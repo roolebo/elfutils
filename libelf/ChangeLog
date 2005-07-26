@@ -1,0 +1,141 @@
+2005-07-23  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf-knowledge.h (SECTION_STRIP_P): Don't handle removal of debug
+	sections here anymore.
+	* elf32_checksum.c: Adjust for change in SECTION_STRIP_P interface.
+
+	* elf_update.c (elf_update): Get write lock, not read lock.
+
+	* elf32_updatenull.c (updatenull): Get section headers if necessary
+	and possible.
+
+2005-07-22  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf32_updatenull.c (updatenull): If program header hasn't been loaded
+	yet, try to do it now.
+	Don't unnecessarily update overflow of section count in zeroth section
+	sh_size field.
+	If section content hasn't been read yet, do it before looking for the
+	block size.  If no section data present, infer size of section header.
+
+2005-05-11  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf.h: Update again.
+
+2005-05-09  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf.h: Update from glibc.
+
+2005-05-08  Roland McGrath  <roland@redhat.com>
+
+	* elf_begin.c (read_file) [_MUDFLAP]: Don't use mmap for now.
+	* elf_update.c (write_file) [_MUDFLAP]: Likewise.
+
+2005-03-29  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf32_checksum.c: Use INTUSE and INTDEF to avoid PLTs.
+	* elf_end.c: Likewise.
+	* elf_getdata.c: Likewise.
+	* gelf_getehdr.c: Likewise.
+	* nlist.c: Likewise.
+	* libelfP.h: Add declarations of internal functions.
+
+2005-02-15  Ulrich Drepper  <drepper@redhat.com>
+
+	* common.h (CONVERT): Make sure all values are unsigned.
+	(CONVERT_TO): Likewise.
+
+	* Makefile.am (AM_CFLAGS): Add -Wformat=2.
+	Fix rule to build libelf.so.
+
+2005-02-06  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: Cleanup AM_CFLAGS handling.  Add -Wunused -Wextra.
+	Remove lint handling.
+	* elf32_getphdr.c: Minor cleanups.
+	* elf32_getshdr.c: Likewise.
+	* elf32_updatefile.c: Likewise.
+	* elf32_updatenull.c: Likewise.
+	* elf_begin.c: Likewise.
+	* elf_error.c: Likewise.
+	* elf_getarsym.c: Likewise.
+	* elf_getdata.c: Likewise.
+	* elf_update.c: Likewise.
+	* gelf_xlate.c: Likewise.
+
+2005-02-05  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: Check for text relocations in constructed DSO.
+
+	* Makefile.am [MUDFLAP] (AM_CFLAGS): Add -Werror -fpic -fmudflap.
+
+2005-02-04  Ulrich Drepper  <drepper@redhat.com>
+
+	* gelf_getehdr.c (gelf_getehdr): Slight optimization.
+
+	* elf32_checksum.c (checksum): Do not look at NOBITS sections.
+
+	* gelf.h: Add gelf_checksum prototype.
+
+2004-09-25  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf32_checksum.c: Make compile with gcc 4.0.
+	* elf32_updatefile.c: Likewise.
+	* elf32_updatenull.c: Likewise.
+	* elf_begin.c: Likewise.
+	* elf_error.c: Likewise.
+	* elf_getdata.c: Likewise.
+	* elf_getident.c: Likewise.
+
+2004-04-01  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf.h: Update from glibc.
+
+2004-01-23  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf_update.c: Fix locking.
+	* elf_clone.c: Likewise.
+
+	* libelf.h: Define ELF_T_LIB.
+	* gelf_getlib.c: New file.
+	* gelf_update_lib.c: New file.
+	* gelf.h: Declare the new functions.  Define GElf_Lib.
+	* abstract.h: Define Lib, Lib32, Lib64.
+	* gelf_xlate.c (__elf_xfctstom): Add ELF_T_LIB entry.
+	* gelf_xlate.h: Add entry for ElfXX_Lib.
+	* elf_getdata.c: Recognize SHT_GNU_LIBLIST as a known section type.
+	* libelf.map: Add new symbols to ELFUTILS_1.1.
+	* Makefile.am (libelf_a_SOURCES): Add gelf_getlib.c and
+	gelf_update_lib.c.
+
+2004-01-17  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: Support building with mudflap.
+
+	* gelf_xlate.c (INLINE3): Avoid using cast as lvalue.
+	* dl-hash.h (_dl_elf_hash): Likewise.
+
+2004-01-05  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf-knowledge.h: New file.  From libelf subdir.
+	* Makefile.am (euincludedir): Define.
+	(euinclude_HEADERS): Add elf-knowledge.h.
+
+2003-09-24  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf.h: Define some PT_IA_64_HP_* constants.
+
+2003-09-23  Jakub Jelinek  <jakub@redhat.com>
+
+	* libelfP.h (struct Elf): Move state.elf64.sizestr_offset after
+	state.elf64.scnincr to match state.elf{,32}.
+
+2003-08-12  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf32_updatefile.c (__updatemmap): When writing back file where
+	some sections have not been read in, count their sizes based on
+	the section header.
+
+2003-08-11  Ulrich Drepper  <drepper@redhat.com>
+
+        * Moved to CVS archive.

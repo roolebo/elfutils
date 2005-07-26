@@ -1,0 +1,13 @@
+2005-07-23  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: Fix rules to allow building with mudflap.
+
+2005-07-21  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (noinst_HEADERS): Add loc2c.c.
+
+	* test2.c (main): Check sscanf result to quiet warning.
+
+2005-07-20  Roland McGrath  <roland@redhat.com>
+
+	* libdwfl-branch merged, creating this direcotry.

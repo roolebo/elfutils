@@ -1,0 +1,4 @@
+#!/bin/bash
+printf 'eu-elflint is only available in the full-featured elfutils package\n' 2>&1
+printf 'See /usr/share/doc/elfutils-@EUVERSION@/FULL'
+exit 1

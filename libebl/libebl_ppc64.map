@@ -1,0 +1,12 @@
+ELFUTILS_1.0 {
+  global:
+    ppc64_backend_name;
+    ppc64_destr;
+    ppc64_init;
+    ppc64_reloc_type_check;
+    ppc64_reloc_type_name;
+    ppc64_reloc_simple_type;
+
+  local:
+    *;
+};

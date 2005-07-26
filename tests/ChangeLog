@@ -1,0 +1,126 @@
+2005-07-21  Ulrich Drepper  <drepper@redhat.com>
+
+	* testfile18.bz2: New file.
+	* run-elflint-test.sh: New file.
+	* Makefile.am (TESTS): Add run-elflint-test.sh.
+	(EXTRA_DIST): Add run-elflint-test.sh and testfile18.bz2.
+
+2005-05-24  Ulrich Drepper  <drepper@redhat.com>
+
+	* get-files.c (main): Use correct format specifier.
+
+2005-05-21  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: Add -Wextra to CFLAGS.
+	* get-files.c: Remove warning this produced.
+	* get-pubnames.c: Likewise.
+	* newfile.c: Likewise.
+	* newscn.c: Likewise.
+	* scnnames.c: Likewise.
+	* showptable.c: Likewise.
+	* test-nlist.c: Likewise.
+	* update1.c: Likewise.
+	* update2.c: Likewise.
+	* update3.c: Likewise.
+	* update4.c: Likewise.
+
+2005-05-08  Ulrich Drepper  <drepper@redhat.com>
+
+	* run-line2addr.sh: Remove testfile14 at the end.
+
+	* run-strip-test.sh: Remove deubinfo test input file as well.
+
+	* Makefile.am (EXTRA_DIST): Newly added files incorrectly used
+	.bz, not .bz2.
+
+2005-05-03  Roland McGrath  <roland@redhat.com>
+
+	* run-strip-test.sh: Use variables for test file names.
+	Optionally produce separate debug file and check it.
+	* run-strip-test2.sh: Use run-strip-test.sh via ., no duplication.
+	* run-strip-test3.sh: Likewise.
+	* run-strip-test4.sh: New file.
+	* run-strip-test5.sh: New file.
+	* run-strip-test6.sh: New file.
+	* testfile15.bz: New file.
+	* testfile15.debug.bz: New file.
+	* testfile16.bz: New file.
+	* testfile16.debug.bz: New file.
+	* testfile17.bz: New file.
+	* testfile17.debug.bz: New file.
+	* Makefile.am (TESTS, EXTRA_DIST): Add them.
+
+2005-04-25  Ulrich Drepper  <drepper@redhat.com>
+
+	* run-line2addr.sh: Also use testfile14.  Adjust for correct
+	return of multiple matches.
+	* testfile14.bz2: New file.
+	* Makefile.am (EXTRA_DIST): Add testfile14.bz2.
+
+	* show-abbrev.c (main): Adjust for dwarf_getabbrev interface change.
+
+2005-04-04  Roland McGrath  <roland@frob.com>
+
+	* line2addr.c (main): Initialize LINES and NLINES before calling
+	dwarf_getsrc_file, and free LINES afterwards.
+
+	* allfcts.c (main): Use size_t for CUHL.
+
+2005-04-04  Ulrich Drepper  <drepper@redhat.com>
+
+	* line2addr.c: New file.
+	* run-line2addr.sh: New file.
+	* Makefile.am: Add rules to build, run, and distribute new code.
+
+2005-04-02  Ulrich Drepper  <drepper@redhat.com>
+
+	* allfcts.c: New file.
+	* run-allfcts.sh: New file.
+	* Makefile.am: Add rules to build, run, and distribute new code.
+
+2005-02-05  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am [MUDFLAP] (AM_CFLAGS): Add -fmudflap.  Link all test
+	programs with -lmudflap.
+
+2004-09-25  Ulrich Drepper  <drepper@redhat.com>
+
+	* asm-tst4.c (main): Add LD_LIBRARY_PATH to elflint invocation.
+	* asm-tst5.c (main): Likewise.
+	* asm-tst6.c (main): Likewise.
+
+2004-01-17  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: Support building with mudflap.
+
+2004-01-12  Ulrich Drepper  <drepper@redhat.com>
+
+	* get-aranges.c: Rewrite to use libdw.
+	* Makefile.am: Reenable get-aranges test.
+
+2004-01-11  Ulrich Drepper  <drepper@redhat.com>
+
+	* get-lines.c: New file.
+	* get-files.c: Adjust for libdw.
+	* run-get-files.sh: Adjust expected result.
+	* run-get-lines.sh: Likewise.
+	* Makefile.am: Run get-lines test.  Don't run get-aranges and
+	get-ciefde test for now.
+
+	* show-abbrev.c: Adjust call to dwarf_getabbrevattr after interface
+	change.  Print attribute offset information.
+	* run-show-abbrev.sh: Adjust expected output.
+
+2004-01-09  Ulrich Drepper  <drepper@redhat.com>
+
+	* show-abbrev.c: Adjust call to dwarf_nextcu after interface change.
+	* show-die-info.c: Likewise.
+	* run-show-die-info.sh: Adjust expected output.
+
+2003-08-13  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.in: Depend on libebl.a, not libebl.so.
+
+2003-08-11  Ulrich Drepper  <drepper@redhat.com>
+
+	* Moved to CVS archive.

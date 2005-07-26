@@ -1,0 +1,39 @@
+2005-05-03  Roland McGrath  <roland@redhat.com>
+
+	* crc32_file.c: New file.
+	* Makefile.am (libeu_a_SOURCES): Add it.
+	* system.h: Declare crc32_file.
+
+2005-04-30  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: Use -ffunction-sections for xmalloc.c.
+
+2005-02-15  Ulrich Drepper  <drepper@redhat.com>
+
+	* dynamicsizehash.c (lookup): Mark val parameter as possibly unused.
+
+2005-02-06  Ulrich Drepper  <drepper@redhat.com>
+
+	* fixedsizehash.h: Mark unused parameters.  Correct CLASS and
+	const order for fshash_find.
+
+	* Makefile.am: Cleanup AM_CFLAGS handling.  Add -Wunused -Wextra.
+
+2005-02-05  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am [MUDFLAP] (AM_CFLAGS): Add -fpic and -fmudflap.
+
+2004-01-17  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: Support building with mudflap.
+
+2003-09-22  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (AM_CFLAGS): Add -fpic.
+
+	* Makefile.am (noinst_HEADERS): Add list.h.
+	* list.h: New file.
+
+2003-08-11  Ulrich Drepper  <drepper@redhat.com>
+
+	* Moved to CVS archive.

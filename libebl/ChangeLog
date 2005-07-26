@@ -1,0 +1,281 @@
+2005-07-23  Ulrich Drepper  <drepper@redhat.com>
+
+	* eblsectionstripp.c: New file.
+	* Makefile.am (gen_SOURCES): Add eblsectionstripp.c.
+	* i386_init.c (i386_init): Install specific debugscn_p callback.
+	* i386_symbol.c (i386_debugscn_p): New function.
+	* libebl.h: Declare ebl_section_strip_p.
+	* libebl_i386.h: Declare i386_debugscn_p.
+
+	* libebl.h: Move Ebl definition to...
+	* libeblP.h: ...here.
+
+2005-07-21  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (install-ebl-modules): New target, commands from ...
+	(install): ... here.  Make this depend on it.
+	(LIBEBL_SUBDIR): New variable, substituted by configure.
+	(install-ebl-modules): Install in $(libdir)/$(LIBEBL_SUBDIR).
+	* eblopenbackend.c (openbackend): Use LIBEBL_SUBDIR in module name.
+
+2005-07-21  Ulrich Drepper  <drepper@redhat.com>
+
+	* eblcopyrelocp.c: New file.
+	* Makefile.am (gen_SOURCES): Add eblcopyrelocp.c.
+	* libebl.h: Declare ebl_copy_reloc_p.
+	* eblopenbackend.c (fill_defaults): Fill in copy_reloc_p.
+	(default_copy_reloc_p): New function.
+	* alpha_init.c: Define and use arch-specific copy_reloc_p function.
+	* alpha_symbol.c: Likewise.
+	* arm_init.c: Likewise.
+	* arm_symbol.c: Likewise.
+	* i386_init.c: Likewise.
+	* i386_symbol.c: Likewise.
+	* ia64_init.c: Likewise.
+	* ia64_symbol.c: Likewise.
+	* ppc64_init.c: Likewise.
+	* ppc64_symbol.c: Likewise.
+	* ppc_init.c: Likewise.
+	* ppc_symbol.c: Likewise.
+	* sh_init.c: Likewise.
+	* sh_symbol.c: Likewise.
+	* sparc_init.c: Likewise.
+	* sparc_symbol.c: Likewise.
+	* x86_64_init.c: Likewise.
+	* x86_64_symbol.c: Likewise.
+	* libebl_alpha.h: Declare the copy_reloc_p function.
+	* libebl_arm.h: Likewise.
+	* libebl_i386.h: Likewise.
+	* libebl_ia64.h: Likewise.
+	* libebl_ppc.h: Likewise.
+	* libebl_ppc64.h: Likewise.
+	* libebl_sh.h: Likewise.
+	* libebl_sparc.h: Likewise.
+	* libebl_x86_64.h: Likewise.
+
+2005-05-31  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (libebl_*_so_SOURCES): Set to $(*_SRCS) so dependency
+	tracking works right.
+
+2005-05-21  Ulrich Drepper  <drepper@redhat.com>
+
+	* libebl_x86_64.map: Add x86_64_core_note.
+
+2005-05-19  Roland McGrath  <roland@redhat.com>
+
+	* libebl_i386.map: Add i386_reloc_valid_use, i386_reloc_simple_type.
+	* libebl_ppc.map: Add ppc_reloc_simple_type.
+	* libebl_ppc64.map: Add ppc64_reloc_simple_type.
+	* libebl_x86_64.map: Add x86_64_reloc_simple_type.
+
+2005-05-11  Ulrich Drepper  <drepper@redhat.com>
+
+	* eblcorenote.c: Handle new AT_* values and files with different
+	endianess.
+	* Makefile.am (x86_64_SRCS): Add x86_64_corenote.c.
+	* x86-64_corenote.c: New file.
+	* x86_64_init.c: Hook in x86_64_corenote.
+	* i386_corenote.c: Make file usable on 64-bit platforms.
+
+	* eblopenbackend.c: If modules version comparison fails, reinitialize
+	hooks.
+
+2005-05-10  Ulrich Drepper  <drepper@redhat.com>
+
+	* eblopenbackend.c: Require the init function to return a string.
+	Compare it with MODVERSION from config.h.
+	* alpha_init.c: Change return type.  Return MODVERSION or NULL.
+	* arm_init.c: Likewise.
+	* eblopenbackend.c: Likewise.
+	* i386_init.c: Likewise.
+	* ia64_init.c: Likewise.
+	* ppc64_init.c: Likewise.
+	* ppc_init.c: Likewise.
+	* sh_init.c: Likewise.
+	* sparc_init.c: Likewise.
+	* x86_64_init.c: Likewise.
+	* libeblP.h: Adjust ebl_bhinit_t.
+	* libebl_alpha.h: Adjust init function prototype.
+	* libebl_arm.h: Likewise.
+	* libebl_i386.h: Likewise.
+	* libebl_ia64.h: Likewise.
+	* libebl_ppc.h: Likewise.
+	* libebl_ppc64.h: Likewise.
+	* libebl_sh.h: Likewise.
+	* libebl_sparc.h: Likewise.
+	* libebl_x86_64.h: Likewise.
+
+	* mips_destr.c: Removed.
+	* mips_init.c: Removed.
+	* mips_symbol.c: Removed.
+	* libebl_mips.h: Removed.
+	* libebl_mips.map: Removed.
+
+2005-05-03  Roland McGrath  <roland@redhat.com>
+
+	* libebl.h (Ebl): Add `reloc_simple_type' member.
+	* eblopenbackend.c (default_reloc_simple_type): New function.
+	(openbackend): Use that as default reloc_simple_type callback.
+	* eblrelocsimpletype.c: New file.
+	* Makefile.am (gen_SOURCES): Add it.
+	* i386_symbol.c (i386_reloc_simple_type): New function.
+	* libebl_i386.h: Declare it.
+	* i386_init.c (i386_init): Use it.
+	* x86_64_symbol.c (x86_64_reloc_simple_type): New function.
+	* libebl_x86_64.h: Declare it.
+	* x86_64_init.c (x86_64_init): Use it.
+	* ppc_symbol.c (ppc_reloc_simple_type): New function.
+	* libebl_ppc.h: Declare it.
+	* ppc_init.c (ppc_init): Use it.
+	* ppc64_symbol.c (ppc64_reloc_simple_type): New function.
+	* libebl_ppc64.h: Declare it.
+	* ppc64_init.c (ppc64_init): Use it.
+
+2005-03-17  Ulrich Drepper  <drepper@redhat.com>
+
+	* eblcorenote.c (ebl_core_note): Add support for AT_SECURE.
+
+2005-02-15  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (AM_CFLAGS): Add -Wformat=2.
+
+2005-02-14  Ulrich Drepper  <drepper@redhat.com>
+
+	* alpha_destr.c: Add __attribute__((unused)) where needed.
+	* alpha_init.c: Likewise.
+	* alpha_symbol.c: Likewise.
+	* arm_destr.c: Likewise.
+	* arm_init.c: Likewise.
+	* arm_symbol.c: Likewise.
+	* i386_corenote.c: Likewise.
+	* i386_destr.c: Likewise.
+	* i386_init.c: Likewise.
+	* i386_symbol.c: Likewise.
+	* ia64_destr.c: Likewise.
+	* ia64_init.c: Likewise.
+	* ia64_symbol.c: Likewise.
+	* mips_destr.c: Likewise.
+	* mips_init.c: Likewise.
+	* mips_symbol.c: Likewise.
+	* ppc64_destr.c: Likewise.
+	* ppc64_init.c: Likewise.
+	* ppc64_symbol.c: Likewise.
+	* ppc_destr.c: Likewise.
+	* ppc_init.c: Likewise.
+	* ppc_symbol.c: Likewise.
+	* sh_destr.c: Likewise.
+	* sh_init.c: Likewise.
+	* sh_symbol.c: Likewise.
+	* sparc_destr.c: Likewise.
+	* sparc_init.c: Likewise.
+	* sparc_symbol.c: Likewise.
+	* x86_64_destr.c: Likewise.
+	* x86_64_init.c: Likewise.
+	* x86_64_symbol.c: Likewise.
+
+	* x86_64_symbol.c (reloc_map_table): Fix entries for R_X86_64_64
+	and R_X86_64_32..
+
+2005-02-06  Ulrich Drepper  <drepper@redhat.com>
+
+	* eblstrtab.c: A few cleanups.
+
+	* eblopenbackend.c: Mark unused parameters.
+
+	* eblgstrtab.c: Cleanups a few printf format strings.
+
+	* Makefile.am: Cleanup AM_CFLAGS handling.  Add -Wunused -Wextra.
+
+2005-02-05  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: Check for text relocations in constructed DSOs.
+
+	* eblstrtab.c: Minor cleanups.
+
+	* Makefile.am (AM_CFLAGS): Add -std=gnu99 and -fmudflap for MUDFLAP.
+
+2004-08-16  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (AM_CFLAGS): Add LIBSTR definition with base name of
+	the lib directory.
+	* eblopenbackend.c (openbackend): Use LIBSTR instead of hardcoded
+	lib in path to ebl modules.
+
+2004-04-01  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: Add rules for ppc and ppc64 ebl module.
+	* ppc_init..c: New file.
+	* ppc_destr.c: New file.
+	* ppc_symbol.c: New file.
+	* libebl_ppc.h: New file.
+	* libebl_ppc.map: New file.
+	* ppc64_init..c: New file.
+	* ppc64_destr.c: New file.
+	* ppc64_symbol.c: New file.
+	* libebl_ppc64.h: New file.
+	* libebl_ppc64.map: New file.
+
+2004-01-20  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: Support building with mudflap.
+
+2004-01-18  Ulrich Drepper  <drepper@redhat.com>
+
+	* libeblP.h (_): Use elfutils domain.
+
+2004-01-16  Ulrich Drepper  <drepper@redhat.com>
+
+	* eblsectionname.c: Add support for SHN_BEFORE and SHN_AFTER.
+
+2004-01-13  Ulrich Drepper  <drepper@redhat.com>
+
+	* eblsegmenttypename.c ((ebl_segment_type_name): Add support for
+	PT_GNU_RELRO.
+
+2004-01-08  Ulrich Drepper  <drepper@redhat.com>
+
+	* libebl.h: Remove last traces of libtool.
+
+2004-01-05  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf-knowledge.h: Move to libelf subdir.
+
+	* Makefile.am (EXTRA_DIST): Remove libebl.map.
+	* libebl.map: Removed.
+
+2003-12-08  Ulrich Drepper  <drepper@redhat.com>
+
+	* eblsectiontypename.c (ebl_section_type_name): Add support for
+	SHT_SUNW_move, SHT_CHECKSUM, and SHT_GNU_LIBLIST.
+
+2003-11-19  Ulrich Drepper  <drepper@redhat.com>
+
+	* ia64_symbol.c (ia64_dynamic_tag_name): New function.
+	* libebl_ia64.h (ia64_dynamic_tag_name): Declare.
+	* ia64_init.c (ia64_init): Register i164_dynamic_tag_name.
+
+2003-09-24  Ulrich Drepper  <drepper@redhat.com>
+
+	* ia64_init.c (ia64_init): Initialize segment_type_name callback.
+	* ia64_symbol.c (ia64_segment_type_name): Define.
+	* libebl_ia64.h (ia64_segment_type_name): Declare.
+
+2003-09-22  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (AM_CFLAGS): Add -fpic.
+
+2003-08-14  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (install): Remove dependency on libebl.so.
+
+2003-08-13  Ulrich Drepper  <drepper@redhat.com>
+
+	* eblopenbackend.c: Adjust relative path to arch-specific DSOs
+	assuming the code ends up in the application.  Add second dlopen()
+	try without any path, just the filename.
+	* Makefile.in: Remove rules to build and install libebl.so.
+
+2003-08-11  Ulrich Drepper  <drepper@redhat.com>
+
+        * Moved to CVS archive.

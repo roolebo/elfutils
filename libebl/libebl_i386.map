@@ -1,0 +1,14 @@
+ELFUTILS_1.0 {
+  global:
+    i386_backend_name;
+    i386_core_note;
+    i386_destr;
+    i386_init;
+    i386_reloc_type_check;
+    i386_reloc_type_name;
+    i386_reloc_valid_use;
+    i386_reloc_simple_type;
+
+  local:
+    *;
+};

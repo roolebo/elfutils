@@ -1,0 +1,413 @@
+2005-07-24  Ulrich Drepper  <drepper@redhat.com>
+
+	* elfcmp.c: Implement comparing gaps between sections.
+
+2005-07-23  Ulrich Drepper  <drepper@redhat.com>
+
+	* elflint.c: Include libeblP.h instead of libebl.h.
+	* nm.c: Likewise.
+	* readelf.c: Likewise.
+	* elfcmp.c: Likewise.
+
+	* elfcmp.c (main): Compare individual ELF header fields, excluding
+	e_shoff instead of the whole struct at once.
+	Use ebl_section_strip_p instead of SECTION_STRIP_P.
+	* strip.c: Use ebl_section_strip_p instead of SECTION_STRIP_P.
+
+2005-07-22  Ulrich Drepper  <drepper@redhat.com>
+
+	* elfcmp.c (main): Take empty section into account when comparing
+	section content.
+
+	* elflint.c (check_dynamic): Check that d_tag value is >= 0 before
+	using it.
+
+2005-07-21  Ulrich Drepper  <drepper@redhat.com>
+
+	* elfcmp.c: New file.
+	* Makefile.am (bin_PROGRAMS): Add elfcmp.
+	(elfcmp_LDADD): Define.
+
+	* elflint.c (check_rela): Check that copy relocations only reference
+	object symbols or symbols with unknown type.
+	(check_rel): Likewise.
+
+2005-06-08  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (print_ops): Add consts.
+
+2005-05-31  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (print_debug_abbrev_section): Don't bail after first CU's
+	abbreviations.  Print a header line before each CU section.
+
+	* readelf.c (print_debug_loc_section): Fix indentation for larger
+	address size.
+
+2005-05-30  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (print_debug_line_section): Print section offset of each
+	CU's table, so they are easy to find from seeing the stmt_list value.
+
+	* readelf.c (dwarf_attr_string): Add all attributes in <dwarf.h>.
+	(attr_callback): Grok DW_AT_ranges and print offset in hex.
+
+	* readelf.c (attr_callback): Add 2 to addrsize * 2 for %#0* format.
+	(print_debug_ranges_section, print_debug_loc_section): Likewise.
+
+	* readelf.c (print_ops): Take different args for indentation control.
+	(attr_callback): Caller updated.
+	Grok several more block-form attributes as being location expressions.
+	For those same attributes with udata forms, format output differently
+	for location list offset.
+	(print_debug_loc_section): Implement it for real.
+
+	* readelf.c (options): Mention ranges for --debug-dump.
+	(enum section_e): Add section_ranges.
+	(parse_opt): Grok "ranges" for -w/--debug-dump.
+	(print_debug_ranges_section): New function.
+	(print_debug): Handle .debug_ranges section.
+
+2005-05-30  Ulrich Drepper  <drepper@redhat.com>
+
+	* readelf.c (handle_notes): At least x86-64 need not have the note
+	section values aligned to 8 bytes.
+
+2005-05-18  Ulrich Drepper  <drepper@redhat.com>
+
+	* readelf.c (dwarf_tag_string): Add new tags.
+
+2005-05-08  Roland McGrath  <roland@redhat.com>
+
+	* strip.c (handle_elf): Don't translate hash and versym data formats,
+	elf_getdata already did it for us.
+
+2005-05-07  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (findtextrel_LDADD): Add $(libmudflap).
+	(addr2line_LDADD): Likewise.
+
+2005-05-03  Roland McGrath  <roland@redhat.com>
+
+	* strip.c (handle_elf): Apply symbol table fixups to discarded
+	relocation sections when they are being saved in the debug file.
+
+	* strip.c (handle_elf): Pass EHDR->e_ident[EI_DATA] to gelf_xlatetom
+	and gelf_xlatetof, not the native byte order.
+
+	* strip.c (parse_opt): Give error if -f or -o is repeated.
+	(main): Exit if argp_parse returns nonzero.
+
+	* strip.c (debug_fname_embed): New variable.
+	(options, parse_opt): New option -F to set it.
+
+2005-05-07  Ulrich Drepper  <drepper@redhat.com>
+
+	* readelf.c (parse_opt): Make any_control_option variable
+	local.  Simplify some tests.
+
+2005-05-03  Roland McGrath  <roland@redhat.com>
+
+	* strip.c (crc32_file): Function removed (now in ../lib).
+
+2005-05-03  Roland McGrath  <roland@redhat.com>
+
+	* elflint.c (is_debuginfo): New variable.
+	(options, parse_opt): New option --debuginfo/-d to set it.
+	(check_sections): If is_debuginfo, don't complain about SHT_NOBITS.
+	(check_note): If is_debuginfo, don't try to get note contents.
+
+2005-04-24  Ulrich Drepper  <drepper@redhat.com>
+
+	* readelf.c (print_debug_abbrev_section): Don't print error when end of
+	section reached.
+
+2005-04-14  Ulrich Drepper  <drepper@redhat.com>
+
+	* readelf.c (dwarf_encoding_string): New function.
+	(dwarf_inline_string): New function.
+	(dwarf_access_string): New function.
+	(dwarf_visibility_string): New function.
+	(dwarf_virtuality_string): New function.
+	(dwarf_identifier_case_string): New function.
+	(dwarf_calling_convention_string): New function.
+	(dwarf_ordering_string): New function.
+	(dwarf_discr_list_string): New function.
+	(attr_callback): Decode man more attribute values.
+
+2005-04-01  Ulrich Drepper  <drepper@redhat.com>
+
+	* addr2line.c: Finish implementation of -f option.
+
+2005-03-29  Ulrich Drepper  <drepper@redhat.com>
+
+	* addr2line.c: New file.
+	* Makefile.am (bin_PROGRAMS): Add addr2line.
+	Define addr2line_LDADD.
+
+	* findtextrel.c: Use new dwarf_addrdie function.
+
+	* findtextrel.c: Fix usage message and re-add accidentally removed
+	line.
+
+2005-03-28  Ulrich Drepper  <drepper@redhat.com>
+
+	* findtextrel.c: New file.
+	* Makefile: Add rules to build findtextrel.
+
+2005-02-15  Ulrich Drepper  <drepper@redhat.com>
+
+	* ldlex.l: Provide ECHO definition to avoid warning.
+
+	* elflint.c (check_program_header): Fix typo in RELRO test.
+
+	* Makefile.am (AM_CFLAGS): Add more warning options.
+	* elflint.c: Fix warnings introduced by the new warning options.
+	* i386_ld.c: Likewise.
+	* ld.c: Likewise.
+	* ld.h: Likewise.
+	* ldgeneric.c: Likewise.
+	* nm.c: Likewise.
+	* readelf.c: Likewise.
+	* sectionhash.c: Likewise.
+	* size.c: Likewise.
+	* string.c: Likewise.
+
+2005-02-05  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: Check for text relocations in constructed DSOs.
+
+	* Makefile.am [MUDFLAP] (AM_CFLAGS): Add -fmudflap.  Link all apps
+	with -lmudflap.
+
+	* ldscript.y: Add as_needed handling.
+	* ldlex.l: Recognize AS_NEEDED token.
+	* ld.h (struct filename_list): Add as_needed flag.
+
+2005-02-04  Ulrich Drepper  <drepper@redhat.com>
+
+	* elflint.c (check_symtab): Correctly determine size of GOT section.
+
+2005-01-19  Ulrich Drepper  <drepper@redhat.com>
+
+	* ld.c: Remove unnecessary more_help function.  Print bug report
+	address using argp.
+	* strip.c: Likewise.
+	* size.c: Likewise.
+	* nm.c: Likewise.
+	* readelf.c: Likewise.
+	* elflint.c: Likewise.
+
+	* elflint.c (main): Don't check for parameter problems here.
+	(parse_opt): Do it here, where we get informed about some of them
+	anyway.
+
+	* readelf.c (main): Don't check for parameter problems here.
+	(parse_opt): Do it here, where we get informed about some of them
+	anyway.
+
+2005-01-11  Ulrich Drepper  <drepper@redhat.com>
+
+	* strip.c: Update copyright year.
+	* readelf.c: Likewise.
+	* size.c: Likewise.
+	* nm.c: Likewise.
+	* ld.c: Likewise.
+	* elflint.c: Likewise.
+
+	* elflint.c (check_symtab): Don't warn about wrong size for
+	_DYNAMIC and __GLOBAL_OFFSET_TABLE__ for --gnu-ld.
+
+2004-10-05  Ulrich Drepper  <drepper@redhat.com>
+
+	* readelf.c (print_phdr): In section mapping, also indicate
+	sections in read-only segments.
+
+2004-09-25  Ulrich Drepper  <drepper@redhat.com>
+
+	* readelf.c: Make compile with gcc 4.0.
+	* strip.c: Likewise.
+
+2004-08-16  Ulrich Drepper  <drepper@redhat.com>
+
+	* strip.c (handle_elf): Rewrite dynamic memory handling to use of
+	allocate to work around gcc 3.4 bug.
+
+2004-01-25  Ulrich Drepper  <drepper@redhat.com>
+
+	* ldlex.l (invalid_char): Better error message.
+
+2004-01-23  Ulrich Drepper  <drepper@redhat.com>
+
+	* readelf.c: Print SHT_GNU_LIBLIST sections.
+
+	* none_ld.c: New file.
+
+2004-01-21  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: Enable building of machine specific linker.
+
+2004-01-20  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: Support building with mudflap.
+
+	* i386_ld.c: Fix warnings gcc 3.4 spits out.
+	* ldgeneric.c: Likewise.
+	* ldscript.y: Likewise.
+	* readelf.c: Likewise.
+	* strip.c: Likewise.
+
+	* readelf.c (print_debug_line_section): Determine address size
+	correctly.
+
+2004-01-19  Ulrich Drepper  <drepper@redhat.com>
+
+	* readelf.c (print_phdr): Show which sections are covered by the
+	PT_GNU_RELRO entry.
+
+	* elflint.c (check_program_header): Check PT_GNU_RELRO entry.
+
+	* readelf.c (print_debug_macinfo_section): Implement.
+
+2004-01-18  Ulrich Drepper  <drepper@redhat.com>
+
+	* readelf.c (print_debug_line_section): Implement.
+
+2004-01-17  Ulrich Drepper  <drepper@redhat.com>
+
+	* src/elflint.c: Use PACKAGE_NAME instead of PACKAGE.
+	* src/ld.c: Likewise.
+	* src/nm.c: Likewise.
+	* src/readelf.c: Likewise.
+	* src/size.c: Likewise.
+	* src/strip.c: Likewise.
+
+	* strip.c: Add a few more unlikely.  Reduce scope of some variables.
+
+	* Makefile.am: Support building with mudflap.
+
+2004-01-16  Ulrich Drepper  <drepper@redhat.com>
+
+	* readelf.c (print_debug_info_section): Free dies memory.
+
+	* readelf.c: Print .debug_info section content.
+
+2004-01-13  Ulrich Drepper  <drepper@redhat.com>
+
+	* readelf.c (print_shdr): Add support for SHF_ORDERED and SHF_EXCLUDE.
+
+2004-01-12  Ulrich Drepper  <drepper@redhat.com>
+
+	* readelf.c (print_debug_aranges): Implement using libdw.
+
+2004-01-11  Ulrich Drepper  <drepper@redhat.com>
+
+	* nm.c: Adjust for Dwarf_Files type and dwarf_lineno interface change.
+
+	* readelf.c: Use libdw instead of libdwarf.  Not all of the old
+	behavior is available yet.
+	* Makefile.am: Link readelf with libdw.  Remove libdwarf include path.
+
+2004-01-09  Ulrich Drepper  <drepper@redhat.com>
+
+	* nm.c (get_local_names): Adjust call to dwarf_nextcu.
+
+	* nm.c: Implement getting information about local variables.
+
+2004-01-07  Ulrich Drepper  <drepper@redhat.com>
+
+	* nm.c: Read also debug information for local symbols.
+
+2004-01-05  Ulrich Drepper  <drepper@redhat.com>
+
+	* nm.c: Shuffle dwarf handling code around so the maximum column
+	width can be computed ahead of printing.  Avoid collection symbols
+	which are not printed anyway.
+
+	* nm.c: Rewrite dwarf handling to use libdw.
+	* Makefile.am (AM_CFLAGS): Add -std parameter.
+	(INCLUDES): Find header in libdw subdir.
+	(nm_LDADD): Replace libdwarf with libdw.
+
+	* elflint.c: Update copyright year.
+	* readelf.c: Likewise.
+	* size.c: Likewise.
+	* strip.c: Likewise.
+	* nm.c: Likewise.
+
+2003-12-31  Ulrich Drepper  <drepper@redhat.com>
+
+	* strip.c (process_file): Close file before returning.
+
+2003-11-19  Ulrich Drepper  <drepper@redhat.com>
+
+	* readelf.c (handle_dynamic): Make column for tag name wider.
+
+2003-09-29  Ulrich Drepper  <drepper@redhat.com>
+
+	* readelf.c (handle_dynamic): Always terminate tag name with a space.
+
+2003-09-25  Ulrich Drepper  <drepper@redhat.com>
+
+	* strip.c (process_file): Don't mmap the input file, we modify the
+	data structures and don't want the change end up on disk.
+
+2003-09-23  Jakub Jelinek  <jakub@redhat.com>
+
+	* unaligned.h (union u_2ubyte_unaligned,
+	union u_4ubyte_unaligned, union u_8ubyte_unaligned): Add
+	packed attribute.
+	(add_2ubyte_unaligned, add_4ubyte_unaligned,
+	add_8ubyte_unaligned): Avoid nesting bswap_NN macros.
+	Read/store value through _ptr->u instead of *_ptr.
+
+2003-09-22  Ulrich Drepper  <drepper@redhat.com>
+
+	* size.c (show_sysv): Change type of maxlen to int.
+
+	* strip.c (handle_elf): Handle the 64-bit archs which is 64-bit
+	buckets.
+
+	* i386_ld.c: Many many fixes and extensions.
+	* ld.c: Likewise.
+	* ldgeneric.c: Likewise.
+
+2003-08-16  Ulrich Drepper  <drepper@redhat.com>
+
+	* ldgeneric.c (check_definition): Don't add symbol on dso_list if
+	the reference is from another DSO.
+
+2003-08-15  Ulrich Drepper  <drepper@redhat.com>
+
+	* ldgeneric.c (find_entry_point): It is no fatal error if no entry
+	point is found when creating a DSO.
+
+2003-08-14  Ulrich Drepper  <drepper@redhat.com>
+
+	* ld.c (main): Always call FLAG_UNRESOLVED.
+	* ldgeneric.c (ld_generic_flag_unresolved): Only complain about
+	undefined symbols if not creating DSO or ld_state.nodefs is not set.
+
+2003-08-13  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.in: Depend on libebl.a, not libebl.so.
+
+	* ld.c (main): Mark stream for linker script as locked by caller.
+	(read_version_script): Likewise.
+	* ldlex.c: Define fread and fwrite to _unlocked variant.
+
+	* i386_ld.c (elf_i386_finalize_plt): Replace #ifdefs with uses of
+	target_bswap_32.
+	* unaligned.h: Define target_bswap_16, target_bswap_32, and
+	target_bswap_64.
+	(store_2ubyte_unaligned, store_4ubyte_unaligned,
+	store_8ubyte_unaligned): Define using new macros.
+
+2003-08-12  Ulrich Drepper  <drepper@redhat.com>
+
+	* i386_ld.c (elf_i386_finalize_plt): Use packed structs to access
+	possibly unaligned memory.  Support use of big endian machines.
+
+2003-08-11  Ulrich Drepper  <drepper@redhat.com>
+
+	* Moved to CVS archive.

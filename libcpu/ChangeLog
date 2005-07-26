@@ -1,0 +1,11 @@
+2005-02-15  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile (AM_CFLAGS): Add -Wunused -Wextra -Wformat=2.
+
+2005-02-05  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (AM_CFLAGS): Define, instead of adding things to DEFS.
+
+2003-08-11  Ulrich Drepper  <drepper@redhat.com>
+
+	* Moved to CVS archive.

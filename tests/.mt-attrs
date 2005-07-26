@@ -1,0 +1,60 @@
+file "run-allfcts.sh"
+execute "true"
+
+file "run-arextract.sh"
+execute "true"
+
+file "run-arsymtest.sh"
+execute "true"
+
+file "run-ecp-test2.sh"
+execute "true"
+
+file "run-ecp-test.sh"
+execute "true"
+
+file "run-elflint-test.sh"
+execute "true"
+
+file "run-get-aranges.sh"
+execute "true"
+
+file "run-get-files.sh"
+execute "true"
+
+file "run-get-lines.sh"
+execute "true"
+
+file "run-get-pubnames.sh"
+execute "true"
+
+file "run-line2addr.sh"
+execute "true"
+
+file "run-show-abbrev.sh"
+execute "true"
+
+file "run-show-ciefde.sh"
+execute "true"
+
+file "run-show-die-info.sh"
+execute "true"
+
+file "run-strip-test2.sh"
+execute "true"
+
+file "run-strip-test3.sh"
+execute "true"
+
+file "run-strip-test4.sh"
+execute "true"
+
+file "run-strip-test5.sh"
+execute "true"
+
+file "run-strip-test6.sh"
+execute "true"
+
+file "run-strip-test.sh"
+execute "true"
+

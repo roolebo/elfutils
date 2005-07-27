@@ -1,3 +1,7 @@
+2005-07-27  Ulrich Drepper  <drepper@redhat.com>
+
+	* elfcmp.c: Print name and index of differing section.
+
 2005-07-24  Ulrich Drepper  <drepper@redhat.com>
 
 	* elfcmp.c: Implement comparing gaps between sections.

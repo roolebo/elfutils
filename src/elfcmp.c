@@ -295,9 +295,19 @@ main (int argc, char *argv[])
 		  || sym1->st_shndx != sym1->st_shndx)
 		{
 		  // XXX Do we want to allow reordered symbol tables?
+		symtab_mismatch:
 		  if (! quiet)
-		    error (0, 0, gettext ("%s %s differ: symbol table"),
-			   fname1, fname2);
+		    {
+		      if (elf_ndxscn (scn1) == elf_ndxscn (scn2))
+			error (0, 0,
+			       gettext ("%s %s differ: symbol table [%zu]"),
+			       fname1, fname2, elf_ndxscn (scn1));
+		      else
+			error (0, 0, gettext ("\
+%s %s differ: symbol table [%zu,%zu]"),
+			       fname1, fname2, elf_ndxscn (scn1),
+			       elf_ndxscn (scn2));
+		    }
 		  result = 1;
 		  goto out;
 		}
@@ -315,13 +325,7 @@ main (int argc, char *argv[])
 		     symbol.  */
 		  if (search_for_copy_reloc (ebl1, elf_ndxscn (scn1), ndx)
 		      || search_for_copy_reloc (ebl2, elf_ndxscn (scn2), ndx))
-		    {
-		      if (! quiet)
-			error (0, 0, gettext ("%s %s differ: symbol table"),
-			       fname1, fname2);
-		      result = 1;
-		      goto out;
-		    }
+		    goto symtab_mismatch;
 		}
 	    }
 	  break;
@@ -338,8 +342,18 @@ main (int argc, char *argv[])
 		  && memcmp (data1->d_buf, data2->d_buf, data1->d_size) != 0))
 	    {
 	      if (! quiet)
-		error (0, 0, gettext ("%s %s differ: section content"),
-		       fname1, fname2);
+		{
+		  if (elf_ndxscn (scn1) == elf_ndxscn (scn2))
+		    error (0, 0, gettext ("\
+%s %s differ: section [%zu] '%s' content"),
+			   fname1, fname2, elf_ndxscn (scn1), sname1);
+		  else
+		  if (elf_ndxscn (scn1) == elf_ndxscn (scn2))
+		    error (0, 0, gettext ("\
+%s %s differ: section [%zu,%zu] '%s' content"),
+			   fname1, fname2, elf_ndxscn (scn1),
+			   elf_ndxscn (scn2), sname1);
+		}
 	      result = 1;
 	      goto out;
 	    }

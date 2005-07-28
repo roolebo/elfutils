@@ -147,10 +147,8 @@ rm -rf ${RPM_BUILD_ROOT}
 #%{_bindir}/eu-ld
 #%{_libdir}/libasm-%{version}.so
 %{_libdir}/libdw-%{version}.so
-%{_libdir}/libdwfl-%{version}.so
 #%{_libdir}/libasm.so.*
 %{_libdir}/libdw.so.*
-%{_libdir}/libdwfl.so.*
 %dir %{_libdir}/elfutils
 %{_libdir}/elfutils/lib*.so
 %endif

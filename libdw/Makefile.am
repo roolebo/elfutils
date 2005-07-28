@@ -72,7 +72,7 @@ am_libdw_pic_a_OBJECTS = $(libdw_a_SOURCES:.c=.os)
 
 libdw_so_SOURCES =
 libdw.so: $(srcdir)/libdw.map libdw_pic.a \
-	  ../libdwfl/libdwfl_pic.a ../libebl/libebl.a ../lib/libeu.a \
+	  ../libdwfl/libdwfl_pic.a ../libebl/libebl.a \
 	  ../libelf/libelf.so
 	$(CC) -shared -o $@ -Wl,--soname,$@.$(VERSION),-z,defs \
 	      -Wl,--version-script,$<,--no-undefined \
@@ -80,7 +80,6 @@ libdw.so: $(srcdir)/libdw.map libdw_pic.a \
 	      -ldl
 	if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
 	ln -fs $@ $@.$(VERSION)
-
 
 %.os: %.c %.o
 	if $(COMPILE) -c -o $@ -fpic -DPIC -DSHARED -MT $@ -MD -MP \
@@ -102,6 +101,8 @@ uninstall: uninstall-am
 	rm -f $(DESTDIR)$(libdir)/libdw.so
 	rmdir --ignore-fail-on-non-empty $(DESTDIR)$(includedir)/elfutils
 endif
+
+libdw_a_LIBADD = $(addprefix ../libdwfl/,$(shell $(AR) t ../libdwfl/libdwfl.a))
 
 noinst_HEADERS = libdwP.h memory-access.h dwarf_abbrev_hash.h
 

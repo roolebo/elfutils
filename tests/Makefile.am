@@ -110,6 +110,6 @@ asm_tst6_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap)
 asm_tst7_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap)
 asm_tst8_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap)
 asm_tst9_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap)
-dwflmodtest_LDADD = $(libdw) $(libelf) $(libmudflap)
+dwflmodtest_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap)
 
 CLEANFILES = xxx

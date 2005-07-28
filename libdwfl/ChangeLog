@@ -1,3 +1,13 @@
+2005-07-28  Ulrich Drepper  <drepper@redhat.com>
+
+	* libdwfl_crc32.c: New file.
+	* libdwfl_crc32_file.c: New file.
+	* libdwflP.h: Declare the new functions.
+	* Makefile.am (libdwfl_a_SOURCES): Add libdwfl_crc32.c and
+	libdwfl_crc32_file.c.
+	* libdwfl/find-debuginfo.c (check_crc): Use __libdwfl_crc32_file
+	instead of crc32_file.
+
 2005-07-28  Roland McGrath  <roland@redhat.com>
 
 	* ptest.c: Moved to ../tests/dwflmodtest.c.

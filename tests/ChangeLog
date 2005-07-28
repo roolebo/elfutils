@@ -1,3 +1,7 @@
+2005-07-28  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (dwflmodtest_LDADD): Add $(libebl).
+
 2005-07-28  Roland McGrath  <roland@redhat.com>
 
 	* dwflmodtest.c: New file, moved from ../libdwfl/ptest.c to here.

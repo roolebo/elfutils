@@ -54,7 +54,8 @@ static inline bool
 check_crc (int fd, GElf_Word debuglink_crc)
 {
   uint32_t file_crc;
-  return crc32_file (fd, &file_crc) == 0 && file_crc == debuglink_crc;
+  return (__libdwfl_crc32_file (fd, &file_crc) == 0
+	  && file_crc == debuglink_crc);
 }
 
 int

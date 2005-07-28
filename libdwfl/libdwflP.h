@@ -205,6 +205,10 @@ extern Dwfl_Error __libdwfl_cu_getsrclines (struct dwfl_cu *cu)
      internal_function;
 
 
+extern uint32_t __libdwfl_crc32 (uint32_t crc, unsigned char *buf, size_t len)
+     attribute_hidden;
+extern int __libdwfl_crc32_file (int fd, uint32_t *resp) attribute_hidden;
+
 
 
 /* Avoid PLT entries.  */

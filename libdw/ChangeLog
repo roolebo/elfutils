@@ -1,3 +1,8 @@
+2005-07-28  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (libdw.so): No need to link with libeu.a anymore.
+	(libdw_a_LIBADD): Add all files from libdwfl.a.
+
 2005-07-27  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am (libdw.so): Link ../libdwfl/libdwfl_pic.a in,

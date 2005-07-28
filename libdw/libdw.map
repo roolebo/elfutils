@@ -1,5 +1,4 @@
-ELFUTILS_0 { };
-ELFUTILS_0.111 {
+ELFUTILS_1.0 {
   global:
     dwarf_abbrevhaschildren;
     dwarf_addrdie;
@@ -90,4 +89,4 @@ ELFUTILS_0.111 {
 
   local:
     *;
-} ELFUTILS_0;
+};

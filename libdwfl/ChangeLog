@@ -1,5 +1,7 @@
 2005-07-28  Roland McGrath  <roland@redhat.com>
 
+	* ptest.c: Moved to ../tests/dwflmodtest.c.
+
 	* Makefile.am (noinst_PROGRAMS): Variable removed.
 	(libdwfl_so_SOURCES, libdwfl_LIBS, libdwfl_so_LDADD): Likewise.
 	(EXTRA_DIST, ptest_LDADD, test2_LDADD): Likewise.

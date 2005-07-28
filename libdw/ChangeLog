@@ -1,7 +1,5 @@
 2005-07-27  Roland McGrath  <roland@redhat.com>
 
-	* ptest.c: Moved to ../tests/dwflmodtest.c.
-
 	* Makefile.am (libdw.so): Link ../libdwfl/libdwfl_pic.a in,
 	along with ../libebl/libebl.a and ../lib/libeu.a;
 	depend on ../libelf/libelf.so.

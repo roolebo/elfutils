@@ -1,3 +1,7 @@
+2005-07-27  Roland McGrath  <roland@redhat.com>
+
+	* libdwfl.map: Add dwfl_getmodules.
+
 2005-07-23  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.am: Fix rules to allow building with mudflap.

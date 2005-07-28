@@ -8,6 +8,7 @@ ELFUTILS_1.0 {
     dwfl_errmsg;
     dwfl_errno;
     dwfl_getdwarf;
+    dwfl_getmodules;
     dwfl_getsrc;
     dwfl_linecu;
     dwfl_lineinfo;

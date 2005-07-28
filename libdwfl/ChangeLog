@@ -1,5 +1,13 @@
 2005-07-28  Roland McGrath  <roland@redhat.com>
 
+	* Makefile.am (noinst_PROGRAMS): Variable removed.
+	(libdwfl_so_SOURCES, libdwfl_LIBS, libdwfl_so_LDADD): Likewise.
+	(EXTRA_DIST, ptest_LDADD, test2_LDADD): Likewise.
+	(libdwfl): Don't use libdwfl.so any more.
+	(libdwfl.so, install, uninstall): Targets removed.
+	(test2_SOURCES): Define EXTRA_DIST instead of this.
+	* libdwfl.map: File removed.
+
 	* libdwfl.h: Use "" for libdw.h #include.
 
 2005-07-27  Roland McGrath  <roland@redhat.com>

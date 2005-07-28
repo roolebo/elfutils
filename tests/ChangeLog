@@ -1,3 +1,10 @@
+2005-07-28  Roland McGrath  <roland@redhat.com>
+
+	* dwflmodtest.c: New file, moved from ../libdwfl/ptest.c to here.
+	* Makefile.am (noinst_PROGRAMS): Add dwflmodtest.
+	(dwflmodtest_LDADD): New variable.
+	(INCLUDES): Add -I$(top_srcdir)/libdwfl here.
+
 2005-07-21  Ulrich Drepper  <drepper@redhat.com>
 
 	* testfile18.bz2: New file.

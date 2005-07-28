@@ -22,6 +22,7 @@ AM_CFLAGS = -Wall -Werror -Wextra -std=gnu99 \
 AM_LDFLAGS = -Wl,-rpath,\$$ORIGIN/../libasm:\$$ORIGIN/../libdw:\$$ORIGIN/../libebl:\$$ORIGIN/../libelf
 endif
 INCLUDES = -I$(top_srcdir)/libasm -I$(top_srcdir)/libdw \
+	   -I$(top_srcdir)/libdwfl \
 	   -I$(top_srcdir)/libebl -I$(top_srcdir)/libelf \
 	   -I$(top_srcdir)/lib -I..
 
@@ -31,7 +32,7 @@ noinst_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  get-aranges allfcts line2addr \
 		  show-abbrev hash asm-tst1 asm-tst2 asm-tst3 \
 		  asm-tst4 asm-tst5 asm-tst6 asm-tst7 asm-tst8 asm-tst9 \
-		  msg_tst newscn ecp
+		  msg_tst newscn ecp dwflmodtest
 # get-ciefde
 
 TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
@@ -109,5 +110,6 @@ asm_tst6_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap)
 asm_tst7_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap)
 asm_tst8_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap)
 asm_tst9_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap)
+dwflmodtest_LDADD = $(libdw) $(libelf) $(libmudflap)
 
 CLEANFILES = xxx

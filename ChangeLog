@@ -1,3 +1,7 @@
+2005-07-27  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (all_SUBDIRS): Put libdwfl before libdw.
+
 2005-07-21  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac: Take --enable-libebl-subdir=DIR to set LIBEBL_SUBDIR.

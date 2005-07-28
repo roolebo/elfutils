@@ -71,11 +71,13 @@ libdw_pic_a_SOURCES =
 am_libdw_pic_a_OBJECTS = $(libdw_a_SOURCES:.c=.os)
 
 libdw_so_SOURCES =
-libdw.so: libdw_pic.a $(srcdir)/libdw.map
-	$(CC) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
-	      -Wl,--version-script,$(srcdir)/libdw.map,--no-undefined \
-	      -Wl,--soname,$@.$(VERSION),-z,defs \
-	      ../libelf/libelf.so
+libdw.so: $(srcdir)/libdw.map libdw_pic.a \
+	  ../libdwfl/libdwfl_pic.a ../libebl/libebl.a ../lib/libeu.a \
+	  ../libelf/libelf.so
+	$(CC) -shared -o $@ -Wl,--soname,$@.$(VERSION),-z,defs \
+	      -Wl,--version-script,$<,--no-undefined \
+	      -Wl,--whole-archive $(filter-out $<,$^) -Wl,--no-whole-archive \
+	      -ldl
 	if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
 	ln -fs $@ $@.$(VERSION)
 

@@ -20,7 +20,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 mini_SUBDIRS = config m4 lib libelf libelf-po
 # Add doc back when we have some real content.
-all_SUBDIRS = libebl libdw libdwfl libcpu libasm src po tests
+all_SUBDIRS = libebl libdwfl libdw libcpu libasm src po tests
 SUBDIRS = $(mini_SUBDIRS) $(all_SUBDIRS)
 
 EXTRA_DIST = elfutils.spec GPG-KEY NOTES COPYING.GPL

@@ -25,14 +25,11 @@ INCLUDES = -I. -I$(srcdir) -I$(srcdir)/../libelf -I$(srcdir)/../libebl \
 	   -I$(srcdir)/../libdw -I.. -I$(srcdir)/../lib
 VERSION = 1
 
-noinst_PROGRAMS = ptest test2
-
-test2_SOURCES = test2.c loc2c.c
+EXTRA_DIST = test2.c loc2c.c
 
 lib_LIBRARIES = libdwfl.a
 if !MUDFLAP
 noinst_LIBRARIES = libdwfl_pic.a
-noinst_PROGRAMS += $(noinst_LIBRARIES:_pic.a=.so)
 endif
 
 euincludedir = ${includedir}/elfutils
@@ -59,7 +56,7 @@ libdw = ../libdw/libdw.a
 libelf = ../libelf/libelf.a
 libmudflap = -lmudflap
 else
-libdwfl = libdwfl.so
+libdwfl = $(libdw)
 libdw = ../libdw/libdw.so
 libelf = ../libelf/libelf.so
 endif
@@ -71,18 +68,6 @@ if !MUDFLAP
 libdwfl_pic_a_SOURCES =
 am_libdwfl_pic_a_OBJECTS = $(libdwfl_a_SOURCES:.c=.os)
 
-libdwfl_so_SOURCES =
-libdwfl_LIBS = $(libeu) $(libdw) $(libebl) $(libelf)
-libdwfl_so_LDADD = -ldl
-libdwfl.so: libdwfl_pic.a $(srcdir)/libdwfl.map $(libdwfl_LIBS)
-	$(CC) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
-	      -Wl,--version-script,$(srcdir)/libdwfl.map,--no-undefined \
-	      -Wl,--soname,$@.$(VERSION),-z,defs \
-	      $(libdwfl_LIBS) $(libdwfl_so_LDADD)
-	if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
-	ln -fs $@ $@.$(VERSION)
-
-
 %.os: %.c %.o
 	if $(COMPILE) -c -o $@ -fpic -DPIC -DSHARED -MT $@ -MD -MP \
 	   -MF "$(DEPDIR)/$*.Tpo" `test -f '$<' || echo '$(srcdir)/'`$<; \
@@ -90,25 +75,8 @@ libdwfl.so: libdwfl_pic.a $(srcdir)/libdwfl.map $(libdwfl_LIBS)
 	     rm -f "$(DEPDIR)/$*.Tpo"; \
 	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
 	fi
-
-install: install-am libdwfl.so
-	$(mkinstalldirs) $(DESTDIR)$(libdir)
-	$(INSTALL_PROGRAM) libdwfl.so $(DESTDIR)$(libdir)/libdwfl-$(PACKAGE_VERSION).so
-	ln -fs libdwfl-$(PACKAGE_VERSION).so $(DESTDIR)$(libdir)/libdwfl.so.$(VERSION)
-	ln -fs libdwfl.so.$(VERSION) $(DESTDIR)$(libdir)/libdwfl.so
-
-uninstall: uninstall-am
-	rm -f $(DESTDIR)$(libdir)/libdwfl-$(PACKAGE_VERSION).so
-	rm -f $(DESTDIR)$(libdir)/libdwfl.so.$(VERSION)
-	rm -f $(DESTDIR)$(libdir)/libdwfl.so
-	rmdir --ignore-fail-on-non-empty $(DESTDIR)$(includedir)/elfutils
 endif
 
 noinst_HEADERS = libdwflP.h loc2c.h
 
-EXTRA_DIST = libdwfl.map
-
 CLEANFILES = $(am_libdwfl_pic_a_OBJECTS)
-
-ptest_LDADD = $(libdwfl) $(libdw) $(libmudflap)
-test2_LDADD = $(libdwfl) $(libdw) $(libmudflap)

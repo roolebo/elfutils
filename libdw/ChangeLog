@@ -1,3 +1,8 @@
+2005-07-27  Roland McGrath  <roland@redhat.com>
+
+	* libdw.map: Define an empty base version and move all symbols to
+	version ELFUTILS_0.111; don't define ELFUTILS_1.0 at all yet.
+
 2005-07-23  Ulrich Drepper  <drepper@redhat.com>
 
 	* dwarf_error.c: Add internal alias for dwarf_errno.

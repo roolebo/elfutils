@@ -1,3 +1,9 @@
+Version 0.111:
+
+libdw: now contains all of libdwfl.  The latter is not installed anymore.
+
+elfcmp: little usability tweak, name and index of differing section is printed.
+
 Version 0.110:
 
 libelf: fix a numbe rof problems with elf_update

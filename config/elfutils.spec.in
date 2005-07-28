@@ -168,7 +168,6 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libdwfl.a
 #%{_libdir}/libasm.so
 %{_libdir}/libdw.so
-%{_libdir}/libdwfl.so
 %endif
 
 %files libelf
@@ -185,6 +184,8 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.so
 
 %changelog
+- libdw: libdwfl.h functions moved into libdw DSO.
+
 * Sun Jul 24 2005 Ulrich Drepper <@redhat.com> 0.110-1
 - libelf: fix a numbe rof problems with elf_update
 - elfcmp: fix a few bugs.  Compare gaps.

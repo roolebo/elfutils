@@ -1,5 +1,7 @@
 2005-07-28  Ulrich Drepper  <drepper@redhat.com>
 
+	* libdwfl.h: Add a few missing extern for function prototypes.
+
 	* libdwfl_crc32.c: New file.
 	* libdwfl_crc32_file.c: New file.
 	* libdwflP.h: Declare the new functions.

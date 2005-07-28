@@ -49,10 +49,10 @@ typedef struct
 
 
 /* Start a new session with the library.  */
-Dwfl *dwfl_begin (const Dwfl_Callbacks *callbacks);
+extern Dwfl *dwfl_begin (const Dwfl_Callbacks *callbacks);
 
 /* End a session.  */
-void dwfl_end (Dwfl *);
+extern void dwfl_end (Dwfl *);
 
 /* Return error code of last failing function call.  This value is kept
    separately for each thread.  */
@@ -173,14 +173,14 @@ extern int dwfl_linux_kernel_report_modules (Dwfl *dwfl);
 /* Call dwfl_report_module for each file mapped into the address space of PID.
    Returns zero on success, -1 if dwfl_report_module failed,
    or an errno code if opening the kernel binary failed.  */
-int dwfl_linux_proc_report (Dwfl *dwfl, pid_t pid);
+extern int dwfl_linux_proc_report (Dwfl *dwfl, pid_t pid);
 
 /* Trivial find_elf callback for use with dwfl_linux_proc_report.
    This uses the module name as a file name directly and tries to open it
    if it begin with a slash, or handles the magic string "[vdso]".  */
-int dwfl_linux_proc_find_elf (Dwfl_Module *mod, void **userdata,
-			      const char *module_name, Dwarf_Addr base,
-			      char **file_name, Elf **);
+extern int dwfl_linux_proc_find_elf (Dwfl_Module *mod, void **userdata,
+				     const char *module_name, Dwarf_Addr base,
+				     char **file_name, Elf **);
 
 /* Standard argument parsing for using a standard callback set.  */
 struct argp;

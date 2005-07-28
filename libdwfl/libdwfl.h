@@ -14,7 +14,7 @@
 #ifndef _LIBDWFL_H
 #define _LIBDWFL_H	1
 
-#include <libdw.h>
+#include "libdw.h"
 
 /* Handle for a session using the library.  */
 typedef struct Dwfl Dwfl;

@@ -27,9 +27,9 @@ VERSION = 1
 
 EXTRA_DIST = test2.c loc2c.c
 
-lib_LIBRARIES = libdwfl.a
+noinst_LIBRARIES = libdwfl.a
 if !MUDFLAP
-noinst_LIBRARIES = libdwfl_pic.a
+noinst_LIBRARIES += libdwfl_pic.a
 endif
 
 euincludedir = ${includedir}/elfutils

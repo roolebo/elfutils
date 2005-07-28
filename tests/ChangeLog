@@ -39,7 +39,7 @@
 
 	* run-line2addr.sh: Remove testfile14 at the end.
 
-	* run-strip-test.sh: Remove deubinfo test input file as well.
+	* run-strip-test.sh: Remove debuginfo test input file as well.
 
 	* Makefile.am (EXTRA_DIST): Newly added files incorrectly used
 	.bz, not .bz2.

@@ -25,6 +25,8 @@ INCLUDES = -I. -I$(srcdir) -I$(srcdir)/../libelf -I$(srcdir)/../libebl \
 	   -I$(srcdir)/../libdw -I.. -I$(srcdir)/../lib
 VERSION = 1
 
+EXTRA_DIST = test2.c loc2c.c
+
 noinst_LIBRARIES = libdwfl.a
 if !MUDFLAP
 noinst_LIBRARIES += libdwfl_pic.a
@@ -76,6 +78,6 @@ am_libdwfl_pic_a_OBJECTS = $(libdwfl_a_SOURCES:.c=.os)
 	fi
 endif
 
-noinst_HEADERS = libdwflP.h
+noinst_HEADERS = libdwflP.h loc2c.h
 
 CLEANFILES = $(am_libdwfl_pic_a_OBJECTS)

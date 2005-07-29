@@ -1,12 +1,3 @@
-2005-07-29  Roland McGrath  <roland@redhat.com>
-
-	* loc2c.c: File removed.
-	* loc2c.h: File removed.
-	* loc2c-runtime.h: File removed.
-	* test2.c: File removed.
-	* Makefile.am (EXTRA_DIST): Variable removed.
-	(noinst_HEADERS): Remove loc2c.h from here.
-
 2005-07-28  Ulrich Drepper  <drepper@redhat.com>
 
 	* libdwfl.h: Add a few missing extern for function prototypes.

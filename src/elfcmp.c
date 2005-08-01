@@ -163,9 +163,7 @@ main (int argc, char *argv[])
       || ehdr1->e_ehsize != ehdr2->e_ehsize
       || ehdr1->e_phentsize != ehdr2->e_phentsize
       || ehdr1->e_phnum != ehdr2->e_phnum
-      || ehdr1->e_shentsize != ehdr2->e_shentsize
-      || ehdr1->e_shnum != ehdr2->e_shnum
-      || ehdr1->e_shstrndx != ehdr2->e_shstrndx)
+      || ehdr1->e_shentsize != ehdr2->e_shentsize)
     {
       if (! quiet)
 	error (0, 0, gettext ("%s %s diff: ELF header"), fname1, fname2);

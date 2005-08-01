@@ -1,3 +1,8 @@
+2005-08-01  Ulrich Drepper  <drepper@redhat.com>
+
+	* elfcmp.c (main): Ignore section count and section name string table
+	section index.
+
 2005-07-27  Roland McGrath  <roland@redhat.com>
 
 	* elfcmp.c: Include <locale.h>.

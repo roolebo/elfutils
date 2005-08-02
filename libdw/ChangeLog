@@ -1,3 +1,8 @@
+2005-08-01  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_getaranges.c (dwarf_getaranges): Check for bogus offset.
+	* dwarf_getabbrev.c (__libdw_getabbrev): Likewise.
+
 2005-07-28  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.am (libdw.so): No need to link with libeu.a anymore.

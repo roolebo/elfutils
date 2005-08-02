@@ -34,8 +34,15 @@ __libdw_getabbrev (dbg, cu, offset, lengthp, result)
   if (dbg->sectiondata[IDX_debug_abbrev] == NULL)
     return NULL;
 
+  if (offset >= dbg->sectiondata[IDX_debug_abbrev]->d_size)
+    {
+      __libdw_seterrno (DWARF_E_INVALID_OFFSET);
+      return NULL;
+    }
+
   const unsigned char *abbrevp
     = (unsigned char *) dbg->sectiondata[IDX_debug_abbrev]->d_buf + offset;
+
   if (*abbrevp == '\0')
     /* We are past the last entry.  */
     return DWARF_END_ABBREV;

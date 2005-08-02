@@ -106,6 +106,10 @@ dwarf_getaranges (dbg, aranges, naranges)
       else
 	offset = read_8ubyte_unaligned_inc (dbg, readp);
 
+      /* Sanity-check the offset.  */
+      if (offset + 4 > dbg->sectiondata[IDX_debug_info]->d_size)
+	goto invalid;
+
       unsigned int address_size = *readp++;
       if (address_size != 4 && address_size != 8)
 	goto invalid;
@@ -153,6 +157,11 @@ dwarf_getaranges (dbg, aranges, naranges)
 	  else
 	    offset_size = 4;
 	  new_arange->arange.offset = offset + 3 * offset_size - 4 + 3;
+
+	  /* Sanity-check the data.  */
+	  if (new_arange->arange.offset
+	      >= dbg->sectiondata[IDX_debug_info]->d_size)
+	    goto invalid;
 
 	  new_arange->next = arangelist;
 	  arangelist = new_arange;

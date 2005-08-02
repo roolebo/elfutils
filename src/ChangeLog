@@ -1,3 +1,11 @@
+2005-08-02  Ulrich Drepper  <drepper@redhat.com>
+
+	* elflint.c (check_reloc_shdr): New function split out from check_rela
+	and check_rel.
+	(check_one_reloc): New function.  Likewise.
+	(check_rela): Use check_reloc_shdr and check_one_reloc.
+	(check_rel): Likewise.
+
 2005-08-01  Ulrich Drepper  <drepper@redhat.com>
 
 	* elfcmp.c (main): Ignore section count and section name string table

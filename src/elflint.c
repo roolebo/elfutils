@@ -935,7 +935,8 @@ section [%2d] '%s': _DYNAMIC symbol size %" PRIu64 " does not match dynamic segm
 
 
 static bool
-is_rel_dyn (Ebl *ebl, GElf_Ehdr *ehdr, int idx, GElf_Shdr *shdr, bool rela)
+is_rel_dyn (Ebl *ebl, const GElf_Ehdr *ehdr, int idx, const GElf_Shdr *shdr,
+	    bool rela)
 {
   /* If this is no executable or DSO it cannot be a .rel.dyn section.  */
   if (ehdr->e_type != ET_EXEC && ehdr->e_type != ET_DYN)
@@ -987,43 +988,25 @@ section [%2d] '%s': DT_RELCOUNT value %d too high for this section\n"),
 }
 
 
-static void
-check_rela (Ebl *ebl, GElf_Ehdr *ehdr, int idx)
+static bool
+check_reloc_shdr (Ebl *ebl, const GElf_Ehdr *ehdr, const GElf_Shdr *shdr,
+		  int idx, int reltype, GElf_Shdr **destshdrp,
+		  GElf_Shdr *destshdr_memp)
 {
-  Elf_Scn *scn;
-  GElf_Shdr shdr_mem;
-  GElf_Shdr *shdr;
-  Elf_Data *data;
-  GElf_Shdr destshdr_mem;
-  GElf_Shdr *destshdr = NULL;
-  size_t cnt;
   bool reldyn = false;
-  bool known_broken = gnuld;
-
-  scn = elf_getscn (ebl->elf, idx);
-  shdr = gelf_getshdr (scn, &shdr_mem);
-  if (shdr == NULL)
-    return;
-  data = elf_getdata (scn, NULL);
-  if (data == NULL)
-    {
-      ERROR (gettext ("section [%2d] '%s': cannot get section data\n"),
-	     idx, section_name (ebl, idx));
-      return;
-    }
 
   /* Check whether the link to the section we relocate is reasonable.  */
   if (shdr->sh_info >= shnum)
     ERROR (gettext ("section [%2d] '%s': invalid destination section index\n"),
 	   idx, section_name (ebl, idx));
-  else
+  else if (shdr->sh_info != 0)
     {
-      destshdr = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_info),
-			       &destshdr_mem);
-      if (destshdr != NULL)
+      *destshdrp = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_info),
+				 destshdr_memp);
+      if (*destshdrp != NULL)
 	{
-	  if(destshdr->sh_type != SHT_PROGBITS
-	     && destshdr->sh_type != SHT_NOBITS)
+	  if((*destshdrp)->sh_type != SHT_PROGBITS
+	     && (*destshdrp)->sh_type != SHT_NOBITS)
 	    {
 	      reldyn = is_rel_dyn (ebl, ehdr, idx, shdr, true);
 	      if (!reldyn)
@@ -1032,7 +1015,7 @@ section [%2d] '%s': invalid destination section type\n"),
 		       idx, section_name (ebl, idx));
 	      else
 		{
-		  /* There is no standard, but we require that .rela.dyn
+		  /* There is no standard, but we require that .rel{,a}.dyn
 		     sections have a sh_info value of zero.  */
 		  if (shdr->sh_info != 0)
 		    ERROR (gettext ("\
@@ -1041,29 +1024,122 @@ section [%2d] '%s': sh_info should be zero\n"),
 		}
 	    }
 
-	  if ((destshdr->sh_flags & (SHF_MERGE | SHF_STRINGS)) != 0)
+	  if (((*destshdrp)->sh_flags & (SHF_MERGE | SHF_STRINGS)) != 0)
 	    ERROR (gettext ("\
 section [%2d] '%s': no relocations for merge-able sections possible\n"),
 		   idx, section_name (ebl, idx));
 	}
     }
 
-  if (shdr->sh_entsize != gelf_fsize (ebl->elf, ELF_T_RELA, 1, EV_CURRENT))
-    ERROR (gettext ("\
-section [%2d] '%s': section entry size does not match ElfXX_Rela\n"),
+  if (shdr->sh_entsize != gelf_fsize (ebl->elf, reltype, 1, EV_CURRENT))
+    ERROR (gettext (reltype == ELF_T_RELA ? "\
+section [%2d] '%s': section entry size does not match ElfXX_Rela\n" : "\
+section [%2d] '%s': section entry size does not match ElfXX_Rel\n"),
 	   idx, section_name (ebl, idx));
+
+  return reldyn;
+}
+
+
+static void
+check_one_reloc (Ebl *ebl, int idx, size_t cnt, const GElf_Shdr *symshdr,
+		 Elf_Data *symdata, GElf_Addr r_offset, GElf_Xword r_info,
+		 const GElf_Shdr *destshdr, bool reldyn)
+{
+  bool known_broken = gnuld;
+
+  if (!ebl_reloc_type_check (ebl, GELF_R_TYPE (r_info)))
+    ERROR (gettext ("section [%2d] '%s': relocation %zu: invalid type\n"),
+	   idx, section_name (ebl, idx), cnt);
+  else if (!ebl_reloc_valid_use (ebl, GELF_R_TYPE (r_info)))
+    ERROR (gettext ("\
+section [%2d] '%s': relocation %zu: relocation type invalid for the file type\n"),
+	   idx, section_name (ebl, idx), cnt);
+
+  if (symshdr != NULL
+      && ((GELF_R_SYM (r_info) + 1)
+	  * gelf_fsize (ebl->elf, ELF_T_SYM, 1, EV_CURRENT)
+	  > symshdr->sh_size))
+    ERROR (gettext ("\
+section [%2d] '%s': relocation %zu: invalid symbol index\n"),
+	   idx, section_name (ebl, idx), cnt);
+
+  if (ebl_gotpc_reloc_check (ebl, GELF_R_TYPE (r_info)))
+    {
+      const char *name;
+      char buf[64];
+      GElf_Sym sym_mem;
+      GElf_Sym *sym = gelf_getsym (symdata, GELF_R_SYM (r_info), &sym_mem);
+      if (sym != NULL
+	  /* Get the name for the symbol.  */
+	  && (name = elf_strptr (ebl->elf, symshdr->sh_link, sym->st_name))
+	  && strcmp (name, "_GLOBAL_OFFSET_TABLE_") !=0 )
+	ERROR (gettext ("\
+section [%2d] '%s': relocation %zu: only symbol '_GLOBAL_OFFSET_TABLE_' can be used with %s\n"),
+	       idx, section_name (ebl, idx), cnt,
+	       ebl_reloc_type_name (ebl, GELF_R_SYM (r_info),
+				    buf, sizeof (buf)));
+    }
+
+  if (reldyn)
+    {
+      // XXX TODO Check .rel.dyn section addresses.
+    }
+  else if (!known_broken)
+    {
+      if (destshdr != NULL
+	  && GELF_R_TYPE (r_info) != 0
+	  && (r_offset - destshdr->sh_addr) >= destshdr->sh_size)
+	ERROR (gettext ("\
+section [%2d] '%s': relocation %zu: offset out of bounds\n"),
+	       idx, section_name (ebl, idx), cnt);
+    }
+
+  if (symdata != NULL && ebl_copy_reloc_p (ebl, GELF_R_TYPE (r_info)))
+    {
+      /* Make sure the referenced symbol is an object or unspecified.  */
+      GElf_Sym sym_mem;
+      GElf_Sym *sym = gelf_getsym (symdata, GELF_R_SYM (r_info), &sym_mem);
+      if (sym != NULL
+	  && GELF_ST_TYPE (sym->st_info) != STT_NOTYPE
+	  && GELF_ST_TYPE (sym->st_info) != STT_OBJECT)
+	{
+	  char buf[64];
+	  ERROR (gettext ("section [%2d] '%s': relocation %zu: copy relocation against symbol of type %s\n"),
+		 idx, section_name (ebl, idx), cnt,
+		 ebl_symbol_type_name (ebl, GELF_ST_TYPE (sym->st_info),
+				       buf, sizeof (buf)));
+	}
+    }
+}
+
+
+static void
+check_rela (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Shdr *shdr, int idx)
+{
+  Elf_Data *data = elf_getdata (elf_getscn (ebl->elf, idx), NULL);
+  if (data == NULL)
+    {
+      ERROR (gettext ("section [%2d] '%s': cannot get section data\n"),
+	     idx, section_name (ebl, idx));
+      return;
+    }
+
+  /* Check the fields of the section header.  */
+  GElf_Shdr destshdr_mem;
+  GElf_Shdr *destshdr = NULL;
+  bool reldyn = check_reloc_shdr (ebl, ehdr, shdr, idx, ELF_T_RELA, &destshdr,
+				  &destshdr_mem);
 
   Elf_Scn *symscn = elf_getscn (ebl->elf, shdr->sh_link);
   GElf_Shdr symshdr_mem;
   GElf_Shdr *symshdr = gelf_getshdr (symscn, &symshdr_mem);
   Elf_Data *symdata = elf_getdata (symscn, NULL);
 
-  for (cnt = 0; cnt < shdr->sh_size / shdr->sh_entsize; ++cnt)
+  for (size_t cnt = 0; cnt < shdr->sh_size / shdr->sh_entsize; ++cnt)
     {
       GElf_Rela rela_mem;
-      GElf_Rela *rela;
-
-      rela = gelf_getrela (data, cnt, &rela_mem);
+      GElf_Rela *rela = gelf_getrela (data, cnt, &rela_mem);
       if (rela == NULL)
 	{
 	  ERROR (gettext ("\
@@ -1072,93 +1148,16 @@ section [%2d] '%s': cannot get relocation %zu: %s\n"),
 	  continue;
 	}
 
-      if (!ebl_reloc_type_check (ebl, GELF_R_TYPE (rela->r_info)))
-	ERROR (gettext ("section [%2d] '%s': relocation %zu: invalid type\n"),
-	       idx, section_name (ebl, idx), cnt);
-      else if (!ebl_reloc_valid_use (ebl, GELF_R_TYPE (rela->r_info)))
-	ERROR (gettext ("\
-section [%2d] '%s': relocation %zu: relocation type invalid for the file type\n"),
-	       idx, section_name (ebl, idx), cnt);
-
-      if (symshdr != NULL
-	  && ((GELF_R_SYM (rela->r_info) + 1)
-	      * gelf_fsize (ebl->elf, ELF_T_SYM, 1, EV_CURRENT)
-	      > symshdr->sh_size))
-	ERROR (gettext ("\
-section [%2d] '%s': relocation %zu: invalid symbol index\n"),
-	       idx, section_name (ebl, idx), cnt);
-
-      if (ebl_gotpc_reloc_check (ebl, GELF_R_TYPE (rela->r_info)))
-	{
-	  const char *name;
-	  char buf[64];
-	  GElf_Sym sym_mem;
-	  GElf_Sym *sym = gelf_getsym (symdata, GELF_R_SYM (rela->r_info),
-				       &sym_mem);
-	  if (sym != NULL
-	      /* Get the name for the symbol.  */
-	      && (name = elf_strptr (ebl->elf, symshdr->sh_link, sym->st_name))
-	      && strcmp (name, "_GLOBAL_OFFSET_TABLE_") !=0 )
-	    ERROR (gettext ("\
-section [%2d] '%s': relocation %zu: only symbol '_GLOBAL_OFFSET_TABLE_' can be used with %s\n"),
-		   idx, section_name (ebl, idx), cnt,
-		   ebl_reloc_type_name (ebl, GELF_R_SYM (rela->r_info),
-					buf, sizeof (buf)));
-	}
-
-      if (reldyn)
-	{
-	  // XXX TODO Check .rel.dyn section addresses.
-	}
-      else if (!known_broken)
-	{
-	  if (destshdr != NULL
-	      && (rela->r_offset - destshdr->sh_addr) >= destshdr->sh_size)
-	    ERROR (gettext ("\
-section [%2d] '%s': relocation %zu: offset out of bounds\n"),
-	       idx, section_name (ebl, idx), cnt);
-	}
-
-      if (symdata != NULL
-	  && ebl_copy_reloc_p (ebl, GELF_R_TYPE (rela->r_info)))
-	{
-	  /* Make sure the referenced symbol is an object or unspecified.  */
-	  GElf_Sym sym_mem;
-	  GElf_Sym *sym = gelf_getsym (symdata, GELF_R_SYM (rela->r_info),
-				       &sym_mem);
-	  if (sym != NULL
-	      && GELF_ST_TYPE (sym->st_info) != STT_NOTYPE
-	      && GELF_ST_TYPE (sym->st_info) != STT_OBJECT)
-	    {
-	      char buf[64];
-	      ERROR (gettext ("section [%2d] '%s': relocation %zu: copy relocation against symbol of type %s\n"),
-		     idx, section_name (ebl, idx), cnt,
-		     ebl_symbol_type_name (ebl, GELF_ST_TYPE (sym->st_info),
-					   buf, sizeof (buf)));
-	    }
-	}
+      check_one_reloc (ebl, idx, cnt, symshdr, symdata, rela->r_offset,
+		       rela->r_info, destshdr, reldyn);
     }
 }
 
 
 static void
-check_rel (Ebl *ebl, GElf_Ehdr *ehdr, int idx)
+check_rel (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Shdr *shdr, int idx)
 {
-  Elf_Scn *scn;
-  GElf_Shdr shdr_mem;
-  GElf_Shdr *shdr;
-  Elf_Data *data;
-  GElf_Shdr destshdr_mem;
-  GElf_Shdr *destshdr = NULL;
-  size_t cnt;
-  bool reldyn = false;
-  bool known_broken = gnuld;
-
-  scn = elf_getscn (ebl->elf, idx);
-  shdr = gelf_getshdr (scn, &shdr_mem);
-  if (shdr == NULL)
-    return;
-  data = elf_getdata (scn, NULL);
+  Elf_Data *data = elf_getdata (elf_getscn (ebl->elf, idx), NULL);
   if (data == NULL)
     {
       ERROR (gettext ("section [%2d] '%s': cannot get section data\n"),
@@ -1166,58 +1165,21 @@ check_rel (Ebl *ebl, GElf_Ehdr *ehdr, int idx)
       return;
     }
 
-  /* Check whether the link to the section we relocate is reasonable.  */
-  if (shdr->sh_info >= shnum)
-    ERROR (gettext ("section [%2d] '%s': invalid destination section index\n"),
-	   idx, section_name (ebl, idx));
-  else
-    {
-      destshdr = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_info),
-			       &destshdr_mem);
-      if (destshdr != NULL)
-	{
-	  if (destshdr->sh_type != SHT_PROGBITS
-	      && destshdr->sh_type != SHT_NOBITS)
-	    {
-	      reldyn = is_rel_dyn (ebl, ehdr, idx, shdr, false);
-	      if (!reldyn)
-		ERROR (gettext ("\
-section [%2d] '%s': invalid destination section type\n"),
-		       idx, section_name (ebl, idx));
-	      else
-		{
-		  /* There is no standard, but we require that .rela.dyn
-		     sections have a sh_info value of zero.  */
-		  if (shdr->sh_info != 0)
-		    ERROR (gettext ("\
-section [%2d] '%s': sh_info should be zero\n"),
-			   idx, section_name (ebl, idx));
-		}
-	    }
-
-	  if ((destshdr->sh_flags & (SHF_MERGE | SHF_STRINGS)) != 0)
-	    ERROR (gettext ("\
-section [%2d] '%s': no relocations for merge-able sections possible\n"),
-		   idx, section_name (ebl, idx));
-	}
-    }
-
-  if (shdr->sh_entsize != gelf_fsize (ebl->elf, ELF_T_REL, 1, EV_CURRENT))
-    ERROR (gettext ("\
-section [%2d] '%s': section entry size does not match ElfXX_Rel\n"),
-	   idx, section_name (ebl, idx));
+  /* Check the fields of the section header.  */
+  GElf_Shdr destshdr_mem;
+  GElf_Shdr *destshdr = NULL;
+  bool reldyn = check_reloc_shdr (ebl, ehdr, shdr, idx, ELF_T_REL, &destshdr,
+				  &destshdr_mem);
 
   Elf_Scn *symscn = elf_getscn (ebl->elf, shdr->sh_link);
   GElf_Shdr symshdr_mem;
   GElf_Shdr *symshdr = gelf_getshdr (symscn, &symshdr_mem);
   Elf_Data *symdata = elf_getdata (symscn, NULL);
 
-  for (cnt = 0; cnt < shdr->sh_size / shdr->sh_entsize; ++cnt)
+  for (size_t cnt = 0; cnt < shdr->sh_size / shdr->sh_entsize; ++cnt)
     {
       GElf_Rel rel_mem;
-      GElf_Rel *rel;
-
-      rel = gelf_getrel (data, cnt, &rel_mem);
+      GElf_Rel *rel = gelf_getrel (data, cnt, &rel_mem);
       if (rel == NULL)
 	{
 	  ERROR (gettext ("\
@@ -1226,72 +1188,8 @@ section [%2d] '%s': cannot get relocation %zu: %s\n"),
 	  continue;
 	}
 
-      if (!ebl_reloc_type_check (ebl, GELF_R_TYPE (rel->r_info)))
-	ERROR (gettext ("section [%2d] '%s': relocation %zu: invalid type\n"),
-	       idx, section_name (ebl, idx), cnt);
-      else if (!ebl_reloc_valid_use (ebl, GELF_R_TYPE (rel->r_info)))
-	ERROR (gettext ("\
-section [%2d] '%s': relocation %zu: relocation type invalid for the file type\n"),
-	       idx, section_name (ebl, idx), cnt);
-
-      if (symshdr != NULL
-	  && ((GELF_R_SYM (rel->r_info) + 1)
-	      * gelf_fsize (ebl->elf, ELF_T_SYM, 1, EV_CURRENT)
-	      > symshdr->sh_size))
-	ERROR (gettext ("\
-section [%2d] '%s': relocation %zu: invalid symbol index\n"),
-	       idx, section_name (ebl, idx), cnt);
-
-      if (ebl_gotpc_reloc_check (ebl, GELF_R_TYPE (rel->r_info)))
-	{
-	  const char *name;
-	  char buf[64];
-	  GElf_Sym sym_mem;
-	  GElf_Sym *sym = gelf_getsym (symdata, GELF_R_SYM (rel->r_info),
-				       &sym_mem);
-	  if (sym != NULL
-	      /* Get the name for the symbol.  */
-	      && (name = elf_strptr (ebl->elf, symshdr->sh_link, sym->st_name))
-	      && strcmp (name, "_GLOBAL_OFFSET_TABLE_") !=0 )
-	    ERROR (gettext ("\
-section [%2d] '%s': relocation %zu: only symbol '_GLOBAL_OFFSET_TABLE_' can be used with %s\n"),
-		   idx, section_name (ebl, idx), cnt,
-		   ebl_reloc_type_name (ebl, GELF_R_SYM (rel->r_info),
-					buf, sizeof (buf)));
-	}
-
-      if (reldyn)
-	{
-	  // XXX TODO Check .rel.dyn section addresses.
-	}
-      else if (!known_broken)
-	{
-	  if (destshdr != NULL
-	      && GELF_R_TYPE (rel->r_info) != 0
-	      && (rel->r_offset - destshdr->sh_addr) >= destshdr->sh_size)
-	    ERROR (gettext ("\
-section [%2d] '%s': relocation %zu: offset out of bounds\n"),
-		   idx, section_name (ebl, idx), cnt);
-	}
-
-      if (symdata != NULL
-	  && ebl_copy_reloc_p (ebl, GELF_R_TYPE (rel->r_info)))
-	{
-	  /* Make sure the referenced symbol is an object or unspecified.  */
-	  GElf_Sym sym_mem;
-	  GElf_Sym *sym = gelf_getsym (symdata, GELF_R_SYM (rel->r_info),
-				       &sym_mem);
-	  if (sym != NULL
-	      && GELF_ST_TYPE (sym->st_info) != STT_NOTYPE
-	      && GELF_ST_TYPE (sym->st_info) != STT_OBJECT)
-	    {
-	      char buf[64];
-	      ERROR (gettext ("section [%2d] '%s': relocation %zu: copy relocation against symbol of type %s\n"),
-		     idx, section_name (ebl, idx), cnt,
-		     ebl_symbol_type_name (ebl, GELF_ST_TYPE (sym->st_info),
-					   buf, sizeof (buf)));
-	    }
-	}
+      check_one_reloc (ebl, idx, cnt, symshdr, symdata, rel->r_offset,
+		       rel->r_info, destshdr, reldyn);
     }
 }
 
@@ -2267,11 +2165,11 @@ section [%2zu] '%s': ELF header says this is the section header string table but
 	  break;
 
 	case SHT_RELA:
-	  check_rela (ebl, ehdr, cnt);
+	  check_rela (ebl, ehdr, shdr, cnt);
 	  break;
 
 	case SHT_REL:
-	  check_rel (ebl, ehdr, cnt);
+	  check_rel (ebl, ehdr, shdr, cnt);
 	  break;
 
 	case SHT_DYNAMIC:

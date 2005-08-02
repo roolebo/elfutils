@@ -1,3 +1,7 @@
+Version 0.112:
+
+elfcmp: some more relaxation.
+
 Version 0.111:
 
 libdw: now contains all of libdwfl.  The latter is not installed anymore.

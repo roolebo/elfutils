@@ -1,11 +1,6 @@
 ELFUTILS_1.0 {
   global:
-    ppc_backend_name;
-    ppc_destr;
     ppc_init;
-    ppc_reloc_type_check;
-    ppc_reloc_type_name;
-    ppc_reloc_simple_type;
 
   local:
     *;

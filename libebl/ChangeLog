@@ -1,3 +1,15 @@
+2005-08-03  Ulrich Drepper  <drepper@redhat.com>
+
+	* libebl_alpha.map: Remove unnecessary exports.
+	* libebl_arm.map: Likewise.
+	* libebl_i386.map: Likewise.
+	* libebl_ia64.map: Likewise.
+	* libebl_ppc.map: Likewise.
+	* libebl_ppc64.map: Likewise.
+	* libebl_sh.map: Likewise.
+	* libebl_sparc.map: Likewise.
+	* libebl_x86_64.map: Likewise.
+
 2005-08-02  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.am (libebl_a_SOURCES): Add eblelfclass.c, eblelfdata.c,

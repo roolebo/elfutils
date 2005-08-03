@@ -1,5 +1,17 @@
 2005-08-02  Ulrich Drepper  <drepper@redhat.com>
 
+	* Makefile.am: Add -ldl to asm_tst[1-9]_LDASS.
+	* asm-tst1.c: Adjust for new asm_begin interface.  Open backend
+	library first.
+	* asm-tst2.c: Likewise.
+	* asm-tst3.c: Likewise.
+	* asm-tst4.c: Likewise.
+	* asm-tst5.c: Likewise.
+	* asm-tst6.c: Likewise.
+	* asm-tst7.c: Likewise.
+	* asm-tst8.c: Likewise.
+	* asm-tst9.c: Likewise.
+
 	* msg_tst.c: Add new error message.
 
 2005-07-28  Ulrich Drepper  <drepper@redhat.com>

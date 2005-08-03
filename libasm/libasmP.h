@@ -1,5 +1,5 @@
 /* Internal definitions for libasm.
-   Copyright (C) 2002, 2004 Red Hat, Inc.
+   Copyright (C) 2002, 2004, 2005 Red Hat, Inc.
 
    This program is Open Source software; you can redistribute it and/or
    modify it under the terms of the Open Software License version 1.0 as
@@ -17,7 +17,6 @@
 #include <stdio.h>
 
 #include <libasm.h>
-#include <libebl.h>
 
 /* gettext helper macros.  */
 #define _(Str) dgettext ("elfutils", Str)
@@ -35,6 +34,7 @@ enum
     ASM_E_DUPLSYM,		/* Duplicate symbol definition.  */
     ASM_E_LIBELF,		/* Refer to error in libelf.  */
     ASM_E_TYPE,			/* Invalid section type for operation.  */
+    ASM_E_IOERROR,		/* Error during output of data.  */
     ASM_E_NUM			/* Keep this entry as the last.  */
   };
 

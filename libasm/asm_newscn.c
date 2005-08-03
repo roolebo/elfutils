@@ -1,5 +1,5 @@
 /* Create new section in output file.
-   Copyright (C) 2002 Red Hat, Inc.
+   Copyright (C) 2002, 2005 Red Hat, Inc.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
    This program is Open Source software; you can redistribute it and/or
@@ -81,7 +81,8 @@ text_newscn (AsmScn_t *result, GElf_Word type, GElf_Xword flags)
   /* Terminate the string.  */
   *wp = '\0';
 
-  printf ("\t.section \"%s\"%s%s\n", result->name, flagstr, typestr);
+  fprintf (result->ctx->out.file, "\t.section \"%s\"%s%s\n",
+	   result->name, flagstr, typestr);
 
   return result;
 }

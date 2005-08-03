@@ -1,4 +1,4 @@
-/* Copyright (C) 2002, 2004 Red Hat, Inc.
+/* Copyright (C) 2002, 2004, 2005 Red Hat, Inc.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
    This program is Open Source software; you can redistribute it and/or
@@ -33,7 +33,14 @@ main (void)
 
   elf_version (EV_CURRENT);
 
-  ctx = asm_begin (fname, false, EM_386, ELFCLASS32, ELFDATA2LSB);
+  Ebl *ebl = ebl_openbackend_machine (EM_386);
+  if (ebl == NULL)
+    {
+      puts ("cannot open backend library");
+      return 1;
+    }
+
+  ctx = asm_begin (fname, ebl, false);
   if (ctx == NULL)
     {
       printf ("cannot create assembler context: %s\n", asm_errmsg (-1));
@@ -83,6 +90,8 @@ env LD_LIBRARY_PATH=../libelf ../src/elflint -q asm-tst4-out.o"));
 
   /* We don't need the file anymore.  */
   unlink (fname);
+
+  ebl_closebackend (ebl);
 
   return result;
 }

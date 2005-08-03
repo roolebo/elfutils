@@ -33,7 +33,12 @@
 static int
 text_end (AsmCtx_t *ctx __attribute__ ((unused)))
 {
-  // XXX Does anything have to be done?
+  if (fclose (ctx->out.file) != 0)
+    {
+      __libasm_seterrno (ASM_E_IOERROR);
+      return -1;
+    }
+
   return 0;
 }
 

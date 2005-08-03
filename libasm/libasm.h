@@ -1,5 +1,5 @@
 /* Interface for libasm.
-   Copyright (C) 2002 Red Hat, Inc.
+   Copyright (C) 2002, 2005 Red Hat, Inc.
 
    This program is Open Source software; you can redistribute it and/or
    modify it under the terms of the Open Software License version 1.0 as
@@ -17,7 +17,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <gelf.h>
+#include <libebl.h>
 
 
 /* Opaque type for the assembler context descriptor.  */
@@ -43,8 +43,7 @@ extern "C" {
    corresponds to an EM_ constant from <elf.h>, KLASS specifies the
    class (32- or 64-bit), and DATA specifies the byte order (little or
    big endian).  */
-extern AsmCtx_t *asm_begin (const char *fname, bool textp, int machine,
-			    int klass, int data);
+extern AsmCtx_t *asm_begin (const char *fname, Ebl *ebl, bool textp);
 
 /* Abort the operation on the assembler context and free all resources.  */
 extern int asm_abort (AsmCtx_t *ctx);

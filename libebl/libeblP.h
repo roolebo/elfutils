@@ -28,6 +28,11 @@ struct ebl
   /* Emulation name.  */
   const char *emulation;
 
+  /* ELF machine, class, and data encoding.  */
+  int machine;
+  int class;
+  int data;
+
   /* The libelf handle (if known).  */
   Elf *elf;
 

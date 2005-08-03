@@ -1,3 +1,13 @@
+2005-08-02  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (libebl_a_SOURCES): Add eblelfclass.c, eblelfdata.c,
+	and eblelfmachine.c.
+	* elbopenbackend.c (machines): Add class and data fields.  Initialize
+	them.
+	(ebl_openbackend): Initialize machine, class, data fields in result.
+	* libebl.h: Declare Add eblelfclass, eblelfdata, and eblelfmachine.
+	* libeblP.h (Ebl): Add machine, class, data fields.
+
 2005-07-23  Ulrich Drepper  <drepper@redhat.com>
 
 	* eblsectionstripp.c: New file.

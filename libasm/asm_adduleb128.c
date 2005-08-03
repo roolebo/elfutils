@@ -1,5 +1,5 @@
 /* Add integer to a section.
-   Copyright (C) 2002 Red Hat, Inc.
+   Copyright (C) 2002, 2005 Red Hat, Inc.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
    This program is Open Source software; you can redistribute it and/or
@@ -37,7 +37,7 @@ asm_adduleb128 (asmscn, num)
     }
 
   if (unlikely (asmscn->ctx->textp))
-    printf ("\t.uleb128\t%" PRIu32 "\n", num);
+    fprintf (asmscn->ctx->out.file, "\t.uleb128\t%" PRIu32 "\n", num);
   else
     {
       char tmpbuf[(sizeof (num) * 8 + 6) / 7];

@@ -1,5 +1,5 @@
 /* Add integer to a section.
-   Copyright (C) 2002 Red Hat, Inc.
+   Copyright (C) 2002, 2005 Red Hat, Inc.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
    This program is Open Source software; you can redistribute it and/or
@@ -53,22 +53,25 @@ FCT(SIZE) (asmscn, num)
     {
       // XXX Needs to use backend specified pseudo-ops
       if (SIZE == 8)
-	printf ("\t.byte\t%" PRId8 "\n", (int8_t) num);
+	fprintf (asmscn->ctx->out.file, "\t.byte\t%" PRId8 "\n", (int8_t) num);
       else if (SIZE == 16)
-	printf ("\t.value\t%" PRId16 "\n", (int16_t) num);
+	fprintf (asmscn->ctx->out.file, "\t.value\t%" PRId16 "\n",
+		 (int16_t) num);
       else if (SIZE == 32)
-	printf ("\t.long\t%" PRId32 "\n", (int32_t) num);
+	fprintf (asmscn->ctx->out.file, "\t.long\t%" PRId32 "\n",
+		 (int32_t) num);
       else
 	{
 	  // XXX This is not necessary for 64-bit machines
 	  bool is_leb = (elf_getident (asmscn->ctx->out.elf, NULL)[EI_DATA]
 			 == ELFDATA2LSB);
 
-	  printf ("\t.long\t%" PRId32 "\n\t.long\t%" PRId32 "\n",
-		  (int32_t) (is_leb
-			     ? num % 0x100000000ll : num / 0x100000000ll),
-		  (int32_t) (is_leb
-			     ? num / 0x100000000ll : num % 0x100000000ll));
+	  fprintf (asmscn->ctx->out.file,
+		   "\t.long\t%" PRId32 "\n\t.long\t%" PRId32 "\n",
+		   (int32_t) (is_leb
+			      ? num % 0x100000000ll : num / 0x100000000ll),
+		   (int32_t) (is_leb
+			      ? num / 0x100000000ll : num % 0x100000000ll));
 	}
     }
   else

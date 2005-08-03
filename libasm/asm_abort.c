@@ -1,5 +1,5 @@
 /* Abort operations on the assembler context, free all resources.
-   Copyright (C) 2002 Red Hat, Inc.
+   Copyright (C) 2002, 2005 Red Hat, Inc.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
    This program is Open Source software; you can redistribute it and/or
@@ -36,7 +36,8 @@ asm_abort (ctx)
     (void) elf_end (ctx->out.elf);
 
   /* Now close the temporary file and remove it.  */
-  (void) unlink (ctx->tmp_fname);
+  if (ctx->fd != -1)
+    (void) unlink (ctx->tmp_fname);
 
   /* Free the resources.  */
   __libasm_finictx (ctx);

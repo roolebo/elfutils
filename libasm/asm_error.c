@@ -1,5 +1,5 @@
 /* Error handling in libasm.
-   Copyright (C) 2002, 2004 Red Hat, Inc.
+   Copyright (C) 2002, 2004, 2005 Red Hat, Inc.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
    This program is Open Source software; you can redistribute it and/or
@@ -112,7 +112,8 @@ static const char *msgs[ASM_E_NUM] =
   [ASM_E_CANNOT_CHMOD] = N_("cannot change mode of output file"),
   [ASM_E_CANNOT_RENAME] = N_("cannot rename output file"),
   [ASM_E_DUPLSYM] = N_("duplicate symbol"),
-  [ASM_E_TYPE] = N_("invalid section type for operation")
+  [ASM_E_TYPE] = N_("invalid section type for operation"),
+  [ASM_E_IOERROR] = N_("error during output of data"),
 };
 
 const char *

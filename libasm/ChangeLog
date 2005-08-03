@@ -1,6 +1,22 @@
+2005-08-02  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (AM_CFLAGS): Add -std=gnu99.
+	* asm_abort.c: Don't try to remove output file if there is none.
+	* asm_addint8.c: In print mode, print to file not stdout.
+	* asm_addsleb128.c: Likewise.
+	* asm_adduleb128.c: Likewise.
+	* asm_newscn.c: Likewise.
+	* asm_align.c: Implement print mode.
+	* asm_begin.c (asm_begin): Change interface.  Take binary class and
+	byte order information from new Ebl parameter.
+	* libasm.h: Adjust prototype.
+	* asm_end.c (text_end): Close file if necesary.
+	* asm_error.c: Add new error ASM_E_IOERROR.
+	* libasmP.h: Add ASM_E_IOERROR definition.
+
 2005-02-15  Ulrich Drepper  <drepper@redhat.com>
 
-	* Makefile (AM_CFLAGS): Add -Wunused -Wextra -Wformat=2.
+	* Makefile.am (AM_CFLAGS): Add -Wunused -Wextra -Wformat=2.
 
 	* asm_end.c (text_end): Mark parameter as possibly unused.
 

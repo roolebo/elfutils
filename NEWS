@@ -6,6 +6,11 @@ elflint: some more tests.
 
 libelf: Add elfXX_offscn and gelf_offscn.
 
+libasm: asm_begin interface changes.
+
+libebl: Add three new interfaces to directly access machine, class, and
+data encoding information.
+
 Version 0.111:
 
 libdw: now contains all of libdwfl.  The latter is not installed anymore.

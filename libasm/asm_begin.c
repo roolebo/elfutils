@@ -18,6 +18,8 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <stdio.h>
+#include <stdio_ext.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -30,12 +32,27 @@
 static AsmCtx_t *
 prepare_text_output (AsmCtx_t *result)
 {
+  if (result->fd == -1)
+    result->out.file = stdout;
+  else
+    {
+      result->out.file = fdopen (result->fd, "a");
+      if (result->out.file == NULL)
+	{
+	  close (result->fd);
+	  free (result);
+	  result = NULL;
+	}
+
+      __fsetlocking (result->out.file, FSETLOCKING_BYCALLER);
+    }
+
   return result;
 }
 
 
 static AsmCtx_t *
-prepare_binary_output (AsmCtx_t *result, int machine, int klass, int data)
+prepare_binary_output (AsmCtx_t *result, Ebl *ebl)
 {
   GElf_Ehdr *ehdr;
   GElf_Ehdr ehdr_mem;
@@ -53,7 +70,8 @@ prepare_binary_output (AsmCtx_t *result, int machine, int klass, int data)
     }
 
   /* Create the ELF header for the output file.  */
-  if (gelf_newehdr (result->out.elf, klass) == 0)
+  int class = ebl_get_elfclass (ebl);
+  if (gelf_newehdr (result->out.elf, class) == 0)
     goto err_libelf;
 
   ehdr = gelf_getehdr (result->out.elf, &ehdr_mem);
@@ -65,11 +83,10 @@ prepare_binary_output (AsmCtx_t *result, int machine, int klass, int data)
   /* Set the ELF version.  */
   ehdr->e_version = EV_CURRENT;
 
-  /* Use the machine value the user provided.  */
-  ehdr->e_machine = machine;
-  /* Same for the class and endianness.  */
-  ehdr->e_ident[EI_CLASS] = klass;
-  ehdr->e_ident[EI_DATA] = data;
+  /* Use the machine, class, and endianess values from the Ebl descriptor.  */
+  ehdr->e_machine = ebl_get_elfmachine (ebl);
+  ehdr->e_ident[EI_CLASS] = class;
+  ehdr->e_ident[EI_DATA] = ebl_get_elfdata (ebl);
 
   memcpy (&ehdr->e_ident[EI_MAG0], ELFMAG, SELFMAG);
 
@@ -95,47 +112,48 @@ prepare_binary_output (AsmCtx_t *result, int machine, int klass, int data)
 
 
 AsmCtx_t *
-asm_begin (fname, textp, machine, klass, data)
+asm_begin (fname, ebl, textp)
      const char *fname;
+     Ebl *ebl;
      bool textp;
-     int machine;
-     int klass;
-     int data;
 {
-  size_t fname_len = strlen (fname);
-  AsmCtx_t *result;
+  if (fname == NULL && ! textp)
+    return NULL;
 
-
-  /* First order of business: find the appropriate backend.  If it
-     does not exist we don't have to look further.  */
-  // XXX
+  size_t fname_len = fname != NULL ? strlen (fname) : 0;
 
   /* Create the file descriptor.  We do not generate the output file
      right away.  Instead we create a temporary file in the same
      directory which, if everything goes alright, will replace a
      possibly existing file with the given name.  */
-  result = (AsmCtx_t *) malloc (sizeof (AsmCtx_t) + 2 * fname_len + 9);
+  AsmCtx_t *result
+    = (AsmCtx_t *) malloc (sizeof (AsmCtx_t) + 2 * fname_len + 9);
   if (result == NULL)
     return NULL;
 
-  /* Initialize the lock.  */
-  rwlock_init (result->lock);
+      /* Initialize the lock.  */
+      rwlock_init (result->lock);
 
-  /* Create the name of the temporary file.  */
-  result->fname = stpcpy (mempcpy (result->tmp_fname, fname, fname_len),
-			  ".XXXXXX") + 1;
-  memcpy (result->fname, fname, fname_len + 1);
-
-  /* Create the temporary file.  */
-  result->fd = mkstemp (result->tmp_fname);
-  if (result->fd == -1)
+  if (fname != NULL)
     {
-      int save_errno = errno;
-      free (result);
-      __libasm_seterrno (ASM_E_CANNOT_CREATE);
-      errno = save_errno;
-      return NULL;
+      /* Create the name of the temporary file.  */
+      result->fname = stpcpy (mempcpy (result->tmp_fname, fname, fname_len),
+			      ".XXXXXX") + 1;
+      memcpy (result->fname, fname, fname_len + 1);
+
+      /* Create the temporary file.  */
+      result->fd = mkstemp (result->tmp_fname);
+      if (result->fd == -1)
+	{
+	  int save_errno = errno;
+	  free (result);
+	  __libasm_seterrno (ASM_E_CANNOT_CREATE);
+	  errno = save_errno;
+	  return NULL;
+	}
     }
+  else
+    result->fd = -1;
 
   /* Initialize the counter for temporary symbols.  */
   result->tempsym_count = 0;
@@ -145,7 +163,7 @@ asm_begin (fname, textp, machine, klass, data)
   if (textp)
     result = prepare_text_output (result);
   else
-    result = prepare_binary_output (result, machine, klass, data);
+    result = prepare_binary_output (result, ebl);
 
   return result;
 }

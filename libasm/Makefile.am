@@ -18,7 +18,7 @@ AM_CFLAGS = -fmudflap
 else
 AM_CFLAGS =
 endif
-AM_CFLAGS += -Wall -Wshadow -Werror -Wunused -Wextra -Wformat=2
+AM_CFLAGS += -std=gnu99 -Wall -Wshadow -Werror -Wunused -Wextra -Wformat=2
 INCLUDES = -I. -I$(srcdir) -I.. -I$(top_srcdir)/libelf -I$(top_srcdir)/libebl \
 	   -I$(top_srcdir)/lib
 GCC_INCLUDE = -I$(shell $(CC) -print-file-name=include)

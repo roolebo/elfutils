@@ -243,6 +243,11 @@ static const char msgstr[] =
   (ELF_E_INVALID_PHDR_IDX \
    + sizeof "program header only allowed in executables and shared objects")
   N_("file has no program header")
+  "\0"
+#define ELF_E_INVALID_OFFSET_IDX \
+  (ELF_E_NO_PHDR_IDX \
+   + sizeof "file has no program header")
+  N_("invalid offset")
 };
 
 
@@ -289,7 +294,8 @@ static const uint_fast16_t msgidx[ELF_E_NUM] =
   [ELF_E_NOFILE] = ELF_E_NOFILE_IDX,
   [ELF_E_GROUP_NOT_REL] = ELF_E_GROUP_NOT_REL_IDX,
   [ELF_E_INVALID_PHDR] = ELF_E_INVALID_PHDR_IDX,
-  [ELF_E_NO_PHDR] = ELF_E_NO_PHDR_IDX
+  [ELF_E_NO_PHDR] = ELF_E_NO_PHDR_IDX,
+  [ELF_E_INVALID_OFFSET] = ELF_E_INVALID_OFFSET_IDX
 };
 #define nmsgidx ((int) (sizeof (msgidx) / sizeof (msgidx[0])))
 

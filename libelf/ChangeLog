@@ -1,3 +1,13 @@
+2005-08-02  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf_error.c: Add handling of ELF_E_INVALID_OFFSET.
+	* elf32_offscn.c: New file.
+	* elf64_offscn.c: New file.
+	* gelf_offscn.c: New file.
+	* Makefile.am (libelf_a_SOURCES): Add elf32_offscn.c, elf64_offscn.c,
+	and gelf_offscn.c.
+	* libelf.sym: Export new symbols.
+
 2005-07-23  Ulrich Drepper  <drepper@redhat.com>
 
 	* elf-knowledge.h (SECTION_STRIP_P): Don't handle removal of debug

@@ -289,7 +289,7 @@ process_file (int fd, Elf *elf, const char *prefix, const char *suffix,
     default:
       /* We cannot do anything.  */
       ERROR (gettext ("\
-Not an ELF file - it has the wrong magic bytes at the start"));
+Not an ELF file - it has the wrong magic bytes at the start\n"));
       break;
     }
 }
@@ -898,36 +898,32 @@ section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol present, but no .got section\n"
 		       idx, section_name (ebl, idx));
 	    }
 	  else if (strcmp (name, "_DYNAMIC") == 0)
-	    {
-	      /* Check that address and size match the dynamic
-		 section.  We locate the dynamic section via the
-		 program header entry.  */
-	      int pcnt;
+	    /* Check that address and size match the dynamic section.
+	       We locate the dynamic section via the program header
+	       entry.  */
+	    for (int pcnt = 0; pcnt < ehdr->e_phnum; ++pcnt)
+	      {
+		GElf_Phdr phdr_mem;
+		GElf_Phdr *phdr = gelf_getphdr (ebl->elf, pcnt, &phdr_mem);
 
-	      for (pcnt = 0; pcnt < ehdr->e_phnum; ++pcnt)
-		{
-		  GElf_Phdr phdr_mem;
-		  GElf_Phdr *phdr = gelf_getphdr (ebl->elf, pcnt, &phdr_mem);
-
-		  if (phdr != NULL && phdr->p_type == PT_DYNAMIC)
-		    {
-		      if (sym->st_value != phdr->p_vaddr)
-			ERROR (gettext ("\
+		if (phdr != NULL && phdr->p_type == PT_DYNAMIC)
+		  {
+		    if (sym->st_value != phdr->p_vaddr)
+		      ERROR (gettext ("\
 section [%2d] '%s': _DYNAMIC_ symbol value %#" PRIx64 " does not match dynamic segment address %#" PRIx64 "\n"),
-			       idx, section_name (ebl, idx),
-			       (uint64_t) sym->st_value,
-			       (uint64_t) phdr->p_vaddr);
+			     idx, section_name (ebl, idx),
+			     (uint64_t) sym->st_value,
+			     (uint64_t) phdr->p_vaddr);
 
-		      if (!gnuld && sym->st_size != phdr->p_memsz)
-			ERROR (gettext ("\
+		    if (!gnuld && sym->st_size != phdr->p_memsz)
+		      ERROR (gettext ("\
 section [%2d] '%s': _DYNAMIC symbol size %" PRIu64 " does not match dynamic segment size %" PRIu64 "\n"),
-			       idx, section_name (ebl, idx),
-			       (uint64_t) sym->st_size,
-			       (uint64_t) phdr->p_memsz);
+			     idx, section_name (ebl, idx),
+			     (uint64_t) sym->st_size,
+			     (uint64_t) phdr->p_memsz);
 
-		      break;
-		    }
-		}
+		    break;
+		  }
 	    }
 	}
     }
@@ -988,10 +984,26 @@ section [%2d] '%s': DT_RELCOUNT value %d too high for this section\n"),
 }
 
 
+struct loaded_segment
+{
+  GElf_Addr from;
+  GElf_Addr to;
+  bool read_only;
+  struct loaded_segment *next;
+};
+
+
+/* Check whether binary has text relocation flag set.  */
+static bool textrel;
+
+/* Keep track of whether text relocation flag is needed.  */
+static bool needed_textrel;
+
+
 static bool
 check_reloc_shdr (Ebl *ebl, const GElf_Ehdr *ehdr, const GElf_Shdr *shdr,
 		  int idx, int reltype, GElf_Shdr **destshdrp,
-		  GElf_Shdr *destshdr_memp)
+		  GElf_Shdr *destshdr_memp, struct loaded_segment **loadedp)
 {
   bool reldyn = false;
 
@@ -1037,14 +1049,83 @@ section [%2d] '%s': section entry size does not match ElfXX_Rela\n" : "\
 section [%2d] '%s': section entry size does not match ElfXX_Rel\n"),
 	   idx, section_name (ebl, idx));
 
+  /* In preparation of checking whether relocations are text
+     relocations or not we need to determine whether the file is
+     flagged to have text relocation and we need to determine a) what
+     the loaded segments are and b) which are read-only.  This will
+     also allow us to determine whether the same reloc section is
+     modifying loaded and not loaded segments.  */
+  for (int i = 0; i < ehdr->e_phnum; ++i)
+    {
+      GElf_Phdr phdr_mem;
+      GElf_Phdr *phdr = gelf_getphdr (ebl->elf, i, &phdr_mem);
+      if (phdr == NULL)
+	continue;
+
+      if (phdr->p_type == PT_LOAD)
+	{
+	  struct loaded_segment *newp = xmalloc (sizeof (*newp));
+	  newp->from = phdr->p_vaddr;
+	  newp->to = phdr->p_vaddr + phdr->p_memsz;
+	  newp->read_only = (phdr->p_flags & PF_W) == 0;
+	  newp->next = *loadedp;
+	  *loadedp = newp;
+	}
+      else if (phdr->p_type == PT_DYNAMIC)
+	{
+	  Elf_Scn *dynscn = gelf_offscn (ebl->elf, phdr->p_offset);
+	  GElf_Shdr dynshdr_mem;
+	  GElf_Shdr *dynshdr = gelf_getshdr (dynscn, &dynshdr_mem);
+	  Elf_Data *dyndata = elf_getdata (dynscn, NULL);
+	  if (dynshdr != NULL && dynshdr->sh_type == SHT_DYNAMIC
+	      && dyndata != NULL)
+	    for (size_t j = 0; j < dynshdr->sh_size / dynshdr->sh_entsize; ++j)
+	      {
+		GElf_Dyn dyn_mem;
+		GElf_Dyn *dyn = gelf_getdyn (dyndata, j, &dyn_mem);
+		if (dyn != NULL
+		    && (dyn->d_tag == DT_TEXTREL
+			|| (dyn->d_tag == DT_FLAGS
+			    && (dyn->d_un.d_val & DF_TEXTREL) != 0)))
+		  {
+		    textrel = true;
+		    break;
+		  }
+	      }
+	}
+    }
+
+  /* A quick test which can be easily done here (although it is a bit
+     out of place): the text relocation flag makes only sense if there
+     is a segment which is not writable.  */
+  if (textrel)
+    {
+      struct loaded_segment *seg = *loadedp;
+      while (seg != NULL && !seg->read_only)
+	seg = seg->next;
+      if (seg == NULL)
+	ERROR (gettext ("\
+text relocation flag set but there is no read-only segment\n"));
+    }
+
   return reldyn;
 }
+
+
+enum load_state
+  {
+    state_undecided,
+    state_loaded,
+    state_unloaded,
+    state_error
+  };
 
 
 static void
 check_one_reloc (Ebl *ebl, int idx, size_t cnt, const GElf_Shdr *symshdr,
 		 Elf_Data *symdata, GElf_Addr r_offset, GElf_Xword r_info,
-		 const GElf_Shdr *destshdr, bool reldyn)
+		 const GElf_Shdr *destshdr, bool reldyn,
+		 struct loaded_segment *loaded, enum load_state *statep)
 {
   bool known_broken = gnuld;
 
@@ -1095,21 +1176,53 @@ section [%2d] '%s': relocation %zu: offset out of bounds\n"),
 	       idx, section_name (ebl, idx), cnt);
     }
 
-  if (symdata != NULL && ebl_copy_reloc_p (ebl, GELF_R_TYPE (r_info)))
-    {
+  GElf_Sym sym_mem;
+  GElf_Sym *sym = gelf_getsym (symdata, GELF_R_SYM (r_info), &sym_mem);
+
+  if (ebl_copy_reloc_p (ebl, GELF_R_TYPE (r_info))
       /* Make sure the referenced symbol is an object or unspecified.  */
-      GElf_Sym sym_mem;
-      GElf_Sym *sym = gelf_getsym (symdata, GELF_R_SYM (r_info), &sym_mem);
-      if (sym != NULL
-	  && GELF_ST_TYPE (sym->st_info) != STT_NOTYPE
-	  && GELF_ST_TYPE (sym->st_info) != STT_OBJECT)
+      && sym != NULL
+      && GELF_ST_TYPE (sym->st_info) != STT_NOTYPE
+      && GELF_ST_TYPE (sym->st_info) != STT_OBJECT)
+    {
+      char buf[64];
+      ERROR (gettext ("section [%2d] '%s': relocation %zu: copy relocation against symbol of type %s\n"),
+	     idx, section_name (ebl, idx), cnt,
+	     ebl_symbol_type_name (ebl, GELF_ST_TYPE (sym->st_info),
+				   buf, sizeof (buf)));
+    }
+
+  bool in_loaded_seg = false;
+  while (loaded != NULL)
+    {
+      if (r_offset < loaded->to
+	  && r_offset + (sym == NULL ? 0 : sym->st_size) >= loaded->from)
 	{
-	  char buf[64];
-	  ERROR (gettext ("section [%2d] '%s': relocation %zu: copy relocation against symbol of type %s\n"),
-		 idx, section_name (ebl, idx), cnt,
-		 ebl_symbol_type_name (ebl, GELF_ST_TYPE (sym->st_info),
-				       buf, sizeof (buf)));
+	  /* The symbol is in this segment.  */
+	  if  (loaded->read_only)
+	    {
+	      if (textrel)
+		needed_textrel = true;
+	      else
+		ERROR (gettext ("section [%2d] '%s': relocation %zu: read-only section modified but text relocation flag not set\n"),
+		       idx, section_name (ebl, idx), cnt);
+	    }
+
+	  in_loaded_seg = true;
 	}
+
+      loaded = loaded->next;
+    }
+
+  if (*statep == state_undecided)
+    *statep = in_loaded_seg ? state_loaded : state_unloaded;
+  else if ((*statep == state_unloaded && in_loaded_seg)
+	   || (*statep == state_loaded && !in_loaded_seg))
+    {
+      ERROR (gettext ("\
+section [%2d] '%s': relocations are against loaded and unloaded data\n"),
+	     idx, section_name (ebl, idx));
+      *statep = state_error;
     }
 }
 
@@ -1128,13 +1241,15 @@ check_rela (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Shdr *shdr, int idx)
   /* Check the fields of the section header.  */
   GElf_Shdr destshdr_mem;
   GElf_Shdr *destshdr = NULL;
+  struct loaded_segment *loaded = NULL;
   bool reldyn = check_reloc_shdr (ebl, ehdr, shdr, idx, ELF_T_RELA, &destshdr,
-				  &destshdr_mem);
+				  &destshdr_mem, &loaded);
 
   Elf_Scn *symscn = elf_getscn (ebl->elf, shdr->sh_link);
   GElf_Shdr symshdr_mem;
   GElf_Shdr *symshdr = gelf_getshdr (symscn, &symshdr_mem);
   Elf_Data *symdata = elf_getdata (symscn, NULL);
+  enum load_state state = state_undecided;
 
   for (size_t cnt = 0; cnt < shdr->sh_size / shdr->sh_entsize; ++cnt)
     {
@@ -1149,7 +1264,14 @@ section [%2d] '%s': cannot get relocation %zu: %s\n"),
 	}
 
       check_one_reloc (ebl, idx, cnt, symshdr, symdata, rela->r_offset,
-		       rela->r_info, destshdr, reldyn);
+		       rela->r_info, destshdr, reldyn, loaded, &state);
+    }
+
+  while (loaded != NULL)
+    {
+      struct loaded_segment *old = loaded;
+      loaded = loaded->next;
+      free (old);
     }
 }
 
@@ -1168,13 +1290,15 @@ check_rel (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Shdr *shdr, int idx)
   /* Check the fields of the section header.  */
   GElf_Shdr destshdr_mem;
   GElf_Shdr *destshdr = NULL;
+  struct loaded_segment *loaded = NULL;
   bool reldyn = check_reloc_shdr (ebl, ehdr, shdr, idx, ELF_T_REL, &destshdr,
-				  &destshdr_mem);
+				  &destshdr_mem, &loaded);
 
   Elf_Scn *symscn = elf_getscn (ebl->elf, shdr->sh_link);
   GElf_Shdr symshdr_mem;
   GElf_Shdr *symshdr = gelf_getshdr (symscn, &symshdr_mem);
   Elf_Data *symdata = elf_getdata (symscn, NULL);
+  enum load_state state = state_undecided;
 
   for (size_t cnt = 0; cnt < shdr->sh_size / shdr->sh_entsize; ++cnt)
     {
@@ -1189,7 +1313,14 @@ section [%2d] '%s': cannot get relocation %zu: %s\n"),
 	}
 
       check_one_reloc (ebl, idx, cnt, symshdr, symdata, rel->r_offset,
-		       rel->r_info, destshdr, reldyn);
+		       rel->r_info, destshdr, reldyn, loaded, &state);
+    }
+
+  while (loaded != NULL)
+    {
+      struct loaded_segment *old = loaded;
+      loaded = loaded->next;
+      free (old);
     }
 }
 
@@ -1199,11 +1330,8 @@ static int ndynamic;
 
 
 static void
-check_dynamic (Ebl *ebl, int idx)
+check_dynamic (Ebl *ebl, GElf_Shdr *shdr, int idx)
 {
-  Elf_Scn *scn;
-  GElf_Shdr shdr_mem;
-  GElf_Shdr *shdr;
   Elf_Data *data;
   GElf_Shdr strshdr_mem;
   GElf_Shdr *strshdr;
@@ -1258,11 +1386,7 @@ check_dynamic (Ebl *ebl, int idx)
   if (++ndynamic == 2)
     ERROR (gettext ("more than one dynamic section present\n"));
 
-  scn = elf_getscn (ebl->elf, idx);
-  shdr = gelf_getshdr (scn, &shdr_mem);
-  if (shdr == NULL)
-    return;
-  data = elf_getdata (scn, NULL);
+  data = elf_getdata (elf_getscn (ebl->elf, idx), NULL);
   if (data == NULL)
     {
       ERROR (gettext ("section [%2d] '%s': cannot get section data\n"),
@@ -2173,7 +2297,7 @@ section [%2zu] '%s': ELF header says this is the section header string table but
 	  break;
 
 	case SHT_DYNAMIC:
-	  check_dynamic (ebl, cnt);
+	  check_dynamic (ebl, shdr, cnt);
 	  break;
 
 	case SHT_SYMTAB_SHNDX:
@@ -2408,9 +2532,33 @@ more than one INTERP entry in program header\n"));
 	}
       else if (phdr->p_type == PT_NOTE)
 	check_note (ebl, ehdr, phdr, cnt);
-      else if (phdr->p_type == PT_DYNAMIC
-	       && ehdr->e_type == ET_EXEC && ! has_interp_segment)
-	ERROR (gettext ("static executable cannot have dynamic sections\n"));
+      else if (phdr->p_type == PT_DYNAMIC)
+	{
+	  if (ehdr->e_type == ET_EXEC && ! has_interp_segment)
+	    ERROR (gettext ("\
+static executable cannot have dynamic sections\n"));
+	  else
+	    {
+	      /* Check that the .dynamic section, if it exists, has
+		 the same address.  */
+	      Elf_Scn *scn = NULL;
+	      while ((scn = elf_nextscn (ebl->elf, scn)) != NULL)
+		{
+		  GElf_Shdr shdr_mem;
+		  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+		  if (shdr != NULL && shdr->sh_type == SHT_DYNAMIC)
+		    {
+		      if (phdr->p_offset != shdr->sh_offset)
+			ERROR (gettext ("\
+dynamic section reference in program header has wrong offset\n"));
+		      if (phdr->p_memsz != shdr->sh_size)
+			ERROR (gettext ("\
+dynamic section size mismatch in program and section header\n"));
+		      break;
+		    }
+		}
+	    }
+	}
       else if (phdr->p_type == PT_GNU_RELRO)
 	{
 	  if (++num_pt_relro == 2)
@@ -2475,6 +2623,8 @@ process_elf_file (Elf *elf, const char *prefix, const char *suffix,
 {
   /* Reset variables.  */
   ndynamic = 0;
+  textrel = false;
+  needed_textrel = false;
 
   GElf_Ehdr ehdr_mem;
   GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);
@@ -2509,6 +2659,10 @@ process_elf_file (Elf *elf, const char *prefix, const char *suffix,
   /* Next the section headers.  It is OK if there are no section
      headers at all.  */
   check_sections (ebl, ehdr);
+
+  /* Report if no relocation section needed the text relocation flag.  */
+  if (textrel && !needed_textrel)
+    ERROR (gettext ("text relocation flag set but not needed\n"));
 
   /* Free the resources.  */
   ebl_closebackend (ebl);

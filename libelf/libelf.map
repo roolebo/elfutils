@@ -7,6 +7,7 @@ ELFUTILS_1.0 {
     elf32_getshdr;
     elf32_newehdr;
     elf32_newphdr;
+    elf32_offscn;
     elf32_xlatetof;
     elf32_xlatetom;
     elf64_checksum;
@@ -16,6 +17,7 @@ ELFUTILS_1.0 {
     elf64_getshdr;
     elf64_newehdr;
     elf64_newphdr;
+    elf64_offscn;
     elf64_xlatetof;
     elf64_xlatetom;
     elf_begin;
@@ -75,6 +77,7 @@ ELFUTILS_1.0 {
     gelf_getversym;
     gelf_newehdr;
     gelf_newphdr;
+    gelf_offscn;
     gelf_rawchunk;
     gelf_update_dyn;
     gelf_update_ehdr;

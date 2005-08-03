@@ -153,6 +153,9 @@ extern int gelf_update_ehdr (Elf *__elf, GElf_Ehdr *__src);
 /* Create new ELF header if none exists.  */
 extern unsigned long int gelf_newehdr (Elf *__elf, int __class);
 
+/* Get section at OFFSET.  */
+extern Elf_Scn *gelf_offscn (Elf *__elf, GElf_Off __offset);
+
 /* Retrieve section header.  */
 extern GElf_Shdr *gelf_getshdr (Elf_Scn *__scn, GElf_Shdr *__dst);
 

@@ -5,6 +5,12 @@
 	(check_one_reloc): New function.  Likewise.
 	(check_rela): Use check_reloc_shdr and check_one_reloc.
 	(check_rel): Likewise.
+	(check_program_header): Check that PT_DYNAMIC entry matches .dynamic
+	section.
+	Add checks that relocations against read-only segments are flagged,
+	that the text relocation flag is not set unnecessarily, and that
+	relocations in one section are either against loaded or not-loaded
+	segments.
 
 2005-08-01  Ulrich Drepper  <drepper@redhat.com>
 

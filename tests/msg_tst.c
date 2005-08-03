@@ -1,4 +1,4 @@
-/* Copyright (C) 2002 Red Hat, Inc.
+/* Copyright (C) 2002, 2005 Red Hat, Inc.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
    This program is Open Source software; you can redistribute it and/or
@@ -68,8 +68,8 @@ static struct
       "only relocatable files can contain section groups" },
     { ELF_E_INVALID_PHDR,
       "program header only allowed in executables and shared objects" },
-    { ELF_E_NO_PHDR,
-      "file has no program header" }
+    { ELF_E_NO_PHDR, "file has no program header" },
+    { ELF_E_INVALID_OFFSET, "invalid offset" }
   };
 
 

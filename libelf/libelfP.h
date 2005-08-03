@@ -117,6 +117,7 @@ enum
   ELF_E_GROUP_NOT_REL,
   ELF_E_INVALID_PHDR,
   ELF_E_NO_PHDR,
+  ELF_E_INVALID_OFFSET,
   /* Keep this as the last entry.  */
   ELF_E_NUM
 };
@@ -453,6 +454,10 @@ extern Elf32_Phdr *__elf32_newphdr_internal (Elf *__elf, size_t __cnt)
      attribute_hidden;
 extern Elf64_Phdr *__elf64_newphdr_internal (Elf *__elf, size_t __cnt)
      attribute_hidden;
+extern Elf_Scn *__elf32_offscn_internal (Elf *__elf, Elf32_Off __offset)
+  attribute_hidden;
+extern Elf_Scn *__elf64_offscn_internal (Elf *__elf, Elf64_Off __offset)
+  attribute_hidden;
 extern int __elf_getshnum_internal (Elf *__elf, size_t *__dst)
      attribute_hidden;
 extern int __elf_getshstrndx_internal (Elf *__elf, size_t *__dst)

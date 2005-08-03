@@ -1,5 +1,5 @@
 /* Interface for libelf.
-   Copyright (C) 1998, 1999, 2000, 2002, 2004 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2004, 2005 Red Hat, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -198,6 +198,11 @@ extern Elf64_Phdr *elf64_newphdr (Elf *__elf, size_t __cnt);
 
 /* Get section at INDEX.  */
 extern Elf_Scn *elf_getscn (Elf *__elf, size_t __index);
+
+/* Get section at OFFSET.  */
+extern Elf_Scn *elf32_offscn (Elf *__elf, Elf32_Off __offset);
+/* Similar bug this time the binary calls is ELFCLASS64.  */
+extern Elf_Scn *elf64_offscn (Elf *__elf, Elf64_Off __offset);
 
 /* Get index of section.  */
 extern size_t elf_ndxscn (Elf_Scn *__scn);

@@ -1,7 +1,7 @@
 		      ToDo list for elfutils                      -*-outline-*-
                       ----------------------
 
-Time-stamp: <2003-08-07 12:52:49 drepper>
+Time-stamp: <2005-08-02 16:36:20 drepper>
 
 * mkinstalldirs
 
@@ -104,10 +104,6 @@ Time-stamp: <2003-08-07 12:52:49 drepper>
 ** additional checks
 
    1st GOT entry == _DYNAMIC
-
-   if TEXTREL check whether any relocation touches RO segment
-
-   if TEXTREL not set check that no relocation touches RO segment
 
    check versioning info:
 

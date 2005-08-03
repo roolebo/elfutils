@@ -1,3 +1,7 @@
+2005-08-02  Ulrich Drepper  <drepper@redhat.com>
+
+	* msg_tst.c: Add new error message.
+
 2005-07-28  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.am (dwflmodtest_LDADD): Add $(libebl).

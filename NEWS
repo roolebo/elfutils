@@ -2,6 +2,10 @@ Version 0.112:
 
 elfcmp: some more relaxation.
 
+elflint: some more tests.
+
+libelf: Add elfXX_offscn and gelf_offscn.
+
 Version 0.111:
 
 libdw: now contains all of libdwfl.  The latter is not installed anymore.

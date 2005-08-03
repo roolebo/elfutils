@@ -1,5 +1,9 @@
 2005-08-02  Ulrich Drepper  <drepper@redhat.com>
 
+	* objdump.c: New file.
+	* Makefile.am (bin_PROGRAMS): Add objdump.
+	(objdump_LDADD): Define.
+
 	* elflint.c (check_reloc_shdr): New function split out from check_rela
 	and check_rel.
 	(check_one_reloc): New function.  Likewise.

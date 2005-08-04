@@ -1,7 +1,7 @@
 		      ToDo list for elfutils                      -*-outline-*-
                       ----------------------
 
-Time-stamp: <2005-08-02 16:36:20 drepper>
+Time-stamp: <2005-08-03 20:38:01 drepper>
 
 * mkinstalldirs
 
@@ -111,14 +111,6 @@ Time-stamp: <2005-08-02 16:36:20 drepper>
      sh_size/sh_entsize matches last offset != 0
 
    check whether any relocation is for a merge-able section
-
-** possibly missing tests
-
-   at most one extended section index table for a symtab
-
-   no extended section index table != ET_REL
-
-   no extended section index table for SHT_DYNSYM
 
 ** relax
 

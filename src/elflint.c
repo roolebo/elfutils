@@ -420,9 +420,7 @@ executables and DSOs cannot have zero program header offset\n"));
 	  /* Get the header of the zeroth section.  The sh_size field
 	     might contain the section number.  */
 	  GElf_Shdr shdr_mem;
-	  GElf_Shdr *shdr;
-
-	  shdr = gelf_getshdr (elf_getscn (ebl->elf, 0), &shdr_mem);
+	  GElf_Shdr *shdr = gelf_getshdr (elf_getscn (ebl->elf, 0), &shdr_mem);
 	  if (shdr != NULL)
 	    {
 	      /* The error will be reported later.  */
@@ -439,17 +437,9 @@ invalid number of section header table entries\n"));
 	  /* Get the header of the zeroth section.  The sh_size field
 	     might contain the section number.  */
 	  GElf_Shdr shdr_mem;
-	  GElf_Shdr *shdr;
-
-	  shdr = gelf_getshdr (elf_getscn (ebl->elf, 0), &shdr_mem);
-	  if (shdr != NULL)
-	    {
-	      /* The error will be reported later.  */
-	      if (shdr->sh_link >= shnum)
-		ERROR (gettext ("invalid section header index\n"));
-	      else
-		shstrndx = shdr->sh_link;
-	    }
+	  GElf_Shdr *shdr = gelf_getshdr (elf_getscn (ebl->elf, 0), &shdr_mem);
+	  if (shdr != NULL && shdr->sh_link < shnum)
+	    shstrndx = shdr->sh_link;
 	}
       else if (shstrndx >= shnum)
 	ERROR (gettext ("invalid section header index\n"));
@@ -511,15 +501,9 @@ check_scn_group (Ebl *ebl, int idx)
 
       for (cnt = idx + 1; cnt < shnum; ++cnt)
 	{
-	  Elf_Scn *scn;
+	  Elf_Scn *scn = elf_getscn (ebl->elf, cnt);
 	  GElf_Shdr shdr_mem;
-	  GElf_Shdr *shdr;
-	  Elf_Data *data;
-	  Elf32_Word *grpdata;
-	  size_t inner;
-
-	  scn = elf_getscn (ebl->elf, cnt);
-	  shdr = gelf_getshdr (scn, &shdr_mem);
+	  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
 	  if (shdr == NULL)
 	    /* We cannot get the section header so we cannot check it.
 	       The error to get the section header will be shown
@@ -529,13 +513,14 @@ check_scn_group (Ebl *ebl, int idx)
 	  if (shdr->sh_type != SHT_GROUP)
 	    continue;
 
-	  data = elf_getdata (scn, NULL);
+	  Elf_Data *data = elf_getdata (scn, NULL);
 	  if (data == NULL || data->d_size < sizeof (Elf32_Word))
 	    /* Cannot check the section.  */
 	    continue;
 
-	  grpdata = (Elf32_Word *) data->d_buf;
-	  for (inner = 1; inner < data->d_size / sizeof (Elf32_Word); ++inner)
+	  Elf32_Word *grpdata = (Elf32_Word *) data->d_buf;
+	  for (size_t inner = 1; inner < data->d_size / sizeof (Elf32_Word);
+	       ++inner)
 	    if (grpdata[inner] == (Elf32_Word) idx)
 	      goto out;
 	}
@@ -583,30 +568,31 @@ check_symtab (Ebl *ebl, GElf_Ehdr *ehdr, int idx)
 
   /* Search for an extended section index table section.  */
   size_t cnt;
-  GElf_Shdr xndxshdr_mem;
-  GElf_Shdr *xndxshdr = NULL;
   Elf_Data *xndxdata = NULL;
   Elf32_Word xndxscnidx = 0;
+  bool found_xndx = false;
   for (cnt = 1; cnt < shnum; ++cnt)
     if (cnt != (size_t) idx)
       {
 	Elf_Scn *xndxscn = elf_getscn (ebl->elf, cnt);
-	xndxshdr = gelf_getshdr (xndxscn, &xndxshdr_mem);
-	xndxdata = elf_getdata (xndxscn, NULL);
-	xndxscnidx = elf_ndxscn (xndxscn);
-
-	if (xndxshdr == NULL || xndxdata == NULL)
+	GElf_Shdr xndxshdr_mem;
+	GElf_Shdr *xndxshdr = gelf_getshdr (xndxscn, &xndxshdr_mem);
+	if (xndxshdr == NULL)
 	  continue;
 
 	if (xndxshdr->sh_type == SHT_SYMTAB_SHNDX
 	    && xndxshdr->sh_link == (GElf_Word) idx)
-	  break;
+	  {
+	    if (found_xndx)
+	      ERROR (gettext ("\
+section [%2d] '%s': symbol table cannot have more than one extended index section\n"),
+		     idx, section_name (ebl, idx));
+
+	    xndxdata = elf_getdata (xndxscn, NULL);
+	    xndxscnidx = elf_ndxscn (xndxscn);
+	    found_xndx = true;
+	  }
       }
-  if (cnt == shnum)
-    {
-      xndxshdr = NULL;
-      xndxdata = NULL;
-    }
 
   if (shdr->sh_entsize != gelf_fsize (ebl->elf, ELF_T_SYM, 1, EV_CURRENT))
     ERROR (gettext ("\
@@ -1414,9 +1400,7 @@ section [%2d] '%s': section entry size does not match ElfXX_Dyn\n"),
   for (cnt = 0; cnt < shdr->sh_size / shdr->sh_entsize; ++cnt)
     {
       GElf_Dyn dyn_mem;
-      GElf_Dyn *dyn;
-
-      dyn = gelf_getdyn (data, cnt, &dyn_mem);
+      GElf_Dyn *dyn = gelf_getdyn (data, cnt, &dyn_mem);
       if (dyn == NULL)
 	{
 	  ERROR (gettext ("\
@@ -1484,9 +1468,7 @@ section [%2d] '%s': entry %zu: DT_PLTREL value must be DT_REL or DT_RELA\n"),
   for (cnt = 1; cnt < DT_NUM; ++cnt)
     if (has_dt[cnt])
       {
-	int inner;
-
-	for (inner = 0; inner < DT_NUM; ++inner)
+	for (int inner = 0; inner < DT_NUM; ++inner)
 	  if (dependencies[cnt][inner] && ! has_dt[inner])
 	    {
 	      char buf1[50];
@@ -1529,30 +1511,24 @@ section [%2d] '%s': not all of %s, %s, and %s are present\n"),
 
 
 static void
-check_symtab_shndx (Ebl *ebl, int idx)
+check_symtab_shndx (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Shdr *shdr, int idx)
 {
-  Elf_Scn *scn;
-  GElf_Shdr shdr_mem;
-  GElf_Shdr *shdr;
+  if (ehdr->e_type != ET_REL)
+    {
+      ERROR (gettext ("\
+section [%2d] '%s': only relocatable files can have extended section index\n"),
+	     idx, section_name (ebl, idx));
+      return;
+    }
+
+  Elf_Scn *symscn = elf_getscn (ebl->elf, shdr->sh_link);
   GElf_Shdr symshdr_mem;
-  GElf_Shdr *symshdr;
-  Elf_Scn *symscn;
-  size_t cnt;
-  Elf_Data *data;
-  Elf_Data *symdata;
-
-  scn = elf_getscn (ebl->elf, idx);
-  shdr = gelf_getshdr (scn, &shdr_mem);
-  if (shdr == NULL)
-    return;
-
-  symscn = elf_getscn (ebl->elf, shdr->sh_link);
-  symshdr = gelf_getshdr (symscn, &symshdr_mem);
+  GElf_Shdr *symshdr = gelf_getshdr (symscn, &symshdr_mem);
   if (symshdr != NULL && symshdr->sh_type != SHT_SYMTAB)
     ERROR (gettext ("\
 section [%2d] '%s': extended section index section not for symbol table\n"),
 	   idx, section_name (ebl, idx));
-  symdata = elf_getdata (symscn, NULL);
+  Elf_Data *symdata = elf_getdata (symscn, NULL);
   if (symdata == NULL)
     ERROR (gettext ("cannot get data for symbol section\n"));
 
@@ -1572,12 +1548,10 @@ section [%2d] '%s': extended index table too small for symbol table\n"),
     ERROR (gettext ("section [%2d] '%s': sh_info not zero\n"),
 	   idx, section_name (ebl, idx));
 
-  for (cnt = idx + 1; cnt < shnum; ++cnt)
+  for (size_t cnt = idx + 1; cnt < shnum; ++cnt)
     {
       GElf_Shdr rshdr_mem;
-      GElf_Shdr *rshdr;
-
-      rshdr = gelf_getshdr (elf_getscn (ebl->elf, cnt), &rshdr_mem);
+      GElf_Shdr *rshdr = gelf_getshdr (elf_getscn (ebl->elf, cnt), &rshdr_mem);
       if (rshdr != NULL && rshdr->sh_type == SHT_SYMTAB_SHNDX
 	  && rshdr->sh_link == shdr->sh_link)
 	{
@@ -1589,12 +1563,12 @@ section [%2d] '%s': extended section index in section [%2zu] '%s' refers to same
 	}
     }
 
-  data = elf_getdata (scn, NULL);
+  Elf_Data *data = elf_getdata (elf_getscn (ebl->elf, idx), NULL);
 
   if (*((Elf32_Word *) data->d_buf) != 0)
     ERROR (gettext ("symbol 0 should have zero extended section index\n"));
 
-  for (cnt = 1; cnt < data->d_size / sizeof (Elf32_Word); ++cnt)
+  for (size_t cnt = 1; cnt < data->d_size / sizeof (Elf32_Word); ++cnt)
     {
       Elf32_Word xndx = ((Elf32_Word *) data->d_buf)[cnt];
 
@@ -1618,22 +1592,17 @@ extended section index is %" PRIu32 " but symbol index is not XINDEX\n"),
 
 
 static void
-check_hash (Ebl *ebl, int idx)
+check_hash (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Shdr *shdr, int idx)
 {
-  Elf_Scn *scn;
-  GElf_Shdr shdr_mem;
-  GElf_Shdr *shdr;
-  Elf_Data *data;
-  Elf32_Word nbucket;
-  Elf32_Word nchain;
-  GElf_Shdr symshdr_mem;
-  GElf_Shdr *symshdr;
+  if (ehdr->e_type == ET_REL)
+    {
+      ERROR (gettext ("\
+section [%2d] '%s': relocatable files cannot have hash tables\n"),
+	     idx, section_name (ebl, idx));
+      return;
+    }
 
-  scn = elf_getscn (ebl->elf, idx);
-  shdr = gelf_getshdr (scn, &shdr_mem);
-  if (shdr == NULL)
-    return;
-  data = elf_getdata (scn, NULL);
+  Elf_Data *data = elf_getdata (elf_getscn (ebl->elf, idx), NULL);
   if (data == NULL)
     {
       ERROR (gettext ("section [%2d] '%s': cannot get section data\n"),
@@ -1641,7 +1610,9 @@ check_hash (Ebl *ebl, int idx)
       return;
     }
 
-  symshdr = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link), &symshdr_mem);
+  GElf_Shdr symshdr_mem;
+  GElf_Shdr *symshdr = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
+				     &symshdr_mem);
   if (symshdr != NULL && symshdr->sh_type != SHT_DYNSYM)
     ERROR (gettext ("\
 section [%2d] '%s': hash table not for dynamic symbol table\n"),
@@ -1664,8 +1635,8 @@ section [%2d] '%s': hash table has not even room for nbucket and nchain\n"),
       return;
     }
 
-  nbucket = ((Elf32_Word *) data->d_buf)[0];
-  nchain = ((Elf32_Word *) data->d_buf)[1];
+  Elf32_Word nbucket = ((Elf32_Word *) data->d_buf)[0];
+  Elf32_Word nchain = ((Elf32_Word *) data->d_buf)[1];
 
   if (shdr->sh_size < (2 + nbucket + nchain) * shdr->sh_entsize)
     ERROR (gettext ("\
@@ -1813,10 +1784,8 @@ section [%2d] '%s': section index %Zu out of range\n"),
 	  else
 	    {
 	      GElf_Shdr refshdr_mem;
-	      GElf_Shdr *refshdr;
-
-	      refshdr = gelf_getshdr (elf_getscn (ebl->elf, val),
-				      &refshdr_mem);
+	      GElf_Shdr *refshdr = gelf_getshdr (elf_getscn (ebl->elf, val),
+						 &refshdr_mem);
 	      if (refshdr == NULL)
 		ERROR (gettext ("\
 section [%2d] '%s': cannot get section header for element %zu: %s\n"),
@@ -1891,7 +1860,12 @@ static const struct
     { ".tbss", 6, SHT_NOBITS, exact, SHF_ALLOC | SHF_WRITE | SHF_TLS, 0 },
     { ".tdata", 7, SHT_PROGBITS, exact, SHF_ALLOC | SHF_WRITE | SHF_TLS, 0 },
     { ".tdata1", 8, SHT_PROGBITS, exact, SHF_ALLOC | SHF_WRITE | SHF_TLS, 0 },
-    { ".text", 6, SHT_PROGBITS, exact, SHF_ALLOC | SHF_EXECINSTR, 0 }
+    { ".text", 6, SHT_PROGBITS, exact, SHF_ALLOC | SHF_EXECINSTR, 0 },
+
+    /* The following are GNU extensions.  */
+    { ".gnu.version", 12, SHT_GNU_versym, exact, SHF_ALLOC, 0 },
+    { ".gnu.version_d", 14, SHT_GNU_verdef, exact, SHF_ALLOC, 0 },
+    { ".gnu.version_r", 14, SHT_GNU_verneed, exact, SHF_ALLOC, 0 }
   };
 #define nspecial_sections \
   (sizeof (special_sections) / sizeof (special_sections[0]))
@@ -1922,9 +1896,8 @@ section_flags_string (GElf_Word flags, char *buf, size_t len)
   const size_t nknown_flags = sizeof (known_flags) / sizeof (known_flags[0]);
 
   char *cp = buf;
-  size_t cnt;
 
-  for (cnt = 0; cnt < nknown_flags; ++cnt)
+  for (size_t cnt = 0; cnt < nknown_flags; ++cnt)
     if (flags & known_flags[cnt].flag)
       {
 	if (cp != buf && len > 1)
@@ -1984,14 +1957,49 @@ section [%2d] '%s' has different number of entries than symbol table [%2d] '%s'\
 }
 
 
+static unsigned int nverneed;
+
+static void
+check_verneed (Ebl *ebl, GElf_Shdr *shdr, int idx)
+{
+  if (++nverneed == 2)
+    ERROR (gettext ("more than one version reference section present\n"));
+
+  GElf_Shdr strshdr_mem;
+  GElf_Shdr *strshdr = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
+				     &strshdr_mem);
+  if (strshdr == NULL)
+    return;
+  if (strshdr->sh_type != SHT_STRTAB)
+    ERROR (gettext ("\
+section [%2d] '%s': sh_link does not link to string table\n"),
+	   idx, section_name (ebl, idx));
+}
+
+
+static unsigned int nverdef;
+
+static void
+check_verdef (Ebl *ebl, GElf_Shdr *shdr, int idx)
+{
+  if (++nverdef == 2)
+    ERROR (gettext ("more than one version definition section present\n"));
+
+  GElf_Shdr strshdr_mem;
+  GElf_Shdr *strshdr = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
+				     &strshdr_mem);
+  if (strshdr == NULL)
+    return;
+  if (strshdr->sh_type != SHT_STRTAB)
+    ERROR (gettext ("\
+section [%2d] '%s': sh_link does not link to string table\n"),
+	   idx, section_name (ebl, idx));
+}
+
+
 static void
 check_sections (Ebl *ebl, GElf_Ehdr *ehdr)
 {
-  GElf_Shdr shdr_mem;
-  GElf_Shdr *shdr;
-  size_t cnt;
-  bool dot_interp_section = false;
-
   if (ehdr->e_shoff == 0)
     /* No section header.  */
     return;
@@ -2002,7 +2010,8 @@ check_sections (Ebl *ebl, GElf_Ehdr *ehdr)
   /* Check the zeroth section first.  It must not have any contents
      and the section header must contain nonzero value at most in the
      sh_size and sh_link fields.  */
-  shdr = gelf_getshdr (elf_getscn (ebl->elf, 0), &shdr_mem);
+  GElf_Shdr shdr_mem;
+  GElf_Shdr *shdr = gelf_getshdr (elf_getscn (ebl->elf, 0), &shdr_mem);
   if (shdr == NULL)
     ERROR (gettext ("cannot get section header of zeroth section\n"));
   else
@@ -2033,12 +2042,11 @@ zeroth section has nonzero size value while ELF header has nonzero shnum value\n
 zeroth section has nonzero link value while ELF header does not signal overflow in shstrndx\n"));
     }
 
-  for (cnt = 1; cnt < shnum; ++cnt)
-    {
-      Elf_Scn *scn;
+  bool dot_interp_section = false;
 
-      scn = elf_getscn (ebl->elf, cnt);
-      shdr = gelf_getshdr (scn, &shdr_mem);
+  for (size_t cnt = 1; cnt < shnum; ++cnt)
+    {
+      shdr = gelf_getshdr (elf_getscn (ebl->elf, cnt), &shdr_mem);
       if (shdr == NULL)
 	{
 	  ERROR (gettext ("\
@@ -2283,8 +2291,13 @@ section [%2zu] '%s': ELF header says this is the section header string table but
 
       switch (shdr->sh_type)
 	{
-	case SHT_SYMTAB:
 	case SHT_DYNSYM:
+	  if (ehdr->e_type == ET_REL)
+	    ERROR (gettext ("\
+section [%2zu] '%s': relocatable files cannot have dynamic symbol tables\n"),
+		   cnt, section_name (ebl, cnt));
+	  /* FALLTHROUGH */
+	case SHT_SYMTAB:
 	  check_symtab (ebl, ehdr, cnt);
 	  break;
 
@@ -2301,11 +2314,11 @@ section [%2zu] '%s': ELF header says this is the section header string table but
 	  break;
 
 	case SHT_SYMTAB_SHNDX:
-	  check_symtab_shndx (ebl, cnt);
+	  check_symtab_shndx (ebl, ehdr, shdr, cnt);
 	  break;
 
 	case SHT_HASH:
-	  check_hash (ebl, cnt);
+	  check_hash (ebl, ehdr, shdr, cnt);
 	  break;
 
 	case SHT_NULL:
@@ -2318,6 +2331,14 @@ section [%2zu] '%s': ELF header says this is the section header string table but
 
 	case SHT_GNU_versym:
 	  check_versym (ebl, shdr, cnt);
+	  break;
+
+	case SHT_GNU_verneed:
+	  check_verneed (ebl, shdr, cnt);
+	  break;
+
+	case SHT_GNU_verdef:
+	  check_verdef (ebl, shdr, cnt);
 	  break;
 
 	default:
@@ -2623,8 +2644,12 @@ process_elf_file (Elf *elf, const char *prefix, const char *suffix,
 {
   /* Reset variables.  */
   ndynamic = 0;
+  nverneed = 0;
+  nverdef = 0;
   textrel = false;
   needed_textrel = false;
+  has_loadable_segment = false;
+  has_interp_segment = false;
 
   GElf_Ehdr ehdr_mem;
   GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);

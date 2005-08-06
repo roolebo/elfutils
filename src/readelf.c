@@ -159,7 +159,7 @@ static void print_ehdr (Ebl *ebl, GElf_Ehdr *ehdr);
 static void print_shdr (Ebl *ebl, GElf_Ehdr *ehdr);
 static void print_phdr (Ebl *ebl, GElf_Ehdr *ehdr);
 static void print_scngrp (Ebl *ebl);
-static void print_dynamic (Ebl *ebl);
+static void print_dynamic (Ebl *ebl, GElf_Ehdr *ehdr);
 static void print_relocs (Ebl *ebl);
 static void handle_relocs_rel (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr);
 static void handle_relocs_rela (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr);
@@ -479,7 +479,7 @@ process_elf_file (Elf *elf, const char *prefix, const char *fname,
   if (print_section_groups)
     print_scngrp (ebl);
   if (print_dynamic_table)
-    print_dynamic (ebl);
+    print_dynamic (ebl, ehdr);
   if (print_relocations)
     print_relocs (ebl);
   if (print_histogram)
@@ -1264,20 +1264,20 @@ handle_dynamic (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 
 /* Print the dynamic segment.  */
 static void
-print_dynamic (Ebl *ebl)
+print_dynamic (Ebl *ebl, GElf_Ehdr *ehdr)
 {
-  /* Find all relocation sections and handle them.  */
-  Elf_Scn *scn = NULL;
-
-  while ((scn = elf_nextscn (ebl->elf, scn)) != NULL)
+  for (int i = 0; i < ehdr->e_phnum; ++i)
     {
-       /* Handle the section if it is a symbol table.  */
-      GElf_Shdr shdr_mem;
-      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+      GElf_Phdr phdr_mem;
+      GElf_Phdr *phdr = gelf_getphdr (ebl->elf, i, &phdr_mem);
 
-      if (shdr != NULL && shdr->sh_type == SHT_DYNAMIC)
+      if (phdr != NULL && phdr->p_type == PT_DYNAMIC)
 	{
-	  handle_dynamic (ebl, scn, shdr);
+	  Elf_Scn *scn = gelf_offscn (ebl->elf, phdr->p_offset);
+	  GElf_Shdr shdr_mem;
+	  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+	  if (shdr != NULL && shdr->sh_type == SHT_DYNAMIC)
+	    handle_dynamic (ebl, scn, shdr);
 	  break;
 	}
     }
@@ -1943,23 +1943,20 @@ get_ver_flags (unsigned int flags)
 static void
 handle_verneed (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 {
-  Elf_Data *data;
   int class = gelf_getclass (ebl->elf);
-  GElf_Shdr glink;
-  int cnt;
-  unsigned int offset;
-  size_t shstrndx;
 
   /* Get the data of the section.  */
-  data = elf_getdata (scn, NULL);
+  Elf_Data *data = elf_getdata (scn, NULL);
   if (data == NULL)
     return;
 
   /* Get the section header string table index.  */
+  size_t shstrndx;
   if (elf_getshstrndx (ebl->elf, &shstrndx) < 0)
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
 
+  GElf_Shdr glink;
   printf (ngettext ("\
 \nVersion needs section [%2u] '%s' contains %d entry:\n Addr: %#0*" PRIx64 "  Offset: %#08" PRIx64 "  Link to section: [%2u] '%s'\n",
 		    "\
@@ -1974,16 +1971,12 @@ handle_verneed (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 		      gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
 				    &glink)->sh_name));
 
-  offset = 0;
-  for (cnt = shdr->sh_info; --cnt >= 0; )
+  unsigned int offset = 0;
+  for (int cnt = shdr->sh_info; --cnt >= 0; )
     {
-      GElf_Verneed needmem;
-      GElf_Verneed *need;
-      unsigned int auxoffset;
-      int cnt2;
-
       /* Get the data at the next offset.  */
-      need = gelf_getverneed (data, offset, &needmem);
+      GElf_Verneed needmem;
+      GElf_Verneed *need = gelf_getverneed (data, offset, &needmem);
       if (need == NULL)
 	break;
 
@@ -1992,13 +1985,11 @@ handle_verneed (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 	      elf_strptr (ebl->elf, shdr->sh_link, need->vn_file),
 	      (unsigned short int) need->vn_cnt);
 
-      auxoffset = offset + need->vn_aux;
-      for (cnt2 = need->vn_cnt; --cnt2 >= 0; )
+      unsigned int auxoffset = offset + need->vn_aux;
+      for (int cnt2 = need->vn_cnt; --cnt2 >= 0; )
 	{
 	  GElf_Vernaux auxmem;
-	  GElf_Vernaux *aux;
-
-	  aux = gelf_getvernaux (data, auxoffset, &auxmem);
+	  GElf_Vernaux *aux = gelf_getvernaux (data, auxoffset, &auxmem);
 	  if (aux == NULL)
 	    break;
 
@@ -2020,23 +2011,19 @@ handle_verneed (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 static void
 handle_verdef (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 {
-  Elf_Data *data;
-  int class = gelf_getclass (ebl->elf);
-  GElf_Shdr glink;
-  int cnt;
-  unsigned int offset;
-  size_t shstrndx;
-
   /* Get the data of the section.  */
-  data = elf_getdata (scn, NULL);
+  Elf_Data *data = elf_getdata (scn, NULL);
   if (data == NULL)
     return;
 
   /* Get the section header string table index.  */
+  size_t shstrndx;
   if (elf_getshstrndx (ebl->elf, &shstrndx) < 0)
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
 
+  int class = gelf_getclass (ebl->elf);
+  GElf_Shdr glink;
   printf (ngettext ("\
 \nVersion definition section [%2u] '%s' contains %d entry:\n Addr: %#0*" PRIx64 "  Offset: %#08" PRIx64 "  Link to section: [%2u] '%s'\n",
 		    "\
@@ -2052,23 +2039,18 @@ handle_verdef (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 		      gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
 				    &glink)->sh_name));
 
-  offset = 0;
-  for (cnt = shdr->sh_info; --cnt >= 0; )
+  unsigned int offset = 0;
+  for (int cnt = shdr->sh_info; --cnt >= 0; )
     {
-      GElf_Verdef defmem;
-      GElf_Verdef *def;
-      GElf_Verdaux auxmem;
-      GElf_Verdaux *aux;
-      unsigned int auxoffset;
-      int cnt2;
-
       /* Get the data at the next offset.  */
-      def = gelf_getverdef (data, offset, &defmem);
+      GElf_Verdef defmem;
+      GElf_Verdef *def = gelf_getverdef (data, offset, &defmem);
       if (def == NULL)
 	break;
 
-      auxoffset = offset + def->vd_aux;
-      aux = gelf_getverdaux (data, auxoffset, &auxmem);
+      unsigned int auxoffset = offset + def->vd_aux;
+      GElf_Verdaux auxmem;
+      GElf_Verdaux *aux = gelf_getverdaux (data, auxoffset, &auxmem);
       if (aux == NULL)
 	break;
 
@@ -2081,7 +2063,7 @@ handle_verdef (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 	      elf_strptr (ebl->elf, shdr->sh_link, aux->vda_name));
 
       auxoffset += aux->vda_next;
-      for (cnt2 = 1; cnt2 < def->vd_cnt; ++cnt2)
+      for (int cnt2 = 1; cnt2 < def->vd_cnt; ++cnt2)
 	{
 	  aux = gelf_getverdaux (data, auxoffset, &auxmem);
 	  if (aux == NULL)
@@ -2103,34 +2085,28 @@ handle_verdef (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 static void
 handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 {
-  Elf_Data *data;
   int class = gelf_getclass (ebl->elf);
-  Elf_Scn *verscn;
   GElf_Shdr glink;
-  Elf_Scn *defscn;
-  Elf_Scn *needscn;
   const char **vername;
   const char **filename;
-  size_t nvername;
-  unsigned int cnt;
-  size_t shstrndx;
 
   /* Get the data of the section.  */
-  data = elf_getdata (scn, NULL);
+  Elf_Data *data = elf_getdata (scn, NULL);
   if (data == NULL)
     return;
 
   /* Get the section header string table index.  */
+  size_t shstrndx;
   if (elf_getshstrndx (ebl->elf, &shstrndx) < 0)
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
 
   /* We have to find the version definition section and extract the
      version names.  */
-  defscn = NULL;
-  needscn = NULL;
+  Elf_Scn *defscn = NULL;
+  Elf_Scn *needscn = NULL;
 
-  verscn = NULL;
+  Elf_Scn *verscn = NULL;
   while ((verscn = elf_nextscn (ebl->elf, verscn)) != NULL)
     {
       GElf_Shdr vershdr_mem;
@@ -2145,6 +2121,7 @@ handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 	}
     }
 
+  size_t nvername;
   if (defscn != NULL || needscn != NULL)
     {
       /* We have a version information (better should have).  Now get
@@ -2167,7 +2144,7 @@ handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 	  if (defshdr == NULL)
 	    return;
 
-	  for (cnt = 0; cnt < defshdr->sh_info; ++cnt)
+	  for (unsigned int cnt = 0; cnt < defshdr->sh_info; ++cnt)
 	    {
 	      GElf_Verdef defmem;
 	      GElf_Verdef *def;
@@ -2197,7 +2174,7 @@ handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 	  if (needshdr == NULL)
 	    return;
 
-	  for (cnt = 0; cnt < needshdr->sh_info; ++cnt)
+	  for (unsigned int cnt = 0; cnt < needshdr->sh_info; ++cnt)
 	    {
 	      GElf_Verneed needmem;
 	      GElf_Verneed *need;
@@ -2255,7 +2232,7 @@ handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 	  if (defshdr == NULL)
 	    return;
 
-	  for (cnt = 0; cnt < defshdr->sh_info; ++cnt)
+	  for (unsigned int cnt = 0; cnt < defshdr->sh_info; ++cnt)
 	    {
 	      GElf_Verdef defmem;
 	      GElf_Verdef *def;
@@ -2293,7 +2270,7 @@ handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 	  if (needshdr == NULL)
 	    return;
 
-	  for (cnt = 0; cnt < needshdr->sh_info; ++cnt)
+	  for (unsigned int cnt = 0; cnt < needshdr->sh_info; ++cnt)
 	    {
 	      GElf_Verneed needmem;
 	      GElf_Verneed *need;
@@ -2352,7 +2329,7 @@ handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 				    &glink)->sh_name));
 
   /* Now we can finally look at the actual contents of this section.  */
-  for (cnt = 0; cnt < shdr->sh_size / shdr->sh_entsize; ++cnt)
+  for (unsigned int cnt = 0; cnt < shdr->sh_size / shdr->sh_entsize; ++cnt)
     {
       GElf_Versym symmem;
       GElf_Versym *sym;

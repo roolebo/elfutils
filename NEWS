@@ -2,7 +2,7 @@ Version 0.112:
 
 elfcmp: some more relaxation.
 
-elflint: some more tests.
+elflint: many more tests, especially regarding to symbol versioning.
 
 libelf: Add elfXX_offscn and gelf_offscn.
 

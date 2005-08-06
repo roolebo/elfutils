@@ -540,26 +540,23 @@ section [%2d] '%s': section group [%2zu] '%s' does not preceed group member\n"),
 
 
 static void
-check_symtab (Ebl *ebl, GElf_Ehdr *ehdr, int idx)
+check_symtab (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Shdr *shdr, int idx)
 {
   bool no_xndx_warned = false;
   int no_pt_tls = 0;
-
-  Elf_Scn *scn = elf_getscn (ebl->elf, idx);
-  GElf_Shdr shdr_mem;
-  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
-  GElf_Shdr strshdr_mem;
-  GElf_Shdr *strshdr = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
-				     &strshdr_mem);
-  if (shdr == NULL || strshdr == NULL)
-    return;
-  Elf_Data *data = elf_getdata (scn, NULL);
+  Elf_Data *data = elf_getdata (elf_getscn (ebl->elf, idx), NULL);
   if (data == NULL)
     {
       ERROR (gettext ("section [%2d] '%s': cannot get section data\n"),
 	     idx, section_name (ebl, idx));
       return;
     }
+
+  GElf_Shdr strshdr_mem;
+  GElf_Shdr *strshdr = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
+				     &strshdr_mem);
+  if (strshdr == NULL)
+    return;
 
   if (strshdr->sh_type != SHT_STRTAB)
     ERROR (gettext ("section [%2d] '%s': referenced as string table for section [%2d] '%s' but type is not SHT_STRTAB\n"),
@@ -1863,9 +1860,9 @@ static const struct
     { ".text", 6, SHT_PROGBITS, exact, SHF_ALLOC | SHF_EXECINSTR, 0 },
 
     /* The following are GNU extensions.  */
-    { ".gnu.version", 12, SHT_GNU_versym, exact, SHF_ALLOC, 0 },
-    { ".gnu.version_d", 14, SHT_GNU_verdef, exact, SHF_ALLOC, 0 },
-    { ".gnu.version_r", 14, SHT_GNU_verneed, exact, SHF_ALLOC, 0 }
+    { ".gnu.version", 13, SHT_GNU_versym, exact, SHF_ALLOC, 0 },
+    { ".gnu.version_d", 15, SHT_GNU_verdef, exact, SHF_ALLOC, 0 },
+    { ".gnu.version_r", 15, SHT_GNU_verneed, exact, SHF_ALLOC, 0 }
   };
 #define nspecial_sections \
   (sizeof (special_sections) / sizeof (special_sections[0]))
@@ -1922,14 +1919,117 @@ section_flags_string (GElf_Word flags, char *buf, size_t len)
 }
 
 
-static void
-check_versym (Ebl *ebl, GElf_Shdr *shdr, int idx)
+static int
+has_copy_reloc (Ebl *ebl, unsigned int symscnndx, unsigned int symndx)
 {
-  /* The number of elements in the version symbol table must be the
-     same as the number of symbols.  */
+  /* First find the relocation section for the symbol table.  */
+  Elf_Scn *scn = NULL;
+  GElf_Shdr shdr_mem;
+  GElf_Shdr *shdr = NULL;
+  while ((scn = elf_nextscn (ebl->elf, scn)) != NULL)
+    {
+      shdr = gelf_getshdr (scn, &shdr_mem);
+      if (shdr != NULL
+	  && (shdr->sh_type == SHT_REL || shdr->sh_type == SHT_RELA)
+	  && shdr->sh_link == symscnndx)
+	/* Found the section.  */
+	break;
+    }
+
+  if (scn == NULL)
+    return 0;
+
+  Elf_Data *data = elf_getdata (scn, NULL);
+  if (data == NULL)
+    return 0;
+
+  if (shdr->sh_type == SHT_REL)
+    for (int i = 0; (size_t) i < shdr->sh_size / shdr->sh_entsize; ++i)
+      {
+	GElf_Rel rel_mem;
+	GElf_Rel *rel = gelf_getrel (data, i, &rel_mem);
+	if (rel == NULL)
+	  continue;
+
+	if (GELF_R_SYM (rel->r_info) == symndx
+	    && ebl_copy_reloc_p (ebl, GELF_R_TYPE (rel->r_info)))
+	  return 1;
+      }
+  else
+    for (int i = 0; (size_t) i < shdr->sh_size / shdr->sh_entsize; ++i)
+      {
+	GElf_Rela rela_mem;
+	GElf_Rela *rela = gelf_getrela (data, i, &rela_mem);
+	if (rela == NULL)
+	  continue;
+
+	if (GELF_R_SYM (rela->r_info) == symndx
+	    && ebl_copy_reloc_p (ebl, GELF_R_TYPE (rela->r_info)))
+	  return 1;
+      }
+
+  return 0;
+}
+
+
+static struct version_namelist
+{
+  const char *objname;
+  const char *name;
+  GElf_Word ndx;
+  enum { ver_def, ver_need } type;
+  struct version_namelist *next;
+} *version_namelist;
+
+
+static int
+add_version (const char *objname, const char *name, GElf_Word ndx, int type)
+{
+  /* Check that there are no duplications.  */
+  struct version_namelist *nlp = version_namelist;
+  while (nlp != NULL)
+    {
+      if (((nlp->objname == NULL && objname == NULL)
+	   || (nlp->objname != NULL && objname != NULL
+	       && strcmp (nlp->objname, objname) == 0))
+	  && strcmp (nlp->name, name) == 0)
+	return nlp->type == ver_def ? 1 : -1;
+      nlp = nlp->next;
+    }
+
+  nlp = xmalloc (sizeof (*nlp));
+  nlp->objname = objname;
+  nlp->name = name;
+  nlp->ndx = ndx;
+  nlp->type = type;
+  nlp->next = version_namelist;
+  version_namelist = nlp;
+
+  return 0;
+}
+
+
+static void
+check_versym (Ebl *ebl, int idx)
+{
+  Elf_Scn *scn = elf_getscn (ebl->elf, idx);
+  GElf_Shdr shdr_mem;
+  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+  if (shdr == NULL)
+    /* The error has already been reported.  */
+    return;
+
+  Elf_Data *data = elf_getdata (scn, NULL);
+  if (data == NULL)
+    {
+      ERROR (gettext ("section [%2d] '%s': cannot get section data\n"),
+	     idx, section_name (ebl, idx));
+      return;
+    }
+
+  Elf_Scn *symscn = elf_getscn (ebl->elf, shdr->sh_link);
   GElf_Shdr symshdr_mem;
-  GElf_Shdr *symshdr = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
-				     &symshdr_mem);
+  GElf_Shdr *symshdr = gelf_getshdr (symscn, &symshdr_mem);
   if (symshdr == NULL)
     /* The error has already been reported.  */
     return;
@@ -1943,6 +2043,8 @@ section [%2d] '%s' refers in sh_link to section [%2d] '%s' which is no dynamic s
       return;
     }
 
+  /* The number of elements in the version symbol table must be the
+     same as the number of symbols.  */
   if (shdr->sh_size / shdr->sh_entsize
       != symshdr->sh_size / symshdr->sh_entsize)
     ERROR (gettext ("\
@@ -1950,17 +2052,123 @@ section [%2d] '%s' has different number of entries than symbol table [%2d] '%s'\
 	   idx, section_name (ebl, idx),
 	   shdr->sh_link, section_name (ebl, shdr->sh_link));
 
-  // XXX TODO A lot more tests
-  // check value of the fields.  local symbols must have zero entries.
-  // nonlocal symbols refer to valid version.  Check that version index
-  // in bound.
+  Elf_Data *symdata = elf_getdata (symscn, NULL);
+  if (symdata == NULL)
+    /* The error has already been reported.  */
+    return;
+
+  for (int cnt = 1; (size_t) cnt < shdr->sh_size / shdr->sh_entsize; ++cnt)
+    {
+      GElf_Versym versym_mem;
+      GElf_Versym *versym = gelf_getversym (data, cnt, &versym_mem);
+      if (versym == NULL)
+	{
+	  ERROR (gettext ("\
+section [%2d] '%s': symbol %d: cannot read version data\n"),
+		 idx, section_name (ebl, idx), cnt);
+	  break;
+	}
+
+      GElf_Sym sym_mem;
+      GElf_Sym *sym = gelf_getsym (symdata, cnt, &sym_mem);
+      if (sym == NULL)
+	/* Already reported elsewhere.  */
+	continue;
+
+      if (*versym == VER_NDX_LOCAL)
+	{
+	  /* Local symbol.  Make sure it is defined unless the
+	     reference is weak.  */
+	  if (sym->st_shndx == SHN_UNDEF
+	      && GELF_ST_BIND (sym->st_info) != STB_WEAK)
+	    ERROR (gettext ("\
+section [%2d] '%s': symbol %d: undefined symbol with local scope\n"),
+		   idx, section_name (ebl, idx), cnt);
+	}
+      else if (*versym == VER_NDX_GLOBAL)
+	{
+	  /* Global symbol.  Make sure it is not defined as local.  */
+	  if (GELF_ST_BIND (sym->st_info) == STB_LOCAL)
+	    ERROR (gettext ("\
+section [%2d] '%s': symbol %d: local symbol with global scope\n"),
+		   idx, section_name (ebl, idx), cnt);
+	}
+      else
+	{
+	  /* Look through the list of defined versions and locate the
+	     index we need for this symbol.  */
+	  struct version_namelist *runp = version_namelist;
+	  while (runp != NULL)
+	    if (runp->ndx == *versym)
+	      break;
+	    else
+	      runp = runp->next;
+
+	  if (runp == NULL)
+	    ERROR (gettext ("\
+section [%2d] '%s': symbol %d: invalid version index %d\n"),
+		   idx, section_name (ebl, idx), cnt, (int) *versym);
+	  else if (sym->st_shndx == SHN_UNDEF
+		   && runp->type == ver_def)
+	    ERROR (gettext ("\
+section [%2d] '%s': symbol %d: version index %d is for defined version\n"),
+		   idx, section_name (ebl, idx), cnt, (int) *versym);
+	  else if (sym->st_shndx != SHN_UNDEF
+		   && runp->type == ver_need)
+	    {
+	      /* Unless this symbol has a copy relocation associated
+		 this must not happen.  */
+	      if (!has_copy_reloc (ebl, shdr->sh_link, cnt))
+		ERROR (gettext ("\
+section [%2d] '%s': symbol %d: version index %d is for requested version\n"),
+		       idx, section_name (ebl, idx), cnt, (int) *versym);
+	    }
+	}
+    }
+}
+
+
+static int
+unknown_dependency_p (Elf *elf, GElf_Ehdr *ehdr, const char *fname)
+{
+  GElf_Phdr phdr_mem;
+  GElf_Phdr *phdr = NULL;
+
+  int i;
+  for (i = 0; i < ehdr->e_phnum; ++i)
+    if ((phdr = gelf_getphdr (elf, i, &phdr_mem)) != NULL
+	&& phdr->p_type == PT_DYNAMIC)
+      break;
+
+  if (i == ehdr->e_phnum)
+    return 1;
+  assert (phdr != NULL);
+  Elf_Scn *scn = gelf_offscn (elf, phdr->p_offset);
+  GElf_Shdr shdr_mem;
+  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+  Elf_Data *data = elf_getdata (scn, NULL);
+  if (shdr != NULL && shdr->sh_type == SHT_DYNAMIC && data != NULL)
+    for (size_t j = 0; j < shdr->sh_size / shdr->sh_entsize; ++j)
+      {
+	GElf_Dyn dyn_mem;
+	GElf_Dyn *dyn = gelf_getdyn (data, j, &dyn_mem);
+	if (dyn != NULL && dyn->d_tag == DT_NEEDED)
+	  {
+	    const char *str = elf_strptr (elf, shdr->sh_link, dyn->d_un.d_val);
+	    if (str != NULL && strcmp (str, fname) == 0)
+	      /* Found it.  */
+	      return 0;
+	  }
+      }
+
+  return 1;
 }
 
 
 static unsigned int nverneed;
 
 static void
-check_verneed (Ebl *ebl, GElf_Shdr *shdr, int idx)
+check_verneed (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Shdr *shdr, int idx)
 {
   if (++nverneed == 2)
     ERROR (gettext ("more than one version reference section present\n"));
@@ -1974,6 +2182,115 @@ check_verneed (Ebl *ebl, GElf_Shdr *shdr, int idx)
     ERROR (gettext ("\
 section [%2d] '%s': sh_link does not link to string table\n"),
 	   idx, section_name (ebl, idx));
+
+  Elf_Data *data = elf_getdata (elf_getscn (ebl->elf, idx), NULL);
+  if (data == NULL)
+    {
+      ERROR (gettext ("section [%2d] '%s': cannot get section data\n"),
+	     idx, section_name (ebl, idx));
+      return;
+    }
+  unsigned int offset = 0;
+  for (int cnt = shdr->sh_info; --cnt >= 0; )
+    {
+      /* Get the data at the next offset.  */
+      GElf_Verneed needmem;
+      GElf_Verneed *need = gelf_getverneed (data, offset, &needmem);
+      if (need == NULL)
+	break;
+
+      unsigned int auxoffset = offset + need->vn_aux;
+
+      if (need->vn_version != EV_CURRENT)
+	ERROR (gettext ("\
+section [%2d] '%s': entry %d has wrong version %d\n"),
+	       idx, section_name (ebl, idx), cnt, (int) need->vn_version);
+
+      if (need->vn_cnt > 0 && need->vn_aux < gelf_fsize (ebl->elf, ELF_T_VNEED,
+							 1, EV_CURRENT))
+	ERROR (gettext ("\
+section [%2d] '%s': entry %d has wrong offset of auxiliary data\n"),
+	       idx, section_name (ebl, idx), cnt);
+
+      const char *libname = elf_strptr (ebl->elf, shdr->sh_link,
+					need->vn_file);
+      if (libname == NULL)
+	{
+	  ERROR (gettext ("\
+section [%2d] '%s': entry %d has invalid file reference\n"),
+		 idx, section_name (ebl, idx), cnt);
+	  goto next_need;
+	}
+
+      /* Check that there is a DT_NEEDED entry for the referenced library.  */
+      if (unknown_dependency_p (ebl->elf, ehdr, libname))
+	ERROR (gettext ("\
+section [%2d] '%s': entry %d references unknown dependency\n"),
+	       idx, section_name (ebl, idx), cnt);
+
+      for (int cnt2 = need->vn_cnt; --cnt2 >= 0; )
+	{
+	  GElf_Vernaux auxmem;
+	  GElf_Vernaux *aux = gelf_getvernaux (data, auxoffset, &auxmem);
+	  if (aux == NULL)
+	    break;
+
+	  if ((aux->vna_flags & ~VER_FLG_WEAK) != 0)
+	    ERROR (gettext ("\
+section [%2d] '%s': auxiliary entry %d of entry %d has unknown flag\n"),
+		   idx, section_name (ebl, idx), need->vn_cnt - cnt2, cnt);
+
+	  const char *verstr = elf_strptr (ebl->elf, shdr->sh_link,
+					   aux->vna_name);
+	  if (verstr == NULL)
+	    ERROR (gettext ("\
+section [%2d] '%s': auxiliary entry %d of entry %d has invalid name reference\n"),
+		   idx, section_name (ebl, idx), need->vn_cnt - cnt2, cnt);
+	  else
+	    {
+	      GElf_Word hashval = elf_hash (verstr);
+	      if (hashval != aux->vna_hash)
+		ERROR (gettext ("\
+section [%2d] '%s': auxiliary entry %d of entry %d has wrong hash value: %#x, expected %#x\n"),
+		       idx, section_name (ebl, idx), need->vn_cnt - cnt2,
+		       cnt, (int) hashval, (int) aux->vna_hash);
+
+	      int res = add_version (libname, verstr, aux->vna_other,
+				     ver_need);
+	      if (unlikely (res !=0))
+		{
+		  assert (res > 0);
+		  ERROR (gettext ("\
+section [%2d] '%s': auxiliary entry %d of entry %d has duplicate version name '%s'\n"),
+			 idx, section_name (ebl, idx), need->vn_cnt - cnt2,
+			 cnt, verstr);
+		}
+	    }
+
+	  if ((aux->vna_next != 0 || cnt2 > 0)
+	      && aux->vna_next < gelf_fsize (ebl->elf, ELF_T_VNAUX, 1,
+					     EV_CURRENT))
+	    {
+	      ERROR (gettext ("\
+section [%2d] '%s': auxiliary entry %d of entry %d has wrong next field\n"),
+		     idx, section_name (ebl, idx), need->vn_cnt - cnt2, cnt);
+	      break;
+	    }
+
+	  auxoffset += MAX (aux->vna_next,
+			    gelf_fsize (ebl->elf, ELF_T_VNAUX, 1, EV_CURRENT));
+	}
+
+      /* Find the next offset.  */
+    next_need:
+      offset += need->vn_next;
+
+      if ((need->vn_next != 0 || cnt > 0)
+	  && offset < auxoffset)
+	ERROR (gettext ("\
+section [%2d] '%s': entry %d has invalid offset to next entry\n"),
+	       idx, section_name (ebl, idx), cnt);
+    }
 }
 
 
@@ -1994,6 +2311,160 @@ check_verdef (Ebl *ebl, GElf_Shdr *shdr, int idx)
     ERROR (gettext ("\
 section [%2d] '%s': sh_link does not link to string table\n"),
 	   idx, section_name (ebl, idx));
+
+  Elf_Data *data = elf_getdata (elf_getscn (ebl->elf, idx), NULL);
+  if (data == NULL)
+    {
+    no_data:
+      ERROR (gettext ("section [%2d] '%s': cannot get section data\n"),
+	     idx, section_name (ebl, idx));
+      return;
+    }
+
+  /* Iterate over all version definition entries.  We check that there
+     is a BASE entry and that each index is unique.  To do the later
+     we collection the information in a list which is later
+     examined.  */
+  struct namelist
+  {
+    const char *name;
+    struct namelist *next;
+  } *namelist = NULL;
+  struct namelist *refnamelist = NULL;
+
+  bool has_base = false;
+  unsigned int offset = 0;
+  for (int cnt = shdr->sh_info; --cnt >= 0; )
+    {
+      /* Get the data at the next offset.  */
+      GElf_Verdef defmem;
+      GElf_Verdef *def = gelf_getverdef (data, offset, &defmem);
+      if (def == NULL)
+	goto no_data;
+
+      if ((def->vd_flags & VER_FLG_BASE) != 0)
+	{
+	  if (has_base)
+	    ERROR (gettext ("\
+section [%2d] '%s': more than one BASE definition\n"),
+		   idx, section_name (ebl, idx));
+	  if (def->vd_ndx != VER_NDX_GLOBAL)
+	    ERROR (gettext ("\
+section [%2d] '%s': BASE definition must have index VER_NDX_GLOBAL\n"),
+		   idx, section_name (ebl, idx));
+	  has_base = true;
+	}
+      if ((def->vd_flags & ~(VER_FLG_BASE|VER_FLG_WEAK)) != 0)
+	ERROR (gettext ("\
+section [%2d] '%s': entry %d has unknown flag\n"),
+	       idx, section_name (ebl, idx), cnt);
+
+      if (def->vd_version != EV_CURRENT)
+	ERROR (gettext ("\
+section [%2d] '%s': entry %d has wrong version %d\n"),
+	       idx, section_name (ebl, idx), cnt, (int) def->vd_version);
+
+      if (def->vd_cnt > 0 && def->vd_aux < gelf_fsize (ebl->elf, ELF_T_VDEF,
+						       1, EV_CURRENT))
+	ERROR (gettext ("\
+section [%2d] '%s': entry %d has wrong offset of auxiliary data\n"),
+	       idx, section_name (ebl, idx), cnt);
+
+      unsigned int auxoffset = offset + def->vd_aux;
+      GElf_Verdaux auxmem;
+      GElf_Verdaux *aux = gelf_getverdaux (data, auxoffset, &auxmem);
+      if (aux == NULL)
+	goto no_data;
+
+      const char *name = elf_strptr (ebl->elf, shdr->sh_link, aux->vda_name);
+      if (name == NULL)
+	{
+	  ERROR (gettext ("\
+section [%2d] '%s': entry %d has invalid name reference\n"),
+		 idx, section_name (ebl, idx), cnt);
+	  goto next_def;
+	}
+      GElf_Word hashval = elf_hash (name);
+      if (def->vd_hash != hashval)
+	ERROR (gettext ("\
+section [%2d] '%s': entry %d has wrong hash value: %#x, expected %#x\n"),
+	       idx, section_name (ebl, idx), cnt, (int) hashval,
+	       (int) def->vd_hash);
+
+      int res = add_version (NULL, name, def->vd_ndx, ver_def);
+      if (unlikely (res !=0))
+	{
+	  assert (res > 0);
+	  ERROR (gettext ("\
+section [%2d] '%s': entry %d has duplicate version name '%s'\n"),
+		 idx, section_name (ebl, idx), cnt, name);
+	}
+
+      struct namelist *newname = alloca (sizeof (*newname));
+      newname->name = elf_strptr (ebl->elf, shdr->sh_link, aux->vda_name);
+      newname->next = namelist;
+      namelist = newname;
+
+      auxoffset += aux->vda_next;
+      for (int cnt2 = 1; cnt2 < def->vd_cnt; ++cnt2)
+	{
+	  aux = gelf_getverdaux (data, auxoffset, &auxmem);
+	  if (aux == NULL)
+	    goto no_data;
+
+	  newname = alloca (sizeof (*newname));
+	  newname->name = elf_strptr (ebl->elf, shdr->sh_link, aux->vda_name);
+	  newname->next = refnamelist;
+	  refnamelist = newname;
+
+	  if ((aux->vda_next != 0 || cnt2 + 1 < def->vd_cnt)
+	      && aux->vda_next < gelf_fsize (ebl->elf, ELF_T_VDAUX, 1,
+					     EV_CURRENT))
+	    {
+	      ERROR (gettext ("\
+section [%2d] '%s': entry %d has wrong next field in auxiliary data\n"),
+		     idx, section_name (ebl, idx), cnt);
+	      break;
+	    }
+
+	  auxoffset += MAX (aux->vda_next,
+			    gelf_fsize (ebl->elf, ELF_T_VDAUX, 1, EV_CURRENT));
+	}
+
+      /* Find the next offset.  */
+    next_def:
+      offset += def->vd_next;
+
+      if ((def->vd_next != 0 || cnt > 0)
+	  && offset < auxoffset)
+	ERROR (gettext ("\
+section [%2d] '%s': entry %d has invalid offset to next entry\n"),
+	       idx, section_name (ebl, idx), cnt);
+    }
+
+  if (!has_base)
+    ERROR (gettext ("section [%2d] '%s': no BASE definition\n"),
+	   idx, section_name (ebl, idx));
+
+  /* Check whether the referenced names are available.  */
+  while (namelist != NULL)
+    {
+      struct version_namelist *runp = version_namelist;
+      while (runp != NULL)
+	{
+	  if (runp->type == ver_def
+	      && strcmp (runp->name, namelist->name) == 0)
+	    break;
+	  runp = runp->next;
+	}
+
+      if (runp == NULL)
+	ERROR (gettext ("\
+section [%2d] '%s': unknown parent version '%s'\n"),
+	       idx, section_name (ebl, idx), namelist->name);
+
+      namelist = namelist->next;
+    }
 }
 
 
@@ -2044,6 +2515,7 @@ zeroth section has nonzero link value while ELF header does not signal overflow 
 
   bool dot_interp_section = false;
 
+  size_t versym_scnndx = 0;
   for (size_t cnt = 1; cnt < shnum; ++cnt)
     {
       shdr = gelf_getshdr (elf_getscn (ebl->elf, cnt), &shdr_mem);
@@ -2298,7 +2770,7 @@ section [%2zu] '%s': relocatable files cannot have dynamic symbol tables\n"),
 		   cnt, section_name (ebl, cnt));
 	  /* FALLTHROUGH */
 	case SHT_SYMTAB:
-	  check_symtab (ebl, ehdr, cnt);
+	  check_symtab (ebl, ehdr, shdr, cnt);
 	  break;
 
 	case SHT_RELA:
@@ -2330,11 +2802,16 @@ section [%2zu] '%s': relocatable files cannot have dynamic symbol tables\n"),
 	  break;
 
 	case SHT_GNU_versym:
-	  check_versym (ebl, shdr, cnt);
+	  /* We cannot process this section now since we have no guarantee
+	     that the verneed and verdef sections have already been read.
+	     Just remember the section index.  */
+	  if (versym_scnndx != 0)
+	    ERROR (gettext ("more than one version symbol table present\n"));
+	  versym_scnndx = cnt;
 	  break;
 
 	case SHT_GNU_verneed:
-	  check_verneed (ebl, shdr, cnt);
+	  check_verneed (ebl, ehdr, shdr, cnt);
 	  break;
 
 	case SHT_GNU_verdef:
@@ -2349,6 +2826,39 @@ section [%2zu] '%s': relocatable files cannot have dynamic symbol tables\n"),
 
   if (has_interp_segment && !dot_interp_section)
     ERROR (gettext ("INTERP program header entry but no .interp section\n"));
+
+  if (version_namelist != NULL)
+    {
+      if (versym_scnndx == 0)
+    ERROR (gettext ("\
+no .gnu.versym section present but .gnu.versym_d or .gnu.versym_r section exist\n"));
+      else
+	check_versym (ebl, versym_scnndx);
+
+      /* Check for duplicate index numbers.  */
+      do
+	{
+	  struct version_namelist *runp = version_namelist->next;
+	  while (runp != NULL)
+	    {
+	      if (version_namelist->ndx == runp->ndx)
+		{
+		  ERROR (gettext ("duplicate version index %d\n"),
+			 (int) version_namelist->ndx);
+		  break;
+		}
+	      runp = runp->next;
+	    }
+
+	  struct version_namelist *old = version_namelist;
+	  version_namelist = version_namelist->next;
+	  free (old);
+	}
+      while (version_namelist != NULL);
+    }
+  else if (versym_scnndx != 0)
+    ERROR (gettext ("\
+.gnu.versym section present without .gnu.versym_d or .gnu.versym_r\n"));
 
   free (scnref);
 }

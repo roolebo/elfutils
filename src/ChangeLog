@@ -1,3 +1,10 @@
+2005-08-05  Ulrich Drepper  <drepper@redhat.com>
+
+	* elflint.c: Many, many more tests.  Mostly related to symbol
+	versioning.  Those sections should now be completely checked.
+
+	* readelf.c (print_dynamic): Use gelf_offscn.
+
 2005-08-04  Ulrich Drepper  <drepper@redhat.com>
 
 	* elflint.c: Add lots more tests: more extension symbol table sanity,

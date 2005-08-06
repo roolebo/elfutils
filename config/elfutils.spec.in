@@ -183,6 +183,15 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.so
 
 %changelog
+* Fri Aug  5 2005 Ulrich Drepper <@redhat.com> 0.112-1
+- elfcmp: some more relaxation.
+- elflint: many more tests, especially regarding to symbol versioning.
+- libelf: Add elfXX_offscn and gelf_offscn.
+- libasm: asm_begin interface changes.
+- libebl: Add three new interfaces to directly access machine, class, an
+ddata encoding information.
+- objdump: New program.  Just the beginning.
+
 * Thu Jul 28 2005 Ulrich Drepper <@redhat.com> 0.111-1
 - libdw: now contains all of libdwfl.  The latter is not installed anymore.
 - elfcmp: little usability tweak, name and index of differing section is

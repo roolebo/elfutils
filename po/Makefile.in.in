@@ -33,7 +33,6 @@ mkinstalldirs = $(SHELL) `case "$(MKINSTALLDIRS)" in /*) echo "$(MKINSTALLDIRS)"
 GMSGFMT = @GMSGFMT@
 MSGFMT = @MSGFMT@
 XGETTEXT = @XGETTEXT@
-XGETTEXT_OPTIONS = --flag=error:3:c-format
 MSGMERGE = msgmerge
 MSGMERGE_UPDATE = @MSGMERGE@ --update
 MSGINIT = msginit
@@ -55,6 +54,8 @@ POTFILES = \
 CATALOGS = @CATALOGS@
 
 # Makevars gets inserted here. (Don't remove this line!)
+
+XGETTEXT_OPTIONS += --flag=error:3:c-format --flag=ERROR:1:c-format
 
 .SUFFIXES:
 .SUFFIXES: .po .gmo .mo .nop .po-update

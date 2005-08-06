@@ -1,3 +1,8 @@
+2005-08-05  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.in.in (XGETTEXT_OPTIONS): Move adding of --flag options
+	after magic Makevars line.  Also look for ERROR from elflint.
+
 2005-07-21  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.in.in: Add src/elfcmp.

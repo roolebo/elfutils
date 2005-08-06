@@ -2401,7 +2401,7 @@ section [%2d] '%s': entry %d has duplicate version name '%s'\n"),
 	}
 
       struct namelist *newname = alloca (sizeof (*newname));
-      newname->name = elf_strptr (ebl->elf, shdr->sh_link, aux->vda_name);
+      newname->name = name;
       newname->next = namelist;
       namelist = newname;
 

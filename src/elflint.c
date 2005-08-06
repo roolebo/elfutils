@@ -2412,10 +2412,18 @@ section [%2d] '%s': entry %d has duplicate version name '%s'\n"),
 	  if (aux == NULL)
 	    goto no_data;
 
-	  newname = alloca (sizeof (*newname));
-	  newname->name = elf_strptr (ebl->elf, shdr->sh_link, aux->vda_name);
-	  newname->next = refnamelist;
-	  refnamelist = newname;
+	  name = elf_strptr (ebl->elf, shdr->sh_link, aux->vda_name);
+	  if (name == NULL)
+	    ERROR (gettext ("\
+section [%2d] '%s': entry %d has invalid name reference in auxiliary data\n"),
+		   idx, section_name (ebl, idx), cnt);
+	  else
+	    {
+	      newname = alloca (sizeof (*newname));
+	      newname->name = name;
+	      newname->next = refnamelist;
+	      refnamelist = newname;
+	    }
 
 	  if ((aux->vda_next != 0 || cnt2 + 1 < def->vd_cnt)
 	      && aux->vda_next < gelf_fsize (ebl->elf, ELF_T_VDAUX, 1,

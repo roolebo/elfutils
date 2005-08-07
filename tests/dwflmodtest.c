@@ -66,12 +66,12 @@ print_module (Dwfl_Module *mod __attribute__ ((unused)),
 	      void **userdata __attribute__ ((unused)),
 	      const char *name, Dwarf_Addr base,
 	      Dwarf *dw, Dwarf_Addr bias,
-	      void *arg __attribute__ ((unused)))
+	      void *arg)
 {
   printf ("module: %30s %08" PRIx64 " %12p %" PRIx64 " (%s)\n",
 	  name, base, dw, bias, dwfl_errmsg (-1));
 
-  if (dw != NULL)
+  if (dw != NULL && *(const bool *) arg)
     {
       Dwarf_Off off = 0;
       size_t cuhl;
@@ -91,6 +91,34 @@ print_module (Dwfl_Module *mod __attribute__ ((unused)),
   return DWARF_CB_OK;
 }
 
+static bool show_functions;
+
+static const struct argp_option options[] =
+  {
+    { "functions", 'f', NULL, 0, N_("Additional show function names"), 0 },
+    { NULL, 0, NULL, 0, NULL, 0 }
+  };
+
+static error_t
+parse_opt (int key, char *arg __attribute__ ((unused)),
+	   struct argp_state *state __attribute__ ((unused)))
+{
+  switch (key)
+    {
+    case ARGP_KEY_INIT:
+      state->child_inputs[0] = state->input;
+      break;
+
+    case 'f':
+      show_functions = true;
+      break;
+
+    default:
+      return ARGP_ERR_UNKNOWN;
+    }
+  return 0;
+}
+
 int
 main (int argc, char **argv)
 {
@@ -101,12 +129,21 @@ main (int argc, char **argv)
   (void) setlocale (LC_ALL, "");
 
   Dwfl *dwfl = NULL;
-  (void) argp_parse (dwfl_standard_argp (), argc, argv, 0, NULL, &dwfl);
+  const struct argp_child argp_children[] =
+    {
+      { .argp = dwfl_standard_argp () },
+      { .argp = NULL }
+    };
+  const struct argp argp =
+    {
+      options, parse_opt, NULL, NULL, argp_children, NULL, NULL
+    };
+  (void) argp_parse (&argp, argc, argv, 0, NULL, &dwfl);
   assert (dwfl != NULL);
 
   ptrdiff_t p = 0;
   do
-    p = dwfl_getdwarf (dwfl, &print_module, NULL, p);
+    p = dwfl_getdwarf (dwfl, &print_module, &show_functions, p);
   while (p > 0);
   if (p < 0)
     error (2, 0, "dwfl_getdwarf: %s", dwfl_errmsg (-1));

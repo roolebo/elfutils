@@ -1,3 +1,7 @@
+2005-08-07  Roland McGrath  <roland@redhat.com>
+
+	* dwflmodtest.c: Print function details only if -f flag is given.
+
 2005-08-06  Ulrich Drepper  <drepper@redhat.com>
 
 	* run-elflint-self.sh: New file.

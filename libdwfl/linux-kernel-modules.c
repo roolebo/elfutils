@@ -113,6 +113,40 @@ dwfl_linux_kernel_find_elf (Dwfl_Module *mod __attribute__ ((unused)),
     }
 
   size_t namelen = strlen (module_name);
+
+  /* This is a kludge.  There is no actual necessary relationship between
+     the name of the .ko file installed and the module name the kernel
+     knows it by when it's loaded.  The kernel's only idea of the module
+     name comes from the name embedded in the object's magic
+     .gnu.linkonce.this_module section.
+
+     In practice, these module names match the .ko file names except for
+     some using '_' and some using '-'.  So our cheap kludge is to look for
+     two files when either a '_' or '-' appears in a module name, one using
+     only '_' and one only using '-'.  */
+
+  char alternate_name[namelen + 1];
+  inline bool subst_name (char from, char to)
+    {
+      const char *n = memchr (module_name, from, namelen);
+      if (n == NULL)
+	return false;
+      char *a = mempcpy (alternate_name, module_name, n - module_name);
+      *a++ = to;
+      ++n;
+      const char *p;
+      while ((p = memchr (n, from, namelen - (n - module_name))) != NULL)
+	{
+	  a = mempcpy (a, n, p - n);
+	  *a++ = to;
+	  n = p + 1;
+	}
+      memcpy (a, n, namelen - (n - module_name) + 1);
+      return true;
+    }
+  if (!subst_name ('-', '_') && !subst_name ('_', '-'))
+    alternate_name[0] = '\0';
+
   FTSENT *f;
   int error = ENOENT;
   while ((f = fts_read (fts)) != NULL)
@@ -124,8 +158,9 @@ dwfl_linux_kernel_find_elf (Dwfl_Module *mod __attribute__ ((unused)),
 	case FTS_NSOK:
 	  /* See if this file name is "MODULE_NAME.ko".  */
 	  if (f->fts_namelen == namelen + 3
-	      && !memcmp (f->fts_name, module_name, namelen)
-	      && !memcmp (f->fts_name + namelen, ".ko", 4))
+	      && !memcmp (f->fts_name + namelen, ".ko", 4)
+	      && (!memcmp (f->fts_name, module_name, namelen)
+		  || !memcmp (f->fts_name, alternate_name, namelen)))
 	    {
 	      int fd = open64 (f->fts_accpath, O_RDONLY);
 	      *file_name = strdup (f->fts_path);

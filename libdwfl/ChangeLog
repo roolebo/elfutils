@@ -1,3 +1,9 @@
+2005-08-07  Roland McGrath  <roland@redhat.com>
+
+	* linux-kernel-modules.c (dwfl_linux_kernel_find_elf): When module
+	names contain '_' or '-', look for files named either "foo-bar.ko"
+	or "foo_bar.ko".
+
 2005-07-29  Roland McGrath  <roland@redhat.com>
 
 	* loc2c.c: File removed.

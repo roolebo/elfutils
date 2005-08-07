@@ -64,10 +64,14 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile18.bz2
 
 if MUDFLAP
+static_build=yes
+libmudflap = -lmudflap
+endif
+
+if BUILD_STATIC
 libdw = ../libdw/libdw.a
 libelf = ../libelf/libelf.a
 libasm = ../libasm/libasm.a
-libmudflap = -lmudflap
 else
 libdw = ../libdw/libdw.so
 libelf = ../libelf/libelf.so
@@ -110,6 +114,6 @@ asm_tst6_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl
 asm_tst7_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl
 asm_tst8_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl
 asm_tst9_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl
-dwflmodtest_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap)
+dwflmodtest_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
 
 CLEANFILES = xxx

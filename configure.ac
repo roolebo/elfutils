@@ -16,7 +16,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software Foundation,
 dnl Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 dnl
-AC_INIT([Red Hat elfutils],[0.112],[http://bugzilla.redhat.com/bugzilla/],
+AC_INIT([Red Hat elfutils],[0.113],[http://bugzilla.redhat.com/bugzilla/],
 	[elfutils])
 
 AC_CONFIG_AUX_DIR([config])
@@ -128,6 +128,18 @@ if test "$use_mudflap" = fail; then
   AC_MSG_FAILURE([--enable-mudflap requires a compiler which understands this option])
 fi
 AM_CONDITIONAL(MUDFLAP, test "$use_mudflap" = yes)
+
+# Enable gprof suport.
+AC_ARG_ENABLE([gprof],
+AC_HELP_STRING([--enable-gprof],
+[build binaries with gprof support]), [use_gprof=yes], [use_gprof=no])
+if test "$use_gprof" = yes; then
+  CFLAGS="$CFLAGS -pg"
+  LDFLAGS="$LDFLAGS -pg"
+fi
+AM_CONDITIONAL(GPROF, test "$use_gprof" = yes)
+AM_CONDITIONAL(BUILD_STATIC, [dnl
+test "$use_mudflap" = yes -o "$use_gprof" = yes])
 
 LIBEBL_SUBDIR="$PACKAGE"
 AC_ARG_ENABLE([libebl-subdir],

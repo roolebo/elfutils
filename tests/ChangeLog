@@ -1,3 +1,8 @@
+2005-08-06  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: Link with statis libs if BUILD_STATIC.
+	(dwflmodtest_LDADD): Also link with -ldl.
+
 2005-08-02  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.am: Add -ldl to asm_tst[1-9]_LDASS.

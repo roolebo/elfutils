@@ -1,3 +1,7 @@
+2005-08-06  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (AM_CFLAGS): Add -fpic when BUILD_STATIC.
+
 2005-08-03  Ulrich Drepper  <drepper@redhat.com>
 
 	* libelf.map: Move elf32_offscn, elf64_offscn, and gelf_offscn in

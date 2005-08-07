@@ -17,9 +17,12 @@
 ##
 DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H
 if MUDFLAP
-AM_CFLAGS = -fpic -fmudflap
+AM_CFLAGS = -fmudflap
 else
 AM_CFLAGS =
+endif
+if BUILD_STATIC
+AM_CFLAGS += -fpic
 endif
 AM_CFLAGS += -Wall -Wshadow -Werror -Wunused -Wextra -Wformat=2 -std=gnu99 \
 	     $($(*F)_CFLAGS)

@@ -15,18 +15,15 @@
 DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H $(YYDEBUG) \
        -DSRCDIR=\"$(shell cd $(srcdir);pwd)\" -DOBJDIR=\"$(shell pwd)\"
 if MUDFLAP
-AM_CFLAGS = -Wall -Wshadow -Wunused -Wextra -std=gnu99 -fmudflap \
-	    $(native_ld_cflags) $(if $($(*F)_no_Wunused),,-Wunused) \
-	    $(if $($(*F)_no_Wformat),,-Wformat=2)
+AM_CFLAGS = -fmudflap
 else
-AM_CFLAGS = -Wall -Wshadow -std=gnu99 $(native_ld_cflags) \
-	    $(if $($(*F)_no_Werror),,-Werror) \
-	    $(if $($(*F)_no_Wunused),,-Wunused -Wextra) \
-	    $(if $($(*F)_no_Wformat),,-Wformat=2)
+AM_CFLAGS =
 endif
-if MUDFLAP
-libmudflap = -lmudflap
-endif
+AM_CFLAGS += -Wall -Wshadow -std=gnu99 $(native_ld_cflags) \
+	     $(if $($(*F)_no_Werror),,-Werror) \
+	     $(if $($(*F)_no_Wunused),,-Wunused -Wextra) \
+	     $(if $($(*F)_no_Wformat),,-Wformat=2)
+
 INCLUDES = -I$(srcdir) -I$(srcdir)/../libelf -I$(srcdir)/../libebl -I$(srcdir)/../lib -I$(srcdir)/../libdw  -I..
 
 YACC = @YACC@ -d
@@ -64,6 +61,10 @@ EXTRA_DIST = elf32-i386.script libld_elf_i386.map $(ld_modules)
 ld_modules = i386_ld.c
 
 if MUDFLAP
+libmudflap = -lmudflap
+endif
+
+if BUILD_STATIC
 libdw = ../libdw/libdw.a
 libelf = ../libelf/libelf.a
 else

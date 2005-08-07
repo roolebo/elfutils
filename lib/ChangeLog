@@ -1,3 +1,7 @@
+2005-08-06  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (xmalloc_CFLAGS): Define only if !GPROF.
+
 2005-05-03  Roland McGrath  <roland@redhat.com>
 
 	* crc32_file.c: New file.

@@ -1,3 +1,8 @@
+2005-08-06  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (AM_CFLAGS): Avoid duplication.
+	Link with statis libs if BUILD_STATIC.
+
 2005-08-05  Ulrich Drepper  <drepper@redhat.com>
 
 	* elflint.c: Many, many more tests.  Mostly related to symbol

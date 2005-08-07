@@ -1813,61 +1813,6 @@ section [%2d] '%s' is contained in more than one section group\n"),
 }
 
 
-static bool has_loadable_segment;
-static bool has_interp_segment;
-
-static const struct
-{
-  const char *name;
-  size_t namelen;
-  GElf_Word type;
-  enum { unused, exact, atleast } attrflag;
-  GElf_Word attr;
-  GElf_Word attr2;
-} special_sections[] =
-  {
-    /* See figure 4-14 in the gABI.  */
-    { ".bss", 5, SHT_NOBITS, exact, SHF_ALLOC | SHF_WRITE, 0 },
-    { ".comment", 8, SHT_PROGBITS, exact, 0, 0 },
-    { ".data", 6, SHT_PROGBITS, exact, SHF_ALLOC | SHF_WRITE, 0 },
-    { ".data1", 7, SHT_PROGBITS, exact, SHF_ALLOC | SHF_WRITE, 0 },
-    { ".debug", 7, SHT_PROGBITS, exact, 0, 0 },
-    { ".dynamic", 9, SHT_DYNAMIC, atleast, SHF_ALLOC, SHF_WRITE },
-    { ".dynstr", 8, SHT_STRTAB, exact, SHF_ALLOC, 0 },
-    { ".dynsym", 8, SHT_DYNSYM, exact, SHF_ALLOC, 0 },
-    { ".fini", 6, SHT_PROGBITS, exact, SHF_ALLOC | SHF_EXECINSTR, 0 },
-    { ".fini_array", 12, SHT_FINI_ARRAY, exact, SHF_ALLOC | SHF_WRITE, 0 },
-    { ".got", 5, SHT_PROGBITS, unused, 0, 0 }, // XXX more info?
-    { ".hash", 6, SHT_HASH, exact, SHF_ALLOC, 0 },
-    { ".init", 6, SHT_PROGBITS, exact, SHF_ALLOC | SHF_EXECINSTR, 0 },
-    { ".init_array", 12, SHT_INIT_ARRAY, exact, SHF_ALLOC | SHF_WRITE, 0 },
-    { ".interp", 8, SHT_PROGBITS, atleast, 0, SHF_ALLOC }, // XXX more tests?
-    { ".line", 6, SHT_PROGBITS, exact, 0, 0 },
-    { ".note", 6, SHT_NOTE, exact, 0, 0 },
-    { ".plt", 5, SHT_PROGBITS, unused, 0, 0 }, // XXX more tests
-    { ".preinit_array", 15, SHT_PREINIT_ARRAY, exact, SHF_ALLOC | SHF_WRITE, 0 },
-    { ".rela", 5, SHT_RELA, atleast, 0, SHF_ALLOC }, // XXX more tests
-    { ".rel", 4, SHT_REL, atleast, 0, SHF_ALLOC }, // XXX more tests
-    { ".rodata", 8, SHT_PROGBITS, exact, SHF_ALLOC, 0 },
-    { ".rodata1", 9, SHT_PROGBITS, exact, SHF_ALLOC, 0 },
-    { ".shstrtab", 10, SHT_STRTAB, exact, 0, 0 },
-    { ".strtab", 8, SHT_STRTAB, atleast, 0, SHF_ALLOC }, // XXX more tests
-    { ".symtab", 8, SHT_SYMTAB, atleast, 0, SHF_ALLOC }, // XXX more tests
-    { ".symtab_shndx", 14, SHT_SYMTAB_SHNDX, atleast, 0, SHF_ALLOC }, // XXX more tests
-    { ".tbss", 6, SHT_NOBITS, exact, SHF_ALLOC | SHF_WRITE | SHF_TLS, 0 },
-    { ".tdata", 7, SHT_PROGBITS, exact, SHF_ALLOC | SHF_WRITE | SHF_TLS, 0 },
-    { ".tdata1", 8, SHT_PROGBITS, exact, SHF_ALLOC | SHF_WRITE | SHF_TLS, 0 },
-    { ".text", 6, SHT_PROGBITS, exact, SHF_ALLOC | SHF_EXECINSTR, 0 },
-
-    /* The following are GNU extensions.  */
-    { ".gnu.version", 13, SHT_GNU_versym, exact, SHF_ALLOC, 0 },
-    { ".gnu.version_d", 15, SHT_GNU_verdef, exact, SHF_ALLOC, 0 },
-    { ".gnu.version_r", 15, SHT_GNU_verneed, exact, SHF_ALLOC, 0 }
-  };
-#define nspecial_sections \
-  (sizeof (special_sections) / sizeof (special_sections[0]))
-
-
 static const char *
 section_flags_string (GElf_Word flags, char *buf, size_t len)
 {
@@ -1969,6 +1914,15 @@ has_copy_reloc (Ebl *ebl, unsigned int symscnndx, unsigned int symndx)
       }
 
   return 0;
+}
+
+
+static int
+in_nobits_scn (Ebl *ebl, unsigned int shndx)
+{
+  GElf_Shdr shdr_mem;
+  GElf_Shdr *shdr = gelf_getshdr (elf_getscn (ebl->elf, shndx), &shdr_mem);
+  return shdr != NULL && shdr->sh_type == SHT_NOBITS;
 }
 
 
@@ -2118,7 +2072,8 @@ section [%2d] '%s': symbol %d: version index %d is for defined version\n"),
 	    {
 	      /* Unless this symbol has a copy relocation associated
 		 this must not happen.  */
-	      if (!has_copy_reloc (ebl, shdr->sh_link, cnt))
+	      if (!has_copy_reloc (ebl, shdr->sh_link, cnt)
+		  && !in_nobits_scn (ebl, sym->st_shndx))
 		ERROR (gettext ("\
 section [%2d] '%s': symbol %d: version index %d is for requested version\n"),
 		       idx, section_name (ebl, idx), cnt, (int) *versym);
@@ -2474,6 +2429,61 @@ section [%2d] '%s': unknown parent version '%s'\n"),
       namelist = namelist->next;
     }
 }
+
+
+static bool has_loadable_segment;
+static bool has_interp_segment;
+
+static const struct
+{
+  const char *name;
+  size_t namelen;
+  GElf_Word type;
+  enum { unused, exact, atleast } attrflag;
+  GElf_Word attr;
+  GElf_Word attr2;
+} special_sections[] =
+  {
+    /* See figure 4-14 in the gABI.  */
+    { ".bss", 5, SHT_NOBITS, exact, SHF_ALLOC | SHF_WRITE, 0 },
+    { ".comment", 8, SHT_PROGBITS, exact, 0, 0 },
+    { ".data", 6, SHT_PROGBITS, exact, SHF_ALLOC | SHF_WRITE, 0 },
+    { ".data1", 7, SHT_PROGBITS, exact, SHF_ALLOC | SHF_WRITE, 0 },
+    { ".debug", 7, SHT_PROGBITS, exact, 0, 0 },
+    { ".dynamic", 9, SHT_DYNAMIC, atleast, SHF_ALLOC, SHF_WRITE },
+    { ".dynstr", 8, SHT_STRTAB, exact, SHF_ALLOC, 0 },
+    { ".dynsym", 8, SHT_DYNSYM, exact, SHF_ALLOC, 0 },
+    { ".fini", 6, SHT_PROGBITS, exact, SHF_ALLOC | SHF_EXECINSTR, 0 },
+    { ".fini_array", 12, SHT_FINI_ARRAY, exact, SHF_ALLOC | SHF_WRITE, 0 },
+    { ".got", 5, SHT_PROGBITS, unused, 0, 0 }, // XXX more info?
+    { ".hash", 6, SHT_HASH, exact, SHF_ALLOC, 0 },
+    { ".init", 6, SHT_PROGBITS, exact, SHF_ALLOC | SHF_EXECINSTR, 0 },
+    { ".init_array", 12, SHT_INIT_ARRAY, exact, SHF_ALLOC | SHF_WRITE, 0 },
+    { ".interp", 8, SHT_PROGBITS, atleast, 0, SHF_ALLOC }, // XXX more tests?
+    { ".line", 6, SHT_PROGBITS, exact, 0, 0 },
+    { ".note", 6, SHT_NOTE, exact, 0, 0 },
+    { ".plt", 5, SHT_PROGBITS, unused, 0, 0 }, // XXX more tests
+    { ".preinit_array", 15, SHT_PREINIT_ARRAY, exact, SHF_ALLOC | SHF_WRITE, 0 },
+    { ".rela", 5, SHT_RELA, atleast, 0, SHF_ALLOC }, // XXX more tests
+    { ".rel", 4, SHT_REL, atleast, 0, SHF_ALLOC }, // XXX more tests
+    { ".rodata", 8, SHT_PROGBITS, atleast, SHF_ALLOC, SHF_MERGE | SHF_STRINGS },
+    { ".rodata1", 9, SHT_PROGBITS, atleast, SHF_ALLOC, SHF_MERGE | SHF_STRINGS },
+    { ".shstrtab", 10, SHT_STRTAB, exact, 0, 0 },
+    { ".strtab", 8, SHT_STRTAB, atleast, 0, SHF_ALLOC }, // XXX more tests
+    { ".symtab", 8, SHT_SYMTAB, atleast, 0, SHF_ALLOC }, // XXX more tests
+    { ".symtab_shndx", 14, SHT_SYMTAB_SHNDX, atleast, 0, SHF_ALLOC }, // XXX more tests
+    { ".tbss", 6, SHT_NOBITS, exact, SHF_ALLOC | SHF_WRITE | SHF_TLS, 0 },
+    { ".tdata", 7, SHT_PROGBITS, exact, SHF_ALLOC | SHF_WRITE | SHF_TLS, 0 },
+    { ".tdata1", 8, SHT_PROGBITS, exact, SHF_ALLOC | SHF_WRITE | SHF_TLS, 0 },
+    { ".text", 6, SHT_PROGBITS, exact, SHF_ALLOC | SHF_EXECINSTR, 0 },
+
+    /* The following are GNU extensions.  */
+    { ".gnu.version", 13, SHT_GNU_versym, exact, SHF_ALLOC, 0 },
+    { ".gnu.version_d", 15, SHT_GNU_verdef, exact, SHF_ALLOC, 0 },
+    { ".gnu.version_r", 15, SHT_GNU_verneed, exact, SHF_ALLOC, 0 }
+  };
+#define nspecial_sections \
+  (sizeof (special_sections) / sizeof (special_sections[0]))
 
 
 static void

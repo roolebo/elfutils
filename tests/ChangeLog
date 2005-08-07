@@ -1,5 +1,9 @@
 2005-08-06  Ulrich Drepper  <drepper@redhat.com>
 
+	* run-elflint-self.sh: New file.
+	* Makefile.am (TESTS): Add run-elflint-self.sh.
+	(EXTRA_DIST): Likewise.
+
 	* Makefile.am: Link with statis libs if BUILD_STATIC.
 	(dwflmodtest_LDADD): Also link with -ldl.
 

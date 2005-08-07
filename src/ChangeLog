@@ -1,5 +1,10 @@
 2005-08-06  Ulrich Drepper  <drepper@redhat.com>
 
+	* elflint.c (in_nobits_scn): New function.
+	(check_versym): Allow references for defined symbols against versions
+	of other DSOs also for symbols in nobits sections.
+	Move a few variables around.
+
 	* Makefile.am (AM_CFLAGS): Avoid duplication.
 	Link with statis libs if BUILD_STATIC.
 

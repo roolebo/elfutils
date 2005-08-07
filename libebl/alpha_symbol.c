@@ -93,6 +93,29 @@ alpha_reloc_type_check (int type)
 	  && reloc_map_table[type] != NULL) ? true : false;
 }
 
+
+const char *
+alpha_dynamic_tag_name (int64_t tag, char *buf __attribute__ ((unused)),
+			size_t len __attribute__ ((unused)))
+{
+  switch (tag)
+    {
+    case DT_ALPHA_PLTRO:
+      return "ALPHA_PLTRO";
+    default:
+      break;
+    }
+  return NULL;
+}
+
+
+bool
+alpha_dynamic_tag_check (int64_t tag)
+{
+  return tag == DT_ALPHA_PLTRO;
+}
+
+
 /* Check whether given relocation is a copy relocation.  */
 bool
 alpha_copy_reloc_p (int reloc)

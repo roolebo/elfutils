@@ -41,6 +41,12 @@ extern Elf_Type ppc_reloc_simple_type (Elf *elf, int type);
 extern bool ppc_core_note (const char *name, uint32_t type, uint32_t descsz,
 			      const char *desc);
 
+/* Name of dynamic tag.  */
+extern const char *ppc_dynamic_tag_name (int64_t tag, char *buf, size_t len);
+
+/* Check dynamic tag.  */
+extern bool ppc_dynamic_tag_check (int64_t tag);
+
 /* Check whether given relocation is a copy relocation.  */
 extern bool ppc_copy_reloc_p (int reloc);
 

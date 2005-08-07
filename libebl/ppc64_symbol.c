@@ -227,6 +227,15 @@ ppc64_dynamic_tag_name (int64_t tag, char *buf __attribute__ ((unused)),
   return NULL;
 }
 
+bool
+ppc64_dynamic_tag_check (int64_t tag)
+{
+  return (tag == DT_PPC64_GLINK
+	  || tag == DT_PPC64_OPD
+	  || tag == DT_PPC64_OPDSZ);
+}
+
+
 /* Check whether given relocation is a copy relocation.  */
 bool
 ppc64_copy_reloc_p (int reloc)

@@ -37,6 +37,7 @@ ppc64_init (elf, machine, eh, ehlen)
   eh->reloc_valid_use = ppc64_reloc_valid_use;
   eh->reloc_simple_type = ppc64_reloc_simple_type;
   eh->dynamic_tag_name = ppc64_dynamic_tag_name;
+  eh->dynamic_tag_check = ppc64_dynamic_tag_check;
   eh->copy_reloc_p = ppc64_copy_reloc_p;
   eh->destr = ppc64_destr;
 

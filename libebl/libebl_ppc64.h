@@ -44,6 +44,9 @@ extern bool ppc64_core_note (const char *name, uint32_t type, uint32_t descsz,
 /* Name of dynamic tag.  */
 extern const char *ppc64_dynamic_tag_name (int64_t tag, char *buf, size_t len);
 
+/* Check dynamic tag.  */
+extern bool ppc64_dynamic_tag_check (int64_t tag);
+
 /* Check whether given relocation is a copy relocation.  */
 extern bool ppc64_copy_reloc_p (int reloc);
 

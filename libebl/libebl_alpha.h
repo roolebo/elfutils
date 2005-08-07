@@ -31,6 +31,12 @@ extern const char *alpha_reloc_type_name (int type, char *buf, size_t len);
 /* Check relocation type.  */
 extern bool alpha_reloc_type_check (int type);
 
+/* Name of dynamic tag.  */
+extern const char *alpha_dynamic_tag_name (int64_t tag, char *buf, size_t len);
+
+/* Check dynamic tag.  */
+extern bool alpha_dynamic_tag_check (int64_t tag);
+
 /* Check whether given relocation is a copy relocation.  */
 extern bool alpha_copy_reloc_p (int reloc);
 

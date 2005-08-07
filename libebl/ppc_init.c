@@ -36,6 +36,8 @@ ppc_init (elf, machine, eh, ehlen)
   eh->reloc_type_check = ppc_reloc_type_check;
   eh->reloc_valid_use = ppc_reloc_valid_use;
   eh->reloc_simple_type = ppc_reloc_simple_type;
+  eh->dynamic_tag_name = ppc_dynamic_tag_name;
+  eh->dynamic_tag_check = ppc_dynamic_tag_check;
   eh->copy_reloc_p = ppc_copy_reloc_p;
   eh->destr = ppc_destr;
 

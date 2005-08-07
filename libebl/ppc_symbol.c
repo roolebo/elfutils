@@ -103,8 +103,14 @@ static struct
     [R_PPC_GOT_DTPREL16] = { "R_PPC_GOT_DTPREL16", exec },
     [R_PPC_GOT_DTPREL16_LO] = { "R_PPC_GOT_DTPREL16_LO", exec },
     [R_PPC_GOT_DTPREL16_HI] = { "R_PPC_GOT_DTPREL16_HI", exec },
-    [R_PPC_GOT_DTPREL16_HA] = { "R_PPC_GOT_DTPREL16_HA", exec }
+    [R_PPC_GOT_DTPREL16_HA] = { "R_PPC_GOT_DTPREL16_HA", exec },
+    [R_PPC_REL16] = { "R_PPC_REL16", rel },
+    [R_PPC_REL16_LO] = { "R_PPC_REL16_LO", rel },
+    [R_PPC_REL16_HI] = { "R_PPC_REL16_HI", rel },
+    [R_PPC_REL16_HA] = { "R_PPC_REL16_HA", rel },
   };
+#define nreloc_map_table \
+     (sizeof (reloc_map_table) / sizeof (reloc_map_table[0]))
 
 
 /* Determine relocation type string for PPC.  */
@@ -112,7 +118,7 @@ const char *
 ppc_reloc_type_name (int type, char *buf __attribute__ ((unused)),
 		     size_t len __attribute__ ((unused)))
 {
-  if (type < 0 || type >= R_PPC_NUM)
+  if (type < 0 || (size_t) type >= nreloc_map_table)
     return NULL;
 
   return reloc_map_table[type].name;
@@ -123,7 +129,7 @@ ppc_reloc_type_name (int type, char *buf __attribute__ ((unused)),
 bool
 ppc_reloc_type_check (int type)
 {
-  return (type >= R_PPC_NONE && type < R_PPC_NUM
+  return (type >= R_PPC_NONE && (size_t) type < nreloc_map_table
 	  && reloc_map_table[type].name != NULL) ? true : false;
 }
 
@@ -165,6 +171,29 @@ ppc_reloc_simple_type (Elf *elf __attribute__ ((unused)), int type)
       return ELF_T_NUM;
     }
 }
+
+
+const char *
+ppc_dynamic_tag_name (int64_t tag, char *buf __attribute__ ((unused)),
+		      size_t len __attribute__ ((unused)))
+{
+  switch (tag)
+    {
+    case DT_PPC_GOT:
+      return "PPC_GOT";
+    default:
+      break;
+    }
+  return NULL;
+}
+
+
+bool
+ppc_dynamic_tag_check (int64_t tag)
+{
+  return tag == DT_PPC_GOT;
+}
+
 
 /* Check whether given relocation is a copy relocation.  */
 bool

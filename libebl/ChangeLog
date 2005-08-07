@@ -1,3 +1,15 @@
+2005-08-07  Ulrich Drepper  <drepper@redhat.com>
+
+	* ppc_init.c: Add support for new DT_PPC_* and R_PPC_* values.
+	* ppc_symbol.c: Likewise.
+	* libebl_ppc.h: Likewise.
+	* ppc64_init.c: There is now also a dynamic_tag_check functions
+	* ppc64_symbol.c: Add dynamic_tag_check.
+	* libebl_ppc64.h: Add prototype.
+	* alpha_init.c: Add support for new DT_ALPHA_* value.
+	* alpha_symbol.c: Likewise.
+	* libebl_alpha.h: Likewise.
+
 2005-08-03  Ulrich Drepper  <drepper@redhat.com>
 
 	* libebl_alpha.map: Remove unnecessary exports.

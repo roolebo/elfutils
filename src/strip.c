@@ -274,7 +274,7 @@ process_file (const char *fname)
     }
 
   /* Open the file.  */
-  int fd = open (fname, O_RDWR);
+  int fd = open (fname, output_fname == NULL ? O_RDWR : O_RDONLY);
   if (fd == -1)
     {
       error (0, errno, gettext ("while opening \"%s\""), fname);
@@ -300,7 +300,8 @@ process_file (const char *fname)
     }
 
   /* Now get the ELF descriptor.  */
-  Elf *elf = elf_begin (fd, ELF_C_RDWR, NULL);
+  Elf *elf = elf_begin (fd, output_fname == NULL ? ELF_C_RDWR : ELF_C_READ,
+			NULL);
   int result;
   switch (elf_kind (elf))
     {

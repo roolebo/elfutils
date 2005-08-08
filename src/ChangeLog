@@ -1,3 +1,8 @@
+2005-08-07  Roland McGrath  <roland@redhat.com>
+
+	* strip.c (process_file): Open read-only when using a different output
+	file.
+
 2005-08-06  Ulrich Drepper  <drepper@redhat.com>
 
 	* elflint.c (in_nobits_scn): New function.

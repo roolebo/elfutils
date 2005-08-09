@@ -1,3 +1,9 @@
+2005-08-09  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_end.c: Add INTDEF.
+	* dwarf_error.c (dwarf_errmsg): Likewise.
+	* libdwP.h (dwarf_end, dwarf_errmsg): Add INTDECLs.
+
 2005-08-01  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_getaranges.c (dwarf_getaranges): Check for bogus offset.

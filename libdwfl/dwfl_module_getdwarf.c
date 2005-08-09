@@ -304,10 +304,10 @@ load_dw (Dwfl_Module *mod, Elf *debugfile)
 	return result;
     }
 
-  mod->dw = dwarf_begin_elf (debugfile, DWARF_C_READ, NULL);
+  mod->dw = INTUSE(dwarf_begin_elf) (debugfile, DWARF_C_READ, NULL);
   if (mod->dw == NULL)
     {
-      int err = dwarf_errno ();
+      int err = INTUSE(dwarf_errno) ();
       return err == DWARF_E_NO_DWARF ? DWFL_E_NO_DWARF : DWFL_E (LIBDW, err);
     }
 

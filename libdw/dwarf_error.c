@@ -155,6 +155,7 @@ dwarf_errmsg (error)
 
   return _(errmsgs[error == -1 ? last_error : error]);
 }
+INTDEF(dwarf_errmsg)
 
 
 #ifndef USE_TLS

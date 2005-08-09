@@ -30,7 +30,7 @@ addrarange (Dwfl_Module *mod, Dwarf_Addr addr, struct dwfl_arange **arange)
   if (mod->aranges == NULL)
     {
       Dwarf_Aranges *dwaranges;
-      if (dwarf_getaranges (mod->dw, &dwaranges, NULL) != 0)
+      if (INTUSE(dwarf_getaranges) (mod->dw, &dwaranges, NULL) != 0)
 	return DWFL_E_LIBDW;
 
       struct dwfl_arange *aranges = malloc (dwaranges->naranges
@@ -176,7 +176,7 @@ intern_cu (Dwfl_Module *mod, Dwarf_Off cuoff, struct dwfl_cu **result)
 	  cu->lines = NULL;
 
 	  /* XXX use non-searching lookup */
-	  Dwarf_Die *die = dwarf_offdie (mod->dw, cuoff, &cu->die);
+	  Dwarf_Die *die = INTUSE(dwarf_offdie) (mod->dw, cuoff, &cu->die);
 	  if (die == NULL)
 	    return DWFL_E_LIBDW;
 	  assert (die == &cu->die);
@@ -230,8 +230,8 @@ __libdwfl_nextcu (Dwfl_Module *mod, struct dwfl_cu *lastcu,
     {
       size_t cuhdrsz;
       Dwarf_Off nextoff;
-      if (dwarf_nextcu (mod->dw, cuoff, &nextoff, &cuhdrsz,
-			NULL, NULL, NULL) != 0)
+      if (INTUSE(dwarf_nextcu) (mod->dw, cuoff, &nextoff, &cuhdrsz,
+				NULL, NULL, NULL) != 0)
 	return DWFL_E_LIBDW;
 
       Dwfl_Error result = intern_cu (mod, cuoff + cuhdrsz, nextp);

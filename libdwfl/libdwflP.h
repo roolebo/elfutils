@@ -25,6 +25,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../libdw/libdwP.h"	/* We need its INTDECLs.  */
+
 /* gettext helper macros.  */
 #define _(Str) dgettext ("elfutils", Str)
 

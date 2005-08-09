@@ -22,7 +22,7 @@ __libdwfl_cu_getsrclines (struct dwfl_cu *cu)
     {
       Dwarf_Lines *lines;
       size_t nlines;
-      if (dwarf_getsrclines (&cu->die, &lines, &nlines) != 0)
+      if (INTUSE(dwarf_getsrclines) (&cu->die, &lines, &nlines) != 0)
 	return DWFL_E_LIBDW;
 
       cu->lines = malloc (offsetof (struct Dwfl_Lines, idx[nlines]));

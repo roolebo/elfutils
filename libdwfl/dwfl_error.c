@@ -113,7 +113,7 @@ canonicalize (Dwfl_Error error)
       value = DWFL_E (LIBELF, elf_errno ());
       break;
     case DWFL_E_LIBDW:
-      value = DWFL_E (LIBDW, dwarf_errno ());
+      value = DWFL_E (LIBDW, INTUSE(dwarf_errno) ());
       break;
 #if 0
     DWFL_E_LIBEBL:
@@ -186,7 +186,7 @@ dwfl_errmsg (error)
     case OTHER_ERROR (LIBELF):
       return elf_errmsg (error & 0xffff);
     case OTHER_ERROR (LIBDW):
-      return dwarf_errmsg (error & 0xffff);
+      return INTUSE(dwarf_errmsg) (error & 0xffff);
 #if 0
     case OTHER_ERROR (LIBEBL):
       return ebl_errmsg (error & 0xffff);

@@ -45,7 +45,7 @@ __libdwfl_module_free (Dwfl_Module *mod)
     }
 
   if (mod->dw != NULL)
-    dwarf_end (mod->dw);
+    INTUSE(dwarf_end) (mod->dw);
 
   if (mod->ebl != NULL)
     ebl_closebackend (mod->ebl);

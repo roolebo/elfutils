@@ -73,3 +73,4 @@ dwarf_end (dwarf)
 
   return 0;
 }
+INTDEF(dwarf_end)

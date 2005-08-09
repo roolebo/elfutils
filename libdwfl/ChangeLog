@@ -1,3 +1,13 @@
+2005-08-09  Roland McGrath  <roland@redhat.com>
+
+	* libdwflP.h: Include ../libdw/libdwP.h for its INTDECLs.
+	* cu.c: Use INTUSE on dwarf_* calls.
+	* dwfl_error.c: Likewise.
+	* dwfl_module.c: Likewise.
+	* dwfl_module_getdwarf.c: Likewise.
+	* dwfl_module_getsrc_file.c: Likewise.
+	* lines.c: Likewise.
+
 2005-08-07  Roland McGrath  <roland@redhat.com>
 
 	* linux-kernel-modules.c (dwfl_linux_kernel_find_elf): When module

@@ -511,7 +511,7 @@ enum
     DW_LNS_const_add_pc = 8,
     DW_LNS_fixed_advance_pc = 9,
     DW_LNS_set_prologue_end = 10,
-    DW_LNS_set_epilog_begin = 11,
+    DW_LNS_set_epilogue_begin = 11,
     DW_LNS_set_isa = 12
   };
 

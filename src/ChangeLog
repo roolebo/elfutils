@@ -1,3 +1,9 @@
+2005-08-08  Roland McGrath  <roland@redhat.com>
+
+	* strip.c (options, parse_opt): Grok -R .comment for compatibility
+	with binutils strip.  Likewise -d, -S, as aliases for -g.
+	Likewise ignore -s/--strip-all.
+
 2005-08-07  Roland McGrath  <roland@redhat.com>
 
 	* strip.c (process_file): Open read-only when using a different output

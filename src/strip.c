@@ -63,11 +63,15 @@ static const struct argp_option options[] =
   { NULL, 'F', "FILE", 0, N_("Embed name FILE instead of -f argument"), 0 },
 
   { NULL, 0, NULL, 0, N_("Output options:"), 0 },
+  { "strip-all", 's', NULL, OPTION_HIDDEN, NULL, 0 },
   { "strip-debug", 'g', NULL, 0, N_("Remove all debugging symbols"), 0 },
+  { NULL, 'd', NULL, OPTION_ALIAS, NULL, 0 },
+  { NULL, 'S', NULL, OPTION_ALIAS, NULL, 0 },
   { "preserve-dates", 'p', NULL, 0,
     N_("Copy modified/access timestamps to the output"), 0 },
   { "remove-comment", OPT_REMOVE_COMMENT, NULL, 0,
     N_("Remove .comment section"), 0 },
+  { "remove-section", 'R', "SECTION", OPTION_HIDDEN, NULL, 0 },
   { "permissive", OPT_PERMISSIVE, NULL, 0,
     N_("Relax a few rules to handle slightly broken ELF files"), 0 },
   { NULL, 0, NULL, 0, NULL, 0 }
@@ -235,12 +239,28 @@ parse_opt (int key, char *arg,
       remove_comment = true;
       break;
 
+    case 'R':
+      if (!strcmp (arg, ".comment"))
+	remove_comment = true;
+      else
+	{
+	  argp_error (state,
+		      gettext ("-R option supports only .comment section"));
+	  return EINVAL;
+	}
+      break;
+
     case 'g':
+    case 'd':
+    case 'S':
       remove_debug = true;
       break;
 
     case OPT_PERMISSIVE:
       permissive = true;
+      break;
+
+    case 's':			/* Ignored for compatibility.  */
       break;
 
     default:

@@ -299,7 +299,7 @@ load_dw (Dwfl_Module *mod, Elf *debugfile)
       find_symtab (mod);
       Dwfl_Error result = mod->symerr;
       if (result == DWFL_E_NOERROR)
-	result = __libdwfl_relocate (mod);
+	result = __libdwfl_relocate (mod, debugfile);
       if (result != DWFL_E_NOERROR)
 	return result;
     }

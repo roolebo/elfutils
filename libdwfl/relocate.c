@@ -61,28 +61,28 @@ __libdwfl_relocate_value (Dwfl_Module *mod, size_t symshstrndx,
 
 Dwfl_Error
 internal_function_def
-__libdwfl_relocate (Dwfl_Module *mod)
+__libdwfl_relocate (Dwfl_Module *mod, Elf *debugfile)
 {
   assert (mod->isrel);
 
   GElf_Ehdr ehdr_mem;
-  const GElf_Ehdr *ehdr = gelf_getehdr (mod->debug.elf, &ehdr_mem);
+  const GElf_Ehdr *ehdr = gelf_getehdr (debugfile, &ehdr_mem);
   if (ehdr == NULL)
     return DWFL_E_LIBELF;
 
   size_t symshstrndx, d_shstrndx;
   if (elf_getshstrndx (mod->symfile->elf, &symshstrndx) < 0)
     return DWFL_E_LIBELF;
-  if (mod->symfile == &mod->debug)
+  if (mod->symfile->elf == debugfile)
     d_shstrndx = symshstrndx;
-  else if (elf_getshstrndx (mod->debug.elf, &d_shstrndx) < 0)
+  else if (elf_getshstrndx (debugfile, &d_shstrndx) < 0)
     return DWFL_E_LIBELF;
 
   /* Look at each section in the debuginfo file, and process the
      relocation sections for debugging sections.  */
   Dwfl_Error result = DWFL_E_NO_DWARF;
   Elf_Scn *scn = NULL;
-  while ((scn = elf_nextscn (mod->debug.elf, scn)) != NULL)
+  while ((scn = elf_nextscn (debugfile, scn)) != NULL)
     {
       GElf_Shdr shdr_mem;
       GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
@@ -92,13 +92,13 @@ __libdwfl_relocate (Dwfl_Module *mod)
 	  /* It's a relocation section.  First, fetch the name of the
 	     section these relocations apply to.  */
 
-	  Elf_Scn *tscn = elf_getscn (mod->debug.elf, shdr->sh_info);
+	  Elf_Scn *tscn = elf_getscn (debugfile, shdr->sh_info);
 	  if (tscn == NULL)
 	    return DWFL_E_LIBELF;
 
 	  GElf_Shdr tshdr_mem;
 	  GElf_Shdr *tshdr = gelf_getshdr (tscn, &tshdr_mem);
-	  const char *tname = elf_strptr (mod->debug.elf, d_shstrndx,
+	  const char *tname = elf_strptr (debugfile, d_shstrndx,
 					  tshdr->sh_name);
 	  if (tname == NULL)
 	    return DWFL_E_LIBELF;
@@ -225,7 +225,7 @@ __libdwfl_relocate (Dwfl_Module *mod)
 	      else
 		{
 		  /* Extract the original value and apply the reloc.  */
-		  Elf_Data *d = gelf_xlatetom (mod->main.elf, &tmpdata, &rdata,
+		  Elf_Data *d = gelf_xlatetom (debugfile, &tmpdata, &rdata,
 					       ehdr->e_ident[EI_DATA]);
 		  if (d == NULL)
 		    return DWFL_E_LIBELF;
@@ -246,7 +246,7 @@ __libdwfl_relocate (Dwfl_Module *mod)
 	      /* Now convert the relocated datum back to the target
 		 format.  This will write into rdata.d_buf, which
 		 points into the raw section data being relocated.  */
-	      Elf_Data *s = gelf_xlatetof (mod->main.elf, &rdata, &tmpdata,
+	      Elf_Data *s = gelf_xlatetof (debugfile, &rdata, &tmpdata,
 					   ehdr->e_ident[EI_DATA]);
 	      if (s == NULL)
 		return DWFL_E_LIBELF;

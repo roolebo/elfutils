@@ -177,11 +177,12 @@ extern void __libdwfl_module_free (Dwfl_Module *mod) internal_function;
 
 
 /* Process relocations in debugging sections in an ET_REL file.
-   MOD->debug.elf must be opened with ELF_C_READ_MMAP_PRIVATE or ELF_C_READ,
+   DEBUGFILE must be opened with ELF_C_READ_MMAP_PRIVATE or ELF_C_READ,
    to make it possible to relocate the data in place (or ELF_C_RDWR or
    ELF_C_RDWR_MMAP if you intend to modify the Elf file on disk).  After
-   this, dwarf_begin_elf on MOD->debug.elf will read the relocated data.  */
-extern Dwfl_Error __libdwfl_relocate (Dwfl_Module *) internal_function;
+   this, dwarf_begin_elf on DEBUGFILE will read the relocated data.  */
+extern Dwfl_Error __libdwfl_relocate (Dwfl_Module *mod, Elf *debugfile)
+  internal_function;
 
 /* Adjust *VALUE from section-relative to absolute.
    MOD->dwfl->callbacks->section_address is called to determine the actual

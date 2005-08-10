@@ -1,3 +1,11 @@
+2005-08-10  Roland McGrath  <roland@redhat.com>
+
+	* relocate.c (__libdwfl_relocate): Take argument DEBUGFILE,
+	use it instead of MOD->debug.file.
+	* libdwflP.h: Update decl.
+	* dwfl_module_getdwarf.c (load_dw): Update caller.
+	Fixes bug #165598.
+
 2005-08-09  Roland McGrath  <roland@redhat.com>
 
 	* libdwflP.h: Include ../libdw/libdwP.h for its INTDECLs.

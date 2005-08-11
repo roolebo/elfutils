@@ -1,3 +1,8 @@
+2005-08-10  Ulrich Drepper  <drepper@redhat.com>
+
+	* readelf.c (print_debug_line_section): Correct fallout of renaming
+	of DW_LNS_set_epilog_begin.
+
 2005-08-08  Roland McGrath  <roland@redhat.com>
 
 	* strip.c (options, parse_opt): Grok -R .comment for compatibility

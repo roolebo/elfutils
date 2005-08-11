@@ -4351,7 +4351,7 @@ define new file: dir=%u, mtime=%" PRIu64 ", length=%" PRIu64 ", name=%s\n"),
 		  break;
 		}
 	    }
-	  else if (opcode <= DW_LNS_set_epilog_begin)
+	  else if (opcode <= DW_LNS_set_epilogue_begin)
 	    {
 	      /* This is a known standard opcode.  */
 	      switch (opcode)
@@ -4438,7 +4438,7 @@ define new file: dir=%u, mtime=%" PRIu64 ", length=%" PRIu64 ", name=%s\n"),
 		  puts (gettext (" set prologue end flag"));
 		  break;
 
-		case DW_LNS_set_epilog_begin:
+		case DW_LNS_set_epilogue_begin:
 		  /* Takes no argument.  */
 		  puts (gettext (" set epilogue begin flag"));
 		  break;

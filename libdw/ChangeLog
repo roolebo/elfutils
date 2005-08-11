@@ -1,3 +1,8 @@
+2005-08-10  Ulrich Drepper  <drepper@redhat.com>
+
+	* dwarf_getsrclines.c (dwarf_getsrclines): Correct fallout of renaming
+	of DW_LNS_set_epilog_begin.
+
 2005-08-09  Roland McGrath  <roland@redhat.com>
 
 	* dwarf.h (DW_LNS_set_epilog_begin): Renamed DW_LNS_set_epilogue_begin.

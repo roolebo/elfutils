@@ -450,7 +450,7 @@ dwarf_getsrclines (Dwarf_Die *cudie, Dwarf_Lines **lines, size_t *nlines)
 		  break;
 		}
 	    }
-	  else if (opcode <= DW_LNS_set_epilog_begin)
+	  else if (opcode <= DW_LNS_set_epilogue_begin)
 	    {
 	      /* This is a known standard opcode.  */
 	      switch (opcode)
@@ -553,7 +553,7 @@ dwarf_getsrclines (Dwarf_Die *cudie, Dwarf_Lines **lines, size_t *nlines)
 		  prologue_end = 1;
 		  break;
 
-		case DW_LNS_set_epilog_begin:
+		case DW_LNS_set_epilogue_begin:
 		  /* Takes no argument.  */
 		  if (unlikely (standard_opcode_lengths[opcode] != 0))
 		    goto invalid_data;

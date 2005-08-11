@@ -4,6 +4,8 @@ elflint: relax a bit. Allow version definitions for defined symbols against
 DSO versions also for symbols in nobits sections.  Allow .rodata section
 to have STRINGS and MERGE flag set.
 
+strip: add some more compatibility with binutils.
+
 Version 0.112:
 
 elfcmp: some more relaxation.
@@ -27,7 +29,7 @@ elfcmp: little usability tweak, name and index of differing section is printed.
 
 Version 0.110:
 
-libelf: fix a numbe rof problems with elf_update
+libelf: fix a number of problems with elf_update
 
 elfcmp: fix a few bugs.  Compare gaps.
 

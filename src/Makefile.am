@@ -24,7 +24,9 @@ AM_CFLAGS += -Wall -Wshadow -std=gnu99 $(native_ld_cflags) \
 	     $(if $($(*F)_no_Wunused),,-Wunused -Wextra) \
 	     $(if $($(*F)_no_Wformat),,-Wformat=2)
 
-INCLUDES = -I$(srcdir) -I$(srcdir)/../libelf -I$(srcdir)/../libebl -I$(srcdir)/../lib -I$(srcdir)/../libdw  -I..
+INCLUDES = -I$(srcdir) -I$(srcdir)/../libelf -I$(srcdir)/../libebl \
+	   -I$(srcdir)/../libdw -I$(srcdir)/../libdwfl \
+	   -I$(srcdir)/../lib -I..
 
 YACC = @YACC@ -d
 AM_YFLAGS = -pld
@@ -90,7 +92,7 @@ endif
 ld_LDFLAGS = -rdynamic
 elflint_LDADD  = $(libebl) $(libelf) $(libeu) $(libmudflap) -ldl
 findtextrel_LDADD = $(libdw) $(libelf) $(libmudflap)
-addr2line_LDADD = $(libdw) $(libelf) $(libmudflap)
+addr2line_LDADD = $(libdw) $(libmudflap)
 elfcmp_LDADD = $(libebl) $(libelf) $(libmudflap) -ldl
 objdump_LDADD  = $(libebl) $(libelf) $(libeu) $(libmudflap) -ldl
 

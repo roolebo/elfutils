@@ -1,7 +1,7 @@
-2005-08-10  Roland McGrath  <roland@redhat.com>
+2005-08-10  Ulrich Drepper  <drepper@redhat.com>
 
-	* dwarf_getsrclines.c (dwarf_getsrclines): Update
-	DW_LNS_set_epilogue_begin use to correct misspelling.
+	* dwarf_getsrclines.c (dwarf_getsrclines): Correct fallout of renaming
+	of DW_LNS_set_epilog_begin.
 
 2005-08-09  Roland McGrath  <roland@redhat.com>
 

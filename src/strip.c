@@ -199,8 +199,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 
 /* Handle program arguments.  */
 static error_t
-parse_opt (int key, char *arg,
-	   struct argp_state *state __attribute__ ((unused)))
+parse_opt (int key, char *arg, struct argp_state *state)
 {
   switch (key)
     {
@@ -369,14 +368,10 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
   size_t fname_len = strlen (fname) + 1;
   char *fullname = alloca (prefix_len + 1 + fname_len);
   char *cp = fullname;
-  Elf *newelf;
   Elf *debugelf = NULL;
   char *tmp_debug_fname = NULL;
   int result = 0;
-  GElf_Ehdr ehdr_mem;
-  GElf_Ehdr *ehdr;
   size_t shstrndx;
-  size_t shnum;
   struct shdr_info
   {
     Elf_Scn *scn;
@@ -462,7 +457,8 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
     }
 
   /* Get the information from the old file.  */
-  ehdr = gelf_getehdr (elf, &ehdr_mem);
+  GElf_Ehdr ehdr_mem;
+  GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);
   if (ehdr == NULL)
     INTERNAL_ERROR (fname);
 
@@ -474,6 +470,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
   /* We now create a new ELF descriptor for the same file.  We
      construct it almost exactly in the same way with some information
      dropped.  */
+  Elf *newelf;
   if (output_fname != NULL)
     newelf = elf_begin (fd, ELF_C_WRITE_MMAP, NULL);
   else
@@ -493,9 +490,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
     for (cnt = 0; cnt < ehdr->e_phnum; ++cnt)
       {
 	GElf_Phdr phdr_mem;
-	GElf_Phdr *phdr;
-
-	phdr = gelf_getphdr (elf, cnt, &phdr_mem);
+	GElf_Phdr *phdr = gelf_getphdr (elf, cnt, &phdr_mem);
 	if (phdr == NULL
 	    || unlikely (gelf_update_phdr (newelf, cnt, phdr) == 0))
 	  INTERNAL_ERROR (fname);
@@ -519,9 +514,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	for (cnt = 0; cnt < ehdr->e_phnum; ++cnt)
 	  {
 	    GElf_Phdr phdr_mem;
-	    GElf_Phdr *phdr;
-
-	    phdr = gelf_getphdr (elf, cnt, &phdr_mem);
+	    GElf_Phdr *phdr = gelf_getphdr (elf, cnt, &phdr_mem);
 	    if (phdr == NULL
 		|| unlikely (gelf_update_phdr (debugelf, cnt, phdr) == 0))
 	      INTERNAL_ERROR (fname);
@@ -529,6 +522,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
     }
 
   /* Number of sections.  */
+  size_t shnum;
   if (unlikely (elf_getshnum (elf, &shnum) < 0))
     {
       error (0, 0, gettext ("cannot determine number of sections: %s"),
@@ -596,9 +590,6 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	}
       else if (unlikely (shdr_info[cnt].shdr.sh_type == SHT_GROUP))
 	{
-	  Elf32_Word *grpref;
-	  size_t inner;
-
 	  /* Cross-reference the sections contained in the section
 	     group.  */
 	  shdr_info[cnt].data = elf_getdata (shdr_info[cnt].scn, NULL);
@@ -606,7 +597,8 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	    INTERNAL_ERROR (fname);
 
 	  /* XXX Fix for unaligned access.  */
-	  grpref = (Elf32_Word *) shdr_info[cnt].data->d_buf;
+	  Elf32_Word *grpref = (Elf32_Word *) shdr_info[cnt].data->d_buf;
+	  size_t inner;
 	  for (inner = 1;
 	       inner < shdr_info[cnt].data->d_size / sizeof (Elf32_Word);
 	       ++inner)
@@ -665,16 +657,14 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	idx = shdr_info[cnt].group_idx;
 	while (idx != 0)
 	  {
-	    /* If the references section group is a normal section
-	       group and has one element remaining, or if it is an
-	       empty COMDAT section group it is removed.  */
-	    bool is_comdat;
-
 	    /* The section group data is already loaded.  */
 	    assert (shdr_info[idx].data != NULL);
 
-	    is_comdat = (((Elf32_Word *) shdr_info[idx].data->d_buf)[0]
-			 & GRP_COMDAT) != 0;
+	    /* If the references section group is a normal section
+	       group and has one element remaining, or if it is an
+	       empty COMDAT section group it is removed.  */
+	    bool is_comdat = (((Elf32_Word *) shdr_info[idx].data->d_buf)[0]
+			      & GRP_COMDAT) != 0;
 
 	    --shdr_info[idx].group_cnt;
 	    if ((!is_comdat && shdr_info[idx].group_cnt == 1)
@@ -720,10 +710,6 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	      if (shdr_info[cnt].shdr.sh_type == SHT_DYNSYM
 		  || shdr_info[cnt].shdr.sh_type == SHT_SYMTAB)
 		{
-		  Elf_Data *symdata;
-		  Elf_Data *xndxdata;
-		  size_t elsize;
-
 		  /* Make sure the data is loaded.  */
 		  if (shdr_info[cnt].data == NULL)
 		    {
@@ -732,7 +718,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 		      if (shdr_info[cnt].data == NULL)
 			INTERNAL_ERROR (fname);
 		    }
-		  symdata = shdr_info[cnt].data;
+		  Elf_Data *symdata = shdr_info[cnt].data;
 
 		  /* If there is an extended section index table load it
 		     as well.  */
@@ -747,11 +733,13 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 		      if (shdr_info[shdr_info[cnt].symtab_idx].data == NULL)
 			INTERNAL_ERROR (fname);
 		    }
-		  xndxdata = shdr_info[shdr_info[cnt].symtab_idx].data;
+		  Elf_Data *xndxdata
+		    = shdr_info[shdr_info[cnt].symtab_idx].data;
 
 		  /* Go through all symbols and make sure the section they
 		     reference is not removed.  */
-		  elsize = gelf_fsize (elf, ELF_T_SYM, 1, ehdr->e_version);
+		  size_t elsize = gelf_fsize (elf, ELF_T_SYM, 1,
+					      ehdr->e_version);
 
 		  for (size_t inner = 0;
 		       inner < shdr_info[cnt].data->d_size / elsize;
@@ -759,15 +747,13 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 		    {
 		      GElf_Sym sym_mem;
 		      Elf32_Word xndx;
-		      GElf_Sym *sym;
-		      size_t scnidx;
-
-		      sym = gelf_getsymshndx (symdata, xndxdata, inner,
-					      &sym_mem, &xndx);
+		      GElf_Sym *sym = gelf_getsymshndx (symdata, xndxdata,
+							inner, &sym_mem,
+							&xndx);
 		      if (sym == NULL)
 			INTERNAL_ERROR (fname);
 
-		      scnidx = sym->st_shndx;
+		      size_t scnidx = sym->st_shndx;
 		      if (scnidx == SHN_UNDEF || scnidx >= shnum
 			  || (scnidx >= SHN_LORESERVE
 			      && scnidx <= SHN_HIRESERVE
@@ -830,20 +816,17 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
     {
       for (cnt = 1; cnt < shnum; ++cnt)
 	{
-	  Elf_Data *debugdata;
-	  GElf_Shdr debugshdr;
-	  bool discard_section;
-
 	  scn = elf_newscn (debugelf);
 	  if (scn == NULL)
 	    error (EXIT_FAILURE, 0,
 		   gettext ("while generating output file: %s"),
 		   elf_errmsg (-1));
 
-	  discard_section = shdr_info[cnt].idx > 0 && cnt != ehdr->e_shstrndx;
+	  bool discard_section = (shdr_info[cnt].idx > 0
+				  && cnt != ehdr->e_shstrndx);
 
 	  /* Set the section header in the new file.  */
-	  debugshdr = shdr_info[cnt].shdr;
+	  GElf_Shdr debugshdr = shdr_info[cnt].shdr;
 	  if (discard_section)
 	    debugshdr.sh_type = SHT_NOBITS;
 
@@ -860,7 +843,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	    }
 
 	  /* Set the data.  This is done by copying from the old file.  */
-	  debugdata = elf_newdata (scn);
+	  Elf_Data *debugdata = elf_newdata (scn);
 	  if (debugdata == NULL)
 	    INTERNAL_ERROR (fname);
 
@@ -931,9 +914,6 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
   /* Create the reference to the file with the debug info.  */
   if (debug_fname != NULL)
     {
-      char *debug_basename;
-      off_t crc_offset;
-
       /* Add the section header string table section name.  */
       shdr_info[cnt].se = ebl_strtabadd (shst, ".gnu_debuglink", 15);
       shdr_info[cnt].idx = idx++;
@@ -964,8 +944,8 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	error (EXIT_FAILURE, 0, gettext ("cannot allocate section data: %s"),
 	       elf_errmsg (-1));
 
-      debug_basename = basename (debug_fname_embed ?: debug_fname);
-      crc_offset = strlen (debug_basename) + 1;
+      char *debug_basename = basename (debug_fname_embed ?: debug_fname);
+      off_t crc_offset = strlen (debug_basename) + 1;
       /* Align to 4 byte boundary */
       crc_offset = ((crc_offset - 1) & ~3) + 4;
 

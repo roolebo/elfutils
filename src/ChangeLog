@@ -1,5 +1,7 @@
 2005-08-10  Ulrich Drepper  <drepper@redhat.com>
 
+	* strip.c (parse_opt): STATE parameter is now used.
+
 	* readelf.c (print_debug_line_section): Correct fallout of renaming
 	of DW_LNS_set_epilog_begin.
 

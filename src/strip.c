@@ -199,8 +199,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 
 /* Handle program arguments.  */
 static error_t
-parse_opt (int key, char *arg,
-	   struct argp_state *state __attribute__ ((unused)))
+parse_opt (int key, char *arg, struct argp_state *state)
 {
   switch (key)
     {

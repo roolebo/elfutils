@@ -21,9 +21,9 @@
 #include <errno.h>
 #include <error.h>
 #include <fcntl.h>
-#include <gelf.h>
 #include <inttypes.h>
-#include <libdw.h>
+#include <libdwfl.h>
+#include <dwarf.h>
 #include <libintl.h>
 #include <locale.h>
 #include <mcheck.h>
@@ -49,9 +49,6 @@ const char *argp_program_bug_address = PACKAGE_BUGREPORT;
 /* Definitions of arguments for argp functions.  */
 static const struct argp_option options[] =
 {
-  { NULL, 0, NULL, 0, N_("Input Selection:"), 0 },
-  { "exe", 'e', "FILE", 0, N_("Find addresses in FILE"), 0 },
-
   { NULL, 0, NULL, 0, N_("Output Selection:"), 0 },
   { "basenames", 's', NULL, 0, N_("Show only base names of source files"), 0 },
   { "functions", 'f', NULL, 0, N_("Additional show function names"), 0 },
@@ -74,19 +71,18 @@ static const char args_doc[] = N_("[ADDR...]");
 /* Prototype for option handler.  */
 static error_t parse_opt (int key, char *arg, struct argp_state *state);
 
+static struct argp_child argp_children[2]; /* [0] is set in main.  */
+
 /* Data structure to communicate with argp functions.  */
-static struct argp argp =
+static const struct argp argp =
 {
-  options, parse_opt, args_doc, doc, NULL, NULL, NULL
+  options, parse_opt, args_doc, doc, argp_children, NULL, NULL
 };
 
 
 /* Handle ADDR.  */
-static void handle_address (GElf_Addr addr, Elf *elf, Dwarf *dw);
+static void handle_address (GElf_Addr addr, Dwfl *dwfl);
 
-
-/* Name of the executable.  */
-static const char *executable = "a.out";
 
 /* True if only base names of files should be shown.  */
 static bool only_basenames;
@@ -116,55 +112,11 @@ main (int argc, char *argv[])
   /* Initialize the message catalog.  */
   (void) textdomain (PACKAGE);
 
-  /* Parse and process arguments.  */
-  (void) argp_parse (&argp, argc, argv, 0, &remaining, NULL);
-
-  /* Tell the library which version we are expecting.  */
-  elf_version (EV_CURRENT);
-
-  /* Open the file.  */
-  int fd = open64 (executable, O_RDONLY);
-  if (fd == -1)
-    error (1, errno, gettext ("cannot open '%s'"), executable);
-
-  /* Create the ELF descriptor.  */
-  Elf *elf = elf_begin (fd, ELF_C_READ_MMAP, NULL);
-  if (elf == NULL)
-    {
-      close (fd);
-      error (1, 0, gettext ("cannot create ELF descriptor: %s"),
-	     elf_errmsg (-1));
-    }
-
-  /* Try to get a DWARF descriptor.  If it fails, we try to locate the
-     debuginfo file.  */
-  Dwarf *dw = dwarf_begin_elf (elf, DWARF_C_READ, NULL);
-  int fd2 = -1;
-  Elf *elf2 = NULL;
-  if (dw == NULL)
-    {
-      char *canon = canonicalize_file_name (executable);
-      GElf_Ehdr ehdr_mem;
-      GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);
-
-      if (canon != NULL && ehdr != NULL)
-	{
-	  const char *debuginfo_dir;
-	  if (ehdr->e_ident[EI_CLASS] == ELFCLASS32
-	      || ehdr->e_machine == EM_IA_64 || ehdr->e_machine == EM_ALPHA)
-	    debuginfo_dir = "/usr/lib/debug";
-	  else
-	    debuginfo_dir = "/usr/lib64/debug";
-
-	  char *difname = alloca (strlen (debuginfo_dir) + strlen (canon) + 1);
-	  strcpy (stpcpy (difname, debuginfo_dir), canon);
-	  fd2 = open64 (difname, O_RDONLY);
-	  if (fd2 != -1)
-	    dw = dwarf_begin_elf (elf2, DWARF_C_READ, NULL);
-	}
-
-      free (canon);
-    }
+  /* Parse and process arguments.  This includes opening the modules.  */
+  argp_children[0].argp = dwfl_standard_argp ();
+  Dwfl *dwfl = NULL;
+  (void) argp_parse (&argp, argc, argv, 0, &remaining, &dwfl);
+  assert (dwfl != NULL);
 
   /* Now handle the addresses.  In case none are given on the command
      line, read from stdin.  */
@@ -183,7 +135,7 @@ main (int argc, char *argv[])
 	  char *endp;
 	  uintmax_t addr = strtoumax (buf, &endp, 0);
 	  if (endp != buf)
-	    handle_address (addr, elf2 ?: elf, dw);
+	    handle_address (addr, dwfl);
 	  else
 	    result = 1;
 	}
@@ -197,7 +149,7 @@ main (int argc, char *argv[])
 	  char *endp;
 	  uintmax_t addr = strtoumax (argv[remaining], &endp, 0);
 	  if (endp != argv[remaining])
-	    handle_address (addr, elf2 ?: elf, dw);
+	    handle_address (addr, dwfl);
 	  else
 	    result = 1;
 	}
@@ -224,19 +176,19 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 
 /* Handle program arguments.  */
 static error_t
-parse_opt (int key, char *arg,
-	   struct argp_state *state __attribute__ ((unused)))
+parse_opt (int key, char *arg __attribute__ ((unused)),
+	   struct argp_state *state)
 {
   switch (key)
     {
+    case ARGP_KEY_INIT:
+      state->child_inputs[0] = state->input;
+      break;
+
     case 'b':
     case 'C':
     case OPT_DEMANGLER:
       /* Ignored for compatibility.  */
-      break;
-
-    case 'e':
-      executable = arg;
       break;
 
     case 's':
@@ -254,118 +206,108 @@ parse_opt (int key, char *arg,
 }
 
 
-struct func_arg
-{
-  GElf_Addr addr;
-  const char *name;
-};
-
-
-static int
-match_func (Dwarf_Func *func, void *arg)
-{
-  struct func_arg *func_arg = (struct func_arg *) arg;
-  Dwarf_Addr addr;
-
-  if (dwarf_func_lowpc (func, &addr) == 0 && addr <= func_arg->addr
-      && dwarf_func_highpc (func, &addr) == 0 && func_arg->addr < addr)
-    {
-      func_arg->name = dwarf_func_name (func);
-      return DWARF_CB_ABORT;
-    }
-
-  return DWARF_CB_OK;
-}
-
-
 static const char *
-elf_getname (GElf_Addr addr, Elf *elf)
+dwarf_diename_integrate (Dwarf_Die *die)
 {
-  /* The DWARF information is not available.  Use the ELF
-     symbol table.  */
-  Elf_Scn *scn = NULL;
-  Elf_Scn *dynscn = NULL;
-
-  while ((scn = elf_nextscn (elf, scn)) != NULL)
-    {
-      GElf_Shdr shdr_mem;
-      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
-      if (shdr != NULL)
-	{
-	  if (shdr->sh_type == SHT_SYMTAB)
-	    break;
-	  if (shdr->sh_type == SHT_DYNSYM)
-	    dynscn = scn;
-	}
-    }
-  if (scn == NULL)
-    scn = dynscn;
-
-  if (scn != NULL)
-    {
-      /* Look through the symbol table for a matching symbol.  */
-      GElf_Shdr shdr_mem;
-      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
-      assert (shdr != NULL);
-
-      Elf_Data *data = elf_getdata (scn, NULL);
-      if (data != NULL)
-	for (int cnt = 1; cnt < (int) (shdr->sh_size / shdr->sh_entsize);
-	     ++cnt)
-	  {
-	    GElf_Sym sym_mem;
-	    GElf_Sym *sym = gelf_getsym (data, cnt, &sym_mem);
-	    if (sym != NULL
-		&& sym->st_value <= addr
-		&& addr < sym->st_value + sym->st_size)
-	      return elf_strptr (elf, shdr->sh_link, sym->st_name);
-	  }
-    }
-
-  return NULL;
+  Dwarf_Attribute attr_mem;
+  return dwarf_formstring (dwarf_attr_integrate (die, DW_AT_name, &attr_mem));
 }
 
+static bool
+print_dwarf_function (Dwfl_Module *mod, Dwarf_Addr addr)
+{
+  Dwarf_Addr bias = 0;
+  Dwarf_Die *cudie = dwfl_module_addrdie (mod, addr, &bias);
+
+  Dwarf_Die *scopes;
+  int nscopes = dwarf_getscopes (cudie, addr - bias, &scopes);
+  if (nscopes <= 0)
+    return false;
+
+  for (int i = 0; i < nscopes; ++i)
+    switch (dwarf_tag (&scopes[i]))
+      {
+      case DW_TAG_subprogram:
+	{
+	  const char *name = dwarf_diename_integrate (&scopes[i]);
+	  if (name == NULL)
+	    return false;
+	  puts (name);
+	  return true;
+	}
+
+      case DW_TAG_inlined_subroutine:
+	{
+	  const char *name = dwarf_diename_integrate (&scopes[i]);
+	  if (name == NULL)
+	    return false;
+	  printf ("%s inlined", name);
+
+	  Dwarf_Files *files;
+	  if (dwarf_getsrcfiles (cudie, &files, NULL) == 0)
+	    {
+	      Dwarf_Attribute attr_mem;
+	      Dwarf_Word val;
+	      if (dwarf_formudata (dwarf_attr (&scopes[i],
+					       DW_AT_call_file,
+					       &attr_mem), &val) == 0)
+		{
+		  const char *file = dwarf_filesrc (files, val, NULL, NULL);
+		  int lineno = 0, colno = 0;
+		  if (dwarf_formudata (dwarf_attr (&scopes[i],
+						   DW_AT_call_line,
+						   &attr_mem), &val) == 0)
+		    lineno = val;
+		  if (dwarf_formudata (dwarf_attr (&scopes[i],
+						   DW_AT_call_column,
+						   &attr_mem), &val) == 0)
+		    colno = val;
+		  if (lineno == 0)
+		    {
+		      if (file != NULL)
+			printf (" from %s", file);
+		    }
+		  else if (colno == 0)
+		    printf (" at %s:%u", file, lineno);
+		  else
+		    printf (" at %s:%u:%u", file, lineno, colno);
+		}
+	    }
+	  printf (" in ");
+	  continue;
+	}
+      }
+
+  return false;
+}
 
 static void
-handle_address (GElf_Addr addr, Elf *elf, Dwarf *dw)
+handle_address (GElf_Addr addr, Dwfl *dwfl)
 {
-  Dwarf_Die die_mem;
-  Dwarf_Die *die = dwarf_addrdie (dw, addr, &die_mem);
+  Dwfl_Module *mod = dwfl_addrmodule (dwfl, addr);
 
   if (show_functions)
     {
       /* First determine the function name.  Use the DWARF information if
 	 possible.  */
-      struct func_arg arg;
-      arg.addr = addr;
-      arg.name = NULL;
-
-      if (dwarf_getfuncs (die, match_func, &arg, 0) <= 0)
-	arg.name = elf_getname (addr, elf);
-
-      puts (arg.name ?: "??");
+      if (! print_dwarf_function (mod, addr))
+	puts (dwfl_module_addrname (mod, addr) ?: "??");
     }
 
+  Dwfl_Line *line = dwfl_module_getsrc (mod, addr);
 
-  Dwarf_Line *line;
   const char *src;
-  if ((line = dwarf_getsrc_die (die, addr)) != NULL
-    && (src = dwarf_linesrc (line, NULL, NULL)) != NULL)
+  int lineno, linecol;
+  if (line != NULL && (src = dwfl_lineinfo (line, &addr, &lineno, &linecol,
+					    NULL, NULL)) != NULL)
     {
       if (only_basenames)
 	src = basename (src);
 
-      int lineno;
-      if (dwarf_lineno (line, &lineno) != -1)
-	{
-	  int linecol;
-	  if (dwarf_linecol (line, &linecol) != -1 && linecol != 0)
-	    printf ("%s:%d:%d\n", src, lineno, linecol);
-	  else
-	    printf ("%s:%d\n", src, lineno);
-	}
+      if (linecol != 0)
+	printf ("%s:%d:%d\n", src, lineno, linecol);
       else
-	printf ("%s:0\n", src);
+	printf ("%s:%d\n", src, lineno);
     }
   else
     puts ("??:0");

@@ -1,6 +1,22 @@
+2005-07-28  Roland McGrath  <roland@redhat.com>
+
+	* addr2line.c (options, parse_opt): Don't handle -e here.
+	(executable): Variable removed.
+	(argp_children): New static variable.
+	(argp): Use it.  Make const.
+	(main): Fill in argp_children from dwfl_standard_argp ().
+	Let libdwfl handle file selection, pass Dwfl handle to handle_address.
+	(print_dwarf_function): New function.  Try to figure out inline chain.
+	(elf_getname): Function removed, libdwfl does it for us.
+	(handle_address): Take Dwfl handle instead of Elf, Dwarf handles.
+	Use dwfl_module_addrname instead of elf_getname.
+	Use dwfl_module_getsrc and dwfl_lineinfo instead of libdw calls.
+	* Makefile.am (INCLUDES): Add libdwfl directory to path.
+
 2005-08-10  Ulrich Drepper  <drepper@redhat.com>
 
 	* strip.c (parse_opt): STATE parameter is now used.
+	Various little cleanups.
 
 	* readelf.c (print_debug_line_section): Correct fallout of renaming
 	of DW_LNS_set_epilog_begin.

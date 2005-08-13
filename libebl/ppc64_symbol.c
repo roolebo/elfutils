@@ -245,7 +245,8 @@ ppc64_copy_reloc_p (int reloc)
 }
 
 
-/* Check whether given symbol's st_size is ok despite normal check failing.  */
+/* Check whether given symbol's st_value and st_size are OK despite failing
+   normal checks.  */
 bool
 ppc64_check_special_symbol (Elf *elf,
 			    const GElf_Sym *sym __attribute__ ((unused)),

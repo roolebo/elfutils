@@ -1,5 +1,10 @@
 2005-08-12  Roland McGrath  <roland@redhat.com>
 
+	* ppc_symbol.c (find_dyn_got): New function, broken out of ...
+	(ppc_bss_plt_p): ... here.  Call that.
+	(ppc_check_special_symbol): Use find_dyn_got to fetch value to check
+	against _GLOBAL_OFFSET_TABLE_.
+
 	* libeblP.h (struct ebl): Add bss_plt_p hook.
 	* eblopenbackend.c (default_bss_plt_p): New function.
 	(fill_defaults): Use it.

@@ -203,7 +203,40 @@ ppc_copy_reloc_p (int reloc)
   return reloc == R_PPC_COPY;
 }
 
-/* Check whether given symbol's value is ok despite failing normal checks.  */
+/* Look for DT_PPC_GOT.  */
+static bool
+find_dyn_got (Elf *elf, GElf_Addr *addr)
+{
+  Elf_Scn *scn = NULL;
+  while ((scn = elf_nextscn (elf, scn)) != NULL)
+    {
+      GElf_Shdr shdr_mem;
+      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+      if (shdr != NULL && shdr->sh_type == SHT_DYNAMIC)
+	{
+	  Elf_Data *data = elf_getdata (scn, NULL);
+	  if (data == NULL)
+	    break;
+	  for (unsigned int i = 0; i < shdr->sh_size / shdr->sh_entsize; ++i)
+	    {
+	      GElf_Dyn dyn_mem;
+	      GElf_Dyn *dyn = gelf_getdyn (data, i, &dyn_mem);
+	      if (dyn == NULL)
+		break;
+	      if (dyn->d_tag == DT_PPC_GOT)
+		{
+		  *addr = dyn->d_un.d_ptr;
+		  return true;
+		}
+	    }
+	}
+    }
+
+  return false;
+}
+
+/* Check whether given symbol's st_value and st_size are OK despite failing
+   normal checks.  */
 bool
 ppc_check_special_symbol (Elf *elf,
 			  const GElf_Sym *sym,
@@ -215,6 +248,9 @@ ppc_check_special_symbol (Elf *elf,
 
   if (!strcmp (name, "_GLOBAL_OFFSET_TABLE_"))
     {
+      GElf_Addr gotaddr;
+      if (find_dyn_got (elf, &gotaddr))
+	return sym->st_value == gotaddr;
       return sym->st_value == destshdr->sh_addr + 4;
     }
 
@@ -243,27 +279,6 @@ ppc_check_special_symbol (Elf *elf,
 bool
 ppc_bss_plt_p (Elf *elf)
 {
-  Elf_Scn *scn = NULL;
-  while ((scn = elf_nextscn (elf, scn)) != NULL)
-    {
-      GElf_Shdr shdr_mem;
-      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
-      if (shdr != NULL && shdr->sh_type == SHT_DYNAMIC)
-	{
-	  Elf_Data *data = elf_getdata (scn, NULL);
-	  if (data == NULL)
-	    break;
-	  for (unsigned int i = 0; i < shdr->sh_size / shdr->sh_entsize; ++i)
-	    {
-	      GElf_Dyn dyn_mem;
-	      GElf_Dyn *dyn = gelf_getdyn (data, i, &dyn_mem);
-	      if (dyn == NULL)
-		break;
-	      if (dyn->d_tag == DT_PPC_GOT)
-		return false;
-	    }
-	}
-    }
-
-  return true;
+  GElf_Addr addr;
+  return ! find_dyn_got (elf, &addr);
 }

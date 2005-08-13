@@ -69,11 +69,6 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
     Elf64_Ehdr *e64;
     void *p;
   } ehdr;
-  union
-  {
-    Elf32_Ehdr e32;
-    Elf64_Ehdr e64;
-  } ehdr_mem;
   bool is32 = e_ident[EI_CLASS] == ELFCLASS32;
 
   /* Make the ELF header available.  */
@@ -88,17 +83,11 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
       /* We have to read the data from the file.  */
       size_t len = is32 ? sizeof (Elf32_Ehdr) : sizeof (Elf64_Ehdr);
 
-      if (likely (map_address != NULL))
-	ehdr.p = memcpy (&ehdr_mem, (char *) map_address + offset, len);
-      else
-	{
-	  /* Fill it.  */
-	  if ((size_t) TEMP_FAILURE_RETRY (pread (fildes, &ehdr_mem, len,
-						  offset)) != len)
-	    /* Failed reading.  */
-	    return (size_t) -1l;
-	  ehdr.p = &ehdr_mem;
-	}
+      ehdr.p = alloca (len);
+      /* Fill it.  */
+      if ((size_t) pread (fildes, ehdr.p, len, offset) != len)
+	/* Failed reading.  */
+	return (size_t) -1l;
 
       if (e_ident[EI_DATA] != MY_ELFDATA)
 	{
@@ -131,27 +120,18 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
 		  || (((size_t) ((char *) map_address + offset))
 		      & (__alignof__ (Elf32_Ehdr) - 1)) == 0))
 	    /* We can directly access the memory.  */
-	    result = ((Elf32_Shdr *) ((char *) map_address + ehdr.e32->e_shoff
+	    result = ((Elf32_Shdr *) ((char *) map_address
+				      + ehdr.e32->e_shoff
 				      + offset))->sh_size;
 	  else
 	    {
 	      Elf32_Word size;
 
-	      if (likely (map_address != NULL))
-		/* gcc will optimize the memcpy to a simple memory
-		   access while taking care of alignment issues.  */
-		memcpy (&size, &((Elf32_Shdr *) ((char *) map_address
-						 + ehdr.e32->e_shoff
-						 + offset))->sh_size,
-			sizeof (Elf32_Word));
-	      else
-		if (TEMP_FAILURE_RETRY (pread (fildes, &size,
-					       sizeof (Elf32_Word),
-					       offset + ehdr.e32->e_shoff
-					       + offsetof (Elf32_Shdr,
-							   sh_size)))
-		    != sizeof (Elf32_Word))
-		  return (size_t) -1l;
+	      if (pread (fildes, &size, sizeof (Elf32_Word),
+			 offset + ehdr.e32->e_shoff
+			 + offsetof (Elf32_Shdr, sh_size))
+		  != sizeof (Elf32_Word))
+		return (size_t) -1l;
 
 	      if (e_ident[EI_DATA] != MY_ELFDATA)
 		CONVERT (size);
@@ -171,41 +151,29 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
 	    /* Cannot read the first section header.  */
 	    return (size_t) -1l;
 
-	  Elf64_Xword size;
 	  if (likely (map_address != NULL) && e_ident[EI_DATA] == MY_ELFDATA
 	      && (ALLOW_UNALIGNED
 		  || (((size_t) ((char *) map_address + offset))
 		      & (__alignof__ (Elf64_Ehdr) - 1)) == 0))
 	    /* We can directly access the memory.  */
-	    size = ((Elf64_Shdr *) ((char *) map_address + ehdr.e64->e_shoff
-				    + offset))->sh_size;
+	    result = ((Elf64_Shdr *) ((char *) map_address
+				      + ehdr.e64->e_shoff
+				      + offset))->sh_size;
 	  else
 	    {
-	      if (likely (map_address != NULL))
-		/* gcc will optimize the memcpy to a simple memory
-		   access while taking care of alignment issues.  */
-		memcpy (&size, &((Elf64_Shdr *) ((char *) map_address
-						 + ehdr.e64->e_shoff
-						 + offset))->sh_size,
-			sizeof (Elf64_Xword));
-	      else
-		if (TEMP_FAILURE_RETRY (pread (fildes, &size,
-					       sizeof (Elf64_Word),
-					       offset + ehdr.e64->e_shoff
-					       + offsetof (Elf64_Shdr,
-							   sh_size)))
-		    != sizeof (Elf64_Xword))
-		  return (size_t) -1l;
+	      Elf64_Word size;
+
+	      if (pread (fildes, &size, sizeof (Elf64_Word),
+			 offset + ehdr.e64->e_shoff
+			 + offsetof (Elf64_Shdr, sh_size))
+		  != sizeof (Elf64_Word))
+		return (size_t) -1l;
 
 	      if (e_ident[EI_DATA] != MY_ELFDATA)
 		CONVERT (size);
+
+	      result = size;
 	    }
-
-	  if (size > ~((GElf_Word) 0))
-	    /* Invalid value, it is too large.  */
-	    return (size_t) -1l;
-
-	  result = size;
 	}
     }
 
@@ -220,7 +188,6 @@ file_read_elf (int fildes, void *map_address, off_t offset, size_t maxsize,
 {
   /* We only read the ELF header now.  */
   unsigned char *e_ident;
-  unsigned char e_ident_mem[EI_NIDENT];
   size_t scncnt;
   Elf *elf;
 
@@ -230,10 +197,9 @@ file_read_elf (int fildes, void *map_address, off_t offset, size_t maxsize,
     e_ident = (unsigned char *) map_address + offset;
   else
     {
-      e_ident = e_ident_mem;
+      e_ident = (unsigned char *) alloca (EI_NIDENT);
 
-      if (TEMP_FAILURE_RETRY (pread (fildes, e_ident, EI_NIDENT, offset))
-	  != EI_NIDENT)
+      if (pread (fildes, e_ident, EI_NIDENT, offset) != EI_NIDENT)
 	{
 	  __libelf_seterrno (ELF_E_READ_ERROR);
 	  return NULL;
@@ -314,21 +280,14 @@ file_read_elf (int fildes, void *map_address, off_t offset, size_t maxsize,
 	}
       else
 	{
-	  if (likely (map_address != NULL))
-	    /* Copy the data.  */
-	    memcpy (&elf->state.elf32.ehdr_mem,
-		    (char *) map_address + offset, sizeof (Elf32_Ehdr));
-	  else
-	    /* Read the data.  */
-	    if (TEMP_FAILURE_RETRY (pread (elf->fildes,
-					   &elf->state.elf32.ehdr_mem,
-					   sizeof (Elf32_Ehdr), offset))
-		!= sizeof (Elf32_Ehdr))
-	      {
-		/* We must be able to read the ELF header.  */
-		__libelf_seterrno (ELF_E_INVALID_FILE);
-		return NULL;
-	      }
+	  /* Read the data.  */
+	  if (pread (elf->fildes, &elf->state.elf32.ehdr_mem,
+		     sizeof (Elf32_Ehdr), offset) != sizeof (Elf32_Ehdr))
+	    {
+	      /* We must be able to read the ELF header.  */
+	      __libelf_seterrno (ELF_E_INVALID_FILE);
+	      return NULL;
+	    }
 
 	  if (e_ident[EI_DATA] != MY_ELFDATA)
 	    {
@@ -406,16 +365,9 @@ file_read_elf (int fildes, void *map_address, off_t offset, size_t maxsize,
 	}
       else
 	{
-	  if (likely (map_address != NULL))
-	    /* Copy the data.  */
-	    memcpy (&elf->state.elf64.ehdr_mem,
-		    (char *) map_address + offset, sizeof (Elf64_Ehdr));
-	  else
-	    /* Read the data.  */
-	    if (TEMP_FAILURE_RETRY (pread (elf->fildes,
-					   &elf->state.elf64.ehdr_mem,
-					   sizeof (Elf64_Ehdr), offset))
-		!= sizeof (Elf64_Ehdr))
+	  /* Read the data.  */
+	  if (pread (elf->fildes, &elf->state.elf64.ehdr_mem,
+		     sizeof (Elf64_Ehdr), offset) != sizeof (Elf64_Ehdr))
 	    {
 	      /* We must be able to read the ELF header.  */
 	      __libelf_seterrno (ELF_E_INVALID_FILE);

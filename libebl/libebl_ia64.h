@@ -40,4 +40,8 @@ extern const char *ia64_dynamic_tag_name (int64_t tag, char *buf, size_t len);
 /* Check whether given relocation is a copy relocation.  */
 extern bool ia64_copy_reloc_p (int reloc);
 
+/* Check whether machine flags are valid.  */
+extern bool ia64_machine_flag_check (GElf_Word flags);
+
+
 #endif	/* libebl_ia64.h */

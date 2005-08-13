@@ -185,3 +185,10 @@ ia64_copy_reloc_p (int reloc)
 {
   return reloc == R_IA64_COPY;
 }
+
+/* Check whether machine flags are valid.  */
+bool
+ia64_machine_flag_check (GElf_Word flags)
+{
+  return ((flags &~ EF_IA_64_ABI64) == 0);
+}

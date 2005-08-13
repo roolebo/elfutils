@@ -1,3 +1,9 @@
+2005-08-13  Roland McGrath  <roland@redhat.com>
+
+	* ia64_symbol.c (ia64_machine_flag_check): New function.
+	* libebl_ia64.h: Declare it.
+	* ia64_init.c (ia64_init): Use it.
+
 2005-08-13  Ulrich Drepper  <drepper@redhat.com>
 
 	* libebl.h: Add ehdr parameter to ebl_bss_plt_p and

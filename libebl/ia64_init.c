@@ -37,6 +37,7 @@ ia64_init (elf, machine, eh, ehlen)
   eh->segment_type_name = ia64_segment_type_name;
   eh->dynamic_tag_name = ia64_dynamic_tag_name;
   eh->copy_reloc_p = ia64_copy_reloc_p;
+  eh->machine_flag_check = ia64_machine_flag_check;
   eh->destr = ia64_destr;
 
   return MODVERSION;

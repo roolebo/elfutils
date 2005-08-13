@@ -23,7 +23,7 @@ $(srcdir)/elfutils.spec.in: $(top_srcdir)/NEWS
 	date +'* %a %b %e %Y' | tr '[\n]' '[ ]' > $$tmpname; \
 	getent passwd "$$(whoami)" | \
 	  awk 'BEGIN {FS=":"} { printf $$5; exit 0}' >> $$tmpname; \
-	echo -n " <$(whoami)@redhat.com> " >> $$tmpname; \
+	echo -n " <$$(whoami)@redhat.com> " >> $$tmpname; \
 	sed 's/Version \(.*\):$$/\1-1/;q' $(top_srcdir)/NEWS >> $$tmpname; \
 	sed '2,/^Version /p;d' $(top_srcdir)/NEWS | \
 	  head -n -1 | \

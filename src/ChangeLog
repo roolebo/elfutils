@@ -1,3 +1,9 @@
+2005-08-13  Ulrich Drepper  <drepper@redhat.com>
+
+	* elflint.c (check_symtab): Simplify last change a bit.  Pass ehdr
+	to ebl_check_special_symbol.
+	(check_sections): Pass ehdr to ebl_bss_plt_p.
+
 2005-08-12  Roland McGrath  <roland@redhat.com>
 
 	* elflint.c (check_symtab): Check that _GLOBAL_OFFSET_TABLE_ st_shndx

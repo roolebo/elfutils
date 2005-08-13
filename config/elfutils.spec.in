@@ -183,6 +183,12 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.so
 
 %changelog
+* Wed Aug 10 2005 Ulrich Drepper <@redhat.com> 0.113-1
+- elflint: relax a bit. Allow version definitions for defined symbols ag
+ainstDSO versions also for symbols in nobits sections.  Allow .rodata 
+sectionto have STRINGS and MERGE flag set.
+- strip: add some more compatibility with binutils.
+
 * Sat Aug  6 2005 Ulrich Drepper <@redhat.com> 0.113-1
 - elflint: relax a bit. Allow version definitions for defined symbols ag
 ainstDSO versions also for symbols in nobits sections.  Allow .rodata 

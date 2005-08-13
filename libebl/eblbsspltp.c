@@ -20,8 +20,9 @@
 
 
 bool
-ebl_bss_plt_p (ebl)
+ebl_bss_plt_p (ebl, ehdr)
      Ebl *ebl;
+     GElf_Ehdr *ehdr;
 {
-  return ebl == NULL ? false : ebl->bss_plt_p (ebl->elf);
+  return ebl == NULL ? false : ebl->bss_plt_p (ebl->elf, ehdr);
 }

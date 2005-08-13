@@ -1,3 +1,20 @@
+2005-08-13  Ulrich Drepper  <drepper@redhat.com>
+
+	* libebl.h: Add ehdr parameter to ebl_bss_plt_p and
+	ebl_check_special_symbol.
+	* libeblP.h (struct ebl): Adjust callback functions.
+	* eblopenbackend.c: Adjust dummy functions.
+	* ebl_check_special_symbol.c: Add parameter and pass it on.
+	* eblbsspltp.c: Likewise.
+	* ppc_symbol.c (find_dyn_got): With ehdr passed, simplify search for
+	the dynamic section entry.
+	(ppc_check_special_symbol): Add ehdr parameter.
+	(ppc_bss_plt_p): Likewise.
+	* libebl_ppc.h: Adjust prototypes.
+	* ppc64_symbol.c (ppc_check_special_symbol): Add ehdr parameter.
+	(ppc_bss_plt_p): Likewise.
+	* libebl_ppc64.h: Adjust prototypes.
+
 2005-08-12  Roland McGrath  <roland@redhat.com>
 
 	* ppc_symbol.c (find_dyn_got): New function, broken out of ...

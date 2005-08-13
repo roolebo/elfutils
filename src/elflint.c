@@ -713,20 +713,21 @@ section [%2d] '%s': symbol %zu: function in COMMON section is nonsense\n"),
 	    {
 	      if (GELF_ST_TYPE (sym->st_info) != STT_TLS)
 		{
-		  bool special = ebl_check_special_symbol (ebl, sym, name,
-							   destshdr);
-		  if ((sym->st_value - destshdr->sh_addr) > destshdr->sh_size
-		      && !special)
-		    ERROR (gettext ("\
+		  if (! ebl_check_special_symbol (ebl, ehdr, sym, name,
+						  destshdr))
+		    {
+		      if ((sym->st_value - destshdr->sh_addr)
+			  > destshdr->sh_size)
+			ERROR (gettext ("\
 section [%2d] '%s': symbol %zu: st_value out of bounds\n"),
-			   idx, section_name (ebl, idx), cnt);
-		  else if ((sym->st_value - destshdr->sh_addr + sym->st_size)
-			   > destshdr->sh_size
-			   && !special)
-		    ERROR (gettext ("\
+			       idx, section_name (ebl, idx), cnt);
+		      else if ((sym->st_value - destshdr->sh_addr
+				+ sym->st_size) > destshdr->sh_size)
+			ERROR (gettext ("\
 section [%2d] '%s': symbol %zu does not fit completely in referenced section [%2d] '%s'\n"),
-			   idx, section_name (ebl, idx), cnt,
-			   (int) xndx, section_name (ebl, xndx));
+			       idx, section_name (ebl, idx), cnt,
+			       (int) xndx, section_name (ebl, xndx));
+		    }
 		}
 	      else
 		{
@@ -834,10 +835,8 @@ section [%2d] '%s': symbol %zu: non-local section symbol\n"),
 	      if (destshdr == NULL && xndx == SHN_ABS)
 		{
 		  /* In a DSO, we have to find the GOT section by name.  */
-
-		  Elf_Scn *gscn = NULL;
-
 		  Elf_Scn *gotscn = NULL;
+		  Elf_Scn *gscn = NULL;
 		  while ((gscn = elf_nextscn (ebl->elf, gscn)) != NULL)
 		    {
 		      destshdr = gelf_getshdr (gscn, &destshdr_mem);
@@ -847,9 +846,9 @@ section [%2d] '%s': symbol %zu: non-local section symbol\n"),
 						      destshdr->sh_name);
 		      if (sname != NULL)
 			{
-			  if (!strcmp (sname, ".got.plt"))
+			  if (strcmp (sname, ".got.plt") == 0)
 			    break;
-			  if (!strcmp (sname, ".got"))
+			  if (strcmp (sname, ".got") == 0)
 			    /* Do not stop looking.
 			       There might be a .got.plt section.  */
 			    gotscn = gscn;
@@ -878,26 +877,26 @@ section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to '%s' section\n"),
 	      if (destshdr != NULL)
 		{
 		  /* Found it.  */
-
-		  bool special = ebl_check_special_symbol (ebl, sym, name,
-							   destshdr);
-
-		  if (sym->st_value != destshdr->sh_addr && !special)
-		    /* This test is more strict than the psABIs which
-		       usually allow the symbol to be in the middle of
-		       the .got section, allowing negative offsets.  */
-		    ERROR (gettext ("\
+		  if (!ebl_check_special_symbol (ebl, ehdr, sym, name,
+						 destshdr))
+		    {
+		      if (sym->st_value != destshdr->sh_addr)
+			/* This test is more strict than the psABIs which
+			   usually allow the symbol to be in the middle of
+			   the .got section, allowing negative offsets.  */
+			ERROR (gettext ("\
 section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol value %#" PRIx64 " does not match %s section address %#" PRIx64 "\n"),
-			   idx, section_name (ebl, idx),
-			   (uint64_t) sym->st_value,
-			   sname, (uint64_t) destshdr->sh_addr);
+			       idx, section_name (ebl, idx),
+			       (uint64_t) sym->st_value,
+			       sname, (uint64_t) destshdr->sh_addr);
 
-		  if (!gnuld && sym->st_size != destshdr->sh_size && !special)
-		    ERROR (gettext ("\
+		      if (!gnuld && sym->st_size != destshdr->sh_size)
+			ERROR (gettext ("\
 section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol size %" PRIu64 " does not match %s section size %" PRIu64 "\n"),
-			   idx, section_name (ebl, idx),
-			   (uint64_t) sym->st_size,
-			   sname, (uint64_t) destshdr->sh_size);
+			       idx, section_name (ebl, idx),
+			       (uint64_t) sym->st_size,
+			       sname, (uint64_t) destshdr->sh_size);
+		    }
 		}
 	      else
 		ERROR (gettext ("\
@@ -2589,7 +2588,7 @@ cannot get section header for section [%2zu] '%s': %s\n"),
 		GElf_Word good_type = special_sections[s].type;
 		if (special_sections[s].namelen == sizeof ".plt" &&
 		    !memcmp (special_sections[s].name, ".plt", sizeof ".plt")
-		    && ebl_bss_plt_p (ebl))
+		    && ebl_bss_plt_p (ebl, ehdr))
 		  good_type = SHT_NOBITS;
 
 		if (shdr->sh_type != good_type

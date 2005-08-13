@@ -106,12 +106,11 @@ struct ebl
   bool (*copy_reloc_p) (int);
 
   /* Check whether given symbol's value is ok despite normal checks.  */
-  bool (*check_special_symbol) (Elf *elf,
-				const GElf_Sym *sym, const char *name,
-				const GElf_Shdr *destshdr);
+  bool (*check_special_symbol) (Elf *, GElf_Ehdr *, const GElf_Sym *,
+				const char *, const GElf_Shdr *);
 
   /* Check if backend uses a bss PLT in this file.  */
-  bool (*bss_plt_p) (Elf *elf);
+  bool (*bss_plt_p) (Elf *, GElf_Ehdr *);
 
   /* Destructor for ELF backend handle.  */
   void (*destr) (struct ebl *);

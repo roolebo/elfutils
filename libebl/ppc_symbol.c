@@ -203,82 +203,81 @@ ppc_copy_reloc_p (int reloc)
   return reloc == R_PPC_COPY;
 }
 
+
 /* Look for DT_PPC_GOT.  */
 static bool
-find_dyn_got (Elf *elf, GElf_Addr *addr)
+find_dyn_got (Elf *elf, GElf_Ehdr *ehdr, GElf_Addr *addr)
 {
-  Elf_Scn *scn = NULL;
-  while ((scn = elf_nextscn (elf, scn)) != NULL)
+  for (int i = 0; i < ehdr->e_phnum; ++i)
     {
+      GElf_Phdr phdr_mem;
+      GElf_Phdr *phdr = gelf_getphdr (elf, i, &phdr_mem);
+      if (phdr == NULL || phdr->p_type != PT_DYNAMIC)
+	continue;
+
+      Elf_Scn *scn = gelf_offscn (elf, phdr->p_offset);
       GElf_Shdr shdr_mem;
       GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
-      if (shdr != NULL && shdr->sh_type == SHT_DYNAMIC)
-	{
-	  Elf_Data *data = elf_getdata (scn, NULL);
-	  if (data == NULL)
-	    break;
-	  for (unsigned int i = 0; i < shdr->sh_size / shdr->sh_entsize; ++i)
-	    {
-	      GElf_Dyn dyn_mem;
-	      GElf_Dyn *dyn = gelf_getdyn (data, i, &dyn_mem);
-	      if (dyn == NULL)
-		break;
-	      if (dyn->d_tag == DT_PPC_GOT)
-		{
-		  *addr = dyn->d_un.d_ptr;
-		  return true;
-		}
-	    }
-	}
+      Elf_Data *data = elf_getdata (scn, NULL);
+      if (shdr != NULL && shdr->sh_type == SHT_DYNAMIC && data != NULL)
+	for (unsigned int j = 0; j < shdr->sh_size / shdr->sh_entsize; ++j)
+	  {
+	    GElf_Dyn dyn_mem;
+	    GElf_Dyn *dyn = gelf_getdyn (data, j, &dyn_mem);
+	    if (dyn != NULL && dyn->d_tag == DT_PPC_GOT)
+	      {
+		*addr = dyn->d_un.d_ptr;
+		return true;
+	      }
+	  }
+
+      /* There is only one PT_DYNAMIC entry.  */
+      break;
     }
 
   return false;
 }
+
 
 /* Check whether given symbol's st_value and st_size are OK despite failing
    normal checks.  */
 bool
-ppc_check_special_symbol (Elf *elf,
-			  const GElf_Sym *sym,
-			  const char *name,
-			  const GElf_Shdr *destshdr)
+ppc_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr, const GElf_Sym *sym,
+			  const char *name, const GElf_Shdr *destshdr)
 {
   if (name == NULL)
     return false;
 
-  if (!strcmp (name, "_GLOBAL_OFFSET_TABLE_"))
+  if (strcmp (name, "_GLOBAL_OFFSET_TABLE_") == 0)
     {
       GElf_Addr gotaddr;
-      if (find_dyn_got (elf, &gotaddr))
+      if (find_dyn_got (elf, ehdr, &gotaddr))
 	return sym->st_value == gotaddr;
       return sym->st_value == destshdr->sh_addr + 4;
     }
 
-  GElf_Ehdr ehdr_mem;
-  GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);
-  if (ehdr == NULL)
-    return false;
   const char *sname = elf_strptr (elf, ehdr->e_shstrndx, destshdr->sh_name);
   if (sname == NULL)
     return false;
 
-  if (!strcmp (name, "_SDA_BASE_"))
-    return (!strcmp (sname, ".sdata")
+  if (strcmp (name, "_SDA_BASE_") == 0)
+    return (strcmp (sname, ".sdata") == 0
 	    && sym->st_value == destshdr->sh_addr + 0x8000
 	    && sym->st_size == 0);
 
-  if (!strcmp (name, "_SDA2_BASE_"))
-    return (!strcmp (sname, ".sdata2")
+  if (strcmp (name, "_SDA2_BASE_") == 0)
+    return (strcmp (sname, ".sdata2") == 0
 	    && sym->st_value == destshdr->sh_addr + 0x8000
 	    && sym->st_size == 0);
 
   return false;
 }
 
+
 /* Check if backend uses a bss PLT in this file.  */
 bool
-ppc_bss_plt_p (Elf *elf)
+ppc_bss_plt_p (Elf *elf, GElf_Ehdr *ehdr)
 {
   GElf_Addr addr;
-  return ! find_dyn_got (elf, &addr);
+  return ! find_dyn_got (elf, ehdr, &addr);
 }

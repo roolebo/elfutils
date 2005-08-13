@@ -114,7 +114,7 @@ extern bool ebl_dynamic_tag_check (Ebl *ebl, int64_t tag);
 
 /* Check whether given symbol's st_value and st_size are OK despite failing
    normal checks.  */
-extern bool ebl_check_special_symbol (Ebl *ebl,
+extern bool ebl_check_special_symbol (Ebl *ebl, GElf_Ehdr *ehdr,
 				      const GElf_Sym *sym, const char *name,
 				      const GElf_Shdr *destshdr);
 
@@ -154,7 +154,7 @@ extern bool ebl_section_strip_p (Ebl *ebl, const GElf_Ehdr *ehdr,
 				 bool remove_comment, bool only_remove_debug);
 
 /* Check if backend uses a bss PLT in this file.  */
-extern bool ebl_bss_plt_p (Ebl *ebl);
+extern bool ebl_bss_plt_p (Ebl *ebl, GElf_Ehdr *ehdr);
 
 
 /* ELF string table handling.  */

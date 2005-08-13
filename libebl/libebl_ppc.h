@@ -52,12 +52,12 @@ extern bool ppc_copy_reloc_p (int reloc);
 
 /* Check whether given symbol's st_value and st_size are OK despite normal
    checks.  */
-extern bool ppc_check_special_symbol (Elf *elf,
+extern bool ppc_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr,
 				      const GElf_Sym *sym, const char *name,
 				      const GElf_Shdr *destshdr);
 
 /* Check if backend uses a bss PLT in this file.  */
-extern bool ppc_bss_plt_p (Elf *elf);
+extern bool ppc_bss_plt_p (Elf *elf, GElf_Ehdr *ehdr);
 
 
 #endif	/* libebl_ppc.h */

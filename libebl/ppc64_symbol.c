@@ -228,6 +228,7 @@ ppc64_dynamic_tag_name (int64_t tag, char *buf __attribute__ ((unused)),
   return NULL;
 }
 
+
 bool
 ppc64_dynamic_tag_check (int64_t tag)
 {
@@ -248,24 +249,22 @@ ppc64_copy_reloc_p (int reloc)
 /* Check whether given symbol's st_value and st_size are OK despite failing
    normal checks.  */
 bool
-ppc64_check_special_symbol (Elf *elf,
+ppc64_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr,
 			    const GElf_Sym *sym __attribute__ ((unused)),
 			    const char *name __attribute__ ((unused)),
 			    const GElf_Shdr *destshdr)
 {
-  GElf_Ehdr ehdr_mem;
-  GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);
-  if (ehdr == NULL)
-    return false;
   const char *sname = elf_strptr (elf, ehdr->e_shstrndx, destshdr->sh_name);
   if (sname == NULL)
     return false;
-  return !strcmp (sname, ".opd");
+  return strcmp (sname, ".opd") == 0;
 }
+
 
 /* Check if backend uses a bss PLT in this file.  */
 bool
-ppc64_bss_plt_p (Elf *elf __attribute__ ((unused)))
+ppc64_bss_plt_p (Elf *elf __attribute__ ((unused)),
+		 GElf_Ehdr *ehdr __attribute__ ((unused)))
 {
   return true;
 }

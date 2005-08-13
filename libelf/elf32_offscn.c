@@ -56,7 +56,12 @@ elfw2(LIBELFBITS,offscn) (elf, offset)
 	if (runp->data[i].shdr.ELFW(e,LIBELFBITS)->sh_offset == offset)
 	  {
 	    result = &runp->data[i];
-	    goto out;
+
+	    /* If this section is empty, the following one has the same
+	       sh_offset.  We presume the caller is looking for a nonempty
+	       section, so keep looking if this one is empty.  */
+	    if (runp->data[i].shdr.ELFW(e,LIBELFBITS)->sh_size != 0)
+	      goto out;
 	  }
 
       runp = runp->next;

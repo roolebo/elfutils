@@ -1,3 +1,8 @@
+2005-08-12  Roland McGrath  <roland@redhat.com>
+
+	* elf32_offscn.c: Do not match empty sections at OFFSET unless
+	there are no nonempty sections at that offset.
+
 2005-08-07  Ulrich Drepper  <drepper@redhat.com>
 
 	* elf.h: Update from glibc.

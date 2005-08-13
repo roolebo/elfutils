@@ -1,3 +1,31 @@
+2005-08-12  Roland McGrath  <roland@redhat.com>
+
+	* libeblP.h (struct ebl): Add bss_plt_p hook.
+	* eblopenbackend.c (default_bss_plt_p): New function.
+	(fill_defaults): Use it.
+	* eblbsspltp.c: New file.
+	* Makefile.am (gen_SOURCES): Add it.
+	* libebl.h: Declare ebl_bss_plt_p.
+	* ppc_symbol.c (ppc_bss_plt_p): New function.
+	* libebl_ppc.h: Declare it.
+	* ppc_init.c (ppc_init): Use it.
+	* ppc64_symbol.c (ppc64_bss_plt_p): New function.
+	* libebl_ppc64.h: Declare it.
+	* ppc64_init.c (ppc64_init): Use it.
+
+	* ebl_check_special_symbol.c: New file.
+	* Makefile.am (gen_SOURCES): Add it.
+	* libebl.h: Declare ebl_check_special_symbol.
+	* libeblP.h (struct ebl): Add check_special_symbol hook.
+	* eblopenbackend.c (default_check_special_symbol): New function.
+	(fill_defaults): Use it.
+	* ppc_symbol.c (ppc_check_special_symbol): New function.
+	* libebl_ppc.h: Add prototype.
+	* ppc_init.c (ppc_init): Use it.
+	* ppc64_symbol.c (ppc64_check_special_symbol): New function.
+	* libebl_ppc64.h: Add prototype.
+	* ppc64_init.c (ppc64_init): Use it.
+
 2005-08-07  Ulrich Drepper  <drepper@redhat.com>
 
 	* ppc_init.c: Add support for new DT_PPC_* and R_PPC_* values.

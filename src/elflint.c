@@ -713,12 +713,16 @@ section [%2d] '%s': symbol %zu: function in COMMON section is nonsense\n"),
 	    {
 	      if (GELF_ST_TYPE (sym->st_info) != STT_TLS)
 		{
-		  if ((sym->st_value - destshdr->sh_addr) > destshdr->sh_size)
+		  bool special = ebl_check_special_symbol (ebl, sym, name,
+							   destshdr);
+		  if ((sym->st_value - destshdr->sh_addr) > destshdr->sh_size
+		      && !special)
 		    ERROR (gettext ("\
 section [%2d] '%s': symbol %zu: st_value out of bounds\n"),
 			   idx, section_name (ebl, idx), cnt);
 		  else if ((sym->st_value - destshdr->sh_addr + sym->st_size)
-			   > destshdr->sh_size)
+			   > destshdr->sh_size
+			   && !special)
 		    ERROR (gettext ("\
 section [%2d] '%s': symbol %zu does not fit completely in referenced section [%2d] '%s'\n"),
 			   idx, section_name (ebl, idx), cnt,
@@ -821,59 +825,79 @@ section [%2d] '%s': symbol %zu: non-local section symbol\n"),
 	{
 	  if (strcmp (name, "_GLOBAL_OFFSET_TABLE_") == 0)
 	    {
-	      /* Check that address and size match the global offset
-		 table.  We have to locate the GOT by searching for a
-		 section named ".got".  */
-	      Elf_Scn *gscn = NULL;
-	      GElf_Addr addr = 0;
-	      GElf_Xword size = 0;
-	      bool found = false;
+	      /* Check that address and size match the global offset table.  */
 
-	      while ((gscn = elf_nextscn (ebl->elf, gscn)) != NULL)
+	      GElf_Shdr destshdr_mem;
+	      GElf_Shdr *destshdr = gelf_getshdr (elf_getscn (ebl->elf, xndx),
+						  &destshdr_mem);
+
+	      if (destshdr == NULL && xndx == SHN_ABS)
 		{
-		  GElf_Shdr gshdr_mem;
-		  GElf_Shdr *gshdr = gelf_getshdr (gscn, &gshdr_mem);
-		  assert (gshdr != NULL);
+		  /* In a DSO, we have to find the GOT section by name.  */
 
-		  const char *sname = elf_strptr (ebl->elf, ehdr->e_shstrndx,
-						  gshdr->sh_name);
-		  if (sname != NULL)
+		  Elf_Scn *gscn = NULL;
+
+		  Elf_Scn *gotscn = NULL;
+		  while ((gscn = elf_nextscn (ebl->elf, gscn)) != NULL)
 		    {
-		      if (strcmp (sname, ".got.plt") == 0)
+		      destshdr = gelf_getshdr (gscn, &destshdr_mem);
+		      assert (destshdr != NULL);
+		      const char *sname = elf_strptr (ebl->elf,
+						      ehdr->e_shstrndx,
+						      destshdr->sh_name);
+		      if (sname != NULL)
 			{
-			  addr = gshdr->sh_addr;
-			  size = gshdr->sh_size;
-			  found = true;
-			  break;
+			  if (!strcmp (sname, ".got.plt"))
+			    break;
+			  if (!strcmp (sname, ".got"))
+			    /* Do not stop looking.
+			       There might be a .got.plt section.  */
+			    gotscn = gscn;
 			}
-		      if (strcmp (sname, ".got") == 0)
-			{
-			  addr = gshdr->sh_addr;
-			  size = gshdr->sh_size;
-			  found = true;
-			  /* Do not stop looking.  There might be a
-			     .got.plt section.  */
-			}
+
+		      destshdr = NULL;
 		    }
+
+		  if (destshdr == NULL && gotscn != NULL)
+		    destshdr = gelf_getshdr (gotscn, &destshdr_mem);
 		}
 
-	      if (found)
+	      const char *sname = (destshdr == NULL ? NULL
+				   : elf_strptr (ebl->elf, ehdr->e_shstrndx,
+						 destshdr->sh_name));
+	      if (sname == NULL)
+		ERROR (gettext ("\
+section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to bad section\n"),
+		       idx, section_name (ebl, idx));
+	      else if (strcmp (sname, ".got.plt") != 0
+		       && strcmp (sname, ".got") != 0)
+		ERROR (gettext ("\
+section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to '%s' section\n"),
+		       idx, section_name (ebl, idx), sname);
+
+	      if (destshdr != NULL)
 		{
 		  /* Found it.  */
-		  if (sym->st_value != addr)
+
+		  bool special = ebl_check_special_symbol (ebl, sym, name,
+							   destshdr);
+
+		  if (sym->st_value != destshdr->sh_addr && !special)
 		    /* This test is more strict than the psABIs which
 		       usually allow the symbol to be in the middle of
 		       the .got section, allowing negative offsets.  */
 		    ERROR (gettext ("\
-section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol value %#" PRIx64 " does not match .got section address %#" PRIx64 "\n"),
+section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol value %#" PRIx64 " does not match %s section address %#" PRIx64 "\n"),
 			   idx, section_name (ebl, idx),
-			   (uint64_t) sym->st_value, (uint64_t) addr);
+			   (uint64_t) sym->st_value,
+			   sname, (uint64_t) destshdr->sh_addr);
 
-		  if (!gnuld && sym->st_size != size)
+		  if (!gnuld && sym->st_size != destshdr->sh_size && !special)
 		    ERROR (gettext ("\
-section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol size %" PRIu64 " does not match .got section size %" PRIu64 "\n"),
+section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol size %" PRIu64 " does not match %s section size %" PRIu64 "\n"),
 			   idx, section_name (ebl, idx),
-			   (uint64_t) sym->st_size, (uint64_t) size);
+			   (uint64_t) sym->st_size,
+			   sname, (uint64_t) destshdr->sh_size);
 		}
 	      else
 		ERROR (gettext ("\
@@ -2562,7 +2586,13 @@ cannot get section header for section [%2zu] '%s': %s\n"),
 		char stbuf2[100];
 		char stbuf3[100];
 
-		if (shdr->sh_type != special_sections[s].type
+		GElf_Word good_type = special_sections[s].type;
+		if (special_sections[s].namelen == sizeof ".plt" &&
+		    !memcmp (special_sections[s].name, ".plt", sizeof ".plt")
+		    && ebl_bss_plt_p (ebl))
+		  good_type = SHT_NOBITS;
+
+		if (shdr->sh_type != good_type
 		    && !(is_debuginfo && shdr->sh_type == SHT_NOBITS))
 		  ERROR (gettext ("\
 section [%2d] '%s' has wrong type: expected %s, is %s\n"),
@@ -2759,7 +2789,9 @@ section [%2zu] '%s' has type NOBITS but is read from the file in segment of prog
 		  }
 		else
 		  {
-		    if (shdr->sh_offset >= phdr->p_offset + phdr->p_filesz)
+		    const GElf_Off end = phdr->p_offset + phdr->p_filesz;
+		    if (shdr->sh_offset > end ||
+			(shdr->sh_offset == end && shdr->sh_size != 0))
 		      ERROR (gettext ("\
 section [%2zu] '%s' has not type NOBITS but is not read from the file in segment of program header entry %d\n"),
 			 cnt, section_name (ebl, cnt), pcnt);

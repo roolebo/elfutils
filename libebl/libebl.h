@@ -112,6 +112,12 @@ extern const char *ebl_dynamic_tag_name (Ebl *ebl, int64_t tag,
 /* Check dynamic tag.  */
 extern bool ebl_dynamic_tag_check (Ebl *ebl, int64_t tag);
 
+/* Check whether given symbol's st_value and st_size are OK despite failing
+   normal checks.  */
+extern bool ebl_check_special_symbol (Ebl *ebl,
+				      const GElf_Sym *sym, const char *name,
+				      const GElf_Shdr *destshdr);
+
 /* Return combined section header flags value.  */
 extern GElf_Word ebl_sh_flags_combine (Ebl *ebl, GElf_Word flags1,
 				       GElf_Word flags2);
@@ -142,11 +148,13 @@ extern bool ebl_debugscn_p (Ebl *ebl, const char *name);
 /* Check whether given relocation is a copy relocation.  */
 extern bool ebl_copy_reloc_p (Ebl *ebl, int reloc);
 
-
-/* CHeck whether section should be stripped.  */
+/* Check whether section should be stripped.  */
 extern bool ebl_section_strip_p (Ebl *ebl, const GElf_Ehdr *ehdr,
 				 const GElf_Shdr *shdr, const char *name,
 				 bool remove_comment, bool only_remove_debug);
+
+/* Check if backend uses a bss PLT in this file.  */
+extern bool ebl_bss_plt_p (Ebl *ebl);
 
 
 /* ELF string table handling.  */

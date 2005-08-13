@@ -153,6 +153,11 @@ static bool default_object_note (const char *name, uint32_t type,
 				 uint32_t descsz, const char *desc);
 static bool default_debugscn_p (const char *name);
 static bool default_copy_reloc_p (int reloc);
+static bool default_check_special_symbol (Elf *elf,
+					  const GElf_Sym *sym,
+					  const char *name,
+					  const GElf_Shdr *destshdr);
+static bool default_bss_plt_p (Elf *elf);
 
 
 static void
@@ -181,6 +186,8 @@ fill_defaults (Ebl *result)
   result->object_note = default_object_note;
   result->debugscn_p = default_debugscn_p;
   result->copy_reloc_p = default_copy_reloc_p;
+  result->check_special_symbol = default_check_special_symbol;
+  result->bss_plt_p = default_bss_plt_p;
   result->destr = default_destr;
 }
 
@@ -550,6 +557,21 @@ default_debugscn_p (const char *name)
 
 static bool
 default_copy_reloc_p (int reloc __attribute__ ((unused)))
+{
+  return false;
+}
+
+static bool
+default_check_special_symbol (Elf *elf __attribute__ ((unused)),
+			      const GElf_Sym *sym __attribute__ ((unused)),
+			      const char *name __attribute__ ((unused)),
+			      const GElf_Shdr *destshdr __attribute__ ((unused)))
+{
+  return false;
+}
+
+static bool
+default_bss_plt_p (Elf *elf __attribute__ ((unused)))
 {
   return false;
 }

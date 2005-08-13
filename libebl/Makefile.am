@@ -48,7 +48,8 @@ gen_SOURCES = eblopenbackend.c eblclosebackend.c eblstrtab.c \
 	      ebldynamictagcheck.c eblcorenotetypename.c eblobjnotetypename.c \
 	      eblcorenote.c eblobjnote.c ebldebugscnp.c \
 	      eblgotpcreloccheck.c eblcopyrelocp.c eblsectionstripp.c \
-	      eblelfclass.c eblelfdata.c eblelfmachine.c
+	      eblelfclass.c eblelfdata.c eblelfmachine.c \
+	      ebl_check_special_symbol.c eblbsspltp.c
 
 libebl_a_SOURCES = $(gen_SOURCES)
 

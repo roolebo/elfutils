@@ -39,6 +39,8 @@ ppc64_init (elf, machine, eh, ehlen)
   eh->dynamic_tag_name = ppc64_dynamic_tag_name;
   eh->dynamic_tag_check = ppc64_dynamic_tag_check;
   eh->copy_reloc_p = ppc64_copy_reloc_p;
+  eh->check_special_symbol = ppc64_check_special_symbol;
+  eh->bss_plt_p = ppc64_bss_plt_p;
   eh->destr = ppc64_destr;
 
   return MODVERSION;

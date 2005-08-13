@@ -1,3 +1,18 @@
+2005-08-12  Roland McGrath  <roland@redhat.com>
+
+	* elflint.c (check_symtab): Check that _GLOBAL_OFFSET_TABLE_ st_shndx
+	refers to the right section if it's not SHN_ABS.
+	Let ebl_check_special_symbol override _G_O_T_ value and size checks.
+
+	* elflint.c (check_sections): Don't complain about a non-NOBITS
+	section taking no segment space, if it's sh_size is 0.
+
+	* elflint.c (check_sections): Use ebl_bss_plt_p to see if .plt should
+	be PROGBITS or NOBITS.
+
+	* elflint.c (check_symtab): Use ebl_check_special_symbol to override
+	standard st_value and st_size checks.
+
 2005-07-28  Roland McGrath  <roland@redhat.com>
 
 	* addr2line.c (options, parse_opt): Don't handle -e here.

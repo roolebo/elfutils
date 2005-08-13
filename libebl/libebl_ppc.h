@@ -50,4 +50,14 @@ extern bool ppc_dynamic_tag_check (int64_t tag);
 /* Check whether given relocation is a copy relocation.  */
 extern bool ppc_copy_reloc_p (int reloc);
 
+/* Check whether given symbol's st_value and st_size are OK despite normal
+   checks.  */
+extern bool ppc_check_special_symbol (Elf *elf,
+				      const GElf_Sym *sym, const char *name,
+				      const GElf_Shdr *destshdr);
+
+/* Check if backend uses a bss PLT in this file.  */
+extern bool ppc_bss_plt_p (Elf *elf);
+
+
 #endif	/* libebl_ppc.h */

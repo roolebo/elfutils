@@ -39,6 +39,8 @@ ppc_init (elf, machine, eh, ehlen)
   eh->dynamic_tag_name = ppc_dynamic_tag_name;
   eh->dynamic_tag_check = ppc_dynamic_tag_check;
   eh->copy_reloc_p = ppc_copy_reloc_p;
+  eh->check_special_symbol = ppc_check_special_symbol;
+  eh->bss_plt_p = ppc_bss_plt_p;
   eh->destr = ppc_destr;
 
   return MODVERSION;

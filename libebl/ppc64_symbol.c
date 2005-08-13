@@ -19,6 +19,7 @@
 #include <assert.h>
 #include <elf.h>
 #include <stddef.h>
+#include <string.h>
 
 #include <libebl_ppc64.h>
 
@@ -241,4 +242,29 @@ bool
 ppc64_copy_reloc_p (int reloc)
 {
   return reloc == R_PPC64_COPY;
+}
+
+
+/* Check whether given symbol's st_size is ok despite normal check failing.  */
+bool
+ppc64_check_special_symbol (Elf *elf,
+			    const GElf_Sym *sym __attribute__ ((unused)),
+			    const char *name __attribute__ ((unused)),
+			    const GElf_Shdr *destshdr)
+{
+  GElf_Ehdr ehdr_mem;
+  GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);
+  if (ehdr == NULL)
+    return false;
+  const char *sname = elf_strptr (elf, ehdr->e_shstrndx, destshdr->sh_name);
+  if (sname == NULL)
+    return false;
+  return !strcmp (sname, ".opd");
+}
+
+/* Check if backend uses a bss PLT in this file.  */
+bool
+ppc64_bss_plt_p (Elf *elf __attribute__ ((unused)))
+{
+  return true;
 }

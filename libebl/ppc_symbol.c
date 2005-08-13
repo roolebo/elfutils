@@ -19,6 +19,7 @@
 #include <assert.h>
 #include <elf.h>
 #include <stddef.h>
+#include <string.h>
 
 #include <libebl_ppc.h>
 
@@ -200,4 +201,69 @@ bool
 ppc_copy_reloc_p (int reloc)
 {
   return reloc == R_PPC_COPY;
+}
+
+/* Check whether given symbol's value is ok despite failing normal checks.  */
+bool
+ppc_check_special_symbol (Elf *elf,
+			  const GElf_Sym *sym,
+			  const char *name,
+			  const GElf_Shdr *destshdr)
+{
+  if (name == NULL)
+    return false;
+
+  if (!strcmp (name, "_GLOBAL_OFFSET_TABLE_"))
+    {
+      return sym->st_value == destshdr->sh_addr + 4;
+    }
+
+  GElf_Ehdr ehdr_mem;
+  GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);
+  if (ehdr == NULL)
+    return false;
+  const char *sname = elf_strptr (elf, ehdr->e_shstrndx, destshdr->sh_name);
+  if (sname == NULL)
+    return false;
+
+  if (!strcmp (name, "_SDA_BASE_"))
+    return (!strcmp (sname, ".sdata")
+	    && sym->st_value == destshdr->sh_addr + 0x8000
+	    && sym->st_size == 0);
+
+  if (!strcmp (name, "_SDA2_BASE_"))
+    return (!strcmp (sname, ".sdata2")
+	    && sym->st_value == destshdr->sh_addr + 0x8000
+	    && sym->st_size == 0);
+
+  return false;
+}
+
+/* Check if backend uses a bss PLT in this file.  */
+bool
+ppc_bss_plt_p (Elf *elf)
+{
+  Elf_Scn *scn = NULL;
+  while ((scn = elf_nextscn (elf, scn)) != NULL)
+    {
+      GElf_Shdr shdr_mem;
+      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+      if (shdr != NULL && shdr->sh_type == SHT_DYNAMIC)
+	{
+	  Elf_Data *data = elf_getdata (scn, NULL);
+	  if (data == NULL)
+	    break;
+	  for (unsigned int i = 0; i < shdr->sh_size / shdr->sh_entsize; ++i)
+	    {
+	      GElf_Dyn dyn_mem;
+	      GElf_Dyn *dyn = gelf_getdyn (data, i, &dyn_mem);
+	      if (dyn == NULL)
+		break;
+	      if (dyn->d_tag == DT_PPC_GOT)
+		return false;
+	    }
+	}
+    }
+
+  return true;
 }

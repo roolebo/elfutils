@@ -105,6 +105,14 @@ struct ebl
   /* Check whether given relocation is a copy relocation.  */
   bool (*copy_reloc_p) (int);
 
+  /* Check whether given symbol's value is ok despite normal checks.  */
+  bool (*check_special_symbol) (Elf *elf,
+				const GElf_Sym *sym, const char *name,
+				const GElf_Shdr *destshdr);
+
+  /* Check if backend uses a bss PLT in this file.  */
+  bool (*bss_plt_p) (Elf *elf);
+
   /* Destructor for ELF backend handle.  */
   void (*destr) (struct ebl *);
 

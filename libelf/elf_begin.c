@@ -220,6 +220,7 @@ file_read_elf (int fildes, void *map_address, off_t offset, size_t maxsize,
 {
   /* We only read the ELF header now.  */
   unsigned char *e_ident;
+  unsigned char e_ident_mem[EI_NIDENT];
   size_t scncnt;
   Elf *elf;
 
@@ -229,9 +230,10 @@ file_read_elf (int fildes, void *map_address, off_t offset, size_t maxsize,
     e_ident = (unsigned char *) map_address + offset;
   else
     {
-      e_ident = (unsigned char *) alloca (EI_NIDENT);
+      e_ident = e_ident_mem;
 
-      if (pread (fildes, e_ident, EI_NIDENT, offset) != EI_NIDENT)
+      if (TEMP_FAILURE_RETRY (pread (fildes, e_ident, EI_NIDENT, offset))
+	  != EI_NIDENT)
 	{
 	  __libelf_seterrno (ELF_E_READ_ERROR);
 	  return NULL;
@@ -312,14 +314,21 @@ file_read_elf (int fildes, void *map_address, off_t offset, size_t maxsize,
 	}
       else
 	{
-	  /* Read the data.  */
-	  if (pread (elf->fildes, &elf->state.elf32.ehdr_mem,
-		     sizeof (Elf32_Ehdr), offset) != sizeof (Elf32_Ehdr))
-	    {
-	      /* We must be able to read the ELF header.  */
-	      __libelf_seterrno (ELF_E_INVALID_FILE);
-	      return NULL;
-	    }
+	  if (likely (map_address != NULL))
+	    /* Copy the data.  */
+	    memcpy (&elf->state.elf32.ehdr_mem,
+		    (char *) map_address + offset, sizeof (Elf32_Ehdr));
+	  else
+	    /* Read the data.  */
+	    if (TEMP_FAILURE_RETRY (pread (elf->fildes,
+					   &elf->state.elf32.ehdr_mem,
+					   sizeof (Elf32_Ehdr), offset))
+		!= sizeof (Elf32_Ehdr))
+	      {
+		/* We must be able to read the ELF header.  */
+		__libelf_seterrno (ELF_E_INVALID_FILE);
+		return NULL;
+	      }
 
 	  if (e_ident[EI_DATA] != MY_ELFDATA)
 	    {
@@ -397,9 +406,16 @@ file_read_elf (int fildes, void *map_address, off_t offset, size_t maxsize,
 	}
       else
 	{
-	  /* Read the data.  */
-	  if (pread (elf->fildes, &elf->state.elf64.ehdr_mem,
-		     sizeof (Elf64_Ehdr), offset) != sizeof (Elf64_Ehdr))
+	  if (likely (map_address != NULL))
+	    /* Copy the data.  */
+	    memcpy (&elf->state.elf64.ehdr_mem,
+		    (char *) map_address + offset, sizeof (Elf64_Ehdr));
+	  else
+	    /* Read the data.  */
+	    if (TEMP_FAILURE_RETRY (pread (elf->fildes,
+					   &elf->state.elf64.ehdr_mem,
+					   sizeof (Elf64_Ehdr), offset))
+		!= sizeof (Elf64_Ehdr))
 	    {
 	      /* We must be able to read the ELF header.  */
 	      __libelf_seterrno (ELF_E_INVALID_FILE);

@@ -3088,10 +3088,12 @@ only executables, shared objects, and core files can have program headers\n"));
 	}
 
       if (phdr->p_type >= PT_NUM && phdr->p_type != PT_GNU_EH_FRAME
-	  && phdr->p_type != PT_GNU_STACK && phdr->p_type != PT_GNU_RELRO)
+	  && phdr->p_type != PT_GNU_STACK && phdr->p_type != PT_GNU_RELRO
+	  /* Check for a known machine-specific type.  */
+	  && ebl_segment_type_name (ebl, phdr->p_type, NULL, 0) == NULL)
 	ERROR (gettext ("\
-program header entry %d: unknown program header entry type\n"),
-	       cnt);
+program header entry %d: unknown program header entry type %#" PRIx64 "\n"),
+	       cnt, (uint64_t) phdr->p_type);
 
       if (phdr->p_type == PT_LOAD)
 	has_loadable_segment = true;

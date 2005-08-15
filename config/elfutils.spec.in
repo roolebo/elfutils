@@ -183,6 +183,10 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.so
 
 %changelog
+* Mon Aug 15 2005 Ulrich Drepper <drepper@redhat.com> 0.114-1
+- libelf: new function elf_getaroff
+- ranlib: new program
+
 * Wed Aug 10 2005 Ulrich Drepper <@redhat.com> 0.113-1
 - elflint: relax a bit. Allow version definitions for defined symbols ag
 ainstDSO versions also for symbols in nobits sections.  Allow .rodata 

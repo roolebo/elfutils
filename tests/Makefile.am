@@ -64,7 +64,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile15.bz2 testfile15.debug.bz2 \
 	     testfile16.bz2 testfile16.debug.bz2 \
 	     testfile17.bz2 testfile17.debug.bz2 \
-	     testfile18.bz2 testfile19.bz testfile19.index.bz2 \
+	     testfile18.bz2 testfile19.bz2 testfile19.index.bz2 \
 	     testfile20.bz2 testfile20.index.bz2 \
 	     testfile21.bz2 testfile21.index.bz2
 

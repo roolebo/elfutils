@@ -22,6 +22,7 @@
 #include <assert.h>
 #include <byteswap.h>
 #include <endian.h>
+#include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -29,6 +30,10 @@
 
 #include <dl-hash.h>
 #include "libelfP.h"
+
+
+#define pread_retry(fd, buf,  len, off) \
+  TEMP_FAILURE_RETRY (pread (fd, buf, len, off))
 
 
 Elf_Arsym *
@@ -69,8 +74,8 @@ elf_getarsym (elf, ptr)
 	{
 	  /* We must read index from the file.  */
 	  assert (elf->fildes != -1);
-	  if (pread (elf->fildes, &elf->state.ar.ar_hdr,
-		     sizeof (struct ar_hdr), elf->start_offset + SARMAG)
+	  if (pread_retry (elf->fildes, &elf->state.ar.ar_hdr,
+			   sizeof (struct ar_hdr), elf->start_offset + SARMAG)
 	      != sizeof (struct ar_hdr))
 	    {
 	      /* It is not possible to read the index.  Maybe it does not
@@ -120,8 +125,8 @@ elf_getarsym (elf, ptr)
       uint32_t n;
       if (elf->map_address == NULL)
 	{
-	  if (pread (elf->fildes, &n, sizeof (n),
-		     elf->start_offset + SARMAG + sizeof (struct ar_hdr))
+	  if (pread_retry (elf->fildes, &n, sizeof (n),
+			   elf->start_offset + SARMAG + sizeof (struct ar_hdr))
 	      != sizeof (n))
 	    {
 	      /* Cannot read the number of entries.  */
@@ -179,15 +184,17 @@ elf_getarsym (elf, ptr)
 	      char *new_str = (char *) (elf->state.ar.ar_sym + n + 1);
 
 	      /* Now read the data from the file.  */
-	      if ((size_t) pread (elf->fildes, file_data,
-				  n * sizeof (uint32_t), elf->start_offset
-				  + SARMAG + sizeof (struct ar_hdr)
-				  + sizeof (uint32_t)) != n * sizeof (uint32_t)
-		  || ((size_t) pread (elf->fildes, new_str,
-				      index_size - n * sizeof (uint32_t),
-				      elf->start_offset
-				      + SARMAG + sizeof (struct ar_hdr)
-				      + (n + 1) * sizeof (uint32_t))
+	      if ((size_t) pread_retry (elf->fildes, file_data,
+					n * sizeof (uint32_t),
+					elf->start_offset + SARMAG
+					+ sizeof (struct ar_hdr)
+					+ sizeof (uint32_t))
+		  != n * sizeof (uint32_t)
+		  || ((size_t) pread_retry (elf->fildes, new_str,
+					    index_size - n * sizeof (uint32_t),
+					    elf->start_offset
+					    + SARMAG + sizeof (struct ar_hdr)
+					    + (n + 1) * sizeof (uint32_t))
 		      != index_size - n * sizeof (uint32_t)))
 		{
 		  /* We were not able to read the data.  */

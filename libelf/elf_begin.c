@@ -740,8 +740,9 @@ __libelf_next_arhdr (elf)
     {
       ar_hdr = &elf->state.ar.ar_hdr;
 
-      if (pread (elf->fildes, ar_hdr, sizeof (struct ar_hdr),
-		 elf->state.ar.offset)
+      if (TEMP_FAILURE_RETRY (pread (elf->fildes, ar_hdr,
+				     sizeof (struct ar_hdr),
+				     elf->state.ar.offset))
 	  != sizeof (struct ar_hdr))
 	{
 	  /* Something went wrong while reading the file.  */

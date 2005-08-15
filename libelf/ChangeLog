@@ -1,5 +1,7 @@
 2005-08-15  Ulrich Drepper  <drepper@redhat.com>
 
+	* elf_begin.c (__libelf_next_arhdr): Use TEMP_FAILURE_RETRY.
+
 	* Makefile (libelf_a_SOURCES): Add elf_getaroff.c.
 	* libelf.map: Export elf_getaroff.
 	* libelf.h: Declare elf_getaroff.

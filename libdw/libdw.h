@@ -508,6 +508,19 @@ extern int dwarf_func_line (Dwarf_Func *func, int *linep)
 extern int dwarf_func_col (Dwarf_Func *func, int *colp)
      __nonnull_attribute__ (2);
 
+/* Get definition DIE of given function.  */
+extern Dwarf_Die *dwarf_func_die (Dwarf_Func *func, Dwarf_Die *die_mem)
+    __nonnull_attribute__ (2);
+
+/* Return nonzero if given function is an abstract inline definition.  */
+extern int dwarf_func_inline (Dwarf_Func *func);
+
+/* Find each concrete inlined instance of the abstract inline definition.  */
+extern int dwarf_func_inline_instances (Dwarf_Func *func,
+					int (*callback) (Dwarf_Die *, void *),
+					void *arg);
+
+
 
 /* Call callback function for each of the macro information entry for
    the CU.  */

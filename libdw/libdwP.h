@@ -342,6 +342,13 @@ extern unsigned char *__libdw_find_attr (Dwarf_Die *die,
 extern int __libdw_func_intval (Dwarf_Func *func, int *linep, int attval)
      __nonnull_attribute__ (1, 2) internal_function;
 
+/* Helper function to walk scopes.  */
+extern int __libdw_visit_scopes (unsigned int depth, Dwarf_Die *root,
+				 int (*visit) (unsigned int depth,
+					       Dwarf_Die *die, void *arg),
+				 void *arg)
+  __nonnull_attribute__ (2, 3) internal_function;
+
 /* Return error code of last failing function call.  This value is kept
    separately for each thread.  */
 extern int __dwarf_errno_internal (void);

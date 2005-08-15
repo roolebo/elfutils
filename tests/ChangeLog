@@ -1,3 +1,9 @@
+2005-08-15  Roland McGrath  <roland@redhat.com>
+
+	* dwflmodtest.c (print_instance, print_inline): New functions.
+	(print_func): Call print_inline.
+	(options, parse_opt): Grok -i/--inlines.
+
 2005-08-07  Roland McGrath  <roland@redhat.com>
 
 	* dwflmodtest.c: Print function details only if -f flag is given.

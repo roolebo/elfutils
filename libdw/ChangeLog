@@ -1,3 +1,15 @@
+2005-08-15  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_func_inline.c: New file.
+	* Makefile.am (libdw_a_SOURCES): Add it.
+	* libdw.h: Declare dwarf_func_inline, dwarf_func_inline_instances.
+	* libdw.map: Add them.
+
+	* dwarf_func_die.c: New file.
+	* Makefile.am (libdw_a_SOURCES): Add it.
+	* libdw.h: Declare dwarf_func_die.
+	* libdw.map: Add it.  Bump version to ELFUTILS_0.114.
+
 2005-08-10  Ulrich Drepper  <drepper@redhat.com>
 
 	* dwarf_getsrclines.c (dwarf_getsrclines): Correct fallout of renaming

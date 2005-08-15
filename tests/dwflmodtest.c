@@ -23,12 +23,93 @@
 #include <locale.h>
 #include <argp.h>
 #include <libdwfl.h>
+#include <dwarf.h>
 
+static bool show_inlines;
+
+struct info
+{
+  Dwarf_Die *cudie;
+  Dwarf_Addr dwbias;
+};
+
+static int
+print_instance (Dwarf_Die *instance, void *arg)
+{
+  const struct info *info = arg;
+
+  printf ("    inlined");
+
+  Dwarf_Files *files;
+  if (dwarf_getsrcfiles (info->cudie, &files, NULL) == 0)
+    {
+      Dwarf_Attribute attr_mem;
+      Dwarf_Word val;
+      if (dwarf_formudata (dwarf_attr (instance, DW_AT_call_file,
+				       &attr_mem), &val) == 0)
+	{
+	  const char *file = dwarf_filesrc (files, val, NULL, NULL);
+	  int lineno = 0, colno = 0;
+	  if (dwarf_formudata (dwarf_attr (instance, DW_AT_call_line,
+					   &attr_mem), &val) == 0)
+	    lineno = val;
+	  if (dwarf_formudata (dwarf_attr (instance, DW_AT_call_column,
+					   &attr_mem), &val) == 0)
+	    colno = val;
+	  if (lineno == 0)
+	    {
+	      if (file != NULL)
+		printf (" from %s", file);
+	    }
+	  else if (colno == 0)
+	    printf (" at %s:%u", file, lineno);
+	  else
+	    printf (" at %s:%u:%u", file, lineno, colno);
+	}
+    }
+
+  Dwarf_Addr lo = -1, hi = -1, entry = -1;
+  if (dwarf_lowpc (instance, &lo) == 0)
+    lo += info->dwbias;
+  else
+    printf (" (lowpc => %s)", dwarf_errmsg (-1));
+  if (dwarf_highpc (instance, &hi) == 0)
+    hi += info->dwbias;
+  else
+    printf (" (highpc => %s)", dwarf_errmsg (-1));
+
+  Dwarf_Attribute attr_mem;
+  Dwarf_Attribute *attr = INTUSE(dwarf_attr) (instance, DW_AT_entry_pc,
+					      &attr_mem);
+  if (attr != NULL)
+    {
+      if (INTUSE(dwarf_formaddr) (attr, &entry) == 0)
+	entry += info->dwbias;
+      else
+	printf (" (entrypc => %s)", dwarf_errmsg (-1));
+    }
+
+  if (lo != (Dwarf_Addr) -1 || hi != (Dwarf_Addr) -1)
+    printf (" %#" PRIx64 "..%#" PRIx64, lo, hi);
+  if (entry != (Dwarf_Addr) -1)
+    printf (" => %#" PRIx64 "\n", entry);
+  else
+    puts ("");
+
+  return DWARF_CB_OK;
+}
+
+static void
+print_inline (Dwarf_Func *func, void *arg)
+{
+  if (dwarf_func_inline_instances (func, &print_instance, arg) != 0)
+    printf ("  error finding instances: %s\n", dwarf_errmsg (-1));
+}
 
 static int
 print_func (Dwarf_Func *func, void *arg)
 {
-  const Dwarf_Addr dwbias = *(Dwarf_Addr *) arg;
+  const struct info *info = arg;
 
   const char *file = dwarf_func_file (func);
   int line = -1;
@@ -37,26 +118,35 @@ print_func (Dwarf_Func *func, void *arg)
 
   printf ("  %s:%d: %s:", file, line, fct);
 
-  Dwarf_Addr lo = -1, hi = -1, entry = -1;
-  if (dwarf_func_lowpc (func, &lo) == 0)
-    lo += dwbias;
+  if (dwarf_func_inline (func))
+    {
+      puts (" inline function");
+      if (show_inlines)
+	print_inline (func, arg);
+    }
   else
-    printf (" (lowpc => %s)", dwarf_errmsg (-1));
-  if (dwarf_func_highpc (func, &hi) == 0)
-    hi += dwbias;
-  else
-    printf (" (highpc => %s)", dwarf_errmsg (-1));
-  if (dwarf_func_entrypc (func, &entry) == 0)
-    entry += dwbias;
-  else
-    printf (" (entrypc => %s)", dwarf_errmsg (-1));
+    {
+      Dwarf_Addr lo = -1, hi = -1, entry = -1;
+      if (dwarf_func_lowpc (func, &lo) == 0)
+	lo += info->dwbias;
+      else
+	printf (" (lowpc => %s)", dwarf_errmsg (-1));
+      if (dwarf_func_highpc (func, &hi) == 0)
+	hi += info->dwbias;
+      else
+	printf (" (highpc => %s)", dwarf_errmsg (-1));
+      if (dwarf_func_entrypc (func, &entry) == 0)
+	entry += info->dwbias;
+      else
+	printf (" (entrypc => %s)", dwarf_errmsg (-1));
 
-  if (lo != (Dwarf_Addr) -1 || hi != (Dwarf_Addr) -1
-      || entry != (Dwarf_Addr) -1)
-    printf (" %#" PRIx64 "..%#" PRIx64 " => %#" PRIx64 "\n",
-	    lo, hi, entry);
-  else
-    puts ("");
+      if (lo != (Dwarf_Addr) -1 || hi != (Dwarf_Addr) -1
+	  || entry != (Dwarf_Addr) -1)
+	printf (" %#" PRIx64 "..%#" PRIx64 " => %#" PRIx64 "\n",
+		lo, hi, entry);
+      else
+	puts ("");
+    }
 
   return DWARF_CB_OK;
 }
@@ -80,9 +170,8 @@ print_module (Dwfl_Module *mod __attribute__ ((unused)),
       while (dwarf_nextcu (dw, off, &noff, &cuhl, NULL, NULL, NULL) == 0)
 	{
 	  Dwarf_Die die_mem;
-	  Dwarf_Die *die = dwarf_offdie (dw, off + cuhl, &die_mem);
-
-	  (void) dwarf_getfuncs (die, print_func, &bias, 0);
+	  struct info info = { dwarf_offdie (dw, off + cuhl, &die_mem), bias };
+	  (void) dwarf_getfuncs (info.cudie, print_func, &info, 0);
 
 	  off = noff;
 	}
@@ -95,7 +184,8 @@ static bool show_functions;
 
 static const struct argp_option options[] =
   {
-    { "functions", 'f', NULL, 0, N_("Additional show function names"), 0 },
+    { "functions", 'f', NULL, 0, N_("Additionally show function names"), 0 },
+    { "inlines", 'i', NULL, 0, N_("Show instances of inlined functions"), 0 },
     { NULL, 0, NULL, 0, NULL, 0 }
   };
 
@@ -111,6 +201,10 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
 
     case 'f':
       show_functions = true;
+      break;
+
+    case 'i':
+      show_inlines = show_functions = true;
       break;
 
     default:

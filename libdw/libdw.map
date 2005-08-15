@@ -1,5 +1,5 @@
 ELFUTILS_0 { };
-ELFUTILS_0.111 {
+ELFUTILS_0.114 {
   global:
     dwarf_abbrevhaschildren;
     dwarf_addrdie;
@@ -29,9 +29,12 @@ ELFUTILS_0.111 {
     dwarf_formstring;
     dwarf_formudata;
     dwarf_func_col;
+    dwarf_func_die;
     dwarf_func_entrypc;
     dwarf_func_file;
     dwarf_func_highpc;
+    dwarf_func_inline;
+    dwarf_func_inline_instances;
     dwarf_func_line;
     dwarf_func_lowpc;
     dwarf_func_name;

@@ -1,3 +1,8 @@
+2005-08-15  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: Add rules to build ranlib.
+	* ranlib.c: New file.
+
 2005-08-14  Roland McGrath  <roland@redhat.com>
 
 	* elflint.c (check_sections): Use ebl_section_type_name and allow any

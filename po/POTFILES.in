@@ -22,3 +22,4 @@ src/elflint.c
 src/addr2line.c
 src/findtextrel.c
 src/elfcmp.c
+src/ranlib.c

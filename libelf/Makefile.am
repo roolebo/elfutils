@@ -83,7 +83,8 @@ libelf_a_SOURCES = elf_version.c elf_hash.c elf_error.c elf_fill.c \
 		   libelf_crc32.c libelf_next_prime.c \
 		   elf_clone.c \
 		   gelf_getlib.c gelf_update_lib.c \
-		   elf32_offscn.c elf64_offscn.c gelf_offscn.c
+		   elf32_offscn.c elf64_offscn.c gelf_offscn.c \
+		   elf_getaroff.c
 
 if !MUDFLAP
 libelf_pic_a_SOURCES =

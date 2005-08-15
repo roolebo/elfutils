@@ -38,7 +38,7 @@ native_ld = @native_ld@
 base_cpu = @base_cpu@
 
 bin_PROGRAMS = readelf nm size strip ld elflint findtextrel addr2line \
-	       elfcmp objdump
+	       elfcmp objdump ar ranlib
 
 
 ld_dsos = libld_elf_i386_pic.a
@@ -95,6 +95,8 @@ findtextrel_LDADD = $(libdw) $(libelf) $(libmudflap)
 addr2line_LDADD = $(libdw) $(libmudflap)
 elfcmp_LDADD = $(libebl) $(libelf) $(libmudflap) -ldl
 objdump_LDADD  = $(libebl) $(libelf) $(libeu) $(libmudflap) -ldl
+ar_LDADD = $(libelf) $(libmudflap)
+ranlib_LDADD = $(libelf) $(libeu) $(libmudflap)
 
 ldlex.o: ldscript.c
 ldlex_no_Werror = yes

@@ -1,3 +1,9 @@
+Version 0.114:
+
+libelf: new function elf_getaroff
+
+ranlib: new program
+
 Version 0.113:
 
 elflint: relax a bit. Allow version definitions for defined symbols against

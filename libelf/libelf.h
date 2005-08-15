@@ -271,6 +271,9 @@ extern char *elf_strptr (Elf *__elf, size_t __index, size_t __offset);
 /* Return header of archive.  */
 extern Elf_Arhdr *elf_getarhdr (Elf *__elf);
 
+/* Return offset in archive for current file ELF.  */
+extern off_t elf_getaroff (Elf *__elf);
+
 /* Select archive element at OFFSET.  */
 extern size_t elf_rand (Elf *__elf, size_t __offset);
 

@@ -678,7 +678,8 @@ section [%2d] '%s': symbol %zu: invalid section index\n"),
       else
 	xndx = sym->st_shndx;
 
-      if (GELF_ST_TYPE (sym->st_info) >= STT_NUM)
+      if (GELF_ST_TYPE (sym->st_info) >= STT_NUM
+	  && !ebl_symbol_type_name (ebl, GELF_ST_TYPE (sym->st_info), NULL, 0))
 	ERROR (gettext ("section [%2d] '%s': symbol %zu: unknown type\n"),
 	       idx, section_name (ebl, idx), cnt);
 
@@ -2708,16 +2709,20 @@ section [%2zu] '%s': size not multiple of entry size\n"),
 	  && shdr->sh_type != SHT_CHECKSUM
 	  && shdr->sh_type != SHT_GNU_verdef
 	  && shdr->sh_type != SHT_GNU_verneed
-	  && shdr->sh_type != SHT_GNU_versym)
-	ERROR (gettext ("unsupported section type %d\n"), (int) shdr->sh_type);
+	  && shdr->sh_type != SHT_GNU_versym
+	  && ebl_section_type_name (ebl, shdr->sh_type, NULL, 0) == NULL)
+	ERROR (gettext ("section [%2zu] '%s' has unsupported type %d\n"),
+	       cnt, section_name (ebl, cnt),
+	       (int) shdr->sh_type);
 
 #define ALL_SH_FLAGS (SHF_WRITE | SHF_ALLOC | SHF_EXECINSTR | SHF_MERGE \
 		      | SHF_STRINGS | SHF_INFO_LINK | SHF_LINK_ORDER \
 		      | SHF_OS_NONCONFORMING | SHF_GROUP | SHF_TLS)
       if (shdr->sh_flags & ~ALL_SH_FLAGS)
-	ERROR (gettext ("section [%2zu] '%s' contain unknown flag(s) %d\n"),
+	ERROR (gettext ("section [%2zu] '%s' contains unknown flag(s)"
+			" %#" PRIx64 "\n"),
 	       cnt, section_name (ebl, cnt),
-	       (int) shdr->sh_flags & ~ALL_SH_FLAGS);
+	       (uint64_t) shdr->sh_flags & ~(uint64_t) ALL_SH_FLAGS);
       else if (shdr->sh_flags & SHF_TLS)
 	{
 	  // XXX Correct?

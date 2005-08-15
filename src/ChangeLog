@@ -1,3 +1,11 @@
+2005-08-14  Roland McGrath  <roland@redhat.com>
+
+	* elflint.c (check_sections): Use ebl_section_type_name and allow any
+	sh_type it recognizes.
+
+	* elflint.c (check_sections): Print unknown flags in hex, don't
+	truncate high bits.  Print section number and name for unknown type.
+
 2005-08-13  Roland McGrath  <roland@redhat.com>
 
 	* elflint.c (check_program_header): Use ebl_segment_type_name and

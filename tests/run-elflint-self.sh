@@ -18,7 +18,9 @@ export LD_LIBRARY_PATH=../libebl:../libelf${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH
 runtest() {
 # Uncomment for debuging
 #  echo $1
-  ../src/elflint --quiet --gnu-ld $1
+  if [ -f $1 ]; then
+    ../src/elflint --quiet --gnu-ld $1
+  fi
 }
 
 runtest ../src/addr2line
@@ -43,5 +45,3 @@ runtest ../libebl/libebl_ppc64.so
 runtest ../libebl/libebl_sh.so
 runtest ../libebl/libebl_sparc.so
 runtest ../libebl/libebl_x86_64.so
-
-

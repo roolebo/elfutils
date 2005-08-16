@@ -2053,17 +2053,7 @@ section [%2d] '%s': symbol %d: cannot read version data\n"),
 	/* Already reported elsewhere.  */
 	continue;
 
-      if (*versym == VER_NDX_LOCAL)
-	{
-	  /* Local symbol.  Make sure it is defined unless the
-	     reference is weak.  */
-	  if (sym->st_shndx == SHN_UNDEF
-	      && GELF_ST_BIND (sym->st_info) != STB_WEAK)
-	    ERROR (gettext ("\
-section [%2d] '%s': symbol %d: undefined symbol with local scope\n"),
-		   idx, section_name (ebl, idx), cnt);
-	}
-      else if (*versym == VER_NDX_GLOBAL)
+      if (*versym == VER_NDX_GLOBAL)
 	{
 	  /* Global symbol.  Make sure it is not defined as local.  */
 	  if (GELF_ST_BIND (sym->st_info) == STB_LOCAL)
@@ -2071,7 +2061,7 @@ section [%2d] '%s': symbol %d: undefined symbol with local scope\n"),
 section [%2d] '%s': symbol %d: local symbol with global scope\n"),
 		   idx, section_name (ebl, idx), cnt);
 	}
-      else
+      else if (*versym != VER_NDX_LOCAL)
 	{
 	  /* Look through the list of defined versions and locate the
 	     index we need for this symbol.  */

@@ -1,5 +1,8 @@
 2005-08-15  Ulrich Drepper  <drepper@redhat.com>
 
+	* elflint.c (check_versym): Allow VER_NDX_LOCAL symbols to be
+	undefined.
+
 	* Makefile.am: Add rules to build ranlib.
 	* ranlib.c: New file.
 

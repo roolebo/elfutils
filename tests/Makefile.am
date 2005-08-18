@@ -29,7 +29,7 @@ INCLUDES = -I$(top_srcdir)/libasm -I$(top_srcdir)/libdw \
 noinst_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  showptable update1 update2 update3 update4 test-nlist \
 		  show-die-info get-files get-lines get-pubnames \
-		  get-aranges allfcts line2addr \
+		  get-aranges allfcts line2addr addrscopes \
 		  show-abbrev hash asm-tst1 asm-tst2 asm-tst3 \
 		  asm-tst4 asm-tst5 asm-tst6 asm-tst7 asm-tst8 asm-tst9 \
 		  msg_tst newscn ecp dwflmodtest
@@ -109,6 +109,7 @@ get_aranges_LDADD = $(libdw) $(libelf) $(libmudflap)
 allfcts_LDADD = $(libdw) $(libelf) $(libmudflap)
 line2addr_no_Wformat = yes
 line2addr_LDADD = $(libdw) $(libelf) $(libmudflap)
+addrscopes_LDADD = $(libdw) $(libmudflap)
 #show_ciefde_LDADD = ../libdwarf/libdwarf.so $(libelf) $(libmudflap)
 asm_tst1_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl
 asm_tst2_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl

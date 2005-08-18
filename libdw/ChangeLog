@@ -1,3 +1,8 @@
+2005-08-18  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_getscopes.c (dwarf_getscopes): Include the CU itself as
+	outermost scope in the results.
+
 2005-08-15  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_func_inline.c: New file.

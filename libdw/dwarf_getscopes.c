@@ -297,9 +297,14 @@ dwarf_getscopes (Dwarf_Die *cudie, Dwarf_Addr pc, Dwarf_Die **scopes)
   if (cudie == NULL)
     return -1;
 
-  int n = find_pc (1, cudie, pc, scopes);
-  if (likely (n >= -1))
-    /* We have an error or a final result.  */
+  int n = find_pc (2, cudie, pc, scopes);
+  if (likely (n >= 0))
+    {
+      /* We have a final result.  Now store the outermost scope, the CU.  */
+      (*scopes)[n++] = *cudie;
+      return n;
+    }
+  if (n == -1)
     return n;
 
   /* We have the scopes out to one that is a concrete instance of an
@@ -320,7 +325,11 @@ dwarf_getscopes (Dwarf_Die *cudie, Dwarf_Addr pc, Dwarf_Die **scopes)
 
   int result = find_die (0, cudie, origin, scopes, n);
   if (likely (result > 0))
-    return n + result - 1;
+    {
+      n = n + result - 1;
+      (*scopes)[n++] = *cudie;
+      return n;
+    }
 
   if (result == 0)		/* No match, shouldn't happen.  */
     {

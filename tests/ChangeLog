@@ -1,5 +1,9 @@
 2005-08-18  Roland McGrath  <roland@redhat.com>
 
+	* run-addrscopes.sh: New file.
+	* testfile22.bz2: New data file.
+	* Makefile.am (TESTS, EXTRA_DIST): Add them.
+
 	* addrscopes.c: New file.
 	* Makefile.am (noinst_PROGRAMS): Add it.
 	(addrscopes_LDADD): New variable.

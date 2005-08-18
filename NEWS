@@ -2,6 +2,8 @@ Version 0.114:
 
 libelf: new function elf_getaroff
 
+libdw: Added dwarf_func_die, dwarf_func_inline, dwarf_func_inline_instances.
+
 ranlib: new program
 
 Version 0.113:

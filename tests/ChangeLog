@@ -1,3 +1,9 @@
+2005-08-22  Roland McGrath  <roland@redhat.com>
+
+	* run-line2addr.sh: Add a case.
+	* testfile23.bz2: New data file.
+	* Makefile.am (EXTRA_DIST): Add it.
+
 2005-08-18  Roland McGrath  <roland@redhat.com>
 
 	* run-addrscopes.sh: New file.
@@ -50,6 +56,14 @@
 2005-07-28  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.am (dwflmodtest_LDADD): Add $(libebl).
+
+2005-06-01  Roland McGrath  <roland@redhat.com>
+
+	* line2addr.c: Rewritten using libdwfl.
+	* run-line2addr.sh: Update test for changed arguments.
+	* Makefile.am (INCLUDES): Add libdwfl source directory to path.
+	(libdwfl): New variable.
+	(line2addr_LDADD): Use it.
 
 2005-07-28  Roland McGrath  <roland@redhat.com>
 

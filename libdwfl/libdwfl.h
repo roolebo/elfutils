@@ -38,11 +38,15 @@ typedef struct
 			 const char *debuglink_file, GElf_Word debuglink_crc,
 			 char **debuginfo_file_name);
 
-  /* Fill *ADDR with the loaded address of the
-     section called SECNAME in the given module.  */
+  /* Fill *ADDR with the loaded address of the section called SECNAME in
+     the given module.  This is called exactly once for each SHF_ALLOC
+     section that relocations affecting DWARF data refer to, so it can
+     easily be used to collect state about the sections referenced.  */
   int (*section_address) (Dwfl_Module *mod, void **userdata,
 			  const char *modname, Dwarf_Addr base,
-			  const char *secname, Dwarf_Addr *addr);
+			  const char *secname,
+			  Elf32_Word shndx, const GElf_Shdr *shdr,
+			  Dwarf_Addr *addr);
 
   char **debuginfo_path;	/* See dwfl_standard_find_debuginfo.  */
 } Dwfl_Callbacks;
@@ -66,7 +70,7 @@ extern const char *dwfl_errmsg (int err);
 
 
 /* Start reporting the current set of modules to the library.  No calls but
-   dwfl_report_module can be made on DWFL until dwfl_report_end is called.  */
+   dwfl_report_* can be made on DWFL until dwfl_report_end is called.  */
 extern void dwfl_report_begin (Dwfl *dwfl);
 
 /* Report that a module called NAME spans addresses [START, END).
@@ -76,12 +80,21 @@ extern Dwfl_Module *dwfl_report_module (Dwfl *dwfl, const char *name,
 					Dwarf_Addr start, Dwarf_Addr end);
 
 /* Report a module with start and end addresses computed from the ELF
-   program headers in the given file, plus BASE.  FD may be -1 to open
-   FILE_NAME.  On success, FD is consumed by the library, and the
-   `find_elf' callback will not be used for this module.  */
+   program headers in the given file, plus BASE.  For an ET_REL file,
+   does a simple absolute section layout starting at BASE.
+   FD may be -1 to open FILE_NAME.  On success, FD is consumed by the
+   library, and the `find_elf' callback will not be used for this module.  */
 extern Dwfl_Module *dwfl_report_elf (Dwfl *dwfl, const char *name,
 				     const char *file_name, int fd,
 				     GElf_Addr base);
+
+/* Similar, but report the module for offline use.  All ET_EXEC files
+   being reported must be reported before any relocatable objects.
+   If this is used, dwfl_report_module and dwfl_report_elf may not be
+   used in the same reporting session.  */
+extern Dwfl_Module *dwfl_report_offline (Dwfl *dwfl, const char *name,
+					 const char *file_name, int fd);
+
 
 /* Finish reporting the current set of modules to the library.
    If REMOVED is not null, it's called for each module that
@@ -150,13 +163,23 @@ extern int dwfl_standard_find_debuginfo (Dwfl_Module *, void **,
 					 GElf_Word, char **);
 
 
+/* This callback must be used when using dwfl_offline_* to report modules,
+   if ET_REL is to be supported.  */
+extern int dwfl_offline_section_address (Dwfl_Module *, void **,
+					 const char *, Dwarf_Addr,
+					 const char *, Elf32_Word,
+					 const GElf_Shdr *,
+					 Dwarf_Addr *addr);
+
+
 /* Callbacks for working with kernel modules in the running Linux kernel.  */
 extern int dwfl_linux_kernel_find_elf (Dwfl_Module *, void **,
 				       const char *, Dwarf_Addr,
 				       char **, Elf **);
 extern int dwfl_linux_kernel_module_section_address (Dwfl_Module *, void **,
 						     const char *, Dwarf_Addr,
-						     const char *,
+						     const char *, Elf32_Word,
+						     const GElf_Shdr *,
 						     Dwarf_Addr *addr);
 
 /* Call dwfl_report_elf for the running Linux kernel.
@@ -168,6 +191,21 @@ extern int dwfl_linux_kernel_report_kernel (Dwfl *dwfl);
    Returns zero on success, -1 if dwfl_report_module failed,
    or an errno code if reading the list of modules failed.  */
 extern int dwfl_linux_kernel_report_modules (Dwfl *dwfl);
+
+/* Report a kernel and its modules found on disk, for offline use.
+   If RELEASE starts with '/', it names a directory to look in;
+   if not, it names a directory to find under /lib/modules/;
+   if null, /lib/modules/`uname -r` is used.
+   Returns zero on success, -1 if dwfl_report_module failed,
+   or an errno code if finding the files on disk failed.
+
+   If PREDICATE is not null, it is called with each module to be reported;
+   its arguments are the module name, and the ELF file name or null if unknown,
+   and its return value should be zero to skip the module, one to report it,
+   or -1 to cause the call to fail and return errno.  */
+extern int dwfl_linux_kernel_report_offline (Dwfl *dwfl, const char *release,
+					     int (*predicate) (const char *,
+							       const char *));
 
 
 /* Call dwfl_report_module for each file mapped into the address space of PID.
@@ -185,6 +223,34 @@ extern int dwfl_linux_proc_find_elf (Dwfl_Module *mod, void **userdata,
 /* Standard argument parsing for using a standard callback set.  */
 struct argp;
 extern const struct argp *dwfl_standard_argp (void) __attribute__ ((const));
+
+
+/*** Relocation of addresses from Dwfl ***/
+
+/* Return the number of relocatable bases associated with the module,
+   which is zero for ET_EXEC and one for ET_DYN.  Returns -1 for errors.  */
+extern int dwfl_module_relocations (Dwfl_Module *mod);
+
+/* Return the relocation base index associated with the *ADDRESS location,
+   and adjust *ADDRESS to be an offset relative to that base.
+   Returns -1 for errors.  */
+extern int dwfl_module_relocate_address (Dwfl_Module *mod,
+					 Dwarf_Addr *address);
+
+/* Return the ELF section name for the given relocation base index;
+   if SHNDXP is not null, set *SHNDXP to the ELF section index.
+   For ET_DYN, returns "" and sets *SHNDXP to SHN_ABS; the relocation
+   base is the runtime start address reported for the module.
+   Returns null for errors.  */
+extern const char *dwfl_module_relocation_info (Dwfl_Module *mod,
+						unsigned int idx,
+						Elf32_Word *shndxp);
+
+/* Validate that ADDRESS and ADDRESS+OFFSET lie in a known module
+   and both within the same contiguous region for relocation purposes.
+   Returns zero for success and -1 for errors.  */
+extern int dwfl_validate_address (Dwfl *dwfl,
+				  Dwarf_Addr address, Dwarf_Sword offset);
 
 
 /*** Dwarf access functions ***/
@@ -234,6 +300,13 @@ extern Dwarf_Die *dwfl_module_nextcu (Dwfl_Module *mod,
 /* Return the module containing the CU DIE.  */
 extern Dwfl_Module *dwfl_cumodule (Dwarf_Die *cudie);
 
+
+/* Cache the source line information fo the CU and return the
+   number of Dwfl_Line entries it has.  */
+extern int dwfl_getsrclines (Dwarf_Die *cudie, size_t *nlines);
+
+/* Access one line number entry within the CU.  */
+extern Dwfl_Line *dwfl_onesrcline (Dwarf_Die *cudie, size_t idx);
 
 /* Get source for address.  */
 extern Dwfl_Line *dwfl_module_getsrc (Dwfl_Module *mod, Dwarf_Addr addr);

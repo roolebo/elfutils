@@ -71,7 +71,11 @@ struct Dwfl
 
   Dwfl_Module **modules;
   size_t nmodules;
+
+  GElf_Addr offline_next_address;
 };
+
+#define OFFLINE_REDZONE		0x10000
 
 struct dwfl_file
 {
@@ -85,7 +89,7 @@ struct dwfl_file
 struct Dwfl_Module
 {
   Dwfl *dwfl;
-  struct Dwfl_Module *next;	/* Link on Dwfl.moduelist.  */
+  struct Dwfl_Module *next;	/* Link on Dwfl.modulelist.  */
 
   void *userdata;
 
@@ -94,8 +98,10 @@ struct Dwfl_Module
 
   struct dwfl_file main, debug;
   Ebl *ebl;
-  bool isrel;			/* True iff this is an ET_REL file.  */
+  GElf_Half e_type;		/* GElf_Ehdr.e_type cache.  */
   Dwfl_Error elferr;		/* Previous failure to open main file.  */
+
+  struct dwfl_relocation *reloc_info; /* Relocatable sections.  */
 
   struct dwfl_file *symfile;	/* Either main or debug.  */
   Elf_Data *symdata;		/* Data in the ELF symbol table section.  */
@@ -227,6 +233,7 @@ INTDECL (dwfl_module_getsrc)
 INTDECL (dwfl_report_elf)
 INTDECL (dwfl_report_begin)
 INTDECL (dwfl_report_module)
+INTDECL (dwfl_report_offline)
 INTDECL (dwfl_report_end)
 INTDECL (dwfl_standard_find_debuginfo)
 INTDECL (dwfl_linux_kernel_find_elf)
@@ -235,6 +242,9 @@ INTDECL (dwfl_linux_proc_report)
 INTDECL (dwfl_linux_proc_find_elf)
 INTDECL (dwfl_linux_kernel_report_kernel)
 INTDECL (dwfl_linux_kernel_report_modules)
+INTDECL (dwfl_linux_kernel_report_offline)
+INTDECL (dwfl_offline_section_address)
+INTDECL (dwfl_module_relocate_address)
 
 /* Leading arguments standard to callbacks passed a Dwfl_Module.  */
 #define MODCB_ARGS(mod)	(mod), &(mod)->userdata, (mod)->name, (mod)->low_addr

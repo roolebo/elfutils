@@ -68,6 +68,8 @@ dwfl_report_begin (Dwfl *dwfl)
     free (dwfl->modules);
   dwfl->modules = NULL;
   dwfl->nmodules = 0;
+
+  dwfl->offline_next_address = OFFLINE_REDZONE;
 }
 INTDEF (dwfl_report_begin)
 

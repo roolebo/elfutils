@@ -35,14 +35,17 @@ euinclude_HEADERS = libdwfl.h
 
 libdwfl_a_SOURCES = dwfl_begin.c dwfl_end.c dwfl_error.c \
 		    dwfl_module.c dwfl_report_elf.c relocate.c \
+		    derelocate.c offline.c \
 		    dwfl_module_info.c  dwfl_getmodules.c \
 		    dwfl_module_getdwarf.c dwfl_getdwarf.c \
+		    dwfl_validate_address.c \
 		    argp-std.c find-debuginfo.c \
 		    linux-kernel-modules.c linux-proc-maps.c \
 		    dwfl_addrmodule.c dwfl_addrdwarf.c \
 		    cu.c dwfl_module_nextcu.c dwfl_nextcu.c dwfl_cumodule.c \
 		    dwfl_module_addrdie.c dwfl_addrdie.c \
 		    lines.c dwfl_lineinfo.c dwfl_linemodule.c \
+		    dwfl_getsrclines.c dwfl_onesrcline.c \
 		    dwfl_module_getsrc.c dwfl_getsrc.c \
 		    dwfl_module_getsrc_file.c \
 		    libdwfl_crc32.c libdwfl_crc32_file.c \

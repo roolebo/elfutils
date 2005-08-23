@@ -1,3 +1,20 @@
+2005-08-23  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_attr_integrate.c (dwarf_attr_integrate): Treat
+	DW_AT_specification the same as DW_AT_abstract_origin.
+
+2005-08-20  Roland McGrath  <roland@redhat.com>
+
+	* libdw.map: Add dwfl_cumodule, remove dwfl_linecu.
+	Add dwfl_linux_kernel_report_offline, dwfl_offline_section_address,
+	and dwfl_report_offline.
+
+2005-08-19  Roland McGrath  <roland@redhat.com>
+
+	* libdw.map: Bump version to ELFUTILS_0.114 for libdwfl changes.
+	Add dwfl_module_relocate_address, dwfl_module_relocations,
+	dwfl_module_relocation_info.
+
 2005-08-18  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_getscopes.c (dwarf_getscopes): Include the CU itself as

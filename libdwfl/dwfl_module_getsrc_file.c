@@ -23,6 +23,13 @@ dwfl_module_getsrc_file (Dwfl_Module *mod,
   if (mod == NULL)
     return -1;
 
+  if (mod->dw == NULL)
+    {
+      Dwarf_Addr bias;
+      if (INTUSE(dwfl_module_getdwarf) (mod, &bias) == NULL)
+	return -1;
+    }
+
   bool is_basename = strchr (fname, '/') == NULL;
 
   size_t max_match = *nsrcs ?: ~0u;

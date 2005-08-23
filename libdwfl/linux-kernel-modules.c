@@ -33,6 +33,28 @@
 #define	SECADDRFMT	"/sys/module/%s/sections/%s"
 
 
+/* Try to open the given file as it is or under the debuginfo directory.  */
+static int
+try_kernel_name (Dwfl *dwfl, char **fname)
+{
+  if (*fname == NULL)
+    return -1;
+
+  int fd = TEMP_FAILURE_RETRY (open64 (*fname, O_RDONLY));
+  if (fd < 0)
+    {
+      char *debugfname = NULL;
+      Dwfl_Module fakemod = { .dwfl = dwfl };
+      fd = INTUSE(dwfl_standard_find_debuginfo) (&fakemod, NULL, NULL, 0,
+						 *fname, basename (*fname), 0,
+						 &debugfname);
+      free (*fname);
+      *fname = debugfname;
+    }
+
+  return fd;
+}
+
 static inline const char *
 kernel_release (void)
 {
@@ -43,46 +65,182 @@ kernel_release (void)
   return utsname.release;
 }
 
-/* Find the ELF file for the running kernel and dwfl_report_elf it.  */
-int
-dwfl_linux_kernel_report_kernel (Dwfl *dwfl)
+static int
+report_kernel (Dwfl *dwfl, const char *release,
+	       int (*predicate) (const char *module, const char *file))
 {
   if (dwfl == NULL)
     return -1;
 
-  const char *release = kernel_release ();
-  if (release == NULL)
-    return errno;
-
   char *fname = NULL;
-  asprintf (&fname, "/boot/vmlinux-%s", release);
-  if (fname == NULL)
-    return -1;
-  int fd = open64 (fname, O_RDONLY);
-  if (fd < 0)
+  if (release[0] == '/')
+    asprintf (&fname, "%s/vmlinux", release);
+  else
+    asprintf (&fname, "/boot/vmlinux-%s", release);
+  int fd = try_kernel_name (dwfl, &fname);
+  if (fd < 0 && release[0] != '/')
     {
       free (fname);
       fname = NULL;
-      asprintf (&fname, "/usr/lib/debug" MODULEDIRFMT "/vmlinux", release);
-      if (fname == NULL)
-	return -1;
-      fd = open64 (fname, O_RDONLY);
+      asprintf (&fname, MODULEDIRFMT "/vmlinux", release);
+      fd = try_kernel_name (dwfl, &fname);
     }
 
   int result = 0;
   if (fd < 0)
-    result = errno;
-  else if (INTUSE(dwfl_report_elf) (dwfl, "kernel", fname, fd, 0) == NULL)
+    result = (predicate != NULL && !(*predicate) ("kernel", NULL)) ? 0 : errno;
+  else
     {
-      close (fd);
-      result = -1;
+      bool report = true;
+
+      if (predicate != NULL)
+	{
+	  /* Let the predicate decide whether to use this one.  */
+	  int want = (*predicate) ("kernel", fname);
+	  if (want < 0)
+	    result = errno;
+	  report = want > 0;
+	}
+
+      if (report
+	  && INTUSE(dwfl_report_elf) (dwfl, "kernel", fname, fd, 0) == NULL)
+	{
+	  close (fd);
+	  result = -1;
+	}
     }
 
   free (fname);
 
   return result;
 }
+
+/* Report a kernel and all its modules found on disk, for offline use.
+   If RELEASE starts with '/', it names a directory to look in;
+   if not, it names a directory to find under /lib/modules/;
+   if null, /lib/modules/`uname -r` is used.
+   Returns zero on success, -1 if dwfl_report_module failed,
+   or an errno code if finding the files on disk failed.  */
+int
+dwfl_linux_kernel_report_offline (Dwfl *dwfl, const char *release,
+				  int (*predicate) (const char *module,
+						    const char *file))
+{
+  if (release == NULL)
+    {
+      release = kernel_release ();
+      if (release == NULL)
+	return errno;
+    }
+
+  /* First report the kernel.  */
+  int result = report_kernel (dwfl, release, predicate);
+  if (result == 0)
+    {
+      /* Do "find /lib/modules/RELEASE/kernel -name *.ko".  */
+
+      char *modulesdir[] = { NULL, NULL };
+      if (release[0] == '/')
+	modulesdir[0] = (char *) release;
+      else
+	{
+	  asprintf (&modulesdir[0], MODULEDIRFMT "/kernel", release);
+	  if (modulesdir[0] == NULL)
+	    return errno;
+	}
+
+      FTS *fts = fts_open (modulesdir, FTS_LOGICAL | FTS_NOSTAT, NULL);
+      if (modulesdir[0] == (char *) release)
+	modulesdir[0] = NULL;
+      if (fts == NULL)
+	{
+	  free (modulesdir[0]);
+	  return errno;
+	}
+
+      FTSENT *f;
+      while ((f = fts_read (fts)) != NULL)
+	{
+	  switch (f->fts_info)
+	    {
+	    case FTS_F:
+	    case FTS_NSOK:
+	      /* See if this file name matches "*.ko".  */
+	      if (f->fts_namelen > 3
+		  && !memcmp (f->fts_name + f->fts_namelen - 3, ".ko", 4))
+		{
+		  /* We have a .ko file to report.  Following the algorithm
+		     by which the kernel makefiles set KBUILD_MODNAME, we
+		     replace all ',' or '-' with '_' in the file name and
+		     call that the module name.  Modules could well be
+		     built using different embedded names than their file
+		     names.  To handle that, we would have to look at the
+		     __this_module.name contents in the module's text.  */
+
+		  char name[f->fts_namelen - 3 + 1];
+		  for (size_t i = 0; i < f->fts_namelen - 3U; ++i)
+		    if (f->fts_name[i] == '-' || f->fts_name[i] == ',')
+		      name[i] = '_';
+		    else
+		      name[i] = f->fts_name[i];
+		  name[f->fts_namelen - 3] = '\0';
+
+		  if (predicate != NULL)
+		    {
+		      /* Let the predicate decide whether to use this one.  */
+		      int want = (*predicate) (name, f->fts_path);
+		      if (want < 0)
+			{
+			  result = -1;
+			  break;
+			}
+		      if (!want)
+			continue;
+		    }
+
+		  if (dwfl_report_offline (dwfl, name,
+					   f->fts_path, -1) == NULL)
+		    {
+		      result = -1;
+		      break;
+		    }
+		}
+	      continue;
+
+	    case FTS_ERR:
+	    case FTS_DNR:
+	    case FTS_NS:
+	      result = f->fts_errno;
+	      break;
+
+	    default:
+	      continue;
+	    }
+
+	  /* We only get here in error cases.  */
+	  break;
+	}
+      fts_close (fts);
+      free (modulesdir[0]);
+    }
+
+  return result;
+}
+INTDEF (dwfl_linux_kernel_report_offline)
+
+
+/* Find the ELF file for the running kernel and dwfl_report_elf it.  */
+int
+dwfl_linux_kernel_report_kernel (Dwfl *dwfl)
+{
+  const char *release = kernel_release ();
+  if (release == NULL)
+    return errno;
+
+  return report_kernel (dwfl, release, NULL);
+}
 INTDEF (dwfl_linux_kernel_report_kernel)
+
 
 /* Dwfl_Callbacks.find_elf for the running Linux kernel and its modules.  */
 
@@ -96,9 +254,9 @@ dwfl_linux_kernel_find_elf (Dwfl_Module *mod __attribute__ ((unused)),
 {
   const char *release = kernel_release ();
   if (release == NULL)
-    return -1;
+    return errno;
 
-  /* Do "find /lib/modules/`uname -r` -name MODULE_NAME.ko".  */
+  /* Do "find /lib/modules/`uname -r`/kernel -name MODULE_NAME.ko".  */
 
   char *modulesdir[] = { NULL, NULL };
   asprintf (&modulesdir[0], MODULEDIRFMT "/kernel", release);
@@ -165,6 +323,7 @@ dwfl_linux_kernel_find_elf (Dwfl_Module *mod __attribute__ ((unused)),
 	      int fd = open64 (f->fts_accpath, O_RDONLY);
 	      *file_name = strdup (f->fts_path);
 	      fts_close (fts);
+	      free (modulesdir[0]);
 	      if (fd < 0)
 		free (*file_name);
 	      else if (*file_name == NULL)
@@ -187,10 +346,13 @@ dwfl_linux_kernel_find_elf (Dwfl_Module *mod __attribute__ ((unused)),
 	}
     }
 
+  fts_close (fts);
+  free (modulesdir[0]);
   errno = error;
   return -1;
 }
 INTDEF (dwfl_linux_kernel_find_elf)
+
 
 /* Dwfl_Callbacks.section_address for kernel modules in the running Linux.
    We read the information from /sys/module directly.  */
@@ -200,7 +362,9 @@ dwfl_linux_kernel_module_section_address
 (Dwfl_Module *mod __attribute__ ((unused)),
  void **userdata __attribute__ ((unused)),
  const char *modname, Dwarf_Addr base __attribute__ ((unused)),
- const char *secname, Dwarf_Addr *addr)
+ const char *secname, Elf32_Word shndx __attribute__ ((unused)),
+ const GElf_Shdr *shdr __attribute__ ((unused)),
+ Dwarf_Addr *addr)
 {
   char *sysfile = NULL;
   asprintf (&sysfile, SECADDRFMT, modname, secname);

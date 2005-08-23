@@ -37,7 +37,8 @@ __libdwfl_relocate_value (Dwfl_Module *mod, size_t symshstrndx,
       if (name == NULL)
 	return DWFL_E_LIBELF;
 
-      if ((*mod->dwfl->callbacks->section_address) (MODCB_ARGS (mod), name,
+      if ((*mod->dwfl->callbacks->section_address) (MODCB_ARGS (mod),
+						    name, shndx, refshdr,
 						    &refshdr->sh_addr))
 	return CBFAIL;
 
@@ -63,7 +64,7 @@ Dwfl_Error
 internal_function_def
 __libdwfl_relocate (Dwfl_Module *mod, Elf *debugfile)
 {
-  assert (mod->isrel);
+  assert (mod->e_type == ET_REL);
 
   GElf_Ehdr ehdr_mem;
   const GElf_Ehdr *ehdr = gelf_getehdr (debugfile, &ehdr_mem);

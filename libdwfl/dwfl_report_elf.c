@@ -45,41 +45,94 @@ dwfl_report_elf (Dwfl *dwfl, const char *name,
       return NULL;
     }
 
-  GElf_Addr start = 0, end = 0;
-  for (uint_fast16_t i = 0; i < ehdr->e_phnum; ++i)
+  GElf_Addr start = 0, end = 0, bias = 0;
+  switch (ehdr->e_type)
     {
-      GElf_Phdr phdr_mem, *ph = gelf_getphdr (elf, i, &phdr_mem);
-      if (ph == NULL)
-	goto elf_error;
-      if (ph->p_type == PT_LOAD)
+    case ET_REL:
+      /* For a relocatable object, we do an arbitrary section layout.
+	 By updating the section header in place, we leave the layout
+	 information to be found by relocation.  */
+
+      start = end = base;
+
+      Elf_Scn *scn = NULL;
+      while ((scn = elf_nextscn (elf, scn)) != NULL)
 	{
-	  start = base + (ph->p_vaddr & -ph->p_align);
-	  break;
-	}
-    }
+	  GElf_Shdr shdr_mem;
+	  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+	  if (shdr == NULL)
+	    goto elf_error;
 
-  for (uint_fast16_t i = ehdr->e_phnum; i-- > 0;)
-    {
-      GElf_Phdr phdr_mem, *ph = gelf_getphdr (elf, i, &phdr_mem);
-      if (ph == NULL)
-	goto elf_error;
-      if (ph->p_type == PT_LOAD)
+	  if (shdr->sh_flags & SHF_ALLOC)
+	    {
+	      const GElf_Xword align = shdr->sh_addralign ?: 1;
+	      shdr->sh_addr = (end + align - 1) & -align;
+	      if (end == base)
+		/* This is the first section assigned a location.
+		   Use its aligned address as the module's base.  */
+		start = shdr->sh_addr;
+	      end = shdr->sh_addr + shdr->sh_size;
+	      if (! gelf_update_shdr (scn, shdr))
+		goto elf_error;
+	    }
+	}
+
+      if (end == start)
 	{
-	  end = base + (ph->p_vaddr + ph->p_memsz);
-	  break;
+	  __libdwfl_seterrno (DWFL_E_BADELF);
+	  if (closefd)
+	    close (fd);
+	  return NULL;
 	}
+      break;
+
+      /* Everything else has to have program headers.  */
+
+    case ET_EXEC:
+    case ET_CORE:
+      /* An assigned base address is meaningless for these.  */
+      base = 0;
+
+    case ET_DYN:
+    default:
+      for (uint_fast16_t i = 0; i < ehdr->e_phnum; ++i)
+	{
+	  GElf_Phdr phdr_mem, *ph = gelf_getphdr (elf, i, &phdr_mem);
+	  if (ph == NULL)
+	    goto elf_error;
+	  if (ph->p_type == PT_LOAD)
+	    {
+	      if ((base & (ph->p_align - 1)) != 0)
+		base = (base + ph->p_align - 1) & -ph->p_align;
+	      start = base + (ph->p_vaddr & -ph->p_align);
+	      break;
+	    }
+	}
+      bias = base;
+
+      for (uint_fast16_t i = ehdr->e_phnum; i-- > 0;)
+	{
+	  GElf_Phdr phdr_mem, *ph = gelf_getphdr (elf, i, &phdr_mem);
+	  if (ph == NULL)
+	    goto elf_error;
+	  if (ph->p_type == PT_LOAD)
+	    {
+	      end = base + (ph->p_vaddr + ph->p_memsz);
+	      break;
+	    }
+	}
+
+      if (end == 0)
+	{
+	  __libdwfl_seterrno (DWFL_E_NO_PHDR);
+	  if (closefd)
+	    close (fd);
+	  return NULL;
+	}
+      break;
     }
 
-  if (end == 0)
-    {
-      __libdwfl_seterrno (DWFL_E_NO_PHDR);
-      if (closefd)
-	close (fd);
-      return NULL;
-    }
-
-  Dwfl_Module *m = INTUSE(dwfl_report_module) (dwfl, name,
-					       base + start, base + end);
+  Dwfl_Module *m = INTUSE(dwfl_report_module) (dwfl, name, start, end);
   if (m != NULL)
     {
       if (m->main.name == NULL)
@@ -103,7 +156,8 @@ dwfl_report_elf (Dwfl *dwfl, const char *name,
       if (m->main.elf == NULL)
 	{
 	  m->main.elf = elf;
-	  m->main.bias = base;
+	  m->main.bias = bias;
+	  m->e_type = ehdr->e_type;
 	}
       else
 	{

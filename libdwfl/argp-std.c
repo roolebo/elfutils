@@ -30,12 +30,22 @@ static const struct argp_option options[] =
   { "pid", 'p', "PID", 0,
     N_("Find addresses in files mapped into process PID"), 0 },
   { "kernel", 'k', NULL, 0, N_("Find addresses in the running kernel"), 0 },
+  { "offline-kernel", 'K', "RELEASE", OPTION_ARG_OPTIONAL,
+    N_("Kernel with all modules"), 0 },
   { "debuginfo-path", OPT_DEBUGINFO, "PATH", 0,
     N_("Search path for separate debuginfo files"), 0 },
   { NULL, 0, NULL, 0, NULL, 0 }
 };
 
 static char *debuginfo_path;
+
+static const Dwfl_Callbacks offline_callbacks =
+  {
+    .find_debuginfo = INTUSE(dwfl_standard_find_debuginfo),
+    .debuginfo_path = &debuginfo_path,
+
+    .section_address = INTUSE(dwfl_offline_section_address),
+  };
 
 static const Dwfl_Callbacks proc_callbacks =
   {
@@ -78,19 +88,29 @@ parse_opt (int key, char *arg, struct argp_state *state)
       break;
 
     case 'e':
-      if (state->hook == NULL)
-	{
-	  Dwfl *dwfl = INTUSE(dwfl_begin) (&proc_callbacks);
-	  if (INTUSE(dwfl_report_elf) (dwfl, "", arg, -1, 0) == NULL)
-	    return fail (-1, arg);
-	  state->hook = dwfl;
-	}
-      else
-	{
-	toomany:
-	  argp_error (state, "%s", _("only one -e, -p, or -k option allowed"));
-	  return EINVAL;
-	}
+      {
+	Dwfl *dwfl = state->hook;
+	if (dwfl == NULL)
+	  {
+	    dwfl = INTUSE(dwfl_begin) (&offline_callbacks);
+	    if (dwfl == NULL)
+	      return fail (-1, arg);
+	    state->hook = dwfl;
+	  }
+	if (dwfl->callbacks == &offline_callbacks)
+	  {
+	    if (INTUSE(dwfl_report_offline) (dwfl, "", arg, -1) == NULL)
+	      return fail (-1, arg);
+	    state->hook = dwfl;
+	  }
+	else
+	  {
+	  toomany:
+	    argp_error (state,
+			"%s", _("only one of -e, -p, -k, or -K allowed"));
+	    return EINVAL;
+	  }
+      }
       break;
 
     case 'p':
@@ -123,6 +143,20 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	goto toomany;
       break;
 
+    case 'K':
+      if (state->hook == NULL)
+	{
+	  Dwfl *dwfl = INTUSE(dwfl_begin) (&offline_callbacks);
+	  int result = INTUSE(dwfl_linux_kernel_report_offline) (dwfl, arg,
+								 NULL);
+	  if (result != 0)
+	    return fail (result, _("cannot find kernel or modules"));
+	  state->hook = dwfl;
+	}
+      else
+	goto toomany;
+      break;
+
     case ARGP_KEY_SUCCESS:
       {
 	Dwfl *dwfl = state->hook;
@@ -131,8 +165,8 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	  {
 	    /* Default if no -e, -p, or -k, is "-e a.out".  */
 	    arg = "a.out";
-	    dwfl = INTUSE(dwfl_begin) (&proc_callbacks);
-	    if (INTUSE(dwfl_report_elf) (dwfl, "", arg, -1, 0) == NULL)
+	    dwfl = INTUSE(dwfl_begin) (&offline_callbacks);
+	    if (INTUSE(dwfl_report_offline) (dwfl, "", arg, -1) == NULL)
 	      return fail (-1, arg);
 	    state->hook = dwfl;
 	  }

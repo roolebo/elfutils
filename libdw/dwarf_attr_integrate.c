@@ -1,4 +1,4 @@
-/* Return specific DWARF attribute of a DIE, integrating DW_AT_abstract_origin.
+/* Return specific DWARF attribute of a DIE, integrating indirections.
    Copyright (C) 2005 Red Hat, Inc.
 
    This program is Open Source software; you can redistribute it and/or
@@ -31,6 +31,8 @@ dwarf_attr_integrate (Dwarf_Die *die, unsigned int search_name,
 	return attr;
 
       attr = INTUSE(dwarf_attr) (die, DW_AT_abstract_origin, result);
+      if (attr == NULL)
+	attr = INTUSE(dwarf_attr) (die, DW_AT_specification, result);
       if (attr == NULL)
 	break;
 

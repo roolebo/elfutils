@@ -1,7 +1,110 @@
 2005-08-22  Roland McGrath  <roland@redhat.com>
 
+	* dwfl_validate_address.c: New file.
+	* Makefile.am (libdwfl_a_SOURCES): Add it.
+	* libdwfl.h: Declare dwfl_validate_address.
+
+	* derelocate.c (dwfl_module_relocate_address): Add INTDEF.
+	* libdwflP.h: Add INTDECL.
+
 	* dwfl_module_getdwarf.c (find_symtab): Use elf_getdata instead of
 	elf_rawdata for symbol-related sections.
+
+	* offline.c (dwfl_report_offline): Move offline_next_address outside
+	module's range, in case it's an ET_EXEC using fixed segment locations.
+	* libdwfl.h: Update comment.
+
+	* dwfl_report_elf.c (dwfl_report_elf): Align BASE to first segment's
+	required alignment.
+
+2005-08-20  Roland McGrath  <roland@redhat.com>
+
+	* linux-kernel-modules.c (report_kernel): Take new argument PREDICATE,
+	function to choose whether to report.
+	(dwfl_linux_kernel_report_offline): Likewise.
+	* libdwfl.h: Update decl.
+	* argp-std.c (parse_opt): Update caller.
+
+	* dwfl_getsrclines.c: New file.
+	* dwfl_onesrcline.c: New file.
+	* Makefile.am (libdwfl_a_SOURCES): Add them.
+	* libdwfl.h: Declare dwfl_getsrclines, dwfl_onesrcline.
+
+	* linux-kernel-modules.c (dwfl_linux_kernel_find_elf): Don't leak
+	MODULESDIR[0].  Call fts_close on failure.
+
+	* dwfl_module_getdwarf.c (load_dw): Take dwfl_file * instead of Elf *.
+	Close ET_REL file descriptors after relocation.
+	(find_dw): Update caller.
+	* offline.c (dwfl_report_offline): Get the file into memory and close
+	the file descriptor.
+
+	* dwfl_module_getdwarf.c (find_debuginfo): Do nothing when
+	MOD->debug.elf is already set.
+
+	* find-debuginfo.c (try_open): Use TEMP_FAILURE_RETRY.
+	(dwfl_standard_find_debuginfo): Fail on errors not ENOENT or ENOTDIR.
+
+	* argp-std.c (options, parse_opt): Grok -K/--offline-kernel, use
+	dwfl_linux_kernel_report_offline with offline_callbacks.
+
+	* linux-kernel-modules.c (report_kernel): New function, broken out of
+	...
+	(dwfl_linux_kernel_report_kernel): ... here.  Use it.
+	(dwfl_linux_kernel_report_offline): New function.
+	* libdwfl.h: Declare it.
+	* libdwflP.h: Add INTDECL.
+
+2005-08-19  Roland McGrath  <roland@redhat.com>
+
+	Use standard debuginfo search path to look for vmlinux.
+	* find-debuginfo.c (dwfl_standard_find_debuginfo): Don't check CRC if
+	passed zero.
+	* linux-kernel-modules.c (try_kernel_name): New function, broken out
+	of ...
+	(dwfl_linux_kernel_report_kernel): ... here.  Use it.
+
+	* argp-std.c (offline_callbacks): New variable.
+	(parse_opt): Use it for -e.  Allow multiple -e options.
+
+	* offline.c: New file.
+	* Makefile.am (libdwfl_a_SOURCES): Add it.
+	* libdwfl.h: Declare dwfl_offline_section_address, dwfl_report_offline.
+	* libdwflP.h: Add INTDECLs.
+	(OFFLINE_REDZONE): New macro.
+	(struct Dwfl): New member `offline_next_address'.
+	* dwfl_begin.c (dwfl_begin): Initialize it.
+	* dwfl_module.c (dwfl_report_begin): Likewise.
+
+	* dwfl_report_elf.c (dwfl_report_elf): Accept all types.  When ET_REL,
+	do a nominal absolute section layout starting at BASE.
+	* libdwfl.h: Update comment.
+
+2005-08-18  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_getsrc_file.c (dwfl_module_getsrc_file): Do
+	dwfl_module_getdwarf if necessary.
+
+	* dwfl_report_elf.c (dwfl_report_elf): Permit ET_REL with BASE==0.
+	* libdwfl.h: Update comment.
+
+	* derelocate.c: New file.
+	* Makefile.am (libdwfl_a_SOURCES): Add it.
+
+	* libdwflP.h (struct Dwfl_Module): isrel -> e_type.
+	* dwfl_report_elf.c (dwfl_report_elf): Initialize it.
+	* dwfl_module_getdwarf.c (open_elf): Update initialization.
+	(load_dw, dwfl_module_addrname): Update uses.
+	* relocate.c (__libdwfl_relocate): Likewise.
+
+2005-08-04  Roland McGrath  <roland@redhat.com>
+
+	* libdwfl.h (Dwfl_Callbacks.section_address): Take additional
+	arguments SHNDX, SHDR.
+	(dwfl_linux_kernel_module_section_address): Update prototype.
+	* relocate.c (__libdwfl_relocate_value): Update caller.
+	* linux-kernel-modules.c (dwfl_linux_kernel_module_section_address):
+	Take the new arguments.
 
 2005-08-10  Roland McGrath  <roland@redhat.com>
 

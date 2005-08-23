@@ -69,7 +69,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile18.bz2 testfile19.bz2 testfile19.index.bz2 \
 	     testfile20.bz2 testfile20.index.bz2 \
 	     testfile21.bz2 testfile21.index.bz2 \
-	     testfile22.bz2
+	     testfile22.bz2 testfile23.bz2
 
 if MUDFLAP
 static_build=yes
@@ -111,7 +111,7 @@ get_files_LDADD = $(libdw) $(libelf) $(libmudflap)
 get_aranges_LDADD = $(libdw) $(libelf) $(libmudflap)
 allfcts_LDADD = $(libdw) $(libelf) $(libmudflap)
 line2addr_no_Wformat = yes
-line2addr_LDADD = $(libdw) $(libelf) $(libmudflap)
+line2addr_LDADD = $(libdw) $(libmudflap)
 addrscopes_LDADD = $(libdw) $(libmudflap)
 #show_ciefde_LDADD = ../libdwarf/libdwarf.so $(libelf) $(libmudflap)
 asm_tst1_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl

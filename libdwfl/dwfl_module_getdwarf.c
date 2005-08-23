@@ -14,6 +14,7 @@
 #include "libdwflP.h"
 #include <fcntl.h>
 #include <string.h>
+#include <unistd.h>
 #include "../libdw/libdwP.h"	/* DWARF_E_* values are here.  */
 
 
@@ -34,7 +35,7 @@ open_elf (Dwfl_Module *mod, struct dwfl_file *file)
   if (ehdr == NULL)
     return DWFL_E (LIBELF, elf_errno ());
 
-  mod->isrel = ehdr->e_type == ET_REL;
+  mod->e_type = ehdr->e_type;
 
   file->bias = 0;
   for (uint_fast16_t i = 0; i < ehdr->e_phnum; ++i)
@@ -74,6 +75,9 @@ find_file (Dwfl_Module *mod)
 static Dwfl_Error
 find_debuginfo (Dwfl_Module *mod)
 {
+  if (mod->debug.elf != NULL)
+    return DWFL_E_NOERROR;
+
   size_t shstrndx;
   if (elf_getshstrndx (mod->main.elf, &shstrndx) < 0)
     return DWFL_E_LIBELF;
@@ -279,9 +283,9 @@ find_symtab (Dwfl_Module *mod)
 
 /* Try to start up libdw on DEBUGFILE.  */
 static Dwfl_Error
-load_dw (Dwfl_Module *mod, Elf *debugfile)
+load_dw (Dwfl_Module *mod, struct dwfl_file *debugfile)
 {
-  if (mod->isrel)
+  if (mod->e_type == ET_REL)
     {
       const Dwfl_Callbacks *const cb = mod->dwfl->callbacks;
 
@@ -299,12 +303,24 @@ load_dw (Dwfl_Module *mod, Elf *debugfile)
       find_symtab (mod);
       Dwfl_Error result = mod->symerr;
       if (result == DWFL_E_NOERROR)
-	result = __libdwfl_relocate (mod, debugfile);
+	result = __libdwfl_relocate (mod, debugfile->elf);
       if (result != DWFL_E_NOERROR)
 	return result;
+
+      /* Don't keep the file descriptors around.  */
+      if (mod->main.fd != -1 && elf_cntl (mod->main.elf, ELF_C_FDREAD) == 0)
+	{
+	  close (mod->main.fd);
+	  mod->main.fd = -1;
+	}
+      if (debugfile->fd != -1 && elf_cntl (debugfile->elf, ELF_C_FDREAD) == 0)
+	{
+	  close (debugfile->fd);
+	  debugfile->fd = -1;
+	}
     }
 
-  mod->dw = INTUSE(dwarf_begin_elf) (debugfile, DWARF_C_READ, NULL);
+  mod->dw = INTUSE(dwarf_begin_elf) (debugfile->elf, DWARF_C_READ, NULL);
   if (mod->dw == NULL)
     {
       int err = INTUSE(dwarf_errno) ();
@@ -331,7 +347,7 @@ find_dw (Dwfl_Module *mod)
     return;
 
   /* First see if the main ELF file has the debugging information.  */
-  mod->dwerr = load_dw (mod, mod->main.elf);
+  mod->dwerr = load_dw (mod, &mod->main);
   switch (mod->dwerr)
     {
     case DWFL_E_NOERROR:
@@ -351,7 +367,7 @@ find_dw (Dwfl_Module *mod)
   switch (mod->dwerr)
     {
     case DWFL_E_NOERROR:
-      mod->dwerr = load_dw (mod, mod->debug.elf);
+      mod->dwerr = load_dw (mod, &mod->debug);
       break;
 
     case DWFL_E_CB:		/* The find_debuginfo hook failed.  */
@@ -435,7 +451,7 @@ dwfl_module_addrname (Dwfl_Module *mod, GElf_Addr addr)
 	  if (sym->st_shndx != SHN_XINDEX)
 	    shndx = sym->st_shndx;
 
-	  if (mod->isrel)
+	  if (mod->e_type == ET_REL)
 	    /* In an ET_REL file, the symbol table values are relative
 	       to the section, not to the module's load base.  */
 	    switch (shndx)

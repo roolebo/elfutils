@@ -507,13 +507,6 @@ static const int length_map[2][3] =
 };
 
 
-struct global_name
-{
-  Dwarf_Global global;
-  const char *name;
-};
-
-
 static int
 global_compare (const void *p1, const void *p2)
 {

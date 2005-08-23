@@ -25,20 +25,30 @@ bunzip2 -c $srcdir/testfile8.bz2 > testfile8 2>/dev/null || exit 0
 # Don't fail if we cannot decompress the file.
 bunzip2 -c $srcdir/testfile14.bz2 > testfile14 2>/dev/null || exit 0
 
-./line2addr testfile:f.c:4 testfile:f.c:8 testfile2:m.c:6 testfile2:b.c:1 testfile8:strip.c:953 testfile8:strip.c:365 testfile14:v.c:6 > line2addr.out
+# Don't fail if we cannot decompress the file.
+bunzip2 -c $srcdir/testfile23.bz2 > testfile23 2>/dev/null || exit 0
+
+(./line2addr -e testfile f.c:4 testfile f.c:8
+ ./line2addr -e testfile2 m.c:6 b.c:1
+ ./line2addr -e testfile8 strip.c:953 strip.c:365
+ ./line2addr -e testfile14 v.c:6
+ ./line2addr -e testfile23 foo.c:2 foo.c:6
+) > line2addr.out
 
 diff -u line2addr.out - <<"EOF"
-testfile:f.c:4 -> 0x804846b
-testfile2:m.c:6 -> 0x100004cc
-testfile2:b.c:1 -> 0x10000470
-testfile8:strip.c:953 -> 0x169f
-testfile8:strip.c:953 -> 0x16aa
-testfile8:strip.c:365 -> 0x278b
-testfile8:strip.c:365 -> 0x2797
-testfile14:v.c:6 -> 0x400468
-testfile14:v.c:6 -> 0x400487
+f.c:4 -> 0x804846b (/home/drepper/gnu/new-bu/build/ttt/f.c:4)
+m.c:6 -> 0x100004cc (/shoggoth/drepper/m.c:6)
+b.c:1 -> 0x10000470 (/shoggoth/drepper/b.c:4)
+strip.c:953 -> (.text)+0x169f (/home/drepper/gnu/elfutils/build/src/../../src/strip.c:953)
+strip.c:953 -> (.text)+0x16aa (/home/drepper/gnu/elfutils/build/src/../../src/strip.c:953)
+strip.c:365 -> (.text)+0x278b (/home/drepper/gnu/elfutils/build/src/../../src/strip.c:365)
+strip.c:365 -> (.text)+0x2797 (/home/drepper/gnu/elfutils/build/src/../../src/strip.c:365)
+v.c:6 -> 0x400468 (/home/drepper/local/elfutils-build/20050425/v.c:6)
+v.c:6 -> 0x400487 (/home/drepper/local/elfutils-build/20050425/v.c:6)
+foo.c:2 -> (.init.text)+0xc (/home/roland/stock-elfutils-build/foo.c:2)
+foo.c:6 -> (.text)+0xc (/home/roland/stock-elfutils-build/foo.c:6)
 EOF
 
-rm -f testfile testfile2 testfile8 testfile14 line2addr.out
+rm -f testfile testfile2 testfile8 testfile14 testfile22 line2addr.out
 
 exit 0

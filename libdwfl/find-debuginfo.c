@@ -40,7 +40,7 @@ try_open (const char *dir, const char *subdir, const char *debuglink,
   if (fname == NULL)
     return -1;
 
-  int fd = open64 (fname, O_RDONLY);
+  int fd = TEMP_FAILURE_RETRY (open64 (fname, O_RDONLY));
   if (fd < 0)
     free (fname);
   else
@@ -59,7 +59,7 @@ check_crc (int fd, GElf_Word debuglink_crc)
 }
 
 int
-dwfl_standard_find_debuginfo (Dwfl_Module *mod __attribute__ ((unused)),
+dwfl_standard_find_debuginfo (Dwfl_Module *mod,
 			      void **userdata __attribute__ ((unused)),
 			      const char *modname __attribute__ ((unused)),
 			      GElf_Addr base __attribute__ ((unused)),
@@ -68,7 +68,7 @@ dwfl_standard_find_debuginfo (Dwfl_Module *mod __attribute__ ((unused)),
 			      GElf_Word debuglink_crc,
 			      char **debuginfo_file_name)
 {
-  bool cancheck = true;
+  bool cancheck = debuglink_crc != (GElf_Word) 0;
 
   const char *file_basename = file_name == NULL ? NULL : basename (file_name);
   if (debuglink_file == NULL)
@@ -141,7 +141,14 @@ dwfl_standard_find_debuginfo (Dwfl_Module *mod __attribute__ ((unused)),
       char *fname;
       int fd = try_open (dir, subdir, debuglink_file, &fname);
       if (fd < 0)
-	continue;
+	switch (errno)
+	  {
+	  case ENOENT:
+	  case ENOTDIR:
+	    continue;
+	  default:
+	    return -1;
+	  }
       if (!check || check_crc (fd, debuglink_crc))
 	{
 	  *debuginfo_file_name = fname;

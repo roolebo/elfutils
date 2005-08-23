@@ -1,4 +1,4 @@
-/* Set up a session using libdwfl.
+/* Return one of the sources lines of a CU.
    Copyright (C) 2005 Red Hat, Inc.
 
    This program is Open Source software; you can redistribute it and/or
@@ -13,24 +13,29 @@
 
 #include "libdwflP.h"
 
-Dwfl *
-dwfl_begin (const Dwfl_Callbacks *callbacks)
+Dwfl_Line *
+dwfl_onesrcline (Dwarf_Die *cudie, size_t idx)
 {
-  if (elf_version (EV_CURRENT) == EV_NONE)
+  struct dwfl_cu *cu = (struct dwfl_cu *) cudie;
+
+  if (cudie == NULL)
+    return NULL;
+
+  if (cu->lines == NULL)
     {
-      __libdwfl_seterrno (DWFL_E_LIBELF);
+      Dwfl_Error error = __libdwfl_cu_getsrclines (cu);
+      if (error != DWFL_E_NOERROR)
+	{
+	  __libdwfl_seterrno (error);
+	  return NULL;
+	}
+    }
+
+  if (idx >= cu->die.cu->lines->nlines)
+    {
+      __libdwfl_seterrno (DWFL_E (LIBDW, DWARF_E_INVALID_LINE_IDX));
       return NULL;
     }
 
-  Dwfl *dwfl = calloc (1, sizeof *dwfl);
-  if (dwfl == NULL)
-    __libdwfl_seterrno (DWFL_E_NOMEM);
-  else
-    {
-      dwfl->callbacks = callbacks;
-      dwfl->offline_next_address = OFFLINE_REDZONE;
-    }
-
-  return dwfl;
+  return &cu->lines->idx[idx];
 }
-INTDEF (dwfl_begin)

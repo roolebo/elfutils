@@ -1,3 +1,8 @@
+2005-08-22  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_getdwarf.c (find_symtab): Use elf_getdata instead of
+	elf_rawdata for symbol-related sections.
+
 2005-08-10  Roland McGrath  <roland@redhat.com>
 
 	* relocate.c (__libdwfl_relocate): Take argument DEBUGFILE,

@@ -257,7 +257,7 @@ find_symtab (Dwfl_Module *mod)
 
   /* Cache the data; MOD->syments was set above.  */
 
-  mod->symstrdata = elf_rawdata (elf_getscn (mod->symfile->elf, strshndx),
+  mod->symstrdata = elf_getdata (elf_getscn (mod->symfile->elf, strshndx),
 				 NULL);
   if (mod->symstrdata == NULL)
     goto elferr;
@@ -266,12 +266,12 @@ find_symtab (Dwfl_Module *mod)
     mod->symxndxdata = NULL;
   else
     {
-      mod->symxndxdata = elf_rawdata (xndxscn, NULL);
+      mod->symxndxdata = elf_getdata (xndxscn, NULL);
       if (mod->symxndxdata == NULL)
 	goto elferr;
     }
 
-  mod->symdata = elf_rawdata (symscn, NULL);
+  mod->symdata = elf_getdata (symscn, NULL);
   if (mod->symdata == NULL)
     goto elferr;
 }

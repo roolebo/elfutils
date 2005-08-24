@@ -4,6 +4,9 @@ libelf: new function elf_getaroff
 
 libdw: Added dwarf_func_die, dwarf_func_inline, dwarf_func_inline_instances.
 
+libdwfl: New functions dwfl_report_offline, dwfl_offline_section_address,
+	 dwfl_linux_kernel_report_offline.
+
 ranlib: new program
 
 Version 0.113:

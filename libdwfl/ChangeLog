@@ -1,3 +1,8 @@
+2005-08-24  Roland McGrath  <roland@redhat.com>
+
+	* argp-std.c [_MUDFLAP] (__libdwfl_argp_mudflap_options): New function,
+	magic initializer to set -heur-stack-bound option.
+
 2005-08-22  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_validate_address.c: New file.

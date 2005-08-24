@@ -77,7 +77,7 @@ libmudflap = -lmudflap
 endif
 
 if BUILD_STATIC
-libdw = ../libdw/libdw.a
+libdw = ../libdw/libdw.a $(libelf) $(libebl)
 libelf = ../libelf/libelf.a
 libasm = ../libasm/libasm.a
 else

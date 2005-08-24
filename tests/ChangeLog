@@ -1,3 +1,7 @@
+2005-08-24  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am [BUILD_STATIC] (libdw): Add $(libelf) and $(libebl).
+
 2005-08-22  Roland McGrath  <roland@redhat.com>
 
 	* run-line2addr.sh: Add a case.

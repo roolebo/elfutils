@@ -1,6 +1,7 @@
 2005-08-24  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.am [BUILD_STATIC] (libdw): Add $(libelf) and $(libebl).
+	[MUDFLAP] (AM_LDFLAGS): Define to find libebl modules.
 
 2005-08-22  Roland McGrath  <roland@redhat.com>
 

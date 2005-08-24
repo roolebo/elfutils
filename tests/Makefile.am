@@ -16,6 +16,7 @@ DEFS = -DHAVE_CONFIG_H -D_GNU_SOURCE
 if MUDFLAP
 AM_CFLAGS = -Wall -Werror -Wextra -std=gnu99 -fmudflap\
 	    $(if $($(*F)_no_Wformat),-Wno-format,-Wformat=2)
+AM_LDFLAGS = -Wl,-rpath,\$$ORIGIN/../libebl
 else
 AM_CFLAGS = -Wall -Werror -Wextra -std=gnu99 \
 	    $(if $($(*F)_no_Wformat),-Wno-format,-Wformat=2)

@@ -2063,6 +2063,12 @@ section [%2d] '%s': symbol %d: local symbol with global scope\n"),
 	}
       else if (*versym != VER_NDX_LOCAL)
 	{
+	  /* Versioned symbol.  Make sure it is not defined as local.  */
+	  if (!gnuld && GELF_ST_BIND (sym->st_info) == STB_LOCAL)
+	    ERROR (gettext ("\
+section [%2d] '%s': symbol %d: local symbol with version\n"),
+		   idx, section_name (ebl, idx), cnt);
+
 	  /* Look through the list of defined versions and locate the
 	     index we need for this symbol.  */
 	  struct version_namelist *runp = version_namelist;

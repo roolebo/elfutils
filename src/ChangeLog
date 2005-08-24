@@ -1,3 +1,8 @@
+2005-08-24  Ulrich Drepper  <drepper@redhat.com>
+
+	* elflint.c (check_versym): Versioned symbols should not have
+	local binding.
+
 2005-08-15  Ulrich Drepper  <drepper@redhat.com>
 
 	* elflint.c (check_versym): Allow VER_NDX_LOCAL symbols to be

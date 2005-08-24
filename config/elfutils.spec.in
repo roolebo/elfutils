@@ -183,6 +183,14 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.so
 
 %changelog
+* Wed Aug 24 2005 Ulrich Drepper <drepper@redhat.com> 0.114-1
+- libelf: new function elf_getaroff
+- libdw: Added dwarf_func_die, dwarf_func_inline, dwarf_func_inline_inst
+ances.
+- libdwfl: New functions dwfl_report_offline, dwfl_offline_section_addre
+ss,	 dwfl_linux_kernel_report_offline.
+- ranlib: new program
+
 * Mon Aug 15 2005 Ulrich Drepper <drepper@redhat.com> 0.114-1
 - libelf: new function elf_getaroff
 - ranlib: new program

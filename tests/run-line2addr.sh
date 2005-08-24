@@ -49,6 +49,7 @@ foo.c:2 -> (.init.text)+0xc (/home/roland/stock-elfutils-build/foo.c:2)
 foo.c:6 -> (.text)+0xc (/home/roland/stock-elfutils-build/foo.c:6)
 EOF
 
-rm -f testfile testfile2 testfile8 testfile14 testfile22 line2addr.out
+rm -f testfile testfile2 testfile8 testfile14 testfile22 testfile23 \
+      line2addr.out
 
 exit 0

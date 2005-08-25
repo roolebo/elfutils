@@ -47,7 +47,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-strip-test6.sh run-ecp-test.sh run-ecp-test2.sh \
 	run-elflint-test.sh run-elflint-self.sh run-ranlib-test.sh \
 	run-ranlib-test2.sh run-ranlib-test3.sh run-ranlib-test4.sh \
-	run-addrscopes.sh run-strings-test.sh
+	run-addrscopes.sh
 # run-show-ciefde.sh
 
 EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
@@ -63,7 +63,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-strip-test4.sh run-strip-test5.sh run-strip-test6.sh \
 	     run-elflint-self.sh run-ranlib-test.sh run-ranlib-test2.sh \
 	     run-ranlib-test3.sh run-ranlib-test4.sh \
-	     run-addrscopes.sh run-strings-test.sh \
+	     run-addrscopes.sh \
 	     testfile15.bz2 testfile15.debug.bz2 \
 	     testfile16.bz2 testfile16.debug.bz2 \
 	     testfile17.bz2 testfile17.debug.bz2 \
@@ -78,7 +78,7 @@ libmudflap = -lmudflap
 endif
 
 if BUILD_STATIC
-libdw = ../libdw/libdw.a $(libelf) $(libebl) -ldl
+libdw = ../libdw/libdw.a $(libelf) $(libebl)
 libelf = ../libelf/libelf.a
 libasm = ../libasm/libasm.a
 else
@@ -126,4 +126,4 @@ asm_tst8_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl
 asm_tst9_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl
 dwflmodtest_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
 
-CLEANFILES = xxx *.gcno *.gcda *gconv
+CLEANFILES = xxx

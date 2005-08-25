@@ -28,7 +28,7 @@ print_address (Dwfl_Module *mod, Dwarf_Addr address)
 	  if (n > 1 || secname[0] != '\0')
 	    printf ("%s(%s)+%#" PRIx64, modname, secname, address);
 	  else
-	    printf ("%s(%s)+%#" PRIx64, modname, secname, address);
+	    printf ("%s+%#" PRIx64, modname, address);
 	  return;
 	}
     }

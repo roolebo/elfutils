@@ -16,7 +16,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software Foundation,
 dnl Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 dnl
-AC_INIT([Red Hat elfutils],[0.115],[http://bugzilla.redhat.com/bugzilla/],
+AC_INIT([Red Hat elfutils],[0.114],[http://bugzilla.redhat.com/bugzilla/],
 	[elfutils])
 
 AC_CONFIG_AUX_DIR([config])
@@ -138,19 +138,8 @@ if test "$use_gprof" = yes; then
   LDFLAGS="$LDFLAGS -pg"
 fi
 AM_CONDITIONAL(GPROF, test "$use_gprof" = yes)
-
-# Enable gcov suport.
-AC_ARG_ENABLE([gcov],
-AC_HELP_STRING([--enable-gcov],
-[build binaries with gcov support]), [use_gcov=yes], [use_gcov=no])
-if test "$use_gcov" = yes; then
-  CFLAGS="$CFLAGS -fprofile-arcs -ftest-coverage"
-  LDFLAGS="$LDFLAGS -fprofile-arcs"
-fi
-AM_CONDITIONAL(GPROF, test "$use_gprof" = yes)
-
 AM_CONDITIONAL(BUILD_STATIC, [dnl
-test "$use_mudflap" = yes -o "$use_gprof" = yes -o "$use_gcov" = yes])
+test "$use_mudflap" = yes -o "$use_gprof" = yes])
 
 LIBEBL_SUBDIR="$PACKAGE"
 AC_ARG_ENABLE([libebl-subdir],

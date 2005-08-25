@@ -20,7 +20,6 @@
 #endif
 
 #include <assert.h>
-#include <errno.h>
 #include <libelf.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -28,7 +27,6 @@
 #include <unistd.h>
 #include <sys/param.h>
 
-#include <system.h>
 #include "libelfP.h"
 
 
@@ -328,7 +326,7 @@ fill (int fd, off_t pos, size_t len, char *fillbuf, size_t *filledp)
       /* This many bytes we want to write in this round.  */
       size_t n = MIN (filled, len);
 
-      if (unlikely ((size_t) pwrite_retry (fd, fillbuf, n, pos) != n))
+      if (unlikely ((size_t) pwrite (fd, fillbuf, n, pos) != n))
 	{
 	  __libelf_seterrno (ELF_E_WRITE_ERROR);
 	  return 1;
@@ -383,8 +381,8 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 	}
 
       /* Write out the ELF header.  */
-      if (unlikely (pwrite_retry (elf->fildes, out_ehdr,
-				  sizeof (ElfW2(LIBELFBITS,Ehdr)), 0)
+      if (unlikely (pwrite (elf->fildes, out_ehdr,
+			    sizeof (ElfW2(LIBELFBITS,Ehdr)), 0)
 		    != sizeof (ElfW2(LIBELFBITS,Ehdr))))
 	{
 	  __libelf_seterrno (ELF_E_WRITE_ERROR);
@@ -443,10 +441,10 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 	}
 
       /* Write out the ELF header.  */
-      size_t phdr_size = sizeof (ElfW2(LIBELFBITS,Phdr)) * ehdr->e_phnum;
-      if (unlikely ((size_t) pwrite_retry (elf->fildes, out_phdr,
-					   phdr_size, ehdr->e_phoff)
-		    != phdr_size))
+      if (unlikely ((size_t) pwrite (elf->fildes, out_phdr,
+				     sizeof (ElfW2(LIBELFBITS,Phdr))
+				     * ehdr->e_phnum, ehdr->e_phoff)
+		    != sizeof (ElfW2(LIBELFBITS,Phdr)) * ehdr->e_phnum))
 	{
 	  __libelf_seterrno (ELF_E_WRITE_ERROR);
 	  return 1;
@@ -546,10 +544,10 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 			(*fctp) (buf, dl->data.d.d_buf, dl->data.d.d_size, 1);
 		      }
 
-		    ssize_t n = pwrite_retry (elf->fildes, buf,
-					      dl->data.d.d_size,
-					      last_offset);
-		    if (unlikely ((size_t) n != dl->data.d.d_size))
+		    if (unlikely ((size_t) pwrite (elf->fildes, buf,
+						   dl->data.d.d_size,
+						   last_offset)
+				  != dl->data.d.d_size))
 		      {
 			if (buf != dl->data.d.d_buf && buf != tmpbuf)
 			  free (buf);
@@ -595,9 +593,9 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 
       /* Write out the section header table.  */
       if (shdr_flags & ELF_F_DIRTY
-	  && unlikely ((size_t) pwrite_retry (elf->fildes, shdr_data,
-					      sizeof (ElfW2(LIBELFBITS,Shdr))
-					      * shnum, shdr_offset)
+	  && unlikely ((size_t) pwrite (elf->fildes, shdr_data,
+					sizeof (ElfW2(LIBELFBITS,Shdr))
+					* shnum, shdr_offset)
 		       != sizeof (ElfW2(LIBELFBITS,Shdr)) * shnum))
 	{
 	  __libelf_seterrno (ELF_E_WRITE_ERROR);

@@ -19,11 +19,9 @@
 # include <config.h>
 #endif
 
-#include <errno.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-#include <system.h>
 #include "libelfP.h"
 #include "common.h"
 
@@ -150,10 +148,9 @@ elfw2(LIBELFBITS,getphdr) (elf)
 	  elf->state.ELFW(elf,LIBELFBITS).phdr_flags |= ELF_F_MALLOCED;
 
 	  /* Read the header.  */
-	  ssize_t n = pread_retry (elf->fildes,
-				   elf->state.ELFW(elf,LIBELFBITS).phdr, size,
-				   elf->start_offset + ehdr->e_phoff);
-	  if (unlikely ((size_t) n != size))
+	  if ((size_t) pread (elf->fildes,
+			      elf->state.ELFW(elf,LIBELFBITS).phdr, size,
+			      (elf->start_offset + ehdr->e_phoff)) != size)
 	    {
 	      /* Severe problems.  We cannot read the data.  */
 	      __libelf_seterrno (ELF_E_READ_ERROR);

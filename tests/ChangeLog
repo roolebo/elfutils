@@ -1,12 +1,6 @@
-2005-08-28  Ulrich Drepper  <drepper@redhat.com>
+2005-08-24  Roland McGrath  <roland@redhat.com>
 
-	* Makefile.an [BUILD_STATIC] (libdw): Add -ldl.
-	(CLEANFILES): Add *.gcno *.gcda *.gconv.
-
-2005-08-28  Ulrich Drepper  <drepper@redhat.com>
-
-	* run-strings-test.sh: New file.
-	* Makefile.am (TESTS, EXTRA_DIST): Add it.
+	* line2addr.c (print_address): Omit () for DSOs.
 
 2005-08-24  Ulrich Drepper  <drepper@redhat.com>
 

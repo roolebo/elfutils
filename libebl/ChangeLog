@@ -1,7 +1,3 @@
-2005-08-28  Ulrich Drepper  <drepper@redhat.com>
-
-	* Makefile.am: Use $(LINK) not $(CC) when creating DSOs.
-
 2005-08-13  Roland McGrath  <roland@redhat.com>
 
 	* ia64_symbol.c (ia64_machine_flag_check): New function.

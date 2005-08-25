@@ -19,13 +19,11 @@
 # include <config.h>
 #endif
 
-#include <errno.h>
 #include <stddef.h>
 #include <string.h>
 #include <unistd.h>
 
 #include "libelfP.h"
-#include <system.h>
 #include "common.h"
 #include "elf-knowledge.h"
 
@@ -241,7 +239,7 @@ __libelf_set_rawdata (Elf_Scn *scn)
       if (entsize == 0)
 	entsize = 1;
 
-      if (unlikely (size % entsize != 0))
+      if (size % entsize != 0)
 	{
 	  __libelf_seterrno (ELF_E_INVALID_DATA);
 	  return 1;
@@ -252,7 +250,7 @@ __libelf_set_rawdata (Elf_Scn *scn)
 	{
 	  /* First see whether the information in the section header is
 	     valid and it does not ask for too much.  */
-	  if (unlikely (offset + size > elf->maximum_size))
+	  if (offset + size > elf->maximum_size)
 	    {
 	      /* Something is wrong.  */
 	      __libelf_seterrno (ELF_E_INVALID_SECTION_HEADER);
@@ -262,7 +260,7 @@ __libelf_set_rawdata (Elf_Scn *scn)
 	  scn->rawdata_base = scn->rawdata.d.d_buf
 	    = (char *) elf->map_address + elf->start_offset + offset;
 	}
-      else if (likely (elf->fildes != -1))
+      else if (elf->fildes != -1)
 	{
 	  /* We have to read the data from the file.  Allocate the needed
 	     memory.  */
@@ -274,9 +272,8 @@ __libelf_set_rawdata (Elf_Scn *scn)
 	      return 1;
 	    }
 
-	  ssize_t n = pread_retry (elf->fildes, scn->rawdata.d.d_buf, size,
-				   elf->start_offset + offset);
-	  if (unlikely ((size_t) n != size))
+	  if ((size_t) pread (elf->fildes, scn->rawdata.d.d_buf, size,
+			      elf->start_offset + offset) != size)
 	    {
 	      /* Cannot read the data.  */
 	      free (scn->rawdata.d.d_buf);

@@ -1,8 +1,3 @@
-2005-08-28  Ulrich Drepper  <drepper@redhat.com>
-
-	* Makefile.am (%.os): Use COMPILE.os.
-	(COMPILE.os): Filter out gconv options.
-
 2005-08-24  Roland McGrath  <roland@redhat.com>
 
 	* argp-std.c [_MUDFLAP] (__libdwfl_argp_mudflap_options): New function,

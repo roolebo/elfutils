@@ -1,7 +1,3 @@
-2005-08-28  Ulrich Drepper  <drepper@redhat.com>
-
-	* system.h: Define pwrite_retry, write_retry, and pread_retry.
-
 2005-08-06  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.am (xmalloc_CFLAGS): Define only if !GPROF.

@@ -40,6 +40,11 @@
 #include <system.h>
 
 
+#define pread_retry(fd, buf, n, off) \
+     TEMP_FAILURE_RETRY (pread (fd, buf, n, off))
+#define write_retry(fd, buf, n) \
+     TEMP_FAILURE_RETRY (write (fd, buf, n))
+
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 # define le_bswap_32(val) bswap_32 (val)
 #else

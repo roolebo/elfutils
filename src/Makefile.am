@@ -38,7 +38,7 @@ native_ld = @native_ld@
 base_cpu = @base_cpu@
 
 bin_PROGRAMS = readelf nm size strip ld elflint findtextrel addr2line \
-	       elfcmp objdump ranlib strings
+	       elfcmp objdump ranlib
 
 
 ld_dsos = libld_elf_i386_pic.a
@@ -67,7 +67,7 @@ libmudflap = -lmudflap
 endif
 
 if BUILD_STATIC
-libdw = ../libdw/libdw.a $(libelf) $(libebl) -ldl
+libdw = ../libdw/libdw.a $(libelf) $(libebl)
 libelf = ../libelf/libelf.a
 else
 libdw = ../libdw/libdw.so
@@ -78,7 +78,6 @@ libeu = ../lib/libeu.a
 
 nm_no_Wformat = yes
 size_no_Wformat = yes
-strings_no_Wformat = yes
 # XXX While the file is not finished, don't warn about this
 ldgeneric_no_Wunused = yes
 
@@ -97,7 +96,6 @@ addr2line_LDADD = $(libdw) $(libmudflap)
 elfcmp_LDADD = $(libebl) $(libelf) $(libmudflap) -ldl
 objdump_LDADD  = $(libebl) $(libelf) $(libeu) $(libmudflap) -ldl
 ranlib_LDADD = $(libelf) $(libeu) $(libmudflap)
-strings_LDADD = $(libelf) $(libeu) $(libmudflap)
 
 ldlex.o: ldscript.c
 ldlex_no_Werror = yes
@@ -148,4 +146,4 @@ installcheck-binPROGRAMS: $(bin_PROGRAMS)
 	  done; \
 	done; rm -f c$${pid}_.???; exit $$bad
 
-CLEANFILES = none_ld.os $(ld_modules:.c=.os) *.gcno *.gcda *.gconv
+CLEANFILES = none_ld.os $(ld_modules:.c=.os)

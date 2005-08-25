@@ -1,5 +1,5 @@
 /* Retrieve uninterpreted chunk of the file contents.
-   Copyright (C) 2002, 2005 Red Hat, Inc.
+   Copyright (C) 2002 Red Hat, Inc.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
 
    This program is free software; you can redistribute it and/or modify
@@ -19,13 +19,11 @@
 # include <config.h>
 #endif
 
-#include <errno.h>
 #include <libelf.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-#include <system.h>
 #include "libelfP.h"
 
 
@@ -42,9 +40,9 @@ gelf_rawchunk (elf, offset, size)
       return NULL;
     }
 
-  if (unlikely (offset >= elf->maximum_size
-		|| offset + size >= elf->maximum_size
-		|| offset + size < offset))
+  if (offset >= elf->maximum_size
+      || offset + size >= elf->maximum_size
+      || offset + size < offset)
     {
       /* Invalid request.  */
       __libelf_seterrno (ELF_E_INVALID_OP);
@@ -61,9 +59,8 @@ gelf_rawchunk (elf, offset, size)
     __libelf_seterrno (ELF_E_NOMEM);
   else
     /* Read the file content.  */
-    if (unlikely ((size_t) pread_retry (elf->fildes, result, size,
-					elf->start_offset + offset)
-		  != size))
+    if ((size_t) pread (elf->fildes, result, size, elf->start_offset + offset)
+	!= size)
       {
 	/* Something went wrong.  */
 	__libelf_seterrno (ELF_E_READ_ERROR);

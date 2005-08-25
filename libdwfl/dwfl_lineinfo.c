@@ -25,7 +25,7 @@ dwfl_lineinfo (Dwfl_Line *line, Dwarf_Addr *addr, int *linep, int *colp,
   const Dwarf_Line *info = &cu->die.cu->lines->info[line->idx];
 
   if (addr != NULL)
-    *addr = info->addr - cu->mod->debug.bias;
+    *addr = info->addr + cu->mod->debug.bias;
   if (linep != NULL)
     *linep = info->line;
   if (colp != NULL)

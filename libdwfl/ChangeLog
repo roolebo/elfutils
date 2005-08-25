@@ -1,5 +1,7 @@
 2005-08-24  Roland McGrath  <roland@redhat.com>
 
+	* dwfl_lineinfo.c (dwfl_lineinfo): Add bias, don't subtract it.
+
 	* argp-std.c [_MUDFLAP] (__libdwfl_argp_mudflap_options): New function,
 	magic initializer to set -heur-stack-bound option.
 

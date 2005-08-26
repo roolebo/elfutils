@@ -1,3 +1,8 @@
+2005-08-25  Roland McGrath  <roland@redhat.com>
+
+	* cu.c (__libdwfl_nextcu): Return success when dwarf_nextcu hits end.
+	* dwfl_nextcu.c (dwfl_nextcu): Skip modules with no dwarf info.
+
 2005-08-24  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_lineinfo.c (dwfl_lineinfo): Add bias, don't subtract it.

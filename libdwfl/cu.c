@@ -230,9 +230,15 @@ __libdwfl_nextcu (Dwfl_Module *mod, struct dwfl_cu *lastcu,
     {
       size_t cuhdrsz;
       Dwarf_Off nextoff;
-      if (INTUSE(dwarf_nextcu) (mod->dw, cuoff, &nextoff, &cuhdrsz,
-				NULL, NULL, NULL) != 0)
+      int end = INTUSE(dwarf_nextcu) (mod->dw, cuoff, &nextoff, &cuhdrsz,
+					NULL, NULL, NULL);
+      if (end < 0)
 	return DWFL_E_LIBDW;
+      if (end > 0)
+	{
+	  *cu = NULL;
+	  return DWFL_E_NOERROR;
+	}
 
       Dwfl_Error result = intern_cu (mod, cuoff + cuhdrsz, nextp);
       if (result != DWFL_E_NOERROR)

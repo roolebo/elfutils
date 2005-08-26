@@ -31,20 +31,35 @@ dwfl_nextcu (Dwfl *dwfl, Dwarf_Die *lastcu, Dwarf_Addr *bias)
     mod = cu->mod;
 
   Dwfl_Error error;
-  while ((error = __libdwfl_nextcu (mod, cu, &cu)) == DWFL_E_NOERROR)
+  do
     {
+      error = __libdwfl_nextcu (mod, cu, &cu);
+      if (error != DWFL_E_NOERROR)
+	break;
+
       if (cu != NULL)
 	{
 	  *bias = mod->debug.bias;
 	  return &cu->die;
 	}
 
-      mod = mod->next;
+      do
+	{
+	  mod = mod->next;
 
-    nextmod:
-      if (mod == NULL || INTUSE(dwfl_module_getdwarf) (mod, bias) == NULL)
-	return NULL;
+	nextmod:
+	  if (mod == NULL)
+	    return NULL;
+
+	  error = mod->dwerr;
+	  if (error == DWFL_E_NOERROR
+	      && (mod->dw != NULL
+		  || INTUSE(dwfl_module_getdwarf) (mod, bias) != NULL))
+	    break;
+	}
+      while (error == DWFL_E_NO_DWARF);
     }
+  while (error == DWFL_E_NOERROR);
 
   __libdwfl_seterrno (error);
   return NULL;

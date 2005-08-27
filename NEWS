@@ -1,3 +1,7 @@
+Version 0.115:
+
+libdw: New function dwarf_getscopes_die.
+
 Version 0.114:
 
 libelf: new function elf_getaroff

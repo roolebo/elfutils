@@ -118,6 +118,8 @@ handle_address (GElf_Addr pc, Dwfl *dwfl)
 	  if (dwarf_lowpc (die, &lowpc) == 0
 	      && dwarf_highpc (die, &highpc) == 0)
 	    {
+	      lowpc += cubias;
+	      highpc += cubias;
 	      Dwfl_Line *loline = dwfl_getsrc (dwfl, lowpc);
 	      Dwfl_Line *hiline = dwfl_getsrc (dwfl, highpc);
 	      paddr (": ", lowpc, loline);

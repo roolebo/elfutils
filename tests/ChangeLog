@@ -1,5 +1,7 @@
 2005-08-27  Roland McGrath  <roland@redhat.com>
 
+	* addrscopes.c (handle_address): Apply bias to PC addresses.
+
 	* run-funcscopes.sh: New file.
 	* testfile25.bz2: New data file.
 	* Makefile.am (TESTS, EXTRA_DIST): Add them.

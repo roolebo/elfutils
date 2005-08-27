@@ -46,59 +46,82 @@ classify_die (Dwarf_Die *die)
 }
 
 int
-__libdw_visit_scopes (depth, root, visit, arg)
+__libdw_visit_scopes (depth, root, previsit, postvisit, arg)
      unsigned int depth;
-     Dwarf_Die *root;
-     int (*visit) (unsigned int depth, Dwarf_Die *die, void *arg);
+     struct Dwarf_Die_Chain *root;
+     int (*previsit) (unsigned int depth, struct Dwarf_Die_Chain *, void *);
+     int (*postvisit) (unsigned int depth, struct Dwarf_Die_Chain *, void *);
      void *arg;
 {
-  Dwarf_Die child;
-  if (INTUSE(dwarf_child) (root, &child) != 0)
+  struct Dwarf_Die_Chain child;
+
+  child.parent = root;
+  if (INTUSE(dwarf_child) (&root->die, &child.die) != 0)
     return -1;
+
+  inline int recurse (void)
+    {
+      return __libdw_visit_scopes (depth + 1, &child,
+				   previsit, postvisit, arg);
+    }
 
   do
     {
-      int result = (*visit) (depth, &child, arg);
-      if (result != DWARF_CB_OK)
-	return result;
+      child.prune = false;
 
-      switch (classify_die (&child))
+      if (previsit != NULL)
 	{
-	case match:
-	case match_inline:
-	case walk:
-	  if (INTUSE(dwarf_haschildren) (&child))
-	    {
-	      result = __libdw_visit_scopes (depth + 1, &child, visit, arg);
-	      if (result != DWARF_CB_OK)
-		return result;
-	    }
-	  break;
+	  int result = (*previsit) (depth + 1, &child, arg);
+	  if (result != DWARF_CB_OK)
+	    return result;
+	}
 
-	case imported:
+      if (!child.prune)
+	switch (classify_die (&child.die))
 	  {
-	    /* This is imports another compilation unit to appear
-	       as part of this one, inside the current scope.
-	       Recurse to searesulth the referenced unit, but without
-	       recording it as an inner scoping level.  */
-
-	    Dwarf_Attribute attr_mem;
-	    Dwarf_Attribute *attr = INTUSE(dwarf_attr) (&child, DW_AT_import,
-							&attr_mem);
-	    if (INTUSE(dwarf_formref_die) (attr, &child) != NULL)
+	  case match:
+	  case match_inline:
+	  case walk:
+	    if (INTUSE(dwarf_haschildren) (&child.die))
 	      {
-		result = __libdw_visit_scopes (depth + 1, &child, visit, arg);
-		if (result != 0)
+		int result = recurse ();
+		if (result != DWARF_CB_OK)
 		  return result;
 	      }
-	  }
-	  break;
+	    break;
 
-	default:
-	  break;
+	  case imported:
+	    {
+	      /* This imports another compilation unit to appear
+		 as part of this one, inside the current scope.
+		 Recurse to search the referenced unit, but without
+		 recording it as an inner scoping level.  */
+
+	      Dwarf_Attribute attr_mem;
+	      Dwarf_Attribute *attr = INTUSE(dwarf_attr) (&child.die,
+							  DW_AT_import,
+							  &attr_mem);
+	      if (INTUSE(dwarf_formref_die) (attr, &child.die) != NULL)
+		{
+		  int result = recurse ();
+		  if (result != DWARF_CB_OK)
+		    return result;
+		}
+	    }
+	    break;
+
+	  default:
+	    break;
+	  }
+
+      if (postvisit != NULL)
+	{
+	  int result = (*postvisit) (depth + 1, &child, arg);
+	  if (result != DWARF_CB_OK)
+	    return result;
 	}
     }
-  while (INTUSE(dwarf_siblingof) (&child, &child) == 0);
+  while (INTUSE(dwarf_siblingof) (&child.die, &child.die) == 0);
 
   return 0;
 }

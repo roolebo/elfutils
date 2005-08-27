@@ -206,13 +206,6 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
 }
 
 
-static const char *
-dwarf_diename_integrate (Dwarf_Die *die)
-{
-  Dwarf_Attribute attr_mem;
-  return dwarf_formstring (dwarf_attr_integrate (die, DW_AT_name, &attr_mem));
-}
-
 static bool
 print_dwarf_function (Dwfl_Module *mod, Dwarf_Addr addr)
 {
@@ -229,7 +222,7 @@ print_dwarf_function (Dwfl_Module *mod, Dwarf_Addr addr)
       {
       case DW_TAG_subprogram:
 	{
-	  const char *name = dwarf_diename_integrate (&scopes[i]);
+	  const char *name = dwarf_diename (&scopes[i]);
 	  if (name == NULL)
 	    return false;
 	  puts (name);
@@ -238,7 +231,7 @@ print_dwarf_function (Dwfl_Module *mod, Dwarf_Addr addr)
 
       case DW_TAG_inlined_subroutine:
 	{
-	  const char *name = dwarf_diename_integrate (&scopes[i]);
+	  const char *name = dwarf_diename (&scopes[i]);
 	  if (name == NULL)
 	    return false;
 	  printf ("%s inlined", name);

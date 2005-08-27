@@ -26,6 +26,8 @@ dwarf_diename (die)
 {
   Dwarf_Attribute attr_mem;
 
-  return INTUSE(dwarf_formstring) (INTUSE(dwarf_attr) (die, DW_AT_name,
-						       &attr_mem));
+  return INTUSE(dwarf_formstring) (INTUSE(dwarf_attr_integrate) (die,
+								 DW_AT_name,
+								 &attr_mem));
 }
+INTDEF (dwarf_diename)

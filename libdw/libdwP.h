@@ -343,9 +343,20 @@ extern int __libdw_func_intval (Dwarf_Func *func, int *linep, int attval)
      __nonnull_attribute__ (1, 2) internal_function;
 
 /* Helper function to walk scopes.  */
-extern int __libdw_visit_scopes (unsigned int depth, Dwarf_Die *root,
-				 int (*visit) (unsigned int depth,
-					       Dwarf_Die *die, void *arg),
+struct Dwarf_Die_Chain
+{
+  Dwarf_Die die;
+  struct Dwarf_Die_Chain *parent;
+  bool prune;			/* The PREVISIT function can set this.  */
+};
+extern int __libdw_visit_scopes (unsigned int depth,
+				 struct Dwarf_Die_Chain *root,
+				 int (*previsit) (unsigned int depth,
+						  struct Dwarf_Die_Chain *,
+						  void *arg),
+				 int (*postvisit) (unsigned int depth,
+						   struct Dwarf_Die_Chain *,
+						   void *arg),
 				 void *arg)
   __nonnull_attribute__ (2, 3) internal_function;
 
@@ -360,6 +371,7 @@ INTDECL (dwarf_attr_integrate)
 INTDECL (dwarf_begin_elf)
 INTDECL (dwarf_child)
 INTDECL (dwarf_dieoffset)
+INTDECL (dwarf_diename)
 INTDECL (dwarf_end)
 INTDECL (dwarf_errmsg)
 INTDECL (dwarf_formaddr)

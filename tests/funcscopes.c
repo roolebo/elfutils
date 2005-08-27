@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <error.h>
 #include <string.h>
+#include <fnmatch.h>
 
 
 static void
@@ -44,6 +45,7 @@ paddr (const char *prefix, Dwarf_Addr addr, Dwfl_Line *line)
   else
     printf ("%s%#" PRIx64, prefix, addr);
 }
+
 
 static void
 print_vars (unsigned int indent, Dwarf_Die *die)
@@ -87,23 +89,53 @@ print_vars (unsigned int indent, Dwarf_Die *die)
 
 #define INDENT 4
 
-static void
-handle_address (GElf_Addr pc, Dwfl *dwfl)
+struct args
 {
-  Dwarf_Addr cubias;
-  Dwarf_Die *cudie = dwfl_addrdie (dwfl, pc, &cubias);
-  if (cudie == NULL)
-    error (EXIT_FAILURE, 0, "dwfl_addrdie: %s", dwfl_errmsg (-1));
+  Dwfl *dwfl;
+  Dwarf_Die *cu;
+  Dwarf_Addr dwbias;
+  char **argv;
+};
+
+static int
+handle_function (Dwarf_Func *func, void *arg)
+{
+  struct args *a = arg;
+
+  const char *name = dwarf_func_name (func);
+  char **argv = a->argv;
+  if (argv[0] != NULL)
+    {
+      bool match;
+      do
+	match = fnmatch (*argv, name, 0) == 0;
+      while (!match && *++argv);
+      if (!match)
+	return 0;
+    }
+
+  Dwarf_Die funcdie_mem;
+  Dwarf_Die *funcdie = dwarf_func_die (func, &funcdie_mem);
+  assert (funcdie == &funcdie_mem);
 
   Dwarf_Die *scopes;
-  int n = dwarf_getscopes (cudie, pc - cubias, &scopes);
-  if (n < 0)
-    error (EXIT_FAILURE, 0, "dwarf_getscopes: %s", dwarf_errmsg (-1));
-  else if (n == 0)
-    printf ("%#" PRIx64 ": not in any scope\n", pc);
+  int n = dwarf_getscopes_die (funcdie, &scopes);
+  if (n <= 0)
+    error (EXIT_FAILURE, 0, "dwarf_getscopes_die: %s", dwarf_errmsg (-1));
   else
     {
-      printf ("%#" PRIx64 ":\n", pc);
+      Dwarf_Addr start, end;
+      const char *fname;
+      const char *modname = dwfl_module_info (dwfl_cumodule (a->cu), NULL,
+					      &start, &end,
+					      NULL, NULL,
+					      &fname, NULL);
+      if (modname == NULL)
+	error (EXIT_FAILURE, 0, "dwfl_module_info: %s", dwarf_errmsg (-1));
+      if (modname[0] == '\0')
+	modname = fname;
+      printf ("%s: %#" PRIx64 " .. %#" PRIx64 "\n", modname, start, end);
+
       unsigned int indent = 0;
       while (n-- > 0)
 	{
@@ -118,8 +150,10 @@ handle_address (GElf_Addr pc, Dwfl *dwfl)
 	  if (dwarf_lowpc (die, &lowpc) == 0
 	      && dwarf_highpc (die, &highpc) == 0)
 	    {
-	      Dwfl_Line *loline = dwfl_getsrc (dwfl, lowpc);
-	      Dwfl_Line *hiline = dwfl_getsrc (dwfl, highpc);
+	      lowpc += a->dwbias;
+	      highpc += a->dwbias;
+	      Dwfl_Line *loline = dwfl_getsrc (a->dwfl, lowpc);
+	      Dwfl_Line *hiline = dwfl_getsrc (a->dwfl, highpc);
 	      paddr (": ", lowpc, loline);
 	      if (highpc != lowpc)
 		paddr (" .. ", lowpc, hiline == loline ? NULL : hiline);
@@ -129,7 +163,10 @@ handle_address (GElf_Addr pc, Dwfl *dwfl)
 	  print_vars (indent + INDENT, die);
 	}
     }
+
+  return 0;
 }
+
 
 int
 main (int argc, char *argv[])
@@ -139,49 +176,17 @@ main (int argc, char *argv[])
   /* Set locale.  */
   (void) setlocale (LC_ALL, "");
 
-  Dwfl *dwfl = NULL;
-  (void) argp_parse (dwfl_standard_argp (), argc, argv, 0, &remaining, &dwfl);
-  assert (dwfl != NULL);
+  struct args a = { .dwfl = NULL, .cu = NULL };
+
+  (void) argp_parse (dwfl_standard_argp (), argc, argv, 0, &remaining,
+		     &a.dwfl);
+  assert (a.dwfl != NULL);
+  a.argv = &argv[remaining];
 
   int result = 0;
 
-  /* Now handle the addresses.  In case none are given on the command
-     line, read from stdin.  */
-  if (remaining == argc)
-    {
-      /* We use no threads here which can interfere with handling a stream.  */
-      (void) __fsetlocking (stdin, FSETLOCKING_BYCALLER);
-
-      char *buf = NULL;
-      size_t len = 0;
-      while (!feof_unlocked (stdin))
-	{
-	  if (getline (&buf, &len, stdin) < 0)
-	    break;
-
-	  char *endp;
-	  uintmax_t addr = strtoumax (buf, &endp, 0);
-	  if (endp != buf)
-	    handle_address (addr, dwfl);
-	  else
-	    result = 1;
-	}
-
-      free (buf);
-    }
-  else
-    {
-      do
-	{
-	  char *endp;
-	  uintmax_t addr = strtoumax (argv[remaining], &endp, 0);
-	  if (endp != argv[remaining])
-	    handle_address (addr, dwfl);
-	  else
-	    result = 1;
-	}
-      while (++remaining < argc);
-    }
+  while ((a.cu = dwfl_nextcu (a.dwfl, a.cu, &a.dwbias)) != NULL)
+    dwarf_getfuncs (a.cu, &handle_function, &a, 0);
 
   return result;
 }

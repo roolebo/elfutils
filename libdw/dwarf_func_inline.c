@@ -14,15 +14,15 @@ struct visitor_info
 
 static int
 scope_visitor (unsigned int depth __attribute__ ((unused)),
-	       Dwarf_Die *die, void *arg)
+	       struct Dwarf_Die_Chain *die, void *arg)
 {
   struct visitor_info *const v = arg;
 
-  if (INTUSE(dwarf_tag) (die) != DW_TAG_inlined_subroutine)
+  if (INTUSE(dwarf_tag) (&die->die) != DW_TAG_inlined_subroutine)
     return DWARF_CB_OK;
 
   Dwarf_Attribute attr_mem;
-  Dwarf_Attribute *attr = INTUSE(dwarf_attr) (die, DW_AT_abstract_origin,
+  Dwarf_Attribute *attr = INTUSE(dwarf_attr) (&die->die, DW_AT_abstract_origin,
 					      &attr_mem);
   if (attr == NULL)
     return DWARF_CB_OK;
@@ -35,7 +35,7 @@ scope_visitor (unsigned int depth __attribute__ ((unused)),
   if (origin->addr != v->die_addr)
     return DWARF_CB_OK;
 
-  return (*v->callback) (die, v->arg);
+  return (*v->callback) (&die->die, v->arg);
 }
 
 int
@@ -68,5 +68,6 @@ dwarf_func_inline_instances (Dwarf_Func *func,
 			     void *arg)
 {
   struct visitor_info v = { func->die->addr, callback, arg };
-  return __libdw_visit_scopes (0, func->cudie, &scope_visitor, &v);
+  struct Dwarf_Die_Chain cu = { .die = *func->cudie, .parent = NULL };
+  return __libdw_visit_scopes (0, &cu, &scope_visitor, NULL, &v);
 }

@@ -1,3 +1,25 @@
+2005-08-27  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_getscopes.c (dwarf_getscopes): Rewritten using
+	__libdw_visit_scopes.
+
+	* dwarf_getscopes_die.c: New file.
+	* Makefile.am (libdw_a_SOURCES): Add it.
+	* libdw.h: Declare dwarf_getscopes_die.
+	* libdw.map: Bump to 0.115 and add it.
+
+	* libdw_visit_scopes.c (__libdw_visit_scopes): Pass a struct
+	containing a DIE and its parent pointer, instead of just Dwarf_Die.
+	Take two functions for both preorder and postorder visitors.
+	* libdwP.h: Update decl.
+	(struct Dwarf_Die_Chain): New type.
+	* dwarf_func_inline.c: Update uses.
+
+	* dwarf_diename.c (dwarf_diename): Use dwarf_attr_integrate.
+	Add INTDEF.
+	* libdwP.h: Add INTDECL.
+	* dwarf_func_name.c (dwarf_func_name): Use dwarf_diename.
+
 2005-08-23  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_attr_integrate.c (dwarf_attr_integrate): Treat

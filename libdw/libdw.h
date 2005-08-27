@@ -442,6 +442,15 @@ extern int dwarf_addrloclists (Dwarf_Attribute *attr, Dwarf_Addr address,
 extern int dwarf_getscopes (Dwarf_Die *cudie, Dwarf_Addr pc,
 			    Dwarf_Die **scopes);
 
+/* Return scope DIEs containing the given DIE.
+   Sets *SCOPES to a malloc'd array of Dwarf_Die structures,
+   and returns the number of elements in the array.
+   (*SCOPES)[0] is a copy of DIE.
+   (*SCOPES)[1] is the DIE for the scope containing that scope, and so on.
+   Returns -1 for errors or 0 if DIE is not found in any scope entry.  */
+extern int dwarf_getscopes_die (Dwarf_Die *die, Dwarf_Die **scopes);
+
+
 /* Search SCOPES[0..NSCOPES-1] for a variable called NAME.
    Ignore the first SKIP_SHADOWS scopes that match the name.
    If MATCH_FILE is not null, accept only declaration in that source file;

@@ -1,3 +1,8 @@
+2005-08-27  Roland McGrath  <roland@redhat.com>
+
+	* addr2line.c (dwarf_diename_integrate): Function removed.
+	(print_dwarf_function): Use plain dwarf_diename.
+
 2005-08-24  Ulrich Drepper  <drepper@redhat.com>
 
 	* elflint.c (check_versym): Versioned symbols should not have

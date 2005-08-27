@@ -1,3 +1,28 @@
+2005-08-27  Roland McGrath  <roland@redhat.com>
+
+	* run-funcscopes.sh: New file.
+	* testfile25.bz2: New data file.
+	* Makefile.am (TESTS, EXTRA_DIST): Add them.
+
+2005-08-26  Roland McGrath  <roland@redhat.com>
+
+	* addrscopes.c (dwarf_diename_integrate): Removed.
+	(print_vars, handle_address): Use plain dwarf_diename.
+
+2005-08-25  Roland McGrath  <roland@redhat.com>
+
+	* funcscopes.c: New file.
+	* Makefile.am (noinst_PROGRAMS): Add it.
+	(funcscopes_LDADD): New variable.
+
+	* run-addrscopes.sh: Add another case.
+	* testfile24.bz2: New data file.
+	* Makefile.am (EXTRA_DIST): Add it.
+
+	* addrscopes.c (handle_address): Take new argument IGNORE_INLINES,
+	pass it to dwarf_getscopes.
+	(main): Pass it, true when '=' follows an address.
+
 2005-08-24  Roland McGrath  <roland@redhat.com>
 
 	* line2addr.c (print_address): Omit () for DSOs.

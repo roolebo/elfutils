@@ -48,7 +48,7 @@ libdw_a_SOURCES = dwarf_begin.c dwarf_begin_elf.c dwarf_end.c dwarf_getelf.c \
 		  dwarf_getabbrevcode.c dwarf_abbrevhaschildren.c \
 		  dwarf_getattrcnt.c dwarf_getabbrevattr.c \
 		  dwarf_getsrclines.c dwarf_getsrc_die.c \
-		  dwarf_getscopes.c dwarf_getscopevar.c \
+		  dwarf_getscopes.c dwarf_getscopes_die.c dwarf_getscopevar.c \
 		  dwarf_linesrc.c dwarf_lineno.c dwarf_lineaddr.c \
 		  dwarf_linecol.c dwarf_linebeginstatement.c \
 		  dwarf_lineendsequence.c dwarf_lineblock.c \

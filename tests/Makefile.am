@@ -30,7 +30,7 @@ INCLUDES = -I$(top_srcdir)/libasm -I$(top_srcdir)/libdw \
 noinst_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  showptable update1 update2 update3 update4 test-nlist \
 		  show-die-info get-files get-lines get-pubnames \
-		  get-aranges allfcts line2addr addrscopes \
+		  get-aranges allfcts line2addr addrscopes funcscopes \
 		  show-abbrev hash asm-tst1 asm-tst2 asm-tst3 \
 		  asm-tst4 asm-tst5 asm-tst6 asm-tst7 asm-tst8 asm-tst9 \
 		  msg_tst newscn ecp dwflmodtest
@@ -47,7 +47,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-strip-test6.sh run-ecp-test.sh run-ecp-test2.sh \
 	run-elflint-test.sh run-elflint-self.sh run-ranlib-test.sh \
 	run-ranlib-test2.sh run-ranlib-test3.sh run-ranlib-test4.sh \
-	run-addrscopes.sh
+	run-addrscopes.sh run-funcscopes.sh
 # run-show-ciefde.sh
 
 EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
@@ -63,14 +63,14 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-strip-test4.sh run-strip-test5.sh run-strip-test6.sh \
 	     run-elflint-self.sh run-ranlib-test.sh run-ranlib-test2.sh \
 	     run-ranlib-test3.sh run-ranlib-test4.sh \
-	     run-addrscopes.sh \
+	     run-addrscopes.sh run-funcscopes.sh \
 	     testfile15.bz2 testfile15.debug.bz2 \
 	     testfile16.bz2 testfile16.debug.bz2 \
 	     testfile17.bz2 testfile17.debug.bz2 \
 	     testfile18.bz2 testfile19.bz2 testfile19.index.bz2 \
 	     testfile20.bz2 testfile20.index.bz2 \
 	     testfile21.bz2 testfile21.index.bz2 \
-	     testfile22.bz2 testfile23.bz2
+	     testfile22.bz2 testfile23.bz2 testfile24.bz2 testfile25.bz2
 
 if MUDFLAP
 static_build=yes
@@ -114,6 +114,7 @@ allfcts_LDADD = $(libdw) $(libelf) $(libmudflap)
 line2addr_no_Wformat = yes
 line2addr_LDADD = $(libdw) $(libmudflap)
 addrscopes_LDADD = $(libdw) $(libmudflap)
+funcscopes_LDADD = $(libdw) $(libmudflap)
 #show_ciefde_LDADD = ../libdwarf/libdwarf.so $(libelf) $(libmudflap)
 asm_tst1_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl
 asm_tst2_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl

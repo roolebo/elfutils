@@ -1,5 +1,5 @@
 ELFUTILS_0 { };
-ELFUTILS_0.114 {
+ELFUTILS_0.115 {
   global:
     dwarf_abbrevhaschildren;
     dwarf_addrdie;
@@ -53,6 +53,7 @@ ELFUTILS_0.114 {
     dwarf_getmacros;
     dwarf_getpubnames;
     dwarf_getscopes;
+    dwarf_getscopes_die;
     dwarf_getscopevar;
     dwarf_getscn_info;
     dwarf_getsrc_die;

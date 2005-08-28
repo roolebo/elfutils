@@ -1,6 +1,8 @@
 2005-08-28  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.am: Use $(LINK) not $(CC) when creating DSO.
+	(%.os): Use COMPILE.os.
+	(COMPILE.os): Filter out gconv options.
 
 2005-08-23  Roland McGrath  <roland@redhat.com>
 

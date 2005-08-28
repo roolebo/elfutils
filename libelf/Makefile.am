@@ -31,6 +31,9 @@ GCC_INCLUDE = -I$(shell $(CC) -print-file-name=include)
 VERSION = 1
 PACKAGE_VERSION = @PACKAGE_VERSION@
 
+COMPILE.os = $(filter-out -fprofile-arcs, $(filter-out -ftest-coverage, \
+						       $(COMPILE)))
+
 lib_LIBRARIES = libelf.a
 if !MUDFLAP
 noinst_LIBRARIES = libelf_pic.a
@@ -99,7 +102,7 @@ libelf.so: libelf_pic.a libelf.map
 	ln -fs $@ $@.$(VERSION)
 
 %.os: %.c %.o
-	if $(COMPILE) -c -o $@ -fpic -DPIC -DSHARED -MT $@ -MD -MP \
+	if $(COMPILE.os) -c -o $@ -fpic -DPIC -DSHARED -MT $@ -MD -MP \
 	  -MF "$(DEPDIR)/$*.Tpo" `test -f '$<' || echo '$(srcdir)/'`$<; \
 	then cat "$(DEPDIR)/$*.Tpo" >> "$(DEPDIR)/$*.Po"; \
 	     rm -f "$(DEPDIR)/$*.Tpo"; \

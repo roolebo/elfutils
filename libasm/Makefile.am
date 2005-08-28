@@ -24,6 +24,9 @@ INCLUDES = -I. -I$(srcdir) -I.. -I$(top_srcdir)/libelf -I$(top_srcdir)/libebl \
 GCC_INCLUDE = -I$(shell $(CC) -print-file-name=include)
 VERSION = 1
 
+COMPILE.os = $(filter-out -fprofile-arcs, $(filter-out -ftest-coverage, \
+						       $(COMPILE)))
+
 lib_LIBRARIES = libasm.a
 if !MUDFLAP
 noinst_LIBRARIES = libasm_pic.a
@@ -60,7 +63,7 @@ libasm.so: libasm_pic.a libasm.map
 
 
 %.os: %.c %.o
-	if $(COMPILE) -c -o $@ -fpic -DPIC -DSHARED -MT $@ -MD -MP \
+	if $(COMPILE.os) -c -o $@ -fpic -DPIC -DSHARED -MT $@ -MD -MP \
 	  -MF "$(DEPDIR)/$*.Tpo" `test -f '$<' || echo '$(srcdir)/'`$<; \
 	then cat "$(DEPDIR)/$*.Tpo" >> "$(DEPDIR)/$*.Po"; \
 	     rm -f "$(DEPDIR)/$*.Tpo"; \

@@ -22,6 +22,9 @@ AM_CFLAGS += -Wall -Werror -Wshadow -Wunused -Wformat=2 -Wextra -std=gnu99
 INCLUDES = -I. -I$(srcdir) -I$(srcdir)/../libelf -I.. -I$(srcdir)/../lib
 VERSION = 1
 
+COMPILE.os = $(filter-out -fprofile-arcs, $(filter-out -ftest-coverage, \
+						       $(COMPILE)))
+
 lib_LIBRARIES = libdw.a
 if !MUDFLAP
 noinst_LIBRARIES = libdw_pic.a
@@ -84,7 +87,7 @@ libdw.so: $(srcdir)/libdw.map libdw_pic.a \
 	ln -fs $@ $@.$(VERSION)
 
 %.os: %.c %.o
-	if $(COMPILE) -c -o $@ -fpic -DPIC -DSHARED -MT $@ -MD -MP \
+	if $(COMPILE.os) -c -o $@ -fpic -DPIC -DSHARED -MT $@ -MD -MP \
 	   -MF "$(DEPDIR)/$*.Tpo" `test -f '$<' || echo '$(srcdir)/'`$<; \
 	then cat "$(DEPDIR)/$*.Tpo" >> "$(DEPDIR)/$*.Po"; \
 	     rm -f "$(DEPDIR)/$*.Tpo"; \

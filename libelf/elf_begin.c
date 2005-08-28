@@ -77,41 +77,25 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
   bool is32 = e_ident[EI_CLASS] == ELFCLASS32;
 
   /* Make the ELF header available.  */
-  if (likely (map_address != NULL) && e_ident[EI_DATA] == MY_ELFDATA
-      && (ALLOW_UNALIGNED
-	  || (((size_t) ((char *) map_address + offset))
-	      & ((is32 ? __alignof__ (Elf32_Ehdr) : __alignof__ (Elf64_Ehdr))
-		 - 1)) == 0))
-    ehdr.p = (char *) map_address + offset;
+  if (e_ident[EI_DATA] == MY_ELFDATA)
+    ehdr.p = e_ident;
   else
     {
-      /* We have to read the data from the file.  */
-      size_t len = is32 ? sizeof (Elf32_Ehdr) : sizeof (Elf64_Ehdr);
+      /* We already read the ELF header.  We have to copy the header
+	 since we possibly modify the data here and the caller
+	 expects the memory it passes in to be preserved.  */
+      ehdr.p = memcpy (&ehdr_mem, e_ident,
+		       is32 ? sizeof (Elf32_Ehdr) : sizeof (Elf64_Ehdr));
 
-      if (likely (map_address != NULL))
-	ehdr.p = memcpy (&ehdr_mem, (char *) map_address + offset, len);
+      if (is32)
+	{
+	  CONVERT (ehdr.e32->e_shnum);
+	  CONVERT (ehdr.e32->e_shoff);
+	}
       else
 	{
-	  /* Fill it.  */
-	  if ((size_t) TEMP_FAILURE_RETRY (pread (fildes, &ehdr_mem, len,
-						  offset)) != len)
-	    /* Failed reading.  */
-	    return (size_t) -1l;
-	  ehdr.p = &ehdr_mem;
-	}
-
-      if (e_ident[EI_DATA] != MY_ELFDATA)
-	{
-	  if (is32)
-	    {
-	      CONVERT (ehdr.e32->e_shnum);
-	      CONVERT (ehdr.e32->e_shoff);
-	    }
-	  else
-	    {
-	      CONVERT (ehdr.e64->e_shnum);
-	      CONVERT (ehdr.e64->e_shoff);
-	    }
+	  CONVERT (ehdr.e64->e_shnum);
+	  CONVERT (ehdr.e64->e_shoff);
 	}
     }
 
@@ -215,31 +199,9 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
 
 /* Create descriptor for ELF file in memory.  */
 static Elf *
-file_read_elf (int fildes, void *map_address, off_t offset, size_t maxsize,
-	       Elf_Cmd cmd, Elf *parent)
+file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
+	       off_t offset, size_t maxsize, Elf_Cmd cmd, Elf *parent)
 {
-  /* We only read the ELF header now.  */
-  unsigned char *e_ident;
-  unsigned char e_ident_mem[EI_NIDENT];
-  size_t scncnt;
-  Elf *elf;
-
-  if (map_address != NULL)
-    /* It's right at the beginning of the file.  No word access
-       required, just bytes.  */
-    e_ident = (unsigned char *) map_address + offset;
-  else
-    {
-      e_ident = e_ident_mem;
-
-      if (TEMP_FAILURE_RETRY (pread (fildes, e_ident, EI_NIDENT, offset))
-	  != EI_NIDENT)
-	{
-	  __libelf_seterrno (ELF_E_READ_ERROR);
-	  return NULL;
-	}
-    }
-
   /* Verify the binary is of the class we can handle.  */
   if ((e_ident[EI_CLASS] != ELFCLASS32
        && e_ident[EI_CLASS] != ELFCLASS64)
@@ -253,14 +215,14 @@ file_read_elf (int fildes, void *map_address, off_t offset, size_t maxsize,
     }
 
   /* Determine the number of sections.  */
-  scncnt = get_shnum (map_address, e_ident, fildes, offset, maxsize);
+  size_t scncnt = get_shnum (map_address, e_ident, fildes, offset, maxsize);
   if (scncnt == (size_t) -1l)
     /* Could not determine the number of sections.  */
     return NULL;
 
   /* We can now allocate the memory.  */
-  elf = allocate_elf (fildes, map_address, offset, maxsize, cmd, parent,
-		      ELF_K_ELF, scncnt * sizeof (Elf_Scn));
+  Elf *elf = allocate_elf (fildes, map_address, offset, maxsize, cmd, parent,
+			   ELF_K_ELF, scncnt * sizeof (Elf_Scn));
   if (elf == NULL)
     /* Not enough memory.  */
     return NULL;
@@ -319,16 +281,8 @@ file_read_elf (int fildes, void *map_address, off_t offset, size_t maxsize,
 	    memcpy (&elf->state.elf32.ehdr_mem,
 		    (char *) map_address + offset, sizeof (Elf32_Ehdr));
 	  else
-	    /* Read the data.  */
-	    if (TEMP_FAILURE_RETRY (pread (elf->fildes,
-					   &elf->state.elf32.ehdr_mem,
-					   sizeof (Elf32_Ehdr), offset))
-		!= sizeof (Elf32_Ehdr))
-	      {
-		/* We must be able to read the ELF header.  */
-		__libelf_seterrno (ELF_E_INVALID_FILE);
-		return NULL;
-	      }
+	    /* Copy the data.  */
+	    memcpy (&elf->state.elf32.ehdr_mem, e_ident, sizeof (Elf32_Ehdr));
 
 	  if (e_ident[EI_DATA] != MY_ELFDATA)
 	    {
@@ -411,16 +365,8 @@ file_read_elf (int fildes, void *map_address, off_t offset, size_t maxsize,
 	    memcpy (&elf->state.elf64.ehdr_mem,
 		    (char *) map_address + offset, sizeof (Elf64_Ehdr));
 	  else
-	    /* Read the data.  */
-	    if (TEMP_FAILURE_RETRY (pread (elf->fildes,
-					   &elf->state.elf64.ehdr_mem,
-					   sizeof (Elf64_Ehdr), offset))
-		!= sizeof (Elf64_Ehdr))
-	    {
-	      /* We must be able to read the ELF header.  */
-	      __libelf_seterrno (ELF_E_INVALID_FILE);
-	      return NULL;
-	    }
+	    /* Copy the data.  */
+	    memcpy (&elf->state.elf64.ehdr_mem, e_ident, sizeof (Elf64_Ehdr));
 
 	  if (e_ident[EI_DATA] != MY_ELFDATA)
 	    {
@@ -469,15 +415,16 @@ __libelf_read_mmaped_file (int fildes, void *map_address,  off_t offset,
      files and archives.  To find out what we have we must look at the
      header.  The header for an ELF file is EI_NIDENT bytes in size,
      the header for an archive file SARMAG bytes long.  */
-  Elf_Kind kind;
+  unsigned char *e_ident = (unsigned char *) map_address + offset;
 
   /* See what kind of object we have here.  */
-  kind = determine_kind (map_address + offset, maxsize);
+  Elf_Kind kind = determine_kind (e_ident, maxsize);
 
   switch (kind)
     {
     case ELF_K_ELF:
-      return file_read_elf (fildes, map_address, offset, maxsize, cmd, parent);
+      return file_read_elf (fildes, map_address, e_ident, offset, maxsize,
+			    cmd, parent);
 
     case ELF_K_AR:
       return file_read_ar (fildes, map_address, offset, maxsize, cmd, parent);
@@ -499,25 +446,33 @@ read_unmmaped_file (int fildes, off_t offset, size_t maxsize, Elf_Cmd cmd,
 {
   /* We have to find out what kind of file this is.  We handle ELF
      files and archives.  To find out what we have we must read the
-     header.  The header for an ELF file is EI_NIDENT bytes in size,
-     the header for an archive file SARMAG bytes long.  Read the
-     maximum of these numbers.
+     header.  The identification header for an ELF file is EI_NIDENT
+     bytes in size, but we read the whole ELF header since we will
+     need it anyway later.  For archives the header in SARMAG bytes
+     long.  Read the maximum of these numbers.
 
-     XXX We have to change this for the extended `ar' format some day.  */
-  unsigned char header[MAX (EI_NIDENT, SARMAG)];
-  ssize_t nread;
-  Elf_Kind kind;
+     XXX We have to change this for the extended `ar' format some day.
+
+     Use a union to ensure alignment.  We might later access the
+     memory as a ElfXX_Ehdr.  */
+  union
+  {
+    Elf64_Ehdr ehdr;
+    unsigned char header[MAX (sizeof (Elf64_Ehdr), SARMAG)];
+  } mem;
 
   /* Read the head of the file.  */
-  nread = pread (fildes, header, MIN (MAX (EI_NIDENT, SARMAG), maxsize),
-		 offset);
+  ssize_t nread = pread (fildes, mem.header, MIN (MAX (sizeof (Elf64_Ehdr),
+						       SARMAG),
+						  maxsize),
+			 offset);
   if (nread == -1)
     /* We cannot even read the head of the file.  Maybe FILDES is associated
        with an unseekable device.  This is nothing we can handle.  */
     return NULL;
 
   /* See what kind of object we have here.  */
-  kind = determine_kind (header, nread);
+  Elf_Kind kind = determine_kind (mem.header, nread);
 
   switch (kind)
     {
@@ -526,9 +481,10 @@ read_unmmaped_file (int fildes, off_t offset, size_t maxsize, Elf_Cmd cmd,
 
     case ELF_K_ELF:
       /* Make sure at least the ELF header is contained in the file.  */
-      if (maxsize >= (header[EI_CLASS] == ELFCLASS32
-		      ? sizeof (Elf32_Ehdr) : sizeof (Elf64_Ehdr)))
-	return file_read_elf (fildes, NULL, offset, maxsize, cmd, parent);
+      if ((size_t) nread >= (mem.header[EI_CLASS] == ELFCLASS32
+			     ? sizeof (Elf32_Ehdr) : sizeof (Elf64_Ehdr)))
+	return file_read_elf (fildes, NULL, mem.header, offset, maxsize, cmd,
+			      parent);
       /* FALLTHROUGH */
 
     default:
@@ -596,10 +552,11 @@ read_file (int fildes, off_t offset, size_t maxsize,
   /* If we have the file in memory optimize the access.  */
   if (map_address != NULL)
     {
-      struct Elf *result;
+      assert (map_address != MAP_FAILED);
 
-      result = __libelf_read_mmaped_file (fildes, map_address, offset, maxsize,
-					  cmd, parent);
+      struct Elf *result = __libelf_read_mmaped_file (fildes, map_address,
+						      offset, maxsize, cmd,
+						      parent);
 
       /* If something went wrong during the initialization unmap the
 	 memory if we mmaped here.  */

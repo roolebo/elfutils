@@ -138,8 +138,19 @@ if test "$use_gprof" = yes; then
   LDFLAGS="$LDFLAGS -pg"
 fi
 AM_CONDITIONAL(GPROF, test "$use_gprof" = yes)
+
+# Enable gcov suport.
+AC_ARG_ENABLE([gcov],
+AC_HELP_STRING([--enable-gcov],
+[build binaries with gcov support]), [use_gcov=yes], [use_gcov=no])
+if test "$use_gcov" = yes; then
+  CFLAGS="$CFLAGS -fprofile-arcs -ftest-coverage"
+  LDFLAGS="$LDFLAGS -fprofile-arcs"
+fi
+AM_CONDITIONAL(GPROF, test "$use_gprof" = yes)
+
 AM_CONDITIONAL(BUILD_STATIC, [dnl
-test "$use_mudflap" = yes -o "$use_gprof" = yes])
+test "$use_mudflap" = yes -o "$use_gprof" = yes -o "$use_gcov" = yes])
 
 LIBEBL_SUBDIR="$PACKAGE"
 AC_ARG_ENABLE([libebl-subdir],

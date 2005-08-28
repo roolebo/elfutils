@@ -1,3 +1,7 @@
+2005-08-28  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: Use $(LINK) not $(CC) when creating DSO.
+
 2005-08-23  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_attr_integrate.c (dwarf_attr_integrate): Treat

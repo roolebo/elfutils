@@ -1,3 +1,7 @@
+2005-08-28  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: Use $(LINK) not $(CC) when creating DSO.
+
 2005-08-27  Ulrich Drepper  <drepper@redhat.com>
 
 	* elf_begin.c (file_read_elf): Avoid reading ELF header from file

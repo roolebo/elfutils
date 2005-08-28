@@ -334,7 +334,7 @@ process_chunk_mb (const char *fname, const unsigned char *buf, off64_t to,
 	    ch = buf[3] << 24 | buf[2] << 16 | buf[1] << 8 | buf[0];
 	}
 
-      if (ch <= 255 && (ch == '\t' || isprint (ch)))
+      if (ch <= 255 && (isprint (ch) || ch == '\t'))
 	{
 	  ++buf;
 	  ++curlen;
@@ -399,8 +399,7 @@ process_chunk (const char *fname, const unsigned char *buf, off64_t to,
   const unsigned char *start = buf;
   while (len > 0)
     {
-      if ((*buf == '\t' || isprint (*buf))
-	       && (! char_7bit || *buf <= 127))
+      if ((isprint (*buf) || *buf == '\t') && (! char_7bit || *buf <= 127))
 	{
 	  ++buf;
 	  ++curlen;

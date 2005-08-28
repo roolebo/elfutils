@@ -78,7 +78,7 @@ libmudflap = -lmudflap
 endif
 
 if BUILD_STATIC
-libdw = ../libdw/libdw.a $(libelf) $(libebl)
+libdw = ../libdw/libdw.a $(libelf) $(libebl) -ldl
 libelf = ../libelf/libelf.a
 libasm = ../libasm/libasm.a
 else
@@ -126,4 +126,4 @@ asm_tst8_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl
 asm_tst9_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl
 dwflmodtest_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
 
-CLEANFILES = xxx
+CLEANFILES = xxx *.gcno *.gcda *gconv

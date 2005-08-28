@@ -92,9 +92,9 @@ am_libelf_pic_a_OBJECTS = $(libelf_a_SOURCES:.c=.os)
 
 libelf_so_SOURCES =
 libelf.so: libelf_pic.a libelf.map
-	$(CC) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
-	      -Wl,--version-script,$(srcdir)/libelf.map,--no-undefined \
-	      -Wl,--soname,$@.$(VERSION),-z,-defs
+	$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
+		-Wl,--version-script,$(srcdir)/libelf.map,--no-undefined \
+		-Wl,--soname,$@.$(VERSION),-z,-defs
 	if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
 	ln -fs $@ $@.$(VERSION)
 
@@ -122,4 +122,4 @@ noinst_HEADERS = elf.h abstract.h common.h exttypes.h gelf_xlate.h libelfP.h \
 		 version_xlate.h dl-hash.h
 EXTRA_DIST = libelf.map
 
-CLEANFILES = $(am_libelf_pic_a_OBJECTS)
+CLEANFILES = $(am_libelf_pic_a_OBJECTS) *.gcno *.gcda

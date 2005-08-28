@@ -67,7 +67,7 @@ libmudflap = -lmudflap
 endif
 
 if BUILD_STATIC
-libdw = ../libdw/libdw.a $(libelf) $(libebl)
+libdw = ../libdw/libdw.a $(libelf) $(libebl) -ldl
 libelf = ../libelf/libelf.a
 else
 libdw = ../libdw/libdw.so
@@ -148,4 +148,4 @@ installcheck-binPROGRAMS: $(bin_PROGRAMS)
 	  done; \
 	done; rm -f c$${pid}_.???; exit $$bad
 
-CLEANFILES = none_ld.os $(ld_modules:.c=.os)
+CLEANFILES = none_ld.os $(ld_modules:.c=.os) *.gcno *.gcda *.gconv

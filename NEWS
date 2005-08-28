@@ -4,6 +4,8 @@ libelf: speed-ups of non-mmap reading.
 
 strings: New program.
 
+Implement --enable-gcov option for configure.
+
 Version 0.114:
 
 libelf: new function elf_getaroff

@@ -51,10 +51,10 @@ am_libasm_pic_a_OBJECTS = $(libasm_a_SOURCES:.c=.os)
 
 libasm_so_SOURCES =
 libasm.so: libasm_pic.a libasm.map
-	$(CC) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
-	      -Wl,--version-script,$(srcdir)/libasm.map,--no-undefined \
-	      -Wl,--soname,$@.$(VERSION) \
-	      ../libebl/libebl.a ../libelf/libelf.so
+	$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
+		-Wl,--version-script,$(srcdir)/libasm.map,--no-undefined \
+		-Wl,--soname,$@.$(VERSION) \
+		../libebl/libebl.a ../libelf/libelf.so
 	if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
 	ln -fs $@ $@.$(VERSION)
 
@@ -83,4 +83,4 @@ endif
 noinst_HEADERS = libasmP.h symbolhash.h
 EXTRA_DIST = libasm.map
 
-CLEANFILES = $(am_libasm_pic_a_OBJECTS)
+CLEANFILES = $(am_libasm_pic_a_OBJECTS) *.gcno *.gcda

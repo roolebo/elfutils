@@ -2,6 +2,8 @@ Version 0.115:
 
 libelf: speed-ups of non-mmap reading.
 
+strings: New program.
+
 Version 0.114:
 
 libelf: new function elf_getaroff

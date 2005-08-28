@@ -38,7 +38,7 @@ native_ld = @native_ld@
 base_cpu = @base_cpu@
 
 bin_PROGRAMS = readelf nm size strip ld elflint findtextrel addr2line \
-	       elfcmp objdump ranlib
+	       elfcmp objdump ranlib strings
 
 
 ld_dsos = libld_elf_i386_pic.a
@@ -78,6 +78,7 @@ libeu = ../lib/libeu.a
 
 nm_no_Wformat = yes
 size_no_Wformat = yes
+strings_no_Wformat = yes
 # XXX While the file is not finished, don't warn about this
 ldgeneric_no_Wunused = yes
 
@@ -96,6 +97,7 @@ addr2line_LDADD = $(libdw) $(libmudflap)
 elfcmp_LDADD = $(libebl) $(libelf) $(libmudflap) -ldl
 objdump_LDADD  = $(libebl) $(libelf) $(libeu) $(libmudflap) -ldl
 ranlib_LDADD = $(libelf) $(libeu) $(libmudflap)
+strings_LDADD = $(libelf) $(libeu) $(libmudflap)
 
 ldlex.o: ldscript.c
 ldlex_no_Werror = yes

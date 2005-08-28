@@ -84,18 +84,33 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
       /* We already read the ELF header.  We have to copy the header
 	 since we possibly modify the data here and the caller
 	 expects the memory it passes in to be preserved.  */
-      ehdr.p = memcpy (&ehdr_mem, e_ident,
-		       is32 ? sizeof (Elf32_Ehdr) : sizeof (Elf64_Ehdr));
+      ehdr.p = &ehdr_mem;
 
       if (is32)
 	{
-	  CONVERT (ehdr.e32->e_shnum);
-	  CONVERT (ehdr.e32->e_shoff);
+	  if (ALLOW_UNALIGNED)
+	    {
+	      ehdr_mem.e32.e_shnum = ((Elf32_Ehdr *) e_ident)->e_shnum;
+	      ehdr_mem.e32.e_shoff = ((Elf32_Ehdr *) e_ident)->e_shoff;
+	    }
+	  else
+	    memcpy (&ehdr_mem, e_ident, sizeof (Elf32_Ehdr));
+
+	  CONVERT (ehdr_mem.e32.e_shnum);
+	  CONVERT (ehdr_mem.e32.e_shoff);
 	}
       else
 	{
-	  CONVERT (ehdr.e64->e_shnum);
-	  CONVERT (ehdr.e64->e_shoff);
+	  if (ALLOW_UNALIGNED)
+	    {
+	      ehdr_mem.e64.e_shnum = ((Elf64_Ehdr *) e_ident)->e_shnum;
+	      ehdr_mem.e64.e_shoff = ((Elf64_Ehdr *) e_ident)->e_shoff;
+	    }
+	  else
+	    memcpy (&ehdr_mem, e_ident, sizeof (Elf64_Ehdr));
+
+	  CONVERT (ehdr_mem.e64.e_shnum);
+	  CONVERT (ehdr_mem.e64.e_shoff);
 	}
     }
 
@@ -203,11 +218,11 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 	       off_t offset, size_t maxsize, Elf_Cmd cmd, Elf *parent)
 {
   /* Verify the binary is of the class we can handle.  */
-  if ((e_ident[EI_CLASS] != ELFCLASS32
-       && e_ident[EI_CLASS] != ELFCLASS64)
-      /* We also can only handle two encodings.  */
-      || (e_ident[EI_DATA] != ELFDATA2LSB
-	  && e_ident[EI_DATA] != ELFDATA2MSB))
+  if (unlikely ((e_ident[EI_CLASS] != ELFCLASS32
+		 && e_ident[EI_CLASS] != ELFCLASS64)
+		/* We also can only handle two encodings.  */
+		|| (e_ident[EI_DATA] != ELFDATA2LSB
+		    && e_ident[EI_DATA] != ELFDATA2MSB)))
     {
       /* Cannot handle this.  */
       __libelf_seterrno (ELF_E_INVALID_FILE);
@@ -230,6 +245,9 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
   /* Some more or less arbitrary value.  */
   elf->state.elf.scnincr = 10;
 
+  /* Make the class easily available.  */
+  elf->class = e_ident[EI_CLASS];
+
   if (e_ident[EI_CLASS] == ELFCLASS32)
     {
       /* This pointer might not be directly usable if the alignment is
@@ -249,17 +267,14 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 		      & (__alignof__ (Elf32_Phdr) - 1)) == 0)))
 	{
 	  /* We can use the mmapped memory.  */
-	  elf->state.elf32.ehdr =
-	    (Elf32_Ehdr *) ((char *) map_address + offset);
-	  elf->state.elf32.shdr =
-	    (Elf32_Shdr *) ((char *) map_address + offset
-			    + elf->state.elf32.ehdr->e_shoff);
-	  if (elf->state.elf32.ehdr->e_phnum)
+	  elf->state.elf32.ehdr = ehdr;
+	  elf->state.elf32.shdr
+	    = (Elf32_Shdr *) ((char *) ehdr + ehdr->e_shoff);
+	  if (ehdr->e_phnum > 0)
 	    /* Assign a value only if there really is a program
 	       header.  Otherwise the value remains NULL.  */
 	    elf->state.elf32.phdr
-	      = (Elf32_Phdr *) ((char *) map_address + offset
-				+ elf->state.elf32.ehdr->e_phoff);
+	      = (Elf32_Phdr *) ((char *) ehdr + ehdr->e_phoff);
 
 	  for (size_t cnt = 0; cnt < scncnt; ++cnt)
 	    {
@@ -276,13 +291,9 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 	}
       else
 	{
-	  if (likely (map_address != NULL))
-	    /* Copy the data.  */
-	    memcpy (&elf->state.elf32.ehdr_mem,
-		    (char *) map_address + offset, sizeof (Elf32_Ehdr));
-	  else
-	    /* Copy the data.  */
-	    memcpy (&elf->state.elf32.ehdr_mem, e_ident, sizeof (Elf32_Ehdr));
+	  /* Copy the ELF header.  */
+	  elf->state.elf32.ehdr = memcpy (&elf->state.elf32.ehdr_mem, e_ident,
+					  sizeof (Elf32_Ehdr));
 
 	  if (e_ident[EI_DATA] != MY_ELFDATA)
 	    {
@@ -300,8 +311,6 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 	      CONVERT (elf->state.elf32.ehdr_mem.e_shnum);
 	      CONVERT (elf->state.elf32.ehdr_mem.e_shstrndx);
 	    }
-
-	  elf->state.elf32.ehdr = &elf->state.elf32.ehdr_mem;
 
 	  for (size_t cnt = 0; cnt < scncnt; ++cnt)
 	    {
@@ -333,17 +342,14 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 		      & (__alignof__ (Elf64_Phdr) - 1)) == 0)))
 	{
 	  /* We can use the mmapped memory.  */
-	  elf->state.elf64.ehdr =
-	    (Elf64_Ehdr *) ((char *) map_address + offset);
-	  elf->state.elf64.shdr =
-	    (Elf64_Shdr *) ((char *) map_address + offset
-			    + elf->state.elf64.ehdr->e_shoff);
-	  if (elf->state.elf64.ehdr->e_phnum)
+	  elf->state.elf64.ehdr = ehdr;
+	  elf->state.elf64.shdr
+	    = (Elf64_Shdr *) ((char *) ehdr + ehdr->e_shoff);
+	  if (ehdr->e_phnum > 0)
 	    /* Assign a value only if there really is a program
 	       header.  Otherwise the value remains NULL.  */
 	    elf->state.elf64.phdr
-	      = (Elf64_Phdr *) ((char *) map_address + offset
-				+ elf->state.elf64.ehdr->e_phoff);
+	      = (Elf64_Phdr *) ((char *) ehdr + ehdr->e_phoff);
 
 	  for (size_t cnt = 0; cnt < scncnt; ++cnt)
 	    {
@@ -360,13 +366,9 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 	}
       else
 	{
-	  if (likely (map_address != NULL))
-	    /* Copy the data.  */
-	    memcpy (&elf->state.elf64.ehdr_mem,
-		    (char *) map_address + offset, sizeof (Elf64_Ehdr));
-	  else
-	    /* Copy the data.  */
-	    memcpy (&elf->state.elf64.ehdr_mem, e_ident, sizeof (Elf64_Ehdr));
+	  /* Copy the ELF header.  */
+	  elf->state.elf64.ehdr = memcpy (&elf->state.elf64.ehdr_mem, e_ident,
+					  sizeof (Elf64_Ehdr));
 
 	  if (e_ident[EI_DATA] != MY_ELFDATA)
 	    {
@@ -385,8 +387,6 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 	      CONVERT (elf->state.elf64.ehdr_mem.e_shstrndx);
 	    }
 
-	  elf->state.elf64.ehdr = &elf->state.elf64.ehdr_mem;
-
 	  for (size_t cnt = 0; cnt < scncnt; ++cnt)
 	    {
 	      elf->state.elf64.scns.data[cnt].index = cnt;
@@ -398,9 +398,6 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
       /* So far only one block with sections.  */
       elf->state.elf64.scns_last = &elf->state.elf64.scns;
     }
-
-  /* Make the class easily available.  */
-  elf->class = e_ident[EI_CLASS];
 
   return elf;
 }

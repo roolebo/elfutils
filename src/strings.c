@@ -351,7 +351,7 @@ process_chunk_mb (const char *fname, const unsigned char *buf, off64_t to,
 		}
 
 	      if (unlikely (locfmt != NULL))
-		printf (locfmt, (int64_t) to - len);
+		printf (locfmt, (int64_t) to - len - (buf - start));
 
 	      if (unlikely (*unprinted != NULL))
 		{
@@ -417,7 +417,7 @@ process_chunk (const char *fname, const unsigned char *buf, off64_t to,
 		}
 
 	      if (unlikely (locfmt != NULL))
-		printf (locfmt, (int64_t) to - len);
+		printf (locfmt, (int64_t) to - len - (buf - start));
 
 	      if (unlikely (*unprinted != NULL))
 		{

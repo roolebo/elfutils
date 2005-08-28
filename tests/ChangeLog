@@ -1,3 +1,8 @@
+2005-08-28  Ulrich Drepper  <drepper@redhat.com>
+
+	* run-strings-test.sh: New file.
+	* Makefile.am (EXTRA_DIST): Add it.
+
 2005-08-24  Ulrich Drepper  <drepper@redhat.com>
 
 	* run-line2addr.sh: Remove testfile23 in the end.

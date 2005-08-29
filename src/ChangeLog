@@ -1,3 +1,18 @@
+2005-08-28  Ulrich Drepper  <drepper@redhat.com>
+
+	* ranlib.c: Don't define pread_retry and write_retry here.
+
+	* Makefile.an [BUILD_STATIC] (libdw): Add -ldl.
+	(CLEANFILES): Add *.gcno *.gcda *.gconv.
+
+	* strings.c (process_chunk): Reorder expressions in conditional
+	(process_chunk_mb): Likewise.
+
+	* strings.c: New file.
+	* Makefile.am (bin_PROGRAMS): Add strings.
+	(strings_no_Wstring): Define.
+	(strings_LDADD): Define.
+
 2005-08-27  Roland McGrath  <roland@redhat.com>
 
 	* addr2line.c (dwarf_diename_integrate): Function removed.

@@ -1,5 +1,11 @@
 Version 0.115:
 
+libelf: speed-ups of non-mmap reading.
+
+strings: New program.
+
+Implement --enable-gcov option for configure.
+
 libdw: New function dwarf_getscopes_die.
 
 Version 0.114:

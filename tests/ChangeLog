@@ -1,3 +1,13 @@
+2005-08-28  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.an [BUILD_STATIC] (libdw): Add -ldl.
+	(CLEANFILES): Add *.gcno *.gcda *.gconv.
+
+2005-08-28  Ulrich Drepper  <drepper@redhat.com>
+
+	* run-strings-test.sh: New file.
+	* Makefile.am (TESTS, EXTRA_DIST): Add it.
+
 2005-08-27  Roland McGrath  <roland@redhat.com>
 
 	* addrscopes.c (handle_address): Apply bias to PC addresses.

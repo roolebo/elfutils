@@ -1,3 +1,8 @@
+2005-08-28  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (%.os): Use COMPILE.os.
+	(COMPILE.os): Filter out gconv options.
+
 2005-08-25  Roland McGrath  <roland@redhat.com>
 
 	* cu.c (__libdwfl_nextcu): Return success when dwarf_nextcu hits end.

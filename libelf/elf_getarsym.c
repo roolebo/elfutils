@@ -28,12 +28,9 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <system.h>
 #include <dl-hash.h>
 #include "libelfP.h"
-
-
-#define pread_retry(fd, buf,  len, off) \
-  TEMP_FAILURE_RETRY (pread (fd, buf, len, off))
 
 
 Elf_Arsym *

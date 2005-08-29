@@ -22,6 +22,9 @@ AM_CFLAGS += -Wall -Werror -Wshadow -Wunused -Wformat=2 -Wextra -std=gnu99
 INCLUDES = -I. -I$(srcdir) -I$(srcdir)/../libelf -I.. -I$(srcdir)/../lib
 VERSION = 1
 
+COMPILE.os = $(filter-out -fprofile-arcs, $(filter-out -ftest-coverage, \
+						       $(COMPILE)))
+
 lib_LIBRARIES = libdw.a
 if !MUDFLAP
 noinst_LIBRARIES = libdw_pic.a
@@ -76,15 +79,15 @@ libdw_so_SOURCES =
 libdw.so: $(srcdir)/libdw.map libdw_pic.a \
 	  ../libdwfl/libdwfl_pic.a ../libebl/libebl.a \
 	  ../libelf/libelf.so
-	$(CC) -shared -o $@ -Wl,--soname,$@.$(VERSION),-z,defs \
-	      -Wl,--version-script,$<,--no-undefined \
-	      -Wl,--whole-archive $(filter-out $<,$^) -Wl,--no-whole-archive \
-	      -ldl
+	$(LINK) -shared -o $@ -Wl,--soname,$@.$(VERSION),-z,defs \
+		-Wl,--version-script,$<,--no-undefined \
+		-Wl,--whole-archive $(filter-out $<,$^) -Wl,--no-whole-archive\
+		-ldl
 	if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
 	ln -fs $@ $@.$(VERSION)
 
 %.os: %.c %.o
-	if $(COMPILE) -c -o $@ -fpic -DPIC -DSHARED -MT $@ -MD -MP \
+	if $(COMPILE.os) -c -o $@ -fpic -DPIC -DSHARED -MT $@ -MD -MP \
 	   -MF "$(DEPDIR)/$*.Tpo" `test -f '$<' || echo '$(srcdir)/'`$<; \
 	then cat "$(DEPDIR)/$*.Tpo" >> "$(DEPDIR)/$*.Po"; \
 	     rm -f "$(DEPDIR)/$*.Tpo"; \
@@ -110,4 +113,4 @@ noinst_HEADERS = libdwP.h memory-access.h dwarf_abbrev_hash.h
 
 EXTRA_DIST = libdw.map
 
-CLEANFILES = $(am_libdw_pic_a_OBJECTS)
+CLEANFILES = $(am_libdw_pic_a_OBJECTS) *.gcno *.gcda

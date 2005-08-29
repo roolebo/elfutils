@@ -1,3 +1,27 @@
+2005-08-28  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf32_getphdr.c: Include <system.h>.  Use pread_retry instead of
+	pread.  And branch prediction where useful.
+	* elf_begin.c: Likewise.
+	* elf_getdata.c: Likewise.
+	* elf_getshstrndx.c: Likewise.
+	* elf_readall.c: Likewise.
+	* gelf_rawchunk.c: Likewise.
+	* elf32_updatefile.c: Include <system.h>.  Use pread_retry instead of
+	pread.  And branch prediction where useful.
+	* elf_getarsym.c: Don't define pread_retry here.
+
+	* Makefile.am: Use $(LINK) not $(CC) when creating DSO.
+	(%.os): Use COMPILE.os.
+	(COMPILE.os): Filter out gconv options.
+
+2005-08-27  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf_begin.c (file_read_elf): Avoid reading ELF header from file
+	again.  Instead accept additional parameter which points to it if we
+	don't use mmap.
+	(get_shnum): Use passed in e_ident value as source of ELF header.
+
 2005-08-15  Ulrich Drepper  <drepper@redhat.com>
 
 	* elf_begin.c (__libelf_next_arhdr): Use TEMP_FAILURE_RETRY.

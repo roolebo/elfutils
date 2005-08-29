@@ -1,7 +1,7 @@
 		      ToDo list for elfutils                      -*-outline-*-
                       ----------------------
 
-Time-stamp: <2005-08-03 20:38:01 drepper>
+Time-stamp: <2005-08-29 08:58:24 drepper>
 
 * mkinstalldirs
 
@@ -23,15 +23,7 @@ Time-stamp: <2005-08-03 20:38:01 drepper>
    remains maintainable.
 
 
-* libdwarf
-
-** Should we do more error checking?
-
-   Most functions don't check whether they get a NULL value passed for
-   a pointer argument.  It could be argued that this is OK since it's
-   a bug inthe program.  But perhaps one could catch the case and return
-   an error which would allow the program using libdwarf to have fewer
-   places with error checking.
+* libdw
 
 ** More memory access checks needed
 
@@ -44,12 +36,6 @@ Time-stamp: <2005-08-03 20:38:01 drepper>
    information so I cannot test it.
 
 ** Rename dwarf_getabbrev
-
-** dwarf_loclist()
-
-   This function and its interface seem to be misdesigned.  The specification
-   is unclear and its changed between v2 and v2.1.  Other implementation
-   implement even different behavior.
 
 
 * nm:
@@ -116,6 +102,14 @@ Time-stamp: <2005-08-03 20:38:01 drepper>
 
    prelink generated files
 
+* elfcmp
+
+** treat relocation sections special
+
+   Differences in the relocation sections can be ignored if all
+   the same symbols with the same targets are present and the order
+   of overlapping relocations doesn't change.  There really never
+   should be overlapping relocations but who knows.
 
 * mcs
 

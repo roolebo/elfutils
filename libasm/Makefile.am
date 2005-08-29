@@ -24,6 +24,9 @@ INCLUDES = -I. -I$(srcdir) -I.. -I$(top_srcdir)/libelf -I$(top_srcdir)/libebl \
 GCC_INCLUDE = -I$(shell $(CC) -print-file-name=include)
 VERSION = 1
 
+COMPILE.os = $(filter-out -fprofile-arcs, $(filter-out -ftest-coverage, \
+						       $(COMPILE)))
+
 lib_LIBRARIES = libasm.a
 if !MUDFLAP
 noinst_LIBRARIES = libasm_pic.a
@@ -51,16 +54,16 @@ am_libasm_pic_a_OBJECTS = $(libasm_a_SOURCES:.c=.os)
 
 libasm_so_SOURCES =
 libasm.so: libasm_pic.a libasm.map
-	$(CC) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
-	      -Wl,--version-script,$(srcdir)/libasm.map,--no-undefined \
-	      -Wl,--soname,$@.$(VERSION) \
-	      ../libebl/libebl.a ../libelf/libelf.so
+	$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
+		-Wl,--version-script,$(srcdir)/libasm.map,--no-undefined \
+		-Wl,--soname,$@.$(VERSION) \
+		../libebl/libebl.a ../libelf/libelf.so
 	if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
 	ln -fs $@ $@.$(VERSION)
 
 
 %.os: %.c %.o
-	if $(COMPILE) -c -o $@ -fpic -DPIC -DSHARED -MT $@ -MD -MP \
+	if $(COMPILE.os) -c -o $@ -fpic -DPIC -DSHARED -MT $@ -MD -MP \
 	  -MF "$(DEPDIR)/$*.Tpo" `test -f '$<' || echo '$(srcdir)/'`$<; \
 	then cat "$(DEPDIR)/$*.Tpo" >> "$(DEPDIR)/$*.Po"; \
 	     rm -f "$(DEPDIR)/$*.Tpo"; \
@@ -83,4 +86,4 @@ endif
 noinst_HEADERS = libasmP.h symbolhash.h
 EXTRA_DIST = libasm.map
 
-CLEANFILES = $(am_libasm_pic_a_OBJECTS)
+CLEANFILES = $(am_libasm_pic_a_OBJECTS) *.gcno *.gcda

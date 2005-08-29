@@ -69,9 +69,9 @@ textrel_check = if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
 
 libebl_i386_so_SOURCES =
 libebl_i386.so: libebl_i386_pic.a libebl_i386.map
-	$(CC) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
-	      -Wl,--version-script,$(srcdir)/libebl_i386.map \
-	      -Wl,-z,defs $(libelf) $(libmudflap)
+	$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
+		-Wl,--version-script,$(srcdir)/libebl_i386.map \
+		-Wl,-z,defs $(libelf) $(libmudflap)
 	$(textrel_check)
 
 
@@ -81,9 +81,9 @@ am_libebl_sh_pic_a_OBJECTS = $(sh_SRCS:.c=.os)
 
 libebl_sh_so_SOURCES =
 libebl_sh.so: libebl_sh_pic.a libebl_sh.map
-	$(CC) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
-	      -Wl,--version-script,$(srcdir)/libebl_sh.map \
-	      -Wl,-z,defs $(libmudflap)
+	$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
+		-Wl,--version-script,$(srcdir)/libebl_sh.map \
+		-Wl,-z,defs $(libmudflap)
 	$(textrel_check)
 
 
@@ -93,9 +93,9 @@ am_libebl_x86_64_pic_a_OBJECTS = $(x86_64_SRCS:.c=.os)
 
 libebl_x86_64_so_SOURCES =
 libebl_x86_64.so: libebl_x86_64_pic.a libebl_x86_64.map
-	$(CC) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
-	      -Wl,--version-script,$(srcdir)/libebl_x86_64.map \
-	      -Wl,-z,defs $(libelf) $(libmudflap)
+	$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
+		-Wl,--version-script,$(srcdir)/libebl_x86_64.map \
+		-Wl,-z,defs $(libelf) $(libmudflap)
 	$(textrel_check)
 
 
@@ -105,9 +105,9 @@ am_libebl_ia64_pic_a_OBJECTS = $(ia64_SRCS:.c=.os)
 
 libebl_ia64_so_SOURCES =
 libebl_ia64.so: libebl_ia64_pic.a libebl_ia64.map
-	$(CC) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
-	      -Wl,--version-script,$(srcdir)/libebl_ia64.map \
-	      -Wl,-z,defs $(libmudflap)
+	$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
+		-Wl,--version-script,$(srcdir)/libebl_ia64.map \
+		-Wl,-z,defs $(libmudflap)
 	$(textrel_check)
 
 
@@ -117,9 +117,9 @@ am_libebl_alpha_pic_a_OBJECTS = $(alpha_SRCS:.c=.os)
 
 libebl_alpha_so_SOURCES =
 libebl_alpha.so: libebl_alpha_pic.a libebl_alpha.map
-	$(CC) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
-	      -Wl,--version-script,$(srcdir)/libebl_alpha.map \
-	      -Wl,-z,defs $(libmudflap)
+	$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
+		-Wl,--version-script,$(srcdir)/libebl_alpha.map \
+		-Wl,-z,defs $(libmudflap)
 	$(textrel_check)
 
 
@@ -129,9 +129,9 @@ am_libebl_arm_pic_a_OBJECTS = $(arm_SRCS:.c=.os)
 
 libebl_arm_so_SOURCES =
 libebl_arm.so: libebl_arm_pic.a libebl_arm.map
-	$(CC) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
-	      -Wl,--version-script,$(srcdir)/libebl_arm.map \
-	      -Wl,-z,defs $(libmudflap)
+	$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
+		-Wl,--version-script,$(srcdir)/libebl_arm.map \
+		-Wl,-z,defs $(libmudflap)
 	$(textrel_check)
 
 
@@ -141,9 +141,9 @@ am_libebl_sparc_pic_a_OBJECTS = $(sparc_SRCS:.c=.os)
 
 libebl_sparc_so_SOURCES =
 libebl_sparc.so: libebl_sparc_pic.a libebl_sparc.map
-	$(CC) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
-	      -Wl,--version-script,$(srcdir)/libebl_sparc.map \
-	      -Wl,-z,defs $(libmudflap)
+	$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
+		-Wl,--version-script,$(srcdir)/libebl_sparc.map \
+		-Wl,-z,defs $(libmudflap)
 	$(textrel_check)
 
 
@@ -153,9 +153,9 @@ am_libebl_ppc_pic_a_OBJECTS = $(ppc_SRCS:.c=.os)
 
 libebl_ppc_so_SOURCES =
 libebl_ppc.so: libebl_ppc_pic.a libebl_ppc.map
-	$(CC) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
-	      -Wl,--version-script,$(srcdir)/libebl_ppc.map \
-	      -Wl,-z,defs $(libelf) $(libmudflap)
+	$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
+		-Wl,--version-script,$(srcdir)/libebl_ppc.map \
+		-Wl,-z,defs $(libelf) $(libmudflap)
 	$(textrel_check)
 
 
@@ -165,9 +165,9 @@ am_libebl_ppc64_pic_a_OBJECTS = $(ppc64_SRCS:.c=.os)
 
 libebl_ppc64_so_SOURCES =
 libebl_ppc64.so: libebl_ppc64_pic.a libebl_ppc64.map
-	$(CC) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
-	      -Wl,--version-script,$(srcdir)/libebl_ppc64.map \
-	      -Wl,-z,defs $(libelf) $(libmudflap)
+	$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
+		-Wl,--version-script,$(srcdir)/libebl_ppc64.map \
+		-Wl,-z,defs $(libelf) $(libmudflap)
 	$(textrel_check)
 
 
@@ -199,5 +199,5 @@ noinst_HEADERS = libeblP.h $(noinst_LIBRARIES:%_pic.a=%.h)
 EXTRA_DIST = $(noinst_LIBRARIES:%_pic.a=%.map) \
 	     $(foreach m,$(modules),$($(m)_SRCS))
 
-CLEANFILES = $(am_libebl_pic_a_OBJECTS) \
+CLEANFILES = $(am_libebl_pic_a_OBJECTS) *.gcno *.gcda \
 	     $(foreach m,$(modules),$(am_libebl_$(m)_pic_a_OBJECTS))

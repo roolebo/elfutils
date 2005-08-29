@@ -31,6 +31,9 @@ GCC_INCLUDE = -I$(shell $(CC) -print-file-name=include)
 VERSION = 1
 PACKAGE_VERSION = @PACKAGE_VERSION@
 
+COMPILE.os = $(filter-out -fprofile-arcs, $(filter-out -ftest-coverage, \
+						       $(COMPILE)))
+
 lib_LIBRARIES = libelf.a
 if !MUDFLAP
 noinst_LIBRARIES = libelf_pic.a
@@ -92,14 +95,14 @@ am_libelf_pic_a_OBJECTS = $(libelf_a_SOURCES:.c=.os)
 
 libelf_so_SOURCES =
 libelf.so: libelf_pic.a libelf.map
-	$(CC) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
-	      -Wl,--version-script,$(srcdir)/libelf.map,--no-undefined \
-	      -Wl,--soname,$@.$(VERSION),-z,-defs
+	$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
+		-Wl,--version-script,$(srcdir)/libelf.map,--no-undefined \
+		-Wl,--soname,$@.$(VERSION),-z,-defs
 	if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
 	ln -fs $@ $@.$(VERSION)
 
 %.os: %.c %.o
-	if $(COMPILE) -c -o $@ -fpic -DPIC -DSHARED -MT $@ -MD -MP \
+	if $(COMPILE.os) -c -o $@ -fpic -DPIC -DSHARED -MT $@ -MD -MP \
 	  -MF "$(DEPDIR)/$*.Tpo" `test -f '$<' || echo '$(srcdir)/'`$<; \
 	then cat "$(DEPDIR)/$*.Tpo" >> "$(DEPDIR)/$*.Po"; \
 	     rm -f "$(DEPDIR)/$*.Tpo"; \
@@ -122,4 +125,4 @@ noinst_HEADERS = elf.h abstract.h common.h exttypes.h gelf_xlate.h libelfP.h \
 		 version_xlate.h dl-hash.h
 EXTRA_DIST = libelf.map
 
-CLEANFILES = $(am_libelf_pic_a_OBJECTS)
+CLEANFILES = $(am_libelf_pic_a_OBJECTS) *.gcno *.gcda

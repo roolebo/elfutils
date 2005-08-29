@@ -20,8 +20,10 @@
 #endif
 
 #include <assert.h>
+#include <errno.h>
 #include <unistd.h>
 
+#include <system.h>
 #include "libelfP.h"
 #include "common.h"
 
@@ -122,12 +124,13 @@ elfw2(LIBELFBITS,getshdr) (scn)
 	      CONVERT_TO (shdr[cnt].sh_entsize, notcvt[cnt].sh_entsize);
 	    }
 	}
-      else if (elf->fildes != -1)
+      else if (likely (elf->fildes != -1))
 	{
 	  /* Read the header.  */
-	  if ((size_t) pread (elf->fildes,
-			      elf->state.ELFW(elf,LIBELFBITS).shdr, size,
-			      elf->start_offset + ehdr->e_shoff) != size)
+	  ssize_t n = pread_retry (elf->fildes,
+				   elf->state.ELFW(elf,LIBELFBITS).shdr, size,
+				   elf->start_offset + ehdr->e_shoff);
+	  if (unlikely ((size_t) n != size))
 	    {
 	      /* Severe problems.  We cannot read the data.  */
 	      __libelf_seterrno (ELF_E_READ_ERROR);

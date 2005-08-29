@@ -23,3 +23,4 @@ src/addr2line.c
 src/findtextrel.c
 src/elfcmp.c
 src/ranlib.c
+src/strings.c

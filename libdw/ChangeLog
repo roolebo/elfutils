@@ -1,3 +1,9 @@
+2005-08-28  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: Use $(LINK) not $(CC) when creating DSO.
+	(%.os): Use COMPILE.os.
+	(COMPILE.os): Filter out gconv options.
+
 2005-08-27  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_getscopes.c (dwarf_getscopes): Rewritten using

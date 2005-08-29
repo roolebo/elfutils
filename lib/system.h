@@ -37,4 +37,12 @@ extern int crc32_file (int fd, uint32_t *resp);
 
 #define gettext_noop(Str) Str
 
+
+#define pwrite_retry(fd, buf,  len, off) \
+  TEMP_FAILURE_RETRY (pwrite (fd, buf, len, off))
+#define write_retry(fd, buf, n) \
+     TEMP_FAILURE_RETRY (write (fd, buf, n))
+#define pread_retry(fd, buf,  len, off) \
+  TEMP_FAILURE_RETRY (pread (fd, buf, len, off))
+
 #endif /* system.h */

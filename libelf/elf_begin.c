@@ -31,6 +31,7 @@
 #include <sys/param.h>
 #include <sys/stat.h>
 
+#include <system.h>
 #include "libelfP.h"
 #include "common.h"
 
@@ -144,12 +145,10 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
 						 + offset))->sh_size,
 			sizeof (Elf32_Word));
 	      else
-		if (TEMP_FAILURE_RETRY (pread (fildes, &size,
-					       sizeof (Elf32_Word),
-					       offset + ehdr.e32->e_shoff
-					       + offsetof (Elf32_Shdr,
-							   sh_size)))
-		    != sizeof (Elf32_Word))
+		if (unlikely (pread_retry (fildes, &size, sizeof (Elf32_Word),
+					   offset + ehdr.e32->e_shoff
+					   + offsetof (Elf32_Shdr, sh_size))
+			      != sizeof (Elf32_Word)))
 		  return (size_t) -1l;
 
 	      if (e_ident[EI_DATA] != MY_ELFDATA)
@@ -188,12 +187,10 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
 						 + offset))->sh_size,
 			sizeof (Elf64_Xword));
 	      else
-		if (TEMP_FAILURE_RETRY (pread (fildes, &size,
-					       sizeof (Elf64_Word),
-					       offset + ehdr.e64->e_shoff
-					       + offsetof (Elf64_Shdr,
-							   sh_size)))
-		    != sizeof (Elf64_Xword))
+		if (unlikely (pread_retry (fildes, &size, sizeof (Elf64_Word),
+					   offset + ehdr.e64->e_shoff
+					   + offsetof (Elf64_Shdr, sh_size))
+			      != sizeof (Elf64_Xword)))
 		  return (size_t) -1l;
 
 	      if (e_ident[EI_DATA] != MY_ELFDATA)
@@ -459,11 +456,11 @@ read_unmmaped_file (int fildes, off_t offset, size_t maxsize, Elf_Cmd cmd,
   } mem;
 
   /* Read the head of the file.  */
-  ssize_t nread = pread (fildes, mem.header, MIN (MAX (sizeof (Elf64_Ehdr),
-						       SARMAG),
-						  maxsize),
-			 offset);
-  if (nread == -1)
+  ssize_t nread = pread_retry (fildes, mem.header,
+			       MIN (MAX (sizeof (Elf64_Ehdr), SARMAG),
+				    maxsize),
+			       offset);
+  if (unlikely (nread == -1))
     /* We cannot even read the head of the file.  Maybe FILDES is associated
        with an unseekable device.  This is nothing we can handle.  */
     return NULL;
@@ -597,8 +594,9 @@ read_long_names (Elf *elf)
       else
 	{
 	  /* Read the header from the file.  */
-	  if (pread (elf->fildes, &hdrm, sizeof (hdrm),
-		     elf->start_offset + offset) != sizeof (hdrm))
+	  if (unlikely (pread_retry (elf->fildes, &hdrm, sizeof (hdrm),
+				     elf->start_offset + offset)
+			!= sizeof (hdrm)))
 	    return NULL;
 
 	  hdr = &hdrm;
@@ -628,10 +626,10 @@ read_long_names (Elf *elf)
 						    len);
       else
 	{
-	  if ((size_t) pread (elf->fildes, newp, len,
-			      elf->start_offset + offset
-			      + sizeof (struct ar_hdr))
-	      != len)
+	  if (unlikely ((size_t) pread_retry (elf->fildes, newp, len,
+					      elf->start_offset + offset
+					      + sizeof (struct ar_hdr))
+			!= len))
 	    {
 	      /* We were not able to read all data.  */
 	      free (newp);
@@ -681,8 +679,8 @@ __libelf_next_arhdr (elf)
   if (elf->map_address != NULL)
     {
       /* See whether this entry is in the file.  */
-      if (elf->state.ar.offset + sizeof (struct ar_hdr)
-	  > elf->start_offset + elf->maximum_size)
+      if (unlikely (elf->state.ar.offset + sizeof (struct ar_hdr)
+		    > elf->start_offset + elf->maximum_size))
 	{
 	  /* This record is not anymore in the file.  */
 	  __libelf_seterrno (ELF_E_RANGE);
@@ -694,10 +692,9 @@ __libelf_next_arhdr (elf)
     {
       ar_hdr = &elf->state.ar.ar_hdr;
 
-      if (TEMP_FAILURE_RETRY (pread (elf->fildes, ar_hdr,
-				     sizeof (struct ar_hdr),
-				     elf->state.ar.offset))
-	  != sizeof (struct ar_hdr))
+      if (unlikely (pread_retry (elf->fildes, ar_hdr, sizeof (struct ar_hdr),
+				 elf->state.ar.offset)
+		    != sizeof (struct ar_hdr)))
 	{
 	  /* Something went wrong while reading the file.  */
 	  __libelf_seterrno (ELF_E_RANGE);
@@ -706,7 +703,7 @@ __libelf_next_arhdr (elf)
     }
 
   /* One little consistency check.  */
-  if (memcmp (ar_hdr->ar_fmag, ARFMAG, 2) != 0)
+  if (unlikely (memcmp (ar_hdr->ar_fmag, ARFMAG, 2) != 0))
     {
       /* This is no valid archive.  */
       __libelf_seterrno (ELF_E_ARCHIVE_FMAG);
@@ -730,14 +727,14 @@ __libelf_next_arhdr (elf)
 	       && memcmp (ar_hdr->ar_name, "//              ", 16) == 0)
 	/* This is the array with the long names.  */
 	elf_ar_hdr->ar_name = memcpy (elf->state.ar.ar_name, "//", 3);
-      else if (isdigit (ar_hdr->ar_name[1]))
+      else if (likely  (isdigit (ar_hdr->ar_name[1])))
 	{
 	  size_t offset;
 
 	  /* This is a long name.  First we have to read the long name
 	     table, if this hasn't happened already.  */
-	  if (elf->state.ar.long_names == NULL
-	      && read_long_names (elf) == NULL)
+	  if (unlikely (elf->state.ar.long_names == NULL
+			&& read_long_names (elf) == NULL))
 	    {
 	      /* No long name table although it is reference.  The archive is
 		 broken.  */
@@ -746,7 +743,7 @@ __libelf_next_arhdr (elf)
 	    }
 
 	  offset = atol (ar_hdr->ar_name + 1);
-	  if (offset >= elf->state.ar.long_names_len)
+	  if (unlikely (offset >= elf->state.ar.long_names_len))
 	    {
 	      /* The index in the long name table is larger than the table.  */
 	      __libelf_seterrno (ELF_E_INVALID_ARCHIVE);
@@ -860,7 +857,7 @@ __libelf_next_arhdr (elf)
 
   if (ar_hdr->ar_size[sizeof (ar_hdr->ar_size) - 1] == ' ')
     {
-      if (ar_hdr->ar_size[0] == ' ')
+      if (unlikely (ar_hdr->ar_size[0] == ' '))
 	/* Something is really wrong.  We cannot live without a size for
 	   the member since it will not be possible to find the next
 	   archive member.  */
@@ -900,7 +897,7 @@ dup_elf (int fildes, Elf_Cmd cmd, Elf *ref)
     fildes = ref->fildes;
   /* The file descriptor better should be the same.  If it was disconnected
      already (using `elf_cntl') we do not test it.  */
-  else if (ref->fildes != -1 && fildes != ref->fildes)
+  else if (unlikely (ref->fildes != -1 && fildes != ref->fildes))
     {
       __libelf_seterrno (ELF_E_FD_MISMATCH);
       return NULL;
@@ -909,10 +906,10 @@ dup_elf (int fildes, Elf_Cmd cmd, Elf *ref)
   /* The mode must allow reading.  I.e., a descriptor creating with a
      command different then ELF_C_READ, ELF_C_WRITE and ELF_C_RDWR is
      not allowed.  */
-  if (ref->cmd != ELF_C_READ && ref->cmd != ELF_C_READ_MMAP
-      && ref->cmd != ELF_C_WRITE && ref->cmd != ELF_C_WRITE_MMAP
-      && ref->cmd != ELF_C_RDWR && ref->cmd != ELF_C_RDWR_MMAP
-      && ref->cmd != ELF_C_READ_MMAP_PRIVATE)
+  if (unlikely (ref->cmd != ELF_C_READ && ref->cmd != ELF_C_READ_MMAP
+		&& ref->cmd != ELF_C_WRITE && ref->cmd != ELF_C_WRITE_MMAP
+		&& ref->cmd != ELF_C_RDWR && ref->cmd != ELF_C_RDWR_MMAP
+		&& ref->cmd != ELF_C_READ_MMAP_PRIVATE))
     {
       __libelf_seterrno (ELF_E_INVALID_OP);
       return NULL;
@@ -989,7 +986,7 @@ elf_begin (fildes, cmd, ref)
 {
   Elf *retval;
 
-  if (! __libelf_version_initialized)
+  if (unlikely (! __libelf_version_initialized))
     {
       /* Version wasn't set so far.  */
       __libelf_seterrno (ELF_E_NO_VERSION);
@@ -999,7 +996,7 @@ elf_begin (fildes, cmd, ref)
   if (ref != NULL)
     /* Make sure the descriptor is not suddenly going away.  */
     rwlock_rdlock (ref->lock);
-  else if (fcntl (fildes, F_GETFL) == -1 && errno == EBADF)
+  else if (unlikely (fcntl (fildes, F_GETFL) == -1 && errno == EBADF))
     {
       /* We cannot do anything productive without a file descriptor.  */
       __libelf_seterrno (ELF_E_INVALID_FILE);
@@ -1015,7 +1012,7 @@ elf_begin (fildes, cmd, ref)
 
     case ELF_C_READ_MMAP_PRIVATE:
       /* If we have a reference it must also be opened this way.  */
-      if (ref != NULL && ref->cmd != ELF_C_READ_MMAP_PRIVATE)
+      if (unlikely (ref != NULL && ref->cmd != ELF_C_READ_MMAP_PRIVATE))
 	{
 	  __libelf_seterrno (ELF_E_INVALID_CMD);
 	  retval = NULL;
@@ -1039,8 +1036,9 @@ elf_begin (fildes, cmd, ref)
 	 command.  */
       if (ref != NULL)
 	{
-	  if (ref->cmd != ELF_C_RDWR && ref->cmd != ELF_C_RDWR_MMAP
-	      && ref->cmd != ELF_C_WRITE && ref->cmd != ELF_C_WRITE_MMAP)
+	  if (unlikely (ref->cmd != ELF_C_RDWR && ref->cmd != ELF_C_RDWR_MMAP
+			&& ref->cmd != ELF_C_WRITE
+			&& ref->cmd != ELF_C_WRITE_MMAP))
 	    {
 	      /* This is not ok.  REF must also be opened for writing.  */
 	      __libelf_seterrno (ELF_E_INVALID_CMD);

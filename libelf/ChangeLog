@@ -1,5 +1,16 @@
 2005-08-28  Ulrich Drepper  <drepper@redhat.com>
 
+	* elf32_getphdr.c: Include <system.h>.  Use pread_retry instead of
+	pread.  And branch prediction where useful.
+	* elf_begin.c: Likewise.
+	* elf_getdata.c: Likewise.
+	* elf_getshstrndx.c: Likewise.
+	* elf_readall.c: Likewise.
+	* gelf_rawchunk.c: Likewise.
+	* elf32_updatefile.c: Include <system.h>.  Use pread_retry instead of
+	pread.  And branch prediction where useful.
+	* elf_getarsym.c: Don't define pread_retry here.
+
 	* Makefile.am: Use $(LINK) not $(CC) when creating DSO.
 	(%.os): Use COMPILE.os.
 	(COMPILE.os): Filter out gconv options.

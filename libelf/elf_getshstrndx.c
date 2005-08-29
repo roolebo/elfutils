@@ -1,5 +1,5 @@
 /* Return section index of section header string table.
-   Copyright (C) 2002 Red Hat, Inc.
+   Copyright (C) 2002, 2005 Red Hat, Inc.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
    This program is free software; you can redistribute it and/or modify
@@ -20,10 +20,12 @@
 #endif
 
 #include <assert.h>
+#include <errno.h>
 #include <gelf.h>
 #include <stddef.h>
 #include <unistd.h>
 
+#include <system.h>
 #include "libelfP.h"
 #include "common.h"
 
@@ -100,8 +102,9 @@ elf_getshstrndx (elf, dst)
 		     the first one.  */
 		  Elf32_Shdr shdr_mem;
 
-		  if (pread (elf->fildes, &shdr_mem, sizeof (Elf32_Shdr),
-			     offset) != sizeof (Elf32_Shdr))
+		  if (unlikely (pread_retry (elf->fildes, &shdr_mem,
+					     sizeof (Elf32_Shdr), offset)
+				!= sizeof (Elf32_Shdr)))
 		    {
 		      /* We must be able to read this ELF section header.  */
 		      __libelf_seterrno (ELF_E_INVALID_FILE);
@@ -116,15 +119,13 @@ elf_getshstrndx (elf, dst)
 	    }
 	  else
 	    {
-	      size_t offset;
-
 	      if (elf->state.elf64.scns.data[0].shdr.e64 != NULL)
 		{
 		  num = elf->state.elf64.scns.data[0].shdr.e64->sh_link;
 		  goto success;
 		}
 
-	      offset = elf->state.elf64.ehdr->e_shoff;
+	      size_t offset = elf->state.elf64.ehdr->e_shoff;
 
 	      if (elf->map_address != NULL
 		  && elf->state.elf64.ehdr->e_ident[EI_DATA] == MY_ELFDATA
@@ -139,8 +140,9 @@ elf_getshstrndx (elf, dst)
 		     the first one.  */
 		  Elf64_Shdr shdr_mem;
 
-		  if (pread (elf->fildes, &shdr_mem, sizeof (Elf64_Shdr),
-			     offset) != sizeof (Elf64_Shdr))
+		  if (unlikely (pread_retry (elf->fildes, &shdr_mem,
+					     sizeof (Elf64_Shdr), offset)
+				!= sizeof (Elf64_Shdr)))
 		    {
 		      /* We must be able to read this ELF section header.  */
 		      __libelf_seterrno (ELF_E_INVALID_FILE);

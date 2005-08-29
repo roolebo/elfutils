@@ -1,5 +1,5 @@
 /* Read all of the file associated with the descriptor.
-   Copyright (C) 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2005 Red Hat, Inc.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
    This program is free software; you can redistribute it and/or modify
@@ -19,8 +19,10 @@
 # include <config.h>
 #endif
 
+#include <errno.h>
 #include <unistd.h>
 
+#include <system.h>
 #include "libelfP.h"
 #include "common.h"
 
@@ -78,8 +80,10 @@ __libelf_readall (elf)
       if (mem != NULL)
 	{
 	  /* Read the file content.  */
-	  if ((size_t) pread (elf->fildes, mem, elf->maximum_size,
-			      elf->start_offset) != elf->maximum_size)
+	  if (unlikely ((size_t) pread_retry (elf->fildes, mem,
+					      elf->maximum_size,
+					      elf->start_offset)
+			!= elf->maximum_size))
 	    {
 	      /* Something went wrong.  */
 	      __libelf_seterrno (ELF_E_READ_ERROR);

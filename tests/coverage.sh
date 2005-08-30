@@ -3,7 +3,7 @@
 cd ..
 
 for d in lib libasm libdw libdwfl libebl libelf src; do
-  tmp=../$d-data
+  tmp=$d-data
   cd $d
   unused=0
   for f in *.gcno; do
@@ -17,7 +17,11 @@ for d in lib libasm libdw libdwfl libebl libelf src; do
       unused=$(($unused + 1))
     fi
   done
-  gawk "{ copct=\$2; co=(\$3*copct)/100; toco+=(co+0); toli += (\$3+0); } END { printf \"%-12s %6.2f%% covered       unused files: %3d\n\", \"$d\", (toco*100)/toli, \"$unused\" }" $tmp
-  rm -f $tmp
+  if [ -f $tmp ]; then
+    gawk "{ copct=\$2; co=(\$3*copct)/100; toco+=(co+0); toli += (\$3+0); } END { printf \"%-12s %6.2f%% covered       unused files: %3d\n\", \"$d\", (toco*100)/toli, \"$unused\" }" $tmp
+    rm -f $tmp
+  else
+    printf "%-12s   0.00%% covered       unused files: %3d\n" "$d" $unused
+  fi
   cd ..
 done

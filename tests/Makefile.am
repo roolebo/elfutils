@@ -70,7 +70,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile18.bz2 testfile19.bz2 testfile19.index.bz2 \
 	     testfile20.bz2 testfile20.index.bz2 \
 	     testfile21.bz2 testfile21.index.bz2 \
-	     testfile22.bz2 testfile23.bz2 testfile24.bz2 testfile25.bz2
+	     testfile22.bz2 testfile23.bz2 testfile24.bz2 testfile25.bz2 \
+	     coverage.sh
 
 if MUDFLAP
 static_build=yes
@@ -128,3 +129,10 @@ asm_tst9_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl
 dwflmodtest_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
 
 CLEANFILES = xxx *.gcno *.gcda *gconv
+
+if GCOV
+check: check-am coverage
+.PHONY: coverage
+coverage:
+	-$(srcdir)/coverage.sh
+endif

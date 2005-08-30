@@ -147,7 +147,7 @@ if test "$use_gcov" = yes; then
   CFLAGS="$CFLAGS -fprofile-arcs -ftest-coverage"
   LDFLAGS="$LDFLAGS -fprofile-arcs"
 fi
-AM_CONDITIONAL(GPROF, test "$use_gprof" = yes)
+AM_CONDITIONAL(GCOV, test "$use_gcov" = yes)
 
 AM_CONDITIONAL(BUILD_STATIC, [dnl
 test "$use_mudflap" = yes -o "$use_gprof" = yes -o "$use_gcov" = yes])

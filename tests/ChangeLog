@@ -1,3 +1,9 @@
+2005-08-29  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (EXTRA_DIST): Add coverage.
+	[GCOV]: Generate coverage summary after the tests ran
+	* coverage.sh: New file.
+
 2005-08-28  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.an [BUILD_STATIC] (libdw): Add -ldl.

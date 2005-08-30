@@ -1,3 +1,7 @@
+2005-08-29  Ulrich Drepper  <drepper@redhat.com>
+
+	* configure.ac: Fix GCOV make condition generation.
+
 2005-08-28  Ulrich Drepper  <drepper@redhat.com>
 
 	* configure.ac: Add --enable-gcov option.

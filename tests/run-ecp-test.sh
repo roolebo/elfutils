@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2002 Red Hat, Inc.
+# Copyright (C) 2002, 2005 Red Hat, Inc.
 # Written by Jakub Jelinek <jakub@redhat.com>, 2002.
 #
 # This program is Open Source software; you can redistribute it and/or
@@ -14,7 +14,7 @@
 set -e
 
 # Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile10.bz2 > testfile10 2>/dev/null || exit 0
+bunzip2 -c $srcdir/testfile10.bz2 > testfile10 2>/dev/null || exit 77
 
 ./ecp testfile10 testfile10.tmp
 

@@ -18,14 +18,14 @@ stripped=${stripped:-testfile7}
 debugout=${debugfile:+-f testfile.debug.temp -F $debugfile}
 
 # Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/$original.bz2 > $original 2>/dev/null || exit 0
+bunzip2 -c $srcdir/$original.bz2 > $original 2>/dev/null || exit 77
 
 # Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/$stripped.bz2 > $stripped 2>/dev/null || exit 0
+bunzip2 -c $srcdir/$stripped.bz2 > $stripped 2>/dev/null || exit 77
 
 # Don't fail if we cannot decompress the file.
 test -z "$debugfile" ||
-bunzip2 -c $srcdir/$debugfile.bz2 > $debugfile 2>/dev/null || exit 0
+bunzip2 -c $srcdir/$debugfile.bz2 > $debugfile 2>/dev/null || exit 77
 
 LD_LIBRARY_PATH=../libebl:../libelf${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH \
   ../src/strip -o testfile.temp $debugout $original

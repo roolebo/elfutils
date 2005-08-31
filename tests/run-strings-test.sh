@@ -14,11 +14,11 @@
 set -e
 
 # Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile.bz2 > testfile 2>/dev/null || exit 0
+bunzip2 -c $srcdir/testfile.bz2 > testfile 2>/dev/null || exit 77
 
 # Don't fail if we cannot decompress the file.
 for n in $(seq 2 9); do
-bunzip2 -c $srcdir/testfile$n.bz2 > testfile$n 2>/dev/null || exit 0
+bunzip2 -c $srcdir/testfile$n.bz2 > testfile$n 2>/dev/null || exit 77
 done
 
 LD_LIBRARY_PATH=../libelf${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH \

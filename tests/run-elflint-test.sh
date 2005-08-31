@@ -14,10 +14,10 @@
 set -e
 
 # Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile18.bz2 > testfile18 2>/dev/null || exit 0
+bunzip2 -c $srcdir/testfile18.bz2 > testfile18 2>/dev/null || exit 77
 
 LD_LIBRARY_PATH=../libebl:../libelf${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH \
-  ../src/elflint --gnu testfile18 >& elflint-test.out || :
+  ../src/elflint --gnu-ld testfile18 >& elflint-test.out || :
 
 diff -u elflint-test.out - <<"EOF"
 section [ 8] '.rela.dyn': relocation 1: copy relocation against symbol of type FUNC

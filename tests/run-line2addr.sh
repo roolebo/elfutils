@@ -14,19 +14,19 @@
 set -e
 
 # Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile.bz2 > testfile 2>/dev/null || exit 0
+bunzip2 -c $srcdir/testfile.bz2 > testfile 2>/dev/null || exit 77
 
 # Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile2.bz2 > testfile2 2>/dev/null || exit 0
+bunzip2 -c $srcdir/testfile2.bz2 > testfile2 2>/dev/null || exit 77
 
 # Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile8.bz2 > testfile8 2>/dev/null || exit 0
+bunzip2 -c $srcdir/testfile8.bz2 > testfile8 2>/dev/null || exit 77
 
 # Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile14.bz2 > testfile14 2>/dev/null || exit 0
+bunzip2 -c $srcdir/testfile14.bz2 > testfile14 2>/dev/null || exit 77
 
 # Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile23.bz2 > testfile23 2>/dev/null || exit 0
+bunzip2 -c $srcdir/testfile23.bz2 > testfile23 2>/dev/null || exit 77
 
 (./line2addr -e testfile f.c:4 testfile f.c:8
  ./line2addr -e testfile2 m.c:6 b.c:1

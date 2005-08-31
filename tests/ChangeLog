@@ -1,3 +1,23 @@
+2005-08-31  Ulrich Drepper  <drepper@redhat.com>
+
+	* run-addrscopes.sh: Use correct exit code if test cannot be performed.
+	* run-allfcts.sh: Likewise.
+	* run-ecp-test.sh: Likewise.
+	* run-ecp-test2.sh: Likewise.
+	* run-elflint-test.sh: Likewise.
+	* run-funcscopes.sh: Likewise.
+	* run-get-aranges.sh: Likewise.
+	* run-get-files.sh: Likewise.
+	* run-get-lines.sh: Likewise.
+	* run-get-pubnames.sh: Likewise.
+	* run-line2addr.sh: Likewise.
+	* run-ranlib-test2.sh: Likewise.
+	* run-show-abbrev.sh: Likewise.
+	* run-show-ciefde.sh: Likewise.
+	* run-show-die-info.sh: Likewise.
+	* run-strings-test.sh: Likewise.
+	* run-strip-test.sh: Likewise.
+
 2005-08-30  Ulrich Drepper  <drepper@redhat.com>
 
 	* coverage.sh: Handle case where there is no .gcno file at all.

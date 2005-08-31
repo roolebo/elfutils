@@ -13,7 +13,7 @@
 set -e
 
 # Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile25.bz2 > testfile25 2>/dev/null || exit 0
+bunzip2 -c $srcdir/testfile25.bz2 > testfile25 2>/dev/null || exit 77
 
 LD_LIBRARY_PATH=../libdw:../libebl:../libelf${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH \
   ./funcscopes -e testfile25 incr >& funcscopes-test.out || :

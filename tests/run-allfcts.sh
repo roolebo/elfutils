@@ -14,13 +14,13 @@
 set -e
 
 # Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile.bz2 > testfile 2>/dev/null || exit 0
+bunzip2 -c $srcdir/testfile.bz2 > testfile 2>/dev/null || exit 77
 
 # Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile2.bz2 > testfile2 2>/dev/null || exit 0
+bunzip2 -c $srcdir/testfile2.bz2 > testfile2 2>/dev/null || exit 77
 
 # Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile8.bz2 > testfile8 2>/dev/null || exit 0
+bunzip2 -c $srcdir/testfile8.bz2 > testfile8 2>/dev/null || exit 77
 
 ./allfcts testfile testfile2 testfile8 > allfcts.out
 

@@ -17,10 +17,10 @@ original=${original:-testfile19}
 indexed=${indexed:-testfile19.index}
 
 # Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/$original.bz2 > $original 2>/dev/null || exit 0
+bunzip2 -c $srcdir/$original.bz2 > $original 2>/dev/null || exit 77
 
 # Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/$indexed.bz2 > $indexed 2>/dev/null || exit 0
+bunzip2 -c $srcdir/$indexed.bz2 > $indexed 2>/dev/null || exit 77
 
 LD_LIBRARY_PATH=../libelf${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH \
   ../src/ranlib $original

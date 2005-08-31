@@ -13,7 +13,7 @@
 set -e
 
 # Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile22.bz2 > testfile22 2>/dev/null || exit 0
+bunzip2 -c $srcdir/testfile22.bz2 > testfile22 2>/dev/null || exit 77
 
 LD_LIBRARY_PATH=../libdw:../libebl:../libelf${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH \
   ./addrscopes -e testfile22 0x8048353 >& addrscopes-test.out || :
@@ -29,7 +29,7 @@ EOF
 rm -f testfile22 addrscopes-test.out
 
 # Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile24.bz2 > testfile24 2>/dev/null || exit 0
+bunzip2 -c $srcdir/testfile24.bz2 > testfile24 2>/dev/null || exit 77
 
 LD_LIBRARY_PATH=../libdw:../libebl:../libelf${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH \
   ./addrscopes -e testfile24 0x804834e >& addrscopes-test.out || :

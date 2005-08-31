@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 1999, 2000, 2002, 2003 Red Hat, Inc.
+# Copyright (C) 1999, 2000, 2002, 2003, 2005 Red Hat, Inc.
 # Written by Ulrich Drepper <drepper@redhat.com>, 1999.
 #
 # This program is Open Source software; you can redistribute it and/or
@@ -14,10 +14,10 @@
 set -e
 
 # Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile.bz2 > testfile 2>/dev/null || exit 0
+bunzip2 -c $srcdir/testfile.bz2 > testfile 2>/dev/null || exit 77
 
 # Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile2.bz2 > testfile2 2>/dev/null || exit 0
+bunzip2 -c $srcdir/testfile2.bz2 > testfile2 2>/dev/null || exit 77
 
 ./get-pubnames testfile testfile2 > get-pubnames.out
 

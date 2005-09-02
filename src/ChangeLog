@@ -1,6 +1,7 @@
 2005-09-02  Ulrich Drepper  <drepper@redhat.com>
 
 	* strings.c (main): Reset elfmap variable afte rmunmap call.
+	[_MUDFLAP] (map_file): Simplify mudflap debugging by not using mmap.
 
 2005-08-28  Ulrich Drepper  <drepper@redhat.com>
 

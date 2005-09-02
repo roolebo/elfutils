@@ -1,3 +1,7 @@
+2005-09-02  Ulrich Drepper  <drepper@redhat.com>
+
+	* strings.c (main): Reset elfmap variable afte rmunmap call.
+
 2005-08-28  Ulrich Drepper  <drepper@redhat.com>
 
 	* ranlib.c: Don't define pread_retry and write_retry here.

@@ -470,6 +470,6 @@ testfile9:    3e20 Discard symbols from object files.
 testfile9:    3e43 [FILE...]
 EOF
 
-rm -f testfile testfile[23456789]
+rm -f testfile testfile[23456789] strings.out
 
 exit 0

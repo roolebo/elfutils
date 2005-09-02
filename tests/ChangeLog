@@ -1,3 +1,7 @@
+2005-09-02  Ulrich Drepper  <drepper@redhat.com>
+
+	* run-strings-test.sh: Remove strings.out in the end.
+
 2005-08-31  Ulrich Drepper  <drepper@redhat.com>
 
 	* run-addrscopes.sh: Use correct exit code if test cannot be performed.

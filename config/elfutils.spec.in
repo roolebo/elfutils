@@ -185,6 +185,12 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.so
 
 %changelog
+* Fri Sep  2 2005 Ulrich Drepper <drepper@redhat.com> 0.115-1
+- libelf: speed-ups of non-mmap reading.
+- strings: New program.
+- Implement --enable-gcov option for configure.
+- libdw: New function dwarf_getscopes_die.
+
 * Wed Aug 24 2005 Ulrich Drepper <drepper@redhat.com> 0.114-1
 - libelf: new function elf_getaroff
 - libdw: Added dwarf_func_die, dwarf_func_inline, dwarf_func_inline_inst

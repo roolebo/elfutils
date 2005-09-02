@@ -198,10 +198,8 @@ main (int argc, char *argv[])
 	  }
 
 	if (elfmap != NULL && elfmap != MAP_FAILED)
-	  {
-	    munmap (elfmap, elfmap_size);
-	    elfmap = NULL;
-	  }
+	  munmap (elfmap, elfmap_size);
+	elfmap = NULL;
       }
     while (++remaining < argc);
 

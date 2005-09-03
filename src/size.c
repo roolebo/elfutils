@@ -306,7 +306,7 @@ process_file (const char *fname)
 	    INTERNAL_ERROR (fname);
 
 	  if (close (fd) != 0)
-	    error (EXIT_FAILURE, errno, gettext ("while close '%s'"), fname);
+	    error (EXIT_FAILURE, errno, gettext ("while closing '%s'"), fname);
 
 	  return 0;
 	}

@@ -365,7 +365,7 @@ process_file (const char *fname, bool more_than_one)
 	    INTERNAL_ERROR (fname);
 
 	  if (close (fd) != 0)
-	    error (EXIT_FAILURE, errno, gettext ("while close '%s'"), fname);
+	    error (EXIT_FAILURE, errno, gettext ("while closing '%s'"), fname);
 
 	  return result;
 	}
@@ -377,7 +377,7 @@ process_file (const char *fname, bool more_than_one)
 	    INTERNAL_ERROR (fname);
 
 	  if (close (fd) != 0)
-	    error (EXIT_FAILURE, errno, gettext ("while close '%s'"), fname);
+	    error (EXIT_FAILURE, errno, gettext ("while closing '%s'"), fname);
 
 	  return result;
 	}

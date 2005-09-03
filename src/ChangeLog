@@ -1,3 +1,7 @@
+2005-09-03  Ulrich Drepper  <drepper@redhat.com>
+
+	* readelf.c: Lots of little cleanups.  Use _unlocked functions.
+
 2005-09-02  Ulrich Drepper  <drepper@redhat.com>
 
 	* strings.c (main): Reset elfmap variable afte rmunmap call.

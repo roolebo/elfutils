@@ -380,8 +380,6 @@ process_file (int fd, Elf *elf, const char *prefix, const char *fname,
 
     case ELF_K_AR:
       {
-	Elf *subelf;
-	Elf_Cmd cmd = ELF_C_READ_MMAP;
 	size_t prefix_len = prefix == NULL ? 0 : strlen (prefix);
 	size_t fname_len = strlen (fname) + 1;
 	char new_prefix[prefix_len + 1 + fname_len];
@@ -396,6 +394,8 @@ process_file (int fd, Elf *elf, const char *prefix, const char *fname,
 	memcpy (cp, fname, fname_len);
 
 	/* It's an archive.  We process each file in it.  */
+	Elf *subelf;
+	Elf_Cmd cmd = ELF_C_READ_MMAP;
 	while ((subelf = elf_begin (fd, cmd, elf)) != NULL)
 	  {
 	    kind = elf_kind (subelf);
@@ -440,7 +440,6 @@ process_elf_file (Elf *elf, const char *prefix, const char *fname,
 {
   GElf_Ehdr ehdr_mem;
   GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);
-  Ebl *ebl;
 
   /* Print the file name.  */
   if (!only_one)
@@ -457,7 +456,7 @@ process_elf_file (Elf *elf, const char *prefix, const char *fname,
       return;
     }
 
-  ebl = ebl_openbackend (elf);
+  Ebl *ebl = ebl_openbackend (elf);
   if (ebl == NULL)
     {
       error (0, errno, gettext ("cannot create EBL handle"));
@@ -530,11 +529,8 @@ print_file_type (unsigned short int e_type)
 static void
 print_ehdr (Ebl *ebl, GElf_Ehdr *ehdr)
 {
-  char buf[512];
-  size_t cnt;
-
   fputs_unlocked (gettext ("ELF Header:\n  Magic:  "), stdout);
-  for (cnt = 0; cnt < EI_NIDENT; ++cnt)
+  for (size_t cnt = 0; cnt < EI_NIDENT; ++cnt)
     printf (" %02hhx", ehdr->e_ident[cnt]);
 
   printf (gettext ("\n  Class:                             %s\n"),
@@ -553,6 +549,7 @@ print_ehdr (Ebl *ebl, GElf_Ehdr *ehdr)
 	  ehdr->e_ident[EI_VERSION] == EV_CURRENT ? gettext ("(current)")
 	  : "(\?\?\?)");
 
+  char buf[512];
   printf (gettext ("  OS/ABI:                            %s\n"),
 	  ebl_osabi_name (ebl, ehdr->e_ident[EI_OSABI], buf, sizeof (buf)));
 
@@ -597,9 +594,7 @@ print_ehdr (Ebl *ebl, GElf_Ehdr *ehdr)
   if (ehdr->e_shnum == 0)
     {
       GElf_Shdr shdr_mem;
-      GElf_Shdr *shdr;
-
-      shdr = gelf_getshdr (elf_getscn (ebl->elf, 0), &shdr_mem);
+      GElf_Shdr *shdr = gelf_getshdr (elf_getscn (ebl->elf, 0), &shdr_mem);
       if (shdr != NULL)
 	printf (gettext (" (%" PRIu32 " in [0].sh_size)"),
 		(uint32_t) shdr->sh_size);
@@ -611,9 +606,7 @@ print_ehdr (Ebl *ebl, GElf_Ehdr *ehdr)
   if (ehdr->e_shstrndx == SHN_XINDEX)
     {
       GElf_Shdr shdr_mem;
-      GElf_Shdr *shdr;
-
-      shdr = gelf_getshdr (elf_getscn (ebl->elf, 0), &shdr_mem);
+      GElf_Shdr *shdr = gelf_getshdr (elf_getscn (ebl->elf, 0), &shdr_mem);
       if (shdr != NULL)
 	/* We managed to get the zeroth section.  */
 	snprintf (buf, sizeof (buf), gettext (" (%" PRIu32 " in [0].sh_link)"),
@@ -679,24 +672,21 @@ There are %d section headers, starting at offset %#" PRIx64 ":\n\
 
   for (cnt = 0; cnt < shnum; ++cnt)
     {
-      char buf[128];
-      char flagbuf[20];
-      char *cp;
       Elf_Scn *scn = elf_getscn (ebl->elf, cnt);
-      GElf_Shdr shdr_mem;
-      GElf_Shdr *shdr;
 
       if (scn == NULL)
 	error (EXIT_FAILURE, 0, gettext ("cannot get section: %s"),
 	       elf_errmsg (-1));
 
       /* Get the section header.  */
-      shdr = gelf_getshdr (scn, &shdr_mem);
+      GElf_Shdr shdr_mem;
+      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
       if (shdr == NULL)
 	error (EXIT_FAILURE, 0, gettext ("cannot get section header: %s"),
 	       elf_errmsg (-1));
 
-      cp = flagbuf;
+      char flagbuf[20];
+      char *cp = flagbuf;
       if (shdr->sh_flags & SHF_WRITE)
 	*cp++ = 'W';
       if (shdr->sh_flags & SHF_ALLOC)
@@ -723,6 +713,7 @@ There are %d section headers, starting at offset %#" PRIx64 ":\n\
 	*cp++ = 'E';
       *cp = '\0';
 
+      char buf[128];
       printf ("[%2zu] %-20s %-12s %0*" PRIx64 " %0*" PRIx64 " %0*" PRIx64
 	      " %2" PRId64 " %-5s %2" PRId32 " %3" PRId32
 	      " %2" PRId64 "\n",
@@ -745,9 +736,6 @@ There are %d section headers, starting at offset %#" PRIx64 ":\n\
 static void
 print_phdr (Ebl *ebl, GElf_Ehdr *ehdr)
 {
-  size_t cnt;
-  size_t shstrndx;
-
   if (ehdr->e_phnum == 0)
     /* No program header, this is OK in relocatable objects.  */
     return;
@@ -764,7 +752,7 @@ print_phdr (Ebl *ebl, GElf_Ehdr *ehdr)
   bool has_relro = false;
   GElf_Addr relro_from = 0;
   GElf_Addr relro_to = 0;
-  for (cnt = 0; cnt < ehdr->e_phnum; ++cnt)
+  for (size_t cnt = 0; cnt < ehdr->e_phnum; ++cnt)
     {
       char buf[128];
       GElf_Phdr mem;
@@ -809,21 +797,20 @@ print_phdr (Ebl *ebl, GElf_Ehdr *ehdr)
     }
 
   /* Get the section header string table index.  */
+  size_t shstrndx;
   if (elf_getshstrndx (ebl->elf, &shstrndx) < 0)
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
 
   puts (gettext ("\n Section to Segment mapping:\n  Segment Sections..."));
 
-  for (cnt = 0; cnt < ehdr->e_phnum; ++cnt)
+  for (size_t cnt = 0; cnt < ehdr->e_phnum; ++cnt)
     {
-      GElf_Phdr phdr_mem;
-      GElf_Phdr *phdr = gelf_getphdr (ebl->elf, cnt, &phdr_mem);
-      size_t inner;
-
       /* Print the segment number.  */
       printf ("   %2.2zu     ", cnt);
 
+      GElf_Phdr phdr_mem;
+      GElf_Phdr *phdr = gelf_getphdr (ebl->elf, cnt, &phdr_mem);
       /* This must not happen.  */
       if (phdr == NULL)
 	error (EXIT_FAILURE, 0, gettext ("cannot get program header: %s"),
@@ -832,19 +819,17 @@ print_phdr (Ebl *ebl, GElf_Ehdr *ehdr)
       /* Iterate over the sections.  */
       bool in_relro = false;
       bool in_ro = false;
-      for (inner = 1; inner < shnum; ++inner)
+      for (size_t inner = 1; inner < shnum; ++inner)
 	{
 	  Elf_Scn *scn = elf_getscn (ebl->elf, inner);
-	  GElf_Shdr shdr_mem;
-	  GElf_Shdr *shdr;
-
-	  /* It should not happen.  */
+	  /* This should not happen.  */
 	  if (scn == NULL)
 	    error (EXIT_FAILURE, 0, gettext ("cannot get section: %s"),
 		   elf_errmsg (-1));
 
 	  /* Get the section header.  */
-	  shdr = gelf_getshdr (scn, &shdr_mem);
+	  GElf_Shdr shdr_mem;
+	  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
 	  if (shdr == NULL)
 	    error (EXIT_FAILURE, 0,
 		   gettext ("cannot get section header: %s"),
@@ -940,34 +925,27 @@ print_phdr (Ebl *ebl, GElf_Ehdr *ehdr)
 static void
 handle_scngrp (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 {
-  Elf_Data *data;
-  Elf32_Word *grpref;
-  Elf_Scn *symscn;
-  GElf_Shdr symshdr_mem;
-  GElf_Shdr *symshdr;
-  Elf_Data *symdata;
-  GElf_Sym sym_mem;
-  size_t cnt;
-  size_t shstrndx;
-
   /* Get the data of the section.  */
-  data = elf_getdata (scn, NULL);
+  Elf_Data *data = elf_getdata (scn, NULL);
 
-  symscn = elf_getscn (ebl->elf, shdr->sh_link);
-  symshdr = gelf_getshdr (symscn, &symshdr_mem);
-  symdata = elf_getdata (symscn, NULL);
+  Elf_Scn *symscn = elf_getscn (ebl->elf, shdr->sh_link);
+  GElf_Shdr symshdr_mem;
+  GElf_Shdr *symshdr = gelf_getshdr (symscn, &symshdr_mem);
+  Elf_Data *symdata = elf_getdata (symscn, NULL);
 
   if (data == NULL || data->d_size < sizeof (Elf32_Word) || symshdr == NULL
       || symdata == NULL)
     return;
 
   /* Get the section header string table index.  */
+  size_t shstrndx;
   if (elf_getshstrndx (ebl->elf, &shstrndx) < 0)
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
 
-  grpref = (Elf32_Word *) data->d_buf;
+  Elf32_Word *grpref = (Elf32_Word *) data->d_buf;
 
+  GElf_Sym sym_mem;
   printf ((grpref[0] & GRP_COMDAT)
 	  ? ngettext ("\
 \nCOMDAT section group [%2zu] '%s' with signature '%s' contains %zu entry:\n",
@@ -985,21 +963,18 @@ handle_scngrp (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 	  ?: gettext ("<INVALID SYMBOL>"),
 	  data->d_size / sizeof (Elf32_Word) - 1);
 
-  for (cnt = 1; cnt < data->d_size / sizeof (Elf32_Word); ++cnt)
+  for (size_t cnt = 1; cnt < data->d_size / sizeof (Elf32_Word); ++cnt)
     {
       GElf_Shdr grpshdr_mem;
-      GElf_Shdr *grpshdr;
+      GElf_Shdr *grpshdr = gelf_getshdr (elf_getscn (ebl->elf, grpref[cnt]),
+					 &grpshdr_mem);
 
-      grpshdr = gelf_getshdr (elf_getscn (ebl->elf, grpref[cnt]),
-			      &grpshdr_mem);
-
-      if (grpshdr == NULL)
-	printf (gettext ("  [%2u] <INVALID SECTION>\n"), grpref[cnt]);
-      else
-	printf ("  [%2u] %s\n",
-		grpref[cnt],
-		elf_strptr (ebl->elf, shstrndx, grpshdr->sh_name)
-		?: gettext ("<INVALID SECTION>"));
+      const char *str;
+      printf ("  [%2u] %s\n",
+	      grpref[cnt],
+	      grpshdr != NULL
+	      && (str = elf_strptr (ebl->elf, shstrndx, grpshdr->sh_name))
+	      ? str : gettext ("<INVALID SECTION>"));
     }
 }
 
@@ -1166,14 +1141,12 @@ handle_dynamic (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 
   for (cnt = 0; cnt < shdr->sh_size / shdr->sh_entsize; ++cnt)
     {
-      char buf[64];
       GElf_Dyn dynmem;
-      GElf_Dyn *dyn;
-
-      dyn = gelf_getdyn (data, cnt, &dynmem);
+      GElf_Dyn *dyn = gelf_getdyn (data, cnt, &dynmem);
       if (dyn == NULL)
 	break;
 
+      char buf[64];
       printf ("  %-17s ",
 	      ebl_dynamic_tag_name (ebl, dyn->d_tag, buf, sizeof (buf)));
 
@@ -1184,7 +1157,7 @@ handle_dynamic (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 	case DT_BIND_NOW:
 	case DT_TEXTREL:
 	  /* No further output.  */
-	  fputc ('\n', stdout);
+	  fputc_unlocked ('\n', stdout);
 	  break;
 
 	case DT_NEEDED:
@@ -1314,31 +1287,22 @@ handle_relocs_rel (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 {
   int class = gelf_getclass (ebl->elf);
   int nentries = shdr->sh_size / shdr->sh_entsize;
-  int cnt;
-  Elf_Data *data;
-  Elf_Scn *symscn;
-  GElf_Shdr symshdr_mem;
-  GElf_Shdr *symshdr;
-  Elf_Data *symdata;
-  GElf_Shdr destshdr_mem;
-  GElf_Shdr *destshdr;
-  Elf_Scn *xndxscn;
-  Elf_Data *xndxdata = NULL;
-  size_t shstrndx;
 
   /* Get the data of the section.  */
-  data = elf_getdata (scn, NULL);
+  Elf_Data *data = elf_getdata (scn, NULL);
   if (data == NULL)
     return;
 
   /* Get the symbol table information.  */
-  symscn = elf_getscn (ebl->elf, shdr->sh_link);
-  symshdr = gelf_getshdr (symscn, &symshdr_mem);
-  symdata = elf_getdata (symscn, NULL);
+  Elf_Scn *symscn = elf_getscn (ebl->elf, shdr->sh_link);
+  GElf_Shdr symshdr_mem;
+  GElf_Shdr *symshdr = gelf_getshdr (symscn, &symshdr_mem);
+  Elf_Data *symdata = elf_getdata (symscn, NULL);
 
   /* Get the section header of the section the relocations are for.  */
-  destshdr = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_info),
-			   &destshdr_mem);
+  GElf_Shdr destshdr_mem;
+  GElf_Shdr *destshdr = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_info),
+				      &destshdr_mem);
 
   if (symshdr == NULL || symdata == NULL || destshdr == NULL)
     {
@@ -1348,13 +1312,12 @@ handle_relocs_rel (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
     }
 
   /* Search for the optional extended section index table.  */
-  xndxscn = NULL;
+  Elf_Scn *xndxscn = NULL;
+  Elf_Data *xndxdata = NULL;
   while ((xndxscn = elf_nextscn (ebl->elf, xndxscn)) != NULL)
     {
       GElf_Shdr xndxshdr_mem;
-      GElf_Shdr *xndxshdr;
-
-      xndxshdr = gelf_getshdr (xndxscn, &xndxshdr_mem);
+      GElf_Shdr *xndxshdr = gelf_getshdr (xndxscn, &xndxshdr_mem);
       if (xndxshdr != NULL && xndxshdr->sh_type == SHT_SYMTAB_SHNDX
 	  && xndxshdr->sh_link == elf_ndxscn (symscn))
 	{
@@ -1365,6 +1328,7 @@ handle_relocs_rel (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
     }
 
   /* Get the section header string table index.  */
+  size_t shstrndx;
   if (elf_getshstrndx (ebl->elf, &shstrndx) < 0)
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
@@ -1401,21 +1365,18 @@ handle_relocs_rel (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
   Offset              Type                 Value               Name\n"),
 	 stdout);
 
-  for (cnt = 0; cnt < nentries; ++cnt)
+  for (int cnt = 0; cnt < nentries; ++cnt)
     {
       GElf_Rel relmem;
-      GElf_Rel *rel;
-
-      rel = gelf_getrel (data, cnt, &relmem);
+      GElf_Rel *rel = gelf_getrel (data, cnt, &relmem);
       if (rel != NULL)
 	{
 	  char buf[128];
 	  GElf_Sym symmem;
-	  GElf_Sym *sym;
 	  Elf32_Word xndx;
-
-	  sym = gelf_getsymshndx (symdata, xndxdata, GELF_R_SYM (rel->r_info),
-				  &symmem, &xndx);
+	  GElf_Sym *sym = gelf_getsymshndx (symdata, xndxdata,
+					    GELF_R_SYM (rel->r_info),
+					    &symmem, &xndx);
 	  if (sym == NULL)
 	    printf ("  %#0*" PRIx64 "  %-20s <%s %ld>\n",
 		    class == ELFCLASS32 ? 10 : 18, rel->r_offset,
@@ -1510,9 +1471,7 @@ handle_relocs_rela (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
   while ((xndxscn = elf_nextscn (ebl->elf, xndxscn)) != NULL)
     {
       GElf_Shdr xndxshdr_mem;
-      GElf_Shdr *xndxshdr;
-
-      xndxshdr = gelf_getshdr (xndxscn, &xndxshdr_mem);
+      GElf_Shdr *xndxshdr = gelf_getshdr (xndxscn, &xndxshdr_mem);
       if (xndxshdr != NULL && xndxshdr->sh_type == SHT_SYMTAB_SHNDX
 	  && xndxshdr->sh_link == elf_ndxscn (symscn))
 	{
@@ -1554,11 +1513,10 @@ handle_relocs_rela (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 	{
 	  char buf[64];
 	  GElf_Sym symmem;
-	  GElf_Sym *sym;
 	  Elf32_Word xndx;
-
-	  sym = gelf_getsymshndx (symdata, xndxdata, GELF_R_SYM (rel->r_info),
-				  &symmem, &xndx);
+	  GElf_Sym *sym = gelf_getsymshndx (symdata, xndxdata,
+					    GELF_R_SYM (rel->r_info),
+					    &symmem, &xndx);
 
 	  if (sym == NULL)
 	    printf ("  %#0*" PRIx64 "  %-15s <%s %ld>\n",
@@ -1649,23 +1607,17 @@ handle_symtab (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
   Elf_Data *verneed_data = NULL;
   Elf_Data *verdef_data = NULL;
   Elf_Data *xndx_data = NULL;
-  Elf_Scn *runscn;
-  Elf_Data *data;
   int class = gelf_getclass (ebl->elf);
-  unsigned int nsyms;
-  unsigned int cnt;
   Elf32_Word verneed_stridx = 0;
   Elf32_Word verdef_stridx = 0;
-  GElf_Shdr glink;
-  size_t shstrndx;
 
   /* Get the data of the section.  */
-  data = elf_getdata (scn, NULL);
+  Elf_Data *data = elf_getdata (scn, NULL);
   if (data == NULL)
     return;
 
   /* Find out whether we have other sections we might need.  */
-  runscn = NULL;
+  Elf_Scn *runscn = NULL;
   while ((runscn = elf_nextscn (ebl->elf, runscn)) != NULL)
     {
       GElf_Shdr runshdr_mem;
@@ -1697,19 +1649,22 @@ handle_symtab (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
     }
 
   /* Get the section header string table index.  */
+  size_t shstrndx;
   if (elf_getshstrndx (ebl->elf, &shstrndx) < 0)
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
 
   /* Now we can compute the number of entries in the section.  */
-  nsyms = data->d_size / (class == ELFCLASS32
-			  ? sizeof (Elf32_Sym) : sizeof (Elf64_Sym));
+  unsigned int nsyms = data->d_size / (class == ELFCLASS32
+				       ? sizeof (Elf32_Sym)
+				       : sizeof (Elf64_Sym));
 
   printf (ngettext ("\nSymbol table [%2u] '%s' contains %u entry:\n",
 		    "\nSymbol table [%2u] '%s' contains %u entries:\n",
 		    nsyms),
 	  (unsigned int) elf_ndxscn (scn),
 	  elf_strptr (ebl->elf, shstrndx, shdr->sh_name), nsyms);
+  GElf_Shdr glink;
   printf (ngettext (" %lu local symbol  String table: [%2u] '%s'\n",
 		    " %lu local symbols  String table: [%2u] '%s'\n",
 		    shdr->sh_info),
@@ -1726,7 +1681,7 @@ handle_symtab (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
   Num:            Value   Size Type    Bind   Vis          Ndx Name\n"),
 		  stdout);
 
-  for (cnt = 0; cnt < nsyms; ++cnt)
+  for (unsigned int cnt = 0; cnt < nsyms; ++cnt)
     {
       char typebuf[64];
       char bindbuf[64];
@@ -1761,9 +1716,7 @@ handle_symtab (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 	{
 	  /* Get the version information.  */
 	  GElf_Versym versym_mem;
-	  GElf_Versym *versym;
-
-	  versym = gelf_getversym (versym_data, cnt, &versym_mem);
+	  GElf_Versym *versym = gelf_getversym (versym_data, cnt, &versym_mem);
 
 	  if (versym != NULL && ((*versym & 0x8000) != 0 || *versym > 1))
 	    {
@@ -1783,13 +1736,13 @@ handle_symtab (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 	      if (is_nobits || ! check_def)
 		{
 		  /* We must test both.  */
-		  GElf_Verneed verneed_mem;
-		  GElf_Verneed *verneed;
 		  GElf_Vernaux vernaux_mem;
 		  GElf_Vernaux *vernaux = NULL;
 		  size_t vn_offset = 0;
 
-		  verneed = gelf_getverneed (verneed_data, 0, &verneed_mem);
+		  GElf_Verneed verneed_mem;
+		  GElf_Verneed *verneed = gelf_getverneed (verneed_data, 0,
+							   &verneed_mem);
 		  while (verneed != NULL)
 		    {
 		      size_t vna_offset = vn_offset;
@@ -1840,11 +1793,11 @@ handle_symtab (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 	      if (check_def && *versym != 0x8001)
 		{
 		  /* We must test both.  */
-		  GElf_Verdef verdef_mem;
-		  GElf_Verdef *verdef;
 		  size_t vd_offset = 0;
 
-		  verdef = gelf_getverdef (verdef_data, 0, &verdef_mem);
+		  GElf_Verdef verdef_mem;
+		  GElf_Verdef *verdef = gelf_getverdef (verdef_data, 0,
+							&verdef_mem);
 		  while (verdef != NULL)
 		    {
 		      if (verdef->vd_ndx == (*versym & 0x7fff))
@@ -1861,11 +1814,10 @@ handle_symtab (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 		  if (verdef != NULL)
 		    {
 		      GElf_Verdaux verdaux_mem;
-		      GElf_Verdaux *verdaux;
-
-		      verdaux = gelf_getverdaux (verdef_data,
-						 vd_offset + verdef->vd_aux,
-						 &verdaux_mem);
+		      GElf_Verdaux *verdaux
+			= gelf_getverdaux (verdef_data,
+					   vd_offset + verdef->vd_aux,
+					   &verdaux_mem);
 
 		      if (verdaux != NULL)
 			printf ((*versym & 0x8000) ? "@%s" : "@@%s",
@@ -1876,7 +1828,7 @@ handle_symtab (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 	    }
 	}
 
-      putchar ('\n');
+      putchar_unlocked ('\n');
     }
 }
 
@@ -2086,7 +2038,6 @@ static void
 handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 {
   int class = gelf_getclass (ebl->elf);
-  GElf_Shdr glink;
   const char **vername;
   const char **filename;
 
@@ -2234,18 +2185,15 @@ handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 
 	  for (unsigned int cnt = 0; cnt < defshdr->sh_info; ++cnt)
 	    {
-	      GElf_Verdef defmem;
-	      GElf_Verdef *def;
-	      GElf_Verdaux auxmem;
-	      GElf_Verdaux *aux;
 
 	      /* Get the data at the next offset.  */
-	      def = gelf_getverdef (defdata, offset, &defmem);
-	      if (def == NULL)
-		break;
-
-	      aux = gelf_getverdaux (defdata, offset + def->vd_aux, &auxmem);
-	      if (aux == NULL)
+	      GElf_Verdef defmem;
+	      GElf_Verdef *def = gelf_getverdef (defdata, offset, &defmem);
+	      GElf_Verdaux auxmem;
+	      GElf_Verdaux *aux = gelf_getverdaux (defdata,
+						   offset + def->vd_aux,
+						   &auxmem);
+	      if (def == NULL || aux == NULL)
 		break;
 
 	      vername[def->vd_ndx & 0x7fff]
@@ -2258,38 +2206,29 @@ handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
       if (needscn != NULL)
 	{
 	  unsigned int offset = 0;
-	  Elf_Data *needdata;
+
+	  Elf_Data *needdata = elf_getdata (needscn, NULL);
 	  GElf_Shdr needshdrmem;
-	  GElf_Shdr *needshdr;
-
-	  needdata = elf_getdata (needscn, NULL);
-	  if (needdata == NULL)
-	    return;
-
-	  needshdr = gelf_getshdr (needscn, &needshdrmem);
-	  if (needshdr == NULL)
+	  GElf_Shdr *needshdr = gelf_getshdr (needscn, &needshdrmem);
+	  if (needdata == NULL || needshdr == NULL)
 	    return;
 
 	  for (unsigned int cnt = 0; cnt < needshdr->sh_info; ++cnt)
 	    {
-	      GElf_Verneed needmem;
-	      GElf_Verneed *need;
-	      unsigned int auxoffset;
-	      int cnt2;
-
 	      /* Get the data at the next offset.  */
-	      need = gelf_getverneed (needdata, offset, &needmem);
+	      GElf_Verneed needmem;
+	      GElf_Verneed *need = gelf_getverneed (needdata, offset,
+						    &needmem);
 	      if (need == NULL)
 		break;
 
 	      /* Run through the auxiliary entries.  */
-	      auxoffset = offset + need->vn_aux;
-	      for (cnt2 = need->vn_cnt; --cnt2 >= 0; )
+	      unsigned int auxoffset = offset + need->vn_aux;
+	      for (int cnt2 = need->vn_cnt; --cnt2 >= 0; )
 		{
 		  GElf_Vernaux auxmem;
-		  GElf_Vernaux *aux;
-
-		  aux = gelf_getvernaux (needdata, auxoffset, &auxmem);
+		  GElf_Vernaux *aux = gelf_getvernaux (needdata, auxoffset,
+						       &auxmem);
 		  if (aux == NULL)
 		    break;
 
@@ -2313,6 +2252,7 @@ handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
     }
 
   /* Print the header.  */
+  GElf_Shdr glink;
   printf (ngettext ("\
 \nVersion symbols section [%2u] '%s' contains %d entry:\n Addr: %#0*" PRIx64 "  Offset: %#08" PRIx64 "  Link to section: [%2u] '%s'",
 		    "\
@@ -2331,19 +2271,17 @@ handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
   /* Now we can finally look at the actual contents of this section.  */
   for (unsigned int cnt = 0; cnt < shdr->sh_size / shdr->sh_entsize; ++cnt)
     {
-      GElf_Versym symmem;
-      GElf_Versym *sym;
-      ssize_t n;
-
       if (cnt % 2 == 0)
 	printf ("\n %4d:", cnt);
 
-      sym = gelf_getversym (data, cnt, &symmem);
+      GElf_Versym symmem;
+      GElf_Versym *sym = gelf_getversym (data, cnt, &symmem);
       if (sym == NULL)
 	break;
 
       switch (*sym)
 	{
+	  ssize_t n;
 	case 0:
 	  fputs_unlocked (gettext ("   0 *local*                     "),
 			  stdout);
@@ -2366,23 +2304,22 @@ handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 	  break;
 	}
     }
-  putchar ('\n');
+  putchar_unlocked ('\n');
 }
 
 
+/* Find the symbol table(s).  For this we have to search through the
+   section table.  */
 static void
 handle_hash (Ebl *ebl)
 {
-  /* Find the symbol table(s).  For this we have to search through the
-     section table.  */
-  Elf_Scn *scn = NULL;
-  size_t shstrndx;
-
   /* Get the section header string table index.  */
+  size_t shstrndx;
   if (elf_getshstrndx (ebl->elf, &shstrndx) < 0)
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
 
+  Elf_Scn *scn = NULL;
   while ((scn = elf_nextscn (ebl->elf, scn)) != NULL)
     {
       /* Handle the section if it is a symbol table.  */
@@ -2392,18 +2329,6 @@ handle_hash (Ebl *ebl)
       if (shdr != NULL && shdr->sh_type == SHT_HASH)
 	{
 	  Elf_Data *data = elf_getdata (scn, NULL);
-	  Elf32_Word nbucket;
-	  Elf32_Word nchain;
-	  Elf32_Word *bucket;
-	  Elf32_Word *chain;
-	  uint32_t *lengths;
-	  uint32_t *counts;
-	  Elf32_Word cnt;
-	  Elf32_Word maxlength = 0;
-	  Elf32_Word nsyms = 0;
-	  uint64_t nzero_counts = 0;
-	  GElf_Shdr glink;
-
 	  if (data == NULL)
 	    {
 	      error (0, 0, gettext ("cannot get data for section %d: %s"),
@@ -2411,11 +2336,12 @@ handle_hash (Ebl *ebl)
 	      continue;
 	    }
 
-	  nbucket = ((Elf32_Word *) data->d_buf)[0];
-	  nchain = ((Elf32_Word *) data->d_buf)[1];
-	  bucket = &((Elf32_Word *) data->d_buf)[2];
-	  chain = &((Elf32_Word *) data->d_buf)[2 + nbucket];
+	  Elf32_Word nbucket = ((Elf32_Word *) data->d_buf)[0];
+	  Elf32_Word nchain = ((Elf32_Word *) data->d_buf)[1];
+	  Elf32_Word *bucket = &((Elf32_Word *) data->d_buf)[2];
+	  Elf32_Word *chain = &((Elf32_Word *) data->d_buf)[2 + nbucket];
 
+	  GElf_Shdr glink;
 	  printf (ngettext ("\
 \nHistogram for bucket list length in section [%2u] '%s' (total of %d bucket):\n Addr: %#0*" PRIx64 "  Offset: %#08" PRIx64 "  Link to section: [%2u] '%s'\n",
 			    "\
@@ -2433,14 +2359,15 @@ handle_hash (Ebl *ebl)
 							shdr->sh_link),
 					    &glink)->sh_name));
 
-	  lengths = (uint32_t *) xcalloc (nbucket, sizeof (uint32_t));
+	  uint32_t *lengths = (uint32_t *) xcalloc (nbucket,
+						    sizeof (uint32_t));
 
-	  for (cnt = 0; cnt < nbucket; ++cnt)
+	  Elf32_Word maxlength = 0;
+	  Elf32_Word nsyms = 0;
+	  for (Elf32_Word cnt = 0; cnt < nbucket; ++cnt)
 	    if (bucket[cnt] != 0)
 	      {
-		Elf32_Word inner;
-
-		inner = bucket[cnt];
+		Elf32_Word inner = bucket[cnt];
 		while (inner > 0 && inner < nchain)
 		  {
 		    ++nsyms;
@@ -2451,21 +2378,23 @@ handle_hash (Ebl *ebl)
 		  }
 	      }
 
-	  counts = (uint32_t *) xcalloc (maxlength + 1, sizeof (uint32_t));
+	  uint32_t *counts = (uint32_t *) xcalloc (maxlength + 1,
+						   sizeof (uint32_t));
 
-	  for (cnt = 0; cnt < nbucket; ++cnt)
+	  for (Elf32_Word cnt = 0; cnt < nbucket; ++cnt)
 	    ++counts[lengths[cnt]];
 
 	  if (nbucket > 0)
 	    {
 	      uint64_t success = 0;
-	      Elf32_Word acc;
 
-	      puts (gettext (" Length  Number  % of total  Coverage"));
+	      fputs_unlocked (gettext ("\
+ Length  Number  % of total  Coverage\n"), stdout);
 	      printf (gettext ("      0  %6" PRIu32 "      %5.1f%%\n"),
 		      counts[0], (counts[0] * 100.0) / nbucket);
 
-	      for (cnt = 1; cnt <= maxlength; ++cnt)
+	      uint64_t nzero_counts = 0;
+	      for (Elf32_Word cnt = 1; cnt <= maxlength; ++cnt)
 		{
 		  nzero_counts += counts[cnt] * cnt;
 		  printf (gettext ("\
@@ -2475,8 +2404,8 @@ handle_hash (Ebl *ebl)
 			  (nzero_counts * 100.0) / nsyms);
 		}
 
-	      acc = 0;
-	      for (cnt = 1; cnt <= maxlength; ++cnt)
+	      Elf32_Word acc = 0;
+	      for (Elf32_Word cnt = 1; cnt <= maxlength; ++cnt)
 		{
 		  acc += cnt;
 		  success += counts[cnt] * acc;

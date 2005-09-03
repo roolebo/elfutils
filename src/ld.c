@@ -339,7 +339,7 @@ main (int argc, char *argv[])
      statements in the script.  This simply must not happen.  */
   ldin = fopen (linker_script, "r");
   if (ldin == NULL)
-    error (EXIT_FAILURE, errno, gettext ("cannot open linker script \"%s\""),
+    error (EXIT_FAILURE, errno, gettext ("cannot open linker script '%s'"),
 	   linker_script);
   /* No need for locking.  */
   __fsetlocking (ldin, FSETLOCKING_BYCALLER);
@@ -579,7 +579,7 @@ parse_opt_1st (int key, char *arg,
 	    else
 	      {
 		error (0, 0,
-		       gettext ("invalid page size value \"%s\": ignored"),
+		       gettext ("invalid page size value '%s': ignored"),
 		       arg);
 		ld_state.pagesize = 0;
 	      }
@@ -1335,7 +1335,7 @@ read_version_script (const char *fname)
      or absolute) path.  No search along a path will be performed.  */
   ldin = fopen (fname, "r");
   if (ldin == NULL)
-    error (EXIT_FAILURE, errno, gettext ("cannot read version script \"%s\""),
+    error (EXIT_FAILURE, errno, gettext ("cannot read version script '%s'"),
 	   fname);
   /* No need for locking.  */
   __fsetlocking (ldin, FSETLOCKING_BYCALLER);

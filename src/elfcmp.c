@@ -114,7 +114,7 @@ main (int argc, char *argv[])
   (void) argp_parse (&argp, argc, argv, 0, &remaining, NULL);
 
   /* We expect exactly two non-option parameters.  */
-  if (remaining + 2 != argc)
+  if (unlikely (remaining + 2 != argc))
     {
       fputs (gettext ("Invalid number of parameters.\n"), stderr);
       argp_help (&argp, stderr, ARGP_HELP_SEE, program_invocation_short_name);
@@ -144,26 +144,26 @@ main (int argc, char *argv[])
   GElf_Ehdr ehdr1_mem;
   GElf_Ehdr *ehdr1 = gelf_getehdr (elf1, &ehdr1_mem);
   if (ehdr1 == NULL)
-    error (EXIT_FAILURE, 0, gettext ("cannot get ELF header of \"%s\": %s"),
+    error (EXIT_FAILURE, 0, gettext ("cannot get ELF header of '%s': %s"),
 	   fname1, elf_errmsg (-1));
   GElf_Ehdr ehdr2_mem;
   GElf_Ehdr *ehdr2 = gelf_getehdr (elf2, &ehdr2_mem);
   if (ehdr2 == NULL)
-    error (EXIT_FAILURE, 0, gettext ("cannot get ELF header of \"%s\": %s"),
+    error (EXIT_FAILURE, 0, gettext ("cannot get ELF header of '%s': %s"),
 	   fname2, elf_errmsg (-1));
 
   /* Compare the ELF headers.  */
-  if (memcmp (ehdr1->e_ident, ehdr2->e_ident, EI_NIDENT) != 0
-      || ehdr1->e_type != ehdr2->e_type
-      || ehdr1->e_machine != ehdr2->e_machine
-      || ehdr1->e_version != ehdr2->e_version
-      || ehdr1->e_entry != ehdr2->e_entry
-      || ehdr1->e_phoff != ehdr2->e_phoff
-      || ehdr1->e_flags != ehdr2->e_flags
-      || ehdr1->e_ehsize != ehdr2->e_ehsize
-      || ehdr1->e_phentsize != ehdr2->e_phentsize
-      || ehdr1->e_phnum != ehdr2->e_phnum
-      || ehdr1->e_shentsize != ehdr2->e_shentsize)
+  if (unlikely (memcmp (ehdr1->e_ident, ehdr2->e_ident, EI_NIDENT) != 0
+		|| ehdr1->e_type != ehdr2->e_type
+		|| ehdr1->e_machine != ehdr2->e_machine
+		|| ehdr1->e_version != ehdr2->e_version
+		|| ehdr1->e_entry != ehdr2->e_entry
+		|| ehdr1->e_phoff != ehdr2->e_phoff
+		|| ehdr1->e_flags != ehdr2->e_flags
+		|| ehdr1->e_ehsize != ehdr2->e_ehsize
+		|| ehdr1->e_phentsize != ehdr2->e_phentsize
+		|| ehdr1->e_phnum != ehdr2->e_phnum
+		|| ehdr1->e_shentsize != ehdr2->e_shentsize))
     {
       if (! quiet)
 	error (0, 0, gettext ("%s %s diff: ELF header"), fname1, fname2);
@@ -221,7 +221,7 @@ main (int argc, char *argv[])
 
       /* Compare the headers.  We allow the name to be at a different
 	 location.  */
-      if (strcmp (sname1, sname2) != 0)
+      if (unlikely (strcmp (sname1, sname2) != 0))
 	{
 	header_mismatch:
 	  error (0, 0, gettext ("%s %s differ: section header"),
@@ -250,13 +250,13 @@ main (int argc, char *argv[])
       Elf_Data *data1 = elf_getdata (scn1, NULL);
       if (data1 == NULL)
 	error (EXIT_FAILURE, 0,
-	       gettext ("cannot get content of section %zu in \"%s\": %s"),
+	       gettext ("cannot get content of section %zu in '%s': %s"),
 	       elf_ndxscn (scn1), fname1, elf_errmsg (-1));
 
       Elf_Data *data2 = elf_getdata (scn2, NULL);
       if (data2 == NULL)
 	error (EXIT_FAILURE, 0,
-	       gettext ("cannot get content of section %zu in \"%s\": %s"),
+	       gettext ("cannot get content of section %zu in '%s': %s"),
 	       elf_ndxscn (scn2), fname2, elf_errmsg (-1));
 
       switch (shdr1->sh_type)
@@ -272,26 +272,26 @@ main (int argc, char *argv[])
 	      GElf_Sym *sym1 = gelf_getsym (data1, ndx, &sym1_mem);
 	      if (sym1 == NULL)
 		error (EXIT_FAILURE, 0,
-		       gettext ("cannot get symbol in \"%s\": %s"),
+		       gettext ("cannot get symbol in '%s': %s"),
 		       fname1, elf_errmsg (-1));
 	      GElf_Sym sym2_mem;
 	      GElf_Sym *sym2 = gelf_getsym (data2, ndx, &sym2_mem);
 	      if (sym2 == NULL)
 		error (EXIT_FAILURE, 0,
-		       gettext ("cannot get symbol in \"%s\": %s"),
+		       gettext ("cannot get symbol in '%s': %s"),
 		       fname2, elf_errmsg (-1));
 
 	      const char *name1 = elf_strptr (elf1, shdr1->sh_link,
 					      sym1->st_name);
 	      const char *name2 = elf_strptr (elf2, shdr2->sh_link,
 					      sym2->st_name);
-	      if (strcmp (name1, name2) != 0
-		  || sym1->st_value != sym2->st_value
-		  || (sym1->st_size != sym2->st_size
-		      && sym1->st_shndx != SHN_UNDEF)
-		  || sym1->st_info != sym2->st_info
-		  || sym1->st_other != sym2->st_other
-		  || sym1->st_shndx != sym1->st_shndx)
+	      if (unlikely (strcmp (name1, name2) != 0
+			    || sym1->st_value != sym2->st_value
+			    || (sym1->st_size != sym2->st_size
+				&& sym1->st_shndx != SHN_UNDEF)
+			    || sym1->st_info != sym2->st_info
+			    || sym1->st_other != sym2->st_other
+			    || sym1->st_shndx != sym1->st_shndx))
 		{
 		  // XXX Do we want to allow reordered symbol tables?
 		symtab_mismatch:
@@ -336,9 +336,10 @@ main (int argc, char *argv[])
 	  assert (shdr2->sh_type == SHT_NOBITS
 		  || (data2->d_buf != NULL || data1->d_size == 0));
 
-	  if (data1->d_size != data2->d_size
-	      || (shdr1->sh_type != SHT_NOBITS
-		  && memcmp (data1->d_buf, data2->d_buf, data1->d_size) != 0))
+	  if (unlikely (data1->d_size != data2->d_size
+			|| (shdr1->sh_type != SHT_NOBITS
+			    && memcmp (data1->d_buf, data2->d_buf,
+				       data1->d_size) != 0)))
 	    {
 	      if (! quiet)
 		{
@@ -360,7 +361,7 @@ main (int argc, char *argv[])
 	}
     }
 
-  if (scn1 != scn2)
+  if (unlikely (scn1 != scn2))
     {
       if (! quiet)
 	error (0, 0,
@@ -398,12 +399,12 @@ main (int argc, char *argv[])
     {
       raw1 = elf_rawfile (elf1, &size1);
       if (raw1 == NULL )
-	error (EXIT_FAILURE, 0, gettext ("cannot load data of \"%s\": %s"),
+	error (EXIT_FAILURE, 0, gettext ("cannot load data of '%s': %s"),
 	       fname1, elf_errmsg (-1));
 
       raw2 = elf_rawfile (elf2, &size2);
       if (raw2 == NULL )
-	error (EXIT_FAILURE, 0, gettext ("cannot load data of \"%s\": %s"),
+	error (EXIT_FAILURE, 0, gettext ("cannot load data of '%s': %s"),
 	       fname2, elf_errmsg (-1));
 
       for (size_t cnt = 0; cnt < nregions; ++cnt)
@@ -422,16 +423,16 @@ main (int argc, char *argv[])
       GElf_Phdr *phdr1 = gelf_getphdr (elf1, ndx, &phdr1_mem);
       if (ehdr1 == NULL)
 	error (EXIT_FAILURE, 0,
-	       gettext ("cannot get program header entry %d of \"%s\": %s"),
+	       gettext ("cannot get program header entry %d of '%s': %s"),
 	       ndx, fname1, elf_errmsg (-1));
       GElf_Phdr phdr2_mem;
       GElf_Phdr *phdr2 = gelf_getphdr (elf2, ndx, &phdr2_mem);
       if (ehdr2 == NULL)
 	error (EXIT_FAILURE, 0,
-	       gettext ("cannot get program header entry %d of \"%s\": %s"),
+	       gettext ("cannot get program header entry %d of '%s': %s"),
 	       ndx, fname2, elf_errmsg (-1));
 
-      if (memcmp (phdr1, phdr2, sizeof (GElf_Phdr)) != 0)
+      if (unlikely (memcmp (phdr1, phdr2, sizeof (GElf_Phdr)) != 0))
 	{
 	  if (! quiet)
 	    error (0, 0, gettext ("%s %s differ: program header %d"),
@@ -454,8 +455,8 @@ main (int argc, char *argv[])
 		{
 		  /* Compare the [LAST,FROM) region.  */
 		  assert (gaps == gaps_match);
-		  if (memcmp (raw1 + last, raw2 + last,
-			      regionsarr[cnt].from - last) != 0)
+		  if (unlikely (memcmp (raw1 + last, raw2 + last,
+					regionsarr[cnt].from - last) != 0))
 		    {
 		    gapmismatch:
 		      if (!quiet)
@@ -513,12 +514,12 @@ parse_opt (int key, char *arg,
     case OPT_GAPS:
       if (strcasecmp (arg, "ignore") == 0)
 	gaps = gaps_ignore;
-      else if (strcasecmp (arg, "match") == 0)
+      else if (likely (strcasecmp (arg, "match") == 0))
 	gaps = gaps_match;
       else
 	{
 	  fprintf (stderr,
-		   gettext ("Invalid value \"%s\" for --gaps parameter."),
+		   gettext ("Invalid value '%s' for --gaps parameter."),
 		   arg);
 	  argp_help (&argp, stderr, ARGP_HELP_SEE,
 		     program_invocation_short_name);
@@ -538,16 +539,16 @@ open_file (const char *fname, int *fdp, Ebl **eblp)
 {
   int fd = open (fname, O_RDONLY);
   if (unlikely (fd == -1))
-    error (EXIT_FAILURE, errno, gettext ("cannot open \"%s\""), fname);
+    error (EXIT_FAILURE, errno, gettext ("cannot open '%s'"), fname);
   Elf *elf = elf_begin (fd, ELF_C_READ_MMAP, NULL);
   if (elf == NULL)
     error (EXIT_FAILURE, 0,
-	   gettext ("cannot create ELF descriptor for \"%s\": %s"),
+	   gettext ("cannot create ELF descriptor for '%s': %s"),
 	   fname, elf_errmsg (-1));
   Ebl *ebl = ebl_openbackend (elf);
   if (ebl == NULL)
     error (EXIT_FAILURE, 0,
-	   gettext ("cannot create EBL descriptor for \"%s\""), fname);
+	   gettext ("cannot create EBL descriptor for '%s'"), fname);
 
   *fdp = fd;
   *eblp = ebl;

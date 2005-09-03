@@ -1,10 +1,18 @@
 2005-09-03  Ulrich Drepper  <drepper@redhat.com>
 
+	* strip.c (handle_elf): Unify some error messages.
+	* ld.c (main): Likewise.
+	* ldgeneric.c (open_elf): Likewise.
+	* elfcmp.c (main): Likewise.
+	* elflint.c (check_elf_header): Likewise.
+
+	* size.c (process_file): Fix typo in error message.
+
 	* readelf.c: Lots of little cleanups.  Use _unlocked functions.
 
 2005-09-02  Ulrich Drepper  <drepper@redhat.com>
 
-	* strings.c (main): Reset elfmap variable afte rmunmap call.
+	* strings.c (main): Reset elfmap variable after munmap call.
 	[_MUDFLAP] (map_file): Simplify mudflap debugging by not using mmap.
 
 2005-08-28  Ulrich Drepper  <drepper@redhat.com>

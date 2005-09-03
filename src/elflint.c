@@ -361,7 +361,7 @@ check_elf_header (Ebl *ebl, GElf_Ehdr *ehdr, size_t size)
 
   /* We currently don't handle any OS ABIs.  */
   if (ehdr->e_ident[EI_OSABI] != ELFOSABI_NONE)
-    ERROR (gettext ("unsupported OS ABI e_ident[%d] == \"%s\"\n"),
+    ERROR (gettext ("unsupported OS ABI e_ident[%d] == '%s'\n"),
 	   EI_OSABI,
 	   ebl_osabi_name (ebl, ehdr->e_ident[EI_OSABI], buf, sizeof (buf)));
 

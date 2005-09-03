@@ -282,7 +282,7 @@ process_file (const char *fname)
     {
       if (stat64 (fname, &pre_st) != 0)
 	{
-	  error (0, errno, gettext ("cannot stat input file \"%s\""), fname);
+	  error (0, errno, gettext ("cannot stat input file '%s'"), fname);
 	  return 1;
 	}
 
@@ -296,7 +296,7 @@ process_file (const char *fname)
   int fd = open (fname, output_fname == NULL ? O_RDWR : O_RDONLY);
   if (fd == -1)
     {
-      error (0, errno, gettext ("while opening \"%s\""), fname);
+      error (0, errno, gettext ("while opening '%s'"), fname);
       return 1;
     }
 
@@ -306,7 +306,7 @@ process_file (const char *fname)
   struct stat64 st;
   if (fstat64 (fd, &st) != 0)
     {
-      error (0, errno, gettext ("cannot stat input file \"%s\""), fname);
+      error (0, errno, gettext ("cannot stat input file '%s'"), fname);
       return 1;
     }
   /* Paranoid mode on.  */

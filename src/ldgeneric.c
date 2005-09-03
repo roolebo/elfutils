@@ -1590,7 +1590,7 @@ open_elf (struct usedfiles *fileinfo, Elf *elf)
       __fsetlocking (ldin, FSETLOCKING_BYCALLER);
 
       if (ldin == NULL)
-	error (EXIT_FAILURE, errno, gettext ("cannot open \"%s\""),
+	error (EXIT_FAILURE, errno, gettext ("cannot open '%s'"),
 	       fileinfo->rfname);
 
       /* Parse the file.  If it is a linker script no problems will be
@@ -3452,7 +3452,7 @@ find_entry_point (void)
     {
       if (ld_state.entry != NULL)
 	error (0, 0, gettext ("\
-cannot find entry symbol \"%s\": defaulting to %#0*" PRIx64),
+cannot find entry symbol '%s': defaulting to %#0*" PRIx64),
 	       ld_state.entry,
 	       xelf_getclass (ld_state.outelf) == ELFCLASS32 ? 10 : 18,
 	       (uint64_t) result);

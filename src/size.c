@@ -290,7 +290,7 @@ process_file (const char *fname)
   fd = open (fname, O_RDONLY);
   if (fd == -1)
     {
-      error (0, errno, gettext ("cannot open '%s"), fname);
+      error (0, errno, gettext ("cannot open '%s'"), fname);
       return 1;
     }
 
@@ -389,7 +389,7 @@ handle_ar (int fd, Elf *elf, const char *prefix, const char *fname)
     INTERNAL_ERROR (fname);
 
   if (close (fd) != 0)
-    error (EXIT_FAILURE, errno, gettext ("while closing `%s'"), fname);
+    error (EXIT_FAILURE, errno, gettext ("while closing '%s'"), fname);
 
   return result;
 }

@@ -147,7 +147,7 @@ asm_errmsg (error)
     last_error = global_error;
 
   if (error < -1)
-    return _("Unknown error");
+    return _("unknown error");
   if (error == 0 && last_error == 0)
     /* No error.  */
     return NULL;

@@ -251,7 +251,7 @@ parse_opt (int key, char *arg,
     case OPT_FORMAT:
       if (strcmp (arg, "bsd") == 0 || strcmp (arg, "berkeley") == 0)
 	format = format_bsd;
-      else if (strcmp (arg, "sysv") == 0)
+      else if (likely (strcmp (arg, "sysv") == 0))
 	format = format_sysv;
       else
 	error (EXIT_FAILURE, 0, gettext ("Invalid format: %s"), arg);
@@ -279,42 +279,38 @@ parse_opt (int key, char *arg,
 }
 
 
+/* Open the file and determine the type.  */
 static int
 process_file (const char *fname)
 {
-  /* Open the file and determine the type.  */
-  int fd;
-  Elf *elf;
-
-  /* Open the file.  */
-  fd = open (fname, O_RDONLY);
-  if (fd == -1)
+  int fd = open (fname, O_RDONLY);
+  if (unlikely (fd == -1))
     {
       error (0, errno, gettext ("cannot open '%s'"), fname);
       return 1;
     }
 
   /* Now get the ELF descriptor.  */
-  elf = elf_begin (fd, ELF_C_READ_MMAP, NULL);
-  if (elf != NULL)
+  Elf *elf = elf_begin (fd, ELF_C_READ_MMAP, NULL);
+  if (likely (elf != NULL))
     {
       if (elf_kind (elf) == ELF_K_ELF)
 	{
 	  handle_elf (elf, NULL, fname);
 
-	  if (elf_end (elf) != 0)
+	  if (unlikely (elf_end (elf) != 0))
 	    INTERNAL_ERROR (fname);
 
-	  if (close (fd) != 0)
+	  if (unlikely (close (fd) != 0))
 	    error (EXIT_FAILURE, errno, gettext ("while closing '%s'"), fname);
 
 	  return 0;
 	}
-      else
+      else if (likely (elf_kind (elf) == ELF_K_AR))
 	return handle_ar (fd, elf, NULL, fname);
 
       /* We cannot handle this type.  Close the descriptor anyway.  */
-      if (elf_end (elf) != 0)
+      if (unlikely (elf_end (elf) != 0))
 	INTERNAL_ERROR (fname);
     }
 
@@ -351,12 +347,9 @@ print_header (Elf *elf)
 static int
 handle_ar (int fd, Elf *elf, const char *prefix, const char *fname)
 {
-  Elf *subelf;
-  Elf_Cmd cmd = ELF_C_READ_MMAP;
   size_t prefix_len = prefix == NULL ? 0 : strlen (prefix);
   size_t fname_len = strlen (fname) + 1;
   char new_prefix[prefix_len + 1 + fname_len];
-  int result = 0;
   char *cp = new_prefix;
 
   /* Create the full name of the file.  */
@@ -368,6 +361,9 @@ handle_ar (int fd, Elf *elf, const char *prefix, const char *fname)
   memcpy (cp, fname, fname_len);
 
   /* Process all the files contained in the archive.  */
+  int result = 0;
+  Elf *subelf;
+  Elf_Cmd cmd = ELF_C_READ_MMAP;
   while ((subelf = elf_begin (fd, cmd, elf)) != NULL)
     {
       /* The the header for this element.  */
@@ -375,20 +371,20 @@ handle_ar (int fd, Elf *elf, const char *prefix, const char *fname)
 
       if (elf_kind (subelf) == ELF_K_ELF)
 	handle_elf (subelf, new_prefix, arhdr->ar_name);
-      else if (elf_kind (subelf) == ELF_K_AR)
+      else if (likely (elf_kind (subelf) == ELF_K_AR))
 	result |= handle_ar (fd, subelf, new_prefix, arhdr->ar_name);
       /* else signal error??? */
 
       /* Get next archive element.  */
       cmd = elf_next (subelf);
-      if (elf_end (subelf) != 0)
+      if (unlikely (elf_end (subelf) != 0))
 	INTERNAL_ERROR (fname);
     }
 
-  if (elf_end (elf) != 0)
+  if (unlikely (elf_end (elf) != 0))
     INTERNAL_ERROR (fname);
 
-  if (close (fd) != 0)
+  if (unlikely  (close (fd) != 0))
     error (EXIT_FAILURE, errno, gettext ("while closing '%s'"), fname);
 
   return result;
@@ -400,22 +396,20 @@ static void
 show_sysv (Elf *elf, const char *prefix, const char *fname,
 	   const char *fullname)
 {
-  size_t shstrndx;
-  Elf_Scn *scn = NULL;
-  GElf_Shdr shdr_mem;
   int maxlen = 10;
-  int digits = length_map[gelf_getclass (elf) - 1][radix];
-  const char *fmtstr;
-  GElf_Off total = 0;
+  const int digits = length_map[gelf_getclass (elf) - 1][radix];
 
   /* Get the section header string table index.  */
-  if (elf_getshstrndx (elf, &shstrndx) < 0)
+  size_t shstrndx;
+  if (unlikely (elf_getshstrndx (elf, &shstrndx) < 0))
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
 
   /* First round over the sections: determine the longest section name.  */
+  Elf_Scn *scn = NULL;
   while ((scn = elf_nextscn (elf, scn)) != NULL)
     {
+      GElf_Shdr shdr_mem;
       GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
 
       if (shdr == NULL)
@@ -436,6 +430,7 @@ show_sysv (Elf *elf, const char *prefix, const char *fname,
 	  digits - 2, sgettext ("sysv|size"),
 	  digits, sgettext ("sysv|addr"));
 
+  const char *fmtstr;
   if (radix == radix_hex)
     fmtstr = "%-*s %*" PRIx64 " %*" PRIx64 "\n";
   else if (radix == radix_decimal)
@@ -444,8 +439,10 @@ show_sysv (Elf *elf, const char *prefix, const char *fname,
     fmtstr = "%-*s %*" PRIo64 " %*" PRIo64 "\n";
 
   /* Iterate over all sections.  */
+  GElf_Off total = 0;
   while ((scn = elf_nextscn (elf, scn)) != NULL)
     {
+      GElf_Shdr shdr_mem;
       GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
 
       /* Ignore all sections which are not used at runtime.  */
@@ -476,18 +473,13 @@ show_sysv (Elf *elf, const char *prefix, const char *fname,
 static void
 show_sysv_one_line (Elf *elf)
 {
-  size_t shstrndx;
-  Elf_Scn *scn = NULL;
-  GElf_Shdr shdr_mem;
-  const char *fmtstr;
-  GElf_Off total = 0;
-  int first = 1;
-
   /* Get the section header string table index.  */
-  if (elf_getshstrndx (elf, &shstrndx) < 0)
+  size_t shstrndx;
+  if (unlikely (elf_getshstrndx (elf, &shstrndx) < 0))
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
 
+  const char *fmtstr;
   if (radix == radix_hex)
     fmtstr = "%" PRIx64 "(%s)";
   else if (radix == radix_decimal)
@@ -496,8 +488,12 @@ show_sysv_one_line (Elf *elf)
     fmtstr = "%" PRIo64 "(%s)";
 
   /* Iterate over all sections.  */
+  GElf_Off total = 0;
+  bool first = true;
+  Elf_Scn *scn = NULL;
   while ((scn = elf_nextscn (elf, scn)) != NULL)
     {
+      GElf_Shdr shdr_mem;
       GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
 
       /* Ignore all sections which are not used at runtime.  */
@@ -506,7 +502,7 @@ show_sysv_one_line (Elf *elf)
 
       if (! first)
 	fputs_unlocked (" + ", stdout);
-      first = 0;
+      first = false;
 
       printf (fmtstr, shdr->sh_size,
 	      elf_strptr (elf, shstrndx, shdr->sh_name));
@@ -534,17 +530,17 @@ static void
 show_bsd (Elf *elf, const char *prefix, const char *fname,
 	  const char *fullname)
 {
-  Elf_Scn *scn = NULL;
-  GElf_Shdr shdr_mem;
   GElf_Off textsize = 0;
   GElf_Off datasize = 0;
   GElf_Off bsssize = 0;
-  int ddigits = length_map[gelf_getclass (elf) - 1][radix_decimal];
-  int xdigits = length_map[gelf_getclass (elf) - 1][radix_hex];
+  const int ddigits = length_map[gelf_getclass (elf) - 1][radix_decimal];
+  const int xdigits = length_map[gelf_getclass (elf) - 1][radix_hex];
 
   /* Iterate over all sections.  */
+  Elf_Scn *scn = NULL;
   while ((scn = elf_nextscn (elf, scn)) != NULL)
     {
+      GElf_Shdr shdr_mem;
       GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
 
       if (shdr == NULL)
@@ -605,16 +601,13 @@ static void
 show_segments (Elf *elf, const char *fullname)
 {
   GElf_Ehdr ehdr_mem;
-  GElf_Ehdr *ehdr;
-  size_t cnt;
-  GElf_Off total = 0;
-  int first = 1;
-
-  ehdr = gelf_getehdr (elf, &ehdr_mem);
+  GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);
   if (ehdr == NULL)
     INTERNAL_ERROR (fullname);
 
-  for (cnt = 0; cnt < ehdr->e_phnum; ++cnt)
+  GElf_Off total = 0;
+  bool first = true;
+  for (size_t cnt = 0; cnt < ehdr->e_phnum; ++cnt)
     {
       GElf_Phdr phdr_mem;
       GElf_Phdr *phdr;
@@ -629,7 +622,7 @@ show_segments (Elf *elf, const char *fullname)
 
       if (! first)
 	fputs_unlocked (" + ", stdout);
-      first = 0;
+      first = false;
 
       printf (radix == radix_hex ? "%" PRIx64 "(%c%c%c)"
 	      : (radix == radix_decimal ? "%" PRId64 "(%c%c%c)"

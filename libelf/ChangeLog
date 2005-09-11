@@ -1,8 +1,3 @@
-2005-09-09  Roland McGrath  <roland@redhat.com>
-
-	* elf_update.c (write_file): Stat the file and fchmod it after update
-	if its mode had S_ISUID or S_ISGID bits set.
-
 2005-08-28  Ulrich Drepper  <drepper@redhat.com>
 
 	* elf32_getphdr.c: Include <system.h>.  Use pread_retry instead of

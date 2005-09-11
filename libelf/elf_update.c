@@ -22,7 +22,6 @@
 #include <libelf.h>
 #include <unistd.h>
 #include <sys/mman.h>
-#include <sys/stat.h>
 
 #include "libelfP.h"
 
@@ -31,14 +30,6 @@ static off_t
 write_file (Elf *elf, off_t size, int change_bo, size_t shnum)
 {
   int class = elf->class;
-
-  /* Check the mode bits now, before modification might change them.  */
-  struct stat st;
-  if (unlikely (fstat (elf->fildes, &st) != 0))
-    {
-      __libelf_seterrno (ELF_E_WRITE_ERROR);
-      return -1;
-    }
 
   /* Adjust the size in any case.  We do this even if we use `write'.
      We cannot do this if this file is in an archive.  We also don't
@@ -91,18 +82,6 @@ write_file (Elf *elf, off_t size, int change_bo, size_t shnum)
       && elf->maximum_size != ~((size_t) 0)
       && (size_t) size < elf->maximum_size
       && unlikely (ftruncate (elf->fildes, size) != 0))
-    {
-      __libelf_seterrno (ELF_E_WRITE_ERROR);
-      size = -1;
-    }
-
-  /* POSIX says that ftruncate and write may clear the S_ISUID and S_ISGID
-     mode bits.  So make sure we restore them afterwards if they were set.
-     This is not atomic if someone else chmod's the file while we operate.  */
-  if (size != -1
-      && unlikely (st.st_mode & (S_ISUID | S_ISGID))
-      /* fchmod ignores the bits we cannot change.  */
-      && unlikely (fchmod (elf->fildes, st.st_mode) != 0))
     {
       __libelf_seterrno (ELF_E_WRITE_ERROR);
       size = -1;

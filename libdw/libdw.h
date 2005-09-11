@@ -292,10 +292,6 @@ extern int dwarf_highpc (Dwarf_Die *die, Dwarf_Addr *return_addr)
 extern int dwarf_lowpc (Dwarf_Die *die, Dwarf_Addr *return_addr)
      __nonnull_attribute__ (2);
 
-/* Return entry_pc or low_pc attribute of DIE.  */
-extern int dwarf_entrypc (Dwarf_Die *die, Dwarf_Addr *return_addr)
-     __nonnull_attribute__ (2);
-
 /* Return 1 if DIE's lowpc/highpc or ranges attributes match the PC address,
    0 if not, or -1 for errors.  */
 extern int dwarf_haspc (Dwarf_Die *die, Dwarf_Addr pc);
@@ -533,12 +529,6 @@ extern int dwarf_func_inline_instances (Dwarf_Func *func,
 					int (*callback) (Dwarf_Die *, void *),
 					void *arg);
 
-
-/* Find the appropriate PC location or locations for function entry
-   breakpoints for the given DW_TAG_subprogram DIE.  Returns -1 for errors.
-   On success, returns the number of breakpoint locations (never zero)
-   and sets *BKPTS to a malloc'd vector of addresses.  */
-extern int dwarf_entry_breakpoints (Dwarf_Die *die, Dwarf_Addr **bkpts);
 
 
 /* Call callback function for each of the macro information entry for

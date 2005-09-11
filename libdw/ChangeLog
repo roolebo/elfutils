@@ -1,14 +1,3 @@
-2005-09-07  Roland McGrath  <roland@redhat.com>
-
-	* dwarf_entry_breakpoints.c: New file.
-	* Makefile.am (libdw_a_SOURCES): Add it.
-	* libdw.h: Declare dwarf_entry_breakpoints.
-
-	* dwarf_entrypc.c: New file.
-	* Makefile.am (libdw_a_SOURCES): Add it.
-	* libdw.h: Declare dwarf_entrypc.
-	* libdwP.h: Add INTDECL.
-
 2005-08-28  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.am: Use $(LINK) not $(CC) when creating DSO.

@@ -10,6 +10,45 @@
 
 2005-10-26  Roland McGrath  <roland@redhat.com>
 
+	* dwarf_getfuncs.c (dwarf_getfuncs): Use Dwarf_Die, not Dwarf_Func.
+	* dwarf_func_file.c: Renamed to ...
+	* dwarf_decl_file.c: ... here.
+	* dwarf_func_col.c: Renamed to ...
+	* dwarf_decl_column.c: ... here.
+	* dwarf_func_line.c: Renamed to ...
+	* dwarf_decl_line.c: ... here.
+	(dwarf_func_line): Renamed to ...
+	(dwarf_decl_line): ... this.  Take a Dwarf_Die * argument.
+	(__libdw_func_intval): Renamed __libdw_attr_intval.
+	* dwarf_func_name.c: File removed.
+	* dwarf_func_lowpc.c: File removed.
+	* dwarf_func_highpc.c: File removed.
+	* dwarf_func_entrypc.c: File removed.
+	* dwarf_func_die.c: File removed.
+	* Makefile.am (libdw_a_SOURCES): Updated.
+	* libdw.h: Update decls.
+	(Dwarf_Func): Type removed.
+	* libdwP.h: Update decls.
+	(struct Dwarf_Func_s): Type removed.
+	* libdw.map: Updated.
+
+	* libdwP.h (CUDIE): New macro.
+	* dwarf_getlocation.c (dwarf_getlocation_addr): Use it.
+	* dwarf_getscopes_die.c (dwarf_getscopes_die): Likewise.
+	* dwarf_ranges.c (dwarf_ranges): Likewise.
+
+	* dwarf_getloclist.c: Renamed to ...
+	* dwarf_getlocation.c: ... here.
+	(getloclist): Renamed to getlocation.
+	(dwarf_getloclist): Renamed to dwarf_getlocation.
+	(dwarf_addrloclists): Renamed to dwarf_getlocation_addr.
+	* Makefile.am (libdw_a_SOURCES): Updated.
+	* libdw.h (dwarf_getloclist): Renamed to dwarf_getlocation.
+	(dwarf_addrloclists): Renamed dwarf_getlocation_addr.
+	(Dwarf_Loc): Renamed Dwarf_Op.
+	* libdwP.h (struct loc_s): Update use.
+	* libdw.map: Update map.
+
 	* dwarf_entry_breakpoints.c: Use the second line record within the
 	function, regardless of its source location data.
 

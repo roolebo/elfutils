@@ -1,5 +1,12 @@
 2005-10-27  Roland McGrath  <roland@redhat.com>
 
+	* allfcts.c (cb): Update for dwarf_func_* -> dwarf_decl_* changes.
+	* funcscopes.c (handle_function): Likewise.
+	* dwflmodtest.c (print_inline, print_func): Likewise.
+	* find-prologues.c (handle_function): Likewise.
+
+2005-10-27  Roland McGrath  <roland@redhat.com>
+
 	* run-find-prologues.sh: New file.
 	* Makefile.am (TESTS, EXTRA_DIST): Add it.
 

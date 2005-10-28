@@ -32,11 +32,11 @@
 #define CIE_VERSION 1
 
 
-/* Known location lists.  */
+/* Known location expressions already decoded.  */
 struct loc_s
 {
   void *addr;
-  Dwarf_Loc *loc;
+  Dwarf_Op *loc;
   size_t nloc;
 };
 
@@ -247,14 +247,13 @@ struct Dwarf_CU
   void *locs;
 };
 
-
-/* Function information.  */
-struct Dwarf_Func_s
-{
-  // XXX If we want to cache functions, we need to change this struct.
-  Dwarf_Die *die;
-  Dwarf_Die *cudie;
-};
+#define CUDIE(fromcu)							      \
+  ((Dwarf_Die)								      \
+   {									      \
+     .cu = (fromcu),							      \
+     .addr = ((char *) (fromcu)->dbg->sectiondata[IDX_debug_info]->d_buf      \
+	      + (fromcu)->start + 3 * (fromcu)->offset_size - 4 + 3),	      \
+   })
 
 
 /* Macro information.  */
@@ -339,7 +338,7 @@ extern unsigned char *__libdw_find_attr (Dwarf_Die *die,
      __nonnull_attribute__ (1) internal_function;
 
 /* Helper function to access integer attribute.  */
-extern int __libdw_func_intval (Dwarf_Func *func, int *linep, int attval)
+extern int __libdw_attr_intval (Dwarf_Die *die, int *valp, int attval)
      __nonnull_attribute__ (1, 2) internal_function;
 
 /* Helper function to walk scopes.  */

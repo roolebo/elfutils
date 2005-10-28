@@ -65,13 +65,7 @@ dwarf_ranges (Dwarf_Die *die, ptrdiff_t offset, Dwarf_Addr *basep,
       assert ((Dwarf_Word) offset == start_offset);
 
       /* Fetch the CU's base address.  */
-      Dwarf_Die cudie =
-	{
-	  .cu = attr->cu,
-	  .addr = ((char *) attr->cu->dbg->sectiondata[IDX_debug_info]->d_buf
-		   + attr->cu->start + 3 * attr->cu->offset_size - 4 + 3),
-	};
-      if (INTUSE(dwarf_lowpc) (&cudie, basep) != 0)
+      if (INTUSE(dwarf_lowpc) (&CUDIE (attr->cu), basep) != 0)
 	return -1;
     }
   else if (offset < 0 || (size_t) offset >= d->d_size)

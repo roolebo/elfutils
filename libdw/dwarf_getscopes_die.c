@@ -50,17 +50,7 @@ dwarf_getscopes_die (Dwarf_Die *die, Dwarf_Die **scopes)
   if (die == NULL)
     return -1;
 
-  struct Dwarf_Die_Chain cu =
-    {
-      .parent = NULL,
-      .die =
-      {
-	.cu = die->cu,
-	.addr = ((char *) die->cu->dbg->sectiondata[IDX_debug_info]->d_buf
-		 + die->cu->start + 3 * die->cu->offset_size - 4 + 3),
-      }
-    };
-
+  struct Dwarf_Die_Chain cu = { .die = CUDIE (die->cu), .parent = NULL };
   void *info = die->addr;
   int result = __libdw_visit_scopes (1, &cu, &scope_visitor, NULL, &info);
   if (result > 0)

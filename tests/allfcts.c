@@ -5,12 +5,12 @@
 
 
 static int
-cb (Dwarf_Func *func, void *arg __attribute__ ((unused)))
+cb (Dwarf_Die *func, void *arg __attribute__ ((unused)))
 {
-  const char *file = dwarf_func_file (func);
+  const char *file = dwarf_decl_file (func);
   int line = -1;
-  dwarf_func_line (func, &line);
-  const char *fct = dwarf_func_name (func);
+  dwarf_decl_line (func, &line);
+  const char *fct = dwarf_diename (func);
 
   printf ("%s:%d:%s\n", file, line, fct);
 

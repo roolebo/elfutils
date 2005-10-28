@@ -1,4 +1,4 @@
-/* Get entry address of function.
+/* Get column number of beginning of given declaration.
    Copyright (C) 2005 Red Hat, Inc.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -21,13 +21,7 @@
 
 
 int
-dwarf_func_entrypc (Dwarf_Func *func, Dwarf_Addr *return_addr)
+dwarf_decl_column (Dwarf_Die *decl, int *colp)
 {
-  Dwarf_Attribute attr_mem;
-  Dwarf_Attribute *attr = INTUSE(dwarf_attr) (func->die, DW_AT_entry_pc,
-					      &attr_mem);
-  if (attr != NULL)
-    return INTUSE(dwarf_formaddr) (attr, return_addr);
-
-  return INTUSE(dwarf_lowpc) (func->die, return_addr);
+  return __libdw_attr_intval (decl, colp, DW_AT_decl_column);
 }

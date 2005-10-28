@@ -76,8 +76,8 @@ loc_compare (const void *p1, const void *p2)
 }
 
 static int
-getloclist (struct Dwarf_CU *cu, const Dwarf_Block *block,
-	    Dwarf_Loc **llbuf, size_t *listlen)
+getlocation (struct Dwarf_CU *cu, const Dwarf_Block *block,
+	     Dwarf_Op **llbuf, size_t *listlen)
 {
   Dwarf *dbg = cu->dbg;
 
@@ -269,7 +269,7 @@ getloclist (struct Dwarf_CU *cu, const Dwarf_Block *block,
     }
 
   /* Allocate the array.  */
-  Dwarf_Loc *result = libdw_alloc (dbg, Dwarf_Loc, sizeof (Dwarf_Loc), n);
+  Dwarf_Op *result = libdw_alloc (dbg, Dwarf_Op, sizeof (Dwarf_Op), n);
 
   /* Store the result.  */
   *llbuf = result;
@@ -303,9 +303,9 @@ getloclist (struct Dwarf_CU *cu, const Dwarf_Block *block,
 }
 
 int
-dwarf_getloclist (attr, llbuf, listlen)
+dwarf_getlocation (attr, llbuf, listlen)
      Dwarf_Attribute *attr;
-     Dwarf_Loc **llbuf;
+     Dwarf_Op **llbuf;
      size_t *listlen;
 {
   if (! attr_ok (attr))
@@ -316,14 +316,14 @@ dwarf_getloclist (attr, llbuf, listlen)
   if (INTUSE(dwarf_formblock) (attr, &block) != 0)
     return -1;
 
-  return getloclist (attr->cu, &block, llbuf, listlen);
+  return getlocation (attr->cu, &block, llbuf, listlen);
 }
 
 int
-dwarf_addrloclists (attr, address, llbufs, listlens, maxlocs)
+dwarf_getlocation_addr (attr, address, llbufs, listlens, maxlocs)
      Dwarf_Attribute *attr;
      Dwarf_Addr address;
-     Dwarf_Loc **llbufs;
+     Dwarf_Op **llbufs;
      size_t *listlens;
      size_t maxlocs;
 {
@@ -340,7 +340,7 @@ dwarf_addrloclists (attr, address, llbufs, listlens, maxlocs)
       if (maxlocs == 0)
 	return 0;
       if (llbufs != NULL &&
-	  getloclist (attr->cu, &block, &llbufs[0], &listlens[0]) != 0)
+	  getlocation (attr->cu, &block, &llbufs[0], &listlens[0]) != 0)
 	return -1;
       return listlens[0] == 0 ? 0 : 1;
     }
@@ -366,13 +366,7 @@ dwarf_addrloclists (attr, address, llbufs, listlens, maxlocs)
 
   /* Fetch the CU's base address.  */
   Dwarf_Addr base;
-  Dwarf_Die cudie =
-    {
-      .cu = attr->cu,
-      .addr = ((char *) attr->cu->dbg->sectiondata[IDX_debug_info]->d_buf
-	       + attr->cu->start + 3 * attr->cu->offset_size - 4 + 3),
-    };
-
+  Dwarf_Die cudie = CUDIE (attr->cu);
 
   /* Find the base address of the compilation unit.  It will
      normally be specified by DW_AT_low_pc.  In DWARF-3 draft 4,
@@ -443,8 +437,9 @@ dwarf_addrloclists (attr, address, llbufs, listlens, maxlocs)
       if (address >= base + begin && address < base + end)
 	{
 	  /* This one matches the address.  */
-	  if (llbufs != NULL && getloclist (attr->cu, &block,
-					    &llbufs[got], &listlens[got]) != 0)
+	  if (llbufs != NULL
+	      && getlocation (attr->cu, &block,
+			      &llbufs[got], &listlens[got]) != 0)
 	    return -1;
 	  ++got;
 	}

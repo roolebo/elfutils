@@ -582,9 +582,9 @@ get_var_range (Dwarf_Die *die, Dwarf_Word *lowpc, Dwarf_Word *highpc)
   if  (locattr == NULL)
     return 1;
 
-  Dwarf_Loc *loc;
+  Dwarf_Op *loc;
   size_t nloc;
-  if (dwarf_getloclist (locattr, &loc, &nloc) != 0)
+  if (dwarf_getlocation (locattr, &loc, &nloc) != 0)
     return 1;
 
   /* Interpret the location expressions.  */

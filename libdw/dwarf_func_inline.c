@@ -39,11 +39,11 @@ scope_visitor (unsigned int depth __attribute__ ((unused)),
 }
 
 int
-dwarf_func_inline (Dwarf_Func *func)
+dwarf_func_inline (Dwarf_Die *func)
 {
   Dwarf_Attribute attr_mem;
   Dwarf_Word val;
-  if (INTUSE(dwarf_formudata) (INTUSE(dwarf_attr) (func->die, DW_AT_inline,
+  if (INTUSE(dwarf_formudata) (INTUSE(dwarf_attr) (func, DW_AT_inline,
 						   &attr_mem),
 			       &val) == 0)
   switch (val)
@@ -63,11 +63,11 @@ dwarf_func_inline (Dwarf_Func *func)
 }
 
 int
-dwarf_func_inline_instances (Dwarf_Func *func,
+dwarf_func_inline_instances (Dwarf_Die *func,
 			     int (*callback) (Dwarf_Die *, void *),
 			     void *arg)
 {
-  struct visitor_info v = { func->die->addr, callback, arg };
-  struct Dwarf_Die_Chain cu = { .die = *func->cudie, .parent = NULL };
+  struct visitor_info v = { func->addr, callback, arg };
+  struct Dwarf_Die_Chain cu = { .die = CUDIE (func->cu), .parent = NULL };
   return __libdw_visit_scopes (0, &cu, &scope_visitor, NULL, &v);
 }

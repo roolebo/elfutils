@@ -21,7 +21,7 @@
 
 
 ptrdiff_t
-dwarf_getfuncs (Dwarf_Die *cudie, int (*callback) (Dwarf_Func *, void *),
+dwarf_getfuncs (Dwarf_Die *cudie, int (*callback) (Dwarf_Die *, void *),
 		void *arg, ptrdiff_t offset)
 {
   if (unlikely (cudie == NULL
@@ -45,12 +45,7 @@ dwarf_getfuncs (Dwarf_Die *cudie, int (*callback) (Dwarf_Func *, void *),
     {
       if (INTUSE(dwarf_tag) (die) == DW_TAG_subprogram)
 	{
-	  Dwarf_Func fct;
-
-	  fct.die = die;
-	  fct.cudie = cudie;
-
-	  if (callback (&fct, arg) != DWARF_CB_OK)
+	  if (callback (die, arg) != DWARF_CB_OK)
 	    return INTUSE(dwarf_dieoffset) (die);
 	}
 

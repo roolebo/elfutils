@@ -25,13 +25,7 @@
 static int
 getfiles (Dwarf_Die *die, Dwarf_Files **files)
 {
-  Dwarf_Die cudie =
-    {
-      .cu = die->cu,
-      .addr = ((char *) die->cu->dbg->sectiondata[IDX_debug_info]->d_buf
-	       + 3 * die->cu->offset_size - 4 + 3),
-    };
-  return INTUSE(dwarf_getsrcfiles) (&cudie, files, NULL);
+  return INTUSE(dwarf_getsrcfiles) (&CUDIE (die->cu), files, NULL);
 }
 
 /* Fetch an attribute that should have a constant integer form.  */

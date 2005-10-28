@@ -1,7 +1,14 @@
 Version 0.116:
 
 libdw: New functions dwarf_ranges, dwarf_entrypc, dwarf_diecu,
-       dwarf_entry_breakpoints.
+       dwarf_entry_breakpoints.  Removed Dwarf_Func type and functions
+       dwarf_func_name, dwarf_func_lowpc, dwarf_func_highpc,
+       dwarf_func_entrypc, dwarf_func_die; dwarf_getfuncs callback now uses
+       Dwarf_Die, and dwarf_func_file, dwarf_func_line, dwarf_func_col
+       replaced by dwarf_decl_file, dwarf_decl_line, dwarf_decl_column;
+       dwarf_func_inline, dwarf_func_inline_instances now take Dwarf_Die.
+       Type Dwarf_Loc renamed to Dwarf_Op; dwarf_getloclist,
+       dwarf_addrloclists renamed dwarf_getlocation, dwarf_getlocation_addr.
 
 Version 0.115:
 

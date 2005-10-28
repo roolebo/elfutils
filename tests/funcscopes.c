@@ -98,11 +98,11 @@ struct args
 };
 
 static int
-handle_function (Dwarf_Func *func, void *arg)
+handle_function (Dwarf_Die *funcdie, void *arg)
 {
   struct args *a = arg;
 
-  const char *name = dwarf_func_name (func);
+  const char *name = dwarf_diename (funcdie);
   char **argv = a->argv;
   if (argv[0] != NULL)
     {
@@ -113,10 +113,6 @@ handle_function (Dwarf_Func *func, void *arg)
       if (!match)
 	return 0;
     }
-
-  Dwarf_Die funcdie_mem;
-  Dwarf_Die *funcdie = dwarf_func_die (func, &funcdie_mem);
-  assert (funcdie == &funcdie_mem);
 
   Dwarf_Die *scopes;
   int n = dwarf_getscopes_die (funcdie, &scopes);

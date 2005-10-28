@@ -59,14 +59,13 @@ libdw_a_SOURCES = dwarf_begin.c dwarf_begin_elf.c dwarf_end.c dwarf_getelf.c \
 		  dwarf_lineprologueend.c dwarf_lineepiloguebegin.c \
 		  dwarf_onesrcline.c dwarf_formblock.c \
 		  dwarf_getsrcfiles.c dwarf_filesrc.c \
-		  dwarf_getloclist.c dwarf_getstring.c dwarf_offabbrev.c \
+		  dwarf_getlocation.c dwarf_getstring.c dwarf_offabbrev.c \
 		  dwarf_getaranges.c dwarf_onearange.c dwarf_getarangeinfo.c \
 		  dwarf_getarange_addr.c dwarf_getattrs.c dwarf_formflag.c \
 		  dwarf_getmacros.c dwarf_macro_opcode.c dwarf_macro_param1.c \
 		  dwarf_macro_param2.c dwarf_addrdie.c \
-		  dwarf_getfuncs.c dwarf_func_name.c dwarf_func_lowpc.c \
-		  dwarf_func_highpc.c dwarf_func_entrypc.c dwarf_func_file.c \
-		  dwarf_func_line.c dwarf_func_col.c dwarf_func_die.c \
+		  dwarf_getfuncs.c  \
+		  dwarf_decl_file.c dwarf_decl_line.c dwarf_decl_column.c \
 		  dwarf_func_inline.c dwarf_getsrc_file.c \
 		  libdw_findcu.c libdw_form.c libdw_alloc.c memory-access.c \
 		  libdw_visit_scopes.c \

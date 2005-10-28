@@ -22,11 +22,10 @@
 
 
 const char *
-dwarf_func_file (Dwarf_Func *func)
+dwarf_decl_file (Dwarf_Die *die)
 {
   Dwarf_Attribute attr_mem;
   Dwarf_Sword idx = 0;
-  Dwarf_Die *die = func->die;
 
   if (INTUSE(dwarf_formsdata) (INTUSE(dwarf_attr) (die, DW_AT_decl_file,
 						   &attr_mem), &idx) != 0)
@@ -40,7 +39,7 @@ dwarf_func_file (Dwarf_Func *func)
     }
 
   /* Get the array of source files for the CU.  */
-  struct Dwarf_CU  *cu = die->cu;
+  struct Dwarf_CU *cu = die->cu;
   if (cu->lines == NULL)
     {
       Dwarf_Lines *lines;
@@ -48,7 +47,7 @@ dwarf_func_file (Dwarf_Func *func)
 
       /* Let the more generic function do the work.  It'll create more
 	 data but that will be needed in an real program anyway.  */
-      (void) INTUSE(dwarf_getsrclines) (func->cudie, &lines, &nlines);
+      (void) INTUSE(dwarf_getsrclines) (&CUDIE (cu), &lines, &nlines);
       assert (cu->lines != NULL);
     }
 

@@ -100,21 +100,21 @@ print_instance (Dwarf_Die *instance, void *arg)
 }
 
 static void
-print_inline (Dwarf_Func *func, void *arg)
+print_inline (Dwarf_Die *func, void *arg)
 {
   if (dwarf_func_inline_instances (func, &print_instance, arg) != 0)
     printf ("  error finding instances: %s\n", dwarf_errmsg (-1));
 }
 
 static int
-print_func (Dwarf_Func *func, void *arg)
+print_func (Dwarf_Die *func, void *arg)
 {
   const struct info *info = arg;
 
-  const char *file = dwarf_func_file (func);
+  const char *file = dwarf_decl_file (func);
   int line = -1;
-  dwarf_func_line (func, &line);
-  const char *fct = dwarf_func_name (func);
+  dwarf_decl_line (func, &line);
+  const char *fct = dwarf_diename (func);
 
   printf ("  %s:%d: %s:", file, line, fct);
 
@@ -127,15 +127,15 @@ print_func (Dwarf_Func *func, void *arg)
   else
     {
       Dwarf_Addr lo = -1, hi = -1, entry = -1;
-      if (dwarf_func_lowpc (func, &lo) == 0)
+      if (dwarf_lowpc (func, &lo) == 0)
 	lo += info->dwbias;
       else
 	printf (" (lowpc => %s)", dwarf_errmsg (-1));
-      if (dwarf_func_highpc (func, &hi) == 0)
+      if (dwarf_highpc (func, &hi) == 0)
 	hi += info->dwbias;
       else
 	printf (" (highpc => %s)", dwarf_errmsg (-1));
-      if (dwarf_func_entrypc (func, &entry) == 0)
+      if (dwarf_entrypc (func, &entry) == 0)
 	entry += info->dwbias;
       else
 	printf (" (entrypc => %s)", dwarf_errmsg (-1));

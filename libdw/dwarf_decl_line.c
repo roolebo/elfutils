@@ -23,19 +23,19 @@
 
 
 int
-dwarf_func_line (Dwarf_Func *func, int *linep)
+dwarf_decl_line (Dwarf_Die *func, int *linep)
 {
-  return __libdw_func_intval (func, linep, DW_AT_decl_line);
+  return __libdw_attr_intval (func, linep, DW_AT_decl_line);
 }
 
 
 int internal_function
-__libdw_func_intval (Dwarf_Func *func, int *linep, int attval)
+__libdw_attr_intval (Dwarf_Die *die, int *linep, int attval)
 {
   Dwarf_Attribute attr_mem;
   Dwarf_Sword line;
 
-  int res = INTUSE(dwarf_formsdata) (INTUSE(dwarf_attr) (func->die, attval,
+  int res = INTUSE(dwarf_formsdata) (INTUSE(dwarf_attr) (die, attval,
 							 &attr_mem), &line);
   if (res == 0)
     {

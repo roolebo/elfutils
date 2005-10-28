@@ -90,9 +90,6 @@ typedef struct Dwarf_Aranges_s Dwarf_Aranges;
 /* CU representation.  */
 struct Dwarf_CU;
 
-/* Function information.  */
-typedef struct Dwarf_Func_s Dwarf_Func;
-
 /* Macro information.  */
 typedef struct Dwarf_Macro_s Dwarf_Macro;
 
@@ -138,15 +135,15 @@ typedef struct
 } Dwarf_Global;
 
 
-// XXX It remains to be seen whether the next two need to be exported.
-/* Location record.  */
+/* One operation in a DWARF location expression.
+   A location expression is an array of these.  */
 typedef struct
 {
   uint8_t atom;			/* Operation */
   Dwarf_Word number;		/* Operand */
   Dwarf_Word number2;		/* Possible second operand */
   Dwarf_Word offset;		/* Offset in location expression */
-} Dwarf_Loc;
+} Dwarf_Op;
 
 
 /* Handle for debug sessions.  */
@@ -436,21 +433,21 @@ extern const char *dwarf_filesrc (Dwarf_Files *file, size_t idx,
 				  Dwarf_Word *mtime, Dwarf_Word *length);
 
 
-/* Return location expression list.  */
-extern int dwarf_getloclist (Dwarf_Attribute *attr, Dwarf_Loc **llbuf,
-			     size_t *listlen) __nonnull_attribute__ (2, 3);
+/* Return location expression, decoded as a list of operations.  */
+extern int dwarf_getlocation (Dwarf_Attribute *attr, Dwarf_Op **expr,
+			      size_t *exprlen) __nonnull_attribute__ (2, 3);
 
-/* Return location expression lists.  If the attribute uses a location
-   list, ADDRESS selects the relevant location expressions from the list.
+/* Return location expressions.  If the attribute uses a location list,
+   ADDRESS selects the relevant location expressions from the list.
    There can be multiple matches, resulting in multiple expressions to
-   return.  LLBUFS and LISTLENS are parallel arrays of NLOCS slots to fill
-   in.  Returns the number of locations filled in, or -1 for errors.  If
-   LLBUFS is a null pointer, stores nothing and returns the total number of
-   locations.  A return value of zero means that the location list
-   indicated no value is accessible.  */
-extern int dwarf_addrloclists (Dwarf_Attribute *attr, Dwarf_Addr address,
-			       Dwarf_Loc **llbufs, size_t *listlens,
-			       size_t nlocs);
+   return.  EXPRS and EXPRLENS are parallel arrays of NLOCS slots to
+   fill in.  Returns the number of locations filled in, or -1 for
+   errors.  If EXPRS is a null pointer, stores nothing and returns the
+   total number of locations.  A return value of zero means that the
+   location list indicated no value is accessible.  */
+extern int dwarf_getlocation_addr (Dwarf_Attribute *attr, Dwarf_Addr address,
+				   Dwarf_Op **exprs, size_t *exprlens,
+				   size_t nlocs);
 
 
 /* Return scope DIEs containing PC address.
@@ -508,44 +505,27 @@ extern Dwarf_Arange *dwarf_getarange_addr (Dwarf_Aranges *aranges,
 
 /* Get functions in CUDIE.  */
 extern ptrdiff_t dwarf_getfuncs (Dwarf_Die *cudie,
-				 int (*callback) (Dwarf_Func *, void *),
+				 int (*callback) (Dwarf_Die *, void *),
 				 void *arg, ptrdiff_t offset);
 
-/* Return name of function.  */
-extern const char *dwarf_func_name (Dwarf_Func *func);
 
-/* Return start address of function.  */
-extern int dwarf_func_lowpc (Dwarf_Func *func, Dwarf_Addr *return_addr)
+/* Return file name containing definition of the given declaration.  */
+extern const char *dwarf_decl_file (Dwarf_Die *decl);
+
+/* Get line number of beginning of given declaration.  */
+extern int dwarf_decl_line (Dwarf_Die *decl, int *linep)
      __nonnull_attribute__ (2);
 
-/* Return end address of function.  */
-extern int dwarf_func_highpc (Dwarf_Func *func, Dwarf_Addr *return_addr)
+/* Get column number of beginning of given declaration.  */
+extern int dwarf_decl_column (Dwarf_Die *decl, int *colp)
      __nonnull_attribute__ (2);
 
-/* Return entry point address of function.  */
-extern int dwarf_func_entrypc (Dwarf_Func *func, Dwarf_Addr *return_addr)
-     __nonnull_attribute__ (2);
-
-/* Return file name containing definition of the given function.  */
-extern const char *dwarf_func_file (Dwarf_Func *func);
-
-/* Get line number of beginning of given function.  */
-extern int dwarf_func_line (Dwarf_Func *func, int *linep)
-     __nonnull_attribute__ (2);
-
-/* Get column number of beginning of given function.  */
-extern int dwarf_func_col (Dwarf_Func *func, int *colp)
-     __nonnull_attribute__ (2);
-
-/* Get definition DIE of given function.  */
-extern Dwarf_Die *dwarf_func_die (Dwarf_Func *func, Dwarf_Die *die_mem)
-    __nonnull_attribute__ (2);
 
 /* Return nonzero if given function is an abstract inline definition.  */
-extern int dwarf_func_inline (Dwarf_Func *func);
+extern int dwarf_func_inline (Dwarf_Die *func);
 
 /* Find each concrete inlined instance of the abstract inline definition.  */
-extern int dwarf_func_inline_instances (Dwarf_Func *func,
+extern int dwarf_func_inline_instances (Dwarf_Die *func,
 					int (*callback) (Dwarf_Die *, void *),
 					void *arg);
 

@@ -1,3 +1,7 @@
+2005-10-26  Roland McGrath  <roland@redhat.com>
+
+	* nm.c (get_var_range): dwarf_getloclist -> dwarf_getlocation.
+
 2005-09-03  Ulrich Drepper  <drepper@redhat.com>
 
 	* strip.c (handle_elf): Unify some error messages.

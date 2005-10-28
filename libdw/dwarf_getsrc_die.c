@@ -36,7 +36,7 @@ dwarf_getsrc_die (Dwarf_Die *cudie, Dwarf_Addr addr)
       size_t idx = (l + u) / 2;
       if (addr < lines->info[idx].addr)
 	u = idx;
-      else if (addr > lines->info[idx].addr)
+      else if (addr > lines->info[idx].addr || lines->info[idx].end_sequence)
 	l = idx + 1;
       else
 	return &lines->info[idx];
@@ -51,7 +51,12 @@ dwarf_getsrc_die (Dwarf_Die *cudie, Dwarf_Addr addr)
      information is faulty and no end-sequence marker is present, we
      still ignore it.  */
   if (u > 0 && u < nlines && addr > lines->info[u - 1].addr)
-    return &lines->info[u - 1];
+    {
+      while (lines->info[u - 1].end_sequence && u > 0)
+	--u;
+      if (u > 0)
+	return &lines->info[u - 1];
+    }
 
   __libdw_seterrno (DWARF_E_ADDR_OUTOFRANGE);
   return NULL;

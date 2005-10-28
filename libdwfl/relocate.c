@@ -168,20 +168,24 @@ __libdwfl_relocate (Dwfl_Module *mod, Elf *debugfile)
 		}
 
 	      /* These are the types we can relocate.  */
-#define TYPES		DO_TYPE (BYTE, Byte) DO_TYPE (HALF, Half) \
-			DO_TYPE (WORD, Word) DO_TYPE (SWORD, Sword) \
-			DO_TYPE (XWORD, Xword) DO_TYPE (SXWORD, Sxword)
+#define TYPES		DO_TYPE (BYTE, Byte); DO_TYPE (HALF, Half); \
+	      		DO_TYPE (WORD, Word); DO_TYPE (SWORD, Sword); \
+			DO_TYPE (XWORD, Xword); DO_TYPE (SXWORD, Sxword)
 	      size_t size;
 	      Elf_Type type = ebl_reloc_simple_type (mod->ebl, rtype);
 	      switch (type)
 		{
-#define DO_TYPE(NAME, Name)						      \
-		    case ELF_T_##NAME:					      \
-		      size = sizeof (GElf_##Name);			      \
-		      break;
-		  TYPES
+#define DO_TYPE(NAME, Name)				\
+		  case ELF_T_##NAME:			\
+		    size = sizeof (GElf_##Name);	\
+		  break
+		  TYPES;
 #undef DO_TYPE
-		    default:
+		default:
+		  /* This might be because ebl_openbackend failed to find
+		     any libebl_CPU.so library.  Diagnose that clearly.  */
+		  if (ebl_get_elfmachine (mod->ebl) == EM_NONE)
+		    return DWFL_E_UNKNOWN_MACHINE;
 		  return DWFL_E_BADRELTYPE;
 		}
 
@@ -189,7 +193,7 @@ __libdwfl_relocate (Dwfl_Module *mod, Elf *debugfile)
 		return DWFL_E_BADRELOFF;
 
 #define DO_TYPE(NAME, Name) GElf_##Name Name;
-	      union { TYPES } tmpbuf;
+	      union { TYPES; } tmpbuf;
 #undef DO_TYPE
 	      Elf_Data tmpdata =
 		{
@@ -213,13 +217,13 @@ __libdwfl_relocate (Dwfl_Module *mod, Elf *debugfile)
 		  value += *addend;
 		  switch (type)
 		    {
-#define DO_TYPE(NAME, Name)						      \
-			case ELF_T_##NAME:				      \
-			  tmpbuf.Name = value;				      \
-			  break;
-		      TYPES
+#define DO_TYPE(NAME, Name)			\
+		      case ELF_T_##NAME:	\
+			tmpbuf.Name = value;	\
+		      break
+		      TYPES;
 #undef DO_TYPE
-			default:
+		    default:
 		      abort ();
 		    }
 		}
@@ -233,13 +237,13 @@ __libdwfl_relocate (Dwfl_Module *mod, Elf *debugfile)
 		  assert (d == &tmpdata);
 		  switch (type)
 		    {
-#define DO_TYPE(NAME, Name)						      \
-			case ELF_T_##NAME:				      \
-			  tmpbuf.Name += (GElf_##Name) value;		      \
-			  break;
-		      TYPES
+#define DO_TYPE(NAME, Name)					\
+		      case ELF_T_##NAME:			\
+			tmpbuf.Name += (GElf_##Name) value;	\
+		      break
+		      TYPES;
 #undef DO_TYPE
-			default:
+		    default:
 		      abort ();
 		    }
 		}

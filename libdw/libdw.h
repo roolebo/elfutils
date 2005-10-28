@@ -194,6 +194,10 @@ extern Dwarf_Off dwarf_dieoffset (Dwarf_Die *die);
 /* Return offset of DIE in CU.  */
 extern Dwarf_Off dwarf_cuoffset (Dwarf_Die *die);
 
+/* Return CU DIE containing given DIE.  */
+extern Dwarf_Die *dwarf_diecu (Dwarf_Die *die, Dwarf_Die *result,
+			       uint8_t *address_sizep, uint8_t *offset_sizep);
+
 /* Return CU DIE containing given address.  */
 extern Dwarf_Die *dwarf_addrdie (Dwarf *dbg, Dwarf_Addr addr,
 				 Dwarf_Die *result) __nonnull_attribute__ (3);
@@ -292,9 +296,25 @@ extern int dwarf_highpc (Dwarf_Die *die, Dwarf_Addr *return_addr)
 extern int dwarf_lowpc (Dwarf_Die *die, Dwarf_Addr *return_addr)
      __nonnull_attribute__ (2);
 
+/* Return entry_pc or low_pc attribute of DIE.  */
+extern int dwarf_entrypc (Dwarf_Die *die, Dwarf_Addr *return_addr)
+     __nonnull_attribute__ (2);
+
 /* Return 1 if DIE's lowpc/highpc or ranges attributes match the PC address,
    0 if not, or -1 for errors.  */
 extern int dwarf_haspc (Dwarf_Die *die, Dwarf_Addr pc);
+
+/* Enumerate the PC address ranges covered by this DIE, covering all
+   addresses where dwarf_haspc returns true.  In the first call OFFSET
+   should be zero and *BASEP need not be initialized.  Returns -1 for
+   errors, zero when there are no more address ranges to report, or a
+   nonzero OFFSET value to pass to the next call.  Each subsequent call
+   must preserve *BASEP from the prior call.  Successful calls fill in
+   *STARTP and *ENDP with a contiguous address range.  */
+extern ptrdiff_t dwarf_ranges (Dwarf_Die *die,
+			       ptrdiff_t offset, Dwarf_Addr *basep,
+			       Dwarf_Addr *startp, Dwarf_Addr *endp);
+
 
 /* Return byte size attribute of DIE.  */
 extern int dwarf_bytesize (Dwarf_Die *die);
@@ -529,6 +549,12 @@ extern int dwarf_func_inline_instances (Dwarf_Func *func,
 					int (*callback) (Dwarf_Die *, void *),
 					void *arg);
 
+
+/* Find the appropriate PC location or locations for function entry
+   breakpoints for the given DW_TAG_subprogram DIE.  Returns -1 for errors.
+   On success, returns the number of breakpoint locations (never zero)
+   and sets *BKPTS to a malloc'd vector of addresses.  */
+extern int dwarf_entry_breakpoints (Dwarf_Die *die, Dwarf_Addr **bkpts);
 
 
 /* Call callback function for each of the macro information entry for

@@ -43,6 +43,10 @@ compare_lines (const void *a, const void *b)
   Dwarf_Line *const *p1 = a;
   Dwarf_Line *const *p2 = b;
 
+  if ((*p1)->addr == (*p2)->addr)
+    /* An end_sequence marker precedes a normal record at the same address.  */
+    return (*p2)->end_sequence - (*p1)->end_sequence;
+
   return (*p1)->addr - (*p2)->addr;
 }
 

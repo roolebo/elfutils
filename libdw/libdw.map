@@ -1,5 +1,5 @@
 ELFUTILS_0 { };
-ELFUTILS_0.115 {
+ELFUTILS_0.116 {
   global:
     dwarf_abbrevhaschildren;
     dwarf_addrdie;
@@ -16,9 +16,12 @@ ELFUTILS_0.115 {
     dwarf_cuoffset;
     dwarf_diename;
     dwarf_dieoffset;
+    dwarf_diecu;
     dwarf_end;
     dwarf_errmsg;
     dwarf_errno;
+    dwarf_entrypc;
+    dwarf_entry_breakpoints;
     dwarf_filesrc;
     dwarf_formaddr;
     dwarf_formblock;
@@ -86,6 +89,7 @@ ELFUTILS_0.115 {
     dwarf_onesrcline;
     dwarf_nextcu;
     dwarf_new_oom_handler;
+    dwarf_ranges;
     dwarf_siblingof;
     dwarf_srclang;
     dwarf_tag;

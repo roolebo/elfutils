@@ -1,3 +1,8 @@
+Version 0.116:
+
+libdw: New functions dwarf_ranges, dwarf_entrypc, dwarf_diecu,
+       dwarf_entry_breakpoints.
+
 Version 0.115:
 
 libelf: speed-ups of non-mmap reading.

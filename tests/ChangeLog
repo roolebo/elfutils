@@ -1,3 +1,16 @@
+2005-10-27  Roland McGrath  <roland@redhat.com>
+
+	* run-find-prologues.sh: New file.
+	* Makefile.am (TESTS, EXTRA_DIST): Add it.
+
+	* find-prologues.c (handle_function): Skip inlines.
+
+2005-10-25  Roland McGrath  <roland@redhat.com>
+
+	* find-prologues.c: New file.
+	* Makefile.am (noinst_PROGRAMS): Add it.
+	(find_prologues_LDADD): New variable.
+
 2005-09-02  Ulrich Drepper  <drepper@redhat.com>
 
 	* run-strings-test.sh: Remove strings.out in the end.

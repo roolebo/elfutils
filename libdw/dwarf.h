@@ -516,7 +516,7 @@ enum
   };
 
 
-/* DWARF extended opcide encodings.  */
+/* DWARF extended opcode encodings.  */
 enum
   {
     DW_LNE_end_sequence = 1,

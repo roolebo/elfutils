@@ -88,7 +88,8 @@ report_kernel (Dwfl *dwfl, const char *release,
 
   int result = 0;
   if (fd < 0)
-    result = (predicate != NULL && !(*predicate) ("kernel", NULL)) ? 0 : errno;
+    result = ((predicate != NULL && !(*predicate) ("kernel", NULL))
+	      ? 0 : errno ?: ENOENT);
   else
     {
       bool report = true;
@@ -398,7 +399,7 @@ dwfl_linux_kernel_module_section_address
 
   (void) __fsetlocking (f, FSETLOCKING_BYCALLER);
 
-  int result = (fscanf (f, "%" PRIi64 "\n", addr) == 1 ? 0
+  int result = (fscanf (f, "%" PRIx64 "\n", addr) == 1 ? 0
 		: ferror_unlocked (f) ? errno : ENOEXEC);
   fclose (f);
 
@@ -423,7 +424,7 @@ dwfl_linux_kernel_report_modules (Dwfl *dwfl)
   Dwarf_Addr modaddr;
   unsigned long int modsz;
   char modname[128];
-  while (fscanf (f, "%128s %lu %*s %*s %*s %" PRIi64 "\n",
+  while (fscanf (f, "%128s %lu %*s %*s %*s %" PRIx64 "\n",
 		 modname, &modsz, &modaddr) == 3)
     if (INTUSE(dwfl_report_module) (dwfl, modname,
 				    modaddr, modaddr + modsz) == NULL)

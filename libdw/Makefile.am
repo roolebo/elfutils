@@ -42,10 +42,11 @@ libdw_a_SOURCES = dwarf_begin.c dwarf_begin_elf.c dwarf_end.c dwarf_getelf.c \
 		  dwarf_attr_integrate.c dwarf_hasattr_integrate.c \
 		  dwarf_child.c dwarf_haschildren.c dwarf_formaddr.c \
 		  dwarf_formudata.c dwarf_formsdata.c dwarf_lowpc.c \
-		  dwarf_haspc.c dwarf_highpc.c \
+		  dwarf_entrypc.c dwarf_haspc.c dwarf_highpc.c dwarf_ranges.c \
 		  dwarf_formref.c dwarf_formref_die.c dwarf_siblingof.c \
-		  dwarf_dieoffset.c dwarf_cuoffset.c dwarf_hasattr.c \
-		  dwarf_hasform.c dwarf_whatform.c dwarf_whatattr.c \
+		  dwarf_dieoffset.c dwarf_cuoffset.c dwarf_diecu.c \
+		  dwarf_hasattr.c dwarf_hasform.c \
+		  dwarf_whatform.c dwarf_whatattr.c \
 		  dwarf_bytesize.c dwarf_arrayorder.c dwarf_bitsize.c \
 		  dwarf_bitoffset.c dwarf_srclang.c dwarf_getabbrevtag.c \
 		  dwarf_getabbrevcode.c dwarf_abbrevhaschildren.c \
@@ -68,8 +69,8 @@ libdw_a_SOURCES = dwarf_begin.c dwarf_begin_elf.c dwarf_end.c dwarf_getelf.c \
 		  dwarf_func_line.c dwarf_func_col.c dwarf_func_die.c \
 		  dwarf_func_inline.c dwarf_getsrc_file.c \
 		  libdw_findcu.c libdw_form.c libdw_alloc.c memory-access.c \
-		  libdw_visit_scopes.c
-
+		  libdw_visit_scopes.c \
+		  dwarf_entry_breakpoints.c
 
 if !MUDFLAP
 libdw_pic_a_SOURCES =

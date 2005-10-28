@@ -1,3 +1,9 @@
+2005-09-16  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac (ALLOW_UNALIGNED) [__ia64__ || __alpha__]:
+	Don't set it, since on IA64 you get error messages for unaligned
+	accesses, and on Alpha it's at least very slow.
+
 2005-08-29  Ulrich Drepper  <drepper@redhat.com>
 
 	* configure.ac: Fix GCOV make condition generation.

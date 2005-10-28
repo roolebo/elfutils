@@ -38,6 +38,7 @@
   DWFL_ERROR (LIBELF, N_("See elf_errno"))				      \
   DWFL_ERROR (LIBDW, N_("See dwarf_errno"))				      \
   DWFL_ERROR (LIBEBL, N_("See ebl_errno (XXX missing)"))		      \
+  DWFL_ERROR (UNKNOWN_MACHINE, N_("no support library found for machine"))    \
   DWFL_ERROR (NOREL, N_("Callbacks missing for ET_REL file"))		      \
   DWFL_ERROR (BADRELTYPE, N_("Unsupported relocation type"))		      \
   DWFL_ERROR (BADRELOFF, N_("r_offset is bogus"))			      \

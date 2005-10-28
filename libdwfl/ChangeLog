@@ -1,3 +1,21 @@
+2005-10-20  Roland McGrath  <roland@redhat.com>
+
+	* libdwflP.h (DWFL_ERRORS): New error UNKNOWN_MACHINE.
+	* relocate.c (__libdwfl_relocate): Return DWFL_E_UNKNOWN_MACHINE
+	instead of DWFL_E_BADRELTYPE if ebl_get_elfmachine yields EM_NONE.
+
+2005-10-01  Roland McGrath  <roland@redhat.com>
+
+	* linux-kernel-modules.c (report_kernel): Return ENOENT if we fail
+	with errno 0.
+
+2005-09-19  Roland McGrath  <roland@redhat.com>
+
+	* linux-kernel-modules.c (dwfl_linux_kernel_report_modules): Use
+	PRIx64 instead of PRIi64, lest addresses with high bits set overflow
+	the signed integer reading; they will just have to be in hexadecimal.
+	(dwfl_linux_kernel_module_section_address): Likewise.
+
 2005-08-28  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.am (%.os): Use COMPILE.os.

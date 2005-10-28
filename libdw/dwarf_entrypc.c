@@ -1,5 +1,5 @@
-/* Determine whether a DIE covers a PC address.
-   Copyright (C) 2005 Red Hat, Inc.
+/* Return entry PC attribute of DIE.
+   Copyright (C) 2003, 2005 Red Hat, Inc.
 
    This program is Open Source software; you can redistribute it and/or
    modify it under the terms of the Open Software License version 1.0 as
@@ -15,25 +15,21 @@
 # include <config.h>
 #endif
 
-#include "libdwP.h"
 #include <dwarf.h>
+#include "libdwP.h"
 
 
 int
-dwarf_haspc (Dwarf_Die *die, Dwarf_Addr pc)
+dwarf_entrypc (die, return_addr)
+     Dwarf_Die *die;
+     Dwarf_Addr *return_addr;
 {
-  if (die == NULL)
-    return -1;
+  Dwarf_Attribute attr_mem;
 
-  Dwarf_Addr base;
-  Dwarf_Addr begin;
-  Dwarf_Addr end;
-  ptrdiff_t offset = 0;
-  while ((offset = INTUSE(dwarf_ranges) (die, offset, &base,
-					 &begin, &end)) > 0)
-    if (pc >= begin && pc < end)
-      return 1;
-
-  return offset;
+  return INTUSE(dwarf_formaddr) (INTUSE(dwarf_attr) (die, DW_AT_entry_pc,
+						     &attr_mem)
+				 ?: INTUSE(dwarf_attr) (die, DW_AT_low_pc,
+							&attr_mem),
+				 return_addr);
 }
-INTDEF (dwarf_haspc)
+INTDEF(dwarf_entrypc)

@@ -1,3 +1,63 @@
+2005-10-27  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_entry_breakpoints.c (search_range): Fix binary search code;
+	don't match end_sequence markers.
+
+	* dwarf_getsrclines.c (compare_lines): Sort end_sequence markers
+	before normal records at the same address.
+	* dwarf_getsrc_die.c (dwarf_getsrc_die): Don't match an end_sequence
+	marker.
+
+2005-10-26  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_entry_breakpoints.c: Use the second line record within the
+	function, regardless of its source location data.
+
+2005-10-25  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_entry_breakpoints.c: Fall back to entrypc for contiguous too.
+
+	* libdw.map: Add dwarf_entrypc, dwarf_entry_breakpoints.
+
+2005-10-14  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_diecu.c (dwarf_diecu): New file.
+	* Makefile.am (libdw_a_SOURCES): Add it.
+	* libdw.h: Declare dwarf_diecu.
+	* libdw.map: Export it.
+
+	* libdw.map: Bump to 0.116; export dwarf_ranges.
+
+2005-09-20  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_haspc.c: Use dwarf_ranges.
+	* dwarf_entry_breakpoints.c: Likewise.
+
+	* dwarf_ranges.c: New file.
+	* Makefile.am (libdw_a_SOURCES): Add it.
+	* libdw.h: Declare dwarf_ranges.
+	* libdwP.h: Add INTDECL.
+
+2005-09-14  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_entry_breakpoints.c (dwarf_entry_breakpoints): Fix braino in
+	prologue_end marker scanning loop.
+
+2005-09-11  Roland McGrath  <roland@redhat.com>
+
+	* dwarf.h: Comment typo fix.
+
+2005-09-07  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_entry_breakpoints.c: New file.
+	* Makefile.am (libdw_a_SOURCES): Add it.
+	* libdw.h: Declare dwarf_entry_breakpoints.
+
+	* dwarf_entrypc.c: New file.
+	* Makefile.am (libdw_a_SOURCES): Add it.
+	* libdw.h: Declare dwarf_entrypc.
+	* libdwP.h: Add INTDECL.
+
 2005-08-28  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.am: Use $(LINK) not $(CC) when creating DSO.

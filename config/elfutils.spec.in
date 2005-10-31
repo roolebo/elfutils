@@ -185,6 +185,17 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.so
 
 %changelog
+* Mon Oct 31 2005 Ulrich Drepper <drepper@redhat.com> 0.116-1
+- libdw: New functions dwarf_ranges, dwarf_entrypc, dwarf_diecu,       d
+warf_entry_breakpoints.  Removed Dwarf_Func type and functions       d
+warf_func_name, dwarf_func_lowpc, dwarf_func_highpc,       dwarf_func_
+entrypc, dwarf_func_die; dwarf_getfuncs callback now uses       Dwarf_
+Die, and dwarf_func_file, dwarf_func_line, dwarf_func_col       replac
+ed by dwarf_decl_file, dwarf_decl_line, dwarf_decl_column;       dwarf
+_func_inline, dwarf_func_inline_instances now take Dwarf_Die.       Ty
+pe Dwarf_Loc renamed to Dwarf_Op; dwarf_getloclist,       dwarf_addrlo
+clists renamed dwarf_getlocation, dwarf_getlocation_addr.
+
 * Fri Sep  2 2005 Ulrich Drepper <drepper@redhat.com> 0.115-1
 - libelf: speed-ups of non-mmap reading.
 - strings: New program.

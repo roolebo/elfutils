@@ -1,3 +1,7 @@
+2005-11-09  Ulrich Drepper  <drepper@redhat.com>
+
+	* line2addr.c (handle_module): Add missing parameter to printf.
+
 2005-10-27  Roland McGrath  <roland@redhat.com>
 
 	* allfcts.c (cb): Update for dwarf_func_* -> dwarf_decl_* changes.

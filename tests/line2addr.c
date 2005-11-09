@@ -74,7 +74,7 @@ handle_module (Dwfl_Module *mod __attribute__ ((unused)),
 		printf (" %s%s:%d", modname[0] != '\0' ? "" : "(",
 			file, line);
 	      if (col != 0)
-		printf (":%d");
+		printf (":%d", col);
 	      if (modname[0] != '\0'
 		  || strcmp (file, a->file) || line != a->line || col != 0)
 		puts (")");

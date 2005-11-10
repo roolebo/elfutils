@@ -1,3 +1,7 @@
+2005-11-10  Roland McGrath  <roland@redhat.com>
+
+	* elf.h: Update from glibc.
+
 2005-09-09  Roland McGrath  <roland@redhat.com>
 
 	* elf_update.c (write_file): Stat the file and fchmod it after update

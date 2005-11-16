@@ -1,3 +1,7 @@
+2005-11-16  Roland McGrath  <roland@redhat.com>
+
+	* libebl.h: Use "" for elf-knowledge.h, not <>.
+
 2005-11-14  Roland McGrath  <roland@redhat.com>
 
 	* ia64_init.c (ia64_init): Initialize EH->reloc_simple_type.

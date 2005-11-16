@@ -19,7 +19,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include <elf-knowledge.h>
+#include "elf-knowledge.h"
 
 
 /* Opaque type for the handle.  */

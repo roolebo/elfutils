@@ -10,21 +10,15 @@
 # License version 1.0 from http://www.opensource.org/licenses/osl.php or
 # by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
 # 3001 King Ranch Road, Ukiah, CA 95482.
-set -e
+. $srcdir/test-subr.sh
 
-# Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile25.bz2 > testfile25 2>/dev/null || exit 77
+testfiles testfile25
 
-LD_LIBRARY_PATH=../libdw:../libebl:../libelf${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH \
-  ./funcscopes -e testfile25 incr >& funcscopes-test.out || :
-
-diff -Bbu funcscopes-test.out - <<\EOF
+testrun_compare ./funcscopes -e testfile25 incr <<\EOF
 testfile25: 0x8048000 .. 0x8049528
     inline-test.c (0x11): 0x8048348 (/home/roland/build/stock-elfutils/inline-test.c:7) .. 0x804834f (/home/roland/build/stock-elfutils/inline-test.c:9)
         incr (0x2e): 0x8048348 (/home/roland/build/stock-elfutils/inline-test.c:7) .. 0x804834f (/home/roland/build/stock-elfutils/inline-test.c:9)
             x                             [    66]
 EOF
-
-rm -f testfile25 funcscopes-test.out
 
 exit 0

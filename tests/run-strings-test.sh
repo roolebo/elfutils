@@ -11,20 +11,12 @@
 # License version 1.0 from http://www.opensource.org/licenses/osl.php or
 # by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
 # 3001 King Ranch Road, Ukiah, CA 95482.
-set -e
+. $srcdir/test-subr.sh
 
-# Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile.bz2 > testfile 2>/dev/null || exit 77
+files="testfile `seq 2 9 | while read n; do echo testfile$n; done`"
+testfiles $files
 
-# Don't fail if we cannot decompress the file.
-for n in $(seq 2 9); do
-bunzip2 -c $srcdir/testfile$n.bz2 > testfile$n 2>/dev/null || exit 77
-done
-
-LD_LIBRARY_PATH=../libelf${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH \
-  ../src/strings -tx -f testfile testfile[23456789] > strings.out
-
-diff -u strings.out - <<"EOF"
+testrun_compare ../src/strings -tx -f $files <<\EOF
 testfile:      f4 /lib/ld-linux.so.2
 testfile:     1c9 __gmon_start__
 testfile:     1d8 libc.so.6
@@ -469,7 +461,5 @@ testfile9:    3d60 cannot get section header string table index
 testfile9:    3e20 Discard symbols from object files.
 testfile9:    3e43 [FILE...]
 EOF
-
-rm -f testfile testfile[23456789] strings.out
 
 exit 0

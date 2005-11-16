@@ -11,19 +11,14 @@
 # License version 1.0 from http://www.opensource.org/licenses/osl.php or
 # by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
 # 3001 King Ranch Road, Ukiah, CA 95482.
-set -e
+. $srcdir/test-subr.sh
 
 original=${original:-testfile19}
 indexed=${indexed:-testfile19.index}
 
-# Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/$original.bz2 > $original 2>/dev/null || exit 77
+testfiles $original $indexed
 
-# Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/$indexed.bz2 > $indexed 2>/dev/null || exit 77
-
-LD_LIBRARY_PATH=../libelf${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH \
-  ../src/ranlib $original
+testrun ../src/ranlib $original
 
 if test -z "$noindex"; then
   # The data in the index is different.  The reference file has it blanked
@@ -33,7 +28,5 @@ if test -z "$noindex"; then
 fi
 
 cmp $original $indexed
-
-rm -f $original $indexed
 
 exit 0

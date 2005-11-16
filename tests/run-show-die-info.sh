@@ -11,17 +11,11 @@
 # License version 1.0 from http://www.opensource.org/licenses/osl.php or
 # by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
 # 3001 King Ranch Road, Ukiah, CA 95482.
-set -e
+. $srcdir/test-subr.sh
 
-# Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile5.bz2 > testfile5 2>/dev/null || exit 77
+testfiles testfile5 testfile2
 
-# Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile2.bz2 > testfile2 2>/dev/null || exit 77
-
-./show-die-info testfile5 testfile2 > show-die-info.out
-
-diff -u show-die-info.out - <<"EOF"
+testrun_compare ./show-die-info testfile5 testfile2 <<\EOF
 file: testfile5
 New CU: off = 0, hsize = 11, ab = 0, as = 4, os = 4
      DW_TAG_compile_unit
@@ -982,7 +976,5 @@ New CU: off = 2521, hsize = 11, ab = 267, as = 4, os = 4
            CU offset : 142
            Attrs     : location name decl_file decl_line external type
 EOF
-
-rm -f testfile2 testfile5 show-die-info.out
 
 exit 0

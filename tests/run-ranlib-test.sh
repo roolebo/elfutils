@@ -11,7 +11,9 @@
 # License version 1.0 from http://www.opensource.org/licenses/osl.php or
 # by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
 # 3001 King Ranch Road, Ukiah, CA 95482.
-set -e
+. $srcdir/test-subr.sh
+
+tempfiles ranlib-test.a ranlib-test.a-copy
 
 cat > ranlib-test.a <<"EOF"
 !<arch>
@@ -23,12 +25,9 @@ EOF
 
 cp ranlib-test.a ranlib-test.a-copy
 
-LD_LIBRARY_PATH=../libelf${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH \
-  ../src/ranlib ranlib-test.a
+testrun ../src/ranlib ranlib-test.a
 
 # The ranlib call should not have changed anything.
 cmp ranlib-test.a ranlib-test.a-copy
-
-rm -f ranlib-test.a ranlib-test.a-copy
 
 exit 0

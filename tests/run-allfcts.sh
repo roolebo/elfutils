@@ -11,20 +11,11 @@
 # License version 1.0 from http://www.opensource.org/licenses/osl.php or
 # by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
 # 3001 King Ranch Road, Ukiah, CA 95482.
-set -e
+. $srcdir/test-subr.sh
 
-# Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile.bz2 > testfile 2>/dev/null || exit 77
+testfiles testfile testfile2 testfile8
 
-# Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile2.bz2 > testfile2 2>/dev/null || exit 77
-
-# Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile8.bz2 > testfile8 2>/dev/null || exit 77
-
-./allfcts testfile testfile2 testfile8 > allfcts.out
-
-diff -u allfcts.out - <<"EOF"
+testrun_compare ./allfcts testfile testfile2 testfile8 <<\EOF
 /home/drepper/gnu/new-bu/build/ttt/m.c:5:main
 /home/drepper/gnu/new-bu/build/ttt/b.c:4:bar
 /home/drepper/gnu/new-bu/build/ttt/f.c:3:foo
@@ -40,7 +31,5 @@ diff -u allfcts.out - <<"EOF"
 /home/drepper/gnu/elfutils/build/src/../../src/strip.c:291:crc32_file
 /home/drepper/gnu/elfutils/build/src/../../src/strip.c:313:handle_elf
 EOF
-
-rm -f testfile testfile2 testfile8 allfcts.out
 
 exit 0

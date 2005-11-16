@@ -16,16 +16,23 @@ DEFS = -DHAVE_CONFIG_H -D_GNU_SOURCE
 if MUDFLAP
 AM_CFLAGS = -Wall -Werror -Wextra -std=gnu99 -fmudflap\
 	    $(if $($(*F)_no_Wformat),-Wno-format,-Wformat=2)
-AM_LDFLAGS = -Wl,-rpath,\$$ORIGIN/../libebl
+BUILD_RPATH = \$$ORIGIN/../libebl
 else
 AM_CFLAGS = -Wall -Werror -Wextra -std=gnu99 \
 	    $(if $($(*F)_no_Wformat),-Wno-format,-Wformat=2)
-AM_LDFLAGS = -Wl,-rpath,\$$ORIGIN/../libasm:\$$ORIGIN/../libdw:\$$ORIGIN/../libebl:\$$ORIGIN/../libelf
+BUILT_RPATH = \$$ORIGIN/../libasm:\$$ORIGIN/../libdw:\$$ORIGIN/../libebl:\$$ORIGIN/../libelf
 endif
 INCLUDES = -I$(top_srcdir)/libasm -I$(top_srcdir)/libdw \
 	   -I$(top_srcdir)/libdwfl \
 	   -I$(top_srcdir)/libebl -I$(top_srcdir)/libelf \
 	   -I$(top_srcdir)/lib -I..
+
+if TESTS_RPATH
+AM_LDFLAGS = -Wl,-rpath,$(BUILT_RPATH)
+tests_rpath = yes
+else
+tests_rpath = no
+endif
 
 noinst_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  showptable update1 update2 update3 update4 test-nlist \
@@ -73,7 +80,16 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile20.bz2 testfile20.index.bz2 \
 	     testfile21.bz2 testfile21.index.bz2 \
 	     testfile22.bz2 testfile23.bz2 testfile24.bz2 testfile25.bz2 \
-	     coverage.sh
+	     coverage.sh test-subr.sh test-wrapper.sh
+
+TESTS_ENVIRONMENT = $(srcdir)/test-wrapper.sh \
+		    ../libdw:../libebl:../libelf:../libasm
+
+installcheck-local:
+	$(MAKE) $(AM_MAKEFLAGS) TESTS_ENVIRONMENT='$(srcdir)/test-wrapper.sh \
+					installed $(tests_rpath) \
+					$(program_transform_name)' \
+		check-TESTS
 
 if MUDFLAP
 static_build=yes

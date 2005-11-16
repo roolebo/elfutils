@@ -11,17 +11,11 @@
 # License version 1.0 from http://www.opensource.org/licenses/osl.php or
 # by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
 # 3001 King Ranch Road, Ukiah, CA 95482.
-set -e
+. $srcdir/test-subr.sh
 
-# Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile.bz2 > testfile 2>/dev/null || exit 77
+testfiles testfile testfile2
 
-# Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile2.bz2 > testfile2 2>/dev/null || exit 77
-
-./get-files testfile testfile2 > get-files.out
-
-diff -u get-files.out - <<"EOF"
+testrun_compare ./get-files testfile testfile2 <<\EOF
 cuhl = 11, o = 0, asz = 4, osz = 4, ncu = 191
  file[0] = "???"
  file[1] = "/home/drepper/gnu/new-bu/build/ttt/m.c"
@@ -58,7 +52,5 @@ cuhl = 11, o = 267, asz = 4, osz = 4, ncu = 2680
  file[0] = "???"
  file[1] = "/shoggoth/drepper/m.c"
 EOF
-
-rm -f testfile testfil2 get-files.out
 
 exit 0

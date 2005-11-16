@@ -1,3 +1,44 @@
+2005-11-15  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (BUILD_RPATH): New variable.
+	[TESTS_RPATH] (AM_LDFLAGS): Pass -rpath option using that value.
+	(tests_rpath): New variable.
+	(installcheck-local): Pass it to test-wrapper.sh.
+	* test-wrapper.sh: In "installed" format, take yes/no value
+	for elfutils_tests_rpath, which export.  When running a test
+	binary for installcheck, exit 77.
+	* test-subr.sh (installed_testrun): When running a test binary
+	for installcheck, exit 77 if $elfutils_tests_rpath = yes.
+
+2005-11-14  Roland McGrath  <roland@redhat.com>
+
+	* test-subr.sh: New file.
+	* test-wrapper.sh: New file.
+	* Makefile.am (EXTRA_DIST): Add them.
+	(AM_LDFLAGS): Variable removed.
+	(TESTS_ENVIRONMENT): New variable.
+	(installcheck-local): New target.
+	* run-addrscopes.sh: Use test-subr.sh.
+	* run-allfcts.sh: Likewise.
+	* run-ecp-test.sh: Likewise.
+	* run-ecp-test2.sh: Likewise.
+	* run-elflint-self.sh: Likewise.
+	* run-elflint-test.sh: Likewise.
+	* run-find-prologues.sh: Likewise.
+	* run-funcscopes.sh: Likewise.
+	* run-get-aranges.sh: Likewise.
+	* run-get-files.sh: Likewise.
+	* run-get-lines.sh: Likewise.
+	* run-get-pubnames.sh: Likewise.
+	* run-line2addr.sh: Likewise.
+	* run-ranlib-test.sh: Likewise.
+	* run-ranlib-test2.sh: Likewise.
+	* run-show-abbrev.sh: Likewise.
+	* run-show-ciefde.sh: Likewise.
+	* run-show-die-info.sh: Likewise.
+	* run-strings-test.sh: Likewise.
+	* run-strip-test.sh: Likewise.
+
 2005-11-09  Ulrich Drepper  <drepper@redhat.com>
 
 	* line2addr.c (handle_module): Add missing parameter to printf.

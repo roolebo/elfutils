@@ -11,18 +11,12 @@
 # License version 1.0 from http://www.opensource.org/licenses/osl.php or
 # by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
 # 3001 King Ranch Road, Ukiah, CA 95482.
-set -e
+. $srcdir/test-subr.sh
 
-# Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile18.bz2 > testfile18 2>/dev/null || exit 77
+testfiles testfile18
 
-LD_LIBRARY_PATH=../libebl:../libelf${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH \
-  ../src/elflint --gnu-ld testfile18 >& elflint-test.out || :
-
-diff -u elflint-test.out - <<"EOF"
+testrun_compare ../src/elflint --gnu-ld testfile18 <<\EOF
 section [ 8] '.rela.dyn': relocation 1: copy relocation against symbol of type FUNC
 EOF
-
-rm -f testfile18 elflint-test.out
 
 exit 0

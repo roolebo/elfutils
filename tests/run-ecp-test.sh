@@ -11,15 +11,13 @@
 # License version 1.0 from http://www.opensource.org/licenses/osl.php or
 # by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
 # 3001 King Ranch Road, Ukiah, CA 95482.
-set -e
+. $srcdir/test-subr.sh
 
-# Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile10.bz2 > testfile10 2>/dev/null || exit 77
+testfiles testfile10
+tempfiles testfile10.tmp
 
-./ecp testfile10 testfile10.tmp
+testrun ./ecp testfile10 testfile10.tmp
 
 cmp testfile10 testfile10.tmp
-
-rm -f testfile10 testfile10.tmp
 
 exit 0

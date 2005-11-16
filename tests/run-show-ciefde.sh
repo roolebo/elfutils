@@ -11,17 +11,11 @@
 # License version 1.0 from http://www.opensource.org/licenses/osl.php or
 # by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
 # 3001 King Ranch Road, Ukiah, CA 95482.
-set -e
+. $srcdir/test-subr.sh
 
-# Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile3.bz2 > testfile3 2>/dev/null || exit 77
+testfiles testfile3 testfile4
 
-# Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile4.bz2 > testfile4 2>/dev/null || exit 77
-
-./show-ciefde testfile3 testfile4 > show-ciefde.out
-
-diff -u show-ciefde.out - <<"EOF"
+testrun_compare ./show-ciefde testfile3 testfile4 <<\EOF
 testfile3 has 1 CIEs and 1 FDEs
 CIE[0]: bytes_in_cie = 16, version = 1, augmenter = ""
 CIE[0]: code_alignment_factor = 1
@@ -313,7 +307,5 @@ no FDE at 8048454
 no FDE at 8048455
 FDE[@80493fc]: cie_offset = 0, cie_index = 0, fde_offset = 28
 EOF
-
-rm -f testfile3 testfile4 show-ciefde.out
 
 exit 0

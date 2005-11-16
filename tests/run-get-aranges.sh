@@ -11,17 +11,11 @@
 # License version 1.0 from http://www.opensource.org/licenses/osl.php or
 # by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
 # 3001 King Ranch Road, Ukiah, CA 95482.
-set -e
+. $srcdir/test-subr.sh
 
-# Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile.bz2 > testfile 2>/dev/null || exit 77
+testfiles testfile testfile2
 
-# Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile2.bz2 > testfile2 2>/dev/null || exit 77
-
-./get-aranges testfile testfile2 > get-aranges.out
-
-cmp get-aranges.out - <<"EOF"
+testrun_compare ./get-aranges testfile testfile2 <<\EOF
 0x804842b: not in range
 CU name: "m.c"
 CU name: "m.c"
@@ -65,7 +59,5 @@ CU name: "f.c"
  [ 2] start: 0x100004b0, length: 100, cu: 2532
 CU name: "m.c"
 EOF
-
-rm -f testfile testfile2 get-aranges.out
 
 exit 0

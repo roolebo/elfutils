@@ -11,17 +11,11 @@
 # License version 1.0 from http://www.opensource.org/licenses/osl.php or
 # by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
 # 3001 King Ranch Road, Ukiah, CA 95482.
-set -e
+. $srcdir/test-subr.sh
 
-# Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile.bz2 > testfile 2>/dev/null || exit 77
+testfiles testfile testfile2
 
-# Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/testfile2.bz2 > testfile2 2>/dev/null || exit 77
-
-./show-abbrev testfile testfile2 > show-abbrev.out
-
-diff -u show-abbrev.out - <<"EOF"
+testrun_compare ./show-abbrev testfile testfile2 <<\EOF
 abbrev[0]: code = 1, tag = 17, children = 1
 abbrev[0]: attr[0]: code = 16, form = 6, offset = 0
 abbrev[0]: attr[1]: code = 18, form = 1, offset = 2
@@ -349,7 +343,5 @@ abbrev[96]: attr[3]: code = 73, form = 19, offset = 369
 abbrev[96]: attr[4]: code = 63, form = 12, offset = 371
 abbrev[96]: attr[5]: code = 2, form = 10, offset = 373
 EOF
-
-rm -f testfile testfile2 show-abbrev.out
 
 exit 0

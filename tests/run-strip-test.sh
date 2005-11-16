@@ -11,41 +11,28 @@
 # License version 1.0 from http://www.opensource.org/licenses/osl.php or
 # by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
 # 3001 King Ranch Road, Ukiah, CA 95482.
-set -e
+. $srcdir/test-subr.sh
 
 original=${original:-testfile11}
 stripped=${stripped:-testfile7}
 debugout=${debugfile:+-f testfile.debug.temp -F $debugfile}
 
-# Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/$original.bz2 > $original 2>/dev/null || exit 77
+testfiles $original $stripped $debugfile
 
-# Don't fail if we cannot decompress the file.
-bunzip2 -c $srcdir/$stripped.bz2 > $stripped 2>/dev/null || exit 77
+tempfiles testfile.temp testfile.debug.temp
 
-# Don't fail if we cannot decompress the file.
-test -z "$debugfile" ||
-bunzip2 -c $srcdir/$debugfile.bz2 > $debugfile 2>/dev/null || exit 77
-
-LD_LIBRARY_PATH=../libebl:../libelf${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH \
-  ../src/strip -o testfile.temp $debugout $original
+testrun ../src/strip -o testfile.temp $debugout $original
 
 cmp $stripped testfile.temp
 
 # Check elflint and the expected result.
-LD_LIBRARY_PATH=../libebl:../libelf${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH \
-  ../src/elflint -q testfile.temp
+testrun ../src/elflint -q testfile.temp
 
 test -z "$debugfile" || {
 cmp $debugfile testfile.debug.temp
 
 # Check elflint and the expected result.
-LD_LIBRARY_PATH=../libebl:../libelf${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH \
-  ../src/elflint -q -d testfile.debug.temp
-
-rm -f "$debugfile"
+testrun ../src/elflint -q -d testfile.debug.temp
 }
-
-rm -f $original $stripped testfile.temp testfile.debug.temp
 
 exit 0

@@ -16,7 +16,12 @@
 # include <config.h>
 #endif
 
-#include <libebl_alpha.h>
+#define BACKEND		alpha_
+#define RELOC_PREFIX	R_ALPHA_
+#include "libebl_CPU.h"
+
+/* This defines the common reloc hooks based on alpha_reloc.def.  */
+#include "common-reloc.c"
 
 
 const char *
@@ -32,12 +37,10 @@ alpha_init (elf, machine, eh, ehlen)
 
   /* We handle it.  */
   eh->name = "Alpha";
-  eh->reloc_type_name = alpha_reloc_type_name;
-  eh->reloc_type_check = alpha_reloc_type_check;
+  alpha_init_reloc (eh);
   eh->dynamic_tag_name = alpha_dynamic_tag_name;
   eh->dynamic_tag_check = alpha_dynamic_tag_check;
-  eh->copy_reloc_p = alpha_copy_reloc_p;
-  eh->destr = alpha_destr;
+  eh->reloc_simple_type = alpha_reloc_simple_type;
 
   return MODVERSION;
 }

@@ -29,91 +29,17 @@ struct ebl
   const char *emulation;
 
   /* ELF machine, class, and data encoding.  */
-  int machine;
-  int class;
-  int data;
+  uint_fast16_t machine;
+  uint_fast8_t class;
+  uint_fast8_t data;
 
   /* The libelf handle (if known).  */
   Elf *elf;
 
-  /* Return symbol representaton of object file type.  */
-  const char *(*object_type_name) (int, char *, size_t);
-
-  /* Return symbolic representation of relocation type.  */
-  const char *(*reloc_type_name) (int, char *, size_t);
-
-  /* Check relocation type.  */
-  bool (*reloc_type_check) (int);
-
-  /* Check if relocation type is for simple absolute relocations.  */
-  Elf_Type (*reloc_simple_type) (Elf *, int);
-
-  /* Check relocation type use.  */
-  bool (*reloc_valid_use) (Elf *, int);
-
-  /* Return true if the symbol type is that referencing the GOT.  */
-  bool (*gotpc_reloc_check) (Elf *, int);
-
-  /* Return symbolic representation of segment type.  */
-  const char *(*segment_type_name) (int, char *, size_t);
-
-  /* Return symbolic representation of section type.  */
-  const char *(*section_type_name) (int, char *, size_t);
-
-  /* Return section name.  */
-  const char *(*section_name) (int, int, char *, size_t);
-
-  /* Return next machine flag name.  */
-  const char *(*machine_flag_name) (GElf_Word *);
-
-  /* Check whether machine flags are valid.  */
-  bool (*machine_flag_check) (GElf_Word);
-
-  /* Return symbolic representation of symbol type.  */
-  const char *(*symbol_type_name) (int, char *, size_t);
-
-  /* Return symbolic representation of symbol binding.  */
-  const char *(*symbol_binding_name) (int, char *, size_t);
-
-  /* Return symbolic representation of dynamic tag.  */
-  const char *(*dynamic_tag_name) (int64_t, char *, size_t);
-
-  /* Check dynamic tag.  */
-  bool (*dynamic_tag_check) (int64_t);
-
-  /* Combine section header flags values.  */
-  GElf_Word (*sh_flags_combine) (GElf_Word, GElf_Word);
-
-  /* Return symbolic representation of OS ABI.  */
-  const char *(*osabi_name) (int, char *, size_t);
-
-  /* Name of a note entry type for core files.  */
-  const char *(*core_note_type_name) (uint32_t, char *, size_t);
-
-  /* Name of a note entry type for object files.  */
-  const char *(*object_note_type_name) (uint32_t, char *, size_t);
-
-  /* Handle core note.  */
-  bool (*core_note) (const char *, uint32_t, uint32_t, const char *);
-
-  /* Handle object file note.  */
-  bool (*object_note) (const char *, uint32_t, uint32_t, const char *);
-
-  /* Check section name for being that of a debug informatino section.  */
-  bool (*debugscn_p) (const char *);
-
-  /* Check whether given relocation is a copy relocation.  */
-  bool (*copy_reloc_p) (int);
-
-  /* Check whether given symbol's value is ok despite normal checks.  */
-  bool (*check_special_symbol) (Elf *, GElf_Ehdr *, const GElf_Sym *,
-				const char *, const GElf_Shdr *);
-
-  /* Check if backend uses a bss PLT in this file.  */
-  bool (*bss_plt_p) (Elf *, GElf_Ehdr *);
-
-  /* Destructor for ELF backend handle.  */
-  void (*destr) (struct ebl *);
+  /* See ebl-hooks.h for the declarations of the hook functions.  */
+# define EBLHOOK(name) (*name)
+# include "ebl-hooks.h"
+# undef EBLHOOK
 
   /* Internal data.  */
   void *dlhandle;

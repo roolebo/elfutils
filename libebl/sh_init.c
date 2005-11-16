@@ -16,7 +16,12 @@
 # include <config.h>
 #endif
 
-#include <libebl_sh.h>
+#define BACKEND		sh_
+#define RELOC_PREFIX	R_SH_
+#include "libebl_CPU.h"
+
+/* This defines the common reloc hooks based on sh_reloc.def.  */
+#include "common-reloc.c"
 
 
 const char *
@@ -32,9 +37,8 @@ sh_init (elf, machine, eh, ehlen)
 
   /* We handle it.  */
   eh->name = "Hitachi SH";
-  eh->reloc_type_name = sh_reloc_type_name;
-  eh->copy_reloc_p = sh_copy_reloc_p;
-  eh->destr = sh_destr;
+  sh_init_reloc (eh);
+  eh->reloc_simple_type = sh_reloc_simple_type;
 
   return MODVERSION;
 }

@@ -1,6 +1,5 @@
-/* Destructor for Arm specific backend library.
-   Copyright (C) 2002, 2005 Red Hat, Inc.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2002.
+/* S/390-specific symbolic name handling.
+   Copyright (C) 2005 Red Hat, Inc.
 
    This program is Open Source software; you can redistribute it and/or
    modify it under the terms of the Open Software License version 1.0 as
@@ -16,12 +15,27 @@
 # include <config.h>
 #endif
 
-#include <libebl_arm.h>
+#include <elf.h>
+#include <stddef.h>
 
+#define BACKEND		s390_
+#include "libebl_CPU.h"
 
-void
-arm_destr (bh)
-     Ebl *bh __attribute__ ((unused));
+/* Check for the simple reloc types.  */
+Elf_Type
+s390_reloc_simple_type (Ebl *ebl __attribute__ ((unused)), int type)
 {
-  /* Nothing to do so far.  */
+  switch (type)
+    {
+    case R_390_64:
+      return ELF_T_SXWORD;
+    case R_390_32:
+      return ELF_T_SWORD;
+    case R_390_16:
+      return ELF_T_HALF;
+    case R_390_8:
+      return ELF_T_BYTE;
+    default:
+      return ELF_T_NUM;
+    }
 }

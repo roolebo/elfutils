@@ -16,8 +16,12 @@
 # include <config.h>
 #endif
 
-#include <libebl_i386.h>
+#define BACKEND		i386_
+#define RELOC_PREFIX	R_386_
+#include "libebl_CPU.h"
 
+/* This defines the common reloc hooks based on i386_reloc.def.  */
+#include "common-reloc.c"
 
 const char *
 i386_init (elf, machine, eh, ehlen)
@@ -32,16 +36,12 @@ i386_init (elf, machine, eh, ehlen)
 
   /* We handle it.  */
   eh->name = "Intel 80386";
-  eh->reloc_type_name = i386_reloc_type_name;
-  eh->reloc_type_check = i386_reloc_type_check;
-  eh->reloc_valid_use = i386_reloc_valid_use;
+  i386_init_reloc (eh);
   eh->reloc_simple_type = i386_reloc_simple_type;
   eh->gotpc_reloc_check = i386_gotpc_reloc_check;
   eh->core_note = i386_core_note;
   generic_debugscn_p = eh->debugscn_p;
   eh->debugscn_p = i386_debugscn_p;
-  eh->copy_reloc_p = i386_copy_reloc_p;
-  eh->destr = i386_destr;
 
   return MODVERSION;
 }

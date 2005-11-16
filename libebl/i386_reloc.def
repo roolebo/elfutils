@@ -1,0 +1,51 @@
+/* List the relocation types for i386.	-*- C -*-
+   Copyright (C) 2000, 2001, 2002, 2003, 2005 Red Hat, Inc.
+
+   This program is Open Source software; you can redistribute it and/or
+   modify it under the terms of the Open Software License version 1.0 as
+   published by the Open Source Initiative.
+
+   You should have received a copy of the Open Software License along
+   with this program; if not, you may obtain a copy of the Open Software
+   License version 1.0 from http://www.opensource.org/licenses/osl.php or
+   by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
+   3001 King Ranch Road, Ukiah, CA 95482.   */
+
+/*	    NAME,		REL|EXEC|DYN	*/
+
+RELOC_TYPE (NONE,		0)
+RELOC_TYPE (COPY,		EXEC)
+RELOC_TYPE (32,			REL|EXEC|DYN)
+RELOC_TYPE (PC32,		REL|EXEC|DYN)
+RELOC_TYPE (GOT32,		REL)
+RELOC_TYPE (PLT32,		REL)
+RELOC_TYPE (GLOB_DAT,		EXEC|DYN)
+RELOC_TYPE (JMP_SLOT,		EXEC|DYN)
+RELOC_TYPE (RELATIVE,		EXEC|DYN)
+RELOC_TYPE (GOTOFF,		REL)
+RELOC_TYPE (GOTPC,		REL)
+RELOC_TYPE (32PLT,		REL)
+RELOC_TYPE (TLS_TPOFF,		EXEC|DYN)
+RELOC_TYPE (TLS_IE,		REL)
+RELOC_TYPE (TLS_GOTIE,		REL)
+RELOC_TYPE (TLS_LE,		REL)
+RELOC_TYPE (TLS_GD,		REL)
+RELOC_TYPE (TLS_LDM,		REL)
+RELOC_TYPE (16,			REL)
+RELOC_TYPE (PC16,		REL)
+RELOC_TYPE (8,			REL)
+RELOC_TYPE (PC8,		REL)
+RELOC_TYPE (TLS_GD_32,		REL)
+RELOC_TYPE (TLS_GD_PUSH,	REL)
+RELOC_TYPE (TLS_GD_CALL,	REL)
+RELOC_TYPE (TLS_GD_POP,		REL)
+RELOC_TYPE (TLS_LDM_32,		REL)
+RELOC_TYPE (TLS_LDM_PUSH,	REL)
+RELOC_TYPE (TLS_LDM_CALL,	REL)
+RELOC_TYPE (TLS_LDM_POP,	REL)
+RELOC_TYPE (TLS_LDO_32,		REL)
+RELOC_TYPE (TLS_IE_32,		REL)
+RELOC_TYPE (TLS_LE_32,		REL)
+RELOC_TYPE (TLS_DTPMOD32,	EXEC|DYN)
+RELOC_TYPE (TLS_DTPOFF32,	EXEC|DYN)
+RELOC_TYPE (TLS_TPOFF32,	EXEC|DYN)

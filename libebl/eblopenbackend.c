@@ -123,7 +123,7 @@ static const char *default_object_type_name (int ignore, char *buf,
 static const char *default_reloc_type_name (int ignore, char *buf, size_t len);
 static bool default_reloc_type_check (int ignore);
 static bool default_reloc_valid_use (Elf *elf, int ignore);
-static Elf_Type default_reloc_simple_type (Elf *elf, int ignore);
+static Elf_Type default_reloc_simple_type (Ebl *ebl, int ignore);
 static bool default_gotpc_reloc_check (Elf *elf, int ignore);
 static const char *default_segment_type_name (int ignore, char *buf,
 					      size_t len);
@@ -381,7 +381,7 @@ default_reloc_valid_use (Elf *elf __attribute__ ((unused)),
 }
 
 static Elf_Type
-default_reloc_simple_type (Elf *elf __attribute__ ((unused)),
+default_reloc_simple_type (Ebl *eh __attribute__ ((unused)),
 			   int ignore __attribute__ ((unused)))
 {
   return ELF_T_NUM;

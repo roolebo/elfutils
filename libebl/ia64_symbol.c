@@ -18,128 +18,10 @@
 
 #include <elf.h>
 #include <stddef.h>
+#include <assert.h>
 
-#include <libebl_ia64.h>
-
-
-/* Return of the backend.  */
-const char *
-ia64_backend_name (void)
-{
-  return "ia64";
-}
-
-
-/* Relocation mapping table.  */
-static const char *reloc_map_table[] =
-  {
-    [R_IA64_NONE] = "R_IA64_NONE",
-    [R_IA64_IMM14] = "R_IA64_IMM14",
-    [R_IA64_IMM22] = "R_IA64_IMM22",
-    [R_IA64_IMM64] = "R_IA64_IMM64",
-    [R_IA64_DIR32MSB] = "R_IA64_DIR32MSB",
-    [R_IA64_DIR32LSB] = "R_IA64_DIR32LSB",
-    [R_IA64_DIR64MSB] = "R_IA64_DIR64MSB",
-    [R_IA64_DIR64LSB] = "R_IA64_DIR64LSB",
-    [R_IA64_GPREL22] = "R_IA64_GPREL22",
-    [R_IA64_GPREL64I] = "R_IA64_GPREL64I",
-    [R_IA64_GPREL32MSB] = "R_IA64_GPREL32MSB",
-    [R_IA64_GPREL32LSB] = "R_IA64_GPREL32LSB",
-    [R_IA64_GPREL64MSB] = "R_IA64_GPREL64MSB",
-    [R_IA64_GPREL64LSB] = "R_IA64_GPREL64LSB",
-    [R_IA64_LTOFF22] = "R_IA64_LTOFF22",
-    [R_IA64_LTOFF64I] = "R_IA64_LTOFF64I",
-    [R_IA64_PLTOFF22] = "R_IA64_PLTOFF22",
-    [R_IA64_PLTOFF64I] = "R_IA64_PLTOFF64I",
-    [R_IA64_PLTOFF64MSB] = "R_IA64_PLTOFF64MSB",
-    [R_IA64_PLTOFF64LSB] = "R_IA64_PLTOFF64LSB",
-    [R_IA64_FPTR64I] = "R_IA64_FPTR64I",
-    [R_IA64_FPTR32MSB] = "R_IA64_FPTR32MSB",
-    [R_IA64_FPTR32LSB] = "R_IA64_FPTR32LSB",
-    [R_IA64_FPTR64MSB] = "R_IA64_FPTR64MSB",
-    [R_IA64_FPTR64LSB] = "R_IA64_FPTR64LSB",
-    [R_IA64_PCREL60B] = "R_IA64_PCREL60B",
-    [R_IA64_PCREL21B] = "R_IA64_PCREL21B",
-    [R_IA64_PCREL21M] = "R_IA64_PCREL21M",
-    [R_IA64_PCREL21F] = "R_IA64_PCREL21F",
-    [R_IA64_PCREL32MSB] = "R_IA64_PCREL32MSB",
-    [R_IA64_PCREL32LSB] = "R_IA64_PCREL32LSB",
-    [R_IA64_PCREL64MSB] = "R_IA64_PCREL64MSB",
-    [R_IA64_PCREL64LSB] = "R_IA64_PCREL64LSB",
-    [R_IA64_LTOFF_FPTR22] = "R_IA64_LTOFF_FPTR22",
-    [R_IA64_LTOFF_FPTR64I] = "R_IA64_LTOFF_FPTR64I",
-    [R_IA64_LTOFF_FPTR32MSB] = "R_IA64_LTOFF_FPTR32MSB",
-    [R_IA64_LTOFF_FPTR32LSB] = "R_IA64_LTOFF_FPTR32LSB",
-    [R_IA64_LTOFF_FPTR64MSB] = "R_IA64_LTOFF_FPTR64MSB",
-    [R_IA64_LTOFF_FPTR64LSB] = "R_IA64_LTOFF_FPTR64LSB",
-    [R_IA64_SEGREL32MSB] = "R_IA64_SEGREL32MSB",
-    [R_IA64_SEGREL32LSB] = "R_IA64_SEGREL32LSB",
-    [R_IA64_SEGREL64MSB] = "R_IA64_SEGREL64MSB",
-    [R_IA64_SEGREL64LSB] = "R_IA64_SEGREL64LSB",
-    [R_IA64_SECREL32MSB] = "R_IA64_SECREL32MSB",
-    [R_IA64_SECREL32LSB] = "R_IA64_SECREL32LSB",
-    [R_IA64_SECREL64MSB] = "R_IA64_SECREL64MSB",
-    [R_IA64_SECREL64LSB] = "R_IA64_SECREL64LSB",
-    [R_IA64_REL32MSB] = "R_IA64_REL32MSB",
-    [R_IA64_REL32LSB] = "R_IA64_REL32LSB",
-    [R_IA64_REL64MSB] = "R_IA64_REL64MSB",
-    [R_IA64_REL64LSB] = "R_IA64_REL64LSB",
-    [R_IA64_LTV32MSB] = "R_IA64_LTV32MSB",
-    [R_IA64_LTV32LSB] = "R_IA64_LTV32LSB",
-    [R_IA64_LTV64MSB] = "R_IA64_LTV64MSB",
-    [R_IA64_LTV64LSB] = "R_IA64_LTV64LSB",
-    [R_IA64_PCREL21BI] = "R_IA64_PCREL21BI",
-    [R_IA64_PCREL22] = "R_IA64_PCREL22",
-    [R_IA64_PCREL64I] = "R_IA64_PCREL64I",
-    [R_IA64_IPLTMSB] = "R_IA64_IPLTMSB",
-    [R_IA64_IPLTLSB] = "R_IA64_IPLTLSB",
-    [R_IA64_COPY] = "R_IA64_COPY",
-    [R_IA64_SUB] = "R_IA64_SUB",
-    [R_IA64_LTOFF22X] = "R_IA64_LTOFF22X",
-    [R_IA64_LDXMOV] = "R_IA64_LDXMOV",
-    [R_IA64_TPREL14] = "R_IA64_TPREL14",
-    [R_IA64_TPREL22] = "R_IA64_TPREL22",
-    [R_IA64_TPREL64I] = "R_IA64_TPREL64I",
-    [R_IA64_TPREL64MSB] = "R_IA64_TPREL64MSB",
-    [R_IA64_TPREL64LSB] = "R_IA64_TPREL64LSB",
-    [R_IA64_LTOFF_TPREL22] = "R_IA64_LTOFF_TPREL22",
-    [R_IA64_DTPMOD64MSB] = "R_IA64_DTPMOD64MSB",
-    [R_IA64_DTPMOD64LSB] = "R_IA64_DTPMOD64LSB",
-    [R_IA64_LTOFF_DTPMOD22] = "R_IA64_LTOFF_DTPMOD22",
-    [R_IA64_DTPREL14] = "R_IA64_DTPREL14",
-    [R_IA64_DTPREL22] = "R_IA64_DTPREL22",
-    [R_IA64_DTPREL64I] = "R_IA64_DTPREL64I",
-    [R_IA64_DTPREL32MSB] = "R_IA64_DTPREL32MSB",
-    [R_IA64_DTPREL32LSB] = "R_IA64_DTPREL32LSB",
-    [R_IA64_DTPREL64MSB] = "R_IA64_DTPREL64MSB",
-    [R_IA64_DTPREL64LSB] = "R_IA64_DTPREL64LSB",
-    [R_IA64_LTOFF_DTPREL22] = "R_IA64_LTOFF_DTPREL22"
-  };
-
-
-/* Determine relocation type string for IA-64.  */
-const char *
-ia64_reloc_type_name (int type, char *buf __attribute__ ((unused)),
-		      size_t len __attribute__ ((unused)))
-{
-  if (type < 0
-      || ((size_t) type
-	  >= sizeof (reloc_map_table) / sizeof (reloc_map_table[0])))
-    return NULL;
-
-  return reloc_map_table[type];
-}
-
-
-/* Check for correct relocation type.  */
-bool
-ia64_reloc_type_check (int type)
-{
-  return (type >= R_IA64_NONE
-	  && ((size_t) type
-	      < sizeof (reloc_map_table) / sizeof (reloc_map_table[0]))
-	  && reloc_map_table[type] != NULL) ? true : false;
-}
+#define BACKEND		ia64_
+#include "libebl_CPU.h"
 
 
 const char *
@@ -164,7 +46,6 @@ ia64_segment_type_name (int segment, char *buf __attribute__ ((unused)),
   return NULL;
 }
 
-
 const char *
 ia64_dynamic_tag_name (int64_t tag, char *buf __attribute__ ((unused)),
 		       size_t len __attribute__ ((unused)))
@@ -179,11 +60,11 @@ ia64_dynamic_tag_name (int64_t tag, char *buf __attribute__ ((unused)),
   return NULL;
 }
 
-/* Check whether given relocation is a copy relocation.  */
+/* Check dynamic tag.  */
 bool
-ia64_copy_reloc_p (int reloc)
+ia64_dynamic_tag_check (int64_t tag)
 {
-  return reloc == R_IA64_COPY;
+  return tag == DT_IA_64_PLT_RESERVE;
 }
 
 /* Check whether machine flags are valid.  */
@@ -191,4 +72,48 @@ bool
 ia64_machine_flag_check (GElf_Word flags)
 {
   return ((flags &~ EF_IA_64_ABI64) == 0);
+}
+
+/* Return symbolic representation of section type.  */
+const char *
+ia64_section_type_name (int type,
+			char *buf __attribute__ ((unused)),
+			size_t len __attribute__ ((unused)))
+{
+  switch (type)
+    {
+    case SHT_IA_64_EXT:
+      return "SHT_IA_64_EXT";
+    case SHT_IA_64_UNWIND:
+      return "HT_IA_64_UNWIND";
+    }
+
+  return NULL;
+}
+
+/* Check for the simple reloc types.  */
+Elf_Type
+ia64_reloc_simple_type (Ebl *ebl, int type)
+{
+  switch (type)
+    {
+    case R_IA64_DIR32MSB:
+      if (ebl->data == ELFDATA2MSB)
+	return ELF_T_WORD;
+      break;
+    case R_IA64_DIR32LSB:
+      if (ebl->data == ELFDATA2LSB)
+	return ELF_T_WORD;
+      break;
+    case R_IA64_DIR64MSB:
+      if (ebl->data == ELFDATA2MSB)
+	return ELF_T_XWORD;
+      break;
+    case R_IA64_DIR64LSB:
+      if (ebl->data == ELFDATA2LSB)
+	return ELF_T_XWORD;
+      break;
+    }
+
+  return ELF_T_NUM;
 }

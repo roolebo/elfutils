@@ -22,7 +22,8 @@
 #include <stdio.h>
 #include <sys/time.h>
 
-#include <libebl_i386.h>
+#define BACKEND i386_
+#include "libebl_CPU.h"
 
 
 /* We cannot include <sys/procfs.h> since the definition would be for

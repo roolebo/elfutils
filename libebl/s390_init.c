@@ -1,6 +1,5 @@
-/* Initialization of IA-64 specific backend library.
-   Copyright (C) 2002, 2003, 2005 Red Hat, Inc.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2002.
+/* Initialization of S/390 specific backend library.
+   Copyright (C) 2005 Red Hat, Inc.
 
    This program is Open Source software; you can redistribute it and/or
    modify it under the terms of the Open Software License version 1.0 as
@@ -16,15 +15,16 @@
 # include <config.h>
 #endif
 
-#define BACKEND		ia64_
-#define RELOC_PREFIX	R_IA64_
+#define BACKEND		s390_
+#define RELOC_PREFIX	R_390_
 #include "libebl_CPU.h"
 
-/* This defines the common reloc hooks based on ia64_reloc.def.  */
+/* This defines the common reloc hooks based on arm_reloc.def.  */
 #include "common-reloc.c"
 
+
 const char *
-ia64_init (elf, machine, eh, ehlen)
+s390_init (elf, machine, eh, ehlen)
      Elf *elf __attribute__ ((unused));
      GElf_Half machine __attribute__ ((unused));
      Ebl *eh;
@@ -35,14 +35,9 @@ ia64_init (elf, machine, eh, ehlen)
     return NULL;
 
   /* We handle it.  */
-  eh->name = "Intel IA-64";
-  ia64_init_reloc (eh);
-  eh->reloc_simple_type = ia64_reloc_simple_type;
-  eh->segment_type_name = ia64_segment_type_name;
-  eh->section_type_name = ia64_section_type_name;
-  eh->dynamic_tag_name = ia64_dynamic_tag_name;
-  eh->dynamic_tag_check = ia64_dynamic_tag_check;
-  eh->machine_flag_check = ia64_machine_flag_check;
+  eh->name = "IBM S/390";
+  s390_init_reloc (eh);
+  eh->reloc_simple_type = s390_reloc_simple_type;
 
   return MODVERSION;
 }

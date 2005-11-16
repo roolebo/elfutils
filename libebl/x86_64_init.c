@@ -16,7 +16,13 @@
 # include <config.h>
 #endif
 
-#include <libebl_x86_64.h>
+#define BACKEND		x86_64_
+#define RELOC_PREFIX	R_X86_64_
+#include "libebl_CPU.h"
+
+/* This defines the common reloc hooks based on x86_64_reloc.def.  */
+#include "common-reloc.c"
+
 
 
 const char *
@@ -32,13 +38,9 @@ x86_64_init (elf, machine, eh, ehlen)
 
   /* We handle it.  */
   eh->name = "AMD x86-64";
-  eh->reloc_type_name = x86_64_reloc_type_name;
-  eh->reloc_type_check = x86_64_reloc_type_check;
-  eh->reloc_valid_use = x86_64_reloc_valid_use;
+  x86_64_init_reloc (eh);
   eh->reloc_simple_type = x86_64_reloc_simple_type;
   eh->core_note = x86_64_core_note;
-  eh->copy_reloc_p = x86_64_copy_reloc_p;
-  eh->destr = x86_64_destr;
 
   return MODVERSION;
 }

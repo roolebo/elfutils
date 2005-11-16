@@ -19,131 +19,27 @@
 #include <elf.h>
 #include <stddef.h>
 
-#include <libebl_sparc.h>
+#define BACKEND		sparc_
+#include "libebl_CPU.h"
 
-
-/* Return of the backend.  */
-const char *
-sparc_backend_name (void)
+/* Check for the simple reloc types.  */
+Elf_Type
+sparc_reloc_simple_type (Ebl *ebl __attribute__ ((unused)), int type)
 {
-  return "sparc";
-}
-
-
-/* Relocation mapping table.  */
-static const char *reloc_map_table[] =
-  {
-    [R_SPARC_NONE] = "R_SPARC_NONE",
-    [R_SPARC_8] = "R_SPARC_8",
-    [R_SPARC_16] = "R_SPARC_16",
-    [R_SPARC_32] = "R_SPARC_32",
-    [R_SPARC_DISP8] = "R_SPARC_DISP8",
-    [R_SPARC_DISP16] = "R_SPARC_DISP16",
-    [R_SPARC_DISP32] = "R_SPARC_DISP32",
-    [R_SPARC_WDISP30] = "R_SPARC_WDISP30",
-    [R_SPARC_WDISP22] = "R_SPARC_WDISP22",
-    [R_SPARC_HI22] = "R_SPARC_HI22",
-    [R_SPARC_22] = "R_SPARC_22",
-    [R_SPARC_13] = "R_SPARC_13",
-    [R_SPARC_LO10] = "R_SPARC_LO10",
-    [R_SPARC_GOT10] = "R_SPARC_GOT10",
-    [R_SPARC_GOT13] = "R_SPARC_GOT13",
-    [R_SPARC_GOT22] = "R_SPARC_GOT22",
-    [R_SPARC_PC10] = "R_SPARC_PC10",
-    [R_SPARC_PC22] = "R_SPARC_PC22",
-    [R_SPARC_WPLT30] = "R_SPARC_WPLT30",
-    [R_SPARC_COPY] = "R_SPARC_COPY",
-    [R_SPARC_GLOB_DAT] = "R_SPARC_GLOB_DAT",
-    [R_SPARC_JMP_SLOT] = "R_SPARC_JMP_SLOT",
-    [R_SPARC_RELATIVE] = "R_SPARC_RELATIVE",
-    [R_SPARC_UA32] = "R_SPARC_UA32",
-    [R_SPARC_PLT32] = "R_SPARC_PLT32",
-    [R_SPARC_HIPLT22] = "R_SPARC_HIPLT22",
-    [R_SPARC_LOPLT10] = "R_SPARC_LOPLT10",
-    [R_SPARC_PCPLT32] = "R_SPARC_PCPLT32",
-    [R_SPARC_PCPLT22] = "R_SPARC_PCPLT22",
-    [R_SPARC_PCPLT10] = "R_SPARC_PCPLT10",
-    [R_SPARC_10] = "R_SPARC_10",
-    [R_SPARC_11] = "R_SPARC_11",
-    [R_SPARC_64] = "R_SPARC_64",
-    [R_SPARC_OLO10] = "R_SPARC_OLO10",
-    [R_SPARC_HH22] = "R_SPARC_HH22",
-    [R_SPARC_HM10] = "R_SPARC_HM10",
-    [R_SPARC_LM22] = "R_SPARC_LM22",
-    [R_SPARC_PC_HH22] = "R_SPARC_PC_HH22",
-    [R_SPARC_PC_HM10] = "R_SPARC_PC_HM10",
-    [R_SPARC_PC_LM22] = "R_SPARC_PC_LM22",
-    [R_SPARC_WDISP16] = "R_SPARC_WDISP16",
-    [R_SPARC_WDISP19] = "R_SPARC_WDISP19",
-    [R_SPARC_7] = "R_SPARC_7",
-    [R_SPARC_5] = "R_SPARC_5",
-    [R_SPARC_6] = "R_SPARC_6",
-    [R_SPARC_DISP64] = "R_SPARC_DISP64",
-    [R_SPARC_PLT64] = "R_SPARC_PLT64",
-    [R_SPARC_HIX22] = "R_SPARC_HIX22",
-    [R_SPARC_LOX10] = "R_SPARC_LOX10",
-    [R_SPARC_H44] = "R_SPARC_H44",
-    [R_SPARC_M44] = "R_SPARC_M44",
-    [R_SPARC_L44] = "R_SPARC_L44",
-    [R_SPARC_REGISTER] = "R_SPARC_REGISTER",
-    [R_SPARC_UA64] = "R_SPARC_UA64",
-    [R_SPARC_UA16] = "R_SPARC_UA16",
-    [R_SPARC_TLS_GD_HI22] = "R_SPARC_TLS_GD_HI22",
-    [R_SPARC_TLS_GD_LO10] = "R_SPARC_TLS_GD_LO10",
-    [R_SPARC_TLS_GD_ADD] = "R_SPARC_TLS_GD_ADD",
-    [R_SPARC_TLS_GD_CALL] = "R_SPARC_TLS_GD_CALL",
-    [R_SPARC_TLS_LDM_HI22] = "R_SPARC_TLS_LDM_HI22",
-    [R_SPARC_TLS_LDM_LO10] = "R_SPARC_TLS_LDM_LO10",
-    [R_SPARC_TLS_LDM_ADD] = "R_SPARC_TLS_LDM_ADD",
-    [R_SPARC_TLS_LDM_CALL] = "R_SPARC_TLS_LDM_CALL",
-    [R_SPARC_TLS_LDO_HIX22] = "R_SPARC_TLS_LDO_HIX22",
-    [R_SPARC_TLS_LDO_LOX10] = "R_SPARC_TLS_LDO_LOX10",
-    [R_SPARC_TLS_LDO_ADD] = "R_SPARC_TLS_LDO_ADD",
-    [R_SPARC_TLS_IE_HI22] = "R_SPARC_TLS_IE_HI22",
-    [R_SPARC_TLS_IE_LO10] = "R_SPARC_TLS_IE_LO10",
-    [R_SPARC_TLS_IE_LD] = "R_SPARC_TLS_IE_LD",
-    [R_SPARC_TLS_IE_LDX] = "R_SPARC_TLS_IE_LDX",
-    [R_SPARC_TLS_IE_ADD] = "R_SPARC_TLS_IE_ADD",
-    [R_SPARC_TLS_LE_HIX22] = "R_SPARC_TLS_LE_HIX22",
-    [R_SPARC_TLS_LE_LOX10] = "R_SPARC_TLS_LE_LOX10",
-    [R_SPARC_TLS_DTPMOD32] = "R_SPARC_TLS_DTPMOD32",
-    [R_SPARC_TLS_DTPMOD64] = "R_SPARC_TLS_DTPMOD64",
-    [R_SPARC_TLS_DTPOFF32] = "R_SPARC_TLS_DTPOFF32",
-    [R_SPARC_TLS_DTPOFF64] = "R_SPARC_TLS_DTPOFF64",
-    [R_SPARC_TLS_TPOFF32] = "R_SPARC_TLS_TPOFF32",
-    [R_SPARC_TLS_TPOFF64] = "R_SPARC_TLS_TPOFF64"
-  };
-
-
-/* Determine relocation type string for sparc.  */
-const char *
-sparc_reloc_type_name (int type, char *buf __attribute__ ((unused)),
-		       size_t len __attribute__ ((unused)))
-{
-  /* High 24 bits of r_type are used for second addend in R_SPARC_OLO10.  */
-  if ((type & 0xff) == R_SPARC_OLO10)
-    return reloc_map_table[type & 0xff];
-
-  if (type < 0 || type >= R_SPARC_NUM)
-    return NULL;
-
-  return reloc_map_table[type];
-}
-
-
-/* Check for correct relocation type.  */
-bool
-sparc_reloc_type_check (int type)
-{
-  if ((type & 0xff) == R_SPARC_OLO10)
-    return true;
-  return (type >= R_SPARC_NONE && type < R_SPARC_NUM
-	  && reloc_map_table[type] != NULL) ? true : false;
-}
-
-/* Check whether given relocation is a copy relocation.  */
-bool
-sparc_copy_reloc_p (int reloc)
-{
-  return reloc == R_SPARC_COPY;
+  switch (type)
+    {
+    case R_SPARC_8:
+      return ELF_T_BYTE;
+    case R_SPARC_16:
+    case R_SPARC_UA16:
+      return ELF_T_HALF;
+    case R_SPARC_32:
+    case R_SPARC_UA32:
+      return ELF_T_WORD;
+    case R_SPARC_64:
+    case R_SPARC_UA64:
+      return ELF_T_XWORD;
+    default:
+      return ELF_T_NUM;
+    }
 }

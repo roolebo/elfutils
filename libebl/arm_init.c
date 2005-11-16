@@ -16,7 +16,12 @@
 # include <config.h>
 #endif
 
-#include <libebl_arm.h>
+#define BACKEND		arm_
+#define RELOC_PREFIX	R_ARM_
+#include "libebl_CPU.h"
+
+/* This defines the common reloc hooks based on arm_reloc.def.  */
+#include "common-reloc.c"
 
 
 const char *
@@ -31,11 +36,9 @@ arm_init (elf, machine, eh, ehlen)
     return NULL;
 
   /* We handle it.  */
-  eh->name = "Arm";
-  eh->reloc_type_name = arm_reloc_type_name;
-  eh->reloc_type_check = arm_reloc_type_check;
-  eh->copy_reloc_p = arm_copy_reloc_p;
-  eh->destr = arm_destr;
+  eh->name = "ARM";
+  arm_init_reloc (eh);
+  eh->reloc_simple_type = arm_reloc_simple_type;
 
   return MODVERSION;
 }

@@ -16,7 +16,12 @@
 # include <config.h>
 #endif
 
-#include <libebl_ppc64.h>
+#define BACKEND		ppc64_
+#define RELOC_PREFIX	R_PPC64_
+#include "libebl_CPU.h"
+
+/* This defines the common reloc hooks based on ppc64_reloc.def.  */
+#include "common-reloc.c"
 
 
 const char *
@@ -32,16 +37,13 @@ ppc64_init (elf, machine, eh, ehlen)
 
   /* We handle it.  */
   eh->name = "PowerPC 64-bit";
-  eh->reloc_type_name = ppc64_reloc_type_name;
-  eh->reloc_type_check = ppc64_reloc_type_check;
-  eh->reloc_valid_use = ppc64_reloc_valid_use;
+  ppc64_init_reloc (eh);
   eh->reloc_simple_type = ppc64_reloc_simple_type;
   eh->dynamic_tag_name = ppc64_dynamic_tag_name;
   eh->dynamic_tag_check = ppc64_dynamic_tag_check;
   eh->copy_reloc_p = ppc64_copy_reloc_p;
   eh->check_special_symbol = ppc64_check_special_symbol;
   eh->bss_plt_p = ppc64_bss_plt_p;
-  eh->destr = ppc64_destr;
 
   return MODVERSION;
 }

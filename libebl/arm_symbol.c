@@ -19,103 +19,22 @@
 #include <elf.h>
 #include <stddef.h>
 
-#include <libebl_arm.h>
+#define BACKEND		arm_
+#include "libebl_CPU.h"
 
-
-/* Return of the backend.  */
-const char *
-arm_backend_name (void)
+/* Check for the simple reloc types.  */
+Elf_Type
+arm_reloc_simple_type (Ebl *ebl __attribute__ ((unused)), int type)
 {
-  return "arm";
-}
-
-
-/* Relocation mapping table.  */
-static const char *reloc_map_table[] =
-  {
-    [R_ARM_NONE] = "R_ARM_NONE",
-    [R_ARM_PC24] = "R_ARM_PC24",
-    [R_ARM_ABS32] = "R_ARM_ABS32",
-    [R_ARM_REL32] = "R_ARM_REL32",
-    [R_ARM_PC13] = "R_ARM_PC13",
-    [R_ARM_ABS16] = "R_ARM_ABS16",
-    [R_ARM_ABS12] = "R_ARM_ABS12",
-    [R_ARM_THM_ABS5] = "R_ARM_THM_ABS5",
-    [R_ARM_ABS8] = "R_ARM_ABS8",
-    [R_ARM_SBREL32] = "R_ARM_SBREL32",
-    [R_ARM_THM_PC22] = "R_ARM_THM_PC22",
-    [R_ARM_THM_PC8] = "R_ARM_THM_PC8",
-    [R_ARM_AMP_VCALL9] = "R_ARM_AMP_VCALL9",
-    [R_ARM_SWI24] = "R_ARM_SWI24",
-    [R_ARM_THM_SWI8] = "R_ARM_THM_SWI8",
-    [R_ARM_XPC25] = "R_ARM_XPC25",
-    [R_ARM_THM_XPC22] = "R_ARM_THM_XPC22",
-    [R_ARM_COPY] = "R_ARM_COPY",
-    [R_ARM_GLOB_DAT] = "R_ARM_GLOB_DAT",
-    [R_ARM_JUMP_SLOT] = "R_ARM_JUMP_SLOT",
-    [R_ARM_RELATIVE] = "R_ARM_RELATIVE",
-    [R_ARM_GOTOFF] = "R_ARM_GOTOFF",
-    [R_ARM_GOTPC] = "R_ARM_GOTPC",
-    [R_ARM_GOT32] = "R_ARM_GOT32",
-    [R_ARM_PLT32] = "R_ARM_PLT32",
-    [R_ARM_ALU_PCREL_7_0] = "R_ARM_ALU_PCREL_7_0",
-    [R_ARM_ALU_PCREL_15_8] = "R_ARM_ALU_PCREL_15_8",
-    [R_ARM_ALU_PCREL_23_15] = "R_ARM_ALU_PCREL_23_15",
-    [R_ARM_LDR_SBREL_11_0] = "R_ARM_LDR_SBREL_11_0",
-    [R_ARM_ALU_SBREL_19_12] = "R_ARM_ALU_SBREL_19_12",
-    [R_ARM_ALU_SBREL_27_20] = "R_ARM_ALU_SBREL_27_20"
-  };
-
-static const char *reloc_map_table2[] =
-  {
-    [R_ARM_GNU_VTENTRY] = "R_ARM_GNU_VTENTRY",
-    [R_ARM_GNU_VTINHERIT] = "R_ARM_GNU_VTINHERIT",
-    [R_ARM_THM_PC11] = "R_ARM_THM_PC11",
-    [R_ARM_THM_PC9] = "R_ARM_THM_PC9"
-  };
-
-static const char *reloc_map_table3[] =
-  {
-    [R_ARM_RXPC25] = "R_ARM_RXPC25",
-    [R_ARM_RSBREL32] = "R_ARM_RSBREL32",
-    [R_ARM_THM_RPC22] = "R_ARM_THM_RPC22",
-    [R_ARM_RREL32] = "R_ARM_RREL32",
-    [R_ARM_RABS22] = "R_ARM_RABS22",
-    [R_ARM_RPC24] = "R_ARM_RPC24",
-    [R_ARM_RBASE] = "R_ARM_RBASE"
-  };
-
-
-/* Determine relocation type string for Alpha.  */
-const char *
-arm_reloc_type_name (int type, char *buf __attribute__ ((unused)),
-		     size_t len __attribute__ ((unused)))
-{
-  if (type >= R_ARM_NONE && type <= R_ARM_ALU_SBREL_27_20)
-    return reloc_map_table[type];
-
-  if (type >= R_ARM_GNU_VTENTRY && type <= R_ARM_THM_PC9)
-    return reloc_map_table2[type - R_ARM_GNU_VTENTRY];
-
-  if (type >= R_ARM_RXPC25 && type <= R_ARM_RBASE)
-    return reloc_map_table3[type - R_ARM_RXPC25];
-
-  return NULL;
-}
-
-
-/* Check for correct relocation type.  */
-bool
-arm_reloc_type_check (int type)
-{
-  return ((type >= R_ARM_NONE && type <= R_ARM_ALU_SBREL_27_20)
-	  || (type >= R_ARM_GNU_VTENTRY && type <= R_ARM_THM_PC9)
-	  || (type >= R_ARM_RXPC25 && type <= R_ARM_RBASE)) ? true : false;
-}
-
-/* Check whether given relocation is a copy relocation.  */
-bool
-arm_copy_reloc_p (int reloc)
-{
-  return reloc == R_ARM_COPY;
+  switch (type)
+    {
+    case R_ARM_ABS32:
+      return ELF_T_WORD;
+    case R_ARM_ABS16:
+      return ELF_T_HALF;
+    case R_ARM_ABS8:
+      return ELF_T_BYTE;
+    default:
+      return ELF_T_NUM;
+    }
 }

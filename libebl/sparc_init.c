@@ -15,7 +15,12 @@
 # include <config.h>
 #endif
 
-#include <libebl_sparc.h>
+#define BACKEND		sparc_
+#define RELOC_PREFIX	R_SPARC_
+#include "libebl_CPU.h"
+
+/* This defines the common reloc hooks based on sparc_reloc.def.  */
+#include "common-reloc.c"
 
 
 const char *
@@ -36,11 +41,9 @@ sparc_init (elf, machine, eh, ehlen)
     eh->name = "SPARC v8+";
   else
     eh->name = "SPARC";
-  eh->reloc_type_name = sparc_reloc_type_name;
-  eh->reloc_type_check = sparc_reloc_type_check;
+  sparc_init_reloc (eh);
+  eh->reloc_simple_type = sparc_reloc_simple_type;
   //eh->core_note = sparc_core_note;
-  eh->copy_reloc_p = sparc_copy_reloc_p;
-  eh->destr = sparc_destr;
 
   return MODVERSION;
 }

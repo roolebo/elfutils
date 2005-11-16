@@ -1,3 +1,160 @@
+2005-11-14  Roland McGrath  <roland@redhat.com>
+
+	* ia64_init.c (ia64_init): Initialize EH->reloc_simple_type.
+	* sh_init.c (sh_init): Likewise.
+	* x86_64_init.c (x86_64_init): Likewise.
+
+	* sparc_symbol.c (sparc_reloc_simple_type): New function.
+	* sparc_init.c (sparc_init): Use it.
+
+	* arm_symbol.c (arm_reloc_simple_type): New function.
+	* arm_init.c (arm_init): Use it.
+
+	* alpha_symbol.c (alpha_reloc_simple_type): New function.
+	* alpha_init.c (alpha_init): Use it.
+
+	* ia64_reloc.def: Update bits per H. J. Lu <hjl@lucon.org>.
+
+	* arm_reloc.def: Update bits per Daniel Jacobowitz <drow@false.org>.
+
+	* alpha_reloc.def: Update bits per Richard Henderson <rth@redhat.com>.
+
+2005-11-10  Roland McGrath  <roland@redhat.com>
+
+	* s390_init.c: New file.
+	* s390_reloc.def: New file.
+	* s390_symbol.c: New file.
+	* Makefile.am (modules, libebl_pic): Add s390.
+	(s390_SRCS, libebl_s390_pic_a_SOURCES): New variables.
+	(am_libebl_s390_pic_a_OBJECTS): New variable.
+
+	* ppc64_init.c: Use common-reloc.c.
+	* ppc64_symbol.c (ppc64_backend_name): Removed.
+	(ppc64_reloc_type_check, ppc64_reloc_type_name): Likewise.
+	(ppc64_copy_reloc_p, ppc64_reloc_valid_use): Likewise.
+
+	* ppc_init.c: Use common-reloc.c.
+	* ppc_symbol.c (ppc_backend_name): Removed.
+	(ppc_reloc_type_name, ppc_reloc_type_check): Likewise.
+	(ppc_reloc_valid_use, ppc_copy_reloc_p): Likewise.
+
+	* sparc_init.c: Use common-reloc.c.
+	* sparc_symbol.c (sparc_backend_name): Removed.
+	(sparc_reloc_type_name, sparc_reloc_type_check): Likewise.
+	(sparc_copy_reloc_p): Likewise.
+
+	* arm_init.c: Use common-reloc.c.
+	* arm_symbol.c (arm_backend_name): Removed.
+	(arm_reloc_type_name, arm_reloc_type_check, arm_copy_reloc_p): Removed.
+
+	* alpha_init.c: Use common-reloc.c.
+	* alpha_symbol.c (alpha_backend_name): Removed.
+	(alpha_reloc_type_name, alpha_reloc_type_check): Likewise.
+	(alpha_copy_reloc_p): Likewise.
+
+	* ia64_symbol.c (ia64_backend_name): Removed.
+	(ia64_reloc_type_name, ia64_reloc_type_check): Likewise.
+	(ia64_copy_reloc_p): Likewise.
+
+	* x86_64_init.c: Use common-reloc.c.
+	* x86_64_symbol.c (x86_64_backend_name): Removed.
+	(x86_64_copy_reloc_p, x86_64_reloc_valid_use): Likewise.
+	(x86_64_reloc_type_check, x86_64_reloc_type_name): Likewise.
+
+	* sh_init.c: Use common-reloc.c.
+	* sh_symbol.c: All functions removed.
+	(sh_reloc_simple_type): New function.
+	(sh_gotpc_reloc_check): New function.
+
+	* common-reloc.c: New file.
+	* Makefile.am (noinst_HEADERS): Add it.
+	* i386_init.c: Include it.
+
+	* sh_reloc.def: New file.
+	* i386_reloc.def: New file.
+	* alpha_reloc.def: New file.
+	* arm_reloc.def: New file.
+	* i386_reloc.def: New file.
+	* ia64_reloc.def: New file.
+	* ppc64_reloc.def: New file.
+	* ppc_reloc.def: New file.
+	* sh_reloc.def: New file.
+	* sparc_reloc.def: New file.
+	* x86_64_reloc.def: New file.
+	* Makefile.am (EXTRA_DIST): Add $(modules:=_reloc.def).
+
+	* libebl_alpha.map: Removed.
+	* libebl_ia64.map: Removed.
+	* libebl_ppc.map: Removed.
+	* libebl_sparc.map: Removed.
+	* libebl_arm.map: Removed.
+	* libebl_i386.map: Removed.
+	* libebl_ppc64.map: Removed.
+	* libebl_sh.map: Removed.
+	* libebl_x86_64.map: Removed.
+	* Makefile.am (EXTRA_DIST): Remove them.
+	(libebl_%.map, libebl_%.so): New pattern rules.
+
+	* libebl_alpha.h: Removed.
+	* libebl_ia64.h: Removed.
+	* libebl_ppc.h: Removed.
+	* libebl_sparc.h: Removed.
+	* libebl_arm.h: Removed.
+	* libebl_i386.h: Removed.
+	* libebl_ppc64.h: Removed.
+	* libebl_sh.h: Removed.
+	* libebl_x86_64.h: Removed.
+	* Makefile.am (noinst_HEADERS): Remove them.
+
+	* x86_64_corenote.c: Use libebl_CPU.h instead.
+	* x86_64_symbol.c: Likewise.
+	* i386_corenote.c: Likewise.
+
+2005-11-09  Roland McGrath  <roland@redhat.com>
+
+	* ia64_symbol.c (ia64_reloc_simple_type): New function.
+
+	* ebl-hooks.h (reloc_simple_type): Take the Ebl handle, not Elf handle.
+	* eblrelocsimpletype.c (ebl_reloc_simple_type): Update caller.
+	* eblopenbackend.c (default_reloc_simple_type): Update signature.
+	* i386_symbol.c (i386_reloc_simple_type): Likewise.
+	* ppc64_symbol.c (ppc64_reloc_simple_type): Likewise.
+	* ppc_symbol.c (ppc_reloc_simple_type): Likewise.
+	* x86_64_symbol.c (x86_64_reloc_simple_type): Likewise.
+
+	* i386_symbol.c (i386_backend_name): Removed.
+	(i386_reloc_type_name, i386_reloc_type_check): Likewise.
+	(i386_reloc_valid_use): Removed.
+	(i386_copy_reloc_p): Removed.
+
+	* alpha_destr.c: Removed.
+	* arm_destr.c: Removed.
+	* i386_destr.c: Removed.
+	* ia64_destr.c: Removed.
+	* ppc64_destr.c: Removed.
+	* ppc_destr.c: Removed.
+	* sh_destr.c: Removed.
+	* sparc_destr.c: Removed.
+	* x86_64_destr.c: Removed.
+
+	* ebl-hooks.h: New file, broken out of ...
+	* libeblP.h (struct ebl): ... here.  #include that for hook
+	declarations, after defining EBLHOOK macro.
+	* libebl_CPU.h: New file.
+	* Makefile.am (noinst_HEADERS): Add them.
+
+	* libeblP.h (struct ebl): Use uint_fast16_t for machine,
+	and uint_fast8_t for class and data.
+
+2005-08-14  Roland McGrath  <roland@redhat.com>
+
+	* ia64_symbol.c (ia64_section_type_name): New function.
+	(ia64_dynamic_tag_check): New function.
+	(ia64_reloc_valid_use): New function.
+	* libebl_ia64.h: Declare them.
+	* ia64_init.c (ia64_init): Use them.
+	* Makefile.am (libebl_ia64.so): Link with libelf.
+
 2005-08-28  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.am: Use $(LINK) not $(CC) when creating DSOs.

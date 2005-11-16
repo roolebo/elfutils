@@ -23,5 +23,5 @@ ebl_reloc_simple_type (ebl, reloc)
      Ebl *ebl;
      int reloc;
 {
-  return ebl != NULL ? ebl->reloc_simple_type (ebl->elf, reloc) : ELF_T_NUM;
+  return ebl != NULL ? ebl->reloc_simple_type (ebl, reloc) : ELF_T_NUM;
 }

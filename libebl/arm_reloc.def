@@ -1,0 +1,65 @@
+/* List the relocation types for arm.  -*- C -*-
+   Copyright (C) 2005 Red Hat, Inc.
+
+   This program is Open Source software; you can redistribute it and/or
+   modify it under the terms of the Open Software License version 1.0 as
+   published by the Open Source Initiative.
+
+   You should have received a copy of the Open Software License along
+   with this program; if not, you may obtain a copy of the Open Software
+   License version 1.0 from http://www.opensource.org/licenses/osl.php or
+   by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
+   3001 King Ranch Road, Ukiah, CA 95482.   */
+
+/*	    NAME,		REL|EXEC|DYN	*/
+
+RELOC_TYPE (NONE,		REL) /* It really is used in ET_REL on ARM.  */
+RELOC_TYPE (PC24,		REL)
+RELOC_TYPE (ABS32,		REL)
+RELOC_TYPE (REL32,		REL)
+RELOC_TYPE (PC13,		REL)
+RELOC_TYPE (ABS16,		REL)
+RELOC_TYPE (ABS12,		REL)
+RELOC_TYPE (THM_ABS5,		REL)
+RELOC_TYPE (ABS8,		REL)
+RELOC_TYPE (SBREL32,		REL)
+RELOC_TYPE (THM_PC22,		REL)
+RELOC_TYPE (THM_PC8,		REL)
+RELOC_TYPE (AMP_VCALL9,		REL)
+RELOC_TYPE (SWI24,		REL)
+RELOC_TYPE (THM_SWI8,		REL)
+RELOC_TYPE (XPC25,		REL)
+RELOC_TYPE (THM_XPC22,		REL)
+RELOC_TYPE (TLS_DTPMOD32,	EXEC|DYN)
+RELOC_TYPE (TLS_DTPOFF32,	EXEC|DYN)
+RELOC_TYPE (TLS_TPOFF32,	EXEC|DYN)
+RELOC_TYPE (COPY,		EXEC)
+RELOC_TYPE (GLOB_DAT,		EXEC|DYN)
+RELOC_TYPE (JUMP_SLOT,		EXEC|DYN)
+RELOC_TYPE (RELATIVE,		EXEC|DYN)
+RELOC_TYPE (GOTOFF,		REL)
+RELOC_TYPE (GOTPC,		REL)
+RELOC_TYPE (GOT32,		REL)
+RELOC_TYPE (PLT32,		REL)
+RELOC_TYPE (ALU_PCREL_7_0,	REL)
+RELOC_TYPE (ALU_PCREL_15_8,	REL)
+RELOC_TYPE (ALU_PCREL_23_15,	REL)
+RELOC_TYPE (LDR_SBREL_11_0,	REL)
+RELOC_TYPE (ALU_SBREL_19_12,	REL)
+RELOC_TYPE (ALU_SBREL_27_20,	REL)
+RELOC_TYPE (GNU_VTENTRY,	REL)
+RELOC_TYPE (GNU_VTINHERIT,	REL)
+RELOC_TYPE (THM_PC11,		REL)
+RELOC_TYPE (THM_PC9,		REL)
+RELOC_TYPE (TLS_GD32,		REL)
+RELOC_TYPE (TLS_LDM32,		REL)
+RELOC_TYPE (TLS_LDO32,		REL)
+RELOC_TYPE (TLS_IE32,		REL)
+RELOC_TYPE (TLS_LE32,		REL)
+RELOC_TYPE (RXPC25,		REL)
+RELOC_TYPE (RSBREL32,		REL)
+RELOC_TYPE (THM_RPC22,		REL)
+RELOC_TYPE (RREL32,		REL)
+RELOC_TYPE (RABS22,		REL)
+RELOC_TYPE (RPC24,		REL)
+RELOC_TYPE (RBASE,		REL)

@@ -1,7 +1,0 @@
-ELFUTILS_1.0 {
-  global:
-    i386_init;
-
-  local:
-    *;
-};

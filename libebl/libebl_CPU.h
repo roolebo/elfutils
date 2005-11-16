@@ -1,5 +1,5 @@
-/* Interface for libebl_sh module.
-   Copyright (C) 2000, 2001, 2002, 2005 Red Hat, Inc.
+/* Common interface for libebl modules.
+   Copyright (C) 2000, 2001, 2002, 2003, 2005 Red Hat, Inc.
 
    This program is Open Source software; you can redistribute it and/or
    modify it under the terms of the Open Software License version 1.0 as
@@ -11,24 +11,24 @@
    by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
    3001 King Ranch Road, Ukiah, CA 95482.   */
 
-#ifndef _LIBEBL_SH_H
-#define _LIBEBL_SH_H 1
+#ifndef _LIBEBL_CPU_H
+#define _LIBEBL_CPU_H 1
 
 #include <libeblP.h>
 
+#define EBLHOOK(name)	EBLHOOK_1(BACKEND, name)
+#define EBLHOOK_1(a, b)	EBLHOOK_2(a, b)
+#define EBLHOOK_2(a, b)	a##b
 
 /* Constructor.  */
-extern const char *sh_init (Elf *elf, GElf_Half machine, Ebl *eh,
-			    size_t ehlen);
+extern const char *EBLHOOK(init) (Elf *elf, GElf_Half machine,
+				  Ebl *eh, size_t ehlen);
 
-/* Destructor.  */
-extern void sh_destr (Ebl *bh);
+#include "ebl-hooks.h"
+
+#define HOOK(eh, name)	eh->name = EBLHOOK(name)
+
+extern bool (*generic_debugscn_p) (const char *) attribute_hidden;
 
 
-/* Function to get relocation type name.  */
-extern const char *sh_reloc_type_name (int type, char *buf, size_t len);
-
-/* Check whether given relocation is a copy relocation.  */
-extern bool sh_copy_reloc_p (int reloc);
-
-#endif	/* libebl_sh.h */
+#endif	/* libebl_CPU.h */

@@ -1,3 +1,16 @@
+2005-11-15  Roland McGrath  <roland@redhat.com>
+
+	* libdwfl.h: Comment fixes.
+
+	* dwfl_module_return_value_location.c: Add unlikely for error case.
+
+2005-11-13  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_return_value_location.c: New file.
+	* Makefile.am (libdwfl_a_SOURCES): Add it.
+	* libdwfl.h: Declare dwfl_module_return_value_location.
+	* libdwflP.h (DWFL_ERRORS): Add DWFL_E_WEIRD_TYPE.
+
 2005-10-20  Roland McGrath  <roland@redhat.com>
 
 	* libdwflP.h (DWFL_ERRORS): New error UNKNOWN_MACHINE.

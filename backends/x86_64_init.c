@@ -1,4 +1,4 @@
-/* Initialization of Alpha specific backend library.
+/* Initialization of x86-64 specific backend library.
    Copyright (C) 2002, 2005 Red Hat, Inc.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -16,16 +16,17 @@
 # include <config.h>
 #endif
 
-#define BACKEND		alpha_
-#define RELOC_PREFIX	R_ALPHA_
+#define BACKEND		x86_64_
+#define RELOC_PREFIX	R_X86_64_
 #include "libebl_CPU.h"
 
-/* This defines the common reloc hooks based on alpha_reloc.def.  */
+/* This defines the common reloc hooks based on x86_64_reloc.def.  */
 #include "common-reloc.c"
 
 
+
 const char *
-alpha_init (elf, machine, eh, ehlen)
+x86_64_init (elf, machine, eh, ehlen)
      Elf *elf __attribute__ ((unused));
      GElf_Half machine __attribute__ ((unused));
      Ebl *eh;
@@ -36,11 +37,11 @@ alpha_init (elf, machine, eh, ehlen)
     return NULL;
 
   /* We handle it.  */
-  eh->name = "Alpha";
-  alpha_init_reloc (eh);
-  eh->dynamic_tag_name = alpha_dynamic_tag_name;
-  eh->dynamic_tag_check = alpha_dynamic_tag_check;
-  eh->reloc_simple_type = alpha_reloc_simple_type;
+  eh->name = "AMD x86-64";
+  x86_64_init_reloc (eh);
+  eh->reloc_simple_type = x86_64_reloc_simple_type;
+  eh->core_note = x86_64_core_note;
+  eh->return_value_location = x86_64_return_value_location;
 
   return MODVERSION;
 }

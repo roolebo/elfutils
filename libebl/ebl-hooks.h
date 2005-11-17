@@ -87,5 +87,10 @@ bool EBLHOOK(check_special_symbol) (Elf *, GElf_Ehdr *, const GElf_Sym *,
 /* Check if backend uses a bss PLT in this file.  */
 bool EBLHOOK(bss_plt_p) (Elf *, GElf_Ehdr *);
 
+/* Return location expression to find return value given the
+   DW_AT_type DIE of a DW_TAG_subprogram DIE.  */
+int EBLHOOK(return_value_location) (Dwarf_Die *functypedie,
+				    const Dwarf_Op **locp);
+
 /* Destructor for ELF backend handle.  */
 void EBLHOOK(destr) (struct ebl *);

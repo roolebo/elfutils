@@ -16,11 +16,11 @@ DEFS = -DHAVE_CONFIG_H -D_GNU_SOURCE
 if MUDFLAP
 AM_CFLAGS = -Wall -Werror -Wextra -std=gnu99 -fmudflap\
 	    $(if $($(*F)_no_Wformat),-Wno-format,-Wformat=2)
-BUILD_RPATH = \$$ORIGIN/../libebl
+BUILD_RPATH = \$$ORIGIN/../backends
 else
 AM_CFLAGS = -Wall -Werror -Wextra -std=gnu99 \
 	    $(if $($(*F)_no_Wformat),-Wno-format,-Wformat=2)
-BUILT_RPATH = \$$ORIGIN/../libasm:\$$ORIGIN/../libdw:\$$ORIGIN/../libebl:\$$ORIGIN/../libelf
+BUILT_RPATH = \$$ORIGIN/../libasm:\$$ORIGIN/../libdw:\$$ORIGIN/../backends:\$$ORIGIN/../libelf
 endif
 
 if !STANDALONE
@@ -41,7 +41,8 @@ noinst_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  showptable update1 update2 update3 update4 test-nlist \
 		  show-die-info get-files get-lines get-pubnames \
 		  get-aranges allfcts line2addr addrscopes funcscopes \
-		  show-abbrev hash newscn ecp dwflmodtest find-prologues
+		  show-abbrev hash newscn ecp dwflmodtest \
+		  find-prologues funcretval
 # get-ciefde
 asm_TESTS = asm-tst1 asm-tst2 asm-tst3 asm-tst4 asm-tst5 \
 	    asm-tst6 asm-tst7 asm-tst8 asm-tst9
@@ -102,7 +103,7 @@ if STANDALONE
 TESTS_ENVIRONMENT = $(installed_TESTS_ENVIRONMENT)
 else !STANDALONE
 TESTS_ENVIRONMENT = $(srcdir)/test-wrapper.sh \
-		    ../libdw:../libebl:../libelf:../libasm
+		    ../libdw:../backends:../libelf:../libasm
 
 installcheck-local:
 	$(MAKE) $(AM_MAKEFLAGS) \
@@ -159,6 +160,7 @@ line2addr_no_Wformat = yes
 line2addr_LDADD = $(libdw) $(libmudflap)
 addrscopes_LDADD = $(libdw) $(libmudflap)
 funcscopes_LDADD = $(libdw) $(libmudflap)
+funcretval_LDADD = $(libdw) $(libmudflap)
 find_prologues_LDADD = $(libdw) $(libmudflap)
 #show_ciefde_LDADD = ../libdwarf/libdwarf.so $(libelf) $(libmudflap)
 asm_tst1_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl

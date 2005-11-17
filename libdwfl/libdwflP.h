@@ -52,7 +52,8 @@
   DWFL_ERROR (ADDR_OUTOFRANGE, N_("address out of range"))		      \
   DWFL_ERROR (NO_MATCH, N_("no matching address range"))		      \
   DWFL_ERROR (TRUNCATED, N_("image truncated"))				      \
-  DWFL_ERROR (BADELF, N_("not a valid ELF file"))
+  DWFL_ERROR (BADELF, N_("not a valid ELF file"))			      \
+  DWFL_ERROR (WEIRD_TYPE, N_("cannot handle DWARF type description"))
 
 #define DWFL_ERROR(name, text) DWFL_E_##name,
 typedef enum { DWFL_ERRORS DWFL_E_NUM } Dwfl_Error;

@@ -328,8 +328,21 @@ extern const char *dwfl_lineinfo (Dwfl_Line *line, Dwarf_Addr *addr,
 
 
 /* Find the symbol that ADDRESS lies inside, and return its name.  */
-const char *dwfl_module_addrname (Dwfl_Module *mod, GElf_Addr address);
+extern const char *dwfl_module_addrname (Dwfl_Module *mod, GElf_Addr address);
 
+
+
+/* Return location expression to find return value given a
+   DW_TAG_subprogram, DW_TAG_subroutine_type, or similar DIE describing
+   function itself (whose DW_AT_type attribute describes its return type).
+   The given DIE must come from the given module.  Returns -1 for errors.
+   Returns zero if the function has no return value (e.g. "void" in C).
+   Otherwise, *LOCOPS gets a location expression to find the return value,
+   and returns the number of operations in the expression.  The pointer is
+   permanently allocated at least as long as the module is live.  */
+extern int dwfl_module_return_value_location (Dwfl_Module *mod,
+					      Dwarf_Die *functypedie,
+					      const Dwarf_Op **locops);
 
 
 #endif	/* libdwfl.h */

@@ -1,6 +1,6 @@
-/* Initialization of x86-64 specific backend library.
-   Copyright (C) 2002, 2005 Red Hat, Inc.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2002.
+/* Initialization of i386 specific backend library.
+   Copyright (C) 2000, 2001, 2002, 2005 Red Hat, Inc.
+   Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
    This program is Open Source software; you can redistribute it and/or
    modify it under the terms of the Open Software License version 1.0 as
@@ -16,17 +16,15 @@
 # include <config.h>
 #endif
 
-#define BACKEND		x86_64_
-#define RELOC_PREFIX	R_X86_64_
+#define BACKEND		i386_
+#define RELOC_PREFIX	R_386_
 #include "libebl_CPU.h"
 
-/* This defines the common reloc hooks based on x86_64_reloc.def.  */
+/* This defines the common reloc hooks based on i386_reloc.def.  */
 #include "common-reloc.c"
 
-
-
 const char *
-x86_64_init (elf, machine, eh, ehlen)
+i386_init (elf, machine, eh, ehlen)
      Elf *elf __attribute__ ((unused));
      GElf_Half machine __attribute__ ((unused));
      Ebl *eh;
@@ -37,10 +35,14 @@ x86_64_init (elf, machine, eh, ehlen)
     return NULL;
 
   /* We handle it.  */
-  eh->name = "AMD x86-64";
-  x86_64_init_reloc (eh);
-  eh->reloc_simple_type = x86_64_reloc_simple_type;
-  eh->core_note = x86_64_core_note;
+  eh->name = "Intel 80386";
+  i386_init_reloc (eh);
+  eh->reloc_simple_type = i386_reloc_simple_type;
+  eh->gotpc_reloc_check = i386_gotpc_reloc_check;
+  eh->core_note = i386_core_note;
+  generic_debugscn_p = eh->debugscn_p;
+  eh->debugscn_p = i386_debugscn_p;
+  eh->return_value_location = i386_return_value_location;
 
   return MODVERSION;
 }

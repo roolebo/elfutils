@@ -1,5 +1,5 @@
 ELFUTILS_0 { };
-ELFUTILS_0.116 {
+ELFUTILS_0.117 {
   global:
     dwarf_abbrevhaschildren;
     dwarf_addrdie;
@@ -124,6 +124,7 @@ ELFUTILS_0.116 {
     dwfl_module_relocate_address;
     dwfl_module_relocation_info;
     dwfl_module_relocations;
+    dwfl_module_return_value_location;
     dwfl_nextcu;
     dwfl_offline_section_address;
     dwfl_onesrcline;

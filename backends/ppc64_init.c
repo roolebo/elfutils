@@ -44,6 +44,7 @@ ppc64_init (elf, machine, eh, ehlen)
   eh->copy_reloc_p = ppc64_copy_reloc_p;
   eh->check_special_symbol = ppc64_check_special_symbol;
   eh->bss_plt_p = ppc64_bss_plt_p;
+  eh->return_value_location = ppc64_return_value_location;
 
   return MODVERSION;
 }

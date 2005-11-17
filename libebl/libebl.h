@@ -15,6 +15,7 @@
 #define _LIBEBL_H 1
 
 #include <gelf.h>
+#include "libdw.h"
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -155,6 +156,19 @@ extern bool ebl_section_strip_p (Ebl *ebl, const GElf_Ehdr *ehdr,
 
 /* Check if backend uses a bss PLT in this file.  */
 extern bool ebl_bss_plt_p (Ebl *ebl, GElf_Ehdr *ehdr);
+
+/* Return location expression to find return value given a
+   DW_TAG_subprogram, DW_TAG_subroutine_type, or similar DIE describing
+   function itself (whose DW_AT_type attribute describes its return type).
+   Returns -1 for a libdw error (see dwarf_errno).
+   Returns -2 for an unrecognized type formation.
+   Returns zero if the function has no return value (e.g. "void" in C).
+   Otherwise, *LOCOPS gets a location expression to find the return value,
+   and returns the number of operations in the expression.  The pointer is
+   permanently allocated at least as long as the Ebl handle is open.  */
+extern int ebl_return_value_location (Ebl *ebl,
+				      Dwarf_Die *functypedie,
+				      const Dwarf_Op **locops);
 
 
 /* ELF string table handling.  */

@@ -52,7 +52,8 @@ libdwfl_a_SOURCES = dwfl_begin.c dwfl_end.c dwfl_error.c \
 		    dwfl_module_getsrc.c dwfl_getsrc.c \
 		    dwfl_module_getsrc_file.c \
 		    libdwfl_crc32.c libdwfl_crc32_file.c \
-		    elf-from-memory.c
+		    elf-from-memory.c \
+		    dwfl_module_return_value_location.c
 
 
 if MUDFLAP

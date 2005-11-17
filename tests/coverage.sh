@@ -2,7 +2,7 @@
 
 cd ..
 
-for d in lib libasm libdw libdwfl libebl libelf src; do
+for d in lib libasm libdw libdwfl libebl libelf backends src; do
   tmp=$d-data
   cd $d
   unused=0

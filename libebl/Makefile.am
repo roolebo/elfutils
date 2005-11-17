@@ -21,19 +21,13 @@ endif
 AM_CFLAGS += -fpic -Wall -Wshadow -Werror -Wunused -Wextra -Wformat=2 \
 	     -std=gnu99
 
-INCLUDES = -I$(srcdir) -I$(top_srcdir)/libelf -I$(top_srcdir)/lib -I..
+INCLUDES = -I$(srcdir) -I$(top_srcdir)/libelf -I$(top_srcdir)/libdw \
+	   -I$(top_srcdir)/lib -I..
 VERSION = 1
 PACKAGE_VERSION = @PACKAGE_VERSION@
 LIBEBL_SUBDIR = @LIBEBL_SUBDIR@
 
 lib_LIBRARIES = libebl.a
-modules = i386 sh x86_64 ia64 alpha arm sparc ppc ppc64 s390
-libebl_pic = libebl_i386_pic.a libebl_sh_pic.a libebl_x86_64_pic.a \
-	     libebl_ia64_pic.a libebl_alpha_pic.a libebl_arm_pic.a \
-	     libebl_sparc_pic.a libebl_ppc_pic.a libebl_ppc64_pic.a \
-	     libebl_s390_pic.a
-noinst_LIBRARIES = $(libebl_pic)
-noinst_DATA = $(libebl_pic:_pic.a=.so)
 
 pkginclude_HEADERS = libebl.h
 
@@ -49,68 +43,9 @@ gen_SOURCES = eblopenbackend.c eblclosebackend.c eblstrtab.c \
 	      eblcorenote.c eblobjnote.c ebldebugscnp.c \
 	      eblgotpcreloccheck.c eblcopyrelocp.c eblsectionstripp.c \
 	      eblelfclass.c eblelfdata.c eblelfmachine.c \
-	      ebl_check_special_symbol.c eblbsspltp.c
+	      ebl_check_special_symbol.c eblbsspltp.c eblretval.c
 
 libebl_a_SOURCES = $(gen_SOURCES)
-
-i386_SRCS = i386_init.c i386_symbol.c i386_corenote.c
-libebl_i386_pic_a_SOURCES = $(i386_SRCS)
-am_libebl_i386_pic_a_OBJECTS = $(i386_SRCS:.c=.os)
-
-if MUDFLAP
-libelf = ../libelf/libelf.a
-libmudflap = -lmudflap
-else
-libelf = ../libelf/libelf.so
-libmudflap =
-endif
-
-textrel_check = if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
-
-libebl_%.so: libebl_%_pic.a libebl_%.map
-	$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
-		-Wl,--version-script,$(word 2,$^) \
-		-Wl,-z,defs $(libelf) $(libmudflap)
-	$(textrel_check)
-
-libebl_%.map: Makefile
-	echo 'ELFUTILS_$(PACKAGE_VERSION) { global: $*_init; local: *; };' > $@
-
-sh_SRCS = sh_init.c sh_symbol.c
-libebl_sh_pic_a_SOURCES = $(sh_SRCS)
-am_libebl_sh_pic_a_OBJECTS = $(sh_SRCS:.c=.os)
-
-x86_64_SRCS = x86_64_init.c x86_64_symbol.c x86_64_corenote.c
-libebl_x86_64_pic_a_SOURCES = $(x86_64_SRCS)
-am_libebl_x86_64_pic_a_OBJECTS = $(x86_64_SRCS:.c=.os)
-
-ia64_SRCS = ia64_init.c ia64_symbol.c
-libebl_ia64_pic_a_SOURCES = $(ia64_SRCS)
-am_libebl_ia64_pic_a_OBJECTS = $(ia64_SRCS:.c=.os)
-
-alpha_SRCS = alpha_init.c alpha_symbol.c
-libebl_alpha_pic_a_SOURCES = $(alpha_SRCS)
-am_libebl_alpha_pic_a_OBJECTS = $(alpha_SRCS:.c=.os)
-
-arm_SRCS = arm_init.c arm_symbol.c
-libebl_arm_pic_a_SOURCES = $(arm_SRCS)
-am_libebl_arm_pic_a_OBJECTS = $(arm_SRCS:.c=.os)
-
-sparc_SRCS = sparc_init.c sparc_symbol.c
-libebl_sparc_pic_a_SOURCES = $(sparc_SRCS)
-am_libebl_sparc_pic_a_OBJECTS = $(sparc_SRCS:.c=.os)
-
-ppc_SRCS = ppc_init.c ppc_symbol.c
-libebl_ppc_pic_a_SOURCES = $(ppc_SRCS)
-am_libebl_ppc_pic_a_OBJECTS = $(ppc_SRCS:.c=.os)
-
-ppc64_SRCS = ppc64_init.c ppc64_symbol.c
-libebl_ppc64_pic_a_SOURCES = $(ppc64_SRCS)
-am_libebl_ppc64_pic_a_OBJECTS = $(ppc64_SRCS:.c=.os)
-
-s390_SRCS = s390_init.c s390_symbol.c
-libebl_s390_pic_a_SOURCES = $(s390_SRCS)
-am_libebl_s390_pic_a_OBJECTS = $(s390_SRCS:.c=.os)
 
 
 %.os: %.c %.o
@@ -121,24 +56,6 @@ am_libebl_s390_pic_a_OBJECTS = $(s390_SRCS:.c=.os)
 	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
 	fi
 
-install: install-am install-ebl-modules
-install-ebl-modules:
-	$(mkinstalldirs) $(DESTDIR)$(libdir)/$(LIBEBL_SUBDIR)
-	for m in $(modules); do \
-	  $(INSTALL_PROGRAM) libebl_$${m}.so $(DESTDIR)$(libdir)/$(LIBEBL_SUBDIR)/libebl_$${m}-$(PACKAGE_VERSION).so; \
-	  ln -fs libebl_$${m}-$(PACKAGE_VERSION).so $(DESTDIR)$(libdir)/$(LIBEBL_SUBDIR)/libebl_$${m}.so; \
-	done
+noinst_HEADERS = libeblP.h ebl-hooks.h
 
-uninstall: uninstall-am
-	for m in $(modules); do \
-	  rm -f $(DESTDIR)$(libdir)/$(LIBEBL_SUBDIR)/libebl_$${m}-$(PACKAGE_VERSION).so; \
-	  rm -f $(DESTDIR)$(libdir)/$(LIBEBL_SUBDIR)/libebl_$${m}.so; \
-	done
-	rmdir --ignore-fail-on-non-empty $(DESTDIR)$(libdir)/$(LIBEBL_SUBDIR)
-	rmdir --ignore-fail-on-non-empty $(DESTDIR)$(pkgincludedir)
-
-noinst_HEADERS = libeblP.h ebl-hooks.h libebl_CPU.h common-reloc.c
-EXTRA_DIST = $(foreach m,$(modules),$($(m)_SRCS)) $(modules:=_reloc.def)
-
-CLEANFILES = $(am_libebl_pic_a_OBJECTS) *.gcno *.gcda \
-	     $(foreach m,$(modules),$(am_libebl_$(m)_pic_a_OBJECTS))
+CLEANFILES = $(am_libebl_pic_a_OBJECTS) *.gcno *.gcda

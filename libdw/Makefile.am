@@ -18,6 +18,9 @@ AM_CFLAGS = -fmudflap
 else
 AM_CFLAGS =
 endif
+if BUILD_STATIC
+AM_CFLAGS += -fpic
+endif
 AM_CFLAGS += -Wall -Werror -Wshadow -Wunused -Wformat=2 -Wextra -std=gnu99
 INCLUDES = -I. -I$(srcdir) -I$(srcdir)/../libelf -I.. -I$(srcdir)/../lib
 VERSION = 1

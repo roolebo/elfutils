@@ -34,11 +34,19 @@
 	* show-die-info.c: Likewise.
 	* update3.c: Likewise.
 	* update4.c: Likewise.
+	* funcretval.c: Likewise.
 
 	* dwflmodtest.c (print_instance): Don't use INTUSE.
 	(options): Don't use N_ macro.
 
 2005-11-15  Roland McGrath  <roland@redhat.com>
+
+	* coverage.sh: Look in backends.
+	* Makefile.am (BUILD_RPATH): Search ../backends, not ../libebl.
+	(TESTS_ENVIRONMENT): Likewise.
+
+	* funcretval.c (handle_function): Don't take DW_AT_type of FUNCDIE,
+	pass FUNCDIE direclty to dwfl_module_return_value_location.
 
 	* Makefile.am (BUILD_RPATH): New variable.
 	[TESTS_RPATH] (AM_LDFLAGS): Pass -rpath option using that value.
@@ -78,6 +86,12 @@
 	* run-show-die-info.sh: Likewise.
 	* run-strings-test.sh: Likewise.
 	* run-strip-test.sh: Likewise.
+
+2005-11-13  Roland McGrath  <roland@redhat.com>
+
+	* funcretval.c: New file.
+	* Makefile.am (noinst_PROGRAMS): Add it.
+	(funcretval_LDADD): New variable.
 
 2005-11-09  Ulrich Drepper  <drepper@redhat.com>
 

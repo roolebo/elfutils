@@ -158,6 +158,8 @@ static bool default_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr,
 					  const char *name,
 					  const GElf_Shdr *destshdr);
 static bool default_bss_plt_p (Elf *elf, GElf_Ehdr *ehdr);
+static int default_return_value_location (Dwarf_Die *functypedie,
+					  const Dwarf_Op **locops);
 
 
 static void
@@ -188,6 +190,7 @@ fill_defaults (Ebl *result)
   result->copy_reloc_p = default_copy_reloc_p;
   result->check_special_symbol = default_check_special_symbol;
   result->bss_plt_p = default_bss_plt_p;
+  result->return_value_location = default_return_value_location;
   result->destr = default_destr;
 }
 
@@ -576,4 +579,11 @@ default_bss_plt_p (Elf *elf __attribute__ ((unused)),
 		   GElf_Ehdr *ehdr __attribute__ ((unused)))
 {
   return false;
+}
+
+static int
+default_return_value_location (Dwarf_Die *functypedie __attribute__ ((unused)),
+			       const Dwarf_Op **locops __attribute__ ((unused)))
+{
+  return -2;
 }

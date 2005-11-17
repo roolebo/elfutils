@@ -1,3 +1,7 @@
+2005-11-13  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (INCLUDES): Search in libdw.
+
 2005-09-02  Ulrich Drepper  <drepper@redhat.com>
 
 	* asm_error.c (asm_errmsg): Unify error message.

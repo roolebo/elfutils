@@ -5,6 +5,9 @@
 
 2005-11-15  Roland McGrath  <roland@redhat.com>
 
+	* Makefile.am (all_SUBDIRS): Add backends.
+	* configure.ac: Write backends/Makefile.
+
 	* configure.ac: Add --enable-tests-rpath option.
 
 2005-09-16  Roland McGrath  <roland@redhat.com>

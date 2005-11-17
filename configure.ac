@@ -194,6 +194,9 @@ dnl Assembler library.
 AM_CONDITIONAL(HAVE_LIBASM, true)dnl Used in tests/Makefile.am, which see.
 AC_CONFIG_FILES([libasm/Makefile])
 
+dnl CPU-specific backend libraries.
+AC_CONFIG_FILES([backends/Makefile])
+
 dnl Tools.
 AC_CONFIG_FILES([src/Makefile po/Makefile.in])
 

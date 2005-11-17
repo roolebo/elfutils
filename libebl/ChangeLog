@@ -2,6 +2,64 @@
 
 	* libebl.h: Use "" for elf-knowledge.h, not <>.
 
+2005-11-15  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am: Removed everything for building libebl_*.so modules,
+	now in ../backends/Makefile.am instead.
+	* alpha_init.c: Moved to ../backends.
+	* alpha_reloc.def: Likewise.
+	* alpha_retval.c: Likewise.
+	* alpha_symbol.c: Likewise.
+	* arm_init.c: Likewise.
+	* arm_reloc.def: Likewise.
+	* arm_symbol.c: Likewise.
+	* common-reloc.c: Likewise.
+	* i386_corenote.c: Likewise.
+	* i386_init.c: Likewise.
+	* i386_reloc.def: Likewise.
+	* i386_retval.c: Likewise.
+	* i386_symbol.c: Likewise.
+	* ia64_init.c: Likewise.
+	* ia64_reloc.def: Likewise.
+	* ia64_symbol.c: Likewise.
+	* libebl_CPU.h: Likewise.
+	* ppc64_init.c: Likewise.
+	* ppc64_reloc.def: Likewise.
+	* ppc64_retval.c: Likewise.
+	* ppc64_symbol.c: Likewise.
+	* ppc_init.c: Likewise.
+	* ppc_reloc.def: Likewise.
+	* ppc_retval.c: Likewise.
+	* ppc_symbol.c: Likewise.
+	* s390_init.c: Likewise.
+	* s390_reloc.def: Likewise.
+	* s390_symbol.c: Likewise.
+	* sh_init.c: Likewise.
+	* sh_reloc.def: Likewise.
+	* sh_symbol.c: Likewise.
+	* sparc_init.c: Likewise.
+	* sparc_reloc.def: Likewise.
+	* sparc_symbol.c: Likewise.
+	* x86_64_corenote.c: Likewise.
+	* x86_64_init.c: Likewise.
+	* x86_64_reloc.def: Likewise.
+	* x86_64_retval.c: Likewise.
+	* x86_64_symbol.c: Likewise.
+
+	* libebl.h: Comment fixes.
+
+	* alpha_retval.c: New file.
+	* Makefile.am (alpha_SRCS): Add it.
+	* alpha_init.c (alpha_init): Initialize return_value_location hook.
+
+	* ppc64_retval.c: New file.
+	* Makefile.am (ppc64_SRCS): Add it.
+	* ppc64_init.c (ppc64_init): Initialize return_value_location hook.
+
+	* ppc_retval.c: New file.
+	* Makefile.am (ppc_SRCS): Add it.
+	* ppc_init.c (ppc_init): Initialize return_value_location hook.
+
 2005-11-14  Roland McGrath  <roland@redhat.com>
 
 	* ia64_init.c (ia64_init): Initialize EH->reloc_simple_type.
@@ -22,6 +80,26 @@
 	* arm_reloc.def: Update bits per Daniel Jacobowitz <drow@false.org>.
 
 	* alpha_reloc.def: Update bits per Richard Henderson <rth@redhat.com>.
+
+2005-11-13  Roland McGrath  <roland@redhat.com>
+
+	* x86_64_retval.c: New file.
+	* Makefile.am (x86_64_SRCS): Add it.
+	* x86_64_init.c (x86_64_init): Use x86_64_return_value_location.
+
+	* i386_retval.c: New file.
+	* Makefile.am (i386_SRCS): Add it.
+	(libdw): New variable.
+	(libebl_%.so): Use $(libdw) in link; use --as-needed.
+	* i386_init.c (i386_init): Use i386_return_value_location.
+
+	* eblretval.c: New file.
+	* Makefile.am (gen_SOURCES): Add it.
+	(INCLUDES): Search in libdw.
+	* libebl.h: Include <libdw.h>.   Declare ebl_return_value_location.
+	* ebl-hooks.h: Declare return_value_location hook.
+	* eblopenbackend.c (default_return_value_location): New function.
+	(fill_defaults): Use it.
 
 2005-11-10  Roland McGrath  <roland@redhat.com>
 

@@ -1,6 +1,6 @@
-/* Initialization of i386 specific backend library.
-   Copyright (C) 2000, 2001, 2002, 2005 Red Hat, Inc.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2000.
+/* Initialization of Alpha specific backend library.
+   Copyright (C) 2002, 2005 Red Hat, Inc.
+   Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
    This program is Open Source software; you can redistribute it and/or
    modify it under the terms of the Open Software License version 1.0 as
@@ -16,15 +16,16 @@
 # include <config.h>
 #endif
 
-#define BACKEND		i386_
-#define RELOC_PREFIX	R_386_
+#define BACKEND		alpha_
+#define RELOC_PREFIX	R_ALPHA_
 #include "libebl_CPU.h"
 
-/* This defines the common reloc hooks based on i386_reloc.def.  */
+/* This defines the common reloc hooks based on alpha_reloc.def.  */
 #include "common-reloc.c"
 
+
 const char *
-i386_init (elf, machine, eh, ehlen)
+alpha_init (elf, machine, eh, ehlen)
      Elf *elf __attribute__ ((unused));
      GElf_Half machine __attribute__ ((unused));
      Ebl *eh;
@@ -35,13 +36,12 @@ i386_init (elf, machine, eh, ehlen)
     return NULL;
 
   /* We handle it.  */
-  eh->name = "Intel 80386";
-  i386_init_reloc (eh);
-  eh->reloc_simple_type = i386_reloc_simple_type;
-  eh->gotpc_reloc_check = i386_gotpc_reloc_check;
-  eh->core_note = i386_core_note;
-  generic_debugscn_p = eh->debugscn_p;
-  eh->debugscn_p = i386_debugscn_p;
+  eh->name = "Alpha";
+  alpha_init_reloc (eh);
+  eh->dynamic_tag_name = alpha_dynamic_tag_name;
+  eh->dynamic_tag_check = alpha_dynamic_tag_check;
+  eh->reloc_simple_type = alpha_reloc_simple_type;
+  eh->return_value_location = alpha_return_value_location;
 
   return MODVERSION;
 }

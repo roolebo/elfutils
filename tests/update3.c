@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <libebl.h>
+#include ELFUTILS_HEADER(ebl)
 
 
 int

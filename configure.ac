@@ -191,12 +191,14 @@ dnl CPU handling library.
 AC_CONFIG_FILES([libcpu/Makefile])
 
 dnl Assembler library.
+AM_CONDITIONAL(HAVE_LIBASM, true)dnl Used in tests/Makefile.am, which see.
 AC_CONFIG_FILES([libasm/Makefile])
 
 dnl Tools.
 AC_CONFIG_FILES([src/Makefile po/Makefile.in])
 
 dnl Test suite.
+AM_CONDITIONAL(STANDALONE, false)dnl Used in tests/Makefile.am, which see.
 AC_CONFIG_FILES([tests/Makefile])
 
 # Get the definitions necessary to create the Makefiles in the po
@@ -299,6 +301,9 @@ AH_BOTTOM([
 # define INTDEF(name) /* empty */
 # define INTDECL(name) /* empty */
 #endif
+
+/* This macro is used by the tests conditionalize for standalone building.  */
+#define ELFUTILS_HEADER(name) <lib##name.h>
 ])
 
 AC_OUTPUT

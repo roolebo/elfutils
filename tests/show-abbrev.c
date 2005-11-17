@@ -15,7 +15,7 @@
 
 #include <fcntl.h>
 #include <inttypes.h>
-#include <libdw.h>
+#include ELFUTILS_HEADER(dw)
 #include <stdio.h>
 #include <unistd.h>
 

@@ -10,6 +10,10 @@
    by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
    3001 King Ranch Road, Ukiah, CA 95482.   */
 
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <assert.h>
 #include <fcntl.h>
 #include <libelf.h>

@@ -24,7 +24,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <libebl.h>
+#include ELFUTILS_HEADER(ebl)
 
 
 int

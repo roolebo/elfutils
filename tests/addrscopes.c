@@ -14,7 +14,7 @@
 #include <config.h>
 #include <assert.h>
 #include <inttypes.h>
-#include <libdwfl.h>
+#include ELFUTILS_HEADER(dwfl)
 #include <dwarf.h>
 #include <argp.h>
 #include <stdio.h>

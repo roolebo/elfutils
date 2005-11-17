@@ -11,8 +11,12 @@
    by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
    3001 King Ranch Road, Ukiah, CA 95482.   */
 
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <fcntl.h>
-#include <libasm.h>
+#include ELFUTILS_HEADER(asm)
 #include <libelf.h>
 #include <stdio.h>
 #include <stdlib.h>

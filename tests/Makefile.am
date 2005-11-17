@@ -22,10 +22,13 @@ AM_CFLAGS = -Wall -Werror -Wextra -std=gnu99 \
 	    $(if $($(*F)_no_Wformat),-Wno-format,-Wformat=2)
 BUILT_RPATH = \$$ORIGIN/../libasm:\$$ORIGIN/../libdw:\$$ORIGIN/../libebl:\$$ORIGIN/../libelf
 endif
+
+if !STANDALONE
 INCLUDES = -I$(top_srcdir)/libasm -I$(top_srcdir)/libdw \
 	   -I$(top_srcdir)/libdwfl \
 	   -I$(top_srcdir)/libebl -I$(top_srcdir)/libelf \
 	   -I$(top_srcdir)/lib -I..
+endif !STANDALONE
 
 if TESTS_RPATH
 AM_LDFLAGS = -Wl,-rpath,$(BUILT_RPATH)
@@ -38,18 +41,17 @@ noinst_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  showptable update1 update2 update3 update4 test-nlist \
 		  show-die-info get-files get-lines get-pubnames \
 		  get-aranges allfcts line2addr addrscopes funcscopes \
-		  show-abbrev hash asm-tst1 asm-tst2 asm-tst3 \
-		  asm-tst4 asm-tst5 asm-tst6 asm-tst7 asm-tst8 asm-tst9 \
-		  msg_tst newscn ecp dwflmodtest find-prologues
+		  show-abbrev hash newscn ecp dwflmodtest find-prologues
 # get-ciefde
+asm_TESTS = asm-tst1 asm-tst2 asm-tst3 asm-tst4 asm-tst5 \
+	    asm-tst6 asm-tst7 asm-tst8 asm-tst9
 
 TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	update1 update2 update3 update4 \
 	run-show-die-info.sh run-get-files.sh run-get-lines.sh \
 	run-get-pubnames.sh run-get-aranges.sh run-allfcts.sh \
-	run-show-abbrev.sh run-line2addr.sh hash asm-tst1 asm-tst2 \
-	asm-tst3 asm-tst4 asm-tst5 asm-tst6 asm-tst7 asm-tst8 asm-tst9 \
-	msg_tst newscn run-strip-test.sh run-strip-test2.sh \
+	run-show-abbrev.sh run-line2addr.sh hash \
+	newscn run-strip-test.sh run-strip-test2.sh \
 	run-strip-test3.sh run-strip-test4.sh run-strip-test5.sh \
 	run-strip-test6.sh run-ecp-test.sh run-ecp-test2.sh \
 	run-elflint-test.sh run-elflint-self.sh run-ranlib-test.sh \
@@ -57,6 +59,17 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-addrscopes.sh run-strings-test.sh run-funcscopes.sh \
 	run-find-prologues.sh
 # run-show-ciefde.sh
+
+if !STANDALONE
+noinst_PROGRAMS += msg_tst
+TESTS += msg_tst
+endif
+
+if HAVE_LIBASM
+noinst_PROGRAMS += $(asm_TESTS)
+TESTS += $(asm_TESTS)
+endif
+
 
 EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-show-die-info.sh run-get-files.sh run-get-lines.sh \
@@ -82,20 +95,31 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile22.bz2 testfile23.bz2 testfile24.bz2 testfile25.bz2 \
 	     coverage.sh test-subr.sh test-wrapper.sh
 
+installed_TESTS_ENVIRONMENT = $(srcdir)/test-wrapper.sh \
+			      installed $(tests_rpath) \
+			      $(program_transform_name)
+if STANDALONE
+TESTS_ENVIRONMENT = $(installed_TESTS_ENVIRONMENT)
+else !STANDALONE
 TESTS_ENVIRONMENT = $(srcdir)/test-wrapper.sh \
 		    ../libdw:../libebl:../libelf:../libasm
 
 installcheck-local:
-	$(MAKE) $(AM_MAKEFLAGS) TESTS_ENVIRONMENT='$(srcdir)/test-wrapper.sh \
-					installed $(tests_rpath) \
-					$(program_transform_name)' \
-		check-TESTS
+	$(MAKE) $(AM_MAKEFLAGS) \
+		TESTS_ENVIRONMENT='$(installed_TESTS_ENVIRONMENT' check-TESTS
+endif !STANDALONE
 
 if MUDFLAP
 static_build=yes
 libmudflap = -lmudflap
 endif
 
+if STANDALONE
+libdw = -ldw
+libelf = -lelf
+libasm = -lasm
+libebl = -lebl
+else !STANDALONE
 if BUILD_STATIC
 libdw = ../libdw/libdw.a $(libelf) $(libebl) -ldl
 libelf = ../libelf/libelf.a
@@ -106,6 +130,7 @@ libelf = ../libelf/libelf.so
 libasm = ../libasm/libasm.so
 endif
 libebl = ../libebl/libebl.a
+endif !STANDALONE
 
 arextract_LDADD = $(libelf) $(libmudflap)
 arsymtest_LDADD = $(libelf) $(libmudflap)

@@ -22,7 +22,7 @@
 #include <error.h>
 #include <locale.h>
 #include <argp.h>
-#include <libdwfl.h>
+#include ELFUTILS_HEADER(dwfl)
 #include <dwarf.h>
 
 static bool show_inlines;
@@ -79,11 +79,10 @@ print_instance (Dwarf_Die *instance, void *arg)
     printf (" (highpc => %s)", dwarf_errmsg (-1));
 
   Dwarf_Attribute attr_mem;
-  Dwarf_Attribute *attr = INTUSE(dwarf_attr) (instance, DW_AT_entry_pc,
-					      &attr_mem);
+  Dwarf_Attribute *attr = dwarf_attr (instance, DW_AT_entry_pc, &attr_mem);
   if (attr != NULL)
     {
-      if (INTUSE(dwarf_formaddr) (attr, &entry) == 0)
+      if (dwarf_formaddr (attr, &entry) == 0)
 	entry += info->dwbias;
       else
 	printf (" (entrypc => %s)", dwarf_errmsg (-1));
@@ -181,6 +180,10 @@ print_module (Dwfl_Module *mod __attribute__ ((unused)),
 }
 
 static bool show_functions;
+
+/* gettext helper macro.  */
+#undef	N_
+#define N_(Str) Str
 
 static const struct argp_option options[] =
   {

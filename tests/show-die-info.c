@@ -16,7 +16,7 @@
 #include <dwarf.h>
 #include <inttypes.h>
 #include <libelf.h>
-#include <libdw.h>
+#include ELFUTILS_HEADER(dw)
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>

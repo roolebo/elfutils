@@ -1,3 +1,43 @@
+2005-11-16  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac: New file, for standalone build/dist of test suite.
+	* Makefile.am [!STANDALONE] (INCLUDES): Don't define it.
+	(asm_TESTS): New variable, broken out of ...
+	(TESTS): ... here.  Also remove msg_tst.
+	[!STANDALONE] (TESTS, noinst_PROGRAMS): Add in $(asm_TESTS), msg_tst.
+	(installed_TESTS_ENVIRONMENT): New variable.
+	[STANDALONE] (TESTS_ENVIRONMENT): Use that.
+	[!STANDALONE] (installcheck-local): Likewise.
+	[STANDALONE] (libdw, libelf, libasm, libebl): Define using -lfoo.
+	* addrscopes.c: Include <config.h>.
+	Use ELFUTILS_HEADER macro in #include of installed elfutils/ headers.
+	* allfcts.c: Likewise.
+	* asm-tst1.c: Likewise.
+	* asm-tst2.c: Likewise.
+	* asm-tst3.c: Likewise.
+	* asm-tst4.c: Likewise.
+	* asm-tst5.c: Likewise.
+	* asm-tst6.c: Likewise.
+	* asm-tst7.c: Likewise.
+	* asm-tst8.c: Likewise.
+	* asm-tst9.c: Likewise.
+	* dwflmodtest.c: Likewise.
+	* find-prologues.c: Likewise.
+	* funcscopes.c: Likewise.
+	* get-aranges.c: Likewise.
+	* get-files.c: Likewise.
+	* get-lines.c: Likewise.
+	* get-pubnames.c: Likewise.
+	* line2addr.c: Likewise.
+	* newscn.c: Likewise.
+	* show-abbrev.c: Likewise.
+	* show-die-info.c: Likewise.
+	* update3.c: Likewise.
+	* update4.c: Likewise.
+
+	* dwflmodtest.c (print_instance): Don't use INTUSE.
+	(options): Don't use N_ macro.
+
 2005-11-15  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am (BUILD_RPATH): New variable.

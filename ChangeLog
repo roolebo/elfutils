@@ -1,3 +1,8 @@
+2005-11-16  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac: Define HAVE_LIBASM and STANDALONE conditionals.
+	In config.h, define ELFUTILS_HEADER macro.
+
 2005-11-15  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac: Add --enable-tests-rpath option.

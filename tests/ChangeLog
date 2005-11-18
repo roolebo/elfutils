@@ -1,3 +1,7 @@
+2005-11-17  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (installcheck-local): Fix typo in last change.
+
 2005-11-16  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac: New file, for standalone build/dist of test suite.

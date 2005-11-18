@@ -107,7 +107,7 @@ TESTS_ENVIRONMENT = $(srcdir)/test-wrapper.sh \
 
 installcheck-local:
 	$(MAKE) $(AM_MAKEFLAGS) \
-		TESTS_ENVIRONMENT='$(installed_TESTS_ENVIRONMENT' check-TESTS
+		TESTS_ENVIRONMENT='$(installed_TESTS_ENVIRONMENT)' check-TESTS
 endif !STANDALONE
 
 if MUDFLAP

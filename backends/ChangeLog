@@ -1,5 +1,7 @@
 2005-11-17  Roland McGrath  <roland@redhat.com>
 
+	* Makefile.am (uninstall): Don't try to remove $(pkgincludedir).
+
 	* ppc_reloc.def: Update bits per Alan Modra <amodra@bigpond.net.au>.
 	* ppc64_reloc.def: Likewise.
 

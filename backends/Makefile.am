@@ -121,7 +121,6 @@ uninstall: uninstall-am
 	  rm -f $(DESTDIR)$(libdir)/$(LIBEBL_SUBDIR)/libebl_$${m}.so; \
 	done
 	rmdir --ignore-fail-on-non-empty $(DESTDIR)$(libdir)/$(LIBEBL_SUBDIR)
-	rmdir --ignore-fail-on-non-empty $(DESTDIR)$(pkgincludedir)
 
 noinst_HEADERS = libebl_CPU.h common-reloc.c
 EXTRA_DIST = $(foreach m,$(modules),$($(m)_SRCS)) $(modules:=_reloc.def)

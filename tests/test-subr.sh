@@ -79,10 +79,15 @@ installed_testrun()
     fi
     ;;
   ../*)
-    program=`program_transform ${program##*/}`
+    program=${bindir}/`program_transform ${program##*/}`
     ;;
   esac
-  $program ${1+"$@"}
+  if [ "${libdir}" != /usr/lib ]; then
+    LD_LIBRARY_PATH="${libdir}${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH" \
+    $program ${1+"$@"}
+  else
+    $program ${1+"$@"}
+  fi
 }
 
 program_transform()

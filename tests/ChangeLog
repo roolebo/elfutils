@@ -1,5 +1,11 @@
 2005-11-17  Roland McGrath  <roland@redhat.com>
 
+	* Makefile.am (installed_TESTS_ENVIRONMENT): Set libdir, bindir in
+	environment for test-wrapper.sh.
+	* test-wrapper.sh: Set LD_LIBRARY_PATH from ${libdir} if not /usr/lib.
+	* test-subr.sh (installed_testrun): Likewise.
+	Use explicit path in ${bindir}.
+
 	* Makefile.am (installcheck-local): Fix typo in last change.
 
 2005-11-16  Roland McGrath  <roland@redhat.com>

@@ -45,6 +45,9 @@ case "$1" in
   elif [ $elfutils_tests_rpath = yes ]; then
     echo >&2 installcheck not possible with --enable-tests-rpath
     exit 77
+  elif [ "x$libdir" != x/usr/lib ]; then
+    LD_LIBRARY_PATH="$libdir${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH"
+    export LD_LIBRARY_PATH
   fi
   ;;
 esac

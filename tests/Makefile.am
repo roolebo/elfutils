@@ -96,7 +96,9 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile22.bz2 testfile23.bz2 testfile24.bz2 testfile25.bz2 \
 	     coverage.sh test-subr.sh test-wrapper.sh
 
-installed_TESTS_ENVIRONMENT = $(srcdir)/test-wrapper.sh \
+installed_TESTS_ENVIRONMENT = libdir=$(DESTDIR)$(libdir) \
+			      bindir=$(DESTDIR)$(bindir) \
+			      $(srcdir)/test-wrapper.sh \
 			      installed $(tests_rpath) \
 			      $(program_transform_name)
 if STANDALONE

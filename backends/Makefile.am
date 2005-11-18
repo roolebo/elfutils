@@ -126,4 +126,5 @@ noinst_HEADERS = libebl_CPU.h common-reloc.c
 EXTRA_DIST = $(foreach m,$(modules),$($(m)_SRCS)) $(modules:=_reloc.def)
 
 CLEANFILES = *.gcno *.gcda \
-	     $(foreach m,$(modules),$(am_libebl_$(m)_pic_a_OBJECTS))
+	     $(foreach m,$(modules),\
+		       libebl_$(m).so $(am_libebl_$(m)_pic_a_OBJECTS))

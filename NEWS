@@ -1,3 +1,9 @@
+Version 0.117:
+
+libdwfl: New function dwfl_module_return_value_location.
+
+libebl: Backend improvements for several CPUs.
+
 Version 0.116:
 
 libdw: New functions dwarf_ranges, dwarf_entrypc, dwarf_diecu,

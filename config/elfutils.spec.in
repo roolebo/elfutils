@@ -185,6 +185,10 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.so
 
 %changelog
+* Thu Nov 17 2005 Ulrich Drepper <drepper@redhat.com> 0.117-1
+- libdwfl: New function dwfl_module_return_value_location.
+- libebl: Backend improvements for several CPUs.
+
 * Mon Oct 31 2005 Ulrich Drepper <drepper@redhat.com> 0.116-1
 - libdw: New functions dwarf_ranges, dwarf_entrypc, dwarf_diecu,       d
 warf_entry_breakpoints.  Removed Dwarf_Func type and functions       d

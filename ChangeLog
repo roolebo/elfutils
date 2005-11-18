@@ -1,3 +1,7 @@
+2005-11-18  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (DISTCHECK_CONFIGURE_FLAGS): New variable.
+
 2005-11-16  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac: Define HAVE_LIBASM and STANDALONE conditionals.

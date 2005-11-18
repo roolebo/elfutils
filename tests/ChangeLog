@@ -1,3 +1,8 @@
+2005-11-18  Roland McGrath  <roland@redhat.com>
+
+	* test-subr.sh (installed_testrun): Treat /usr/lib64 like /usr/lib.
+	* test-wrapper.sh: Likewise.
+
 2005-11-17  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am (installed_TESTS_ENVIRONMENT): Set libdir, bindir in

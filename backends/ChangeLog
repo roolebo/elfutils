@@ -1,3 +1,7 @@
+2005-11-19  Roland McGrath  <roland@redhat.com>
+
+	* ppc64_reloc.def: REL30 -> ADDR30.
+
 2005-11-18  Roland McGrath  <roland@redhat.com>
 
 	* alpha_init.c: Use HOOK macro.

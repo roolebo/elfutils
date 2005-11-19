@@ -39,9 +39,9 @@ x86_64_init (elf, machine, eh, ehlen)
   /* We handle it.  */
   eh->name = "AMD x86-64";
   x86_64_init_reloc (eh);
-  eh->reloc_simple_type = x86_64_reloc_simple_type;
-  eh->core_note = x86_64_core_note;
-  eh->return_value_location = x86_64_return_value_location;
+  HOOK (eh, reloc_simple_type);
+  HOOK (eh, core_note);
+  HOOK (eh, return_value_location);
 
   return MODVERSION;
 }

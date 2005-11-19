@@ -42,8 +42,8 @@ sparc_init (elf, machine, eh, ehlen)
   else
     eh->name = "SPARC";
   sparc_init_reloc (eh);
-  eh->reloc_simple_type = sparc_reloc_simple_type;
-  //eh->core_note = sparc_core_note;
+  HOOK (eh, reloc_simple_type);
+  //HOOK (eh, core_note);
 
   return MODVERSION;
 }

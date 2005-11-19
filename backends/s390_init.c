@@ -37,7 +37,7 @@ s390_init (elf, machine, eh, ehlen)
   /* We handle it.  */
   eh->name = "IBM S/390";
   s390_init_reloc (eh);
-  eh->reloc_simple_type = s390_reloc_simple_type;
+  HOOK (eh, reloc_simple_type);
 
   return MODVERSION;
 }

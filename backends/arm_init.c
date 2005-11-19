@@ -38,7 +38,7 @@ arm_init (elf, machine, eh, ehlen)
   /* We handle it.  */
   eh->name = "ARM";
   arm_init_reloc (eh);
-  eh->reloc_simple_type = arm_reloc_simple_type;
+  HOOK (eh, reloc_simple_type);
 
   return MODVERSION;
 }

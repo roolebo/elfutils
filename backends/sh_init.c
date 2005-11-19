@@ -38,7 +38,7 @@ sh_init (elf, machine, eh, ehlen)
   /* We handle it.  */
   eh->name = "Hitachi SH";
   sh_init_reloc (eh);
-  eh->reloc_simple_type = sh_reloc_simple_type;
+  HOOK (eh, reloc_simple_type);
 
   return MODVERSION;
 }

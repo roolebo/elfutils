@@ -1,3 +1,16 @@
+2005-11-18  Roland McGrath  <roland@redhat.com>
+
+	* alpha_init.c: Use HOOK macro.
+	* arm_init.c: Likewise.
+	* i386_init.c: Likewise.
+	* ia64_init.c: Likewise.
+	* ppc64_init.c: Likewise.
+	* ppc_init.c: Likewise.
+	* s390_init.c: Likewise.
+	* sh_init.c: Likewise.
+	* sparc_init.c: Likewise.
+	* x86_64_init.c: Likewise.
+
 2005-11-17  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am (uninstall): Don't try to remove $(pkgincludedir).

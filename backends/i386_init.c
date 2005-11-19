@@ -37,12 +37,12 @@ i386_init (elf, machine, eh, ehlen)
   /* We handle it.  */
   eh->name = "Intel 80386";
   i386_init_reloc (eh);
-  eh->reloc_simple_type = i386_reloc_simple_type;
-  eh->gotpc_reloc_check = i386_gotpc_reloc_check;
-  eh->core_note = i386_core_note;
+  HOOK (eh, reloc_simple_type);
+  HOOK (eh, gotpc_reloc_check);
+  HOOK (eh, core_note);
   generic_debugscn_p = eh->debugscn_p;
-  eh->debugscn_p = i386_debugscn_p;
-  eh->return_value_location = i386_return_value_location;
+  HOOK (eh, debugscn_p);
+  HOOK (eh, return_value_location);
 
   return MODVERSION;
 }

@@ -38,10 +38,10 @@ alpha_init (elf, machine, eh, ehlen)
   /* We handle it.  */
   eh->name = "Alpha";
   alpha_init_reloc (eh);
-  eh->dynamic_tag_name = alpha_dynamic_tag_name;
-  eh->dynamic_tag_check = alpha_dynamic_tag_check;
-  eh->reloc_simple_type = alpha_reloc_simple_type;
-  eh->return_value_location = alpha_return_value_location;
+  HOOK (eh, dynamic_tag_name);
+  HOOK (eh, dynamic_tag_check);
+  HOOK (eh, reloc_simple_type);
+  HOOK (eh, return_value_location);
 
   return MODVERSION;
 }

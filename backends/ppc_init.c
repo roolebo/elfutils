@@ -38,12 +38,12 @@ ppc_init (elf, machine, eh, ehlen)
   /* We handle it.  */
   eh->name = "PowerPC";
   ppc_init_reloc (eh);
-  eh->reloc_simple_type = ppc_reloc_simple_type;
-  eh->dynamic_tag_name = ppc_dynamic_tag_name;
-  eh->dynamic_tag_check = ppc_dynamic_tag_check;
-  eh->check_special_symbol = ppc_check_special_symbol;
-  eh->bss_plt_p = ppc_bss_plt_p;
-  eh->return_value_location = ppc_return_value_location;
+  HOOK (eh, reloc_simple_type);
+  HOOK (eh, dynamic_tag_name);
+  HOOK (eh, dynamic_tag_check);
+  HOOK (eh, check_special_symbol);
+  HOOK (eh, bss_plt_p);
+  HOOK (eh, return_value_location);
 
   return MODVERSION;
 }

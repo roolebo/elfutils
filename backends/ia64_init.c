@@ -37,12 +37,12 @@ ia64_init (elf, machine, eh, ehlen)
   /* We handle it.  */
   eh->name = "Intel IA-64";
   ia64_init_reloc (eh);
-  eh->reloc_simple_type = ia64_reloc_simple_type;
-  eh->segment_type_name = ia64_segment_type_name;
-  eh->section_type_name = ia64_section_type_name;
-  eh->dynamic_tag_name = ia64_dynamic_tag_name;
-  eh->dynamic_tag_check = ia64_dynamic_tag_check;
-  eh->machine_flag_check = ia64_machine_flag_check;
+  HOOK (eh, reloc_simple_type);
+  HOOK (eh, segment_type_name);
+  HOOK (eh, section_type_name);
+  HOOK (eh, dynamic_tag_name);
+  HOOK (eh, dynamic_tag_check);
+  HOOK (eh, machine_flag_check);
 
   return MODVERSION;
 }

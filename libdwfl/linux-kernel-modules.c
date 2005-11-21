@@ -373,6 +373,8 @@ dwfl_linux_kernel_module_section_address
     return ENOMEM;
 
   FILE *f = fopen (sysfile, "r");
+  free (sysfile);
+
   if (f == NULL)
     {
       if (errno == ENOENT)
@@ -392,11 +394,29 @@ dwfl_linux_kernel_module_section_address
 	      *addr = 0;
 	      return DWARF_CB_OK;
 	    }
+
+	  /* The goofy PPC64 module_frob_arch_sections function tweaks
+	     the section names as a way to control other kernel code's
+	     behavior, and this cruft leaks out into the /sys information.
+	     The file name for ".init*" may actually look like "_init*".  */
+
+	  if (!strncmp (secname, ".init", 5))
+	    {
+	      sysfile = NULL;
+	      asprintf (&sysfile, SECADDRFMT "%s", modname, "_", &secname[1]);
+	      if (sysfile == NULL)
+		return ENOMEM;
+	      f = fopen (sysfile, "r");
+	      free (sysfile);
+	      if (f != NULL)
+		goto ok;
+	    }
 	}
 
       return DWARF_CB_ABORT;
     }
 
+ ok:
   (void) __fsetlocking (f, FSETLOCKING_BYCALLER);
 
   int result = (fscanf (f, "%" PRIx64 "\n", addr) == 1 ? 0

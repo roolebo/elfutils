@@ -1,3 +1,10 @@
+2005-11-21  Roland McGrath  <roland@redhat.com>
+
+	* linux-kernel-modules.c (dwfl_linux_kernel_module_section_address):
+	Don't leak malloc'd file name.
+	If a /sys/.../sections file is missing and starts with ".init",
+	try the variant with "_init" too; catches PPC64 kernel braindamage.
+
 2005-11-15  Roland McGrath  <roland@redhat.com>
 
 	* libdwfl.h: Comment fixes.

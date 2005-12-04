@@ -1,3 +1,13 @@
+2005-11-28  Ulrich Drepper  <drepper@redhat.com>
+
+	* elflint.c (check_one_reloc): Take additional parameters.  Use
+	them to determine whether relocation is valid in this type of
+	file.  DSOs and executables can contain relocation sections in
+	unloaded sections which just show the relocations the linker
+	applied.  Adjust all callers.
+	(check_program_header): Check that PT_PHDR is loaded and that offset
+	matches the one in the ELF header.
+
 2005-10-26  Roland McGrath  <roland@redhat.com>
 
 	* nm.c (get_var_range): dwarf_getloclist -> dwarf_getlocation.

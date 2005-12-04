@@ -1129,8 +1129,9 @@ enum load_state
 
 
 static void
-check_one_reloc (Ebl *ebl, int idx, size_t cnt, const GElf_Shdr *symshdr,
-		 Elf_Data *symdata, GElf_Addr r_offset, GElf_Xword r_info,
+check_one_reloc (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Shdr *relshdr, int idx,
+		 size_t cnt, const GElf_Shdr *symshdr, Elf_Data *symdata,
+		 GElf_Addr r_offset, GElf_Xword r_info,
 		 const GElf_Shdr *destshdr, bool reldyn,
 		 struct loaded_segment *loaded, enum load_state *statep)
 {
@@ -1139,7 +1140,12 @@ check_one_reloc (Ebl *ebl, int idx, size_t cnt, const GElf_Shdr *symshdr,
   if (!ebl_reloc_type_check (ebl, GELF_R_TYPE (r_info)))
     ERROR (gettext ("section [%2d] '%s': relocation %zu: invalid type\n"),
 	   idx, section_name (ebl, idx), cnt);
-  else if (!ebl_reloc_valid_use (ebl, GELF_R_TYPE (r_info)))
+  else if (((ehdr->e_type != ET_EXEC && ehdr->e_type != ET_DYN)
+	    /* The executable/DSO can contain relocation sections with
+	       all the relocations the linker has applied.  Those sections
+	       are marked non-loaded, though.  */
+	    || (relshdr->sh_flags & SHF_ALLOC) != 0)
+	   && !ebl_reloc_valid_use (ebl, GELF_R_TYPE (r_info)))
     ERROR (gettext ("\
 section [%2d] '%s': relocation %zu: relocation type invalid for the file type\n"),
 	   idx, section_name (ebl, idx), cnt);
@@ -1270,8 +1276,9 @@ section [%2d] '%s': cannot get relocation %zu: %s\n"),
 	  continue;
 	}
 
-      check_one_reloc (ebl, idx, cnt, symshdr, symdata, rela->r_offset,
-		       rela->r_info, destshdr, reldyn, loaded, &state);
+      check_one_reloc (ebl, ehdr, shdr, idx, cnt, symshdr, symdata,
+		       rela->r_offset, rela->r_info, destshdr, reldyn, loaded,
+		       &state);
     }
 
   while (loaded != NULL)
@@ -1319,8 +1326,9 @@ section [%2d] '%s': cannot get relocation %zu: %s\n"),
 	  continue;
 	}
 
-      check_one_reloc (ebl, idx, cnt, symshdr, symdata, rel->r_offset,
-		       rel->r_info, destshdr, reldyn, loaded, &state);
+      check_one_reloc (ebl, ehdr, shdr, idx, cnt, symshdr, symdata,
+		       rel->r_offset, rel->r_info, destshdr, reldyn, loaded,
+		       &state);
     }
 
   while (loaded != NULL)
@@ -1337,7 +1345,7 @@ static int ndynamic;
 
 
 static void
-check_dynamic (Ebl *ebl, GElf_Shdr *shdr, int idx)
+check_dynamic (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Shdr *shdr, int idx)
 {
   Elf_Data *data;
   GElf_Shdr strshdr_mem;
@@ -1484,6 +1492,56 @@ section [%2d] '%s': entry %zu: DT_PLTREL value must be DT_REL or DT_RELA\n"),
 	pltreladdr = dyn->d_un.d_ptr;
       if (dyn->d_tag == DT_PLTRELSZ)
 	pltrelsz = dyn->d_un.d_val;
+
+      /* Check that addresses for entries are in loaded segments.  */
+      switch (dyn->d_tag)
+	{
+	  size_t n;
+	default:
+	  if (dyn->d_tag < DT_ADDRRNGLO || dyn->d_tag > DT_ADDRRNGHI)
+	    /* Value is no pointer.  */
+	    break;
+	  /* FALLTHROUGH */
+
+	case DT_PLTGOT:
+	case DT_HASH:
+	case DT_STRTAB:
+	case DT_SYMTAB:
+	case DT_RELA:
+	case DT_INIT:
+	case DT_FINI:
+	case DT_SONAME:
+	case DT_RPATH:
+	case DT_SYMBOLIC:
+	case DT_REL:
+	case DT_JMPREL:
+	case DT_INIT_ARRAY:
+	case DT_FINI_ARRAY:
+	case DT_RUNPATH:
+	case DT_VERSYM:
+	case DT_VERDEF:
+	case DT_VERNEED:
+	case DT_AUXILIARY:
+	case DT_FILTER:
+	  for (n = 0; n < ehdr->e_phnum; ++n)
+	    {
+	      GElf_Phdr phdr_mem;
+	      GElf_Phdr *phdr = gelf_getphdr (ebl->elf, n, &phdr_mem);
+	      if (phdr != NULL && phdr->p_type == PT_LOAD
+		  && phdr->p_vaddr <= dyn->d_un.d_ptr
+		  && phdr->p_vaddr + phdr->p_memsz > dyn->d_un.d_ptr)
+		break;
+	    }
+	  if (unlikely (n >= ehdr->e_phnum))
+	    {
+	      char buf[50];
+	      ERROR (gettext ("\
+section [%2d] '%s': entry %zu: %s value must point into loaded segment\n"),
+		     idx, section_name (ebl, idx), cnt,
+		     ebl_dynamic_tag_name (ebl, dyn->d_tag, buf,
+					   sizeof (buf)));
+	    }
+	}
     }
 
   for (cnt = 1; cnt < DT_NUM; ++cnt)
@@ -2832,7 +2890,7 @@ section [%2zu] '%s': relocatable files cannot have dynamic symbol tables\n"),
 	  break;
 
 	case SHT_DYNAMIC:
-	  check_dynamic (ebl, shdr, cnt);
+	  check_dynamic (ebl, ehdr, shdr, cnt);
 	  break;
 
 	case SHT_SYMTAB_SHNDX:
@@ -3177,8 +3235,36 @@ loadable segment GNU_RELRO applies to is executable\n"));
 
 	      if (inner >= ehdr->e_phnum)
 		ERROR (gettext ("\
-GNU_RELRO segment not contained in a loaded segment\n"));
+%s segment not contained in a loaded segment\n"), "GNU_RELRO");
 	    }
+	}
+      else if (phdr->p_type == PT_PHDR)
+	{
+	  /* Check that the region is in a writable segment.  */
+	  int inner;
+	  for (inner = 0; inner < ehdr->e_phnum; ++inner)
+	    {
+	      GElf_Phdr phdr2_mem;
+	      GElf_Phdr *phdr2;
+
+	      phdr2 = gelf_getphdr (ebl->elf, inner, &phdr2_mem);
+	      if (phdr2 != NULL
+		  && phdr2->p_type == PT_LOAD
+		  && phdr->p_vaddr >= phdr2->p_vaddr
+		  && (phdr->p_vaddr + phdr->p_memsz
+		      <= phdr2->p_vaddr + phdr2->p_memsz))
+		break;
+	    }
+
+	  if (inner >= ehdr->e_phnum)
+	    ERROR (gettext ("\
+%s segment not contained in a loaded segment\n"), "PHDR");
+
+	  /* Check that offset in segment corresponds to offset in ELF
+	     header.  */
+	  if (phdr->p_offset != ehdr->e_phoff)
+	    ERROR (gettext ("\
+program header offset in ELF header and PHDR entry do not match"));
 	}
 
       if (phdr->p_filesz > phdr->p_memsz)

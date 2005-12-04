@@ -1205,37 +1205,41 @@ section [%2d] '%s': relocation %zu: offset out of bounds\n"),
 				   buf, sizeof (buf)));
     }
 
-  bool in_loaded_seg = false;
-  while (loaded != NULL)
+  if ((ehdr->e_type != ET_EXEC && ehdr->e_type != ET_DYN)
+      || (relshdr->sh_flags & SHF_ALLOC) != 0)
     {
-      if (r_offset < loaded->to
-	  && r_offset + (sym == NULL ? 0 : sym->st_size) >= loaded->from)
+      bool in_loaded_seg = false;
+      while (loaded != NULL)
 	{
-	  /* The symbol is in this segment.  */
-	  if  (loaded->read_only)
+	  if (r_offset < loaded->to
+	      && r_offset + (sym == NULL ? 0 : sym->st_size) >= loaded->from)
 	    {
-	      if (textrel)
-		needed_textrel = true;
-	      else
-		ERROR (gettext ("section [%2d] '%s': relocation %zu: read-only section modified but text relocation flag not set\n"),
-		       idx, section_name (ebl, idx), cnt);
+	      /* The symbol is in this segment.  */
+	      if  (loaded->read_only)
+		{
+		  if (textrel)
+		    needed_textrel = true;
+		  else
+		    ERROR (gettext ("section [%2d] '%s': relocation %zu: read-only section modified but text relocation flag not set\n"),
+			   idx, section_name (ebl, idx), cnt);
+		}
+
+	      in_loaded_seg = true;
 	    }
 
-	  in_loaded_seg = true;
+	  loaded = loaded->next;
 	}
 
-      loaded = loaded->next;
-    }
-
-  if (*statep == state_undecided)
-    *statep = in_loaded_seg ? state_loaded : state_unloaded;
-  else if ((*statep == state_unloaded && in_loaded_seg)
-	   || (*statep == state_loaded && !in_loaded_seg))
-    {
-      ERROR (gettext ("\
+      if (*statep == state_undecided)
+	*statep = in_loaded_seg ? state_loaded : state_unloaded;
+      else if ((*statep == state_unloaded && in_loaded_seg)
+	       || (*statep == state_loaded && !in_loaded_seg))
+	{
+	  ERROR (gettext ("\
 section [%2d] '%s': relocations are against loaded and unloaded data\n"),
-	     idx, section_name (ebl, idx));
-      *statep = state_error;
+		 idx, section_name (ebl, idx));
+	  *statep = state_error;
+	}
     }
 }
 

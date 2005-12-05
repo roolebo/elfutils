@@ -1,4 +1,4 @@
-/* Finish a session using libdwfl.
+/* Return register name information.
    Copyright (C) 2005 Red Hat, Inc.
 
    This program is Open Source software; you can redistribute it and/or
@@ -11,17 +11,23 @@
    by writing the Open Source Initiative c/o Lawrence Rosen, Esq.,
    3001 King Ranch Road, Ukiah, CA 95482.   */
 
-#include "libdwflP.h"
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
 
-void
-dwfl_end (Dwfl *dwfl)
+#include <inttypes.h>
+#include <libeblP.h>
+
+
+ssize_t
+ebl_register_name (ebl, regno, name, namelen, prefix, setname)
+     Ebl *ebl;
+     int regno;
+     char *name;
+     size_t namelen;
+     const char **prefix;
+     const char **setname;
 {
-  if (dwfl != NULL)
-    {
-      for (size_t i = 0; i < dwfl->nmodules; ++i)
-	if (dwfl->modules[i] != NULL)
-	  __libdwfl_module_free (dwfl->modules[i]);
-      free (dwfl->modules);
-      free (dwfl);
-    }
+  return ebl == NULL ? -1 : ebl->register_name (ebl, regno, name, namelen,
+						prefix, setname);
 }

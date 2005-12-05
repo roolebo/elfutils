@@ -1,3 +1,7 @@
+2005-11-25  Roland McGrath  <roland@redhat.com>
+
+	* libdw.map: Bump to 0.118; export dwfl_module_register_names.
+
 2005-11-15  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am [BUILD_STATIC] (AM_CFLAGS): Add -fpic.

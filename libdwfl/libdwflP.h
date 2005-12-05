@@ -180,7 +180,6 @@ struct dwfl_arange
 
 
 
-
 extern void __libdwfl_module_free (Dwfl_Module *mod) internal_function;
 
 
@@ -200,6 +199,10 @@ extern Dwfl_Error __libdwfl_relocate_value (Dwfl_Module *mod,
 					    Elf32_Word shndx,
 					    GElf_Addr *value)
      internal_function;
+
+
+/* Ensure that MOD->ebl is set up.  */
+extern Dwfl_Error __libdwfl_module_getebl (Dwfl_Module *mod) internal_function;
 
 /* Iterate through all the CU's in the module.  Start by passing a null
    LASTCU, and then pass the last *CU returned.  Success return with null

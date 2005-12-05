@@ -96,5 +96,7 @@ main (int argc, char *argv[])
   while ((a.cu = dwfl_nextcu (a.dwfl, a.cu, &a.dwbias)) != NULL)
     dwarf_getfuncs (a.cu, &handle_function, &a, 0);
 
+  dwfl_end (a.dwfl);
+
   return result;
 }

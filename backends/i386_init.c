@@ -43,6 +43,7 @@ i386_init (elf, machine, eh, ehlen)
   generic_debugscn_p = eh->debugscn_p;
   HOOK (eh, debugscn_p);
   HOOK (eh, return_value_location);
+  HOOK (eh, register_name);
 
   return MODVERSION;
 }

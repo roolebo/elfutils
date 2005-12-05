@@ -138,5 +138,7 @@ main (int argc, char *argv[])
       free (a.file);
     }
 
+  dwfl_end (dwfl);
+
   return 0;
 }

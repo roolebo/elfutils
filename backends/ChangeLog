@@ -1,3 +1,24 @@
+2005-12-05  Roland McGrath  <roland@redhat.com>
+
+	* i386_regs.c (i386_register_name): Use a table for the first 8 regs.
+	* x86_64_regs.c (x86_64_register_name): Likewise.
+
+2005-11-25  Roland McGrath  <roland@redhat.com>
+
+	* i386_regs.c (i386_register_name): Return 0, not 1, for gaps.
+
+	* i386_regs.c: New file.
+	* ppc_regs.c: New file.
+	* sparc_regs.c: New file.
+	* x86_64_regs.c: New file.
+	* Makefile.am
+	(i386_SRCS, x86_64_SRCS, ppc_SRCS, ppc64_SRCS, sparc_SRCS): Add them.
+	* i386_init.c: Initialize register_name hook.
+	* ppc_init.c: Likewise.
+	* ppc64_init.c: Likewise.
+	* sparc_init.c: Likewise.
+	* x86_64_init.c: Likewise.
+
 2005-11-19  Roland McGrath  <roland@redhat.com>
 
 	* ppc64_reloc.def: REL30 -> ADDR30.

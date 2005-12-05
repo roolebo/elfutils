@@ -1,3 +1,12 @@
+2005-11-25  Roland McGrath  <roland@redhat.com>
+
+	* eblregname.c: New file.
+	* Makefile.am (gen_SOURCES): Add it.
+	* ebl-hooks.h: Declare register_name hook.
+	* libebl.h: Declare ebl_register_name.
+	* eblopenbackend.c (default_register_name): New function.
+	(fill_defaults): Use it.
+
 2005-11-16  Roland McGrath  <roland@redhat.com>
 
 	* libebl.h: Use "" for elf-knowledge.h, not <>.

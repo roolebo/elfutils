@@ -344,5 +344,19 @@ extern int dwfl_module_return_value_location (Dwfl_Module *mod,
 					      Dwarf_Die *functypedie,
 					      const Dwarf_Op **locops);
 
+/* Enumerate the DWARF register numbers and their names.
+   For each register, CALLBACK gets its DWARF number, a string describing
+   the register set (such as "integer" or "FPU"), a prefix used in
+   assembler syntax (such as "%" or "$", may be ""), and the name for the
+   register (contains identifier characters only, possibly all digits).
+   The REGNAME string is valid only during the callback. */
+extern int dwfl_module_register_names (Dwfl_Module *mod,
+				       int (*callback) (void *arg,
+							int regno,
+							const char *setname,
+							const char *prefix,
+							const char *regname),
+				       void *arg);
+
 
 #endif	/* libdwfl.h */

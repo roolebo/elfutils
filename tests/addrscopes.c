@@ -185,5 +185,7 @@ main (int argc, char *argv[])
       while (++remaining < argc);
     }
 
+  dwfl_end (dwfl);
+
   return result;
 }

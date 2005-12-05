@@ -1,3 +1,24 @@
+2005-11-25  Roland McGrath  <roland@redhat.com>
+
+	* coverage.sh: Given -v argument, print names of unused files.
+
+	* addrscopes.c (main): Use dwfl_end before return.
+	* allregs.c (main): Likewise.
+	* find-prologues.c (main): Likewise.
+	* funcretval.c (main): Likewise.
+	* funcscopes.c (main): Likewise.
+	* line2addr.c (main): Likewise.
+
+	* run-allregs.sh: New file.
+	* Makefile.am (TESTS, EXTRA_DIST): Add it.
+
+	* allregs.c: Use libdwfl wrapper instead of direct libebl calls.
+	* Makefile.am (allregs_LDADD): Updated.
+
+	* allregs.c: New file.
+	* Makefile.am (noinst_PROGRAMS): Add it.
+	(allregs_LDADD): New variable.
+
 2005-11-18  Roland McGrath  <roland@redhat.com>
 
 	* test-subr.sh (installed_testrun): Treat /usr/lib64 like /usr/lib.

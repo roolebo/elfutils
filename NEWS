@@ -2,6 +2,11 @@ Version 0.118:
 
 elflint: more tests.
 
+
+libdwfl: New function dwfl_module_register_names.
+
+libebl: New backend hook for register names.
+
 Version 0.117:
 
 libdwfl: New function dwfl_module_return_value_location.

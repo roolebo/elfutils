@@ -1,3 +1,18 @@
+2005-11-26  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_end.c (dwfl_end): Free the DWFL itself.
+
+2005-11-25  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_getdwarf.c (__libdwfl_module_getebl): New function.
+	(load_dw): Use it.
+	* dwfl_module_register_names.c (dwfl_module_register_names): Likewise.
+	* libdwflP.h: Declare it.
+
+	* dwfl_module_register_names.c: New file.
+	* Makefile.am (libdwfl_a_SOURCES): Add it.
+	* libdwfl.h: Declare dwfl_module_register_names.
+
 2005-11-21  Roland McGrath  <roland@redhat.com>
 
 	* linux-kernel-modules.c (dwfl_linux_kernel_module_section_address):

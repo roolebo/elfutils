@@ -1,11 +1,18 @@
 #! /bin/bash
 
+if [ "x$1" = "x-v" ]; then
+  verbose=yes
+else
+  verbose=no
+fi
+
 cd ..
 
 for d in lib libasm libdw libdwfl libebl libelf backends src; do
   tmp=$d-data
   cd $d
   unused=0
+  unused_files=
   for f in *.gcno; do
     base="$(basename $f .gcno)"
     fc="$base.c"
@@ -15,6 +22,7 @@ for d in lib libasm libdw libdwfl libebl libelf backends src; do
       gawk "/$d.$fc/ { getline; co=gensub(/.*:(.*)% .*/, \"\\\\1\", \"g\"); co=co+0.0; li=\$4+0; printf \"%-35s  %6.2f %5d\n\", \"$d/$fc\", co, li } " >> $tmp
     else
       unused=$(($unused + 1))
+      unused_files="$unused_files $fc"
     fi
   done
   if [ -f $tmp ]; then
@@ -22,6 +30,11 @@ for d in lib libasm libdw libdwfl libebl libelf backends src; do
     rm -f $tmp
   else
     printf "%-12s   0.00%% covered       unused files: %3d\n" "$d" $unused
+  fi
+  if [ $verbose = yes ]; then
+    for f in $unused_files; do
+      printf '%-42s%s\n' '' $f
+    done
   fi
   cd ..
 done

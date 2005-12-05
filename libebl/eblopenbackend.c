@@ -21,6 +21,7 @@
 #include <gelf.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include <libeblP.h>
 
@@ -160,6 +161,10 @@ static bool default_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr,
 static bool default_bss_plt_p (Elf *elf, GElf_Ehdr *ehdr);
 static int default_return_value_location (Dwarf_Die *functypedie,
 					  const Dwarf_Op **locops);
+static ssize_t default_register_name (Ebl *ebl,
+				      int regno, char *name, size_t namelen,
+				      const char **prefix,
+				      const char **setname);
 
 
 static void
@@ -191,6 +196,7 @@ fill_defaults (Ebl *result)
   result->check_special_symbol = default_check_special_symbol;
   result->bss_plt_p = default_bss_plt_p;
   result->return_value_location = default_return_value_location;
+  result->register_name = default_register_name;
   result->destr = default_destr;
 }
 
@@ -586,4 +592,18 @@ default_return_value_location (Dwarf_Die *functypedie __attribute__ ((unused)),
 			       const Dwarf_Op **locops __attribute__ ((unused)))
 {
   return -2;
+}
+
+static ssize_t
+default_register_name (Ebl *ebl __attribute__ ((unused)),
+		       int regno, char *name, size_t namelen,
+		       const char **prefix,
+		       const char **setname)
+{
+  if (name == NULL)
+    return 0;
+
+  *setname = "???";
+  *prefix = "";
+  return snprintf (name, namelen, "reg%d", regno);
 }

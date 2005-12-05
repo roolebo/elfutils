@@ -42,7 +42,7 @@ noinst_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  show-die-info get-files get-lines get-pubnames \
 		  get-aranges allfcts line2addr addrscopes funcscopes \
 		  show-abbrev hash newscn ecp dwflmodtest \
-		  find-prologues funcretval
+		  find-prologues funcretval allregs
 # get-ciefde
 asm_TESTS = asm-tst1 asm-tst2 asm-tst3 asm-tst4 asm-tst5 \
 	    asm-tst6 asm-tst7 asm-tst8 asm-tst9
@@ -58,7 +58,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-elflint-test.sh run-elflint-self.sh run-ranlib-test.sh \
 	run-ranlib-test2.sh run-ranlib-test3.sh run-ranlib-test4.sh \
 	run-addrscopes.sh run-strings-test.sh run-funcscopes.sh \
-	run-find-prologues.sh
+	run-find-prologues.sh run-allregs.sh
 # run-show-ciefde.sh
 
 if !STANDALONE
@@ -86,7 +86,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-elflint-self.sh run-ranlib-test.sh run-ranlib-test2.sh \
 	     run-ranlib-test3.sh run-ranlib-test4.sh \
 	     run-addrscopes.sh run-strings-test.sh run-funcscopes.sh \
-	     run-find-prologues.sh \
+	     run-find-prologues.sh run-allregs.sh \
 	     testfile15.bz2 testfile15.debug.bz2 \
 	     testfile16.bz2 testfile16.debug.bz2 \
 	     testfile17.bz2 testfile17.debug.bz2 \
@@ -163,6 +163,7 @@ line2addr_LDADD = $(libdw) $(libmudflap)
 addrscopes_LDADD = $(libdw) $(libmudflap)
 funcscopes_LDADD = $(libdw) $(libmudflap)
 funcretval_LDADD = $(libdw) $(libmudflap)
+allregs_LDADD = $(libdw) $(libmudflap)
 find_prologues_LDADD = $(libdw) $(libmudflap)
 #show_ciefde_LDADD = ../libdwarf/libdwarf.so $(libelf) $(libmudflap)
 asm_tst1_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl

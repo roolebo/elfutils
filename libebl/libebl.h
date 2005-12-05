@@ -170,6 +170,20 @@ extern int ebl_return_value_location (Ebl *ebl,
 				      Dwarf_Die *functypedie,
 				      const Dwarf_Op **locops);
 
+/* Fill in register name information given DWARF register numbers.
+   If NAME is null, return the maximum REGNO + 1 that has a name.
+   Otherwise, store in NAME the name for DWARF register number REGNO
+   and return the number of bytes written (including '\0' terminator).
+   Return -1 if NAMELEN is too short or REGNO is negative or too large.
+   Return 0 if REGNO is unused (a gap in the DWARF number assignment).
+   On success, set *SETNAME to a description like "integer" or "FPU"
+   fit for "%s registers" title display, and *PREFIX to the string
+   that precedes NAME in canonical assembler syntax (e.g. "%" or "$").
+   The NAME string contains identifier characters only (maybe just digits).  */
+extern ssize_t ebl_register_name (Ebl *ebl,
+				  int regno, char *name, size_t namelen,
+				  const char **prefix, const char **setname);
+
 
 /* ELF string table handling.  */
 struct Ebl_Strtab;

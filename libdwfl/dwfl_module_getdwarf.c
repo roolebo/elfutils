@@ -281,6 +281,24 @@ find_symtab (Dwfl_Module *mod)
 }
 
 
+/* Try to open a libebl backend for MOD.  */
+Dwfl_Error
+internal_function_def
+__libdwfl_module_getebl (Dwfl_Module *mod)
+{
+  if (mod->ebl == NULL)
+    {
+      find_file (mod);
+      if (mod->elferr != DWFL_E_NOERROR)
+	return mod->elferr;
+
+      mod->ebl = ebl_openbackend (mod->main.elf);
+      if (mod->ebl == NULL)
+	return DWFL_E_LIBEBL;
+    }
+  return DWFL_E_NOERROR;
+}
+
 /* Try to start up libdw on DEBUGFILE.  */
 static Dwfl_Error
 load_dw (Dwfl_Module *mod, struct dwfl_file *debugfile)
@@ -293,12 +311,9 @@ load_dw (Dwfl_Module *mod, struct dwfl_file *debugfile)
       if (cb->section_address == NULL)
 	return DWFL_E_NOREL;
 
-      if (mod->ebl == NULL)
-	{
-	  mod->ebl = ebl_openbackend (mod->main.elf);
-	  if (mod->ebl == NULL)
-	    return DWFL_E_LIBEBL;
-	}
+      Dwfl_Error error = __libdwfl_module_getebl (mod);
+      if (error != DWFL_E_NOERROR)
+	return error;
 
       find_symtab (mod);
       Dwfl_Error result = mod->symerr;

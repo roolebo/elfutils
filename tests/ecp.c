@@ -1,4 +1,4 @@
-/* Copyright (C) 2002 Red Hat, Inc.
+/* Copyright (C) 2002, 2005 Red Hat, Inc.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
    This program is Open Source software; you can redistribute it and/or
@@ -82,7 +82,10 @@ main (int argc, char *argv[])
   if (elf_update (outelf, ELF_C_WRITE) == -1)
     error (EXIT_FAILURE, 0, "elf_update failed: %s", elf_errmsg (-1));
 
+  elf_end (outelf);
   close (outfd);
+
+  elf_end (inelf);
 
   return 0;
 }

@@ -14,12 +14,11 @@
 #include "libebl_CPU.h"
 #include <assert.h>
 
-#define R_TYPE(name)		PASTE (RELOC_PREFIX, name)
-#define PASTE(a, b)		PASTE_1 (a, b)
-#define PASTE_1(a, b)		a##b
-#define R_NAME(name)		R_NAME_1 (RELOC_PREFIX, name)
-#define R_NAME_1(prefix, type)	R_NAME_2 (prefix, type)
-#define R_NAME_2(prefix, type)	#prefix #type
+#define R_TYPE(name)	PASTE (RELOC_PREFIX, name)
+#define PASTE(a, b)	PASTE_1 (a, b)
+#define PASTE_1(a, b)	a##b
+#define R_NAME(name)	R_NAME_1 (R_TYPE (name))
+#define R_NAME_1(type)	#type
 
 #define RELOC_TYPES		STRINGIFIED_PASTE (BACKEND, reloc.def)
 #define STRINGIFIED_PASTE(a, b)	STRINGIFY (PASTE (a, b))

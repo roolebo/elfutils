@@ -1,7 +1,3 @@
-2005-12-10  Ulrich Drepper
-
-	* common-reloc.c (R_NAME): Generate string correctly.
-
 2005-12-05  Roland McGrath  <roland@redhat.com>
 
 	* i386_regs.c (i386_register_name): Use a table for the first 8 regs.

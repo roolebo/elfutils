@@ -91,13 +91,15 @@ elfw2(LIBELFBITS,getshdr) (scn)
 	     directly this would already have happened.  */
 	  assert (ehdr->e_ident[EI_DATA] != MY_ELFDATA
 		  || (! ALLOW_UNALIGNED
-		      && (ehdr->e_shoff
+		      && (((uintptr_t) elf->map_address + elf->start_offset
+			   + ehdr->e_shoff)
 			  & (__alignof__ (ElfW2(LIBELFBITS,Shdr)) - 1)) != 0));
 
 	  /* Now copy the data and at the same time convert the byte
 	     order.  */
 	  if (ALLOW_UNALIGNED
-	      || (ehdr->e_shoff
+	      || (((uintptr_t) elf->map_address + elf->start_offset
+		   + ehdr->e_shoff)
 		  & (__alignof__ (ElfW2(LIBELFBITS,Shdr)) - 1)) == 0)
 	    notcvt = (ElfW2(LIBELFBITS,Shdr) *)
 	      ((char *) elf->map_address

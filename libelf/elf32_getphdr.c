@@ -85,8 +85,9 @@ elfw2(LIBELFBITS,getphdr) (elf)
 	  /* All the data is already mapped.  Use it.  */
 	  if (ehdr->e_ident[EI_DATA] == MY_ELFDATA
 	      && (ALLOW_UNALIGNED
-		  || (ehdr->e_phoff
-		      & (__alignof__ (ElfW2(LIBELFBITS,Phdr)) - 1)) == 0))
+		  || ((((uintptr_t) elf->map_address + elf->start_offset
+			+ ehdr->e_phoff)
+		       & (__alignof__ (ElfW2(LIBELFBITS,Phdr)) - 1)) == 0)))
 	    /* Simply use the mapped data.  */
 	    elf->state.ELFW(elf,LIBELFBITS).phdr = (ElfW2(LIBELFBITS,Phdr) *)
 	      ((char *) elf->map_address + elf->start_offset + ehdr->e_phoff);
@@ -110,8 +111,9 @@ elfw2(LIBELFBITS,getphdr) (elf)
 	      /* Now copy the data and at the same time convert the
 		 byte order.  */
 	      if (ALLOW_UNALIGNED
-		  || (ehdr->e_phoff
-		      & (__alignof__ (ElfW2(LIBELFBITS,Phdr)) - 1)) == 0)
+		  || ((((uintptr_t) elf->map_address + elf->start_offset
+			+ ehdr->e_phoff)
+		       & (__alignof__ (ElfW2(LIBELFBITS,Phdr)) - 1)) == 0))
 		notcvt = (ElfW2(LIBELFBITS,Phdr) *)
 		  ((char *) elf->map_address
 		   + elf->start_offset + ehdr->e_phoff);

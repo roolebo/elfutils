@@ -22,6 +22,7 @@
 #include <byteswap.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "libelfP.h"
 
@@ -47,15 +48,25 @@ static void
    bit.  We need only functions for 16, 32, and 64 bits.  The
    functions referenced in the table will be aliases for one of these
    functions.  Which one is decided by the ELFxx_FSZ_type.  */
-#define LEN2_SWAP(Src)  bswap_16 (*((uint16_t *) Src))
-#define word2_t uint16_t
 
-#define LEN4_SWAP(Src)  bswap_32 (*((uint32_t *) Src))
-#define word4_t uint32_t
+#if ALLOW_UNALIGNED
 
-#define LEN8_SWAP(Src)  bswap_64 (*((uint64_t *) Src))
-#define word8_t uint64_t
+#define FETCH(Bits, ptr)	(*(const uint##Bits##_t *) ptr)
+#define STORE(Bits, ptr, val)	(*(uint##Bits##_t *) ptr = val)
 
+#else
+
+union unaligned
+  {
+    uint16_t u16;
+    uint32_t u32;
+    uint64_t u64;
+  } __attribute__ ((packed));
+
+#define FETCH(Bits, ptr)	(((const union unaligned *) ptr)->u##Bits)
+#define STORE(Bits, ptr, val)	(((union unaligned *) ptr)->u##Bits = val)
+
+#endif
 
 /* Now define the conversion functions for the basic types.  We use here
    the fact that file and memory types are the same and that we have the
@@ -67,37 +78,41 @@ static void
   INLINE2 (ELFW2(Bits,FSZ_##NAME), ElfW2(Bits,cvt_##Name), ElfW2(Bits,Name))
 #define INLINE2(Bytes, FName, TName) \
   INLINE3 (Bytes, FName, TName)
-#define INLINE3(Bytes, FName, TName) \
+#define INLINE3(Bytes, FName, TName)					      \
+  static inline void FName##1 (void *dest, const void *ptr)		      \
+  {									      \
+    switch (Bytes)							      \
+      {									      \
+      case 2: STORE (16, dest, bswap_16 (FETCH (16, ptr))); break;	      \
+      case 4: STORE (32, dest, bswap_32 (FETCH (32, ptr))); break;	      \
+      case 8: STORE (64, dest, bswap_64 (FETCH (64, ptr))); break;	      \
+      default:								      \
+	abort ();							      \
+      }									      \
+  }									      \
+									      \
   static void FName (void *dest, const void *ptr, size_t len,		      \
 		     int encode __attribute__ ((unused)))		      \
   {									      \
     size_t n = len / sizeof (TName);					      \
     if (dest < ptr)							      \
-      {									      \
-	word##Bytes##_t *tdest = (word##Bytes##_t *) dest;		      \
-        const word##Bytes##_t *tptr = (const word##Bytes##_t *) ptr;	      \
-        while (n-- > 0)							      \
-	  {								      \
-	    *tdest++ = LEN##Bytes##_SWAP (tptr);			      \
-	    tptr++;							      \
-	  }								      \
-      }									      \
+      while (n-- > 0)							      \
+	{								      \
+	  FName##1 (dest, ptr);						      \
+	  dest += Bytes;						      \
+	  ptr += Bytes;							      \
+	}								      \
     else								      \
       {									      \
-	word##Bytes##_t *tdest = (word##Bytes##_t *) dest + n;		      \
-	const word##Bytes##_t *tptr = (const word##Bytes##_t *) ptr + n;      \
+	dest += len;							      \
+	ptr += len;							      \
 	while (n-- > 0)							      \
 	  {								      \
-	    --tptr;							      \
-	    *--tdest = LEN##Bytes##_SWAP (tptr);			      \
+	    ptr -= Bytes;						      \
+	    dest -= Bytes;						      \
+	    FName##1 (dest, ptr);					      \
 	  }								      \
       }									      \
- }									      \
-									      \
-  static inline void FName##1 (void *dest, const void *ptr)		      \
-  {									      \
-    *((word##Bytes##_t *) dest) =					      \
-      LEN##Bytes##_SWAP ((((word##Bytes##_t *) ptr)));			      \
   }
 
 

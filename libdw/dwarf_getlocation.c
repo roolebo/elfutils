@@ -346,7 +346,7 @@ dwarf_getlocation_addr (attr, address, llbufs, listlens, maxlocs)
     }
 
   int error = INTUSE(dwarf_errno) ();
-  if (error != DWARF_E_NO_BLOCK)
+  if (unlikely (error != DWARF_E_NO_BLOCK))
     {
       __libdw_seterrno (error);
       return -1;
@@ -354,32 +354,17 @@ dwarf_getlocation_addr (attr, address, llbufs, listlens, maxlocs)
 
   /* Must have the form data4 or data8 which act as an offset.  */
   Dwarf_Word offset;
-  if (INTUSE(dwarf_formudata) (attr, &offset) != 0)
+  if (unlikely (INTUSE(dwarf_formudata) (attr, &offset) != 0))
     return -1;
 
   const Elf_Data *d = attr->cu->dbg->sectiondata[IDX_debug_loc];
-  if (d == NULL)
+  if (unlikely (d == NULL))
     {
       __libdw_seterrno (DWARF_E_NO_LOCLIST);
       return -1;
     }
 
-  /* Fetch the CU's base address.  */
-  Dwarf_Addr base;
-  Dwarf_Die cudie = CUDIE (attr->cu);
-
-  /* Find the base address of the compilation unit.  It will
-     normally be specified by DW_AT_low_pc.  In DWARF-3 draft 4,
-     the base address could be overridden by DW_AT_entry_pc.  It's
-     been removed, but GCC emits DW_AT_entry_pc and not DW_AT_lowpc
-     for compilation units with discontinuous ranges.  */
-  Dwarf_Attribute attr_mem;
-  if (INTUSE(dwarf_lowpc) (&cudie, &base) != 0
-      && INTUSE(dwarf_formaddr) (INTUSE(dwarf_attr) (&cudie, DW_AT_entry_pc,
-						     &attr_mem),
-				 &base) != 0)
-    return -1;
-
+  Dwarf_Addr base = (Dwarf_Addr) -1;
   unsigned char *readp = d->d_buf + offset;
   size_t got = 0;
   while (got < maxlocs)
@@ -402,6 +387,8 @@ dwarf_getlocation_addr (attr, address, llbufs, listlens, maxlocs)
 	  if (begin == (Elf64_Addr) -1l) /* Base address entry.  */
 	    {
 	      base = end;
+	      if (unlikely (base == (Dwarf_Addr) -1))
+		goto invalid;
 	      continue;
 	    }
 	}
@@ -421,10 +408,7 @@ dwarf_getlocation_addr (attr, address, llbufs, listlens, maxlocs)
 	break;
 
       if ((unsigned char *) d->d_buf + d->d_size - readp < 2)
-	{
-	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
-	  return -1;
-	}
+	goto invalid;
 
       /* We have a location expression.  */
       block.length = read_2ubyte_unaligned_inc (attr->cu->dbg, readp);
@@ -434,12 +418,35 @@ dwarf_getlocation_addr (attr, address, llbufs, listlens, maxlocs)
 	goto invalid;
       readp += block.length;
 
+      if (base == (Dwarf_Addr) -1)
+	{
+	  /* Fetch the CU's base address.  */
+	  Dwarf_Die cudie = CUDIE (attr->cu);
+
+	  /* Find the base address of the compilation unit.  It will
+	     normally be specified by DW_AT_low_pc.  In DWARF-3 draft 4,
+	     the base address could be overridden by DW_AT_entry_pc.  It's
+	     been removed, but GCC emits DW_AT_entry_pc and not DW_AT_lowpc
+	     for compilation units with discontinuous ranges.  */
+	  Dwarf_Attribute attr_mem;
+	  if (unlikely (INTUSE(dwarf_lowpc) (&cudie, &base) != 0)
+	      && INTUSE(dwarf_formaddr) (INTUSE(dwarf_attr) (&cudie,
+							     DW_AT_entry_pc,
+							     &attr_mem),
+					 &base) != 0)
+	    {
+	      if (INTUSE(dwarf_errno) () == 0)
+		goto invalid;
+	      return -1;
+	    }
+	}
+
       if (address >= base + begin && address < base + end)
 	{
 	  /* This one matches the address.  */
 	  if (llbufs != NULL
-	      && getlocation (attr->cu, &block,
-			      &llbufs[got], &listlens[got]) != 0)
+	      && unlikely (getlocation (attr->cu, &block,
+					&llbufs[got], &listlens[got]) != 0))
 	    return -1;
 	  ++got;
 	}

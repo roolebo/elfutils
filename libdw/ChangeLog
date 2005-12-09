@@ -1,3 +1,9 @@
+2005-12-09  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_getlocation.c (dwarf_getlocation_addr): Add some unlikelys.
+	Delay CU base lookup until it's needed.
+	If CU base lookup fails with no error, flag invalid DWARF.
+
 2005-11-25  Roland McGrath  <roland@redhat.com>
 
 	* libdw.map: Bump to 0.118; export dwfl_module_register_names.

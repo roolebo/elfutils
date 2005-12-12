@@ -1,3 +1,8 @@
+2005-12-12  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_ranges.c: Copy CU base address-finding code from
+	dwarf_getlocation.
+
 2005-12-09  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_getlocation.c (dwarf_getlocation_addr): Add some unlikelys.

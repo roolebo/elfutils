@@ -65,8 +65,26 @@ dwarf_ranges (Dwarf_Die *die, ptrdiff_t offset, Dwarf_Addr *basep,
       assert ((Dwarf_Word) offset == start_offset);
 
       /* Fetch the CU's base address.  */
-      if (INTUSE(dwarf_lowpc) (&CUDIE (attr->cu), basep) != 0)
-	return -1;
+      Dwarf_Die cudie = CUDIE (attr->cu);
+
+      /* Find the base address of the compilation unit.  It will
+	 normally be specified by DW_AT_low_pc.  In DWARF-3 draft 4,
+	 the base address could be overridden by DW_AT_entry_pc.  It's
+	 been removed, but GCC emits DW_AT_entry_pc and not DW_AT_lowpc
+	 for compilation units with discontinuous ranges.  */
+      if (unlikely (INTUSE(dwarf_lowpc) (&cudie, basep) != 0)
+	  && INTUSE(dwarf_formaddr) (INTUSE(dwarf_attr) (&cudie,
+							 DW_AT_entry_pc,
+							 &attr_mem),
+				     basep) != 0)
+	{
+	  if (INTUSE(dwarf_errno) () == 0)
+	    {
+	    invalid:
+	      __libdw_seterrno (DWARF_E_INVALID_DWARF);
+	    }
+	  return -1;
+	}
     }
   else if (offset < 0 || (size_t) offset >= d->d_size)
     {
@@ -79,10 +97,7 @@ dwarf_ranges (Dwarf_Die *die, ptrdiff_t offset, Dwarf_Addr *basep,
  next:
   if ((unsigned char *) d->d_buf + d->d_size - readp
       < die->cu->address_size * 2)
-    {
-      __libdw_seterrno (DWARF_E_INVALID_DWARF);
-      return -1;
-    }
+    goto invalid;
 
   Dwarf_Addr begin;
   Dwarf_Addr end;

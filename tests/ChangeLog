@@ -1,3 +1,9 @@
+2005-12-10  Ulrich Drepper  <drepper@redhat.com
+
+	* run-readelf-test1.sh: New file.
+	* Makefile.am (TESTS): Add run-readelf-test1.sh.
+	(EXTRA_DIST): Likewise.
+
 2005-12-07  Roland McGrath  <roland@redhat.com>
 
 	* ecp.c (main): Use elf_end to clean up.

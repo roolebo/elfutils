@@ -58,7 +58,8 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-elflint-test.sh run-elflint-self.sh run-ranlib-test.sh \
 	run-ranlib-test2.sh run-ranlib-test3.sh run-ranlib-test4.sh \
 	run-addrscopes.sh run-strings-test.sh run-funcscopes.sh \
-	run-find-prologues.sh run-allregs.sh run-readelf-test1.sh
+	run-find-prologues.sh run-allregs.sh run-readelf-test1.sh \
+	run-native-test.sh
 # run-show-ciefde.sh
 
 if !STANDALONE
@@ -86,7 +87,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-elflint-self.sh run-ranlib-test.sh run-ranlib-test2.sh \
 	     run-ranlib-test3.sh run-ranlib-test4.sh \
 	     run-addrscopes.sh run-strings-test.sh run-funcscopes.sh \
-	     run-find-prologues.sh run-allregs.sh \
+	     run-find-prologues.sh run-allregs.sh run-native-test.sh \
 	     testfile15.bz2 testfile15.debug.bz2 \
 	     testfile16.bz2 testfile16.debug.bz2 \
 	     testfile17.bz2 testfile17.debug.bz2 \

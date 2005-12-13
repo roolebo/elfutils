@@ -107,7 +107,7 @@ match_register (void *arg,
   if (regno == *(int *) arg)
     printf ("%5d => %s register %s%s\n", regno, setname, prefix, regname);
 
-  return DWARF_CB_OK;
+  return DWARF_CB_ABORT;
 }
 
 
@@ -131,9 +131,9 @@ main (int argc, char **argv)
     {
       struct state state = { NULL, 0 };
       int result = dwfl_module_register_names (mod, &one_register, &state);
-      if (result != 0)
+      if (result != 0 || state.nregs == 0)
 	error (EXIT_FAILURE, 0, "dwfl_module_register_names: %s",
-	       dwfl_errmsg (-1));
+	       result ? dwfl_errmsg (-1) : "no backend registers known");
 
       qsort (state.info, state.nregs, sizeof state.info[0], &compare);
 
@@ -156,9 +156,9 @@ main (int argc, char **argv)
 	const char *arg = argv[remaining++];
 	int regno = atoi (arg);
 	int result = dwfl_module_register_names (mod, &match_register, &regno);
-	if (result != 0)
+	if (result != DWARF_CB_ABORT)
 	  error (EXIT_FAILURE, 0, "dwfl_module_register_names: %s",
-		 dwfl_errmsg (-1));
+		 result ? dwfl_errmsg (-1) : "no backend registers known");
       }
     while (remaining < argc);
 

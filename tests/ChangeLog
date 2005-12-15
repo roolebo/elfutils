@@ -1,3 +1,7 @@
+2005-12-14  Roland McGrath  <roland@redhat.com>
+
+	* run-native-test.sh: Redirect output from native test process.
+
 2005-12-13  Roland McGrath  <roland@redhat.com>
 
 	* allregs.c (main): Fail if we find no registers.

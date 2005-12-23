@@ -1,3 +1,8 @@
+2005-12-22  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_nextcu.c (dwfl_nextcu): Don't fail when dwfl_module_getdwarf
+	failed with DWFL_E_NO_DWARF.
+
 2005-11-26  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_end.c (dwfl_end): Free the DWFL itself.

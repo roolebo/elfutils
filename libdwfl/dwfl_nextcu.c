@@ -51,13 +51,13 @@ dwfl_nextcu (Dwfl *dwfl, Dwarf_Die *lastcu, Dwarf_Addr *bias)
 	  if (mod == NULL)
 	    return NULL;
 
-	  error = mod->dwerr;
-	  if (error == DWFL_E_NOERROR
+	  if (mod->dwerr == DWFL_E_NOERROR
 	      && (mod->dw != NULL
 		  || INTUSE(dwfl_module_getdwarf) (mod, bias) != NULL))
 	    break;
 	}
-      while (error == DWFL_E_NO_DWARF);
+      while (mod->dwerr == DWFL_E_NO_DWARF);
+      error = mod->dwerr;
     }
   while (error == DWFL_E_NOERROR);
 

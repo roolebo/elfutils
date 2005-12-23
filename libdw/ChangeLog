@@ -1,3 +1,7 @@
+2005-12-22  Roland McGrath  <roland@redhat.com>
+
+	* libdw.map: Bump to 0.119; export dwfl_linux_proc_maps_report.
+
 2005-12-12  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_ranges.c: Copy CU base address-finding code from

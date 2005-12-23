@@ -1,5 +1,5 @@
 ELFUTILS_0 { };
-ELFUTILS_0.118 {
+ELFUTILS_0.119 {
   global:
     dwarf_abbrevhaschildren;
     dwarf_addrdie;
@@ -113,6 +113,7 @@ ELFUTILS_0.118 {
     dwfl_linux_kernel_report_offline;
     dwfl_linux_proc_find_elf;
     dwfl_linux_proc_report;
+    dwfl_linux_proc_maps_report;
     dwfl_module_addrdie;
     dwfl_module_addrname;
     dwfl_module_getdwarf;

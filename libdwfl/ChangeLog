@@ -1,5 +1,14 @@
 2005-12-22  Roland McGrath  <roland@redhat.com>
 
+	* argp-std.c (parse_opt): Call dwfl_end in failure cases.
+
+	* linux-proc-maps.c (proc_maps_report): New function, broken out of ...
+	(dwfl_linux_proc_report): ... here.  Call it.
+	(dwfl_linux_proc_maps_report): New function.
+	* libdwfl.h: Declare it.
+	* libdwflP.h: Add INTDECL.
+	* argp-std.c (options, parse_opt): Grok -M/--linux-process-map.
+
 	* dwfl_nextcu.c (dwfl_nextcu): Don't fail when dwfl_module_getdwarf
 	failed with DWFL_E_NO_DWARF.
 

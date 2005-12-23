@@ -15,6 +15,7 @@
 #define _LIBDWFL_H	1
 
 #include "libdw.h"
+#include <stdio.h>
 
 /* Handle for a session using the library.  */
 typedef struct Dwfl Dwfl;
@@ -212,6 +213,10 @@ extern int dwfl_linux_kernel_report_offline (Dwfl *dwfl, const char *release,
    Returns zero on success, -1 if dwfl_report_module failed,
    or an errno code if opening the kernel binary failed.  */
 extern int dwfl_linux_proc_report (Dwfl *dwfl, pid_t pid);
+
+/* Similar, but reads an input stream in the format of Linux /proc/PID/maps
+   files giving module layout, not the file for a live process.  */
+extern int dwfl_linux_proc_maps_report (Dwfl *dwfl, FILE *);
 
 /* Trivial find_elf callback for use with dwfl_linux_proc_report.
    This uses the module name as a file name directly and tries to open it

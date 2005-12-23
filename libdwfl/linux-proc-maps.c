@@ -91,30 +91,9 @@ find_sysinfo_ehdr (pid_t pid, GElf_Addr *sysinfo_ehdr)
   return nread < 0 ? errno : 0;
 }
 
-int
-dwfl_linux_proc_report (Dwfl *dwfl, pid_t pid)
+static int
+proc_maps_report (Dwfl *dwfl, FILE *f, GElf_Addr sysinfo_ehdr, pid_t pid)
 {
-  if (dwfl == NULL)
-    return -1;
-
-  /* We'll notice the AT_SYSINFO_EHDR address specially when we hit it.  */
-  GElf_Addr sysinfo_ehdr = 0;
-  int result = find_sysinfo_ehdr (pid, &sysinfo_ehdr);
-  if (result != 0)
-    return result;
-
-  char *fname = NULL;
-  asprintf (&fname, PROCMAPSFMT, pid);
-  if (fname == NULL)
-    return ENOMEM;
-
-  FILE *f = fopen (fname, "r");
-  free (fname);
-  if (f == NULL)
-    return errno;
-
-  (void) __fsetlocking (f, FSETLOCKING_BYCALLER);
-
   unsigned int last_dmajor = -1, last_dminor = -1;
   uint64_t last_ino = -1;
   char *last_file = NULL;
@@ -201,16 +180,52 @@ dwfl_linux_proc_report (Dwfl *dwfl, pid_t pid)
     }
   free (line);
 
-  result = ferror_unlocked (f) ? errno : feof_unlocked (f) ? 0 : ENOEXEC;
-  fclose (f);
+  int result = ferror_unlocked (f) ? errno : feof_unlocked (f) ? 0 : ENOEXEC;
 
   /* Report the final one.  */
   bool lose = report ();
 
   return result != 0 ? result : lose ? -1 : 0;
 }
-INTDEF (dwfl_linux_proc_report)
 
+int
+dwfl_linux_proc_maps_report (Dwfl *dwfl, FILE *f)
+{
+  return proc_maps_report (dwfl, f, 0, 0);
+}
+INTDEF (dwfl_linux_proc_maps_report)
+
+int
+dwfl_linux_proc_report (Dwfl *dwfl, pid_t pid)
+{
+  if (dwfl == NULL)
+    return -1;
+
+  /* We'll notice the AT_SYSINFO_EHDR address specially when we hit it.  */
+  GElf_Addr sysinfo_ehdr = 0;
+  int result = find_sysinfo_ehdr (pid, &sysinfo_ehdr);
+  if (result != 0)
+    return result;
+
+  char *fname = NULL;
+  asprintf (&fname, PROCMAPSFMT, pid);
+  if (fname == NULL)
+    return ENOMEM;
+
+  FILE *f = fopen (fname, "r");
+  free (fname);
+  if (f == NULL)
+    return errno;
+
+  (void) __fsetlocking (f, FSETLOCKING_BYCALLER);
+
+  result = proc_maps_report (dwfl, f, sysinfo_ehdr, pid);
+
+  fclose (f);
+
+  return result;
+}
+INTDEF (dwfl_linux_proc_report)
 
 static ssize_t
 read_proc_memory (void *arg, void *data, GElf_Addr address,

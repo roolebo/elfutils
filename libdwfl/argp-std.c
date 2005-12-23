@@ -29,6 +29,9 @@ static const struct argp_option options[] =
   { "executable", 'e', "FILE", 0, N_("Find addresses in FILE"), 0 },
   { "pid", 'p', "PID", 0,
     N_("Find addresses in files mapped into process PID"), 0 },
+  { "linux-process-map", 'M', "FILE", 0,
+    N_("Find addresses in files mapped as read from FILE"
+       " in Linux /proc/PID/maps format"), 0 },
   { "kernel", 'k', NULL, 0, N_("Find addresses in the running kernel"), 0 },
   { "offline-kernel", 'K', "RELEASE", OPTION_ARG_OPTIONAL,
     N_("Kernel with all modules"), 0 },
@@ -67,17 +70,19 @@ static const Dwfl_Callbacks kernel_callbacks =
 static error_t
 parse_opt (int key, char *arg, struct argp_state *state)
 {
-  inline void failure (int errnum, const char *msg)
+  inline void failure (Dwfl *dwfl, int errnum, const char *msg)
     {
       if (errnum == -1)
 	argp_failure (state, EXIT_FAILURE, 0, "%s: %s",
 		      msg, INTUSE(dwfl_errmsg) (-1));
       else
 	argp_failure (state, EXIT_FAILURE, errnum, "%s", msg);
+      if (dwfl != NULL)
+	dwfl_end (dwfl);
     }
-  inline error_t fail (int errnum, const char *msg)
+  inline error_t fail (Dwfl *dwfl, int errnum, const char *msg)
     {
-      failure (errnum, msg);
+      failure (dwfl, errnum, msg);
       return errnum == -1 ? EIO : errnum;
     }
 
@@ -94,13 +99,13 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	  {
 	    dwfl = INTUSE(dwfl_begin) (&offline_callbacks);
 	    if (dwfl == NULL)
-	      return fail (-1, arg);
+	      return fail (dwfl, -1, arg);
 	    state->hook = dwfl;
 	  }
 	if (dwfl->callbacks == &offline_callbacks)
 	  {
 	    if (INTUSE(dwfl_report_offline) (dwfl, "", arg, -1) == NULL)
-	      return fail (-1, arg);
+	      return fail (dwfl, -1, arg);
 	    state->hook = dwfl;
 	  }
 	else
@@ -119,7 +124,29 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	  Dwfl *dwfl = INTUSE(dwfl_begin) (&proc_callbacks);
 	  int result = INTUSE(dwfl_linux_proc_report) (dwfl, atoi (arg));
 	  if (result != 0)
-	    return fail (result, arg);
+	    return fail (dwfl, result, arg);
+	  state->hook = dwfl;
+	}
+      else
+	goto toomany;
+      break;
+
+    case 'M':
+      if (state->hook == NULL)
+	{
+	  FILE *f = fopen (arg, "r");
+	  if (f == NULL)
+	    {
+	      int code = errno;
+	      argp_failure (state, EXIT_FAILURE, code,
+			    "cannot open '%s'", arg);
+	      return code;
+	    }
+	  Dwfl *dwfl = INTUSE(dwfl_begin) (&proc_callbacks);
+	  int result = INTUSE(dwfl_linux_proc_maps_report) (dwfl, f);
+	  fclose (f);
+	  if (result != 0)
+	    return fail (dwfl, result, arg);
 	  state->hook = dwfl;
 	}
       else
@@ -132,11 +159,11 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	  Dwfl *dwfl = INTUSE(dwfl_begin) (&kernel_callbacks);
 	  int result = INTUSE(dwfl_linux_kernel_report_kernel) (dwfl);
 	  if (result != 0)
-	    return fail (result, _("cannot load kernel symbols"));
+	    return fail (dwfl, result, _("cannot load kernel symbols"));
 	  result = INTUSE(dwfl_linux_kernel_report_modules) (dwfl);
 	  if (result != 0)
 	    /* Non-fatal to have no modules since we do have the kernel.  */
-	    failure (result, _("cannot find kernel modules"));
+	    failure (dwfl, result, _("cannot find kernel modules"));
 	  state->hook = dwfl;
 	}
       else
@@ -150,7 +177,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	  int result = INTUSE(dwfl_linux_kernel_report_offline) (dwfl, arg,
 								 NULL);
 	  if (result != 0)
-	    return fail (result, _("cannot find kernel or modules"));
+	    return fail (dwfl, result, _("cannot find kernel or modules"));
 	  state->hook = dwfl;
 	}
       else
@@ -167,7 +194,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	    arg = "a.out";
 	    dwfl = INTUSE(dwfl_begin) (&offline_callbacks);
 	    if (INTUSE(dwfl_report_offline) (dwfl, "", arg, -1) == NULL)
-	      return fail (-1, arg);
+	      return fail (dwfl, -1, arg);
 	    state->hook = dwfl;
 	  }
 

@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+## Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
 ##
 ## This program is Open Source software; you can redistribute it and/or
 ## modify it under the terms of the Open Software License version 1.0 as
@@ -96,7 +96,7 @@ ppc64_SRCS = ppc64_init.c ppc64_symbol.c ppc64_retval.c ppc_regs.c
 libebl_ppc64_pic_a_SOURCES = $(ppc64_SRCS)
 am_libebl_ppc64_pic_a_OBJECTS = $(ppc64_SRCS:.c=.os)
 
-s390_SRCS = s390_init.c s390_symbol.c
+s390_SRCS = s390_init.c s390_symbol.c s390_regs.c
 libebl_s390_pic_a_SOURCES = $(s390_SRCS)
 am_libebl_s390_pic_a_OBJECTS = $(s390_SRCS:.c=.os)
 

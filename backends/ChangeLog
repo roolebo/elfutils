@@ -1,5 +1,9 @@
 2006-01-11  Roland McGrath  <roland@redhat.com>
 
+	* s390_regs.c: New file.
+	* Makefile.am (s390_SRCS): Add it.
+	* s390_init.c (s390_init): Install register_name hook.
+
 	* s390_reloc.def: Update bits per
 	Martin Schwidefsky <schwidefsky@de.ibm.com>.
 

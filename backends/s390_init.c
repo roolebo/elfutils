@@ -1,5 +1,5 @@
 /* Initialization of S/390 specific backend library.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2006 Red Hat, Inc.
 
    This program is Open Source software; you can redistribute it and/or
    modify it under the terms of the Open Software License version 1.0 as
@@ -38,6 +38,7 @@ s390_init (elf, machine, eh, ehlen)
   eh->name = "IBM S/390";
   s390_init_reloc (eh);
   HOOK (eh, reloc_simple_type);
+  HOOK (eh, register_name);
 
   return MODVERSION;
 }

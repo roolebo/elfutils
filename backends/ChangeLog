@@ -1,3 +1,8 @@
+2006-01-11  Roland McGrath  <roland@redhat.com>
+
+	* s390_reloc.def: Update bits per
+	Martin Schwidefsky <schwidefsky@de.ibm.com>.
+
 2005-12-10  Ulrich Drepper
 
 	* common-reloc.c (R_NAME): Generate string correctly.

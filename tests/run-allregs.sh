@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2005 Red Hat, Inc.
+# Copyright (C) 2005, 2006 Red Hat, Inc.
 #
 # This program is Open Source software; you can redistribute it and/or
 # modify it under the terms of the Open Software License version 1.0 as
@@ -21,7 +21,7 @@ regs_test()
   test_cleanup
 }
 
-regs_test testfile11 <<EOF
+regs_test testfile11 <<\EOF
 integer registers:
 	  0: %eax (eax)
 	  1: %ecx (ecx)
@@ -74,7 +74,7 @@ x87 registers:
 	 18: %st7 (st7)
 EOF
 
-regs_test testfile12 <<EOF
+regs_test testfile12 <<\EOF
 integer registers:
 	  0: %rax (rax)
 	  1: %rdx (rdx)
@@ -130,7 +130,7 @@ x87 registers:
 	 40: %st7 (st7)
 EOF
 
-regs_test testfile2 testfile23 <<EOF
+regs_test testfile2 testfile23 <<\EOF
 integer registers:
 	  0: r0 (r0)
 	  1: r1 (r1)
@@ -1150,6 +1150,79 @@ vector registers:
 	1153: vr29 (vr29)
 	1154: vr30 (vr30)
 	1155: vr31 (vr31)
+EOF
+
+regs_test testfile26 testfile27 <<\EOF
+integer registers:
+	  0: %r0 (r0)
+	  1: %r1 (r1)
+	  2: %r2 (r2)
+	  3: %r3 (r3)
+	  4: %r4 (r4)
+	  5: %r5 (r5)
+	  6: %r6 (r6)
+	  7: %r7 (r7)
+	  8: %r8 (r8)
+	  9: %r9 (r9)
+	 10: %r10 (r10)
+	 11: %r11 (r11)
+	 12: %r12 (r12)
+	 13: %r13 (r13)
+	 14: %r14 (r14)
+	 15: %r15 (r15)
+FPU registers:
+	 16: %f0 (f0)
+	 17: %f2 (f2)
+	 18: %f4 (f4)
+	 19: %f6 (f6)
+	 20: %f1 (f1)
+	 21: %f3 (f3)
+	 22: %f5 (f5)
+	 23: %f7 (f7)
+	 24: %f8 (f8)
+	 25: %f10 (f10)
+	 26: %f12 (f12)
+	 27: %f14 (f14)
+	 28: %f9 (f9)
+	 29: %f11 (f11)
+	 30: %f13 (f13)
+	 31: %f15 (f15)
+access registers:
+	 48: %a0 (a0)
+	 49: %a1 (a1)
+	 50: %a2 (a2)
+	 51: %a3 (a3)
+	 52: %a4 (a4)
+	 53: %a5 (a5)
+	 54: %a6 (a6)
+	 55: %a7 (a7)
+	 56: %a8 (a8)
+	 57: %a9 (a9)
+	 58: %a10 (a10)
+	 59: %a11 (a11)
+	 60: %a12 (a12)
+	 61: %a13 (a13)
+	 62: %a14 (a14)
+	 63: %a15 (a15)
+control registers:
+	 32: %c0 (c0)
+	 33: %c1 (c1)
+	 34: %c2 (c2)
+	 35: %c3 (c3)
+	 36: %c4 (c4)
+	 37: %c5 (c5)
+	 38: %c6 (c6)
+	 39: %c7 (c7)
+	 40: %c8 (c8)
+	 41: %c9 (c9)
+	 42: %c10 (c10)
+	 43: %c11 (c11)
+	 44: %c12 (c12)
+	 45: %c13 (c13)
+	 46: %c14 (c14)
+	 47: %c15 (c15)
+	 64: %pswm (pswm)
+	 65: %pswa (pswa)
 EOF
 
 exit 0

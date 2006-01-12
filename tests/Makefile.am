@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 1996-2002, 2003, 2004, 2005 Red Hat, Inc.
+## Copyright (C) 1996-2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
 ##
 ## This program is Open Source software; you can redistribute it and/or
 ## modify it under the terms of the Open Software License version 1.0 as
@@ -95,6 +95,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile20.bz2 testfile20.index.bz2 \
 	     testfile21.bz2 testfile21.index.bz2 \
 	     testfile22.bz2 testfile23.bz2 testfile24.bz2 testfile25.bz2 \
+	     testfile26.bz2 testfile27.bz2 \
 	     coverage.sh test-subr.sh test-wrapper.sh run-readelf-test1.sh
 
 installed_TESTS_ENVIRONMENT = libdir=$(DESTDIR)$(libdir) \

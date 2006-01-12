@@ -1,3 +1,10 @@
+2006-01-11  Roland McGrath  <roland@redhat.com>
+
+	* testfile26.bz2: New data file.
+	* testfile27.bz2: New data file.
+	* Makefile.am (EXTRA_DIST): Add them.
+	* run-allregs.sh: Test s390 data.
+
 2005-12-14  Roland McGrath  <roland@redhat.com>
 
 	* run-native-test.sh: Redirect output from native test process.

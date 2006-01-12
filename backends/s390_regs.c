@@ -55,9 +55,9 @@ s390_register_name (Ebl *ebl __attribute__ ((unused)),
   else if (regno < 32)
     *setname = "FPU";
   else if (regno < 48 || regno > 63)
-    *setname = "control";	/* XXX ? */
+    *setname = "control";
   else
-    *setname = "address";	/* XXX ? */
+    *setname = "access";
 
   switch (regno)
     {

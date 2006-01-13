@@ -1,3 +1,9 @@
+2006-01-12  Roland McGrath  <roland@redhat.com>
+
+	* s390_retval.c: New file.
+	* Makefile.am (s390_SRCS): Add it.
+	* s390_init.c (s390_init): Install return_value_location hook.
+
 2006-01-11  Roland McGrath  <roland@redhat.com>
 
 	* s390_regs.c: New file.

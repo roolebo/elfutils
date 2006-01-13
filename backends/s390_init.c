@@ -39,6 +39,7 @@ s390_init (elf, machine, eh, ehlen)
   s390_init_reloc (eh);
   HOOK (eh, reloc_simple_type);
   HOOK (eh, register_name);
+  HOOK (eh, return_value_location);
 
   return MODVERSION;
 }

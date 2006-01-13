@@ -185,6 +185,11 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.so
 
 %changelog
+* Thu Jan 12 2006 Roland McGrath <roland@redhat.com> 0.118-1
+- elflint: more tests.
+- libdwfl: New function dwfl_module_register_names.
+- libebl: New backend hook for register names.
+
 * Tue Dec  6 2005 Ulrich Drepper <drepper@redhat.com> 0.118-1
 - elflint: more tests.
 - libdwfl: New function dwfl_module_register_names.

@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2005 Red Hat, Inc.
+# Copyright (C) 2005, 2006 Red Hat, Inc.
 #
 # This program is Open Source software; you can redistribute it and/or
 # modify it under the terms of the Open Software License version 1.0 as
@@ -25,11 +25,21 @@ tempfiles native.c native
 echo 'main () { while (1) pause (); }' > native.c
 
 native=0
+kill_native()
+{
+  test $native -eq 0 || {
+    kill -9 $native 2> /dev/null || :
+    wait $native 2> /dev/null || :
+  }
+  native=0
+}
+
 native_cleanup()
 {
-  test $native -eq 0 || kill -9 $native || :
-  rm -f $remove_files
+  kill_native
+  test_cleanup
 }
+
 trap native_cleanup 0 1 2 15
 
 for cc in "$HOSTCC" "$HOST_CC" cc gcc "$CC"; do
@@ -56,3 +66,10 @@ native_test()
 
 native_test ./allregs
 native_test ./funcretval
+
+# We do this explicitly rather than letting the trap 0 cover it,
+# because as of version 3.1 bash prints the "Killed" report for
+# $native when we do the kill inside the exit handler.
+native_cleanup
+
+exit 0

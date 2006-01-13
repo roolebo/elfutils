@@ -1,3 +1,8 @@
+2006-01-13  Roland McGrath  <roland@redhat.com>
+
+	* run-native-test.sh: Do kill -9 and reap explicitly at end, since
+	bash 3.1 whines when it's done in the trap 0 handler.
+
 2006-01-11  Roland McGrath  <roland@redhat.com>
 
 	* testfile26.bz2: New data file.

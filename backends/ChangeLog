@@ -1,3 +1,12 @@
+2006-02-22  Roland McGrath  <roland@redhat.com>
+
+	* ppc64_retval.c (SVR4_STRUCT_RETURN): New macro.
+	(ppc64_return_value_location): Use registers for aggregate conditional
+	on that.
+	* ppc_retval.c (SVR4_STRUCT_RETURN): New macro.
+	(ppc_return_value_location): Use registers for aggregate conditional
+	on that.
+
 2006-01-12  Roland McGrath  <roland@redhat.com>
 
 	* s390_retval.c: New file.

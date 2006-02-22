@@ -1,5 +1,5 @@
 /* Function return value location for Linux/PPC ABI.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2006 Red Hat, Inc.
 
    This program is Open Source software; you can redistribute it and/or
    modify it under the terms of the Open Software License version 1.0 as
@@ -20,6 +20,10 @@
 
 #define BACKEND ppc_
 #include "libebl_CPU.h"
+
+
+/* This is the SVR4 ELF ABI convention, but AIX and Linux do not use it.  */
+#define SVR4_STRUCT_RETURN 0
 
 
 /* r3, or pair r3, r4.  */
@@ -46,6 +50,7 @@ static const Dwarf_Op loc_aggregate[] =
     { .atom = DW_OP_breg3, .number = 0 }
   };
 #define nloc_aggregate 1
+
 
 int
 ppc_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
@@ -127,7 +132,8 @@ ppc_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
     case DW_TAG_class_type:
     case DW_TAG_union_type:
     case DW_TAG_array_type:
-      if (dwarf_formudata (dwarf_attr (typedie, DW_AT_byte_size,
+      if (SVR4_STRUCT_RETURN
+	  && dwarf_formudata (dwarf_attr (typedie, DW_AT_byte_size,
 				       &attr_mem), &size) == 0
 	  && size > 0 && size <= 8)
 	goto intreg;

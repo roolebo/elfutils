@@ -1,5 +1,5 @@
 /* Function return value location for Linux/PPC64 ABI.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2006 Red Hat, Inc.
 
    This program is Open Source software; you can redistribute it and/or
    modify it under the terms of the Open Software License version 1.0 as
@@ -20,6 +20,10 @@
 
 #define BACKEND ppc64_
 #include "libebl_CPU.h"
+
+
+/* This is the SVR4 ELF ABI convention, but AIX and Linux do not use it.  */
+#define SVR4_STRUCT_RETURN 0
 
 
 /* r3.  */
@@ -121,7 +125,7 @@ ppc64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
 		return nloc_fp4regs;
 	    }
 	}
-      if (size <= 8)
+      if (size <= 8 && SVR4_STRUCT_RETURN)
 	{
 	intreg:
 	  *locp = loc_intreg;

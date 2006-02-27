@@ -1,5 +1,5 @@
 ELFUTILS_0 { };
-ELFUTILS_0.119 {
+ELFUTILS_0.120 {
   global:
     dwarf_abbrevhaschildren;
     dwarf_addrdie;
@@ -137,6 +137,7 @@ ELFUTILS_0.119 {
     dwfl_report_offline;
     dwfl_standard_argp;
     dwfl_standard_find_debuginfo;
+    dwfl_version;
 
   local:
     *;

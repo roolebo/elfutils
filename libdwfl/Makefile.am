@@ -2,7 +2,7 @@
 ##
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2005 Red Hat, Inc.
+## Copyright (C) 2005, 2006 Red Hat, Inc.
 ##
 ## This program is Open Source software; you can redistribute it and/or
 ## modify it under the terms of the Open Software License version 1.0 as
@@ -36,7 +36,7 @@ endif
 euincludedir = ${includedir}/elfutils
 euinclude_HEADERS = libdwfl.h
 
-libdwfl_a_SOURCES = dwfl_begin.c dwfl_end.c dwfl_error.c \
+libdwfl_a_SOURCES = dwfl_begin.c dwfl_end.c dwfl_error.c dwfl_version.c \
 		    dwfl_module.c dwfl_report_elf.c relocate.c \
 		    derelocate.c offline.c \
 		    dwfl_module_info.c  dwfl_getmodules.c \

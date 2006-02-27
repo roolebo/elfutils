@@ -1,5 +1,5 @@
 /* Interfaces for libdwfl.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2006 Red Hat, Inc.
 
    This program is Open Source software; you can redistribute it and/or
    modify it under the terms of the Open Software License version 1.0 as
@@ -58,6 +58,9 @@ extern Dwfl *dwfl_begin (const Dwfl_Callbacks *callbacks);
 
 /* End a session.  */
 extern void dwfl_end (Dwfl *);
+
+/* Return implementation's version string suitable for printing.  */
+extern const char *dwfl_version (Dwfl *);
 
 /* Return error code of last failing function call.  This value is kept
    separately for each thread.  */

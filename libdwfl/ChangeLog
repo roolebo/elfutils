@@ -1,5 +1,9 @@
 2006-02-26  Roland McGrath  <roland@redhat.com>
 
+	* dwfl_version.c: New file.
+	* Makefile.am (libdwfl_a_SOURCES): Add it.
+	* libdwfl.h: Declare dwfl_version.
+
 	* offline.c (dwfl_report_offline): Account for dwfl_report_elf having
 	aligned up from DWFL->offline_next_address when checking for overlap.
 

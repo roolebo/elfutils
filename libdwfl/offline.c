@@ -1,5 +1,5 @@
 /* Recover relocatibility for addresses computed from debug information.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2006 Red Hat, Inc.
 
    This program is Open Source software; you can redistribute it and/or
    modify it under the terms of the Open Software License version 1.0 as
@@ -60,8 +60,11 @@ dwfl_report_offline (Dwfl *dwfl, const char *name,
       /* If this is an ET_EXEC file with fixed addresses, the address range
 	 it consumed may or may not intersect with the arbitrary range we
 	 will use for relocatable modules.  Make sure we always use a free
-	 range for the offline allocations.  */
-      if (dwfl->offline_next_address >= mod->low_addr
+	 range for the offline allocations.  If this module did use
+	 offline_next_address, it may have rounded it up for the module's
+	 alignment requirements.  */
+      if ((dwfl->offline_next_address >= mod->low_addr
+	   || mod->low_addr - dwfl->offline_next_address < OFFLINE_REDZONE)
 	  && dwfl->offline_next_address < mod->high_addr + OFFLINE_REDZONE)
 	dwfl->offline_next_address = mod->high_addr + OFFLINE_REDZONE;
 

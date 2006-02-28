@@ -1,5 +1,5 @@
 /* This file defines standard DWARF types, structures, and macros.
-   Copyright (C) 2000, 2002, 2005 Red Hat, Inc.
+   Copyright (C) 2000, 2002, 2005, 2006 Red Hat, Inc.
 
    This program is Open Source software; you can redistribute it and/or
    modify it under the terms of the Open Software License version 1.0 as
@@ -57,8 +57,8 @@ enum
     DW_TAG_namelist_item = 0x2c,
     DW_TAG_packed_type = 0x2d,
     DW_TAG_subprogram = 0x2e,
-    DW_TAG_template_type_param = 0x2f,
-    DW_TAG_template_value_param = 0x30,
+    DW_TAG_template_type_parameter = 0x2f,
+    DW_TAG_template_value_parameter = 0x30,
     DW_TAG_thrown_type = 0x31,
     DW_TAG_try_block = 0x32,
     DW_TAG_variant_part = 0x33,
@@ -73,6 +73,8 @@ enum
     DW_TAG_partial_unit = 0x3c,
     DW_TAG_imported_unit = 0x3d,
     DW_TAG_mutable_type = 0x3e,
+    DW_TAG_condition = 0x3f,
+    DW_TAG_shared_type = 0x40,
     DW_TAG_lo_user = 0x4080,
     DW_TAG_MIPS_loop = 0x4081,
     DW_TAG_format_label = 0x4101,
@@ -124,7 +126,7 @@ enum
     DW_AT_prototyped = 0x27,
     DW_AT_return_addr = 0x2a,
     DW_AT_start_scope = 0x2c,
-    DW_AT_stride_size = 0x2e,
+    DW_AT_bit_stride = 0x2e,
     DW_AT_upper_bound = 0x2f,
     DW_AT_abstract_origin = 0x31,
     DW_AT_accessibility = 0x32,
@@ -145,7 +147,7 @@ enum
     DW_AT_friend = 0x41,
     DW_AT_identifier_case = 0x42,
     DW_AT_macro_info = 0x43,
-    DW_AT_namelist_items = 0x44,
+    DW_AT_namelist_item = 0x44,
     DW_AT_priority = 0x45,
     DW_AT_segment = 0x46,
     DW_AT_specification = 0x47,
@@ -158,7 +160,7 @@ enum
     DW_AT_allocated = 0x4e,
     DW_AT_associated = 0x4f,
     DW_AT_data_location = 0x50,
-    DW_AT_stride = 0x51,
+    DW_AT_byte_stride = 0x51,
     DW_AT_entry_pc = 0x52,
     DW_AT_use_UTF8 = 0x53,
     DW_AT_extension = 0x54,
@@ -168,6 +170,21 @@ enum
     DW_AT_call_file = 0x58,
     DW_AT_call_line = 0x59,
     DW_AT_description = 0x5a,
+    DW_AT_binary_scale = 0x5b,
+    DW_AT_decimal_scale = 0x5c,
+    DW_AT_small = 0x5d,
+    DW_AT_decimal_sign = 0x5e,
+    DW_AT_digit_count = 0x5f,
+    DW_AT_picture_string = 0x60,
+    DW_AT_mutable = 0x61,
+    DW_AT_threads_scaled = 0x62,
+    DW_AT_explicit = 0x63,
+    DW_AT_object_pointer = 0x64,
+    DW_AT_endianity = 0x65,
+    DW_AT_elemental = 0x66,
+    DW_AT_pure = 0x67,
+    DW_AT_recursive = 0x68,
+
     DW_AT_lo_user = 0x2000,
     DW_AT_MIPS_fde = 0x2001,
     DW_AT_MIPS_loop_begin = 0x2002,
@@ -375,6 +392,9 @@ enum
     DW_OP_call2 = 0x98,
     DW_OP_call4 = 0x99,
     DW_OP_call_ref = 0x9a,
+    DW_OP_form_tls_address = 0x9b,/* TLS offset to address in current thread */
+    DW_OP_call_frame_cfa = 0x9c,/* CFA as determined by CFI.  */
+    DW_OP_bit_piece = 0x9d,	/* ULEB128 size and ULEB128 offset in bits.  */
 
     DW_OP_lo_user = 0xe0,	/* Implementation-defined range start.  */
     DW_OP_hi_user = 0xff	/* Implementation-defined range end.  */
@@ -394,9 +414,38 @@ enum
     DW_ATE_unsigned = 0x7,
     DW_ATE_unsigned_char = 0x8,
     DW_ATE_imaginary_float = 0x9,
+    DW_ATE_packed_decimal = 0xa,
+    DW_ATE_numeric_string = 0xb,
+    DW_ATE_edited = 0xc,
+    DW_ATE_signed_fixed = 0xd,
+    DW_ATE_unsigned_fixed = 0xe,
+    DW_ATE_decimal_float = 0xf,
 
     DW_ATE_lo_user = 0x80,
     DW_ATE_hi_user = 0xff
+  };
+
+
+/* DWARF decimal sign encodings.  */
+enum
+  {
+    DW_DS_unsigned = 1,
+    DW_DS_leading_overpunch = 2,
+    DW_DS_trailing_overpunch = 3,
+    DW_DS_leading_separate = 4,
+    DW_DS_trailing_separate = 5,
+  };
+
+
+/* DWARF endianity encodings.  */
+enum
+  {
+    DW_END_default = 0,
+    DW_END_big = 1,
+    DW_END_little = 2,
+
+    DW_END_lo_user = 0x40,
+    DW_END_hi_user = 0xff
   };
 
 
@@ -445,6 +494,11 @@ enum
     DW_LANG_Ada95 = 0x000d,
     DW_LANG_Fortran95 = 0x000e,
     DW_LANG_PL1 = 0x000f,
+    DW_LANG_Objc = 0x0010,
+    DW_LANG_ObjC_plus_plus = 0x0011,
+    DW_LANG_UPC = 0x0012,
+    DW_LANG_D = 0x0013,
+
     DW_LANG_lo_user = 0x8000,
     DW_LANG_Mips_Assembler = 0x8001,
     DW_LANG_hi_user = 0xffff
@@ -567,6 +621,10 @@ enum
     DW_CFA_offset_extended_sf = 0x11,
     DW_CFA_def_cfa_sf = 0x12,
     DW_CFA_def_cfa_offset_sf = 0x13,
+    DW_CFA_val_offset = 0x14,
+    DW_CFA_val_offset_sf = 0x15,
+    DW_CFA_val_expression = 0x16,
+
     DW_CFA_low_user = 0x1c,
     DW_CFA_MIPS_advance_loc8 = 0x1d,
     DW_CFA_GNU_window_save = 0x2d,

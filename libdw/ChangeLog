@@ -1,3 +1,9 @@
+2006-02-28  Roland McGrath  <roland@redhat.com>
+
+	* dwarf.h: Add missing DW_ATE_*, DW_TAG_*, DW_LANG_*, DW_CFA_*,
+	DW_OP_* values, to match DWARF 3.0.  Add new DW_DS_*, DW_END_*
+	values from DWARF 3.0.
+
 2006-02-22  Roland McGrath  <roland@redhat.com>
 
 	* libdw.map: Bump to 0.120; export dwfl_version.

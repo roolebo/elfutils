@@ -1,3 +1,8 @@
+2006-03-01  Roland McGrath  <roland@redhat.com>
+
+	* show-die-info.c (tagnames, attrs): Update name tables for dwarf.h
+	changes matching 3.0 spec.
+
 2006-01-13  Roland McGrath  <roland@redhat.com>
 
 	* run-native-test.sh: Do kill -9 and reap explicitly at end, since

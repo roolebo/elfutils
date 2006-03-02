@@ -1,3 +1,9 @@
+2006-03-01  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (dwarf_tag_string, dwarf_attr_string): Update name tables
+	for dwarf.h changes matching 3.0 spec.
+	(dwarf_encoding_string, dwarf_lang_string, print_ops): Likewise.
+
 2005-12-04  Ulrich Drepper  <drepper@redhat.com>
 
 	* elflint.c (check_one_reloc): If relocation section is not loaded,

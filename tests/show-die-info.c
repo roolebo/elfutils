@@ -1,4 +1,4 @@
-/* Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004 Red Hat, Inc.
+/* Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004, 2006 Red Hat, Inc.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
    This program is Open Source software; you can redistribute it and/or
@@ -65,13 +65,24 @@ static const char *tagnames[] =
   [DW_TAG_namelist_item] = "DW_TAG_namelist_item",
   [DW_TAG_packed_type] = "DW_TAG_packed_type",
   [DW_TAG_subprogram] = "DW_TAG_subprogram",
-  [DW_TAG_template_type_param] = "DW_TAG_template_type_param",
-  [DW_TAG_template_value_param] = "DW_TAG_template_value_param",
+  [DW_TAG_template_type_parameter] = "DW_TAG_template_type_parameter",
+  [DW_TAG_template_value_parameter] = "DW_TAG_template_value_parameter",
   [DW_TAG_thrown_type] = "DW_TAG_thrown_type",
   [DW_TAG_try_block] = "DW_TAG_try_block",
   [DW_TAG_variant_part] = "DW_TAG_variant_part",
   [DW_TAG_variable] = "DW_TAG_variable",
-  [DW_TAG_volatile_type] = "DW_TAG_volatile_type"
+  [DW_TAG_volatile_type] = "DW_TAG_volatile_type",
+  [DW_TAG_dwarf_procedure] = "DW_TAG_dwarf_procedure",
+  [DW_TAG_restrict_type] = "DW_TAG_restrict_type",
+  [DW_TAG_interface_type] = "DW_TAG_interface_type",
+  [DW_TAG_namespace] = "DW_TAG_namespace",
+  [DW_TAG_imported_module] = "DW_TAG_imported_module",
+  [DW_TAG_unspecified_type] = "DW_TAG_unspecified_type",
+  [DW_TAG_partial_unit] = "DW_TAG_partial_unit",
+  [DW_TAG_imported_unit] = "DW_TAG_imported_unit",
+  [DW_TAG_mutable_type] = "DW_TAG_mutable_type",
+  [DW_TAG_condition] = "DW_TAG_condition",
+  [DW_TAG_shared_type] = "DW_TAG_shared_type",
 };
 #define ntagnames (sizeof (tagnames) / sizeof (tagnames[0]))
 
@@ -113,7 +124,7 @@ const struct
   { DW_AT_prototyped, "prototyped" },
   { DW_AT_return_addr, "return_addr" },
   { DW_AT_start_scope, "start_scope" },
-  { DW_AT_stride_size, "stride_size" },
+  { DW_AT_bit_stride, "bit_stride" },
   { DW_AT_upper_bound, "upper_bound" },
   { DW_AT_abstract_origin, "abstract_origin" },
   { DW_AT_accessibility, "accessibility" },
@@ -134,7 +145,7 @@ const struct
   { DW_AT_friend, "friend" },
   { DW_AT_identifier_case, "identifier_case" },
   { DW_AT_macro_info, "macro_info" },
-  { DW_AT_namelist_items, "namelist_items" },
+  { DW_AT_namelist_item, "namelist_item" },
   { DW_AT_priority, "priority" },
   { DW_AT_segment, "segment" },
   { DW_AT_specification, "specification" },
@@ -144,6 +155,33 @@ const struct
   { DW_AT_variable_parameter, "variable_parameter" },
   { DW_AT_virtuality, "virtuality" },
   { DW_AT_vtable_elem_location, "vtable_elem_location" },
+  { DW_AT_allocated, "allocated" },
+  { DW_AT_associated, "associated" },
+  { DW_AT_data_location, "data_location" },
+  { DW_AT_byte_stride, "byte_stride" },
+  { DW_AT_entry_pc, "entry_pc" },
+  { DW_AT_use_UTF8, "use_UTF8" },
+  { DW_AT_extension, "extension" },
+  { DW_AT_ranges, "ranges" },
+  { DW_AT_trampoline, "trampoline" },
+  { DW_AT_call_column, "call_column" },
+  { DW_AT_call_file, "call_file" },
+  { DW_AT_call_line, "call_line" },
+  { DW_AT_description, "description" },
+  { DW_AT_binary_scale, "binary_scale" },
+  { DW_AT_decimal_scale, "decimal_scale" },
+  { DW_AT_small, "small" },
+  { DW_AT_decimal_sign, "decimal_sign" },
+  { DW_AT_digit_count, "digit_count" },
+  { DW_AT_picture_string, "picture_string" },
+  { DW_AT_mutable, "mutable" },
+  { DW_AT_threads_scaled, "threads_scaled" },
+  { DW_AT_explicit, "explicit" },
+  { DW_AT_object_pointer, "object_pointer" },
+  { DW_AT_endianity, "endianity" },
+  { DW_AT_elemental, "elemental" },
+  { DW_AT_pure, "pure" },
+  { DW_AT_recursive, "recursive" },
   { DW_AT_MIPS_fde, "MIPS_fde" },
   { DW_AT_MIPS_loop_begin, "MIPS_loop_begin" },
   { DW_AT_MIPS_tail_loop_begin, "MIPS_tail_loop_begin" },
@@ -166,7 +204,7 @@ const struct
   { DW_AT_mac_info, "mac_info" },
   { DW_AT_src_coords, "src_coords" },
   { DW_AT_body_begin, "body_begin" },
-  { DW_AT_body_end, "body_end" }
+  { DW_AT_body_end, "body_end" },
 };
 #define nattrs (sizeof (attrs) / sizeof (attrs[0]))
 

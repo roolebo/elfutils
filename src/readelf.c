@@ -2533,8 +2533,8 @@ dwarf_tag_string (unsigned int tag)
       [DW_TAG_namelist_item] = "namelist_item",
       [DW_TAG_packed_type] = "packed_type",
       [DW_TAG_subprogram] = "subprogram",
-      [DW_TAG_template_type_param] = "template_type_param",
-      [DW_TAG_template_value_param] = "template_value_param",
+      [DW_TAG_template_type_parameter] = "template_type_parameter",
+      [DW_TAG_template_value_parameter] = "template_value_parameter",
       [DW_TAG_thrown_type] = "thrown_type",
       [DW_TAG_try_block] = "try_block",
       [DW_TAG_variant_part] = "variant_part",
@@ -2548,10 +2548,9 @@ dwarf_tag_string (unsigned int tag)
       [DW_TAG_unspecified_type] = "unspecified_type",
       [DW_TAG_partial_unit] = "partial_unit",
       [DW_TAG_imported_unit] = "imported_unit",
-      [DW_TAG_unspecified_type] = "unspecified_type",
-      [DW_TAG_partial_unit] = "partial_unit",
-      [DW_TAG_imported_unit] = "imported_unit",
       [DW_TAG_mutable_type] = "mutable_type",
+      [DW_TAG_condition] = "condition",
+      [DW_TAG_shared_type] = "shared_type",
     };
   const unsigned int nknown_tags = (sizeof (known_tags)
 				    / sizeof (known_tags[0]));
@@ -2630,7 +2629,7 @@ dwarf_attr_string (unsigned int attrnum)
       [DW_AT_prototyped] = "prototyped",
       [DW_AT_return_addr] = "return_addr",
       [DW_AT_start_scope] = "start_scope",
-      [DW_AT_stride_size] = "stride_size",
+      [DW_AT_bit_stride] = "bit_stride",
       [DW_AT_upper_bound] = "upper_bound",
       [DW_AT_abstract_origin] = "abstract_origin",
       [DW_AT_accessibility] = "accessibility",
@@ -2651,7 +2650,7 @@ dwarf_attr_string (unsigned int attrnum)
       [DW_AT_friend] = "friend",
       [DW_AT_identifier_case] = "identifier_case",
       [DW_AT_macro_info] = "macro_info",
-      [DW_AT_namelist_items] = "namelist_items",
+      [DW_AT_namelist_item] = "namelist_item",
       [DW_AT_priority] = "priority",
       [DW_AT_segment] = "segment",
       [DW_AT_specification] = "specification",
@@ -2664,7 +2663,7 @@ dwarf_attr_string (unsigned int attrnum)
       [DW_AT_allocated] = "allocated",
       [DW_AT_associated] = "associated",
       [DW_AT_data_location] = "data_location",
-      [DW_AT_stride] = "stride",
+      [DW_AT_byte_stride] = "byte_stride",
       [DW_AT_entry_pc] = "entry_pc",
       [DW_AT_use_UTF8] = "use_UTF8",
       [DW_AT_extension] = "extension",
@@ -2673,7 +2672,21 @@ dwarf_attr_string (unsigned int attrnum)
       [DW_AT_call_column] = "call_column",
       [DW_AT_call_file] = "call_file",
       [DW_AT_call_line] = "call_line",
-      [DW_AT_description] = "description"
+      [DW_AT_description] = "description",
+      [DW_AT_binary_scale] = "binary_scale",
+      [DW_AT_decimal_scale] = "decimal_scale",
+      [DW_AT_small] = "small",
+      [DW_AT_decimal_sign] = "decimal_sign",
+      [DW_AT_digit_count] = "digit_count",
+      [DW_AT_picture_string] = "picture_string",
+      [DW_AT_mutable] = "mutable",
+      [DW_AT_threads_scaled] = "threads_scaled",
+      [DW_AT_explicit] = "explicit",
+      [DW_AT_object_pointer] = "object_pointer",
+      [DW_AT_endianity] = "endianity",
+      [DW_AT_elemental] = "elemental",
+      [DW_AT_pure] = "pure",
+      [DW_AT_recursive] = "recursive",
     };
   const unsigned int nknown_attrs = (sizeof (known_attrs)
 				     / sizeof (known_attrs[0]));
@@ -2845,7 +2858,7 @@ dwarf_lang_string (unsigned int lang)
       [DW_LANG_C89] = "ISO C89",
       [DW_LANG_C] = "C",
       [DW_LANG_Ada83] = "Ada83",
-      [DW_LANG_C_plus_plus ] = "C++",
+      [DW_LANG_C_plus_plus] = "C++",
       [DW_LANG_Cobol74] = "Cobol74",
       [DW_LANG_Cobol85] = "Cobol85",
       [DW_LANG_Fortran77] = "Fortran77",
@@ -2856,7 +2869,11 @@ dwarf_lang_string (unsigned int lang)
       [DW_LANG_C99] = "ISO C99",
       [DW_LANG_Ada95] = "Ada95",
       [DW_LANG_Fortran95] = "Fortran95",
-      [DW_LANG_PL1] = "PL1"
+      [DW_LANG_PL1] = "PL1",
+      [DW_LANG_Objc] = "Objective C",
+      [DW_LANG_ObjC_plus_plus] = "Objective C++",
+      [DW_LANG_UPC] = "UPC",
+      [DW_LANG_D] = "D",
     };
 
   if (lang < sizeof (known) / sizeof (known[0]))
@@ -2908,7 +2925,13 @@ dwarf_encoding_string (unsigned int code)
       [DW_ATE_signed_char] = "signed_char",
       [DW_ATE_unsigned] = "unsigned",
       [DW_ATE_unsigned_char] = "unsigned_char",
-      [DW_ATE_imaginary_float] = "imaginary_float"
+      [DW_ATE_imaginary_float] = "imaginary_float",
+      [DW_ATE_packed_decimal] = "packed_decimal",
+      [DW_ATE_numeric_string] = "numeric_string",
+      [DW_ATE_edited] = "edited",
+      [DW_ATE_signed_fixed] = "signed_fixed",
+      [DW_ATE_unsigned_fixed] = "unsigned_fixed",
+      [DW_ATE_decimal_float] = "decimal_float",
     };
 
   if (code < sizeof (known) / sizeof (known[0]))
@@ -3205,6 +3228,9 @@ print_ops (Dwarf *dbg, int indent, int indentrest,
       [DW_OP_call2] = "call2",
       [DW_OP_call4] = "call4",
       [DW_OP_call_ref] = "call_ref",
+      [DW_OP_form_tls_address] = "form_tls_address",
+      [DW_OP_call_frame_cfa] = "call_frame_cfa",
+      [DW_OP_bit_piece] = "bit_piece",
     };
 
   Dwarf_Word offset = 0;
@@ -3234,8 +3260,8 @@ print_ops (Dwarf *dbg, int indent, int indentrest,
 	  offset += 1 + addrsize;
 	  break;
 
-	case DW_OP_deref_size:		/* XXX Correct?  */
-	case DW_OP_xderef_size:		/* XXX Correct?  */
+	case DW_OP_deref_size:
+	case DW_OP_xderef_size:
 	case DW_OP_pick:
 	case DW_OP_const1u:
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu8 "\n",
@@ -3309,7 +3335,7 @@ print_ops (Dwarf *dbg, int indent, int indentrest,
 	  offset += 9;
 	  break;
 
-	case DW_OP_piece:		/* XXX Correct?  */
+	case DW_OP_piece:
 	case DW_OP_regx:
 	case DW_OP_plus_uconst:
 	case DW_OP_constu:;
@@ -3319,6 +3345,18 @@ print_ops (Dwarf *dbg, int indent, int indentrest,
 	  printf ("%*s[%4" PRIuMAX "] %s %u\n",
 		  indent, "", (uintmax_t) offset,
 		  known[op] ?: "???", uleb);
+	  len -= data - start;
+	  offset += 1 + (data - start);
+	  break;
+
+	case DW_OP_bit_piece:
+	  start = data;
+	  unsigned int uleb2;
+	  get_uleb128 (uleb, data);
+	  get_uleb128 (uleb2, data);
+	  printf ("%*s[%4" PRIuMAX "] %s %u, %u\n",
+		  indent, "", (uintmax_t) offset,
+		  known[op] ?: "???", uleb, uleb2);
 	  len -= data - start;
 	  offset += 1 + (data - start);
 	  break;

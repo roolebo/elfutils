@@ -23,15 +23,18 @@ AM_CFLAGS = -Wall -Werror -Wextra -std=gnu99 \
 BUILT_RPATH = \$$ORIGIN/../libasm:\$$ORIGIN/../libdw:\$$ORIGIN/../backends:\$$ORIGIN/../libelf
 endif
 
+AM_LDFLAGS =
+
 if !STANDALONE
 INCLUDES = -I$(top_srcdir)/libasm -I$(top_srcdir)/libdw \
 	   -I$(top_srcdir)/libdwfl \
 	   -I$(top_srcdir)/libebl -I$(top_srcdir)/libelf \
 	   -I$(top_srcdir)/lib -I..
+AM_LDFLAGS += -Wl,-rpath-link,../libasm:../libdw:../libelf
 endif !STANDALONE
 
 if TESTS_RPATH
-AM_LDFLAGS = -Wl,-rpath,$(BUILT_RPATH)
+AM_LDFLAGS += -Wl,-rpath,$(BUILT_RPATH)
 tests_rpath = yes
 else
 tests_rpath = no

@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 1996-2002, 2003, 2004, 2005 Red Hat, Inc.
+## Copyright (C) 1996-2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
 ##
 ## This program is Open Source software; you can redistribute it and/or
 ## modify it under the terms of the Open Software License version 1.0 as
@@ -27,6 +27,8 @@ AM_CFLAGS += -Wall -Wshadow -std=gnu99 $(native_ld_cflags) \
 INCLUDES = -I$(srcdir) -I$(srcdir)/../libelf -I$(srcdir)/../libebl \
 	   -I$(srcdir)/../libdw -I$(srcdir)/../libdwfl \
 	   -I$(srcdir)/../lib -I..
+
+AM_LDFLAGS = -Wl,-rpath-link,../libelf:../libdw
 
 YACC = @YACC@ -d
 AM_YFLAGS = -pld

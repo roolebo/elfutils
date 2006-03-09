@@ -1,3 +1,7 @@
+2006-03-09  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (AM_LDFLAGS): New variable.
+
 2006-03-01  Roland McGrath  <roland@redhat.com>
 
 	* readelf.c (dwarf_tag_string, dwarf_attr_string): Update name tables

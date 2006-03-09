@@ -1,3 +1,7 @@
+2006-03-09  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (AM_LDFLAGS): Define to pass -rpath-link.
+
 2006-03-01  Roland McGrath  <roland@redhat.com>
 
 	* show-die-info.c (tagnames, attrs): Update name tables for dwarf.h

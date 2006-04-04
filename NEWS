@@ -6,6 +6,10 @@ dwarf.h updated for DWARF 3.0 final specification.
 
 libdwfl: New function dwfl_version.
 
+The license is now GPL for most files.  The libelf, libebl, libdw,
+and libdwfl libraries have additional exceptions.  Add reference to
+OIN.
+
 Version 0.119:
 
 bug fixes

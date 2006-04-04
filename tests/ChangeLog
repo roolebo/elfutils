@@ -1,3 +1,11 @@
+2006-04-04  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: Add rules to run run-bug1-test.sh.
+	* rdwrmmap.c: New file.
+	* run-bug1-test.sh: New file.
+	* testfile28.bz2: New file.
+	* testfile28.rdwr.bz2: New file.
+
 2006-03-09  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am (AM_LDFLAGS): Define to pass -rpath-link.

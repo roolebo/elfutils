@@ -1,5 +1,5 @@
 /* Update data structures for changes and write them out.
-   Copyright (C) 1999, 2000, 2001, 2002, 2004, 2005 Red Hat, Inc.
+   Copyright (C) 1999, 2000, 2001, 2002, 2004, 2005, 2006 Red Hat, Inc.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1999.
 
    This program is free software; you can redistribute it and/or modify
@@ -181,15 +181,7 @@ elf_update (elf, cmd)
 	  size = -1;
 	}
       else
-	{
-	  if (elf->parent != NULL)
-	    {
-	      extern int puts (const char *);
-	      puts ("this is an archive member");
-	    }
-
-	  size = write_file (elf, size, change_bo, shnum);
-	}
+	size = write_file (elf, size, change_bo, shnum);
     }
 
  out:

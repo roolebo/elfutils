@@ -1,5 +1,5 @@
 /* Update data structures for changes.
-   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
    This program is free software; you can redistribute it and/or modify
@@ -319,8 +319,18 @@ __elfw2(LIBELFBITS,updatenull) (Elf *elf, int *change_bop, size_t shnum)
 				     scn->shdr_flags);
 
 		  size = (size + sh_align - 1) & ~(sh_align - 1);
+		  int offset_changed = 0;
 		  update_if_changed (shdr->sh_offset, (GElf_Word) size,
-				     changed);
+				     offset_changed);
+		  changed |= offset_changed;
+
+		  if (offset_changed && scn->data_list_rear == NULL)
+		    {
+		      /* The position of the section in the file
+			 changed.  Create the section data list.  */
+		      if (INTUSE(elf_getdata) (scn, NULL) == NULL)
+			return -1;
+		    }
 
 		  /* See whether the section size is correct.  */
 		  update_if_changed (shdr->sh_size, (GElf_Word) offset,

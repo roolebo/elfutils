@@ -1,3 +1,16 @@
+2006-04-04  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf32_updatefile.c (updatemmap): Cleanups.  Remove shdr_dest
+	variable.  Before writing sections, make a copy of the section
+	header data if necessary.  Don't write section header while
+	writing the section constent, it might overwrite some sections.
+	Restore the pointer afterwards.
+	* elf32_updatenull.c (updatenull): If the offset of a section in a
+	file changed make sure we read the section so that it'll be written
+	out.
+
+	* elf_update.c: Remove debug message.
+
 2005-12-07  Roland McGrath  <roland@redhat.com>
 
 	* gelf_xlate.c [! ALLOW_UNALIGNED] (union unaligned): New type.

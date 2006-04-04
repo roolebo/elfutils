@@ -1,3 +1,7 @@
+2006-04-04  Roland McGrath  <roland@redhat.com>
+
+	* POTFILES.in: Comment out lib/xstrdup.c, not distributed any more.
+
 2005-08-27  Ulrich Drepper  <drepper@redhat.com>
 
 	* POTFILES.in: Add src/strings.c.

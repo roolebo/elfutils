@@ -3,7 +3,7 @@
 
 # Files from the compatibility library
 lib/xmalloc.c
-lib/xstrdup.c
+#lib/xstrdup.c
 lib/xstrndup.c
 
 # Library sources

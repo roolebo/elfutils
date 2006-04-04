@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU General Public License along
    with Red Hat elfutils; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+   Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301 USA.
 
    In addition, as a special exception, Red Hat, Inc. gives You the
    additional right to link the code of Red Hat elfutils with code licensed

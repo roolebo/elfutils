@@ -1,22 +1,13 @@
 # -*- rpm-spec-*-
-%define fake 0
 Summary: A collection of utilities and DSOs to handle compiled objects.
 Name: elfutils
 Version: @PACKAGE_VERSION@
 Release: 1
-%if %{fake}
 License: GPL
-%else
-License: OSL
-%endif
 Group: Development/Tools
-#URL: file://home/devel/drepper/
 Source: elfutils-%{version}.tar.gz
 Obsoletes: libelf libelf-devel
 Requires: elfutils-libelf = %{version}-%{release}
-%if %{fake}
-Requires: binutils >= 2.14.90.0.4-26.2
-%endif
 Requires: glibc >= 2.3.1-2
 
 # ExcludeArch: xxx
@@ -42,11 +33,6 @@ handling.
 %package devel
 Summary: Development libraries to handle compiled objects.
 Group: Development/Tools
-%if %{fake}
-License: GPL
-%else
-License: OSL
-%endif
 Requires: elfutils = %{version}-%{release}
 Requires: elfutils-libelf-devel = %{version}-%{release}
 
@@ -60,9 +46,6 @@ assembler interface.
 %package libelf
 Summary: Library to read and write ELF files.
 Group: Development/Tools
-%if %{fake}
-License: GPL
-%endif
 
 %description libelf
 The elfutils-libelf package provides a DSO which allows reading and
@@ -75,9 +58,6 @@ Summary: Development support for libelf
 Group: Development/Tools
 Requires: elfutils-libelf = %{version}-%{release}
 Conflicts: libelf-devel
-%if %{fake}
-License: GPL
-%endif
 
 %description libelf-devel
 The elfutils-libelf-devel package contains the libraries to create
@@ -99,11 +79,8 @@ mkdir -p ${RPM_BUILD_ROOT}%{_prefix}
 %makeinstall
 
 chmod +x ${RPM_BUILD_ROOT}%{_prefix}/%{_lib}/lib*.so*
-%if !%{fake}
 chmod +x ${RPM_BUILD_ROOT}%{_prefix}/%{_lib}/elfutils/lib*.so*
-%endif
 
-%if !%{fake}
 # XXX Nuke unpackaged files
 { cd ${RPM_BUILD_ROOT}
   rm -f .%{_bindir}/eu-ld
@@ -113,7 +90,6 @@ chmod +x ${RPM_BUILD_ROOT}%{_prefix}/%{_lib}/elfutils/lib*.so*
   rm -f .%{_libdir}/libasm.so
   rm -f .%{_libdir}/libasm.a
 }
-%endif
 
 %check
 make check
@@ -132,9 +108,6 @@ rm -rf ${RPM_BUILD_ROOT}
 %files
 %defattr(-,root,root)
 %doc README TODO
-%if %{fake}
-%doc fake-src/FULL
-%endif
 %{_bindir}/eu-elflint
 %{_bindir}/eu-nm
 %{_bindir}/eu-readelf
@@ -145,7 +118,6 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_bindir}/eu-elfcmp
 %{_bindir}/eu-ranlib
 %{_bindir}/eu-strings
-%if !%{fake}
 #%{_bindir}/eu-ld
 #%{_libdir}/libasm-%{version}.so
 %{_libdir}/libdw-%{version}.so
@@ -153,14 +125,12 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libdw.so.*
 %dir %{_libdir}/elfutils
 %{_libdir}/elfutils/lib*.so
-%endif
 
 %files devel
 %defattr(-,root,root)
 %{_includedir}/dwarf.h
 %dir %{_includedir}/elfutils
 %{_includedir}/elfutils/elf-knowledge.h
-%if !%{fake}
 %{_includedir}/elfutils/libebl.h
 %{_includedir}/elfutils/libdw.h
 %{_includedir}/elfutils/libdwfl.h
@@ -169,7 +139,6 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libdw.a
 #%{_libdir}/libasm.so
 %{_libdir}/libdw.so
-%endif
 
 %files libelf
 %defattr(-,root,root)
@@ -185,7 +154,12 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.so
 
 %changelog
-* Thu Jan 12 2006 Roland McGrath <roland@redhat.com> 0.118-1
+* Thu Mar 30 2006 Roland McGrath <roland@redhat.com> 0.120-1
+- Bug fixes.
+- dwarf.h updated for DWARF 3.0 final specification.
+- libdwfl: New function dwfl_version.
+
+* Thu Jan 12 2006 Roland McGrath <roland@redhat.com> 0.119-1
 - elflint: more tests.
 - libdwfl: New function dwfl_module_register_names.
 - libebl: New backend hook for register names.

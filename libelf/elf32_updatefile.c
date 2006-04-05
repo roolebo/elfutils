@@ -224,7 +224,8 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 	{
 	  Elf_Scn *scn = scns[cnt];
 
-	  if ((scn->shdr_flags & ELF_F_MALLOCED) == 0
+	  if (!elf->state.ELFW(elf,LIBELFBITS).shdr_malloced
+	      && (scn->shdr_flags & ELF_F_MALLOCED) == 0
 	      && scn->shdr.ELFW(e,LIBELFBITS) != &shdr_dest[scn->index])
 	    {
 	      assert ((char *) elf->map_address + elf->start_offset
@@ -348,10 +349,11 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 	      /* If we previously made a copy of the section header
 		 entry we now have to adjust the pointer again so
 		 point to new place in the mapping.  */
-	      if ((scn->shdr_flags & ELF_F_MALLOCED) == 0)
+	      if (!elf->state.ELFW(elf,LIBELFBITS).shdr_malloced
+		  && (scn->shdr_flags & ELF_F_MALLOCED) == 0)
 		scn->shdr.ELFW(e,LIBELFBITS) = &shdr_dest[scn->index];
 
-	      scn->shdr_flags  &= ~ELF_F_DIRTY;
+	      scn->shdr_flags &= ~ELF_F_DIRTY;
 	    }
 	}
     }

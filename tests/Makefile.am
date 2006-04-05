@@ -112,7 +112,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile22.bz2 testfile23.bz2 testfile24.bz2 testfile25.bz2 \
 	     testfile26.bz2 testfile27.bz2 \
 	     coverage.sh test-subr.sh test-wrapper.sh run-readelf-test1.sh \
-	     run-bug1-test.sh testfile28.bz2 testfile28.rdwr.bz2
+	     run-bug1-test.sh testfile28.bz2 testfile28.rdwr.bz2 \
+	     testfile29.bz2 testfile29.rdwr.bz2
 
 installed_TESTS_ENVIRONMENT = libdir=$(DESTDIR)$(libdir) \
 			      bindir=$(DESTDIR)$(bindir) \

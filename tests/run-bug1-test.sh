@@ -31,4 +31,12 @@ testrun ./rdwrmmap testfile28
 
 cmp testfile28 testfile28.rdwr
 
+test_cleanup
+
+testfiles testfile29 testfile29.rdwr
+
+testrun ./rdwrmmap testfile29
+
+cmp testfile29 testfile29.rdwr
+
 exit 0

@@ -1,4 +1,4 @@
-#! /bin/sh -x
+#! /bin/sh
 # Copyright (C) 2006 Red Hat, Inc.
 # Written by Ulrich Drepper <drepper@redhat.com>, 2006.
 #

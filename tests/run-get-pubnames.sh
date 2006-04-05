@@ -2,6 +2,7 @@
 # Copyright (C) 1999, 2000, 2002, 2003, 2005 Red Hat, Inc.
 # This file is part of Red Hat elfutils.
 # Written by Ulrich Drepper <drepper@redhat.com>, 1999.
+#
 # Red Hat elfutils is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by the
 # Free Software Foundation; version 2 of the License.

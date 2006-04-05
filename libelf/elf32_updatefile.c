@@ -231,7 +231,8 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 	      assert ((char *) elf->map_address + elf->start_offset
 		      < (char *) scn->shdr.ELFW(e,LIBELFBITS));
 	      assert ((char *) scn->shdr.ELFW(e,LIBELFBITS)
-		      < (char *) elf->map_address + elf->maximum_size);
+		      < ((char *) elf->map_address + elf->start_offset
+			 + elf->maximum_size));
 
 	      void *p = alloca (sizeof (ElfW2(LIBELFBITS,Shdr)));
 	      scn->shdr.ELFW(e,LIBELFBITS)

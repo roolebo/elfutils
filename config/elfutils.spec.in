@@ -154,6 +154,13 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.so
 
 %changelog
+* Tue Apr  4 2006 Ulrich Drepper <drepper@redhat.com> 0.120-1
+- Bug fixes.
+- dwarf.h updated for DWARF 3.0 final specification.
+- libdwfl: New function dwfl_version.
+- The license is now GPL for most files.  The libelf, libebl, libdw,and 
+libdwfl libraries have additional exceptions.  Add reference toOIN.
+
 * Thu Mar 30 2006 Roland McGrath <roland@redhat.com> 0.120-1
 - Bug fixes.
 - dwarf.h updated for DWARF 3.0 final specification.

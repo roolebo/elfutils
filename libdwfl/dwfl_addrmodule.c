@@ -1,5 +1,5 @@
 /* Find module containing address.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -52,7 +52,7 @@
 Dwfl_Module *
 dwfl_addrmodule (Dwfl *dwfl, Dwarf_Addr address)
 {
-  if (dwfl == NULL)
+  if (dwfl == NULL || dwfl->modules == NULL)
     return NULL;
 
   /* Do binary search on the array indexed by module load address.  */

@@ -1,3 +1,8 @@
+2006-05-21  Ulrich Drepper  <drepper@redhat.com>
+
+	* libdw.h: Add nonnull attributes to dwarf_tag, dwarf_getattrs,
+	dwarf_haschildren.
+
 2006-02-28  Roland McGrath  <roland@redhat.com>
 
 	* dwarf.h: Add missing DW_ATE_*, DW_TAG_*, DW_LANG_*, DW_CFA_*,

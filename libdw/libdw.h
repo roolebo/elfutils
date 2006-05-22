@@ -237,22 +237,23 @@ extern Dwarf_Die *dwarf_addrdie (Dwarf *dbg, Dwarf_Addr addr,
 
 /* Return child of current DIE.  */
 extern int dwarf_child (Dwarf_Die *die, Dwarf_Die *result)
-     __nonnull_attribute__ (2);
+     __nonnull_attribute__ (1, 2);
 
 /* Return sibling of given DIE.  */
 extern int dwarf_siblingof (Dwarf_Die *die, Dwarf_Die *result)
      __nonnull_attribute__ (2);
 
 /* Check whether the DIE has children.  */
-extern int dwarf_haschildren (Dwarf_Die *die);
+extern int dwarf_haschildren (Dwarf_Die *die) __nonnull_attribute__ (1);
 
 /* Get attributes of the DIE.  */
 extern ptrdiff_t dwarf_getattrs (Dwarf_Die *die,
 				 int (*callback) (Dwarf_Attribute *, void *),
-				 void *arg, ptrdiff_t offset);
+				 void *arg, ptrdiff_t offset)
+     __nonnull_attribute__ (2);
 
 /* Return tag of given DIE.  */
-extern int dwarf_tag (Dwarf_Die *die);
+extern int dwarf_tag (Dwarf_Die *die) __nonnull_attribute__ (1);
 
 
 /* Return specific attribute of DIE.  */

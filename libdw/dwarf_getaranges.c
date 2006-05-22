@@ -1,5 +1,5 @@
 /* Return list address ranges.
-   Copyright (C) 2000, 2001, 2002, 2004, 2005 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2004, 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -86,6 +86,15 @@ dwarf_getaranges (dbg, aranges, naranges)
       *aranges = dbg->aranges;
       if (naranges != NULL)
 	*naranges = dbg->aranges->naranges;
+      return 0;
+    }
+
+  if (dbg->sectiondata[IDX_debug_aranges] == NULL)
+    {
+      /* No such section.  */
+      *aranges = NULL;
+      if (naranges != NULL)
+	*naranges = 0;
       return 0;
     }
 

@@ -1,3 +1,7 @@
+2006-05-22  Ulrich Drepper  <drepper@redhat.com>
+
+	* cu.c (addrarange): Handle files without aranges information.
+
 2006-05-16  Ulrich Drepper  <drepper@redhat.com>
 
 	* dwfl_addrmodule.c (dwfl_addrmodule): Also return NULL of

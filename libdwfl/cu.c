@@ -1,5 +1,5 @@
 /* Keeping track of DWARF compilation units in libdwfl.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -65,32 +65,38 @@ addrarange (Dwfl_Module *mod, Dwarf_Addr addr, struct dwfl_arange **arange)
 {
   if (mod->aranges == NULL)
     {
-      Dwarf_Aranges *dwaranges;
-      if (INTUSE(dwarf_getaranges) (mod->dw, &dwaranges, NULL) != 0)
+      struct dwfl_arange *aranges = NULL;
+      Dwarf_Aranges *dwaranges = NULL;
+      size_t naranges;
+      if (INTUSE(dwarf_getaranges) (mod->dw, &dwaranges, &naranges) != 0)
 	return DWFL_E_LIBDW;
 
-      struct dwfl_arange *aranges = malloc (dwaranges->naranges
-					    * sizeof *aranges);
-      if (unlikely (aranges == NULL))
-	return DWFL_E_NOMEM;
+      /* If the module has no aranges (when no code is included) we
+	 allocate nothing.  */
+      if (naranges != 0)
+	{
+	  aranges = malloc (naranges * sizeof *aranges);
+	  if (unlikely (aranges == NULL))
+	    return DWFL_E_NOMEM;
 
-      /* libdw has sorted its list by address, which is how we want it.
-	 But the sorted list is full of not-quite-contiguous runs pointing
-	 to the same CU.  We don't care about the little gaps inside the
-	 module, we'll consider them part of the surrounding CU anyway.
-	 Collect our own array with just one record for each run of ranges
-	 pointing to one CU.  */
+	  /* libdw has sorted its list by address, which is how we want it.
+	     But the sorted list is full of not-quite-contiguous runs pointing
+	     to the same CU.  We don't care about the little gaps inside the
+	     module, we'll consider them part of the surrounding CU anyway.
+	     Collect our own array with just one record for each run of ranges
+	     pointing to one CU.  */
 
-      size_t naranges = 0;
-      Dwarf_Off lastcu = 0;
-      for (size_t i = 0; i < dwaranges->naranges; ++i)
-	if (i == 0 || dwaranges->info[i].offset != lastcu)
-	  {
-	    aranges[naranges].arange = i;
-	    aranges[naranges].cu = NULL;
-	    ++naranges;
-	    lastcu = dwaranges->info[i].offset;
-	  }
+	  naranges = 0;
+	  Dwarf_Off lastcu = 0;
+	  for (size_t i = 0; i < dwaranges->naranges; ++i)
+	    if (i == 0 || dwaranges->info[i].offset != lastcu)
+	      {
+		aranges[naranges].arange = i;
+		aranges[naranges].cu = NULL;
+		++naranges;
+		lastcu = dwaranges->info[i].offset;
+	      }
+	}
 
       /* Store the final array, which is probably much smaller than before.  */
       mod->naranges = naranges;

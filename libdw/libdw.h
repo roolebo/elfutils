@@ -1,5 +1,5 @@
 /* Interfaces for libdw.
-   Copyright (C) 2002, 2004, 2005 Red Hat, Inc.
+   Copyright (C) 2002, 2004, 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -193,6 +193,10 @@ typedef void (*Dwarf_OOM) (void);
 typedef void (*__attribute__ ((noreturn)) Dwarf_OOM) (void);
 #endif
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Create a handle for a new debug session.  */
 extern Dwarf *dwarf_begin (int fildes, Dwarf_Cmd cmd);
@@ -625,5 +629,9 @@ dwarf_whatform (Dwarf_Attribute *attr)
   return attr == NULL ? 0 : attr->form;
 }
 #endif	/* Optimize.  */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* libdw.h */

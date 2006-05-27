@@ -1,3 +1,7 @@
+2006-05-27  Ulrich Drepper  <drepper@redhat.com>
+
+	* libdw.h: Add extern "C".
+
 2006-05-22  Ulrich Drepper  <drepper@redhat.com>
 
 	* dwarf_getaranges.c (dwarf_getaranges): Handle files without

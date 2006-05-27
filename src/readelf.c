@@ -1543,7 +1543,7 @@ handle_relocs_rela (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 		    (long int) GELF_R_SYM (rel->r_info));
 	  else if (GELF_ST_TYPE (sym->st_info) != STT_SECTION)
 	    printf ("\
-  %#0*" PRIx64 "  %-15s %#0*" PRIx64 "  +%5" PRId64 " %s\n",
+  %#0*" PRIx64 "  %-15s %#0*" PRIx64 "  %+6" PRId64 " %s\n",
 		    class == ELFCLASS32 ? 10 : 18, rel->r_offset,
 		    ebl_reloc_type_check (ebl, GELF_R_TYPE (rel->r_info))
 		    /* Avoid the leading R_ which isn't carrying any
@@ -1575,7 +1575,7 @@ handle_relocs_rela (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 				    ? xndx : sym->st_shndx));
 	      else
 		printf ("\
-  %#0*" PRIx64 "  %-15s %#0*" PRIx64 "  +%5" PRId64 " %s\n",
+  %#0*" PRIx64 "  %-15s %#0*" PRIx64 "  %+6" PRId64 " %s\n",
 			class == ELFCLASS32 ? 10 : 18, rel->r_offset,
 			ebl_reloc_type_check (ebl, GELF_R_TYPE (rel->r_info))
 			/* Avoid the leading R_ which isn't carrying any

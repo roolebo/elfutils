@@ -1,3 +1,7 @@
+2006-05-27  Ulrich Drepper  <drepper@redhat.com>
+
+	* libdwfl.h: Add extern "C".
+
 2006-05-22  Ulrich Drepper  <drepper@redhat.com>
 
 	* cu.c (addrarange): Handle files without aranges information.

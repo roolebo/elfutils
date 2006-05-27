@@ -1,3 +1,7 @@
+2006-05-27  Ulrich Drepper  <drepper@redhat.com>
+
+	* libebl.h: Add extern "C".
+
 2005-11-25  Roland McGrath  <roland@redhat.com>
 
 	* eblregname.c: New file.

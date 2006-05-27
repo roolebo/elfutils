@@ -1,5 +1,5 @@
 /* Interface for libebl.
-   Copyright (C) 2000, 2001, 2002, 2004, 2005 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2004, 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -62,6 +62,10 @@
 /* Opaque type for the handle.  */
 typedef struct ebl Ebl;
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* Get backend handle for object associated with ELF handle.  */
 extern Ebl *ebl_openbackend (Elf *elf);
@@ -288,5 +292,9 @@ extern void ebl_gstrtabfinalize (struct Ebl_GStrtab *st, Elf_Data *data);
 
 /* Get offset in wide char string table for string associated with SE.  */
 extern size_t ebl_gstrtaboffset (struct Ebl_GStrent *se);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* libebl.h */

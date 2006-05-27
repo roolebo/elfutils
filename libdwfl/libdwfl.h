@@ -89,6 +89,10 @@ typedef struct
 } Dwfl_Callbacks;
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Start a new session with the library.  */
 extern Dwfl *dwfl_begin (const Dwfl_Callbacks *callbacks);
 
@@ -402,5 +406,9 @@ extern int dwfl_module_register_names (Dwfl_Module *mod,
 							const char *regname),
 				       void *arg);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* libdwfl.h */

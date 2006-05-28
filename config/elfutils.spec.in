@@ -154,6 +154,12 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.so
 
 %changelog
+* Sun May 28 2006 Ulrich Drepper <drepper@redhat.com> 0.121-1
+- libelf: bug fixes for rewriting existing files when using mmap
+- make all installed headers usable in C++ code
+- readelf: better output format
+- libdw, libdwfl: handle files without aranges info
+
 * Tue Apr  4 2006 Ulrich Drepper <drepper@redhat.com> 0.120-1
 - Bug fixes.
 - dwarf.h updated for DWARF 3.0 final specification.

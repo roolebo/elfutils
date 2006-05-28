@@ -1,3 +1,13 @@
+Version 0.121:
+
+libelf: bug fixes for rewriting existing files when using mmap.
+
+make all installed headers usable in C++ code.
+
+readelf: better output format.
+
+libdw, libdwfl: handle files without aranges info.
+
 Version 0.120:
 
 Bug fixes.

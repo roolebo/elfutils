@@ -556,7 +556,7 @@ print_ehdr (Ebl *ebl, GElf_Ehdr *ehdr)
 	  : ehdr->e_ident[EI_DATA] == ELFDATA2MSB
 	  ? "2's complement, big endian" : "\?\?\?");
 
-  printf (gettext ("  Version:                           %hhd %s\n"),
+  printf (gettext ("  Ident Version:                     %hhd %s\n"),
 	  ehdr->e_ident[EI_VERSION],
 	  ehdr->e_ident[EI_VERSION] == EV_CURRENT ? gettext ("(current)")
 	  : "(\?\?\?)");

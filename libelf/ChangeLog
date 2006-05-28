@@ -1,3 +1,9 @@
+2006-05-28  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf32_updatefile.c (updatemmap): Preserve section content if
+	copying would overwrite them.
+	Fix msync paramters.
+
 2006-04-04  Roland McGrath  <roland@redhat.com>
 
 	* elf32_updatefile.c (updatemmap): Handle other-endian case.

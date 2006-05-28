@@ -239,6 +239,32 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 		= memcpy (p, scn->shdr.ELFW(e,LIBELFBITS),
 			  sizeof (ElfW2(LIBELFBITS,Shdr)));
 	    }
+
+	  /* If the file is mmaped and the original position of the
+	     section in the file is lower than the new position we
+	     need to save the section content since otherwise it is
+	     overwritten before it can be copied.  If there are
+	     multiple data segments in the list only the first can be
+	     from the file.  */
+	  if (((char *) elf->map_address + elf->start_offset
+	       <= (char  *) scn->data_list.data.d.d_buf)
+	      && ((char *) scn->data_list.data.d.d_buf
+		  < ((char *) elf->map_address + elf->start_offset
+		     + elf->maximum_size))
+	      && (((char *) elf->map_address + elf->start_offset
+		   + scn->shdr.ELFW(e,LIBELFBITS)->sh_offset)
+		  > (char *) scn->data_list.data.d.d_buf))
+	    {
+	      void *p = malloc (scn->data_list.data.d.d_size);
+	      if (p == NULL)
+		{
+		  __libelf_seterrno (ELF_E_NOMEM);
+		  return -1;
+		}
+	      scn->data_list.data.d.d_buf = scn->data_base
+		= memcpy (p, scn->data_list.data.d.d_buf,
+			  scn->data_list.data.d.d_size);
+	    }
 	}
 
       /* Iterate over all the section in the order in which they
@@ -364,10 +390,10 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 
   /* Make sure the content hits the disk.  */
   char *msync_start = ((char *) elf->map_address
-		       + elf->start_offset / sysconf (_SC_PAGESIZE));
+		       + (elf->start_offset & ~(sysconf (_SC_PAGESIZE) - 1)));
   char *msync_end = ((char *) elf->map_address
 		     + elf->start_offset + ehdr->e_shoff
-		     * ehdr->e_shentsize * shnum);
+		     + ehdr->e_shentsize * shnum);
   (void) msync (msync_start, msync_end - msync_start, MS_SYNC);
 
   return 0;

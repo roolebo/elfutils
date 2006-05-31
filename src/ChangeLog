@@ -1,7 +1,13 @@
-2006-05-28  Ulrich Drepper  <drepper@redhat.com>
+2006-05-31  Ulrich Drepper  <drepper@redhat.com>
 
-	* addr2line.c (print_dwarf_function): Use unsigned type for lineno
-	and colno.
+	* ld.c: Recognize --as-needed and --no-as-needed options.
+	* ld.h (struct usedfile): Add as_needed field.
+	(struct ld_state): Likewise.
+	* ldgeneric.c (ld_handle_filename_list): Copy as_needed flag from
+	the list.
+	* ldscript.y (filename_id_list): Split to correctly parse all
+	combinations.
+	(mark_as_needed): Fix loop.
 
 2006-05-27  Ulrich Drepper  <drepper@redhat.com>
 

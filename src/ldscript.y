@@ -1,6 +1,6 @@
 %{
 /* Parser for linker scripts.
-   Copyright (C) 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -128,6 +128,7 @@ extern int yylex (void);
 %type <output_rule> outputsections
 %type <assignment> assignment
 %type <filename_list> filename_id_list
+%type <filename_list> filename_id_listelem
 %type <version> versionlist
 %type <version> version
 %type <version> version_stmt_list
@@ -358,7 +359,20 @@ expr:		  kALIGN '(' expr ')'
 		    { $$ = new_expr (exp_pagesize); }
 		;
 
-filename_id_list: kGROUP '(' filename_id_list ')'
+filename_id_list: filename_id_list comma_opt filename_id_listelem
+		    {
+		      $3->next = $1->next;
+		      $$ = $1->next = $3;
+		    }
+		| filename_id_listelem
+		    { $$ = $1; }
+		;
+
+comma_opt:	  ','
+		|
+		;
+
+filename_id_listelem: kGROUP '(' filename_id_list ')'
 		    {
 		      /* First little optimization.  If there is only one
 			 file in the group don't do anything.  */
@@ -371,19 +385,10 @@ filename_id_list: kGROUP '(' filename_id_list ')'
 		    }
 		| kAS_NEEDED '(' filename_id_list ')'
 		    { $$ = mark_as_needed ($3); }
-		| filename_id_list comma_opt filename_id
-		    {
-		      struct filename_list *newp = new_filename_listelem ($3);
-		      newp->next = $1->next;
-		      $$ = $1->next = newp;
-		    }
 		| filename_id
 		    { $$ = new_filename_listelem ($1); }
 		;
 
-comma_opt:	  ','
-		|
-		;
 
 versionlist:	  versionlist version
 		    {
@@ -579,11 +584,12 @@ static struct filename_list *
 mark_as_needed (struct filename_list *listp)
 {
   struct filename_list *runp = listp;
-  while (runp != NULL)
+  do
     {
       runp->as_needed = true;
       runp = runp->next;
     }
+  while (runp != listp);
 
   return listp;
 }

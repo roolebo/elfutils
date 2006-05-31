@@ -1,4 +1,4 @@
-/* Copyright (C) 2001, 2002, 2003, 2005 Red Hat, Inc.
+/* Copyright (C) 2001, 2002, 2003, 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -114,6 +114,10 @@ struct usedfiles
   /* If this is a DSO the flag indicates whether the file is directly
      used in a reference.  */
   bool used;
+
+  /* True when file should be added to DT_NEEDED list only when
+     directly referenced.  */
+  bool as_needed;
 
   /* If nonzero this is the archive sequence number which can be used to
      determine whether back refernces from -( -) or GROUP statements
@@ -790,6 +794,10 @@ struct ld_state
 
   /* If true static linking is requested.  */
   bool statically;
+
+  /* If true, add DT_NEEDED entries for following files if they are
+     needed.  */
+  bool as_needed;
 
   /* How to extract elements from archives.  */
   enum extract_rule extract_rule;

@@ -1,4 +1,4 @@
-/* Copyright (C) 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+/* Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -1534,8 +1534,11 @@ ld_handle_filename_list (struct filename_list *fnames)
       curp = runp->real = ld_new_inputfile (runp->name, relocatable_file_type);
 
       /* Set flags for group handling.  */
-      runp->real->group_start = runp->group_start;
-      runp->real->group_end = runp->group_end;
+      curp->group_start = runp->group_start;
+      curp->group_end = runp->group_end;
+
+      /* Set as-needed flag from the file, not the command line.  */
+      curp->as_needed = runp->as_needed;
 
       /* Read the file and everything else which comes up, including
 	 handling groups.  */

@@ -1,5 +1,5 @@
 /* Internal interfaces for libelf.
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -546,8 +546,9 @@ extern uint32_t __libelf_crc32 (uint32_t crc, unsigned char *buf, size_t len)
 
 
 /* We often have to update a flag iff a value changed.  Make this
-   convenient.  */
-#define update_if_changed(var, exp, flag) \
+   convenient.  None of the parameters must have a side effect.  */
+#ifdef __GNUC__
+# define update_if_changed(var, exp, flag) \
   do {									      \
     __typeof__ (var) *_var = &(var);					      \
     __typeof__ (exp) _exp = (exp);					      \
@@ -557,5 +558,15 @@ extern uint32_t __libelf_crc32 (uint32_t crc, unsigned char *buf, size_t len)
 	(flag) |= ELF_F_DIRTY;						      \
       }									      \
   } while (0)
+#else
+# define update_if_changed(var, exp, flag) \
+  do {									      \
+    if ((var) != (exp))							      \
+      {									      \
+	(var) = (exp);							      \
+	(flag) |= ELF_F_DIRTY;						      \
+      }									      \
+  } while (0)
+#endif
 
 #endif  /* libelfP.h */

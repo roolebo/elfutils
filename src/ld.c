@@ -71,6 +71,8 @@ enum
     ARGP_no_gc_sections,
     ARGP_no_undefined,
     ARGP_conserve,
+    ARGP_as_needed,
+    ARGP_no_as_needed,
 #if YYDEBUG
     ARGP_yydebug,
 #endif
@@ -191,6 +193,11 @@ Default rules of extracting from archive; weak references are not enough."),
   { "-Q y | n", 'Q', NULL, OPTION_DOC,
     N_("Add/suppress addition indentifying link-editor to .comment section"),
     0 },
+
+  { "as-needed", ARGP_as_needed, NULL, 0,
+    N_("Only set DT_NEEDED for following dynamic libs if actually used"), 0 },
+  { "no-as-needed", ARGP_no_as_needed, NULL, 0,
+    N_("Always set DT_NEEDED for following dynamic libs"), 0 },
 
 #if YYDEBUG
   { "yydebug", ARGP_yydebug, NULL, 0,
@@ -636,6 +643,8 @@ parse_opt_1st (int key, char *arg,
     case 'O':
     case ARGP_whole_archive:
     case ARGP_no_whole_archive:
+    case ARGP_as_needed:
+    case ARGP_no_as_needed:
     case 'L':
     case '(':
     case ')':
@@ -730,6 +739,13 @@ parse_opt_2nd (int key, char *arg,
       break;
     case ARGP_no_whole_archive:
       ld_state.extract_rule = defaultextract;
+      break;
+
+    case ARGP_as_needed:
+      ld_state.as_needed = true;
+      break;
+    case ARGP_no_as_needed:
+      ld_state.as_needed = false;
       break;
 
     case ARGP_static:
@@ -1107,6 +1123,7 @@ ld_new_inputfile (const char *fname, enum file_type type)
   newfile->soname = newfile->fname = newfile->rfname = fname;
   newfile->file_type = type;
   newfile->extract_rule = ld_state.extract_rule;
+  newfile->as_needed = ld_state.as_needed;
   newfile->lazyload = ld_state.lazyload;
   newfile->status = not_opened;
 

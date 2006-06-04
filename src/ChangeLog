@@ -9,6 +9,11 @@
 	combinations.
 	(mark_as_needed): Fix loop.
 
+2006-05-28  Ulrich Drepper  <drepper@redhat.com>
+
+	* addr2line.c (print_dwarf_function): Use unsigned type for lineno
+	and colno.
+
 2006-05-27  Ulrich Drepper  <drepper@redhat.com>
 
 	* readelf.c (handle_relocs_rela): Better notations for addon value.

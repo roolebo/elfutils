@@ -258,8 +258,7 @@ print_dwarf_function (Dwfl_Module *mod, Dwarf_Addr addr)
 					       &attr_mem), &val) == 0)
 		{
 		  const char *file = dwarf_filesrc (files, val, NULL, NULL);
-		  unsigned int lineno = 0;
-		  unsigned int colno = 0;
+		  int lineno = 0, colno = 0;
 		  if (dwarf_formudata (dwarf_attr (&scopes[i],
 						   DW_AT_call_line,
 						   &attr_mem), &val) == 0)

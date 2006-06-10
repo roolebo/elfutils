@@ -1,4 +1,4 @@
-/* Copyright (C) 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+/* Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -396,14 +396,19 @@ elf_i386_finalize_plt (struct ld_state *statep, size_t nsym,
       /* Point the GOT entry at the PLT entry, after the initial jmp.  */
       ((Elf32_Word *) data->d_buf)[3 + cnt] = pltentryaddr + 6;
 
-      /* The value of the symbol is the address of the corresponding PLT
-	 entry.  Store the address, also for the normal symbol table if
-	 this is necessary.  */
-      ((Elf32_Sym *) dynsymdata->d_buf)[1 + cnt].st_value = pltentryaddr;
 
-      if (symdata != NULL)
-	((Elf32_Sym *) symdata->d_buf)[nsym - statep->nplt + cnt].st_value
-	  = pltentryaddr;
+      /* If the symbol is defined, adjust the address.  */
+      if (((Elf32_Sym *) dynsymdata->d_buf)[1 + cnt].st_shndx != SHN_UNDEF)
+	{
+	  /* The value of the symbol is the address of the corresponding PLT
+	     entry.  Store the address, also for the normal symbol table if
+	     this is necessary.  */
+	  ((Elf32_Sym *) dynsymdata->d_buf)[1 + cnt].st_value = pltentryaddr;
+
+	  if (symdata != NULL)
+	    ((Elf32_Sym *) symdata->d_buf)[nsym - statep->nplt + cnt].st_value
+	      = pltentryaddr;
+	}
     }
 
   /* Create the .plt section.  */

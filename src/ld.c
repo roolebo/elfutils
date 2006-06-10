@@ -926,9 +926,9 @@ parse_z_option (const char *arg)
 	   && ld_state.file_type == dso_file_type)
     ld_state.dt_flags_1 |= DF_1_NOOPEN;
   else if (strcmp (arg, "ignore") == 0)
-    ld_state.ignore_unused_dsos = true;
+    ld_state.as_needed = true;
   else if (strcmp (arg, "record") == 0)
-    ld_state.ignore_unused_dsos = false;
+    ld_state.as_needed = false;
   else if (strcmp (arg, "systemlibrary") == 0)
     ld_state.is_system_library = true;
   else if (strcmp (arg, "allextract") != 0

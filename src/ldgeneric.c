@@ -2264,7 +2264,6 @@ ld_generic_generate_sections (struct ld_state *statep)
      program header.  */
   if (dynamically_linked_p ())
     {
-      int ndt_needed;
       /* Use any versioning (defined or required)?  */
       bool use_versioning = false;
       /* Use version requirements?  */
@@ -2294,11 +2293,6 @@ ld_generic_generate_sections (struct ld_state *statep)
       // XXX For Linux/Alpha we need other sizes unless they change...
       new_generated_scn (scn_dot_hash, ".hash", SHT_HASH, SHF_ALLOC,
 			 sizeof (Elf32_Word), sizeof (Elf32_Word));
-
-      /* By default we add all DSOs provided on the command line.  If
-	 the user added '-z ignore' to the command line we only add
-	 those which are actually used.  */
-      ndt_needed = ld_state.ignore_unused_dsos ? 0 : ld_state.ndsofiles;
 
       /* Create the section associated with the PLT if necessary.  */
       if (ld_state.nplt > 0)
@@ -2374,29 +2368,29 @@ ld_generic_generate_sections (struct ld_state *statep)
 	    new_generated_scn (scn_dot_version_r, ".gnu.version_r",
 			       SHT_GNU_verneed, SHF_ALLOC, 0,
 			       xelf_fsize (ld_state.outelf, ELF_T_WORD, 1));
+	}
 
-	  /* Now count the used DSOs since this is what the user
-	     wants.  */
-	  ndt_needed = 0;
-	  if (ld_state.ndsofiles > 0)
-	    {
-	      struct usedfiles *frunp = ld_state.dsofiles;
+      /* Now count the used DSOs since this is what the user
+	 wants.  */
+      int ndt_needed = 0;
+      if (ld_state.ndsofiles > 0)
+	{
+	  struct usedfiles *frunp = ld_state.dsofiles;
 
-	      do
-		if (! ld_state.ignore_unused_dsos || frunp->used)
-		  {
-		    ++ndt_needed;
-		    if (frunp->lazyload)
-		      /* We have to create another dynamic section
-			 entry for the DT_POSFLAG_1 entry.
+	  do
+	    if (! frunp->as_needed || frunp->used)
+	      {
+		++ndt_needed;
+		if (frunp->lazyload)
+		  /* We have to create another dynamic section
+		     entry for the DT_POSFLAG_1 entry.
 
-			 XXX Once more functionality than the
-			 lazyloading flag are suppported the test
-			 must be extended.  */
-		      ++ndt_needed;
-		  }
-	      while ((frunp = frunp->next) != ld_state.dsofiles);
-	    }
+		     XXX Once more functionality than the lazyloading
+		     flag are suppported the test must be
+		     extended.  */
+		  ++ndt_needed;
+	      }
+	  while ((frunp = frunp->next) != ld_state.dsofiles);
 	}
 
       if (use_versioning)
@@ -3923,7 +3917,7 @@ ld_generic_create_outfile (struct ld_state *statep)
 	      struct usedfiles *frunp = ld_state.dsofiles;
 
 	      do
-		if (! ld_state.ignore_unused_dsos || frunp->used)
+		if (! frunp->as_needed || frunp->used)
 		  frunp->sonameent = ebl_strtabadd (dynstrtab, frunp->soname,
 						    0);
 	      while ((frunp = frunp->next) != ld_state.dsofiles);
@@ -5283,7 +5277,6 @@ cannot create hash table section for output file: %s"),
 	if (symstrent[cnt] != NULL)
 	  {
 	    XElf_Sym_vardef (sym);
-	    size_t hashidx;
 	    size_t dynidx = ndxtosym[cnt]->outdynsymidx;
 
 #if NATIVE_ELF != 0
@@ -5301,7 +5294,7 @@ cannot create hash table section for output file: %s"),
 	    (void) xelf_update_sym (dynsymdata, dynidx, sym);
 
 	    /* Add to the hash table.  */
-	    hashidx = hashcodes[dynidx] % nbucket;
+	    size_t hashidx = hashcodes[dynidx] % nbucket;
 	    if (bucket[hashidx] == 0)
 	      bucket[hashidx] = dynidx;
 	    else
@@ -5428,7 +5421,7 @@ cannot create hash table section for output file: %s"),
     strtab_ent = ebl_strtabadd (ld_state.shstrtab, ".strtab", 8);
   /* At this point we would have to test for failures in the
      allocation.  But we skip this.  First, the problem will be caught
-     latter when doing more allocations for the section header table.
+     later when doing more allocations for the section header table.
      Even if this would not be the case all that would happen is that
      the section names are empty.  The binary would still be usable if
      it is an executable or a DSO.  Not adding the test here saves
@@ -5533,11 +5526,7 @@ cannot create hash table section for output file: %s"),
   groups = ld_state.groups;
   while (groups != NULL)
     {
-      Elf_Scn *scn;
-      struct scngroup *oldp;
-      Elf32_Word si;
-
-      scn = elf_getscn (ld_state.outelf, groups->outscnidx);
+      Elf_Scn *scn = elf_getscn (ld_state.outelf, groups->outscnidx);
       xelf_getshdr (scn, shdr);
       assert (shdr != NULL);
 
@@ -5548,7 +5537,8 @@ cannot create hash table section for output file: %s"),
       shdr->sh_entsize = sizeof (Elf32_Word);
 
       /* Determine the index for the signature symbol.  */
-      si = groups->symbol->file->symindirect[groups->symbol->symidx];
+      Elf32_Word si
+	= groups->symbol->file->symindirect[groups->symbol->symidx];
       if (si == 0)
 	{
 	  assert (groups->symbol->file->symref[groups->symbol->symidx]
@@ -5560,7 +5550,7 @@ cannot create hash table section for output file: %s"),
 
       (void) xelf_update_shdr (scn, shdr);
 
-      oldp = groups;
+      struct scngroup *oldp = groups;
       groups = groups->next;
       free (oldp);
     }
@@ -5794,8 +5784,8 @@ internal error: nobits section follows nobits section"));
       (void) xelf_update_phdr (ld_state.outelf, 0, phdr);
 
 
-      /* Adjust the addresses in the addresses of the symbol according
-	 to the load addresses of the sections.  */
+      /* Adjust the addresses in the address fields of the symbol
+	 records according to the load addresses of the sections.  */
       if (ld_state.need_symtab)
 	for (cnt = 1; cnt < nsym; ++cnt)
 	  {
@@ -5948,7 +5938,7 @@ internal error: nobits section follows nobits section"));
 	      struct usedfiles *runp = ld_state.dsofiles->next;
 
 	      do
-		if (! ld_state.ignore_unused_dsos || runp->used)
+		if (runp->used || !runp->as_needed)
 		  {
 		    /* Add the position-dependent flag if necessary.  */
 		    if (runp->lazyload)

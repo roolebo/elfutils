@@ -1,3 +1,15 @@
+2006-06-09  Ulrich Drepper  <drepper@redhat.com>
+
+	* i386_ld.c (elf_i386_finalize_plt): Don't change symbol table entries
+	for PLT entries if there is no local definition.
+
+	* ld.c (parse_option): Handle -z ignore like --as-needed and
+	-z record like --no-as-needed.
+	* ld.h (struct ld_state): Remove ignore_unused_dsos field.
+	* ldgeneric.c (new_generated_scn): Always compute ndt_needed by
+	looping over DSOs.  When deciding about adding DT_NEEDED entries
+	use ->as_needed instead of ignore_unused_dsos.
+
 2006-05-31  Ulrich Drepper  <drepper@redhat.com>
 
 	* ld.c: Recognize --as-needed and --no-as-needed options.
@@ -8,11 +20,6 @@
 	* ldscript.y (filename_id_list): Split to correctly parse all
 	combinations.
 	(mark_as_needed): Fix loop.
-
-2006-05-28  Ulrich Drepper  <drepper@redhat.com>
-
-	* addr2line.c (print_dwarf_function): Use unsigned type for lineno
-	and colno.
 
 2006-05-27  Ulrich Drepper  <drepper@redhat.com>
 

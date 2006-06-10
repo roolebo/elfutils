@@ -999,10 +999,6 @@ struct ld_state
   /* Lazy-loading state for dependencies.  */
   bool lazyload;
 
-  /* True is DSOs which are not used in the linking process are not
-     recorded.  */
-  bool ignore_unused_dsos;
-
 
   /* True if in executables all global symbols should be exported in
      the dynamic symbol table.  */

@@ -1,7 +1,7 @@
 		      ToDo list for elfutils                      -*-outline-*-
                       ----------------------
 
-Time-stamp: <2005-08-29 08:58:24 drepper>
+Time-stamp: <2006-06-11 11:07:01 drepper>
 
 * mkinstalldirs
 
@@ -79,11 +79,15 @@ Time-stamp: <2005-08-29 08:58:24 drepper>
    The old mapping should be reused in that case.  The problem is worse
    for files which are not mapped read-only (archives again).
 
-
 ** size for STT_SECTION entries
 
    The STT_SECTION entries have zero for the size but can easily get
    the size of the section.
+
+** .eh_frame_hdr
+
+   Not implemented at all in the moment except for recognition of the option
+   itself.
 
 * elflint
 

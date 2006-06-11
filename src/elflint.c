@@ -1513,32 +1513,42 @@ section [%2d] '%s': entry %zu: DT_PLTREL value must be DT_REL or DT_RELA\n"),
       switch (dyn->d_tag)
 	{
 	  size_t n;
+	case DT_STRTAB:
+	  /* We require the referenced section is the same as the one
+	     specified in sh_link.  */
+	  if (strshdr->sh_addr != dyn->d_un.d_val)
+	    {
+	      ERROR (gettext ("\
+section [%2d] '%s': entry %zu: pointer does not match address of section [%2d] '%s' referenced by sh_link\n"),
+		     idx, section_name (ebl, idx), cnt,
+		     shdr->sh_link, section_name (ebl, shdr->sh_link));
+	      break;
+	    }
+	  goto check_addr;
+
 	default:
 	  if (dyn->d_tag < DT_ADDRRNGLO || dyn->d_tag > DT_ADDRRNGHI)
 	    /* Value is no pointer.  */
 	    break;
 	  /* FALLTHROUGH */
 
-	case DT_PLTGOT:
-	case DT_HASH:
-	case DT_STRTAB:
-	case DT_SYMTAB:
-	case DT_RELA:
-	case DT_INIT:
-	case DT_FINI:
-	case DT_SONAME:
-	case DT_RPATH:
-	case DT_SYMBOLIC:
-	case DT_REL:
-	case DT_JMPREL:
-	case DT_INIT_ARRAY:
-	case DT_FINI_ARRAY:
-	case DT_RUNPATH:
-	case DT_VERSYM:
-	case DT_VERDEF:
-	case DT_VERNEED:
 	case DT_AUXILIARY:
 	case DT_FILTER:
+	case DT_FINI:
+	case DT_FINI_ARRAY:
+	case DT_HASH:
+	case DT_INIT:
+	case DT_INIT_ARRAY:
+	case DT_JMPREL:
+	case DT_PLTGOT:
+	case DT_REL:
+	case DT_RELA:
+	case DT_SYMBOLIC:
+	case DT_SYMTAB:
+	case DT_VERDEF:
+	case DT_VERNEED:
+	case DT_VERSYM:
+	check_addr:
 	  for (n = 0; n < ehdr->e_phnum; ++n)
 	    {
 	      GElf_Phdr phdr_mem;
@@ -1557,6 +1567,23 @@ section [%2d] '%s': entry %zu: %s value must point into loaded segment\n"),
 		     ebl_dynamic_tag_name (ebl, dyn->d_tag, buf,
 					   sizeof (buf)));
 	    }
+	  break;
+
+	case DT_NEEDED:
+	case DT_RPATH:
+	case DT_RUNPATH:
+	case DT_SONAME:
+	  if (dyn->d_un.d_ptr >= strshdr->sh_size)
+	    {
+	      char buf[50];
+	      ERROR (gettext ("\
+section [%2d] '%s': entry %zu: %s value must be valid offset in section [%2d] '%s'\n"),
+		     idx, section_name (ebl, idx), cnt,
+		     ebl_dynamic_tag_name (ebl, dyn->d_tag, buf,
+					   sizeof (buf)),
+		     shdr->sh_link, section_name (ebl, shdr->sh_link));
+	    }
+	  break;
 	}
     }
 

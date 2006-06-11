@@ -1,5 +1,11 @@
 2006-06-11  Ulrich Drepper  <drepper@redhat.com>
 
+	* elflint.c (check_dynamic): Fix checking value of tags which are
+	offsets in the string section.  Make sure DT_STRTAB points to the
+	section referenced in sh_link.
+
+	* ld.c (options): Add headers.  Add short option 'R' for '--rpath'.
+
 	* ld.c: Recognize --eh-frame-hdr option.
 	* ld.h (struct ld_state): Add eh_frame_hdr field.
 	* ldgeneric.c (struct unw_eh_frame_hdr): Define.

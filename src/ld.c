@@ -925,10 +925,6 @@ parse_z_option (const char *arg)
 	   /* This is only meaningful if we create a DSO.  */
 	   && ld_state.file_type == dso_file_type)
     ld_state.dt_flags_1 |= DF_1_NOOPEN;
-  else if (strcmp (arg, "ignore") == 0)
-    ld_state.as_needed = true;
-  else if (strcmp (arg, "record") == 0)
-    ld_state.as_needed = false;
   else if (strcmp (arg, "systemlibrary") == 0)
     ld_state.is_system_library = true;
   else if (strcmp (arg, "execstack") == 0)
@@ -939,7 +935,9 @@ parse_z_option (const char *arg)
 	   && strcmp (arg, "defaultextract") != 0
 	   && strcmp (arg, "weakextract") != 0
 	   && strcmp (arg, "lazyload") != 0
-	   && strcmp (arg, "nolazyload") != 0)
+	   && strcmp (arg, "nolazyload") != 0
+	   && strcmp (arg, "ignore") != 0
+	   && strcmp (arg, "record") != 0)
     error (0, 0, gettext ("unknown option `-%c %s'"), 'z', arg);
 }
 
@@ -957,6 +955,10 @@ parse_z_option_2 (const char *arg)
     ld_state.lazyload = true;
   else if (strcmp (arg, "nolazyload") == 0)
     ld_state.lazyload = false;
+  else if (strcmp (arg, "ignore") == 0)
+    ld_state.as_needed = true;
+  else if (strcmp (arg, "record") == 0)
+    ld_state.as_needed = false;
 }
 
 

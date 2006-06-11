@@ -1007,6 +1007,9 @@ struct ld_state
   /* Lazy-loading state for dependencies.  */
   bool lazyload;
 
+  /* True if an .eh_frame_hdr section should be generated.  */
+  bool eh_frame_hdr;
+
 
   /* True if in executables all global symbols should be exported in
      the dynamic symbol table.  */

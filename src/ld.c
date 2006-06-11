@@ -73,6 +73,7 @@ enum
     ARGP_conserve,
     ARGP_as_needed,
     ARGP_no_as_needed,
+    ARGP_eh_frame_hdr,
 #if YYDEBUG
     ARGP_yydebug,
 #endif
@@ -198,6 +199,9 @@ Default rules of extracting from archive; weak references are not enough."),
     N_("Only set DT_NEEDED for following dynamic libs if actually used"), 0 },
   { "no-as-needed", ARGP_no_as_needed, NULL, 0,
     N_("Always set DT_NEEDED for following dynamic libs"), 0 },
+
+  { "eh-frame-hdr", ARGP_eh_frame_hdr, NULL, 0,
+    N_("Create .eh_frame_hdr section"), 0 },
 
 #if YYDEBUG
   { "yydebug", ARGP_yydebug, NULL, 0,
@@ -625,6 +629,10 @@ parse_opt_1st (int key, char *arg,
     case ARGP_gc_sections:
     case ARGP_no_gc_sections:
       ld_state.gc_sections = key == ARGP_gc_sections;
+      break;
+
+    case ARGP_eh_frame_hdr:
+      ld_state.eh_frame_hdr = true;
       break;
 
     case 's':

@@ -1,3 +1,14 @@
+2006-06-11  Ulrich Drepper  <drepper@redhat.com>
+
+	* ld.c: Recognize --eh-frame-hdr option.
+	* ld.h (struct ld_state): Add eh_frame_hdr field.
+	* ldgeneric.c (struct unw_eh_frame_hdr): Define.
+
+	* ldgeneric.c (add_section): Use ebl_sh_flags_combine instead of
+	SH_FLAGS_COMBINE.
+	(add_relocatable_file): Minor optimization of last change.
+	(match_section): Don't preserve SHF_GROUP flag any longer.
+
 2006-06-10  Ulrich Drepper  <drepper@redhat.com>
 
 	* ld.c (parse_z_option): Recognize execstack and noexecstack.

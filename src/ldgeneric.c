@@ -49,6 +49,17 @@
 #include "list.h"
 
 
+/* Header of .eh_frame_hdr section.  */
+struct unw_eh_frame_hdr
+{
+  unsigned char version;
+  unsigned char eh_frame_ptr_enc;
+  unsigned char fde_count_enc;
+  unsigned char table_enc;
+};
+#define EH_FRAME_HDR_VERSION 1
+
+
 /* Prototypes for local functions.  */
 static const char **ld_generic_lib_extensions (struct ld_state *)
      __attribute__ ((__const__));
@@ -989,7 +1000,8 @@ add_section (struct usedfiles *fileinfo, struct scninfo *scninfo)
 	  scninfo->next = queued->last->next;
 	  queued->last = queued->last->next = scninfo;
 
-	  queued->flags = SH_FLAGS_COMBINE (queued->flags, shdr->sh_flags);
+	  queued->flags = ebl_sh_flags_combine (ld_state.ebl, queued->flags,
+						shdr->sh_flags);
 	  queued->align = MAX (queued->align, shdr->sh_addralign);
 	}
     }
@@ -1240,13 +1252,11 @@ add_relocatable_file (struct usedfiles *fileinfo, GElf_Word secttype)
 	{
 	  /* Check whether the check needs to be executable.  */
 	  if (shdr->sh_type == SHT_PROGBITS
+	      && (shdr->sh_flags & SHF_EXECINSTR) == 0
 	      && strcmp (elf_strptr (fileinfo->elf, fileinfo->shstrndx,
 				     shdr->sh_name),
-			 ".note.GNU-stack") == 0
-	      && (shdr->sh_flags & SHF_EXECINSTR) == 0)
+			 ".note.GNU-stack") == 0)
 	    execstack = execstack_false;
-	  printf("%s %d\n", elf_strptr (fileinfo->elf, fileinfo->shstrndx,
-					shdr->sh_name),(int)execstack);
 
 	  add_section (fileinfo, &fileinfo->scninfo[cnt]);
 	}
@@ -1258,7 +1268,6 @@ add_relocatable_file (struct usedfiles *fileinfo, GElf_Word secttype)
       && execstack == execstack_true
       && ld_state.execstack != execstack_false_force)
     ld_state.execstack = execstack_true;
-  printf("%s: state = %d\n", fileinfo->fname,(int)ld_state.execstack);
 
   /* Handle the symbols.  Record defined and undefined symbols in the
      hash table.  In theory there can be a file without any symbol
@@ -2686,7 +2695,7 @@ match_section (const char *osectname, struct filemask_section_name *sectmask,
       const char *brfname = basename (runp->fileinfo->rfname);
 
       /* If the section isn't used, the name doesn't match the positive
-	 inclusion list or the name does match the negative inclusion
+	 inclusion list, or the name does match the negative inclusion
 	 list, ignore the section.  */
       if (!runp->used
 	  || (sectmask->filemask != NULL
@@ -2731,7 +2740,9 @@ match_section (const char *osectname, struct filemask_section_name *sectmask,
 	      newp->kind = scn_normal;
 	      newp->name = osectname;
 	      newp->type = SCNINFO_SHDR (found->shdr).sh_type;
-	      newp->flags = SCNINFO_SHDR (found->shdr).sh_flags;
+	      /* Executable or DSO do not have section groups.  Drop that
+		 information.  */
+	      newp->flags = SCNINFO_SHDR (found->shdr).sh_flags & ~SHF_GROUP;
 	      newp->segment_nr = segment_nr;
 	      newp->last = found->next = found;
 	      newp->used = true;
@@ -2762,9 +2773,12 @@ match_section (const char *osectname, struct filemask_section_name *sectmask,
 		/* XXX Any better choice?  */
 		queued->type = SHT_PROGBITS;
 	      if (queued->flags != SCNINFO_SHDR (found->shdr).sh_flags)
+		/* Executable or DSO do not have section groups.  Drop that
+		   information.  */
 		queued->flags = ebl_sh_flags_combine (ld_state.ebl,
 						      queued->flags,
-						      SCNINFO_SHDR (found->shdr).sh_flags);
+						      SCNINFO_SHDR (found->shdr).sh_flags
+						      & ~SHF_GROUP);
 
 	      /* Accumulate the relocation section size.  */
 	      queued->relsize += found->relsize;

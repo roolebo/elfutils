@@ -1028,6 +1028,9 @@ add_relocatable_file (struct usedfiles *fileinfo, GElf_Word secttype)
   size_t nsymbols = 0;
   size_t nlocalsymbols = 0;
   bool has_merge_sections = false;
+  /* Unless we have different information we assume the code needs
+     an executable stack.  */
+  enum execstack execstack = execstack_true;
 
   /* Prerequisites.  */
   assert (fileinfo->elf != NULL);
@@ -1234,8 +1237,28 @@ add_relocatable_file (struct usedfiles *fileinfo, GElf_Word secttype)
 			  || shdr->sh_type == SHT_INIT_ARRAY
 			  || shdr->sh_type == SHT_FINI_ARRAY
 			  || shdr->sh_type == SHT_PREINIT_ARRAY))
-	add_section (fileinfo, &fileinfo->scninfo[cnt]);
+	{
+	  /* Check whether the check needs to be executable.  */
+	  if (shdr->sh_type == SHT_PROGBITS
+	      && strcmp (elf_strptr (fileinfo->elf, fileinfo->shstrndx,
+				     shdr->sh_name),
+			 ".note.GNU-stack") == 0
+	      && (shdr->sh_flags & SHF_EXECINSTR) == 0)
+	    execstack = execstack_false;
+	  printf("%s %d\n", elf_strptr (fileinfo->elf, fileinfo->shstrndx,
+					shdr->sh_name),(int)execstack);
+
+	  add_section (fileinfo, &fileinfo->scninfo[cnt]);
+	}
     }
+
+  /* Now we know more about the requirements for an executable stack
+     of the result.  */
+  if (fileinfo->file_type == relocatable_file_type
+      && execstack == execstack_true
+      && ld_state.execstack != execstack_false_force)
+    ld_state.execstack = execstack_true;
+  printf("%s: state = %d\n", fileinfo->fname,(int)ld_state.execstack);
 
   /* Handle the symbols.  Record defined and undefined symbols in the
      hash table.  In theory there can be a file without any symbol
@@ -5573,6 +5596,10 @@ cannot create hash table section for output file: %s"),
 
 	 XXX Determine whether the segment is non-empty.  */
       nphdr = 0;
+
+      /* We always add a PT_GNU_stack entry.  */
+      ++nphdr;
+
       segment = ld_state.output_segments;
       while (segment != NULL)
 	{
@@ -5772,7 +5799,7 @@ internal error: nobits section follows nobits section"));
       xelf_getehdr (ld_state.outelf, ehdr);
       assert (ehdr != NULL);
 
-      xelf_getphdr_ptr (ld_state.outelf, 1, phdr);
+      xelf_getphdr_ptr (ld_state.outelf, 0, phdr);
       phdr->p_type = PT_PHDR;
       phdr->p_offset = ehdr->e_phoff;
       phdr->p_vaddr = ld_state.output_segments->addr + phdr->p_offset;
@@ -5782,6 +5809,21 @@ internal error: nobits section follows nobits section"));
       phdr->p_flags = 0;		/* No need to set PF_R or so.  */
       phdr->p_align = xelf_fsize (ld_state.outelf, ELF_T_ADDR, 1);
       (void) xelf_update_phdr (ld_state.outelf, 0, phdr);
+
+
+      /* Add the stack information.  */
+      xelf_getphdr_ptr (ld_state.outelf, nphdr, phdr);
+      phdr->p_type = PT_GNU_STACK;
+      phdr->p_offset = 0;
+      phdr->p_vaddr = 0;
+      phdr->p_paddr = 0;
+      phdr->p_filesz = 0;
+      phdr->p_memsz = 0;
+      phdr->p_flags = ld_state.execstack == execstack_true ? PF_X : 0;
+      phdr->p_align = 0;
+
+      (void) xelf_update_phdr (ld_state.outelf, nphdr, phdr);
+      ++nphdr;
 
 
       /* Adjust the addresses in the address fields of the symbol

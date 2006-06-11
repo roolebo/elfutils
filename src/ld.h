@@ -956,6 +956,14 @@ struct ld_state
   bool default_bind_local;
   bool default_bind_global;
 
+  /* Execuatable stack selection.  */
+  enum execstack
+    {
+      execstack_false = 0, 
+      execstack_true,
+      execstack_false_force
+    } execstack;
+
   /* True if only used sections are used.  */
   bool gc_sections;
 

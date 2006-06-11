@@ -931,6 +931,10 @@ parse_z_option (const char *arg)
     ld_state.as_needed = false;
   else if (strcmp (arg, "systemlibrary") == 0)
     ld_state.is_system_library = true;
+  else if (strcmp (arg, "execstack") == 0)
+    ld_state.execstack = execstack_true;
+  else if (strcmp (arg, "noexecstack") == 0)
+    ld_state.execstack = execstack_false_force;
   else if (strcmp (arg, "allextract") != 0
 	   && strcmp (arg, "defaultextract") != 0
 	   && strcmp (arg, "weakextract") != 0

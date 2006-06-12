@@ -1,3 +1,12 @@
+2006-06-12  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (gen_SOURCES): Add eblnonerelocp.c.
+	* eblnonerelocp.c: New file.
+	* ebl-hooks.c: Add none_reloc_p.
+	* eblopenbackend.c (default_none_reloc_p): New function.
+	(fill_defaults): Hook it up.
+	* libebl.h: Declare ebl_none_reloc_p.
+
 2006-05-27  Ulrich Drepper  <drepper@redhat.com>
 
 	* libebl.h: Add extern "C".

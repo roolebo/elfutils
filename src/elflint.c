@@ -1170,6 +1170,10 @@ section [%2d] '%s': relocation %zu: relocation type invalid for the file type\n"
 section [%2d] '%s': relocation %zu: invalid symbol index\n"),
 	   idx, section_name (ebl, idx), cnt);
 
+  /* No more tests if this is a no-op relocation.  */
+  if (ebl_none_reloc_p (ebl, GELF_R_TYPE (r_info)))
+    return;
+
   if (ebl_gotpc_reloc_check (ebl, GELF_R_TYPE (r_info)))
     {
       const char *name;

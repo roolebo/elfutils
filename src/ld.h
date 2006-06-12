@@ -174,6 +174,8 @@ struct usedfiles
     Elf32_Word allsectionsidx;
     /* True if the section is used.  */
     bool used;
+    /* True if section is an unused COMDAT section.  */
+    bool unused_comdat;
     /* Section group number.  This is the index of the SHT_GROUP section.  */
     Elf32_Word grpid;
     /* Pointer back to the containing file information structure.  */

@@ -1,3 +1,25 @@
+2006-06-12  Ulrich Drepper  <drepper@redhat.com>
+
+	* ldgeneric.c (ld_generic_generate_sections): Don't create .interp
+	section if creating a DSO and no interpreter is given.
+	(ld_generic_create_outfile): Don't store reference to symbols in
+	discarded COMDAT groups.  Don't create PHDR and INTERP program header
+	for DSO if no interpreter is specified.
+	* ldscript.y (content): If a DSO is created don't set default
+	interpreter from linker script.
+
+	* i386_ld.c (elf_i386_count_relocations): Do not add relocations
+	for symbols in discarded COMDAT groups.
+	(elf_i386_create_relocations): Likewise.
+	* ld.h (struct scninfo): Add unused_comdat.
+	* ldgeneric.c (add_section): Also check group signature when
+	matching COMDAT sections.
+	(add_relocatable_file): Ignore symbols in COMDAT group which are
+	discarded.
+
+	* elflint.c (check_one_reloc): For *_NONE relocs only check type
+	and symbol reference.
+
 2006-06-11  Ulrich Drepper  <drepper@redhat.com>
 
 	* elflint.c (check_dynamic): Fix checking value of tags which are

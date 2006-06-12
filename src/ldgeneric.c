@@ -991,7 +991,36 @@ add_section (struct usedfiles *fileinfo, struct scninfo *scninfo)
 	    }
 
 	  /* XXX Possibly unaligned memory access.  */
-	  is_comdat = ((Elf32_Word *) grpscndata->d_buf)[0] & GRP_COMDAT;
+	  if ((((Elf32_Word *) grpscndata->d_buf)[0] & GRP_COMDAT) != 0)
+	    {
+	      /* We have to compare the group signatures.  There might
+		 be sections with the same name but belonging to
+		 groups with different signatures.  This means we have
+		 to compare the new group signature with all those
+		 already collected.  There might also be some
+		 non-group sections in the mix.  */
+	      struct scninfo *runp = queued->last;
+	      do
+		{
+		  if (SCNINFO_SHDR (runp->shdr).sh_flags & SHF_GROUP)
+		    {
+		      struct scninfo *grpscn2
+			= find_section_group (runp->fileinfo,
+					      elf_ndxscn (runp->scn),
+					      &grpscndata);
+		  
+		      if (strcmp (grpscn->symbols->name,
+				  grpscn2->symbols->name) == 0)
+			{
+			  scninfo->unused_comdat = is_comdat = true;
+			  break;
+			}
+		    }
+
+		  runp = runp->next;
+		}
+	      while (runp != queued->last);
+	    }
 	}
 
       if (!is_comdat)
@@ -1376,6 +1405,11 @@ add_relocatable_file (struct usedfiles *fileinfo, GElf_Word secttype)
 	  /* We ignore ABS symbols from DSOs.  */
 	  // XXX Is this correct?
 	  if (unlikely (shndx == SHN_ABS) && secttype == SHT_DYNSYM)
+	    continue;
+
+	  if ((shndx < SHN_LORESERVE || shndx > SHN_HIRESERVE)
+	      && fileinfo->scninfo[shndx].unused_comdat)
+	    /* The symbol is not used.  */
 	    continue;
 
 	  /* If the DSO uses symbols determine whether this is the default
@@ -2302,8 +2336,9 @@ ld_generic_generate_sections (struct ld_state *statep)
       bool need_version = false;
 
       /* First the .interp section.  */
-      new_generated_scn (scn_dot_interp, ".interp", SHT_PROGBITS, SHF_ALLOC,
-			 0, 1);
+      if (ld_state.interp != NULL || ld_state.file_type != dso_file_type)
+	new_generated_scn (scn_dot_interp, ".interp", SHT_PROGBITS, SHF_ALLOC,
+			   0, 1);
 
       /* Now the .dynamic section.  */
       new_generated_scn (scn_dot_dynamic, ".dynamic", SHT_DYNAMIC,
@@ -4739,23 +4774,24 @@ section index too large in dynamic symbol table"));
 	     Find the symbol if this has not happened yet.  We do
 	     not need the information for local symbols.  */
 	  if (defp == NULL && cnt >= file->nlocalsymbols)
-	    {
-	      defp = file->symref[cnt];
-	      assert (defp != NULL);
-	    }
+	    defp = file->symref[cnt];
 
-	  /* Store the reference to the symbol record.  The
-	     sorting code will have to keep this array in the
-	     correct order, too.  */
-	  ndxtosym[nsym] = defp;
-
-	  /* One more entry finished.  */
-	  if (cnt >= file->nlocalsymbols)
+	  /* Ignore symbols in discarded COMDAT group sections.  */
+	  if (defp != NULL)
 	    {
-	      assert (file->symref[cnt]->outsymidx == 0);
-	      file->symref[cnt]->outsymidx = nsym;
+	      /* Store the reference to the symbol record.  The
+		 sorting code will have to keep this array in the
+		 correct order, too.  */
+	      ndxtosym[nsym] = defp;
+
+	      /* One more entry finished.  */
+	      if (cnt >= file->nlocalsymbols)
+		{
+		  assert (file->symref[cnt]->outsymidx == 0);
+		  file->symref[cnt]->outsymidx = nsym;
+		}
+	      file->symindirect[cnt] = nsym++;
 	    }
-	  file->symindirect[cnt] = nsym++;
 	}
     }
   while ((file = file->next) != ld_state.relfiles->next);
@@ -5624,10 +5660,16 @@ cannot create hash table section for output file: %s"),
       /* Add the number of SHT_NOTE sections.  We counted them earlier.  */
       nphdr += ld_state.nnotesections;
 
-      /* If we create a DSO or the file is linked against DSOs we have three
-	 more entries: INTERP, PHDR, DYNAMIC.  */
+      /* If we create a DSO or the file is linked against DSOs we have
+	 at least one more entry: DYNAMIC.  If an interpreter is
+	 specified we add PHDR and INTERP, too.  */
       if (dynamically_linked_p ())
-	nphdr += 3;
+	{
+	  ++nphdr;
+
+	  if (ld_state.interp != NULL || ld_state.file_type != dso_file_type)
+	    nphdr += 2;
+	}
 
       /* Create the program header structure.  */
       if (xelf_newphdr (ld_state.outelf, nphdr) == 0)
@@ -5655,7 +5697,14 @@ cannot create hash table section for output file: %s"),
       addr = shdr->sh_offset;
 
       /* The index of the first loadable segment.  */
-      nphdr = 1 + (dynamically_linked_p () == true) * 2;
+      nphdr = 0;
+      if (dynamically_linked_p ())
+	{
+	  ++nphdr;
+	  if (ld_state.interp != NULL
+	      || ld_state.file_type != dso_file_type)
+	    nphdr += 2;
+	}
 
       segment = ld_state.output_segments;
       while (segment != NULL)
@@ -5813,18 +5862,6 @@ internal error: nobits section follows nobits section"));
       xelf_getehdr (ld_state.outelf, ehdr);
       assert (ehdr != NULL);
 
-      xelf_getphdr_ptr (ld_state.outelf, 0, phdr);
-      phdr->p_type = PT_PHDR;
-      phdr->p_offset = ehdr->e_phoff;
-      phdr->p_vaddr = ld_state.output_segments->addr + phdr->p_offset;
-      phdr->p_paddr = phdr->p_vaddr;
-      phdr->p_filesz = ehdr->e_phnum * ehdr->e_phentsize;
-      phdr->p_memsz = phdr->p_filesz;
-      phdr->p_flags = 0;		/* No need to set PF_R or so.  */
-      phdr->p_align = xelf_fsize (ld_state.outelf, ELF_T_ADDR, 1);
-      (void) xelf_update_phdr (ld_state.outelf, 0, phdr);
-
-
       /* Add the stack information.  */
       xelf_getphdr_ptr (ld_state.outelf, nphdr, phdr);
       phdr->p_type = PT_GNU_STACK;
@@ -5941,24 +5978,41 @@ internal error: nobits section follows nobits section"));
 	{
 	  Elf_Scn *outscn;
 
-	  assert (ld_state.interpscnidx != 0);
-	  xelf_getshdr (elf_getscn (ld_state.outelf, ld_state.interpscnidx),
-			shdr);
-	  assert (shdr != NULL);
+	  int idx = 0;
+	  if (ld_state.interp != NULL || ld_state.file_type != dso_file_type)
+	    {
+	      assert (ld_state.interpscnidx != 0);
+	      xelf_getshdr (elf_getscn (ld_state.outelf,
+					ld_state.interpscnidx), shdr);
+	      assert (shdr != NULL);
 
-	  /* The interpreter string.  */
-	  // XXX Do we need to support files (DSOs) without interpreters?
-	  xelf_getphdr_ptr (ld_state.outelf, 1, phdr);
-	  phdr->p_type = PT_INTERP;
-	  phdr->p_offset = shdr->sh_offset;
-	  phdr->p_vaddr = shdr->sh_addr;
-	  phdr->p_paddr = phdr->p_vaddr;
-	  phdr->p_filesz = shdr->sh_size;
-	  phdr->p_memsz = phdr->p_filesz;
-	  phdr->p_flags = 0;		/* No need to set PF_R or so.  */
-	  phdr->p_align = 1;		/* It's a string.  */
+	      xelf_getphdr_ptr (ld_state.outelf, idx, phdr);
+	      phdr->p_type = PT_PHDR;
+	      phdr->p_offset = ehdr->e_phoff;
+	      phdr->p_vaddr = ld_state.output_segments->addr + phdr->p_offset;
+	      phdr->p_paddr = phdr->p_vaddr;
+	      phdr->p_filesz = ehdr->e_phnum * ehdr->e_phentsize;
+	      phdr->p_memsz = phdr->p_filesz;
+	      phdr->p_flags = 0;	/* No need to set PF_R or so.  */
+	      phdr->p_align = xelf_fsize (ld_state.outelf, ELF_T_ADDR, 1);
 
-	  (void) xelf_update_phdr (ld_state.outelf, 1, phdr);
+	      (void) xelf_update_phdr (ld_state.outelf, idx, phdr);
+	      ++idx;
+
+	      /* The interpreter string.  */
+	      xelf_getphdr_ptr (ld_state.outelf, idx, phdr);
+	      phdr->p_type = PT_INTERP;
+	      phdr->p_offset = shdr->sh_offset;
+	      phdr->p_vaddr = shdr->sh_addr;
+	      phdr->p_paddr = phdr->p_vaddr;
+	      phdr->p_filesz = shdr->sh_size;
+	      phdr->p_memsz = phdr->p_filesz;
+	      phdr->p_flags = 0;	/* No need to set PF_R or so.  */
+	      phdr->p_align = 1;	/* It's a string.  */
+
+	      (void) xelf_update_phdr (ld_state.outelf, idx, phdr);
+	      ++idx;
+	    }
 
 	  /* The pointer to the dynamic section.  We this we need to
 	     get the information for the dynamic section first.  */
@@ -5967,7 +6021,7 @@ internal error: nobits section follows nobits section"));
 	  xelf_getshdr (outscn, shdr);
 	  assert (shdr != NULL);
 
-	  xelf_getphdr_ptr (ld_state.outelf, 2, phdr);
+	  xelf_getphdr_ptr (ld_state.outelf, idx, phdr);
 	  phdr->p_type = PT_DYNAMIC;
 	  phdr->p_offset = shdr->sh_offset;
 	  phdr->p_vaddr = shdr->sh_addr;
@@ -5977,7 +6031,7 @@ internal error: nobits section follows nobits section"));
 	  phdr->p_flags = 0;		/* No need to set PF_R or so.  */
 	  phdr->p_align = shdr->sh_addralign;
 
-	  (void) xelf_update_phdr (ld_state.outelf, 2, phdr);
+	  (void) xelf_update_phdr (ld_state.outelf, idx, phdr);
 
 	  /* Fill in the reference to the .dynstr section.  */
 	  assert (ld_state.dynstrscnidx != 0);

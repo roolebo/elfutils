@@ -1,5 +1,5 @@
 /* Generate ELF backend handle.
-   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -190,6 +190,7 @@ static bool default_object_note (const char *name, uint32_t type,
 				 uint32_t descsz, const char *desc);
 static bool default_debugscn_p (const char *name);
 static bool default_copy_reloc_p (int reloc);
+static bool default_none_reloc_p (int reloc);
 static bool default_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr,
 					  const GElf_Sym *sym,
 					  const char *name,
@@ -229,6 +230,7 @@ fill_defaults (Ebl *result)
   result->object_note = default_object_note;
   result->debugscn_p = default_debugscn_p;
   result->copy_reloc_p = default_copy_reloc_p;
+  result->none_reloc_p = default_none_reloc_p;
   result->check_special_symbol = default_check_special_symbol;
   result->bss_plt_p = default_bss_plt_p;
   result->return_value_location = default_return_value_location;
@@ -605,6 +607,7 @@ default_copy_reloc_p (int reloc __attribute__ ((unused)))
 {
   return false;
 }
+strong_alias (default_copy_reloc_p, default_none_reloc_p)
 
 static bool
 default_check_special_symbol (Elf *elf __attribute__ ((unused)),

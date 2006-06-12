@@ -6,6 +6,10 @@ make all installed headers usable in C++ code.
 
 readelf: better output format.
 
+elflint: fix tests of dynamic section content.
+
+ld: Implement --as-needed, --execstack, PT_GNU_STACK.  Many small patches.
+
 libdw, libdwfl: handle files without aranges info.
 
 Version 0.120:

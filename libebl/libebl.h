@@ -189,6 +189,9 @@ extern bool ebl_debugscn_p (Ebl *ebl, const char *name);
 /* Check whether given relocation is a copy relocation.  */
 extern bool ebl_copy_reloc_p (Ebl *ebl, int reloc);
 
+/* Check whether given relocation is a no-op relocation.  */
+extern bool ebl_none_reloc_p (Ebl *ebl, int reloc);
+
 /* Check whether section should be stripped.  */
 extern bool ebl_section_strip_p (Ebl *ebl, const GElf_Ehdr *ehdr,
 				 const GElf_Shdr *shdr, const char *name,

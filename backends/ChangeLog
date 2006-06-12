@@ -1,3 +1,8 @@
+2006-06-12  Ulrich Drepper  <drepper@redhat.com>
+
+	* common-reloc.c (none_reloc_p): New function.
+	(init_reloc): Hoop it up.
+
 2006-02-22  Roland McGrath  <roland@redhat.com>
 
 	* ppc64_retval.c (SVR4_STRUCT_RETURN): New macro.

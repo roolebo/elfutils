@@ -525,6 +525,11 @@ elf_i386_count_relocations (struct ld_state *statep, struct scninfo *scninfo)
 	{
 	  Elf32_Word r_sym = XELF_R_SYM (rel->r_info);
 
+	  /* Symbols in COMDAT group sections which are discarded do
+	     not have to be relocated.  */
+	  if (unlikely (scninfo->fileinfo->symref[r_sym] == NULL))
+	    continue;
+
 	  switch (XELF_R_TYPE (rel->r_info))
 	    {
 	    case R_386_GOT32:
@@ -717,16 +722,24 @@ elf_i386_create_relocations (struct ld_state *statep,
 		 section in the output file and the addend.  */
 	      value = scninfo[sym->st_shndx].offset + sym->st_value;
 	    }
-	  else if (symref[idx]->in_dso)
-	    {
-	      /* MERGE.VALUE contains the PLT index.  We have to add 1 since
-		 there is this one special PLT entry at the beginning.  */
-	      assert (symref[idx]->merge.value != 0
-		      || symref[idx]->type != STT_FUNC);
-	      value = pltaddr + symref[idx]->merge.value * PLT_ENTRY_SIZE;
-	    }
 	  else
-	    value = symref[idx]->merge.value;
+	    {
+	      if (symref[idx] == NULL)
+		/* Symbol in ignored COMDAT group section.  */
+		continue;
+
+	      if (symref[idx]->in_dso)
+		{
+		  /* MERGE.VALUE contains the PLT index.  We have to
+		     add 1 since there is this one special PLT entry
+		     at the beginning.  */
+		  assert (symref[idx]->merge.value != 0
+			  || symref[idx]->type != STT_FUNC);
+		  value = pltaddr + symref[idx]->merge.value * PLT_ENTRY_SIZE;
+		}
+	      else
+		value = symref[idx]->merge.value;
+	    }
 
 	  /* Address of the relocated memory in the data buffer.  */
 	  void *relloc = (char *) data->d_buf + rel->r_offset;

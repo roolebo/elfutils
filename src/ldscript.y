@@ -165,7 +165,8 @@ content:	  kENTRY '(' kID ')' ';'
 		    }
 		| kINTERP '(' filename_id ')' ';'
 		    {
-		      if (likely (ld_state.interp == NULL))
+		      if (likely (ld_state.interp == NULL)
+			  && ld_state.file_type != dso_file_type)
 			ld_state.interp = $3;
 		    }
 		| kSEGMENT kMODE '{' outputsections '}'

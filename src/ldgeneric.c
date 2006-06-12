@@ -3649,66 +3649,62 @@ allocate_version_names (struct usedfiles *runp, struct Ebl_Strtab *dynstrtab)
 }
 
 
-XElf_Off
+static XElf_Off
 create_verneed_data (XElf_Off offset, Elf_Data *verneeddata,
 		     struct usedfiles *runp, int *ntotal)
 {
-	  size_t verneed_size = xelf_fsize (ld_state.outelf, ELF_T_VNEED, 1);
-	  size_t vernaux_size = xelf_fsize (ld_state.outelf, ELF_T_VNAUX, 1);
-	      int need_offset;
-	      bool filled = false;
-	      GElf_Verneed verneed;
-	      GElf_Vernaux vernaux;
-	      int ndef = 0;
-size_t cnt;
+  size_t verneed_size = xelf_fsize (ld_state.outelf, ELF_T_VNEED, 1);
+  size_t vernaux_size = xelf_fsize (ld_state.outelf, ELF_T_VNAUX, 1);
+  int need_offset;
+  bool filled = false;
+  GElf_Verneed verneed;
+  GElf_Vernaux vernaux;
+  int ndef = 0;
+  size_t cnt;
 
-	      /* If this DSO has no versions skip it.  */
-	      if (runp->nverdefused == 0)
-		return offset;
+  /* If this DSO has no versions skip it.  */
+  if (runp->nverdefused == 0)
+    return offset;
 
-	      /* We fill in the Verneed record last.  Remember the
-		 offset.  */
-	      need_offset = offset;
-	      offset += verneed_size;
+  /* We fill in the Verneed record last.  Remember the offset.  */
+  need_offset = offset;
+  offset += verneed_size;
 
-	      for (cnt = 2; cnt <= runp->nverdef; ++cnt)
-		if (runp->verdefused[cnt] != 0)
-		  {
-		    assert (runp->verdefent[cnt] != NULL);
+  for (cnt = 2; cnt <= runp->nverdef; ++cnt)
+    if (runp->verdefused[cnt] != 0)
+      {
+	assert (runp->verdefent[cnt] != NULL);
 
-		    if (filled)
-		      {
-			vernaux.vna_next = vernaux_size;
-			(void) gelf_update_vernaux (verneeddata, offset,
-						    &vernaux);
-			offset += vernaux_size;
-		      }
+	if (filled)
+	  {
+	    vernaux.vna_next = vernaux_size;
+	    (void) gelf_update_vernaux (verneeddata, offset, &vernaux);
+	    offset += vernaux_size;
+	  }
 
-		    vernaux.vna_hash
-		      = elf_hash (ebl_string (runp->verdefent[cnt]));
-		    vernaux.vna_flags = 0;
-		    vernaux.vna_other = runp->verdefused[cnt];
-		    vernaux.vna_name = ebl_strtaboffset (runp->verdefent[cnt]);
-		    filled = true;
-		    ++ndef;
-		  }
+	vernaux.vna_hash = elf_hash (ebl_string (runp->verdefent[cnt]));
+	vernaux.vna_flags = 0;
+	vernaux.vna_other = runp->verdefused[cnt];
+	vernaux.vna_name = ebl_strtaboffset (runp->verdefent[cnt]);
+	filled = true;
+	++ndef;
+      }
 
-	      assert (filled);
-	      vernaux.vna_next = 0;
-	      (void) gelf_update_vernaux (verneeddata, offset, &vernaux);
-	      offset += vernaux_size;
+  assert (filled);
+  vernaux.vna_next = 0;
+  (void) gelf_update_vernaux (verneeddata, offset, &vernaux);
+  offset += vernaux_size;
 
-	      verneed.vn_version = VER_NEED_CURRENT;
-	      verneed.vn_cnt = ndef;
-	      verneed.vn_file = ebl_strtaboffset (runp->verdefent[1]);
-	      /* The first auxiliary entry is always found directly
-		 after the verneed entry.  */
-	      verneed.vn_aux = verneed_size;
-	      verneed.vn_next = --*ntotal > 0 ? offset - need_offset : 0;
-	      (void) gelf_update_verneed (verneeddata, need_offset,
-					  &verneed);
+  verneed.vn_version = VER_NEED_CURRENT;
+  verneed.vn_cnt = ndef;
+  verneed.vn_file = ebl_strtaboffset (runp->verdefent[1]);
+  /* The first auxiliary entry is always found directly
+     after the verneed entry.  */
+  verneed.vn_aux = verneed_size;
+  verneed.vn_next = --*ntotal > 0 ? offset - need_offset : 0;
+  (void) gelf_update_verneed (verneeddata, need_offset, &verneed);
 
-	      return offset;
+  return offset;
 }
 
 

@@ -5,6 +5,8 @@
 	(ld_generic_create_outfile): Don't store reference to symbols in
 	discarded COMDAT groups.  Don't create PHDR and INTERP program header
 	for DSO if no interpreter is specified.
+	(create_verneed_data): Pretty printing.
+
 	* ldscript.y (content): If a DSO is created don't set default
 	interpreter from linker script.
 

@@ -1,7 +1,3 @@
-2006-06-13  Roland McGrath  <roland@redhat.com>
-
-	* ppc64_retval.c: Remove SVR4_STRUCT_RETURN braino.
-
 2006-06-12  Ulrich Drepper  <drepper@redhat.com>
 
 	* common-reloc.c (none_reloc_p): New function.

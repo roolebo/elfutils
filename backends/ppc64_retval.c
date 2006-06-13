@@ -34,10 +34,6 @@
 #include "libebl_CPU.h"
 
 
-/* This is the SVR4 ELF ABI convention, but AIX and Linux do not use it.  */
-#define SVR4_STRUCT_RETURN 0
-
-
 /* r3.  */
 static const Dwarf_Op loc_intreg[] =
   {
@@ -137,7 +133,7 @@ ppc64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
 		return nloc_fp4regs;
 	    }
 	}
-      if (size <= 8 && SVR4_STRUCT_RETURN)
+      if (size <= 8)
 	{
 	intreg:
 	  *locp = loc_intreg;

@@ -446,8 +446,6 @@ struct symbol
   unsigned int weak:1;
   unsigned int added:1;
   unsigned int merged:1;
-  unsigned int local:1;
-  unsigned int hidden:1;
   /* Nonzero if the symbol is on the from_dso list.  */
   unsigned int on_dsolist:1;
   /* Nonzero if symbol needs copy relocation, reset when the
@@ -963,7 +961,7 @@ struct ld_state
   /* Execuatable stack selection.  */
   enum execstack
     {
-      execstack_false = 0,
+      execstack_false = 0, 
       execstack_true,
       execstack_false_force
     } execstack;

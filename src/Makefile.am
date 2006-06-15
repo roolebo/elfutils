@@ -63,12 +63,6 @@ else
 noinst_LIBRARIES = libld_elf.a $(ld_dsos)
 noinst_PROGRAMS = $(ld_dsos:_pic.a=.so)
 endif
-if NEVER
-# We never build this library but we need to get the dependency files
-# of all the linker backends that might be used in a non-generic linker.
-noinst_LIBRARIES += libdummy.a
-libdummy_a_SOURCES = i386_ld.c
-endif
 
 textrel_check = if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
 
@@ -108,7 +102,6 @@ size_LDADD = $(libelf) $(libeu) $(libmudflap)
 strip_LDADD = $(libebl) $(libelf) $(libeu) $(libmudflap) -ldl
 ld_LDADD = $(libebl) $(libelf) $(libeu) $(libmudflap) -ldl
 if NATIVE_LD
-# -ldl is always needed for libebl.
 ld_LDADD += libld_elf.a
 endif
 ld_LDFLAGS = -rdynamic
@@ -124,10 +117,9 @@ ldlex.o: ldscript.c
 ldlex_no_Werror = yes
 ldscript.h: ldscript.c
 
-if NATIVE_LD
 # Machine-specific linker code.
-libld_elf_a_SOURCES := $(base_cpu)_ld.c
-else
+libld_elf_a_SOURCES = $(base_cpu)_ld.c
+
 libld_elf_i386_pic_a_SOURCES =
 am_libld_elf_i386_pic_a_OBJECTS = i386_ld.os
 
@@ -137,7 +129,6 @@ libld_elf_i386.so: libld_elf_i386_pic.a libld_elf_i386.map
 	      $(libelf) $(libeu) \
 	      -Wl,--version-script,$(srcdir)/libld_elf_i386.map
 	$(textrel_check)
-endif
 
 
 %.os: %.c %.o

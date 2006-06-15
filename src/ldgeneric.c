@@ -1008,7 +1008,7 @@ add_section (struct usedfiles *fileinfo, struct scninfo *scninfo)
 			= find_section_group (runp->fileinfo,
 					      elf_ndxscn (runp->scn),
 					      &grpscndata);
-
+		  
 		      if (strcmp (grpscn->symbols->name,
 				  grpscn2->symbols->name) == 0)
 			{
@@ -1436,9 +1436,9 @@ add_relocatable_file (struct usedfiles *fileinfo, GElf_Word secttype)
 	     _GLOBAL_OFFSET_TABLE_, _DYNAMIC.  */
 	  // XXX This loop is hot and the following tests hardly ever match.
 	  // XXX Maybe move the tests somewhere they are executed less often.
-	  if (((unlikely (hval == 165832675ul)
+	  if (((unlikely (hval == 165832675)
 		&& strcmp (search.name, "_DYNAMIC") == 0)
-	       || (unlikely (hval == 102264335ul)
+	       || (unlikely (hval == 102264335)
 		   && strcmp (search.name, "_GLOBAL_OFFSET_TABLE_") == 0))
 	      && sym->st_shndx != SHN_UNDEF
 	      /* If somebody defines such a variable in a relocatable we
@@ -1451,7 +1451,7 @@ add_relocatable_file (struct usedfiles *fileinfo, GElf_Word secttype)
 	  struct symbol *newp;
 	  if (likely (oldp == NULL))
 	    {
-	      /* No symbol of this name known.  Add it.  */
+	      /* No symbol of this name know.  Add it.  */
 	      newp = (struct symbol *) obstack_alloc (&ld_state.smem,
 						      sizeof (*newp));
 	      newp->name = search.name;
@@ -1467,8 +1467,6 @@ add_relocatable_file (struct usedfiles *fileinfo, GElf_Word secttype)
 	      newp->weak = XELF_ST_BIND (sym->st_info) == STB_WEAK;
 	      newp->added = 0;
 	      newp->merged = 0;
-	      newp->local = 0;
-	      newp->hidden = 0;
 	      newp->need_copy = 0;
 	      newp->on_dsolist = 0;
 	      newp->in_dso = secttype == SHT_DYNSYM;
@@ -1930,18 +1928,6 @@ file_process2 (struct usedfiles *fileinfo)
 		       ebl_object_type_name (ld_state.ebl,
 					     FILEINFO_EHDR (fileinfo->ehdr).e_type,
 					     buf, sizeof (buf)));
-	      fileinfo->status = closed;
-	      return 1;
-	    }
-
-	  /* Make sure the file type matches the backend.  */
-	  if (FILEINFO_EHDR (fileinfo->ehdr).e_machine
-	      != ebl_get_elfmachine (ld_state.ebl))
-	    {
-	      fprintf (stderr, gettext ("\
-%s: input file incompatible with ELF machine type %s\n"),
-		       fileinfo->rfname,
-		       ebl_backend_name (ld_state.ebl));
 	      fileinfo->status = closed;
 	      return 1;
 	    }
@@ -2549,7 +2535,7 @@ ld_generic_open_outfile (struct ld_state *statep, int machine, int klass,
     {
       strcpy (mempcpy (tempfname, ld_state.outfname, outfname_len), ".XXXXXX");
 
-      /* The use of mktemp() here is fine.  We do not want to use
+      /* The useof mktemp() here is fine.  We do not want to use
 	 mkstemp() since then the umask isn't used.  And the output
 	 file will have these permissions anyhow.  Any intruder could
 	 change the file later if it would be possible now.  */
@@ -3256,7 +3242,7 @@ reduce_symbol_p (XElf_Sym *sym, struct Ebl_Strent *strent)
     {
       search.id = strndupa (str, version - str);
       if (*++version == VER_CHR)
-	/* Skip the second '@' signaling a default definition.  */
+	/* Skip the second '@' signalling a default definition.  */
 	++version;
     }
   else
@@ -3574,9 +3560,9 @@ fillin_special_symbol (struct symbol *symst, size_t scnidx, size_t nsym,
   /* The name offset will be filled in later.  */
   sym->st_name = 0;
   /* Traditionally: globally visible.  */
-  sym->st_info = XELF_ST_INFO (symst->local ? STB_LOCAL : STB_GLOBAL,
-			       symst->type);
-  sym->st_other = symst->hidden ? STV_HIDDEN : STV_DEFAULT;
+  sym->st_info = XELF_ST_INFO (STB_GLOBAL, symst->type);
+  /* No special visibility or so.  */
+  sym->st_other = 0;
   /* Reference to the GOT or dynamic section.  Since the GOT and
      dynamic section are only created for executables and DSOs it
      cannot be that the section index is too large.  */
@@ -3733,7 +3719,7 @@ create_verneed_data (XElf_Off offset, Elf_Data *verneeddata,
    For executables (shared or not) we have to create the program header,
    additional sections like the .interp, eventually (in addition) create
    a dynamic symbol table and a dynamic section.  Also the relocations
-   have to be processed differently.  */
+have to be processed differently.  */
 static int
 ld_generic_create_outfile (struct ld_state *statep)
 {
@@ -4601,7 +4587,6 @@ ld_generic_create_outfile (struct ld_state *statep)
   file = ld_state.relfiles->next;
   symdata = elf_getdata (elf_getscn (ld_state.outelf, ld_state.symscnidx),
 			 NULL);
-
   do
     {
       size_t maxcnt;
@@ -4660,11 +4645,11 @@ ld_generic_create_outfile (struct ld_state *statep)
 	    continue;
 
 #if NATIVE_ELF != 0
-	  /* Copy old data.  We create a temporary copy because the
-	     symbol might still be discarded.  */
-	  XElf_Sym sym_mem;
-	  sym_mem = *sym;
-	  sym = &sym_mem;
+	  /* Copy old data.  */
+	  XElf_Sym *sym2 = sym;
+	  assert (nsym < nsym_allocated);
+	  xelf_getsym (symdata, nsym, sym);
+	  *sym = *sym2;
 #endif
 
 	  if (sym->st_shndx != SHN_UNDEF
@@ -4769,7 +4754,6 @@ section index too large in dynamic symbol table"));
 	  /* Once we know the name this field will get the correct
 	     offset.  For now set it to zero which means no name
 	     associated.  */
-	  GElf_Word st_name = sym->st_name;
 	  sym->st_name = 0;
 
 	  /* If we had to merge sections we have a completely new
@@ -4780,56 +4764,37 @@ section index too large in dynamic symbol table"));
 
 	  /* Create the record in the output sections.  */
 	  assert (nsym < nsym_allocated);
-	  xelf_update_symshndx (symdata, xndxdata, nsym, sym, xndx, 1);
+	  xelf_update_symshndx (symdata, xndxdata, nsym, sym, xndx, 0);
 
 	  /* Add the reference to the symbol record in case we need it.
 	     Find the symbol if this has not happened yet.  We do
 	     not need the information for local symbols.  */
 	  if (defp == NULL && cnt >= file->nlocalsymbols)
-	    {
-	      defp = file->symref[cnt];
+	    defp = file->symref[cnt];
 
-	      if (defp == NULL)
+	  /* Ignore symbols in discarded COMDAT group sections.  */
+	  if (defp != NULL)
+	    {
+	      /* Store the reference to the symbol record.  The
+		 sorting code will have to keep this array in the
+		 correct order, too.  */
+	      ndxtosym[nsym] = defp;
+
+	      /* One more entry finished.  */
+	      if (cnt >= file->nlocalsymbols)
 		{
-		  /* This is a symbol in a discarded COMDAT section.
-		     Find the definition we actually use.  */
-		  // XXX The question is: do we have to do this here
-		  // XXX or can we do it earlier when we discard the
-		  // XXX section.
-		  struct symbol search;
-		  search.name = elf_strptr (file->elf, file->symstridx,
-					    st_name);
-		  struct symbol *realp
-		    = ld_symbol_tab_find (&ld_state.symbol_tab,
-					  elf_hash (search.name), &search);
-		  if (realp == NULL)
-		    // XXX What to do here?
-		    error (EXIT_FAILURE, 0,
-			   "couldn't find symbol from COMDAT section");
-
-		  file->symref[cnt] = realp;
-
-		  continue;
+		  assert (file->symref[cnt]->outsymidx == 0);
+		  file->symref[cnt]->outsymidx = nsym;
 		}
+	      file->symindirect[cnt] = nsym++;
 	    }
-
-	  /* Store the reference to the symbol record.  The sorting
-	     code will have to keep this array in the correct order, too.  */
-	  ndxtosym[nsym] = defp;
-
-	  /* One more entry finished.  */
-	  if (cnt >= file->nlocalsymbols)
-	    {
-	      assert (file->symref[cnt]->outsymidx == 0);
-	      file->symref[cnt]->outsymidx = nsym;
-	    }
-	  file->symindirect[cnt] = nsym++;
 	}
     }
   while ((file = file->next) != ld_state.relfiles->next);
   /* Make sure we didn't create the extended section index table for
      nothing.  */
   assert (xndxdata == NULL || need_xndx);
+
 
   /* Create the version related sections.  */
   if (ld_state.verneedscnidx != 0)
@@ -5263,8 +5228,7 @@ section index too large in dynamic symbol table"));
 	  if (XELF_ST_TYPE (sym->st_info) == STT_FILE
 	      || XELF_ST_VISIBILITY (sym->st_other) == STV_INTERNAL
 	      || XELF_ST_VISIBILITY (sym->st_other) == STV_HIDDEN
-	      || (!ld_state.export_all_dynamic
-		  && !ndxtosym[cnt]->in_dso && ndxtosym[cnt]->defined))
+	      || (!ndxtosym[cnt]->in_dso && ndxtosym[cnt]->defined))
 	    {
 	      symstrent[cnt] = NULL;
 	      continue;
@@ -5287,9 +5251,7 @@ section index too large in dynamic symbol table"));
 	    {
 	      struct symbol *symp = ndxtosym[cnt];
 
-	      /* Synthetic symbols (i.e., those with no file attached)
-		 have no version information.  */
-	      if (symp->file != NULL && symp->file->verdefdata != NULL)
+	      if (symp->file->verdefdata != NULL)
 		{
 		  GElf_Versym versym;
 

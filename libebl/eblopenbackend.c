@@ -54,7 +54,7 @@
 #include <assert.h>
 #include <dlfcn.h>
 #include <error.h>
-#include <libelfP.h>
+#include <gelf.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -89,7 +89,6 @@ static const struct
   { "sparc", "elf_sparcv9", "sparc", 5, EM_SPARCV9, 0, 0 },
   { "sparc", "elf_sparc", "sparc", 5, EM_SPARC, 0, 0 },
   { "sparc", "elf_sparcv8plus", "sparc", 5, EM_SPARC32PLUS, 0, 0 },
-  { "s390", "ebl_s390", "s390", 4, EM_S390, 0, 0 },
 
   { "m32", "elf_m32", "m32", 3, EM_M32, 0, 0 },
   { "m68k", "elf_m68k", "m68k", 4, EM_68K, 0, 0 },
@@ -100,6 +99,7 @@ static const struct
   { "vpp500", "elf_vpp500", "vpp500", 5, EM_VPP500, 0, 0 },
   { "sparc", "elf_v8plus", "v8plus", 6, EM_SPARC32PLUS, 0, 0 },
   { "i960", "elf_i960", "i960", 4, EM_960, 0, 0 },
+  { "s390", "ebl_s390", "s390", 4, EM_S390, 0, 0 },
   { "v800", "ebl_v800", "v800", 4, EM_V800, 0, 0 },
   { "fr20", "ebl_fr20", "fr20", 4, EM_FR20, 0, 0 },
   { "rh32", "ebl_rh32", "rh32", 4, EM_RH32, 0, 0 },
@@ -191,7 +191,6 @@ static bool default_object_note (const char *name, uint32_t type,
 static bool default_debugscn_p (const char *name);
 static bool default_copy_reloc_p (int reloc);
 static bool default_none_reloc_p (int reloc);
-static bool default_relative_reloc_p (int reloc);
 static bool default_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr,
 					  const GElf_Sym *sym,
 					  const char *name,
@@ -232,13 +231,11 @@ fill_defaults (Ebl *result)
   result->debugscn_p = default_debugscn_p;
   result->copy_reloc_p = default_copy_reloc_p;
   result->none_reloc_p = default_none_reloc_p;
-  result->relative_reloc_p = default_relative_reloc_p;
   result->check_special_symbol = default_check_special_symbol;
   result->bss_plt_p = default_bss_plt_p;
   result->return_value_location = default_return_value_location;
   result->register_name = default_register_name;
   result->destr = default_destr;
-  result->sysvhash_entrysize = sizeof (Elf32_Word);
 }
 
 
@@ -283,28 +280,9 @@ openbackend (elf, emulation, machine)
 	/* Well, we know the emulation name now.  */
 	result->emulation = machines[cnt].emulation;
 
-	/* We access some data structures directly.  Make sure the 32 and
-	   64 bit variants are laid out the same.  */
-	assert (offsetof (Elf32_Ehdr, e_machine)
-		== offsetof (Elf64_Ehdr, e_machine));
-	assert (sizeof (((Elf32_Ehdr *) 0)->e_machine)
-		== sizeof (((Elf64_Ehdr *) 0)->e_machine));
-	assert (offsetof (Elf, state.elf32.ehdr)
-		== offsetof (Elf, state.elf64.ehdr));
-
-	/* Prefer taking the information from the ELF file.  */
-	if (elf == NULL)
-	  {
-	    result->machine = machines[cnt].em;
-	    result->class = machines[cnt].class;
-	    result->data = machines[cnt].data;
-	  }
-	else
-	  {
-	    result->machine = elf->state.elf32.ehdr->e_machine;
-	    result->class = elf->state.elf32.ehdr->e_ident[EI_CLASS];
-	    result->data = elf->state.elf32.ehdr->e_ident[EI_DATA];
-	  }
+	result->machine = machines[cnt].em;
+	result->class = machines[cnt].class;
+	result->data = machines[cnt].data;
 
 #ifndef LIBEBL_SUBDIR
 # define LIBEBL_SUBDIR PACKAGE
@@ -630,7 +608,6 @@ default_copy_reloc_p (int reloc __attribute__ ((unused)))
   return false;
 }
 strong_alias (default_copy_reloc_p, default_none_reloc_p)
-strong_alias (default_copy_reloc_p, default_relative_reloc_p)
 
 static bool
 default_check_special_symbol (Elf *elf __attribute__ ((unused)),

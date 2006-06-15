@@ -1,5 +1,5 @@
 /* Check dynamic tag.
-   Copyright (C) 2001, 2002, 2006 Red Hat, Inc.
+   Copyright (C) 2001, 2002 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -66,7 +66,7 @@ ebl_dynamic_tag_check (ebl, tag)
   if (!res
       && ((tag >= 0 && tag < DT_NUM)
 	  || (tag >= DT_GNU_PRELINKED && tag <= DT_SYMINENT)
-	  || (tag >= DT_GNU_HASH && tag <= DT_SYMINFO)
+	  || (tag >= DT_GNU_CONFLICT && tag <= DT_SYMINFO)
 	  || tag == DT_VERSYM
 	  || (tag >= DT_RELACOUNT && tag <= DT_VERNEEDNUM)
 	  || tag == DT_AUXILIARY

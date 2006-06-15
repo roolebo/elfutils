@@ -1519,8 +1519,6 @@ create_special_section_symbol (struct symbol **symp, const char *name)
     abort ();
 
   (*symp)->defined = 1;
-  (*symp)->local = 1;
-  (*symp)->hidden = 1;
   (*symp)->type = STT_OBJECT;
 
   ++ld_state.nsymtab;

@@ -1,14 +1,3 @@
-2006-07-05  Ulrich Drepper  <drepper@redhat.com>
-
-	* alpha_init.c: Initialize sysvhash_entrysize.
-	* s390_init.c: Likewise.
-
-2006-07-04  Ulrich Drepper  <drepper@redhat.com>
-
-	* common-reloc.c (relative_reloc_p): New function.
-	(init_reloc): Hook it up.
-	* ia64_reloc.def: Define NO_RELATIVE_RELOC.
-
 2006-06-13  Roland McGrath  <roland@redhat.com>
 
 	* ppc64_retval.c: Remove SVR4_STRUCT_RETURN braino.
@@ -16,7 +5,7 @@
 2006-06-12  Ulrich Drepper  <drepper@redhat.com>
 
 	* common-reloc.c (none_reloc_p): New function.
-	(init_reloc): Hook it up.
+	(init_reloc): Hoop it up.
 
 2006-02-22  Roland McGrath  <roland@redhat.com>
 

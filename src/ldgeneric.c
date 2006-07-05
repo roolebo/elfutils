@@ -1008,7 +1008,7 @@ add_section (struct usedfiles *fileinfo, struct scninfo *scninfo)
 			= find_section_group (runp->fileinfo,
 					      elf_ndxscn (runp->scn),
 					      &grpscndata);
-		  
+
 		      if (strcmp (grpscn->symbols->name,
 				  grpscn2->symbols->name) == 0)
 			{
@@ -1932,6 +1932,18 @@ file_process2 (struct usedfiles *fileinfo)
 	      return 1;
 	    }
 
+	  /* Make sure the file type matches the backend.  */
+	  if (FILEINFO_EHDR (fileinfo->ehdr).e_machine
+	      != ebl_get_elfmachine (ld_state.ebl))
+	    {
+	      fprintf (stderr, gettext ("\
+%s: input file incompatible with ELF machine type %s\n"),
+		       fileinfo->rfname,
+		       ebl_backend_name (ld_state.ebl));
+	      fileinfo->status = closed;
+	      return 1;
+	    }
+
 	  /* Determine the section header string table section index.  */
 	  if (unlikely (elf_getshstrndx (fileinfo->elf, &fileinfo->shstrndx)
 			< 0))
@@ -2535,7 +2547,7 @@ ld_generic_open_outfile (struct ld_state *statep, int machine, int klass,
     {
       strcpy (mempcpy (tempfname, ld_state.outfname, outfname_len), ".XXXXXX");
 
-      /* The useof mktemp() here is fine.  We do not want to use
+      /* The use of mktemp() here is fine.  We do not want to use
 	 mkstemp() since then the umask isn't used.  And the output
 	 file will have these permissions anyhow.  Any intruder could
 	 change the file later if it would be possible now.  */
@@ -3242,7 +3254,7 @@ reduce_symbol_p (XElf_Sym *sym, struct Ebl_Strent *strent)
     {
       search.id = strndupa (str, version - str);
       if (*++version == VER_CHR)
-	/* Skip the second '@' signalling a default definition.  */
+	/* Skip the second '@' signaling a default definition.  */
 	++version;
     }
   else
@@ -3560,9 +3572,9 @@ fillin_special_symbol (struct symbol *symst, size_t scnidx, size_t nsym,
   /* The name offset will be filled in later.  */
   sym->st_name = 0;
   /* Traditionally: globally visible.  */
-  sym->st_info = XELF_ST_INFO (STB_GLOBAL, symst->type);
-  /* No special visibility or so.  */
-  sym->st_other = 0;
+  sym->st_info = XELF_ST_INFO (symst->local ? STB_LOCAL : STB_GLOBAL,
+			       symst->type);
+  sym->st_other = symst->hidden ? STV_HIDDEN : 0;
   /* Reference to the GOT or dynamic section.  Since the GOT and
      dynamic section are only created for executables and DSOs it
      cannot be that the section index is too large.  */
@@ -4645,11 +4657,11 @@ ld_generic_create_outfile (struct ld_state *statep)
 	    continue;
 
 #if NATIVE_ELF != 0
-	  /* Copy old data.  */
-	  XElf_Sym *sym2 = sym;
-	  assert (nsym < nsym_allocated);
-	  xelf_getsym (symdata, nsym, sym);
-	  *sym = *sym2;
+	  /* Copy old data.  We create a temporary copy because the
+	     symbol might still be discarded.  */
+	  XElf_Sym sym_mem;
+	  sym_mem = *sym;
+	  sym = &sym_mem;
 #endif
 
 	  if (sym->st_shndx != SHN_UNDEF
@@ -4764,7 +4776,7 @@ section index too large in dynamic symbol table"));
 
 	  /* Create the record in the output sections.  */
 	  assert (nsym < nsym_allocated);
-	  xelf_update_symshndx (symdata, xndxdata, nsym, sym, xndx, 0);
+	  xelf_update_symshndx (symdata, xndxdata, nsym, sym, xndx, 1);
 
 	  /* Add the reference to the symbol record in case we need it.
 	     Find the symbol if this has not happened yet.  We do
@@ -5228,7 +5240,8 @@ section index too large in dynamic symbol table"));
 	  if (XELF_ST_TYPE (sym->st_info) == STT_FILE
 	      || XELF_ST_VISIBILITY (sym->st_other) == STV_INTERNAL
 	      || XELF_ST_VISIBILITY (sym->st_other) == STV_HIDDEN
-	      || (!ndxtosym[cnt]->in_dso && ndxtosym[cnt]->defined))
+	      || (!ld_state.export_all_dynamic
+		  && !ndxtosym[cnt]->in_dso && ndxtosym[cnt]->defined))
 	    {
 	      symstrent[cnt] = NULL;
 	      continue;
@@ -5251,7 +5264,9 @@ section index too large in dynamic symbol table"));
 	    {
 	      struct symbol *symp = ndxtosym[cnt];
 
-	      if (symp->file->verdefdata != NULL)
+	      /* Synthetic symbols (i.e., those with no file attached)
+		 have no version information.  */
+	      if (symp->file != NULL && symp->file->verdefdata != NULL)
 		{
 		  GElf_Versym versym;
 

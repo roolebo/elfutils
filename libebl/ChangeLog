@@ -1,3 +1,21 @@
+2006-07-05  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (gen_SOURCES): Add eblsysvhashentrysize.c.
+	* libeblP.h (struct ebl): Add sysvhash_entrysize element.
+	* eblopenbackend.c (fill_defaults): Initialize sysvhash_entrysize.
+
+	* eblopenbackend.c (openbackend): If possible, fill machine, class,
+	and data values in from the ELF file.
+
+2006-07-04  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (gen_SOURCES): Add eblrelativerelocp.c.
+	* eblrelativerelocp.c: New file.
+	* ebl-hooks.c: Add relative_reloc_p.
+	* eblopenbackend.c (default_relative_reloc_p): New function.
+	(fill_defaults): Hook it up.
+	* libebl.h: Declare ebl_relative_reloc_p.
+
 2006-06-12  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.am (gen_SOURCES): Add eblnonerelocp.c.

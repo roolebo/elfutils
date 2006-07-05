@@ -527,13 +527,15 @@ elf_i386_count_relocations (struct ld_state *statep, struct scninfo *scninfo)
 
 	  /* Symbols in COMDAT group sections which are discarded do
 	     not have to be relocated.  */
-	  if (unlikely (scninfo->fileinfo->symref[r_sym] == NULL))
+	  if (r_sym >= scninfo->fileinfo->nlocalsymbols
+	      && unlikely (scninfo->fileinfo->symref[r_sym] == NULL))
 	    continue;
 
 	  switch (XELF_R_TYPE (rel->r_info))
 	    {
 	    case R_386_GOT32:
-	      if (! scninfo->fileinfo->symref[r_sym]->defined)
+	      if (! scninfo->fileinfo->symref[r_sym]->defined
+		  || scninfo->fileinfo->symref[r_sym]->in_dso)
 		relsize += sizeof (Elf32_Rel);
 
 	      /* This relocation is not emitted in the output file but
@@ -556,6 +558,8 @@ elf_i386_count_relocations (struct ld_state *statep, struct scninfo *scninfo)
 		  if (statep->file_type == dso_file_type)
 		    {
 		      relsize += sizeof (Elf32_Rel);
+		      // XXX Do we have to check whether the target
+		      // XXX section is read-only first?
 		      statep->dt_flags |= DF_TEXTREL;
 		    }
 		  else
@@ -575,10 +579,9 @@ elf_i386_count_relocations (struct ld_state *statep, struct scninfo *scninfo)
 		    }
 		}
 	      else if (statep->file_type == dso_file_type
-		       && r_sym >= SCNINFO_SHDR (scninfo->fileinfo->scninfo[shdr->sh_link].shdr).sh_info
-		       && scninfo->fileinfo->symref[r_sym]->outdynsymidx != 0
 		       && XELF_R_TYPE (rel->r_info) == R_386_32)
 		relsize += sizeof (Elf32_Rel);
+
 	      break;
 
 	    case R_386_PLT32:
@@ -702,8 +705,7 @@ elf_i386_create_relocations (struct ld_state *statep,
       /* Cache the access to the symbol table data.  */
       Elf_Data *symdata = elf_getdata (scninfo[rshdr->sh_link].scn, NULL);
 
-      int cnt;
-      for (cnt = 0; cnt < nrels; ++cnt)
+      for (int cnt = 0; cnt < nrels; ++cnt)
 	{
 	  XElf_Rel_vardef (rel);
 	  XElf_Rel *rel2;
@@ -812,8 +814,7 @@ elf_i386_create_relocations (struct ld_state *statep,
 		    }
 		}
 	      else if (statep->file_type == dso_file_type
-		       && idx >= SCNINFO_SHDR (scninfo[rshdr->sh_link].shdr).sh_info
-		       && symref[idx]->outdynsymidx != 0)
+		       && XELF_R_TYPE (rel->r_info) == R_386_32)
 		{
 #if NATIVE_ELF != 0
 		  xelf_getrel_ptr (reldyndata, nreldyn, rel2);
@@ -821,8 +822,15 @@ elf_i386_create_relocations (struct ld_state *statep,
 		  rel2 = &rel_mem;
 #endif
 		  rel2->r_offset = value;
-		  rel2->r_info
-		    = XELF_R_INFO (symref[idx]->outdynsymidx, R_386_32);
+
+		  /* For symbols we do not export we generate a relative
+		     relocation.  */
+		  if (idx < SCNINFO_SHDR (scninfo[rshdr->sh_link].shdr).sh_info
+		      || symref[idx]->outdynsymidx == 0)
+		    rel2->r_info = XELF_R_INFO (0, R_386_RELATIVE);
+		  else
+		    rel2->r_info
+		      = XELF_R_INFO (symref[idx]->outdynsymidx, R_386_32);
 		  (void) xelf_update_rel (reldyndata, nreldyn, rel2);
 		  ++nreldyn;
 

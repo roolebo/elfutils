@@ -1,3 +1,34 @@
+2006-07-05  Ulrich Drepper  <drepper@redhat.com>
+
+	* i386_ld.c (elf_i386_count_relocations): Lot of corrections.
+	(elf_i386_create_relocations): Likewise.
+	* ld.h (struct symbol): Add local and hidden bits.
+	* ld.c (create_special_section_symbol): These synthsized symbols
+	are local and hidden.
+	* ldgeneric.c (file_process2): Check whether input file matches
+	the emulation.
+	(fillin_special_symbol): Create symbols as local and/or hidden
+	if requested.
+	(ld_generic_create_outfile): Make local copy of symbol.
+	Don't hide global, defined symbols in dynamic symbol table unless
+	requested.  Synthetic symbols have no version information.
+
+	* elflint.c: Add support for checking 64-bit SyV-stlye hash tables.
+	* readelf.c: Add support for printing 64-bit SyV-stlye hash tables.
+
+2006-07-04  Ulrich Drepper  <drepper@redhat.com>
+
+	* elflint.c (is_rel_dyn): Fix and extend DT_RELCOUNT/DT_RELACOUNT
+	testing.
+
+2006-07-03  Ulrich Drepper  <drepper@redhat.com>
+
+	* elflint.c: Add testing of DT_GNU_HASH.
+	* readelf.c: Implement showing histogram for DT_GNU_HASH section.
+
+	* Makefile.am: Add hacks to create dependency files for non-generic
+	linker.
+
 2006-06-12  Ulrich Drepper  <drepper@redhat.com>
 
 	* ldgeneric.c (ld_generic_generate_sections): Don't create .interp

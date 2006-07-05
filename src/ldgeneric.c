@@ -3574,7 +3574,7 @@ fillin_special_symbol (struct symbol *symst, size_t scnidx, size_t nsym,
   /* Traditionally: globally visible.  */
   sym->st_info = XELF_ST_INFO (symst->local ? STB_LOCAL : STB_GLOBAL,
 			       symst->type);
-  sym->st_other = symst->hidden ? STV_HIDDEN : 0;
+  sym->st_other = symst->hidden ? STV_HIDDEN : STV_DEFAULT;
   /* Reference to the GOT or dynamic section.  Since the GOT and
      dynamic section are only created for executables and DSOs it
      cannot be that the section index is too large.  */
@@ -3731,7 +3731,7 @@ create_verneed_data (XElf_Off offset, Elf_Data *verneeddata,
    For executables (shared or not) we have to create the program header,
    additional sections like the .interp, eventually (in addition) create
    a dynamic symbol table and a dynamic section.  Also the relocations
-have to be processed differently.  */
+   have to be processed differently.  */
 static int
 ld_generic_create_outfile (struct ld_state *statep)
 {
@@ -4599,6 +4599,7 @@ ld_generic_create_outfile (struct ld_state *statep)
   file = ld_state.relfiles->next;
   symdata = elf_getdata (elf_getscn (ld_state.outelf, ld_state.symscnidx),
 			 NULL);
+
   do
     {
       size_t maxcnt;
@@ -4785,7 +4786,7 @@ section index too large in dynamic symbol table"));
 	    defp = file->symref[cnt];
 
 	  /* Ignore symbols in discarded COMDAT group sections.  */
-	  if (defp != NULL)
+	  if (defp != NULL || cnt < file->nlocalsymbols)
 	    {
 	      /* Store the reference to the symbol record.  The
 		 sorting code will have to keep this array in the
@@ -4806,7 +4807,6 @@ section index too large in dynamic symbol table"));
   /* Make sure we didn't create the extended section index table for
      nothing.  */
   assert (xndxdata == NULL || need_xndx);
-
 
   /* Create the version related sections.  */
   if (ld_state.verneedscnidx != 0)

@@ -72,7 +72,7 @@ elf_i386_relocate_section (struct ld_state *statep __attribute__ ((unused)),
   Elf_Data *data;
 
   /* Iterate over all the input sections.  Appropriate data buffers in the
-     output sections were already created.  I get them iteratively, too.  */
+     output sections were already created.  */
   runp = firstp;
   data = NULL;
   do
@@ -159,15 +159,13 @@ elf_i386_relocate_section (struct ld_state *statep __attribute__ ((unused)),
 	     itself.  */
 	  if (XELF_ST_TYPE (sym->st_info) == STT_SECTION)
 	    {
-	      Elf32_Word toadd;
-
-	      /* We expect here on R_386_32 relocations.  */
+	      /* We expect here only R_386_32 relocations.  */
 	      assert (XELF_R_TYPE (rel->r_info) == R_386_32);
 
 	      /* Avoid writing to the section memory if this is
 		 effectively a no-op since it might save a
 		 copy-on-write operation.  */
-	      toadd = file->scninfo[xndx].offset;
+	      Elf32_Word toadd = file->scninfo[xndx].offset;
 	      if (toadd != 0)
 		add_4ubyte_unaligned (reltgtdata->d_buf + rel->r_offset,
 				      toadd);

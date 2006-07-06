@@ -5,6 +5,7 @@ libebl:add function to test for relative relocation
 elflint: fix and extend DT_RELCOUNT/DT_RELACOUNT checks
 
 elflint, readelf: add support for DT_GNU_HASH
+libelf: add elf_gnu_hash
 
 elflint, readelf: add support for 64-bit SysV-style hash tables
 

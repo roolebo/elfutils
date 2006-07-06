@@ -1,7 +1,7 @@
-/* Check dynamic tag.
-   Copyright (C) 2001, 2002, 2006 Red Hat, Inc.
+/* Check whether given relocation is a relocation relocation.
+   Copyright (C) 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2001.
+   Written by Ulrich Drepper <drepper@redhat.com>, 2006.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by the
@@ -52,26 +52,13 @@
 # include <config.h>
 #endif
 
-#include <inttypes.h>
 #include <libeblP.h>
 
 
 bool
-ebl_dynamic_tag_check (ebl, tag)
+ebl_relative_reloc_p (ebl, reloc)
      Ebl *ebl;
-     int64_t tag;
+     int reloc;
 {
-  bool res = ebl != NULL ? ebl->dynamic_tag_check (tag) : false;
-
-  if (!res
-      && ((tag >= 0 && tag < DT_NUM)
-	  || (tag >= DT_GNU_PRELINKED && tag <= DT_SYMINENT)
-	  || (tag >= DT_GNU_HASH && tag <= DT_SYMINFO)
-	  || tag == DT_VERSYM
-	  || (tag >= DT_RELACOUNT && tag <= DT_VERNEEDNUM)
-	  || tag == DT_AUXILIARY
-	  || tag == DT_FILTER))
-    res = true;
-
-  return res;
+  return ebl->relative_reloc_p (reloc);
 }

@@ -1895,19 +1895,19 @@ static void
 check_gnu_hash (Ebl *ebl, GElf_Shdr *shdr, Elf_Data *data, int idx,
 		GElf_Shdr *symshdr)
 {
-  Elf32_Word nbucket = ((Elf32_Word *) data->d_buf)[0];
+  Elf32_Word nbuckets = ((Elf32_Word *) data->d_buf)[0];
   Elf32_Word symbias = ((Elf32_Word *) data->d_buf)[1];
 
-  if (shdr->sh_size < (2 + nbucket) * shdr->sh_entsize)
+  if (shdr->sh_size < (2 + 2 * nbuckets) * sizeof (Elf32_Word))
     {
       ERROR (gettext ("\
 section [%2d] '%s': hash table section is too small (is %ld, expected at least%ld)\n"),
 	     idx, section_name (ebl, idx), (long int) shdr->sh_size,
-	     (long int) ((2 + nbucket) * shdr->sh_entsize));
+	     (long int) ((2 + 2 * nbuckets) * sizeof (Elf32_Word)));
       return;
     }
 
-  size_t maxidx = shdr->sh_size / sizeof (Elf32_Word) - (2 + nbucket);
+  size_t maxidx = shdr->sh_size / sizeof (Elf32_Word) - (2 + 2 * nbuckets);
 
   if (symshdr != NULL)
     maxidx = MIN (maxidx, symshdr->sh_size / symshdr->sh_entsize);
@@ -1916,38 +1916,82 @@ section [%2d] '%s': hash table section is too small (is %ld, expected at least%l
   Elf_Data *symdata = elf_getdata (elf_getscn (ebl->elf, shdr->sh_link), NULL);
 
   size_t cnt;
-  for (cnt = 2; cnt < 2 + nbucket; ++cnt)
+  for (cnt = 2; cnt < 2 + 2 * nbuckets; cnt += 2)
     {
-      Elf32_Word chainidx = ((Elf32_Word *) data->d_buf)[cnt];
+      Elf32_Word bitset = ((Elf32_Word *) data->d_buf)[cnt];
+      Elf32_Word symidx = ((Elf32_Word *) data->d_buf)[cnt + 1];
 
-      if (chainidx == ~0u)
-	/* Nothing in here.  */
-	continue;
+      if (symidx == 0)
+	{
+	  /* Nothing in here.  No bit in the bitset should be set either.  */
+	  if (bitset != 0)
+	    ERROR (gettext ("\
+section [%2d] '%s': hash chain for bucket %zu empty but bitset is not\n"),
+		   idx, section_name (ebl, idx), cnt / 2 - 1);
 
-      while (chainidx < maxidx
-	     && ((((Elf32_Word *) data->d_buf)[2 + nbucket + chainidx] & 1)
-		 == 0))
-	++chainidx;
+	  continue;
+	}
 
-      if (chainidx >= maxidx)
+      if (symidx < symbias)
+	{
+	  ERROR (gettext ("\
+section [%2d] '%s': hash chain for bucket %zu lower than symbol index bias\n"),
+		 idx, section_name (ebl, idx), cnt / 2 - 1);
+	  continue;
+	}
+
+      Elf32_Word collected_bitset = 0;
+      while (symidx - symbias < maxidx)
+	{
+	  Elf32_Word chainhash = ((Elf32_Word *) data->d_buf)[2 + 2 * nbuckets
+							      + symidx
+							      - symbias];
+
+	  if (symdata != NULL)
+	    {
+	      /* Check that the referenced symbol is not undefined.  */
+	      GElf_Sym sym_mem;
+	      GElf_Sym *sym = gelf_getsym (symdata, symidx, &sym_mem);
+	      if (sym != NULL && sym->st_shndx == SHN_UNDEF)
+		ERROR (gettext ("\
+section [%2d] '%s': symbol %u referenced in chain for bucket %zu is undefined\n"),
+		       idx, section_name (ebl, idx), symidx, cnt / 2 - 1);
+
+	      const char *symname = elf_strptr (ebl->elf, symshdr->sh_link,
+						sym->st_name);
+	      if (symname != NULL)
+		{
+		  Elf32_Word hval = elf_gnu_hash (symname);
+		  if ((hval & ~1u) != (chainhash & ~1u))
+		    ERROR (gettext ("\
+section [%2d] '%s': hash value for symbol %u in chain for bucket %zu wrong\n"),
+			   idx, section_name (ebl, idx), symidx, cnt / 2 - 1);
+		}
+	    }
+
+	  collected_bitset |= 1 << ((chainhash >> 5) & 31);
+
+	  if ((chainhash & 1) != 0)
+	    break;
+
+	  ++symidx;
+	}
+
+      if (symidx - symbias >= maxidx)
 	ERROR (gettext ("\
 section [%2d] '%s': hash chain for bucket %zu out of bounds\n"),
-	       idx, section_name (ebl, idx), cnt - 2);
+	       idx, section_name (ebl, idx), cnt / 2 - 1);
       else if (symshdr != NULL
-	       && symbias + chainidx > symshdr->sh_size / symshdr->sh_entsize)
+	       && symidx > symshdr->sh_size / symshdr->sh_entsize)
 	ERROR (gettext ("\
 section [%2d] '%s': symbol reference in chain for bucket %zu out of bounds\n"),
-	       idx, section_name (ebl, idx), cnt - 2);
-      else if (symdata != NULL)
-	{
-	  /* Check that the referenced symbol is not undefined.  */
-	  GElf_Sym sym_mem;
-	  GElf_Sym *sym = gelf_getsym (symdata, symbias + cnt - 2, &sym_mem);
-	  if (sym != NULL && sym->st_shndx == SHN_UNDEF)
+	       idx, section_name (ebl, idx), cnt / 2 - 1);
+
+      if (bitset != collected_bitset)
 	ERROR (gettext ("\
-section [%2d] '%s': symbol reference in chain for bucket %zu is undefined\n"),
-	       idx, section_name (ebl, idx), cnt - 2);
-	}
+section [%2d] '%s': bitset for bucket %zu does not match chain entries: computed %#x, reported %#x\n"),
+	       idx, section_name (ebl, idx), cnt / 2 - 1,
+	       collected_bitset, bitset);
     }
 }
 
@@ -1979,9 +2023,11 @@ section [%2d] '%s': relocatable files cannot have hash tables\n"),
 section [%2d] '%s': hash table not for dynamic symbol table\n"),
 	   idx, section_name (ebl, idx));
 
-  if (shdr->sh_entsize != sizeof (Elf32_Word))
+  if (shdr->sh_entsize != (tag == SHT_GNU_HASH
+			   ? sizeof (Elf32_Word)
+			   : (size_t) ebl_sysvhash_entrysize (ebl)))
     ERROR (gettext ("\
-section [%2d] '%s': entry size does not match Elf32_Word\n"),
+section [%2d] '%s': hash table entry size incorrect\n"),
 	   idx, section_name (ebl, idx));
 
   if ((shdr->sh_flags & SHF_ALLOC) == 0)
@@ -1991,7 +2037,7 @@ section [%2d] '%s': entry size does not match Elf32_Word\n"),
   if (shdr->sh_size < 2 * shdr->sh_entsize)
     {
       ERROR (gettext ("\
-section [%2d] '%s': hash table has not even room for nbucket and nchain\n"),
+section [%2d] '%s': hash table has not even room for initial two administrative entries\n"),
 	     idx, section_name (ebl, idx));
       return;
     }
@@ -2399,7 +2445,7 @@ section [%2d] '%s': symbol %d: local symbol with version\n"),
 	     index we need for this symbol.  */
 	  struct version_namelist *runp = version_namelist;
 	  while (runp != NULL)
-	    if (runp->ndx == *versym)
+	    if (runp->ndx == (*versym & 0x7fff))
 	      break;
 	    else
 	      runp = runp->next;

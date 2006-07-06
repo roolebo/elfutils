@@ -112,3 +112,8 @@ ELFUTILS_1.1.1 {
     gelf_offscn;
     elf_getaroff;
 } ELFUTILS_1.1;
+
+ELFUTILS_1.2 {
+  global:
+    elf_gnu_hash;
+} ELFUTILS_1.1.1;

@@ -1,5 +1,5 @@
 /* Interface for libelf.
-   Copyright (C) 1998, 1999, 2000, 2002, 2004, 2005 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2004, 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -369,6 +369,10 @@ extern void elf_fill (int __fill);
 
 /* Compute hash value.  */
 extern unsigned long int elf_hash (const char *__string)
+       __attribute__ ((__pure__));
+
+/* Compute hash value using the GNU-specific hash function.  */
+extern unsigned long int elf_gnu_hash (const char *__string)
        __attribute__ ((__pure__));
 
 

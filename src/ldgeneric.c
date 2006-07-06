@@ -1436,9 +1436,9 @@ add_relocatable_file (struct usedfiles *fileinfo, GElf_Word secttype)
 	     _GLOBAL_OFFSET_TABLE_, _DYNAMIC.  */
 	  // XXX This loop is hot and the following tests hardly ever match.
 	  // XXX Maybe move the tests somewhere they are executed less often.
-	  if (((unlikely (hval == 165832675)
+	  if (((unlikely (hval == 165832675ul)
 		&& strcmp (search.name, "_DYNAMIC") == 0)
-	       || (unlikely (hval == 102264335)
+	       || (unlikely (hval == 102264335ul)
 		   && strcmp (search.name, "_GLOBAL_OFFSET_TABLE_") == 0))
 	      && sym->st_shndx != SHN_UNDEF
 	      /* If somebody defines such a variable in a relocatable we
@@ -1451,7 +1451,7 @@ add_relocatable_file (struct usedfiles *fileinfo, GElf_Word secttype)
 	  struct symbol *newp;
 	  if (likely (oldp == NULL))
 	    {
-	      /* No symbol of this name know.  Add it.  */
+	      /* No symbol of this name known.  Add it.  */
 	      newp = (struct symbol *) obstack_alloc (&ld_state.smem,
 						      sizeof (*newp));
 	      newp->name = search.name;
@@ -1467,6 +1467,8 @@ add_relocatable_file (struct usedfiles *fileinfo, GElf_Word secttype)
 	      newp->weak = XELF_ST_BIND (sym->st_info) == STB_WEAK;
 	      newp->added = 0;
 	      newp->merged = 0;
+	      newp->local = 0;
+	      newp->hidden = 0;
 	      newp->need_copy = 0;
 	      newp->on_dsolist = 0;
 	      newp->in_dso = secttype == SHT_DYNSYM;
@@ -4767,6 +4769,7 @@ section index too large in dynamic symbol table"));
 	  /* Once we know the name this field will get the correct
 	     offset.  For now set it to zero which means no name
 	     associated.  */
+	  GElf_Word st_name = sym->st_name;
 	  sym->st_name = 0;
 
 	  /* If we had to merge sections we have a completely new
@@ -4783,24 +4786,44 @@ section index too large in dynamic symbol table"));
 	     Find the symbol if this has not happened yet.  We do
 	     not need the information for local symbols.  */
 	  if (defp == NULL && cnt >= file->nlocalsymbols)
-	    defp = file->symref[cnt];
-
-	  /* Ignore symbols in discarded COMDAT group sections.  */
-	  if (defp != NULL || cnt < file->nlocalsymbols)
 	    {
-	      /* Store the reference to the symbol record.  The
-		 sorting code will have to keep this array in the
-		 correct order, too.  */
-	      ndxtosym[nsym] = defp;
+	      defp = file->symref[cnt];
 
-	      /* One more entry finished.  */
-	      if (cnt >= file->nlocalsymbols)
+	      if (defp == NULL)
 		{
-		  assert (file->symref[cnt]->outsymidx == 0);
-		  file->symref[cnt]->outsymidx = nsym;
+		  /* This is a symbol in a discarded COMDAT section.
+		     Find the definition we actually use.  */
+		  // XXX The question is: do we have to do this here
+		  // XXX or can we do it earlier when we discard the
+		  // XXX section.
+		  struct symbol search;
+		  search.name = elf_strptr (file->elf, file->symstridx,
+					    st_name);
+		  struct symbol *realp
+		    = ld_symbol_tab_find (&ld_state.symbol_tab,
+					  elf_hash (search.name), &search);
+		  if (realp == NULL)
+		    // XXX What to do here?
+		    error (EXIT_FAILURE, 0,
+			   "couldn't find symbol from COMDAT section");
+
+		  file->symref[cnt] = realp;
+
+		  continue;
 		}
-	      file->symindirect[cnt] = nsym++;
 	    }
+
+	  /* Store the reference to the symbol record.  The sorting
+	     code will have to keep this array in the correct order, too.  */
+	  ndxtosym[nsym] = defp;
+
+	  /* One more entry finished.  */
+	  if (cnt >= file->nlocalsymbols)
+	    {
+	      assert (file->symref[cnt]->outsymidx == 0);
+	      file->symref[cnt]->outsymidx = nsym;
+	    }
+	  file->symindirect[cnt] = nsym++;
 	}
     }
   while ((file = file->next) != ld_state.relfiles->next);

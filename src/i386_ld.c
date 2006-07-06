@@ -149,8 +149,8 @@ elf_i386_relocate_section (struct ld_state *statep __attribute__ ((unused)),
 	  assert (xndx < SHN_LORESERVE || xndx > SHN_HIRESERVE);
 
 	  /* We fortunately don't have to do much.  The relocations
-	     mostly get only updates of the offset.  Only is a
-	     relocation referred to a section do we have to do
+	     mostly get only updates of the offset.  Only for a
+	     relocation referring to a section do we have to do
 	     something.  In this case the reference to the sections
 	     has no direct equivalent since the part the input section
 	     contributes need not start at the same offset as in the

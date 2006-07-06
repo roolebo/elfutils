@@ -1,3 +1,9 @@
+2006-07-06  Ulrich Drepper  <drepper@redhat.com>
+
+	* ebldynamictagname.c: Add support for DT_GNU_HASH.
+	* ebldynamictagcheck.c: Likewise.
+	* eblsectiontypename.c: Add support for SHT_GNU_HASH.
+
 2006-07-05  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.am (gen_SOURCES): Add eblsysvhashentrysize.c.

@@ -2480,17 +2480,18 @@ handle_gnu_hash (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx)
     }
 
   Elf32_Word nbucket = ((Elf32_Word *) data->d_buf)[0];
+  Elf32_Word symbias = ((Elf32_Word *) data->d_buf)[1];
   Elf32_Word *bucket = &((Elf32_Word *) data->d_buf)[2];
-  Elf32_Word *chain = &((Elf32_Word *) data->d_buf)[2 + nbucket];
+  Elf32_Word *chain = &((Elf32_Word *) data->d_buf)[2 + 2 * nbucket];
 
   uint32_t *lengths = (uint32_t *) xcalloc (nbucket, sizeof (uint32_t));
 
   uint_fast32_t maxlength = 0;
   uint_fast32_t nsyms = 0;
   for (Elf32_Word cnt = 0; cnt < nbucket; ++cnt)
-    if (bucket[cnt] != ~0u)
+    if (bucket[2 * cnt + 1] != 0)
       {
-	Elf32_Word inner = bucket[cnt];
+	Elf32_Word inner = bucket[2 * cnt + 1] - symbias;
 	do
 	  {
 	    ++nsyms;

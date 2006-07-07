@@ -2320,6 +2320,194 @@ handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 }
 
 
+static void
+print_hash_info (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx,
+		 uint_fast32_t maxlength, Elf32_Word nbucket,
+		 uint_fast32_t nsyms, uint32_t *lengths)
+{
+  uint32_t *counts = (uint32_t *) xcalloc (maxlength + 1, sizeof (uint32_t));
+
+  for (Elf32_Word cnt = 0; cnt < nbucket; ++cnt)
+    ++counts[lengths[cnt]];
+
+  GElf_Shdr glink;
+  printf (ngettext ("\
+\nHistogram for bucket list length in section [%2u] '%s' (total of %d bucket):\n Addr: %#0*" PRIx64 "  Offset: %#08" PRIx64 "  Link to section: [%2u] '%s'\n",
+		    "\
+\nHistogram for bucket list length in section [%2u] '%s' (total of %d buckets):\n Addr: %#0*" PRIx64 "  Offset: %#08" PRIx64 "  Link to section: [%2u] '%s'\n",
+		    nbucket),
+	  (unsigned int) elf_ndxscn (scn),
+	  elf_strptr (ebl->elf, shstrndx, shdr->sh_name),
+	  (int) nbucket,
+	  gelf_getclass (ebl->elf) == ELFCLASS32 ? 10 : 18,
+	  shdr->sh_addr,
+	  shdr->sh_offset,
+	  (unsigned int) shdr->sh_link,
+	  elf_strptr (ebl->elf, shstrndx,
+		      gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
+				    &glink)->sh_name));
+
+  if (nbucket > 0)
+    {
+      uint64_t success = 0;
+
+      fputs_unlocked (gettext ("\
+ Length  Number  % of total  Coverage\n"), stdout);
+      printf (gettext ("      0  %6" PRIu32 "      %5.1f%%\n"),
+	      counts[0], (counts[0] * 100.0) / nbucket);
+
+      uint64_t nzero_counts = 0;
+      for (Elf32_Word cnt = 1; cnt <= maxlength; ++cnt)
+	{
+	  nzero_counts += counts[cnt] * cnt;
+	  printf (gettext ("\
+%7d  %6" PRIu32 "      %5.1f%%    %5.1f%%\n"),
+		  (int) cnt, counts[cnt], (counts[cnt] * 100.0) / nbucket,
+		  (nzero_counts * 100.0) / nsyms);
+	}
+
+      Elf32_Word acc = 0;
+      for (Elf32_Word cnt = 1; cnt <= maxlength; ++cnt)
+	{
+	  acc += cnt;
+	  success += counts[cnt] * acc;
+	}
+
+      printf (gettext ("\
+ Average number of tests:   successful lookup: %f\n\
+                          unsuccessful lookup: %f\n"),
+	      (double) success / (double) nzero_counts,
+	      (double) nzero_counts / (double) nbucket);
+    }
+
+  free (counts);
+}
+
+
+/* This function handles the traditional System V-style hash table format.  */
+static void
+handle_sysv_hash (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx)
+{
+  Elf_Data *data = elf_getdata (scn, NULL);
+  if (data == NULL)
+    {
+      error (0, 0, gettext ("cannot get data for section %d: %s"),
+	     (int) elf_ndxscn (scn), elf_errmsg (-1));
+      return;
+    }
+
+  Elf32_Word nbucket = ((Elf32_Word *) data->d_buf)[0];
+  Elf32_Word nchain = ((Elf32_Word *) data->d_buf)[1];
+  Elf32_Word *bucket = &((Elf32_Word *) data->d_buf)[2];
+  Elf32_Word *chain = &((Elf32_Word *) data->d_buf)[2 + nbucket];
+
+  uint32_t *lengths = (uint32_t *) xcalloc (nbucket, sizeof (uint32_t));
+
+  uint_fast32_t maxlength = 0;
+  uint_fast32_t nsyms = 0;
+  for (Elf32_Word cnt = 0; cnt < nbucket; ++cnt)
+    {
+      Elf32_Word inner = bucket[cnt];
+      while (inner > 0 && inner < nchain)
+	{
+	  ++nsyms;
+	  if (maxlength < ++lengths[cnt])
+	    ++maxlength;
+
+	  inner = chain[inner];
+	}
+    }
+
+  print_hash_info (ebl, scn, shdr, shstrndx, maxlength, nbucket, nsyms,
+		   lengths);
+
+  free (lengths);
+}
+
+
+/* This function handles the incorrect, System V-style hash table
+   format some 64-bit architectures use.  */
+static void
+handle_sysv_hash64 (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx)
+{
+  Elf_Data *data = elf_getdata (scn, NULL);
+  if (data == NULL)
+    {
+      error (0, 0, gettext ("cannot get data for section %d: %s"),
+	     (int) elf_ndxscn (scn), elf_errmsg (-1));
+      return;
+    }
+
+  Elf64_Xword nbucket = ((Elf64_Xword *) data->d_buf)[0];
+  Elf64_Xword nchain = ((Elf64_Xword *) data->d_buf)[1];
+  Elf64_Xword *bucket = &((Elf64_Xword *) data->d_buf)[2];
+  Elf64_Xword *chain = &((Elf64_Xword *) data->d_buf)[2 + nbucket];
+
+  uint32_t *lengths = (uint32_t *) xcalloc (nbucket, sizeof (uint32_t));
+
+  uint_fast32_t maxlength = 0;
+  uint_fast32_t nsyms = 0;
+  for (Elf64_Xword cnt = 0; cnt < nbucket; ++cnt)
+    {
+      Elf64_Xword inner = bucket[cnt];
+      while (inner > 0 && inner < nchain)
+	{
+	  ++nsyms;
+	  if (maxlength < ++lengths[cnt])
+	    ++maxlength;
+
+	  inner = chain[inner];
+	}
+    }
+
+  print_hash_info (ebl, scn, shdr, shstrndx, maxlength, nbucket, nsyms,
+		   lengths);
+
+  free (lengths);
+}
+
+
+/* This function handles the GNU-style hash table format.  */
+static void
+handle_gnu_hash (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx)
+{
+  Elf_Data *data = elf_getdata (scn, NULL);
+  if (data == NULL)
+    {
+      error (0, 0, gettext ("cannot get data for section %d: %s"),
+	     (int) elf_ndxscn (scn), elf_errmsg (-1));
+      return;
+    }
+
+  Elf32_Word nbucket = ((Elf32_Word *) data->d_buf)[0];
+  Elf32_Word symbias = ((Elf32_Word *) data->d_buf)[1];
+  Elf32_Word *bucket = &((Elf32_Word *) data->d_buf)[2];
+  Elf32_Word *chain = &((Elf32_Word *) data->d_buf)[2 + 2 * nbucket];
+
+  uint32_t *lengths = (uint32_t *) xcalloc (nbucket, sizeof (uint32_t));
+
+  uint_fast32_t maxlength = 0;
+  uint_fast32_t nsyms = 0;
+  for (Elf32_Word cnt = 0; cnt < nbucket; ++cnt)
+    if (bucket[2 * cnt + 1] != 0)
+      {
+	Elf32_Word inner = bucket[2 * cnt + 1] - symbias;
+	do
+	  {
+	    ++nsyms;
+	    if (maxlength < ++lengths[cnt])
+	      ++maxlength;
+	  }
+	while ((chain[inner++] & 1) == 0);
+      }
+
+  print_hash_info (ebl, scn, shdr, shstrndx, maxlength, nbucket, nsyms,
+		   lengths);
+
+  free (lengths);
+}
+
+
 /* Find the symbol table(s).  For this we have to search through the
    section table.  */
 static void
@@ -2338,100 +2526,17 @@ handle_hash (Ebl *ebl)
       GElf_Shdr shdr_mem;
       GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
 
-      if (shdr != NULL && shdr->sh_type == SHT_HASH)
+      if (shdr != NULL)
 	{
-	  Elf_Data *data = elf_getdata (scn, NULL);
-	  if (data == NULL)
+	  if (shdr->sh_type == SHT_HASH)
 	    {
-	      error (0, 0, gettext ("cannot get data for section %d: %s"),
-		     (int) elf_ndxscn (scn), elf_errmsg (-1));
-	      continue;
+	      if (ebl_sysvhash_entrysize (ebl) == sizeof (Elf64_Xword))
+		handle_sysv_hash64 (ebl, scn, shdr, shstrndx);
+	      else
+		handle_sysv_hash (ebl, scn, shdr, shstrndx);
 	    }
-
-	  Elf32_Word nbucket = ((Elf32_Word *) data->d_buf)[0];
-	  Elf32_Word nchain = ((Elf32_Word *) data->d_buf)[1];
-	  Elf32_Word *bucket = &((Elf32_Word *) data->d_buf)[2];
-	  Elf32_Word *chain = &((Elf32_Word *) data->d_buf)[2 + nbucket];
-
-	  GElf_Shdr glink;
-	  printf (ngettext ("\
-\nHistogram for bucket list length in section [%2u] '%s' (total of %d bucket):\n Addr: %#0*" PRIx64 "  Offset: %#08" PRIx64 "  Link to section: [%2u] '%s'\n",
-			    "\
-\nHistogram for bucket list length in section [%2u] '%s' (total of %d buckets):\n Addr: %#0*" PRIx64 "  Offset: %#08" PRIx64 "  Link to section: [%2u] '%s'\n",
-			    nbucket),
-		  (unsigned int) elf_ndxscn (scn),
-		  elf_strptr (ebl->elf, shstrndx, shdr->sh_name),
-		  (int) nbucket,
-		  gelf_getclass (ebl->elf) == ELFCLASS32 ? 10 : 18,
-		  shdr->sh_addr,
-		  shdr->sh_offset,
-		  (unsigned int) shdr->sh_link,
-		  elf_strptr (ebl->elf, shstrndx,
-			      gelf_getshdr (elf_getscn (ebl->elf,
-							shdr->sh_link),
-					    &glink)->sh_name));
-
-	  uint32_t *lengths = (uint32_t *) xcalloc (nbucket,
-						    sizeof (uint32_t));
-
-	  Elf32_Word maxlength = 0;
-	  Elf32_Word nsyms = 0;
-	  for (Elf32_Word cnt = 0; cnt < nbucket; ++cnt)
-	    if (bucket[cnt] != 0)
-	      {
-		Elf32_Word inner = bucket[cnt];
-		while (inner > 0 && inner < nchain)
-		  {
-		    ++nsyms;
-		    if (maxlength < ++lengths[cnt])
-		      ++maxlength;
-
-		    inner = chain[inner];
-		  }
-	      }
-
-	  uint32_t *counts = (uint32_t *) xcalloc (maxlength + 1,
-						   sizeof (uint32_t));
-
-	  for (Elf32_Word cnt = 0; cnt < nbucket; ++cnt)
-	    ++counts[lengths[cnt]];
-
-	  if (nbucket > 0)
-	    {
-	      uint64_t success = 0;
-
-	      fputs_unlocked (gettext ("\
- Length  Number  % of total  Coverage\n"), stdout);
-	      printf (gettext ("      0  %6" PRIu32 "      %5.1f%%\n"),
-		      counts[0], (counts[0] * 100.0) / nbucket);
-
-	      uint64_t nzero_counts = 0;
-	      for (Elf32_Word cnt = 1; cnt <= maxlength; ++cnt)
-		{
-		  nzero_counts += counts[cnt] * cnt;
-		  printf (gettext ("\
-%7d  %6" PRIu32 "      %5.1f%%    %5.1f%%\n"),
-			  (int) cnt,
-			  counts[cnt], (counts[cnt] * 100.0) / nbucket,
-			  (nzero_counts * 100.0) / nsyms);
-		}
-
-	      Elf32_Word acc = 0;
-	      for (Elf32_Word cnt = 1; cnt <= maxlength; ++cnt)
-		{
-		  acc += cnt;
-		  success += counts[cnt] * acc;
-		}
-
-	      printf (gettext ("\
- Average number of tests:   successful lookup: %f\n\
-                          unsuccessful lookup: %f\n"),
-		      (double) success / (double) nzero_counts,
-		      (double) nzero_counts / (double) nbucket);
-	    }
-
-	  free (counts);
-	  free (lengths);
+	  else if (shdr->sh_type == SHT_GNU_HASH)
+	    handle_gnu_hash (ebl, scn, shdr, shstrndx);
 	}
     }
 }

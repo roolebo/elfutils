@@ -1,3 +1,10 @@
+2006-07-06  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf_gnu_hash.c: New file.
+	* libelf.h: Declare elf_gnu_hash.
+	* Makefile.am (libelf_a_SOURCES): Add elf_gnu_hash.
+	* libelf.map: Add elf_gnu_map for version ELFUTILS_1.2.
+
 2006-06-15  Roland McGrath  <roland@redhat.com>
 
 	* libelf.h (elf_getarsym): Fix comment typo.

@@ -119,6 +119,9 @@ bool EBLHOOK(copy_reloc_p) (int);
 /* Check whether given relocation is a no-op relocation.  */
 bool EBLHOOK(none_reloc_p) (int);
 
+/* Check whether given relocation is a relative relocation.  */
+bool EBLHOOK(relative_reloc_p) (int);
+
 /* Check whether given symbol's value is ok despite normal checks.  */
 bool EBLHOOK(check_special_symbol) (Elf *, GElf_Ehdr *, const GElf_Sym *,
 			      const char *, const GElf_Shdr *);

@@ -1,5 +1,5 @@
 /* Internal definitions for interface for libebl.
-   Copyright (C) 2000, 2001, 2002, 2004, 2005 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2004, 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -77,6 +77,9 @@ struct ebl
 # include "ebl-hooks.h"
 # undef EBLHOOK
 
+  /* Size of entry in Sysv-style hash table.  */
+  int sysvhash_entrysize;
+
   /* Internal data.  */
   void *dlhandle;
 };
@@ -87,6 +90,7 @@ typedef const char *(*ebl_bhinit_t) (Elf *, GElf_Half, Ebl *, size_t);
 
 
 /* gettext helper macros.  */
+#undef _
 #define _(Str) dgettext ("elfutils", Str)
 
 #endif	/* libeblP.h */

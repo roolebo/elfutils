@@ -371,6 +371,10 @@ extern void elf_fill (int __fill);
 extern unsigned long int elf_hash (const char *__string)
        __attribute__ ((__pure__));
 
+/* Compute hash value using the GNU-specific hash function.  */
+extern unsigned long int elf_gnu_hash (const char *__string)
+       __attribute__ ((__pure__));
+
 
 /* Compute simple checksum from permanent parts of the ELF file.  */
 extern long int elf32_checksum (Elf *__elf);

@@ -1,5 +1,5 @@
 /* Return dynamic tag name.
-   Copyright (C) 2001, 2002 Red Hat, Inc.
+   Copyright (C) 2001, 2002, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -96,15 +96,16 @@ ebl_dynamic_tag_name (ebl, tag, buf, len)
 
 	  res = valrntags[tag - DT_GNU_PRELINKED];
 	}
-      else if (tag >= DT_GNU_CONFLICT && tag <= DT_SYMINFO)
+      else if (tag >= DT_GNU_HASH && tag <= DT_SYMINFO)
 	{
 	  static const char *addrrntags[] =
 	    {
+	      "GNU_HASH", "TLSDESC_PLT", "TLSDESC_DOT",
 	      "GNU_CONFLICT", "GNU_LIBLIST", "CONFIG", "DEPAUDIT", "AUDIT",
 	      "PLTPAD", "MOVETAB", "SYMINFO"
 	    };
 
-	  res = addrrntags[tag - DT_GNU_CONFLICT];
+	  res = addrrntags[tag - DT_GNU_HASH];
 	}
       else if (tag >= DT_RELACOUNT && tag <= DT_VERNEEDNUM)
 	{

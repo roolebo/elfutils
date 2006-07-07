@@ -53,5 +53,9 @@ s390_init (elf, machine, eh, ehlen)
   HOOK (eh, register_name);
   HOOK (eh, return_value_location);
 
+  /* Only the 64-bit format uses the incorrect hash table entry size.  */
+  if (eh->class == ELFCLASS64)
+    eh->sysvhash_entrysize = sizeof (Elf64_Xword);
+
   return MODVERSION;
 }

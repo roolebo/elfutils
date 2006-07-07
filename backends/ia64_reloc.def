@@ -1,5 +1,5 @@
 /* List the relocation types for ia64.  -*- C -*-
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -106,3 +106,5 @@ RELOC_TYPE (DTPREL32LSB,	REL|EXEC|DYN)
 RELOC_TYPE (DTPREL64MSB,	REL|EXEC|DYN)
 RELOC_TYPE (DTPREL64LSB,	REL|EXEC|DYN)
 RELOC_TYPE (LTOFF_DTPREL22,	REL)
+
+#define NO_RELATIVE_RELOC	1

@@ -1,4 +1,4 @@
-/* Check whether given relocation is a copy relocation.
+/* Check whether given relocation is a no-op relocation.
    Copyright (C) 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2006.

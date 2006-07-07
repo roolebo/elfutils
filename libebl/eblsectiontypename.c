@@ -1,5 +1,5 @@
 /* Return section type name.
-   Copyright (C) 2001, 2002 Red Hat, Inc.
+   Copyright (C) 2001, 2002, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -116,6 +116,8 @@ ebl_section_type_name (ebl, section, buf, len)
 	    res = "CHECKSUM";
 	  else if (section == SHT_GNU_LIBLIST)
 	    res = "GNU_LIBLIST";
+	  else if (section == SHT_GNU_HASH)
+	    res = "GNU_HASH";
 	  /* Handle OS-specific section names.  */
 	  else
 	    {

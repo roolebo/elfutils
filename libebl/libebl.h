@@ -192,6 +192,9 @@ extern bool ebl_copy_reloc_p (Ebl *ebl, int reloc);
 /* Check whether given relocation is a no-op relocation.  */
 extern bool ebl_none_reloc_p (Ebl *ebl, int reloc);
 
+/* Check whether given relocation is a relative relocation.  */
+extern bool ebl_relative_reloc_p (Ebl *ebl, int reloc);
+
 /* Check whether section should be stripped.  */
 extern bool ebl_section_strip_p (Ebl *ebl, const GElf_Ehdr *ehdr,
 				 const GElf_Shdr *shdr, const char *name,
@@ -199,6 +202,9 @@ extern bool ebl_section_strip_p (Ebl *ebl, const GElf_Ehdr *ehdr,
 
 /* Check if backend uses a bss PLT in this file.  */
 extern bool ebl_bss_plt_p (Ebl *ebl, GElf_Ehdr *ehdr);
+
+/* Return size of entry in SysV-style hash table.  */
+extern int ebl_sysvhash_entrysize (Ebl *ebl);
 
 /* Return location expression to find return value given a
    DW_TAG_subprogram, DW_TAG_subroutine_type, or similar DIE describing

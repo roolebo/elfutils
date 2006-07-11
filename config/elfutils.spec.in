@@ -170,11 +170,6 @@ hes.
 - The license is now GPL for most files.  The libelf, libebl, libdw,and 
 libdwfl libraries have additional exceptions.  Add reference toOIN.
 
-* Thu Mar 30 2006 Roland McGrath <roland@redhat.com> 0.120-1
-- Bug fixes.
-- dwarf.h updated for DWARF 3.0 final specification.
-- libdwfl: New function dwfl_version.
-
 * Thu Jan 12 2006 Roland McGrath <roland@redhat.com> 0.119-1
 - elflint: more tests.
 - libdwfl: New function dwfl_module_register_names.

@@ -1,5 +1,5 @@
 /* Maintenance of module list in libdwfl.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -161,6 +161,7 @@ dwfl_report_module (Dwfl *dwfl, const char *name,
 }
 INTDEF (dwfl_report_module)
 
+
 static int
 compare_modules (const void *a, const void *b)
 {
@@ -170,7 +171,13 @@ compare_modules (const void *a, const void *b)
     return -1;
   if (m2 == NULL)
     return 1;
-  return (GElf_Sxword) (m1->low_addr - m2->low_addr);
+
+  GElf_Sxword diff = m1->low_addr - m2->low_addr;
+  if (diff < 0)
+    return -1;
+  if (diff > 0)
+    return 1;
+  return 0;
 }
 
 

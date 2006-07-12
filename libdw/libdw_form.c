@@ -1,5 +1,5 @@
 /* Helper functions for form handling.
-   Copyright (C) 2003, 2004 Red Hat, Inc.
+   Copyright (C) 2003, 2004, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -59,7 +59,7 @@
 
 
 size_t
-internal_function_def
+internal_function
 __libdw_form_val_len (Dwarf *dbg, struct Dwarf_CU *cu, unsigned int form,
 		      const unsigned char *valp)
 {

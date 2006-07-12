@@ -112,7 +112,7 @@ sort_sections (Elf_Scn **scns, Elf_ScnList *list)
 
 
 int
-internal_function_def
+internal_function
 __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 {
   ElfW2(LIBELFBITS,Ehdr) *ehdr;
@@ -444,7 +444,7 @@ fill (int fd, off_t pos, size_t len, char *fillbuf, size_t *filledp)
 
 
 int
-internal_function_def
+internal_function
 __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 {
   char fillbuf[FILLBUFSIZE];

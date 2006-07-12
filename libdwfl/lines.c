@@ -1,5 +1,5 @@
 /* Fetch source line info for CU.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -51,7 +51,7 @@
 #include "../libdw/libdwP.h"
 
 Dwfl_Error
-internal_function_def
+internal_function
 __libdwfl_cu_getsrclines (struct dwfl_cu *cu)
 {
   if (cu->lines == NULL)

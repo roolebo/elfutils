@@ -64,7 +64,7 @@ nofree (void *arg __attribute__ ((unused)))
 }
 
 void
-internal_function_def
+internal_function
 __libdwfl_module_free (Dwfl_Module *mod)
 {
   if (mod->lazy_cu_root != NULL)

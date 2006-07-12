@@ -1,5 +1,5 @@
 /* Return vhild of current DIE.
-   Copyright (C) 2003, 2004, 2005 Red Hat, Inc.
+   Copyright (C) 2003, 2004, 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -60,7 +60,7 @@
 
 
 unsigned char *
-internal_function_def
+internal_function
 __libdw_find_attr (Dwarf_Die *die, unsigned int search_name,
 		   unsigned int *codep, unsigned int *formp)
 {

@@ -1,3 +1,12 @@
+2006-07-12  Ulrich Drepper  <drepper@redhat.com>
+
+	* cu.c: Adjust for internal_function_def removal.
+	* dwfl_error.c: Likewise.
+	* dwfl_module.c: Likewise.
+	* dwfl_module_getdwarf.c: Likewise.
+	* lines.c: Likewise.
+	* relocate.c: Likewise.
+
 2006-07-11  Ulrich Drepper  <drepper@redhat.com>
 
 	* dwfl_module.c (compare_modules): Don't return GElf_Sxword value,

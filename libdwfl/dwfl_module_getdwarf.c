@@ -319,7 +319,7 @@ find_symtab (Dwfl_Module *mod)
 
 /* Try to open a libebl backend for MOD.  */
 Dwfl_Error
-internal_function_def
+internal_function
 __libdwfl_module_getebl (Dwfl_Module *mod)
 {
   if (mod->ebl == NULL)

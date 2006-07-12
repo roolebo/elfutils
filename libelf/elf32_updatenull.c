@@ -132,7 +132,7 @@ ELFW(default_ehdr,LIBELFBITS) (Elf *elf, ElfW2(LIBELFBITS,Ehdr) *ehdr,
 
 
 off_t
-internal_function_def
+internal_function
 __elfw2(LIBELFBITS,updatenull) (Elf *elf, int *change_bop, size_t shnum)
 {
   ElfW2(LIBELFBITS,Ehdr) *ehdr = INTUSE(elfw2(LIBELFBITS,getehdr)) (elf);

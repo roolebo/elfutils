@@ -215,7 +215,7 @@ convert_data (Elf_Scn *scn, int version __attribute__ ((unused)), int eclass,
 
 /* Store the information for the raw data in the `rawdata' element.  */
 int
-internal_function_def
+internal_function
 __libelf_set_rawdata (Elf_Scn *scn)
 {
   size_t offset;

@@ -1,5 +1,5 @@
 /* Out of line functions for memory-access.h macros.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -54,7 +54,7 @@
 #include "memory-access.h"
 
 uint64_t
-internal_function_def
+internal_function
 __libdw_get_uleb128 (uint64_t acc, unsigned int i, const unsigned char **addrp)
 {
   unsigned char __b;
@@ -62,7 +62,7 @@ __libdw_get_uleb128 (uint64_t acc, unsigned int i, const unsigned char **addrp)
 }
 
 int64_t
-internal_function_def
+internal_function
 __libdw_get_sleb128 (int64_t acc, unsigned int i, const unsigned char **addrp)
 {
   unsigned char __b;

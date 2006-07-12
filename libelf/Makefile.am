@@ -132,7 +132,7 @@ uninstall: uninstall-am
 endif
 
 noinst_HEADERS = elf.h abstract.h common.h exttypes.h gelf_xlate.h libelfP.h \
-		 version_xlate.h dl-hash.h
+		 version_xlate.h gnuhash_xlate.h dl-hash.h
 EXTRA_DIST = libelf.map
 
 CLEANFILES = $(am_libelf_pic_a_OBJECTS) *.gcno *.gcda

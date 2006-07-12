@@ -1886,8 +1886,8 @@ section [%2d] '%s': hash bucket reference %zu out of bounds\n"),
   for (; cnt < 2 + nbucket + nchain; ++cnt)
     if (((Elf64_Xword *) data->d_buf)[cnt] >= maxidx)
       ERROR (gettext ("\
-section [%2d] '%s': hash chain reference %zu out of bounds\n"),
-	     idx, section_name (ebl, idx), cnt - 2 - nbucket);
+section [%2d] '%s': hash chain reference %" PRIu64 " out of bounds\n"),
+	     idx, section_name (ebl, idx), (uint64_t) (cnt - 2 - nbucket));
 }
 
 

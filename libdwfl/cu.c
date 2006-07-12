@@ -248,7 +248,7 @@ intern_cu (Dwfl_Module *mod, Dwarf_Off cuoff, struct dwfl_cu **result)
 /* Traverse all the CUs in the module.  */
 
 Dwfl_Error
-internal_function_def
+internal_function
 __libdwfl_nextcu (Dwfl_Module *mod, struct dwfl_cu *lastcu,
 		  struct dwfl_cu **cu)
 {
@@ -315,7 +315,7 @@ arangecu (Dwfl_Module *mod, struct dwfl_arange *arange, struct dwfl_cu **cu)
 }
 
 Dwfl_Error
-internal_function_def
+internal_function
 __libdwfl_addrcu (Dwfl_Module *mod, Dwarf_Addr addr, struct dwfl_cu **cu)
 {
   struct dwfl_arange *arange;

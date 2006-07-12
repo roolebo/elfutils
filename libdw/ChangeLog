@@ -1,3 +1,11 @@
+2006-07-12  Ulrich Drepper  <drepper@redhat.com>
+
+	* dwarf_child.c: Adjust for internal_function_def removal.
+	* dwarf_getabbrev.c: Likewise.
+	* dwarf_tag.c: Likewise.
+	* libdw_form.c: Likewise.
+	* memory-access.c: Likewise.
+
 2006-06-28  Roland McGrath  <roland@redhat.com>
 
 	* libdw.map: Export dwfl_linecu, dwfl_line_comp_dir.

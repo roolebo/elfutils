@@ -1,3 +1,10 @@
+2006-07-12  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf32_updatefile.c: Adjust for internal_function_def removal.
+	* elf32_updatenull.c: Likewise.
+	* elf_begin.c: Likewise.
+	* elf_getdata.c: Likewise.
+
 2006-07-11  Ulrich Drepper  <drepper@redhat.com>
 
 	* libelf.h: Define ELF_T_GNUHASH.

@@ -1,5 +1,5 @@
 /* Error handling in libdwfl.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -162,14 +162,14 @@ canonicalize (Dwfl_Error error)
 }
 
 int
-internal_function_def
+internal_function
 __libdwfl_canon_error (Dwfl_Error error)
 {
   return canonicalize (error);
 }
 
 void
-internal_function_def
+internal_function
 __libdwfl_seterrno (Dwfl_Error error)
 {
   int value = canonicalize (error);

@@ -1,5 +1,5 @@
 /* Relocate debug information.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -156,11 +156,6 @@ __libdwfl_relocate (Dwfl_Module *mod, Elf *debugfile)
 	    {
 	      /* First, resolve the symbol to an absolute value.  */
 	      GElf_Addr value;
-	      inline Dwfl_Error adjust (GElf_Word shndx)
-		{
-		  return __libdwfl_relocate_value (mod, symshstrndx,
-						   shndx, &value);
-		}
 
 	      if (symndx == STN_UNDEF)
 		/* When strip removes a section symbol referring to a
@@ -172,35 +167,17 @@ __libdwfl_relocate (Dwfl_Module *mod, Elf *debugfile)
 		value = 0;
 	      else
 		{
-		  GElf_Sym sym_mem;
+		  GElf_Sym sym;
 		  GElf_Word shndx;
-		  GElf_Sym *sym = gelf_getsymshndx (mod->symdata,
-						    mod->symxndxdata,
-						    symndx, &sym_mem,
-						    &shndx);
-		  if (sym == NULL)
-		    return DWFL_E_LIBELF;
 
-		  value = sym->st_value;
-		  if (sym->st_shndx != SHN_XINDEX)
-		    shndx = sym->st_shndx;
-		  switch (shndx)
-		    {
-		    case SHN_ABS:
-		      break;
+		  if (INTUSE(dwfl_module_getsym) (mod, symndx,
+						  &sym, &shndx) == NULL)
+		    return dwfl_errno ();
 
-		    case SHN_UNDEF:
-		    case SHN_COMMON:
-		      return DWFL_E_RELUNDEF;
+		  if (shndx == SHN_UNDEF || shndx == SHN_COMMON)
+		    return DWFL_E_RELUNDEF;
 
-		    default:
-		      {
-			Dwfl_Error error = adjust (shndx);
-			if (error != DWFL_E_NOERROR)
-			  return error;
-			break;
-		      }
-		    }
+		  value = sym.st_value;
 		}
 
 	      /* These are the types we can relocate.  */

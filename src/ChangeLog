@@ -45,6 +45,13 @@
 	* Makefile.am: Add hacks to create dependency files for non-generic
 	linker.
 
+2006-06-28  Roland McGrath  <roland@redhat.com>
+
+	* addr2line.c (use_comp_dir): New variable.
+	(options, parse_opt): Grok -A/--absolute to set it.
+	(handle_address): If set, prepend dwfl_line_comp_dir results to
+	relative file names.
+
 2006-06-12  Ulrich Drepper  <drepper@redhat.com>
 
 	* ldgeneric.c (ld_generic_generate_sections): Don't create .interp

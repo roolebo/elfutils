@@ -1,4 +1,4 @@
-/* Get information from a source line record returned by libdwfl.
+/* Find debugging and symbol information for a module in libdwfl.
    Copyright (C) 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
@@ -48,29 +48,23 @@
    <http://www.openinventionnetwork.com>.  */
 
 #include "libdwflP.h"
-#include "../libdw/libdwP.h"
 
 const char *
-dwfl_lineinfo (Dwfl_Line *line, Dwarf_Addr *addr, int *linep, int *colp,
-	       Dwarf_Word *mtime, Dwarf_Word *length)
+dwfl_module_addrname (Dwfl_Module *mod, GElf_Addr addr)
 {
-  if (line == NULL)
+  int syments = INTUSE(dwfl_module_getsymtab) (mod);
+  if (syments < 0)
     return NULL;
 
-  struct dwfl_cu *cu = dwfl_linecu (line);
-  const Dwarf_Line *info = &cu->die.cu->lines->info[line->idx];
+  /* Look through the symbol table for a matching symbol.  */
+  for (int i = 1; i < syments; ++i)
+    {
+      GElf_Sym sym;
+      const char *name = INTUSE(dwfl_module_getsym) (mod, i, &sym, NULL);
+      if (name != NULL
+	  && sym.st_value <= addr && addr < sym.st_value + sym.st_size)
+	return name;
+    }
 
-  if (addr != NULL)
-    *addr = info->addr + cu->mod->debug.bias;
-  if (linep != NULL)
-    *linep = info->line;
-  if (colp != NULL)
-    *colp = info->column;
-
-  struct Dwarf_Fileinfo_s *file = &info->files->info[info->file];
-  if (mtime != NULL)
-    *mtime = file->mtime;
-  if (length != NULL)
-    *length = file->length;
-  return file->name;
+  return NULL;
 }

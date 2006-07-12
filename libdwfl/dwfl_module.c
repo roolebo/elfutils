@@ -186,11 +186,12 @@ compare_modules (const void *a, const void *b)
    existed before but was not included in the current report.
    Returns a nonzero return value from the callback.
    DWFL cannot be used until this function has returned zero.  */
-int dwfl_report_end (Dwfl *dwfl,
-		     int (*removed) (Dwfl_Module *, void *,
-				     const char *, Dwarf_Addr,
-				     void *arg),
-		     void *arg)
+int
+dwfl_report_end (Dwfl *dwfl,
+		 int (*removed) (Dwfl_Module *, void *,
+				 const char *, Dwarf_Addr,
+				 void *arg),
+		 void *arg)
 {
   assert (dwfl->modules == NULL);
 

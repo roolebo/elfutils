@@ -1,5 +1,5 @@
 /* Internal definitions for libdwfl.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -144,7 +144,7 @@ struct Dwfl_Module
   struct dwfl_file *symfile;	/* Either main or debug.  */
   Elf_Data *symdata;		/* Data in the ELF symbol table section.  */
   size_t syments;		/* sh_size / sh_entsize of that section.  */
-  const Elf_Data *symstrdata;	/* Data for its string table.  */
+  Elf_Data *symstrdata;		/* Data for its string table.  */
   Elf_Data *symxndxdata;	/* Data in the extended section index table. */
   Dwfl_Error symerr;		/* Previous failure to load symbols.  */
 
@@ -198,13 +198,14 @@ struct Dwfl_Lines
 };
 
 static inline struct dwfl_cu *
-dwfl_linecu (const Dwfl_Line *line)
+dwfl_linecu_inline (const Dwfl_Line *line)
 {
   const struct Dwfl_Lines *lines = ((const void *) line
 				    - offsetof (struct Dwfl_Lines,
 						idx[line->idx]));
   return lines->cu;
 }
+#define dwfl_linecu dwfl_linecu_inline
 
 /* This describes a contiguous address range that lies in a single CU.
    We condense runs of Dwarf_Arange entries for the same CU into this.  */
@@ -270,6 +271,8 @@ INTDECL (dwfl_addrdie)
 INTDECL (dwfl_module_addrdie)
 INTDECL (dwfl_module_getdwarf)
 INTDECL (dwfl_module_getelf)
+INTDECL (dwfl_module_getsym)
+INTDECL (dwfl_module_getsymtab)
 INTDECL (dwfl_module_getsrc)
 INTDECL (dwfl_report_elf)
 INTDECL (dwfl_report_begin)

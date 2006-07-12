@@ -63,6 +63,8 @@ static const struct argp_option options[] =
 {
   { NULL, 0, NULL, 0, N_("Output Selection:"), 0 },
   { "basenames", 's', NULL, 0, N_("Show only base names of source files"), 0 },
+  { "absolute", 'A', NULL, 0,
+    N_("Show absolute file names using compilation directory"), 0 },
   { "functions", 'f', NULL, 0, N_("Additional show function names"), 0 },
 
   { NULL, 0, NULL, 0, N_("Miscellaneous:"), 0 },
@@ -98,6 +100,9 @@ static void handle_address (GElf_Addr addr, Dwfl *dwfl);
 
 /* True if only base names of files should be shown.  */
 static bool only_basenames;
+
+/* True if absolute file names based on DW_AT_comp_dir should be shown.  */
+static bool use_comp_dir;
 
 /* True if function names should be shown.  */
 static bool show_functions;
@@ -207,6 +212,10 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
       only_basenames = true;
       break;
 
+    case 'A':
+      use_comp_dir = true;
+      break;
+
     case 'f':
       show_functions = true;
       break;
@@ -307,13 +316,24 @@ handle_address (GElf_Addr addr, Dwfl *dwfl)
   if (line != NULL && (src = dwfl_lineinfo (line, &addr, &lineno, &linecol,
 					    NULL, NULL)) != NULL)
     {
+      const char *comp_dir = "";
+      const char *comp_dir_sep = "";
+
       if (only_basenames)
 	src = basename (src);
+      else if (use_comp_dir && src[0] != '/')
+	{
+	  comp_dir = dwfl_line_comp_dir (line);
+	  if (comp_dir != NULL)
+	    comp_dir_sep = "/";
+	}
 
       if (linecol != 0)
-	printf ("%s:%d:%d\n", src, lineno, linecol);
+	printf ("%s%s%s:%d:%d\n",
+		comp_dir, comp_dir_sep, src, lineno, linecol);
       else
-	printf ("%s:%d\n", src, lineno);
+	printf ("%s%s%s:%d\n",
+		comp_dir, comp_dir_sep, src, lineno);
     }
   else
     puts ("??:0");

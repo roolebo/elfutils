@@ -82,7 +82,7 @@ typedef struct
   int (*section_address) (Dwfl_Module *mod, void **userdata,
 			  const char *modname, Dwarf_Addr base,
 			  const char *secname,
-			  Elf32_Word shndx, const GElf_Shdr *shdr,
+			  GElf_Word shndx, const GElf_Shdr *shdr,
 			  Dwarf_Addr *addr);
 
   char **debuginfo_path;	/* See dwfl_standard_find_debuginfo.  */
@@ -179,6 +179,9 @@ extern ptrdiff_t dwfl_getmodules (Dwfl *dwfl,
 				  void *arg,
 				  ptrdiff_t offset);
 
+/* Find the module containing the given address.  */
+extern Dwfl_Module *dwfl_addrmodule (Dwfl *dwfl, Dwarf_Addr address);
+
 
 /*** Standard callbacks ***/
 
@@ -211,7 +214,7 @@ extern int dwfl_standard_find_debuginfo (Dwfl_Module *, void **,
    if ET_REL is to be supported.  */
 extern int dwfl_offline_section_address (Dwfl_Module *, void **,
 					 const char *, Dwarf_Addr,
-					 const char *, Elf32_Word,
+					 const char *, GElf_Word,
 					 const GElf_Shdr *,
 					 Dwarf_Addr *addr);
 
@@ -222,7 +225,7 @@ extern int dwfl_linux_kernel_find_elf (Dwfl_Module *, void **,
 				       char **, Elf **);
 extern int dwfl_linux_kernel_module_section_address (Dwfl_Module *, void **,
 						     const char *, Dwarf_Addr,
-						     const char *, Elf32_Word,
+						     const char *, GElf_Word,
 						     const GElf_Shdr *,
 						     Dwarf_Addr *addr);
 
@@ -292,7 +295,7 @@ extern int dwfl_module_relocate_address (Dwfl_Module *mod,
    Returns null for errors.  */
 extern const char *dwfl_module_relocation_info (Dwfl_Module *mod,
 						unsigned int idx,
-						Elf32_Word *shndxp);
+						GElf_Word *shndxp);
 
 /* Validate that ADDRESS and ADDRESS+OFFSET lie in a known module
    and both within the same contiguous region for relocation purposes.
@@ -301,16 +304,33 @@ extern int dwfl_validate_address (Dwfl *dwfl,
 				  Dwarf_Addr address, Dwarf_Sword offset);
 
 
-/*** Dwarf access functions ***/
-
-/* Find the module containing the given address.  */
-extern Dwfl_Module *dwfl_addrmodule (Dwfl *dwfl, Dwarf_Addr address);
+/*** ELF access functions ***/
 
 /* Fetch the module main ELF file (where the allocated sections
    are found) for use with libelf.  If successful, fills in *BIAS
    with the difference between addresses within the loaded module
    and those in symbol tables or Dwarf information referring to it.  */
 extern Elf *dwfl_module_getelf (Dwfl_Module *, GElf_Addr *bias);
+
+/* Return the number of symbols in the module's symbol table,
+   or -1 for errors.  */
+extern int dwfl_module_getsymtab (Dwfl_Module *mod);
+
+/* Fetch one entry from the module's symbol table.  On errors, returns
+   NULL.  If successful, fills in *SYM and returns the string for st_name.
+   This works like gelf_getsym except that st_value is always adjusted
+   to an absolute value based on the module's location.  If SHNDXP is
+   non-null, it's set with the section index (whether from st_shndx or
+   extended index table).  */
+extern const char *dwfl_module_getsym (Dwfl_Module *mod, int ndx,
+				       GElf_Sym *sym, GElf_Word *shndxp)
+  __nonnull_attribute__ (3);
+
+/* Find the symbol that ADDRESS lies inside, and return its name.  */
+extern const char *dwfl_module_addrname (Dwfl_Module *mod, GElf_Addr address);
+
+
+/*** Dwarf access functions ***/
 
 /* Fetch the module's debug information for use with libdw.
    If successful, fills in *BIAS with the difference between
@@ -368,17 +388,20 @@ extern int dwfl_module_getsrc_file (Dwfl_Module *mod,
 /* Return the module containing this line record.  */
 extern Dwfl_Module *dwfl_linemodule (Dwfl_Line *line);
 
+/* Return the CU containing this line record.  */
+extern Dwarf_Die *dwfl_linecu (Dwfl_Line *line);
+
 /* Return the source file name and fill in other information.
    Arguments may be null for unneeded fields.  */
 extern const char *dwfl_lineinfo (Dwfl_Line *line, Dwarf_Addr *addr,
 				  int *linep, int *colp,
 				  Dwarf_Word *mtime, Dwarf_Word *length);
 
+/* Return the compilation directory (AT_comp_dir) from this line's CU.  */
+extern const char *dwfl_line_comp_dir (Dwfl_Line *line);
 
-/* Find the symbol that ADDRESS lies inside, and return its name.  */
-extern const char *dwfl_module_addrname (Dwfl_Module *mod, GElf_Addr address);
 
-
+/*** Machine backend access functions ***/
 
 /* Return location expression to find return value given a
    DW_TAG_subprogram, DW_TAG_subroutine_type, or similar DIE describing

@@ -1,5 +1,5 @@
-/* Get information from a source line record returned by libdwfl.
-   Copyright (C) 2005, 2006 Red Hat, Inc.
+/* Fetch the module containing a source line record returned by libdwfl.
+   Copyright (C) 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -48,29 +48,15 @@
    <http://www.openinventionnetwork.com>.  */
 
 #include "libdwflP.h"
-#include "../libdw/libdwP.h"
 
-const char *
-dwfl_lineinfo (Dwfl_Line *line, Dwarf_Addr *addr, int *linep, int *colp,
-	       Dwarf_Word *mtime, Dwarf_Word *length)
+#undef dwfl_linecu
+
+Dwarf_Die *
+dwfl_linecu (Dwfl_Line *line)
 {
   if (line == NULL)
     return NULL;
 
-  struct dwfl_cu *cu = dwfl_linecu (line);
-  const Dwarf_Line *info = &cu->die.cu->lines->info[line->idx];
-
-  if (addr != NULL)
-    *addr = info->addr + cu->mod->debug.bias;
-  if (linep != NULL)
-    *linep = info->line;
-  if (colp != NULL)
-    *colp = info->column;
-
-  struct Dwarf_Fileinfo_s *file = &info->files->info[info->file];
-  if (mtime != NULL)
-    *mtime = file->mtime;
-  if (length != NULL)
-    *length = file->length;
-  return file->name;
+  struct dwfl_cu *cu = dwfl_linecu_inline (line);
+  return &cu->die;
 }

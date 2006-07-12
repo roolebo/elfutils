@@ -1,5 +1,5 @@
-/* Get information from a source line record returned by libdwfl.
-   Copyright (C) 2005, 2006 Red Hat, Inc.
+/* Find debugging and symbol information for a module in libdwfl.
+   Copyright (C) 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -48,29 +48,69 @@
    <http://www.openinventionnetwork.com>.  */
 
 #include "libdwflP.h"
-#include "../libdw/libdwP.h"
 
 const char *
-dwfl_lineinfo (Dwfl_Line *line, Dwarf_Addr *addr, int *linep, int *colp,
-	       Dwarf_Word *mtime, Dwarf_Word *length)
+dwfl_module_getsym (Dwfl_Module *mod, int ndx,
+		    GElf_Sym *sym, GElf_Word *shndxp)
 {
-  if (line == NULL)
+  if (unlikely (mod == NULL))
     return NULL;
 
-  struct dwfl_cu *cu = dwfl_linecu (line);
-  const Dwarf_Line *info = &cu->die.cu->lines->info[line->idx];
+  if (unlikely (mod->symdata == NULL))
+    {
+      int result = INTUSE(dwfl_module_getsymtab) (mod);
+      if (result < 0)
+	return NULL;
+    }
 
-  if (addr != NULL)
-    *addr = info->addr + cu->mod->debug.bias;
-  if (linep != NULL)
-    *linep = info->line;
-  if (colp != NULL)
-    *colp = info->column;
+  GElf_Word shndx;
+  sym = gelf_getsymshndx (mod->symdata, mod->symxndxdata, ndx, sym, &shndx);
+  if (unlikely (sym == NULL))
+    {
+      __libdwfl_seterrno (DWFL_E_LIBELF);
+      return NULL;
+    }
 
-  struct Dwarf_Fileinfo_s *file = &info->files->info[info->file];
-  if (mtime != NULL)
-    *mtime = file->mtime;
-  if (length != NULL)
-    *length = file->length;
-  return file->name;
+  if (sym->st_shndx != SHN_XINDEX)
+    shndx = sym->st_shndx;
+
+  if (shndxp != NULL)
+    *shndxp = shndx;
+
+  switch (shndx)
+    {
+    case SHN_ABS:
+    case SHN_UNDEF:
+    case SHN_COMMON:
+      break;
+
+    default:
+      if (mod->e_type != ET_REL)
+	/* Apply the bias to the symbol value.  */
+	sym->st_value += mod->symfile->bias;
+      else
+	{
+	  /* In an ET_REL file, the symbol table values are relative
+	     to the section, not to the module's load base.  */
+	  size_t symshstrndx;
+	  Dwfl_Error result = DWFL_E_LIBELF;
+	  if (elf_getshstrndx (mod->symfile->elf, &symshstrndx) == 0)
+	    result = __libdwfl_relocate_value (mod, symshstrndx,
+					       shndx, &sym->st_value);
+	  if (unlikely (result != DWFL_E_NOERROR))
+	    {
+	      __libdwfl_seterrno (result);
+	      return NULL;
+	    }
+	}
+      break;
+    }
+
+  if (unlikely (sym->st_name >= mod->symstrdata->d_size))
+    {
+      __libdwfl_seterrno (DWFL_E_BADSTROFF);
+      return NULL;
+    }
+  return (const char *) mod->symstrdata->d_buf + sym->st_name;
 }
+INTDEF (dwfl_module_getsym)

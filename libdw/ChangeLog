@@ -1,3 +1,10 @@
+2006-06-28  Roland McGrath  <roland@redhat.com>
+
+	* libdw.map: Export dwfl_linecu, dwfl_line_comp_dir.
+
+	* libdw.map: Bump to 0.122; export dwfl_module_getsymtab and
+	dwfl_module_getsym.
+
 2006-05-27  Ulrich Drepper  <drepper@redhat.com>
 
 	* libdw.h: Add extern "C".

@@ -48,29 +48,17 @@
    <http://www.openinventionnetwork.com>.  */
 
 #include "libdwflP.h"
-#include "../libdw/libdwP.h"
+#include <dwarf.h>
 
 const char *
-dwfl_lineinfo (Dwfl_Line *line, Dwarf_Addr *addr, int *linep, int *colp,
-	       Dwarf_Word *mtime, Dwarf_Word *length)
+dwfl_line_comp_dir (Dwfl_Line *line)
 {
   if (line == NULL)
     return NULL;
 
   struct dwfl_cu *cu = dwfl_linecu (line);
-  const Dwarf_Line *info = &cu->die.cu->lines->info[line->idx];
-
-  if (addr != NULL)
-    *addr = info->addr + cu->mod->debug.bias;
-  if (linep != NULL)
-    *linep = info->line;
-  if (colp != NULL)
-    *colp = info->column;
-
-  struct Dwarf_Fileinfo_s *file = &info->files->info[info->file];
-  if (mtime != NULL)
-    *mtime = file->mtime;
-  if (length != NULL)
-    *length = file->length;
-  return file->name;
+  Dwarf_Attribute attr_mem;
+  return INTUSE(dwarf_formstring) (INTUSE(dwarf_attr) (&cu->die,
+						       DW_AT_comp_dir,
+						       &attr_mem));
 }

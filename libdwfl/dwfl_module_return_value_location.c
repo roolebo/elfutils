@@ -1,5 +1,5 @@
 /* Return location expression to find return value given a function type DIE.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -61,10 +61,10 @@ dwfl_module_return_value_location (mod, functypedie, locops)
 
   if (mod->ebl == NULL)
     {
-      mod->ebl = ebl_openbackend (mod->main.elf);
-      if (mod->ebl == NULL)
+      Dwfl_Error error = __libdwfl_module_getebl (mod);
+      if (error != DWFL_E_NOERROR)
 	{
-	  __libdwfl_seterrno (DWFL_E_LIBEBL);
+	  __libdwfl_seterrno (error);
 	  return -1;
 	}
     }

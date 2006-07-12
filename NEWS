@@ -1,5 +1,7 @@
 Version 0.122:
 
+libdwfl: New functions dwfl_module_getsymtab, dwfl_module_getsym.
+
 libebl:add function to test for relative relocation
 
 elflint: fix and extend DT_RELCOUNT/DT_RELACOUNT checks

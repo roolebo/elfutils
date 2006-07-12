@@ -1,5 +1,5 @@
 /* Find debugging and symbol information for a module in libdwfl.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -471,77 +471,17 @@ dwfl_module_getdwarf (Dwfl_Module *mod, Dwarf_Addr *bias)
 }
 INTDEF (dwfl_module_getdwarf)
 
-
-const char *
-dwfl_module_addrname (Dwfl_Module *mod, GElf_Addr addr)
+int
+dwfl_module_getsymtab (Dwfl_Module *mod)
 {
   if (mod == NULL)
-    return NULL;
+    return -1;
 
   find_symtab (mod);
-  if (mod->symerr != DWFL_E_NOERROR)
-    {
-      __libdwfl_seterrno (mod->symerr);
-      return NULL;
-    }
+  if (mod->symerr == DWFL_E_NOERROR)
+    return mod->syments;
 
-  addr -= mod->symfile->bias;
-
-  /* Look through the symbol table for a matching symbol.  */
-  size_t symshstrndx = SHN_UNDEF;
-  for (size_t i = 1; i < mod->syments; ++i)
-    {
-      GElf_Sym sym_mem;
-      GElf_Word shndx;
-      GElf_Sym *sym = gelf_getsymshndx (mod->symdata, mod->symxndxdata,
-					i, &sym_mem, &shndx);
-      if (sym != NULL)
-	{
-	  GElf_Addr symaddr = sym->st_value;
-
-	  if (sym->st_shndx != SHN_XINDEX)
-	    shndx = sym->st_shndx;
-
-	  if (mod->e_type == ET_REL)
-	    /* In an ET_REL file, the symbol table values are relative
-	       to the section, not to the module's load base.  */
-	    switch (shndx)
-	      {
-	      case SHN_UNDEF:	/* Undefined symbol can't match an address.  */
-	      case SHN_COMMON:	/* Nor can a common defn.  */
-		continue;
-
-	      case SHN_ABS:	/* Symbol value is already absolute.  */
-		break;
-
-	      default:
-		{
-		  Dwfl_Error result = DWFL_E_LIBELF;
-		  if (likely (symshstrndx != SHN_UNDEF)
-		      || elf_getshstrndx (mod->symfile->elf,
-					  &symshstrndx) == 0)
-		    result = __libdwfl_relocate_value (mod, symshstrndx,
-						       shndx, &symaddr);
-		  if (unlikely (result != DWFL_E_NOERROR))
-		    {
-		      __libdwfl_seterrno (result);
-		      return NULL;
-		    }
-		  break;
-		}
-	      }
-
-	  if (symaddr <= addr && addr < symaddr + sym->st_size)
-	    {
-	      if (unlikely (sym->st_name >= mod->symstrdata->d_size))
-		{
-		  __libdwfl_seterrno (DWFL_E_BADSTROFF);
-		  return NULL;
-		}
-	      return (const char *) mod->symstrdata->d_buf + sym->st_name;
-	    }
-	}
-    }
-
-  return NULL;
+  __libdwfl_seterrno (mod->symerr);
+  return -1;
 }
+INTDEF (dwfl_module_getsymtab)

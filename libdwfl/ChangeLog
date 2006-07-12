@@ -4,10 +4,46 @@
 	it can overflow the return value type.
 	Patch by Tim Moore <timoore@redhat.com>.
 
+2006-06-28  Roland McGrath  <roland@redhat.com>
+
+	* libdwfl.h: Cosmetic changes.
+
+	* dwfl_line_comp_dir.c: New file.
+	* Makefile.am (libdwfl_a_SOURCES): Add it.
+	* libdwfl.h: Declare dwfl_line_comp_dir.
+
+	* dwfl_lineinfo.c (dwfl_lineinfo): Remove stray extern in defn.
+
+	* dwfl_linecu.c: New file.
+	* Makefile.am (libdwfl_a_SOURCES): Add it.
+	* libdwfl.h: Declare dwfl_linecu.
+
+	* libdwflP.h (dwfl_linecu_inline): Function renamed from dwfl_linecu.
+	(dwfl_linecu): Define as macro.
+
+	* relocate.c (__libdwfl_relocate): Use dwfl_module_getsym.
+
+	* dwfl_module_getdwarf.c (dwfl_module_getsymtab): New function.
+	(dwfl_module_addrname): Function moved ...
+	* dwfl_module_addrname.c: ... here, new file.
+	* dwfl_module_getsym.c: New file.
+	* Makefile.am (libdwfl_a_SOURCES): Add them.
+	* libdwfl.h: Declare dwfl_module_getsymtab, dwfl_module_getsym.
+	* libdwflP.h: Add INTDECLs.
+
+2006-06-27  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module.c (dwfl_report_end): Whitespace fix.
+
 2006-06-13  Roland McGrath  <roland@redhat.com>
 
 	* elf-from-memory.c (elf_from_remote_memory): Fix 32/64 typo.
 	Use __libdwfl_seterrno for elf_memory failure.
+
+2006-05-22  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_return_value_location.c
+	(dwfl_module_return_value_location): Use __libdwfl_module_getebl.
 
 2006-05-27  Ulrich Drepper  <drepper@redhat.com>
 

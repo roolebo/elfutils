@@ -246,15 +246,13 @@ AH_BOTTOM([
   extern __typeof (name) aliasname __attribute__ ((alias (#name)));
 
 #ifdef __i386__
-# define internal_function_def __attribute__ ((regparm (3), stdcall))
+# define internal_function __attribute__ ((regparm (3), stdcall))
 #else
-# define internal_function_def /* nothing */
+# define internal_function /* nothing */
 #endif
 
-# define internal_function \
-  internal_function_def __attribute__ ((visibility ("internal")))
-# define internal_strong_alias(name, aliasname) \
-  extern __typeof (name) aliasname __attribute__ ((alias (#name), visibility ("internal"))) internal_function_def;
+#define internal_strong_alias(name, aliasname) \
+  extern __typeof (name) aliasname __attribute__ ((alias (#name))) internal_function;
 
 #define attribute_hidden \
   __attribute__ ((visibility ("hidden")))

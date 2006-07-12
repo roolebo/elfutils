@@ -1,8 +1,6 @@
 Version 0.122:
 
-libdwfl: New functions dwfl_module_getsymtab, dwfl_module_getsym.
-
-libebl:add function to test for relative relocation
+libebl: add function to test for relative relocation
 
 elflint: fix and extend DT_RELCOUNT/DT_RELACOUNT checks
 
@@ -10,6 +8,8 @@ elflint, readelf: add support for DT_GNU_HASH
 libelf: add elf_gnu_hash
 
 elflint, readelf: add support for 64-bit SysV-style hash tables
+
+libdwfl: new functions dwfl_module_getsymtab, dwfl_module_getsym.
 
 Version 0.121:
 

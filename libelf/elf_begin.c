@@ -1,5 +1,5 @@
 /* Create descriptor for processing file.
-   Copyright (C) 1998-2005, 2006 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -434,7 +434,7 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 
 
 Elf *
-internal_function
+internal_function_def
 __libelf_read_mmaped_file (int fildes, void *map_address,  off_t offset,
 			   size_t maxsize, Elf_Cmd cmd, Elf *parent)
 {
@@ -702,7 +702,7 @@ read_long_names (Elf *elf)
 
 /* Read the next archive header.  */
 int
-internal_function
+internal_function_def
 __libelf_next_arhdr (elf)
      Elf *elf;
 {

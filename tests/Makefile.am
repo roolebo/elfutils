@@ -57,7 +57,8 @@ noinst_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  show-die-info get-files get-lines get-pubnames \
 		  get-aranges allfcts line2addr addrscopes funcscopes \
 		  show-abbrev hash newscn ecp dwflmodtest \
-		  find-prologues funcretval allregs rdwrmmap
+		  find-prologues funcretval allregs rdwrmmap \
+		  countcu
 # get-ciefde
 asm_TESTS = asm-tst1 asm-tst2 asm-tst3 asm-tst4 asm-tst5 \
 	    asm-tst6 asm-tst7 asm-tst8 asm-tst9
@@ -183,6 +184,7 @@ addrscopes_LDADD = $(libdw) $(libmudflap)
 funcscopes_LDADD = $(libdw) $(libmudflap)
 funcretval_LDADD = $(libdw) $(libmudflap)
 allregs_LDADD = $(libdw) $(libmudflap)
+countcu_LDADD = $(libdw) $(libmudflap)
 find_prologues_LDADD = $(libdw) $(libmudflap)
 #show_ciefde_LDADD = ../libdwarf/libdwarf.so $(libelf) $(libmudflap)
 asm_tst1_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl

@@ -1,0 +1,88 @@
+* regexp on multiple formats to yield records (pc, mod, sym, offset, size?)
+
+glibc backtrace_symbols_fd:
+
+foo.so(sym+0x123)[0x345]
+foo.so(sym-0x123)[0x345]
+foobar[0x12345678]
+
+	======= Backtrace: =========
+	/lib/libc.so.6[0x715124]
+	/lib/libc.so.6(__libc_free+0x77)[0x71565f]
+	./loser[0x80483f8]
+	/lib/libc.so.6(__libc_start_main+0xdf)[0x6c6d5f]
+	./loser[0x804832d]
+
+-->
+	(0x715124, "/lib/libc.so.6", , , )
+	(0x71565f, "/lib/libc.so.6", "__libc_free", +0x77, )
+	(0x80483f8, "./loser", , , )
+	(0x6c6d5f, "/lib/libc.so.6", "__libc_start_main", +0xdf, )
+	(0x804832d, "./loser", , , )
+
+
+i386 kernel oops:
+
+		 st_size
+[<%x>] sym+0x123/0x32
+[<%x>] sym-0x123/0x32
+[<%x>] sym+0x123/0x32 [mod]
+
+	 <1>Unable to handle kernel NULL pointer dereference at virtual address 00000000
+	 printing eip:
+	f8c54000
+	*pde = 2f36a001
+	Oops: 0002 [#2]
+	SMP
+	last sysfs file: /block/hdc/removable
+	Modules linked in: oopsmod2(U) oopsmod(U) nfs lockd nfs_acl ipv6 lp ppdev autofs4 rfcomm l2cap bluetooth sunrpc video button battery ac parport_pc parport floppy ohci1394 ieee1394 hw_random e1000 snd_intel8x0 snd_ac97_codec snd_ac97_bus snd_seq_dummy snd_seq_oss snd_seq_midi_event snd_seq snd_seq_device snd_pcm_oss snd_mixer_oss snd_pcm snd_timer i2c_i801 snd soundcore i2c_core ehci_hcd snd_page_alloc shpchp uhci_hcd dm_snapshot dm_zero dm_mirror dm_mod ext3 jbd ata_piix libata sd_mod scsi_mod
+	CPU:    0
+	EIP:    0060:[<f8c54000>]    Not tainted VLI
+	EFLAGS: 00010286   (2.6.14-1.1773_FC5smp)
+	EIP is at crasher+0x0/0xc [oopsmod2]
+	eax: f8bd2000   ebx: f8c54380   ecx: f8c54380   edx: 00000001
+	esi: 00000000   edi: 00000000   ebp: eecb8000   esp: eecb8fa8
+	ds: 007b   es: 007b   ss: 0068
+	Process insmod (pid: 3454, threadinfo=eecb8000 task=f768eaa0)
+	Stack: f8bd2006 c01393d7 083d8018 00000000 c0103f19 083d8018 000109ca 083d8008
+	       00000000 00000000 bfc73888 ffffffda 0000007b c010007b 00000080 0059a402
+	       00000073 00000206 bfc7381c 0000007b 00000000 00000000
+	Call Trace:
+	 [<f8bd2006>] init_crash+0x6/0x9 [oopsmod2]     [<c01393d7>] sys_init_module+0xe2/0x205
+	 [<c0103f19>] syscall_call+0x7/0xb
+
+-->
+	kernel-release "2.6.14-1.1773_FC5smp"
+	(0xf8c54000, "oopsmod2", "crasher", 0x0, 0xc)
+	(0xf8bd2006, "oopsmod2", "init_crash", +0x6, 0x9)
+	(0xc01393d7, "kernel", "sys_init_module", +0xe2, 0x205)
+	(0xc0103f19, "kernel", "syscall_call", +0x7, 0xb)
+
+
+x86-64 oops:
+
+[<%x>]
+<%x>{sym+%d}
+<%x>{sym-%d}
+<%x>{:mod:sym+%d}
+<%x>{:mod:sym-%d}
+
+kernel `uname -r`:
+
+... Not tainted  (%s)
+... Tainted: [A-Z]*  (%s)
+
+
+* guess mod loadbase from sym+ofs==pc -> pc-(symval+ofs)==bias
+
+* for kernel
+** seen-modules = "kernel", "mod", ...
+** dwfl_linux_kernel_report_offline with predicate = member seen-modules
+** intuit mod bases
+** dwfl_report_end, dwfl_report_begin, dwfl_report_elf on seen-modules w/bases
+
+* for user
+** seen-modules = files
+** dwfl_report_offline on seen-modules
+** intuit mod bases
+** dwfl_report_end, dwfl_report_begin, dwfl_report_elf on seen-modules w/bases

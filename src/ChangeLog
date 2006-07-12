@@ -1,7 +1,11 @@
-2006-07-11  Ulrich Drepper  <drepper@redhat.com>
+2006-07-11  Roland McGrath  <roland@redhat.com>
 
-	* readelf.c (handle_gnu_hash): Adjust for final form of .gnu.hash.
-	* elflint.c (check_gnu_hash): Likewise.
+	* addr2line.c (options): English fix in -f doc string.
+
+	* addr2line.c (use_comp_dir): New variable.
+	(options, parse_opt): Grok -A/--absolute to set it.
+	(handle_address): If set, prepend dwfl_line_comp_dir results to
+	relative file names.
 
 2006-07-06  Ulrich Drepper  <drepper@redhat.com>
 
@@ -44,13 +48,6 @@
 
 	* Makefile.am: Add hacks to create dependency files for non-generic
 	linker.
-
-2006-06-28  Roland McGrath  <roland@redhat.com>
-
-	* addr2line.c (use_comp_dir): New variable.
-	(options, parse_opt): Grok -A/--absolute to set it.
-	(handle_address): If set, prepend dwfl_line_comp_dir results to
-	relative file names.
 
 2006-06-12  Ulrich Drepper  <drepper@redhat.com>
 

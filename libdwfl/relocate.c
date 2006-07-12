@@ -55,7 +55,7 @@ typedef uint8_t GElf_Byte;
    We update the section header in place to cache the result.  */
 
 Dwfl_Error
-internal_function
+internal_function_def
 __libdwfl_relocate_value (Dwfl_Module *mod, size_t symshstrndx,
 			  Elf32_Word shndx, GElf_Addr *value)
 {
@@ -97,7 +97,7 @@ __libdwfl_relocate_value (Dwfl_Module *mod, size_t symshstrndx,
 }
 
 Dwfl_Error
-internal_function
+internal_function_def
 __libdwfl_relocate (Dwfl_Module *mod, Elf *debugfile)
 {
   assert (mod->e_type == ET_REL);

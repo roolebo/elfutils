@@ -64,7 +64,7 @@ static const struct argp_option options[] =
   { NULL, 0, NULL, 0, N_("Output Selection:"), 0 },
   { "basenames", 's', NULL, 0, N_("Show only base names of source files"), 0 },
   { "absolute", 'A', NULL, 0,
-    N_("Show absolute directory names of source files"), 0 },
+    N_("Show absolute file names using compilation directory"), 0 },
   { "functions", 'f', NULL, 0, N_("Also show function names"), 0 },
 
   { NULL, 0, NULL, 0, N_("Miscellaneous:"), 0 },

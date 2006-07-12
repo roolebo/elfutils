@@ -2323,7 +2323,7 @@ handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 static void
 print_hash_info (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx,
 		 uint_fast32_t maxlength, Elf32_Word nbucket,
-		 uint_fast32_t nsyms, uint32_t *lengths)
+		 uint_fast32_t nsyms, uint32_t *lengths, const char *extrastr)
 {
   uint32_t *counts = (uint32_t *) xcalloc (maxlength + 1, sizeof (uint32_t));
 
@@ -2346,6 +2346,9 @@ print_hash_info (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx,
 	  elf_strptr (ebl->elf, shstrndx,
 		      gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
 				    &glink)->sh_name));
+
+  if (extrastr != NULL)
+    fputs (extrastr, stdout);
 
   if (nbucket > 0)
     {
@@ -2419,7 +2422,7 @@ handle_sysv_hash (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx)
     }
 
   print_hash_info (ebl, scn, shdr, shstrndx, maxlength, nbucket, nsyms,
-		   lengths);
+		   lengths, NULL);
 
   free (lengths);
 }
@@ -2461,7 +2464,7 @@ handle_sysv_hash64 (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx)
     }
 
   print_hash_info (ebl, scn, shdr, shstrndx, maxlength, nbucket, nsyms,
-		   lengths);
+		   lengths, NULL);
 
   free (lengths);
 }
@@ -2481,17 +2484,30 @@ handle_gnu_hash (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx)
 
   Elf32_Word nbucket = ((Elf32_Word *) data->d_buf)[0];
   Elf32_Word symbias = ((Elf32_Word *) data->d_buf)[1];
-  Elf32_Word *bucket = &((Elf32_Word *) data->d_buf)[2];
-  Elf32_Word *chain = &((Elf32_Word *) data->d_buf)[2 + 2 * nbucket];
+
+  /* Next comes the size of the bitmap.  It's measured in words for
+     the architecture.  It's 32 bits for 32 bit archs, and 64 bits for
+     64 bit archs.  */
+  Elf32_Word bitmask_words = ((Elf32_Word *) data->d_buf)[2];
+  if (gelf_getclass (ebl->elf) == ELFCLASS64)
+    bitmask_words *= 2;
+
+  Elf32_Word shift = ((Elf32_Word *) data->d_buf)[3];
 
   uint32_t *lengths = (uint32_t *) xcalloc (nbucket, sizeof (uint32_t));
 
+  Elf32_Word *bitmask = &((Elf32_Word *) data->d_buf)[4];
+  Elf32_Word *bucket = &((Elf32_Word *) data->d_buf)[4 + bitmask_words];
+  Elf32_Word *chain = &((Elf32_Word *) data->d_buf)[4 + bitmask_words
+						    + nbucket];
+
+  /* Compute distribution of chain lengths.  */
   uint_fast32_t maxlength = 0;
   uint_fast32_t nsyms = 0;
   for (Elf32_Word cnt = 0; cnt < nbucket; ++cnt)
-    if (bucket[2 * cnt + 1] != 0)
+    if (bucket[cnt] != 0)
       {
-	Elf32_Word inner = bucket[2 * cnt + 1] - symbias;
+	Elf32_Word inner = bucket[cnt] - symbias;
 	do
 	  {
 	    ++nsyms;
@@ -2501,9 +2517,32 @@ handle_gnu_hash (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx)
 	while ((chain[inner++] & 1) == 0);
       }
 
-  print_hash_info (ebl, scn, shdr, shstrndx, maxlength, nbucket, nsyms,
-		   lengths);
+  /* Count bits in bitmask.  */
+  uint_fast32_t nbits = 0;
+  for (Elf32_Word cnt = 0; cnt < bitmask_words; ++cnt)
+    {
+      uint_fast32_t word = bitmask[cnt];
 
+      word = (word & 0x55555555) + ((word >> 1) & 0x55555555);
+      word = (word & 0x33333333) + ((word >> 2) & 0x33333333);
+      word = (word & 0x0f0f0f0f) + ((word >> 4) & 0x0f0f0f0f);
+      word = (word & 0x00ff00ff) + ((word >> 8) & 0x00ff00ff);
+      nbits += (word & 0x0000ffff) + ((word >> 16) & 0x0000ffff);
+    }
+
+  char *str;
+  if (asprintf (&str, gettext ("\
+ Symbol Bias: %u\n\
+ Bitmask Size: %zu bytes  %" PRIuFAST32 "%% bits set  2nd hash shift: %u\n"),
+		symbias, bitmask_words * sizeof (Elf32_Word),
+		(nbits * 100 + 50) / (bitmask_words * sizeof (Elf32_Word) * 8),
+		shift) == -1)
+    error (EXIT_FAILURE, 0, gettext ("memory exhausted"));
+
+  print_hash_info (ebl, scn, shdr, shstrndx, maxlength, nbucket, nsyms,
+		   lengths, str);
+
+  free (str);
   free (lengths);
 }
 

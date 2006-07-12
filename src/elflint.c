@@ -1897,17 +1897,34 @@ check_gnu_hash (Ebl *ebl, GElf_Shdr *shdr, Elf_Data *data, int idx,
 {
   Elf32_Word nbuckets = ((Elf32_Word *) data->d_buf)[0];
   Elf32_Word symbias = ((Elf32_Word *) data->d_buf)[1];
+  Elf32_Word bitmask_words = ((Elf32_Word *) data->d_buf)[2];
 
-  if (shdr->sh_size < (2 + 2 * nbuckets) * sizeof (Elf32_Word))
+  if (!powerof2 (bitmask_words))
+    ERROR (gettext ("\
+section [%2d] '%s': bitmask size not power of 2: %u\n"),
+	   idx, section_name (ebl, idx), bitmask_words);
+
+  size_t bitmask_idxmask = bitmask_words - 1;
+  if (gelf_getclass (ebl->elf) == ELFCLASS64)
+    bitmask_words *= 2;
+  Elf32_Word shift = ((Elf32_Word *) data->d_buf)[3];
+
+  if (shdr->sh_size < (4 + bitmask_words + nbuckets) * sizeof (Elf32_Word))
     {
       ERROR (gettext ("\
 section [%2d] '%s': hash table section is too small (is %ld, expected at least%ld)\n"),
 	     idx, section_name (ebl, idx), (long int) shdr->sh_size,
-	     (long int) ((2 + 2 * nbuckets) * sizeof (Elf32_Word)));
+	     (long int) ((4 + bitmask_words + nbuckets) * sizeof (Elf32_Word)));
       return;
     }
 
-  size_t maxidx = shdr->sh_size / sizeof (Elf32_Word) - (2 + 2 * nbuckets);
+  if (shift > 31)
+    ERROR (gettext ("\
+section [%2d] '%s': 2nd hash function shift too big: %u\n"),
+	   idx, section_name (ebl, idx), shift);
+
+  size_t maxidx = shdr->sh_size / sizeof (Elf32_Word) - (4 + bitmask_words
+							 + nbuckets);
 
   if (symshdr != NULL)
     maxidx = MIN (maxidx, symshdr->sh_size / symshdr->sh_entsize);
@@ -1915,35 +1932,36 @@ section [%2d] '%s': hash table section is too small (is %ld, expected at least%l
   /* We need the symbol section data.  */
   Elf_Data *symdata = elf_getdata (elf_getscn (ebl->elf, shdr->sh_link), NULL);
 
+  union
+  {
+    Elf32_Word *p32;
+    Elf64_Xword *p64;
+  } bitmask = { .p32 = &((Elf32_Word *) data->d_buf)[4] },
+      collected = { .p32 = xcalloc (bitmask_words, sizeof (Elf32_Word)) };
+
+  size_t classbits = gelf_getclass (ebl->elf) == ELFCLASS32 ? 32 : 64;
+
   size_t cnt;
-  for (cnt = 2; cnt < 2 + 2 * nbuckets; cnt += 2)
+  for (cnt = 4 + bitmask_words; cnt < 4 + bitmask_words + nbuckets; ++cnt)
     {
-      Elf32_Word bitset = ((Elf32_Word *) data->d_buf)[cnt];
-      Elf32_Word symidx = ((Elf32_Word *) data->d_buf)[cnt + 1];
+      Elf32_Word symidx = ((Elf32_Word *) data->d_buf)[cnt];
 
       if (symidx == 0)
-	{
-	  /* Nothing in here.  No bit in the bitset should be set either.  */
-	  if (bitset != 0)
-	    ERROR (gettext ("\
-section [%2d] '%s': hash chain for bucket %zu empty but bitset is not\n"),
-		   idx, section_name (ebl, idx), cnt / 2 - 1);
-
-	  continue;
-	}
+	continue;
 
       if (symidx < symbias)
 	{
 	  ERROR (gettext ("\
 section [%2d] '%s': hash chain for bucket %zu lower than symbol index bias\n"),
-		 idx, section_name (ebl, idx), cnt / 2 - 1);
+		 idx, section_name (ebl, idx), cnt - (4 + bitmask_words));
 	  continue;
 	}
 
-      Elf32_Word collected_bitset = 0;
       while (symidx - symbias < maxidx)
 	{
-	  Elf32_Word chainhash = ((Elf32_Word *) data->d_buf)[2 + 2 * nbuckets
+	  Elf32_Word chainhash = ((Elf32_Word *) data->d_buf)[4
+							      + bitmask_words
+							      + nbuckets
 							      + symidx
 							      - symbias];
 
@@ -1966,10 +1984,25 @@ section [%2d] '%s': symbol %u referenced in chain for bucket %zu is undefined\n"
 		    ERROR (gettext ("\
 section [%2d] '%s': hash value for symbol %u in chain for bucket %zu wrong\n"),
 			   idx, section_name (ebl, idx), symidx, cnt / 2 - 1);
+
+		  /* Set the bits in the bitmask.  */
+		  size_t maskidx = (hval / classbits) & bitmask_idxmask;
+		  if (classbits == 32)
+		    {
+		      collected.p32[maskidx]
+			|= UINT32_C (1) << (hval & (classbits - 1));
+		      collected.p32[maskidx]
+			|= UINT32_C (1) << ((hval >> shift) & (classbits - 1));
+		    }
+		  else
+		    {
+		      collected.p64[maskidx]
+			|= UINT64_C (1) << (hval & (classbits - 1));
+		      collected.p64[maskidx]
+			|= UINT64_C (1) << ((hval >> shift) & (classbits - 1));
+		    }
 		}
 	    }
-
-	  collected_bitset |= 1 << ((chainhash >> 5) & 31);
 
 	  if ((chainhash & 1) != 0)
 	    break;
@@ -1986,13 +2019,14 @@ section [%2d] '%s': hash chain for bucket %zu out of bounds\n"),
 	ERROR (gettext ("\
 section [%2d] '%s': symbol reference in chain for bucket %zu out of bounds\n"),
 	       idx, section_name (ebl, idx), cnt / 2 - 1);
-
-      if (bitset != collected_bitset)
-	ERROR (gettext ("\
-section [%2d] '%s': bitset for bucket %zu does not match chain entries: computed %#x, reported %#x\n"),
-	       idx, section_name (ebl, idx), cnt / 2 - 1,
-	       collected_bitset, bitset);
     }
+
+  if (memcmp (collected.p32, bitmask.p32, bitmask_words * sizeof (Elf32_Word)))
+    ERROR (gettext ("\
+section [%2d] '%s': bitmask does not match names in the hash table\n"),
+	   idx, section_name (ebl, idx));
+
+  free (collected.p32);
 }
 
 
@@ -2024,7 +2058,8 @@ section [%2d] '%s': hash table not for dynamic symbol table\n"),
 	   idx, section_name (ebl, idx));
 
   if (shdr->sh_entsize != (tag == SHT_GNU_HASH
-			   ? sizeof (Elf32_Word)
+			   ? (gelf_getclass (ebl->elf) == ELFCLASS32
+			      ? sizeof (Elf32_Word) : 0)
 			   : (size_t) ebl_sysvhash_entrysize (ebl)))
     ERROR (gettext ("\
 section [%2d] '%s': hash table entry size incorrect\n"),
@@ -2034,10 +2069,10 @@ section [%2d] '%s': hash table entry size incorrect\n"),
     ERROR (gettext ("section [%2d] '%s': not marked to be allocated\n"),
 	   idx, section_name (ebl, idx));
 
-  if (shdr->sh_size < 2 * shdr->sh_entsize)
+  if (shdr->sh_size < (tag == SHT_GNU_HASH ? 4 : 2) * (shdr->sh_entsize ?: 4))
     {
       ERROR (gettext ("\
-section [%2d] '%s': hash table has not even room for initial two administrative entries\n"),
+section [%2d] '%s': hash table has not even room for initial administrative entries\n"),
 	     idx, section_name (ebl, idx));
       return;
     }
@@ -2056,7 +2091,7 @@ section [%2d] '%s': hash table has not even room for initial two administrative 
       break;
 
     default:
-      assert (! "should not  happen");
+      assert (! "should not happen");
     }
 }
 

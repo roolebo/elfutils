@@ -1,3 +1,8 @@
+2006-07-11  Ulrich Drepper  <drepper@redhat.com>
+
+	* readelf.c (handle_gnu_hash): Adjust for final form of .gnu.hash.
+	* elflint.c (check_gnu_hash): Likewise.
+
 2006-07-06  Ulrich Drepper  <drepper@redhat.com>
 
 	* elflint.c: Adjust for latest new hash table format.

@@ -1,5 +1,5 @@
 /* Transformation functions for ELF data types.
-   Copyright (C) 1998, 1999, 2000, 2002, 2004, 2005 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2004, 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -184,6 +184,7 @@ union unaligned
 /* We have a few functions which we must create by hand since the sections
    do not contain records of only one type.  */
 #include "version_xlate.h"
+#include "gnuhash_xlate.h"
 
 
 /* Now the externally visible table with the function pointers.  */
@@ -216,10 +217,12 @@ const xfct_t __elf_xfctstom[EV_NUM - 1][EV_NUM - 1][ELFCLASSNUM - 1][ELF_T_NUM] 
 	[ELF_T_SYMINFO] = ElfW2(Bits, cvt_Syminfo),			      \
 	[ELF_T_MOVE]	= ElfW2(Bits, cvt_Move),			      \
 	[ELF_T_LIB]	= ElfW2(Bits, cvt_Lib)
-        define_xfcts (32)
+        define_xfcts (32),
+	[ELF_T_GNUHASH] = Elf32_cvt_Word
       },
       [ELFCLASS64 - 1] = {
-	define_xfcts (64)
+	define_xfcts (64),
+	[ELF_T_GNUHASH] = elf_cvt_gnuhash
       }
     }
   }

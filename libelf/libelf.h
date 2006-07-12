@@ -82,6 +82,7 @@ typedef enum
   ELF_T_SYMINFO,		/* Elf32_Syminfo, Elf64_Syminfo, ... */
   ELF_T_MOVE,			/* Elf32_Move, Elf64_Move, ... */
   ELF_T_LIB,			/* Elf32_Lib, Elf64_Lib, ... */
+  ELF_T_GNUHASH,		/* GNU-style hash section.  */
   /* Keep this the last entry.  */
   ELF_T_NUM
 } Elf_Type;

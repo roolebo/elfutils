@@ -1,3 +1,10 @@
+2006-07-11  Ulrich Drepper  <drepper@redhat.com>
+
+	* libelf.h: Define ELF_T_GNUHASH.
+	* elf_getdata.c (TYPEIDX): Handle SHT_GNU_HASH.
+	(shtype_map): Add SHT_GNU_HASH entries.
+	* gelf_xlate.c (__elf_xfctstom): Add ELF_T_GNUHASH entries.
+
 2006-07-06  Ulrich Drepper  <drepper@redhat.com>
 
 	* elf_gnu_hash.c: New file.

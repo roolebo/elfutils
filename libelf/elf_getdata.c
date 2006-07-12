@@ -1,5 +1,5 @@
 /* Return the next data element from the section after possibly converting it.
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright (C) 1998-2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -73,8 +73,8 @@
 #define TYPEIDX(Sh_Type) \
   (Sh_Type >= SHT_NULL && Sh_Type < SHT_NUM				      \
    ? Sh_Type								      \
-   : (Sh_Type >= SHT_GNU_LIBLIST && Sh_Type <= SHT_HISUNW		      \
-      ? SHT_NUM + Sh_Type - SHT_GNU_LIBLIST				      \
+   : (Sh_Type >= SHT_GNU_HASH && Sh_Type <= SHT_HISUNW			      \
+      ? SHT_NUM + Sh_Type - SHT_GNU_HASH				      \
       : 0))
 
 static const struct
@@ -131,12 +131,16 @@ static const struct
       [TYPEIDX (SHT_SUNW_move)] = { ELF_T_MOVE, sizeof (ElfW2(Bits,Move))     \
 				    AL (__alignof__ (ElfW2(Bits,Move))) },    \
       [TYPEIDX (SHT_GNU_LIBLIST)] = { ELF_T_LIB, sizeof (ElfW2(Bits,Lib))     \
-				    AL (__alignof__ (ElfW2(Bits,Lib))) }
-      DEFINE (32)
+				      AL (__alignof__ (ElfW2(Bits,Lib))) }
+      DEFINE (32),
+      [TYPEIDX (SHT_GNU_HASH)] = { ELF_T_WORD, sizeof (Elf32_Word)
+				   AL (__alignof__ (Elf32_Word)) }
     },
     [ELFCLASS64 - 1] =
     {
-      DEFINE (64)
+      DEFINE (64),
+      [TYPEIDX (SHT_GNU_HASH)] = { ELF_T_GNUHASH, 1
+				   AL (__alignof__ (Elf64_Xword)) }
     }
   }
 };
@@ -335,8 +339,8 @@ __libelf_set_rawdata (Elf_Scn *scn)
       GElf_Ehdr ehdr_mem;
 
       scn->rawdata.d.d_type
-	= (SH_ENTSIZE_HASH (INTUSE(gelf_getehdr) (elf, &ehdr_mem))
-	   == 4 ? ELF_T_WORD : ELF_T_XWORD);
+	= (SH_ENTSIZE_HASH (INTUSE(gelf_getehdr) (elf, &ehdr_mem)) == 4
+	   ? ELF_T_WORD : ELF_T_XWORD);
     }
   else
     {

@@ -1,3 +1,8 @@
+2006-07-12  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (handle_gnu_hash): Add casts for machines where
+	Elf32_Word != unsigned int.
+
 2006-07-12  Ulrich Drepper  <drepper@redhat.com>
 
 	* elflint.c (check_sysv_hash64): Fix printf format.

@@ -2534,9 +2534,10 @@ handle_gnu_hash (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx)
   if (asprintf (&str, gettext ("\
  Symbol Bias: %u\n\
  Bitmask Size: %zu bytes  %" PRIuFAST32 "%% bits set  2nd hash shift: %u\n"),
-		symbias, bitmask_words * sizeof (Elf32_Word),
-		(nbits * 100 + 50) / (bitmask_words * sizeof (Elf32_Word) * 8),
-		shift) == -1)
+		(unsigned int) symbias, bitmask_words * sizeof (Elf32_Word),
+		((nbits * 100 + 50)
+		 / (uint_fast32_t) (bitmask_words * sizeof (Elf32_Word) * 8)),
+		(unsigned int) shift) == -1)
     error (EXIT_FAILURE, 0, gettext ("memory exhausted"));
 
   print_hash_info (ebl, scn, shdr, shstrndx, maxlength, nbucket, nsyms,

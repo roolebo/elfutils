@@ -2361,14 +2361,14 @@ static struct version_namelist
 {
   const char *objname;
   const char *name;
-  GElf_Word ndx;
+  GElf_Versym ndx;
   enum { ver_def, ver_need } type;
   struct version_namelist *next;
 } *version_namelist;
 
 
 static int
-add_version (const char *objname, const char *name, GElf_Word ndx, int type)
+add_version (const char *objname, const char *name, GElf_Versym ndx, int type)
 {
   /* Check that there are no duplications.  */
   struct version_namelist *nlp = version_namelist;
@@ -2480,7 +2480,7 @@ section [%2d] '%s': symbol %d: local symbol with version\n"),
 	     index we need for this symbol.  */
 	  struct version_namelist *runp = version_namelist;
 	  while (runp != NULL)
-	    if (runp->ndx == (*versym & 0x7fff))
+	    if (runp->ndx == (*versym & (GElf_Versym) 0x7fff))
 	      break;
 	    else
 	      runp = runp->next;

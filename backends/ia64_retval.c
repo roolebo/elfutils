@@ -86,6 +86,148 @@ static const Dwarf_Op loc_aggregate[] =
 #define nloc_aggregate 1
 
 
+/* If this type is an HFA small enough to be returned in FP registers,
+   return the number of registers to use.  Otherwise 9, or -1 for errors.  */
+static int
+hfa_type (Dwarf_Die *typedie, const Dwarf_Op **locp, int fpregs_used)
+{
+  /* Descend the type structure, counting elements and finding their types.
+     If we find a datum that's not an FP type (and not quad FP), punt.
+     If we find a datum that's not the same FP type as the first datum, punt.
+     If we count more than eight total homogeneous FP data, punt.  */
+
+  inline int hfa (const Dwarf_Op *loc, int nregs)
+    {
+      if (fpregs_used == 0)
+	*locp = loc;
+      else if (*locp != loc)
+	return 9;
+      return fpregs_used + nregs;
+    }
+
+  int tag = dwarf_tag (typedie);
+  switch (tag)
+    {
+      Dwarf_Attribute attr_mem;
+
+    case -1:
+      return -1;
+
+    case DW_TAG_base_type:;
+      int size = dwarf_bytesize (typedie);
+      if (size < 0)
+	return -1;
+
+      Dwarf_Word encoding;
+      if (dwarf_formudata (dwarf_attr (typedie, DW_AT_encoding,
+				       &attr_mem), &encoding) != 0)
+	return -1;
+
+      switch (encoding)
+	{
+	case DW_ATE_float:
+	  switch (size)
+	    {
+	    case 4:		/* float */
+	      return hfa (loc_fpreg_4, 1);
+	    case 8:		/* double */
+	      return hfa (loc_fpreg_8, 1);
+	    case 10:       /* x86-style long double, not really used */
+	      return hfa (loc_fpreg_10, 1);
+	    }
+	  break;
+
+	case DW_ATE_complex_float:
+	  switch (size)
+	    {
+	    case 4 * 2:	/* complex float */
+	      return hfa (loc_fpreg_4, 2);
+	    case 8 * 2:	/* complex double */
+	      return hfa (loc_fpreg_8, 2);
+	    case 10 * 2:	/* complex long double (x86-style) */
+	      return hfa (loc_fpreg_10, 2);
+	    }
+	  break;
+	}
+      break;
+
+    case DW_TAG_structure_type:
+    case DW_TAG_class_type:
+    case DW_TAG_union_type:;
+      Dwarf_Die child_mem;
+      switch (dwarf_child (typedie, &child_mem))
+	{
+	default:
+	  return -1;
+
+	case 1:			/* No children: empty struct.  */
+	  break;
+
+	case 0:;		/* Look at each element.  */
+	  int max_used = fpregs_used;
+	  do
+	    switch (dwarf_tag (&child_mem))
+	      {
+	      case -1:
+		return -1;
+
+	      case DW_TAG_member:;
+		Dwarf_Die child_type_mem;
+		Dwarf_Die *child_typedie
+		  = dwarf_formref_die (dwarf_attr (&child_mem, DW_AT_type,
+						   &attr_mem),
+				       &child_type_mem);
+		if (tag == DW_TAG_union_type)
+		  {
+		    int used = hfa_type (child_typedie, locp, fpregs_used);
+		    if (used < 0 || used > 8)
+		      return used;
+		    if (used > max_used)
+		      max_used = used;
+		  }
+		else
+		  {
+		    fpregs_used = hfa_type (child_typedie, locp, fpregs_used);
+		    if (fpregs_used < 0 || fpregs_used > 8)
+		      return fpregs_used;
+		  }
+	      }
+	  while (dwarf_siblingof (&child_mem, &child_mem) == 0);
+	  if (tag == DW_TAG_union_type)
+	    fpregs_used = max_used;
+	  break;
+	}
+      break;
+
+    case DW_TAG_array_type:;
+      size = dwarf_bytesize (typedie);
+      if (size < 0)
+	return 9;
+      if (size == 0)
+	break;
+
+      Dwarf_Die base_type_mem;
+      Dwarf_Die *base_typedie = dwarf_formref_die (dwarf_attr (typedie,
+							       DW_AT_type,
+							       &attr_mem),
+						   &base_type_mem);
+
+      int used = hfa_type (base_typedie, locp, 0);
+      if (used < 0 || used > 8)
+	return used;
+      if (size % (*locp)[1].number != 0)
+	return 0;
+      size /= (*locp)[1].number;
+      fpregs_used += used * size;
+      break;
+
+    default:
+      return 9;
+    }
+
+  return fpregs_used;
+}
+
 int
 ia64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
 {
@@ -204,14 +346,17 @@ ia64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
       if (dwarf_formudata (dwarf_attr (typedie, DW_AT_byte_size,
 				       &attr_mem), &size) != 0)
 	return -1;
+
+      /* If this qualifies as an homogeneous floating-point aggregate
+	 (HFA), then it should be returned in FP regs. */
+      int nfpreg = hfa_type (typedie, locp, 0);
+      if (nfpreg < 0)
+	return nfpreg;
+      else if (nfpreg > 0 && nfpreg <= 8)
+	return nfpreg == 1 ? nloc_fpreg : nloc_fpregs (nfpreg);
+
       if (size > 32)
 	goto large;
-
-      /* XXX
-	 Must examine the fields in picayune ways to determine the
-	 actual answer.  If it qualifies as an HFA (all floats)
-	 then it should be returned in fp regs.
-      */
 
       goto intreg;
     }

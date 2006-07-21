@@ -1,3 +1,17 @@
+2006-07-21  Roland McGrath  <roland@redhat.com>
+
+	* i386_regs.c (i386_register_name): Fix return value when using stpcpy.
+	* ppc_regs.c (ppc_register_name): Likewise.
+	* s390_regs.c (s390_register_name): Likewise.
+
+	* ia64_retval.c: New file.
+	* Makefile.am (ia64_SRCS): Add it.
+	* ia64_init.c (ia64_init): Install return_value_location hook.
+
+	* ia64_regs.c: New file.
+	* Makefile.am (ia64_SRCS): Add it.
+	* ia64_init.c (ia64_init): Install register_name hook.
+
 2006-07-05  Ulrich Drepper  <drepper@redhat.com>
 
 	* alpha_init.c: Initialize sysvhash_entrysize.

@@ -1,5 +1,5 @@
 /* Register names and numbers for i386 DWARF.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -72,9 +72,9 @@ i386_register_name (Ebl *ebl __attribute__ ((unused)),
       break;
 
     case 9:
-      return stpcpy (name, "eflags") - name;
+      return stpcpy (name, "eflags") + 1 - name;
     case 10:
-      return stpcpy (name, "trapno") - name;
+      return stpcpy (name, "trapno") + 1 - name;
 
     case 11 ... 18:
       name[0] = 's';
@@ -99,11 +99,11 @@ i386_register_name (Ebl *ebl __attribute__ ((unused)),
       break;
 
     case 37:
-      return stpcpy (name, "fctrl") - name;
+      return stpcpy (name, "fctrl") + 1 - name;
     case 38:
-      return stpcpy (name, "fstat") - name;
+      return stpcpy (name, "fstat") + 1 - name;
     case 39:
-      return stpcpy (name, "mxcsr") - name;
+      return stpcpy (name, "mxcsr") + 1 - name;
 
     case 40 ... 45:
       name[0] = "ecsdfg"[regno - 40];

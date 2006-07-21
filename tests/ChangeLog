@@ -1,3 +1,8 @@
+2006-07-21  Roland McGrath  <roland@redhat.com>
+
+	* allregs.c (struct reginfo): Increase size of name.
+	(one_register): Assert that it's big enough.
+
 2006-04-04  Roland McGrath  <roland@redhat.com>
 
 	* run-bug1-test.sh: Test a second case, to cover both byte orders.

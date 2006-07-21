@@ -114,9 +114,9 @@ s390_register_name (Ebl *ebl __attribute__ ((unused)),
       break;
 
     case 64:
-      return stpcpy (name, "pswm") - name;
+      return stpcpy (name, "pswm") + 1 - name;
     case 65:
-      return stpcpy (name, "pswa") - name;
+      return stpcpy (name, "pswa") + 1 - name;
 
     default:
       *setname = NULL;

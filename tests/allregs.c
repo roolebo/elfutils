@@ -1,4 +1,4 @@
-/* Copyright (C) 2005 Red Hat, Inc.
+/* Copyright (C) 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -62,7 +62,7 @@ struct reginfo
 {
   const char *set, *pfx;
   int regno;
-  char name[8];
+  char name[32];
 };
 
 static int
@@ -103,6 +103,7 @@ one_register (void *arg,
   state->info[regno].regno = regno;
   state->info[regno].set = setname;
   state->info[regno].pfx = prefix;
+  assert (strlen (regname) < sizeof state->info[regno].name);
   strcpy (state->info[regno].name, regname);
 
   return DWARF_CB_OK;

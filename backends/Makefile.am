@@ -84,7 +84,7 @@ x86_64_SRCS = x86_64_init.c x86_64_symbol.c x86_64_corenote.c \
 libebl_x86_64_pic_a_SOURCES = $(x86_64_SRCS)
 am_libebl_x86_64_pic_a_OBJECTS = $(x86_64_SRCS:.c=.os)
 
-ia64_SRCS = ia64_init.c ia64_symbol.c
+ia64_SRCS = ia64_init.c ia64_symbol.c ia64_regs.c ia64_retval.c
 libebl_ia64_pic_a_SOURCES = $(ia64_SRCS)
 am_libebl_ia64_pic_a_OBJECTS = $(ia64_SRCS:.c=.os)
 

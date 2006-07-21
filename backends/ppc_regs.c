@@ -1,5 +1,5 @@
 /* Register names and numbers for PowerPC DWARF.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -83,11 +83,11 @@ ppc_register_name (Ebl *ebl __attribute__ ((unused)),
       break;
 
     case 64:
-      return stpcpy (name, "cr") - name;
+      return stpcpy (name, "cr") + 1 - name;
     case 65:
-      return stpcpy (name, "fpscr") - name;
+      return stpcpy (name, "fpscr") + 1 - name;
     case 66:
-      return stpcpy (name, "msr") - name;
+      return stpcpy (name, "msr") + 1 - name;
 
     case 70 + 0 ... 70 + 9:
       name[0] = 's';

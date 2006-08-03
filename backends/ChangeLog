@@ -1,3 +1,8 @@
+2006-08-03  Roland McGrath  <roland@redhat.com>
+
+	* sparc_regs.c (sparc_register_name): List 32 FPU regs only for
+	EM_SPARC.  EM_SPARC32PLUS also has 64.
+
 2006-07-21  Roland McGrath  <roland@redhat.com>
 
 	* i386_regs.c (i386_register_name): Fix return value when using stpcpy.

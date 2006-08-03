@@ -1,5 +1,5 @@
 /* Register names and numbers for SPARC DWARF.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -37,7 +37,7 @@ sparc_register_name (Ebl *ebl,
 		     int regno, char *name, size_t namelen,
 		     const char **prefix, const char **setname)
 {
-  const int nfp = ebl->machine == EM_SPARCV9 ? 64 : 32;
+  const int nfp = ebl->machine == EM_SPARC ? 32 : 64;
 
   if (name == NULL)
     return 32 + nfp;

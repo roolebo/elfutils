@@ -1,3 +1,10 @@
+2006-08-03  Roland McGrath  <roland@redhat.com>
+
+	* run-allregs.sh: Add sparc cases.
+	* testfile30.bz2: New data file.
+	* testfile31.bz2: New data file.
+	* Makefile.am (EXTRA_DIST): Add them.
+
 2006-07-21  Roland McGrath  <roland@redhat.com>
 
 	* allregs.c (struct reginfo): Increase size of name.

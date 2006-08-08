@@ -692,7 +692,7 @@ typedef struct
 #define DT_SYMINENT	0x6ffffdff	/* Entry size of syminfo */
 #define DT_VALRNGHI	0x6ffffdff
 #define DT_VALTAGIDX(tag)	(DT_VALRNGHI - (tag))	/* Reverse order! */
-#define DT_VALNUM 12
+#define DT_VALNUM 11
 
 /* DT_* entries which fall between DT_ADDRRNGHI & DT_ADDRRNGLO use the
    Dyn.d_un.d_ptr field of the Elf*_Dyn structure.
@@ -713,7 +713,7 @@ typedef struct
 #define DT_SYMINFO	0x6ffffeff	/* Syminfo table.  */
 #define DT_ADDRRNGHI	0x6ffffeff
 #define DT_ADDRTAGIDX(tag)	(DT_ADDRRNGHI - (tag))	/* Reverse order! */
-#define DT_ADDRNUM 10
+#define DT_ADDRNUM 11
 
 /* The versioning entry types.  The next are defined as part of the
    GNU extension.  */

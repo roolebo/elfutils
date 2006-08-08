@@ -1,3 +1,8 @@
+2006-08-08  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf.h (DT_VALNUM): Update.
+	(DT_ADDRNUM): Likewise.
+
 2006-07-12  Ulrich Drepper  <drepper@redhat.com>
 
 	* elf32_updatefile.c: Adjust for internal_function_def removal.

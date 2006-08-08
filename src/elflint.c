@@ -1469,8 +1469,7 @@ check_dynamic (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Shdr *shdr, int idx)
       [DT_PLTRELSZ] = { [DT_JMPREL] = true },
       [DT_HASH] = { [DT_SYMTAB] = true },
       [DT_STRTAB] = { [DT_STRSZ] = true },
-      [DT_SYMTAB] = { [DT_STRTAB] = true, [DT_HASH] = true,
-		      [DT_SYMENT] = true },
+      [DT_SYMTAB] = { [DT_STRTAB] = true, [DT_SYMENT] = true },
       [DT_RELA] = { [DT_RELASZ] = true, [DT_RELAENT] = true },
       [DT_RELASZ] = { [DT_RELA] = true },
       [DT_RELAENT] = { [DT_RELA] = true },
@@ -1487,6 +1486,8 @@ check_dynamic (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Shdr *shdr, int idx)
       [DT_PLTRELSZ] = { [DT_JMPREL] = true }
     };
   bool has_dt[DT_NUM];
+  bool has_val_dt[DT_VALNUM];
+  bool has_addr_dt[DT_ADDRNUM];
   static const bool level2[DT_NUM] =
     {
       [DT_RPATH] = true,
@@ -1497,7 +1498,6 @@ check_dynamic (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Shdr *shdr, int idx)
   static const bool mandatory[DT_NUM] =
     {
       [DT_NULL] = true,
-      [DT_HASH] = true,
       [DT_STRTAB] = true,
       [DT_SYMTAB] = true,
       [DT_STRSZ] = true,
@@ -1509,6 +1509,8 @@ check_dynamic (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Shdr *shdr, int idx)
   GElf_Word pltrelsz = 0;
 
   memset (has_dt, '\0', sizeof (has_dt));
+  memset (has_val_dt, '\0', sizeof (has_val_dt));
+  memset (has_addr_dt, '\0', sizeof (has_addr_dt));
 
   if (++ndynamic == 2)
     ERROR (gettext ("more than one dynamic section present\n"));
@@ -1589,6 +1591,12 @@ section [%2d] '%s': entry %zu: level 2 tag %s used\n"),
 
 	  has_dt[dyn->d_tag] = true;
 	}
+      else if (dyn->d_tag <= DT_VALRNGHI
+	       && DT_VALTAGIDX (dyn->d_tag) < DT_VALNUM)
+	has_val_dt[DT_VALTAGIDX (dyn->d_tag)] = true;
+      else if (dyn->d_tag <= DT_ADDRRNGHI
+	       && DT_ADDRTAGIDX (dyn->d_tag) < DT_ADDRNUM)
+	has_addr_dt[DT_ADDRTAGIDX (dyn->d_tag)] = true;
 
       if (dyn->d_tag == DT_PLTREL && dyn->d_un.d_val != DT_REL
 	  && dyn->d_un.d_val != DT_RELA)
@@ -1711,6 +1719,20 @@ section [%2d] '%s': mandatory tag %s not present\n"),
 	  }
       }
 
+  /* Make sure we have an hash table.  */
+  if (!has_dt[DT_HASH] && !has_addr_dt[DT_ADDRTAGIDX (DT_GNU_HASH)])
+    ERROR (gettext ("\
+section [%2d] '%s': no hash section present\n"),
+	   idx, section_name (ebl, idx));
+
+  /* The GNU-style hash table also needs a symbol table.  */
+  if (!has_dt[DT_HASH] && has_addr_dt[DT_ADDRTAGIDX (DT_GNU_HASH)]
+      && !has_dt[DT_SYMTAB])
+    ERROR (gettext ("\
+section [%2d] '%s': contains %s entry but not %s\n"),
+	   idx, section_name (ebl, idx),
+	   "DT_GNU_HASH", "DT_SYMTAB");
+
   /* Check the rel/rela tags.  At least one group must be available.  */
   if ((has_dt[DT_RELA] || has_dt[DT_RELASZ] || has_dt[DT_RELAENT])
       && (!has_dt[DT_RELA] || !has_dt[DT_RELASZ] || !has_dt[DT_RELAENT]))
@@ -1725,6 +1747,49 @@ section [%2d] '%s': not all of %s, %s, and %s are present\n"),
 section [%2d] '%s': not all of %s, %s, and %s are present\n"),
 	   idx, section_name (ebl, idx),
 	   "DT_REL", "DT_RELSZ", "DT_RELENT");
+
+  /* Check that all prelink sections are present if any of them is.  */
+  if (has_val_dt[DT_VALTAGIDX (DT_GNU_PRELINKED)]
+      || has_val_dt[DT_VALTAGIDX (DT_CHECKSUM)])
+    {
+      if (!has_val_dt[DT_VALTAGIDX (DT_GNU_PRELINKED)])
+	ERROR (gettext ("\
+section [%2d] '%s': %s tag missing in DSO marked during prelinking\n"),
+	       idx, section_name (ebl, idx), "DT_GNU_PRELINKED");
+      if (!has_val_dt[DT_VALTAGIDX (DT_CHECKSUM)])
+	ERROR (gettext ("\
+section [%2d] '%s': %s tag missing in DSO marked during prelinking\n"),
+	       idx, section_name (ebl, idx), "DT_CHECKSUM");
+
+      /* Only DSOs can be marked like this.  */
+      if (ehdr->e_type != ET_DYN)
+	ERROR (gettext ("\
+section [%2d] '%s': non-DSO file marked as dependency during prelink\n"),
+	       idx, section_name (ebl, idx));
+    }
+
+  if (has_val_dt[DT_VALTAGIDX (DT_GNU_CONFLICTSZ)]
+      || has_val_dt[DT_VALTAGIDX (DT_GNU_LIBLISTSZ)]
+      || has_addr_dt[DT_ADDRTAGIDX (DT_GNU_CONFLICT)]
+      || has_addr_dt[DT_ADDRTAGIDX (DT_GNU_LIBLIST)])
+    {
+      if (!has_val_dt[DT_VALTAGIDX (DT_GNU_CONFLICTSZ)])
+	ERROR (gettext ("\
+section [%2d] '%s': %s tag missing in prelinked executable\n"),
+	       idx, section_name (ebl, idx), "DT_GNU_CONFLICTSZ");
+      if (!has_val_dt[DT_VALTAGIDX (DT_GNU_LIBLISTSZ)])
+	ERROR (gettext ("\
+section [%2d] '%s': %s tag missing in prelinked executable\n"),
+	       idx, section_name (ebl, idx), "DT_GNU_LIBLISTSZ");
+      if (!has_addr_dt[DT_ADDRTAGIDX (DT_GNU_CONFLICT)])
+	ERROR (gettext ("\
+section [%2d] '%s': %s tag missing in prelinked executable\n"),
+	       idx, section_name (ebl, idx), "DT_GNU_CONFLICT");
+      if (!has_addr_dt[DT_ADDRTAGIDX (DT_GNU_LIBLIST)])
+	ERROR (gettext ("\
+section [%2d] '%s': %s tag missing in prelinked executable\n"),
+	       idx, section_name (ebl, idx), "DT_GNU_LIBLIST");
+    }
 }
 
 
@@ -1970,7 +2035,8 @@ section [%2d] '%s': hash chain for bucket %zu lower than symbol index bias\n"),
 	      /* Check that the referenced symbol is not undefined.  */
 	      GElf_Sym sym_mem;
 	      GElf_Sym *sym = gelf_getsym (symdata, symidx, &sym_mem);
-	      if (sym != NULL && sym->st_shndx == SHN_UNDEF)
+	      if (sym != NULL && sym->st_shndx == SHN_UNDEF
+		  && GELF_ST_TYPE (sym->st_info) != STT_FUNC)
 		ERROR (gettext ("\
 section [%2d] '%s': symbol %u referenced in chain for bucket %zu is undefined\n"),
 		       idx, section_name (ebl, idx), symidx, cnt / 2 - 1);

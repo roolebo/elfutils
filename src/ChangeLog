@@ -1,3 +1,13 @@
+2006-08-08  Ulrich Drepper  <drepper@redhat.com>
+
+	* elflint.c (check_dynamic): Don't require DT_HASH for DT_SYMTAB.
+	Keep track of which "high DT" entries are present.
+	Check that either old or GNU-style hash table is present.
+	If GNU-style hash table is used a symbol table is mandatory.
+	Check that if any prelink entry is present all of them are.
+	(check_gnu_hash): Only fail for undefined symbols in GNU-style hash
+	table if they don't refer to functions.
+
 2006-07-17  Roland McGrath  <roland@redhat.com>
 
 	* elflint.c (struct version_namelist): Use GElf_Versym for `ndx' field.

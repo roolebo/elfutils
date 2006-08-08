@@ -1,3 +1,7 @@
+2006-06-23  Stepan Kasal  <skasal@redhat.com>
+
+	* Makefile.am (PACKAGE_VERSION): Remove superfluous definition.
+
 2006-08-03  Roland McGrath  <roland@redhat.com>
 
 	* sparc_regs.c (sparc_register_name): List 32 FPU regs only for

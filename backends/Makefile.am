@@ -35,7 +35,6 @@ AM_CFLAGS += -fpic -Wall -Wshadow -Werror -Wunused -Wextra -Wformat=2 \
 INCLUDES = -I$(srcdir) -I$(top_srcdir)/libebl \
 	   -I$(top_srcdir)/libelf -I$(top_srcdir)/libdw \
 	   -I$(top_srcdir)/lib -I..
-PACKAGE_VERSION = @PACKAGE_VERSION@
 
 
 modules = i386 sh x86_64 ia64 alpha arm sparc ppc ppc64 s390

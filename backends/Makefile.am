@@ -112,11 +112,10 @@ libebl_s390_pic_a_SOURCES = $(s390_SRCS)
 am_libebl_s390_pic_a_OBJECTS = $(s390_SRCS:.c=.os)
 
 
-%.os: %.c %.o
+%.os: %.c
 	if $(COMPILE) -c -o $@ -fpic -DPIC -DSHARED -MT $@ -MD -MP \
 	  -MF "$(DEPDIR)/$*.Tpo" `test -f '$<' || echo '$(srcdir)/'`$<; \
-	then cat "$(DEPDIR)/$*.Tpo" >> "$(DEPDIR)/$*.Po"; \
-	     rm -f "$(DEPDIR)/$*.Tpo"; \
+	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; \
 	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
 	fi
 

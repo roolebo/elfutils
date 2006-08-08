@@ -1,3 +1,9 @@
+2006-08-08  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (%.os): Don't depend on %.o, since we don't actually
+	need static object for anything here.  This rule is the only source of
+	.deps/ files.
+
 2006-06-23  Stepan Kasal  <skasal@redhat.com>
 
 	* Makefile.am (PACKAGE_VERSION): Remove superfluous definition.

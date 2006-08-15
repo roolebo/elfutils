@@ -1,3 +1,15 @@
+Version 0.123:
+
+libebl: Backend build fixes, thanks to Stepan Kasal.
+
+libebl: ia64 backend support for register names, return value location
+
+libdwfl: Handle truncated linux kernel module section names.
+
+libdwfl: Look for linux kernel "vmlinux" files with ".debug" suffix.
+
+elflint: Fix checks to permit --hash-style=gnu format.
+
 Version 0.122:
 
 libebl: add function to test for relative relocation

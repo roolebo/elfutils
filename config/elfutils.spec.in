@@ -154,6 +154,13 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.so
 
 %changelog
+* Mon Aug 14 2006 Roland McGrath <roland@redhat.com> 0.123-1
+- libebl: Backend build fixes, thanks to Stepan Kasal.
+- libebl: ia64 backend support for register names, return value location
+- libdwfl: Handle truncated linux kernel module section names.
+- libdwfl: Look for linux kernel vmlinux files with .debug suffix.
+- elflint: Fix checks to permit --hash-style=gnu format.
+
 * Wed Jul 12 2006 Ulrich Drepper <drepper@redhat.com> 0.122-1
 - libebl: add function to test for relative relocation
 - elflint: fix and extend DT_RELCOUNT/DT_RELACOUNT checks

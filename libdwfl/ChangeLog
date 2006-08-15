@@ -1,3 +1,19 @@
+2006-08-14  Roland McGrath  <roland@redhat.com>
+
+	* linux-kernel-modules.c (try_kernel_name): If the call to
+	dwfl_standard_find_debuginfo produces no results, try it again
+	with NULL as DEBUGLINK_FILE to try *FNAME with .debug suffix.
+
+	* find-debuginfo.c (DEFAULT_DEBUGINFO_PATH): Macro moved ...
+	* libdwflP.h: ... to here.
+	* linux-kernel-modules.c (try_kernel_name): Skip manual open if it
+	repeats the first thing dwfl_standard_find_debuginfo will try.
+
+	* linux-kernel-modules.c (MODULE_SECT_NAME_LEN): New macro.
+	(dwfl_linux_kernel_module_section_address): If a /sys file is missing
+	and the section name is >= MODULE_SECT_NAME_LEN, try truncating the
+	section name.
+
 2006-07-12  Ulrich Drepper  <drepper@redhat.com>
 
 	* cu.c: Adjust for internal_function_def removal.

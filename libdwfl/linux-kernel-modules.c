@@ -1,5 +1,5 @@
 /* Standard libdwfl callbacks for debugging the running Linux kernel.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -66,7 +66,8 @@
 #define MODULEDIRFMT	"/lib/modules/%s"
 
 #define MODULELIST	"/proc/modules"
-#define	SECADDRFMT	"/sys/module/%s/sections/%s"
+#define	SECADDRDIRFMT	"/sys/module/%s/sections/"
+#define MODULE_SECT_NAME_LEN 32	/* Minimum any linux/module.h has had.  */
 
 
 /* Try to open the given file as it is or under the debuginfo directory.  */
@@ -76,14 +77,27 @@ try_kernel_name (Dwfl *dwfl, char **fname)
   if (*fname == NULL)
     return -1;
 
-  int fd = TEMP_FAILURE_RETRY (open64 (*fname, O_RDONLY));
+  /* Don't bother trying *FNAME itself here if the path will cause it to be
+     tried because we give its own basename as DEBUGLINK_FILE.  */
+  int fd = ((((dwfl->callbacks->debuginfo_path
+	       ? *dwfl->callbacks->debuginfo_path : NULL)
+	      ?: DEFAULT_DEBUGINFO_PATH)[0] == ':') ? -1
+	    : TEMP_FAILURE_RETRY (open64 (*fname, O_RDONLY)));
   if (fd < 0)
     {
       char *debugfname = NULL;
       Dwfl_Module fakemod = { .dwfl = dwfl };
+      /* First try the file's unadorned basename as DEBUGLINK_FILE,
+	 to look for "vmlinux" files.  */
       fd = INTUSE(dwfl_standard_find_debuginfo) (&fakemod, NULL, NULL, 0,
 						 *fname, basename (*fname), 0,
 						 &debugfname);
+      if (fd < 0)
+	/* Next, let the call use the default of basename + ".debug",
+	   to look for "vmlinux.debug" files.  */
+	fd = INTUSE(dwfl_standard_find_debuginfo) (&fakemod, NULL, NULL, 0,
+						   *fname, NULL, 0,
+						   &debugfname);
       free (*fname);
       *fname = debugfname;
     }
@@ -404,7 +418,7 @@ dwfl_linux_kernel_module_section_address
  Dwarf_Addr *addr)
 {
   char *sysfile = NULL;
-  asprintf (&sysfile, SECADDRFMT, modname, secname);
+  asprintf (&sysfile, SECADDRDIRFMT "%s", modname, secname);
   if (sysfile == NULL)
     return ENOMEM;
 
@@ -436,14 +450,46 @@ dwfl_linux_kernel_module_section_address
 	     behavior, and this cruft leaks out into the /sys information.
 	     The file name for ".init*" may actually look like "_init*".  */
 
-	  if (!strncmp (secname, ".init", 5))
+	  const bool is_init = !strncmp (secname, ".init", 5);
+	  if (is_init)
 	    {
 	      sysfile = NULL;
-	      asprintf (&sysfile, SECADDRFMT "%s", modname, "_", &secname[1]);
+	      asprintf (&sysfile, SECADDRDIRFMT "_%s", modname, &secname[1]);
 	      if (sysfile == NULL)
 		return ENOMEM;
 	      f = fopen (sysfile, "r");
 	      free (sysfile);
+	      if (f != NULL)
+		goto ok;
+	    }
+
+	  /* The kernel truncates section names to MODULE_SECT_NAME_LEN - 1.
+	     In case that size increases in the future, look for longer
+	     truncated names first.  */
+	  size_t namelen = strlen (secname);
+	  if (namelen >= MODULE_SECT_NAME_LEN)
+	    {
+	      sysfile = NULL;
+	      int len = asprintf (&sysfile, SECADDRDIRFMT "%s",
+				  modname, secname);
+	      if (sysfile == NULL)
+		return ENOMEM;
+	      char *end = sysfile + len;
+	      do
+		{
+		  *--end = '\0';
+		  f = fopen (sysfile, "r");
+		  if (is_init && f == NULL && errno == ENOENT)
+		    {
+		      sysfile[len - namelen] = '_';
+		      f = fopen (sysfile, "r");
+		      sysfile[len - namelen] = '.';
+		    }
+		}
+	      while (f == NULL && errno == ENOENT
+		     && end - &sysfile[len - namelen] >= MODULE_SECT_NAME_LEN);
+	      free (sysfile);
+
 	      if (f != NULL)
 		goto ok;
 	    }

@@ -1,5 +1,5 @@
 /* Standard find_debuginfo callback for libdwfl.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -52,9 +52,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include "system.h"
-
-
-#define DEFAULT_DEBUGINFO_PATH ":.debug:/usr/lib/debug"
 
 
 /* Try to open64 [DIR/][SUBDIR/]DEBUGLINK, return file descriptor or -1.

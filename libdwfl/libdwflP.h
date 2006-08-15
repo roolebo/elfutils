@@ -296,4 +296,8 @@ INTDECL (dwfl_module_relocate_address)
 #define CBFAIL		(errno ? DWFL_E (ERRNO, errno) : DWFL_E_CB);
 
 
+/* The default used by dwfl_standard_find_debuginfo.  */
+#define DEFAULT_DEBUGINFO_PATH ":.debug:/usr/lib/debug"
+
+
 #endif	/* libdwflP.h */

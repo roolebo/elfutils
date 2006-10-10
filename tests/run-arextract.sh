@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 1999, 2000, 2002, 2005 Red Hat, Inc.
+# Copyright (C) 1999, 2000, 2002, 2005, 2006 Red Hat, Inc.
 # This file is part of Red Hat elfutils.
 # Written by Ulrich Drepper <drepper@redhat.com>, 1999.
 #
@@ -24,6 +24,9 @@
 # Network licensing program, please visit www.openinventionnetwork.com
 # <http://www.openinventionnetwork.com>.
 
+. $srcdir/test-subr.sh
+
+tempfiles arextract.test
 
 archive=../libelf/libelf.a
 if test -f $archive; then
@@ -32,12 +35,11 @@ if test -f $archive; then
 
     # The files we are looking at.
     for f in ../libelf/*.o; do
-	./arextract $archive `basename $f` arextract.test || exit 1
+	testrun ./arextract $archive `basename $f` arextract.test || exit 1
 	cmp $f arextract.test || {
 	    echo "Extraction of $1 failed"
 	    exit 1
 	}
-	rm -f ${objpfx}arextract.test
     done
 
     echo "done"

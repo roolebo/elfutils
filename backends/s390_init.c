@@ -50,7 +50,7 @@ s390_init (elf, machine, eh, ehlen)
   eh->name = "IBM S/390";
   s390_init_reloc (eh);
   HOOK (eh, reloc_simple_type);
-  HOOK (eh, register_name);
+  HOOK (eh, register_info);
   HOOK (eh, return_value_location);
 
   /* Only the 64-bit format uses the incorrect hash table entry size.  */

@@ -55,7 +55,7 @@ ia64_init (elf, machine, eh, ehlen)
   HOOK (eh, dynamic_tag_name);
   HOOK (eh, dynamic_tag_check);
   HOOK (eh, machine_flag_check);
-  HOOK (eh, register_name);
+  HOOK (eh, register_info);
   HOOK (eh, return_value_location);
 
   return MODVERSION;

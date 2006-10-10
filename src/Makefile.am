@@ -172,3 +172,5 @@ installcheck-binPROGRAMS: $(bin_PROGRAMS)
 	done; rm -f c$${pid}_.???; exit $$bad
 
 CLEANFILES = none_ld.os $(ld_modules:.c=.os) *.gcno *.gcda *.gconv
+
+MAINTAINERCLEANFILES = ldlex.c ldscript.c ldscript.h

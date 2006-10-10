@@ -135,9 +135,10 @@ int EBLHOOK(return_value_location) (Dwarf_Die *functypedie,
 				    const Dwarf_Op **locp);
 
 /* Return register name information.  */
-ssize_t EBLHOOK(register_name) (Ebl *ebl,
+ssize_t EBLHOOK(register_info) (Ebl *ebl,
 				int regno, char *name, size_t namelen,
-				const char **prefix, const char **setname);
+				const char **prefix, const char **setname,
+				int *bits, int *type);
 
 
 /* Destructor for ELF backend handle.  */

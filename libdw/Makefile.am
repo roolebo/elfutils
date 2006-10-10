@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2002, 2003, 2004, 2005 Red Hat, Inc.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -128,4 +128,4 @@ noinst_HEADERS = libdwP.h memory-access.h dwarf_abbrev_hash.h
 
 EXTRA_DIST = libdw.map
 
-CLEANFILES = $(am_libdw_pic_a_OBJECTS) *.gcno *.gcda
+CLEANFILES = $(am_libdw_pic_a_OBJECTS) *.gcno *.gcda libdw.so.$(VERSION)

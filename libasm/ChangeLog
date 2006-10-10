@@ -1,3 +1,7 @@
+2006-08-29  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (CLEANFILES): Add libasm.so.$(VERSION).
+
 2005-11-13  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am (INCLUDES): Search in libdw.

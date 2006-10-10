@@ -1,5 +1,5 @@
 /* Enumerate DWARF register numbers and their names.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -54,7 +54,8 @@ int
 dwfl_module_register_names (mod, func, arg)
      Dwfl_Module *mod;
      int (*func) (void *, int regno, const char *setname,
-		  const char *prefix, const char *regname);
+		  const char *prefix, const char *regname,
+		  int bits, int type);
      void *arg;
 {
   if (unlikely (mod == NULL))
@@ -70,15 +71,18 @@ dwfl_module_register_names (mod, func, arg)
 	}
     }
 
-  int nregs = ebl_register_name (mod->ebl, -1, NULL, 0, NULL, NULL);
+  int nregs = ebl_register_info (mod->ebl, -1, NULL, 0,
+				 NULL, NULL, NULL, NULL);
   int result = 0;
   for (int regno = 0; regno < nregs && likely (result == 0); ++regno)
     {
       char name[32];
       const char *setname = NULL;
       const char *prefix = NULL;
-      ssize_t len = ebl_register_name (mod->ebl, regno, name, sizeof name,
-				       &prefix, &setname);
+      int bits = -1;
+      int type = -1;
+      ssize_t len = ebl_register_info (mod->ebl, regno, name, sizeof name,
+				       &prefix, &setname, &bits, &type);
       if (unlikely (len < 0))
 	{
 	  __libdwfl_seterrno (DWFL_E_LIBEBL);
@@ -88,7 +92,7 @@ dwfl_module_register_names (mod, func, arg)
       if (likely (len > 0))
 	{
 	  assert (len > 1);	/* Backend should never yield "".  */
-	  result = (*func) (arg, regno, setname, prefix, name);
+	  result = (*func) (arg, regno, setname, prefix, name, bits, type);
 	}
     }
 

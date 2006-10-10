@@ -56,7 +56,7 @@ gen_SOURCES = eblopenbackend.c eblclosebackend.c eblstrtab.c \
 	      eblgotpcreloccheck.c eblcopyrelocp.c eblsectionstripp.c \
 	      eblelfclass.c eblelfdata.c eblelfmachine.c \
 	      ebl_check_special_symbol.c eblbsspltp.c eblretval.c \
-	      eblregname.c eblnonerelocp.c eblrelativerelocp.c \
+	      eblreginfo.c eblnonerelocp.c eblrelativerelocp.c \
 	      eblsysvhashentrysize.c
 
 libebl_a_SOURCES = $(gen_SOURCES)

@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2002, 2004, 2005 Red Hat, Inc.
+## Copyright (C) 2002, 2004, 2005, 2006 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -99,4 +99,4 @@ endif
 noinst_HEADERS = libasmP.h symbolhash.h
 EXTRA_DIST = libasm.map
 
-CLEANFILES = $(am_libasm_pic_a_OBJECTS) *.gcno *.gcda
+CLEANFILES = $(am_libasm_pic_a_OBJECTS) *.gcno *.gcda libasm.so.$(VERSION)

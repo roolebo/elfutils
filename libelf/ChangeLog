@@ -1,3 +1,11 @@
+2006-08-29  Roland McGrath  <roland@redhat.com>
+
+	* elf32_getphdr.c: Don't byteswap phdr fields when EI_DATA matches
+	MY_ELFDATA on !ALLOW_UNALIGNED machines.
+	Reported by Christian Aichinger <Greek0@gmx.net>.
+
+	* Makefile.am (CLEANFILES): Add libelf.so.$(VERSION).
+
 2006-08-08  Ulrich Drepper  <drepper@redhat.com>
 
 	* elf.h (DT_VALNUM): Update.

@@ -1418,7 +1418,7 @@ handle_relocs_rel (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 						   ? xndx : sym->st_shndx),
 				       &destshdr_mem);
 
-	      if (shdr == NULL)
+	      if (destshdr == NULL)
 		printf ("  %#0*" PRIx64 "  %-20s <%s %ld>\n",
 			class == ELFCLASS32 ? 10 : 18, rel->r_offset,
 			ebl_reloc_type_check (ebl, GELF_R_TYPE (rel->r_info))

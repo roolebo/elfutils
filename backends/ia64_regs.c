@@ -28,14 +28,16 @@
 #endif
 
 #include <string.h>
+#include <dwarf.h>
 
 #define BACKEND i386_
 #include "libebl_CPU.h"
 
 ssize_t
-ia64_register_name (Ebl *ebl __attribute__ ((unused)),
+ia64_register_info (Ebl *ebl __attribute__ ((unused)),
 		    int regno, char *name, size_t namelen,
-		    const char **prefix, const char **setname)
+		    const char **prefix, const char **setname,
+		    int *bits, int *type)
 {
   if (name == NULL)
     return 687 + 64;
@@ -45,6 +47,8 @@ ia64_register_name (Ebl *ebl __attribute__ ((unused)),
 
   *prefix = "ar.";
   *setname = "application";
+  *bits = 64;
+  *type = DW_ATE_signed;
   switch (regno)
     {
     case 0 ... 9:
@@ -78,6 +82,8 @@ ia64_register_name (Ebl *ebl __attribute__ ((unused)),
       name[0] = 'f';
       name[1] = (regno - 128) + '0';
       namelen = 2;
+      *type = DW_ATE_float;
+      *bits = 128;
       *setname = "FPU";
       *prefix = "";
       break;
@@ -97,6 +103,8 @@ ia64_register_name (Ebl *ebl __attribute__ ((unused)),
       name[2] = (regno - 128 - 100) / 10 + '0';
       name[3] = (regno - 128) % 10 + '0';
       namelen = 4;
+      *type = DW_ATE_float;
+      *bits = 128;
       *setname = "FPU";
       *prefix = "";
       break;
@@ -105,6 +113,7 @@ ia64_register_name (Ebl *ebl __attribute__ ((unused)),
       name[0] = 'b';
       name[1] = (regno - 320) + '0';
       namelen = 2;
+      *type = DW_ATE_address;
       *setname = "branch";
       *prefix = "";
       break;
@@ -117,12 +126,14 @@ ia64_register_name (Ebl *ebl __attribute__ ((unused)),
 	  };
 	*setname = "special";
 	*prefix = "";
+	*type = regno == 331 ? DW_ATE_address : DW_ATE_unsigned;
 	return stpcpy (name, named_special[regno - 328]) + 1 - name;
       }
 
     case 590:
       *setname = "special";
       *prefix = "";
+      *type = DW_ATE_unsigned;
       return stpcpy (name, "bof") + 1 - name;
 
     case 334 + 0 ... 334 + 7:
@@ -158,6 +169,9 @@ ia64_register_name (Ebl *ebl __attribute__ ((unused)),
 	    [66 - 8] = "ec",
 	  };
 	const size_t idx = regno - (334 + 8);
+	*type = DW_ATE_unsigned;
+	if (idx == 1 || idx == 2)
+	  *type = DW_ATE_address;
 	if (idx < sizeof named_ar / sizeof named_ar[0]
 	    && named_ar[idx][0] != '\0')
 	  return stpcpy (name, named_ar[idx]) + 1 - name;
@@ -193,6 +207,8 @@ ia64_register_name (Ebl *ebl __attribute__ ((unused)),
       name[3] = (regno - 462) + '0';
       namelen = 4;
       *setname = "NAT";
+      *type = DW_ATE_boolean;
+      *bits = 1;
       *prefix = "";
       break;
 
@@ -204,6 +220,8 @@ ia64_register_name (Ebl *ebl __attribute__ ((unused)),
       name[4] = (regno - 462) % 10 + '0';
       namelen = 5;
       *setname = "NAT";
+      *type = DW_ATE_boolean;
+      *bits = 1;
       *prefix = "";
       break;
 
@@ -216,6 +234,8 @@ ia64_register_name (Ebl *ebl __attribute__ ((unused)),
       name[5] = (regno - 462) % 10 + '0';
       namelen = 6;
       *setname = "NAT";
+      *type = DW_ATE_boolean;
+      *bits = 1;
       *prefix = "";
       break;
 
@@ -224,6 +244,8 @@ ia64_register_name (Ebl *ebl __attribute__ ((unused)),
       name[1] = (regno - 687) + '0';
       namelen = 2;
       *setname = "predicate";
+      *type = DW_ATE_boolean;
+      *bits = 1;
       *prefix = "";
       break;
 
@@ -233,6 +255,8 @@ ia64_register_name (Ebl *ebl __attribute__ ((unused)),
       name[2] = (regno - 687) % 10 + '0';
       namelen = 3;
       *setname = "predicate";
+      *type = DW_ATE_boolean;
+      *bits = 1;
       *prefix = "";
       break;
 

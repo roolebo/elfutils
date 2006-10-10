@@ -28,14 +28,16 @@
 #endif
 
 #include <string.h>
+#include <dwarf.h>
 
 #define BACKEND i386_
 #include "libebl_CPU.h"
 
 ssize_t
-i386_register_name (Ebl *ebl __attribute__ ((unused)),
+i386_register_info (Ebl *ebl __attribute__ ((unused)),
 		    int regno, char *name, size_t namelen,
-		    const char **prefix, const char **setname)
+		    const char **prefix, const char **setname,
+		    int *bits, int *type)
 {
   if (name == NULL)
     return 46;
@@ -44,18 +46,37 @@ i386_register_name (Ebl *ebl __attribute__ ((unused)),
     return -1;
 
   *prefix = "%";
+  *bits = 32;
+  *type = DW_ATE_unsigned;
   if (regno < 11)
-    *setname = "integer";
+    {
+      *setname = "integer";
+      if (regno < 9)
+	*type = DW_ATE_signed;
+    }
   else if (regno < 19)
-    *setname = "x87";
+    {
+      *setname = "x87";
+      *type = DW_ATE_float;
+      *bits = 80;
+    }
   else if (regno < 29)
-    *setname = "SSE";
+    {
+      *setname = "SSE";
+      *bits = 128;
+    }
   else if (regno < 37)
-    *setname = "MMX";
+    {
+      *setname = "MMX";
+      *bits = 64;
+    }
   else if (regno < 40)
     *setname = "FPU-control";
   else
-    *setname = "segment";
+    {
+      *setname = "segment";
+      *bits = 16;
+    }
 
   switch (regno)
     {
@@ -64,7 +85,12 @@ i386_register_name (Ebl *ebl __attribute__ ((unused)),
 	  "ax", "cx", "dx", "bx", "sp", "bp", "si", "di", "ip"
 	};
 
-    case 0 ... 8:
+    case 4:
+    case 5:
+    case 8:
+      *type = DW_ATE_address;
+    case 0 ... 3:
+    case 6 ... 7:
       name[0] = 'e';
       name[1] = baseregs[regno][0];
       name[2] = baseregs[regno][1];

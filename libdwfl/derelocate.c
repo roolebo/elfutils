@@ -1,5 +1,5 @@
 /* Recover relocatibility for addresses computed from debug information.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -124,7 +124,7 @@ cache_sections (Dwfl_Module *mod)
       return -1;
     }
 
-  struct secref *sortrefs[nrefs];
+  struct secref **sortrefs = alloca (nrefs * sizeof sortrefs[0]);
   for (size_t i = nrefs; i-- > 0; refs = refs->next)
     sortrefs[i] = refs;
   assert (refs == NULL);

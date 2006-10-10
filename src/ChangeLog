@@ -1,3 +1,13 @@
+2006-08-29  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (MAINTAINERCLEANFILES): New variable.
+
+	* readelf.c (handle_relocs_rel): Typo fix, test DESTSHDR properly.
+	Reported by Christian Aichinger <Greek0@gmx.net>.
+
+	* elflint.c (valid_e_machine): Add EM_ALPHA.
+	Reported by Christian Aichinger <Greek0@gmx.net>.
+
 2006-08-08  Ulrich Drepper  <drepper@redhat.com>
 
 	* elflint.c (check_dynamic): Don't require DT_HASH for DT_SYMTAB.

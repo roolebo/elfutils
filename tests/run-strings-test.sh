@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2005 Red Hat, Inc.
+# Copyright (C) 2005, 2006 Red Hat, Inc.
 # This file is part of Red Hat elfutils.
 # Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 #
@@ -28,6 +28,9 @@
 
 files="testfile `seq 2 9 | while read n; do echo testfile$n; done`"
 testfiles $files
+
+LC_ALL=C
+export LC_ALL
 
 testrun_compare ../src/strings -tx -f $files <<\EOF
 testfile:      f4 /lib/ld-linux.so.2

@@ -1,3 +1,8 @@
+2006-09-05  Roland McGrath  <roland@redhat.com>
+
+	* derelocate.c (cache_sections): Use alloca instead of variable-sized
+	auto array, in function already alloca.
+
 2006-08-14  Roland McGrath  <roland@redhat.com>
 
 	* linux-kernel-modules.c (try_kernel_name): If the call to

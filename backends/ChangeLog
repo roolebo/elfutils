@@ -1,3 +1,30 @@
+2006-10-09  Roland McGrath  <roland@redhat.com>
+
+	* ia64_symbol.c (ia64_reloc_simple_type): Treat SECREL types as simple.
+
+2006-08-29  Roland McGrath  <roland@redhat.com>
+
+	* sparc_retval.c: New file.
+	* Makefile.am (sparc_SRCS): Add it.
+	* sparc_init.c (sparc_init): Initialize return_value_location hook.
+
+2006-08-22  Roland McGrath  <roland@redhat.com>
+
+	* i386_regs.c (i386_register_name): Renamed i386_register_info.
+	Take new args, yield more info.
+	* i386_init.c (i386_init): Update initializer.
+	* ia64_regs.c (ia64_register_name): Likewise.
+	* ia64_init.c (ia64_init): Likewise.
+	* ppc_regs.c (ppc_register_name): Likewise.
+	* ppc64_init.c (ppc64_init): Likewise.
+	* ppc_init.c (ppc_init): Likewise.
+	* s390_regs.c (s390_register_name): Likewise.
+	* s390_init.c (s390_init): Likewise.
+	* sparc_regs.c (sparc_register_name): Likewise.
+	* sparc_init.c (sparc_init): Likewise.
+	* x86_64_regs.c (x86_64_register_name): Likewise.
+	* x86_64_init.c (x86_64_init): Likewise.
+
 2006-08-08  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am (%.os): Don't depend on %.o, since we don't actually

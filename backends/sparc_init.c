@@ -1,5 +1,5 @@
 /* Initialization of SPARC specific backend library.
-   Copyright (C) 2002, 2005 Red Hat, Inc.
+   Copyright (C) 2002, 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -56,7 +56,8 @@ sparc_init (elf, machine, eh, ehlen)
   sparc_init_reloc (eh);
   HOOK (eh, reloc_simple_type);
   //HOOK (eh, core_note);
-  HOOK (eh, register_name);
+  HOOK (eh, register_info);
+  HOOK (eh, return_value_location);
 
   return MODVERSION;
 }

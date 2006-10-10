@@ -58,7 +58,8 @@ trap native_cleanup 0 1 2 15
 for cc in "$HOSTCC" "$HOST_CC" cc gcc "$CC"; do
   test "x$cc" != x || continue
   $cc -o native -g native.c > /dev/null 2>&1 &&
-  ./native > /dev/null 2>&1 & native=$! &&
+  # Some shell versions don't do this right without the braces.
+  { ./native > /dev/null 2>&1 & native=$! ; } &&
   sleep 1 && kill -0 $native 2> /dev/null &&
   break ||
   native=0

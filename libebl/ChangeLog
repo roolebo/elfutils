@@ -1,3 +1,17 @@
+2006-09-04  Roland McGrath  <roland@redhat.com>
+
+	* ebl-hooks.h: Replace register_name hook with register_info.
+	Also yield natural bit width and base type encoding.
+	* eblopenbackend.c (default_register_name): Renamed
+	default_register_info, new args added.
+	(fill_defaults): Update initialization.
+	* eblregname.c: File renamed ...
+	* eblreginfo.c: ... to this.
+	(ebl_register_name): Renamed to ebl_register_info, new args added.
+	* libebl.h: Update decl.
+
+	* Makefile.am (gen_SOURCES): Update list.
+
 2006-07-06  Ulrich Drepper  <drepper@redhat.com>
 
 	* ebldynamictagname.c: Add support for DT_GNU_HASH.

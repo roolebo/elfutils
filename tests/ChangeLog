@@ -1,3 +1,23 @@
+2006-09-05  Roland McGrath  <roland@redhat.com>
+
+	* run-strings-test.sh: Export LC_ALL=C for the test.
+
+2006-08-29  Roland McGrath  <roland@redhat.com>
+
+	* run-arextract.sh: Use testrun, tempfiles functions from test-subr.sh.
+	* run-arsymtest.sh: Likewise.
+
+	* run-native-test.sh (native.c compilation): Add some braces.
+
+2006-08-22  Roland McGrath  <roland@redhat.com>
+
+	* allregs.c (dwarf_encoding_string): New function, swiped from readelf.
+	(struct reginfo): New members bits, type.
+	(one_register, match_register): Update to take new args,
+	record and display new info.
+	(main): Display new info.
+	* run-allregs.sh: Update expected results.
+
 2006-08-03  Roland McGrath  <roland@redhat.com>
 
 	* run-allregs.sh: Add sparc cases.

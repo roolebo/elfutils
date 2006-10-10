@@ -1,5 +1,5 @@
 /* Memory handling for libdw.
-   Copyright (C) 2003, 2004 Red Hat, Inc.
+   Copyright (C) 2003, 2004, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -60,20 +60,24 @@
 
 
 void *
-__libdw_allocate (Dwarf *dbg, size_t minsize)
+__libdw_allocate (Dwarf *dbg, size_t minsize, size_t align)
 {
   size_t size = MAX (dbg->mem_default_size,
-		     2 * minsize + offsetof (struct libdw_memblock, mem));
+		     (align - 1 +
+		      2 * minsize + offsetof (struct libdw_memblock, mem)));
   struct libdw_memblock *newp = malloc (size);
   if (newp == NULL)
     dbg->oom_handler ();
 
-  newp->size = newp->remaining = size - offsetof (struct libdw_memblock, mem);
+  uintptr_t result = ((uintptr_t) newp->mem + align - 1) & ~(align - 1);
+
+  newp->size = size - offsetof (struct libdw_memblock, mem);
+  newp->remaining = (uintptr_t) newp + size - (result + minsize);
 
   newp->prev = dbg->mem_tail;
   dbg->mem_tail = newp;
 
-  return newp->mem;
+  return (void *) result;
 }
 
 

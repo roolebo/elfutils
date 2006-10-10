@@ -1,5 +1,5 @@
 /* Initialization of i386 specific backend library.
-   Copyright (C) 2000, 2001, 2002, 2005 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -55,7 +55,7 @@ i386_init (elf, machine, eh, ehlen)
   generic_debugscn_p = eh->debugscn_p;
   HOOK (eh, debugscn_p);
   HOOK (eh, return_value_location);
-  HOOK (eh, register_name);
+  HOOK (eh, register_info);
 
   return MODVERSION;
 }

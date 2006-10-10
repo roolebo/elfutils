@@ -1,5 +1,5 @@
 /* Internal definitions for libdwarf.
-   Copyright (C) 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -315,7 +315,7 @@ extern void __libdw_seterrno (int value) internal_function;
 
 
 /* Memory handling, the easy parts.  This macro does not do any locking.  */
-#define libdw_alloc(dbg, type, tsize, cnt) \
+#define libdw_alloc(dbg, type, tsize, cnt)				      \
   ({ struct libdw_memblock *_tail = (dbg)->mem_tail;			      \
      size_t _required = (tsize) * (cnt);				      \
      type *_result = (type *) (_tail->mem + (_tail->size - _tail->remaining));\
@@ -323,23 +323,20 @@ extern void __libdw_seterrno (int value) internal_function;
 			 - ((uintptr_t) _result & (__alignof (type) - 1)))    \
 			& (__alignof (type) - 1));			      \
      if (unlikely (_tail->remaining < _required + _padding))		      \
-       {								      \
-	 _result = (type *) __libdw_allocate (dbg, _required);		      \
-	 _tail = (dbg)->mem_tail;					      \
-       }								      \
+       _result = (type *) __libdw_allocate (dbg, _required, __alignof (type));\
      else								      \
        {								      \
 	 _required += _padding;						      \
 	 _result = (type *) ((char *) _result + _padding);		      \
+	 _tail->remaining -= _required;					      \
        }								      \
-     _tail->remaining -= _required;					      \
      _result; })
 
 #define libdw_typed_alloc(dbg, type) \
   libdw_alloc (dbg, type, sizeof (type), 1)
 
 /* Callback to allocate more.  */
-extern void *__libdw_allocate (Dwarf *dbg, size_t minsize)
+extern void *__libdw_allocate (Dwarf *dbg, size_t minsize, size_t align)
      __attribute__ ((__malloc__)) __nonnull_attribute__ (1);
 
 /* Default OOM handler.  */

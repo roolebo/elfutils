@@ -232,7 +232,8 @@ extern Dwarf_Off dwarf_cuoffset (Dwarf_Die *die);
 
 /* Return CU DIE containing given DIE.  */
 extern Dwarf_Die *dwarf_diecu (Dwarf_Die *die, Dwarf_Die *result,
-			       uint8_t *address_sizep, uint8_t *offset_sizep);
+			       uint8_t *address_sizep, uint8_t *offset_sizep)
+     __nonnull_attribute__ (2);
 
 /* Return CU DIE containing given address.  */
 extern Dwarf_Die *dwarf_addrdie (Dwarf *dbg, Dwarf_Addr addr,
@@ -240,7 +241,7 @@ extern Dwarf_Die *dwarf_addrdie (Dwarf *dbg, Dwarf_Addr addr,
 
 /* Return child of current DIE.  */
 extern int dwarf_child (Dwarf_Die *die, Dwarf_Die *result)
-     __nonnull_attribute__ (1, 2);
+     __nonnull_attribute__ (2);
 
 /* Return sibling of given DIE.  */
 extern int dwarf_siblingof (Dwarf_Die *die, Dwarf_Die *result)

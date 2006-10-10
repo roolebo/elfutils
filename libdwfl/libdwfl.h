@@ -426,7 +426,8 @@ extern int dwfl_module_register_names (Dwfl_Module *mod,
 							int regno,
 							const char *setname,
 							const char *prefix,
-							const char *regname),
+							const char *regname,
+							int bits, int type),
 				       void *arg);
 
 

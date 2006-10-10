@@ -1,5 +1,5 @@
 /* Initialization of PPC specific backend library.
-   Copyright (C) 2004, 2005 Red Hat, Inc.
+   Copyright (C) 2004, 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
@@ -56,7 +56,7 @@ ppc_init (elf, machine, eh, ehlen)
   HOOK (eh, check_special_symbol);
   HOOK (eh, bss_plt_p);
   HOOK (eh, return_value_location);
-  HOOK (eh, register_name);
+  HOOK (eh, register_info);
 
   return MODVERSION;
 }

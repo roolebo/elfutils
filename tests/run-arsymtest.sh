@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 1999, 2000, 2002 Red Hat, Inc.
+# Copyright (C) 1999, 2000, 2002, 2006 Red Hat, Inc.
 # This file is part of Red Hat elfutils.
 # Written by Ulrich Drepper <drepper@redhat.com>, 1999.
 #
@@ -24,12 +24,16 @@
 # Network licensing program, please visit www.openinventionnetwork.com
 # <http://www.openinventionnetwork.com>.
 
+. $srcdir/test-subr.sh
+
 lib=../libelf/libelf.a
 okfile=arsymtest.ok
 tmpfile=arsymtest.tmp
 testfile=arsymtest.test
 
-result=0
+tempfiles $okfile $tmpfile $testfile
+
+result=77
 if test -f $lib; then
     # Generate list using `nm' we check against.
     nm -s $lib |
@@ -37,14 +41,12 @@ if test -f $lib; then
     sort > $okfile
 
     # Now run our program using libelf.
-    ./arsymtest $lib $tmpfile || exit 1
+    testrun ./arsymtest $lib $tmpfile || exit 1
     sort $tmpfile > $testfile
-    rm $tmpfile
 
     # Compare the outputs.
     if cmp $okfile $testfile; then
 	result=0
-	rm $testfile $okfile
     else
 	result=1
     fi

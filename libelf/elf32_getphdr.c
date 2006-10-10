@@ -1,5 +1,5 @@
 /* Get ELF program header table.
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -55,6 +55,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <assert.h>
 
 #include <system.h>
 #include "libelfP.h"
@@ -116,14 +117,14 @@ elfw2(LIBELFBITS,getphdr) (elf)
       if (elf->map_address != NULL)
 	{
 	  /* All the data is already mapped.  Use it.  */
+	  void *file_phdr = ((char *) elf->map_address
+			     + elf->start_offset + ehdr->e_phoff);
 	  if (ehdr->e_ident[EI_DATA] == MY_ELFDATA
 	      && (ALLOW_UNALIGNED
-		  || ((((uintptr_t) elf->map_address + elf->start_offset
-			+ ehdr->e_phoff)
-		       & (__alignof__ (ElfW2(LIBELFBITS,Phdr)) - 1)) == 0)))
+		  || ((uintptr_t) file_phdr
+		      & (__alignof__ (ElfW2(LIBELFBITS,Phdr)) - 1)) == 0))
 	    /* Simply use the mapped data.  */
-	    elf->state.ELFW(elf,LIBELFBITS).phdr = (ElfW2(LIBELFBITS,Phdr) *)
-	      ((char *) elf->map_address + elf->start_offset + ehdr->e_phoff);
+	    elf->state.ELFW(elf,LIBELFBITS).phdr = file_phdr;
 	  else
 	    {
 	      ElfW2(LIBELFBITS,Phdr) *notcvt;
@@ -143,31 +144,35 @@ elfw2(LIBELFBITS,getphdr) (elf)
 
 	      /* Now copy the data and at the same time convert the
 		 byte order.  */
-	      if (ALLOW_UNALIGNED
-		  || ((((uintptr_t) elf->map_address + elf->start_offset
-			+ ehdr->e_phoff)
-		       & (__alignof__ (ElfW2(LIBELFBITS,Phdr)) - 1)) == 0))
-		notcvt = (ElfW2(LIBELFBITS,Phdr) *)
-		  ((char *) elf->map_address
-		   + elf->start_offset + ehdr->e_phoff);
+
+	      if (ehdr->e_ident[EI_DATA] == MY_ELFDATA)
+		{
+		  assert (! ALLOW_UNALIGNED);
+		  memcpy (phdr, file_phdr, size);
+		}
 	      else
 		{
-		  notcvt = (ElfW2(LIBELFBITS,Phdr) *) alloca (size);
-		  memcpy (notcvt, ((char *) elf->map_address +
-				   elf->start_offset + ehdr->e_phoff),
-			  size);
-		}
+		  if (ALLOW_UNALIGNED
+		      || ((uintptr_t) file_phdr
+			  & (__alignof__ (ElfW2(LIBELFBITS,Phdr)) - 1)) == 0)
+		    notcvt = file_phdr;
+		  else
+		    {
+		      notcvt = (ElfW2(LIBELFBITS,Phdr) *) alloca (size);
+		      memcpy (notcvt, file_phdr, size);
+		    }
 
-	      for (size_t cnt = 0; cnt < phnum; ++cnt)
-		{
-		  CONVERT_TO (phdr[cnt].p_type, notcvt[cnt].p_type);
-		  CONVERT_TO (phdr[cnt].p_offset, notcvt[cnt].p_offset);
-		  CONVERT_TO (phdr[cnt].p_vaddr, notcvt[cnt].p_vaddr);
-		  CONVERT_TO (phdr[cnt].p_paddr, notcvt[cnt].p_paddr);
-		  CONVERT_TO (phdr[cnt].p_filesz, notcvt[cnt].p_filesz);
-		  CONVERT_TO (phdr[cnt].p_memsz, notcvt[cnt].p_memsz);
-		  CONVERT_TO (phdr[cnt].p_flags, notcvt[cnt].p_flags);
-		  CONVERT_TO (phdr[cnt].p_align, notcvt[cnt].p_align);
+		  for (size_t cnt = 0; cnt < phnum; ++cnt)
+		    {
+		      CONVERT_TO (phdr[cnt].p_type, notcvt[cnt].p_type);
+		      CONVERT_TO (phdr[cnt].p_offset, notcvt[cnt].p_offset);
+		      CONVERT_TO (phdr[cnt].p_vaddr, notcvt[cnt].p_vaddr);
+		      CONVERT_TO (phdr[cnt].p_paddr, notcvt[cnt].p_paddr);
+		      CONVERT_TO (phdr[cnt].p_filesz, notcvt[cnt].p_filesz);
+		      CONVERT_TO (phdr[cnt].p_memsz, notcvt[cnt].p_memsz);
+		      CONVERT_TO (phdr[cnt].p_flags, notcvt[cnt].p_flags);
+		      CONVERT_TO (phdr[cnt].p_align, notcvt[cnt].p_align);
+		    }
 		}
 	    }
 	}

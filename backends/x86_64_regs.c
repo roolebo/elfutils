@@ -1,5 +1,5 @@
 /* Register names and numbers for x86-64 DWARF.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -34,9 +34,10 @@
 #include "libebl_CPU.h"
 
 ssize_t
-x86_64_register_name (Ebl *ebl __attribute__ ((unused)),
+x86_64_register_info (Ebl *ebl __attribute__ ((unused)),
 		      int regno, char *name, size_t namelen,
-		      const char **prefix, const char **setname)
+		      const char **prefix, const char **setname,
+		      int *bits, int *type)
 {
   if (name == NULL)
     return 49;
@@ -45,14 +46,32 @@ x86_64_register_name (Ebl *ebl __attribute__ ((unused)),
     return -1;
 
   *prefix = "%";
+  *bits = 64;
+  *type = DW_ATE_unsigned;
   if (regno < 17)
-    *setname = "integer";
+    {
+      *setname = "integer";
+      if (regno == 16 || regno == 6 || regno == 7)
+	*type = DW_ATE_address;
+      else
+	*type = DW_ATE_signed;
+    }
   else if (regno < 33)
-    *setname = "SSE";
+    {
+      *setname = "SSE";
+      *bits = 128;
+    }
   else if (regno < 41)
-    *setname = "x87";
+    {
+      *setname = "x87";
+      *type = DW_ATE_float;
+      *bits = 80;
+    }
   else
-    *setname = "MMX";
+    {
+      *setname = "MMX";
+      *bits = 64;
+    }
 
   switch (regno)
     {

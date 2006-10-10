@@ -28,6 +28,7 @@
 #endif
 
 #include <string.h>
+#include <dwarf.h>
 
 #define BACKEND s390_
 #include "libebl_CPU.h"
@@ -50,9 +51,10 @@ zseries (64)
 
 
 ssize_t
-s390_register_name (Ebl *ebl __attribute__ ((unused)),
+s390_register_info (Ebl *ebl __attribute__ ((unused)),
 		    int regno, char *name, size_t namelen,
-		    const char **prefix, const char **setname)
+		    const char **prefix, const char **setname,
+		    int *bits, int *type)
 {
   if (name == NULL)
     return 66;
@@ -62,14 +64,26 @@ s390_register_name (Ebl *ebl __attribute__ ((unused)),
 
   *prefix = "%";
 
+  *bits = ebl->class == ELFCLASS64 ? 64 : 32;
+  *type = DW_ATE_unsigned;
   if (regno < 16)
-    *setname = "integer";
+    {
+      *setname = "integer";
+      *type = DW_ATE_signed;
+    }
   else if (regno < 32)
-    *setname = "FPU";
+    {
+      *setname = "FPU";
+      *type = DW_ATE_float;
+      *bits = 64;
+    }
   else if (regno < 48 || regno > 63)
     *setname = "control";
   else
-    *setname = "access";
+    {
+      *setname = "access";
+      *bits = 32;
+    }
 
   switch (regno)
     {
@@ -116,6 +130,7 @@ s390_register_name (Ebl *ebl __attribute__ ((unused)),
     case 64:
       return stpcpy (name, "pswm") + 1 - name;
     case 65:
+      *type = DW_ATE_address;
       return stpcpy (name, "pswa") + 1 - name;
 
     default:

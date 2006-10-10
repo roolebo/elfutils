@@ -34,7 +34,44 @@
 #include <argp.h>
 #include <assert.h>
 #include ELFUTILS_HEADER(dwfl)
+#include <dwarf.h>
 
+
+static const char *
+dwarf_encoding_string (unsigned int code)
+{
+  static const char *known[] =
+    {
+      [DW_ATE_void] = "void",
+      [DW_ATE_address] = "address",
+      [DW_ATE_boolean] = "boolean",
+      [DW_ATE_complex_float] = "complex_float",
+      [DW_ATE_float] = "float",
+      [DW_ATE_signed] = "signed",
+      [DW_ATE_signed_char] = "signed_char",
+      [DW_ATE_unsigned] = "unsigned",
+      [DW_ATE_unsigned_char] = "unsigned_char",
+      [DW_ATE_imaginary_float] = "imaginary_float",
+      [DW_ATE_packed_decimal] = "packed_decimal",
+      [DW_ATE_numeric_string] = "numeric_string",
+      [DW_ATE_edited] = "edited",
+      [DW_ATE_signed_fixed] = "signed_fixed",
+      [DW_ATE_unsigned_fixed] = "unsigned_fixed",
+      [DW_ATE_decimal_float] = "decimal_float",
+    };
+
+  if (code < sizeof (known) / sizeof (known[0]))
+    return known[code];
+
+  if (code >= DW_ATE_lo_user && code <= DW_ATE_hi_user)
+    {
+      static char buf[30];
+      snprintf (buf, sizeof (buf), "lo_user+%u", code - DW_ATE_lo_user);
+      return buf;
+    }
+
+  return "???";
+}
 
 static int
 first_module (Dwfl_Module *mod,
@@ -62,6 +99,8 @@ struct reginfo
 {
   const char *set, *pfx;
   int regno;
+  int bits;
+  int type;
   char name[32];
 };
 
@@ -87,7 +126,8 @@ one_register (void *arg,
 	      int regno,
 	      const char *setname,
 	      const char *prefix,
-	      const char *regname)
+	      const char *regname,
+	      int bits, int type)
 {
   struct state *state = arg;
 
@@ -103,6 +143,8 @@ one_register (void *arg,
   state->info[regno].regno = regno;
   state->info[regno].set = setname;
   state->info[regno].pfx = prefix;
+  state->info[regno].bits = bits;
+  state->info[regno].type = type;
   assert (strlen (regname) < sizeof state->info[regno].name);
   strcpy (state->info[regno].name, regname);
 
@@ -115,10 +157,13 @@ match_register (void *arg,
 		int regno,
 		const char *setname,
 		const char *prefix,
-		const char *regname)
+		const char *regname,
+		int bits, int type)
 {
   if (regno == *(int *) arg)
-    printf ("%5d => %s register %s%s\n", regno, setname, prefix, regname);
+    printf ("%5d => %s register %s%s %s %d bits\n",
+	    regno, setname, prefix, regname,
+	    dwarf_encoding_string (type), bits);
 
   return DWARF_CB_ABORT;
 }
@@ -158,9 +203,12 @@ main (int argc, char **argv)
 	      printf ("%s registers:\n", state.info[i].set);
 	    set = state.info[i].set;
 
-	    printf ("\t%3d: %s%s (%s)\n", state.info[i].regno,
+	    printf ("\t%3d: %s%s (%s), %s %d bits\n",
+		    state.info[i].regno,
 		    state.info[i].pfx ?: "", state.info[i].name,
-		    state.info[i].name);
+		    state.info[i].name,
+		    dwarf_encoding_string (state.info[i].type),
+		    state.info[i].bits);
 	  }
     }
   else

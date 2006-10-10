@@ -1,3 +1,13 @@
+Version 0.124:
+
+libebl: sparc backend support for return value location
+
+libebl, libdwfl: backend register name support extended with more info
+
+libelf, libdw: bug fixes for unaligned accesses on machines that care
+
+readelf, elflint: trivial bugs fixed
+
 Version 0.123:
 
 libebl: Backend build fixes, thanks to Stepan Kasal.

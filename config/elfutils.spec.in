@@ -154,6 +154,12 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.so
 
 %changelog
+* Tue Oct 10 2006 Ulrich Drepper <drepper@redhat.com> 0.124-1
+- libebl: sparc backend support for return value location
+- libebl, libdwfl: backend register name support extended with more info
+- libelf, libdw: bug fixes for unaligned accesses on machines that care
+- readelf, elflint: trivial bugs fixed
+
 * Mon Aug 14 2006 Roland McGrath <roland@redhat.com> 0.123-1
 - libebl: Backend build fixes, thanks to Stepan Kasal.
 - libebl: ia64 backend support for register names, return value location

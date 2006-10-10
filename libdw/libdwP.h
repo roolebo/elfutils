@@ -283,7 +283,7 @@ struct Dwarf_CU
   void *locs;
 };
 
-#define CUDIE(fromcu)							      \
+#define CUDIE(fromcu) \
   ((Dwarf_Die)								      \
    {									      \
      .cu = (fromcu),							      \
@@ -315,7 +315,7 @@ extern void __libdw_seterrno (int value) internal_function;
 
 
 /* Memory handling, the easy parts.  This macro does not do any locking.  */
-#define libdw_alloc(dbg, type, tsize, cnt)				      \
+#define libdw_alloc(dbg, type, tsize, cnt) \
   ({ struct libdw_memblock *_tail = (dbg)->mem_tail;			      \
      size_t _required = (tsize) * (cnt);				      \
      type *_result = (type *) (_tail->mem + (_tail->size - _tail->remaining));\

@@ -2162,6 +2162,141 @@ section [%2d] '%s': hash table has not even room for initial administrative entr
 }
 
 
+/* Compare content of both hash tables, it must be identical.  */
+static void
+compare_hash_gnu_hash (Ebl *ebl, GElf_Ehdr *ehdr, size_t hash_idx,
+		       size_t gnu_hash_idx)
+{
+  Elf_Scn *hash_scn = elf_getscn (ebl->elf, hash_idx);
+  Elf_Data *hash_data = elf_getdata (hash_scn, NULL);
+  GElf_Shdr hash_shdr_mem;
+  GElf_Shdr *hash_shdr = gelf_getshdr (hash_scn, &hash_shdr_mem);
+  Elf_Scn *gnu_hash_scn = elf_getscn (ebl->elf, gnu_hash_idx);
+  Elf_Data *gnu_hash_data = elf_getdata (gnu_hash_scn, NULL);
+  GElf_Shdr gnu_hash_shdr_mem;
+  GElf_Shdr *gnu_hash_shdr = gelf_getshdr (gnu_hash_scn, &gnu_hash_shdr_mem);
+
+  if (hash_shdr == NULL || gnu_hash_shdr == NULL
+      || hash_data == NULL || gnu_hash_data == NULL)
+    /* None of these pointers should be NULL since we used the
+       sections already.  We are careful nonetheless.  */
+    return;
+
+  /* The link must point to the same symbol table.  */
+  if (hash_shdr->sh_link != gnu_hash_shdr->sh_link)
+    {
+      ERROR (gettext ("\
+sh_link in hash sections [%2zu] '%s' and [%2zu] '%s' not identical\n"),
+	     hash_idx, elf_strptr (ebl->elf, shstrndx, hash_shdr->sh_name),
+	     gnu_hash_idx,
+	     elf_strptr (ebl->elf, shstrndx, gnu_hash_shdr->sh_name));
+      return;
+    }
+
+  Elf_Scn *sym_scn = elf_getscn (ebl->elf, hash_shdr->sh_link);
+  Elf_Data *sym_data = elf_getdata (sym_scn, NULL);
+  GElf_Shdr sym_shdr_mem;
+  GElf_Shdr *sym_shdr = gelf_getshdr (sym_scn, &sym_shdr_mem);
+
+  if (sym_data == NULL || sym_shdr == NULL)
+    return;
+
+  int nentries = sym_shdr->sh_size / sym_shdr->sh_entsize;
+  char *used = alloca (nentries);
+  memset (used, '\0', nentries);
+
+  /* First go over the GNU_HASH table and mark the entries as used.  */
+  const Elf32_Word *gnu_hasharr = (Elf32_Word *) gnu_hash_data->d_buf;
+  Elf32_Word gnu_nbucket = gnu_hasharr[0];
+  const int bitmap_factor = ehdr->e_ident[EI_CLASS] == ELFCLASS32 ? 1 : 2;
+  const Elf32_Word *gnu_bucket = (gnu_hasharr
+				  + (4 + gnu_hasharr[2] * bitmap_factor));
+  const Elf32_Word *gnu_chain = gnu_bucket + gnu_hasharr[0] - gnu_hasharr[1];
+
+  for (Elf32_Word cnt = 0; cnt < gnu_nbucket; ++cnt)
+    {
+      Elf32_Word symidx = gnu_bucket[cnt];
+      if (symidx != STN_UNDEF)
+	do
+	  used[symidx] |= 1;
+	while ((gnu_chain[symidx++] & 1u) == 0);
+    }
+
+  /* Now go over the old hash table and check that we cover the same
+     entries.  */
+  if (hash_shdr->sh_entsize == sizeof (Elf32_Word))
+    {
+      const Elf32_Word *hasharr = (Elf32_Word *) hash_data->d_buf;
+      Elf32_Word nbucket = hasharr[0];
+      const Elf32_Word *bucket = &hasharr[2];
+      const Elf32_Word *chain = &hasharr[2 + nbucket];
+
+      for (Elf32_Word cnt = 0; cnt < nbucket; ++cnt)
+	{
+	  Elf32_Word symidx = bucket[cnt];
+	  while (symidx != STN_UNDEF)
+	    {
+	      used[symidx] |= 2;
+	      symidx = chain[symidx];
+	    }
+	}
+    }
+  else
+    {
+      const Elf64_Xword *hasharr = (Elf64_Xword *) hash_data->d_buf;
+      Elf64_Xword nbucket = hasharr[0];
+      const Elf64_Xword *bucket = &hasharr[2];
+      const Elf64_Xword *chain = &hasharr[2 + nbucket];
+
+      for (Elf64_Xword cnt = 0; cnt < nbucket; ++cnt)
+	{
+	  Elf64_Xword symidx = bucket[cnt];
+	  while (symidx != STN_UNDEF)
+	    {
+	      used[symidx] |= 2;
+	      symidx = chain[symidx];
+	    }
+	}
+    }
+
+  /* Now see which entries are not set in one or both hash tables
+     (unless the symbol is undefined in which case it can be omitted
+     in the new table format).  */
+  if ((used[0] & 1) != 0)
+    ERROR (gettext ("section [%2zu] '%s': reference to symbol index 0\n"),
+	   gnu_hash_idx,
+	   elf_strptr (ebl->elf, shstrndx, gnu_hash_shdr->sh_name));
+  if ((used[0] & 2) != 0)
+    ERROR (gettext ("section [%2zu] '%s': reference to symbol index 0\n"),
+	   hash_idx, elf_strptr (ebl->elf, shstrndx, hash_shdr->sh_name));
+
+  for (int cnt = 1; cnt < nentries; ++cnt)
+    if (used[cnt] != 0 && used[cnt] != 3)
+      {
+	if (used[cnt] == 1)
+	  ERROR (gettext ("\
+symbol %d referenced in new hash table in [%2zu] '%s' but not in old hash table in [%2zu] '%s'\n"),
+		 cnt, gnu_hash_idx,
+		 elf_strptr (ebl->elf, shstrndx, gnu_hash_shdr->sh_name),
+		 hash_idx,
+		 elf_strptr (ebl->elf, shstrndx, hash_shdr->sh_name));
+	else
+	  {
+	    GElf_Sym sym_mem;
+	    GElf_Sym *sym = gelf_getsym (sym_data, cnt, &sym_mem);
+
+	    if (sym != NULL && sym->st_shndx != STN_UNDEF)
+	      ERROR (gettext ("\
+symbol %d referenced in old hash table in [%2zu] '%s' but not in new hash table in [%2zu] '%s'\n"),
+		     cnt, hash_idx,
+		     elf_strptr (ebl->elf, shstrndx, hash_shdr->sh_name),
+		     gnu_hash_idx,
+		     elf_strptr (ebl->elf, shstrndx, gnu_hash_shdr->sh_name));
+	  }
+      }
+}
+
+
 static void
 check_null (Ebl *ebl, GElf_Shdr *shdr, int idx)
 {
@@ -3026,6 +3161,9 @@ zeroth section has nonzero link value while ELF header does not signal overflow 
 
   bool dot_interp_section = false;
 
+  size_t hash_idx = 0;
+  size_t gnu_hash_idx = 0;
+
   size_t versym_scnndx = 0;
   for (size_t cnt = 1; cnt < shnum; ++cnt)
     {
@@ -3313,8 +3451,13 @@ section [%2zu] '%s': relocatable files cannot have dynamic symbol tables\n"),
 	  break;
 
 	case SHT_HASH:
+	  check_hash (shdr->sh_type, ebl, ehdr, shdr, cnt);
+	  hash_idx = cnt;
+	  break;
+
 	case SHT_GNU_HASH:
 	  check_hash (shdr->sh_type, ebl, ehdr, shdr, cnt);
+	  gnu_hash_idx = cnt;
 	  break;
 
 	case SHT_NULL:
@@ -3383,6 +3526,9 @@ no .gnu.versym section present but .gnu.versym_d or .gnu.versym_r section exist\
   else if (versym_scnndx != 0)
     ERROR (gettext ("\
 .gnu.versym section present without .gnu.versym_d or .gnu.versym_r\n"));
+
+  if (hash_idx != 0 && gnu_hash_idx != 0)
+    compare_hash_gnu_hash (ebl, ehdr, hash_idx, gnu_hash_idx);
 
   free (scnref);
 }

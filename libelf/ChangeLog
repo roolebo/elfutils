@@ -1,3 +1,10 @@
+2006-10-13  Roland McGrath  <roland@redhat.com>
+
+	* elf32_updatenull.c: Look for phdr if e_phnum nonzero, regardless of
+	e_type.  Diagnose ELF_E_INVALID_PHDR only for ET_REL, and not
+	if ELF_F_PERMISSIVE.
+	* elf_error.c (msgstr): Change ELF_E_INVALID_PHDR string.
+
 2006-08-29  Roland McGrath  <roland@redhat.com>
 
 	* elf32_getphdr.c: Don't byteswap phdr fields when EI_DATA matches

@@ -109,7 +109,7 @@ dwfl_report_begin (Dwfl *dwfl)
 }
 INTDEF (dwfl_report_begin)
 
-/* Report that a module called NAME pans addresses [START, END).
+/* Report that a module called NAME spans addresses [START, END).
    Returns the module handle, either existing or newly allocated,
    or returns a null pointer for an allocation error.  */
 Dwfl_Module *

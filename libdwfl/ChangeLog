@@ -1,3 +1,7 @@
+2006-10-30  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module.c (dwfl_report_module): Comment typo fix.
+
 2006-09-05  Roland McGrath  <roland@redhat.com>
 
 	* derelocate.c (cache_sections): Use alloca instead of variable-sized

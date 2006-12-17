@@ -133,9 +133,9 @@ am_libld_elf_i386_pic_a_OBJECTS = i386_ld.os
 
 libld_elf_i386_so_SOURCES =
 libld_elf_i386.so: libld_elf_i386_pic.a libld_elf_i386.map
-	$(CC) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
-	      $(libelf) $(libeu) \
-	      -Wl,--version-script,$(srcdir)/libld_elf_i386.map
+	$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
+		$(libelf) $(libeu) \
+		-Wl,--version-script,$(srcdir)/libld_elf_i386.map
 	$(textrel_check)
 endif
 

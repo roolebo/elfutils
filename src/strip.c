@@ -344,9 +344,9 @@ process_file (const char *fname)
     case ELF_K_AR:
       /* It is not possible to strip the content of an archive direct
 	 the output to a specific file.  */
-      if (unlikely (output_fname != NULL))
+      if (unlikely (output_fname != NULL || debug_fname != NULL))
 	{
-	  error (0, 0, gettext ("%s: cannot use -o when stripping archive"),
+	  error (0, 0, gettext ("%s: cannot use -o or -f when stripping archive"),
 		 fname);
 	  result = 1;
 	}

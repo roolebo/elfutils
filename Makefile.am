@@ -32,7 +32,7 @@ mini_SUBDIRS = config m4 lib libelf libelf-po
 all_SUBDIRS = libebl libdwfl libdw libcpu libasm backends src po tests
 SUBDIRS = $(mini_SUBDIRS) $(all_SUBDIRS)
 
-EXTRA_DIST = elfutils.spec GPG-KEY NOTES
+EXTRA_DIST = elfutils.spec GPG-KEY NOTES EXCEPTION
 
 # Make sure the test install uses lib64 when $LIB will yield lib64.
 # Make sure the test build uses the same compiler, which on e.g. ppc64

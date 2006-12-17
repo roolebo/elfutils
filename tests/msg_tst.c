@@ -1,4 +1,4 @@
-/* Copyright (C) 2002, 2005 Red Hat, Inc.
+/* Copyright (C) 2002, 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -79,7 +79,7 @@ static struct
     { ELF_E_GROUP_NOT_REL,
       "only relocatable files can contain section groups" },
     { ELF_E_INVALID_PHDR,
-      "program header only allowed in executables and shared objects" },
+      "program header not allowed in relocatable files" },
     { ELF_E_NO_PHDR, "file has no program header" },
     { ELF_E_INVALID_OFFSET, "invalid offset" }
   };

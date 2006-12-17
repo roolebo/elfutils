@@ -147,13 +147,13 @@ __elfw2(LIBELFBITS,updatenull) (Elf *elf, int *change_bop, size_t shnum)
   off_t size = elf_typesize (LIBELFBITS, ELF_T_EHDR, 1);
 
   /* Set the program header position.  */
-  if (elf->state.ELFW(elf,LIBELFBITS).phdr == NULL
-      && (ehdr->e_type == ET_EXEC || ehdr->e_type == ET_DYN))
+  if (elf->state.ELFW(elf,LIBELFBITS).phdr == NULL && ehdr->e_phnum != 0)
     (void) INTUSE(elfw2(LIBELFBITS,getphdr)) (elf);
   if (elf->state.ELFW(elf,LIBELFBITS).phdr != NULL)
     {
       /* Only executables or shared objects have a program header.  */
-      if (ehdr->e_type != ET_EXEC && unlikely (ehdr->e_type != ET_DYN))
+      if (unlikely (ehdr->e_type == ET_REL)
+	  && (elf->flags & ELF_F_PERMISSIVE) == 0)
 	{
 	  __libelf_seterrno (ELF_E_INVALID_PHDR);
 	  return -1;

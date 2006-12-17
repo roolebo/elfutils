@@ -4,6 +4,19 @@
 	two hash tables have different content (module expected omission
 	of undefined symbols).
 
+2006-10-31  Roland McGrath  <roland@redhat.com>
+
+	* elflint.c (check_program_header): Don't complain about
+	p_filesz > p_memsz if p_memsz is zero and p_type is not PT_LOAD.
+
+2006-09-19  Jakub Jelinek  <jakub@redhat.com>
+
+	* strip.c (process_file): Disallow -f on archives.
+
+2006-10-09  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (libld_elf_i386.so): Use $(LINK), not $(CC).
+
 2006-08-29  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am (MAINTAINERCLEANFILES): New variable.

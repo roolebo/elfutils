@@ -1,5 +1,5 @@
 /* Error handling in libelf.
-   Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -270,11 +270,11 @@ static const char msgstr[] =
 #define ELF_E_INVALID_PHDR_IDX \
   (ELF_E_GROUP_NOT_REL_IDX \
    + sizeof "only relocatable files can contain section groups")
-  N_("program header only allowed in executables and shared objects")
+  N_("program header not allowed in relocatable files")
   "\0"
 #define ELF_E_NO_PHDR_IDX \
   (ELF_E_INVALID_PHDR_IDX \
-   + sizeof "program header only allowed in executables and shared objects")
+   + sizeof "program header not allowed in relocatable files")
   N_("file has no program header")
   "\0"
 #define ELF_E_INVALID_OFFSET_IDX \

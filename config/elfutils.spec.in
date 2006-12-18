@@ -43,6 +43,15 @@ higher-level ELF access functionality.  libdw provides access to
 the DWARF debugging information.  libasm provides a programmable
 assembler interface.
 
+%package devel-static
+Summary: Static archives to handle compiled objects.
+Group: Development/Tools
+Requires: elfutils-devel = %{version}-%{release}
+
+%description devel-static
+The elfutils-devel-static archive contains the static archives
+with the code the handle compiled objects.
+
 %package libelf
 Summary: Library to read and write ELF files.
 Group: Development/Tools
@@ -64,6 +73,16 @@ The elfutils-libelf-devel package contains the libraries to create
 applications for handling compiled objects.  libelf allows you to
 access the internals of the ELF object file format, so you can see the
 different sections of an ELF file.
+
+%package libelf-devel-static
+Summary: Static archive of libelf
+Group: Development/Tools
+Requires: elfutils-libelf-devel = %{version}-%{release}
+Conflicts: libelf-devel
+
+%description libelf-devel-static
+The elfutils-libelf-static package contains the static archive
+for libelf.
 
 %prep
 %setup -q
@@ -118,6 +137,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_bindir}/eu-elfcmp
 %{_bindir}/eu-ranlib
 %{_bindir}/eu-strings
+%{_bindir}/eu-objdump
 #%{_bindir}/eu-ld
 #%{_libdir}/libasm-%{version}.so
 %{_libdir}/libdw-%{version}.so
@@ -134,11 +154,13 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_includedir}/elfutils/libebl.h
 %{_includedir}/elfutils/libdw.h
 %{_includedir}/elfutils/libdwfl.h
-#%{_libdir}/libasm.a
 %{_libdir}/libebl.a
-%{_libdir}/libdw.a
 #%{_libdir}/libasm.so
 %{_libdir}/libdw.so
+
+%files devel-static
+%{_libdir}/libdw.a
+#%{_libdir}/libasm.a
 
 %files libelf
 %defattr(-,root,root)
@@ -150,10 +172,16 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_includedir}/libelf.h
 %{_includedir}/gelf.h
 %{_includedir}/nlist.h
-%{_libdir}/libelf.a
 %{_libdir}/libelf.so
 
+%files libelf-devel-static
+%{_libdir}/libelf.a
+
 %changelog
+* Mon Dec 18 2006 Ulrich Drepper <drepper@redhat.com> 0.125-1
+- elflint: Compare DT_GNU_HASH tests.
+- move archives into -static RPMs
+
 * Tue Oct 10 2006 Ulrich Drepper <drepper@redhat.com> 0.124-1
 - libebl: sparc backend support for return value location
 - libebl, libdwfl: backend register name support extended with more info

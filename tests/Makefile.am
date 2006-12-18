@@ -34,6 +34,7 @@ AM_CFLAGS = -Wall -Werror -Wextra -std=gnu99 \
 	    $(if $($(*F)_no_Wformat),-Wno-format,-Wformat=2)
 BUILT_RPATH = \$$ORIGIN/../libasm:\$$ORIGIN/../libdw:\$$ORIGIN/../backends:\$$ORIGIN/../libelf
 endif
+CFLAGS := $(filter-out -Wall,$(CFLAGS))
 
 AM_LDFLAGS =
 

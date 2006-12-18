@@ -1,3 +1,11 @@
+Version 0.125:
+
+elflint: Compare DT_GNU_HASH tests.
+
+move archives into -static RPMs
+
+libelf, elflint: better support for core file handling
+
 Version 0.124:
 
 libebl: sparc backend support for return value location

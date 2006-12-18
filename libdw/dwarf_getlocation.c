@@ -471,13 +471,13 @@ dwarf_getlocation_addr (attr, address, llbufs, listlens, maxlocs)
 							     &attr_mem),
 					 &base) != 0)
 	    {
-	      if (INTUSE(dwarf_errno) () == 0)
-		/* The compiler provided no base address when it should
-		   have.  Buggy GCC does this when it used absolute
-		   addresses in the location list and no DW_AT_ranges.  */
-		base = 0;
-	      else
+	      if (INTUSE(dwarf_errno) () != 0)
 		return -1;
+
+	      /* The compiler provided no base address when it should
+		 have.  Buggy GCC does this when it used absolute
+		 addresses in the location list and no DW_AT_ranges.  */
+	      base = 0;
 	    }
 	}
 

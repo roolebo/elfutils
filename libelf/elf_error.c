@@ -270,11 +270,13 @@ static const char msgstr[] =
 #define ELF_E_INVALID_PHDR_IDX \
   (ELF_E_GROUP_NOT_REL_IDX \
    + sizeof "only relocatable files can contain section groups")
-  N_("program header not allowed in relocatable files")
+  N_("program header only allowed in executables, shared objects, and \
+core files")
   "\0"
 #define ELF_E_NO_PHDR_IDX \
   (ELF_E_INVALID_PHDR_IDX \
-   + sizeof "program header not allowed in relocatable files")
+   + sizeof "program header only allowed in executables, shared objects, and \
+core files")
   N_("file has no program header")
   "\0"
 #define ELF_E_INVALID_OFFSET_IDX \

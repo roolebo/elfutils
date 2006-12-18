@@ -79,7 +79,8 @@ static struct
     { ELF_E_GROUP_NOT_REL,
       "only relocatable files can contain section groups" },
     { ELF_E_INVALID_PHDR,
-      "program header not allowed in relocatable files" },
+      "program header only allowed in executables, shared objects, \
+and core files" },
     { ELF_E_NO_PHDR, "file has no program header" },
     { ELF_E_INVALID_OFFSET, "invalid offset" }
   };

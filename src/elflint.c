@@ -3830,7 +3830,7 @@ program header offset in ELF header and PHDR entry do not match"));
 	}
 
       if (phdr->p_filesz > phdr->p_memsz
-	  && (phdr->p_memsz != 0 || phdr->p_type == PT_LOAD))
+	  && (phdr->p_memsz != 0 || phdr->p_type != PT_NOTE))
 	ERROR (gettext ("\
 program header entry %d: file size greater than memory size\n"),
 	       cnt);

@@ -181,6 +181,7 @@ rm -rf ${RPM_BUILD_ROOT}
 * Mon Dec 18 2006 Ulrich Drepper <drepper@redhat.com> 0.125-1
 - elflint: Compare DT_GNU_HASH tests.
 - move archives into -static RPMs
+- libelf, elflint: better support for core file handling
 
 * Tue Oct 10 2006 Ulrich Drepper <drepper@redhat.com> 0.124-1
 - libebl: sparc backend support for return value location

@@ -1,3 +1,9 @@
+2006-12-29  Ulrich Drepper  <drepper@redhat.com>
+
+	* dwfl_module.c (compare_modules): Do not try to be smart and use
+	subtraction which can lead to wrong results.
+	Patch by Frank Eigler <fche@redhat.com>.
+
 2006-10-30  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_module.c (dwfl_report_module): Comment typo fix.

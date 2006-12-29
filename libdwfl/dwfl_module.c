@@ -172,10 +172,9 @@ compare_modules (const void *a, const void *b)
   if (m2 == NULL)
     return 1;
 
-  GElf_Sxword diff = m1->low_addr - m2->low_addr;
-  if (diff < 0)
+  if (m1->low_addr < m2->low_addr
     return -1;
-  if (diff > 0)
+  if (m1->low_addr > m2->low_addr)
     return 1;
   return 0;
 }

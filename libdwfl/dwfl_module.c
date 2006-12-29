@@ -172,7 +172,9 @@ compare_modules (const void *a, const void *b)
   if (m2 == NULL)
     return 1;
 
-  if (m1->low_addr < m2->low_addr
+  /* No signed difference calculation is correct here, since the
+     terms are unsigned and could be more than INT64_MAX apart.  */
+  if (m1->low_addr < m2->low_addr)
     return -1;
   if (m1->low_addr > m2->low_addr)
     return 1;

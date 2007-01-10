@@ -1,3 +1,9 @@
+2007-01-10  Roland McGrath  <roland@redhat.com>
+
+	* dwfl-bug-addr-overflow.c: New file.
+	* Makefile.am (TESTS): Add it.
+	(dwfl_bug_addr_overflow_LDADD): New variable.
+
 2006-12-17  Roland McGrath  <roland@redhat.com>
 
 	* msg_tst.c (libelf_msgs): Fix ELF_E_INVALID_PHDR msg.

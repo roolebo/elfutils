@@ -1,5 +1,5 @@
 /* Interfaces for libdwfl.
-   Copyright (C) 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -94,7 +94,9 @@ extern "C" {
 #endif
 
 /* Start a new session with the library.  */
-extern Dwfl *dwfl_begin (const Dwfl_Callbacks *callbacks);
+extern Dwfl *dwfl_begin (const Dwfl_Callbacks *callbacks)
+  __nonnull_attribute__ (1);
+
 
 /* End a session.  */
 extern void dwfl_end (Dwfl *);

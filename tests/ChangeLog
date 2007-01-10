@@ -1,3 +1,7 @@
+2007-01-10  Ulrich Drepper  <drepper@redhat.com>
+
+	* run-elflint-self.sh (runtest): Show which file has the problem.
+
 2007-01-10  Roland McGrath  <roland@redhat.com>
 
 	* dwfl-bug-addr-overflow.c: New file.

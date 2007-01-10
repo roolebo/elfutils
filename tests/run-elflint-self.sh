@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2005 Red Hat, Inc.
+# Copyright (C) 2005, 2007 Red Hat, Inc.
 # This file is part of Red Hat elfutils.
 # Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 #
@@ -30,7 +30,8 @@ runtest() {
 # Uncomment for debuging
 #  echo $1
   if [ -f $1 ]; then
-    testrun ../src/elflint --quiet --gnu-ld $1
+    testrun ../src/elflint --quiet --gnu-ld $1 ||
+    (echo "*** failure in $1"; exit 1)
   fi
 }
 

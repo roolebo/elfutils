@@ -1,3 +1,18 @@
+2007-01-10  Ulrich Drepper  <drepper@redhat.com>
+
+	* addr2line.c: Update copyright year.
+	* elfcmp.c: Likewise.
+	* elflint.c: Likewise.
+	* findtextrel.c: Likewise.
+	* ld.c: Likewise.
+	* nm.c: Likewise.
+	* objdump.c: Likewise.
+	* ranlib.c:  Likewise.
+	* readelf.c: Likewise.
+	* size.c: Likewise.
+	* strings.c: Likewise.
+	* strip.c: Likewise.
+
 2006-12-09  Ulrich Drepper  <drepper@redhat.com>
 
 	* elflint.c (compare_hash_gnu_hash): New function.  Report if the

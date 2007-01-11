@@ -6,6 +6,8 @@
 	(dwfl_linux_kernel_find_elf): Likewise.
 	(dwfl_linux_kernel_module_section_address): Likewise.
 	* find-debuginfo.c (try_open): Likewise.
+	* linux-proc-maps.c (find_sysinfo_ehdr): Likewise.
+	(dwfl_linux_proc_report): Likewise.
 
 	* libdwfl.h (dwfl_begin): Require nonnull argument.
 

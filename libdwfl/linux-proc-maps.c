@@ -1,5 +1,5 @@
 /* Standard libdwfl callbacks for debugging a live Linux process.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -72,9 +72,8 @@
 static int
 find_sysinfo_ehdr (pid_t pid, GElf_Addr *sysinfo_ehdr)
 {
-  char *fname = NULL;
-  asprintf (&fname, PROCAUXVFMT, pid);
-  if (fname == NULL)
+  char *fname;
+  if (asprintf (&fname, PROCAUXVFMT, pid) < 0)
     return ENOMEM;
 
   int fd = open64 (fname, O_RDONLY);
@@ -243,9 +242,8 @@ dwfl_linux_proc_report (Dwfl *dwfl, pid_t pid)
   if (result != 0)
     return result;
 
-  char *fname = NULL;
-  asprintf (&fname, PROCMAPSFMT, pid);
-  if (fname == NULL)
+  char *fname;
+  if (asprintf (&fname, PROCMAPSFMT, pid) < 0)
     return ENOMEM;
 
   FILE *f = fopen (fname, "r");
@@ -312,9 +310,8 @@ dwfl_linux_proc_find_elf (Dwfl_Module *mod __attribute__ ((unused)),
     {
       /* Special case for in-memory ELF image.  */
 
-      char *fname = NULL;
-      asprintf (&fname, PROCMEMFMT, pid);
-      if (fname == NULL)
+      char *fname;
+      if (asprintf (&fname, PROCMEMFMT, pid) < 0)
 	return -1;
 
       int fd = open64 (fname, O_RDONLY);

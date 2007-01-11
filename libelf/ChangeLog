@@ -1,7 +1,3 @@
-2007-01-30  Ulrich Drepper  <drepper@redhat.com>
-
-	* nlist.c: Close file descriptor before returning.
-
 2006-10-13  Roland McGrath  <roland@redhat.com>
 
 	* elf32_updatenull.c: Look for and accept phdr also for ET_CORE.

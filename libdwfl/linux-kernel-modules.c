@@ -1,5 +1,5 @@
 /* Standard libdwfl callbacks for debugging the running Linux kernel.
-   Copyright (C) 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -122,17 +122,17 @@ report_kernel (Dwfl *dwfl, const char *release,
   if (dwfl == NULL)
     return -1;
 
-  char *fname = NULL;
-  if (release[0] == '/')
-    asprintf (&fname, "%s/vmlinux", release);
-  else
-    asprintf (&fname, "/boot/vmlinux-%s", release);
+  char *fname;
+  if ((release[0] == '/'
+       ? asprintf (&fname, "%s/vmlinux", release)
+       : asprintf (&fname, "/boot/vmlinux-%s", release)) < 0)
+    return -1;
   int fd = try_kernel_name (dwfl, &fname);
   if (fd < 0 && release[0] != '/')
     {
       free (fname);
-      fname = NULL;
-      asprintf (&fname, MODULEDIRFMT "/vmlinux", release);
+      if (asprintf (&fname, MODULEDIRFMT "/vmlinux", release) < 0)
+	return -1;
       fd = try_kernel_name (dwfl, &fname);
     }
 
@@ -195,8 +195,7 @@ dwfl_linux_kernel_report_offline (Dwfl *dwfl, const char *release,
 	modulesdir[0] = (char *) release;
       else
 	{
-	  asprintf (&modulesdir[0], MODULEDIRFMT "/kernel", release);
-	  if (modulesdir[0] == NULL)
+	  if (asprintf (&modulesdir[0], MODULEDIRFMT "/kernel", release) < 0)
 	    return errno;
 	}
 
@@ -310,8 +309,7 @@ dwfl_linux_kernel_find_elf (Dwfl_Module *mod __attribute__ ((unused)),
   /* Do "find /lib/modules/`uname -r`/kernel -name MODULE_NAME.ko".  */
 
   char *modulesdir[] = { NULL, NULL };
-  asprintf (&modulesdir[0], MODULEDIRFMT "/kernel", release);
-  if (modulesdir[0] == NULL)
+  if (asprintf (&modulesdir[0], MODULEDIRFMT "/kernel", release) < 0)
     return -1;
 
   FTS *fts = fts_open (modulesdir, FTS_LOGICAL | FTS_NOSTAT, NULL);
@@ -417,9 +415,8 @@ dwfl_linux_kernel_module_section_address
  const GElf_Shdr *shdr __attribute__ ((unused)),
  Dwarf_Addr *addr)
 {
-  char *sysfile = NULL;
-  asprintf (&sysfile, SECADDRDIRFMT "%s", modname, secname);
-  if (sysfile == NULL)
+  char *sysfile;
+  if (asprintf (&sysfile, SECADDRDIRFMT "%s", modname, secname))
     return ENOMEM;
 
   FILE *f = fopen (sysfile, "r");
@@ -453,9 +450,8 @@ dwfl_linux_kernel_module_section_address
 	  const bool is_init = !strncmp (secname, ".init", 5);
 	  if (is_init)
 	    {
-	      sysfile = NULL;
-	      asprintf (&sysfile, SECADDRDIRFMT "_%s", modname, &secname[1]);
-	      if (sysfile == NULL)
+	      if (asprintf (&sysfile, SECADDRDIRFMT "_%s",
+			    modname, &secname[1]) < 0)
 		return ENOMEM;
 	      f = fopen (sysfile, "r");
 	      free (sysfile);
@@ -469,10 +465,9 @@ dwfl_linux_kernel_module_section_address
 	  size_t namelen = strlen (secname);
 	  if (namelen >= MODULE_SECT_NAME_LEN)
 	    {
-	      sysfile = NULL;
 	      int len = asprintf (&sysfile, SECADDRDIRFMT "%s",
 				  modname, secname);
-	      if (sysfile == NULL)
+	      if (len < 0)
 		return ENOMEM;
 	      char *end = sysfile + len;
 	      do

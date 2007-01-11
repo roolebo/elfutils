@@ -1,5 +1,12 @@
 2007-01-10  Roland McGrath  <roland@redhat.com>
 
+	* linux-kernel-modules.c (report_kernel): Check asprintf return value
+	directly instead of via side effect, to silence warn_unused_result.
+	(dwfl_linux_kernel_report_offline): Likewise.
+	(dwfl_linux_kernel_find_elf): Likewise.
+	(dwfl_linux_kernel_module_section_address): Likewise.
+	* find-debuginfo.c (try_open): Likewise.
+
 	* libdwfl.h (dwfl_begin): Require nonnull argument.
 
 2006-12-27  Roland McGrath  <roland@redhat.com>

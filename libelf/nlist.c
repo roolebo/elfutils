@@ -230,6 +230,9 @@ nlist (const char *filename, struct nlist *nl)
   /* We do not need the ELF descriptor anymore.  */
   (void) INTUSE(elf_end) (elf);
 
+  /* Neither the file descriptor.  */
+  (void) close (fd);
+
   return 0;
 
  fail_dealloc:
@@ -238,6 +241,9 @@ nlist (const char *filename, struct nlist *nl)
  fail_close:
   /* We do not need the ELF descriptor anymore.  */
   (void) INTUSE(elf_end) (elf);
+
+  /* Neither the file descriptor.  */
+  (void) close (fd);
 
  fail:
   /* We have to set all entries to zero.  */

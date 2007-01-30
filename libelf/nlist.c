@@ -108,7 +108,7 @@ nlist (const char *filename, struct nlist *nl)
   /* Now get an ELF descriptor.  */
   elf = INTUSE(elf_begin) (fd, ELF_C_READ_MMAP, NULL);
   if (elf == NULL)
-    goto fail;
+    goto fail_fd;
 
   /* Find a symbol table.  We prefer the real symbol table but if it
      does not exist use the dynamic symbol table.  */
@@ -242,6 +242,7 @@ nlist (const char *filename, struct nlist *nl)
   /* We do not need the ELF descriptor anymore.  */
   (void) INTUSE(elf_end) (elf);
 
+ fail_fd:
   /* Neither the file descriptor.  */
   (void) close (fd);
 

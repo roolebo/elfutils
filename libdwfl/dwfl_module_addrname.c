@@ -1,5 +1,5 @@
 /* Find debugging and symbol information for a module in libdwfl.
-   Copyright (C) 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -56,15 +56,70 @@ dwfl_module_addrname (Dwfl_Module *mod, GElf_Addr addr)
   if (syments < 0)
     return NULL;
 
+  /* Return true iff we consider ADDR to lie in the same section as SYM.  */
+  GElf_Word addr_shndx = SHN_UNDEF;
+  inline bool same_section (const GElf_Sym *sym, GElf_Word shndx)
+    {
+      /* For absolute symbols and the like, only match exactly.  */
+      if (shndx >= SHN_LORESERVE)
+	return sym->st_value == addr;
+
+      /* Ignore section and other special symbols.  */
+      switch (GELF_ST_TYPE (sym->st_info))
+	{
+	case STT_SECTION:
+	case STT_FILE:
+	case STT_TLS:
+	  return false;
+	}
+
+      /* Figure out what section ADDR lies in.  */
+      if (addr_shndx == SHN_UNDEF)
+	{
+	  GElf_Addr mod_addr = addr - mod->symfile->bias;
+	  Elf_Scn *scn = NULL;
+	  addr_shndx = SHN_ABS;
+	  while ((scn = elf_nextscn (mod->symfile->elf, scn)) != NULL)
+	    {
+	      GElf_Shdr shdr_mem;
+	      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+	      if (likely (shdr != NULL)
+		  && mod_addr >= shdr->sh_addr
+		  && mod_addr < shdr->sh_addr + shdr->sh_size)
+		{
+		  addr_shndx = elf_ndxscn (scn);
+		  break;
+		}
+	    }
+	}
+
+      return shndx == addr_shndx;
+    }
+
   /* Look through the symbol table for a matching symbol.  */
+  const char *closest = NULL;
+  GElf_Addr closest_value = 0;
   for (int i = 1; i < syments; ++i)
     {
       GElf_Sym sym;
-      const char *name = INTUSE(dwfl_module_getsym) (mod, i, &sym, NULL);
-      if (name != NULL
-	  && sym.st_value <= addr && addr < sym.st_value + sym.st_size)
-	return name;
+      GElf_Word shndx;
+      const char *name = INTUSE(dwfl_module_getsym) (mod, i, &sym, &shndx);
+      if (name != NULL && sym.st_value <= addr)
+	{
+	  if (addr < sym.st_value + sym.st_size)
+	    return name;
+
+	  /* Handwritten assembly symbols sometimes have no st_size.
+	     If no symbol with proper size includes the address, we'll
+	     use the closest one that is in the same section as ADDR.   */
+	  if (sym.st_size == 0 && sym.st_value >= closest_value
+	      && same_section (&sym, shndx))
+	    {
+	      closest_value = sym.st_value;
+	      closest = name;
+	    }
+	}
     }
 
-  return NULL;
+  return closest;
 }

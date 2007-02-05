@@ -76,7 +76,8 @@ typedef struct
 			 char **debuginfo_file_name);
 
   /* Fill *ADDR with the loaded address of the section called SECNAME in
-     the given module.  This is called exactly once for each SHF_ALLOC
+     the given module.  Use (Dwarf_Addr) -1 if this section is omitted from
+     accessible memory.  This is called exactly once for each SHF_ALLOC
      section that relocations affecting DWARF data refer to, so it can
      easily be used to collect state about the sections referenced.  */
   int (*section_address) (Dwfl_Module *mod, void **userdata,

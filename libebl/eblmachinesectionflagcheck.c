@@ -1,5 +1,5 @@
-/* Find module containing address.
-   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
+/* Check SHF_MASKPROC flags.
+   Copyright (C) 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -47,37 +47,17 @@
    Network licensing program, please visit www.openinventionnetwork.com
    <http://www.openinventionnetwork.com>.  */
 
-#include "libdwflP.h"
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
 
-Dwfl_Module *
-dwfl_addrmodule (Dwfl *dwfl, Dwarf_Addr address)
+#include <libeblP.h>
+
+
+bool
+ebl_machine_section_flag_check (ebl, flags)
+     Ebl *ebl;
+     GElf_Xword flags;
 {
-  if (dwfl == NULL || dwfl->modules == NULL)
-    return NULL;
-
-  Dwfl_Module *boundary = NULL;
-
-  /* Do binary search on the array indexed by module load address.  */
-  size_t l = 0, u = dwfl->nmodules;
-  while (l < u)
-    {
-      size_t idx = (l + u) / 2;
-      Dwfl_Module *m = dwfl->modules[idx];
-      if (address < m->low_addr)
-	u = idx;
-      else if (address >= m->high_addr)
-	{
-	  l = idx + 1;
-	  if (address == m->high_addr)
-	    /* If the high bound of this module is not the low bound of
- 	       another, then consider the boundary address to be inside
-	       this module.  */
-	    boundary = m;
-	}
-      else
-	return m;
-    }
-
-  return boundary;
+  return ebl != NULL ? ebl->machine_section_flag_check (flags) : (flags == 0);
 }
-INTDEF (dwfl_addrmodule)

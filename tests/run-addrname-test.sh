@@ -1,7 +1,6 @@
 #! /bin/sh
-# Copyright (C) 2005, 2007 Red Hat, Inc.
+# Copyright (C) 2007 Red Hat, Inc.
 # This file is part of Red Hat elfutils.
-# Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 #
 # Red Hat elfutils is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by the
@@ -26,16 +25,23 @@
 
 . $srcdir/test-subr.sh
 
-testfiles testfile18
+testfiles testfile34
 
-testrun_compare ../src/elflint --gnu-ld testfile18 <<\EOF
-section [ 8] '.rela.dyn': relocation 1: copy relocation against symbol of type FUNC
+testrun_compare ../src/addr2line -f -e testfile34 \
+				 0x08048074 0x08048075 0x08048076 \
+				 0x08049078 0x08048080 0x08049080 <<\EOF
+foo
+??:0
+bar
+??:0
+_etext
+??:0
+data1
+??:0
+??
+??:0
+_end
+??:0
 EOF
-
-testfiles testfile32
-testrun ../src/elflint -q testfile32
-
-testfiles testfile33
-testrun ../src/elflint -q testfile33
 
 exit 0

@@ -1,5 +1,5 @@
 /* Retrieve uninterpreted chunk of the file contents.
-   Copyright (C) 2002, 2005 Red Hat, Inc.
+   Copyright (C) 2002, 2005, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -101,6 +101,7 @@ gelf_rawchunk (elf, offset, size)
 	/* Something went wrong.  */
 	__libelf_seterrno (ELF_E_READ_ERROR);
 	free (result);
+	result = NULL;
       }
 
   return result;

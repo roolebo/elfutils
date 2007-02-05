@@ -1,5 +1,5 @@
 /* Return implementation's version string suitable for printing.
-   Copyright (C) 2006 Red Hat, Inc.
+   Copyright (C) 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -53,5 +53,5 @@ const char *
 dwfl_version (dwfl)
      Dwfl *dwfl __attribute__ ((unused));
 {
-  return PACKAGE_STRING;
+  return PACKAGE_VERSION;
 }

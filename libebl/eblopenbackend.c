@@ -1,5 +1,5 @@
 /* Generate ELF backend handle.
-   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -171,6 +171,7 @@ static const char *default_section_name (int ignore, int ignore2, char *buf,
 					 size_t len);
 static const char *default_machine_flag_name (Elf64_Word *ignore);
 static bool default_machine_flag_check (Elf64_Word flags);
+static bool default_machine_section_flag_check (GElf_Xword flags);
 static const char *default_symbol_type_name (int ignore, char *buf,
 					     size_t len);
 static const char *default_symbol_binding_name (int ignore, char *buf,
@@ -221,6 +222,7 @@ fill_defaults (Ebl *result)
   result->section_name = default_section_name;
   result->machine_flag_name = default_machine_flag_name;
   result->machine_flag_check = default_machine_flag_check;
+  result->machine_section_flag_check = default_machine_section_flag_check;
   result->symbol_type_name = default_symbol_type_name;
   result->symbol_binding_name = default_symbol_binding_name;
   result->dynamic_tag_name = default_dynamic_tag_name;
@@ -498,6 +500,12 @@ default_machine_flag_name (Elf64_Word *ignore __attribute__ ((unused)))
 
 static bool
 default_machine_flag_check (Elf64_Word flags __attribute__ ((unused)))
+{
+  return flags == 0;
+}
+
+static bool
+default_machine_section_flag_check (GElf_Xword flags)
 {
   return flags == 0;
 }

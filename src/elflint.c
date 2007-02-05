@@ -3338,12 +3338,25 @@ section [%2zu] '%s': size not multiple of entry size\n"),
 #define ALL_SH_FLAGS (SHF_WRITE | SHF_ALLOC | SHF_EXECINSTR | SHF_MERGE \
 		      | SHF_STRINGS | SHF_INFO_LINK | SHF_LINK_ORDER \
 		      | SHF_OS_NONCONFORMING | SHF_GROUP | SHF_TLS)
-      if (shdr->sh_flags & ~ALL_SH_FLAGS)
-	ERROR (gettext ("section [%2zu] '%s' contains unknown flag(s)"
-			" %#" PRIx64 "\n"),
-	       cnt, section_name (ebl, cnt),
-	       (uint64_t) shdr->sh_flags & ~(uint64_t) ALL_SH_FLAGS);
-      else if (shdr->sh_flags & SHF_TLS)
+      if (shdr->sh_flags & ~(GElf_Xword) ALL_SH_FLAGS)
+	{
+	  GElf_Xword sh_flags = shdr->sh_flags & ~(GElf_Xword) ALL_SH_FLAGS;
+	  if (sh_flags & SHF_MASKPROC)
+	    {
+	      if (!ebl_machine_section_flag_check (ebl,
+						   sh_flags & SHF_MASKPROC))
+		ERROR (gettext ("section [%2zu] '%s'"
+				" contains invalid processor-specific flag(s)"
+				" %#" PRIx64 "\n"),
+		       cnt, section_name (ebl, cnt), sh_flags & SHF_MASKPROC);
+	      sh_flags &= ~(GElf_Xword) SHF_MASKPROC;
+	    }
+	  if (sh_flags != 0)
+	    ERROR (gettext ("section [%2zu] '%s' contains unknown flag(s)"
+			    " %#" PRIx64 "\n"),
+		   cnt, section_name (ebl, cnt), sh_flags);
+	}
+      if (shdr->sh_flags & SHF_TLS)
 	{
 	  // XXX Correct?
 	  if (shdr->sh_addr != 0 && !gnuld)

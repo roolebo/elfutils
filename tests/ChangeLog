@@ -1,3 +1,26 @@
+2007-02-02  Roland McGrath  <roland@redhat.com>
+
+	* run-addrname-test.sh: New file.
+	* Makefile.am (TESTS, EXTRA_DIST): Add it.
+	* testfile34.bz2: New data file.
+	* Makefile.am (EXTRA_DIST): Add it.
+
+2007-01-20  Roland McGrath  <roland@redhat.com>
+
+	* testfile33.bz2: New data file.
+	* Makefile.am (EXTRA_DIST): Add it.
+	* run-elflint-test.sh: Test on it too.
+
+2007-01-18  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (CFLAGS): Don't molest it.
+
+2007-01-11  Roland McGrath  <roland@redhat.com>
+
+	* testfile32.bz2: New data file.
+	* Makefile.am (EXTRA_DIST): Add it.
+	* run-elflint-test.sh: Test on it too.
+
 2007-02-04  Ulrich Drepper  <drepper@redhat.com>
 
 	* arls.c: New file.

@@ -1,5 +1,5 @@
 /* Standard argp argument parsers for tools using libdwfl.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -137,6 +137,10 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	    if (dwfl == NULL)
 	      return fail (dwfl, -1, arg);
 	    state->hook = dwfl;
+
+	    /* Start at zero so if there is just one -e foo.so,
+	       the DSO is shown without address bias.  */
+	    dwfl->offline_next_address = 0;
 	  }
 	if (dwfl->callbacks == &offline_callbacks)
 	  {

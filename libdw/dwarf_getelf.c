@@ -1,5 +1,5 @@
 /* Retrieve ELF descriptor used for DWARF access.
-   Copyright (C) 2002, 2004 Red Hat, Inc.
+   Copyright (C) 2002, 2004, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -58,7 +58,7 @@
 
 
 Elf *
-dwarf_get_elf (dwarf)
+dwarf_getelf (dwarf)
      Dwarf *dwarf;
 {
   if (dwarf == NULL)

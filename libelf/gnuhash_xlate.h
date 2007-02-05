@@ -1,5 +1,5 @@
 /* Conversion functions for versioning information.
-   Copyright (C) 2006 Red Hat, Inc.
+   Copyright (C) 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2006.
 
@@ -87,7 +87,7 @@ elf_cvt_gnuhash (void *dest, const void *src, size_t len, int encode)
   /* The rest are 32 bit words again.  */
   src32 = (const Elf32_Word *) &src64[bitmask_words];
   dest32 = (Elf32_Word *) &dest64[bitmask_words];
-  while (len > 4)
+  while (len >= 4)
     {
       *dest32++ = bswap_32 (*src32++);
       len -= 4;

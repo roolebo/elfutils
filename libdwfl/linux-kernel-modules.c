@@ -431,14 +431,14 @@ dwfl_linux_kernel_module_section_address
 	     CONFIG_MODULE_UNLOAD, the .exit.* sections are not
 	     actually loaded at all.
 
-	     Just relocate these bogusly to zero.  This part of the
-	     debug information will not be of any use.  */
+	     Setting *ADDR to -1 tells the caller this section is
+	     actually absent from memory.  */
 
 	  if (!strcmp (secname, ".modinfo")
 	      || !strcmp (secname, ".data.percpu")
 	      || !strncmp (secname, ".exit", 5))
 	    {
-	      *addr = 0;
+	      *addr = (Dwarf_Addr) -1l;
 	      return DWARF_CB_OK;
 	    }
 

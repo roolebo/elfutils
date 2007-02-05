@@ -34,7 +34,6 @@ AM_CFLAGS = -Wall -Werror -Wextra -std=gnu99 \
 	    $(if $($(*F)_no_Wformat),-Wno-format,-Wformat=2)
 BUILT_RPATH = \$$ORIGIN/../libasm:\$$ORIGIN/../libdw:\$$ORIGIN/../backends:\$$ORIGIN/../libelf
 endif
-CFLAGS := $(filter-out -Wall,$(CFLAGS))
 
 AM_LDFLAGS =
 
@@ -77,7 +76,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-addrscopes.sh run-strings-test.sh run-funcscopes.sh \
 	run-find-prologues.sh run-allregs.sh run-readelf-test1.sh \
 	run-native-test.sh run-bug1-test.sh \
-	dwfl-bug-addr-overflow
+	dwfl-bug-addr-overflow run-addrname-test.sh
 # run-show-ciefde.sh
 
 if !STANDALONE
@@ -106,6 +105,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-ranlib-test3.sh run-ranlib-test4.sh \
 	     run-addrscopes.sh run-strings-test.sh run-funcscopes.sh \
 	     run-find-prologues.sh run-allregs.sh run-native-test.sh \
+	     run-addrname-test.sh \
 	     testfile15.bz2 testfile15.debug.bz2 \
 	     testfile16.bz2 testfile16.debug.bz2 \
 	     testfile17.bz2 testfile17.debug.bz2 \
@@ -117,7 +117,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     coverage.sh test-subr.sh test-wrapper.sh run-readelf-test1.sh \
 	     run-bug1-test.sh testfile28.bz2 testfile28.rdwr.bz2 \
 	     testfile29.bz2 testfile29.rdwr.bz2 \
-	     testfile30.bz2 testfile31.bz2
+	     testfile30.bz2 testfile31.bz2 testfile32.bz2 testfile33.bz2 \
+	     testfile34.bz2
 
 installed_TESTS_ENVIRONMENT = libdir=$(DESTDIR)$(libdir) \
 			      bindir=$(DESTDIR)$(bindir) \

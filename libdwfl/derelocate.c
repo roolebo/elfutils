@@ -1,5 +1,5 @@
 /* Recover relocatibility for addresses computed from debug information.
-   Copyright (C) 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -99,7 +99,18 @@ cache_sections (Dwfl_Module *mod)
       if (shdr == NULL)
 	return -1;
 
-      if ((shdr->sh_flags & SHF_ALLOC) && shdr->sh_addr != 0)
+      if ((shdr->sh_flags & SHF_ALLOC) && shdr->sh_addr == 0)
+	{
+	  /* This section might not yet have been looked at.  */
+	  if (__libdwfl_relocate_value (mod, symshstrndx, elf_ndxscn (scn),
+					&shdr->sh_addr) != DWFL_E_NOERROR)
+	    continue;
+	  shdr = gelf_getshdr (scn, &shdr_mem);
+	  if (shdr == NULL)
+	    return -1;
+	}
+
+      if (shdr->sh_flags & SHF_ALLOC)
 	{
 	  const char *name = elf_strptr (mod->symfile->elf, symshstrndx,
 					 shdr->sh_name);

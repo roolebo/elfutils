@@ -1,5 +1,5 @@
 /* Interface for libebl.
-   Copyright (C) 2000, 2001, 2002, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2004, 2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -137,6 +137,9 @@ extern const char *ebl_machine_flag_name (Ebl *ebl, GElf_Word flags,
 
 /* Check whether machine flag is valid.  */
 extern bool ebl_machine_flag_check (Ebl *ebl, GElf_Word flags);
+
+/* Check whether SHF_MASKPROC flags are valid.  */
+extern bool ebl_machine_section_flag_check (Ebl *ebl, GElf_Xword flags);
 
 /* Return symbol type name.  */
 extern const char *ebl_symbol_type_name (Ebl *ebl, int symbol,

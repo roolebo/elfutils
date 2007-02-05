@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
+## Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -49,7 +49,8 @@ gen_SOURCES = eblopenbackend.c eblclosebackend.c eblstrtab.c \
 	      eblsymboltypename.c ebldynamictagname.c eblsectionname.c \
 	      eblobjecttypename.c eblsymbolbindingname.c \
 	      eblbackendname.c eblshflagscombine.c eblwstrtab.c \
-	      eblgstrtab.c eblosabiname.c eblmachineflagcheck.c \
+	      eblgstrtab.c eblosabiname.c \
+	      eblmachineflagcheck.c eblmachinesectionflagcheck.c \
 	      eblreloctypecheck.c eblrelocvaliduse.c eblrelocsimpletype.c \
 	      ebldynamictagcheck.c eblcorenotetypename.c eblobjnotetypename.c \
 	      eblcorenote.c eblobjnote.c ebldebugscnp.c \

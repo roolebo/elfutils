@@ -1,5 +1,5 @@
 /* Backend hook signatures internal interface for libebl.
-   Copyright (C) 2000, 2001, 2002, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2004, 2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -79,6 +79,9 @@ const char *EBLHOOK(machine_flag_name) (GElf_Word *);
 
 /* Check whether machine flags are valid.  */
 bool EBLHOOK(machine_flag_check) (GElf_Word);
+
+/* Check whether SHF_MASKPROC flag bits are valid.  */
+bool EBLHOOK(machine_section_flag_check) (GElf_Xword);
 
 /* Return symbolic representation of symbol type.  */
 const char *EBLHOOK(symbol_type_name) (int, char *, size_t);

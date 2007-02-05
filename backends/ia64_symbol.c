@@ -1,5 +1,5 @@
 /* IA-64 specific symbolic name handling.
-   Copyright (C) 2002, 2003, 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2002, 2003, 2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -86,6 +86,13 @@ ia64_machine_flag_check (GElf_Word flags)
   return ((flags &~ EF_IA_64_ABI64) == 0);
 }
 
+/* Check whether SHF_MASKPROC flags are valid.  */
+bool
+ia64_machine_section_flag_check (GElf_Xword sh_flags)
+{
+  return (sh_flags &~ (SHF_IA_64_SHORT | SHF_IA_64_NORECOV)) == 0;
+}
+
 /* Return symbolic representation of section type.  */
 const char *
 ia64_section_type_name (int type,
@@ -97,7 +104,7 @@ ia64_section_type_name (int type,
     case SHT_IA_64_EXT:
       return "SHT_IA_64_EXT";
     case SHT_IA_64_UNWIND:
-      return "HT_IA_64_UNWIND";
+      return "SHT_IA_64_UNWIND";
     }
 
   return NULL;

@@ -8,6 +8,19 @@
 
 	* nlist.c: Close file descriptor before returning.
 
+2007-01-20  Roland McGrath  <roland@redhat.com>
+
+	* gnuhash_xlate.h (elf_cvt_gnuhash): Fix fence-post error so we
+	convert the final word.
+
+	* elf32_getshdr.c: Don't byteswap shdr fields when EI_DATA matches
+	MY_ELFDATA on !ALLOW_UNALIGNED machines.
+
+2007-01-18  Roland McGrath  <roland@redhat.com>
+
+	* gelf_rawchunk.c (gelf_rawchunk): Clear RESULT pointer after freeing
+	it on read error.
+
 2006-10-13  Roland McGrath  <roland@redhat.com>
 
 	* elf32_updatenull.c: Look for and accept phdr also for ET_CORE.

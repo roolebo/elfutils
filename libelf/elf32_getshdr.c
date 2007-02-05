@@ -1,5 +1,5 @@
 /* Return section header.
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2005 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2005, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -105,7 +105,7 @@ elfw2(LIBELFBITS,getshdr) (scn)
 	goto out;
       size_t size = shnum * sizeof (ElfW2(LIBELFBITS,Shdr));
 
-      /* Allocate memory for the program headers.  We know the number
+      /* Allocate memory for the section headers.  We know the number
 	 of entries from the ELF header.  */
       ElfW2(LIBELFBITS,Shdr) *shdr = elf->state.ELFW(elf,LIBELFBITS).shdr =
 	(ElfW2(LIBELFBITS,Shdr) *) malloc (size);
@@ -122,41 +122,50 @@ elfw2(LIBELFBITS,getshdr) (scn)
 
 	  /* All the data is already mapped.  If we could use it
 	     directly this would already have happened.  */
+	  void *file_shdr = ((char *) elf->map_address
+			     + elf->start_offset + ehdr->e_shoff);
+
 	  assert (ehdr->e_ident[EI_DATA] != MY_ELFDATA
 		  || (! ALLOW_UNALIGNED
-		      && (((uintptr_t) elf->map_address + elf->start_offset
-			   + ehdr->e_shoff)
+		      && ((uintptr_t) file_shdr
 			  & (__alignof__ (ElfW2(LIBELFBITS,Shdr)) - 1)) != 0));
 
-	  /* Now copy the data and at the same time convert the byte
-	     order.  */
-	  if (ALLOW_UNALIGNED
-	      || (((uintptr_t) elf->map_address + elf->start_offset
-		   + ehdr->e_shoff)
-		  & (__alignof__ (ElfW2(LIBELFBITS,Shdr)) - 1)) == 0)
-	    notcvt = (ElfW2(LIBELFBITS,Shdr) *)
-	      ((char *) elf->map_address
-	       + elf->start_offset + ehdr->e_shoff);
+	  /* Now copy the data and at the same time convert the byte order.  */
+	  if (ehdr->e_ident[EI_DATA] == MY_ELFDATA)
+	    {
+	      assert (! ALLOW_UNALIGNED);
+	      memcpy (shdr, file_shdr, size);
+	    }
 	  else
 	    {
-	      notcvt = (ElfW2(LIBELFBITS,Shdr) *) alloca (size);
-	      memcpy (notcvt, ((char *) elf->map_address
-			       + elf->start_offset + ehdr->e_shoff),
-		      size);
-	    }
+	      if (ALLOW_UNALIGNED
+		  || ((uintptr_t) file_shdr
+		      & (__alignof__ (ElfW2(LIBELFBITS,Shdr)) - 1)) == 0)
+		notcvt = (ElfW2(LIBELFBITS,Shdr) *)
+		  ((char *) elf->map_address
+		   + elf->start_offset + ehdr->e_shoff);
+	      else
+		{
+		  notcvt = (ElfW2(LIBELFBITS,Shdr) *) alloca (size);
+		  memcpy (notcvt, ((char *) elf->map_address
+				   + elf->start_offset + ehdr->e_shoff),
+			  size);
+		}
 
-	  for (size_t cnt = 0; cnt < shnum; ++cnt)
-	    {
-	      CONVERT_TO (shdr[cnt].sh_name, notcvt[cnt].sh_name);
-	      CONVERT_TO (shdr[cnt].sh_type, notcvt[cnt].sh_type);
-	      CONVERT_TO (shdr[cnt].sh_flags, notcvt[cnt].sh_flags);
-	      CONVERT_TO (shdr[cnt].sh_addr, notcvt[cnt].sh_addr);
-	      CONVERT_TO (shdr[cnt].sh_offset, notcvt[cnt].sh_offset);
-	      CONVERT_TO (shdr[cnt].sh_size, notcvt[cnt].sh_size);
-	      CONVERT_TO (shdr[cnt].sh_link, notcvt[cnt].sh_link);
-	      CONVERT_TO (shdr[cnt].sh_info, notcvt[cnt].sh_info);
-	      CONVERT_TO (shdr[cnt].sh_addralign, notcvt[cnt].sh_addralign);
-	      CONVERT_TO (shdr[cnt].sh_entsize, notcvt[cnt].sh_entsize);
+	      for (size_t cnt = 0; cnt < shnum; ++cnt)
+		{
+		  CONVERT_TO (shdr[cnt].sh_name, notcvt[cnt].sh_name);
+		  CONVERT_TO (shdr[cnt].sh_type, notcvt[cnt].sh_type);
+		  CONVERT_TO (shdr[cnt].sh_flags, notcvt[cnt].sh_flags);
+		  CONVERT_TO (shdr[cnt].sh_addr, notcvt[cnt].sh_addr);
+		  CONVERT_TO (shdr[cnt].sh_offset, notcvt[cnt].sh_offset);
+		  CONVERT_TO (shdr[cnt].sh_size, notcvt[cnt].sh_size);
+		  CONVERT_TO (shdr[cnt].sh_link, notcvt[cnt].sh_link);
+		  CONVERT_TO (shdr[cnt].sh_info, notcvt[cnt].sh_info);
+		  CONVERT_TO (shdr[cnt].sh_addralign,
+			      notcvt[cnt].sh_addralign);
+		  CONVERT_TO (shdr[cnt].sh_entsize, notcvt[cnt].sh_entsize);
+		}
 	    }
 	}
       else if (likely (elf->fildes != -1))

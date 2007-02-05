@@ -1,3 +1,10 @@
+2007-02-03  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_getelf.c (dwarf_getelf): Renamed from dwarf_get_elf.
+	* libdw.map (ELFUTILS_0.126): New version set, inherits from
+	ELFUTILS_0.122.  Move dwarf_getelf there; it was never truly
+	exported in the past.
+
 2006-12-17  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_getlocation.c (dwarf_getlocation_addr): Use zero as base

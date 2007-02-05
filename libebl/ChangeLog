@@ -1,3 +1,12 @@
+2007-01-11  Roland McGrath  <roland@redhat.com>
+
+	* ebl-hooks.h (machine_section_flag_check): New hook.
+	* libebl.h: Declare ebl_machine_section_flag_check.
+	* eblmachinesectionflagcheck.c: New file.
+	* Makefile.am (gen_SOURCES): Add it.
+	* eblopenbackend.c (default_machine_section_flag_check): New function.
+	(fill_defaults): Use it.
+
 2006-09-04  Roland McGrath  <roland@redhat.com>
 
 	* ebl-hooks.h: Replace register_name hook with register_info.

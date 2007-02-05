@@ -1,3 +1,10 @@
+2007-01-11  Roland McGrath  <roland@redhat.com>
+
+	* ia64_symbol.c (ia64_machine_section_flag_check): New function.
+	* ia64_init.c (ia64_init): Use it.
+
+	* ia64_symbol.c (ia64_section_type_name): Typo fix in string.
+
 2006-10-09  Roland McGrath  <roland@redhat.com>
 
 	* ia64_symbol.c (ia64_reloc_simple_type): Treat SECREL types as simple.

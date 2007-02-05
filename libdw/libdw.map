@@ -44,7 +44,6 @@ ELFUTILS_0.122 {
     dwarf_getaranges;
     dwarf_getattrcnt;
     dwarf_getattrs;
-    dwarf_getelf;
     dwarf_getfuncs;
     dwarf_getlocation;
     dwarf_getlocation_addr;
@@ -146,3 +145,10 @@ ELFUTILS_0.122 {
   local:
     *;
 } ELFUTILS_0;
+ELFUTILS_0.126 {
+  global:
+    dwarf_getelf;
+
+  local:
+    *;
+} ELFUTILS_0.122;

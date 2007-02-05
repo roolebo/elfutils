@@ -1,5 +1,5 @@
 /* Recover relocatibility for addresses computed from debug information.
-   Copyright (C) 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -52,8 +52,9 @@
 
 /* Since dwfl_report_elf lays out the sections already, this will only be
    called when the section headers of the debuginfo file are being
-   consulted instead.  With binutils strip-to-debug, the symbol table
-   is in the debuginfo file and relocation looks there.  */
+   consulted instead, or for a section located at zeron.  With binutils
+   strip-to-debug, the symbol table is in the debuginfo file and relocation
+   looks there.  */
 int
 dwfl_offline_section_address (Dwfl_Module *mod,
 			      void **userdata __attribute__ ((unused)),
@@ -64,8 +65,6 @@ dwfl_offline_section_address (Dwfl_Module *mod,
 			      const GElf_Shdr *shdr __attribute__ ((unused)),
 			      Dwarf_Addr *addr)
 {
-  assert (mod->symfile != &mod->main);
-
   GElf_Shdr shdr_mem;
   GElf_Shdr *main_shdr = gelf_getshdr (elf_getscn (mod->main.elf, shndx),
 				       &shdr_mem);
@@ -74,8 +73,10 @@ dwfl_offline_section_address (Dwfl_Module *mod,
 
   assert (shdr->sh_addr == 0);
   assert (shdr->sh_flags & SHF_ALLOC);
-  assert (main_shdr->sh_addr != 0);
   assert (main_shdr->sh_flags == shdr->sh_flags);
+
+  if (main_shdr->sh_addr != 0)
+    assert (mod->symfile != &mod->main);
 
   *addr = main_shdr->sh_addr;
   return 0;

@@ -1,5 +1,5 @@
 /* Relocate debug information.
-   Copyright (C) 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -78,11 +78,14 @@ __libdwfl_relocate_value (Dwfl_Module *mod, size_t symshstrndx,
 						    &refshdr->sh_addr))
 	return CBFAIL;
 
-      if (refshdr->sh_addr == 0)
-	/* The callback resolved this to zero, indicating it wasn't
-	   really loaded but we don't really care.  Mark it so we
-	   don't check it again for the next relocation.  */
-	refshdr->sh_flags &= ~SHF_ALLOC;
+      if (refshdr->sh_addr == (Dwarf_Addr) -1l)
+	{
+	  /* The callback indicated this section wasn't really loaded but we
+	     don't really care.  Mark it so we don't check it again for the
+	     next relocation.  */
+	  refshdr->sh_flags &= ~SHF_ALLOC;
+	  refshdr->sh_addr = 0;	/* Make no adjustment below.  */
+	}
 
       /* Update the in-core file's section header to show the final
 	 load address (or unloadedness).  This serves as a cache,

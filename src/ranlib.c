@@ -197,8 +197,7 @@ handle_file (const char *fname)
       return 1;
     }
 
-  struct arlib_symtab symtab;
-  arlib_init (&symtab);
+  arlib_init ();
 
   /* Iterate over the content of the archive.  */
   off_t index_off = -1;
@@ -219,7 +218,7 @@ handle_file (const char *fname)
 	}
       else
 	{
-	  arlib_add_symbols (elf, fname, arhdr->ar_name, &symtab, cur_off);
+	  arlib_add_symbols (elf, fname, arhdr->ar_name, cur_off);
 	  cur_off += (((arhdr->ar_size + 1) & ~((off_t) 1))
 		      + sizeof (struct ar_hdr));
 	}
@@ -231,7 +230,7 @@ handle_file (const char *fname)
 	       elf_errmsg (-1));
     }
 
-  arlib_finalize (&symtab);
+  arlib_finalize ();
 
   /* If the file contains no symbols we need not do anything.  */
   int status = 0;
@@ -299,7 +298,7 @@ handle_file (const char *fname)
 
   elf_end (arelf);
 
-  arlib_fini (&symtab);
+  arlib_fini ();
 
   close (fd);
 

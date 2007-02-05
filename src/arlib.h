@@ -68,28 +68,28 @@ struct arlib_symtab
 };
 
 
-/* Initialize ARLIB_SYMTAB structure.  */
-extern void arlib_init (struct arlib_symtab *symtab);
+/* Global variable with symbol table.  */
+extern struct arlib_symtab symtab;
 
+
+/* Initialize ARLIB_SYMTAB structure.  */
+extern void arlib_init (void);
 
 /* Finalize ARLIB_SYMTAB content.  */
-extern void arlib_finalize (struct arlib_symtab *symtab);
+extern void arlib_finalize (void);
 
 /* Free resources for ARLIB_SYMTAB.  */
-extern void arlib_fini (struct arlib_symtab *symtab);
+extern void arlib_fini (void);
 
 /* Add symbols from ELF with value OFFSET to the symbol table SYMTAB.  */
 extern void arlib_add_symbols (Elf *elf, const char *arfname,
-			       const char *membername,
-			       struct arlib_symtab *symtab, off_t off);
+			       const char *membername, off_t off);
 
 /* Add name a file offset of a symbol.  */
-extern void arlib_add_symref (struct arlib_symtab *symtab, const char *symname,
-			      off_t symoff);
+extern void arlib_add_symref (const char *symname, off_t symoff);
 
 /* Add long file name FILENAME of length FILENAMELEN to the symbol table
    SYMTAB.  Return the offset into the long file name table.  */
-extern long int arlib_add_long_name (struct arlib_symtab *symtab,
-				     const char *filename, size_t filenamelen);
+extern long int arlib_add_long_name (const char *filename, size_t filenamelen);
 
 #endif	/* arlib.h */

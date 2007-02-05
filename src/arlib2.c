@@ -39,13 +39,12 @@
 /* Add long file name FILENAME of length FILENAMELEN to the symbol table
    SYMTAB.  Return the offset into the long file name table.  */
 long int
-arlib_add_long_name (struct arlib_symtab *symtab, const char *filename,
-		     size_t filenamelen)
+arlib_add_long_name (const char *filename, size_t filenamelen)
 {
-  int retval = obstack_object_size (&symtab->longnamesob);
+  int retval = obstack_object_size (&symtab.longnamesob);
 
-  obstack_grow (&symtab->longnamesob, filename, filenamelen);
-  obstack_grow (&symtab->longnamesob, "/\n", 2);
+  obstack_grow (&symtab.longnamesob, filename, filenamelen);
+  obstack_grow (&symtab.longnamesob, "/\n", 2);
 
   return retval;
 }

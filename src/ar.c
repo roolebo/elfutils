@@ -475,7 +475,6 @@ do_oper_extract (int oper, const char *arfname, char **argv, int argc,
 	       gettext ("cannot insert into hash table"));
     }
 
-  struct arlib_symtab symtab;
   struct stat st;
   if (force_symtab)
     {
@@ -485,7 +484,7 @@ do_oper_extract (int oper, const char *arfname, char **argv, int argc,
 	  close (fd);
 	  return 1;
 	}
-      arlib_init (&symtab);
+      arlib_init ();
     }
 
   Elf_Cmd cmd = ELF_C_READ_MMAP;
@@ -505,7 +504,7 @@ do_oper_extract (int oper, const char *arfname, char **argv, int argc,
 
       if (force_symtab)
 	{
-	  arlib_add_symbols (elf, arfname, arhdr->ar_name, &symtab, cur_off);
+	  arlib_add_symbols (elf, arfname, arhdr->ar_name, cur_off);
 	  cur_off += (((arhdr->ar_size + 1) & ~((off_t) 1))
 		      + sizeof (struct ar_hdr));
 	}
@@ -741,7 +740,7 @@ cannot rename temporary file to %.*s"),
 
   if (force_symtab)
     {
-      arlib_finalize (&symtab);
+      arlib_finalize ();
 
       if (symtab.symsnamelen != 0
 	  /* We have to rewrite the file also if it initially had an index
@@ -910,8 +909,7 @@ do_oper_delete (const char *arfname, char **argv, int argc,
 	       gettext ("cannot insert into hash table"));
     }
 
-  struct arlib_symtab symtab;
-  arlib_init (&symtab);
+  arlib_init ();
 
   off_t cur_off = SARMAG;
   Elf_Cmd cmd = ELF_C_READ_MMAP;
@@ -960,14 +958,12 @@ do_oper_delete (const char *arfname, char **argv, int argc,
 
 	  /* If we recreate the symbol table read the file's symbol
 	     table now.  */
-	  arlib_add_symbols (subelf, arfname, arhdr->ar_name, &symtab,
-			     newp->off);
+	  arlib_add_symbols (subelf, arfname, arhdr->ar_name, newp->off);
 
 	  /* Remember long file names.  */
 	  size_t ar_namelen = strlen (arhdr->ar_name);
 	  if (ar_namelen > MAX_AR_NAME_LEN)
-	    newp->long_name_off = arlib_add_long_name (&symtab,
-						       arhdr->ar_name,
+	    newp->long_name_off = arlib_add_long_name (arhdr->ar_name,
 						       ar_namelen);
 	  else
 	    newp->long_name_off = -1l;
@@ -979,7 +975,7 @@ do_oper_delete (const char *arfname, char **argv, int argc,
 	error (1, 0, "%s: %s", arfname, elf_errmsg (-1));
     }
 
-  arlib_finalize (&symtab);
+  arlib_finalize ();
 
   hdestroy ();
 
@@ -1052,7 +1048,7 @@ do_oper_delete (const char *arfname, char **argv, int argc,
 #ifdef DEBUG
   elf_end (elf);
 
-  arlib_fini (&symtab);
+  arlib_fini ();
 
   close (fd);
 #endif
@@ -1087,8 +1083,7 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
   struct armem **found = alloca (sizeof (*found) * argc);
   memset (found, '\0', sizeof (*found) * argc);
 
-  struct arlib_symtab symtab;
-  arlib_init (&symtab);
+  arlib_init ();
 
   if (fd == -1)
     {
@@ -1142,8 +1137,7 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
       /* Remember long file names.  */
       size_t ar_namelen = strlen (arhdr->ar_name);
       if (ar_namelen > MAX_AR_NAME_LEN)
-	newp->long_name_off = arlib_add_long_name (&symtab, arhdr->ar_name,
-						   ar_namelen);
+	newp->long_name_off = arlib_add_long_name (arhdr->ar_name, ar_namelen);
       else
 	newp->long_name_off = -1l;
 
@@ -1234,8 +1228,7 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
 
 	      size_t ar_namelen = strlen (argv[cnt]);
 	      if (ar_namelen > MAX_AR_NAME_LEN)
-		found[cnt]->long_name_off = arlib_add_long_name (&symtab,
-								 bname,
+		found[cnt]->long_name_off = arlib_add_long_name (bname,
 								 ar_namelen);
 	      else
 		found[cnt]->long_name_off = -1l;
@@ -1299,8 +1292,7 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
 	      /* Remember long file names.  */
 	      size_t bnamelen = strlen (bname);
 	      if (bnamelen > MAX_AR_NAME_LEN)
-		found[cnt]->long_name_off = arlib_add_long_name (&symtab,
-								 bname,
+		found[cnt]->long_name_off = arlib_add_long_name (bname,
 								 bnamelen);
 	      else
 		found[cnt]->long_name_off = -1l;
@@ -1313,7 +1305,7 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
 #ifdef DEBUG
       elf_end (elf);
 
-      arlib_fini (&symtab);
+      arlib_fini ();
 
       close (fd);
 #endif
@@ -1369,16 +1361,12 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
 		 archive content.  But who knows...  */
 	      error (EXIT_FAILURE, 0, "%s: %s", arfname, elf_errmsg (-1));
 
-	    arlib_add_symbols (subelf, arfname, arhdr->ar_name, &symtab,
-			       cur_off);
+	    arlib_add_symbols (subelf, arfname, arhdr->ar_name, cur_off);
 
 	    elf_end (subelf);
 	  }
 	else
-	  {
-	    arlib_add_symbols (memp->elf, arfname, memp->name, &symtab,
-			       cur_off);
-	  }
+	  arlib_add_symbols (memp->elf, arfname, memp->name, cur_off);
 
 	cur_off += (((memp->size + 1) & ~((off_t) 1))
 		    + sizeof (struct ar_hdr));
@@ -1386,7 +1374,7 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
 
   /* Now we have all the information for the symbol table and long
      file name table.  Construct the final layout.  */
-  arlib_finalize (&symtab);
+  arlib_finalize ();
 
   /* Create a new, temporary file in the same directory as the
      original file.  */
@@ -1522,7 +1510,7 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
 #ifdef DEBUG
   elf_end (elf);
 
-  arlib_fini (&symtab);
+  arlib_fini ();
 
   close (fd);
 #endif

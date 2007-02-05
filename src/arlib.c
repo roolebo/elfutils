@@ -40,15 +40,19 @@
 #include "arlib.h"
 
 
+/* The one symbol table we hanble.  */
+struct arlib_symtab symtab;
+
+
 /* Initialize ARLIB_SYMTAB structure.  */
 void
-arlib_init (struct arlib_symtab *symtab)
+arlib_init (void)
 {
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free
-  obstack_init (&symtab->symsoffob);
-  obstack_init (&symtab->symsnameob);
-  obstack_init (&symtab->longnamesob);
+  obstack_init (&symtab.symsoffob);
+  obstack_init (&symtab.symsnameob);
+  obstack_init (&symtab.longnamesob);
 
   /* We add the archive header here as well, that avoids allocating
      another memory block.  */
@@ -78,13 +82,13 @@ arlib_init (struct arlib_symtab *symtab)
   memcpy (ar_hdr.ar_fmag, ARFMAG, sizeof (ar_hdr.ar_fmag));
 
   /* Add the archive header to the file content.  */
-  obstack_grow (&symtab->symsoffob, &ar_hdr, sizeof (ar_hdr));
+  obstack_grow (&symtab.symsoffob, &ar_hdr, sizeof (ar_hdr));
 
   /* The first word in the offset table specifies the size.  Create
      such an entry now.  The real value will be filled-in later.  For
      all supported platforms the following is true.  */
   assert (sizeof (uint32_t) == sizeof (int));
-  obstack_int_grow (&symtab->symsoffob, 0);
+  obstack_int_grow (&symtab.symsoffob, 0);
 
   /* The long name obstack also gets its archive header.  As above,
      some of the input strings are longer than required but we only
@@ -95,110 +99,109 @@ arlib_init (struct arlib_symtab *symtab)
   memcpy (ar_hdr.ar_gid, "            ", sizeof (ar_hdr.ar_gid));
   memcpy (ar_hdr.ar_mode, "            ", sizeof (ar_hdr.ar_mode));
   /* The ar_size field will be filled in later and ar_fmag is already OK.  */
-  obstack_grow (&symtab->longnamesob, &ar_hdr, sizeof (ar_hdr));
+  obstack_grow (&symtab.longnamesob, &ar_hdr, sizeof (ar_hdr));
 
   /* All other members are zero.  */
-  symtab->symsofflen = 0;
-  symtab->symsoff = NULL;
-  symtab->symsnamelen = 0;
-  symtab->symsname = NULL;
+  symtab.symsofflen = 0;
+  symtab.symsoff = NULL;
+  symtab.symsnamelen = 0;
+  symtab.symsname = NULL;
 }
 
 
 /* Finalize ARLIB_SYMTAB content.  */
 void
-arlib_finalize (struct arlib_symtab *symtab)
+arlib_finalize (void)
 {
   char tmpbuf[sizeof (((struct ar_hdr *) NULL)->ar_size) + 1];
 
-  symtab->longnameslen = obstack_object_size (&symtab->longnamesob);
-  if (symtab->longnameslen != sizeof (struct ar_hdr))
+  symtab.longnameslen = obstack_object_size (&symtab.longnamesob);
+  if (symtab.longnameslen != sizeof (struct ar_hdr))
     {
-      symtab->longnames = obstack_finish (&symtab->longnamesob);
+      symtab.longnames = obstack_finish (&symtab.longnamesob);
 
-      memcpy (&((struct ar_hdr *) symtab->longnames)->ar_size, tmpbuf,
+      memcpy (&((struct ar_hdr *) symtab.longnames)->ar_size, tmpbuf,
 	      snprintf (tmpbuf, sizeof (tmpbuf), "%-*zu",
 			(int) sizeof (((struct ar_hdr *) NULL)->ar_size),
-			symtab->longnameslen - sizeof (struct ar_hdr)));
+			symtab.longnameslen - sizeof (struct ar_hdr)));
     }
 
-  symtab->symsofflen = obstack_object_size (&symtab->symsoffob);
-  assert (symtab->symsofflen % sizeof (uint32_t) == 0);
-  if (symtab->symsofflen != 0)
+  symtab.symsofflen = obstack_object_size (&symtab.symsoffob);
+  assert (symtab.symsofflen % sizeof (uint32_t) == 0);
+  if (symtab.symsofflen != 0)
     {
-      symtab->symsoff = (uint32_t *) obstack_finish (&symtab->symsoffob);
+      symtab.symsoff = (uint32_t *) obstack_finish (&symtab.symsoffob);
 
       /* Fill in the number of offsets now.  */
-      symtab->symsoff[AR_HDR_WORDS] = le_bswap_32 ((symtab->symsofflen
+      symtab.symsoff[AR_HDR_WORDS] = le_bswap_32 ((symtab.symsofflen
 						    - sizeof (struct ar_hdr))
 						   / sizeof (uint32_t) - 1);
     }
 
-  symtab->symsnamelen = obstack_object_size (&symtab->symsnameob);
-  if ((symtab->symsnamelen & 1) != 0)
+  symtab.symsnamelen = obstack_object_size (&symtab.symsnameob);
+  if ((symtab.symsnamelen & 1) != 0)
     {
       /* Add one more NUL byte to make length even.  */
-      obstack_grow (&symtab->symsnameob, "", 1);
-      ++symtab->symsnamelen;
+      obstack_grow (&symtab.symsnameob, "", 1);
+      ++symtab.symsnamelen;
     }
-  symtab->symsname = obstack_finish (&symtab->symsnameob);
+  symtab.symsname = obstack_finish (&symtab.symsnameob);
 
   /* Determine correction for the offsets in the symbol table.   */
   off_t disp = 0;
-  if (symtab->symsnamelen > 0)
-    disp = symtab->symsofflen + symtab->symsnamelen;
-  if (symtab->longnameslen > sizeof (struct ar_hdr))
-    disp += symtab->longnameslen;
+  if (symtab.symsnamelen > 0)
+    disp = symtab.symsofflen + symtab.symsnamelen;
+  if (symtab.longnameslen > sizeof (struct ar_hdr))
+    disp += symtab.longnameslen;
 
-  if (disp != 0 && symtab->symsoff != NULL)
+  if (disp != 0 && symtab.symsoff != NULL)
     {
-      uint32_t nsyms = le_bswap_32 (symtab->symsoff[AR_HDR_WORDS]);
+      uint32_t nsyms = le_bswap_32 (symtab.symsoff[AR_HDR_WORDS]);
 
       for (uint32_t cnt = 1; cnt <= nsyms; ++cnt)
 	{
-	  uint32_t val = le_bswap_32 (symtab->symsoff[AR_HDR_WORDS + cnt]);
+	  uint32_t val = le_bswap_32 (symtab.symsoff[AR_HDR_WORDS + cnt]);
 	  val += disp;
-	  symtab->symsoff[AR_HDR_WORDS + cnt] = le_bswap_32 (val);
+	  symtab.symsoff[AR_HDR_WORDS + cnt] = le_bswap_32 (val);
 	}
     }
 
   /* See comment for ar_date above.  */
-  memcpy (&((struct ar_hdr *) symtab->symsoff)->ar_size, tmpbuf,
+  memcpy (&((struct ar_hdr *) symtab.symsoff)->ar_size, tmpbuf,
 	  snprintf (tmpbuf, sizeof (tmpbuf), "%-*zu",
 		    (int) sizeof (((struct ar_hdr *) NULL)->ar_size),
-		    symtab->symsofflen + symtab->symsnamelen
+		    symtab.symsofflen + symtab.symsnamelen
 		    - sizeof (struct ar_hdr)));
 }
 
 
 /* Free resources for ARLIB_SYMTAB.  */
 void
-arlib_fini (struct arlib_symtab *symtab)
+arlib_fini (void)
 {
-  obstack_free (&symtab->symsoffob, NULL);
-  obstack_free (&symtab->symsnameob, NULL);
-  obstack_free (&symtab->longnamesob, NULL);
+  obstack_free (&symtab.symsoffob, NULL);
+  obstack_free (&symtab.symsnameob, NULL);
+  obstack_free (&symtab.longnamesob, NULL);
 }
 
 
 /* Add name a file offset of a symbol.  */
 void
-arlib_add_symref (struct arlib_symtab *symtab, const char *symname,
-		  off_t symoff)
+arlib_add_symref (const char *symname, off_t symoff)
 {
   /* For all supported platforms the following is true.  */
   assert (sizeof (uint32_t) == sizeof (int));
-  obstack_int_grow (&symtab->symsoffob, (int) le_bswap_32 (symoff));
+  obstack_int_grow (&symtab.symsoffob, (int) le_bswap_32 (symoff));
 
   size_t symname_len = strlen (symname) + 1;
-  obstack_grow (&symtab->symsnameob, symname, symname_len);
+  obstack_grow (&symtab.symsnameob, symname, symname_len);
 }
 
 
 /* Add symbols from ELF with value OFFSET to the symbol table SYMTAB.  */
 void
 arlib_add_symbols (Elf *elf, const char *arfname, const char *membername,
-		   struct arlib_symtab *symtab, off_t off)
+		   off_t off)
 {
   if (sizeof (off) > sizeof (uint32_t) && off > ~((uint32_t) 0))
     /* The archive is too big.  */
@@ -259,7 +262,7 @@ arlib_add_symbols (Elf *elf, const char *arfname, const char *membername,
 	  /* Use this symbol.  */
 	  const char *symname = elf_strptr (elf, shdr->sh_link, sym->st_name);
 	  if (symname != NULL)
-	    arlib_add_symref (symtab, symname, off);
+	    arlib_add_symref (symname, off);
 	}
 
       /* Only relocatable files can have more than one symbol table.  */

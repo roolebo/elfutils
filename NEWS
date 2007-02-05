@@ -1,3 +1,7 @@
+Version 0.126:
+
+new program: ar
+
 Version 0.125:
 
 elflint: Compare DT_GNU_HASH tests.

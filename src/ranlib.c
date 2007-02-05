@@ -31,8 +31,6 @@
 #include <ar.h>
 #include <argp.h>
 #include <assert.h>
-#include <byteswap.h>
-#include <endian.h>
 #include <errno.h>
 #include <error.h>
 #include <fcntl.h>
@@ -44,19 +42,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdio_ext.h>
-#include <time.h>
 #include <unistd.h>
+#include <sys/mman.h>
 #include <sys/param.h>
 #include <sys/stat.h>
 
 #include <system.h>
 
-
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-# define le_bswap_32(val) bswap_32 (val)
-#else
-# define le_bswap_32(val) (val)
-#endif
+#include "arlib.h"
 
 
 /* Prototypes for local functions.  */
@@ -83,13 +76,10 @@ static const char doc[] = N_("Generate an index to speed access to archives.");
 /* Strings for arguments in help texts.  */
 static const char args_doc[] = N_("ARCHIVE");
 
-/* Prototype for option handler.  */
-static error_t parse_opt (int key, char *arg, struct argp_state *state);
-
 /* Data structure to communicate with argp functions.  */
-static struct argp argp =
+static const struct argp argp =
 {
-  options, parse_opt, args_doc, doc, NULL, NULL, NULL
+  options, NULL, args_doc, doc, NULL, NULL, NULL
 };
 
 
@@ -152,141 +142,20 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 }
 
 
-/* Handle program arguments.  */
-static error_t
-parse_opt (int key, char *arg __attribute__ ((unused)),
-	   struct argp_state *state __attribute__ ((unused)))
-{
-  switch (key)
-    {
-    default:
-      return ARGP_ERR_UNKNOWN;
-    }
-  return 0;
-}
-
-
-static struct obstack offsob;
-size_t offs_len;
-static struct obstack namesob;
-size_t names_len;
-
-
-/* Add all exported, defined symbols from the given section to the table.  */
-static void
-add_symbols (Elf *elf, const char *fname, off_t off, Elf_Scn *scn,
-	     GElf_Shdr *shdr)
-{
-  if (sizeof (off) > sizeof (uint32_t) && off > ~((uint32_t) 0))
-    /* The archive is too big.  */
-    error (EXIT_FAILURE, 0, gettext ("the archive '%s' is too large"), fname);
-
-  Elf_Data *data = elf_getdata (scn, NULL);
-  assert (data->d_size == shdr->sh_size);
-
-  /* We can skip the local symbols in the table.  */
-  for (int cnt = shdr->sh_info; cnt < (int) (shdr->sh_size / shdr->sh_entsize);
-       ++cnt)
-    {
-      GElf_Sym sym_mem;
-      GElf_Sym *sym = gelf_getsym (data, cnt, &sym_mem);
-      if (sym == NULL)
-	/* Should never happen.  */
-	continue;
-
-      /* Ignore undefined symbols.  */
-      if (sym->st_shndx == SHN_UNDEF)
-	continue;
-
-      /* For all supported platforms the following is true.  */
-      assert (sizeof (uint32_t) == sizeof (int));
-      obstack_int_grow (&offsob, (int) le_bswap_32 (off));
-      offs_len += sizeof (uint32_t);
-
-      const char *symname = elf_strptr (elf, shdr->sh_link, sym->st_name);
-      size_t symname_len = strlen (symname) + 1;
-      obstack_grow (&namesob, symname, symname_len);
-      names_len += symname_len;
-    }
-}
-
-
-/* Look through ELF file and collect all symbols available for
-   linking.  If available, we use the dynamic symbol section.
-   Otherwise the normal one.  Relocatable files are allowed to have
-   multiple symbol tables.  */
-static void
-handle_elf (Elf *elf, const char *arfname, off_t off)
-{
-  GElf_Ehdr ehdr_mem;
-  GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);
-  assert (ehdr != NULL);
-
-  if (ehdr->e_type == ET_REL)
-    {
-      Elf_Scn *scn = NULL;
-      while ((scn = elf_nextscn (elf, scn)) != NULL)
-	{
-	  GElf_Shdr shdr_mem;
-	  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
-	  if (shdr != NULL && shdr->sh_type == SHT_SYMTAB)
-	    add_symbols (elf, arfname, off, scn, shdr);
-	}
-    }
-  else
-    {
-      Elf_Scn *symscn = NULL;
-      GElf_Shdr *symshdr = NULL;
-      Elf_Scn *scn = NULL;
-      GElf_Shdr shdr_mem;
-      while ((scn = elf_nextscn (elf, scn)) != NULL)
-	{
-	  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
-	  symshdr = NULL;
-	  if (shdr != NULL)
-	    {
-	      if (shdr->sh_type == SHT_DYNSYM)
-		{
-		  symscn = scn;
-		  symshdr = shdr;
-		  break;
-		}
-	      if (shdr->sh_type == SHT_SYMTAB)
-		{
-		  /* There better be only one symbol table in
-		     executables in DSOs.  */
-		  assert (symscn == NULL);
-		  symscn = scn;
-		  symshdr = shdr;
-		}
-	    }
-	}
-
-      add_symbols (elf, arfname, off, symscn,
-		   symshdr ?: gelf_getshdr (scn, &shdr_mem));
-    }
-}
-
-
 static int
-copy_content (int oldfd, int newfd, off_t off, size_t n)
+copy_content (Elf *elf, int newfd, off_t off, size_t n)
 {
-  while (n > 0)
-    {
-      char buf[32768];
+  size_t len;
+  char *rawfile = elf_rawfile (elf, &len);
 
-      ssize_t nread = pread_retry (oldfd, buf, MIN (sizeof (buf), n), off);
-      if (unlikely (nread <= 0))
-	return 1;
+  assert (off + n <= len);
 
-      if (write_retry (newfd, buf, nread) != nread)
-	return 1;
+  /* Tell the kernel we will read all the pages sequentially.  */
+  size_t ps = sysconf (_SC_PAGESIZE);
+  if (n > 2 * ps)
+    posix_madvise (rawfile + (off & ~(ps - 1)), n, POSIX_MADV_SEQUENTIAL);
 
-      n -= nread;
-      off += nread;
-    }
-
-  return 0;
+  return write_retry (newfd, rawfile + off, n) != (ssize_t) n;
 }
 
 
@@ -328,84 +197,64 @@ handle_file (const char *fname)
       return 1;
     }
 
-#define obstack_chunk_alloc xmalloc
-#define obstack_chunk_free free
-  obstack_init (&offsob);
-  offs_len = 0;
-  obstack_init (&namesob);
-  names_len = 0;
-
-  /* The first word in the offset table specifies the size.  Create
-     such an entry now.  The real value will be filled-in later.  For
-     all supported platforms the following is true.  */
-  assert (sizeof (uint32_t) == sizeof (int));
-  obstack_int_grow (&offsob, 0);
-  offs_len += sizeof (uint32_t);
+  struct arlib_symtab symtab;
+  arlib_init (&symtab);
 
   /* Iterate over the content of the archive.  */
   off_t index_off = -1;
   size_t index_size = 0;
+  off_t cur_off = SARMAG;
   Elf *elf;
   Elf_Cmd cmd = ELF_C_READ_MMAP;
   while ((elf = elf_begin (fd, cmd, arelf)) != NULL)
     {
       Elf_Arhdr *arhdr = elf_getarhdr (elf);
       assert (arhdr != NULL);
-      off_t off = elf_getaroff (elf);
 
-      Elf_Kind kind = elf_kind (elf);
-      if (kind == ELF_K_ELF)
-	handle_elf (elf, fname, off);
-#if 0
-      else if (kind == ELF_K_AR)
-	{
-	  // XXX Should we implement this?
-	}
-#endif
       /* If this is the index, remember the location.  */
-      else if (strcmp (arhdr->ar_name, "/") == 0)
+      if (strcmp (arhdr->ar_name, "/") == 0)
 	{
-	  index_off = off;
+	  index_off = elf_getaroff (elf);
 	  index_size = arhdr->ar_size;
+	}
+      else
+	{
+	  arlib_add_symbols (elf, fname, arhdr->ar_name, &symtab, cur_off);
+	  cur_off += (((arhdr->ar_size + 1) & ~((off_t) 1))
+		      + sizeof (struct ar_hdr));
 	}
 
       /* Get next archive element.  */
       cmd = elf_next (elf);
       if (elf_end (elf) != 0)
-	error (0, 0,
-	       gettext (" error while freeing sub-ELF descriptor: %s\n"),
+	error (0, 0, gettext ("error while freeing sub-ELF descriptor: %s"),
 	       elf_errmsg (-1));
     }
 
-  elf_end (arelf);
-  uint32_t *offs_arr = obstack_finish (&offsob);
-  assert (offs_len % sizeof (uint32_t) == 0);
-  if ((names_len & 1) != 0)
-    {
-      /* Add one more NUL byte to make length even.  */
-      obstack_grow (&namesob, "", 1);
-      ++names_len;
-    }
-  const char *names_str = obstack_finish (&namesob);
+  arlib_finalize (&symtab);
 
   /* If the file contains no symbols we need not do anything.  */
-  if (names_len != 0
+  int status = 0;
+  if (symtab.symsnamelen != 0
       /* We have to rewrite the file also if it initially had an index
 	 but now does not need one anymore.  */
-      || (names_len == 0 && index_off != -1))
+      || (symtab.symsnamelen == 0 && index_size != 0))
     {
       /* Create a new, temporary file in the same directory as the
 	 original file.  */
-      char tmpfname[strlen (fname) + 8];
-      strcpy (stpcpy (tmpfname, fname), ".XXXXXX");
+      char tmpfname[strlen (fname) + 7];
+      strcpy (stpcpy (tmpfname, fname), "XXXXXX");
       int newfd = mkstemp (tmpfname);
-      if (newfd == -1)
-      nonew:
-	error (0, errno, gettext ("cannot create new file"));
+      if (unlikely (newfd == -1))
+	{
+	nonew:
+	  error (0, errno, gettext ("cannot create new file"));
+	  status = 1;
+	}
       else
 	{
 	  /* Create the header.  */
-	  if (write_retry (newfd, ARMAG, SARMAG) != SARMAG)
+	  if (unlikely (write_retry (newfd, ARMAG, SARMAG) != SARMAG))
 	    {
 	      // XXX Use /prof/self/fd/%d ???
 	    nonew_unlink:
@@ -414,62 +263,6 @@ handle_file (const char *fname)
 		close (newfd);
 	      goto nonew;
 	    }
-
-	  struct ar_hdr ar_hdr;
-	  memcpy (ar_hdr.ar_name, "/               ", sizeof (ar_hdr.ar_name));
-	  /* Using snprintf here has a problem: the call always wants
-	     to add a NUL byte.  We could use a trick whereby we
-	     specify the target buffer size longer than it is and this
-	     would not actually fail, since all the fields are
-	     consecutive and we fill them in in sequence (i.e., the
-	     NUL byte gets overwritten).  But _FORTIFY_SOURCE=2 would
-	     not let us play these games.  Therefore we play it
-	     safe.  */
-	  char tmpbuf[MAX (sizeof (ar_hdr.ar_date), sizeof (ar_hdr.ar_size))
-		      + 1];
-	  memcpy (ar_hdr.ar_date, tmpbuf,
-		  snprintf (tmpbuf, sizeof (tmpbuf), "%-*lld",
-			    (int) sizeof (ar_hdr.ar_date),
-			    (long long int) time (NULL)));
-
-	  /* Note the string for the ar_uid and ar_gid cases is longer
-	     than necessary.  This does not matter since we copy only as
-	     much as necessary but it helps the compiler to use the same
-	     string for the ar_mode case.  */
-	  memcpy (ar_hdr.ar_uid, "0       ", sizeof (ar_hdr.ar_uid));
-	  memcpy (ar_hdr.ar_gid, "0       ", sizeof (ar_hdr.ar_gid));
-	  memcpy (ar_hdr.ar_mode, "0       ", sizeof (ar_hdr.ar_mode));
-
-	  /* See comment for ar_date above.  */
-	  memcpy (ar_hdr.ar_size, tmpbuf,
-		  snprintf (tmpbuf, sizeof (tmpbuf), "%-*zu",
-			    (int) sizeof (ar_hdr.ar_size),
-			    offs_len + names_len));
-	  memcpy (ar_hdr.ar_fmag, ARFMAG, sizeof (ar_hdr.ar_fmag));
-
-	  /* Fill in the number of offsets now.  */
-	  offs_arr[0] = le_bswap_32 (offs_len / sizeof (uint32_t) - 1);
-
-	  /* Adjust the offset values for the name index size (if
-	     necessary).  */
-	  off_t disp = (offs_len + ((names_len + 1) & ~1ul)
-			- ((index_size + 1) & ~1ul));
-	  /* If there was no index so far but one is needed now we
-	     have to take the archive header into account.  */
-	  if (index_off == -1 && names_len != 0)
-	    disp += sizeof (struct ar_hdr);
-	  if (disp != 0)
-	    for (size_t cnt = 1; cnt < offs_len / sizeof (uint32_t); ++cnt)
-	      {
-		uint32_t val;
-		val = le_bswap_32 (offs_arr[cnt]);
-
-		if (val > index_off)
-		  {
-		    val += disp;
-		    offs_arr[cnt] = le_bswap_32 (val);
-		  }
-	      }
 
 	  /* Create the new file.  There are three parts as far we are
 	     concerned: 1. original context before the index, 2. the
@@ -481,30 +274,34 @@ handle_file (const char *fname)
 	  else
 	    rest_off = SARMAG;
 
-	  if ((index_off > SARMAG
-	       && copy_content (fd, newfd, SARMAG, index_off - SARMAG))
-	      || (names_len != 0
-		  && ((write_retry (newfd, &ar_hdr, sizeof (ar_hdr))
-		       != sizeof (ar_hdr))
-		      || (write_retry (newfd, offs_arr, offs_len)
-			  != (ssize_t) offs_len)
-		      || (write_retry (newfd, names_str, names_len)
-			  != (ssize_t) names_len)))
-	      || copy_content (fd, newfd, rest_off, st.st_size - rest_off)
+	  if ((symtab.symsnamelen != 0
+	       && ((write_retry (newfd, symtab.symsoff,
+				 symtab.symsofflen)
+		    != (ssize_t) symtab.symsofflen)
+		   || (write_retry (newfd, symtab.symsname,
+				    symtab.symsnamelen)
+		       != (ssize_t) symtab.symsnamelen)))
+	      /* Even if the original file had content before the
+		 symbol table, we write it in the correct order.  */
+	      || (index_off > SARMAG
+		  && copy_content (arelf, newfd, SARMAG, index_off - SARMAG))
+	      || copy_content (arelf, newfd, rest_off, st.st_size - rest_off)
 	      /* Set the mode of the new file to the same values the
 		 original file has.  */
 	      || fchmod (newfd, st.st_mode & ALLPERMS) != 0
-	      || fchown (newfd, st.st_uid, st.st_gid) != 0
-	      || close (newfd) != 0
+	      /* Never complain about fchown failing.  */
+	      || (fchown (newfd, st.st_uid, st.st_gid),
+		  close (newfd) != 0)
 	      || (newfd = -1, rename (tmpfname, fname) != 0))
 	    goto nonew_unlink;
 	}
     }
 
-  obstack_free (&offsob, NULL);
-  obstack_free (&namesob, NULL);
+  elf_end (arelf);
+
+  arlib_fini (&symtab);
 
   close (fd);
 
-  return 0;
+  return status;
 }

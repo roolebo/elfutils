@@ -731,9 +731,22 @@ section [%2d] '%s': symbol %zu: function in COMMON section is nonsense\n"),
 		    {
 		      if ((sym->st_value - destshdr->sh_addr)
 			  > destshdr->sh_size)
-			ERROR (gettext ("\
+			{
+			  /* GNU ld has severe bugs.  When it decides to remove
+			     empty sections it leaves symbols referencing them
+			     behind.  These are symbols in .symtab.  */
+			  if (!gnuld
+			      || strcmp (section_name (ebl, idx), ".symtab")
+			      || (strcmp (name, "__preinit_array_start") != 0
+				  && strcmp (name, "__preinit_array_end") != 0
+				  && strcmp (name, "__init_array_start") != 0
+				  && strcmp (name, "__init_array_end") != 0
+				  && strcmp (name, "__fini_array_start") != 0
+				  && strcmp (name, "__fini_array_end") != 0))
+			    ERROR (gettext ("\
 section [%2d] '%s': symbol %zu: st_value out of bounds\n"),
-			       idx, section_name (ebl, idx), cnt);
+				   idx, section_name (ebl, idx), cnt);
+			}
 		      else if ((sym->st_value - destshdr->sh_addr
 				+ sym->st_size) > destshdr->sh_size)
 			ERROR (gettext ("\

@@ -1,3 +1,18 @@
+2007-02-04  Ulrich Drepper  <drepper@redhat.com>
+
+	* ar.c: New file.
+	* arlib.c: New file.
+	* arlib2.c: New file.
+	* arlib.h: New file.
+	* Makefile (noinst_LIBRARIES): Add libar.
+	(libar_a_SOURCES): Define.
+	(ar_LDADD): Define.
+	(CFLAGS_ar): Define.
+	* ranlib.c: Change to use arlib.
+
+	* elflint.c (check_symtab): Work around GNU ld bug which omits
+	sections but not symbols in those sections.
+
 2007-01-10  Ulrich Drepper  <drepper@redhat.com>
 
 	* addr2line.c: Update copyright year.

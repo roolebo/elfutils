@@ -1,5 +1,5 @@
 /* Create descriptor for processing file.
-   Copyright (C) 1998-2005, 2006 Red Hat, Inc.
+   Copyright (C) 1998-2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -561,6 +561,7 @@ read_file (int fildes, off_t offset, size_t maxsize,
 					      ? PROT_READ
 					      : PROT_READ|PROT_WRITE),
 			      cmd == ELF_C_READ_MMAP_PRIVATE
+			      || cmd == ELF_C_READ_MMAP
 			      ? MAP_PRIVATE : MAP_SHARED,
 			      fildes, offset);
 
@@ -686,7 +687,7 @@ read_long_names (Elf *elf)
 	  /* NUL-terminate the string.  */
 	  *runp = '\0';
 
-	  /* Skip the NUL bzte and the \012.  */
+	  /* Skip the NUL byte and the \012.  */
 	  runp += 2;
 
 	  /* A sanity check.  Somebody might have generated invalid

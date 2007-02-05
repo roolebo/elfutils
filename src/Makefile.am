@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 1996-2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
+## Copyright (C) 1996-2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -34,7 +34,7 @@ endif
 AM_CFLAGS += -Wall -Wshadow -std=gnu99 $(native_ld_cflags) \
 	     $(if $($(*F)_no_Werror),,-Werror) \
 	     $(if $($(*F)_no_Wunused),,-Wunused -Wextra) \
-	     $(if $($(*F)_no_Wformat),,-Wformat=2)
+	     $(if $($(*F)_no_Wformat),,-Wformat=2) $(CFLAGS_$(*F))
 
 INCLUDES = -I$(srcdir) -I$(srcdir)/../libelf -I$(srcdir)/../libebl \
 	   -I$(srcdir)/../libdw -I$(srcdir)/../libdwfl \
@@ -52,15 +52,15 @@ native_ld = @native_ld@
 base_cpu = @base_cpu@
 
 bin_PROGRAMS = readelf nm size strip ld elflint findtextrel addr2line \
-	       elfcmp objdump ranlib strings
+	       elfcmp objdump ranlib strings ar
 
 
 ld_dsos = libld_elf_i386_pic.a
 if NATIVE_LD
-noinst_LIBRARIES = libld_elf.a
+noinst_LIBRARIES = libld_elf.a libar.a
 native_ld_cflags = -DBASE_ELF_NAME=elf_$(base_cpu)
 else
-noinst_LIBRARIES = libld_elf.a $(ld_dsos)
+noinst_LIBRARIES = libld_elf.a libar.a $(ld_dsos)
 noinst_PROGRAMS = $(ld_dsos:_pic.a=.so)
 endif
 if NEVER
@@ -76,10 +76,12 @@ textrel_check = if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
 ld_SOURCES = ld.c ldgeneric.c ldlex.l ldscript.y symbolhash.c sectionhash.c \
 	     versionhash.c
 
+libar_a_SOURCES = arlib.c arlib2.c
+
 noinst_HEADERS = ld.h symbolhash.h sectionhash.h versionhash.h \
 		 ldscript.h xelf.h unaligned.h
 
-EXTRA_DIST = elf32-i386.script libld_elf_i386.map $(ld_modules)
+EXTRA_DIST = elf32-i386.script libld_elf_i386.map $(ld_modules) arlib.h
 ld_modules = i386_ld.c
 
 if MUDFLAP
@@ -117,8 +119,10 @@ findtextrel_LDADD = $(libdw) $(libelf) $(libmudflap)
 addr2line_LDADD = $(libdw) $(libmudflap)
 elfcmp_LDADD = $(libebl) $(libelf) $(libmudflap) -ldl
 objdump_LDADD  = $(libebl) $(libelf) $(libeu) $(libmudflap) -ldl
-ranlib_LDADD = $(libelf) $(libeu) $(libmudflap)
+ranlib_LDADD = libar.a $(libelf) $(libeu) $(libmudflap)
 strings_LDADD = $(libelf) $(libeu) $(libmudflap)
+ar_LDADD = libar.a $(libelf) $(libeu) $(libmudflap)
+CFLAGS_ar = -DAR=\"$(shell echo ar|sed '$(transform)')\"
 
 ldlex.o: ldscript.c
 ldlex_no_Werror = yes

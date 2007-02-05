@@ -34,7 +34,7 @@ testfiles $original $indexed
 testrun ../src/ranlib $original
 
 if test -z "$noindex"; then
-  # The data in the index is different.  The reference file has it blanked
+  # The date in the index is different.  The reference file has it blanked
   # out, we do the same here.
   echo "            " |
   dd of=$original seek=24 bs=1 count=12 conv=notrunc 2>/dev/null

@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 1996-2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
+## Copyright (C) 1996-2006, 2007 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -107,7 +107,7 @@ libelf_so_SOURCES =
 libelf.so: libelf_pic.a libelf.map
 	$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
 		-Wl,--version-script,$(srcdir)/libelf.map,--no-undefined \
-		-Wl,--soname,$@.$(VERSION),-z,-defs
+		-Wl,--soname,$@.$(VERSION),-z,-defs,-z,relro
 	if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
 	ln -fs $@ $@.$(VERSION)
 

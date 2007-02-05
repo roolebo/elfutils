@@ -1,3 +1,9 @@
+2007-02-04  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile (libelf.so): Build with -z relro.
+
+	* elf_begin.c (read_file): When using ELF_C_READ_MMAP use MAP_PRIVATE.
+
 2007-01-30  Ulrich Drepper  <drepper@redhat.com>
 
 	* nlist.c: Close file descriptor before returning.

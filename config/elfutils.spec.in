@@ -138,6 +138,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_bindir}/eu-ranlib
 %{_bindir}/eu-strings
 %{_bindir}/eu-objdump
+%{_bindir}/eu-ar
 #%{_bindir}/eu-ld
 #%{_libdir}/libasm-%{version}.so
 %{_libdir}/libdw-%{version}.so
@@ -178,6 +179,9 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
+* Mon Feb  5 2007 Ulrich Drepper <drepper@redhat.com> 0.126-1
+- new program: ar
+
 * Mon Dec 18 2006 Ulrich Drepper <drepper@redhat.com> 0.125-1
 - elflint: Compare DT_GNU_HASH tests.
 - move archives into -static RPMs

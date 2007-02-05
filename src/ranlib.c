@@ -289,7 +289,7 @@ handle_file (const char *fname)
 		 original file has.  */
 	      || fchmod (newfd, st.st_mode & ALLPERMS) != 0
 	      /* Never complain about fchown failing.  */
-	      || (fchown (newfd, st.st_uid, st.st_gid),
+	      || (({asm ("" :: "r" (fchown (newfd, st.st_uid, st.st_gid))); }),
 		  close (newfd) != 0)
 	      || (newfd = -1, rename (tmpfname, fname) != 0))
 	    goto nonew_unlink;

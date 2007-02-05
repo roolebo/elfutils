@@ -795,7 +795,8 @@ cannot rename temporary file to %.*s"),
 		     original file has.  */
 		  || fchmod (newfd, st.st_mode & ALLPERMS) != 0
 		  /* Never complain about fchown failing.  */
-		  || (fchown (newfd, st.st_uid, st.st_gid),
+		  || (({asm ("" :: "r" (fchown (newfd, st.st_uid,
+						st.st_gid))); }),
 		      close (newfd) != 0)
 		  || (newfd = -1, rename (tmpfname, arfname) != 0))
 		goto nonew_unlink;
@@ -1039,7 +1040,7 @@ do_oper_delete (const char *arfname, char **argv, int argc,
      has.  */
   if (fchmod (newfd, st.st_mode & ALLPERMS) != 0
       /* Never complain about fchown failing.  */
-      || (fchown (newfd, st.st_uid, st.st_gid),
+      || (({asm ("" :: "r" (fchown (newfd, st.st_uid, st.st_gid))); }),
 	  close (newfd) != 0)
       || (newfd = -1, rename (tmpfname, arfname) != 0))
     goto nonew_unlink;
@@ -1478,7 +1479,8 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
 
 	      /* Pad the file if its size is odd.  */
 	      if ((all->size & 1) != 0)
-		write (newfd, "\n", 1);
+		if (write (newfd, "\n", 1) != 1)
+		  goto nonew_unlink;
 	    }
 	  else
 	    {
@@ -1501,7 +1503,7 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
   if (fd != -1
       && (fchmod (newfd, st.st_mode & ALLPERMS) != 0
 	  /* Never complain about fchown failing.  */
-	  || (fchown (newfd, st.st_uid, st.st_gid),
+	  || (({asm ("" :: "r" (fchown (newfd, st.st_uid, st.st_gid))); }),
 	      close (newfd) != 0)
 	  || (newfd = -1, rename (tmpfname, arfname) != 0)))
       goto nonew_unlink;

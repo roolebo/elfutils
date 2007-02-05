@@ -22,7 +22,7 @@ AC_INIT([Red Hat elfutils],[0.126],[http://bugzilla.redhat.com/bugzilla/],
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_FILES([config/Makefile])
 
-AC_COPYRIGHT([Copyright (C) 1996-2003, 2004, 2005, 2006 Red Hat, Inc.])
+AC_COPYRIGHT([Copyright (C) 1996-2003, 2004, 2005, 2006, 2007 Red Hat, Inc.])
 AC_PREREQ(2.59)			dnl Minimum Autoconf version required.
 
 AM_INIT_AUTOMAKE([gnits 1.7])

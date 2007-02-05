@@ -1,9 +1,15 @@
 2007-02-05  Ulrich Drepper  <drepper@redhat.com>
 
+	* ar.r: Add ugly hack to work around gcc complaining that we
+	ignore fchown's return value.
+	(do_oper_insert): Handle error when writing padding.
+	* ranlib.c: Add fchown complain work around.
+
 	* arlib.c: Make symtab a global variable.  Change all users.
 	* arlib2.c: Likewise.
 	* ranlib.c: Likewise.
 	* ar.c: Likewise.
+
 	* arlib.h: Declare it.
 
 2007-01-11  Roland McGrath  <roland@redhat.com>

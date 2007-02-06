@@ -1,3 +1,7 @@
+2007-02-05  Roland McGrath  <roland@redhat.com>
+
+	* ar.c: Include <limits.h>, since we use LONG_MAX.
+
 2007-02-05  Ulrich Drepper  <drepper@redhat.com>
 
 	* ar.r: Add ugly hack to work around gcc complaining that we

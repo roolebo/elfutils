@@ -1,5 +1,5 @@
 # -*- rpm-spec-*-
-Summary: A collection of utilities and DSOs to handle compiled objects
+Summary: A collection of utilities and DSOs to handle compiled objects.
 Name: elfutils
 Version: @PACKAGE_VERSION@
 Release: 1

@@ -33,6 +33,7 @@
 #include <fcntl.h>
 #include <gelf.h>
 #include <libintl.h>
+#include <limits.h>
 #include <locale.h>
 #include <mcheck.h>
 #include <search.h>

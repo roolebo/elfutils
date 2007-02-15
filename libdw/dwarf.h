@@ -1,5 +1,5 @@
 /* This file defines standard DWARF types, structures, and macros.
-   Copyright (C) 2000, 2002, 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2000, 2002, 2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -418,7 +418,7 @@ enum
     DW_OP_breg30 = 0x8e,	/* Base register 30.  */
     DW_OP_breg31 = 0x8f,	/* Base register 31.  */
     DW_OP_regx = 0x90,		/* Unsigned LEB128 register.  */
-    DW_OP_fbreg = 0x91,		/* Signed LEB128 register.  */
+    DW_OP_fbreg = 0x91,		/* Signed LEB128 offset.  */
     DW_OP_bregx = 0x92,		/* ULEB128 register followed by SLEB128 off. */
     DW_OP_piece = 0x93,		/* ULEB128 size of piece addressed. */
     DW_OP_deref_size = 0x94,	/* 1-byte size of data retrieved.  */

@@ -1,3 +1,7 @@
+2007-02-10  Roland McGrath  <roland@redhat.com>
+
+	* dwarf.h (DW_OP_fbreg): Comment fix.
+
 2007-02-03  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_getelf.c (dwarf_getelf): Renamed from dwarf_get_elf.

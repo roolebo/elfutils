@@ -1,3 +1,7 @@
+2007-02-15  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (print_debug): Fix brainos in SHDR test.
+
 2007-02-05  Roland McGrath  <roland@redhat.com>
 
 	* ar.c: Include <limits.h>, since we use LONG_MAX.

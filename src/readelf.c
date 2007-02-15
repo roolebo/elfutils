@@ -4953,7 +4953,7 @@ print_debug (Ebl *ebl, GElf_Ehdr *ehdr)
       GElf_Shdr shdr_mem;
       GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
 
-      if (shdr != NULL || shdr->sh_type != SHT_PROGBITS)
+      if (shdr != NULL && shdr->sh_type == SHT_PROGBITS)
 	{
 	  static const struct
 	  {

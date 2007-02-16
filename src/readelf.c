@@ -518,7 +518,7 @@ print_file_type (unsigned short int e_type)
 {
   if (e_type <= ET_CORE)
     {
-      static const char *knowntypes[] =
+      static const char *const knowntypes[] =
       {
 	N_("NONE (None)"),
 	N_("REL (Relocatable file)"),
@@ -2648,7 +2648,7 @@ print_liblist (Ebl *ebl)
 static const char *
 dwarf_tag_string (unsigned int tag)
 {
-  static const char *known_tags[]  =
+  static const char *const known_tags[]  =
     {
       [DW_TAG_array_type] = "array_type",
       [DW_TAG_class_type] = "class_type",
@@ -2753,7 +2753,7 @@ dwarf_tag_string (unsigned int tag)
 static const char *
 dwarf_attr_string (unsigned int attrnum)
 {
-  static const char *known_attrs[] =
+  static const char *const known_attrs[] =
     {
       [DW_AT_sibling] = "sibling",
       [DW_AT_location] = "location",
@@ -2967,7 +2967,7 @@ dwarf_attr_string (unsigned int attrnum)
 static const char *
 dwarf_form_string (unsigned int form)
 {
-  static const char *known_forms[] =
+  static const char *const known_forms[] =
     {
       [DW_FORM_addr] = "addr",
       [DW_FORM_block2] = "block2",
@@ -3010,7 +3010,7 @@ dwarf_form_string (unsigned int form)
 static const char *
 dwarf_lang_string (unsigned int lang)
 {
-  static const char *known[] =
+  static const char *const known[] =
     {
       [DW_LANG_C89] = "ISO C89",
       [DW_LANG_C] = "C",
@@ -3053,7 +3053,7 @@ dwarf_lang_string (unsigned int lang)
 static const char *
 dwarf_inline_string (unsigned int code)
 {
-  static const char *known[] =
+  static const char *const known[] =
     {
       [DW_INL_not_inlined] = "not_inlined",
       [DW_INL_inlined] = "inlined",
@@ -3071,7 +3071,7 @@ dwarf_inline_string (unsigned int code)
 static const char *
 dwarf_encoding_string (unsigned int code)
 {
-  static const char *known[] =
+  static const char *const known[] =
     {
       [DW_ATE_void] = "void",
       [DW_ATE_address] = "address",
@@ -3108,7 +3108,7 @@ dwarf_encoding_string (unsigned int code)
 static const char *
 dwarf_access_string (unsigned int code)
 {
-  static const char *known[] =
+  static const char *const known[] =
     {
       [DW_ACCESS_public] = "public",
       [DW_ACCESS_protected] = "protected",
@@ -3125,7 +3125,7 @@ dwarf_access_string (unsigned int code)
 static const char *
 dwarf_visibility_string (unsigned int code)
 {
-  static const char *known[] =
+  static const char *const known[] =
     {
       [DW_VIS_local] = "local",
       [DW_VIS_exported] = "exported",
@@ -3142,7 +3142,7 @@ dwarf_visibility_string (unsigned int code)
 static const char *
 dwarf_virtuality_string (unsigned int code)
 {
-  static const char *known[] =
+  static const char *const known[] =
     {
       [DW_VIRTUALITY_none] = "none",
       [DW_VIRTUALITY_virtual] = "virtual",
@@ -3159,7 +3159,7 @@ dwarf_virtuality_string (unsigned int code)
 static const char *
 dwarf_identifier_case_string (unsigned int code)
 {
-  static const char *known[] =
+  static const char *const known[] =
     {
       [DW_ID_case_sensitive] = "sensitive",
       [DW_ID_up_case] = "up_case",
@@ -3177,7 +3177,7 @@ dwarf_identifier_case_string (unsigned int code)
 static const char *
 dwarf_calling_convention_string (unsigned int code)
 {
-  static const char *known[] =
+  static const char *const known[] =
     {
       [DW_CC_normal] = "normal",
       [DW_CC_program] = "program",
@@ -3201,7 +3201,7 @@ dwarf_calling_convention_string (unsigned int code)
 static const char *
 dwarf_ordering_string (unsigned int code)
 {
-  static const char *known[] =
+  static const char *const known[] =
     {
       [DW_ORD_row_major] = "row_major",
       [DW_ORD_col_major] = "col_major"
@@ -3217,7 +3217,7 @@ dwarf_ordering_string (unsigned int code)
 static const char *
 dwarf_discr_list_string (unsigned int code)
 {
-  static const char *known[] =
+  static const char *const known[] =
     {
       [DW_DSC_label] = "label",
       [DW_DSC_range] = "range"
@@ -3234,7 +3234,7 @@ static void
 print_ops (Dwarf *dbg, int indent, int indentrest,
 	   unsigned int addrsize, Dwarf_Word len, const unsigned char *data)
 {
-  static const char *known[] =
+  static const char *const known[] =
     {
       [DW_OP_addr] = "addr",
       [DW_OP_deref] = "deref",
@@ -4047,97 +4047,9 @@ print_debug_info_section (Ebl *ebl __attribute__ ((unused)),
 	  goto do_return;
 	}
 
-#if 1
-      const char *tagstr = dwarf_tag_string (tag);
-#else
-      static const char *const lowtags[] =
-	{
-	  [DW_TAG_array_type] = "array_type",
-	  [DW_TAG_class_type] = "class_type",
-	  [DW_TAG_entry_point] = "entry_point",
-	  [DW_TAG_enumeration_type] = "enumeration_type",
-	  [DW_TAG_formal_parameter] = "formal_parameter",
-	  [DW_TAG_imported_declaration] = "imported_declaration",
-	  [DW_TAG_label] = "label",
-	  [DW_TAG_lexical_block] = "lexical_block",
-	  [DW_TAG_member] = "member",
-	  [DW_TAG_pointer_type] = "pointer_type",
-	  [DW_TAG_reference_type] = "reference_type",
-	  [DW_TAG_compile_unit] = "compile_unit",
-	  [DW_TAG_string_type] = "string_type",
-	  [DW_TAG_structure_type] = "structure_type",
-	  [DW_TAG_subroutine_type] = "subroutine_type",
-	  [DW_TAG_typedef] = "typedef",
-	  [DW_TAG_union_type] = "union_type",
-	  [DW_TAG_unspecified_parameters] = "unspecified_parameters",
-	  [DW_TAG_variant] = "variant",
-	  [DW_TAG_common_block] = "common_block",
-	  [DW_TAG_common_inclusion] = "common_inclusion",
-	  [DW_TAG_inheritance] = "inheritance",
-	  [DW_TAG_inlined_subroutine] = "inlined_subroutine",
-	  [DW_TAG_module] = "module",
-	  [DW_TAG_ptr_to_member_type] = "ptr_to_member_type",
-	  [DW_TAG_set_type] = "set_type",
-	  [DW_TAG_subrange_type] = "subrange_type",
-	  [DW_TAG_with_stmt] = "with_stmt",
-	  [DW_TAG_access_declaration] = "access_declaration",
-	  [DW_TAG_base_type] = "base_type",
-	  [DW_TAG_catch_block] = "catch_block",
-	  [DW_TAG_const_type] = "const_type",
-	  [DW_TAG_constant] = "constant",
-	  [DW_TAG_enumerator] = "enumerator",
-	  [DW_TAG_file_type] = "file_type",
-	  [DW_TAG_friend] = "friend",
-	  [DW_TAG_namelist] = "namelist",
-	  [DW_TAG_namelist_item] = "namelist_item",
-	  [DW_TAG_packed_type] = "packed_type",
-	  [DW_TAG_subprogram] = "subprogram",
-	  [DW_TAG_template_type_param] = "template_type_param",
-	  [DW_TAG_template_value_param] = "template_value_param",
-	  [DW_TAG_thrown_type] = "thrown_type",
-	  [DW_TAG_try_block] = "try_block",
-	  [DW_TAG_variant_part] = "variant_part",
-	  [DW_TAG_variable] = "variable",
-	  [DW_TAG_volatile_type] = "volatile_type"
-	};
-
-      const char *tagstr;
-      switch (tag)
-	{
-	case DW_TAG_lo_user:
-	  tagstr = "lo_user";
-	  break;
-
-	case DW_TAG_MIPS_loop:
-	  tagstr = "MIPS_loop";
-	  break;
-
-	case DW_TAG_format_label:
-	  tagstr = "format_label";
-	  break;
-
-	case DW_TAG_function_template:
-	  tagstr = "function_template";
-	  break;
-
-	case DW_TAG_class_template:
-	  tagstr = "class_template";
-	  break;
-	case DW_TAG_hi_user:
-	  tagstr = "hi_user";
-	  break;
-
-	default:
-	  if (tag < (int) (sizeof (lowtags) / sizeof (lowtags[0])))
-	    tagstr = lowtags[tag];
-	  else
-	    tagstr = "???";
-	  break;
-	}
-#endif
-
       printf (" [%6" PRIx64 "]  %*s%s\n",
-	      (uint64_t) offset, (int) (level * 2), "", tagstr);
+	      (uint64_t) offset, (int) (level * 2), "",
+	      dwarf_tag_string (tag));
 
       /* Print the attribute values.  */
       args.level = level;

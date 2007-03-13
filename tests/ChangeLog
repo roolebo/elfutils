@@ -1,3 +1,12 @@
+2007-03-04  Roland McGrath  <roland@redhat.com>
+
+	* dwfl-bug-fd-leak.c: New file.
+	* Makefile.am (noinst_PROGRAMS, TESTS): Add it.
+	(dwfl_bug_fd_leak_LDADD): New variable.
+
+	* dwflmodtest.c: Test dwfl_getmodules before and after getdwarf,
+	show what files have been located.
+
 2007-02-02  Roland McGrath  <roland@redhat.com>
 
 	* run-addrname-test.sh: New file.

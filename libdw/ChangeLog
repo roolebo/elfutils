@@ -1,3 +1,12 @@
+2007-03-12  Roland McGrath  <roland@redhat.com>
+
+	* libdw.map (ELFUTILS_0.127): Add dwfl_report_begin_add.
+
+2007-03-04  Roland McGrath  <roland@redhat.com>
+
+	* libdw.map (ELFUTILS_0.127): New version set, inherits from
+	ELFUTILS_0.126.  Add dwfl_module_addrsym.
+
 2007-02-10  Roland McGrath  <roland@redhat.com>
 
 	* dwarf.h (DW_OP_fbreg): Comment fix.

@@ -156,6 +156,14 @@ extern int dwfl_report_end (Dwfl *dwfl,
 					    void *arg),
 			    void *arg);
 
+/* Start reporting additional modules to the library.  No calls but
+   dwfl_report_* can be made on DWFL until dwfl_report_end is called.
+   This is like dwfl_report_begin, but all the old modules are kept on.
+   More dwfl_report_* calls can follow to add more modules.
+   When dwfl_report_end is called, no old modules will be removed.  */
+extern void dwfl_report_begin_add (Dwfl *dwfl);
+
+
 /* Return the name of the module, and for each non-null argument store
    interesting details: *USERDATA is a location for storing your own
    pointer, **USERDATA is initially null; *START and *END give the address
@@ -331,6 +339,12 @@ extern const char *dwfl_module_getsym (Dwfl_Module *mod, int ndx,
 
 /* Find the symbol that ADDRESS lies inside, and return its name.  */
 extern const char *dwfl_module_addrname (Dwfl_Module *mod, GElf_Addr address);
+
+/* Find the symbol that ADDRESS lies inside, and return detailed
+   information as for dwfl_module_getsym (above).  */
+extern const char *dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr address,
+					GElf_Sym *sym, GElf_Word *shndxp)
+  __nonnull_attribute__ (3);
 
 
 /*** Dwarf access functions ***/

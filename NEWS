@@ -1,3 +1,7 @@
+Version 0.127-UNFINISHED:
+
+libdwfl: new function dwfl_module_addrsym
+
 Version 0.126:
 
 new program: ar

@@ -1,5 +1,5 @@
 /* Internal definitions for libdwfl.
-   Copyright (C) 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -269,6 +269,7 @@ INTDECL (dwfl_addrmodule)
 INTDECL (dwfl_addrdwarf)
 INTDECL (dwfl_addrdie)
 INTDECL (dwfl_module_addrdie)
+INTDECL (dwfl_module_addrsym)
 INTDECL (dwfl_module_getdwarf)
 INTDECL (dwfl_module_getelf)
 INTDECL (dwfl_module_getsym)
@@ -276,6 +277,7 @@ INTDECL (dwfl_module_getsymtab)
 INTDECL (dwfl_module_getsrc)
 INTDECL (dwfl_report_elf)
 INTDECL (dwfl_report_begin)
+INTDECL (dwfl_report_begin_add)
 INTDECL (dwfl_report_module)
 INTDECL (dwfl_report_offline)
 INTDECL (dwfl_report_end)

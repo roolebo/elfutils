@@ -63,8 +63,11 @@
 #include <fts.h>
 
 
+#define KERNEL_MODNAME	"kernel"
+
 #define MODULEDIRFMT	"/lib/modules/%s"
 
+#define KSYMSFILE	"/proc/kallsyms"
 #define MODULELIST	"/proc/modules"
 #define	SECADDRDIRFMT	"/sys/module/%s/sections/"
 #define MODULE_SECT_NAME_LEN 32	/* Minimum any linux/module.h has had.  */
@@ -116,29 +119,45 @@ kernel_release (void)
 }
 
 static int
+find_kernel_elf (Dwfl *dwfl, const char *release, char **fname)
+{
+  if ((release[0] == '/'
+       ? asprintf (fname, "%s/vmlinux", release)
+       : asprintf (fname, "/boot/vmlinux-%s", release)) < 0)
+    return -1;
+
+  int fd = try_kernel_name (dwfl, fname);
+  if (fd < 0 && release[0] != '/')
+    {
+      free (*fname);
+      if (asprintf (fname, MODULEDIRFMT "/vmlinux", release) < 0)
+	return -1;
+      fd = try_kernel_name (dwfl, fname);
+    }
+
+  return fd;
+}
+
+static int
 report_kernel (Dwfl *dwfl, const char *release,
 	       int (*predicate) (const char *module, const char *file))
 {
   if (dwfl == NULL)
     return -1;
 
-  char *fname;
-  if ((release[0] == '/'
-       ? asprintf (&fname, "%s/vmlinux", release)
-       : asprintf (&fname, "/boot/vmlinux-%s", release)) < 0)
-    return -1;
-  int fd = try_kernel_name (dwfl, &fname);
-  if (fd < 0 && release[0] != '/')
+  if (release == NULL)
     {
-      free (fname);
-      if (asprintf (&fname, MODULEDIRFMT "/vmlinux", release) < 0)
-	return -1;
-      fd = try_kernel_name (dwfl, &fname);
+      release = kernel_release ();
+      if (release == NULL)
+	return errno;
     }
+
+  char *fname;
+  int fd = find_kernel_elf (dwfl, release, &fname);
 
   int result = 0;
   if (fd < 0)
-    result = ((predicate != NULL && !(*predicate) ("kernel", NULL))
+    result = ((predicate != NULL && !(*predicate) (KERNEL_MODNAME, NULL))
 	      ? 0 : errno ?: ENOENT);
   else
     {
@@ -147,14 +166,15 @@ report_kernel (Dwfl *dwfl, const char *release,
       if (predicate != NULL)
 	{
 	  /* Let the predicate decide whether to use this one.  */
-	  int want = (*predicate) ("kernel", fname);
+	  int want = (*predicate) (KERNEL_MODNAME, fname);
 	  if (want < 0)
 	    result = errno;
 	  report = want > 0;
 	}
 
       if (report
-	  && INTUSE(dwfl_report_elf) (dwfl, "kernel", fname, fd, 0) == NULL)
+	  && INTUSE(dwfl_report_elf) (dwfl, KERNEL_MODNAME,
+				      fname, fd, 0) == NULL)
 	{
 	  close (fd);
 	  result = -1;
@@ -177,13 +197,6 @@ dwfl_linux_kernel_report_offline (Dwfl *dwfl, const char *release,
 				  int (*predicate) (const char *module,
 						    const char *file))
 {
-  if (release == NULL)
-    {
-      release = kernel_release ();
-      if (release == NULL)
-	return errno;
-    }
-
   /* First report the kernel.  */
   int result = report_kernel (dwfl, release, predicate);
   if (result == 0)
@@ -279,15 +292,87 @@ dwfl_linux_kernel_report_offline (Dwfl *dwfl, const char *release,
 INTDEF (dwfl_linux_kernel_report_offline)
 
 
-/* Find the ELF file for the running kernel and dwfl_report_elf it.  */
+/* Grovel around to guess the bounds of the runtime kernel image.  */
+static int
+intuit_kernel_bounds (Dwarf_Addr *start, Dwarf_Addr *end)
+{
+  FILE *f = fopen (KSYMSFILE, "r");
+  if (f == NULL)
+    return errno;
+
+  (void) __fsetlocking (f, FSETLOCKING_BYCALLER);
+
+  char *line = NULL;
+  size_t linesz = 0;
+  size_t n = getline (&line, &linesz, f);
+  Dwarf_Addr first;
+  char *p = NULL;
+  int result = 0;
+  if (n > 0 && (first = strtoull (line, &p, 16)) > 0 && p > line)
+    {
+      Dwarf_Addr last = 0;
+      while ((n = getline (&line, &linesz, f)) > 1 && line[n - 2] != ']')
+	{
+	  p = NULL;
+	  last = strtoull (line, &p, 16);
+	  if (p == NULL || p == line || last == 0)
+	    {
+	      result = -1;
+	      break;
+	    }
+	}
+      if ((n == 0 && feof_unlocked (f)) || (n > 1 && line[n - 2] == ']'))
+	{
+	  Dwarf_Addr round_kernel = sysconf (_SC_PAGE_SIZE);
+	  first &= -(Dwarf_Addr) round_kernel;
+	  last += round_kernel - 1;
+	  last &= -(Dwarf_Addr) round_kernel;
+	  *start = first;
+	  *end = last;
+	  result = 0;
+	}
+    }
+  free (line);
+
+  if (result == -1)
+    result = ferror_unlocked (f) ? errno : ENOEXEC;
+
+  fclose (f);
+
+  return result;
+}
+
 int
 dwfl_linux_kernel_report_kernel (Dwfl *dwfl)
 {
-  const char *release = kernel_release ();
-  if (release == NULL)
-    return errno;
+  Dwarf_Addr start;
+  Dwarf_Addr end;
+  inline int report (void)
+    {
+      return INTUSE(dwfl_report_module) (dwfl, KERNEL_MODNAME,
+					 start, end) == NULL ? -1 : 0;
+    }
 
-  return report_kernel (dwfl, release, NULL);
+  /* This is a bit of a kludge.  If we already reported the kernel,
+     don't bother figuring it out again--it never changes.  */
+  for (Dwfl_Module *m = dwfl->modulelist; m != NULL; m = m->next)
+    if (!strcmp (m->name, KERNEL_MODNAME))
+      {
+	start = m->low_addr;
+	end = m->high_addr;
+	return report ();
+      }
+
+  /* Try to figure out the bounds of the kernel image without
+     looking for any vmlinux file.  */
+  int result = intuit_kernel_bounds (&start, &end);
+  if (result == 0)
+    return report ();
+  if (result != ENOENT)
+    return result;
+
+  /* Find the ELF file for the running kernel and dwfl_report_elf it.  */
+  return report_kernel (dwfl, NULL, NULL);
 }
 INTDEF (dwfl_linux_kernel_report_kernel)
 
@@ -305,6 +390,9 @@ dwfl_linux_kernel_find_elf (Dwfl_Module *mod __attribute__ ((unused)),
   const char *release = kernel_release ();
   if (release == NULL)
     return errno;
+
+  if (!strcmp (module_name, KERNEL_MODNAME))
+    return find_kernel_elf (mod->dwfl, release, file_name);
 
   /* Do "find /lib/modules/`uname -r`/kernel -name MODULE_NAME.ko".  */
 
@@ -416,7 +504,7 @@ dwfl_linux_kernel_module_section_address
  Dwarf_Addr *addr)
 {
   char *sysfile;
-  if (asprintf (&sysfile, SECADDRDIRFMT "%s", modname, secname))
+  if (asprintf (&sysfile, SECADDRDIRFMT "%s", modname, secname) < 0)
     return ENOMEM;
 
   FILE *f = fopen (sysfile, "r");

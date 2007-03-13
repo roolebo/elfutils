@@ -145,6 +145,7 @@ ELFUTILS_0.122 {
   local:
     *;
 } ELFUTILS_0;
+
 ELFUTILS_0.126 {
   global:
     dwarf_getelf;
@@ -152,3 +153,12 @@ ELFUTILS_0.126 {
   local:
     *;
 } ELFUTILS_0.122;
+
+ELFUTILS_0.127 {
+  global:
+    dwfl_module_addrsym;
+    dwfl_report_begin_add;
+
+  local:
+    *;
+} ELFUTILS_0.126;

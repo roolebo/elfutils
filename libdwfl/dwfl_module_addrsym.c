@@ -50,8 +50,88 @@
 #include "libdwflP.h"
 
 const char *
-dwfl_module_addrname (Dwfl_Module *mod, GElf_Addr addr)
+dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr addr,
+		     GElf_Sym *closest_sym, GElf_Word *shndxp)
 {
-  GElf_Sym sym;
-  return INTUSE(dwfl_module_addrsym) (mod, addr, &sym, NULL);
+  int syments = INTUSE(dwfl_module_getsymtab) (mod);
+  if (syments < 0)
+    return NULL;
+
+  /* Return true iff we consider ADDR to lie in the same section as SYM.  */
+  GElf_Word addr_shndx = SHN_UNDEF;
+  inline bool same_section (const GElf_Sym *sym, GElf_Word shndx)
+    {
+      /* For absolute symbols and the like, only match exactly.  */
+      if (shndx >= SHN_LORESERVE)
+	return sym->st_value == addr;
+
+      /* Ignore section and other special symbols.  */
+      switch (GELF_ST_TYPE (sym->st_info))
+	{
+	case STT_SECTION:
+	case STT_FILE:
+	case STT_TLS:
+	  return false;
+	}
+
+      /* Figure out what section ADDR lies in.  */
+      if (addr_shndx == SHN_UNDEF)
+	{
+	  GElf_Addr mod_addr = addr - mod->symfile->bias;
+	  Elf_Scn *scn = NULL;
+	  addr_shndx = SHN_ABS;
+	  while ((scn = elf_nextscn (mod->symfile->elf, scn)) != NULL)
+	    {
+	      GElf_Shdr shdr_mem;
+	      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+	      if (likely (shdr != NULL)
+		  && mod_addr >= shdr->sh_addr
+		  && mod_addr < shdr->sh_addr + shdr->sh_size)
+		{
+		  addr_shndx = elf_ndxscn (scn);
+		  break;
+		}
+	    }
+	}
+
+      return shndx == addr_shndx;
+    }
+
+  /* Look through the symbol table for a matching symbol.  */
+  const char *closest_name = NULL;
+  closest_sym->st_value = 0;
+  GElf_Word closest_shndx = SHN_UNDEF;
+  for (int i = 1; i < syments; ++i)
+    {
+      GElf_Sym sym;
+      GElf_Word shndx;
+      const char *name = INTUSE(dwfl_module_getsym) (mod, i, &sym, &shndx);
+      if (name != NULL && sym.st_value <= addr)
+	{
+	  inline void closest (void)
+	    {
+	      *closest_sym = sym;
+	      closest_shndx = shndx;
+	      closest_name = name;
+	    }
+
+	  if (addr < sym.st_value + sym.st_size)
+	    {
+	      closest ();
+	      break;
+	    }
+
+	  /* Handwritten assembly symbols sometimes have no st_size.
+	     If no symbol with proper size includes the address, we'll
+	     use the closest one that is in the same section as ADDR.   */
+	  if (sym.st_size == 0 && sym.st_value >= closest_sym->st_value
+	      && same_section (&sym, shndx))
+	    closest ();
+	}
+    }
+
+  if (shndxp != NULL)
+    *shndxp = closest_shndx;
+  return closest_name;
 }
+INTDEF (dwfl_module_addrsym)

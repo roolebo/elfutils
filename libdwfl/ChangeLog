@@ -1,3 +1,47 @@
+2007-03-12  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module.c (dwfl_report_begin_add): New function broken out of ...
+	(dwfl_report_begin): ... here.  Call it.
+	* libdwfl.h: Declare it.
+	* libdwflP.h: Add INTDECL.
+
+	* elf-from-memory.c (elf_from_remote_memory): Fix 32/64 typo.
+
+	* offline.c: Comment typo fix.
+
+2007-03-04  Roland McGrath  <roland@redhat.com>
+
+	* linux-kernel-modules.c (KERNEL_MODNAME): New macro for "kernel".
+	(find_kernel_elf): New function, broken out of ...
+	(report_kernel): ... here.  Call it.
+	(dwfl_linux_kernel_find_elf): Use it for module named KERNEL_MODNAME.
+	(intuit_kernel_bounds): New function, grovel /proc/kallsyms to guess
+	virtual address bounds of kernel from symbols rounded to page size.
+	(dwfl_linux_kernel_report_kernel): Use that if it works, before
+	resorting to report_kernel.
+
+	* dwfl_module_getdwarf.c (open_elf): Set MOD->e_type to ET_DYN for an
+	ET_EXEC file with nonzero bias.
+
+	* dwfl_module_addrname.c (dwfl_module_addrname): Just call
+	dwfl_module_addrsym.  Guts moved to ...
+	* dwfl_module_addrsym.c: ... here; new file.
+	* Makefile.am (libdwfl_a_SOURCES): Add it.
+	* libdwfl.h: Declare dwfl_module_addrsym.
+	* libdwflP.h: Add INTDECL.
+
+2007-03-03  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module.c (free_file): New function, broken out of ...
+	(__libdwfl_module_free): ... here.  In it, close fd after elf_end.
+
+	* dwfl_module_getdwarf.c (open_elf): Close fd and reset to -1
+	on libelf failure.
+
+2007-03-02  Roland McGrath  <roland@redhat.com>
+
+	* linux-kernel-modules.c: Fix bogus error test for asprintf call.
+
 2007-02-02  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_addrmodule.c (dwfl_addrmodule): Match a module's high boundary

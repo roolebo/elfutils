@@ -52,7 +52,7 @@
 
 /* Since dwfl_report_elf lays out the sections already, this will only be
    called when the section headers of the debuginfo file are being
-   consulted instead, or for a section located at zeron.  With binutils
+   consulted instead, or for a section located at zero.  With binutils
    strip-to-debug, the symbol table is in the debuginfo file and relocation
    looks there.  */
 int

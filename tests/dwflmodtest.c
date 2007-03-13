@@ -1,5 +1,5 @@
 /* Test program for libdwfl basic module tracking, relocation.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -163,6 +163,25 @@ print_func (Dwarf_Die *func, void *arg)
 }
 
 static int
+list_module (Dwfl_Module *mod __attribute__ ((unused)),
+	     void **userdata __attribute__ ((unused)),
+	     const char *name, Dwarf_Addr base,
+	     void *arg __attribute__ ((unused)))
+{
+  Dwarf_Addr start;
+  Dwarf_Addr end;
+  const char *file;
+  const char *debug;
+  if (dwfl_module_info (mod, NULL, &start, &end,
+			NULL, NULL, &file, &debug) != name
+      || start != base)
+    abort ();
+  printf ("module: %30s %08" PRIx64 "..%08" PRIx64 " %s %s\n",
+	  name, start, end, file, debug);
+  return DWARF_CB_OK;
+}
+
+static int
 print_module (Dwfl_Module *mod __attribute__ ((unused)),
 	      void **userdata __attribute__ ((unused)),
 	      const char *name, Dwarf_Addr base,
@@ -252,10 +271,23 @@ main (int argc, char **argv)
 
   ptrdiff_t p = 0;
   do
+    p = dwfl_getmodules (dwfl, &list_module, NULL, p);
+  while (p > 0);
+  if (p < 0)
+    error (2, 0, "dwfl_getmodules: %s", dwfl_errmsg (-1));
+
+  do
     p = dwfl_getdwarf (dwfl, &print_module, &show_functions, p);
   while (p > 0);
   if (p < 0)
     error (2, 0, "dwfl_getdwarf: %s", dwfl_errmsg (-1));
+
+  p = 0;
+  do
+    p = dwfl_getmodules (dwfl, &list_module, NULL, p);
+  while (p > 0);
+  if (p < 0)
+    error (2, 0, "dwfl_getmodules: %s", dwfl_errmsg (-1));
 
   dwfl_end (dwfl);
 

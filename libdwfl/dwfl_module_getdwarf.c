@@ -1,5 +1,5 @@
 /* Find debugging and symbol information for a module in libdwfl.
-   Copyright (C) 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -69,9 +69,12 @@ open_elf (Dwfl_Module *mod, struct dwfl_file *file)
 
   GElf_Ehdr ehdr_mem, *ehdr = gelf_getehdr (file->elf, &ehdr_mem);
   if (ehdr == NULL)
-    return DWFL_E (LIBELF, elf_errno ());
-
-  mod->e_type = ehdr->e_type;
+    {
+    elf_error:
+      close (file->fd);
+      file->fd = -1;
+      return DWFL_E_LIBELF;
+    }
 
   file->bias = 0;
   for (uint_fast16_t i = 0; i < ehdr->e_phnum; ++i)
@@ -79,7 +82,7 @@ open_elf (Dwfl_Module *mod, struct dwfl_file *file)
       GElf_Phdr ph_mem;
       GElf_Phdr *ph = gelf_getphdr (file->elf, i, &ph_mem);
       if (ph == NULL)
-	return DWFL_E_LIBELF;
+	goto elf_error;
       if (ph->p_type == PT_LOAD)
 	{
 	  file->bias = ((mod->low_addr & -ph->p_align)
@@ -87,6 +90,12 @@ open_elf (Dwfl_Module *mod, struct dwfl_file *file)
 	  break;
 	}
     }
+
+  mod->e_type = ehdr->e_type;
+
+  /* Relocatable Linux kernels are ET_EXEC but act like ET_DYN.  */
+  if (mod->e_type == ET_EXEC && file->bias != 0)
+    mod->e_type = ET_DYN;
 
   return DWFL_E_NOERROR;
 }

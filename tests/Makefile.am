@@ -58,7 +58,7 @@ noinst_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  get-aranges allfcts line2addr addrscopes funcscopes \
 		  show-abbrev hash newscn ecp dwflmodtest \
 		  find-prologues funcretval allregs rdwrmmap \
-		  dwfl-bug-addr-overflow arls
+		  dwfl-bug-addr-overflow arls dwfl-bug-fd-leak
 # get-ciefde
 asm_TESTS = asm-tst1 asm-tst2 asm-tst3 asm-tst4 asm-tst5 \
 	    asm-tst6 asm-tst7 asm-tst8 asm-tst9
@@ -76,7 +76,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-addrscopes.sh run-strings-test.sh run-funcscopes.sh \
 	run-find-prologues.sh run-allregs.sh run-readelf-test1.sh \
 	run-native-test.sh run-bug1-test.sh \
-	dwfl-bug-addr-overflow run-addrname-test.sh
+	dwfl-bug-addr-overflow run-addrname-test.sh dwfl-bug-fd-leak
 # run-show-ciefde.sh
 
 if !STANDALONE
@@ -203,6 +203,7 @@ dwflmodtest_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
 rdwrmmap_LDADD = $(libelf)
 dwfl_bug_addr_overflow_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
 arls_LDADD = $(libelf) $(libmudflap)
+dwfl_bug_fd_leak_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
 
 CLEANFILES = xxx *.gcno *.gcda *gconv
 

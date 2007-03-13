@@ -1,5 +1,5 @@
 /* Maintenance of module list in libdwfl.
-   Copyright (C) 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -49,6 +49,7 @@
 
 #include "libdwflP.h"
 #include <search.h>
+#include <unistd.h>
 
 static void
 free_cu (struct dwfl_cu *cu)
@@ -61,6 +62,17 @@ free_cu (struct dwfl_cu *cu)
 static void
 nofree (void *arg __attribute__ ((unused)))
 {
+}
+
+static void
+free_file (struct dwfl_file *file)
+{
+  if (file->elf != NULL)
+    {
+      elf_end (file->elf);
+      if (file->fd != -1)
+	close (file->fd);
+    }
 }
 
 void
@@ -86,24 +98,30 @@ __libdwfl_module_free (Dwfl_Module *mod)
   if (mod->ebl != NULL)
     ebl_closebackend (mod->ebl);
 
-  if (mod->debug.elf != mod->main.elf && mod->debug.elf != NULL)
-    elf_end (mod->debug.elf);
-  if (mod->main.elf != NULL)
-    elf_end (mod->main.elf);
+  if (mod->debug.elf != mod->main.elf)
+    free_file (&mod->debug);
+  free_file (&mod->main);
 
   free (mod->name);
 }
 
 void
-dwfl_report_begin (Dwfl *dwfl)
+dwfl_report_begin_add (Dwfl *dwfl)
 {
-  for (Dwfl_Module *m = dwfl->modulelist; m != NULL; m = m->next)
-    m->gc = true;
-
   if (dwfl->modules != NULL)
     free (dwfl->modules);
   dwfl->modules = NULL;
   dwfl->nmodules = 0;
+}
+INTDEF (dwfl_report_begin_add)
+
+void
+dwfl_report_begin (Dwfl *dwfl)
+{
+  INTUSE(dwfl_report_begin_add) (dwfl);
+
+  for (Dwfl_Module *m = dwfl->modulelist; m != NULL; m = m->next)
+    m->gc = true;
 
   dwfl->offline_next_address = OFFLINE_REDZONE;
 }

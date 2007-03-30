@@ -1,5 +1,5 @@
 /* Internal interfaces for libelf.
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006 Red Hat, Inc.
+   Copyright (C) 1998,1999,2000,2001,2002,2003,2005,2006,2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -423,6 +423,22 @@ extern int __libelf_fill_byte attribute_hidden;
 /* Nonzero if the version was set.  */
 extern int __libelf_version_initialized attribute_hidden;
 
+/* Index for __libelf_type_sizes et al.  */
+#if EV_NUM == 2
+# define LIBELF_EV_IDX	0
+#else
+# define LIBELF_EV_IDX	(__libelf_version - 1)
+#endif
+
+#if !ALLOW_UNALIGNED
+/* Array with alignment requirements of the internal types indexed by ELF
+   version, binary class, and type. */
+extern const uint_fast8_t __libelf_type_aligns[EV_NUM - 1][ELFCLASSNUM - 1][ELF_T_NUM] attribute_hidden;
+# define __libelf_type_align(class, type)	\
+    (__libelf_type_aligns[LIBELF_EV_IDX][class][type] ?: 1)
+#else
+# define __libelf_type_align(class, type)	1
+#endif
 
 /* The libelf API does not have such a function but it is still useful.
    Get the memory size for the given type.

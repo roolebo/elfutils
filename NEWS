@@ -1,6 +1,6 @@
 Version 0.127-UNFINISHED:
 
-libdwfl: new function dwfl_module_addrsym
+libdwfl: new functions dwfl_module_addrsym, dwfl_report_begin_add
 
 Version 0.126:
 

@@ -1,5 +1,5 @@
 /* Print contents of core note.
-   Copyright (C) 2002, 2004, 2005 Red Hat, Inc.
+   Copyright (C) 2002, 2004, 2005, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -173,14 +173,7 @@ ebl_core_note (ebl, name, type, descsz, desc)
 
 	    switch (atype)
 	      {
-	      case AT_NULL:
-	      case AT_IGNORE:
-	      case AT_IGNOREPPC:
-	      case AT_NOTELF:
-	      default:
-		printf ("    %s\n", at);
-		break;
-
+		/* Decimal.  */
 	      case AT_EXECFD:
 	      case AT_PHENT:
 	      case AT_PHNUM:
@@ -202,6 +195,20 @@ ebl_core_note (ebl, name, type, descsz, desc)
 		printf ("    %s: %jd\n", at, val);
 		break;
 
+		/* Normally zero.  */
+	      case AT_NULL:
+	      case AT_IGNORE:
+	      case AT_IGNOREPPC:
+	      case AT_NOTELF:
+	      default:
+		if (val == 0)
+		  {
+		    printf ("    %s\n", at);
+		    break;
+		  }
+		/* Fall through.  */
+
+		/* Hex.  */
 	      case AT_PHDR:
 	      case AT_BASE:
 	      case AT_FLAGS:	/* XXX Print flags?  */

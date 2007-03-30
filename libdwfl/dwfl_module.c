@@ -103,6 +103,7 @@ __libdwfl_module_free (Dwfl_Module *mod)
   free_file (&mod->main);
 
   free (mod->name);
+  free (mod);
 }
 
 void

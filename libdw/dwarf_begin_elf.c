@@ -1,5 +1,5 @@
 /* Create descriptor from ELF descriptor for processing file.
-   Copyright (C) 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -84,7 +84,7 @@ static const char dwarf_scnnames[IDX_last][17] =
 #define ndwarf_scnnames (sizeof (dwarf_scnnames) / sizeof (dwarf_scnnames[0]))
 
 
-static void
+static Dwarf *
 check_section (Dwarf *result, GElf_Ehdr *ehdr, Elf_Scn *scn, bool inscngrp)
 {
   GElf_Shdr shdr_mem;
@@ -105,7 +105,7 @@ check_section (Dwarf *result, GElf_Ehdr *ehdr, Elf_Scn *scn, bool inscngrp)
      a section which isn't part of the section group.  */
   if (! inscngrp && (shdr->sh_flags & SHF_GROUP) != 0)
     /* Ignore the section.  */
-    return;
+    return result;
 
 
   /* We recognize the DWARF section by their names.  This is not very
@@ -118,7 +118,7 @@ check_section (Dwarf *result, GElf_Ehdr *ehdr, Elf_Scn *scn, bool inscngrp)
 	 invalid.  */
       __libdw_seterrno (DWARF_E_INVALID_ELF);
       free (result);
-      return;
+      return NULL;
     }
 
 
@@ -140,6 +140,8 @@ check_section (Dwarf *result, GElf_Ehdr *ehdr, Elf_Scn *scn, bool inscngrp)
 
 	break;
       }
+
+  return result;
 }
 
 
@@ -153,9 +155,11 @@ valid_p (Dwarf *result)
      XXX Which sections are absolutely necessary?  Add tests if
      necessary.  For now we require only .debug_info.  Hopefully this
      is correct.  */
-  if (unlikely (result->sectiondata[IDX_debug_info] == NULL))
+  if (likely (result != NULL)
+      && unlikely (result->sectiondata[IDX_debug_info] == NULL))
     {
       __libdw_seterrno (DWARF_E_NO_DWARF);
+      free (result);
       result = NULL;
     }
 
@@ -168,8 +172,8 @@ global_read (Dwarf *result, Elf *elf, GElf_Ehdr *ehdr)
 {
   Elf_Scn *scn = NULL;
 
-  while ((scn = elf_nextscn (elf, scn)) != NULL)
-    check_section (result, ehdr, scn, false);
+  while (result != NULL && (scn = elf_nextscn (elf, scn)) != NULL)
+    result = check_section (result, ehdr, scn, false);
 
   return valid_p (result);
 }
@@ -204,7 +208,9 @@ scngrp_read (Dwarf *result, Elf *elf, GElf_Ehdr *ehdr, Elf_Scn *scngrp)
 	  return NULL;
 	}
 
-      check_section (result, ehdr, scn, true);
+      result = check_section (result, ehdr, scn, true);
+      if (result == NULL)
+	break;
     }
 
   return valid_p (result);

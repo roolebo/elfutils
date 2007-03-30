@@ -1,3 +1,8 @@
+2007-03-10  Roland McGrath  <roland@redhat.com>
+
+	* eblcorenote.c (ebl_core_note): For normally-zero types,
+	print in hex if not zero.
+
 2007-01-11  Roland McGrath  <roland@redhat.com>
 
 	* ebl-hooks.h (machine_section_flag_check): New hook.

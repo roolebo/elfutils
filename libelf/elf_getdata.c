@@ -1,5 +1,5 @@
 /* Return the next data element from the section after possibly converting it.
-   Copyright (C) 1998-2005, 2006 Red Hat, Inc.
+   Copyright (C) 1998-2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -63,13 +63,6 @@
 #include "elf-knowledge.h"
 
 
-#if _STRING_ARCH_unaligned
-# define ALLOW_ALIGNED	1
-#else
-# define ALLOW_ALIGNED	0
-#endif
-
-
 #define TYPEIDX(Sh_Type) \
   (Sh_Type >= SHT_NULL && Sh_Type < SHT_NUM				      \
    ? Sh_Type								      \
@@ -77,95 +70,74 @@
       ? SHT_NUM + Sh_Type - SHT_GNU_HASH				      \
       : 0))
 
-static const struct
-{
-  Elf_Type type;
-  size_t size;
-#if ALLOW_ALIGNED
-# define AL(val)
-#else
-  size_t align;
-# define AL(val), val
-#endif
-} shtype_map[EV_NUM - 1][ELFCLASSNUM - 1][TYPEIDX (SHT_HISUNW) + 1] =
-{
-  [EV_CURRENT - 1] =
+/* Associate section types with libelf types.  */
+static const Elf_Type shtype_map[EV_NUM - 1][TYPEIDX (SHT_HISUNW) + 1] =
   {
-    [ELFCLASS32 - 1] =
+    [EV_CURRENT - 1] =
     {
-      /* Associate section types with libelf types, their sizes and
-	 alignment.  SHT_GNU_verdef is special since the section does
-	 not contain entries of only one size.  */
-#define DEFINE(Bits) \
-      [SHT_SYMTAB] = { ELF_T_SYM, sizeof (ElfW2(Bits,Sym))		      \
-		       AL (__alignof__ (ElfW2(Bits,Sym))) },		      \
-      [SHT_RELA] = { ELF_T_RELA, sizeof (ElfW2(Bits,Rela))		      \
-		       AL (__alignof__ (ElfW2(Bits,Rela))) },		      \
-      [SHT_HASH] = { ELF_T_WORD, sizeof (ElfW2(Bits,Word))		      \
-		       AL (__alignof__ (ElfW2(Bits,Word))) },		      \
-      [SHT_DYNAMIC] = { ELF_T_DYN, sizeof (ElfW2(Bits,Dyn))		      \
-		       AL (__alignof__ (ElfW2(Bits,Dyn))) },		      \
-      [SHT_REL] = { ELF_T_REL, sizeof (ElfW2(Bits,Rel))			      \
-		       AL (__alignof__ (ElfW2(Bits,Rel))) },		      \
-      [SHT_DYNSYM] = { ELF_T_SYM, sizeof (ElfW2(Bits,Sym))		      \
-		       AL (__alignof__ (ElfW2(Bits,Sym))) },		      \
-      [SHT_INIT_ARRAY] = { ELF_T_ADDR, sizeof (ElfW2(Bits,Addr))	      \
-			   AL (__alignof__ (ElfW2(Bits,Addr))) },	      \
-      [SHT_FINI_ARRAY] = { ELF_T_ADDR, sizeof (ElfW2(Bits,Addr))	      \
-			   AL (__alignof__ (ElfW2(Bits,Addr))) },	      \
-      [SHT_PREINIT_ARRAY] = { ELF_T_ADDR, sizeof (ElfW2(Bits,Addr))	      \
-			      AL (__alignof__ (ElfW2(Bits,Addr))) },	      \
-      [SHT_GROUP] = { ELF_T_WORD, sizeof (Elf32_Word)			      \
-		      AL (__alignof__ (Elf32_Word)) },			      \
-      [SHT_SYMTAB_SHNDX] = { ELF_T_WORD, sizeof (Elf32_Word)		      \
-			     AL (__alignof__ (Elf32_Word)) },		      \
-      [TYPEIDX (SHT_GNU_verdef)] = { ELF_T_VDEF, 1 AL (1) },		      \
-      [TYPEIDX (SHT_GNU_verneed)] = { ELF_T_VNEED,			      \
-				      sizeof (ElfW2(Bits,Verneed))	      \
-				      AL (__alignof__ (ElfW2(Bits,Verneed)))},\
-      [TYPEIDX (SHT_GNU_versym)] = { ELF_T_HALF, sizeof (ElfW2(Bits,Versym))  \
-				     AL (__alignof__ (ElfW2(Bits,Versym))) }, \
-      [TYPEIDX (SHT_SUNW_syminfo)] = { ELF_T_SYMINFO,			      \
-				       sizeof (ElfW2(Bits,Syminfo))	      \
-				       AL(__alignof__ (ElfW2(Bits,Syminfo)))},\
-      [TYPEIDX (SHT_SUNW_move)] = { ELF_T_MOVE, sizeof (ElfW2(Bits,Move))     \
-				    AL (__alignof__ (ElfW2(Bits,Move))) },    \
-      [TYPEIDX (SHT_GNU_LIBLIST)] = { ELF_T_LIB, sizeof (ElfW2(Bits,Lib))     \
-				      AL (__alignof__ (ElfW2(Bits,Lib))) }
-      DEFINE (32),
-      [TYPEIDX (SHT_GNU_HASH)] = { ELF_T_WORD, sizeof (Elf32_Word)
-				   AL (__alignof__ (Elf32_Word)) }
-    },
-    [ELFCLASS64 - 1] =
-    {
-      DEFINE (64),
-      [TYPEIDX (SHT_GNU_HASH)] = { ELF_T_GNUHASH, 1
-				   AL (__alignof__ (Elf64_Xword)) }
+      [SHT_SYMTAB] = ELF_T_SYM,
+      [SHT_RELA] = ELF_T_RELA,
+      [SHT_HASH] = ELF_T_WORD,
+      [SHT_DYNAMIC] = ELF_T_DYN,
+      [SHT_REL] = ELF_T_REL,
+      [SHT_DYNSYM] = ELF_T_SYM,
+      [SHT_INIT_ARRAY] = ELF_T_ADDR,
+      [SHT_FINI_ARRAY] = ELF_T_ADDR,
+      [SHT_PREINIT_ARRAY] = ELF_T_ADDR,
+      [SHT_GROUP] = ELF_T_WORD,
+      [SHT_SYMTAB_SHNDX] = ELF_T_WORD,
+      [TYPEIDX (SHT_GNU_verdef)] = ELF_T_VDEF,
+      [TYPEIDX (SHT_GNU_verneed)] = ELF_T_VNEED,
+      [TYPEIDX (SHT_GNU_versym)] = ELF_T_HALF,
+      [TYPEIDX (SHT_SUNW_syminfo)] = ELF_T_SYMINFO,
+      [TYPEIDX (SHT_SUNW_move)] = ELF_T_MOVE,
+      [TYPEIDX (SHT_GNU_LIBLIST)] = ELF_T_LIB,
+      [TYPEIDX (SHT_GNU_HASH)] = ELF_T_GNUHASH,
     }
-  }
-};
+  };
+
+#if !ALLOW_UNALIGNED
+/* Associate libelf types with their internal alignment requirements.  */
+const uint_fast8_t __libelf_type_aligns[EV_NUM - 1][ELFCLASSNUM - 1][ELF_T_NUM] =
+  {
+# define TYPE_ALIGNS(Bits)						      \
+    {									      \
+      [ELF_T_ADDR] = __alignof__ (ElfW2(Bits,Addr)),			      \
+      [ELF_T_HALF] = __alignof__ (ElfW2(Bits,Half)),			      \
+      [ELF_T_WORD] = __alignof__ (ElfW2(Bits,Word)),			      \
+      [ELF_T_SYM] = __alignof__ (ElfW2(Bits,Sym)),			      \
+      [ELF_T_SYMINFO] = __alignof__ (ElfW2(Bits,Syminfo)),		      \
+      [ELF_T_REL] = __alignof__ (ElfW2(Bits,Rel)),			      \
+      [ELF_T_RELA] = __alignof__ (ElfW2(Bits,Rela)),			      \
+      [ELF_T_DYN] = __alignof__ (ElfW2(Bits,Dyn)),			      \
+      [ELF_T_VDEF] = __alignof__ (ElfW2(Bits,Verdef)),			      \
+      [ELF_T_VDAUX] = __alignof__ (ElfW2(Bits,Verdaux)),		      \
+      [ELF_T_VNEED] = __alignof__ (ElfW2(Bits,Verneed)),		      \
+      [ELF_T_VNAUX] = __alignof__ (ElfW2(Bits,Vernaux)),		      \
+      [ELF_T_MOVE] = __alignof__ (ElfW2(Bits,Move)),			      \
+      [ELF_T_LIB] = __alignof__ (ElfW2(Bits,Lib)),			      \
+      [ELF_T_AUXV] = __alignof__ (ElfW2(Bits,auxv_t)),			      \
+    }
+    [EV_CURRENT - 1] =
+    {
+      [ELFCLASS32 - 1] = TYPE_ALIGNS (32),
+      [ELFCLASS64 - 1] = TYPE_ALIGNS (64),
+    }
+# undef TYPE_ALIGNS
+  };
+#endif
 
 
 /* Convert the data in the current section.  */
 static void
 convert_data (Elf_Scn *scn, int version __attribute__ ((unused)), int eclass,
-	      int data, size_t size, size_t type)
+	      int data, size_t size, Elf_Type type)
 {
-#if ALLOW_ALIGNED
-  /* No need to compute the alignment requirement of the host.  */
-  const size_t align = 1;
-#else
-# if EV_NUM != 2
-  size_t align = shtype_map[version - 1][eclass - 1][type].align;
-# else
-  size_t align = shtype_map[0][eclass - 1][type].align;
-# endif
-#endif
+  const size_t align = __libelf_type_align (eclass, type);
 
   if (data == MY_ELFDATA)
     {
-      if (ALLOW_ALIGNED
-	  || (((size_t) ((char *) scn->rawdata_base)) & (align - 1)) == 0)
+      if (((((size_t) (char *) scn->rawdata_base)) & (align - 1)) == 0)
 	/* No need to copy, we can use the raw data.  */
 	scn->data_base = scn->rawdata_base;
       else
@@ -266,11 +238,12 @@ __libelf_set_rawdata (Elf_Scn *scn)
 	}
       else
 	{
-#if EV_NUM != 2
-	  entsize = shtype_map[__libelf_version - 1][elf->class - 1][TYPEIDX (type)].size;
-#else
-	  entsize = shtype_map[0][elf->class - 1][TYPEIDX (type)].size;
-#endif
+	  Elf_Type t = shtype_map[LIBELF_EV_IDX][TYPEIDX (type)];
+	  if (t == ELF_T_VDEF
+	      || (t == ELF_T_GNUHASH && elf->class == ELFCLASS64))
+	    entsize = 1;
+	  else
+	    entsize = __libelf_type_sizes[LIBELF_EV_IDX][elf->class - 1][t];
 	}
 
       /* We assume it is an array of bytes if it is none of the structured
@@ -343,15 +316,7 @@ __libelf_set_rawdata (Elf_Scn *scn)
 	   ? ELF_T_WORD : ELF_T_XWORD);
     }
   else
-    {
-#if EV_NUM != 2
-      scn->rawdata.d.d_type =
-	shtype_map[__libelf_version - 1][elf->class - 1][TYPEIDX (type)].type;
-#else
-      scn->rawdata.d.d_type =
-	shtype_map[0][elf->class - 1][TYPEIDX (type)].type;
-#endif
-    }
+    scn->rawdata.d.d_type = shtype_map[LIBELF_EV_IDX][TYPEIDX (type)];
   scn->rawdata.d.d_off = 0;
   scn->rawdata.d.d_align = align;
   if (elf->class == ELFCLASS32

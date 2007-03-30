@@ -1,3 +1,18 @@
+2007-03-18  Roland McGrath  <roland@redhat.com>
+
+	* elf_begin.c (get_shnum): Fix test for e_shoff being out of bounds.
+	Return zero when the section headers do not fit within MAXSIZE.
+
+2007-03-09  Roland McGrath  <roland@redhat.com>
+
+	* libelfP.h (LIBELF_EV_IDX): New macro.
+	(__libelf_type_align): New macro.
+	[! ALLOW_UNALIGNED]: Declare __libc_type_aligns array.
+	* elf_getdata.c (shtype_map): Convert to just Elf_Type[][].
+	(convert_data, __libelf_set_rawdata): Use that, __libelf_type_align,
+	and __libelf_type_sizes, in place of old table.
+	(__libc_type_aligns): New const variable.
+
 2007-02-04  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile (libelf.so): Build with -z relro.

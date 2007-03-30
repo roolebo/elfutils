@@ -115,6 +115,67 @@ find_file (Dwfl_Module *mod)
   mod->elferr = open_elf (mod, &mod->main);
 }
 
+/* Search an ELF file for a ".gnu_debuglink" section.  */
+static const char *
+find_debuglink (Elf *elf, GElf_Word *crc)
+{
+  size_t shstrndx;
+  if (elf_getshstrndx (elf, &shstrndx) < 0)
+    return NULL;
+
+  Elf_Scn *scn = NULL;
+  while ((scn = elf_nextscn (elf, scn)) != NULL)
+    {
+      GElf_Shdr shdr_mem;
+      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+      if (shdr == NULL)
+	return NULL;
+
+      const char *name = elf_strptr (elf, shstrndx, shdr->sh_name);
+      if (name == NULL)
+	return NULL;
+
+      if (!strcmp (name, ".gnu_debuglink"))
+	break;
+    }
+
+  if (scn == NULL)
+    return NULL;
+
+  /* Found the .gnu_debuglink section.  Extract its contents.  */
+  Elf_Data *rawdata = elf_rawdata (scn, NULL);
+  if (rawdata == NULL)
+    return NULL;
+
+  Elf_Data crcdata =
+    {
+      .d_type = ELF_T_WORD,
+      .d_buf = crc,
+      .d_size = sizeof *crc,
+      .d_version = EV_CURRENT,
+    };
+  Elf_Data conv =
+    {
+      .d_type = ELF_T_WORD,
+      .d_buf = rawdata->d_buf + rawdata->d_size - sizeof *crc,
+      .d_size = sizeof *crc,
+      .d_version = EV_CURRENT,
+    };
+
+  GElf_Ehdr ehdr_mem;
+  GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);
+  if (ehdr == NULL)
+    return NULL;
+
+  Elf_Data *d = gelf_xlatetom (elf, &crcdata, &conv, ehdr->e_ident[EI_DATA]);
+  if (d == NULL)
+    return NULL;
+  assert (d == &crcdata);
+
+  return rawdata->d_buf;
+}
+
+
 /* Find the separate debuginfo file for this module and open libelf on it.
    When we return success, MOD->debug is set up.  */
 static Dwfl_Error
@@ -123,66 +184,8 @@ find_debuginfo (Dwfl_Module *mod)
   if (mod->debug.elf != NULL)
     return DWFL_E_NOERROR;
 
-  size_t shstrndx;
-  if (elf_getshstrndx (mod->main.elf, &shstrndx) < 0)
-    return DWFL_E_LIBELF;
-
-  Elf_Scn *scn = elf_getscn (mod->main.elf, 0);
-  if (scn == NULL)
-    return DWFL_E_LIBELF;
-  do
-    {
-      GElf_Shdr shdr_mem, *shdr = gelf_getshdr (scn, &shdr_mem);
-      if (shdr == NULL)
-	return DWFL_E_LIBELF;
-
-      const char *name = elf_strptr (mod->main.elf, shstrndx, shdr->sh_name);
-      if (name == NULL)
-	return DWFL_E_LIBELF;
-
-      if (!strcmp (name, ".gnu_debuglink"))
-	break;
-
-      scn = elf_nextscn (mod->main.elf, scn);
-    } while (scn != NULL);
-
-  const char *debuglink_file = NULL;
   GElf_Word debuglink_crc = 0;
-  if (scn != NULL)
-    {
-      /* Found the .gnu_debuglink section.  Extract its contents.  */
-      Elf_Data *rawdata = elf_rawdata (scn, NULL);
-      if (rawdata == NULL)
-	return DWFL_E_LIBELF;
-
-      Elf_Data crcdata =
-	{
-	  .d_type = ELF_T_WORD,
-	  .d_buf = &debuglink_crc,
-	  .d_size = sizeof debuglink_crc,
-	  .d_version = EV_CURRENT,
-	};
-      Elf_Data conv =
-	{
-	  .d_type = ELF_T_WORD,
-	  .d_buf = rawdata->d_buf + rawdata->d_size - sizeof debuglink_crc,
-	  .d_size = sizeof debuglink_crc,
-	  .d_version = EV_CURRENT,
-	};
-
-      GElf_Ehdr ehdr_mem;
-      GElf_Ehdr *ehdr = gelf_getehdr (mod->main.elf, &ehdr_mem);
-      if (ehdr == NULL)
-	return DWFL_E_LIBELF;
-
-      Elf_Data *d = gelf_xlatetom (mod->main.elf, &crcdata, &conv,
-				   ehdr->e_ident[EI_DATA]);
-      if (d == NULL)
-	return DWFL_E_LIBELF;
-      assert (d == &crcdata);
-
-      debuglink_file = rawdata->d_buf;
-    }
+  const char *debuglink_file = find_debuglink (mod->main.elf, &debuglink_crc);
 
   mod->debug.fd = (*mod->dwfl->callbacks->find_debuginfo) (MODCB_ARGS (mod),
 							   mod->main.name,

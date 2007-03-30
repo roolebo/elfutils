@@ -1,3 +1,13 @@
+2007-03-26  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module.c (__libdwfl_module_free): Free MOD itself.
+
+2007-03-18  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_getdwarf.c (find_debuglink): New function, broken out of
+	(find_debuginfo): ... here.  Call it.
+	Don't return error for libelf errors finding .gnu_debuglink section.
+
 2007-03-12  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_module.c (dwfl_report_begin_add): New function broken out of ...

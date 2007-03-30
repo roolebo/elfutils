@@ -155,9 +155,9 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
 
       if (unlikely (result == 0) && ehdr.e32->e_shoff != 0)
 	{
-	  if (offset + ehdr.e32->e_shoff + sizeof (Elf32_Shdr) > maxsize)
+	  if (ehdr.e32->e_shoff + sizeof (Elf32_Shdr) > maxsize)
 	    /* Cannot read the first section header.  */
-	    return (size_t) -1l;
+	    return 0;
 
 	  if (likely (map_address != NULL) && e_ident[EI_DATA] == MY_ELFDATA
 	      && (ALLOW_UNALIGNED
@@ -190,6 +190,11 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
 	      result = size;
 	    }
 	}
+
+      /* If the section headers were truncated, pretend none were there.  */
+      if (ehdr.e32->e_shoff > maxsize
+	  || maxsize - ehdr.e32->e_shoff < sizeof (Elf32_Shdr) * result)
+	result = 0;
     }
   else
     {
@@ -198,9 +203,9 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
 
       if (unlikely (result == 0) && ehdr.e64->e_shoff != 0)
 	{
-	  if (offset + ehdr.e64->e_shoff + sizeof (Elf64_Shdr) > maxsize)
+	  if (ehdr.e64->e_shoff + sizeof (Elf64_Shdr) > maxsize)
 	    /* Cannot read the first section header.  */
-	    return (size_t) -1l;
+	    return 0;
 
 	  Elf64_Xword size;
 	  if (likely (map_address != NULL) && e_ident[EI_DATA] == MY_ELFDATA
@@ -236,6 +241,11 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
 
 	  result = size;
 	}
+
+      /* If the section headers were truncated, pretend none were there.  */
+      if (ehdr.e64->e_shoff > maxsize
+	  || maxsize - ehdr.e64->e_shoff < sizeof (Elf64_Shdr) * result)
+	result = 0;
     }
 
   return result;

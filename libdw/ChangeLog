@@ -1,3 +1,11 @@
+2007-03-25  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_begin_elf.c (check_section): Return Dwarf * instead of void.
+	Return NULL when freeing RESULT on error.
+	(global_read, scngrp_read): Check return value from check_section,
+	break out of loop after it has freed RESULT.
+	(valid_p): Handle null argument.
+
 2007-03-12  Roland McGrath  <roland@redhat.com>
 
 	* libdw.map (ELFUTILS_0.127): Add dwfl_report_begin_add.

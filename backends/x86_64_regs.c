@@ -1,5 +1,5 @@
 /* Register names and numbers for x86-64 DWARF.
-   Copyright (C) 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -29,6 +29,7 @@
 
 #include <assert.h>
 #include <dwarf.h>
+#include <string.h>
 
 #define BACKEND x86_64_
 #include "libebl_CPU.h"
@@ -40,9 +41,9 @@ x86_64_register_info (Ebl *ebl __attribute__ ((unused)),
 		      int *bits, int *type)
 {
   if (name == NULL)
-    return 49;
+    return 67;
 
-  if (regno < 0 || regno > 48 || namelen < 6)
+  if (regno < 0 || regno > 66 || namelen < 7)
     return -1;
 
   *prefix = "%";
@@ -51,10 +52,7 @@ x86_64_register_info (Ebl *ebl __attribute__ ((unused)),
   if (regno < 17)
     {
       *setname = "integer";
-      if (regno == 16 || regno == 6 || regno == 7)
-	*type = DW_ATE_address;
-      else
-	*type = DW_ATE_signed;
+      *type = DW_ATE_signed;
     }
   else if (regno < 33)
     {
@@ -67,11 +65,15 @@ x86_64_register_info (Ebl *ebl __attribute__ ((unused)),
       *type = DW_ATE_float;
       *bits = 80;
     }
-  else
+  else if (regno < 49)
+    *setname = "MMX";
+  else if (regno > 49 && regno < 60)
     {
-      *setname = "MMX";
-      *bits = 64;
+      *setname = "segment";
+      *bits = 16;
     }
+  else
+    *setname = "control";
 
   switch (regno)
     {
@@ -80,7 +82,9 @@ x86_64_register_info (Ebl *ebl __attribute__ ((unused)),
 	  "ax", "dx", "cx", "bx", "si", "di", "bp", "sp"
 	};
 
-    case 0 ... 7:
+    case 6 ... 7:
+      *type = DW_ATE_address;
+    case 0 ... 5:
       name[0] = 'r';
       name[1] = baseregs[regno][0];
       name[2] = baseregs[regno][1];
@@ -101,6 +105,7 @@ x86_64_register_info (Ebl *ebl __attribute__ ((unused)),
       break;
 
     case 16:
+      *type = DW_ATE_address;
       name[0] = 'r';
       name[1] = 'i';
       name[2] = 'p';
@@ -137,6 +142,37 @@ x86_64_register_info (Ebl *ebl __attribute__ ((unused)),
       name[2] = regno - 41 + '0';
       namelen = 3;
       break;
+
+    case 50 ... 55:
+      name[0] = "ecsdfg"[regno - 50];
+      name[1] = 's';
+      namelen = 2;
+      break;
+
+    case 58 ... 59:
+      *type = DW_ATE_address;
+      *bits = 64;
+      name[0] = regno - 58 + 'f';
+      return stpcpy (&name[1], "s.base") + 1 - name;
+
+    case 49:
+      return stpcpy (name, "rflags") + 1 - name;
+    case 62:
+      return stpcpy (name, "tr") + 1 - name;
+    case 63:
+      return stpcpy (name, "ldtr") + 1 - name;
+    case 64:
+      return stpcpy (name, "mxcsr") + 1 - name;
+
+    case 65 ... 66:
+      name[0] = 'f';
+      name[1] = "cs"[regno - 65];
+      name[2] = 'w';
+      namelen = 3;
+      break;
+
+    default:
+      return 0;
     }
 
   name[namelen++] = '\0';

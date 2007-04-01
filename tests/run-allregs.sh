@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2005, 2006 Red Hat, Inc.
+# Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
 # This file is part of Red Hat elfutils.
 #
 # Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -132,6 +132,22 @@ SSE registers:
 	 30: %xmm13 (xmm13), unsigned 128 bits
 	 31: %xmm14 (xmm14), unsigned 128 bits
 	 32: %xmm15 (xmm15), unsigned 128 bits
+control registers:
+	 49: %rflags (rflags), unsigned 64 bits
+	 62: %tr (tr), unsigned 64 bits
+	 63: %ldtr (ldtr), unsigned 64 bits
+	 64: %mxcsr (mxcsr), unsigned 64 bits
+	 65: %fcw (fcw), unsigned 64 bits
+	 66: %fsw (fsw), unsigned 64 bits
+segment registers:
+	 50: %es (es), unsigned 16 bits
+	 51: %cs (cs), unsigned 16 bits
+	 52: %ss (ss), unsigned 16 bits
+	 53: %ds (ds), unsigned 16 bits
+	 54: %fs (fs), unsigned 16 bits
+	 55: %gs (gs), unsigned 16 bits
+	 58: %fs.base (fs.base), address 64 bits
+	 59: %gs.base (gs.base), address 64 bits
 x87 registers:
 	 33: %st0 (st0), float 80 bits
 	 34: %st1 (st1), float 80 bits

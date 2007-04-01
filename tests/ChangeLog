@@ -1,3 +1,7 @@
+2007-04-01  Roland McGrath  <roland@redhat.com>
+
+	* run-allregs.sh: Updated expected output for x86_64.
+
 2007-03-04  Roland McGrath  <roland@redhat.com>
 
 	* dwfl-bug-fd-leak.c: New file.

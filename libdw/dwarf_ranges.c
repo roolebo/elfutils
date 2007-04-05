@@ -1,5 +1,5 @@
 /* Enumerate the PC ranges covered by a DIE.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -141,18 +141,21 @@ dwarf_ranges (Dwarf_Die *die, ptrdiff_t offset, Dwarf_Addr *basep,
     {
       begin = read_8ubyte_unaligned_inc (die->cu->dbg, readp);
       end = read_8ubyte_unaligned_inc (die->cu->dbg, readp);
+      if (begin == (uint64_t) -1l) /* Base address entry.  */
+	{
+	  *basep = end;
+	  goto next;
+	}
     }
   else
     {
-      begin = (Dwarf_Sword) read_4sbyte_unaligned_inc (die->cu->dbg,
-						       readp);
+      begin = read_4ubyte_unaligned_inc (die->cu->dbg, readp);
       end = read_4ubyte_unaligned_inc (die->cu->dbg, readp);
-    }
-
-  if (begin == (Dwarf_Addr) -1l) /* Base address entry.  */
-    {
-      *basep = end;
-      goto next;
+      if (begin == (uint32_t) -1) /* Base address entry.  */
+	{
+	  *basep = end;
+	  goto next;
+	}
     }
 
   if (begin == 0 && end == 0) /* End of list entry.  */

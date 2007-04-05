@@ -1,3 +1,9 @@
+2007-04-05  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_ranges.c (dwarf_ranges): Don't sign-extend 32-bit BEGIN
+	address to check for all-ones base address entry.  Check directly.
+	Reported by Sébastien Dugué <sebastien.dugue@bull.net>.
+
 2007-03-25  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_begin_elf.c (check_section): Return Dwarf * instead of void.

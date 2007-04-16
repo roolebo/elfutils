@@ -1,5 +1,7 @@
 Version 0.127:
 
+libdw: new function dwarf_getsrcdirs
+
 libdwfl: new functions dwfl_module_addrsym, dwfl_report_begin_add
 
 Version 0.126:

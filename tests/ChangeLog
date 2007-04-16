@@ -1,3 +1,14 @@
+2007-04-16  Roland McGrath  <roland@redhat.com>
+
+	* dwfl-addr-sect.c: New file.
+	* Makefile.am (noinst_PROGRAMS): Add it.
+	(dwfl_addr_sect_LDADD): New variable.
+
+2007-04-05  Roland McGrath  <roland@redhat.com>
+
+	* get-files.c: Test dwarf_getsrcdirs.
+	* run-get-files.sh: Update expected output.
+
 2007-04-01  Roland McGrath  <roland@redhat.com>
 
 	* run-allregs.sh: Updated expected output for x86_64.

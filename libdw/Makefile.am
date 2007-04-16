@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -73,7 +73,7 @@ libdw_a_SOURCES = dwarf_begin.c dwarf_begin_elf.c dwarf_end.c dwarf_getelf.c \
 		  dwarf_lineendsequence.c dwarf_lineblock.c \
 		  dwarf_lineprologueend.c dwarf_lineepiloguebegin.c \
 		  dwarf_onesrcline.c dwarf_formblock.c \
-		  dwarf_getsrcfiles.c dwarf_filesrc.c \
+		  dwarf_getsrcfiles.c dwarf_filesrc.c dwarf_getsrcdirs.c \
 		  dwarf_getlocation.c dwarf_getstring.c dwarf_offabbrev.c \
 		  dwarf_getaranges.c dwarf_onearange.c dwarf_getarangeinfo.c \
 		  dwarf_getarange_addr.c dwarf_getattrs.c dwarf_formflag.c \

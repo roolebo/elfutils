@@ -1,3 +1,14 @@
+2007-04-16  Roland McGrath  <roland@redhat.com>
+
+	* derelocate.c (cache_sections): Apply bias to sh_addr.
+	(compare_secrefs): Fix address comparison to avoid signed overflow.
+	(find_section): New function, broken out of ...
+	(dwfl_module_relocate_address): ... here, call it.
+	(check_module): New function, broken out of ...
+	(dwfl_module_relocate_address): ... here, call it.
+	(dwfl_module_address_section): New function.
+	* libdwfl.h: Declare it.
+
 2007-03-26  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_module.c (__libdwfl_module_free): Free MOD itself.

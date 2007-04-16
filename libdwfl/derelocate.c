@@ -75,7 +75,14 @@ compare_secrefs (const void *a, const void *b)
   struct secref *const *p1 = a;
   struct secref *const *p2 = b;
 
-  return (*p1)->start - (*p2)->start;
+  /* No signed difference calculation is correct here, since the
+     terms are unsigned and could be more than INT64_MAX apart.  */
+  if ((*p1)->start < (*p2)->start)
+    return -1;
+  if ((*p1)->start > (*p2)->start)
+    return 1;
+
+  return 0;
 }
 
 static int
@@ -120,8 +127,8 @@ cache_sections (Dwfl_Module *mod)
 	  struct secref *newref = alloca (sizeof *newref);
 	  newref->scn = scn;
 	  newref->name = name;
-	  newref->start = shdr->sh_addr;
-	  newref->end = shdr->sh_addr + shdr->sh_size;
+	  newref->start = shdr->sh_addr + mod->symfile->bias;
+	  newref->end = newref->start + shdr->sh_size;
 	  newref->next = refs;
 	  refs = newref;
 	  ++nrefs;
@@ -224,25 +231,41 @@ dwfl_module_relocation_info (Dwfl_Module *mod, unsigned int idx,
   return sections->refs[idx].name;
 }
 
-int
-dwfl_module_relocate_address (Dwfl_Module *mod, Dwarf_Addr *addr)
+/* Check that MOD is valid and make sure its relocation has been done.  */
+static bool
+check_module (Dwfl_Module *mod)
 {
-  if (mod == NULL)
-    return -1;
+  if (INTUSE(dwfl_module_getsymtab) (mod) < 0)
+    {
+      Dwfl_Error error = dwfl_errno ();
+      if (error != DWFL_E_NO_SYMTAB)
+	{
+	  __libdwfl_seterrno (error);
+	  return true;
+	}
+    }
 
   if (mod->dw == NULL)
     {
       Dwarf_Addr bias;
       if (INTUSE(dwfl_module_getdwarf) (mod, &bias) == NULL)
-	return -1;
+	{
+	  Dwfl_Error error = dwfl_errno ();
+	  if (error != DWFL_E_NO_DWARF)
+	    {
+	      __libdwfl_seterrno (error);
+	      return true;
+	    }
+	}
     }
 
-  if (mod->e_type != ET_REL)
-    {
-      *addr -= mod->debug.bias;
-      return 0;
-    }
+  return false;
+}
 
+/* Find the index in MOD->reloc_info.refs containing *ADDR.  */
+static int
+find_section (Dwfl_Module *mod, Dwarf_Addr *addr)
+{
   if (unlikely (mod->reloc_info == NULL) && cache_sections (mod) < 0)
     return -1;
 
@@ -275,4 +298,34 @@ dwfl_module_relocate_address (Dwfl_Module *mod, Dwarf_Addr *addr)
   __libdw_seterrno (DWARF_E_NO_MATCH);
   return -1;
 }
+
+int
+dwfl_module_relocate_address (Dwfl_Module *mod, Dwarf_Addr *addr)
+{
+  if (check_module (mod))
+    return -1;
+
+  if (mod->e_type != ET_REL)
+    {
+      *addr -= mod->debug.bias;
+      return 0;
+    }
+
+  return find_section (mod, addr);
+}
 INTDEF (dwfl_module_relocate_address)
+
+Elf_Scn *
+dwfl_module_address_section (Dwfl_Module *mod, Dwarf_Addr *address,
+			     Dwarf_Addr *bias)
+{
+  if (check_module (mod))
+    return NULL;
+
+  int idx = find_section (mod, address);
+  if (idx < 0)
+    return NULL;
+
+  *bias = mod->symfile->bias;
+  return mod->reloc_info->refs[idx].scn;
+}

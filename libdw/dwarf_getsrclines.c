@@ -1,5 +1,5 @@
 /* Return line number information of CU.
-   Copyright (C) 2004, 2005 Red Hat, Inc.
+   Copyright (C) 2004, 2005, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
@@ -256,13 +256,10 @@ dwarf_getsrclines (Dwarf_Die *cudie, Dwarf_Lines **lines, size_t *nlines)
       /* Rearrange the list in array form.  */
       struct dirlist **dirarray
 	= (struct dirlist **) alloca (ndirlist * sizeof (*dirarray));
-      while (ndirlist-- > 0)
-	{
-	  dirarray[ndirlist] = dirlist;
-	  dirlist = dirlist->next;
-	}
+      for (unsigned int n = ndirlist; n-- > 0; dirlist = dirlist->next)
+	dirarray[n] = dirlist;
 
-        /* Now read the files.  */
+      /* Now read the files.  */
       struct filelist null_file =
 	{
 	  .info =
@@ -618,8 +615,11 @@ dwarf_getsrclines (Dwarf_Die *cudie, Dwarf_Lines **lines, size_t *nlines)
       /* Put all the files in an array.  */
       Dwarf_Files *files = libdw_alloc (dbg, Dwarf_Files,
 					sizeof (Dwarf_Files)
-					+ nfilelist * sizeof (Dwarf_Fileinfo),
-				       1);
+					+ nfilelist * sizeof (Dwarf_Fileinfo)
+					+ (ndirlist + 1) * sizeof (char *),
+					1);
+      const char **dirs = (void *) &files->info[nfilelist];
+
       files->nfiles = nfilelist;
       while (nfilelist-- > 0)
 	{
@@ -627,6 +627,12 @@ dwarf_getsrclines (Dwarf_Die *cudie, Dwarf_Lines **lines, size_t *nlines)
 	  filelist = filelist->next;
 	}
       assert (filelist == NULL);
+
+      /* Put all the directory strings in an array.  */
+      files->ndirs = ndirlist;
+      for (unsigned int i = 0; i < ndirlist; ++i)
+	dirs[i] = dirarray[i]->dir;
+      dirs[ndirlist] = NULL;
 
       /* Remember the debugging descriptor.  */
       files->dbg = dbg;

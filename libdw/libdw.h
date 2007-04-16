@@ -1,5 +1,5 @@
 /* Interfaces for libdw.
-   Copyright (C) 2002, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2002, 2004, 2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -472,6 +472,14 @@ extern const char *dwarf_linesrc (Dwarf_Line *line,
 /* Return file information.  */
 extern const char *dwarf_filesrc (Dwarf_Files *file, size_t idx,
 				  Dwarf_Word *mtime, Dwarf_Word *length);
+
+/* Return the directory list used in the file information extracted.
+   (*RESULT)[0] is the CU's DW_AT_comp_dir value, and may be null.
+   (*RESULT)[0..*NDIRS-1] are the compile-time include directory path
+   encoded by the compiler.  */
+extern int dwarf_getsrcdirs (Dwarf_Files *files,
+			     const char *const **result, size_t *ndirs)
+  __nonnull_attribute__ (2, 3);
 
 
 /* Return location expression, decoded as a list of operations.  */

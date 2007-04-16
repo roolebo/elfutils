@@ -1,4 +1,18 @@
+2007-04-16  Roland McGrath  <roland@redhat.com>
+
+	* libdw.map (ELFUTILS_0.127): Add dwfl_module_address_section.
+
 2007-04-05  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_getsrcdirs.c: New file.
+	* Makefile.am (libdw_a_SOURCES): Add it.
+	* libdw.h: Declare dwarf_getsrcdirs.
+	* libdw.map (ELFUTILS_0.127): Add it.
+
+	* libdwP.h (struct Dwarf_Files_s): New member ndirs.
+	* dwarf_getsrclines.c (dwarf_getsrclines): Don't clobber NDIRLIST to
+	zero before we use it to check for DWARF_E_INVALID_DIR_IDX.
+	Save DIRARRAY in the Dwarf_Files.
 
 	* dwarf_ranges.c (dwarf_ranges): Don't sign-extend 32-bit BEGIN
 	address to check for all-ones base address entry.  Check directly.

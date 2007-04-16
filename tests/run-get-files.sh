@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 1999, 2000, 2002, 2004, 2005 Red Hat, Inc.
+# Copyright (C) 1999, 2000, 2002, 2004, 2005, 2007 Red Hat, Inc.
 # This file is part of Red Hat elfutils.
 # Written by Ulrich Drepper <drepper@redhat.com>, 1999.
 #
@@ -30,9 +30,11 @@ testfiles testfile testfile2
 
 testrun_compare ./get-files testfile testfile2 <<\EOF
 cuhl = 11, o = 0, asz = 4, osz = 4, ncu = 191
+ dirs[0] = "/home/drepper/gnu/new-bu/build/ttt"
  file[0] = "???"
  file[1] = "/home/drepper/gnu/new-bu/build/ttt/m.c"
 cuhl = 11, o = 114, asz = 4, osz = 4, ncu = 5617
+ dirs[0] = "/home/drepper/gnu/new-bu/build/ttt"
  file[0] = "???"
  file[1] = "/home/drepper/gnu/new-bu/build/ttt/b.c"
  file[2] = "/usr/lib/gcc-lib/i386-redhat-linux/2.96/include/stddef.h"
@@ -46,9 +48,11 @@ cuhl = 11, o = 114, asz = 4, osz = 4, ncu = 5617
  file[10] = "/usr/include/_G_config.h"
  file[11] = "/usr/include/gconv.h"
 cuhl = 11, o = 412, asz = 4, osz = 4, ncu = 5752
+ dirs[0] = "/home/drepper/gnu/new-bu/build/ttt"
  file[0] = "???"
  file[1] = "/home/drepper/gnu/new-bu/build/ttt/f.c"
 cuhl = 11, o = 0, asz = 4, osz = 4, ncu = 2418
+ dirs[0] = "/shoggoth/drepper"
  file[0] = "???"
  file[1] = "/shoggoth/drepper/b.c"
  file[2] = "/home/geoffk/objs/laurel-000912-branch/lib/gcc-lib/powerpc-unknown-linux-gnu/2.96-laurel-000912/include/stddef.h"
@@ -59,9 +63,11 @@ cuhl = 11, o = 0, asz = 4, osz = 4, ncu = 2418
  file[7] = "/usr/include/libio.h"
  file[8] = "/usr/include/_G_config.h"
 cuhl = 11, o = 213, asz = 4, osz = 4, ncu = 2521
+ dirs[0] = "/shoggoth/drepper"
  file[0] = "???"
  file[1] = "/shoggoth/drepper/f.c"
 cuhl = 11, o = 267, asz = 4, osz = 4, ncu = 2680
+ dirs[0] = "/shoggoth/drepper"
  file[0] = "???"
  file[1] = "/shoggoth/drepper/m.c"
 EOF

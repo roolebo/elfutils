@@ -156,8 +156,11 @@ ELFUTILS_0.126 {
 
 ELFUTILS_0.127 {
   global:
+    dwarf_getsrcdirs;
+
     dwfl_module_addrsym;
     dwfl_report_begin_add;
+    dwfl_module_address_section;
 
   local:
     *;

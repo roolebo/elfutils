@@ -1,4 +1,4 @@
-/* Copyright (C) 2002, 2004, 2005 Red Hat, Inc.
+/* Copyright (C) 2002, 2004, 2005, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -83,6 +83,22 @@ main (int argc, char *argv[])
 	      result = 1;
 	      break;
 	    }
+
+	  const char *const *dirs;
+	  size_t ndirs;
+	  if (dwarf_getsrcdirs (files, &dirs, &ndirs) != 0)
+	    {
+	      printf ("%s: cannot get include directories\n", argv[cnt]);
+	      result = 1;
+	      break;
+	    }
+
+	  if (dirs[0] == NULL)
+	    puts (" dirs[0] = (null)");
+	  else
+	    printf (" dirs[0] = \"%s\"\n", dirs[0]);
+	  for (size_t i = 1; i < ndirs; ++i)
+	    printf (" dirs[%zu] = \"%s\"\n", i, dirs[i]);
 
 	  for (size_t i = 0; i < nfiles; ++i)
 	    printf (" file[%zu] = \"%s\"\n", i,

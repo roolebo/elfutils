@@ -1,5 +1,5 @@
 /* Internal definitions for libdwarf.
-   Copyright (C) 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -209,6 +209,7 @@ struct Dwarf_Abbrev
 struct Dwarf_Files_s
   {
     Dwarf *dbg;
+    unsigned int ndirs;
     unsigned int nfiles;
     struct Dwarf_Fileinfo_s
     {
@@ -216,6 +217,7 @@ struct Dwarf_Files_s
       Dwarf_Word mtime;
       Dwarf_Word length;
     } info[0];
+    /* nfiles of those, followed by char *[ndirs].  */
   };
 typedef struct Dwarf_Fileinfo_s Dwarf_Fileinfo;
 

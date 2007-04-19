@@ -116,7 +116,6 @@ const uint_fast8_t __libelf_type_aligns[EV_NUM - 1][ELFCLASSNUM - 1][ELF_T_NUM] 
       [ELF_T_VNAUX] = __alignof__ (ElfW2(Bits,Vernaux)),		      \
       [ELF_T_MOVE] = __alignof__ (ElfW2(Bits,Move)),			      \
       [ELF_T_LIB] = __alignof__ (ElfW2(Bits,Lib)),			      \
-      [ELF_T_AUXV] = __alignof__ (ElfW2(Bits,auxv_t)),			      \
     }
     [EV_CURRENT - 1] =
     {

@@ -1,3 +1,8 @@
+2007-04-18  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.in.in: Remove MKINSTALLDIRS.
+	Define mkinstalldirs to mkdir -p.
+
 2005-05-07  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.in.in (XGETTEXT_OPTIONS): Define.

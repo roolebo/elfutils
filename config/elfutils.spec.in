@@ -179,6 +179,11 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
+* Wed Apr 18 2007 Ulrich Drepper <drepper@redhat.com> 0.127-1
+- libdw: new function dwarf_getsrcdirs
+- libdwfl: new functions dwfl_module_addrsym, dwfl_report_begin_add,
+	 dwfl_module_address_section
+
 * Mon Feb  5 2007 Ulrich Drepper <drepper@redhat.com> 0.126-1
 - new program: ar
 

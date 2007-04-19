@@ -1,3 +1,8 @@
+2007-04-18  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.in.in: Remove MKINSTALLDIRS.
+	Define mkinstalldirs to mkdir -p.
+
 2006-04-04  Roland McGrath  <roland@redhat.com>
 
 	* POTFILES.in: Comment out lib/xstrdup.c, not distributed any more.

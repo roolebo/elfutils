@@ -1,5 +1,5 @@
 /* This file defines standard ELF types, structures, and macros.
-   Copyright (C) 1995-2003, 2004, 2005, 2006 Free Software Foundation, Inc.
+   Copyright (C) 1995-2003,2004,2005,2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -329,8 +329,8 @@ typedef struct
 #define SHT_GROUP	  17		/* Section group */
 #define SHT_SYMTAB_SHNDX  18		/* Extended section indeces */
 #define	SHT_NUM		  19		/* Number of defined types.  */
-#define SHT_LOOS	  0x60000000	/* Start OS-specific */
-#define SHT_GNU_HASH	  0x6ffffff6	/* GNU style symbol hash table.  */
+#define SHT_LOOS	  0x60000000	/* Start OS-specific.  */
+#define SHT_GNU_HASH	  0x6ffffff6	/* GNU-style hash table.  */
 #define SHT_GNU_LIBLIST	  0x6ffffff7	/* Prelink library list */
 #define SHT_CHECKSUM	  0x6ffffff8	/* Checksum for DSO content.  */
 #define SHT_LOSUNW	  0x6ffffffa	/* Sun-specific low bound.  */
@@ -603,6 +603,7 @@ typedef struct
 #define NT_LWPSTATUS	16		/* Contains copy of lwpstatus struct */
 #define NT_LWPSINFO	17		/* Contains copy of lwpinfo struct */
 #define NT_PRFPXREG	20		/* Contains copy of fprxregset struct*/
+#define NT_PRXFPREG	0x46e62b7f	/* Contains copy of user_fxsr_struct*/
 
 /* Legal values for the note segment descriptor types for object files.  */
 
@@ -692,7 +693,7 @@ typedef struct
 #define DT_SYMINENT	0x6ffffdff	/* Entry size of syminfo */
 #define DT_VALRNGHI	0x6ffffdff
 #define DT_VALTAGIDX(tag)	(DT_VALRNGHI - (tag))	/* Reverse order! */
-#define DT_VALNUM 11
+#define DT_VALNUM 12
 
 /* DT_* entries which fall between DT_ADDRRNGHI & DT_ADDRRNGLO use the
    Dyn.d_un.d_ptr field of the Elf*_Dyn structure.
@@ -700,7 +701,7 @@ typedef struct
    If any adjustment is made to the ELF object after it has been
    built these entries will need to be adjusted.  */
 #define DT_ADDRRNGLO	0x6ffffe00
-#define DT_GNU_HASH	0x6ffffef5	/* Address of GNU symbol hash table */
+#define DT_GNU_HASH	0x6ffffef5	/* GNU-style hash table.  */
 #define DT_TLSDESC_PLT	0x6ffffef6
 #define DT_TLSDESC_GOT	0x6ffffef7
 #define DT_GNU_CONFLICT	0x6ffffef8	/* Start of conflict section */
@@ -1254,14 +1255,15 @@ typedef struct
 #define DT_SPARC_REGISTER 0x70000001
 #define DT_SPARC_NUM	2
 
-/* Bits present in AT_HWCAP, primarily for Sparc32.  */
+/* Bits present in AT_HWCAP on SPARC.  */
 
-#define HWCAP_SPARC_FLUSH	1	/* The cpu supports flush insn.  */
+#define HWCAP_SPARC_FLUSH	1	/* The CPU supports flush insn.  */
 #define HWCAP_SPARC_STBAR	2
 #define HWCAP_SPARC_SWAP	4
 #define HWCAP_SPARC_MULDIV	8
-#define HWCAP_SPARC_V9		16	/* The cpu is v9, so v8plus is ok.  */
+#define HWCAP_SPARC_V9		16	/* The CPU is v9, so v8plus is ok.  */
 #define HWCAP_SPARC_ULTRA3	32
+#define HWCAP_SPARC_BLKINIT	64	/* Sun4v with block-init/load-twin.  */
 
 /* MIPS R3000 specific definitions.  */
 
@@ -1510,8 +1512,9 @@ typedef struct
 #define R_MIPS_TLS_TPREL64	48	/* TP-relative offset, 64 bit */
 #define R_MIPS_TLS_TPREL_HI16	49	/* TP-relative offset, high 16 bits */
 #define R_MIPS_TLS_TPREL_LO16	50	/* TP-relative offset, low 16 bits */
+#define R_MIPS_GLOB_DAT		51
 /* Keep this the last entry.  */
-#define R_MIPS_NUM		51
+#define R_MIPS_NUM		52
 
 /* Legal values for p_type field of Elf32_Phdr.  */
 

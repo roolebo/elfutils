@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 1999, 2000, 2002, 2003, 2005 Red Hat, Inc.
+# Copyright (C) 1999, 2000, 2002, 2003, 2005, 2007 Red Hat, Inc.
 # This file is part of Red Hat elfutils.
 # Written by Ulrich Drepper <drepper@redhat.com>, 1999.
 #
@@ -32,7 +32,7 @@ debugout=${debugfile:+-f testfile.debug.temp -F $debugfile}
 
 testfiles $original $stripped $debugfile
 
-tempfiles testfile.temp testfile.debug.temp
+tempfiles testfile.temp testfile.debug.temp testfile.unstrip
 
 testrun ../src/strip -o testfile.temp $debugout $original
 
@@ -46,6 +46,12 @@ cmp $debugfile testfile.debug.temp
 
 # Check elflint and the expected result.
 testrun ../src/elflint -q -d testfile.debug.temp
+
+# Now test unstrip recombining those files.
+testrun ../src/unstrip -o testfile.unstrip testfile.temp testfile.debug.temp
+
+# Check that it came back whole.
+testrun ../src/elfcmp --hash-inexact $original testfile.unstrip
 }
 
 exit 0

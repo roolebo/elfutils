@@ -1,3 +1,7 @@
+2007-04-23  Roland McGrath  <roland@redhat.com>
+
+	* elfutils.spec.in: Distribute eu-unstrip.
+
 2005-08-13  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am ($(srcdir)/elfutils.spec.in): Add missing $.

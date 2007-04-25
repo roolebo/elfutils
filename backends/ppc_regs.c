@@ -1,5 +1,5 @@
 /* Register names and numbers for PowerPC DWARF.
-   Copyright (C) 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -53,7 +53,11 @@ ppc_register_info (Ebl *ebl __attribute__ ((unused)),
   if (regno < 32 || regno == 64 || regno == 66)
     *setname = "integer";
   else if (regno < 64 || regno == 65)
-    *setname = "FPU";
+    {
+      *setname = "FPU";
+      if (ebl->machine != EM_PPC64 && regno < 64)
+	*bits = 64;
+    }
   else if (regno < 1124)
     *setname = "privileged";
   else
@@ -112,7 +116,25 @@ ppc_register_info (Ebl *ebl __attribute__ ((unused)),
       namelen = 4;
       break;
 
-    case 100 ... 109:
+    case 101:
+      return stpcpy (name, "xer") + 1 - name;
+    case 108:
+      return stpcpy (name, "lr") + 1 - name;
+    case 109:
+      return stpcpy (name, "ctr") + 1 - name;
+    case 118:
+      return stpcpy (name, "dsisr") + 1 - name;
+    case 119:
+      return stpcpy (name, "dar") + 1 - name;
+    case 122:
+      return stpcpy (name, "dec") + 1 - name;
+    case 356:
+      return stpcpy (name, "vrsave") + 1 - name;
+    case 100:
+      if (*bits == 32)
+	return stpcpy (name, "mq") + 1 - name;
+
+    case 102 ... 107:
       name[0] = 's';
       name[1] = 'p';
       name[2] = 'r';
@@ -120,7 +142,9 @@ ppc_register_info (Ebl *ebl __attribute__ ((unused)),
       namelen = 4;
       break;
 
-    case 110 ... 199:
+    case 110 ... 117:
+    case 120 ... 121:
+    case 123 ... 199:
       name[0] = 's';
       name[1] = 'p';
       name[2] = 'r';
@@ -129,7 +153,8 @@ ppc_register_info (Ebl *ebl __attribute__ ((unused)),
       namelen = 5;
       break;
 
-    case 200 ... 999:
+    case 200 ... 355:
+    case 357 ... 999:
       name[0] = 's';
       name[1] = 'p';
       name[2] = 'r';

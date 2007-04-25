@@ -1,3 +1,13 @@
+2007-04-23  Roland McGrath  <roland@redhat.com>
+
+	* argp-std.c (options): Fix group title string.
+
+	* argp-std.c (parse_opt): Handle ARGP_KEY_ERROR, free the Dwfl.
+	Update via STATE->input every time we set STATE->hook, not only at
+	ARGP_KEY_SUCCESS.
+
+	* dwfl_module.c (free_file): Free FILE->name.
+
 2007-04-16  Roland McGrath  <roland@redhat.com>
 
 	* derelocate.c (cache_sections): Apply bias to sh_addr.

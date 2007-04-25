@@ -1,5 +1,5 @@
 /* Register names and numbers for i386 DWARF.
-   Copyright (C) 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -125,8 +125,10 @@ i386_register_info (Ebl *ebl __attribute__ ((unused)),
       break;
 
     case 37:
+      *bits = 16;
       return stpcpy (name, "fctrl") + 1 - name;
     case 38:
+      *bits = 16;
       return stpcpy (name, "fstat") + 1 - name;
     case 39:
       return stpcpy (name, "mxcsr") + 1 - name;

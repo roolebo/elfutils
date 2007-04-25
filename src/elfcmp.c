@@ -59,13 +59,16 @@ void (*argp_program_version_hook) (FILE *, struct argp_state *) = print_version;
 const char *argp_program_bug_address = PACKAGE_BUGREPORT;
 
 /* Values for the parameters which have no short form.  */
-#define OPT_GAPS 0x100
+#define OPT_GAPS		0x100
+#define OPT_HASH_INEXACT	0x101
 
 /* Definitions of arguments for argp functions.  */
 static const struct argp_option options[] =
 {
   { NULL, 0, NULL, 0, N_("Control options:"), 0 },
   { "gaps", OPT_GAPS, "ACTION", 0, N_("Control treatment of gaps in loadable segments [ignore|match] (default: ignore)"), 0 },
+  { "hash-inexact", OPT_HASH_INEXACT, NULL, 0,
+    N_("Ignore permutation of buckets in SHT_HASH section"), 0 },
   { "quiet", 'q', NULL, 0, N_("Output nothing; yield exit status only"), 0 },
 
   { NULL, 0, NULL, 0, N_("Miscellaneous:"), 0 },
@@ -107,6 +110,11 @@ struct region
 
 /* Nonzero if only exit status is wanted.  */
 static bool quiet;
+
+/* True iff SHT_HASH treatment should be generous.  */
+static bool hash_inexact;
+
+static bool hash_content_equivalent (size_t entsize, Elf_Data *, Elf_Data *);
 
 
 int
@@ -353,6 +361,12 @@ main (int argc, char *argv[])
 			    && memcmp (data1->d_buf, data2->d_buf,
 				       data1->d_size) != 0)))
 	    {
+	      if (hash_inexact
+		  && shdr1->sh_type == SHT_HASH
+		  && data1->d_size == data2->d_size
+		  && hash_content_equivalent (shdr1->sh_entsize, data1, data2))
+		break;
+
 	      if (! quiet)
 		{
 		  if (elf_ndxscn (scn1) == elf_ndxscn (scn2))
@@ -360,7 +374,6 @@ main (int argc, char *argv[])
 %s %s differ: section [%zu] '%s' content"),
 			   fname1, fname2, elf_ndxscn (scn1), sname1);
 		  else
-		  if (elf_ndxscn (scn1) == elf_ndxscn (scn2))
 		    error (0, 0, gettext ("\
 %s %s differ: section [%zu,%zu] '%s' content"),
 			   fname1, fname2, elf_ndxscn (scn1),
@@ -539,6 +552,10 @@ parse_opt (int key, char *arg,
 	}
       break;
 
+    case OPT_HASH_INEXACT:
+      hash_inexact = true;
+      break;
+
     default:
       return ARGP_ERR_UNKNOWN;
     }
@@ -625,7 +642,7 @@ search_for_copy_reloc (Ebl *ebl, size_t scnndx, int symndx)
 }
 
 
-static  int
+static int
 regioncompare (const void *p1, const void *p2)
 {
   const struct region *r1 = (const struct region *) p1;
@@ -634,4 +651,96 @@ regioncompare (const void *p1, const void *p2)
   if (r1->from < r2->from)
     return -1;
   return 1;
+}
+
+
+static int
+compare_Elf32_Word (const void *p1, const void *p2)
+{
+  const Elf32_Word *w1 = p1;
+  const Elf32_Word *w2 = p2;
+  assert (sizeof (int) >= sizeof (*w1));
+  return (int) *w1 - (int) *w2;
+}
+
+static int
+compare_Elf64_Xword (const void *p1, const void *p2)
+{
+  const Elf64_Xword *w1 = p1;
+  const Elf64_Xword *w2 = p2;
+  return *w1 < *w2 ? -1 : *w1 > *w2 ? 1 : 0;
+}
+
+static bool
+hash_content_equivalent (size_t entsize, Elf_Data *data1, Elf_Data *data2)
+{
+#define CHECK_HASH(Hash_Word)						      \
+  {									      \
+    const Hash_Word *const hash1 = data1->d_buf;			      \
+    const Hash_Word *const hash2 = data2->d_buf;			      \
+    const size_t nbucket = hash1[0];					      \
+    const size_t nchain = hash1[1];					      \
+    if (data1->d_size != (2 + nbucket + nchain) * sizeof hash1[0]	      \
+	|| hash2[0] != nbucket || hash2[1] != nchain)			      \
+      return false;							      \
+									      \
+    const Hash_Word *const bucket1 = &hash1[2];				      \
+    const Hash_Word *const chain1 = &bucket1[nbucket];			      \
+    const Hash_Word *const bucket2 = &hash2[2];				      \
+    const Hash_Word *const chain2 = &bucket2[nbucket];			      \
+									      \
+    bool chain_ok[nchain];						      \
+    Hash_Word temp1[nchain - 1];					      \
+    Hash_Word temp2[nchain - 1];					      \
+    memset (chain_ok, 0, sizeof chain_ok);				      \
+    for (size_t i = 0; i < nbucket; ++i)				      \
+      {									      \
+	if (bucket1[i] >= nchain || bucket2[i] >= nchain)		      \
+	  return false;							      \
+									      \
+	size_t b1 = 0;							      \
+	for (size_t p = bucket1[i]; p != STN_UNDEF; p = chain1[p])	      \
+	  if (p >= nchain || b1 >= nchain - 1)				      \
+	    return false;						      \
+	  else								      \
+	    temp1[b1++] = p;						      \
+									      \
+	size_t b2 = 0;							      \
+	for (size_t p = bucket2[i]; p != STN_UNDEF; p = chain2[p])	      \
+	  if (p >= nchain || b2 >= nchain - 1)				      \
+	    return false;						      \
+	  else								      \
+	    temp2[b2++] = p;						      \
+									      \
+	if (b1 != b2)							      \
+	  return false;							      \
+									      \
+	qsort (temp1, b1, sizeof temp1[0], compare_##Hash_Word);	      \
+	qsort (temp2, b2, sizeof temp2[0], compare_##Hash_Word);	      \
+									      \
+	for (b1 = 0; b1 < b2; ++b1)					      \
+	  if (temp1[b1] != temp2[b1])					      \
+	    return false;						      \
+	  else								      \
+	    chain_ok[temp1[b1]] = true;					      \
+      }									      \
+									      \
+    for (size_t i = 0; i < nchain; ++i)					      \
+      if (!chain_ok[i] && chain1[i] != chain2[i])			      \
+	return false;							      \
+									      \
+    return true;							      \
+  }
+
+  switch (entsize)
+    {
+    case 4:
+      CHECK_HASH (Elf32_Word);
+      break;
+    case 8:
+      CHECK_HASH (Elf64_Xword);
+      break;
+    }
+
+  return false;
 }

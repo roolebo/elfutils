@@ -70,7 +70,7 @@ const char *argp_program_bug_address = PACKAGE_BUGREPORT;
 static const struct argp_option options[] =
 {
   { NULL, 0, NULL, 0, N_("Output selection:"), 0 },
-  { NULL, 'o', "FILE", 0, N_("Place stripped output into FILE"), 0 },
+  { "output", 'o', "FILE", 0, N_("Place stripped output into FILE"), 0 },
   { NULL, 'f', "FILE", 0, N_("Extract the removed sections into FILE"), 0 },
   { NULL, 'F', "FILE", 0, N_("Embed name FILE instead of -f argument"), 0 },
 

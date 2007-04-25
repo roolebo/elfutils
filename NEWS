@@ -1,3 +1,9 @@
+Version 0.128:
+
+new program: unstrip
+
+elfcmp: new option --hash-inexact
+
 Version 0.127:
 
 libdw: new function dwarf_getsrcdirs

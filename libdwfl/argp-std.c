@@ -61,7 +61,7 @@
 
 static const struct argp_option options[] =
 {
-  { NULL, 0, NULL, 0, N_("Input Selection:"), 0 },
+  { NULL, 0, NULL, 0, N_("Input selection options:"), 0 },
   { "executable", 'e', "FILE", 0, N_("Find addresses in FILE"), 0 },
   { "pid", 'p', "PID", 0,
     N_("Find addresses in files mapped into process PID"), 0 },
@@ -244,14 +244,20 @@ parse_opt (int key, char *arg, struct argp_state *state)
 
 	int result = INTUSE(dwfl_report_end) (dwfl, NULL, NULL);
 	assert (result == 0);
-
-	*(Dwfl **) state->input = dwfl;
       }
+      break;
+
+    case ARGP_KEY_ERROR:
+      dwfl_end (state->hook);
+      state->hook = NULL;
       break;
 
     default:
       return ARGP_ERR_UNKNOWN;
     }
+
+  /* Update the input all along, so a parent parser can see it.  */
+  *(Dwfl **) state->input = state->hook;
   return 0;
 }
 

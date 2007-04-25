@@ -1,3 +1,12 @@
+2007-04-22  Roland McGrath  <roland@redhat.com>
+
+	* ppc_regs.c (ppc_register_info): Use some names instead of sprNNN:
+	mq, xer, lr, ctr, dsisr, dar, dec, vrsave.
+	Set *BITS to 64 for FPU registers.
+
+	* i386_regs.c (i386_register_info): Set *BITS to 16 for fctrl, fstat.
+	* x86_64_regs.c (x86_64_register_info): Likewise for fcw, fsw.
+
 2007-04-01  Roland McGrath  <roland@redhat.com>
 
 	* x86_64_regs.c (x86_64_register_info): Add more registers from newer

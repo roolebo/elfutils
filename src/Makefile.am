@@ -52,7 +52,7 @@ native_ld = @native_ld@
 base_cpu = @base_cpu@
 
 bin_PROGRAMS = readelf nm size strip ld elflint findtextrel addr2line \
-	       elfcmp objdump ranlib strings ar
+	       elfcmp objdump ranlib strings ar unstrip
 
 
 ld_dsos = libld_elf_i386_pic.a
@@ -123,6 +123,7 @@ ranlib_LDADD = libar.a $(libelf) $(libeu) $(libmudflap)
 strings_LDADD = $(libelf) $(libeu) $(libmudflap)
 ar_LDADD = libar.a $(libelf) $(libeu) $(libmudflap)
 CFLAGS_ar = -DAR=\"$(shell echo ar|sed '$(transform)')\"
+unstrip_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(libmudflap) -ldl
 
 ldlex.o: ldscript.c
 ldlex_no_Werror = yes

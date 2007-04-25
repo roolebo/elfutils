@@ -48,8 +48,8 @@ integer registers:
 	  9: %eflags (eflags), unsigned 32 bits
 	 10: %trapno (trapno), unsigned 32 bits
 FPU-control registers:
-	 37: %fctrl (fctrl), unsigned 32 bits
-	 38: %fstat (fstat), unsigned 32 bits
+	 37: %fctrl (fctrl), unsigned 16 bits
+	 38: %fstat (fstat), unsigned 16 bits
 	 39: %mxcsr (mxcsr), unsigned 32 bits
 MMX registers:
 	 29: %mm0 (mm0), unsigned 64 bits
@@ -137,8 +137,8 @@ control registers:
 	 62: %tr (tr), unsigned 64 bits
 	 63: %ldtr (ldtr), unsigned 64 bits
 	 64: %mxcsr (mxcsr), unsigned 64 bits
-	 65: %fcw (fcw), unsigned 64 bits
-	 66: %fsw (fsw), unsigned 64 bits
+	 65: %fcw (fcw), unsigned 16 bits
+	 66: %fsw (fsw), unsigned 16 bits
 segment registers:
 	 50: %es (es), unsigned 16 bits
 	 51: %cs (cs), unsigned 16 bits
@@ -196,38 +196,38 @@ integer registers:
 	 64: cr (cr), unsigned 32 bits
 	 66: msr (msr), unsigned 32 bits
 FPU registers:
-	 32: f0 (f0), float 32 bits
-	 33: f1 (f1), float 32 bits
-	 34: f2 (f2), float 32 bits
-	 35: f3 (f3), float 32 bits
-	 36: f4 (f4), float 32 bits
-	 37: f5 (f5), float 32 bits
-	 38: f6 (f6), float 32 bits
-	 39: f7 (f7), float 32 bits
-	 40: f8 (f8), float 32 bits
-	 41: f9 (f9), float 32 bits
-	 42: f10 (f10), float 32 bits
-	 43: f11 (f11), float 32 bits
-	 44: f12 (f12), float 32 bits
-	 45: f13 (f13), float 32 bits
-	 46: f14 (f14), float 32 bits
-	 47: f15 (f15), float 32 bits
-	 48: f16 (f16), float 32 bits
-	 49: f17 (f17), float 32 bits
-	 50: f18 (f18), float 32 bits
-	 51: f19 (f19), float 32 bits
-	 52: f20 (f20), float 32 bits
-	 53: f21 (f21), float 32 bits
-	 54: f22 (f22), float 32 bits
-	 55: f23 (f23), float 32 bits
-	 56: f24 (f24), float 32 bits
-	 57: f25 (f25), float 32 bits
-	 58: f26 (f26), float 32 bits
-	 59: f27 (f27), float 32 bits
-	 60: f28 (f28), float 32 bits
-	 61: f29 (f29), float 32 bits
-	 62: f30 (f30), float 32 bits
-	 63: f31 (f31), float 32 bits
+	 32: f0 (f0), float 64 bits
+	 33: f1 (f1), float 64 bits
+	 34: f2 (f2), float 64 bits
+	 35: f3 (f3), float 64 bits
+	 36: f4 (f4), float 64 bits
+	 37: f5 (f5), float 64 bits
+	 38: f6 (f6), float 64 bits
+	 39: f7 (f7), float 64 bits
+	 40: f8 (f8), float 64 bits
+	 41: f9 (f9), float 64 bits
+	 42: f10 (f10), float 64 bits
+	 43: f11 (f11), float 64 bits
+	 44: f12 (f12), float 64 bits
+	 45: f13 (f13), float 64 bits
+	 46: f14 (f14), float 64 bits
+	 47: f15 (f15), float 64 bits
+	 48: f16 (f16), float 64 bits
+	 49: f17 (f17), float 64 bits
+	 50: f18 (f18), float 64 bits
+	 51: f19 (f19), float 64 bits
+	 52: f20 (f20), float 64 bits
+	 53: f21 (f21), float 64 bits
+	 54: f22 (f22), float 64 bits
+	 55: f23 (f23), float 64 bits
+	 56: f24 (f24), float 64 bits
+	 57: f25 (f25), float 64 bits
+	 58: f26 (f26), float 64 bits
+	 59: f27 (f27), float 64 bits
+	 60: f28 (f28), float 64 bits
+	 61: f29 (f29), float 64 bits
+	 62: f30 (f30), float 64 bits
+	 63: f31 (f31), float 64 bits
 	 65: fpscr (fpscr), unsigned 32 bits
 privileged registers:
 	 70: sr0 (sr0), unsigned 32 bits
@@ -246,16 +246,16 @@ privileged registers:
 	 83: sr13 (sr13), unsigned 32 bits
 	 84: sr14 (sr14), unsigned 32 bits
 	 85: sr15 (sr15), unsigned 32 bits
-	100: spr0 (spr0), unsigned 32 bits
-	101: spr1 (spr1), unsigned 32 bits
+	100: mq (mq), unsigned 32 bits
+	101: xer (xer), unsigned 32 bits
 	102: spr2 (spr2), unsigned 32 bits
 	103: spr3 (spr3), unsigned 32 bits
 	104: spr4 (spr4), unsigned 32 bits
 	105: spr5 (spr5), unsigned 32 bits
 	106: spr6 (spr6), unsigned 32 bits
 	107: spr7 (spr7), unsigned 32 bits
-	108: spr8 (spr8), unsigned 32 bits
-	109: spr9 (spr9), unsigned 32 bits
+	108: lr (lr), unsigned 32 bits
+	109: ctr (ctr), unsigned 32 bits
 	110: spr10 (spr10), unsigned 32 bits
 	111: spr11 (spr11), unsigned 32 bits
 	112: spr12 (spr12), unsigned 32 bits
@@ -264,11 +264,11 @@ privileged registers:
 	115: spr15 (spr15), unsigned 32 bits
 	116: spr16 (spr16), unsigned 32 bits
 	117: spr17 (spr17), unsigned 32 bits
-	118: spr18 (spr18), unsigned 32 bits
-	119: spr19 (spr19), unsigned 32 bits
+	118: dsisr (dsisr), unsigned 32 bits
+	119: dar (dar), unsigned 32 bits
 	120: spr20 (spr20), unsigned 32 bits
 	121: spr21 (spr21), unsigned 32 bits
-	122: spr22 (spr22), unsigned 32 bits
+	122: dec (dec), unsigned 32 bits
 	123: spr23 (spr23), unsigned 32 bits
 	124: spr24 (spr24), unsigned 32 bits
 	125: spr25 (spr25), unsigned 32 bits
@@ -502,7 +502,7 @@ privileged registers:
 	353: spr253 (spr253), unsigned 32 bits
 	354: spr254 (spr254), unsigned 32 bits
 	355: spr255 (spr255), unsigned 32 bits
-	356: spr256 (spr256), unsigned 32 bits
+	356: vrsave (vrsave), unsigned 32 bits
 	357: spr257 (spr257), unsigned 32 bits
 	358: spr258 (spr258), unsigned 32 bits
 	359: spr259 (spr259), unsigned 32 bits
@@ -1269,15 +1269,15 @@ privileged registers:
 	 84: sr14 (sr14), unsigned 64 bits
 	 85: sr15 (sr15), unsigned 64 bits
 	100: spr0 (spr0), unsigned 64 bits
-	101: spr1 (spr1), unsigned 64 bits
+	101: xer (xer), unsigned 64 bits
 	102: spr2 (spr2), unsigned 64 bits
 	103: spr3 (spr3), unsigned 64 bits
 	104: spr4 (spr4), unsigned 64 bits
 	105: spr5 (spr5), unsigned 64 bits
 	106: spr6 (spr6), unsigned 64 bits
 	107: spr7 (spr7), unsigned 64 bits
-	108: spr8 (spr8), unsigned 64 bits
-	109: spr9 (spr9), unsigned 64 bits
+	108: lr (lr), unsigned 64 bits
+	109: ctr (ctr), unsigned 64 bits
 	110: spr10 (spr10), unsigned 64 bits
 	111: spr11 (spr11), unsigned 64 bits
 	112: spr12 (spr12), unsigned 64 bits
@@ -1286,11 +1286,11 @@ privileged registers:
 	115: spr15 (spr15), unsigned 64 bits
 	116: spr16 (spr16), unsigned 64 bits
 	117: spr17 (spr17), unsigned 64 bits
-	118: spr18 (spr18), unsigned 64 bits
-	119: spr19 (spr19), unsigned 64 bits
+	118: dsisr (dsisr), unsigned 64 bits
+	119: dar (dar), unsigned 64 bits
 	120: spr20 (spr20), unsigned 64 bits
 	121: spr21 (spr21), unsigned 64 bits
-	122: spr22 (spr22), unsigned 64 bits
+	122: dec (dec), unsigned 64 bits
 	123: spr23 (spr23), unsigned 64 bits
 	124: spr24 (spr24), unsigned 64 bits
 	125: spr25 (spr25), unsigned 64 bits
@@ -1524,7 +1524,7 @@ privileged registers:
 	353: spr253 (spr253), unsigned 64 bits
 	354: spr254 (spr254), unsigned 64 bits
 	355: spr255 (spr255), unsigned 64 bits
-	356: spr256 (spr256), unsigned 64 bits
+	356: vrsave (vrsave), unsigned 64 bits
 	357: spr257 (spr257), unsigned 64 bits
 	358: spr258 (spr258), unsigned 64 bits
 	359: spr259 (spr259), unsigned 64 bits

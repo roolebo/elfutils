@@ -139,6 +139,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_bindir}/eu-strings
 %{_bindir}/eu-objdump
 %{_bindir}/eu-ar
+%{_bindir}/eu-unstrip
 #%{_bindir}/eu-ld
 #%{_libdir}/libasm-%{version}.so
 %{_libdir}/libdw-%{version}.so
@@ -225,7 +226,7 @@ hes.
 - Bug fixes.
 - dwarf.h updated for DWARF 3.0 final specification.
 - libdwfl: New function dwfl_version.
-- The license is now GPL for most files.  The libelf, libebl, libdw,and 
+- The license is now GPL for most files.  The libelf, libebl, libdw,and
 libdwfl libraries have additional exceptions.  Add reference toOIN.
 
 * Thu Jan 12 2006 Roland McGrath <roland@redhat.com> 0.119-1

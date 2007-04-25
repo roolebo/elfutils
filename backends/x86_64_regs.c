@@ -165,6 +165,7 @@ x86_64_register_info (Ebl *ebl __attribute__ ((unused)),
       return stpcpy (name, "mxcsr") + 1 - name;
 
     case 65 ... 66:
+      *bits = 16;
       name[0] = 'f';
       name[1] = "cs"[regno - 65];
       name[2] = 'w';

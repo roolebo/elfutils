@@ -67,6 +67,7 @@ nofree (void *arg __attribute__ ((unused)))
 static void
 free_file (struct dwfl_file *file)
 {
+  free (file->name);
   if (file->elf != NULL)
     {
       elf_end (file->elf);

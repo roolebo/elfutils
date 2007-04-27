@@ -26,12 +26,13 @@
 
 . $srcdir/test-subr.sh
 
+status=0
 runtest() {
 # Uncomment for debuging
 #  echo $1
   if [ -f $1 ]; then
     testrun ../src/elflint --quiet --gnu-ld $1 ||
-    (echo "*** failure in $1"; exit 1)
+    { echo "*** failure in $1"; status=1; }
   fi
 }
 
@@ -57,3 +58,5 @@ runtest ../libebl/libebl_ppc64.so
 runtest ../libebl/libebl_sh.so
 runtest ../libebl/libebl_sparc.so
 runtest ../libebl/libebl_x86_64.so
+
+exit $status

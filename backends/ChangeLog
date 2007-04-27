@@ -1,5 +1,8 @@
 2007-04-26  Roland McGrath  <roland@redhat.com>
 
+	* alpha_symbol.c (alpha_machine_section_flag_check): New function.
+	* alpha_init.c (alpha_init): Initialize hook.
+
 	* alpha_regs.c: New file.
 	* Makefile.am (alpha_SRCS): Add it.
 	* alpha_init.c (alpha_init): Initialize register_info hook.

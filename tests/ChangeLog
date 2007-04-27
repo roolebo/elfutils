@@ -1,3 +1,9 @@
+2007-04-26  Roland McGrath  <roland@redhat.com>
+
+	* run-elflint-self.sh: Run all tests even if one fails.
+
+	* run-allregs.sh: Add expected output for alpha.
+
 2007-04-24  Roland McGrath  <roland@redhat.com>
 
 	* run-strip-test.sh: When we saved the debug info, test unstrip too.

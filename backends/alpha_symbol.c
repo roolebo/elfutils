@@ -1,5 +1,5 @@
 /* Alpha specific symbolic name handling.
-   Copyright (C) 2002, 2005 Red Hat, Inc.
+   Copyright (C) 2002, 2005, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -68,4 +68,12 @@ alpha_reloc_simple_type (Ebl *ebl __attribute__ ((unused)), int type)
     default:
       return ELF_T_NUM;
     }
+}
+
+
+/* Check whether SHF_MASKPROC flags are valid.  */
+bool
+alpha_machine_section_flag_check (GElf_Xword sh_flags)
+{
+  return (sh_flags &~ (SHF_ALPHA_GPREL)) == 0;
 }

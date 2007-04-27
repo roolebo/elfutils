@@ -2519,4 +2519,75 @@ control registers:
 	 85: %y (y), unsigned 64 bits
 EOF
 
+regs_test testfile10 <<\EOF
+integer registers:
+	  0: $v0 (v0), signed 64 bits
+	  1: $t0 (t0), signed 64 bits
+	  2: $t1 (t1), signed 64 bits
+	  3: $t2 (t2), signed 64 bits
+	  4: $t3 (t3), signed 64 bits
+	  5: $t4 (t4), signed 64 bits
+	  6: $t5 (t5), signed 64 bits
+	  7: $t6 (t6), signed 64 bits
+	  8: $t7 (t7), signed 64 bits
+	  9: $s0 (s0), signed 64 bits
+	 10: $s1 (s1), signed 64 bits
+	 11: $s2 (s2), signed 64 bits
+	 12: $s3 (s3), signed 64 bits
+	 13: $s4 (s4), signed 64 bits
+	 14: $s5 (s5), signed 64 bits
+	 15: $fp (fp), address 64 bits
+	 16: $a0 (a0), signed 64 bits
+	 17: $a1 (a1), signed 64 bits
+	 18: $a2 (a2), signed 64 bits
+	 19: $a3 (a3), signed 64 bits
+	 20: $a4 (a4), signed 64 bits
+	 21: $a5 (a5), signed 64 bits
+	 22: $t8 (t8), signed 64 bits
+	 23: $t9 (t9), signed 64 bits
+	 24: $t10 (t10), signed 64 bits
+	 25: $t11 (t11), signed 64 bits
+	 26: $ra (ra), address 64 bits
+	 27: $t12 (t12), signed 64 bits
+	 28: $at (at), signed 64 bits
+	 29: $gp (gp), address 64 bits
+	 30: $sp (sp), address 64 bits
+	 31: $zero (zero), signed 64 bits
+	 64: $pc (pc), address 64 bits
+	 66: $unique (unique), address 64 bits
+FPU registers:
+	 32: $f0 (f0), float 64 bits
+	 33: $f1 (f1), float 64 bits
+	 34: $f2 (f2), float 64 bits
+	 35: $f3 (f3), float 64 bits
+	 36: $f4 (f4), float 64 bits
+	 37: $f5 (f5), float 64 bits
+	 38: $f6 (f6), float 64 bits
+	 39: $f7 (f7), float 64 bits
+	 40: $f8 (f8), float 64 bits
+	 41: $f9 (f9), float 64 bits
+	 42: $f10 (f10), float 64 bits
+	 43: $f11 (f11), float 64 bits
+	 44: $f12 (f12), float 64 bits
+	 45: $f13 (f13), float 64 bits
+	 46: $f14 (f14), float 64 bits
+	 47: $f15 (f15), float 64 bits
+	 48: $f16 (f16), float 64 bits
+	 49: $f17 (f17), float 64 bits
+	 50: $f18 (f18), float 64 bits
+	 51: $f19 (f19), float 64 bits
+	 52: $f20 (f20), float 64 bits
+	 53: $f21 (f21), float 64 bits
+	 54: $f22 (f22), float 64 bits
+	 55: $f23 (f23), float 64 bits
+	 56: $f24 (f24), float 64 bits
+	 57: $f25 (f25), float 64 bits
+	 58: $f26 (f26), float 64 bits
+	 59: $f27 (f27), float 64 bits
+	 60: $f28 (f28), float 64 bits
+	 61: $f29 (f29), float 64 bits
+	 62: $f30 (f30), float 64 bits
+	 63: $fpcr (fpcr), unsigned 64 bits
+EOF
+
 exit 0

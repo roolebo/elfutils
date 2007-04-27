@@ -55,6 +55,7 @@ alpha_init (elf, machine, eh, ehlen)
   HOOK (eh, reloc_simple_type);
   HOOK (eh, return_value_location);
   HOOK (eh, register_info);
+  HOOK (eh, machine_section_flag_check);
   eh->sysvhash_entrysize = sizeof (Elf64_Xword);
 
   return MODVERSION;

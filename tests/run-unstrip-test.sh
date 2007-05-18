@@ -1,7 +1,6 @@
 #! /bin/sh
-# Copyright (C) 1999, 2000, 2002, 2003, 2005, 2007 Red Hat, Inc.
+# Copyright (C) 2007 Red Hat, Inc.
 # This file is part of Red Hat elfutils.
-# Written by Ulrich Drepper <drepper@redhat.com>, 1999.
 #
 # Red Hat elfutils is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by the
@@ -26,34 +25,17 @@
 
 . $srcdir/test-subr.sh
 
-original=${original:-testfile11}
-stripped=${stripped:-testfile7}
-debugout=${debugfile:+-f testfile.debug.temp -F $debugfile}
+original=${original:-testfile12}
+stripped=${stripped:-testfile17}
+debugfile=${debugfile:-${stripped}.debug}
 
 testfiles $original $stripped $debugfile
 
-tempfiles testfile.temp testfile.debug.temp testfile.unstrip
+# These are old reference output from run-test-strip6.sh, when
+# strip left the .debug file with unchanged sh_size in
+# stripped sections that shrank in the stripped file.  strip
+# no longer does that, but unstrip must still handle it.
 
-testrun ../src/strip -o testfile.temp $debugout $original
+testrun ../src/unstrip -o testfile.unstrip $stripped $debugfile
 
-status=0
-
-cmp $stripped testfile.temp || status=$?
-
-# Check elflint and the expected result.
-testrun ../src/elflint -q testfile.temp || status=$?
-
-test -z "$debugfile" || {
-cmp $debugfile testfile.debug.temp || status=$?
-
-# Check elflint and the expected result.
-testrun ../src/elflint -q -d testfile.debug.temp || status=$?
-
-# Now test unstrip recombining those files.
-testrun ../src/unstrip -o testfile.unstrip testfile.temp testfile.debug.temp
-
-# Check that it came back whole.
 testrun ../src/elfcmp --hash-inexact $original testfile.unstrip
-}
-
-exit $status

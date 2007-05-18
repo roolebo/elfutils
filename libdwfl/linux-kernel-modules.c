@@ -139,21 +139,24 @@ find_kernel_elf (Dwfl *dwfl, const char *release, char **fname)
 }
 
 static int
-report_kernel (Dwfl *dwfl, const char *release,
+report_kernel (Dwfl *dwfl, const char **release,
 	       int (*predicate) (const char *module, const char *file))
 {
   if (dwfl == NULL)
     return -1;
 
-  if (release == NULL)
+  const char *release_string = release == NULL ? NULL : *release;
+  if (release_string == NULL)
     {
-      release = kernel_release ();
-      if (release == NULL)
+      release_string = kernel_release ();
+      if (release_string == NULL)
 	return errno;
+      if (release != NULL)
+	*release = release_string;
     }
 
   char *fname;
-  int fd = find_kernel_elf (dwfl, release, &fname);
+  int fd = find_kernel_elf (dwfl, release_string, &fname);
 
   int result = 0;
   if (fd < 0)
@@ -198,17 +201,17 @@ dwfl_linux_kernel_report_offline (Dwfl *dwfl, const char *release,
 						    const char *file))
 {
   /* First report the kernel.  */
-  int result = report_kernel (dwfl, release, predicate);
+  int result = report_kernel (dwfl, &release, predicate);
   if (result == 0)
     {
-      /* Do "find /lib/modules/RELEASE/kernel -name *.ko".  */
+      /* Do "find /lib/modules/RELEASE -name *.ko".  */
 
       char *modulesdir[] = { NULL, NULL };
       if (release[0] == '/')
 	modulesdir[0] = (char *) release;
       else
 	{
-	  if (asprintf (&modulesdir[0], MODULEDIRFMT "/kernel", release) < 0)
+	  if (asprintf (&modulesdir[0], MODULEDIRFMT, release) < 0)
 	    return errno;
 	}
 
@@ -394,10 +397,10 @@ dwfl_linux_kernel_find_elf (Dwfl_Module *mod __attribute__ ((unused)),
   if (!strcmp (module_name, KERNEL_MODNAME))
     return find_kernel_elf (mod->dwfl, release, file_name);
 
-  /* Do "find /lib/modules/`uname -r`/kernel -name MODULE_NAME.ko".  */
+  /* Do "find /lib/modules/`uname -r` -name MODULE_NAME.ko".  */
 
   char *modulesdir[] = { NULL, NULL };
-  if (asprintf (&modulesdir[0], MODULEDIRFMT "/kernel", release) < 0)
+  if (asprintf (&modulesdir[0], MODULEDIRFMT, release) < 0)
     return -1;
 
   FTS *fts = fts_open (modulesdir, FTS_LOGICAL | FTS_NOSTAT, NULL);
@@ -609,14 +612,21 @@ dwfl_linux_kernel_report_modules (Dwfl *dwfl)
   Dwarf_Addr modaddr;
   unsigned long int modsz;
   char modname[128];
-  while (fscanf (f, "%128s %lu %*s %*s %*s %" PRIx64 "\n",
-		 modname, &modsz, &modaddr) == 3)
+  char *line = NULL;
+  size_t linesz = 0;
+  /* We can't just use fscanf here because it's not easy to distinguish \n
+     from other whitespace so as to take the optional word following the
+     address but always stop at the end of the line.  */
+  while (getline (&line, &linesz, f) > 0
+	 && sscanf (line, "%128s %lu %*s %*s %*s %" PRIx64 " %*s\n",
+		    modname, &modsz, &modaddr) == 3)
     if (INTUSE(dwfl_report_module) (dwfl, modname,
 				    modaddr, modaddr + modsz) == NULL)
       {
 	result = -1;
 	break;
       }
+  free (line);
 
   if (result == 0)
     result = ferror_unlocked (f) ? errno : feof_unlocked (f) ? 0 : ENOEXEC;

@@ -835,6 +835,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 		   elf_errmsg (-1));
 
 	  bool discard_section = (shdr_info[cnt].idx > 0
+				  && shdr_info[cnt].shdr.sh_type != SHT_NOTE
 				  && cnt != ehdr->e_shstrndx);
 
 	  /* Set the section header in the new file.  */
@@ -1251,6 +1252,24 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	 symbol table.  */
       for (cnt = 1; cnt <= shdridx; ++cnt)
 	{
+	  /* Update section headers when the data size has changed.
+	     We also update the SHT_NOBITS section in the debug
+	     file so that the section headers match in sh_size.  */
+	  inline void update_section_size (const Elf_Data *newdata)
+	    {
+	      GElf_Shdr shdr_mem;
+	      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+	      shdr->sh_size = newdata->d_size;
+	      (void) gelf_update_shdr (scn, shdr);
+	      if (debugelf != NULL)
+		{
+		  /* libelf will use d_size to set sh_size.  */
+		  Elf_Data *debugdata = elf_getdata (elf_getscn (debugelf,
+								 cnt), NULL);
+		  debugdata->d_size = newdata->d_size;
+		}
+	    }
+
 	  if (shdr_info[cnt].idx == 0 && debug_fname == NULL)
 	    /* Ignore sections which are discarded.  When we are saving a
 	       relocation section in a separate debug file, we must fix up
@@ -1354,12 +1373,9 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 		  Elf32_Word *chain = bucket + nbucket;
 
 		  /* New size of the section.  */
-		  GElf_Shdr shdr_mem;
-		  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
-		  shdr->sh_size = hashd->d_size
-		    = (2 + symd->d_size / elsize + nbucket)
-		      * sizeof (Elf32_Word);
-		  (void) gelf_update_shdr (scn, shdr);
+		  hashd->d_size = ((2 + symd->d_size / elsize + nbucket)
+				   * sizeof (Elf32_Word));
+		  update_section_size (hashd);
 
 		  /* Clear the arrays.  */
 		  memset (bucket, '\0',
@@ -1411,12 +1427,9 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 		  Elf64_Xword *chain = bucket + nbucket;
 
 		  /* New size of the section.  */
-		  GElf_Shdr shdr_mem;
-		  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
-		  shdr->sh_size = hashd->d_size
-		    = (2 + symd->d_size / elsize + nbucket)
-		      * sizeof (Elf64_Xword);
-		  (void) gelf_update_shdr (scn, shdr);
+		  hashd->d_size = ((2 + symd->d_size / elsize + nbucket)
+				   * sizeof (Elf64_Xword));
+		  update_section_size (hashd);
 
 		  /* Clear the arrays.  */
 		  memset (bucket, '\0',
@@ -1492,14 +1505,12 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 		  verstab[newsymidx[inner]] = verstab[inner];
 
 	      /* New size of the section.  */
-	      GElf_Shdr shdr_mem;
-	      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
-	      shdr->sh_size = verd->d_size
-		= gelf_fsize (newelf, verd->d_type,
-			      symd->d_size / gelf_fsize (elf, symd->d_type, 1,
-							 ehdr->e_version),
-			      ehdr->e_version);
-	      (void) gelf_update_shdr (scn, shdr);
+	      verd->d_size = gelf_fsize (newelf, verd->d_type,
+					 symd->d_size
+					 / gelf_fsize (elf, symd->d_type, 1,
+						       ehdr->e_version),
+					 ehdr->e_version);
+	      update_section_size (verd);
 	    }
 	  else if (shdr_info[cnt].shdr.sh_type == SHT_GROUP)
 	    {

@@ -61,7 +61,7 @@ const char *argp_program_bug_address = PACKAGE_BUGREPORT;
 /* Definitions of arguments for argp functions.  */
 static const struct argp_option options[] =
 {
-  { NULL, 0, NULL, 0, N_("Output Selection:"), 0 },
+  { NULL, 0, NULL, 0, N_("Output selection options:"), 2 },
   { "basenames", 's', NULL, 0, N_("Show only base names of source files"), 0 },
   { "absolute", 'A', NULL, 0,
     N_("Show absolute file names using compilation directory"), 0 },
@@ -131,6 +131,7 @@ main (int argc, char *argv[])
 
   /* Parse and process arguments.  This includes opening the modules.  */
   argp_children[0].argp = dwfl_standard_argp ();
+  argp_children[0].group = 1;
   Dwfl *dwfl = NULL;
   (void) argp_parse (&argp, argc, argv, 0, &remaining, &dwfl);
   assert (dwfl != NULL);

@@ -1,5 +1,5 @@
 original=testfile12
-stripped=testfile17
-debugfile=testfile17.debug
+stripped=testfile35
+debugfile=testfile35.debug
 
 . $srcdir/run-strip-test.sh

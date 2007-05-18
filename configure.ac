@@ -25,7 +25,8 @@ AC_CONFIG_FILES([config/Makefile])
 AC_COPYRIGHT([Copyright (C) 1996-2003, 2004, 2005, 2006, 2007 Red Hat, Inc.])
 AC_PREREQ(2.59)			dnl Minimum Autoconf version required.
 
-AM_INIT_AUTOMAKE([gnits 1.7])
+dnl We use GNU make extensions; automake 1.10 defaults to -Wportability.
+AM_INIT_AUTOMAKE([gnits 1.7 -Wno-portability])
 AM_MAINTAINER_MODE
 
 dnl Unique ID for this build.

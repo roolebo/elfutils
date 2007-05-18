@@ -65,21 +65,53 @@ dwfl_offline_section_address (Dwfl_Module *mod,
 			      const GElf_Shdr *shdr __attribute__ ((unused)),
 			      Dwarf_Addr *addr)
 {
-  GElf_Shdr shdr_mem;
-  GElf_Shdr *main_shdr = gelf_getshdr (elf_getscn (mod->main.elf, shndx),
-				       &shdr_mem);
-  if (unlikely (main_shdr == NULL))
-    return -1;
-
+  assert (mod->e_type == ET_REL);
   assert (shdr->sh_addr == 0);
   assert (shdr->sh_flags & SHF_ALLOC);
-  assert (main_shdr->sh_flags == shdr->sh_flags);
 
-  if (main_shdr->sh_addr != 0)
-    assert (mod->symfile != &mod->main);
+  if (mod->symfile == &mod->main)
+    {
+      /* Because the actual address is zero, we failed to notice
+	 we in fact had the right address cached already.  */
+      *addr = 0;
+      return 0;
+    }
 
-  *addr = main_shdr->sh_addr;
-  return 0;
+  /* The section numbers might not match between the two files.
+     The best we can rely on is the order of SHF_ALLOC sections.  */
+
+  Elf_Scn *ourscn = elf_getscn (mod->symfile->elf, shndx);
+  Elf_Scn *scn = NULL;
+  uint_fast32_t skip_alloc = 0;
+  while ((scn = elf_nextscn (mod->symfile->elf, scn)) != ourscn)
+    {
+      assert (scn != NULL);
+      GElf_Shdr shdr_mem;
+      GElf_Shdr *sh = gelf_getshdr (scn, &shdr_mem);
+      if (unlikely (sh == NULL))
+	return -1;
+      if (sh->sh_flags & SHF_ALLOC)
+	++skip_alloc;
+    }
+
+  scn = NULL;
+  while ((scn = elf_nextscn (mod->main.elf, scn)) != NULL)
+    {
+      GElf_Shdr shdr_mem;
+      GElf_Shdr *main_shdr = gelf_getshdr (elf_getscn (mod->main.elf, shndx),
+					   &shdr_mem);
+      if (unlikely (main_shdr == NULL))
+	return -1;
+      if ((main_shdr->sh_flags & SHF_ALLOC) && skip_alloc-- == 0)
+	{
+	  assert (main_shdr->sh_flags == shdr->sh_flags);
+	  *addr = main_shdr->sh_addr;
+	  return 0;
+	}
+    }
+
+  /* This should never happen.  */
+  return -1;
 }
 INTDEF (dwfl_offline_section_address)
 

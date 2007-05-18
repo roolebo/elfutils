@@ -3407,7 +3407,9 @@ section [%2zu] '%s': merge flag set but entry size is zero\n"),
 		    || (phdr->p_type == PT_TLS
 			&& (shdr->sh_flags & SHF_TLS) != 0))
 		&& phdr->p_offset <= shdr->sh_offset
-		&& phdr->p_offset + phdr->p_memsz > shdr->sh_offset)
+		&& (phdr->p_offset + phdr->p_filesz > shdr->sh_offset
+		    || (phdr->p_offset + phdr->p_memsz > shdr->sh_offset
+			&& shdr->sh_type == SHT_NOBITS)))
 	      {
 		/* Found the segment.  */
 		if (phdr->p_offset + phdr->p_memsz

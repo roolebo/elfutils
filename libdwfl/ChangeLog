@@ -1,3 +1,23 @@
+2007-05-17  Roland McGrath  <roland@redhat.com>
+
+	* linux-kernel-modules.c (dwfl_linux_kernel_report_offline): Look at
+	whole /lib/modules/VERSION tree, not just /lib/modules/VERSION/kernel.
+	(dwfl_linux_kernel_find_elf): Likewise.
+
+	* linux-kernel-modules.c (dwfl_linux_kernel_report_modules): Use
+	getline and sscanf instead of fscanf.
+
+2007-05-08  Roland McGrath  <roland@redhat.com>
+
+	* offline.c (dwfl_offline_section_address): Don't assume section
+	numbers match between stripped and debuginfo files.  Instead, assume
+	only that the ordering among SHF_ALLOC sections matches.
+
+	* linux-kernel-modules.c (report_kernel): Change RELEASE argument to
+	pointer to string.
+	(dwfl_linux_kernel_report_offline): Update caller.
+	(dwfl_linux_kernel_report_kernel): Likewise.
+
 2007-04-23  Roland McGrath  <roland@redhat.com>
 
 	* argp-std.c (options): Fix group title string.

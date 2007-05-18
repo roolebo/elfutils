@@ -1,3 +1,28 @@
+2007-05-18  Roland McGrath  <roland@redhat.com>
+
+	* run-strip-test4.sh (stripped, debugfile): Use new reference files.
+	* testfile37.bz2: New data file.
+	* testfile37.debug.bz2: New data file.
+	* run-unstrip-test2.sh: New file.
+	* Makefile.am (TESTS, EXTRA_DIST): Add them.
+
+2007-05-10  Roland McGrath  <roland@redhat.com>
+
+	* run-dwfl-bug-offline-rel.sh: New file.
+	* testfile36.bz2: New data file.
+	* testfile36.debug.bz2: New data file.
+	* Makefile.am (TESTS, EXTRA_DIST): Add them.
+
+2007-04-28  Roland McGrath  <roland@redhat.com>
+
+	* run-strip-test6.sh (stripped, debugfile): Use new reference files.
+	* testfile35.bz2: New data file.
+	* testfile35.debug.bz2: New data file.
+	* run-unstrip-test.sh: New file.
+	* Makefile.am (TESTS, EXTRA_DIST): Add them.
+
+	* run-strip-test.sh: Do all elflint and cmp runs even when some fail.
+
 2007-04-26  Roland McGrath  <roland@redhat.com>
 
 	* run-elflint-self.sh: Run all tests even if one fails.

@@ -1,3 +1,58 @@
+2007-05-18  Roland McGrath  <roland@redhat.com>
+
+	* unstrip.c (copy_elided_sections): Match up non-NOBITS sections with
+	stripped file, so as not to duplicate a section copied in both.
+
+	* strip.c (handle_elf): Keep SHT_NOTE section copies in the debug file.
+
+2007-05-17  Roland McGrath  <roland@redhat.com>
+
+	* unstrip.c (copy_elided_sections): Don't call gelf_newphdr for 0.
+
+	* unstrip.c (handle_file): Tweak BIAS != 0 warning.
+
+	* unstrip.c (handle_file): Take new arg CREATE_DIRS.  If set,
+	call make_directories here.
+	(handle_explicit_files): Take new arg CREATE_DIRS, pass it down.
+	(handle_dwfl_module): Likewise.
+	(handle_implicit_modules): Update callers.
+	(handle_output_dir_module): Likewise.  Don't do make_directories here.
+
+	* unstrip.c (get_section_name): New function, broken out of ...
+	(copy_elided_sections): here.  Update callers.
+	(find_alloc_section): Broken out of ...
+	(copy_elided_sections): ... here.  Update caller.
+	(symtab_count_leading_section_symbols): Take new arg NEWSYMDATA,
+	update STT_SECTION symbols' st_value fields as a side effect.
+	(check_symtab_section_symbols): Update caller.
+	(add_new_section_symbols): Set st_value in symbols added.
+	(collect_symbols): Reset S->value for STT_SECTION symbols recorded.
+	Take new arg SPLIT_BSS.  Adjust S->shndx recorded for symbols moved
+	from .bss to .dynbss.
+	(find_alloc_sections_prelink): New function.  Associate debug file
+	allocated SHT_NOBITS shdrs with stripped moved by prelink via
+	.gnu.prelink_undo information.
+	(copy_elided_sections): Call it when we couldn't find every allocated
+	section.  Don't use a debug file non-NOBITS section if SHF_ALLOC.
+	Take STRIPPED_EHDR arg instead of E_TYPE and PHNUM.
+	(handle_file): Update callers.
+
+	* unstrip.c (copy_elided_sections): Ignore unfound unallocated section
+	named ".comment".
+
+	* elflint.c (check_sections): Fix association of segments with
+	sections when p_memsz > p_filesz.
+
+2007-04-29  Roland McGrath  <roland@redhat.com>
+
+	* addr2line.c (options, main): Tweak argp group settings to fix
+	usage output.
+
+2007-04-28  Roland McGrath  <roland@redhat.com>
+
+	* strip.c (handle_elf): Update debug file's SHT_NOBITS sections'
+	sizes to match sections adjusted in the stripped file.
+
 2007-04-24  Roland McGrath  <roland@redhat.com>
 
 	* elfcmp.c (OPT_HASH_INEXACT): New macro.

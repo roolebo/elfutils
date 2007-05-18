@@ -1,7 +1,6 @@
 #! /bin/sh
-# Copyright (C) 1999, 2000, 2002, 2003, 2005, 2007 Red Hat, Inc.
+# Copyright (C) 2007 Red Hat, Inc.
 # This file is part of Red Hat elfutils.
-# Written by Ulrich Drepper <drepper@redhat.com>, 1999.
 #
 # Red Hat elfutils is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by the
@@ -26,34 +25,12 @@
 
 . $srcdir/test-subr.sh
 
-original=${original:-testfile11}
-stripped=${stripped:-testfile7}
-debugout=${debugfile:+-f testfile.debug.temp -F $debugfile}
+testfiles testfile36 testfile36.debug
 
-testfiles $original $stripped $debugfile
+testrun_compare ./dwflmodtest -e testfile36 <<\EOF
+module:                                00000000..00002308 testfile36 (null)
+module:                                00000000        (nil) 0 (Callback returned failure)
+module:                                00000000..00002308 testfile36 testfile36.debug
+EOF
 
-tempfiles testfile.temp testfile.debug.temp testfile.unstrip
-
-testrun ../src/strip -o testfile.temp $debugout $original
-
-status=0
-
-cmp $stripped testfile.temp || status=$?
-
-# Check elflint and the expected result.
-testrun ../src/elflint -q testfile.temp || status=$?
-
-test -z "$debugfile" || {
-cmp $debugfile testfile.debug.temp || status=$?
-
-# Check elflint and the expected result.
-testrun ../src/elflint -q -d testfile.debug.temp || status=$?
-
-# Now test unstrip recombining those files.
-testrun ../src/unstrip -o testfile.unstrip testfile.temp testfile.debug.temp
-
-# Check that it came back whole.
-testrun ../src/elfcmp --hash-inexact $original testfile.unstrip
-}
-
-exit $status
+exit 0

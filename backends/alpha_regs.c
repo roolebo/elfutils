@@ -70,15 +70,11 @@ alpha_register_info (Ebl *ebl __attribute__ ((unused)),
       namelen = 2;
       break;
 
-    case 9 ... 14:
+    case 9 ... 15:
       name[0] = 's';
       name[1] = regno - 9 + '0';
       namelen = 2;
       break;
-
-    case 15:
-      *type = DW_ATE_address;
-      return stpcpy (name, "fp") + 1 - name;
 
     case 16 ... 21:
       name[0] = 'a';

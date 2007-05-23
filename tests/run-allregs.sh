@@ -2536,7 +2536,7 @@ integer registers:
 	 12: $s3 (s3), signed 64 bits
 	 13: $s4 (s4), signed 64 bits
 	 14: $s5 (s5), signed 64 bits
-	 15: $fp (fp), address 64 bits
+	 15: $s6 (s6), signed 64 bits
 	 16: $a0 (a0), signed 64 bits
 	 17: $a1 (a1), signed 64 bits
 	 18: $a2 (a2), signed 64 bits

@@ -1,3 +1,7 @@
+2007-05-23  Roland McGrath  <roland@redhat.com>
+
+	* run-allregs.sh: Update expected Alpha results.
+
 2007-05-18  Roland McGrath  <roland@redhat.com>
 
 	* run-strip-test4.sh (stripped, debugfile): Use new reference files.

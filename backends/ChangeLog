@@ -1,3 +1,7 @@
+2007-05-23  Roland McGrath  <roland@redhat.com>
+
+	* alpha_regs.c (alpha_register_info): fp -> s6
+
 2007-04-26  Roland McGrath  <roland@redhat.com>
 
 	* alpha_symbol.c (alpha_machine_section_flag_check): New function.

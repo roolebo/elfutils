@@ -10,3 +10,4 @@ config/config\.sub$
 config/depcomp$
 config/install-sh$
 config/missing$
+config/ylwrap$

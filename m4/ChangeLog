@@ -3,6 +3,8 @@
 	* gettext.m4: Update from gettext 0.16.1.
 	* iconv.m4: Likewise.
 	* progtest.m4: Likewise.
+	* nls.m4: New file.
+	* po.m4: New file.
 
 2005-02-15  Ulrich Drepper  <drepper@redhat.com>
 

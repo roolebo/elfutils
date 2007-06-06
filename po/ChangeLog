@@ -4,6 +4,8 @@
 	* Rules-quot: Likewise.
 	* Makevars: Add more XGGETEXT_OPTIONS.
 
+	* remove-potcdata.sin: New file.
+
 2007-04-18  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.in.in: Remove MKINSTALLDIRS.

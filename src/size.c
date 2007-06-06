@@ -115,7 +115,7 @@ static void show_bsd_totals (void);
 
 #define INTERNAL_ERROR(fname) \
   error (EXIT_FAILURE, 0, gettext ("%s: INTERNAL ERROR %d (%s-%s): %s"),      \
-	 fname, __LINE__, VERSION, __DATE__, elf_errmsg (-1))
+	 fname, __LINE__, PACKAGE_VERSION, __DATE__, elf_errmsg (-1))
 
 
 /* User-selectable options.  */
@@ -180,10 +180,10 @@ main (int argc, char *argv[])
   setlocale (LC_ALL, "");
 
   /* Make sure the message catalog can be found.  */
-  bindtextdomain (PACKAGE, LOCALEDIR);
+  bindtextdomain (PACKAGE_TARNAME, LOCALEDIR);
 
   /* Initialize the message catalog.  */
-  textdomain (PACKAGE);
+  textdomain (PACKAGE_TARNAME);
 
   /* Parse and process arguments.  */
   argp_parse (&argp, argc, argv, 0, &remaining, NULL);
@@ -215,7 +215,7 @@ main (int argc, char *argv[])
 static void
 print_version (FILE *stream, struct argp_state *state __attribute__ ((unused)))
 {
-  fprintf (stream, "size (%s) %s\n", PACKAGE_NAME, VERSION);
+  fprintf (stream, "size (%s) %s\n", PACKAGE_NAME, PACKAGE_VERSION);
   fprintf (stream, gettext ("\
 Copyright (C) %s Red Hat, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\

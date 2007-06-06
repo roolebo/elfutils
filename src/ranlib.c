@@ -98,10 +98,10 @@ main (int argc, char *argv[])
   (void) setlocale (LC_ALL, "");
 
   /* Make sure the message catalog can be found.  */
-  (void) bindtextdomain (PACKAGE, LOCALEDIR);
+  (void) bindtextdomain (PACKAGE_TARNAME, LOCALEDIR);
 
   /* Initialize the message catalog.  */
-  (void) textdomain (PACKAGE);
+  (void) textdomain (PACKAGE_TARNAME);
 
   /* Parse and process arguments.  */
   int remaining;
@@ -132,7 +132,7 @@ main (int argc, char *argv[])
 static void
 print_version (FILE *stream, struct argp_state *state __attribute__ ((unused)))
 {
-  fprintf (stream, "ranlib (%s) %s\n", PACKAGE_NAME, VERSION);
+  fprintf (stream, "ranlib (%s) %s\n", PACKAGE_NAME, PACKAGE_VERSION);
   fprintf (stream, gettext ("\
 Copyright (C) %s Red Hat, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\

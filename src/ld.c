@@ -296,10 +296,10 @@ main (int argc, char *argv[])
   setlocale (LC_ALL, "");
 
   /* Make sure the message catalog can be found.  */
-  bindtextdomain (PACKAGE, LOCALEDIR);
+  bindtextdomain (PACKAGE_TARNAME, LOCALEDIR);
 
   /* Initialize the message catalog.  */
-  textdomain (PACKAGE);
+  textdomain (PACKAGE_TARNAME);
 
   /* Before we start tell the ELF library which version we are using.  */
   elf_version (EV_CURRENT);
@@ -865,7 +865,7 @@ load_needed (void)
 static void
 print_version (FILE *stream, struct argp_state *state __attribute__ ((unused)))
 {
-  fprintf (stream, "ld (%s) %s\n", PACKAGE_NAME, VERSION);
+  fprintf (stream, "ld (%s) %s\n", PACKAGE_NAME, PACKAGE_VERSION);
   fprintf (stream, gettext ("\
 Copyright (C) %s Red Hat, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\

@@ -1,3 +1,21 @@
+2007-06-05  Ulrich Drepper  <drepper@redhat.com>
+
+	* addr2line.c: Update for latest autoconf header.
+	* ar.c: Likewise.
+	* elfcmp.c: Likewise.
+	* elflint.c: Likewise.
+	* findtextrel.c: Likewise.
+	* ld.c: Likewise.
+	* ldgeneric.c: Likewise.
+	* nm.c: Likewise.
+	* objdump.c: Likewise.
+	* ranlib.c: Likewise.
+	* readelf.c: Likewise.
+	* size.c: Likewise.
+	* strings.c: Likewise.
+	* strip.c: Likewise.
+	* unstrip.c: Likewise.
+
 2007-05-18  Roland McGrath  <roland@redhat.com>
 
 	* unstrip.c (copy_elided_sections): Match up non-NOBITS sections with

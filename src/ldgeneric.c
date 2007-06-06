@@ -4535,7 +4535,7 @@ ld_generic_create_outfile (struct ld_state *statep)
 		       gettext ("cannot create section for output file: %s"),
 		       elf_errmsg (-1));
 
-	      outdata->d_buf = (void *) "\0ld (Red Hat " PACKAGE ") " VERSION;
+	      outdata->d_buf = (void *) "\0ld (" PACKAGE_NAME ") " PACKAGE_VERSION;
 	      outdata->d_size = strlen ((char *) outdata->d_buf + 1) + 2;
 	      outdata->d_off = offset;
 	      outdata->d_type = ELF_T_BYTE;

@@ -6,6 +6,8 @@
 
 	* remove-potcdata.sin: New file.
 
+	* POTFILES.in: Also include messages from libelf.
+
 2007-04-18  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.in.in: Remove MKINSTALLDIRS.

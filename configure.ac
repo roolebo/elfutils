@@ -181,7 +181,7 @@ dnl Support library.
 AC_CONFIG_FILES([lib/Makefile])
 
 dnl ELF library.
-AC_CONFIG_FILES([libelf/Makefile libelf-po/Makefile.in])
+AC_CONFIG_FILES([libelf/Makefile])
 
 dnl Higher-level ELF support library.
 AC_CONFIG_FILES([libebl/Makefile])

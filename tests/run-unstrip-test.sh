@@ -30,6 +30,7 @@ stripped=${stripped:-testfile17}
 debugfile=${debugfile:-${stripped}.debug}
 
 testfiles $original $stripped $debugfile
+tempfiles testfile.unstrip
 
 # These are old reference output from run-test-strip6.sh, when
 # strip left the .debug file with unchanged sh_size in

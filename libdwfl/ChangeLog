@@ -1,3 +1,7 @@
+2007-06-08  Roland McGrath  <roland@frob.com>
+
+	* libdwflP.h: Fix #ifndef for config.h to use PACKAGE_NAME.
+
 2007-05-17  Roland McGrath  <roland@redhat.com>
 
 	* linux-kernel-modules.c (dwfl_linux_kernel_report_offline): Look at

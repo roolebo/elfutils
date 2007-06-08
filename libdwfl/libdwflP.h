@@ -50,7 +50,7 @@
 #ifndef _LIBDWFLP_H
 #define _LIBDWFLP_H	1
 
-#ifndef PACKAGE
+#ifndef PACKAGE_NAME
 # include <config.h>
 #endif
 #include <libdwfl.h>

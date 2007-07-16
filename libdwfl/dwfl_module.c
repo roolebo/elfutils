@@ -149,6 +149,7 @@ dwfl_report_module (Dwfl *dwfl, const char *name,
 	  m->next = *tailp;
 	  m->gc = false;
 	  *tailp = m;
+	  ++dwfl->nmodules;
 	  return m;
 	}
 

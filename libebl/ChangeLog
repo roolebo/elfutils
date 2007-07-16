@@ -1,3 +1,10 @@
+2007-07-09  Roland McGrath  <roland@redhat.com>
+
+	* eblobjnotetypename.c (ebl_object_note_type_name): Handle
+	NT_GNU_HWCAP, NT_GNU_BUILD_ID.
+
+	* eblobjnote.c (ebl_object_note): Handle NT_GNU_BUILD_ID.
+
 2007-04-22  Roland McGrath  <roland@redhat.com>
 
 	* eblcorenotetypename.c (ebl_core_note_type_name): Handle NT_PRXFPREG.

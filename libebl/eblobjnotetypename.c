@@ -1,5 +1,5 @@
 /* Return note type name.
-   Copyright (C) 2002 Red Hat, Inc.
+   Copyright (C) 2002, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -72,6 +72,8 @@ ebl_object_note_type_name (ebl, type, buf, len)
 	{
 #define KNOWNSTYPE(name) [NT_##name] = #name
 	  KNOWNSTYPE (VERSION),
+	  KNOWNSTYPE (GNU_HWCAP),
+	  KNOWNSTYPE (GNU_BUILD_ID),
 	};
 
       /* Handle standard names.  */

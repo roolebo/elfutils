@@ -1,5 +1,5 @@
 /* Print contents of object file note.
-   Copyright (C) 2002 Red Hat, Inc.
+   Copyright (C) 2002, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -70,6 +70,17 @@ ebl_object_note (ebl, name, type, descsz, desc)
     /* The machine specific function did not know this type.  */
     switch (type)
       {
+      case NT_GNU_BUILD_ID:
+	if (strcmp (name, "GNU") == 0 && descsz > 0)
+	  {
+	    printf (gettext ("    Build ID: "));
+	    uint_fast32_t i;
+	    for (i = 0; i < descsz - 1; ++i)
+	      printf ("%02" PRIx8, (uint8_t) desc[i]);
+	    printf ("%02" PRIx8 "\n", (uint8_t) desc[i]);
+	  }
+	break;
+
       case NT_VERSION:
 	if (strcmp (name, "GNU") == 0 && descsz >= 8)
 	  {

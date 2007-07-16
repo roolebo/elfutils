@@ -1,4 +1,10 @@
-2007-06-06  Roland McGrath  <roland@frob.com>
+2007-07-16  Roland McGrath  <roland@redhat.com>
+
+	* dwfl-bug-report.c: New file.
+	* Makefile.am (noinst_PROGRAMS, TESTS): Add it.
+	(dwfl_bug_report_LDADD): New variable.
+
+2007-06-06  Roland McGrath  <roland@redhat.com>
 
 	* run-unstrip-test.sh: Declare testfile.unstrip for removal.
 
@@ -579,7 +585,7 @@
 
 	* show-abbrev.c (main): Adjust for dwarf_getabbrev interface change.
 
-2005-04-04  Roland McGrath  <roland@frob.com>
+2005-04-04  Roland McGrath  <roland@redhat.com>
 
 	* line2addr.c (main): Initialize LINES and NLINES before calling
 	dwarf_getsrc_file, and free LINES afterwards.

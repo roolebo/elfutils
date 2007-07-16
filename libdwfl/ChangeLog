@@ -1,4 +1,9 @@
-2007-06-08  Roland McGrath  <roland@frob.com>
+2007-07-16  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module.c (dwfl_report_module): Increment DWFL->nmodules when
+	reviving an existing module.
+
+2007-06-08  Roland McGrath  <roland@redhat.com>
 
 	* libdwflP.h: Fix #ifndef for config.h to use PACKAGE_NAME.
 

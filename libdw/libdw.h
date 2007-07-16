@@ -61,6 +61,12 @@
 # define __nonnull_attribute__(args...)
 #endif
 
+#ifdef __GNUC_STDC_INLINE__
+# define __extern_inline extern __inline __attribute__ ((__gnu_inline__))
+#else
+# define __extern_inline extern __inline
+#endif
+
 
 /* Mode for the session.  */
 typedef enum
@@ -624,14 +630,14 @@ extern Dwarf_OOM dwarf_new_oom_handler (Dwarf *dbg, Dwarf_OOM handler);
 /* Inline optimizations.  */
 #ifdef __OPTIMIZE__
 /* Return attribute code of given attribute.  */
-extern inline unsigned int
+__extern_inline unsigned int
 dwarf_whatattr (Dwarf_Attribute *attr)
 {
   return attr == NULL ? 0 : attr->code;
 }
 
 /* Return attribute code of given attribute.  */
-extern inline unsigned int
+__extern_inline unsigned int
 dwarf_whatform (Dwarf_Attribute *attr)
 {
   return attr == NULL ? 0 : attr->form;

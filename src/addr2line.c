@@ -66,6 +66,7 @@ static const struct argp_option options[] =
   { "absolute", 'A', NULL, 0,
     N_("Show absolute file names using compilation directory"), 0 },
   { "functions", 'f', NULL, 0, N_("Also show function names"), 0 },
+  { "symbols", 'S', NULL, 0, N_("Also show symbol or section names"), 0 },
 
   { NULL, 0, NULL, 0, N_("Miscellaneous:"), 0 },
   /* Unsupported options.  */
@@ -106,6 +107,9 @@ static bool use_comp_dir;
 
 /* True if function names should be shown.  */
 static bool show_functions;
+
+/* True if ELF symbol or section info should be shown.  */
+static bool show_symbols;
 
 
 int
@@ -221,6 +225,10 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
       show_functions = true;
       break;
 
+    case 'S':
+      show_symbols = true;
+      break;
+
     default:
       return ARGP_ERR_UNKNOWN;
     }
@@ -298,6 +306,29 @@ print_dwarf_function (Dwfl_Module *mod, Dwarf_Addr addr)
 }
 
 static void
+print_addrsym (Dwfl_Module *mod, GElf_Addr addr)
+{
+  GElf_Sym s;
+  GElf_Word shndx;
+  const char *name = dwfl_module_addrsym (mod, addr, &s, &shndx);
+  if (name == NULL)
+    {
+      /* No symbol name.  Get a section name instead.  */
+      int i = dwfl_module_relocate_address (mod, &addr);
+      if (i >= 0)
+	name = dwfl_module_relocation_info (mod, i, NULL);
+      if (name == NULL)
+	puts ("??");
+      else
+	printf ("(%s)+%#" PRIx64 "\n", name, addr);
+    }
+  else if (addr == s.st_value)
+    puts (name);
+  else
+    printf ("%s+%#" PRIx64 "\n", name, addr - s.st_value);
+}
+
+static void
 handle_address (GElf_Addr addr, Dwfl *dwfl)
 {
   Dwfl_Module *mod = dwfl_addrmodule (dwfl, addr);
@@ -306,9 +337,12 @@ handle_address (GElf_Addr addr, Dwfl *dwfl)
     {
       /* First determine the function name.  Use the DWARF information if
 	 possible.  */
-      if (! print_dwarf_function (mod, addr))
+      if (! print_dwarf_function (mod, addr) && !show_symbols)
 	puts (dwfl_module_addrname (mod, addr) ?: "??");
     }
+
+  if (show_symbols)
+    print_addrsym (mod, addr);
 
   Dwfl_Line *line = dwfl_module_getsrc (mod, addr);
 

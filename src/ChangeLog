@@ -1,3 +1,29 @@
+2007-08-03  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (print_string_sections): New variable.
+	(options, parse_opt): Handle --strings/-p to set it.
+	(print_strings): New function.
+	(process_elf_file): Call it under -p.
+
+	* readelf.c (options): Add hidden aliases --segments, --sections,
+	as taken by binutils readelf.
+
+2007-08-01  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (dump_data_sections, dump_data_sections_tail):
+	New variables.
+	(options, parse_opt): Handle --hex-dump/-x, set them.
+	(hex_dump): New function.
+	(dump_data): New function, call it.
+	(process_elf_file): Call it.
+
+2007-07-25  Roland McGrath  <roland@redhat.com>
+
+	* addr2line.c (show_symbols): New variable.
+	(print_addrsym): New function.
+	(handle_address): Call it.
+	(options, parse_opt): Handle -S/--symbols.
+
 2007-06-05  Ulrich Drepper  <drepper@redhat.com>
 
 	* addr2line.c: Update for latest autoconf header.

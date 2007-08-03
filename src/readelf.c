@@ -70,8 +70,10 @@ static const struct argp_option options[] =
   { "histogram", 'I', NULL, 0,
     N_("Display histogram of bucket list lengths"), 0 },
   { "program-headers", 'l', NULL, 0, N_("Display the program headers"), 0 },
+  { "segments", 'l', NULL, OPTION_ALIAS | OPTION_HIDDEN, NULL, 0 },
   { "relocs", 'r', NULL, 0, N_("Display relocations"), 0 },
   { "section-headers", 'S', NULL, 0, N_("Display the sections' header"), 0 },
+  { "sections", 'S', NULL, OPTION_ALIAS | OPTION_HIDDEN, NULL, 0 },
   { "symbols", 's', NULL, 0, N_("Display the symbol table"), 0 },
   { "version-info", 'V', NULL, 0, N_("Display versioning information"), 0 },
   { "debug-dump", 'w', "SECTION", OPTION_ARG_OPTIONAL,
@@ -81,6 +83,10 @@ static const struct argp_option options[] =
   { "notes", 'n', NULL, 0, N_("Display the core notes"), 0 },
   { "arch-specific", 'A', NULL, 0,
     N_("Display architecture specific information (if any)"), 0 },
+  { "hex-dump", 'x', "SECTION", 0,
+    N_("Dump the uninterpreted contents of SECTION, by number or name"), 0 },
+  { "strings", 'p', NULL, 0,
+    N_("Print contents of sections marked as containing only strings"), 0 },
 
   { NULL, 0, NULL, 0, N_("Output control:"), 0 },
 
@@ -139,6 +145,9 @@ static bool print_arch;
 /* True if note section content should be printed.  */
 static bool print_notes;
 
+/* True if SHF_STRINGS section content should be printed.  */
+static bool print_string_sections;
+
 /* Select printing of debugging sections.  */
 static enum section_e
 {
@@ -157,6 +166,16 @@ static enum section_e
 		 | section_pubnames | section_str | section_macinfo
 		 | section_ranges)
 } print_debug_sections;
+
+/* Select hex dumping of sections.  */
+static struct section_argument *dump_data_sections;
+static struct section_argument **dump_data_sections_tail = &dump_data_sections;
+
+struct section_argument
+{
+  struct section_argument *next;
+  const char *arg;
+};
 
 /* Number of sections in the file.  */
 static size_t shnum;
@@ -186,6 +205,8 @@ static void print_debug (Ebl *ebl, GElf_Ehdr *ehdr);
 static void handle_hash (Ebl *ebl);
 static void handle_notes (Ebl *ebl, GElf_Ehdr *ehdr);
 static void print_liblist (Ebl *ebl);
+static void dump_data (Ebl *ebl);
+static void print_strings (Ebl *ebl);
 
 
 int
@@ -303,6 +324,10 @@ parse_opt (int key, char *arg,
       print_symbol_table = true;
       any_control_option = true;
       break;
+    case 'p':
+      print_string_sections = true;
+      any_control_option = true;
+      break;
     case 'V':
       print_version_info = true;
       any_control_option = true;
@@ -338,6 +363,16 @@ parse_opt (int key, char *arg,
 		     program_invocation_short_name);
 	  exit (1);
 	}
+      any_control_option = true;
+      break;
+    case 'x':
+      {
+	struct section_argument *a = xmalloc (sizeof *a);
+	a->arg = arg;
+	a->next = NULL;
+	*dump_data_sections_tail = a;
+	dump_data_sections_tail = &a->next;
+      }
       any_control_option = true;
       break;
     case ARGP_KEY_NO_ARGS:
@@ -503,10 +538,14 @@ process_elf_file (Elf *elf, const char *prefix, const char *fname,
     print_symtab (ebl, SHT_SYMTAB);
   if (print_arch)
     print_liblist (ebl);
+  if (dump_data_sections != NULL)
+    dump_data (ebl);
   if (print_debug_sections != 0)
     print_debug (ebl, ehdr);
   if (print_notes)
     handle_notes (ebl, ehdr);
+  if (print_string_sections)
+    print_strings (ebl);
 
   ebl_closebackend (ebl);
 }
@@ -5006,5 +5045,169 @@ handle_notes (Ebl *ebl, GElf_Ehdr *ehdr)
 	}
 
       gelf_freechunk (ebl->elf, notemem);
+    }
+}
+
+
+static void
+hex_dump (const uint8_t *data, size_t len)
+{
+  size_t pos = 0;
+  while (pos < len)
+    {
+      printf ("  0x%08Zu ", pos);
+
+      const size_t chunk = MIN (len - pos, 16);
+
+      for (size_t i = 0; i < chunk; ++i)
+	if (i % 4 == 3)
+	  printf ("%02x ", data[pos + i]);
+	else
+	  printf ("%02x", data[pos + i]);
+
+      if (chunk < 16)
+	printf ("%*s", (int) ((chunk - 16) * 2 + (chunk - 16) / 4), "");
+
+      for (size_t i = 0; i < chunk; ++i)
+	{
+	  unsigned char b = data[pos + i];
+	  printf ("%c", b > ' ' && b < 0x7f ? b : '.');
+	}
+
+      putchar ('\n');
+      pos += chunk;
+    }
+}
+
+static void
+dump_data (Ebl *ebl)
+{
+  /* Get the section header string table index.  */
+  size_t shstrndx;
+  if (elf_getshstrndx (ebl->elf, &shstrndx) < 0)
+    error (EXIT_FAILURE, 0,
+	   gettext ("cannot get section header string table index"));
+
+  for (struct section_argument *a = dump_data_sections; a != NULL; a = a->next)
+    {
+      Elf_Scn *scn;
+      GElf_Shdr shdr_mem;
+      const char *name;
+
+      char *endp = NULL;
+      unsigned long int shndx = strtoul (a->arg, &endp, 0);
+      if (endp != NULL && endp != a->arg && *endp == '\0')
+	{
+	  scn = elf_getscn (ebl->elf, shndx);
+	  if (scn == NULL)
+	    {
+	      error (0, 0, gettext ("\nsection [%lu] does not exist"), shndx);
+	      continue;
+	    }
+
+	  if (gelf_getshdr (scn, &shdr_mem) == NULL)
+	    error (EXIT_FAILURE, 0, gettext ("cannot get section header: %s"),
+		   elf_errmsg (-1));
+	  name = elf_strptr (ebl->elf, shstrndx, shdr_mem.sh_name);
+	}
+      else
+	{
+	  /* Need to look up the section by name.  */
+	  scn = NULL;
+	  while ((scn = elf_nextscn (ebl->elf, scn)) != NULL)
+	    {
+	      if (gelf_getshdr (scn, &shdr_mem) == NULL)
+		continue;
+	      name = elf_strptr (ebl->elf, shstrndx, shdr_mem.sh_name);
+	      if (name == NULL)
+		continue;
+	      if (!strcmp (name, a->arg))
+		break;
+	    }
+
+	  if (scn == NULL)
+	    {
+	      error (0, 0, gettext ("\nsection '%s' does not exist"), a->arg);
+	      continue;
+	    }
+	}
+
+      if (shdr_mem.sh_size == 0 || shdr_mem.sh_type == SHT_NOBITS)
+	printf (gettext ("\nSection [%Zu] '%s' has no data to dump.\n"),
+		elf_ndxscn (scn), name);
+      else
+	{
+	  Elf_Data *data = elf_rawdata (scn, NULL);
+	  if (data == NULL)
+	    error (0, 0, gettext ("cannot get data for section [%Zu] '%s': %s"),
+		   elf_ndxscn (scn), name, elf_errmsg (-1));
+	  else
+	    {
+	      printf (gettext ("\nHex dump of section [%Zu] '%s', %" PRIu64
+			       " bytes at offset %#0" PRIx64 ":\n"),
+		      elf_ndxscn (scn), name,
+		      shdr_mem.sh_size, shdr_mem.sh_offset);
+	      hex_dump (data->d_buf, data->d_size);
+	    }
+	}
+    }
+}
+
+static void
+print_strings (Ebl *ebl)
+{
+  /* Get the section header string table index.  */
+  size_t shstrndx;
+  if (elf_getshstrndx (ebl->elf, &shstrndx) < 0)
+    error (EXIT_FAILURE, 0,
+	   gettext ("cannot get section header string table index"));
+
+  Elf_Scn *scn;
+  GElf_Shdr shdr_mem;
+  const char *name;
+  scn = NULL;
+  while ((scn = elf_nextscn (ebl->elf, scn)) != NULL)
+    {
+      if (gelf_getshdr (scn, &shdr_mem) == NULL)
+	continue;
+
+      if (shdr_mem.sh_type != SHT_PROGBITS
+	  || !(shdr_mem.sh_flags & SHF_STRINGS))
+	continue;
+
+      name = elf_strptr (ebl->elf, shstrndx, shdr_mem.sh_name);
+      if (name == NULL)
+	continue;
+
+      if (shdr_mem.sh_size == 0)
+	printf (gettext ("\nSection [%Zu] '%s' is empty.\n"),
+		elf_ndxscn (scn), name);
+
+      Elf_Data *data = elf_rawdata (scn, NULL);
+      if (data == NULL)
+	error (0, 0, gettext ("cannot get data for section [%Zu] '%s': %s"),
+	       elf_ndxscn (scn), name, elf_errmsg (-1));
+      else
+	{
+	  printf (gettext ("\nString section [%Zu] '%s' contains %" PRIu64
+			   " bytes at offset %#0" PRIx64 ":\n"),
+		  elf_ndxscn (scn), name,
+		  shdr_mem.sh_size, shdr_mem.sh_offset);
+
+	  const char *start = data->d_buf;
+	  const char *const limit = start + data->d_size;
+	  do
+	    {
+	      const char *end = memchr (start, '\0', limit - start);
+	      const size_t pos = start - (const char *) data->d_buf;
+	      if (unlikely (end == NULL))
+		{
+		  printf ("  [%6Zx]- %.*s\n", pos, (int) (end - start), start);
+		  break;
+		}
+	      printf ("  [%6Zx]  %s\n", pos, start);
+	      start = end + 1;
+	    } while (start < limit);
+	}
     }
 }

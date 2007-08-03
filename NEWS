@@ -1,3 +1,9 @@
+Version 0.129:
+
+readelf: new options --hex-dump (or -x), --strings (or -p)
+
+addr2line: new option --symbols (or -S)
+
 Version 0.128:
 
 new program: unstrip

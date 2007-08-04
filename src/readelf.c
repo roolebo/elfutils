@@ -30,6 +30,7 @@
 
 #include <argp.h>
 #include <assert.h>
+#include <ctype.h>
 #include <dwarf.h>
 #include <errno.h>
 #include <error.h>
@@ -5071,7 +5072,7 @@ hex_dump (const uint8_t *data, size_t len)
       for (size_t i = 0; i < chunk; ++i)
 	{
 	  unsigned char b = data[pos + i];
-	  printf ("%c", b > ' ' && b < 0x7f ? b : '.');
+	  printf ("%c", isprint (b) ? b : '.');
 	}
 
       putchar ('\n');
@@ -5096,7 +5097,7 @@ dump_data (Ebl *ebl)
 
       char *endp = NULL;
       unsigned long int shndx = strtoul (a->arg, &endp, 0);
-      if (endp != NULL && endp != a->arg && *endp == '\0')
+      if (endp != a->arg && *endp == '\0')
 	{
 	  scn = elf_getscn (ebl->elf, shndx);
 	  if (scn == NULL)

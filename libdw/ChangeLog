@@ -1,3 +1,14 @@
+2007-08-07  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_getscopes.c (pc_match): Swallow dwarf_haspc error return when
+	error code is DWARF_E_NOERROR (0).
+
+	* dwarf_getscopes.c (pc_record): Always bail early if DIE->prune.
+	Fix typo in __libdw_visit_scopes argument.
+
+	* dwarf_getscopes.c (pc_match): Check dwarf_haspc error return,
+	swallow DWARF_E_NO_DEBUG_RANGES but not other errors.
+
 2007-07-03  Roland McGrath  <roland@redhat.com>
 
 	* libdw.h (__extern_inline): New macro.

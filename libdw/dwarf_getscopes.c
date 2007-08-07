@@ -1,5 +1,5 @@
 /* Return scope DIEs containing PC address.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -71,10 +71,32 @@ pc_match (unsigned int depth, struct Dwarf_Die_Chain *die, void *arg)
 {
   struct args *a = arg;
 
-  if (a->scopes != NULL || INTUSE(dwarf_haspc) (&die->die, a->pc) <= 0)
+  if (a->scopes != NULL)
     die->prune = true;
-  else if (INTUSE (dwarf_tag) (&die->die) == DW_TAG_inlined_subroutine)
-    a->inlined = depth;
+  else
+    {
+      /* dwarf_haspc returns an error if there are no appropriate attributes.
+	 But we use it indiscriminantly instead of presuming which tags can
+	 have PC attributes.  So when it fails for that reason, treat it just
+	 as a nonmatching return.  */
+      int result = INTUSE(dwarf_haspc) (&die->die, a->pc);
+      if (result < 0)
+	{
+	  int error = INTUSE(dwarf_errno) ();
+	  if (error != DWARF_E_NOERROR && error != DWARF_E_NO_DEBUG_RANGES)
+	    {
+	      __libdw_seterrno (error);
+	      return -1;
+	    }
+	  result = 0;
+	}
+      if (result == 0)
+    	die->prune = true;
+
+      if (!die->prune
+	  && INTUSE (dwarf_tag) (&die->die) == DW_TAG_inlined_subroutine)
+	a->inlined = depth;
+    }
 
   return 0;
 }
@@ -119,11 +141,11 @@ pc_record (unsigned int depth, struct Dwarf_Die_Chain *die, void *arg)
 {
   struct args *a = arg;
 
+  if (die->prune)
+    return 0;
+
   if (a->scopes == NULL)
     {
-      if (die->prune)
-	return 0;
-
       /* We have hit the innermost DIE that contains the target PC.  */
 
       a->nscopes = depth + 1 - a->inlined;
@@ -175,7 +197,7 @@ pc_record (unsigned int depth, struct Dwarf_Die_Chain *die, void *arg)
      If we don't find it, return to search the containing scope.
      If we do find it, the nonzero return value will bail us out
      of the postorder traversal.  */
-  return __libdw_visit_scopes (depth, die, &origin_match, NULL, &a);
+  return __libdw_visit_scopes (depth, die, &origin_match, NULL, a);
 }
 
 

@@ -97,37 +97,74 @@ dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr addr,
       return shndx == addr_shndx;
     }
 
-  /* Look through the symbol table for a matching symbol.  */
+  /* Keep track of the closest symbol we have seen so far.
+     Here we store only symbols with nonzero st_size.  */
   const char *closest_name = NULL;
-  closest_sym->st_value = 0;
   GElf_Word closest_shndx = SHN_UNDEF;
+
+  /* Keep track of an eligible symbol with st_size == 0 as a fallback.  */
+  const char *sizeless_name = NULL;
+  GElf_Sym sizeless_sym;
+  GElf_Word sizeless_shndx = SHN_UNDEF;
+
+  /* Keep track of the lowest address a relevant sizeless symbol could have.  */
+  GElf_Addr min_label = addr;
+
+  /* Look through the symbol table for a matching symbol.  */
   for (int i = 1; i < syments; ++i)
     {
       GElf_Sym sym;
       GElf_Word shndx;
       const char *name = INTUSE(dwfl_module_getsym) (mod, i, &sym, &shndx);
-      if (name != NULL && sym.st_value <= addr)
+      if (name != NULL
+	  && sym.st_value <= addr
+	  && (sym.st_size == 0 || addr - sym.st_value < sym.st_size))
 	{
-	  inline void closest (void)
-	    {
-	      *closest_sym = sym;
-	      closest_shndx = shndx;
-	      closest_name = name;
-	    }
+	  /* Even if we don't choose this symbol, its existence
+	     excludes any sizeless symbol (assembly label) that
+	     is inside its bounds.  */
+	  if (sym.st_value + sym.st_size > addr)
+	    min_label = sym.st_value + sym.st_size;
 
-	  if (addr < sym.st_value + sym.st_size)
+	  /* This symbol is a better candidate than the current one
+	     if it's a named symbol, not a section or file symbol,
+	     and is closer to ADDR or is global when it was local.  */
+	  if (name[0] != '\0'
+	      && GELF_ST_TYPE (sym.st_info) != STT_SECTION
+	      && GELF_ST_TYPE (sym.st_info) != STT_FILE
+	      && (closest_name == NULL
+		  || closest_sym->st_value < sym.st_value
+		  || (GELF_ST_BIND (closest_sym->st_info)
+		      < GELF_ST_BIND (sym.st_info))))
 	    {
-	      closest ();
-	      break;
+	      if (sym.st_size != 0)
+		{
+		  *closest_sym = sym;
+		  closest_shndx = shndx;
+		  closest_name = name;
+		}
+	      else if (same_section (&sym, shndx))
+		{
+		  /* Handwritten assembly symbols sometimes have no st_size.
+		     If no symbol with proper size includes the address,
+		     we'll use the closest one that is in the same section
+		     as ADDR.  */
+		  sizeless_sym = sym;
+		  sizeless_shndx = shndx;
+		  sizeless_name = name;
+		}
 	    }
-
-	  /* Handwritten assembly symbols sometimes have no st_size.
-	     If no symbol with proper size includes the address, we'll
-	     use the closest one that is in the same section as ADDR.   */
-	  if (sym.st_size == 0 && sym.st_value >= closest_sym->st_value
-	      && same_section (&sym, shndx))
-	    closest ();
 	}
+    }
+
+  /* If we found no proper sized symbol to use, fall back to the best
+     candidate sizeless symbol we found, if any.  */
+  if (closest_name == NULL
+      && sizeless_name != NULL && sizeless_sym.st_value >= min_label)
+    {
+      *closest_sym = sizeless_sym;
+      closest_shndx = sizeless_shndx;
+      closest_name = sizeless_name;
     }
 
   if (shndxp != NULL)

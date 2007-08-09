@@ -25,7 +25,7 @@
 
 . $srcdir/test-subr.sh
 
-testfiles testfile34
+testfiles testfile34 testfile38
 
 testrun_compare ../src/addr2line -f -e testfile34 \
 				 0x08048074 0x08048075 0x08048076 \
@@ -41,6 +41,17 @@ data1
 ??
 ??:0
 _end
+??:0
+EOF
+
+testrun_compare ../src/addr2line -S -e testfile38 0x02 0x10a 0x211 0x31a <<\EOF
+t1_global_outer+0x2
+??:0
+t2_global_symbol+0x2
+??:0
+t3_global_after_0+0x1
+??:0
+(.text)+0x31a
 ??:0
 EOF
 

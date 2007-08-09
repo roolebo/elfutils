@@ -125,7 +125,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile30.bz2 testfile31.bz2 testfile32.bz2 testfile33.bz2 \
 	     testfile34.bz2 testfile35.bz2 testfile35.debug.bz2 \
 	     testfile36.bz2 testfile36.debug.bz2 \
-	     testfile37.bz2 testfile37.debug.bz2
+	     testfile37.bz2 testfile37.debug.bz2 \
+	     testfile38.bz2
 
 installed_TESTS_ENVIRONMENT = libdir=$(DESTDIR)$(libdir) \
 			      bindir=$(DESTDIR)$(bindir) \

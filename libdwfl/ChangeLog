@@ -1,3 +1,9 @@
+2007-08-08  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_addrsym.c: Don't use STT_SECTION, STT_FILE symbols and
+	those with no names.  Rewrite best symbol algorithm not to assume a
+	sorted table and to be smarter handling sizeless symbols.
+
 2007-07-16  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_module.c (dwfl_report_module): Increment DWFL->nmodules when

@@ -3,7 +3,7 @@ Summary: A collection of utilities and DSOs to handle compiled objects
 Name: elfutils
 Version: @PACKAGE_VERSION@
 Release: 1
-License: GPL
+License: GPLv2 with exceptions
 Group: Development/Tools
 Source: elfutils-%{version}.tar.gz
 Obsoletes: libelf libelf-devel

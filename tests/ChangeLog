@@ -1,3 +1,13 @@
+2007-08-09  Roland McGrath  <roland@redhat.com>
+
+	* dwfl-bug-report.c: Fix header inclusion.
+
+2007-08-08  Roland McGrath  <roland@redhat.com>
+
+	* run-addrname-test.sh: Add a new case using addr2line -S.
+	* testfile38.bz2: New data file.
+	* Makefile.am (EXTRA_DIST): Add it.
+
 2007-07-16  Roland McGrath  <roland@redhat.com>
 
 	* dwfl-bug-report.c: New file.

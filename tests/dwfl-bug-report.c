@@ -26,7 +26,6 @@
 #include <config.h>
 #include ELFUTILS_HEADER(dwfl)
 
-#include <elfutils/libdwfl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>

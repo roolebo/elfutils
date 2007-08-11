@@ -3692,16 +3692,22 @@ phdr[%d]: unknown core file note type %" PRIu64 " at offset %" PRIu64 "\n"),
 	    }
 	}
       else
-	{
-	  if (type != NT_VERSION)
+	switch (type)
+	  {
+	  case NT_GNU_ABI_TAG:	/* aka NT_VERSION */
+	  case NT_GNU_HWCAP:
+	  case NT_GNU_BUILD_ID:
+	    /* Known type.  */
+	    break;
+
+	  default:
 	    ERROR (gettext ("\
 phdr[%d]: unknown object file note type %" PRIu64 " at offset %" PRIu64 "\n"),
 		   cnt, type, idx);
-	}
+	  }
 
       /* Move to the next entry.  */
       idx += 3 * align + ALIGNED_LEN (namesz) + ALIGNED_LEN (descsz);
-
     }
 
   gelf_freechunk (ebl->elf, notemem);

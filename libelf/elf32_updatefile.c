@@ -1,5 +1,5 @@
 /* Write changed data structures.
-   Copyright (C) 2000, 2001, 2002, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2004, 2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -85,6 +85,14 @@ compare_sections (const void *a, const void *b)
       > (*scnb)->shdr.ELFW(e,LIBELFBITS)->sh_offset)
     return 1;
 
+  if ((*scna)->shdr.ELFW(e,LIBELFBITS)->sh_size
+      < (*scnb)->shdr.ELFW(e,LIBELFBITS)->sh_size)
+    return -1;
+
+  if ((*scna)->shdr.ELFW(e,LIBELFBITS)->sh_size
+      > (*scnb)->shdr.ELFW(e,LIBELFBITS)->sh_size)
+    return 1;
+
   if ((*scna)->index < (*scnb)->index)
     return -1;
 
@@ -97,7 +105,10 @@ compare_sections (const void *a, const void *b)
 
 /* Insert the sections in the list into the provided array and sort
    them according to their start offsets.  For sections with equal
-   start offsets the section index is used.  */
+   start offsets, the size is used; for sections with equal start
+   offsets and sizes, the section index is used.  Sorting by size
+   ensures that zero-length sections are processed first, which
+   is what we want since they do not advance our file writing position.  */
 static void
 sort_sections (Elf_Scn **scns, Elf_ScnList *list)
 {
@@ -684,7 +695,7 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 		    sizeof (ElfW2(LIBELFBITS,Shdr)));
 
 	  shdr_flags |= scn->shdr_flags;
-	  scn->shdr_flags  &= ~ELF_F_DIRTY;
+	  scn->shdr_flags &= ~ELF_F_DIRTY;
 	}
 
       /* Fill the gap between last section and section header table if

@@ -1,3 +1,11 @@
+2007-08-12  Roland McGrath  <roland@redhat.com>
+
+	* run-strip-test7.sh: New file.
+	* testfile39.bz2: New data file.
+	* testfile40.bz2: New data file.
+	* testfile40.debug.bz2: New data file.
+	* Makefile.am (TESTS, EXTRA_DIST): Add them.
+
 2007-08-09  Roland McGrath  <roland@redhat.com>
 
 	* dwfl-bug-report.c: Fix header inclusion.

@@ -104,9 +104,8 @@ dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr addr,
 
   /* Keep track of an eligible symbol with st_size == 0 as a fallback.  */
   const char *sizeless_name = NULL;
-  GElf_Sym sizeless_sym;
+  GElf_Sym sizeless_sym = { 0, 0, 0, 0, 0, SHN_UNDEF };
   GElf_Word sizeless_shndx = SHN_UNDEF;
-  sizeless_sym.st_value = 0;
 
   /* Keep track of the lowest address a relevant sizeless symbol could have.  */
   GElf_Addr min_label = addr;

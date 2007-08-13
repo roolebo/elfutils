@@ -213,6 +213,7 @@ elf_from_remote_memory (GElf_Addr ehdr_vma,
   size_t contents_size = 0;
   GElf_Off segments_end = 0;
   GElf_Addr loadbase = ehdr_vma;
+  bool found_base = false;
   switch (ehdr.e32.e_ident[EI_CLASS])
     {
       inline void handle_segment (GElf_Addr vaddr, GElf_Off offset,
@@ -223,8 +224,11 @@ elf_from_remote_memory (GElf_Addr ehdr_vma,
 	  if (segment_end > (GElf_Off) contents_size)
 	    contents_size = segment_end;
 
-	  if ((offset & -align) == 0 && loadbase == ehdr_vma)
-	    loadbase = ehdr_vma - (vaddr & -align);
+	  if (!found_base && (offset & -align) == 0)
+	    {
+	      loadbase = ehdr_vma - (vaddr & -align);
+	      found_base = true;
+	    }
 
 	  segments_end = offset + filesz;
 	}

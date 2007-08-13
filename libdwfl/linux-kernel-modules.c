@@ -215,7 +215,7 @@ dwfl_linux_kernel_report_offline (Dwfl *dwfl, const char *release,
 	    return errno;
 	}
 
-      FTS *fts = fts_open (modulesdir, FTS_LOGICAL | FTS_NOSTAT, NULL);
+      FTS *fts = fts_open (modulesdir, FTS_NOSTAT, NULL);
       if (modulesdir[0] == (char *) release)
 	modulesdir[0] = NULL;
       if (fts == NULL)
@@ -403,7 +403,7 @@ dwfl_linux_kernel_find_elf (Dwfl_Module *mod __attribute__ ((unused)),
   if (asprintf (&modulesdir[0], MODULEDIRFMT, release) < 0)
     return -1;
 
-  FTS *fts = fts_open (modulesdir, FTS_LOGICAL | FTS_NOSTAT, NULL);
+  FTS *fts = fts_open (modulesdir, FTS_NOSTAT, NULL);
   if (fts == NULL)
     {
       free (modulesdir[0]);

@@ -1,3 +1,11 @@
+2007-08-12  Roland McGrath  <roland@redhat.com>
+
+	* elflint.c (check_note): Accept type 0 with name "Linux".
+
+	* elflint.c (special_sections): Accept SHF_ALLOC for ".note".
+
+	* elflint.c (section_flags_string): Return "none" for 0, not "".
+
 2007-08-11  Roland McGrath  <roland@redhat.com>
 
 	* elflint.c (check_note): Accept NT_GNU_HWCAP, NT_GNU_BUILD_ID.

@@ -1,3 +1,8 @@
+2007-08-12  Roland McGrath  <roland@redhat.com>
+
+	* elf32_updatefile.c (compare_sections): Sort secondarily on sh_size,
+	and only tertiarily on index.
+
 2007-07-09  Roland McGrath  <roland@redhat.com>
 
 	* elf.h: Update from glibc.

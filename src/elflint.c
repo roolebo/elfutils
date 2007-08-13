@@ -2461,6 +2461,9 @@ section [%2d] '%s' is contained in more than one section group\n"),
 static const char *
 section_flags_string (GElf_Word flags, char *buf, size_t len)
 {
+  if (flags == 0)
+    return "none";
+
   static const struct
   {
     GElf_Word flag;
@@ -3102,7 +3105,7 @@ static const struct
     { ".init_array", 12, SHT_INIT_ARRAY, exact, SHF_ALLOC | SHF_WRITE, 0 },
     { ".interp", 8, SHT_PROGBITS, atleast, 0, SHF_ALLOC }, // XXX more tests?
     { ".line", 6, SHT_PROGBITS, exact, 0, 0 },
-    { ".note", 6, SHT_NOTE, exact, 0, 0 },
+    { ".note", 6, SHT_NOTE, atleast, 0, SHF_ALLOC },
     { ".plt", 5, SHT_PROGBITS, unused, 0, 0 }, // XXX more tests
     { ".preinit_array", 15, SHT_PREINIT_ARRAY, exact, SHF_ALLOC | SHF_WRITE, 0 },
     { ".rela", 5, SHT_RELA, atleast, 0, SHF_ALLOC }, // XXX more tests
@@ -3699,6 +3702,12 @@ phdr[%d]: unknown core file note type %" PRIu64 " at offset %" PRIu64 "\n"),
 	  case NT_GNU_BUILD_ID:
 	    /* Known type.  */
 	    break;
+
+	  case 0:
+	    /* Linux vDSOs use a type 0 note for the kernel version word.  */
+	    if (namesz == sizeof "Linux"
+		&& !memcmp (notemem + idx + 3 * align, "Linux", sizeof "Linux"))
+	      break;
 
 	  default:
 	    ERROR (gettext ("\

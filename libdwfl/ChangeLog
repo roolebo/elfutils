@@ -1,3 +1,15 @@
+2007-08-13  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_addrsym.c: Add dead initializer for stupid compiler.
+
+2007-08-12  Roland McGrath  <roland@redhat.com>
+
+	* linux-kernel-modules.c (dwfl_linux_kernel_report_offline): Don't use
+	FTS_LOGICAL.
+
+	* elf-from-memory.c (elf_from_remote_memory): Don't reset LOADBASE on
+	a second phdr if it happens to match EHDR_VMA exactly.
+
 2007-08-08  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_module_addrsym.c: Don't use STT_SECTION, STT_FILE symbols and

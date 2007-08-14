@@ -180,6 +180,10 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
+* Tue Aug 14 2007 Ulrich Drepper <drepper@redhat.com> 0.129-1
+- readelf: new options --hex-dump (or -x), --strings (or -p)
+- addr2line: new option --symbols (or -S)
+
 * Wed Apr 18 2007 Ulrich Drepper <drepper@redhat.com> 0.127-1
 - libdw: new function dwarf_getsrcdirs
 - libdwfl: new functions dwfl_module_addrsym, dwfl_report_begin_add,

@@ -156,6 +156,7 @@ x86_64_register_info (Ebl *ebl __attribute__ ((unused)),
       return stpcpy (&name[1], "s.base") + 1 - name;
 
     case 49:
+      *setname = "integer";
       return stpcpy (name, "rflags") + 1 - name;
     case 62:
       return stpcpy (name, "tr") + 1 - name;

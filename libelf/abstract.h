@@ -1,5 +1,5 @@
 /* Abstract description of component ELF types.
-   Copyright (C) 1998, 1999, 2000, 2002, 2004 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2004, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -314,3 +314,20 @@ END (Bits, Ext##Lib)
   Lib (32, Ext)
 #define Lib64(Ext) \
   Lib (64, Ext)
+
+#define auxv_t32(Ext) \
+START (32, auxv_t, Ext##auxv_t)						      \
+  TYPE_NAME (ElfW2(32, Ext##Word), a_type)				      \
+  TYPE_EXTRA (union {)							      \
+  TYPE_EXTRA (ElfW2(32, Ext##Word) a_val;)				      \
+  TYPE_XLATE (Elf32_cvt_Addr1 (&tdest->a_un.a_val, &tsrc->a_un.a_val);)	      \
+  TYPE_EXTRA (} a_un;)							      \
+END (32, Ext##auxv_t)
+#define auxv_t64(Ext) \
+START (64, auxv_t, Ext##auxv_t)						      \
+  TYPE_NAME (ElfW2(64, Ext##Xword), a_type)				      \
+  TYPE_EXTRA (union {)							      \
+  TYPE_EXTRA (ElfW2(64, Ext##Xword) a_val;)				      \
+  TYPE_XLATE (Elf64_cvt_Addr1 (&tdest->a_un.a_val, &tsrc->a_un.a_val);)	      \
+  TYPE_EXTRA (} a_un;)							      \
+END (64, Ext##auxv_t)

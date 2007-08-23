@@ -1,5 +1,5 @@
 /* Return the size of an object file type.
-   Copyright (C) 1998, 1999, 2000, 2002 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -86,7 +86,8 @@ const size_t __libelf_type_sizes[EV_NUM - 1][ELFCLASSNUM - 1][ELF_T_NUM] =
       [ELF_T_VNAUX]	= sizeof (ElfW2(LIBELFBITS, Ext_Vernaux)),	      \
       [ELF_T_NHDR]	= sizeof (ElfW2(LIBELFBITS, Ext_Nhdr)),		      \
       [ELF_T_SYMINFO]	= sizeof (ElfW2(LIBELFBITS, Ext_Syminfo)),	      \
-      [ELF_T_MOVE]	= sizeof (ElfW2(LIBELFBITS, Ext_Move))
+      [ELF_T_MOVE]	= sizeof (ElfW2(LIBELFBITS, Ext_Move)),		      \
+      [ELF_T_AUXV]	= sizeof (ElfW2(LIBELFBITS, Ext_auxv_t))
       TYPE_SIZES (32)
     },
     [ELFCLASS64 - 1] = {

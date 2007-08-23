@@ -1,3 +1,7 @@
+2007-08-23  Roland McGrath  <roland@redhat.com>
+
+	* run-allregs.sh: Update expected x86-64 output for %rflags.
+
 2007-08-12  Roland McGrath  <roland@redhat.com>
 
 	* run-strip-test7.sh: New file.

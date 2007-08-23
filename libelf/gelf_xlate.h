@@ -1,5 +1,5 @@
 /* Helper file for type conversion function generation.
-   Copyright (C) 1998, 1999, 2000, 2002, 2004 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2004, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -70,6 +70,7 @@ TYPE (Dyn, LIBELFBITS)
 TYPE (Syminfo, LIBELFBITS)
 TYPE (Move, LIBELFBITS)
 TYPE (Lib, LIBELFBITS)
+TYPE (auxv_t, LIBELFBITS)
 
 
 /* Prepare for the next round.  */

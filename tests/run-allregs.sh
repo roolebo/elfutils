@@ -106,6 +106,7 @@ integer registers:
 	 14: %r14 (r14), signed 64 bits
 	 15: %r15 (r15), signed 64 bits
 	 16: %rip (rip), address 64 bits
+	 49: %rflags (rflags), unsigned 64 bits
 MMX registers:
 	 41: %mm0 (mm0), unsigned 64 bits
 	 42: %mm1 (mm1), unsigned 64 bits
@@ -133,7 +134,6 @@ SSE registers:
 	 31: %xmm14 (xmm14), unsigned 128 bits
 	 32: %xmm15 (xmm15), unsigned 128 bits
 control registers:
-	 49: %rflags (rflags), unsigned 64 bits
 	 62: %tr (tr), unsigned 64 bits
 	 63: %ldtr (ldtr), unsigned 64 bits
 	 64: %mxcsr (mxcsr), unsigned 64 bits

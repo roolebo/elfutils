@@ -1,5 +1,5 @@
-/* x86-64 specific core note handling.
-   Copyright (C) 2005, 2007 Red Hat, Inc.
+/* PowerPC specific core note handling.
+   Copyright (C) 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -33,74 +33,70 @@
 #include <stdio.h>
 #include <sys/time.h>
 
-#define BACKEND		x86_64_
+#ifndef BITS
+# define BITS 		32
+# define BACKEND	ppc_
+#else
+# define BITS 		64
+# define BACKEND	ppc64_
+#endif
 #include "libebl_CPU.h"
-
 
 static const Ebl_Register_Location prstatus_regs[] =
   {
 #define GR(at, n, dwreg)						\
-    { .offset = at * 8, .regno = dwreg, .count = n, .bits = 64 }
-#define SR(at, n, dwreg)						\
-    { .offset = at * 8, .regno = dwreg, .count = n, .bits = 16, .pad = 6 }
+    { .offset = at * BITS/8, .regno = dwreg, .count = n, .bits = BITS }
 
-    GR (0, 1, 15),		/* %r15 */
-    GR (1, 1, 14),		/* %r14 */
-    GR (2, 1, 13),		/* %r13 */
-    GR (3, 1, 12),		/* %r12 */
-    GR (4, 1, 6),		/* %rbp */
-    GR (5, 1, 3),		/* %rbx */
-    GR (6, 1, 11),		/* %r11 */
-    GR (7, 1, 10),		/* %r10 */
-    GR (8, 1, 9),		/* %r9 */
-    GR (9, 1, 8),		/* %r8 */
-    GR (10,1, 0),		/* %rax */
-    GR (11,1, 2),		/* %rcx */
-    GR (12,1, 1),		/* %rdx */
-    GR (13,2, 4),		/* %rsi-%rdi */
-    /*  15,1,			    orig_rax */
-    GR (16,1, 16),		/* %rip */
-    SR (17,1, 51),		/* %cs */
-    GR (18,1, 49),		/* %rFLAGS */
-    GR (19,1, 7),		/* %rsp */
-    SR (20,1, 52),		/* %ss */
-    GR (21,2, 58),		/* %fs.base-%gs.base */
-    SR (23,1, 53),		/* %ds */
-    SR (24,1, 50),		/* %es */
-    SR (25,2, 54),		/* %fs-%gs */
+    GR (0, 32, 0),		/* r0-r31 */
+    /*	32, 1,			   nip */
+    GR (33, 1, 66),		/* msr */
+    /*	34, 1,			   orig_gpr3 */
+    GR (35, 1, 109),		/* ctr */
+    GR (36, 1, 108),		/* lr */
+    GR (37, 1, 101),		/* xer */
+    GR (38, 1, 64),		/* cr */
+    GR (39, 1, 100),		/* mq */
+    /*  40, 1,			   trap */
+    GR (41, 1, 119),		/* dar */
+    GR (42, 1, 118),		/* dsisr */
 
 #undef	GR
-#undef	SR
   };
-#define PRSTATUS_REGS_SIZE	(27 * 8)
-
-#define	ULONG			uint64_t
-#define PID_T			int32_t
-#define	UID_T			uint32_t
-#define	GID_T			uint32_t
-#define ALIGN_ULONG		8
-#define ALIGN_PID_T		4
-#define ALIGN_UID_T		4
-#define ALIGN_GID_T		4
-#define TYPE_ULONG		ELF_T_XWORD
-#define TYPE_PID_T		ELF_T_SWORD
-#define TYPE_UID_T		ELF_T_SWORD
-#define TYPE_GID_T		ELF_T_SWORD
-
-#define PRSTATUS_REGSET_ITEMS						      \
-  {									      \
-    .name = "orig_rax", .type = ELF_T_SXWORD, .format = 'd',		      \
-    .offset = offsetof (struct EBLHOOK(prstatus), pr_reg) + (8 * 15),	      \
-    .group = "register"	       			  	       	 	      \
-  }
+#define PRSTATUS_REGS_SIZE	(BITS / 8 * 48)
 
 static const Ebl_Register_Location fpregset_regs[] =
   {
-    { .offset = 0, .regno = 65, .count = 2, .bits = 16 }, /* fcw-fsw */
-    { .offset = 24, .regno = 64, .count = 1, .bits = 32 }, /* mxcsr */
-    { .offset = 32, .regno = 33, .count = 8, .bits = 80, .pad = 6 }, /* stN */
-    { .offset = 32 + 128, .regno = 17, .count = 16, .bits = 128 }, /* xmm */
+    { .offset = 0, .regno = 32, .count = 32, .bits = 64 }, /* f0-f31 */
+    { .offset = 32 * 8 + 4, .regno = 65, .count = 1, .bits = 32 } /* fpscr */
   };
-#define FPREGSET_SIZE	512
+#define FPREGSET_SIZE		(33 * 8)
+
+#if BITS == 32
+# define ULONG			uint32_t
+# define ALIGN_ULONG		4
+# define TYPE_ULONG		ELF_T_WORD
+# define TYPE_LONG		ELF_T_SWORD
+#else
+# define ULONG			uint64_t
+# define ALIGN_ULONG		8
+# define TYPE_ULONG		ELF_T_XWORD
+# define TYPE_LONG		ELF_T_SXWORD
+#endif
+#define PID_T			int32_t
+#define	UID_T			uint32_t
+#define	GID_T			uint32_t
+#define ALIGN_PID_T		4
+#define ALIGN_UID_T		4
+#define ALIGN_GID_T		4
+#define TYPE_PID_T		ELF_T_SWORD
+#define TYPE_UID_T		ELF_T_WORD
+#define TYPE_GID_T		ELF_T_WORD
+
+#define PRSTATUS_REGSET_ITEMS						      \
+  {									      \
+    .name = "orig_gpr3", .type = TYPE_LONG, .format = 'd',		      \
+    .offset = offsetof (struct EBLHOOK(prstatus), pr_reg) + (4 * 34),	      \
+    .group = "register"	       			  	       	 	      \
+  }
 
 #include "linux-core-note.c"

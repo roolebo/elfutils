@@ -186,8 +186,12 @@ static const char *default_core_note_type_name (uint32_t, char *buf,
 						size_t len);
 static const char *default_object_note_type_name (uint32_t, char *buf,
 						  size_t len);
-static bool default_core_note (const char *name, uint32_t type,
-			       uint32_t descsz, const char *desc);
+static int default_core_note (GElf_Word n_type, GElf_Word descsz,
+			      GElf_Word *regs_offset, size_t *nregloc,
+			      const Ebl_Register_Location **reglocs,
+			      size_t *nitems, const Ebl_Core_Item **);
+static int default_auxv_info (GElf_Xword a_type,
+			      const char **name, const char **format);
 static bool default_object_note (const char *name, uint32_t type,
 				 uint32_t descsz, const char *desc);
 static bool default_debugscn_p (const char *name);
@@ -232,6 +236,7 @@ fill_defaults (Ebl *result)
   result->core_note_type_name = default_core_note_type_name;
   result->object_note_type_name = default_object_note_type_name;
   result->core_note = default_core_note;
+  result->auxv_info = default_auxv_info;
   result->object_note = default_object_note;
   result->debugscn_p = default_debugscn_p;
   result->copy_reloc_p = default_copy_reloc_p;
@@ -567,19 +572,31 @@ default_core_note_type_name (uint32_t ignore __attribute__ ((unused)),
   return NULL;
 }
 
+static int
+default_auxv_info (GElf_Xword a_type __attribute__ ((unused)),
+		   const char **name __attribute__ ((unused)),
+		   const char **format __attribute__ ((unused)))
+{
+  return 0;
+}
+
+static int
+default_core_note (GElf_Word n_type __attribute__ ((unused)),
+		   GElf_Word descsz __attribute__ ((unused)),
+		   GElf_Word *ro __attribute__ ((unused)),
+		   size_t *nregloc  __attribute__ ((unused)),
+		   const Ebl_Register_Location **reglocs
+		   __attribute__ ((unused)),
+		   size_t *nitems __attribute__ ((unused)),
+		   const Ebl_Core_Item **items __attribute__ ((unused)))
+{
+  return 0;
+}
+
 static const char *
 default_object_note_type_name (uint32_t ignore __attribute__ ((unused)),
 			       char *buf __attribute__ ((unused)),
 			       size_t len __attribute__ ((unused)))
-{
-  return NULL;
-}
-
-static bool
-default_core_note (const char *name __attribute__ ((unused)),
-		   uint32_t type __attribute__ ((unused)),
-		   uint32_t descsz __attribute__ ((unused)),
-		   const char *desc __attribute__ ((unused)))
 {
   return NULL;
 }

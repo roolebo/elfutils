@@ -1,7 +1,6 @@
-/* External ELF types.
-   Copyright (C) 1998, 1999, 2000, 2002, 2007 Red Hat, Inc.
+/* Describe known auxv types.
+   Copyright (C) 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
-   Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by the
@@ -48,74 +47,75 @@
    Network licensing program, please visit www.openinventionnetwork.com
    <http://www.openinventionnetwork.com>.  */
 
-#ifndef _EXTTYPES_H
-#define	_EXTTYPES_H 1
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
 
-/* Integral types.  */
-typedef char Elf32_Ext_Addr[ELF32_FSZ_ADDR];
-typedef char Elf32_Ext_Off[ELF32_FSZ_OFF];
-typedef char Elf32_Ext_Half[ELF32_FSZ_HALF];
-typedef char Elf32_Ext_Sword[ELF32_FSZ_SWORD];
-typedef char Elf32_Ext_Word[ELF32_FSZ_WORD];
-typedef char Elf32_Ext_Sxword[ELF32_FSZ_SXWORD];
-typedef char Elf32_Ext_Xword[ELF32_FSZ_XWORD];
+#include <assert.h>
+#include <byteswap.h>
+#include <endian.h>
+#include <inttypes.h>
+#include <stdio.h>
+#include <stddef.h>
+#include <libeblP.h>
 
-typedef char Elf64_Ext_Addr[ELF64_FSZ_ADDR];
-typedef char Elf64_Ext_Off[ELF64_FSZ_OFF];
-typedef char Elf64_Ext_Half[ELF64_FSZ_HALF];
-typedef char Elf64_Ext_Sword[ELF64_FSZ_SWORD];
-typedef char Elf64_Ext_Word[ELF64_FSZ_WORD];
-typedef char Elf64_Ext_Sxword[ELF64_FSZ_SXWORD];
-typedef char Elf64_Ext_Xword[ELF64_FSZ_XWORD];
+#define AUXV_TYPES							      \
+  TYPE (NULL, "")							      \
+  TYPE (IGNORE, "")							      \
+  TYPE (EXECFD, "d")							      \
+  TYPE (PHDR, "p")							      \
+  TYPE (PHENT, "u")							      \
+  TYPE (PHNUM, "u")							      \
+  TYPE (PAGESZ, "u")							      \
+  TYPE (BASE, "p")							      \
+  TYPE (FLAGS, "x")							      \
+  TYPE (ENTRY, "p")							      \
+  TYPE (NOTELF, "")							      \
+  TYPE (UID, "u")							      \
+  TYPE (EUID, "u")							      \
+  TYPE (GID, "u")							      \
+  TYPE (EGID, "u")							      \
+  TYPE (CLKTCK, "u")							      \
+  TYPE (PLATFORM, "s")							      \
+  TYPE (HWCAP, "x")							      \
+  TYPE (FPUCW, "x")							      \
+  TYPE (DCACHEBSIZE, "d")						      \
+  TYPE (ICACHEBSIZE, "d")						      \
+  TYPE (UCACHEBSIZE, "d")						      \
+  TYPE (IGNOREPPC, "")							      \
+  TYPE (SECURE, "u")							      \
+  TYPE (SYSINFO, "p")							      \
+  TYPE (SYSINFO_EHDR, "p")						      \
+  TYPE (L1I_CACHESHAPE, "d")						      \
+  TYPE (L1D_CACHESHAPE, "d")						      \
+  TYPE (L2_CACHESHAPE, "d")						      \
+  TYPE (L3_CACHESHAPE, "d")
 
+static const struct
+{
+  const char *name, *format;
+} auxv_types[] =
+  {
+#define TYPE(name, fmt) [AT_##name] = { #name, fmt },
+    AUXV_TYPES
+#undef	TYPE
+  };
+#define nauxv_types (sizeof auxv_types / sizeof auxv_types[0])
 
-/* Define the composed types.  */
-#define START(Bits, Name, EName) typedef struct {
-#define END(Bits, Name) } ElfW2(Bits, Name)
-#define TYPE_NAME(Type, Name) Type Name;
-#define TYPE_EXTRA(Text) Text
-#define TYPE_XLATE(Text)
-
-/* Get the abstract definitions. */
-#include "abstract.h"
-
-/* And define the types.  */
-Ehdr32 (Ext_);
-Phdr32 (Ext_);
-Shdr32 (Ext_);
-Sym32 (Ext_);
-Rel32 (Ext_);
-Rela32 (Ext_);
-Note32 (Ext_);
-Dyn32 (Ext_);
-Verdef32 (Ext_);
-Verdaux32 (Ext_);
-Verneed32 (Ext_);
-Vernaux32 (Ext_);
-Syminfo32 (Ext_);
-Move32 (Ext_);
-auxv_t32 (Ext_);
-
-Ehdr64 (Ext_);
-Phdr64 (Ext_);
-Shdr64 (Ext_);
-Sym64 (Ext_);
-Rel64 (Ext_);
-Rela64 (Ext_);
-Note64 (Ext_);
-Dyn64 (Ext_);
-Verdef64 (Ext_);
-Verdaux64 (Ext_);
-Verneed64 (Ext_);
-Vernaux64 (Ext_);
-Syminfo64 (Ext_);
-Move64 (Ext_);
-auxv_t64 (Ext_);
-
-#undef START
-#undef END
-#undef TYPE_NAME
-#undef TYPE_EXTRA
-#undef TYPE_XLATE
-
-#endif	/* exttypes.h */
+int
+ebl_auxv_info (ebl, a_type, name, format)
+     Ebl *ebl;
+     GElf_Xword a_type;
+     const char **name;
+     const char **format;
+{
+  int result = ebl->auxv_info (a_type, name, format);
+  if (result == 0 && a_type < nauxv_types)
+    {
+      /* The machine specific function did not know this type.  */
+      *name = auxv_types[a_type].name;
+      *format = auxv_types[a_type].format;
+      result = 1;
+    }
+  return result;
+}

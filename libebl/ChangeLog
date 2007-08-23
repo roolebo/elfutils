@@ -1,3 +1,23 @@
+2007-08-22  Roland McGrath  <roland@redhat.com>
+
+	* libebl.h (Ebl_Core_Item): New member `group'.
+
+2007-08-19  Roland McGrath  <roland@redhat.com>
+
+	* ebl-hooks.h: Add new hook auxv_info.
+	* eblopenbackend.c (default_auxv_info): New function.
+	(fill_defaults): Initialize auxv_info hook.
+	* eblauxvinfo.c : New file.
+	* Makefile.am (gen_SOURCES): Add it.
+	* libebl.h: Declare ebl_auxv_info.
+
+	* eblcorenote.c: Rewritten with new signature.
+	* Makefile.am (gen_SOURCES): Add it.
+	* libebl.h (Ebl_Register_Location, Ebl_Core_Item): New types.
+	(ebl_core_note_info): Completely revamp signature.
+	* ebl-hooks.h: Update decl.
+	* eblopenbackend.c (default_core_note): Update signature.
+
 2007-07-09  Roland McGrath  <roland@redhat.com>
 
 	* eblobjnotetypename.c (ebl_object_note_type_name): Handle

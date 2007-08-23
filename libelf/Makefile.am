@@ -83,6 +83,7 @@ libelf_a_SOURCES = elf_version.c elf_hash.c elf_error.c elf_fill.c \
 		   gelf_getdyn.c gelf_update_dyn.c \
 		   gelf_getmove.c gelf_update_move.c \
 		   gelf_getsyminfo.c gelf_update_syminfo.c \
+		   gelf_getauxv.c gelf_update_auxv.c \
 		   gelf_xlatetof.c gelf_xlatetom.c \
 		   nlist.c \
 		   gelf_getsymshndx.c gelf_update_symshndx.c \

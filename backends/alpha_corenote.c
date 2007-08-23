@@ -1,7 +1,6 @@
-/* Initialization of PPC64 specific backend library.
-   Copyright (C) 2004, 2005, 2006, 2007 Red Hat, Inc.
+/* PowerPC specific core note handling.
+   Copyright (C) 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by the
@@ -28,38 +27,41 @@
 # include <config.h>
 #endif
 
-#define BACKEND		ppc64_
-#define RELOC_PREFIX	R_PPC64_
+#include <elf.h>
+#include <inttypes.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <sys/time.h>
+
+#define BACKEND	alpha_
 #include "libebl_CPU.h"
 
-/* This defines the common reloc hooks based on ppc64_reloc.def.  */
-#include "common-reloc.c"
+static const Ebl_Register_Location prstatus_regs[] =
+  {
+    { .offset = 0, .regno = 0, .count = 31, .bits = 64 }, /* r0-r30 */
+    { .offset = 32 * 8, .regno = 64, .count = 1, .bits = 64 }, /* pc */
+    { .offset = 33 * 8, .regno = 66, .count = 1, .bits = 64 }, /* unique */
+  };
+#define PRSTATUS_REGS_SIZE	(33 * 8)
 
+static const Ebl_Register_Location fpregset_regs[] =
+  {
+    { .offset = 0, .regno = 32, .count = 32, .bits = 64 }, /* f0-f30, fpcr */
+  };
+#define FPREGSET_SIZE		(32 * 8)
 
-const char *
-ppc64_init (elf, machine, eh, ehlen)
-     Elf *elf __attribute__ ((unused));
-     GElf_Half machine __attribute__ ((unused));
-     Ebl *eh;
-     size_t ehlen;
-{
-  /* Check whether the Elf_BH object has a sufficent size.  */
-  if (ehlen < sizeof (Ebl))
-    return NULL;
+#define ULONG			uint64_t
+#define ALIGN_ULONG		8
+#define TYPE_ULONG		ELF_T_XWORD
+#define TYPE_LONG		ELF_T_SXWORD
+#define PID_T			int32_t
+#define	UID_T			uint32_t
+#define	GID_T			uint32_t
+#define ALIGN_PID_T		4
+#define ALIGN_UID_T		4
+#define ALIGN_GID_T		4
+#define TYPE_PID_T		ELF_T_SWORD
+#define TYPE_UID_T		ELF_T_WORD
+#define TYPE_GID_T		ELF_T_WORD
 
-  /* We handle it.  */
-  eh->name = "PowerPC 64-bit";
-  ppc64_init_reloc (eh);
-  HOOK (eh, reloc_simple_type);
-  HOOK (eh, dynamic_tag_name);
-  HOOK (eh, dynamic_tag_check);
-  HOOK (eh, copy_reloc_p);
-  HOOK (eh, check_special_symbol);
-  HOOK (eh, bss_plt_p);
-  HOOK (eh, return_value_location);
-  HOOK (eh, register_info);
-  HOOK (eh, core_note);
-  HOOK (eh, auxv_info);
-
-  return MODVERSION;
-}
+#include "linux-core-note.c"

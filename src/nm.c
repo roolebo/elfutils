@@ -938,34 +938,39 @@ show_symbols_posix (Elf *elf, GElf_Word strndx, const char *prefix,
 /* Maximum size of memory we allocate on the stack.  */
 #define MAX_STACK_ALLOC	65536
 
+static int
+sort_by_address (const void *p1, const void *p2)
+{
+  GElf_SymX *s1 = (GElf_SymX *) p1;
+  GElf_SymX *s2 = (GElf_SymX *) p2;
+
+  int result = (s1->sym.st_value < s2->sym.st_value
+		? -1 : (s1->sym.st_value == s2->sym.st_value ? 0 : 1));
+
+  return reverse_sort ? -result : result;
+}
+
+static Elf_Data *sort_by_name_strtab;
+
+static int
+sort_by_name (const void *p1, const void *p2)
+{
+  GElf_SymX *s1 = (GElf_SymX *) p1;
+  GElf_SymX *s2 = (GElf_SymX *) p2;
+
+  const char *n1 = sort_by_name_strtab->d_buf + s1->sym.st_name;
+  const char *n2 = sort_by_name_strtab->d_buf + s2->sym.st_name;
+
+  int result = strcmp (n1, n2);
+
+  return reverse_sort ? -result : result;
+}
+
 static void
 show_symbols (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, Elf_Scn *xndxscn,
 	      GElf_Shdr *shdr, const char *prefix, const char *fname,
 	      const char *fullname)
 {
-  int sort_by_name (const void *p1, const void *p2)
-    {
-      GElf_SymX *s1 = (GElf_SymX *) p1;
-      GElf_SymX *s2 = (GElf_SymX *) p2;
-      int result;
-
-      result = strcmp (elf_strptr (ebl->elf, shdr->sh_link, s1->sym.st_name),
-		       elf_strptr (ebl->elf, shdr->sh_link, s2->sym.st_name));
-
-      return reverse_sort ? -result : result;
-    }
-
-  int sort_by_address (const void *p1, const void *p2)
-    {
-      GElf_SymX *s1 = (GElf_SymX *) p1;
-      GElf_SymX *s2 = (GElf_SymX *) p2;
-
-      int result = (s1->sym.st_value < s2->sym.st_value
-		    ? -1 : (s1->sym.st_value == s2->sym.st_value ? 0 : 1));
-
-      return reverse_sort ? -result : result;
-    }
-
   /* Get the section header string table index.  */
   size_t shstrndx;
   if (elf_getshstrndx (ebl->elf, &shstrndx) < 0)
@@ -1142,7 +1147,11 @@ show_symbols (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, Elf_Scn *xndxscn,
 
   /* Sort the entries according to the users wishes.  */
   if (sort == sort_name)
-    qsort (sym_mem, nentries, sizeof (GElf_SymX), sort_by_name);
+    {
+      sort_by_name_strtab = elf_getdata (elf_getscn (ebl->elf, shdr->sh_link),
+					 NULL);
+      qsort (sym_mem, nentries, sizeof (GElf_SymX), sort_by_name);
+    }
   else if (sort == sort_numeric)
     qsort (sym_mem, nentries, sizeof (GElf_SymX), sort_by_address);
 

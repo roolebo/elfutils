@@ -1,5 +1,5 @@
 /* PPC specific symbolic name handling.
-   Copyright (C) 2004, 2005 Red Hat, Inc.
+   Copyright (C) 2004, 2005, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
@@ -122,10 +122,13 @@ ppc_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr, const GElf_Sym *sym,
 
   if (strcmp (name, "_GLOBAL_OFFSET_TABLE_") == 0)
     {
+      /* In -msecure-plt mode, DT_PPC_GOT is present and must match.  */
       GElf_Addr gotaddr;
       if (find_dyn_got (elf, ehdr, &gotaddr))
 	return sym->st_value == gotaddr;
-      return sym->st_value == destshdr->sh_addr + 4;
+
+      /* In -mbss-plt mode, any place in the section is valid.  */
+      return true;
     }
 
   const char *sname = elf_strptr (elf, ehdr->e_shstrndx, destshdr->sh_name);

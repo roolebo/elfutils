@@ -41,6 +41,7 @@
 #include <libdw.h>
 #include <libintl.h>
 #include <locale.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -4949,6 +4950,621 @@ print_debug (Ebl *ebl, GElf_Ehdr *ehdr)
 }
 
 
+#define ITEM_INDENT		4
+#define ITEM_WRAP_COLUMN	150
+#define REGISTER_WRAP_COLUMN	75
+
+/* Print "NAME: FORMAT", wrapping when FORMAT_MAX chars of FORMAT would
+   make the line exceed ITEM_WRAP_COLUMN.  Unpadded numbers look better
+   for the core items.  But we do not want the line breaks to depend on
+   the particular values.  */
+static unsigned int
+__attribute__ ((format (printf, 7, 8)))
+print_core_item (unsigned int colno, char sep, unsigned int wrap,
+		 size_t name_width, const char *name,
+		 size_t format_max, const char *format, ...)
+{
+  size_t len = strlen (name);
+  if (name_width < len)
+    name_width = len;
+
+  size_t n = name_width + sizeof ": " - 1 + format_max;
+
+  if (colno == 0)
+    {
+      printf ("%*s", ITEM_INDENT, "");
+      colno = ITEM_INDENT + n;
+    }
+  else if (colno + 2 + n < wrap)
+    {
+      printf ("%c ", sep);
+      colno += 2 + n;
+    }
+  else
+    {
+      printf ("\n%*s", ITEM_INDENT, "");
+      colno = ITEM_INDENT + n;
+    }
+
+  printf ("%s: %*s", name, (int) (name_width - len), "");
+
+  va_list ap;
+  va_start (ap, format);
+  vprintf (format, ap);
+  va_end (ap);
+
+  return colno;
+}
+
+static const void *
+convert (Elf *core, Elf_Type type, uint_fast16_t count,
+	 void *value, const void *data)
+{
+  Elf_Data valuedata =
+    {
+      .d_type = type,
+      .d_buf = value,
+      .d_size = gelf_fsize (core, type, count, EV_CURRENT),
+      .d_version = EV_CURRENT,
+    };
+  Elf_Data indata =
+    {
+      .d_type = type,
+      .d_buf = (void *) data,
+      .d_size = valuedata.d_size,
+      .d_version = EV_CURRENT,
+    };
+
+  Elf_Data *d = (gelf_getclass (core) == ELFCLASS32
+		 ? elf32_xlatetom : elf64_xlatetom)
+    (&valuedata, &indata, elf_getident (core, NULL)[EI_DATA]);
+  if (d == NULL)
+    error (EXIT_FAILURE, 0,
+	   gettext ("cannot convert core note data: %s"), elf_errmsg (-1));
+
+  return data + indata.d_size;
+}
+
+typedef uint8_t GElf_Byte;
+
+static unsigned int
+handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
+		  unsigned int colno)
+{
+  uint_fast16_t count = item->count ?: 1;
+
+#define TYPES								      \
+  DO_TYPE (BYTE, Byte, "0x%.2" PRIx8, "%" PRId8, 4);			      \
+  DO_TYPE (HALF, Half, "0x%.4" PRIx16, "%" PRId16, 6);			      \
+  DO_TYPE (WORD, Word, "0x%.8" PRIx32, "%" PRId32, 11);			      \
+  DO_TYPE (SWORD, Sword, "%" PRId32, "%" PRId32, 11);			      \
+  DO_TYPE (XWORD, Xword, "0x%.16" PRIx64, "%" PRId64, 20);		      \
+  DO_TYPE (SXWORD, Sxword, "%" PRId64, "%" PRId64, 20)
+
+#define DO_TYPE(NAME, Name, hex, dec, max) GElf_##Name Name[count]
+  union { TYPES; } value;
+#undef DO_TYPE
+
+  desc = convert (core, item->type, count, &value, desc + item->offset);
+
+  switch (item->format)
+    {
+    case 'd':
+      assert (count == 1);
+      switch (item->type)
+	{
+#define DO_TYPE(NAME, Name, hex, dec, max)				      \
+	  case ELF_T_##NAME:						      \
+	    colno = print_core_item (colno, ',', ITEM_WRAP_COLUMN,	      \
+				     0, item->name, max, dec, value.Name[0]); \
+	    break
+	  TYPES;
+#undef DO_TYPE
+	default:
+	  abort ();
+	}
+      break;
+
+    case 'x':
+      assert (count == 1);
+      switch (item->type)
+	{
+#define DO_TYPE(NAME, Name, hex, dec, max)				      \
+	  case ELF_T_##NAME:						      \
+	    colno = print_core_item (colno, ',', ITEM_WRAP_COLUMN,	      \
+				     0, item->name, max, hex, value.Name[0]); \
+	    break
+	  TYPES;
+#undef DO_TYPE
+	default:
+	  abort ();
+	}
+      break;
+
+    case 'b':
+      assert (count == 1);
+      Dwarf_Word bits = 0;
+      Dwarf_Word bit = 0;
+      switch (item->type)
+	{
+#define DO_TYPE(NAME, Name, hex, dec, max)				\
+	  case ELF_T_##NAME:						      \
+	    bits = value.Name[0];					      \
+	    bit = (Dwarf_Word) 1 << ((sizeof value.Name[0] * 8) - 1);	      \
+	    break
+	  TYPES;
+#undef DO_TYPE
+	default:
+	  abort ();
+	}
+      char printed[sizeof (Dwarf_Word) * 8 + 1];
+      int i = 0;
+      while (bit != 0)
+	{
+	  printed[i++] = (bits & bit) ? '1' : '0';
+	  bit >>= 1;
+	}
+      colno = print_core_item (colno, ',', ITEM_WRAP_COLUMN, 0, item->name,
+			       sizeof printed - 1, "%.*s", i, printed);
+      break;
+
+    case 'T':
+      assert (count == 2);
+      Dwarf_Word sec;
+      Dwarf_Word usec;
+      size_t maxfmt = 7;
+      switch (item->type)
+	{
+#define DO_TYPE(NAME, Name, hex, dec, max)				      \
+	  case ELF_T_##NAME:						      \
+	    sec = value.Name[0];					      \
+	    usec = value.Name[1];					      \
+	    maxfmt += max;						      \
+	    break
+	  TYPES;
+#undef DO_TYPE
+	default:
+	  abort ();
+	}
+      colno = print_core_item (colno, ',', ITEM_WRAP_COLUMN, 0, item->name,
+			       maxfmt, "%" PRIu64 ".%.6" PRIu64, sec, usec);
+      break;
+
+    case 'c':
+      assert (count == 1);
+      colno = print_core_item (colno, ',', ITEM_WRAP_COLUMN, 0, item->name,
+			       1, "%c", value.Byte[0]);
+      break;
+
+    case 's':
+      colno = print_core_item (colno, ',', ITEM_WRAP_COLUMN, 0, item->name,
+			       count, "%.*s", (int) count, value.Byte);
+      break;
+
+    default:
+      error (0, 0, "XXX not handling format '%c' for %s",
+	     item->format, item->name);
+      break;
+    }
+
+#undef TYPES
+
+  return colno;
+}
+
+
+/* Sort items by group, and by layout offset within each group.  */
+static int
+compare_core_items (const void *a, const void *b)
+{
+  const Ebl_Core_Item *const *p1 = a;
+  const Ebl_Core_Item *const *p2 = b;
+  const Ebl_Core_Item *item1 = *p1;
+  const Ebl_Core_Item *item2 = *p2;
+
+  return ((item1->group == item2->group ? 0
+	   : strcmp (item1->group, item2->group))
+	  ?: (int) item1->offset - (int) item2->offset);
+}
+
+/* Sort item groups by layout offset of the first item in the group.  */
+static int
+compare_core_item_groups (const void *a, const void *b)
+{
+  const Ebl_Core_Item *const *const *p1 = a;
+  const Ebl_Core_Item *const *const *p2 = b;
+  const Ebl_Core_Item *const *group1 = *p1;
+  const Ebl_Core_Item *const *group2 = *p2;
+  const Ebl_Core_Item *item1 = *group1;
+  const Ebl_Core_Item *item2 = *group2;
+
+  return (int) item1->offset - (int) item2->offset;
+}
+
+static unsigned int
+handle_core_items (Elf *core, const void *desc,
+		   const Ebl_Core_Item *items, size_t nitems)
+{
+  if (nitems == 0)
+    return 0;
+
+  /* Sort to collect the groups together.  */
+  const Ebl_Core_Item *sorted_items[nitems];
+  for (size_t i = 0; i < nitems; ++i)
+    sorted_items[i] = &items[i];
+  qsort (sorted_items, nitems, sizeof sorted_items[0], &compare_core_items);
+
+  /* Collect the unique groups and sort them.  */
+  const Ebl_Core_Item **groups[nitems];
+  groups[0] = &sorted_items[0];
+  size_t ngroups = 1;
+  for (size_t i = 1; i < nitems; ++i)
+    if (sorted_items[i]->group != sorted_items[i - 1]->group
+	&& strcmp (sorted_items[i]->group, sorted_items[i - 1]->group))
+      groups[ngroups++] = &sorted_items[i];
+  qsort (groups, ngroups, sizeof groups[0], &compare_core_item_groups);
+
+  /* Write out all the groups.  */
+  unsigned int colno = 0;
+  for (size_t i = 0; i < ngroups; ++i)
+    {
+      for (const Ebl_Core_Item **item = groups[i];
+	   (item < &sorted_items[nitems]
+	    && ((*item)->group == groups[i][0]->group
+		|| !strcmp ((*item)->group, groups[i][0]->group)));
+	   ++item)
+	colno = handle_core_item (core, *item, desc, colno);
+
+      /* Force a line break at the end of the group.  */
+      colno = ITEM_WRAP_COLUMN;
+    }
+
+  return colno;
+}
+
+static unsigned int
+handle_bit_registers (const Ebl_Register_Location *regloc, const void *desc,
+		      unsigned int colno)
+{
+  desc += regloc->offset;
+
+  abort ();			/* XXX */
+  return colno;
+}
+
+
+static unsigned int
+handle_core_register (Ebl *ebl, Elf *core, int maxregname,
+		      const Ebl_Register_Location *regloc, const void *desc,
+		      unsigned int colno)
+{
+  if (regloc->bits % 8 != 0)
+    return handle_bit_registers (regloc, desc, colno);
+
+  desc += regloc->offset;
+
+  for (int reg = regloc->regno; reg < regloc->regno + regloc->count; ++reg)
+    {
+      const char *pfx;
+      const char *set;
+      char name[16];
+      int bits;
+      int type;
+      ssize_t n = ebl_register_info (ebl, reg, name, sizeof name,
+				     &pfx, &set, &bits, &type);
+      if (n <= 0)
+	error (EXIT_FAILURE, 0,
+	       gettext ("unable to handle register number %d"),
+	       regloc->regno);
+
+#define TYPES								      \
+      BITS (8, BYTE, "%4" PRId8, "0x%.2" PRIx8, 4);			      \
+      BITS (16, HALF, "%6" PRId16, "0x%.4" PRIx16, 6);			      \
+      BITS (32, WORD, "%11" PRId32, " 0x%.8" PRIx32, 11);		      \
+      BITS (64, XWORD, "%20" PRId64, "  0x%.16" PRIx64, 20)
+
+#define BITS(bits, xtype, sfmt, ufmt, max)				\
+      uint##bits##_t b##bits; int##bits##_t b##bits##s
+      union { TYPES; uint64_t b128[2]; } value;
+#undef	BITS
+
+      switch (type)
+	{
+	case DW_ATE_unsigned:
+	case DW_ATE_signed:
+	case DW_ATE_address:
+	  switch (bits)
+	    {
+#define BITS(bits, xtype, sfmt, ufmt, max)				      \
+	    case bits:							      \
+	      desc = convert (core, ELF_T_##xtype, 1, &value, desc);	      \
+	      if (type == DW_ATE_signed)				      \
+		colno = print_core_item (colno, ' ', REGISTER_WRAP_COLUMN,    \
+					 maxregname, name,		      \
+					 max, sfmt, value.b##bits##s);	      \
+	      else							      \
+		colno = print_core_item (colno, ' ', REGISTER_WRAP_COLUMN,    \
+					 maxregname, name,		      \
+					 max, ufmt, value.b##bits);	      \
+	      break
+
+	    TYPES;
+
+	    case 128:
+	      assert (type == DW_ATE_unsigned);
+	      desc = convert (core, ELF_T_XWORD, 2, &value, desc);
+	      int be = elf_getident (core, NULL)[EI_DATA] == ELFDATA2MSB;
+	      colno = print_core_item (colno, ' ', REGISTER_WRAP_COLUMN,
+				       maxregname, name,
+				       34, "0x%.16" PRIx64 "%.16" PRIx64,
+				       value.b128[!be], value.b128[be]);
+	      break;
+
+	    default:
+	      abort ();
+#undef	BITS
+	    }
+	  break;
+
+	default:
+	  /* Print each byte in hex, the whole thing in native byte order.  */
+	  assert (bits % 8 == 0);
+	  const uint8_t *bytes = desc;
+	  desc += bits / 8;
+	  char hex[bits / 4 + 1];
+	  hex[bits / 4] = '\0';
+	  int incr = 1;
+	  if (elf_getident (core, NULL)[EI_DATA] == ELFDATA2LSB)
+	    {
+	      bytes += bits / 8 - 1;
+	      incr = -1;
+	    }
+	  size_t idx = 0;
+	  for (char *h = hex; bits > 0; bits -= 8, idx += incr)
+	    {
+	      *h++ = "0123456789abcdef"[bytes[idx] >> 4];
+	      *h++ = "0123456789abcdef"[bytes[idx] & 0xf];
+	    }
+	  colno = print_core_item (colno, ' ', REGISTER_WRAP_COLUMN,
+				   maxregname, name,
+				   2 + sizeof hex - 1, "0x%s", hex);
+	  break;
+	}
+      desc += regloc->pad;
+
+#undef TYPES
+    }
+
+  return colno;
+}
+
+
+struct register_info
+{
+  const Ebl_Register_Location *regloc;
+  const char *set;
+  char name[16];
+  Dwarf_Half regno;
+  uint8_t bits;
+  uint8_t type;
+};
+
+static int
+register_bitpos (const struct register_info *r)
+{
+  return (r->regloc->offset * 8
+	  + ((r->regno - r->regloc->regno)
+	     * (r->regloc->bits + r->regloc->pad * 8)));
+}
+
+static int
+compare_sets_by_info (const struct register_info *r1,
+		      const struct register_info *r2)
+{
+  return ((int) r2->bits - (int) r1->bits
+	  ?: register_bitpos (r1) - register_bitpos (r2));
+}
+
+/* Sort registers by set, and by size and layout offset within each set.  */
+static int
+compare_registers (const void *a, const void *b)
+{
+  const struct register_info *r1 = a;
+  const struct register_info *r2 = b;
+
+  /* Unused elements sort last.  */
+  if (r1->regloc == NULL)
+    return r2->regloc == NULL ? 0 : 1;
+  if (r2->regloc == NULL)
+    return -1;
+
+  return ((r1->set == r2->set ? 0 : strcmp (r1->set, r2->set))
+	  ?: compare_sets_by_info (r1, r2));
+}
+
+/* Sort register sets by layout offset of the first register in the set.  */
+static int
+compare_register_sets (const void *a, const void *b)
+{
+  const struct register_info *const *p1 = a;
+  const struct register_info *const *p2 = b;
+  return compare_sets_by_info (*p1, *p2);
+}
+
+static unsigned int
+handle_core_registers (Ebl *ebl, Elf *core, const void *desc,
+		       const Ebl_Register_Location *reglocs, size_t nregloc)
+{
+  if (nregloc == 0)
+    return 0;
+
+  ssize_t maxnreg = ebl_register_info (ebl, 0, NULL, 0, NULL, NULL, NULL, NULL);
+  if (maxnreg <= 0)
+    error (EXIT_FAILURE, 0,
+	   gettext ("cannot register info: %s"), elf_errmsg (-1));
+
+  struct register_info regs[maxnreg];
+  memset (regs, 0, sizeof regs);
+
+  /* Sort to collect the sets together.  */
+  int maxreg = 0;
+  for (size_t i = 0; i < nregloc; ++i)
+    for (int reg = reglocs[i].regno;
+	 reg < reglocs[i].regno + reglocs[i].count;
+	 ++reg)
+      {
+	assert (reg < maxnreg);
+	if (reg > maxreg)
+	  maxreg = reg;
+	struct register_info *info = &regs[reg];
+
+	const char *pfx;
+	int bits;
+	int type;
+	ssize_t n = ebl_register_info (ebl, reg, info->name, sizeof info->name,
+				       &pfx, &info->set, &bits, &type);
+	if (n <= 0)
+	  error (EXIT_FAILURE, 0,
+		 gettext ("cannot register info: %s"), elf_errmsg (-1));
+
+	info->regloc = &reglocs[i];
+	info->regno = reg;
+	info->bits = bits;
+	info->type = type;
+      }
+  qsort (regs, maxreg + 1, sizeof regs[0], &compare_registers);
+
+  /* Collect the unique sets and sort them.  */
+  inline bool same_set (const struct register_info *a,
+			const struct register_info *b)
+  {
+    return (a < &regs[maxnreg] && a->regloc != NULL
+	    && b < &regs[maxnreg] && b->regloc != NULL
+	    && a->bits == b->bits
+	    && (a->set == b->set || !strcmp (a->set, b->set)));
+  }
+  struct register_info *sets[maxreg + 1];
+  sets[0] = &regs[0];
+  size_t nsets = 1;
+  for (int i = 1; i <= maxreg; ++i)
+    if (regs[i].regloc != NULL && !same_set (&regs[i], &regs[i - 1]))
+      sets[nsets++] = &regs[i];
+  qsort (sets, nsets, sizeof sets[0], &compare_register_sets);
+
+  /* Write out all the sets.  */
+  unsigned int colno = 0;
+  for (size_t i = 0; i < nsets; ++i)
+    {
+      /* Find the longest name of a register in this set.  */
+      size_t maxname = 0;
+      const struct register_info *end;
+      for (end = sets[i]; same_set (sets[i], end); ++end)
+	{
+	  size_t len = strlen (end->name);
+	  if (len > maxname)
+	    maxname = len;
+	}
+
+      for (const struct register_info *reg = sets[i];
+	   reg < end;
+	   reg += reg->regloc->count ?: 1)
+	colno = handle_core_register (ebl, core, maxname,
+				      reg->regloc, desc, colno);
+
+      /* Force a line break at the end of the group.  */
+      colno = REGISTER_WRAP_COLUMN;
+    }
+
+  return colno;
+}
+
+static void
+handle_auxv_note (Ebl *ebl, Elf *core, GElf_Word descsz, const void *desc)
+{
+  const size_t nauxv = descsz / gelf_fsize (core, ELF_T_AUXV, 1, EV_CURRENT);
+  for (size_t i = 0; i < nauxv; ++i)
+    {
+      const GElf_auxv_t *av = (const GElf_auxv_t *) desc + i;
+
+      const char *name;
+      const char *fmt;
+      if (ebl_auxv_info (ebl, av->a_type, &name, &fmt) == 0)
+	{
+	  /* Unknown type.  */
+	  if (av->a_un.a_val == 0)
+	    printf ("    %" PRIu64 "\n", av->a_type);
+	  else
+	    printf ("    %" PRIu64 ": %#" PRIx64 "\n",
+		    av->a_type, av->a_un.a_val);
+	}
+      else
+	switch (fmt[0])
+	  {
+	  case '\0':		/* Normally zero.  */
+	    if (av->a_un.a_val == 0)
+	      {
+		printf ("    %s\n", name);
+		break;
+	      }
+	    /* Fall through */
+	  case 'x':		/* hex */
+	  case 'p':		/* address */
+	  case 's':		/* address of string */
+	    printf ("    %s: %#" PRIx64 "\n", name, av->a_un.a_val);
+	    break;
+	  case 'u':
+	    printf ("    %s: %" PRIu64 "\n", name, av->a_un.a_val);
+	    break;
+	  case 'd':
+	    printf ("    %s: %" PRId64 "\n", name, av->a_un.a_val);
+	    break;
+
+	  case 'b':
+	    printf ("    %s: %#" PRIx64 "  ", name, av->a_un.a_val);
+	    GElf_Xword bit = 1;
+	    const char *pfx = "<";
+	    for (const char *p = fmt + 1; *p != 0; p = strchr (p, '\0') + 1)
+	      {
+		if (av->a_un.a_val & bit)
+		  {
+		    printf ("%s%s", pfx, p);
+		    pfx = " ";
+		  }
+		bit <<= 1;
+	      }
+	    printf (">\n");
+	    break;
+
+	  default:
+	    abort ();
+	  }
+    }
+}
+
+static void
+handle_core_note (Ebl *ebl, const GElf_Nhdr *nhdr, const void *desc)
+{
+  GElf_Word regs_offset;
+  size_t nregloc;
+  const Ebl_Register_Location *reglocs;
+  size_t nitems;
+  const Ebl_Core_Item *items;
+
+  if (! ebl_core_note (ebl, nhdr->n_type, nhdr->n_descsz,
+		       &regs_offset, &nregloc, &reglocs, &nitems, &items))
+    return;
+
+  unsigned int colno = handle_core_items (ebl->elf, desc, items, nitems);
+  if (colno != 0)
+    putchar_unlocked ('\n');
+
+  colno = handle_core_registers (ebl, ebl->elf, desc + regs_offset,
+				 reglocs, nregloc);
+  if (colno != 0)
+    putchar_unlocked ('\n');
+}
+
+
 static void
 handle_notes (Ebl *ebl, GElf_Ehdr *ehdr)
 {
@@ -4998,18 +5614,13 @@ handle_notes (Ebl *ebl, GElf_Ehdr *ehdr)
       size_t idx = 0;
       while (idx < phdr->p_filesz)
 	{
-	  /* XXX Handle 64-bit note section entries correctly.  */
-	  struct
-	  {
-	    uint32_t namesz;
-	    uint32_t descsz;
-	    uint32_t type;
-	    char name[0];
-	  } *noteentry = (__typeof (noteentry)) (notemem + idx);
+	  const GElf_Nhdr *nhdr = (const GElf_Nhdr *) (notemem + idx);
+	  const char *name = (const char *) (nhdr + 1);
+	  const void *desc = &name[ALIGNED_LEN (nhdr->n_namesz)];
 
 	  if (idx + 12 > phdr->p_filesz
-	      || (idx + 12 + ALIGNED_LEN (noteentry->namesz)
-		  + ALIGNED_LEN (noteentry->descsz) > phdr->p_filesz))
+	      || (idx + 12 + ALIGNED_LEN (nhdr->n_namesz)
+		  + ALIGNED_LEN (nhdr->n_descsz) > phdr->p_filesz))
 	    /* This entry isn't completely contained in the note
 	       section.  Ignore it.  */
 	    break;
@@ -5017,32 +5628,34 @@ handle_notes (Ebl *ebl, GElf_Ehdr *ehdr)
 	  char buf[100];
 	  char buf2[100];
 	  printf (gettext ("  %-13.*s  %9" PRId32 "  %s\n"),
-		  (int) noteentry->namesz, noteentry->name,
-		  noteentry->descsz,
+		  (int) nhdr->n_namesz, name,
+		  nhdr->n_descsz,
 		  ehdr->e_type == ET_CORE
-		  ? ebl_core_note_type_name (ebl, noteentry->type,
+		  ? ebl_core_note_type_name (ebl, nhdr->n_type,
 					     buf, sizeof (buf))
-		  : ebl_object_note_type_name (ebl, noteentry->type,
+		  : ebl_object_note_type_name (ebl, nhdr->n_type,
 					       buf2, sizeof (buf2)));
 
 	  /* Filter out invalid entries.  */
-	  if (memchr (noteentry->name, '\0', noteentry->namesz) != NULL
+	  if (memchr (name, '\0', nhdr->n_namesz) != NULL
 	      /* XXX For now help broken Linux kernels.  */
 	      || 1)
 	    {
 	      if (ehdr->e_type == ET_CORE)
-		ebl_core_note (ebl, noteentry->name, noteentry->type,
-			       noteentry->descsz,
-			       &noteentry->name[ALIGNED_LEN (noteentry->namesz)]);
+		{
+		  if (nhdr->n_type == NT_AUXV)
+		    handle_auxv_note (ebl, ebl->elf, nhdr->n_descsz, desc);
+		  else
+		    handle_core_note (ebl, nhdr, desc);
+		}
 	      else
-		ebl_object_note (ebl, noteentry->name, noteentry->type,
-				 noteentry->descsz,
-				 &noteentry->name[ALIGNED_LEN (noteentry->namesz)]);
+		ebl_object_note (ebl, name, nhdr->n_type,
+				 nhdr->n_descsz, desc);
 	    }
 
 	  /* Move to the next entry.  */
-	  idx += (12 + ALIGNED_LEN (noteentry->namesz)
-		  + ALIGNED_LEN (noteentry->descsz));
+	  idx += (12 + ALIGNED_LEN (nhdr->n_namesz)
+		  + ALIGNED_LEN (nhdr->n_descsz));
 	}
 
       gelf_freechunk (ebl->elf, notemem);

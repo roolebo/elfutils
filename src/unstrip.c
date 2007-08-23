@@ -1094,6 +1094,73 @@ find_alloc_sections_prelink (Elf *debug, Elf_Data *debug_shstrtab,
   return split_bss;
 }
 
+/* Create new .shstrtab contents, subroutine of copy_elided_sections.
+   This can't be open coded there and still use variable-length auto arrays,
+   since the end of our block would free other VLAs too.  */
+static Elf_Data *
+new_shstrtab (Elf *unstripped, size_t unstripped_shnum,
+	      Elf_Data *shstrtab, size_t unstripped_shstrndx,
+	      struct section *sections, size_t stripped_shnum,
+	      struct Ebl_Strtab *strtab)
+{
+  if (strtab == NULL)
+    return NULL;
+
+  struct Ebl_Strent *unstripped_strent[unstripped_shnum - 1];
+  memset (unstripped_strent, 0, sizeof unstripped_strent);
+  for (struct section *sec = sections;
+       sec < &sections[stripped_shnum - 1];
+       ++sec)
+    if (sec->outscn != NULL)
+      {
+	if (sec->strent == NULL)
+	  {
+	    sec->strent = ebl_strtabadd (strtab, sec->name, 0);
+	    ELF_CHECK (sec->strent != NULL,
+		       _("cannot add section name to string table: %s"));
+	  }
+	unstripped_strent[elf_ndxscn (sec->outscn) - 1] = sec->strent;
+      }
+
+  /* Add names of sections we aren't touching.  */
+  for (size_t i = 0; i < unstripped_shnum - 1; ++i)
+    if (unstripped_strent[i] == NULL)
+      {
+	Elf_Scn *scn = elf_getscn (unstripped, i + 1);
+	GElf_Shdr shdr_mem;
+	GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+	const char *name = get_section_name (i + 1, shdr, shstrtab);
+	unstripped_strent[i] = ebl_strtabadd (strtab, name, 0);
+	ELF_CHECK (unstripped_strent[i] != NULL,
+		   _("cannot add section name to string table: %s"));
+      }
+    else
+      unstripped_strent[i] = NULL;
+
+  /* Now finalize the string table so we can get offsets.  */
+  Elf_Data *strtab_data = elf_getdata (elf_getscn (unstripped,
+						   unstripped_shstrndx), NULL);
+  ELF_CHECK (elf_flagdata (strtab_data, ELF_C_SET, ELF_F_DIRTY),
+	     _("cannot update section header string table data: %s"));
+  ebl_strtabfinalize (strtab, strtab_data);
+
+  /* Update the sh_name fields of sections we aren't modifying later.  */
+  for (size_t i = 0; i < unstripped_shnum - 1; ++i)
+    if (unstripped_strent[i] != NULL)
+      {
+	Elf_Scn *scn = elf_getscn (unstripped, i + 1);
+	GElf_Shdr shdr_mem;
+	GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+	shdr->sh_name = ebl_strtaboffset (unstripped_strent[i]);
+	if (i + 1 == unstripped_shstrndx)
+	  shdr->sh_size = strtab_data->d_size;
+	ELF_CHECK (gelf_update_shdr (scn, shdr),
+		   _("cannot update section header: %s"));
+      }
+
+  return strtab_data;
+}
+
 /* Fill in any SHT_NOBITS sections in UNSTRIPPED by
    copying their contents and sh_type from STRIPPED.  */
 static void
@@ -1310,63 +1377,11 @@ copy_elided_sections (Elf *unstripped, Elf *stripped,
       ndx_section[secndx - 1] = elf_ndxscn (sec->outscn);
     }
 
-  Elf_Data *strtab_data = NULL;
-  if (strtab != NULL)
-    {
-      /* We added some sections, so we need a new shstrtab.  */
-
-      struct Ebl_Strent *unstripped_strent[unstripped_shnum - 1];
-      memset (unstripped_strent, 0, sizeof unstripped_strent);
-      for (struct section *sec = sections;
-	   sec < &sections[stripped_shnum - 1];
-	   ++sec)
-	if (sec->outscn != NULL)
-	  {
-	    if (sec->strent == NULL)
-	      {
-		sec->strent = ebl_strtabadd (strtab, sec->name, 0);
-		ELF_CHECK (sec->strent != NULL,
-			   _("cannot add section name to string table: %s"));
-	      }
-	    unstripped_strent[elf_ndxscn (sec->outscn) - 1] = sec->strent;
-	  }
-
-      /* Add names of sections we aren't touching.  */
-      for (size_t i = 0; i < unstripped_shnum - 1; ++i)
-	if (unstripped_strent[i] == NULL)
-	  {
-	    scn = elf_getscn (unstripped, i + 1);
-	    GElf_Shdr shdr_mem;
-	    GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
-	    const char *name = get_section_name (i + 1, shdr, shstrtab);
-	    unstripped_strent[i] = ebl_strtabadd (strtab, name, 0);
-	    ELF_CHECK (unstripped_strent[i] != NULL,
-		       _("cannot add section name to string table: %s"));
-	  }
-	else
-	  unstripped_strent[i] = NULL;
-
-      /* Now finalize the string table so we can get offsets.  */
-      strtab_data = elf_getdata (elf_getscn (unstripped, unstripped_shstrndx),
-				 NULL);
-      ELF_CHECK (elf_flagdata (strtab_data, ELF_C_SET, ELF_F_DIRTY),
-		 _("cannot update section header string table data: %s"));
-      ebl_strtabfinalize (strtab, strtab_data);
-
-      /* Update the sh_name fields of sections we aren't modifying later.  */
-      for (size_t i = 0; i < unstripped_shnum - 1; ++i)
-	if (unstripped_strent[i] != NULL)
-	  {
-	    scn = elf_getscn (unstripped, i + 1);
-	    GElf_Shdr shdr_mem;
-	    GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
-	    shdr->sh_name = ebl_strtaboffset (unstripped_strent[i]);
-	    if (i + 1 == unstripped_shstrndx)
-	      shdr->sh_size = strtab_data->d_size;
-	    ELF_CHECK (gelf_update_shdr (scn, shdr),
-		       _("cannot update section header: %s"));
-	  }
-    }
+  /* We added some sections, so we need a new shstrtab.  */
+  Elf_Data *strtab_data = new_shstrtab (unstripped, unstripped_shnum,
+					shstrtab, unstripped_shstrndx,
+					sections, stripped_shnum,
+					strtab);
 
   /* Get the updated section count.  */
   ELF_CHECK (elf_getshnum (unstripped, &unstripped_shnum) == 0,

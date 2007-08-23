@@ -1,3 +1,46 @@
+2007-08-23  Roland McGrath  <roland@redhat.com>
+
+	* x86_64_regs.c (x86_64_register_info): Put %rflags in "integer" set.
+
+2007-08-22  Roland McGrath  <roland@redhat.com>
+
+	* linux-core-note.c (prstatus_items): Add .group initializers.
+	(prpsinfo_items): Likewise.
+	* x86_64_corenote.c (PRSTATUS_REGSET_ITEMS): Likewise.
+	* i386_corenote.c (PRSTATUS_REGSET_ITEMS): Likewise.
+	* ppc_corenote.c (PRSTATUS_REGSET_ITEMS): Likewise.
+
+2007-08-20  Roland McGrath  <roland@redhat.com>
+
+	* ppc_symbol.c (ppc_check_special_symbol): For _GLOBAL_OFFSET_TABLE_
+	when DT_PPC_GOT is not found, anywhere in the section is valid.
+
+2007-08-19  Roland McGrath  <roland@redhat.com>
+
+	* i386_auxv.c: New file.
+	* Makefile.am (i386_SRCS, x86_64_SRCS): Add it.
+	* ppc_auxv.c: New file.
+	* Makefile.am (ppc_SRCS, ppc64_SRCS): Add it.
+	* i386_init.c (i386_init): Initialize auxv_info hook.
+	* x86_64_init.c (x86_64_init): Likewise.
+	* ppc_init.c (ppc_init): Likewise.
+	* ppc64_init.c (ppc64_init): Likewise.
+
+	* alpha_corenote.c: New file.
+	* Makefile.am (alpha_SRCS): Add it.
+	* alpha_init.c (alpha_init): Initialize core_note hook.
+
+	* ppc_corenote.c: New file.
+	* ppc64_corenote.c: New file.
+	* Makefile.am (ppc_SRCS, ppc64_SRCS): Add them.
+	* ppc_init.c (ppc_init): Initialize core_note hook.
+	* ppc64_init.c (ppc64_init): Likewise.
+
+	* linux-core-note.c: New file.
+	* Makefile.am (noinst_HEADERS): Add it.
+	* i386_corenote.c: Rewritten.
+	* x86_64_corenote.c: Likewise.
+
 2007-05-23  Roland McGrath  <roland@redhat.com>
 
 	* alpha_regs.c (alpha_register_info): fp -> s6

@@ -1,5 +1,5 @@
 /* Transformation functions for ELF data types.
-   Copyright (C) 1998, 1999, 2000, 2002, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright (C) 1998,1999,2000,2002,2004,2005,2006,2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -216,7 +216,8 @@ const xfct_t __elf_xfctstom[EV_NUM - 1][EV_NUM - 1][ELFCLASSNUM - 1][ELF_T_NUM] 
 	[ELF_T_NHDR]	= ElfW2(Bits, cvt_Nhdr),			      \
 	[ELF_T_SYMINFO] = ElfW2(Bits, cvt_Syminfo),			      \
 	[ELF_T_MOVE]	= ElfW2(Bits, cvt_Move),			      \
-	[ELF_T_LIB]	= ElfW2(Bits, cvt_Lib)
+	[ELF_T_LIB]	= ElfW2(Bits, cvt_Lib),				      \
+	[ELF_T_AUXV]	= ElfW2(Bits, cvt_auxv_t)
         define_xfcts (32),
 	[ELF_T_GNUHASH] = Elf32_cvt_Word
       },

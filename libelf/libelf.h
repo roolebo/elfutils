@@ -1,5 +1,5 @@
 /* Interface for libelf.
-   Copyright (C) 1998, 1999, 2000, 2002, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2004, 2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -83,6 +83,7 @@ typedef enum
   ELF_T_MOVE,			/* Elf32_Move, Elf64_Move, ... */
   ELF_T_LIB,			/* Elf32_Lib, Elf64_Lib, ... */
   ELF_T_GNUHASH,		/* GNU-style hash section.  */
+  ELF_T_AUXV,			/* Elf32_auxv_t, Elf64_auxv_t, ... */
   /* Keep this the last entry.  */
   ELF_T_NUM
 } Elf_Type;

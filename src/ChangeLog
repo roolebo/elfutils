@@ -1,3 +1,49 @@
+2007-08-23  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (printf_with_wrap): Function removed.
+	(REGISTER_WRAP_COLUMN): New macro.
+	(handle_core_register): Use print_core_item instead.
+	(struct register_info): New type.
+	(compare_registers, compare_register_sets): New functions.
+	(register_bitpos, compare_sets_by_info): New functions.
+	(handle_core_registers): Use those to segregate and sort registers
+	for display.
+
+	* readelf.c (ITEM_WRAP_COLUMN): New macro.
+	(print_core_item): New function.
+	(handle_core_item): Use it instead of printf_with_wrap.
+	(compare_core_items, compare_core_item_groups): New functions.
+	(handle_core_items): Use them.  Sort by group and force line breaks
+	between groups.
+
+	* readelf.c (handle_core_registers, handle_core_items): New functions,
+	broken out of ...
+	(handle_core_note): ... here.   Call them.
+
+2007-08-22  Roland McGrath  <roland@redhat.com>
+
+	* unstrip.c (new_shstrtab): New function, broken out of ...
+	(copy_elided_sections): ... here.
+
+2007-08-20  Roland McGrath  <roland@redhat.com>
+
+	Avoid local function trampolines in nm binary.
+	* nm.c (sort_by_address): Move to a static function instead of local
+	inside show_symbols.
+	(sort_by_name_strtab): New static variable.
+	(sort_by_name): Use it.  Move to a static function instead of local
+	inside show_symbols.
+	(show_symbols): Set sort_by_name_strtab.
+
+2007-08-19  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (handle_auxv_note): New function.
+	(handle_notes): Call it.
+
+	* readelf.c (printf_with_wrap, convert): New functions.
+	(handle_core_item, (handle_core_register): New functions.
+	(handle_notes): Call those with details from ebl_core_note.
+
 2007-08-12  Roland McGrath  <roland@redhat.com>
 
 	* elflint.c (check_note): Accept type 0 with name "Linux".

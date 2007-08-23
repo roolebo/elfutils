@@ -117,3 +117,9 @@ ELFUTILS_1.2 {
   global:
     elf_gnu_hash;
 } ELFUTILS_1.1.1;
+
+ELFUTILS_1.3 {
+  global:
+    gelf_getauxv;
+    gelf_update_auxv;
+};

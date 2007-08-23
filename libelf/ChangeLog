@@ -1,3 +1,19 @@
+2007-08-19  Roland McGrath  <roland@redhat.com>
+
+	* gelf_update_auxv.c: New file.
+	* gelf_getauxv.c: New file.
+	* Makefile.am (libelf_a_SOURCES): Add them.
+	* gelf.h: Declare gelf_getauxv, gelf_update_auxv.
+	* libelf.map (ELFUTILS_1.3): New set, inherits fom ELFUTILS_1.2.
+	Export gelf_getauxv, gelf_update_auxv.
+
+	* libelf.h (Elf_Type): Add ELF_T_AUXV.
+	* abstract.h: Add auxv_t entries.
+	* exttypes.h: Likewise.
+	* gelf_xlate.h: Likewise.
+	* gelf_xlate.c (__elf_xfctstom): Add ELF_T_AUXV entries.
+	* gelf_fsize.c (__libelf_type_sizes): Likewise.
+
 2007-08-12  Roland McGrath  <roland@redhat.com>
 
 	* elf32_updatefile.c (compare_sections): Sort secondarily on sh_size,

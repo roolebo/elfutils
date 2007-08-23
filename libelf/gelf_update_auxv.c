@@ -1,7 +1,6 @@
-/* External ELF types.
-   Copyright (C) 1998, 1999, 2000, 2002, 2007 Red Hat, Inc.
+/* Update information in dynamic table at the given index.
+   Copyright (C) 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
-   Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by the
@@ -48,74 +47,89 @@
    Network licensing program, please visit www.openinventionnetwork.com
    <http://www.openinventionnetwork.com>.  */
 
-#ifndef _EXTTYPES_H
-#define	_EXTTYPES_H 1
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
 
-/* Integral types.  */
-typedef char Elf32_Ext_Addr[ELF32_FSZ_ADDR];
-typedef char Elf32_Ext_Off[ELF32_FSZ_OFF];
-typedef char Elf32_Ext_Half[ELF32_FSZ_HALF];
-typedef char Elf32_Ext_Sword[ELF32_FSZ_SWORD];
-typedef char Elf32_Ext_Word[ELF32_FSZ_WORD];
-typedef char Elf32_Ext_Sxword[ELF32_FSZ_SXWORD];
-typedef char Elf32_Ext_Xword[ELF32_FSZ_XWORD];
+#include <gelf.h>
+#include <string.h>
 
-typedef char Elf64_Ext_Addr[ELF64_FSZ_ADDR];
-typedef char Elf64_Ext_Off[ELF64_FSZ_OFF];
-typedef char Elf64_Ext_Half[ELF64_FSZ_HALF];
-typedef char Elf64_Ext_Sword[ELF64_FSZ_SWORD];
-typedef char Elf64_Ext_Word[ELF64_FSZ_WORD];
-typedef char Elf64_Ext_Sxword[ELF64_FSZ_SXWORD];
-typedef char Elf64_Ext_Xword[ELF64_FSZ_XWORD];
+#include "libelfP.h"
 
 
-/* Define the composed types.  */
-#define START(Bits, Name, EName) typedef struct {
-#define END(Bits, Name) } ElfW2(Bits, Name)
-#define TYPE_NAME(Type, Name) Type Name;
-#define TYPE_EXTRA(Text) Text
-#define TYPE_XLATE(Text)
+int
+gelf_update_auxv (data, ndx, src)
+     Elf_Data *data;
+     int ndx;
+     GElf_auxv_t *src;
+{
+  Elf_Data_Scn *data_scn = (Elf_Data_Scn *) data;
+  Elf_Scn *scn;
+  int result = 0;
 
-/* Get the abstract definitions. */
-#include "abstract.h"
+  if (data == NULL)
+    return 0;
 
-/* And define the types.  */
-Ehdr32 (Ext_);
-Phdr32 (Ext_);
-Shdr32 (Ext_);
-Sym32 (Ext_);
-Rel32 (Ext_);
-Rela32 (Ext_);
-Note32 (Ext_);
-Dyn32 (Ext_);
-Verdef32 (Ext_);
-Verdaux32 (Ext_);
-Verneed32 (Ext_);
-Vernaux32 (Ext_);
-Syminfo32 (Ext_);
-Move32 (Ext_);
-auxv_t32 (Ext_);
+  if (unlikely (ndx < 0))
+    {
+      __libelf_seterrno (ELF_E_INVALID_INDEX);
+      return 0;
+    }
 
-Ehdr64 (Ext_);
-Phdr64 (Ext_);
-Shdr64 (Ext_);
-Sym64 (Ext_);
-Rel64 (Ext_);
-Rela64 (Ext_);
-Note64 (Ext_);
-Dyn64 (Ext_);
-Verdef64 (Ext_);
-Verdaux64 (Ext_);
-Verneed64 (Ext_);
-Vernaux64 (Ext_);
-Syminfo64 (Ext_);
-Move64 (Ext_);
-auxv_t64 (Ext_);
+  if (unlikely (data_scn->d.d_type != ELF_T_AUXV))
+    {
+      /* The type of the data better should match.  */
+      __libelf_seterrno (ELF_E_DATA_MISMATCH);
+      return 0;
+    }
 
-#undef START
-#undef END
-#undef TYPE_NAME
-#undef TYPE_EXTRA
-#undef TYPE_XLATE
+  scn = data_scn->s;
+  rwlock_wrlock (scn->elf->lock);
 
-#endif	/* exttypes.h */
+  if (scn->elf->class == ELFCLASS32)
+    {
+      Elf32_auxv_t *auxv;
+
+      /* There is the possibility that the values in the input are
+	 too large.  */
+      if (unlikely (src->a_type > 0xffffffffll)
+	  || unlikely (src->a_un.a_val > 0xffffffffull))
+	{
+	  __libelf_seterrno (ELF_E_INVALID_DATA);
+	  goto out;
+	}
+
+      /* Check whether we have to resize the data buffer.  */
+      if (unlikely ((ndx + 1) * sizeof (Elf32_auxv_t) > data_scn->d.d_size))
+	{
+	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+	  goto out;
+	}
+
+      auxv = &((Elf32_auxv_t *) data_scn->d.d_buf)[ndx];
+
+      auxv->a_type = src->a_type;
+      auxv->a_un.a_val = src->a_un.a_val;
+    }
+  else
+    {
+      /* Check whether we have to resize the data buffer.  */
+      if (unlikely ((ndx + 1) * sizeof (Elf64_auxv_t) > data_scn->d.d_size))
+	{
+	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+	  goto out;
+	}
+
+      ((Elf64_auxv_t *) data_scn->d.d_buf)[ndx] = *src;
+    }
+
+  result = 1;
+
+  /* Mark the section as modified.  */
+  scn->flags |= ELF_F_DIRTY;
+
+ out:
+  rwlock_unlock (scn->elf->lock);
+
+  return result;
+}

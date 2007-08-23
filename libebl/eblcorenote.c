@@ -1,7 +1,6 @@
-/* Print contents of core note.
-   Copyright (C) 2002, 2004, 2005, 2007 Red Hat, Inc.
+/* Describe known core note formats.
+   Copyright (C) 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by the
@@ -61,174 +60,48 @@
 #include <libeblP.h>
 
 
-void
-ebl_core_note (ebl, name, type, descsz, desc)
+int
+ebl_core_note (ebl, n_type, descsz,
+	       regs_offset, nregloc, reglocs, nitems, items)
      Ebl *ebl;
-     const char *name;
-     uint32_t type;
-     uint32_t descsz;
-     const char *desc;
+     GElf_Word n_type;
+     GElf_Word descsz;
+     GElf_Word *regs_offset;
+     size_t *nregloc;
+     const Ebl_Register_Location **reglocs;
+     size_t *nitems;
+     const Ebl_Core_Item **items;
 {
-  GElf_Ehdr ehdr_mem;
-  GElf_Ehdr *ehdr = gelf_getehdr (ebl->elf, &ehdr_mem);
-  assert (ehdr != NULL);
-  int class = ehdr->e_ident[EI_CLASS];
-  int endian = ehdr->e_ident[EI_DATA];
+  int result = ebl->core_note (n_type, descsz, regs_offset, nregloc, reglocs,
+			       nitems, items);
+  if (result == 0)
+    {
+      /* The machine specific function did not know this type.  */
 
-  if (! ebl->core_note (name, type, descsz, desc))
-    /* The machine specific function did not know this type.  */
-    switch (type)
-      {
-      case NT_PLATFORM:
-	printf (gettext ("    Platform: %.*s\n"), (int) descsz, desc);
-	break;
+      *regs_offset = 0;
+      *nregloc = 0;
+      *reglocs = NULL;
+      switch (n_type)
+	{
+#define ITEMS(type, table)				\
+	  case type:					\
+	    *items = table;				\
+	    *nitems = sizeof table / sizeof table[0];	\
+	    result = 1;					\
+	    break
 
-      case NT_AUXV:
-	;
-	size_t elsize = (class == ELFCLASS32
-			 ? sizeof (Elf32_auxv_t) : sizeof (Elf64_auxv_t));
-
-	for (size_t cnt = 0; (cnt + 1) * elsize <= descsz; ++cnt)
-	  {
-	    uintmax_t atype;
-	    uintmax_t val;
-
-	    if (class == ELFCLASS32)
+	  static const Ebl_Core_Item platform[] =
+	    {
 	      {
-		Elf32_auxv_t *auxv = &((Elf32_auxv_t *) desc)[cnt];
-
-		if ((endian == ELFDATA2LSB && __BYTE_ORDER == __LITTLE_ENDIAN)
-		    || (endian == ELFDATA2MSB && __BYTE_ORDER == __BIG_ENDIAN))
-		  {
-		    atype = auxv->a_type;
-		    val = auxv->a_un.a_val;
-		  }
-		else
-		  {
-		    atype = bswap_32 (auxv->a_type);
-		    val = bswap_32 (auxv->a_un.a_val);
-		  }
+		.name = "Platform",
+		.type = ELF_T_BYTE, .count = 0, .format = 's'
 	      }
-	    else
-	      {
-		Elf64_auxv_t *auxv = &((Elf64_auxv_t *) desc)[cnt];
+	    };
+	  ITEMS (NT_PLATFORM, platform);
 
-		if ((endian == ELFDATA2LSB && __BYTE_ORDER == __LITTLE_ENDIAN)
-		    || (endian == ELFDATA2MSB && __BYTE_ORDER == __BIG_ENDIAN))
-		  {
-		    atype = auxv->a_type;
-		    val = auxv->a_un.a_val;
-		  }
-		else
-		  {
-		    atype = bswap_64 (auxv->a_type);
-		    val = bswap_64 (auxv->a_un.a_val);
-		  }
-	      }
+#undef	ITEMS
+	}
+    }
 
-	    /* XXX Do we need the auxiliary vector info anywhere
-	       else?  If yes, move code into a separate function.  */
-	    const char *at;
-
-	    switch (atype)
-	      {
-#define NEW_AT(name) case AT_##name: at = #name; break
-		NEW_AT (NULL);
-		NEW_AT (IGNORE);
-		NEW_AT (EXECFD);
-		NEW_AT (PHDR);
-		NEW_AT (PHENT);
-		NEW_AT (PHNUM);
-		NEW_AT (PAGESZ);
-		NEW_AT (BASE);
-		NEW_AT (FLAGS);
-		NEW_AT (ENTRY);
-		NEW_AT (NOTELF);
-		NEW_AT (UID);
-		NEW_AT (EUID);
-		NEW_AT (GID);
-		NEW_AT (EGID);
-		NEW_AT (CLKTCK);
-		NEW_AT (PLATFORM);
-		NEW_AT (HWCAP);
-		NEW_AT (FPUCW);
-		NEW_AT (DCACHEBSIZE);
-		NEW_AT (ICACHEBSIZE);
-		NEW_AT (UCACHEBSIZE);
-		NEW_AT (IGNOREPPC);
-		NEW_AT (SECURE);
-		NEW_AT (SYSINFO);
-		NEW_AT (SYSINFO_EHDR);
-		NEW_AT (L1I_CACHESHAPE);
-		NEW_AT (L1D_CACHESHAPE);
-		NEW_AT (L2_CACHESHAPE);
-		NEW_AT (L3_CACHESHAPE);
-
-	      default:;
-		static char buf[30];
-		sprintf (buf, "%ju (AT_?""?""?)", atype);
-		at = buf;
-		break;
-	      }
-
-	    switch (atype)
-	      {
-		/* Decimal.  */
-	      case AT_EXECFD:
-	      case AT_PHENT:
-	      case AT_PHNUM:
-	      case AT_PAGESZ:
-	      case AT_UID:
-	      case AT_EUID:
-	      case AT_GID:
-	      case AT_EGID:
-	      case AT_CLKTCK:
-	      case AT_FPUCW:
-	      case AT_DCACHEBSIZE:
-	      case AT_ICACHEBSIZE:
-	      case AT_UCACHEBSIZE:
-	      case AT_SECURE:
-	      case AT_L1I_CACHESHAPE:
-	      case AT_L1D_CACHESHAPE:
-	      case AT_L2_CACHESHAPE:
-	      case AT_L3_CACHESHAPE:
-		printf ("    %s: %jd\n", at, val);
-		break;
-
-		/* Normally zero.  */
-	      case AT_NULL:
-	      case AT_IGNORE:
-	      case AT_IGNOREPPC:
-	      case AT_NOTELF:
-	      default:
-		if (val == 0)
-		  {
-		    printf ("    %s\n", at);
-		    break;
-		  }
-		/* Fall through.  */
-
-		/* Hex.  */
-	      case AT_PHDR:
-	      case AT_BASE:
-	      case AT_FLAGS:	/* XXX Print flags?  */
-	      case AT_ENTRY:
-	      case AT_PLATFORM:	/* XXX Get string?  */
-	      case AT_HWCAP:	/* XXX Print flags?  */
-	      case AT_SYSINFO:
-	      case AT_SYSINFO_EHDR:
-		printf ("    %s: %#jx\n", at, val);
-		break;
-	      }
-
-	    if (atype == AT_NULL)
-	      /* Reached the end.  */
-	      break;
-	  }
-	break;
-
-      default:
-	/* Unknown type.  */
-	break;
-      }
+  return result;
 }

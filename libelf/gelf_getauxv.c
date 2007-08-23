@@ -1,7 +1,6 @@
-/* External ELF types.
-   Copyright (C) 1998, 1999, 2000, 2002, 2007 Red Hat, Inc.
+/* Get information from auxiliary vector at the given index.
+   Copyright (C) 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
-   Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by the
@@ -48,74 +47,84 @@
    Network licensing program, please visit www.openinventionnetwork.com
    <http://www.openinventionnetwork.com>.  */
 
-#ifndef _EXTTYPES_H
-#define	_EXTTYPES_H 1
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
 
-/* Integral types.  */
-typedef char Elf32_Ext_Addr[ELF32_FSZ_ADDR];
-typedef char Elf32_Ext_Off[ELF32_FSZ_OFF];
-typedef char Elf32_Ext_Half[ELF32_FSZ_HALF];
-typedef char Elf32_Ext_Sword[ELF32_FSZ_SWORD];
-typedef char Elf32_Ext_Word[ELF32_FSZ_WORD];
-typedef char Elf32_Ext_Sxword[ELF32_FSZ_SXWORD];
-typedef char Elf32_Ext_Xword[ELF32_FSZ_XWORD];
+#include <assert.h>
+#include <gelf.h>
+#include <string.h>
 
-typedef char Elf64_Ext_Addr[ELF64_FSZ_ADDR];
-typedef char Elf64_Ext_Off[ELF64_FSZ_OFF];
-typedef char Elf64_Ext_Half[ELF64_FSZ_HALF];
-typedef char Elf64_Ext_Sword[ELF64_FSZ_SWORD];
-typedef char Elf64_Ext_Word[ELF64_FSZ_WORD];
-typedef char Elf64_Ext_Sxword[ELF64_FSZ_SXWORD];
-typedef char Elf64_Ext_Xword[ELF64_FSZ_XWORD];
+#include "libelfP.h"
 
 
-/* Define the composed types.  */
-#define START(Bits, Name, EName) typedef struct {
-#define END(Bits, Name) } ElfW2(Bits, Name)
-#define TYPE_NAME(Type, Name) Type Name;
-#define TYPE_EXTRA(Text) Text
-#define TYPE_XLATE(Text)
+GElf_auxv_t *
+gelf_getauxv (data, ndx, dst)
+     Elf_Data *data;
+     int ndx;
+     GElf_auxv_t *dst;
+{
+  Elf_Data_Scn *data_scn = (Elf_Data_Scn *) data;
+  GElf_auxv_t *result = NULL;
+  Elf *elf;
 
-/* Get the abstract definitions. */
-#include "abstract.h"
+  if (data_scn == NULL)
+    return NULL;
 
-/* And define the types.  */
-Ehdr32 (Ext_);
-Phdr32 (Ext_);
-Shdr32 (Ext_);
-Sym32 (Ext_);
-Rel32 (Ext_);
-Rela32 (Ext_);
-Note32 (Ext_);
-Dyn32 (Ext_);
-Verdef32 (Ext_);
-Verdaux32 (Ext_);
-Verneed32 (Ext_);
-Vernaux32 (Ext_);
-Syminfo32 (Ext_);
-Move32 (Ext_);
-auxv_t32 (Ext_);
+  if (unlikely (data_scn->d.d_type != ELF_T_AUXV))
+    {
+      __libelf_seterrno (ELF_E_INVALID_HANDLE);
+      return NULL;
+    }
 
-Ehdr64 (Ext_);
-Phdr64 (Ext_);
-Shdr64 (Ext_);
-Sym64 (Ext_);
-Rel64 (Ext_);
-Rela64 (Ext_);
-Note64 (Ext_);
-Dyn64 (Ext_);
-Verdef64 (Ext_);
-Verdaux64 (Ext_);
-Verneed64 (Ext_);
-Vernaux64 (Ext_);
-Syminfo64 (Ext_);
-Move64 (Ext_);
-auxv_t64 (Ext_);
+  elf = data_scn->s->elf;
 
-#undef START
-#undef END
-#undef TYPE_NAME
-#undef TYPE_EXTRA
-#undef TYPE_XLATE
+  rwlock_rdlock (elf->lock);
 
-#endif	/* exttypes.h */
+  /* This is the one place where we have to take advantage of the fact
+     that an `Elf_Data' pointer is also a pointer to `Elf_Data_Scn'.
+     The interface is broken so that it requires this hack.  */
+  if (elf->class == ELFCLASS32)
+    {
+      Elf32_auxv_t *src;
+
+      /* Here it gets a bit more complicated.  The format of the vector
+	 entries has to be converted.  The user better have provided a
+	 buffer where we can store the information.  While copying the data
+	 we convert the format.  */
+      if (unlikely ((ndx + 1) * sizeof (Elf32_auxv_t) > data_scn->d.d_size))
+	{
+	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+	  goto out;
+	}
+
+      src = &((Elf32_auxv_t *) data_scn->d.d_buf)[ndx];
+
+      /* This might look like a simple copy operation but it's
+	 not.  There are zero- and sign-extensions going on.  */
+      dst->a_type = src->a_type;
+      dst->a_un.a_val = src->a_un.a_val;
+    }
+  else
+    {
+      /* If this is a 64 bit object it's easy.  */
+      assert (sizeof (GElf_auxv_t) == sizeof (Elf64_auxv_t));
+
+      /* The data is already in the correct form.  Just make sure the
+	 index is OK.  */
+      if (unlikely ((ndx + 1) * sizeof (GElf_auxv_t) > data_scn->d.d_size))
+	{
+	  __libelf_seterrno (ELF_E_INVALID_INDEX);
+	  goto out;
+	}
+
+      *dst = ((GElf_auxv_t *) data_scn->d.d_buf)[ndx];
+    }
+
+  result = dst;
+
+ out:
+  rwlock_unlock (elf->lock);
+
+  return result;
+}

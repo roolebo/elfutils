@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
+## Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -70,7 +70,7 @@ libebl_%.map: Makefile
 
 
 i386_SRCS = i386_init.c i386_symbol.c i386_corenote.c \
-	    i386_retval.c i386_regs.c
+	    i386_retval.c i386_regs.c i386_auxv.c
 libebl_i386_pic_a_SOURCES = $(i386_SRCS)
 am_libebl_i386_pic_a_OBJECTS = $(i386_SRCS:.c=.os)
 
@@ -79,7 +79,7 @@ libebl_sh_pic_a_SOURCES = $(sh_SRCS)
 am_libebl_sh_pic_a_OBJECTS = $(sh_SRCS:.c=.os)
 
 x86_64_SRCS = x86_64_init.c x86_64_symbol.c x86_64_corenote.c \
-	      x86_64_retval.c x86_64_regs.c
+	      x86_64_retval.c x86_64_regs.c i386_auxv.c
 libebl_x86_64_pic_a_SOURCES = $(x86_64_SRCS)
 am_libebl_x86_64_pic_a_OBJECTS = $(x86_64_SRCS:.c=.os)
 
@@ -87,7 +87,8 @@ ia64_SRCS = ia64_init.c ia64_symbol.c ia64_regs.c ia64_retval.c
 libebl_ia64_pic_a_SOURCES = $(ia64_SRCS)
 am_libebl_ia64_pic_a_OBJECTS = $(ia64_SRCS:.c=.os)
 
-alpha_SRCS = alpha_init.c alpha_symbol.c alpha_retval.c alpha_regs.c
+alpha_SRCS = alpha_init.c alpha_symbol.c alpha_retval.c alpha_regs.c \
+	     alpha_corenote.c
 libebl_alpha_pic_a_SOURCES = $(alpha_SRCS)
 am_libebl_alpha_pic_a_OBJECTS = $(alpha_SRCS:.c=.os)
 
@@ -99,11 +100,13 @@ sparc_SRCS = sparc_init.c sparc_symbol.c sparc_regs.c sparc_retval.c
 libebl_sparc_pic_a_SOURCES = $(sparc_SRCS)
 am_libebl_sparc_pic_a_OBJECTS = $(sparc_SRCS:.c=.os)
 
-ppc_SRCS = ppc_init.c ppc_symbol.c ppc_retval.c ppc_regs.c
+ppc_SRCS = ppc_init.c ppc_symbol.c ppc_retval.c ppc_regs.c \
+	   ppc_corenote.c ppc_auxv.c
 libebl_ppc_pic_a_SOURCES = $(ppc_SRCS)
 am_libebl_ppc_pic_a_OBJECTS = $(ppc_SRCS:.c=.os)
 
-ppc64_SRCS = ppc64_init.c ppc64_symbol.c ppc64_retval.c ppc_regs.c
+ppc64_SRCS = ppc64_init.c ppc64_symbol.c ppc64_retval.c \
+	     ppc64_corenote.c ppc_regs.c ppc_auxv.c
 libebl_ppc64_pic_a_SOURCES = $(ppc64_SRCS)
 am_libebl_ppc64_pic_a_OBJECTS = $(ppc64_SRCS:.c=.os)
 
@@ -134,7 +137,7 @@ uninstall: uninstall-am
 	done
 	rmdir --ignore-fail-on-non-empty $(DESTDIR)$(libdir)/$(LIBEBL_SUBDIR)
 
-noinst_HEADERS = libebl_CPU.h common-reloc.c
+noinst_HEADERS = libebl_CPU.h common-reloc.c linux-core-note.c
 EXTRA_DIST = $(foreach m,$(modules),$($(m)_SRCS)) $(modules:=_reloc.def)
 
 CLEANFILES = *.gcno *.gcda \

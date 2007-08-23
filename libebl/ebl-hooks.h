@@ -107,11 +107,16 @@ const char *EBLHOOK(core_note_type_name) (uint32_t, char *, size_t);
 /* Name of a note entry type for object files.  */
 const char *EBLHOOK(object_note_type_name) (uint32_t, char *, size_t);
 
-/* Handle core note.  */
-bool EBLHOOK(core_note) (const char *, uint32_t, uint32_t, const char *);
+/* Describe core note format.  */
+int EBLHOOK(core_note) (GElf_Word, GElf_Word, GElf_Word *, size_t *,
+			const Ebl_Register_Location **,
+			size_t *, const Ebl_Core_Item **);
 
 /* Handle object file note.  */
 bool EBLHOOK(object_note) (const char *, uint32_t, uint32_t, const char *);
+
+/* Describe auxv element type.  */
+int EBLHOOK(auxv_info) (GElf_Xword, const char **, const char **);
 
 /* Check section name for being that of a debug informatino section.  */
 bool EBLHOOK(debugscn_p) (const char *);

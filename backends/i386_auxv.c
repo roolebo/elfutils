@@ -1,7 +1,6 @@
-/* Initialization of PPC64 specific backend library.
-   Copyright (C) 2004, 2005, 2006, 2007 Red Hat, Inc.
+/* i386 specific auxv handling.
+   Copyright (C) 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by the
@@ -28,38 +27,23 @@
 # include <config.h>
 #endif
 
-#define BACKEND		ppc64_
-#define RELOC_PREFIX	R_PPC64_
+#define BACKEND i386_
 #include "libebl_CPU.h"
 
-/* This defines the common reloc hooks based on ppc64_reloc.def.  */
-#include "common-reloc.c"
-
-
-const char *
-ppc64_init (elf, machine, eh, ehlen)
-     Elf *elf __attribute__ ((unused));
-     GElf_Half machine __attribute__ ((unused));
-     Ebl *eh;
-     size_t ehlen;
+int
+EBLHOOK(auxv_info) (GElf_Xword a_type, const char **name, const char **format)
 {
-  /* Check whether the Elf_BH object has a sufficent size.  */
-  if (ehlen < sizeof (Ebl))
-    return NULL;
+  if (a_type != AT_HWCAP)
+    return 0;
 
-  /* We handle it.  */
-  eh->name = "PowerPC 64-bit";
-  ppc64_init_reloc (eh);
-  HOOK (eh, reloc_simple_type);
-  HOOK (eh, dynamic_tag_name);
-  HOOK (eh, dynamic_tag_check);
-  HOOK (eh, copy_reloc_p);
-  HOOK (eh, check_special_symbol);
-  HOOK (eh, bss_plt_p);
-  HOOK (eh, return_value_location);
-  HOOK (eh, register_info);
-  HOOK (eh, core_note);
-  HOOK (eh, auxv_info);
-
-  return MODVERSION;
+  *name = "HWCAP";
+  *format = "b"
+    "fpu\0" "vme\0" "de\0" "pse\0" "tsc\0" "msr\0" "pae\0" "mce\0"
+    "cx8\0" "apic\0" "10\0" "sep\0" "mtrr\0" "pge\0" "mca\0" "cmov\0"
+    "pat\0" "pse36\0" "pn\0" "clflush\0" "20\0" "dts\0" "acpi\0" "mmx\0"
+    "fxsr\0" "sse\0" "sse2\0" "ss\0" "ht\0" "tm\0" "ia64\0" "pbe\0" "\0";
+  return 1;
 }
+
+__typeof (i386_auxv_info) x86_64_auxv_info
+			  __attribute__ ((alias ("i386_auxv_info")));

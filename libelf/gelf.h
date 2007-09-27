@@ -335,6 +335,14 @@ extern GElf_auxv_t *gelf_getauxv (Elf_Data *__data, int __ndx,
 extern int gelf_update_auxv (Elf_Data *__data, int __ndx, GElf_auxv_t *__src);
 
 
+/* Get note header at the given offset into the data, and the offsets of
+   the note's name and descriptor data.  Returns the offset of the next
+   note header, or 0 for an invalid offset or corrupt note header.  */
+extern size_t gelf_getnote (Elf_Data *__data, size_t __offset,
+			    GElf_Nhdr *__result,
+			    size_t *__name_offset, size_t *__desc_offset);
+
+
 /* Retrieve uninterpreted chunk of the file contents.  */
 extern char *gelf_rawchunk (Elf *__elf, GElf_Off __offset, GElf_Word __size);
 

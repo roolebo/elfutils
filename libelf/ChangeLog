@@ -1,3 +1,18 @@
+2007-08-24  Roland McGrath  <roland@redhat.com>
+
+	* gelf_getnote.c: New file.
+	* Makefile.am (libelf_a_SOURCES): Add it.
+	* gelf.h: Declare gelf_getnote.
+	* libelf.map (ELFUTILS_1.3): Add gelf_getnote.
+
+	* libelfP.h (NOTE_ALIGN): New macro.
+	* note_xlate.h: New file.
+	* Makefile.am (noinst_HEADERS): Add it.
+	* gelf_xlate.c: Include it.
+	(__elf_xfctstom): Use elf_cvt_note.
+	* elf_getdata.c (shtype_map, __libelf_type_align): Handle SHT_NOTE.
+	(__libelf_set_rawdata): Likewise.
+
 2007-08-19  Roland McGrath  <roland@redhat.com>
 
 	* gelf_update_auxv.c: New file.

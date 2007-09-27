@@ -185,6 +185,7 @@ union unaligned
    do not contain records of only one type.  */
 #include "version_xlate.h"
 #include "gnuhash_xlate.h"
+#include "note_xlate.h"
 
 
 /* Now the externally visible table with the function pointers.  */
@@ -213,7 +214,7 @@ const xfct_t __elf_xfctstom[EV_NUM - 1][EV_NUM - 1][ELFCLASSNUM - 1][ELF_T_NUM] 
 	[ELF_T_VDAUX]	= elf_cvt_Verdef,				      \
 	[ELF_T_VNEED]	= elf_cvt_Verneed,				      \
 	[ELF_T_VNAUX]	= elf_cvt_Verneed,				      \
-	[ELF_T_NHDR]	= ElfW2(Bits, cvt_Nhdr),			      \
+	[ELF_T_NHDR]	= elf_cvt_note,					      \
 	[ELF_T_SYMINFO] = ElfW2(Bits, cvt_Syminfo),			      \
 	[ELF_T_MOVE]	= ElfW2(Bits, cvt_Move),			      \
 	[ELF_T_LIB]	= ElfW2(Bits, cvt_Lib),				      \

@@ -122,4 +122,5 @@ ELFUTILS_1.3 {
   global:
     gelf_getauxv;
     gelf_update_auxv;
+    gelf_getnote;
 };

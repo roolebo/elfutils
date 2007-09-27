@@ -1,3 +1,14 @@
+2007-09-27  Roland McGrath  <roland@redhat.com>
+
+	* alpha_retval.c: Use dwarf_attr_integrate and dwarf_hasattr_integrate.
+	* i386_retval.c: Likewise.
+	* ia64_retval.c: Likewise.
+	* ppc64_retval.c: Likewise.
+	* ppc_retval.c: Likewise.
+	* s390_retval.c: Likewise.
+	* sparc_retval.c: Likewise.
+	* x86_64_retval.c: Likewise.
+
 2007-08-23  Roland McGrath  <roland@redhat.com>
 
 	* x86_64_regs.c (x86_64_register_info): Put %rflags in "integer" set.

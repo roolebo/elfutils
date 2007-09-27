@@ -1,3 +1,9 @@
+2007-09-11  Roland McGrath  <roland@redhat.com>
+
+	* run-addrname-test.sh: Add a new case.
+	* testfile41.bz2: New data file.
+	* Makefile.am (EXTRA_DIST): Add it.
+
 2007-08-23  Roland McGrath  <roland@redhat.com>
 
 	* run-allregs.sh: Update expected x86-64 output for %rflags.

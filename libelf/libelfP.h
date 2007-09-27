@@ -574,4 +574,7 @@ extern uint32_t __libelf_crc32 (uint32_t crc, unsigned char *buf, size_t len)
       }									      \
   } while (0)
 
+/* Align offset to 4 bytes as needed for note name and descriptor data.  */
+#define NOTE_ALIGN(n)	(((n) + 3) & -4U)
+
 #endif  /* libelfP.h */

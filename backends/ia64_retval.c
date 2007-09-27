@@ -1,5 +1,5 @@
 /* Function return value location for IA64 ABI.
-   Copyright (C) 2006 Red Hat, Inc.
+   Copyright (C) 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -119,8 +119,8 @@ hfa_type (Dwarf_Die *typedie, const Dwarf_Op **locp, int fpregs_used)
 	return -1;
 
       Dwarf_Word encoding;
-      if (dwarf_formudata (dwarf_attr (typedie, DW_AT_encoding,
-				       &attr_mem), &encoding) != 0)
+      if (dwarf_formudata (dwarf_attr_integrate (typedie, DW_AT_encoding,
+						 &attr_mem), &encoding) != 0)
 	return -1;
 
       switch (encoding)
@@ -174,8 +174,9 @@ hfa_type (Dwarf_Die *typedie, const Dwarf_Op **locp, int fpregs_used)
 	      case DW_TAG_member:;
 		Dwarf_Die child_type_mem;
 		Dwarf_Die *child_typedie
-		  = dwarf_formref_die (dwarf_attr (&child_mem, DW_AT_type,
-						   &attr_mem),
+		  = dwarf_formref_die (dwarf_attr_integrate (&child_mem,
+							     DW_AT_type,
+							     &attr_mem),
 				       &child_type_mem);
 		if (tag == DW_TAG_union_type)
 		  {
@@ -207,10 +208,10 @@ hfa_type (Dwarf_Die *typedie, const Dwarf_Op **locp, int fpregs_used)
 	break;
 
       Dwarf_Die base_type_mem;
-      Dwarf_Die *base_typedie = dwarf_formref_die (dwarf_attr (typedie,
-							       DW_AT_type,
-							       &attr_mem),
-						   &base_type_mem);
+      Dwarf_Die *base_typedie
+	= dwarf_formref_die (dwarf_attr_integrate (typedie, DW_AT_type,
+						   &attr_mem),
+			     &base_type_mem);
 
       int used = hfa_type (base_typedie, locp, 0);
       if (used < 0 || used > 8)
@@ -235,7 +236,8 @@ ia64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
      which is the type of the return value.  */
 
   Dwarf_Attribute attr_mem;
-  Dwarf_Attribute *attr = dwarf_attr (functypedie, DW_AT_type, &attr_mem);
+  Dwarf_Attribute *attr = dwarf_attr_integrate (functypedie, DW_AT_type,
+						&attr_mem);
   if (attr == NULL)
     /* The function has no return value, like a `void' function in C.  */
     return 0;
@@ -261,9 +263,9 @@ ia64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
       return -1;
 
     case DW_TAG_subrange_type:
-      if (! dwarf_hasattr (typedie, DW_AT_byte_size))
+      if (! dwarf_hasattr_integrate (typedie, DW_AT_byte_size))
 	{
-	  attr = dwarf_attr (typedie, DW_AT_type, &attr_mem);
+	  attr = dwarf_attr_integrate (typedie, DW_AT_type, &attr_mem);
 	  typedie = dwarf_formref_die (attr, &die_mem);
 	  tag = dwarf_tag (typedie);
 	}
@@ -273,8 +275,8 @@ ia64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
     case DW_TAG_enumeration_type:
     case DW_TAG_pointer_type:
     case DW_TAG_ptr_to_member_type:
-      if (dwarf_formudata (dwarf_attr (typedie, DW_AT_byte_size,
-				       &attr_mem), &size) != 0)
+      if (dwarf_formudata (dwarf_attr_integrate (typedie, DW_AT_byte_size,
+						 &attr_mem), &size) != 0)
 	{
 	  if (tag == DW_TAG_pointer_type || tag == DW_TAG_ptr_to_member_type)
 	    size = 8;
@@ -284,8 +286,9 @@ ia64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
       if (tag == DW_TAG_base_type)
 	{
 	  Dwarf_Word encoding;
-	  if (dwarf_formudata (dwarf_attr (typedie, DW_AT_encoding,
-					   &attr_mem), &encoding) != 0)
+	  if (dwarf_formudata (dwarf_attr_integrate (typedie, DW_AT_encoding,
+						     &attr_mem),
+			       &encoding) != 0)
 	    return -1;
 
 	  switch (encoding)
@@ -343,8 +346,8 @@ ia64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
     case DW_TAG_class_type:
     case DW_TAG_union_type:
     case DW_TAG_array_type:
-      if (dwarf_formudata (dwarf_attr (typedie, DW_AT_byte_size,
-				       &attr_mem), &size) != 0)
+      if (dwarf_formudata (dwarf_attr_integrate (typedie, DW_AT_byte_size,
+						 &attr_mem), &size) != 0)
 	return -1;
 
       /* If this qualifies as an homogeneous floating-point aggregate

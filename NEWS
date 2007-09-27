@@ -1,3 +1,8 @@
+Version 0.130:
+
+readelf: -p option can take an argument like -x for one section,
+	 or no argument (as before) for all SHF_STRINGS sections
+
 Version 0.129:
 
 readelf: new options --hex-dump (or -x), --strings (or -p)

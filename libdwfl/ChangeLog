@@ -1,3 +1,8 @@
+2007-09-11  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_addrsym.c: Prefer a later global symbol at the same
+	address if its st_size is smaller.
+
 2007-08-13  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_module_addrsym.c: Add dead initializer for stupid compiler.

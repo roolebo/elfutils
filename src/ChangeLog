@@ -1,3 +1,20 @@
+2007-09-10  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (options): Give -p optional argument, alias --string-dump.
+	(string_sections, string_sections_tail): New static variables.
+	(parse_opt): Set them when -p has an argument.
+	(print_string_section): New function, broken out of ...
+	(print_strings): ... here.  Call it.
+	(dump_data_section): New function, broken out of ...
+	(dump_data): ... here.  Call it.
+	(for_each_section_argument): New function, broken out of ...
+	(dump_data): ... here.  Call it.
+	(dump_strings): New function.
+
+2007-08-31  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (print_strings): Typo fix.
+
 2007-08-23  Roland McGrath  <roland@redhat.com>
 
 	* readelf.c (printf_with_wrap): Function removed.

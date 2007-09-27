@@ -87,8 +87,9 @@ static const struct argp_option options[] =
     N_("Display architecture specific information (if any)"), 0 },
   { "hex-dump", 'x', "SECTION", 0,
     N_("Dump the uninterpreted contents of SECTION, by number or name"), 0 },
-  { "strings", 'p', NULL, 0,
-    N_("Print contents of sections marked as containing only strings"), 0 },
+  { "strings", 'p', "SECTION", OPTION_ARG_OPTIONAL,
+    N_("Print string contents of sections"), 0 },
+  { "string-dump", 'p', NULL, OPTION_ALIAS | OPTION_HIDDEN, NULL, 0 },
 
   { NULL, 0, NULL, 0, N_("Output control:"), 0 },
 
@@ -173,6 +174,10 @@ static enum section_e
 static struct section_argument *dump_data_sections;
 static struct section_argument **dump_data_sections_tail = &dump_data_sections;
 
+/* Select string dumping of sections.  */
+static struct section_argument *string_sections;
+static struct section_argument **string_sections_tail = &string_sections;
+
 struct section_argument
 {
   struct section_argument *next;
@@ -208,6 +213,7 @@ static void handle_hash (Ebl *ebl);
 static void handle_notes (Ebl *ebl, GElf_Ehdr *ehdr);
 static void print_liblist (Ebl *ebl);
 static void dump_data (Ebl *ebl);
+static void dump_strings (Ebl *ebl);
 static void print_strings (Ebl *ebl);
 
 
@@ -326,10 +332,6 @@ parse_opt (int key, char *arg,
       print_symbol_table = true;
       any_control_option = true;
       break;
-    case 'p':
-      print_string_sections = true;
-      any_control_option = true;
-      break;
     case 'V':
       print_version_info = true;
       any_control_option = true;
@@ -367,13 +369,23 @@ parse_opt (int key, char *arg,
 	}
       any_control_option = true;
       break;
+    case 'p':
+      any_control_option = true;
+      if (arg == NULL)
+	{
+	  print_string_sections = true;
+	  break;
+	}
+      /* Fall through.  */
     case 'x':
       {
 	struct section_argument *a = xmalloc (sizeof *a);
 	a->arg = arg;
 	a->next = NULL;
-	*dump_data_sections_tail = a;
-	dump_data_sections_tail = &a->next;
+	struct section_argument ***tailp
+	  = key == 'x' ? &dump_data_sections_tail : &string_sections_tail;
+	**tailp = a;
+	*tailp = &a->next;
       }
       any_control_option = true;
       break;
@@ -542,6 +554,8 @@ process_elf_file (Elf *elf, const char *prefix, const char *fname,
     print_liblist (ebl);
   if (dump_data_sections != NULL)
     dump_data (ebl);
+  if (string_sections != NULL)
+    dump_strings (ebl);
   if (print_debug_sections != 0)
     print_debug (ebl, ehdr);
   if (print_notes)
@@ -5694,15 +5708,76 @@ hex_dump (const uint8_t *data, size_t len)
 }
 
 static void
-dump_data (Ebl *ebl)
+dump_data_section (Elf_Scn *scn, const GElf_Shdr *shdr, const char *name)
+{
+  if (shdr->sh_size == 0 || shdr->sh_type == SHT_NOBITS)
+    printf (gettext ("\nSection [%Zu] '%s' has no data to dump.\n"),
+	    elf_ndxscn (scn), name);
+  else
+    {
+      Elf_Data *data = elf_rawdata (scn, NULL);
+      if (data == NULL)
+	error (0, 0, gettext ("cannot get data for section [%Zu] '%s': %s"),
+	       elf_ndxscn (scn), name, elf_errmsg (-1));
+      else
+	{
+	  printf (gettext ("\nHex dump of section [%Zu] '%s', %" PRIu64
+			   " bytes at offset %#0" PRIx64 ":\n"),
+		  elf_ndxscn (scn), name,
+		  shdr->sh_size, shdr->sh_offset);
+	  hex_dump (data->d_buf, data->d_size);
+	}
+    }
+}
+
+static void
+print_string_section (Elf_Scn *scn, const GElf_Shdr *shdr, const char *name)
+{
+  if (shdr->sh_size == 0)
+    printf (gettext ("\nSection [%Zu] '%s' is empty.\n"),
+	    elf_ndxscn (scn), name);
+
+  Elf_Data *data = elf_rawdata (scn, NULL);
+  if (data == NULL)
+    error (0, 0, gettext ("cannot get data for section [%Zu] '%s': %s"),
+	   elf_ndxscn (scn), name, elf_errmsg (-1));
+  else
+    {
+      printf (gettext ("\nString section [%Zu] '%s' contains %" PRIu64
+		       " bytes at offset %#0" PRIx64 ":\n"),
+	      elf_ndxscn (scn), name,
+	      shdr->sh_size, shdr->sh_offset);
+
+      const char *start = data->d_buf;
+      const char *const limit = start + data->d_size;
+      do
+	{
+	  const char *end = memchr (start, '\0', limit - start);
+	  const size_t pos = start - (const char *) data->d_buf;
+	  if (unlikely (end == NULL))
+	    {
+	      printf ("  [%6Zx]- %.*s\n",
+		      pos, (int) (limit - start), start);
+	      break;
+	    }
+	  printf ("  [%6Zx]  %s\n", pos, start);
+	  start = end + 1;
+	} while (start < limit);
+    }
+}
+
+static void
+for_each_section_argument (Elf *elf, const struct section_argument *list,
+			   void (*dump) (Elf_Scn *scn, const GElf_Shdr *shdr,
+					 const char *name))
 {
   /* Get the section header string table index.  */
   size_t shstrndx;
-  if (elf_getshstrndx (ebl->elf, &shstrndx) < 0)
+  if (elf_getshstrndx (elf, &shstrndx) < 0)
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
 
-  for (struct section_argument *a = dump_data_sections; a != NULL; a = a->next)
+  for (const struct section_argument *a = list; a != NULL; a = a->next)
     {
       Elf_Scn *scn;
       GElf_Shdr shdr_mem;
@@ -5712,7 +5787,7 @@ dump_data (Ebl *ebl)
       unsigned long int shndx = strtoul (a->arg, &endp, 0);
       if (endp != a->arg && *endp == '\0')
 	{
-	  scn = elf_getscn (ebl->elf, shndx);
+	  scn = elf_getscn (elf, shndx);
 	  if (scn == NULL)
 	    {
 	      error (0, 0, gettext ("\nsection [%lu] does not exist"), shndx);
@@ -5722,17 +5797,17 @@ dump_data (Ebl *ebl)
 	  if (gelf_getshdr (scn, &shdr_mem) == NULL)
 	    error (EXIT_FAILURE, 0, gettext ("cannot get section header: %s"),
 		   elf_errmsg (-1));
-	  name = elf_strptr (ebl->elf, shstrndx, shdr_mem.sh_name);
+	  name = elf_strptr (elf, shstrndx, shdr_mem.sh_name);
 	}
       else
 	{
 	  /* Need to look up the section by name.  */
 	  scn = NULL;
-	  while ((scn = elf_nextscn (ebl->elf, scn)) != NULL)
+	  while ((scn = elf_nextscn (elf, scn)) != NULL)
 	    {
 	      if (gelf_getshdr (scn, &shdr_mem) == NULL)
 		continue;
-	      name = elf_strptr (ebl->elf, shstrndx, shdr_mem.sh_name);
+	      name = elf_strptr (elf, shstrndx, shdr_mem.sh_name);
 	      if (name == NULL)
 		continue;
 	      if (!strcmp (name, a->arg))
@@ -5746,25 +5821,20 @@ dump_data (Ebl *ebl)
 	    }
 	}
 
-      if (shdr_mem.sh_size == 0 || shdr_mem.sh_type == SHT_NOBITS)
-	printf (gettext ("\nSection [%Zu] '%s' has no data to dump.\n"),
-		elf_ndxscn (scn), name);
-      else
-	{
-	  Elf_Data *data = elf_rawdata (scn, NULL);
-	  if (data == NULL)
-	    error (0, 0, gettext ("cannot get data for section [%Zu] '%s': %s"),
-		   elf_ndxscn (scn), name, elf_errmsg (-1));
-	  else
-	    {
-	      printf (gettext ("\nHex dump of section [%Zu] '%s', %" PRIu64
-			       " bytes at offset %#0" PRIx64 ":\n"),
-		      elf_ndxscn (scn), name,
-		      shdr_mem.sh_size, shdr_mem.sh_offset);
-	      hex_dump (data->d_buf, data->d_size);
-	    }
-	}
+      (*dump) (scn, &shdr_mem, name);
     }
+}
+
+static void
+dump_data (Ebl *ebl)
+{
+  for_each_section_argument (ebl->elf, dump_data_sections, &dump_data_section);
+}
+
+static void
+dump_strings (Ebl *ebl)
+{
+  for_each_section_argument (ebl->elf, string_sections, &print_string_section);
 }
 
 static void
@@ -5793,35 +5863,6 @@ print_strings (Ebl *ebl)
       if (name == NULL)
 	continue;
 
-      if (shdr_mem.sh_size == 0)
-	printf (gettext ("\nSection [%Zu] '%s' is empty.\n"),
-		elf_ndxscn (scn), name);
-
-      Elf_Data *data = elf_rawdata (scn, NULL);
-      if (data == NULL)
-	error (0, 0, gettext ("cannot get data for section [%Zu] '%s': %s"),
-	       elf_ndxscn (scn), name, elf_errmsg (-1));
-      else
-	{
-	  printf (gettext ("\nString section [%Zu] '%s' contains %" PRIu64
-			   " bytes at offset %#0" PRIx64 ":\n"),
-		  elf_ndxscn (scn), name,
-		  shdr_mem.sh_size, shdr_mem.sh_offset);
-
-	  const char *start = data->d_buf;
-	  const char *const limit = start + data->d_size;
-	  do
-	    {
-	      const char *end = memchr (start, '\0', limit - start);
-	      const size_t pos = start - (const char *) data->d_buf;
-	      if (unlikely (end == NULL))
-		{
-		  printf ("  [%6Zx]- %.*s\n", pos, (int) (end - start), start);
-		  break;
-		}
-	      printf ("  [%6Zx]  %s\n", pos, start);
-	      start = end + 1;
-	    } while (start < limit);
-	}
+      print_string_section (scn, &shdr_mem, name);
     }
 }

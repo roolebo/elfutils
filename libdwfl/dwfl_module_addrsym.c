@@ -131,27 +131,39 @@ dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr addr,
 	     and is closer to ADDR or is global when it was local.  */
 	  if (name[0] != '\0'
 	      && GELF_ST_TYPE (sym.st_info) != STT_SECTION
-	      && GELF_ST_TYPE (sym.st_info) != STT_FILE
-	      && (closest_name == NULL
+	      && GELF_ST_TYPE (sym.st_info) != STT_FILE)
+	    {
+	      if (closest_name == NULL
 		  || closest_sym->st_value < sym.st_value
 		  || (GELF_ST_BIND (closest_sym->st_info)
-		      < GELF_ST_BIND (sym.st_info))))
-	    {
-	      if (sym.st_size != 0)
+		      < GELF_ST_BIND (sym.st_info)))
+		{
+		  if (sym.st_size != 0)
+		    {
+		      *closest_sym = sym;
+		      closest_shndx = shndx;
+		      closest_name = name;
+		    }
+		  else if (same_section (&sym, shndx))
+		    {
+		      /* Handwritten assembly symbols sometimes have no
+			 st_size.  If no symbol with proper size includes
+			 the address, we'll use the closest one that is in
+			 the same section as ADDR.  */
+		      sizeless_sym = sym;
+		      sizeless_shndx = shndx;
+		      sizeless_name = name;
+		    }
+		}
+	      /* When the beginning of its range is no closer,
+		 the end of its range might be.  */
+	      else if (sym.st_size != 0
+		       && closest_sym->st_value == sym.st_value
+		       && closest_sym->st_size > sym.st_size)
 		{
 		  *closest_sym = sym;
 		  closest_shndx = shndx;
 		  closest_name = name;
-		}
-	      else if (same_section (&sym, shndx))
-		{
-		  /* Handwritten assembly symbols sometimes have no st_size.
-		     If no symbol with proper size includes the address,
-		     we'll use the closest one that is in the same section
-		     as ADDR.  */
-		  sizeless_sym = sym;
-		  sizeless_shndx = shndx;
-		  sizeless_name = name;
 		}
 	    }
 	}

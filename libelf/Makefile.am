@@ -84,6 +84,7 @@ libelf_a_SOURCES = elf_version.c elf_hash.c elf_error.c elf_fill.c \
 		   gelf_getmove.c gelf_update_move.c \
 		   gelf_getsyminfo.c gelf_update_syminfo.c \
 		   gelf_getauxv.c gelf_update_auxv.c \
+		   gelf_getnote.c \
 		   gelf_xlatetof.c gelf_xlatetom.c \
 		   nlist.c \
 		   gelf_getsymshndx.c gelf_update_symshndx.c \
@@ -133,7 +134,7 @@ uninstall: uninstall-am
 endif
 
 noinst_HEADERS = elf.h abstract.h common.h exttypes.h gelf_xlate.h libelfP.h \
-		 version_xlate.h gnuhash_xlate.h dl-hash.h
+		 version_xlate.h gnuhash_xlate.h note_xlate.h dl-hash.h
 EXTRA_DIST = libelf.map
 
 CLEANFILES = $(am_libelf_pic_a_OBJECTS) *.gcno *.gcda libelf.so.$(VERSION)

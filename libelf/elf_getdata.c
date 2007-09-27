@@ -86,6 +86,7 @@ static const Elf_Type shtype_map[EV_NUM - 1][TYPEIDX (SHT_HISUNW) + 1] =
       [SHT_PREINIT_ARRAY] = ELF_T_ADDR,
       [SHT_GROUP] = ELF_T_WORD,
       [SHT_SYMTAB_SHNDX] = ELF_T_WORD,
+      [SHT_NOTE] = ELF_T_NHDR,
       [TYPEIDX (SHT_GNU_verdef)] = ELF_T_VDEF,
       [TYPEIDX (SHT_GNU_verneed)] = ELF_T_VNEED,
       [TYPEIDX (SHT_GNU_versym)] = ELF_T_HALF,
@@ -116,6 +117,7 @@ const uint_fast8_t __libelf_type_aligns[EV_NUM - 1][ELFCLASSNUM - 1][ELF_T_NUM] 
       [ELF_T_VNAUX] = __alignof__ (ElfW2(Bits,Vernaux)),		      \
       [ELF_T_MOVE] = __alignof__ (ElfW2(Bits,Move)),			      \
       [ELF_T_LIB] = __alignof__ (ElfW2(Bits,Lib)),			      \
+      [ELF_T_NHDR] = __alignof__ (ElfW2(Bits,Nhdr)),			      \
     }
     [EV_CURRENT - 1] =
     {
@@ -238,7 +240,7 @@ __libelf_set_rawdata (Elf_Scn *scn)
       else
 	{
 	  Elf_Type t = shtype_map[LIBELF_EV_IDX][TYPEIDX (type)];
-	  if (t == ELF_T_VDEF
+	  if (t == ELF_T_VDEF || t == ELF_T_NHDR
 	      || (t == ELF_T_GNUHASH && elf->class == ELFCLASS64))
 	    entsize = 1;
 	  else

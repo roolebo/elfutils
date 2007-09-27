@@ -1,5 +1,5 @@
 /* Function return value location for S/390 ABI.
-   Copyright (C) 2006 Red Hat, Inc.
+   Copyright (C) 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -67,7 +67,8 @@ s390_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
      which is the type of the return value.  */
 
   Dwarf_Attribute attr_mem;
-  Dwarf_Attribute *attr = dwarf_attr (functypedie, DW_AT_type, &attr_mem);
+  Dwarf_Attribute *attr = dwarf_attr_integrate (functypedie, DW_AT_type,
+						&attr_mem);
   if (attr == NULL)
     /* The function has no return value, like a `void' function in C.  */
     return 0;
@@ -81,7 +82,7 @@ s390_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
 	 || tag == DW_TAG_const_type || tag == DW_TAG_volatile_type
 	 || tag == DW_TAG_restrict_type || tag == DW_TAG_mutable_type)
     {
-      attr = dwarf_attr (typedie, DW_AT_type, &attr_mem);
+      attr = dwarf_attr_integrate (typedie, DW_AT_type, &attr_mem);
       typedie = dwarf_formref_die (attr, &die_mem);
       tag = dwarf_tag (typedie);
     }
@@ -93,7 +94,7 @@ s390_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
       return -1;
 
     case DW_TAG_subrange_type:
-      if (! dwarf_hasattr (typedie, DW_AT_byte_size))
+      if (! dwarf_hasattr_integrate (typedie, DW_AT_byte_size))
 	{
 	  attr = dwarf_attr (typedie, DW_AT_type, &attr_mem);
 	  typedie = dwarf_formref_die (attr, &die_mem);
@@ -122,8 +123,9 @@ s390_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
 	if (tag == DW_TAG_base_type)
 	  {
 	    Dwarf_Word encoding;
-	    if (dwarf_formudata (dwarf_attr (typedie, DW_AT_encoding,
-					     &attr_mem), &encoding) != 0)
+	    if (dwarf_formudata (dwarf_attr_integrate (typedie, DW_AT_encoding,
+						       &attr_mem),
+				 &encoding) != 0)
 	      return -1;
 	    if (encoding == DW_ATE_float && size <= 8)
 	      {

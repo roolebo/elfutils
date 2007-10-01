@@ -5694,7 +5694,7 @@ hex_dump (const uint8_t *data, size_t len)
 	  printf ("%02x", data[pos + i]);
 
       if (chunk < 16)
-	printf ("%*s", (int) ((chunk - 16) * 2 + (chunk - 16) / 4), "");
+	printf ("%*s", (int) ((16 - chunk) * 2 + (16 - chunk) / 4), "");
 
       for (size_t i = 0; i < chunk; ++i)
 	{

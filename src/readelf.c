@@ -5683,7 +5683,7 @@ hex_dump (const uint8_t *data, size_t len)
   size_t pos = 0;
   while (pos < len)
     {
-      printf ("  0x%08Zu ", pos);
+      printf ("  0x%08Zx ", pos);
 
       const size_t chunk = MIN (len - pos, 16);
 

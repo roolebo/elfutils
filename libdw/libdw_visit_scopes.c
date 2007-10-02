@@ -1,5 +1,5 @@
 /* Helper functions to descend DWARF scope trees.
-   Copyright (C) 2005,2006 Red Hat, Inc.
+   Copyright (C) 2005,2006,2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -80,6 +80,8 @@ classify_die (Dwarf_Die *die)
 
       /* DIEs without addresses that can own DIEs with addresses.  */
     case DW_TAG_namespace:
+    case DW_TAG_class_type:
+    case DW_TAG_structure_type:
       return walk;
 
       /* Special indirection required.  */

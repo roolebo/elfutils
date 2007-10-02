@@ -77,7 +77,8 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-elflint-test.sh run-elflint-self.sh run-ranlib-test.sh \
 	run-ranlib-test2.sh run-ranlib-test3.sh run-ranlib-test4.sh \
 	run-addrscopes.sh run-strings-test.sh run-funcscopes.sh \
-	run-find-prologues.sh run-allregs.sh run-readelf-test1.sh \
+	run-find-prologues.sh run-allregs.sh \
+	run-readelf-test1.sh run-readelf-test2.sh \
 	run-native-test.sh run-bug1-test.sh \
 	dwfl-bug-addr-overflow run-addrname-test.sh \
 	dwfl-bug-fd-leak dwfl-bug-report \
@@ -120,7 +121,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile21.bz2 testfile21.index.bz2 \
 	     testfile22.bz2 testfile23.bz2 testfile24.bz2 testfile25.bz2 \
 	     testfile26.bz2 testfile27.bz2 \
-	     coverage.sh test-subr.sh test-wrapper.sh run-readelf-test1.sh \
+	     coverage.sh test-subr.sh test-wrapper.sh \
+	     run-readelf-test1.sh run-readelf-test2.sh \
 	     run-bug1-test.sh testfile28.bz2 testfile28.rdwr.bz2 \
 	     testfile29.bz2 testfile29.rdwr.bz2 \
 	     testfile30.bz2 testfile31.bz2 testfile32.bz2 testfile33.bz2 \

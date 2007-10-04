@@ -1,3 +1,44 @@
+2007-10-04  Roland McGrath  <roland@redhat.com>
+
+	* linux-kernel-modules.c (intuit_kernel_bounds): Take new arg NOTES,
+	fill in with vaddr of "__start_notes" symbol if found.
+	(check_notes): New function.
+	(check_kernel_notes): New function.
+	(dwfl_linux_kernel_report_kernel): Call it.
+	(check_module_notes): New function.
+	(dwfl_linux_kernel_report_modules): Call it.
+
+	* linux-kernel-modules.c (dwfl_linux_kernel_find_elf):
+	Try dwfl_build_id_find_elf first.
+
+	* linux-kernel-modules.c (report_kernel): Don't leak FD if !REPORT.
+	Set kernel module e_type to ET_DYN.
+
+2007-10-03  Roland McGrath  <roland@redhat.com>
+
+	* find-debuginfo.c (validate): New function, broken out of ...
+	(find_debuginfo_in_path): ... here.  New function, broken out of ...
+	(dwfl_standard_find_debuginfo): ... here.  Call it, after trying
+	dwfl_build_id_find_debuginfo first.
+
+	* dwfl_build_id_find_elf.c: New file.
+	* dwfl_build_id_find_debuginfo.c: New file.
+	* Makefile.am (libdwfl_a_SOURCES): Add them.
+	* libdwfl.h: Declare them.
+	* libdwflP.h: Add INTDECLs.
+
+	* dwfl_module_build_id.c: New file.
+	* dwfl_module_report_build_id.c: New file.
+	* Makefile.am (libdwfl_a_SOURCES): Add them.
+	* libdwfl.h: Declare them.
+	* libdwflP.h (struct Dwfl_Module): New members build_id_bits,
+	build_id_len, build_id_vaddr.  Declare __libdwfl_find_build_id.
+	* dwfl_module.c (__libdwfl_module_free): Free MOD->build_id_bits.
+
+	* dwfl_module_getdwarf.c (find_offsets): New function.
+	(find_dynsym): New function, calls that.
+	(find_symtab): Call it.
+
 2007-09-11  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_module_addrsym.c: Prefer a later global symbol at the same

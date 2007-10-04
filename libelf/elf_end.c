@@ -1,5 +1,5 @@
 /* Free resources associated with Elf descriptor.
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004, 2005 Red Hat, Inc.
+   Copyright (C) 1998,1999,2000,2001,2002,2004,2005,2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -89,7 +89,8 @@ elf_end (elf)
 	 descriptor.  The long name table cannot be freed yet since
 	 the archive headers for the ELF files in the archive point
 	 into this array.  */
-      free (elf->state.ar.ar_sym);
+      if (elf->state.ar.ar_sym != (Elf_Arsym *) -1l)
+	free (elf->state.ar.ar_sym);
       elf->state.ar.ar_sym = NULL;
 
       if (elf->state.ar.children != NULL)
@@ -134,6 +135,21 @@ elf_end (elf)
 
     case ELF_K_ELF:
       {
+	Elf_Data_Chunk *rawchunks
+	  = (elf->class == ELFCLASS32
+	     || (offsetof (struct Elf, state.elf32.rawchunks)
+		 == offsetof (struct Elf, state.elf64.rawchunks))
+	     ? elf->state.elf32.rawchunks
+	     : elf->state.elf64.rawchunks);
+	while (rawchunks != NULL)
+	  {
+	    Elf_Data_Chunk *next = rawchunks->next;
+	    if (rawchunks->dummy_scn.flags & ELF_F_MALLOCED)
+	      free (rawchunks->data.d.d_buf);
+	    free (rawchunks);
+	    rawchunks = next;
+	  }
+
 	Elf_ScnList *list = (elf->class == ELFCLASS32
 			     || (offsetof (struct Elf, state.elf32.scns)
 				 == offsetof (struct Elf, state.elf64.scns))

@@ -90,15 +90,37 @@ check_crc (int fd, GElf_Word debuglink_crc)
 	  && file_crc == debuglink_crc);
 }
 
-int
-dwfl_standard_find_debuginfo (Dwfl_Module *mod,
-			      void **userdata __attribute__ ((unused)),
-			      const char *modname __attribute__ ((unused)),
-			      GElf_Addr base __attribute__ ((unused)),
-			      const char *file_name,
-			      const char *debuglink_file,
-			      GElf_Word debuglink_crc,
-			      char **debuginfo_file_name)
+static bool
+validate (Dwfl_Module *mod, int fd, bool check, GElf_Word debuglink_crc)
+{
+  /* If we have a build ID, check only that.  */
+  if (mod->build_id_len > 0)
+    {
+      /* We need to open an Elf handle on the file so we can check its
+	 build ID note for validation.  Backdoor the handle into the
+	 module data structure since we had to open it early anyway.  */
+      mod->debug.elf = elf_begin (fd, ELF_C_READ_MMAP_PRIVATE, NULL);
+      if (likely (__libdwfl_find_build_id (mod, false, mod->debug.elf) == 2))
+	/* Also backdoor the gratuitous flag.  */
+	mod->debug.valid = true;
+      else
+	{
+	  /* A mismatch!  */
+	  elf_end (mod->debug.elf);
+	  mod->debug.elf = NULL;
+	  mod->debug.valid = false;
+	}
+
+      return mod->debug.valid;
+    }
+
+  return !check || check_crc (fd, debuglink_crc);
+}
+
+static int
+find_debuginfo_in_path (Dwfl_Module *mod, const char *file_name,
+			const char *debuglink_file, GElf_Word debuglink_crc,
+			char **debuginfo_file_name)
 {
   bool cancheck = debuglink_crc != (GElf_Word) 0;
 
@@ -181,7 +203,7 @@ dwfl_standard_find_debuginfo (Dwfl_Module *mod,
 	  default:
 	    return -1;
 	  }
-      if (!check || check_crc (fd, debuglink_crc))
+      if (validate (mod, fd, check, debuglink_crc))
 	{
 	  *debuginfo_file_name = fname;
 	  return fd;
@@ -193,5 +215,34 @@ dwfl_standard_find_debuginfo (Dwfl_Module *mod,
   /* No dice.  */
   errno = 0;
   return -1;
+}
+
+int
+dwfl_standard_find_debuginfo (Dwfl_Module *mod,
+			      void **userdata __attribute__ ((unused)),
+			      const char *modname __attribute__ ((unused)),
+			      GElf_Addr base __attribute__ ((unused)),
+			      const char *file_name,
+			      const char *debuglink_file,
+			      GElf_Word debuglink_crc,
+			      char **debuginfo_file_name)
+{
+  /* First try by build ID if we have one.  If that succeeds or fails
+     other than just by finding nothing, that's all we do.  */
+  const unsigned char *bits;
+  GElf_Addr vaddr;
+  if (INTUSE(dwfl_module_build_id) (mod, &bits, &vaddr) > 0)
+    {
+      int fd = INTUSE(dwfl_build_id_find_debuginfo) (mod,
+						     NULL, NULL, 0,
+						     NULL, NULL, 0,
+						     debuginfo_file_name);
+      if (fd >= 0 || errno != 0)
+	return fd;
+    }
+
+  /* Failing that, search the path by name.  */
+  return find_debuginfo_in_path (mod, file_name, debuglink_file, debuglink_crc,
+				 debuginfo_file_name);
 }
 INTDEF (dwfl_standard_find_debuginfo)

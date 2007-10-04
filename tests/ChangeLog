@@ -1,3 +1,13 @@
+2007-10-04  Roland McGrath  <roland@redhat.com>
+
+	* run-readelf-test4.sh: New file.
+	* Makefile.am (TESTS, EXTRA_DIST): Add it.
+
+2007-10-03  Roland McGrath  <roland@redhat.com>
+
+	* run-readelf-test3.sh: New file.
+	* Makefile.am (TESTS, EXTRA_DIST): Add it.
+
 2007-10-01  Roland McGrath  <roland@redhat.com>
 
 	* run-readelf-test2.sh: New file.

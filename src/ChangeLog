@@ -1,3 +1,34 @@
+2007-10-04  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (print_archive_index): New variable.
+	(options, parse_opt): Accept -c/--archive-index to set it.
+	(dump_archive_index): New function.
+	(process_file): Take new arg WILL_PRINT_ARCHIVE_INDEX.
+	Call dump_archive_index on archives if set.
+	(main): Update caller.
+	(any_control_option): Give it file scope, moved out of ...
+	(parse_opt): ... here.
+
+2007-10-03  Roland McGrath  <roland@redhat.com>
+
+	* unstrip.c (struct arg_info): Add `list' flag.
+	(options, parse_opt): Grok -n/--list to set it.
+	(list_module): New function.
+	(handle_implicit_modules): Call it under -n.
+
+	* elflint.c (check_note_section): New function.
+	(check_sections): Call it for SHT_NOTE.
+
+	* readelf.c (handle_notes): Use sections when available.
+
+	* elflint.c (check_note_data): New function, broken out of ...
+	(check_note): ... here.  Call it and elf_getdata_rawchunk.
+
+	* readelf.c (handle_auxv_note): Take offset as argument, not buffer.
+	Use elf_getdata_rawchunk and gelf_getauxv.
+	(handle_notes_data): New function, broken out of ...
+	(handle_notes): ... here.  Call it and elf_getdata_rawchunk.
+
 2007-10-01  Roland McGrath  <roland@redhat.com>
 
 	* readelf.c (hex_dump): Fix transposed subtraction generating spaces.

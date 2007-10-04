@@ -1,3 +1,11 @@
+2007-10-03  Roland McGrath  <roland@redhat.com>
+
+	* libdw.map (ELFUTILS_0.130: Add dwfl_build_id_find_elf
+	and dwfl_build_id_find_debuginfo.
+
+	* libdw.map (ELFUTILS_0.130): New version set, inherits from
+	ELFUTILS_0.127.  Add dwfl_module_build_id, dwfl_module_report_build_id.
+
 2007-10-02  Roland McGrath  <roland@redhat.com>
 
 	* libdw_visit_scopes.c (classify_die): Return walk for class_type and

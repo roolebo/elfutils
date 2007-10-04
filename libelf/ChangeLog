@@ -1,3 +1,27 @@
+2007-10-04  Roland McGrath  <roland@redhat.com>
+
+	* elf_end.c (elf_end): Don't free ELF->state.ar.ar_sym when it's -1l.
+
+2007-10-03  Roland McGrath  <roland@redhat.com>
+
+	* libelf.h (Elf_Data): Use off64_t for d_off.
+	(Elf_Arhdr): Use off64_t for ar_size.
+	(elf_update, elf_getbase, elf_getaroff): Return off64_t.
+
+	* gelf_rawchunk.c: File removed.
+	* gelf_freechunk.c: File removed.
+	* Makefile.am (libelf_a_SOURCES): Remove them.
+	* libelf.map (ELFUTILS_1.0): Remove exports.
+	* gelf.h: Remove decls.
+
+	* elf_getdata_rawchunk.c: New file.
+	* Makefile.am (libelf_a_SOURCES): Add it.
+	* libelf.map (ELFUTILS_1.3): Add elf_getdata_rawchunk.
+	* libelf.h: Declare it.
+	* libelfP.h (Elf_Data_Chunk): New type.
+	(struct Elf.elf): New member `rawchunks'.
+	* elf_end.c (elf_end): Free recorded rawchunk buffers.
+
 2007-08-24  Roland McGrath  <roland@redhat.com>
 
 	* gelf_getnote.c: New file.

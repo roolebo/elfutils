@@ -96,6 +96,9 @@ static void process_file (int fd, Elf *elf, const char *prefix,
 			  bool only_one);
 static void process_elf_file (Elf *elf, const char *prefix, const char *suffix,
 			      const char *fname, size_t size, bool only_one);
+static void check_note_section (Ebl *ebl, GElf_Ehdr *ehdr,
+				GElf_Shdr *shdr, int idx);
+
 
 /* Report an error.  */
 #define ERROR(str, args...) \
@@ -3499,6 +3502,10 @@ section [%2zu] '%s': relocatable files cannot have dynamic symbol tables\n"),
 	  check_group (ebl, ehdr, shdr, cnt);
 	  break;
 
+	case SHT_NOTE:
+	  check_note_section (ebl, ehdr, shdr, cnt);
+	  break;
+
 	case SHT_GNU_versym:
 	  /* We cannot process this section now since we have no guarantee
 	     that the verneed and verdef sections have already been read.
@@ -3565,6 +3572,86 @@ no .gnu.versym section present but .gnu.versym_d or .gnu.versym_r section exist\
 }
 
 
+static GElf_Off
+check_note_data (Ebl *ebl, const GElf_Ehdr *ehdr,
+		 Elf_Data *data, int shndx, int phndx, GElf_Off start)
+{
+  size_t offset = 0;
+  size_t last_offset = 0;
+  GElf_Nhdr nhdr;
+  size_t name_offset;
+  size_t desc_offset;
+  while (offset < data->d_size
+	 && (offset = gelf_getnote (data, offset,
+				    &nhdr, &name_offset, &desc_offset)) > 0)
+    {
+      last_offset = offset;
+
+      /* Make sure it is one of the note types we know about.  */
+      if (ehdr->e_type == ET_CORE)
+	switch (nhdr.n_type)
+	  {
+	  case NT_PRSTATUS:
+	  case NT_FPREGSET:
+	  case NT_PRPSINFO:
+	  case NT_TASKSTRUCT:		/* NT_PRXREG on Solaris.  */
+	  case NT_PLATFORM:
+	  case NT_AUXV:
+	  case NT_GWINDOWS:
+	  case NT_ASRS:
+	  case NT_PSTATUS:
+	  case NT_PSINFO:
+	  case NT_PRCRED:
+	  case NT_UTSNAME:
+	  case NT_LWPSTATUS:
+	  case NT_LWPSINFO:
+	  case NT_PRFPXREG:
+	    /* Known type.  */
+	    break;
+
+	  default:
+	    if (shndx == 0)
+	      ERROR (gettext ("\
+phdr[%d]: unknown core file note type %" PRIu32 " at offset %" PRIu64 "\n"),
+		     phndx, (uint32_t) nhdr.n_type, start + offset);
+	    else
+	      ERROR (gettext ("\
+section [%2d] '%s': unknown core file note type %" PRIu32
+			      " at offset %Zu\n"),
+		     shndx, section_name (ebl, shndx),
+		     (uint32_t) nhdr.n_type, offset);
+	  }
+      else
+	switch (nhdr.n_type)
+	  {
+	  case NT_GNU_ABI_TAG:
+	  case NT_GNU_HWCAP:
+	  case NT_GNU_BUILD_ID:
+	    break;
+
+	  case 0:
+	    /* Linux vDSOs use a type 0 note for the kernel version word.  */
+	    if (nhdr.n_namesz == sizeof "Linux"
+		&& !memcmp (data->d_buf + name_offset, "Linux", sizeof "Linux"))
+	      break;
+
+	  default:
+	    if (shndx == 0)
+	      ERROR (gettext ("\
+phdr[%d]: unknown object file note type %" PRIu32 " at offset %Zu\n"),
+		     phndx, (uint32_t) nhdr.n_type, offset);
+	    else
+	      ERROR (gettext ("\
+section [%2d] '%s': unknown object file note type %" PRIu32
+			      " at offset %Zu\n"),
+		     shndx, section_name (ebl, shndx),
+		     (uint32_t) nhdr.n_type, offset);
+	  }
+    }
+
+  return last_offset;
+}
+
 static void
 check_note (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Phdr *phdr, int cnt)
 {
@@ -3578,150 +3665,48 @@ phdr[%d]: no note entries defined for the type of file\n"),
     /* The p_offset values in a separate debug file are bogus.  */
     return;
 
-  char *notemem = gelf_rawchunk (ebl->elf, phdr->p_offset, phdr->p_filesz);
+  GElf_Off notes_size = 0;
+  Elf_Data *data = elf_getdata_rawchunk (ebl->elf,
+					 phdr->p_offset, phdr->p_filesz,
+					 ELF_T_NHDR);
+  if (data != NULL)
+    notes_size = check_note_data (ebl, ehdr, data, 0, cnt, phdr->p_offset);
 
-  /* ELF64 files often use note section entries in the 32-bit format.
-     The p_align field is set to 8 in case the 64-bit format is used.
-     In case the p_align value is 0 or 4 the 32-bit format is
-     used.  */
-  GElf_Xword align = phdr->p_align == 0 || phdr->p_align == 4 ? 4 : 8;
-#define ALIGNED_LEN(len) (((len) + align - 1) & ~(align - 1))
-
-  GElf_Xword idx = 0;
-  while (idx < phdr->p_filesz)
-    {
-      uint64_t namesz;
-      uint64_t descsz;
-      uint64_t type;
-      uint32_t namesz32;
-      uint32_t descsz32;
-
-      if (align == 4)
-	{
-	  uint32_t *ptr = (uint32_t *) (notemem + idx);
-
-	  if ((__BYTE_ORDER == __LITTLE_ENDIAN
-	       && ehdr->e_ident[EI_DATA] == ELFDATA2MSB)
-	      || (__BYTE_ORDER == __BIG_ENDIAN
-		  && ehdr->e_ident[EI_DATA] == ELFDATA2LSB))
-	    {
-	      namesz32 = namesz = bswap_32 (*ptr);
-	      ++ptr;
-	      descsz32 = descsz = bswap_32 (*ptr);
-	      ++ptr;
-	      type = bswap_32 (*ptr);
-	    }
-	  else
-	    {
-	      namesz32 = namesz = *ptr++;
-	      descsz32 = descsz = *ptr++;
-	      type = *ptr;
-	    }
-	}
-      else
-	{
-	  uint64_t *ptr = (uint64_t *) (notemem + idx);
-	  uint32_t *ptr32 = (uint32_t *) (notemem + idx);
-
-	  if ((__BYTE_ORDER == __LITTLE_ENDIAN
-	       && ehdr->e_ident[EI_DATA] == ELFDATA2MSB)
-	      || (__BYTE_ORDER == __BIG_ENDIAN
-		  && ehdr->e_ident[EI_DATA] == ELFDATA2LSB))
-	    {
-	      namesz = bswap_64 (*ptr);
-	      ++ptr;
-	      descsz = bswap_64 (*ptr);
-	      ++ptr;
-	      type = bswap_64 (*ptr);
-
-	      namesz32 = bswap_32 (*ptr32);
-	      ++ptr32;
-	      descsz32 = bswap_32 (*ptr32);
-	    }
-	  else
-	    {
-	      namesz = *ptr++;
-	      descsz = *ptr++;
-	      type = *ptr;
-
-	      namesz32 = *ptr32++;
-	      descsz32 = *ptr32;
-	    }
-	}
-
-      if (idx + 3 * align > phdr->p_filesz
-	  || (idx + 3 * align + ALIGNED_LEN (namesz) + ALIGNED_LEN (descsz)
-	      > phdr->p_filesz))
-	{
-	  if (ehdr->e_ident[EI_CLASS] == ELFCLASS64
-	      && idx + 3 * 4 <= phdr->p_filesz
-	      && (idx + 3 * 4 + ALIGNED_LEN (namesz32) + ALIGNED_LEN (descsz32)
-		  <= phdr->p_filesz))
-	    ERROR (gettext ("\
-phdr[%d]: note entries probably in form of a 32-bit ELF file\n"), cnt);
-	  else
-	    ERROR (gettext ("phdr[%d]: extra %zu bytes after last note\n"),
-		   cnt, (size_t) (phdr->p_filesz - idx));
-	  break;
-	}
-
-      /* Make sure it is one of the note types we know about.  */
-      if (ehdr->e_type == ET_CORE)
-	{
-	  switch (type)
-	    {
-	    case NT_PRSTATUS:
-	    case NT_FPREGSET:
-	    case NT_PRPSINFO:
-	    case NT_TASKSTRUCT:		/* NT_PRXREG on Solaris.  */
-	    case NT_PLATFORM:
-	    case NT_AUXV:
-	    case NT_GWINDOWS:
-	    case NT_ASRS:
-	    case NT_PSTATUS:
-	    case NT_PSINFO:
-	    case NT_PRCRED:
-	    case NT_UTSNAME:
-	    case NT_LWPSTATUS:
-	    case NT_LWPSINFO:
-	    case NT_PRFPXREG:
-	      /* Known type.  */
-	      break;
-
-	    default:
-	      ERROR (gettext ("\
-phdr[%d]: unknown core file note type %" PRIu64 " at offset %" PRIu64 "\n"),
-		     cnt, type, idx);
-	    }
-	}
-      else
-	switch (type)
-	  {
-	  case NT_GNU_ABI_TAG:	/* aka NT_VERSION */
-	  case NT_GNU_HWCAP:
-	  case NT_GNU_BUILD_ID:
-	    /* Known type.  */
-	    break;
-
-	  case 0:
-	    /* Linux vDSOs use a type 0 note for the kernel version word.  */
-	    if (namesz == sizeof "Linux"
-		&& !memcmp (notemem + idx + 3 * align, "Linux", sizeof "Linux"))
-	      break;
-
-	  default:
-	    ERROR (gettext ("\
-phdr[%d]: unknown object file note type %" PRIu64 " at offset %" PRIu64 "\n"),
-		   cnt, type, idx);
-	  }
-
-      /* Move to the next entry.  */
-      idx += 3 * align + ALIGNED_LEN (namesz) + ALIGNED_LEN (descsz);
-    }
-
-  gelf_freechunk (ebl->elf, notemem);
+  if (notes_size == 0)
+    ERROR (gettext ("phdr[%d]: cannot get content of note section: %s\n"),
+	   cnt, elf_errmsg (-1));
+  else if (notes_size != phdr->p_filesz)
+    ERROR (gettext ("phdr[%d]: extra %" PRIu64 " bytes after last note\n"),
+	   cnt, phdr->p_filesz - notes_size);
 }
 
+static void
+check_note_section (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Shdr *shdr, int idx)
+{
+  Elf_Data *data = elf_getdata (elf_getscn (ebl->elf, idx), NULL);
+  if (data == NULL)
+    {
+      ERROR (gettext ("section [%2d] '%s': cannot get section data\n"),
+	     idx, section_name (ebl, idx));
+      return;
+    }
+
+  if (ehdr->e_type != ET_CORE && ehdr->e_type != ET_REL
+      && ehdr->e_type != ET_EXEC && ehdr->e_type != ET_DYN)
+    ERROR (gettext ("\
+section [%2d] '%s': no note entries defined for the type of file\n"),
+	     idx, section_name (ebl, idx));
+
+  GElf_Off notes_size = check_note_data (ebl, ehdr, data, idx, 0, 0);
+
+  if (notes_size == 0)
+    ERROR (gettext ("section [%2d] '%s': cannot get content of note section\n"),
+	   idx, section_name (ebl, idx));
+  else if (notes_size != shdr->sh_size)
+    ERROR (gettext ("section [%2d] '%s': extra %" PRIu64
+		    " bytes after last note\n"),
+	   idx, section_name (ebl, idx), shdr->sh_size - notes_size);
+}
 
 static void
 check_program_header (Ebl *ebl, GElf_Ehdr *ehdr)

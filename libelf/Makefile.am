@@ -71,6 +71,7 @@ libelf_a_SOURCES = elf_version.c elf_hash.c elf_error.c elf_fill.c \
 		   elf32_getshdr.c elf64_getshdr.c gelf_getshdr.c \
 		   gelf_update_shdr.c \
 		   elf_strptr.c elf_rawdata.c elf_getdata.c elf_newdata.c \
+		   elf_getdata_rawchunk.c \
 		   elf_flagelf.c elf_flagehdr.c elf_flagphdr.c elf_flagscn.c \
 		   elf_flagshdr.c elf_flagdata.c elf_memory.c \
 		   elf_update.c elf32_updatenull.c elf64_updatenull.c \
@@ -93,7 +94,6 @@ libelf_a_SOURCES = elf_version.c elf_hash.c elf_error.c elf_fill.c \
 		   gelf_update_verdaux.c \
 		   elf_getshnum.c elf_getshstrndx.c \
 		   gelf_checksum.c elf32_checksum.c elf64_checksum.c \
-		   gelf_rawchunk.c gelf_freechunk.c \
 		   libelf_crc32.c libelf_next_prime.c \
 		   elf_clone.c \
 		   gelf_getlib.c gelf_update_lib.c \

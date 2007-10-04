@@ -1,7 +1,6 @@
-/* Retrieve uninterpreted chunk of the file contents.
-   Copyright (C) 2002, 2005, 2007 Red Hat, Inc.
+/* Find the debuginfo file for a module from its build ID.
+   Copyright (C) 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
-   Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by the
@@ -48,61 +47,46 @@
    Network licensing program, please visit www.openinventionnetwork.com
    <http://www.openinventionnetwork.com>.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
-
-#include <errno.h>
-#include <libelf.h>
-#include <stddef.h>
-#include <stdlib.h>
+#include "libdwflP.h"
 #include <unistd.h>
 
-#include <system.h>
-#include "libelfP.h"
 
-
-char *
-gelf_rawchunk (elf, offset, size)
-     Elf *elf;
-     GElf_Off offset;
-     GElf_Word size;
+int
+dwfl_build_id_find_debuginfo (Dwfl_Module *mod,
+			      void **userdata __attribute__ ((unused)),
+			      const char *modname __attribute__ ((unused)),
+			      Dwarf_Addr base __attribute__ ((unused)),
+			      const char *file __attribute__ ((unused)),
+			      const char *debuglink __attribute__ ((unused)),
+			      GElf_Word crc __attribute__ ((unused)),
+			      char **debuginfo_file_name)
 {
-  if (elf == NULL)
+  int fd = -1;
+  const unsigned char *bits;
+  GElf_Addr vaddr;
+  if (INTUSE(dwfl_module_build_id) (mod, &bits, &vaddr) > 0)
+    fd = __libdwfl_open_by_build_id (mod, true, debuginfo_file_name);
+  if (fd >= 0)
     {
-      /* No valid descriptor.  */
-      __libelf_seterrno (ELF_E_INVALID_HANDLE);
-      return NULL;
+      /* We need to open an Elf handle on the file so we can check its
+	 build ID note for validation.  Backdoor the handle into the
+	 module data structure since we had to open it early anyway.  */
+      mod->debug.elf = elf_begin (fd, ELF_C_READ_MMAP_PRIVATE, NULL);
+      if (likely (__libdwfl_find_build_id (mod, false, mod->debug.elf) == 2))
+	/* Also backdoor the gratuitous flag.  */
+	mod->debug.valid = true;
+      else
+	{
+	  /* A mismatch!  */
+	  elf_end (mod->debug.elf);
+	  mod->debug.elf = NULL;
+	  close (fd);
+	  fd = -1;
+	  free (*debuginfo_file_name);
+	  *debuginfo_file_name = NULL;
+	  errno = 0;
+	}
     }
-
-  if (unlikely (offset >= elf->maximum_size
-		|| offset + size >= elf->maximum_size
-		|| offset + size < offset))
-    {
-      /* Invalid request.  */
-      __libelf_seterrno (ELF_E_INVALID_OP);
-      return NULL;
-    }
-
-  /* If the file is mmap'ed return an appropriate pointer.  */
-  if (elf->map_address != NULL)
-    return (char *) elf->map_address + elf->start_offset + offset;
-
-  /* We allocate the memory and read the data from the file.  */
-  char *result = (char *) malloc (size);
-  if (result == NULL)
-    __libelf_seterrno (ELF_E_NOMEM);
-  else
-    /* Read the file content.  */
-    if (unlikely ((size_t) pread_retry (elf->fildes, result, size,
-					elf->start_offset + offset)
-		  != size))
-      {
-	/* Something went wrong.  */
-	__libelf_seterrno (ELF_E_READ_ERROR);
-	free (result);
-	result = NULL;
-      }
-
-  return result;
+  return fd;
 }
+INTDEF (dwfl_build_id_find_debuginfo)

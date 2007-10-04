@@ -50,6 +50,7 @@
 #include <sys/param.h>
 
 #include <system.h>
+#include "../libelf/libelfP.h"
 #include "../libebl/libeblP.h"
 #include "../libdw/libdwP.h"
 #include "../libdw/memory-access.h"
@@ -90,6 +91,8 @@ static const struct argp_option options[] =
   { "strings", 'p', "SECTION", OPTION_ARG_OPTIONAL,
     N_("Print string contents of sections"), 0 },
   { "string-dump", 'p', NULL, OPTION_ALIAS | OPTION_HIDDEN, NULL, 0 },
+  { "archive-index", 'c', NULL, 0,
+    N_("Display the symbol index of an archive"), 0 },
 
   { NULL, 0, NULL, 0, N_("Output control:"), 0 },
 
@@ -151,6 +154,12 @@ static bool print_notes;
 /* True if SHF_STRINGS section content should be printed.  */
 static bool print_string_sections;
 
+/* True if archive index should be printed.  */
+static bool print_archive_index;
+
+/* True if any of the control options except print_archive_index is set.  */
+static bool any_control_option;
+
 /* Select printing of debugging sections.  */
 static enum section_e
 {
@@ -190,7 +199,8 @@ static size_t shnum;
 
 /* Declarations of local functions.  */
 static void process_file (int fd, Elf *elf, const char *prefix,
-			  const char *fname, bool only_one);
+			  const char *fname, bool only_one,
+			  bool will_print_archive_index);
 static void process_elf_file (Elf *elf, const char *prefix, const char *fname,
 			      bool only_one);
 static void print_ehdr (Ebl *ebl, GElf_Ehdr *ehdr);
@@ -215,6 +225,7 @@ static void print_liblist (Ebl *ebl);
 static void dump_data (Ebl *ebl);
 static void dump_strings (Ebl *ebl);
 static void print_strings (Ebl *ebl);
+static void dump_archive_index (Elf *, const char *);
 
 
 int
@@ -252,7 +263,8 @@ main (int argc, char *argv[])
 	       elf_errmsg (-1));
       else
 	{
-	  process_file (fd, elf, NULL, argv[remaining], only_one);
+	  process_file (fd, elf, NULL, argv[remaining], only_one,
+			print_archive_index);
 
 	  /* Now we can close the descriptor.  */
 	  if (elf_end (elf) != 0)
@@ -273,9 +285,6 @@ static error_t
 parse_opt (int key, char *arg,
 	   struct argp_state *state __attribute__ ((unused)))
 {
-  /* True if any of the control options is set.  */
-  static bool any_control_option;
-
   switch (key)
     {
     case 'a':
@@ -336,6 +345,9 @@ parse_opt (int key, char *arg,
       print_version_info = true;
       any_control_option = true;
       break;
+    case 'c':
+      print_archive_index = true;
+      break;
     case 'w':
       if (arg == NULL)
 	print_debug_sections = section_all;
@@ -393,7 +405,7 @@ parse_opt (int key, char *arg,
       fputs (gettext ("Missing file name.\n"), stderr);
       goto do_argp_help;
     case ARGP_KEY_FINI:
-      if (! any_control_option)
+      if (! any_control_option && ! print_archive_index)
 	{
 	  fputs (gettext ("No operation specified.\n"), stderr);
 	do_argp_help:
@@ -426,7 +438,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 /* Process one file.  */
 static void
 process_file (int fd, Elf *elf, const char *prefix, const char *fname,
-	      bool only_one)
+	      bool only_one, bool will_print_archive_index)
 {
   /* We can handle two types of files: ELF files and archives.  */
   Elf_Kind kind = elf_kind (elf);
@@ -435,8 +447,13 @@ process_file (int fd, Elf *elf, const char *prefix, const char *fname,
   switch (kind)
     {
     case ELF_K_ELF:
+      if (unlikely (will_print_archive_index))
+	error (0, 0,
+	       gettext ("'%s' is not an archive, cannot print archive index"),
+	       fname);
       /* Yes!  It's an ELF file.  */
-      process_elf_file (elf, prefix, fname, only_one);
+      if (any_control_option)
+	process_elf_file (elf, prefix, fname, only_one);
       break;
 
     case ELF_K_AR:
@@ -454,6 +471,9 @@ process_file (int fd, Elf *elf, const char *prefix, const char *fname,
 	  }
 	memcpy (cp, fname, fname_len);
 
+	if (will_print_archive_index)
+	  dump_archive_index (elf, new_prefix);
+
 	/* It's an archive.  We process each file in it.  */
 	Elf *subelf;
 	Elf_Cmd cmd = ELF_C_READ_MMAP;
@@ -467,7 +487,8 @@ process_file (int fd, Elf *elf, const char *prefix, const char *fname,
 		Elf_Arhdr *arhdr = elf_getarhdr (subelf);
 		assert (arhdr != NULL);
 
-		process_file (fd, subelf, new_prefix, arhdr->ar_name, false);
+		process_file (fd, subelf, new_prefix, arhdr->ar_name, false,
+			      kind == ELF_K_AR && will_print_archive_index);
 	      }
 
 	    /* Get next archive element.  */
@@ -5493,12 +5514,21 @@ handle_core_registers (Ebl *ebl, Elf *core, const void *desc,
 }
 
 static void
-handle_auxv_note (Ebl *ebl, Elf *core, GElf_Word descsz, const void *desc)
+handle_auxv_note (Ebl *ebl, Elf *core, GElf_Word descsz, GElf_Off desc_pos)
 {
+  Elf_Data *data = elf_getdata_rawchunk (core, desc_pos, descsz, ELF_T_AUXV);
+  if (data == NULL)
+  elf_error:
+    error (EXIT_FAILURE, 0,
+	   gettext ("cannot convert core note data: %s"), elf_errmsg (-1));
+
   const size_t nauxv = descsz / gelf_fsize (core, ELF_T_AUXV, 1, EV_CURRENT);
   for (size_t i = 0; i < nauxv; ++i)
     {
-      const GElf_auxv_t *av = (const GElf_auxv_t *) desc + i;
+      GElf_auxv_t av_mem;
+      GElf_auxv_t *av = gelf_getauxv (data, i, &av_mem);
+      if (av == NULL)
+	goto elf_error;
 
       const char *name;
       const char *fmt;
@@ -5578,16 +5608,101 @@ handle_core_note (Ebl *ebl, const GElf_Nhdr *nhdr, const void *desc)
     putchar_unlocked ('\n');
 }
 
+static void
+handle_notes_data (Ebl *ebl, const GElf_Ehdr *ehdr,
+		   GElf_Off start, Elf_Data *data)
+{
+  fputs_unlocked (gettext ("  Owner          Data size  Type\n"), stdout);
+
+  if (data == NULL)
+    goto bad_note;
+
+  size_t offset = 0;
+  GElf_Nhdr nhdr;
+  size_t name_offset;
+  size_t desc_offset;
+  while (offset < data->d_size
+	 && (offset = gelf_getnote (data, offset,
+				    &nhdr, &name_offset, &desc_offset)) > 0)
+    {
+      const char *name = data->d_buf + name_offset;
+      const char *desc = data->d_buf + desc_offset;
+
+      char buf[100];
+      char buf2[100];
+      printf (gettext ("  %-13.*s  %9" PRId32 "  %s\n"),
+	      (int) nhdr.n_namesz, name, nhdr.n_descsz,
+	      ehdr->e_type == ET_CORE
+	      ? ebl_core_note_type_name (ebl, nhdr.n_type,
+					 buf, sizeof (buf))
+	      : ebl_object_note_type_name (ebl, nhdr.n_type,
+					   buf2, sizeof (buf2)));
+
+      /* Filter out invalid entries.  */
+      if (memchr (name, '\0', nhdr.n_namesz) != NULL
+	  /* XXX For now help broken Linux kernels.  */
+	  || 1)
+	{
+	  if (ehdr->e_type == ET_CORE)
+	    {
+	      if (nhdr.n_type == NT_AUXV)
+		handle_auxv_note (ebl, ebl->elf, nhdr.n_descsz,
+				  start + desc_offset);
+	      else
+		handle_core_note (ebl, &nhdr, desc);
+	    }
+	  else
+	    ebl_object_note (ebl, name, nhdr.n_type, nhdr.n_descsz, desc);
+	}
+    }
+
+  if (offset == data->d_size)
+    return;
+
+ bad_note:
+  error (EXIT_FAILURE, 0,
+	 gettext ("cannot get content of note section: %s"),
+	 elf_errmsg (-1));
+}
 
 static void
 handle_notes (Ebl *ebl, GElf_Ehdr *ehdr)
 {
-  int class = gelf_getclass (ebl->elf);
-  size_t cnt;
+  /* If we have section headers, just look for SHT_NOTE sections.
+     In a debuginfo file, the program headers are not reliable.  */
+  if (shnum != 0)
+    {
+      /* Get the section header string table index.  */
+      size_t shstrndx;
+      if (elf_getshstrndx (ebl->elf, &shstrndx) < 0)
+	error (EXIT_FAILURE, 0,
+	       gettext ("cannot get section header string table index"));
+
+      Elf_Scn *scn = NULL;
+      while ((scn = elf_nextscn (ebl->elf, scn)) != NULL)
+	{
+	  GElf_Shdr shdr_mem;
+	  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+
+	  if (shdr == NULL || shdr->sh_type != SHT_NOTE)
+	    /* Not what we are looking for.  */
+	    continue;
+
+	  printf (gettext ("\
+\nNote section [%2zu] '%s' of %" PRIu64 " bytes at offset %#0" PRIx64 ":\n"),
+		  elf_ndxscn (scn),
+		  elf_strptr (ebl->elf, shstrndx, shdr->sh_name),
+		  shdr->sh_size, shdr->sh_offset);
+
+	  handle_notes_data (ebl, ehdr, shdr->sh_offset,
+			     elf_getdata (scn, NULL));
+	}
+      return;
+    }
 
   /* We have to look through the program header to find the note
      sections.  There can be more than one.  */
-  for (cnt = 0; cnt < ehdr->e_phnum; ++cnt)
+  for (size_t cnt = 0; cnt < ehdr->e_phnum; ++cnt)
     {
       GElf_Phdr mem;
       GElf_Phdr *phdr = gelf_getphdr (ebl->elf, cnt, &mem);
@@ -5597,82 +5712,13 @@ handle_notes (Ebl *ebl, GElf_Ehdr *ehdr)
 	continue;
 
       printf (gettext ("\
-\nNote segment of %" PRId64 " bytes at offset %#0" PRIx64 ":\n"),
+\nNote segment of %" PRIu64 " bytes at offset %#0" PRIx64 ":\n"),
 	      phdr->p_filesz, phdr->p_offset);
 
-      char *notemem = gelf_rawchunk (ebl->elf, phdr->p_offset, phdr->p_filesz);
-      if (notemem == NULL)
-	error (EXIT_FAILURE, 0,
-	       gettext ("cannot get content of note section: %s"),
-	       elf_errmsg (-1));
-
-      fputs_unlocked (gettext ("  Owner          Data size  Type\n"), stdout);
-
-
-      /* Handle the note section content.  It consists of one or more
-	 entries each of which consists of five parts:
-
-	 - a 32-bit name length
-	 - a 32-bit descriptor length
-	 - a 32-bit type field
-	 - the NUL-terminated name, length as specified in the first field
-	 - the descriptor, length as specified in the second field
-
-	 The variable sized fields are padded to 32- or 64-bits
-	 depending on whether the file is a 32- or 64-bit ELF file.
-      */
-      // XXX Which 64-bit archs need 8-byte alignment?  x86-64 does not.
-      size_t align = class == ELFCLASS32 ? 4 : 4; // XXX 8;
-#define ALIGNED_LEN(len) (((len) + align - 1) & ~(align - 1))
-
-      size_t idx = 0;
-      while (idx < phdr->p_filesz)
-	{
-	  const GElf_Nhdr *nhdr = (const GElf_Nhdr *) (notemem + idx);
-	  const char *name = (const char *) (nhdr + 1);
-	  const void *desc = &name[ALIGNED_LEN (nhdr->n_namesz)];
-
-	  if (idx + 12 > phdr->p_filesz
-	      || (idx + 12 + ALIGNED_LEN (nhdr->n_namesz)
-		  + ALIGNED_LEN (nhdr->n_descsz) > phdr->p_filesz))
-	    /* This entry isn't completely contained in the note
-	       section.  Ignore it.  */
-	    break;
-
-	  char buf[100];
-	  char buf2[100];
-	  printf (gettext ("  %-13.*s  %9" PRId32 "  %s\n"),
-		  (int) nhdr->n_namesz, name,
-		  nhdr->n_descsz,
-		  ehdr->e_type == ET_CORE
-		  ? ebl_core_note_type_name (ebl, nhdr->n_type,
-					     buf, sizeof (buf))
-		  : ebl_object_note_type_name (ebl, nhdr->n_type,
-					       buf2, sizeof (buf2)));
-
-	  /* Filter out invalid entries.  */
-	  if (memchr (name, '\0', nhdr->n_namesz) != NULL
-	      /* XXX For now help broken Linux kernels.  */
-	      || 1)
-	    {
-	      if (ehdr->e_type == ET_CORE)
-		{
-		  if (nhdr->n_type == NT_AUXV)
-		    handle_auxv_note (ebl, ebl->elf, nhdr->n_descsz, desc);
-		  else
-		    handle_core_note (ebl, nhdr, desc);
-		}
-	      else
-		ebl_object_note (ebl, name, nhdr->n_type,
-				 nhdr->n_descsz, desc);
-	    }
-
-	  /* Move to the next entry.  */
-	  idx += (12 + ALIGNED_LEN (nhdr->n_namesz)
-		  + ALIGNED_LEN (nhdr->n_descsz));
-	}
-
-      gelf_freechunk (ebl->elf, notemem);
+      handle_notes_data (ebl, ehdr, phdr->p_offset,
+			 elf_getdata_rawchunk (ebl->elf,
+					       phdr->p_offset, phdr->p_filesz,
+					       ELF_T_NHDR));
     }
 }
 
@@ -5864,5 +5910,50 @@ print_strings (Ebl *ebl)
 	continue;
 
       print_string_section (scn, &shdr_mem, name);
+    }
+}
+
+static void
+dump_archive_index (Elf *elf, const char *fname)
+{
+  size_t narsym;
+  const Elf_Arsym *arsym = elf_getarsym (elf, &narsym);
+  if (arsym == NULL)
+    {
+      int result = elf_errno ();
+      if (result != ELF_E_NO_INDEX)
+	error (EXIT_FAILURE, 0,
+	       gettext ("cannot get symbol index of archive '%s': %s"),
+	       fname, elf_errmsg (result));
+      else
+	printf (gettext ("\nArchive '%s' has no symbol index\n"), fname);
+      return;
+    }
+
+  printf (gettext ("\nIndex of archive '%s' has %Zu entries:\n"),
+	  fname, narsym);
+
+  size_t as_off = 0;
+  for (const Elf_Arsym *s = arsym; s < &arsym[narsym - 1]; ++s)
+    {
+      if (s->as_off != as_off)
+	{
+	  as_off = s->as_off;
+
+	  Elf *subelf;
+	  if (elf_rand (elf, as_off) == 0
+	      || (subelf = elf_begin (-1, ELF_C_READ_MMAP, elf)) == NULL)
+	    error (EXIT_FAILURE, 0,
+		   gettext ("cannot extract member at offset %Zu in '%s': %s"),
+		   as_off, fname, elf_errmsg (-1));
+
+	  const Elf_Arhdr *h = elf_getarhdr (subelf);
+
+	  printf (gettext ("Archive member '%s' contains:\n"), h->ar_name);
+
+	  elf_end (subelf);
+	}
+
+      printf ("\t%s\n", s->as_name);
     }
 }

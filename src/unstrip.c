@@ -53,6 +53,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdio_ext.h>
+#include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -90,6 +91,8 @@ static const struct argp_option options[] =
   { "all", 'a', NULL, 0,
     N_("Create output for modules that have no separate debug information"),
     0 },
+  { "list-only", 'n', NULL, 0,
+    N_("Only list module and file names, build IDs"), 0 },
   { NULL, 0, NULL, 0, NULL, 0 }
 };
 
@@ -99,6 +102,7 @@ struct arg_info
   const char *output_dir;
   Dwfl *dwfl;
   char **args;
+  bool list;
   bool all;
   bool ignore;
   bool modnames;
@@ -147,6 +151,9 @@ parse_opt (int key, char *arg, struct argp_state *state)
     case 'i':
       info->ignore = true;
       break;
+    case 'n':
+      info->list = true;
+      break;
 
     case ARGP_KEY_ARGS:
     case ARGP_KEY_NO_ARGS:
@@ -156,6 +163,15 @@ parse_opt (int key, char *arg, struct argp_state *state)
       if (info->output_file != NULL && info->output_dir != NULL)
 	{
 	  argp_error (state, _("only one of -o or -d allowed"));
+	  return EINVAL;
+	}
+
+      if (info->list && (info->dwfl == NULL
+			 || info->output_dir != NULL
+			 || info->output_file != NULL))
+	{
+	  argp_error (state,
+		      _("-n cannot be used with explicit files or -o or -d"));
 	  return EINVAL;
 	}
 
@@ -194,7 +210,8 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	     from defaulting to "-e a.out".  */
 	  return ENOSYS;
 	}
-      else if (info->output_file == NULL && info->output_dir == NULL)
+      else if (info->output_file == NULL && info->output_dir == NULL
+	       && !info->list)
 	{
 	  argp_error (state,
 		      _("-o or -d is required when using implicit files"));
@@ -1947,6 +1964,47 @@ handle_output_dir_module (const char *output_dir, Dwfl_Module *mod,
 }
 
 
+static void
+list_module (Dwfl_Module *mod)
+{
+  /* Make sure we have searched for the files.  */
+  GElf_Addr bias;
+  bool have_elf = dwfl_module_getelf (mod, &bias) != NULL;
+  bool have_dwarf = dwfl_module_getdwarf (mod, &bias) != NULL;
+
+  const char *file;
+  const char *debug;
+  Dwarf_Addr start;
+  Dwarf_Addr end;
+  const char *name = dwfl_module_info (mod, NULL, &start, &end,
+				       NULL, NULL, &file, &debug);
+  if (file != NULL && debug != NULL && (debug == file || !strcmp (debug, file)))
+    debug = ".";
+
+  const unsigned char *id;
+  GElf_Addr id_vaddr;
+  int id_len = dwfl_module_build_id (mod, &id, &id_vaddr);
+
+  printf ("%#" PRIx64 "+%#" PRIx64 " ", start, end - start);
+
+  if (id_len > 0)
+    {
+      do
+	printf ("%02" PRIx8, *id++);
+      while (--id_len > 0);
+      if (id_vaddr != 0)
+	printf ("@%#" PRIx64, id_vaddr);
+    }
+  else
+    putchar ('-');
+
+  printf (" %s %s %s\n",
+	  file ?: have_elf ? "." : "-",
+	  debug ?: have_dwarf ? "." : "-",
+	  name);
+}
+
+
 struct match_module_info
 {
   char **patterns;
@@ -2006,7 +2064,11 @@ handle_implicit_modules (const struct arg_info *info)
   if (offset == 0)
     error (EXIT_FAILURE, 0, _("no matching modules found"));
 
-  if (info->output_dir == NULL)
+  if (info->list)
+    do
+      list_module (mmi.found);
+    while ((offset = next (offset)) > 0);
+  else if (info->output_dir == NULL)
     {
       if (next (offset) != 0)
 	error (EXIT_FAILURE, 0, _("matched more than one module"));
@@ -2068,7 +2130,19 @@ With no arguments, process all modules found.\n\
 Multiple modules are written to files under OUTPUT-DIRECTORY, \
 creating subdirectories as needed.  \
 With -m these files have simple module names, otherwise they have the \
-name of the main file complete with directory underneath OUTPUT-DIRECTORY.")
+name of the main file complete with directory underneath OUTPUT-DIRECTORY.\n\
+\n\
+With -n no files are written, but one line to standard output for each module:\
+\n\tSTART+SIZE BUILDID FILE DEBUGFILE MODULENAME\n\
+START and SIZE are hexadecimal giving the address bounds of the module.  \
+BUILDID is hexadecimal for the build ID bits, or - if no ID is known; \
+the hexadecimal may be followed by @0xADDR giving the address where the \
+ID resides if that is known.  \
+FILE is the file name found for the module, or - if none was found, \
+or . if an ELF image is available but not from any named file.  \
+DEBUGFILE is the separate debuginfo file name, \
+or - if no debuginfo was found, or . if FILE contains the debug information.\
+")
     };
 
   int remaining;
@@ -2102,7 +2176,7 @@ name of the main file complete with directory underneath OUTPUT-DIRECTORY.")
   else
     {
       /* parse_opt checked this.  */
-      assert (info.output_file != NULL || info.output_dir != NULL);
+      assert (info.output_file != NULL || info.output_dir != NULL || info.list);
 
       handle_implicit_modules (&info);
 

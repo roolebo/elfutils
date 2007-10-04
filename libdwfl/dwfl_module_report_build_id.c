@@ -1,7 +1,6 @@
-/* Release uninterpreted chunk of the file contents.
-   Copyright (C) 2002 Red Hat, Inc.
+/* Report build ID information for a module.
+   Copyright (C) 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
-   Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by the
@@ -48,31 +47,56 @@
    Network licensing program, please visit www.openinventionnetwork.com
    <http://www.openinventionnetwork.com>.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include "libdwflP.h"
 
-#include <libelf.h>
-#include <stddef.h>
-#include <stdlib.h>
-
-#include "libelfP.h"
-
-
-void
-gelf_freechunk (elf, ptr)
-     Elf *elf;
-     char *ptr;
+// XXX vs report changed module: punting old file
+int
+dwfl_module_report_build_id (Dwfl_Module *mod,
+			     const unsigned char *bits, size_t len,
+			     GElf_Addr vaddr)
 {
-  if (elf == NULL)
-    /* No valid descriptor.  */
-    return;
+  if (mod == NULL)
+    return -1;
 
-  /* We do not have to do anything if the pointer returned by
-     gelf_rawchunk points into the memory allocated for the ELF
-     descriptor.  */
-  if (ptr < (char *) elf->map_address + elf->start_offset
-      || ptr >= ((char *) elf->map_address + elf->start_offset
-		 + elf->maximum_size))
-    free (ptr);
+  if (mod->main.elf != NULL)
+    {
+      /* Once we know about a file, we won't take any lies about
+	 its contents.  The only permissible call is a no-op.  */
+
+      if ((size_t) mod->build_id_len == len
+	  && (mod->build_id_vaddr == vaddr || vaddr == 0)
+	  && !memcmp (bits, mod->build_id_bits, len))
+	return 0;
+
+      __libdwfl_seterrno (DWFL_E_ALREADY_ELF);
+      return -1;
+    }
+
+  if (vaddr != 0 && (vaddr < mod->low_addr || vaddr + len > mod->high_addr))
+    {
+      __libdwfl_seterrno (DWFL_E_ADDR_OUTOFRANGE);
+      return -1;
+    }
+
+  void *copy = NULL;
+  if (len > 0)
+    {
+      copy = malloc (len);
+      if (unlikely (copy == NULL))
+	{
+	  __libdwfl_seterrno (DWFL_E_NOMEM);
+	  return -1;
+	}
+      memcpy (copy, bits, len);
+    }
+
+  if (mod->build_id_len > 0)
+    free (mod->build_id_bits);
+
+  mod->build_id_bits = copy;
+  mod->build_id_len = len;
+  mod->build_id_vaddr = vaddr;
+
+  return 0;
 }
+INTDEF (dwfl_module_report_build_id)

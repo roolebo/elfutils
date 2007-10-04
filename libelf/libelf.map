@@ -55,7 +55,6 @@ ELFUTILS_1.0 {
     elf_update;
     elf_version;
     gelf_checksum;
-    gelf_freechunk;
     gelf_fsize;
     gelf_getclass;
     gelf_getdyn;
@@ -75,7 +74,6 @@ ELFUTILS_1.0 {
     gelf_getversym;
     gelf_newehdr;
     gelf_newphdr;
-    gelf_rawchunk;
     gelf_update_dyn;
     gelf_update_ehdr;
     gelf_update_move;
@@ -120,6 +118,7 @@ ELFUTILS_1.2 {
 
 ELFUTILS_1.3 {
   global:
+    elf_getdata_rawchunk;
     gelf_getauxv;
     gelf_update_auxv;
     gelf_getnote;

@@ -343,13 +343,6 @@ extern size_t gelf_getnote (Elf_Data *__data, size_t __offset,
 			    size_t *__name_offset, size_t *__desc_offset);
 
 
-/* Retrieve uninterpreted chunk of the file contents.  */
-extern char *gelf_rawchunk (Elf *__elf, GElf_Off __offset, GElf_Word __size);
-
-/* Release uninterpreted chunk of the file contents.  */
-extern void gelf_freechunk (Elf *__elf, char *__ptr);
-
-
 /* Compute simple checksum from permanent parts of the ELF file.  */
 extern long int gelf_checksum (Elf *__elf);
 

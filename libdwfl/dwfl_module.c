@@ -103,6 +103,9 @@ __libdwfl_module_free (Dwfl_Module *mod)
     free_file (&mod->debug);
   free_file (&mod->main);
 
+  if (mod->build_id_bits != NULL)
+    free (mod->build_id_bits);
+
   free (mod->name);
   free (mod);
 }

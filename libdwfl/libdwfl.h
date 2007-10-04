@@ -194,27 +194,82 @@ extern ptrdiff_t dwfl_getmodules (Dwfl *dwfl,
 extern Dwfl_Module *dwfl_addrmodule (Dwfl *dwfl, Dwarf_Addr address);
 
 
+/* Report the known build ID bits associated with a module.
+   If VADDR is nonzero, it gives the absolute address where those
+   bits are found within the module.  This can be called at any
+   time, but is usually used immediately after dwfl_report_module.
+   Once the module's main ELF file is opened, the ID note found
+   there takes precedence and cannot be changed.  */
+extern int dwfl_module_report_build_id (Dwfl_Module *mod,
+					const unsigned char *bits, size_t len,
+					GElf_Addr vaddr)
+  __nonnull_attribute__ (2);
+
+/* Extract the build ID bits associated with a module.
+   Returns -1 for errors, 0 if no ID is known, or the number of ID bytes.
+   When an ID is found, *BITS points to it; *VADDR is the absolute address
+   at which the ID bits are found within the module, or 0 if unknown.
+
+   This returns 0 when the module's main ELF file has not yet been loaded
+   and its build ID bits were not reported.  To ensure the ID is always
+   returned when determinable, call dwfl_module_getelf first.  */
+extern int dwfl_module_build_id (Dwfl_Module *mod,
+				 const unsigned char **bits, GElf_Addr *vaddr)
+  __nonnull_attribute__ (2, 3);
+
+
 /*** Standard callbacks ***/
 
-/* Standard find_debuginfo callback function.
-   This is controlled by a string specifying directories to look in.
+/* These standard find_elf and find_debuginfo callbacks are
+   controlled by a string specifying directories to look in.
    If `debuginfo_path' is set in the Dwfl_Callbacks structure
-   and the char * it points to is not null, that supplies the string.
-   Otherwise a default path is used.
+   and the char * it points to is not null, that supplies the
+   string.  Otherwise a default path is used.
 
-   If the first character of the string is + or - that says to check or to
-   ignore (respectively) the CRC32 checksum from the .gnu_debuglink
-   section.  The default is to check it.  The remainder of the string is
-   composed of elements separated by colons.  Each element can start with +
-   or - to override the global checksum behavior.  If the remainder of the
-   element is empty, the directory containing the main file is tried; if
-   it's an absolute path name, the absolute directory path containing the
-   main file is taken as a subdirectory of this path; a relative path name
-   is taken as a subdirectory of the directory containing the main file.
-   Hence for /bin/ls, string ":.debug:/usr/lib/debug" says to look in /bin,
-   then /bin/.debug, then /usr/lib/debug/bin, for the file name in the
-   .gnu_debuglink section (or "ls.debug" if none was found).  */
+   If the first character of the string is + or - that enables or
+   disables CRC32 checksum validation when it's necessary.  The
+   remainder of the string is composed of elements separated by
+   colons.  Each element can start with + or - to override the
+   global checksum behavior.  This flag is never relevant when
+   working with build IDs, but it's always parsed in the path
+   string.  The remainder of the element indicates a directory.
 
+   Searches by build ID consult only the elements naming absolute
+   directory paths.  They look under those directories for a link
+   named ".build-id/xx/yy" or ".build-id/xx/yy.debug", where "xxyy"
+   is the lower-case hexadecimal representation of the ID bytes.
+
+   In searches for debuginfo by name, if the remainder of the
+   element is empty, the directory containing the main file is
+   tried; if it's an absolute path name, the absolute directory path
+   containing the main file is taken as a subdirectory of this path;
+   a relative path name is taken as a subdirectory of the directory
+   containing the main file.  Hence for /bin/ls, the default string
+   ":.debug:/usr/lib/debug" says to look in /bin, then /bin/.debug,
+   then /usr/lib/debug/bin, for the file name in the .gnu_debuglink
+   section (or "ls.debug" if none was found).  */
+
+/* Standard find_elf callback function working solely on build ID.
+   This can be tried first by any find_elf callback, to use the
+   bits passed to dwfl_module_report_build_id, if any.  */
+extern int dwfl_build_id_find_elf (Dwfl_Module *, void **,
+				   const char *, Dwarf_Addr,
+				   char **, Elf **);
+
+/* Standard find_debuginfo callback function working solely on build ID.
+   This can be tried first by any find_debuginfo callback,
+   to use the build ID bits from the main file when present.  */
+extern int dwfl_build_id_find_debuginfo (Dwfl_Module *, void **,
+					 const char *, Dwarf_Addr,
+					 const char *, const char *,
+					 GElf_Word, char **);
+
+/* Standard find_debuginfo callback function.
+   If a build ID is available, this tries first to use that.
+   If there is no build ID or no valid debuginfo found by ID,
+   it searches the debuginfo path by name, as described above.
+   Any file found in the path is validated by build ID if possible,
+   or else by CRC32 checksum if enabled, and skipped if it does not match.  */
 extern int dwfl_standard_find_debuginfo (Dwfl_Module *, void **,
 					 const char *, Dwarf_Addr,
 					 const char *, const char *,

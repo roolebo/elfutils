@@ -88,6 +88,7 @@
   DWFL_ERROR (ADDR_OUTOFRANGE, N_("address out of range"))		      \
   DWFL_ERROR (NO_MATCH, N_("no matching address range"))		      \
   DWFL_ERROR (TRUNCATED, N_("image truncated"))				      \
+  DWFL_ERROR (ALREADY_ELF, N_("ELF file opened"))			      \
   DWFL_ERROR (BADELF, N_("not a valid ELF file"))			      \
   DWFL_ERROR (WEIRD_TYPE, N_("cannot handle DWARF type description"))
 
@@ -119,6 +120,7 @@ struct dwfl_file
 {
   char *name;
   int fd;
+  bool valid;			/* The build ID note has been matched.  */
 
   Elf *elf;
   GElf_Addr bias;		/* Actual load address - p_vaddr.  */
@@ -133,6 +135,10 @@ struct Dwfl_Module
 
   char *name;			/* Iterator name for this module.  */
   GElf_Addr low_addr, high_addr;
+
+  void *build_id_bits;		/* malloc'd copy of build ID bits.  */
+  GElf_Addr build_id_vaddr;	/* Address where they reside, 0 if unknown.  */
+  int build_id_len;		/* -1 for prior failure, 0 if unset.  */
 
   struct dwfl_file main, debug;
   Ebl *ebl;
@@ -253,11 +259,21 @@ extern Dwfl_Error __libdwfl_addrcu (Dwfl_Module *mod, Dwarf_Addr addr,
 
 /* Ensure that CU->lines (and CU->cu->lines) is set up.  */
 extern Dwfl_Error __libdwfl_cu_getsrclines (struct dwfl_cu *cu)
-     internal_function;
+  internal_function;
 
+/* Look in ELF for an NT_GNU_BUILD_ID note.  If SET is true, store it
+   in MOD and return its length.  If SET is false, instead compare it
+   to that stored in MOD and return 2 if they match, 1 if they do not.
+   Returns -1 for errors, 0 if no note is found.  */
+extern int __libdwfl_find_build_id (Dwfl_Module *mod, bool set, Elf *elf)
+  internal_function;
+
+/* Open a main or debuginfo file by its build ID, returns the fd.  */
+extern int __libdwfl_open_by_build_id (Dwfl_Module *mod, bool debug,
+				       char **file_name) internal_function;
 
 extern uint32_t __libdwfl_crc32 (uint32_t crc, unsigned char *buf, size_t len)
-     attribute_hidden;
+  attribute_hidden;
 extern int __libdwfl_crc32_file (int fd, uint32_t *resp) attribute_hidden;
 
 
@@ -270,17 +286,21 @@ INTDECL (dwfl_addrdwarf)
 INTDECL (dwfl_addrdie)
 INTDECL (dwfl_module_addrdie)
 INTDECL (dwfl_module_addrsym)
+INTDECL (dwfl_module_build_id)
 INTDECL (dwfl_module_getdwarf)
 INTDECL (dwfl_module_getelf)
 INTDECL (dwfl_module_getsym)
 INTDECL (dwfl_module_getsymtab)
 INTDECL (dwfl_module_getsrc)
+INTDECL (dwfl_module_report_build_id)
 INTDECL (dwfl_report_elf)
 INTDECL (dwfl_report_begin)
 INTDECL (dwfl_report_begin_add)
 INTDECL (dwfl_report_module)
 INTDECL (dwfl_report_offline)
 INTDECL (dwfl_report_end)
+INTDECL (dwfl_build_id_find_elf)
+INTDECL (dwfl_build_id_find_debuginfo)
 INTDECL (dwfl_standard_find_debuginfo)
 INTDECL (dwfl_linux_kernel_find_elf)
 INTDECL (dwfl_linux_kernel_module_section_address)

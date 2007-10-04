@@ -255,6 +255,18 @@ typedef struct Elf_ScnList
 } Elf_ScnList;
 
 
+/* elf_getdata_rawchunk result.  */
+typedef struct Elf_Data_Chunk
+{
+  Elf_Data_Scn data;
+  union
+  {
+    Elf_Scn dummy_scn;
+    struct Elf_Data_Chunk *next;
+  };
+} Elf_Data_Chunk;
+
+
 /* The ELF descriptor.  */
 struct Elf
 {
@@ -313,6 +325,7 @@ struct Elf
       Elf_ScnList *scns_last;	/* Last element in the section list.
 				   If NULL the data has not yet been
 				   read from the file.  */
+      Elf_Data_Chunk *rawchunks; /* List of elf_getdata_rawchunk results.  */
       unsigned int scnincr;	/* Number of sections allocate the last
 				   time.  */
       off64_t sizestr_offset;	/* Offset of the size string in the parent
@@ -332,6 +345,7 @@ struct Elf
       Elf_ScnList *scns_last;	/* Last element in the section list.
 				   If NULL the data has not yet been
 				   read from the file.  */
+      Elf_Data_Chunk *rawchunks; /* List of elf_getdata_rawchunk results.  */
       unsigned int scnincr;	/* Number of sections allocate the last
 				   time.  */
       off64_t sizestr_offset;	/* Offset of the size string in the parent
@@ -357,6 +371,7 @@ struct Elf
       Elf_ScnList *scns_last;	/* Last element in the section list.
 				   If NULL the data has not yet been
 				   read from the file.  */
+      Elf_Data_Chunk *rawchunks; /* List of elf_getdata_rawchunk results.  */
       unsigned int scnincr;	/* Number of sections allocate the last
 				   time.  */
       off64_t sizestr_offset;	/* Offset of the size string in the parent

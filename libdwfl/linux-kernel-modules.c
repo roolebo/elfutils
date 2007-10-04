@@ -501,6 +501,9 @@ dwfl_linux_kernel_report_kernel (Dwfl *dwfl)
   /* Try to figure out the bounds of the kernel image without
      looking for any vmlinux file.  */
   Dwarf_Addr notes;
+  /* The compiler cannot deduce that if intuit_kernel_bounds returns
+     zero NOTES will be initialized.  Fake the initialization.  */
+  asm ("" : "=m" (notes));
   int result = intuit_kernel_bounds (&start, &end, &notes);
   if (result == 0)
     {

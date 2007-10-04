@@ -5888,7 +5888,7 @@ print_strings (Ebl *ebl)
 {
   /* Get the section header string table index.  */
   size_t shstrndx;
-  if (elf_getshstrndx (ebl->elf, &shstrndx) < 0)
+  if (unlikely (elf_getshstrndx (ebl->elf, &shstrndx) < 0))
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
 
@@ -5921,7 +5921,7 @@ dump_archive_index (Elf *elf, const char *fname)
   if (arsym == NULL)
     {
       int result = elf_errno ();
-      if (result != ELF_E_NO_INDEX)
+      if (unlikely (result != ELF_E_NO_INDEX))
 	error (EXIT_FAILURE, 0,
 	       gettext ("cannot get symbol index of archive '%s': %s"),
 	       fname, elf_errmsg (result));
@@ -5941,11 +5941,15 @@ dump_archive_index (Elf *elf, const char *fname)
 	  as_off = s->as_off;
 
 	  Elf *subelf;
-	  if (elf_rand (elf, as_off) == 0
-	      || (subelf = elf_begin (-1, ELF_C_READ_MMAP, elf)) == NULL)
-	    error (EXIT_FAILURE, 0,
-		   gettext ("cannot extract member at offset %Zu in '%s': %s"),
-		   as_off, fname, elf_errmsg (-1));
+	  if (unlikely (elf_rand (elf, as_off) == 0)
+	      || unlikely ((subelf = elf_begin (-1, ELF_C_READ_MMAP, elf))
+			   == NULL))
+#if __GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 7)
+	    while (1)
+#endif
+	      error (EXIT_FAILURE, 0,
+		     gettext ("cannot extract member at offset %Zu in '%s': %s"),
+		     as_off, fname, elf_errmsg (-1));
 
 	  const Elf_Arhdr *h = elf_getarhdr (subelf);
 

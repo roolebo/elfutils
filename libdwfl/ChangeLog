@@ -1,3 +1,8 @@
+2007-10-04  Ulrich Drepper  <drepper@redhat.com>
+
+	* linux-kernel-modules.c (dwfl_linux_kernel_report_kernel): Fake
+	initialization of notes variable.
+
 2007-10-04  Roland McGrath  <roland@redhat.com>
 
 	* linux-kernel-modules.c (intuit_kernel_bounds): Take new arg NOTES,

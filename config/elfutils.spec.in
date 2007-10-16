@@ -180,6 +180,22 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
+* Mon Oct 15 2007 Ulrich Drepper <drepper@redhat.com> 0.130-1
+- readelf: -p option can take an argument like -x for one section,
+	 or no argument (as before) for all SHF_STRINGS sections;
+	 new option --archive-index (or -c);	 improved -n output fo
+r core files, on many machines
+- libelf: new function elf_getdata_rawchunk, replaces gelf_rawchunk;
+	new functions gelf_getnote, gelf_getauxv, gelf_update_auxv
+- readelf, elflint: handle SHT_NOTE sections without requiring phdrs
+- elflint: stricter checks on debug sections
+- libdwfl: new functions dwfl_build_id_find_elf, dwfl_build_id_find_debu
+ginfo,	 dwfl_module_build_id, dwfl_module_report_build_id;	 suppo
+rt dynamic symbol tables found via phdrs;	 dwfl_standard_find_de
+buginfo now uses build IDs when available
+- unstrip: new option --list (or -n)
+- libebl: backend improvements for sparc, alpha, powerpc
+
 * Tue Aug 14 2007 Ulrich Drepper <drepper@redhat.com> 0.129-1
 - readelf: new options --hex-dump (or -x), --strings (or -p)
 - addr2line: new option --symbols (or -S)

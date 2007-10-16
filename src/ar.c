@@ -884,6 +884,15 @@ write_member (struct armem *memb, off_t *startp, off_t *lenp, Elf *elf,
   return 0;
 }
 
+/* Store the name in the long name table if necessary.
+   Record its offset or -1 if we did not need to use the table.  */
+static void
+remember_long_name (struct armem *mem, const char *name, size_t namelen)
+{
+  mem->long_name_off = (namelen > MAX_AR_NAME_LEN
+			? arlib_add_long_name (name, namelen)
+			: -1l);
+}
 
 static int
 do_oper_delete (const char *arfname, char **argv, int argc,
@@ -963,12 +972,7 @@ do_oper_delete (const char *arfname, char **argv, int argc,
 	  arlib_add_symbols (subelf, arfname, arhdr->ar_name, newp->off);
 
 	  /* Remember long file names.  */
-	  size_t ar_namelen = strlen (arhdr->ar_name);
-	  if (ar_namelen > MAX_AR_NAME_LEN)
-	    newp->long_name_off = arlib_add_long_name (arhdr->ar_name,
-						       ar_namelen);
-	  else
-	    newp->long_name_off = -1l;
+	  remember_long_name (newp, arhdr->ar_name, strlen (arhdr->ar_name));
 	}
 
     next:
@@ -1087,6 +1091,9 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
 
   arlib_init ();
 
+  /* Initialize early for no_old case.  */
+  off_t cur_off = SARMAG;
+
   if (fd == -1)
     {
       if (!suppress_create_msg)
@@ -1118,7 +1125,6 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
   /* While iterating over the current content of the archive we must
      determine a number of things: which archive members to keep,
      which are replaced, and where to insert the new members.  */
-  off_t cur_off = SARMAG;
   Elf_Cmd cmd = ELF_C_READ_MMAP;
   Elf *subelf;
   while ((subelf = elf_begin (fd, cmd, elf)) != NULL)
@@ -1137,11 +1143,7 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
       newp->mem = NULL;
 
       /* Remember long file names.  */
-      size_t ar_namelen = strlen (arhdr->ar_name);
-      if (ar_namelen > MAX_AR_NAME_LEN)
-	newp->long_name_off = arlib_add_long_name (arhdr->ar_name, ar_namelen);
-      else
-	newp->long_name_off = -1l;
+      remember_long_name (newp, arhdr->ar_name, strlen (arhdr->ar_name));
 
       /* Check whether this is a file we are looking for.  */
       if (oper != oper_qappend)
@@ -1223,17 +1225,13 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
       for (int cnt = 0; cnt < argc; ++cnt)
 	{
 	  const char *bname = basename (argv[cnt]);
+	  size_t bnamelen = strlen (bname);
 	  if (found[cnt] == NULL)
 	    {
 	      found[cnt] = alloca (sizeof (struct armem));
 	      found[cnt]->old_off = -1;
 
-	      size_t ar_namelen = strlen (argv[cnt]);
-	      if (ar_namelen > MAX_AR_NAME_LEN)
-		found[cnt]->long_name_off = arlib_add_long_name (bname,
-								 ar_namelen);
-	      else
-		found[cnt]->long_name_off = -1l;
+	      remember_long_name (found[cnt], bname, bnamelen);
 	    }
 
 	  struct stat newst;
@@ -1275,14 +1273,12 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
 		printf ("%c - %s\n",
 			found[cnt]->old_off == -1l ? 'a' : 'r', argv[cnt]);
 
-#ifdef DEBUG
 	      found[cnt]->elf = newelf;
-#endif
 	      found[cnt]->sec = newst.st_mtime;
 	      found[cnt]->uid = newst.st_uid;
 	      found[cnt]->gid = newst.st_gid;
 	      found[cnt]->mode = newst.st_mode;
-	      found[cnt]->name = basename (argv[cnt]);
+	      found[cnt]->name = bname;
 
 	      found[cnt]->mem = elf_rawfile (newelf, &found[cnt]->size);
 	      if (found[cnt] == NULL || elf_cntl (newelf, ELF_C_FDDONE) != 0)
@@ -1291,13 +1287,9 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
 
 	      close (newfd);
 
-	      /* Remember long file names.  */
-	      size_t bnamelen = strlen (bname);
-	      if (bnamelen > MAX_AR_NAME_LEN)
-		found[cnt]->long_name_off = arlib_add_long_name (bname,
-								 bnamelen);
-	      else
-		found[cnt]->long_name_off = -1l;
+	      if (found[cnt]->old_off != -1l)
+		/* Remember long file names.  */
+		remember_long_name (found[cnt], bname, bnamelen);
 	    }
 	}
     }
@@ -1449,8 +1441,9 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
 	      if (all->long_name_off == -1)
 		{
 		  size_t namelen = strlen (all->name);
-		  memset (mempcpy (arhdr.ar_name, all->name, namelen),
-			  ' ', sizeof (arhdr.ar_name) - namelen);
+		  char *p = mempcpy (arhdr.ar_name, all->name, namelen);
+		  *p++ = '/';
+		  memset (p, ' ', sizeof (arhdr.ar_name) - namelen - 1);
 		}
 	      else
 		{
@@ -1480,7 +1473,7 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
 
 	      /* Pad the file if its size is odd.  */
 	      if ((all->size & 1) != 0)
-		if (write (newfd, "\n", 1) != 1)
+		if (unlikely (write_retry (newfd, "\n", 1) != 1))
 		  goto nonew_unlink;
 	    }
 	  else

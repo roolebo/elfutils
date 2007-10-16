@@ -41,10 +41,10 @@
 long int
 arlib_add_long_name (const char *filename, size_t filenamelen)
 {
-  int retval = obstack_object_size (&symtab.longnamesob);
+  size_t size = obstack_object_size (&symtab.longnamesob);
 
   obstack_grow (&symtab.longnamesob, filename, filenamelen);
   obstack_grow (&symtab.longnamesob, "/\n", 2);
 
-  return retval;
+  return size - sizeof (struct ar_hdr);
 }

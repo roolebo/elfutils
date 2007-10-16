@@ -1,7 +1,6 @@
-/* SPARC specific symbolic name handling.
-   Copyright (C) 2002, 2003, 2005, 2007 Red Hat, Inc.
+/* SPARC-specific auxv handling.
+   Copyright (C) 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
-   Written by Jakub Jelinek <jakub@redhat.com>, 2002.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by the
@@ -28,41 +27,17 @@
 # include <config.h>
 #endif
 
-#include <elf.h>
-#include <stddef.h>
-
-#define BACKEND		sparc_
+#define BACKEND sparc_
 #include "libebl_CPU.h"
 
-/* Check for the simple reloc types.  */
-Elf_Type
-sparc_reloc_simple_type (Ebl *ebl __attribute__ ((unused)), int type)
+int
+EBLHOOK(auxv_info) (GElf_Xword a_type, const char **name, const char **format)
 {
-  switch (type)
-    {
-    case R_SPARC_8:
-      return ELF_T_BYTE;
-    case R_SPARC_16:
-    case R_SPARC_UA16:
-      return ELF_T_HALF;
-    case R_SPARC_32:
-    case R_SPARC_UA32:
-      return ELF_T_WORD;
-    case R_SPARC_64:
-    case R_SPARC_UA64:
-      return ELF_T_XWORD;
-    default:
-      return ELF_T_NUM;
-    }
-}
+  if (a_type != AT_HWCAP)
+    return 0;
 
-/* Check whether machine flags are valid.  */
-bool
-sparc_machine_flag_check (GElf_Word flags)
-{
-  return ((flags &~ (EF_SPARCV9_MM
-		     | EF_SPARC_LEDATA
-		     | EF_SPARC_32PLUS
-		     | EF_SPARC_SUN_US1
-		     | EF_SPARC_SUN_US3)) == 0);
+  *name = "HWCAP";
+  *format = "b"
+    "flush\0" "stbar\0" "swap\0" "muldiv\0" "v9\0" "ultra3\0" "v9v\0" "\0";
+  return 1;
 }

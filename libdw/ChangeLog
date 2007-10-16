@@ -1,3 +1,10 @@
+2007-10-05  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_begin_elf.c (check_section): Punt on SHT_NOBITS sections.
+
+	* libdw.h (__extern_inline): Rename to __libdw_extern_inline.
+	[__OPTIMIZE__] (dwarf_whatattr, dwarf_whatform): Update uses.
+
 2007-10-03  Roland McGrath  <roland@redhat.com>
 
 	* libdw.map (ELFUTILS_0.130: Add dwfl_build_id_find_elf

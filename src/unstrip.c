@@ -30,11 +30,6 @@
 
   * prelink vs .debug_* linked addresses
 
-  * merge many inputs? -> ET_EXEC with union phdrs + new phdrs for ET_REL mods
-  ** with applied relocs to ET_REL mods, use data modified by dwfl
-  *** still must apply relocs to SHF_ALLOC
-  ** useless unless merge all symtabs and dwarf sections
-
  */
 
 #ifdef HAVE_CONFIG_H
@@ -91,6 +86,8 @@ static const struct argp_option options[] =
   { "all", 'a', NULL, 0,
     N_("Create output for modules that have no separate debug information"),
     0 },
+  { "relocate", 'R', NULL, 0,
+    N_("Apply relocations to DWARF sections in ET_REL files"), 0 },
   { "list-only", 'n', NULL, 0,
     N_("Only list module and file names, build IDs"), 0 },
   { NULL, 0, NULL, 0, NULL, 0 }
@@ -107,6 +104,7 @@ struct arg_info
   bool ignore;
   bool modnames;
   bool match_files;
+  bool relocate;
 };
 
 /* Handle program arguments.  */
@@ -154,6 +152,9 @@ parse_opt (int key, char *arg, struct argp_state *state)
     case 'n':
       info->list = true;
       break;
+    case 'R':
+      info->relocate = true;
+      break;
 
     case ARGP_KEY_ARGS:
     case ARGP_KEY_NO_ARGS:
@@ -199,10 +200,10 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	      return EINVAL;
 	    }
 
-	  if (info->ignore || info->all || info->modnames)
+	  if (info->ignore || info->all || info->modnames || info->relocate)
 	    {
 	      argp_error (state, _("\
--m, -a, and -i options not allowed with explicit files"));
+-m, -a, -R, and -i options not allowed with explicit files"));
 	      return EINVAL;
 	    }
 
@@ -543,7 +544,7 @@ adjust_all_relocs (Elf *elf, Elf_Scn *symtab, const GElf_Shdr *symshdr,
    possible, add in section symbols for the added sections.  */
 static Elf_Data *
 add_new_section_symbols (Elf_Scn *old_symscn, size_t old_shnum,
-			 Elf *elf, Elf_Scn *symscn, size_t shnum)
+			 Elf *elf, bool rel, Elf_Scn *symscn, size_t shnum)
 {
   const size_t added = shnum - old_shnum;
 
@@ -590,7 +591,7 @@ add_new_section_symbols (Elf_Scn *old_symscn, size_t old_shnum,
       ELF_CHECK (i_shdr != NULL, _("cannot get section header: %s"));
       GElf_Sym sym =
 	{
-	  .st_value = i_shdr->sh_addr,
+	  .st_value = rel ? 0 : i_shdr->sh_addr,
 	  .st_info = GELF_ST_INFO (STB_LOCAL, STT_SECTION),
 	  .st_shndx = i < SHN_LORESERVE ? i : SHN_XINDEX
 	};
@@ -623,7 +624,7 @@ add_new_section_symbols (Elf_Scn *old_symscn, size_t old_shnum,
 /* This has the side effect of updating STT_SECTION symbols' values,
    in case of prelink adjustments.  */
 static Elf_Data *
-check_symtab_section_symbols (Elf *elf, Elf_Scn *scn,
+check_symtab_section_symbols (Elf *elf, bool rel, Elf_Scn *scn,
 			      size_t shnum, size_t shstrndx,
 			      Elf_Scn *oscn, size_t oshnum, size_t oshstrndx,
 			      size_t debuglink)
@@ -632,10 +633,10 @@ check_symtab_section_symbols (Elf *elf, Elf_Scn *scn,
 						   elf_getdata (scn, NULL));
 
   if (n == oshnum)
-    return add_new_section_symbols (oscn, n, elf, scn, shnum);
+    return add_new_section_symbols (oscn, n, elf, rel, scn, shnum);
 
   if (n == oshstrndx || (n == debuglink && n == oshstrndx - 1))
-    return add_new_section_symbols (oscn, n, elf, scn, shstrndx);
+    return add_new_section_symbols (oscn, n, elf, rel, scn, shstrndx);
 
   return NULL;
 }
@@ -650,15 +651,20 @@ struct section
 };
 
 static int
-compare_alloc_sections (const struct section *s1, const struct section *s2)
+compare_alloc_sections (const struct section *s1, const struct section *s2,
+			bool rel)
 {
-  /* Sort by address.  */
-  if (s1->shdr.sh_addr < s2->shdr.sh_addr)
-    return -1;
-  if (s1->shdr.sh_addr > s2->shdr.sh_addr)
-    return 1;
+  if (!rel)
+    {
+      /* Sort by address.  */
+      if (s1->shdr.sh_addr < s2->shdr.sh_addr)
+	return -1;
+      if (s1->shdr.sh_addr > s2->shdr.sh_addr)
+	return 1;
+    }
 
-  return 0;
+  /* At the same address, preserve original section order.  */
+  return (ssize_t) elf_ndxscn (s1->scn) - (ssize_t) elf_ndxscn (s2->scn);
 }
 
 static int
@@ -676,7 +682,7 @@ compare_unalloc_sections (const GElf_Shdr *shdr1, const GElf_Shdr *shdr2,
 }
 
 static int
-compare_sections (const void *a, const void *b)
+compare_sections (const void *a, const void *b, bool rel)
 {
   const struct section *s1 = a;
   const struct section *s2 = b;
@@ -686,9 +692,21 @@ compare_sections (const void *a, const void *b)
     return (s1->shdr.sh_flags & SHF_ALLOC) ? -1 : 1;
 
   return ((s1->shdr.sh_flags & SHF_ALLOC)
-	  ? compare_alloc_sections (s1, s2)
+	  ? compare_alloc_sections (s1, s2, rel)
 	  : compare_unalloc_sections (&s1->shdr, &s2->shdr,
 				      s1->name, s2->name));
+}
+
+static int
+compare_sections_rel (const void *a, const void *b)
+{
+  return compare_sections (a, b, true);
+}
+
+int
+compare_sections_nonrel (const void *a, const void *b)
+{
+  return compare_sections (a, b, false);
 }
 
 
@@ -717,7 +735,7 @@ struct symbol
 
 /* Collect input symbols into our internal form.  */
 static void
-collect_symbols (Elf *outelf, Elf_Scn *symscn, Elf_Scn *strscn,
+collect_symbols (Elf *outelf, bool rel, Elf_Scn *symscn, Elf_Scn *strscn,
 		 const size_t nent, const GElf_Addr bias,
 		 const size_t scnmap[], struct symbol *table, size_t *map,
 		 struct section *split_bss)
@@ -752,16 +770,14 @@ collect_symbols (Elf *outelf, Elf_Scn *symscn, Elf_Scn *strscn,
       if (scnmap != NULL && shndx != SHN_UNDEF && shndx < SHN_LORESERVE)
 	s->shndx = scnmap[shndx - 1];
 
-      if (GELF_ST_TYPE (s->info.info) == STT_SECTION)
+      if (GELF_ST_TYPE (s->info.info) == STT_SECTION && !rel)
 	{
+	  /* Update the value to match the output section.  */
 	  GElf_Shdr shdr_mem;
-	  GElf_Shdr *shdr = gelf_getshdr (elf_getscn (outelf, shndx),
+	  GElf_Shdr *shdr = gelf_getshdr (elf_getscn (outelf, s->shndx),
 					  &shdr_mem);
 	  ELF_CHECK (shdr != NULL, _("cannot get section header: %s"));
-
-	  if (GELF_ST_TYPE (s->info.info) == STT_SECTION)
-	    /* Update the value to match the output section.  */
-	    s->value = shdr->sh_addr;
+	  s->value = shdr->sh_addr;
 	}
       else if (split_bss != NULL
 	       && s->value < split_bss->shdr.sh_addr
@@ -836,6 +852,18 @@ compare_symbols_output (const void *a, const void *b)
 
 #undef CMP
 
+/* Return true iff the flags, size, and name match.  */
+static bool
+sections_match (const struct section *sections, size_t i,
+		const GElf_Shdr *shdr, const char *name)
+{
+  return (sections[i].shdr.sh_flags == shdr->sh_flags
+	  && (sections[i].shdr.sh_size == shdr->sh_size
+	      || (sections[i].shdr.sh_size < shdr->sh_size
+		  && section_can_shrink (&sections[i].shdr)))
+	  && !strcmp (sections[i].name, name));
+}
+
 /* Locate a matching allocated section in SECTIONS.  */
 static struct section *
 find_alloc_section (const GElf_Shdr *shdr, GElf_Addr bias, const char *name,
@@ -858,11 +886,7 @@ find_alloc_section (const GElf_Shdr *shdr, GElf_Addr bias, const char *name,
 	    --i;
 	  for (; i < nalloc && sections[i].shdr.sh_addr == addr;
 	       ++i)
-	    if (sections[i].shdr.sh_flags == shdr->sh_flags
-		&& (sections[i].shdr.sh_size == shdr->sh_size
-		    || (sections[i].shdr.sh_size < shdr->sh_size
-			&& section_can_shrink (&sections[i].shdr)))
-		&& !strcmp (sections[i].name, name))
+	    if (sections_match (sections, i, shdr, name))
 	      return &sections[i];
 	  break;
 	}
@@ -1001,7 +1025,7 @@ find_alloc_sections_prelink (Elf *debug, Elf_Data *debug_shstrtab,
 	    }
 	}
       qsort (undo_sections, undo_nalloc,
-	     sizeof undo_sections[0], compare_sections);
+	     sizeof undo_sections[0], compare_sections_nonrel);
     }
 
   bool fail = false;
@@ -1221,7 +1245,9 @@ copy_elided_sections (Elf *unstripped, Elf *stripped,
   const struct section *stripped_symtab = NULL;
 
   /* Sort the sections, allocated by address and others after.  */
-  qsort (sections, stripped_shnum - 1, sizeof sections[0], compare_sections);
+  qsort (sections, stripped_shnum - 1, sizeof sections[0],
+	 stripped_ehdr->e_type == ET_REL
+	 ? compare_sections_rel : compare_sections_nonrel);
   size_t nalloc = stripped_shnum - 1;
   while (nalloc > 0 && !(sections[nalloc - 1].shdr.sh_flags & SHF_ALLOC))
     {
@@ -1260,6 +1286,7 @@ copy_elided_sections (Elf *unstripped, Elf *stripped,
   bool check_prelink = false;
   Elf_Scn *unstripped_symtab = NULL;
   size_t unstripped_strtab_ndx = SHN_UNDEF;
+  size_t alloc_avail = 0;
   scn = NULL;
   while ((scn = elf_nextscn (unstripped, scn)) != NULL)
     {
@@ -1280,35 +1307,58 @@ copy_elided_sections (Elf *unstripped, Elf *stripped,
 
       const char *name = get_section_name (ndx, shdr, shstrtab);
 
-      /* Look for the section that matches.  */
-      struct section *sec = ((shdr->sh_flags & SHF_ALLOC)
-			     ? find_alloc_section (shdr, bias, name,
-						   sections, nalloc)
-			     : find_unalloc_section (shdr, name));
-      if (sec == NULL)
+      struct section *sec = NULL;
+      if (shdr->sh_flags & SHF_ALLOC)
 	{
-	  if ((shdr->sh_flags & SHF_ALLOC) && stripped_ehdr->e_type != ET_REL)
+	  if (stripped_ehdr->e_type != ET_REL)
 	    {
-	      /* If we couldn't figure it out, it may be a prelink issue.  */
-	      check_prelink = true;
-	      continue;
+	      /* Look for the section that matches.  */
+	      sec = find_alloc_section (shdr, bias, name, sections, nalloc);
+	      if (sec == NULL)
+		{
+		  /* We couldn't figure it out.  It may be a prelink issue.  */
+		  check_prelink = true;
+		  continue;
+		}
 	    }
-
-	  /* An additional unallocated section is fine if not SHT_NOBITS.
-	     We looked it up anyway in case it's an unallocated section
-	     copied in both files (e.g. SHT_NOTE), so we don't keep both.  */
-	  if (shdr->sh_type != SHT_NOBITS && !(shdr->sh_flags & SHF_ALLOC))
-	    continue;
-
-	  /* Somehow some old .debug files wound up with SHT_NOBITS
-	     .comment sections, so let those pass.  */
-	  if (!(shdr->sh_flags & SHF_ALLOC) && !strcmp (name, ".comment"))
-	    continue;
-
-	  error (EXIT_FAILURE, 0,
-		 _("cannot find matching section for [%Zu] '%s'"),
-		 elf_ndxscn (scn), name);
+	  else
+	    {
+	      /* The sh_addr of allocated sections does not help us,
+		 but the order usually matches.  */
+	      if (likely (sections_match (sections, alloc_avail, shdr, name)))
+		sec = &sections[alloc_avail++];
+	      else
+		for (size_t i = alloc_avail + 1; i < nalloc; ++i)
+		  if (sections_match (sections, i, shdr, name))
+		    {
+		      sec = &sections[i];
+		      break;
+		    }
+	    }
 	}
+      else
+	{
+	  /* Look for the section that matches.  */
+	  sec = find_unalloc_section (shdr, name);
+	  if (sec == NULL)
+	    {
+	      /* An additional unallocated section is fine if not SHT_NOBITS.
+		 We looked it up anyway in case it's an unallocated section
+		 copied in both files (e.g. SHT_NOTE), and don't keep both.  */
+	      if (shdr->sh_type != SHT_NOBITS)
+		continue;
+
+	      /* Somehow some old .debug files wound up with SHT_NOBITS
+		 .comment sections, so let those pass.  */
+	      if (!strcmp (name, ".comment"))
+		continue;
+	    }
+	}
+
+      if (sec == NULL)
+	error (EXIT_FAILURE, 0,
+	       _("cannot find matching section for [%Zu] '%s'"),
+	       elf_ndxscn (scn), name);
 
       sec->outscn = scn;
     }
@@ -1374,6 +1424,7 @@ copy_elided_sections (Elf *unstripped, Elf *stripped,
 	    {
 	      /* This was created by stripping.  We don't want it.  */
 	      debuglink = secndx;
+	      ndx_section[secndx - 1] = SHN_UNDEF;
 	      continue;
 	    }
 
@@ -1418,7 +1469,16 @@ copy_elided_sections (Elf *unstripped, Elf *stripped,
 	GElf_Shdr *shdr = gelf_getshdr (sec->outscn, &shdr_mem);
 	ELF_CHECK (shdr != NULL, _("cannot get section header: %s"));
 
-	shdr_mem.sh_addr = sec->shdr.sh_addr;
+	/* In an ET_REL file under --relocate, the sh_addr of SHF_ALLOC
+	   sections will have been set nonzero by relocation.  This
+	   touched the shdrs of whichever file had the symtab.  sh_addr
+	   is still zero in the corresponding shdr.  The relocated
+	   address is what we want to use.  */
+	if (stripped_ehdr->e_type != ET_REL
+	    || !(shdr_mem.sh_flags & SHF_ALLOC)
+	    || shdr_mem.sh_addr == 0)
+	  shdr_mem.sh_addr = sec->shdr.sh_addr;
+
 	shdr_mem.sh_type = sec->shdr.sh_type;
 	shdr_mem.sh_size = sec->shdr.sh_size;
 	shdr_mem.sh_info = sec->shdr.sh_info;
@@ -1525,13 +1585,14 @@ copy_elided_sections (Elf *unstripped, Elf *stripped,
       size_t symndx_map[total_syms];
 
       if (stripped_symtab != NULL)
-	collect_symbols (unstripped, stripped_symtab->scn,
+	collect_symbols (unstripped, stripped_ehdr->e_type == ET_REL,
+			 stripped_symtab->scn,
 			 elf_getscn (stripped, stripped_symtab->shdr.sh_link),
 			 stripped_nsym, 0, ndx_section,
 			 symbols, symndx_map, NULL);
 
       Elf_Scn *unstripped_strtab = elf_getscn (unstripped, shdr->sh_link);
-      collect_symbols (unstripped,
+      collect_symbols (unstripped, stripped_ehdr->e_type == ET_REL,
 		       unstripped_symtab, unstripped_strtab, unstripped_nsym,
 		       stripped_ehdr->e_type == ET_REL ? 0 : bias, NULL,
 		       &symbols[stripped_nsym - 1],
@@ -1542,11 +1603,15 @@ copy_elided_sections (Elf *unstripped, Elf *stripped,
 
       /* Now we can weed out the duplicates.  Assign remaining symbols
 	 new slots, collecting a map from old indices to new.  */
-      size_t nsym = *symbols[0].map = 1;
-      for (size_t i = 1; i < total_syms; ++i)
-	*symbols[i].map = (!compare_symbols (&symbols[i - 1], &symbols[i])
-			   ? 0 /* This is a duplicate.  */
-			   : ++nsym); /* Allocate the next slot.  */
+      size_t nsym = 0;
+      for (struct symbol *s = symbols; s < &symbols[total_syms]; ++s)
+	/* Skip a section symbol for a removed section, or a duplicate.  */
+	*s->map = (((s->shndx == SHN_UNDEF
+		     && GELF_ST_TYPE (s->info.info) == STT_SECTION)
+		    || (s + 1 < &symbols[total_syms]
+			&& !compare_symbols (s, s + 1))) ? 0
+		   /* Allocate the next slot.  */
+		   : ++nsym);
 
       /* Now we sort again, to determine the order in the output.  */
       qsort (symbols, total_syms, sizeof symbols[0], compare_symbols_output);
@@ -1627,14 +1692,18 @@ copy_elided_sections (Elf *unstripped, Elf *stripped,
 			 &symndx_map[stripped_nsym - 1]);
     }
   else if (stripped_symtab != NULL && stripped_shnum != unstripped_shnum)
-    check_symtab_section_symbols (unstripped, stripped_symtab->scn,
+    check_symtab_section_symbols (unstripped,
+				  stripped_ehdr->e_type == ET_REL,
+				  stripped_symtab->scn,
 				  unstripped_shnum, unstripped_shstrndx,
 				  stripped_symtab->outscn,
 				  stripped_shnum, stripped_shstrndx,
 				  debuglink);
 
   if (stripped_dynsym != NULL)
-    (void) check_symtab_section_symbols (unstripped, stripped_dynsym->outscn,
+    (void) check_symtab_section_symbols (unstripped,
+					 stripped_ehdr->e_type == ET_REL,
+					 stripped_dynsym->outscn,
 					 unstripped_shnum,
 					 unstripped_shstrndx,
 					 stripped_dynsym->scn, stripped_shnum,
@@ -1861,7 +1930,7 @@ handle_explicit_files (const char *output_file, bool create_dirs,
 /* Handle a pair of files opened implicitly by libdwfl for one module.  */
 static void
 handle_dwfl_module (const char *output_file, bool create_dirs,
-		    Dwfl_Module *mod, bool all, bool ignore)
+		    Dwfl_Module *mod, bool all, bool ignore, bool relocate)
 {
   GElf_Addr bias;
   Elf *stripped = dwfl_module_getelf (mod, &bias);
@@ -1922,25 +1991,38 @@ handle_dwfl_module (const char *output_file, bool create_dirs,
 
   if (stripped_ehdr.e_type == ET_REL)
     {
-      /* We can't use the Elf handles already open,
-	 because the DWARF sections have been relocated.  */
+      if (!relocate)
+	{
+	  /* We can't use the Elf handles already open,
+	     because the DWARF sections have been relocated.  */
 
-      const char *stripped_file = NULL;
-      const char *unstripped_file = NULL;
-      (void) dwfl_module_info (mod, NULL, NULL, NULL, NULL, NULL,
-			       &stripped_file, &unstripped_file);
+	  const char *stripped_file = NULL;
+	  const char *unstripped_file = NULL;
+	  (void) dwfl_module_info (mod, NULL, NULL, NULL, NULL, NULL,
+				   &stripped_file, &unstripped_file);
 
-      handle_explicit_files (output_file, create_dirs,
-			     stripped_file, unstripped_file);
+	  handle_explicit_files (output_file, create_dirs,
+				 stripped_file, unstripped_file);
+	  return;
+	}
+
+      /* Relocation is what we want!  This ensures that all sections that can
+	 get sh_addr values assigned have them, even ones not used in DWARF.
+	 They might still be used in the symbol table.  */
+      if (dwfl_module_relocations (mod) < 0)
+	error (EXIT_FAILURE, 0,
+	       _("cannot cache section addresses for module '%s': %s"),
+	       dwfl_module_info (mod, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	       dwfl_errmsg (-1));
     }
-  else
-    handle_file (output_file, create_dirs, stripped, &stripped_ehdr, debug);
+
+  handle_file (output_file, create_dirs, stripped, &stripped_ehdr, debug);
 }
 
 /* Handle one module being written to the output directory.  */
 static void
 handle_output_dir_module (const char *output_dir, Dwfl_Module *mod,
-			  bool all, bool ignore, bool modnames)
+			  bool all, bool ignore, bool modnames, bool relocate)
 {
   if (! modnames)
     {
@@ -1960,7 +2042,7 @@ handle_output_dir_module (const char *output_dir, Dwfl_Module *mod,
   if (asprintf (&output_file, "%s/%s", output_dir, modnames ? name : file) < 0)
     error (EXIT_FAILURE, 0, _("memory exhausted"));
 
-  handle_dwfl_module (output_file, true, mod, all, ignore);
+  handle_dwfl_module (output_file, true, mod, all, ignore, relocate);
 }
 
 
@@ -2073,12 +2155,13 @@ handle_implicit_modules (const struct arg_info *info)
       if (next (offset) != 0)
 	error (EXIT_FAILURE, 0, _("matched more than one module"));
       handle_dwfl_module (info->output_file, false, mmi.found,
-			  info->all, info->ignore);
+			  info->all, info->ignore, info->relocate);
     }
   else
     do
       handle_output_dir_module (info->output_dir, mmi.found,
-				info->all, info->ignore, info->modnames);
+				info->all, info->ignore,
+				info->modnames, info->relocate);
     while ((offset = next (offset)) > 0);
 }
 

@@ -77,7 +77,7 @@
 
 /* Try to open the given file as it is or under the debuginfo directory.  */
 static int
-try_kernel_name (Dwfl *dwfl, char **fname)
+try_kernel_name (Dwfl *dwfl, char **fname, bool try_debug)
 {
   if (*fname == NULL)
     return -1;
@@ -97,7 +97,7 @@ try_kernel_name (Dwfl *dwfl, char **fname)
       fd = INTUSE(dwfl_standard_find_debuginfo) (&fakemod, NULL, NULL, 0,
 						 *fname, basename (*fname), 0,
 						 &debugfname);
-      if (fd < 0)
+      if (fd < 0 && try_debug)
 	/* Next, let the call use the default of basename + ".debug",
 	   to look for "vmlinux.debug" files.  */
 	fd = INTUSE(dwfl_standard_find_debuginfo) (&fakemod, NULL, NULL, 0,
@@ -128,21 +128,20 @@ find_kernel_elf (Dwfl *dwfl, const char *release, char **fname)
        : asprintf (fname, "/boot/vmlinux-%s", release)) < 0)
     return -1;
 
-  int fd = try_kernel_name (dwfl, fname);
+  int fd = try_kernel_name (dwfl, fname, true);
   if (fd < 0 && release[0] != '/')
     {
       free (*fname);
       if (asprintf (fname, MODULEDIRFMT "/vmlinux", release) < 0)
 	return -1;
-      fd = try_kernel_name (dwfl, fname);
+      fd = try_kernel_name (dwfl, fname, true);
     }
 
   return fd;
 }
 
 static int
-report_kernel (Dwfl *dwfl, const char **release,
-	       int (*predicate) (const char *module, const char *file))
+get_release (Dwfl *dwfl, const char **release)
 {
   if (dwfl == NULL)
     return -1;
@@ -157,10 +156,20 @@ report_kernel (Dwfl *dwfl, const char **release,
 	*release = release_string;
     }
 
-  char *fname;
-  int fd = find_kernel_elf (dwfl, release_string, &fname);
+  return 0;
+}
 
-  int result = 0;
+static int
+report_kernel (Dwfl *dwfl, const char **release,
+	       int (*predicate) (const char *module, const char *file))
+{
+  int result = get_release (dwfl, release);
+  if (unlikely (result != 0))
+    return result;
+
+  char *fname;
+  int fd = find_kernel_elf (dwfl, *release, &fname);
+
   if (fd < 0)
     result = ((predicate != NULL && !(*predicate) (KERNEL_MODNAME, NULL))
 	      ? 0 : errno ?: ENOENT);
@@ -197,6 +206,34 @@ report_kernel (Dwfl *dwfl, const char **release,
   return result;
 }
 
+/* Look for a kernel debug archive.  If we find one, report all its modules.
+   If not, return ENOENT.  */
+static int
+report_kernel_archive (Dwfl *dwfl, const char **release,
+		       int (*predicate) (const char *module, const char *file))
+{
+  int result = get_release (dwfl, release);
+  if (unlikely (result != 0))
+    return result;
+
+  char *archive;
+  if (unlikely ((*release)[0] == '/'
+		? asprintf (&archive, "%s/debug.a", *release)
+		: asprintf (&archive, MODULEDIRFMT "/debug.a", *release)) < 0)
+    return ENOMEM;
+
+  int fd = try_kernel_name (dwfl, &archive, false);
+  if (fd < 0)
+    result = errno ?: ENOENT;
+  else
+    /* We have the archive file open!  */
+    result = __libdwfl_report_offline (dwfl, NULL, archive, fd, true,
+				       predicate) == NULL ? -1 : 0;
+
+  free (archive);
+  return result;
+}
+
 /* Report a kernel and all its modules found on disk, for offline use.
    If RELEASE starts with '/', it names a directory to look in;
    if not, it names a directory to find under /lib/modules/;
@@ -208,8 +245,12 @@ dwfl_linux_kernel_report_offline (Dwfl *dwfl, const char *release,
 				  int (*predicate) (const char *module,
 						    const char *file))
 {
+  int result = report_kernel_archive (dwfl, &release, predicate);
+  if (result != ENOENT)
+    return result;
+
   /* First report the kernel.  */
-  int result = report_kernel (dwfl, &release, predicate);
+  result = report_kernel (dwfl, &release, predicate);
   if (result == 0)
     {
       /* Do "find /lib/modules/RELEASE -name *.ko".  */

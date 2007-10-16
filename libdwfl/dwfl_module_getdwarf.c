@@ -205,7 +205,9 @@ find_debuginfo (Dwfl_Module *mod)
 }
 
 
-/* Try to find a symbol table in FILE.  */
+/* Try to find a symbol table in FILE.
+   Returns DWFL_E_NOERROR if a proper one is found.
+   Returns DWFL_E_NO_SYMTAB if not, but still sets results for SHT_DYNSYM.  */
 static Dwfl_Error
 load_symtab (struct dwfl_file *file, struct dwfl_file **symfile,
 	     Elf_Scn **symscn, Elf_Scn **xndxscn,
@@ -223,7 +225,7 @@ load_symtab (struct dwfl_file *file, struct dwfl_file **symfile,
 	    *symfile = file;
 	    *strshndx = shdr->sh_link;
 	    *syments = shdr->sh_size / shdr->sh_entsize;
-	    if (*symscn != NULL && *xndxscn != NULL)
+	    if (*xndxscn != NULL)
 	      return DWFL_E_NOERROR;
 	    break;
 
@@ -237,12 +239,22 @@ load_symtab (struct dwfl_file *file, struct dwfl_file **symfile,
 
 	  case SHT_SYMTAB_SHNDX:
 	    *xndxscn = scn;
+	    if (*symscn != NULL)
+	      return DWFL_E_NOERROR;
 	    break;
 
 	  default:
 	    break;
 	  }
     }
+
+  if (*symscn != NULL)
+    /* We found one, though no SHT_SYMTAB_SHNDX to go with it.  */
+    return DWFL_E_NOERROR;
+
+  /* We found no SHT_SYMTAB, so any SHT_SYMTAB_SHNDX was bogus.
+     We might have found an SHT_DYNSYM and set *SYMSCN et al though.  */
+  *xndxscn = NULL;
   return DWFL_E_NO_SYMTAB;
 }
 

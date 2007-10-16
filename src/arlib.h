@@ -35,8 +35,9 @@
 #include <sys/types.h>
 
 
-/* Maximum length of a file name that fits directly into the ar header.  */
-#define MAX_AR_NAME_LEN (sizeof (((struct ar_hdr *) NULL)->ar_name))
+/* Maximum length of a file name that fits directly into the ar header.
+   We cannot use the final byte since a / goes there.  */
+#define MAX_AR_NAME_LEN (sizeof (((struct ar_hdr *) NULL)->ar_name) - 1)
 
 
 /* Words matching in size to archive header.  */

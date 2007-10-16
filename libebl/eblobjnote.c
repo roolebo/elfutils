@@ -81,48 +81,60 @@ ebl_object_note (ebl, name, type, descsz, desc)
 	  }
 	break;
 
-      case NT_VERSION:
-	if (strcmp (name, "GNU") == 0 && descsz >= 8)
+      case NT_GNU_ABI_TAG:
+	if (strcmp (name, "GNU") == 0 && descsz >= 8 && descsz % 4 == 0)
 	  {
-	    struct
-	    {
-	      uint32_t os;
-	      uint32_t version[descsz / 4 - 1];
-	    } *tag = (__typeof (tag)) desc;
-
-	    const char *os;
-	    switch (tag->os)
+	    Elf_Data in =
 	      {
-	      case ELF_NOTE_OS_LINUX:
-		os = "Linux";
-		break;
-
-	      case ELF_NOTE_OS_GNU:
-		os = "GNU";
-		break;
-
-	      case ELF_NOTE_OS_SOLARIS2:
-		os = "Solaris";
-		break;
-
-	      case ELF_NOTE_OS_FREEBSD:
-		os = "FreeBSD";
-		break;
-
-	      default:
-		os = "???";
-		break;
-	      }
-
-	    printf (gettext ("    OS: %s, ABI: "), os);
-	    size_t cnt;
-	    for (cnt = 0; cnt < descsz / 4 - 1; ++cnt)
+		.d_version = EV_CURRENT,
+		.d_type = ELF_T_WORD,
+		.d_size = descsz,
+		.d_buf = (void *) desc
+	      };
+	    uint32_t buf[descsz / 4];
+	    Elf_Data out =
 	      {
-		if (cnt != 0)
-		  putchar_unlocked ('.');
-		printf ("%" PRIu32, tag->version[cnt]);
+		.d_version = EV_CURRENT,
+		.d_type = ELF_T_WORD,
+		.d_size = descsz,
+		.d_buf = buf
+	      };
+
+	    if (elf32_xlatetom (&out, &in, ebl->data) != NULL)
+	      {
+		const char *os;
+		switch (buf[0])
+		  {
+		  case ELF_NOTE_OS_LINUX:
+		    os = "Linux";
+		    break;
+
+		  case ELF_NOTE_OS_GNU:
+		    os = "GNU";
+		    break;
+
+		  case ELF_NOTE_OS_SOLARIS2:
+		    os = "Solaris";
+		    break;
+
+		  case ELF_NOTE_OS_FREEBSD:
+		    os = "FreeBSD";
+		    break;
+
+		  default:
+		    os = "???";
+		    break;
+		  }
+
+		printf (gettext ("    OS: %s, ABI: "), os);
+		for (size_t cnt = 1; cnt < descsz / 4; ++cnt)
+		  {
+		    if (cnt > 1)
+		      putchar_unlocked ('.');
+		    printf ("%" PRIu32, buf[cnt]);
+		  }
+		putchar_unlocked ('\n');
 	      }
-	    putchar_unlocked ('\n');
 	    break;
 	  }
 	/* FALLTHROUGH */

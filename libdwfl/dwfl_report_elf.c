@@ -1,5 +1,5 @@
 /* Report a module to libdwfl based on ELF program headers.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -51,33 +51,16 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-
 Dwfl_Module *
-dwfl_report_elf (Dwfl *dwfl, const char *name,
-		 const char *file_name, int fd, GElf_Addr base)
+internal_function
+__libdwfl_report_elf (Dwfl *dwfl, const char *name, const char *file_name,
+		      int fd, Elf *elf, GElf_Addr base)
 {
-  bool closefd = false;
-
-  if (fd < 0)
-    {
-      fd = open64 (file_name, O_RDONLY);
-      if (fd < 0)
-	{
-	  __libdwfl_seterrno (DWFL_E_ERRNO);
-	  return NULL;
-	}
-      closefd = true;
-    }
-
-  Elf *elf = elf_begin (fd, ELF_C_READ_MMAP_PRIVATE, NULL);
-
   GElf_Ehdr ehdr_mem, *ehdr = gelf_getehdr (elf, &ehdr_mem);
   if (ehdr == NULL)
     {
     elf_error:
       __libdwfl_seterrno (DWFL_E_LIBELF);
-      if (closefd)
-	close (fd);
       return NULL;
     }
 
@@ -102,23 +85,39 @@ dwfl_report_elf (Dwfl *dwfl, const char *name,
 	  if (shdr->sh_flags & SHF_ALLOC)
 	    {
 	      const GElf_Xword align = shdr->sh_addralign ?: 1;
-	      shdr->sh_addr = (end + align - 1) & -align;
-	      if (end == base)
-		/* This is the first section assigned a location.
-		   Use its aligned address as the module's base.  */
-		start = shdr->sh_addr;
-	      end = shdr->sh_addr + shdr->sh_size;
-	      if (! gelf_update_shdr (scn, shdr))
-		goto elf_error;
+	      if (shdr->sh_addr == 0 || (bias == 0 && end > start))
+		{
+		  shdr->sh_addr = (end + align - 1) & -align;
+		  if (end == base)
+		    /* This is the first section assigned a location.
+		       Use its aligned address as the module's base.  */
+		    start = shdr->sh_addr;
+		  end = shdr->sh_addr + shdr->sh_size;
+		  if (shdr->sh_addr == 0)
+		    /* This is a marker that this was resolved to zero,
+		       to prevent a callback.  */
+		    shdr->sh_offset = 0;
+		  if (! gelf_update_shdr (scn, shdr))
+		    goto elf_error;
+		}
+	      else
+		{
+		  if (bias == 0 || end < shdr->sh_addr + shdr->sh_size)
+		    end = shdr->sh_addr + shdr->sh_size;
+		  if (bias == 0 || bias > shdr->sh_addr)
+		    bias = shdr->sh_addr;
+		}
 	    }
 	}
 
-      if (end == start)
+      if (bias != 0)
 	{
-	  __libdwfl_seterrno (DWFL_E_BADELF);
-	  if (closefd)
-	    close (fd);
-	  return NULL;
+	  /* The section headers had nonzero sh_addr values.  The layout
+	     was already done.  We've just collected the total span.
+	     Now just compute the bias from the requested base.  */
+	  start = base;
+	  end = end - bias + start;
+	  bias -= start;
 	}
       break;
 
@@ -161,8 +160,6 @@ dwfl_report_elf (Dwfl *dwfl, const char *name,
       if (end == 0)
 	{
 	  __libdwfl_seterrno (DWFL_E_NO_PHDR);
-	  if (closefd)
-	    close (fd);
 	  return NULL;
 	}
       break;
@@ -181,8 +178,6 @@ dwfl_report_elf (Dwfl *dwfl, const char *name,
 	{
 	  elf_end (elf);
 	overlap:
-	  if (closefd)
-	    close (fd);
 	  m->gc = true;
 	  __libdwfl_seterrno (DWFL_E_OVERLAP);
 	  m = NULL;
@@ -203,5 +198,34 @@ dwfl_report_elf (Dwfl *dwfl, const char *name,
 	}
     }
   return m;
+}
+
+Dwfl_Module *
+dwfl_report_elf (Dwfl *dwfl, const char *name,
+		 const char *file_name, int fd, GElf_Addr base)
+{
+  bool closefd = false;
+  if (fd < 0)
+    {
+      closefd = true;
+      fd = open64 (file_name, O_RDONLY);
+      if (fd < 0)
+	{
+	  __libdwfl_seterrno (DWFL_E_ERRNO);
+	  return NULL;
+	}
+    }
+
+  Elf *elf = elf_begin (fd, ELF_C_READ_MMAP_PRIVATE, NULL);
+  Dwfl_Module *mod = __libdwfl_report_elf (dwfl, name, file_name,
+					   fd, elf, base);
+  if (mod == NULL)
+    {
+      elf_end (elf);
+      if (closefd)
+	close (fd);
+    }
+
+  return mod;
 }
 INTDEF (dwfl_report_elf)

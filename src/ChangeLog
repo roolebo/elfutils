@@ -1,3 +1,114 @@
+2007-10-15  Roland McGrath  <roland@redhat.com>
+
+	* make-debug-archive.in: New file.
+	* Makefile.am (EXTRA_DIST): Add it.
+	(make-debug-archive): New target.
+	(bin_SCRIPTS, CLEANFILES): Add it.
+
+2007-10-10  Roland McGrath  <roland@redhat.com>
+
+	* elflint.c (special_sections): Add new attrflag value exact_or_gnuld.
+	Use it to check MERGE|STRINGS for .debug_str.
+	(check_sections): Handle exact_or_gnuld.
+
+2007-10-08  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (handle_core_item): Handle 'T'|0x80 to indicate
+	64-bit struct timeval with 32-bit tv_usec.
+
+2007-10-07  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (check_archive_index): New function.
+	(process_file): Call it.  Change signature to take only fd and name.
+	Use libdwfl to open the file, then iterate on its modules (multiple
+	for an archive) to print file name and call process_elf_file.
+	(main): Update caller.  Let process_file do elf_begin.
+	(count_dwflmod, process_dwflmod, find_no_debuginfo): New functions.
+	(process_elf_file): Take only Dwfl_Module * argument.
+	Don't print the file name here.
+	(print_debug_*_section): Take Dwfl_Module * argument.
+	(print_debug): Likewise.  Update caller.
+	(format_dwarf_addr): New function.
+	(print_debug_ranges_section): Use it.
+	(attr_callback): Likewise.
+	(print_debug_line_section, print_debug_loc_section): Likewise.
+
+	* readelf.c (print_debug_ranges_section): Translate all strings.
+	(print_debug_loc_section): Likewise.
+
+	* unstrip.c (copy_elided_sections): Initialize SEC.
+
+	* ar.c (do_oper_insert): Put trailing / on short names.
+
+	* arlib.h (MAX_AR_NAME_LEN): Decrease by one.
+
+	* arlib2.c (arlib_add_long_name): Adjust for header size.
+
+	* arlib.c (arlib_finalize): Pad long name table to keep size even.
+
+	* ar.c (do_oper_insert): Use write_retry for padding write.
+
+	* ar.c (do_oper_insert): Initialize CUR_OFF in no_old case.
+	Unconditionally set FOUND[CNT]->elf when setting ->mem.
+	(remember_long_name): New function.
+	(do_oper_insert): Call it.  Correctly use length of basename,
+	not original name.  Don't store long name twice for new member.
+
+2007-10-06  Roland McGrath  <roland@redhat.com>
+
+	* elflint.c (check_note): Skip empty segment.
+	(check_note_section): Skip empty section.
+
+	* unstrip.c (options, parse_opt, struct arg_info): Grok -R/--relocate.
+	(handle_output_dir_module, handle_implicit_modules): Pass it down.
+	(handle_dwfl_module): When set, use ET_REL already loaded by Dwfl.
+	(compare_alloc_sections): Take new arg REL, ignore address if true.
+	(compare_sections): Likewise, pass it down.
+	(compare_sections_rel, compare_sections_nonrel): New functions.
+	(find_alloc_sections_prelink, copy_elided_sections): Use them
+	instead of compare_sections.
+	(sections_match): New function, broken out of ...
+	(find_alloc_section): ... here.
+	(copy_elided_sections): Reorganize section match-up logic.
+	Use sections_match for SHF_ALLOC in ET_REL.
+	For ET_REL, let the nonzero sh_addr from the debug file dominate.
+
+	* unstrip.c (add_new_section_symbols): Take new arg REL.
+	When true, do not update section symbol values.
+	(collect_symbols): Likewise.  Update section symbols with address
+	of chosen output section, not original section.
+	(check_symtab_section_symbols, copy_elided_sections): Update callers.
+
+	* unstrip.c (compare_alloc_sections): At the same address, preserve
+	original section order.
+
+	* elflint.c (special_sections): Don't require MERGE|STRINGS for
+	.debug_str, it didn't always have them with older tools.
+
+	* elflint.c (check_symtab, check_one_reloc): Ignore sh_addr in ET_REL.
+
+2007-10-05  Roland McGrath  <roland@redhat.com>
+
+	* elflint.c (check_symtab): Allow SHN_UNDEF _GLOBAL_OFFSET_TABLE_ in
+	ET_REL file.
+
+	* elflint.c (check_symtab): For _GLOBAL_OFFSET_TABLE_, diagnose
+	SHN_UNDEF as "bad section".  Use shndx value in messages.
+
+	* elflint.c (special_sections): Add ".debug_str".  Decrement namelen
+	for ".debug" so it matches as a prefix.
+	(IS_KNOWN_SPECIAL): New macro.
+	(check_sections): Use it for ".plt" match.  Cite wrong SHT_NOBITS
+	type even under -d, for a .debug* or .shstrtab section.
+
+	* readelf.c (print_ops): Use hex for address operand.
+
+2007-10-04  Roland McGrath  <roland@redhat.com>
+
+	* unstrip.c (copy_elided_sections): Initialize NDX_SECTION element for
+	.gnu_debuglink section to SHN_UNDEF.  Drop STT_SECTION symbols for
+	sections mapped to SHN_UNDEF.
+
 2007-10-04  Ulrich Drepper  <drepper@redhat.com>
 
 	* readelf.c (dump_archive_index): Avoid warning about uninitialized

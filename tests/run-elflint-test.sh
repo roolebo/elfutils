@@ -38,4 +38,7 @@ testrun ../src/elflint -q testfile32
 testfiles testfile33
 testrun ../src/elflint -q testfile33
 
+testfiles testfile42
+testrun ../src/elflint -q --gnu-ld testfile42
+
 exit 0

@@ -97,6 +97,11 @@ check_section (Dwarf *result, GElf_Ehdr *ehdr, Elf_Scn *scn, bool inscngrp)
        wrong in the libelf library.  */
     abort ();
 
+  /* Ignore any SHT_NOBITS sections.  Debugging sections should not
+     have been stripped, but in case of a corrupt file we won't try
+     to look at the missing data.  */
+  if (unlikely (shdr->sh_type == SHT_NOBITS))
+    return result;
 
   /* Make sure the section is part of a section group only iff we
      really need it.  If we are looking for the global (= non-section

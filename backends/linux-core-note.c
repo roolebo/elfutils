@@ -53,6 +53,15 @@ struct EBLHOOK(timeval)
   FIELD (ULONG, tv_usec);
 };
 
+/* On sparc64, tv_usec (suseconds_t) is actually 32 bits with 32 bits padding.
+   The 'T'|0x80 value for .format indicates this as a special kludge.  */
+#if SUSECONDS_HALF
+# define TIMEVAL_FIELD(name)	FIELD (time, ULONG, name, 'T'|0x80, .count = 2)
+#else
+# define TIMEVAL_FIELD(name)	FIELD (time, ULONG, name, 'T', .count = 2)
+#endif
+
+
 struct EBLHOOK(prstatus)
 {
   struct EBLHOOK(siginfo) pr_info;
@@ -115,10 +124,10 @@ static const Ebl_Core_Item prstatus_items[] =
     FIELD (identity, PID_T, ppid, 'd'),
     FIELD (identity, PID_T, pgrp, 'd'),
     FIELD (identity, PID_T, sid, 'd'),
-    FIELD (time, ULONG, utime, 'T', .count = 2),
-    FIELD (time, ULONG, stime, 'T', .count = 2),
-    FIELD (time, ULONG, cutime, 'T', .count = 2),
-    FIELD (time, ULONG, cstime, 'T', .count = 2),
+    TIMEVAL_FIELD (utime),
+    TIMEVAL_FIELD (stime),
+    TIMEVAL_FIELD (cutime),
+    TIMEVAL_FIELD (cstime),
 #ifdef PRSTATUS_REGSET_ITEMS
     PRSTATUS_REGSET_ITEMS,
 #endif

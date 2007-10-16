@@ -812,7 +812,14 @@ __libelf_next_arhdr (elf)
       if (endp != NULL)
 	endp[-1] = '\0';
       else
-	elf->state.ar.raw_name[16] = '\0';
+	{
+	  /* In the old BSD style of archive, there is no / terminator.
+	     Instead, there is space padding at the end of the name.  */
+	  size_t i = 15;
+	  do
+	    elf->state.ar.ar_name[i] = '\0';
+	  while (i > 0 && elf->state.ar.ar_name[--i] == ' ');
+	}
 
       elf_ar_hdr->ar_name = elf->state.ar.ar_name;
     }

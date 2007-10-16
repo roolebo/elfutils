@@ -118,6 +118,13 @@ arlib_finalize (void)
   symtab.longnameslen = obstack_object_size (&symtab.longnamesob);
   if (symtab.longnameslen != sizeof (struct ar_hdr))
     {
+      if ((symtab.longnameslen & 1) != 0)
+	{
+	  /* Add one more byte to make length even.  */
+	  obstack_grow (&symtab.longnamesob, "\n", 1);
+	  ++symtab.longnameslen;
+	}
+
       symtab.longnames = obstack_finish (&symtab.longnamesob);
 
       memcpy (&((struct ar_hdr *) symtab.longnames)->ar_size, tmpbuf,

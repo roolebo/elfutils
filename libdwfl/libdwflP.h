@@ -237,8 +237,8 @@ extern Dwfl_Error __libdwfl_relocate (Dwfl_Module *mod, Elf *debugfile)
 /* Adjust *VALUE from section-relative to absolute.
    MOD->dwfl->callbacks->section_address is called to determine the actual
    address of a loaded section.  */
-extern Dwfl_Error __libdwfl_relocate_value (Dwfl_Module *mod,
-					    size_t m_shstrndx,
+extern Dwfl_Error __libdwfl_relocate_value (Dwfl_Module *mod, Elf *elf,
+					    size_t *shstrndx_cache,
 					    Elf32_Word shndx,
 					    GElf_Addr *value)
      internal_function;
@@ -276,6 +276,21 @@ extern uint32_t __libdwfl_crc32 (uint32_t crc, unsigned char *buf, size_t len)
   attribute_hidden;
 extern int __libdwfl_crc32_file (int fd, uint32_t *resp) attribute_hidden;
 
+
+/* Meat of dwfl_report_elf, given elf_begin just called.
+   Consumes ELF on success, not on failure.  */
+extern Dwfl_Module *__libdwfl_report_elf (Dwfl *dwfl, const char *name,
+					  const char *file_name, int fd,
+					  Elf *elf, GElf_Addr base)
+  internal_function;
+
+/* Meat of dwfl_report_offline.  */
+extern Dwfl_Module *__libdwfl_report_offline (Dwfl *dwfl, const char *name,
+					      const char *file_name,
+					      int fd, bool closefd,
+					      int (*predicate) (const char *,
+								const char *))
+  internal_function;
 
 
 /* Avoid PLT entries.  */

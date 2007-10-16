@@ -188,8 +188,8 @@ print_module (Dwfl_Module *mod __attribute__ ((unused)),
 	      Dwarf *dw, Dwarf_Addr bias,
 	      void *arg)
 {
-  printf ("module: %30s %08" PRIx64 " %12p %" PRIx64 " (%s)\n",
-	  name, base, dw, bias, dwfl_errmsg (-1));
+  printf ("module: %30s %08" PRIx64 " %s %" PRIx64 " (%s)\n",
+	  name, base, dw == NULL ? "no" : "DWARF", bias, dwfl_errmsg (-1));
 
   if (dw != NULL && *(const bool *) arg)
     {

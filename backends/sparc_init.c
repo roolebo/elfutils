@@ -1,5 +1,5 @@
 /* Initialization of SPARC specific backend library.
-   Copyright (C) 2002, 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2002, 2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -34,6 +34,7 @@
 /* This defines the common reloc hooks based on sparc_reloc.def.  */
 #include "common-reloc.c"
 
+extern __typeof (EBLHOOK (core_note)) sparc64_core_note attribute_hidden;
 
 const char *
 sparc_init (elf, machine, eh, ehlen)
@@ -55,7 +56,12 @@ sparc_init (elf, machine, eh, ehlen)
     eh->name = "SPARC";
   sparc_init_reloc (eh);
   HOOK (eh, reloc_simple_type);
-  //HOOK (eh, core_note);
+  HOOK (eh, machine_flag_check);
+  if (eh->class == ELFCLASS64)
+    eh->core_note = sparc64_core_note;
+  else
+    HOOK (eh, core_note);
+  HOOK (eh, auxv_info);
   HOOK (eh, register_info);
   HOOK (eh, return_value_location);
 

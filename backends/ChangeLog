@@ -1,3 +1,21 @@
+2007-10-09  Roland McGrath  <roland@redhat.com>
+
+	* sparc_auxv.c: New file.
+	* Makefile.am (sparc_SRCS): Add it.
+	* sparc_init.c (sparc_init): Initialize auxv_info hook.
+
+2007-10-08  Roland McGrath  <roland@redhat.com>
+
+	* linux-core-note.c (TIMEVAL_FIELD): New macro.
+	(prstatus_items): Use it.
+	* sparc_corenote.c: New file.
+	* sparc64_corenote.c: New file.
+	* Makefile.am (sparc_SRCS): Add them.
+	* sparc_init.c (sparc_init): Initialize core_note hook.
+
+	* sparc_symbol.c (sparc_machine_flag_check): New function.
+	* sparc_init.c (sparc_init): Use it.
+
 2007-09-27  Roland McGrath  <roland@redhat.com>
 
 	* alpha_retval.c: Use dwarf_attr_integrate and dwarf_hasattr_integrate.

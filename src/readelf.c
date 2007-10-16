@@ -39,6 +39,7 @@
 #include <inttypes.h>
 #include <langinfo.h>
 #include <libdw.h>
+#include <libdwfl.h>
 #include <libintl.h>
 #include <locale.h>
 #include <stdarg.h>
@@ -198,11 +199,8 @@ static size_t shnum;
 
 
 /* Declarations of local functions.  */
-static void process_file (int fd, Elf *elf, const char *prefix,
-			  const char *fname, bool only_one,
-			  bool will_print_archive_index);
-static void process_elf_file (Elf *elf, const char *prefix, const char *fname,
-			      bool only_one);
+static void process_file (int fd, const char *fname, bool only_one);
+static void process_elf_file (Dwfl_Module *dwflmod);
 static void print_ehdr (Ebl *ebl, GElf_Ehdr *ehdr);
 static void print_shdr (Ebl *ebl, GElf_Ehdr *ehdr);
 static void print_phdr (Ebl *ebl, GElf_Ehdr *ehdr);
@@ -218,7 +216,7 @@ static void handle_verneed (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr);
 static void handle_verdef (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr);
 static void handle_versym (Ebl *ebl, Elf_Scn *scn,
 			   GElf_Shdr *shdr);
-static void print_debug (Ebl *ebl, GElf_Ehdr *ehdr);
+static void print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr);
 static void handle_hash (Ebl *ebl);
 static void handle_notes (Ebl *ebl, GElf_Ehdr *ehdr);
 static void print_liblist (Ebl *ebl);
@@ -256,21 +254,7 @@ main (int argc, char *argv[])
 	  continue;
 	}
 
-      /* Create an `Elf' descriptor.  */
-      Elf *elf = elf_begin (fd, ELF_C_READ_MMAP, NULL);
-      if (elf == NULL)
-	error (0, 0, gettext ("cannot generate Elf descriptor: %s\n"),
-	       elf_errmsg (-1));
-      else
-	{
-	  process_file (fd, elf, NULL, argv[remaining], only_one,
-			print_archive_index);
-
-	  /* Now we can close the descriptor.  */
-	  if (elf_end (elf) != 0)
-	    error (0, 0, gettext ("error while closing Elf descriptor: %s"),
-		   elf_errmsg (-1));
-	}
+      process_file (fd, argv[remaining], only_one);
 
       close (fd);
     }
@@ -435,102 +419,137 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 }
 
 
-/* Process one file.  */
+/* Check if the file is an archive, and if so dump its index.  */
 static void
-process_file (int fd, Elf *elf, const char *prefix, const char *fname,
-	      bool only_one, bool will_print_archive_index)
+check_archive_index (int fd, const char *fname, bool only_one)
 {
-  /* We can handle two types of files: ELF files and archives.  */
-  Elf_Kind kind = elf_kind (elf);
-  struct stat64 st;
-
-  switch (kind)
+  /* Create an `Elf' descriptor.  */
+  Elf *elf = elf_begin (fd, ELF_C_READ_MMAP, NULL);
+  if (elf == NULL)
+    error (0, 0, gettext ("cannot generate Elf descriptor: %s"),
+	   elf_errmsg (-1));
+  else
     {
-    case ELF_K_ELF:
-      if (unlikely (will_print_archive_index))
+      if (elf_kind (elf) == ELF_K_AR)
+	{
+	  if (!only_one)
+	    printf ("\n%s:\n\n", fname);
+	  dump_archive_index (elf, fname);
+	}
+      else
 	error (0, 0,
 	       gettext ("'%s' is not an archive, cannot print archive index"),
 	       fname);
-      /* Yes!  It's an ELF file.  */
-      if (any_control_option)
-	process_elf_file (elf, prefix, fname, only_one);
-      break;
 
-    case ELF_K_AR:
-      {
-	size_t prefix_len = prefix == NULL ? 0 : strlen (prefix);
-	size_t fname_len = strlen (fname) + 1;
-	char new_prefix[prefix_len + 1 + fname_len];
-	char *cp = new_prefix;
+      /* Now we can close the descriptor.  */
+      if (elf_end (elf) != 0)
+	error (0, 0, gettext ("error while closing Elf descriptor: %s"),
+	       elf_errmsg (-1));
+    }
+}
 
-	/* Create the full name of the file.  */
-	if (prefix != NULL)
-	  {
-	    cp = mempcpy (cp, prefix, prefix_len);
-	    *cp++ = ':';
-	  }
-	memcpy (cp, fname, fname_len);
+/* Trivial callback used for checking if we opened an archive.  */
+static int
+count_dwflmod (Dwfl_Module *dwflmod __attribute__ ((unused)),
+	       void **userdata __attribute__ ((unused)),
+	       const char *name __attribute__ ((unused)),
+	       Dwarf_Addr base __attribute__ ((unused)),
+	       void *arg)
+{
+  *(bool *) arg = false;
+  return DWARF_CB_ABORT;
+}
 
-	if (will_print_archive_index)
-	  dump_archive_index (elf, new_prefix);
+static int
+process_dwflmod (Dwfl_Module *dwflmod,
+		 void **userdata __attribute__ ((unused)),
+		 const char *name __attribute__ ((unused)),
+		 Dwarf_Addr base __attribute__ ((unused)),
+		 void *arg)
+{
+  bool only_one = *(bool *) arg;
 
-	/* It's an archive.  We process each file in it.  */
-	Elf *subelf;
-	Elf_Cmd cmd = ELF_C_READ_MMAP;
-	while ((subelf = elf_begin (fd, cmd, elf)) != NULL)
-	  {
-	    kind = elf_kind (subelf);
+  /* Print the file name.  */
+  if (!only_one)
+    {
+      const char *fname;
+      dwfl_module_info (dwflmod, NULL, NULL, NULL, NULL, NULL, &fname, NULL);
 
-	    /* Call this function recursively.  */
-	    if (kind == ELF_K_ELF || kind == ELF_K_AR)
-	      {
-		Elf_Arhdr *arhdr = elf_getarhdr (subelf);
-		assert (arhdr != NULL);
+      printf ("\n%s:\n\n", fname);
+    }
 
-		process_file (fd, subelf, new_prefix, arhdr->ar_name, false,
-			      kind == ELF_K_AR && will_print_archive_index);
-	      }
+  process_elf_file (dwflmod);
 
-	    /* Get next archive element.  */
-	    cmd = elf_next (subelf);
-	    if (elf_end (subelf) != 0)
-	      error (0, 0,
-		     gettext (" error while freeing sub-ELF descriptor: %s\n"),
-		     elf_errmsg (-1));
-	  }
-      }
-      break;
+  return DWARF_CB_OK;
+}
 
-    default:
+/* Stub libdwfl callback, only the ELF handle already open is ever used.  */
+static int
+find_no_debuginfo (Dwfl_Module *mod __attribute__ ((unused)),
+		   void **userdata __attribute__ ((unused)),
+		   const char *modname __attribute__ ((unused)),
+		   Dwarf_Addr base __attribute__ ((unused)),
+		   const char *file_name __attribute__ ((unused)),
+		   const char *debuglink_file __attribute__ ((unused)),
+		   GElf_Word debuglink_crc __attribute__ ((unused)),
+		   char **debuginfo_file_name __attribute__ ((unused)))
+{
+  return -1;
+}
+
+/* Process one input file.  */
+static void
+process_file (int fd, const char *fname, bool only_one)
+{
+  if (print_archive_index)
+    check_archive_index (fd, fname, only_one);
+
+  if (!any_control_option)
+    return;
+
+  /* Use libdwfl in a trivial way to open the libdw handle for us.
+     This takes care of applying relocations to DWARF data in ET_REL files.  */
+  static const Dwfl_Callbacks callbacks =
+    {
+      .section_address = dwfl_offline_section_address,
+      .find_debuginfo = find_no_debuginfo
+    };
+  Dwfl *dwfl = dwfl_begin (&callbacks);
+  if (dwfl_report_offline (dwfl, fname, fname, fd) == NULL)
+    {
+      struct stat64 st;
       if (fstat64 (fd, &st) != 0)
 	error (0, errno, gettext ("cannot stat input file"));
       else if (st.st_size == 0)
 	error (0, 0, gettext ("input file is empty"));
       else
-	/* We cannot do anything.  */
-	error (0, 0, gettext ("\
-Not an ELF file - it has the wrong magic bytes at the start"));
-      break;
+	error (0, 0, gettext ("failed reading '%s': %s"),
+	       fname, dwfl_errmsg (-1));
     }
+  else
+    {
+      dwfl_report_end (dwfl, NULL, NULL);
+
+      if (only_one)
+	/* Clear ONLY_ONE if we have multiple modules, from an archive.  */
+	dwfl_getmodules (dwfl, &count_dwflmod, &only_one, 1);
+
+      /* Process the one or more modules gleaned from this file.  */
+      dwfl_getmodules (dwfl, &process_dwflmod, &only_one, 0);
+    }
+  dwfl_end (dwfl);
 }
 
 
-/* Process one file.  */
+/* Process one ELF file.  */
 static void
-process_elf_file (Elf *elf, const char *prefix, const char *fname,
-		  bool only_one)
+process_elf_file (Dwfl_Module *dwflmod)
 {
+  GElf_Addr dwflbias;
+  Elf *elf = dwfl_module_getelf (dwflmod, &dwflbias);
+
   GElf_Ehdr ehdr_mem;
   GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);
-
-  /* Print the file name.  */
-  if (!only_one)
-    {
-      if (prefix != NULL)
-	printf ("\n%s(%s):\n\n", prefix, fname);
-      else
-	printf ("\n%s:\n\n", fname);
-    }
 
   if (ehdr == NULL)
     {
@@ -578,7 +597,7 @@ process_elf_file (Elf *elf, const char *prefix, const char *fname,
   if (string_sections != NULL)
     dump_strings (ebl);
   if (print_debug_sections != 0)
-    print_debug (ebl, ehdr);
+    print_debug (dwflmod, ebl, ehdr);
   if (print_notes)
     handle_notes (ebl, ehdr);
   if (print_string_sections)
@@ -2721,6 +2740,79 @@ print_liblist (Ebl *ebl)
 }
 
 
+static char *
+format_dwarf_addr (Dwfl_Module *dwflmod,
+		   int address_size, Dwarf_Addr address)
+{
+  /* See if there is a name we can give for this address.  */
+  GElf_Sym sym;
+  const char *name = dwfl_module_addrsym (dwflmod, address, &sym, NULL);
+  if (name != NULL)
+    sym.st_value = address - sym.st_value;
+
+  /* Relativize the address.  */
+  int n = dwfl_module_relocations (dwflmod);
+  int i = n < 1 ? -1 : dwfl_module_relocate_address (dwflmod, &address);
+
+  /* In an ET_REL file there is a section name to refer to.  */
+  const char *scn = (i < 0 ? NULL
+		     : dwfl_module_relocation_info (dwflmod, i, NULL));
+
+  char *result;
+  if ((name != NULL
+       ? (sym.st_value != 0
+	  ? (scn != NULL
+	     ? (address_size == 0
+		? asprintf (&result,
+			    gettext ("%s+%#" PRIx64 " <%s+%#" PRIx64 ">"),
+			    scn, address, name, sym.st_value)
+		: asprintf (&result,
+			    gettext ("%s+%#0*" PRIx64 " <%s+%#" PRIx64 ">"),
+			    scn, 2 + address_size * 2, address,
+			    name, sym.st_value))
+	     : (address_size == 0
+		? asprintf (&result,
+			    gettext ("%#" PRIx64 " <%s+%#" PRIx64 ">"),
+			    address, name, sym.st_value)
+		: asprintf (&result,
+			    gettext ("%#0*" PRIx64 " <%s+%#" PRIx64 ">"),
+			    2 + address_size * 2, address,
+			    name, sym.st_value)))
+	  : (scn != NULL
+	     ? (address_size == 0
+		? asprintf (&result,
+			    gettext ("%s+%#" PRIx64 " <%s>"),
+			    scn, address, name)
+		: asprintf (&result,
+			    gettext ("%s+%#0*" PRIx64 " <%s>"),
+			    scn, 2 + address_size * 2, address, name))
+	     : (address_size == 0
+		? asprintf (&result,
+			    gettext ("%#" PRIx64 " <%s>"),
+			    address, name)
+		: asprintf (&result,
+			    gettext ("%#0*" PRIx64 " <%s>"),
+			    2 + address_size * 2, address, name))))
+       : (scn != NULL
+	  ? (address_size == 0
+	     ? asprintf (&result,
+			 gettext ("%s+%#" PRIx64),
+			 scn, address)
+	     : asprintf (&result,
+			 gettext ("%s+%#0*" PRIx64),
+			 scn, 2 + address_size * 2, address))
+	  : (address_size == 0
+	     ? asprintf (&result,
+			 "%#" PRIx64,
+			 address)
+	     : asprintf (&result,
+			 "%#0*" PRIx64,
+			 2 + address_size * 2, address)))) < 0)
+    error (EXIT_FAILURE, 0, _("memory exhausted"));
+
+  return result;
+}
+
 static const char *
 dwarf_tag_string (unsigned int tag)
 {
@@ -3307,7 +3399,7 @@ dwarf_discr_list_string (unsigned int code)
 
 
 static void
-print_ops (Dwarf *dbg, int indent, int indentrest,
+print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	   unsigned int addrsize, Dwarf_Word len, const unsigned char *data)
 {
   static const char *const known[] =
@@ -3487,9 +3579,18 @@ print_ops (Dwarf *dbg, int indent, int indentrest,
 	  data += addrsize;
 	  len -= addrsize;
 
-	  printf ("%*s[%4" PRIuMAX "] %s %" PRIuMAX "\n",
-		  indent, "", (uintmax_t) offset,
-		  known[op] ?: "???", (uintmax_t) addr);
+	  if (op == DW_OP_addr)
+	    {
+	      char *a = format_dwarf_addr (dwflmod, 0, addr);
+	      printf ("%*s[%4" PRIuMAX "] %s %s\n",
+		      indent, "", (uintmax_t) offset,
+		      known[op] ?: "???", a);
+	      free (a);
+	    }
+	  else
+	    printf ("%*s[%4" PRIuMAX "] %s %#" PRIxMAX "\n",
+		    indent, "", (uintmax_t) offset,
+		    known[op] ?: "???", (uintmax_t) addr);
 	  offset += 1 + addrsize;
 	  break;
 
@@ -3646,7 +3747,8 @@ print_ops (Dwarf *dbg, int indent, int indentrest,
 
 
 static void
-print_debug_abbrev_section (Ebl *ebl __attribute__ ((unused)),
+print_debug_abbrev_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
+			    Ebl *ebl __attribute__ ((unused)),
 			    GElf_Ehdr *ehdr __attribute__ ((unused)),
 			    Elf_Scn *scn __attribute__ ((unused)),
 			    GElf_Shdr *shdr, Dwarf *dbg)
@@ -3717,7 +3819,8 @@ print_debug_abbrev_section (Ebl *ebl __attribute__ ((unused)),
    not have to know a bit about the structure of the section, libdwarf
    takes care of it.  */
 static void
-print_debug_aranges_section (Ebl *ebl __attribute__ ((unused)),
+print_debug_aranges_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
+			     Ebl *ebl __attribute__ ((unused)),
 			     GElf_Ehdr *ehdr __attribute__ ((unused)),
 			     Elf_Scn *scn __attribute__ ((unused)),
 			     GElf_Shdr *shdr, Dwarf *dbg)
@@ -3773,7 +3876,8 @@ print_debug_aranges_section (Ebl *ebl __attribute__ ((unused)),
 
 /* Print content of DWARF .debug_ranges section.  */
 static void
-print_debug_ranges_section (Ebl *ebl __attribute__ ((unused)),
+print_debug_ranges_section (Dwfl_Module *dwflmod,
+			    Ebl *ebl __attribute__ ((unused)),
 			    GElf_Ehdr *ehdr, Elf_Scn *scn, GElf_Shdr *shdr,
 			    Dwarf *dbg)
 {
@@ -3800,7 +3904,7 @@ print_debug_ranges_section (Ebl *ebl __attribute__ ((unused)),
 
       if (data->d_size - offset < address_size * 2)
 	{
-	  printf (" [%6tx]  <INVALID DATA>\n", offset);
+	  printf (gettext (" [%6tx]  <INVALID DATA>\n"), offset);
 	  break;
 	}
 
@@ -3820,21 +3924,24 @@ print_debug_ranges_section (Ebl *ebl __attribute__ ((unused)),
 	}
 
       if (begin == (Dwarf_Addr) -1l) /* Base address entry.  */
-	printf (" [%6tx]  base address %#0*" PRIxMAX "\n", offset,
-		2 + (int) (address_size * 2), (uintmax_t) end);
+	{
+	  char *b = format_dwarf_addr (dwflmod, address_size, end);
+	  printf (gettext (" [%6tx]  base address %s\n"), offset, b);
+	  free (b);
+	}
       else if (begin == 0 && end == 0) /* End of list entry.  */
 	first = true;
       else
 	{
+	  char *b = format_dwarf_addr (dwflmod, address_size, begin);
+	  char *e = format_dwarf_addr (dwflmod, address_size, end);
 	  /* We have an address range entry.  */
 	  if (first)		/* First address range entry in a list.  */
-	    printf (" [%6tx]  %#0*" PRIxMAX "..%#0*" PRIxMAX "\n", offset,
-		    2 + (int) (address_size * 2), (uintmax_t) begin,
-		    2 + (int) (address_size * 2), (uintmax_t) end);
+	    printf (gettext (" [%6tx]  %s..%s\n"), offset, b, e);
 	  else
-	    printf ("           %#0*" PRIxMAX "..%#0*" PRIxMAX "\n",
-		    2 + (int) (address_size * 2), (uintmax_t) begin,
-		    2 + (int) (address_size * 2), (uintmax_t) end);
+	    printf (gettext ("           %s..%s\n"), b, e);
+	  free (b);
+	  free (e);
 
 	  first = false;
 	}
@@ -3843,7 +3950,8 @@ print_debug_ranges_section (Ebl *ebl __attribute__ ((unused)),
 
 
 static void
-print_debug_frame_section (Ebl *ebl __attribute__ ((unused)),
+print_debug_frame_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
+			   Ebl *ebl __attribute__ ((unused)),
 			   GElf_Ehdr *ehdr __attribute__ ((unused)),
 			   Elf_Scn *scn __attribute__ ((unused)),
 			   GElf_Shdr *shdr __attribute__ ((unused)),
@@ -3854,6 +3962,7 @@ print_debug_frame_section (Ebl *ebl __attribute__ ((unused)),
 
 struct attrcb_args
 {
+  Dwfl_Module *dwflmod;
   Dwarf *dbg;
   int level;
   unsigned int addrsize;
@@ -3885,18 +3994,21 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 
   switch (form)
     {
-    case DW_FORM_addr:;
-      Dwarf_Addr addr;
-      if (unlikely (dwarf_formaddr (attrp, &addr) != 0))
-	{
-	attrval_out:
-	  error (0, 0, gettext ("cannot get attribute value: %s"),
-		 dwarf_errmsg (-1));
-	  return DWARF_CB_ABORT;
-	}
-      printf ("           %*s%-20s %#0*" PRIxMAX "\n",
-	      (int) (level * 2), "", dwarf_attr_string (attr),
-	      2 + (int) (cbargs->addrsize * 2), (uintmax_t) addr);
+    case DW_FORM_addr:
+      {
+	Dwarf_Addr addr;
+	if (unlikely (dwarf_formaddr (attrp, &addr) != 0))
+	  {
+	  attrval_out:
+	    error (0, 0, gettext ("cannot get attribute value: %s"),
+		   dwarf_errmsg (-1));
+	    return DWARF_CB_ABORT;
+	  }
+	char *a = format_dwarf_addr (cbargs->dwflmod, cbargs->addrsize, addr);
+	printf ("           %*s%-20s %s\n",
+		(int) (level * 2), "", dwarf_attr_string (attr), a);
+	free (a);
+      }
       break;
 
     case DW_FORM_indirect:
@@ -4033,7 +4145,8 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	case DW_AT_frame_base:
 	case DW_AT_return_addr:
 	case DW_AT_static_link:
-	  print_ops (cbargs->dbg, 12 + level * 2, 12 + level * 2,
+	  print_ops (cbargs->dwflmod, cbargs->dbg,
+		     12 + level * 2, 12 + level * 2,
 		     cbargs->addrsize, block.length, block.data);
 	  break;
 	}
@@ -4051,7 +4164,8 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 
 
 static void
-print_debug_info_section (Ebl *ebl __attribute__ ((unused)),
+print_debug_info_section (Dwfl_Module *dwflmod,
+			  Ebl *ebl __attribute__ ((unused)),
 			  GElf_Ehdr *ehdr __attribute__ ((unused)),
 			  Elf_Scn *scn __attribute__ ((unused)),
 			  GElf_Shdr *shdr, Dwarf *dbg)
@@ -4088,6 +4202,7 @@ print_debug_info_section (Ebl *ebl __attribute__ ((unused)),
 
 
   struct attrcb_args args;
+  args.dwflmod = dwflmod;
   args.dbg = dbg;
   args.addrsize = addrsize;
   args.cu_offset = offset;
@@ -4172,7 +4287,8 @@ print_debug_info_section (Ebl *ebl __attribute__ ((unused)),
 
 
 static void
-print_debug_line_section (Ebl *ebl, GElf_Ehdr *ehdr __attribute__ ((unused)),
+print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl,
+			  GElf_Ehdr *ehdr __attribute__ ((unused)),
 			  Elf_Scn *scn, GElf_Shdr *shdr, Dwarf *dbg)
 {
   printf (gettext ("\
@@ -4391,10 +4507,11 @@ print_debug_line_section (Ebl *ebl, GElf_Ehdr *ehdr __attribute__ ((unused)),
 	      line += line_increment;
 	      address += address_increment;
 
+	      char *a = format_dwarf_addr (dwflmod, 0, address);
 	      printf (gettext ("\
- special opcode %u: address+%u = %#" PRIx64 ", line%+d = %zu\n"),
-		      opcode, address_increment, (uint64_t) address,
-		      line_increment, line);
+ special opcode %u: address+%u = %s, line%+d = %zu\n"),
+		      opcode, address_increment, a, line_increment, line);
+	      free (a);
 	    }
 	  else if (opcode == 0)
 	    {
@@ -4429,8 +4546,11 @@ print_debug_line_section (Ebl *ebl, GElf_Ehdr *ehdr __attribute__ ((unused)),
 		    address = read_4ubyte_unaligned_inc (dbg, linep);
 		  else
 		    address = read_8ubyte_unaligned_inc (dbg, linep);
-		  printf (gettext ("set address to %#" PRIx64 "\n"),
-			  (uint64_t) address);
+		  {
+		    char *a = format_dwarf_addr (dwflmod, 0, address);
+		    printf (gettext ("set address to %s\n"), a);
+		    free (a);
+		  }
 		  break;
 
 		case DW_LNE_define_file:
@@ -4478,9 +4598,12 @@ define new file: dir=%u, mtime=%" PRIu64 ", length=%" PRIu64 ", name=%s\n"),
 		     address.  */
 		  get_uleb128 (u128, linep);
 		  address += minimum_instr_len * u128;
-		  printf (gettext ("\
- advance address by %u to %#" PRIx64 "\n"),
-			  u128, (uint64_t) address);
+		  {
+		    char *a = format_dwarf_addr (dwflmod, 0, address);
+		    printf (gettext ("advance address by %u to %s\n"),
+			    u128, a);
+		    free (a);
+		  }
 		  break;
 
 		case DW_LNS_advance_line:
@@ -4527,9 +4650,12 @@ define new file: dir=%u, mtime=%" PRIu64 ", length=%" PRIu64 ", name=%s\n"),
 		  u128 = (minimum_instr_len
 			  * ((255 - opcode_base) / line_range));
 		  address += u128;
-		  printf (gettext ("\
- advance address by constant %u to %#" PRIx64 "\n"),
-			  u128, (uint64_t) address);
+		  {
+		    char *a = format_dwarf_addr (dwflmod, 0, address);
+		    printf (gettext ("advance address by constant %u to %s\n"),
+			    u128, a);
+		    free (a);
+		  }
 		  break;
 
 		case DW_LNS_fixed_advance_pc:
@@ -4540,9 +4666,13 @@ define new file: dir=%u, mtime=%" PRIu64 ", length=%" PRIu64 ", name=%s\n"),
 
 		  u128 = read_2ubyte_unaligned_inc (dbg, linep);
 		  address += u128;
-		  printf (gettext ("\
- advance address by fixed value %u to %#" PRIx64 "\n"),
-			  u128, (uint64_t) address);
+		  {
+		    char *a = format_dwarf_addr (dwflmod, 0, address);
+		    printf (gettext ("\
+advance address by fixed value %u to %s\n"),
+			    u128, a);
+		    free (a);
+		  }
 		  break;
 
 		case DW_LNS_set_prologue_end:
@@ -4585,7 +4715,8 @@ define new file: dir=%u, mtime=%" PRIu64 ", length=%" PRIu64 ", name=%s\n"),
 
 
 static void
-print_debug_loc_section (Ebl *ebl __attribute__ ((unused)),
+print_debug_loc_section (Dwfl_Module *dwflmod,
+			 Ebl *ebl __attribute__ ((unused)),
 			 GElf_Ehdr *ehdr __attribute__ ((unused)),
 			 Elf_Scn *scn __attribute__ ((unused)),
 			 GElf_Shdr *shdr,
@@ -4614,7 +4745,7 @@ print_debug_loc_section (Ebl *ebl __attribute__ ((unused)),
 
       if (data->d_size - offset < address_size * 2)
 	{
-	  printf (" [%6tx]  <INVALID DATA>\n", offset);
+	  printf (gettext (" [%6tx]  <INVALID DATA>\n"), offset);
 	  break;
 	}
 
@@ -4634,8 +4765,11 @@ print_debug_loc_section (Ebl *ebl __attribute__ ((unused)),
 	}
 
       if (begin == (Dwarf_Addr) -1l) /* Base address entry.  */
-	printf (" [%6tx]  base address %#0*" PRIxMAX "\n", offset,
-		2 + (int) (address_size * 2), (uintmax_t) end);
+	{
+	  char *b = format_dwarf_addr (dwflmod, address_size, end);
+	  printf (gettext (" [%6tx]  base address %s\n"), offset, b);
+	  free (b);
+	}
       else if (begin == 0 && end == 0) /* End of list entry.  */
 	first = true;
       else
@@ -4643,17 +4777,18 @@ print_debug_loc_section (Ebl *ebl __attribute__ ((unused)),
 	  /* We have a location expression entry.  */
 	  uint_fast16_t len = read_2ubyte_unaligned_inc (dbg, readp);
 
-	  if (first)		/* First entry in a list.  */
-	    printf (" [%6tx]  %#0*" PRIxMAX "..%#0*" PRIxMAX,
-		    offset,
-		    2 + (int) (address_size * 2), (uintmax_t) begin,
-		    2 + (int) (address_size * 2), (uintmax_t) end);
-	  else
-	    printf ("           %#0*" PRIxMAX "..%#0*" PRIxMAX,
-		    2 + (int) (address_size * 2), (uintmax_t) begin,
-		    2 + (int) (address_size * 2), (uintmax_t) end);
+	  char *b = format_dwarf_addr (dwflmod, address_size, begin);
+	  char *e = format_dwarf_addr (dwflmod, address_size, end);
 
-	  print_ops (dbg, 1, 18 + (address_size * 4),
+	  if (first)		/* First entry in a list.  */
+	    printf (gettext (" [%6tx]  %s..%s"), offset, b, e);
+	  else
+	    printf (gettext ("           %s..%s"), b, e);
+
+	  free (b);
+	  free (e);
+
+	  print_ops (dwflmod, dbg, 1, 18 + (address_size * 4),
 		     address_size, len, readp);
 
 	  first = false;
@@ -4686,7 +4821,8 @@ mac_compare (const void *p1, const void *p2)
 
 
 static void
-print_debug_macinfo_section (Ebl *ebl __attribute__ ((unused)),
+print_debug_macinfo_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
+			     Ebl *ebl __attribute__ ((unused)),
 			     GElf_Ehdr *ehdr __attribute__ ((unused)),
 			     Elf_Scn *scn, GElf_Shdr *shdr, Dwarf *dbg)
 {
@@ -4857,7 +4993,8 @@ print_pubnames (Dwarf *dbg __attribute__ ((unused)), Dwarf_Global *global,
 
 /* Print the known exported symbols in the DWARF section '.debug_pubnames'.  */
 static void
-print_debug_pubnames_section (Ebl *ebl __attribute__ ((unused)),
+print_debug_pubnames_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
+			      Ebl *ebl __attribute__ ((unused)),
 			      GElf_Ehdr *ehdr __attribute__ ((unused)),
 			      Elf_Scn *scn __attribute__ ((unused)),
 			      GElf_Shdr *shdr, Dwarf *dbg)
@@ -4871,7 +5008,8 @@ print_debug_pubnames_section (Ebl *ebl __attribute__ ((unused)),
 
 /* Print the content of the DWARF string section '.debug_str'.  */
 static void
-print_debug_str_section (Ebl *ebl __attribute__ ((unused)),
+print_debug_str_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
+			 Ebl *ebl __attribute__ ((unused)),
 			 GElf_Ehdr *ehdr __attribute__ ((unused)),
 			 Elf_Scn *scn __attribute__ ((unused)),
 			 GElf_Shdr *shdr, Dwarf *dbg)
@@ -4910,34 +5048,29 @@ print_debug_str_section (Ebl *ebl __attribute__ ((unused)),
     }
 }
 
-
 static void
-print_debug (Ebl *ebl, GElf_Ehdr *ehdr)
+print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
 {
-  /* Find the version information sections.  For this we have to
-     search through the section table.  */
-  Dwarf *dbg;
-  Elf_Scn *scn;
-  size_t shstrndx;
-
   /* Before we start the real work get a debug context descriptor.  */
-  dbg = dwarf_begin_elf (ebl->elf, DWARF_C_READ, NULL);
+  Dwarf_Addr dwbias;
+  Dwarf *dbg = dwfl_module_getdwarf (dwflmod, &dwbias);
   if (dbg == NULL)
     {
       error (0, 0, gettext ("cannot get debug context descriptor: %s"),
-	     dwarf_errmsg (-1));
+	     dwfl_errmsg (-1));
       return;
     }
 
   /* Get the section header string table index.  */
+  size_t shstrndx;
   if (elf_getshstrndx (ebl->elf, &shstrndx) < 0)
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
 
-  scn = NULL;
+  /* Look through all the sections for the debugging sections to print.  */
+  Elf_Scn *scn = NULL;
   while ((scn = elf_nextscn (ebl->elf, scn)) != NULL)
     {
-      /* Handle the section if it is part of the versioning handling.  */
       GElf_Shdr shdr_mem;
       GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
 
@@ -4947,7 +5080,8 @@ print_debug (Ebl *ebl, GElf_Ehdr *ehdr)
 	  {
 	    const char *name;
 	    enum section_e bitmask;
-	    void (*fp) (Ebl *, GElf_Ehdr *, Elf_Scn *, GElf_Shdr *, Dwarf *);
+	    void (*fp) (Dwfl_Module *, Ebl *,
+			GElf_Ehdr *, Elf_Scn *, GElf_Shdr *, Dwarf *);
 	  } debug_sections[] =
 	    {
 #define NEW_SECTION(name) \
@@ -4974,14 +5108,11 @@ print_debug (Ebl *ebl, GElf_Ehdr *ehdr)
 	    if (strcmp (name, debug_sections[n].name) == 0)
 	      {
 		if (print_debug_sections & debug_sections[n].bitmask)
-		  debug_sections[n].fp (ebl, ehdr, scn, shdr, dbg);
+		  debug_sections[n].fp (dwflmod, ebl, ehdr, scn, shdr, dbg);
 		break;
 	      }
 	}
     }
-
-  /* We are done with the DWARF handling.  */
-  dwarf_end (dbg);
 }
 
 
@@ -5144,6 +5275,7 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
       break;
 
     case 'T':
+    case (char) ('T'|0x80):
       assert (count == 2);
       Dwarf_Word sec;
       Dwarf_Word usec;
@@ -5160,6 +5292,22 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
 #undef DO_TYPE
 	default:
 	  abort ();
+	}
+      if (unlikely (item->format == (char) ('T'|0x80)))
+	{
+	  /* This is a hack for an ill-considered 64-bit ABI where
+	     tv_usec is actually a 32-bit field with 32 bits of padding
+	     rounding out struct timeval.  We've already converted it as
+	     a 64-bit field.  For little-endian, this just means the
+	     high half is the padding; it's presumably zero, but should
+	     be ignored anyway.  For big-endian, it means the 32-bit
+	     field went into the high half of USEC.  */
+	  GElf_Ehdr ehdr_mem;
+	  GElf_Ehdr *ehdr = gelf_getehdr (core, &ehdr_mem);
+	  if (likely (ehdr->e_ident[EI_DATA] == ELFDATA2MSB))
+	    usec >>= 32;
+	  else
+	    usec &= UINT32_MAX;
 	}
       colno = print_core_item (colno, ',', ITEM_WRAP_COLUMN, 0, item->name,
 			       maxfmt, "%" PRIu64 ".%.6" PRIu64, sec, usec);

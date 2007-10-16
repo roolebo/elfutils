@@ -1,3 +1,9 @@
+2007-10-07  Roland McGrath  <roland@redhat.com>
+
+	* elf_begin.c (__libelf_next_arhdr): Fix fencepost error and wrong
+	member access in terminating name with no trailing /.  Trim trailing
+	spaces when there is no /.
+
 2007-10-04  Roland McGrath  <roland@redhat.com>
 
 	* elf_end.c (elf_end): Don't free ELF->state.ar.ar_sym when it's -1l.

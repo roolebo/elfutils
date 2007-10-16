@@ -727,13 +727,14 @@ section [%2d] '%s': symbol %zu: function in COMMON section is nonsense\n"),
 	  destshdr = gelf_getshdr (elf_getscn (ebl->elf, xndx), &destshdr_mem);
 	  if (destshdr != NULL)
 	    {
+	      GElf_Addr sh_addr = (ehdr->e_type == ET_REL ? 0
+				   : destshdr->sh_addr);
 	      if (GELF_ST_TYPE (sym->st_info) != STT_TLS)
 		{
 		  if (! ebl_check_special_symbol (ebl, ehdr, sym, name,
 						  destshdr))
 		    {
-		      if ((sym->st_value - destshdr->sh_addr)
-			  > destshdr->sh_size)
+		      if (sym->st_value - sh_addr > destshdr->sh_size)
 			{
 			  /* GNU ld has severe bugs.  When it decides to remove
 			     empty sections it leaves symbols referencing them
@@ -750,7 +751,7 @@ section [%2d] '%s': symbol %zu: function in COMMON section is nonsense\n"),
 section [%2d] '%s': symbol %zu: st_value out of bounds\n"),
 				   idx, section_name (ebl, idx), cnt);
 			}
-		      else if ((sym->st_value - destshdr->sh_addr
+		      else if ((sym->st_value - sh_addr
 				+ sym->st_size) > destshdr->sh_size)
 			ERROR (gettext ("\
 section [%2d] '%s': symbol %zu does not fit completely in referenced section [%2d] '%s'\n"),
@@ -890,18 +891,24 @@ section [%2d] '%s': symbol %zu: non-local section symbol\n"),
 		    destshdr = gelf_getshdr (gotscn, &destshdr_mem);
 		}
 
-	      const char *sname = (destshdr == NULL ? NULL
+	      const char *sname = ((destshdr == NULL || xndx == SHN_UNDEF)
+				   ? NULL
 				   : elf_strptr (ebl->elf, ehdr->e_shstrndx,
 						 destshdr->sh_name));
 	      if (sname == NULL)
-		ERROR (gettext ("\
-section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to bad section\n"),
-		       idx, section_name (ebl, idx));
+		{
+		  if (xndx != SHN_UNDEF || ehdr->e_type != ET_REL)
+		    ERROR (gettext ("\
+section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to \
+bad section [%2d]\n"),
+			   idx, section_name (ebl, idx), xndx);
+		}
 	      else if (strcmp (sname, ".got.plt") != 0
 		       && strcmp (sname, ".got") != 0)
 		ERROR (gettext ("\
-section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to '%s' section\n"),
-		       idx, section_name (ebl, idx), sname);
+section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to \
+section [%2d] '%s'\n"),
+		       idx, section_name (ebl, idx), xndx, sname);
 
 	      if (destshdr != NULL)
 		{
@@ -909,7 +916,8 @@ section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to '%s' section\n"),
 		  if (!ebl_check_special_symbol (ebl, ehdr, sym, name,
 						 destshdr))
 		    {
-		      if (sym->st_value != destshdr->sh_addr)
+		      if (ehdr->e_type != ET_REL
+			  && sym->st_value != destshdr->sh_addr)
 			/* This test is more strict than the psABIs which
 			   usually allow the symbol to be in the middle of
 			   the .got section, allowing negative offsets.  */
@@ -1307,7 +1315,8 @@ section [%2d] '%s': relocation %zu: only symbol '_GLOBAL_OFFSET_TABLE_' can be u
     {
       if (destshdr != NULL
 	  && GELF_R_TYPE (r_info) != 0
-	  && (r_offset - destshdr->sh_addr) >= destshdr->sh_size)
+	  && (r_offset - (ehdr->e_type == ET_REL ? 0
+			  : destshdr->sh_addr)) >= destshdr->sh_size)
 	ERROR (gettext ("\
 section [%2d] '%s': relocation %zu: offset out of bounds\n"),
 	       idx, section_name (ebl, idx), cnt);
@@ -3086,7 +3095,7 @@ static const struct
   const char *name;
   size_t namelen;
   GElf_Word type;
-  enum { unused, exact, atleast } attrflag;
+  enum { unused, exact, atleast, exact_or_gnuld } attrflag;
   GElf_Word attr;
   GElf_Word attr2;
 } special_sections[] =
@@ -3096,7 +3105,8 @@ static const struct
     { ".comment", 8, SHT_PROGBITS, exact, 0, 0 },
     { ".data", 6, SHT_PROGBITS, exact, SHF_ALLOC | SHF_WRITE, 0 },
     { ".data1", 7, SHT_PROGBITS, exact, SHF_ALLOC | SHF_WRITE, 0 },
-    { ".debug", 7, SHT_PROGBITS, exact, 0, 0 },
+    { ".debug_str", 11, SHT_PROGBITS, exact_or_gnuld, SHF_MERGE | SHF_STRINGS, 0 },
+    { ".debug", 6, SHT_PROGBITS, exact, 0, 0 },
     { ".dynamic", 9, SHT_DYNAMIC, atleast, SHF_ALLOC, SHF_WRITE },
     { ".dynstr", 8, SHT_STRTAB, exact, SHF_ALLOC, 0 },
     { ".dynsym", 8, SHT_DYNSYM, exact, SHF_ALLOC, 0 },
@@ -3132,6 +3142,10 @@ static const struct
 #define nspecial_sections \
   (sizeof (special_sections) / sizeof (special_sections[0]))
 
+#define IS_KNOWN_SPECIAL(idx, string, prefix)			      \
+  (special_sections[idx].namelen == sizeof string - (prefix ? 1 : 0)  \
+   && !memcmp (special_sections[idx].name, string, \
+	       sizeof string - (prefix ? 1 : 0)))
 
 static void
 check_sections (Ebl *ebl, GElf_Ehdr *ehdr)
@@ -3213,13 +3227,18 @@ cannot get section header for section [%2zu] '%s': %s\n"),
 		char stbuf3[100];
 
 		GElf_Word good_type = special_sections[s].type;
-		if (special_sections[s].namelen == sizeof ".plt" &&
-		    !memcmp (special_sections[s].name, ".plt", sizeof ".plt")
+		if (IS_KNOWN_SPECIAL (s, ".plt", false)
 		    && ebl_bss_plt_p (ebl, ehdr))
 		  good_type = SHT_NOBITS;
 
+		/* In a debuginfo file, any normal section can be SHT_NOBITS.
+		   This is only invalid for DWARF sections and .shstrtab.  */
 		if (shdr->sh_type != good_type
-		    && !(is_debuginfo && shdr->sh_type == SHT_NOBITS))
+		    && (shdr->sh_type != SHT_NOBITS
+			|| !is_debuginfo
+			|| IS_KNOWN_SPECIAL (s, ".debug_str", false)
+			|| IS_KNOWN_SPECIAL (s, ".debug", true)
+			|| IS_KNOWN_SPECIAL (s, ".shstrtab", false)))
 		  ERROR (gettext ("\
 section [%2d] '%s' has wrong type: expected %s, is %s\n"),
 			 (int) cnt, scnname,
@@ -3228,12 +3247,14 @@ section [%2d] '%s' has wrong type: expected %s, is %s\n"),
 			 ebl_section_type_name (ebl, shdr->sh_type,
 						stbuf2, sizeof (stbuf2)));
 
-		if (special_sections[s].attrflag == exact)
+		if (special_sections[s].attrflag == exact
+		    || special_sections[s].attrflag == exact_or_gnuld)
 		  {
 		    /* Except for the link order and group bit all the
 		       other bits should match exactly.  */
 		    if ((shdr->sh_flags & ~(SHF_LINK_ORDER | SHF_GROUP))
-			!= special_sections[s].attr)
+			!= special_sections[s].attr
+			&& (special_sections[s].attrflag == exact || !gnuld))
 		      ERROR (gettext ("\
 section [%2zu] '%s' has wrong flags: expected %s, is %s\n"),
 			     cnt, scnname,
@@ -3665,6 +3686,9 @@ phdr[%d]: no note entries defined for the type of file\n"),
     /* The p_offset values in a separate debug file are bogus.  */
     return;
 
+  if (phdr->p_filesz == 0)
+    return;
+
   GElf_Off notes_size = 0;
   Elf_Data *data = elf_getdata_rawchunk (ebl->elf,
 					 phdr->p_offset, phdr->p_filesz,
@@ -3683,6 +3707,9 @@ phdr[%d]: no note entries defined for the type of file\n"),
 static void
 check_note_section (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Shdr *shdr, int idx)
 {
+  if (shdr->sh_size == 0)
+    return;
+
   Elf_Data *data = elf_getdata (elf_getscn (ebl->elf, idx), NULL);
   if (data == NULL)
     {

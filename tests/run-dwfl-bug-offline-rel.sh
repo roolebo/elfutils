@@ -29,7 +29,7 @@ testfiles testfile36 testfile36.debug
 
 testrun_compare ./dwflmodtest -e testfile36 <<\EOF
 module:                                00000000..00002308 testfile36 (null)
-module:                                00000000        (nil) 0 (Callback returned failure)
+module:                                00000000 DWARF 0 (no error)
 module:                                00000000..00002308 testfile36 testfile36.debug
 EOF
 

@@ -1,3 +1,8 @@
+2007-10-11  Roland McGrath  <roland@redhat.com>
+
+	* eblobjnote.c (ebl_object_note): Translate target format (byte-swap)
+	for NT_GNU_ABI_TAG contents.
+
 2007-08-22  Roland McGrath  <roland@redhat.com>
 
 	* libebl.h (Ebl_Core_Item): New member `group'.

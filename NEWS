@@ -2,12 +2,15 @@ Version 0.130:
 
 readelf: -p option can take an argument like -x for one section,
 	 or no argument (as before) for all SHF_STRINGS sections;
-	 new option --archive-index (or -c)
+	 new option --archive-index (or -c);
+	 improved -n output for core files, on many machines
 
 libelf: new function elf_getdata_rawchunk, replaces gelf_rawchunk;
 	new functions gelf_getnote, gelf_getauxv, gelf_update_auxv
 
 readelf, elflint: handle SHT_NOTE sections without requiring phdrs
+
+elflint: stricter checks on debug sections
 
 libdwfl: new functions dwfl_build_id_find_elf, dwfl_build_id_find_debuginfo,
 	 dwfl_module_build_id, dwfl_module_report_build_id;
@@ -15,6 +18,8 @@ libdwfl: new functions dwfl_build_id_find_elf, dwfl_build_id_find_debuginfo,
 	 dwfl_standard_find_debuginfo now uses build IDs when available
 
 unstrip: new option --list (or -n)
+
+libebl: backend improvements for sparc, alpha, powerpc
 
 Version 0.129:
 

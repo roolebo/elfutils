@@ -1,3 +1,68 @@
+2007-10-09  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_report_elf.c (__libdwfl_report_elf): Clear SHDR->sh_offset when
+	caching SHDR->sh_addr = 0.
+	* offline.c (dwfl_offline_section_address): Never called for sh_addr
+	really at 0, don't check for it.  Use MOD->debug directly, not symfile.
+
+	* dwfl_module_getdwarf.c (load_symtab): Return success properly when
+	we've found SHT_SYMTAB.
+
+	* relocate.c (relocate_getsym): New function.
+	(__libdwfl_relocate): Use it.
+	(__libdwfl_relocate_value): Take new Elf * argument.  Make SYMSHSTRNDX
+	be a pointer instead of value; cache getshstrndx result there.
+	* libdwflP.h: Update decl.
+	* derelocate.c (cache_sections): Update caller.
+	Always work on the main file, not the symfile.
+	(dwfl_module_address_section): Likewise.
+	* dwfl_module_getsym.c (dwfl_module_getsym): Update caller.
+
+2007-10-07  Roland McGrath  <roland@redhat.com>
+
+	* offline.c (process_archive): Initialize MOD.
+
+	* linux-kernel-modules.c (get_release): New function, broken out of ...
+	(report_kernel): ... here.  Call it.
+	(try_kernel_name): Take new arg TRY_DEBUG, only try ".debug" if set.
+	(find_kernel_elf): Update caller.
+	(report_kernel_archive): New function.
+	(dwfl_linux_kernel_report_offline): Call it.
+
+	* offline.c (process_file): Take new arg PREDICATE, pass it down.
+	(process_archive): Likewise.
+	(process_archive_member): Likewise.  When nonnull, let the predicate
+	decide whether to use this member.
+	(__libdwfl_report_offline): New function, broken out of ...
+	(dwfl_report_offline): ... here.  Call it.
+	* libdwflP.h: Declare it.
+
+	* offline.c (process_archive, process_archive_member): New functions.
+	(process_elf, process_file): New functions, broken out of ...
+	(dwfl_report_offline): ... here.  Call process_file, which recurses on
+	ELF_K_AR files.
+
+	* dwfl_report_elf.c (__libdwfl_report_elf): New, broken out of ...
+	(dwfl_report_elf): ... here.  Call it.
+	* libdwflP.h: Declare it.
+
+2007-10-06  Roland McGrath  <roland@redhat.com>
+
+	* derelocate.c (dwfl_module_relocations): Don't call
+	dwfl_module_getdwarf.
+
+	* derelocate.c (find_section): Use __libdwfl_seterrno, not
+	__libdw_seterrno.
+
+	* relocate.c (__libdwfl_relocate_value): Abuse sh_offset, not
+	SHF_ALLOC, to cache sh_addr resolved to 0.
+
+	* dwfl_report_elf.c (dwfl_report_elf): When an ET_REL file has sh_addr
+	values nonzero already, just use its existing layout.
+
+	* relocate.c (__libdwfl_relocate): Clear size of reloc section in its
+	in-core shdr after applying it.
+
 2007-10-04  Ulrich Drepper  <drepper@redhat.com>
 
 	* linux-kernel-modules.c (dwfl_linux_kernel_report_kernel): Fake

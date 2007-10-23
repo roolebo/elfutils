@@ -1,5 +1,5 @@
 /* Return reference offset represented by attribute.
-   Copyright (C) 2003, 2005 Red Hat, Inc.
+   Copyright (C) 2003, 2005, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -55,15 +55,11 @@
 #include <dwarf.h>
 #include "libdwP.h"
 
-
 int
-dwarf_formref (attr, return_offset)
+__libdw_formref (attr, return_offset)
      Dwarf_Attribute *attr;
      Dwarf_Off *return_offset;
 {
-  if (attr == NULL)
-    return -1;
-
   const unsigned char *datap;
 
   switch (attr->form)
@@ -100,4 +96,16 @@ dwarf_formref (attr, return_offset)
 
   return 0;
 }
-INTDEF(dwarf_formref)
+
+/* This is the old public entry point.
+   It is now deprecated in favor of dwarf_formref_die.  */
+int
+dwarf_formref (attr, return_offset)
+     Dwarf_Attribute *attr;
+     Dwarf_Off *return_offset;
+{
+  if (attr == NULL)
+    return -1;
+
+  return __libdw_formref (attr, return_offset);
+}

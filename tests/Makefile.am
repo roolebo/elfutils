@@ -83,7 +83,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-native-test.sh run-bug1-test.sh \
 	dwfl-bug-addr-overflow run-addrname-test.sh \
 	dwfl-bug-fd-leak dwfl-bug-report \
-	run-dwfl-bug-offline-rel.sh
+	run-dwfl-bug-offline-rel.sh run-dwfl-addr-sect.sh
 # run-show-ciefde.sh
 
 if !STANDALONE
@@ -114,6 +114,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-addrscopes.sh run-strings-test.sh run-funcscopes.sh \
 	     run-find-prologues.sh run-allregs.sh run-native-test.sh \
 	     run-addrname-test.sh run-dwfl-bug-offline-rel.sh \
+	     run-dwfl-addr-sect.sh \
 	     testfile15.bz2 testfile15.debug.bz2 \
 	     testfile16.bz2 testfile16.debug.bz2 \
 	     testfile17.bz2 testfile17.debug.bz2 \
@@ -132,7 +133,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile36.bz2 testfile36.debug.bz2 \
 	     testfile37.bz2 testfile37.debug.bz2 \
 	     testfile38.bz2 testfile39.bz2 testfile40.bz2 testfile40.debug.bz2 \
-	     testfile41.bz2 testfile42.bz2
+	     testfile41.bz2 testfile42.bz2 testfile43.bz2
 
 installed_TESTS_ENVIRONMENT = libdir=$(DESTDIR)$(libdir) \
 			      bindir=$(DESTDIR)$(bindir) \

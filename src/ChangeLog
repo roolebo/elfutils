@@ -1,3 +1,31 @@
+2007-10-20  Roland McGrath  <roland@redhat.com>
+
+	* unstrip.c (options): Update -R description.
+	(struct symbol): Put symbol details a union with a size_t pointer
+	`duplicate'.
+	(compare_symbols_output): Use null ->name as marker for discard
+	symbols, not zero *->map.
+	(copy_elided_sections): Record forwarding pointers for discarded
+	duplicates and fill SYMNDX_MAP elements through them.
+
+	* readelf.c (process_file): Set offline_next_address to 0 at start.
+	(struct process_dwflmod_args): New type.
+	(process_dwflmod): Take args in it, pass fd to process_elf_file.
+	(process_file): Update caller; dup FD for passing to libdwfl.
+	(process_elf_file): Take new arg FD.  For ET_REL file when
+	displaying data affected by libdwfl relocation, open a new Elf handle.
+
+2007-10-17  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (print_debug_line_section): For invalid data inside a
+	unit with plausible length, keep printing at the next unit boundary.
+
+	* readelf.c (attr_callback): Use dwarf_formref_die, not dwarf_formref.
+
+2007-10-16  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (hex_dump): Fix rounding error in whitespace calculation.
+
 2007-10-15  Roland McGrath  <roland@redhat.com>
 
 	* make-debug-archive.in: New file.

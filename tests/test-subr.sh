@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2005 Red Hat, Inc.
+# Copyright (C) 2005, 2007 Red Hat, Inc.
 # This file is part of Red Hat elfutils.
 #
 # Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -58,7 +58,7 @@ testrun_compare()
 {
   outfile="${1##*/}.out"
   testrun_out $outfile "$@"
-  diff -Bbu $outfile -
+  diff -u $outfile -
   # diff's exit status will kill the script.
 }
 

@@ -85,10 +85,7 @@ dwfl_module_getsym (Dwfl_Module *mod, int ndx,
       break;
 
     default:
-      if (mod->e_type != ET_REL)
-	/* Apply the bias to the symbol value.  */
-	sym->st_value += mod->symfile->bias;
-      else
+      if (mod->e_type == ET_REL)
 	{
 	  /* In an ET_REL file, the symbol table values are relative
 	     to the section, not to the module's load base.  */
@@ -102,6 +99,8 @@ dwfl_module_getsym (Dwfl_Module *mod, int ndx,
 	      return NULL;
 	    }
 	}
+      /* Apply the bias to the symbol value.  */
+      sym->st_value += mod->symfile->bias;
       break;
     }
 

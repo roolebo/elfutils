@@ -1,3 +1,22 @@
+2007-10-17  Roland McGrath  <roland@redhat.com>
+
+	* libdw.h (__deprecated_attribute__): New macro.
+	(dwarf_formref): Mark it deprecated.
+	* dwarf_formref.c (__libdw_formref): New function, broken out of ...
+	(dwarf_formref): ... here.  Call it.  Remove INTDEF.
+	* libdwP.h: Remove INTDECL.
+	Declare __libdw_formref.
+	* dwarf_siblingof.c (dwarf_siblingof): Call __libdw_formref instead.
+	* dwarf_formref_die.c: Likewise.  Handle DW_FORM_ref_addr here.
+
+	* libdw_form.c (__libdw_form_val_len): Fix DW_FORM_ref_addr result,
+	needs to check CU->version.
+
+	* libdwP.h (struct Dwarf_CU): New member `version'.
+	* libdw_findcu.c (__libdw_findcu): Initialize it.
+
+	* dwarf_child.c: Return 1 for null entry as first child.
+
 2007-10-05  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_begin_elf.c (check_section): Punt on SHT_NOBITS sections.

@@ -53,8 +53,9 @@
 
 /* Since dwfl_report_elf lays out the sections already, this will only be
    called when the section headers of the debuginfo file are being
-   consulted instead.  With binutils strip-to-debug, the symbol table is in
-   the debuginfo file and relocation looks there.  */
+   consulted instead, or for the section placed at 0.  With binutils
+   strip-to-debug, the symbol table is in the debuginfo file and relocation
+   looks there.  */
 int
 dwfl_offline_section_address (Dwfl_Module *mod,
 			      void **userdata __attribute__ ((unused)),
@@ -68,6 +69,11 @@ dwfl_offline_section_address (Dwfl_Module *mod,
   assert (mod->e_type == ET_REL);
   assert (shdr->sh_addr == 0);
   assert (shdr->sh_flags & SHF_ALLOC);
+
+  if (mod->debug.elf == NULL)
+    /* We are only here because sh_addr is zero even though layout is complete.
+       The first section in the first file under -e is placed at 0.  */
+    return 0;
 
   /* The section numbers might not match between the two files.
      The best we can rely on is the order of SHF_ALLOC sections.  */
@@ -114,7 +120,8 @@ static Dwfl_Module *process_archive (Dwfl *dwfl, const char *name,
 				     int (*predicate) (const char *module,
 						       const char *file));
 
-/* Report one module for an ELF file, or many for an archive.  */
+/* Report one module for an ELF file, or many for an archive.
+   Always consumes ELF and FD.  */
 static Dwfl_Module *
 process_file (Dwfl *dwfl, const char *name, const char *file_name, int fd,
 	      Elf *elf, int (*predicate) (const char *module,
@@ -135,7 +142,7 @@ process_file (Dwfl *dwfl, const char *name, const char *file_name, int fd,
     }
 }
 
-/* Report the open ELF file as a module.  */
+/* Report the open ELF file as a module.  Always consumes ELF and FD.  */
 static Dwfl_Module *
 process_elf (Dwfl *dwfl, const char *name, const char *file_name, int fd,
 	     Elf *elf)
@@ -166,24 +173,30 @@ process_elf (Dwfl *dwfl, const char *name, const char *file_name, int fd,
   return mod;
 }
 
-static bool
+/* Always consumes MEMBER.  Returns elf_next result on success.
+   For errors returns ELF_C_NULL with *MOD set to null.  */
+static Elf_Cmd
 process_archive_member (Dwfl *dwfl, const char *name, const char *file_name,
 			int (*predicate) (const char *module, const char *file),
-			Elf *member, Dwfl_Module **mod)
+			int fd, Elf *member, Dwfl_Module **mod)
 {
   const Elf_Arhdr *h = elf_getarhdr (member);
   if (unlikely (h == NULL))
     {
       __libdwfl_seterrno (DWFL_E_LIBELF);
+    fail:
       elf_end (member);
       *mod = NULL;
-      return false;
+      return ELF_C_NULL;
     }
 
   if (!strcmp (h->ar_name, "/") || !strcmp (h->ar_name, "//"))
     {
+    skip:;
+      /* Skip this and go to the next.  */
+      Elf_Cmd result = elf_next (member);
       elf_end (member);
-      return true;
+      return result;
     }
 
   char *member_name;
@@ -193,7 +206,7 @@ process_archive_member (Dwfl *dwfl, const char *name, const char *file_name,
       __libdwfl_seterrno (DWFL_E_NOMEM);
       elf_end (member);
       *mod = NULL;
-      return false;
+      return ELF_C_NULL;
     }
 
   char *module_name = NULL;
@@ -218,18 +231,24 @@ process_archive_member (Dwfl *dwfl, const char *name, const char *file_name,
 	  if (unlikely (want < 0))
 	    {
 	      __libdwfl_seterrno (DWFL_E_CB);
-	      elf_end (member);
-	      *mod = NULL;
-	      return false;
+	      goto fail;
 	    }
-	  return true;
+	  goto skip;
 	}
     }
 
-  *mod = process_file (dwfl, name, member_name, -1, member, predicate);
+  /* We let __libdwfl_report_elf cache the fd in mod->main.fd,
+     though it's the same fd for all the members.
+     On module teardown we will close it only on the last Elf reference.  */
+  *mod = process_file (dwfl, name, member_name, fd, member, predicate);
   free (member_name);
   free (module_name);
-  return *mod != NULL;
+
+  if (*mod == NULL)		/* process_file called elf_end.  */
+    return ELF_C_NULL;
+
+  /* Advance the archive-reading offset for the next iteration.  */
+  return elf_next (member);
 }
 
 /* Report each member of the archive as its own module.  */
@@ -240,24 +259,18 @@ process_archive (Dwfl *dwfl, const char *name, const char *file_name, int fd,
 
 {
   Dwfl_Module *mod = NULL;
-  bool more = true;
-  do
-    {
-      Elf *member = elf_begin (-1, ELF_C_READ_MMAP_PRIVATE, archive);
-      if (process_archive_member (dwfl, name, file_name, predicate,
-				  member, &mod))
-	/* Advance the archive-reading offset for the next iteration.  */
-	more = elf_next (member) != ELF_C_NULL;
-      else if (mod == NULL)
-	{
-	  elf_end (member);
-	  break;
-	}
-    }
-  while (more);
-  elf_end (archive);
-  if (likely (mod != NULL))
+  while (process_archive_member (dwfl, name, file_name, predicate,
+				 fd, elf_begin (fd, ELF_C_READ_MMAP_PRIVATE,
+						archive), &mod) != ELF_C_NULL)
+    ;
+
+  /* We can drop the archive Elf handle even if we're still using members
+     in live modules.  When the last module's elf_end on a member returns
+     zero, that module will close FD.  If no modules survived the predicate,
+     we are all done with the file right here.  */
+  if (elf_end (archive) == 0)
     close (fd);
+
   return mod;
 }
 

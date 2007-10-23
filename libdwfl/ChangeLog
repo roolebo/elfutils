@@ -1,3 +1,95 @@
+2007-10-23  Roland McGrath  <roland@redhat.com>
+
+	* linux-kernel-modules.c (report_kernel_archive): Reorder the kernel
+	module to appear first.
+
+2007-10-20  Roland McGrath  <roland@redhat.com>
+
+	* offline.c (process_archive_member): Take FD argument, pass it down
+	to process_file.  Return Elf_Cmd, not bool.
+	Call elf_next here, always before elf_end.
+	(process_archive): Update caller.  Don't close FD here unless there
+	are no member refs.
+
+	* dwfl_module.c (free_file): Close fd only when elf_end returns zero.
+
+	* libdwflP.h (struct dwfl_file): New bool member `relocated'.
+	* dwfl_module_getdwarf.c (dwfl_module_getelf): For ET_REL, apply
+	partial relocation to one or both files.
+	(dwfl_module_getdwarf): For ET_REL, make sure extra sections'
+	relocations have been applied to the debug file if dwfl_module_getelf
+	has been used before.
+
+	* relocate.c (resolve_symbol): New function.
+	(relocate_section): Call it.
+
+	* relocate.c (relocate_getsym): Handle null MOD->symfile.
+	(relocate_section): Take new bool arg, PARTIAL.  If true,
+	no error for BADRELTYPE/RELUNDEF, instead just skip them
+	and leave only those skipped relocs behind the reloc section.
+	(__libdwfl_relocate_section): Take new arg, pass it down.
+	(__libdwfl_relocate): Take new bool arg, DEBUG.  If false,
+	do partial relocation on all sections.
+	* dwfl_module_getdwarf.c (load_dw): Update caller.
+	* libdwflP.h: Update decls.
+	* derelocate.c (dwfl_module_address_section): Pass new argument
+	to __libdwfl_relocate_section, true.
+
+	* derelocate.c (cache_sections): Don't cache reloc sections when
+	section_address callback is null.
+
+2007-10-19  Roland McGrath  <roland@redhat.com>
+
+	* relocate.c (relocate_section): Fix fencepost error in r_offset check.
+
+	* derelocate.c (struct dwfl_relocation): Add member `relocs'.
+	(struct secref): Likewise.
+	(cache_sections): Cache the relocation section referring to each
+	section we cache, if any.
+	(dwfl_module_address_section): Use __libdwfl_relocate_section as
+	necessary.
+
+	* relocate.c (struct reloc_symtab_cache): New type.
+	(relocate_getsym): Use it instead of four arguments.
+	(__libdwfl_relocate): Update caller.
+	(relocate_section): New function, broken out of ...
+	(__libdwfl_relocate): ... here.
+	(__libdwfl_relocate_section): New function.
+	* libdwflP.h: Declare it.
+
+2007-10-17  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_getsym.c (dwfl_module_getsym): Apply MOD->symfile->bias
+	to relocated st_value.
+
+	* dwfl_report_elf.c (__libdwfl_report_elf): Align initial BASE for
+	ET_REL to 0x100.
+
+2007-10-16  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_report_elf.c (__libdwfl_report_elf): Readjust BASE when a later
+	section has larger alignment requirements not met by the original BASE,
+	rather than padding more between sections.
+
+	* dwfl_report_elf.c (__libdwfl_report_elf): Fix bias calculation.
+
+	* dwfl_module_build_id.c (__libdwfl_find_build_id): Apply module bias
+	to sh_addr value.
+
+	* dwfl_report_elf.c (__libdwfl_report_elf): Don't be confused by BASE
+	at zero in ET_REL case.  Adjust BASE to necessary alignment.
+
+	* dwfl_module_build_id.c (check_notes): Take -1, not 0, as stub value
+	for DATA_VADDR.
+	(__libdwfl_find_build_id): Update caller.
+
+	* relocate.c (__libdwfl_relocate_value): Don't use sh_offset.
+	* dwfl_report_elf.c (__libdwfl_report_elf): Likewise.
+	* offline.c (dwfl_offline_section_address): Bail early if there is
+	separate debug file.
+
+	* relocate.c (__libdwfl_relocate): Don't return DWFL_E_NO_DWARF.
+
 2007-10-09  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_report_elf.c (__libdwfl_report_elf): Clear SHDR->sh_offset when

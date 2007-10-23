@@ -99,6 +99,8 @@ static const Ebl_Register_Location prxfpreg_regs[] =
     { .offset = 32, .regno = 11, .count = 8, .bits = 80, .pad = 6 }, /* stN */
     { .offset = 32 + 128, .regno = 21, .count = 8, .bits = 128 }, /* xmm */
   };
-#define PRXFPREG_SIZE	512
+
+#define	EXTRA_NOTES \
+  EXTRA_REGSET (NT_PRFPXREG, 512, prxfpreg_regs)
 
 #include "linux-core-note.c"

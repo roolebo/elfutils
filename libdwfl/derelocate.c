@@ -55,6 +55,7 @@ struct dwfl_relocation
   struct
   {
     Elf_Scn *scn;
+    Elf_Scn *relocs;
     const char *name;
     GElf_Addr start, end;
   } refs[0];
@@ -65,6 +66,7 @@ struct secref
 {
   struct secref *next;
   Elf_Scn *scn;
+  Elf_Scn *relocs;
   const char *name;
   GElf_Addr start, end;
 };
@@ -99,6 +101,7 @@ cache_sections (Dwfl_Module *mod)
       return -1;
     }
 
+  bool check_reloc_sections = false;
   Elf_Scn *scn = NULL;
   while ((scn = elf_nextscn (mod->main.elf, scn)) != NULL)
     {
@@ -128,12 +131,35 @@ cache_sections (Dwfl_Module *mod)
 
 	  struct secref *newref = alloca (sizeof *newref);
 	  newref->scn = scn;
+	  newref->relocs = NULL;
 	  newref->name = name;
 	  newref->start = shdr->sh_addr + mod->main.bias;
 	  newref->end = newref->start + shdr->sh_size;
 	  newref->next = refs;
 	  refs = newref;
 	  ++nrefs;
+	}
+
+      if (mod->e_type == ET_REL
+	  && shdr->sh_size != 0
+	  && (shdr->sh_type == SHT_REL || shdr->sh_type == SHT_RELA)
+	  && mod->dwfl->callbacks->section_address != NULL)
+	{
+	  if (shdr->sh_info < elf_ndxscn (scn))
+	    {
+	      /* We've already looked at the section these relocs apply to.  */
+	      Elf_Scn *tscn = elf_getscn (mod->main.elf, shdr->sh_info);
+	      if (likely (tscn != NULL))
+		for (struct secref *sec = refs; sec != NULL; sec = sec->next)
+		  if (sec->scn == tscn)
+		    {
+		      sec->relocs = scn;
+		      break;
+		    }
+	    }
+	  else
+	    /* We'll have to do a second pass.  */
+	    check_reloc_sections = true;
 	}
     }
 
@@ -156,8 +182,38 @@ cache_sections (Dwfl_Module *mod)
     {
       mod->reloc_info->refs[i].name = sortrefs[i]->name;
       mod->reloc_info->refs[i].scn = sortrefs[i]->scn;
+      mod->reloc_info->refs[i].relocs = sortrefs[i]->relocs;
       mod->reloc_info->refs[i].start = sortrefs[i]->start;
       mod->reloc_info->refs[i].end = sortrefs[i]->end;
+    }
+
+  if (unlikely (check_reloc_sections))
+    {
+      /* There was a reloc section that preceded its target section.
+	 So we have to scan again now that we have cached all the
+	 possible target sections we care about.  */
+
+      scn = NULL;
+      while ((scn = elf_nextscn (mod->main.elf, scn)) != NULL)
+	{
+	  GElf_Shdr shdr_mem;
+	  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+	  if (shdr == NULL)
+	    goto elf_error;
+
+      	  if (shdr->sh_size != 0
+	      && (shdr->sh_type == SHT_REL || shdr->sh_type == SHT_RELA))
+	    {
+	      Elf_Scn *tscn = elf_getscn (mod->main.elf, shdr->sh_info);
+	      if (likely (tscn != NULL))
+		for (size_t i = 0; i < nrefs; ++i)
+		  if (mod->reloc_info->refs[i].scn == tscn)
+		    {
+		      mod->reloc_info->refs[i].relocs = scn;
+		      break;
+		    }
+	    }
+	}
     }
 
   return nrefs;
@@ -320,6 +376,23 @@ dwfl_module_address_section (Dwfl_Module *mod, Dwarf_Addr *address,
   int idx = find_section (mod, address);
   if (idx < 0)
     return NULL;
+
+  if (mod->reloc_info->refs[idx].relocs != NULL)
+    {
+      assert (mod->e_type == ET_REL);
+
+      Elf_Scn *tscn = mod->reloc_info->refs[idx].scn;
+      Elf_Scn *relocscn = mod->reloc_info->refs[idx].relocs;
+      Dwfl_Error result = __libdwfl_relocate_section (mod, mod->main.elf,
+						      relocscn, tscn, true);
+      if (likely (result == DWFL_E_NOERROR))
+	mod->reloc_info->refs[idx].relocs = NULL;
+      else
+	{
+	  __libdwfl_seterrno (result);
+	  return NULL;
+	}
+    }
 
   *bias = mod->main.bias;
   return mod->reloc_info->refs[idx].scn;

@@ -54,6 +54,7 @@
 #include "../libelf/libelfP.h"
 #include "../libebl/libeblP.h"
 #include "../libdw/libdwP.h"
+#include "../libdwfl/libdwflP.h"
 #include "../libdw/memory-access.h"
 
 
@@ -200,7 +201,7 @@ static size_t shnum;
 
 /* Declarations of local functions.  */
 static void process_file (int fd, const char *fname, bool only_one);
-static void process_elf_file (Dwfl_Module *dwflmod);
+static void process_elf_file (Dwfl_Module *dwflmod, int fd);
 static void print_ehdr (Ebl *ebl, GElf_Ehdr *ehdr);
 static void print_shdr (Ebl *ebl, GElf_Ehdr *ehdr);
 static void print_phdr (Ebl *ebl, GElf_Ehdr *ehdr);
@@ -460,6 +461,12 @@ count_dwflmod (Dwfl_Module *dwflmod __attribute__ ((unused)),
   return DWARF_CB_ABORT;
 }
 
+struct process_dwflmod_args
+{
+  int fd;
+  bool only_one;
+};
+
 static int
 process_dwflmod (Dwfl_Module *dwflmod,
 		 void **userdata __attribute__ ((unused)),
@@ -467,10 +474,10 @@ process_dwflmod (Dwfl_Module *dwflmod,
 		 Dwarf_Addr base __attribute__ ((unused)),
 		 void *arg)
 {
-  bool only_one = *(bool *) arg;
+  const struct process_dwflmod_args *a = arg;
 
   /* Print the file name.  */
-  if (!only_one)
+  if (!a->only_one)
     {
       const char *fname;
       dwfl_module_info (dwflmod, NULL, NULL, NULL, NULL, NULL, &fname, NULL);
@@ -478,7 +485,7 @@ process_dwflmod (Dwfl_Module *dwflmod,
       printf ("\n%s:\n\n", fname);
     }
 
-  process_elf_file (dwflmod);
+  process_elf_file (dwflmod, a->fd);
 
   return DWARF_CB_OK;
 }
@@ -507,6 +514,11 @@ process_file (int fd, const char *fname, bool only_one)
   if (!any_control_option)
     return;
 
+  /* Duplicate an fd for dwfl_report_offline to swallow.  */
+  int dwfl_fd = dup (fd);
+  if (unlikely (dwfl_fd < 0))
+    error (EXIT_FAILURE, errno, "dup");
+
   /* Use libdwfl in a trivial way to open the libdw handle for us.
      This takes care of applying relocations to DWARF data in ET_REL files.  */
   static const Dwfl_Callbacks callbacks =
@@ -515,7 +527,10 @@ process_file (int fd, const char *fname, bool only_one)
       .find_debuginfo = find_no_debuginfo
     };
   Dwfl *dwfl = dwfl_begin (&callbacks);
-  if (dwfl_report_offline (dwfl, fname, fname, fd) == NULL)
+  if (likely (dwfl != NULL))
+    /* Let 0 be the logical address of the file (or first in archive).  */
+    dwfl->offline_next_address = 0;
+  if (dwfl_report_offline (dwfl, fname, fname, dwfl_fd) == NULL)
     {
       struct stat64 st;
       if (fstat64 (fd, &st) != 0)
@@ -535,7 +550,8 @@ process_file (int fd, const char *fname, bool only_one)
 	dwfl_getmodules (dwfl, &count_dwflmod, &only_one, 1);
 
       /* Process the one or more modules gleaned from this file.  */
-      dwfl_getmodules (dwfl, &process_dwflmod, &only_one, 0);
+      struct process_dwflmod_args a = { .fd = fd, .only_one = only_one };
+      dwfl_getmodules (dwfl, &process_dwflmod, &a, 0);
     }
   dwfl_end (dwfl);
 }
@@ -543,7 +559,7 @@ process_file (int fd, const char *fname, bool only_one)
 
 /* Process one ELF file.  */
 static void
-process_elf_file (Dwfl_Module *dwflmod)
+process_elf_file (Dwfl_Module *dwflmod, int fd)
 {
   GElf_Addr dwflbias;
   Elf *elf = dwfl_module_getelf (dwflmod, &dwflbias);
@@ -553,6 +569,7 @@ process_elf_file (Dwfl_Module *dwflmod)
 
   if (ehdr == NULL)
     {
+    elf_error:
       error (0, 0, gettext ("cannot read ELF header: %s"), elf_errmsg (-1));
       return;
     }
@@ -560,6 +577,7 @@ process_elf_file (Dwfl_Module *dwflmod)
   Ebl *ebl = ebl_openbackend (elf);
   if (ebl == NULL)
     {
+    ebl_error:
       error (0, errno, gettext ("cannot create EBL handle"));
       return;
     }
@@ -570,10 +588,40 @@ process_elf_file (Dwfl_Module *dwflmod)
 	   gettext ("cannot determine number of sections: %s"),
 	   elf_errmsg (-1));
 
+  /* For an ET_REL file, libdwfl has adjusted the in-core shdrs
+     and may have applied relocation to some sections.
+     So we need to get a fresh Elf handle on the file to display those.  */
+  bool print_unrelocated = (print_section_header
+			    || print_relocations
+			    || dump_data_sections != NULL
+			    || print_notes);
+
+  Elf *pure_elf = NULL;
+  Ebl *pure_ebl = ebl;
+  if (ehdr->e_type == ET_REL && print_unrelocated)
+    {
+      /* Read the file afresh.  */
+      pure_elf = elf_begin (fd, ELF_C_READ_MMAP, NULL);
+      off64_t aroff = elf_getaroff (elf);
+      if (aroff > 0)
+	{
+	  /* Archive member.  */
+	  (void) elf_rand (pure_elf, aroff);
+	  Elf *armem = elf_begin (-1, ELF_C_READ_MMAP, pure_elf);
+	  elf_end (pure_elf);
+	  pure_elf = armem;
+	}
+      if (pure_elf == NULL)
+	goto elf_error;
+      pure_ebl = ebl_openbackend (pure_elf);
+      if (pure_ebl == NULL)
+	goto ebl_error;
+    }
+
   if (print_file_header)
     print_ehdr (ebl, ehdr);
   if (print_section_header)
-    print_shdr (ebl, ehdr);
+    print_shdr (pure_ebl, ehdr);
   if (print_program_header)
     print_phdr (ebl, ehdr);
   if (print_section_groups)
@@ -581,7 +629,7 @@ process_elf_file (Dwfl_Module *dwflmod)
   if (print_dynamic_table)
     print_dynamic (ebl, ehdr);
   if (print_relocations)
-    print_relocs (ebl);
+    print_relocs (pure_ebl);
   if (print_histogram)
     handle_hash (ebl);
   if (print_symbol_table)
@@ -593,17 +641,23 @@ process_elf_file (Dwfl_Module *dwflmod)
   if (print_arch)
     print_liblist (ebl);
   if (dump_data_sections != NULL)
-    dump_data (ebl);
+    dump_data (pure_ebl);
   if (string_sections != NULL)
     dump_strings (ebl);
   if (print_debug_sections != 0)
     print_debug (dwflmod, ebl, ehdr);
   if (print_notes)
-    handle_notes (ebl, ehdr);
+    handle_notes (pure_ebl, ehdr);
   if (print_string_sections)
     print_strings (ebl);
 
   ebl_closebackend (ebl);
+
+  if (pure_ebl != ebl)
+    {
+      ebl_closebackend (pure_ebl);
+      elf_end (pure_elf);
+    }
 }
 
 
@@ -4027,13 +4081,13 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
     case DW_FORM_ref4:
     case DW_FORM_ref2:
     case DW_FORM_ref1:;
-      Dwarf_Off ref;
-      if (unlikely (dwarf_formref (attrp, &ref) != 0))
+      Dwarf_Die ref;
+      if (unlikely (dwarf_formref_die (attrp, &ref) == NULL))
 	goto attrval_out;
 
       printf ("           %*s%-20s [%6" PRIxMAX "]\n",
 	      (int) (level * 2), "", dwarf_attr_string (attr),
-	      (uintmax_t) (ref + cbargs->cu_offset));
+	      (uintmax_t) dwarf_dieoffset (&ref));
       break;
 
     case DW_FORM_udata:
@@ -4384,7 +4438,15 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl,
 	      line_range, opcode_base);
 
       if (unlikely (linep + opcode_base - 1 >= lineendp))
-	goto invalid_data;
+	{
+	invalid_unit:
+	  error (0, 0,
+		 gettext ("invalid data at offset %tu in section [%zu] '%s'"),
+		 linep - (const unsigned char *) data->d_buf,
+		 elf_ndxscn (scn), ".debug_line");
+	  linep = lineendp;
+	  continue;
+	}
       int opcode_base_l10 = 1;
       unsigned int tmp = opcode_base;
       while (tmp > 10)
@@ -4400,14 +4462,14 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl,
 		opcode_base_l10, cnt, linep[cnt - 1]);
       linep += opcode_base - 1;
       if (unlikely (linep >= lineendp))
-	goto invalid_data;
+	goto invalid_unit;
 
       puts (gettext ("\nDirectory table:"));
       while (*linep != 0)
 	{
 	  unsigned char *endp = memchr (linep, '\0', lineendp - linep);
 	  if (endp == NULL)
-	    goto invalid_data;
+	    goto invalid_unit;
 
 	  printf (" %s\n", (char *) linep);
 
@@ -4417,7 +4479,7 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl,
       ++linep;
 
       if (unlikely (linep >= lineendp))
-	goto invalid_data;
+	goto invalid_unit;
       puts (gettext ("\nFile name table:\n"
 		     " Entry Dir   Time      Size      Name"));
       for (unsigned int cnt = 1; *linep != 0; ++cnt)
@@ -4426,7 +4488,7 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl,
 	  char *fname = (char *) linep;
 	  unsigned char *endp = memchr (fname, '\0', lineendp - linep);
 	  if (endp == NULL)
-	    goto invalid_data;
+	    goto invalid_unit;
 	  linep = endp + 1;
 
 	  /* Then the index.  */
@@ -4517,13 +4579,13 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl,
 	    {
 	      /* This an extended opcode.  */
 	      if (unlikely (linep + 2 > lineendp))
-		goto invalid_data;
+		goto invalid_unit;
 
 	      /* The length.  */
 	      unsigned int len = *linep++;
 
 	      if (unlikely (linep + len > lineendp))
-		goto invalid_data;
+		goto invalid_unit;
 
 	      /* The sub-opcode.  */
 	      opcode = *linep++;
@@ -4559,7 +4621,7 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl,
 		    unsigned char *endp = memchr (linep, '\0',
 						  lineendp - linep);
 		    if (endp == NULL)
-		      goto invalid_data;
+		      goto invalid_unit;
 		    linep = endp + 1;
 
 		    unsigned int diridx;
@@ -4626,7 +4688,7 @@ define new file: dir=%u, mtime=%" PRIu64 ", length=%" PRIu64 ", name=%s\n"),
 		case DW_LNS_set_column:
 		  /* Takes one uleb128 parameter which is stored in column.  */
 		  if (unlikely (standard_opcode_lengths[opcode] != 1))
-		    goto invalid_data;
+		    goto invalid_unit;
 
 		  get_uleb128 (u128, linep);
 		  printf (gettext (" set column to %" PRIu64 "\n"),
@@ -4662,7 +4724,7 @@ define new file: dir=%u, mtime=%" PRIu64 ", length=%" PRIu64 ", name=%s\n"),
 		  /* Takes one 16 bit parameter which is added to the
 		     address.  */
 		  if (unlikely (standard_opcode_lengths[opcode] != 1))
-		    goto invalid_data;
+		    goto invalid_unit;
 
 		  u128 = read_2ubyte_unaligned_inc (dbg, linep);
 		  address += u128;
@@ -5888,7 +5950,7 @@ hex_dump (const uint8_t *data, size_t len)
 	  printf ("%02x", data[pos + i]);
 
       if (chunk < 16)
-	printf ("%*s", (int) ((16 - chunk) * 2 + (16 - chunk) / 4), "");
+	printf ("%*s", (int) ((16 - chunk) * 2 + (16 - chunk + 3) / 4), "");
 
       for (size_t i = 0; i < chunk; ++i)
 	{

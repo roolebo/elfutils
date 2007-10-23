@@ -86,20 +86,26 @@ ebl_core_note_type_name (ebl, type, buf, len)
 	  KNOWNSTYPE (LWPSTATUS),
 	  KNOWNSTYPE (LWPSINFO),
 	  KNOWNSTYPE (PRFPXREG)
+#undef KNOWNSTYPE
 	};
 
       /* Handle standard names.  */
       if (type < sizeof (knowntypes) / sizeof (knowntypes[0])
 	  && knowntypes[type] != NULL)
 	res = knowntypes[type];
-      else if (type == NT_PRXFPREG)
-	res = "PRXFPREG";
       else
-	{
-	  snprintf (buf, len, "%s: %" PRIu32, gettext ("<unknown>"), type);
+	switch (type)
+	  {
+#define KNOWNSTYPE(name) case NT_##name: res = #name; break
+	    KNOWNSTYPE (PRXFPREG);
+	    KNOWNSTYPE (PPC_VMX);
+#undef KNOWNSTYPE
 
-	  res = buf;
-	}
+	  default:
+	    snprintf (buf, len, "%s: %" PRIu32, gettext ("<unknown>"), type);
+
+	    res = buf;
+	  }
     }
 
   return res;

@@ -87,7 +87,7 @@ static const struct argp_option options[] =
     N_("Create output for modules that have no separate debug information"),
     0 },
   { "relocate", 'R', NULL, 0,
-    N_("Apply relocations to DWARF sections in ET_REL files"), 0 },
+    N_("Apply relocations to section contents in ET_REL files"), 0 },
   { "list-only", 'n', NULL, 0,
     N_("Only list module and file names, build IDs"), 0 },
   { NULL, 0, NULL, 0, NULL, 0 }
@@ -719,17 +719,27 @@ struct symbol
     const char *name;
     struct Ebl_Strent *strent;
   };
-  GElf_Addr value;
-  GElf_Xword size;
-  GElf_Word shndx;
   union
   {
     struct
     {
-      uint8_t info;
-      uint8_t other;
-    } info;
-    int16_t compare;
+      GElf_Addr value;
+      GElf_Xword size;
+      GElf_Word shndx;
+      union
+      {
+	struct
+	{
+	  uint8_t info;
+	  uint8_t other;
+	} info;
+	int16_t compare;
+      };
+    };
+
+    /* For a symbol discarded after first sort, this matches its better's
+       map pointer.  */
+    size_t *duplicate;
   };
 };
 
@@ -819,7 +829,7 @@ compare_symbols_output (const void *a, const void *b)
   int cmp;
 
   /* Sort discarded symbols last.  */
-  cmp = (*s1->map == 0) - (*s2->map == 0);
+  cmp = (s1->name == NULL) - (s2->name == NULL);
 
   if (cmp == 0)
     /* Local symbols must come first.  */
@@ -1605,29 +1615,63 @@ copy_elided_sections (Elf *unstripped, Elf *stripped,
 	 new slots, collecting a map from old indices to new.  */
       size_t nsym = 0;
       for (struct symbol *s = symbols; s < &symbols[total_syms]; ++s)
-	/* Skip a section symbol for a removed section, or a duplicate.  */
-	*s->map = (((s->shndx == SHN_UNDEF
-		     && GELF_ST_TYPE (s->info.info) == STT_SECTION)
-		    || (s + 1 < &symbols[total_syms]
-			&& !compare_symbols (s, s + 1))) ? 0
-		   /* Allocate the next slot.  */
-		   : ++nsym);
+	{
+	  /* Skip a section symbol for a removed section.  */
+	  if (s->shndx == SHN_UNDEF
+	      && GELF_ST_TYPE (s->info.info) == STT_SECTION)
+	    {
+	      s->name = NULL;	/* Mark as discarded. */
+	      *s->map = STN_UNDEF;
+	      s->duplicate = NULL;
+	      continue;
+	    }
+
+	  struct symbol *n = s;
+	  while (n + 1 < &symbols[total_syms] && !compare_symbols (s, n + 1))
+	    ++n;
+
+	  while (s < n)
+	    {
+	      /* This is a duplicate.  Its twin will get the next slot.  */
+	      s->name = NULL;	/* Mark as discarded. */
+	      s->duplicate = n->map;
+	      ++s;
+	    }
+
+	  /* Allocate the next slot.  */
+	  *s->map = ++nsym;
+	}
 
       /* Now we sort again, to determine the order in the output.  */
       qsort (symbols, total_syms, sizeof symbols[0], compare_symbols_output);
 
       if (nsym < total_syms)
 	/* The discarded symbols are now at the end of the table.  */
-	assert (*symbols[nsym].map == 0);
+	assert (symbols[nsym].name == NULL);
 
       /* Now a final pass updates the map with the final order,
 	 and builds up the new string table.  */
       symstrtab = ebl_strtabinit (true);
       for (size_t i = 0; i < nsym; ++i)
 	{
+	  assert (symbols[i].name != NULL);
 	  assert (*symbols[i].map != 0);
-	  *symbols[i].map = i;
+	  *symbols[i].map = 1 + i;
 	  symbols[i].strent = ebl_strtabadd (symstrtab, symbols[i].name, 0);
+	}
+
+      /* Scan the discarded symbols too, just to update their slots
+	 in SYMNDX_MAP to refer to their live duplicates.  */
+      for (size_t i = nsym; i < total_syms; ++i)
+	{
+	  assert (symbols[i].name == NULL);
+	  if (symbols[i].duplicate == NULL)
+	    assert (*symbols[i].map == STN_UNDEF);
+	  else
+	    {
+	      assert (*symbols[i].duplicate != STN_UNDEF);
+	      *symbols[i].map = *symbols[i].duplicate;
+	    }
 	}
 
       /* Now we are ready to write the new symbol table.  */

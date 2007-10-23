@@ -71,6 +71,19 @@ static const Ebl_Register_Location fpregset_regs[] =
   };
 #define FPREGSET_SIZE		(33 * 8)
 
+static const Ebl_Register_Location altivec_regs[] =
+  {
+    /* vr0-vr31 */
+    { .offset = 0, .regno = 1124, .count = 32, .bits = 128 },
+    /* vscr XXX 67 is an unofficial assignment */
+    { .offset = 32 * 16, .regno = 67, .count = 1, .bits = 32, .pad = 12 },
+    /* vrsave */
+    { .offset = 33 * 16, .regno = 356, .count = 1, .bits = 32, .pad = 12 }
+  };
+
+#define EXTRA_NOTES \
+  EXTRA_REGSET (NT_PPC_VMX, 34 * 16, altivec_regs)
+
 #if BITS == 32
 # define ULONG			uint32_t
 # define ALIGN_ULONG		4

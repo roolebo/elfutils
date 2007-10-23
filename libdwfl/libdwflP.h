@@ -121,6 +121,7 @@ struct dwfl_file
   char *name;
   int fd;
   bool valid;			/* The build ID note has been matched.  */
+  bool relocated;		/* Partial relocation of all sections done.  */
 
   Elf *elf;
   GElf_Addr bias;		/* Actual load address - p_vaddr.  */
@@ -227,11 +228,20 @@ extern void __libdwfl_module_free (Dwfl_Module *mod) internal_function;
 
 
 /* Process relocations in debugging sections in an ET_REL file.
-   DEBUGFILE must be opened with ELF_C_READ_MMAP_PRIVATE or ELF_C_READ,
+   FILE must be opened with ELF_C_READ_MMAP_PRIVATE or ELF_C_READ,
    to make it possible to relocate the data in place (or ELF_C_RDWR or
    ELF_C_RDWR_MMAP if you intend to modify the Elf file on disk).  After
-   this, dwarf_begin_elf on DEBUGFILE will read the relocated data.  */
-extern Dwfl_Error __libdwfl_relocate (Dwfl_Module *mod, Elf *debugfile)
+   this, dwarf_begin_elf on FILE will read the relocated data.
+
+   When DEBUG is false, apply partial relocation to all sections.  */
+extern Dwfl_Error __libdwfl_relocate (Dwfl_Module *mod, Elf *file, bool debug)
+  internal_function;
+
+/* Process (simple) relocations in arbitrary section TSCN of an ET_REL file.
+   RELOCSCN is SHT_REL or SHT_RELA and TSCN is its sh_info target section.  */
+extern Dwfl_Error __libdwfl_relocate_section (Dwfl_Module *mod, Elf *relocated,
+					      Elf_Scn *relocscn, Elf_Scn *tscn,
+					      bool partial)
   internal_function;
 
 /* Adjust *VALUE from section-relative to absolute.

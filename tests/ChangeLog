@@ -1,3 +1,24 @@
+2007-10-20  Roland McGrath  <roland@redhat.com>
+
+	* run-dwfl-addr-sect.sh: Change expected output, no errors.
+
+2007-10-19  Roland McGrath  <roland@redhat.com>
+
+	* dwfl-addr-sect.c (handle_address): Return int.
+	Don't exit on error, just return nonzero.
+	(main): Collect results.
+	* run-dwfl-addr-sect.sh: New file.
+	* testfile43.bz2: New data file.
+	* Makefile.am (EXTRA_DIST, TESTS): Add them.
+
+2007-10-18  Roland McGrath  <roland@redhat.com>
+
+	* run-allregs.sh: Update expected ppc output for vrsave/vscr.
+
+2007-10-16  Roland McGrath  <roland@redhat.com>
+
+	* test-subr.sh (remove_files): Don't pass -Bb to diff.
+
 2007-10-09  Roland McGrath  <roland@redhat.com>
 
 	* dwflmodtest.c (print_module): Don't use %p in output.

@@ -1,3 +1,7 @@
+2007-10-18  Roland McGrath  <roland@redhat.com>
+
+	* eblcorenotetypename.c (ebl_core_note_type_name): Handle NT_PPC_VMX.
+
 2007-10-11  Roland McGrath  <roland@redhat.com>
 
 	* eblobjnote.c (ebl_object_note): Translate target format (byte-swap)

@@ -57,9 +57,12 @@
 
 #if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 3)
 # define __nonnull_attribute__(...) __attribute__ ((__nonnull__ (__VA_ARGS__)))
+# define __deprecated_attribute__ __attribute__ ((__deprecated__))
 #else
 # define __nonnull_attribute__(args...)
+# define __deprecated_attribute__
 #endif
+
 
 #ifdef __GNUC_STDC_INLINE__
 # define __libdw_extern_inline extern __inline __attribute__ ((__gnu_inline__))
@@ -310,9 +313,10 @@ extern int dwarf_formsdata (Dwarf_Attribute *attr, Dwarf_Sword *return_uval)
 extern int dwarf_formaddr (Dwarf_Attribute *attr, Dwarf_Addr *return_addr)
      __nonnull_attribute__ (2);
 
-/* Return reference offset represented by attribute.  */
+/* This function is deprecated.  Always use dwarf_formref_die instead.
+   Return reference offset represented by attribute.  */
 extern int dwarf_formref (Dwarf_Attribute *attr, Dwarf_Off *return_offset)
-     __nonnull_attribute__ (2);
+     __nonnull_attribute__ (2) __deprecated_attribute__;
 
 /* Look up the DIE in a reference-form attribute.  */
 extern Dwarf_Die *dwarf_formref_die (Dwarf_Attribute *attr, Dwarf_Die *die_mem)

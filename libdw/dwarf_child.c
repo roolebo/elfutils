@@ -1,5 +1,5 @@
 /* Return vhild of current DIE.
-   Copyright (C) 2003, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -176,6 +176,15 @@ dwarf_child (die, result)
 
   if (addr == NULL)
     return -1;
+
+  /* It's kosher (just suboptimal) to have a null entry first thing (7.5.3).
+     So if this starts with ULEB128 of 0 (even with silly encoding of 0),
+     it is a kosher null entry and we do not really have any children.  */
+  const unsigned char *code = addr;
+  while (unlikely (*code == 0x80))
+    ++code;
+  if (unlikely (*code == '\0'))
+    return 1;
 
   /* RESULT can be the same as DIE.  So preserve what we need.  */
   struct Dwarf_CU *cu = die->cu;

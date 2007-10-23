@@ -51,6 +51,14 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+
+/* We start every ET_REL module at a moderately aligned boundary.
+   This keeps the low addresses easy to read compared to a layout
+   starting at 0 (as when using -e).  It also makes it unlikely
+   that a middle section will have a larger alignment and require
+   rejiggering (see below).  */
+#define REL_MIN_ALIGN	((GElf_Xword) 0x100)
+
 Dwfl_Module *
 internal_function
 __libdwfl_report_elf (Dwfl *dwfl, const char *name, const char *file_name,
@@ -72,41 +80,91 @@ __libdwfl_report_elf (Dwfl *dwfl, const char *name, const char *file_name,
 	 By updating the section header in place, we leave the layout
 	 information to be found by relocation.  */
 
-      start = end = base;
+      start = end = base = (base + REL_MIN_ALIGN - 1) & -REL_MIN_ALIGN;
 
+      bool first = true;
       Elf_Scn *scn = NULL;
       while ((scn = elf_nextscn (elf, scn)) != NULL)
 	{
 	  GElf_Shdr shdr_mem;
 	  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
-	  if (shdr == NULL)
+	  if (unlikely (shdr == NULL))
 	    goto elf_error;
 
 	  if (shdr->sh_flags & SHF_ALLOC)
 	    {
 	      const GElf_Xword align = shdr->sh_addralign ?: 1;
-	      if (shdr->sh_addr == 0 || (bias == 0 && end > start))
+	      const GElf_Addr next = (end + align - 1) & -align;
+	      if (shdr->sh_addr == 0
+		  /* Once we've started doing layout we have to do it all,
+		     unless we just layed out the first section at 0 when
+		     it already was at 0.  */
+		  || (bias == 0 && end > start && end != next))
 		{
-		  shdr->sh_addr = (end + align - 1) & -align;
+		  shdr->sh_addr = next;
 		  if (end == base)
 		    /* This is the first section assigned a location.
 		       Use its aligned address as the module's base.  */
-		    start = shdr->sh_addr;
+		    start = base = shdr->sh_addr;
+		  else if (unlikely (base & (align - 1)))
+		    {
+		      /* If BASE has less than the maximum alignment of
+			 any section, we eat more than the optimal amount
+			 of padding and so make the module's apparent
+			 size come out larger than it would when placed
+			 at zero.  So reset the layout with a better base.  */
+
+		      start = end = base = (base + align - 1) & -align;
+		      Elf_Scn *prev_scn = NULL;
+		      do
+			{
+			  prev_scn = elf_nextscn (elf, prev_scn);
+			  GElf_Shdr prev_shdr_mem;
+			  GElf_Shdr *prev_shdr = gelf_getshdr (prev_scn,
+							       &prev_shdr_mem);
+			  if (unlikely (prev_shdr == NULL))
+			    goto elf_error;
+			  if (prev_shdr->sh_flags & SHF_ALLOC)
+			    {
+			      const GElf_Xword prev_align
+				= prev_shdr->sh_addralign ?: 1;
+
+			      prev_shdr->sh_addr
+				= (end + prev_align - 1) & -prev_align;
+			      end = prev_shdr->sh_addr + prev_shdr->sh_size;
+
+			      if (unlikely (! gelf_update_shdr (prev_scn,
+								prev_shdr)))
+				goto elf_error;
+			    }
+			}
+		      while (prev_scn != scn);
+		      continue;
+		    }
+
 		  end = shdr->sh_addr + shdr->sh_size;
-		  if (shdr->sh_addr == 0)
-		    /* This is a marker that this was resolved to zero,
-		       to prevent a callback.  */
-		    shdr->sh_offset = 0;
-		  if (! gelf_update_shdr (scn, shdr))
+		  if (likely (shdr->sh_addr != 0)
+		      && unlikely (! gelf_update_shdr (scn, shdr)))
 		    goto elf_error;
 		}
 	      else
 		{
-		  if (bias == 0 || end < shdr->sh_addr + shdr->sh_size)
+		  /* The address is already assigned.  Just track it.  */
+		  if (first || end < shdr->sh_addr + shdr->sh_size)
 		    end = shdr->sh_addr + shdr->sh_size;
-		  if (bias == 0 || bias > shdr->sh_addr)
+		  if (first || bias > shdr->sh_addr)
+		    /* This is the lowest address in the module.  */
 		    bias = shdr->sh_addr;
+
+		  if ((shdr->sh_addr - bias + base) & (align - 1))
+		    /* This section winds up misaligned using BASE.
+		       Adjust BASE upwards to make it congruent to
+		       the lowest section address in the file modulo ALIGN.  */
+		    base = (((base + align - 1) & -align)
+			    + (bias & (align - 1)));
 		}
+
+	      first = false;
 	    }
 	}
 
@@ -117,7 +175,7 @@ __libdwfl_report_elf (Dwfl *dwfl, const char *name, const char *file_name,
 	     Now just compute the bias from the requested base.  */
 	  start = base;
 	  end = end - bias + start;
-	  bias -= start;
+	  bias = start - bias;
 	}
       break;
 
@@ -133,7 +191,7 @@ __libdwfl_report_elf (Dwfl *dwfl, const char *name, const char *file_name,
       for (uint_fast16_t i = 0; i < ehdr->e_phnum; ++i)
 	{
 	  GElf_Phdr phdr_mem, *ph = gelf_getphdr (elf, i, &phdr_mem);
-	  if (ph == NULL)
+	  if (unlikely (ph == NULL))
 	    goto elf_error;
 	  if (ph->p_type == PT_LOAD)
 	    {
@@ -148,7 +206,7 @@ __libdwfl_report_elf (Dwfl *dwfl, const char *name, const char *file_name,
       for (uint_fast16_t i = ehdr->e_phnum; i-- > 0;)
 	{
 	  GElf_Phdr phdr_mem, *ph = gelf_getphdr (elf, i, &phdr_mem);
-	  if (ph == NULL)
+	  if (unlikely (ph == NULL))
 	    goto elf_error;
 	  if (ph->p_type == PT_LOAD)
 	    {

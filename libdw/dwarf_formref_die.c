@@ -1,5 +1,5 @@
 /* Look up the DIE in a reference-form attribute.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -52,13 +52,39 @@
 #endif
 
 #include "libdwP.h"
+#include <dwarf.h>
+
 
 Dwarf_Die *
-dwarf_formref_die (Dwarf_Attribute *attr, Dwarf_Die *die_mem)
+dwarf_formref_die (attr, die_mem)
+     Dwarf_Attribute *attr;
+     Dwarf_Die *die_mem;
 {
+  if (attr == NULL)
+    return NULL;
+
   Dwarf_Off offset;
-  return (unlikely (INTUSE(dwarf_formref) (attr, &offset) != 0) ? NULL
-	  : INTUSE(dwarf_offdie) (attr->cu->dbg, attr->cu->start + offset,
-				  die_mem));
+  if (attr->form == DW_FORM_ref_addr)
+    {
+      /* This has an absolute offset.  */
+
+      uint8_t ref_size = (attr->cu->version == 2
+			  ? attr->cu->address_size
+			  : attr->cu->offset_size);
+
+      if (ref_size == 8)
+	offset = read_8ubyte_unaligned (attr->cu->dbg, attr->valp);
+      else
+	offset = read_4ubyte_unaligned (attr->cu->dbg, attr->valp);
+    }
+  else
+    {
+      /* Other forms produce an offset from the CU.  */
+      if (unlikely (__libdw_formref (attr, &offset) != 0))
+	return NULL;
+      offset += attr->cu->start;
+    }
+
+  return INTUSE(dwarf_offdie) (attr->cu->dbg, offset, die_mem);
 }
 INTDEF (dwarf_formref_die)

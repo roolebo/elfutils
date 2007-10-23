@@ -37,8 +37,7 @@
 #include ELFUTILS_HEADER(dwfl)
 #include <dwarf.h>
 
-
-static void
+static int
 handle_address (Dwfl *dwfl, Dwarf_Addr address)
 {
   Dwfl_Module *mod = dwfl_addrmodule (dwfl, address);
@@ -46,12 +45,16 @@ handle_address (Dwfl *dwfl, Dwarf_Addr address)
   Dwarf_Addr bias;
   Elf_Scn *scn = dwfl_module_address_section (mod, &adjusted, &bias);
   if (scn == NULL)
-    error (EXIT_FAILURE, 0, "%#" PRIx64 ": dwfl_module_address_section: %s",
-	   address, dwfl_errmsg (-1));
+    {
+      error (0, 0, "%#" PRIx64 ": dwfl_module_address_section: %s",
+	     address, dwfl_errmsg (-1));
+      return 1;
+    }
   printf ("address %#" PRIx64 " => module \"%s\" section %zu + %#" PRIx64 "\n",
 	  address,
 	  dwfl_module_info (mod, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 	  elf_ndxscn (scn), adjusted);
+  return 0;
 }
 
 int
@@ -74,7 +77,7 @@ main (int argc, char **argv)
       char *endp;
       uintmax_t addr = strtoumax (argv[remaining], &endp, 0);
       if (endp != argv[remaining])
-	handle_address (dwfl, addr);
+	result |= handle_address (dwfl, addr);
       else
 	result = 1;
     }

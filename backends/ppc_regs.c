@@ -58,13 +58,13 @@ ppc_register_info (Ebl *ebl __attribute__ ((unused)),
       if (ebl->machine != EM_PPC64 && regno < 64)
 	*bits = 64;
     }
-  else if (regno < 1124)
-    *setname = "privileged";
-  else
+  else if (regno == 67 || regno == 356 || regno >= 1124)
     {
       *setname = "vector";
-      *bits = 128;
+      *bits = regno >= 1124 ? 128 : 32;
     }
+  else
+    *setname = "privileged";
 
   switch (regno)
     {
@@ -100,6 +100,8 @@ ppc_register_info (Ebl *ebl __attribute__ ((unused)),
       return stpcpy (name, "fpscr") + 1 - name;
     case 66:
       return stpcpy (name, "msr") + 1 - name;
+    case 67:			/* XXX unofficial assignment */
+      return stpcpy (name, "vscr") + 1 - name;
 
     case 70 + 0 ... 70 + 9:
       name[0] = 's';

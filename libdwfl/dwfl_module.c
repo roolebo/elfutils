@@ -68,12 +68,10 @@ static void
 free_file (struct dwfl_file *file)
 {
   free (file->name);
-  if (file->elf != NULL)
-    {
-      elf_end (file->elf);
-      if (file->fd != -1)
-	close (file->fd);
-    }
+
+  /* Close the fd only on the last reference.  */
+  if (file->elf != NULL && elf_end (file->elf) == 0 && file->fd != -1)
+    close (file->fd);
 }
 
 void

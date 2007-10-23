@@ -1,5 +1,5 @@
 /* Find CU for given offset.
-   Copyright (C) 2003, 2004, 2005 Red Hat, Inc.
+   Copyright (C) 2003, 2004, 2005, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -97,6 +97,7 @@ __libdw_findcu (dbg, start)
 
   if (start < dbg->next_cu_offset)
     {
+    invalid:
       __libdw_seterrno (DWARF_E_INVALID_DWARF);
       return NULL;
     }
@@ -115,6 +116,15 @@ __libdw_findcu (dbg, start)
 	/* No more entries.  */
 	return NULL;
 
+      /* XXX We need the version number but dwarf_nextcu swallows it.  */
+      const char *bytes = (dbg->sectiondata[IDX_debug_info]->d_buf + oldoff
+			   + (2 * offset_size - 4));
+      uint16_t version = read_2ubyte_unaligned (dbg, bytes);
+
+      /* We only know how to handle the DWARF version 2 and 3 formats.  */
+      if (unlikely (version != 2) && unlikely (version != 3))
+	goto invalid;
+
       /* Create an entry for this CU.  */
       struct Dwarf_CU *newp = libdw_typed_alloc (dbg, struct Dwarf_CU);
 
@@ -123,6 +133,7 @@ __libdw_findcu (dbg, start)
       newp->end = dbg->next_cu_offset;
       newp->address_size = address_size;
       newp->offset_size = offset_size;
+      newp->version = version;
       Dwarf_Abbrev_Hash_init (&newp->abbrev_hash, 41);
       newp->orig_abbrev_offset = newp->last_abbrev_offset = abbrev_offset;
       newp->lines = NULL;

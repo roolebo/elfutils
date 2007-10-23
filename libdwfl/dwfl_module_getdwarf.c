@@ -600,7 +600,7 @@ load_dw (Dwfl_Module *mod, struct dwfl_file *debugfile)
       find_symtab (mod);
       Dwfl_Error result = mod->symerr;
       if (result == DWFL_E_NOERROR)
-	result = __libdwfl_relocate (mod, debugfile->elf);
+	result = __libdwfl_relocate (mod, debugfile->elf, true);
       if (result != DWFL_E_NOERROR)
 	return result;
 
@@ -689,6 +689,26 @@ dwfl_module_getelf (Dwfl_Module *mod, GElf_Addr *loadbase)
   find_file (mod);
   if (mod->elferr == DWFL_E_NOERROR)
     {
+      if (mod->e_type == ET_REL && ! mod->main.relocated)
+	{
+	  /* Before letting them get at the Elf handle,
+	     apply all the relocations we know how to.  */
+
+	  mod->main.relocated = true;
+	  if (likely (__libdwfl_module_getebl (mod) == DWFL_E_NOERROR))
+	    {
+	      (void) __libdwfl_relocate (mod, mod->main.elf, false);
+
+	      if (mod->debug.elf == mod->main.elf)
+		mod->debug.relocated = true;
+	      else if (mod->debug.elf != NULL && ! mod->debug.relocated)
+		{
+		  mod->debug.relocated = true;
+		  (void) __libdwfl_relocate (mod, mod->debug.elf, false);
+		}
+	    }
+	}
+
       *loadbase = mod->main.bias;
       return mod->main.elf;
     }
@@ -708,6 +728,16 @@ dwfl_module_getdwarf (Dwfl_Module *mod, Dwarf_Addr *bias)
   find_dw (mod);
   if (mod->dwerr == DWFL_E_NOERROR)
     {
+      /* If dwfl_module_getelf was used previously, then partial apply
+	 relocation to miscellaneous sections in the debug file too.  */
+      if (mod->e_type == ET_REL
+	  && mod->main.relocated && ! mod->debug.relocated)
+	{
+	  mod->debug.relocated = true;
+	  if (mod->debug.elf != mod->main.elf)
+	    (void) __libdwfl_relocate (mod, mod->debug.elf, false);
+	}
+
       *bias = mod->debug.bias;
       return mod->dw;
     }

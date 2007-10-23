@@ -226,9 +226,26 @@ report_kernel_archive (Dwfl *dwfl, const char **release,
   if (fd < 0)
     result = errno ?: ENOENT;
   else
-    /* We have the archive file open!  */
-    result = __libdwfl_report_offline (dwfl, NULL, archive, fd, true,
-				       predicate) == NULL ? -1 : 0;
+    {
+      /* We have the archive file open!  */
+      Dwfl_Module *last = __libdwfl_report_offline (dwfl, NULL, archive, fd,
+						    true, predicate);
+      if (unlikely (last == NULL))
+	result = -1;
+      else
+	{
+	  /* Find the kernel and move it to the head of the list.  */
+	  Dwfl_Module **tailp = &dwfl->modulelist, **prevp = tailp;
+	  for (Dwfl_Module *m = *prevp; m != NULL; m = *(prevp = &m->next))
+	    if (!m->gc && m->e_type != ET_REL && !strcmp (m->name, "kernel"))
+	      {
+		*prevp = m->next;
+		m->next = *tailp;
+		*tailp = m;
+		break;
+	      }
+	}
+    }
 
   free (archive);
   return result;

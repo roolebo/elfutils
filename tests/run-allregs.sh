@@ -502,7 +502,6 @@ privileged registers:
 	353: spr253 (spr253), unsigned 32 bits
 	354: spr254 (spr254), unsigned 32 bits
 	355: spr255 (spr255), unsigned 32 bits
-	356: vrsave (vrsave), unsigned 32 bits
 	357: spr257 (spr257), unsigned 32 bits
 	358: spr258 (spr258), unsigned 32 bits
 	359: spr259 (spr259), unsigned 32 bits
@@ -1147,6 +1146,8 @@ privileged registers:
 	998: spr898 (spr898), unsigned 32 bits
 	999: spr899 (spr899), unsigned 32 bits
 vector registers:
+	 67: vscr (vscr), unsigned 32 bits
+	356: vrsave (vrsave), unsigned 32 bits
 	1124: vr0 (vr0), unsigned 128 bits
 	1125: vr1 (vr1), unsigned 128 bits
 	1126: vr2 (vr2), unsigned 128 bits
@@ -1524,7 +1525,6 @@ privileged registers:
 	353: spr253 (spr253), unsigned 64 bits
 	354: spr254 (spr254), unsigned 64 bits
 	355: spr255 (spr255), unsigned 64 bits
-	356: vrsave (vrsave), unsigned 64 bits
 	357: spr257 (spr257), unsigned 64 bits
 	358: spr258 (spr258), unsigned 64 bits
 	359: spr259 (spr259), unsigned 64 bits
@@ -2169,6 +2169,8 @@ privileged registers:
 	998: spr898 (spr898), unsigned 64 bits
 	999: spr899 (spr899), unsigned 64 bits
 vector registers:
+	 67: vscr (vscr), unsigned 32 bits
+	356: vrsave (vrsave), unsigned 32 bits
 	1124: vr0 (vr0), unsigned 128 bits
 	1125: vr1 (vr1), unsigned 128 bits
 	1126: vr2 (vr2), unsigned 128 bits

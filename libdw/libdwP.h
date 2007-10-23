@@ -267,6 +267,7 @@ struct Dwarf_CU
   Dwarf_Off end;
   uint8_t address_size;
   uint8_t offset_size;
+  uint16_t version;
 
   /* Hash table for the abbreviations.  */
   Dwarf_Abbrev_Hash abbrev_hash;
@@ -365,6 +366,11 @@ extern size_t __libdw_form_val_len (Dwarf *dbg, struct Dwarf_CU *cu,
 				    const unsigned char *valp)
      __nonnull_attribute__ (1, 2, 4) internal_function;
 
+/* Helper function for DW_FORM_ref* handling.  */
+extern int __libdw_formref (Dwarf_Attribute *attr, Dwarf_Off *return_offset)
+     __nonnull_attribute__ (1, 2) internal_function;
+
+
 /* Helper function to locate attribute.  */
 extern unsigned char *__libdw_find_attr (Dwarf_Die *die,
 					 unsigned int search_name,
@@ -411,7 +417,6 @@ INTDECL (dwarf_entrypc)
 INTDECL (dwarf_errmsg)
 INTDECL (dwarf_formaddr)
 INTDECL (dwarf_formblock)
-INTDECL (dwarf_formref)
 INTDECL (dwarf_formref_die)
 INTDECL (dwarf_formsdata)
 INTDECL (dwarf_formstring)

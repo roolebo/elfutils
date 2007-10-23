@@ -1,3 +1,14 @@
+2007-10-18  Roland McGrath  <roland@redhat.com>
+
+	* ppc_regs.c (ppc_register_info): Assign 67 to "vscr".
+	Return "vector" and 32 bits for vscr and vrsave.
+	* ppc_corenote.c (altivec_regs): New variable.
+	(EXTRA_NOTES): New macro, handle NT_PPC_VMX.
+
+	* linux-core-note.c (EXTRA_REGSET): New macro.
+	Remove NT_PRXFPREG case.  Instead, use EXTRA_NOTES if defined.
+	* i386_corenote.c (EXTRA_NOTES): Define it.
+
 2007-10-09  Roland McGrath  <roland@redhat.com>
 
 	* sparc_auxv.c: New file.

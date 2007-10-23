@@ -73,6 +73,8 @@ found_build_id (Dwfl_Module *mod, bool set,
   return len;
 }
 
+#define NO_VADDR	((GElf_Addr) -1l)
+
 static int
 check_notes (Dwfl_Module *mod, bool set, Elf_Data *data, GElf_Addr data_vaddr)
 {
@@ -86,7 +88,7 @@ check_notes (Dwfl_Module *mod, bool set, Elf_Data *data, GElf_Addr data_vaddr)
 						     "GNU", sizeof "GNU"))
       return found_build_id (mod, set,
 			     data->d_buf + desc_pos, nhdr.n_descsz,
-			     data_vaddr == 0 ? 0 : data_vaddr + pos);
+			     data_vaddr == NO_VADDR ? 0 : data_vaddr + pos);
   return 0;
 }
 
@@ -129,7 +131,7 @@ __libdwfl_find_build_id (Dwfl_Module *mod, bool set, Elf *elf)
 	if (likely (shdr != NULL) && shdr->sh_type == SHT_NOTE)
 	  result = check_notes (mod, set, elf_getdata (scn, NULL),
 				(shdr->sh_flags & SHF_ALLOC)
-				? shdr->sh_addr : 0);
+				? shdr->sh_addr + mod->main.bias : NO_VADDR);
       }
     while (result == 0 && (scn = elf_nextscn (elf, scn)) != NULL);
 

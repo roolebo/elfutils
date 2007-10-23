@@ -198,28 +198,23 @@ EBLHOOK(core_note) (n_type, descsz,
       *items = prpsinfo_items;
       return 1;
 
-#ifdef FPREGSET_SIZE
-    case NT_FPREGSET:
-      if (descsz != FPREGSET_SIZE)
-	return 0;
-      *regs_offset = 0;
-      *nregloc = sizeof fpregset_regs / sizeof fpregset_regs[0];
-      *reglocs = fpregset_regs;
-      *nitems = 0;
-      *items = NULL;
+#define EXTRA_REGSET(type, size, table)					      \
+    case type:								      \
+      if (descsz != size)						      \
+	return 0;							      \
+      *regs_offset = 0;							      \
+      *nregloc = sizeof table / sizeof table[0];			      \
+      *reglocs = table;							      \
+      *nitems = 0;							      \
+      *items = NULL;							      \
       return 1;
+
+#ifdef FPREGSET_SIZE
+    EXTRA_REGSET (NT_FPREGSET, FPREGSET_SIZE, fpregset_regs)
 #endif
 
-#ifdef PRXFPREG_SIZE
-    case NT_PRXFPREG:
-      if (descsz != PRXFPREG_SIZE)
-	return 0;
-      *regs_offset = 0;
-      *nregloc = sizeof prxfpreg_regs / sizeof prxfpreg_regs[0];
-      *reglocs = prxfpreg_regs;
-      *nitems = 0;
-      *items = NULL;
-      return 1;
+#ifdef EXTRA_NOTES
+    EXTRA_NOTES
 #endif
     }
 

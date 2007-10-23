@@ -1,3 +1,7 @@
+2007-10-18  Roland McGrath  <roland@redhat.com>
+
+	* elf.h: Update from glibc.
+
 2007-10-07  Roland McGrath  <roland@redhat.com>
 
 	* elf_begin.c (__libelf_next_arhdr): Fix fencepost error and wrong

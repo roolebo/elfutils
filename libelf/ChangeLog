@@ -1,3 +1,7 @@
+2007-11-03  Roland McGrath  <roland@redhat.com>
+
+	* libelf.h (Elf_Data): Comment fix.
+
 2007-10-18  Roland McGrath  <roland@redhat.com>
 
 	* elf.h: Update from glibc.

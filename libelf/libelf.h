@@ -95,7 +95,7 @@ typedef struct
   Elf_Type d_type;		/* Type of this piece of data.  */
   unsigned int d_version;	/* ELF version.  */
   size_t d_size;		/* Size in bytes.  */
-  off64_t d_off;			/* Offset into section.  */
+  off64_t d_off;		/* Offset into section.  */
   size_t d_align;		/* Alignment in section.  */
 } Elf_Data;
 

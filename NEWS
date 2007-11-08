@@ -1,3 +1,13 @@
+Version 0.131:
+
+libdw: DW_FORM_ref_addr support; dwarf_formref entry point now deprecated;
+       bug fixes for oddly-formatted DWARF
+
+libdwfl: bug fixes in offline archive support, symbol table handling;
+	 apply partial relocations for dwfl_module_address_section on ET_REL
+
+libebl: powerpc backend support for Altivec registers
+
 Version 0.130:
 
 readelf: -p option can take an argument like -x for one section,

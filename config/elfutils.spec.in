@@ -180,14 +180,6 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
-* Sun Nov 11 2007 Ulrich Drepper <drepper@redhat.com> 0.131-1
-- libdw: DW_FORM_ref_addr support; dwarf_formref entry point now depreca
-ted;       bug fixes for oddly-formatted DWARF
-- libdwfl: bug fixes in offline archive support, symbol table handling;
-	 apply partial relocations for dwfl_module_address_section on 
-ET_REL
-- libebl: powerpc backend support for Altivec registers
-
 * Mon Oct 15 2007 Ulrich Drepper <drepper@redhat.com> 0.130-1
 - readelf: -p option can take an argument like -x for one section,
 	 or no argument (as before) for all SHF_STRINGS sections;

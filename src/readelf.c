@@ -4104,6 +4104,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
       switch (attr)
 	{
 	case DW_AT_location:
+	case DW_AT_data_location:
 	case DW_AT_data_member_location:
 	case DW_AT_vtable_elem_location:
 	case DW_AT_string_length:
@@ -4192,6 +4193,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
       switch (attr)
 	{
 	case DW_AT_location:
+	case DW_AT_data_location:
 	case DW_AT_data_member_location:
 	case DW_AT_vtable_elem_location:
 	case DW_AT_string_length:

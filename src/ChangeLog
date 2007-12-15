@@ -1,6 +1,15 @@
+2007-11-19  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (print_ops): Handle all bad op codes gracefully.
+	Print their numbers instead of just ???.
+
 2007-11-09  Roland McGrath  <roland@redhat.com>
 
 	* readelf.c (attr_callback): Handle DW_AT_data_location.
+	Handle block forms to mean a DWARF expression for DW_AT_allocated,
+	DW_AT_associated, DW_AT_bit_size, DW_AT_bit_offset, DW_AT_bit_stride,
+	DW_AT_byte_size, DW_AT_byte_stride, DW_AT_count, DW_AT_lower_bound,
+	DW_AT_upper_bound.
 
 2007-10-20  Roland McGrath  <roland@redhat.com>
 

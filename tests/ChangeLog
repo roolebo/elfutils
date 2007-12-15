@@ -1,3 +1,7 @@
+2007-12-15  Roland McGrath  <roland@redhat.com>
+
+	* run-allregs.sh: Change expected output for powerpc spefscr.
+
 2007-10-20  Roland McGrath  <roland@redhat.com>
 
 	* run-dwfl-addr-sect.sh: Change expected output, no errors.

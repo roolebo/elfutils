@@ -42,7 +42,7 @@ ppc_register_info (Ebl *ebl __attribute__ ((unused)),
   if (name == NULL)
     return 1156;
 
-  if (regno < 0 || regno > 1155 || namelen < 7)
+  if (regno < 0 || regno > 1155 || namelen < 8)
     return -1;
 
   *prefix = NULL;
@@ -58,7 +58,7 @@ ppc_register_info (Ebl *ebl __attribute__ ((unused)),
       if (ebl->machine != EM_PPC64 && regno < 64)
 	*bits = 64;
     }
-  else if (regno == 67 || regno == 356 || regno >= 1124)
+  else if (regno == 67 || regno == 356 || regno == 612 || regno >= 1124)
     {
       *setname = "vector";
       *bits = regno >= 1124 ? 128 : 32;
@@ -132,6 +132,8 @@ ppc_register_info (Ebl *ebl __attribute__ ((unused)),
       return stpcpy (name, "dec") + 1 - name;
     case 356:
       return stpcpy (name, "vrsave") + 1 - name;
+    case 612:
+      return stpcpy (name, "spefscr") + 1 - name;
     case 100:
       if (*bits == 32)
 	return stpcpy (name, "mq") + 1 - name;
@@ -156,7 +158,8 @@ ppc_register_info (Ebl *ebl __attribute__ ((unused)),
       break;
 
     case 200 ... 355:
-    case 357 ... 999:
+    case 357 ... 611:
+    case 613 ... 999:
       name[0] = 's';
       name[1] = 'p';
       name[2] = 'r';

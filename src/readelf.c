@@ -3615,7 +3615,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
   Dwarf_Word offset = 0;
   while (len-- > 0)
     {
-      size_t op = *data++;
+      uint_fast8_t op = *data++;
 
       switch (op)
 	{
@@ -3788,9 +3788,12 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 
 	default:
 	  /* No Operand.  */
-	  printf ("%*s[%4" PRIuMAX "] %s\n",
-		  indent, "", (uintmax_t) offset,
-		  known[op] ?: "???");
+	  if (op < sizeof known / sizeof known[0] && known[op] != NULL)
+	    printf ("%*s[%4" PRIuMAX "] %s\n",
+		    indent, "", (uintmax_t) offset, known[op]);
+	  else
+	    printf ("%*s[%4" PRIuMAX "] %#x\n",
+		    indent, "", (uintmax_t) offset, op);
 	  ++offset;
 	  break;
 	}
@@ -4201,6 +4204,16 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	case DW_AT_frame_base:
 	case DW_AT_return_addr:
 	case DW_AT_static_link:
+	case DW_AT_allocated:
+	case DW_AT_associated:
+	case DW_AT_bit_size:
+	case DW_AT_bit_offset:
+	case DW_AT_bit_stride:
+	case DW_AT_byte_size:
+	case DW_AT_byte_stride:
+	case DW_AT_count:
+	case DW_AT_lower_bound:
+	case DW_AT_upper_bound:
 	  print_ops (cbargs->dwflmod, cbargs->dbg,
 		     12 + level * 2, 12 + level * 2,
 		     cbargs->addrsize, block.length, block.data);

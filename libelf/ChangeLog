@@ -1,3 +1,8 @@
+2007-11-12  Roland McGrath  <roland@redhat.com>
+
+	* libelf.h: Replace off64_t with loff_t throughout.
+	Only that type name is unconditionally defined by <sys/types.h>
+
 2007-11-03  Roland McGrath  <roland@redhat.com>
 
 	* libelf.h (Elf_Data): Comment fix.

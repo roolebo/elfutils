@@ -1,3 +1,7 @@
+2008-01-02  Ulrich Drepper  <drepper@redhat.com>
+
+	* elfutils.spec.in: Changes for disasm branch merge.
+
 2007-08-08  Roland McGrath  <roland@redhat.com>
 
 	* elfutils.spec.in (License): Canonicalize.

@@ -30,8 +30,9 @@ AM_CFLAGS = -fmudflap
 else
 AM_CFLAGS =
 endif
-AM_CFLAGS += -Wall -Wshadow -Werror -Wunused -Wextra -std=gnu99 -fpic \
-	     $($(*F)_CFLAGS)
+AM_CFLAGS += -Wall -Wshadow -Wunused -Wextra -std=gnu99 -fpic \
+	     $($(*F)_CFLAGS) \
+	     $(if $($(*F)_no_Werror),,-Werror)
 INCLUDES = -I$(srcdir) -I$(srcdir)/../lib -I$(srcdir)/../libelf \
 	   -I$(srcdir)/../libebl -I$(srcdir)/../libdw -I$(srcdir)/../libasm
 LEXCOMPILE = $(LEX) $(LFLAGS) $(AM_LFLAGS) -P$(<F:lex.l=)
@@ -64,6 +65,8 @@ i386.mnemonics x86_64.mnemonics: %.mnemonics: $(srcdir)/defs/%
 	m4 -D$(<F) -DDISASSEMBLER $^ \
 	| sed '1,/^%%/d;/^#/d;/^[[:space:]]*$$/d;s/[^:]*:\([^[:space:]]*\).*/MNE(\1)/;s/{[^}]*}//g;/INVALID/d' \
 	| sort -u > $@
+
+i386_lex_no_Werror = yes
 
 libeu = ../lib/libeu.a
 

@@ -132,7 +132,7 @@ main (int argc, char *argv[])
     {
       struct args a = { .arg = argv[cnt] };
 
-      switch (sscanf (a.arg, "%a[^:]:%d", &a.file, &a.line))
+      switch (sscanf (a.arg, "%m[^:]:%d", &a.file, &a.line))
 	{
 	default:
 	case 0:

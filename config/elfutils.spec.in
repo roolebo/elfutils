@@ -13,7 +13,8 @@ Requires: glibc >= 2.3.1-2
 # ExcludeArch: xxx
 
 BuildRoot: %{_tmppath}/%{name}-root
-BuildRequires: gcc >= 3.4
+BuildRequires: gcc >= 4.1.2-33
+BuildRequires: glibc >= 2.7
 BuildRequires: bison >= 1.875
 BuildRequires: flex >= 2.5.4a
 BuildRequires: bzip2
@@ -104,8 +105,6 @@ chmod +x ${RPM_BUILD_ROOT}%{_prefix}/%{_lib}/elfutils/lib*.so*
 { cd ${RPM_BUILD_ROOT}
   rm -f .%{_bindir}/eu-ld
   rm -f .%{_includedir}/elfutils/libasm.h
-  rm -f .%{_libdir}/libasm-%{version}.so
-  rm -f .%{_libdir}/libasm.so.*
   rm -f .%{_libdir}/libasm.so
   rm -f .%{_libdir}/libasm.a
 }
@@ -140,10 +139,11 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_bindir}/eu-objdump
 %{_bindir}/eu-ar
 %{_bindir}/eu-unstrip
+%{_bindir}/eu-make-debug-archive
 #%{_bindir}/eu-ld
-#%{_libdir}/libasm-%{version}.so
+%{_libdir}/libasm-%{version}.so
 %{_libdir}/libdw-%{version}.so
-#%{_libdir}/libasm.so.*
+%{_libdir}/libasm.so.*
 %{_libdir}/libdw.so.*
 %dir %{_libdir}/elfutils
 %{_libdir}/elfutils/lib*.so
@@ -153,6 +153,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_includedir}/dwarf.h
 %dir %{_includedir}/elfutils
 %{_includedir}/elfutils/elf-knowledge.h
+#%{_includedir}/elfutils/libasm.h
 %{_includedir}/elfutils/libebl.h
 %{_includedir}/elfutils/libdw.h
 %{_includedir}/elfutils/libdwfl.h

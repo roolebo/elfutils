@@ -1,5 +1,9 @@
 2008-01-01  Ulrich Drepper  <drepper@redhat.com>
 
+	* line2addr.c: Use %m modifier instead of %a to appease gcc.
+
+2008-01-01  Ulrich Drepper  <drepper@redhat.com>
+
 	* testfile44.expect.bz2: New tests.
 	* testfile44.expect.bz2: Adjust.
 

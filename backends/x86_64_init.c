@@ -54,7 +54,8 @@ x86_64_init (elf, machine, eh, ehlen)
   HOOK (eh, return_value_location);
   HOOK (eh, register_info);
   HOOK (eh, auxv_info);
-  HOOK (eh, disasm);
+  // XXX Not yet.
+  // HOOK (eh, disasm);
 
   return MODVERSION;
 }

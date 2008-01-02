@@ -304,3 +304,6 @@ handle_file (const char *fname)
 
   return status;
 }
+
+
+#include "debugpred.h"

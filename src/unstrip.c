@@ -2312,3 +2312,6 @@ or - if no debuginfo was found, or . if FILE contains the debug information.\
 
   return 0;
 }
+
+
+#include "debugpred.h"

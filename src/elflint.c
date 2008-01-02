@@ -579,11 +579,10 @@ check_symtab (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Shdr *shdr, int idx)
 	   idx, section_name (ebl, idx));
 
   /* Search for an extended section index table section.  */
-  size_t cnt;
   Elf_Data *xndxdata = NULL;
   Elf32_Word xndxscnidx = 0;
   bool found_xndx = false;
-  for (cnt = 1; cnt < shnum; ++cnt)
+  for (size_t cnt = 1; cnt < shnum; ++cnt)
     if (cnt != (size_t) idx)
       {
 	Elf_Scn *xndxscn = elf_getscn (ebl->elf, cnt);
@@ -608,8 +607,8 @@ section [%2d] '%s': symbol table cannot have more than one extended index sectio
 
   if (shdr->sh_entsize != gelf_fsize (ebl->elf, ELF_T_SYM, 1, EV_CURRENT))
     ERROR (gettext ("\
-section [%2zu] '%s': entry size is does not match ElfXX_Sym\n"),
-	   cnt, section_name (ebl, cnt));
+section [%2u] '%s': entry size is does not match ElfXX_Sym\n"),
+	   idx, section_name (ebl, idx));
 
   /* Test the zeroth entry.  */
   GElf_Sym sym_mem;
@@ -644,7 +643,7 @@ section [%2d] '%s': XINDEX for zeroth entry not zero\n"),
 	       xndxscnidx, section_name (ebl, xndxscnidx));
     }
 
-  for (cnt = 1; cnt < shdr->sh_size / shdr->sh_entsize; ++cnt)
+  for (size_t cnt = 1; cnt < shdr->sh_size / shdr->sh_entsize; ++cnt)
     {
       sym = gelf_getsymshndx (data, xndxdata, cnt, &sym_mem, &xndx);
       if (sym == NULL)
@@ -3958,3 +3957,6 @@ process_elf_file (Elf *elf, const char *prefix, const char *suffix,
   /* Free the resources.  */
   ebl_closebackend (ebl);
 }
+
+
+#include "debugpred.h"

@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007 Red Hat, Inc.
+## Copyright (C) 2000-2006, 2007 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -32,7 +32,7 @@ AM_CFLAGS =
 endif
 AM_CFLAGS += -fpic -Wall -Wshadow -Werror -Wunused -Wextra -Wformat=2 \
 	     -std=gnu99
-INCLUDES = -I$(srcdir) -I$(top_srcdir)/libebl \
+INCLUDES = -I$(srcdir) -I$(top_srcdir)/libebl -I$(top_srcdir)/libasm \
 	   -I$(top_srcdir)/libelf -I$(top_srcdir)/libdw \
 	   -I$(top_srcdir)/lib -I..
 
@@ -59,18 +59,10 @@ endif
 
 textrel_check = if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
 
-libebl_%.so: libebl_%_pic.a libebl_%.map $(libelf) $(libdw)
-	$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
-		-Wl,--version-script,$(word 2,$^) \
-		-Wl,-z,defs -Wl,--as-needed $(libelf) $(libdw) $(libmudflap)
-	$(textrel_check)
-
-libebl_%.map: Makefile
-	echo 'ELFUTILS_$(PACKAGE_VERSION) { global: $*_init; local: *; };' > $@
-
 
 i386_SRCS = i386_init.c i386_symbol.c i386_corenote.c \
 	    i386_retval.c i386_regs.c i386_auxv.c
+cpu_i386 = ../libcpu/libcpu_i386.a
 libebl_i386_pic_a_SOURCES = $(i386_SRCS)
 am_libebl_i386_pic_a_OBJECTS = $(i386_SRCS:.c=.os)
 
@@ -80,6 +72,7 @@ am_libebl_sh_pic_a_OBJECTS = $(sh_SRCS:.c=.os)
 
 x86_64_SRCS = x86_64_init.c x86_64_symbol.c x86_64_corenote.c \
 	      x86_64_retval.c x86_64_regs.c i386_auxv.c
+cpu_x86_64 = ../libcpu/libcpu_x86_64.a
 libebl_x86_64_pic_a_SOURCES = $(x86_64_SRCS)
 am_libebl_x86_64_pic_a_OBJECTS = $(x86_64_SRCS:.c=.os)
 
@@ -115,6 +108,21 @@ s390_SRCS = s390_init.c s390_symbol.c s390_regs.c s390_retval.c
 libebl_s390_pic_a_SOURCES = $(s390_SRCS)
 am_libebl_s390_pic_a_OBJECTS = $(s390_SRCS:.c=.os)
 
+
+libebl_%.so: libebl_%_pic.a libebl_%.map $(libelf) $(libdw) \
+	     $(cpu_$(@:libebl_%.so=%)
+	$(LINK) -shared -o $@ -Wl,--whole-archive,$<\
+		$(cpu_$(@:libebl_%.so=%)) -Wl,--no-whole-archive \
+		-Wl,--version-script,$(word 2,$^) \
+		-Wl,-z,defs -Wl,--as-needed $(libelf) $(libdw) $(libmudflap)
+	$(textrel_check)
+
+# XXX Should not be needed...
+libebl_i386.so: $(cpu_i386)
+libebl_x86_64.so: $(cpu_x86_64)
+
+libebl_%.map: Makefile
+	echo 'ELFUTILS_$(PACKAGE_VERSION) { global: $*_init; local: *; };' > $@
 
 %.os: %.c
 	if $(COMPILE) -c -o $@ -fpic -DPIC -DSHARED -MT $@ -MD -MP \

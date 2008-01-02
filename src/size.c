@@ -685,3 +685,6 @@ handle_elf (Elf *elf, const char *prefix, const char *fname)
       show_bsd (elf, prefix, fname, fullname);
     }
 }
+
+
+#include "debugpred.h"

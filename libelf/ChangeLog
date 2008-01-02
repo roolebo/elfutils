@@ -1,3 +1,14 @@
+2007-12-20  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (libelf_a_SOURCES): Add elf_scnshndx.
+	* libelfP.h (struct Elf_Scn): Add shndx_index field.
+	Declare __elf_scnshndx_internal.
+	* elf32_getshdr.c: Record location of extended section header.
+	* elf_begin.c (file_read_elf): Likewise.
+	* elf_scnshndx.c: New file.
+	* libelf.h: Declare elf_scnshndx.
+	* libelf.map: Add elf_scnshndx to version ELFUTILS_1.4.
+
 2007-11-12  Roland McGrath  <roland@redhat.com>
 
 	* libelf.h: Replace off64_t with loff_t throughout.

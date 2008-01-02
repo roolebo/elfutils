@@ -606,3 +606,6 @@ a relocation modifies memory at offset %llu in a write-protected segment\n"),
 	break;
       }
 }
+
+
+#include "debugpred.h"

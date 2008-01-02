@@ -42,6 +42,10 @@
 	* sparc_retval.c: Likewise.
 	* x86_64_retval.c: Likewise.
 
+2007-10-31  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: More dependencies for the libebl_* libraries.
+
 2007-08-23  Roland McGrath  <roland@redhat.com>
 
 	* x86_64_regs.c (x86_64_register_info): Put %rflags in "integer" set.

@@ -45,6 +45,20 @@ typedef struct AsmScnGrp AsmScnGrp_t;
 typedef struct AsmSym AsmSym_t;
 
 
+/* Opaque type for the disassembler context descriptor.  */
+typedef struct DisasmCtx DisasmCtx_t;
+
+/* Type used for callback functions to retrieve symbol name.  The
+   symbol reference is in the section designated by the second parameter
+   at an offset described by the first parameter.  The value is the
+   third parameter.  */
+typedef int (*DisasmGetSymCB_t) (GElf_Addr, Elf32_Word, GElf_Addr, char *,
+				 size_t, void *);
+
+/* Output function callback.  */
+typedef int (*DisasmOutputCB_t) (char *, size_t, void *);
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -158,6 +172,25 @@ extern int asm_errno (void);
    behaviour is similar to the last case except that not NULL but a legal
    string is returned.  */
 extern const char *asm_errmsg (int __error);
+
+
+/* Create context descriptor for disassembler.  */
+extern DisasmCtx_t *disasm_begin (Ebl *ebl, Elf *elf, DisasmGetSymCB_t symcb);
+
+/* Release descriptor for disassembler.  */
+extern int disasm_end (DisasmCtx_t *ctx);
+
+/* Produce of disassembly output for given memory, store text in
+   provided buffer.  */
+extern int disasm_str (DisasmCtx_t *ctx, const uint8_t **startp,
+		       const uint8_t *end, GElf_Addr addr, const char *fmt,
+		       char **bufp, size_t len, void *symcbarg);
+
+/* Produce disassembly output for given memory and output it using the
+   given callback functions.  */
+extern int disasm_cb (DisasmCtx_t *ctx, const uint8_t **startp,
+		      const uint8_t *end, GElf_Addr addr, const char *fmt,
+		      DisasmOutputCB_t outcb, void *outcbarg, void *symcbarg);
 
 #ifdef __cplusplus
 }

@@ -59,6 +59,7 @@ libasm_a_SOURCES = asm_begin.c asm_abort.c asm_end.c asm_error.c \
 		   asm_addint32.c asm_adduint32.c \
 		   asm_addint64.c asm_adduint64.c \
 		   asm_adduleb128.c asm_addsleb128.c \
+		   disasm_begin.c disasm_cb.c disasm_end.c disasm_str.c \
 		   symbolhash.c
 
 if !MUDFLAP

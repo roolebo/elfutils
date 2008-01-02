@@ -1,6 +1,7 @@
-/* Internal definitions for interface for libebl.
-   Copyright (C) 2000, 2001, 2002, 2004, 2005, 2006 Red Hat, Inc.
+/* Get the section index of the extended section index table.
+   Copyright (C) 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
+   Contributed by Ulrich Drepper <drepper@redhat.com>, 2007.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by the
@@ -47,51 +48,24 @@
    Network licensing program, please visit www.openinventionnetwork.com
    <http://www.openinventionnetwork.com>.  */
 
-#ifndef _LIBEBLP_H
-#define _LIBEBLP_H 1
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
 
-#include <gelf.h>
-#include <libasm.h>
-#include <libebl.h>
-#include <libintl.h>
+#include "libelfP.h"
 
 
-/* Backend handle.  */
-struct ebl
+int
+elf_scnshndx (Elf_Scn *scn)
 {
-  /* Machine name.  */
-  const char *name;
+  if (unlikely (scn->shndx_index == 0))
+    {
+      /* We do not have the value yet.  We get it as a side effect of
+	 getting a section header.  */
+      GElf_Shdr shdr_mem;
+      (void) INTUSE(gelf_getshdr) (scn, &shdr_mem);
+    }
 
-  /* Emulation name.  */
-  const char *emulation;
-
-  /* ELF machine, class, and data encoding.  */
-  uint_fast16_t machine;
-  uint_fast8_t class;
-  uint_fast8_t data;
-
-  /* The libelf handle (if known).  */
-  Elf *elf;
-
-  /* See ebl-hooks.h for the declarations of the hook functions.  */
-# define EBLHOOK(name) (*name)
-# include "ebl-hooks.h"
-# undef EBLHOOK
-
-  /* Size of entry in Sysv-style hash table.  */
-  int sysvhash_entrysize;
-
-  /* Internal data.  */
-  void *dlhandle;
-};
-
-
-/* Type of the initialization functions in the backend modules.  */
-typedef const char *(*ebl_bhinit_t) (Elf *, GElf_Half, Ebl *, size_t);
-
-
-/* gettext helper macros.  */
-#undef _
-#define _(Str) dgettext ("elfutils", Str)
-
-#endif	/* libeblP.h */
+  return scn->shndx_index;
+}
+INTDEF(elf_scnshndx)

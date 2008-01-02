@@ -1513,3 +1513,6 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
 
   return status;
 }
+
+
+#include "debugpred.h"

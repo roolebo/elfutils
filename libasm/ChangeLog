@@ -1,3 +1,14 @@
+2007-12-20  Ulrich Drepper  <drepper@redhat.com>
+
+	* disasm_cb.c: Add initial support to resolve addresses to symbols.
+
+2007-02-05  Ulrich Drepper  <drepper@redhat.com>
+
+	* disasm_begin.c: New file.
+	* disasm_cb.c: New file.
+	* disasm_end.c: New file.
+	* disasm_str.c: New file.
+
 2006-08-29  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am (CLEANFILES): Add libasm.so.$(VERSION).

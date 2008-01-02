@@ -122,4 +122,9 @@ ELFUTILS_1.3 {
     gelf_getauxv;
     gelf_update_auxv;
     gelf_getnote;
-};
+} ELFUTILS_1.2;
+
+ELFUTILS_1.4 {
+  global:
+    elf_scnshndx;
+} ELFUTILS_1.3;

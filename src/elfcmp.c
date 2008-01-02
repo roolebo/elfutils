@@ -744,3 +744,6 @@ hash_content_equivalent (size_t entsize, Elf_Data *data1, Elf_Data *data2)
 
   return false;
 }
+
+
+#include "debugpred.h"

@@ -248,6 +248,10 @@ extern Elf_Scn *elf_nextscn (Elf *__elf, Elf_Scn *__scn);
 /* Create a new section and append it at the end of the table.  */
 extern Elf_Scn *elf_newscn (Elf *__elf);
 
+/* Get the section index of the extended section index table for the
+   given symbol table.  */
+extern int elf_scnshndx (Elf_Scn *__scn);
+
 /* Get the number of sections in the ELF file.  If the file uses more
    sections than can be represented in the e_shnum field of the ELF
    header the information from the sh_size field in the zeroth section

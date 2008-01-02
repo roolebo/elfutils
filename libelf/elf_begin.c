@@ -327,6 +327,19 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 		((char *) map_address + offset
 		 + elf->state.elf32.shdr[cnt].sh_offset);
 	      elf->state.elf32.scns.data[cnt].list = &elf->state.elf32.scns;
+
+	      /* If this is a section with an extended index add a
+		 reference in the section which uses the extended
+		 index.  */
+	      if (elf->state.elf32.shdr[cnt].sh_type == SHT_SYMTAB_SHNDX
+		  && elf->state.elf32.shdr[cnt].sh_link < scncnt)
+		elf->state.elf32.scns.data[elf->state.elf32.shdr[cnt].sh_link].shndx_index
+		  = cnt;
+
+	      /* Set the own shndx_index field in case it has not yet
+		 been set.  */
+	      if (elf->state.elf32.scns.data[cnt].shndx_index == 0)
+		elf->state.elf32.scns.data[cnt].shndx_index = -1;
 	    }
 	}
       else
@@ -402,6 +415,19 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 		((char *) map_address + offset
 		 + elf->state.elf64.shdr[cnt].sh_offset);
 	      elf->state.elf64.scns.data[cnt].list = &elf->state.elf64.scns;
+
+	      /* If this is a section with an extended index add a
+		 reference in the section which uses the extended
+		 index.  */
+	      if (elf->state.elf64.shdr[cnt].sh_type == SHT_SYMTAB_SHNDX
+		  && elf->state.elf64.shdr[cnt].sh_link < scncnt)
+		elf->state.elf64.scns.data[elf->state.elf64.shdr[cnt].sh_link].shndx_index
+		  = cnt;
+
+	      /* Set the own shndx_index field in case it has not yet
+		 been set.  */
+	      if (elf->state.elf64.scns.data[cnt].shndx_index == 0)
+		elf->state.elf64.scns.data[cnt].shndx_index = -1;
 	    }
 	}
       else

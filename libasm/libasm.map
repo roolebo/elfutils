@@ -28,6 +28,11 @@ ELFUTILS_1.0 {
     asm_newsym;
     asm_scngrp_newsignature;
 
+    disasm_begin;
+    disasm_cb;
+    disasm_end;
+    disasm_str;
+
   local:
     *;
 };

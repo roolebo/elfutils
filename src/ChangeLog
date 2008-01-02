@@ -15,6 +15,40 @@
 	* strip.c: Likewise.
 	* unstrip.c: Likewise.
 
+2007-12-30  Ulrich Drepper  <drepper@redhat.com>
+
+	* objdump (show_disasm): Use %e after third parameter.
+
+2007-12-21  Ulrich Drepper  <drepper@redhat.com>
+
+	* strip.c: Fix wrong parenthesis in a few branch predictions.
+	* strings.c: Likewise.
+
+2007-12-20  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (DEFS): Add DEBUGPRED.
+	* addr2line.c: Include debugpred.h.
+	* ar.c: Likewise.
+	* elfcmp.c: Likewise.
+	* elflint.c: Likewise.
+	* findtextrel.c: Likewise.
+	* nm.c: Likewise.
+	* objdump.c: Likewise.
+	* ranlib.c: Likewise.
+	* readelf.c: Likewise.
+	* size.c: Likewise.
+	* strings.c: Likewise.
+	* strip.c: Likewise.
+	* unstrip.c: Likewise.
+	* debugpred.h: New file.
+
+	* readelf.c (handle_relocs_rel): Use elf_scnshndx.
+	(handle_relocs_rela): Likewise.
+
+	* readelf.c: Add lots of likely/unlikely.
+
+	* elflint.c: Minor cleanups.
+
 2007-11-19  Roland McGrath  <roland@redhat.com>
 
 	* readelf.c (print_ops): Handle all bad op codes gracefully.

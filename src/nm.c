@@ -1294,3 +1294,6 @@ handle_elf (Elf *elf, const char *prefix, const char *fname,
 
   return result;
 }
+
+
+#include "debugpred.h"

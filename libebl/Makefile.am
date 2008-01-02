@@ -34,7 +34,7 @@ AM_CFLAGS += -fpic -Wall -Wshadow -Werror -Wunused -Wextra -Wformat=2 \
 	     -std=gnu99
 
 INCLUDES = -I$(srcdir) -I$(top_srcdir)/libelf -I$(top_srcdir)/libdw \
-	   -I$(top_srcdir)/lib -I..
+	   -I$(top_srcdir)/lib -I.. -I$(srcdir)/../libasm
 VERSION = 1
 PACKAGE_VERSION = @PACKAGE_VERSION@
 LIBEBL_SUBDIR = @LIBEBL_SUBDIR@

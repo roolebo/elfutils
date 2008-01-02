@@ -246,6 +246,7 @@ fill_defaults (Ebl *result)
   result->bss_plt_p = default_bss_plt_p;
   result->return_value_location = default_return_value_location;
   result->register_info = default_register_info;
+  result->disasm = NULL;
   result->destr = default_destr;
   result->sysvhash_entrysize = sizeof (Elf32_Word);
 }

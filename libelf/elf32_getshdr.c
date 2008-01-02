@@ -165,6 +165,20 @@ elfw2(LIBELFBITS,getshdr) (scn)
 		  CONVERT_TO (shdr[cnt].sh_addralign,
 			      notcvt[cnt].sh_addralign);
 		  CONVERT_TO (shdr[cnt].sh_entsize, notcvt[cnt].sh_entsize);
+
+		  /* If this is a section with an extended index add a
+		     reference in the section which uses the extended
+		     index.  */
+		  if (shdr[cnt].sh_type == SHT_SYMTAB_SHNDX
+		      && shdr[cnt].sh_link < shnum)
+		    elf->state.ELFW(elf,LIBELFBITS).scns.data[shdr[cnt].sh_link].shndx_index
+		      = cnt;
+
+		  /* Set the own shndx_index field in case it has not yet
+		     been set.  */
+		  if (elf->state.ELFW(elf,LIBELFBITS).scns.data[cnt].shndx_index == 0)
+		    elf->state.ELFW(elf,LIBELFBITS).scns.data[cnt].shndx_index
+		      = -1;
 		}
 	    }
 	}

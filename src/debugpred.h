@@ -1,7 +1,7 @@
-/* Initialization of i386 specific backend library.
-   Copyright (C) 2000, 2001, 2002, 2005, 2006, 2007 Red Hat, Inc.
+/* Support to debug branch prediction.
+   Copyright (C) 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2000.
+   Written by Ulrich Drepper <drepper@redhat.com>, 2007.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by the
@@ -24,40 +24,30 @@
    Network licensing program, please visit www.openinventionnetwork.com
    <http://www.openinventionnetwork.com>.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <stdio.h>
 
-#define BACKEND		i386_
-#define RELOC_PREFIX	R_386_
-#include "libebl_CPU.h"
+#if DEBUGPRED
+extern const unsigned long int __start_predict_data;
+extern const unsigned long int __stop_predict_data;
+extern const unsigned long int __start_predict_line;
+extern const char *__start_predict_file;
 
-/* This defines the common reloc hooks based on i386_reloc.def.  */
-#include "common-reloc.c"
-
-const char *
-i386_init (elf, machine, eh, ehlen)
-     Elf *elf __attribute__ ((unused));
-     GElf_Half machine __attribute__ ((unused));
-     Ebl *eh;
-     size_t ehlen;
+static void
+__attribute__ ((destructor))
+predprint (void)
 {
-  /* Check whether the Elf_BH object has a sufficent size.  */
-  if (ehlen < sizeof (Ebl))
-    return NULL;
-
-  /* We handle it.  */
-  eh->name = "Intel 80386";
-  i386_init_reloc (eh);
-  HOOK (eh, reloc_simple_type);
-  HOOK (eh, gotpc_reloc_check);
-  HOOK (eh, core_note);
-  generic_debugscn_p = eh->debugscn_p;
-  HOOK (eh, debugscn_p);
-  HOOK (eh, return_value_location);
-  HOOK (eh, register_info);
-  HOOK (eh, auxv_info);
-  HOOK (eh, disasm);
-
-  return MODVERSION;
+  const unsigned long int *s = &__start_predict_data;
+  const unsigned long int *e = &__stop_predict_data;
+  const unsigned long int *sl = &__start_predict_line;
+  const char **sf = &__start_predict_file;
+  while (s < e)
+    {
+      if (s[0] != 0 || s[1] != 0)
+	printf ("%s:%lu: wrong=%lu, correct=%lu%s\n", *sf, *sl, s[0], s[1],
+		s[0] > s[1] ? "   <==== WARNING" : "");
+      ++sl;
+      ++sf;
+      s += 2;
+    }
 }
+#endif

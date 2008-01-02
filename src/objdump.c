@@ -681,12 +681,87 @@ show_full_content (Ebl *ebl, const char *fname, uint32_t shstrndx)
 }
 
 
-static int
-show_disasm (Ebl *ebl __attribute__ ((unused)),
-	     const char *fname __attribute__ ((unused)),
-	     uint32_t shstrndx __attribute__ ((unused)))
+struct disasm_info
 {
-  /// XXX For now nothing.
+  GElf_Addr addr;
+  const uint8_t *cur;
+  const uint8_t *last_end;
+};
+
+
+// XXX This is not the preferred output for all architectures.  Needs
+// XXX customization, too.
+static int
+disasm_output (char *buf, size_t buflen, void *arg)
+{
+  struct disasm_info *info = (struct disasm_info *) arg;
+
+  printf ("%8" PRIx64 ":   ", (uint64_t) info->addr);
+  size_t cnt;
+  for (cnt = 0; cnt < (size_t) MIN (info->cur - info->last_end, 8); ++cnt)
+    printf (" %02" PRIx8, info->last_end[cnt]);
+  printf ("%*s %.*s\n",
+	  (int) (8 - cnt) * 3 + 1, "", (int) buflen, buf);
+
+  info->addr += cnt;
+
+  /* We limit the number of bytes printed before the mnemonic to 8.
+     Print the rest on a separate, following line.  */
+  if (info->cur - info->last_end > 8)
+    {
+      printf ("%8" PRIx64 ":   ", (uint64_t) info->addr);
+      for (; cnt < (size_t) (info->cur - info->last_end); ++cnt)
+	printf (" %02" PRIx8, info->last_end[cnt]);
+      putchar_unlocked ('\n');
+      info->addr += info->cur - info->last_end - 8;
+    }
+
+  info->last_end = info->cur;
+
+  return 0;
+}
+
+
+static int
+show_disasm (Ebl *ebl, const char *fname, uint32_t shstrndx)
+{
+  DisasmCtx_t *ctx = disasm_begin (ebl, ebl->elf, NULL /* XXX TODO */);
+  if (ctx == NULL)
+    error (EXIT_FAILURE, 0, gettext ("cannot disassemble"));
+
+  Elf_Scn *scn = NULL;
+  while ((scn = elf_nextscn (ebl->elf, scn)) != NULL)
+    {
+      GElf_Shdr shdr_mem;
+      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+
+      if (shdr == NULL)
+	INTERNAL_ERROR (fname);
+
+      if (shdr->sh_type == SHT_PROGBITS && shdr->sh_size > 0
+	  && (shdr->sh_flags & SHF_EXECINSTR) != 0)
+	{
+ 	  if  (! section_match (ebl->elf, elf_ndxscn (scn), shdr, shstrndx))
+	    continue;
+
+	  Elf_Data *data = elf_getdata (scn, NULL);
+	  if (data == NULL)
+	    continue;
+
+	  printf ("Disassembly of section %s:\n\n",
+		  elf_strptr (ebl->elf, shstrndx, shdr->sh_name));
+
+	  struct disasm_info info;
+	  info.addr = shdr->sh_addr;
+	  info.last_end = info.cur = data->d_buf;
+
+	  disasm_cb (ctx, &info.cur, info.cur + data->d_size, info.addr,
+		     "%7m%e %.1o%e,%.2o%e,%.3o%e", disasm_output, &info,
+		     NULL /* XXX */);
+	}
+    }
+
+  (void) disasm_end (ctx);
 
   return 0;
 }
@@ -735,3 +810,6 @@ handle_elf (Elf *elf, const char *prefix, const char *fname,
 
   return result;
 }
+
+
+#include "debugpred.h"

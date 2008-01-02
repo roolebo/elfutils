@@ -373,3 +373,6 @@ handle_address (GElf_Addr addr, Dwfl *dwfl)
   else
     puts ("??:0");
 }
+
+
+#include "debugpred.h"

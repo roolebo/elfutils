@@ -1525,3 +1525,6 @@ create_special_section_symbol (struct symbol **symp, const char *name)
 
   ++ld_state.nsymtab;
 }
+
+
+#include "debugpred.h"

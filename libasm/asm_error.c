@@ -126,6 +126,7 @@ static const char *msgs[ASM_E_NUM] =
   [ASM_E_DUPLSYM] = N_("duplicate symbol"),
   [ASM_E_TYPE] = N_("invalid section type for operation"),
   [ASM_E_IOERROR] = N_("error during output of data"),
+  [ASM_E_ENOSUP] = N_("no backend support available"),
 };
 
 const char *

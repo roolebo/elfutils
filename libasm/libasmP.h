@@ -47,6 +47,7 @@ enum
     ASM_E_LIBELF,		/* Refer to error in libelf.  */
     ASM_E_TYPE,			/* Invalid section type for operation.  */
     ASM_E_IOERROR,		/* Error during output of data.  */
+    ASM_E_ENOSUP,		/* No backend support.  */
     ASM_E_NUM			/* Keep this entry as the last.  */
   };
 
@@ -235,6 +236,21 @@ struct AsmScnGrp
 };
 
 
+/* Descriptor for disassembler.   */
+struct DisasmCtx
+{
+  /* Handle for the backend library with the disassembler routine.  */
+  Ebl *ebl;
+
+  /* ELF file containing all the data passed to the function.  This
+     allows to look up symbols.  */
+  Elf *elf;
+
+  /* Callback function to determine symbol names.  */
+  DisasmGetSymCB_t symcb;
+};
+
+
 /* The default fill pattern: one zero byte.  */
 extern const struct FillPattern *__libasm_default_pattern
      attribute_hidden;
@@ -268,6 +284,14 @@ extern int __asm_addint32_internal (AsmScn_t *asmscn, int32_t num)
 extern int __asm_addint64_internal (AsmScn_t *asmscn, int64_t num)
      attribute_hidden;
 
+
+/* Produce disassembly output for given memory and output it using the
+   given callback functions.  */
+extern int __disasm_cb_internal (DisasmCtx_t *ctx, const uint8_t **startp,
+				 const uint8_t *end, GElf_Addr addr,
+				 const char *fmt, DisasmOutputCB_t outcb,
+				 void *outcbarp, void *symcbarg)
+     attribute_hidden;
 
 
 /* Test whether given symbol is an internal symbol and if yes, whether

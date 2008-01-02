@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2002, 2005 Red Hat, Inc.
+## Copyright (C) 2002, 2004, 2005, 2007 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -25,9 +25,56 @@
 ## <http://www.openinventionnetwork.com>.
 ##
 DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H
-AM_CFLAGS = -Wall -Wshadow -Werror -Wextra -Wformat=2 -Wunused
-INCLUDES = -I$(srcdir)
+if MUDFLAP
+AM_CFLAGS = -fmudflap
+else
+AM_CFLAGS =
+endif
+AM_CFLAGS += -Wall -Wshadow -Werror -Wunused -Wextra -std=gnu99 -fpic \
+	     $($(*F)_CFLAGS)
+INCLUDES = -I$(srcdir) -I$(srcdir)/../lib -I$(srcdir)/../libelf \
+	   -I$(srcdir)/../libebl -I$(srcdir)/../libdw -I$(srcdir)/../libasm
+LEXCOMPILE = $(LEX) $(LFLAGS) $(AM_LFLAGS) -P$(<F:lex.l=)
+LEX_OUTPUT_ROOT = lex.$(<F:lex.l=)
+AM_YFLAGS = -p$(<F:parse.y=)
 
-noinst_LIBRARIES = libcpu_i386.a
+if MUDFLAP
+libmudflap = -lmudflap
+endif
 
-libcpu_i386_a_SOURCES = i386_dis.c
+# XXX x86-64 uncommented for now.
+noinst_LIBRARIES = libcpu_i386.a# libcpu_x86_64.a
+noinst_PROGRAMS = i386_gendis
+
+libcpu_i386_a_SOURCES = i386_disasm.c
+# XXX Unused for now.
+#libcpu_x86_64_a_SOURCES = x86_64_disasm.c
+
+i386_gendis_SOURCES = i386_gendis.c i386_lex.l i386_parse.y
+
+i386_disasm.o: i386.mnemonics i386_dis.h
+x86_64_disasm.o: x86_64.mnemonics x86_64_dis.h i386_disasm.c
+
+i386_dis.h: i386_gendis $(srcdir)/defs/i386
+	m4 -Di386 -DDISASSEMBLER $(srcdir)/defs/i386 | ./i386_gendis - > $@
+x86_64_dis.h: i386_gendis $(srcdir)/defs/x86_64
+	m4 -Dx86_64 -DDISASSEMBLER $(srcdir)/defs/x86_64 | ./i386_gendis - > $@
+
+i386.mnemonics x86_64.mnemonics: %.mnemonics: $(srcdir)/defs/%
+	m4 -D$(<F) -DDISASSEMBLER $^ \
+	| sed '1,/^%%/d;/^#/d;/^[[:space:]]*$$/d;s/[^:]*:\([^[:space:]]*\).*/MNE(\1)/;s/{[^}]*}//g;/INVALID/d' \
+	| sort -u > $@
+
+libeu = ../lib/libeu.a
+
+i386_lex_CFLAGS = -Wno-unused-label -Wno-unused-function -Wno-sign-compare
+i386_gendis.o: i386_parse.c i386.mnemonics
+i386_parse_CFLAGS = -DNMNES=$$(wc -l < i386.mnemonics)
+i386_lex.o: i386_parse.c
+i386_gendis_LDADD = $(libeu) -lm $(libmudflap)
+
+noinst_HEADERS = memory-access.h i386_parse.h i386_data.h
+
+EXTRA_DIST = defs/i386 defs/x86_64
+
+CLEANFILES = i386.mnemonics i386_dis.h x86_64.mnemonics x86_64_dis.h

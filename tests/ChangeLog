@@ -1,3 +1,52 @@
+2008-01-01  Ulrich Drepper  <drepper@redhat.com>
+
+	* testfile44.expect.bz2: New tests.
+	* testfile44.expect.bz2: Adjust.
+
+2007-12-31  Ulrich Drepper  <drepper@redhat.com>
+
+	* testfile44.expect.bz2: New tests.
+	* testfile44.expect.bz2: Adjust.
+
+2007-12-30  Ulrich Drepper  <drepper@redhat.com>
+
+	* testfile44.expect.bz2: New tests.
+	* testfile44.expect.bz2: Adjust.
+
+2007-12-29  Ulrich Drepper  <drepper@redhat.com>
+
+	* testfile44.expect.bz2: New tests.
+	* testfile44.expect.bz2: Adjust.
+
+2007-12-28  Ulrich Drepper  <drepper@redhat.com>
+
+	* testfile44.S.bz2: New tests.
+	* testfile44.expect.bz2: Adjust.
+
+2007-12-27  Ulrich Drepper  <drepper@redhat.com>
+
+	* testfile44.S.bz2: New tests.
+	* testfile44.expect.bz2: Adjust.
+
+2007-12-26  Ulrich Drepper  <drepper@redhat.com>
+
+	* testfile44.S.bz2: New tests.
+	* testfile44.expect.bz2: Adjust
+
+2007-12-21  Ulrich Drepper  <drepper@redhat.com>
+
+	* testfile44.S.bz2: More tests.
+	* testfile44.expect.bz2: Adjust appropriately.
+
+2007-12-19  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (TESTS): Add run-disasm.sh.
+	(EXTRA_DIST): Add run-disasm.sh, testfile44.S.bz2, and
+	testfile44.expect.bz2.
+	* run-disasm.sh: New file.
+	* testfile44.S.bz2: New file.
+	* testfile44.expect.bz2: New file.
+
 2007-12-15  Roland McGrath  <roland@redhat.com>
 
 	* run-allregs.sh: Change expected output for powerpc spefscr.

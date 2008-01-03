@@ -1,3 +1,10 @@
+2008-01-02  Ulrich Drepper  <drepper@redhat.com>
+
+	* i386_disasm.c (i386_disasm): Extend matcher to allow tables to
+	contain instructions with prefixes.
+	* defs/i386: Use for many SSE operations.
+	* i386_data.h (FCT_mmxreg2): Removed.
+
 2008-01-01  Ulrich Drepper  <drepper@redhat.com>
 
 	* defs/i386: More 0f prefix support.

@@ -1,3 +1,29 @@
+/* Helper routines for disassembler for x86-64.
+   Copyright (C) 2007, 2008 Red Hat, Inc.
+   This file is part of Red Hat elfutils.
+   Written by Ulrich Drepper <drepper@redhat.com>, 2007.
+
+   Red Hat elfutils is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by the
+   Free Software Foundation; version 2 of the License.
+
+   Red Hat elfutils is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License along
+   with Red Hat elfutils; if not, write to the Free Software Foundation,
+   Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301 USA.
+
+   Red Hat elfutils is an included package of the Open Invention Network.
+   An included package of the Open Invention Network is a package for which
+   Open Invention Network licensees cross-license their patents.  No patent
+   license is granted, either expressly or impliedly, by designation as an
+   included package.  Should you wish to participate in the Open Invention
+   Network licensing program, please visit www.openinventionnetwork.com
+   <http://www.openinventionnetwork.com>.  */
+
 #include <inttypes.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -916,37 +942,6 @@ FCT_mmxreg (GElf_Addr addr __attribute__ ((unused)),
   byte = (byte >> (5 - opoff1 % 8)) & 7;
   size_t avail = bufsize - *bufcntp;
   int needed = snprintf (&bufp[*bufcntp], avail, "%%mm%" PRIxFAST8, byte);
-  if ((size_t) needed > avail)
-    return needed - avail;
-  *bufcntp += needed;
-  return 0;
-}
-
-static int
-FCT_mmxreg2 (GElf_Addr addr __attribute__ ((unused)),
-	     int *prefixes __attribute__ ((unused)),
-	     const char *op1str __attribute__ ((unused)),
-	     size_t opoff1 __attribute__ ((unused)),
-	     size_t opoff2 __attribute__ ((unused)),
-	     size_t opoff3 __attribute__ ((unused)),
-	     char *bufp __attribute__ ((unused)),
-	     size_t *bufcntp __attribute__ ((unused)),
-	     size_t bufsize __attribute__ ((unused)),
-	     const uint8_t *data __attribute__ ((unused)),
-	     const uint8_t **param_start __attribute__ ((unused)),
-	     const uint8_t *end __attribute__ ((unused)),
-	     DisasmGetSymCB_t symcb __attribute__ ((unused)),
-	     void *symcbarg __attribute__ ((unused)))
-{
-  uint_fast8_t byte = data[opoff1 / 8];
-  assert (opoff1 % 8 == 2 || opoff1 % 8 == 5);
-  byte = (byte >> (5 - opoff1 % 8)) & 7;
-  size_t avail = bufsize - *bufcntp;
-  int needed;
-  if (*prefixes & (has_rep | has_repne))
-    needed = snprintf (&bufp[*bufcntp], avail, "%%%s", regs[byte]);
-  else
-    needed = snprintf (&bufp[*bufcntp], avail, "%%mm%" PRIxFAST8, byte);
   if ((size_t) needed > avail)
     return needed - avail;
   *bufcntp += needed;

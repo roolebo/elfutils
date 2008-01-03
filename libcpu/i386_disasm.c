@@ -1,3 +1,33 @@
+/* Disassembler for x86.
+   Copyright (C) 2007, 2008 Red Hat, Inc.
+   This file is part of Red Hat elfutils.
+   Written by Ulrich Drepper <drepper@redhat.com>, 2007.
+
+   Red Hat elfutils is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by the
+   Free Software Foundation; version 2 of the License.
+
+   Red Hat elfutils is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License along
+   with Red Hat elfutils; if not, write to the Free Software Foundation,
+   Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301 USA.
+
+   Red Hat elfutils is an included package of the Open Invention Network.
+   An included package of the Open Invention Network is a package for which
+   Open Invention Network licensees cross-license their patents.  No patent
+   license is granted, either expressly or impliedly, by designation as an
+   included package.  Should you wish to participate in the Open Invention
+   Network licensing program, please visit www.openinventionnetwork.com
+   <http://www.openinventionnetwork.com>.  */
+
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <assert.h>
 #include <config.h>
 #include <ctype.h>
@@ -185,6 +215,7 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
       size_t bufcnt = 0;
 
       int prefixes = 0;
+      int last_prefix_bit = 0;
 
       const uint8_t *data = *startp;
       const uint8_t *begin = data;
@@ -201,7 +232,7 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 	  if (i == nknown_prefixes)
 	    break;
 
-	  prefixes |= 1 << i;
+	  prefixes |= last_prefix_bit = 1 << i;
 
 	  ++data;
 	}
@@ -224,7 +255,7 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
       size_t cnt = 0;
       while (curr < match_end)
 	{
-	  const uint8_t *const start = curr;
+	  const uint8_t *start = curr;
 
 	  uint_fast8_t len = *curr++;
 
@@ -233,6 +264,25 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 
 	  const uint8_t *codep = data;
 	  size_t avail = len;
+	  int correct_prefix = 0;
+	  int opoff = 0;
+
+	  if (data > begin && codep[-1] == curr[1] && curr[0] == 0xff)
+	    {
+	      /* We match a prefix byte.  This is exactly one byte and
+		 is matched exactly, without a mask.  */
+	      --avail;
+
+	      --len;
+	      start += 2;
+	      opoff = 8;
+
+	      curr += 2;
+	      assert (avail > 0);
+
+	      assert (last_prefix_bit != 0);
+	      correct_prefix = last_prefix_bit;
+	    }
 
 	  do
 	    {
@@ -259,6 +309,10 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 	       caller can figure this out by looking at the pointer into
 	       the input data.  */
 	    return 0;
+
+	  assert (correct_prefix == 0
+		  || (prefixes & correct_prefix) != 0);
+	  prefixes ^= correct_prefix;
 
 	  size_t prefix_size = 0;
 
@@ -463,238 +517,8 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 			  str = prefixes & has_addr16 ? "jcxz" : "jecxz";
 			  break;
 
-			case 0x0f:
-			  if (data[1] == 0x10 || data[1] == 0x11)
-			    {
-			      bufcnt = 0;
-			      int mod = prefixes & (has_data16 | has_rep
-						    | has_repne);
-			      if (mod & (mod - 1))
-				return -1;
-			      str = (mod & has_data16
-				     ? "movupd"
-				     : mod & has_rep
-				     ? "movss"
-				     : mod & has_repne
-				     ? "movsd"
-				     : "movups");
-			      break;
-			    }
-			  if (data[1] == 0x12)
-			    {
-			      bufcnt = 0;
-			      int mod = prefixes & (has_data16 | has_rep
-						    | has_repne);
-			      if (mod & (mod - 1))
-				return -1;
-			      str = (mod & has_data16
-				     ? "movlpd"
-				     : mod & has_rep
-				     ? "movsldup"
-				     : mod & has_repne
-				     ? "movddup"
-				     : (data[2] & 0xc0) == 0xc0
-				     ? "movhlps"
-				     : "movlps");
-			      break;
-			    }
-			  if (data[1] == 0x13)
-			    {
-			      bufcnt = 0;
-			      int mod = prefixes & has_data16;
-			      if (mod & (mod - 1))
-				return -1;
-			      str = (mod & has_data16
-				     ? ((data[2] & 0xc0) == 0xc0
-					? "movhlpd"
-					: "movlpd")
-				     : (data[2] & 0xc0) == 0xc0
-				     ? "movhlps"
-				     : "movlps");
-			      break;
-			    }
-			  if (data[1] == 0x14)
-			    {
-			      bufcnt = 0;
-			      int mod = prefixes & has_data16;
-			      if (mod & (mod - 1))
-				return -1;
-			      str = (mod & has_data16
-				     ? "unpcklpd" : "unpcklps");
-			      break;
-			    }
-			  if (data[1] == 0x15)
-			    {
-			      bufcnt = 0;
-			      int mod = prefixes & has_data16;
-			      if (mod & (mod - 1))
-				return -1;
-			      str = (mod & has_data16
-				     ? "unpckhpd" : "unpckhps");
-			      break;
-			    }
-			  if (data[1] == 0x16)
-			    {
-			      bufcnt = 0;
-			      int mod = prefixes & (has_data16 | has_rep);
-			      if (mod & (mod - 1))
-				return -1;
-			      str = (mod & has_data16
-				     ? "movhpd"
-				     : mod & has_rep
-				     ? "movshdup"
-				     : (data[2] & 0xc0) == 0xc0
-				     ? "movlhps"
-				     : "movhps");
-			      break;
-			    }
-			  if (data[1] == 0x17)
-			    {
-			      bufcnt = 0;
-			      int mod = prefixes & has_data16;
-			      if (mod & (mod - 1))
-				return -1;
-			      str = (mod & has_data16
-				     ? ((data[2] & 0xc0) == 0xc0
-					? "movlhpd" : "movhpd")
-				     : (data[2] & 0xc0) == 0xc0
-				     ? "movlhps"
-				     : "movhps");
-			      break;
-			    }
-			  if (data[1] == 0x28 || data[1] == 0x29)
-			    {
-			      bufcnt = 0;
-			      int mod = prefixes & has_data16;
-			      if (mod & (mod - 1))
-				return -1;
-			      str = (mod & has_data16) ? "movapd" : "movaps";
-			      break;
-			    }
-			  if (data[1] == 0x2a)
-			    {
-			      bufcnt = 0;
-			      int mod = prefixes & (has_data16 | has_rep
-						    | has_repne);
-			      if (mod & (mod - 1))
-				return -1;
-			      str = (mod & has_data16
-				     ? "cvtpi2pd"
-				     : mod & has_rep
-				     ? "cvtsi2ss"
-				     : mod & has_repne
-				     ? "cvtsi2sd"
-				     : "cvtpi2ps");
-			      break;
-			    }
-			  if (data[1] == 0x2b)
-			    {
-			      bufcnt = 0;
-			      int mod = prefixes & has_data16;
-			      if (mod & (mod - 1))
-				return -1;
-			      prefixes ^= mod;
-			      str = (mod & has_data16) ? "movntpd" : "movntps";
-			      break;
-			    }
-			  if (data[1] == 0x2c)
-			    {
-			      bufcnt = 0;
-			      int mod = prefixes & (has_data16 | has_rep
-						    | has_repne);
-			      if (mod & (mod - 1))
-				return -1;
-			      str = (mod & has_data16
-				     ? "cvttpd2pi"
-				     : mod & has_rep
-				     ? "cvttss2si"
-				     : mod & has_repne
-				     ? "cvttsd2si"
-				     : "cvttps2pi");
-			      break;
-			    }
-			  if (data[1] == 0x2d)
-			    {
-			      bufcnt = 0;
-			      int mod = prefixes & (has_data16 | has_rep
-						    | has_repne);
-			      if (mod & (mod - 1))
-				return -1;
-			      str = (mod & has_data16
-				     ? "cvtpd2pi"
-				     : mod & has_rep
-				     ? "cvtss2si"
-				     : mod & has_repne
-				     ? "cvtsd2si"
-				     : "cvtps2pi");
-			      break;
-			    }
-			  if (data[1] == 0x2e)
-			    {
-			      int mod = prefixes & has_data16;
-			      if (mod & (mod - 1))
-				return -1;
-			      str = (mod & has_data16
-				     ? "ucomisd" : "ucomiss");
-			      break;
-			    }
-			  if (data[1] == 0x2f)
-			    {
-			      int mod = prefixes & has_data16;
-			      if (mod & (mod - 1))
-				return -1;
-			      str = (mod & has_data16
-				     ? "comisd" : "comiss");
-			      break;
-			    }
-			  if (data[1] == 0x50)
-			    {
-			      int mod = prefixes & has_data16;
-			      if (mod & (mod - 1))
-				return -1;
-			      prefixes ^= mod;
-			      str = (mod & has_data16
-				     ? "movmskpd" : "movmskps");
-			      break;
-			    }
-			  if (data[1] == 0x51)
-			    {
-			      bufcnt = 0;
-			      int mod = prefixes & (has_data16 | has_rep
-						    | has_repne);
-			      if (mod & (mod - 1))
-				return -1;
-			      str = (mod & has_data16
-				     ? "sqrtpd"
-				     : mod & has_rep
-				     ? "sqrtss"
-				     : mod & has_repne
-				     ? "sqrtsd"
-				     : "sqrtps");
-			      break;
-			    }
-			  if (data[1] == 0x52)
-			    {
-			      bufcnt = 0;
-			      int mod = prefixes & has_rep;
-			      if (mod & (mod - 1))
-				return -1;
-			      str = mod & has_rep ? "rsqrtss" : "rsqrtps";
-			      break;
-			    }
-			  if (data[1] == 0x53)
-			    {
-			      bufcnt = 0;
-			      int mod = prefixes & has_rep;
-			      if (mod & (mod - 1))
-				return -1;
-			      str = mod & has_rep ? "rcpss" : "rcpps";
-			      break;
-			    }
-			  /* FALLTHROUGH */
-
 			default:
-			  abort ();
+			  assert (! "INVALID not handled");
 			}
 		    }
 		  else
@@ -778,9 +602,9 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 #else
 							   NULL,
 #endif
-							   instrtab[cnt].off1_1 + OFF1_1_BIAS,
-							   instrtab[cnt].off1_2 + OFF1_2_BIAS,
-							   instrtab[cnt].off1_3 + OFF1_3_BIAS,
+							   instrtab[cnt].off1_1 + OFF1_1_BIAS - opoff,
+							   instrtab[cnt].off1_2 + OFF1_2_BIAS - opoff,
+							   instrtab[cnt].off1_3 + OFF1_3_BIAS - opoff,
 							   buf, &bufcnt, bufsize,
 							   data, &param_start,
 							   end,
@@ -810,9 +634,9 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 #else
 							   NULL,
 #endif
-							   instrtab[cnt].off2_1 + OFF2_1_BIAS,
-							   instrtab[cnt].off2_2 + OFF2_2_BIAS,
-							   instrtab[cnt].off2_3 + OFF2_3_BIAS,
+							   instrtab[cnt].off2_1 + OFF2_1_BIAS - opoff,
+							   instrtab[cnt].off2_2 + OFF2_2_BIAS - opoff,
+							   instrtab[cnt].off2_3 + OFF2_3_BIAS - opoff,
 							   buf, &bufcnt, bufsize,
 							   data, &param_start,
 							   end,
@@ -842,14 +666,14 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 #else
 							   NULL,
 #endif
-							   instrtab[cnt].off3_1 + OFF3_1_BIAS,
+							   instrtab[cnt].off3_1 + OFF3_1_BIAS - opoff,
 #ifdef OFF3_2_BITS
-							   instrtab[cnt].off3_2 + OFF3_2_BIAS,
+							   instrtab[cnt].off3_2 + OFF3_2_BIAS - opoff,
 #else
 							   0,
 #endif
 #ifdef OFF3_3_BITS
-							   instrtab[cnt].off3_3 + OFF3_3_BIAS,
+							   instrtab[cnt].off3_3 + OFF3_3_BIAS - opoff,
 #else
 							   0,
 #endif

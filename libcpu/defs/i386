@@ -74,8 +74,6 @@ ifdef(`i386',
 10000011,{mod}000{r_m},{imms8}:add{w0} {imms8},{mod}{r_m}
 0000000{w},{mod}{reg}{r_m}:add {reg}{w},{mod}{r_m}
 0000001{w},{mod}{reg}{r_m}:add {mod}{r_m},{reg}{w}
-11110010,00001111,01011000,{Mod}{xmmreg}{R_m}:addsd {Mod}{R_m},{xmmreg}
-11110011,00001111,01011000,{Mod}{xmmreg}{R_m}:addss {Mod}{R_m},{xmmreg}
 01100110,00001111,11010000,{Mod}{xmmreg}{R_m}:addsubpd {Mod}{R_m},{xmmreg}
 11110010,00001111,11010000,{Mod}{xmmreg}{R_m}:addsubps {Mod}{R_m},{xmmreg}
 0010010{w},{imm}:and {imm}{w},{ax}{w}
@@ -149,15 +147,8 @@ ifdef(`ASSEMBLER',
 # SPECIAL 00001111,11000111,{mod}001{r_m}:[{rex.w}?cmpxchg16b:cmpxchg8b] {reg},{mod}{r_m}
 00001111,10100010:cpuid
 11110011,00001111,11100110,{Mod}{xmmreg}{R_m}:cvtdq2pd {Mod}{R_m},{xmmreg}
-00001111,01011011,{Mod}{xmmreg}{R_m}:cvtdq2ps {Mod}{R_m},{xmmreg}
 11110010,00001111,11100110,{Mod}{xmmreg}{R_m}:cvtpd2dq {Mod}{R_m},{xmmreg}
-01100110,00001111,01011010,{Mod}{xmmreg}{R_m}:cvtpd2ps {Mod}{R_m},{xmmreg}
-01100110,00001111,01011011,{Mod}{xmmreg}{R_m}:cvtps2dq {Mod}{R_m},{xmmreg}
-00001111,01011010,{Mod}{xmmreg}{R_m}:cvtps2pd {Mod}{R_m},{xmmreg}
-11110010,00001111,01011010,{Mod}{xmmreg}{R_m}:cvtsd2ss {Mod}{R_m},{xmmreg}
-11110011,00001111,01011010,{Mod}{xmmreg}{R_m}:cvtss2sd {Mod}{R_m},{xmmreg}
 01100110,00001111,11100110,{Mod}{xmmreg}{R_m}:cvttpd2dq {Mod}{R_m},{xmmreg}
-11110011,00001111,01011011,{Mod}{mmxreg}{R_m}:cvttps2dq {Mod}{R_m},{mmxreg}
 ifdef(`i386',
 `00100111:daa
 00101111:das
@@ -167,10 +158,6 @@ ifdef(`i386',
 `01001{reg}:dec {reg}
 ')dnl
 1111011{w},{mod}110{r_m}:div{w} {mod}{r_m}{w}
-01100110,00001111,01011110,{Mod}{xmmreg}{R_m}:divpd {Mod}{R_m},{xmmreg}
-00001111,01011110,{Mod}{xmmreg}{R_m}:divps {Mod}{R_m},{xmmreg}
-11110010,00001111,01011110,{Mod}{xmmreg}{R_m}:divsd {Mod}{R_m},{xmmreg}
-11110011,00001111,01011110,{Mod}{xmmreg}{R_m}:divss {Mod}{R_m},{xmmreg}
 00001111,01110111:emms
 11001000,{imm16},{imm8}:enter {imm16},{imm8}
 11011001,11010000:fnop
@@ -569,8 +556,6 @@ ifdef(`ASSEMBLER',
 00001111,011010{gg},{MOD}{mmxreg}{R_M}:punpckh{gg} {MOD}{R_M},{mmxreg}
 00001111,011000{gg},{MOD}{mmxreg}{R_M}:punpckl{gg} {MOD}{R_M},{mmxreg}
 00001111,11101111,{MOD}{mmxreg}{R_M}:pxor {MOD}{R_M},{mmxreg}
-00001111,01011000,{Mod}{xmmreg}{R_m}:addps {Mod}{R_m},{xmmreg}
-11110011,00001111,01011000,{Mod}{xmmreg}{R_m}:addss {Mod}{R_m},{xmmreg}
 00001111,01010101,{Mod}{xmmreg}{R_m}:andnps {Mod}{R_m},{xmmreg}
 00001111,01010100,{Mod}{xmmreg}{R_m}:andps {Mod}{R_m},{xmmreg}
 00001111,11000010,{Mod}{xmmreg}{R_m},00000000:cmpeqps {Mod}{R_m},{xmmreg}
@@ -589,15 +574,9 @@ ifdef(`ASSEMBLER',
 11110011,00001111,11000010,{Mod}{xmmreg}{R_m},00000101:cmpnltss {Mod}{R_m},{xmmreg}
 11110011,00001111,11000010,{Mod}{xmmreg}{R_m},00000110:cmpnless {Mod}{R_m},{xmmreg}
 11110011,00001111,11000010,{Mod}{xmmreg}{R_m},00000111:cmpordss {Mod}{R_m},{xmmreg}
-00001111,01011110,{Mod}{xmmreg}{R_m}:divps {Mod}{R_m},{xmmreg}
-11110011,00001111,01011110,{Mod}{xmmreg}{R_m}:divss {Mod}{R_m},{xmmreg}
 00001111,10101110,{mod}001{r_m}:fxrstor {mod}{r_m}
 00001111,10101110,{mod}000{r_m}:fxsave {mod}{r_m}
 00001111,10101110,{mod}010{r_m}:ldmxcsr {mod}{r_m}
-00001111,01011111,{Mod}{xmmreg}{R_m}:maxps {Mod}{R_m},{xmmreg}
-11110011,00001111,01011111,{Mod}{xmmreg}{R_m}:maxss {Mod}{R_m},{xmmreg}
-00001111,01011101,{Mod}{xmmreg}{R_m}:minps {Mod}{R_m},{xmmreg}
-11110011,00001111,01011101,{Mod}{xmmreg}{R_m}:minss {Mod}{R_m},{xmmreg}
 11110010,00001111,00010000,{Mod}{xmmreg}{R_m}:movsd {Mod}{R_m},{xmmreg}
 11110011,00001111,00010000,{Mod}{xmmreg}{R_m}:movss {Mod}{R_m},{xmmreg}
 01100110,00001111,00010000,{Mod}{xmmreg}{R_m}:movupd {Mod}{R_m},{xmmreg}
@@ -660,6 +639,45 @@ ifdef(`ASSEMBLER',
 00001111,01010010,{Mod}{xmmreg}{R_m}:rsqrtps {Mod}{R_m},{xmmreg}
 11110011,00001111,01010011,{Mod}{xmmreg}{R_m}:rcpss {Mod}{R_m},{xmmreg}
 00001111,01010011,{Mod}{xmmreg}{R_m}:rcpps {Mod}{R_m},{xmmreg}
+01100110,00001111,01010100,{Mod}{xmmreg}{R_m}:andpd {Mod}{R_m},{xmmreg}
+00001111,01010100,{Mod}{xmmreg}{R_m}:andps {Mod}{R_m},{xmmreg}
+01100110,00001111,01010101,{Mod}{xmmreg}{R_m}:andnpd {Mod}{R_m},{xmmreg}
+00001111,01010101,{Mod}{xmmreg}{R_m}:andnps {Mod}{R_m},{xmmreg}
+01100110,00001111,01010110,{Mod}{xmmreg}{R_m}:orpd {Mod}{R_m},{xmmreg}
+00001111,01010110,{Mod}{xmmreg}{R_m}:orps {Mod}{R_m},{xmmreg}
+01100110,00001111,01010111,{Mod}{xmmreg}{R_m}:xorpd {Mod}{R_m},{xmmreg}
+00001111,01010111,{Mod}{xmmreg}{R_m}:xorps {Mod}{R_m},{xmmreg}
+11110010,00001111,01011000,{Mod}{xmmreg}{R_m}:addsd {Mod}{R_m},{xmmreg}
+11110011,00001111,01011000,{Mod}{xmmreg}{R_m}:addss {Mod}{R_m},{xmmreg}
+01100110,00001111,01011000,{Mod}{xmmreg}{R_m}:addpd {Mod}{R_m},{xmmreg}
+00001111,01011000,{Mod}{xmmreg}{R_m}:addps {Mod}{R_m},{xmmreg}
+11110010,00001111,01011001,{Mod}{xmmreg}{R_m}:mulsd {Mod}{R_m},{xmmreg}
+11110011,00001111,01011001,{Mod}{xmmreg}{R_m}:mulss {Mod}{R_m},{xmmreg}
+01100110,00001111,01011001,{Mod}{xmmreg}{R_m}:mulpd {Mod}{R_m},{xmmreg}
+00001111,01011001,{Mod}{xmmreg}{R_m}:mulps {Mod}{R_m},{xmmreg}
+11110010,00001111,01011010,{Mod}{xmmreg}{R_m}:cvtsd2ss {Mod}{R_m},{xmmreg}
+11110011,00001111,01011010,{Mod}{xmmreg}{R_m}:cvtss2sd {Mod}{R_m},{xmmreg}
+01100110,00001111,01011010,{Mod}{xmmreg}{R_m}:cvtpd2ps {Mod}{R_m},{xmmreg}
+00001111,01011010,{Mod}{xmmreg}{R_m}:cvtps2pd {Mod}{R_m},{xmmreg}
+01100110,00001111,01011011,{Mod}{xmmreg}{R_m}:cvtps2dq {Mod}{R_m},{xmmreg}
+11110011,00001111,01011011,{Mod}{xmmreg}{R_m}:cvttps2dq {Mod}{R_m},{xmmreg}
+00001111,01011011,{Mod}{xmmreg}{R_m}:cvtdq2ps {Mod}{R_m},{xmmreg}
+11110010,00001111,01011100,{Mod}{xmmreg}{R_m}:subsd {Mod}{R_m},{xmmreg}
+11110011,00001111,01011100,{Mod}{xmmreg}{R_m}:subss {Mod}{R_m},{xmmreg}
+01100110,00001111,01011100,{Mod}{xmmreg}{R_m}:subpd {Mod}{R_m},{xmmreg}
+00001111,01011100,{Mod}{xmmreg}{R_m}:subps {Mod}{R_m},{xmmreg}
+11110010,00001111,01011101,{Mod}{xmmreg}{R_m}:minsd {Mod}{R_m},{xmmreg}
+11110011,00001111,01011101,{Mod}{xmmreg}{R_m}:minss {Mod}{R_m},{xmmreg}
+01100110,00001111,01011101,{Mod}{xmmreg}{R_m}:minpd {Mod}{R_m},{xmmreg}
+00001111,01011101,{Mod}{xmmreg}{R_m}:minps {Mod}{R_m},{xmmreg}
+11110010,00001111,01011110,{Mod}{xmmreg}{R_m}:divsd {Mod}{R_m},{xmmreg}
+11110011,00001111,01011110,{Mod}{xmmreg}{R_m}:divss {Mod}{R_m},{xmmreg}
+01100110,00001111,01011110,{Mod}{xmmreg}{R_m}:divpd {Mod}{R_m},{xmmreg}
+00001111,01011110,{Mod}{xmmreg}{R_m}:divps {Mod}{R_m},{xmmreg}
+11110010,00001111,01011111,{Mod}{xmmreg}{R_m}:maxsd {Mod}{R_m},{xmmreg}
+11110011,00001111,01011111,{Mod}{xmmreg}{R_m}:maxss {Mod}{R_m},{xmmreg}
+01100110,00001111,01011111,{Mod}{xmmreg}{R_m}:maxpd {Mod}{R_m},{xmmreg}
+00001111,01011111,{Mod}{xmmreg}{R_m}:maxps {Mod}{R_m},{xmmreg}
 # ORDER:
 dnl Many previous entries depend on this being last.
 000{sreg2}111:pop {sreg2}

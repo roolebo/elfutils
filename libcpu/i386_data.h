@@ -882,6 +882,8 @@ FCT_imm8 (GElf_Addr addr __attribute__ ((unused)),
 	  void *symcbarg __attribute__ ((unused)))
 {
   size_t avail = bufsize - *bufcntp;
+  if (*param_start >= end)
+    return -1;
   uint_fast8_t byte = *(*param_start)++;
   int needed = snprintf (&bufp[*bufcntp], avail, "$0x%" PRIx32,
 			 (uint32_t) byte);

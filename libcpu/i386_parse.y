@@ -108,9 +108,7 @@ struct instruction
 
   /* Suffix.  */
   enum { suffix_none = 0, suffix_w, suffix_w0, suffix_W, suffix_tttn,
-	 suffix_w1, suffix_gg, suffix_GG, suffix_0g, suffix_gG,
-         suffix_predpd, suffix_predps, suffix_predsd, suffix_predss,
-	 suffix_D } suffix;
+	 suffix_w1, suffix_D } suffix;
 
   /* Flag set if modr/m is used.  */
   int modrm;
@@ -326,22 +324,6 @@ instr:		  bytes ':' bitfieldopt kID bitfieldopt optargs
 				newp->suffix = suffix_w1;
 			      else if (strcmp ($5->name, "W") == 0)
 				newp->suffix = suffix_W;
-			      else if (strcmp ($5->name, "gg") == 0)
-				newp->suffix = suffix_gg;
-			      else if (strcmp ($5->name, "GG") == 0)
-				newp->suffix = suffix_GG;
-			      else if (strcmp ($5->name, "0g") == 0)
-				newp->suffix = suffix_0g;
-			      else if (strcmp ($5->name, "gG") == 0)
-				newp->suffix = suffix_gG;
-			      else if (strcmp ($5->name, "predpd") == 0)
-				newp->suffix = suffix_predpd;
-			      else if (strcmp ($5->name, "predps") == 0)
-				newp->suffix = suffix_predps;
-			      else if (strcmp ($5->name, "predsd") == 0)
-				newp->suffix = suffix_predsd;
-			      else if (strcmp ($5->name, "predss") == 0)
-				newp->suffix = suffix_predss;
 			      else if (strcmp ($5->name, "D") == 0)
 				newp->suffix = suffix_D;
 			      else

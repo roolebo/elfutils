@@ -420,6 +420,9 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		param_start += 4;
 	      else if ((modrm & 0xc0) == 0x40)
 		param_start += 1;
+
+	      if (unlikely (param_start > end))
+		goto not;
 	    }
 
 	  unsigned long string_end_idx = 0;

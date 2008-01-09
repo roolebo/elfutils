@@ -1,3 +1,14 @@
+2008-01-08  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (TESTS): Add run-disasm-x86-64.sh.
+	(EXTRA): Add testfile45.S.bz2, testfile45.expect.bz2,
+	run-disasm-x86-64.sh.
+	* run-disasm-x86-64.sh: New file.
+	* testfile45.S.bz2: New file.
+	* testfile45.expect.bz2: New file.
+	* testfile44.S.bz2: New tests.
+	* testfile44.expect.bz2: Adjust.
+
 2008-01-04  Ulrich Drepper  <drepper@redhat.com>
 
 	* testfile44.S.bz2: New tests.

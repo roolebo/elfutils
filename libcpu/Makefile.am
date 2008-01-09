@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2002, 2004, 2005, 2007 Red Hat, Inc.
+## Copyright (C) 2002, 2004, 2005, 2007, 2008 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -43,13 +43,11 @@ if MUDFLAP
 libmudflap = -lmudflap
 endif
 
-# XXX x86-64 uncommented for now.
-noinst_LIBRARIES = libcpu_i386.a# libcpu_x86_64.a
+noinst_LIBRARIES = libcpu_i386.a libcpu_x86_64.a
 noinst_PROGRAMS = i386_gendis
 
 libcpu_i386_a_SOURCES = i386_disasm.c
-# XXX Unused for now.
-#libcpu_x86_64_a_SOURCES = x86_64_disasm.c
+libcpu_x86_64_a_SOURCES = x86_64_disasm.c
 
 i386_gendis_SOURCES = i386_gendis.c i386_lex.l i386_parse.y
 
@@ -58,11 +56,11 @@ x86_64_disasm.o: x86_64.mnemonics x86_64_dis.h i386_disasm.c
 
 i386_dis.h: i386_gendis $(srcdir)/defs/i386
 	m4 -Di386 -DDISASSEMBLER $(srcdir)/defs/i386 | ./i386_gendis - > $@
-x86_64_dis.h: i386_gendis $(srcdir)/defs/x86_64
-	m4 -Dx86_64 -DDISASSEMBLER $(srcdir)/defs/x86_64 | ./i386_gendis - > $@
+x86_64_dis.h: i386_gendis $(srcdir)/defs/i386
+	m4 -Dx86_64 -DDISASSEMBLER $(srcdir)/defs/i386 | ./i386_gendis - > $@
 
-i386.mnemonics x86_64.mnemonics: %.mnemonics: $(srcdir)/defs/%
-	m4 -D$(<F) -DDISASSEMBLER $^ \
+i386.mnemonics x86_64.mnemonics: %.mnemonics: $(srcdir)/defs/i386
+	m4 -D$(@:.mnemonics=) -DDISASSEMBLER $^ \
 	| sed '1,/^%%/d;/^#/d;/^[[:space:]]*$$/d;s/[^:]*:\([^[:space:]]*\).*/MNE(\1)/;s/{[^}]*}//g;/INVALID/d' \
 	| sort -u > $@
 

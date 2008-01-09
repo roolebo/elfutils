@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2000-2006, 2007 Red Hat, Inc.
+## Copyright (C) 2000-2006, 2007, 2008 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -72,8 +72,7 @@ am_libebl_sh_pic_a_OBJECTS = $(sh_SRCS:.c=.os)
 
 x86_64_SRCS = x86_64_init.c x86_64_symbol.c x86_64_corenote.c \
 	      x86_64_retval.c x86_64_regs.c i386_auxv.c
-# XXX Not yet
-# cpu_x86_64 = ../libcpu/libcpu_x86_64.a
+cpu_x86_64 = ../libcpu/libcpu_x86_64.a
 libebl_x86_64_pic_a_SOURCES = $(x86_64_SRCS)
 am_libebl_x86_64_pic_a_OBJECTS = $(x86_64_SRCS:.c=.os)
 

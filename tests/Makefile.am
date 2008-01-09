@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 1996-2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
+## Copyright (C) 1996-2002, 2003, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -84,7 +84,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	dwfl-bug-addr-overflow run-addrname-test.sh \
 	dwfl-bug-fd-leak dwfl-bug-report \
 	run-dwfl-bug-offline-rel.sh run-dwfl-addr-sect.sh \
-	run-disasm.sh
+	run-disasm-x86.sh run-disasm-x86-64.sh
 # run-show-ciefde.sh
 
 if !STANDALONE
@@ -135,7 +135,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile37.bz2 testfile37.debug.bz2 \
 	     testfile38.bz2 testfile39.bz2 testfile40.bz2 testfile40.debug.bz2 \
 	     testfile41.bz2 testfile42.bz2 testfile43.bz2 \
-	     testfile44.S.bz2 testfile44.expect.bz2 run-disasm.sh
+	     testfile44.S.bz2 testfile44.expect.bz2 run-disasm-x86.sh \
+	     testfile45.S.bz2 testfile45.expect.bz2 run-disasm-x86-64.sh
 
 installed_TESTS_ENVIRONMENT = libdir=$(DESTDIR)$(libdir) \
 			      bindir=$(DESTDIR)$(bindir) \

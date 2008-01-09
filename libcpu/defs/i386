@@ -1,6 +1,8 @@
 %mask {s}	1
 %mask {w}	1
 %mask {w1}	1
+%mask {W1}	1
+%mask {W2}	1
 dnl floating point reg suffix
 %mask {D}	1
 %mask {imm8}	8
@@ -8,6 +10,7 @@ dnl floating point reg suffix
 %mask {imm16}	16
 %mask {reg}	3
 %mask {reg16}	3
+%mask {reg64}	3
 %mask {tttn}	4
 %mask {mod}	2
 %mask {moda}	2
@@ -17,6 +20,8 @@ dnl like {r_m} but referencing byte register
 %mask {8r_m}	3
 dnl like {r_m} but referencing 16-bit register
 %mask {16r_m}	3
+dnl like {r_m} but referencing 32- or 64-bit register
+%mask {64r_m}	3
 %mask {disp8}	8
 dnl imm really is 8/16/32 bit depending on the situation.
 %mask {imm}	8
@@ -62,18 +67,18 @@ ifdef(`i386',
 0001010{w},{imm}:adc {imm}{w},{ax}{w}
 1000000{w},{mod}010{r_m},{imm}:adc{w} {imm}{w},{mod}{r_m}{w}
 1000001{w},{mod}010{r_m},{imms8}:adc{w} {imms8},{mod}{r_m}
-0001000{w},{mod}{reg}{r_m}:adc {reg}{w},{mod}{r_m}
-0001001{w},{mod}{reg}{r_m}:adc {mod}{r_m},{reg}{w}
+0001000{w},{mod}{reg}{r_m}:adc {reg}{w},{mod}{r_m}{w}
+0001001{w},{mod}{reg}{r_m}:adc {mod}{r_m}{w},{reg}{w}
 0000010{w},{imm}:add {imm}{w},{ax}{w}
 1000000{w},{mod}000{r_m},{imm}:add{w} {imm}{w},{mod}{r_m}{w}
 10000011,{mod}000{r_m},{imms8}:add{w0} {imms8},{mod}{r_m}
-0000000{w},{mod}{reg}{r_m}:add {reg}{w},{mod}{r_m}
-0000001{w},{mod}{reg}{r_m}:add {mod}{r_m},{reg}{w}
+0000000{w},{mod}{reg}{r_m}:add {reg}{w},{mod}{r_m}{w}
+0000001{w},{mod}{reg}{r_m}:add {mod}{r_m}{w},{reg}{w}
 01100110,00001111,11010000,{Mod}{xmmreg}{R_m}:addsubpd {Mod}{R_m},{xmmreg}
 11110010,00001111,11010000,{Mod}{xmmreg}{R_m}:addsubps {Mod}{R_m},{xmmreg}
 0010010{w},{imm}:and {imm}{w},{ax}{w}
 1000000{w},{mod}100{r_m},{imm}:and{w} {imm}{w},{mod}{r_m}{w}
-1000001{w},{mod}100{r_m},{imms}:and{w} {imms},{mod}{r_m}
+1000001{w},{mod}100{r_m},{imms8}:and{w} {imms8},{mod}{r_m}
 0010000{w},{mod}{reg}{r_m}:and {reg}{w},{mod}{r_m}{w}
 0010001{w},{mod}{reg}{r_m}:and {mod}{r_m}{w},{reg}{w}
 01100110,00001111,01010100,{Mod}{xmmreg}{R_m}:andpd {Mod}{R_m},{xmmreg}
@@ -83,6 +88,8 @@ ifdef(`i386',
 ifdef(`i386',
 `01100011,{mod}{reg16}{r_m}:arpl {reg16},{mod}{r_m}
 01100010,{moda}{reg}{r_m}:bound {reg},{moda}{r_m}
+',
+`01100011,{mod}{reg64}{r_m}:movslq {mod}{r_m},{reg64}
 ')dnl
 00001111,10111100,{mod}{reg}{r_m}:bsf {mod}{r_m},{reg}
 00001111,10111101,{mod}{reg}{r_m}:bsr {mod}{r_m},{reg}
@@ -95,12 +102,12 @@ ifdef(`i386',
 00001111,10111010,{mod}110{r_m},{imm8}:btr{w} {imm8},{mod}{r_m}
 00001111,10101011,{mod}{reg}{r_m}:bts {reg},{mod}{r_m}
 00001111,10111010,{mod}101{r_m},{imm8}:bts{w} {imm8},{mod}{r_m}
-11101000,{rel}:call {rel}
-11111111,{mod}010{r_m}:call *{mod}{r_m}
+11101000,{rel}:call{W} {rel}
+11111111,{mod}010{64r_m}:call{W} *{mod}{64r_m}
 ifdef(`i386',
 `10011010,{absval},{sel}:lcall {sel},{absval}
 ')dnl
-11111111,{mod}011{r_m}:lcall *{mod}{r_m}
+11111111,{mod}011{64r_m}:lcall{W} *{mod}{64r_m}
 # SPECIAL 10011000:[{rex.w}?cltq:{dpfx}?cbtw:cwtl]
 10011000:INVALID
 # SPECIAL 10011001:[{rew.w}?cqto:{dpfx}?cltd:cwtd]
@@ -120,10 +127,17 @@ ifdef(`i386',
 10000011,{mod}111{r_m},{imms8}:cmp{w0} {imms8},{mod}{r_m}
 0011100{w},{mod}{reg}{r_m}:cmp {reg}{w},{mod}{r_m}{w}
 0011101{w},{mod}{reg}{r_m}:cmp {mod}{r_m}{w},{reg}{w}
-11110010,00001111,11000010,{Mod}{xmmreg}{R_m},{imm8}:cmpsd {imm8},{Mod}{R_m},{xmmreg}
+ifdef(`ASSEMBLER',
+`11110010,00001111,11000010,{Mod}{xmmreg}{R_m},{imm8}:cmpsd {imm8},{Mod}{R_m},{xmmreg}
 11110011,00001111,11000010,{Mod}{xmmreg}{R_m},{imm8}:cmpss {imm8},{Mod}{R_m},{xmmreg}
 01100110,00001111,11000010,{Mod}{xmmreg}{R_m},{imm8}:cmppd {imm8},{Mod}{R_m},{xmmreg}
 00001111,11000010,{Mod}{xmmreg}{R_m},{imm8}:cmpps {imm8},{Mod}{R_m},{xmmreg}
+',
+`11110010,00001111,11000010,{Mod}{xmmreg}{R_m},{imm8}:INVALID {Mod}{R_m},{xmmreg}
+11110011,00001111,11000010,{Mod}{xmmreg}{R_m},{imm8}:INVALID {Mod}{R_m},{xmmreg}
+01100110,00001111,11000010,{Mod}{xmmreg}{R_m},{imm8}:INVALID {Mod}{R_m},{xmmreg}
+00001111,11000010,{Mod}{xmmreg}{R_m},{imm8}:INVALID {Mod}{R_m},{xmmreg}
+')dnl
 1010011{w}:{RE}cmps{w} {es_di},{ds_si}
 00001111,1011000{w},{mod}{reg}{r_m}:cmpxchg {reg}{w},{mod}{r_m}{w}
 ifdef(`i386',
@@ -146,7 +160,7 @@ ifdef(`i386',
 ')dnl
 1111011{w},{mod}110{r_m}:div{w} {mod}{r_m}{w}
 00001111,01110111:emms
-11001000,{imm16},{imm8}:enter {imm16},{imm8}
+11001000,{imm16},{imm8}:enter{W} {imm16},{imm8}
 11011001,11010000:fnop
 11011001,11100000:fchs
 11011001,11100001:fabs
@@ -342,33 +356,44 @@ ifdef(`ASSEMBLER',
 0110110{w}:{R}ins{w} {dx},{es_di}
 11001101,{imm8}:int {imm8}
 11001100:int3
-11001110:into
+ifdef(`i386',
+`11001110:into
+')dnl
 00001111,00001000:invd
 # ORDER
 00001111,00000001,11111000:swapgs
 00001111,00000001,{mod}111{r_m}:invlpg {mod}{r_m}
 # ORDER END
-11001111:iret{W}
+11001111:iret{W1}
 0111{tttn},{disp8}:j{tttn} {disp8}
 00001111,1000{tttn},{rel}:j{tttn} {rel}
 00001111,1001{tttn},{mod}000{8r_m}:set{tttn} {mod}{8r_m}
 # SPECIAL 11100011,{disp8}:[{dpfx}?jcxz:jecxz] {disp8}
 11100011,{disp8}:INVALID {disp8}
 11101011,{disp8}:jmp {disp8}
-11101001,{rel}:jmp {rel}
-11111111,{mod}100{r_m}:jmp *{mod}{r_m}
+11101001,{rel}:jmp{W} {rel}
+11111111,{mod}100{64r_m}:jmp{W} *{mod}{64r_m}
 11101010,{absval},{sel}:ljmp {sel},{absval}
-11111111,{mod}101{r_m}:ljmp *{mod}{r_m}
+11111111,{mod}101{64r_m}:ljmp{W} *{mod}{64r_m}
 10011111:lahf
 00001111,00000010,{mod}{reg}{16r_m}:lar {mod}{16r_m},{reg}
-11000101,{mod}{reg}{r_m}:lds {mod}{r_m},{reg}
+ifdef(`i386',
+`11000101,{mod}{reg}{r_m}:lds {mod}{r_m},{reg}
+')dnl
 10001101,{mod}{reg}{r_m}:lea {mod}{r_m},{reg}
-11001001:leave
-11000100,{mod}{reg}{r_m}:les {mod}{r_m},{reg}
+11001001:leave{W}
+ifdef(`i386',
+`11000100,{mod}{reg}{r_m}:les {mod}{r_m},{reg}
+')dnl
 00001111,10110100,{mod}{reg}{r_m}:lfs {mod}{r_m},{reg}
-00001111,00000001,{mod}010{r_m}:lgdt{w0} {mod}{r_m}
 00001111,10110101,{mod}{reg}{r_m}:lgs {mod}{r_m},{reg}
+ifdef(`i386',
+`00001111,00000001,{mod}010{r_m}:lgdt{w0} {mod}{r_m}
 00001111,00000001,{mod}011{r_m}:lidt{w0} {mod}{r_m}
+',
+`00001111,00000001,{mod}010{r_m}:lgdt {mod}{r_m}
+00001111,00000001,{mod}011{r_m}:lidt {mod}{r_m}
+')dnl
 00001111,00000000,{mod}010{16r_m}:lldt {mod}{16r_m}
 00001111,00000001,{mod}110{16r_m}:lmsw {mod}{16r_m}
 11110000:lock
@@ -385,10 +410,10 @@ ifdef(`ASSEMBLER',
 1011{w}{reg},{imm}:mov {imm}{w},{reg}{w}
 1010000{w},{abs}:mov {abs},{ax}{w}
 1010001{w},{abs}:mov {ax}{w},{abs}
-00001111,00100000,11{ccc}{reg}:mov {ccc},{reg}
-00001111,00100010,11{ccc}{reg}:mov {reg},{ccc}
-00001111,00100001,11{ddd}{reg}:mov {ddd},{reg}
-00001111,00100011,11{ddd}{reg}:mov {reg},{ddd}
+00001111,00100000,11{ccc}{reg64}:mov {ccc},{reg64}
+00001111,00100010,11{ccc}{reg64}:mov {reg64},{ccc}
+00001111,00100001,11{ddd}{reg64}:mov {ddd},{reg64}
+00001111,00100011,11{ddd}{reg64}:mov {reg64},{ddd}
 10001100,{mod}{sreg3}{r_m}:mov {sreg3},{mod}{r_m}
 10001110,{mod}{sreg3}{r_m}:mov {mod}{r_m},{sreg3}
 1010010{w}:{R}movs{w} {ds_si},{es_di}
@@ -398,12 +423,8 @@ ifdef(`ASSEMBLER',
 00001111,10110111,{mod}{reg}{16r_m}:movzwl {mod}{16r_m},{reg}
 1111011{w},{mod}100{r_m}:mul{w} {mod}{r_m}{w}
 1111011{w},{mod}011{r_m}:neg{w} {mod}{r_m}{w}
-ifdef(`ASSEMBLER',
-`10010000:nop
 11110011,10010000:pause
-',
-`10010000:{R}INVALID
-')dnl
+10010000:nop
 1111011{w},{mod}010{r_m}:not{w} {mod}{r_m}{w}
 0000100{w},{mod}{reg}{r_m}:or {reg}{w},{mod}{r_m}{w}
 0000101{w},{mod}{reg}{r_m}:or {mod}{r_m}{w},{reg}{w}
@@ -413,17 +434,36 @@ ifdef(`ASSEMBLER',
 1110011{w},{imm8}:out {ax}{w},{imm8}
 1110111{w}:out {ax}{w},{dx}
 0110111{w}:{R}outs{w} {ds_si},{dx}
-10001111,{mod}000{r_m}:pop{w} {mod}{r_m}
-01011{reg}:pop {reg}
-00001111,10{sreg3}001:pop {sreg3}
-01100001:popa{W}
+ifdef(`i386',
+`10001111,{mod}000{r_m}:pop{w} {mod}{r_m}
+',
+# XXX This is not the cleanest way...
+`10001111,11000{reg64}:pop {reg64}
+10001111,{mod}000{r_m}:pop{W} {mod}{r_m}
+')dnl
+00001111,10{sreg3}001:pop{W} {sreg3}
 10011101:popf{W}
-11111111,{mod}110{r_m}:push{w} {mod}{r_m}
-01010{reg}:push {reg}
-011010{s}0,{imm}:push {imm}{s}
+# XXX This is not the cleanest way...
+ifdef(`i386',
+`11111111,{mod}110{r_m}:push{w} {mod}{r_m}
+',
+`11111111,11110{reg64}:push {reg64}
+11111111,{mod}110{r_m}:pushq {mod}{r_m}
+')dnl
+ifdef(`i386',
+`01010{reg}:push {reg}
+01011{reg}:pop {reg}
+',
+`01010{reg64}:push {reg64}
+01011{reg64}:pop {reg64}
+')dnl
+011010{s}0,{imm}:push{W} {imm}{s}
 000{sreg2}110:push {sreg2}
-00001111,10{sreg3}000:push {sreg3}
-01100000:pusha{W}
+00001111,10{sreg3}000:push{W} {sreg3}
+ifdef(`i386',
+`01100000:pusha{W}
+01100001:popa{W}
+')dnl
 10011100:pushf{W}
 1101000{w},{mod}010{r_m}:rcl{w} {mod}{r_m}{w}
 1101001{w},{mod}010{r_m}:rcl{w} %cl,{mod}{r_m}{w}
@@ -434,8 +474,8 @@ ifdef(`ASSEMBLER',
 00001111,00110010:rdmsr
 00001111,00110011:rdpmc
 00001111,00110001:rdtsc
-11000011:ret
-11000010,{imm16}:ret {imm16}
+11000011:ret{W}
+11000010,{imm16}:ret{W} {imm16}
 11001011:lret
 11001010,{imm16}:lret {imm16}
 1101000{w},{mod}000{r_m}:rol{w} {mod}{r_m}{w}
@@ -453,7 +493,7 @@ ifdef(`ASSEMBLER',
 0001101{w},{mod}{reg}{r_m}:sbb {mod}{r_m}{w},{reg}{w}
 0001110{w},{imm}:sbb {imm}{w},{ax}{w}
 1000000{w},{mod}011{r_m},{imm}:sbb{w} {imm}{w},{mod}{r_m}{w}
-1000001{w},{mod}011{r_m},{imms}:sbb{w} {imms},{mod}{r_m}
+1000001{w},{mod}011{r_m},{imms8}:sbb{w} {imms8},{mod}{r_m}
 1010111{w}:{RE}scas {es_di},{ax}{w}
 00001111,1001{tttn},{mod}000{r_m}:set{tttn} {mod}{r_m}
 1101000{w},{mod}100{r_m}:shl{w} {mod}{r_m}{w}
@@ -471,14 +511,27 @@ ifdef(`ASSEMBLER',
 00001111,00000001,11000010:vmlaunch
 00001111,00000001,11000011:vmresume
 00001111,00000001,11000100:vmxoff
-00001111,01111000,{mod}{reg}{r_m}:vmread {reg},{mod}{r_m}
-00001111,01111001,{mod}{reg}{r_m}:vmwrite {mod}{r_m},{reg}
-00001111,00000001,{mod}000{r_m}:sgdtl {mod}{r_m}
+00001111,01111000,{mod}{reg64}{64r_m}:vmread {reg64},{mod}{64r_m}
+00001111,01111001,{mod}{reg64}{64r_m}:vmwrite {mod}{64r_m},{reg64}
+ifdef(`i386',
+`00001111,00000001,{mod}000{r_m}:sgdtl {mod}{r_m}
+',
+`00001111,00000001,{mod}000{r_m}:sgdt {mod}{r_m}
+')dnl
 # ORDER END
 # ORDER
-00001111,00000001,11001000:monitor %eax,%ecx,%edx
+ifdef(`i386',
+`00001111,00000001,11001000:monitor %eax,%ecx,%edx
 00001111,00000001,11001001:mwait %eax,%ecx
-00001111,00000001,{mod}001{r_m}:sidtl {mod}{r_m}
+',
+`00001111,00000001,11001000:monitor %rax,%rcx,%rdx
+00001111,00000001,11001001:mwait %rax,%rcx
+')dnl
+ifdef(`i386',
+`00001111,00000001,{mod}001{r_m}:sidtl {mod}{r_m}
+',
+`00001111,00000001,{mod}001{r_m}:sidt {mod}{r_m}
+')dnl
 # ORDER END
 00001111,00000000,{mod}000{r_m}:sldt {mod}{r_m}
 00001111,00000001,{mod}100{r_m}:smsw {mod}{r_m}
@@ -491,7 +544,7 @@ ifdef(`ASSEMBLER',
 0010101{w},{mod}{reg}{r_m}:sub {mod}{r_m}{w},{reg}{w}
 0010110{w},{imm}:sub {imm}{w},{ax}{w}
 1000000{w},{mod}101{r_m},{imm}:sub{w} {imm}{w},{mod}{r_m}{w}
-1000001{w},{mod}101{r_m},{imms}:sub{w} {imms},{mod}{r_m}
+1000001{w},{mod}101{r_m},{imms8}:sub{w} {imms8},{mod}{r_m}
 1000010{w},{mod}{reg}{r_m}:test {reg}{w},{mod}{r_m}{w}
 1010100{w},{imm}:test {imm}{w},{ax}{w}
 1111011{w},{mod}000{r_m},{imm}:test{w} {imm}{w},{mod}{r_m}{w}
@@ -515,7 +568,7 @@ ifdef(`ASSEMBLER',
 0011001{w},{mod}{reg}{r_m}:xor {mod}{r_m}{w},{reg}{w}
 0011010{w},{imm}:xor {imm}{w},{ax}{w}
 1000000{w},{mod}110{r_m},{imm}:xor{w} {imm}{w},{mod}{r_m}{w}
-1000001{w},{mod}110{r_m},{imms}:xor{w} {imms},{mod}{r_m}
+1000001{w},{mod}110{r_m},{imms8}:xor{w} {imms8},{mod}{r_m}
 00001111,01110111:emms
 01100110,00001111,11011011,{Mod}{xmmreg}{R_m}:pand {Mod}{R_m},{xmmreg}
 00001111,11011011,{MOD}{mmxreg}{R_M}:pand {MOD}{R_M},{mmxreg}

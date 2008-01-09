@@ -1,3 +1,12 @@
+2008-01-08  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: Enable x86-64 again.
+	* defs/i386: Lots of changes for x86-64.
+	* i386_data.h: Add support for use in x86-64 disassembler.
+	* i386_disasm.c: Likewise.
+	* i386_parse.y: Likewise.
+	* defs/x86_64: Removed.
+
 2008-01-04  Ulrich Drepper  <drepper@redhat.com>
 
 	* defs/i386: Cleanups, remove masks which are not needed.

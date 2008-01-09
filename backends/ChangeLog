@@ -1,3 +1,13 @@
+2008-01-08  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: Add x86-64 disassembler.
+	* x86_64_init.c (x86_64_init): Hook up disassembler.
+
+2007-12-28  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: Add x86 disassembler.
+	* i386_init.c (i386_init): Hook up disassembler.
+
 2007-12-15  Roland McGrath  <roland@redhat.com>
 
 	* ppc_regs.c (ppc_register_info): Return "spefscr", not "spr512".

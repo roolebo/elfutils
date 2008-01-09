@@ -101,7 +101,7 @@ data_prefix (int *prefixes, char *bufp, size_t *bufcntp, size_t bufsize)
   else if (*prefixes & has_es)
     {
       ch = 'e';
-      *prefixes &= has_es;
+      *prefixes &= ~has_es;
     }
   else if (*prefixes & has_fs)
     {
@@ -132,10 +132,26 @@ data_prefix (int *prefixes, char *bufp, size_t *bufcntp, size_t bufsize)
   return 0;
 }
 
-static const char regs[8][4] =
+#ifdef X86_64
+static const char hiregs[8][4] =
+  {
+    "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15"
+  };
+static const char aregs[8][4] =
+  {
+    "rax", "rcx", "rdx", "rbx", "rsp", "rbp", "rsi", "rdi"
+  };
+static const char dregs[8][4] =
   {
     "eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi"
   };
+#else
+static const char aregs[8][4] =
+  {
+    "eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi"
+  };
+# define dregs aregs
+#endif
 
 static int
 general_mod$r_m (GElf_Addr addr __attribute__ ((unused)),
@@ -158,7 +174,48 @@ general_mod$r_m (GElf_Addr addr __attribute__ ((unused)),
     return r;
 
   uint_fast8_t modrm = data[opoff1 / 8];
-  if ((*prefixes & has_addr16) == 0)
+#ifndef X86_64
+  if (unlikely ((*prefixes & has_addr16) != 0))
+    {
+      int16_t disp = 0;
+      bool nodisp = false;
+
+      if ((modrm & 0xc7) == 6 || (modrm & 0xc0) == 0x80)
+	/* 16 bit displacement.  */
+	disp = read_2sbyte_unaligned (&data[opoff1 / 8 + 1]);
+      else if ((modrm & 0xc0) == 0x40)
+	/* 8 bit displacement.  */
+	disp = *(const int8_t *) &data[opoff1 / 8 + 1];
+      else if ((modrm & 0xc0) == 0)
+	nodisp = true;
+
+      char tmpbuf[sizeof ("-0x1234(%rr,%rr)")];
+      int n;
+      if ((modrm & 0xc7) == 6)
+	n = snprintf (tmpbuf, sizeof (tmpbuf), "0x%" PRIx16, disp);
+      else
+	{
+	  n = 0;
+	  if (!nodisp)
+	    n = snprintf (tmpbuf, sizeof (tmpbuf), "%s0x%" PRIx16,
+			  disp < 0 ? "-" : "", disp < 0 ? -disp : disp);
+
+	  if ((modrm & 0x4) == 0)
+	    n += snprintf (tmpbuf + n, sizeof (tmpbuf) - n, "(%%b%c,%%%ci)",
+			   "xp"[(modrm >> 1) & 1], "sd"[modrm & 1]);
+	  else
+	    n += snprintf (tmpbuf + n, sizeof (tmpbuf) - n, "(%%%s)",
+			   ((const char [4][3]) { "si", "di", "bp", "bx" })[modrm & 3]);
+	}
+
+      if (*bufcntp + n + 1 > bufsize)
+	return *bufcntp + n + 1 - bufsize;
+
+      memcpy (&bufp[*bufcntp], tmpbuf, n + 1);
+      *bufcntp += n;
+    }
+  else
+#endif
     {
       if ((modrm & 7) != 4)
 	{
@@ -174,16 +231,53 @@ general_mod$r_m (GElf_Addr addr __attribute__ ((unused)),
 	  else if ((modrm & 0xc0) == 0)
 	    nodisp = true;
 
-	  char tmpbuf[sizeof ("-0x12345678(%rrr)")];
+	  char tmpbuf[sizeof ("-0x12345678(%rrrr)")];
 	  int n;
 	  if (nodisp)
-	    n = snprintf (tmpbuf, sizeof (tmpbuf), "(%%%s)", regs[modrm & 7]);
+	    {
+	      n = snprintf (tmpbuf, sizeof (tmpbuf), "(%%%s)",
+#ifdef X86_64
+			    (*prefixes & has_rex_b) ? hiregs[modrm & 7] :
+#endif
+			    aregs[modrm & 7]);
+#ifdef X86_64
+	      if (*prefixes & has_addr16)
+		{
+		  if (*prefixes & has_rex_b)
+		    tmpbuf[n++] = 'd';
+		  else
+		    tmpbuf[2] = 'e';
+		}
+#endif
+	    }
 	  else if ((modrm & 0xc7) != 5)
-	    n = snprintf (tmpbuf, sizeof (tmpbuf), "%s0x%" PRIx32 "(%%%s)",
-			  disp < 0 ? "-" : "", disp < 0 ? -disp : disp,
-			  regs[modrm & 7]);
+	    {
+	      int p;
+	      n = snprintf (tmpbuf, sizeof (tmpbuf), "%s0x%" PRIx32 "(%%%n%s)",
+			    disp < 0 ? "-" : "", disp < 0 ? -disp : disp, &p,
+#ifdef X86_64
+			    (*prefixes & has_rex_b) ? hiregs[modrm & 7] :
+#endif
+			    aregs[modrm & 7]);
+#ifdef X86_64
+	      if (*prefixes & has_addr16)
+		{
+		  if (*prefixes & has_rex_b)
+		    tmpbuf[n++] = 'd';
+		  else
+		    tmpbuf[p] = 'e';
+		}
+#endif
+	    }
 	  else
-	    n = snprintf (tmpbuf, sizeof (tmpbuf), "0x%" PRIx32, disp);
+	    {
+#ifdef X86_64
+	      n = snprintf (tmpbuf, sizeof (tmpbuf), "%s0x%" PRIx32 "(%%rip)",
+			    disp < 0 ? "-" : "", disp < 0 ? -disp : disp);
+#else
+	      n = snprintf (tmpbuf, sizeof (tmpbuf), "0x%" PRIx32, disp);
+#endif
+	    }
 
 	  if (*bufcntp + n + 1 > bufsize)
 	    return *bufcntp + n + 1 - bufsize;
@@ -208,10 +302,14 @@ general_mod$r_m (GElf_Addr addr __attribute__ ((unused)),
 	  else
 	    nodisp = true;
 
-	  char tmpbuf[sizeof ("-0x12345678(%rrr,%rrr,N)")];
+	  char tmpbuf[sizeof ("-0x12345678(%rrrr,%rrrr,N)")];
 	  char *cp = tmpbuf;
 	  int n;
-	  if ((modrm & 0xc0) != 0 || (sib & 0x3f) != 0x25)
+	  if ((modrm & 0xc0) != 0 || (sib & 0x3f) != 0x25
+#ifdef X86_64
+	      || (*prefixes & has_rex_x) != 0
+#endif
+	      )
 	    {
 	      if (!nodisp)
 		{
@@ -225,14 +323,40 @@ general_mod$r_m (GElf_Addr addr __attribute__ ((unused)),
 	      if ((modrm & 0xc7) != 0x4 || (sib & 0x7) != 0x5)
 		{
 		  *cp++ = '%';
-		  cp = mempcpy (cp, regs[sib & 7], 3);
+		  cp = stpcpy (cp,
+#ifdef X86_64
+			       (*prefixes & has_rex_b) ? hiregs[sib & 7] :
+			       (*prefixes & has_addr16) ? dregs[sib & 7] :
+#endif
+			       aregs[sib & 7]);
+#ifdef X86_64
+		  if ((*prefixes & (has_rex_b | has_addr16))
+		      == (has_rex_b | has_addr16))
+		    *cp++ = 'd';
+#endif
 		}
 
-	      if ((sib & 0x38) != 0x20)
+	      if ((sib & 0x38) != 0x20
+#ifdef X86_64
+		  || (*prefixes & has_rex_x) != 0
+#endif
+		  )
 		{
 		  *cp++ = ',';
 		  *cp++ = '%';
-		  cp = mempcpy (cp, regs[(sib >> 3) & 7], 3);
+		  cp = stpcpy (cp,
+#ifdef X86_64
+			       (*prefixes & has_rex_x)
+			       ? hiregs[(sib >> 3) & 7] :
+			       (*prefixes & has_addr16)
+			       ? dregs[(sib >> 3) & 7] :
+#endif
+			       aregs[(sib >> 3) & 7]);
+#ifdef X86_64
+		  if ((*prefixes & (has_rex_b | has_addr16))
+		      == (has_rex_b | has_addr16))
+		    *cp++ = 'd';
+#endif
 
 		  *cp++ = ',';
 		  *cp++ = '0' + (1 << (sib >> 6));
@@ -243,7 +367,13 @@ general_mod$r_m (GElf_Addr addr __attribute__ ((unused)),
 	  else
 	    {
 	      assert (! nodisp);
-	      n = snprintf (cp, sizeof (tmpbuf), "0x%" PRIx32, disp);
+#ifdef X86_64
+	      if ((*prefixes & has_addr16) == 0)
+		n = snprintf (cp, sizeof (tmpbuf), "0x%" PRIx64,
+			      (int64_t) disp);
+	      else
+#endif
+		n = snprintf (cp, sizeof (tmpbuf), "0x%" PRIx32, disp);
 	      cp += n;
 	    }
 
@@ -283,7 +413,7 @@ FCT_MOD$R_M (GElf_Addr addr __attribute__ ((unused)),
       size_t avail = bufsize - *bufcntp;
       int needed;
       if (*prefixes & (has_rep | has_repne))
-	needed = snprintf (&bufp[*bufcntp], avail, "%%%s", regs[byte]);
+	needed = snprintf (&bufp[*bufcntp], avail, "%%%s", dregs[byte]);
       else
 	needed = snprintf (&bufp[*bufcntp], avail, "%%mm%" PRIxFAST8, byte);
       if ((size_t) needed > avail)
@@ -344,7 +474,13 @@ generic_abs (int *prefixes __attribute__ ((unused)),
 	     const uint8_t *end __attribute__ ((unused)),
 	     DisasmGetSymCB_t symcb __attribute__ ((unused)),
 	     void *symcbarg __attribute__ ((unused)),
-	     const char *absstring)
+	     const char *absstring
+#ifdef X86_64
+	     , int abslen
+#else
+# define abslen 4
+#endif
+	     )
 {
   int r = data_prefix (prefixes, bufp, bufcntp, bufsize);
   if (r != 0)
@@ -352,12 +488,22 @@ generic_abs (int *prefixes __attribute__ ((unused)),
 
   assert (opoff1 % 8 == 0);
   assert (opoff1 / 8 == 1);
-  if (*param_start + 4 > end)
+  if (*param_start + abslen > end)
     return -1;
-  *param_start += 4;
-  uint32_t absval = read_4ubyte_unaligned (&data[1]);
+  *param_start += abslen;
+#ifndef X86_64
+  uint32_t absval;
+# define ABSPRIFMT PRIx32
+#else
+  uint64_t absval;
+# define ABSPRIFMT PRIx64
+  if (abslen == 8)
+    absval = read_8ubyte_unaligned (&data[1]);
+  else
+#endif
+    absval = read_4ubyte_unaligned (&data[1]);
   size_t avail = bufsize - *bufcntp;
-  int needed = snprintf (&bufp[*bufcntp], avail, "%s0x%" PRIx32,
+  int needed = snprintf (&bufp[*bufcntp], avail, "%s0x%" ABSPRIFMT,
 			 absstring, absval);
   if ((size_t) needed > avail)
     return needed - avail;
@@ -383,7 +529,11 @@ FCT_absval (GElf_Addr addr __attribute__ ((unused)),
 {
   return generic_abs (prefixes, opoff1, bufp,
 		      bufcntp, bufsize, data, param_start, end, symcb,
-		      symcbarg, "$");
+		      symcbarg, "$"
+#ifdef X86_64
+		      , 4
+#endif
+		      );
 }
 
 static int
@@ -404,7 +554,11 @@ FCT_abs (GElf_Addr addr __attribute__ ((unused)),
 {
   return generic_abs (prefixes, opoff1, bufp,
 		      bufcntp, bufsize, data, param_start, end, symcb,
-		      symcbarg, "");
+		      symcbarg, ""
+#ifdef X86_64
+		      , 8
+#endif
+		      );
 }
 
 static int
@@ -576,7 +730,12 @@ FCT_ds_xx (const char *reg,
 
   size_t avail = bufsize - *bufcntp;
   int needed = snprintf (&bufp[*bufcntp], avail, "(%%%s%s)",
-			 *prefixes & idx_addr16 ? "" : "e", reg);
+#ifdef X86_64
+			 *prefixes & idx_addr16 ? "e" : "r",
+#else
+			 *prefixes & idx_addr16 ? "" : "e",
+#endif
+			 reg);
   if ((size_t) needed > avail)
     return (size_t) needed - avail;
   *bufcntp += needed;
@@ -665,7 +824,12 @@ FCT_es_di (GElf_Addr addr __attribute__ ((unused)),
 {
   size_t avail = bufsize - *bufcntp;
   int needed = snprintf (&bufp[*bufcntp], avail, "%%es:(%%%sdi)",
-			 *prefixes & idx_addr16 ? "" : "e");
+#ifdef X86_64
+			 *prefixes & idx_addr16 ? "e" : "r"
+#else
+			 *prefixes & idx_addr16 ? "" : "e"
+#endif
+			 );
   if ((size_t) needed > avail)
     return (size_t) needed - avail;
   *bufcntp += needed;
@@ -757,9 +921,14 @@ FCT_imms (GElf_Addr addr __attribute__ ((unused)),
 	  void *symcbarg __attribute__ ((unused)))
 {
   size_t avail = bufsize - *bufcntp;
-  int_fast8_t byte = *(*param_start)++;
+  int8_t byte = *(*param_start)++;
+#ifdef X86_64
+  int needed = snprintf (&bufp[*bufcntp], avail, "$0x%" PRIx64,
+			 (int64_t) byte);
+#else
   int needed = snprintf (&bufp[*bufcntp], avail, "$0x%" PRIx32,
 			 (int32_t) byte);
+#endif
   if ((size_t) needed > avail)
     return (size_t) needed - avail;
   *bufcntp += needed;
@@ -793,8 +962,13 @@ FCT_imm$s (GElf_Addr addr __attribute__ ((unused)),
     {
       if (*param_start + 4 > end)
 	return -1;
-      uint32_t word = read_4ubyte_unaligned_inc (*param_start);
+      int32_t word = read_4sbyte_unaligned_inc (*param_start);
+#ifdef X86_64
+      int needed = snprintf (&bufp[*bufcntp], avail, "$0x%" PRIx64,
+			     (int64_t) word);
+#else
       int needed = snprintf (&bufp[*bufcntp], avail, "$0x%" PRIx32, word);
+#endif
       if ((size_t) needed > avail)
 	return (size_t) needed - avail;
       *bufcntp += needed;
@@ -893,7 +1067,6 @@ FCT_imm8 (GElf_Addr addr __attribute__ ((unused)),
   return 0;
 }
 
-#ifndef X86_64
 static int
 FCT_rel (GElf_Addr addr __attribute__ ((unused)),
 	 int *prefixes __attribute__ ((unused)),
@@ -913,15 +1086,19 @@ FCT_rel (GElf_Addr addr __attribute__ ((unused)),
   size_t avail = bufsize - *bufcntp;
   if (*param_start + 4 > end)
     return -1;
-  uint32_t rel = read_4ubyte_unaligned_inc (*param_start);
+  int32_t rel = read_4sbyte_unaligned_inc (*param_start);
+#ifdef X86_64
+  int needed = snprintf (&bufp[*bufcntp], avail, "0x%" PRIx64,
+			 (uint64_t) (addr + rel + (*param_start - data)));
+#else
   int needed = snprintf (&bufp[*bufcntp], avail, "0x%" PRIx32,
 			 (uint32_t) (addr + rel + (*param_start - data)));
+#endif
   if ((size_t) needed > avail)
     return (size_t) needed - avail;
   *bufcntp += needed;
   return 0;
 }
-#endif
 
 static int
 FCT_mmxreg (GElf_Addr addr __attribute__ ((unused)),
@@ -971,14 +1148,33 @@ FCT_mod$r_m (GElf_Addr addr __attribute__ ((unused)),
   uint_fast8_t modrm = data[opoff1 / 8];
   if ((modrm & 0xc0) == 0xc0)
     {
+      if (*prefixes & has_addr16)
+	return -1;
+
       int is_16bit = (*prefixes & has_data16) != 0;
 
       if (*bufcntp + 5 - is_16bit > bufsize)
 	return *bufcntp + 5 - is_16bit - bufsize;
       bufp[(*bufcntp)++] = '%';
-      memcpy (&bufp[*bufcntp], regs[modrm & 7] + is_16bit,
-	      sizeof (regs[0]) - is_16bit);
-      *bufcntp += 3 - is_16bit;
+
+      char *cp;
+#ifdef X86_64
+      if ((*prefixes & has_rex_b) != 0 && !is_16bit)
+	{
+	  cp = stpcpy (&bufp[*bufcntp], hiregs[modrm & 7]);
+	  if ((*prefixes & has_rex_w) == 0)
+	    *cp++ = 'd';
+	}
+      else
+#endif
+	{
+	  cp = stpcpy (&bufp[*bufcntp], dregs[modrm & 7] + is_16bit);
+#ifdef X86_64
+	  if ((*prefixes & has_rex_w) != 0)
+	    bufp[*bufcntp] = 'r';
+#endif
+	}
+      *bufcntp = cp - bufp;
       return 0;
     }
 
@@ -1013,6 +1209,9 @@ FCT_moda$r_m (GElf_Addr addr __attribute__ ((unused)),
   uint_fast8_t modrm = data[opoff1 / 8];
   if ((modrm & 0xc0) == 0xc0)
     {
+      if (*prefixes & has_addr16)
+	return -1;
+
       if (*bufcntp + 3 > bufsize)
 	return *bufcntp + 3 - bufsize;
 
@@ -1028,6 +1227,14 @@ FCT_moda$r_m (GElf_Addr addr __attribute__ ((unused)),
 }
 #endif
 
+
+#ifdef X86_64
+static const char rex_8bit[8][3] =
+  {
+    [0] = "a", [1] = "c", [2] = "d", [3] = "b",
+    [4] = "sp", [5] = "bp", [6] = "si", [7] = "di"
+  };
+#endif
 
 static int
 FCT_mod$r_m$w (GElf_Addr addr __attribute__ ((unused)),
@@ -1053,24 +1260,60 @@ FCT_mod$r_m$w (GElf_Addr addr __attribute__ ((unused)),
   uint_fast8_t modrm = data[opoff1 / 8];
   if ((modrm & 0xc0) == 0xc0)
     {
+      if (*prefixes & has_addr16)
+	return -1;
+
+      if (*bufcntp + 5 > bufsize)
+	return *bufcntp + 5 - bufsize;
+
       if ((data[opoff3 / 8] & (1 << (7 - (opoff3 & 7)))) == 0)
 	{
-	  if (*bufcntp + 3 > bufsize)
-	    return *bufcntp + 3 - bufsize;
 	  bufp[(*bufcntp)++] = '%';
-	  bufp[(*bufcntp)++] = "acdb"[modrm & 3];
-	  bufp[(*bufcntp)++] = "lh"[(modrm & 4) >> 2];
+
+#ifdef X86_64
+	  if (*prefixes & has_rex)
+	    {
+	      if (*prefixes & has_rex_r)
+		*bufcntp += snprintf (bufp + *bufcntp, bufsize - *bufcntp,
+				      "r%db", 8 + (modrm & 7));
+	      else
+		{
+		  char *cp = stpcpy (bufp + *bufcntp, hiregs[modrm & 7]);
+		  *cp++ = 'l';
+		  *bufcntp = cp - bufp;
+		}
+	    }
+	  else
+#endif
+	    {
+	      bufp[(*bufcntp)++] = "acdb"[modrm & 3];
+	      bufp[(*bufcntp)++] = "lh"[(modrm & 4) >> 2];
+	    }
 	}
       else
 	{
 	  int is_16bit = (*prefixes & has_data16) != 0;
 
-	  if (*bufcntp + 5 - is_16bit > bufsize)
-	    return *bufcntp + 5 - is_16bit - bufsize;
 	  bufp[(*bufcntp)++] = '%';
-	  memcpy (&bufp[*bufcntp], regs[modrm & 7] + is_16bit,
-		  sizeof (regs[0]) - is_16bit);
-	  *bufcntp += 3 - is_16bit;
+
+	  char *cp;
+#ifdef X86_64
+	  if ((*prefixes & has_rex_b) != 0 && !is_16bit)
+	    {
+	      cp = stpcpy (&bufp[*bufcntp], hiregs[modrm & 7]);
+	      if ((*prefixes & has_rex_w) == 0)
+		*cp++ = 'd';
+	    }
+	  else
+#endif
+	    {
+	      cp = stpcpy (&bufp[*bufcntp], dregs[modrm & 7] + is_16bit);
+#ifdef X86_64
+	      if ((*prefixes & has_rex_w) != 0)
+		bufp[*bufcntp] = 'r';
+#endif
+	    }
+	  *bufcntp = cp - bufp;
 	}
       return 0;
     }
@@ -1081,7 +1324,6 @@ FCT_mod$r_m$w (GElf_Addr addr __attribute__ ((unused)),
 }
 
 
-#ifndef X86_64
 static int
 FCT_mod$8r_m (GElf_Addr addr __attribute__ ((unused)),
 	      int *prefixes __attribute__ ((unused)),
@@ -1114,7 +1356,6 @@ FCT_mod$8r_m (GElf_Addr addr __attribute__ ((unused)),
 			  bufcntp, bufsize, data, param_start, end,
 			  symcb, symcbarg);
 }
-#endif
 
 static int
 FCT_mod$16r_m (GElf_Addr addr __attribute__ ((unused)),
@@ -1140,7 +1381,7 @@ FCT_mod$16r_m (GElf_Addr addr __attribute__ ((unused)),
       if (*bufcntp + 3 > bufsize)
 	return *bufcntp + 3 - bufsize;
       bufp[(*bufcntp)++] = '%';
-      memcpy (&bufp[*bufcntp], regs[byte] + 1, sizeof (regs[0]) - 1);
+      memcpy (&bufp[*bufcntp], dregs[byte] + 1, sizeof (dregs[0]) - 1);
       *bufcntp += 2;
       return 0;
     }
@@ -1149,6 +1390,45 @@ FCT_mod$16r_m (GElf_Addr addr __attribute__ ((unused)),
 			  bufcntp, bufsize, data, param_start, end,
 			  symcb, symcbarg);
 }
+
+#ifdef X86_64
+static int
+FCT_mod$64r_m (GElf_Addr addr __attribute__ ((unused)),
+	       int *prefixes __attribute__ ((unused)),
+	       const char *op1str __attribute__ ((unused)),
+	       size_t opoff1 __attribute__ ((unused)),
+	       size_t opoff2 __attribute__ ((unused)),
+	       size_t opoff3 __attribute__ ((unused)),
+	       char *bufp __attribute__ ((unused)),
+	       size_t *bufcntp __attribute__ ((unused)),
+	       size_t bufsize __attribute__ ((unused)),
+	       const uint8_t *data __attribute__ ((unused)),
+	       const uint8_t **param_start __attribute__ ((unused)),
+	       const uint8_t *end __attribute__ ((unused)),
+	       DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	       void *symcbarg __attribute__ ((unused)))
+{
+  assert (opoff1 % 8 == 0);
+  uint_fast8_t modrm = data[opoff1 / 8];
+  if ((modrm & 0xc0) == 0xc0)
+    {
+      uint_fast8_t byte = data[opoff1 / 8] & 7;
+      if (*bufcntp + 4 > bufsize)
+	return *bufcntp + 4 - bufsize;
+      char *cp = &bufp[*bufcntp];
+      *cp++ = '%';
+      cp = stpcpy (cp, (*prefixes & has_rex_b) ? hiregs[byte] : aregs[byte]);
+      *bufcntp = cp - bufp;
+      return 0;
+    }
+
+  return general_mod$r_m (addr, prefixes, op1str, opoff1, opoff2, opoff3, bufp,
+			  bufcntp, bufsize, data, param_start, end,
+			  symcb, symcbarg);
+}
+#else
+static typeof (FCT_mod$r_m) FCT_mod$64r_m __attribute__ ((alias ("FCT_mod$r_m")));
+#endif
 
 static int
 FCT_reg (GElf_Addr addr __attribute__ ((unused)),
@@ -1171,11 +1451,69 @@ FCT_reg (GElf_Addr addr __attribute__ ((unused)),
   byte >>= 8 - (opoff1 % 8 + 3);
   byte &= 7;
   int is_16bit = (*prefixes & has_data16) != 0;
-  if (*bufcntp + 4 > bufsize)
-    return *bufcntp + 4 - bufsize;
+  if (*bufcntp + 5 > bufsize)
+    return *bufcntp + 5 - bufsize;
   bufp[(*bufcntp)++] = '%';
-  memcpy (&bufp[*bufcntp], regs[byte] + is_16bit, sizeof (regs[0]) - is_16bit);
-  *bufcntp += 3 - is_16bit;
+#ifdef X86_64
+  if ((*prefixes & has_rex_r) != 0 && !is_16bit)
+    {
+      *bufcntp += snprintf (&bufp[*bufcntp], bufsize - *bufcntp, "r%d",
+			    8 + byte);
+      if ((*prefixes & has_rex_w) == 0)
+	bufp[(*bufcntp)++] = 'd';
+    }
+  else
+#endif
+    {
+      memcpy (&bufp[*bufcntp], dregs[byte] + is_16bit, 3 - is_16bit);
+#ifdef X86_64
+      if ((*prefixes & has_rex_w) != 0 && !is_16bit)
+	bufp[*bufcntp] = 'r';
+#endif
+      *bufcntp += 3 - is_16bit;
+    }
+  return 0;
+}
+
+static int
+FCT_reg64 (GElf_Addr addr __attribute__ ((unused)),
+	   int *prefixes __attribute__ ((unused)),
+	   const char *op1str __attribute__ ((unused)),
+	   size_t opoff1 __attribute__ ((unused)),
+	   size_t opoff2 __attribute__ ((unused)),
+	   size_t opoff3 __attribute__ ((unused)),
+	   char *bufp __attribute__ ((unused)),
+	   size_t *bufcntp __attribute__ ((unused)),
+	   size_t bufsize __attribute__ ((unused)),
+	   const uint8_t *data __attribute__ ((unused)),
+	   const uint8_t **param_start __attribute__ ((unused)),
+	   const uint8_t *end __attribute__ ((unused)),
+	   DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	   void *symcbarg __attribute__ ((unused)))
+{
+  uint_fast8_t byte = data[opoff1 / 8];
+  assert (opoff1 % 8 + 3 <= 8);
+  byte >>= 8 - (opoff1 % 8 + 3);
+  byte &= 7;
+  if ((*prefixes & has_data16) != 0)
+    return -1;
+  if (*bufcntp + 5 > bufsize)
+    return *bufcntp + 5 - bufsize;
+  bufp[(*bufcntp)++] = '%';
+#ifdef X86_64
+  if ((*prefixes & has_rex_r) != 0)
+    {
+      *bufcntp += snprintf (&bufp[*bufcntp], bufsize - *bufcntp, "r%d",
+			    8 + byte);
+      if ((*prefixes & has_rex_w) == 0)
+	bufp[(*bufcntp)++] = 'd';
+    }
+  else
+#endif
+    {
+      memcpy (&bufp[*bufcntp], aregs[byte], 3);
+      *bufcntp += 3;
+    }
   return 0;
 }
 
@@ -1202,15 +1540,34 @@ FCT_reg$w (GElf_Addr addr __attribute__ ((unused)),
   assert (opoff1 % 8 + 3 <= 8);
   byte >>= 8 - (opoff1 % 8 + 3);
   byte &= 7;
-  if (*bufcntp + 3 > bufsize)
-    return *bufcntp + 3 - bufsize;
+
+  if (*bufcntp + 4 > bufsize)
+    return *bufcntp + 4 - bufsize;
+
   bufp[(*bufcntp)++] = '%';
-  bufp[(*bufcntp)++] = "acdb"[byte & 3];
-  bufp[(*bufcntp)++] = "lh"[byte >> 2];
+
+#ifdef X86_64
+  if (*prefixes & has_rex)
+    {
+      if (*prefixes & has_rex_r)
+	*bufcntp += snprintf (bufp + *bufcntp, bufsize - *bufcntp,
+			      "r%db", 8 + byte);
+      else
+	{
+	  char* cp = stpcpy (bufp + *bufcntp, rex_8bit[byte]);
+	  *cp++ = 'l';
+	  *bufcntp = cp - bufp;
+	}
+    }
+  else
+#endif
+    {
+      bufp[(*bufcntp)++] = "acdb"[byte & 3];
+      bufp[(*bufcntp)++] = "lh"[byte >> 2];
+    }
   return 0;
 }
 
-#ifndef X86_64
 static int
 FCT_freg (GElf_Addr addr __attribute__ ((unused)),
 	  int *prefixes __attribute__ ((unused)),
@@ -1238,6 +1595,7 @@ FCT_freg (GElf_Addr addr __attribute__ ((unused)),
   return 0;
 }
 
+#ifndef X86_64
 static int
 FCT_reg16 (GElf_Addr addr __attribute__ ((unused)),
 	   int *prefixes __attribute__ ((unused)),

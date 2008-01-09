@@ -108,7 +108,7 @@ struct instruction
 
   /* Suffix.  */
   enum { suffix_none = 0, suffix_w, suffix_w0, suffix_W, suffix_tttn,
-	 suffix_w1, suffix_D } suffix;
+	 suffix_w1, suffix_W1, suffix_D } suffix;
 
   /* Flag set if modr/m is used.  */
   int modrm;
@@ -324,6 +324,8 @@ instr:		  bytes ':' bitfieldopt kID bitfieldopt optargs
 				newp->suffix = suffix_w1;
 			      else if (strcmp ($5->name, "W") == 0)
 				newp->suffix = suffix_W;
+			      else if (strcmp ($5->name, "W1") == 0)
+				newp->suffix = suffix_W1;
 			      else if (strcmp ($5->name, "D") == 0)
 				newp->suffix = suffix_D;
 			      else
@@ -1130,6 +1132,7 @@ instrtable_out (void)
   EMIT_SUFFIX (tttn);
   EMIT_SUFFIX (D);
   EMIT_SUFFIX (w1);
+  EMIT_SUFFIX (W1);
 
   fputc_unlocked ('\n', outfile);
 

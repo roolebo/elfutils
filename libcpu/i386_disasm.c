@@ -90,7 +90,12 @@ static const unsigned short int mneidx[] =
 
 enum
   {
-    idx_cs = 0,
+    idx_rex_b = 0,
+    idx_rex_x,
+    idx_rex_r,
+    idx_rex_w,
+    idx_rex,
+    idx_cs,
     idx_ds,
     idx_es,
     idx_fs,
@@ -106,6 +111,11 @@ enum
 enum
   {
 #define prefbit(pref) has_##pref = 1 << idx_##pref
+    prefbit (rex_b),
+    prefbit (rex_x),
+    prefbit (rex_r),
+    prefbit (rex_w),
+    prefbit (rex),
     prefbit (cs),
     prefbit (ds),
     prefbit (es),
@@ -226,7 +236,7 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
       while (data < end)
 	{
 	  unsigned int i;
-	  for (i = 0; i < nknown_prefixes; ++i)
+	  for (i = idx_cs; i < nknown_prefixes; ++i)
 	    if (known_prefixes[i] == *data)
 	      break;
 	  if (i == nknown_prefixes)
@@ -236,6 +246,11 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 
 	  ++data;
 	}
+
+#ifdef X86_64
+      if (data < end && (*data & 0xf0) == 0x40)
+	prefixes |= ((*data++) & 0xf) | has_rex;
+#endif
 
       assert (data <= end);
       if (data == end)
@@ -407,19 +422,29 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 	    {
 	      uint_fast8_t modrm = codep[-1];
 
-	      if ((prefixes & has_addr16) == 0)
+#ifndef X86_64
+	      if (likely ((prefixes & has_addr16) != 0))
+		{
+		  /* Account for displacement.  */
+		  if ((modrm & 0xc7) == 6 || (modrm & 0xc0) == 0x80)
+		    param_start += 2;
+		  else if ((modrm & 0xc0) == 0x40)
+		    param_start += 1;
+		}
+	      else
+#endif
 		{
 		  /* Account for SIB.  */
 		  if ((modrm & 0xc0) != 0xc0 && (modrm & 0x7) == 0x4)
 		    param_start += 1;
-		}
 
-	      /* Account for displacement.  */
-	      if ((modrm & 0xc7) == 5 || (modrm & 0xc0) == 0x80
-		  || ((modrm & 0xc7) == 0x4 && (codep[0] & 0x7) == 0x5))
-		param_start += 4;
-	      else if ((modrm & 0xc0) == 0x40)
-		param_start += 1;
+		  /* Account for displacement.  */
+		  if ((modrm & 0xc7) == 5 || (modrm & 0xc0) == 0x80
+		      || ((modrm & 0xc7) == 0x4 && (codep[0] & 0x7) == 0x5))
+		    param_start += 4;
+		  else if ((modrm & 0xc0) == 0x40)
+		    param_start += 1;
+		}
 
 	      if (unlikely (param_start > end))
 		goto not;
@@ -484,6 +509,7 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 	      size_t start_idx = bufcnt;
 	      switch (*fmt++)
 		{
+		  char mnebuf[16];
 		  const char *str;
 
 		case 'm':
@@ -493,15 +519,6 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		    {
 		      switch (*data)
 			{
-			case 0x90:
-			  if (prefixes & ~has_rep)
-			    goto print_prefix;
-			  /* Discard the 'rep' prefix string possibly
-			     already in the buffer.  */
-			  bufcnt = 0;
-			  str = prefixes & has_rep ? "pause" : "nop";
-			  break;
-
 			case 0x98:
 			  if (prefixes & ~has_data16)
 			    goto print_prefix;
@@ -517,8 +534,55 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 			case 0xe3:
 			  if (prefixes & ~has_addr16)
 			    goto print_prefix;
+#ifdef X86_64
+			  str = prefixes & has_addr16 ? "jecxz" : "jrcxz";
+#else
 			  str = prefixes & has_addr16 ? "jcxz" : "jecxz";
+#endif
 			  break;
+
+			case 0x0f:
+#ifdef X86_64
+			  if (data[1] == 0xc7)
+			    {
+			      str = ((prefixes & has_rex_w)
+				     ? "cmpxchg16b" : "cmpxchg8b");
+			      break;
+			    }
+#endif
+			  if (data[1] == 0xc2)
+			    {
+			      if (param_start >= end)
+				goto not;
+			      if (*param_start > 7)
+				goto not;
+			      static const char cmpops[][9] =
+				{
+				  [0] = "cmpeq",
+				  [1] = "cmplt",
+				  [2] = "cmple",
+				  [3] = "cmpunord",
+				  [4] = "cmpneq",
+				  [5] = "cmpnlt",
+				  [6] = "cmpnle",
+				  [7] = "cmpord"
+				};
+			      char *cp = stpcpy (mnebuf, cmpops[*param_start]);
+			      if (correct_prefix & (has_rep | has_repne))
+				*cp++ = 's';
+			      else
+				*cp++ = 'p';
+			      if (correct_prefix & (has_data16 | has_repne))
+				*cp++ = 'd';
+			      else
+				*cp++ = 's';
+			      *cp = '\0';
+			      str = mnebuf;
+			      /* Eat the immediate byte indicating the
+				 operation.  */
+			      ++param_start;
+			      break;
+			    }
 
 			default:
 			  assert (! "INVALID not handled");
@@ -565,11 +629,23 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 			  ADD_CHAR ('w');
 			  prefixes &= ~has_data16;
 			}
-#ifdef x86_64
+#ifdef X86_64
 		      else
-			abort ();
+			ADD_CHAR ('q');
 #endif
 		      break;
+		    case suffix_W1:
+		      if (prefixes & has_data16)
+			{
+			  ADD_CHAR ('w');
+			  prefixes &= ~has_data16;
+			}
+#ifdef X86_64
+		      else if (prefixes & has_rex_w)
+			ADD_CHAR ('q');
+#endif
+		      break;
+
 		    case suffix_tttn:;
 		      static const char tttn[16][3] =
 			{

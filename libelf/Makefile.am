@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 1996-2006, 2007 Red Hat, Inc.
+## Copyright (C) 1996-2006, 2007, 2008 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -50,8 +50,7 @@ noinst_PROGRAMS = $(noinst_LIBRARIES:_pic.a=.so)
 endif
 include_HEADERS = libelf.h gelf.h nlist.h
 
-euincludedir = $(includedir)/elfutils
-euinclude_HEADERS = elf-knowledge.h
+pkginclude_HEADERS = elf-knowledge.h
 
 libelf_a_SOURCES = elf_version.c elf_hash.c elf_error.c elf_fill.c \
 		   elf_begin.c elf_next.c elf_rand.c elf_end.c elf_kind.c \

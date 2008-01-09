@@ -1,3 +1,9 @@
+2008-01-08  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (euinclude): Variable removed.
+	(pkginclude_HEADERS): Set this instead of euinclude_HEADERS.
+	(libdw.so): Pass -Wl,--enable-new-dtags,-rpath,$(pkglibdir).
+
 2007-10-17  Roland McGrath  <roland@redhat.com>
 
 	* libdw.h (__deprecated_attribute__): New macro.

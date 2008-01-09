@@ -1,5 +1,5 @@
 /* Pedantic checking of ELF files compliance with gABI/psABI spec.
-   Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -1507,7 +1507,6 @@ check_dynamic (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Shdr *shdr, int idx)
       [DT_JMPREL] = { [DT_PLTRELSZ] = true, [DT_PLTREL] = true },
       [DT_RUNPATH] = { [DT_STRTAB] = true },
       [DT_PLTREL] = { [DT_JMPREL] = true },
-      [DT_PLTRELSZ] = { [DT_JMPREL] = true }
     };
   bool has_dt[DT_NUM];
   bool has_val_dt[DT_VALNUM];

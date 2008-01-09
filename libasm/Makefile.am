@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2002, 2004, 2005, 2006 Red Hat, Inc.
+## Copyright (C) 2002, 2004, 2005, 2006, 2008 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -45,8 +45,7 @@ if !MUDFLAP
 noinst_LIBRARIES = libasm_pic.a
 noinst_PROGRAMS = $(noinst_LIBRARIES:_pic.a=.so)
 endif
-euincludedir = ${includedir}/elfutils
-euinclude_HEADERS = libasm.h
+pkginclude_HEADERS = libasm.h
 
 libasm_a_SOURCES = asm_begin.c asm_abort.c asm_end.c asm_error.c \
 		   asm_getelf.c asm_newscn.c asm_newscn_ingrp.c \

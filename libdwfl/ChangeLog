@@ -1,3 +1,8 @@
+2008-01-08  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (euinclude): Variable removed.
+	(pkginclude_HEADERS): Set this instead of euinclude_HEADERS.
+
 2007-10-23  Roland McGrath  <roland@redhat.com>
 
 	* linux-kernel-modules.c (report_kernel_archive): Reorder the kernel

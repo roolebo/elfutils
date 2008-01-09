@@ -2,7 +2,7 @@
 ##
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
+## Copyright (C) 2005, 2006, 2007, 2008 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -45,8 +45,7 @@ if !MUDFLAP
 noinst_LIBRARIES += libdwfl_pic.a
 endif
 
-euincludedir = ${includedir}/elfutils
-euinclude_HEADERS = libdwfl.h
+pkginclude_HEADERS = libdwfl.h
 
 libdwfl_a_SOURCES = dwfl_begin.c dwfl_end.c dwfl_error.c dwfl_version.c \
 		    dwfl_module.c dwfl_report_elf.c relocate.c \

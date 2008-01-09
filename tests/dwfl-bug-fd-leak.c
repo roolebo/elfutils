@@ -1,5 +1,5 @@
 /* Test program for libdwfl file decriptors leakage.
-   Copyright (C) 2007 Red Hat, Inc.
+   Copyright (C) 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -102,7 +102,7 @@ main (void)
 
   for (int i = 0; i < 5000; ++i)
     {
-      Dwfl *dwfl = elfutils_open (getpid (), (Dwarf_Addr) main);
+      Dwfl *dwfl = elfutils_open (getpid (), (Dwarf_Addr) (uintptr_t) &main);
       elfutils_close (dwfl);
     }
 

@@ -1,3 +1,12 @@
+2008-01-08  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (euinclude): Variable removed.
+	(pkginclude_HEADERS): Set this instead of euinclude_HEADERS.
+
+2008-01-03  Roland McGrath  <roland@redhat.com>
+
+	* common.h: Add __attribute__ ((unused)) to static functions.
+
 2007-12-20  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.am (libelf_a_SOURCES): Add elf_scnshndx.

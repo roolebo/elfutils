@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -47,8 +47,7 @@ noinst_PROGRAMS = $(noinst_LIBRARIES:_pic.a=.so)
 endif
 
 include_HEADERS = dwarf.h
-euincludedir = ${includedir}/elfutils
-euinclude_HEADERS = libdw.h
+pkginclude_HEADERS = libdw.h
 
 libdw_a_SOURCES = dwarf_begin.c dwarf_begin_elf.c dwarf_end.c dwarf_getelf.c \
 		  dwarf_getpubnames.c dwarf_getabbrev.c dwarf_tag.c \
@@ -94,7 +93,10 @@ libdw_so_SOURCES =
 libdw.so: $(srcdir)/libdw.map libdw_pic.a \
 	  ../libdwfl/libdwfl_pic.a ../libebl/libebl.a \
 	  ../libelf/libelf.so
+# The rpath is necessary for libebl because its $ORIGIN use will
+# not fly in a setuid executable that links in libdw.
 	$(LINK) -shared -o $@ -Wl,--soname,$@.$(VERSION),-z,defs \
+		-Wl,--enable-new-dtags,-rpath,$(pkglibdir) \
 		-Wl,--version-script,$<,--no-undefined \
 		-Wl,--whole-archive $(filter-out $<,$^) -Wl,--no-whole-archive\
 		-ldl

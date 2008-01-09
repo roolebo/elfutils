@@ -383,6 +383,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
   Elf *debugelf = NULL;
   char *tmp_debug_fname = NULL;
   int result = 0;
+  size_t shdridx = 0;
   size_t shstrndx;
   struct shdr_info
   {
@@ -981,7 +982,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
     }
 
   /* Index of the section header table in the shdr_info array.  */
-  size_t shdridx = cnt;
+  shdridx = cnt;
 
   /* Add the section header string table section name.  */
   shdr_info[cnt].se = ebl_strtabadd (shst, ".shstrtab", 10);

@@ -78,53 +78,56 @@ struct instr_enc
 };
 
 
-typedef int (*opfct_t) (struct output_data *);
+typedef int (*opfct_t) (GElf_Addr, int *, const char *, size_t, size_t, size_t,
+			char *, size_t *, size_t, const uint8_t *data,
+			const uint8_t **param_start, const uint8_t *end,
+			DisasmGetSymCB_t, void *);
 
 
 static int
-data_prefix (struct output_data *d)
+data_prefix (int *prefixes, char *bufp, size_t *bufcntp, size_t bufsize)
 {
   char ch = '\0';
-  if (*d->prefixes & has_cs)
+  if (*prefixes & has_cs)
     {
       ch = 'c';
-      *d->prefixes &= ~has_cs;
+      *prefixes &= ~has_cs;
     }
-  else if (*d->prefixes & has_ds)
+  else if (*prefixes & has_ds)
     {
       ch = 'd';
-      *d->prefixes &= ~has_ds;
+      *prefixes &= ~has_ds;
     }
-  else if (*d->prefixes & has_es)
+  else if (*prefixes & has_es)
     {
       ch = 'e';
-      *d->prefixes &= ~has_es;
+      *prefixes &= ~has_es;
     }
-  else if (*d->prefixes & has_fs)
+  else if (*prefixes & has_fs)
     {
       ch = 'f';
-      *d->prefixes &= ~has_fs;
+      *prefixes &= ~has_fs;
     }
-  else if (*d->prefixes & has_gs)
+  else if (*prefixes & has_gs)
     {
       ch = 'g';
-      *d->prefixes &= ~has_gs;
+      *prefixes &= ~has_gs;
     }
-  else if (*d->prefixes & has_ss)
+  else if (*prefixes & has_ss)
     {
       ch = 's';
-      *d->prefixes &= ~has_ss;
+      *prefixes &= ~has_ss;
     }
   else
     return 0;
 
-  if (*d->bufcntp + 4 > d->bufsize)
-    return *d->bufcntp + 4 - d->bufsize;
+  if (*bufcntp + 4 > bufsize)
+    return *bufcntp + 4 - bufsize;
 
-  d->bufp[(*d->bufcntp)++] = '%';
-  d->bufp[(*d->bufcntp)++] = ch;
-  d->bufp[(*d->bufcntp)++] = 's';
-  d->bufp[(*d->bufcntp)++] = ':';
+  bufp[(*bufcntp)++] = '%';
+  bufp[(*bufcntp)++] = ch;
+  bufp[(*bufcntp)++] = 's';
+  bufp[(*bufcntp)++] = ':';
 
   return 0;
 }
@@ -151,31 +154,38 @@ static const char aregs[8][4] =
 #endif
 
 static int
-general_mod$r_m (struct output_data *d)
+general_mod$r_m (GElf_Addr addr __attribute__ ((unused)),
+		 int *prefixes __attribute__ ((unused)),
+		 const char *op1str __attribute__ ((unused)),
+		 size_t opoff1 __attribute__ ((unused)),
+		 size_t opoff2 __attribute__ ((unused)),
+		 size_t opoff3 __attribute__ ((unused)),
+		 char *bufp __attribute__ ((unused)),
+		 size_t *bufcntp __attribute__ ((unused)),
+		 size_t bufsize __attribute__ ((unused)),
+		 const uint8_t *data __attribute__ ((unused)),
+		 const uint8_t **param_start __attribute__ ((unused)),
+		 const uint8_t *end __attribute__ ((unused)),
+		 DisasmGetSymCB_t symcb __attribute__ ((unused)),
+		 void *symcbarg __attribute__ ((unused)))
 {
-  int r = data_prefix (d);
+  int r = data_prefix (prefixes, bufp, bufcntp, bufsize);
   if (r != 0)
     return r;
 
-  int prefixes = *d->prefixes;
-  const uint8_t *data = &d->data[d->opoff1 / 8];
-  char *bufp = d->bufp;
-  size_t *bufcntp = d->bufcntp;
-  size_t bufsize = d->bufsize;
-
-  uint_fast8_t modrm = data[0];
+  uint_fast8_t modrm = data[opoff1 / 8];
 #ifndef X86_64
-  if (unlikely ((prefixes & has_addr16) != 0))
+  if (unlikely ((*prefixes & has_addr16) != 0))
     {
       int16_t disp = 0;
       bool nodisp = false;
 
       if ((modrm & 0xc7) == 6 || (modrm & 0xc0) == 0x80)
 	/* 16 bit displacement.  */
-	disp = read_2sbyte_unaligned (&data[1]);
+	disp = read_2sbyte_unaligned (&data[opoff1 / 8 + 1]);
       else if ((modrm & 0xc0) == 0x40)
 	/* 8 bit displacement.  */
-	disp = *(const int8_t *) &data[1];
+	disp = *(const int8_t *) &data[opoff1 / 8 + 1];
       else if ((modrm & 0xc0) == 0)
 	nodisp = true;
 
@@ -214,10 +224,10 @@ general_mod$r_m (struct output_data *d)
 
 	  if ((modrm & 0xc7) == 5 || (modrm & 0xc0) == 0x80)
 	    /* 32 bit displacement.  */
-	    disp = read_4sbyte_unaligned (&data[1]);
+	    disp = read_4sbyte_unaligned (&data[opoff1 / 8 + 1]);
 	  else if ((modrm & 0xc0) == 0x40)
 	    /* 8 bit displacement.  */
-	    disp = *(const int8_t *) &data[1];
+	    disp = *(const int8_t *) &data[opoff1 / 8 + 1];
 	  else if ((modrm & 0xc0) == 0)
 	    nodisp = true;
 
@@ -227,13 +237,13 @@ general_mod$r_m (struct output_data *d)
 	    {
 	      n = snprintf (tmpbuf, sizeof (tmpbuf), "(%%%s)",
 #ifdef X86_64
-			    (prefixes & has_rex_b) ? hiregs[modrm & 7] :
+			    (*prefixes & has_rex_b) ? hiregs[modrm & 7] :
 #endif
 			    aregs[modrm & 7]);
 #ifdef X86_64
-	      if (prefixes & has_addr16)
+	      if (*prefixes & has_addr16)
 		{
-		  if (prefixes & has_rex_b)
+		  if (*prefixes & has_rex_b)
 		    tmpbuf[n++] = 'd';
 		  else
 		    tmpbuf[2] = 'e';
@@ -246,13 +256,13 @@ general_mod$r_m (struct output_data *d)
 	      n = snprintf (tmpbuf, sizeof (tmpbuf), "%s0x%" PRIx32 "(%%%n%s)",
 			    disp < 0 ? "-" : "", disp < 0 ? -disp : disp, &p,
 #ifdef X86_64
-			    (prefixes & has_rex_b) ? hiregs[modrm & 7] :
+			    (*prefixes & has_rex_b) ? hiregs[modrm & 7] :
 #endif
 			    aregs[modrm & 7]);
 #ifdef X86_64
-	      if (prefixes & has_addr16)
+	      if (*prefixes & has_addr16)
 		{
-		  if (prefixes & has_rex_b)
+		  if (*prefixes & has_rex_b)
 		    tmpbuf[n++] = 'd';
 		  else
 		    tmpbuf[p] = 'e';
@@ -278,17 +288,17 @@ general_mod$r_m (struct output_data *d)
       else
 	{
 	  /* SIB */
-	  uint_fast8_t sib = data[1];
+	  uint_fast8_t sib = data[opoff1 / 8 + 1];
 	  int32_t disp = 0;
 	  bool nodisp = false;
 
 	  if ((modrm & 0xc7) == 5 || (modrm & 0xc0) == 0x80
 	      || ((modrm & 0xc7) == 0x4 && (sib & 0x7) == 0x5))
 	    /* 32 bit displacement.  */
-	    disp = read_4sbyte_unaligned (&data[2]);
+	    disp = read_4sbyte_unaligned (&data[opoff1 / 8 + 2]);
 	  else if ((modrm & 0xc0) == 0x40)
 	    /* 8 bit displacement.  */
-	    disp = *(const int8_t *) &data[2];
+	    disp = *(const int8_t *) &data[opoff1 / 8 + 2];
 	  else
 	    nodisp = true;
 
@@ -297,7 +307,7 @@ general_mod$r_m (struct output_data *d)
 	  int n;
 	  if ((modrm & 0xc0) != 0 || (sib & 0x3f) != 0x25
 #ifdef X86_64
-	      || (prefixes & has_rex_x) != 0
+	      || (*prefixes & has_rex_x) != 0
 #endif
 	      )
 	    {
@@ -315,12 +325,12 @@ general_mod$r_m (struct output_data *d)
 		  *cp++ = '%';
 		  cp = stpcpy (cp,
 #ifdef X86_64
-			       (prefixes & has_rex_b) ? hiregs[sib & 7] :
-			       (prefixes & has_addr16) ? dregs[sib & 7] :
+			       (*prefixes & has_rex_b) ? hiregs[sib & 7] :
+			       (*prefixes & has_addr16) ? dregs[sib & 7] :
 #endif
 			       aregs[sib & 7]);
 #ifdef X86_64
-		  if ((prefixes & (has_rex_b | has_addr16))
+		  if ((*prefixes & (has_rex_b | has_addr16))
 		      == (has_rex_b | has_addr16))
 		    *cp++ = 'd';
 #endif
@@ -328,7 +338,7 @@ general_mod$r_m (struct output_data *d)
 
 	      if ((sib & 0x38) != 0x20
 #ifdef X86_64
-		  || (prefixes & has_rex_x) != 0
+		  || (*prefixes & has_rex_x) != 0
 #endif
 		  )
 		{
@@ -336,14 +346,14 @@ general_mod$r_m (struct output_data *d)
 		  *cp++ = '%';
 		  cp = stpcpy (cp,
 #ifdef X86_64
-			       (prefixes & has_rex_x)
+			       (*prefixes & has_rex_x)
 			       ? hiregs[(sib >> 3) & 7] :
-			       (prefixes & has_addr16)
+			       (*prefixes & has_addr16)
 			       ? dregs[(sib >> 3) & 7] :
 #endif
 			       aregs[(sib >> 3) & 7]);
 #ifdef X86_64
-		  if ((prefixes & (has_rex_b | has_addr16))
+		  if ((*prefixes & (has_rex_b | has_addr16))
 		      == (has_rex_b | has_addr16))
 		    *cp++ = 'd';
 #endif
@@ -358,7 +368,7 @@ general_mod$r_m (struct output_data *d)
 	    {
 	      assert (! nodisp);
 #ifdef X86_64
-	      if ((prefixes & has_addr16) == 0)
+	      if ((*prefixes & has_addr16) == 0)
 		n = snprintf (cp, sizeof (tmpbuf), "0x%" PRIx64,
 			      (int64_t) disp);
 	      else
@@ -379,62 +389,92 @@ general_mod$r_m (struct output_data *d)
 
 
 static int
-FCT_MOD$R_M (struct output_data *d)
+FCT_MOD$R_M (GElf_Addr addr __attribute__ ((unused)),
+	     int *prefixes __attribute__ ((unused)),
+	     const char *op1str __attribute__ ((unused)),
+	     size_t opoff1 __attribute__ ((unused)),
+	     size_t opoff2 __attribute__ ((unused)),
+	     size_t opoff3 __attribute__ ((unused)),
+	     char *bufp __attribute__ ((unused)),
+	     size_t *bufcntp __attribute__ ((unused)),
+	     size_t bufsize __attribute__ ((unused)),
+	     const uint8_t *data __attribute__ ((unused)),
+	     const uint8_t **param_start __attribute__ ((unused)),
+	     const uint8_t *end __attribute__ ((unused)),
+	     DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	     void *symcbarg __attribute__ ((unused)))
 {
-  assert (d->opoff1 % 8 == 0);
-  uint_fast8_t modrm = d->data[d->opoff1 / 8];
+  assert (opoff1 % 8 == 0);
+  uint_fast8_t modrm = data[opoff1 / 8];
   if ((modrm & 0xc0) == 0xc0)
     {
-      assert (d->opoff1 / 8 == d->opoff2 / 8);
-      assert (d->opoff2 % 8 == 5);
-      //uint_fast8_t byte = d->data[d->opoff2 / 8] & 7;
-      uint_fast8_t byte = modrm & 7;
-
-      size_t *bufcntp = d->bufcntp;
-      char *buf = d->bufp + *bufcntp;
-      size_t avail = d->bufsize - *bufcntp;
+      uint_fast8_t byte = data[opoff2 / 8] & 7;
+      assert (opoff2 % 8 == 5);
+      size_t avail = bufsize - *bufcntp;
       int needed;
-      if (*d->prefixes & (has_rep | has_repne))
-	needed = snprintf (buf, avail, "%%%s", dregs[byte]);
+      if (*prefixes & (has_rep | has_repne))
+	needed = snprintf (&bufp[*bufcntp], avail, "%%%s", dregs[byte]);
       else
-	needed = snprintf (buf, avail, "%%mm%" PRIxFAST8, byte);
+	needed = snprintf (&bufp[*bufcntp], avail, "%%mm%" PRIxFAST8, byte);
       if ((size_t) needed > avail)
 	return needed - avail;
       *bufcntp += needed;
       return 0;
     }
 
-  return general_mod$r_m (d);
+  return general_mod$r_m (addr, prefixes, op1str, opoff1, opoff2, opoff3, bufp,
+			  bufcntp, bufsize, data, param_start, end,
+			  symcb, symcbarg);
 }
 
 
 static int
-FCT_Mod$R_m (struct output_data *d)
+FCT_Mod$R_m (GElf_Addr addr __attribute__ ((unused)),
+	     int *prefixes __attribute__ ((unused)),
+	     const char *op1str __attribute__ ((unused)),
+	     size_t opoff1 __attribute__ ((unused)),
+	     size_t opoff2 __attribute__ ((unused)),
+	     size_t opoff3 __attribute__ ((unused)),
+	     char *bufp __attribute__ ((unused)),
+	     size_t *bufcntp __attribute__ ((unused)),
+	     size_t bufsize __attribute__ ((unused)),
+	     const uint8_t *data __attribute__ ((unused)),
+	     const uint8_t **param_start __attribute__ ((unused)),
+	     const uint8_t *end __attribute__ ((unused)),
+	     DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	     void *symcbarg __attribute__ ((unused)))
 {
-  assert (d->opoff1 % 8 == 0);
-  uint_fast8_t modrm = d->data[d->opoff1 / 8];
+  assert (opoff1 % 8 == 0);
+  uint_fast8_t modrm = data[opoff1 / 8];
   if ((modrm & 0xc0) == 0xc0)
     {
-      assert (d->opoff1 / 8 == d->opoff2 / 8);
-      assert (d->opoff2 % 8 == 5);
-      //uint_fast8_t byte = data[opoff2 / 8] & 7;
-      uint_fast8_t byte = modrm & 7;
-
-      size_t *bufcntp = d->bufcntp;
-      size_t avail = d->bufsize - *bufcntp;
-      int needed = snprintf (&d->bufp[*bufcntp], avail, "%%xmm%" PRIxFAST8,
-			     byte);
+      uint_fast8_t byte = data[opoff2 / 8] & 7;
+      assert (opoff2 % 8 == 5);
+      size_t avail = bufsize - *bufcntp;
+      int needed = snprintf (&bufp[*bufcntp], avail, "%%xmm%" PRIxFAST8, byte);
       if ((size_t) needed > avail)
 	return needed - avail;
-      *d->bufcntp += needed;
+      *bufcntp += needed;
       return 0;
     }
 
-  return general_mod$r_m (d);
+  return general_mod$r_m (addr, prefixes, op1str, opoff1, opoff2, opoff3, bufp,
+			  bufcntp, bufsize, data, param_start, end,
+			  symcb, symcbarg);
 }
 
 static int
-generic_abs (struct output_data *d, const char *absstring
+generic_abs (int *prefixes __attribute__ ((unused)),
+	     size_t opoff1 __attribute__ ((unused)),
+	     char *bufp __attribute__ ((unused)),
+	     size_t *bufcntp __attribute__ ((unused)),
+	     size_t bufsize __attribute__ ((unused)),
+	     const uint8_t *data __attribute__ ((unused)),
+	     const uint8_t **param_start __attribute__ ((unused)),
+	     const uint8_t *end __attribute__ ((unused)),
+	     DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	     void *symcbarg __attribute__ ((unused)),
+	     const char *absstring
 #ifdef X86_64
 	     , int abslen
 #else
@@ -442,15 +482,15 @@ generic_abs (struct output_data *d, const char *absstring
 #endif
 	     )
 {
-  int r = data_prefix (d);
+  int r = data_prefix (prefixes, bufp, bufcntp, bufsize);
   if (r != 0)
     return r;
 
-  assert (d->opoff1 % 8 == 0);
-  assert (d->opoff1 / 8 == 1);
-  if (*d->param_start + abslen > d->end)
+  assert (opoff1 % 8 == 0);
+  assert (opoff1 / 8 == 1);
+  if (*param_start + abslen > end)
     return -1;
-  *d->param_start += abslen;
+  *param_start += abslen;
 #ifndef X86_64
   uint32_t absval;
 # define ABSPRIFMT PRIx32
@@ -458,13 +498,12 @@ generic_abs (struct output_data *d, const char *absstring
   uint64_t absval;
 # define ABSPRIFMT PRIx64
   if (abslen == 8)
-    absval = read_8ubyte_unaligned (&d->data[1]);
+    absval = read_8ubyte_unaligned (&data[1]);
   else
 #endif
-    absval = read_4ubyte_unaligned (&d->data[1]);
-  size_t *bufcntp = d->bufcntp;
-  size_t avail = d->bufsize - *bufcntp;
-  int needed = snprintf (&d->bufp[*bufcntp], avail, "%s0x%" ABSPRIFMT,
+    absval = read_4ubyte_unaligned (&data[1]);
+  size_t avail = bufsize - *bufcntp;
+  int needed = snprintf (&bufp[*bufcntp], avail, "%s0x%" ABSPRIFMT,
 			 absstring, absval);
   if ((size_t) needed > avail)
     return needed - avail;
@@ -472,11 +511,25 @@ generic_abs (struct output_data *d, const char *absstring
   return 0;
 }
 
-
 static int
-FCT_absval (struct output_data *d)
+FCT_absval (GElf_Addr addr __attribute__ ((unused)),
+	    int *prefixes __attribute__ ((unused)),
+	    const char *op1str __attribute__ ((unused)),
+	    size_t opoff1 __attribute__ ((unused)),
+	    size_t opoff2 __attribute__ ((unused)),
+	    size_t opoff3 __attribute__ ((unused)),
+	    char *bufp __attribute__ ((unused)),
+	    size_t *bufcntp __attribute__ ((unused)),
+	    size_t bufsize __attribute__ ((unused)),
+	    const uint8_t *data __attribute__ ((unused)),
+	    const uint8_t **param_start __attribute__ ((unused)),
+	    const uint8_t *end __attribute__ ((unused)),
+	    DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	    void *symcbarg __attribute__ ((unused)))
 {
-  return generic_abs (d, "$"
+  return generic_abs (prefixes, opoff1, bufp,
+		      bufcntp, bufsize, data, param_start, end, symcb,
+		      symcbarg, "$"
 #ifdef X86_64
 		      , 4
 #endif
@@ -484,9 +537,24 @@ FCT_absval (struct output_data *d)
 }
 
 static int
-FCT_abs (struct output_data *d)
+FCT_abs (GElf_Addr addr __attribute__ ((unused)),
+	 int *prefixes __attribute__ ((unused)),
+	 const char *op1str __attribute__ ((unused)),
+	 size_t opoff1 __attribute__ ((unused)),
+	 size_t opoff2 __attribute__ ((unused)),
+	 size_t opoff3 __attribute__ ((unused)),
+	 char *bufp __attribute__ ((unused)),
+	 size_t *bufcntp __attribute__ ((unused)),
+	 size_t bufsize __attribute__ ((unused)),
+	 const uint8_t *data __attribute__ ((unused)),
+	 const uint8_t **param_start __attribute__ ((unused)),
+	 const uint8_t *end __attribute__ ((unused)),
+	 DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	 void *symcbarg __attribute__ ((unused)))
 {
-  return generic_abs (d, ""
+  return generic_abs (prefixes, opoff1, bufp,
+		      bufcntp, bufsize, data, param_start, end, symcb,
+		      symcbarg, ""
 #ifdef X86_64
 		      , 8
 #endif
@@ -494,13 +562,22 @@ FCT_abs (struct output_data *d)
 }
 
 static int
-FCT_ax (struct output_data *d)
+FCT_ax (GElf_Addr addr __attribute__ ((unused)),
+	int *prefixes __attribute__ ((unused)),
+	const char *op1str __attribute__ ((unused)),
+	size_t opoff1 __attribute__ ((unused)),
+	size_t opoff2 __attribute__ ((unused)),
+	size_t opoff3 __attribute__ ((unused)),
+	char *bufp __attribute__ ((unused)),
+	size_t *bufcntp __attribute__ ((unused)),
+	size_t bufsize __attribute__ ((unused)),
+	const uint8_t *data __attribute__ ((unused)),
+	const uint8_t **param_start __attribute__ ((unused)),
+	const uint8_t *end __attribute__ ((unused)),
+	DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	void *symcbarg __attribute__ ((unused)))
 {
-  int is_16bit = (*d->prefixes & has_data16) != 0;
-
-  size_t *bufcntp = d->bufcntp;
-  char *bufp = d->bufp;
-  size_t bufsize = d->bufsize;
+  int is_16bit = (*prefixes & has_data16) != 0;
 
   if (*bufcntp + 4 - is_16bit > bufsize)
     return *bufcntp + 4 - is_16bit - bufsize;
@@ -514,16 +591,25 @@ FCT_ax (struct output_data *d)
   return 0;
 }
 
-
 static int
-FCT_ax$w (struct output_data *d)
+FCT_ax$w (GElf_Addr addr __attribute__ ((unused)),
+	  int *prefixes __attribute__ ((unused)),
+	  const char *op1str __attribute__ ((unused)),
+	  size_t opoff1 __attribute__ ((unused)),
+	  size_t opoff2 __attribute__ ((unused)),
+	  size_t opoff3 __attribute__ ((unused)),
+	  char *bufp __attribute__ ((unused)),
+	  size_t *bufcntp __attribute__ ((unused)),
+	  size_t bufsize __attribute__ ((unused)),
+	  const uint8_t *data __attribute__ ((unused)),
+	  const uint8_t **param_start __attribute__ ((unused)),
+	  const uint8_t *end __attribute__ ((unused)),
+	  DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	  void *symcbarg __attribute__ ((unused)))
 {
-  if ((d->data[d->opoff2 / 8] & (1 << (7 - (d->opoff2 & 7)))) != 0)
-    return FCT_ax (d);
-
-  size_t *bufcntp = d->bufcntp;
-  char *bufp = d->bufp;
-  size_t bufsize = d->bufsize;
+  if ((data[opoff2 / 8] & (1 << (7 - (opoff2 & 7)))) != 0)
+    return FCT_ax (addr, prefixes, op1str, opoff1, opoff2, opoff3, bufp,
+		   bufcntp, bufsize, data, param_start, end, symcb, symcbarg);
 
   if (*bufcntp + 3 > bufsize)
     return *bufcntp + 3 - bufsize;
@@ -535,95 +621,119 @@ FCT_ax$w (struct output_data *d)
   return 0;
 }
 
-
 static int
-FCT_ccc (struct output_data *d)
+FCT_ccc (GElf_Addr addr __attribute__ ((unused)),
+	 int *prefixes __attribute__ ((unused)),
+	 const char *op1str __attribute__ ((unused)),
+	 size_t opoff1 __attribute__ ((unused)),
+	 size_t opoff2 __attribute__ ((unused)),
+	 size_t opoff3 __attribute__ ((unused)),
+	 char *bufp __attribute__ ((unused)),
+	 size_t *bufcntp __attribute__ ((unused)),
+	 size_t bufsize __attribute__ ((unused)),
+	 const uint8_t *data __attribute__ ((unused)),
+	 const uint8_t **param_start __attribute__ ((unused)),
+	 const uint8_t *end __attribute__ ((unused)),
+	 DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	 void *symcbarg __attribute__ ((unused)))
 {
-  if (*d->prefixes & has_data16)
+  if (*prefixes & has_data16)
     return -1;
 
-  size_t *bufcntp = d->bufcntp;
-
-  // XXX If this assert is true, use absolute offset below
-  assert (d->opoff1 / 8 == 2);
-  assert (d->opoff1 % 8 == 2);
-  size_t avail = d->bufsize - *bufcntp;
-  int needed = snprintf (&d->bufp[*bufcntp], avail, "%%cr%" PRIx32,
-			 (uint32_t) (d->data[d->opoff1 / 8] >> 3) & 7);
+  assert (opoff1 % 8 == 2);
+  size_t avail = bufsize - *bufcntp;
+  int needed = snprintf (&bufp[*bufcntp], avail, "%%cr%" PRIx32,
+			 (uint32_t) (data[opoff1 / 8] >> 3) & 7);
   if ((size_t) needed > avail)
     return needed - avail;
   *bufcntp += needed;
   return 0;
 }
 
-
 static int
-FCT_ddd (struct output_data *d)
+FCT_ddd (GElf_Addr addr __attribute__ ((unused)),
+	 int *prefixes __attribute__ ((unused)),
+	 const char *op1str __attribute__ ((unused)),
+	 size_t opoff1 __attribute__ ((unused)),
+	 size_t opoff2 __attribute__ ((unused)),
+	 size_t opoff3 __attribute__ ((unused)),
+	 char *bufp __attribute__ ((unused)),
+	 size_t *bufcntp __attribute__ ((unused)),
+	 size_t bufsize __attribute__ ((unused)),
+	 const uint8_t *data __attribute__ ((unused)),
+	 const uint8_t **param_start __attribute__ ((unused)),
+	 const uint8_t *end __attribute__ ((unused)),
+	 DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	 void *symcbarg __attribute__ ((unused)))
 {
-  if (*d->prefixes & has_data16)
+  if (*prefixes & has_data16)
     return -1;
 
-  size_t *bufcntp = d->bufcntp;
-
-  // XXX If this assert is true, use absolute offset below
-  assert (d->opoff1 / 8 == 2);
-  assert (d->opoff1 % 8 == 2);
-  size_t avail = d->bufsize - *bufcntp;
-  int needed = snprintf (&d->bufp[*bufcntp], avail, "%%db%" PRIx32,
-			 (uint32_t) (d->data[d->opoff1 / 8] >> 3) & 7);
+  assert (opoff1 % 8 == 2);
+  size_t avail = bufsize - *bufcntp;
+  int needed = snprintf (&bufp[*bufcntp], avail, "%%db%" PRIx32,
+			 (uint32_t) (data[opoff1 / 8] >> 3) & 7);
   if ((size_t) needed > avail)
     return needed - avail;
   *bufcntp += needed;
   return 0;
 }
 
-
 static int
-FCT_disp8 (struct output_data *d)
+FCT_disp8 (GElf_Addr addr __attribute__ ((unused)),
+	   int *prefixes __attribute__ ((unused)),
+	   const char *op1str __attribute__ ((unused)),
+	   size_t opoff1 __attribute__ ((unused)),
+	   size_t opoff2 __attribute__ ((unused)),
+	   size_t opoff3 __attribute__ ((unused)),
+	   char *bufp __attribute__ ((unused)),
+	   size_t *bufcntp __attribute__ ((unused)),
+	   size_t bufsize __attribute__ ((unused)),
+	   const uint8_t *data __attribute__ ((unused)),
+	   const uint8_t **param_start __attribute__ ((unused)),
+	   const uint8_t *end __attribute__ ((unused)),
+	   DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	   void *symcbarg __attribute__ ((unused)))
 {
-  assert (d->opoff1 % 8 == 0);
-  if (*d->param_start >= d->end)
-    return -1;
-  int32_t offset = *(const int8_t *) (*d->param_start)++;
-
-  size_t *bufcntp = d->bufcntp;
-  size_t avail = d->bufsize - *bufcntp;
-  int needed = snprintf (&d->bufp[*bufcntp], avail, "0x%" PRIx32,
-			 (uint32_t) (d->addr + (*d->param_start - d->data)
-				     + offset));
+  assert (opoff1 % 8 == 0);
+  int32_t offset = *(const int8_t *) (*param_start)++;
+  size_t avail = bufsize - *bufcntp;
+  int needed = snprintf (&bufp[*bufcntp], avail, "0x%" PRIx32,
+			 (uint32_t) (addr + (*param_start - data) + offset));
   if ((size_t) needed > avail)
     return needed - avail;
   *bufcntp += needed;
   return 0;
 }
-
 
 static int
 __attribute__ ((noinline))
-FCT_ds_xx (struct output_data *d, const char *reg)
+FCT_ds_xx (const char *reg,
+	   int *prefixes __attribute__ ((unused)),
+	   char *bufp __attribute__ ((unused)),
+	   size_t *bufcntp __attribute__ ((unused)),
+	   size_t bufsize __attribute__ ((unused)))
 {
-  int prefix = *d->prefixes & SEGMENT_PREFIXES;
+  int prefix = *prefixes & SEGMENT_PREFIXES;
 
   if (prefix == 0)
-    *d->prefixes |= prefix = has_ds;
+    prefix = has_ds;
   /* Make sure only one bit is set.  */
   else if ((prefix - 1) & prefix)
     return -1;
+  else
+    *prefixes ^= prefix;
 
-  int r = data_prefix (d);
-
-  assert ((*d->prefixes & prefix) == 0);
-
+  int r = data_prefix (&prefix, bufp, bufcntp, bufsize);
   if (r != 0)
     return r;
 
-  size_t *bufcntp = d->bufcntp;
-  size_t avail = d->bufsize - *bufcntp;
-  int needed = snprintf (&d->bufp[*bufcntp], avail, "(%%%s%s)",
+  size_t avail = bufsize - *bufcntp;
+  int needed = snprintf (&bufp[*bufcntp], avail, "(%%%s%s)",
 #ifdef X86_64
-			 *d->prefixes & idx_addr16 ? "e" : "r",
+			 *prefixes & idx_addr16 ? "e" : "r",
 #else
-			 *d->prefixes & idx_addr16 ? "" : "e",
+			 *prefixes & idx_addr16 ? "" : "e",
 #endif
 			 reg);
   if ((size_t) needed > avail)
@@ -633,46 +743,91 @@ FCT_ds_xx (struct output_data *d, const char *reg)
   return 0;
 }
 
-
 static int
-FCT_ds_bx (struct output_data *d)
+FCT_ds_bx (GElf_Addr addr __attribute__ ((unused)),
+	   int *prefixes __attribute__ ((unused)),
+	   const char *op1str __attribute__ ((unused)),
+	   size_t opoff1 __attribute__ ((unused)),
+	   size_t opoff2 __attribute__ ((unused)),
+	   size_t opoff3 __attribute__ ((unused)),
+	   char *bufp __attribute__ ((unused)),
+	   size_t *bufcntp __attribute__ ((unused)),
+	   size_t bufsize __attribute__ ((unused)),
+	   const uint8_t *data __attribute__ ((unused)),
+	   const uint8_t **param_start __attribute__ ((unused)),
+	   const uint8_t *end __attribute__ ((unused)),
+	   DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	   void *symcbarg __attribute__ ((unused)))
 {
-  return FCT_ds_xx (d, "bx");
+  return FCT_ds_xx ("bx", prefixes, bufp, bufcntp, bufsize);
 }
 
-
 static int
-FCT_ds_si (struct output_data *d)
+FCT_ds_si (GElf_Addr addr __attribute__ ((unused)),
+	   int *prefixes __attribute__ ((unused)),
+	   const char *op1str __attribute__ ((unused)),
+	   size_t opoff1 __attribute__ ((unused)),
+	   size_t opoff2 __attribute__ ((unused)),
+	   size_t opoff3 __attribute__ ((unused)),
+	   char *bufp __attribute__ ((unused)),
+	   size_t *bufcntp __attribute__ ((unused)),
+	   size_t bufsize __attribute__ ((unused)),
+	   const uint8_t *data __attribute__ ((unused)),
+	   const uint8_t **param_start __attribute__ ((unused)),
+	   const uint8_t *end __attribute__ ((unused)),
+	   DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	   void *symcbarg __attribute__ ((unused)))
 {
-  return FCT_ds_xx (d, "si");
+  return FCT_ds_xx ("si", prefixes, bufp, bufcntp, bufsize);
 }
 
-
 static int
-FCT_dx (struct output_data *d)
+FCT_dx (GElf_Addr addr __attribute__ ((unused)),
+	int *prefixes __attribute__ ((unused)),
+	const char *op1str __attribute__ ((unused)),
+	size_t opoff1 __attribute__ ((unused)),
+	size_t opoff2 __attribute__ ((unused)),
+	size_t opoff3 __attribute__ ((unused)),
+	char *bufp __attribute__ ((unused)),
+	size_t *bufcntp __attribute__ ((unused)),
+	size_t bufsize __attribute__ ((unused)),
+	const uint8_t *data __attribute__ ((unused)),
+	const uint8_t **param_start __attribute__ ((unused)),
+	const uint8_t *end __attribute__ ((unused)),
+	DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	void *symcbarg __attribute__ ((unused)))
 {
-  size_t *bufcntp = d->bufcntp;
+  if (*bufcntp + 7 > bufsize)
+    return *bufcntp + 7 - bufsize;
 
-  if (*bufcntp + 7 > d->bufsize)
-    return *bufcntp + 7 - d->bufsize;
-
-  memcpy (&d->bufp[*bufcntp], "(%dx)", 5);
+  memcpy (&bufp[*bufcntp], "(%dx)", 5);
   *bufcntp += 5;
 
   return 0;
 }
 
-
 static int
-FCT_es_di (struct output_data *d)
+FCT_es_di (GElf_Addr addr __attribute__ ((unused)),
+	   int *prefixes __attribute__ ((unused)),
+	   const char *op1str __attribute__ ((unused)),
+	   size_t opoff1 __attribute__ ((unused)),
+	   size_t opoff2 __attribute__ ((unused)),
+	   size_t opoff3 __attribute__ ((unused)),
+	   char *bufp __attribute__ ((unused)),
+	   size_t *bufcntp __attribute__ ((unused)),
+	   size_t bufsize __attribute__ ((unused)),
+	   const uint8_t *data __attribute__ ((unused)),
+	   const uint8_t **param_start __attribute__ ((unused)),
+	   const uint8_t *end __attribute__ ((unused)),
+	   DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	   void *symcbarg __attribute__ ((unused)))
 {
-  size_t *bufcntp = d->bufcntp;
-  size_t avail = d->bufsize - *bufcntp;
-  int needed = snprintf (&d->bufp[*bufcntp], avail, "%%es:(%%%sdi)",
+  size_t avail = bufsize - *bufcntp;
+  int needed = snprintf (&bufp[*bufcntp], avail, "%%es:(%%%sdi)",
 #ifdef X86_64
-			 *d->prefixes & idx_addr16 ? "e" : "r"
+			 *prefixes & idx_addr16 ? "e" : "r"
 #else
-			 *d->prefixes & idx_addr16 ? "" : "e"
+			 *prefixes & idx_addr16 ? "" : "e"
 #endif
 			 );
   if ((size_t) needed > avail)
@@ -682,26 +837,37 @@ FCT_es_di (struct output_data *d)
   return 0;
 }
 
-
 static int
-FCT_imm (struct output_data *d)
+FCT_imm (GElf_Addr addr __attribute__ ((unused)),
+	 int *prefixes __attribute__ ((unused)),
+	 const char *op1str __attribute__ ((unused)),
+	 size_t opoff1 __attribute__ ((unused)),
+	 size_t opoff2 __attribute__ ((unused)),
+	 size_t opoff3 __attribute__ ((unused)),
+	 char *bufp __attribute__ ((unused)),
+	 size_t *bufcntp __attribute__ ((unused)),
+	 size_t bufsize __attribute__ ((unused)),
+	 const uint8_t *data __attribute__ ((unused)),
+	 const uint8_t **param_start __attribute__ ((unused)),
+	 const uint8_t *end __attribute__ ((unused)),
+	 DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	 void *symcbarg __attribute__ ((unused)))
 {
-  size_t *bufcntp = d->bufcntp;
-  size_t avail = d->bufsize - *bufcntp;
+  size_t avail = bufsize - *bufcntp;
   int needed;
-  if (*d->prefixes & has_data16)
+  if (*prefixes & has_data16)
     {
-      if (*d->param_start + 2 > d->end)
+      if (*param_start + 2 > end)
 	return -1;
-      uint16_t word = read_2ubyte_unaligned_inc (*d->param_start);
-      needed = snprintf (&d->bufp[*bufcntp], avail, "$0x%" PRIx16, word);
+      uint16_t word = read_2ubyte_unaligned_inc (*param_start);
+      needed = snprintf (&bufp[*bufcntp], avail, "$0x%" PRIx16, word);
     }
   else
     {
-      if (*d->param_start + 4 > d->end)
+      if (*param_start + 4 > end)
 	return -1;
-      uint32_t word = read_4ubyte_unaligned_inc (*d->param_start);
-      needed = snprintf (&d->bufp[*bufcntp], avail, "$0x%" PRIx32, word);
+      uint32_t word = read_4ubyte_unaligned_inc (*param_start);
+      needed = snprintf (&bufp[*bufcntp], avail, "$0x%" PRIx32, word);
     }
   if ((size_t) needed > avail)
     return (size_t) needed - avail;
@@ -709,39 +875,58 @@ FCT_imm (struct output_data *d)
   return 0;
 }
 
-
 static int
-FCT_imm$w (struct output_data *d)
+FCT_imm$w (GElf_Addr addr __attribute__ ((unused)),
+	   int *prefixes __attribute__ ((unused)),
+	   const char *op1str __attribute__ ((unused)),
+	   size_t opoff1 __attribute__ ((unused)),
+	   size_t opoff2 __attribute__ ((unused)),
+	   size_t opoff3 __attribute__ ((unused)),
+	   char *bufp __attribute__ ((unused)),
+	   size_t *bufcntp __attribute__ ((unused)),
+	   size_t bufsize __attribute__ ((unused)),
+	   const uint8_t *data __attribute__ ((unused)),
+	   const uint8_t **param_start __attribute__ ((unused)),
+	   const uint8_t *end __attribute__ ((unused)),
+	   DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	   void *symcbarg __attribute__ ((unused)))
 {
-  if ((d->data[d->opoff2 / 8] & (1 << (7 - (d->opoff2 & 7)))) != 0)
-    return FCT_imm (d);
+  if ((data[opoff2 / 8] & (1 << (7 - (opoff2 & 7)))) != 0)
+    return FCT_imm (addr, prefixes, op1str, opoff1, opoff2, opoff3, bufp,
+		    bufcntp, bufsize, data, param_start, end, symcb, symcbarg);
 
-  size_t *bufcntp = d->bufcntp;
-  size_t avail = d->bufsize - *bufcntp;
-  if (*d->param_start>= d->end)
-    return -1;
-  uint_fast8_t word = *(*d->param_start)++;
-  int needed = snprintf (&d->bufp[*bufcntp], avail, "$0x%" PRIxFAST8, word);
+  size_t avail = bufsize - *bufcntp;
+  uint_fast8_t word = *(*param_start)++;
+  int needed = snprintf (&bufp[*bufcntp], avail, "$0x%" PRIxFAST8, word);
   if ((size_t) needed > avail)
     return (size_t) needed - avail;
   *bufcntp += needed;
   return 0;
 }
 
-
 static int
-FCT_imms (struct output_data *d)
+FCT_imms (GElf_Addr addr __attribute__ ((unused)),
+	  int *prefixes __attribute__ ((unused)),
+	  const char *op1str __attribute__ ((unused)),
+	  size_t opoff1 __attribute__ ((unused)),
+	  size_t opoff2 __attribute__ ((unused)),
+	  size_t opoff3 __attribute__ ((unused)),
+	  char *bufp __attribute__ ((unused)),
+	  size_t *bufcntp __attribute__ ((unused)),
+	  size_t bufsize __attribute__ ((unused)),
+	  const uint8_t *data __attribute__ ((unused)),
+	  const uint8_t **param_start __attribute__ ((unused)),
+	  const uint8_t *end __attribute__ ((unused)),
+	  DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	  void *symcbarg __attribute__ ((unused)))
 {
-  size_t *bufcntp = d->bufcntp;
-  size_t avail = d->bufsize - *bufcntp;
-  if (*d->param_start>= d->end)
-    return -1;
-  int8_t byte = *(*d->param_start)++;
+  size_t avail = bufsize - *bufcntp;
+  int8_t byte = *(*param_start)++;
 #ifdef X86_64
-  int needed = snprintf (&d->bufp[*bufcntp], avail, "$0x%" PRIx64,
+  int needed = snprintf (&bufp[*bufcntp], avail, "$0x%" PRIx64,
 			 (int64_t) byte);
 #else
-  int needed = snprintf (&d->bufp[*bufcntp], avail, "$0x%" PRIx32,
+  int needed = snprintf (&bufp[*bufcntp], avail, "$0x%" PRIx32,
 			 (int32_t) byte);
 #endif
   if ((size_t) needed > avail)
@@ -750,26 +935,39 @@ FCT_imms (struct output_data *d)
   return 0;
 }
 
-
 static int
-FCT_imm$s (struct output_data *d)
+FCT_imm$s (GElf_Addr addr __attribute__ ((unused)),
+	   int *prefixes __attribute__ ((unused)),
+	   const char *op1str __attribute__ ((unused)),
+	   size_t opoff1 __attribute__ ((unused)),
+	   size_t opoff2 __attribute__ ((unused)),
+	   size_t opoff3 __attribute__ ((unused)),
+	   char *bufp __attribute__ ((unused)),
+	   size_t *bufcntp __attribute__ ((unused)),
+	   size_t bufsize __attribute__ ((unused)),
+	   const uint8_t *data __attribute__ ((unused)),
+	   const uint8_t **param_start __attribute__ ((unused)),
+	   const uint8_t *end __attribute__ ((unused)),
+	   DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	   void *symcbarg __attribute__ ((unused)))
 {
-  uint_fast8_t opcode = d->data[d->opoff2 / 8];
-  size_t *bufcntp = d->bufcntp;
-  size_t avail = d->bufsize - *bufcntp;
+  uint_fast8_t opcode = data[opoff2 / 8];
+  size_t avail = bufsize - *bufcntp;
   if ((opcode & 2) != 0)
-    return FCT_imms (d);
+    return FCT_imms (addr, prefixes, op1str, opoff1, opoff2, opoff3, bufp,
+		     bufcntp, bufsize, data, param_start, end, symcb,
+		     symcbarg);
 
-  if ((*d->prefixes & has_data16) == 0)
+  if ((*prefixes & has_data16) == 0)
     {
-      if (*d->param_start + 4 > d->end)
+      if (*param_start + 4 > end)
 	return -1;
-      int32_t word = read_4sbyte_unaligned_inc (*d->param_start);
+      int32_t word = read_4sbyte_unaligned_inc (*param_start);
 #ifdef X86_64
-      int needed = snprintf (&d->bufp[*bufcntp], avail, "$0x%" PRIx64,
+      int needed = snprintf (&bufp[*bufcntp], avail, "$0x%" PRIx64,
 			     (int64_t) word);
 #else
-      int needed = snprintf (&d->bufp[*bufcntp], avail, "$0x%" PRIx32, word);
+      int needed = snprintf (&bufp[*bufcntp], avail, "$0x%" PRIx32, word);
 #endif
       if ((size_t) needed > avail)
 	return (size_t) needed - avail;
@@ -777,10 +975,10 @@ FCT_imm$s (struct output_data *d)
     }
   else
     {
-      if (*d->param_start + 2 > d->end)
+      if (*param_start + 2 > end)
 	return -1;
-      uint16_t word = read_2ubyte_unaligned_inc (*d->param_start);
-      int needed = snprintf (&d->bufp[*bufcntp], avail, "$0x%" PRIx16, word);
+      uint16_t word = read_2ubyte_unaligned_inc (*param_start);
+      int needed = snprintf (&bufp[*bufcntp], avail, "$0x%" PRIx16, word);
       if ((size_t) needed > avail)
 	return (size_t) needed - avail;
       *bufcntp += needed;
@@ -788,32 +986,52 @@ FCT_imm$s (struct output_data *d)
   return 0;
 }
 
-
 static int
-FCT_imm16 (struct output_data *d)
+FCT_imm16 (GElf_Addr addr __attribute__ ((unused)),
+	   int *prefixes __attribute__ ((unused)),
+	   const char *op1str __attribute__ ((unused)),
+	   size_t opoff1 __attribute__ ((unused)),
+	   size_t opoff2 __attribute__ ((unused)),
+	   size_t opoff3 __attribute__ ((unused)),
+	   char *bufp __attribute__ ((unused)),
+	   size_t *bufcntp __attribute__ ((unused)),
+	   size_t bufsize __attribute__ ((unused)),
+	   const uint8_t *data __attribute__ ((unused)),
+	   const uint8_t **param_start __attribute__ ((unused)),
+	   const uint8_t *end __attribute__ ((unused)),
+	   DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	   void *symcbarg __attribute__ ((unused)))
 {
-  if (*d->param_start + 2 > d->end)
+  if (*param_start + 2 > end)
     return -1;
-  uint16_t word = read_2ubyte_unaligned_inc (*d->param_start);
-  size_t *bufcntp = d->bufcntp;
-  size_t avail = d->bufsize - *bufcntp;
-  int needed = snprintf (&d->bufp[*bufcntp], avail, "$0x%" PRIx16, word);
+  uint16_t word = read_2ubyte_unaligned_inc (*param_start);
+  size_t avail = bufsize - *bufcntp;
+  int needed = snprintf (&bufp[*bufcntp], avail, "$0x%" PRIx16, word);
   if ((size_t) needed > avail)
     return (size_t) needed - avail;
   *bufcntp += needed;
   return 0;
 }
 
-
 static int
-FCT_imms8 (struct output_data *d)
+FCT_imms8 (GElf_Addr addr __attribute__ ((unused)),
+	   int *prefixes __attribute__ ((unused)),
+	   const char *op1str __attribute__ ((unused)),
+	   size_t opoff1 __attribute__ ((unused)),
+	   size_t opoff2 __attribute__ ((unused)),
+	   size_t opoff3 __attribute__ ((unused)),
+	   char *bufp __attribute__ ((unused)),
+	   size_t *bufcntp __attribute__ ((unused)),
+	   size_t bufsize __attribute__ ((unused)),
+	   const uint8_t *data __attribute__ ((unused)),
+	   const uint8_t **param_start __attribute__ ((unused)),
+	   const uint8_t *end __attribute__ ((unused)),
+	   DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	   void *symcbarg __attribute__ ((unused)))
 {
-  size_t *bufcntp = d->bufcntp;
-  size_t avail = d->bufsize - *bufcntp;
-  if (*d->param_start >= d->end)
-    return -1;
-  int_fast8_t byte = *(*d->param_start)++;
-  int needed = snprintf (&d->bufp[*bufcntp], avail, "$0x%" PRIx32,
+  size_t avail = bufsize - *bufcntp;
+  int_fast8_t byte = *(*param_start)++;
+  int needed = snprintf (&bufp[*bufcntp], avail, "$0x%" PRIx32,
 			 (int32_t) byte);
   if ((size_t) needed > avail)
     return (size_t) needed - avail;
@@ -821,16 +1039,27 @@ FCT_imms8 (struct output_data *d)
   return 0;
 }
 
-
 static int
-FCT_imm8 (struct output_data *d)
+FCT_imm8 (GElf_Addr addr __attribute__ ((unused)),
+	  int *prefixes __attribute__ ((unused)),
+	  const char *op1str __attribute__ ((unused)),
+	  size_t opoff1 __attribute__ ((unused)),
+	  size_t opoff2 __attribute__ ((unused)),
+	  size_t opoff3 __attribute__ ((unused)),
+	  char *bufp __attribute__ ((unused)),
+	  size_t *bufcntp __attribute__ ((unused)),
+	  size_t bufsize __attribute__ ((unused)),
+	  const uint8_t *data __attribute__ ((unused)),
+	  const uint8_t **param_start __attribute__ ((unused)),
+	  const uint8_t *end __attribute__ ((unused)),
+	  DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	  void *symcbarg __attribute__ ((unused)))
 {
-  size_t *bufcntp = d->bufcntp;
-  size_t avail = d->bufsize - *bufcntp;
-  if (*d->param_start >= d->end)
+  size_t avail = bufsize - *bufcntp;
+  if (*param_start >= end)
     return -1;
-  uint_fast8_t byte = *(*d->param_start)++;
-  int needed = snprintf (&d->bufp[*bufcntp], avail, "$0x%" PRIx32,
+  uint_fast8_t byte = *(*param_start)++;
+  int needed = snprintf (&bufp[*bufcntp], avail, "$0x%" PRIx32,
 			 (uint32_t) byte);
   if ((size_t) needed > avail)
     return (size_t) needed - avail;
@@ -838,23 +1067,32 @@ FCT_imm8 (struct output_data *d)
   return 0;
 }
 
-
 static int
-FCT_rel (struct output_data *d)
+FCT_rel (GElf_Addr addr __attribute__ ((unused)),
+	 int *prefixes __attribute__ ((unused)),
+	 const char *op1str __attribute__ ((unused)),
+	 size_t opoff1 __attribute__ ((unused)),
+	 size_t opoff2 __attribute__ ((unused)),
+	 size_t opoff3 __attribute__ ((unused)),
+	 char *bufp __attribute__ ((unused)),
+	 size_t *bufcntp __attribute__ ((unused)),
+	 size_t bufsize __attribute__ ((unused)),
+	 const uint8_t *data __attribute__ ((unused)),
+	 const uint8_t **param_start __attribute__ ((unused)),
+	 const uint8_t *end __attribute__ ((unused)),
+	 DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	 void *symcbarg __attribute__ ((unused)))
 {
-  size_t *bufcntp = d->bufcntp;
-  size_t avail = d->bufsize - *bufcntp;
-  if (*d->param_start + 4 > d->end)
+  size_t avail = bufsize - *bufcntp;
+  if (*param_start + 4 > end)
     return -1;
-  int32_t rel = read_4sbyte_unaligned_inc (*d->param_start);
+  int32_t rel = read_4sbyte_unaligned_inc (*param_start);
 #ifdef X86_64
-  int needed = snprintf (&d->bufp[*bufcntp], avail, "0x%" PRIx64,
-			 (uint64_t) (d->addr + rel
-				     + (*d->param_start - d->data)));
+  int needed = snprintf (&bufp[*bufcntp], avail, "0x%" PRIx64,
+			 (uint64_t) (addr + rel + (*param_start - data)));
 #else
-  int needed = snprintf (&d->bufp[*bufcntp], avail, "0x%" PRIx32,
-			 (uint32_t) (d->addr + rel
-				     + (*d->param_start - d->data)));
+  int needed = snprintf (&bufp[*bufcntp], avail, "0x%" PRIx32,
+			 (uint32_t) (addr + rel + (*param_start - data)));
 #endif
   if ((size_t) needed > avail)
     return (size_t) needed - avail;
@@ -862,16 +1100,27 @@ FCT_rel (struct output_data *d)
   return 0;
 }
 
-
 static int
-FCT_mmxreg (struct output_data *d)
+FCT_mmxreg (GElf_Addr addr __attribute__ ((unused)),
+	    int *prefixes __attribute__ ((unused)),
+	    const char *op1str __attribute__ ((unused)),
+	    size_t opoff1 __attribute__ ((unused)),
+	    size_t opoff2 __attribute__ ((unused)),
+	    size_t opoff3 __attribute__ ((unused)),
+	    char *bufp __attribute__ ((unused)),
+	    size_t *bufcntp __attribute__ ((unused)),
+	    size_t bufsize __attribute__ ((unused)),
+	    const uint8_t *data __attribute__ ((unused)),
+	    const uint8_t **param_start __attribute__ ((unused)),
+	    const uint8_t *end __attribute__ ((unused)),
+	    DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	    void *symcbarg __attribute__ ((unused)))
 {
-  uint_fast8_t byte = d->data[d->opoff1 / 8];
-  assert (d->opoff1 % 8 == 2 || d->opoff1 % 8 == 5);
-  byte = (byte >> (5 - d->opoff1 % 8)) & 7;
-  size_t *bufcntp =  d->bufcntp;
-  size_t avail = d->bufsize - *bufcntp;
-  int needed = snprintf (&d->bufp[*bufcntp], avail, "%%mm%" PRIxFAST8, byte);
+  uint_fast8_t byte = data[opoff1 / 8];
+  assert (opoff1 % 8 == 2 || opoff1 % 8 == 5);
+  byte = (byte >> (5 - opoff1 % 8)) & 7;
+  size_t avail = bufsize - *bufcntp;
+  int needed = snprintf (&bufp[*bufcntp], avail, "%%mm%" PRIxFAST8, byte);
   if ((size_t) needed > avail)
     return needed - avail;
   *bufcntp += needed;
@@ -880,30 +1129,40 @@ FCT_mmxreg (struct output_data *d)
 
 
 static int
-FCT_mod$r_m (struct output_data *d)
+FCT_mod$r_m (GElf_Addr addr __attribute__ ((unused)),
+	     int *prefixes __attribute__ ((unused)),
+	     const char *op1str __attribute__ ((unused)),
+	     size_t opoff1 __attribute__ ((unused)),
+	     size_t opoff2 __attribute__ ((unused)),
+	     size_t opoff3 __attribute__ ((unused)),
+	     char *bufp __attribute__ ((unused)),
+	     size_t *bufcntp __attribute__ ((unused)),
+	     size_t bufsize __attribute__ ((unused)),
+	     const uint8_t *data __attribute__ ((unused)),
+	     const uint8_t **param_start __attribute__ ((unused)),
+	     const uint8_t *end __attribute__ ((unused)),
+	     DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	     void *symcbarg __attribute__ ((unused)))
 {
-  assert (d->opoff1 % 8 == 0);
-  uint_fast8_t modrm = d->data[d->opoff1 / 8];
+  assert (opoff1 % 8 == 0);
+  uint_fast8_t modrm = data[opoff1 / 8];
   if ((modrm & 0xc0) == 0xc0)
     {
-      int prefixes = *d->prefixes;
-      if (prefixes & has_addr16)
+      if (*prefixes & has_addr16)
 	return -1;
 
-      int is_16bit = (prefixes & has_data16) != 0;
+      int is_16bit = (*prefixes & has_data16) != 0;
 
-      size_t *bufcntp = d->bufcntp;
-      char *bufp = d->bufp;
-      if (*bufcntp + 5 - is_16bit > d->bufsize)
-	return *bufcntp + 5 - is_16bit - d->bufsize;
+      if (*bufcntp + 5 - is_16bit > bufsize)
+	return *bufcntp + 5 - is_16bit - bufsize;
       bufp[(*bufcntp)++] = '%';
 
       char *cp;
 #ifdef X86_64
-      if ((prefixes & has_rex_b) != 0 && !is_16bit)
+      if ((*prefixes & has_rex_b) != 0 && !is_16bit)
 	{
 	  cp = stpcpy (&bufp[*bufcntp], hiregs[modrm & 7]);
-	  if ((prefixes & has_rex_w) == 0)
+	  if ((*prefixes & has_rex_w) == 0)
 	    *cp++ = 'd';
 	}
       else
@@ -911,7 +1170,7 @@ FCT_mod$r_m (struct output_data *d)
 	{
 	  cp = stpcpy (&bufp[*bufcntp], dregs[modrm & 7] + is_16bit);
 #ifdef X86_64
-	  if ((prefixes & has_rex_w) != 0)
+	  if ((*prefixes & has_rex_w) != 0)
 	    bufp[*bufcntp] = 'r';
 #endif
 	}
@@ -919,32 +1178,52 @@ FCT_mod$r_m (struct output_data *d)
       return 0;
     }
 
-  return general_mod$r_m (d);
+  return general_mod$r_m (addr, prefixes, op1str, opoff1, opoff2, opoff3, bufp,
+			  bufcntp, bufsize, data, param_start, end,
+			  symcb, symcbarg);
 }
 
 
 #ifndef X86_64
 static int
-FCT_moda$r_m (struct output_data *d)
+FCT_moda$r_m (GElf_Addr addr __attribute__ ((unused)),
+	      int *prefixes __attribute__ ((unused)),
+	      const char *op1str __attribute__ ((unused)),
+	      size_t opoff1 __attribute__ ((unused)),
+	      size_t opoff2 __attribute__ ((unused)),
+	      size_t opoff3 __attribute__ ((unused)),
+	      char *bufp __attribute__ ((unused)),
+	      size_t *bufcntp __attribute__ ((unused)),
+	      size_t bufsize __attribute__ ((unused)),
+	      const uint8_t *data __attribute__ ((unused)),
+	      const uint8_t **param_start __attribute__ ((unused)),
+	      const uint8_t *end __attribute__ ((unused)),
+	      DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	      void *symcbarg __attribute__ ((unused)))
 {
-  assert (d->opoff1 % 8 == 0);
-  uint_fast8_t modrm = d->data[d->opoff1 / 8];
+  int r = data_prefix (prefixes, bufp, bufcntp, bufsize);
+  if (r != 0)
+    return r;
+
+  assert (opoff1 % 8 == 0);
+  uint_fast8_t modrm = data[opoff1 / 8];
   if ((modrm & 0xc0) == 0xc0)
     {
-      if (*d->prefixes & has_addr16)
+      if (*prefixes & has_addr16)
 	return -1;
 
-      size_t *bufcntp = d->bufcntp;
-      if (*bufcntp + 3 > d->bufsize)
-	return *bufcntp + 3 - d->bufsize;
+      if (*bufcntp + 3 > bufsize)
+	return *bufcntp + 3 - bufsize;
 
-      memcpy (&d->bufp[*bufcntp], "???", 3);
+      memcpy (&bufp[*bufcntp], "???", 3);
       *bufcntp += 3;
 
       return 0;
     }
 
-  return general_mod$r_m (d);
+  return general_mod$r_m (addr, prefixes, op1str, opoff1, opoff2, opoff3, bufp,
+			  bufcntp, bufsize, data, param_start, end,
+			  symcb, symcbarg);
 }
 #endif
 
@@ -957,34 +1236,45 @@ static const char rex_8bit[8][3] =
   };
 #endif
 
-
 static int
-FCT_mod$r_m$w (struct output_data *d)
+FCT_mod$r_m$w (GElf_Addr addr __attribute__ ((unused)),
+	       int *prefixes __attribute__ ((unused)),
+	       const char *op1str __attribute__ ((unused)),
+	       size_t opoff1 __attribute__ ((unused)),
+	       size_t opoff2 __attribute__ ((unused)),
+	       size_t opoff3 __attribute__ ((unused)),
+	       char *bufp __attribute__ ((unused)),
+	       size_t *bufcntp __attribute__ ((unused)),
+	       size_t bufsize __attribute__ ((unused)),
+	       const uint8_t *data __attribute__ ((unused)),
+	       const uint8_t **param_start __attribute__ ((unused)),
+	       const uint8_t *end __attribute__ ((unused)),
+	       DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	       void *symcbarg __attribute__ ((unused)))
 {
-  assert (d->opoff1 % 8 == 0);
-  const uint8_t *data = d->data;
-  uint_fast8_t modrm = data[d->opoff1 / 8];
+  int r = data_prefix (prefixes, bufp, bufcntp, bufsize);
+  if (r != 0)
+    return r;
+
+  assert (opoff1 % 8 == 0);
+  uint_fast8_t modrm = data[opoff1 / 8];
   if ((modrm & 0xc0) == 0xc0)
     {
-      int prefixes = *d->prefixes;
-
-      if (prefixes & has_addr16)
+      if (*prefixes & has_addr16)
 	return -1;
 
-      size_t *bufcntp = d->bufcntp;
-      char *bufp = d->bufp;
-      if (*bufcntp + 5 > d->bufsize)
-	return *bufcntp + 5 - d->bufsize;
+      if (*bufcntp + 5 > bufsize)
+	return *bufcntp + 5 - bufsize;
 
-      if ((data[d->opoff3 / 8] & (1 << (7 - (d->opoff3 & 7)))) == 0)
+      if ((data[opoff3 / 8] & (1 << (7 - (opoff3 & 7)))) == 0)
 	{
 	  bufp[(*bufcntp)++] = '%';
 
 #ifdef X86_64
-	  if (prefixes & has_rex)
+	  if (*prefixes & has_rex)
 	    {
-	      if (prefixes & has_rex_r)
-		*bufcntp += snprintf (bufp + *bufcntp, d->bufsize - *bufcntp,
+	      if (*prefixes & has_rex_r)
+		*bufcntp += snprintf (bufp + *bufcntp, bufsize - *bufcntp,
 				      "r%db", 8 + (modrm & 7));
 	      else
 		{
@@ -1002,16 +1292,16 @@ FCT_mod$r_m$w (struct output_data *d)
 	}
       else
 	{
-	  int is_16bit = (prefixes & has_data16) != 0;
+	  int is_16bit = (*prefixes & has_data16) != 0;
 
 	  bufp[(*bufcntp)++] = '%';
 
 	  char *cp;
 #ifdef X86_64
-	  if ((prefixes & has_rex_b) != 0 && !is_16bit)
+	  if ((*prefixes & has_rex_b) != 0 && !is_16bit)
 	    {
 	      cp = stpcpy (&bufp[*bufcntp], hiregs[modrm & 7]);
-	      if ((prefixes & has_rex_w) == 0)
+	      if ((*prefixes & has_rex_w) == 0)
 		*cp++ = 'd';
 	    }
 	  else
@@ -1019,7 +1309,7 @@ FCT_mod$r_m$w (struct output_data *d)
 	    {
 	      cp = stpcpy (&bufp[*bufcntp], dregs[modrm & 7] + is_16bit);
 #ifdef X86_64
-	      if ((prefixes & has_rex_w) != 0)
+	      if ((*prefixes & has_rex_w) != 0)
 		bufp[*bufcntp] = 'r';
 #endif
 	    }
@@ -1028,250 +1318,361 @@ FCT_mod$r_m$w (struct output_data *d)
       return 0;
     }
 
-  return general_mod$r_m (d);
+  return general_mod$r_m (addr, prefixes, op1str, opoff1, opoff2, opoff3, bufp,
+			  bufcntp, bufsize, data, param_start, end,
+			  symcb, symcbarg);
 }
 
 
 static int
-FCT_mod$8r_m (struct output_data *d)
+FCT_mod$8r_m (GElf_Addr addr __attribute__ ((unused)),
+	      int *prefixes __attribute__ ((unused)),
+	      const char *op1str __attribute__ ((unused)),
+	      size_t opoff1 __attribute__ ((unused)),
+	      size_t opoff2 __attribute__ ((unused)),
+	      size_t opoff3 __attribute__ ((unused)),
+	      char *bufp __attribute__ ((unused)),
+	      size_t *bufcntp __attribute__ ((unused)),
+	      size_t bufsize __attribute__ ((unused)),
+	      const uint8_t *data __attribute__ ((unused)),
+	      const uint8_t **param_start __attribute__ ((unused)),
+	      const uint8_t *end __attribute__ ((unused)),
+	      DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	      void *symcbarg __attribute__ ((unused)))
 {
-  assert (d->opoff1 % 8 == 0);
-  uint_fast8_t modrm = d->data[d->opoff1 / 8];
+  assert (opoff1 % 8 == 0);
+  uint_fast8_t modrm = data[opoff1 / 8];
   if ((modrm & 0xc0) == 0xc0)
     {
-      size_t *bufcntp = d->bufcntp;
-      char *bufp = d->bufp;
-      if (*bufcntp + 3 > d->bufsize)
-	return *bufcntp + 3 - d->bufsize;
+      if (*bufcntp + 3 > bufsize)
+	return *bufcntp + 3 - bufsize;
       bufp[(*bufcntp)++] = '%';
       bufp[(*bufcntp)++] = "acdb"[modrm & 3];
       bufp[(*bufcntp)++] = "lh"[(modrm & 4) >> 2];
       return 0;
     }
 
-  return general_mod$r_m (d);
+  return general_mod$r_m (addr, prefixes, op1str, opoff1, opoff2, opoff3, bufp,
+			  bufcntp, bufsize, data, param_start, end,
+			  symcb, symcbarg);
 }
 
-
 static int
-FCT_mod$16r_m (struct output_data *d)
+FCT_mod$16r_m (GElf_Addr addr __attribute__ ((unused)),
+	       int *prefixes __attribute__ ((unused)),
+	       const char *op1str __attribute__ ((unused)),
+	       size_t opoff1 __attribute__ ((unused)),
+	       size_t opoff2 __attribute__ ((unused)),
+	       size_t opoff3 __attribute__ ((unused)),
+	       char *bufp __attribute__ ((unused)),
+	       size_t *bufcntp __attribute__ ((unused)),
+	       size_t bufsize __attribute__ ((unused)),
+	       const uint8_t *data __attribute__ ((unused)),
+	       const uint8_t **param_start __attribute__ ((unused)),
+	       const uint8_t *end __attribute__ ((unused)),
+	       DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	       void *symcbarg __attribute__ ((unused)))
 {
-  assert (d->opoff1 % 8 == 0);
-  uint_fast8_t modrm = d->data[d->opoff1 / 8];
+  assert (opoff1 % 8 == 0);
+  uint_fast8_t modrm = data[opoff1 / 8];
   if ((modrm & 0xc0) == 0xc0)
     {
-      assert (d->opoff1 / 8 == d->opoff2 / 8);
-      //uint_fast8_t byte = data[opoff2 / 8] & 7;
-      uint_fast8_t byte = modrm & 7;
-
-      size_t *bufcntp = d->bufcntp;
-      if (*bufcntp + 3 > d->bufsize)
-	return *bufcntp + 3 - d->bufsize;
-      d->bufp[(*bufcntp)++] = '%';
-      memcpy (&d->bufp[*bufcntp], dregs[byte] + 1, sizeof (dregs[0]) - 1);
+      uint_fast8_t byte = data[opoff1 / 8] & 7;
+      if (*bufcntp + 3 > bufsize)
+	return *bufcntp + 3 - bufsize;
+      bufp[(*bufcntp)++] = '%';
+      memcpy (&bufp[*bufcntp], dregs[byte] + 1, sizeof (dregs[0]) - 1);
       *bufcntp += 2;
       return 0;
     }
 
-  return general_mod$r_m (d);
+  return general_mod$r_m (addr, prefixes, op1str, opoff1, opoff2, opoff3, bufp,
+			  bufcntp, bufsize, data, param_start, end,
+			  symcb, symcbarg);
 }
-
 
 #ifdef X86_64
 static int
-FCT_mod$64r_m (struct output_data *d)
+FCT_mod$64r_m (GElf_Addr addr __attribute__ ((unused)),
+	       int *prefixes __attribute__ ((unused)),
+	       const char *op1str __attribute__ ((unused)),
+	       size_t opoff1 __attribute__ ((unused)),
+	       size_t opoff2 __attribute__ ((unused)),
+	       size_t opoff3 __attribute__ ((unused)),
+	       char *bufp __attribute__ ((unused)),
+	       size_t *bufcntp __attribute__ ((unused)),
+	       size_t bufsize __attribute__ ((unused)),
+	       const uint8_t *data __attribute__ ((unused)),
+	       const uint8_t **param_start __attribute__ ((unused)),
+	       const uint8_t *end __attribute__ ((unused)),
+	       DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	       void *symcbarg __attribute__ ((unused)))
 {
-  assert (d->opoff1 % 8 == 0);
-  uint_fast8_t modrm = d->data[d->opoff1 / 8];
+  assert (opoff1 % 8 == 0);
+  uint_fast8_t modrm = data[opoff1 / 8];
   if ((modrm & 0xc0) == 0xc0)
     {
-      assert (d->opoff1 / 8 == d->opoff2 / 8);
-      //uint_fast8_t byte = data[opoff2 / 8] & 7;
-      uint_fast8_t byte = modrm & 7;
-
-      size_t *bufcntp = d->bufcntp;
-      if (*bufcntp + 4 > d->bufsize)
-	return *bufcntp + 4 - d->bufsize;
-      char *cp = &d->bufp[*bufcntp];
+      uint_fast8_t byte = data[opoff1 / 8] & 7;
+      if (*bufcntp + 4 > bufsize)
+	return *bufcntp + 4 - bufsize;
+      char *cp = &bufp[*bufcntp];
       *cp++ = '%';
-      cp = stpcpy (cp,
-		   (*d->prefixes & has_rex_b) ? hiregs[byte] : aregs[byte]);
-      *bufcntp = cp - d->bufp;
+      cp = stpcpy (cp, (*prefixes & has_rex_b) ? hiregs[byte] : aregs[byte]);
+      *bufcntp = cp - bufp;
       return 0;
     }
 
-  return general_mod$r_m (d);
+  return general_mod$r_m (addr, prefixes, op1str, opoff1, opoff2, opoff3, bufp,
+			  bufcntp, bufsize, data, param_start, end,
+			  symcb, symcbarg);
 }
 #else
 static typeof (FCT_mod$r_m) FCT_mod$64r_m __attribute__ ((alias ("FCT_mod$r_m")));
 #endif
 
-
 static int
-FCT_reg (struct output_data *d)
+FCT_reg (GElf_Addr addr __attribute__ ((unused)),
+	 int *prefixes __attribute__ ((unused)),
+	 const char *op1str __attribute__ ((unused)),
+	 size_t opoff1 __attribute__ ((unused)),
+	 size_t opoff2 __attribute__ ((unused)),
+	 size_t opoff3 __attribute__ ((unused)),
+	 char *bufp __attribute__ ((unused)),
+	 size_t *bufcntp __attribute__ ((unused)),
+	 size_t bufsize __attribute__ ((unused)),
+	 const uint8_t *data __attribute__ ((unused)),
+	 const uint8_t **param_start __attribute__ ((unused)),
+	 const uint8_t *end __attribute__ ((unused)),
+	 DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	 void *symcbarg __attribute__ ((unused)))
 {
-  uint_fast8_t byte = d->data[d->opoff1 / 8];
-  assert (d->opoff1 % 8 + 3 <= 8);
-  byte >>= 8 - (d->opoff1 % 8 + 3);
+  uint_fast8_t byte = data[opoff1 / 8];
+  assert (opoff1 % 8 + 3 <= 8);
+  byte >>= 8 - (opoff1 % 8 + 3);
   byte &= 7;
-  int is_16bit = (*d->prefixes & has_data16) != 0;
-  size_t *bufcntp = d->bufcntp;
-  if (*bufcntp + 5 > d->bufsize)
-    return *bufcntp + 5 - d->bufsize;
-  d->bufp[(*bufcntp)++] = '%';
+  int is_16bit = (*prefixes & has_data16) != 0;
+  if (*bufcntp + 5 > bufsize)
+    return *bufcntp + 5 - bufsize;
+  bufp[(*bufcntp)++] = '%';
 #ifdef X86_64
-  if ((*d->prefixes & has_rex_r) != 0 && !is_16bit)
+  if ((*prefixes & has_rex_r) != 0 && !is_16bit)
     {
-      *bufcntp += snprintf (&d->bufp[*bufcntp], d->bufsize - *bufcntp, "r%d",
+      *bufcntp += snprintf (&bufp[*bufcntp], bufsize - *bufcntp, "r%d",
 			    8 + byte);
-      if ((*d->prefixes & has_rex_w) == 0)
-	d->bufp[(*bufcntp)++] = 'd';
+      if ((*prefixes & has_rex_w) == 0)
+	bufp[(*bufcntp)++] = 'd';
     }
   else
 #endif
     {
-      memcpy (&d->bufp[*bufcntp], dregs[byte] + is_16bit, 3 - is_16bit);
+      memcpy (&bufp[*bufcntp], dregs[byte] + is_16bit, 3 - is_16bit);
 #ifdef X86_64
-      if ((*d->prefixes & has_rex_w) != 0 && !is_16bit)
-	d->bufp[*bufcntp] = 'r';
+      if ((*prefixes & has_rex_w) != 0 && !is_16bit)
+	bufp[*bufcntp] = 'r';
 #endif
       *bufcntp += 3 - is_16bit;
     }
   return 0;
 }
 
-
 static int
-FCT_reg64 (struct output_data *d)
+FCT_reg64 (GElf_Addr addr __attribute__ ((unused)),
+	   int *prefixes __attribute__ ((unused)),
+	   const char *op1str __attribute__ ((unused)),
+	   size_t opoff1 __attribute__ ((unused)),
+	   size_t opoff2 __attribute__ ((unused)),
+	   size_t opoff3 __attribute__ ((unused)),
+	   char *bufp __attribute__ ((unused)),
+	   size_t *bufcntp __attribute__ ((unused)),
+	   size_t bufsize __attribute__ ((unused)),
+	   const uint8_t *data __attribute__ ((unused)),
+	   const uint8_t **param_start __attribute__ ((unused)),
+	   const uint8_t *end __attribute__ ((unused)),
+	   DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	   void *symcbarg __attribute__ ((unused)))
 {
-  uint_fast8_t byte = d->data[d->opoff1 / 8];
-  assert (d->opoff1 % 8 + 3 <= 8);
-  byte >>= 8 - (d->opoff1 % 8 + 3);
+  uint_fast8_t byte = data[opoff1 / 8];
+  assert (opoff1 % 8 + 3 <= 8);
+  byte >>= 8 - (opoff1 % 8 + 3);
   byte &= 7;
-  if ((*d->prefixes & has_data16) != 0)
+  if ((*prefixes & has_data16) != 0)
     return -1;
-  size_t *bufcntp = d->bufcntp;
-  if (*bufcntp + 5 > d->bufsize)
-    return *bufcntp + 5 - d->bufsize;
-  d->bufp[(*bufcntp)++] = '%';
+  if (*bufcntp + 5 > bufsize)
+    return *bufcntp + 5 - bufsize;
+  bufp[(*bufcntp)++] = '%';
 #ifdef X86_64
-  if ((*d->prefixes & has_rex_r) != 0)
+  if ((*prefixes & has_rex_r) != 0)
     {
-      *bufcntp += snprintf (&d->bufp[*bufcntp], d->bufsize - *bufcntp, "r%d",
+      *bufcntp += snprintf (&bufp[*bufcntp], bufsize - *bufcntp, "r%d",
 			    8 + byte);
-      if ((*d->prefixes & has_rex_w) == 0)
-	d->bufp[(*bufcntp)++] = 'd';
+      if ((*prefixes & has_rex_w) == 0)
+	bufp[(*bufcntp)++] = 'd';
     }
   else
 #endif
     {
-      memcpy (&d->bufp[*bufcntp], aregs[byte], 3);
+      memcpy (&bufp[*bufcntp], aregs[byte], 3);
       *bufcntp += 3;
     }
   return 0;
 }
 
-
 static int
-FCT_reg$w (struct output_data *d)
+FCT_reg$w (GElf_Addr addr __attribute__ ((unused)),
+	   int *prefixes __attribute__ ((unused)),
+	   const char *op1str __attribute__ ((unused)),
+	   size_t opoff1 __attribute__ ((unused)),
+	   size_t opoff2 __attribute__ ((unused)),
+	   size_t opoff3 __attribute__ ((unused)),
+	   char *bufp __attribute__ ((unused)),
+	   size_t *bufcntp __attribute__ ((unused)),
+	   size_t bufsize __attribute__ ((unused)),
+	   const uint8_t *data __attribute__ ((unused)),
+	   const uint8_t **param_start __attribute__ ((unused)),
+	   const uint8_t *end __attribute__ ((unused)),
+	   DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	   void *symcbarg __attribute__ ((unused)))
 {
-  if (d->data[d->opoff2 / 8] & (1 << (7 - (d->opoff2 & 7))))
-    return FCT_reg (d);
-
-  uint_fast8_t byte = d->data[d->opoff1 / 8];
-  assert (d->opoff1 % 8 + 3 <= 8);
-  byte >>= 8 - (d->opoff1 % 8 + 3);
+  if (data[opoff2 / 8] & (1 << (7 - (opoff2 & 7))))
+    return FCT_reg (addr, prefixes, op1str, opoff1, opoff2, opoff3, bufp,
+		    bufcntp, bufsize, data, param_start, end, symcb, symcbarg);
+  uint_fast8_t byte = data[opoff1 / 8];
+  assert (opoff1 % 8 + 3 <= 8);
+  byte >>= 8 - (opoff1 % 8 + 3);
   byte &= 7;
 
-  size_t *bufcntp = d->bufcntp;
-  if (*bufcntp + 4 > d->bufsize)
-    return *bufcntp + 4 - d->bufsize;
+  if (*bufcntp + 4 > bufsize)
+    return *bufcntp + 4 - bufsize;
 
-  d->bufp[(*bufcntp)++] = '%';
+  bufp[(*bufcntp)++] = '%';
 
 #ifdef X86_64
-  if (*d->prefixes & has_rex)
+  if (*prefixes & has_rex)
     {
-      if (*d->prefixes & has_rex_r)
-	*bufcntp += snprintf (d->bufp + *bufcntp, d->bufsize - *bufcntp,
+      if (*prefixes & has_rex_r)
+	*bufcntp += snprintf (bufp + *bufcntp, bufsize - *bufcntp,
 			      "r%db", 8 + byte);
       else
 	{
-	  char* cp = stpcpy (d->bufp + *bufcntp, rex_8bit[byte]);
+	  char* cp = stpcpy (bufp + *bufcntp, rex_8bit[byte]);
 	  *cp++ = 'l';
-	  *bufcntp = cp - d->bufp;
+	  *bufcntp = cp - bufp;
 	}
     }
   else
 #endif
     {
-      d->bufp[(*bufcntp)++] = "acdb"[byte & 3];
-      d->bufp[(*bufcntp)++] = "lh"[byte >> 2];
+      bufp[(*bufcntp)++] = "acdb"[byte & 3];
+      bufp[(*bufcntp)++] = "lh"[byte >> 2];
     }
   return 0;
 }
 
-
 static int
-FCT_freg (struct output_data *d)
+FCT_freg (GElf_Addr addr __attribute__ ((unused)),
+	  int *prefixes __attribute__ ((unused)),
+	  const char *op1str __attribute__ ((unused)),
+	  size_t opoff1 __attribute__ ((unused)),
+	  size_t opoff2 __attribute__ ((unused)),
+	  size_t opoff3 __attribute__ ((unused)),
+	  char *bufp __attribute__ ((unused)),
+	  size_t *bufcntp __attribute__ ((unused)),
+	  size_t bufsize __attribute__ ((unused)),
+	  const uint8_t *data __attribute__ ((unused)),
+	  const uint8_t **param_start __attribute__ ((unused)),
+	  const uint8_t *end __attribute__ ((unused)),
+	  DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	  void *symcbarg __attribute__ ((unused)))
 {
-  assert (d->opoff1 / 8 == 1);
-  assert (d->opoff1 % 8 == 5);
-  size_t *bufcntp = d->bufcntp;
-  size_t avail = d->bufsize - *bufcntp;
-  int needed = snprintf (&d->bufp[*bufcntp], avail, "%%st(%" PRIx32 ")",
-			 (uint32_t) (d->data[1] & 7));
+  assert (opoff1 / 8 == 1);
+  assert (opoff1 % 8 == 5);
+  size_t avail = bufsize - *bufcntp;
+  int needed = snprintf (&bufp[*bufcntp], avail, "%%st(%" PRIx32 ")",
+			 (uint32_t) (data[1] & 7));
   if ((size_t) needed > avail)
     return (size_t) needed - avail;
   *bufcntp += needed;
   return 0;
 }
 
-
 #ifndef X86_64
 static int
-FCT_reg16 (struct output_data *d)
+FCT_reg16 (GElf_Addr addr __attribute__ ((unused)),
+	   int *prefixes __attribute__ ((unused)),
+	   const char *op1str __attribute__ ((unused)),
+	   size_t opoff1 __attribute__ ((unused)),
+	   size_t opoff2 __attribute__ ((unused)),
+	   size_t opoff3 __attribute__ ((unused)),
+	   char *bufp __attribute__ ((unused)),
+	   size_t *bufcntp __attribute__ ((unused)),
+	   size_t bufsize __attribute__ ((unused)),
+	   const uint8_t *data __attribute__ ((unused)),
+	   const uint8_t **param_start __attribute__ ((unused)),
+	   const uint8_t *end __attribute__ ((unused)),
+	   DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	   void *symcbarg __attribute__ ((unused)))
 {
-  if (*d->prefixes & has_data16)
+  if (*prefixes & has_data16)
     return -1;
 
-  *d->prefixes |= has_data16;
-  return FCT_reg (d);
+  *prefixes |= has_data16;
+  return FCT_reg (addr, prefixes, op1str, opoff1, opoff2, opoff3, bufp,
+		  bufcntp, bufsize, data, param_start, end, symcb, symcbarg);
 }
 #endif
 
-
 static int
-FCT_sel (struct output_data *d)
+FCT_sel (GElf_Addr addr __attribute__ ((unused)),
+	 int *prefixes __attribute__ ((unused)),
+	 const char *op1str __attribute__ ((unused)),
+	 size_t opoff1 __attribute__ ((unused)),
+	 size_t opoff2 __attribute__ ((unused)),
+	 size_t opoff3 __attribute__ ((unused)),
+	 char *bufp __attribute__ ((unused)),
+	 size_t *bufcntp __attribute__ ((unused)),
+	 size_t bufsize __attribute__ ((unused)),
+	 const uint8_t *data __attribute__ ((unused)),
+	 const uint8_t **param_start __attribute__ ((unused)),
+	 const uint8_t *end __attribute__ ((unused)),
+	 DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	 void *symcbarg __attribute__ ((unused)))
 {
-  assert (d->opoff1 % 8 == 0);
-  assert (d->opoff1 / 8 == 5);
-  if (*d->param_start + 2 > d->end)
+  assert (opoff1 % 8 == 0);
+  assert (opoff1 / 8 == 5);
+  if (*param_start + 2 > end)
     return -1;
-  *d->param_start += 2;
-  uint16_t absval = read_2ubyte_unaligned (&d->data[5]);
-
-  size_t *bufcntp = d->bufcntp;
-  size_t avail = d->bufsize - *bufcntp;
-  int needed = snprintf (&d->bufp[*bufcntp], avail, "$0x%" PRIx16, absval);
+  *param_start += 2;
+  uint16_t absval = read_2ubyte_unaligned (&data[5]);
+  size_t avail = bufsize - *bufcntp;
+  int needed = snprintf (&bufp[*bufcntp], avail, "$0x%" PRIx16, absval);
   if ((size_t) needed > avail)
     return needed - avail;
   *bufcntp += needed;
   return 0;
 }
 
-
 static int
-FCT_sreg2 (struct output_data *d)
+FCT_sreg2 (GElf_Addr addr __attribute__ ((unused)),
+	   int *prefixes __attribute__ ((unused)),
+	   const char *op1str __attribute__ ((unused)),
+	   size_t opoff1 __attribute__ ((unused)),
+	   size_t opoff2 __attribute__ ((unused)),
+	   size_t opoff3 __attribute__ ((unused)),
+	   char *bufp __attribute__ ((unused)),
+	   size_t *bufcntp __attribute__ ((unused)),
+	   size_t bufsize __attribute__ ((unused)),
+	   const uint8_t *data __attribute__ ((unused)),
+	   const uint8_t **param_start __attribute__ ((unused)),
+	   const uint8_t *end __attribute__ ((unused)),
+	   DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	   void *symcbarg __attribute__ ((unused)))
 {
-  uint_fast8_t byte = d->data[d->opoff1 / 8];
-  assert (d->opoff1 % 8 + 3 <= 8);
-  byte >>= 8 - (d->opoff1 % 8 + 2);
+  uint_fast8_t byte = data[opoff1 / 8];
+  assert (opoff1 % 8 + 3 <= 8);
+  byte >>= 8 - (opoff1 % 8 + 2);
 
-  size_t *bufcntp = d->bufcntp;
-  char *bufp = d->bufp;
-  if (*bufcntp + 3 > d->bufsize)
-    return *bufcntp + 3 - d->bufsize;
+  if (*bufcntp + 3 > bufsize)
+    return *bufcntp + 3 - bufsize;
 
   bufp[(*bufcntp)++] = '%';
   bufp[(*bufcntp)++] = "ecsd"[byte & 3];
@@ -1280,21 +1681,31 @@ FCT_sreg2 (struct output_data *d)
   return 0;
 }
 
-
 static int
-FCT_sreg3 (struct output_data *d)
+FCT_sreg3 (GElf_Addr addr __attribute__ ((unused)),
+	   int *prefixes __attribute__ ((unused)),
+	   const char *op1str __attribute__ ((unused)),
+	   size_t opoff1 __attribute__ ((unused)),
+	   size_t opoff2 __attribute__ ((unused)),
+	   size_t opoff3 __attribute__ ((unused)),
+	   char *bufp __attribute__ ((unused)),
+	   size_t *bufcntp __attribute__ ((unused)),
+	   size_t bufsize __attribute__ ((unused)),
+	   const uint8_t *data __attribute__ ((unused)),
+	   const uint8_t **param_start __attribute__ ((unused)),
+	   const uint8_t *end __attribute__ ((unused)),
+	   DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	   void *symcbarg __attribute__ ((unused)))
 {
-  uint_fast8_t byte = d->data[d->opoff1 / 8];
-  assert (d->opoff1 % 8 + 4 <= 8);
-  byte >>= 8 - (d->opoff1 % 8 + 3);
+  uint_fast8_t byte = data[opoff1 / 8];
+  assert (opoff1 % 8 + 4 <= 8);
+  byte >>= 8 - (opoff1 % 8 + 3);
 
   if ((byte & 7) >= 6)
     return -1;
 
-  size_t *bufcntp = d->bufcntp;
-  char *bufp = d->bufp;
-  if (*bufcntp + 3 > d->bufsize)
-    return *bufcntp + 3 - d->bufsize;
+  if (*bufcntp + 3 > bufsize)
+    return *bufcntp + 3 - bufsize;
 
   bufp[(*bufcntp)++] = '%';
   bufp[(*bufcntp)++] = "ecsdfg"[byte & 7];
@@ -1303,24 +1714,46 @@ FCT_sreg3 (struct output_data *d)
   return 0;
 }
 
-
 static int
-FCT_string (struct output_data *d __attribute__ ((unused)))
+FCT_string (GElf_Addr addr __attribute__ ((unused)),
+	    int *prefixes __attribute__ ((unused)),
+	    const char *op1str __attribute__ ((unused)),
+	    size_t opoff1 __attribute__ ((unused)),
+	    size_t opoff2 __attribute__ ((unused)),
+	    size_t opoff3 __attribute__ ((unused)),
+	    char *bufp __attribute__ ((unused)),
+	    size_t *bufcntp __attribute__ ((unused)),
+	    size_t bufsize __attribute__ ((unused)),
+	    const uint8_t *data __attribute__ ((unused)),
+	    const uint8_t **param_start __attribute__ ((unused)),
+	    const uint8_t *end __attribute__ ((unused)),
+	    DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	    void *symcbarg __attribute__ ((unused)))
 {
   return 0;
 }
 
-
 static int
-FCT_xmmreg (struct output_data *d)
+FCT_xmmreg (GElf_Addr addr __attribute__ ((unused)),
+	    int *prefixes __attribute__ ((unused)),
+	    const char *op1str __attribute__ ((unused)),
+	    size_t opoff1 __attribute__ ((unused)),
+	    size_t opoff2 __attribute__ ((unused)),
+	    size_t opoff3 __attribute__ ((unused)),
+	    char *bufp __attribute__ ((unused)),
+	    size_t *bufcntp __attribute__ ((unused)),
+	    size_t bufsize __attribute__ ((unused)),
+	    const uint8_t *data __attribute__ ((unused)),
+	    const uint8_t **param_start __attribute__ ((unused)),
+	    const uint8_t *end __attribute__ ((unused)),
+	    DisasmGetSymCB_t symcb __attribute__ ((unused)),
+	    void *symcbarg __attribute__ ((unused)))
 {
-  uint_fast8_t byte = d->data[d->opoff1 / 8];
-  assert (d->opoff1 % 8 == 2 || d->opoff1 % 8 == 5);
-  byte = (byte >> (5 - d->opoff1 % 8)) & 7;
-
-  size_t *bufcntp = d->bufcntp;
-  size_t avail = d->bufsize - *bufcntp;
-  int needed = snprintf (&d->bufp[*bufcntp], avail, "%%xmm%" PRIxFAST8, byte);
+  uint_fast8_t byte = data[opoff1 / 8];
+  assert (opoff1 % 8 == 2 || opoff1 % 8 == 5);
+  byte = (byte >> (5 - opoff1 % 8)) & 7;
+  size_t avail = bufsize - *bufcntp;
+  int needed = snprintf (&bufp[*bufcntp], avail, "%%xmm%" PRIxFAST8, byte);
   if ((size_t) needed > avail)
     return needed - avail;
   *bufcntp += needed;

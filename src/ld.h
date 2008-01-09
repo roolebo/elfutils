@@ -1,4 +1,4 @@
-/* Copyright (C) 2001, 2002, 2003, 2005, 2006 Red Hat, Inc.
+/* Copyright (C) 2001, 2002, 2003, 2005, 2006, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -1087,6 +1087,9 @@ extern bool dynamically_linked_p (void);
 
 /* Checked whether the symbol is undefined and referenced from a DSO.  */
 extern bool linked_from_dso_p (struct scninfo *scninfo, size_t symidx);
+#ifdef __GNUC_STDC_INLINE__
+__attribute__ ((__gnu_inline__))
+#endif
 extern inline bool
 linked_from_dso_p (struct scninfo *scninfo, size_t symidx)
 {

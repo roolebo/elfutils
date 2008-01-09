@@ -1,5 +1,5 @@
 /* Common definitions for handling files in memory or only on disk.
-   Copyright (C) 1998, 1999, 2000, 2002, 2005 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2005, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -59,6 +59,7 @@
 
 
 static inline Elf_Kind
+__attribute__ ((unused))
 determine_kind (void *buf, size_t len)
 {
   /* First test for an archive.  */
@@ -86,6 +87,7 @@ determine_kind (void *buf, size_t len)
 
 /* Allocate an Elf descriptor and fill in the generic information.  */
 static inline Elf *
+__attribute__ ((unused))
 allocate_elf (int fildes, void *map_address, off_t offset, size_t maxsize,
               Elf_Cmd cmd, Elf *parent, Elf_Kind kind, size_t extra)
 {
@@ -112,6 +114,7 @@ allocate_elf (int fildes, void *map_address, off_t offset, size_t maxsize,
 
 /* Acquire lock for the descriptor and all children.  */
 static void
+__attribute__ ((unused))
 libelf_acquire_all (Elf *elf)
 {
   rwlock_wrlock (elf->lock);
@@ -131,6 +134,7 @@ libelf_acquire_all (Elf *elf)
 
 /* Release own lock and those of the children.  */
 static void
+__attribute__ ((unused))
 libelf_release_all (Elf *elf)
 {
   if (elf->kind == ELF_K_AR)

@@ -1,3 +1,13 @@
+2008-01-04  Roland McGrath  <roland@redhat.com>
+
+	* strip.c (handle_elf): Move SHDRIDX defn to silence gcc warning.
+
+2008-01-03  Roland McGrath  <roland@redhat.com>
+
+	* ld.h (linked_from_dso_p): Use __attribute__ ((__gnu_inline__)).
+
+	* elflint.c (check_dynamic): Remove duplicate initializer.
+
 2008-01-02  Ulrich Drepper  <drepper@redhat.com>
 
 	* addr2line.c: Update copyright year.

@@ -184,25 +184,6 @@ static const char *prefix_str[] =
 #endif
 
 
-struct output_data
-{
-  GElf_Addr addr;
-  int *prefixes;
-  const char *op1str;
-  size_t opoff1;
-  size_t opoff2;
-  size_t opoff3;
-  char *bufp;
-  size_t *bufcntp;
-  size_t bufsize;
-  const uint8_t *data;
-  const uint8_t **param_start;
-  const uint8_t *end;
-  DisasmGetSymCB_t symcb;
-  void *symcbarg;
-};
-
-
 #ifndef DISFILE
 # define DISFILE "i386_dis.h"
 #endif
@@ -423,7 +404,6 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		  break;
 		default:
 		  /* Cannot happen.  */
-		  puts ("unknown prefix");
 		  abort ();
 		}
 	      data = begin + 1;
@@ -469,20 +449,6 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 	      if (unlikely (param_start > end))
 		goto not;
 	    }
-
-	  struct output_data output_data =
-	    {
-	      .addr = addr + (data - begin),
-	      .prefixes = &prefixes,
-	      .bufp = buf,
-	      .bufcntp = &bufcnt,
-	      .bufsize = bufsize,
-	      .data = data,
-	      .param_start = &param_start,
-	      .end = end,
-	      .symcb = symcb,
-	      .symcbarg = symcbarg
-	    };
 
 	  unsigned long string_end_idx = 0;
 	  while (*fmt != '\0')
@@ -707,14 +673,21 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		      if (instrtab[cnt].str1 != 0)
 			ADD_STRING (op1_str[instrtab[cnt].str1]);
 
-		      output_data.op1str = op1_str[instrtab[cnt].str1];
-		      output_data.opoff1 = (instrtab[cnt].off1_1
-					    + OFF1_1_BIAS - opoff);
-		      output_data.opoff2 = (instrtab[cnt].off1_2
-					    + OFF1_2_BIAS - opoff);
-		      output_data.opoff3 = (instrtab[cnt].off1_3
-					    + OFF1_3_BIAS - opoff);
-		      int r = op1_fct[instrtab[cnt].fct1] (&output_data);
+		      int r = op1_fct[instrtab[cnt].fct1] (addr
+							   + (data - begin),
+							   &prefixes,
+#ifdef STR1_BITS
+							   op1_str[instrtab[cnt].str1],
+#else
+							   NULL,
+#endif
+							   instrtab[cnt].off1_1 + OFF1_1_BIAS - opoff,
+							   instrtab[cnt].off1_2 + OFF1_2_BIAS - opoff,
+							   instrtab[cnt].off1_3 + OFF1_3_BIAS - opoff,
+							   buf, &bufcnt, bufsize,
+							   data, &param_start,
+							   end,
+							   symcb, symcbarg);
 		      if (r < 0)
 			goto not;
 		      if (r > 0)
@@ -725,17 +698,28 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		  else if (prec == 2 && instrtab[cnt].fct2 != 0)
 		    {
 		      /* Second parameter.  */
+#ifdef STR2_BITS
+		      // XXX Probably not needed once the instruction
+		      // XXX tables are complete
 		      if (instrtab[cnt].str2 != 0)
 			ADD_STRING (op2_str[instrtab[cnt].str2]);
+#endif
 
-		      output_data.op1str = op2_str[instrtab[cnt].str2];
-		      output_data.opoff1 = (instrtab[cnt].off2_1
-					    + OFF2_1_BIAS - opoff);
-		      output_data.opoff2 = (instrtab[cnt].off2_2
-					    + OFF2_2_BIAS - opoff);
-		      output_data.opoff3 = (instrtab[cnt].off2_3
-					    + OFF2_3_BIAS - opoff);
-		      int r = op2_fct[instrtab[cnt].fct2] (&output_data);
+		      int r = op2_fct[instrtab[cnt].fct2] (addr
+							   + (data - begin),
+							   &prefixes,
+#ifdef STR2_BITS
+							   op2_str[instrtab[cnt].str2],
+#else
+							   NULL,
+#endif
+							   instrtab[cnt].off2_1 + OFF2_1_BIAS - opoff,
+							   instrtab[cnt].off2_2 + OFF2_2_BIAS - opoff,
+							   instrtab[cnt].off2_3 + OFF2_3_BIAS - opoff,
+							   buf, &bufcnt, bufsize,
+							   data, &param_start,
+							   end,
+							   symcb, symcbarg);
 		      if (r < 0)
 			goto not;
 		      if (r > 0)
@@ -746,21 +730,36 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		  else if (prec == 3 && instrtab[cnt].fct3 != 0)
 		    {
 		      /* Third parameter.  */
+#ifdef STR3_BITS
+		      // XXX Probably not needed once the instruction
+		      // XXX tables are complete
 		      if (instrtab[cnt].str3 != 0)
 			ADD_STRING (op3_str[instrtab[cnt].str3]);
-
-		      output_data.op1str = op3_str[instrtab[cnt].str3];
-		      output_data.opoff1 = (instrtab[cnt].off3_1
-					    + OFF3_1_BIAS - opoff);
-		      output_data.opoff2 = (instrtab[cnt].off3_2
-					    + OFF3_2_BIAS - opoff);
-#ifdef OFF3_3_BITS
-		      output_data.opoff3 = (instrtab[cnt].off3_3
-					    + OFF3_3_BIAS - opoff);
-#else
-		      output_data.opoff3 = 0;
 #endif
-		      int r = op3_fct[instrtab[cnt].fct3] (&output_data);
+
+		      int r = op3_fct[instrtab[cnt].fct3] (addr
+							   + (data - begin),
+							   &prefixes,
+#ifdef STR3_BITS
+							   op3_str[instrtab[cnt].str3],
+#else
+							   NULL,
+#endif
+							   instrtab[cnt].off3_1 + OFF3_1_BIAS - opoff,
+#ifdef OFF3_2_BITS
+							   instrtab[cnt].off3_2 + OFF3_2_BIAS - opoff,
+#else
+							   0,
+#endif
+#ifdef OFF3_3_BITS
+							   instrtab[cnt].off3_3 + OFF3_3_BIAS - opoff,
+#else
+							   0,
+#endif
+							   buf, &bufcnt, bufsize,
+							   data, &param_start,
+							   end,
+							   symcb, symcbarg);
 		      if (r < 0)
 			goto not;
 		      if (r > 0)

@@ -507,7 +507,11 @@ FCT_ax (struct output_data *d)
 
   bufp[(*bufcntp)++] = '%';
   if (! is_16bit)
-    bufp[(*bufcntp)++] = 'e';
+    bufp[(*bufcntp)++] = (
+#ifdef X86_64
+			  (*d->prefixes & has_rex_w) ? 'r' :
+#endif
+			  'e');
   bufp[(*bufcntp)++] = 'a';
   bufp[(*bufcntp)++] = 'x';
 
@@ -694,8 +698,14 @@ FCT_imm (struct output_data *d)
     {
       if (*d->param_start + 4 > d->end)
 	return -1;
-      uint32_t word = read_4ubyte_unaligned_inc (*d->param_start);
-      needed = snprintf (&d->bufp[*bufcntp], avail, "$0x%" PRIx32, word);
+      int32_t word = read_4sbyte_unaligned_inc (*d->param_start);
+#ifdef X86_64
+      if (*d->prefixes & has_rex_w)
+	needed = snprintf (&d->bufp[*bufcntp], avail, "$0x%" PRIx64,
+			   (int64_t) word);
+      else
+#endif
+	needed = snprintf (&d->bufp[*bufcntp], avail, "$0x%" PRIx32, word);
     }
   if ((size_t) needed > avail)
     return (size_t) needed - avail;

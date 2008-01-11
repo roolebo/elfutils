@@ -429,7 +429,7 @@ ifdef(`i386',
 0000100{w},{mod}{reg}{r_m}:or {reg}{w},{mod}{r_m}{w}
 0000101{w},{mod}{reg}{r_m}:or {mod}{r_m}{w},{reg}{w}
 1000000{w},{mod}001{r_m},{imm}:or{w} {imm}{w},{mod}{r_m}{w}
-100000{s}{w},{mod}001{r_m},{imm}:or{w} {imm}{s},{mod}{r_m}{w}
+1000001{w},{mod}001{r_m},{imm8}:or{w} {imm8},{mod}{r_m}{w}
 0000110{w},{imm}:or {imm}{w},{ax}{w}
 1110011{w},{imm8}:out {ax}{w},{imm8}
 1110111{w}:out {ax}{w},{dx}

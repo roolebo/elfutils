@@ -1,3 +1,9 @@
+2008-01-11  Ulrich Drepper  <drepper@redhat.com>
+
+	* libasm.h (DisasmGetSymCB_t): Change type of fourth and fifth
+	parameter.
+	* disasm_cb.c: Adjust accordingly.
+
 2008-01-08  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am (euinclude): Variable removed.

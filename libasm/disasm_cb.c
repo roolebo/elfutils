@@ -1,4 +1,4 @@
-/* Copyright (C) 2005, 2007 Red Hat, Inc.
+/* Copyright (C) 2005, 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -42,7 +42,7 @@ struct symtoken
 
 static int
 default_elf_getsym (GElf_Addr addr, Elf32_Word scnndx, GElf_Addr value,
-		    char *buf, size_t buflen, void *arg)
+		    char **buf, size_t *buflen, void *arg)
 {
   struct symtoken *symtoken = (struct symtoken *) arg;
 
@@ -140,8 +140,8 @@ static int
 null_elf_getsym (GElf_Addr addr __attribute__ ((unused)),
 		 Elf32_Word scnndx __attribute__ ((unused)),
 		 GElf_Addr value __attribute__ ((unused)),
-		 char *buf __attribute__ ((unused)),
-		 size_t buflen __attribute__ ((unused)),
+		 char **buf __attribute__ ((unused)),
+		 size_t *buflen __attribute__ ((unused)),
 		 void *arg __attribute__ ((unused)))
 {
   return -1;

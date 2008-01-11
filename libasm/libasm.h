@@ -1,5 +1,5 @@
 /* Interface for libasm.
-   Copyright (C) 2002, 2005 Red Hat, Inc.
+   Copyright (C) 2002, 2005, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -52,8 +52,8 @@ typedef struct DisasmCtx DisasmCtx_t;
    symbol reference is in the section designated by the second parameter
    at an offset described by the first parameter.  The value is the
    third parameter.  */
-typedef int (*DisasmGetSymCB_t) (GElf_Addr, Elf32_Word, GElf_Addr, char *,
-				 size_t, void *);
+typedef int (*DisasmGetSymCB_t) (GElf_Addr, Elf32_Word, GElf_Addr, char **,
+				 size_t *, void *);
 
 /* Output function callback.  */
 typedef int (*DisasmOutputCB_t) (char *, size_t, void *);

@@ -234,17 +234,33 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 	     void *outcbarg, void *symcbarg)
 {
   const char *save_fmt = fmt;
+  char *labelbuf = NULL;
+  //size_t labelbufsize = 0;
 
+#define BUFSIZE 512
+  char initbuf[BUFSIZE];
+  int prefixes;
+  size_t bufcnt;
+  size_t bufsize = BUFSIZE;
+  char *buf = initbuf;
+  const uint8_t *param_start;
+
+  struct output_data output_data =
+    {
+      .prefixes = &prefixes,
+      .bufp = buf,
+      .bufsize = bufsize,
+      .bufcntp = &bufcnt,
+      .param_start = &param_start,
+      .end = end,
+      .symcb = symcb,
+      .symcbarg = symcbarg
+    };
+
+  int retval = 0;
   while (1)
     {
-#define BUFSIZE 512
-      const size_t bufsize = BUFSIZE;
-      char initbuf[BUFSIZE];
-      char *buf = initbuf;
-      size_t bufcnt = 0;
-
-      int prefixes = 0;
-      int last_prefix_bit = 0;
+      prefixes = 0;
 
       const uint8_t *data = *startp;
       const uint8_t *begin = data;
@@ -252,6 +268,7 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
       fmt = save_fmt;
 
       /* Recognize all prefixes.  */
+      int last_prefix_bit = 0;
       while (data < end)
 	{
 	  unsigned int i;
@@ -271,20 +288,41 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 	prefixes |= ((*data++) & 0xf) | has_rex;
 #endif
 
+      const uint8_t *curr = match_data;
+      const uint8_t *const match_end = match_data + sizeof (match_data);
+
       assert (data <= end);
       if (data == end)
 	{
 	  if (prefixes != 0)
 	    goto print_prefix;
 
-	  return -1;
+	  retval = -1;
+	  goto do_ret;
 	}
 
-      const uint8_t *curr = match_data;
-      const uint8_t *const match_end = match_data + sizeof (match_data);
+      if (0)
+	{
+	  /* Resize the buffer.  */
+	  char *oldbuf;
+	enomem:
+	  oldbuf = buf;
+	  if (buf == initbuf)
+	    buf = malloc (2 * bufsize);
+	  else
+	    buf = realloc (buf, 2 * bufsize);
+	  if (buf == NULL)
+	    {
+	      buf = oldbuf;
+	      retval = ENOMEM;
+	      goto do_ret;
+	    }
+	  bufsize *= 2;
 
-    enomem:
-      ;
+	  output_data.bufp = buf;
+	  output_data.bufsize = bufsize;
+	}
+      bufcnt = 0;
 
       size_t cnt = 0;
       while (curr < match_end)
@@ -326,7 +364,7 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 
 	      --avail;
 	      if (codep == end && avail > 0)
-		return 0;
+		goto do_ret;
 	    }
 	  while (avail > 0);
 
@@ -342,7 +380,7 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 	    /* There is not enough data for the entire instruction.  The
 	       caller can figure this out by looking at the pointer into
 	       the input data.  */
-	    return 0;
+	    goto do_ret;
 
 	  assert (correct_prefix == 0
 		  || (prefixes & correct_prefix) != 0);
@@ -437,7 +475,7 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 
 	  /* We have a match.  First determine how many bytes are
 	     needed for the adressing mode.  */
-	  const uint8_t *param_start = codep;
+	  param_start = codep;
 	  if (instrtab[cnt].modrm)
 	    {
 	      uint_fast8_t modrm = codep[-1];
@@ -470,19 +508,8 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		goto not;
 	    }
 
-	  struct output_data output_data =
-	    {
-	      .addr = addr + (data - begin),
-	      .prefixes = &prefixes,
-	      .bufp = buf,
-	      .bufcntp = &bufcnt,
-	      .bufsize = bufsize,
-	      .data = data,
-	      .param_start = &param_start,
-	      .end = end,
-	      .symcb = symcb,
-	      .symcbarg = symcbarg
-	    };
+	  output_data.addr = addr + (data - begin);
+	  output_data.data = data;
 
 	  unsigned long string_end_idx = 0;
 	  while (*fmt != '\0')
@@ -523,7 +550,8 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 			  break;
 
 			default:
-			  return EINVAL;
+			  retval = EINVAL;
+			  goto do_ret;
 			}
 		    }
 		  ADD_CHAR (ch);
@@ -813,10 +841,15 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 
     out:
       *startp = data;
-      int res = outcb (buf, strlen (buf), outcbarg);
-      if (res != 0)
-	return res;
+      retval = outcb (buf, strlen (buf), outcbarg);
+      if (retval != 0)
+	goto do_ret;
     }
 
-  return 0;
+ do_ret:
+  free (labelbuf);
+  if (buf != initbuf)
+    free (buf);
+
+  return retval;
 }

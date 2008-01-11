@@ -1,3 +1,8 @@
+2008-01-11  Ulrich Drepper  <drepper@redhat.com>
+
+	* i386_disasm.c (i386_disasm): Resize output buffer if necessary.
+	Optimize output_data initialization.  Free buffers before return.
+
 2008-01-10  Ulrich Drepper  <drepper@redhat.com>
 
 	* i386_data.h (FCT_crdb): New function.

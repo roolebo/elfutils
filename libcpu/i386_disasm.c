@@ -640,6 +640,10 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 			    {
 			      if (prefixes & has_data16)
 				ch = 'w';
+#ifdef X86_64
+			      else if (prefixes & has_rex_w)
+				ch = 'q';
+#endif
 			      else
 				ch = 'l';
 			    }

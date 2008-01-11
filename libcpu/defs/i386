@@ -71,7 +71,7 @@ ifdef(`i386',
 0001001{w},{mod}{reg}{r_m}:adc {mod}{r_m}{w},{reg}{w}
 0000010{w},{imm}:add {imm}{w},{ax}{w}
 1000000{w},{mod}000{r_m},{imm}:add{w} {imm}{w},{mod}{r_m}{w}
-10000011,{mod}000{r_m},{imms8}:add{w0} {imms8},{mod}{r_m}
+10000011,{mod}000{r_m},{imms8}:add{w} {imms8},{mod}{r_m}
 0000000{w},{mod}{reg}{r_m}:add {reg}{w},{mod}{r_m}{w}
 0000001{w},{mod}{reg}{r_m}:add {mod}{r_m}{w},{reg}{w}
 01100110,00001111,11010000,{Mod}{xmmreg}{R_m}:addsubpd {Mod}{R_m},{xmmreg}
@@ -124,7 +124,7 @@ ifdef(`i386',
 00001111,0100{tttn},{mod}{reg}{r_m}:cmov{tttn} {mod}{r_m},{reg}
 0011110{w},{imm}:cmp {imm}{w},{ax}{w}
 1000000{w},{mod}111{r_m},{imm}:cmp{w} {imm}{w},{mod}{r_m}{w}
-10000011,{mod}111{r_m},{imms8}:cmp{w0} {imms8},{mod}{r_m}
+10000011,{mod}111{r_m},{imms8}:cmp{w} {imms8},{mod}{r_m}
 0011100{w},{mod}{reg}{r_m}:cmp {reg}{w},{mod}{r_m}{w}
 0011101{w},{mod}{reg}{r_m}:cmp {mod}{r_m}{w},{reg}{w}
 ifdef(`ASSEMBLER',
@@ -429,7 +429,7 @@ ifdef(`i386',
 0000100{w},{mod}{reg}{r_m}:or {reg}{w},{mod}{r_m}{w}
 0000101{w},{mod}{reg}{r_m}:or {mod}{r_m}{w},{reg}{w}
 1000000{w},{mod}001{r_m},{imm}:or{w} {imm}{w},{mod}{r_m}{w}
-1000001{w},{mod}001{r_m},{imm8}:or{w} {imm8},{mod}{r_m}{w}
+1000001{w},{mod}001{r_m},{imms8}:or{w} {imms8},{mod}{r_m}{w}
 0000110{w},{imm}:or {imm}{w},{ax}{w}
 1110011{w},{imm8}:out {ax}{w},{imm8}
 1110111{w}:out {ax}{w},{dx}

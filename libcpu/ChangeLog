@@ -1,5 +1,7 @@
 2008-01-10  Ulrich Drepper  <drepper@redhat.com>
 
+	* defs/i386: Fix a few instructions with immediate arguments.
+
 	* i386_disasm.c: Rewrite interface to callback functions for operands
 	to take a single pointer to a structure.
 	* i386_data.h: Adjust all functions.

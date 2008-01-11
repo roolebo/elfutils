@@ -813,8 +813,15 @@ FCT_imms8 (struct output_data *d)
   if (*d->param_start >= d->end)
     return -1;
   int_fast8_t byte = *(*d->param_start)++;
-  int needed = snprintf (&d->bufp[*bufcntp], avail, "$0x%" PRIx32,
-			 (int32_t) byte);
+  int needed;
+#ifdef X86_64
+  if (*d->prefixes & has_rex_w)
+    needed = snprintf (&d->bufp[*bufcntp], avail, "$0x%" PRIx64,
+		       (int64_t) byte);
+  else
+#endif
+    needed = snprintf (&d->bufp[*bufcntp], avail, "$0x%" PRIx32,
+		       (int32_t) byte);
   if ((size_t) needed > avail)
     return (size_t) needed - avail;
   *bufcntp += needed;

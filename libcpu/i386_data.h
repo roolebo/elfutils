@@ -537,7 +537,8 @@ FCT_ax$w (struct output_data *d)
 
 
 static int
-FCT_ccc (struct output_data *d)
+__attribute__ ((noinline))
+FCT_crdb (struct output_data *d, const char *regstr)
 {
   if (*d->prefixes & has_data16)
     return -1;
@@ -548,8 +549,8 @@ FCT_ccc (struct output_data *d)
   assert (d->opoff1 / 8 == 2);
   assert (d->opoff1 % 8 == 2);
   size_t avail = d->bufsize - *bufcntp;
-  int needed = snprintf (&d->bufp[*bufcntp], avail, "%%cr%" PRIx32,
-			 (uint32_t) (d->data[d->opoff1 / 8] >> 3) & 7);
+  int needed = snprintf (&d->bufp[*bufcntp], avail, "%%%s%" PRIx32,
+			 regstr, (uint32_t) (d->data[d->opoff1 / 8] >> 3) & 7);
   if ((size_t) needed > avail)
     return needed - avail;
   *bufcntp += needed;
@@ -558,23 +559,16 @@ FCT_ccc (struct output_data *d)
 
 
 static int
+FCT_ccc (struct output_data *d)
+{
+  return FCT_crdb (d, "cr");
+}
+
+
+static int
 FCT_ddd (struct output_data *d)
 {
-  if (*d->prefixes & has_data16)
-    return -1;
-
-  size_t *bufcntp = d->bufcntp;
-
-  // XXX If this assert is true, use absolute offset below
-  assert (d->opoff1 / 8 == 2);
-  assert (d->opoff1 % 8 == 2);
-  size_t avail = d->bufsize - *bufcntp;
-  int needed = snprintf (&d->bufp[*bufcntp], avail, "%%db%" PRIx32,
-			 (uint32_t) (d->data[d->opoff1 / 8] >> 3) & 7);
-  if ((size_t) needed > avail)
-    return needed - avail;
-  *bufcntp += needed;
-  return 0;
+  return FCT_crdb (d, "db");
 }
 
 

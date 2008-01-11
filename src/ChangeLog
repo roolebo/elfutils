@@ -1,3 +1,8 @@
+2008-01-11  Ulrich Drepper  <drepper@redhat.com>
+
+	* objdump.c (show_disasm): Adjust disassembler format string for
+	removal of %e.
+
 2008-01-04  Roland McGrath  <roland@redhat.com>
 
 	* strip.c (handle_elf): Move SHDRIDX defn to silence gcc warning.

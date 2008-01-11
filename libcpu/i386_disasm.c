@@ -188,7 +188,6 @@ struct output_data
 {
   GElf_Addr addr;
   int *prefixes;
-  const char *op1str;
   size_t opoff1;
   size_t opoff2;
   size_t opoff3;
@@ -467,9 +466,6 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 	      data = begin + 1;
 	      ++addr;
 
-	      /* The string definitely fits.  */
-	      buf[bufcnt++] = '\0';
-
 	      goto out;
 	    }
 
@@ -659,6 +655,7 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		    {
 		    case suffix_none:
 		      break;
+
 		    case suffix_w:
 		      if ((codep[-1] & 0xc0) != 0xc0)
 			{
@@ -681,14 +678,17 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 			  ADD_CHAR (ch);
 			}
 		      break;
+
 		    case suffix_w0:
 		      if ((codep[-1] & 0xc0) != 0xc0)
 			ADD_CHAR ('l');
 		      break;
+
 		    case suffix_w1:
 		      if ((data[0] & 0x4) == 0)
 			ADD_CHAR ('l');
 		      break;
+
 		    case suffix_W:
 		      if (prefixes & has_data16)
 			{
@@ -700,6 +700,7 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 			ADD_CHAR ('q');
 #endif
 		      break;
+
 		    case suffix_W1:
 		      if (prefixes & has_data16)
 			{
@@ -720,10 +721,12 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 			};
 		      ADD_STRING (tttn[codep[-1 - instrtab[cnt].modrm] & 0x0f]);
 		      break;
+
 		    case suffix_D:
 		      if ((codep[-1] & 0xc0) != 0xc0)
 			ADD_CHAR ((data[0] & 0x04) == 0 ? 's' : 'l');
 		      break;
+
 		    default:
 		      printf("unknown suffix %d\n", instrtab[cnt].suffix);
 		      abort ();
@@ -739,7 +742,6 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		      if (instrtab[cnt].str1 != 0)
 			ADD_STRING (op1_str[instrtab[cnt].str1]);
 
-		      output_data.op1str = op1_str[instrtab[cnt].str1];
 		      output_data.opoff1 = (instrtab[cnt].off1_1
 					    + OFF1_1_BIAS - opoff);
 		      output_data.opoff2 = (instrtab[cnt].off1_2
@@ -752,7 +754,7 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		      if (r > 0)
 			goto enomem;
 
-		      string_end_idx = ~0ul;
+		      string_end_idx = bufcnt;
 		    }
 		  else if (prec == 2 && instrtab[cnt].fct2 != 0)
 		    {
@@ -760,7 +762,6 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		      if (instrtab[cnt].str2 != 0)
 			ADD_STRING (op2_str[instrtab[cnt].str2]);
 
-		      output_data.op1str = op2_str[instrtab[cnt].str2];
 		      output_data.opoff1 = (instrtab[cnt].off2_1
 					    + OFF2_1_BIAS - opoff);
 		      output_data.opoff2 = (instrtab[cnt].off2_2
@@ -773,7 +774,7 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		      if (r > 0)
 			goto enomem;
 
-		      string_end_idx = ~0ul;
+		      string_end_idx = bufcnt;
 		    }
 		  else if (prec == 3 && instrtab[cnt].fct3 != 0)
 		    {
@@ -781,7 +782,6 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		      if (instrtab[cnt].str3 != 0)
 			ADD_STRING (op3_str[instrtab[cnt].str3]);
 
-		      output_data.op1str = op3_str[instrtab[cnt].str3];
 		      output_data.opoff1 = (instrtab[cnt].off3_1
 					    + OFF3_1_BIAS - opoff);
 		      output_data.opoff2 = (instrtab[cnt].off3_2
@@ -798,16 +798,8 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		      if (r > 0)
 			goto enomem;
 
-		      string_end_idx = ~0ul;
+		      string_end_idx = bufcnt;
 		    }
-		  break;
-
-		case 'e':
-		  /* String end marker.  */
-		  if (string_end_idx == ~0ul)
-		    string_end_idx = bufcnt;
-		  /* No padding.  */
-		  width = 0;
 		  break;
 		}
 
@@ -820,8 +812,8 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 	  if ((prefixes & SEGMENT_PREFIXES) != 0)
 	    goto print_prefix;
 
-	  if (string_end_idx != ~0ul)
-	    buf[string_end_idx] = '\0';
+	  assert (string_end_idx != ~0ul);
+	  bufcnt = string_end_idx;
 
 	  addr += param_start - begin;
 	  data = param_start;
@@ -837,11 +829,13 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
       ADD_STRING ("(bad)");
       addr += data - begin;
 
-      buf[bufcnt++] = '\0';
-
     out:
+      if (bufcnt == bufsize)
+	goto enomem;
+      buf[bufcnt] = '\0';
+
       *startp = data;
-      retval = outcb (buf, strlen (buf), outcbarg);
+      retval = outcb (buf, bufcnt, outcbarg);
       if (retval != 0)
 	goto do_ret;
     }

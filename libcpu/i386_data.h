@@ -1,4 +1,4 @@
-/* Helper routines for disassembler for x86-64.
+/* Helper routines for disassembler for x86/x86-64.
    Copyright (C) 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2007.

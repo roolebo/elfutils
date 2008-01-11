@@ -2,6 +2,8 @@
 
 	* i386_disasm.c (i386_disasm): Resize output buffer if necessary.
 	Optimize output_data initialization.  Free buffers before return.
+	(struct output_data): Remove op1str field.  Adjust code.
+	(i386_disasm): Store final NUL btye at end of functions.
 
 2008-01-10  Ulrich Drepper  <drepper@redhat.com>
 

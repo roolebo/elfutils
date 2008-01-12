@@ -1,3 +1,7 @@
+2008-01-12  Ulrich Drepper  <drepper@redhat.com>
+
+	* elfutils.spec.in: Add m4 to build requirements.
+
 2008-01-02  Ulrich Drepper  <drepper@redhat.com>
 
 	* elfutils.spec.in: Changes for disasm branch merge.

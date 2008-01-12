@@ -1,9 +1,14 @@
 2008-01-11  Ulrich Drepper  <drepper@redhat.com>
 
-	* i386_disasm.c (struct output)buffer): Add labelbuf, labelbufsize,
+	* i386_disasm.c (struct output_buffer): Remove symcb and symcbarg.
+	(i386_disasm): Remove appropriate initializers.
+	Use symcb to lookup symbol strings.
+
+	* i386_disasm.c (struct output_buffer): Add labelbuf, labelbufsize,
 	symaddr_use, and symaddr fields.
 	(i386_disasm): Remove labelbuf and labelbufsize variables.
 	Add back %e format.  Implement %a and %l formats.
+
 	* i386_data.h (general_mod$r_m): Set symaddr_use and symaddr for %rip
 	base addressing.
 

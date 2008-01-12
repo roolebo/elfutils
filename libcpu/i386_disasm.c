@@ -197,8 +197,6 @@ struct output_data
   const uint8_t *data;
   const uint8_t **param_start;
   const uint8_t *end;
-  DisasmGetSymCB_t symcb;
-  void *symcbarg;
   char *labelbuf;
   size_t labelbufsize;
   enum
@@ -237,7 +235,6 @@ struct output_data
   } while (0)
 
 
-#include <stdio.h>
 int
 i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 	     const char *fmt, DisasmOutputCB_t outcb, DisasmGetSymCB_t symcb,
@@ -260,9 +257,7 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
       .bufsize = bufsize,
       .bufcntp = &bufcnt,
       .param_start = &param_start,
-      .end = end,
-      .symcb = symcb,
-      .symcbarg = symcbarg
+      .end = end
     };
 
   int retval = 0;
@@ -840,11 +835,17 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 
 		      // XXX Lookup symbol based on symaddr
 		      const char *symstr = NULL;
+		      if (symcb != NULL
+			  && symcb (0 /* XXX */, 0 /* XXX */, symaddr,
+				    &output_data.labelbuf,
+				    &output_data.labelbufsize, symcbarg) == 0)
+			symstr = output_data.labelbuf;
 
 		      size_t bufavail = bufsize - bufcnt;
 		      int r = 0;
 		      if (symstr != NULL)
-			r = snprintf (&buf[bufcnt], bufavail, "# %s", symstr);
+			r = snprintf (&buf[bufcnt], bufavail, "# <%s>",
+				      symstr);
 		      else if (output_data.symaddr_use == addr_abs_always
 			       || output_data.symaddr_use == addr_rel_always)
 			r = snprintf (&buf[bufcnt], bufavail, "# %#" PRIx64,

@@ -264,6 +264,9 @@ general_mod$r_m (struct output_data *d)
 #ifdef X86_64
 	      n = snprintf (tmpbuf, sizeof (tmpbuf), "%s0x%" PRIx32 "(%%rip)",
 			    disp < 0 ? "-" : "", disp < 0 ? -disp : disp);
+
+	      d->symaddr_use = addr_rel_always;
+	      d->symaddr = disp;
 #else
 	      n = snprintf (tmpbuf, sizeof (tmpbuf), "0x%" PRIx32, disp);
 #endif

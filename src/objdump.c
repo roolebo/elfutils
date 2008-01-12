@@ -756,8 +756,7 @@ show_disasm (Ebl *ebl, const char *fname, uint32_t shstrndx)
 	  info.last_end = info.cur = data->d_buf;
 
 	  disasm_cb (ctx, &info.cur, info.cur + data->d_size, info.addr,
-		     //"%7m%e %.1o%e,%.2o%e,%.3o%e", disasm_output, &info,
-		     "%7m %.1o,%.2o,%.3o", disasm_output, &info,
+		     "%7m %.1o,%.2o,%.3o%34a %l", disasm_output, &info,
 		     NULL /* XXX */);
 	}
     }
@@ -776,7 +775,7 @@ handle_elf (Elf *elf, const char *prefix, const char *fname,
   /* Get the backend for this object file type.  */
   Ebl *ebl = ebl_openbackend (elf);
 
-  printf (gettext ("%s: elf%d-%s\n\n"),
+  printf ("%s: elf%d-%s\n\n",
 	  fname, gelf_getclass (elf) == ELFCLASS32 ? 32 : 64,
 	  ebl_backend_name (ebl));
 

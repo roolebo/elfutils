@@ -199,6 +199,17 @@ struct output_data
   const uint8_t *end;
   DisasmGetSymCB_t symcb;
   void *symcbarg;
+  char *labelbuf;
+  size_t labelbufsize;
+  enum
+    {
+      addr_none = 0,
+      addr_abs_symbolic,
+      addr_abs_always,
+      addr_rel_symbolic,
+      addr_rel_always
+    } symaddr_use;
+  GElf_Addr symaddr;
 };
 
 
@@ -233,8 +244,6 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 	     void *outcbarg, void *symcbarg)
 {
   const char *save_fmt = fmt;
-  char *labelbuf = NULL;
-  //size_t labelbufsize = 0;
 
 #define BUFSIZE 512
   char initbuf[BUFSIZE];
@@ -800,6 +809,56 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 
 		      string_end_idx = bufcnt;
 		    }
+		  else
+		    bufcnt = string_end_idx;
+		  break;
+
+		case 'e':
+		  string_end_idx = bufcnt;
+		  break;
+
+		case 'a':
+		  /* Pad to requested column.  */
+		  while (bufcnt < (size_t) width)
+		    ADD_CHAR (' ');
+		  width = 0;
+		  break;
+
+		case 'l':
+		  if (output_data.labelbuf != NULL
+		      && output_data.labelbuf[0] != '\0')
+		    {
+		      ADD_STRING (output_data.labelbuf);
+		      output_data.labelbuf[0] = '\0';
+		      string_end_idx = bufcnt;
+		    }
+		  else if (output_data.symaddr_use != addr_none)
+		    {
+		      GElf_Addr symaddr = output_data.symaddr;
+		      if (output_data.symaddr_use >= addr_rel_symbolic)
+			symaddr += addr + param_start - begin;
+
+		      // XXX Lookup symbol based on symaddr
+		      const char *symstr = NULL;
+
+		      size_t bufavail = bufsize - bufcnt;
+		      int r = 0;
+		      if (symstr != NULL)
+			r = snprintf (&buf[bufcnt], bufavail, "# %s", symstr);
+		      else if (output_data.symaddr_use == addr_abs_always
+			       || output_data.symaddr_use == addr_rel_always)
+			r = snprintf (&buf[bufcnt], bufavail, "# %#" PRIx64,
+				      (uint64_t) symaddr);
+
+		      if (r < 0)
+			goto not;
+		      if ((size_t) r >= bufavail)
+			goto enomem;
+		      bufcnt += r;
+		      string_end_idx = bufcnt;
+
+		      output_data.symaddr_use = addr_none;
+		    }
 		  break;
 		}
 
@@ -841,7 +900,7 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
     }
 
  do_ret:
-  free (labelbuf);
+  free (output_data.labelbuf);
   if (buf != initbuf)
     free (buf);
 

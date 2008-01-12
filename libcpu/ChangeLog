@@ -1,5 +1,12 @@
 2008-01-11  Ulrich Drepper  <drepper@redhat.com>
 
+	* i386_disasm.c (struct output)buffer): Add labelbuf, labelbufsize,
+	symaddr_use, and symaddr fields.
+	(i386_disasm): Remove labelbuf and labelbufsize variables.
+	Add back %e format.  Implement %a and %l formats.
+	* i386_data.h (general_mod$r_m): Set symaddr_use and symaddr for %rip
+	base addressing.
+
 	* i386_disasm.c (i386_disasm): Resize output buffer if necessary.
 	Optimize output_data initialization.  Free buffers before return.
 	(struct output_data): Remove op1str field.  Adjust code.

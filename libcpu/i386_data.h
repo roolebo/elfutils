@@ -736,6 +736,39 @@ FCT_imm$w (struct output_data *d)
 }
 
 
+#ifdef X86_64
+static int
+FCT_imm64$w (struct output_data *d)
+{
+  if ((d->data[d->opoff2 / 8] & (1 << (7 - (d->opoff2 & 7)))) == 0
+      || (*d->prefixes & has_data16) != 0)
+    return FCT_imm$w (d);
+
+  size_t *bufcntp = d->bufcntp;
+  size_t avail = d->bufsize - *bufcntp;
+  int needed;
+  if (*d->prefixes & has_rex_w)
+    {
+      if (*d->param_start + 8 > d->end)
+	return -1;
+      uint64_t word = read_8ubyte_unaligned_inc (*d->param_start);
+      needed = snprintf (&d->bufp[*bufcntp], avail, "$0x%" PRIx64, word);
+    }
+  else
+    {
+      if (*d->param_start + 4 > d->end)
+	return -1;
+      int32_t word = read_4sbyte_unaligned_inc (*d->param_start);
+      needed = snprintf (&d->bufp[*bufcntp], avail, "$0x%" PRIx32, word);
+    }
+  if ((size_t) needed > avail)
+    return (size_t) needed - avail;
+  *bufcntp += needed;
+  return 0;
+}
+#endif
+
+
 static int
 FCT_imms (struct output_data *d)
 {
@@ -1155,6 +1188,26 @@ FCT_reg (struct output_data *d)
 }
 
 
+#ifdef X86_64
+static int
+FCT_oreg (struct output_data *d)
+{
+  /* Special form where register comes from opcode.  The rex.B bit is used,
+     rex.R and rex.X are ignored.  */
+  int save_prefixes = *d->prefixes;
+
+  *d->prefixes = ((save_prefixes & ~has_rex_r)
+		  | ((save_prefixes & has_rex_b) << (idx_rex_r - idx_rex_b)));
+
+  int r = FCT_reg (d);
+
+  *d->prefixes = save_prefixes;
+
+  return r;
+}
+#endif
+
+
 static int
 FCT_reg64 (struct output_data *d)
 {
@@ -1224,6 +1277,26 @@ FCT_reg$w (struct output_data *d)
     }
   return 0;
 }
+
+
+#ifdef X86_64
+static int
+FCT_oreg$w (struct output_data *d)
+{
+  /* Special form where register comes from opcode.  The rex.B bit is used,
+     rex.R and rex.X are ignored.  */
+  int save_prefixes = *d->prefixes;
+
+  *d->prefixes = ((save_prefixes & ~has_rex_r)
+		  | ((save_prefixes & has_rex_b) << (idx_rex_r - idx_rex_b)));
+
+  int r = FCT_reg$w (d);
+
+  *d->prefixes = save_prefixes;
+
+  return r;
+}
+#endif
 
 
 static int

@@ -1,3 +1,16 @@
+2008-01-14  Ulrich Drepper  <drepper@redhat.com>
+
+	* defs/i386: Add fixes for opcodes with register number in opcode,
+	64-bit immediate forms, nop with rex.B.
+	* i386_data.h [X86_64] (FCT_imm64$w): New function.
+	(FCT_oreg): New function.
+	(FCT_oreg$w): New function.
+	* i386_disasm.c (i386_disasm): Reinitialize fmt always before
+	starting the loop to process the string.  Handle 0x90 special for
+	x86-64.
+	* i386_parse.y (fillin_arg): Expand synonyms before concatening to
+	form the function name.
+
 2008-01-11  Ulrich Drepper  <drepper@redhat.com>
 
 	* i386_disasm.c (struct output_buffer): Remove symcb and symcbarg.

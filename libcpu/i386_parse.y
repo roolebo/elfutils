@@ -802,7 +802,17 @@ fillin_arg (struct bitvalue *bytes, struct argname *name,
 	    /* Add some string which contains invalid characters.  */
 	    obstack_grow_str (&ob, "!!!INVALID!!!");
 	  else
-	    obstack_grow_str (&ob, runp->field->name);
+	    {
+	      char *fieldname = runp->field->name;
+
+	      struct synonym search = { .from = fieldname };
+
+	      struct synonym **res = tfind (&search, &synonyms, compare_syn);
+	      if (res != NULL)
+		fieldname = (*res)->to;
+
+	      obstack_grow_str (&ob, fieldname);
+	    }
 
 	  /* Now compute the bit offset of the field.  */
 	  struct bitvalue *b = bytes;
@@ -843,11 +853,6 @@ fillin_arg (struct bitvalue *bytes, struct argname *name,
     obstack_grow_str (&ob, "string");
   obstack_1grow (&ob, '\0');
   char *fct = obstack_finish (&ob);
-
-  struct synonym search = { .from = fct };
-  struct synonym **res = tfind (&search, &synonyms, compare_syn);
-  if (res != NULL)
-    fct = (*res)->to;
 
   instr->operands[n].fct = fct;
 }

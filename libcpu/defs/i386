@@ -9,6 +9,7 @@ dnl floating point reg suffix
 %mask {imms8}	8
 %mask {imm16}	16
 %mask {reg}	3
+%mask {oreg}	3
 %mask {reg16}	3
 %mask {reg64}	3
 %mask {tttn}	4
@@ -25,6 +26,7 @@ dnl like {r_m} but referencing 32- or 64-bit register
 %mask {disp8}	8
 dnl imm really is 8/16/32 bit depending on the situation.
 %mask {imm}	8
+%mask {imm64}	8
 %mask {imms}	8
 %mask {rel}	32
 %mask {abs}	32
@@ -56,6 +58,10 @@ dnl imm really is 8/16/32 bit depending on the situation.
 %synonym {xmmreg2} {xmmreg}
 %synonym {mmxreg1} {mmxreg}
 %synonym {mmxreg2} {mmxreg}
+ifdef(`i386',
+`%synonym {oreg} {reg}
+%synonym {imm64} {imm}
+')dnl
 
 %%
 ifdef(`i386',
@@ -352,7 +358,9 @@ ifdef(`ASSEMBLER',
 1110010{w},{imm8}:in {imm8},{ax}{w}
 1110110{w}:in {dx},{ax}{w}
 1111111{w},{mod}000{r_m}:inc{w} {mod}{r_m}{w}
-01000{reg}:inc {reg}
+ifdef(`i386',
+`01000{reg}:inc {reg}
+')dnl
 0110110{w}:{R}ins{w} {dx},{es_di}
 11001101,{imm8}:int {imm8}
 11001100:int3
@@ -407,7 +415,7 @@ ifdef(`i386',
 1000100{w},{mod}{reg}{r_m}:mov {reg}{w},{mod}{r_m}{w}
 1000101{w},{mod}{reg}{r_m}:mov {mod}{r_m}{w},{reg}{w}
 1100011{w},{mod}000{r_m},{imm}:mov{w} {imm}{w},{mod}{r_m}{w}
-1011{w}{reg},{imm}:mov {imm}{w},{reg}{w}
+1011{w}{oreg},{imm64}:mov {imm64}{w},{oreg}{w}
 1010000{w},{abs}:mov {abs},{ax}{w}
 1010001{w},{abs}:mov {ax}{w},{abs}
 00001111,00100000,11{ccc}{reg64}:mov {ccc},{reg64}
@@ -424,7 +432,11 @@ ifdef(`i386',
 1111011{w},{mod}100{r_m}:mul{w} {mod}{r_m}{w}
 1111011{w},{mod}011{r_m}:neg{w} {mod}{r_m}{w}
 11110011,10010000:pause
-10010000:nop
+ifdef(`i386',
+`10010000:nop
+',
+`10010000:INVALID
+')dnl
 1111011{w},{mod}010{r_m}:not{w} {mod}{r_m}{w}
 0000100{w},{mod}{reg}{r_m}:or {reg}{w},{mod}{r_m}{w}
 0000101{w},{mod}{reg}{r_m}:or {mod}{r_m}{w},{reg}{w}
@@ -562,7 +574,7 @@ ifdef(`i386',
 00001111,00110000:wrmsr
 00001111,1100000{w},{mod}{reg}{r_m}:xadd {reg}{w},{mod}{r_m}{w}
 1000011{w},{mod}{reg}{r_m}:xchg {reg}{w},{mod}{r_m}{w}
-10010{reg}:xchg {ax},{reg}
+10010{oreg}:xchg {ax},{oreg}
 11010111:xlat {ds_bx}
 0011000{w},{mod}{reg}{r_m}:xor {reg}{w},{mod}{r_m}{w}
 0011001{w},{mod}{reg}{r_m}:xor {mod}{r_m}{w},{reg}{w}

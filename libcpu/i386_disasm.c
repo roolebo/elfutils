@@ -268,8 +268,6 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
       const uint8_t *data = *startp;
       const uint8_t *begin = data;
 
-      fmt = save_fmt;
-
       /* Recognize all prefixes.  */
       int last_prefix_bit = 0;
       while (data < end)
@@ -512,6 +510,7 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 	  output_data.data = data;
 
 	  unsigned long string_end_idx = 0;
+	  fmt = save_fmt;
 	  while (*fmt != '\0')
 	    {
 	      if (*fmt != '%')
@@ -581,6 +580,14 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		    {
 		      switch (*data)
 			{
+#ifdef X86_64
+			case 0x90:
+			  if (prefixes & has_rex_b)
+			    goto not;
+			  str = "nop";
+			  break;
+#endif
+
 			case 0x98:
 			  if (prefixes & ~has_data16)
 			    goto print_prefix;

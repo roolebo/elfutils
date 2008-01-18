@@ -8,7 +8,7 @@ Group: Development/Tools
 Source: elfutils-%{version}.tar.gz
 Obsoletes: libelf libelf-devel
 Requires: elfutils-libelf = %{version}-%{release}
-Requires: glibc >= 2.3.1-2
+Requires: glibc >= 2.7
 
 # ExcludeArch: xxx
 

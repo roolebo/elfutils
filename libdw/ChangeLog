@@ -1,3 +1,8 @@
+2008-01-18  Ulrich Drepper  <drepper@redhat.com>
+
+	* dwarf_getsrclines.c (dwarf_getsrclines): Don't require exact match
+	of DWARF_VERSION comparison, just fail if the file's version is newer.
+
 2008-01-17  Nick Clifton  <nickc@redhat.com>
 
 	* dwarf.h (DWARF3_LENGTH_MIN_ESCAPE_CODE): New define.

@@ -180,7 +180,7 @@ dwarf_getsrclines (Dwarf_Die *cudie, Dwarf_Lines **lines, size_t *nlines)
 
       /* The next element of the header is the version identifier.  */
       uint_fast16_t version = read_2ubyte_unaligned_inc (dbg, linep);
-      if (unlikely (version != DWARF_VERSION))
+      if (unlikely (version > DWARF_VERSION))
 	{
 	  __libdw_seterrno (DWARF_E_VERSION);
 	  goto out;

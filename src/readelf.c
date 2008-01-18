@@ -601,6 +601,7 @@ process_elf_file (Dwfl_Module *dwflmod, int fd)
   if (ehdr->e_type == ET_REL && print_unrelocated)
     {
       /* Read the file afresh.  */
+      pure_elf = elf_begin (fd, ELF_C_READ_MMAP, NULL);
       off64_t aroff = elf_getaroff (elf);
       if (aroff > 0)
 	{
@@ -610,8 +611,6 @@ process_elf_file (Dwfl_Module *dwflmod, int fd)
 	  elf_end (pure_elf);
 	  pure_elf = armem;
 	}
-      else
-	pure_elf = elf_begin (fd, ELF_C_READ_MMAP, NULL);
       if (pure_elf == NULL)
 	goto elf_error;
       pure_ebl = ebl_openbackend (pure_elf);

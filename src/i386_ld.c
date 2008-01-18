@@ -1,4 +1,4 @@
-/* Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008 Red Hat, Inc.
+/* Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -592,9 +592,10 @@ elf_i386_count_relocations (struct ld_state *statep, struct scninfo *scninfo)
 		 If the symbol is not defined and we are not creating
 		 a statically linked binary, then we need in any case
 		 a PLT entry.  */
-	      if (! scninfo->fileinfo->symref[r_sym]->defined
-		  && !statep->statically)
+	      if (! scninfo->fileinfo->symref[r_sym]->defined)
 		{
+		  assert (!statep->statically);
+
 		  sym = scninfo->fileinfo->symref[r_sym];
 		  sym->type = STT_FUNC;
 		  sym->in_dso = 1;
@@ -613,9 +614,6 @@ elf_i386_count_relocations (struct ld_state *statep, struct scninfo *scninfo)
 		}
 	      break;
 
-	    case R_386_TLS_IE:
-	    case R_386_TLS_GOTIE:
-	    case R_386_TLS_LE:
 	    case R_386_TLS_GD:
 	    case R_386_TLS_LDM:
 	    case R_386_TLS_GD_32:

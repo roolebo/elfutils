@@ -1,4 +1,4 @@
-/* Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008 Red Hat, Inc.
+/* Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -726,8 +726,7 @@ check_definition (const XElf_Sym *sym, size_t symidx,
 	     and it's indicating whether the reference is weak or not.  */
 	  oldp->weak = XELF_ST_BIND (sym->st_info) == STB_WEAK;
 
-	  // XXX Really exclude SHN_ABS?
-	  if (sym->st_shndx != SHN_COMMON && sym->st_shndx != SHN_ABS)
+	  if (sym->st_shndx != SHN_COMMON)
 	    {
 	      struct scninfo *ignore;
 	      mark_section_used (&fileinfo->scninfo[sym->st_shndx],
@@ -1413,8 +1412,8 @@ add_relocatable_file (struct usedfiles *fileinfo, GElf_Word secttype)
 	    /* The symbol is not used.  */
 	    continue;
 
-	  /* If the DSO uses symbol versions determine whether this is
-	     the default version.  Otherwise we'll ignore the symbol.  */
+	  /* If the DSO uses symbols determine whether this is the default
+	     version.  Otherwise we'll ignore the symbol.  */
 	  if (versymdata != NULL)
 	    {
 	      XElf_Versym versym;
@@ -1786,16 +1785,15 @@ extract_from_archive (struct usedfiles *fileinfo)
   static int archive_seq;
   int res = 0;
 
-  if (fileinfo->archive_seq == 0)
-    /* This is an archive we are not using completely.  Give it a
-       unique number.  */
-    fileinfo->archive_seq = ++archive_seq;
+  /* This is an archive we are not using completely.  Give it a
+     unique number.  */
+  fileinfo->archive_seq = ++archive_seq;
 
   /* If there are no unresolved symbols don't do anything.  */
-  assert (ld_state.extract_rule == defaultextract
-	  || ld_state.extract_rule == weakextract);
   if ((likely (ld_state.extract_rule == defaultextract)
-       ? ld_state.nunresolved_nonweak : ld_state.nunresolved) == 0)
+       && ld_state.nunresolved_nonweak == 0)
+      || (unlikely (ld_state.extract_rule == weakextract)
+	  && ld_state.nunresolved == 0))
     return 0;
 
   Elf_Arsym *syms;
@@ -1820,6 +1818,7 @@ extract_from_archive (struct usedfiles *fileinfo)
      the first definition.  */
   // XXX Is this a compatible behavior?
   bool any_used;
+  int nround = 0;
   do
     {
       any_used = false;
@@ -1877,7 +1876,7 @@ extract_from_archive (struct usedfiles *fileinfo)
 	    }
 	}
 
-      if (any_used)
+      if (++nround == 1)
 	{
 	  /* This is an archive therefore it must have a number.  */
 	  assert (fileinfo->archive_seq != 0);
@@ -2070,22 +2069,9 @@ cannot use DSO '%s' when generating relocatable object file"),
 	  res = 0;
 	}
       else
-	{
-	  if (ld_state.group_start_requested
-	      && ld_state.group_start_archive == NULL)
-	    ld_state.group_start_archive = fileinfo;
-
-	  if (ld_state.archives == NULL)
-	    ld_state.archives = fileinfo;
-
-	  if (ld_state.tailarchives != NULL)
-	    ld_state.tailarchives->next = fileinfo;
-	  ld_state.tailarchives = fileinfo;
-
-	  /* Extract only the members from the archive which are
-	     currently referenced by unresolved symbols.  */
-	  res = extract_from_archive (fileinfo);
-	}
+	/* Extract only the members from the archive which are
+	   currently referenced by unresolved symbols.  */
+	res = extract_from_archive (fileinfo);
     }
   else
     /* This should never happen, we know about no other types.  */
@@ -2141,7 +2127,7 @@ ld_generic_file_process (int fd, struct usedfiles *fileinfo,
       /* We found the file.  Now test whether it is a file type we can
 	 handle.
 
-	 XXX Do we need to have the ability to start from a given
+	 XXX Do we have to have the ability to start from a given
 	 position in the search path again to look for another file if
 	 the one found has not the right type?  */
       res = open_elf (fileinfo, elf_begin (fileinfo->fd,
@@ -2184,24 +2170,19 @@ ld_generic_file_process (int fd, struct usedfiles *fileinfo,
 	      runp = runp->next;
 	    }
 	  while (runp != fileinfo->next);
-
-	  /* Do not do this again.  */
-	  ld_state.archives = NULL;
-
-	  /* Do not move on to the next archive.  */
-	  *nextp = fileinfo->next = NULL;
 	}
     }
   else if (unlikely (fileinfo->group_end))
     {
-      /* This is the end of a group.  We possibly have to go back.
+      /* This is the end of a group.  We possibly of to go back.
 	 Determine which file we would go back to and see whether it
 	 makes sense.  If there has not been an archive we don't have
 	 to do anything.  */
-      if (ld_state.group_start_requested)
+      if (!ld_state.group_start_requested)
 	{
 	  if (ld_state.group_start_archive != ld_state.tailarchives)
-	    /* The loop includes more than one archive, add the pointer.  */
+	    /* The loop would include more than one archive, add the
+	       pointer.  */
 	    {
 	      *nextp = ld_state.tailarchives->group_backref =
 		ld_state.group_start_archive;
@@ -2220,7 +2201,6 @@ ld_generic_file_process (int fd, struct usedfiles *fileinfo,
 
       /* Clear the flags.  */
       ld_state.group_start_requested = false;
-      ld_state.group_start_archive = NULL;
       fileinfo->group_end = false;
     }
 

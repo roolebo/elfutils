@@ -1,27 +1,3 @@
-2008-01-19  Ulrich Drepper  <drepper@redhat.com>
-
-	* i386_ld.c (elf_i386_count_relocations): PLT relocations for undefined
-	symbols are not carried over into statically linked output files.
-	Add dummy entries for more TLS relocations.
-
-	* ld.c (options): Add long names for -( and -).
-
-	* ldgeneric.c (check_definition): For newly found definitions don't
-	mark section as used if symbol is absolute.
-	(extract_from_archive): Only assign archive sequence number the first
-	time the archive is handled.  Update ld_state.last_archive_used
-	if any symbol was used.  Remove nround variable.
-	(file_process2): When using symbol from an archive, update
-	ld_state.group_start_archive, ld_state.archives, and
-	ld_state.tailarchives.
-	(ld_generic_file_process): If group is not handled anymore, after
-	freeing ELF handles for the archives, clear ld_state.archives and
-	*nextp.  Fix wrong logic in recognizing first iteration of group
-	loop.  When clearing flags, also clear ld_state.group_start_archive.
-
-	* src/readelf.c (process_elf_file): When re-reading pure file,
-	don't first open the file and then map from the mapped archive.
-
 2008-01-11  Ulrich Drepper  <drepper@redhat.com>
 
 	* objdump.c (show_disasm): Adjust disassembler format string for

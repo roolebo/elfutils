@@ -252,14 +252,24 @@ extern Dwarf_Die *dwarf_addrdie (Dwarf *dbg, Dwarf_Addr addr,
 extern int dwarf_child (Dwarf_Die *die, Dwarf_Die *result)
      __nonnull_attribute__ (2);
 
-/* Return sibling of given DIE.  */
+/* Locates the first sibling of DIE and places it in RESULT.
+   Returns 0 if a sibling was found, -1 if something went wrong.
+   Returns 1 if no sibling could be found and, if RESULT is not
+   the same as DIE, it sets RESULT->addr to the address of the
+   (non-sibling) DIE that follows this one, or NULL if this DIE
+   was the last one in the cokmpilation unit.  */
 extern int dwarf_siblingof (Dwarf_Die *die, Dwarf_Die *result)
      __nonnull_attribute__ (2);
 
 /* Check whether the DIE has children.  */
 extern int dwarf_haschildren (Dwarf_Die *die) __nonnull_attribute__ (1);
 
-/* Get attributes of the DIE.  */
+/* Walks the attributes of DIE, starting at the one OFFSET bytes in,
+   calling the CALLBACK function for each one.  Stops if the callback
+   function ever returns a value other than DWARF_CB_OK and returns the
+   offset of the offending attribute.  If the end of the attributes
+   is reached 1 is returned.  If something goes wrong -1 is returned and
+   the dwarf error number is set.  */
 extern ptrdiff_t dwarf_getattrs (Dwarf_Die *die,
 				 int (*callback) (Dwarf_Attribute *, void *),
 				 void *arg, ptrdiff_t offset)

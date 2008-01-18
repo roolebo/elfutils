@@ -76,8 +76,7 @@ __libdw_findabbrev (struct Dwarf_CU *cu, unsigned int code)
 	  {
 	    /* Make sure we do not try to search for it again.  */
 	    cu->last_abbrev_offset = (size_t) -1l;
-	    abb = (void *) -1l;
-	    break;
+	    return DWARF_END_ABBREV;
 	  }
 
 	cu->last_abbrev_offset += length;
@@ -107,7 +106,7 @@ dwarf_tag (die)
       die->abbrev = __libdw_findabbrev (die->cu, u128);
     }
 
-  if (die->abbrev == (Dwarf_Abbrev *) -1l)
+  if (die->abbrev == DWARF_END_ABBREV)
     {
       __libdw_seterrno (DWARF_E_INVALID_DWARF);
       return DW_TAG_invalid;

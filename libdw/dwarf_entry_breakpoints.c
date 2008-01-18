@@ -87,12 +87,7 @@ dwarf_entry_breakpoints (die, bkpts)
     }
 
   /* Fetch the CU's line records to look for this DIE's addresses.  */
-  Dwarf_Die cudie =
-    {
-      .cu = die->cu,
-      .addr = ((char *) die->cu->dbg->sectiondata[IDX_debug_info]->d_buf
-	       + die->cu->start + 3 * die->cu->offset_size - 4 + 3),
-    };
+  Dwarf_Die cudie = CUDIE (die->cu);
   Dwarf_Lines *lines;
   size_t nlines;
   if (INTUSE(dwarf_getsrclines) (&cudie, &lines, &nlines) < 0)

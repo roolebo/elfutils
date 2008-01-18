@@ -56,7 +56,6 @@
 #include <dwarf.h>
 #include <string.h>
 
-
 int
 dwarf_siblingof (die, result)
      Dwarf_Die *die;
@@ -65,6 +64,12 @@ dwarf_siblingof (die, result)
   /* Ignore previous errors.  */
   if (die == NULL)
     return -1;
+
+  if (result == NULL)
+    return -1;
+
+  if (result != die)
+    result->addr = NULL;
 
   unsigned int level = 0;
 
@@ -102,12 +107,11 @@ dwarf_siblingof (die, result)
 		  + sibattr.cu->start + offset);
 	}
       else if (unlikely (addr == NULL)
-	       || unlikely (this_die.abbrev == (Dwarf_Abbrev *) -1l))
+	       || unlikely (this_die.abbrev == DWARF_END_ABBREV))
 	return -1;
       else if (this_die.abbrev->has_children)
 	/* This abbreviation has children.  */
 	++level;
-
 
       while (1)
 	{
@@ -120,8 +124,12 @@ dwarf_siblingof (die, result)
 	    break;
 
 	  if (level-- == 0)
-	    /* No more sibling at all.  */
-	    return 1;
+	    {
+	      if (result != die)
+		result->addr = addr;
+	      /* No more sibling at all.  */
+	      return 1;
+	    }
 
 	  ++addr;
 	}

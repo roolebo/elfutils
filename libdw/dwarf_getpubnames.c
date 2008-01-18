@@ -58,6 +58,7 @@
 #include <sys/param.h>
 
 #include <libdwP.h>
+#include <dwarf.h>
 
 
 static int
@@ -93,10 +94,16 @@ get_offsets (Dwarf *dbg)
       /* Read the set header.  */
       int len_bytes = 4;
       Dwarf_Off len = read_4ubyte_unaligned_inc (dbg, readp);
-      if (len == 0xffffffff)
+      if (len == DWARF3_LENGTH_64_BIT)
 	{
 	  len = read_8ubyte_unaligned_inc (dbg, readp);
 	  len_bytes = 8;
+	}
+      else if (unlikely (len >= DWARF3_LENGTH_MIN_ESCAPE_CODE
+			 && len <= DWARF3_LENGTH_MAX_ESCAPE_CODE))
+	{
+	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
+	  goto err_return;
 	}
 
       /* Now we know the offset of the first offset/name pair.  */
@@ -122,14 +129,17 @@ get_offsets (Dwarf *dbg)
 	mem[cnt].cu_offset = read_8ubyte_unaligned (dbg, readp + 2);
 
       /* Determine the size of the CU header.  */
-      assert (dbg->sectiondata[IDX_debug_info] != NULL);
-      assert (dbg->sectiondata[IDX_debug_info]->d_buf != NULL);
-      assert (mem[cnt].cu_offset + 3
-	      < dbg->sectiondata[IDX_debug_info]->d_size);
+      if (dbg->sectiondata[IDX_debug_info] == NULL
+	  || dbg->sectiondata[IDX_debug_info]->d_buf == NULL
+	  || mem[cnt].cu_offset + 3 >= dbg->sectiondata[IDX_debug_info]->d_size)
+	{
+	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
+	  goto err_return;
+	}      
       unsigned char *infop
 	= ((unsigned char *) dbg->sectiondata[IDX_debug_info]->d_buf
 	   + mem[cnt].cu_offset);
-      if (read_4ubyte_unaligned_noncvt (infop) == 0xffffffff)
+      if (read_4ubyte_unaligned_noncvt (infop) == DWARF3_LENGTH_64_BIT)
 	mem[cnt].cu_header_size = 23;
       else
 	mem[cnt].cu_header_size = 11;

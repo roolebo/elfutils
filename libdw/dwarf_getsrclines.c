@@ -164,7 +164,7 @@ dwarf_getsrclines (Dwarf_Die *cudie, Dwarf_Lines **lines, size_t *nlines)
 	}
       Dwarf_Word unit_length = read_4ubyte_unaligned_inc (dbg, linep);
       unsigned int length = 4;
-      if (unlikely (unit_length == 0xffffffff))
+      if (unlikely (unit_length == DWARF3_LENGTH_64_BIT))
 	{
 	  if (unlikely (linep + 8 > lineendp))
 	    goto invalid_data;

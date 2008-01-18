@@ -1,3 +1,49 @@
+2008-01-17  Nick Clifton  <nickc@redhat.com>
+
+	* dwarf.h (DWARF3_LENGTH_MIN_ESCAPE_CODE): New define.
+	(DWARF3_LENGTH_MAX_ESCAPE_CODE): New define.
+	(DWARF3_LENGTH_64_BIT): New define.
+	* dwarf_getaranges (dwarf_getaranges): Use the new definitions.
+	* dwarf_getpubnames: Include dwarf.h.
+	(get_offsets): Use the new definitions.
+	* dwarf_getsrclines.c (dwarf_getsrclines): Use the new defintions.
+	* dwarf_nextcu.c: Include dwarf.h.  Correct comment.
+	(dwarf_nextcu): Use the new definitions.
+
+	* libdwP.h (DIE_OFFSET_FROM_CU_OFFSET): New macro.
+	* dwarf_die.c (dwarf_diecu): Use the new macro.
+	* dwarf_getaranges (dwarf_getaranges): Use the new macro.
+	* dwarf_nextcu.c (dwarf_nextcu): Use the new macro.
+
+	* dwarf_getpubnames (get_offsets): Replace assertion with test and
+	error return.
+
+	* dwarf_entry_breakpoints.c (dwarf_entry_breakpoints): Use CUDIE.
+
+	* dwarf_siblingof (dwarf_siblingof): Detect a NULL return pointer.
+	Set the address in the return structure to the address of the next
+	non-sibling die, if there is no sibling and the return pointer is
+	not the same as the die pointer.
+	* libdw.h: Expand the description of the dwarf_siblingof prototype.
+
+	* dwarf_child.c: Fix typo in comment.
+
+	* libdwP.h (DWARF_VERSION): Change to 3.
+
+	* dwarf_formref.c (__libdw_formref.c): Handle attributes which do
+	not have a initialised valp pointer.
+
+	* dwarf_getattrs.c (dwarf_getattrs): Return 1 rather than 0 when
+	the end of the attributes is reached.  When the callback fails,
+	return the address of the failing attribute, not the address of
+	its successor.
+	* libdw.h: Expand the description of the dwarf_getattrs prototype.
+
+	* dwarf_child.c (__libdw_find_attr): Use the new definition.
+	(dwarf_child): Likewise.
+	* dwarf_tag.c (__libdw_findabbrev): Likewise.
+	(dwarf_tag): Likewise.
+
 2008-01-08  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am (euinclude): Variable removed.

@@ -672,4 +672,19 @@ enum
 /* DWARF XXX.  */
 #define DW_ADDR_none	0
 
+/* Section 7.2.2 of the DWARF3 specification defines a range of escape
+   codes that can appear in the length field of certain DWARF structures.
+   
+   These defines enumerate the minium and maximum values of this range.
+   Currently only the maximum value is used (to indicate that 64-bit
+   values are going to be used in the dwarf data that accompanies the
+   structure).  The other values are reserved.
+
+   Note: There is a typo in DWARF3 spec (published Dec 20, 2005).  In
+   sections 7.4, 7.5.1, 7.19, 7.20 the minimum escape code is referred to
+   as 0xffffff00 whereas in fact it should be 0xfffffff0.  */
+#define DWARF3_LENGTH_MIN_ESCAPE_CODE 0xfffffff0u
+#define DWARF3_LENGTH_MAX_ESCAPE_CODE 0xffffffffu
+#define DWARF3_LENGTH_64_BIT          DWARF3_LENGTH_MAX_ESCAPE_CODE
+
 #endif	/* dwarf.h */

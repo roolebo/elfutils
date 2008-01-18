@@ -62,7 +62,7 @@
 
 
 /* Version of the DWARF specification we support.  */
-#define DWARF_VERSION 2
+#define DWARF_VERSION 3
 
 /* Version of the CIE format.  */
 #define CIE_VERSION 1
@@ -285,6 +285,19 @@ struct Dwarf_CU
   /* Known location lists.  */
   void *locs;
 };
+
+/* Compute the offset of a CU's first DIE from its offset.  This
+   is either:
+        LEN       VER     OFFSET    ADDR
+      4-bytes + 2-bytes + 4-bytes + 1-byte  for 32-bit dwarf
+     12-bytes + 2-bytes + 8-bytes + 1-byte  for 64-bit dwarf
+     
+   Note the trick in the computation.  If the offset_size is 4
+   the '- 4' term changes the '3 *' into a '2 *'.  If the
+   offset_size is 8 it accounts for the 4-byte escape value
+   used at the start of the length.  */
+#define DIE_OFFSET_FROM_CU_OFFSET(cu_offset, offset_size) \
+  ((cu_offset) + 3 * (offset_size) - 4 + 3)
 
 #define CUDIE(fromcu) \
   ((Dwarf_Die)								      \

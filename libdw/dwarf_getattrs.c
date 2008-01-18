@@ -72,7 +72,7 @@ dwarf_getattrs (Dwarf_Die *die, int (*callback) (Dwarf_Attribute *, void *),
     /* Find the abbreviation.  */
     die->abbrev = __libdw_findabbrev (die->cu, u128);
 
-  if (die->abbrev == (Dwarf_Abbrev *) -1l)
+  if (die->abbrev == DWARF_END_ABBREV)
     {
       __libdw_seterrno (DWARF_E_INVALID_DWARF);
       return -1l;
@@ -96,13 +96,19 @@ dwarf_getattrs (Dwarf_Die *die, int (*callback) (Dwarf_Attribute *, void *),
 
       /* Get attribute name and form.  */
       Dwarf_Attribute attr;
+      const unsigned char * remembered_attrp = attrp;
+
       // XXX Fix bound checks
       get_uleb128 (attr.code, attrp);
       get_uleb128 (attr.form, attrp);
 
       /* We can stop if we found the attribute with value zero.  */
       if (attr.code == 0 && attr.form == 0)
-        return 0;
+	/* Do not return 0 here - there would be no way to
+	   distinguish this value from the attribute at offset 0.
+	   Instead we return +1 which would never be a valid
+	   offset of an attribute.  */
+        return 1l;
 
       /* Fill in the rest.  */
       attr.valp = (unsigned char *) die_addr;
@@ -110,7 +116,10 @@ dwarf_getattrs (Dwarf_Die *die, int (*callback) (Dwarf_Attribute *, void *),
 
       /* Now call the callback function.  */
       if (callback (&attr, arg) != DWARF_CB_OK)
-	return attrp - die->abbrev->attrp;
+	/* Return the offset of the start of the attribute, so that
+	   dwarf_getattrs() can be restarted from this point if the
+	   caller so desires.  */
+	return remembered_attrp - die->abbrev->attrp;
 
       /* Skip over the rest of this attribute (if there is any).  */
       if (attr.form != 0)

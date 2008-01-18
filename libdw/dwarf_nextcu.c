@@ -53,6 +53,7 @@
 #endif
 
 #include <libdwP.h>
+#include <dwarf.h>
 
 
 int
@@ -91,9 +92,9 @@ dwarf_nextcu (dwarf, off, next_off, header_sizep, abbrev_offsetp,
 	 of the .debug_info contribution for that compilation unit, not
 	 including the length field itself. In the 32-bit DWARF format,
 	 this is a 4-byte unsigned integer (which must be less than
-	 0xffffff00); in the 64-bit DWARF format, this consists of the
+	 0xfffffff0); in the 64-bit DWARF format, this consists of the
 	 4-byte value 0xffffffff followed by an 8-byte unsigned integer
-	 that gives the actual length (see Section 7.4).
+	 that gives the actual length (see Section 7.2.2).
 
       2. A 2-byte unsigned integer representing the version of the
 	 DWARF information for that compilation unit. For DWARF Version
@@ -112,22 +113,27 @@ dwarf_nextcu (dwarf, off, next_off, header_sizep, abbrev_offsetp,
 	 offset portion of an address.  */
   uint64_t length = read_4ubyte_unaligned_inc (dwarf, bytes);
   size_t offset_size = 4;
-  if (length == 0xffffffffu)
+  /* Lengths of 0xfffffff0 - 0xffffffff are escape codes.  Oxffffffff is
+     used to indicate that 64-bit dwarf information is being used, the
+     other values are currently reserved.  */
+  if (length == DWARF3_LENGTH_64_BIT)
     offset_size = 8;
+  else if (unlikely (length >= DWARF3_LENGTH_MIN_ESCAPE_CODE
+		     && length <= DWARF3_LENGTH_MAX_ESCAPE_CODE))
+    {
+      __libdw_seterrno (DWARF_E_INVALID_DWARF);
+      return -1;
+    }
 
-  /* Now we know how large the header is.  Note the trick in the
-     computation.  If the offset_size is 4 the '- 4' term undoes the
-     '2 *'.  If offset_size is 8 this term computes the size of the
-     escape value plus the 8 byte offset.  */
-  if (unlikely (off + 2 * offset_size - 4 + sizeof (uint16_t)
-		+ offset_size + sizeof (uint8_t)
+  /* Now we know how large the header is.  */
+  if (unlikely (DIE_OFFSET_FROM_CU_OFFSET (off, offset_size)
 		>= dwarf->sectiondata[IDX_debug_info]->d_size))
     {
       *next_off = -1;
       return 1;
     }
 
-  if (length == 0xffffffffu)
+  if (length == DWARF3_LENGTH_64_BIT)
     /* This is a 64-bit DWARF format.  */
     length = read_8ubyte_unaligned_inc (dwarf, bytes);
 
@@ -160,7 +166,8 @@ dwarf_nextcu (dwarf, off, next_off, header_sizep, abbrev_offsetp,
 		     - ((char *) dwarf->sectiondata[IDX_debug_info]->d_buf
 			+ off));
 
-  /* See above for an explanation of the trick in this formula.  */
+  /* See definition of DIE_OFFSET_FROM_CU_OFFSET macro
+     for an explanation of the trick in this expression.  */
   *next_off = off + 2 * offset_size - 4 + length;
 
   return 0;

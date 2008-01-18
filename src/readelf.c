@@ -4041,7 +4041,8 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	if (unlikely (dwarf_formaddr (attrp, &addr) != 0))
 	  {
 	  attrval_out:
-	    error (0, 0, gettext ("cannot get attribute value: %s"),
+	    error (0, 0, gettext ("offset: %" PRIx64 " cannot get attribute value: %s"),
+		   attrp->valp - (unsigned char *) attrp->cu->dbg->sectiondata[IDX_debug_info]->d_buf,
 		   dwarf_errmsg (-1));
 	    return DWARF_CB_ABORT;
 	  }
@@ -4285,7 +4286,7 @@ print_debug_info_section (Dwfl_Module *dwflmod,
       int tag = dwarf_tag (&dies[level]);
       if (unlikely (tag == DW_TAG_invalid))
 	{
-	  error (0, 0, gettext ("cannot get tag of DIE at offset %" PRIu64
+	  error (0, 0, gettext ("cannot get tag of DIE at offset %" PRIx64
 				" in section '%s': %s"),
 		 (uint64_t) offset, ".debug_info", dwarf_errmsg (-1));
 	  goto do_return;
@@ -4309,8 +4310,10 @@ print_debug_info_section (Dwfl_Module *dwflmod,
       if (res > 0)
 	{
 	  while ((res = dwarf_siblingof (&dies[level], &dies[level])) == 1)
-	    if (level-- == 0)
-	      break;
+	    {
+	      if (level-- == 0)
+		break;
+	    }
 
 	  if (unlikely (res == -1))
 	    {

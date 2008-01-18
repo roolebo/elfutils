@@ -1,4 +1,4 @@
-/* Return vhild of current DIE.
+/* Return child of current DIE.
    Copyright (C) 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
@@ -77,9 +77,9 @@ __libdw_find_attr (Dwarf_Die *die, unsigned int search_name,
   if (abbrevp == NULL)
     {
       abbrevp = __libdw_findabbrev (die->cu, abbrev_code);
-      die->abbrev = abbrevp ?: (Dwarf_Abbrev *) -1l;
+      die->abbrev = abbrevp ?: DWARF_END_ABBREV;
     }
-  if (unlikely (die->abbrev == (Dwarf_Abbrev *) -1l))
+  if (unlikely (die->abbrev == DWARF_END_ABBREV))
     {
       __libdw_seterrno (DWARF_E_INVALID_DWARF);
       return NULL;
@@ -163,7 +163,7 @@ dwarf_child (die, result)
   void *addr = NULL;
 
   /* If we already know there are no children do not search.  */
-  if (die->abbrev != (Dwarf_Abbrev *) -1
+  if (die->abbrev != DWARF_END_ABBREV
       && (die->abbrev == NULL || die->abbrev->has_children))
     addr = __libdw_find_attr (die, INVALID, NULL, NULL);
   if (die->abbrev == (Dwarf_Abbrev *) -1l)

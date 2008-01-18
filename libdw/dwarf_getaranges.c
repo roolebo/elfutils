@@ -55,7 +55,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "libdwP.h"
-
+#include <dwarf.h>
 
 struct arangelist
 {
@@ -131,11 +131,14 @@ dwarf_getaranges (dbg, aranges, naranges)
 	 a segment descriptor on the target system.  */
       Dwarf_Word length = read_4ubyte_unaligned_inc (dbg, readp);
       unsigned int length_bytes = 4;
-      if (length == 0xffffffff)
+      if (length == DWARF3_LENGTH_64_BIT)
 	{
 	  length = read_8ubyte_unaligned_inc (dbg, readp);
 	  length_bytes = 8;
 	}
+      else if (unlikely (length >= DWARF3_LENGTH_MIN_ESCAPE_CODE
+			 && length <= DWARF3_LENGTH_MAX_ESCAPE_CODE))
+	goto invalid;
 
       unsigned int version = read_2ubyte_unaligned_inc (dbg, readp);
       if (version != 2)
@@ -197,11 +200,11 @@ dwarf_getaranges (dbg, aranges, naranges)
 	  const char *cu_header = (dbg->sectiondata[IDX_debug_info]->d_buf
 				   + offset);
 	  unsigned int offset_size;
-	  if (read_4ubyte_unaligned_noncvt (cu_header) == 0xffffffff)
+	  if (read_4ubyte_unaligned_noncvt (cu_header) == DWARF3_LENGTH_64_BIT)
 	    offset_size = 8;
 	  else
 	    offset_size = 4;
-	  new_arange->arange.offset = offset + 3 * offset_size - 4 + 3;
+	  new_arange->arange.offset = DIE_OFFSET_FROM_CU_OFFSET (offset, offset_size);
 
 	  /* Sanity-check the data.  */
 	  if (new_arange->arange.offset

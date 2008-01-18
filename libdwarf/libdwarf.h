@@ -134,7 +134,7 @@ extern int dwarf_init (int fd, Dwarf_Unsigned access,
 		       Dwarf_Handler errhand, Dwarf_Ptr errarg,
 		       Dwarf_Debug *dbg, Dwarf_Error *errdesc);
 
-/* Similar to `dwarf_init' but instead of a file descriptor of ELF
+/* Similar to `dwarf_init' but instead of a file descriptor an ELF
    descriptor is passed.  */
 extern int dwarf_elf_init (Elf *elf, Dwarf_Unsigned access,
 			   Dwarf_Handler errhand, Dwarf_Ptr errarg,

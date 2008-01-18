@@ -62,6 +62,12 @@ __libdw_formref (attr, return_offset)
 {
   const unsigned char *datap;
 
+  if (attr->valp == NULL)
+    {
+      __libdw_seterrno (DWARF_E_INVALID_REFERENCE);
+      return -1;
+    }
+
   switch (attr->form)
     {
     case DW_FORM_ref1:

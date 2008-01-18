@@ -204,7 +204,8 @@ dwarf_getaranges (dbg, aranges, naranges)
 	    offset_size = 8;
 	  else
 	    offset_size = 4;
-	  new_arange->arange.offset = DIE_OFFSET_FROM_CU_OFFSET (offset, offset_size);
+	  new_arange->arange.offset = DIE_OFFSET_FROM_CU_OFFSET (offset,
+								 offset_size);
 
 	  /* Sanity-check the data.  */
 	  if (new_arange->arange.offset

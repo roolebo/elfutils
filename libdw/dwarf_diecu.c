@@ -70,7 +70,8 @@ dwarf_diecu (die, result, address_sizep, offset_sizep)
   memset (result, '\0', sizeof (Dwarf_Die));
 
   result->addr = ((char *) die->cu->dbg->sectiondata[IDX_debug_info]->d_buf
- 		  + DIE_OFFSET_FROM_CU_OFFSET (die->cu->start, die->cu->offset_size));
+ 		  + DIE_OFFSET_FROM_CU_OFFSET (die->cu->start,
+					       die->cu->offset_size));
   result->cu = die->cu;
 
   if (address_sizep != NULL)

@@ -96,7 +96,7 @@ dwarf_getattrs (Dwarf_Die *die, int (*callback) (Dwarf_Attribute *, void *),
 
       /* Get attribute name and form.  */
       Dwarf_Attribute attr;
-      const unsigned char * remembered_attrp = attrp;
+      const unsigned char *remembered_attrp = attrp;
 
       // XXX Fix bound checks
       get_uleb128 (attr.code, attrp);

@@ -602,6 +602,7 @@ process_elf_file (Dwfl_Module *dwflmod, int fd)
     {
       /* Read the file afresh.  */
       off64_t aroff = elf_getaroff (elf);
+      pure_elf = elf_begin (fd, ELF_C_READ_MMAP, NULL);
       if (aroff > 0)
 	{
 	  /* Archive member.  */
@@ -610,8 +611,6 @@ process_elf_file (Dwfl_Module *dwflmod, int fd)
 	  elf_end (pure_elf);
 	  pure_elf = armem;
 	}
-      else
-	pure_elf = elf_begin (fd, ELF_C_READ_MMAP, NULL);
       if (pure_elf == NULL)
 	goto elf_error;
       pure_ebl = ebl_openbackend (pure_elf);

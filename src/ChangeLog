@@ -19,9 +19,6 @@
 	*nextp.  Fix wrong logic in recognizing first iteration of group
 	loop.  When clearing flags, also clear ld_state.group_start_archive.
 
-	* src/readelf.c (process_elf_file): When re-reading pure file,
-	don't first open the file and then map from the mapped archive.
-
 2008-01-11  Ulrich Drepper  <drepper@redhat.com>
 
 	* objdump.c (show_disasm): Adjust disassembler format string for

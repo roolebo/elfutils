@@ -1,5 +1,5 @@
 /* Return offset in archive for current file ELF.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -71,5 +71,5 @@ elf_getaroff (elf)
   Elf *parent = elf->parent;
   assert (parent->kind == ELF_K_AR);
 
-  return parent->state.ar.offset;
+  return elf->start_offset - sizeof (struct ar_hdr) - parent->start_offset;
 }

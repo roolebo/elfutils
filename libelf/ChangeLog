@@ -1,3 +1,8 @@
+2008-01-20  Roland McGrath  <roland@redhat.com>
+
+	* elf_getaroff.c: Calculate from start_offset, instead of using
+	parent's state.ar.offset field.
+
 2008-01-08  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am (euinclude): Variable removed.

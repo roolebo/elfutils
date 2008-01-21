@@ -1090,6 +1090,10 @@ print_op_fct (const void *nodep, VISIT value,
 }
 
 
+#if NMNES < 2
+# error "bogus NMNES value"
+#endif
+
 static void
 instrtable_out (void)
 {

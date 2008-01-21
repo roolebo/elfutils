@@ -56,7 +56,6 @@
 #include <dwarf.h>
 #include <string.h>
 
-
 int
 dwarf_siblingof (die, result)
      Dwarf_Die *die;
@@ -113,7 +112,6 @@ dwarf_siblingof (die, result)
       else if (this_die.abbrev->has_children)
 	/* This abbreviation has children.  */
 	++level;
-
 
       while (1)
 	{

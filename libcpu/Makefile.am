@@ -76,6 +76,6 @@ i386_gendis_LDADD = $(libeu) -lm $(libmudflap)
 
 noinst_HEADERS = memory-access.h i386_parse.h i386_data.h
 
-EXTRA_DIST = defs/i386 defs/x86_64
+EXTRA_DIST = defs/i386
 
 CLEANFILES = i386.mnemonics i386_dis.h x86_64.mnemonics x86_64_dis.h

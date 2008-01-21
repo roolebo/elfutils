@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl Configure input file for elfutils.                     -*-autoconf-*-
 dnl
-dnl Copyright (C) 1996-2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
+dnl Copyright (C) 1996-2002, 2003, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
 dnl
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software Foundation,
 dnl Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 dnl
-AC_INIT([Red Hat elfutils],[0.131],[http://bugzilla.redhat.com/bugzilla/],
+AC_INIT([Red Hat elfutils],[0.132],[http://bugzilla.redhat.com/bugzilla/],
 	[elfutils])
 
 AC_CONFIG_AUX_DIR([config])
@@ -136,7 +136,7 @@ AM_CONDITIONAL(MUDFLAP, test "$use_mudflap" = yes)
 
 dnl enable debugging of branch prediction.
 use_debugpred=0
-AC_ARG_ENABLE([debugpred], 
+AC_ARG_ENABLE([debugpred],
 AC_HELP_STRING([--enable-debugpred],
 [build binaries with support to debug branch prediction]),
 [use_debugpred=1], [use_debugpred=0])

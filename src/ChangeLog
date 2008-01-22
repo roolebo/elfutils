@@ -1,3 +1,27 @@
+2008-01-22  Ulrich Drepper  <drepper@redhat.com>
+
+	* ld.h (struct callbacks): Add initialize_gotplt.
+	(struct scnhead): Add scn_dot_gotplt.
+	(struct ld_state): Add gotpltscnidx.
+	* i386_ld.c (elf_i386_initialize_plt): Minor optimization.
+	(elf_i386_initialize_pltrel): Likewise.
+	(elf_i386_initialize_got): There is now a separate .got.plt, so
+	don't do the PLT-related work here.  Initialize d_type.
+	(elf_i386_initialize_gotplt): New function.
+	(elf_i386_plt0): Use ud2a after indirect jump.
+	(elf_i386_pic_plt0_entry): Likewise.
+	(elf_i386_finalize_plt): Reference now .got.plt.
+	(elf_i386_count_relocations): For GOT entries which need no relocation
+	don't bump nrel_got.
+	(elf_i386_create_relocations): Also get .got.plt.  Rewrite R-386_GOT32
+	handling for split .got/.got.plt.
+	(elf_i386_ld_init): Initialize callbacks.initialize_gotplt.
+	* elf32-i386.script: Sort sections for security.  There are no .got
+	input sections.  Add .got.plt.
+	* ldgeneric.c (ld_generic_generate_sections): Add .got.plt section.
+	(ld_generic_create_outfile): Initialize .got.plt section.
+	Use .got.plt address for _GLOBAL_OFFSET_TABLE_ symbol and DT_PLTGOT.
+
 2008-01-19  Ulrich Drepper  <drepper@redhat.com>
 
 	* i386_ld.c (elf_i386_count_relocations): PLT relocations for undefined

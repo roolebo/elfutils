@@ -214,8 +214,9 @@ elf_i386_initialize_plt (struct ld_state *statep, Elf_Scn *scn)
      relocation routines) and one for each function we call in a DSO.  */
   data->d_size = (1 + statep->nplt) * PLT_ENTRY_SIZE;
   data->d_buf = xcalloc (1, data->d_size);
-  data->d_align = 8;
+  assert (data->d_type == ELF_T_BYTE);
   data->d_off = 0;
+  data->d_align = 8;
 
   statep->nplt_used = 1;
 }
@@ -232,9 +233,10 @@ elf_i386_initialize_pltrel (struct ld_state *statep, Elf_Scn *scn)
 	   elf_errmsg (-1));
 
   /* One relocation per PLT entry.  */
-  data->d_size = statep->nplt * sizeof (Elf32_Rel);
-  data->d_buf = xcalloc (1, data->d_size);
+  size_t size = statep->nplt * sizeof (Elf32_Rel);
+  data->d_buf = xcalloc (1, size);
   data->d_type = ELF_T_REL;
+  data->d_size = size;
   data->d_align = 4;
   data->d_off = 0;
 }
@@ -243,26 +245,45 @@ elf_i386_initialize_pltrel (struct ld_state *statep, Elf_Scn *scn)
 static void
 elf_i386_initialize_got (struct ld_state *statep, Elf_Scn *scn)
 {
-  Elf_Data *data;
+  /* If we come here we better need a GOT.  */
+  assert (statep->ngot != 0);
 
-  /* If we have no .plt we don't need the special entries we normally
-     create for it.  The other contents is created later.  */
-  if (statep->ngot + statep->nplt == 0)
-    return;
-
-  data = elf_newdata (scn);
+  Elf_Data *data = elf_newdata (scn);
   if (data == NULL)
     error (EXIT_FAILURE, 0, gettext ("cannot allocate GOT section: %s"),
 	   elf_errmsg (-1));
 
-  /* We construct the .got section in pieces.  Here we only add the data
+  /* Just a single word per GOT entry is needed.  */
+  size_t size = statep->ngot * sizeof (Elf32_Addr);
+  data->d_buf = xcalloc (1, size);
+  data->d_size = size;
+  data->d_type = ELF_T_WORD;
+  data->d_off = 0;
+  data->d_align = sizeof (Elf32_Addr);
+}
+
+
+static void
+elf_i386_initialize_gotplt (struct ld_state *statep, Elf_Scn *scn)
+{
+  /* If we come here we better need a PLT.  */
+  assert (statep->nplt != 0);
+
+  Elf_Data *data = elf_newdata (scn);
+  if (data == NULL)
+    error (EXIT_FAILURE, 0, gettext ("cannot allocate GOTPLT section: %s"),
+	   elf_errmsg (-1));
+
+  /* We construct the .got.plt section in pieces.  Here we only add the data
      structures which are used by the PLT.  This includes three reserved
      entries at the beginning (the first will contain a pointer to the
      .dynamic section), and one word for each PLT entry.  */
-  data->d_size = (3 + statep->ngot + statep->nplt) * sizeof (Elf32_Addr);
-  data->d_buf = xcalloc (1, data->d_size);
-  data->d_align = sizeof (Elf32_Addr);
+  size_t size = (3 + statep->nplt) * sizeof (Elf32_Addr);
+  data->d_buf = xcalloc (1, size);
+  data->d_type = ELF_T_WORD;
+  data->d_size = size;
   data->d_off = 0;
+  data->d_align = sizeof (Elf32_Addr);
 }
 
 
@@ -274,7 +295,8 @@ static const unsigned char elf_i386_plt0_entry[PLT_ENTRY_SIZE] =
   0, 0, 0, 0,	/* replaced with address of .got + 4.  */
   0xff, 0x25,	/* jmp indirect */
   0, 0, 0, 0,	/* replaced with address of .got + 8.  */
-  0, 0, 0, 0	/* pad out to 16 bytes.  */
+  0x0f, 0x0b,	/* ud2a, to prevent further decoding.  */
+  0, 0		/* pad out to 16 bytes.  */
 };
 
 /* Type describing the first PLT entry in non-PIC.  */
@@ -295,7 +317,8 @@ static const unsigned char elf_i386_pic_plt0_entry[PLT_ENTRY_SIZE] =
 {
   0xff, 0xb3, 4, 0, 0, 0,	/* pushl 4(%ebx) */
   0xff, 0xa3, 8, 0, 0, 0,	/* jmp *8(%ebx) */
-  0, 0, 0, 0			/* pad out to 16 bytes.  */
+  0x0f, 0x0b,			/* ud2a, to prevent further decoding.  */
+  0, 0				/* pad out to 16 bytes.  */
 };
 
 /* Contents of all but the first PLT entry in executable.  */
@@ -352,23 +375,24 @@ elf_i386_finalize_plt (struct ld_state *statep, size_t nsym,
     return;
 
   /* Get the address of the got section.  */
-  scn = elf_getscn (statep->outelf, statep->gotscnidx);
+  scn = elf_getscn (statep->outelf, statep->gotpltscnidx);
   xelf_getshdr (scn, shdr);
   data = elf_getdata (scn, NULL);
   assert (shdr != NULL && data != NULL);
   Elf32_Addr gotaddr = shdr->sh_addr;
 
-  /* Now create the initial values for the .got section.  The first
-     word contains the address of the .dynamic section.  */
+  /* Now create the initial values for the .got.plt section.  The
+     first word contains the address of the .dynamic section.  The
+     second and third entry are left empty for use by the dynamic
+     linker.  The following entries are pointers to the instructions
+     following the initial jmp instruction in the corresponding PLT
+     entry.  */
   xelf_getshdr (elf_getscn (statep->outelf, statep->dynamicscnidx), shdr);
   assert (shdr != NULL);
   ((Elf32_Word *) data->d_buf)[0] = shdr->sh_addr;
 
-  /* The second and third entry are left empty for use by the dynamic
-     linker.  The following entries are pointers to the instructions
-     following the initial jmp instruction in the corresponding PLT
-     entry.  Since the first PLT entry is special the first used one
-     has the index 1.  */
+  /* The PLT contains code which a user of a function jumps to.  The first
+     PLT entry is special, so the first used one has the index 1.  */
   scn = elf_getscn (statep->outelf, statep->pltscnidx);
   xelf_getshdr (scn, shdr);
   assert (shdr != NULL);
@@ -393,7 +417,6 @@ elf_i386_finalize_plt (struct ld_state *statep, size_t nsym,
 
       /* Point the GOT entry at the PLT entry, after the initial jmp.  */
       ((Elf32_Word *) data->d_buf)[3 + cnt] = pltentryaddr + 6;
-
 
       /* If the symbol is defined, adjust the address.  */
       if (((Elf32_Sym *) dynsymdata->d_buf)[1 + cnt].st_shndx != SHN_UNDEF)
@@ -458,7 +481,7 @@ elf_i386_finalize_plt (struct ld_state *statep, size_t nsym,
     }
 
   /* Create the .rel.plt section data.  It simply means relocations
-     addressing the corresponding entry in the .got section.  The
+     addressing the corresponding entry in the .got.plt section.  The
      section name is misleading.  */
   scn = elf_getscn (statep->outelf, statep->pltrelscnidx);
   xelf_getshdr (scn, shdr);
@@ -466,12 +489,12 @@ elf_i386_finalize_plt (struct ld_state *statep, size_t nsym,
   assert (shdr != NULL && data != NULL);
 
   /* Update the sh_link to point to the section being modified.  We
-     point it here (correctly) to the .got section.  Some linkers
+     point it here (correctly) to the .got.plt section.  Some linkers
      (e.g., the GNU binutils linker) point to the .plt section.  This
      is wrong since the .plt section isn't modified even though the
      name .rel.plt suggests that this is correct.  */
   shdr->sh_link = statep->dynsymscnidx;
-  shdr->sh_info = statep->gotscnidx;
+  shdr->sh_info = statep->gotpltscnidx;
   (void) xelf_update_shdr (scn, shdr);
 
   for (cnt = 0; cnt < statep->nplt; ++cnt)
@@ -482,7 +505,7 @@ elf_i386_finalize_plt (struct ld_state *statep, size_t nsym,
       xelf_getrel_ptr (data, cnt, rel);
       rel->r_offset = gotaddr + (3 + cnt) * sizeof (Elf32_Addr);
       /* The symbol table entries for the functions from DSOs are at
-	 the end of the symbol table.  */
+	 the beginning of the symbol table.  */
       rel->r_info = XELF_R_INFO (1 + cnt, R_386_JMP_SLOT);
       (void) xelf_update_rel (data, cnt, rel);
     }
@@ -533,13 +556,16 @@ elf_i386_count_relocations (struct ld_state *statep, struct scninfo *scninfo)
 	    {
 	    case R_386_GOT32:
 	      if (! scninfo->fileinfo->symref[r_sym]->defined
-		  || scninfo->fileinfo->symref[r_sym]->in_dso)
-		relsize += sizeof (Elf32_Rel);
+		  || scninfo->fileinfo->symref[r_sym]->in_dso
+		  || statep->file_type == dso_file_type)
+		{
+		  relsize += sizeof (Elf32_Rel);
+		  ++statep->nrel_got;
+		}
 
-	      /* This relocation is not emitted in the output file but
-		 requires a GOT entry.  */
+	      /* Even if this relocation is not emitted in the output
+		 file it requires a GOT entry.  */
 	      ++statep->ngot;
-	      ++statep->nrel_got;
 
 	      /* FALLTHROUGH */
 
@@ -668,15 +694,25 @@ elf_i386_create_relocations (struct ld_state *statep,
   Elf32_Addr pltaddr = shdr->sh_addr;
 
   Elf_Scn *gotscn = elf_getscn (statep->outelf, statep->gotscnidx);
-  shdr = elf32_getshdr (gotscn);
+  // XXX Adjust the address, if necessary, for relro
+  Elf_Data *gotdata = NULL;
+  if (statep->need_got)
+    {
+      gotdata = elf_getdata (gotscn, NULL);
+      assert (gotdata != NULL);
+    }
+
+  Elf_Scn *gotpltscn = elf_getscn (statep->outelf, statep->gotpltscnidx);
+  shdr = elf32_getshdr (gotpltscn);
   assert (shdr != NULL);
   Elf32_Addr gotaddr = shdr->sh_addr;
 
   Elf_Scn *reldynscn = elf_getscn (statep->outelf, statep->reldynscnidx);
   Elf_Data *reldyndata = elf_getdata (reldynscn, NULL);
+  assert (reldyndata != NULL);
 
   size_t nreldyn = 0;
-#define ngot_used (3 + statep->nplt + nreldyn)
+  size_t ngotconst = statep->nrel_got;
 
   struct scninfo *first = statep->rellist->next;
   struct scninfo *runp = first;
@@ -686,7 +722,7 @@ elf_i386_create_relocations (struct ld_state *statep,
       Elf_Data *reldata = elf_getdata (runp->scn, NULL);
       int nrels = rshdr->sh_size / rshdr->sh_entsize;
 
-      /* We will need the following vlaues a couple of times.  Help
+      /* We will need the following values a couple of times.  Help
 	 the compiler and improve readability.  */
       struct symbol **symref = runp->fileinfo->symref;
       struct scninfo *scninfo = runp->fileinfo->scninfo;
@@ -720,7 +756,7 @@ elf_i386_create_relocations (struct ld_state *statep,
 	      XElf_Sym_vardef (sym);
 	      xelf_getsym (symdata, idx, sym);
 
-	      /* The value just depends on the position of the referenced
+	      /* The value only depends on the position of the referenced
 		 section in the output file and the addend.  */
 	      value = scninfo[sym->st_shndx].offset + sym->st_value;
 	    }
@@ -730,22 +766,20 @@ elf_i386_create_relocations (struct ld_state *statep,
 		/* Symbol in ignored COMDAT group section.  */
 		continue;
 
+	      value = symref[idx]->merge.value;
 	      if (symref[idx]->in_dso)
 		{
-		  /* MERGE.VALUE contains the PLT index.  We have to
-		     add 1 since there is this one special PLT entry
-		     at the beginning.  */
-		  assert (symref[idx]->merge.value != 0
-			  || symref[idx]->type != STT_FUNC);
-		  value = pltaddr + symref[idx]->merge.value * PLT_ENTRY_SIZE;
+		  /* MERGE.VALUE contains the PLT index.  If this is not for
+		     a function the actual value will be computed later.  */
+		  assert (value != 0 || symref[idx]->type != STT_FUNC);
+		  value = pltaddr + value * PLT_ENTRY_SIZE;
 		}
-	      else
-		value = symref[idx]->merge.value;
 	    }
 
 	  /* Address of the relocated memory in the data buffer.  */
 	  void *relloc = (char *) data->d_buf + rel->r_offset;
 
+	  uint32_t thisgotidx;
 	  switch (XELF_R_TYPE (rel->r_info))
 	    {
 	      /* These three cases can be handled together since the
@@ -781,6 +815,7 @@ elf_i386_create_relocations (struct ld_state *statep,
 			= XELF_R_INFO (symref[idx]->outdynsymidx, R_386_COPY);
 		      (void) xelf_update_rel (reldyndata, nreldyn, rel2);
 		      ++nreldyn;
+		      assert (nreldyn <= statep->nrel_got);
 
 		      /* Update the symbol table record for the new
 			 address.  */
@@ -833,6 +868,7 @@ elf_i386_create_relocations (struct ld_state *statep,
 		      = XELF_R_INFO (symref[idx]->outdynsymidx, R_386_32);
 		  (void) xelf_update_rel (reldyndata, nreldyn, rel2);
 		  ++nreldyn;
+		  assert (nreldyn <= statep->nrel_got);
 
 		  value = 0;
 		}
@@ -840,19 +876,45 @@ elf_i386_create_relocations (struct ld_state *statep,
 	      break;
 
 	    case R_386_GOT32:
-	      store_4ubyte_unaligned (relloc, ngot_used * sizeof (Elf32_Addr));
+	      if (! symref[idx]->defined || symref[idx]->in_dso)
+		{
+		  thisgotidx = nreldyn++;
+		  assert (thisgotidx < statep->nrel_got);
 
-	      /* Add a relocation to initialize the GOT entry.  */
+		  /* Add a relocation to initialize the GOT entry.  */
 #if NATIVE_ELF != 0
-	      xelf_getrel_ptr (reldyndata, nreldyn, rel2);
+		  xelf_getrel_ptr (reldyndata, thisgotidx, rel2);
 #else
-	      rel2 = &rel_mem;
+		  rel2 = &rel_mem;
 #endif
-	      rel2->r_offset = gotaddr + ngot_used * sizeof (Elf32_Addr);
-	      rel2->r_info
-		= XELF_R_INFO (symref[idx]->outdynsymidx, R_386_GLOB_DAT);
-	      (void) xelf_update_rel (reldyndata, nreldyn, rel2);
-	      ++nreldyn;
+		  rel2->r_offset = gotaddr + ((thisgotidx - statep->ngot)
+					      * sizeof (Elf32_Addr));
+		  rel2->r_info
+		    = XELF_R_INFO (symref[idx]->outdynsymidx, R_386_GLOB_DAT);
+		  (void) xelf_update_rel (reldyndata, thisgotidx, rel2);
+		}
+	      else if (statep->file_type != dso_file_type)
+		{
+		  thisgotidx = ngotconst++;
+		  assert (thisgotidx < statep->ngot);
+
+		  /* We have to use a GOT since the generated code
+		     requires it but we know the address and therefore
+		     do not need a relocation.  */
+		  ((uint32_t *) gotdata->d_buf)[thisgotidx] = value;
+		}
+	      else
+		{
+		  thisgotidx = nreldyn++;
+		  assert (thisgotidx < statep->nrel_got);
+
+		  // XXX generate a relative relocation.
+		  abort ();
+		}
+
+	      store_4ubyte_unaligned (relloc,
+				      (thisgotidx - statep->ngot)
+				      * sizeof (Elf32_Addr));
 	      break;
 
 	    case R_386_GOTOFF:
@@ -882,7 +944,6 @@ elf_i386_create_relocations (struct ld_state *statep,
 	    case R_386_TLS_IE_32:
 	    case R_386_TLS_LE_32:
 	      // XXX For now fall through
- printf("ignored relocation %d\n", (int) XELF_R_TYPE (rel->r_info));
 	      break;
 
 	    case R_386_NONE:
@@ -919,6 +980,7 @@ elf_i386_ld_init (struct ld_state *statep)
   statep->callbacks.initialize_pltrel = elf_i386_initialize_pltrel;
 
   statep->callbacks.initialize_got = elf_i386_initialize_got;
+  statep->callbacks.initialize_gotplt = elf_i386_initialize_gotplt;
 
   statep->callbacks.finalize_plt = elf_i386_finalize_plt;
 

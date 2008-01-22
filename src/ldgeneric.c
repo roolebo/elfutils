@@ -1280,7 +1280,7 @@ add_relocatable_file (struct usedfiles *fileinfo, GElf_Word secttype)
 			  || shdr->sh_type == SHT_FINI_ARRAY
 			  || shdr->sh_type == SHT_PREINIT_ARRAY))
 	{
-	  /* Check whether the check needs to be executable.  */
+	  /* Check whether the section needs to be executable.  */
 	  if (shdr->sh_type == SHT_PROGBITS
 	      && (shdr->sh_flags & SHF_EXECINSTR) == 0
 	      && strcmp (elf_strptr (fileinfo->elf, fileinfo->shstrndx,
@@ -2414,8 +2414,11 @@ ld_generic_generate_sections (struct ld_state *statep)
 			     : xelf_fsize (ld_state.outelf, ELF_T_RELA, 1),
 			     xelf_fsize (ld_state.outelf, ELF_T_ADDR, 1));
 
-	  /* This means we will also need the .got section.  */
-	  ld_state.need_got = true;
+	  /* XXX We might need a function which returns the section flags.  */
+	  new_generated_scn (scn_dot_gotplt, ".got.plt", SHT_PROGBITS,
+			     SHF_ALLOC | SHF_WRITE,
+			     xelf_fsize (ld_state.outelf, ELF_T_ADDR, 1),
+			     xelf_fsize (ld_state.outelf, ELF_T_ADDR, 1));
 
 	  /* Mark all used DSOs as used.  Determine whether any referenced
 	     object uses symbol versioning.  */
@@ -3938,6 +3941,17 @@ ld_generic_create_outfile (struct ld_state *statep)
 	  continue;
 	}
 
+      if (unlikely (head->kind == scn_dot_gotplt))
+	{
+	  /* Remember the index of this section.  */
+	  ld_state.gotpltscnidx = elf_ndxscn (scn);
+
+	  /* Give the backend the change to initialize the section.  */
+	  INITIALIZE_GOTPLT (&ld_state, scn);
+
+	  continue;
+	}
+
       if (unlikely (head->kind == scn_dot_dynrel))
 	{
 	  Elf_Data *outdata;
@@ -4592,7 +4606,8 @@ ld_generic_create_outfile (struct ld_state *statep)
   if (ld_state.got_symbol != NULL)
     {
       assert (nsym < nsym_allocated);
-      fillin_special_symbol (ld_state.got_symbol, ld_state.gotscnidx,
+      // XXX Fix so that it works even if no PLT is needed.
+      fillin_special_symbol (ld_state.got_symbol, ld_state.gotpltscnidx,
 			     nsym++, symdata, strtab);
     }
 
@@ -6189,8 +6204,9 @@ internal error: nobits section follows nobits section"));
 	  /* Add the entries related to the .plt.  */
 	  if (ld_state.nplt > 0)
 	    {
-	      xelf_getshdr (elf_getscn (ld_state.outelf, ld_state.gotscnidx),
-			    shdr);
+	      // XXX Make this work if there is no PLT
+	      xelf_getshdr (elf_getscn (ld_state.outelf,
+					ld_state.gotpltscnidx), shdr);
 	      assert (shdr != NULL);
 	      new_dynamic_entry (dyndata, ld_state.ndynamic_filled++,
 				 // XXX This should probably be machine

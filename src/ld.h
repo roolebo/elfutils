@@ -406,6 +406,11 @@ struct callbacks
 #define INITIALIZE_GOT(state, scn) \
   DL_CALL_FCT ((state)->callbacks.initialize_got, (state, scn))
 
+  /* Create the data structures for the .got.plt section and initialize it.  */
+  void (*initialize_gotplt) (struct ld_state *, Elf_Scn *scn);
+#define INITIALIZE_GOTPLT(state, scn) \
+  DL_CALL_FCT ((state)->callbacks.initialize_gotplt, (state, scn))
+
   /* Return the tag corresponding to the native relocation type for
      the platform.  */
   int (*rel_type) (struct ld_state *);
@@ -670,6 +675,7 @@ struct scnhead
       scn_normal,		/* Section from the input file(s).  */
       scn_dot_interp,		/* Generated .interp section.  */
       scn_dot_got,		/* Generated .got section.  */
+      scn_dot_gotplt,		/* Generated .got.plt section.  */
       scn_dot_dynrel,		/* Generated .rel.dyn section.  */
       scn_dot_dynamic,		/* Generated .dynamic section.  */
       scn_dot_dynsym,		/* Generated .dynsym section.  */
@@ -937,6 +943,8 @@ struct ld_state
 
   /* Global offset table section.  */
   Elf32_Word gotscnidx;
+  /* And the part of the PLT.  */
+  Elf32_Word gotpltscnidx;
 
   /* This section will hole all non-PLT relocations.  */
   Elf32_Word reldynscnidx;

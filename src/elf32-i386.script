@@ -85,13 +85,6 @@ SEGMENT [RW]
   /* Adjust the address for the data segment.  We want to adjust up to
      the same address within the page on the next page up.  */
   . = ALIGN(PAGESIZE) + (. & (PAGESIZE - 1));
-  .data
-    {
-      *(.data)
-      *(.data.*)
-      *(.gnu.linkonce.d.*)
-    }
-  .data1;
   .eh_frame
     {
       KEEP (*(.eh_frame))
@@ -125,15 +118,19 @@ SEGMENT [RW]
       KEEP (*(.dtors))
     }
   .jcr;
-  .got
-    {
-      *(.got.plt)
-      *(.got)
-    }
   .dynamic;
+  .got;
+  .got.plt;
+  .data
+    {
+      *(.data)
+      *(.data.*)
+      *(.gnu.linkonce.d.*)
+    }
   /* We want the small data sections together, so single-instruction offsets
      can access them all, and initialized data all before uninitialized, so
      we can shorten the on-disk segment size.  */
+  .data1;
   .sdata
     {
       *(.sdata)

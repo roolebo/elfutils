@@ -71,8 +71,10 @@ libeu = ../lib/libeu.a
 i386_lex_CFLAGS = -Wno-unused-label -Wno-unused-function -Wno-sign-compare
 i386_parse.o: i386_parse.c i386.mnemonics
 i386_parse_CFLAGS = -DNMNES=$$(wc -l < i386.mnemonics)
-i386_lex.o: i386_parse.c
+i386_lex.o: i386_parse.h
 i386_gendis_LDADD = $(libeu) -lm $(libmudflap)
+
+i386_parse.h: i386_parse.c ;
 
 noinst_HEADERS = memory-access.h i386_parse.h i386_data.h
 

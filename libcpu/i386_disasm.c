@@ -589,22 +589,26 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 #endif
 
 			case 0x98:
+#ifdef X86_64
 			  if (prefixes == (has_rex_w | has_rex))
 			    {
 			      str = "cltq";
 			      break;
 			    }
+#endif
 			  if (prefixes & ~has_data16)
 			    goto print_prefix;
 			  str = prefixes & has_data16 ? "cbtw" : "cwtl";
 			  break;
 
 			case 0x99:
+#ifdef X86_64
 			  if (prefixes == (has_rex_w | has_rex))
 			    {
 			      str = "cqto";
 			      break;
 			    }
+#endif
 			  if (prefixes & ~has_data16)
 			    goto print_prefix;
 			  str = prefixes & has_data16 ? "cwtd" : "cltd";

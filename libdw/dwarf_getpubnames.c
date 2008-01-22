@@ -102,6 +102,7 @@ get_offsets (Dwarf *dbg)
       else if (unlikely (len >= DWARF3_LENGTH_MIN_ESCAPE_CODE
 			 && len <= DWARF3_LENGTH_MAX_ESCAPE_CODE))
 	{
+	invalid_dwarf:
 	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
 	  goto err_return;
 	}
@@ -116,7 +117,7 @@ get_offsets (Dwarf *dbg)
 
       /* Read the version.  It better be two for now.  */
       uint16_t version = read_2ubyte_unaligned (dbg, readp);
-      if (version != 2)
+      if (unlikely (version != 2))
 	{
 	  __libdw_seterrno (DWARF_E_INVALID_VERSION);
 	  goto err_return;
@@ -129,13 +130,12 @@ get_offsets (Dwarf *dbg)
 	mem[cnt].cu_offset = read_8ubyte_unaligned (dbg, readp + 2);
 
       /* Determine the size of the CU header.  */
-      if (dbg->sectiondata[IDX_debug_info] == NULL
-	  || dbg->sectiondata[IDX_debug_info]->d_buf == NULL
-	  || mem[cnt].cu_offset + 3 >= dbg->sectiondata[IDX_debug_info]->d_size)
-	{
-	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
-	  goto err_return;
-	}
+      if (unlikely (dbg->sectiondata[IDX_debug_info] == NULL
+		    || dbg->sectiondata[IDX_debug_info]->d_buf == NULL
+		    || (mem[cnt].cu_offset + 3
+			>= dbg->sectiondata[IDX_debug_info]->d_size)))
+	goto invalid_dwarf;
+
       unsigned char *infop
 	= ((unsigned char *) dbg->sectiondata[IDX_debug_info]->d_buf
 	   + mem[cnt].cu_offset);
@@ -173,7 +173,7 @@ dwarf_getpubnames (dbg, callback, arg, offset)
   if (dbg == NULL)
     return -1l;
 
-  if (offset < 0)
+  if (unlikely (offset < 0))
     {
       __libdw_seterrno (DWARF_E_INVALID_OFFSET);
       return -1l;
@@ -187,7 +187,7 @@ dwarf_getpubnames (dbg, callback, arg, offset)
     return 0;
 
   /* If necessary read the set information.  */
-  if (dbg->pubnames_nsets == 0 && get_offsets (dbg) != 0)
+  if (dbg->pubnames_nsets == 0 && unlikely (get_offsets (dbg) != 0))
     return -1l;
 
   /* Find the place where to start.  */

@@ -81,6 +81,7 @@ __libdw_find_attr (Dwarf_Die *die, unsigned int search_name,
     }
   if (unlikely (die->abbrev == DWARF_END_ABBREV))
     {
+    invalid_dwarf:
       __libdw_seterrno (DWARF_E_INVALID_DWARF);
       return NULL;
     }
@@ -95,10 +96,7 @@ __libdw_find_attr (Dwarf_Die *die, unsigned int search_name,
     {
       /* Are we still in bounds?  This test needs to be refined.  */
       if (unlikely (attrp + 1 >= endp))
-	{
-	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
-	  return NULL;
-	}
+	goto invalid_dwarf;
 
       /* Get attribute name and form.
 
@@ -166,7 +164,7 @@ dwarf_child (die, result)
   if (die->abbrev != DWARF_END_ABBREV
       && (die->abbrev == NULL || die->abbrev->has_children))
     addr = __libdw_find_attr (die, INVALID, NULL, NULL);
-  if (die->abbrev == (Dwarf_Abbrev *) -1l)
+  if (unlikely (die->abbrev == (Dwarf_Abbrev *) -1l))
     return -1;
 
   /* Make sure the DIE really has children.  */

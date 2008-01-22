@@ -1,3 +1,11 @@
+2008-01-21  Ulrich Drepper  <drepper@redhat.com>
+
+	* dwarf_child.c: Minor optimizations.
+	* dwarf_getattrs.c: Likewise.
+	* dwarf_getpubnames.c: Likewise.
+	* dwarf_siblingof.c: Likewise.
+	* dwarf_tag.c: Likewise.
+
 2008-01-18  Ulrich Drepper  <drepper@redhat.com>
 
 	* dwarf_getsrclines.c (dwarf_getsrclines): Don't require exact match

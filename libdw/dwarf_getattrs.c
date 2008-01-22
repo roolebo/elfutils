@@ -72,8 +72,9 @@ dwarf_getattrs (Dwarf_Die *die, int (*callback) (Dwarf_Attribute *, void *),
     /* Find the abbreviation.  */
     die->abbrev = __libdw_findabbrev (die->cu, u128);
 
-  if (die->abbrev == DWARF_END_ABBREV)
+  if (unlikely (die->abbrev == DWARF_END_ABBREV))
     {
+    invalid_dwarf:
       __libdw_seterrno (DWARF_E_INVALID_DWARF);
       return -1l;
     }
@@ -89,10 +90,7 @@ dwarf_getattrs (Dwarf_Die *die, int (*callback) (Dwarf_Attribute *, void *),
       if (unlikely (attrp
 		    >= ((unsigned char *) dbg->sectiondata[IDX_debug_abbrev]->d_buf
 			+ dbg->sectiondata[IDX_debug_abbrev]->d_size)))
-	{
-	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
-	  return -1;
-	}
+	goto invalid_dwarf;
 
       /* Get attribute name and form.  */
       Dwarf_Attribute attr;

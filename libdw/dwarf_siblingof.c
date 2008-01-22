@@ -98,7 +98,7 @@ dwarf_siblingof (die, result)
 	{
 	  Dwarf_Off offset;
 	  sibattr.valp = addr;
-	  if (__libdw_formref (&sibattr, &offset) != 0)
+	  if (unlikely (__libdw_formref (&sibattr, &offset) != 0))
 	    /* Something went wrong.  */
 	    return -1;
 

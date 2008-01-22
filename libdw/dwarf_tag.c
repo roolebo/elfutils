@@ -106,7 +106,7 @@ dwarf_tag (die)
       die->abbrev = __libdw_findabbrev (die->cu, u128);
     }
 
-  if (die->abbrev == DWARF_END_ABBREV)
+  if (unlikely (die->abbrev == DWARF_END_ABBREV))
     {
       __libdw_seterrno (DWARF_E_INVALID_DWARF);
       return DW_TAG_invalid;

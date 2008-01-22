@@ -1,5 +1,8 @@
 2008-01-21  Roland McGrath  <roland@redhat.com>
 
+	* defs/i386: Fix typo in comment.
+	* i386_disasm.c (i386_disasm): Handle cltq, cqto.
+
 	* i386_parse.y: Add sanity check for NMNES macro value.
 	* Makefile.am (i386_parse.o): Fix target in dependency rule.
 	(i386_parse.h): New target with empty commands.

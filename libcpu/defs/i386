@@ -116,7 +116,7 @@ ifdef(`i386',
 11111111,{mod}011{64r_m}:lcall{W} *{mod}{64r_m}
 # SPECIAL 10011000:[{rex.w}?cltq:{dpfx}?cbtw:cwtl]
 10011000:INVALID
-# SPECIAL 10011001:[{rew.w}?cqto:{dpfx}?cltd:cwtd]
+# SPECIAL 10011001:[{rex.w}?cqto:{dpfx}?cltd:cwtd]
 10011001:INVALID
 11111000:clc
 11111100:cld

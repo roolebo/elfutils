@@ -129,13 +129,10 @@ get_offsets (Dwarf *dbg)
 	mem[cnt].cu_offset = read_8ubyte_unaligned (dbg, readp + 2);
 
       /* Determine the size of the CU header.  */
-      if (dbg->sectiondata[IDX_debug_info] == NULL
-	  || dbg->sectiondata[IDX_debug_info]->d_buf == NULL
-	  || mem[cnt].cu_offset + 3 >= dbg->sectiondata[IDX_debug_info]->d_size)
-	{
-	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
-	  goto err_return;
-	}      
+      assert (dbg->sectiondata[IDX_debug_info] != NULL);
+      assert (dbg->sectiondata[IDX_debug_info]->d_buf != NULL);
+      assert (mem[cnt].cu_offset + 3
+	      < dbg->sectiondata[IDX_debug_info]->d_size);
       unsigned char *infop
 	= ((unsigned char *) dbg->sectiondata[IDX_debug_info]->d_buf
 	   + mem[cnt].cu_offset);

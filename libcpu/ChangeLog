@@ -1,3 +1,10 @@
+2008-01-21  Roland McGrath  <roland@redhat.com>
+
+	* i386_parse.y: Add sanity check for NMNES macro value.
+	* Makefile.am (i386_parse.o): Fix target in dependency rule.
+	(i386_parse.h): New target with empty commands.
+	(i386_lex.o): Depend on it in place of i386_parse.c.
+
 2008-01-21  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.am (EXTRA_DIST): Remove defs/x86_64.

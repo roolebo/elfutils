@@ -1,5 +1,5 @@
 /* Interfaces for libdw.
-   Copyright (C) 2002, 2004, 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2002, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify

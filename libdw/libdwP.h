@@ -1,5 +1,5 @@
 /* Internal definitions for libdwarf.
-   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -291,7 +291,7 @@ struct Dwarf_CU
         LEN       VER     OFFSET    ADDR
       4-bytes + 2-bytes + 4-bytes + 1-byte  for 32-bit dwarf
      12-bytes + 2-bytes + 8-bytes + 1-byte  for 64-bit dwarf
-     
+
    Note the trick in the computation.  If the offset_size is 4
    the '- 4' term changes the '3 *' into a '2 *'.  If the
    offset_size is 8 it accounts for the 4-byte escape value

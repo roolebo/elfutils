@@ -1,5 +1,5 @@
 /* Return list address ranges.
-   Copyright (C) 2000, 2001, 2002, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2004, 2005, 2006, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 

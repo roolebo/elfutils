@@ -1,5 +1,5 @@
 /* Return tag of given DIE.
-   Copyright (C) 2003, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2003, 2004, 2005, 2006, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 

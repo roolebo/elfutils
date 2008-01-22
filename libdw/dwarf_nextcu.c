@@ -1,5 +1,5 @@
 /* Advance to next CU header.
-   Copyright (C) 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 

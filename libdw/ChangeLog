@@ -16,7 +16,7 @@
 	(dwarf_nextcu): Use the new definitions.
 
 	* libdwP.h (DIE_OFFSET_FROM_CU_OFFSET): New macro.
-	* dwarf_die.c (dwarf_diecu): Use the new macro.
+	* dwarf_diecu.c (dwarf_diecu): Use the new macro.
 	* dwarf_getaranges (dwarf_getaranges): Use the new macro.
 	* dwarf_nextcu.c (dwarf_nextcu): Use the new macro.
 

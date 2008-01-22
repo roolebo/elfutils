@@ -1,5 +1,5 @@
 /* This file defines standard DWARF types, structures, and macros.
-   Copyright (C) 2000, 2002, 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2000, 2002, 2005, 2006, 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -674,7 +674,7 @@ enum
 
 /* Section 7.2.2 of the DWARF3 specification defines a range of escape
    codes that can appear in the length field of certain DWARF structures.
-   
+
    These defines enumerate the minium and maximum values of this range.
    Currently only the maximum value is used (to indicate that 64-bit
    values are going to be used in the dwarf data that accompanies the

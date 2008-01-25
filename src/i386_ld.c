@@ -360,25 +360,23 @@ struct plt_entry
 
 static void
 elf_i386_finalize_plt (struct ld_state *statep, size_t nsym,
-		       size_t nsym_dyn __attribute__ ((unused)))
+		       size_t nsym_local, struct symbol **ndxtosym)
 {
-  Elf_Scn *scn;
-  XElf_Shdr_vardef (shdr);
-  Elf_Data *data;
-  Elf_Data *symdata = NULL;
-  Elf_Data *dynsymdata;
-  size_t cnt;
-  const bool build_dso = statep->file_type == dso_file_type;
-
   if (unlikely (statep->nplt + statep->ngot == 0))
     /* Nothing to be done.  */
     return;
 
-  /* Get the address of the got section.  */
+  Elf_Scn *scn;
+  XElf_Shdr_vardef (shdr);
+  Elf_Data *data;
+  const bool build_dso = statep->file_type == dso_file_type;
+
+  /* Get the address of the .got.plt section.  */
   scn = elf_getscn (statep->outelf, statep->gotpltscnidx);
   xelf_getshdr (scn, shdr);
   data = elf_getdata (scn, NULL);
   assert (shdr != NULL && data != NULL);
+  /* The address points to the .got.plt section, not the .got section.  */
   Elf32_Addr gotaddr = shdr->sh_addr;
 
   /* Now create the initial values for the .got.plt section.  The
@@ -394,13 +392,15 @@ elf_i386_finalize_plt (struct ld_state *statep, size_t nsym,
   /* The PLT contains code which a user of a function jumps to.  The first
      PLT entry is special, so the first used one has the index 1.  */
   scn = elf_getscn (statep->outelf, statep->pltscnidx);
-  xelf_getshdr (scn, shdr);
-  assert (shdr != NULL);
+  XElf_Shdr_vardef (pltshdr);
+  xelf_getshdr (scn, pltshdr);
+  assert (pltshdr != NULL);
 
-  dynsymdata = elf_getdata (elf_getscn (statep->outelf, statep->dynsymscnidx),
-			    NULL);
+  Elf_Data *dynsymdata = elf_getdata (elf_getscn (statep->outelf,
+						  statep->dynsymscnidx), NULL);
   assert (dynsymdata != NULL);
 
+  Elf_Data *symdata = NULL;
   if (statep->symscnidx != 0)
     {
       symdata = elf_getdata (elf_getscn (statep->outelf, statep->symscnidx),
@@ -408,47 +408,40 @@ elf_i386_finalize_plt (struct ld_state *statep, size_t nsym,
       assert (symdata != NULL);
     }
 
-  for (cnt = 0; cnt < statep->nplt; ++cnt)
-    {
-      assert ((4 + cnt) * sizeof (Elf32_Word) <= data->d_size);
-
-      /* Address in the PLT.  */
-      Elf32_Addr pltentryaddr = shdr->sh_addr + (1 + cnt) * PLT_ENTRY_SIZE;
-
-      /* Point the GOT entry at the PLT entry, after the initial jmp.  */
-      ((Elf32_Word *) data->d_buf)[3 + cnt] = pltentryaddr + 6;
-
-      /* If the symbol is defined, adjust the address.  */
-      if (((Elf32_Sym *) dynsymdata->d_buf)[1 + cnt].st_shndx != SHN_UNDEF)
-	{
-	  /* The value of the symbol is the address of the corresponding PLT
-	     entry.  Store the address, also for the normal symbol table if
-	     this is necessary.  */
-	  ((Elf32_Sym *) dynsymdata->d_buf)[1 + cnt].st_value = pltentryaddr;
-
-	  if (symdata != NULL)
-	    ((Elf32_Sym *) symdata->d_buf)[nsym - statep->nplt + cnt].st_value
-	      = pltentryaddr;
-	}
-    }
-
   /* Create the .plt section.  */
   scn = elf_getscn (statep->outelf, statep->pltscnidx);
-  data = elf_getdata (scn, NULL);
-  assert (data != NULL);
+  Elf_Data *pltdata = elf_getdata (scn, NULL);
+  assert (pltdata != NULL);
 
-  /* Create the first entry.  */
-  assert (data->d_size >= PLT_ENTRY_SIZE);
+  /* Also create the .rel.plt section data.  It simply means relocations
+     addressing the corresponding entry in the .got.plt section.  The
+     section name is misleading.  */
+  scn = elf_getscn (statep->outelf, statep->pltrelscnidx);
+  xelf_getshdr (scn, shdr);
+  Elf_Data *reldata = elf_getdata (scn, NULL);
+  assert (shdr != NULL && reldata != NULL);
+
+  /* Update the sh_link to point to the section being modified.  We
+     point it here (correctly) to the .got.plt section.  Some linkers
+     (e.g., the GNU binutils linker) point to the .plt section.  This
+     is wrong since the .plt section isn't modified even though the
+     name .rel.plt suggests that this is correct.  */
+  shdr->sh_link = statep->dynsymscnidx;
+  shdr->sh_info = statep->gotpltscnidx;
+  (void) xelf_update_shdr (scn, shdr);
+
+  /* Create the first entry of the .plt section.  */
+  assert (pltdata->d_size >= PLT_ENTRY_SIZE);
   if (build_dso)
     /* Copy the entry.  It's complete, no relocation needed.  */
-    memcpy (data->d_buf, elf_i386_pic_plt0_entry, PLT_ENTRY_SIZE);
+    memcpy (pltdata->d_buf, elf_i386_pic_plt0_entry, PLT_ENTRY_SIZE);
   else
     {
       /* Copy the skeleton.  */
-      memcpy (data->d_buf, elf_i386_plt0_entry, PLT_ENTRY_SIZE);
+      memcpy (pltdata->d_buf, elf_i386_plt0_entry, PLT_ENTRY_SIZE);
 
       /* And fill in the addresses.  */
-      struct plt0_entry *addr = (struct plt0_entry *) data->d_buf;
+      struct plt0_entry *addr = (struct plt0_entry *) pltdata->d_buf;
       addr->gotp4_addr = target_bswap_32 (gotaddr + 4);
       addr->gotp8_addr = target_bswap_32 (gotaddr + 8);
     }
@@ -460,54 +453,68 @@ elf_i386_finalize_plt (struct ld_state *statep, size_t nsym,
   const unsigned char *plt_template
     = build_dso ? elf_i386_pic_plt_entry : elf_i386_plt_entry;
 
-  for (cnt = 0; cnt < statep->nplt; ++cnt)
+  for (size_t idx = nsym_local; idx < nsym; ++idx)
     {
-      struct plt_entry *addr;
+      struct symbol *symbol = ndxtosym[idx];
+      if (symbol == NULL || symbol->type != STT_FUNC
+	  || ndxtosym[idx]->outdynsymidx == 0
+	  // XXX is the following test correct?
+	  || ! ndxtosym[idx]->in_dso)
+	continue;
 
-      /* Copy the template.  */
-      assert (data->d_size >= (2 + cnt) * PLT_ENTRY_SIZE);
-      addr = (struct plt_entry *) ((char *) data->d_buf
-				   + (1 + cnt) * PLT_ENTRY_SIZE);
+      size_t pltidx = symbol->merge.value;
+
+      assert (pltidx > 0);
+      assert ((3 + pltidx) * sizeof (Elf32_Word) <= data->d_size);
+
+      /* Address in the PLT.  */
+      Elf32_Addr pltentryaddr = (pltshdr->sh_addr + pltidx * PLT_ENTRY_SIZE);
+
+      /* Point the GOT entry at the PLT entry, after the initial jmp.  */
+      ((Elf32_Word *) data->d_buf)[2 + pltidx] = pltentryaddr + 6;
+
+      /* If the symbol is defined, adjust the address.  */
+      if (((Elf32_Sym *) dynsymdata->d_buf)[ndxtosym[idx]->outdynsymidx].st_shndx != SHN_UNDEF)
+	{
+	  /* The value of the symbol is the address of the corresponding PLT
+	     entry.  Store the address, also for the normal symbol table if
+	     this is necessary.  */
+	  ((Elf32_Sym *) dynsymdata->d_buf)[pltidx].st_value = pltentryaddr;
+
+	  if (symdata != NULL)
+ {
+   assert(nsym - statep->nplt + (pltidx - 1) == idx);
+	    ((Elf32_Sym *) symdata->d_buf)[nsym - statep->nplt
+					   + (pltidx - 1)].st_value
+	      = pltentryaddr;
+ }
+	}
+
+      /* Copy the PLT entry template.  */
+      assert (pltdata->d_size >= (1 + pltidx) * PLT_ENTRY_SIZE);
+      struct plt_entry *addr = (struct plt_entry *) ((char *) pltdata->d_buf
+						     + (pltidx
+							* PLT_ENTRY_SIZE));
       memcpy (addr, plt_template, PLT_ENTRY_SIZE);
 
       /* And once more, fill in the addresses.  First the address of
 	 this symbol in .got.  */
       addr->offset_got = target_bswap_32 (gotaddr_off
-					  + (3 + cnt) * sizeof (Elf32_Addr));
+					  + (2 + pltidx) * sizeof (Elf32_Addr));
       /* Offset into relocation table.  */
-      addr->push_imm = target_bswap_32 (cnt * sizeof (Elf32_Rel));
+      addr->push_imm = target_bswap_32 ((pltidx - 1) * sizeof (Elf32_Rel));
       /* Offset to start of .plt.  */
-      addr->plt0_offset = target_bswap_32 (-(2 + cnt) * PLT_ENTRY_SIZE);
-    }
+      addr->plt0_offset = target_bswap_32 (-(1 + pltidx) * PLT_ENTRY_SIZE);
 
-  /* Create the .rel.plt section data.  It simply means relocations
-     addressing the corresponding entry in the .got.plt section.  The
-     section name is misleading.  */
-  scn = elf_getscn (statep->outelf, statep->pltrelscnidx);
-  xelf_getshdr (scn, shdr);
-  data = elf_getdata (scn, NULL);
-  assert (shdr != NULL && data != NULL);
 
-  /* Update the sh_link to point to the section being modified.  We
-     point it here (correctly) to the .got.plt section.  Some linkers
-     (e.g., the GNU binutils linker) point to the .plt section.  This
-     is wrong since the .plt section isn't modified even though the
-     name .rel.plt suggests that this is correct.  */
-  shdr->sh_link = statep->dynsymscnidx;
-  shdr->sh_info = statep->gotpltscnidx;
-  (void) xelf_update_shdr (scn, shdr);
-
-  for (cnt = 0; cnt < statep->nplt; ++cnt)
-    {
       XElf_Rel_vardef (rel);
-
-      assert ((1 + cnt) * sizeof (Elf32_Rel) <= data->d_size);
-      xelf_getrel_ptr (data, cnt, rel);
-      rel->r_offset = gotaddr + (3 + cnt) * sizeof (Elf32_Addr);
+      assert (pltidx * sizeof (Elf32_Rel) <= reldata->d_size);
+      xelf_getrel_ptr (reldata, pltidx - 1, rel);
+      rel->r_offset = gotaddr + (2 + pltidx) * sizeof (Elf32_Addr);
       /* The symbol table entries for the functions from DSOs are at
 	 the beginning of the symbol table.  */
-      rel->r_info = XELF_R_INFO (1 + cnt, R_386_JMP_SLOT);
-      (void) xelf_update_rel (data, cnt, rel);
+      rel->r_info = XELF_R_INFO (ndxtosym[idx]->outdynsymidx, R_386_JMP_SLOT);
+      (void) xelf_update_rel (reldata, pltidx - 1, rel);
     }
 }
 

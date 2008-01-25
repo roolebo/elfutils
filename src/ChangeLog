@@ -1,3 +1,14 @@
+2008-01-24  Ulrich Drepper  <drepper@redhat.com>
+
+	* elflint.c (check_group): Check that signature symbol for section
+	group is not an empty string.
+	* ldgeneric.c: Remove magic assignment of indeces in the dynsym
+	section.  Start implementation of --hash-style.
+	* i386_ld.c: Likewise.
+	* ld.c: Recognize --hash-style.
+	* ld.h (struct scninfo): Add comdat_group.
+	Add additional parameter to finalize_plt callback.
+
 2008-01-22  Ulrich Drepper  <drepper@redhat.com>
 
 	* ld.h (struct callbacks): Add initialize_gotplt.

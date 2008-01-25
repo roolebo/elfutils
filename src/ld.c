@@ -73,6 +73,7 @@ enum
     ARGP_as_needed,
     ARGP_no_as_needed,
     ARGP_eh_frame_hdr,
+    ARGP_hash_style,
 #if YYDEBUG
     ARGP_yydebug,
 #endif
@@ -167,6 +168,8 @@ Default rules of extracting from archive; weak references are not enough."),
     0 },
   { "eh-frame-hdr", ARGP_eh_frame_hdr, NULL, 0,
     N_("Create .eh_frame_hdr section"), 0 },
+  { "hash-style", ARGP_hash_style, "STYLE", 0,
+    N_("Set hash style to sysv, gnu or both."), 0 },
 
   { NULL, 0, NULL, 0, N_("Linker Operation Control:"), 0 },
   { "verbose", 'v', NULL, 0, N_("Verbose messages."), 0 },
@@ -327,6 +330,11 @@ main (int argc, char *argv[])
 
   /* Determine which ELF backend to use.  */
   determine_output_format ();
+
+  /* If no hash style was specific default to the oldand slow SysV
+     method.  */
+  if (unlikely (ld_state.hash_style == hash_style_none))
+    ld_state.hash_style = hash_style_sysv;
 
   /* Prepare state.  */
   err = ld_prepare_state (emulation);
@@ -609,6 +617,17 @@ parse_opt_1st (int key, char *arg,
 
     case ARGP_eh_frame_hdr:
       ld_state.eh_frame_hdr = true;
+      break;
+
+    case ARGP_hash_style:
+      if (strcmp (arg, "gnu") == 0)
+	ld_state.hash_style = hash_style_gnu;
+      else if (strcmp (arg, "both") == 0)
+	ld_state.hash_style = hash_style_gnu | hash_style_sysv;
+      else if (strcmp (arg, "sysv") == 0)
+	ld_state.hash_style = hash_style_sysv;
+      else
+	error (EXIT_FAILURE, 0, gettext ("invalid hash style '%s'"), arg);
       break;
 
     case 's':

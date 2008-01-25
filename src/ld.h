@@ -176,11 +176,14 @@ struct usedfiles
     bool used;
     /* True if section is an unused COMDAT section.  */
     bool unused_comdat;
+    /* True if this is a COMDAT group section.  */
+    bool comdat_group;
     /* Section group number.  This is the index of the SHT_GROUP section.  */
     Elf32_Word grpid;
     /* Pointer back to the containing file information structure.  */
     struct usedfiles *fileinfo;
-    /* List of symbols in this section (set only for merge-able sections).  */
+    /* List of symbols in this section (set only for merge-able sections
+       and group sections).  */
     struct symbol *symbols;
     /* Size of relocations in this section.  Only used for relocation
        sections.  */
@@ -397,9 +400,10 @@ struct callbacks
   DL_CALL_FCT ((state)->callbacks.initialize_pltrel, (state, scn))
 
   /* Finalize the .plt section the what belongs to them.  */
-  void (*finalize_plt) (struct ld_state *, size_t, size_t);
-#define FINALIZE_PLT(state, nsym, nsym_dyn) \
-  DL_CALL_FCT ((state)->callbacks.finalize_plt, (state, nsym, nsym_dyn))
+  void (*finalize_plt) (struct ld_state *, size_t, size_t, struct symbol **);
+#define FINALIZE_PLT(state, nsym, nsym_dyn, ndxtosym) \
+  DL_CALL_FCT ((state)->callbacks.finalize_plt, (state, nsym, nsym_dyn, \
+						 ndxtosym))
 
   /* Create the data structures for the .got section and initialize it.  */
   void (*initialize_got) (struct ld_state *, Elf_Scn *scn);
@@ -681,6 +685,7 @@ struct scnhead
       scn_dot_dynsym,		/* Generated .dynsym section.  */
       scn_dot_dynstr,		/* Generated .dynstr section.  */
       scn_dot_hash,		/* Generated .hash section.  */
+      scn_dot_gnu_hash,		/* Generated .gnu.hash section.  */
       scn_dot_plt,		/* Generated .plt section.  */
       scn_dot_pltrel,		/* Generated .rel.plt section.  */
       scn_dot_version,		/* Generated .gnu.version section.  */
@@ -931,8 +936,9 @@ struct ld_state
   Elf32_Word dynsymscnidx;
   /* Dynamic symbol string table section.  */
   Elf32_Word dynstrscnidx;
-  /* Dynamic symbol hash table.  */
+  /* Dynamic symbol hash tables.  */
   size_t hashscnidx;
+  size_t gnuhashscnidx;
 
   /* Procedure linkage table section.  */
   Elf32_Word pltscnidx;
@@ -1021,6 +1027,17 @@ struct ld_state
 
   /* True if an .eh_frame_hdr section should be generated.  */
   bool eh_frame_hdr;
+
+  /* What hash style to generate.  */
+  enum
+    {
+      hash_style_none = 0,
+      hash_style_sysv = 1,
+#define GENERATE_SYSV_HASH ((ld_state.hash_style & hash_style_sysv) != 0)
+      hash_style_gnu = 2
+#define GENERATE_GNU_HASH ((ld_state.hash_style & hash_style_gnu) != 0)
+    }
+  hash_style;
 
 
   /* True if in executables all global symbols should be exported in

@@ -2352,9 +2352,9 @@ section [%2d] '%s': section groups only allowed in relocatable object files\n"),
     }
 
   /* Check that sh_link is an index of a symbol table.  */
+  Elf_Scn *symscn = elf_getscn (ebl->elf, shdr->sh_link);
   GElf_Shdr symshdr_mem;
-  GElf_Shdr *symshdr = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
-				     &symshdr_mem);
+  GElf_Shdr *symshdr = gelf_getshdr (symscn, &symshdr_mem);
   if (symshdr == NULL)
     ERROR (gettext ("section [%2d] '%s': cannot get symbol table: %s\n"),
 	   idx, section_name (ebl, idx), elf_errmsg (-1));
@@ -2373,6 +2373,19 @@ section [%2d] '%s': invalid symbol index in sh_info\n"),
 
       if (shdr->sh_flags != 0)
 	ERROR (gettext ("section [%2d] '%s': sh_flags not zero\n"),
+	       idx, section_name (ebl, idx));
+
+      GElf_Sym sym_data;
+      GElf_Sym *sym = gelf_getsym (elf_getdata (symscn, NULL), shdr->sh_info,
+				   &sym_data);
+      if (sym == NULL)
+	ERROR (gettext ("\
+section [%2d] '%s': cannot get symbol for signature\n"),
+	       idx, section_name (ebl, idx));
+      else if (strcmp (elf_strptr (ebl->elf, symshdr->sh_link, sym->st_name),
+		       "") == 0)
+	ERROR (gettext ("\
+section [%2d] '%s': signature symbol canot be empty string\n"),
 	       idx, section_name (ebl, idx));
 
       if (be_strict

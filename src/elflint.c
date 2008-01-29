@@ -2062,7 +2062,8 @@ section [%2d] '%s': hash chain for bucket %zu lower than symbol index bias\n"),
 		  && GELF_ST_TYPE (sym->st_info) != STT_FUNC)
 		ERROR (gettext ("\
 section [%2d] '%s': symbol %u referenced in chain for bucket %zu is undefined\n"),
-		       idx, section_name (ebl, idx), symidx, cnt / 2 - 1);
+		       idx, section_name (ebl, idx), symidx,
+		       cnt - (4 + bitmask_words));
 
 	      const char *symname = elf_strptr (ebl->elf, symshdr->sh_link,
 						sym->st_name);
@@ -2072,7 +2073,8 @@ section [%2d] '%s': symbol %u referenced in chain for bucket %zu is undefined\n"
 		  if ((hval & ~1u) != (chainhash & ~1u))
 		    ERROR (gettext ("\
 section [%2d] '%s': hash value for symbol %u in chain for bucket %zu wrong\n"),
-			   idx, section_name (ebl, idx), symidx, cnt / 2 - 1);
+			   idx, section_name (ebl, idx), symidx,
+			   cnt - (4 + bitmask_words));
 
 		  /* Set the bits in the bitmask.  */
 		  size_t maskidx = (hval / classbits) & bitmask_idxmask;
@@ -2102,12 +2104,12 @@ section [%2d] '%s': hash value for symbol %u in chain for bucket %zu wrong\n"),
       if (symidx - symbias >= maxidx)
 	ERROR (gettext ("\
 section [%2d] '%s': hash chain for bucket %zu out of bounds\n"),
-	       idx, section_name (ebl, idx), cnt / 2 - 1);
+	       idx, section_name (ebl, idx), cnt - (4 + bitmask_words));
       else if (symshdr != NULL
 	       && symidx > symshdr->sh_size / symshdr->sh_entsize)
 	ERROR (gettext ("\
 section [%2d] '%s': symbol reference in chain for bucket %zu out of bounds\n"),
-	       idx, section_name (ebl, idx), cnt / 2 - 1);
+	       idx, section_name (ebl, idx), cnt - (4 + bitmask_words));
     }
 
   if (memcmp (collected.p32, bitmask.p32, bitmask_words * sizeof (Elf32_Word)))

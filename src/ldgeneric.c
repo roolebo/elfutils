@@ -49,8 +49,6 @@
 #include "list.h"
 
 
-unsigned *p1;
-
 /* Header of .eh_frame_hdr section.  */
 struct unw_eh_frame_hdr
 {
@@ -3536,7 +3534,8 @@ optimal_bucket_size (Elf32_Word *hashcodes, size_t maxcnt, int optlevel)
       memset (counts, '\0', (maxcnt + 1) * sizeof (uint32_t));
 
       /* Determine how often each hash bucket is used.  */
-      for (inner = 0; inner < maxcnt; ++inner)
+      assert (hashcodes[0] == 0);
+      for (inner = 1; inner < maxcnt; ++inner)
 	++lengths[hashcodes[inner] % size];
 
       /* Determine the lengths.  */
@@ -3705,6 +3704,8 @@ fillin_special_symbol (struct symbol *symst, size_t scnidx, size_t nsym,
   sym->st_shndx = scnidx;
   /* We want the beginning of the section.  */
   sym->st_value = 0;
+  // XXX What size?
+  sym->st_size = 0;
 
   /* Determine the size of the section.  */
   if (scnidx != SHN_ABS)
@@ -3842,15 +3843,249 @@ create_verneed_data (XElf_Off offset, Elf_Data *verneeddata,
 }
 
 
+/* Callback for qsort to sort dynamic string table.  */
+static Elf32_Word *global_hashcodes;
+static size_t global_nbuckets;
+static int
+sortfct_hashval (const void *p1, const void *p2)
+{
+  size_t idx1 = *(size_t *) p1;
+  size_t idx2 = *(size_t *) p2;
+
+  int def1 = ndxtosym[idx1]->defined && !ndxtosym[idx1]->in_dso;
+  int def2 = ndxtosym[idx2]->defined && !ndxtosym[idx2]->in_dso;
+
+  if (! def1 && def2)
+    return -1;
+  if (def1 && !def2)
+    return 1;
+  if (! def1)
+    return 0;
+
+  Elf32_Word hval1 = (global_hashcodes[ndxtosym[idx1]->outdynsymidx]
+		      % global_nbuckets);
+  Elf32_Word hval2 = (global_hashcodes[ndxtosym[idx2]->outdynsymidx]
+		      % global_nbuckets);
+
+  if (hval1 < hval2)
+    return -1;
+  if (hval1 > hval2)
+    return 1;
+  return 0;
+}
+
+
 /* Sort the dynamic symbol table.  The GNU hash table lookup assumes
    that all symbols with the same hash value module the bucket table
    size follow one another.  This avoids the extra hash chain table.
    There is no need (and no way) to perform this operation if we do
    not use the new hash table format.  */
 static void
-sort_dynsym (uint32_t *hashcodes, size_t nbuckets, size_t nsym_dyn)
+create_gnu_hash (size_t nsym_local, size_t nsym, size_t nsym_dyn,
+		 Elf32_Word *gnuhashcodes)
 {
-  // XXX
+  size_t gnu_bitmask_nwords = 0;
+  size_t gnu_shift = 0;
+  size_t gnu_nbuckets = 0;
+  Elf32_Word *gnu_bitmask = NULL;
+  Elf32_Word *gnu_buckets = NULL;
+  Elf32_Word *gnu_chain = NULL;
+  XElf_Shdr_vardef (shdr);
+
+  /* Determine the "optimal" bucket size.  */
+  optimal_gnu_hash_size (gnuhashcodes, nsym_dyn, ld_state.optlevel,
+			 &gnu_bitmask_nwords, &gnu_shift, &gnu_nbuckets);
+
+  /* Create the .gnu.hash section data structures.  */
+  Elf_Scn *hashscn = elf_getscn (ld_state.outelf, ld_state.gnuhashscnidx);
+  xelf_getshdr (hashscn, shdr);
+  Elf_Data *hashdata = elf_newdata (hashscn);
+  if (shdr == NULL || hashdata == NULL)
+    error (EXIT_FAILURE, 0, gettext ("\
+cannot create GNU hash table section for output file: %s"),
+	   elf_errmsg (-1));
+
+  shdr->sh_link = ld_state.dynsymscnidx;
+  (void) xelf_update_shdr (hashscn, shdr);
+
+  hashdata->d_size = (xelf_fsize (ld_state.outelf, ELF_T_ADDR,
+				  gnu_bitmask_nwords)
+		      + (4 + gnu_nbuckets + nsym_dyn) * sizeof (Elf32_Word));
+  hashdata->d_buf = xcalloc (1, hashdata->d_size);
+  hashdata->d_align = sizeof (Elf32_Word);
+  hashdata->d_type = ELF_T_WORD;
+  hashdata->d_off = 0;
+
+  ((Elf32_Word *) hashdata->d_buf)[0] = gnu_nbuckets;
+  ((Elf32_Word *) hashdata->d_buf)[2] = gnu_bitmask_nwords;
+  ((Elf32_Word *) hashdata->d_buf)[3] = gnu_shift;
+  gnu_bitmask = &((Elf32_Word *) hashdata->d_buf)[4];
+  gnu_buckets = &gnu_bitmask[xelf_fsize (ld_state.outelf, ELF_T_ADDR,
+					 gnu_bitmask_nwords)
+			     / sizeof (*gnu_buckets)];
+  gnu_chain = &gnu_buckets[gnu_nbuckets];
+#ifndef NDEBUG
+  void *endp = &gnu_chain[nsym_dyn];
+#endif
+  assert (endp == (void *) ((char *) hashdata->d_buf + hashdata->d_size));
+
+
+  size_t *remap = xmalloc (nsym_dyn * sizeof (size_t));
+#ifndef NDEBUG
+  size_t nsym_dyn_cnt = 1;
+#endif
+  for (size_t cnt = nsym_local; cnt < nsym; ++cnt)
+    if (symstrent[cnt] != NULL)
+      {
+	assert (ndxtosym[cnt]->outdynsymidx > 0);
+	assert (ndxtosym[cnt]->outdynsymidx < nsym_dyn);
+	remap[ndxtosym[cnt]->outdynsymidx] = cnt;
+#ifndef NDEBUG
+	++nsym_dyn_cnt;
+#endif
+      }
+  assert (nsym_dyn_cnt == nsym_dyn);
+
+  // XXX Until we can rely on qsort_r use global variables.
+  global_hashcodes = gnuhashcodes;
+  global_nbuckets = gnu_nbuckets;
+  qsort (remap + 1, nsym_dyn - 1, sizeof (size_t), sortfct_hashval);
+
+  bool bm32 = (xelf_fsize (ld_state.outelf, ELF_T_ADDR, 1)
+	       ==  sizeof (Elf32_Word));
+
+  size_t first_defined = 0;
+  Elf64_Word bitmask_idxbits = gnu_bitmask_nwords - 1;
+  Elf32_Word last_bucket = 0;
+  for (size_t cnt = 1; cnt < nsym_dyn; ++cnt)
+    {
+      if (first_defined == 0)
+	{
+	  if (! ndxtosym[remap[cnt]]->defined
+	      || ndxtosym[remap[cnt]]->in_dso)
+	    goto next;
+
+	  ((Elf32_Word *) hashdata->d_buf)[1] = first_defined = cnt;
+	}
+
+      Elf32_Word hval = gnuhashcodes[ndxtosym[remap[cnt]]->outdynsymidx];
+
+      if (bm32)
+	{
+	  Elf32_Word *bsw = &gnu_bitmask[(hval / 32) & bitmask_idxbits];
+	  assert ((void *) gnu_bitmask <= (void *) bsw);
+	  assert ((void *) bsw < (void *) gnu_buckets);
+	  *bsw |= 1 << (hval & 31);
+	  *bsw |= 1 << ((hval >> gnu_shift) & 31);
+	}
+      else
+	{
+	  Elf64_Word *bsw = &((Elf64_Word *) gnu_bitmask)[(hval / 64)
+							  & bitmask_idxbits];
+	  assert ((void *) gnu_bitmask <= (void *) bsw);
+	  assert ((void *) bsw < (void *) gnu_buckets);
+	  *bsw |= 1 << (hval & 63);
+	  *bsw |= 1 << ((hval >> gnu_shift) & 63);
+	}
+
+      size_t this_bucket = hval % gnu_nbuckets;
+      if (cnt == first_defined || this_bucket != last_bucket)
+	{
+	  if (cnt != first_defined)
+	    {
+	      /* Terminate the previous chain.  */
+	      assert ((void *) &gnu_chain[cnt - first_defined - 1] < endp);
+	      gnu_chain[cnt - first_defined - 1] |= 1;
+	    }
+
+	  assert (this_bucket < gnu_nbuckets);
+	  gnu_buckets[this_bucket] = cnt;
+	  last_bucket = this_bucket;
+	}
+
+      assert (cnt >= first_defined);
+      assert (cnt - first_defined < nsym_dyn);
+      gnu_chain[cnt - first_defined] = hval & ~1u;
+
+    next:
+      ndxtosym[remap[cnt]]->outdynsymidx = cnt;
+    }
+
+  /* Terminate the last chain.  */
+  if (first_defined != 0)
+    {
+      assert (nsym_dyn > first_defined);
+      assert (nsym_dyn - first_defined - 1 < nsym_dyn);
+      gnu_chain[nsym_dyn - first_defined - 1] |= 1;
+
+      hashdata->d_size -= first_defined * sizeof (Elf32_Word);
+    }
+  else
+    /* We do not need any hash table.  */
+    // XXX
+    do { } while (0);
+
+  free (remap);
+}
+
+
+/* Create the SysV-style hash table.  */
+static void
+create_hash (size_t nsym_local, size_t nsym, size_t nsym_dyn,
+	     Elf32_Word *hashcodes)
+{
+  size_t nbucket = 0;
+  Elf32_Word *bucket = NULL;
+  Elf32_Word *chain = NULL;
+  XElf_Shdr_vardef (shdr);
+
+  /* Determine the "optimal" bucket size.  If we also generate the
+     new-style hash function there is no need to waste effort and
+     space on the old one which should not be used.  Make it as small
+     as possible.  */
+  if (GENERATE_GNU_HASH)
+    nbucket = 1;
+  else
+    nbucket = optimal_bucket_size (hashcodes, nsym_dyn, ld_state.optlevel);
+  /* Create the .hash section data structures.  */
+  Elf_Scn *hashscn = elf_getscn (ld_state.outelf, ld_state.hashscnidx);
+  xelf_getshdr (hashscn, shdr);
+  Elf_Data *hashdata = elf_newdata (hashscn);
+  if (shdr == NULL || hashdata == NULL)
+    error (EXIT_FAILURE, 0, gettext ("\
+cannot create hash table section for output file: %s"),
+	   elf_errmsg (-1));
+
+  shdr->sh_link = ld_state.dynsymscnidx;
+  (void) xelf_update_shdr (hashscn, shdr);
+
+  hashdata->d_size = (2 + nsym_dyn + nbucket) * sizeof (Elf32_Word);
+  hashdata->d_buf = xcalloc (1, hashdata->d_size);
+  hashdata->d_align = sizeof (Elf32_Word);
+  hashdata->d_type = ELF_T_WORD;
+  hashdata->d_off = 0;
+
+  ((Elf32_Word *) hashdata->d_buf)[0] = nbucket;
+  ((Elf32_Word *) hashdata->d_buf)[1] = nsym_dyn;
+  bucket = &((Elf32_Word *) hashdata->d_buf)[2];
+  chain = &((Elf32_Word *) hashdata->d_buf)[2 + nbucket];
+
+  for (size_t cnt = nsym_local; cnt < nsym; ++cnt)
+    if (symstrent[cnt] != NULL)
+      {
+	size_t dynidx = ndxtosym[cnt]->outdynsymidx;
+	size_t hashidx = hashcodes[dynidx] % nbucket;
+	if (bucket[hashidx] == 0)
+	  bucket[hashidx] = dynidx;
+	else
+	  {
+	    hashidx = bucket[hashidx];
+	    while (chain[hashidx] != 0)
+	      hashidx = chain[hashidx];
+
+	    chain[hashidx] = dynidx;
+	  }
+      }
 }
 
 
@@ -5310,17 +5545,6 @@ section index too large in dynamic symbol table"));
     }
 
 
-  size_t nbucket = 0;
-  Elf32_Word *bucket = NULL;
-  Elf32_Word *chain = NULL;
-
-  size_t gnu_bitmask_nwords = 0;
-  size_t gnu_shift = 0;
-  size_t gnu_nbuckets = 0;
-  Elf32_Word *gnu_bitmask = NULL;
-  Elf32_Word *gnu_bucket = NULL;
-  Elf32_Word *gnu_chain = NULL;
-
   /* If we have to construct the dynamic symbol table we must not include
      the local symbols.  If the normal symbol has to be emitted as well
      we haven't done anything else yet and we can construct it from
@@ -5358,7 +5582,7 @@ section index too large in dynamic symbol table"));
 		  gelf_getversym (symp->file->versymdata, symp->symidx,
 				  &versym);
 
-		  (void) gelf_update_versym (versymdata, nsym_dyn,
+		  (void) gelf_update_versym (versymdata, symp->outdynsymidx,
 					     &symp->file->verdefused[versym]);
 		}
 	      }
@@ -5406,7 +5630,6 @@ cannot create dynamic symbol table for output file: %s"),
 
       /* We have and empty entry at the beginning.  */
       nsym_dyn = 1;
-      size_t gnu_symbias = 0;
 
       /* Populate the table.  */
       for (cnt = nsym_local; cnt < nsym; ++cnt)
@@ -5439,32 +5662,9 @@ section index too large in dynamic symbol table"));
 	      continue;
 	    }
 
-	  /* Add the version information.  */
-	  if (versymdata != NULL)
-	    {
-	      struct symbol *symp = ndxtosym[cnt];
-
-	      /* Synthetic symbols (i.e., those with no file attached)
-		 have no version information.  */
-	      if (symp->file != NULL && symp->file->verdefdata != NULL)
-		{
-		  GElf_Versym versym;
-
-		  gelf_getversym (symp->file->versymdata, symp->symidx,
-				  &versym);
-
-		  (void) gelf_update_versym (versymdata, nsym_dyn,
-					     &symp->file->verdefused[versym]);
-		}
-	      else
-		{
-		  /* XXX Add support for version definitions.  */
-		  GElf_Versym global = VER_NDX_GLOBAL;
-		  (void) gelf_update_versym (versymdata, nsym_dyn, &global);
-		}
-	    }
-
-	  /* Store the index of the symbol in the dynamic symbol table.  */
+	  /* Store the index of the symbol in the dynamic symbol
+	     table.  This is a preliminary value in case we use the
+	     GNU-style hash table.  */
 	  ndxtosym[cnt]->outdynsymidx = nsym_dyn;
 
 	  /* Create a new string table entry.  */
@@ -5484,90 +5684,43 @@ section index too large in dynamic symbol table"));
 
 	  assert (ld_state.hashscnidx != 0 || ld_state.gnuhashscnidx != 0);
 
-	  if (GENERATE_SYSV_HASH)
-	    {
-	      /* Determine the "optimal" bucket size.  If we also generate
-		 the new-style hash function there is no need to waste
-		 effort and space on the old one which should not be used.
-		 Make it as small as possible.  */
-	      if (GENERATE_GNU_HASH)
-		nbucket = 1;
-	      else
-		nbucket = optimal_bucket_size (hashcodes, nsym_dyn,
-					       ld_state.optlevel);
-
-	      /* Create the .hash section data structures.  */
-	      Elf_Scn *hashscn = elf_getscn (ld_state.outelf,
-					     ld_state.hashscnidx);
-	      xelf_getshdr (hashscn, shdr);
-	      Elf_Data *hashdata = elf_newdata (hashscn);
-	      if (shdr == NULL || hashdata == NULL)
-		error (EXIT_FAILURE, 0, gettext ("\
-cannot create hash table section for output file: %s"),
-		       elf_errmsg (-1));
-
-	      shdr->sh_link = ld_state.dynsymscnidx;
-	      (void) xelf_update_shdr (hashscn, shdr);
-
-	      hashdata->d_size = (2 + nsym_dyn + nbucket) * sizeof (Elf32_Word);
-	      hashdata->d_buf = xcalloc (1, hashdata->d_size);
-	      hashdata->d_align = sizeof (Elf32_Word);
-	      hashdata->d_type = ELF_T_WORD;
-	      hashdata->d_off = 0;
-
-	      ((Elf32_Word *) hashdata->d_buf)[0] = nbucket;
-	      ((Elf32_Word *) hashdata->d_buf)[1] = nsym_dyn;
-	      bucket = &((Elf32_Word *) hashdata->d_buf)[2];
-	      chain = &((Elf32_Word *) hashdata->d_buf)[2 + nbucket];
-	    }
-
+	  /* Create the GNU-style hash table.  */
 	  if (GENERATE_GNU_HASH)
-	    {
-	      /* Determine the "optimal" bucket size.  */
-	      optimal_gnu_hash_size (gnuhashcodes, nsym_dyn, ld_state.optlevel,
-				     &gnu_bitmask_nwords, &gnu_shift,
-				     &gnu_nbuckets);
+	    create_gnu_hash (nsym_local, nsym, nsym_dyn, gnuhashcodes);
 
-	      /* Sort the symbol table according to the GNU hash table
-		 bucket table size.  */
-	      sort_dynsym (gnuhashcodes, gnu_nbuckets, nsym_dyn);
-
-	      /* Create the .gnu.hash section data structures.  */
-	      Elf_Scn *hashscn = elf_getscn (ld_state.outelf,
-					     ld_state.gnuhashscnidx);
-	      xelf_getshdr (hashscn, shdr);
-	      Elf_Data *hashdata = elf_newdata (hashscn);
-	      if (shdr == NULL || hashdata == NULL)
-		error (EXIT_FAILURE, 0, gettext ("\
-cannot create hash table section for output file: %s"),
-		       elf_errmsg (-1));
-
-	      shdr->sh_link = ld_state.dynsymscnidx;
-	      (void) xelf_update_shdr (hashscn, shdr);
-
-	      hashdata->d_size = ((4 + (xelf_fsize (ld_state.outelf,
-						    ELF_T_ADDR, 1)
-					/ sizeof (Elf32_Word)
-					* gnu_bitmask_nwords)
-				   + gnu_nbuckets + nsym_dyn)
-				  * sizeof (Elf32_Word));
-	      hashdata->d_buf = xcalloc (1, hashdata->d_size);
-	      hashdata->d_align = sizeof (Elf32_Word);
-	      hashdata->d_type = ELF_T_WORD;
-	      hashdata->d_off = 0;
-
-	      ((Elf32_Word *) hashdata->d_buf)[0] = gnu_nbuckets;
-	      ((Elf32_Word *) hashdata->d_buf)[1] = gnu_symbias;
-	      ((Elf32_Word *) hashdata->d_buf)[2] = gnu_bitmask_nwords;
-	      ((Elf32_Word *) hashdata->d_buf)[3] = gnu_shift;
-	      gnu_bitmask = &((Elf32_Word *) hashdata->d_buf)[4];
-	      gnu_bucket = &gnu_bitmask[xelf_fsize (ld_state.outelf,
-						    ELF_T_ADDR, 1)
-					/ sizeof (Elf32_Word)
-					* gnu_bitmask_nwords];
-	      gnu_chain = &gnu_bucket[gnu_nbuckets];
-	    }
+	  /* Create the SysV-style hash table.  This has to happen
+	     after the GNU-style table is created since
+	     CREATE-GNU-HASH might reorder the dynamic symbol table.  */
+	  if (GENERATE_SYSV_HASH)
+	    create_hash (nsym_local, nsym, nsym_dyn, hashcodes);
 	}
+
+	  /* Add the version information.  */
+      if (versymdata != NULL)
+	for (cnt = nsym_local; cnt < nsym; ++cnt)
+	  if (symstrent[cnt] != NULL)
+	    {
+	      struct symbol *symp = ndxtosym[cnt];
+
+	      /* Synthetic symbols (i.e., those with no file attached)
+		 have no version information.  */
+	      if (symp->file != NULL && symp->file->verdefdata != NULL)
+		{
+		  GElf_Versym versym;
+
+		  gelf_getversym (symp->file->versymdata, symp->symidx,
+				  &versym);
+
+		  (void) gelf_update_versym (versymdata, symp->outdynsymidx,
+					     &symp->file->verdefused[versym]);
+		}
+	      else
+		{
+		  /* XXX Add support for version definitions.  */
+		  GElf_Versym global = VER_NDX_GLOBAL;
+		  (void) gelf_update_versym (versymdata, nsym_dyn, &global);
+		}
+	    }
 
       /* Update the information about the symbol section.  */
       if (versymdata != NULL)
@@ -5609,22 +5762,6 @@ cannot create hash table section for output file: %s"),
 	    sym->st_name = ebl_strtaboffset (symstrent[cnt]);
 
 	    (void) xelf_update_sym (dynsymdata, dynidx, sym);
-
-	    /* Add to the hash table.  */
-	    if (GENERATE_SYSV_HASH)
-	      {
-		size_t hashidx = hashcodes[dynidx] % nbucket;
-		if (bucket[hashidx] == 0)
-		  bucket[hashidx] = dynidx;
-		else
-		  {
-		    hashidx = bucket[hashidx];
-		    while (chain[hashidx] != 0)
-		      hashidx = chain[hashidx];
-
-		    chain[hashidx] = dynidx;
-		  }
-	      }
 	  }
 
       free (hashcodes);

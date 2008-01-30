@@ -19,6 +19,7 @@ SEGMENT [RX]
 
   .interp;
   .hash;
+  .gnu.hash;
   .dynsym;
   .dynstr;
   .gnu.version;

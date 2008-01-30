@@ -1,5 +1,14 @@
 2008-01-29  Ulrich Drepper  <drepper@redhat.com>
 
+	* elf32-i386.script: Add .gnu.hash section.
+	* ldgeneric.c (optimal_bucket_size): A tiny bit more efficient.
+	(fillin_special_symbol): Initialize st_size.
+	(sortfct_hashval): New function.
+	(create_gnu_hash): New function.
+	(create_hash): New function.
+	(ld_generic_create_outfile): Use the new functions to create the
+	hash tables.
+
 	* elflint.c (check_gnu_hash): Fix index value printed in error message.
 
 2008-01-24  Ulrich Drepper  <drepper@redhat.com>

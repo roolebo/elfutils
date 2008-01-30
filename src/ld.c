@@ -197,6 +197,7 @@ static const char doc[] = N_("Combine object and archive files.");
 static const char args_doc[] = N_("[FILE]...");
 
 /* Prototype for option handler.  */
+static void replace_args (int argc, char *argv[]);
 static error_t parse_opt_1st (int key, char *arg, struct argp_state *state);
 static error_t parse_opt_2nd (int key, char *arg, struct argp_state *state);
 
@@ -315,6 +316,9 @@ main (int argc, char *argv[])
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free
   obstack_init (&ld_state.smem);
+
+  /* Recognize old-style parameters for compatibility.  */
+  replace_args (argc, argv);
 
   /* One quick pass over the parameters which allows us to scan for options
      with global effect which influence the rest of the processing.  */
@@ -487,6 +491,31 @@ main (int argc, char *argv[])
   /* Return with an non-zero exit status also if any error message has
      been printed.  */
   return err | (error_message_count != 0);
+}
+
+
+static void
+replace_args (int argc, char *argv[])
+{
+  static const struct
+  {
+    const char *from;
+    const char *to;
+  } args[] =
+      {
+	{ "-export-dynamic", "--export-dynamic" },
+	{ "-dynamic-linker", "--dynamic-linker" }
+      };
+  const size_t nargs = sizeof (args) / sizeof (args[0]);
+
+  for (int i = 1; i < argc; ++i)
+    if (argv[i][0] == '-' && islower (argv[i][1]))
+      for (size_t j = 0; j < nargs; ++j)
+	if (strcmp (argv[i], args[j].from) == 0)
+	  {
+	    argv[i] = (char *) args[j].to;
+	    break;
+	  }
 }
 
 

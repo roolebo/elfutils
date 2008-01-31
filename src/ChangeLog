@@ -1,3 +1,12 @@
+2008-01-31  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf32-i386.script: Add .note.ABI-tag and .note.gnu.build-id sections.
+	* ld.c: Recognize --build-id command line parameter.
+	* ld.h: Define scn_dot_note_gnu_build_id.
+	(struct ld_state): Add build_id and buildidscnidx elements.
+	* ldgeneric.c: Implement --build-id command line parameter.
+	* ldlex.l (ID): Recognize - as valid character after the first one.
+
 2008-01-29  Ulrich Drepper  <drepper@redhat.com>
 
 	* ld.c (replace_args): New function.

@@ -689,7 +689,8 @@ struct scnhead
       scn_dot_plt,		/* Generated .plt section.  */
       scn_dot_pltrel,		/* Generated .rel.plt section.  */
       scn_dot_version,		/* Generated .gnu.version section.  */
-      scn_dot_version_r		/* Generated .gnu.version_r section.  */
+      scn_dot_version_r,	/* Generated .gnu.version_r section.  */
+      scn_dot_note_gnu_build_id	/* Generated .note.gnu.build-id section.  */
     } kind;
 
   /* True is the section is used in the output.  */
@@ -1043,6 +1044,10 @@ struct ld_state
   /* True if in executables all global symbols should be exported in
      the dynamic symbol table.  */
   bool export_all_dynamic;
+
+  /* Build-ID style.  NULL is none.  */
+  const char *build_id;
+  Elf32_Word buildidscnidx;
 
   /* If DSO is generated, this is the SONAME.  */
   const char *soname;

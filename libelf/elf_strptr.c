@@ -1,5 +1,5 @@
 /* Return string pointer from string section.
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -140,12 +140,30 @@ elf_strptr (elf, idx, offset)
 	}
     }
 
-  if (strscn->rawdata_base == NULL
+  if (strscn->rawdata_base == NULL && ! strscn->data_read
       /* Read the section data.  */
       && __libelf_set_rawdata (strscn) != 0)
     goto out;
 
-  result = &strscn->rawdata_base[offset];
+  if (likely (strscn->rawdata_base != NULL))
+    result = &strscn->rawdata_base[offset];
+  else
+    {
+      /* This is a file which is currently created.  Use the list of
+	 data blocks.  */
+      struct Elf_Data_List *dl = &strscn->data_list;
+      while (dl != NULL)
+	{
+	  if (offset >= (size_t) dl->data.d.d_off
+	      && offset < dl->data.d.d_off + dl->data.d.d_size)
+	    {
+	      result = (char *) dl->data.d.d_buf + (offset - dl->data.d.d_off);
+	      break;
+	    }
+
+	  dl = dl->next;
+	}
+    }
 
  out:
   rwlock_unlock (elf->lock);

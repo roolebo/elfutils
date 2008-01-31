@@ -18,6 +18,8 @@ SEGMENT [RX]
 #endif
 
   .interp;
+  .note.ABI-tag;
+  .note.gnu.build-id;
   .hash;
   .gnu.hash;
   .dynsym;

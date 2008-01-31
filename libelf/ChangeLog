@@ -1,3 +1,8 @@
+2008-01-31  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf_strptr.c (elf_strptr): Don't fail if the ELF file is currently
+	under construction and no raw data can be read from disk.
+
 2008-01-20  Roland McGrath  <roland@redhat.com>
 
 	* elf_getaroff.c: Calculate from start_offset, instead of using

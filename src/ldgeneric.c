@@ -28,6 +28,7 @@
 #endif
 
 #include <assert.h>
+#include <ctype.h>
 #include <dlfcn.h>
 #include <errno.h>
 #include <error.h>
@@ -44,9 +45,11 @@
 #include <sys/param.h>
 #include <sys/stat.h>
 
-#include <system.h>
+#include <elf-knowledge.h>
 #include "ld.h"
 #include "list.h"
+#include <md5.h>
+#include <system.h>
 
 
 /* Header of .eh_frame_hdr section.  */
@@ -2432,6 +2435,11 @@ ld_generic_generate_sections (struct ld_state *statep)
   /* The relocation section type.  */
   int rel_type = REL_TYPE (&ld_state) == DT_REL ? SHT_REL : SHT_RELA;
 
+  /* When requested, every output file will have a build ID section.  */
+  if (statep->build_id != NULL)
+    new_generated_scn (scn_dot_note_gnu_build_id, ".note.gnu.build-id",
+		       SHT_NOTE, SHF_ALLOC, 0, 4);
+
   /* When building dynamically linked object we have to include a
      section containing a string describing the interpreter.  This
      should be at the very beginning of the file together with the
@@ -4089,6 +4097,163 @@ cannot create hash table section for output file: %s"),
 }
 
 
+static void
+create_build_id_section (Elf_Scn *scn)
+{
+  /* We know how large the section will be so we can create it now.  */
+  Elf_Data *d = elf_newdata (scn);
+  if (d == NULL)
+    error (EXIT_FAILURE, 0, gettext ("cannot create build ID section: %s"),
+	   elf_errmsg (-1));
+
+  d->d_type = ELF_T_BYTE;
+  d->d_version = EV_CURRENT;
+
+  /* The note section header.  */
+  assert (sizeof (Elf32_Nhdr) == sizeof (Elf64_Nhdr));
+  d->d_size = sizeof (GElf_Nhdr);
+  /* The string is four bytes long.  */
+  d->d_size += sizeof (ELF_NOTE_GNU);
+  assert (d->d_size % 4 == 0);
+
+  if (strcmp (ld_state.build_id, "md5") == 0
+      || strcmp (ld_state.build_id, "uuid") == 0)
+    d->d_size += 16;
+  else
+    {
+      assert (ld_state.build_id[0] == '0' && ld_state.build_id[1] == 'x');
+      /* Use an upper limit of the possible number of bytes generated
+	 from the string.  */
+      d->d_size += strlen (ld_state.build_id) / 2;
+    }
+
+  d->d_buf = xcalloc (d->d_size, 1);
+  d->d_off = 0;
+  d->d_align = 0;
+}
+
+
+/* Iterate over the sections */
+static void
+compute_build_id (void)
+{
+  Elf_Data *d = elf_getdata (elf_getscn (ld_state.outelf,
+					 ld_state.buildidscnidx), NULL);
+  assert (d != NULL);
+
+  GElf_Nhdr *hdr = d->d_buf;
+  hdr->n_namesz = sizeof (ELF_NOTE_GNU);
+  hdr->n_type = NT_GNU_BUILD_ID;
+  char *dp = mempcpy (hdr + 1, ELF_NOTE_GNU, sizeof (ELF_NOTE_GNU));
+
+  if (strcmp (ld_state.build_id, "md5") == 0)
+    {
+      /* Compute the MD5 sum of various parts of the generated file.
+	 We compute the hash sum over the external representation.  */
+      struct md5_ctx ctx;
+      md5_init_ctx (&ctx);
+
+      /* The call cannot fail.  */
+      size_t shstrndx;
+      (void) elf_getshstrndx (ld_state.outelf, &shstrndx);
+
+      const char *ident = elf_getident (ld_state.outelf, NULL);
+      bool same_byte_order = ((ident[EI_DATA] == ELFDATA2LSB
+			       && __BYTE_ORDER == __LITTLE_ENDIAN)
+			      || (ident[EI_DATA] == ELFDATA2MSB
+				  && __BYTE_ORDER == __BIG_ENDIAN));
+
+      /* Iterate over all sections to find those which are not strippable.  */
+      Elf_Scn *scn = NULL;
+      while ((scn = elf_nextscn (ld_state.outelf, scn)) != NULL)
+	{
+	  /* Get the section header.  */
+	  GElf_Shdr shdr_mem;
+	  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+	  assert (shdr != NULL);
+
+	  if (SECTION_STRIP_P (shdr,
+			       elf_strptr (ld_state.outelf, shstrndx,
+					   shdr->sh_name), true))
+	    /* The section can be stripped.  Don't use it.  */
+	    continue;
+
+	  /* Do not look at NOBITS sections.  */
+	  if (shdr->sh_type == SHT_NOBITS)
+	    continue;
+
+	  /* Iterate through the list of data blocks.  */
+	  Elf_Data *data = NULL;
+	  while ((data = INTUSE(elf_getdata) (scn, data)) != NULL)
+	    /* If the file byte order is the same as the host byte order
+	       process the buffer directly.  If the data is just a stream
+	       of bytes which the library will not convert we can use it
+	       as well.  */
+	    if (likely (same_byte_order) || data->d_type == ELF_T_BYTE)
+	      md5_process_bytes (data->d_buf, data->d_size, &ctx);
+	    else
+	      {
+		/* Convert the data to file byte order.  */
+		if (gelf_xlatetof (ld_state.outelf, data, data, ident[EI_DATA])
+		    == NULL)
+		  error (EXIT_FAILURE, 0, gettext ("\
+cannot convert section data to file format: %s"),
+			 elf_errmsg (-1));
+
+		md5_process_bytes (data->d_buf, data->d_size, &ctx);
+
+		/* And convert it back.  */
+		if (gelf_xlatetom (ld_state.outelf, data, data, ident[EI_DATA])
+		    == NULL)
+		  error (EXIT_FAILURE, 0, gettext ("\
+cannot convert section data to memory format: %s"),
+			 elf_errmsg (-1));
+	      }
+
+	  /* We are done computing the checksum.  */
+	  (void) md5_finish_ctx (&ctx, dp);
+
+	  hdr->n_descsz = 16;
+	}
+    }
+  else if (strcmp (ld_state.build_id, "uuid") == 0)
+    {
+      int fd = open ("/dev/urandom", O_RDONLY);
+      if (fd == -1)
+	error (EXIT_FAILURE, errno, gettext ("cannot open '%s'"),
+	       "/dev/urandom");
+
+      if (TEMP_FAILURE_RETRY (read (fd, dp, 16)) != 16)
+	error (EXIT_FAILURE, 0, gettext ("cannot read enough data for UUID"));
+
+      close (fd);
+
+      hdr->n_descsz = 16;
+    }
+  else
+    {
+      const char *cp = ld_state.build_id + 2;
+
+      /* The form of the string has been verified before so here we can
+	 simplify the scanning.  */
+      do
+	{
+	  if (isxdigit (cp[0]))
+	    {
+	      char ch1 = tolower (cp[0]);
+	      char ch2 = tolower (cp[1]);
+
+	      *dp++ = (((isdigit (ch1) ? ch1 - '0' : ch1 - 'a' + 10) << 4)
+		       | (isdigit (ch2) ? ch2 - '0' : ch2 - 'a' + 10));
+	    }
+	  else
+	    ++cp;
+	}
+      while (*cp != '\0');
+    }
+}
+
+
 /* Create the output file.
 
    For relocatable files what basically has to happen is that all
@@ -4481,6 +4646,16 @@ ld_generic_create_outfile (struct ld_state *statep)
 	{
 	  /* Remember the index of this section.  */
 	  ld_state.verneedscnidx = elf_ndxscn (scn);
+
+	  continue;
+	}
+
+      if (unlikely (head->kind == scn_dot_note_gnu_build_id))
+	{
+	  /* Remember the index of this section.  */
+	  ld_state.buildidscnidx = elf_ndxscn (scn);
+
+	  create_build_id_section (scn);
 
 	  continue;
 	}
@@ -6694,6 +6869,12 @@ internal error: nobits section follows nobits section"));
 
   /* Finalize the .plt section and what else belongs to it.  */
   FINALIZE_PLT (statep, nsym, nsym_local, ndxtosym);
+
+
+  /* Finally, if we have to compute the build ID.  */
+  if (ld_state.build_id != NULL)
+    compute_build_id ();
+
 
   /* We don't need the map from the symbol table index to the symbol
      structure anymore.  */

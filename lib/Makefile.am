@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 1996-2001, 2002, 2004, 2005 Red Hat, Inc.
+## Copyright (C) 1996-2001, 2002, 2004, 2005, 2008 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -36,9 +36,9 @@ INCLUDES = -I$(srcdir)/../libelf -I..
 noinst_LIBRARIES = libeu.a
 
 libeu_a_SOURCES = xstrndup.c xmalloc.c next_prime.c \
-		  crc32.c crc32_file.c
+		  crc32.c crc32_file.c md5.c
 
-noinst_HEADERS = fixedsizehash.h system.h dynamicsizehash.h list.h
+noinst_HEADERS = fixedsizehash.h system.h dynamicsizehash.h list.h md5.h
 EXTRA_DIST = dynamicsizehash.c
 
 if !GPROF

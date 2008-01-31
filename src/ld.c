@@ -74,6 +74,7 @@ enum
     ARGP_no_as_needed,
     ARGP_eh_frame_hdr,
     ARGP_hash_style,
+    ARGP_build_id,
 #if YYDEBUG
     ARGP_yydebug,
 #endif
@@ -164,12 +165,14 @@ Default rules of extracting from archive; weak references are not enough."),
   { "dynamic-linker", 'I', "NAME", 0, N_("Set the dynamic linker name."), 0 },
   { NULL, 'Q', "YN", OPTION_HIDDEN, NULL, 0 },
   { "-Q y | n", 'Q', NULL, OPTION_DOC,
-    N_("Add/suppress addition indentifying link-editor to .comment section"),
+    N_("Add/suppress addition indentifying link-editor to .comment section."),
     0 },
   { "eh-frame-hdr", ARGP_eh_frame_hdr, NULL, 0,
     N_("Create .eh_frame_hdr section"), 0 },
   { "hash-style", ARGP_hash_style, "STYLE", 0,
     N_("Set hash style to sysv, gnu or both."), 0 },
+  { "build-id", ARGP_build_id, "STYLE", OPTION_ARG_OPTIONAL,
+    N_("Generate build ID note (md5 (default), uuid)."), 0 },
 
   { NULL, 0, NULL, 0, N_("Linker Operation Control:"), 0 },
   { "verbose", 'v', NULL, 0, N_("Verbose messages."), 0 },
@@ -519,6 +522,30 @@ replace_args (int argc, char *argv[])
 }
 
 
+static int
+valid_hexarg (const char *arg)
+{
+  if (strncasecmp (arg, "0x", 2) != 0)
+    return 0;
+
+  arg += 2;
+  do
+    {
+      if (isxdigit (arg[0]) && isxdigit (arg[1]))
+	{
+	  arg += 2;
+	  if (arg[0] == '-' || arg[0] == ':')
+	    ++arg;
+	}
+      else
+	return 0;
+    }
+  while (*arg != '\0');
+
+  return 1;
+}
+
+
 /* Quick scan of the parameter list for options with global effect.  */
 static error_t
 parse_opt_1st (int key, char *arg,
@@ -657,6 +684,17 @@ parse_opt_1st (int key, char *arg,
 	ld_state.hash_style = hash_style_sysv;
       else
 	error (EXIT_FAILURE, 0, gettext ("invalid hash style '%s'"), arg);
+      break;
+
+    case ARGP_build_id:
+      if (arg == NULL)
+	ld_state.build_id = "md5";
+      else if (strcmp (arg, "uuid") != 0
+	       && strcmp (arg, "md5") != 0
+	       && !valid_hexarg (arg))
+	error (EXIT_FAILURE, 0, gettext ("invalid build-ID style '%s'"), arg);
+      else
+	ld_state.build_id = arg;
       break;
 
     case 's':

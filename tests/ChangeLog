@@ -1,3 +1,8 @@
+2008-02-01  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am: Hook up sha1-tst.c.
+	* sha1-tst.c: New file.
+
 2008-01-21  Roland McGrath  <roland@redhat.com>
 
 	* testfile45.S.bz2: Add tests for cltq, cqto.

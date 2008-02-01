@@ -172,7 +172,7 @@ Default rules of extracting from archive; weak references are not enough."),
   { "hash-style", ARGP_hash_style, "STYLE", 0,
     N_("Set hash style to sysv, gnu or both."), 0 },
   { "build-id", ARGP_build_id, "STYLE", OPTION_ARG_OPTIONAL,
-    N_("Generate build ID note (md5 (default), uuid)."), 0 },
+    N_("Generate build ID note (md5, sha1 (default), uuid)."), 0 },
 
   { NULL, 0, NULL, 0, N_("Linker Operation Control:"), 0 },
   { "verbose", 'v', NULL, 0, N_("Verbose messages."), 0 },
@@ -688,9 +688,10 @@ parse_opt_1st (int key, char *arg,
 
     case ARGP_build_id:
       if (arg == NULL)
-	ld_state.build_id = "md5";
+	ld_state.build_id = "sha1";
       else if (strcmp (arg, "uuid") != 0
 	       && strcmp (arg, "md5") != 0
+	       && strcmp (arg, "sha1") != 0
 	       && !valid_hexarg (arg))
 	error (EXIT_FAILURE, 0, gettext ("invalid build-ID style '%s'"), arg);
       else

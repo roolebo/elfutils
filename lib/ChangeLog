@@ -1,7 +1,16 @@
+2008-02-01  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (libeu_a_SOURCES): Add sha1.c.
+	(noinst_HEADERS): Add sha1.h.
+	* sha1.c: New file.
+	* sha1.h: New file.
+
 2008-01-31  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.am (libeu_a_SOURCES): Add md5.c.
 	(noinst_HEADERS): Add md5.h.
+	* md5.c: New file.
+	* md5.h: New file.
 
 2006-04-04  Ulrich Drepper  <drepper@redhat.com>
 

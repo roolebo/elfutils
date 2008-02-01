@@ -49,6 +49,7 @@
 #include "ld.h"
 #include "list.h"
 #include <md5.h>
+#include <sha1.h>
 #include <system.h>
 
 
@@ -4119,6 +4120,8 @@ create_build_id_section (Elf_Scn *scn)
   if (strcmp (ld_state.build_id, "md5") == 0
       || strcmp (ld_state.build_id, "uuid") == 0)
     d->d_size += 16;
+  else if (strcmp (ld_state.build_id, "sha1") == 0)
+    d->d_size += 20;
   else
     {
       assert (ld_state.build_id[0] == '0' && ld_state.build_id[1] == 'x');
@@ -4130,6 +4133,68 @@ create_build_id_section (Elf_Scn *scn)
   d->d_buf = xcalloc (d->d_size, 1);
   d->d_off = 0;
   d->d_align = 0;
+}
+
+
+static void
+compute_hash_sum (void (*hashfct) (const void *, size_t, void *), void *ctx)
+{
+  /* The call cannot fail.  */
+  size_t shstrndx;
+  (void) elf_getshstrndx (ld_state.outelf, &shstrndx);
+
+  const char *ident = elf_getident (ld_state.outelf, NULL);
+  bool same_byte_order = ((ident[EI_DATA] == ELFDATA2LSB
+			   && __BYTE_ORDER == __LITTLE_ENDIAN)
+			  || (ident[EI_DATA] == ELFDATA2MSB
+			      && __BYTE_ORDER == __BIG_ENDIAN));
+
+  /* Iterate over all sections to find those which are not strippable.  */
+  Elf_Scn *scn = NULL;
+  while ((scn = elf_nextscn (ld_state.outelf, scn)) != NULL)
+    {
+      /* Get the section header.  */
+      GElf_Shdr shdr_mem;
+      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+      assert (shdr != NULL);
+
+      if (SECTION_STRIP_P (shdr, elf_strptr (ld_state.outelf, shstrndx,
+					     shdr->sh_name), true))
+	/* The section can be stripped.  Don't use it.  */
+	continue;
+
+      /* Do not look at NOBITS sections.  */
+      if (shdr->sh_type == SHT_NOBITS)
+	continue;
+
+      /* Iterate through the list of data blocks.  */
+      Elf_Data *data = NULL;
+      while ((data = INTUSE(elf_getdata) (scn, data)) != NULL)
+	/* If the file byte order is the same as the host byte order
+	   process the buffer directly.  If the data is just a stream
+	   of bytes which the library will not convert we can use it
+	   as well.  */
+	if (likely (same_byte_order) || data->d_type == ELF_T_BYTE)
+	  hashfct (data->d_buf, data->d_size, ctx);
+	else
+	  {
+	    /* Convert the data to file byte order.  */
+	    if (gelf_xlatetof (ld_state.outelf, data, data, ident[EI_DATA])
+		== NULL)
+	      error (EXIT_FAILURE, 0, gettext ("\
+cannot convert section data to file format: %s"),
+		     elf_errmsg (-1));
+
+	    hashfct (data->d_buf, data->d_size, ctx);
+
+	    /* And convert it back.  */
+	    if (gelf_xlatetom (ld_state.outelf, data, data, ident[EI_DATA])
+		== NULL)
+	      error (EXIT_FAILURE, 0, gettext ("\
+cannot convert section data to memory format: %s"),
+		     elf_errmsg (-1));
+	  }
+    }
 }
 
 
@@ -4146,75 +4211,37 @@ compute_build_id (void)
   hdr->n_type = NT_GNU_BUILD_ID;
   char *dp = mempcpy (hdr + 1, ELF_NOTE_GNU, sizeof (ELF_NOTE_GNU));
 
-  if (strcmp (ld_state.build_id, "md5") == 0)
+  if (strcmp (ld_state.build_id, "sha1") == 0)
+    {
+      /* Compute the SHA1 sum of various parts of the generated file.
+	 We compute the hash sum over the external representation.  */
+      struct sha1_ctx ctx;
+      sha1_init_ctx (&ctx);
+
+      /* Compute the hash sum by running over all sections.  */
+      compute_hash_sum ((void (*) (const void *, size_t, void *)) sha1_process_bytes,
+			&ctx);
+
+      /* We are done computing the checksum.  */
+      (void) sha1_finish_ctx (&ctx, dp);
+
+      hdr->n_descsz = SHA1_DIGEST_SIZE;
+    }
+  else if (strcmp (ld_state.build_id, "md5") == 0)
     {
       /* Compute the MD5 sum of various parts of the generated file.
 	 We compute the hash sum over the external representation.  */
       struct md5_ctx ctx;
       md5_init_ctx (&ctx);
 
-      /* The call cannot fail.  */
-      size_t shstrndx;
-      (void) elf_getshstrndx (ld_state.outelf, &shstrndx);
+      /* Compute the hash sum by running over all sections.  */
+      compute_hash_sum ((void (*) (const void *, size_t, void *)) md5_process_bytes,
+			&ctx);
 
-      const char *ident = elf_getident (ld_state.outelf, NULL);
-      bool same_byte_order = ((ident[EI_DATA] == ELFDATA2LSB
-			       && __BYTE_ORDER == __LITTLE_ENDIAN)
-			      || (ident[EI_DATA] == ELFDATA2MSB
-				  && __BYTE_ORDER == __BIG_ENDIAN));
+      /* We are done computing the checksum.  */
+      (void) md5_finish_ctx (&ctx, dp);
 
-      /* Iterate over all sections to find those which are not strippable.  */
-      Elf_Scn *scn = NULL;
-      while ((scn = elf_nextscn (ld_state.outelf, scn)) != NULL)
-	{
-	  /* Get the section header.  */
-	  GElf_Shdr shdr_mem;
-	  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
-	  assert (shdr != NULL);
-
-	  if (SECTION_STRIP_P (shdr,
-			       elf_strptr (ld_state.outelf, shstrndx,
-					   shdr->sh_name), true))
-	    /* The section can be stripped.  Don't use it.  */
-	    continue;
-
-	  /* Do not look at NOBITS sections.  */
-	  if (shdr->sh_type == SHT_NOBITS)
-	    continue;
-
-	  /* Iterate through the list of data blocks.  */
-	  Elf_Data *data = NULL;
-	  while ((data = INTUSE(elf_getdata) (scn, data)) != NULL)
-	    /* If the file byte order is the same as the host byte order
-	       process the buffer directly.  If the data is just a stream
-	       of bytes which the library will not convert we can use it
-	       as well.  */
-	    if (likely (same_byte_order) || data->d_type == ELF_T_BYTE)
-	      md5_process_bytes (data->d_buf, data->d_size, &ctx);
-	    else
-	      {
-		/* Convert the data to file byte order.  */
-		if (gelf_xlatetof (ld_state.outelf, data, data, ident[EI_DATA])
-		    == NULL)
-		  error (EXIT_FAILURE, 0, gettext ("\
-cannot convert section data to file format: %s"),
-			 elf_errmsg (-1));
-
-		md5_process_bytes (data->d_buf, data->d_size, &ctx);
-
-		/* And convert it back.  */
-		if (gelf_xlatetom (ld_state.outelf, data, data, ident[EI_DATA])
-		    == NULL)
-		  error (EXIT_FAILURE, 0, gettext ("\
-cannot convert section data to memory format: %s"),
-			 elf_errmsg (-1));
-	      }
-
-	  /* We are done computing the checksum.  */
-	  (void) md5_finish_ctx (&ctx, dp);
-
-	  hdr->n_descsz = 16;
-	}
+      hdr->n_descsz = MD5_DIGEST_SIZE;
     }
   else if (strcmp (ld_state.build_id, "uuid") == 0)
     {

@@ -88,8 +88,8 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 # run-show-ciefde.sh
 
 if !STANDALONE
-noinst_PROGRAMS += msg_tst
-TESTS += msg_tst
+noinst_PROGRAMS += msg_tst sha1-tst
+TESTS += msg_tst sha1-tst
 endif
 
 if HAVE_LIBASM
@@ -175,6 +175,7 @@ libelf = ../libelf/libelf.so
 libasm = ../libasm/libasm.so
 endif
 libebl = ../libebl/libebl.a
+libeu = ../lib/libeu.a
 endif !STANDALONE
 
 arextract_LDADD = $(libelf) $(libmudflap)
@@ -224,6 +225,7 @@ arls_LDADD = $(libelf) $(libmudflap)
 dwfl_bug_fd_leak_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
 dwfl_bug_report_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
 dwfl_addr_sect_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
+sha1_tst_LDADD = $(libeu) $(libmudflap)
 
 CLEANFILES = xxx *.gcno *.gcda *gconv
 

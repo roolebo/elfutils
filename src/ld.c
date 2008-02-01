@@ -512,7 +512,7 @@ replace_args (int argc, char *argv[])
   const size_t nargs = sizeof (args) / sizeof (args[0]);
 
   for (int i = 1; i < argc; ++i)
-    if (argv[i][0] == '-' && islower (argv[i][1]))
+    if (argv[i][0] == '-' && islower (argv[i][1]) && argv[i][2] != '\0')
       for (size_t j = 0; j < nargs; ++j)
 	if (strcmp (argv[i], args[j].from) == 0)
 	  {

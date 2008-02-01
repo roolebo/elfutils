@@ -1,5 +1,8 @@
 2008-02-01  Ulrich Drepper  <drepper@redhat.com>
 
+	* ld.c (replace_args): Prevent loop over replacements if the parameter
+	is only two characters long.
+
 	* ld.c: Recognize sha1 argument for --build-id parameter.
 	* ldgeneric.c (create_build_id_section): Handle sha1.
 	(compute_hash_sum): New function.  Broken out of compute_build_id.

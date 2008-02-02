@@ -1085,6 +1085,9 @@ add_section (struct usedfiles *fileinfo, struct scninfo *scninfo)
       queued->segment_nr = ~0;
       queued->last = scninfo->next = scninfo;
 
+      /* Check whether we need a TLS segment.  */
+      ld_state.need_tls |= (shdr->sh_flags & SHF_TLS) != 0;
+
       /* Add to the hash table and possibly overwrite existing value.  */
       ld_section_tab_insert (&ld_state.section_tab, hval, queued);
     }
@@ -6209,13 +6212,6 @@ section index too large in dynamic symbol table"));
 
   if (ld_state.file_type != relocatable_file_type)
     {
-      size_t nphdr;
-      XElf_Addr addr;
-      struct output_segment *segment;
-      Elf_Scn *scn;
-      Elf32_Word nsec;
-      XElf_Phdr_vardef (phdr);
-
       /* Every executable needs a program header.  The number of entries
 	 varies.  One exists for each segment.  Each SHT_NOTE section gets
 	 one, too.  For dynamically linked executables we have to create
@@ -6223,12 +6219,12 @@ section index too large in dynamic symbol table"));
 	 section.  First count the number of segments.
 
 	 XXX Determine whether the segment is non-empty.  */
-      nphdr = 0;
+      size_t nphdr = 0;
 
       /* We always add a PT_GNU_stack entry.  */
       ++nphdr;
 
-      segment = ld_state.output_segments;
+      struct output_segment *segment = ld_state.output_segments;
       while (segment != NULL)
 	{
 	  ++nphdr;
@@ -6249,7 +6245,12 @@ section index too large in dynamic symbol table"));
 	    nphdr += 2;
 	}
 
+      /* If we need a TLS segment we need an entry for that.  */
+      if (ld_state.need_tls)
+	++nphdr;
+
       /* Create the program header structure.  */
+      XElf_Phdr_vardef (phdr);
       if (xelf_newphdr (ld_state.outelf, nphdr) == 0)
 	error (EXIT_FAILURE, 0, gettext ("cannot create program header: %s"),
 	       elf_errmsg (-1));
@@ -6265,14 +6266,20 @@ section index too large in dynamic symbol table"));
 
       /* Now determine the memory addresses of all the sections and
 	 segments.  */
-      nsec = 0;
-      scn = elf_getscn (ld_state.outelf, ld_state.allsections[nsec]->scnidx);
+      Elf32_Word nsec = 0;
+      Elf_Scn *scn = elf_getscn (ld_state.outelf,
+				 ld_state.allsections[nsec]->scnidx);
       xelf_getshdr (scn, shdr);
       assert (shdr != NULL);
 
       /* The address we start with is the offset of the first (not
 	 zeroth) section.  */
-      addr = shdr->sh_offset;
+      XElf_Addr addr = shdr->sh_offset;
+      XElf_Addr tls_offset = 0;
+      XElf_Addr tls_start = ~((XElf_Addr) 0);
+      XElf_Addr tls_end = 0;
+      XElf_Off tls_filesize = 0;
+      XElf_Addr tls_align = 0;
 
       /* The index of the first loadable segment.  */
       nphdr = 0;
@@ -6292,15 +6299,13 @@ section index too large in dynamic symbol table"));
 	  XElf_Off nobits_size = 0;
 	  XElf_Off memsize = 0;
 
-	  /* the minimum alignment is a page size.  */
+	  /* The minimum alignment is a page size.  */
 	  segment->align = ld_state.pagesize;
 
 	  for (orule = segment->output_rules; orule != NULL;
 	       orule = orule->next)
 	    if (orule->tag == output_section)
 	      {
-		XElf_Off oldoff;
-
 		/* See whether this output rule corresponds to the next
 		   section.  Yes, this is a pointer comparison.  */
 		if (ld_state.allsections[nsec]->name
@@ -6330,6 +6335,22 @@ section index too large in dynamic symbol table"));
 
 		    /* Remember the address.  */
 		    ld_state.allsections[nsec]->addr = addr;
+
+		    /* Handle TLS sections.  */
+		    if (unlikely (shdr->sh_flags & SHF_TLS))
+		      {
+			if (tls_start > addr)
+			  {
+			    tls_start = addr;
+			    tls_offset = shdr->sh_offset;
+			  }
+			if (tls_end < addr + shdr->sh_size)
+			  tls_end = addr + shdr->sh_size;
+			if (shdr->sh_type != SHT_NOBITS)
+			  tls_filesize += shdr->sh_size;
+			if (shdr->sh_addralign > tls_align)
+			  tls_align = shdr->sh_addralign;
+		      }
 		  }
 
 		if (first_section)
@@ -6352,12 +6373,19 @@ section index too large in dynamic symbol table"));
 		    first_section = false;
 		  }
 
-		memsize = shdr->sh_offset - segment->offset + shdr->sh_size;
-		if (nobits_size != 0 && shdr->sh_type != SHT_NOTE)
-		  error (EXIT_FAILURE, 0, gettext ("\
-internal error: nobits section follows nobits section"));
-		if (shdr->sh_type == SHT_NOBITS)
-		  nobits_size += shdr->sh_size;
+		/* NOBITS TLS sections are not laid out in address space
+		   along with the other sections.  */
+		if (shdr->sh_type != SHT_NOBITS
+		    || (shdr->sh_flags & SHF_TLS) == 0)
+		  {
+		    memsize = (shdr->sh_offset - segment->offset
+			       + shdr->sh_size);
+		    if (nobits_size != 0 && shdr->sh_type != SHT_NOTE)
+		      error (EXIT_FAILURE, 0, gettext ("\
+internal error: non-nobits section follows nobits section"));
+		    if (shdr->sh_type == SHT_NOBITS)
+		      nobits_size += shdr->sh_size;
+		  }
 
 		/* Determine the new address which is computed using
 		   the difference of the offsets on the sections.  Note
@@ -6365,7 +6393,7 @@ internal error: nobits section follows nobits section"));
 		   other in the section header table are also
 		   consecutive in the file.  This is true here because
 		   libelf constructs files this way.  */
-		oldoff = shdr->sh_offset;
+		XElf_Off oldoff = shdr->sh_offset;
 
 		if (++nsec >= ld_state.nallsections)
 		  break;
@@ -6440,6 +6468,25 @@ internal error: nobits section follows nobits section"));
       xelf_getehdr (ld_state.outelf, ehdr);
       assert (ehdr != NULL);
 
+      /* Add the TLS information.  */
+      if (ld_state.need_tls)
+	{
+	  xelf_getphdr_ptr (ld_state.outelf, nphdr, phdr);
+	  phdr->p_type = PT_TLS;
+	  phdr->p_offset = tls_offset;
+	  phdr->p_vaddr = tls_start;
+	  phdr->p_paddr = tls_start;
+	  phdr->p_filesz = tls_filesize;
+	  phdr->p_memsz = tls_end - tls_start;
+	  phdr->p_flags = PF_R;
+	  phdr->p_align = tls_align;
+	  ld_state.tls_tcb = tls_end;
+	  ld_state.tls_start = tls_start;
+
+	  (void) xelf_update_phdr (ld_state.outelf, nphdr, phdr);
+	  ++nphdr;
+	}
+
       /* Add the stack information.  */
       xelf_getphdr_ptr (ld_state.outelf, nphdr, phdr);
       phdr->p_type = PT_GNU_STACK;
@@ -6448,8 +6495,9 @@ internal error: nobits section follows nobits section"));
       phdr->p_paddr = 0;
       phdr->p_filesz = 0;
       phdr->p_memsz = 0;
-      phdr->p_flags = ld_state.execstack == execstack_true ? PF_X : 0;
-      phdr->p_align = 0;
+      phdr->p_flags = (PF_R | PF_W
+		       | (ld_state.execstack == execstack_true ? PF_X : 0));
+      phdr->p_align = xelf_fsize (ld_state.outelf, ELF_T_ADDR, 1);
 
       (void) xelf_update_phdr (ld_state.outelf, nphdr, phdr);
       ++nphdr;

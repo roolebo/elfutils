@@ -646,9 +646,17 @@ elf_i386_count_relocations (struct ld_state *statep, struct scninfo *scninfo)
 		}
 	      break;
 
+	    case R_386_TLS_LDO_32:
+	      if (statep->file_type != executable_file_type)
+		abort ();
+	      break;
+
+	    case R_386_TLS_LE:
+	      /* We never need a relocation in the output file.  */
+	      break;
+
 	    case R_386_TLS_IE:
 	    case R_386_TLS_GOTIE:
-	    case R_386_TLS_LE:
 	    case R_386_TLS_GD:
 	    case R_386_TLS_LDM:
 	    case R_386_TLS_GD_32:
@@ -659,7 +667,6 @@ elf_i386_count_relocations (struct ld_state *statep, struct scninfo *scninfo)
 	    case R_386_TLS_LDM_PUSH:
 	    case R_386_TLS_LDM_CALL:
 	    case R_386_TLS_LDM_POP:
-	    case R_386_TLS_LDO_32:
 	    case R_386_TLS_IE_32:
 	    case R_386_TLS_LE_32:
 	      /* XXX */
@@ -928,11 +935,20 @@ elf_i386_create_relocations (struct ld_state *statep,
 	      add_4ubyte_unaligned (relloc, value - gotaddr);
 	      break;
 
+	    case R_386_TLS_LE:
+	      value = symref[idx]->merge.value - ld_state.tls_tcb;
+	      store_4ubyte_unaligned (relloc, value);
+	      break;
+
+	    case R_386_TLS_LDO_32:
+	      value = symref[idx]->merge.value - ld_state.tls_start;
+	      store_4ubyte_unaligned (relloc, value);
+	      break;
+
 	    case R_386_32PLT:
 	    case R_386_TLS_TPOFF:
 	    case R_386_TLS_IE:
 	    case R_386_TLS_GOTIE:
-	    case R_386_TLS_LE:
 	    case R_386_TLS_GD:
 	    case R_386_TLS_LDM:
 	    case R_386_16:
@@ -947,7 +963,6 @@ elf_i386_create_relocations (struct ld_state *statep,
 	    case R_386_TLS_LDM_PUSH:
 	    case R_386_TLS_LDM_CALL:
 	    case R_386_TLS_LDM_POP:
-	    case R_386_TLS_LDO_32:
 	    case R_386_TLS_IE_32:
 	    case R_386_TLS_LE_32:
 	      // XXX For now fall through

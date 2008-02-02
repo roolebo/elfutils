@@ -967,6 +967,11 @@ struct ld_state
   /* Index of next version.  */
   int nextveridx;
 
+  /* TLS segment.  */
+  bool need_tls;
+  XElf_Addr tls_start;
+  XElf_Addr tls_tcb;
+
   /* Hash table for version symbol strings.  Only strings without
      special characters are hashed here.  */
   ld_version_str_tab version_str_tab;

@@ -1,3 +1,15 @@
+2008-02-02  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf32-i386.script: Add .eh_frame_hdr, .tdata, and .tbss sections.
+	* i386_ld.c (elf_i386_count_relocations): Handle R_386_TLS_LDO_32
+	and R_386_TLS_LE.
+	(elf_i386_create_relocations): Likewise.
+	* ld.h (struct ld_state): Add need_tls, tls_start, and tls_tcb
+	elements.
+	* ldgeneric.c (add_section): If TLS section is used, set need_tls flag.
+	(ld_generic_create_outfile): Add PT_TLS entry to program  header.
+	Fix generation of PT_GNU_STACK entry.
+
 2008-02-01  Ulrich Drepper  <drepper@redhat.com>
 
 	* ld.c (replace_args): Prevent loop over replacements if the parameter

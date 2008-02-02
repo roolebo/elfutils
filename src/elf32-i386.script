@@ -50,6 +50,7 @@ SEGMENT [RX]
       *(.gnu.linkonce.r.*)
     }
   .rodata1;
+  .eh_frame_hdr;
   . = ALIGN(32 / 8);
   PROVIDE (__preinit_array_start = .);
   .preinit_array
@@ -93,6 +94,19 @@ SEGMENT [RW]
       KEEP (*(.eh_frame))
     }
   .gcc_except_table;
+  .tdata
+    {
+      *(.tdata)
+      *(.tdata.*)
+      *(.gnu.linkone.td.*)
+    }
+  .tbss
+    {
+      *(.tbss)
+      *(.tbss.*)
+      *(.gnu.linkone.tb.*)
+      *(.tcommon)
+    }
   .ctors
     {
       /* gcc uses crtbegin.o to find the start of

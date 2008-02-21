@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2005, 2007 Red Hat, Inc.
+# Copyright (C) 2005, 2007, 2008 Red Hat, Inc.
 # This file is part of Red Hat elfutils.
 # Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 #
@@ -40,5 +40,8 @@ testrun ../src/elflint -q testfile33
 
 testfiles testfile42
 testrun ../src/elflint -q --gnu-ld testfile42
+
+testfiles testfile47
+testrun ../src/elflint -q testfile47
 
 exit 0

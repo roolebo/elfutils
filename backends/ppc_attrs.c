@@ -1,7 +1,6 @@
-/* Initialization of PPC specific backend library.
-   Copyright (C) 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
+/* Object attribute tags for PowerPC.
+   Copyright (C) 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by the
@@ -28,38 +27,50 @@
 # include <config.h>
 #endif
 
-#define BACKEND		ppc_
-#define RELOC_PREFIX	R_PPC_
+#include <string.h>
+#include <dwarf.h>
+
+#define BACKEND ppc_
 #include "libebl_CPU.h"
 
-/* This defines the common reloc hooks based on ppc_reloc.def.  */
-#include "common-reloc.c"
-
-
-const char *
-ppc_init (elf, machine, eh, ehlen)
-     Elf *elf __attribute__ ((unused));
-     GElf_Half machine __attribute__ ((unused));
-     Ebl *eh;
-     size_t ehlen;
+bool
+ppc_check_object_attribute (ebl, vendor, tag, value, tag_name, value_name)
+     Ebl *ebl __attribute__ ((unused));
+     const char *vendor;
+     int tag;
+     uint64_t value;
+     const char **tag_name;
+     const char **value_name;
 {
-  /* Check whether the Elf_BH object has a sufficent size.  */
-  if (ehlen < sizeof (Ebl))
-    return NULL;
+  if (!strcmp (vendor, "gnu"))
+    switch (tag)
+      {
+      case 4:
+	*tag_name = "GNU_Power_ABI_FP";
+	static const char *fp_kinds[] =
+	  {
+	    "Hard or soft float",
+	    "Hard float",
+	    "Soft float",
+	  };
+	if (value < sizeof fp_kinds / sizeof fp_kinds[0])
+	  *value_name = fp_kinds[value];
+	return true;
 
-  /* We handle it.  */
-  eh->name = "PowerPC";
-  ppc_init_reloc (eh);
-  HOOK (eh, reloc_simple_type);
-  HOOK (eh, dynamic_tag_name);
-  HOOK (eh, dynamic_tag_check);
-  HOOK (eh, check_special_symbol);
-  HOOK (eh, bss_plt_p);
-  HOOK (eh, return_value_location);
-  HOOK (eh, register_info);
-  HOOK (eh, core_note);
-  HOOK (eh, auxv_info);
-  HOOK (eh, check_object_attribute);
+      case 8:
+	*tag_name = "GNU_Power_ABI_Vector";
+	static const char *vector_kinds[] =
+	  {
+	    "Any", "Generic", "AltiVec", "SPE"
+	  };
+	if (value < sizeof vector_kinds / sizeof vector_kinds[0])
+	  *value_name = vector_kinds[value];
+	return true;
+      }
 
-  return MODVERSION;
+  return false;
 }
+
+__typeof (ppc_check_object_attribute)
+     ppc64_check_object_attribute
+     __attribute__ ((alias ("ppc_check_object_attribute")));

@@ -1,5 +1,5 @@
 /* Interface for libebl.
-   Copyright (C) 2000, 2001, 2002, 2004, 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -181,6 +181,15 @@ extern const char *ebl_object_note_type_name (Ebl *ebl, uint32_t type,
 /* Print information about object note if available.  */
 extern void ebl_object_note (Ebl *ebl, const char *name, uint32_t type,
 			     uint32_t descsz, const char *desc);
+
+/* Check whether an attribute in a .gnu_attributes section is recognized.
+   Fills in *TAG_NAME with the name for this tag.
+   If VALUE is a known value for that tag, also fills in *VALUE_NAME.  */
+extern bool ebl_check_object_attribute (Ebl *ebl, const char *vendor,
+					int tag, uint64_t value,
+					const char **tag_name,
+					const char **value_name);
+
 
 /* Check section name for being that of a debug informatino section.  */
 extern bool ebl_debugscn_p (Ebl *ebl, const char *name);

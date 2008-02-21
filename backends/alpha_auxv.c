@@ -1,7 +1,6 @@
-/* Initialization of PPC specific backend library.
-   Copyright (C) 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
+/* Alpha-specific auxv handling.
+   Copyright (C) 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by the
@@ -28,38 +27,20 @@
 # include <config.h>
 #endif
 
-#define BACKEND		ppc_
-#define RELOC_PREFIX	R_PPC_
+#define BACKEND alpha_
 #include "libebl_CPU.h"
 
-/* This defines the common reloc hooks based on ppc_reloc.def.  */
-#include "common-reloc.c"
-
-
-const char *
-ppc_init (elf, machine, eh, ehlen)
-     Elf *elf __attribute__ ((unused));
-     GElf_Half machine __attribute__ ((unused));
-     Ebl *eh;
-     size_t ehlen;
+int
+EBLHOOK(auxv_info) (GElf_Xword a_type, const char **name, const char **format)
 {
-  /* Check whether the Elf_BH object has a sufficent size.  */
-  if (ehlen < sizeof (Ebl))
-    return NULL;
+  if (a_type != AT_HWCAP)
+    return 0;
 
-  /* We handle it.  */
-  eh->name = "PowerPC";
-  ppc_init_reloc (eh);
-  HOOK (eh, reloc_simple_type);
-  HOOK (eh, dynamic_tag_name);
-  HOOK (eh, dynamic_tag_check);
-  HOOK (eh, check_special_symbol);
-  HOOK (eh, bss_plt_p);
-  HOOK (eh, return_value_location);
-  HOOK (eh, register_info);
-  HOOK (eh, core_note);
-  HOOK (eh, auxv_info);
-  HOOK (eh, check_object_attribute);
-
-  return MODVERSION;
+  *name = "HWCAP";
+  *format = "b"
+    "bwx\0" "fix\0" "cix\0" "0x08\0"
+    "0x10\0" "0x20\0" "0x40\0" "0x80\0"
+    "max\0" "precise_trap\0"
+    "\0";
+  return 1;
 }

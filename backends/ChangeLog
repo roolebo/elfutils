@@ -1,3 +1,26 @@
+2008-02-20  Roland McGrath  <roland@redhat.com>
+
+	* ppc_attrs.c: New file.
+	* Makefile.am (ppc_SRCS, ppc64_SRCS): Add it.
+	* ppc_init.c (ppc_init): Initialize check_object_attribute hook.
+
+2008-02-14  Roland McGrath  <roland@redhat.com>
+
+	* alpha_auxv.c: New file.
+	* Makefile.am (alpha_SRCS): Add it.
+	* alpha_init.c (alpha_init): Initialize auxv_info hook.
+
+2008-02-08  Roland McGrath  <roland@redhat.com>
+
+	* ppc_corenote.c (spe_regs): New const variable.
+	(EXTRA_NOTES): Use it for NT_PPC_SPE.
+
+2008-01-02  Roland McGrath  <roland@redhat.com>
+
+	* i386_corenote.c (tls_items): New const table.
+	(tls_info): New function, uses it.
+	(EXTRA_NOTES): Use it to handle NT_386_TLS.
+
 2008-01-08  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.am: Add x86-64 disassembler.

@@ -1,5 +1,5 @@
 /* Relocate debug information.
-   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -306,6 +306,12 @@ relocate_section (Dwfl_Module *mod, Elf *relocated, const GElf_Ehdr *ehdr,
   Dwfl_Error relocate (GElf_Addr offset, const GElf_Sxword *addend,
 		       int rtype, int symndx)
   {
+    /* First see if this is a reloc we can handle.
+       If we are skipping it, don't bother resolving the symbol.  */
+    Elf_Type type = ebl_reloc_simple_type (mod->ebl, rtype);
+    if (unlikely (type == ELF_T_NUM))
+      return DWFL_E_BADRELTYPE;
+
     /* First, resolve the symbol to an absolute value.  */
     GElf_Addr value;
 
@@ -342,7 +348,6 @@ relocate_section (Dwfl_Module *mod, Elf *relocated, const GElf_Ehdr *ehdr,
     DO_TYPE (WORD, Word); DO_TYPE (SWORD, Sword);			\
     DO_TYPE (XWORD, Xword); DO_TYPE (SXWORD, Sxword)
     size_t size;
-    Elf_Type type = ebl_reloc_simple_type (mod->ebl, rtype);
     switch (type)
       {
 #define DO_TYPE(NAME, Name)			\
@@ -352,10 +357,6 @@ relocate_section (Dwfl_Module *mod, Elf *relocated, const GElf_Ehdr *ehdr,
 	TYPES;
 #undef DO_TYPE
       default:
-	/* This might be because ebl_openbackend failed to find
-	   any libebl_CPU.so library.  Diagnose that clearly.  */
-	if (ebl_get_elfmachine (mod->ebl) == EM_NONE)
-	  return DWFL_E_UNKNOWN_MACHINE;
 	return DWFL_E_BADRELTYPE;
       }
 
@@ -437,6 +438,19 @@ relocate_section (Dwfl_Module *mod, Elf *relocated, const GElf_Ehdr *ehdr,
     return DWFL_E_LIBELF;
 
   Dwfl_Error result = DWFL_E_NOERROR;
+  bool first_badreltype = true;
+  inline void check_badreltype (void)
+  {
+    if (first_badreltype)
+      {
+	first_badreltype = false;
+	if (ebl_get_elfmachine (mod->ebl) == EM_NONE)
+	  /* This might be because ebl_openbackend failed to find
+	     any libebl_CPU.so library.  Diagnose that clearly.  */
+	  result = DWFL_E_UNKNOWN_MACHINE;
+      }
+  }
+
   size_t nrels = shdr->sh_size / shdr->sh_entsize;
   size_t complete = 0;
   if (shdr->sh_type == SHT_REL)
@@ -448,6 +462,7 @@ relocate_section (Dwfl_Module *mod, Elf *relocated, const GElf_Ehdr *ehdr,
 	result = relocate (r->r_offset, NULL,
 			   GELF_R_TYPE (r->r_info),
 			   GELF_R_SYM (r->r_info));
+	check_badreltype ();
 	if (partial)
 	  switch (result)
 	    {
@@ -476,6 +491,7 @@ relocate_section (Dwfl_Module *mod, Elf *relocated, const GElf_Ehdr *ehdr,
 	result = relocate (r->r_offset, &r->r_addend,
 			   GELF_R_TYPE (r->r_info),
 			   GELF_R_SYM (r->r_info));
+	check_badreltype ();
 	if (partial)
 	  switch (result)
 	    {

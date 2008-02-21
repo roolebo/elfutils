@@ -1,3 +1,25 @@
+2008-02-20  Roland McGrath  <roland@redhat.com>
+
+	* libebl.h: Declare ebl_check_object_attribute.
+	* eblcheckobjattr.c: New file.
+	* Makefile.am (gen_SOURCES): Add it.
+	* ebl-hooks.h: Add check_object_attribute hook.
+	* eblopenbackend.c (default_check_object_attribute): New function.
+	(fill_defaults): Initialize pointer to it.
+
+2008-02-19  Roland McGrath  <roland@redhat.com>
+
+	* eblsectiontypename.c (ebl_section_type_name):
+	Handle SHT_GNU_ATTRIBUTES.
+
+2008-02-08  Roland McGrath  <roland@redhat.com>
+
+	* eblcorenotetypename.c (ebl_core_note_type_name): Handle NT_PPC_SPE.
+
+2008-01-30  Roland McGrath  <roland@redhat.com>
+
+	* eblcorenotetypename.c (ebl_core_note_type_name): Handle NT_386_TLS.
+
 2007-10-18  Roland McGrath  <roland@redhat.com>
 
 	* eblcorenotetypename.c (ebl_core_note_type_name): Handle NT_PPC_VMX.

@@ -46,7 +46,12 @@
 
 #include <elf-knowledge.h>
 #include <system.h>
+#include "../libelf/libelfP.h"
+#include "../libelf/common.h"
 #include "../libebl/libeblP.h"
+#include "../libdw/libdwP.h"
+#include "../libdwfl/libdwflP.h"
+#include "../libdw/memory-access.h"
 
 
 /* Name and version of program.  */
@@ -3099,6 +3104,194 @@ section [%2d] '%s': unknown parent version '%s'\n"),
     }
 }
 
+static void
+check_attributes (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Shdr *shdr, int idx)
+{
+  if (shdr->sh_size == 0)
+    {
+      ERROR (gettext ("section [%2d] '%s': empty object attributes section\n"),
+	     idx, section_name (ebl, idx));
+      return;
+    }
+
+  Elf_Data *data = elf_rawdata (elf_getscn (ebl->elf, idx), NULL);
+  if (data == NULL || data->d_size == 0)
+    {
+      ERROR (gettext ("section [%2d] '%s': cannot get section data\n"),
+	     idx, section_name (ebl, idx));
+      return;
+    }
+
+  inline size_t pos (const unsigned char *p)
+  {
+    return p - (const unsigned char *) data->d_buf;
+  }
+
+  const unsigned char *p = data->d_buf;
+  if (*p++ != 'A')
+    {
+      ERROR (gettext ("section [%2d] '%s': unrecognized attribute format\n"),
+	     idx, section_name (ebl, idx));
+      return;
+    }
+
+  inline size_t left (void)
+  {
+    return (const unsigned char *) data->d_buf + data->d_size - p;
+  }
+
+  while (left () >= 4)
+    {
+      uint32_t len;
+      memcpy (&len, p, sizeof len);
+
+      if (len == 0)
+	ERROR (gettext ("\
+section [%2d] '%s': offset %zu: zero length field in attribute section\n"),
+	       idx, section_name (ebl, idx), pos (p));
+
+      if (MY_ELFDATA != ehdr->e_ident[EI_DATA])
+	CONVERT (len);
+
+      if (len > left ())
+	{
+	  ERROR (gettext ("\
+section [%2d] '%s': offset %zu: invalid length in attribute section\n"),
+		 idx, section_name (ebl, idx), pos (p));
+	  break;
+	}
+
+      const unsigned char *name = p + sizeof len;
+      p += len;
+
+      unsigned const char *q = memchr (name, '\0', len);
+      if (q == NULL)
+	{
+	  ERROR (gettext ("\
+section [%2d] '%s': offset %zu: unterminated vendor name string\n"),
+		 idx, section_name (ebl, idx), pos (p));
+	  continue;
+	}
+      ++q;
+
+      if (q - name == sizeof "gnu" && !memcmp (name, "gnu", sizeof "gnu"))
+	while (q < p)
+	  {
+	    unsigned const char *chunk = q;
+
+	    unsigned int subsection_tag;
+	    get_uleb128 (subsection_tag, q);
+
+	    if (q >= p)
+	      {
+		ERROR (gettext ("\
+section [%2d] '%s': offset %zu: endless ULEB128 in attribute subsection tag\n"),
+		       idx, section_name (ebl, idx), pos (chunk));
+		break;
+	      }
+
+	    uint32_t subsection_len;
+	    if (p - q < (ptrdiff_t) sizeof subsection_len)
+	      {
+		ERROR (gettext ("\
+section [%2d] '%s': offset %zu: truncated attribute section\n"),
+		       idx, section_name (ebl, idx), pos (q));
+		break;
+	      }
+
+	    memcpy (&subsection_len, q, sizeof subsection_len);
+	    if (subsection_len == 0)
+	      {
+		ERROR (gettext ("\
+section [%2d] '%s': offset %zu: zero length field in attribute subsection\n"),
+		       idx, section_name (ebl, idx), pos (q));
+
+		q += sizeof subsection_len;
+		continue;
+	      }
+
+	    if (MY_ELFDATA != ehdr->e_ident[EI_DATA])
+	      CONVERT (subsection_len);
+
+	    if (p - chunk < subsection_len)
+	      {
+		ERROR (gettext ("\
+section [%2d] '%s': offset %zu: invalid length in attribute subsection\n"),
+		       idx, section_name (ebl, idx), pos (q));
+		break;
+	      }
+
+	    const unsigned char *subsection_end = chunk + subsection_len;
+	    chunk = q;
+	    q = subsection_end;
+
+	    if (subsection_tag != 1) /* Tag_File */
+	      ERROR (gettext ("\
+section [%2d] '%s': offset %zu: attribute subsection has unexpected tag %u\n"),
+		     idx, section_name (ebl, idx), pos (chunk), subsection_tag);
+	    else
+	      {
+		chunk += sizeof subsection_len;
+		while (chunk < q)
+		  {
+		    unsigned int tag;
+		    get_uleb128 (tag, chunk);
+
+		    uint64_t value = 0;
+		    const unsigned char *r = chunk;
+		    if (tag == 32 || (tag & 1) == 0)
+		      {
+			get_uleb128 (value, r);
+			if (r > q)
+			  {
+			    ERROR (gettext ("\
+section [%2d] '%s': offset %zu: endless ULEB128 in attribute tag\n"),
+				   idx, section_name (ebl, idx), pos (chunk));
+			    break;
+			  }
+		      }
+		    if (tag == 32 || (tag & 1) != 0)
+		      {
+			r = memchr (r, '\0', q - r);
+			if (r == NULL)
+			  {
+			    ERROR (gettext ("\
+section [%2d] '%s': offset %zu: unterminated string in attribute\n"),
+				   idx, section_name (ebl, idx), pos (chunk));
+			    break;
+			  }
+			++r;
+		      }
+
+		    const char *tag_name = NULL;
+		    const char *value_name = NULL;
+		    if (!ebl_check_object_attribute (ebl, (const char *) name,
+						     tag, value,
+						     &tag_name, &value_name))
+		      ERROR (gettext ("\
+section [%2d] '%s': offset %zu: unrecognized attribute tag %u\n"),
+			     idx, section_name (ebl, idx), pos (chunk), tag);
+		    else if ((tag & 1) == 0 && value_name == NULL)
+		      ERROR (gettext ("\
+section [%2d] '%s': offset %zu: unrecognized %s attribute value %" PRIu64 "\n"),
+			     idx, section_name (ebl, idx), pos (chunk),
+			     tag_name, value);
+
+		    chunk = r;
+		  }
+	      }
+	  }
+      else
+	ERROR (gettext ("\
+section [%2d] '%s': offset %zu: vendor '%s' unknown\n"),
+	       idx, section_name (ebl, idx), pos (p), name);
+    }
+
+  if (left () != 0)
+    ERROR (gettext ("\
+section [%2d] '%s': offset %zu: extra bytes after last attribute section\n"),
+	   idx, section_name (ebl, idx), pos (p));
+}
 
 static bool has_loadable_segment;
 static bool has_interp_segment;
@@ -3150,7 +3343,8 @@ static const struct
     /* The following are GNU extensions.  */
     { ".gnu.version", 13, SHT_GNU_versym, exact, SHF_ALLOC, 0 },
     { ".gnu.version_d", 15, SHT_GNU_verdef, exact, SHF_ALLOC, 0 },
-    { ".gnu.version_r", 15, SHT_GNU_verneed, exact, SHF_ALLOC, 0 }
+    { ".gnu.version_r", 15, SHT_GNU_verneed, exact, SHF_ALLOC, 0 },
+    { ".gnu.attributes", 16, SHT_GNU_ATTRIBUTES, exact, 0, 0 },
   };
 #define nspecial_sections \
   (sizeof (special_sections) / sizeof (special_sections[0]))
@@ -3365,6 +3559,7 @@ section [%2zu] '%s': size not multiple of entry size\n"),
 	ERROR (gettext ("cannot get section header\n"));
 
       if (shdr->sh_type >= SHT_NUM
+	  && shdr->sh_type != SHT_GNU_ATTRIBUTES
 	  && shdr->sh_type != SHT_GNU_LIBLIST
 	  && shdr->sh_type != SHT_CHECKSUM
 	  && shdr->sh_type != SHT_GNU_verdef
@@ -3555,6 +3750,10 @@ section [%2zu] '%s': relocatable files cannot have dynamic symbol tables\n"),
 
 	case SHT_GNU_verdef:
 	  check_verdef (ebl, shdr, cnt);
+	  break;
+
+	case SHT_GNU_ATTRIBUTES:
+	  check_attributes (ebl, ehdr, shdr, cnt);
 	  break;
 
 	default:

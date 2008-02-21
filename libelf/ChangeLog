@@ -1,7 +1,24 @@
+2008-02-19  Roland McGrath  <roland@redhat.com>
+
+	* elf.h: Update from glibc.
+
+2008-02-08  Roland McGrath  <roland@redhat.com>
+
+	* elf.h: Update from glibc.
+
 2008-01-31  Ulrich Drepper  <drepper@redhat.com>
 
 	* elf_strptr.c (elf_strptr): Don't fail if the ELF file is currently
 	under construction and no raw data can be read from disk.
+
+2008-01-30  Roland McGrath  <roland@redhat.com>
+
+	* elf.h: Update from glibc.
+
+2008-01-26  Roland McGrath  <roland@redhat.com>
+
+	* elf_begin.c (__libelf_next_arhdr): Rewrite conversions using a macro.
+	Fixes various pastos in wrong type in sizeof, wrong string parsed.
 
 2008-01-20  Roland McGrath  <roland@redhat.com>
 

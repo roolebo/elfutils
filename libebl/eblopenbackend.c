@@ -1,5 +1,5 @@
 /* Generate ELF backend handle.
-   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007,2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -210,6 +210,10 @@ static ssize_t default_register_info (Ebl *ebl,
 				      const char **prefix,
 				      const char **setname,
 				      int *bits, int *type);
+static bool default_check_object_attribute (Ebl *ebl, const char *vendor,
+					    int tag, uint64_t value,
+					    const char **tag_name,
+					    const char **value_name);
 
 
 static void
@@ -246,6 +250,7 @@ fill_defaults (Ebl *result)
   result->bss_plt_p = default_bss_plt_p;
   result->return_value_location = default_return_value_location;
   result->register_info = default_register_info;
+  result->check_object_attribute = default_check_object_attribute;
   result->disasm = NULL;
   result->destr = default_destr;
   result->sysvhash_entrysize = sizeof (Elf32_Word);
@@ -699,4 +704,16 @@ default_register_info (Ebl *ebl __attribute__ ((unused)),
   *bits = -1;
   *type = DW_ATE_void;
   return snprintf (name, namelen, "reg%d", regno);
+}
+
+static bool
+default_check_object_attribute (Ebl *ebl __attribute__ ((unused)),
+				const char *vendor  __attribute__ ((unused)),
+				int tag __attribute__ ((unused)),
+				uint64_t value __attribute__ ((unused)),
+				const char **tag_name, const char **value_name)
+{
+  *tag_name = NULL;
+  *value_name = NULL;
+  return false;
 }

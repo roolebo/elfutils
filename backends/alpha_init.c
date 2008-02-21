@@ -1,5 +1,5 @@
 /* Initialization of Alpha specific backend library.
-   Copyright (C) 2002, 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2002, 2005, 2006, 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -57,6 +57,7 @@ alpha_init (elf, machine, eh, ehlen)
   HOOK (eh, machine_section_flag_check);
   HOOK (eh, register_info);
   HOOK (eh, core_note);
+  HOOK (eh, auxv_info);
   eh->sysvhash_entrysize = sizeof (Elf64_Xword);
 
   return MODVERSION;

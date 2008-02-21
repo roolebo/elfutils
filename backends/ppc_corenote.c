@@ -1,5 +1,5 @@
 /* PowerPC specific core note handling.
-   Copyright (C) 2007 Red Hat, Inc.
+   Copyright (C) 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -81,8 +81,19 @@ static const Ebl_Register_Location altivec_regs[] =
     { .offset = 33 * 16, .regno = 356, .count = 1, .bits = 32, .pad = 12 }
   };
 
+static const Ebl_Register_Location spe_regs[] =
+  {
+    /* evr0-evr31
+    { .offset = 0, .regno = ???, .count = 32, .bits = 32 },
+     * acc *
+    { .offset = 32 * 4, .regno = ???, .count = 1, .bits = 64 }, */
+    /* spefscr */
+    { .offset = 34 * 4, .regno = 612, .count = 1, .bits = 32 }
+  };
+
 #define EXTRA_NOTES \
-  EXTRA_REGSET (NT_PPC_VMX, 34 * 16, altivec_regs)
+  EXTRA_REGSET (NT_PPC_VMX, 34 * 16, altivec_regs) \
+  EXTRA_REGSET (NT_PPC_SPE, 35 * 4, spe_regs)
 
 #if BITS == 32
 # define ULONG			uint32_t

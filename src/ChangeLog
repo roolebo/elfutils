@@ -1,3 +1,21 @@
+2008-02-20  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (print_attributes): New function.
+	(process_elf_file): Call it under -A.
+
+	* elflint.c (check_attributes): Implement it for real.
+
+2008-02-19  Roland McGrath  <roland@redhat.com>
+
+	* elflint.c (special_sections): Handle .gnu.attributes section.
+	(check_sections): Likewise.
+	(check_attributes): New function.
+
+2008-02-10  Roland McGrath  <roland@redhat.com>
+
+	* elfcmp.c (main): Ignore sh_offset differences in non-SHF_ALLOC
+	sections and ET_REL files.
+
 2008-02-02  Ulrich Drepper  <drepper@redhat.com>
 
 	* elf32-i386.script: Add .eh_frame_hdr, .tdata, and .tbss sections.
@@ -107,6 +125,12 @@
 
 	* objdump.c (show_disasm): Adjust disassembler format string for
 	removal of %e.
+
+2008-01-04  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (handle_core_items): Take new arg DESCSZ; if nonzero,
+	a size greater than the items cover means multiple sets of items.
+	(handle_core_note): Update caller.
 
 2008-01-04  Roland McGrath  <roland@redhat.com>
 

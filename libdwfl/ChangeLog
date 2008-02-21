@@ -1,3 +1,19 @@
+2008-02-19  Roland McGrath  <roland@redhat.com>
+
+	* relocate.c (relocate_section): Check for an unhandled relocation
+	type before resolving a reloc's symbol.  Lift DWFL_E_BADRELTYPE ->
+	DWFL_E_UNKNOWN_MACHINE check out of loops.
+
+	* dwfl_module_getdwarf.c (load_dw): Skip relocation if
+	DEBUGFILE->relocated is already set.
+
+2008-01-26  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_getdwarf.c (open_elf): Open FILE->name if it's non-null.
+
+	* dwfl_build_id_find_elf.c (__libdwfl_open_by_build_id): Don't clear
+	incoming *FILE_NAME at the start.
+
 2008-01-08  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am (euinclude): Variable removed.

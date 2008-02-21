@@ -1,5 +1,6 @@
 /* This file defines standard ELF types, structures, and macros.
-   Copyright (C) 1995-2003,2004,2005,2006,2007 Free Software Foundation, Inc.
+   Copyright (C) 1995-2003,2004,2005,2006,2007,2008
+	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -330,6 +331,7 @@ typedef struct
 #define SHT_SYMTAB_SHNDX  18		/* Extended section indeces */
 #define	SHT_NUM		  19		/* Number of defined types.  */
 #define SHT_LOOS	  0x60000000	/* Start OS-specific.  */
+#define SHT_GNU_ATTRIBUTES 0x6ffffff5	/* Object attributes.  */
 #define SHT_GNU_HASH	  0x6ffffff6	/* GNU-style hash table.  */
 #define SHT_GNU_LIBLIST	  0x6ffffff7	/* Prelink library list */
 #define SHT_CHECKSUM	  0x6ffffff8	/* Checksum for DSO content.  */
@@ -605,6 +607,8 @@ typedef struct
 #define NT_PRFPXREG	20		/* Contains copy of fprxregset struct */
 #define NT_PRXFPREG	0x46e62b7f	/* Contains copy of user_fxsr_struct */
 #define NT_PPC_VMX	0x100		/* PowerPC Altivec/VMX registers */
+#define NT_PPC_SPE	0x101		/* PowerPC SPE/EVR registers */
+#define NT_386_TLS	0x200		/* i386 TLS slots (struct user_desc) */
 
 /* Legal values for the note segment descriptor types for object files.  */
 
@@ -1278,6 +1282,7 @@ typedef struct
 #define HWCAP_SPARC_V9		16	/* The CPU is v9, so v8plus is ok.  */
 #define HWCAP_SPARC_ULTRA3	32
 #define HWCAP_SPARC_BLKINIT	64	/* Sun4v with block-init/load-twin.  */
+#define HWCAP_SPARC_N2		128
 
 /* MIPS R3000 specific definitions.  */
 

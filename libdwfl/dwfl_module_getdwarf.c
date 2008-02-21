@@ -1,5 +1,5 @@
 /* Find debugging and symbol information for a module in libdwfl.
-   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -61,6 +61,11 @@ open_elf (Dwfl_Module *mod, struct dwfl_file *file)
 {
   if (file->elf == NULL)
     {
+      /* If there was a pre-primed file name left that the callback left
+	 behind, try to open that file name.  */
+      if (file->fd < 0 && file->name != NULL)
+	file->fd = TEMP_FAILURE_RETRY (open64 (file->name, O_RDONLY));
+
       if (file->fd < 0)
 	return CBFAIL;
 
@@ -585,7 +590,7 @@ __libdwfl_module_getebl (Dwfl_Module *mod)
 static Dwfl_Error
 load_dw (Dwfl_Module *mod, struct dwfl_file *debugfile)
 {
-  if (mod->e_type == ET_REL)
+  if (mod->e_type == ET_REL && !debugfile->relocated)
     {
       const Dwfl_Callbacks *const cb = mod->dwfl->callbacks;
 

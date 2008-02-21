@@ -1,5 +1,5 @@
 /* Create descriptor for processing file.
-   Copyright (C) 1998-2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 1998-2005, 2006, 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -850,112 +850,45 @@ __libelf_next_arhdr (elf)
       elf_ar_hdr->ar_name = elf->state.ar.ar_name;
     }
 
+  if (unlikely (ar_hdr->ar_size[0] == ' '))
+    /* Something is really wrong.  We cannot live without a size for
+       the member since it will not be possible to find the next
+       archive member.  */
+    {
+      __libelf_seterrno (ELF_E_INVALID_ARCHIVE);
+      return -1;
+    }
+
   /* Since there are no specialized functions to convert ASCII to
      time_t, uid_t, gid_t, mode_t, and off_t we use either atol or
      atoll depending on the size of the types.  We are also prepared
      for the case where the whole field in the `struct ar_hdr' is
      filled in which case we cannot simply use atol/l but instead have
      to create a temporary copy.  */
-  if (ar_hdr->ar_date[sizeof (ar_hdr->ar_date) - 1] == ' ')
-    {
-      if (ar_hdr->ar_date[0] == ' ')
-	elf_ar_hdr->ar_date = 0;
-      else
-	elf_ar_hdr->ar_date = (sizeof (time_t) <= sizeof (long int)
-			       ? (time_t) atol (ar_hdr->ar_date)
-			       : (time_t) atoll (ar_hdr->ar_date));
-    }
-  else
-    {
-      char buf[sizeof (ar_hdr->ar_date) + 1];
-      *((char *) __mempcpy (buf, ar_hdr->ar_date, sizeof (ar_hdr->ar_date)))
-	= '\0';
-      elf_ar_hdr->ar_date = (sizeof (time_t) <= sizeof (long int)
-			     ? (time_t) atol (ar_hdr->ar_date)
-			     : (time_t) atoll (ar_hdr->ar_date));
-    }
 
-  if (ar_hdr->ar_uid[sizeof (ar_hdr->ar_uid) - 1] == ' ')
-    {
-      if (ar_hdr->ar_uid[0] == ' ')
-	elf_ar_hdr->ar_uid = 0;
-      else
-	elf_ar_hdr->ar_uid = (sizeof (uid_t) <= sizeof (long int)
-			      ? (uid_t) atol (ar_hdr->ar_uid)
-			      : (uid_t) atoll (ar_hdr->ar_uid));
-    }
-  else
-    {
-      char buf[sizeof (ar_hdr->ar_uid) + 1];
-      *((char *) __mempcpy (buf, ar_hdr->ar_uid, sizeof (ar_hdr->ar_uid)))
-	= '\0';
-      elf_ar_hdr->ar_uid = (sizeof (uid_t) <= sizeof (long int)
-			     ? (uid_t) atol (ar_hdr->ar_uid)
-			     : (uid_t) atoll (ar_hdr->ar_uid));
-    }
+#define INT_FIELD(FIELD)						      \
+  do									      \
+    {									      \
+      char buf[sizeof (ar_hdr->FIELD) + 1];				      \
+      const char *string = ar_hdr->FIELD;				      \
+      if (ar_hdr->FIELD[sizeof (ar_hdr->FIELD) - 1] != ' ')		      \
+	{								      \
+	  *((char *) __mempcpy (buf, ar_hdr->FIELD, sizeof (ar_hdr->FIELD)))  \
+	    = '\0';							      \
+	  string = buf;							      \
+	}								      \
+      if (sizeof (elf_ar_hdr->FIELD) <= sizeof (long int))		      \
+	elf_ar_hdr->FIELD = (__typeof (elf_ar_hdr->FIELD)) atol (string);     \
+      else								      \
+	elf_ar_hdr->FIELD = (__typeof (elf_ar_hdr->FIELD)) atoll (string);    \
+    }									      \
+  while (0)
 
-  if (ar_hdr->ar_gid[sizeof (ar_hdr->ar_gid) - 1] == ' ')
-    {
-      if (ar_hdr->ar_gid[0] == ' ')
-	elf_ar_hdr->ar_gid = 0;
-      else
-	elf_ar_hdr->ar_gid = (sizeof (gid_t) <= sizeof (long int)
-			      ? (gid_t) atol (ar_hdr->ar_gid)
-			      : (gid_t) atoll (ar_hdr->ar_gid));
-    }
-  else
-    {
-      char buf[sizeof (ar_hdr->ar_gid) + 1];
-      *((char *) __mempcpy (buf, ar_hdr->ar_gid, sizeof (ar_hdr->ar_gid)))
-	= '\0';
-      elf_ar_hdr->ar_gid = (sizeof (gid_t) <= sizeof (long int)
-			     ? (gid_t) atol (ar_hdr->ar_gid)
-			     : (gid_t) atoll (ar_hdr->ar_gid));
-    }
-
-  if (ar_hdr->ar_mode[sizeof (ar_hdr->ar_mode) - 1] == ' ')
-    {
-      if (ar_hdr->ar_mode[0] == ' ')
-	elf_ar_hdr->ar_mode = 0;
-      else
-	elf_ar_hdr->ar_mode = (sizeof (mode_t) <= sizeof (long int)
-			       ? (mode_t) strtol (ar_hdr->ar_mode, NULL, 8)
-			       : (mode_t) strtoll (ar_hdr->ar_mode, NULL, 8));
-    }
-  else
-    {
-      char buf[sizeof (ar_hdr->ar_mode) + 1];
-      *((char *) __mempcpy (buf, ar_hdr->ar_mode, sizeof (ar_hdr->ar_mode)))
-	= '\0';
-      elf_ar_hdr->ar_mode = (sizeof (mode_t) <= sizeof (long int)
-			     ? (mode_t) strtol (ar_hdr->ar_mode, NULL, 8)
-			     : (mode_t) strtoll (ar_hdr->ar_mode, NULL, 8));
-    }
-
-  if (ar_hdr->ar_size[sizeof (ar_hdr->ar_size) - 1] == ' ')
-    {
-      if (unlikely (ar_hdr->ar_size[0] == ' '))
-	/* Something is really wrong.  We cannot live without a size for
-	   the member since it will not be possible to find the next
-	   archive member.  */
-	{
-	  __libelf_seterrno (ELF_E_INVALID_ARCHIVE);
-	  return -1;
-	}
-      else
-	elf_ar_hdr->ar_size = (sizeof (time_t) == sizeof (long int)
-			       ? (off_t) atol (ar_hdr->ar_size)
-			       : (off_t) atoll (ar_hdr->ar_size));
-    }
-  else
-    {
-      char buf[sizeof (ar_hdr->ar_size) + 1];
-      *((char *) __mempcpy (buf, ar_hdr->ar_size, sizeof (ar_hdr->ar_size)))
-	= '\0';
-      elf_ar_hdr->ar_size = (sizeof (time_t) == sizeof (long int)
-			     ? (off_t) atol (ar_hdr->ar_size)
-			     : (off_t) atoll (ar_hdr->ar_size));
-    }
+  INT_FIELD (ar_date);
+  INT_FIELD (ar_uid);
+  INT_FIELD (ar_gid);
+  INT_FIELD (ar_mode);
+  INT_FIELD (ar_size);
 
   return 0;
 }

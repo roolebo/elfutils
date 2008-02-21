@@ -1,5 +1,5 @@
 /* Print information from ELF file in human-readable form.
-   Copyright (C) 1999,2000,2001,2002,2003,2004,2005,2006,2007 Red Hat, Inc.
+   Copyright (C) 1999,2000,2001,2002,2003,2004,2005,2006,2007,2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1999.
 
@@ -52,6 +52,7 @@
 
 #include <system.h>
 #include "../libelf/libelfP.h"
+#include "../libelf/common.h"
 #include "../libebl/libeblP.h"
 #include "../libdw/libdwP.h"
 #include "../libdwfl/libdwflP.h"
@@ -221,6 +222,7 @@ static void print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr);
 static void handle_hash (Ebl *ebl);
 static void handle_notes (Ebl *ebl, GElf_Ehdr *ehdr);
 static void print_liblist (Ebl *ebl);
+static void print_attributes (Ebl *ebl, const GElf_Ehdr *ehdr);
 static void dump_data (Ebl *ebl);
 static void dump_strings (Ebl *ebl);
 static void print_strings (Ebl *ebl);
@@ -640,6 +642,8 @@ process_elf_file (Dwfl_Module *dwflmod, int fd)
     print_symtab (ebl, SHT_SYMTAB);
   if (print_arch)
     print_liblist (ebl);
+  if (print_arch)
+    print_attributes (ebl, ehdr);
   if (dump_data_sections != NULL)
     dump_data (pure_ebl);
   if (string_sections != NULL)
@@ -2773,6 +2777,166 @@ print_liblist (Ebl *ebl)
 		      (unsigned int) lib->l_version,
 		      (unsigned int) lib->l_flags);
 	    }
+	}
+    }
+}
+
+static void
+print_attributes (Ebl *ebl, const GElf_Ehdr *ehdr)
+{
+  /* Find the object attributes sections.  For this we have to search
+     through the section table.  */
+  Elf_Scn *scn = NULL;
+
+  /* Get the section header string table index.  */
+  size_t shstrndx;
+  if (unlikely (elf_getshstrndx (ebl->elf, &shstrndx) < 0))
+    error (EXIT_FAILURE, 0,
+	   gettext ("cannot get section header string table index"));
+
+  while ((scn = elf_nextscn (ebl->elf, scn)) != NULL)
+    {
+      GElf_Shdr shdr_mem;
+      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+
+      if (shdr == NULL || shdr->sh_type != SHT_GNU_ATTRIBUTES)
+	continue;
+
+      printf (gettext ("\
+\nObject attributes section [%2zu] '%s' of %" PRIu64
+		       " bytes at offset %#0" PRIx64 ":\n"),
+	      elf_ndxscn (scn),
+	      elf_strptr (ebl->elf, shstrndx, shdr->sh_name),
+	      shdr->sh_size, shdr->sh_offset);
+
+      Elf_Data *data = elf_rawdata (scn, NULL);
+      if (data == NULL)
+	return;
+
+      const unsigned char *p = data->d_buf;
+
+      if (unlikely (*p++ != 'A'))
+	return;
+
+      fputs_unlocked (gettext ("  Owner          Size\n"), stdout);
+
+      inline size_t left (void)
+      {
+	return (const unsigned char *) data->d_buf + data->d_size - p;
+      }
+
+      while (left () >= 4)
+	{
+	  uint32_t len;
+	  memcpy (&len, p, sizeof len);
+
+	  if (MY_ELFDATA != ehdr->e_ident[EI_DATA])
+	    CONVERT (len);
+
+	  if (unlikely (len > left ()))
+	    break;
+
+	  const unsigned char *name = p + sizeof len;
+	  p += len;
+
+	  unsigned const char *q = memchr (name, '\0', len);
+	  if (unlikely (q == NULL))
+	    continue;
+	  ++q;
+
+	  printf (gettext ("  %-13s  %4" PRIu32 "\n"), name, len);
+
+	  if (q - name == sizeof "gnu"
+	      && !memcmp (name, "gnu", sizeof "gnu"))
+	    while (q < p)
+	      {
+		const unsigned char *const sub = q;
+
+		unsigned int subsection_tag;
+		get_uleb128 (subsection_tag, q);
+		if (unlikely (q >= p))
+		  break;
+
+		uint32_t subsection_len;
+		if (unlikely (p - sub < (ptrdiff_t) sizeof subsection_len))
+		  break;
+
+		memcpy (&subsection_len, q, sizeof subsection_len);
+
+		if (MY_ELFDATA != ehdr->e_ident[EI_DATA])
+		  CONVERT (subsection_len);
+
+		if (unlikely (p - sub < subsection_len))
+		  break;
+
+		const unsigned char *r = q + sizeof subsection_len;
+		q = sub + subsection_len;
+
+		switch (subsection_tag)
+		  {
+		  default:
+		    printf (gettext ("    %-4u %12" PRIu32 "\n"),
+			    subsection_tag, subsection_len);
+		    break;
+
+		  case 1:	/* Tag_File */
+		    printf (gettext ("    File: %11" PRIu32 "\n"),
+			    subsection_len);
+
+		    while (r < q)
+		      {
+			unsigned int tag;
+			get_uleb128 (tag, r);
+			if (unlikely (r >= q))
+			  break;
+
+			uint64_t value = 0;
+			const char *string = NULL;
+			if (tag == 32 || (tag & 1) == 0)
+			  {
+			    get_uleb128 (value, r);
+			    if (r > q)
+			      break;
+			  }
+			if (tag == 32 || (tag & 1) != 0)
+			  {
+			    r = memchr (r, '\0', q - r);
+			    if (r == NULL)
+			      break;
+			    ++r;
+			  }
+
+			const char *tag_name = NULL;
+			const char *value_name = NULL;
+			ebl_check_object_attribute (ebl, (const char *) name,
+						    tag, value,
+						    &tag_name, &value_name);
+
+			if (tag_name != NULL)
+			  {
+			    if (tag == 32)
+			      printf (gettext ("      %s: %" PRId64 ", %s\n"),
+				      tag_name, value, string);
+			    else if (string == NULL && value_name == NULL)
+			      printf (gettext ("      %s: %" PRId64 "\n"),
+				      tag_name, value);
+			    else
+			      printf (gettext ("      %s: %s\n"),
+				      tag_name, string ?: value_name);
+			  }
+			else
+			  {
+			    assert (tag != 32);
+			    if (string == NULL)
+			      printf (gettext ("      %u: %" PRId64 "\n"),
+				      tag, value);
+			    else
+			      printf (gettext ("      %u: %s\n"),
+				      tag, string);
+			  }
+		      }
+		  }
+	      }
 	}
     }
 }
@@ -5426,7 +5590,7 @@ compare_core_item_groups (const void *a, const void *b)
 }
 
 static unsigned int
-handle_core_items (Elf *core, const void *desc,
+handle_core_items (Elf *core, const void *desc, size_t descsz,
 		   const Ebl_Core_Item *items, size_t nitems)
 {
   if (nitems == 0)
@@ -5450,18 +5614,35 @@ handle_core_items (Elf *core, const void *desc,
 
   /* Write out all the groups.  */
   unsigned int colno = 0;
-  for (size_t i = 0; i < ngroups; ++i)
-    {
-      for (const Ebl_Core_Item **item = groups[i];
-	   (item < &sorted_items[nitems]
-	    && ((*item)->group == groups[i][0]->group
-		|| !strcmp ((*item)->group, groups[i][0]->group)));
-	   ++item)
-	colno = handle_core_item (core, *item, desc, colno);
 
-      /* Force a line break at the end of the group.  */
-      colno = ITEM_WRAP_COLUMN;
+  do
+    {
+      for (size_t i = 0; i < ngroups; ++i)
+	{
+	  for (const Ebl_Core_Item **item = groups[i];
+	       (item < &sorted_items[nitems]
+		&& ((*item)->group == groups[i][0]->group
+		    || !strcmp ((*item)->group, groups[i][0]->group)));
+	       ++item)
+	    colno = handle_core_item (core, *item, desc, colno);
+
+	  /* Force a line break at the end of the group.  */
+	  colno = ITEM_WRAP_COLUMN;
+	}
+
+      if (descsz == 0)
+	break;
+
+      /* This set of items consumed a certain amount of the note's data.
+	 If there is more data there, we have another unit of the same size.
+	 Loop to print that out too.  */
+      const Ebl_Core_Item *item = &items[nitems - 1];
+      size_t eltsz = item->offset + gelf_fsize (core, item->type,
+						item->count ?: 1, EV_CURRENT);
+      descsz -= eltsz;
+      desc += eltsz;
     }
+  while (descsz > 0);
 
   return colno;
 }
@@ -5807,7 +5988,13 @@ handle_core_note (Ebl *ebl, const GElf_Nhdr *nhdr, const void *desc)
 		       &regs_offset, &nregloc, &reglocs, &nitems, &items))
     return;
 
-  unsigned int colno = handle_core_items (ebl->elf, desc, items, nitems);
+  /* Pass 0 for DESCSZ when there are registers in the note,
+     so that the ITEMS array does not describe the whole thing.
+     For non-register notes, the actual descsz might be a multiple
+     of the unit size, not just exactly the unit size.  */
+  unsigned int colno = handle_core_items (ebl->elf, desc,
+					  nregloc == 0 ? nhdr->n_descsz : 0,
+					  items, nitems);
   if (colno != 0)
     putchar_unlocked ('\n');
 

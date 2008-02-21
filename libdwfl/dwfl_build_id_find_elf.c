@@ -1,5 +1,5 @@
 /* Find an ELF file for a module from its build ID.
-   Copyright (C) 2007 Red Hat, Inc.
+   Copyright (C) 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -57,7 +57,8 @@ int
 internal_function
 __libdwfl_open_by_build_id (Dwfl_Module *mod, bool debug, char **file_name)
 {
-  *file_name = NULL;
+  /* If *FILE_NAME was primed into the module, leave it there
+     as the fallback when we have nothing to offer.  */
   errno = 0;
   if (mod->build_id_len <= 0)
     return -1;

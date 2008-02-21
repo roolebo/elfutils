@@ -1,5 +1,5 @@
 /* i386 specific core note handling.
-   Copyright (C) 2007 Red Hat, Inc.
+   Copyright (C) 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -101,6 +101,34 @@ static const Ebl_Register_Location prxfpreg_regs[] =
   };
 
 #define	EXTRA_NOTES \
-  EXTRA_REGSET (NT_PRFPXREG, 512, prxfpreg_regs)
+  EXTRA_REGSET (NT_PRFPXREG, 512, prxfpreg_regs) \
+  case NT_386_TLS: \
+    return tls_info (descsz, regs_offset, nregloc, reglocs, nitems, items);
+
+#define NT_386_TLS	0x200		/* i386 TLS slots (struct user_desc) */
+
+static const Ebl_Core_Item tls_items[] =
+  {
+    { .type = ELF_T_WORD, .offset = 0x0, .format = 'd', .name = "index" },
+    { .type = ELF_T_WORD, .offset = 0x4, .format = 'x', .name = "base" },
+    { .type = ELF_T_WORD, .offset = 0x8, .format = 'x', .name = "limit" },
+    { .type = ELF_T_WORD, .offset = 0xc, .format = 'x', .name = "flags" },
+  };
+
+static int
+tls_info (GElf_Word descsz, GElf_Word *regs_offset,
+	  size_t *nregloc, const Ebl_Register_Location **reglocs,
+	  size_t *nitems, const Ebl_Core_Item **items)
+{
+  if (descsz % 16 != 0)
+    return 0;
+
+  *regs_offset = 0;
+  *nregloc = 0;
+  *reglocs = NULL;
+  *nitems = sizeof tls_items / sizeof tls_items[0];
+  *items = tls_items;
+  return 1;
+}
 
 #include "linux-core-note.c"

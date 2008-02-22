@@ -26,7 +26,7 @@
 . $srcdir/test-subr.sh
 
 # Run x86-64 test.
-case "$(arch)" in
+case "`uname -m`" in
   x86_64)
     tempfiles testfile45.o
     testfiles testfile45.S testfile45.expect

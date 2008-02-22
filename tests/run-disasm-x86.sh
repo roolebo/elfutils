@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2007 Red Hat, Inc.
+# Copyright (C) 2007, 2008 Red Hat, Inc.
 # This file is part of Red Hat elfutils.
 #
 # Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -26,7 +26,7 @@
 . $srcdir/test-subr.sh
 
 # Run x86 test.
-case "$(arch)" in
+case "`uname -m`" in
   x86_64 | i?86 )
     tempfiles testfile44.o
     testfiles testfile44.S testfile44.expect

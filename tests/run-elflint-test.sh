@@ -41,7 +41,7 @@ testrun ../src/elflint -q testfile33
 testfiles testfile42
 testrun ../src/elflint -q --gnu-ld testfile42
 
-testfiles testfile47
-testrun ../src/elflint -q testfile47
+testfiles testfile46
+testrun ../src/elflint -q testfile46
 
 exit 0

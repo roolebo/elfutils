@@ -649,6 +649,7 @@ elf_i386_count_relocations (struct ld_state *statep, struct scninfo *scninfo)
 	    case R_386_TLS_LDO_32:
 	      if (statep->file_type != executable_file_type)
 		abort ();
+	      /* We do not need a relocation in the output file.  */
 	      break;
 
 	    case R_386_TLS_LE:
@@ -656,8 +657,25 @@ elf_i386_count_relocations (struct ld_state *statep, struct scninfo *scninfo)
 	      break;
 
 	    case R_386_TLS_IE:
-	    case R_386_TLS_GOTIE:
+	      if (statep->file_type == dso_file_type)
+		error (EXIT_FAILURE, 0, gettext ("initial-executable TLS relocation cannot be used "));
+	      if (!scninfo->fileinfo->symref[r_sym]->defined
+		  || scninfo->fileinfo->symref[r_sym]->in_dso)
+		{
+		  abort ();
+		}
+	      break;
+
 	    case R_386_TLS_GD:
+	      if (statep->file_type != executable_file_type
+		  || !scninfo->fileinfo->symref[r_sym]->defined
+		  || scninfo->fileinfo->symref[r_sym]->in_dso)
+		{
+		  abort ();
+		}
+	      break;
+
+	    case R_386_TLS_GOTIE:
 	    case R_386_TLS_LDM:
 	    case R_386_TLS_GD_32:
 	    case R_386_TLS_GD_PUSH:
@@ -791,7 +809,7 @@ elf_i386_create_relocations (struct ld_state *statep,
 	    }
 
 	  /* Address of the relocated memory in the data buffer.  */
-	  void *relloc = (char *) data->d_buf + rel->r_offset;
+	  unsigned char *relloc = (unsigned char *) data->d_buf + rel->r_offset;
 
 	  uint32_t thisgotidx;
 	  switch (XELF_R_TYPE (rel->r_info))
@@ -940,16 +958,92 @@ elf_i386_create_relocations (struct ld_state *statep,
 	      store_4ubyte_unaligned (relloc, value);
 	      break;
 
+	    case R_386_TLS_IE:
+	      if (symref[idx]->defined && !symref[idx]->in_dso)
+		{
+		  /* The symbol is defined in the executable.
+		     Perform the IE->LE optimization.
+		     There are multiple versions, though.
+
+		     First version: mov ADDR,REG.  */
+		  if (relloc[-2] == 0x8b
+		      && ((relloc[-1] & 0xc7) == 0x05))
+		    {
+		      relloc[-2] = 0xc7;
+		      relloc[-1] = 0xc0 | ((relloc[-1] >> 3) & 7);
+		      store_4ubyte_unaligned (relloc, (symref[idx]->merge.value
+						       - ld_state.tls_tcb));
+		    }
+		  else
+		    {
+		      abort ();
+		    }
+		}
+	      else
+		{
+		  abort ();
+		}
+	      break;
+
 	    case R_386_TLS_LDO_32:
 	      value = symref[idx]->merge.value - ld_state.tls_start;
 	      store_4ubyte_unaligned (relloc, value);
 	      break;
 
+	    case R_386_TLS_GD:
+	      if (ld_state.file_type == executable_file_type)
+		{
+		  if (symref[idx]->defined && !symref[idx]->in_dso)
+		    {
+		      /* The symbol is defined in the executable.
+			 Perform the GD->LE optimization.  */
+		      static const char gd_to_le[] =
+			{
+			  /* mov %gs:0x0,%eax */
+			  0x65, 0xa1, 0x00, 0x00, 0x00, 0x00,
+			  /* sub $OFFSET,%eax */
+			  0x81, 0xe8
+			};
+#ifndef NDEBUG
+		      static const char gd_text[] =
+			{
+			  /* lea 0x0(,%ebx,1),%eax */
+			  0x8d, 0x04, 0x1d, 0x00, 0x00, 0x00, 0x00,
+			  /* call ___tls_get_addr */
+			  0xe8
+			};
+		      assert (memcmp (relloc - 3, gd_text, sizeof (gd_text))
+			      == 0);
+#endif
+		      relloc = mempcpy (relloc - 3, gd_to_le,
+					sizeof (gd_to_le));
+		      value = ld_state.tls_tcb- symref[idx]->merge.value;
+		      store_4ubyte_unaligned (relloc, value);
+
+		      /* We have to skip over the next relocation which is
+			 the matching R_i386_PLT32 for __tls_get_addr.  */
+		      ++cnt;
+#ifndef NDEBUG
+		      assert (cnt < nrels);
+		      XElf_Off old_offset = rel->r_offset;
+		      xelf_getrel (reldata, cnt, rel);
+		      assert (rel != NULL);
+		      assert (XELF_R_TYPE (rel->r_info) == R_386_PLT32);
+		      idx = XELF_R_SYM (rel->r_info);
+		      assert (strcmp (symref[idx]->name, "___tls_get_addr")
+			      == 0);
+		      assert (old_offset + 5 == rel->r_offset);
+#endif
+
+		      break;
+		    }
+		}
+	      abort ();
+	      break;
+
 	    case R_386_32PLT:
 	    case R_386_TLS_TPOFF:
-	    case R_386_TLS_IE:
 	    case R_386_TLS_GOTIE:
-	    case R_386_TLS_GD:
 	    case R_386_TLS_LDM:
 	    case R_386_16:
 	    case R_386_PC16:

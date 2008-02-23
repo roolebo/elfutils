@@ -1,7 +1,7 @@
 		      ToDo list for elfutils                      -*-outline-*-
                       ----------------------
 
-Time-stamp: <2006-06-11 11:07:01 drepper>
+Time-stamp: <2008-02-03 14:15:41 drepper>
 
 * mkinstalldirs
 
@@ -101,6 +101,12 @@ Time-stamp: <2006-06-11 11:07:01 drepper>
      sh_size/sh_entsize matches last offset != 0
 
    check whether any relocation is for a merge-able section
+
+   check TLS relocation depencies
+
+*** for x86
+
+    check that R_386_TLS_GD is followed by R_386_PLT32 for __tls_get_addr
 
 ** relax
 

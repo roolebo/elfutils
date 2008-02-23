@@ -1,3 +1,9 @@
+2008-02-03  Ulrich Drepper  <drepper@redhat.com>
+
+	* i386_ld.c (elf_i386_count_relocations): Implement R_386_TLS_GD
+	when linked into executable.
+	(elf_i386_create_relocations): Likewise.
+
 2008-02-20  Roland McGrath  <roland@redhat.com>
 
 	* readelf.c (print_attributes): New function.

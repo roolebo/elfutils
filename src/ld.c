@@ -507,7 +507,8 @@ replace_args (int argc, char *argv[])
   } args[] =
       {
 	{ "-export-dynamic", "--export-dynamic" },
-	{ "-dynamic-linker", "--dynamic-linker" }
+	{ "-dynamic-linker", "--dynamic-linker" },
+	{ "-static", "--static" },
       };
   const size_t nargs = sizeof (args) / sizeof (args[0]);
 

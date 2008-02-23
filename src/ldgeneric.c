@@ -1108,6 +1108,7 @@ add_relocatable_file (struct usedfiles *fileinfo, GElf_Word secttype)
   size_t nsymbols = 0;
   size_t nlocalsymbols = 0;
   bool has_merge_sections = false;
+  bool has_tls_symbols = false;
   /* Unless we have different information we assume the code needs
      an executable stack.  */
   enum execstack execstack = execstack_true;
@@ -1164,6 +1165,7 @@ add_relocatable_file (struct usedfiles *fileinfo, GElf_Word secttype)
 
       /* Check whether this section is marked as merge-able.  */
       has_merge_sections |= (shdr->sh_flags & SHF_MERGE) != 0;
+      has_tls_symbols |= (shdr->sh_flags & SHF_TLS) != 0;
 
       /* Get the ELF section header and data.  */
       /* Make the file structure available.  */
@@ -1392,7 +1394,7 @@ add_relocatable_file (struct usedfiles *fileinfo, GElf_Word secttype)
       /* In case this file contains merge-able sections we have to
 	 locate the symbols which are in these sections.  */
       fileinfo->has_merge_sections = has_merge_sections;
-      if (likely (has_merge_sections))
+      if (likely (has_merge_sections || has_tls_symbols))
 	{
 	  fileinfo->symref = (struct symbol **)
 	    obstack_calloc (&ld_state.smem,
@@ -1424,8 +1426,9 @@ add_relocatable_file (struct usedfiles *fileinfo, GElf_Word secttype)
 
 	      if (XELF_ST_TYPE (sym->st_info) != STT_SECTION
 		  && (shndx < SHN_LORESERVE || shndx > SHN_HIRESERVE)
-		  && (SCNINFO_SHDR (fileinfo->scninfo[shndx].shdr).sh_flags
-		      & SHF_MERGE))
+		  && ((SCNINFO_SHDR (fileinfo->scninfo[shndx].shdr).sh_flags
+		       & SHF_MERGE)
+		      || XELF_ST_TYPE (sym->st_info) == STT_TLS))
 		{
 		  /* Create a symbol record for this symbol and add it
 		     to the list for this section.  */
@@ -1437,6 +1440,7 @@ add_relocatable_file (struct usedfiles *fileinfo, GElf_Word secttype)
 		  newp->symidx = cnt;
 		  newp->scndx = shndx;
 		  newp->file = fileinfo;
+		  newp->defined = 1;
 		  fileinfo->symref[cnt] = newp;
 
 		  if (fileinfo->scninfo[shndx].symbols == NULL)

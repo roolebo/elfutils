@@ -3213,7 +3213,7 @@ section [%2d] '%s': offset %zu: zero length field in attribute subsection\n"),
 	    if (MY_ELFDATA != ehdr->e_ident[EI_DATA])
 	      CONVERT (subsection_len);
 
-	    if (p - chunk < subsection_len)
+	    if (p - chunk < (ptrdiff_t) subsection_len)
 	      {
 		ERROR (gettext ("\
 section [%2d] '%s': offset %zu: invalid length in attribute subsection\n"),

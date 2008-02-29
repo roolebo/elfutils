@@ -1,3 +1,12 @@
+2008-02-29  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (print_attributes): Add a cast.
+	* elflint.c (check_attributes): Likewise.
+
+	* unaligned.h (add_8ubyte_unaligned): Cast PTR argument for parity
+	with [UNALIGNED_ACCESS_CLASS == BYTE_ORDER] definition.
+	(add_4ubyte_unaligned, add_2ubyte_unaligned): Likewise.
+
 2008-02-03  Ulrich Drepper  <drepper@redhat.com>
 
 	* i386_ld.c (elf_i386_count_relocations): Implement R_386_TLS_GD

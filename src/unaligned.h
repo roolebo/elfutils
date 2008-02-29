@@ -1,5 +1,5 @@
 /* Unaligned memory access functionality.
-   Copyright (C) 2000, 2001, 2002, 2003 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2003, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -89,19 +89,19 @@ union u_8ubyte_unaligned
 #else
 # define add_2ubyte_unaligned(ptr, value) \
   do {									      \
-    union u_2ubyte_unaligned *_ptr = (ptr);				      \
+    union u_2ubyte_unaligned *_ptr = (void *) (ptr);			      \
     uint16_t _val = bswap_16 (_ptr->u) + (value);			      \
     _ptr->u = bswap_16 (_val);						      \
   } while (0)
 # define add_4ubyte_unaligned(ptr, value) \
   do {									      \
-    union u_4ubyte_unaligned *_ptr = (ptr);				      \
+    union u_4ubyte_unaligned *_ptr = (void *) (ptr);			      \
     uint32_t _val = bswap_32 (_ptr->u) + (value);			      \
     _ptr->u = bswap_32 (_val);						      \
   } while (0)
 # define add_8ubyte_unaligned(ptr, value) \
   do {									      \
-    union u_8ubyte_unaligned *_ptr = (ptr);				      \
+    union u_8ubyte_unaligned *_ptr = (void *) (ptr);			      \
     uint64_t _val = bswap_64 (_ptr->u) + (value);			      \
     _ptr->u = bswap_64 (_val);						      \
   } while (0)

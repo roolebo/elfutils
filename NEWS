@@ -1,3 +1,13 @@
+Version 0.133:
+
+readelf, elflint, libebl: SHT_GNU_ATTRIBUTE section handling (readelf -A)
+
+readelf: core note handling for NT_386_TLS, NT_PPC_SPE, Alpha NT_AUXV
+
+libdwfl: bug fixes and optimization in relocation handling
+
+elfcmp: bug fix for non-allocated section handling
+
 Version 0.132:
 
 libcpu: Implement x86 and x86-64 disassembler.

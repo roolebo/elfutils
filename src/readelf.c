@@ -2866,7 +2866,7 @@ print_attributes (Ebl *ebl, const GElf_Ehdr *ehdr)
 		if (MY_ELFDATA != ehdr->e_ident[EI_DATA])
 		  CONVERT (subsection_len);
 
-		if (unlikely (p - sub < subsection_len))
+		if (unlikely (p - sub < (ptrdiff_t) subsection_len))
 		  break;
 
 		const unsigned char *r = q + sizeof subsection_len;

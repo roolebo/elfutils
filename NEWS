@@ -8,6 +8,8 @@ libdwfl: bug fixes and optimization in relocation handling
 
 elfcmp: bug fix for non-allocated section handling
 
+ld: implement newer features of binutils linker.
+
 Version 0.132:
 
 libcpu: Implement x86 and x86-64 disassembler.

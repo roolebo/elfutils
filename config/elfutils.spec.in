@@ -182,6 +182,13 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
+* Sat Mar  1 2008 Ulrich Drepper <drepper@redhat.com> 0.133-1
+- readelf, elflint, libebl: SHT_GNU_ATTRIBUTE section handling (readelf -A)
+- readelf: core note handling for NT_386_TLS, NT_PPC_SPE, Alpha NT_AUXV
+- libdwfl: bug fixes and optimization in relocation handling
+- elfcmp: bug fix for non-allocated section handling
+- ld: implement newer features of binutils linker.
+
 * Mon Jan 21 2008 Ulrich Drepper <drepper@redhat.com> 0.132-1
 - libcpu: Implement x86 and x86-64 disassembler.
 - libasm: Add interface for disassembler.

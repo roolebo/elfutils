@@ -1,3 +1,22 @@
+2008-03-26  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_getdwarf.c (load_symtab): Don't return success for
+	SHT_DYNSYM, just set *SYMSCN like the comment says.
+
+	* dwfl_end.c (dwfl_end): Iterate on modulelist chain, not modules array.
+
+	* argp-std.c (parse_opt): On failure, call dwfl_end before argp_failure.
+
+2008-03-19  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_getsrc.c: Adjust address for module bias before search.
+
+2008-03-01  Roland McGrath  <roland@redhat.com>
+
+	* libdwflP.h (__libdwfl_seterrno): Remove parameter name from
+	prototype to avoid older compiler's complaint about reuse of the name.
+	(__libdwfl_canon_error): Likewise.
+
 2008-02-19  Roland McGrath  <roland@redhat.com>
 
 	* relocate.c (relocate_section): Check for an unhandled relocation

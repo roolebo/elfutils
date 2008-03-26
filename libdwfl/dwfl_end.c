@@ -1,5 +1,5 @@
 /* Finish a session using libdwfl.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -54,9 +54,12 @@ dwfl_end (Dwfl *dwfl)
 {
   if (dwfl != NULL)
     {
-      for (size_t i = 0; i < dwfl->nmodules; ++i)
-	if (dwfl->modules[i] != NULL)
-	  __libdwfl_module_free (dwfl->modules[i]);
+      while (dwfl->modulelist != NULL)
+	{
+	  Dwfl_Module *mod = dwfl->modulelist;
+	  dwfl->modulelist = mod->next;
+	  __libdwfl_module_free (mod);
+	}
       free (dwfl->modules);
       free (dwfl);
     }

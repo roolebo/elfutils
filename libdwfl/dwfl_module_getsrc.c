@@ -1,5 +1,5 @@
 /* Find source location for PC address in module.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -63,6 +63,9 @@ dwfl_module_getsrc (Dwfl_Module *mod, Dwarf_Addr addr)
     error = __libdwfl_cu_getsrclines (cu);
   if (likely (error == DWFL_E_NOERROR))
     {
+      /* Now we look at the module-relative address.  */
+      addr -= bias;
+
       /* The lines are sorted by address, so we can use binary search.  */
       size_t l = 0, u = cu->die.cu->lines->nlines;
       while (l < u)

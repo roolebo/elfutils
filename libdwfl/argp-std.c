@@ -1,5 +1,5 @@
 /* Standard argp argument parsers for tools using libdwfl.
-   Copyright (C) 2005, 2007 Red Hat, Inc.
+   Copyright (C) 2005, 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -108,13 +108,13 @@ parse_opt (int key, char *arg, struct argp_state *state)
 {
   inline void failure (Dwfl *dwfl, int errnum, const char *msg)
     {
+      if (dwfl != NULL)
+	dwfl_end (dwfl);
       if (errnum == -1)
 	argp_failure (state, EXIT_FAILURE, 0, "%s: %s",
 		      msg, INTUSE(dwfl_errmsg) (-1));
       else
 	argp_failure (state, EXIT_FAILURE, errnum, "%s", msg);
-      if (dwfl != NULL)
-	dwfl_end (dwfl);
     }
   inline error_t fail (Dwfl *dwfl, int errnum, const char *msg)
     {

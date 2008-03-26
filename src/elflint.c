@@ -4055,9 +4055,10 @@ more than one GNU_RELRO entry in program header\n"));
 		      if ((phdr2->p_flags & PF_W) == 0)
 			ERROR (gettext ("\
 loadable segment GNU_RELRO applies to is not writable\n"));
-		      if ((phdr2->p_flags & PF_X) != 0)
+		      if ((phdr2->p_flags &~ PF_W) != (phdr->p_flags &~ PF_W))
 			ERROR (gettext ("\
-loadable segment GNU_RELRO applies to is executable\n"));
+loadable segment [%u] flags do not match GNU_RELRO [%u] flags\n"),
+			       cnt, inner);
 		      break;
 		    }
 		}

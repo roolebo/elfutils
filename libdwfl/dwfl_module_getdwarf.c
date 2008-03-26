@@ -218,6 +218,7 @@ load_symtab (struct dwfl_file *file, struct dwfl_file **symfile,
 	     Elf_Scn **symscn, Elf_Scn **xndxscn,
 	     size_t *syments, GElf_Word *strshndx)
 {
+  bool symtab = false;
   Elf_Scn *scn = NULL;
   while ((scn = elf_nextscn (file->elf, scn)) != NULL)
     {
@@ -226,6 +227,7 @@ load_symtab (struct dwfl_file *file, struct dwfl_file **symfile,
 	switch (shdr->sh_type)
 	  {
 	  case SHT_SYMTAB:
+	    symtab = true;
 	    *symscn = scn;
 	    *symfile = file;
 	    *strshndx = shdr->sh_link;
@@ -235,6 +237,8 @@ load_symtab (struct dwfl_file *file, struct dwfl_file **symfile,
 	    break;
 
 	  case SHT_DYNSYM:
+	    if (symtab)
+	      break;
 	    /* Use this if need be, but keep looking for SHT_SYMTAB.  */
 	    *symscn = scn;
 	    *symfile = file;
@@ -244,7 +248,7 @@ load_symtab (struct dwfl_file *file, struct dwfl_file **symfile,
 
 	  case SHT_SYMTAB_SHNDX:
 	    *xndxscn = scn;
-	    if (*symscn != NULL)
+	    if (symtab)
 	      return DWFL_E_NOERROR;
 	    break;
 
@@ -253,7 +257,7 @@ load_symtab (struct dwfl_file *file, struct dwfl_file **symfile,
 	  }
     }
 
-  if (*symscn != NULL)
+  if (symtab)
     /* We found one, though no SHT_SYMTAB_SHNDX to go with it.  */
     return DWFL_E_NOERROR;
 

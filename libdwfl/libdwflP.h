@@ -1,5 +1,5 @@
 /* Internal definitions for libdwfl.
-   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -99,8 +99,8 @@ typedef enum { DWFL_ERRORS DWFL_E_NUM } Dwfl_Error;
 #define OTHER_ERROR(name)	((unsigned int) DWFL_E_##name << 16)
 #define DWFL_E(name, errno)	(OTHER_ERROR (name) | (errno))
 
-extern int __libdwfl_canon_error (Dwfl_Error error) internal_function;
-extern void __libdwfl_seterrno (Dwfl_Error error) internal_function;
+extern int __libdwfl_canon_error (Dwfl_Error) internal_function;
+extern void __libdwfl_seterrno (Dwfl_Error) internal_function;
 
 struct Dwfl
 {

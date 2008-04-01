@@ -141,6 +141,12 @@ extern bool ebl_machine_flag_check (Ebl *ebl, GElf_Word flags);
 /* Check whether SHF_MASKPROC flags are valid.  */
 extern bool ebl_machine_section_flag_check (Ebl *ebl, GElf_Xword flags);
 
+/* Check whether the section with the given index, header, and name
+   is a special machine section that is valid despite a combination
+   of flags or other details that are not generically valid.  */
+extern bool ebl_check_special_section (Ebl *ebl, int ndx,
+				       const GElf_Shdr *shdr, const char *name);
+
 /* Return symbol type name.  */
 extern const char *ebl_symbol_type_name (Ebl *ebl, int symbol,
 					 char *buf, size_t len);

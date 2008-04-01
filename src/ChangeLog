@@ -1,3 +1,14 @@
+2008-03-31  Roland McGrath  <roland@redhat.com>
+
+	* elflint.c (check_sections): Add checks on SHF_EXECINSTR sections:
+	must be SHT_PROGBITS, must not be SHF_WRITE.  Let backend hook
+	excuse a special section.
+
+2008-03-27  Roland McGrath  <roland@redhat.com>
+
+	* elflint.c (check_sections): Check that executability and writability
+	of sections is reflected in segment p_flags.
+
 2008-03-26  Roland McGrath  <roland@redhat.com>
 
 	* elflint.c (check_program_header): Accept PT_GNU_RELRO p_flags

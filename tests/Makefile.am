@@ -59,7 +59,7 @@ noinst_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  show-abbrev hash newscn ecp dwflmodtest \
 		  find-prologues funcretval allregs rdwrmmap \
 		  dwfl-bug-addr-overflow arls dwfl-bug-fd-leak \
-		  dwfl-addr-sect dwfl-bug-report
+		  dwfl-addr-sect dwfl-bug-report early-offscn
 # get-ciefde
 asm_TESTS = asm-tst1 asm-tst2 asm-tst3 asm-tst4 asm-tst5 \
 	    asm-tst6 asm-tst7 asm-tst8 asm-tst9
@@ -84,7 +84,8 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	dwfl-bug-addr-overflow run-addrname-test.sh \
 	dwfl-bug-fd-leak dwfl-bug-report \
 	run-dwfl-bug-offline-rel.sh run-dwfl-addr-sect.sh \
-	run-disasm-x86.sh run-disasm-x86-64.sh
+	run-disasm-x86.sh run-disasm-x86-64.sh \
+	run-early-offscn.sh
 # run-show-ciefde.sh
 
 if !STANDALONE
@@ -115,7 +116,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-addrscopes.sh run-strings-test.sh run-funcscopes.sh \
 	     run-find-prologues.sh run-allregs.sh run-native-test.sh \
 	     run-addrname-test.sh run-dwfl-bug-offline-rel.sh \
-	     run-dwfl-addr-sect.sh \
+	     run-dwfl-addr-sect.sh run-early-offscn.sh \
 	     testfile15.bz2 testfile15.debug.bz2 \
 	     testfile16.bz2 testfile16.debug.bz2 \
 	     testfile17.bz2 testfile17.debug.bz2 \
@@ -190,6 +191,7 @@ hash_LDADD = $(libelf) $(libmudflap)
 test_nlist_LDADD = $(libelf) $(libmudflap)
 msg_tst_LDADD = $(libelf) $(libmudflap)
 newscn_LDADD = $(libelf) $(libmudflap)
+early_offscn_LDADD = $(libelf) $(libmudflap)
 ecp_LDADD = $(libelf) $(libmudflap)
 update1_LDADD = $(libelf) $(libmudflap)
 update2_LDADD = $(libelf) $(libmudflap)

@@ -1,5 +1,5 @@
 /* Return dynamic tag name.
-   Copyright (C) 2001, 2002, 2006 Red Hat, Inc.
+   Copyright (C) 2001, 2002, 2006, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -123,7 +123,7 @@ ebl_dynamic_tag_name (ebl, tag, buf, len)
 	res = "FILTER";
       else
 	{
-	  snprintf (buf, len, gettext ("<unknown>: %" PRId64), tag);
+	  snprintf (buf, len, gettext ("<unknown>: %#" PRIx64), tag);
 
 	  res = buf;
 

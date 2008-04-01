@@ -3399,6 +3399,8 @@ zeroth section has nonzero size value while ELF header has nonzero shnum value\n
 zeroth section has nonzero link value while ELF header does not signal overflow in shstrndx\n"));
     }
 
+  int *segment_flags = xcalloc (ehdr->e_phnum, sizeof segment_flags[0]);
+
   bool dot_interp_section = false;
 
   size_t hash_idx = 0;
@@ -3627,6 +3629,31 @@ section [%2zu] '%s': merge flag set but entry size is zero\n"),
       if (shdr->sh_flags & SHF_GROUP)
 	check_scn_group (ebl, cnt);
 
+      if (shdr->sh_flags & SHF_EXECINSTR)
+	{
+	  switch (shdr->sh_type)
+	    {
+	    case SHT_PROGBITS:
+	      break;
+
+	    case SHT_NOBITS:
+	      if (is_debuginfo)
+		break;
+	    default:
+	      ERROR (gettext ("\
+section [%2zu] '%s' has unexpected type %d for an executable section\n"),
+		     cnt, section_name (ebl, cnt), shdr->sh_type);
+	      break;
+	    }
+
+	  if ((shdr->sh_flags & SHF_WRITE)
+	      && !ebl_check_special_section (ebl, cnt, shdr,
+					     section_name (ebl, cnt)))
+	    ERROR (gettext ("\
+section [%2zu] '%s' is both executable and writable\n"),
+		   cnt, section_name (ebl, cnt));
+	}
+
       if (ehdr->e_type != ET_REL && (shdr->sh_flags & SHF_ALLOC) != 0)
 	{
 	  /* Make sure the section is contained in a loaded segment
@@ -3669,6 +3696,28 @@ section [%2zu] '%s' has type NOBITS but is read from the file in segment of prog
 		      ERROR (gettext ("\
 section [%2zu] '%s' has not type NOBITS but is not read from the file in segment of program header entry %d\n"),
 			 cnt, section_name (ebl, cnt), pcnt);
+		  }
+
+		if (shdr->sh_type != SHT_NOBITS)
+		  {
+		    if ((shdr->sh_flags & SHF_EXECINSTR) != 0)
+		      {
+			segment_flags[pcnt] |= PF_X;
+			if ((phdr->p_flags & PF_X) == 0)
+			  ERROR (gettext ("\
+section [%2zu] '%s' is executable in nonexecutable segment %d\n"),
+				 cnt, section_name (ebl, cnt), pcnt);
+		      }
+
+		    if ((shdr->sh_flags & SHF_WRITE) != 0)
+		      {
+			segment_flags[pcnt] |= PF_W;
+			if (0	/* XXX vdso images have this */
+			    && (phdr->p_flags & PF_W) == 0)
+			  ERROR (gettext ("\
+section [%2zu] '%s' is writable in unwritable segment %d\n"),
+				 cnt, section_name (ebl, cnt), pcnt);
+		      }
 		  }
 
 		break;
@@ -3764,6 +3813,29 @@ section [%2zu] '%s': relocatable files cannot have dynamic symbol tables\n"),
 
   if (has_interp_segment && !dot_interp_section)
     ERROR (gettext ("INTERP program header entry but no .interp section\n"));
+
+  if (!is_debuginfo)
+    for (int pcnt = 0; pcnt < ehdr->e_phnum; ++pcnt)
+      {
+	GElf_Phdr phdr_mem;
+	GElf_Phdr *phdr = gelf_getphdr (ebl->elf, pcnt, &phdr_mem);
+	if (phdr != NULL && (phdr->p_type == PT_LOAD || phdr->p_type == PT_TLS))
+	  {
+	    if ((phdr->p_flags & PF_X) != 0
+		&& (segment_flags[pcnt] & PF_X) == 0)
+	      ERROR (gettext ("\
+loadable segment [%u] is executable but contains no executable sections\n"),
+		     pcnt);
+
+	    if ((phdr->p_flags & PF_W) != 0
+		&& (segment_flags[pcnt] & PF_W) == 0)
+	      ERROR (gettext ("\
+loadable segment [%u] is writable but contains no writable sections\n"),
+		     pcnt);
+	  }
+      }
+
+  free (segment_flags);
 
   if (version_namelist != NULL)
     {

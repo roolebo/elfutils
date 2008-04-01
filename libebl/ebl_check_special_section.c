@@ -1,7 +1,6 @@
-/* Get section at specific index.
-   Copyright (C) 2005, 2008 Red Hat, Inc.
+/* Check for a special section allowed to violate generic constraints.
+   Copyright (C) 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
-   Contributed by Ulrich Drepper <drepper@redhat.com>, 2005.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by the
@@ -52,70 +51,15 @@
 # include <config.h>
 #endif
 
-#include <assert.h>
-#include <stddef.h>
-#include <stdlib.h>
-
-#include "libelfP.h"
-
-#ifndef LIBELFBITS
-# define LIBELFBITS 32
-#endif
+#include <libeblP.h>
 
 
-Elf_Scn *
-elfw2(LIBELFBITS,offscn) (elf, offset)
-     Elf *elf;
-     ElfW2(LIBELFBITS,Off) offset;
+bool
+ebl_check_special_section (ebl, ndx, shdr, sname)
+     Ebl *ebl;
+     int ndx;
+     const GElf_Shdr *shdr;
+     const char *sname;
 {
-  if (elf == NULL)
-    return NULL;
-
-  if (unlikely (elf->kind != ELF_K_ELF))
-    {
-      __libelf_seterrno (ELF_E_INVALID_HANDLE);
-      return NULL;
-    }
-
-  Elf_ScnList *runp = &elf->state.ELFW(elf,LIBELFBITS).scns;
-
-  /* If we have not looked at section headers before,
-     we might need to read them in first.  */
-  if (runp->cnt > 0
-      && unlikely (runp->data[0].shdr.ELFW(e,LIBELFBITS) == NULL)
-      && unlikely (elfw2(LIBELFBITS,getshdr) (&runp->data[0]) == NULL))
-    return NULL;
-
-  rwlock_rdlock (elf->lock);
-
-  Elf_Scn *result = NULL;
-
-  /* Find the section in the list.  */
-  while (1)
-    {
-      for (unsigned int i = 0; i < runp->cnt; ++i)
-	if (runp->data[i].shdr.ELFW(e,LIBELFBITS)->sh_offset == offset)
-	  {
-	    result = &runp->data[i];
-
-	    /* If this section is empty, the following one has the same
-	       sh_offset.  We presume the caller is looking for a nonempty
-	       section, so keep looking if this one is empty.  */
-	    if (runp->data[i].shdr.ELFW(e,LIBELFBITS)->sh_size != 0)
-	      goto out;
-	  }
-
-      runp = runp->next;
-      if (runp == NULL)
-	{
-	  __libelf_seterrno (ELF_E_INVALID_OFFSET);
-	  break;
-	}
-    }
-
- out:
-  rwlock_unlock (elf->lock);
-
-  return result;
+  return ebl != NULL && ebl->check_special_section (ebl, ndx, shdr, sname);
 }
-INTDEF(elfw2(LIBELFBITS,offscn))

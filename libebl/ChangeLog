@@ -1,3 +1,14 @@
+2008-03-31  Roland McGrath  <roland@redhat.com>
+
+	* ebldynamictagname.c (ebl_dynamic_tag_name): Use hex for unknown tag.
+
+	* ebl-hooks.h: Add check_special_section hook.
+	* eblopenbackend.c (fill_defaults): Set new hook to ...
+	(default_check_special_section): ... this, new function.
+	* ebl_check_special_section.c: New file.
+	* Makefile.am (gen_SOURCES): Add it.
+	* libebl.h: Declare it.
+
 2008-02-20  Roland McGrath  <roland@redhat.com>
 
 	* libebl.h: Declare ebl_check_object_attribute.

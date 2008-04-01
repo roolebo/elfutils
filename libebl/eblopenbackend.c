@@ -202,6 +202,8 @@ static bool default_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr,
 					  const GElf_Sym *sym,
 					  const char *name,
 					  const GElf_Shdr *destshdr);
+static bool default_check_special_section (Ebl *, int,
+					   const GElf_Shdr *, const char *);
 static bool default_bss_plt_p (Elf *elf, GElf_Ehdr *ehdr);
 static int default_return_value_location (Dwarf_Die *functypedie,
 					  const Dwarf_Op **locops);
@@ -231,6 +233,7 @@ fill_defaults (Ebl *result)
   result->machine_flag_name = default_machine_flag_name;
   result->machine_flag_check = default_machine_flag_check;
   result->machine_section_flag_check = default_machine_section_flag_check;
+  result->check_special_section = default_check_special_section;
   result->symbol_type_name = default_symbol_type_name;
   result->symbol_binding_name = default_symbol_binding_name;
   result->dynamic_tag_name = default_dynamic_tag_name;
@@ -519,6 +522,15 @@ static bool
 default_machine_section_flag_check (GElf_Xword flags)
 {
   return flags == 0;
+}
+
+static bool
+default_check_special_section (Ebl *ebl __attribute__ ((unused)),
+			       int ndx __attribute__ ((unused)),
+			       const GElf_Shdr *shdr __attribute__ ((unused)),
+			       const char *sname __attribute__ ((unused)))
+{
+  return false;
 }
 
 static const char *

@@ -1,3 +1,7 @@
+2008-03-31  Roland McGrath  <roland@redhat.com>
+
+	* elf32_offscn.c: Make sure shdrs have been read in.
+
 2008-02-19  Roland McGrath  <roland@redhat.com>
 
 	* elf.h: Update from glibc.

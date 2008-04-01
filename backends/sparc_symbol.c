@@ -1,5 +1,5 @@
 /* SPARC specific symbolic name handling.
-   Copyright (C) 2002, 2003, 2005, 2007 Red Hat, Inc.
+   Copyright (C) 2002, 2003, 2005, 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Jakub Jelinek <jakub@redhat.com>, 2002.
 
@@ -65,4 +65,82 @@ sparc_machine_flag_check (GElf_Word flags)
 		     | EF_SPARC_32PLUS
 		     | EF_SPARC_SUN_US1
 		     | EF_SPARC_SUN_US3)) == 0);
+}
+
+bool
+sparc_check_special_section (Ebl *ebl,
+			     int ndx __attribute__ ((unused)),
+			     const GElf_Shdr *shdr,
+			     const char *sname __attribute__ ((unused)))
+{
+  ebl=ebl;
+  if ((shdr->sh_flags & (SHF_WRITE | SHF_EXECINSTR))
+      == (SHF_WRITE | SHF_EXECINSTR))
+    {
+      /* This is ordinarily flagged, but is valid for a PLT on SPARC.
+
+	 Look for the SHT_DYNAMIC section and the DT_PLTGOT tag in it.
+	 Its d_ptr should match the .plt section's sh_addr.  */
+
+      Elf_Scn *scn = NULL;
+      while ((scn = elf_nextscn (ebl->elf, scn)) != NULL)
+	{
+	  GElf_Shdr scn_shdr;
+	  if (likely (gelf_getshdr (scn, &scn_shdr) != NULL)
+	      && scn_shdr.sh_type == SHT_DYNAMIC
+	      && scn_shdr.sh_entsize != 0)
+	    {
+	      Elf_Data *data = elf_getdata (scn, NULL);
+	      if (data != NULL)
+		for (size_t i = 0; i < data->d_size / scn_shdr.sh_entsize; ++i)
+		  {
+		    GElf_Dyn dyn;
+		    if (unlikely (gelf_getdyn (data, i, &dyn) == NULL))
+		      break;
+		    if (dyn.d_tag == DT_PLTGOT)
+		      return dyn.d_un.d_ptr == shdr->sh_addr;
+		  }
+	      break;
+	    }
+	}
+    }
+
+  return false;
+}
+
+const char *
+sparc_symbol_type_name (int type,
+			char *buf __attribute__ ((unused)),
+			size_t len __attribute__ ((unused)))
+{
+  switch (type)
+    {
+    case STT_SPARC_REGISTER:
+      return "SPARC_REGISTER";
+    }
+  return NULL;
+}
+
+const char *
+sparc_dynamic_tag_name (int64_t tag,
+			char *buf __attribute__ ((unused)),
+			size_t len __attribute__ ((unused)))
+{
+  switch (tag)
+    {
+    case DT_SPARC_REGISTER:
+      return "SPARC_REGISTER";
+    }
+  return NULL;
+}
+
+bool
+sparc_dynamic_tag_check (int64_t tag)
+{
+  switch (tag)
+    {
+    case DT_SPARC_REGISTER:
+      return true;
+    }
+  return false;
 }

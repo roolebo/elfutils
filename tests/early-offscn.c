@@ -1,5 +1,4 @@
-/* Initialization of SPARC specific backend library.
-   Copyright (C) 2002, 2005, 2006, 2007, 2008 Red Hat, Inc.
+/* Copyright (C) 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -27,47 +26,35 @@
 # include <config.h>
 #endif
 
-#define BACKEND		sparc_
-#define RELOC_PREFIX	R_SPARC_
-#include "libebl_CPU.h"
+#include <errno.h>
+#include <error.h>
+#include <fcntl.h>
+#include <gelf.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-/* This defines the common reloc hooks based on sparc_reloc.def.  */
-#include "common-reloc.c"
-
-extern __typeof (EBLHOOK (core_note)) sparc64_core_note attribute_hidden;
-
-const char *
-sparc_init (elf, machine, eh, ehlen)
-     Elf *elf __attribute__ ((unused));
-     GElf_Half machine __attribute__ ((unused));
-     Ebl *eh;
-     size_t ehlen;
+int
+main (int argc, char *argv[])
 {
-  /* Check whether the Elf_BH object has a sufficent size.  */
-  if (ehlen < sizeof (Ebl))
-    return NULL;
+  if (argc < 2)
+    error (1, 0, "Usage: %s FILE OFFSET", argv[0]);
 
-  /* We handle it.  */
-  if (machine == EM_SPARCV9)
-    eh->name = "SPARC v9";
-  else if (machine == EM_SPARC32PLUS)
-    eh->name = "SPARC v8+";
-  else
-    eh->name = "SPARC";
-  sparc_init_reloc (eh);
-  HOOK (eh, reloc_simple_type);
-  HOOK (eh, machine_flag_check);
-  HOOK (eh, check_special_section);
-  HOOK (eh, symbol_type_name);
-  HOOK (eh, dynamic_tag_name);
-  HOOK (eh, dynamic_tag_check);
-  if (eh->class == ELFCLASS64)
-    eh->core_note = sparc64_core_note;
-  else
-    HOOK (eh, core_note);
-  HOOK (eh, auxv_info);
-  HOOK (eh, register_info);
-  HOOK (eh, return_value_location);
+  /* Set the ELF version.  */
+  elf_version (EV_CURRENT);
 
-  return MODVERSION;
+  /* Open the archive.  */
+  int fd = open (argv[1], O_RDONLY);
+  if (fd < 0)
+    error (1, errno, "cannot open '%s'", argv[1]);
+
+  Elf *elf = elf_begin (fd, ELF_C_READ, NULL);
+  if (elf == NULL)
+    error (2, 0, "elf_begin: %s", elf_errmsg (-1));
+
+  Elf_Scn *scn = gelf_offscn (elf, strtoull (argv[2], NULL, 0));
+  if (scn == NULL)
+    error (3, 0, "gelf_offscn: %s", elf_errmsg (-1));
+
+  elf_end (elf);
+  return 0;
 }

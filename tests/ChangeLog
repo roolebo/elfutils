@@ -1,3 +1,10 @@
+2008-03-31  Roland McGrath  <roland@redhat.com>
+
+	* run-early-offscn.sh: New file.
+	* early-offscn.c: New file.
+	* Makefile.am (noinst_PROGRAMS, TESTS, EXTRA_DIST): Add them.
+	(early_offscn_LDADD): New variable.
+
 2008-03-19  Roland McGrath  <roland@redhat.com>
 
 	* run-addrname-test.sh: Add a new case.

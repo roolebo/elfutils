@@ -1,3 +1,8 @@
+2008-04-04  Roland McGrath  <roland@redhat.com>
+
+	* alpha_symbol.c (alpha_check_special_section): New function.
+	* alpha_init.c (alpha_init): Initialize check_special_section hook.
+
 2008-03-31  Roland McGrath  <roland@redhat.com>
 
 	* sparc_symbol.c (sparc_symbol_type_name): New function.

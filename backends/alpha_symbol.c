@@ -1,5 +1,5 @@
 /* Alpha specific symbolic name handling.
-   Copyright (C) 2002, 2005, 2007 Red Hat, Inc.
+   Copyright (C) 2002,2005,2007,2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -76,4 +76,48 @@ bool
 alpha_machine_section_flag_check (GElf_Xword sh_flags)
 {
   return (sh_flags &~ (SHF_ALPHA_GPREL)) == 0;
+}
+
+bool
+alpha_check_special_section (Ebl *ebl,
+			     int ndx __attribute__ ((unused)),
+			     const GElf_Shdr *shdr,
+			     const char *sname __attribute__ ((unused)))
+{
+  if ((shdr->sh_flags
+       & (SHF_WRITE | SHF_EXECINSTR)) == (SHF_WRITE | SHF_EXECINSTR)
+      && shdr->sh_addr != 0)
+    {
+      /* This is ordinarily flagged, but is valid for an old-style PLT.
+
+	 Look for the SHT_DYNAMIC section and the DT_PLTGOT tag in it.
+	 Its d_ptr should match the .plt section's sh_addr.  */
+
+      Elf_Scn *scn = NULL;
+      while ((scn = elf_nextscn (ebl->elf, scn)) != NULL)
+	{
+	  GElf_Shdr scn_shdr;
+	  if (likely (gelf_getshdr (scn, &scn_shdr) != NULL)
+	      && scn_shdr.sh_type == SHT_DYNAMIC
+	      && scn_shdr.sh_entsize != 0)
+	    {
+	      GElf_Addr pltgot = 0;
+	      Elf_Data *data = elf_getdata (scn, NULL);
+	      if (data != NULL)
+		for (size_t i = 0; i < data->d_size / scn_shdr.sh_entsize; ++i)
+		  {
+		    GElf_Dyn dyn;
+		    if (unlikely (gelf_getdyn (data, i, &dyn) == NULL))
+		      break;
+		    if (dyn.d_tag == DT_PLTGOT)
+		      pltgot = dyn.d_un.d_ptr;
+		    else if (dyn.d_tag == DT_ALPHA_PLTRO && dyn.d_un.d_val != 0)
+		      return false; /* This PLT should not be writable.  */
+		  }
+	      return pltgot == shdr->sh_addr;
+	    }
+	}
+    }
+
+  return false;
 }

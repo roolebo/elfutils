@@ -73,7 +73,6 @@ sparc_check_special_section (Ebl *ebl,
 			     const GElf_Shdr *shdr,
 			     const char *sname __attribute__ ((unused)))
 {
-  ebl=ebl;
   if ((shdr->sh_flags & (SHF_WRITE | SHF_EXECINSTR))
       == (SHF_WRITE | SHF_EXECINSTR))
     {

@@ -55,6 +55,7 @@ alpha_init (elf, machine, eh, ehlen)
   HOOK (eh, reloc_simple_type);
   HOOK (eh, return_value_location);
   HOOK (eh, machine_section_flag_check);
+  HOOK (eh, check_special_section);
   HOOK (eh, register_info);
   HOOK (eh, core_note);
   HOOK (eh, auxv_info);

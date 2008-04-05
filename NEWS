@@ -1,3 +1,9 @@
+Version 0.134:
+
+elflint: backend improvements for sparc, alpha
+
+libdwfl, libelf: bug fixes
+
 Version 0.133:
 
 readelf, elflint, libebl: SHT_GNU_ATTRIBUTE section handling (readelf -A)

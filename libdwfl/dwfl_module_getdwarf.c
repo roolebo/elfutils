@@ -123,8 +123,8 @@ find_file (Dwfl_Module *mod)
     {
       /* Clear any explicitly reported build ID, just in case it was wrong.
 	 We'll fetch it from the file when asked.  */
-      if (mod->build_id_len > 0)
-	free (mod->build_id_bits);
+      free (mod->build_id_bits);
+      mod->build_id_bits = NULL;
       mod->build_id_len = 0;
     }
 }

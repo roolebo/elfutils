@@ -1,5 +1,5 @@
 /* Report build ID information for a module.
-   Copyright (C) 2007 Red Hat, Inc.
+   Copyright (C) 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -90,8 +90,7 @@ dwfl_module_report_build_id (Dwfl_Module *mod,
       memcpy (copy, bits, len);
     }
 
-  if (mod->build_id_len > 0)
-    free (mod->build_id_bits);
+  free (mod->build_id_bits);
 
   mod->build_id_bits = copy;
   mod->build_id_len = len;

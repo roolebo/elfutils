@@ -1,5 +1,5 @@
 /* Standard libdwfl callbacks for debugging a live Linux process.
-   Copyright (C) 2005, 2007 Red Hat, Inc.
+   Copyright (C) 2005, 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -138,12 +138,12 @@ proc_maps_report (Dwfl *dwfl, FILE *f, GElf_Addr sysinfo_ehdr, pid_t pid)
     {
       if (last_file != NULL)
 	{
-	  if (INTUSE(dwfl_report_module) (dwfl, last_file, low, high) == NULL)
-	    {
-	      free (last_file);
-	      return true;
-	    }
+	  Dwfl_Module *mod = INTUSE(dwfl_report_module) (dwfl, last_file,
+							 low, high);
+	  free (last_file);
 	  last_file = NULL;
+	  if (unlikely (mod == NULL))
+	    return true;
 	}
       return false;
     }

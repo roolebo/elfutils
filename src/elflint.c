@@ -579,9 +579,12 @@ check_symtab (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Shdr *shdr, int idx)
     return;
 
   if (strshdr->sh_type != SHT_STRTAB)
-    ERROR (gettext ("section [%2d] '%s': referenced as string table for section [%2d] '%s' but type is not SHT_STRTAB\n"),
-	   shdr->sh_link, section_name (ebl, shdr->sh_link),
-	   idx, section_name (ebl, idx));
+    {
+      ERROR (gettext ("section [%2d] '%s': referenced as string table for section [%2d] '%s' but type is not SHT_STRTAB\n"),
+	     shdr->sh_link, section_name (ebl, shdr->sh_link),
+	     idx, section_name (ebl, idx));
+      strshdr = NULL;
+    }
 
   /* Search for an extended section index table section.  */
   Elf_Data *xndxdata = NULL;
@@ -659,7 +662,9 @@ section [%2d] '%s': XINDEX for zeroth entry not zero\n"),
 	}
 
       const char *name = NULL;
-      if (sym->st_name >= strshdr->sh_size)
+      if (strshdr == NULL)
+	name = "";
+      else if (sym->st_name >= strshdr->sh_size)
 	ERROR (gettext ("\
 section [%2d] '%s': symbol %zu: invalid name value\n"),
 	       idx, section_name (ebl, idx), cnt);

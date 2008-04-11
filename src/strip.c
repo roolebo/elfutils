@@ -1,5 +1,5 @@
 /* Discard section not used at runtime from object files.
-   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007,2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -390,6 +390,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
     Elf_Scn *scn;
     GElf_Shdr shdr;
     Elf_Data *data;
+    Elf_Data *debug_data;
     const char *name;
     Elf32_Word idx;		/* Index in new file.  */
     Elf32_Word old_sh_link;	/* Original value of shdr.sh_link.  */
@@ -720,8 +721,10 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	      /* The content of symbol tables we don't remove must not
 		 reference any section which we do remove.  Otherwise
 		 we cannot remove the section.  */
-	      if (shdr_info[cnt].shdr.sh_type == SHT_DYNSYM
-		  || shdr_info[cnt].shdr.sh_type == SHT_SYMTAB)
+	      if (debug_fname != NULL
+		  && shdr_info[cnt].debug_data == NULL
+		  && (shdr_info[cnt].shdr.sh_type == SHT_DYNSYM
+		      || shdr_info[cnt].shdr.sh_type == SHT_SYMTAB))
 		{
 		  /* Make sure the data is loaded.  */
 		  if (shdr_info[cnt].data == NULL)
@@ -779,11 +782,10 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 			scnidx = xndx;
 
 		      if (shdr_info[scnidx].idx == 0)
-			{
-			  /* Mark this section as used.  */
-			  shdr_info[scnidx].idx = 1;
-			  changes |= scnidx < cnt;
-			}
+			/* This symbol table has a real symbol in
+			   a discarded section.  So preserve the
+			   original table in the debug file.  */
+			shdr_info[cnt].debug_data = symdata;
 		    }
 		}
 
@@ -819,6 +821,36 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	      /* Mark the section as investigated.  */
 	      shdr_info[cnt].idx = 2;
 	    }
+
+	  if (debug_fname != NULL
+	      && (shdr_info[cnt].idx == 0 || shdr_info[cnt].debug_data != NULL))
+	    {
+	      /* This section is being preserved in the debug file.
+		 Sections it refers to must be preserved there too.
+
+		 In this pass we mark sections to be preserved in both
+		 files by setting the .debug_data pointer to the original
+		 file's .data pointer.  Below, we'll copy the section
+		 contents.  */
+
+	      inline void check_preserved (size_t i)
+	      {
+		if (i != 0 && shdr_info[i].idx != 0)
+		  {
+		    if (shdr_info[i].data == NULL)
+		      shdr_info[i].data = elf_getdata (shdr_info[i].scn, NULL);
+		    if (shdr_info[i].data == NULL)
+		      INTERNAL_ERROR (fname);
+
+		    shdr_info[i].debug_data = shdr_info[i].data;
+		    changes |= i < cnt;
+		  }
+	      }
+
+	      check_preserved (shdr_info[cnt].shdr.sh_link);
+	      if (SH_INFO_LINK_P (&shdr_info[cnt].shdr))
+		check_preserved (shdr_info[cnt].shdr.sh_info);
+	    }
 	}
     }
   while (changes);
@@ -836,6 +868,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 		   elf_errmsg (-1));
 
 	  bool discard_section = (shdr_info[cnt].idx > 0
+				  && shdr_info[cnt].debug_data == NULL
 				  && shdr_info[cnt].shdr.sh_type != SHT_NOTE
 				  && cnt != ehdr->e_shstrndx);
 
@@ -866,6 +899,13 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	  *debugdata = *shdr_info[cnt].data;
 	  if (discard_section)
 	    debugdata->d_buf = NULL;
+	  else if (shdr_info[cnt].debug_data != NULL)
+	    {
+	      /* Copy the original data before it gets modified.  */
+	      shdr_info[cnt].debug_data = debugdata;
+	      debugdata->d_buf = memcpy (xmalloc (debugdata->d_size),
+					 debugdata->d_buf, debugdata->d_size);
+	    }
 	}
 
       /* Finish the ELF header.  Fill in the fields not handled by
@@ -1078,7 +1118,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	    /* We know the size.  */
 	    shdr_info[cnt].shdr.sh_size = shdr_info[cnt].data->d_size;
 
-	    /* We have to adjust symtol tables.  The st_shndx member might
+	    /* We have to adjust symbol tables.  The st_shndx member might
 	       have to be updated.  */
 	    if (shdr_info[cnt].shdr.sh_type == SHT_DYNSYM
 		|| shdr_info[cnt].shdr.sh_type == SHT_SYMTAB)
@@ -1206,7 +1246,8 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 			    shdr_info[cnt].shdr.sh_info = destidx - 1;
 			  }
 		      }
-		    else
+		    else if (debug_fname == NULL
+			     || shdr_info[cnt].debug_data == NULL)
 		      /* This is a section symbol for a section which has
 			 been removed.  */
 		      assert (GELF_ST_TYPE (sym->st_info) == STT_SECTION);
@@ -1248,291 +1289,288 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 
   /* Adjust symbol references if symbol tables changed.  */
   if (any_symtab_changes)
-    {
-      /* Find all relocation sections which use this
-	 symbol table.  */
-      for (cnt = 1; cnt <= shdridx; ++cnt)
+    /* Find all relocation sections which use this symbol table.  */
+    for (cnt = 1; cnt <= shdridx; ++cnt)
+      {
+	/* Update section headers when the data size has changed.
+	   We also update the SHT_NOBITS section in the debug
+	   file so that the section headers match in sh_size.  */
+	inline void update_section_size (const Elf_Data *newdata)
 	{
-	  /* Update section headers when the data size has changed.
-	     We also update the SHT_NOBITS section in the debug
-	     file so that the section headers match in sh_size.  */
-	  inline void update_section_size (const Elf_Data *newdata)
+	  GElf_Shdr shdr_mem;
+	  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+	  shdr->sh_size = newdata->d_size;
+	  (void) gelf_update_shdr (scn, shdr);
+	  if (debugelf != NULL)
 	    {
-	      GElf_Shdr shdr_mem;
-	      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
-	      shdr->sh_size = newdata->d_size;
-	      (void) gelf_update_shdr (scn, shdr);
-	      if (debugelf != NULL)
-		{
-		  /* libelf will use d_size to set sh_size.  */
-		  Elf_Data *debugdata = elf_getdata (elf_getscn (debugelf,
-								 cnt), NULL);
-		  debugdata->d_size = newdata->d_size;
-		}
-	    }
-
-	  if (shdr_info[cnt].idx == 0 && debug_fname == NULL)
-	    /* Ignore sections which are discarded.  When we are saving a
-	       relocation section in a separate debug file, we must fix up
-	       the symbol table references.  */
-	    continue;
-
-	  if (shdr_info[cnt].shdr.sh_type == SHT_REL
-	      || shdr_info[cnt].shdr.sh_type == SHT_RELA)
-	    {
-	      /* If the symbol table hasn't changed, do not do anything.  */
-	      if (shdr_info[shdr_info[cnt].old_sh_link].newsymidx == NULL)
-		continue;
-
-	      Elf32_Word *newsymidx
-		= shdr_info[shdr_info[cnt].old_sh_link].newsymidx;
-	      Elf_Data *d = elf_getdata (shdr_info[cnt].idx == 0
-					 ? elf_getscn (debugelf, cnt)
-					 : elf_getscn (newelf,
-						       shdr_info[cnt].idx),
-					 NULL);
-	      assert (d != NULL);
-	      size_t nrels = (shdr_info[cnt].shdr.sh_size
-			      / shdr_info[cnt].shdr.sh_entsize);
-
-	      if (shdr_info[cnt].shdr.sh_type == SHT_REL)
-		for (size_t relidx = 0; relidx < nrels; ++relidx)
-		  {
-		    GElf_Rel rel_mem;
-		    if (gelf_getrel (d, relidx, &rel_mem) == NULL)
-		      INTERNAL_ERROR (fname);
-
-		    size_t symidx = GELF_R_SYM (rel_mem.r_info);
-		    if (newsymidx[symidx] != symidx)
-		      {
-			rel_mem.r_info
-			  = GELF_R_INFO (newsymidx[symidx],
-					 GELF_R_TYPE (rel_mem.r_info));
-
-			if (gelf_update_rel (d, relidx, &rel_mem) == 0)
-			  INTERNAL_ERROR (fname);
-		      }
-		  }
-	      else
-		for (size_t relidx = 0; relidx < nrels; ++relidx)
-		  {
-		    GElf_Rela rel_mem;
-		    if (gelf_getrela (d, relidx, &rel_mem) == NULL)
-		      INTERNAL_ERROR (fname);
-
-		    size_t symidx = GELF_R_SYM (rel_mem.r_info);
-		    if (newsymidx[symidx] != symidx)
-		      {
-			rel_mem.r_info
-			  = GELF_R_INFO (newsymidx[symidx],
-					 GELF_R_TYPE (rel_mem.r_info));
-
-			if (gelf_update_rela (d, relidx, &rel_mem) == 0)
-			  INTERNAL_ERROR (fname);
-		      }
-		  }
-	    }
-	  else if (shdr_info[cnt].shdr.sh_type == SHT_HASH)
-	    {
-	      /* We have to recompute the hash table.  */
-	      Elf32_Word symtabidx = shdr_info[cnt].old_sh_link;
-
-	      /* We do not have to do anything if the symbol table was
-		 not changed.  */
-	      if (shdr_info[symtabidx].newsymidx == NULL)
-		continue;
-
-	      assert (shdr_info[cnt].idx > 0);
-
-	      /* The hash section in the new file.  */
-	      scn = elf_getscn (newelf, shdr_info[cnt].idx);
-
-	      /* The symbol table data.  */
-	      Elf_Data *symd = elf_getdata (elf_getscn (newelf,
-							shdr_info[symtabidx].idx),
-					    NULL);
-	      assert (symd != NULL);
-
-	      /* The hash table data.  */
-	      Elf_Data *hashd = elf_getdata (scn, NULL);
-	      assert (hashd != NULL);
-
-	      if (shdr_info[cnt].shdr.sh_entsize == sizeof (Elf32_Word))
-		{
-		  /* Sane arches first.  */
-		  Elf32_Word *bucket = (Elf32_Word *) hashd->d_buf;
-
-		  size_t strshndx = shdr_info[symtabidx].old_sh_link;
-		  size_t elsize = gelf_fsize (elf, ELF_T_SYM, 1,
-					      ehdr->e_version);
-
-		  /* Adjust the nchain value.  The symbol table size
-		     changed.  We keep the same size for the bucket array.  */
-		  bucket[1] = symd->d_size / elsize;
-		  Elf32_Word nbucket = bucket[0];
-		  bucket += 2;
-		  Elf32_Word *chain = bucket + nbucket;
-
-		  /* New size of the section.  */
-		  hashd->d_size = ((2 + symd->d_size / elsize + nbucket)
-				   * sizeof (Elf32_Word));
-		  update_section_size (hashd);
-
-		  /* Clear the arrays.  */
-		  memset (bucket, '\0',
-			  (symd->d_size / elsize + nbucket)
-			  * sizeof (Elf32_Word));
-
-		  for (size_t inner = shdr_info[symtabidx].shdr.sh_info;
-		       inner < symd->d_size / elsize; ++inner)
-		    {
-		      GElf_Sym sym_mem;
-		      GElf_Sym *sym = gelf_getsym (symd, inner, &sym_mem);
-		      assert (sym != NULL);
-
-		      const char *name = elf_strptr (elf, strshndx,
-						     sym->st_name);
-		      assert (name != NULL);
-		      size_t hidx = elf_hash (name) % nbucket;
-
-		      if (bucket[hidx] == 0)
-			bucket[hidx] = inner;
-		      else
-			{
-			  hidx = bucket[hidx];
-
-			  while (chain[hidx] != 0)
-			    hidx = chain[hidx];
-
-			  chain[hidx] = inner;
-			}
-		    }
-		}
-	      else
-		{
-		  /* Alpha and S390 64-bit use 64-bit SHT_HASH entries.  */
-		  assert (shdr_info[cnt].shdr.sh_entsize
-			  == sizeof (Elf64_Xword));
-
-		  Elf64_Xword *bucket = (Elf64_Xword *) hashd->d_buf;
-
-		  size_t strshndx = shdr_info[symtabidx].old_sh_link;
-		  size_t elsize = gelf_fsize (elf, ELF_T_SYM, 1,
-					      ehdr->e_version);
-
-		  /* Adjust the nchain value.  The symbol table size
-		     changed.  We keep the same size for the bucket array.  */
-		  bucket[1] = symd->d_size / elsize;
-		  Elf64_Xword nbucket = bucket[0];
-		  bucket += 2;
-		  Elf64_Xword *chain = bucket + nbucket;
-
-		  /* New size of the section.  */
-		  hashd->d_size = ((2 + symd->d_size / elsize + nbucket)
-				   * sizeof (Elf64_Xword));
-		  update_section_size (hashd);
-
-		  /* Clear the arrays.  */
-		  memset (bucket, '\0',
-			  (symd->d_size / elsize + nbucket)
-			  * sizeof (Elf64_Xword));
-
-		  for (size_t inner = shdr_info[symtabidx].shdr.sh_info;
-		       inner < symd->d_size / elsize; ++inner)
-		    {
-		      GElf_Sym sym_mem;
-		      GElf_Sym *sym = gelf_getsym (symd, inner, &sym_mem);
-		      assert (sym != NULL);
-
-		      const char *name = elf_strptr (elf, strshndx,
-						     sym->st_name);
-		      assert (name != NULL);
-		      size_t hidx = elf_hash (name) % nbucket;
-
-		      if (bucket[hidx] == 0)
-			bucket[hidx] = inner;
-		      else
-			{
-			  hidx = bucket[hidx];
-
-			  while (chain[hidx] != 0)
-			    hidx = chain[hidx];
-
-			  chain[hidx] = inner;
-			}
-		    }
-	        }
-	    }
-	  else if (shdr_info[cnt].shdr.sh_type == SHT_GNU_versym)
-	    {
-	      /* If the symbol table changed we have to adjust the
-		 entries.  */
-	      Elf32_Word symtabidx = shdr_info[cnt].old_sh_link;
-
-	      /* We do not have to do anything if the symbol table was
-		 not changed.  */
-	      if (shdr_info[symtabidx].newsymidx == NULL)
-		continue;
-
-	      assert (shdr_info[cnt].idx > 0);
-
-	      /* The symbol version section in the new file.  */
-	      scn = elf_getscn (newelf, shdr_info[cnt].idx);
-
-	      /* The symbol table data.  */
-	      Elf_Data *symd = elf_getdata (elf_getscn (newelf,
-							shdr_info[symtabidx].idx),
-					    NULL);
-	      assert (symd != NULL);
-
-	      /* The version symbol data.  */
-	      Elf_Data *verd = elf_getdata (scn, NULL);
-	      assert (verd != NULL);
-
-	      /* The symbol version array.  */
-	      GElf_Half *verstab = (GElf_Half *) verd->d_buf;
-
-	      /* New indices of the symbols.  */
-	      Elf32_Word *newsymidx = shdr_info[symtabidx].newsymidx;
-
-	      /* Walk through the list and */
-	      size_t elsize = gelf_fsize (elf, verd->d_type, 1,
-					  ehdr->e_version);
-	      for (size_t inner = 1; inner < verd->d_size / elsize; ++inner)
-		if (newsymidx[inner] != 0)
-		  /* Overwriting the same array works since the
-		     reordering can only move entries to lower indices
-		     in the array.  */
-		  verstab[newsymidx[inner]] = verstab[inner];
-
-	      /* New size of the section.  */
-	      verd->d_size = gelf_fsize (newelf, verd->d_type,
-					 symd->d_size
-					 / gelf_fsize (elf, symd->d_type, 1,
-						       ehdr->e_version),
-					 ehdr->e_version);
-	      update_section_size (verd);
-	    }
-	  else if (shdr_info[cnt].shdr.sh_type == SHT_GROUP)
-	    {
-	      /* Check whether the associated symbol table changed.  */
-	      if (shdr_info[shdr_info[cnt].old_sh_link].newsymidx != NULL)
-		{
-		  /* Yes the symbol table changed.  Update the section
-		     header of the section group.  */
-		  scn = elf_getscn (newelf, shdr_info[cnt].idx);
-		  GElf_Shdr shdr_mem;
-		  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
-		  assert (shdr != NULL);
-
-		  size_t stabidx = shdr_info[cnt].old_sh_link;
-		  shdr->sh_info = shdr_info[stabidx].newsymidx[shdr->sh_info];
-
-		  (void) gelf_update_shdr (scn, shdr);
-		}
+	      /* libelf will use d_size to set sh_size.  */
+	      Elf_Data *debugdata = elf_getdata (elf_getscn (debugelf,
+							     cnt), NULL);
+	      debugdata->d_size = newdata->d_size;
 	    }
 	}
-    }
+
+	if (shdr_info[cnt].idx == 0 && debug_fname == NULL)
+	  /* Ignore sections which are discarded.  When we are saving a
+	     relocation section in a separate debug file, we must fix up
+	     the symbol table references.  */
+	  continue;
+
+	const Elf32_Word symtabidx = shdr_info[cnt].old_sh_link;
+	const Elf32_Word *const newsymidx = shdr_info[symtabidx].newsymidx;
+	switch (shdr_info[cnt].shdr.sh_type)
+	  {
+	    inline bool no_symtab_updates (void)
+	    {
+	      /* If the symbol table hasn't changed, do not do anything.  */
+	      if (shdr_info[symtabidx].newsymidx == NULL)
+		return true;
+
+	      /* If the symbol table is not discarded, but additionally
+		 duplicated in the separate debug file and this section
+		 is discarded, don't adjust anything.  */
+	      return (shdr_info[cnt].idx == 0
+		      && shdr_info[symtabidx].debug_data != NULL);
+	    }
+
+	  case SHT_REL:
+	  case SHT_RELA:
+	    if (no_symtab_updates ())
+	      break;
+
+	    Elf_Data *d = elf_getdata (shdr_info[cnt].idx == 0
+				       ? elf_getscn (debugelf, cnt)
+				       : elf_getscn (newelf,
+						     shdr_info[cnt].idx),
+				       NULL);
+	    assert (d != NULL);
+	    size_t nrels = (shdr_info[cnt].shdr.sh_size
+			    / shdr_info[cnt].shdr.sh_entsize);
+
+	    if (shdr_info[cnt].shdr.sh_type == SHT_REL)
+	      for (size_t relidx = 0; relidx < nrels; ++relidx)
+		{
+		  GElf_Rel rel_mem;
+		  if (gelf_getrel (d, relidx, &rel_mem) == NULL)
+		    INTERNAL_ERROR (fname);
+
+		  size_t symidx = GELF_R_SYM (rel_mem.r_info);
+		  if (newsymidx[symidx] != symidx)
+		    {
+		      rel_mem.r_info
+			= GELF_R_INFO (newsymidx[symidx],
+				       GELF_R_TYPE (rel_mem.r_info));
+
+		      if (gelf_update_rel (d, relidx, &rel_mem) == 0)
+			INTERNAL_ERROR (fname);
+		    }
+		}
+	    else
+	      for (size_t relidx = 0; relidx < nrels; ++relidx)
+		{
+		  GElf_Rela rel_mem;
+		  if (gelf_getrela (d, relidx, &rel_mem) == NULL)
+		    INTERNAL_ERROR (fname);
+
+		  size_t symidx = GELF_R_SYM (rel_mem.r_info);
+		  if (newsymidx[symidx] != symidx)
+		    {
+		      rel_mem.r_info
+			= GELF_R_INFO (newsymidx[symidx],
+				       GELF_R_TYPE (rel_mem.r_info));
+
+		      if (gelf_update_rela (d, relidx, &rel_mem) == 0)
+			INTERNAL_ERROR (fname);
+		    }
+		}
+	    break;
+
+	  case SHT_HASH:
+	    if (no_symtab_updates ())
+	      break;
+
+	    /* We have to recompute the hash table.  */
+
+	    assert (shdr_info[cnt].idx > 0);
+
+	    /* The hash section in the new file.  */
+	    scn = elf_getscn (newelf, shdr_info[cnt].idx);
+
+	    /* The symbol table data.  */
+	    Elf_Data *symd = elf_getdata (elf_getscn (newelf,
+						      shdr_info[symtabidx].idx),
+					  NULL);
+	    assert (symd != NULL);
+
+	    /* The hash table data.  */
+	    Elf_Data *hashd = elf_getdata (scn, NULL);
+	    assert (hashd != NULL);
+
+	    if (shdr_info[cnt].shdr.sh_entsize == sizeof (Elf32_Word))
+	      {
+		/* Sane arches first.  */
+		Elf32_Word *bucket = (Elf32_Word *) hashd->d_buf;
+
+		size_t strshndx = shdr_info[symtabidx].old_sh_link;
+		size_t elsize = gelf_fsize (elf, ELF_T_SYM, 1,
+					    ehdr->e_version);
+
+		/* Adjust the nchain value.  The symbol table size
+		   changed.  We keep the same size for the bucket array.  */
+		bucket[1] = symd->d_size / elsize;
+		Elf32_Word nbucket = bucket[0];
+		bucket += 2;
+		Elf32_Word *chain = bucket + nbucket;
+
+		/* New size of the section.  */
+		hashd->d_size = ((2 + symd->d_size / elsize + nbucket)
+				 * sizeof (Elf32_Word));
+		update_section_size (hashd);
+
+		/* Clear the arrays.  */
+		memset (bucket, '\0',
+			(symd->d_size / elsize + nbucket)
+			* sizeof (Elf32_Word));
+
+		for (size_t inner = shdr_info[symtabidx].shdr.sh_info;
+		     inner < symd->d_size / elsize; ++inner)
+		  {
+		    GElf_Sym sym_mem;
+		    GElf_Sym *sym = gelf_getsym (symd, inner, &sym_mem);
+		    assert (sym != NULL);
+
+		    const char *name = elf_strptr (elf, strshndx,
+						   sym->st_name);
+		    assert (name != NULL);
+		    size_t hidx = elf_hash (name) % nbucket;
+
+		    if (bucket[hidx] == 0)
+		      bucket[hidx] = inner;
+		    else
+		      {
+			hidx = bucket[hidx];
+
+			while (chain[hidx] != 0)
+			  hidx = chain[hidx];
+
+			chain[hidx] = inner;
+		      }
+		  }
+	      }
+	    else
+	      {
+		/* Alpha and S390 64-bit use 64-bit SHT_HASH entries.  */
+		assert (shdr_info[cnt].shdr.sh_entsize
+			== sizeof (Elf64_Xword));
+
+		Elf64_Xword *bucket = (Elf64_Xword *) hashd->d_buf;
+
+		size_t strshndx = shdr_info[symtabidx].old_sh_link;
+		size_t elsize = gelf_fsize (elf, ELF_T_SYM, 1,
+					    ehdr->e_version);
+
+		/* Adjust the nchain value.  The symbol table size
+		   changed.  We keep the same size for the bucket array.  */
+		bucket[1] = symd->d_size / elsize;
+		Elf64_Xword nbucket = bucket[0];
+		bucket += 2;
+		Elf64_Xword *chain = bucket + nbucket;
+
+		/* New size of the section.  */
+		hashd->d_size = ((2 + symd->d_size / elsize + nbucket)
+				 * sizeof (Elf64_Xword));
+		update_section_size (hashd);
+
+		/* Clear the arrays.  */
+		memset (bucket, '\0',
+			(symd->d_size / elsize + nbucket)
+			* sizeof (Elf64_Xword));
+
+		for (size_t inner = shdr_info[symtabidx].shdr.sh_info;
+		     inner < symd->d_size / elsize; ++inner)
+		  {
+		    GElf_Sym sym_mem;
+		    GElf_Sym *sym = gelf_getsym (symd, inner, &sym_mem);
+		    assert (sym != NULL);
+
+		    const char *name = elf_strptr (elf, strshndx,
+						   sym->st_name);
+		    assert (name != NULL);
+		    size_t hidx = elf_hash (name) % nbucket;
+
+		    if (bucket[hidx] == 0)
+		      bucket[hidx] = inner;
+		    else
+		      {
+			hidx = bucket[hidx];
+
+			while (chain[hidx] != 0)
+			  hidx = chain[hidx];
+
+			chain[hidx] = inner;
+		      }
+		  }
+	      }
+	    break;
+
+	  case SHT_GNU_versym:
+	    /* If the symbol table changed we have to adjust the entries.  */
+	    if (no_symtab_updates ())
+	      break;
+
+	    assert (shdr_info[cnt].idx > 0);
+
+	    /* The symbol version section in the new file.  */
+	    scn = elf_getscn (newelf, shdr_info[cnt].idx);
+
+	    /* The symbol table data.  */
+	    symd = elf_getdata (elf_getscn (newelf, shdr_info[symtabidx].idx),
+				NULL);
+	    assert (symd != NULL);
+
+	    /* The version symbol data.  */
+	    Elf_Data *verd = elf_getdata (scn, NULL);
+	    assert (verd != NULL);
+
+	    /* The symbol version array.  */
+	    GElf_Half *verstab = (GElf_Half *) verd->d_buf;
+
+	    /* Walk through the list and */
+	    size_t elsize = gelf_fsize (elf, verd->d_type, 1,
+					ehdr->e_version);
+	    for (size_t inner = 1; inner < verd->d_size / elsize; ++inner)
+	      if (newsymidx[inner] != 0)
+		/* Overwriting the same array works since the
+		   reordering can only move entries to lower indices
+		   in the array.  */
+		verstab[newsymidx[inner]] = verstab[inner];
+
+	    /* New size of the section.  */
+	    verd->d_size = gelf_fsize (newelf, verd->d_type,
+				       symd->d_size
+				       / gelf_fsize (elf, symd->d_type, 1,
+						     ehdr->e_version),
+				       ehdr->e_version);
+	    update_section_size (verd);
+	    break;
+
+	  case SHT_GROUP:
+	    if (no_symtab_updates ())
+	      break;
+
+	    /* Yes, the symbol table changed.
+	       Update the section header of the section group.  */
+	    scn = elf_getscn (newelf, shdr_info[cnt].idx);
+	    GElf_Shdr shdr_mem;
+	    GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+	    assert (shdr != NULL);
+
+	    shdr->sh_info = newsymidx[shdr->sh_info];
+
+	    (void) gelf_update_shdr (scn, shdr);
+	    break;
+	  }
+      }
 
   /* Now that we have done all adjustments to the data,
      we can actually write out the debug file.  */
@@ -1659,7 +1697,11 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	 table indices.  */
       if (any_symtab_changes)
 	for (cnt = 1; cnt <= shdridx; ++cnt)
-	  free (shdr_info[cnt].newsymidx);
+	  {
+	    free (shdr_info[cnt].newsymidx);
+	    if (shdr_info[cnt].debug_data != NULL)
+	      free (shdr_info[cnt].debug_data->d_buf);
+	  }
 
       /* Free the memory.  */
       if ((shnum + 2) * sizeof (struct shdr_info) > MAX_STACK_ALLOC)

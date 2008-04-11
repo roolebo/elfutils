@@ -1,3 +1,16 @@
+2008-04-10  Roland McGrath  <roland@redhat.com>
+
+	* testfile48.bz2, testfile48.bz2.debug: New data files.
+	* Makefile.am (EXTRA_DIST): Add them.
+	* run-strip-test8.sh: Use them.
+
+	* testfile16.bz2, testfile16.debug.bz2: Replace data files.
+
+	* run-strip-test.sh: Fail if stripped output has ".debug_*" sections.
+	* run-strip-test8.sh: New file.
+	* testfile47.bz2: New data file.
+	* Makefile.am (TESTS, EXTRA_DIST): Add them.
+
 2008-03-31  Roland McGrath  <roland@redhat.com>
 
 	* run-early-offscn.sh: New file.

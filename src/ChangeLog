@@ -1,3 +1,22 @@
+2008-04-10  Roland McGrath  <roland@redhat.com>
+
+	* strip.c (handle_elf): Don't keep sections that kept symbol tables
+	refer to.  Instead, just be sure to preserve the original symbol
+	table in the debug file so those symbols go with their sections and
+	can be elided from the stripped version of the symbol table.
+
+	* strip.c (handle_elf): When a discarded section kept in the debug
+	file refers to a nondiscard section via sh_link/sh_info, preserve
+	that nondiscarded section unmodified in the debug file as well.
+	Skip adjustment of discarded sections symbol table references when
+	that symbol table is copied in this way.
+
+	* elflint.c (check_symtab): Don't crash from missing symbol names
+	after diagnosing bogus strtab.
+
+	* strip.c (handle_elf): Cosmetic cleanup in special section contents
+	adjustment for symtab changes.
+
 2008-03-31  Roland McGrath  <roland@redhat.com>
 
 	* elflint.c (check_sections): Add checks on SHF_EXECINSTR sections:

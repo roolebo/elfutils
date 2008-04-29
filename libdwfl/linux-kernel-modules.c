@@ -1,5 +1,5 @@
 /* Standard libdwfl callbacks for debugging the running Linux kernel.
-   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -192,9 +192,9 @@ report_kernel (Dwfl *dwfl, const char **release,
 						      fname, fd, 0);
 	  if (mod == NULL)
 	    result = -1;
-
-	  /* The kernel is ET_EXEC, but always treat it as relocatable.  */
-	  mod->e_type = ET_DYN;
+	  else
+	    /* The kernel is ET_EXEC, but always treat it as relocatable.  */
+	    mod->e_type = ET_DYN;
 	}
 
       if (!report || result < 0)

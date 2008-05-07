@@ -281,7 +281,7 @@ dwfl_linux_kernel_report_offline (Dwfl *dwfl, const char *release,
 	    return errno;
 	}
 
-      FTS *fts = fts_open (modulesdir, FTS_NOSTAT, NULL);
+      FTS *fts = fts_open (modulesdir, FTS_NOSTAT | FTS_LOGICAL, NULL);
       if (modulesdir[0] == (char *) release)
 	modulesdir[0] = NULL;
       if (fts == NULL)
@@ -296,6 +296,7 @@ dwfl_linux_kernel_report_offline (Dwfl *dwfl, const char *release,
 	  switch (f->fts_info)
 	    {
 	    case FTS_F:
+	    case FTS_SL:
 	    case FTS_NSOK:
 	      /* See if this file name matches "*.ko".  */
 	      if (f->fts_namelen > 3
@@ -345,6 +346,7 @@ dwfl_linux_kernel_report_offline (Dwfl *dwfl, const char *release,
 	      result = f->fts_errno;
 	      break;
 
+	    case FTS_SLNONE:
 	    default:
 	      continue;
 	    }
@@ -494,7 +496,7 @@ check_module_notes (Dwfl_Module *mod)
   if (asprintf (&dirs[0], MODNOTESFMT, mod->name) < 0)
     return ENOMEM;
 
-  FTS *fts = fts_open (dirs, FTS_NOSTAT, NULL);
+  FTS *fts = fts_open (dirs, FTS_NOSTAT | FTS_LOGICAL, NULL);
   if (fts == NULL)
     {
       free (dirs[0]);
@@ -508,6 +510,7 @@ check_module_notes (Dwfl_Module *mod)
       switch (f->fts_info)
 	{
 	case FTS_F:
+	case FTS_SL:
 	case FTS_NSOK:
 	  result = check_notes (mod, f->fts_accpath, 0, f->fts_name);
 	  if (result > 0)	/* Nothing found.  */
@@ -523,6 +526,7 @@ check_module_notes (Dwfl_Module *mod)
 	  break;
 
 	case FTS_NS:
+	case FTS_SLNONE:
 	default:
 	  continue;
 	}
@@ -607,7 +611,7 @@ dwfl_linux_kernel_find_elf (Dwfl_Module *mod,
   if (asprintf (&modulesdir[0], MODULEDIRFMT, release) < 0)
     return -1;
 
-  FTS *fts = fts_open (modulesdir, FTS_NOSTAT, NULL);
+  FTS *fts = fts_open (modulesdir, FTS_NOSTAT | FTS_LOGICAL, NULL);
   if (fts == NULL)
     {
       free (modulesdir[0]);
@@ -657,6 +661,7 @@ dwfl_linux_kernel_find_elf (Dwfl_Module *mod,
       switch (f->fts_info)
 	{
 	case FTS_F:
+	case FTS_SL:
 	case FTS_NSOK:
 	  /* See if this file name is "MODULE_NAME.ko".  */
 	  if (f->fts_namelen == namelen + 3
@@ -685,6 +690,7 @@ dwfl_linux_kernel_find_elf (Dwfl_Module *mod,
 	  error = f->fts_errno;
 	  break;
 
+	case FTS_SLNONE:
 	default:
 	  break;
 	}

@@ -1,3 +1,17 @@
+2008-05-06  Roland McGrath  <roland@frob.com>
+
+	* linux-kernel-modules.c (dwfl_linux_kernel_report_offline): Use
+	FTS_LOGICAL here too.
+	(dwfl_linux_kernel_find_elf): Likewise.
+
+2008-04-29  Roland McGrath  <roland@redhat.com>
+
+	* find-debuginfo.c (dwfl_standard_find_debuginfo): Try path search
+	based on canonicalize_file_name if it differs from the supplied name.
+
+	* linux-kernel-modules.c (check_module_notes): Use FTS_LOGICAL so
+	we accept symlinks.
+
 2008-04-27  Roland McGrath  <roland@redhat.com>
 
 	* linux-kernel-modules.c (report_kernel): Fix crash when

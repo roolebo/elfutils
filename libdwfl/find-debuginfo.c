@@ -1,5 +1,5 @@
 /* Standard find_debuginfo callback for libdwfl.
-   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -242,7 +242,23 @@ dwfl_standard_find_debuginfo (Dwfl_Module *mod,
     }
 
   /* Failing that, search the path by name.  */
-  return find_debuginfo_in_path (mod, file_name, debuglink_file, debuglink_crc,
-				 debuginfo_file_name);
+  int fd = find_debuginfo_in_path (mod, file_name,
+				   debuglink_file, debuglink_crc,
+				   debuginfo_file_name);
+
+  if (fd < 0 && errno == 0)
+    {
+      /* If FILE_NAME is a symlink, the debug file might be associated
+	 with the symlink target name instead.  */
+
+      char *canon = canonicalize_file_name (file_name);
+      if (canon != NULL && strcmp (file_name, canon))
+	fd = find_debuginfo_in_path (mod, canon,
+				     debuglink_file, debuglink_crc,
+				     debuginfo_file_name);
+      free (canon);
+    }
+
+  return fd;
 }
 INTDEF (dwfl_standard_find_debuginfo)

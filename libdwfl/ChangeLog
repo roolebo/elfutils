@@ -1,3 +1,7 @@
+2008-05-22  Petr Machata  <pmachata@redhat.com>
+
+	* dwfl_module_getdwarf.c (open_elf): Bias of ET_EXEC files is always 0.
+
 2008-05-06  Roland McGrath  <roland@frob.com>
 
 	* linux-kernel-modules.c (dwfl_linux_kernel_report_offline): Use

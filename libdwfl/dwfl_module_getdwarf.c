@@ -81,20 +81,25 @@ open_elf (Dwfl_Module *mod, struct dwfl_file *file)
       return DWFL_E_LIBELF;
     }
 
+  /* The addresses in an ET_EXEC file are absolute.  The lowest p_vaddr of
+     the main file can differ from that of the debug file due to prelink.
+     But that doesn't not change addresses that symbols, debuginfo, or
+     sh_addr of any program sections refer to.  */
   file->bias = 0;
-  for (uint_fast16_t i = 0; i < ehdr->e_phnum; ++i)
-    {
-      GElf_Phdr ph_mem;
-      GElf_Phdr *ph = gelf_getphdr (file->elf, i, &ph_mem);
-      if (ph == NULL)
-	goto elf_error;
-      if (ph->p_type == PT_LOAD)
-	{
-	  file->bias = ((mod->low_addr & -ph->p_align)
-			- (ph->p_vaddr & -ph->p_align));
-	  break;
-	}
-    }
+  if (mod->e_type != ET_EXEC)
+    for (uint_fast16_t i = 0; i < ehdr->e_phnum; ++i)
+      {
+	GElf_Phdr ph_mem;
+	GElf_Phdr *ph = gelf_getphdr (file->elf, i, &ph_mem);
+	if (ph == NULL)
+	  goto elf_error;
+	if (ph->p_type == PT_LOAD)
+	  {
+	    file->bias = ((mod->low_addr & -ph->p_align)
+			  - (ph->p_vaddr & -ph->p_align));
+	    break;
+	  }
+      }
 
   mod->e_type = ehdr->e_type;
 

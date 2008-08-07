@@ -1,5 +1,5 @@
-/* Describe known auxv types.
-   Copyright (C) 2007, 2008 Red Hat, Inc.
+/* Return system call ABI mapped to DWARF register numbers.
+   Copyright (C) 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -51,72 +51,16 @@
 # include <config.h>
 #endif
 
-#include <assert.h>
-#include <byteswap.h>
-#include <endian.h>
-#include <inttypes.h>
-#include <stdio.h>
-#include <stddef.h>
 #include <libeblP.h>
 
-#define AUXV_TYPES							      \
-  TYPE (NULL, "")							      \
-  TYPE (IGNORE, "")							      \
-  TYPE (EXECFD, "d")							      \
-  TYPE (EXECFN, "s")							      \
-  TYPE (PHDR, "p")							      \
-  TYPE (PHENT, "u")							      \
-  TYPE (PHNUM, "u")							      \
-  TYPE (PAGESZ, "u")							      \
-  TYPE (BASE, "p")							      \
-  TYPE (FLAGS, "x")							      \
-  TYPE (ENTRY, "p")							      \
-  TYPE (NOTELF, "")							      \
-  TYPE (UID, "u")							      \
-  TYPE (EUID, "u")							      \
-  TYPE (GID, "u")							      \
-  TYPE (EGID, "u")							      \
-  TYPE (CLKTCK, "u")							      \
-  TYPE (PLATFORM, "s")							      \
-  TYPE (HWCAP, "x")							      \
-  TYPE (FPUCW, "x")							      \
-  TYPE (DCACHEBSIZE, "d")						      \
-  TYPE (ICACHEBSIZE, "d")						      \
-  TYPE (UCACHEBSIZE, "d")						      \
-  TYPE (IGNOREPPC, "")							      \
-  TYPE (SECURE, "u")							      \
-  TYPE (SYSINFO, "p")							      \
-  TYPE (SYSINFO_EHDR, "p")						      \
-  TYPE (L1I_CACHESHAPE, "d")						      \
-  TYPE (L1D_CACHESHAPE, "d")						      \
-  TYPE (L2_CACHESHAPE, "d")						      \
-  TYPE (L3_CACHESHAPE, "d")
-
-static const struct
-{
-  const char *name, *format;
-} auxv_types[] =
-  {
-#define TYPE(name, fmt) [AT_##name] = { #name, fmt },
-    AUXV_TYPES
-#undef	TYPE
-  };
-#define nauxv_types (sizeof auxv_types / sizeof auxv_types[0])
 
 int
-ebl_auxv_info (ebl, a_type, name, format)
+ebl_syscall_abi (ebl, sp, pc, callno, args)
      Ebl *ebl;
-     GElf_Xword a_type;
-     const char **name;
-     const char **format;
+     int *sp;
+     int *pc;
+     int *callno;
+     int args[6];
 {
-  int result = ebl->auxv_info (a_type, name, format);
-  if (result == 0 && a_type < nauxv_types && auxv_types[a_type].name != NULL)
-    {
-      /* The machine specific function did not know this type.  */
-      *name = auxv_types[a_type].name;
-      *format = auxv_types[a_type].format;
-      result = 1;
-    }
-  return result;
+  return ebl != NULL ? ebl->syscall_abi (ebl, sp, pc, callno, args) : -1;
 }

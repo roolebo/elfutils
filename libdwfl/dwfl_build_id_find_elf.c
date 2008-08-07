@@ -119,6 +119,13 @@ __libdwfl_open_by_build_id (Dwfl_Module *mod, bool debug, char **file_name)
       free (name);
     }
 
+  /* If we simply found nothing, clear errno.  If we had some other error
+     with the file, report that.  Possibly this should treat other errors
+     like ENOENT too.  But ignoring all errors could mask some that should
+     be reported.  */
+  if (fd < 0 && errno == ENOENT)
+    errno = 0;
+
   return fd;
 }
 

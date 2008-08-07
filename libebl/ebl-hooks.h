@@ -158,6 +158,10 @@ ssize_t EBLHOOK(register_info) (Ebl *ebl,
 				const char **prefix, const char **setname,
 				int *bits, int *type);
 
+/* Return system call ABI registers.  */
+int EBLHOOK(syscall_abi) (Ebl *ebl, int *sp, int *pc,
+			  int *callno, int args[6]);
+
 /* Disassembler function.  */
 int EBLHOOK(disasm) (const uint8_t **startp, const uint8_t *end,
 		     GElf_Addr addr, const char *fmt, DisasmOutputCB_t outcb,

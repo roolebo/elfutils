@@ -1,7 +1,6 @@
-/* Initialization of PPC64 specific backend library.
-   Copyright (C) 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
+/* Linux/i386 system call ABI in DWARF register numbers.
+   Copyright (C) 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by the
@@ -28,39 +27,21 @@
 # include <config.h>
 #endif
 
-#define BACKEND		ppc64_
-#define RELOC_PREFIX	R_PPC64_
+#define BACKEND i386_
 #include "libebl_CPU.h"
 
-/* This defines the common reloc hooks based on ppc64_reloc.def.  */
-#include "common-reloc.c"
-
-
-const char *
-ppc64_init (elf, machine, eh, ehlen)
-     Elf *elf __attribute__ ((unused));
-     GElf_Half machine __attribute__ ((unused));
-     Ebl *eh;
-     size_t ehlen;
+int
+i386_syscall_abi (Ebl *ebl __attribute__ ((unused)),
+		  int *sp, int *pc, int *callno, int args[6])
 {
-  /* Check whether the Elf_BH object has a sufficent size.  */
-  if (ehlen < sizeof (Ebl))
-    return NULL;
-
-  /* We handle it.  */
-  eh->name = "PowerPC 64-bit";
-  ppc64_init_reloc (eh);
-  HOOK (eh, reloc_simple_type);
-  HOOK (eh, dynamic_tag_name);
-  HOOK (eh, dynamic_tag_check);
-  HOOK (eh, copy_reloc_p);
-  HOOK (eh, check_special_symbol);
-  HOOK (eh, bss_plt_p);
-  HOOK (eh, return_value_location);
-  HOOK (eh, register_info);
-  HOOK (eh, syscall_abi);
-  HOOK (eh, core_note);
-  HOOK (eh, auxv_info);
-
-  return MODVERSION;
+  *sp = 4;			/* %esp */
+  *pc = 8;			/* %eip */
+  *callno = 0;			/* %eax */
+  args[0] = 3;			/* %ebx */
+  args[1] = 1;			/* %ecx */
+  args[2] = 2;			/* %edx */
+  args[3] = 6;			/* %esi */
+  args[4] = 7;			/* %edi */
+  args[5] = 5;			/* %ebp */
+  return 0;
 }

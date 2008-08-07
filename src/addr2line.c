@@ -1,5 +1,5 @@
 /* Locate source files and line information for given addresses
-   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -96,7 +96,7 @@ static const struct argp argp =
 
 
 /* Handle ADDR.  */
-static void handle_address (GElf_Addr addr, Dwfl *dwfl);
+static int handle_address (const char *addr, Dwfl *dwfl);
 
 
 /* True if only base names of files should be shown.  */
@@ -154,12 +154,7 @@ main (int argc, char *argv[])
 	  if (getline (&buf, &len, stdin) < 0)
 	    break;
 
-	  char *endp;
-	  uintmax_t addr = strtoumax (buf, &endp, 0);
-	  if (endp != buf)
-	    handle_address (addr, dwfl);
-	  else
-	    result = 1;
+	  result = handle_address (buf, dwfl);
 	}
 
       free (buf);
@@ -167,14 +162,7 @@ main (int argc, char *argv[])
   else
     {
       do
-	{
-	  char *endp;
-	  uintmax_t addr = strtoumax (argv[remaining], &endp, 0);
-	  if (endp != argv[remaining])
-	    handle_address (addr, dwfl);
-	  else
-	    result = 1;
-	}
+	result = handle_address (argv[remaining], dwfl);
       while (++remaining < argc);
     }
 
@@ -328,9 +316,131 @@ print_addrsym (Dwfl_Module *mod, GElf_Addr addr)
     printf ("%s+%#" PRIx64 "\n", name, addr - s.st_value);
 }
 
-static void
-handle_address (GElf_Addr addr, Dwfl *dwfl)
+static int
+see_one_module (Dwfl_Module *mod,
+		void **userdata __attribute__ ((unused)),
+		const char *name __attribute__ ((unused)),
+		Dwarf_Addr start __attribute__ ((unused)),
+		void *arg)
 {
+  Dwfl_Module **result = arg;
+  if (*result != NULL)
+    return DWARF_CB_ABORT;
+  *result = mod;
+  return DWARF_CB_OK;
+}
+
+static int
+find_symbol (Dwfl_Module *mod,
+	     void **userdata __attribute__ ((unused)),
+	     const char *name __attribute__ ((unused)),
+	     Dwarf_Addr start __attribute__ ((unused)),
+	     void *arg)
+{
+  const char *looking_for = ((void **) arg)[0];
+  GElf_Sym *symbol = ((void **) arg)[1];
+
+  int n = dwfl_module_getsymtab (mod);
+  for (int i = 1; i < n; ++i)
+    {
+      const char *symbol_name = dwfl_module_getsym (mod, i, symbol, NULL);
+      if (symbol_name == NULL)
+	continue;
+      switch (GELF_ST_TYPE (symbol->st_info))
+	{
+	case STT_SECTION:
+	case STT_FILE:
+	case STT_TLS:
+	  break;
+	default:
+	  if (!strcmp (symbol_name, looking_for))
+	    {
+	      ((void **) arg)[0] = NULL;
+	      return DWARF_CB_ABORT;
+	    }
+	}
+    }
+
+  return DWARF_CB_OK;
+}
+
+static int
+handle_address (const char *string, Dwfl *dwfl)
+{
+  char *endp;
+  uintmax_t addr = strtoumax (string, &endp, 0);
+  if (endp == string)
+    {
+      bool parsed = false;
+      int n;
+      char *name = NULL;
+      if (sscanf (string, "(%m[^)])%" PRIiMAX "%n", &name, &addr, &n) == 2
+	  && string[n] == '\0')
+	{
+	  /* It was (section)+offset.  This makes sense if there is
+	     only one module to look in for a section.  */
+	  Dwfl_Module *mod = NULL;
+	  if (dwfl_getmodules (dwfl, &see_one_module, &mod, 0) != 0
+	      || mod == NULL)
+	    error (EXIT_FAILURE, 0, gettext ("Section syntax requires"
+					     " exactly one module"));
+
+	  int nscn = dwfl_module_relocations (mod);
+	  for (int i = 0; i < nscn; ++i)
+	    {
+	      GElf_Word shndx;
+	      const char *scn = dwfl_module_relocation_info (mod, i, &shndx);
+	      if (unlikely (scn == NULL))
+		break;
+	      if (!strcmp (scn, name))
+		{
+		  /* Found the section.  */
+		  GElf_Shdr shdr_mem;
+		  GElf_Addr shdr_bias;
+		  GElf_Shdr *shdr = gelf_getshdr
+		    (elf_getscn (dwfl_module_getelf (mod, &shdr_bias), shndx),
+		     &shdr_mem);
+		  if (unlikely (shdr == NULL))
+		    break;
+
+		  if (addr >= shdr->sh_size)
+		    error (0, 0,
+			   gettext ("offset %#" PRIxMAX " lies outside"
+				    " section '%s'"),
+			   addr, scn);
+
+		  addr += shdr->sh_addr + shdr_bias;
+		  parsed = true;
+		  break;
+		}
+	    }
+	}
+      else if (sscanf (string, "%m[^-+]%" PRIiMAX "%n", &name, &addr, &n) == 2
+	       && string[n] == '\0')
+	{
+	  /* It was symbol+offset.  */
+	  GElf_Sym sym;
+	  void *arg[2] = { name, &sym };
+	  (void) dwfl_getmodules (dwfl, &find_symbol, arg, 0);
+	  if (arg[0] != NULL)
+	    error (0, 0, gettext ("cannot find symbol '%s'"), name);
+	  else
+	    {
+	      if (sym.st_size != 0 && addr >= sym.st_size)
+		error (0, 0,
+		       gettext ("offset %#" PRIxMAX " lies outside"
+				" contents of '%s'"),
+		       addr, name);
+	      addr += sym.st_value;
+	      parsed = true;
+	    }
+	}
+
+      free (name);
+      if (!parsed)
+	return 1;
+    }
+
   Dwfl_Module *mod = dwfl_addrmodule (dwfl, addr);
 
   if (show_functions)
@@ -372,6 +482,8 @@ handle_address (GElf_Addr addr, Dwfl *dwfl)
     }
   else
     puts ("??:0");
+
+  return 0;
 }
 
 

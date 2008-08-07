@@ -118,8 +118,13 @@ static const Ebl_Register_Location spe_regs[] =
 
 #define PRSTATUS_REGSET_ITEMS						      \
   {									      \
+    .name = "nip", .type = ELF_T_ADDR, .format = 'x',			      \
+    .offset = offsetof (struct EBLHOOK(prstatus), pr_reg[32]),		      \
+    .group = "register"	       			  	       	 	      \
+  },								      	      \
+  {									      \
     .name = "orig_gpr3", .type = TYPE_LONG, .format = 'd',		      \
-    .offset = offsetof (struct EBLHOOK(prstatus), pr_reg) + (4 * 34),	      \
+    .offset = offsetof (struct EBLHOOK(prstatus), pr_reg[34]),		      \
     .group = "register"	       			  	       	 	      \
   }
 

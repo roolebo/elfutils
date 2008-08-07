@@ -1,3 +1,22 @@
+2008-08-01  Roland McGrath  <roland@redhat.com>
+
+	* linux-core-note.c (prstatus_items): Use 'B' instead of 'b'
+	for sigpend and sighold.
+
+2008-07-04  Roland McGrath  <roland@redhat.com>
+
+	* i386_syscall.c: New file.
+	* x86_64_syscall.c: New file.
+	* ppc_syscall.c: New file.
+	* Makefile.am (i386_SRCS, x86_64_SRCS, ppc_SRCS, ppc64_SRCS): Add them.
+	* i386_init.c (i386_init): Initialize syscall_abi hook.
+	* x86_64_init.c (x86_64_init): Likewise.
+	* ppc_init.c (ppc_init): Likewise.
+	* ppc64_init.c (ppc64_init): Likewise.
+
+	* ppc_corenote.c (PRSTATUS_REGSET_ITEMS): Add nip.
+	Fix offset calculation for 64-bit case.
+
 2008-04-04  Roland McGrath  <roland@redhat.com>
 
 	* alpha_symbol.c (alpha_check_special_section): New function.

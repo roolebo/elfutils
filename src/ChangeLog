@@ -1,3 +1,30 @@
+2008-08-07  Roland McGrath  <roland@redhat.com>
+
+	* addr2line.c (main): Pass string to handle_address.
+	(see_one_module): New function, subroutine of handle_address.
+	(find_symbol): Likewise.
+	(handle_address): Take string argument rather than address.
+	Convert plain number, or handle strings like "(section)+offset"
+	or "symbol+offset".
+
+2008-08-01  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (handle_core_item): Handle 'B' type for 1-origin bitset.
+	For 'b' and 'B', print <x-y,z> or ~<x,y-z> rather than 1/0 string.
+
+	* readelf.c (convert): Take new argument SIZE.
+	(handle_core_register, handle_core_item): Update callers.
+	(handle_core_item): Take new arg REPEATED_SIZE.
+	(handle_core_items): Special case for a singleton item,
+	let handle_core_item handle repeats if it wants to.
+
+	* readelf.c (handle_core_items): Give abridged output
+	for identical groups repeated more than twice.
+
+2008-07-04  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (handle_core_items): Handle ELF_T_ADDR.
+
 2008-04-10  Roland McGrath  <roland@redhat.com>
 
 	* strip.c (handle_elf): Don't keep sections that kept symbol tables

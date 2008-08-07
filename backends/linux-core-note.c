@@ -1,5 +1,5 @@
 /* Common core note type descriptions for Linux.
-   Copyright (C) 2007 Red Hat, Inc.
+   Copyright (C) 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -118,8 +118,8 @@ static const Ebl_Core_Item prstatus_items[] =
     FIELD (signal, INT, info.si_code, 'd'),
     FIELD (signal, INT, info.si_errno, 'd'),
     FIELD (signal, SHORT, cursig, 'd'),
-    FIELD (signal, ULONG, sigpend, 'b'),
-    FIELD (signal, ULONG, sighold, 'b'),
+    FIELD (signal, ULONG, sigpend, 'B'),
+    FIELD (signal, ULONG, sighold, 'B'),
     FIELD (identity, PID_T, pid, 'd', .thread_identifier = true),
     FIELD (identity, PID_T, ppid, 'd'),
     FIELD (identity, PID_T, pgrp, 'd'),

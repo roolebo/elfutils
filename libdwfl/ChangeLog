@@ -1,3 +1,17 @@
+2008-08-03  Roland McGrath  <roland@redhat.com>
+
+	* linux-kernel-modules.c: Include <fts.h> before <config.h>.
+
+2008-07-17  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_build_id_find_elf.c (__libdwfl_open_by_build_id): Set errno to
+	zero if the failure was only ENOENT.
+
+2008-06-03  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_addrsym.c (dwfl_module_addrsym): Exclude undefined
+	symbols.
+
 2008-05-22  Petr Machata  <pmachata@redhat.com>
 
 	* dwfl_module_getdwarf.c (open_elf): Bias of ET_EXEC files is always 0.

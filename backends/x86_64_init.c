@@ -53,6 +53,7 @@ x86_64_init (elf, machine, eh, ehlen)
   HOOK (eh, core_note);
   HOOK (eh, return_value_location);
   HOOK (eh, register_info);
+  HOOK (eh, syscall_abi);
   HOOK (eh, auxv_info);
   HOOK (eh, disasm);
 

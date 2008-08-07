@@ -1,3 +1,19 @@
+2008-07-28  Roland McGrath  <roland@redhat.com>
+
+	* eblauxvinfo.c (AUXV_TYPES): Add EXECFN.
+
+	* eblauxvinfo.c (ebl_auxv_info): Handle missing elements of standard
+	table.
+
+2008-07-04  Roland McGrath  <roland@redhat.com>
+
+	* libebl.h: Declare ebl_syscall_abi.
+	* ebl_syscall_abi.c: New file.
+	* Makefile.am (gen_SOURCES): Add it.
+	* ebl-hooks.h: New hook syscall_abi.
+	* eblopenbackend.c (default_syscall_abi): New function.
+	(fill_defaults): Use it.
+
 2008-03-31  Roland McGrath  <roland@redhat.com>
 
 	* ebldynamictagname.c (ebl_dynamic_tag_name): Use hex for unknown tag.

@@ -47,8 +47,12 @@
    Network licensing program, please visit www.openinventionnetwork.com
    <http://www.openinventionnetwork.com>.  */
 
+/* We include this before config.h because it can't handle _FILE_OFFSET_BITS.
+   Everything we need here is fine if its declarations just come first.  */
+
+#include <fts.h>
+
 #include <config.h>
-#undef	_FILE_OFFSET_BITS	/* Doesn't jibe with fts.  */
 
 #include "libdwflP.h"
 #include <inttypes.h>
@@ -60,7 +64,6 @@
 #include <sys/utsname.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <fts.h>
 
 
 #define KERNEL_MODNAME	"kernel"

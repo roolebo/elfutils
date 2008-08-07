@@ -5389,13 +5389,13 @@ print_core_item (unsigned int colno, char sep, unsigned int wrap,
 
 static const void *
 convert (Elf *core, Elf_Type type, uint_fast16_t count,
-	 void *value, const void *data)
+	 void *value, const void *data, size_t size)
 {
   Elf_Data valuedata =
     {
       .d_type = type,
       .d_buf = value,
-      .d_size = gelf_fsize (core, type, count, EV_CURRENT),
+      .d_size = size ?: gelf_fsize (core, type, count, EV_CURRENT),
       .d_version = EV_CURRENT,
     };
   Elf_Data indata =
@@ -5420,7 +5420,7 @@ typedef uint8_t GElf_Byte;
 
 static unsigned int
 handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
-		  unsigned int colno)
+		  unsigned int colno, size_t *repeated_size)
 {
   uint_fast16_t count = item->count ?: 1;
 
@@ -5436,13 +5436,33 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
   union { TYPES; } value;
 #undef DO_TYPE
 
-  desc = convert (core, item->type, count, &value, desc + item->offset);
+  void *data = &value;
+  size_t size = gelf_fsize (core, item->type, count, EV_CURRENT);
+  size_t convsize = size;
+  if (repeated_size != NULL)
+    {
+      if (*repeated_size > size && (item->format == 'b' || item->format == 'B'))
+	{
+	  data = alloca (*repeated_size);
+	  count *= *repeated_size / size;
+	  convsize = count * size;
+	  *repeated_size -= convsize;
+	}
+      else
+	*repeated_size -= size;
+    }
+
+  desc = convert (core, item->type, count, data, desc + item->offset, convsize);
+
+  Elf_Type type = item->type;
+  if (type == ELF_T_ADDR)
+    type = gelf_getclass (core) == ELFCLASS32 ? ELF_T_WORD : ELF_T_XWORD;
 
   switch (item->format)
     {
     case 'd':
       assert (count == 1);
-      switch (item->type)
+      switch (type)
 	{
 #define DO_TYPE(NAME, Name, hex, dec, max)				      \
 	  case ELF_T_##NAME:						      \
@@ -5458,7 +5478,7 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
 
     case 'x':
       assert (count == 1);
-      switch (item->type)
+      switch (type)
 	{
 #define DO_TYPE(NAME, Name, hex, dec, max)				      \
 	  case ELF_T_##NAME:						      \
@@ -5473,30 +5493,59 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
       break;
 
     case 'b':
-      assert (count == 1);
-      Dwarf_Word bits = 0;
-      Dwarf_Word bit = 0;
-      switch (item->type)
-	{
-#define DO_TYPE(NAME, Name, hex, dec, max)				\
-	  case ELF_T_##NAME:						      \
-	    bits = value.Name[0];					      \
-	    bit = (Dwarf_Word) 1 << ((sizeof value.Name[0] * 8) - 1);	      \
-	    break
-	  TYPES;
-#undef DO_TYPE
-	default:
-	  abort ();
-	}
-      char printed[sizeof (Dwarf_Word) * 8 + 1];
-      int i = 0;
-      while (bit != 0)
-	{
-	  printed[i++] = (bits & bit) ? '1' : '0';
-	  bit >>= 1;
-	}
-      colno = print_core_item (colno, ',', ITEM_WRAP_COLUMN, 0, item->name,
-			       sizeof printed - 1, "%.*s", i, printed);
+    case 'B':
+      assert (size % sizeof (unsigned int) == 0);
+      unsigned int nbits = count * size * 8;
+      unsigned int pop = 0;
+      for (const unsigned int *i = data; (void *) i < data + count * size; ++i)
+	pop += __builtin_popcount (*i);
+      bool negate = pop > nbits / 2;
+      const unsigned int bias = item->format == 'b';
+
+      {
+	char printed[(negate ? nbits - pop : pop) * 16];
+	char *p = printed;
+	*p = '\0';
+
+	if (BYTE_ORDER != LITTLE_ENDIAN && size > sizeof (unsigned int))
+	  {
+	    assert (size == sizeof (unsigned int) * 2);
+	    for (unsigned int *i = data;
+		 (void *) i < data + count * size; i += 2)
+	      {
+		unsigned int w = i[1];
+		i[1] = i[0];
+		i[0] = w;
+	      }
+	  }
+
+	unsigned int lastbit = 0;
+	for (const unsigned int *i = data;
+	     (void *) i < data + count * size; ++i)
+	  {
+	    unsigned int bit = ((void *) i - data) * 8;
+	    unsigned int w = negate ? ~*i : *i;
+	    while (w != 0)
+	      {
+		int n = ffs (w);
+		w >>= n;
+		bit += n;
+
+		if (lastbit + 1 != bit)
+		  p += sprintf (p, "-%u,%u", lastbit - bias, bit - bias);
+		else if (lastbit == 0)
+		  p += sprintf (p, "%u", bit - bias);
+
+		lastbit = bit;
+	      }
+	  }
+	if (lastbit > 0 && lastbit + 1 != nbits)
+	  p += sprintf (p, "-%u", nbits - bias);
+
+	colno = print_core_item (colno, ',', ITEM_WRAP_COLUMN, 0, item->name,
+				 4 + nbits * 4,
+				 negate ? "~<%s>" : "<%s>", printed);
+      }
       break;
 
     case 'T':
@@ -5505,7 +5554,7 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
       Dwarf_Word sec;
       Dwarf_Word usec;
       size_t maxfmt = 7;
-      switch (item->type)
+      switch (type)
 	{
 #define DO_TYPE(NAME, Name, hex, dec, max)				      \
 	  case ELF_T_##NAME:						      \
@@ -5615,6 +5664,17 @@ handle_core_items (Elf *core, const void *desc, size_t descsz,
   /* Write out all the groups.  */
   unsigned int colno = 0;
 
+  const void *last = desc;
+  if (nitems == 1)
+    {
+      size_t size = descsz;
+      colno = handle_core_item (core, sorted_items[0], desc, colno, &size);
+      if (size == 0)
+	return colno;
+      desc += descsz - size;
+      descsz = size;
+    }
+
   do
     {
       for (size_t i = 0; i < ngroups; ++i)
@@ -5624,7 +5684,7 @@ handle_core_items (Elf *core, const void *desc, size_t descsz,
 		&& ((*item)->group == groups[i][0]->group
 		    || !strcmp ((*item)->group, groups[i][0]->group)));
 	       ++item)
-	    colno = handle_core_item (core, *item, desc, colno);
+	    colno = handle_core_item (core, *item, desc, colno, NULL);
 
 	  /* Force a line break at the end of the group.  */
 	  colno = ITEM_WRAP_COLUMN;
@@ -5639,8 +5699,27 @@ handle_core_items (Elf *core, const void *desc, size_t descsz,
       const Ebl_Core_Item *item = &items[nitems - 1];
       size_t eltsz = item->offset + gelf_fsize (core, item->type,
 						item->count ?: 1, EV_CURRENT);
-      descsz -= eltsz;
-      desc += eltsz;
+
+      int reps = -1;
+      do
+	{
+	  ++reps;
+	  desc += eltsz;
+	  descsz -= eltsz;
+	}
+      while (descsz >= eltsz && !memcmp (desc, last, eltsz));
+
+      if (reps == 1)
+	{
+	  /* For just one repeat, print it unabridged twice.  */
+	  desc -= eltsz;
+	  descsz += eltsz;
+	}
+      else if (reps > 1)
+	printf (gettext ("\n%*s... <repeats %u more times> ..."),
+		ITEM_INDENT, "", reps);
+
+      last = desc;
     }
   while (descsz > 0);
 
@@ -5702,7 +5781,7 @@ handle_core_register (Ebl *ebl, Elf *core, int maxregname,
 	    {
 #define BITS(bits, xtype, sfmt, ufmt, max)				      \
 	    case bits:							      \
-	      desc = convert (core, ELF_T_##xtype, 1, &value, desc);	      \
+	      desc = convert (core, ELF_T_##xtype, 1, &value, desc, 0);	      \
 	      if (type == DW_ATE_signed)				      \
 		colno = print_core_item (colno, ' ', REGISTER_WRAP_COLUMN,    \
 					 maxregname, name,		      \
@@ -5717,7 +5796,7 @@ handle_core_register (Ebl *ebl, Elf *core, int maxregname,
 
 	    case 128:
 	      assert (type == DW_ATE_unsigned);
-	      desc = convert (core, ELF_T_XWORD, 2, &value, desc);
+	      desc = convert (core, ELF_T_XWORD, 2, &value, desc, 0);
 	      int be = elf_getident (core, NULL)[EI_DATA] == ELFDATA2MSB;
 	      colno = print_core_item (colno, ' ', REGISTER_WRAP_COLUMN,
 				       maxregname, name,

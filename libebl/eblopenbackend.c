@@ -212,6 +212,8 @@ static ssize_t default_register_info (Ebl *ebl,
 				      const char **prefix,
 				      const char **setname,
 				      int *bits, int *type);
+static int default_syscall_abi (Ebl *ebl, int *sp, int *pc,
+				int *callno, int args[6]);
 static bool default_check_object_attribute (Ebl *ebl, const char *vendor,
 					    int tag, uint64_t value,
 					    const char **tag_name,
@@ -253,6 +255,7 @@ fill_defaults (Ebl *result)
   result->bss_plt_p = default_bss_plt_p;
   result->return_value_location = default_return_value_location;
   result->register_info = default_register_info;
+  result->syscall_abi = default_syscall_abi;
   result->check_object_attribute = default_check_object_attribute;
   result->disasm = NULL;
   result->destr = default_destr;
@@ -716,6 +719,20 @@ default_register_info (Ebl *ebl __attribute__ ((unused)),
   *bits = -1;
   *type = DW_ATE_void;
   return snprintf (name, namelen, "reg%d", regno);
+}
+
+static int
+default_syscall_abi (Ebl *ebl __attribute__ ((unused)),
+		     int *sp, int *pc, int *callno, int args[6])
+{
+  *sp = *pc = *callno = -1;
+  args[0] = -1;
+  args[1] = -1;
+  args[2] = -1;
+  args[3] = -1;
+  args[4] = -1;
+  args[5] = -1;
+  return -1;
 }
 
 static bool

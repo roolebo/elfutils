@@ -1,3 +1,8 @@
+2008-08-15  Ulrich Drepper  <drepper@redhat.com>
+
+	* libelfP.h (LIBELF_CHECKED_LOCK): Use dummy definition also if
+	USE_TLS is not defined.
+
 2008-08-05  Petr Machata  <pmachata@redhat.com>
 
 	* elf_getdata.c, libelfP.h (__elf_getdata_internal):

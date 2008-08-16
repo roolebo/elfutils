@@ -626,7 +626,7 @@ extern uint32_t __libelf_crc32 (uint32_t crc, unsigned char *buf, size_t len)
 /* Align offset to 4 bytes as needed for note name and descriptor data.  */
 #define NOTE_ALIGN(n)	(((n) + 3) & -4U)
 
-#ifdef NDEBUG
+#if defined NDEBUG || !defined USE_TLS
 # define LIBELF_CHECKED_LOCK(V, S) ((void)(V))
 #else
 /* Checked locking primitives.  Prints out an error to stderr if the

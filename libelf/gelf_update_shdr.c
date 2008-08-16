@@ -68,11 +68,12 @@ gelf_update_shdr (Elf_Scn *scn, GElf_Shdr *src)
     return 0;
 
   elf = scn->elf;
-  rwlock_wrlock (elf->lock);
+  RWLOCK_WRLOCK (elf->lock);
 
   if (elf->class == ELFCLASS32)
     {
-      Elf32_Shdr *shdr = scn->shdr.e32 ?: INTUSE(elf32_getshdr) (scn);
+      Elf32_Shdr *shdr
+	= scn->shdr.e32 ?: __elf32_getshdr_internal (scn, LS_WRLOCKED);
 
       if (shdr == NULL)
 	{
@@ -106,7 +107,8 @@ gelf_update_shdr (Elf_Scn *scn, GElf_Shdr *src)
     }
   else
     {
-      Elf64_Shdr *shdr = scn->shdr.e64 ?: INTUSE(elf64_getshdr) (scn);
+      Elf64_Shdr *shdr
+	= scn->shdr.e64 ?: __elf64_getshdr_internal (scn, LS_WRLOCKED);
 
       if (shdr == NULL)
 	{
@@ -121,7 +123,7 @@ gelf_update_shdr (Elf_Scn *scn, GElf_Shdr *src)
   result = 1;
 
  out:
-  rwlock_unlock (elf->lock);
+  RWLOCK_UNLOCK (elf->lock);
 
   return result;
 }

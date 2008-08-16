@@ -79,7 +79,7 @@ elfw2(LIBELFBITS,newphdr) (elf, count)
       return NULL;
     }
 
-  rwlock_wrlock (elf->lock);
+  RWLOCK_WRLOCK (elf->lock);
 
   if (elf->class == 0)
     elf->class = ELFW(ELFCLASS,LIBELFBITS);
@@ -164,7 +164,7 @@ elfw2(LIBELFBITS,newphdr) (elf, count)
     }
 
  out:
-  rwlock_unlock (elf->lock);
+  RWLOCK_UNLOCK (elf->lock);
 
   return result;
 }

@@ -141,7 +141,7 @@ nlist (const char *filename, struct nlist *nl)
   /* SHDR->SH_LINK now contains the index of the string section.  */
 
   /* Get the data for the symbol section.  */
-  data = INTUSE(elf_getdata) (symscn, NULL);
+  data = __elf_getdata_internal (symscn, NULL, LS_UNLOCKED);
   if (data == NULL)
     goto fail_close;
 

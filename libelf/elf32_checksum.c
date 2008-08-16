@@ -150,7 +150,7 @@ elfw2(LIBELFBITS,checksum) (elf)
 	}
 
       /* Iterate through the list of data blocks.  */
-      while ((data = INTUSE(elf_getdata) (scn, data)) != NULL)
+      while ((data = __elf_getdata_internal (scn, data, LS_UNLOCKED)) != NULL)
 	/* If the file byte order is the same as the host byte order
 	   process the buffer directly.  If the data is just a stream
 	   of bytes which the library will not convert we can use it

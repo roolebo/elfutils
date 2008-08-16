@@ -83,7 +83,7 @@ gelf_update_lib (data, ndx, src)
     }
 
   Elf_Scn *scn = data_scn->s;
-  rwlock_wrlock (scn->elf->lock);
+  RWLOCK_WRLOCK (scn->elf->lock);
 
   /* Check whether we have to resize the data buffer.  */
   int result = 0;
@@ -99,7 +99,7 @@ gelf_update_lib (data, ndx, src)
       scn->flags |= ELF_F_DIRTY;
     }
 
-  rwlock_unlock (scn->elf->lock);
+  RWLOCK_UNLOCK (scn->elf->lock);
 
   return result;
 }

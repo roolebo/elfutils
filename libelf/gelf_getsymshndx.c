@@ -84,7 +84,7 @@ gelf_getsymshndx (symdata, shndxdata, ndx, dst, dstshndx)
       return NULL;
     }
 
-  rwlock_rdlock (symdata_scn->s->elf->lock);
+  RWLOCK_RDLOCK (symdata_scn->s->elf->lock);
 
   /* The user is not required to pass a data descriptor for an extended
      section index table.  */
@@ -155,7 +155,7 @@ gelf_getsymshndx (symdata, shndxdata, ndx, dst, dstshndx)
   result = dst;
 
  out:
-  rwlock_unlock (symdata_scn->s->elf->lock);
+  RWLOCK_UNLOCK (symdata_scn->s->elf->lock);
 
   return result;
 }

@@ -174,7 +174,7 @@ elf_update (elf, cmd)
       return -1;
     }
 
-  rwlock_wrlock (elf->lock);
+  RWLOCK_WRLOCK (elf->lock);
 
   /* Make sure we have an ELF header.  */
   if (elf->state.elf.ehdr == NULL)
@@ -193,8 +193,8 @@ elf_update (elf, cmd)
      will come right after the ELF header.  The count the size of all
      sections and finally place the section table.  */
   size = (elf->class == ELFCLASS32
-	  ? __elf32_updatenull (elf, &change_bo, shnum)
-	  : __elf64_updatenull (elf, &change_bo, shnum));
+	  ? __elf32_updatenull (elf, &change_bo, shnum, LS_WRLOCKED)
+	  : __elf64_updatenull (elf, &change_bo, shnum, LS_WRLOCKED));
   if (likely (size != -1)
       /* See whether we actually have to write out the data.  */
       && (cmd == ELF_C_WRITE || cmd == ELF_C_WRITE_MMAP))
@@ -218,7 +218,7 @@ elf_update (elf, cmd)
     }
 
  out:
-  rwlock_unlock (elf->lock);
+  RWLOCK_UNLOCK (elf->lock);
 
   return size;
 }

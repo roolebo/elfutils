@@ -93,7 +93,7 @@ gelf_update_symshndx (symdata, shndxdata, ndx, src, srcshndx)
   scn = symdata_scn->s;
   /* We simply have to believe the user that the two sections belong to
      the same ELF file.  */
-  rwlock_wrlock (scn->elf->lock);
+  RWLOCK_WRLOCK (scn->elf->lock);
 
   /* The user is not required to pass a data descriptor for an extended
      section index table.  */
@@ -170,7 +170,7 @@ gelf_update_symshndx (symdata, shndxdata, ndx, src, srcshndx)
   scn->flags |= ELF_F_DIRTY;
 
  out:
-  rwlock_unlock (scn->elf->lock);
+  RWLOCK_UNLOCK (scn->elf->lock);
 
   return result;
 }

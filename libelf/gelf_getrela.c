@@ -88,7 +88,7 @@ gelf_getrela (data, ndx, dst)
      The interface is broken so that it requires this hack.  */
   scn = data_scn->s;
 
-  rwlock_rdlock (scn->elf->lock);
+  RWLOCK_RDLOCK (scn->elf->lock);
 
   if (scn->elf->class == ELFCLASS32)
     {
@@ -124,7 +124,7 @@ gelf_getrela (data, ndx, dst)
 			 sizeof (Elf64_Rela));
     }
 
-  rwlock_unlock (scn->elf->lock);
+  RWLOCK_UNLOCK (scn->elf->lock);
 
   return result;
 }

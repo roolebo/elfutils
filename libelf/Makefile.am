@@ -105,11 +105,16 @@ if !MUDFLAP
 libelf_pic_a_SOURCES =
 am_libelf_pic_a_OBJECTS = $(libelf_a_SOURCES:.c=.os)
 
+libelf_so_LDLIBS =
+if USE_TLS
+libelf_so_LDLIBS += -lpthread
+endif
+
 libelf_so_SOURCES =
 libelf.so: libelf_pic.a libelf.map
 	$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
 		-Wl,--version-script,$(srcdir)/libelf.map,--no-undefined \
-		-Wl,--soname,$@.$(VERSION),-z,-defs,-z,relro
+		-Wl,--soname,$@.$(VERSION),-z,-defs,-z,relro $(libelf_so_LDLIBS)
 	if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
 	ln -fs $@ $@.$(VERSION)
 

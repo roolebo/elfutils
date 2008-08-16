@@ -189,7 +189,7 @@ convert_data (Elf_Scn *scn, int version __attribute__ ((unused)), int eclass,
 /* Store the information for the raw data in the `rawdata' element.  */
 int
 internal_function
-__libelf_set_rawdata (Elf_Scn *scn)
+__libelf_set_rawdata (Elf_Scn *scn, lockstat_t locked)
 {
   size_t offset;
   size_t size;
@@ -199,7 +199,8 @@ __libelf_set_rawdata (Elf_Scn *scn)
 
   if (elf->class == ELFCLASS32)
     {
-      Elf32_Shdr *shdr = scn->shdr.e32 ?: INTUSE(elf32_getshdr) (scn);
+      Elf32_Shdr *shdr
+	= scn->shdr.e32 ?: __elf32_getshdr_internal (scn, locked);
 
       if (shdr == NULL)
 	/* Something went terribly wrong.  */
@@ -212,7 +213,8 @@ __libelf_set_rawdata (Elf_Scn *scn)
     }
   else
     {
-      Elf64_Shdr *shdr = scn->shdr.e64 ?: INTUSE(elf64_getshdr) (scn);
+      Elf64_Shdr *shdr
+	= scn->shdr.e64 ?: __elf64_getshdr_internal (scn, locked);
 
       if (shdr == NULL)
 	/* Something went terribly wrong.  */
@@ -234,8 +236,8 @@ __libelf_set_rawdata (Elf_Scn *scn)
       if (type == SHT_HASH)
 	{
 	  GElf_Ehdr ehdr_mem;
-
-	  entsize = SH_ENTSIZE_HASH (INTUSE(gelf_getehdr) (elf, &ehdr_mem));
+	  GElf_Ehdr *ehdr = __gelf_getehdr_internal (elf, &ehdr_mem, locked);
+	  entsize = SH_ENTSIZE_HASH (ehdr);
 	}
       else
 	{
@@ -311,10 +313,9 @@ __libelf_set_rawdata (Elf_Scn *scn)
   if (type == SHT_HASH && elf->class == ELFCLASS64)
     {
       GElf_Ehdr ehdr_mem;
-
+      GElf_Ehdr *ehdr = __gelf_getehdr_internal (elf, &ehdr_mem, locked);
       scn->rawdata.d.d_type
-	= (SH_ENTSIZE_HASH (INTUSE(gelf_getehdr) (elf, &ehdr_mem)) == 4
-	   ? ELF_T_WORD : ELF_T_XWORD);
+	= (SH_ENTSIZE_HASH (ehdr) == 4 ? ELF_T_WORD : ELF_T_XWORD);
     }
   else
     scn->rawdata.d.d_type = shtype_map[LIBELF_EV_IDX][TYPEIDX (type)];
@@ -341,9 +342,10 @@ __libelf_set_rawdata (Elf_Scn *scn)
 
 
 Elf_Data *
-elf_getdata (scn, data)
+__elf_getdata_internal (scn, data, locked)
      Elf_Scn *scn;
      Elf_Data *data;
+     lockstat_t locked;
 {
   Elf_Data *result = NULL;
   Elf *elf;
@@ -360,7 +362,8 @@ elf_getdata (scn, data)
   /* We will need this multiple times later on.  */
   elf = scn->elf;
 
-  rwlock_rdlock (elf->lock);
+  if (locked == LS_UNLOCKED)
+    RWLOCK_RDLOCK (elf->lock);
 
   /* If `data' is not NULL this means we are not addressing the initial
      data in the file.  But this also means this data is already read
@@ -414,13 +417,12 @@ elf_getdata (scn, data)
          lock.  Therefore give up the read lock and then get the write
          lock.  But this means that the data could meanwhile be
          modified, therefore start the tests again.  */
-      rwlock_unlock (elf->lock);
-      rwlock_wrlock (elf->lock);
+      rwlock_to_wrlock (LS_RDLOCKED, &elf->lock);
 
       /* Read the data from the file.  There is always a file (or
 	 memory region) associated with this descriptor since
 	 otherwise the `data_read' flag would be set.  */
-      if (scn->data_read == 0 && __libelf_set_rawdata (scn) != 0)
+      if (scn->data_read == 0 && __libelf_set_rawdata (scn, LS_WRLOCKED) != 0)
 	/* Something went wrong.  The error value is already set.  */
 	goto out;
     }
@@ -453,8 +455,19 @@ elf_getdata (scn, data)
     result = &scn->data_list.data.d;
 
  out:
-  rwlock_unlock (elf->lock);
+  if (locked == LS_UNLOCKED)
+    RWLOCK_UNLOCK (elf->lock);
 
   return result;
 }
-INTDEF(elf_getdata)
+
+Elf_Data *
+elf_getdata (scn, data)
+     Elf_Scn *scn;
+     Elf_Data *data;
+{
+  if (scn == NULL)
+    return NULL;
+
+  return __elf_getdata_internal (scn, data, LS_UNLOCKED);
+}

@@ -79,7 +79,7 @@ gelf_getauxv (data, ndx, dst)
 
   elf = data_scn->s->elf;
 
-  rwlock_rdlock (elf->lock);
+  RWLOCK_RDLOCK (elf->lock);
 
   /* This is the one place where we have to take advantage of the fact
      that an `Elf_Data' pointer is also a pointer to `Elf_Data_Scn'.
@@ -124,7 +124,7 @@ gelf_getauxv (data, ndx, dst)
   result = dst;
 
  out:
-  rwlock_unlock (elf->lock);
+  RWLOCK_UNLOCK (elf->lock);
 
   return result;
 }

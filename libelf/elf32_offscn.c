@@ -86,7 +86,7 @@ elfw2(LIBELFBITS,offscn) (elf, offset)
       && unlikely (elfw2(LIBELFBITS,getshdr) (&runp->data[0]) == NULL))
     return NULL;
 
-  rwlock_rdlock (elf->lock);
+  RWLOCK_RDLOCK (elf->lock);
 
   Elf_Scn *result = NULL;
 
@@ -114,7 +114,7 @@ elfw2(LIBELFBITS,offscn) (elf, offset)
     }
 
  out:
-  rwlock_unlock (elf->lock);
+  RWLOCK_UNLOCK (elf->lock);
 
   return result;
 }

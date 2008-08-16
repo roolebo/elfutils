@@ -73,7 +73,7 @@ elf_cntl (elf, cmd)
       return -1;
     }
 
-  rwlock_wrlock (elf->lock);
+  RWLOCK_WRLOCK (elf->lock);
 
   switch (cmd)
     {
@@ -98,7 +98,7 @@ elf_cntl (elf, cmd)
       break;
     }
 
-  rwlock_unlock (elf->lock);
+  RWLOCK_UNLOCK (elf->lock);
 
   return result;
 }

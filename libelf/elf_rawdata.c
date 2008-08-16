@@ -88,7 +88,7 @@ elf_rawdata (scn, data)
       /* First thing we do is to read the data from the file.  There is
 	 always a file (or memory region) associated with this descriptor
 	 since otherwise the `data_read' flag would be set.  */
-      if (__libelf_set_rawdata (scn) != 0)
+      if (__libelf_set_rawdata (scn, LS_UNLOCKED) != 0)
 	/* Something went wrong.  The error value is already set.  */
 	return NULL;
     }

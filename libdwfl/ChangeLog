@@ -1,3 +1,9 @@
+2008-07-15  Petr Machata  <pmachata@redhat.com>
+
+	* linux-kernel-modules.c: #undef __USE_FILE_OFFSET64, it doesn't
+	work with fts.  It gets defined through <pthread.h> include in
+	<config.h>.
+
 2008-08-03  Roland McGrath  <roland@redhat.com>
 
 	* linux-kernel-modules.c: Include <fts.h> before <config.h>.

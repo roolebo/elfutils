@@ -84,7 +84,7 @@ gelf_getvernaux (data, offset, dst)
   assert (sizeof (GElf_Vernaux) == sizeof (Elf32_Vernaux));
   assert (sizeof (GElf_Vernaux) == sizeof (Elf64_Vernaux));
 
-  rwlock_rdlock (((Elf_Data_Scn *) data)->s->elf->lock);
+  RWLOCK_RDLOCK (((Elf_Data_Scn *) data)->s->elf->lock);
 
   /* The data is already in the correct form.  Just make sure the
      index is OK.  */
@@ -99,7 +99,7 @@ gelf_getvernaux (data, offset, dst)
     result = (GElf_Vernaux *) memcpy (dst, (char *) data->d_buf + offset,
 				      sizeof (GElf_Verneed));
 
-  rwlock_unlock (((Elf_Data_Scn *) data)->s->elf->lock);
+  RWLOCK_UNLOCK (((Elf_Data_Scn *) data)->s->elf->lock);
 
   return result;
 }

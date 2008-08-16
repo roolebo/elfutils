@@ -90,12 +90,12 @@ __libelf_readall (elf)
      Elf *elf;
 {
   /* Get the file.  */
-  rwlock_wrlock (elf->lock);
+  RWLOCK_WRLOCK (elf->lock);
 
   if (elf->map_address == NULL && unlikely (elf->fildes == -1))
     {
       __libelf_seterrno (ELF_E_INVALID_HANDLE);
-      rwlock_unlock (elf->lock);
+      RWLOCK_UNLOCK (elf->lock);
       return NULL;
     }
 
@@ -147,7 +147,7 @@ __libelf_readall (elf)
       libelf_release_all (elf);
     }
 
-  rwlock_unlock (elf->lock);
+  RWLOCK_UNLOCK (elf->lock);
 
   return (char *) elf->map_address;
 }

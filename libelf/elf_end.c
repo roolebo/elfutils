@@ -71,13 +71,13 @@ elf_end (elf)
     return 0;
 
   /* Make sure we are alone.  */
-  rwlock_wrlock (elf->lock);
+  RWLOCK_WRLOCK (elf->lock);
 
   if (elf->ref_count != 0 && --elf->ref_count != 0)
     {
       /* Not yet the last activation.  */
       int result = elf->ref_count;
-      rwlock_unlock (elf->lock);
+      RWLOCK_UNLOCK (elf->lock);
       return result;
     }
 
@@ -106,9 +106,9 @@ elf_end (elf)
 	 solve this problem by giving free the child lock.  The
 	 state of REF_COUNT==0 is handled all over the library, so
 	 this should be ok.  */
-      rwlock_unlock (elf->lock);
-      rwlock_rdlock (parent->lock);
-      rwlock_wrlock (elf->lock);
+      RWLOCK_UNLOCK (elf->lock);
+      RWLOCK_RDLOCK (parent->lock);
+      RWLOCK_WRLOCK (elf->lock);
 
       if (parent->state.ar.children == elf)
 	parent->state.ar.children = elf->next;
@@ -122,7 +122,7 @@ elf_end (elf)
 	  child->next = elf->next;
 	}
 
-      rwlock_unlock (parent->lock);
+      RWLOCK_UNLOCK (parent->lock);
     }
 
   /* This was the last activation.  Free all resources.  */

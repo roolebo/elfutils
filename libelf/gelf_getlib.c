@@ -76,7 +76,7 @@ gelf_getlib (data, ndx, dst)
 
   Elf_Data_Scn *data_scn = (Elf_Data_Scn *) data;
 
-  rwlock_rdlock (data_scn->s->elf->lock);
+  RWLOCK_RDLOCK (data_scn->s->elf->lock);
 
   /* The on disk format of Elf32_Lib and Elf64_Lib is identical.  So
      we can simplify things significantly.  */
@@ -95,7 +95,7 @@ gelf_getlib (data, ndx, dst)
       result = dst;
     }
 
-  rwlock_unlock (data_scn->s->elf->lock);
+  RWLOCK_UNLOCK (data_scn->s->elf->lock);
 
   return result;
 }

@@ -57,6 +57,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "libelfP.h"
 
 static inline Elf_Kind
 __attribute__ ((unused))
@@ -117,7 +118,7 @@ static void
 __attribute__ ((unused))
 libelf_acquire_all (Elf *elf)
 {
-  rwlock_wrlock (elf->lock);
+  RWLOCK_WRLOCK (elf->lock);
 
   if (elf->kind == ELF_K_AR)
     {
@@ -149,7 +150,33 @@ libelf_release_all (Elf *elf)
 	}
     }
 
-  rwlock_unlock (elf->lock);
+  RWLOCK_UNLOCK (elf->lock);
+}
+
+/* Convert given lock LOCK with lock state FROM to lock state
+   LS_WRLOCKED. */
+static void
+__attribute__ ((unused))
+rwlock_to_wrlock(lockstat_t from, rwlock_define (,*lock))
+{
+  if (from == LS_WRLOCKED)
+    return;
+  if (from == LS_RDLOCKED)
+    RWLOCK_UNLOCK (*lock);
+  RWLOCK_WRLOCK (*lock);
+}
+
+/* Convert given lock LOCK with lock state LS_WRLOCKED to lock state
+   TO. */
+static void
+__attribute__ ((unused))
+rwlock_from_wrlock(lockstat_t to, rwlock_define (,*lock))
+{
+  if (to == LS_WRLOCKED)
+    return;
+  RWLOCK_UNLOCK (*lock);
+  if (to == LS_RDLOCKED)
+    RWLOCK_RDLOCK (*lock);
 }
 
 

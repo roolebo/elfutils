@@ -94,7 +94,7 @@ elf_getarsym (elf, ptr)
   if (result == NULL)
     {
       /* We have not yet read the index.  */
-      rwlock_wrlock (elf->lock);
+      RWLOCK_WRLOCK (elf->lock);
 
       /* In case we find no index remember this for the next call.  */
       elf->state.ar.ar_sym = (Elf_Arsym *) -1l;
@@ -268,7 +268,7 @@ elf_getarsym (elf, ptr)
       result = elf->state.ar.ar_sym;
 
     out:
-      rwlock_unlock (elf->lock);
+      RWLOCK_UNLOCK (elf->lock);
     }
 
   if (ptr != NULL)

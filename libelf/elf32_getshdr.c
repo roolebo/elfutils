@@ -66,9 +66,11 @@
 
 
 ElfW2(LIBELFBITS,Shdr) *
-elfw2(LIBELFBITS,getshdr) (scn)
+__elfw2(LIBELFBITS,getshdr_internal) (scn, locked)
      Elf_Scn *scn;
+     lockstat_t locked;
 {
+  /* XXX: no read locking here, figure out why is it not necessary. */
   ElfW2(LIBELFBITS,Shdr) *result;
 
   if (scn == NULL)
@@ -93,7 +95,7 @@ elfw2(LIBELFBITS,getshdr) (scn)
       Elf *elf = scn->elf;
       ElfW2(LIBELFBITS,Ehdr) *ehdr = elf->state.ELFW(elf,LIBELFBITS).ehdr;
 
-      rwlock_wrlock (elf->lock);
+      rwlock_to_wrlock (locked, &elf->lock);
 
       /* Try again, maybe the data is there now.  */
       result = scn->shdr.ELFW(e,LIBELFBITS);
@@ -101,7 +103,7 @@ elfw2(LIBELFBITS,getshdr) (scn)
 	goto out;
 
       size_t shnum;
-      if (INTUSE (elf_getshnum) (elf, &shnum) != 0)
+      if (__elf_getshnum_internal (elf, &shnum, LS_WRLOCKED) != 0)
 	goto out;
       size_t size = shnum * sizeof (ElfW2(LIBELFBITS,Shdr));
 
@@ -235,9 +237,15 @@ elfw2(LIBELFBITS,getshdr) (scn)
       assert (result != NULL);
 
     out:
-      rwlock_unlock (elf->lock);
+      rwlock_from_wrlock (locked, &elf->lock);
     }
 
   return result;
 }
-INTDEF(elfw2(LIBELFBITS,getshdr))
+
+ElfW2(LIBELFBITS,Shdr) *
+elfw2(LIBELFBITS,getshdr) (scn)
+     Elf_Scn *scn;
+{
+  return __elfw2(LIBELFBITS,getshdr_internal) (scn, LS_UNLOCKED);
+}

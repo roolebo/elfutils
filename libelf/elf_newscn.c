@@ -80,7 +80,7 @@ elf_newscn (elf)
   assert (offsetof (Elf, state.elf32.scns)
 	  == offsetof (Elf, state.elf64.scns));
 
-  rwlock_wrlock (elf->lock);
+  RWLOCK_WRLOCK (elf->lock);
 
  again:
   if (elf->state.elf.scns_last->cnt < elf->state.elf.scns_last->max)
@@ -170,7 +170,7 @@ elf_newscn (elf)
   result->flags |= ELF_F_DIRTY;
 
  out:
-  rwlock_unlock (elf->lock);
+  RWLOCK_UNLOCK (elf->lock);
 
   return result;
 }

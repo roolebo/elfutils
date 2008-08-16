@@ -81,7 +81,7 @@ gelf_getverdaux (data, offset, dst)
   assert (sizeof (GElf_Verdaux) == sizeof (Elf32_Verdaux));
   assert (sizeof (GElf_Verdaux) == sizeof (Elf64_Verdaux));
 
-  rwlock_rdlock (((Elf_Data_Scn *) data)->s->elf->lock);
+  RWLOCK_RDLOCK (((Elf_Data_Scn *) data)->s->elf->lock);
 
   /* The data is already in the correct form.  Just make sure the
      index is OK.  */
@@ -97,7 +97,7 @@ gelf_getverdaux (data, offset, dst)
 				      sizeof (GElf_Verdaux));
 
 
-  rwlock_unlock (((Elf_Data_Scn *) data)->s->elf->lock);
+  RWLOCK_UNLOCK (((Elf_Data_Scn *) data)->s->elf->lock);
 
   return result;
 }

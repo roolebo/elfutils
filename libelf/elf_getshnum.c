@@ -60,9 +60,10 @@
 
 
 int
-elf_getshnum (elf, dst)
+__elf_getshnum_internal (elf, dst, locked)
      Elf *elf;
      size_t *dst;
+     lockstat_t locked;
 {
   int result = 0;
   int idx;
@@ -76,7 +77,8 @@ elf_getshnum (elf, dst)
       return -1;
     }
 
-  rwlock_rdlock (elf->lock);
+  if (locked == LS_UNLOCKED)
+    RWLOCK_RDLOCK (elf->lock);
 
   idx = elf->state.elf.scns_last->cnt;
   if (idx != 0
@@ -90,8 +92,19 @@ elf_getshnum (elf, dst)
   else
     *dst = 0;
 
-  rwlock_unlock (elf->lock);
+  if (locked == LS_UNLOCKED)
+    RWLOCK_UNLOCK (elf->lock);
 
   return result;
 }
-INTDEF(elf_getshnum)
+
+int
+elf_getshnum (elf, dst)
+     Elf *elf;
+     size_t *dst;
+{
+  if (elf == NULL)
+    return -1;
+
+  return __elf_getshnum_internal (elf, dst, LS_UNLOCKED);
+}

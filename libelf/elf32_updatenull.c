@@ -133,11 +133,14 @@ ELFW(default_ehdr,LIBELFBITS) (Elf *elf, ElfW2(LIBELFBITS,Ehdr) *ehdr,
 
 off_t
 internal_function
-__elfw2(LIBELFBITS,updatenull) (Elf *elf, int *change_bop, size_t shnum)
+__elfw2(LIBELFBITS,updatenull) (Elf *elf, int *change_bop,
+				size_t shnum, lockstat_t locked)
 {
-  ElfW2(LIBELFBITS,Ehdr) *ehdr = INTUSE(elfw2(LIBELFBITS,getehdr)) (elf);
+  ElfW2(LIBELFBITS,Ehdr) *ehdr;
   int changed = 0;
   int ehdr_flags = 0;
+
+  ehdr = __elfw2(LIBELFBITS,getehdr_internal) (elf, locked);
 
   /* Set the default values.  */
   if (ELFW(default_ehdr,LIBELFBITS) (elf, ehdr, shnum, change_bop) != 0)
@@ -150,7 +153,7 @@ __elfw2(LIBELFBITS,updatenull) (Elf *elf, int *change_bop, size_t shnum)
   if (elf->state.ELFW(elf,LIBELFBITS).phdr == NULL
       && (ehdr->e_type == ET_EXEC || ehdr->e_type == ET_DYN
 	  || ehdr->e_type == ET_CORE))
-    (void) INTUSE(elfw2(LIBELFBITS,getphdr)) (elf);
+    (void) __elfw2(LIBELFBITS,getphdr_internal) (elf, locked);
   if (elf->state.ELFW(elf,LIBELFBITS).phdr != NULL)
     {
       /* Only executables, shared objects, and core files have a program
@@ -204,7 +207,7 @@ __elfw2(LIBELFBITS,updatenull) (Elf *elf, int *change_bop, size_t shnum)
       /* Load the section headers if necessary.  This loads the
 	 headers for all sections.  */
       if (list->data[1].shdr.ELFW(e,LIBELFBITS) == NULL)
-	(void) INTUSE(elfw2(LIBELFBITS,getshdr)) (&list->data[1]);
+	(void) __elfw2(LIBELFBITS,getshdr_internal) (&list->data[1], locked);
 
       do
 	{
@@ -265,7 +268,8 @@ __elfw2(LIBELFBITS,updatenull) (Elf *elf, int *change_bop, size_t shnum)
 	      update_if_changed (shdr->sh_entsize, sh_entsize,
 				 scn->shdr_flags);
 
-	      if (scn->data_read == 0 && __libelf_set_rawdata (scn) != 0)
+	      if (scn->data_read == 0
+		  && __libelf_set_rawdata (scn, locked) != 0)
 		/* Something went wrong.  The error value is already set.  */
 		return -1;
 
@@ -364,7 +368,7 @@ __elfw2(LIBELFBITS,updatenull) (Elf *elf, int *change_bop, size_t shnum)
 		    {
 		      /* The position of the section in the file
 			 changed.  Create the section data list.  */
-		      if (INTUSE(elf_getdata) (scn, NULL) == NULL)
+		      if (__elf_getdata_internal (scn, NULL, locked) == NULL)
 			return -1;
 		    }
 

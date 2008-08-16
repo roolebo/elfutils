@@ -90,11 +90,11 @@ gelf_getmove (data, ndx, dst)
     }
 
   elf = ((Elf_Data_Scn *) data)->s->elf;
-  rwlock_rdlock (elf->lock);
+  RWLOCK_RDLOCK (elf->lock);
 
   *dst = ((GElf_Move *) data->d_buf)[ndx];
 
-  rwlock_unlock (elf->lock);
+  RWLOCK_UNLOCK (elf->lock);
 
   result = dst;
 

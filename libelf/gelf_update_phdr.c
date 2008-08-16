@@ -72,7 +72,7 @@ gelf_update_phdr (Elf *elf, int ndx, GElf_Phdr *src)
       return 0;
     }
 
-  rwlock_wrlock (elf->lock);
+  RWLOCK_WRLOCK (elf->lock);
 
   if (elf->class == ELFCLASS32)
     {
@@ -94,7 +94,7 @@ gelf_update_phdr (Elf *elf, int ndx, GElf_Phdr *src)
 
       if (phdr == NULL)
 	{
-	  phdr = INTUSE(elf32_getphdr) (elf);
+	  phdr = __elf32_getphdr_internal (elf, LS_WRLOCKED);
 	  if (phdr == NULL)
 	    /* The error number is already set.  */
 	    goto out;
@@ -127,7 +127,7 @@ gelf_update_phdr (Elf *elf, int ndx, GElf_Phdr *src)
 
       if (phdr == NULL)
 	{
-	  phdr = INTUSE(elf64_getphdr) (elf);
+	  phdr = __elf64_getphdr_internal (elf, LS_WRLOCKED);
 	  if (phdr == NULL)
 	    /* The error number is already set.  */
 	    goto out;
@@ -147,7 +147,7 @@ gelf_update_phdr (Elf *elf, int ndx, GElf_Phdr *src)
   result = 1;
 
  out:
-  rwlock_unlock (elf->lock);
+  RWLOCK_UNLOCK (elf->lock);
 
   return result;
 }

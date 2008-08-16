@@ -1005,7 +1005,7 @@ elf_begin (fildes, cmd, ref)
 
   if (ref != NULL)
     /* Make sure the descriptor is not suddenly going away.  */
-    rwlock_rdlock (ref->lock);
+    RWLOCK_RDLOCK (ref->lock);
   else if (unlikely (fcntl (fildes, F_GETFL) == -1 && errno == EBADF))
     {
       /* We cannot do anything productive without a file descriptor.  */
@@ -1077,7 +1077,7 @@ elf_begin (fildes, cmd, ref)
 
   /* Release the lock.  */
   if (ref != NULL)
-    rwlock_unlock (ref->lock);
+    RWLOCK_UNLOCK (ref->lock);
 
   return retval;
 }

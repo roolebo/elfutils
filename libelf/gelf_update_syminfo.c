@@ -90,7 +90,7 @@ gelf_update_syminfo (data, ndx, src)
   assert (sizeof (GElf_Syminfo) == sizeof (Elf64_Syminfo));
 
   scn = data_scn->s;
-  rwlock_wrlock (scn->elf->lock);
+  RWLOCK_WRLOCK (scn->elf->lock);
 
   /* Check whether we have to resize the data buffer.  */
   if (unlikely ((ndx + 1) * sizeof (GElf_Syminfo) > data_scn->d.d_size))
@@ -107,7 +107,7 @@ gelf_update_syminfo (data, ndx, src)
   scn->flags |= ELF_F_DIRTY;
 
  out:
-  rwlock_unlock (scn->elf->lock);
+  RWLOCK_UNLOCK (scn->elf->lock);
 
   return result;
 }

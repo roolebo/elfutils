@@ -50,7 +50,10 @@ AC_CANONICAL_HOST
 
 AC_ARG_ENABLE([tls],
 AS_HELP_STRING([--enable-tls], [enable use of thread local storage]),
-AC_DEFINE(USE_TLS))
+use_tls=yes, use_tls=no)
+AM_CONDITIONAL(USE_TLS, test "$use_tls" = yes)
+AS_IF([test "$use_tls" = yes], [AC_DEFINE(USE_TLS)])
+
 AH_TEMPLATE([USE_TLS], [Defined if thread local storage should be used.])
 
 dnl Add all the languages for which translations are available.
@@ -226,6 +229,21 @@ AM_PO_SUBDIRS
 dnl Test of the config.h file.  We hide all kinds of configuration magic
 dnl in there.
 AH_BOTTOM([
+#ifdef USE_TLS
+# include <pthread.h>
+# define tls_key_t			__thread void *
+# define key_create(keyp, freefct)	(1)
+# define getspecific(key)		key
+# define setspecific(key,val)		key = val
+# define once_define(class,name)	class struct { } name
+# define once_execute(name,fct)		((void) &name, (void) (fct))
+# define rwlock_define(class,name)	class pthread_rwlock_t name
+# define rwlock_init(lock)		pthread_rwlock_init (&lock, NULL)
+# define rwlock_fini(lock)		pthread_rwlock_destroy (&lock)
+# define rwlock_rdlock(lock)		pthread_rwlock_rdlock (&lock)
+# define rwlock_wrlock(lock)		pthread_rwlock_wrlock (&lock)
+# define rwlock_unlock(lock)		pthread_rwlock_unlock (&lock)
+#else
 /* Eventually we will allow multi-threaded applications to use the
    libraries.  Therefore we will add the necessary locking although
    the macros used expand to nothing for now.  */
@@ -247,6 +265,7 @@ AH_BOTTOM([
       fct ();								      \
     name = 1;								      \
   } while (0)
+#endif
 
 /* gettext helper macro.  */
 #define N_(Str) Str

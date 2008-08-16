@@ -89,14 +89,14 @@ gelf_update_vernaux (data, offset, src)
       return 0;
     }
 
-  rwlock_wrlock (data_scn->s->elf->lock);
+  RWLOCK_WRLOCK (data_scn->s->elf->lock);
 
   memcpy ((char *) data_scn->d.d_buf + offset, src, sizeof (GElf_Vernaux));
 
   /* Mark the section as modified.  */
   data_scn->s->flags |= ELF_F_DIRTY;
 
-  rwlock_unlock (data_scn->s->elf->lock);
+  RWLOCK_UNLOCK (data_scn->s->elf->lock);
 
   return 1;
 }

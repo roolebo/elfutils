@@ -88,7 +88,7 @@ gelf_getversym (data, ndx, dst)
   assert (sizeof (GElf_Versym) == sizeof (Elf32_Versym));
   assert (sizeof (GElf_Versym) == sizeof (Elf64_Versym));
 
-  RWLOCK_RDLOCK (scn->elf->lock);
+  rwlock_rdlock (scn->elf->lock);
 
   /* The data is already in the correct form.  Just make sure the
      index is OK.  */
@@ -104,7 +104,7 @@ gelf_getversym (data, ndx, dst)
       result = dst;
     }
 
-  RWLOCK_UNLOCK (scn->elf->lock);
+  rwlock_unlock (scn->elf->lock);
 
   return result;
 }

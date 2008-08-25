@@ -53,6 +53,7 @@
 #endif
 
 #include <errno.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <assert.h>
@@ -65,22 +66,11 @@
 # define LIBELFBITS 32
 #endif
 
-
 ElfW2(LIBELFBITS,Phdr) *
-__elfw2(LIBELFBITS,getphdr_internal) (elf, locked)
-     lockstat_t locked;
+__elfw2(LIBELFBITS,getphdr_wrlock) (elf)
      Elf *elf;
 {
   ElfW2(LIBELFBITS,Phdr) *result;
-
-  if (elf == NULL)
-    return NULL;
-
-  if (unlikely (elf->kind != ELF_K_ELF))
-    {
-      __libelf_seterrno (ELF_E_INVALID_HANDLE);
-      return NULL;
-    }
 
   /* If the program header entry has already been filled in the code
      below must already have been run.  So the class is set, too.  No
@@ -88,8 +78,6 @@ __elfw2(LIBELFBITS,getphdr_internal) (elf, locked)
   result = elf->state.ELFW(elf,LIBELFBITS).phdr;
   if (likely (result != NULL))
     return result;
-
-  rwlock_to_wrlock (locked, &elf->lock);
 
   if (elf->class == 0)
     elf->class = ELFW(ELFCLASS,LIBELFBITS);
@@ -235,7 +223,6 @@ __elfw2(LIBELFBITS,getphdr_internal) (elf, locked)
     }
 
  out:
-  rwlock_from_wrlock (locked, &elf->lock);
   return result;
 }
 
@@ -243,8 +230,12 @@ ElfW2(LIBELFBITS,Phdr) *
 elfw2(LIBELFBITS,getphdr) (elf)
      Elf *elf;
 {
-  if (elf == NULL)
-    return NULL;
+  ElfW2(LIBELFBITS,Phdr) *result;
 
-  return __elfw2(LIBELFBITS,getphdr_internal) (elf, LS_UNLOCKED);
+  rwlock_wrlock (elf->lock);
+  result = __elfw2(LIBELFBITS,getphdr_wrlock) (elf);
+  rwlock_unlock (elf->lock);
+
+  return result;
 }
+INTDEF(elfw2(LIBELFBITS,getphdr))

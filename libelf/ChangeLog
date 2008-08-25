@@ -1,85 +1,43 @@
-2008-08-15  Ulrich Drepper  <drepper@redhat.com>
+2008-08-25  Roland McGrath  <roland@redhat.com>
 
-	* libelfP.h (LIBELF_CHECKED_LOCK): Use dummy definition also if
-	USE_TLS is not defined.
+	* Makefile.am (libelf_so_LDLIBS): New variable.
+	(libelf.so): Use it in the link.
 
-2008-08-05  Petr Machata  <pmachata@redhat.com>
+2008-08-21  Petr Machata  <pmachata@redhat.com>
 
-	* elf_getdata.c, libelfP.h (__elf_getdata_internal):
-	Add lockstat argument in a fashion similar to elf32_getehdr below.
-	* elf32_updatenull.c (__elf32_updatenull, __elf64_updatenull):
-	Call __elf32_getshdr_internal and __elf64_getshdr_internal
-	explicitly, not via INTUSE.
-	Call __elf_getdata_internal explicitly, not via INTUSE.
-
-2008-08-05  Petr Machata  <pmachata@redhat.com>
-
-	* gelf_getehdr.c, libelfP.h (__gelf_getehdr_internal):
-	Add lockstat argument in a fashion similar to elf32_getehdr below.
-	* elf_getdata.c, libelfP.h (__libelf_set_rawdata):
-	Add lockstat argument.
-	Call __gelf_getehdr_internal explicitly, not via INTUSE.
-	Call rwlock_to_wrlock instead of RWLOCK_UNLOCK/_WRLOCK sequence.
-	(elf_getdata): Pass lockstat argument to __libelf_set_rawdata.
+	* elf_getdata.c, libelfP.h
+	(__elf_getdata_internal): Rename to __elf_getdata_rdlock.
+	(__libelf_set_rawdata_wrlock): New function.
+	(__libelf_set_rawdata): Make it a wrapper that calls *_wrlock.
 	* elf32_updatenull.c, libelfP.h
-	(__elf32_updatenull, __elf64_updatenull):
-	Add lockstat argument in a fashion similar to elf32_getehdr below.
-	Pass lockstat argument to __libelf_set_rawdata.
-	* elf_strptr.c (elf_strptr):
-	Pass lockstat argument to __libelf_set_rawdata.
-	* elf_update.c (elf_update):
-	Pass lockstat argument to __elf32_updatenull and
-	__elf64_updatenull.
+	(__elfNN_updatenull): Rename to __elfNN_updatenull_wrlock.
 
-2008-08-05  Petr Machata  <pmachata@redhat.com>
+2008-08-21  Petr Machata  <pmachata@redhat.com>
 
-	* common.h (rwlock_to_wrlock, rwlock_from_wrlock): New functions.
 	* elf32_getphdr.c, libelfP.h
-	(__elf32_getphdr_internal, __elf64_getphdr_internal):
-	Add lockstat argument in a fashion similar to elf32_getehdr below.
-	* gelf_getphdr.c (gelf_getphdr): Call __elf32_getphdr_internal and
-	__elf32_getphdr_internal explicitly, not via INTUSE.
+	(__elfNN_getphdr_internal): Drop.  Move __elfNN_getphdr_internal
+	code to __elfNN_getphdr_wrlock.
+	(__elfNN_getphdr_rdlock, __elfNN_getphdr_wrlock): New functions.
+	(__elfNN_getphdr_rdlock, __elfNN_getphdr_wrlock): Make these
+	wrappers of getphdr_impl.
 
-2008-08-05  Petr Machata  <pmachata@redhat.com>
+2008-08-21  Petr Machata  <pmachata@redhat.com>
 
-	* libelfP.h (lockstat_t): New enum that describes what type of
-	lock is currently being held.  To be used by _internal functions.
 	* elf32_getehdr.c, libelfP.h
-	(__elf32_getehdr_internal, __elf64_getehdr_internal):
-	Take extra lockstat argument.
-	Move "meat" of the getehdr functinonality here.
-	* elf32_getehdr.c (elf32_getehdr, elf64_getehdr):
-	Make this a simple wrapper that calls _internal variant.
-	* elf32_updatenull.c: Call __elf32_getehdr_internal explicitly,
-	not via INTUSE.
-	* elf32_getshdr.c, libelfP.h
-	(__elf32_getshdr_internal, __elf64_getshdr_internal):
-	Add lockstat argument in a fashion similar to elf32_getehdr.
-	* elf_getshnum.c, libelfP.h (__elf_getshnum_internal):
-	Likewise.
-	* gelf_getshdr.c (gelf_getshdr): Call __elf32_getshdr_internal,
-	__elf64_getshdr_internal explicitly, not via INTUSE.
+	(__elfNN_getehdr_internal): Rename to __elfNN_getehdr_rdlock.
+	* gelf_getehdr, libelfP.h:
+	(__gelf_getehdr_internal): Rename to __gelf_getehdr_rdlock.
 
-2008-08-04  Petr Machata  <pmachata@redhat.com>
+2008-08-21  Petr Machata  <pmachata@redhat.com>
 
-	* common.h, elf32_getehdr.c, elf32_getphdr.c, elf32_getshdr.c,
-	elf32_newehdr.c, elf32_newphdr.c, elf32_offscn.c, elf_begin.c,
-	elf_clone.c, elf_cntl.c, elf_end.c, elf_getarsym.c, elf_getdata.c,
-	elf_getscn.c, elf_getshnum.c, elf_getshstrndx.c, elf_newdata.c,
-	elf_newscn.c, elf_nextscn.c, elf_readall.c, elf_strptr.c,
-	elf_update.c, gelf_getauxv.c, gelf_getdyn.c, gelf_getehdr.c,
-	gelf_getlib.c, gelf_getmove.c, gelf_getnote.c, gelf_getphdr.c,
-	gelf_getrel.c, gelf_getrela.c, gelf_getshdr.c, gelf_getsym.c,
-	gelf_getsyminfo.c, gelf_getsymshndx.c, gelf_getverdaux.c,
-	gelf_getverdef.c, gelf_getvernaux.c, gelf_getverneed.c,
-	gelf_getversym.c, gelf_update_auxv.c, gelf_update_dyn.c,
-	gelf_update_ehdr.c, gelf_update_lib.c, gelf_update_move.c,
-	gelf_update_phdr.c, gelf_update_rel.c, gelf_update_rela.c,
-	gelf_update_sym.c, gelf_update_syminfo.c, gelf_update_symshndx.c,
-	gelf_update_verdaux.c, gelf_update_verdef.c,
-	gelf_update_vernaux.c, gelf_update_verneed.c,
-	gelf_update_versym.c:
-		Change rwlock_{rd,wr,un}lock calls to RWLOCK_{RD,WR,UN}LOCK.
+	* elf32_getshdr.c
+	(__elfNN_getshdr_internal): Drop.
+	(load_shdr_rwlock, scn_valid): New functions, contain bits of
+	behaviour from __elfNN_getshdr_internal.
+	(__elfNN_getshdr_rdlock, __elfNN_getshdr_wrlock): Replacements for
+	dropped _internal functions above.
+	* elf_getshnum.c
+	(__elf_getshnum_internal): Rename to __elf_getshnum_rdlock.
 
 2008-08-04  Petr Machata  <pmachata@redhat.com>
 

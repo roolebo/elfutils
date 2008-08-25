@@ -1,5 +1,5 @@
 /* Interfaces for libdwfl.
-   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -116,9 +116,41 @@ extern int dwfl_errno (void);
 extern const char *dwfl_errmsg (int err);
 
 
-/* Start reporting the current set of modules to the library.  No calls but
-   dwfl_report_* can be made on DWFL until dwfl_report_end is called.  */
+/* Start reporting the current set of segments and modules to the library.
+   All existing segments are wiped.  Existing modules are marked to be
+   deleted, and will not be found via dwfl_addrmodule et al if they are not
+   re-reported before dwfl_report_end is called.  */
 extern void dwfl_report_begin (Dwfl *dwfl);
+
+/* Report that segment NDX begins at PHDR->p_vaddr + BIAS.
+   If NDX is < 0, the value succeeding the last call's NDX
+   is used instead (zero on the first call).
+
+   If nonzero, the smallest PHDR->p_align value seen sets the
+   effective page size for the address space DWFL describes.
+   This is the granularity at which reported module boundary
+   addresses will be considered to fall in or out of a segment.
+
+   Returns -1 for errors, or NDX (or its assigned replacement) on success.
+
+   When NDX is the value succeeding the last call's NDX (or is implicitly
+   so as above), IDENT is nonnull and matches the value in the last call,
+   and the PHDR and BIAS values reflect a segment that would be contiguous,
+   in both memory and file, with the last segment reported, then this
+   segment may be coalesced internally with preceding segments.  When given
+   an address inside this segment, dwfl_addrsegment may return the NDX of a
+   preceding contiguous segment.  To prevent coalesced segments, always
+   pass a null pointer for IDENT.
+
+   The values passed are not stored (except to track coalescence).
+   The only information that can be extracted from DWFL later is the
+   mapping of an address to a segment index that starts at or below
+   it.  Reporting segments at all is optional.  Its only benefit to
+   the caller is to offer this quick lookup via dwfl_addrsegment,
+   or use other segment-based calls.  */
+extern int dwfl_report_segment (Dwfl *dwfl, int ndx,
+				const GElf_Phdr *phdr, GElf_Addr bias,
+				const void *ident);
 
 /* Report that a module called NAME spans addresses [START, END).
    Returns the module handle, either existing or newly allocated,
@@ -192,6 +224,13 @@ extern ptrdiff_t dwfl_getmodules (Dwfl *dwfl,
 
 /* Find the module containing the given address.  */
 extern Dwfl_Module *dwfl_addrmodule (Dwfl *dwfl, Dwarf_Addr address);
+
+/* Find the segment, if any, and module, if any, containing ADDRESS.
+   Returns a segment index returned by dwfl_report_segment, or -1
+   if no segment matches the address.  Regardless of the return value,
+   *MOD is always set to the module containing ADDRESS, or to null.  */
+extern int dwfl_addrsegment (Dwfl *dwfl, Dwarf_Addr address, Dwfl_Module **mod);
+
 
 
 /* Report the known build ID bits associated with a module.

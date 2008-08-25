@@ -1,3 +1,12 @@
+2008-08-25  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac (--enable-tls): Set AM_CONDITIONAL USE_TLS too.
+
+2008-08-21  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac (AH_BOTTOM): Emit #include <eu-config.h> and
+	move the contents to lib/eu-config.h instead of keeping them here.
+
 2007-12-20  Ulrich Drepper  <drepper@redhat.com>
 
 	* configure.ac: Add support for --enable-debugpred.

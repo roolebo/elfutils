@@ -63,9 +63,8 @@
 
 
 ElfW2(LIBELFBITS,Ehdr) *
-__elfw2(LIBELFBITS,getehdr_internal) (elf, locked)
+__elfw2(LIBELFBITS,getehdr_rdlock) (elf)
      Elf *elf;
-     lockstat_t locked;
 {
   ElfW2(LIBELFBITS,Ehdr) *result;
 
@@ -77,9 +76,6 @@ __elfw2(LIBELFBITS,getehdr_internal) (elf, locked)
       __libelf_seterrno (ELF_E_INVALID_HANDLE);
       return NULL;
     }
-
-  if (locked == LS_UNLOCKED)
-    RWLOCK_RDLOCK (elf->lock);
 
   if (elf->class == 0)
     elf->class = ELFW(ELFCLASS,LIBELFBITS);
@@ -93,9 +89,6 @@ __elfw2(LIBELFBITS,getehdr_internal) (elf, locked)
   result = elf->state.ELFW(elf,LIBELFBITS).ehdr;
 
  out:
-  if (locked == LS_UNLOCKED)
-    RWLOCK_UNLOCK (elf->lock);
-
   return result;
 }
 
@@ -103,8 +96,13 @@ ElfW2(LIBELFBITS,Ehdr) *
 elfw2(LIBELFBITS,getehdr) (elf)
      Elf *elf;
 {
+  ElfW2(LIBELFBITS,Ehdr) *result;
   if (elf == NULL)
     return NULL;
 
-  return __elfw2(LIBELFBITS,getehdr_internal) (elf, LS_UNLOCKED);
+  rwlock_rdlock (elf->lock);
+  result = __elfw2(LIBELFBITS,getehdr_rdlock) (elf);
+  rwlock_unlock (elf->lock);
+
+  return result;
 }

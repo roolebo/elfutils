@@ -81,7 +81,7 @@ gelf_getverdef (data, offset, dst)
   assert (sizeof (GElf_Verdef) == sizeof (Elf32_Verdef));
   assert (sizeof (GElf_Verdef) == sizeof (Elf64_Verdef));
 
-  RWLOCK_RDLOCK (((Elf_Data_Scn *) data)->s->elf->lock);
+  rwlock_rdlock (((Elf_Data_Scn *) data)->s->elf->lock);
 
   /* The data is already in the correct form.  Just make sure the
      index is OK.  */
@@ -96,7 +96,7 @@ gelf_getverdef (data, offset, dst)
     result = (GElf_Verdef *) memcpy (dst, (char *) data->d_buf + offset,
 				     sizeof (GElf_Verdef));
 
-  RWLOCK_UNLOCK (((Elf_Data_Scn *) data)->s->elf->lock);
+  rwlock_unlock (((Elf_Data_Scn *) data)->s->elf->lock);
 
   return result;
 }

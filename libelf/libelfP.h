@@ -418,16 +418,6 @@ struct Elf
   /* There absolutely never must be anything following the union.  */
 };
 
-/* For _locked calls.  This gives the callee insight into how is the
-   object locked.  Some functions, e.g. elf32_getshdr, are called from
-   both callers of both rwlock_wrlock and rwlock_rdlock. */
-typedef enum
-{
-  LS_UNLOCKED = 0,
-  LS_RDLOCKED,
-  LS_WRLOCKED
-} lockstat_t;
-
 /* Type of the conversion functions.  These functions will convert the
    byte order.  */
 typedef void (*xfct_t) (void *, const void *, size_t, int);
@@ -505,17 +495,15 @@ extern char *__libelf_readall (Elf *elf) internal_function;
 extern int __libelf_readsections (Elf *elf) internal_function;
 
 /* Store the information for the raw data in the `rawdata_list' element.  */
-extern int __libelf_set_rawdata (Elf_Scn *scn, lockstat_t locked)
-  internal_function;
+extern int __libelf_set_rawdata (Elf_Scn *scn) internal_function;
+extern int __libelf_set_rawdata_wrlock (Elf_Scn *scn) internal_function;
 
 
 /* Helper functions for elf_update.  */
-extern off_t __elf32_updatenull (Elf *elf, int *change_bop, size_t shnum,
-				 lockstat_t locked)
-     internal_function;
-extern off_t __elf64_updatenull (Elf *elf, int *change_bop, size_t shnum,
-				 lockstat_t locked)
-     internal_function;
+extern off_t __elf32_updatenull_wrlock (Elf *elf, int *change_bop,
+					size_t shnum) internal_function;
+extern off_t __elf64_updatenull_wrlock (Elf *elf, int *change_bop,
+					size_t shnum) internal_function;
 
 extern int __elf32_updatemmap (Elf *elf, int change_bo, size_t shnum)
      internal_function;
@@ -527,20 +515,19 @@ extern int __elf64_updatefile (Elf *elf, int change_bo, size_t shnum)
      internal_function;
 
 
-/* Alias for exported functions to avoid PLT entries.  */
-extern int __elf_end_internal (Elf *__elf);
+/* Alias for exported functions to avoid PLT entries, and
+   rdlock/wrlock variants of these functions.  */
+extern int __elf_end_internal (Elf *__elf) attribute_hidden;
 extern Elf *__elf_begin_internal (int __fildes, Elf_Cmd __cmd, Elf *__ref)
      attribute_hidden;
-extern Elf32_Ehdr *__elf32_getehdr_internal (Elf *__elf, lockstat_t locked)
-  attribute_hidden;
-extern Elf64_Ehdr *__elf64_getehdr_internal (Elf *__elf, lockstat_t locked)
-  attribute_hidden;
+extern Elf32_Ehdr *__elf32_getehdr_rdlock (Elf *__elf) internal_function;
+extern Elf64_Ehdr *__elf64_getehdr_rdlock (Elf *__elf) internal_function;
 extern Elf32_Ehdr *__elf32_newehdr_internal (Elf *__elf) attribute_hidden;
 extern Elf64_Ehdr *__elf64_newehdr_internal (Elf *__elf) attribute_hidden;
-extern Elf32_Phdr *__elf32_getphdr_internal (Elf *__elf, lockstat_t locked)
-     attribute_hidden;
-extern Elf64_Phdr *__elf64_getphdr_internal (Elf *__elf, lockstat_t locked)
-     attribute_hidden;
+extern Elf32_Phdr *__elf32_getphdr_internal (Elf *__elf) attribute_hidden;
+extern Elf64_Phdr *__elf64_getphdr_internal (Elf *__elf) attribute_hidden;
+extern Elf32_Phdr *__elf32_getphdr_wrlock (Elf *__elf) attribute_hidden;
+extern Elf64_Phdr *__elf64_getphdr_wrlock (Elf *__elf) attribute_hidden;
 extern Elf32_Phdr *__elf32_newphdr_internal (Elf *__elf, size_t __cnt)
      attribute_hidden;
 extern Elf64_Phdr *__elf64_newphdr_internal (Elf *__elf, size_t __cnt)
@@ -549,23 +536,22 @@ extern Elf_Scn *__elf32_offscn_internal (Elf *__elf, Elf32_Off __offset)
   attribute_hidden;
 extern Elf_Scn *__elf64_offscn_internal (Elf *__elf, Elf64_Off __offset)
   attribute_hidden;
-extern int __elf_getshnum_internal (Elf *__elf, size_t *__dst,
-				    lockstat_t locked)
-     attribute_hidden;
+extern int __elf_getshnum_rdlock (Elf *__elf, size_t *__dst) internal_function;
 extern int __elf_getshstrndx_internal (Elf *__elf, size_t *__dst)
      attribute_hidden;
-extern Elf32_Shdr *__elf32_getshdr_internal (Elf_Scn *__scn, lockstat_t locked)
-     attribute_hidden;
-extern Elf64_Shdr *__elf64_getshdr_internal (Elf_Scn *__scn, lockstat_t locked)
-     attribute_hidden;
+extern Elf32_Shdr *__elf32_getshdr_rdlock (Elf_Scn *__scn) internal_function;
+extern Elf64_Shdr *__elf64_getshdr_rdlock (Elf_Scn *__scn) internal_function;
+extern Elf32_Shdr *__elf32_getshdr_wrlock (Elf_Scn *__scn) internal_function;
+extern Elf64_Shdr *__elf64_getshdr_wrlock (Elf_Scn *__scn) internal_function;
 extern Elf_Scn *__elf_getscn_internal (Elf *__elf, size_t __index)
      attribute_hidden;
 extern Elf_Scn *__elf_nextscn_internal (Elf *__elf, Elf_Scn *__scn)
      attribute_hidden;
 extern int __elf_scnshndx_internal (Elf_Scn *__scn) attribute_hidden;
-extern Elf_Data *__elf_getdata_internal (Elf_Scn *__scn, Elf_Data *__data,
-					 lockstat_t locked)
+extern Elf_Data *__elf_getdata_internal (Elf_Scn *__scn, Elf_Data *__data)
      attribute_hidden;
+extern Elf_Data *__elf_getdata_rdlock (Elf_Scn *__scn, Elf_Data *__data)
+     internal_function;
 extern Elf_Data *__elf_rawdata_internal (Elf_Scn *__scn, Elf_Data *__data)
      attribute_hidden;
 extern char *__elf_strptr_internal (Elf *__elf, size_t __index,
@@ -594,9 +580,8 @@ extern long int __elf32_checksum_internal (Elf *__elf) attribute_hidden;
 extern long int __elf64_checksum_internal (Elf *__elf) attribute_hidden;
 
 
-extern GElf_Ehdr *__gelf_getehdr_internal (Elf *__elf, GElf_Ehdr *__dest,
-					   lockstat_t locked)
-     attribute_hidden;
+extern GElf_Ehdr *__gelf_getehdr_rdlock (Elf *__elf, GElf_Ehdr *__dest)
+     internal_function;
 extern size_t __gelf_fsize_internal (Elf *__elf, Elf_Type __type,
 				     size_t __count, unsigned int __version)
      attribute_hidden;
@@ -625,35 +610,5 @@ extern uint32_t __libelf_crc32 (uint32_t crc, unsigned char *buf, size_t len)
 
 /* Align offset to 4 bytes as needed for note name and descriptor data.  */
 #define NOTE_ALIGN(n)	(((n) + 3) & -4U)
-
-#if defined NDEBUG || !defined USE_TLS
-# define LIBELF_CHECKED_LOCK(V, S) ((void)(V))
-#else
-/* Checked locking primitives.  Prints out an error to stderr if the
-   locking or unlocking function returns an error code.  A development
-   aid similar to assert, the user is not supposed to ever see any of
-   these.  */
-# if (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600) && ! _GNU_SOURCE
-#  error The XSI-compliant version of strerror_r() is provided, but in following, \
-  the GNU version is assumed.  Please rewrite.
-# endif
-
-# define LIBELF_CHECKED_LOCK(V, S)				\
-  do {								\
-    int err = (V);						\
-    if (err != 0)						\
-      {								\
-	char __buf[128];					\
-	char *__ptr = strerror_r (err, __buf, sizeof __buf);	\
-	fprintf (stderr, "%s:%d: %s: %s\n",			\
-		 __FILE__, __LINE__, (S), __ptr);		\
-      }								\
-  } while (0)
-
-#endif
-
-#define RWLOCK_RDLOCK(LOCK) LIBELF_CHECKED_LOCK (rwlock_rdlock (LOCK), "rwlock_rdlock")
-#define RWLOCK_WRLOCK(LOCK) LIBELF_CHECKED_LOCK (rwlock_wrlock (LOCK), "rwlock_wrlock")
-#define RWLOCK_UNLOCK(LOCK) LIBELF_CHECKED_LOCK (rwlock_unlock (LOCK), "rwlock_unlock")
 
 #endif  /* libelfP.h */

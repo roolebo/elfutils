@@ -1,8 +1,50 @@
-2008-07-15  Petr Machata  <pmachata@redhat.com>
+2008-08-21  Denys Vlasenko  <dvlasenk@redhat.com>
 
-	* linux-kernel-modules.c: #undef __USE_FILE_OFFSET64, it doesn't
-	work with fts.  It gets defined through <pthread.h> include in
-	<config.h>.
+	* dwfl_module_addrsym.c (dwfl_module_addrsym): Improve logic
+	which decides which symbol is "closest" to a given address.
+
+2008-08-15  Roland McGrath  <roland@redhat.com>
+
+	* argp-std.c (offline_callbacks): Use dwfl_build_id_find_elf.
+	(options, parse_opt): Handle --core.
+
+	* core-file.c: New file.
+	* Makefile.am (libdwfl_a_SOURCES): Add it.
+	* libdwflP.h (dwfl_core_file_report): Declare it.
+
+	* link_map.c: New file.
+	* Makefile.am (libdwfl_a_SOURCES): Add it.
+	* libdwflP.h (dwfl_link_map_report): Declare it.
+
+	* libdwflP.h (MIN, MAX): New macros.
+	(Dwfl_Memory_Callback): New typedef.
+	(Dwfl_Module_Callback): New typedef.
+	(dwfl_segment_report_module): Declare it.
+	* dwfl_segment_report_module.c: New file.
+	* Makefile.am (libdwfl_a_SOURCES): Add it.
+
+	* derelocate.c (dwfl_module_address_section): Add INTDEF.
+	* libdwflP.h: Add INTDECL.
+
+	* segment.c: New file.
+	* Makefile.am (libdwfl_a_SOURCES): Add it.
+	* libdwfl.h: Declare dwfl_addrsegment, dwfl_report_segment.
+	* libdwflP.h (struct Dwfl): New members lookup_elts, lookup_alloc,
+	lookup_addr, lookup_module, lookup_segndx, replace removed members
+	modules, nmodules.
+	(struct Dwfl_Module): New member segment.
+	* dwfl_end.c (dwfl_end): Free the new ones.  Iterate via modulelist
+	to each free module.
+	* dwfl_module.c (dwfl_report_begin_add): Do nothing.
+	(dwfl_report_begin): Don't call it.  Truncate the segment table instead.
+	(dwfl_report_module): Don't touch DWFL->nmodules.
+	(dwfl_report_end): Don't touch DWFL->modules and DWFL->nmodules.
+	(compare_modules): Function removed.
+	* dwfl_getmodules.c: Rewritten.
+	Add INTDEF.
+	* libdwflP.h: Add INTDECLs.
+	* dwfl_getdwarf.c: Rewritten to call dwfl_getmodules.
+	* dwfl_addrmodule.c: Rewritten to just call dwfl_addrsegment.
 
 2008-08-03  Roland McGrath  <roland@redhat.com>
 

@@ -77,7 +77,7 @@ gelf_getsym (data, ndx, dst)
       return NULL;
     }
 
-  RWLOCK_RDLOCK (data_scn->s->elf->lock);
+  rwlock_rdlock (data_scn->s->elf->lock);
 
   /* This is the one place where we have to take advantage of the fact
      that an `Elf_Data' pointer is also a pointer to `Elf_Data_Scn'.
@@ -131,7 +131,7 @@ gelf_getsym (data, ndx, dst)
   result = dst;
 
  out:
-  RWLOCK_UNLOCK (data_scn->s->elf->lock);
+  rwlock_unlock (data_scn->s->elf->lock);
 
   return result;
 }

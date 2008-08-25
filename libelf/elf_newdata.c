@@ -83,7 +83,7 @@ elf_newdata (Elf_Scn *scn)
       return NULL;
     }
 
-  RWLOCK_WRLOCK (scn->elf->lock);
+  rwlock_wrlock (scn->elf->lock);
 
   if (scn->data_read && scn->data_list_rear == NULL)
     {
@@ -122,7 +122,7 @@ elf_newdata (Elf_Scn *scn)
   scn->data_list_rear = result;
 
  out:
-  RWLOCK_UNLOCK (scn->elf->lock);
+  rwlock_unlock (scn->elf->lock);
 
   /* Please note that the following is thread safe and is also defined
      for RESULT == NULL since it still return NULL.  */

@@ -89,14 +89,14 @@ gelf_update_versym (data, ndx, src)
       return 0;
     }
 
-  RWLOCK_WRLOCK (data_scn->s->elf->lock);
+  rwlock_wrlock (data_scn->s->elf->lock);
 
   ((GElf_Versym *) data_scn->d.d_buf)[ndx] = *src;
 
   /* Mark the section as modified.  */
   data_scn->s->flags |= ELF_F_DIRTY;
 
-  RWLOCK_UNLOCK (data_scn->s->elf->lock);
+  rwlock_unlock (data_scn->s->elf->lock);
 
   return 1;
 }

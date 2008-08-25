@@ -52,17 +52,22 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <libintl.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 /* gettext helper macros.  */
 #define _(Str) dgettext ("elfutils", Str)
 
 
-#define OPT_DEBUGINFO 0x100
+#define OPT_DEBUGINFO	0x100
+#define OPT_COREFILE	0x101
 
 static const struct argp_option options[] =
 {
   { NULL, 0, NULL, 0, N_("Input selection options:"), 0 },
   { "executable", 'e', "FILE", 0, N_("Find addresses in FILE"), 0 },
+  { "core", OPT_COREFILE, "COREFILE", 0,
+    N_("Find addresses from signatures found in COREFILE"), 0 },
   { "pid", 'p', "PID", 0,
     N_("Find addresses in files mapped into process PID"), 0 },
   { "linux-process-map", 'M', "FILE", 0,
@@ -84,6 +89,9 @@ static const Dwfl_Callbacks offline_callbacks =
     .debuginfo_path = &debuginfo_path,
 
     .section_address = INTUSE(dwfl_offline_section_address),
+
+    /* We use this table for core files too.  */
+    .find_elf = INTUSE(dwfl_build_id_find_elf),
   };
 
 static const Dwfl_Callbacks proc_callbacks =
@@ -151,8 +159,8 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	else
 	  {
 	  toomany:
-	    argp_error (state,
-			"%s", _("only one of -e, -p, -k, or -K allowed"));
+	    argp_error (state, "%s",
+			_("only one of -e, -p, -k, -K, or --core allowed"));
 	    return EINVAL;
 	  }
       }
@@ -176,6 +184,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	{
 	  FILE *f = fopen (arg, "r");
 	  if (f == NULL)
+	  nofile:
 	    {
 	      int code = errno;
 	      argp_failure (state, EXIT_FAILURE, code,
@@ -191,6 +200,50 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	}
       else
 	goto toomany;
+      break;
+
+    case OPT_COREFILE:
+      {
+	Dwfl *dwfl = state->hook;
+	if (dwfl == NULL)
+	  state->hook = dwfl = INTUSE(dwfl_begin) (&offline_callbacks);
+	/* Permit -e and --core together.  */
+	else if (dwfl->callbacks != &offline_callbacks)
+	  goto toomany;
+
+	int fd = open64 (arg, O_RDONLY);
+	if (fd < 0)
+	  goto nofile;
+
+	Elf *core = elf_begin (fd, ELF_C_READ_MMAP_PRIVATE, NULL);
+	if (core == NULL)
+	  {
+	    close (fd);
+	    argp_failure (state, EXIT_FAILURE, 0,
+			  _("cannot read ELF core file: %s"),
+			  elf_errmsg (-1));
+	    return EIO;
+	  }
+
+	GElf_Ehdr ehdr;
+	int result = INTUSE(dwfl_core_file_report) (dwfl, core,
+						    gelf_getehdr (core, &ehdr));
+	if (result < 0)
+	  {
+	    elf_end (core);
+	    close (fd);
+	    return fail (dwfl, result, arg);
+	  }
+
+	/* From now we leak FD and CORE.  */
+
+	if (result == 0)
+	  {
+	    argp_failure (state, EXIT_FAILURE, 0,
+			  _("No modules recognized in core file"));
+	    return ENOENT;
+	  }
+      }
       break;
 
     case 'k':

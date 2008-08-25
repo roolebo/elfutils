@@ -1,5 +1,5 @@
 /* Find module containing address.
-   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -52,32 +52,8 @@
 Dwfl_Module *
 dwfl_addrmodule (Dwfl *dwfl, Dwarf_Addr address)
 {
-  if (dwfl == NULL || dwfl->modules == NULL)
-    return NULL;
-
-  Dwfl_Module *boundary = NULL;
-
-  /* Do binary search on the array indexed by module load address.  */
-  size_t l = 0, u = dwfl->nmodules;
-  while (l < u)
-    {
-      size_t idx = (l + u) / 2;
-      Dwfl_Module *m = dwfl->modules[idx];
-      if (address < m->low_addr)
-	u = idx;
-      else if (address >= m->high_addr)
-	{
-	  l = idx + 1;
-	  if (address == m->high_addr)
-	    /* If the high bound of this module is not the low bound of
- 	       another, then consider the boundary address to be inside
-	       this module.  */
-	    boundary = m;
-	}
-      else
-	return m;
-    }
-
-  return boundary;
+  Dwfl_Module *mod;
+  (void) INTUSE(dwfl_addrsegment) (dwfl, address, &mod);
+  return mod;
 }
 INTDEF (dwfl_addrmodule)

@@ -72,7 +72,7 @@ gelf_update_ehdr (Elf *elf, GElf_Ehdr *src)
       return 0;
     }
 
-  RWLOCK_WRLOCK (elf->lock);
+  rwlock_wrlock (elf->lock);
 
   if (elf->class == ELFCLASS32)
     {
@@ -130,7 +130,7 @@ gelf_update_ehdr (Elf *elf, GElf_Ehdr *src)
   result = 1;
 
  out:
-  RWLOCK_UNLOCK (elf->lock);
+  rwlock_unlock (elf->lock);
 
   return result;
 }

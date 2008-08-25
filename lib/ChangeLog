@@ -1,3 +1,14 @@
+2008-08-25  Roland McGrath  <roland@redhat.com>
+
+	* eu-config.h [USE_TLS] (RWLOCK_CALL): New macro.
+	(rwlock_init, rwlock_fini, rwlock_rdlock, rwlock_wrlock, rwlock_unlock):
+	Use it.
+
+2008-08-24  Roland McGrath  <roland@redhat.com>
+
+	* eu-config.h: New file.
+	* Makefile.am (noinst_HEADERS): Add it.
+
 2008-02-01  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.am (libeu_a_SOURCES): Add sha1.c.

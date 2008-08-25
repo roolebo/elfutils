@@ -52,15 +52,20 @@
 void
 dwfl_end (Dwfl *dwfl)
 {
-  if (dwfl != NULL)
+  if (dwfl == NULL)
+    return;
+
+  free (dwfl->lookup_addr);
+  free (dwfl->lookup_module);
+  free (dwfl->lookup_segndx);
+
+  Dwfl_Module *next = dwfl->modulelist;
+  while (next != NULL)
     {
-      while (dwfl->modulelist != NULL)
-	{
-	  Dwfl_Module *mod = dwfl->modulelist;
-	  dwfl->modulelist = mod->next;
-	  __libdwfl_module_free (mod);
-	}
-      free (dwfl->modules);
-      free (dwfl);
+      Dwfl_Module *dead = next;
+      next = dead->next;
+      __libdwfl_module_free (dead);
     }
+
+  free (dwfl);
 }

@@ -69,7 +69,7 @@ elf_nextscn (elf, scn)
   if (elf == NULL)
     return NULL;
 
-  RWLOCK_RDLOCK (elf->lock);
+  rwlock_rdlock (elf->lock);
 
   if (scn == NULL)
     {
@@ -103,7 +103,7 @@ elf_nextscn (elf, scn)
 	}
     }
 
-  RWLOCK_UNLOCK (elf->lock);
+  rwlock_unlock (elf->lock);
 
   return result;
 }

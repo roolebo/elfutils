@@ -73,7 +73,7 @@ elf_getscn (elf, idx)
       return NULL;
     }
 
-  RWLOCK_RDLOCK (elf->lock);
+  rwlock_rdlock (elf->lock);
 
   Elf_Scn *result = NULL;
 
@@ -103,7 +103,7 @@ elf_getscn (elf, idx)
 	}
     }
 
-  RWLOCK_UNLOCK (elf->lock);
+  rwlock_unlock (elf->lock);
 
   return result;
 }

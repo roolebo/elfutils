@@ -77,7 +77,7 @@ elfw2(LIBELFBITS,newehdr) (elf)
       return NULL;
     }
 
-  RWLOCK_WRLOCK (elf->lock);
+  rwlock_wrlock (elf->lock);
 
   if (elf->class == 0)
     elf->class = ELFW(ELFCLASS,LIBELFBITS);
@@ -106,7 +106,7 @@ elfw2(LIBELFBITS,newehdr) (elf)
   result = elf->state.ELFW(elf,LIBELFBITS).ehdr;
 
  out:
-  RWLOCK_UNLOCK (elf->lock);
+  rwlock_unlock (elf->lock);
 
   return result;
 }

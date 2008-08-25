@@ -79,7 +79,7 @@ gelf_getnote (data, offset, result, name_offset, desc_offset)
   assert (sizeof (GElf_Nhdr) == sizeof (Elf32_Nhdr));
   assert (sizeof (GElf_Nhdr) == sizeof (Elf64_Nhdr));
 
-  RWLOCK_RDLOCK (((Elf_Data_Scn *) data)->s->elf->lock);
+  rwlock_rdlock (((Elf_Data_Scn *) data)->s->elf->lock);
 
   /* The data is already in the correct form.  Just make sure the
      offset is OK.  */
@@ -113,7 +113,7 @@ gelf_getnote (data, offset, result, name_offset, desc_offset)
 	}
     }
 
-  RWLOCK_UNLOCK (((Elf_Data_Scn *) data)->s->elf->lock);
+  rwlock_unlock (((Elf_Data_Scn *) data)->s->elf->lock);
 
   return offset;
 }

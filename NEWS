@@ -1,3 +1,8 @@
+Version 0.136:
+
+libdwfl: bug fixes; new "segment" interfaces;
+	 all the libdwfl-based tools now support --core=COREFILE option
+
 Version 0.135:
 
 libdwfl: bug fixes

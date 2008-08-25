@@ -73,7 +73,7 @@ elf_strptr (elf, idx, offset)
       return NULL;
     }
 
-  RWLOCK_RDLOCK (elf->lock);
+  rwlock_rdlock (elf->lock);
 
   char *result = NULL;
   Elf_Scn *strscn;
@@ -140,10 +140,15 @@ elf_strptr (elf, idx, offset)
 	}
     }
 
-  if (strscn->rawdata_base == NULL && ! strscn->data_read
-      /* Read the section data.  */
-      && __libelf_set_rawdata (strscn, LS_RDLOCKED) != 0)
-    goto out;
+  if (strscn->rawdata_base == NULL && ! strscn->data_read)
+    {
+      rwlock_unlock (elf->lock);
+      rwlock_wrlock (elf->lock);
+      if (strscn->rawdata_base == NULL && ! strscn->data_read
+	/* Read the section data.  */
+	  && __libelf_set_rawdata_wrlock (strscn) != 0)
+	goto out;
+    }
 
   if (likely (strscn->rawdata_base != NULL))
     result = &strscn->rawdata_base[offset];
@@ -166,7 +171,7 @@ elf_strptr (elf, idx, offset)
     }
 
  out:
-  RWLOCK_UNLOCK (elf->lock);
+  rwlock_unlock (elf->lock);
 
   return result;
 }

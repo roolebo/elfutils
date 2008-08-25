@@ -65,17 +65,12 @@ if !MUDFLAP
 libasm_pic_a_SOURCES =
 am_libasm_pic_a_OBJECTS = $(libasm_a_SOURCES:.c=.os)
 
-libasm_so_LDLIBS =
-if USE_TLS
-libasm_so_LDLIBS += -lpthread
-endif
-
 libasm_so_SOURCES =
 libasm.so: libasm_pic.a libasm.map
 	$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
 		-Wl,--version-script,$(srcdir)/libasm.map,--no-undefined \
 		-Wl,--soname,$@.$(VERSION) \
-		../libebl/libebl.a ../libelf/libelf.so $(libasm_so_LDLIBS)
+		../libebl/libebl.a ../libelf/libelf.so
 	if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
 	ln -fs $@ $@.$(VERSION)
 

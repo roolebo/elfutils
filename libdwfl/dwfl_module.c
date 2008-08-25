@@ -1,5 +1,5 @@
 /* Maintenance of module list in libdwfl.
-   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -109,19 +109,18 @@ __libdwfl_module_free (Dwfl_Module *mod)
 }
 
 void
-dwfl_report_begin_add (Dwfl *dwfl)
+dwfl_report_begin_add (Dwfl *dwfl __attribute__ ((unused)))
 {
-  if (dwfl->modules != NULL)
-    free (dwfl->modules);
-  dwfl->modules = NULL;
-  dwfl->nmodules = 0;
+  /* The lookup table will be cleared on demand, there is nothing we need
+     to do here.  */
 }
 INTDEF (dwfl_report_begin_add)
 
 void
 dwfl_report_begin (Dwfl *dwfl)
 {
-  INTUSE(dwfl_report_begin_add) (dwfl);
+  /* Clear the segment lookup table.  */
+  dwfl->lookup_elts = 0;
 
   for (Dwfl_Module *m = dwfl->modulelist; m != NULL; m = m->next)
     m->gc = true;
@@ -138,6 +137,21 @@ dwfl_report_module (Dwfl *dwfl, const char *name,
 		    GElf_Addr start, GElf_Addr end)
 {
   Dwfl_Module **tailp = &dwfl->modulelist, **prevp = tailp;
+
+  inline Dwfl_Module *use (Dwfl_Module *mod)
+  {
+    mod->next = *tailp;
+    *tailp = mod;
+
+    if (unlikely (dwfl->lookup_module != NULL))
+      {
+	free (dwfl->lookup_module);
+	dwfl->lookup_module = NULL;
+      }
+
+    return mod;
+  }
+
   for (Dwfl_Module *m = *prevp; m != NULL; m = *(prevp = &m->next))
     {
       if (m->low_addr == start && m->high_addr == end
@@ -145,13 +159,9 @@ dwfl_report_module (Dwfl *dwfl, const char *name,
 	{
 	  /* This module is still here.  Move it to the place in the list
 	     after the last module already reported.  */
-
 	  *prevp = m->next;
-	  m->next = *tailp;
 	  m->gc = false;
-	  *tailp = m;
-	  ++dwfl->nmodules;
-	  return m;
+	  return use (m);
 	}
 
       if (! m->gc)
@@ -175,33 +185,9 @@ dwfl_report_module (Dwfl *dwfl, const char *name,
   mod->high_addr = end;
   mod->dwfl = dwfl;
 
-  mod->next = *tailp;
-  *tailp = mod;
-  ++dwfl->nmodules;
-
-  return mod;
+  return use (mod);
 }
 INTDEF (dwfl_report_module)
-
-
-static int
-compare_modules (const void *a, const void *b)
-{
-  Dwfl_Module *const *p1 = a, *const *p2 = b;
-  const Dwfl_Module *m1 = *p1, *m2 = *p2;
-  if (m1 == NULL)
-    return -1;
-  if (m2 == NULL)
-    return 1;
-
-  /* No signed difference calculation is correct here, since the
-     terms are unsigned and could be more than INT64_MAX apart.  */
-  if (m1->low_addr < m2->low_addr)
-    return -1;
-  if (m1->low_addr > m2->low_addr)
-    return 1;
-  return 0;
-}
 
 
 /* Finish reporting the current set of modules to the library.
@@ -216,8 +202,6 @@ dwfl_report_end (Dwfl *dwfl,
 				 void *arg),
 		 void *arg)
 {
-  assert (dwfl->modules == NULL);
-
   Dwfl_Module **tailp = &dwfl->modulelist;
   while (*tailp != NULL)
     {
@@ -236,21 +220,6 @@ dwfl_report_end (Dwfl *dwfl,
       else
 	tailp = &m->next;
     }
-
-  dwfl->modules = malloc (dwfl->nmodules * sizeof dwfl->modules[0]);
-  if (dwfl->modules == NULL && dwfl->nmodules != 0)
-    return -1;
-
-  size_t i = 0;
-  for (Dwfl_Module *m = dwfl->modulelist; m != NULL; m = m->next)
-    {
-      assert (! m->gc);
-      dwfl->modules[i++] = m;
-    }
-  assert (i == dwfl->nmodules);
-
-  qsort (dwfl->modules, dwfl->nmodules, sizeof dwfl->modules[0],
-	 &compare_modules);
 
   return 0;
 }

@@ -80,7 +80,7 @@ gelf_getsyminfo (data, ndx, dst)
   assert (sizeof (GElf_Syminfo) == sizeof (Elf32_Syminfo));
   assert (sizeof (GElf_Syminfo) == sizeof (Elf64_Syminfo));
 
-  RWLOCK_RDLOCK (((Elf_Data_Scn *) data)->s->elf->lock);
+  rwlock_rdlock (((Elf_Data_Scn *) data)->s->elf->lock);
 
   /* The data is already in the correct form.  Just make sure the
      index is OK.  */
@@ -95,7 +95,7 @@ gelf_getsyminfo (data, ndx, dst)
   result = dst;
 
  out:
-  RWLOCK_UNLOCK (((Elf_Data_Scn *) data)->s->elf->lock);
+  rwlock_unlock (((Elf_Data_Scn *) data)->s->elf->lock);
 
   return result;
 }

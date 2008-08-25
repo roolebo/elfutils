@@ -108,10 +108,22 @@ struct Dwfl
 
   Dwfl_Module *modulelist;    /* List in order used by full traversals.  */
 
-  Dwfl_Module **modules;
-  size_t nmodules;
-
   GElf_Addr offline_next_address;
+
+  GElf_Addr segment_align;	/* Smallest granularity of segments.  */
+
+  /* Binary search table in three parallel malloc'd arrays.  */
+  size_t lookup_elts;		/* Elements in use.  */
+  size_t lookup_alloc;		/* Elements allococated.  */
+  GElf_Addr *lookup_addr;	/* Start address of segment.  */
+  Dwfl_Module **lookup_module;	/* Module associated with segment, or null.  */
+  int *lookup_segndx;		/* User segment index, or -1.  */
+
+  /* Cache from last dwfl_report_segment call.  */
+  const void *lookup_tail_ident;
+  GElf_Off lookup_tail_vaddr;
+  GElf_Off lookup_tail_offset;
+  int lookup_tail_ndx;
 };
 
 #define OFFLINE_REDZONE		0x10000
@@ -168,6 +180,7 @@ struct Dwfl_Module
   struct dwfl_arange *aranges;	/* Mapping of addresses in module to CUs.  */
   unsigned int naranges;
 
+  int segment;			/* Index of first segment table entry.  */
   bool gc;			/* Mark/sweep flag.  */
 };
 
@@ -303,13 +316,64 @@ extern Dwfl_Module *__libdwfl_report_offline (Dwfl *dwfl, const char *name,
   internal_function;
 
 
+/* These are working nicely for --core, but are not ready to be
+   exported interfaces quite yet.  */
+
+/* Type of callback function ...
+ */
+typedef bool Dwfl_Memory_Callback (Dwfl *dwfl, int segndx,
+				   void **buffer, size_t *buffer_available,
+				   GElf_Addr vaddr, size_t minread, void *arg);
+
+/* Type of callback function ...
+ */
+typedef bool Dwfl_Module_Callback (Dwfl_Module *mod, void **userdata,
+				   const char *name, Dwarf_Addr base,
+				   void **buffer, size_t *buffer_available,
+				   GElf_Off cost, GElf_Off worthwhile,
+				   GElf_Off whole, GElf_Off contiguous,
+				   void *arg, Elf **elfp);
+
+/* ...
+ */
+extern int dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
+				       Dwfl_Memory_Callback *memory_callback,
+				       void *memory_callback_arg,
+				       Dwfl_Module_Callback *read_eagerly,
+				       void *read_eagerly_arg);
+
+/* Report a module for entry in the dynamic linker's struct link_map list.
+   For each link_map entry, if an existing module resides at its address,
+   this just modifies that module's name and suggested file name.  If
+   no such module exists, this calls dwfl_report_elf on the l_name string.
+
+   If AUXV is not null, it points to AUXV_SIZE bytes of auxiliary vector
+   data as contained in an NT_AUXV note or read from a /proc/pid/auxv
+   file.  When this is available, it guides the search.  If AUXV is null
+   or the memory it points to is not accessible, then this search can
+   only find where to begin if the correct executable file was
+   previously reported and preloaded as with dwfl_report_elf.
+
+   Returns the number of modules found, or -1 for errors.  */
+extern int dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
+				 Dwfl_Memory_Callback *memory_callback,
+				 void *memory_callback_arg);
+
+/* Examine an ET_CORE file and report modules based on its contents.  */
+extern int dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const GElf_Ehdr *ehdr);
+
+
 /* Avoid PLT entries.  */
 INTDECL (dwfl_begin)
 INTDECL (dwfl_errmsg)
 INTDECL (dwfl_addrmodule)
+INTDECL (dwfl_addrsegment)
 INTDECL (dwfl_addrdwarf)
 INTDECL (dwfl_addrdie)
+INTDECL (dwfl_core_file_report)
+INTDECL (dwfl_getmodules)
 INTDECL (dwfl_module_addrdie)
+INTDECL (dwfl_module_address_section)
 INTDECL (dwfl_module_addrsym)
 INTDECL (dwfl_module_build_id)
 INTDECL (dwfl_module_getdwarf)
@@ -322,11 +386,13 @@ INTDECL (dwfl_report_elf)
 INTDECL (dwfl_report_begin)
 INTDECL (dwfl_report_begin_add)
 INTDECL (dwfl_report_module)
+INTDECL (dwfl_report_segment)
 INTDECL (dwfl_report_offline)
 INTDECL (dwfl_report_end)
 INTDECL (dwfl_build_id_find_elf)
 INTDECL (dwfl_build_id_find_debuginfo)
 INTDECL (dwfl_standard_find_debuginfo)
+INTDECL (dwfl_link_map_report)
 INTDECL (dwfl_linux_kernel_find_elf)
 INTDECL (dwfl_linux_kernel_module_section_address)
 INTDECL (dwfl_linux_proc_report)

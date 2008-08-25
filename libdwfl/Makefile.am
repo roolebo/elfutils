@@ -50,7 +50,7 @@ pkginclude_HEADERS = libdwfl.h
 libdwfl_a_SOURCES = dwfl_begin.c dwfl_end.c dwfl_error.c dwfl_version.c \
 		    dwfl_module.c dwfl_report_elf.c relocate.c \
 		    dwfl_module_build_id.c dwfl_module_report_build_id.c \
-		    derelocate.c offline.c \
+		    derelocate.c offline.c segment.c \
 		    dwfl_module_info.c  dwfl_getmodules.c \
 		    dwfl_module_getdwarf.c dwfl_getdwarf.c \
 		    dwfl_validate_address.c \
@@ -71,7 +71,9 @@ libdwfl_a_SOURCES = dwfl_begin.c dwfl_end.c dwfl_error.c dwfl_version.c \
 		    dwfl_module_getsym.c \
 		    dwfl_module_addrname.c dwfl_module_addrsym.c \
 		    dwfl_module_return_value_location.c \
-		    dwfl_module_register_names.c
+		    dwfl_module_register_names.c \
+		    dwfl_segment_report_module.c \
+		    link_map.c core-file.c
 
 
 if MUDFLAP

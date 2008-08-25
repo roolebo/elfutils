@@ -176,3 +176,12 @@ ELFUTILS_0.130 {
   local:
     *;
 } ELFUTILS_0.127;
+
+ELFUTILS_0.136 {
+  global:
+    dwfl_addrsegment;
+    dwfl_report_segment;
+
+  local:
+    *;
+} ELFUTILS_0.130;

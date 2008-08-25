@@ -79,7 +79,7 @@ elf_getshstrndx (elf, dst)
       return -1;
     }
 
-  RWLOCK_RDLOCK (elf->lock);
+  rwlock_rdlock (elf->lock);
 
   /* We rely here on the fact that the `elf' element is a common prefix
      of `elf32' and `elf64'.  */
@@ -196,7 +196,7 @@ elf_getshstrndx (elf, dst)
     }
 
  out:
-  RWLOCK_UNLOCK (elf->lock);
+  rwlock_unlock (elf->lock);
 
   return result;
 }

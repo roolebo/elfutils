@@ -1,5 +1,5 @@
 /* Iterate through modules.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -59,15 +59,49 @@ dwfl_getmodules (Dwfl *dwfl,
   if (dwfl == NULL)
     return -1;
 
-  if ((size_t) offset > dwfl->nmodules)
-    return -1;
+  Dwfl_Module *m = dwfl->modulelist;
 
-  while ((size_t) offset < dwfl->nmodules)
+  if (unlikely (dwfl->lookup_module == NULL))
     {
-      Dwfl_Module *mod = dwfl->modules[offset++];
-      if ((*callback) (MODCB_ARGS (mod), arg) != DWARF_CB_OK)
-	return offset;
+      for (ptrdiff_t pos = 0; pos < offset; ++pos)
+	if (m == NULL)
+	  return -1;
+	else
+	  m = m->next;
+      while (m != NULL)
+	{
+	  ++offset;
+	  if ((*callback) (MODCB_ARGS (m), arg) != DWARF_CB_OK)
+	    return offset;
+	  m = m->next;
+	}
+    }
+  else
+    {
+      if (offset > 0)
+	{
+	  if ((size_t) offset - 1 == dwfl->lookup_elts)
+	    return 0;
+
+	  if (unlikely ((size_t) offset - 1 > dwfl->lookup_elts))
+	    return -1;
+
+	  m = dwfl->lookup_module[offset - 1];
+	  if (unlikely (m == NULL))
+	    return -1;
+	}
+
+      while (m != NULL)
+	{
+	  int ok = (*callback) (MODCB_ARGS (m), arg);
+	  m = m->next;
+	  if (ok != DWARF_CB_OK)
+	    return (m == NULL
+		    ? (ptrdiff_t) dwfl->lookup_elts + 1
+		    : m->segment + 1);
+	}
     }
 
   return 0;
 }
+INTDEF (dwfl_getmodules)

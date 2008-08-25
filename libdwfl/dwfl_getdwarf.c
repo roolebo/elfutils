@@ -1,5 +1,5 @@
 /* Iterate through modules to fetch Dwarf information.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -49,6 +49,24 @@
 
 #include "libdwflP.h"
 
+struct module_callback_info
+{
+  int (*callback) (Dwfl_Module *, void **,
+		   const char *, Dwarf_Addr,
+		   Dwarf *, Dwarf_Addr, void *);
+  void *arg;
+};
+
+static int
+module_callback (Dwfl_Module *mod, void **userdata,
+		 const char *name, Dwarf_Addr start, void *arg)
+{
+  const struct module_callback_info *info = arg;
+  Dwarf_Addr bias = 0;
+  Dwarf *dw = INTUSE(dwfl_module_getdwarf) (mod, &bias);
+  return (*info->callback) (mod, userdata, name, start, dw, bias, info->arg);
+}
+
 ptrdiff_t
 dwfl_getdwarf (Dwfl *dwfl,
 	       int (*callback) (Dwfl_Module *, void **,
@@ -57,20 +75,6 @@ dwfl_getdwarf (Dwfl *dwfl,
 	       void *arg,
 	       ptrdiff_t offset)
 {
-  if (dwfl == NULL)
-    return -1;
-
-  if ((size_t) offset > dwfl->nmodules)
-    return -1;
-
-  while ((size_t) offset < dwfl->nmodules)
-    {
-      Dwfl_Module *mod = dwfl->modules[offset++];
-      Dwarf_Addr bias = 0;
-      Dwarf *dw = INTUSE(dwfl_module_getdwarf) (mod, &bias);
-      if ((*callback) (MODCB_ARGS (mod), dw, bias, arg) != DWARF_CB_OK)
-	return offset;
-    }
-
-  return 0;
+  struct module_callback_info info = { callback, arg };
+  return INTUSE(dwfl_getmodules) (dwfl, &module_callback, &info, offset);
 }

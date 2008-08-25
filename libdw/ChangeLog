@@ -1,3 +1,8 @@
+2008-08-15  Roland McGrath  <roland@redhat.com>
+
+	* libdw.map (ELFUTILS_0.136): New version set, inherits from
+	ELFUTILS_0.130.  Add dwfl_addrsegment, dwfl_report_segment.
+
 2008-01-21  Ulrich Drepper  <drepper@redhat.com>
 
 	* dwarf_child.c: Minor optimizations.

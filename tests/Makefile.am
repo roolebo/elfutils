@@ -139,7 +139,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile41.bz2 testfile42.bz2 testfile43.bz2 \
 	     testfile44.S.bz2 testfile44.expect.bz2 run-disasm-x86.sh \
 	     testfile45.S.bz2 testfile45.expect.bz2 run-disasm-x86-64.sh \
-	     testfile46.bz2 testfile47.bz2 testfile48.bz2 testfile48.debug.bz2
+	     testfile46.bz2 testfile47.bz2 testfile48.bz2 testfile48.debug.bz2 \
+	     testfile49.bz2
 
 installed_TESTS_ENVIRONMENT = libdir=$(DESTDIR)$(libdir) \
 			      bindir=$(DESTDIR)$(bindir) \

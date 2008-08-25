@@ -133,14 +133,13 @@ ELFW(default_ehdr,LIBELFBITS) (Elf *elf, ElfW2(LIBELFBITS,Ehdr) *ehdr,
 
 off_t
 internal_function
-__elfw2(LIBELFBITS,updatenull) (Elf *elf, int *change_bop,
-				size_t shnum, lockstat_t locked)
+__elfw2(LIBELFBITS,updatenull_wrlock) (Elf *elf, int *change_bop, size_t shnum)
 {
   ElfW2(LIBELFBITS,Ehdr) *ehdr;
   int changed = 0;
   int ehdr_flags = 0;
 
-  ehdr = __elfw2(LIBELFBITS,getehdr_internal) (elf, locked);
+  ehdr = __elfw2(LIBELFBITS,getehdr_rdlock) (elf);
 
   /* Set the default values.  */
   if (ELFW(default_ehdr,LIBELFBITS) (elf, ehdr, shnum, change_bop) != 0)
@@ -153,7 +152,7 @@ __elfw2(LIBELFBITS,updatenull) (Elf *elf, int *change_bop,
   if (elf->state.ELFW(elf,LIBELFBITS).phdr == NULL
       && (ehdr->e_type == ET_EXEC || ehdr->e_type == ET_DYN
 	  || ehdr->e_type == ET_CORE))
-    (void) __elfw2(LIBELFBITS,getphdr_internal) (elf, locked);
+    (void) __elfw2(LIBELFBITS,getphdr_wrlock) (elf);
   if (elf->state.ELFW(elf,LIBELFBITS).phdr != NULL)
     {
       /* Only executables, shared objects, and core files have a program
@@ -207,7 +206,7 @@ __elfw2(LIBELFBITS,updatenull) (Elf *elf, int *change_bop,
       /* Load the section headers if necessary.  This loads the
 	 headers for all sections.  */
       if (list->data[1].shdr.ELFW(e,LIBELFBITS) == NULL)
-	(void) __elfw2(LIBELFBITS,getshdr_internal) (&list->data[1], locked);
+	(void) __elfw2(LIBELFBITS,getshdr_wrlock) (&list->data[1]);
 
       do
 	{
@@ -269,7 +268,7 @@ __elfw2(LIBELFBITS,updatenull) (Elf *elf, int *change_bop,
 				 scn->shdr_flags);
 
 	      if (scn->data_read == 0
-		  && __libelf_set_rawdata (scn, locked) != 0)
+		  && __libelf_set_rawdata_wrlock (scn) != 0)
 		/* Something went wrong.  The error value is already set.  */
 		return -1;
 
@@ -368,7 +367,7 @@ __elfw2(LIBELFBITS,updatenull) (Elf *elf, int *change_bop,
 		    {
 		      /* The position of the section in the file
 			 changed.  Create the section data list.  */
-		      if (__elf_getdata_internal (scn, NULL, locked) == NULL)
+		      if (__elf_getdata_rdlock (scn, NULL) == NULL)
 			return -1;
 		    }
 

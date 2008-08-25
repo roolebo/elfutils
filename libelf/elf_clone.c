@@ -68,7 +68,7 @@ elf_clone (Elf *elf, Elf_Cmd cmd)
     return NULL;
 
   /* Make sure the descriptor is not suddenly going away.  */
-  RWLOCK_RDLOCK (elf->lock);
+  rwlock_rdlock (elf->lock);
 
   if (cmd != ELF_C_EMPTY)
     // XXX TODO handle ELF_C_READ/WRITE etc
@@ -96,7 +96,7 @@ elf_clone (Elf *elf, Elf_Cmd cmd)
 
   /* Release the lock.  */
  out:
-  RWLOCK_UNLOCK (elf->lock);
+  rwlock_unlock (elf->lock);
 
   return retval;
 }

@@ -86,7 +86,7 @@ gelf_update_sym (data, ndx, src)
     }
 
   scn = data_scn->s;
-  RWLOCK_WRLOCK (scn->elf->lock);
+  rwlock_wrlock (scn->elf->lock);
 
   if (scn->elf->class == ELFCLASS32)
     {
@@ -140,7 +140,7 @@ gelf_update_sym (data, ndx, src)
   scn->flags |= ELF_F_DIRTY;
 
  out:
-  RWLOCK_UNLOCK (scn->elf->lock);
+  rwlock_unlock (scn->elf->lock);
 
   return result;
 }

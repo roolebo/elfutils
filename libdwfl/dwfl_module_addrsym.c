@@ -49,6 +49,9 @@
 
 #include "libdwflP.h"
 
+/* Returns the name of the symbol "closest" to ADDR.
+   Never returns symbols at addresses above ADDR.  */
+
 const char *
 dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr addr,
 		     GElf_Sym *closest_sym, GElf_Word *shndxp)
@@ -64,15 +67,6 @@ dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr addr,
       /* For absolute symbols and the like, only match exactly.  */
       if (shndx >= SHN_LORESERVE)
 	return sym->st_value == addr;
-
-      /* Ignore section and other special symbols.  */
-      switch (GELF_ST_TYPE (sym->st_info))
-	{
-	case STT_SECTION:
-	case STT_FILE:
-	case STT_TLS:
-	  return false;
-	}
 
       /* Figure out what section ADDR lies in.  */
       if (addr_shndx == SHN_UNDEF)
@@ -108,7 +102,7 @@ dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr addr,
   GElf_Word sizeless_shndx = SHN_UNDEF;
 
   /* Keep track of the lowest address a relevant sizeless symbol could have.  */
-  GElf_Addr min_label = addr;
+  GElf_Addr min_label = 0;
 
   /* Look through the symbol table for a matching symbol.  */
   for (int i = 1; i < syments; ++i)
@@ -116,24 +110,23 @@ dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr addr,
       GElf_Sym sym;
       GElf_Word shndx;
       const char *name = INTUSE(dwfl_module_getsym) (mod, i, &sym, &shndx);
-      if (name != NULL
+      if (name != NULL && name[0] != '\0'
 	  && sym.st_shndx != SHN_UNDEF
 	  && sym.st_value <= addr
-	  && (sym.st_size == 0 || addr - sym.st_value < sym.st_size))
+	  && GELF_ST_TYPE (sym.st_info) != STT_SECTION
+	  && GELF_ST_TYPE (sym.st_info) != STT_FILE
+	  && GELF_ST_TYPE (sym.st_info) != STT_TLS)
 	{
-	  /* Even if we don't choose this symbol, its existence
-	     excludes any sizeless symbol (assembly label) that
-	     is inside its bounds.  */
-	  if (sym.st_value + sym.st_size > addr)
+	  /* Even if we don't choose this symbol, its existence excludes
+	     any sizeless symbol (assembly label) that is below its upper
+	     bound.  */
+	  if (sym.st_value + sym.st_size > min_label)
 	    min_label = sym.st_value + sym.st_size;
 
-	  /* This symbol is a better candidate than the current one
-	     if it's a named symbol, not a section or file symbol,
-	     and is closer to ADDR or is global when it was local.  */
-	  if (name[0] != '\0'
-	      && GELF_ST_TYPE (sym.st_info) != STT_SECTION
-	      && GELF_ST_TYPE (sym.st_info) != STT_FILE)
+	  if (sym.st_size == 0 || addr - sym.st_value < sym.st_size)
 	    {
+	      /* This symbol is a better candidate than the current one
+		 if it's closer to ADDR or is global when it was local.  */
 	      if (closest_name == NULL
 		  || closest_sym->st_value < sym.st_value
 		  || (GELF_ST_BIND (closest_sym->st_info)
@@ -157,10 +150,13 @@ dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr addr,
 		    }
 		}
 	      /* When the beginning of its range is no closer,
-		 the end of its range might be.  */
+		 the end of its range might be.  But do not
+		 replace a global symbol with a local!  */
 	      else if (sym.st_size != 0
 		       && closest_sym->st_value == sym.st_value
-		       && closest_sym->st_size > sym.st_size)
+		       && closest_sym->st_size > sym.st_size
+		       && (GELF_ST_BIND (closest_sym->st_info)
+			   <= GELF_ST_BIND (sym.st_info)))
 		{
 		  *closest_sym = sym;
 		  closest_shndx = shndx;

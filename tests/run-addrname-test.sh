@@ -25,7 +25,7 @@
 
 . $srcdir/test-subr.sh
 
-testfiles testfile34 testfile38 testfile41
+testfiles testfile34 testfile38 testfile41 testfile49
 
 testrun_compare ../src/addr2line -f -e testfile34 \
 				 0x08048074 0x08048075 0x08048076 \
@@ -82,6 +82,141 @@ caller+0x14
 /home/drepper/local/elfutils-build/20050425/v.c:11
 foo+0xb
 /home/drepper/local/elfutils-build/20030710/u.c:5
+EOF
+
+#	.section .text
+#	nop #0
+#sizeless_foo:
+#	nop #1
+#	nop #2
+#sized_bar:
+#	nop #3
+#	nop #4
+#sizeless_baz:
+#	nop #5
+#	nop #6
+#	.size sized_bar, . - sized_bar
+#	nop #7
+#	nop #8
+#sizeless_x:
+#	nop #9
+#	.org 0x100
+#	nop #0
+#	.globl global_outer
+#global_outer:
+#	nop #1
+#	nop #2
+#	.globl global_in_global
+#global_in_global:
+#	nop #3
+#	nop #4
+#	.size global_in_global, . - global_in_global
+#local_in_global:
+#	nop #5 
+#	nop #6 
+#	.size local_in_global, . - local_in_global
+#	nop #7
+#	nop #8
+#.Lsizeless1:
+#	nop #9
+#	nop #10
+#	.size global_outer, . - global_outer
+#	nop #11
+#	.org 0x200
+#	nop #0
+#local_outer:
+#	nop #1
+#	nop #2
+#	.globl global_in_local
+#global_in_local:
+#	nop #3
+#	nop #4
+#	.size global_in_local, . - global_in_local
+#local_in_local:
+#	nop #5 
+#	nop #6 
+#	.size local_in_local, . - local_in_local
+#	nop #7
+#	nop #8
+#.Lsizeless2:
+#	nop #9
+#	nop #10
+#	.size local_outer, . - local_outer
+#	nop #11
+testrun_compare ../src/addr2line -S -e testfile49 \
+    		0 1 2 3 4 5 6 7 8 9 \
+		0x100 0x101 0x102 0x103 0x104 0x105 \
+		0x106 0x107 0x108 0x109 0x10a 0x10b \
+		0x200 0x201 0x202 0x203 0x204 0x205 \
+		0x206 0x207 0x208 0x209 0x20a 0x20b <<\EOF
+(.text)+0
+??:0
+sizeless_foo
+??:0
+sizeless_foo+0x1
+??:0
+sized_bar
+??:0
+sized_bar+0x1
+??:0
+sized_bar+0x2
+??:0
+sized_bar+0x3
+??:0
+(.text)+0x7
+??:0
+(.text)+0x8
+??:0
+sizeless_x
+??:0
+sizeless_x+0xf7
+??:0
+global_outer
+??:0
+global_outer+0x1
+??:0
+global_in_global
+??:0
+global_in_global+0x1
+??:0
+global_outer+0x4
+??:0
+global_outer+0x5
+??:0
+global_outer+0x6
+??:0
+global_outer+0x7
+??:0
+global_outer+0x8
+??:0
+global_outer+0x9
+??:0
+(.text)+0x10b
+??:0
+(.text)+0x200
+??:0
+local_outer
+??:0
+local_outer+0x1
+??:0
+global_in_local
+??:0
+global_in_local+0x1
+??:0
+local_in_local
+??:0
+local_in_local+0x1
+??:0
+local_outer+0x6
+??:0
+local_outer+0x7
+??:0
+local_outer+0x8
+??:0
+local_outer+0x9
+??:0
+(.text)+0x20b
+??:0
 EOF
 
 exit 0

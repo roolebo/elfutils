@@ -54,6 +54,7 @@
 
 #include <gelf.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "libelfP.h"
 
@@ -81,7 +82,7 @@ gelf_getphdr (elf, ndx, dst)
       return NULL;
     }
 
-  RWLOCK_RDLOCK (elf->lock);
+  rwlock_rdlock (elf->lock);
 
   if (elf->class == ELFCLASS32)
     {
@@ -90,10 +91,12 @@ gelf_getphdr (elf, ndx, dst)
 
       if (phdr == NULL)
 	{
-	  phdr = __elf32_getphdr_internal (elf, LS_RDLOCKED);
+	  rwlock_unlock (elf->lock);
+	  phdr = INTUSE(elf32_getphdr) (elf);
 	  if (phdr == NULL)
 	    /* The error number is already set.  */
-	    goto out;
+	    return NULL;
+	  rwlock_rdlock (elf->lock);
 	}
 
       /* Test whether the index is ok.  */
@@ -126,10 +129,12 @@ gelf_getphdr (elf, ndx, dst)
 
       if (phdr == NULL)
 	{
-	  phdr = __elf64_getphdr_internal (elf, LS_RDLOCKED);
+	  rwlock_unlock (elf->lock);
+	  phdr = INTUSE(elf64_getphdr) (elf);
 	  if (phdr == NULL)
 	    /* The error number is already set.  */
-	    goto out;
+	    return NULL;
+	  rwlock_rdlock (elf->lock);
 	}
 
       /* Test whether the index is ok.  */
@@ -144,7 +149,7 @@ gelf_getphdr (elf, ndx, dst)
     }
 
  out:
-  RWLOCK_UNLOCK (elf->lock);
+  rwlock_unlock (elf->lock);
 
   return result;
 }

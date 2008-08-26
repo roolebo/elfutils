@@ -72,13 +72,20 @@ open_elf (Dwfl_Module *mod, struct dwfl_file *file)
       file->elf = elf_begin (file->fd, ELF_C_READ_MMAP_PRIVATE, NULL);
     }
 
+  if (unlikely (elf_kind (file->elf) != ELF_K_ELF))
+    {
+      close (file->fd);
+      file->fd = -1;
+      return DWFL_E_BADELF;
+    }
+
   GElf_Ehdr ehdr_mem, *ehdr = gelf_getehdr (file->elf, &ehdr_mem);
   if (ehdr == NULL)
     {
     elf_error:
       close (file->fd);
       file->fd = -1;
-      return DWFL_E_LIBELF;
+      return DWFL_E (LIBELF, elf_errno ());
     }
 
   /* The addresses in an ET_EXEC file are absolute.  The lowest p_vaddr of

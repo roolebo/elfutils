@@ -313,7 +313,8 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
      {
 	const void *note_name = nh + 1;
 	const void *note_desc = note_name + NOTE_ALIGN (nh->n_namesz);
-	if (unlikely ((const void *) notes + filesz - note_desc < nh->n_descsz))
+	if (unlikely ((size_t) ((const void *) notes + filesz
+				- note_desc) < nh->n_descsz))
 	  break;
 
 	if (nh->n_type == NT_GNU_BUILD_ID

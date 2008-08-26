@@ -1,3 +1,16 @@
+2008-08-26  Roland McGrath  <roland@redhat.com>
+
+	* segment.c (reify_segments): Insert a trailing segment for a module
+	end that is above the highest current segment.
+
+2008-08-25  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_getdwarf.c (open_elf): Extract elf_errno () for
+	coded return value, not plain DWFL_E_LIBELF.  Return DWFL_E_BADELF
+	if FILE->elf is not ELF_K_ELF.
+
+	* dwfl_segment_report_module.c: Add a cast.
+
 2008-08-21  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	* dwfl_module_addrsym.c (dwfl_module_addrsym): Improve logic

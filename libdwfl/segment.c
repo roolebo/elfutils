@@ -176,8 +176,8 @@ reify_segments (Dwfl *dwfl)
 	    ++idx;
 	  }
 
-	if ((size_t) idx + 1 < dwfl->lookup_elts
-	    && end < dwfl->lookup_addr[idx + 1]
+	if (((size_t) idx + 1 == dwfl->lookup_elts
+	     || end < dwfl->lookup_addr[idx + 1])
 	    /* The module ends in the middle of this segment.  Split it.  */
 	    && unlikely (insert (dwfl, idx + 1,
 				 end, dwfl->lookup_addr[idx + 1], -1)))

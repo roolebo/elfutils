@@ -232,6 +232,22 @@ elfw2(LIBELFBITS,getphdr) (elf)
 {
   ElfW2(LIBELFBITS,Phdr) *result;
 
+  if (elf == NULL)
+    return NULL;
+
+  if (unlikely (elf->kind != ELF_K_ELF))
+    {
+      __libelf_seterrno (ELF_E_INVALID_HANDLE);
+      return NULL;
+    }
+
+  /* If the program header entry has already been filled in the code
+   * in getphdr_wrlock must already have been run.  So the class is
+   * set, too.  No need to waste any more time here.  */
+  result = elf->state.ELFW(elf,LIBELFBITS).phdr;
+  if (likely (result != NULL))
+    return result;
+
   rwlock_wrlock (elf->lock);
   result = __elfw2(LIBELFBITS,getphdr_wrlock) (elf);
   rwlock_unlock (elf->lock);

@@ -182,6 +182,9 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
+* Tue Aug 26 2008 Ulrich Drepper <drepper@redhat.com> 0.137-1
+- Minor fixes for unreleased 0.136 release.
+
 * Mon Aug 25 2008 Ulrich Drepper <drepper@redhat.com> 0.136-1
 - libdwfl: bug fixes; new segment interfaces;	 all the libdwfl-based
  tools now support --core=COREFILE option

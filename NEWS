@@ -1,3 +1,7 @@
+Version 0.137:
+
+Minor fixes for unreleased 0.136 release.
+
 Version 0.136:
 
 libdwfl: bug fixes; new "segment" interfaces;

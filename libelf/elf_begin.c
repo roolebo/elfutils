@@ -111,7 +111,11 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
   bool is32 = e_ident[EI_CLASS] == ELFCLASS32;
 
   /* Make the ELF header available.  */
-  if (e_ident[EI_DATA] == MY_ELFDATA)
+  if (e_ident[EI_DATA] == MY_ELFDATA
+      && (ALLOW_UNALIGNED
+	  || (((size_t) e_ident
+	       & ((is32 ? __alignof__ (Elf32_Ehdr) : __alignof__ (Elf64_Ehdr))
+		  - 1)) == 0)))
     ehdr.p = e_ident;
   else
     {
@@ -130,8 +134,11 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
 	  else
 	    memcpy (&ehdr_mem, e_ident, sizeof (Elf32_Ehdr));
 
-	  CONVERT (ehdr_mem.e32.e_shnum);
-	  CONVERT (ehdr_mem.e32.e_shoff);
+	  if (e_ident[EI_DATA] != MY_ELFDATA)
+	    {
+	      CONVERT (ehdr_mem.e32.e_shnum);
+	      CONVERT (ehdr_mem.e32.e_shoff);
+	    }
 	}
       else
 	{
@@ -143,8 +150,11 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
 	  else
 	    memcpy (&ehdr_mem, e_ident, sizeof (Elf64_Ehdr));
 
-	  CONVERT (ehdr_mem.e64.e_shnum);
-	  CONVERT (ehdr_mem.e64.e_shoff);
+	  if (e_ident[EI_DATA] != MY_ELFDATA)
+	    {
+	      CONVERT (ehdr_mem.e64.e_shnum);
+	      CONVERT (ehdr_mem.e64.e_shoff);
+	    }
 	}
     }
 

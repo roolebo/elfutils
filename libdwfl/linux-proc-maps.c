@@ -267,6 +267,9 @@ read_proc_memory (void *arg, void *data, GElf_Addr address,
 {
   const int fd = *(const int *) arg;
   ssize_t nread = pread64 (fd, data, maxread, (off64_t) address);
+  /* Some kernels don't actually let us do this read, ignore those errors.  */
+  if (nread < 0 && (errno == EINVAL || errno == EPERM))
+    return 0;
   if (nread > 0 && (size_t) nread < minread)
     nread = 0;
   return nread;

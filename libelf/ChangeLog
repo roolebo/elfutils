@@ -1,3 +1,9 @@
+2008-08-27  Roland McGrath  <roland@redhat.com>
+
+	* elf_begin.c (get_shnum): Avoid misaligned reads for matching endian.
+
+	* libelfP.h [!ALLOW_UNALIGNED] (__libelf_type_align): Fix CLASS index.
+
 2008-08-25  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am (libelf_so_LDLIBS): New variable.

@@ -1,3 +1,17 @@
+2008-09-29  Roland McGrath  <roland@redhat.com>
+
+	* segment.c (insert): Must realloc DWFL->lookup_module here too.
+	(dwfl_report_segment): Clear DWFL->lookup_module before insert calls.
+
+2008-08-28  Roland McGrath  <roland@redhat.com>
+
+	* segment.c (reify_segments): Fix last change.
+
+2008-08-27  Roland McGrath  <roland@redhat.com>
+
+	* linux-proc-maps.c (read_proc_memory): Return 0 for EINVAL or EPERM
+	failure from pread64.
+
 2008-08-26  Roland McGrath  <roland@redhat.com>
 
 	* segment.c (reify_segments): Insert a trailing segment for a module

@@ -460,7 +460,7 @@ extern int __libelf_version_initialized attribute_hidden;
    version, binary class, and type. */
 extern const uint_fast8_t __libelf_type_aligns[EV_NUM - 1][ELFCLASSNUM - 1][ELF_T_NUM] attribute_hidden;
 # define __libelf_type_align(class, type)	\
-    (__libelf_type_aligns[LIBELF_EV_IDX][class][type] ?: 1)
+    (__libelf_type_aligns[LIBELF_EV_IDX][class - 1][type] ?: 1)
 #else
 # define __libelf_type_align(class, type)	1
 #endif

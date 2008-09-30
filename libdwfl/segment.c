@@ -83,12 +83,26 @@ insert (Dwfl *dwfl, size_t i, GElf_Addr start, GElf_Addr end, int segndx)
       int *nsegndx = realloc (dwfl->lookup_segndx, sizeof nsegndx[0] * n);
       if (unlikely (nsegndx == NULL))
 	{
-	  free (naddr);
+	  if (naddr != dwfl->lookup_addr)
+	    free (naddr);
 	  return true;
 	}
       dwfl->lookup_alloc = n;
       dwfl->lookup_addr = naddr;
       dwfl->lookup_segndx = nsegndx;
+
+      if (dwfl->lookup_module != NULL)
+	{
+	  /* Make sure this array is big enough too.  */
+	  Dwfl_Module **old = dwfl->lookup_module;
+	  dwfl->lookup_module = realloc (dwfl->lookup_module,
+					 sizeof dwfl->lookup_module[0] * n);
+	  if (unlikely (dwfl->lookup_module == NULL))
+	    {
+	      free (old);
+	      return true;
+	    }
+	}
     }
 
   if (unlikely (i < dwfl->lookup_elts))
@@ -175,9 +189,17 @@ reify_segments (Dwfl *dwfl)
 	      return true;
 	    ++idx;
 	  }
+	else if (dwfl->lookup_addr[idx] < start)
+	  {
+	    /* The module starts past the end of this segment.
+	       Add a new one.  */
+	    if (unlikely (insert (dwfl, idx + 1, start, end, -1)))
+	      return true;
+	    ++idx;
+	  }
 
-	if (((size_t) idx + 1 == dwfl->lookup_elts
-	     || end < dwfl->lookup_addr[idx + 1])
+	if ((size_t) idx + 1 < dwfl->lookup_elts
+	    && end < dwfl->lookup_addr[idx + 1]
 	    /* The module ends in the middle of this segment.  Split it.  */
 	    && unlikely (insert (dwfl, idx + 1,
 				 end, dwfl->lookup_addr[idx + 1], -1)))
@@ -261,6 +283,12 @@ dwfl_report_segment (Dwfl *dwfl, int ndx, const GElf_Phdr *phdr, GElf_Addr bias,
 			    phdr->p_align < dwfl->segment_align))
     dwfl->segment_align = phdr->p_align;
 
+  if (unlikely (dwfl->lookup_module != NULL))
+    {
+      free (dwfl->lookup_module);
+      dwfl->lookup_module = NULL;
+    }
+
   GElf_Addr start = segment_start (dwfl, bias + phdr->p_vaddr);
   GElf_Addr end = segment_end (dwfl, bias + phdr->p_vaddr + phdr->p_memsz);
 
@@ -288,12 +316,6 @@ dwfl_report_segment (Dwfl *dwfl, int ndx, const GElf_Phdr *phdr, GElf_Addr bias,
   dwfl->lookup_tail_vaddr = end;
   dwfl->lookup_tail_offset = end - bias - phdr->p_vaddr + phdr->p_offset;
   dwfl->lookup_tail_ndx = ndx + 1;
-
-  if (unlikely (dwfl->lookup_module != NULL))
-    {
-      free (dwfl->lookup_module);
-      dwfl->lookup_module = NULL;
-    }
 
   return ndx;
 }

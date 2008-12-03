@@ -59,49 +59,55 @@ dwfl_getmodules (Dwfl *dwfl,
   if (dwfl == NULL)
     return -1;
 
+  /* We iterate through the linked list when it's all we have.
+     But continuing from an offset is slow that way.  So when
+     DWFL->lookup_module is populated, we can instead keep our
+     place by jumping directly into the array.  Since the actions
+     of a callback could cause it to get populated, we must
+     choose the style of place-holder when we return an offset,
+     and we encode the choice in the low bits of that value.  */
+
   Dwfl_Module *m = dwfl->modulelist;
 
-  if (unlikely (dwfl->lookup_module == NULL))
+  if ((offset & 3) == 1)
     {
+      offset >>= 2;
       for (ptrdiff_t pos = 0; pos < offset; ++pos)
 	if (m == NULL)
 	  return -1;
 	else
 	  m = m->next;
-      while (m != NULL)
-	{
-	  ++offset;
-	  if ((*callback) (MODCB_ARGS (m), arg) != DWARF_CB_OK)
-	    return offset;
-	  m = m->next;
-	}
     }
-  else
+  else if (((offset & 3) == 2) && likely (dwfl->lookup_module != NULL))
     {
-      if (offset > 0)
-	{
-	  if ((size_t) offset - 1 == dwfl->lookup_elts)
-	    return 0;
+      offset >>= 2;
 
-	  if (unlikely ((size_t) offset - 1 > dwfl->lookup_elts))
-	    return -1;
+      if ((size_t) offset - 1 == dwfl->lookup_elts)
+	return 0;
 
-	  m = dwfl->lookup_module[offset - 1];
-	  if (unlikely (m == NULL))
-	    return -1;
-	}
+      if (unlikely ((size_t) offset - 1 > dwfl->lookup_elts))
+	return -1;
 
-      while (m != NULL)
-	{
-	  int ok = (*callback) (MODCB_ARGS (m), arg);
-	  m = m->next;
-	  if (ok != DWARF_CB_OK)
-	    return (m == NULL
-		    ? (ptrdiff_t) dwfl->lookup_elts + 1
-		    : m->segment + 1);
-	}
+      m = dwfl->lookup_module[offset - 1];
+      if (unlikely (m == NULL))
+	return -1;
+    }
+  else if (offset != 0)
+    {
+      __libdwfl_seterrno (DWFL_E_BADSTROFF);
+      return -1;
     }
 
+  while (m != NULL)
+    {
+      int ok = (*callback) (MODCB_ARGS (m), arg);
+      ++offset;
+      m = m->next;
+      if (ok != DWARF_CB_OK)
+	return ((dwfl->lookup_module == NULL) ? ((offset << 2) | 1)
+		: (((m == NULL ? (ptrdiff_t) dwfl->lookup_elts + 1
+		     : m->segment + 1) << 2) | 2));
+    }
   return 0;
 }
 INTDEF (dwfl_getmodules)

@@ -1,5 +1,5 @@
 /* x86-64 specific core note handling.
-   Copyright (C) 2005, 2007 Red Hat, Inc.
+   Copyright (C) 2005, 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -103,4 +103,7 @@ static const Ebl_Register_Location fpregset_regs[] =
   };
 #define FPREGSET_SIZE	512
 
+#define	EXTRA_NOTES	EXTRA_NOTES_IOPERM
+
+#include "x86_corenote.c"
 #include "linux-core-note.c"

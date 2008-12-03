@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2007 Red Hat, Inc.
+# Copyright (C) 2007, 2008 Red Hat, Inc.
 # This file is part of Red Hat elfutils.
 #
 # Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -27,7 +27,6 @@
 
 testfiles testfile43
 
-export LC_ALL=C
 testrun_compare ./dwfl-addr-sect -e testfile43 0x64 0x8 0x98 <<\EOF
 address 0x64 => module "" section 4 + 0
 address 0x8 => module "" section 1 + 0x8

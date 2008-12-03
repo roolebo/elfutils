@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2005, 2007 Red Hat, Inc.
+# Copyright (C) 2005, 2007, 2008 Red Hat, Inc.
 # This file is part of Red Hat elfutils.
 #
 # Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -29,6 +29,9 @@
 # canonical sh state for test runs.
 
 set -e
+
+#LC_ALL=C
+#export LC_ALL
 
 remove_files=
 trap 'rm -f $remove_files' 0

@@ -103,9 +103,8 @@ static const Ebl_Register_Location prxfpreg_regs[] =
 #define	EXTRA_NOTES \
   EXTRA_REGSET (NT_PRFPXREG, 512, prxfpreg_regs) \
   case NT_386_TLS: \
-    return tls_info (descsz, regs_offset, nregloc, reglocs, nitems, items);
-
-#define NT_386_TLS	0x200		/* i386 TLS slots (struct user_desc) */
+    return tls_info (descsz, regs_offset, nregloc, reglocs, nitems, items); \
+  EXTRA_NOTES_IOPERM
 
 static const Ebl_Core_Item tls_items[] =
   {
@@ -131,4 +130,5 @@ tls_info (GElf_Word descsz, GElf_Word *regs_offset,
   return 1;
 }
 
+#include "x86_corenote.c"
 #include "linux-core-note.c"

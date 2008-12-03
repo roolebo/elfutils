@@ -1,5 +1,5 @@
 /* Return build ID information for a module.
-   Copyright (C) 2007 Red Hat, Inc.
+   Copyright (C) 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -88,7 +88,8 @@ check_notes (Dwfl_Module *mod, bool set, Elf_Data *data, GElf_Addr data_vaddr)
 						     "GNU", sizeof "GNU"))
       return found_build_id (mod, set,
 			     data->d_buf + desc_pos, nhdr.n_descsz,
-			     data_vaddr == NO_VADDR ? 0 : data_vaddr + pos);
+			     data_vaddr == NO_VADDR ? 0
+			     : data_vaddr + desc_pos);
   return 0;
 }
 

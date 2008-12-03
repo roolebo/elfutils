@@ -1,3 +1,7 @@
+2008-08-01  Roland McGrath  <roland@redhat.com>
+
+	* eblcorenotetypename.c: Handle NT_386_IOPERM.
+
 2008-07-28  Roland McGrath  <roland@redhat.com>
 
 	* eblauxvinfo.c (AUXV_TYPES): Add EXECFN.

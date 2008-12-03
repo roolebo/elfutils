@@ -1,3 +1,16 @@
+2008-12-02  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_getmodules.c (dwfl_getmodules): Typo fix in last change.
+
+2008-11-26  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_getmodules.c (dwfl_getmodules): Encode iteration style in
+	return value, and interpret encoded OFFSET argument.
+
+2008-10-07  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_build_id.c (check_notes): Fix typo in vaddr calculation.
+
 2008-09-29  Roland McGrath  <roland@redhat.com>
 
 	* segment.c (insert): Must realloc DWFL->lookup_module here too.

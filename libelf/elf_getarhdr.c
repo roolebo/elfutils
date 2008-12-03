@@ -1,5 +1,5 @@
 /* Read header of next archive member.
-   Copyright (C) 1998, 1999, 2000, 2002 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -63,6 +63,9 @@ Elf_Arhdr *
 elf_getarhdr (elf)
      Elf *elf;
 {
+  if (elf == NULL)
+    return NULL;
+
   Elf *parent = elf->parent;
 
   /* Calling this function is not ok for any file type but archives.  */
@@ -77,7 +80,6 @@ elf_getarhdr (elf)
       && __libelf_next_arhdr (parent) != 0)
     /* Something went wrong.  Maybe there is no member left.  */
     return NULL;
-
 
   /* We can be sure the parent is an archive.  */
   assert (parent->kind == ELF_K_AR);

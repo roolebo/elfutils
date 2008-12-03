@@ -1,3 +1,8 @@
+2008-12-02  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (count_dwflmod, process_file): Don't presume encoding of
+	nonzero OFFSET argument to dwfl_getmodules.
+
 2008-08-07  Roland McGrath  <roland@redhat.com>
 
 	* addr2line.c (main): Pass string to handle_address.

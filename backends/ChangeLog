@@ -5,6 +5,11 @@
 
 2008-08-01  Roland McGrath  <roland@redhat.com>
 
+	* x86_corenote.c: New file.
+	* Makefile.am (noinst_HEADERS): Add it.
+	* i386_corenote.c: Include it, use EXTRA_NOTES_IOPERM in EXTRA_NOTES.
+	* x86_64_corenote.c: Likewise.
+
 	* linux-core-note.c (prstatus_items): Use 'B' instead of 'b'
 	for sigpend and sighold.
 

@@ -146,7 +146,7 @@ uninstall: uninstall-am
 	done
 	rmdir --ignore-fail-on-non-empty $(DESTDIR)$(libdir)/$(LIBEBL_SUBDIR)
 
-noinst_HEADERS = libebl_CPU.h common-reloc.c linux-core-note.c
+noinst_HEADERS = libebl_CPU.h common-reloc.c linux-core-note.c x86_corenote.c
 EXTRA_DIST = $(foreach m,$(modules),$($(m)_SRCS)) $(modules:=_reloc.def)
 
 CLEANFILES = *.gcno *.gcda \

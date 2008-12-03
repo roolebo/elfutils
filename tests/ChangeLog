@@ -1,3 +1,15 @@
+2008-11-26  Roland McGrath  <roland@redhat.com>
+
+	* dwfl-bug-getmodules.c: New file.
+	* Makefile.am (noinst_PROGRAMS): Add it.
+	(dwfl_bug_getmodules_LDADD): New variable.
+
+2008-09-10  Roland McGrath  <roland@redhat.com>
+
+	* test-subr.sh (LC_ALL): Export it set to "C".
+	* run-dwfl-addr-sect.sh: Don't do it here.
+	* run-strings-test.sh: Likewise.
+
 2008-08-21  Denys Vlasenko  <dvlasenk@redhat.com>
 
 	* run-addrname-test.sh: Add a new case.

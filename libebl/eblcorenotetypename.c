@@ -56,7 +56,6 @@
 #include <stdio.h>
 #include <libeblP.h>
 
-
 const char *
 ebl_core_note_type_name (ebl, type, buf, len)
      Ebl *ebl;
@@ -101,6 +100,7 @@ ebl_core_note_type_name (ebl, type, buf, len)
 	    KNOWNSTYPE (PPC_VMX);
 	    KNOWNSTYPE (PPC_SPE);
 	    KNOWNSTYPE (386_TLS);
+	    KNOWNSTYPE (386_IOPERM);
 #undef KNOWNSTYPE
 
 	  default:

@@ -459,8 +459,10 @@ count_dwflmod (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	       Dwarf_Addr base __attribute__ ((unused)),
 	       void *arg)
 {
-  *(bool *) arg = false;
-  return DWARF_CB_ABORT;
+  if (*(bool *) arg)
+    return DWARF_CB_ABORT;
+  *(bool *) arg = true;
+  return DWARF_CB_OK;
 }
 
 struct process_dwflmod_args
@@ -548,8 +550,11 @@ process_file (int fd, const char *fname, bool only_one)
       dwfl_report_end (dwfl, NULL, NULL);
 
       if (only_one)
-	/* Clear ONLY_ONE if we have multiple modules, from an archive.  */
-	dwfl_getmodules (dwfl, &count_dwflmod, &only_one, 1);
+	{
+	  /* Clear ONLY_ONE if we have multiple modules, from an archive.  */
+	  bool seen = false;
+	  only_one = dwfl_getmodules (dwfl, &count_dwflmod, &seen, 0) == 0;
+	}
 
       /* Process the one or more modules gleaned from this file.  */
       struct process_dwflmod_args a = { .fd = fd, .only_one = only_one };

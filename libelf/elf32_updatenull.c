@@ -139,7 +139,7 @@ __elfw2(LIBELFBITS,updatenull_wrlock) (Elf *elf, int *change_bop, size_t shnum)
   int changed = 0;
   int ehdr_flags = 0;
 
-  ehdr = __elfw2(LIBELFBITS,getehdr_rdlock) (elf);
+  ehdr = __elfw2(LIBELFBITS,getehdr_wrlock) (elf);
 
   /* Set the default values.  */
   if (ELFW(default_ehdr,LIBELFBITS) (elf, ehdr, shnum, change_bop) != 0)

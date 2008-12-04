@@ -364,6 +364,7 @@ __elf_getdata_rdlock (scn, data)
 {
   Elf_Data *result = NULL;
   Elf *elf;
+  int locked = 0;
 
   if (scn == NULL)
     return NULL;
@@ -431,6 +432,7 @@ __elf_getdata_rdlock (scn, data)
          modified, therefore start the tests again.  */
       rwlock_unlock (elf->lock);
       rwlock_wrlock (elf->lock);
+      locked = 1;
 
       /* Read the data from the file.  There is always a file (or
 	 memory region) associated with this descriptor since
@@ -446,14 +448,24 @@ __elf_getdata_rdlock (scn, data)
   if (scn->data_list_rear == NULL)
     {
       if (scn->rawdata.d.d_buf != NULL && scn->rawdata.d.d_size > 0)
-	/* Convert according to the version and the type.   */
-	convert_data (scn, __libelf_version, elf->class,
-		      (elf->class == ELFCLASS32
-		       || (offsetof (struct Elf, state.elf32.ehdr)
-			   == offsetof (struct Elf, state.elf64.ehdr))
-		       ? elf->state.elf32.ehdr->e_ident[EI_DATA]
-		       : elf->state.elf64.ehdr->e_ident[EI_DATA]),
-		      scn->rawdata.d.d_size, scn->rawdata.d.d_type);
+	{
+	  if (!locked)
+	    {
+	      rwlock_unlock (elf->lock);
+	      rwlock_wrlock (elf->lock);
+	      if (scn->data_list_rear != NULL)
+		goto pass;
+	    }
+
+	  /* Convert according to the version and the type.   */
+	  convert_data (scn, __libelf_version, elf->class,
+			(elf->class == ELFCLASS32
+			 || (offsetof (struct Elf, state.elf32.ehdr)
+			     == offsetof (struct Elf, state.elf64.ehdr))
+			 ? elf->state.elf32.ehdr->e_ident[EI_DATA]
+			 : elf->state.elf64.ehdr->e_ident[EI_DATA]),
+			scn->rawdata.d.d_size, scn->rawdata.d.d_type);
+	}
       else
 	/* This is an empty or NOBITS section.  There is no buffer but
 	   the size information etc is important.  */
@@ -464,6 +476,7 @@ __elf_getdata_rdlock (scn, data)
 
   /* If no data is present we cannot return any.  */
   if (scn->data_list_rear != NULL)
+  pass:
     /* Return the first data element in the list.  */
     result = &scn->data_list.data.d;
 

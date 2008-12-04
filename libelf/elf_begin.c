@@ -750,7 +750,7 @@ read_long_names (Elf *elf)
 /* Read the next archive header.  */
 int
 internal_function
-__libelf_next_arhdr (elf)
+__libelf_next_arhdr_wrlock (elf)
      Elf *elf;
 {
   struct ar_hdr *ar_hdr;
@@ -949,7 +949,7 @@ dup_elf (int fildes, Elf_Cmd cmd, Elf *ref)
      pointing to.  First read the header of the next member if this
      has not happened already.  */
   if (ref->state.ar.elf_ar_hdr.ar_name == NULL
-      && __libelf_next_arhdr (ref) != 0)
+      && __libelf_next_arhdr_wrlock (ref) != 0)
     /* Something went wrong.  Maybe there is no member left.  */
     return NULL;
 
@@ -1023,6 +1023,19 @@ elf_begin (fildes, cmd, ref)
       return NULL;
     }
 
+  Elf *lock_dup_elf ()
+  {
+    /* We need wrlock to dup an archive.  */
+    if (ref->kind == ELF_K_AR)
+      {
+	rwlock_unlock (ref->lock);
+	rwlock_wrlock (ref->lock);
+      }
+
+    /* Duplicate the descriptor.  */
+    return dup_elf (fildes, cmd, ref);
+  }
+
   switch (cmd)
     {
     case ELF_C_NULL:
@@ -1043,8 +1056,7 @@ elf_begin (fildes, cmd, ref)
     case ELF_C_READ:
     case ELF_C_READ_MMAP:
       if (ref != NULL)
-	/* Duplicate the descriptor.  */
-	retval = dup_elf (fildes, cmd, ref);
+	retval = lock_dup_elf ();
       else
 	/* Create descriptor for existing file.  */
 	retval = read_file (fildes, 0, ~((size_t) 0), cmd, NULL);
@@ -1065,8 +1077,7 @@ elf_begin (fildes, cmd, ref)
 	      retval = NULL;
 	    }
 	  else
-	    /* Duplicate this descriptor.  */
-	    retval = dup_elf (fildes, cmd, ref);
+	    retval = lock_dup_elf ();
 	}
       else
 	/* Create descriptor for existing file.  */

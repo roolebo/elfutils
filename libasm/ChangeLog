@@ -1,7 +1,3 @@
-2008-12-03  Ulrich Drepper  <drepper@redhat.com>
-
-	* Makefile.am [USE_TLS]: Like libasm.so with libpthread.
-
 2008-01-11  Ulrich Drepper  <drepper@redhat.com>
 
 	* libasm.h (DisasmGetSymCB_t): Change type of fourth and fifth

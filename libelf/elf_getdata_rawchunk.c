@@ -95,6 +95,9 @@ elf_getdata_rawchunk (elf, offset, size, type)
   /* Get the raw bytes from the file.  */
   void *rawchunk;
   int flags = 0;
+  Elf_Data *result = NULL;
+
+  rwlock_rdlock (elf->lock);
 
   /* If the file is mmap'ed we can use it directly.  */
   if (elf->map_address != NULL)
@@ -107,7 +110,7 @@ elf_getdata_rawchunk (elf, offset, size, type)
 	{
 	nomem:
 	  __libelf_seterrno (ELF_E_NOMEM);
-	  return NULL;
+	  goto out;
 	}
 
       /* Read the file content.  */
@@ -118,7 +121,7 @@ elf_getdata_rawchunk (elf, offset, size, type)
 	  /* Something went wrong.  */
 	  free (rawchunk);
 	  __libelf_seterrno (ELF_E_READ_ERROR);
-	  return NULL;
+	  goto out;
 	}
 
       flags = ELF_F_MALLOCED;
@@ -181,8 +184,14 @@ elf_getdata_rawchunk (elf, offset, size, type)
   chunk->data.d.d_align = align;
   chunk->data.d.d_version = __libelf_version;
 
+  rwlock_unlock (elf->lock);
+  rwlock_wrlock (elf->lock);
+
   chunk->next = elf->state.elf.rawchunks;
   elf->state.elf.rawchunks = chunk;
+  result = &chunk->data.d;
 
-  return &chunk->data.d;
+ out:
+  rwlock_unlock (elf->lock);
+  return result;
 }

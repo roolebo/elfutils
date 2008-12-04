@@ -78,8 +78,15 @@ elf_getarhdr (elf)
   /* Make sure we have read the archive header.  */
   if (parent->state.ar.elf_ar_hdr.ar_name == NULL
       && __libelf_next_arhdr (parent) != 0)
-    /* Something went wrong.  Maybe there is no member left.  */
-    return NULL;
+    {
+      rwlock_wrlock (parent->lock);
+      int st = __libelf_next_arhdr_wrlock (parent);
+      rwlock_unlock (parent->lock);
+
+      if (st != 0)
+	/* Something went wrong.  Maybe there is no member left.  */
+	return NULL;
+    }
 
   /* We can be sure the parent is an archive.  */
   assert (parent->kind == ELF_K_AR);

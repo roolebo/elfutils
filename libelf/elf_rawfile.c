@@ -63,6 +63,8 @@ elf_rawfile (elf, ptr)
      Elf *elf;
      size_t *ptr;
 {
+  char *result;
+
   if (elf == NULL)
     {
       /* No valid descriptor.  */
@@ -77,8 +79,12 @@ elf_rawfile (elf, ptr)
   if (elf->map_address == NULL && __libelf_readall (elf) == NULL)
     goto error_out;
 
+  rwlock_rdlock (elf->lock);
   if (ptr != NULL)
     *ptr = elf->maximum_size;
 
-  return (char *) elf->map_address + elf->start_offset;
+  result = (char *) elf->map_address + elf->start_offset;
+  rwlock_unlock (elf->lock);
+
+  return result;
 }

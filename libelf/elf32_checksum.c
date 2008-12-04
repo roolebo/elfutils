@@ -105,6 +105,14 @@ elfw2(LIBELFBITS,checksum) (elf)
 		     || (ident[EI_DATA] == ELFDATA2MSB
 			 && __BYTE_ORDER == __BIG_ENDIAN));
 
+  /* If we don't have native byte order, we will likely need to
+     convert the data with xlate functions.  We do it upfront instead
+     of relocking mid-iteration. */
+  if (!likely (same_byte_order))
+    rwlock_wrlock (elf->lock);
+  else
+    rwlock_rdlock (elf->lock);
+
   /* Iterate over all sections to find those which are not strippable.  */
   scn = NULL;
   while ((scn = INTUSE(elf_nextscn) (elf, scn)) != NULL)
@@ -118,7 +126,8 @@ elfw2(LIBELFBITS,checksum) (elf)
       if (shdr == NULL)
 	{
 	  __libelf_seterrno (ELF_E_INVALID_SECTION_HEADER);
-	  return -1l;
+	  result = -1l;
+	  goto out;
 	}
 
       if (SECTION_STRIP_P (shdr,
@@ -162,17 +171,25 @@ elfw2(LIBELFBITS,checksum) (elf)
 	    /* Convert the data to file byte order.  */
 	    if (INTUSE(elfw2(LIBELFBITS,xlatetof)) (data, data, ident[EI_DATA])
 		== NULL)
-	      return -1l;
+	      {
+		result = -1l;
+		goto out;
+	      }
 
 	    result = process_block (result, data);
 
 	    /* And convert it back.  */
 	    if (INTUSE(elfw2(LIBELFBITS,xlatetom)) (data, data, ident[EI_DATA])
 		== NULL)
-	      return -1l;
+	      {
+		result = -1l;
+		goto out;
+	      }
 	  }
     }
 
+ out:
+  rwlock_unlock (elf->lock);
   return result;
 }
 INTDEF(elfw2(LIBELFBITS,checksum))

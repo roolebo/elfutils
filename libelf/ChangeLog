@@ -1,3 +1,44 @@
+2008-10-22  Petr Machata  <pmachata@redhat.com>
+
+	* elf_rawfile.c (elf_rawfile): Lock around elf-> references.
+
+2008-10-21  Petr Machata  <pmachata@redhat.com>
+
+	* libelfP.h: Rename getehdr_rdlock to getehdr_wrlock.
+	* elf32_getehdr.c (getehdr_rdlock): Move the code to new function
+	getehdr_impl and make it a wrapper.  Rename to getehdr_wrlock.
+	(getehdr_impl): Guard elf->class init with wrlock.
+	(getehdr): Also make it a wrapper of getehdr_impl.
+	* elf32_updatenull.c (updatenull_wrlock): Call getehdr_wrlock.
+
+2008-10-20  Petr Machata  <pmachata@redhat.com>
+
+	* elf_getdata_rawchunk.c (elf_getdata_rawchunk): Lock around the
+	code that reads mutable elf state.  Relock to write lock to chain
+	the new chunk on the elf rawchunks list.
+
+2008-10-20  Petr Machata  <pmachata@redhat.com>
+
+	* elf32_checksum.c (checksum): Place a lock around the code that
+	processes data.  Make it wrlock if the code needs to xlate the
+	data before processing.
+
+2008-10-16  Petr Machata  <pmachata@redhat.com>
+
+	* elf_begin.c
+	(__libelf_next_arhdr): Rename to __libelf_next_arhdr_wrlock.
+	(dup_elf): Adjust the call.
+	(elf_begin): New local function lock_dup_elf.  Relocks the elf if
+	necessary before calling dup.  Call this instead of dup_elf.
+	* elf_getarhdr.c
+	(elf_getarhdr): Lock before calling __libelf_next_arhdr_wrlock.
+	* elf_next.c (elf_next): Likewise.
+	* elf_rand.c (elf_rand): Likewise.
+
+2008-10-14  Petr Machata  <pmachata@redhat.com>
+
+	* elf_getdata.c (__elf_getdata_rdlock): Lock before converting.
+
 2008-11-26  Roland McGrath  <roland@redhat.com>
 
 	* elf.h: Update from glibc.
@@ -46,7 +87,7 @@
 
 	* elf32_getshdr.c
 	(__elfNN_getshdr_internal): Drop.
-	(load_shdr_rwlock, scn_valid): New functions, contain bits of
+	(load_shdr_wrlock, scn_valid): New functions, contain bits of
 	behaviour from __elfNN_getshdr_internal.
 	(__elfNN_getshdr_rdlock, __elfNN_getshdr_wrlock): Replacements for
 	dropped _internal functions above.

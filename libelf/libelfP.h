@@ -486,7 +486,7 @@ extern Elf *__libelf_read_mmaped_file (int fildes, void *map_address,
 extern void __libelf_seterrno (int value) internal_function;
 
 /* Get the next archive header.  */
-extern int __libelf_next_arhdr (Elf *elf) internal_function;
+extern int __libelf_next_arhdr_wrlock (Elf *elf) internal_function;
 
 /* Read all of the file associated with the descriptor.  */
 extern char *__libelf_readall (Elf *elf) internal_function;
@@ -520,8 +520,8 @@ extern int __elf64_updatefile (Elf *elf, int change_bo, size_t shnum)
 extern int __elf_end_internal (Elf *__elf) attribute_hidden;
 extern Elf *__elf_begin_internal (int __fildes, Elf_Cmd __cmd, Elf *__ref)
      attribute_hidden;
-extern Elf32_Ehdr *__elf32_getehdr_rdlock (Elf *__elf) internal_function;
-extern Elf64_Ehdr *__elf64_getehdr_rdlock (Elf *__elf) internal_function;
+extern Elf32_Ehdr *__elf32_getehdr_wrlock (Elf *__elf) internal_function;
+extern Elf64_Ehdr *__elf64_getehdr_wrlock (Elf *__elf) internal_function;
 extern Elf32_Ehdr *__elf32_newehdr_internal (Elf *__elf) attribute_hidden;
 extern Elf64_Ehdr *__elf64_newehdr_internal (Elf *__elf) attribute_hidden;
 extern Elf32_Phdr *__elf32_getphdr_internal (Elf *__elf) attribute_hidden;

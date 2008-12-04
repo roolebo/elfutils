@@ -67,7 +67,7 @@
 
 
 static ElfW2(LIBELFBITS,Shdr) *
-load_shdr_rwlock (Elf_Scn *scn)
+load_shdr_wrlock (Elf_Scn *scn)
 {
   ElfW2(LIBELFBITS,Shdr) *result;
 
@@ -243,7 +243,6 @@ ElfW2(LIBELFBITS,Shdr) *
 __elfw2(LIBELFBITS,getshdr_rdlock) (scn)
      Elf_Scn *scn;
 {
-  /* XXX: no read locking here, figure out why is it not necessary. */
   ElfW2(LIBELFBITS,Shdr) *result;
 
   if (!scn_valid (scn))
@@ -256,7 +255,7 @@ __elfw2(LIBELFBITS,getshdr_rdlock) (scn)
       rwlock_wrlock (scn->elf->lock);
       result = scn->shdr.ELFW(e,LIBELFBITS);
       if (result == NULL)
-	result = load_shdr_rwlock (scn);
+	result = load_shdr_wrlock (scn);
     }
 
   return result;
@@ -273,7 +272,7 @@ __elfw2(LIBELFBITS,getshdr_wrlock) (scn)
 
   result = scn->shdr.ELFW(e,LIBELFBITS);
   if (result == NULL)
-    result = load_shdr_rwlock (scn);
+    result = load_shdr_wrlock (scn);
 
   return result;
 }

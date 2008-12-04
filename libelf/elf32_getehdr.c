@@ -62,12 +62,11 @@
 #endif
 
 
-ElfW2(LIBELFBITS,Ehdr) *
-__elfw2(LIBELFBITS,getehdr_rdlock) (elf)
+static ElfW2(LIBELFBITS,Ehdr) *
+getehdr_impl (elf, wrlock)
      Elf *elf;
+     int wrlock;
 {
-  ElfW2(LIBELFBITS,Ehdr) *result;
-
   if (elf == NULL)
     return NULL;
 
@@ -77,19 +76,32 @@ __elfw2(LIBELFBITS,getehdr_rdlock) (elf)
       return NULL;
     }
 
+ again:
   if (elf->class == 0)
-    elf->class = ELFW(ELFCLASS,LIBELFBITS);
+    {
+      if (!wrlock)
+	{
+	  rwlock_unlock (elf->lock);
+	  rwlock_wrlock (elf->lock);
+	  wrlock = 1;
+	  goto again;
+	}
+      elf->class = ELFW(ELFCLASS,LIBELFBITS);
+    }
   else if (unlikely (elf->class != ELFW(ELFCLASS,LIBELFBITS)))
     {
       __libelf_seterrno (ELF_E_INVALID_CLASS);
-      result = NULL;
-      goto out;
+      return NULL;
     }
 
-  result = elf->state.ELFW(elf,LIBELFBITS).ehdr;
+  return elf->state.ELFW(elf,LIBELFBITS).ehdr;
+}
 
- out:
-  return result;
+ElfW2(LIBELFBITS,Ehdr) *
+__elfw2(LIBELFBITS,getehdr_wrlock) (elf)
+     Elf *elf;
+{
+  return getehdr_impl (elf, 1);
 }
 
 ElfW2(LIBELFBITS,Ehdr) *
@@ -101,7 +113,7 @@ elfw2(LIBELFBITS,getehdr) (elf)
     return NULL;
 
   rwlock_rdlock (elf->lock);
-  result = __elfw2(LIBELFBITS,getehdr_rdlock) (elf);
+  result = getehdr_impl (elf, 0);
   rwlock_unlock (elf->lock);
 
   return result;

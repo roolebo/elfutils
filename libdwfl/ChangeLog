@@ -1,3 +1,10 @@
+2008-12-11  Roland McGrath  <roland@redhat.com>
+
+	* offline.c (process_archive): Don't call elf_end and close if
+	returning NULL.  Check first elf_begin call and set error code
+	specially for empty archive.
+	Fixes RHBZ#465878.
+
 2008-12-02  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_getmodules.c (dwfl_getmodules): Typo fix in last change.

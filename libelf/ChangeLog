@@ -1,3 +1,7 @@
+2008-12-10  Roland McGrath  <roland@redhat.com>
+
+	* elf_getarhdr.c (elf_getarhdr): Fix missing rename in last change.
+
 2008-10-22  Petr Machata  <pmachata@redhat.com>
 
 	* elf_rawfile.c (elf_rawfile): Lock around elf-> references.

@@ -77,7 +77,7 @@ elf_getarhdr (elf)
 
   /* Make sure we have read the archive header.  */
   if (parent->state.ar.elf_ar_hdr.ar_name == NULL
-      && __libelf_next_arhdr (parent) != 0)
+      && __libelf_next_arhdr_wrlock (parent) != 0)
     {
       rwlock_wrlock (parent->lock);
       int st = __libelf_next_arhdr_wrlock (parent);

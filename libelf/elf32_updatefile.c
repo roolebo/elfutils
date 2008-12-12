@@ -293,35 +293,42 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 	  if (shdr->sh_type != SHT_NOBITS && scn->data_list_rear != NULL)
 	    do
 	      {
+		assert (dl->data.d.d_off >= 0);
+		assert ((GElf_Off) dl->data.d.d_off <= shdr->sh_size);
+		assert (dl->data.d.d_size <= (shdr->sh_size
+					      - (GElf_Off) dl->data.d.d_off));
+
 		if ((scn->flags | dl->flags | elf->flags) & ELF_F_DIRTY)
 		  {
-		    if (scn_start + dl->data.d.d_off != last_position)
+		    if (scn_start + dl->data.d.d_off > last_position)
 		      {
-			if (scn_start + dl->data.d.d_off > last_position)
+			/* This code assumes that the data blocks for
+			   a section are ordered by offset.  */
+			size_t written = 0;
+
+			if (last_position < shdr_start)
 			  {
-			    /* This code assumes that the data blocks for
-			       a section are ordered by offset.  */
-			    size_t written = 0;
+			    written = MIN (scn_start + dl->data.d.d_off
+					   - last_position,
+					   shdr_start - last_position);
 
-			    if (last_position < shdr_start)
-			      {
-				written = MIN (scn_start + dl->data.d.d_off
-					       - last_position,
-					       shdr_start - last_position);
-
-				memset (last_position, __libelf_fill_byte,
-					written);
-			      }
-
-			    if (last_position + written
-				!= scn_start + dl->data.d.d_off
-				&& shdr_end < scn_start + dl->data.d.d_off)
-			      memset (shdr_end, __libelf_fill_byte,
-				      scn_start + dl->data.d.d_off - shdr_end);
-
-			    last_position = scn_start + dl->data.d.d_off;
+			    memset (last_position, __libelf_fill_byte,
+				    written);
 			  }
+
+			if (last_position + written
+			    != scn_start + dl->data.d.d_off
+			    && shdr_end < scn_start + dl->data.d.d_off)
+			  memset (shdr_end, __libelf_fill_byte,
+				  scn_start + dl->data.d.d_off - shdr_end);
+
 		      }
+
+		    /* Let it go backward if the sections are not
+		       presented in layout order, or use a bogus
+		       layout (overlaps, etc.).  */
+
+		    last_position = scn_start + dl->data.d.d_off;
 
 		    if (unlikely (change_bo))
 		      {
@@ -346,6 +353,9 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 		  }
 		else
 		  last_position += dl->data.d.d_size;
+
+		assert (scn_start + dl->data.d.d_off + dl->data.d.d_size
+			== last_position);
 
 		dl->flags &= ~ELF_F_DIRTY;
 
@@ -621,18 +631,20 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 		    char tmpbuf[MAX_TMPBUF];
 		    void *buf = dl->data.d.d_buf;
 
-		    if (scn_start + dl->data.d.d_off != last_offset)
+		    if (scn_start + dl->data.d.d_off > last_offset)
 		      {
-			assert (last_offset < scn_start + dl->data.d.d_off);
-
 			if (unlikely (fill (elf->fildes, last_offset,
 					    (scn_start + dl->data.d.d_off)
 					    - last_offset, fillbuf,
 					    &filled) != 0))
 			  return 1;
-
-			last_offset = scn_start + dl->data.d.d_off;
 		      }
+
+		    /* Let it go backward if the sections are not
+		       presented in layout order, or use a bogus
+		       layout (overlaps, etc.).  */
+
+		    last_offset = scn_start + dl->data.d.d_off;
 
 		    if (unlikely (change_bo))
 		      {

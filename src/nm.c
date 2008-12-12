@@ -1,5 +1,5 @@
 /* Print symbol information from ELF file in human-readable form.
-   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007,2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -703,6 +703,18 @@ get_local_names (Dwarf *dbg)
     }
 }
 
+/* Do elf_strptr, but return a backup string and never NULL.  */
+static const char *
+sym_name (Elf *elf, GElf_Word strndx, GElf_Word st_name, char buf[], size_t n)
+{
+  const char *symstr = elf_strptr (elf, strndx, st_name);
+  if (symstr == NULL)
+    {
+      snprintf (buf, n, "[invalid st_name %#" PRIx32 "]", st_name);
+      symstr = buf;
+    }
+  return symstr;
+}
 
 /* Show symbols in SysV format.  */
 static void
@@ -736,9 +748,15 @@ show_symbols_sysv (Ebl *ebl, GElf_Word strndx,
 
       assert (elf_ndxscn (scn) == cnt++);
 
-      scnnames[elf_ndxscn (scn)]
-	= elf_strptr (ebl->elf, shstrndx,
-		      gelf_getshdr (scn, &shdr_mem)->sh_name);
+      char *name = elf_strptr (ebl->elf, shstrndx,
+			       gelf_getshdr (scn, &shdr_mem)->sh_name);
+      if (unlikely (name == NULL))
+	{
+	  name = alloca (sizeof "[invalid sh_name 0x12345678]");
+	  snprintf (name, sizeof name, "[invalid sh_name %#" PRIx32 "]",
+		    gelf_getshdr (scn, &shdr_mem)->sh_name);
+	}
+      scnnames[elf_ndxscn (scn)] = name;
     }
 
   int digits = length_map[gelf_getclass (ebl->elf) - 1][radix];
@@ -772,8 +790,10 @@ show_symbols_sysv (Ebl *ebl, GElf_Word strndx,
   /* Iterate over all symbols.  */
   for (cnt = 0; cnt < nsyms; ++cnt)
     {
-      const char *symstr = elf_strptr (ebl->elf, strndx,
-				       syms[cnt].sym.st_name);
+      char symstrbuf[50];
+      const char *symstr = sym_name (ebl->elf, strndx, syms[cnt].sym.st_name,
+				     symstrbuf, sizeof symstrbuf);
+
       char symbindbuf[50];
       char symtypebuf[50];
       char secnamebuf[1024];
@@ -850,7 +870,9 @@ show_symbols_bsd (Elf *elf, GElf_Word strndx,
   /* Iterate over all symbols.  */
   for (size_t cnt = 0; cnt < nsyms; ++cnt)
     {
-      const char *symstr = elf_strptr (elf, strndx, syms[cnt].sym.st_name);
+      char symstrbuf[50];
+      const char *symstr = sym_name (elf, strndx, syms[cnt].sym.st_name,
+				     symstrbuf, sizeof symstrbuf);
 
       /* Printing entries with a zero-length name makes the output
 	 not very well parseable.  Since these entries don't carry
@@ -872,7 +894,7 @@ show_symbols_bsd (Elf *elf, GElf_Word strndx,
 		? (GELF_ST_BIND (syms[cnt].sym.st_info) == STB_WEAK
 		   ? "*" : " ")
 		: "",
-		elf_strptr (elf, strndx, syms[cnt].sym.st_name));
+		symstr);
       else
 	printf (print_size ? sfmtstrs[radix] : fmtstrs[radix],
 		digits, syms[cnt].sym.st_value,
@@ -881,7 +903,7 @@ show_symbols_bsd (Elf *elf, GElf_Word strndx,
 		? (GELF_ST_BIND (syms[cnt].sym.st_info) == STB_WEAK
 		   ? "*" : " ")
 		: "",
-		elf_strptr (elf, strndx, syms[cnt].sym.st_name),
+		symstr,
 		digits, (uint64_t) syms[cnt].sym.st_size);
     }
 }
@@ -907,7 +929,9 @@ show_symbols_posix (Elf *elf, GElf_Word strndx, const char *prefix,
   /* Iterate over all symbols.  */
   for (size_t cnt = 0; cnt < nsyms; ++cnt)
     {
-      const char *symstr = elf_strptr (elf, strndx, syms[cnt].sym.st_name);
+      char symstrbuf[50];
+      const char *symstr = sym_name (elf, strndx, syms[cnt].sym.st_name,
+				     symstrbuf, sizeof symstrbuf);
 
       /* Printing entries with a zero-length name makes the output
 	 not very well parseable.  Since these entries don't carry
@@ -1056,6 +1080,8 @@ show_symbols (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, Elf_Scn *xndxscn,
 	{
 	  const char *symstr = elf_strptr (ebl->elf, shdr->sh_link,
 					   sym->st_name);
+	  if (symstr == NULL)
+	    continue;
 
 	  longest_name = MAX ((size_t) longest_name, strlen (symstr));
 

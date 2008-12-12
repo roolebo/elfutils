@@ -1,5 +1,5 @@
 /* Write changed data structures.
-   Copyright (C) 2000, 2001, 2002, 2004, 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -321,12 +321,12 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 			    && shdr_end < scn_start + dl->data.d.d_off)
 			  memset (shdr_end, __libelf_fill_byte,
 				  scn_start + dl->data.d.d_off - shdr_end);
-
 		      }
 
-		    /* Let it go backward if the sections are not
-		       presented in layout order, or use a bogus
-		       layout (overlaps, etc.).  */
+		    /* Let it go backward if the sections use a bogus
+		       layout with overlaps.  We'll overwrite the stupid
+		       user's section data with the latest one, rather than
+		       crashing.  */
 
 		    last_position = scn_start + dl->data.d.d_off;
 
@@ -640,9 +640,10 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 			  return 1;
 		      }
 
-		    /* Let it go backward if the sections are not
-		       presented in layout order, or use a bogus
-		       layout (overlaps, etc.).  */
+		    /* Let it go backward if the sections use a bogus
+		       layout with overlaps.  We'll overwrite the stupid
+		       user's section data with the latest one, rather than
+		       crashing.  */
 
 		    last_offset = scn_start + dl->data.d.d_off;
 

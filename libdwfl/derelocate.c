@@ -358,7 +358,7 @@ dwfl_module_relocate_address (Dwfl_Module *mod, Dwarf_Addr *addr)
 
   if (mod->e_type != ET_REL)
     {
-      *addr -= mod->debug.bias;
+      *addr -= mod->main.bias;
       return 0;
     }
 

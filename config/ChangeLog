@@ -1,3 +1,7 @@
+2008-12-16  Roland McGrath  <roland@redhat.com>
+
+	* version.h.in: New file.
+
 2008-01-12  Ulrich Drepper  <drepper@redhat.com>
 
 	* elfutils.spec.in: Add m4 to build requirements.

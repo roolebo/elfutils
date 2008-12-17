@@ -229,4 +229,15 @@ dnl Appended to the config.h file.
 dnl We hide all kinds of configuration magic in lib/eu-config.h.
 AH_BOTTOM([#include <eu-config.h>])
 
+dnl Version compatibility header.
+AC_CONFIG_FILES([version.h:config/version.h.in])
+AC_SUBST([eu_version])
+case $PACKAGE_VERSION in
+0.???) eu_version=${PACKAGE_VERSION#0.} ;;
+?.???) eu_version=${PACKAGE_VERSION/./} ;;
+?.??)  eu_version=${PACKAGE_VERSION/./}0 ;;
+?.?)   eu_version=${PACKAGE_VERSION/./}00 ;;
+*)     AC_MSG_ERROR([confused by version number '$PACKAGE_VERSION']) ;;
+esac
+
 AC_OUTPUT

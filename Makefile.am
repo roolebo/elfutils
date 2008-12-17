@@ -1,7 +1,7 @@
 ## Process this file with automake to create Makefile.in
 ## Configure input file for elfutils.
 ##
-## Copyright (C) 1996-2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
+## Copyright (C) 1996-2002, 2003, 2004, 2005, 2006, 2008 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -26,6 +26,8 @@
 ## <http://www.openinventionnetwork.com>.
 ##
 ACLOCAL_AMFLAGS = -I m4
+
+pkginclude_HEADERS = version.h
 
 # Add doc back when we have some real content.
 SUBDIRS = config m4 lib libelf libebl libdwfl libdw libcpu libasm backends \

@@ -185,3 +185,12 @@ ELFUTILS_0.136 {
   local:
     *;
 } ELFUTILS_0.130;
+
+ELFUTILS_0.138 {
+  global:
+    # Replaced ELFUTILS_0.130 version, which has bug-compatibility wrapper.
+    dwfl_module_build_id;
+
+  local:
+    *;
+} ELFUTILS_0.136;

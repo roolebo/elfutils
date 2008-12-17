@@ -1,3 +1,10 @@
+2008-12-16  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_build_id.c (dwfl_module_build_id): Define with alias and
+	symver magic to bind to ELFUTILS_0.138.
+	(_BUG_COMPAT_dwfl_module_build_id): New function, bug compatible
+	wrapper for ELFUTILS_0.130 version set.
+
 2008-12-15  Roland McGrath  <roland@redhat.com>
 
 	* derelocate.c (dwfl_module_relocate_address): Apply main.bias, not

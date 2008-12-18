@@ -5,6 +5,11 @@
 	(_BUG_COMPAT_dwfl_module_build_id): New function, bug compatible
 	wrapper for ELFUTILS_0.130 version set.
 
+2008-12-18  Roland McGrath  <roland@redhat.com>
+
+	* derelocate.c (dwfl_module_relocate_address): Fix last fix: ET_DYN
+	addresses are taken as relative to MOD->low_addr.
+
 2008-12-15  Roland McGrath  <roland@redhat.com>
 
 	* derelocate.c (dwfl_module_relocate_address): Apply main.bias, not

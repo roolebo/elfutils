@@ -1,5 +1,11 @@
 2008-12-11  Roland McGrath  <roland@redhat.com>
 
+	* elf32_updatefile.c (__elfw2(LIBELFBITS,updatemmap)): Handle
+	placement offset going backwards, for out-of-order or overlapping
+	(bogus) sh_offset layouts.  It's a dumb use, but should not crash.
+	(__elfw2(LIBELFBITS,updatefile)): Likewise.
+	Fixes RHBZ#476136.
+
 	* libelf.h (Elf_Data): Whitespace fix.
 
 2008-12-10  Roland McGrath  <roland@redhat.com>

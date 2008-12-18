@@ -351,13 +351,12 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 	      opoff = 8;
 
 	      curr += 2;
-	      assert (avail > 0);
 
 	      assert (last_prefix_bit != 0);
 	      correct_prefix = last_prefix_bit;
 	    }
 
-	  do
+	  while (avail > 0)
 	    {
 	      uint_fast8_t masked = *codep++ & *curr++;
 	      if (masked != *curr++)
@@ -367,7 +366,6 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 	      if (codep == end && avail > 0)
 		goto do_ret;
 	    }
-	  while (avail > 0);
 
 	  if (avail != 0)
 	    {

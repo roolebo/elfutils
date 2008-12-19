@@ -911,6 +911,7 @@ ifdef(`i386',
 00001111,10101110,11110000:mfence
 00001111,10101110,11111000:sfence
 00001111,10101110,{mod}111{r_m}:clflush {mod}{r_m}
+00001111,00001111,{MOD}{mmxreg}{R_M}:INVALID {MOD}{R_M},{mmxreg}
 # ORDER:
 dnl Many previous entries depend on this being last.
 000{sreg2}111:pop {sreg2}

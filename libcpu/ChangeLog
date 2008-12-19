@@ -1,3 +1,13 @@
+2008-12-19  Ulrich Drepper  <drepper@redhat.com>
+
+	* defs/i386: Add entry for AMD 3DNOW.
+	* i386_disasm.c: Implement AMD 3DNOW disassembly.
+
+2008-12-17  Ulrich Drepper  <drepper@redhat.com>
+
+	* i386_disasm.c (i386_disasm): If instruction matches prefix,
+	undoing the prefix match finishes the instruction.
+
 2008-01-21  Roland McGrath  <roland@redhat.com>
 
 	* defs/i386: Fix typo in comment.

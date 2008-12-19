@@ -184,6 +184,73 @@ static const char *prefix_str[] =
 #endif
 
 
+static const char amd3dnowstr[] =
+#define MNE_3DNOW_PAVGUSB 1
+  "pavgusb\0"
+#define MNE_3DNOW_PFADD (MNE_3DNOW_PAVGUSB + 8)
+  "pfadd\0"
+#define MNE_3DNOW_PFSUB (MNE_3DNOW_PFADD + 6)
+  "pfsub\0"
+#define MNE_3DNOW_PFSUBR (MNE_3DNOW_PFSUB + 6)
+  "pfsubr\0"
+#define MNE_3DNOW_PFACC (MNE_3DNOW_PFSUBR + 7)
+  "pfacc\0"
+#define MNE_3DNOW_PFCMPGE (MNE_3DNOW_PFACC + 6)
+  "pfcmpge\0"
+#define MNE_3DNOW_PFCMPGT (MNE_3DNOW_PFCMPGE + 8)
+  "pfcmpgt\0"
+#define MNE_3DNOW_PFCMPEQ (MNE_3DNOW_PFCMPGT + 8)
+  "pfcmpeq\0"
+#define MNE_3DNOW_PFMIN (MNE_3DNOW_PFCMPEQ + 8)
+  "pfmin\0"
+#define MNE_3DNOW_PFMAX (MNE_3DNOW_PFMIN + 6)
+  "pfmax\0"
+#define MNE_3DNOW_PI2FD (MNE_3DNOW_PFMAX + 6)
+  "pi2fd\0"
+#define MNE_3DNOW_PF2ID (MNE_3DNOW_PI2FD + 6)
+  "pf2id\0"
+#define MNE_3DNOW_PFRCP (MNE_3DNOW_PF2ID + 6)
+  "pfrcp\0"
+#define MNE_3DNOW_PFRSQRT (MNE_3DNOW_PFRCP + 6)
+  "pfrsqrt\0"
+#define MNE_3DNOW_PFMUL (MNE_3DNOW_PFRSQRT + 8)
+  "pfmul\0"
+#define MNE_3DNOW_PFRCPIT1 (MNE_3DNOW_PFMUL + 6)
+  "pfrcpit1\0"
+#define MNE_3DNOW_PFRSQIT1 (MNE_3DNOW_PFRCPIT1 + 9)
+  "pfrsqit1\0"
+#define MNE_3DNOW_PFRCPIT2 (MNE_3DNOW_PFRSQIT1 + 9)
+  "pfrcpit2\0"
+#define MNE_3DNOW_PMULHRW (MNE_3DNOW_PFRCPIT2 + 9)
+  "pmulhrw";
+
+#define AMD3DNOW_LOW_IDX 0x0d
+#define AMD3DNOW_HIGH_IDX (sizeof (amd3dnow) + AMD3DNOW_LOW_IDX - 1)
+#define AMD3DNOW_IDX(val) ((val) - AMD3DNOW_LOW_IDX)
+static unsigned char amd3dnow[] =
+  {
+    [AMD3DNOW_IDX (0xbf)] = MNE_3DNOW_PAVGUSB,
+    [AMD3DNOW_IDX (0x9e)] = MNE_3DNOW_PFADD,
+    [AMD3DNOW_IDX (0x9a)] = MNE_3DNOW_PFSUB,
+    [AMD3DNOW_IDX (0xaa)] = MNE_3DNOW_PFSUBR,
+    [AMD3DNOW_IDX (0xae)] = MNE_3DNOW_PFACC,
+    [AMD3DNOW_IDX (0x90)] = MNE_3DNOW_PFCMPGE,
+    [AMD3DNOW_IDX (0xa0)] = MNE_3DNOW_PFCMPGT,
+    [AMD3DNOW_IDX (0xb0)] = MNE_3DNOW_PFCMPEQ,
+    [AMD3DNOW_IDX (0x94)] = MNE_3DNOW_PFMIN,
+    [AMD3DNOW_IDX (0xa4)] = MNE_3DNOW_PFMAX,
+    [AMD3DNOW_IDX (0x0d)] = MNE_3DNOW_PI2FD,
+    [AMD3DNOW_IDX (0x1d)] = MNE_3DNOW_PF2ID,
+    [AMD3DNOW_IDX (0x96)] = MNE_3DNOW_PFRCP,
+    [AMD3DNOW_IDX (0x97)] = MNE_3DNOW_PFRSQRT,
+    [AMD3DNOW_IDX (0xb4)] = MNE_3DNOW_PFMUL,
+    [AMD3DNOW_IDX (0xa6)] = MNE_3DNOW_PFRCPIT1,
+    [AMD3DNOW_IDX (0xa7)] = MNE_3DNOW_PFRSQIT1,
+    [AMD3DNOW_IDX (0xb6)] = MNE_3DNOW_PFRCPIT2,
+    [AMD3DNOW_IDX (0xb7)] = MNE_3DNOW_PMULHRW
+  };
+
+
 struct output_data
 {
   GElf_Addr addr;
@@ -351,13 +418,12 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 	      opoff = 8;
 
 	      curr += 2;
-	      assert (avail > 0);
 
 	      assert (last_prefix_bit != 0);
 	      correct_prefix = last_prefix_bit;
 	    }
 
-	  do
+	  while (avail > 0)
 	    {
 	      uint_fast8_t masked = *codep++ & *curr++;
 	      if (masked != *curr++)
@@ -367,7 +433,6 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 	      if (codep == end && avail > 0)
 		goto do_ret;
 	    }
-	  while (avail > 0);
 
 	  if (avail != 0)
 	    {
@@ -625,6 +690,24 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 			  break;
 
 			case 0x0f:
+			  if (data[1] == 0x0f)
+			    {
+			      /* AMD 3DNOW.  We need one more byte.  */
+			      if (param_start >= end)
+				goto not;
+			      if (*param_start < AMD3DNOW_LOW_IDX
+				  || *param_start > AMD3DNOW_HIGH_IDX)
+				goto not;
+			      unsigned int idx
+				= amd3dnow[AMD3DNOW_IDX (*param_start)];
+			      if (idx == 0)
+				goto not;
+			      str = amd3dnowstr + idx - 1;
+			      /* Eat the immediate byte indicating the
+				 operation.  */
+			      ++param_start;
+			      break;
+			    }
 #ifdef X86_64
 			  if (data[1] == 0xc7)
 			    {

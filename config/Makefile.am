@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
 ## Configure input file for elfutils.
 ##
-## Copyright (C) 2004, 2005 Red Hat, Inc.
+## Copyright (C) 2004, 2005, 2008 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -27,21 +27,22 @@
 ##
 EXTRA_DIST = elfutils.spec.in
 
+if MAINTAINER_MODE
 $(srcdir)/elfutils.spec.in: $(top_srcdir)/NEWS
 	@tmpname=$$(mktemp $${TMPDIR:-/tmp}/elfutils.XXXXXX); \
 	date +'* %a %b %e %Y' | tr '[\n]' '[ ]' > $$tmpname; \
 	getent passwd "$$(whoami)" | \
 	  awk 'BEGIN {FS=":"} { printf $$5; exit 0}' >> $$tmpname; \
 	echo -n " <$$(whoami)@redhat.com> " >> $$tmpname; \
-	sed 's/Version \(.*\):$$/\1-1/;q' $(top_srcdir)/NEWS >> $$tmpname; \
-	sed '2,/^Version /p;d' $(top_srcdir)/NEWS | \
-	  head -n -1 | \
-	  awk '{ if ($$0 == "") { if (line != "") { printf "- "; fflush(); system("echo \"" line "\" | fold -w 70"); line=""; } } else { line=line $$0; }} END { if (line != "") { printf "- "; system("echo \"" line "\" | fold -w 70")}}' >> $$tmpname; \
-	echo >> $$tmpname; \
+	awk '\
+	  $$1 == "Version" && started { exit } \
+	  $$1 == "Version" { started=1; line=""; sub(/:/,"",$$2); \
+			     print $$2 "-1"; next } \
+	  NF > 0 { line = (line != "") ? (line " " $$0) : ("- " $$0) } \
+	  NF == 0 && line != "" { print line; line="" } \
+	  END { if (line != "") print line; print "" }' $< \
+	| fold -s -w 70 | sed '1!s/^[^-]/  &/' >> $$tmpname; \
 	sed "/^%changelog/r $$tmpname" $@ > $@.new; \
 	rm -f $$tmpname; \
 	mv -f $@.new $@
-	-@if [ -d $(srcdir)/CVS ]; then \
-	  cd $(srcdir); \
-	  cvs ci -m "Added changelog." $(@F); \
-	fi
+endif

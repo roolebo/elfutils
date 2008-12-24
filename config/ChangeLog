@@ -1,3 +1,8 @@
+2008-12-24  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am ($(srcdir)/elfutils.spec.in): Rewrite awk magic.
+	Put the target inside [if MAINTAINER_MODE].
+
 2008-12-16  Roland McGrath  <roland@redhat.com>
 
 	* version.h.in: New file.

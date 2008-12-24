@@ -1,3 +1,18 @@
+Version 0.138:
+
+Install <elfutils/version.h> header file for applications to use in source
+version compatibility checks.
+
+libebl: backend fixes for i386 TLS relocs; backend support for NT_386_IOPERM
+
+libcpu: disassembler fixes
+
+libdwfl: bug fixes
+
+libelf: bug fixes
+
+nm: bug fixes for handling corrupt input files
+
 Version 0.137:
 
 Minor fixes for unreleased 0.136 release.

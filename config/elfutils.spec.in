@@ -5,7 +5,7 @@ Version: @PACKAGE_VERSION@
 Release: 1
 License: GPLv2 with exceptions
 Group: Development/Tools
-Source: elfutils-%{version}.tar.gz
+Source: elfutils-%{version}.tar.bz2
 Obsoletes: libelf libelf-devel
 Requires: elfutils-libelf = %{version}-%{release}
 Requires: glibc >= 2.7
@@ -182,6 +182,16 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
+* Wed Dec 24 2008 Roland McGrath <roland@redhat.com> 0.138-1
+- Install <elfutils/version.h> header file for applications to use in
+  source version compatibility checks.
+- libebl: backend fixes for i386 TLS relocs; backend support for
+  NT_386_IOPERM
+- libcpu: disassembler fixes
+- libdwfl: bug fixes
+- libelf: bug fixes
+- nm: bug fixes for handling corrupt input files
+
 * Tue Aug 26 2008 Ulrich Drepper <drepper@redhat.com> 0.137-1
 - Minor fixes for unreleased 0.136 release.
 
@@ -214,7 +224,7 @@ rm -rf ${RPM_BUILD_ROOT}
 - libdw: DW_FORM_ref_addr support; dwarf_formref entry point now depreca
 ted;       bug fixes for oddly-formatted DWARF
 - libdwfl: bug fixes in offline archive support, symbol table handling;
-	 apply partial relocations for dwfl_module_address_section on 
+	 apply partial relocations for dwfl_module_address_section on
 ET_REL
 - libebl: powerpc backend support for Altivec registers
 

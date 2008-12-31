@@ -1,5 +1,7 @@
 2008-12-31  Ulrich Drepper  <drepper@redhat.com>
 
+	* i386_disasm.c (i386_disasm): Correct resizing of buffer.
+
 	* i386_parse.y (struct argstring): Add off element.
 	(off_op_str): New global variable.
 	(print_op_str): Print strings as concatenated strings.  Keep track

@@ -356,6 +356,9 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 	prefixes |= ((*data++) & 0xf) | has_rex;
 #endif
 
+      bufcnt = 0;
+      size_t cnt = 0;
+
       const uint8_t *curr = match_data;
       const uint8_t *const match_end = match_data + sizeof (match_data);
 
@@ -369,30 +372,6 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 	  goto do_ret;
 	}
 
-      if (0)
-	{
-	  /* Resize the buffer.  */
-	  char *oldbuf;
-	enomem:
-	  oldbuf = buf;
-	  if (buf == initbuf)
-	    buf = malloc (2 * bufsize);
-	  else
-	    buf = realloc (buf, 2 * bufsize);
-	  if (buf == NULL)
-	    {
-	      buf = oldbuf;
-	      retval = ENOMEM;
-	      goto do_ret;
-	    }
-	  bufsize *= 2;
-
-	  output_data.bufp = buf;
-	  output_data.bufsize = bufsize;
-	}
-      bufcnt = 0;
-
-      size_t cnt = 0;
     next_match:
       while (curr < match_end)
 	{
@@ -446,6 +425,41 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 	  assert (correct_prefix == 0
 		  || (prefixes & correct_prefix) != 0);
 	  prefixes ^= correct_prefix;
+
+	  if (0)
+	    {
+	      /* Resize the buffer.  */
+	      char *oldbuf;
+	    enomem:
+	      oldbuf = buf;
+	      if (buf == initbuf)
+		buf = malloc (2 * bufsize);
+	      else
+		buf = realloc (buf, 2 * bufsize);
+	      if (buf == NULL)
+		{
+		  buf = oldbuf;
+		  retval = ENOMEM;
+		  goto do_ret;
+		}
+	      bufsize *= 2;
+
+	      output_data.bufp = buf;
+	      output_data.bufsize = bufsize;
+	      bufcnt = 0;
+
+	      if (data == end)
+		{
+		  assert (prefixes != 0);
+		  goto print_prefix;
+		}
+
+	      /* gcc is not clever enough to see the following variables
+		 are not used uninitialized.  */
+	      asm (""
+		   : "=mr" (opoff), "=mr" (correct_prefix), "=mr" (codep),
+		     "=mr" (start), "=mr" (len));
+	    }
 
 	  size_t prefix_size = 0;
 

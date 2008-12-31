@@ -1,6 +1,6 @@
 2008-12-30  Ulrich Drepper  <drepper@redhat.com>
 
-	* testfile44.S.bz2: Add tests for blendpd.
+	* testfile44.S.bz2: Add tests for blendpd and blendps.
 	* testfile45.S.bz2: Likewise.
 	* testfile44.expect.bz2: Adjust accordingly.
 	* testfile45.expect.bz2: Likewise.

@@ -912,6 +912,7 @@ ifdef(`i386',
 00001111,10101110,11111000:sfence
 00001111,10101110,{mod}111{r_m}:clflush {mod}{r_m}
 00001111,00001111,{MOD}{mmxreg}{R_M}:INVALID {MOD}{R_M},{mmxreg}
+01100110,00001111,00111010,00001100,{Mod}{xmmreg}{R_m},{imm8}:blendps {imm8},{Mod}{R_m},{xmmreg}
 01100110,00001111,00111010,00001101,{Mod}{xmmreg}{R_m},{imm8}:blendpd {imm8},{Mod}{R_m},{xmmreg}
 # ORDER:
 dnl Many previous entries depend on this being last.

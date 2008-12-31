@@ -1,6 +1,6 @@
 2008-12-30  Ulrich Drepper  <drepper@redhat.com>
 
-	* defs/i386: Add blendpd opcode.
+	* defs/i386: Add blendpd and blendps opcodes.
 
 2008-12-19  Ulrich Drepper  <drepper@redhat.com>
 

@@ -860,7 +860,8 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		    {
 		      /* First parameter.  */
 		      if (instrtab[cnt].str1 != 0)
-			ADD_STRING (op1_str[instrtab[cnt].str1]);
+			ADD_STRING (op1_str
+				    + op1_str_idx[instrtab[cnt].str1 - 1]);
 
 		      output_data.opoff1 = (instrtab[cnt].off1_1
 					    + OFF1_1_BIAS - opoff);
@@ -880,7 +881,8 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		    {
 		      /* Second parameter.  */
 		      if (instrtab[cnt].str2 != 0)
-			ADD_STRING (op2_str[instrtab[cnt].str2]);
+			ADD_STRING (op2_str
+				    + op2_str_idx[instrtab[cnt].str2 - 1]);
 
 		      output_data.opoff1 = (instrtab[cnt].off2_1
 					    + OFF2_1_BIAS - opoff);
@@ -900,7 +902,8 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		    {
 		      /* Third parameter.  */
 		      if (instrtab[cnt].str3 != 0)
-			ADD_STRING (op3_str[instrtab[cnt].str3]);
+			ADD_STRING (op3_str
+				    + op3_str_idx[instrtab[cnt].str3 - 1]);
 
 		      output_data.opoff1 = (instrtab[cnt].off3_1
 					    + OFF3_1_BIAS - opoff);

@@ -145,6 +145,7 @@ struct argstring
 {
   char *str;
   int idx;
+  int off;
 };
 
 
@@ -1066,15 +1067,29 @@ compare_suf (const void *p1, const void *p2)
 
 
 static int count_op_str;
+static int off_op_str;
 static void
 print_op_str (const void *nodep, VISIT value,
 	      int level __attribute__ ((unused)))
 {
   if (value == leaf || value == postorder)
     {
-      fprintf (outfile, "  \"%s\",\n", (*(struct argstring **) nodep)->str);
+      const char *str = (*(struct argstring **) nodep)->str;
+      fprintf (outfile, "%s\n  \"%s",
+	       count_op_str == 0 ? "" : "\\0\"", str);
       (*(struct argstring **) nodep)->idx = ++count_op_str;
+      (*(struct argstring **) nodep)->off = off_op_str;
+      off_op_str += strlen (str) + 1;
     }
+}
+
+
+static void
+print_op_str_idx (const void *nodep, VISIT value,
+		  int level __attribute__ ((unused)))
+{
+  if (value == leaf || value == postorder)
+    printf ("  %d,\n", (*(struct argstring **) nodep)->off);
 }
 
 
@@ -1149,7 +1164,8 @@ instrtable_out (void)
     {
       /* Functions.  */
       count_op_str = 0;
-      fprintf (outfile, "static opfct_t op%d_fct[] =\n{\n  NULL,\n", i + 1);
+      fprintf (outfile, "static const opfct_t op%d_fct[] =\n{\n  NULL,\n",
+	       i + 1);
       twalk (fct_names[i], print_op_fct);
       fputs ("};\n", outfile);
 
@@ -1157,9 +1173,14 @@ instrtable_out (void)
       if (nbitstr[i] != 0)
 	{
 	  count_op_str = 0;
-	  fprintf (outfile, "static const char *op%d_str[] =\n{\n  NULL,\n",
-		   i + 1);
+	  off_op_str = 0;
+	  fprintf (outfile, "static const char op%d_str[] =", i + 1);
 	  twalk (strs[i], print_op_str);
+	  fputs ("\"\n;\n", outfile);
+
+	  fprintf (outfile, "static const uint8_t op%d_str_idx[] = {\n",
+		   i + 1);
+	  twalk (strs[i], print_op_str_idx);
 	  fputs ("};\n", outfile);
 	}
     }

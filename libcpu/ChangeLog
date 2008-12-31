@@ -1,5 +1,15 @@
 2008-12-31  Ulrich Drepper  <drepper@redhat.com>
 
+	* i386_parse.y (struct argstring): Add off element.
+	(off_op_str): New global variable.
+	(print_op_str): Print strings as concatenated strings.  Keep track
+	of index and length.  Update ->off element.
+	(print_op_str_idx): New function.
+	(instrtable_out): Mark op%d_fct as const.
+	Emit two tables for the strings: the string itself (op%d_str) and the
+	index table (op%d_str_idx).
+	* i386_disasm.c (i386_disasm): Adjust for new op%d_str definition.
+
 	* i386_disasm.c [X86_64] (i386_disasm): Handle rex prefix when
 	printing only prefix.
 

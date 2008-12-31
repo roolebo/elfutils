@@ -1,3 +1,10 @@
+2008-12-30  Ulrich Drepper  <drepper@redhat.com>
+
+	* testfile44.S.bz2: Add tests for blendpd.
+	* testfile45.S.bz2: Likewise.
+	* testfile44.expect.bz2: Adjust accordingly.
+	* testfile45.expect.bz2: Likewise.
+
 2008-12-19  Ulrich Drepper  <drepper@redhat.com>
 
 	* testfile44.S.bz2: Add tests for AMD 3DNOW.

@@ -520,6 +520,23 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		case prefix_lock:
 		  ADD_STRING ("lock");
 		  break;
+#ifdef X86_64
+		case 0x40 ... 0x4f:
+		  ADD_STRING ("rex");
+		  if (byte != 0x40)
+		    {
+		      ADD_CHAR ('.');
+		      if (byte & 0x8)
+			ADD_CHAR ('w');
+		      if (byte & 0x4)
+			ADD_CHAR ('r');
+		      if (byte & 0x3)
+			ADD_CHAR ('x');
+		      if (byte & 0x1)
+			ADD_CHAR ('b');
+		    }
+		  break;
+#endif
 		default:
 		  /* Cannot happen.  */
 		  puts ("unknown prefix");

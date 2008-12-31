@@ -393,17 +393,16 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
       bufcnt = 0;
 
       size_t cnt = 0;
+    next_match:
       while (curr < match_end)
 	{
+	  uint_fast8_t len = *curr++;
 	  const uint8_t *start = curr;
 
-	  uint_fast8_t len = *curr++;
-
 	  assert (len > 0);
-	  assert (curr + 2 * len + 2 <= match_end);
+	  assert (curr + 2 * len <= match_end);
 
 	  const uint8_t *codep = data;
-	  size_t avail = len;
 	  int correct_prefix = 0;
 	  int opoff = 0;
 
@@ -411,8 +410,6 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 	    {
 	      /* We match a prefix byte.  This is exactly one byte and
 		 is matched exactly, without a mask.  */
-	      --avail;
-
 	      --len;
 	      start += 2;
 	      opoff = 8;
@@ -423,23 +420,21 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 	      correct_prefix = last_prefix_bit;
 	    }
 
+	  size_t avail = len;
 	  while (avail > 0)
 	    {
 	      uint_fast8_t masked = *codep++ & *curr++;
 	      if (masked != *curr++)
-		break;
+		{
+		not:
+		  curr = start + 2 * len;
+		  ++cnt;
+		  goto next_match;
+		}
 
 	      --avail;
 	      if (codep == end && avail > 0)
 		goto do_ret;
-	    }
-
-	  if (avail != 0)
-	    {
-	    not:
-	      curr = start + 1 + 2 * len + 2;
-	      ++cnt;
-	      continue;
 	    }
 
 	  if (len > end - data)

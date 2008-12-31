@@ -1296,7 +1296,7 @@ instrtable_out (void)
 	  b = b->next;
 	}
 
-      fprintf (outfile, " %#zx, %#zx,\n", cnt & 0xff, cnt >> 8);
+      fputc_unlocked ('\n', outfile);
     }
   fputs ("};\n", outfile);
 }

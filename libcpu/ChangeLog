@@ -1,5 +1,12 @@
 2008-12-31  Ulrich Drepper  <drepper@redhat.com>
 
+	* i386_disasm.c (i386_disasm): Minor optimizations.
+
+	* i386_parse.y (instrtable_out): No need to emit index, the reader can
+	keep track.
+	* i386_disasm.c (i386_disasm): The index is not emitted anymore, no
+	need to skip it.
+
 	* i386_disasm.c (amd3dnow): Mark as const.
 
 	* defs/i386: Add blendvpd and blendvps opcodes.

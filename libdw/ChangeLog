@@ -1,3 +1,9 @@
+2008-12-31  Roland McGrath  <roland@redhat.com>
+
+	* libdwP.h (struct Dwarf_Abbrev): Change type of 'has_children' to bool.
+	Reorder members.
+	* dwarf_haschildren.c: Return -1 for error case, not 0.
+
 2008-08-15  Roland McGrath  <roland@redhat.com>
 
 	* libdw.map (ELFUTILS_0.136): New version set, inherits from

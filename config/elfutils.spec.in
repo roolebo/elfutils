@@ -182,7 +182,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
-* Wed Dec 24 2008 Roland McGrath <roland@redhat.com> 0.138-1
+* Wed Dec 31 2008 Roland McGrath <roland@redhat.com> 0.138-1
 - Install <elfutils/version.h> header file for applications to use in
   source version compatibility checks.
 - libebl: backend fixes for i386 TLS relocs; backend support for

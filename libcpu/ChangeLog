@@ -1,5 +1,7 @@
 2008-12-31  Ulrich Drepper  <drepper@redhat.com>
 
+	* i386_disasm.c (amd3dnow): Mark as const.
+
 	* defs/i386: Add blendvpd and blendvps opcodes.
 
 2008-12-30  Ulrich Drepper  <drepper@redhat.com>

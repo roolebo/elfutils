@@ -227,7 +227,7 @@ static const char amd3dnowstr[] =
 #define AMD3DNOW_LOW_IDX 0x0d
 #define AMD3DNOW_HIGH_IDX (sizeof (amd3dnow) + AMD3DNOW_LOW_IDX - 1)
 #define AMD3DNOW_IDX(val) ((val) - AMD3DNOW_LOW_IDX)
-static unsigned char amd3dnow[] =
+static const unsigned char amd3dnow[] =
   {
     [AMD3DNOW_IDX (0xbf)] = MNE_3DNOW_PAVGUSB,
     [AMD3DNOW_IDX (0x9e)] = MNE_3DNOW_PFADD,

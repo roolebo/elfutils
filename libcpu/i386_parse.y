@@ -1176,7 +1176,7 @@ instrtable_out (void)
 	  off_op_str = 0;
 	  fprintf (outfile, "static const char op%d_str[] =", i + 1);
 	  twalk (strs[i], print_op_str);
-	  fputs ("\"\n;\n", outfile);
+	  fputs ("\";\n", outfile);
 
 	  fprintf (outfile, "static const uint8_t op%d_str_idx[] = {\n",
 		   i + 1);

@@ -1,3 +1,31 @@
+2008-12-31  Ulrich Drepper  <drepper@redhat.com>
+
+	* i386_disasm.c (i386_disasm): Correct resizing of buffer.
+
+	* i386_parse.y (struct argstring): Add off element.
+	(off_op_str): New global variable.
+	(print_op_str): Print strings as concatenated strings.  Keep track
+	of index and length.  Update ->off element.
+	(print_op_str_idx): New function.
+	(instrtable_out): Mark op%d_fct as const.
+	Emit two tables for the strings: the string itself (op%d_str) and the
+	index table (op%d_str_idx).
+	* i386_disasm.c (i386_disasm): Adjust for new op%d_str definition.
+
+	* i386_disasm.c [X86_64] (i386_disasm): Handle rex prefix when
+	printing only prefix.
+
+	* i386_disasm.c (i386_disasm): Minor optimizations.
+
+	* i386_parse.y (instrtable_out): No need to emit index, the reader can
+	keep track.
+	* i386_disasm.c (i386_disasm): The index is not emitted anymore, no
+	need to skip it.
+
+	* i386_disasm.c (amd3dnow): Mark as const.
+
+	* defs/i386: Add blendvpd and blendvps opcodes.
+
 2008-12-30  Ulrich Drepper  <drepper@redhat.com>
 
 	* defs/i386: Add blendpd and blendps opcodes.

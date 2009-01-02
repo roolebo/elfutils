@@ -1,5 +1,9 @@
 2009-01-01  Ulrich Drepper  <drepper@redhat.com>
 
+	* i386_parse.y (instrtable_out): Optimize match_data table by not
+	emitting 0xff masks for leading bytes.
+	* i386_disasm.c (i386_disasm): Adjust reader of match_data.
+
 	* i386_disasm.c (i386_disasm): Reset bufcnt when not matched.  We
 	don't expect snprintf to fail.
 

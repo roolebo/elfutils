@@ -1,5 +1,16 @@
 2008-12-31  Ulrich Drepper  <drepper@redhat.com>
 
+	* testfile44.S.bz2: Add tests for dppd, dpps, insertps, movntdqa,
+	mpsadbw, packusdw, pblendvb, pblendw, pcmpeqq, pcmpestri, pcmpestrm,
+	pcmpistri, pcmpistrm, pcmpgtq, phminposuw, pinsrb, pinsrd, pmaxsb,
+	pmaxsd, pmaxud, pmaxuw, pminsb, pminsd, pminud, pminuw, pmovsxbw,
+	pmovsxbd, pmovsxbq, pmovsxwd, pmovsxwq, pmovsxdq, pmovsxbw, pmovsxbd,
+	pmovsxbq, pmovsxwd, pmovsxwq, pmovsxdq, pmuldq, pmulld, popcnt, ptest,
+	roundss, roundps, roundpd, and roundsd.
+	* testfile45.S.bz2: Likewise.
+	* testfile44.expect.bz2: Adjust accordingly.
+	* testfile45.expect.bz2: Likewise.
+
 	* testfile44.S.bz2: Add tests for blendvpd and blendvps.
 	* testfile45.S.bz2: Likewise.
 	* testfile44.expect.bz2: Adjust accordingly.

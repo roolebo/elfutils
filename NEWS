@@ -1,3 +1,7 @@
+Version 0.139:
+
+libcpu: Add Intel SSE4 disassembler support
+
 Version 0.138:
 
 Install <elfutils/version.h> header file for applications to use in source

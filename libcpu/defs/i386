@@ -437,6 +437,9 @@ ifdef(`i386',
 ',
 `10010000:INVALID
 ')dnl
+# ORDER before out
+11110011,00001111,10111000,{mod}{reg}{r_m}:popcnt {mod}{r_m},{reg}
+# END ORDER
 1111011{w},{mod}010{r_m}:not{w} {mod}{r_m}{w}
 0000100{w},{mod}{reg}{r_m}:or {reg}{w},{mod}{r_m}{w}
 0000101{w},{mod}{reg}{r_m}:or {mod}{r_m}{w},{reg}{w}
@@ -916,6 +919,51 @@ ifdef(`i386',
 01100110,00001111,00111010,00001101,{Mod}{xmmreg}{R_m},{imm8}:blendpd {imm8},{Mod}{R_m},{xmmreg}
 01100110,00001111,00111000,00010100,{Mod}{xmmreg}{R_m}:blendvps %xmm0,{Mod}{R_m},{xmmreg}
 01100110,00001111,00111000,00010101,{Mod}{xmmreg}{R_m}:blendvpd %xmm0,{Mod}{R_m},{xmmreg}
+01100110,00001111,00111010,01000000,{Mod}{xmmreg}{R_m},{imm8}:dpps {imm8},{Mod}{R_m},{xmmreg}
+01100110,00001111,00111010,01000001,{Mod}{xmmreg}{R_m},{imm8}:dppd {imm8},{Mod}{R_m},{xmmreg}
+01100110,00001111,00111010,00100001,{Mod}{xmmreg}{R_m},{imm8}:insertps {imm8},{Mod}{R_m},{xmmreg}
+# Mod == 11 is not valid
+01100110,00001111,00111000,00101010,{Mod}{xmmreg}{R_m}:movntdqa {Mod}{R_m},{xmmreg}
+01100110,00001111,00111010,01000010,{Mod}{xmmreg}{R_m},{imm8}:mpsadbw {imm8},{Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00101011,{Mod}{xmmreg}{R_m}:packusdw {Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00010000,{Mod}{xmmreg}{R_m}:pblendvb %xmm0,{Mod}{R_m},{xmmreg}
+01100110,00001111,00111010,00001110,{Mod}{xmmreg}{R_m},{imm8}:pblendw {imm8},{Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00101001,{Mod}{xmmreg}{R_m}:pcmpeqq {Mod}{R_m},{xmmreg}
+01100110,00001111,00111010,01100001,{Mod}{xmmreg}{R_m},{imm8}:pcmpestri {imm8},{Mod}{R_m},{xmmreg}
+01100110,00001111,00111010,01100000,{Mod}{xmmreg}{R_m},{imm8}:pcmpestrm {imm8},{Mod}{R_m},{xmmreg}
+01100110,00001111,00111010,01100011,{Mod}{xmmreg}{R_m},{imm8}:pcmpistri {imm8},{Mod}{R_m},{xmmreg}
+01100110,00001111,00111010,01100010,{Mod}{xmmreg}{R_m},{imm8}:pcmpistrm {imm8},{Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00110111,{Mod}{xmmreg}{R_m}:pcmpgtq {Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,01000001,{Mod}{xmmreg}{R_m}:phminposuw {Mod}{R_m},{xmmreg}
+01100110,00001111,00111010,00100000,{mod}{xmmreg}{r_m},{imm8}:pinsrb {imm8},{mod}{r_m},{xmmreg}
+01100110,00001111,00111010,00100010,{mod}{xmmreg}{r_m},{imm8}:pinsrd {imm8},{mod}{r_m},{xmmreg}
+01100110,00001111,00111000,00111100,{Mod}{xmmreg}{R_m}:pmaxsb {Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00111101,{Mod}{xmmreg}{R_m}:pmaxsd {Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00111111,{Mod}{xmmreg}{R_m}:pmaxud {Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00111110,{Mod}{xmmreg}{R_m}:pmaxuw {Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00111000,{Mod}{xmmreg}{R_m}:pminsb {Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00111001,{Mod}{xmmreg}{R_m}:pminsd {Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00111011,{Mod}{xmmreg}{R_m}:pminud {Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00111010,{Mod}{xmmreg}{R_m}:pminuw {Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00100000,{Mod}{xmmreg}{R_m}:pmovsxbw {Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00100001,{Mod}{xmmreg}{R_m}:pmovsxbd {Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00100010,{Mod}{xmmreg}{R_m}:pmovsxbq {Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00100011,{Mod}{xmmreg}{R_m}:pmovsxwd {Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00100100,{Mod}{xmmreg}{R_m}:pmovsxwq {Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00100101,{Mod}{xmmreg}{R_m}:pmovsxdq {Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00110000,{Mod}{xmmreg}{R_m}:pmovzxbw {Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00110001,{Mod}{xmmreg}{R_m}:pmovzxbd {Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00110010,{Mod}{xmmreg}{R_m}:pmovzxbq {Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00110011,{Mod}{xmmreg}{R_m}:pmovzxwd {Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00110100,{Mod}{xmmreg}{R_m}:pmovzxwq {Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00110101,{Mod}{xmmreg}{R_m}:pmovzxdq {Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00101000,{Mod}{xmmreg}{R_m}:pmuldq {Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,01000000,{Mod}{xmmreg}{R_m}:pmulld {Mod}{R_m},{xmmreg}
+01100110,00001111,00111000,00010111,{Mod}{xmmreg}{R_m}:ptest {Mod}{R_m},{xmmreg}
+01100110,00001111,00111010,00001000,{Mod}{xmmreg}{R_m},{imm8}:roundps {imm8},{Mod}{R_m},{xmmreg}
+01100110,00001111,00111010,00001001,{Mod}{xmmreg}{R_m},{imm8}:roundpd {imm8},{Mod}{R_m},{xmmreg}
+01100110,00001111,00111010,00001010,{Mod}{xmmreg}{R_m},{imm8}:roundss {imm8},{Mod}{R_m},{xmmreg}
+01100110,00001111,00111010,00001011,{Mod}{xmmreg}{R_m},{imm8}:roundsd {imm8},{Mod}{R_m},{xmmreg}
 # ORDER:
 dnl Many previous entries depend on this being last.
 000{sreg2}111:pop {sreg2}

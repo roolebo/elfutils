@@ -1,6 +1,6 @@
 %{
 /* Parser for i386 CPU description.
-   Copyright (C) 2004, 2005, 2007, 2008 Red Hat, Inc.
+   Copyright (C) 2004, 2005, 2007, 2008, 2009 Red Hat, Inc.
    Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -37,6 +37,7 @@
 #include <math.h>
 #include <obstack.h>
 #include <search.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1248,6 +1249,8 @@ instrtable_out (void)
       /* First count the number of bytes.  */
       size_t totalbits = 0;
       size_t zerobits = 0;
+      bool leading_p = true;
+      size_t leadingbits = 0;
       struct bitvalue *b = instr->bytes;
       while (b != NULL)
 	{
@@ -1255,6 +1258,8 @@ instrtable_out (void)
 	    {
 	      ++totalbits;
 	      zerobits = 0;
+	      if (leading_p)
+		++leadingbits;
 	    }
 	  else
 	    {
@@ -1264,13 +1269,15 @@ instrtable_out (void)
 		zerobits = 0;
 	      else
 		zerobits += b->field->bits;
+	      leading_p = false;
 	    }
 	  b = b->next;
 	}
       size_t nbytes = (totalbits - zerobits + 7) / 8;
       assert (nbytes > 0);
+      size_t leadingbytes = leadingbits / 8;
 
-      fprintf (outfile, "  %#zx,", nbytes);
+      fprintf (outfile, "  %#zx,", nbytes | (leadingbytes << 4));
 
       /* Now create the mask and byte values.  */
       uint8_t byte = 0;
@@ -1285,7 +1292,15 @@ instrtable_out (void)
 	      mask = (mask << 1) | 1;
 	      if (++nbits == 8)
 		{
-		  fprintf (outfile, " %#" PRIx8 ", %#" PRIx8 ",", mask, byte);
+		  if (leadingbytes > 0)
+		    {
+		      assert (mask == 0xff);
+		      fprintf (outfile, " %#" PRIx8 ",", byte);
+		      --leadingbytes;
+		    }
+		  else
+		    fprintf (outfile, " %#" PRIx8 ", %#" PRIx8 ",",
+			     mask, byte);
 		  byte = mask = nbits = 0;
 		  if (--nbytes == 0)
 		    break;
@@ -1293,6 +1308,8 @@ instrtable_out (void)
 	    }
 	  else
 	    {
+	      assert (leadingbytes == 0);
+
 	      unsigned long int remaining = b->field->bits;
 	      while (nbits + remaining > 8)
 		{

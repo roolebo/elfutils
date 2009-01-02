@@ -1,5 +1,5 @@
 /* Disassembler for x86.
-   Copyright (C) 2007, 2008 Red Hat, Inc.
+   Copyright (C) 2007, 2008, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2007.
 
@@ -376,38 +376,51 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
       while (curr < match_end)
 	{
 	  uint_fast8_t len = *curr++;
-	  const uint8_t *start = curr;
+	  uint_fast8_t clen = len >> 4;
+	  len &= 0xf;
+	  const uint8_t *next_curr = curr + clen + (len - clen) * 2;
 
 	  assert (len > 0);
-	  assert (curr + 2 * len <= match_end);
+	  assert (curr + clen + 2 * (len - clen) <= match_end);
 
 	  const uint8_t *codep = data;
 	  int correct_prefix = 0;
 	  int opoff = 0;
 
-	  if (data > begin && codep[-1] == curr[1] && curr[0] == 0xff)
+	  if (data > begin && codep[-1] == *curr && clen > 0)
 	    {
 	      /* We match a prefix byte.  This is exactly one byte and
 		 is matched exactly, without a mask.  */
 	      --len;
-	      start += 2;
+	      --clen;
 	      opoff = 8;
 
-	      curr += 2;
+	      ++curr;
 
 	      assert (last_prefix_bit != 0);
 	      correct_prefix = last_prefix_bit;
 	    }
 
 	  size_t avail = len;
+	  while (clen > 0)
+	    {
+	      if (*codep++ != *curr++)
+		goto not;
+	      --avail;
+	      --clen;
+	      if (codep == end && avail > 0)
+		goto do_ret;
+	    }
+
 	  while (avail > 0)
 	    {
 	      uint_fast8_t masked = *codep++ & *curr++;
 	      if (masked != *curr++)
 		{
 		not:
-		  curr = start + 2 * len;
+		  curr = next_curr;
 		  ++cnt;
+		  bufcnt = 0;
 		  goto next_match;
 		}
 
@@ -458,7 +471,7 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		 are not used uninitialized.  */
 	      asm (""
 		   : "=mr" (opoff), "=mr" (correct_prefix), "=mr" (codep),
-		     "=mr" (start), "=mr" (len));
+		     "=mr" (next_curr), "=mr" (len));
 	    }
 
 	  size_t prefix_size = 0;
@@ -984,8 +997,7 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 			r = snprintf (&buf[bufcnt], bufavail, "# %#" PRIx64,
 				      (uint64_t) symaddr);
 
-		      if (r < 0)
-			goto not;
+		      assert (r >= 0);
 		      if ((size_t) r >= bufavail)
 			goto enomem;
 		      bufcnt += r;

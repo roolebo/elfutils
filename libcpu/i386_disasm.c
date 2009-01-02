@@ -408,6 +408,7 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		not:
 		  curr = start + 2 * len;
 		  ++cnt;
+		  bufcnt = 0;
 		  goto next_match;
 		}
 
@@ -984,8 +985,7 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 			r = snprintf (&buf[bufcnt], bufavail, "# %#" PRIx64,
 				      (uint64_t) symaddr);
 
-		      if (r < 0)
-			goto not;
+		      assert (r >= 0);
 		      if ((size_t) r >= bufavail)
 			goto enomem;
 		      bufcnt += r;

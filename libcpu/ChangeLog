@@ -1,4 +1,17 @@
+2009-01-01  Ulrich Drepper  <drepper@redhat.com>
+
+	* i386_disasm.c (i386_disasm): Reset bufcnt when not matched.  We
+	don't expect snprintf to fail.
+
 2008-12-31  Ulrich Drepper  <drepper@redhat.com>
+
+	* defs/i386: Add dppd, dpps, insertps, movntdqa, mpsadbw, packusdw,
+	pblendvb, pblendw, pcmpeqq, pcmpestri, pcmpestrm, pcmpistri, pcmpistrm,
+	pcmpgtq, phminposuw, pinsrb, pinsrd, pmaxsb, pmaxsd, pmaxud, pmaxuw,
+	pminsb, pminsd, pminud, pminuw, pmovsxbw, pmovsxbd, pmovsxbq, pmovsxwd,
+	pmovsxwq, pmovsxdq, pmovzxbw, pmovzxbd, pmovzxbq, pmovzxwd, pmovzxwq,
+	pmovzxdq, pmuldq, pmulld, popcnt, ptest, roundss, roundps, roundpd,
+	and roundsd opcodes.
 
 	* i386_disasm.c (i386_disasm): Correct resizing of buffer.
 

@@ -1,7 +1,7 @@
 		      ToDo list for elfutils                      -*-outline-*-
                       ----------------------
 
-Time-stamp: <2008-02-03 14:15:41 drepper>
+Time-stamp: <2009-01-01 16:56:38 drepper>
 
 * mkinstalldirs
 
@@ -37,6 +37,20 @@ Time-stamp: <2008-02-03 14:15:41 drepper>
 
 ** Rename dwarf_getabbrev
 
+
+* libcpu
+
+** x86
+
+*** Opcodes
+
+     crc32
+     extractps
+     pextrb
+     pextrd/pextrq
+     pextrw
+     pinsrq
+     popcnt 64-bit reg
 
 * nm:
 
@@ -156,5 +170,5 @@ Time-stamp: <2008-02-03 14:15:41 drepper>
      -V    Print on standard error the version number of mcs.
 
 Local Variables:
-eval:(hide-body)
+eval:(hide-sublevels 3)
 End:

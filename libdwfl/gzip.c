@@ -52,6 +52,7 @@
 #include <unistd.h>
 
 #ifdef BZLIB
+# define inflate_groks_header	true
 # include <bzlib.h>
 # define unzip		__libdw_bunzip2
 # define DWFL_E_ZLIB	DWFL_E_BZLIB
@@ -66,6 +67,7 @@
 # define gzread		BZ2_bzread
 # define gzclose	BZ2_bzclose
 #else
+# define inflate_groks_header	false
 # include <zlib.h>
 # define unzip		__libdw_gunzip
 # define MAGIC		"\037\213"
@@ -115,19 +117,25 @@ unzip (int fd, off64_t start_offset,
     return failure;
   }
 
-  if (mapped != NULL)
+  /* If the file is already mapped in, look at the header.  */
+  if (mapped != NULL
+      && (mapped_size <= sizeof MAGIC
+	  || memcmp (mapped, MAGIC, sizeof MAGIC - 1)))
+    /* Not a compressed file.  */
+    return DWFL_E_BADELF;
+
+  if (mapped != NULL && inflate_groks_header)
     {
-      /* The file is already mapped in.  Look at the header.  */
-      if (mapped_size <= sizeof MAGIC || memcmp (mapped, MAGIC, sizeof MAGIC))
-	/* Not a compressed file.  */
-	return DWFL_E_CB;
+      /* This style actually only works with bzlib.
+	 The stupid zlib interface has nothing to grok the
+	 gzip file headers except the slow gzFile interface.  */
 
       z_stream z = { .next_in = mapped, .avail_in = mapped_size };
       int result = inflateInit (&z);
       if (result != Z (OK))
 	return zlib_fail (result);
 
-      while ((result = inflate (&z, Z_SYNC_FLUSH)) == Z (OK))
+      do
 	{
 	  ptrdiff_t pos = (void *) z.next_out - buffer;
 	  if (!bigger_buffer (z.avail_in))
@@ -138,6 +146,7 @@ unzip (int fd, off64_t start_offset,
 	  z.next_out = buffer + pos;
 	  z.avail_out = size - pos;
 	}
+      while ((result = inflate (&z, Z_SYNC_FLUSH)) == Z (OK));
 
 #ifdef BZLIB
       uint64_t total_out = (((uint64_t) z.total_out_hi32 << 32)
@@ -154,16 +163,18 @@ unzip (int fd, off64_t start_offset,
     }
   else
     {
+      /* Let the decompression library read the file directly.  */
+
       int d = dup (fd);
       if (unlikely (d < 0))
-	return DWFL_E_CB;
+	return DWFL_E_BADELF;
       if (start_offset != 0)
 	{
 	  off64_t off = lseek (d, start_offset, SEEK_SET);
 	  if (off != start_offset)
 	    {
 	      close (d);
-	      return DWFL_E_CB;
+	      return DWFL_E_BADELF;
 	    }
 	}
       gzFile zf = gzdopen (d, "r");
@@ -179,7 +190,7 @@ unzip (int fd, off64_t start_offset,
       if (gzdirect (zf))
 	{
 	  gzclose (zf);
-	  return DWFL_E_CB;
+	  return DWFL_E_BADELF;
 	}
 #endif
 
@@ -201,7 +212,7 @@ unzip (int fd, off64_t start_offset,
 		{
 		  gzclose (zf);
 		  free (buffer);
-		  return DWFL_E_CB;
+		  return DWFL_E_BADELF;
 		}
 #endif
 	      gzclose (zf);
@@ -219,5 +230,5 @@ unzip (int fd, off64_t start_offset,
   *whole = buffer;
   *whole_size = size;
 
-return DWFL_E_NOERROR;
+  return DWFL_E_NOERROR;
 }

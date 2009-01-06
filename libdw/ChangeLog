@@ -1,3 +1,7 @@
+2009-01-05  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (libdw.so): Link in $(zip_LIBS).
+
 2008-08-15  Roland McGrath  <roland@redhat.com>
 
 	* libdw.map (ELFUTILS_0.136): New version set, inherits from

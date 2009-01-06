@@ -1,5 +1,5 @@
 /* Standard argp argument parsers for tools using libdwfl.
-   Copyright (C) 2005, 2007, 2008 Red Hat, Inc.
+   Copyright (C) 2005, 2007, 2008, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -215,14 +215,14 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	if (fd < 0)
 	  goto nofile;
 
-	Elf *core = elf_begin (fd, ELF_C_READ_MMAP_PRIVATE, NULL);
-	if (core == NULL)
+	Elf *core;
+	Dwfl_Error error = __libdw_open_file (&fd, &core, true, false);
+	if (error != DWFL_E_NOERROR)
 	  {
-	    close (fd);
 	    argp_failure (state, EXIT_FAILURE, 0,
 			  _("cannot read ELF core file: %s"),
-			  elf_errmsg (-1));
-	    return EIO;
+			  INTUSE(dwfl_errmsg) (error));
+	    return error == DWFL_E_ERRNO ? errno : EIO;
 	  }
 
 	GElf_Ehdr ehdr;

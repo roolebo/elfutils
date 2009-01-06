@@ -2,7 +2,7 @@
 ##
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2005, 2006, 2007, 2008 Red Hat, Inc.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -73,8 +73,14 @@ libdwfl_a_SOURCES = dwfl_begin.c dwfl_end.c dwfl_error.c dwfl_version.c \
 		    dwfl_module_return_value_location.c \
 		    dwfl_module_register_names.c \
 		    dwfl_segment_report_module.c \
-		    link_map.c core-file.c
+		    link_map.c core-file.c open.c
 
+if ZLIB
+libdwfl_a_SOURCES += gzip.c
+endif
+if BZLIB
+libdwfl_a_SOURCES += bzip2.c
+endif
 
 if MUDFLAP
 libdwfl = libdwfl.a $(libdw) $(libebl) $(libelf) $(libeu)

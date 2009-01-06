@@ -1,5 +1,5 @@
 /* Standard libdwfl callbacks for debugging the running Linux kernel.
-   Copyright (C) 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright (C) 2005-2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -254,6 +254,27 @@ report_kernel_archive (Dwfl *dwfl, const char **release,
   return result;
 }
 
+static bool
+is_ko (const FTSENT *f, size_t namelen)
+{
+#define has_suffix(f, sfx, namelen)					      \
+  ((namelen ? f->fts_namelen == namelen + sizeof sfx - 1		      \
+    : f->fts_namelen >= sizeof sfx)					      \
+   && !memcmp (f->fts_name + f->fts_namelen - (sizeof sfx - 1),		      \
+	       sfx, sizeof sfx))
+
+  return (has_suffix (f, ".ko", namelen)
+#if USE_ZLIB
+	  || has_suffix (f, ".ko.gz", namelen)
+#endif
+#if USE_BZLIB
+	  || has_suffix (f, ".ko.bz2", namelen)
+#endif
+	  );
+
+#undef	has_suffix
+}
+
 /* Report a kernel and all its modules found on disk, for offline use.
    If RELEASE starts with '/', it names a directory to look in;
    if not, it names a directory to find under /lib/modules/;
@@ -302,8 +323,7 @@ dwfl_linux_kernel_report_offline (Dwfl *dwfl, const char *release,
 	    case FTS_SL:
 	    case FTS_NSOK:
 	      /* See if this file name matches "*.ko".  */
-	      if (f->fts_namelen > 3
-		  && !memcmp (f->fts_name + f->fts_namelen - 3, ".ko", 4))
+	      if (is_ko (f, 0))
 		{
 		  /* We have a .ko file to report.  Following the algorithm
 		     by which the kernel makefiles set KBUILD_MODNAME, we
@@ -667,8 +687,7 @@ dwfl_linux_kernel_find_elf (Dwfl_Module *mod,
 	case FTS_SL:
 	case FTS_NSOK:
 	  /* See if this file name is "MODULE_NAME.ko".  */
-	  if (f->fts_namelen == namelen + 3
-	      && !memcmp (f->fts_name + namelen, ".ko", 4)
+	  if (is_ko (f, namelen)
 	      && (!memcmp (f->fts_name, module_name, namelen)
 		  || !memcmp (f->fts_name, alternate_name, namelen)))
 	    {

@@ -254,25 +254,27 @@ report_kernel_archive (Dwfl *dwfl, const char **release,
   return result;
 }
 
-static bool
-is_ko (const FTSENT *f, size_t namelen)
+static size_t
+check_suffix (const FTSENT *f, size_t namelen)
 {
-#define has_suffix(f, sfx, namelen)					      \
-  ((namelen ? f->fts_namelen == namelen + sizeof sfx - 1		      \
-    : f->fts_namelen >= sizeof sfx)					      \
-   && !memcmp (f->fts_name + f->fts_namelen - (sizeof sfx - 1),		      \
-	       sfx, sizeof sfx))
+#define TRY(sfx)							\
+  if ((namelen ? f->fts_namelen == namelen + sizeof sfx - 1		\
+       : f->fts_namelen >= sizeof sfx)					\
+      && !memcmp (f->fts_name + f->fts_namelen - (sizeof sfx - 1),	\
+		  sfx, sizeof sfx))					\
+    return sizeof sfx - 1
 
-  return (has_suffix (f, ".ko", namelen)
+  TRY (".ko");
 #if USE_ZLIB
-	  || has_suffix (f, ".ko.gz", namelen)
+  TRY (".ko.gz");
 #endif
 #if USE_BZLIB
-	  || has_suffix (f, ".ko.bz2", namelen)
+  TRY (".ko.bz2");
 #endif
-	  );
 
-#undef	has_suffix
+  return 0;
+
+#undef	TRY
 }
 
 /* Report a kernel and all its modules found on disk, for offline use.
@@ -321,9 +323,10 @@ dwfl_linux_kernel_report_offline (Dwfl *dwfl, const char *release,
 	    {
 	    case FTS_F:
 	    case FTS_SL:
-	    case FTS_NSOK:
+	    case FTS_NSOK:;
 	      /* See if this file name matches "*.ko".  */
-	      if (is_ko (f, 0))
+	      const size_t suffix = check_suffix (f, 0);
+	      if (suffix)
 		{
 		  /* We have a .ko file to report.  Following the algorithm
 		     by which the kernel makefiles set KBUILD_MODNAME, we
@@ -333,13 +336,13 @@ dwfl_linux_kernel_report_offline (Dwfl *dwfl, const char *release,
 		     names.  To handle that, we would have to look at the
 		     __this_module.name contents in the module's text.  */
 
-		  char name[f->fts_namelen - 3 + 1];
+		  char name[f->fts_namelen - suffix + 1];
 		  for (size_t i = 0; i < f->fts_namelen - 3U; ++i)
 		    if (f->fts_name[i] == '-' || f->fts_name[i] == ',')
 		      name[i] = '_';
 		    else
 		      name[i] = f->fts_name[i];
-		  name[f->fts_namelen - 3] = '\0';
+		  name[f->fts_namelen - suffix] = '\0';
 
 		  if (predicate != NULL)
 		    {
@@ -354,8 +357,7 @@ dwfl_linux_kernel_report_offline (Dwfl *dwfl, const char *release,
 			continue;
 		    }
 
-		  if (dwfl_report_offline (dwfl, name,
-					   f->fts_path, -1) == NULL)
+		  if (dwfl_report_offline (dwfl, name, f->fts_path, -1) == NULL)
 		    {
 		      result = -1;
 		      break;
@@ -687,7 +689,7 @@ dwfl_linux_kernel_find_elf (Dwfl_Module *mod,
 	case FTS_SL:
 	case FTS_NSOK:
 	  /* See if this file name is "MODULE_NAME.ko".  */
-	  if (is_ko (f, namelen)
+	  if (check_suffix (f, namelen)
 	      && (!memcmp (f->fts_name, module_name, namelen)
 		  || !memcmp (f->fts_name, alternate_name, namelen)))
 	    {

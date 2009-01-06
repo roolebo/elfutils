@@ -1,6 +1,6 @@
 2009-01-06  Roland McGrath  <roland@redhat.com>
 
-	* linux-kernel-modules.c (is_ko): New function.
+	* linux-kernel-modules.c (check_suffix): New function.
 	Match ".ko", ".ko.gz", and ".ko.bz2" suffixes.
 	(dwfl_linux_kernel_report_offline): Use it.
 	(dwfl_linux_kernel_find_elf): Likewise.

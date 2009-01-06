@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl Configure input file for elfutils.                     -*-autoconf-*-
 dnl
-dnl Copyright (C) 1996-2002, 2003, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
+dnl Copyright (C) 1996-2009 Red Hat, Inc.
 dnl
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -181,6 +181,29 @@ LIBEBL_SUBDIR="$enable_libebl_subdir"])
 AC_SUBST([LIBEBL_SUBDIR])
 AC_DEFINE_UNQUOTED(LIBEBL_SUBDIR, "$LIBEBL_SUBDIR")
 AH_TEMPLATE([LIBEBL_SUBDIR], [$libdir subdirectory containing libebl modules.])
+
+m4_defun([eu_ZIPLIB], [with_[$1]lib=default
+AC_ARG_WITH([[$1]lib],
+AC_HELP_STRING([--with-[$1]lib], [support g[$1]ip compression in libdwfl]))
+if test $with_[$1]lib != no; then
+  AC_SEARCH_LIBS([$4], [$3], [with_[$1]lib=yes],
+  	         [test $with_[$1]lib = default ||
+		  AC_MSG_ERROR([missing -l[$3] for --with-[$1]lib])])
+fi
+AM_CONDITIONAL([$2]LIB, test $with_[$1]lib = yes)
+if test $with_[$1]lib = yes; then
+  AC_DEFINE(USE_[$2]LIB)
+fi
+AH_TEMPLATE(USE_[$2]LIB, [Support $5 decompression via -l$3.])
+])
+
+save_LIBS="$LIBS"
+LIBS=
+eu_ZIPLIB(z,Z,z,gzdopen,gzip)
+eu_ZIPLIB(bz,BZ,bz2,BZ2_bzdopen,bzip2)
+zip_LIBS="$LIBS"
+LIBS="$save_LIBS"
+AC_SUBST([zip_LIBS])
 
 dnl The directories with content.
 

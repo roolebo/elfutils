@@ -1,5 +1,5 @@
 /* Find debugging and symbol information for a module in libdwfl.
-   Copyright (C) 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -69,10 +69,11 @@ open_elf (Dwfl_Module *mod, struct dwfl_file *file)
       if (file->fd < 0)
 	return CBFAIL;
 
-      file->elf = elf_begin (file->fd, ELF_C_READ_MMAP_PRIVATE, NULL);
+      Dwfl_Error error = __libdw_open_file (&file->fd, &file->elf, true, false);
+      if (error != DWFL_E_NOERROR)
+	return error;
     }
-
-  if (unlikely (elf_kind (file->elf) != ELF_K_ELF))
+  else if (unlikely (elf_kind (file->elf) != ELF_K_ELF))
     {
       close (file->fd);
       file->fd = -1;

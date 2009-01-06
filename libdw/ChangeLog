@@ -1,8 +1,17 @@
-2008-12-31  Roland McGrath  <roland@redhat.com>
+2008-01-06  Roland McGrath  <roland@redhat.com>
 
 	* libdwP.h (struct Dwarf_Abbrev): Change type of 'has_children' to bool.
 	Reorder members.
 	* dwarf_haschildren.c: Return -1 for error case, not 0.
+
+	* Makefile.am (libdw.so): Link in $(zip_LIBS).
+
+2009-01-06  Ulrich Drepper  <drepper@redhat.com>
+
+	* dwarf.h: Add definition for unwind and call frame information.
+
+	* memory-access.h: Define read_ubyte_unaligned, read_sbyte_unaligned,
+	read_ubyte_unaligned_inc, and read_sbyte_unaligned_inc.
 
 2008-08-15  Roland McGrath  <roland@redhat.com>
 

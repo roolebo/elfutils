@@ -1183,11 +1183,12 @@ ld_new_searchdir (const char *dir)
 
   /* Enqueue the file.  */
   if (ld_state.tailpaths == NULL)
-    ld_state.paths = ld_state.tailpaths = newpath;
+    ld_state.paths = ld_state.tailpaths = newpath->next = newpath;
   else
     {
       ld_state.tailpaths->next = newpath;
       ld_state.tailpaths = newpath;
+      newpath->next = ld_state.paths;
     }
 }
 

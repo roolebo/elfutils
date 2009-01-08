@@ -1,3 +1,7 @@
+2009-01-08  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (libdw.so): Don't depend on $(zip_LIBS), just link it in.
+
 2009-01-06  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am (libdw.so): Link in $(zip_LIBS).

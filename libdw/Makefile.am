@@ -92,14 +92,14 @@ am_libdw_pic_a_OBJECTS = $(libdw_a_SOURCES:.c=.os)
 libdw_so_SOURCES =
 libdw.so: $(srcdir)/libdw.map libdw_pic.a \
 	  ../libdwfl/libdwfl_pic.a ../libebl/libebl.a \
-	  ../libelf/libelf.so $(zip_LIBS)
+	  ../libelf/libelf.so
 # The rpath is necessary for libebl because its $ORIGIN use will
 # not fly in a setuid executable that links in libdw.
 	$(LINK) -shared -o $@ -Wl,--soname,$@.$(VERSION),-z,defs \
 		-Wl,--enable-new-dtags,-rpath,$(pkglibdir) \
 		-Wl,--version-script,$<,--no-undefined \
 		-Wl,--whole-archive $(filter-out $<,$^) -Wl,--no-whole-archive\
-		-ldl
+		-ldl $(zip_LIBS)
 	if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
 	ln -fs $@ $@.$(VERSION)
 

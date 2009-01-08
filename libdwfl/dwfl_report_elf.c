@@ -1,5 +1,5 @@
 /* Report a module to libdwfl based on ELF program headers.
-   Copyright (C) 2005, 2007 Red Hat, Inc.
+   Copyright (C) 2005, 2007, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -274,7 +274,14 @@ dwfl_report_elf (Dwfl *dwfl, const char *name,
 	}
     }
 
-  Elf *elf = elf_begin (fd, ELF_C_READ_MMAP_PRIVATE, NULL);
+  Elf *elf;
+  Dwfl_Error error = __libdw_open_file (&fd, &elf, closefd, false);
+  if (error != DWFL_E_NOERROR)
+    {
+      __libdwfl_seterrno (error);
+      return NULL;
+    }
+
   Dwfl_Module *mod = __libdwfl_report_elf (dwfl, name, file_name,
 					   fd, elf, base);
   if (mod == NULL)

@@ -1,5 +1,5 @@
 /* Internal definitions for libdwfl.
-   Copyright (C) 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -74,6 +74,8 @@
   DWFL_ERROR (LIBELF, N_("See elf_errno"))				      \
   DWFL_ERROR (LIBDW, N_("See dwarf_errno"))				      \
   DWFL_ERROR (LIBEBL, N_("See ebl_errno (XXX missing)"))		      \
+  DWFL_ERROR (ZLIB, N_("gzip decompression failed"))			      \
+  DWFL_ERROR (BZLIB, N_("bzip2 decompression failed"))			      \
   DWFL_ERROR (UNKNOWN_MACHINE, N_("no support library found for machine"))    \
   DWFL_ERROR (NOREL, N_("Callbacks missing for ET_REL file"))		      \
   DWFL_ERROR (BADRELTYPE, N_("Unsupported relocation type"))		      \
@@ -315,6 +317,23 @@ extern Dwfl_Module *__libdwfl_report_offline (Dwfl *dwfl, const char *name,
 								const char *))
   internal_function;
 
+/* Decompression wrappers: decompress whole file into memory.  */
+extern Dwfl_Error __libdw_gunzip  (int fd, off64_t start_offset,
+				   void *mapped, size_t mapped_size,
+				   void **whole, size_t *whole_size)
+  internal_function;
+extern Dwfl_Error __libdw_bunzip2  (int fd, off64_t start_offset,
+				    void *mapped, size_t mapped_size,
+				    void **whole, size_t *whole_size)
+  internal_function;
+
+/* Open Elf handle on *FDP.  This handles decompression and checks
+   elf_kind.  Succeed only for ELF_K_ELF, or also ELF_K_AR if ARCHIVE_OK.
+   Returns DWFL_E_NOERROR and sets *ELFP on success, resets *FDP to -1 if
+   it's no longer used.  Resets *FDP on failure too iff CLOSE_ON_FAIL.  */
+extern Dwfl_Error __libdw_open_file (int *fdp, Elf **elfp,
+				     bool close_on_fail, bool archive_ok)
+  internal_function;
 
 /* These are working nicely for --core, but are not ready to be
    exported interfaces quite yet.  */
@@ -361,6 +380,7 @@ extern int dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 
 /* Examine an ET_CORE file and report modules based on its contents.  */
 extern int dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const GElf_Ehdr *ehdr);
+
 
 
 /* Avoid PLT entries.  */

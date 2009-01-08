@@ -4,6 +4,8 @@ libcpu: Add Intel SSE4 disassembler support
 
 readelf: Implement call frame information dumping.
 
+libdwfl: Support automatic gzip/bzip2 decompression of ELF files.
+
 Version 0.138:
 
 Install <elfutils/version.h> header file for applications to use in source

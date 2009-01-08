@@ -1,5 +1,5 @@
-/* Find the debuginfo file for a module from its build ID.
-   Copyright (C) 2007, 2009 Red Hat, Inc.
+/* Decompression support for libdwfl: zlib (gzip) and/or bzlib (bzip2).
+   Copyright (C) 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -47,52 +47,97 @@
    Network licensing program, please visit www.openinventionnetwork.com
    <http://www.openinventionnetwork.com>.  */
 
+#include "../libelf/libelfP.h"
+#undef	_
 #include "libdwflP.h"
+
 #include <unistd.h>
 
+#if !USE_ZLIB
+# define __libdw_gunzip(...)	false
+#endif
 
-int
-dwfl_build_id_find_debuginfo (Dwfl_Module *mod,
-			      void **userdata __attribute__ ((unused)),
-			      const char *modname __attribute__ ((unused)),
-			      Dwarf_Addr base __attribute__ ((unused)),
-			      const char *file __attribute__ ((unused)),
-			      const char *debuglink __attribute__ ((unused)),
-			      GElf_Word crc __attribute__ ((unused)),
-			      char **debuginfo_file_name)
+#if !USE_BZLIB
+# define __libdw_bunzip2(...)	false
+#endif
+
+/* Always consumes *ELF, never consumes FD.
+   Replaces *ELF on success.  */
+static Dwfl_Error
+decompress (int fd, Elf **elf)
 {
-  int fd = -1;
-  const unsigned char *bits;
-  GElf_Addr vaddr;
-  if (INTUSE(dwfl_module_build_id) (mod, &bits, &vaddr) > 0)
-    fd = __libdwfl_open_by_build_id (mod, true, debuginfo_file_name);
-  if (fd >= 0)
+  Dwfl_Error error = DWFL_E_BADELF;
+
+#if USE_ZLIB || USE_BZLIB
+  void *buffer;
+  size_t size;
+
+  const off64_t offset = (*elf)->start_offset;
+  void *const mapped = ((*elf)->map_address == NULL ? NULL
+			: (*elf)->map_address + (*elf)->start_offset);
+  const size_t mapped_size = (*elf)->maximum_size;
+
+  error = __libdw_gunzip (fd, offset, mapped, mapped_size, &buffer, &size);
+  if (error == DWFL_E_BADELF)
+    error = __libdw_bunzip2 (fd, offset, mapped, mapped_size, &buffer, &size);
+#endif
+
+  elf_end (*elf);
+  *elf = NULL;
+
+  if (error == DWFL_E_NOERROR)
     {
-      /* We need to open an Elf handle on the file so we can check its
-	 build ID note for validation.  Backdoor the handle into the
-	 module data structure since we had to open it early anyway.  */
-      Dwfl_Error error = __libdw_open_file (&fd, &mod->debug.elf, true, false);
-      if (error != DWFL_E_NOERROR)
-	__libdwfl_seterrno (error);
-      else if (likely (__libdwfl_find_build_id (mod, false,
-						mod->debug.elf) == 2))
+      *elf = elf_memory (buffer, size);
+      if (*elf == NULL)
 	{
-	  /* Also backdoor the gratuitous flag.  */
-	  mod->debug.valid = true;
-	  return fd;
+	  error = DWFL_E_LIBELF;
+	  free (buffer);
 	}
       else
-	{
-	  /* A mismatch!  */
-	  elf_end (mod->debug.elf);
-	  mod->debug.elf = NULL;
-	  close (fd);
-	  fd = -1;
-	}
-      free (*debuginfo_file_name);
-      *debuginfo_file_name = NULL;
-      errno = 0;
+	(*elf)->flags |= ELF_F_MALLOCED;
     }
-  return fd;
+
+  return error;
 }
-INTDEF (dwfl_build_id_find_debuginfo)
+
+Dwfl_Error internal_function
+__libdw_open_file (int *fdp, Elf **elfp, bool close_on_fail, bool archive_ok)
+{
+  bool close_fd = false;
+  Dwfl_Error error = DWFL_E_NOERROR;
+
+  Elf *elf = elf_begin (*fdp, ELF_C_READ_MMAP_PRIVATE, NULL);
+  Elf_Kind kind = elf_kind (elf);
+  if (unlikely (kind == ELF_K_NONE))
+    {
+      if (unlikely (elf == NULL))
+	error = DWFL_E_LIBELF;
+      else
+	{
+	  error = decompress (*fdp, &elf);
+	  if (error == DWFL_E_NOERROR)
+	    {
+	      close_fd = true;
+	      kind = elf_kind (elf);
+	    }
+	}
+    }
+
+  if (error == DWFL_E_NOERROR
+      && kind != ELF_K_ELF
+      && !(archive_ok && kind == ELF_K_AR))
+    {
+      elf_end (elf);
+      elf = NULL;
+      error = DWFL_E_BADELF;
+    }
+
+  if (error == DWFL_E_NOERROR ? close_fd : close_on_fail)
+    {
+      close (*fdp);
+      *fdp = -1;
+    }
+
+  *elfp = elf;
+  return error;
+}

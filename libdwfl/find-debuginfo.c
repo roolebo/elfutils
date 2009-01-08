@@ -1,5 +1,5 @@
 /* Standard find_debuginfo callback for libdwfl.
-   Copyright (C) 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -99,16 +99,22 @@ validate (Dwfl_Module *mod, int fd, bool check, GElf_Word debuglink_crc)
       /* We need to open an Elf handle on the file so we can check its
 	 build ID note for validation.  Backdoor the handle into the
 	 module data structure since we had to open it early anyway.  */
-      mod->debug.elf = elf_begin (fd, ELF_C_READ_MMAP_PRIVATE, NULL);
-      if (likely (__libdwfl_find_build_id (mod, false, mod->debug.elf) == 2))
-	/* Also backdoor the gratuitous flag.  */
-	mod->debug.valid = true;
+
+      mod->debug.valid = false;
+      Dwfl_Error error = __libdw_open_file (&fd, &mod->debug.elf, false, false);
+      if (error != DWFL_E_NOERROR)
+	__libdwfl_seterrno (error);
+      else if (likely (__libdwfl_find_build_id (mod, false,
+						mod->debug.elf) == 2))
+	  /* Also backdoor the gratuitous flag.  */
+	  mod->debug.valid = true;
       else
 	{
 	  /* A mismatch!  */
 	  elf_end (mod->debug.elf);
 	  mod->debug.elf = NULL;
-	  mod->debug.valid = false;
+	  close (fd);
+	  fd = -1;
 	}
 
       return mod->debug.valid;

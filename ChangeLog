@@ -1,3 +1,8 @@
+2009-01-05  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac (eu_ZIPLIB): New macro.
+	Use it to test for -lz, -lbz2, set .am ZLIB, BZLIB, zip_LIBS.
+
 2008-12-30  Ulrich Drepper  <drepper@redhat.com>
 
 	* configure.ac: We need automake 1.8 now.

@@ -1,3 +1,30 @@
+2009-01-06  Roland McGrath  <roland@redhat.com>
+
+	* linux-kernel-modules.c (check_suffix): New function.
+	Match ".ko", ".ko.gz", and ".ko.bz2" suffixes.
+	(dwfl_linux_kernel_report_offline): Use it.
+	(dwfl_linux_kernel_find_elf): Likewise.
+
+2009-01-05  Roland McGrath  <roland@redhat.com>
+
+	* argp-std.c (parse_opt): Use __libdw_open_file for core file.
+	* dwfl_build_id_find_debuginfo.c: Use it to open the file.
+	* dwfl_build_id_find_elf.c: Likewise.
+	* dwfl_module_getdwarf.c (open_elf): Likewise.
+	* dwfl_report_elf.c: Likewise.
+	* find-debuginfo.c (validate): Likewise.
+	* offline.c (__libdwfl_report_offline): Likewise.
+
+	* libdwflP.h: Declare __libdw_open_file.
+	* open.c: New file.
+	* Makefile.am (libdwfl_a_SOURCES): Add it.
+
+	* gzip.c: New file.
+	* Makefile.am [ZLIB] (libdwfl_a_SOURCES): Add it.
+	* bzip2.c: New file.
+	* Makefile.am [BZLIB] (libdwfl_a_SOURCES): Add it.
+	* libdwflP.h: Declare __libdw_gunzip, __libdw_bunzip2.
+
 2008-12-16  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_module_build_id.c (dwfl_module_build_id): Define with alias and

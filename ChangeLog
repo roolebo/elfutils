@@ -1,3 +1,7 @@
+2009-01-08  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac (eu_ZIPLIB): Moved to m4/zip.am.
+
 2009-01-05  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac (eu_ZIPLIB): New macro.

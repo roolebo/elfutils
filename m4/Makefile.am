@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
 ##
-## Copyright (C) 2000, 2001, 2002, 2004, 2005 Red Hat, Inc.
+## Copyright (C) 2000-2009 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -26,4 +26,4 @@
 ##
 
 ##m4-files-begin
-EXTRA_DIST = codeset.m4 gettext.m4 iconv.m4 lcmessage.m4 progtest.m4
+EXTRA_DIST = codeset.m4 gettext.m4 iconv.m4 lcmessage.m4 progtest.m4 zip.m4

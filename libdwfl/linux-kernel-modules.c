@@ -319,6 +319,15 @@ dwfl_linux_kernel_report_offline (Dwfl *dwfl, const char *release,
       FTSENT *f;
       while ((f = fts_read (fts)) != NULL)
 	{
+	  /* Skip a "source" subtree, which tends to be large.
+	     This insane hard-coding of names is what depmod does too.  */
+	  if (f->fts_namelen == sizeof "source" - 1
+	      && !strcmp (f->fts_name, "source"))
+	    {
+	      fts_set (fts, f, FTS_SKIP);
+	      continue;
+	    }
+
 	  switch (f->fts_info)
 	    {
 	    case FTS_F:
@@ -682,6 +691,15 @@ dwfl_linux_kernel_find_elf (Dwfl_Module *mod,
   int error = ENOENT;
   while ((f = fts_read (fts)) != NULL)
     {
+      /* Skip a "source" subtree, which tends to be large.
+	 This insane hard-coding of names is what depmod does too.  */
+      if (f->fts_namelen == sizeof "source" - 1
+	  && !strcmp (f->fts_name, "source"))
+	{
+	  fts_set (fts, f, FTS_SKIP);
+	  continue;
+	}
+
       error = ENOENT;
       switch (f->fts_info)
 	{

@@ -73,7 +73,7 @@ once_define (static, once);
 
 /* The initialization and destruction functions.  */
 static void init (void);
-static void free_key_mem (void *mem);
+static void __attribute__ ((unused)) free_key_mem (void *mem);
 #endif	/* TLS */
 
 
@@ -207,9 +207,6 @@ free_key_mem (void *mem __attribute__ ((unused)))
 static void
 init (void)
 {
-  // XXX Screw you, gcc4, the unused function attribute does not work.
-  __asm ("" :: "r" (free_key_mem));
-
   if (key_create (&key, free_key_mem) == 0)
     /* Creating the key succeeded.  */
     threaded = true;

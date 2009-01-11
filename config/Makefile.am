@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
 ## Configure input file for elfutils.
 ##
-## Copyright (C) 2004, 2005, 2008 Red Hat, Inc.
+## Copyright (C) 2004, 2005, 2008, 2009 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -25,7 +25,7 @@
 ## Network licensing program, please visit www.openinventionnetwork.com
 ## <http://www.openinventionnetwork.com>.
 ##
-EXTRA_DIST = elfutils.spec.in
+EXTRA_DIST = elfutils.spec.in known-dwarf.awk
 
 if MAINTAINER_MODE
 $(srcdir)/elfutils.spec.in: $(top_srcdir)/NEWS

@@ -1,3 +1,11 @@
+2009-01-11  Roland McGrath  <roland@redhat.com>
+
+	* dwarf.h: Add description comments for DW_LANG_* values.
+
+	* Makefile.am [MAINTAINER_MODE]
+	($(srcdir)/known-dwarf.h): New target.
+	(BUILT_SOURCES): Add it.
+
 2009-01-10  Ulrich Drepper  <drepper@redhat.com>
 
 	* dwarf_error.c: Always use __thread.  Remove all !USE_TLS code.

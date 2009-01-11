@@ -1,3 +1,9 @@
+2009-01-10  Ulrich Drepper  <drepper@redhat.com>
+
+	* eu-config.h: Remove tls_key_t, key_create, getspecific, setspecific,
+	once_define, and once_execute macros.  Use USE_LOCKS instead of
+	USE_TLS.
+
 2008-08-25  Roland McGrath  <roland@redhat.com>
 
 	* eu-config.h [USE_TLS] (RWLOCK_CALL): New macro.

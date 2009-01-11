@@ -1,3 +1,7 @@
+2009-01-10  Ulrich Drepper  <drepper@redhat.com>
+
+	* dwfl_error.c: Always use __thread.  Remove all !USE_TLS code.
+
 2009-01-08  Roland McGrath  <roland@redhat.com>
 
 	* linux-kernel-modules.c (dwfl_linux_kernel_report_offline):

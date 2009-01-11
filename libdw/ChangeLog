@@ -1,3 +1,7 @@
+2009-01-10  Ulrich Drepper  <drepper@redhat.com>
+
+	* dwarf_error.c: Always use __thread.  Remove all !USE_TLS code.
+
 2009-01-08  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am (libdw.so): Don't depend on $(zip_LIBS), just link it in.

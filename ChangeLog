@@ -1,3 +1,9 @@
+2009-01-10  Ulrich Drepper  <drepper@redhat.com>
+
+	* configure.ac: Require gcc with TLS support.
+	Rename USE_TLS to USE_LOCKS.  The option is renamed to
+	--enable-thread-safety.
+
 2009-01-08  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac (eu_ZIPLIB): Moved to m4/zip.am.

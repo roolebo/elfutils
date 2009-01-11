@@ -1,5 +1,5 @@
 /* Error handling in libasm.
-   Copyright (C) 2002, 2004, 2005 Red Hat, Inc.
+   Copyright (C) 2002, 2004, 2005, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -36,50 +36,13 @@
 
 
 /* This is the key for the thread specific memory.  */
-static tls_key_t key;
-
-/* The error number.  Used in non-threaded programs.  */
-static int global_error;
-static bool threaded;
-/* We need to initialize the thread-specific data.  */
-once_define (static, once);
-
-/* The initialization and destruction functions.  */
-static void init (void);
-static void free_key_mem (void *mem);
+static __thread int global_error;
 
 
 int
 asm_errno (void)
 {
-  int result;
-
-  /* If we have not yet initialized the buffer do it now.  */
-  once_execute (once, init);
-
-  if (threaded)
-    {
-      /* We have a key.  Use it to get the thread-specific buffer.  */
-      int *buffer = getspecific (key);
-      if (buffer == NULL)
-	{
-	  /* No buffer allocated so far.  */
-	  buffer = (int *) malloc (sizeof (int));
-	  if (buffer == NULL)
-	    /* No more memory available.  We use the static buffer.  */
-	    buffer = &global_error;
-
-	  setspecific (key, buffer);
-
-	  *buffer = 0;
-	}
-
-      result = *buffer;
-      *buffer = ASM_E_NOERROR;
-      return result;
-    }
-
-  result = global_error;
+  int result = global_error;
   global_error = ASM_E_NOERROR;
   return result;
 }
@@ -89,27 +52,6 @@ void
 __libasm_seterrno (value)
      int value;
 {
-  /* If we have not yet initialized the buffer do it now.  */
-  once_execute (once, init);
-
-  if (threaded)
-    {
-      /* We have a key.  Use it to get the thread-specific buffer.  */
-      int *buffer = getspecific (key);
-      if (buffer == NULL)
-        {
-          /* No buffer allocated so far.  */
-          buffer = malloc (sizeof (int));
-          if (buffer == NULL)
-            /* No more memory available.  We use the static buffer.  */
-            buffer = &global_error;
-
-          setspecific (key, buffer);
-        }
-
-      *buffer = value;
-    }
-
   global_error = value;
 }
 
@@ -133,31 +75,7 @@ const char *
 asm_errmsg (error)
      int error;
 {
-  int last_error;
-
-  /* If we have not yet initialized the buffer do it now.  */
-  once_execute (once, init);
-
-  if ((error == 0 || error == -1) && threaded)
-    {
-      /* We have a key.  Use it to get the thread-specific buffer.  */
-      int *buffer = (int *) getspecific (key);
-      if (buffer == NULL)
-	{
-	  /* No buffer allocated so far.  */
-	  buffer = (int *) malloc (sizeof (int));
-	  if (buffer == NULL)
-	    /* No more memory available.  We use the static buffer.  */
-	    buffer = &global_error;
-
-	  setspecific (key, buffer);
-	  *buffer = 0;
-	}
-
-      last_error = *buffer;
-    }
-  else
-    last_error = global_error;
+  int last_error = global_error;
 
   if (error < -1)
     return _("unknown error");
@@ -172,26 +90,4 @@ asm_errmsg (error)
     return elf_errmsg (-1);
 
   return _(msgs[last_error]);
-}
-
-
-/* Free the thread specific data, this is done if a thread terminates.  */
-static void
-free_key_mem (void *mem)
-{
-  free (mem);
-  setspecific (key, NULL);
-}
-
-
-/* Initialize the key for the global variable.  */
-static void
-init (void)
-{
-  // XXX Screw you, gcc4, the unused function attribute does not work.
-  __asm ("" :: "r" (free_key_mem));
-
-  if (key_create (&key, free_key_mem) == 0)
-    /* Creating the key succeeded.  */
-    threaded = true;
 }

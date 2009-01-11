@@ -1,5 +1,5 @@
 /* Error handling in libelf.
-   Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright (C) 1998,1999,2000,2002,2003,2004,2005,2006,2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -61,46 +61,14 @@
 #include "libelfP.h"
 
 
-#ifdef USE_TLS
 /* The error number.  */
 static __thread int global_error;
-#else
-/* This is the key for the thread specific memory.  */
-static tls_key_t key;
-
-/* The error number.  Used in non-threaded programs.  */
-static int global_error;
-static bool threaded;
-/* We need to initialize the thread-specific data.  */
-once_define (static, once);
-
-/* The initialization and destruction functions.  */
-static void init (void);
-static void free_key_mem (void *mem);
-#endif	/* TLS */
 
 
 int
 elf_errno (void)
 {
-  int result;
-
-#ifndef USE_TLS
-  /* If we have not yet initialized the buffer do it now.  */
-  once_execute (once, init);
-
-  if (threaded)
-    {
-    /* We do not allocate memory for the data.  It is only a word.
-       We can store it in place of the pointer.  */
-      result = (intptr_t) getspecific (key);
-
-      setspecific (key, (void *) (intptr_t) ELF_E_NOERROR);
-      return result;
-    }
-#endif	/* TLS */
-
-  result = global_error;
+  int result = global_error;
   global_error = ELF_E_NOERROR;
   return result;
 }
@@ -339,16 +307,6 @@ void
 __libelf_seterrno (value)
      int value;
 {
-#ifndef USE_TLS
-  /* If we have not yet initialized the buffer do it now.  */
-  once_execute (once, init);
-
-  if (threaded)
-    /* We do not allocate memory for the data.  It is only a word.
-       We can store it in place of the pointer.  */
-    setspecific (key, (void *) (intptr_t) value);
-#endif	/* TLS */
-
   global_error = value >= 0 && value < nmsgidx ? value : ELF_E_UNKNOWN_ERROR;
 }
 
@@ -357,19 +315,7 @@ const char *
 elf_errmsg (error)
      int error;
 {
-  int last_error;
-
-#ifndef USE_TLS
-  /* If we have not yet initialized the buffer do it now.  */
-  once_execute (once, init);
-
-  if ((error == 0 || error == -1) && threaded)
-    /* We do not allocate memory for the data.  It is only a word.
-       We can store it in place of the pointer.  */
-    last_error = (intptr_t) getspecific (key);
-  else
-#endif	/* TLS */
-    last_error = global_error;
+  int last_error = global_error;
 
   if (error == 0)
     {
@@ -382,26 +328,3 @@ elf_errmsg (error)
   assert (msgidx[error == -1 ? last_error : error] < sizeof (msgstr));
   return _(msgstr + msgidx[error == -1 ? last_error : error]);
 }
-
-
-#ifndef USE_TLS
-/* Free the thread specific data, this is done if a thread terminates.  */
-static void
-free_key_mem (void *mem __attribute__ ((unused)))
-{
-  setspecific (key, NULL);
-}
-
-
-/* Initialize the key for the global variable.  */
-static void
-init (void)
-{
-  // XXX Screw you, gcc4, the unused function attribute does not work.
-  __asm ("" :: "r" (free_key_mem));
-
-  if (key_create (&key, free_key_mem) == 0)
-    /* Creating the key succeeded.  */
-    threaded = true;
-}
-#endif	/* TLS */

@@ -48,13 +48,13 @@ AC_CONFIG_FILES([elfutils.spec:config/elfutils.spec.in])
 
 AC_CANONICAL_HOST
 
-AC_ARG_ENABLE([tls],
-AS_HELP_STRING([--enable-tls], [enable use of thread local storage]),
-use_tls=yes, use_tls=no)
-AM_CONDITIONAL(USE_TLS, test "$use_tls" = yes)
-AS_IF([test "$use_tls" = yes], [AC_DEFINE(USE_TLS)])
+AC_ARG_ENABLE([thread-safety],
+AS_HELP_STRING([--enable-thread-safety], [enable thread safety of libraries]),
+use_tls=locks, use_locks=no)
+AM_CONDITIONAL(USE_LOCKS, test "$use_locks" = yes)
+AS_IF([test "$use_locks" = yes], [AC_DEFINE(USE_LOCKS)])
 
-AH_TEMPLATE([USE_TLS], [Defined if thread local storage should be used.])
+AH_TEMPLATE([USE_LOCKS], [Defined if libraries should be thread-safe.])
 
 dnl Add all the languages for which translations are available.
 ALL_LINGUAS=
@@ -73,6 +73,13 @@ int foo (int a) { for (int i = 0; i < a; ++i) if (i % 4) break; int s = a; }],
 CFLAGS="$old_CFLAGS"])
 AS_IF([test "x$ac_cv_c99" != xyes],
       AC_MSG_ERROR([gcc with C99 support required]))
+
+AC_CACHE_CHECK([for gcc with TLS support], ac_cv_tls, [dnl
+AC_COMPILE_IFELSE([dnl
+__thread int a; int foo (int b) { return a + b; }],
+		  ac_cv_tls=yes, ac_cv_tls=no)])
+AS_IF([test "x$ac_cv_tls" != xyes],
+      AC_MSG_ERROR([gcc with TLS support required]))
 
 LOCALEDIR=$datadir
 AC_SUBST(LOCALEDIR)

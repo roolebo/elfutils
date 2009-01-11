@@ -1,3 +1,7 @@
+2009-01-10  Ulrich Drepper  <drepper@redhat.com>
+
+	* strings.c (read_block): Fix typo in error message string.
+
 2009-01-07  Ulrich Drepper  <drepper@redhat.com>
 
 	* ld.c (ld_new_searchdir): Fix adding to search path list.

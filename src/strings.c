@@ -677,7 +677,7 @@ read_block (int fd, const char *fname, off64_t fdlen, off64_t from, off64_t to)
 	  if (mmap64 (remap_base, read_now, PROT_READ,
 		      MAP_PRIVATE | MAP_POPULATE | MAP_FIXED, fd, handled_to)
 	      == MAP_FAILED)
-	    error (EXIT_FAILURE, errno, gettext ("re=mmap failed"));
+	    error (EXIT_FAILURE, errno, gettext ("re-mmap failed"));
 	  elfmap_off = handled_to;
 
 	  process_chunk (fname, remap_base - to_keep,

@@ -1,5 +1,5 @@
 /* Internal interfaces for libelf.
-   Copyright (C) 1998-2003, 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 1998-2003, 2005, 2006, 2007, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -64,7 +64,7 @@
 #include <string.h>
 
 /* gettext helper macros.  */
-#define _(Str) dgettext ("libelf", Str)
+#define _(Str) dgettext ("elfutils", Str)
 
 
 /* Helper Macros to write 32 bit and 64 bit functions.  */

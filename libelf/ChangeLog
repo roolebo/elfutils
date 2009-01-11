@@ -1,5 +1,7 @@
 2009-01-10  Ulrich Drepper  <drepper@redhat.com>
 
+	* libelfP.h (_): We only have one translation domain, elfutils.
+
 	* Makefile.am: Use USE_LOCKS instead of USE_TLS.
 	* elf_error.c: Always use __thread.  Remove all !USE_TLS code.
 

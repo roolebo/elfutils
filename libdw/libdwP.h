@@ -194,12 +194,12 @@ struct Dwarf
 /* Abbreviation representation.  */
 struct Dwarf_Abbrev
 {
+  Dwarf_Off offset;
+  unsigned char *attrp;
+  unsigned int attrcnt;
   unsigned int code;
   unsigned int tag;
-  int has_children;
-  unsigned int attrcnt;
-  unsigned char *attrp;
-  Dwarf_Off offset;
+  bool has_children;
 };
 
 #include "dwarf_abbrev_hash.h"

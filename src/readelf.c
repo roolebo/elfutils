@@ -70,7 +70,7 @@ const char *argp_program_bug_address = PACKAGE_BUGREPORT;
 static const struct argp_option options[] =
 {
   { NULL, 0, NULL, 0, N_("Output selection:"), 0 },
-  { "all", 'a', NULL, 0, N_("Equivalent to: -h -l"), 0 },
+  { "all", 'a', NULL, 0, N_("Equivalent to: -e -h -l"), 0 },
   { "dynamic", 'd', NULL, 0, N_("Display the dynamic segment"), 0 },
   { "file-header", 'h', NULL, 0, N_("Display the ELF file header"), 0 },
   { "histogram", 'I', NULL, 0,
@@ -84,8 +84,8 @@ static const struct argp_option options[] =
   { "version-info", 'V', NULL, 0, N_("Display versioning information"), 0 },
   { "debug-dump", 'w', "SECTION", OPTION_ARG_OPTIONAL,
     N_("Display DWARF section content.  SECTION can be one of abbrev, "
-       "aranges, frame, info, loc, line, ranges, pubnames, str, or macinfo."),
-    0 },
+       "aranges, frame, info, loc, line, ranges, pubnames, str, macinfo, "
+       "or exception"), 0 },
   { "notes", 'n', NULL, 0, N_("Display the core notes"), 0 },
   { "arch-specific", 'A', NULL, 0,
     N_("Display architecture specific information (if any)"), 0 },
@@ -96,6 +96,8 @@ static const struct argp_option options[] =
   { "string-dump", 'p', NULL, OPTION_ALIAS | OPTION_HIDDEN, NULL, 0 },
   { "archive-index", 'c', NULL, 0,
     N_("Display the symbol index of an archive"), 0 },
+  { "exception", 'e', NULL, 0, N_("Display sections for exception handling"),
+    0 },
 
   { NULL, 0, NULL, 0, N_("Output control:"), 0 },
 
@@ -166,20 +168,21 @@ static bool any_control_option;
 /* Select printing of debugging sections.  */
 static enum section_e
 {
-  section_abbrev = 1,	/* .debug_abbrev  */
-  section_aranges = 2,	/* .debug_aranges  */
-  section_frame = 4,	/* .debug_frame or .eh_frame  */
-  section_info = 8,	/* .debug_info  */
-  section_line = 16,	/* .debug_line  */
-  section_loc = 32,	/* .debug_loc  */
-  section_pubnames = 64,/* .debug_pubnames  */
-  section_str = 128,	/* .debug_str  */
-  section_macinfo = 256,/* .debug_macinfo  */
-  section_ranges = 512, /* .debug_ranges  */
+  section_abbrev = 1,		/* .debug_abbrev  */
+  section_aranges = 2,		/* .debug_aranges  */
+  section_frame = 4,		/* .debug_frame or .eh_frame & al.  */
+  section_info = 8,		/* .debug_info  */
+  section_line = 16,		/* .debug_line  */
+  section_loc = 32,		/* .debug_loc  */
+  section_pubnames = 64,	/* .debug_pubnames  */
+  section_str = 128,		/* .debug_str  */
+  section_macinfo = 256,	/* .debug_macinfo  */
+  section_ranges = 512, 	/* .debug_ranges  */
+  section_exception = 1024,	/* .eh_frame & al.  */
   section_all = (section_abbrev | section_aranges | section_frame
 		 | section_info | section_line | section_loc
 		 | section_pubnames | section_str | section_macinfo
-		 | section_ranges)
+		 | section_ranges | section_exception)
 } print_debug_sections;
 
 /* Select hex dumping of sections.  */
@@ -286,6 +289,7 @@ parse_opt (int key, char *arg,
       print_histogram = true;
       print_arch = true;
       print_notes = true;
+      print_debug_sections |= section_exception;
       any_control_option = true;
       break;
     case 'A':
@@ -294,6 +298,10 @@ parse_opt (int key, char *arg,
       break;
     case 'd':
       print_dynamic_table = true;
+      any_control_option = true;
+      break;
+    case 'e':
+      print_debug_sections |= section_exception;
       any_control_option = true;
       break;
     case 'g':
@@ -358,6 +366,8 @@ parse_opt (int key, char *arg,
 	print_debug_sections |= section_str;
       else if (strcmp (arg, "macinfo") == 0)
 	print_debug_sections |= section_macinfo;
+      else if (strcmp (arg, "exception") == 0)
+	print_debug_sections |= section_exception;
       else
 	{
 	  fprintf (stderr, gettext ("Unknown DWARF debug section `%s'.\n"),
@@ -4516,11 +4526,7 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 					+ data->d_size);
   while (readp < dataend)
     {
-      /* At the beginning there must be a CIE.  There can be multiple,
-	 hence we test tis in a loop.  */
-      ptrdiff_t offset = readp - (unsigned char *) data->d_buf;
-
-      if (unlikely (readp + 12 > dataend))
+      if (unlikely (readp + 4 > dataend))
 	{
 	invalid_data:
 	  error (0, 0, gettext ("invalid data in section [%zu] '%s'"),
@@ -4528,21 +4534,32 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	      return;
 	}
 
-      unsigned int ptr_size = ehdr->e_ident[EI_CLASS] == ELFCLASS32 ? 4 : 8;
+      /* At the beginning there must be a CIE.  There can be multiple,
+	 hence we test tis in a loop.  */
+      ptrdiff_t offset = readp - (unsigned char *) data->d_buf;
 
       Dwarf_Word unit_length = read_4ubyte_unaligned_inc (dbg, readp);
       unsigned int length = 4;
       if (unlikely (unit_length == 0xffffffff))
 	{
+	  if (unlikely (readp + 8 > dataend))
+	    goto invalid_data;
+
 	  unit_length = read_8ubyte_unaligned_inc (dbg, readp);
 	  length = 8;
-
-	  if (unlikely (readp + 12 > dataend))
-	    goto invalid_data;
 	}
+
+      if (unlikely (unit_length == 0))
+	{
+	  printf (gettext ("\n [%6jx] Zero terminator\n"), offset);
+	  continue;
+	}
+
+      unsigned int ptr_size = ehdr->e_ident[EI_CLASS] == ELFCLASS32 ? 4 : 8;
+
       ptrdiff_t start = readp - (unsigned char *) data->d_buf;
       const unsigned char *const cieend = readp + unit_length;
-      if (unlikely (cieend > dataend))
+      if (unlikely (cieend > dataend || readp + 8 > dataend))
 	goto invalid_data;
 
       Dwarf_Word cie_id;
@@ -4580,7 +4597,7 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	    // XXX Check overflow
 	    get_uleb128 (return_address_register, readp);
 
-	  printf (" [%6jx] CIE length=%" PRIu64 "\n"
+	  printf ("\n [%6jx] CIE length=%" PRIu64 "\n"
 		  "   CIE_id:                   %" PRIu64 "\n"
 		  "   version:                  %u\n"
 		  "   augmentation:             \"%s\"\n"
@@ -4704,6 +4721,7 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	  code_alignment_factor = cie->code_alignment_factor;
 	  data_alignment_factor = cie->data_alignment_factor;
 
+	  const unsigned char *base = readp;
 	  // XXX There are sometimes relocations for this value
 	  initial_location = read_ubyte_unaligned_inc (ptr_size, dbg, readp);
 	  Dwarf_Word address_range
@@ -4716,6 +4734,13 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 		  cie->cie_offset, (uint64_t) cie_id,
 		  (uint64_t) initial_location);
 	  if ((fde_encoding & 0x70) == DW_EH_PE_pcrel)
+	    printf (gettext (" (offset: %#" PRIx64 ")"),
+		    ((uint64_t) shdr->sh_offset
+		     + (base - (const unsigned char *) data->d_buf)
+		     + (uint64_t) initial_location)
+		    & (ptr_size == 4
+		       ? UINT64_C (0xffffffff)
+		       : UINT64_C (0xffffffffffffffff)));
 
 	  printf ("\n   address_range:            %#" PRIx64 "\n",
 		  (uint64_t) address_range);
@@ -5918,9 +5943,7 @@ static void
 print_debug_frame_hdr_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 			       Ebl *ebl __attribute__ ((unused)),
 			       GElf_Ehdr *ehdr __attribute__ ((unused)),
-			       Elf_Scn *scn,
-			       GElf_Shdr *shdr __attribute__ ((unused)),
-			       Dwarf *dbg)
+			       Elf_Scn *scn, GElf_Shdr *shdr, Dwarf *dbg)
 {
   printf (gettext ("\
 \nCall frame search table section [%2zu] '.eh_frame_hdr':\n"),
@@ -6014,6 +6037,31 @@ print_debug_frame_hdr_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 }
 
 
+/* Print the content of the exception handling table section
+   '.eh_frame_hdr'.  */
+static void
+print_debug_exception_table (Dwfl_Module *dwflmod __attribute__ ((unused)),
+			     Ebl *ebl __attribute__ ((unused)),
+			     GElf_Ehdr *ehdr __attribute__ ((unused)),
+			     Elf_Scn *scn __attribute__ ((unused)),
+			     GElf_Shdr *shdr __attribute__ ((unused)),
+			     Dwarf *dbg __attribute__ ((unused)))
+{
+  printf (gettext ("\
+\nException handling table section [%2zu] '.gcc_except_table':\n"),
+	  elf_ndxscn (scn));
+
+  Elf_Data *data = elf_rawdata (scn, NULL);
+
+  if (unlikely (data == NULL))
+    {
+      error (0, 0, gettext ("cannot get %s content: %s"),
+	     ".gcc_except_table", elf_errmsg (-1));
+      return;
+    }
+}
+
+
 static void
 print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
 {
@@ -6062,8 +6110,12 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
 	      NEW_SECTION (str),
 	      NEW_SECTION (macinfo),
 	      NEW_SECTION (ranges),
-	      { ".eh_frame", section_frame, print_debug_frame_section },
-	      { ".eh_frame_hdr", section_frame, print_debug_frame_hdr_section }
+	      { ".eh_frame", section_frame | section_exception,
+		print_debug_frame_section },
+	      { ".eh_frame_hdr", section_frame | section_exception,
+		print_debug_frame_hdr_section },
+	      { ".gcc_except_table", section_frame | section_exception,
+		print_debug_exception_table }
 	    };
 	  const int ndebug_sections = (sizeof (debug_sections)
 				       / sizeof (debug_sections[0]));

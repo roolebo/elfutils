@@ -1,3 +1,13 @@
+2009-01-16  Ulrich Drepper  <drepper@redhat.com>
+
+	* readelf.c: Add -e option.  Dump exception and unwind related
+	sections.  Add -e to -a.
+	(print_debug_exception_table): Beginning of support.
+	(print_debug): Hook up print_debug_exception_table for
+	.gcc_except_table sections.
+
+	* readelf.c (print_debug_frame_section): Some fixes for last change.
+
 2009-01-15  Ulrich Drepper  <drepper@redhat.com>
 
 	* readelf.c (print_encoding): Now a toplevel function.

@@ -53,6 +53,7 @@
 
 #ifdef BZLIB
 # define inflate_groks_header	true
+# define mapped_zImage(...)	false
 # include <bzlib.h>
 # define unzip		__libdw_bunzip2
 # define DWFL_E_ZLIB	DWFL_E_BZLIB
@@ -66,12 +67,41 @@
 # define gzdopen	BZ2_bzdopen
 # define gzread		BZ2_bzread
 # define gzclose	BZ2_bzclose
+# define gzerror	BZ2_bzerror
 #else
 # define inflate_groks_header	false
 # include <zlib.h>
 # define unzip		__libdw_gunzip
 # define MAGIC		"\037\213"
 # define Z(what)	Z_##what
+
+/* We can also handle Linux kernel zImage format in a very hackish way.
+   If it looks like one, we actually just scan the image for the gzip
+   magic bytes to figure out where the gzip image starts.  */
+
+# define LINUX_MAGIC_OFFSET	514
+# define LINUX_MAGIC		"HdrS"
+
+static bool
+mapped_zImage (off64_t *start_offset, void **mapped, size_t *mapped_size)
+{
+  const size_t pos = LINUX_MAGIC_OFFSET + sizeof LINUX_MAGIC;
+  if (*mapped_size > pos
+      && !memcmp (*mapped + LINUX_MAGIC_OFFSET,
+		  LINUX_MAGIC, sizeof LINUX_MAGIC - 1))
+    {
+      void *p = memmem (*mapped + pos, *mapped_size - pos,
+			MAGIC, sizeof MAGIC - 1);
+      if (p != NULL)
+	{
+	  *start_offset += p - *mapped;
+	  *mapped_size = *mapped + *mapped_size - p,
+	  *mapped = p;
+	  return true;
+	}
+    }
+  return false;
+}
 #endif
 
 /* If this is not a compressed image, return DWFL_E_BADELF.
@@ -120,7 +150,8 @@ unzip (int fd, off64_t start_offset,
   /* If the file is already mapped in, look at the header.  */
   if (mapped != NULL
       && (mapped_size <= sizeof MAGIC
-	  || memcmp (mapped, MAGIC, sizeof MAGIC - 1)))
+	  || memcmp (mapped, MAGIC, sizeof MAGIC - 1))
+      && !mapped_zImage (&start_offset, &mapped, &mapped_size))
     /* Not a compressed file.  */
     return DWFL_E_BADELF;
 
@@ -165,34 +196,68 @@ unzip (int fd, off64_t start_offset,
     {
       /* Let the decompression library read the file directly.  */
 
-      int d = dup (fd);
-      if (unlikely (d < 0))
-	return DWFL_E_BADELF;
-      if (start_offset != 0)
-	{
-	  off64_t off = lseek (d, start_offset, SEEK_SET);
-	  if (off != start_offset)
-	    {
-	      close (d);
-	      return DWFL_E_BADELF;
-	    }
-	}
-      gzFile zf = gzdopen (d, "r");
-      if (unlikely (zf == NULL))
-	{
-	  close (d);
-	  return zlib_fail (Z (MEM_ERROR));
-	}
+      gzFile zf;
+      Dwfl_Error open_stream (void)
+      {
+	int d = dup (fd);
+	if (unlikely (d < 0))
+	  return DWFL_E_BADELF;
+	if (start_offset != 0)
+	  {
+	    off64_t off = lseek (d, start_offset, SEEK_SET);
+	    if (off != start_offset)
+	      {
+		close (d);
+		return DWFL_E_BADELF;
+	      }
+	  }
+	zf = gzdopen (d, "r");
+	if (unlikely (zf == NULL))
+	  {
+	    close (d);
+	    return zlib_fail (Z (MEM_ERROR));
+	  }
 
-      /* From here on, zlib will close D.  */
+	/* From here on, zlib will close D.  */
+
+	return DWFL_E_NOERROR;
+      }
+
+      Dwfl_Error result = open_stream ();
 
 #ifndef BZLIB
-      if (gzdirect (zf))
+      if (result == DWFL_E_NOERROR && gzdirect (zf))
 	{
+	  bool found = false;
+	  char buf[sizeof LINUX_MAGIC - 1];
+	  gzseek (zf, start_offset + LINUX_MAGIC_OFFSET, SEEK_SET);
+	  int n = gzread (zf, buf, sizeof buf);
+	  if (n == sizeof buf
+	      && !memcmp (buf, LINUX_MAGIC, sizeof LINUX_MAGIC - 1))
+	    while (gzread (zf, buf, sizeof MAGIC - 1) == sizeof MAGIC - 1)
+	      if (!memcmp (buf, MAGIC, sizeof MAGIC - 1))
+		{
+		  start_offset = gztell (zf) - 2;
+		  found = true;
+		  break;
+		}
 	  gzclose (zf);
-	  return DWFL_E_BADELF;
+	  if (found)
+	    {
+	      result = open_stream ();
+	      if (result == DWFL_E_NOERROR && unlikely (gzdirect (zf)))
+		{
+		  gzclose (zf);
+		  result = DWFL_E_BADELF;
+		}
+	    }
+	  else
+	    result = DWFL_E_BADELF;
 	}
 #endif
+
+      if (result != DWFL_E_NOERROR)
+	return result;
 
       ptrdiff_t pos = 0;
       while (1)
@@ -205,9 +270,9 @@ unzip (int fd, off64_t start_offset,
 	  int n = gzread (zf, buffer + pos, size - pos);
 	  if (n < 0)
 	    {
-#ifdef BZLIB
 	      int code;
-	      BZ2_bzerror (zf, &code);
+	      gzerror (zf, &code);
+#ifdef BZLIB
 	      if (code == BZ_DATA_ERROR_MAGIC)
 		{
 		  gzclose (zf);
@@ -216,7 +281,7 @@ unzip (int fd, off64_t start_offset,
 		}
 #endif
 	      gzclose (zf);
-	      return zlib_fail (Z (DATA_ERROR));
+	      return zlib_fail (code);
 	    }
 	  if (n == 0)
 	    break;

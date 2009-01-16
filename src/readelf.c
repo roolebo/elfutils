@@ -4459,9 +4459,9 @@ print_relinfo (unsigned int val)
 
 
 static void
-print_encoding_base (unsigned int fde_encoding)
+print_encoding_base (const char *pfx, unsigned int fde_encoding)
 {
-  putchar_unlocked ('(');
+  printf ("(%s", pfx);
 
   unsigned int w = fde_encoding;
 
@@ -4480,6 +4480,60 @@ print_encoding_base (unsigned int fde_encoding)
     printf ("(%s%x", w != fde_encoding ? " " : "", w);
 
   puts (")");
+}
+
+
+static const unsigned char *
+read_encoded (unsigned int encoding, const unsigned char *readp,
+	      const unsigned char *const endp, uint64_t *res, Dwarf *dbg)
+{
+  switch (encoding & 0xf)
+    {
+    case DW_EH_PE_uleb128:
+      // XXX buffer overrun check
+      get_uleb128 (*res, readp);
+      break;
+    case DW_EH_PE_sleb128:
+      // XXX buffer overrun check
+      get_sleb128 (*res, readp);
+      break;
+    case DW_EH_PE_udata2:
+      if (readp + 2 > endp)
+	goto invalid;
+      *res = read_2ubyte_unaligned_inc (dbg, readp);
+      break;
+    case DW_EH_PE_udata4:
+      if (readp + 4 > endp)
+	goto invalid;
+      *res = read_4ubyte_unaligned_inc (dbg, readp);
+      break;
+    case DW_EH_PE_udata8:
+      if (readp + 8 > endp)
+	goto invalid;
+      *res = read_8ubyte_unaligned_inc (dbg, readp);
+      break;
+    case DW_EH_PE_sdata2:
+      if (readp + 2 > endp)
+	goto invalid;
+      *res = read_2sbyte_unaligned_inc (dbg, readp);
+      break;
+    case DW_EH_PE_sdata4:
+      if (readp + 4 > endp)
+	goto invalid;
+      *res = read_4sbyte_unaligned_inc (dbg, readp);
+      break;
+    case DW_EH_PE_sdata8:
+      if (readp + 8 > endp)
+	goto invalid;
+      *res = read_8sbyte_unaligned_inc (dbg, readp);
+      break;
+    default:
+    invalid:
+      error (1, 0,
+	     gettext ("invalid encoding"));
+    }
+
+  return readp;
 }
 
 
@@ -4518,6 +4572,7 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
     unsigned int code_alignment_factor;
     unsigned int data_alignment_factor;
     unsigned int fde_encoding;
+    unsigned int lsda_encoding;
     struct cieinfo *next;
   } *cies = NULL;
 
@@ -4571,6 +4626,7 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
       unsigned int code_alignment_factor;
       int data_alignment_factor;
       unsigned int fde_encoding = 0;
+      unsigned int lsda_encoding = 0;
       Dwarf_Word initial_location = 0;
 
       if (cie_id == (is_eh_frame ? 0 : DW_CIE_ID))
@@ -4622,8 +4678,15 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
 		  if (*cp == 'R')
 		    {
-		      fde_encoding = *readp;
-		      print_encoding_base (fde_encoding);
+		      fde_encoding = *readp++;
+		      print_encoding_base (gettext ("FDE address encoding: "),
+					   fde_encoding);
+		    }
+		  else if (*cp == 'L')
+		    {
+		      lsda_encoding = *readp++;
+		      print_encoding_base (gettext ("LSDA pointer encoding: "),
+					   lsda_encoding);
 		    }
 		  else if (*cp == 'P')
 		    {
@@ -4687,13 +4750,13 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
 		  ++cp;
 		}
-	      readp += augmentationlen;
 	    }
 
 	  struct cieinfo *newp = alloca (sizeof (*newp));
 	  newp->cie_offset = offset;
 	  newp->augmentation = augmentation;
 	  newp->fde_encoding = fde_encoding;
+	  newp->lsda_encoding = lsda_encoding;
 	  newp->code_alignment_factor = code_alignment_factor;
 	  newp->data_alignment_factor = data_alignment_factor;
 	  newp->next = cies;
@@ -4717,6 +4780,7 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
 	  /* Initialize from CIE data.  */
 	  fde_encoding = cie->fde_encoding;
+	  lsda_encoding = cie->lsda_encoding;
 	  ptr_size = encoded_ptr_size (fde_encoding, ptr_size);
 	  code_alignment_factor = cie->code_alignment_factor;
 	  data_alignment_factor = cie->data_alignment_factor;
@@ -4754,12 +4818,33 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 		{
 		  const char *hdr = "Augmentation data:";
 		  const char *cp = cie->augmentation + 1;
-		  for (unsigned int u = 0; u < augmentationlen; ++cp, ++u)
+		  unsigned int u = 0;
+		  while (*cp != '\0')
 		    {
-		      printf ("   %-26s%#x (", hdr, readp[u]);
+		      if (*cp == 'L')
+			{
+			  uint64_t lsda_pointer;
+			  const unsigned char *p
+			    = read_encoded (lsda_encoding, &readp[u],
+					    &readp[augmentationlen],
+					    &lsda_pointer, dbg);
+			  u = p - readp;
+			  printf (gettext ("\
+   %-26sLSDA pointer: %#" PRIx64 "\n"),
+				  hdr, lsda_pointer);
+			  hdr = "";
+			}
+		      ++cp;
+		    }
+
+		  while (u < augmentationlen)
+		    {
+		      printf ("   %-26s%#x\n", hdr, readp[u++]);
 		      hdr = "";
 		    }
 		}
+
+	      readp += augmentationlen;
 	    }
 	}
 
@@ -5883,60 +5968,6 @@ print_debug_str_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 }
 
 
-static const unsigned char *
-read_encoded (unsigned int encoding, const unsigned char *readp,
-	      const unsigned char *const endp, uint64_t *res, Dwarf *dbg)
-{
-  switch (encoding & 0xf)
-    {
-    case DW_EH_PE_uleb128:
-      // XXX buffer overrun check
-      get_uleb128 (*res, readp);
-      break;
-    case DW_EH_PE_sleb128:
-      // XXX buffer overrun check
-      get_sleb128 (*res, readp);
-      break;
-    case DW_EH_PE_udata2:
-      if (readp + 2 > endp)
-	goto invalid;
-      *res = read_2ubyte_unaligned_inc (dbg, readp);
-      break;
-    case DW_EH_PE_udata4:
-      if (readp + 4 > endp)
-	goto invalid;
-      *res = read_4ubyte_unaligned_inc (dbg, readp);
-      break;
-    case DW_EH_PE_udata8:
-      if (readp + 8 > endp)
-	goto invalid;
-      *res = read_8ubyte_unaligned_inc (dbg, readp);
-      break;
-    case DW_EH_PE_sdata2:
-      if (readp + 2 > endp)
-	goto invalid;
-      *res = read_2sbyte_unaligned_inc (dbg, readp);
-      break;
-    case DW_EH_PE_sdata4:
-      if (readp + 4 > endp)
-	goto invalid;
-      *res = read_4sbyte_unaligned_inc (dbg, readp);
-      break;
-    case DW_EH_PE_sdata8:
-      if (readp + 8 > endp)
-	goto invalid;
-      *res = read_8sbyte_unaligned_inc (dbg, readp);
-      break;
-    default:
-    invalid:
-      error (1, 0,
-	     gettext ("invalid encoding"));
-    }
-
-  return readp;
-}
-
-
 /* Print the content of the call frame search table section
    '.eh_frame_hdr'.  */
 static void
@@ -5977,11 +6008,11 @@ print_debug_frame_hdr_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
   printf (" version:          %u\n"
 	  " eh_frame_ptr_enc: %#x ",
 	  version, eh_frame_ptr_enc);
-  print_encoding_base (eh_frame_ptr_enc);
+  print_encoding_base ("", eh_frame_ptr_enc);
   printf (" fde_count_enc:    %#x ", fde_count_enc);
-  print_encoding_base (fde_count_enc);
+  print_encoding_base ("", fde_count_enc);
   printf (" table_enc:        %#x ", table_enc);
-  print_encoding_base (table_enc);
+  print_encoding_base ("", table_enc);
 
   uint64_t eh_frame_ptr = 0;
   if (eh_frame_ptr_enc != DW_EH_PE_omit)

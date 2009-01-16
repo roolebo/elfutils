@@ -1495,11 +1495,11 @@ handle_relocs_rel (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 
   if (shdr->sh_info != 0)
     printf (ngettext ("\
-\nRelocation section [%2u] '%s' for section [%2u] '%s' at offset %#0" PRIx64 " contains %d entry:\n",
+\nRelocation section [%2zu] '%s' for section [%2u] '%s' at offset %#0" PRIx64 " contains %d entry:\n",
 		    "\
-\nRelocation section [%2u] '%s' for section [%2u] '%s' at offset %#0" PRIx64 " contains %d entries:\n",
+\nRelocation section [%2zu] '%s' for section [%2u] '%s' at offset %#0" PRIx64 " contains %d entries:\n",
 		      nentries),
-	    (unsigned int) elf_ndxscn (scn),
+	    elf_ndxscn (scn),
 	    elf_strptr (ebl->elf, shstrndx, shdr->sh_name),
 	    (unsigned int) shdr->sh_info,
 	    elf_strptr (ebl->elf, shstrndx, destshdr->sh_name),
@@ -3962,12 +3962,11 @@ static void
 print_debug_abbrev_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 			    Ebl *ebl __attribute__ ((unused)),
 			    GElf_Ehdr *ehdr __attribute__ ((unused)),
-			    Elf_Scn *scn __attribute__ ((unused)),
-			    GElf_Shdr *shdr, Dwarf *dbg)
+			    Elf_Scn *scn, GElf_Shdr *shdr, Dwarf *dbg)
 {
-  printf (gettext ("\nDWARF section '%s' at offset %#" PRIx64 ":\n"
+  printf (gettext ("\nDWARF section [%2zu] '%s' at offset %#" PRIx64 ":\n"
 		   " [ Code]\n"),
-	  ".debug_abbrev", (uint64_t) shdr->sh_offset);
+	  elf_ndxscn (scn), ".debug_abbrev", (uint64_t) shdr->sh_offset);
 
   Dwarf_Off offset = 0;
   while (offset < shdr->sh_size)
@@ -4033,8 +4032,7 @@ print_debug_abbrev_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 static void
 print_debug_aranges_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 			     Ebl *ebl __attribute__ ((unused)),
-			     GElf_Ehdr *ehdr __attribute__ ((unused)),
-			     Elf_Scn *scn __attribute__ ((unused)),
+			     GElf_Ehdr *ehdr, Elf_Scn *scn,
 			     GElf_Shdr *shdr, Dwarf *dbg)
 {
   Dwarf_Aranges *aranges;
@@ -4047,11 +4045,11 @@ print_debug_aranges_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
     }
 
   printf (ngettext ("\
-\nDWARF section '%s' at offset %#" PRIx64 " contains %zu entry:\n",
+\nDWARF section [%2zu] '%s' at offset %#" PRIx64 " contains %zu entry:\n",
 		    "\
-\nDWARF section '%s' at offset %#" PRIx64 " contains %zu entries:\n",
+\nDWARF section [%2zu] '%s' at offset %#" PRIx64 " contains %zu entries:\n",
 		    cnt),
-	  ".debug_aranges", (uint64_t) shdr->sh_offset, cnt);
+	  elf_ndxscn (scn), ".debug_aranges", (uint64_t) shdr->sh_offset, cnt);
 
   /* Compute floor(log16(cnt)).  */
   size_t tmp = cnt;
@@ -4103,8 +4101,8 @@ print_debug_ranges_section (Dwfl_Module *dwflmod,
     }
 
   printf (gettext ("\
-\nDWARF section '%s' at offset %#" PRIx64 ":\n"),
-	  ".debug_ranges", (uint64_t) shdr->sh_offset);
+\nDWARF section [%2zu] '%s' at offset %#" PRIx64 ":\n"),
+	  elf_ndxscn (scn), ".debug_ranges", (uint64_t) shdr->sh_offset);
 
   size_t address_size = ehdr->e_ident[EI_CLASS] == ELFCLASS32 ? 4 : 8;
 
@@ -4381,6 +4379,100 @@ encoded_ptr_size (int encoding, unsigned int ptr_size)
 }
 
 
+static unsigned int
+print_encoding (unsigned int val)
+{
+  switch (val & 0xf)
+    {
+    case DW_EH_PE_absptr:
+      fputs ("absptr", stdout);
+      break;
+    case DW_EH_PE_uleb128:
+      fputs ("uleb128", stdout);
+      break;
+    case DW_EH_PE_udata2:
+      fputs ("udata2", stdout);
+      break;
+    case DW_EH_PE_udata4:
+      fputs ("udata4", stdout);
+      break;
+    case DW_EH_PE_udata8:
+      fputs ("udata8", stdout);
+      break;
+    case DW_EH_PE_sleb128:
+      fputs ("sleb128", stdout);
+      break;
+    case DW_EH_PE_sdata2:
+      fputs ("sdata2", stdout);
+      break;
+    case DW_EH_PE_sdata4:
+      fputs ("sdata4", stdout);
+      break;
+    case DW_EH_PE_sdata8:
+      fputs ("sdata8", stdout);
+      break;
+    default:
+      /* We did not use any of the bits after all.  */
+      return val;
+    }
+
+  return val & ~0xf;
+}
+
+
+static unsigned int
+print_relinfo (unsigned int val)
+{
+  switch (val & 0x70)
+    {
+    case DW_EH_PE_pcrel:
+      fputs ("pcrel", stdout);
+      break;
+    case DW_EH_PE_textrel:
+      fputs ("textrel", stdout);
+      break;
+    case DW_EH_PE_datarel:
+      fputs ("datarel", stdout);
+      break;
+    case DW_EH_PE_funcrel:
+      fputs ("funcrel", stdout);
+      break;
+    case DW_EH_PE_aligned:
+      fputs ("aligned", stdout);
+      break;
+    default:
+      return val;
+    }
+
+  return val & ~0x70;
+}
+
+
+static void
+print_encoding_base (unsigned int fde_encoding)
+{
+  putchar_unlocked ('(');
+
+  unsigned int w = fde_encoding;
+
+  if (w & 0xf)
+    w = print_encoding (w);
+
+  if (w & 0x70)
+    {
+      if (w != fde_encoding)
+	fputc_unlocked (' ', stdout);
+
+      w = print_relinfo (w);
+    }
+
+  if (w != 0)
+    printf ("(%s%x", w != fde_encoding ? " " : "", w);
+
+  puts (")");
+}
+
+
 static void
 print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 			   Elf_Scn *scn, GElf_Shdr *shdr, Dwarf *dbg)
@@ -4398,10 +4490,16 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	     scnname, elf_errmsg (-1));
       return;
     }
+  bool is_eh_frame = strcmp (scnname, ".eh_frame") == 0;
 
-  printf (gettext ("\
-\nDWARF section '%s' at offset %#" PRIx64 ":\n"),
-	  scnname, (uint64_t) shdr->sh_offset);
+  if (is_eh_frame)
+    printf (gettext ("\
+\nCall frame information section [%2zu] '%s' at offset %#" PRIx64 ":\n"),
+	    elf_ndxscn (scn), scnname, (uint64_t) shdr->sh_offset);
+  else
+    printf (gettext ("\
+\nDWARF section [%2zu] '%s' at offset %#" PRIx64 ":\n"),
+	    elf_ndxscn (scn), scnname, (uint64_t) shdr->sh_offset);
 
   struct cieinfo
   {
@@ -4416,7 +4514,6 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
   const unsigned char *readp = data->d_buf;
   const unsigned char *const dataend = ((unsigned char *) data->d_buf
 					+ data->d_size);
-  bool is_eh_frame = strcmp (scnname, ".eh_frame") == 0;
   while (readp < dataend)
     {
       /* At the beginning there must be a CIE.  There can be multiple,
@@ -4459,8 +4556,7 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
       unsigned int fde_encoding = 0;
       Dwarf_Word initial_location = 0;
 
-      if ((is_eh_frame && cie_id == 0)
-	  || (! is_eh_frame && cie_id == DW_CIE_ID))
+      if (cie_id == (is_eh_frame ? 0 : DW_CIE_ID))
 	{
 	  uint_fast8_t version = *readp++;
 	  const char *const augmentation = (const char *) readp;
@@ -4497,71 +4593,6 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
 	  if (augmentation[0] == 'z')
 	    {
-	      unsigned int print_encoding (unsigned int val)
-	      {
-		switch (val & 0xf)
-		  {
-		  case DW_EH_PE_absptr:
-		    fputs ("absptr", stdout);
-		    break;
-		  case DW_EH_PE_uleb128:
-		    fputs ("uleb128", stdout);
-		    break;
-		  case DW_EH_PE_udata2:
-		    fputs ("udata2", stdout);
-		    break;
-		  case DW_EH_PE_udata4:
-		    fputs ("udata4", stdout);
-		    break;
-		  case DW_EH_PE_udata8:
-		    fputs ("udata8", stdout);
-		    break;
-		  case DW_EH_PE_sleb128:
-		    fputs ("sleb128", stdout);
-		    break;
-		  case DW_EH_PE_sdata2:
-		    fputs ("sdata2", stdout);
-		    break;
-		  case DW_EH_PE_sdata4:
-		    fputs ("sdata4", stdout);
-		    break;
-		  case DW_EH_PE_sdata8:
-		    fputs ("sdata8", stdout);
-		    break;
-		  default:
-		    /* We did not use any of the bits after all.  */
-		    return val;
-		  }
-
-		return val & ~0xf;
-	      }
-
-	      unsigned int print_relinfo (unsigned int val)
-	      {
-		switch (val & 0x70)
-		  {
-		  case DW_EH_PE_pcrel:
-		    fputs ("pcrel", stdout);
-		    break;
-		  case DW_EH_PE_textrel:
-		    fputs ("textrel", stdout);
-		    break;
-		  case DW_EH_PE_datarel:
-		    fputs ("datarel", stdout);
-		    break;
-		  case DW_EH_PE_funcrel:
-		    fputs ("funcrel", stdout);
-		    break;
-		  case DW_EH_PE_aligned:
-		    fputs ("aligned", stdout);
-		    break;
-		  default:
-		    return val;
-		  }
-
-		return val & ~0x70;
-	      }
-
 	      unsigned int augmentationlen;
 	      get_uleb128 (augmentationlen, readp);
 
@@ -4574,28 +4605,13 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
 		  if (*cp == 'R')
 		    {
-		      putchar_unlocked ('(');
-
-		      unsigned int w = fde_encoding = *readp++;
-
-		      if (w & 0xf)
-			w = print_encoding (w);
-
-		      if (w & 0x70)
-			{
-			  if (w != fde_encoding)
-			    fputc_unlocked (' ', stdout);
-
-			  w = print_relinfo (w);
-			}
-
-		      if (w != 0)
-			printf ("(%s%x", w != fde_encoding ? " " : "", w);
-
-		      puts (")");
+		      fde_encoding = *readp;
+		      print_encoding_base (fde_encoding);
 		    }
 		  else if (*cp == 'P')
 		    {
+		      /* Personality.  This field usually has a relocation
+			 attached pointing to __gcc_personality_v0.  */
 		      const unsigned char *startp = readp;
 		      unsigned int encoding = *readp++;
 		      uint64_t val = 0;
@@ -4670,7 +4686,9 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	{
 	  struct cieinfo *cie = cies;
 	  while (cie != NULL)
-	    if (start - (ptrdiff_t) cie_id == cie->cie_offset)
+	    if (is_eh_frame
+		? start - (ptrdiff_t) cie_id == cie->cie_offset
+		: (ptrdiff_t) cie_id == cie->cie_offset)
 	      break;
 	    else
 	      cie = cie->next;
@@ -4681,34 +4699,41 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	    }
 
 	  /* Initialize from CIE data.  */
-	  ptr_size = encoded_ptr_size (cie->fde_encoding, ptr_size);
+	  fde_encoding = cie->fde_encoding;
+	  ptr_size = encoded_ptr_size (fde_encoding, ptr_size);
 	  code_alignment_factor = cie->code_alignment_factor;
 	  data_alignment_factor = cie->data_alignment_factor;
-	  fde_encoding = cie->fde_encoding;
 
+	  // XXX There are sometimes relocations for this value
 	  initial_location = read_ubyte_unaligned_inc (ptr_size, dbg, readp);
 	  Dwarf_Word address_range
 	    = read_ubyte_unaligned_inc (ptr_size, dbg, readp);
 
 	  printf ("\n [%6jx] FDE length=%" PRIu64 " cie=[%6jx]\n"
 		  "   CIE_pointer:              %" PRIu64 "\n"
-		  "   initial_location:         %#" PRIx64 "\n"
-		  "   address_range:            %#" PRIx64 "\n",
+		  "   initial_location:         %#" PRIx64,
 		  offset, (uint64_t) unit_length,
 		  cie->cie_offset, (uint64_t) cie_id,
-		  (uint64_t) initial_location, (uint64_t) address_range);
+		  (uint64_t) initial_location);
+	  if ((fde_encoding & 0x70) == DW_EH_PE_pcrel)
+
+	  printf ("\n   address_range:            %#" PRIx64 "\n",
+		  (uint64_t) address_range);
 
 	  if (cie->augmentation[0] == 'z')
 	    {
 	      unsigned int augmentationlen;
 	      get_uleb128 (augmentationlen, readp);
 
-	      const char *hdr = "Augmentation data:";
-	      const char *cp = cie->augmentation + 1;
-	      for (unsigned int u = 0; u < augmentationlen; ++cp, ++u)
+	      if (augmentationlen > 0)
 		{
-		  printf ("   %-26s%#x (", hdr, readp[u]);
-		  hdr = "";
+		  const char *hdr = "Augmentation data:";
+		  const char *cp = cie->augmentation + 1;
+		  for (unsigned int u = 0; u < augmentationlen; ++cp, ++u)
+		    {
+		      printf ("   %-26s%#x (", hdr, readp[u]);
+		      hdr = "";
+		    }
 		}
 	    }
 	}
@@ -4947,12 +4972,12 @@ static void
 print_debug_info_section (Dwfl_Module *dwflmod,
 			  Ebl *ebl __attribute__ ((unused)),
 			  GElf_Ehdr *ehdr __attribute__ ((unused)),
-			  Elf_Scn *scn __attribute__ ((unused)),
+			  Elf_Scn *scn,
 			  GElf_Shdr *shdr, Dwarf *dbg)
 {
   printf (gettext ("\
-\nDWARF section '%s' at offset %#" PRIx64 ":\n [Offset]\n"),
-	  ".debug_info", (uint64_t) shdr->sh_offset);
+\nDWARF section [%2zu] '%s' at offset %#" PRIx64 ":\n [Offset]\n"),
+	  elf_ndxscn (scn), ".debug_info", (uint64_t) shdr->sh_offset);
 
   /* If the section is empty we don't have to do anything.  */
   if (shdr->sh_size == 0)
@@ -5072,8 +5097,8 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl,
 			  Elf_Scn *scn, GElf_Shdr *shdr, Dwarf *dbg)
 {
   printf (gettext ("\
-\nDWARF section '%s' at offset %#" PRIx64 ":\n"),
-	  ".debug_line", (uint64_t) shdr->sh_offset);
+\nDWARF section [%2zu] '%s' at offset %#" PRIx64 ":\n"),
+	  elf_ndxscn (scn), ".debug_line", (uint64_t) shdr->sh_offset);
 
   if (shdr->sh_size == 0)
     return;
@@ -5504,11 +5529,8 @@ advance address by fixed value %u to %s\n"),
 
 static void
 print_debug_loc_section (Dwfl_Module *dwflmod,
-			 Ebl *ebl __attribute__ ((unused)),
-			 GElf_Ehdr *ehdr __attribute__ ((unused)),
-			 Elf_Scn *scn __attribute__ ((unused)),
-			 GElf_Shdr *shdr,
-			 Dwarf *dbg __attribute__ ((unused)))
+			 Ebl *ebl __attribute__ ((unused)), GElf_Ehdr *ehdr,
+			 Elf_Scn *scn, GElf_Shdr *shdr, Dwarf *dbg)
 {
   Elf_Data *data = elf_rawdata (scn, NULL);
 
@@ -5520,8 +5542,8 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
     }
 
   printf (gettext ("\
-\nDWARF section '%s' at offset %#" PRIx64 ":\n"),
-	  ".debug_loc", (uint64_t) shdr->sh_offset);
+\nDWARF section [%2zu] '%s' at offset %#" PRIx64 ":\n"),
+	  elf_ndxscn (scn), ".debug_loc", (uint64_t) shdr->sh_offset);
 
   size_t address_size = ehdr->e_ident[EI_CLASS] == ELFCLASS32 ? 4 : 8;
 
@@ -5615,8 +5637,8 @@ print_debug_macinfo_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 			     Elf_Scn *scn, GElf_Shdr *shdr, Dwarf *dbg)
 {
   printf (gettext ("\
-\nDWARF section '%s' at offset %#" PRIx64 ":\n"),
-	  ".debug_macinfo", (uint64_t) shdr->sh_offset);
+\nDWARF section [%2zu] '%s' at offset %#" PRIx64 ":\n"),
+	  elf_ndxscn (scn), ".debug_macinfo", (uint64_t) shdr->sh_offset);
   putc_unlocked ('\n', stdout);
 
   /* There is no function in libdw to iterate over the raw content of
@@ -5784,11 +5806,10 @@ static void
 print_debug_pubnames_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 			      Ebl *ebl __attribute__ ((unused)),
 			      GElf_Ehdr *ehdr __attribute__ ((unused)),
-			      Elf_Scn *scn __attribute__ ((unused)),
-			      GElf_Shdr *shdr, Dwarf *dbg)
+			      Elf_Scn *scn, GElf_Shdr *shdr, Dwarf *dbg)
 {
-  printf (gettext ("\nDWARF section '%s' at offset %#" PRIx64 ":\n"),
-	  ".debug_pubnames", (uint64_t) shdr->sh_offset);
+  printf (gettext ("\nDWARF section [%2zu] '%s' at offset %#" PRIx64 ":\n"),
+	  elf_ndxscn (scn), ".debug_pubnames", (uint64_t) shdr->sh_offset);
 
   int n = 0;
   (void) dwarf_getpubnames (dbg, print_pubnames, &n, 0);
@@ -5799,8 +5820,7 @@ static void
 print_debug_str_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 			 Ebl *ebl __attribute__ ((unused)),
 			 GElf_Ehdr *ehdr __attribute__ ((unused)),
-			 Elf_Scn *scn __attribute__ ((unused)),
-			 GElf_Shdr *shdr, Dwarf *dbg)
+			 Elf_Scn *scn, GElf_Shdr *shdr, Dwarf *dbg)
 {
   /* Compute floor(log16(shdr->sh_size)).  */
   GElf_Addr tmp = shdr->sh_size;
@@ -5812,8 +5832,9 @@ print_debug_str_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
     }
   digits = MAX (4, digits);
 
-  printf (gettext ("\nDWARF section '%s' at offset %#" PRIx64 ":\n"
+  printf (gettext ("\nDWARF section [%2zu] '%s' at offset %#" PRIx64 ":\n"
 		   " %*s  String\n"),
+	  elf_ndxscn (scn),
 	  ".debug_str", (uint64_t) shdr->sh_offset,
 	  /* TRANS: the debugstr| prefix makes the string unique.  */
 	  digits + 2, sgettext ("debugstr|Offset"));
@@ -5835,6 +5856,163 @@ print_debug_str_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
       offset += len + 1;
     }
 }
+
+
+static const unsigned char *
+read_encoded (unsigned int encoding, const unsigned char *readp,
+	      const unsigned char *const endp, uint64_t *res, Dwarf *dbg)
+{
+  switch (encoding & 0xf)
+    {
+    case DW_EH_PE_uleb128:
+      // XXX buffer overrun check
+      get_uleb128 (*res, readp);
+      break;
+    case DW_EH_PE_sleb128:
+      // XXX buffer overrun check
+      get_sleb128 (*res, readp);
+      break;
+    case DW_EH_PE_udata2:
+      if (readp + 2 > endp)
+	goto invalid;
+      *res = read_2ubyte_unaligned_inc (dbg, readp);
+      break;
+    case DW_EH_PE_udata4:
+      if (readp + 4 > endp)
+	goto invalid;
+      *res = read_4ubyte_unaligned_inc (dbg, readp);
+      break;
+    case DW_EH_PE_udata8:
+      if (readp + 8 > endp)
+	goto invalid;
+      *res = read_8ubyte_unaligned_inc (dbg, readp);
+      break;
+    case DW_EH_PE_sdata2:
+      if (readp + 2 > endp)
+	goto invalid;
+      *res = read_2sbyte_unaligned_inc (dbg, readp);
+      break;
+    case DW_EH_PE_sdata4:
+      if (readp + 4 > endp)
+	goto invalid;
+      *res = read_4sbyte_unaligned_inc (dbg, readp);
+      break;
+    case DW_EH_PE_sdata8:
+      if (readp + 8 > endp)
+	goto invalid;
+      *res = read_8sbyte_unaligned_inc (dbg, readp);
+      break;
+    default:
+    invalid:
+      error (1, 0,
+	     gettext ("invalid encoding"));
+    }
+
+  return readp;
+}
+
+
+/* Print the content of the call frame search table section
+   '.eh_frame_hdr'.  */
+static void
+print_debug_frame_hdr_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
+			       Ebl *ebl __attribute__ ((unused)),
+			       GElf_Ehdr *ehdr __attribute__ ((unused)),
+			       Elf_Scn *scn,
+			       GElf_Shdr *shdr __attribute__ ((unused)),
+			       Dwarf *dbg)
+{
+  printf (gettext ("\
+\nCall frame search table section [%2zu] '.eh_frame_hdr':\n"),
+	  elf_ndxscn (scn));
+
+  Elf_Data *data = elf_rawdata (scn, NULL);
+
+  if (unlikely (data == NULL))
+    {
+      error (0, 0, gettext ("cannot get %s content: %s"),
+	     ".eh_frame_hdr", elf_errmsg (-1));
+      return;
+    }
+
+  const unsigned char *readp = data->d_buf;
+  const unsigned char *const dataend = ((unsigned char *) data->d_buf
+					+ data->d_size);
+
+  if (unlikely (readp + 4 > dataend))
+    {
+    invalid_data:
+      error (0, 0, gettext ("invalid data"));
+      return;
+    }
+
+  unsigned int version = *readp++;
+  unsigned int eh_frame_ptr_enc = *readp++;
+  unsigned int fde_count_enc = *readp++;
+  unsigned int table_enc = *readp++;
+
+  printf (" version:          %u\n"
+	  " eh_frame_ptr_enc: %#x ",
+	  version, eh_frame_ptr_enc);
+  print_encoding_base (eh_frame_ptr_enc);
+  printf (" fde_count_enc:    %#x ", fde_count_enc);
+  print_encoding_base (fde_count_enc);
+  printf (" table_enc:        %#x ", table_enc);
+  print_encoding_base (table_enc);
+
+  uint64_t eh_frame_ptr = 0;
+  if (eh_frame_ptr_enc != DW_EH_PE_omit)
+    {
+      readp = read_encoded (eh_frame_ptr_enc, readp, dataend, &eh_frame_ptr,
+			    dbg);
+      if (unlikely (readp == NULL))
+	goto invalid_data;
+
+      printf (" eh_frame_ptr:     %#" PRIx64, eh_frame_ptr);
+      if ((eh_frame_ptr_enc & 0x70) == DW_EH_PE_pcrel)
+	printf (" (offset: %#" PRIx64 ")",
+		/* +4 because of the 4 byte header of the section.  */
+		(uint64_t) shdr->sh_offset + 4 + eh_frame_ptr);
+
+      putchar_unlocked ('\n');
+    }
+
+  uint64_t fde_count = 0;
+  if (fde_count_enc != DW_EH_PE_omit)
+    {
+      readp = read_encoded (fde_count_enc, readp, dataend, &fde_count, dbg);
+      if (unlikely (readp == NULL))
+	goto invalid_data;
+
+      printf (" fde_count:        %" PRIu64 "\n", fde_count);
+    }
+
+  if (fde_count == 0 || table_enc == DW_EH_PE_omit)
+    return;
+
+  puts (" Table:");
+
+  /* Optimize for the most common case.  */
+  if (table_enc == (DW_EH_PE_datarel | DW_EH_PE_sdata4))
+    while (fde_count > 0 && readp + 8 <= dataend)
+      {
+	int32_t initial_location = read_4sbyte_unaligned_inc (dbg, readp);
+	uint64_t initial_offset = ((uint64_t) shdr->sh_offset
+				   + (int64_t) initial_location);
+	int32_t address = read_4sbyte_unaligned_inc (dbg, readp);
+	// XXX Possibly print symbol name or section offset for initial_offset
+	printf ("  %#" PRIx32 " (offset: %#6" PRIx64 ") -> %#" PRIx32
+		" fde=[%6" PRIx64 "]\n",
+		initial_location, initial_offset,
+		address, address - (eh_frame_ptr + 4));
+      }
+  else
+    while (0 && readp < dataend)
+      {
+
+      }
+}
+
 
 static void
 print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
@@ -5884,7 +6062,8 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
 	      NEW_SECTION (str),
 	      NEW_SECTION (macinfo),
 	      NEW_SECTION (ranges),
-	      { ".eh_frame", section_frame, print_debug_frame_section }
+	      { ".eh_frame", section_frame, print_debug_frame_section },
+	      { ".eh_frame_hdr", section_frame, print_debug_frame_hdr_section }
 	    };
 	  const int ndebug_sections = (sizeof (debug_sections)
 				       / sizeof (debug_sections[0]));

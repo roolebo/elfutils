@@ -1,3 +1,28 @@
+2009-01-15  Ulrich Drepper  <drepper@redhat.com>
+
+	* readelf.c (print_encoding): Now a toplevel function.
+	(print_relinfo): Likewise.
+	(print_encoding_base): Broken out of print_debug_frame_section.
+	(print_debug_frame_section): Print different header for .eh_frame
+	sections.  Fix recognition of matching CIEs in .debug_frame sections.
+	Print absolute offset for PC-relative FDE locations.  Don't print
+	table header for FDEs if the table is empty.
+	(read_encoded): New function.
+	(print_debug_frame_hdr_section): New function.
+	(print_debug): Hook up print_debug_frame_hdr_section for .eh_frame_hdr
+	sections.
+
+	* readelf.c (handle_relocs_rel): Print section number.
+	(print_debug_abbrev_section): Likewise.
+	(print_debug_aranges_section): Likewise.
+	(print_debug_ranges_section): Likewise.
+	(print_debug_info_section): Likewise.
+	(print_debug_line_section): Likewise.
+	(print_debug_loc_section): Likewise.
+	(print_debug_macinfo_section): Likewise.
+	(print_debug_pubnames_section): Likewise.
+	(print_debug_str_section): Likewise.
+
 2009-01-10  Ulrich Drepper  <drepper@redhat.com>
 
 	* strings.c (read_block): Fix typo in error message string.

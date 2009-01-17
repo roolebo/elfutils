@@ -44,6 +44,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <system.h>
+
 
 struct segments
 {
@@ -54,10 +56,10 @@ struct segments
 
 /* Name and version of program.  */
 static void print_version (FILE *stream, struct argp_state *state);
-void (*argp_program_version_hook) (FILE *, struct argp_state *) = print_version;
+ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
 
 /* Bug report address.  */
-const char *argp_program_bug_address = PACKAGE_BUGREPORT;
+ARGP_PROGRAM_BUG_ADDRESS_DEF = PACKAGE_BUGREPORT;
 
 /* Values for the parameters which have no short form.  */
 #define OPT_DEBUGINFO 0x100

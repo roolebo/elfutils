@@ -1,5 +1,5 @@
 /* Declarations for common convenience functions.
-   Copyright (C) 2006 Red Hat, Inc.
+   Copyright (C) 2006, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -77,5 +77,17 @@ extern int crc32_file (int fd, uint32_t *resp);
      TEMP_FAILURE_RETRY (write (fd, buf, n))
 #define pread_retry(fd, buf,  len, off) \
   TEMP_FAILURE_RETRY (pread (fd, buf, len, off))
+
+
+/* We need define two variables, argp_program_version_hook and
+   argp_program_bug_address, in all programs.  argp.h declares these
+   variables as non-const (which is correct in general).  But we can
+   do better, it is not going to change.  So we want to move them into
+   the .rodata section.  Define macros to do the trick.  */
+#define ARGP_PROGRAM_VERSION_HOOK_DEF \
+  void (*const apvh) (FILE *, struct argp_state *) \
+   __asm ("argp_program_version_hook")
+#define ARGP_PROGRAM_BUG_ADDRESS_DEF \
+  const char *const apba__ __asm ("argp_program_bug_address")
 
 #endif /* system.h */

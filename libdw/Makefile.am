@@ -85,6 +85,11 @@ libdw_a_SOURCES = dwarf_begin.c dwarf_begin_elf.c dwarf_end.c dwarf_getelf.c \
 		  libdw_visit_scopes.c \
 		  dwarf_entry_breakpoints.c
 
+BUILT_SOURCES = known-dwarf.h
+known-dwarf.h: $(top_srcdir)/config/known-dwarf.awk $(srcdir)/dwarf.h
+	$(AWK) -f $^ > $@.new
+	mv -f $@.new $@
+
 if !MUDFLAP
 libdw_pic_a_SOURCES =
 am_libdw_pic_a_OBJECTS = $(libdw_a_SOURCES:.c=.os)

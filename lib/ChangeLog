@@ -1,3 +1,8 @@
+2009-01-17  Ulrich Drepper  <drepper@redhat.com>
+
+	* system.h (ARGP_PROGRAM_VERSION_HOOK_DEF): Define.
+	(ARGP_PROGRAM_BUG_ADDRESS_DEF): Define.
+
 2009-01-10  Ulrich Drepper  <drepper@redhat.com>
 
 	* eu-config.h: Remove tls_key_t, key_create, getspecific, setspecific,

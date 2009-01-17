@@ -1,5 +1,5 @@
 /* This file defines standard DWARF types, structures, and macros.
-   Copyright (C) 2000, 2002, 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright (C) 2000,2002,2005,2006,2007,2008,2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -432,6 +432,10 @@ enum
     DW_OP_call_frame_cfa = 0x9c,/* CFA as determined by CFI.  */
     DW_OP_bit_piece = 0x9d,	/* ULEB128 size and ULEB128 offset in bits.  */
 
+    /* GNU extensions.  */
+    DW_OP_GNU_push_tls_address = 0xe0,
+    DW_OP_GNU_uninit = 0xf0,
+
     DW_OP_lo_user = 0xe0,	/* Implementation-defined range start.  */
     DW_OP_hi_user = 0xff	/* Implementation-defined range end.  */
   };
@@ -515,25 +519,25 @@ enum
 /* DWARF language encodings.  */
 enum
   {
-    DW_LANG_C89 = 0x0001,
-    DW_LANG_C = 0x0002,
-    DW_LANG_Ada83 = 0x0003,
-    DW_LANG_C_plus_plus	= 0x0004,
-    DW_LANG_Cobol74 = 0x0005,
-    DW_LANG_Cobol85 = 0x0006,
-    DW_LANG_Fortran77 = 0x0007,
-    DW_LANG_Fortran90 = 0x0008,
-    DW_LANG_Pascal83 = 0x0009,
-    DW_LANG_Modula2 = 0x000a,
-    DW_LANG_Java = 0x000b,
-    DW_LANG_C99 = 0x000c,
-    DW_LANG_Ada95 = 0x000d,
-    DW_LANG_Fortran95 = 0x000e,
-    DW_LANG_PL1 = 0x000f,
-    DW_LANG_Objc = 0x0010,
-    DW_LANG_ObjC_plus_plus = 0x0011,
-    DW_LANG_UPC = 0x0012,
-    DW_LANG_D = 0x0013,
+    DW_LANG_C89 = 0x0001,	     /* ISO C:1989 */
+    DW_LANG_C = 0x0002,		     /* C */
+    DW_LANG_Ada83 = 0x0003,	     /* ISO Ada:1983 */
+    DW_LANG_C_plus_plus	= 0x0004,    /* ISO C++:1998 */
+    DW_LANG_Cobol74 = 0x0005,	     /* ISO Cobol:1974 */
+    DW_LANG_Cobol85 = 0x0006,	     /* ISO Cobol:1985 */
+    DW_LANG_Fortran77 = 0x0007,	     /* ISO FORTRAN 77 */
+    DW_LANG_Fortran90 = 0x0008,	     /* ISO Fortran 90 */
+    DW_LANG_Pascal83 = 0x0009,	     /* ISO Pascal:1983 */
+    DW_LANG_Modula2 = 0x000a,	     /* ISO Modula-2:1996 */
+    DW_LANG_Java = 0x000b,	     /* Java */
+    DW_LANG_C99 = 0x000c,	     /* ISO C:1999 */
+    DW_LANG_Ada95 = 0x000d,	     /* ISO Ada:1995 */
+    DW_LANG_Fortran95 = 0x000e,	     /* ISO Fortran 95 */
+    DW_LANG_PL1 = 0x000f,	     /* ISO PL/1:1976 */
+    DW_LANG_Objc = 0x0010,	     /* Objective-C */
+    DW_LANG_ObjC_plus_plus = 0x0011, /* Objective-C++ */
+    DW_LANG_UPC = 0x0012,	     /* Unified Parallel C */
+    DW_LANG_D = 0x0013,		     /* D */
 
     DW_LANG_lo_user = 0x8000,
     DW_LANG_Mips_Assembler = 0x8001,

@@ -1,5 +1,9 @@
 2009-01-16  Ulrich Drepper  <drepper@redhat.com>
 
+	* elflint.c (check_program_header): Check that PT_GNU_EH_FRAME entry
+	matches .eh_frame_hdr section, if it is available.  Also check that
+	the segment is allocated, not writable, not executable.
+
 	* readelf.c: Add -e option.  Dump exception and unwind related
 	sections.  Add -e to -a.
 	(print_encoding_base): Handle DW_EH_PE_omit.

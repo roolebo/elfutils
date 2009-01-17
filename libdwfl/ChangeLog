@@ -1,3 +1,8 @@
+2009-01-14  Roland McGrath  <roland@redhat.com>
+
+	* gzip.c [!BZLIB] (mapped_zImage): New function.
+	(unzip) [!BZLIB]: Grok Linux kernel zImage format.
+
 2009-01-10  Ulrich Drepper  <drepper@redhat.com>
 
 	* dwfl_error.c: Always use __thread.  Remove all !USE_TLS code.

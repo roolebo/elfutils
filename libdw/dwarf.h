@@ -432,6 +432,10 @@ enum
     DW_OP_call_frame_cfa = 0x9c,/* CFA as determined by CFI.  */
     DW_OP_bit_piece = 0x9d,	/* ULEB128 size and ULEB128 offset in bits.  */
 
+    /* GNU extensions.  */
+    DW_OP_GNU_push_tls_address = 0xe0,
+    DW_OP_GNU_uninit = 0xf0,
+
     DW_OP_lo_user = 0xe0,	/* Implementation-defined range start.  */
     DW_OP_hi_user = 0xff	/* Implementation-defined range end.  */
   };

@@ -56,10 +56,10 @@
 
 /* Name and version of program.  */
 static void print_version (FILE *stream, struct argp_state *state);
-void (*argp_program_version_hook) (FILE *, struct argp_state *) = print_version;
+ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
 
 /* Bug report address.  */
-const char *argp_program_bug_address = PACKAGE_BUGREPORT;
+ARGP_PROGRAM_BUG_ADDRESS_DEF = PACKAGE_BUGREPORT;
 
 #define ARGP_strict	300
 #define ARGP_gnuld	301
@@ -67,7 +67,6 @@ const char *argp_program_bug_address = PACKAGE_BUGREPORT;
 /* Definitions of arguments for argp functions.  */
 static const struct argp_option options[] =
 {
-
   { "strict", ARGP_strict, NULL, 0,
     N_("Be extremely strict, flag level 2 features."), 0 },
   { "quiet", 'q', NULL, 0, N_("Do not print anything if successful"), 0 },
@@ -4132,7 +4131,7 @@ more than one GNU_RELRO entry in program header\n"));
 		      if ((phdr2->p_flags & PF_W) == 0)
 			ERROR (gettext ("\
 loadable segment GNU_RELRO applies to is not writable\n"));
-		      if ((phdr2->p_flags &~ PF_W) != (phdr->p_flags &~ PF_W))
+		      if ((phdr2->p_flags & ~PF_W) != (phdr->p_flags & ~PF_W))
 			ERROR (gettext ("\
 loadable segment [%u] flags do not match GNU_RELRO [%u] flags\n"),
 			       cnt, inner);
@@ -4172,6 +4171,41 @@ loadable segment [%u] flags do not match GNU_RELRO [%u] flags\n"),
 	  if (phdr->p_offset != ehdr->e_phoff)
 	    ERROR (gettext ("\
 program header offset in ELF header and PHDR entry do not match"));
+	}
+      else if (phdr->p_type == PT_GNU_EH_FRAME)
+	{
+	  /* If there is an .eh_frame_hdr section it must be
+	     referenced by this program header entry.  */
+	  Elf_Scn *scn = NULL;
+	  while ((scn = elf_nextscn (ebl->elf, scn)) != NULL)
+	    {
+	      GElf_Shdr shdr_mem;
+	      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+	      if (shdr != NULL && shdr->sh_type == SHT_PROGBITS
+		  && ! strcmp (".eh_frame_hdr",
+			       elf_strptr (ebl->elf, shstrndx, shdr->sh_name)))
+		{
+		  if (phdr->p_offset != shdr->sh_offset)
+		    ERROR (gettext ("\
+call frame search table reference in program header has wrong offset\n"));
+		  if (phdr->p_memsz != shdr->sh_size)
+		    ERROR (gettext ("\
+call frame search table size mismatch in program and section header\n"));
+		  break;
+		}
+	    }
+
+	  /* The section must be allocated and not be writable and
+	     executable.  */
+	  if ((phdr->p_flags & PF_R) == 0)
+	    ERROR (gettext ("\
+call frame search table must be allocated\n"));
+	  if ((phdr->p_flags & PF_W) != 0)
+	    ERROR (gettext ("\
+call frame search table must not be writable\n"));
+	  if ((phdr->p_flags & PF_X) != 0)
+	    ERROR (gettext ("\
+call frame search table must not be executable\n"));
 	}
 
       if (phdr->p_filesz > phdr->p_memsz

@@ -1,7 +1,7 @@
 		      ToDo list for elfutils                      -*-outline-*-
                       ----------------------
 
-Time-stamp: <2009-01-01 16:56:38 drepper>
+Time-stamp: <2009-01-16 20:55:06 drepper>
 
 * mkinstalldirs
 
@@ -117,6 +117,8 @@ Time-stamp: <2009-01-01 16:56:38 drepper>
    check whether any relocation is for a merge-able section
 
    check TLS relocation depencies
+
+   Check content of .eh_frame_hdr, .eh_frame, .gcc_except_table
 
 *** for x86
 

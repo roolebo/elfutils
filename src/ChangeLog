@@ -2,6 +2,7 @@
 
 	* readelf.c: Add -e option.  Dump exception and unwind related
 	sections.  Add -e to -a.
+	(print_encoding_base): Handle DW_EH_PE_omit.
 	(print_debug_exception_table): Beginning of support.
 	(print_debug): Hook up print_debug_exception_table for
 	.gcc_except_table sections.

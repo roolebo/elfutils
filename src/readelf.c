@@ -4463,23 +4463,28 @@ print_encoding_base (const char *pfx, unsigned int fde_encoding)
 {
   printf ("(%s", pfx);
 
-  unsigned int w = fde_encoding;
-
-  if (w & 0xf)
-    w = print_encoding (w);
-
-  if (w & 0x70)
+  if (fde_encoding == DW_EH_PE_omit)
+    puts ("omit)");
+  else
     {
-      if (w != fde_encoding)
-	fputc_unlocked (' ', stdout);
+      unsigned int w = fde_encoding;
 
-      w = print_relinfo (w);
+      if (w & 0xf)
+	w = print_encoding (w);
+
+      if (w & 0x70)
+	{
+	  if (w != fde_encoding)
+	    fputc_unlocked (' ', stdout);
+
+	  w = print_relinfo (w);
+	}
+
+      if (w != 0)
+	printf ("%s%x", w != fde_encoding ? " " : "", w);
+
+      puts (")");
     }
-
-  if (w != 0)
-    printf ("(%s%x", w != fde_encoding ? " " : "", w);
-
-  puts (")");
 }
 
 
@@ -6074,7 +6079,7 @@ static void
 print_debug_exception_table (Dwfl_Module *dwflmod __attribute__ ((unused)),
 			     Ebl *ebl __attribute__ ((unused)),
 			     GElf_Ehdr *ehdr __attribute__ ((unused)),
-			     Elf_Scn *scn __attribute__ ((unused)),
+			     Elf_Scn *scn,
 			     GElf_Shdr *shdr __attribute__ ((unused)),
 			     Dwarf *dbg __attribute__ ((unused)))
 {
@@ -6089,6 +6094,135 @@ print_debug_exception_table (Dwfl_Module *dwflmod __attribute__ ((unused)),
       error (0, 0, gettext ("cannot get %s content: %s"),
 	     ".gcc_except_table", elf_errmsg (-1));
       return;
+    }
+
+  const unsigned char *readp = data->d_buf;
+  const unsigned char *const dataend = readp + data->d_size;
+
+  if (unlikely (readp + 1 > dataend))
+    {
+    invalid_data:
+      error (0, 0, gettext ("invalid data"));
+      return;
+    }
+  unsigned int lpstart_encoding = *readp++;
+  printf (gettext (" LPStart encoding:    %#x "), lpstart_encoding);
+  print_encoding_base ("", lpstart_encoding);
+  if (lpstart_encoding != DW_EH_PE_omit)
+    {
+      uint64_t lpstart;
+      readp = read_encoded (lpstart_encoding, readp, dataend, &lpstart, dbg);
+      printf (" LPStart:             %#" PRIx64 "\n", lpstart);
+    }
+
+  if (unlikely (readp + 1 > dataend))
+    goto invalid_data;
+  unsigned int ttype_encoding = *readp++;
+  printf (gettext (" TType encoding:      %#x "), ttype_encoding);
+  print_encoding_base ("", ttype_encoding);
+  const unsigned char *ttype_base = NULL;
+  if (ttype_encoding != DW_EH_PE_omit)
+    {
+      unsigned int ttype_base_offset;
+      get_uleb128 (ttype_base_offset, readp);
+      printf (" TType base offset:   %#x\n", ttype_base_offset);
+      ttype_base = readp + ttype_base_offset;
+    }
+
+  if (unlikely (readp + 1 > dataend))
+    goto invalid_data;
+  unsigned int call_site_encoding = *readp++;
+  printf (gettext (" Call site encoding:  %#x "), call_site_encoding);
+  print_encoding_base ("", call_site_encoding);
+  unsigned int call_site_table_len;
+  get_uleb128 (call_site_table_len, readp);
+
+  const unsigned char *const action_table = readp + call_site_table_len;
+  if (unlikely (action_table > dataend))
+    goto invalid_data;
+  unsigned int u = 0;
+  unsigned int max_action = 0;
+  while (readp < action_table)
+    {
+      if (u == 0)
+	puts (gettext ("\n Call site table:"));
+
+      uint64_t call_site_start;
+      readp = read_encoded (call_site_encoding, readp, dataend,
+			    &call_site_start, dbg);
+      uint64_t call_site_length;
+      readp = read_encoded (call_site_encoding, readp, dataend,
+			    &call_site_length, dbg);
+      uint64_t landing_pad;
+      readp = read_encoded (call_site_encoding, readp, dataend,
+			    &landing_pad, dbg);
+      unsigned int action;
+      get_uleb128 (action, readp);
+      max_action = MAX (action, max_action);
+      printf (gettext (" [%4u] Call site start:   %#" PRIx64 "\n"
+		       "        Call site length:  %" PRIu64 "\n"
+		       "        Landing pad:       %#" PRIx64 "\n"
+		       "        Action:            %u\n"),
+	      u++, call_site_start, call_site_length, landing_pad, action);
+    }
+  assert (readp == action_table);
+
+  unsigned int max_ar_filter = 0;
+  if (max_action > 0)
+    {
+      puts ("\n Action table:");
+
+      const unsigned char *const action_table_end
+	= action_table + max_action + 1;
+
+      u = 0;
+      do
+	{
+	  int ar_filter;
+	  get_sleb128 (ar_filter, readp);
+	  if (ar_filter > 0 && (unsigned int) ar_filter > max_ar_filter)
+	    max_ar_filter = ar_filter;
+	  int ar_disp;
+	  get_sleb128 (ar_disp, readp);
+
+	  printf (" [%4u] ar_filter:  %d\n"
+		  "        ar_disp:    %d\n",
+		  u++, ar_filter, ar_disp);
+	}
+      while (readp < action_table_end);
+    }
+
+  if (max_ar_filter > 0)
+    {
+      puts ("\n TType table:");
+
+      // XXX Not *4, size of encoding;
+      switch (ttype_encoding & 7)
+	{
+	case DW_EH_PE_udata2:
+	case DW_EH_PE_sdata2:
+	  readp = ttype_base - max_ar_filter * 2;
+	  break;
+	case DW_EH_PE_udata4:
+	case DW_EH_PE_sdata4:
+	  readp = ttype_base - max_ar_filter * 4;
+	  break;
+	case DW_EH_PE_udata8:
+	case DW_EH_PE_sdata8:
+	  readp = ttype_base - max_ar_filter * 8;
+	  break;
+	default:
+	  error (1, 0, gettext ("invalid TType encoding"));
+	}
+
+      do
+	{
+	  uint64_t ttype;
+	  readp = read_encoded (ttype_encoding, readp, ttype_base, &ttype,
+				dbg);
+	  printf (" [%4u] %#" PRIx64 "\n", max_ar_filter--, ttype);
+	}
+      while (readp < ttype_base);
     }
 }
 

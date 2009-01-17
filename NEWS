@@ -2,7 +2,8 @@ Version 0.139:
 
 libcpu: Add Intel SSE4 disassembler support
 
-readelf: Implement call frame information dumping.
+readelf: Implement call frame information and exception handling dumping.
+         Add -e option.  Enable it implicitly for -a.
 
 libdwfl: Support automatic gzip/bzip2 decompression of ELF files.
 

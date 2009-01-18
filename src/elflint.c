@@ -4199,10 +4199,11 @@ program header offset in ELF header and PHDR entry do not match"));
 	  /* If there is an .eh_frame_hdr section it must be
 	     referenced by this program header entry.  */
 	  Elf_Scn *scn = NULL;
+	  GElf_Shdr shdr_mem;
+	  GElf_Shdr *shdr = NULL;
 	  while ((scn = elf_nextscn (ebl->elf, scn)) != NULL)
 	    {
-	      GElf_Shdr shdr_mem;
-	      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+	      shdr = gelf_getshdr (scn, &shdr_mem);
 	      if (shdr != NULL && shdr->sh_type == SHT_PROGBITS
 		  && ! strcmp (".eh_frame_hdr",
 			       elf_strptr (ebl->elf, shstrndx, shdr->sh_name)))
@@ -4222,12 +4223,25 @@ call frame search table size mismatch in program and section header\n"));
 	  if ((phdr->p_flags & PF_R) == 0)
 	    ERROR (gettext ("\
 call frame search table must be allocated\n"));
+	  else if (shdr != NULL && (shdr->sh_flags & SHF_ALLOC) != 0)
+	    ERROR (gettext ("\
+section [%2zu] '%s' must be allocated\n"), elf_ndxscn (scn), ".eh_frame_hdr");
+
 	  if ((phdr->p_flags & PF_W) != 0)
 	    ERROR (gettext ("\
 call frame search table must not be writable\n"));
+	  else if (shdr != NULL && (shdr->sh_flags & SHF_WRITE) != 0)
+	    ERROR (gettext ("\
+section [%2zu] '%s' must not be writable\n"),
+		   elf_ndxscn (scn), ".eh_frame_hdr");
+
 	  if ((phdr->p_flags & PF_X) != 0)
 	    ERROR (gettext ("\
 call frame search table must not be executable\n"));
+	  else if (shdr != NULL && (shdr->sh_flags & SHF_EXECINSTR) != 0)
+	    ERROR (gettext ("\
+section [%2zu] '%s' must not be executable\n"),
+		   elf_ndxscn (scn), ".eh_frame_hdr");
 
 	  /* Remember which entry this is.  */
 	  pt_gnu_eh_frame_pndx = cnt;
@@ -4253,10 +4267,9 @@ program header entry %d: file offset and virtual address not module of alignment
 
 
 static void
-check_exception_data (Ebl *ebl, GElf_Ehdr *ehdr)
+check_exception_data (Ebl *ebl __attribute__ ((unused)),
+		      GElf_Ehdr *ehdr __attribute__ ((unused)))
 {
-  ebl;
-  ehdr;
 }
 
 

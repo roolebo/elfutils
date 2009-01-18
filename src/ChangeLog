@@ -1,5 +1,11 @@
 2009-01-17  Ulrich Drepper  <drepper@redhat.com>
 
+	* readelf.c (print_debug_exception_table): Show target of ar_disp
+	field.
+
+	* elflint.c (check_program_header): Add most consistency checks for
+	PT_GNU_EH_FRAME entry.
+
 	* addr2line.c: Use ARGP_PROGRAM_VERSION_HOOK_DEF and
 	ARGP_PROGRAM_BUG_ADDRESS_DEF.
 	* ar.c: Likewise.
@@ -11,6 +17,7 @@
 	* objdump.c: Likewise.
 	* ranlib.c: Likewise.
 	* readelf.c: Likewise.
+
 	* size.c: Likewise.
 	* strings.c: Likewise.
 	* strip.c: Likewise.

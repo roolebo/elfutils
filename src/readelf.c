@@ -6185,9 +6185,16 @@ print_debug_exception_table (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	  int ar_disp;
 	  get_sleb128 (ar_disp, readp);
 
-	  printf (" [%4u] ar_filter:  %d\n"
-		  "        ar_disp:    %d\n",
-		  u++, ar_filter, ar_disp);
+	  printf (" [%4u] ar_filter:  % d\n"
+		  "        ar_disp:    % -5d",
+		  u, ar_filter, ar_disp);
+	  if (abs (ar_disp) & 1)
+	    printf (" -> [%4u]\n", u + (ar_disp + 1) / 2);
+	  else if (ar_disp != 0)
+	    puts (" -> ???");
+	  else
+	    putchar_unlocked ('\n');
+	  ++u;
 	}
       while (readp < action_table_end);
     }

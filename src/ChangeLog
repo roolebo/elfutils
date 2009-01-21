@@ -1,3 +1,9 @@
+2009-01-21  Ulrich Drepper  <drepper@redhat.com>
+
+	* elflint.c (check_program_header): Fix typo in .eh_frame_hdr section
+	test.
+	(check_exception_data): First sanity test.
+
 2009-01-17  Ulrich Drepper  <drepper@redhat.com>
 
 	* readelf.c (print_debug_exception_table): Show target of ar_disp

@@ -4223,7 +4223,7 @@ call frame search table size mismatch in program and section header\n"));
 	  if ((phdr->p_flags & PF_R) == 0)
 	    ERROR (gettext ("\
 call frame search table must be allocated\n"));
-	  else if (shdr != NULL && (shdr->sh_flags & SHF_ALLOC) != 0)
+	  else if (shdr != NULL && (shdr->sh_flags & SHF_ALLOC) == 0)
 	    ERROR (gettext ("\
 section [%2zu] '%s' must be allocated\n"), elf_ndxscn (scn), ".eh_frame_hdr");
 
@@ -4270,6 +4270,10 @@ static void
 check_exception_data (Ebl *ebl __attribute__ ((unused)),
 		      GElf_Ehdr *ehdr __attribute__ ((unused)))
 {
+  if ((ehdr->e_type == ET_EXEC || ehdr->e_type == ET_DYN)
+      && pt_gnu_eh_frame_pndx == 0 && eh_frame_hdr_scnndx != 0)
+    ERROR (gettext ("executable/DSO with .eh_frame_hdr section does not have "
+		    "a PT_GNU_EH_FRAME program header entry"));
 }
 
 

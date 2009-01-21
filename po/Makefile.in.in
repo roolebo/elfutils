@@ -9,6 +9,7 @@
 # General Public License and is *not* in the public domain.
 #
 # Origin: gettext-0.16
+#
 
 PACKAGE = @PACKAGE@
 VERSION = @VERSION@

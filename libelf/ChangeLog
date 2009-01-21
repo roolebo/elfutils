@@ -1,3 +1,10 @@
+2009-01-21  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf32_updatefile.c (elfXX_updatemmap): When skipping non-NOBITS
+	sections we haven't loaded, update last_position based on scn_start,
+	not based on old value.  Don't run the loop for the dummy section 0.
+	(elfXX_updatefile): Don't run the loop for the dummy section 0.
+
 2009-01-10  Ulrich Drepper  <drepper@redhat.com>
 
 	* libelfP.h (_): We only have one translation domain, elfutils.

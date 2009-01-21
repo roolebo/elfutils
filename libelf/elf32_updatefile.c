@@ -283,6 +283,13 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
       for (size_t cnt = 0; cnt < shnum; ++cnt)
 	{
 	  Elf_Scn *scn = scns[cnt];
+	  if (scn->index == 0)
+	    {
+	      /* The dummy section header entry.  It should not be
+		 possible to make this "section" as dirty.  */
+	      assert ((scn->flags & ELF_F_DIRTY) == 0);
+	      continue;
+	    }
 
 	  ElfW2(LIBELFBITS,Shdr) *shdr = scn->shdr.ELFW(e,LIBELFBITS);
 
@@ -362,9 +369,9 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 		dl = dl->next;
 	      }
 	    while (dl != NULL);
-	  else if (shdr->sh_type != SHT_NOBITS && scn->index != 0)
+	  else if (shdr->sh_type != SHT_NOBITS)
 	    /* We have to trust the existing section header information.  */
-	    last_position += shdr->sh_size;
+	    last_position = scn_start + shdr->sh_size;
 
 	  scn->flags &= ~ELF_F_DIRTY;
 	}
@@ -616,6 +623,13 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
       for (size_t cnt = 0; cnt < shnum; ++cnt)
 	{
 	  Elf_Scn *scn = scns[cnt];
+	  if (scn->index == 0)
+	    {
+	      /* The dummy section header entry.  It should not be
+		 possible to make this "section" as dirty.  */
+	      assert ((scn->flags & ELF_F_DIRTY) == 0);
+	      continue;
+	    }
 
 	  ElfW2(LIBELFBITS,Shdr) *shdr = scn->shdr.ELFW(e,LIBELFBITS);
 
@@ -695,7 +709,7 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 		dl = dl->next;
 	      }
 	    while (dl != NULL);
-	  else if (shdr->sh_type != SHT_NOBITS && scn->index != 0)
+	  else if (shdr->sh_type != SHT_NOBITS)
 	    last_offset = scn_start + shdr->sh_size;
 
 	  /* Collect the section header table information.  */

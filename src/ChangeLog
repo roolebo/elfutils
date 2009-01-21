@@ -1,7 +1,7 @@
 2009-01-21  Ulrich Drepper  <drepper@redhat.com>
 
 	* elflint.c (check_program_header): Fix typo in .eh_frame_hdr section
-	test.
+	test.  Handle debuginfo files.
 	(check_exception_data): First sanity test.
 
 2009-01-17  Ulrich Drepper  <drepper@redhat.com>

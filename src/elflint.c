@@ -4201,47 +4201,66 @@ program header offset in ELF header and PHDR entry do not match"));
 	  Elf_Scn *scn = NULL;
 	  GElf_Shdr shdr_mem;
 	  GElf_Shdr *shdr = NULL;
+	  bool any = false;
 	  while ((scn = elf_nextscn (ebl->elf, scn)) != NULL)
 	    {
+	      any = true;
 	      shdr = gelf_getshdr (scn, &shdr_mem);
-	      if (shdr != NULL && shdr->sh_type == SHT_PROGBITS
+	      if (shdr != NULL
+		  && shdr->sh_type == (is_debuginfo
+				       ? SHT_NOBITS : SHT_PROGBITS)
 		  && ! strcmp (".eh_frame_hdr",
 			       elf_strptr (ebl->elf, shstrndx, shdr->sh_name)))
 		{
-		  if (phdr->p_offset != shdr->sh_offset)
-		    ERROR (gettext ("\
+		  if (! is_debuginfo)
+		    {
+		      if (phdr->p_offset != shdr->sh_offset)
+			ERROR (gettext ("\
 call frame search table reference in program header has wrong offset\n"));
-		  if (phdr->p_memsz != shdr->sh_size)
-		    ERROR (gettext ("\
+		      if (phdr->p_memsz != shdr->sh_size)
+			ERROR (gettext ("\
 call frame search table size mismatch in program and section header\n"));
+		    }
 		  break;
 		}
 	    }
 
-	  /* The section must be allocated and not be writable and
-	     executable.  */
-	  if ((phdr->p_flags & PF_R) == 0)
-	    ERROR (gettext ("\
+	  if (scn == NULL)
+	    {
+	      /* If there is no section header table we don't
+		 complain.  But if there is one there should be an
+		 entry for .eh_frame_hdr.  */
+	      if (any)
+		ERROR (gettext ("\
+PT_GNU_EH_FRAME present but no .eh_frame_hdr section\n"));
+	    }
+	  else
+	    {
+	      /* The section must be allocated and not be writable and
+		 executable.  */
+	      if ((phdr->p_flags & PF_R) == 0)
+		ERROR (gettext ("\
 call frame search table must be allocated\n"));
-	  else if (shdr != NULL && (shdr->sh_flags & SHF_ALLOC) == 0)
-	    ERROR (gettext ("\
+	      else if (shdr != NULL && (shdr->sh_flags & SHF_ALLOC) == 0)
+		ERROR (gettext ("\
 section [%2zu] '%s' must be allocated\n"), elf_ndxscn (scn), ".eh_frame_hdr");
 
-	  if ((phdr->p_flags & PF_W) != 0)
-	    ERROR (gettext ("\
+	      if ((phdr->p_flags & PF_W) != 0)
+		ERROR (gettext ("\
 call frame search table must not be writable\n"));
-	  else if (shdr != NULL && (shdr->sh_flags & SHF_WRITE) != 0)
-	    ERROR (gettext ("\
+	      else if (shdr != NULL && (shdr->sh_flags & SHF_WRITE) != 0)
+		ERROR (gettext ("\
 section [%2zu] '%s' must not be writable\n"),
-		   elf_ndxscn (scn), ".eh_frame_hdr");
+		       elf_ndxscn (scn), ".eh_frame_hdr");
 
-	  if ((phdr->p_flags & PF_X) != 0)
-	    ERROR (gettext ("\
+	      if ((phdr->p_flags & PF_X) != 0)
+		ERROR (gettext ("\
 call frame search table must not be executable\n"));
-	  else if (shdr != NULL && (shdr->sh_flags & SHF_EXECINSTR) != 0)
-	    ERROR (gettext ("\
+	      else if (shdr != NULL && (shdr->sh_flags & SHF_EXECINSTR) != 0)
+		ERROR (gettext ("\
 section [%2zu] '%s' must not be executable\n"),
-		   elf_ndxscn (scn), ".eh_frame_hdr");
+		       elf_ndxscn (scn), ".eh_frame_hdr");
+	    }
 
 	  /* Remember which entry this is.  */
 	  pt_gnu_eh_frame_pndx = cnt;

@@ -1,7 +1,4 @@
-Dummy commit, testing Transifex at
-https://translate.fedoraproject.org/submit/module/elfutils/.
-            
-Transmitted-via: Transifex (translate.fedoraproject.org)2007-06-05  Ulrich Drepper  <drepper@redhat.com>
+2007-06-05  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.in.in: Update from gettext 0.16.1.
 	* Rules-quot: Likewise.

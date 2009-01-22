@@ -1,8 +1,3 @@
-2009-01-04  Roland McGrath  <roland@redhat.com>
-
-	* note_xlate.h (elf_cvt_note): Don't examine a size too small to
-	container a note header.
-
 2009-01-21  Ulrich Drepper  <drepper@redhat.com>
 
 	* elf32_updatefile.c (elfXX_updatemmap): When skipping non-NOBITS

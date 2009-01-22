@@ -1,8 +1,3 @@
-2009-01-05  Roland McGrath  <roland@redhat.com>
-
-	* elfcmp.c: Exit with status 2 for errors (like cmp, diff, grep).
-	Status 1 (aka EXIT_FAILURE) is only for completed OK but not equal.
-
 2009-01-21  Ulrich Drepper  <drepper@redhat.com>
 
 	* elflint.c (check_program_header): Fix typo in .eh_frame_hdr section

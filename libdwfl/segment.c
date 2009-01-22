@@ -1,5 +1,5 @@
 /* Manage address space lookup table for libdwfl.
-   Copyright (C) 2008 Red Hat, Inc.
+   Copyright (C) 2008, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -142,7 +142,7 @@ lookup (Dwfl *dwfl, GElf_Addr address, int hint)
   if (hint >= 0
       && address >= dwfl->lookup_addr[hint]
       && ((size_t) hint + 1 == dwfl->lookup_elts
-	  || address <= dwfl->lookup_addr[hint + 1]))
+	  || address < dwfl->lookup_addr[hint + 1]))
     return hint;
 
   /* Do binary search on the array indexed by module load address.  */

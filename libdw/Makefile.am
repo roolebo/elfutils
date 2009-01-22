@@ -86,6 +86,7 @@ libdw_a_SOURCES = dwarf_begin.c dwarf_begin_elf.c dwarf_end.c dwarf_getelf.c \
 		  dwarf_entry_breakpoints.c
 
 BUILT_SOURCES = known-dwarf.h
+CLEANFILES = known-dwarf.h
 known-dwarf.h: $(top_srcdir)/config/known-dwarf.awk $(srcdir)/dwarf.h
 	$(AWK) -f $^ > $@.new
 	mv -f $@.new $@
@@ -135,4 +136,4 @@ noinst_HEADERS = libdwP.h memory-access.h dwarf_abbrev_hash.h
 
 EXTRA_DIST = libdw.map
 
-CLEANFILES = $(am_libdw_pic_a_OBJECTS) *.gcno *.gcda libdw.so.$(VERSION)
+MOSTLYCLEANFILES = $(am_libdw_pic_a_OBJECTS) *.gcno *.gcda libdw.so.$(VERSION)

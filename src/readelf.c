@@ -4701,13 +4701,12 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 		      unsigned int encoding = *readp++;
 		      uint64_t val = 0;
 		      int64_t sval = 0;
-		      bool is_signed;
+		      bool is_signed = false;
 
 		      switch (encoding & 0xf)
 			{
 			case DW_EH_PE_uleb128:
 			  get_uleb128 (val, readp);
-			  is_signed = false;
 			  break;
 			case DW_EH_PE_sleb128:
 			  get_sleb128 (sval, readp);
@@ -4715,15 +4714,12 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 			  break;
 			case DW_EH_PE_udata2:
 			  val = read_2ubyte_unaligned_inc (dbg, readp);
-			  is_signed = false;
 			  break;
 			case DW_EH_PE_udata4:
 			  val = read_4ubyte_unaligned_inc (dbg, readp);
-			  is_signed = false;
 			  break;
 			case DW_EH_PE_udata8:
 			  val = read_8ubyte_unaligned_inc (dbg, readp);
-			  is_signed = false;
 			  break;
 			case DW_EH_PE_sdata2:
 			  val = read_2sbyte_unaligned_inc (dbg, readp);

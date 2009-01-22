@@ -1,5 +1,10 @@
 2009-01-22  Roland McGrath  <roland@redhat.com>
 
+	* readelf.c (print_debug_frame_section): Initialize IS_SIGNED to false
+	and reset it only for the 'true' cases.
+
+	* Makefile.am (addr2line_no_Wformat): New variable.
+
 	* readelf.c (print_debug_frame_section): Use t instead of j formats
 	for ptrdiff_t OFFSET.
 

@@ -80,6 +80,7 @@
 2009-01-06  Ulrich Drepper  <drepper@redhat.com>
 
 	* readelf.c: Implement call frame debug section dumping.
+
 2009-01-05  Roland McGrath  <roland@redhat.com>
 
 	* elfcmp.c: Exit with status 2 for errors (like cmp, diff, grep).

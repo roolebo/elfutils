@@ -435,6 +435,7 @@ enum
     /* GNU extensions.  */
     DW_OP_GNU_push_tls_address = 0xe0,
     DW_OP_GNU_uninit = 0xf0,
+    DW_OP_GNU_encoded_addr = 0xf1,
 
     DW_OP_lo_user = 0xe0,	/* Implementation-defined range start.  */
     DW_OP_hi_user = 0xff	/* Implementation-defined range end.  */

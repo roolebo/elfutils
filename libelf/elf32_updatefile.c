@@ -292,12 +292,14 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 	    }
 
 	  ElfW2(LIBELFBITS,Shdr) *shdr = scn->shdr.ELFW(e,LIBELFBITS);
+	  if (shdr->sh_type == SHT_NOBITS)
+	    goto next;
 
 	  char *scn_start = ((char *) elf->map_address
 			     + elf->start_offset + shdr->sh_offset);
 	  Elf_Data_List *dl = &scn->data_list;
 
-	  if (shdr->sh_type != SHT_NOBITS && scn->data_list_rear != NULL)
+	  if (scn->data_list_rear != NULL)
 	    do
 	      {
 		assert (dl->data.d.d_off >= 0);
@@ -369,10 +371,11 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 		dl = dl->next;
 	      }
 	    while (dl != NULL);
-	  else if (shdr->sh_type != SHT_NOBITS)
+	  else
 	    /* We have to trust the existing section header information.  */
 	    last_position = scn_start + shdr->sh_size;
 
+	next:
 	  scn->flags &= ~ELF_F_DIRTY;
 	}
 
@@ -632,12 +635,13 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 	    }
 
 	  ElfW2(LIBELFBITS,Shdr) *shdr = scn->shdr.ELFW(e,LIBELFBITS);
+	  if (shdr->sh_type == SHT_NOBITS)
+	    goto next;
 
 	  off_t scn_start = elf->start_offset + shdr->sh_offset;
 	  Elf_Data_List *dl = &scn->data_list;
 
-	  if (shdr->sh_type != SHT_NOBITS && scn->data_list_rear != NULL
-	      && scn->index != 0)
+	  if (scn->data_list_rear != NULL)
 	    do
 	      {
 		if ((scn->flags | dl->flags | elf->flags) & ELF_F_DIRTY)
@@ -709,9 +713,10 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 		dl = dl->next;
 	      }
 	    while (dl != NULL);
-	  else if (shdr->sh_type != SHT_NOBITS)
+	  else
 	    last_offset = scn_start + shdr->sh_size;
 
+	next:
 	  /* Collect the section header table information.  */
 	  if (unlikely (change_bo))
 	    (*shdr_fctp) (&shdr_data[scn->index],

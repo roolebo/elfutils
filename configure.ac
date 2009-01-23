@@ -75,12 +75,19 @@ AS_IF([test "x$ac_cv_c99" != xyes],
       AC_MSG_ERROR([gcc with C99 support required]))
 
 AC_CACHE_CHECK([for __thread support], ac_cv_tls, [dnl
+# Use the same flags that we use for our DSOs, so the test is representative.
+# Some old compiler/linker/libc combinations fail some ways and not others.
+save_CFLAGS="$CFLAGS"
+save_LDFLAGS="$LDFLAGS"
+CFLAGS="-fpic $CFLAGS"
+LDFLAGS="-shared -Wl,-z,defs,-z,relro $LDFLAGS"
 AC_LINK_IFELSE([dnl
 AC_LANG_PROGRAM([[#undef __thread
-static __thread int a __attribute__ ((tls_model ("local-dynamic")));
-int foo (int b) { return a + b; }]],
+static __thread int a; int foo (int b) { return a + b; }]],
 		[[exit (foo (0));]])],
-	       ac_cv_tls=yes, ac_cv_tls=no)])
+	       ac_cv_tls=yes, ac_cv_tls=no)
+CFLAGS="$save_CFLAGS"
+LDFLAGS="$save_LDFLAGS"])
 AS_IF([test "x$ac_cv_tls" != xyes],
       AC_MSG_ERROR([__thread support required]))
 

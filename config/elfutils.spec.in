@@ -176,6 +176,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_includedir}/libelf.h
 %{_includedir}/gelf.h
 %{_includedir}/nlist.h
+%{_includedir}/elfutils/version.h
 %{_libdir}/libelf.so
 
 %files libelf-devel-static

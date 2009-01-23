@@ -1,3 +1,8 @@
+2009-01-22  Ulrich Drepper  <drepper@redhat.com>
+
+	* elfutils.spec.in: Distribute <elfutils/version.h> in
+	elfutils-libelf-devel.
+
 2009-01-22  Roland McGrath  <roland@redhat.com>
 
 	* known-dwarf.awk: Handle DW_FOO_BAR_* sets better.

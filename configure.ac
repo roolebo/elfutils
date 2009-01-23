@@ -74,12 +74,13 @@ CFLAGS="$old_CFLAGS"])
 AS_IF([test "x$ac_cv_c99" != xyes],
       AC_MSG_ERROR([gcc with C99 support required]))
 
-AC_CACHE_CHECK([for gcc with TLS support], ac_cv_tls, [dnl
-AC_COMPILE_IFELSE([dnl
-__thread int a; int foo (int b) { return a + b; }],
-		  ac_cv_tls=yes, ac_cv_tls=no)])
+AC_CACHE_CHECK([for __thread support], ac_cv_tls, [dnl
+AC_LINK_IFELSE([dnl
+AC_LANG_PROGRAM([[static __thread int a; int foo (int b) { return a + b; }]],
+		[[exit (foo (0));]])],
+	       ac_cv_tls=yes, ac_cv_tls=no)])
 AS_IF([test "x$ac_cv_tls" != xyes],
-      AC_MSG_ERROR([gcc with TLS support required]))
+      AC_MSG_ERROR([__thread support required]))
 
 LOCALEDIR=$datadir
 AC_SUBST(LOCALEDIR)

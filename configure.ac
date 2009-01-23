@@ -76,7 +76,9 @@ AS_IF([test "x$ac_cv_c99" != xyes],
 
 AC_CACHE_CHECK([for __thread support], ac_cv_tls, [dnl
 AC_LINK_IFELSE([dnl
-AC_LANG_PROGRAM([[static __thread int a; int foo (int b) { return a + b; }]],
+AC_LANG_PROGRAM([[#undef __thread
+static __thread int a __attribute__ ((tls_model ("local-dynamic")));
+int foo (int b) { return a + b; }]],
 		[[exit (foo (0));]])],
 	       ac_cv_tls=yes, ac_cv_tls=no)])
 AS_IF([test "x$ac_cv_tls" != xyes],

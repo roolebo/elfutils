@@ -976,6 +976,10 @@ print_phdr (Ebl *ebl, GElf_Ehdr *ehdr)
 	}
     }
 
+  if (ehdr->e_shnum == 0)
+    /* No sections in the file.  Punt.  */
+    return;
+
   /* Get the section header string table index.  */
   size_t shstrndx;
   if (unlikely (elf_getshstrndx (ebl->elf, &shstrndx) < 0))

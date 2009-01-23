@@ -1,3 +1,7 @@
+2009-01-22  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (rpm): The tarball is now bzip2-compressed.
+
 2009-01-10  Ulrich Drepper  <drepper@redhat.com>
 
 	* configure.ac: Require gcc with TLS support.

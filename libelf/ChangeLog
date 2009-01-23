@@ -1,10 +1,17 @@
+2009-01-22  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf32_updatefile.c (__elfXX_updatemmap): Fill the gap between
+	sections even if only the section at the start of the gap has been
+	changed.
+	(__elfXX_updatefile): Likewise.
+
 2009-01-21  Ulrich Drepper  <drepper@redhat.com>
 
-	* elf32_updatefile.c (elfXX_updatemmap): Skip most of the loop to
+	* elf32_updatefile.c (__elfXX_updatemmap): Skip most of the loop to
 	handle sections for NOBITS sections.
 	(elfXX_updatefile): Likewise.
 
-	* elf32_updatefile.c (elfXX_updatemmap): When skipping non-NOBITS
+	* elf32_updatefile.c (__elfXX_updatemmap): When skipping non-NOBITS
 	sections we haven't loaded, update last_position based on scn_start,
 	not based on old value.  Don't run the loop for the dummy section 0.
 	(elfXX_updatefile): Don't run the loop for the dummy section 0.

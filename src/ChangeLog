@@ -1,3 +1,13 @@
+2009-01-22  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (print_debug_frame_section): Initialize IS_SIGNED to false
+	and reset it only for the 'true' cases.
+
+	* Makefile.am (addr2line_no_Wformat): New variable.
+
+	* readelf.c (print_debug_frame_section): Use t instead of j formats
+	for ptrdiff_t OFFSET.
+
 2009-01-21  Ulrich Drepper  <drepper@redhat.com>
 
 	* elflint.c (check_program_header): Fix typo in .eh_frame_hdr section
@@ -80,6 +90,7 @@
 2009-01-06  Ulrich Drepper  <drepper@redhat.com>
 
 	* readelf.c: Implement call frame debug section dumping.
+
 2009-01-05  Roland McGrath  <roland@redhat.com>
 
 	* elfcmp.c: Exit with status 2 for errors (like cmp, diff, grep).

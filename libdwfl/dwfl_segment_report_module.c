@@ -1,5 +1,5 @@
 /* Sniff out modules from ELF headers visible in memory segments.
-   Copyright (C) 2008 Red Hat, Inc.
+   Copyright (C) 2008, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -86,13 +86,6 @@ addr_segndx (Dwfl *dwfl, size_t segment, GElf_Addr addr)
     }
   while (segment < dwfl->lookup_elts - 1
 	 && dwfl->lookup_addr[segment] < addr);
-
-  while (dwfl->lookup_segndx[segment] < 0
-	 && segment < dwfl->lookup_elts - 1)
-      ++segment;
-
-  if (dwfl->lookup_segndx[segment] >= 0)
-    ndx = dwfl->lookup_segndx[segment];
 
   return ndx;
 }

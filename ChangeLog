@@ -1,5 +1,7 @@
 2009-01-23  Roland McGrath  <roland@redhat.com>
 
+	* configure.ac (zlib check): Check for gzdirect, need zlib >= 1.2.2.3.
+
 	* configure.ac (__thread check): Use AC_LINK_IFELSE, in case of
 	building with compiler support but no working runtime support.
 

@@ -34,7 +34,7 @@ endif
 AM_CFLAGS += -Wall -Wshadow -std=gnu99 $(native_ld_cflags) \
 	     $(if $($(*F)_no_Werror),,-Werror) \
 	     $(if $($(*F)_no_Wunused),,-Wunused -Wextra) \
-	     $(if $($(*F)_no_Wformat),,-Wformat=2) $(CFLAGS_$(*F))
+	     $(if $($(*F)_no_Wformat),-Wno-format,-Wformat=2) $(CFLAGS_$(*F))
 
 INCLUDES = -I$(srcdir) -I$(srcdir)/../libelf -I$(srcdir)/../libebl \
 	   -I$(srcdir)/../libdw -I$(srcdir)/../libdwfl \

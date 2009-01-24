@@ -275,6 +275,17 @@ static error_t
 parse_opt (int key, char *arg,
 	   struct argp_state *state __attribute__ ((unused)))
 {
+  void add_dump_section (const char *name)
+  {
+    struct section_argument *a = xmalloc (sizeof *a);
+    a->arg = name;
+    a->next = NULL;
+    struct section_argument ***tailp
+      = key == 'x' ? &dump_data_sections_tail : &string_sections_tail;
+    **tailp = a;
+    *tailp = &a->next;
+  }
+
   switch (key)
     {
     case 'a':
@@ -290,6 +301,9 @@ parse_opt (int key, char *arg,
       print_arch = true;
       print_notes = true;
       print_debug_sections |= section_exception;
+      add_dump_section (".strtab");
+      add_dump_section (".dynstr");
+      add_dump_section (".comment");
       any_control_option = true;
       break;
     case 'A':
@@ -387,15 +401,7 @@ parse_opt (int key, char *arg,
 	}
       /* Fall through.  */
     case 'x':
-      {
-	struct section_argument *a = xmalloc (sizeof *a);
-	a->arg = arg;
-	a->next = NULL;
-	struct section_argument ***tailp
-	  = key == 'x' ? &dump_data_sections_tail : &string_sections_tail;
-	**tailp = a;
-	*tailp = &a->next;
-      }
+      add_dump_section (arg);
       any_control_option = true;
       break;
     case ARGP_KEY_NO_ARGS:

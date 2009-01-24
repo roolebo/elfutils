@@ -85,11 +85,13 @@ libdw_a_SOURCES = dwarf_begin.c dwarf_begin_elf.c dwarf_end.c dwarf_getelf.c \
 		  libdw_visit_scopes.c \
 		  dwarf_entry_breakpoints.c
 
-BUILT_SOURCES = known-dwarf.h
-CLEANFILES = known-dwarf.h
-known-dwarf.h: $(top_srcdir)/config/known-dwarf.awk $(srcdir)/dwarf.h
+if MAINTAINER_MODE
+BUILT_SOURCES = $(srcdir)/known-dwarf.h
+MAINTAINERCLEANFILES = $(srcdir)/known-dwarf.h
+$(srcdir)/known-dwarf.h: $(top_srcdir)/config/known-dwarf.awk $(srcdir)/dwarf.h
 	$(AWK) -f $^ > $@.new
 	mv -f $@.new $@
+endif
 
 if !MUDFLAP
 libdw_pic_a_SOURCES =

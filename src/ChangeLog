@@ -1,5 +1,9 @@
 2009-01-23  Ulrich Drepper  <drepper@redhat.com>
 
+	* size.c (process_file): When handling archive, close file descriptor
+	here.  For unknown file format also close file descriptor.
+	(handle_ar): Don't close file descriptor here.
+
 	* readelf.c (parse_opt): Move code to add to dump_data_sections and
 	string_sections list in local function add_dump_section.  Adjust 'x'
 	key handling.  For 'a' key add .strtab, .dynstr, and .comment section

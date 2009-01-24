@@ -319,12 +319,22 @@ process_file (const char *fname)
 	  return 0;
 	}
       else if (likely (elf_kind (elf) == ELF_K_AR))
-	return handle_ar (fd, elf, NULL, fname);
+	{
+	  int result = handle_ar (fd, elf, NULL, fname);
+
+	  if (unlikely  (close (fd) != 0))
+	    error (EXIT_FAILURE, errno, gettext ("while closing '%s'"), fname);
+
+	  return result;
+	}
 
       /* We cannot handle this type.  Close the descriptor anyway.  */
       if (unlikely (elf_end (elf) != 0))
 	INTERNAL_ERROR (fname);
     }
+
+  if (unlikely (close (fd) != 0))
+    error (EXIT_FAILURE, errno, gettext ("while closing '%s'"), fname);
 
   error (0, 0, gettext ("%s: file format not recognized"), fname);
 
@@ -395,9 +405,6 @@ handle_ar (int fd, Elf *elf, const char *prefix, const char *fname)
 
   if (unlikely (elf_end (elf) != 0))
     INTERNAL_ERROR (fname);
-
-  if (unlikely  (close (fd) != 0))
-    error (EXIT_FAILURE, errno, gettext ("while closing '%s'"), fname);
 
   return result;
 }

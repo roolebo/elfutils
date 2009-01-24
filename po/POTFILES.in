@@ -1,5 +1,5 @@
 # List of files which containing translatable strings.
-# Copyright (C) 2000, 2005 Red Hat, Inc.
+# Copyright (C) 2000, 2005, 2009 Red Hat, Inc.
 
 # Files from the compatibility library
 lib/xmalloc.c
@@ -10,14 +10,30 @@ lib/xstrndup.c
 libelf/elf_error.c
 libasm/asm_error.c
 libdw/dwarf_error.c
+libdwfl/argp-std.c
+libebl/eblbackendname.c
+libebl/eblcorenotetypename.c
+libebl/ebldynamictagname.c
+libebl/eblobjecttypename.c
+libebl/eblobjnote.c
+libebl/eblobjnotetypename.c
+libebl/eblosabiname.c
+libebl/eblsectionname.c
+libebl/eblsectiontypename.c
+libebl/eblsegmenttypename.c
+libebl/eblsymbolbindingname.c
+libebl/eblsymboltypename.c
 
 # Program sources
+src/ar.c
+src/arlib.c
 src/nm.c
 src/readelf.c
 src/size.c
 src/strip.c
 src/ld.c
 src/ldgeneric.c
+src/i386_ld.c
 src/ldscript.y
 src/elflint.c
 src/addr2line.c
@@ -25,3 +41,5 @@ src/findtextrel.c
 src/elfcmp.c
 src/ranlib.c
 src/strings.c
+src/unstrip.c
+src/objdump.c

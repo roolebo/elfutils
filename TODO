@@ -1,11 +1,21 @@
 		      ToDo list for elfutils                      -*-outline-*-
                       ----------------------
 
-Time-stamp: <2009-01-16 20:55:06 drepper>
+Time-stamp: <2009-01-23 12:04:54 drepper>
 
 * mkinstalldirs
 
   Remove everywhere.  Use mkdir -p.
+
+* po/Makefile.in.in
+
+  We need to tell xgettext about a few special functions.  At least needed:
+
+   --flag=error:3:c-format --flag=argp_error:2:c-format
+
+  How do we pass these options without modifying po/Makefile.in.in?  The
+  xgettext invocation uses XGETTEXT_OPTIONS which isn't defined.  So the
+  toplevel makefile could potentially define this variable.
 
 * libelf:
 

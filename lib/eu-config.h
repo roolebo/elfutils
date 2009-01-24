@@ -46,6 +46,9 @@
    Network licensing program, please visit www.openinventionnetwork.com
    <http://www.openinventionnetwork.com>.  */
 
+#ifndef EU_CONFIG_H
+#define EU_CONFIG_H	1
+
 #ifdef USE_LOCKS
 # include <pthread.h>
 # include <assert.h>
@@ -178,3 +181,6 @@ asm (".section predict_data, \"aw\"; .previous\n"
 
 /* This macro is used by the tests conditionalize for standalone building.  */
 #define ELFUTILS_HEADER(name) <lib##name.h>
+
+
+#endif	/* eu-config.h */

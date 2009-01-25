@@ -437,7 +437,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
   int debug_fd = -1;
 
   /* Get the EBL handling.  The -g option is currently the only reason
-     we need EBL so dont open the backend unless necessary.  */
+     we need EBL so don't open the backend unless necessary.  */
   Ebl *ebl = NULL;
   if (remove_debug)
     {

@@ -4643,6 +4643,7 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
       unsigned int fde_encoding = 0;
       unsigned int lsda_encoding = 0;
       Dwarf_Word initial_location = 0;
+      Dwarf_Word vma_base = 0;
 
       if (cie_id == (is_eh_frame ? 0 : DW_CIE_ID))
 	{
@@ -4809,16 +4810,26 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 		  cie->cie_offset, (uint64_t) cie_id,
 		  (uint64_t) initial_location);
 	  if ((fde_encoding & 0x70) == DW_EH_PE_pcrel)
-	    printf (gettext (" (offset: %#" PRIx64 ")"),
-		    ((uint64_t) shdr->sh_offset
-		     + (base - (const unsigned char *) data->d_buf)
-		     + (uint64_t) initial_location)
+	    {
+	      vma_base = (((uint64_t) shdr->sh_offset
+			   + (base - (const unsigned char *) data->d_buf)
+			   + (uint64_t) initial_location)
+			  & (ptr_size == 4
+			     ? UINT64_C (0xffffffff)
+			     : UINT64_C (0xffffffffffffffff)));
+	      printf (gettext (" (offset: %#" PRIx64 ")"),
+		      (uint64_t) vma_base);
+	    }
+
+	  printf ("\n   address_range:            %#" PRIx64,
+		  (uint64_t) address_range);
+	  if ((fde_encoding & 0x70) == DW_EH_PE_pcrel)
+	    printf (gettext (" (end offset: %#" PRIx64 ")"),
+		    ((uint64_t) vma_base + (uint64_t) address_range)
 		    & (ptr_size == 4
 		       ? UINT64_C (0xffffffff)
 		       : UINT64_C (0xffffffffffffffff)));
-
-	  printf ("\n   address_range:            %#" PRIx64 "\n",
-		  (uint64_t) address_range);
+	  putchar ('\n');
 
 	  if (cie->augmentation[0] == 'z')
 	    {
@@ -4858,13 +4869,6 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	      readp += augmentationlen;
 	    }
 	}
-
-      /* To print correct addresses compute the base address.  */
-      Dwarf_Word vma_base;
-      if ((fde_encoding & 0x70) == DW_EH_PE_pcrel && ehdr->e_type != ET_REL)
-	vma_base = shdr->sh_addr + initial_location;
-      else
-	vma_base = 0;
 
       /* Handle the initialization instructions.  */
       print_cfa_program (readp, cieend, vma_base, code_alignment_factor,

@@ -25,3 +25,4 @@ config/ylwrap
 configure
 elfutils.spec
 *.pot
+libdw/known-dwarf.h

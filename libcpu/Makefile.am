@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2002, 2004, 2005, 2007, 2008 Red Hat, Inc.
+## Copyright (C) 2002, 2004, 2005, 2007, 2008, 2009 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -70,7 +70,7 @@ libeu = ../lib/libeu.a
 
 i386_lex_CFLAGS = -Wno-unused-label -Wno-unused-function -Wno-sign-compare
 i386_parse.o: i386_parse.c i386.mnemonics
-i386_parse_CFLAGS = -DNMNES=$$(wc -l < i386.mnemonics)
+i386_parse_CFLAGS = -DNMNES="`wc -l < i386.mnemonics`"
 i386_lex.o: i386_parse.h
 i386_gendis_LDADD = $(libeu) -lm $(libmudflap)
 

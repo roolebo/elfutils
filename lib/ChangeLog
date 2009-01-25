@@ -1,3 +1,7 @@
+2009-01-23  Roland McGrath  <roland@redhat.com>
+
+	* eu-config.h: Add multiple inclusion protection.
+
 2009-01-17  Ulrich Drepper  <drepper@redhat.com>
 
 	* system.h (ARGP_PROGRAM_VERSION_HOOK_DEF): Define.

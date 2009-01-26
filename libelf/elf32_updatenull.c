@@ -1,5 +1,5 @@
 /* Update data structures for changes.
-   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -401,8 +401,9 @@ __elfw2(LIBELFBITS,updatenull_wrlock) (Elf *elf, int *change_bop, size_t shnum)
       /* Store section information.  */
       if (elf->flags & ELF_F_LAYOUT)
 	{
-	  /* The user is supposed to fill out e_phoff.  Use it and
-	     e_phnum to determine the maximum extend.  */
+	  /* The user is supposed to fill out e_shoff.  Use it and
+	     e_shnum (or sh_size of the dummy, first section header)
+	     to determine the maximum extend.  */
 	  size = MAX ((GElf_Word) size,
 		      (ehdr->e_shoff
 		       + (elf_typesize (LIBELFBITS, ELF_T_SHDR, shnum))));

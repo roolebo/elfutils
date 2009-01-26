@@ -1,3 +1,8 @@
+2009-01-26  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf32_updatenull.c (updatenull_wrlock): Fix comment of
+	ELF_F_LAYOUT behaviour re section header table.
+
 2009-01-22  Ulrich Drepper  <drepper@redhat.com>
 
 	* elf32_updatefile.c (__elfXX_updatemmap): Fill the gap between

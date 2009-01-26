@@ -1,3 +1,7 @@
+2009-01-25  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_getattrs.c: Correctly skip attribute values when restarting.
+
 2009-01-23  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am ($(srcdir)/known-dwarf.h): Target renamed back.

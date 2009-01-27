@@ -1,5 +1,5 @@
 /* Enumerate the PC ranges covered by a DIE.
-   Copyright (C) 2005, 2007 Red Hat, Inc.
+   Copyright (C) 2005, 2007, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -78,8 +78,9 @@ dwarf_ranges (Dwarf_Die *die, ptrdiff_t offset, Dwarf_Addr *basep,
   /* We have to look for a noncontiguous range.  */
 
   const Elf_Data *d = die->cu->dbg->sectiondata[IDX_debug_ranges];
-  if (d == NULL)
+  if (d == NULL && offset != 0)
     {
+    no_ranges:
       __libdw_seterrno (DWARF_E_NO_DEBUG_RANGES);
       return -1;
     }
@@ -90,12 +91,16 @@ dwarf_ranges (Dwarf_Die *die, ptrdiff_t offset, Dwarf_Addr *basep,
       Dwarf_Attribute *attr = INTUSE(dwarf_attr) (die, DW_AT_ranges,
 						  &attr_mem);
       if (attr == NULL)
-	return -1;
+	/* No PC attributes in this DIE at all, so an empty range list.  */
+	return 0;
 
       /* Must have the form data4 or data8 which act as an offset.  */
       Dwarf_Word start_offset;
       if (INTUSE(dwarf_formudata) (attr, &start_offset) != 0)
 	return -1;
+
+      if (d == NULL)
+	goto no_ranges;
 
       offset = start_offset;
       assert ((Dwarf_Word) offset == start_offset);

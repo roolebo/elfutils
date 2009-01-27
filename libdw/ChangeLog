@@ -1,3 +1,7 @@
+2009-01-26  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_ranges.c: Return 0 when no ranges or *_pc attrs at all.
+
 2009-01-25  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_getattrs.c: Correctly skip attribute values when restarting.

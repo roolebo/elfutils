@@ -1,3 +1,12 @@
+2009-01-27  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (print_ops): Notice short length, don't overrun buffer
+	(still need to fix LEB128).
+
+	* readelf.c (print_ops): Fix DW_OP_call[24] decoding.
+
+	* readelf.c (print_ops): Print (empty)\n when LEN == 0.
+
 2009-01-24  Ulrich Drepper  <drepper@redhat.com>
 
 	* readelf.c (print_debug_frame_section): Fix computation of vma_base

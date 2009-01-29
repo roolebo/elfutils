@@ -223,26 +223,27 @@ typedef struct Dwarf_Fileinfo_s Dwarf_Fileinfo;
 
 
 /* Representation of a row in the line table.  */
+
+struct Dwarf_Line_s
+{
+  Dwarf_Addr addr;
+  unsigned int file;
+  int line;
+  unsigned short int column;
+  unsigned int is_stmt:1;
+  unsigned int basic_block:1;
+  unsigned int end_sequence:1;
+  unsigned int prologue_end:1;
+  unsigned int epilogue_begin:1;
+
+  Dwarf_Files *files;
+};
+
 struct Dwarf_Lines_s
-  {
-    size_t nlines;
-
-    struct Dwarf_Line_s
-    {
-      Dwarf_Addr addr;
-      unsigned int file;
-      int line;
-      unsigned short int column;
-      unsigned int is_stmt:1;
-      unsigned int basic_block:1;
-      unsigned int end_sequence:1;
-      unsigned int prologue_end:1;
-      unsigned int epilogue_begin:1;
-
-      Dwarf_Files *files;
-    } info[0];
-  };
-
+{
+  size_t nlines;
+  struct Dwarf_Line_s info[0];
+};
 
 /* Representation of address ranges.  */
 struct Dwarf_Aranges_s

@@ -1,5 +1,5 @@
 /* Return line number information of CU.
-   Copyright (C) 2004, 2005, 2007, 2008 Red Hat, Inc.
+   Copyright (C) 2004-2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
@@ -634,8 +634,8 @@ dwarf_getsrclines (Dwarf_Die *cudie, Dwarf_Lines **lines, size_t *nlines)
 	dirs[i] = dirarray[i]->dir;
       dirs[ndirlist] = NULL;
 
-      /* Remember the debugging descriptor.  */
-      files->dbg = dbg;
+      /* Remember the referring CU.  */
+      files->cu = cu;
 
       /* Make the file data structure available through the CU.  */
       cu->files = files;

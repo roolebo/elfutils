@@ -1,3 +1,7 @@
+2009-02-01  Roland McGrath  <roland@redhat.com>
+
+	* zip.m4: Fix --with/--without argument handling.
+
 2009-01-08  Roland McGrath  <roland@redhat.com>
 
 	* zip.am: New file.

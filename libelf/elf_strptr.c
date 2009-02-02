@@ -1,5 +1,5 @@
 /* Return string pointer from string section.
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004, 2008 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004, 2008, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -151,6 +151,10 @@ elf_strptr (elf, idx, offset)
     }
 
   if (likely (strscn->rawdata_base != NULL))
+    // XXX Is this correct if a file is read and then new data is added
+    // XXX to the string section?  Likely needs to check offset against
+    // XXX size of rawdata_base buffer and then iterate over rest of the
+    // XXX list.
     result = &strscn->rawdata_base[offset];
   else
     {

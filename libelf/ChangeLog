@@ -1,3 +1,7 @@
+2009-02-01  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf_strptr.c: Add comment re possible problem.
+
 2009-01-26  Ulrich Drepper  <drepper@redhat.com>
 
 	* elf32_updatenull.c (updatenull_wrlock): Fix comment of

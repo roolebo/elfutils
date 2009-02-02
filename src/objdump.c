@@ -500,7 +500,15 @@ show_relocs_rela (Ebl *ebl, GElf_Shdr *shdr, Elf_Data *data,
 	    }
 
 	  if (rel->r_addend != 0)
-	    printf ("+%#" PRIx64, rel->r_addend);
+	    {
+	      char sign = '+';
+	      if (rel->r_addend < 0)
+		{
+		  sign = '-';
+		  rel->r_addend = -rel->r_addend;
+		}
+	      printf ("%c%#" PRIx64, sign, rel->r_addend);
+	    }
 	  putchar ('\n');
 	}
     }
@@ -561,7 +569,7 @@ show_relocs (Ebl *ebl, const char *fname, uint32_t shstrndx)
 							  shdr->sh_info),
 					      &destshdr_mem);
 
-	  printf (gettext ("RELOCATION RECORDS FOR [%s]:\n"
+	  printf (gettext ("\n\nRELOCATION RECORDS FOR [%s]:\n"
 			   "%-*s TYPE                 VALUE\n"),
 		  elf_strptr (ebl->elf, shstrndx, destshdr->sh_name),
 		  elfclass == ELFCLASS32 ? 8 : 16, gettext ("OFFSET"));

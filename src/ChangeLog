@@ -1,5 +1,7 @@
 2009-02-01  Ulrich Drepper  <drepper@redhat.com>
 
+	* objdump.c (show_relocs_rela): Show offsets as signed values.
+
 	* ar.c (main): Fix recognition of invalid modes for a, b, i modifiers.
 	Improve some error messages.
 	Use program_invocation_short_name instead of AR macro.

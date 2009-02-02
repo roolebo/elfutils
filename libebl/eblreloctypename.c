@@ -1,5 +1,5 @@
 /* Return relocation type name.
-   Copyright (C) 2001, 2002 Red Hat, Inc.
+   Copyright (C) 2001, 2002, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -68,7 +68,7 @@ ebl_reloc_type_name (ebl, reloc, buf, len)
   res = ebl != NULL ? ebl->reloc_type_name (reloc, buf, len) : NULL;
   if (res == NULL)
     /* There are no generic relocation type names.  */
-    res = "???";
+    res = "<INVALID RELOC>";
 
   return res;
 }

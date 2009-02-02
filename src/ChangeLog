@@ -1,5 +1,9 @@
 2009-02-01  Ulrich Drepper  <drepper@redhat.com>
 
+	* objdump.c (show_relocs_rel, show_relocs_rela): Split common parts
+	into ...
+	(show_relocs_x): ...here.  New function.
+
 	* objdump.c (show_relocs_rela): Show offsets as signed values.
 
 	* ar.c (main): Fix recognition of invalid modes for a, b, i modifiers.

@@ -508,7 +508,7 @@ show_relocs (Ebl *ebl, const char *fname, uint32_t shstrndx)
 							  shdr->sh_info),
 					      &destshdr_mem);
 
-	  printf (gettext ("\n\nRELOCATION RECORDS FOR [%s]:\n"
+	  printf (gettext ("\nRELOCATION RECORDS FOR [%s]:\n"
 			   "%-*s TYPE                 VALUE\n"),
 		  elf_strptr (ebl->elf, shstrndx, destshdr->sh_name),
 		  elfclass == ELFCLASS32 ? 8 : 16, gettext ("OFFSET"));
@@ -548,10 +548,10 @@ show_relocs (Ebl *ebl, const char *fname, uint32_t shstrndx)
 	  else
 	    show_relocs_rela (ebl, shdr, data, symdata, xndxdata,
 			      symshdr->sh_link, shstrndx);
+
+	  fputs ("\n", stdout);
 	}
     }
-
-  fputs_unlocked ("\n\n", stdout);
 
   return 0;
 }

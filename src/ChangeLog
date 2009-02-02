@@ -3,6 +3,7 @@
 	* objdump.c (show_relocs_rel, show_relocs_rela): Split common parts
 	into ...
 	(show_relocs_x): ...here.  New function.
+	(show_relocs): Better spacing in output.
 
 	* objdump.c (show_relocs_rela): Show offsets as signed values.
 

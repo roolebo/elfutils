@@ -188,14 +188,16 @@ main (int argc, char *argv[])
   if (ipos != ipos_none)
     {
       /* Only valid for certain operations.  */
-      if (operation == oper_extract && operation == oper_delete)
+      if (operation != oper_move && operation != oper_replace)
 	error (1, 0, gettext ("\
 'a', 'b', and 'i' are only allowed with the 'm' and 'r' options"));
 
       if (remaining == argc)
 	{
-	  error (0, 0, gettext ("MEMBER parameter required"));
-	  argp_help (&argp, stderr, ARGP_HELP_SEE, AR);
+	  error (0, 0, gettext ("\
+MEMBER parameter required for 'a', 'b', and 'i' modifiers"));
+	  argp_help (&argp, stderr, ARGP_HELP_USAGE | ARGP_HELP_SEE,
+		     program_invocation_short_name);
 	  exit (EXIT_FAILURE);
 	}
 
@@ -214,7 +216,8 @@ main (int argc, char *argv[])
       if (remaining == argc)
 	{
 	  error (0, 0, gettext ("COUNT parameter required"));
-	  argp_help (&argp, stderr, ARGP_HELP_SEE, AR);
+	  argp_help (&argp, stderr, ARGP_HELP_SEE,
+		     program_invocation_short_name);
 	  exit (EXIT_FAILURE);
 	}
 
@@ -237,8 +240,8 @@ main (int argc, char *argv[])
   /* There must at least be one more parameter specifying the archive.   */
   if (remaining == argc)
     {
-      error (0, 0, gettext ("Archive name required"));
-      argp_help (&argp, stderr, ARGP_HELP_SEE, AR);
+      error (0, 0, gettext ("archive name required"));
+      argp_help (&argp, stderr, ARGP_HELP_SEE, program_invocation_short_name);
       exit (EXIT_FAILURE);
     }
 
@@ -309,7 +312,8 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
       if (operation != oper_none)
 	{
 	  error (0, 0, gettext ("More than one operation specified"));
-	  argp_help (&argp, stderr, ARGP_HELP_SEE, AR);
+	  argp_help (&argp, stderr, ARGP_HELP_SEE,
+		     program_invocation_short_name);
 	  exit (EXIT_FAILURE);
 	}
 
@@ -1098,7 +1102,8 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
   if (fd == -1)
     {
       if (!suppress_create_msg)
-	fprintf (stderr, "%s: creating %s\n", AR, arfname);
+	fprintf (stderr, "%s: creating %s\n",
+		 program_invocation_short_name, arfname);
 
       goto no_old;
     }
@@ -1212,7 +1217,7 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
 	  if (found[cnt] == NULL)
 	    {
 	      fprintf (stderr, gettext ("%s: no entry %s in archive!\n"),
-		       AR, argv[cnt]);
+		       program_invocation_short_name, argv[cnt]);
 	      status = 1;
 	    }
 

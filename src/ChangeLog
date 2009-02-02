@@ -1,3 +1,13 @@
+2009-02-01  Ulrich Drepper  <drepper@redhat.com>
+
+	* ar.c (main): Fix recognition of invalid modes for a, b, i modifiers.
+	Improve some error messages.
+	Use program_invocation_short_name instead of AR macro.
+	* Makefile.am (CFLAGS_ar): Remove.
+	* elflint.c (parse_opt): ARGP_HELP_EXIT_ERR does nothing for argp_help.
+	* objdump.c (parse_opt): Likewise.
+	* readelf.c (parse_opt): Likewise.
+
 2009-01-24  Ulrich Drepper  <drepper@redhat.com>
 
 	* readelf.c (print_debug_frame_section): Fix computation of vma_base

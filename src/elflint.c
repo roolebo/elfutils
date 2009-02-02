@@ -220,9 +220,8 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
 
     case ARGP_KEY_NO_ARGS:
       fputs (gettext ("Missing file name.\n"), stderr);
-      argp_help (&argp, stderr, ARGP_HELP_SEE | ARGP_HELP_EXIT_ERR,
-		 program_invocation_short_name);
-      exit (1);
+      argp_help (&argp, stderr, ARGP_HELP_SEE, program_invocation_short_name);
+      exit (EXIT_FAILURE);
 
     default:
       return ARGP_ERR_UNKNOWN;

@@ -234,9 +234,9 @@ parse_opt (int key, char *arg,
       if (! any_control_option)
 	{
 	  fputs (gettext ("No operation specified.\n"), stderr);
-	  argp_help (&argp, stderr, ARGP_HELP_SEE | ARGP_HELP_EXIT_ERR,
+	  argp_help (&argp, stderr, ARGP_HELP_SEE,
 		     program_invocation_short_name);
-	  exit (1);
+	  exit (EXIT_FAILURE);
 	}
 
     default:

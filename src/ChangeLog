@@ -3,6 +3,7 @@
 	* objdump.c (show_relocs_x): Minor cleanups.
 
 	* readelf.c (print_cfa_program): Correct a few labels.
+	Print first DW_CFA_expression parameter as register.
 
 2009-02-01  Ulrich Drepper  <drepper@redhat.com>
 

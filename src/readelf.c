@@ -4335,13 +4335,14 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    printf ("     def_cfa_expression %" PRIu64 "\n", op1);
 	    print_ops (dwflmod, dbg, 10, 10, ptr_size, op1, readp);
 	    readp += op1;
-	    error (1,0,"need to implement BLOCK reading");
+	    //error (1,0,"need to implement BLOCK reading");
 	    break;
 	  case DW_CFA_expression:
 	    // XXX overflow check
 	    get_uleb128 (op1, readp);
 	    get_uleb128 (op2, readp);	/* Length of DW_FORM_block.  */
-	    printf ("     expression %" PRIu64 "\n", op1);
+	    printf ("     expression r%" PRIu64 " (%s) \n",
+		    op1, regname (op1));
 	    print_ops (dwflmod, dbg, 10, 10, ptr_size, op2, readp);
 	    readp += op2;
 	    break;

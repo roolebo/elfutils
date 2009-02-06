@@ -4383,7 +4383,8 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    // XXX overflow check
 	    get_uleb128 (op1, readp);
 	    get_uleb128 (op2, readp);	/* Length of DW_FORM_block.  */
-	    printf ("     val_expression %" PRIu64 "\n", op1);
+	    printf ("     val_expression r%" PRIu64 " (%s)\n",
+		    op1, regname (op1));
 	    print_ops (dwflmod, dbg, 10, 10, ptr_size, op2, readp);
 	    readp += op2;
 	    break;

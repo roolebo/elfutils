@@ -1,5 +1,5 @@
 /* Get attributes of the DIE.
-   Copyright (C) 2004, 2005, 2008 Red Hat, Inc.
+   Copyright (C) 2004, 2005, 2008, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
@@ -62,6 +62,9 @@ dwarf_getattrs (Dwarf_Die *die, int (*callback) (Dwarf_Attribute *, void *),
   if (die == NULL)
     return -1l;
 
+  if (unlikely (offset == 1))
+    return 1;
+
   const unsigned char *die_addr = die->addr;
 
   /* Get the abbreviation code.  */
@@ -80,7 +83,8 @@ dwarf_getattrs (Dwarf_Die *die, int (*callback) (Dwarf_Attribute *, void *),
     }
 
   /* This is where the attributes start.  */
-  const unsigned char *attrp = die->abbrev->attrp + offset;
+  const unsigned char *attrp = die->abbrev->attrp;
+  const unsigned char *const offset_attrp = die->abbrev->attrp + offset;
 
   /* Go over the list of attributes.  */
   Dwarf *dbg = die->cu->dbg;
@@ -108,16 +112,21 @@ dwarf_getattrs (Dwarf_Die *die, int (*callback) (Dwarf_Attribute *, void *),
 	   offset of an attribute.  */
         return 1l;
 
-      /* Fill in the rest.  */
-      attr.valp = (unsigned char *) die_addr;
-      attr.cu = die->cu;
+      /* If we are not to OFFSET_ATTRP yet, we just have to skip
+	 the values of the intervening attributes.  */
+      if (remembered_attrp >= offset_attrp)
+	{
+	  /* Fill in the rest.  */
+	  attr.valp = (unsigned char *) die_addr;
+	  attr.cu = die->cu;
 
-      /* Now call the callback function.  */
-      if (callback (&attr, arg) != DWARF_CB_OK)
-	/* Return the offset of the start of the attribute, so that
-	   dwarf_getattrs() can be restarted from this point if the
-	   caller so desires.  */
-	return remembered_attrp - die->abbrev->attrp;
+	  /* Now call the callback function.  */
+	  if (callback (&attr, arg) != DWARF_CB_OK)
+	    /* Return the offset of the start of the attribute, so that
+	       dwarf_getattrs() can be restarted from this point if the
+	       caller so desires.  */
+	    return remembered_attrp - die->abbrev->attrp;
+	}
 
       /* Skip over the rest of this attribute (if there is any).  */
       if (attr.form != 0)

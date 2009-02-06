@@ -1,3 +1,18 @@
+2009-01-28  Roland McGrath  <roland@redhat.com>
+
+	* libdwP.h (struct Dwarf_Line_s): Move out of struct Dwarf_Lines_s
+	defn so C++ doesn't scope the name to not match the Dwarf_Line typedef.
+
+	* libdwP.h (struct Dwarf_Files_s): Replace dbg field with cu field.
+
+2009-01-26  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_ranges.c: Return 0 when no ranges or *_pc attrs at all.
+
+2009-01-25  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_getattrs.c: Correctly skip attribute values when restarting.
+
 2009-01-23  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am ($(srcdir)/known-dwarf.h): Target renamed back.

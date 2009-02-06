@@ -208,7 +208,8 @@ __libdwfl_report_elf (Dwfl *dwfl, const char *name, const char *file_name,
 	  GElf_Phdr phdr_mem, *ph = gelf_getphdr (elf, i, &phdr_mem);
 	  if (unlikely (ph == NULL))
 	    goto elf_error;
-	  if (ph->p_type == PT_LOAD)
+	  if (ph->p_type == PT_LOAD
+	      && ph->p_vaddr + ph->p_memsz > 0)
 	    {
 	      end = base + (ph->p_vaddr + ph->p_memsz);
 	      break;

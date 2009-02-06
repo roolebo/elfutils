@@ -1,5 +1,5 @@
 /* Internal definitions for libdwarf.
-   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright (C) 2002-2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -208,7 +208,7 @@ struct Dwarf_Abbrev
 /* Files in line information records.  */
 struct Dwarf_Files_s
   {
-    Dwarf *dbg;
+    struct Dwarf_CU *cu;
     unsigned int ndirs;
     unsigned int nfiles;
     struct Dwarf_Fileinfo_s
@@ -223,26 +223,27 @@ typedef struct Dwarf_Fileinfo_s Dwarf_Fileinfo;
 
 
 /* Representation of a row in the line table.  */
+
+struct Dwarf_Line_s
+{
+  Dwarf_Addr addr;
+  unsigned int file;
+  int line;
+  unsigned short int column;
+  unsigned int is_stmt:1;
+  unsigned int basic_block:1;
+  unsigned int end_sequence:1;
+  unsigned int prologue_end:1;
+  unsigned int epilogue_begin:1;
+
+  Dwarf_Files *files;
+};
+
 struct Dwarf_Lines_s
-  {
-    size_t nlines;
-
-    struct Dwarf_Line_s
-    {
-      Dwarf_Addr addr;
-      unsigned int file;
-      int line;
-      unsigned short int column;
-      unsigned int is_stmt:1;
-      unsigned int basic_block:1;
-      unsigned int end_sequence:1;
-      unsigned int prologue_end:1;
-      unsigned int epilogue_begin:1;
-
-      Dwarf_Files *files;
-    } info[0];
-  };
-
+{
+  size_t nlines;
+  struct Dwarf_Line_s info[0];
+};
 
 /* Representation of address ranges.  */
 struct Dwarf_Aranges_s

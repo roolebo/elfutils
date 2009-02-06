@@ -4302,7 +4302,7 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    // XXX overflow check
 	    get_uleb128 (op1, readp);
 	    get_uleb128 (op2, readp);
-	    printf ("     same_value r%" PRIu64 " (%s) in r%" PRIu64 " (%s)\n",
+	    printf ("     register r%" PRIu64 " (%s) in r%" PRIu64 " (%s)\n",
 		    op1, regname (op1), op2, regname (op2));
 	    break;
 	  case DW_CFA_remember_state:
@@ -4376,7 +4376,7 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    // XXX overflow check
 	    get_uleb128 (op1, readp);
 	    get_sleb128 (sop2, readp);
-	    printf ("     val_offset %" PRIu64 " at offset %" PRId64 "\n",
+	    printf ("     val_offset_sf %" PRIu64 " at offset %" PRId64 "\n",
 		    op1, sop2 * data_align);
 	    break;
 	  case DW_CFA_val_expression:
@@ -4389,11 +4389,11 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    break;
 	  case DW_CFA_MIPS_advance_loc8:
 	    op1 = read_8ubyte_unaligned_inc (dbg, readp);
-	    printf ("     advance_loc2 %" PRIu64 " to %#" PRIx64 "\n",
+	    printf ("     MIPS_advance_loc8 %" PRIu64 " to %#" PRIx64 "\n",
 		    op1, pc += op1 * code_align);
 	    break;
 	  case DW_CFA_GNU_window_save:
-	    puts ("     window_save");
+	    puts ("     GNU_window_save");
 	    break;
 	  case DW_CFA_GNU_args_size:
 	    // XXX overflow check

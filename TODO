@@ -1,7 +1,7 @@
 		      ToDo list for elfutils                      -*-outline-*-
                       ----------------------
 
-Time-stamp: <2009-01-23 16:28:46 drepper>
+Time-stamp: <2009-02-05 21:40:59 drepper>
 
 * mkinstalldirs
 
@@ -102,6 +102,13 @@ Time-stamp: <2009-01-23 16:28:46 drepper>
 
    Not implemented at all in the moment except for recognition of the option
    itself.
+
+** variables with aliases in executables
+
+   When linking an executable with a references against a variable in a
+   DSO, create symbol table entries for all the aliases of the variable
+   in the DSO and create a relocation for one of them (a non-weak
+   definition)
 
 * elflint
 

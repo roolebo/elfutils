@@ -364,16 +364,15 @@ show_relocs_x (Ebl *ebl, GElf_Shdr *shdr, Elf_Data *symdata,
 {
   int elfclass = gelf_getclass (ebl->elf);
   char buf[128];
-  GElf_Sym symmem;
-  GElf_Sym *sym;
-  Elf32_Word xndx;
 
   printf ("%0*" PRIx64 " %-20s ",
 	  elfclass == ELFCLASS32 ? 8 : 16, r_offset,
 	  ebl_reloc_type_name (ebl, GELF_R_TYPE (r_info), buf, sizeof (buf)));
 
-  sym = gelf_getsymshndx (symdata, xndxdata, GELF_R_SYM (r_info),
-			  &symmem, &xndx);
+  Elf32_Word xndx;
+  GElf_Sym symmem;
+  GElf_Sym *sym = gelf_getsymshndx (symdata, xndxdata, GELF_R_SYM (r_info),
+				    &symmem, &xndx);
 
   if (sym == NULL)
     printf ("<%s %ld>",
@@ -549,7 +548,7 @@ show_relocs (Ebl *ebl, const char *fname, uint32_t shstrndx)
 	    show_relocs_rela (ebl, shdr, data, symdata, xndxdata,
 			      symshdr->sh_link, shstrndx);
 
-	  fputs ("\n", stdout);
+	  putchar ('\n');
 	}
     }
 

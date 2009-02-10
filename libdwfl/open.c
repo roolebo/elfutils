@@ -75,6 +75,8 @@ decompress (int fd __attribute__ ((unused)), Elf **elf)
   void *const mapped = ((*elf)->map_address == NULL ? NULL
 			: (*elf)->map_address + (*elf)->start_offset);
   const size_t mapped_size = (*elf)->maximum_size;
+  if (mapped_size == 0)
+    return error;
 
   error = __libdw_gunzip (fd, offset, mapped, mapped_size, &buffer, &size);
   if (error == DWFL_E_BADELF)

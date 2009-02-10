@@ -1,3 +1,7 @@
+2009-02-10  Ulrich Drepper  <drepper@redhat.com>
+
+	* open.c (decompress): Avoid crash with empty input file.
+
 2009-01-27  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_report_elf.c (__libdwfl_report_elf): Ignore trailing PT_LOAD

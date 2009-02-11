@@ -62,7 +62,7 @@
 Dwfl_Module *
 internal_function
 __libdwfl_report_elf (Dwfl *dwfl, const char *name, const char *file_name,
-		      int fd, Elf *elf, GElf_Addr base)
+		      int fd, Elf *elf, GElf_Addr base, bool sanity)
 {
   GElf_Ehdr ehdr_mem, *ehdr = gelf_getehdr (elf, &ehdr_mem);
   if (ehdr == NULL)
@@ -216,7 +216,7 @@ __libdwfl_report_elf (Dwfl *dwfl, const char *name, const char *file_name,
 	    }
 	}
 
-      if (end == 0)
+      if (end == 0 && sanity)
 	{
 	  __libdwfl_seterrno (DWFL_E_NO_PHDR);
 	  return NULL;
@@ -284,7 +284,7 @@ dwfl_report_elf (Dwfl *dwfl, const char *name,
     }
 
   Dwfl_Module *mod = __libdwfl_report_elf (dwfl, name, file_name,
-					   fd, elf, base);
+					   fd, elf, base, true);
   if (mod == NULL)
     {
       elf_end (elf);

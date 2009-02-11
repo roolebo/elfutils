@@ -1,5 +1,12 @@
 2009-02-10  Roland McGrath  <roland@redhat.com>
 
+	* dwfl_report_elf.c (__libdwfl_report_elf): Take new arg SANITY.
+	If false, don't fail for NO_PHDR.
+	(dwfl_report_elf): Update caller.
+	* libdwflP.h: Update decl.
+	* offline.c (process_elf): Call it with false, so we don't refuse
+	dubiously-formed objects here.
+
 	* link_map.c (consider_executable): Don't assert dwfl_addrsegment
 	finds our module.  We shouldn't crash when we confuse some guesses.
 

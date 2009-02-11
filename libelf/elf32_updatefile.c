@@ -662,7 +662,7 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 	      /* The dummy section header entry.  It should not be
 		 possible to mark this "section" as dirty.  */
 	      assert ((scn->flags & ELF_F_DIRTY) == 0);
-	      continue;
+	      goto next;
 	    }
 
 	  ElfW2(LIBELFBITS,Shdr) *shdr = scn->shdr.ELFW(e,LIBELFBITS);

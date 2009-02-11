@@ -1,3 +1,8 @@
+2009-02-10  Roland McGrath  <roland@redhat.com>
+
+	* link_map.c (consider_executable): Don't assert dwfl_addrsegment
+	finds our module.  We shouldn't crash when we confuse some guesses.
+
 2009-02-10  Ulrich Drepper  <drepper@redhat.com>
 
 	* open.c (decompress): Avoid crash with empty input file.

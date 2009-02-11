@@ -1,5 +1,5 @@
 /* Report modules by examining dynamic linker data structures.
-   Copyright (C) 2008 Red Hat, Inc.
+   Copyright (C) 2008, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -561,9 +561,7 @@ consider_executable (Dwfl_Module *mod, GElf_Addr at_phdr, GElf_Addr at_entry,
       void *buffer = NULL;
       size_t buffer_available = addrsize (ehdr.e_ident[EI_CLASS]);
 
-      Dwfl_Module *m;
-      int segndx = INTUSE(dwfl_addrsegment) (mod->dwfl, d_val_vaddr, &m);
-      assert (m == mod);
+      int segndx = INTUSE(dwfl_addrsegment) (mod->dwfl, d_val_vaddr, NULL);
 
       if ((*memory_callback) (mod->dwfl, segndx,
 			      &buffer, &buffer_available,

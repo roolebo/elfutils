@@ -1,6 +1,6 @@
 2009-02-10  Ulrich Drepper  <drepper@redhat.com>
 
-	* elf32_updatefile.c (updatefile): Fir the zeroth section we still
+	* elf32_updatefile.c (updatefile): For the zeroth section we still
 	have to copy the section header.
 
 2009-02-01  Ulrich Drepper  <drepper@redhat.com>

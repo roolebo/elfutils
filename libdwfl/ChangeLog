@@ -1,3 +1,8 @@
+2009-02-12  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_build_id.c (__libdwfl_find_build_id): Use
+	__libdwfl_relocate_value to find correct sh_addr value.
+
 2009-02-10  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_report_elf.c (__libdwfl_report_elf): Take new arg SANITY.

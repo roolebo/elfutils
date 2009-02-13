@@ -1,5 +1,5 @@
 /* Return build ID information for a module.
-   Copyright (C) 2007, 2008 Red Hat, Inc.
+   Copyright (C) 2007, 2008, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -130,9 +130,16 @@ __libdwfl_find_build_id (Dwfl_Module *mod, bool set, Elf *elf)
 	GElf_Shdr shdr_mem;
 	GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
 	if (likely (shdr != NULL) && shdr->sh_type == SHT_NOTE)
-	  result = check_notes (mod, set, elf_getdata (scn, NULL),
-				(shdr->sh_flags & SHF_ALLOC)
-				? shdr->sh_addr + mod->main.bias : NO_VADDR);
+	  {
+	    /* Determine the right sh_addr in this module.  */
+	    size_t shstrndx = SHN_UNDEF;
+	    GElf_Addr vaddr = 0;
+	    if (!(shdr->sh_flags & SHF_ALLOC)
+		|| __libdwfl_relocate_value (mod, elf, &shstrndx,
+					     elf_ndxscn (scn), &vaddr))
+	      vaddr = NO_VADDR;
+	    result = check_notes (mod, set, elf_getdata (scn, NULL), vaddr);
+	  }
       }
     while (result == 0 && (scn = elf_nextscn (elf, scn)) != NULL);
 

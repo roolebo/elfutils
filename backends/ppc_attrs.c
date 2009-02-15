@@ -69,12 +69,12 @@ ppc_check_object_attribute (ebl, vendor, tag, value, tag_name, value_name)
 
       case 12:
 	*tag_name = "GNU_Power_ABI_Struct_Return";
-	static const char *vector_kinds[] =
+	static const char *struct_return_kinds[] =
 	  {
 	    "Any", "r3/r4", "Memory"
 	  };
-	if (value < sizeof vector_kinds / sizeof vector_kinds[0])
-	  *value_name = vector_kinds[value];
+	if (value < sizeof struct_return_kinds / sizeof struct_return_kinds[0])
+	  *value_name = struct_return_kinds[value];
 	return true;
       }
 

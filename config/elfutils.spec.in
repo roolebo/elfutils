@@ -183,6 +183,11 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
+* Mon Feb 16 2009 Ulrich Drepper <drepper@redhat.com> 0.140-1
+- libelf: Fix regression in creation of section header
+- libdwfl: Less strict behavior if DWARF reader ist just used to 
+  display data
+
 * Thu Jan 22 2009 Ulrich Drepper <drepper@redhat.com> 0.139-1
 - libcpu: Add Intel SSE4 disassembler support
 - readelf: Implement call frame information and exception handling 

@@ -1,3 +1,9 @@
+Version 0.140:
+
+libelf: Fix regression in creation of section header
+
+libdwfl: Less strict behavior if DWARF reader ist just used to display data
+
 Version 0.139:
 
 libcpu: Add Intel SSE4 disassembler support

@@ -1,5 +1,5 @@
 /* Relocate debug information.
-   Copyright (C) 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright (C) 2005-2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -96,7 +96,7 @@ __libdwfl_relocate_value (Dwfl_Module *mod, Elf *elf, size_t *shstrndx,
     }
 
   /* Apply the adjustment.  */
-  *value += refshdr->sh_addr;
+  *value += refshdr->sh_addr + mod->main.bias;
   return DWFL_E_NOERROR;
 }
 

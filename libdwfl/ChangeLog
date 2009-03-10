@@ -1,3 +1,7 @@
+2009-03-09  Roland McGrath  <roland@redhat.com>
+
+	* relocate.c (__libdwfl_relocate_value): Add MOD->main.bias to sh_addr.
+
 2009-02-12  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_module_build_id.c (__libdwfl_find_build_id): Use

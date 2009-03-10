@@ -97,6 +97,7 @@ int
 internal_function
 __libdwfl_find_build_id (Dwfl_Module *mod, bool set, Elf *elf)
 {
+  size_t shstrndx = SHN_UNDEF;
   int result = 0;
 
   Elf_Scn *scn = elf_nextscn (elf, NULL);
@@ -132,7 +133,6 @@ __libdwfl_find_build_id (Dwfl_Module *mod, bool set, Elf *elf)
 	if (likely (shdr != NULL) && shdr->sh_type == SHT_NOTE)
 	  {
 	    /* Determine the right sh_addr in this module.  */
-	    size_t shstrndx = SHN_UNDEF;
 	    GElf_Addr vaddr = 0;
 	    if (!(shdr->sh_flags & SHF_ALLOC)
 		|| __libdwfl_relocate_value (mod, elf, &shstrndx,

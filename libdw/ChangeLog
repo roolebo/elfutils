@@ -1,3 +1,7 @@
+2009-04-01  Roland McGrath  <roland@redhat.com>
+
+	* dwarf.h: Add DW_CFA_GNU_negative_offset_extended.
+
 2009-01-28  Roland McGrath  <roland@redhat.com>
 
 	* libdwP.h (struct Dwarf_Line_s): Move out of struct Dwarf_Lines_s

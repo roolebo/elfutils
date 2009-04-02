@@ -1,5 +1,5 @@
 /* This file defines standard ELF types, structures, and macros.
-   Copyright (C) 1995-2003,2004,2005,2006,2007,2008
+   Copyright (C) 1995-2003,2004,2005,2006,2007,2008,2009
 	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -459,6 +459,7 @@ typedef struct
 #define STT_TLS		6		/* Symbol is thread-local data object*/
 #define	STT_NUM		7		/* Number of defined types.  */
 #define STT_LOOS	10		/* Start of OS-specific */
+#define STT_GNU_IFUNC	10		/* Symbol is indirect code object */
 #define STT_HIOS	12		/* End of OS-specific */
 #define STT_LOPROC	13		/* Start of processor-specific */
 #define STT_HIPROC	15		/* End of processor-specific */
@@ -972,6 +973,10 @@ typedef struct
 
 #define	AT_SECURE	23		/* Boolean, was exec setuid-like?  */
 
+#define AT_BASE_PLATFORM 24		/* String identifying real platforms.*/
+
+#define AT_RANDOM	25		/* Address of 16 random bytes.  */
+
 #define AT_EXECFN	31		/* Filename of executable.  */
 
 /* Pointer to the global system page used for system calls and other
@@ -1241,6 +1246,7 @@ typedef struct
 #define R_SPARC_PC_LM22		39	/* Low miggle 22 bits of ... */
 #define R_SPARC_WDISP16		40	/* PC relative 16 bit shifted */
 #define R_SPARC_WDISP19		41	/* PC relative 19 bit shifted */
+#define R_SPARC_GLOB_JMP	42	/* was part of v9 ABI but was removed */
 #define R_SPARC_7		43	/* Direct 7 bit */
 #define R_SPARC_5		44	/* Direct 5 bit */
 #define R_SPARC_6		45	/* Direct 6 bit */
@@ -1278,8 +1284,19 @@ typedef struct
 #define R_SPARC_TLS_DTPOFF64	77
 #define R_SPARC_TLS_TPOFF32	78
 #define R_SPARC_TLS_TPOFF64	79
+#define R_SPARC_GOTDATA_HIX22	80
+#define R_SPARC_GOTDATA_LOX10	81
+#define R_SPARC_GOTDATA_OP_HIX22	82
+#define R_SPARC_GOTDATA_OP_LOX10	83
+#define R_SPARC_GOTDATA_OP	84
+#define R_SPARC_H34		85
+#define R_SPARC_SIZE32		86
+#define R_SPARC_SIZE64		87
+#define R_SPARC_GNU_VTINHERIT	250
+#define R_SPARC_GNU_VTENTRY	251
+#define R_SPARC_REV32		252
 /* Keep this the last entry.  */
-#define R_SPARC_NUM		80
+#define R_SPARC_NUM		253
 
 /* For Sparc64, legal values for d_tag of Elf64_Dyn.  */
 

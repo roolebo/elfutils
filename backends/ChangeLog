@@ -1,3 +1,8 @@
+2009-04-01  Roland McGrath  <roland@redhat.com>
+
+	* sparc_reloc.def: Update table.
+	Data from Dave Miller <davem@davemloft.net>.
+
 2009-02-15  Roland McGrath  <roland@redhat.com>
 
 	* ppc_attrs.c (ppc_check_object_attribute): Handle tag

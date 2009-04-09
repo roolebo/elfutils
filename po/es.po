@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: elfutils\n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2009-04-02 19:14+0000\n"
+"POT-Creation-Date: 2009-04-09 14:04+0000\n"
 "PO-Revision-Date: \n"
-"Last-Translator: Domingo Becker <domingobecker@gmail.com>\n"
+"Last-Translator: Claudio Rodrigo Pereyra Diaz <claudio@pereyradiaz.com.ar>\n"
 "Language-Team: Fedora Spanish <fedora-trans-es@redhat.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -462,7 +462,7 @@ msgstr "No se puede encontrar nodo de tipo de letra '%s'."
 
 #: ../libdwfl/argp-std.c:273
 msgid "cannot find kernel or modules"
-msgstr ""
+msgstr "imposible encontrar kernel o modulos"
 
 #: ../libebl/eblbackendname.c:63
 #, fuzzy
@@ -565,11 +565,11 @@ msgstr "  [N]          - usa la instancia [cuenta] del nombre\n"
 
 #: ../src/ar.c:90
 msgid "Do not replace existing files with extracted files."
-msgstr ""
+msgstr "No reemplazar los archivos existentes con los archivos extraídos."
 
 #: ../src/ar.c:91
 msgid "Allow filename to be truncated if necessary."
-msgstr ""
+msgstr "Permitir truncamiento del nombre de archivo de ser necesario"
 
 #: ../src/ar.c:93
 #, fuzzy
@@ -598,7 +598,7 @@ msgstr "lo mismo que --format=posix"
 
 #: ../src/ar.c:98
 msgid "Suppress message when library has to be created."
-msgstr ""
+msgstr "Suprimir mensaje cuando se alla creado la libreria"
 
 #: ../src/ar.c:100
 #, fuzzy
@@ -613,7 +613,7 @@ msgstr "solamente añade ficheros más recientes que la copia del archivo"
 #. Short description of program.
 #: ../src/ar.c:107
 msgid "Create, modify, and extract from archives."
-msgstr ""
+msgstr "Crear, modificar, y extraer desde archivos."
 
 #. Strings for arguments in help texts.
 #: ../src/ar.c:110
@@ -884,7 +884,7 @@ msgstr "Formato de salida:\n"
 
 #: ../src/nm.c:87
 msgid "Print name of the input file before every symbol"
-msgstr ""
+msgstr "Imprimir el nombre del archivo de entrada antes de cada símbolo"
 
 #: ../src/nm.c:90
 msgid "Use the output format FORMAT.  FORMAT can be `bsd', `sysv' or `posix'.  The default is `sysv'"
@@ -1030,7 +1030,7 @@ msgstr "Mí_n"
 #: ../src/nm.c:464
 #, c-format
 msgid "cannot reset archive offset to beginning"
-msgstr ""
+msgstr "imposible restablecer archivo compensar al inicio"
 
 #: ../src/nm.c:488
 #: ../src/objdump.c:344
@@ -1936,77 +1936,77 @@ msgstr "10 x 11 in"
 #: ../src/readelf.c:2943
 #, c-format
 msgid "      %s: %<PRId64>, %s\n"
-msgstr ""
+msgstr "      %s: %<PRId64>, %s\n"
 
 #: ../src/readelf.c:2946
 #, c-format
 msgid "      %s: %<PRId64>\n"
-msgstr ""
+msgstr "      %s: %<PRId64>\n"
 
 #: ../src/readelf.c:2949
 #, c-format
 msgid "      %s: %s\n"
-msgstr ""
+msgstr "      %s: %s\n"
 
 #: ../src/readelf.c:2956
 #, c-format
 msgid "      %u: %<PRId64>\n"
-msgstr ""
+msgstr "      %u: %<PRId64>\n"
 
 #: ../src/readelf.c:2959
 #, c-format
 msgid "      %u: %s\n"
-msgstr ""
+msgstr "      %u: %s\n"
 
 #: ../src/readelf.c:2994
 #, c-format
 msgid "%s+%#<PRIx64> <%s+%#<PRIx64>>"
-msgstr ""
+msgstr "%s+%#<PRIx64> <%s+%#<PRIx64>>"
 
 #: ../src/readelf.c:2997
 #, c-format
 msgid "%s+%#0*<PRIx64> <%s+%#<PRIx64>>"
-msgstr ""
+msgstr "%s+%#0*<PRIx64> <%s+%#<PRIx64>>"
 
 #: ../src/readelf.c:3002
 #, c-format
 msgid "%#<PRIx64> <%s+%#<PRIx64>>"
-msgstr ""
+msgstr "%#<PRIx64> <%s+%#<PRIx64>>"
 
 #: ../src/readelf.c:3005
 #, c-format
 msgid "%#0*<PRIx64> <%s+%#<PRIx64>>"
-msgstr ""
+msgstr "%#0*<PRIx64> <%s+%#<PRIx64>>"
 
 #: ../src/readelf.c:3011
 #, c-format
 msgid "%s+%#<PRIx64> <%s>"
-msgstr ""
+msgstr "%s+%#<PRIx64> <%s>"
 
 #: ../src/readelf.c:3014
 #, c-format
 msgid "%s+%#0*<PRIx64> <%s>"
-msgstr ""
+msgstr "%s+%#0*<PRIx64> <%s>"
 
 #: ../src/readelf.c:3018
 #, c-format
 msgid "%#<PRIx64> <%s>"
-msgstr ""
+msgstr "%#<PRIx64> <%s>"
 
 #: ../src/readelf.c:3021
 #, c-format
 msgid "%#0*<PRIx64> <%s>"
-msgstr ""
+msgstr "%#0*<PRIx64> <%s>"
 
 #: ../src/readelf.c:3026
 #, c-format
 msgid "%s+%#<PRIx64>"
-msgstr ""
+msgstr "%s+%#<PRIx64>"
 
 #: ../src/readelf.c:3029
 #, c-format
 msgid "%s+%#0*<PRIx64>"
-msgstr ""
+msgstr "%s+%#0*<PRIx64>"
 
 #: ../src/readelf.c:3137
 #, fuzzy, c-format
@@ -2092,7 +2092,7 @@ msgstr[1] ""
 #: ../src/readelf.c:4137
 #, c-format
 msgid " [%*zu] ???\n"
-msgstr ""
+msgstr " [%*zu] ???\n"
 
 #: ../src/readelf.c:4139
 #, c-format
@@ -2133,12 +2133,12 @@ msgstr "    %8.8lx %8.8lx %8.8lx (dirección base)\n"
 #: ../src/readelf.c:4210
 #, c-format
 msgid " [%6tx]  %s..%s\n"
-msgstr ""
+msgstr " [%6tx]  %s..%s\n"
 
 #: ../src/readelf.c:4212
 #, c-format
 msgid "           %s..%s\n"
-msgstr ""
+msgstr "           %s..%s\n"
 
 #: ../src/readelf.c:4609
 #: ../src/readelf.c:6043
@@ -2427,12 +2427,12 @@ msgstr ""
 #: ../src/readelf.c:5760
 #, c-format
 msgid " [%6tx]  %s..%s"
-msgstr ""
+msgstr " [%6tx]  %s..%s"
 
 #: ../src/readelf.c:5762
 #, c-format
 msgid "           %s..%s"
-msgstr ""
+msgstr "           %s..%s"
 
 #: ../src/readelf.c:5815
 #, c-format

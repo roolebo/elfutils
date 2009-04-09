@@ -1,5 +1,5 @@
 /* Find debugging and symbol information for a module in libdwfl.
-   Copyright (C) 2006,2007 Red Hat, Inc.
+   Copyright (C) 2006,2007,2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -77,7 +77,7 @@ dwfl_module_getsym (Dwfl_Module *mod, int ndx,
   if (shndxp != NULL)
     *shndxp = shndx;
 
-  switch (shndx)
+  switch (sym->st_shndx)
     {
     case SHN_ABS:
     case SHN_UNDEF:

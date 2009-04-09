@@ -1,3 +1,10 @@
+2009-04-08  Roland McGrath  <roland@redhat.com>
+
+	* relocate.c (__libdwfl_relocate_value): Don't adjust a value from
+	a non-SHF_ALLOC section.
+	(relocate_getsym): Test st_shndx for SHN_* values, not *SHNDX.
+	* dwfl_module_getsym.c (dwfl_module_getsym): Likewise.
+
 2009-03-09  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_module_build_id.c (__libdwfl_find_build_id): Move SHSTRNDX

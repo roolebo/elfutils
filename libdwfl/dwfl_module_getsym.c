@@ -99,8 +99,9 @@ dwfl_module_getsym (Dwfl_Module *mod, int ndx,
 	      return NULL;
 	    }
 	}
-      /* Apply the bias to the symbol value.  */
-      sym->st_value += mod->symfile->bias;
+      else
+	/* Apply the bias to the symbol value.  */
+	sym->st_value += mod->symfile->bias;
       break;
     }
 

@@ -1,3 +1,11 @@
+Version 0.141:
+
+libebl: sparc backend fixes
+libdwfl: fix dwfl_module_build_id for prelinked DSO case;
+	 fixes in core file support;
+	 dwfl_module_getsym interface improved for non-address symbols
+strip: fix infinite loop on strange inputs with -f
+
 Version 0.140:
 
 libelf: Fix regression in creation of section header

@@ -835,7 +835,8 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 
 	      inline void check_preserved (size_t i)
 	      {
-		if (i != 0 && shdr_info[i].idx != 0)
+		if (i != 0 && shdr_info[i].idx != 0
+		    && shdr_info[i].debug_data == NULL)
 		  {
 		    if (shdr_info[i].data == NULL)
 		      shdr_info[i].data = elf_getdata (shdr_info[i].scn, NULL);

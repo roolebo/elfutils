@@ -1,5 +1,5 @@
 /* Core file handling.
-   Copyright (C) 2008 Red Hat, Inc.
+   Copyright (C) 2008, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -278,7 +278,7 @@ dwfl_elf_phdr_memory_callback (Dwfl *dwfl, int ndx,
 
   do
     if (unlikely (gelf_getphdr (elf, ndx++, &phdr) == NULL))
-      return true;
+      return false;
   while (phdr.p_type != PT_LOAD
 	 || ((phdr.p_vaddr + phdr.p_memsz + align - 1) & -align) <= vaddr);
 
@@ -320,8 +320,14 @@ dwfl_elf_phdr_memory_callback (Dwfl *dwfl, int ndx,
   if (elf->map_address != NULL)
     (void) more (elf->maximum_size - start);
 
-  if (unlikely (end - start > elf->maximum_size))
-    end = start + elf->maximum_size;
+  /* Make sure we don't look past the end of the actual file,
+     even if the headers tell us to.  */
+  if (unlikely (end > elf->maximum_size))
+    end = elf->maximum_size;
+
+  /* If the file is too small, there is nothing at all to get.  */
+  if (unlikely (start >= end))
+    return false;
 
   if (elf->map_address != NULL)
     {

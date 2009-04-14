@@ -1,3 +1,13 @@
+2009-04-14  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_segment_report_module.c: Handle DT_STRTAB value being either
+	absolute (already adjusted in place) or needing load bias adjustment.
+
+	* core-file.c (dwfl_elf_phdr_memory_callback): Fix return value for
+	gelf_getphdr failure.  Fix file size limit checks.
+
+	* dwfl_segment_report_module.c: Fix underflow in DYNSTRSZ check.
+
 2009-04-08  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_module_getsym.c: Don't adjust for bias again after

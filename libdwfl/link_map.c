@@ -585,7 +585,6 @@ consider_executable (Dwfl_Module *mod, GElf_Addr at_phdr, GElf_Addr at_entry,
 	  (*memory_callback) (mod->dwfl, -1, &buffer, &buffer_available, 0, 0,
 			      memory_callback_arg);
 
-
 	  if (*elfclass == ELFCLASSNONE)
 	    *elfclass = ehdr.e_ident[EI_CLASS];
 	  else if (*elfclass != ehdr.e_ident[EI_CLASS])

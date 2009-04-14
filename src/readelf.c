@@ -6922,7 +6922,7 @@ handle_core_registers (Ebl *ebl, Elf *core, const void *desc,
   ssize_t maxnreg = ebl_register_info (ebl, 0, NULL, 0, NULL, NULL, NULL, NULL);
   if (maxnreg <= 0)
     error (EXIT_FAILURE, 0,
-	   gettext ("cannot register info: %s"), elf_errmsg (-1));
+	   gettext ("cannot get register info: %s"), elf_errmsg (-1));
 
   struct register_info regs[maxnreg];
   memset (regs, 0, sizeof regs);

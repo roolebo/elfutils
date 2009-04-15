@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2000-2006, 2007, 2008 Red Hat, Inc.
+## Copyright (C) 2000-2009 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -85,7 +85,8 @@ alpha_SRCS = alpha_init.c alpha_symbol.c alpha_retval.c alpha_regs.c \
 libebl_alpha_pic_a_SOURCES = $(alpha_SRCS)
 am_libebl_alpha_pic_a_OBJECTS = $(alpha_SRCS:.c=.os)
 
-arm_SRCS = arm_init.c arm_symbol.c
+arm_SRCS = arm_init.c arm_symbol.c arm_regs.c arm_corenote.c \
+	   arm_auxv.c arm_attrs.c arm_retval.c
 libebl_arm_pic_a_SOURCES = $(arm_SRCS)
 am_libebl_arm_pic_a_OBJECTS = $(arm_SRCS:.c=.os)
 

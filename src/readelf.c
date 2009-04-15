@@ -4676,9 +4676,13 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
       if (unlikely (cieend > dataend || readp + 8 > dataend))
 	goto invalid_data;
 
-      Dwarf_Word cie_id;
+      Dwarf_Off cie_id;
       if (length == 4)
-	cie_id = read_4ubyte_unaligned_inc (dbg, readp);
+	{
+	  cie_id = read_4ubyte_unaligned_inc (dbg, readp);
+	  if (!is_eh_frame && cie_id == DW_CIE_ID_32)
+	    cie_id = DW_CIE_ID_64;
+	}
       else
 	cie_id = read_8ubyte_unaligned_inc (dbg, readp);
 
@@ -4689,7 +4693,7 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
       Dwarf_Word initial_location = 0;
       Dwarf_Word vma_base = 0;
 
-      if (cie_id == (is_eh_frame ? 0 : DW_CIE_ID))
+      if (cie_id == (is_eh_frame ? 0 : DW_CIE_ID_64))
 	{
 	  uint_fast8_t version = *readp++;
 	  const char *const augmentation = (const char *) readp;

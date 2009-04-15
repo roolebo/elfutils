@@ -1,3 +1,8 @@
+2009-04-15  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (print_debug_frame_section): Check for DW_CIE_ID_64 in
+	64-bit format header, DW_CIE_ID_32 in 32-bit format header.
+
 2009-04-14  Roland McGrath  <roland@redhat.com>
 
 	* readelf.c (print_attributes): Treat SHT_ARM_ATTRIBUTES on EM_ARM

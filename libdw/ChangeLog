@@ -1,3 +1,8 @@
+2009-04-15  Roland McGrath  <roland@redhat.com>
+
+	* dwarf.h (DW_CIE_ID): Removed.
+	(DW_CIE_ID_32, DW_CIE_ID_64): New constants replace it.
+
 2009-04-01  Roland McGrath  <roland@redhat.com>
 
 	* dwarf.h: Add DW_CFA_GNU_negative_offset_extended.

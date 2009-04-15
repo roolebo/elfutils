@@ -677,7 +677,8 @@ enum
 /* ID indicating CIE as opposed to FDE in .debug_frame.  */
 enum
   {
-    DW_CIE_ID = 0xffffffff
+    DW_CIE_ID_32 = 0xffffffffU,		 /* In 32-bit format CIE header.  */
+    DW_CIE_ID_64 = 0xffffffffffffffffULL /* In 64-bit format CIE header.  */
   };
 
 

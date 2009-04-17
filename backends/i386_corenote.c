@@ -1,5 +1,5 @@
 /* i386 specific core note handling.
-   Copyright (C) 2007, 2008 Red Hat, Inc.
+   Copyright (C) 2007-2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -101,7 +101,7 @@ static const Ebl_Register_Location prxfpreg_regs[] =
   };
 
 #define	EXTRA_NOTES \
-  EXTRA_REGSET (NT_PRFPXREG, 512, prxfpreg_regs) \
+  EXTRA_REGSET (NT_PRXFPREG, 512, prxfpreg_regs) \
   case NT_386_TLS: \
     return tls_info (descsz, regs_offset, nregloc, reglocs, nitems, items); \
   EXTRA_NOTES_IOPERM

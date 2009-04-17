@@ -1,3 +1,7 @@
+2009-04-16  Roland McGrath  <roland@redhat.com>
+
+	* i386_corenote.c (EXTRA_NOTES): NT_PRXFPREG -> NT_PRXFPREG
+
 2009-04-14  Roland McGrath  <roland@redhat.com>
 
 	* arm_retval.c: New file.

@@ -40,9 +40,9 @@ arm_register_info (Ebl *ebl __attribute__ ((unused)),
 		   int *bits, int *type)
 {
   if (name == NULL)
-    return 129;
+    return 320;
 
-  if (regno < 0 || regno > 128 || namelen < 5)
+  if (regno < 0 || regno > 320 || namelen < 5)
     return -1;
 
   *prefix = NULL;
@@ -87,6 +87,25 @@ arm_register_info (Ebl *ebl __attribute__ ((unused)),
     case 128:
       *type = DW_ATE_unsigned;
       return stpcpy (name, "spsr") + 1 - name;
+
+    case 256 + 0 ... 256 + 9:
+      *setname = "VFP";
+      *type = DW_ATE_float;
+      *bits = 64;
+      name[0] = 'd';
+      name[1] = regno - 256 + '0';
+      namelen = 2;
+      break;
+
+    case 256 + 10 ... 256 + 31:
+      *setname = "VFP";
+      *type = DW_ATE_float;
+      *bits = 64;
+      name[0] = 'd';
+      name[1] = (regno - 256) / 10 + '0';
+      name[2] = (regno - 256) % 10 + '0';
+      namelen = 3;
+      break;
 
     default:
       *setname = NULL;

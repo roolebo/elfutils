@@ -16,13 +16,13 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software Foundation,
 dnl Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 dnl
-AC_INIT([Red Hat elfutils],[0.140],[http://bugzilla.redhat.com/bugzilla/],
+AC_INIT([Red Hat elfutils],[0.140.90],[http://bugzilla.redhat.com/bugzilla/],
 	[elfutils])
 
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_FILES([config/Makefile])
 
-AC_COPYRIGHT([Copyright (C) 1996-2008, 2009 Red Hat, Inc.])
+AC_COPYRIGHT([Copyright (C) 1996-2009 Red Hat, Inc.])
 AC_PREREQ(2.59)			dnl Minimum Autoconf version required.
 
 dnl We use GNU make extensions; automake 1.10 defaults to -Wportability.
@@ -259,12 +259,35 @@ AH_BOTTOM([#include <eu-config.h>])
 dnl Version compatibility header.
 AC_CONFIG_FILES([version.h:config/version.h.in])
 AC_SUBST([eu_version])
-case $PACKAGE_VERSION in
-0.???) eu_version=${PACKAGE_VERSION#0.} ;;
-?.???) eu_version=${PACKAGE_VERSION/./} ;;
-?.??)  eu_version=${PACKAGE_VERSION/./}0 ;;
-?.?)   eu_version=${PACKAGE_VERSION/./}00 ;;
-*)     AC_MSG_ERROR([confused by version number '$PACKAGE_VERSION']) ;;
+
+# 1.234<whatever> -> 1234<whatever>
+case "$PACKAGE_VERSION" in
+[[0-9]].*) eu_version="${PACKAGE_VERSION/./}" ;;
+*)     	   AC_MSG_ERROR([confused by version number '$PACKAGE_VERSION']) ;;
+esac
+case "$eu_version" in
+*.*)
+  # 1234.567 -> "1234", "567"
+  eu_extra_version="${eu_version#*.}"
+  eu_version="${eu_version%%.*}"
+  case "$eu_extra_version" in
+  [[0-9]][[0-9]][[0-9]]) ;;
+  [[0-9]][[0-9]])	eu_extra_version="${eu_extra_version}0" ;;
+  [[0-9]])	   	eu_extra_version="${eu_extra_version}00" ;;
+  *) AC_MSG_ERROR([confused by version number '$PACKAGE_VERSION']) ;;
+  esac
+  ;;
+*)
+  eu_extra_version=000
+  ;;
+esac
+
+case "$eu_version" in
+      0[[0-9]][[0-9]][[0-9]]) eu_version="${eu_version#0}$eu_extra_version" ;;
+[[0-9]][[0-9]][[0-9]][[0-9]]) eu_version="${eu_version}$eu_extra_version" ;;
+[[0-9]][[0-9]][[0-9]])	      eu_version="${eu_version}0$eu_extra_version" ;;
+[[0-9]][[0-9]])   	      eu_version="${eu_version}00$eu_extra_version";;
+*) AC_MSG_ERROR([confused by version number '$PACKAGE_VERSION']) ;;
 esac
 
 AC_OUTPUT

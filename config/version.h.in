@@ -1,5 +1,5 @@
 /* Version information about elfutils development libraries.
-   Copyright (C) 2008 Red Hat, Inc.
+   Copyright (C) 2008-2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -53,6 +53,6 @@
 #define _ELFUTILS_VERSION	@eu_version@
 
 #define _ELFUTILS_PREREQ(major, minor) \
-  (_ELFUTILS_VERSION >= ((major) * 1000 + (minor)))
+  (_ELFUTILS_VERSION >= ((major) * 1000000 + (minor) * 1000))
 
 #endif	/* elfutils/version.h */

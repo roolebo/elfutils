@@ -53,6 +53,6 @@
 #define _ELFUTILS_VERSION	@eu_version@
 
 #define _ELFUTILS_PREREQ(major, minor) \
-  (_ELFUTILS_VERSION >= ((major) * 1000000 + (minor) * 1000))
+  ((_ELFUTILS_VERSION + 999) / 1000 >= ((major) * 1000 + (minor)))
 
 #endif	/* elfutils/version.h */

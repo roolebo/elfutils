@@ -290,4 +290,7 @@ case "$eu_version" in
 *) AC_MSG_ERROR([confused by version number '$PACKAGE_VERSION']) ;;
 esac
 
+# Round up to the next release API (x.y) version.
+[eu_version=$[($eu_version + 999) / 1000]]
+
 AC_OUTPUT

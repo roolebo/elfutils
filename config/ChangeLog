@@ -1,3 +1,7 @@
+2009-04-19  Roland McGrath  <roland@redhat.com>
+
+	* version.h.in: Revert last change.
+
 2009-04-17  Roland McGrath  <roland@redhat.com>
 
 	* version.h.in (_ELFUTILS_PREREQ): Multiple major by 1000000 and minor

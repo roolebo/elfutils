@@ -69,6 +69,8 @@ static const struct argp_option options[] =
     N_("Show absolute file names using compilation directory"), 0 },
   { "functions", 'f', NULL, 0, N_("Also show function names"), 0 },
   { "symbols", 'S', NULL, 0, N_("Also show symbol or section names"), 0 },
+  { "section", 'j', "NAME", 0,
+    N_("Treat addresses as offsets relative to NAME section."), 0 },
 
   { NULL, 0, NULL, 0, N_("Miscellaneous:"), 0 },
   /* Unsupported options.  */
@@ -112,6 +114,9 @@ static bool show_functions;
 
 /* True if ELF symbol or section info should be shown.  */
 static bool show_symbols;
+
+/* If non-null, take address parameters as relative to named section.  */
+static const char *just_section;
 
 
 int
@@ -188,8 +193,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 
 /* Handle program arguments.  */
 static error_t
-parse_opt (int key, char *arg __attribute__ ((unused)),
-	   struct argp_state *state)
+parse_opt (int key, char *arg, struct argp_state *state)
 {
   switch (key)
     {
@@ -217,6 +221,10 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
 
     case 'S':
       show_symbols = true;
+      break;
+
+    case 'j':
+      just_section = arg;
       break;
 
     default:
@@ -366,6 +374,49 @@ find_symbol (Dwfl_Module *mod,
   return DWARF_CB_OK;
 }
 
+static bool
+adjust_to_section (const char *name, uintmax_t *addr, Dwfl *dwfl)
+{
+  /* It was (section)+offset.  This makes sense if there is
+     only one module to look in for a section.  */
+  Dwfl_Module *mod = NULL;
+  if (dwfl_getmodules (dwfl, &see_one_module, &mod, 0) != 0
+      || mod == NULL)
+    error (EXIT_FAILURE, 0, gettext ("Section syntax requires"
+				     " exactly one module"));
+
+  int nscn = dwfl_module_relocations (mod);
+  for (int i = 0; i < nscn; ++i)
+    {
+      GElf_Word shndx;
+      const char *scn = dwfl_module_relocation_info (mod, i, &shndx);
+      if (unlikely (scn == NULL))
+	break;
+      if (!strcmp (scn, name))
+	{
+	  /* Found the section.  */
+	  GElf_Shdr shdr_mem;
+	  GElf_Addr shdr_bias;
+	  GElf_Shdr *shdr = gelf_getshdr
+	    (elf_getscn (dwfl_module_getelf (mod, &shdr_bias), shndx),
+	     &shdr_mem);
+	  if (unlikely (shdr == NULL))
+	    break;
+
+	  if (*addr >= shdr->sh_size)
+	    error (0, 0,
+		   gettext ("offset %#" PRIxMAX " lies outside"
+			    " section '%s'"),
+		   *addr, scn);
+
+	  *addr += shdr->sh_addr + shdr_bias;
+	  return true;
+	}
+    }
+
+  return false;
+}
+
 static int
 handle_address (const char *string, Dwfl *dwfl)
 {
@@ -378,45 +429,7 @@ handle_address (const char *string, Dwfl *dwfl)
       char *name = NULL;
       if (sscanf (string, "(%m[^)])%" PRIiMAX "%n", &name, &addr, &n) == 2
 	  && string[n] == '\0')
-	{
-	  /* It was (section)+offset.  This makes sense if there is
-	     only one module to look in for a section.  */
-	  Dwfl_Module *mod = NULL;
-	  if (dwfl_getmodules (dwfl, &see_one_module, &mod, 0) != 0
-	      || mod == NULL)
-	    error (EXIT_FAILURE, 0, gettext ("Section syntax requires"
-					     " exactly one module"));
-
-	  int nscn = dwfl_module_relocations (mod);
-	  for (int i = 0; i < nscn; ++i)
-	    {
-	      GElf_Word shndx;
-	      const char *scn = dwfl_module_relocation_info (mod, i, &shndx);
-	      if (unlikely (scn == NULL))
-		break;
-	      if (!strcmp (scn, name))
-		{
-		  /* Found the section.  */
-		  GElf_Shdr shdr_mem;
-		  GElf_Addr shdr_bias;
-		  GElf_Shdr *shdr = gelf_getshdr
-		    (elf_getscn (dwfl_module_getelf (mod, &shdr_bias), shndx),
-		     &shdr_mem);
-		  if (unlikely (shdr == NULL))
-		    break;
-
-		  if (addr >= shdr->sh_size)
-		    error (0, 0,
-			   gettext ("offset %#" PRIxMAX " lies outside"
-				    " section '%s'"),
-			   addr, scn);
-
-		  addr += shdr->sh_addr + shdr_bias;
-		  parsed = true;
-		  break;
-		}
-	    }
-	}
+	parsed = adjust_to_section (name, &addr, dwfl);
       else if (sscanf (string, "%m[^-+]%" PRIiMAX "%n", &name, &addr, &n) == 2
 	       && string[n] == '\0')
 	{
@@ -442,6 +455,9 @@ handle_address (const char *string, Dwfl *dwfl)
       if (!parsed)
 	return 1;
     }
+  else if (just_section != NULL
+	   && !adjust_to_section (just_section, &addr, dwfl))
+    return 1;
 
   Dwfl_Module *mod = dwfl_addrmodule (dwfl, addr);
 

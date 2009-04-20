@@ -121,6 +121,7 @@ open_elf (Dwfl_Module *mod, struct dwfl_file *file)
 /* Find the main ELF file for this module and open libelf on it.
    When we return success, MOD->main.elf and MOD->main.bias are set up.  */
 void
+internal_function
 __libdwfl_getelf (Dwfl_Module *mod)
 {
   if (mod->main.elf != NULL	/* Already done.  */

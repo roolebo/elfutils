@@ -1,3 +1,7 @@
+2009-04-20  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_getdwarf.c (__libdwfl_getelf): Add internal_function.
+
 2009-04-19  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_module_getdwarf.c (find_file): Renamed to ...

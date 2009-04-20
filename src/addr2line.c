@@ -284,15 +284,35 @@ print_dwarf_function (Dwfl_Module *mod, Dwarf_Addr addr)
 						   DW_AT_call_column,
 						   &attr_mem), &val) == 0)
 		    colno = val;
-		  if (lineno == 0)
+
+		  const char *comp_dir = "";
+		  const char *comp_dir_sep = "";
+
+		  if (file == NULL)
+		    file = "???";
+		  else if (only_basenames)
+		    file = basename (file);
+		  else if (use_comp_dir && file[0] != '/')
 		    {
-		      if (file != NULL)
-			printf (" from %s", file);
+		      const char *const *dirs;
+		      size_t ndirs;
+		      if (dwarf_getsrcdirs (files, &dirs, &ndirs) == 0
+			  && dirs[0] != NULL)
+			{
+			  comp_dir = dirs[0];
+			  comp_dir_sep = "/";
+			}
 		    }
+
+		  if (lineno == 0)
+		    printf (" from %s%s%s",
+			    comp_dir, comp_dir_sep, file);
 		  else if (colno == 0)
-		    printf (" at %s:%u", file, lineno);
+		    printf (" at %s%s%s:%u",
+			    comp_dir, comp_dir_sep, file, lineno);
 		  else
-		    printf (" at %s:%u:%u", file, lineno, colno);
+		    printf (" at %s%s%s:%u:%u",
+			    comp_dir, comp_dir_sep, file, lineno, colno);
 		}
 	    }
 	  printf (" in ");

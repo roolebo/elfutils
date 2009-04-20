@@ -51,8 +51,8 @@ libdwfl_a_SOURCES = dwfl_begin.c dwfl_end.c dwfl_error.c dwfl_version.c \
 		    dwfl_module.c dwfl_report_elf.c relocate.c \
 		    dwfl_module_build_id.c dwfl_module_report_build_id.c \
 		    derelocate.c offline.c segment.c \
-		    dwfl_module_info.c  dwfl_getmodules.c \
-		    dwfl_module_getdwarf.c dwfl_getdwarf.c \
+		    dwfl_module_info.c dwfl_getmodules.c dwfl_getdwarf.c \
+		    dwfl_module_getdwarf.c dwfl_module_getelf.c \
 		    dwfl_validate_address.c \
 		    argp-std.c find-debuginfo.c \
 		    dwfl_build_id_find_elf.c \

@@ -1,3 +1,13 @@
+2009-04-19  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_getdwarf.c (find_file): Renamed to ...
+	(__libdwfl_getelf): ... this.  Make it global.
+	(find_symtab, find_dw): Update callers.
+	(dwfl_module_getelf): Functions moved ...
+	* dwfl_module_getelf.c: ... here, new file.
+	* Makefile.am (libdwfl_a_SOURCES): Add it.
+	* libdwflP.h: Declare __libdwfl_getelf.
+
 2009-04-14  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_segment_report_module.c: Handle DT_STRTAB value being either

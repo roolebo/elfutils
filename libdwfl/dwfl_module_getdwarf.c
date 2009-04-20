@@ -120,8 +120,8 @@ open_elf (Dwfl_Module *mod, struct dwfl_file *file)
 
 /* Find the main ELF file for this module and open libelf on it.
    When we return success, MOD->main.elf and MOD->main.bias are set up.  */
-static void
-find_file (Dwfl_Module *mod)
+void
+__libdwfl_getelf (Dwfl_Module *mod)
 {
   if (mod->main.elf != NULL	/* Already done.  */
       || mod->elferr != DWFL_E_NOERROR)	/* Cached failure.  */
@@ -496,7 +496,7 @@ find_symtab (Dwfl_Module *mod)
       || mod->symerr != DWFL_E_NOERROR) /* Cached previous failure.  */
     return;
 
-  find_file (mod);
+  __libdwfl_getelf (mod);
   mod->symerr = mod->elferr;
   if (mod->symerr != DWFL_E_NOERROR)
     return;
@@ -592,7 +592,7 @@ __libdwfl_module_getebl (Dwfl_Module *mod)
 {
   if (mod->ebl == NULL)
     {
-      find_file (mod);
+      __libdwfl_getelf (mod);
       if (mod->elferr != DWFL_E_NOERROR)
 	return mod->elferr;
 
@@ -660,7 +660,7 @@ find_dw (Dwfl_Module *mod)
       || mod->dwerr != DWFL_E_NOERROR) /* Cached previous failure.  */
     return;
 
-  find_file (mod);
+  __libdwfl_getelf (mod);
   mod->dwerr = mod->elferr;
   if (mod->dwerr != DWFL_E_NOERROR)
     return;
@@ -700,46 +700,6 @@ find_dw (Dwfl_Module *mod)
  canonicalize:
   mod->dwerr = __libdwfl_canon_error (mod->dwerr);
 }
-
-
-Elf *
-dwfl_module_getelf (Dwfl_Module *mod, GElf_Addr *loadbase)
-{
-  if (mod == NULL)
-    return NULL;
-
-  find_file (mod);
-  if (mod->elferr == DWFL_E_NOERROR)
-    {
-      if (mod->e_type == ET_REL && ! mod->main.relocated)
-	{
-	  /* Before letting them get at the Elf handle,
-	     apply all the relocations we know how to.  */
-
-	  mod->main.relocated = true;
-	  if (likely (__libdwfl_module_getebl (mod) == DWFL_E_NOERROR))
-	    {
-	      (void) __libdwfl_relocate (mod, mod->main.elf, false);
-
-	      if (mod->debug.elf == mod->main.elf)
-		mod->debug.relocated = true;
-	      else if (mod->debug.elf != NULL && ! mod->debug.relocated)
-		{
-		  mod->debug.relocated = true;
-		  (void) __libdwfl_relocate (mod, mod->debug.elf, false);
-		}
-	    }
-	}
-
-      *loadbase = mod->main.bias;
-      return mod->main.elf;
-    }
-
-  __libdwfl_seterrno (mod->elferr);
-  return NULL;
-}
-INTDEF (dwfl_module_getelf)
-
 
 Dwarf *
 dwfl_module_getdwarf (Dwfl_Module *mod, Dwarf_Addr *bias)

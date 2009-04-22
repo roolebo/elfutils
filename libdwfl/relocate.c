@@ -267,8 +267,14 @@ resolve_symbol (Dwfl_Module *referer, struct reloc_symtab_cache *symtab,
 		  continue;
 
 		/* We found it!  */
-		if (shndx == SHN_ABS)
+		if (shndx == SHN_ABS) /* XXX maybe should apply bias? */
 		  return DWFL_E_NOERROR;
+
+		if (m->e_type != ET_REL)
+		  {
+		    sym->st_value += m->symfile->bias;
+		    return DWFL_E_NOERROR;
+		  }
 
 		/* In an ET_REL file, the symbol table values are relative
 		   to the section, not to the module's load base.  */

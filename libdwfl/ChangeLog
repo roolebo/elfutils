@@ -1,5 +1,8 @@
 2009-04-22  Roland McGrath  <roland@redhat.com>
 
+	* relocate.c (resolve_symbol): Apply correct bias to st_value found in
+	a non-ET_REL module.
+
 	* dwfl_module_build_id.c (__libdwfl_find_build_id): Fix last change to
 	adjust properly for non-ET_REL.
 

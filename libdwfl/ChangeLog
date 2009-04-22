@@ -1,3 +1,8 @@
+2009-04-22  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_build_id.c (__libdwfl_find_build_id): Fix last change to
+	adjust properly for non-ET_REL.
+
 2009-04-21  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_module_getsym.c: Apply non-ET_REL bias only if SHF_ALLOC.

@@ -134,10 +134,12 @@ __libdwfl_find_build_id (Dwfl_Module *mod, bool set, Elf *elf)
 	  {
 	    /* Determine the right sh_addr in this module.  */
 	    GElf_Addr vaddr = 0;
-	    if (!(shdr->sh_flags & SHF_ALLOC)
-		|| (mod->e_type == ET_REL
-		    && __libdwfl_relocate_value (mod, elf, &shstrndx,
-						 elf_ndxscn (scn), &vaddr)))
+	    if (!(shdr->sh_flags & SHF_ALLOC))
+	      vaddr = NO_VADDR;
+	    else if (mod->e_type != ET_REL)
+	      vaddr = shdr->sh_addr + mod->main.bias;
+	    else if (__libdwfl_relocate_value (mod, elf, &shstrndx,
+					       elf_ndxscn (scn), &vaddr))
 	      vaddr = NO_VADDR;
 	    result = check_notes (mod, set, elf_getdata (scn, NULL), vaddr);
 	  }

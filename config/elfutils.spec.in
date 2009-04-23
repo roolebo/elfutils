@@ -183,6 +183,15 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
+* Thu Apr 23 2009 Ulrich Drepper <drepper@redhat.com> 0.141-1
+- libebl: sparc backend fixes; 	some more arm backend support
+- libdwfl: fix dwfl_module_build_id for prelinked DSO case; 	 
+  fixes in core file support; 	 dwfl_module_getsym interface 
+  improved for non-address symbols
+- strip: fix infinite loop on strange inputs with -f
+- addr2line: take -j/--section=NAME option for binutils compatibility 
+  	   (same effect as '(NAME)0x123' syntax already supported)
+
 * Mon Feb 16 2009 Ulrich Drepper <drepper@redhat.com> 0.140-1
 - libelf: Fix regression in creation of section header
 - libdwfl: Less strict behavior if DWARF reader ist just used to 

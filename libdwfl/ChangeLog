@@ -1,3 +1,8 @@
+2009-04-23  Ulrich Drepper  <drepper@redhat.com>
+
+	* dwfl_module_build_id.c: Define versioned symbols only if SHARED is
+	defined.  Otherwise just define the latest version.
+
 2009-04-22  Roland McGrath  <roland@redhat.com>
 
 	* relocate.c (resolve_symbol): Apply correct bias to st_value found in

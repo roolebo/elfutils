@@ -174,6 +174,7 @@ __dwfl_module_build_id (Dwfl_Module *mod,
   *vaddr = mod->build_id_vaddr;
   return mod->build_id_len;
 }
+#ifdef SHARED
 extern __typeof__ (dwfl_module_build_id) INTUSE(dwfl_module_build_id)
      __attribute__ ((alias ("__dwfl_module_build_id")));
 asm (".symver "
@@ -190,3 +191,7 @@ _BUG_COMPAT_dwfl_module_build_id (Dwfl_Module *mod,
 }
 asm (".symver "
      "_BUG_COMPAT_dwfl_module_build_id, dwfl_module_build_id@ELFUTILS_0.130");
+#else
+extern __typeof__ (dwfl_module_build_id) dwfl_module_build_id
+     __attribute__ ((alias ("__dwfl_module_build_id")));
+#endif

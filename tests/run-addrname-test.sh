@@ -64,7 +64,6 @@ EOF
 
 testfiles testfile12 testfile14
 tempfiles testmaps
-remove_files=
 
 cat > testmaps <<EOF
 00400000-00401000 r-xp 00000000 fd:01 4006812                            `pwd`/testfile14

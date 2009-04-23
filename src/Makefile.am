@@ -95,7 +95,7 @@ endif
 
 if BUILD_STATIC
 libasm = ../libasm/libasm.a
-libdw = ../libdw/libdw.a $(libelf) $(libebl) -ldl
+libdw = ../libdw/libdw.a $(zip_LIBS) $(libelf) $(libebl) -ldl
 libelf = ../libelf/libelf.a
 else
 libasm = ../libasm/libasm.so

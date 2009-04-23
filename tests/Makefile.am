@@ -160,7 +160,7 @@ installcheck-local:
 endif !STANDALONE
 
 if MUDFLAP
-static_build=yes
+static_build = yes
 libmudflap = -lmudflap
 endif
 
@@ -171,7 +171,7 @@ libasm = -lasm
 libebl = -lebl
 else !STANDALONE
 if BUILD_STATIC
-libdw = ../libdw/libdw.a $(libelf) $(libebl) -ldl
+libdw = ../libdw/libdw.a $(zip_LIBS) $(libelf) $(libebl) -ldl
 libelf = ../libelf/libelf.a
 libasm = ../libasm/libasm.a
 else
@@ -225,7 +225,7 @@ asm_tst7_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl
 asm_tst8_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl
 asm_tst9_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl
 dwflmodtest_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
-rdwrmmap_LDADD = $(libelf)
+rdwrmmap_LDADD = $(libelf) $(libmudflap)
 dwfl_bug_addr_overflow_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
 arls_LDADD = $(libelf) $(libmudflap)
 dwfl_bug_fd_leak_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl

@@ -1,3 +1,8 @@
+2009-04-23  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile [BUILD_STATIC] (libdw): Add $(zip_LIBS).
+	(rdwrmmap_LDADD): Add $(libmudflap).
+	
 2009-04-21  Roland McGrath  <roland@redhat.com>
 
 	* testfile50.bz2: New data file.

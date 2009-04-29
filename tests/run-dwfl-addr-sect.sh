@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2007, 2008 Red Hat, Inc.
+# Copyright (C) 2007-2009 Red Hat, Inc.
 # This file is part of Red Hat elfutils.
 #
 # Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -25,12 +25,16 @@
 
 . $srcdir/test-subr.sh
 
-testfiles testfile43
+testfiles testfile43 testfile50
 
 testrun_compare ./dwfl-addr-sect -e testfile43 0x64 0x8 0x98 <<\EOF
 address 0x64 => module "" section 4 + 0
 address 0x8 => module "" section 1 + 0x8
 address 0x98 => module "" section 7 + 0
+EOF
+
+testrun_compare ./dwfl-addr-sect -e testfile50 0x1 <<\EOF
+address 0x1 => module "" section 1 + 0x1
 EOF
 
 exit 0

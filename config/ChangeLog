@@ -1,3 +1,12 @@
+2009-04-19  Roland McGrath  <roland@redhat.com>
+
+	* version.h.in: Revert last change.
+
+2009-04-17  Roland McGrath  <roland@redhat.com>
+
+	* version.h.in (_ELFUTILS_PREREQ): Multiple major by 1000000 and minor
+	by 1000; now _ELFUTILS_VERSION is 789000 for version 0.789.
+
 2009-01-22  Ulrich Drepper  <drepper@redhat.com>
 
 	* elfutils.spec.in: Distribute <elfutils/version.h> in

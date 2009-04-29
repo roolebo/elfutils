@@ -1,3 +1,32 @@
+2009-04-23  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile [BUILD_STATIC] (libdw): Add $(zip_LIBS).
+
+2009-04-20  Roland McGrath  <roland@redhat.com>
+
+	* addr2line.c (print_dwarf_function): Honor -s and -A for file names
+	of inline call sites.
+
+	* addr2line.c (just_section): New variable.
+	(adjust_to_section): New function, broken out of ...
+	(handle_address): ... here.
+	(options, parse_opt): Add -j/--section=NAME to set it.
+
+2009-04-15  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (print_debug_frame_section): Check for DW_CIE_ID_64 in
+	64-bit format header, DW_CIE_ID_32 in 32-bit format header.
+
+2009-04-14  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (print_attributes): Treat SHT_ARM_ATTRIBUTES on EM_ARM
+	like SHT_GNU_ATTRIBUTES.
+
+	* readelf.c (handle_core_registers): Fix error message.
+
+	* strip.c (handle_elf: check_preserved): Don't note any change when
+	.debug_data is already filled from a previous pass.
+
 2009-02-05  Ulrich Drepper  <drepper@redhat.com>
 
 	* objdump.c (show_relocs_x): Minor cleanups.

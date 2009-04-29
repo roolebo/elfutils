@@ -1,7 +1,6 @@
-/* Return symbol type name.
-   Copyright (C) 2001, 2002, 2009 Red Hat, Inc.
+/* Find debugging and symbol information for a module in libdwfl.
+   Copyright (C) 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by the
@@ -48,54 +47,42 @@
    Network licensing program, please visit www.openinventionnetwork.com
    <http://www.openinventionnetwork.com>.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include "libdwflP.h"
 
-#include <stdio.h>
-#include <libeblP.h>
-
-
-const char *
-ebl_symbol_type_name (ebl, symbol, buf, len)
-     Ebl *ebl;
-     int symbol;
-     char *buf;
-     size_t len;
+Elf *
+dwfl_module_getelf (Dwfl_Module *mod, GElf_Addr *loadbase)
 {
-  const char *res;
+  if (mod == NULL)
+    return NULL;
 
-  res = ebl != NULL ? ebl->symbol_type_name (symbol, buf, len) : NULL;
-  if (res == NULL)
+  __libdwfl_getelf (mod);
+  if (mod->elferr == DWFL_E_NOERROR)
     {
-      static const char *stt_names[STT_NUM] =
+      if (mod->e_type == ET_REL && ! mod->main.relocated)
 	{
-	  [STT_NOTYPE] = "NOTYPE",
-	  [STT_OBJECT] = "OBJECT",
-	  [STT_FUNC] = "FUNC",
-	  [STT_SECTION] = "SECTION",
-	  [STT_FILE] = "FILE",
-	  [STT_COMMON] = "COMMON",
-	  [STT_TLS] = "TLS"
-	};
+	  /* Before letting them get at the Elf handle,
+	     apply all the relocations we know how to.  */
 
-      /* Standard type?  */
-      if (symbol < STT_NUM)
-	res = stt_names[symbol];
-      else
-	{
-	  if (symbol >= STT_LOPROC && symbol <= STT_HIPROC)
-	    snprintf (buf, len, "LOPROC+%d", symbol - STT_LOPROC);
-	  else if (symbol == STT_GNU_IFUNC)
-	    return "GNU_IFUNC";
-	  else if (symbol >= STT_LOOS && symbol <= STT_HIOS)
-	    snprintf (buf, len, "LOOS+%d", symbol - STT_LOOS);
-	  else
-	    snprintf (buf, len, gettext ("<unknown>: %d"), symbol);
+	  mod->main.relocated = true;
+	  if (likely (__libdwfl_module_getebl (mod) == DWFL_E_NOERROR))
+	    {
+	      (void) __libdwfl_relocate (mod, mod->main.elf, false);
 
-	  res = buf;
+	      if (mod->debug.elf == mod->main.elf)
+		mod->debug.relocated = true;
+	      else if (mod->debug.elf != NULL && ! mod->debug.relocated)
+		{
+		  mod->debug.relocated = true;
+		  (void) __libdwfl_relocate (mod, mod->debug.elf, false);
+		}
+	    }
 	}
+
+      *loadbase = mod->main.bias;
+      return mod->main.elf;
     }
 
-  return res;
+  __libdwfl_seterrno (mod->elferr);
+  return NULL;
 }
+INTDEF (dwfl_module_getelf)

@@ -1,7 +1,6 @@
-/* Initialization of Arm specific backend library.
-   Copyright (C) 2002, 2005, 2009 Red Hat, Inc.
+/* ARM specific core note handling.
+   Copyright (C) 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by the
@@ -28,37 +27,47 @@
 # include <config.h>
 #endif
 
-#define BACKEND		arm_
-#define RELOC_PREFIX	R_ARM_
+#include <elf.h>
+#include <inttypes.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <sys/time.h>
+
+#define BACKEND arm_
 #include "libebl_CPU.h"
 
-/* This defines the common reloc hooks based on arm_reloc.def.  */
-#include "common-reloc.c"
 
+static const Ebl_Register_Location prstatus_regs[] =
+  {
+    { .offset = 0, .regno = 0, .count = 16, .bits = 32 },	/* r0..r15 */
+    { .offset = 16 * 4, .regno = 128, .count = 1, .bits = 32 }, /* cpsr */
+  };
+#define PRSTATUS_REGS_SIZE	(18 * 4)
 
-const char *
-arm_init (elf, machine, eh, ehlen)
-     Elf *elf __attribute__ ((unused));
-     GElf_Half machine __attribute__ ((unused));
-     Ebl *eh;
-     size_t ehlen;
-{
-  /* Check whether the Elf_BH object has a sufficent size.  */
-  if (ehlen < sizeof (Ebl))
-    return NULL;
+#define PRSTATUS_REGSET_ITEMS						      \
+  {									      \
+    .name = "orig_r0", .type = ELF_T_SWORD, .format = 'd',		      \
+    .offset = offsetof (struct EBLHOOK(prstatus), pr_reg) + (4 * 17),	      \
+    .group = "register"	       			  	       	 	      \
+  }
 
-  /* We handle it.  */
-  eh->name = "ARM";
-  arm_init_reloc (eh);
-  HOOK (eh, segment_type_name);
-  HOOK (eh, section_type_name);
-  HOOK (eh, machine_flag_check);
-  HOOK (eh, reloc_simple_type);
-  HOOK (eh, register_info);
-  HOOK (eh, core_note);
-  HOOK (eh, auxv_info);
-  HOOK (eh, check_object_attribute);
-  HOOK (eh, return_value_location);
+static const Ebl_Register_Location fpregset_regs[] =
+  {
+    { .offset = 0, .regno = 96, .count = 8, .bits = 96 }, /* f0..f7 */
+  };
+#define FPREGSET_SIZE	140
 
-  return MODVERSION;
-}
+#define	ULONG			uint32_t
+#define PID_T			int32_t
+#define	UID_T			uint16_t
+#define	GID_T			uint16_t
+#define ALIGN_ULONG		4
+#define ALIGN_PID_T		4
+#define ALIGN_UID_T		2
+#define ALIGN_GID_T		2
+#define TYPE_ULONG		ELF_T_WORD
+#define TYPE_PID_T		ELF_T_SWORD
+#define TYPE_UID_T		ELF_T_HALF
+#define TYPE_GID_T		ELF_T_HALF
+
+#include "linux-core-note.c"

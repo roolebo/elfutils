@@ -670,13 +670,15 @@ enum
     DW_CFA_MIPS_advance_loc8 = 0x1d,
     DW_CFA_GNU_window_save = 0x2d,
     DW_CFA_GNU_args_size = 0x2e,
+    DW_CFA_GNU_negative_offset_extended = 0x2f,
     DW_CFA_high_user = 0x3f
   };
 
 /* ID indicating CIE as opposed to FDE in .debug_frame.  */
 enum
   {
-    DW_CIE_ID = 0xffffffff
+    DW_CIE_ID_32 = 0xffffffffU,		 /* In 32-bit format CIE header.  */
+    DW_CIE_ID_64 = 0xffffffffffffffffULL /* In 64-bit format CIE header.  */
   };
 
 

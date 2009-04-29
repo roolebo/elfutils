@@ -1,7 +1,6 @@
-/* Initialization of Arm specific backend library.
-   Copyright (C) 2002, 2005, 2009 Red Hat, Inc.
+/* ARM-specific auxv handling.
+   Copyright (C) 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by the
@@ -28,37 +27,20 @@
 # include <config.h>
 #endif
 
-#define BACKEND		arm_
-#define RELOC_PREFIX	R_ARM_
+#define BACKEND arm_
 #include "libebl_CPU.h"
 
-/* This defines the common reloc hooks based on arm_reloc.def.  */
-#include "common-reloc.c"
-
-
-const char *
-arm_init (elf, machine, eh, ehlen)
-     Elf *elf __attribute__ ((unused));
-     GElf_Half machine __attribute__ ((unused));
-     Ebl *eh;
-     size_t ehlen;
+int
+EBLHOOK(auxv_info) (GElf_Xword a_type, const char **name, const char **format)
 {
-  /* Check whether the Elf_BH object has a sufficent size.  */
-  if (ehlen < sizeof (Ebl))
-    return NULL;
+  if (a_type != AT_HWCAP)
+    return 0;
 
-  /* We handle it.  */
-  eh->name = "ARM";
-  arm_init_reloc (eh);
-  HOOK (eh, segment_type_name);
-  HOOK (eh, section_type_name);
-  HOOK (eh, machine_flag_check);
-  HOOK (eh, reloc_simple_type);
-  HOOK (eh, register_info);
-  HOOK (eh, core_note);
-  HOOK (eh, auxv_info);
-  HOOK (eh, check_object_attribute);
-  HOOK (eh, return_value_location);
-
-  return MODVERSION;
+  *name = "HWCAP";
+  *format = "b"
+    "swp\0" "half\0" "thumb\0" "26bit\0"
+    "fast-mult\0" "fpa\0" "vfp\0" "edsp\0"
+    "java\0" "iwmmxt\0"
+    "\0";
+  return 1;
 }

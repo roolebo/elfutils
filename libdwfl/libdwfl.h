@@ -1,5 +1,5 @@
 /* Interfaces for libdwfl.
-   Copyright (C) 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright (C) 2005-2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -423,10 +423,11 @@ extern int dwfl_module_getsymtab (Dwfl_Module *mod);
 
 /* Fetch one entry from the module's symbol table.  On errors, returns
    NULL.  If successful, fills in *SYM and returns the string for st_name.
-   This works like gelf_getsym except that st_value is always adjusted
-   to an absolute value based on the module's location.  If SHNDXP is
-   non-null, it's set with the section index (whether from st_shndx or
-   extended index table).  */
+   This works like gelf_getsym except that st_value is always adjusted to
+   an absolute value based on the module's location, when the symbol is in
+   an SHF_ALLOC section.  If SHNDXP is non-null, it's set with the section
+   index (whether from st_shndx or extended index table); in case of a
+   symbol in a non-allocated section, *SHNDXP is instead set to -1.  */
 extern const char *dwfl_module_getsym (Dwfl_Module *mod, int ndx,
 				       GElf_Sym *sym, GElf_Word *shndxp)
   __nonnull_attribute__ (3);

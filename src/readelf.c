@@ -2824,7 +2824,9 @@ print_attributes (Ebl *ebl, const GElf_Ehdr *ehdr)
       GElf_Shdr shdr_mem;
       GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
 
-      if (shdr == NULL || shdr->sh_type != SHT_GNU_ATTRIBUTES)
+      if (shdr == NULL || (shdr->sh_type != SHT_GNU_ATTRIBUTES
+			   && (shdr->sh_type != SHT_ARM_ATTRIBUTES
+			       || ehdr->e_machine != EM_ARM)))
 	continue;
 
       printf (gettext ("\
@@ -2871,8 +2873,9 @@ print_attributes (Ebl *ebl, const GElf_Ehdr *ehdr)
 
 	  printf (gettext ("  %-13s  %4" PRIu32 "\n"), name, len);
 
-	  if (q - name == sizeof "gnu"
-	      && !memcmp (name, "gnu", sizeof "gnu"))
+	  if (shdr->sh_type != SHT_GNU_ATTRIBUTES
+	      || (q - name == sizeof "gnu"
+		  && !memcmp (name, "gnu", sizeof "gnu")))
 	    while (q < p)
 	      {
 		const unsigned char *const sub = q;
@@ -4673,9 +4676,13 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
       if (unlikely (cieend > dataend || readp + 8 > dataend))
 	goto invalid_data;
 
-      Dwarf_Word cie_id;
+      Dwarf_Off cie_id;
       if (length == 4)
-	cie_id = read_4ubyte_unaligned_inc (dbg, readp);
+	{
+	  cie_id = read_4ubyte_unaligned_inc (dbg, readp);
+	  if (!is_eh_frame && cie_id == DW_CIE_ID_32)
+	    cie_id = DW_CIE_ID_64;
+	}
       else
 	cie_id = read_8ubyte_unaligned_inc (dbg, readp);
 
@@ -4686,7 +4693,7 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
       Dwarf_Word initial_location = 0;
       Dwarf_Word vma_base = 0;
 
-      if (cie_id == (is_eh_frame ? 0 : DW_CIE_ID))
+      if (cie_id == (is_eh_frame ? 0 : DW_CIE_ID_64))
 	{
 	  uint_fast8_t version = *readp++;
 	  const char *const augmentation = (const char *) readp;
@@ -6922,7 +6929,7 @@ handle_core_registers (Ebl *ebl, Elf *core, const void *desc,
   ssize_t maxnreg = ebl_register_info (ebl, 0, NULL, 0, NULL, NULL, NULL, NULL);
   if (maxnreg <= 0)
     error (EXIT_FAILURE, 0,
-	   gettext ("cannot register info: %s"), elf_errmsg (-1));
+	   gettext ("cannot get register info: %s"), elf_errmsg (-1));
 
   struct register_info regs[maxnreg];
   memset (regs, 0, sizeof regs);

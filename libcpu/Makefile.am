@@ -31,6 +31,7 @@ else
 AM_CFLAGS =
 endif
 AM_CFLAGS += -Wall -Wshadow -Wunused -Wextra -std=gnu99 -fpic \
+	     -fdollars-in-identifiers \
 	     $($(*F)_CFLAGS) \
 	     $(if $($(*F)_no_Werror),,-Werror)
 INCLUDES = -I$(srcdir) -I$(srcdir)/../lib -I$(srcdir)/../libelf \

@@ -97,6 +97,7 @@ int
 internal_function
 __libdwfl_find_build_id (Dwfl_Module *mod, bool set, Elf *elf)
 {
+  size_t shstrndx = SHN_UNDEF;
   int result = 0;
 
   Elf_Scn *scn = elf_nextscn (elf, NULL);
@@ -132,11 +133,13 @@ __libdwfl_find_build_id (Dwfl_Module *mod, bool set, Elf *elf)
 	if (likely (shdr != NULL) && shdr->sh_type == SHT_NOTE)
 	  {
 	    /* Determine the right sh_addr in this module.  */
-	    size_t shstrndx = SHN_UNDEF;
 	    GElf_Addr vaddr = 0;
-	    if (!(shdr->sh_flags & SHF_ALLOC)
-		|| __libdwfl_relocate_value (mod, elf, &shstrndx,
-					     elf_ndxscn (scn), &vaddr))
+	    if (!(shdr->sh_flags & SHF_ALLOC))
+	      vaddr = NO_VADDR;
+	    else if (mod->e_type != ET_REL)
+	      vaddr = shdr->sh_addr + mod->main.bias;
+	    else if (__libdwfl_relocate_value (mod, elf, &shstrndx,
+					       elf_ndxscn (scn), &vaddr))
 	      vaddr = NO_VADDR;
 	    result = check_notes (mod, set, elf_getdata (scn, NULL), vaddr);
 	  }
@@ -171,6 +174,7 @@ __dwfl_module_build_id (Dwfl_Module *mod,
   *vaddr = mod->build_id_vaddr;
   return mod->build_id_len;
 }
+#ifdef SHARED
 extern __typeof__ (dwfl_module_build_id) INTUSE(dwfl_module_build_id)
      __attribute__ ((alias ("__dwfl_module_build_id")));
 asm (".symver "
@@ -187,3 +191,7 @@ _BUG_COMPAT_dwfl_module_build_id (Dwfl_Module *mod,
 }
 asm (".symver "
      "_BUG_COMPAT_dwfl_module_build_id, dwfl_module_build_id@ELFUTILS_0.130");
+#else
+extern __typeof__ (dwfl_module_build_id) dwfl_module_build_id
+     __attribute__ ((alias ("__dwfl_module_build_id")));
+#endif

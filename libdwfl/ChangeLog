@@ -1,3 +1,66 @@
+2009-04-23  Ulrich Drepper  <drepper@redhat.com>
+
+	* dwfl_module_build_id.c: Define versioned symbols only if SHARED is
+	defined.  Otherwise just define the latest version.
+
+2009-04-22  Roland McGrath  <roland@redhat.com>
+
+	* relocate.c (resolve_symbol): Apply correct bias to st_value found in
+	a non-ET_REL module.
+
+	* dwfl_module_build_id.c (__libdwfl_find_build_id): Fix last change to
+	adjust properly for non-ET_REL.
+
+2009-04-21  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_getsym.c: Apply non-ET_REL bias only if SHF_ALLOC.
+
+	* relocate.c (__libdwfl_relocate_value): Assert that MOD is ET_REL.
+	* derelocate.c (cache_sections): Call __libdwfl_relocate_value only
+	for ET_REL.
+	* dwfl_module_build_id.c (__libdwfl_find_build_id): Likewise.
+
+2009-04-20  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_getdwarf.c (__libdwfl_getelf): Add internal_function.
+
+2009-04-19  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_getdwarf.c (find_file): Renamed to ...
+	(__libdwfl_getelf): ... this.  Make it global.
+	(find_symtab, find_dw): Update callers.
+	(dwfl_module_getelf): Functions moved ...
+	* dwfl_module_getelf.c: ... here, new file.
+	* Makefile.am (libdwfl_a_SOURCES): Add it.
+	* libdwflP.h: Declare __libdwfl_getelf.
+
+2009-04-14  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_segment_report_module.c: Handle DT_STRTAB value being either
+	absolute (already adjusted in place) or needing load bias adjustment.
+
+	* core-file.c (dwfl_elf_phdr_memory_callback): Fix return value for
+	gelf_getphdr failure.  Fix file size limit checks.
+
+	* dwfl_segment_report_module.c: Fix underflow in DYNSTRSZ check.
+
+2009-04-08  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_getsym.c: Don't adjust for bias again after
+	__libdwfl_relocate_value.
+
+	* relocate.c (__libdwfl_relocate_value): Don't adjust a value from
+	a non-SHF_ALLOC section.
+	(relocate_getsym): Test st_shndx for SHN_* values, not *SHNDX.
+	* dwfl_module_getsym.c (dwfl_module_getsym): Likewise.
+
+2009-03-09  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_build_id.c (__libdwfl_find_build_id): Move SHSTRNDX
+	variable to outer scope, so we cache it for the loop.
+
+	* relocate.c (__libdwfl_relocate_value): Add MOD->main.bias to sh_addr.
+
 2009-02-12  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_module_build_id.c (__libdwfl_find_build_id): Use

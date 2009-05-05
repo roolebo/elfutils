@@ -1,3 +1,55 @@
+2009-04-14  Roland McGrath  <roland@redhat.com>
+
+	* elf.h: Update from glibc.
+
+2009-04-01  Roland McGrath  <roland@redhat.com>
+
+	* elf.h: Update from glibc.
+
+2009-02-10  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf32_updatefile.c (updatefile): For the zeroth section we still
+	have to copy the section header.
+
+2009-02-01  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf_strptr.c: Add comment re possible problem.
+
+2009-01-26  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf32_updatenull.c (updatenull_wrlock): Fix comment of
+	ELF_F_LAYOUT behaviour re section header table.
+
+2009-01-22  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf32_updatefile.c (__elfXX_updatemmap): Fill the gap between
+	sections even if only the section at the start of the gap has been
+	changed.
+	(__elfXX_updatefile): Likewise.
+
+2009-01-21  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf32_updatefile.c (__elfXX_updatemmap): Skip most of the loop to
+	handle sections for NOBITS sections.
+	(elfXX_updatefile): Likewise.
+
+	* elf32_updatefile.c (__elfXX_updatemmap): When skipping non-NOBITS
+	sections we haven't loaded, update last_position based on scn_start,
+	not based on old value.  Don't run the loop for the dummy section 0.
+	(elfXX_updatefile): Don't run the loop for the dummy section 0.
+
+2009-01-10  Ulrich Drepper  <drepper@redhat.com>
+
+	* libelfP.h (_): We only have one translation domain, elfutils.
+
+	* Makefile.am: Use USE_LOCKS instead of USE_TLS.
+	* elf_error.c: Always use __thread.  Remove all !USE_TLS code.
+
+2009-01-04  Roland McGrath  <roland@redhat.com>
+
+	* note_xlate.h (elf_cvt_note): Don't examine a size too small to
+	container a note header.
+
 2008-12-11  Roland McGrath  <roland@redhat.com>
 
 	* elf32_updatefile.c (__elfw2(LIBELFBITS,updatemmap)): Handle

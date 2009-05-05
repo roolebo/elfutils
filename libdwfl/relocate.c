@@ -1,5 +1,5 @@
 /* Relocate debug information.
-   Copyright (C) 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright (C) 2005-2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -59,6 +59,8 @@ internal_function
 __libdwfl_relocate_value (Dwfl_Module *mod, Elf *elf, size_t *shstrndx,
 			  Elf32_Word shndx, GElf_Addr *value)
 {
+  assert (mod->e_type == ET_REL);
+
   Elf_Scn *refscn = elf_getscn (elf, shndx);
   GElf_Shdr refshdr_mem, *refshdr = gelf_getshdr (refscn, &refshdr_mem);
   if (refshdr == NULL)
@@ -95,8 +97,10 @@ __libdwfl_relocate_value (Dwfl_Module *mod, Elf *elf, size_t *shstrndx,
 	return DWFL_E_LIBELF;
     }
 
-  /* Apply the adjustment.  */
-  *value += refshdr->sh_addr;
+  if (refshdr->sh_flags & SHF_ALLOC)
+    /* Apply the adjustment.  */
+    *value += refshdr->sh_addr + mod->main.bias;
+
   return DWFL_E_NOERROR;
 }
 
@@ -183,7 +187,7 @@ relocate_getsym (Dwfl_Module *mod,
   if (sym->st_shndx != SHN_XINDEX)
     *shndx = sym->st_shndx;
 
-  switch (*shndx)
+  switch (sym->st_shndx)
     {
     case SHN_ABS:
     case SHN_UNDEF:
@@ -263,8 +267,14 @@ resolve_symbol (Dwfl_Module *referer, struct reloc_symtab_cache *symtab,
 		  continue;
 
 		/* We found it!  */
-		if (shndx == SHN_ABS)
+		if (shndx == SHN_ABS) /* XXX maybe should apply bias? */
 		  return DWFL_E_NOERROR;
+
+		if (m->e_type != ET_REL)
+		  {
+		    sym->st_value += m->symfile->bias;
+		    return DWFL_E_NOERROR;
+		  }
 
 		/* In an ET_REL file, the symbol table values are relative
 		   to the section, not to the module's load base.  */

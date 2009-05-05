@@ -41,6 +41,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <system.h>
 #include "../libelf/elf-knowledge.h"
 #include "../libebl/libeblP.h"
 
@@ -53,10 +54,10 @@ static  int regioncompare (const void *p1, const void *p2);
 
 /* Name and version of program.  */
 static void print_version (FILE *stream, struct argp_state *state);
-void (*argp_program_version_hook) (FILE *, struct argp_state *) = print_version;
+ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
 
 /* Bug report address.  */
-const char *argp_program_bug_address = PACKAGE_BUGREPORT;
+ARGP_PROGRAM_BUG_ADDRESS_DEF = PACKAGE_BUGREPORT;
 
 /* Values for the parameters which have no short form.  */
 #define OPT_GAPS		0x100
@@ -164,12 +165,12 @@ main (int argc, char *argv[])
   GElf_Ehdr ehdr1_mem;
   GElf_Ehdr *ehdr1 = gelf_getehdr (elf1, &ehdr1_mem);
   if (ehdr1 == NULL)
-    error (EXIT_FAILURE, 0, gettext ("cannot get ELF header of '%s': %s"),
+    error (2, 0, gettext ("cannot get ELF header of '%s': %s"),
 	   fname1, elf_errmsg (-1));
   GElf_Ehdr ehdr2_mem;
   GElf_Ehdr *ehdr2 = gelf_getehdr (elf2, &ehdr2_mem);
   if (ehdr2 == NULL)
-    error (EXIT_FAILURE, 0, gettext ("cannot get ELF header of '%s': %s"),
+    error (2, 0, gettext ("cannot get ELF header of '%s': %s"),
 	   fname2, elf_errmsg (-1));
 
   /* Compare the ELF headers.  */
@@ -271,13 +272,13 @@ main (int argc, char *argv[])
 
       Elf_Data *data1 = elf_getdata (scn1, NULL);
       if (data1 == NULL)
-	error (EXIT_FAILURE, 0,
+	error (2, 0,
 	       gettext ("cannot get content of section %zu in '%s': %s"),
 	       elf_ndxscn (scn1), fname1, elf_errmsg (-1));
 
       Elf_Data *data2 = elf_getdata (scn2, NULL);
       if (data2 == NULL)
-	error (EXIT_FAILURE, 0,
+	error (2, 0,
 	       gettext ("cannot get content of section %zu in '%s': %s"),
 	       elf_ndxscn (scn2), fname2, elf_errmsg (-1));
 
@@ -293,13 +294,13 @@ main (int argc, char *argv[])
 	      GElf_Sym sym1_mem;
 	      GElf_Sym *sym1 = gelf_getsym (data1, ndx, &sym1_mem);
 	      if (sym1 == NULL)
-		error (EXIT_FAILURE, 0,
+		error (2, 0,
 		       gettext ("cannot get symbol in '%s': %s"),
 		       fname1, elf_errmsg (-1));
 	      GElf_Sym sym2_mem;
 	      GElf_Sym *sym2 = gelf_getsym (data2, ndx, &sym2_mem);
 	      if (sym2 == NULL)
-		error (EXIT_FAILURE, 0,
+		error (2, 0,
 		       gettext ("cannot get symbol in '%s': %s"),
 		       fname2, elf_errmsg (-1));
 
@@ -426,12 +427,12 @@ main (int argc, char *argv[])
     {
       raw1 = elf_rawfile (elf1, &size1);
       if (raw1 == NULL )
-	error (EXIT_FAILURE, 0, gettext ("cannot load data of '%s': %s"),
+	error (2, 0, gettext ("cannot load data of '%s': %s"),
 	       fname1, elf_errmsg (-1));
 
       raw2 = elf_rawfile (elf2, &size2);
       if (raw2 == NULL )
-	error (EXIT_FAILURE, 0, gettext ("cannot load data of '%s': %s"),
+	error (2, 0, gettext ("cannot load data of '%s': %s"),
 	       fname2, elf_errmsg (-1));
 
       for (size_t cnt = 0; cnt < nregions; ++cnt)
@@ -449,13 +450,13 @@ main (int argc, char *argv[])
       GElf_Phdr phdr1_mem;
       GElf_Phdr *phdr1 = gelf_getphdr (elf1, ndx, &phdr1_mem);
       if (ehdr1 == NULL)
-	error (EXIT_FAILURE, 0,
+	error (2, 0,
 	       gettext ("cannot get program header entry %d of '%s': %s"),
 	       ndx, fname1, elf_errmsg (-1));
       GElf_Phdr phdr2_mem;
       GElf_Phdr *phdr2 = gelf_getphdr (elf2, ndx, &phdr2_mem);
       if (ehdr2 == NULL)
-	error (EXIT_FAILURE, 0,
+	error (2, 0,
 	       gettext ("cannot get program header entry %d of '%s': %s"),
 	       ndx, fname2, elf_errmsg (-1));
 
@@ -570,15 +571,15 @@ open_file (const char *fname, int *fdp, Ebl **eblp)
 {
   int fd = open (fname, O_RDONLY);
   if (unlikely (fd == -1))
-    error (EXIT_FAILURE, errno, gettext ("cannot open '%s'"), fname);
+    error (2, errno, gettext ("cannot open '%s'"), fname);
   Elf *elf = elf_begin (fd, ELF_C_READ_MMAP, NULL);
   if (elf == NULL)
-    error (EXIT_FAILURE, 0,
+    error (2, 0,
 	   gettext ("cannot create ELF descriptor for '%s': %s"),
 	   fname, elf_errmsg (-1));
   Ebl *ebl = ebl_openbackend (elf);
   if (ebl == NULL)
-    error (EXIT_FAILURE, 0,
+    error (2, 0,
 	   gettext ("cannot create EBL descriptor for '%s'"), fname);
 
   *fdp = fd;
@@ -596,7 +597,7 @@ search_for_copy_reloc (Ebl *ebl, size_t scnndx, int symndx)
       GElf_Shdr shdr_mem;
       GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
       if (shdr == NULL)
-	error (EXIT_FAILURE, 0,
+	error (2, 0,
 	       gettext ("cannot get section header of section %zu: %s"),
 	       elf_ndxscn (scn), elf_errmsg (-1));
 
@@ -606,7 +607,7 @@ search_for_copy_reloc (Ebl *ebl, size_t scnndx, int symndx)
 
       Elf_Data *data = elf_getdata (scn, NULL);
       if (data == NULL)
-	error (EXIT_FAILURE, 0,
+	error (2, 0,
 	       gettext ("cannot get content of section %zu: %s"),
 	       elf_ndxscn (scn), elf_errmsg (-1));
 
@@ -617,7 +618,7 @@ search_for_copy_reloc (Ebl *ebl, size_t scnndx, int symndx)
 	    GElf_Rel rel_mem;
 	    GElf_Rel *rel = gelf_getrel (data, ndx, &rel_mem);
 	    if (rel == NULL)
-	      error (EXIT_FAILURE, 0, gettext ("cannot get relocation: %s"),
+	      error (2, 0, gettext ("cannot get relocation: %s"),
 		     elf_errmsg (-1));
 
 	    if ((int) GELF_R_SYM (rel->r_info) == symndx
@@ -631,7 +632,7 @@ search_for_copy_reloc (Ebl *ebl, size_t scnndx, int symndx)
 	    GElf_Rela rela_mem;
 	    GElf_Rela *rela = gelf_getrela (data, ndx, &rela_mem);
 	    if (rela == NULL)
-	      error (EXIT_FAILURE, 0, gettext ("cannot get relocation: %s"),
+	      error (2, 0, gettext ("cannot get relocation: %s"),
 		     elf_errmsg (-1));
 
 	    if ((int) GELF_R_SYM (rela->r_info) == symndx

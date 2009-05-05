@@ -1,5 +1,5 @@
 /* Configuration definitions.
-   Copyright (C) 2008 Red Hat, Inc.
+   Copyright (C) 2008, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -46,15 +46,12 @@
    Network licensing program, please visit www.openinventionnetwork.com
    <http://www.openinventionnetwork.com>.  */
 
-#ifdef USE_TLS
+#ifndef EU_CONFIG_H
+#define EU_CONFIG_H	1
+
+#ifdef USE_LOCKS
 # include <pthread.h>
 # include <assert.h>
-# define tls_key_t			__thread void *
-# define key_create(keyp, freefct)	(1)
-# define getspecific(key)		key
-# define setspecific(key,val)		key = val
-# define once_define(class,name)	class struct { } name
-# define once_execute(name,fct)		((void) &name, (void) (fct))
 # define rwlock_define(class,name)	class pthread_rwlock_t name
 # define RWLOCK_CALL(call)		\
   ({ int _err = pthread_rwlock_ ## call; assert_perror (_err); })
@@ -67,25 +64,13 @@
 /* Eventually we will allow multi-threaded applications to use the
    libraries.  Therefore we will add the necessary locking although
    the macros used expand to nothing for now.  */
-# define lock_lock(lock) ((void) (lock))
 # define rwlock_define(class,name) class int name
 # define rwlock_init(lock) ((void) (lock))
 # define rwlock_fini(lock) ((void) (lock))
 # define rwlock_rdlock(lock) ((void) (lock))
 # define rwlock_wrlock(lock) ((void) (lock))
 # define rwlock_unlock(lock) ((void) (lock))
-# define tls_key_t void *
-# define key_create(keyp, freefct) (1)
-# define getspecific(key) key
-# define setspecific(key,val) key = val
-# define once_define(class,name) class int name
-# define once_execute(name,fct) \
-  do {									      \
-    if (name == 0)							      \
-      fct ();								      \
-    name = 1;								      \
-  } while (0)
-#endif	/* USE_TLS */
+#endif	/* USE_LOCKS */
 
 /* gettext helper macro.  */
 #define N_(Str) Str
@@ -196,3 +181,6 @@ asm (".section predict_data, \"aw\"; .previous\n"
 
 /* This macro is used by the tests conditionalize for standalone building.  */
 #define ELFUTILS_HEADER(name) <lib##name.h>
+
+
+#endif	/* eu-config.h */

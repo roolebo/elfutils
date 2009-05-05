@@ -1,8 +1,69 @@
+2009-04-15  Roland McGrath  <roland@redhat.com>
+
+	* dwarf.h (DW_CIE_ID): Removed.
+	(DW_CIE_ID_32, DW_CIE_ID_64): New constants replace it.
+
+2009-04-01  Roland McGrath  <roland@redhat.com>
+
+	* dwarf.h: Add DW_CFA_GNU_negative_offset_extended.
+
+2009-01-28  Roland McGrath  <roland@redhat.com>
+
+	* libdwP.h (struct Dwarf_Line_s): Move out of struct Dwarf_Lines_s
+	defn so C++ doesn't scope the name to not match the Dwarf_Line typedef.
+
+	* libdwP.h (struct Dwarf_Files_s): Replace dbg field with cu field.
+
+2009-01-26  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_ranges.c: Return 0 when no ranges or *_pc attrs at all.
+
+2009-01-25  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_getattrs.c: Correctly skip attribute values when restarting.
+
+2009-01-23  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am ($(srcdir)/known-dwarf.h): Target renamed back.
+	Put these rules under if MAINTAINER_MODE.
+
+2009-01-22  Roland McGrath  <roland@redhat.com>
+
+	* dwarf.h: Add DW_OP_GNU_encoded_addr.
+
+2009-01-21  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (CLEANFILES): Renamed to ...
+	(MOSTLYCLEANFILES): ... here.
+	(CLEANFILES): New variable, add known-dwarf.h.
+
+2009-01-17  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (known-dwarf.h): Target renamed, not in $(srcdir).
+	Make it unconditional.
+	(BUILT_SOURCES): Updated.
+
+	* dwarf.h: Add description comments for DW_LANG_* values.
+
+	* Makefile.am [MAINTAINER_MODE]
+	($(srcdir)/known-dwarf.h): New target.
+	(BUILT_SOURCES): Add it.
+
+	* dwarf.h: Add DW_OP_GNU_push_tls_address, DW_OP_GNU_uninit.
+
+2009-01-10  Ulrich Drepper  <drepper@redhat.com>
+
+	* dwarf_error.c: Always use __thread.  Remove all !USE_TLS code.
+
 2009-01-08  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am (libdw.so): Don't depend on $(zip_LIBS), just link it in.
 
-2009-01-06  Roland McGrath  <roland@redhat.com>
+2008-01-06  Roland McGrath  <roland@redhat.com>
+
+	* libdwP.h (struct Dwarf_Abbrev): Change type of 'has_children' to bool.
+	Reorder members.
+	* dwarf_haschildren.c: Return -1 for error case, not 0.
 
 	* Makefile.am (libdw.so): Link in $(zip_LIBS).
 

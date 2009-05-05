@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2002, 2004, 2005, 2006, 2008 Red Hat, Inc.
+## Copyright (C) 2002, 2004, 2005, 2006, 2008, 2009 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -66,7 +66,7 @@ libasm_pic_a_SOURCES =
 am_libasm_pic_a_OBJECTS = $(libasm_a_SOURCES:.c=.os)
 
 libasm_so_LDLIBS =
-if USE_TLS
+if USE_LOCKS
 libasm_so_LDLIBS += -lpthread
 endif
 

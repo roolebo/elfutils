@@ -1,5 +1,5 @@
 /* Return symbol type name.
-   Copyright (C) 2001, 2002 Red Hat, Inc.
+   Copyright (C) 2001, 2002, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -86,6 +86,8 @@ ebl_symbol_type_name (ebl, symbol, buf, len)
 	{
 	  if (symbol >= STT_LOPROC && symbol <= STT_HIPROC)
 	    snprintf (buf, len, "LOPROC+%d", symbol - STT_LOPROC);
+	  else if (symbol == STT_GNU_IFUNC)
+	    return "GNU_IFUNC";
 	  else if (symbol >= STT_LOOS && symbol <= STT_HIOS)
 	    snprintf (buf, len, "LOOS+%d", symbol - STT_LOOS);
 	  else

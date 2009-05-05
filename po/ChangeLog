@@ -1,3 +1,9 @@
+2009-01-23  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makevars (XGETTEXT_OPTIONS): Add --flag option for argp_error.
+
+	* POTFILES.in: Add more files with translatable strings.
+
 2007-06-05  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile.in.in: Update from gettext 0.16.1.

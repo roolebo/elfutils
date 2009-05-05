@@ -1,7 +1,7 @@
 		      ToDo list for elfutils                      -*-outline-*-
                       ----------------------
 
-Time-stamp: <2009-01-01 16:56:38 drepper>
+Time-stamp: <2009-02-05 22:08:01 drepper>
 
 * mkinstalldirs
 
@@ -21,6 +21,13 @@ Time-stamp: <2009-01-01 16:56:38 drepper>
    broken out of elf_begin.  There are several different forms of
    archives and only when having the archive handling separately this
    remains maintainable.
+
+** shdrs in read-only files
+
+   When reading (ELF_C_READ*) then there is no need to malloc Shdr
+   structure in elfXX_getshdr if file is mmaped and unaligned access
+   is allowed or the structure is aligned.  Use ELF_F_MALLOCED flag
+   to differentiate.
 
 
 * libdw
@@ -103,6 +110,13 @@ Time-stamp: <2009-01-01 16:56:38 drepper>
    Not implemented at all in the moment except for recognition of the option
    itself.
 
+** variables with aliases in executables
+
+   When linking an executable with a references against a variable in a
+   DSO, create symbol table entries for all the aliases of the variable
+   in the DSO and create a relocation for one of them (a non-weak
+   definition)
+
 * elflint
 
 ** additional checks
@@ -117,6 +131,8 @@ Time-stamp: <2009-01-01 16:56:38 drepper>
    check whether any relocation is for a merge-able section
 
    check TLS relocation depencies
+
+   Check content of .eh_frame_hdr, .eh_frame, .gcc_except_table
 
 *** for x86
 

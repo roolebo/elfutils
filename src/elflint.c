@@ -56,10 +56,10 @@
 
 /* Name and version of program.  */
 static void print_version (FILE *stream, struct argp_state *state);
-void (*argp_program_version_hook) (FILE *, struct argp_state *) = print_version;
+ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
 
 /* Bug report address.  */
-const char *argp_program_bug_address = PACKAGE_BUGREPORT;
+ARGP_PROGRAM_BUG_ADDRESS_DEF = PACKAGE_BUGREPORT;
 
 #define ARGP_strict	300
 #define ARGP_gnuld	301
@@ -67,7 +67,6 @@ const char *argp_program_bug_address = PACKAGE_BUGREPORT;
 /* Definitions of arguments for argp functions.  */
 static const struct argp_option options[] =
 {
-
   { "strict", ARGP_strict, NULL, 0,
     N_("Be extremely strict, flag level 2 features."), 0 },
   { "quiet", 'q', NULL, 0, N_("Do not print anything if successful"), 0 },
@@ -221,9 +220,8 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
 
     case ARGP_KEY_NO_ARGS:
       fputs (gettext ("Missing file name.\n"), stderr);
-      argp_help (&argp, stderr, ARGP_HELP_SEE | ARGP_HELP_EXIT_ERR,
-		 program_invocation_short_name);
-      exit (1);
+      argp_help (&argp, stderr, ARGP_HELP_SEE, program_invocation_short_name);
+      exit (EXIT_FAILURE);
 
     default:
       return ARGP_ERR_UNKNOWN;
@@ -978,6 +976,17 @@ section [%2d] '%s': _DYNAMIC symbol size %" PRIu64 " does not match dynamic segm
 		  }
 	    }
 	}
+
+      if (GELF_ST_VISIBILITY (sym->st_other) != STV_DEFAULT
+	  && shdr->sh_type == SHT_DYNSYM)
+	ERROR (gettext ("\
+section [%2d] '%s': symbol %zu: symbol in dynamic symbol table with non-default visibility\n"),
+	       idx, section_name (ebl, idx), cnt);
+      if ((sym->st_other ^ GELF_ST_VISIBILITY (sym->st_other)) != 0)
+	ERROR (gettext ("\
+section [%2d] '%s': symbol %zu: unknown bit set in st_other\n"),
+	       idx, section_name (ebl, idx), cnt);
+
     }
 }
 
@@ -3359,6 +3368,13 @@ static const struct
    && !memcmp (special_sections[idx].name, string, \
 	       sizeof string - (prefix ? 1 : 0)))
 
+
+/* Indeces of some sections we need later.  */
+static size_t eh_frame_hdr_scnndx;
+static size_t eh_frame_scnndx;
+static size_t gcc_except_table_scnndx;
+
+
 static void
 check_sections (Ebl *ebl, GElf_Ehdr *ehdr)
 {
@@ -3555,6 +3571,14 @@ section [%2zu] '%s' has SHF_ALLOC flag not set but there are loadable segments\n
 
 		break;
 	      }
+
+	  /* Remember a few special sections for later.  */
+	  if (strcmp (scnname, ".eh_frame_hdr") == 0)
+	    eh_frame_hdr_scnndx = cnt;
+	  else if (strcmp (scnname, ".eh_frame") == 0)
+	    eh_frame_scnndx = cnt;
+	  else if (strcmp (scnname, ".gcc_except_table") == 0)
+	    gcc_except_table_scnndx = cnt;
 	}
 
       if (shdr->sh_entsize != 0 && shdr->sh_size % shdr->sh_entsize)
@@ -3962,6 +3986,7 @@ section [%2d] '%s': unknown object file note type %" PRIu32
   return last_offset;
 }
 
+
 static void
 check_note (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Phdr *phdr, int cnt)
 {
@@ -3993,6 +4018,7 @@ phdr[%d]: no note entries defined for the type of file\n"),
 	   cnt, phdr->p_filesz - notes_size);
 }
 
+
 static void
 check_note_section (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Shdr *shdr, int idx)
 {
@@ -4023,6 +4049,11 @@ section [%2d] '%s': no note entries defined for the type of file\n"),
 		    " bytes after last note\n"),
 	   idx, section_name (ebl, idx), shdr->sh_size - notes_size);
 }
+
+
+/* Index of the PT_GNU_EH_FRAME program eader entry.  */
+static int pt_gnu_eh_frame_pndx;
+
 
 static void
 check_program_header (Ebl *ebl, GElf_Ehdr *ehdr)
@@ -4132,7 +4163,7 @@ more than one GNU_RELRO entry in program header\n"));
 		      if ((phdr2->p_flags & PF_W) == 0)
 			ERROR (gettext ("\
 loadable segment GNU_RELRO applies to is not writable\n"));
-		      if ((phdr2->p_flags &~ PF_W) != (phdr->p_flags &~ PF_W))
+		      if ((phdr2->p_flags & ~PF_W) != (phdr->p_flags & ~PF_W))
 			ERROR (gettext ("\
 loadable segment [%u] flags do not match GNU_RELRO [%u] flags\n"),
 			       cnt, inner);
@@ -4173,6 +4204,77 @@ loadable segment [%u] flags do not match GNU_RELRO [%u] flags\n"),
 	    ERROR (gettext ("\
 program header offset in ELF header and PHDR entry do not match"));
 	}
+      else if (phdr->p_type == PT_GNU_EH_FRAME)
+	{
+	  /* If there is an .eh_frame_hdr section it must be
+	     referenced by this program header entry.  */
+	  Elf_Scn *scn = NULL;
+	  GElf_Shdr shdr_mem;
+	  GElf_Shdr *shdr = NULL;
+	  bool any = false;
+	  while ((scn = elf_nextscn (ebl->elf, scn)) != NULL)
+	    {
+	      any = true;
+	      shdr = gelf_getshdr (scn, &shdr_mem);
+	      if (shdr != NULL
+		  && shdr->sh_type == (is_debuginfo
+				       ? SHT_NOBITS : SHT_PROGBITS)
+		  && ! strcmp (".eh_frame_hdr",
+			       elf_strptr (ebl->elf, shstrndx, shdr->sh_name)))
+		{
+		  if (! is_debuginfo)
+		    {
+		      if (phdr->p_offset != shdr->sh_offset)
+			ERROR (gettext ("\
+call frame search table reference in program header has wrong offset\n"));
+		      if (phdr->p_memsz != shdr->sh_size)
+			ERROR (gettext ("\
+call frame search table size mismatch in program and section header\n"));
+		    }
+		  break;
+		}
+	    }
+
+	  if (scn == NULL)
+	    {
+	      /* If there is no section header table we don't
+		 complain.  But if there is one there should be an
+		 entry for .eh_frame_hdr.  */
+	      if (any)
+		ERROR (gettext ("\
+PT_GNU_EH_FRAME present but no .eh_frame_hdr section\n"));
+	    }
+	  else
+	    {
+	      /* The section must be allocated and not be writable and
+		 executable.  */
+	      if ((phdr->p_flags & PF_R) == 0)
+		ERROR (gettext ("\
+call frame search table must be allocated\n"));
+	      else if (shdr != NULL && (shdr->sh_flags & SHF_ALLOC) == 0)
+		ERROR (gettext ("\
+section [%2zu] '%s' must be allocated\n"), elf_ndxscn (scn), ".eh_frame_hdr");
+
+	      if ((phdr->p_flags & PF_W) != 0)
+		ERROR (gettext ("\
+call frame search table must not be writable\n"));
+	      else if (shdr != NULL && (shdr->sh_flags & SHF_WRITE) != 0)
+		ERROR (gettext ("\
+section [%2zu] '%s' must not be writable\n"),
+		       elf_ndxscn (scn), ".eh_frame_hdr");
+
+	      if ((phdr->p_flags & PF_X) != 0)
+		ERROR (gettext ("\
+call frame search table must not be executable\n"));
+	      else if (shdr != NULL && (shdr->sh_flags & SHF_EXECINSTR) != 0)
+		ERROR (gettext ("\
+section [%2zu] '%s' must not be executable\n"),
+		       elf_ndxscn (scn), ".eh_frame_hdr");
+	    }
+
+	  /* Remember which entry this is.  */
+	  pt_gnu_eh_frame_pndx = cnt;
+	}
 
       if (phdr->p_filesz > phdr->p_memsz
 	  && (phdr->p_memsz != 0 || phdr->p_type != PT_NOTE))
@@ -4190,6 +4292,17 @@ program header entry %d: alignment not a power of 2\n"), cnt);
 program header entry %d: file offset and virtual address not module of alignment\n"), cnt);
 	}
     }
+}
+
+
+static void
+check_exception_data (Ebl *ebl __attribute__ ((unused)),
+		      GElf_Ehdr *ehdr __attribute__ ((unused)))
+{
+  if ((ehdr->e_type == ET_EXEC || ehdr->e_type == ET_DYN)
+      && pt_gnu_eh_frame_pndx == 0 && eh_frame_hdr_scnndx != 0)
+    ERROR (gettext ("executable/DSO with .eh_frame_hdr section does not have "
+		    "a PT_GNU_EH_FRAME program header entry"));
 }
 
 
@@ -4240,6 +4353,11 @@ process_elf_file (Elf *elf, const char *prefix, const char *suffix,
   /* Next the section headers.  It is OK if there are no section
      headers at all.  */
   check_sections (ebl, ehdr);
+
+  /* Check the exception handling data, if it exists.  */
+  if (pt_gnu_eh_frame_pndx != 0 || eh_frame_hdr_scnndx != 0
+      || eh_frame_scnndx != 0 || gcc_except_table_scnndx != 0)
+    check_exception_data (ebl, ehdr);
 
   /* Report if no relocation section needed the text relocation flag.  */
   if (textrel && !needed_textrel)

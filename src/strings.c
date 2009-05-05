@@ -59,10 +59,10 @@ static int read_elf (Elf *elf, int fd, const char *fname, off64_t fdlen);
 
 /* Name and version of program.  */
 static void print_version (FILE *stream, struct argp_state *state);
-void (*argp_program_version_hook) (FILE *, struct argp_state *) = print_version;
+ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
 
 /* Bug report address.  */
-const char *argp_program_bug_address = PACKAGE_BUGREPORT;
+ARGP_PROGRAM_BUG_ADDRESS_DEF = PACKAGE_BUGREPORT;
 
 /* Definitions of arguments for argp functions.  */
 static const struct argp_option options[] =
@@ -677,7 +677,7 @@ read_block (int fd, const char *fname, off64_t fdlen, off64_t from, off64_t to)
 	  if (mmap64 (remap_base, read_now, PROT_READ,
 		      MAP_PRIVATE | MAP_POPULATE | MAP_FIXED, fd, handled_to)
 	      == MAP_FAILED)
-	    error (EXIT_FAILURE, errno, gettext ("re=mmap failed"));
+	    error (EXIT_FAILURE, errno, gettext ("re-mmap failed"));
 	  elfmap_off = handled_to;
 
 	  process_chunk (fname, remap_base - to_keep,

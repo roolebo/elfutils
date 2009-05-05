@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl Configure input file for elfutils.                     -*-autoconf-*-
 dnl
-dnl Copyright (C) 1996-2009 Red Hat, Inc.
+dnl Copyright (C) 1996-2008, 2009 Red Hat, Inc.
 dnl
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -16,13 +16,13 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software Foundation,
 dnl Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 dnl
-AC_INIT([Red Hat elfutils],[0.138],[http://bugzilla.redhat.com/bugzilla/],
+AC_INIT([Red Hat elfutils],[0.141],[http://bugzilla.redhat.com/bugzilla/],
 	[elfutils])
 
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_FILES([config/Makefile])
 
-AC_COPYRIGHT([Copyright (C) 1996-2007, 2008 Red Hat, Inc.])
+AC_COPYRIGHT([Copyright (C) 1996-2009 Red Hat, Inc.])
 AC_PREREQ(2.59)			dnl Minimum Autoconf version required.
 
 dnl We use GNU make extensions; automake 1.10 defaults to -Wportability.
@@ -48,13 +48,13 @@ AC_CONFIG_FILES([elfutils.spec:config/elfutils.spec.in])
 
 AC_CANONICAL_HOST
 
-AC_ARG_ENABLE([tls],
-AS_HELP_STRING([--enable-tls], [enable use of thread local storage]),
-use_tls=yes, use_tls=no)
-AM_CONDITIONAL(USE_TLS, test "$use_tls" = yes)
-AS_IF([test "$use_tls" = yes], [AC_DEFINE(USE_TLS)])
+AC_ARG_ENABLE([thread-safety],
+AS_HELP_STRING([--enable-thread-safety], [enable thread safety of libraries]),
+use_tls=locks, use_locks=no)
+AM_CONDITIONAL(USE_LOCKS, test "$use_locks" = yes)
+AS_IF([test "$use_locks" = yes], [AC_DEFINE(USE_LOCKS)])
 
-AH_TEMPLATE([USE_TLS], [Defined if thread local storage should be used.])
+AH_TEMPLATE([USE_LOCKS], [Defined if libraries should be thread-safe.])
 
 dnl Add all the languages for which translations are available.
 ALL_LINGUAS=
@@ -73,6 +73,23 @@ int foo (int a) { for (int i = 0; i < a; ++i) if (i % 4) break; int s = a; }],
 CFLAGS="$old_CFLAGS"])
 AS_IF([test "x$ac_cv_c99" != xyes],
       AC_MSG_ERROR([gcc with C99 support required]))
+
+AC_CACHE_CHECK([for __thread support], ac_cv_tls, [dnl
+# Use the same flags that we use for our DSOs, so the test is representative.
+# Some old compiler/linker/libc combinations fail some ways and not others.
+save_CFLAGS="$CFLAGS"
+save_LDFLAGS="$LDFLAGS"
+CFLAGS="-fpic $CFLAGS"
+LDFLAGS="-shared -Wl,-z,defs,-z,relro $LDFLAGS"
+AC_LINK_IFELSE([dnl
+AC_LANG_PROGRAM([[#undef __thread
+static __thread int a; int foo (int b) { return a + b; }]],
+		[[exit (foo (0));]])],
+	       ac_cv_tls=yes, ac_cv_tls=no)
+CFLAGS="$save_CFLAGS"
+LDFLAGS="$save_LDFLAGS"])
+AS_IF([test "x$ac_cv_tls" != xyes],
+      AC_MSG_ERROR([__thread support required]))
 
 LOCALEDIR=$datadir
 AC_SUBST(LOCALEDIR)
@@ -186,7 +203,7 @@ dnl Test for zlib and bzlib, gives ZLIB/BZLIB .am
 dnl conditional and config.h USE_ZLIB/USE_BZLIB #define.
 save_LIBS="$LIBS"
 LIBS=
-eu_ZIPLIB(z,Z,z,gzdopen,gzip)
+eu_ZIPLIB(z,Z,z,gzdirect,gzip)
 eu_ZIPLIB(bz,BZ,bz2,BZ2_bzdopen,bzip2)
 zip_LIBS="$LIBS"
 LIBS="$save_LIBS"
@@ -242,12 +259,38 @@ AH_BOTTOM([#include <eu-config.h>])
 dnl Version compatibility header.
 AC_CONFIG_FILES([version.h:config/version.h.in])
 AC_SUBST([eu_version])
-case $PACKAGE_VERSION in
-0.???) eu_version=${PACKAGE_VERSION#0.} ;;
-?.???) eu_version=${PACKAGE_VERSION/./} ;;
-?.??)  eu_version=${PACKAGE_VERSION/./}0 ;;
-?.?)   eu_version=${PACKAGE_VERSION/./}00 ;;
-*)     AC_MSG_ERROR([confused by version number '$PACKAGE_VERSION']) ;;
+
+# 1.234<whatever> -> 1234<whatever>
+case "$PACKAGE_VERSION" in
+[[0-9]].*) eu_version="${PACKAGE_VERSION/./}" ;;
+*)     	   AC_MSG_ERROR([confused by version number '$PACKAGE_VERSION']) ;;
 esac
+case "$eu_version" in
+*.*)
+  # 1234.567 -> "1234", "567"
+  eu_extra_version="${eu_version#*.}"
+  eu_version="${eu_version%%.*}"
+  case "$eu_extra_version" in
+  [[0-9]][[0-9]][[0-9]]) ;;
+  [[0-9]][[0-9]])	eu_extra_version="${eu_extra_version}0" ;;
+  [[0-9]])	   	eu_extra_version="${eu_extra_version}00" ;;
+  *) AC_MSG_ERROR([confused by version number '$PACKAGE_VERSION']) ;;
+  esac
+  ;;
+*)
+  eu_extra_version=000
+  ;;
+esac
+
+case "$eu_version" in
+      0[[0-9]][[0-9]][[0-9]]) eu_version="${eu_version#0}$eu_extra_version" ;;
+[[0-9]][[0-9]][[0-9]][[0-9]]) eu_version="${eu_version}$eu_extra_version" ;;
+[[0-9]][[0-9]][[0-9]])	      eu_version="${eu_version}0$eu_extra_version" ;;
+[[0-9]][[0-9]])   	      eu_version="${eu_version}00$eu_extra_version";;
+*) AC_MSG_ERROR([confused by version number '$PACKAGE_VERSION']) ;;
+esac
+
+# Round up to the next release API (x.y) version.
+[eu_version=$[($eu_version + 999) / 1000]]
 
 AC_OUTPUT

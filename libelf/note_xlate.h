@@ -1,5 +1,5 @@
 /* Conversion functions for notes.
-   Copyright (C) 2007 Red Hat, Inc.
+   Copyright (C) 2007, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -52,7 +52,7 @@ elf_cvt_note (void *dest, const void *src, size_t len, int encode)
 {
   assert (sizeof (Elf32_Nhdr) == sizeof (Elf64_Nhdr));
 
-  while (len > 0)
+  while (len >= sizeof (Elf32_Nhdr))
     {
       (1 ? Elf32_cvt_Nhdr : Elf64_cvt_Nhdr) (dest, src, sizeof (Elf32_Nhdr),
 					     encode);

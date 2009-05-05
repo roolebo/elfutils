@@ -55,10 +55,10 @@
 
 /* Name and version of program.  */
 static void print_version (FILE *stream, struct argp_state *state);
-void (*argp_program_version_hook) (FILE *, struct argp_state *) = print_version;
+ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
 
 /* Bug report address.  */
-const char *argp_program_bug_address = PACKAGE_BUGREPORT;
+ARGP_PROGRAM_BUG_ADDRESS_DEF = PACKAGE_BUGREPORT;
 
 
 /* Values for the parameters which have no short form.  */
@@ -437,7 +437,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
   int debug_fd = -1;
 
   /* Get the EBL handling.  The -g option is currently the only reason
-     we need EBL so dont open the backend unless necessary.  */
+     we need EBL so don't open the backend unless necessary.  */
   Ebl *ebl = NULL;
   if (remove_debug)
     {
@@ -835,7 +835,8 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 
 	      inline void check_preserved (size_t i)
 	      {
-		if (i != 0 && shdr_info[i].idx != 0)
+		if (i != 0 && shdr_info[i].idx != 0
+		    && shdr_info[i].debug_data == NULL)
 		  {
 		    if (shdr_info[i].data == NULL)
 		      shdr_info[i].data = elf_getdata (shdr_info[i].scn, NULL);

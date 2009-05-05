@@ -1,3 +1,38 @@
+2009-04-16  Roland McGrath  <roland@redhat.com>
+
+	* arm_regs.c (arm_register_info): Handle VFP registers.
+
+	* i386_corenote.c (EXTRA_NOTES): NT_PRXFPREG -> NT_PRXFPREG
+
+2009-04-14  Roland McGrath  <roland@redhat.com>
+
+	* arm_retval.c: New file.
+	* arm_attrs.c: New file.
+	* Makefile.am (arm_SRCS): Add them.
+	* arm_symbol.c (arm_segment_type_name): New function.
+	(arm_section_type_name): New function.
+	(arm_machine_flag_check): New function.
+	* arm_init.c (arm_init): Initialize those hooks.
+
+	* arm_regs.c: New file.
+	* arm_corenote.c: New file.
+	* arm_auxv.c: New file.
+	* Makefile.am (arm_SRCS): Add them.
+	* arm_init.c (arm_init): Initialize core_note, register_info,
+	and auxv_info hooks.
+
+	* ia64_symbol.c (ia64_section_type_name): Remove "SHT_" prefixes.
+
+2009-04-01  Roland McGrath  <roland@redhat.com>
+
+	* sparc_reloc.def: Update table.
+	Data from Dave Miller <davem@davemloft.net>.
+
+2009-02-15  Roland McGrath  <roland@redhat.com>
+
+	* ppc_attrs.c (ppc_check_object_attribute): Handle tag
+	GNU_Power_ABI_Struct_Return.
+
 2008-10-04  Ulrich Drepper  <drepper@redhat.com>
 
 	* i386_reloc.def: Fix entries for TLS_GOTDESC, TLS_DESC_CALL, and

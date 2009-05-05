@@ -1,5 +1,5 @@
 /* Sniff out modules from ELF headers visible in memory segments.
-   Copyright (C) 2008 Red Hat, Inc.
+   Copyright (C) 2008, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -86,13 +86,6 @@ addr_segndx (Dwfl *dwfl, size_t segment, GElf_Addr addr)
     }
   while (segment < dwfl->lookup_elts - 1
 	 && dwfl->lookup_addr[segment] < addr);
-
-  while (dwfl->lookup_segndx[segment] < 0
-	 && segment < dwfl->lookup_elts - 1)
-      ++segment;
-
-  if (dwfl->lookup_segndx[segment] >= 0)
-    ndx = dwfl->lookup_segndx[segment];
 
   return ndx;
 }
@@ -526,13 +519,28 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
   size_t soname_size = 0;
   if (dynstrsz != 0 && dynstr_vaddr != 0)
     {
-      /* We know the bounds of the .dynstr section.  */
-      dynstr_vaddr += bias;
+      /* We know the bounds of the .dynstr section.
+
+	 The DYNSTR_VADDR pointer comes from the .dynamic section
+	 (DT_STRTAB, detected above).  Ordinarily the dynamic linker
+	 will have adjusted this pointer in place so it's now an
+	 absolute address.  But sometimes .dynamic is read-only (in
+	 vDSOs and odd architectures), and sometimes the adjustment
+	 just hasn't happened yet in the memory image we looked at.
+	 So treat DYNSTR_VADDR as an absolute address if it falls
+	 within the module bounds, or try applying the phdr bias
+	 when that adjusts it to fall within the module bounds.  */
+
+      if ((dynstr_vaddr < module_start || dynstr_vaddr >= module_end)
+	  && dynstr_vaddr + bias >= module_start
+	  && dynstr_vaddr + bias < module_end)
+	dynstr_vaddr += bias;
+
       if (unlikely (dynstr_vaddr + dynstrsz > module_end))
 	dynstrsz = 0;
 
       /* Try to get the DT_SONAME string.  */
-      if (soname_stroff != 0 && soname_stroff < dynstrsz - 1
+      if (soname_stroff != 0 && soname_stroff + 1 < dynstrsz
 	  && ! read_portion (&soname, &soname_size,
 			     dynstr_vaddr + soname_stroff, 0))
 	name = soname;

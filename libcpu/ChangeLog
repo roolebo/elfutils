@@ -1,3 +1,13 @@
+2009-04-14  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (AM_CFLAGS): Add -fdollars-in-identifiers; it is not the
+	default on every machine.
+
+2009-01-23  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (i386_parse_CFLAGS): Use quotes around command
+	substitution that can produce leading whitespace.
+
 2009-01-01  Ulrich Drepper  <drepper@redhat.com>
 
 	* i386_parse.y (instrtable_out): Optimize match_data table by not

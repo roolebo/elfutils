@@ -241,6 +241,8 @@ struct dwfl_arange
 
 extern void __libdwfl_module_free (Dwfl_Module *mod) internal_function;
 
+/* Find the main ELF file, update MOD->elferr and/or MOD->main.elf.  */
+extern void __libdwfl_getelf (Dwfl_Module *mod) internal_function;
 
 /* Process relocations in debugging sections in an ET_REL file.
    FILE must be opened with ELF_C_READ_MMAP_PRIVATE or ELF_C_READ,
@@ -306,7 +308,7 @@ extern int __libdwfl_crc32_file (int fd, uint32_t *resp) attribute_hidden;
    Consumes ELF on success, not on failure.  */
 extern Dwfl_Module *__libdwfl_report_elf (Dwfl *dwfl, const char *name,
 					  const char *file_name, int fd,
-					  Elf *elf, GElf_Addr base)
+					  Elf *elf, GElf_Addr base, bool sanity)
   internal_function;
 
 /* Meat of dwfl_report_offline.  */

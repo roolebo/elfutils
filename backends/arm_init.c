@@ -1,5 +1,5 @@
 /* Initialization of Arm specific backend library.
-   Copyright (C) 2002, 2005 Red Hat, Inc.
+   Copyright (C) 2002, 2005, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -50,7 +50,15 @@ arm_init (elf, machine, eh, ehlen)
   /* We handle it.  */
   eh->name = "ARM";
   arm_init_reloc (eh);
+  HOOK (eh, segment_type_name);
+  HOOK (eh, section_type_name);
+  HOOK (eh, machine_flag_check);
   HOOK (eh, reloc_simple_type);
+  HOOK (eh, register_info);
+  HOOK (eh, core_note);
+  HOOK (eh, auxv_info);
+  HOOK (eh, check_object_attribute);
+  HOOK (eh, return_value_location);
 
   return MODVERSION;
 }

@@ -1,3 +1,14 @@
+2009-04-01  Roland McGrath  <roland@redhat.com>
+
+	* eblsymboltypename.c (ebl_symbol_type_name): Add STT_GNU_IFUNC.
+
+	* eblauxvinfo.c (AUXV_TYPES): Add RANDOM and BASE_PLATFORM.
+
+2009-02-01  Ulrich Drepper  <drepper@redhat.com>
+
+	* eblreloctypename.c (ebl_reloc_type_name): Return "<INVALID RELOC>"
+	instead of "???" for invalid relocations.
+
 2008-08-01  Roland McGrath  <roland@redhat.com>
 
 	* eblcorenotetypename.c: Handle NT_386_IOPERM.

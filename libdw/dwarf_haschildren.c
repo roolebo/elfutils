@@ -1,5 +1,5 @@
 /* Return string associated with given attribute.
-   Copyright (C) 2003, 2005 Red Hat, Inc.
+   Copyright (C) 2003, 2005, 2008 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -77,7 +77,7 @@ dwarf_haschildren (die)
   if (unlikely (die->abbrev == DWARF_END_ABBREV))
     {
       __libdw_seterrno (DWARF_E_INVALID_DWARF);
-      return 0;
+      return -1;
     }
 
   return die->abbrev->has_children;

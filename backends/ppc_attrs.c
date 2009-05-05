@@ -1,5 +1,5 @@
 /* Object attribute tags for PowerPC.
-   Copyright (C) 2008 Red Hat, Inc.
+   Copyright (C) 2008, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -65,6 +65,16 @@ ppc_check_object_attribute (ebl, vendor, tag, value, tag_name, value_name)
 	  };
 	if (value < sizeof vector_kinds / sizeof vector_kinds[0])
 	  *value_name = vector_kinds[value];
+	return true;
+
+      case 12:
+	*tag_name = "GNU_Power_ABI_Struct_Return";
+	static const char *struct_return_kinds[] =
+	  {
+	    "Any", "r3/r4", "Memory"
+	  };
+	if (value < sizeof struct_return_kinds / sizeof struct_return_kinds[0])
+	  *value_name = struct_return_kinds[value];
 	return true;
       }
 

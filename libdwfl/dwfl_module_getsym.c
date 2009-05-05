@@ -1,5 +1,5 @@
 /* Find debugging and symbol information for a module in libdwfl.
-   Copyright (C) 2006,2007 Red Hat, Inc.
+   Copyright (C) 2006,2007,2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -74,12 +74,25 @@ dwfl_module_getsym (Dwfl_Module *mod, int ndx,
   if (sym->st_shndx != SHN_XINDEX)
     shndx = sym->st_shndx;
 
-  if (shndxp != NULL)
-    *shndxp = shndx;
-
-  switch (shndx)
+  /* Figure out whether this symbol points into an SHF_ALLOC section.  */
+  bool alloc = true;
+  if ((shndxp != NULL || mod->e_type != ET_REL)
+      && (sym->st_shndx == SHN_XINDEX
+	  || (sym->st_shndx < SHN_LORESERVE && sym->st_shndx != SHN_UNDEF)))
     {
-    case SHN_ABS:
+      GElf_Shdr shdr_mem;
+      GElf_Shdr *shdr = gelf_getshdr (elf_getscn (mod->symfile->elf, shndx),
+				      &shdr_mem);
+      alloc = unlikely (shdr == NULL) || (shdr->sh_flags & SHF_ALLOC);
+    }
+
+  if (shndxp != NULL)
+    /* Yield -1 in case of a non-SHF_ALLOC section.  */
+    *shndxp = alloc ? shndx : (GElf_Word) -1;
+
+  switch (sym->st_shndx)
+    {
+    case SHN_ABS:		/* XXX sometimes should use bias?? */
     case SHN_UNDEF:
     case SHN_COMMON:
       break;
@@ -99,8 +112,9 @@ dwfl_module_getsym (Dwfl_Module *mod, int ndx,
 	      return NULL;
 	    }
 	}
-      /* Apply the bias to the symbol value.  */
-      sym->st_value += mod->symfile->bias;
+      else if (alloc)
+	/* Apply the bias to the symbol value.  */
+	sym->st_value += mod->symfile->bias;
       break;
     }
 

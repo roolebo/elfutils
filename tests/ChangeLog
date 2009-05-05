@@ -1,3 +1,14 @@
+2009-04-23  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile [BUILD_STATIC] (libdw): Add $(zip_LIBS).
+	(rdwrmmap_LDADD): Add $(libmudflap).
+	
+2009-04-21  Roland McGrath  <roland@redhat.com>
+
+	* testfile50.bz2: New data file.
+	* Makefile.am (EXTRA_DIST): Add it.
+	* run-dwfl-addr-sect.sh: Add a case using it.
+
 2008-12-31  Ulrich Drepper  <drepper@redhat.com>
 
 	* testfile44.S.bz2: Add tests for dppd, dpps, insertps, movntdqa,

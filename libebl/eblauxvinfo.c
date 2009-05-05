@@ -1,5 +1,5 @@
 /* Describe known auxv types.
-   Copyright (C) 2007, 2008 Red Hat, Inc.
+   Copyright (C) 2007, 2008, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -78,6 +78,7 @@
   TYPE (EGID, "u")							      \
   TYPE (CLKTCK, "u")							      \
   TYPE (PLATFORM, "s")							      \
+  TYPE (BASE_PLATFORM, "s")						      \
   TYPE (HWCAP, "x")							      \
   TYPE (FPUCW, "x")							      \
   TYPE (DCACHEBSIZE, "d")						      \
@@ -90,7 +91,8 @@
   TYPE (L1I_CACHESHAPE, "d")						      \
   TYPE (L1D_CACHESHAPE, "d")						      \
   TYPE (L2_CACHESHAPE, "d")						      \
-  TYPE (L3_CACHESHAPE, "d")
+  TYPE (L3_CACHESHAPE, "d")						      \
+  TYPE (RANDOM, "p")
 
 static const struct
 {

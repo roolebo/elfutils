@@ -1,5 +1,5 @@
 /* IA-64 specific symbolic name handling.
-   Copyright (C) 2002, 2003, 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2002-2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -102,9 +102,9 @@ ia64_section_type_name (int type,
   switch (type)
     {
     case SHT_IA_64_EXT:
-      return "SHT_IA_64_EXT";
+      return "IA_64_EXT";
     case SHT_IA_64_UNWIND:
-      return "SHT_IA_64_UNWIND";
+      return "IA_64_UNWIND";
     }
 
   return NULL;

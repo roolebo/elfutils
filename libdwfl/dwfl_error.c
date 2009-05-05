@@ -1,5 +1,5 @@
 /* Error handling in libdwfl.
-   Copyright (C) 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -61,46 +61,14 @@
 #include "libdwflP.h"
 
 
-#ifdef USE_TLS
 /* The error number.  */
 static __thread int global_error;
-#else
-/* This is the key for the thread specific memory.  */
-static tls_key_t key;
-
-/* The error number.  Used in non-threaded programs.  */
-static int global_error;
-static bool threaded;
-/* We need to initialize the thread-specific data.  */
-once_define (static, once);
-
-/* The initialization and destruction functions.  */
-static void init (void);
-static void free_key_mem (void *mem);
-#endif	/* TLS */
 
 
 int
 dwfl_errno (void)
 {
-  int result;
-
-#ifndef USE_TLS
-  /* If we have not yet initialized the buffer do it now.  */
-  once_execute (once, init);
-
-  if (threaded)
-    {
-      /* We do not allocate memory for the data.  It is only a word.
-	 We can store it in place of the pointer.  */
-      result = (intptr_t) getspecific (key);
-
-      setspecific (key, (void *) (intptr_t) DWFL_E_NOERROR);
-      return result;
-    }
-#endif	/* TLS */
-
-  result = global_error;
+  int result = global_error;
   global_error = DWFL_E_NOERROR;
   return result;
 }
@@ -172,19 +140,7 @@ void
 internal_function
 __libdwfl_seterrno (Dwfl_Error error)
 {
-  int value = canonicalize (error);
-
-#ifndef USE_TLS
-  /* If we have not yet initialized the buffer do it now.  */
-  once_execute (once, init);
-
-  if (threaded)
-    /* We do not allocate memory for the data.  It is only a word.
-       We can store it in place of the pointer.  */
-    setspecific (key, (void *) (intptr_t) value);
-#endif	/* TLS */
-
-  global_error = value;
+  global_error = canonicalize (error);
 }
 
 
@@ -194,19 +150,7 @@ dwfl_errmsg (error)
 {
   if (error == 0 || error == -1)
     {
-      int last_error;
-
-#ifndef USE_TLS
-      /* If we have not yet initialized the buffer do it now.  */
-      once_execute (once, init);
-
-      if (threaded)
-	/* We do not allocate memory for the data.  It is only a word.
-	   We can store it in place of the pointer.  */
-	last_error = (intptr_t) getspecific (key);
-      else
-#endif	/* TLS */
-	last_error = global_error;
+      int last_error = global_error;
 
       if (error == 0 && last_error == 0)
 	return NULL;
@@ -233,26 +177,3 @@ dwfl_errmsg (error)
 			  ? error : DWFL_E_UNKNOWN_ERROR]]);
 }
 INTDEF (dwfl_errmsg)
-
-
-#ifndef USE_TLS
-/* Free the thread specific data, this is done if a thread terminates.  */
-static void
-free_key_mem (void *mem __attribute__ ((unused)))
-{
-  setspecific (key, NULL);
-}
-
-
-/* Initialize the key for the global variable.  */
-static void
-init (void)
-{
-  // XXX Screw you, gcc4, the unused function attribute does not work.
-  __asm ("" :: "r" (free_key_mem));
-
-  if (key_create (&key, free_key_mem) == 0)
-    /* Creating the key succeeded.  */
-    threaded = true;
-}
-#endif	/* TLS */

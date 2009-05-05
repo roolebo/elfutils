@@ -49,10 +49,10 @@
 
 /* Name and version of program.  */
 static void print_version (FILE *stream, struct argp_state *state);
-void (*argp_program_version_hook) (FILE *, struct argp_state *) = print_version;
+ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
 
 /* Bug report address.  */
-const char *argp_program_bug_address = PACKAGE_BUGREPORT;
+ARGP_PROGRAM_BUG_ADDRESS_DEF = PACKAGE_BUGREPORT;
 
 
 /* Definitions of arguments for argp functions.  */
@@ -234,9 +234,9 @@ parse_opt (int key, char *arg,
       if (! any_control_option)
 	{
 	  fputs (gettext ("No operation specified.\n"), stderr);
-	  argp_help (&argp, stderr, ARGP_HELP_SEE | ARGP_HELP_EXIT_ERR,
+	  argp_help (&argp, stderr, ARGP_HELP_SEE,
 		     program_invocation_short_name);
-	  exit (1);
+	  exit (EXIT_FAILURE);
 	}
 
     default:
@@ -358,11 +358,66 @@ handle_ar (int fd, Elf *elf, const char *prefix, const char *fname,
 
 
 static void
+show_relocs_x (Ebl *ebl, GElf_Shdr *shdr, Elf_Data *symdata,
+	       Elf_Data *xndxdata, size_t symstrndx, size_t shstrndx,
+	       GElf_Addr r_offset, GElf_Xword r_info, GElf_Sxword r_addend)
+{
+  int elfclass = gelf_getclass (ebl->elf);
+  char buf[128];
+
+  printf ("%0*" PRIx64 " %-20s ",
+	  elfclass == ELFCLASS32 ? 8 : 16, r_offset,
+	  ebl_reloc_type_name (ebl, GELF_R_TYPE (r_info), buf, sizeof (buf)));
+
+  Elf32_Word xndx;
+  GElf_Sym symmem;
+  GElf_Sym *sym = gelf_getsymshndx (symdata, xndxdata, GELF_R_SYM (r_info),
+				    &symmem, &xndx);
+
+  if (sym == NULL)
+    printf ("<%s %ld>",
+	    gettext ("INVALID SYMBOL"), (long int) GELF_R_SYM (r_info));
+  else if (GELF_ST_TYPE (sym->st_info) != STT_SECTION)
+    printf ("%s",
+	    elf_strptr (ebl->elf, symstrndx, sym->st_name));
+  else
+    {
+      GElf_Shdr destshdr_mem;
+      GElf_Shdr *destshdr;
+      destshdr = gelf_getshdr (elf_getscn (ebl->elf,
+					   sym->st_shndx == SHN_XINDEX
+					   ? xndx : sym->st_shndx),
+			       &destshdr_mem);
+
+      if (shdr == NULL)
+	printf ("<%s %ld>",
+		gettext ("INVALID SECTION"),
+		(long int) (sym->st_shndx == SHN_XINDEX
+			    ? xndx : sym->st_shndx));
+      else
+	printf ("%s",
+		elf_strptr (ebl->elf, shstrndx, destshdr->sh_name));
+    }
+
+  if (r_addend != 0)
+    {
+      char sign = '+';
+      if (r_addend < 0)
+	{
+	  sign = '-';
+	  r_addend = -r_addend;
+	}
+      printf ("%c%#" PRIx64, sign, r_addend);
+    }
+  putchar ('\n');
+}
+
+
+static void
 show_relocs_rel (Ebl *ebl, GElf_Shdr *shdr, Elf_Data *data,
 		 Elf_Data *symdata, Elf_Data *xndxdata, size_t symstrndx,
 		 size_t shstrndx)
 {
-  int elfclass = gelf_getclass (ebl->elf);
   int nentries = shdr->sh_size / shdr->sh_entsize;
 
   for (int cnt = 0; cnt < nentries; ++cnt)
@@ -372,60 +427,8 @@ show_relocs_rel (Ebl *ebl, GElf_Shdr *shdr, Elf_Data *data,
 
       rel = gelf_getrel (data, cnt, &relmem);
       if (rel != NULL)
-	{
-	  char buf[128];
-	  GElf_Sym symmem;
-	  GElf_Sym *sym;
-	  Elf32_Word xndx;
-
-	  sym = gelf_getsymshndx (symdata, xndxdata, GELF_R_SYM (rel->r_info),
-				  &symmem, &xndx);
-	  if (sym == NULL)
-	    printf ("%0*" PRIx64 " %-20s <%s %ld>\n",
-		    elfclass == ELFCLASS32 ? 8 : 16, rel->r_offset,
-		    ebl_reloc_type_check (ebl, GELF_R_TYPE (rel->r_info))
-		    ? ebl_reloc_type_name (ebl, GELF_R_TYPE (rel->r_info),
-					   buf, sizeof (buf))
-		    : gettext ("<INVALID RELOC>"),
-		    gettext ("INVALID SYMBOL"),
-		    (long int) GELF_R_SYM (rel->r_info));
-	  else if (GELF_ST_TYPE (sym->st_info) != STT_SECTION)
-	    printf ("%0*" PRIx64 " %-20s %s\n",
-		    elfclass == ELFCLASS32 ? 8 : 16, rel->r_offset,
-		    ebl_reloc_type_check (ebl, GELF_R_TYPE (rel->r_info))
-		    ? ebl_reloc_type_name (ebl, GELF_R_TYPE (rel->r_info),
-					   buf, sizeof (buf))
-		    : gettext ("<INVALID RELOC>"),
-		    elf_strptr (ebl->elf, symstrndx, sym->st_name));
-	  else
-	    {
-	      GElf_Shdr destshdr_mem;
-	      GElf_Shdr *destshdr;
-	      destshdr = gelf_getshdr (elf_getscn (ebl->elf,
-						   sym->st_shndx == SHN_XINDEX
-						   ? xndx : sym->st_shndx),
-				       &destshdr_mem);
-
-	      if (shdr == NULL)
-		printf ("%0*" PRIx64 " %-20s <%s %ld>\n",
-			elfclass == ELFCLASS32 ? 8 : 16, rel->r_offset,
-			ebl_reloc_type_check (ebl, GELF_R_TYPE (rel->r_info))
-			? ebl_reloc_type_name (ebl, GELF_R_TYPE (rel->r_info),
-					       buf, sizeof (buf))
-			: gettext ("<INVALID RELOC>"),
-			gettext ("INVALID SECTION"),
-			(long int) (sym->st_shndx == SHN_XINDEX
-				    ? xndx : sym->st_shndx));
-	      else
-		printf ("%0*" PRIx64 " %-20s %s\n",
-			elfclass == ELFCLASS32 ? 8 : 16, rel->r_offset,
-			ebl_reloc_type_check (ebl, GELF_R_TYPE (rel->r_info))
-			? ebl_reloc_type_name (ebl, GELF_R_TYPE (rel->r_info),
-					       buf, sizeof (buf))
-			: gettext ("<INVALID RELOC>"),
-			elf_strptr (ebl->elf, shstrndx, destshdr->sh_name));
-	    }
-	}
+	show_relocs_x (ebl, shdr, symdata, xndxdata, symstrndx, shstrndx,
+		       rel->r_offset, rel->r_info, 0);
     }
 }
 
@@ -435,7 +438,6 @@ show_relocs_rela (Ebl *ebl, GElf_Shdr *shdr, Elf_Data *data,
 		  Elf_Data *symdata, Elf_Data *xndxdata, size_t symstrndx,
 		  size_t shstrndx)
 {
-  int elfclass = gelf_getclass (ebl->elf);
   int nentries = shdr->sh_size / shdr->sh_entsize;
 
   for (int cnt = 0; cnt < nentries; ++cnt)
@@ -445,64 +447,8 @@ show_relocs_rela (Ebl *ebl, GElf_Shdr *shdr, Elf_Data *data,
 
       rel = gelf_getrela (data, cnt, &relmem);
       if (rel != NULL)
-	{
-	  char buf[128];
-	  GElf_Sym symmem;
-	  GElf_Sym *sym;
-	  Elf32_Word xndx;
-
-	  sym = gelf_getsymshndx (symdata, xndxdata, GELF_R_SYM (rel->r_info),
-				  &symmem, &xndx);
-	  if (sym == NULL)
-	    printf ("%0*" PRIx64 " %-20s <%s %ld>",
-		    elfclass == ELFCLASS32 ? 8 : 16, rel->r_offset,
-		    ebl_reloc_type_check (ebl, GELF_R_TYPE (rel->r_info))
-		    ? ebl_reloc_type_name (ebl, GELF_R_TYPE (rel->r_info),
-					   buf, sizeof (buf))
-		    : gettext ("<INVALID RELOC>"),
-		    gettext ("INVALID SYMBOL"),
-		    (long int) GELF_R_SYM (rel->r_info));
-	  else if (GELF_ST_TYPE (sym->st_info) != STT_SECTION)
-	    printf ("%0*" PRIx64 " %-20s %s",
-		    elfclass == ELFCLASS32 ? 8 : 16, rel->r_offset,
-		    ebl_reloc_type_check (ebl, GELF_R_TYPE (rel->r_info))
-		    ? ebl_reloc_type_name (ebl, GELF_R_TYPE (rel->r_info),
-					   buf, sizeof (buf))
-		    : gettext ("<INVALID RELOC>"),
-		    elf_strptr (ebl->elf, symstrndx, sym->st_name));
-	  else
-	    {
-	      GElf_Shdr destshdr_mem;
-	      GElf_Shdr *destshdr;
-	      destshdr = gelf_getshdr (elf_getscn (ebl->elf,
-						   sym->st_shndx == SHN_XINDEX
-						   ? xndx : sym->st_shndx),
-				       &destshdr_mem);
-
-	      if (shdr == NULL)
-		printf ("%0*" PRIx64 " %-20s <%s %ld>",
-			elfclass == ELFCLASS32 ? 8 : 16, rel->r_offset,
-			ebl_reloc_type_check (ebl, GELF_R_TYPE (rel->r_info))
-			? ebl_reloc_type_name (ebl, GELF_R_TYPE (rel->r_info),
-					       buf, sizeof (buf))
-			: gettext ("<INVALID RELOC>"),
-			gettext ("INVALID SECTION"),
-			(long int) (sym->st_shndx == SHN_XINDEX
-				    ? xndx : sym->st_shndx));
-	      else
-		printf ("%0*" PRIx64 " %-20s %s",
-			elfclass == ELFCLASS32 ? 8 : 16, rel->r_offset,
-			ebl_reloc_type_check (ebl, GELF_R_TYPE (rel->r_info))
-			? ebl_reloc_type_name (ebl, GELF_R_TYPE (rel->r_info),
-					       buf, sizeof (buf))
-			: gettext ("<INVALID RELOC>"),
-			elf_strptr (ebl->elf, shstrndx, destshdr->sh_name));
-	    }
-
-	  if (rel->r_addend != 0)
-	    printf ("+%#" PRIx64, rel->r_addend);
-	  putchar ('\n');
-	}
+	show_relocs_x (ebl, shdr, symdata, xndxdata, symstrndx, shstrndx,
+		       rel->r_offset, rel->r_info, rel->r_addend);
     }
 }
 
@@ -561,7 +507,7 @@ show_relocs (Ebl *ebl, const char *fname, uint32_t shstrndx)
 							  shdr->sh_info),
 					      &destshdr_mem);
 
-	  printf (gettext ("RELOCATION RECORDS FOR [%s]:\n"
+	  printf (gettext ("\nRELOCATION RECORDS FOR [%s]:\n"
 			   "%-*s TYPE                 VALUE\n"),
 		  elf_strptr (ebl->elf, shstrndx, destshdr->sh_name),
 		  elfclass == ELFCLASS32 ? 8 : 16, gettext ("OFFSET"));
@@ -601,10 +547,10 @@ show_relocs (Ebl *ebl, const char *fname, uint32_t shstrndx)
 	  else
 	    show_relocs_rela (ebl, shdr, data, symdata, xndxdata,
 			      symshdr->sh_link, shstrndx);
+
+	  putchar ('\n');
 	}
     }
-
-  fputs_unlocked ("\n\n", stdout);
 
   return 0;
 }

@@ -1,3 +1,33 @@
+2009-04-29  Ulrich Drepper  <drepper@redhat.com>
+
+	* elflint.c (check_symtab): Add tests of st_other field.
+
+2009-04-19  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac (eu_version): Round down here, not in version.h macros.
+
+2009-04-17  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac (eu_version): Compute number 1000 times larger,
+	let $PACKAGE_VERSION be x.y.z as well as x.y (implied x.y.0).
+
+2009-01-23  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac (zlib check): Check for gzdirect, need zlib >= 1.2.2.3.
+
+	* configure.ac (__thread check): Use AC_LINK_IFELSE, in case of
+	building with compiler support but no working runtime support.
+
+2009-01-22  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (rpm): The tarball is now bzip2-compressed.
+
+2009-01-10  Ulrich Drepper  <drepper@redhat.com>
+
+	* configure.ac: Require gcc with TLS support.
+	Rename USE_TLS to USE_LOCKS.  The option is renamed to
+	--enable-thread-safety.
+
 2009-01-08  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac (eu_ZIPLIB): Moved to m4/zip.am.

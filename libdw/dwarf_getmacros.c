@@ -75,16 +75,19 @@ dwarf_getmacros (die, callback, arg, offset)
   if (INTUSE(dwarf_formudata) (&attr, &macoff) != 0)
     return -1;
 
-  const unsigned char *readp
-    = die->cu->dbg->sectiondata[IDX_debug_macinfo]->d_buf + offset;
-  const unsigned char *readendp
-    = readp + die->cu->dbg->sectiondata[IDX_debug_macinfo]->d_size;
+  Elf_Data *d = die->cu->dbg->sectiondata[IDX_debug_macinfo];
+  if (unlikely (d == NULL) || unlikely (d->d_buf == NULL))
+    {
+      __libdw_seterrno (DWARF_E_NO_ENTRY);
+      return -1;
+    }
+
+  const unsigned char *macdata = d->d_buf + macoff;
+  const unsigned char *readp =  macdata + offset;
+  const unsigned char *readendp = d->d_buf + d->d_size;
 
   if (readp == readendp)
     return 0;
-
-  if (*readp != DW_MACINFO_start_file)
-    goto invalid;
 
   while (readp < readendp)
     {
@@ -142,9 +145,7 @@ dwarf_getmacros (die, callback, arg, offset)
 	mac.param2.s = str;
 
       if (callback (&mac, arg) != DWARF_CB_OK)
-	return (readp
-		- ((unsigned char *) die->cu->dbg->sectiondata[IDX_debug_macinfo]->d_buf
-		   + offset));
+	return readp - macdata;
     }
 
   /* If we come here the termination of the data for the CU is not

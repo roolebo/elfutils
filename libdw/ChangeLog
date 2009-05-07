@@ -1,3 +1,8 @@
+2009-05-07  Petr Machata  <pmachata@redhat.com>
+
+	* dwarf_getmacros.c (dwarf_getmacros): Take into account offset in
+	DW_AT_macro_info attribute of CU DIE.
+
 2009-04-15  Roland McGrath  <roland@redhat.com>
 
 	* dwarf.h (DW_CIE_ID): Removed.

@@ -1,3 +1,11 @@
+2009-05-07  Petr Machata  <pmachata@redhat.com>
+
+	* testfile51.bz2: New data file.
+	* dwarf-getmacros.c: New test core.
+	* run-dwarf-getmacros.sh: New test wrapper.
+	* Makefile.am (noinst_PROGRAMS, TESTS, EXTRA_DIST,
+	dwarf_getmacros_LDADD): Add new files.
+
 2009-04-23  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile [BUILD_STATIC] (libdw): Add $(zip_LIBS).

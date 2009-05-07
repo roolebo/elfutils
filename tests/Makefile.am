@@ -60,7 +60,7 @@ noinst_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  find-prologues funcretval allregs rdwrmmap \
 		  dwfl-bug-addr-overflow arls dwfl-bug-fd-leak \
 		  dwfl-addr-sect dwfl-bug-report early-offscn \
-		  dwfl-bug-getmodules
+		  dwfl-bug-getmodules dwarf-getmacros
 # get-ciefde
 asm_TESTS = asm-tst1 asm-tst2 asm-tst3 asm-tst4 asm-tst5 \
 	    asm-tst6 asm-tst7 asm-tst8 asm-tst9
@@ -86,7 +86,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	dwfl-bug-fd-leak dwfl-bug-report \
 	run-dwfl-bug-offline-rel.sh run-dwfl-addr-sect.sh \
 	run-disasm-x86.sh run-disasm-x86-64.sh \
-	run-early-offscn.sh
+	run-early-offscn.sh run-dwarf-getmacros.sh
 # run-show-ciefde.sh
 
 if !STANDALONE
@@ -141,7 +141,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile44.S.bz2 testfile44.expect.bz2 run-disasm-x86.sh \
 	     testfile45.S.bz2 testfile45.expect.bz2 run-disasm-x86-64.sh \
 	     testfile46.bz2 testfile47.bz2 testfile48.bz2 testfile48.debug.bz2 \
-	     testfile49.bz2 testfile50.bz2
+	     testfile49.bz2 testfile50.bz2 run-dwarf-getmacros.sh
 
 installed_TESTS_ENVIRONMENT = libdir=$(DESTDIR)$(libdir) \
 			      bindir=$(DESTDIR)$(bindir) \
@@ -233,6 +233,7 @@ dwfl_bug_report_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
 dwfl_bug_getmodules_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
 dwfl_addr_sect_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
 sha1_tst_LDADD = $(libeu) $(libmudflap)
+dwarf_getmacros_LDADD = $(libdw)
 
 CLEANFILES = xxx *.gcno *.gcda *gconv
 

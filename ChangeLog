@@ -1,7 +1,3 @@
-2009-04-29  Ulrich Drepper  <drepper@redhat.com>
-
-	* elflint.c (check_symtab): Add tests of st_other field.
-
 2009-04-19  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac (eu_version): Round down here, not in version.h macros.

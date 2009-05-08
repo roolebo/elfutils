@@ -1,3 +1,9 @@
+2009-05-07  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_getmacros.c (dwarf_getmacros): Use absolute section offset in
+	return value and OFFSET argument, not CU-relative.  Only fetch the
+	attribute data when called with OFFSET of 0.
+
 2009-05-07  Petr Machata  <pmachata@redhat.com>
 
 	* dwarf_getmacros.c (dwarf_getmacros): Take into account offset in

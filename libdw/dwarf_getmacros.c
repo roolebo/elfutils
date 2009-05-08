@@ -1,5 +1,5 @@
 /* Get macro information.
-   Copyright (C) 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright (C) 2002-2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -65,16 +65,6 @@ dwarf_getmacros (die, callback, arg, offset)
      void *arg;
      ptrdiff_t offset;
 {
-  /* Get the appropriate attribute.  */
-  Dwarf_Attribute attr;
-  if (INTUSE(dwarf_attr) (die, DW_AT_macro_info, &attr) == NULL)
-    return -1;
-
-  /* Offset into the .debug_macinfo section.  */
-  Dwarf_Word macoff;
-  if (INTUSE(dwarf_formudata) (&attr, &macoff) != 0)
-    return -1;
-
   Elf_Data *d = die->cu->dbg->sectiondata[IDX_debug_macinfo];
   if (unlikely (d == NULL) || unlikely (d->d_buf == NULL))
     {
@@ -82,8 +72,24 @@ dwarf_getmacros (die, callback, arg, offset)
       return -1;
     }
 
-  const unsigned char *macdata = d->d_buf + macoff;
-  const unsigned char *readp =  macdata + offset;
+  if (offset == 0)
+    {
+      /* Get the appropriate attribute.  */
+      Dwarf_Attribute attr;
+      if (INTUSE(dwarf_attr) (die, DW_AT_macro_info, &attr) == NULL)
+	return -1;
+
+      /* Offset into the .debug_macinfo section.  */
+      Dwarf_Word macoff;
+      if (INTUSE(dwarf_formudata) (&attr, &macoff) != 0)
+	return -1;
+
+      offset = macoff;
+    }
+  if (unlikely (offset > (ptrdiff_t) d->d_size))
+    goto invalid;
+
+  const unsigned char *readp = d->d_buf + offset;
   const unsigned char *readendp = d->d_buf + d->d_size;
 
   if (readp == readendp)
@@ -145,7 +151,7 @@ dwarf_getmacros (die, callback, arg, offset)
 	mac.param2.s = str;
 
       if (callback (&mac, arg) != DWARF_CB_OK)
-	return readp - macdata;
+	return readp - (const unsigned char *) d->d_buf;
     }
 
   /* If we come here the termination of the data for the CU is not

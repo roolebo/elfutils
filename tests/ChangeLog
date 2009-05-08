@@ -3,14 +3,14 @@
 	* testfile51.bz2: New data file.
 	* dwarf-getmacros.c: New test core.
 	* run-dwarf-getmacros.sh: New test wrapper.
-	* Makefile.am (noinst_PROGRAMS, TESTS, EXTRA_DIST,
-	dwarf_getmacros_LDADD): Add new files.
+	* Makefile.am (TESTS, EXTRA_DIST, noinst_PROGRAMS): Add them.
+	(dwarf_getmacros_LDADD): New variable.
 
 2009-04-23  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makefile [BUILD_STATIC] (libdw): Add $(zip_LIBS).
 	(rdwrmmap_LDADD): Add $(libmudflap).
-	
+
 2009-04-21  Roland McGrath  <roland@redhat.com>
 
 	* testfile50.bz2: New data file.

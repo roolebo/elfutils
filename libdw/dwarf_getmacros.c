@@ -65,6 +65,9 @@ dwarf_getmacros (die, callback, arg, offset)
      void *arg;
      ptrdiff_t offset;
 {
+  if (d == NULL)
+    return -1;
+
   Elf_Data *d = die->cu->dbg->sectiondata[IDX_debug_macinfo];
   if (unlikely (d == NULL) || unlikely (d->d_buf == NULL))
     {

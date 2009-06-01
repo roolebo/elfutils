@@ -1,3 +1,11 @@
+2009-06-01  Ulrich Drepper  <drepper@redhat.com>
+
+	* readelf.c (print_relocs): Expect ELF header argument and pass on
+	to handle_relocs_rel* functions. Adjust caller.
+	(handle_relocs_rel): Add ELF header argument.  Add special case for
+	the IRELATIVE relocations in statically linked executables.
+	(handle_relocs_rela): Likewise.
+
 2009-04-29  Ulrich Drepper  <drepper@redhat.com>
 
 	* elflint.c (check_symtab): Add tests of st_other field.

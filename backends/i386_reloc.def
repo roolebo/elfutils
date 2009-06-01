@@ -1,5 +1,5 @@
 /* List the relocation types for i386.	-*- C -*-
-   Copyright (C) 2000, 2001, 2002, 2003, 2005 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2003, 2005, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -64,3 +64,4 @@ RELOC_TYPE (TLS_TPOFF32,	EXEC|DYN)
 RELOC_TYPE (TLS_GOTDESC,	REL)
 RELOC_TYPE (TLS_DESC_CALL,	REL)
 RELOC_TYPE (TLS_DESC,		EXEC)
+RELOC_TYPE (IRELATIVE,		EXEC|DYN)

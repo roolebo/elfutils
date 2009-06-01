@@ -1,3 +1,8 @@
+2009-06-01  Ulrich Drepper  <drepper@redhat.com>
+
+	* i386_reloc.def: Add IRELATIVE entry.
+	* x86_64_reloc.def: Likewise.
+
 2009-04-16  Roland McGrath  <roland@redhat.com>
 
 	* arm_regs.c (arm_register_info): Handle VFP registers.

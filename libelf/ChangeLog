@@ -1,3 +1,7 @@
+2009-06-01  Ulrich Drepper  <drepper@redhat.com>
+
+	* elf.h: Update from glibc.
+
 2009-04-14  Roland McGrath  <roland@redhat.com>
 
 	* elf.h: Update from glibc.

@@ -72,7 +72,7 @@ __libdwfl_relocate_value (Dwfl_Module *mod, Elf *elf, size_t *shstrndx,
 	 address and update the section header.  */
 
       if (*shstrndx == SHN_UNDEF
-	  && unlikely (elf_getshstrndx (elf, shstrndx) < 0))
+	  && unlikely (elf_getshdrstrndx (elf, shstrndx) < 0))
 	return DWFL_E_LIBELF;
 
       const char *name = elf_strptr (elf, *shstrndx, refshdr->sh_name);
@@ -582,7 +582,7 @@ __libdwfl_relocate (Dwfl_Module *mod, Elf *debugfile, bool debug)
     return DWFL_E_LIBELF;
 
   size_t d_shstrndx;
-  if (elf_getshstrndx (debugfile, &d_shstrndx) < 0)
+  if (elf_getshdrstrndx (debugfile, &d_shstrndx) < 0)
     return DWFL_E_LIBELF;
 
   RELOC_SYMTAB_CACHE (reloc_symtab);
@@ -626,7 +626,7 @@ __libdwfl_relocate_section (Dwfl_Module *mod, Elf *relocated,
   RELOC_SYMTAB_CACHE (reloc_symtab);
 
   size_t shstrndx;
-  if (elf_getshstrndx (relocated, &shstrndx) < 0)
+  if (elf_getshdrstrndx (relocated, &shstrndx) < 0)
     return DWFL_E_LIBELF;
 
   return (__libdwfl_module_getebl (mod)

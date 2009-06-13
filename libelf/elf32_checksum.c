@@ -1,5 +1,5 @@
 /* Compute simple checksum from permanent parts of the ELF file.
-   Copyright (C) 2002, 2003, 2004, 2005 Red Hat, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -90,7 +90,7 @@ elfw2(LIBELFBITS,checksum) (elf)
     return -1l;
 
   /* Find the section header string table.  */
-  if  (INTUSE(elf_getshstrndx) (elf, &shstrndx) < 0)
+  if  (INTUSE(elf_getshdrstrndx) (elf, &shstrndx) < 0)
     {
       /* This can only happen if the ELF handle is not for real.  */
       __libelf_seterrno (ELF_E_INVALID_HANDLE);

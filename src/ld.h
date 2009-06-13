@@ -1,4 +1,4 @@
-/* Copyright (C) 2001, 2002, 2003, 2005, 2006, 2008 Red Hat, Inc.
+/* Copyright (C) 2001, 2002, 2003, 2005, 2006, 2008, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -146,7 +146,7 @@ struct usedfiles
      separate field and not the e_shstrndx field in the ELF header
      since in case of a file with more than 64000 sections the index
      might be stored in the section header of section zero.  The
-     elf_getshstrndx() function can find the value but it is too
+     elf_getshdrstrndx() function can find the value but it is too
      costly to repeat this call over and over.  */
   size_t shstrndx;
 

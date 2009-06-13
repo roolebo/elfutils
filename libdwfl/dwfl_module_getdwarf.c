@@ -148,7 +148,7 @@ static const char *
 find_debuglink (Elf *elf, GElf_Word *crc)
 {
   size_t shstrndx;
-  if (elf_getshstrndx (elf, &shstrndx) < 0)
+  if (elf_getshdrstrndx (elf, &shstrndx) < 0)
     return NULL;
 
   Elf_Scn *scn = NULL;

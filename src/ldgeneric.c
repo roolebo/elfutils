@@ -1,4 +1,4 @@
-/* Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008 Red Hat, Inc.
+/* Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -656,7 +656,7 @@ check_definition (const XElf_Sym *sym, size_t shndx, size_t symidx,
       Elf32_Word xndx;
       size_t shnum;
 
-      if (elf_getshnum (fileinfo->elf, &shnum) < 0)
+      if (elf_getshdrnum (fileinfo->elf, &shnum) < 0)
 	error (EXIT_FAILURE, 0,
 	       gettext ("cannot determine number of sections: %s"),
 	       elf_errmsg (-1));
@@ -1117,7 +1117,7 @@ add_relocatable_file (struct usedfiles *fileinfo, GElf_Word secttype)
   assert (fileinfo->elf != NULL);
 
   /* Allocate memory for the sections.  */
-  if (unlikely (elf_getshnum (fileinfo->elf, &scncnt) < 0))
+  if (unlikely (elf_getshdrnum (fileinfo->elf, &scncnt) < 0))
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot determine number of sections: %s"),
 	   elf_errmsg (-1));
@@ -1619,7 +1619,7 @@ add_relocatable_file (struct usedfiles *fileinfo, GElf_Word secttype)
 
 #ifndef NDEBUG
 	      size_t shnum;
-	      assert (elf_getshnum (fileinfo->elf, &shnum) == 0);
+	      assert (elf_getshdrnum (fileinfo->elf, &shnum) == 0);
 	      assert (shndx < shnum);
 #endif
 
@@ -2038,7 +2038,7 @@ file_process2 (struct usedfiles *fileinfo)
 	    }
 
 	  /* Determine the section header string table section index.  */
-	  if (unlikely (elf_getshstrndx (fileinfo->elf, &fileinfo->shstrndx)
+	  if (unlikely (elf_getshdrstrndx (fileinfo->elf, &fileinfo->shstrndx)
 			< 0))
 	    {
 	      fprintf (stderr, gettext ("\
@@ -4148,7 +4148,7 @@ compute_hash_sum (void (*hashfct) (const void *, size_t, void *), void *ctx)
 {
   /* The call cannot fail.  */
   size_t shstrndx;
-  (void) elf_getshstrndx (ld_state.outelf, &shstrndx);
+  (void) elf_getshdrstrndx (ld_state.outelf, &shstrndx);
 
   const char *ident = elf_getident (ld_state.outelf, NULL);
   bool same_byte_order = ((ident[EI_DATA] == ELFDATA2LSB

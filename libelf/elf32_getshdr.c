@@ -1,5 +1,5 @@
 /* Return section header.
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2005, 2007 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2005, 2007, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -81,7 +81,7 @@ load_shdr_wrlock (Elf_Scn *scn)
     goto out;
 
   size_t shnum;
-  if (__elf_getshnum_rdlock (elf, &shnum) != 0)
+  if (__elf_getshdrnum_rdlock (elf, &shnum) != 0)
     goto out;
   size_t size = shnum * sizeof (ElfW2(LIBELFBITS,Shdr));
 

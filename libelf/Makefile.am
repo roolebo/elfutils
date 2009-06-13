@@ -91,7 +91,7 @@ libelf_a_SOURCES = elf_version.c elf_hash.c elf_error.c elf_fill.c \
 		   gelf_update_versym.c gelf_update_verneed.c \
 		   gelf_update_vernaux.c gelf_update_verdef.c \
 		   gelf_update_verdaux.c \
-		   elf_getshnum.c elf_getshstrndx.c \
+		   elf_getshdrnum.c elf_getshdrstrndx.c \
 		   gelf_checksum.c elf32_checksum.c elf64_checksum.c \
 		   libelf_crc32.c libelf_next_prime.c \
 		   elf_clone.c \

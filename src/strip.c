@@ -477,7 +477,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
     INTERNAL_ERROR (fname);
 
   /* Get the section header string table index.  */
-  if (unlikely (elf_getshstrndx (elf, &shstrndx) < 0))
+  if (unlikely (elf_getshdrstrndx (elf, &shstrndx) < 0))
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
 
@@ -537,7 +537,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 
   /* Number of sections.  */
   size_t shnum;
-  if (unlikely (elf_getshnum (elf, &shnum) < 0))
+  if (unlikely (elf_getshdrnum (elf, &shnum) < 0))
     {
       error (0, 0, gettext ("cannot determine number of sections: %s"),
 	     elf_errmsg (-1));

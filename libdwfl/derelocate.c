@@ -94,7 +94,7 @@ cache_sections (Dwfl_Module *mod)
   size_t nrefs = 0;
 
   size_t shstrndx;
-  if (unlikely (elf_getshstrndx (mod->main.elf, &shstrndx) < 0))
+  if (unlikely (elf_getshdrstrndx (mod->main.elf, &shstrndx) < 0))
     {
     elf_error:
       __libdwfl_seterrno (DWFL_E_LIBELF);

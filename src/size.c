@@ -420,7 +420,7 @@ show_sysv (Elf *elf, const char *prefix, const char *fname,
 
   /* Get the section header string table index.  */
   size_t shstrndx;
-  if (unlikely (elf_getshstrndx (elf, &shstrndx) < 0))
+  if (unlikely (elf_getshdrstrndx (elf, &shstrndx) < 0))
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
 
@@ -494,7 +494,7 @@ show_sysv_one_line (Elf *elf)
 {
   /* Get the section header string table index.  */
   size_t shstrndx;
-  if (unlikely (elf_getshstrndx (elf, &shstrndx) < 0))
+  if (unlikely (elf_getshdrstrndx (elf, &shstrndx) < 0))
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
 

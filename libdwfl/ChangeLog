@@ -1,3 +1,9 @@
+2009-06-13  Ulrich Drepper  <drepper@redhat.com>
+
+	* derelocate.c: Don't use deprecated libelf functions.
+	* dwfl_module_getdwarf.c: Likewise.
+	* relocate.c: Likewise.
+
 2009-04-23  Ulrich Drepper  <drepper@redhat.com>
 
 	* dwfl_module_build_id.c: Define versioned symbols only if SHARED is

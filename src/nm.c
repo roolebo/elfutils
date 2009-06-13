@@ -724,7 +724,7 @@ show_symbols_sysv (Ebl *ebl, GElf_Word strndx,
 		   int longest_where)
 {
   size_t shnum;
-  if (elf_getshnum (ebl->elf, &shnum) < 0)
+  if (elf_getshdrnum (ebl->elf, &shnum) < 0)
     INTERNAL_ERROR (fullname);
 
   bool scnnames_malloced = shnum * sizeof (const char *) > 128 * 1024;
@@ -735,7 +735,7 @@ show_symbols_sysv (Ebl *ebl, GElf_Word strndx,
     scnnames = (const char **) alloca (sizeof (const char *) * shnum);
   /* Get the section header string table index.  */
   size_t shstrndx;
-  if (elf_getshstrndx (ebl->elf, &shstrndx) < 0)
+  if (elf_getshdrstrndx (ebl->elf, &shstrndx) < 0)
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
 
@@ -997,7 +997,7 @@ show_symbols (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, Elf_Scn *xndxscn,
 {
   /* Get the section header string table index.  */
   size_t shstrndx;
-  if (elf_getshstrndx (ebl->elf, &shstrndx) < 0)
+  if (elf_getshdrstrndx (ebl->elf, &shstrndx) < 0)
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
 

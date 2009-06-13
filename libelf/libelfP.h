@@ -533,11 +533,12 @@ extern Elf32_Phdr *__elf32_newphdr_internal (Elf *__elf, size_t __cnt)
 extern Elf64_Phdr *__elf64_newphdr_internal (Elf *__elf, size_t __cnt)
      attribute_hidden;
 extern Elf_Scn *__elf32_offscn_internal (Elf *__elf, Elf32_Off __offset)
-  attribute_hidden;
+     attribute_hidden;
 extern Elf_Scn *__elf64_offscn_internal (Elf *__elf, Elf64_Off __offset)
-  attribute_hidden;
-extern int __elf_getshnum_rdlock (Elf *__elf, size_t *__dst) internal_function;
-extern int __elf_getshstrndx_internal (Elf *__elf, size_t *__dst)
+     attribute_hidden;
+extern int __elf_getshdrnum_rdlock (Elf *__elf, size_t *__dst)
+     internal_function;
+extern int __elf_getshdrstrndx_internal (Elf *__elf, size_t *__dst)
      attribute_hidden;
 extern Elf32_Shdr *__elf32_getshdr_rdlock (Elf_Scn *__scn) internal_function;
 extern Elf64_Shdr *__elf64_getshdr_rdlock (Elf_Scn *__scn) internal_function;

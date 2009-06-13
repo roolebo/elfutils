@@ -1218,19 +1218,19 @@ copy_elided_sections (Elf *unstripped, Elf *stripped,
 		      const GElf_Ehdr *stripped_ehdr, GElf_Addr bias)
 {
   size_t unstripped_shstrndx;
-  ELF_CHECK (elf_getshstrndx (unstripped, &unstripped_shstrndx) == 0,
+  ELF_CHECK (elf_getshdrstrndx (unstripped, &unstripped_shstrndx) == 0,
 	     _("cannot get section header string table section index: %s"));
 
   size_t stripped_shstrndx;
-  ELF_CHECK (elf_getshstrndx (stripped, &stripped_shstrndx) == 0,
+  ELF_CHECK (elf_getshdrstrndx (stripped, &stripped_shstrndx) == 0,
 	     _("cannot get section header string table section index: %s"));
 
   size_t unstripped_shnum;
-  ELF_CHECK (elf_getshnum (unstripped, &unstripped_shnum) == 0,
+  ELF_CHECK (elf_getshdrnum (unstripped, &unstripped_shnum) == 0,
 	     _("cannot get section count: %s"));
 
   size_t stripped_shnum;
-  ELF_CHECK (elf_getshnum (stripped, &stripped_shnum) == 0,
+  ELF_CHECK (elf_getshdrnum (stripped, &stripped_shnum) == 0,
 	     _("cannot get section count: %s"));
 
   /* Cache the stripped file's section details.  */
@@ -1461,7 +1461,7 @@ copy_elided_sections (Elf *unstripped, Elf *stripped,
 					strtab);
 
   /* Get the updated section count.  */
-  ELF_CHECK (elf_getshnum (unstripped, &unstripped_shnum) == 0,
+  ELF_CHECK (elf_getshdrnum (unstripped, &unstripped_shnum) == 0,
 	     _("cannot get section count: %s"));
 
   bool placed[unstripped_shnum - 1];

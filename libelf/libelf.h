@@ -1,5 +1,5 @@
 /* Interface for libelf.
-   Copyright (C) 1998, 1999, 2000, 2002, 2004, 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 1998-2000, 2002, 2004-2007, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -256,14 +256,24 @@ extern int elf_scnshndx (Elf_Scn *__scn);
    sections than can be represented in the e_shnum field of the ELF
    header the information from the sh_size field in the zeroth section
    header is used.  */
-extern int elf_getshnum (Elf *__elf, size_t *__dst);
+extern int elf_getshdrnum (Elf *__elf, size_t *__dst);
+/* Sun messed up the implementation of 'elf_getshnum' in their implementation.
+   It was agreed to make the same functionality available under a different
+   name and obsolete the old name.  */
+extern int elf_getshnum (Elf *__elf, size_t *__dst)
+     __attribute__ ((__deprecated__));
 
 
 /* Get the section index of the section header string table in the ELF
    file.  If the index cannot be represented in the e_shnum field of
    the ELF header the information from the sh_link field in the zeroth
    section header is used.  */
-extern int elf_getshstrndx (Elf *__elf, size_t *__dst);
+extern int elf_getshdrstrndx (Elf *__elf, size_t *__dst);
+/* Sun messed up the implementation of 'elf_getshnum' in their implementation.
+   It was agreed to make the same functionality available under a different
+   name and obsolete the old name.  */
+extern int elf_getshstrndx (Elf *__elf, size_t *__dst)
+     __attribute__ ((__deprecated__));
 
 
 /* Retrieve section header of ELFCLASS32 binary.  */

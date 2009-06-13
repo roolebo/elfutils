@@ -739,7 +739,7 @@ handle_elf (Elf *elf, const char *prefix, const char *fname,
 
   /* Get the section header string table index.  */
   size_t shstrndx;
-  if (elf_getshstrndx (ebl->elf, &shstrndx) < 0)
+  if (elf_getshdrstrndx (ebl->elf, &shstrndx) < 0)
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
 

@@ -1,3 +1,20 @@
+2009-06-13  Ulrich Drepper  <drepper@redhat.com>
+
+	* Makefile.am (libelf_a_SOURCES): Replace elf_getshnum.c and
+	elf_getshstrndx.c with elf_getshdrnum.c and elf_getshdrstrndx.c.
+	* elf_getshnum.c: Renamed to...
+	* elf_getshdrnum.c: ...this.  Rename function and add old name as
+	alias.  Likewise for internal functions with derived names.
+	* elf_getshstrndx.c: Renamed to...
+	* elf_getshdrstrndx.c: ...this.  Rename function and add old name as
+	alias.  Likewise for internal functions with derived names.
+	* libelf.h: Add prototypes for new names.  Make old names as
+	deprecated.
+	* libelfP.h: Rename internal function prototypes.
+	* libelf.map: Export for names.
+	* elf32_checksum.c: Don't use deprecated functions.
+	* elf32_getshdr.c: Likewise.
+
 2009-06-01  Ulrich Drepper  <drepper@redhat.com>
 
 	* elf.h: Update from glibc.

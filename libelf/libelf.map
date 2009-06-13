@@ -128,3 +128,8 @@ ELFUTILS_1.4 {
   global:
     elf_scnshndx;
 } ELFUTILS_1.3;
+
+ELFUTILS_1.5 {
+  global:
+    elf_getshdrnum; elf_getshdrstrndx;
+} ELFUTILS_1.4;

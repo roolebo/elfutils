@@ -1,5 +1,5 @@
 /* Return number of sections in the ELF file.
-   Copyright (C) 2002 Red Hat, Inc.
+   Copyright (C) 2002, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -60,7 +60,7 @@
 
 
 int
-__elf_getshnum_rdlock (elf, dst)
+__elf_getshdrnum_rdlock (elf, dst)
      Elf *elf;
      size_t *dst;
 {
@@ -92,7 +92,7 @@ __elf_getshnum_rdlock (elf, dst)
 }
 
 int
-elf_getshnum (elf, dst)
+elf_getshdrnum (elf, dst)
      Elf *elf;
      size_t *dst;
 {
@@ -102,8 +102,10 @@ elf_getshnum (elf, dst)
     return -1;
 
   rwlock_rdlock (elf->lock);
-  result = __elf_getshnum_rdlock (elf, dst);
+  result = __elf_getshdrnum_rdlock (elf, dst);
   rwlock_unlock (elf->lock);
 
   return result;
 }
+/* Alias for the deprecated name.  */
+strong_alias (elf_getshdrnum, elf_getshnum)

@@ -72,10 +72,9 @@ dwarf_formref_die (attr, die_mem)
 			  ? attr->cu->address_size
 			  : attr->cu->offset_size);
 
-      if (ref_size == 8)
-	offset = read_8ubyte_unaligned (attr->cu->dbg, attr->valp);
-      else
-	offset = read_4ubyte_unaligned (attr->cu->dbg, attr->valp);
+      if (__libdw_read_offset (attr->cu->dbg, IDX_debug_info, attr->valp,
+			       ref_size, &offset, IDX_debug_info, 0))
+	return NULL;
     }
   else
     {

@@ -1,3 +1,37 @@
+2009-05-05  Petr Machata  <pmachata@redhat.com>
+
+	* libdwP.h (__libdw_formptr): Declare new function.
+	* dwarf_formudata.c: Implement it here.
+	* dwarf_getlocation.c (dwarf_getlocation_addr):
+	Call it instead of hand-rolled offset handling code.
+	* dwarf_getsrclines.c (dwarf_getsrclines): Likewise.
+	* dwarf_ranges.c (dwarf_ranges): Likewise.
+
+2009-05-04  Petr Machata  <pmachata@redhat.com>
+
+	* libdwP.h (__libdw_read_begin_end_pair_inc): Declare new function.
+	* dwarf_ranges.c: Implement it here.
+	(dwarf_ranges): Call it.
+	* dwarf_getlocation.c (dwarf_getlocation_addr): Call it also here.
+
+2009-04-23  Petr Machata  <pmachata@redhat.com>
+
+	* dwarf_formaddr.c (dwarf_formaddr): Call __libdw_read_* instead
+	of read_*ubyte_unaligned.
+	* dwarf_formref_die.c (dwarf_formref_die): Likewise.
+	* dwarf_formstring.c (dwarf_formstring): Likewise.
+	* dwarf_formudate.c (dwarf_formudata): Likewise.
+	* dwarf_getaranges.c (dwarf_getaranges): Likewise.
+	* dwarf_getlocation.c (dwarf_getlocation_addr): Likewise.
+	* dwarf_getpubnames.c (get_offsets): Likewise.
+	* dwarf_nextcu.c (dwarf_nextcu): Likewise.
+
+2009-04-23  Petr Machata  <pmachata@redhat.com>
+
+	* libdwP.h (__libdw_read_addr_inc, __libdw_read_off_inc,
+	__libdw_read_addr, __libdw_read_off): Add four new internal
+	functions.
+
 2009-05-07  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_getmacros.c (dwarf_getmacros): Use absolute section offset in

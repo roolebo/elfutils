@@ -113,7 +113,7 @@ loc_compare (const void *p1, const void *p2)
 
 static int
 getlocation (struct Dwarf_CU *cu, const Dwarf_Block *block,
-	     Dwarf_Op **llbuf, size_t *listlen)
+	     Dwarf_Op **llbuf, size_t *listlen, int sec_index)
 {
   Dwarf *dbg = cu->dbg;
 
@@ -151,24 +151,9 @@ getlocation (struct Dwarf_CU *cu, const Dwarf_Block *block,
 	{
 	case DW_OP_addr:
 	  /* Address, depends on address size of CU.  */
-	  if (cu->address_size == 4)
-	    {
-	      if (unlikely (data + 4 > end_data))
-		{
-		invalid:
-		  __libdw_seterrno (DWARF_E_INVALID_DWARF);
-		  return -1;
-		}
-
-	      newloc->number = read_4ubyte_unaligned_inc (dbg, data);
-	    }
-	  else
-	    {
-	      if (unlikely (data + 8 > end_data))
-		goto invalid;
-
-	      newloc->number = read_8ubyte_unaligned_inc (dbg, data);
-	    }
+	  if (__libdw_read_address_inc (dbg, sec_index, (unsigned char **)&data,
+					cu->address_size, &newloc->number))
+	    return -1;
 	  break;
 
 	case DW_OP_deref:
@@ -211,7 +196,11 @@ getlocation (struct Dwarf_CU *cu, const Dwarf_Block *block,
 	case DW_OP_deref_size:
 	case DW_OP_xderef_size:
 	  if (unlikely (data >= end_data))
-	    goto invalid;
+	    {
+	    invalid:
+	      __libdw_seterrno (DWARF_E_INVALID_DWARF);
+	      return -1;
+	    }
 
 	  newloc->number = *data++;
 	  break;
@@ -352,7 +341,7 @@ dwarf_getlocation (attr, llbuf, listlen)
   if (INTUSE(dwarf_formblock) (attr, &block) != 0)
     return -1;
 
-  return getlocation (attr->cu, &block, llbuf, listlen);
+  return getlocation (attr->cu, &block, llbuf, listlen, IDX_debug_info);
 }
 
 int
@@ -376,7 +365,8 @@ dwarf_getlocation_addr (attr, address, llbufs, listlens, maxlocs)
       if (maxlocs == 0)
 	return 0;
       if (llbufs != NULL &&
-	  getlocation (attr->cu, &block, &llbufs[0], &listlens[0]) != 0)
+	  getlocation (attr->cu, &block, &llbufs[0], &listlens[0],
+		       IDX_debug_info) != 0)
 	return -1;
       return listlens[0] == 0 ? 0 : 1;
     }
@@ -388,25 +378,17 @@ dwarf_getlocation_addr (attr, address, llbufs, listlens, maxlocs)
       return -1;
     }
 
-  /* Must have the form data4 or data8 which act as an offset.  */
-  Dwarf_Word offset;
-  if (unlikely (INTUSE(dwarf_formudata) (attr, &offset) != 0))
+  unsigned char *endp;
+  unsigned char *readp = __libdw_formptr (attr, IDX_debug_loc,
+					  DWARF_E_NO_LOCLIST, &endp, NULL);
+  if (readp == NULL)
     return -1;
 
-  const Elf_Data *d = attr->cu->dbg->sectiondata[IDX_debug_loc];
-  if (unlikely (d == NULL))
-    {
-      __libdw_seterrno (DWARF_E_NO_LOCLIST);
-      return -1;
-    }
-
   Dwarf_Addr base = (Dwarf_Addr) -1;
-  unsigned char *readp = d->d_buf + offset;
   size_t got = 0;
   while (got < maxlocs)
     {
-      if ((unsigned char *) d->d_buf + d->d_size - readp
-	  < attr->cu->address_size * 2)
+      if (endp - readp < attr->cu->address_size * 2)
 	{
 	invalid:
 	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
@@ -415,42 +397,25 @@ dwarf_getlocation_addr (attr, address, llbufs, listlens, maxlocs)
 
       Dwarf_Addr begin;
       Dwarf_Addr end;
-      if (attr->cu->address_size == 8)
-	{
-	  begin = read_8ubyte_unaligned_inc (attr->cu->dbg, readp);
-	  end = read_8ubyte_unaligned_inc (attr->cu->dbg, readp);
 
-	  if (begin == (Elf64_Addr) -1l) /* Base address entry.  */
-	    {
-	      base = end;
-	      if (unlikely (base == (Dwarf_Addr) -1))
-		goto invalid;
-	      continue;
-	    }
-	}
-      else
-	{
-	  begin = read_4ubyte_unaligned_inc (attr->cu->dbg, readp);
-	  end = read_4ubyte_unaligned_inc (attr->cu->dbg, readp);
-
-	  if (begin == (Elf32_Addr) -1) /* Base address entry.  */
-	    {
-	      base = end;
-	      continue;
-	    }
-	}
-
-      if (begin == 0 && end == 0) /* End of list entry.  */
+      int status
+	= __libdw_read_begin_end_pair_inc (attr->cu->dbg, IDX_debug_loc,
+					   &readp, attr->cu->address_size,
+					   &begin, &end, &base);
+      if (status == 2) /* End of list entry.  */
 	break;
+      else if (status == 1) /* Base address selected.  */
+	continue;
+      else if (status < 0)
+	return status;
 
-      if ((unsigned char *) d->d_buf + d->d_size - readp < 2)
+      if (endp - readp < 2)
 	goto invalid;
 
       /* We have a location expression.  */
       block.length = read_2ubyte_unaligned_inc (attr->cu->dbg, readp);
       block.data = readp;
-      if ((unsigned char *) d->d_buf + d->d_size - readp
-	  < (ptrdiff_t) block.length)
+      if (endp - readp < (ptrdiff_t) block.length)
 	goto invalid;
       readp += block.length;
 
@@ -486,7 +451,8 @@ dwarf_getlocation_addr (attr, address, llbufs, listlens, maxlocs)
 	  /* This one matches the address.  */
 	  if (llbufs != NULL
 	      && unlikely (getlocation (attr->cu, &block,
-					&llbufs[got], &listlens[got]) != 0))
+					&llbufs[got], &listlens[got],
+					IDX_debug_loc) != 0))
 	    return -1;
 	  ++got;
 	}

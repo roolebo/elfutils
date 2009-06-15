@@ -419,6 +419,156 @@ extern int __libdw_visit_scopes (unsigned int depth,
 extern int __dwarf_errno_internal (void);
 
 
+/* Reader hooks.  */
+
+/* Relocation hooks return -1 on error (in that case the error code
+   must already have been set), 0 if there is no relocation and 1 if a
+   relocation was present.*/
+
+static inline int
+__libdw_relocate_address (Dwarf *dbg __attribute__ ((unused)),
+			  int sec_index __attribute__ ((unused)),
+			  const void *addr __attribute__ ((unused)),
+			  int width __attribute__ ((unused)),
+			  Dwarf_Addr *val __attribute__ ((unused)))
+{
+  return 0;
+}
+
+static inline int
+__libdw_relocate_offset (Dwarf *dbg __attribute__ ((unused)),
+			 int sec_index __attribute__ ((unused)),
+			 const void *addr __attribute__ ((unused)),
+			 int width __attribute__ ((unused)),
+			 Dwarf_Off *val __attribute__ ((unused)))
+{
+  return 0;
+}
+
+static inline Elf_Data *
+__libdw_checked_get_data (Dwarf *dbg, int sec_index)
+{
+  Elf_Data *data = dbg->sectiondata[sec_index];
+  if (unlikely (data == NULL)
+      || unlikely (data->d_buf == NULL))
+    {
+      __libdw_seterrno (DWARF_E_INVALID_DWARF);
+      return NULL;
+    }
+  return data;
+}
+
+static inline int
+__libdw_offset_in_section (Dwarf *dbg, int sec_index,
+			   Dwarf_Off offset, size_t size)
+{
+  Elf_Data *data = __libdw_checked_get_data (dbg, sec_index);
+  if (data == NULL)
+    return -1;
+  if (unlikely (offset > data->d_size)
+      || unlikely (data->d_size - offset < size))
+    {
+      __libdw_seterrno (DWARF_E_INVALID_OFFSET);
+      return -1;
+    }
+
+  return 0;
+}
+
+static inline bool
+__libdw_in_section (Dwarf *dbg, int sec_index,
+		    const void *addr, size_t size)
+{
+  Elf_Data *data = __libdw_checked_get_data (dbg, sec_index);
+  if (data == NULL)
+    return false;
+  if (unlikely (addr < data->d_buf)
+      || unlikely (data->d_size - (addr - data->d_buf) < size))
+    {
+      __libdw_seterrno (DWARF_E_INVALID_OFFSET);
+      return false;
+    }
+
+  return true;
+}
+
+#define READ_AND_RELOCATE(RELOC_HOOK, VAL)				\
+  ({									\
+    if (!__libdw_in_section (dbg, sec_index, addr, width))		\
+      return -1;							\
+									\
+    const unsigned char *orig_addr = addr;				\
+    if (width == 4)							\
+      VAL = read_4ubyte_unaligned_inc (dbg, addr);			\
+    else								\
+      VAL = read_8ubyte_unaligned_inc (dbg, addr);			\
+									\
+    int status = RELOC_HOOK (dbg, sec_index, orig_addr, width, &VAL);	\
+    if (status < 0)							\
+      return status;							\
+    status > 0;								\
+   })
+
+static inline int
+__libdw_read_address_inc (Dwarf *dbg,
+			  int sec_index, unsigned char **addrp,
+			  int width, Dwarf_Addr *ret)
+{
+  unsigned char *addr = *addrp;
+  READ_AND_RELOCATE (__libdw_relocate_address, (*ret));
+  *addrp = addr;
+  return 0;
+}
+
+static inline int
+__libdw_read_address (Dwarf *dbg,
+		      int sec_index, const unsigned char *addr,
+		      int width, Dwarf_Addr *ret)
+{
+  READ_AND_RELOCATE (__libdw_relocate_address, (*ret));
+  return 0;
+}
+
+static inline int
+__libdw_read_offset_inc (Dwarf *dbg,
+			 int sec_index, unsigned char **addrp,
+			 int width, Dwarf_Off *ret, int sec_ret,
+			 size_t size)
+{
+  unsigned char *addr = *addrp;
+  READ_AND_RELOCATE (__libdw_relocate_offset, (*ret));
+  *addrp = addr;
+  return __libdw_offset_in_section (dbg, sec_ret, *ret, size);
+}
+
+static inline int
+__libdw_read_offset (Dwarf *dbg,
+		     int sec_index, const unsigned char *addr,
+		     int width, Dwarf_Off *ret, int sec_ret,
+		     size_t size)
+{
+  READ_AND_RELOCATE (__libdw_relocate_offset, (*ret));
+  return __libdw_offset_in_section (dbg, sec_ret, *ret, size);
+}
+
+/* Read up begin/end pair and increment read pointer.
+    - If it's normal range record, set up *BEGINP and *ENDP and return 0.
+    - If it's base address selection record, set up *BASEP and return 1.
+    - If it's end of rangelist, don't set anything and return 2
+    - If an error occurs, don't set anything and return <0.  */
+int __libdw_read_begin_end_pair_inc (Dwarf *dbg, int sec_index,
+				     unsigned char **addr, int width,
+				     Dwarf_Addr *beginp, Dwarf_Addr *endp,
+				     Dwarf_Addr *basep)
+  internal_function;
+
+unsigned char * __libdw_formptr (Dwarf_Attribute *attr, int sec_index,
+				 int err_nodata, unsigned char **endpp,
+				 Dwarf_Off *offsetp)
+  internal_function;
+
+
+
 /* Aliases to avoid PLTs.  */
 INTDECL (dwarf_attr)
 INTDECL (dwarf_attr_integrate)

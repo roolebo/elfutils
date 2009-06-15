@@ -70,10 +70,10 @@ dwarf_formaddr (attr, return_addr)
       return -1;
     }
 
-  if (attr->cu->address_size == 8)
-    *return_addr = read_8ubyte_unaligned (attr->cu->dbg, attr->valp);
-  else
-    *return_addr = read_4ubyte_unaligned (attr->cu->dbg, attr->valp);
+  if (__libdw_read_address (attr->cu->dbg,
+			    IDX_debug_info, attr->valp,
+			    attr->cu->address_size, return_addr))
+    return -1;
 
   return 0;
 }

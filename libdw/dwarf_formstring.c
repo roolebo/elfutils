@@ -74,20 +74,14 @@ dwarf_formstring (attrp)
   if (unlikely (attrp->form != DW_FORM_strp)
       || dbg->sectiondata[IDX_debug_str] == NULL)
     {
-    invalid_error:
       __libdw_seterrno (DWARF_E_NO_STRING);
       return NULL;
     }
 
   uint64_t off;
-  // XXX We need better boundary checks.
-  if (attrp->cu->offset_size == 8)
-    off = read_8ubyte_unaligned (dbg, attrp->valp);
-  else
-    off = read_4ubyte_unaligned (dbg, attrp->valp);
-
-  if (off  >= dbg->sectiondata[IDX_debug_str]->d_size)
-    goto invalid_error;
+  if (__libdw_read_offset (dbg, IDX_debug_info, attrp->valp,
+			   attrp->cu->offset_size, &off, IDX_debug_str, 1))
+    return NULL;
 
   return (const char *) dbg->sectiondata[IDX_debug_str]->d_buf + off;
 }

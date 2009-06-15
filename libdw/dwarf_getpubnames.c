@@ -102,7 +102,6 @@ get_offsets (Dwarf *dbg)
       else if (unlikely (len >= DWARF3_LENGTH_MIN_ESCAPE_CODE
 			 && len <= DWARF3_LENGTH_MAX_ESCAPE_CODE))
 	{
-	invalid_dwarf:
 	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
 	  goto err_return;
 	}
@@ -124,18 +123,12 @@ get_offsets (Dwarf *dbg)
 	}
 
       /* Get the CU offset.  */
-      if (len_bytes == 4)
-	mem[cnt].cu_offset = read_4ubyte_unaligned (dbg, readp + 2);
-      else
-	mem[cnt].cu_offset = read_8ubyte_unaligned (dbg, readp + 2);
+      if (__libdw_read_offset (dbg, IDX_debug_pubnames, readp + 2, len_bytes,
+			       &mem[cnt].cu_offset, IDX_debug_info, 3))
+	/* Error has been already set in reader.  */
+	goto err_return;
 
       /* Determine the size of the CU header.  */
-      if (unlikely (dbg->sectiondata[IDX_debug_info] == NULL
-		    || dbg->sectiondata[IDX_debug_info]->d_buf == NULL
-		    || (mem[cnt].cu_offset + 3
-			>= dbg->sectiondata[IDX_debug_info]->d_size)))
-	goto invalid_dwarf;
-
       unsigned char *infop
 	= ((unsigned char *) dbg->sectiondata[IDX_debug_info]->d_buf
 	   + mem[cnt].cu_offset);

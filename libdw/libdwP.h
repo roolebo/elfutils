@@ -511,10 +511,10 @@ __libdw_in_section (Dwarf *dbg, int sec_index,
 
 static inline int
 __libdw_read_address_inc (Dwarf *dbg,
-			  int sec_index, unsigned char **addrp,
+			  int sec_index, const unsigned char **addrp,
 			  int width, Dwarf_Addr *ret)
 {
-  unsigned char *addr = *addrp;
+  const unsigned char *addr = *addrp;
   READ_AND_RELOCATE (__libdw_relocate_address, (*ret));
   *addrp = addr;
   return 0;
@@ -531,11 +531,11 @@ __libdw_read_address (Dwarf *dbg,
 
 static inline int
 __libdw_read_offset_inc (Dwarf *dbg,
-			 int sec_index, unsigned char **addrp,
+			 int sec_index, const unsigned char **addrp,
 			 int width, Dwarf_Off *ret, int sec_ret,
 			 size_t size)
 {
-  unsigned char *addr = *addrp;
+  const unsigned char *addr = *addrp;
   READ_AND_RELOCATE (__libdw_relocate_offset, (*ret));
   *addrp = addr;
   return __libdw_offset_in_section (dbg, sec_ret, *ret, size);

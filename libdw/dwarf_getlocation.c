@@ -1,5 +1,5 @@
 /* Return location expression list.
-   Copyright (C) 2000, 2001, 2002, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2000-2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -151,7 +151,7 @@ getlocation (struct Dwarf_CU *cu, const Dwarf_Block *block,
 	{
 	case DW_OP_addr:
 	  /* Address, depends on address size of CU.  */
-	  if (__libdw_read_address_inc (dbg, sec_index, (unsigned char **)&data,
+	  if (__libdw_read_address_inc (dbg, sec_index, &data,
 					cu->address_size, &newloc->number))
 	    return -1;
 	  break;

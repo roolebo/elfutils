@@ -1,5 +1,5 @@
 /* Advance to next CU header.
-   Copyright (C) 2002, 2003, 2004, 2005, 2008 Red Hat, Inc.
+   Copyright (C) 2002-2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -84,8 +84,8 @@ dwarf_nextcu (dwarf, off, next_off, header_sizep, abbrev_offsetp,
 
   /* This points into the .debug_info section to the beginning of the
      CU entry.  */
-  unsigned char *data = dwarf->sectiondata[IDX_debug_info]->d_buf;
-  unsigned char *bytes = data + off;
+  const unsigned char *data = dwarf->sectiondata[IDX_debug_info]->d_buf;
+  const unsigned char *bytes = data + off;
 
   /* The format of the CU header is described in dwarf2p1 7.5.1:
 

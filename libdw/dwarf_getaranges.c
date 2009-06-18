@@ -1,5 +1,5 @@
 /* Return list address ranges.
-   Copyright (C) 2000, 2001, 2002, 2004, 2005, 2006, 2008 Red Hat, Inc.
+   Copyright (C) 2000-2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -104,13 +104,13 @@ dwarf_getaranges (dbg, aranges, naranges)
   struct arangelist *arangelist = NULL;
   unsigned int narangelist = 0;
 
-  const char *readp
-    = (const char *) dbg->sectiondata[IDX_debug_aranges]->d_buf;
-  const char *readendp = readp + dbg->sectiondata[IDX_debug_aranges]->d_size;
+  const unsigned char *readp = dbg->sectiondata[IDX_debug_aranges]->d_buf;
+  const unsigned char *readendp
+    = readp + dbg->sectiondata[IDX_debug_aranges]->d_size;
 
   while (readp < readendp)
     {
-      const char *hdrstart = readp;
+      const unsigned char *hdrstart = readp;
 
       /* Each entry starts with a header:
 
@@ -150,7 +150,7 @@ dwarf_getaranges (dbg, aranges, naranges)
 
       Dwarf_Word offset;
       if (__libdw_read_offset_inc (dbg,
-				   IDX_debug_aranges, (unsigned char **)&readp,
+				   IDX_debug_aranges, &readp,
 				   length_bytes, &offset, IDX_debug_info, 4))
 	return -1;
 
@@ -171,8 +171,7 @@ dwarf_getaranges (dbg, aranges, naranges)
 	  Dwarf_Word range_address;
 	  Dwarf_Word range_length;
 
-	  if (__libdw_read_address_inc (dbg, IDX_debug_aranges,
-					(unsigned char **)&readp,
+	  if (__libdw_read_address_inc (dbg, IDX_debug_aranges, &readp,
 					address_size, &range_address))
 	    return -1;
 

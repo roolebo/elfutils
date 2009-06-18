@@ -424,8 +424,7 @@ dwarf_getsrclines (Dwarf_Die *cudie, Dwarf_Lines **lines, size_t *nlines)
 		  /* The value is an address.  The size is defined as
 		     apporiate for the target machine.  We use the
 		     address size field from the CU header.  */
-		  if (__libdw_read_address_inc (dbg, IDX_debug_line,
-						(unsigned char **)&linep,
+		  if (__libdw_read_address_inc (dbg, IDX_debug_line, &linep,
 						cu->address_size, &address))
 		    goto out;
 		  break;

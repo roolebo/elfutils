@@ -235,11 +235,10 @@ __libdwfl_report_elf (Dwfl *dwfl, const char *name, const char *file_name,
       else if ((fd >= 0 && m->main.fd != fd)
 	       || strcmp (m->main.name, file_name))
 	{
-	  elf_end (elf);
 	overlap:
 	  m->gc = true;
 	  __libdwfl_seterrno (DWFL_E_OVERLAP);
-	  m = NULL;
+	  return NULL;
 	}
 
       /* Preinstall the open ELF handle for the module.  */

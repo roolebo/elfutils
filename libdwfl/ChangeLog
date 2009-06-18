@@ -1,3 +1,7 @@
+2009-06-18  Mark Wielaard  <mjw@redhat.com>
+
+	* dwfl_report_elf.c (__libdwfl_report_elf): Return NULL on overlap.
+
 2009-06-13  Ulrich Drepper  <drepper@redhat.com>
 
 	* derelocate.c: Don't use deprecated libelf functions.

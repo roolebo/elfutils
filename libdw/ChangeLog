@@ -1,5 +1,58 @@
 2009-07-08  Roland McGrath  <roland@redhat.com>
 
+	* libdw.map (ELFUTILS_0.142): Add dwfl_module_dwarf_cfi,
+	dwfl_module_eh_cfi.
+
+	* libdwP.h (struct Dwarf): Add member `cfi'.
+	* dwarf_end.c (dwarf_end): Call __libdw_destroy_frame_cache on it.
+	* dwarf_getcfi.c: New file.
+	* dwarf_getcfi_elf.c: New file.
+	* dwarf_cfi_end.c: New file.
+	* dwarf_cfi_addrframe.c: New file.
+	* dwarf_frame_cfa.c: New file.
+	* dwarf_frame_register.c: New file.
+	* dwarf_frame_return_address_register.c: New file.
+	* Makefile.am (libdw_a_SOURCES): Add them.
+	* unwind.h: Declare those functions.
+	* libdw.map (ELFUTILS_0.142): Export them.
+
+	* dwarf_getlocation.c (__libdw_intern_expression): New function,
+	broken out of ...
+	(getlocation): ... here, call it.
+	* libdwP.h: Declare it.
+
+	* cie.c: New file.
+	* fde.c: New file.
+	* frame-cache.c: New file.
+	* cfi.c: New file.
+	* cfi.h: New file.
+	* encoded-value.h: New file.
+	* Makefile.am (libdw_a_SOURCES, noinst_HEADERS): Add them.
+	* libdwP.h: Add DWARF_E_INVALID_CFI to errors enum.
+	* dwarf_error.c (errmsgs): Add element for it.
+
+	* dwarf_next_cfi.c: New file.
+	* Makefile.am (libdw_a_SOURCES): Add it.
+	* libdw.h (Dwarf_CIE, Dwarf_FDE, Dwarf_CIE_Entry): New types.
+	Declare dwarf_next_cfi.
+	* libdw.map (ELFUTILS_0.142): New set, inherits from ELFUTILS_0.136.
+	Add dwarf_next_cfi.
+
+	* memory-access.h [! ALLOW_UNALIGNED]
+	(read_2ubyte_unaligned): Renamed to ...
+	(read_2ubyte_unaligned_1): ... this.  Take bool rather than Dwarf *.
+	(read_2ubyte_unaligned): Define as macro passing dbg->other_byte_order.
+	(read_2sbyte_unaligned): Likewise.
+	(read_4ubyte_unaligned): Likewise.
+	(read_4sbyte_unaligned): Likewise.
+	(read_8ubyte_unaligned): Likewise.
+	(read_8sbyte_unaligned): Likewise.
+
+	* libdwP.h (IDX_eh_frame): Remove it.
+	* dwarf_begin_elf.c (dwarf_scnnames): Remove its element.
+
+2009-07-08  Roland McGrath  <roland@redhat.com>
+
 	* libdwP.h (struct Dwarf_Line_s): Reorder members to pack better.
 
 	* dwarf_getlocation.c (check_constant_offset): New function.

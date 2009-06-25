@@ -1,5 +1,5 @@
-/* Internal definitions for interface for libebl.
-   Copyright (C) 2000-2009 Red Hat, Inc.
+/* Compute frame state at PC.
+   Copyright (C) 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -47,57 +47,32 @@
    Network licensing program, please visit www.openinventionnetwork.com
    <http://www.openinventionnetwork.com>.  */
 
-#ifndef _LIBEBLP_H
-#define _LIBEBLP_H 1
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
 
-#include <gelf.h>
-#include <libasm.h>
-#include <libebl.h>
-#include <libintl.h>
+#include "cfi.h"
 
-
-/* Backend handle.  */
-struct ebl
+int
+dwarf_cfi_addrframe (cache, address, frame)
+     Dwarf_CFI *cache;
+     Dwarf_Addr address;
+     Dwarf_Frame **frame;
 {
-  /* Machine name.  */
-  const char *name;
+  /* Maybe there was a previous error.  */
+  if (cache == NULL)
+    return -1;
 
-  /* Emulation name.  */
-  const char *emulation;
+  struct dwarf_fde *fde = __libdw_find_fde (cache, address);
+  if (fde == NULL)
+    return -1;
 
-  /* ELF machine, class, and data encoding.  */
-  uint_fast16_t machine;
-  uint_fast8_t class;
-  uint_fast8_t data;
-
-  /* The libelf handle (if known).  */
-  Elf *elf;
-
-  /* See ebl-hooks.h for the declarations of the hook functions.  */
-# define EBLHOOK(name) (*name)
-# include "ebl-hooks.h"
-# undef EBLHOOK
-
-  /* Size of entry in Sysv-style hash table.  */
-  int sysvhash_entrysize;
-
-  /* Internal data.  */
-  void *dlhandle;
-};
-
-
-/* Type of the initialization functions in the backend modules.  */
-typedef const char *(*ebl_bhinit_t) (Elf *, GElf_Half, Ebl *, size_t);
-
-
-/* gettext helper macros.  */
-#undef _
-#define _(Str) dgettext ("elfutils", Str)
-
-
-/* LEB128 constant helper macros.  */
-#define ULEB128_7(x)	(BUILD_BUG_ON_ZERO ((x) >= (1U << 7)) + (x))
-
-#define BUILD_BUG_ON_ZERO(x) (sizeof (char [(x) ? -1 : 1]) - 1)
-
-#endif	/* libeblP.h */
+  int error = __libdw_frame_at_address (cache, fde, address, frame);
+  if (error != DWARF_E_NOERROR)
+    {
+      __libdw_seterrno (error);
+      return -1;
+    }
+  return 0;
+}
+INTDEF (dwarf_cfi_addrframe)

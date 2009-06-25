@@ -60,7 +60,7 @@ endif
 textrel_check = if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
 
 
-i386_SRCS = i386_init.c i386_symbol.c i386_corenote.c \
+i386_SRCS = i386_init.c i386_symbol.c i386_corenote.c i386_cfi.c \
 	    i386_retval.c i386_regs.c i386_auxv.c i386_syscall.c
 cpu_i386 = ../libcpu/libcpu_i386.a
 libebl_i386_pic_a_SOURCES = $(i386_SRCS)
@@ -70,7 +70,7 @@ sh_SRCS = sh_init.c sh_symbol.c
 libebl_sh_pic_a_SOURCES = $(sh_SRCS)
 am_libebl_sh_pic_a_OBJECTS = $(sh_SRCS:.c=.os)
 
-x86_64_SRCS = x86_64_init.c x86_64_symbol.c x86_64_corenote.c \
+x86_64_SRCS = x86_64_init.c x86_64_symbol.c x86_64_corenote.c x86_64_cfi.c \
 	      x86_64_retval.c x86_64_regs.c i386_auxv.c x86_64_syscall.c
 cpu_x86_64 = ../libcpu/libcpu_x86_64.a
 libebl_x86_64_pic_a_SOURCES = $(x86_64_SRCS)

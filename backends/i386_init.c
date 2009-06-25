@@ -1,5 +1,5 @@
 /* Initialization of i386 specific backend library.
-   Copyright (C) 2000, 2001, 2002, 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright (C) 2000-2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -59,6 +59,7 @@ i386_init (elf, machine, eh, ehlen)
   HOOK (eh, syscall_abi);
   HOOK (eh, auxv_info);
   HOOK (eh, disasm);
+  HOOK (eh, abi_cfi);
 
   return MODVERSION;
 }

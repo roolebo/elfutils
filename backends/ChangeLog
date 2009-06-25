@@ -1,3 +1,13 @@
+2009-07-08  Roland McGrath  <roland@redhat.com>
+
+	* x86_64_cfi.c (x86_64_abi_cfi): New file.
+	* Makefile.am (x86_64_SRCS): Add it.
+	* x86_64_init.c (x86_64_init): Add initializer.
+
+	* i386_cfi.c (i386_abi_cfi): New file.
+	* Makefile.am (i386_SRCS): Add it.
+	* i386_init.c (i386_init): Initialize abi_cfi hook.
+
 2009-06-01  Ulrich Drepper  <drepper@redhat.com>
 
 	* i386_reloc.def: Add IRELATIVE entry.

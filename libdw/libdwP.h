@@ -84,7 +84,6 @@ enum
     IDX_debug_aranges,
     IDX_debug_line,
     IDX_debug_frame,
-    IDX_eh_frame,
     IDX_debug_loc,
     IDX_debug_pubnames,
     IDX_debug_str,
@@ -136,6 +135,7 @@ enum
   DWARF_E_NO_FLAG,
   DWARF_E_INVALID_OFFSET,
   DWARF_E_NO_DEBUG_RANGES,
+  DWARF_E_INVALID_CFI,
 };
 
 
@@ -171,6 +171,9 @@ struct Dwarf
 
   /* Address ranges.  */
   Dwarf_Aranges *aranges;
+
+  /* Cached info from the CFI section.  */
+  struct Dwarf_CFI_s *cfi;
 
   /* Internal memory handling.  This is basically a simplified
      reimplementation of obstacks.  Unfortunately the standard obstack
@@ -413,6 +416,17 @@ extern int __libdw_visit_scopes (unsigned int depth,
 						   void *arg),
 				 void *arg)
   __nonnull_attribute__ (2, 3) internal_function;
+
+/* Parse a DWARF Dwarf_Block into an array of Dwarf_Op's,
+   and cache the result (via tsearch).  */
+extern int __libdw_intern_expression (Dwarf *dbg,
+				      bool other_byte_order,
+				      unsigned int address_size,
+				      void **cache, const Dwarf_Block *block,
+				      Dwarf_Op **llbuf, size_t *listlen,
+				      int sec_index)
+  __nonnull_attribute__ (4, 5, 6, 7) internal_function;
+
 
 /* Return error code of last failing function call.  This value is kept
    separately for each thread.  */

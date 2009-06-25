@@ -1,5 +1,5 @@
-/* Internal definitions for interface for libebl.
-   Copyright (C) 2000-2009 Red Hat, Inc.
+/* Get CFA expression for frame.
+   Copyright (C) 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -47,57 +47,55 @@
    Network licensing program, please visit www.openinventionnetwork.com
    <http://www.openinventionnetwork.com>.  */
 
-#ifndef _LIBEBLP_H
-#define _LIBEBLP_H 1
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
 
-#include <gelf.h>
-#include <libasm.h>
-#include <libebl.h>
-#include <libintl.h>
+#include "cfi.h"
+#include <dwarf.h>
+#include <stdlib.h>
 
-
-/* Backend handle.  */
-struct ebl
+int
+dwarf_frame_cfa (fs, ops)
+     Dwarf_Frame *fs;
+     Dwarf_Op **ops;
 {
-  /* Machine name.  */
-  const char *name;
+  /* Maybe there was a previous error.  */
+  if (fs == NULL)
+    return -1;
 
-  /* Emulation name.  */
-  const char *emulation;
+  switch (fs->cfa_rule)
+    {
+    case cfa_undefined:
+      *ops = NULL;
+      return 0;
 
-  /* ELF machine, class, and data encoding.  */
-  uint_fast16_t machine;
-  uint_fast8_t class;
-  uint_fast8_t data;
+    case cfa_offset:
+      /* The Dwarf_Op was already fully initialized by execute_cfi.  */
+      *ops = &fs->cfa_data.offset;
+      return 1;
 
-  /* The libelf handle (if known).  */
-  Elf *elf;
+    case cfa_expr:
+      {
+	unsigned int address_size = (fs->cache->e_ident[EI_CLASS] == ELFCLASS32
+				     ? 4 : 8);
+	size_t nops;
 
-  /* See ebl-hooks.h for the declarations of the hook functions.  */
-# define EBLHOOK(name) (*name)
-# include "ebl-hooks.h"
-# undef EBLHOOK
+	/* Parse the expression into internal form.  */
+	int result = __libdw_intern_expression (NULL,
+						fs->cache->other_byte_order,
+						address_size,
+						&fs->cache->expr_tree,
+						&fs->cfa_data.expr,
+						ops, &nops,
+						IDX_debug_frame);
+	return result ?: (int) nops;
+      }
 
-  /* Size of entry in Sysv-style hash table.  */
-  int sysvhash_entrysize;
+    default:
+      abort ();
+    }
 
-  /* Internal data.  */
-  void *dlhandle;
-};
-
-
-/* Type of the initialization functions in the backend modules.  */
-typedef const char *(*ebl_bhinit_t) (Elf *, GElf_Half, Ebl *, size_t);
-
-
-/* gettext helper macros.  */
-#undef _
-#define _(Str) dgettext ("elfutils", Str)
-
-
-/* LEB128 constant helper macros.  */
-#define ULEB128_7(x)	(BUILD_BUG_ON_ZERO ((x) >= (1U << 7)) + (x))
-
-#define BUILD_BUG_ON_ZERO(x) (sizeof (char [(x) ? -1 : 1]) - 1)
-
-#endif	/* libeblP.h */
+  /*NOTREACHED*/
+  return -1;
+}

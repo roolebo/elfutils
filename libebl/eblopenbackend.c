@@ -1,5 +1,5 @@
 /* Generate ELF backend handle.
-   Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007,2008 Red Hat, Inc.
+   Copyright (C) 2000-2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -218,6 +218,7 @@ static bool default_check_object_attribute (Ebl *ebl, const char *vendor,
 					    int tag, uint64_t value,
 					    const char **tag_name,
 					    const char **value_name);
+static int default_abi_cfi (Ebl *ebl, Dwarf_CIE *abi_info);
 
 
 static void
@@ -258,6 +259,7 @@ fill_defaults (Ebl *result)
   result->syscall_abi = default_syscall_abi;
   result->check_object_attribute = default_check_object_attribute;
   result->disasm = NULL;
+  result->abi_cfi = default_abi_cfi;
   result->destr = default_destr;
   result->sysvhash_entrysize = sizeof (Elf32_Word);
 }
@@ -745,4 +747,11 @@ default_check_object_attribute (Ebl *ebl __attribute__ ((unused)),
   *tag_name = NULL;
   *value_name = NULL;
   return false;
+}
+
+static int
+default_abi_cfi (Ebl *ebl __attribute__ ((unused)),
+		 Dwarf_CIE *abi_info __attribute__ ((unused)))
+{
+  return 0;
 }

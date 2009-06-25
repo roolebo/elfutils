@@ -1,5 +1,5 @@
 /* Create descriptor from ELF descriptor for processing file.
-   Copyright (C) 2002, 2003, 2004, 2005, 2007 Red Hat, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2007, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -70,7 +70,6 @@ static const char dwarf_scnnames[IDX_last][17] =
   [IDX_debug_aranges] = ".debug_aranges",
   [IDX_debug_line] = ".debug_line",
   [IDX_debug_frame] = ".debug_frame",
-  [IDX_eh_frame] = ".eh_frame",
   [IDX_debug_loc] = ".debug_loc",
   [IDX_debug_pubnames] = ".debug_pubnames",
   [IDX_debug_str] = ".debug_str",

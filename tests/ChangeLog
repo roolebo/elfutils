@@ -1,3 +1,9 @@
+2009-07-08  Roland McGrath  <roland@redhat.com>
+
+	* addrcfi.c: New file.
+	* Makefile.am (noinst_PROGRAMS): Add it.
+	(addrcfi_LDADD): New variable.
+
 2009-05-07  Petr Machata  <pmachata@redhat.com>
 
 	* testfile51.bz2: New data file.

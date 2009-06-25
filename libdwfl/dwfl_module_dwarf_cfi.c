@@ -1,5 +1,5 @@
-/* Internal definitions for interface for libebl.
-   Copyright (C) 2000-2009 Red Hat, Inc.
+/* Find DWARF CFI for a module in libdwfl.
+   Copyright (C) 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -47,57 +47,43 @@
    Network licensing program, please visit www.openinventionnetwork.com
    <http://www.openinventionnetwork.com>.  */
 
-#ifndef _LIBEBLP_H
-#define _LIBEBLP_H 1
+#include "libdwflP.h"
+#include "../libdw/cfi.h"
 
-#include <gelf.h>
-#include <libasm.h>
-#include <libebl.h>
-#include <libintl.h>
-
-
-/* Backend handle.  */
-struct ebl
+Dwarf_CFI *
+internal_function
+__libdwfl_set_cfi (Dwfl_Module *mod, Dwarf_CFI **slot, Dwarf_CFI *cfi)
 {
-  /* Machine name.  */
-  const char *name;
+  if (cfi != NULL && cfi->ebl == NULL)
+    {
+      Dwfl_Error error = __libdwfl_module_getebl (mod);
+      if (error == DWFL_E_NOERROR)
+	cfi->ebl = mod->ebl;
+      else
+	{
+	  if (slot == &mod->eh_cfi)
+	    INTUSE(dwarf_cfi_end) (cfi);
+	  __libdwfl_seterrno (error);
+	  return NULL;
+	}
+    }
 
-  /* Emulation name.  */
-  const char *emulation;
+  return *slot = cfi;
+}
 
-  /* ELF machine, class, and data encoding.  */
-  uint_fast16_t machine;
-  uint_fast8_t class;
-  uint_fast8_t data;
+Dwarf_CFI *
+dwfl_module_dwarf_cfi (mod, bias)
+     Dwfl_Module *mod;
+     Dwarf_Addr *bias;
+{
+  if (mod == NULL)
+    return NULL;
 
-  /* The libelf handle (if known).  */
-  Elf *elf;
+  if (mod->dwarf_cfi != NULL)
+    return mod->dwarf_cfi;
 
-  /* See ebl-hooks.h for the declarations of the hook functions.  */
-# define EBLHOOK(name) (*name)
-# include "ebl-hooks.h"
-# undef EBLHOOK
-
-  /* Size of entry in Sysv-style hash table.  */
-  int sysvhash_entrysize;
-
-  /* Internal data.  */
-  void *dlhandle;
-};
-
-
-/* Type of the initialization functions in the backend modules.  */
-typedef const char *(*ebl_bhinit_t) (Elf *, GElf_Half, Ebl *, size_t);
-
-
-/* gettext helper macros.  */
-#undef _
-#define _(Str) dgettext ("elfutils", Str)
-
-
-/* LEB128 constant helper macros.  */
-#define ULEB128_7(x)	(BUILD_BUG_ON_ZERO ((x) >= (1U << 7)) + (x))
-
-#define BUILD_BUG_ON_ZERO(x) (sizeof (char [(x) ? -1 : 1]) - 1)
-
-#endif	/* libeblP.h */
+  return __libdwfl_set_cfi (mod, &mod->dwarf_cfi,
+			    INTUSE(dwarf_getcfi)
+			    (INTUSE(dwfl_module_getdwarf) (mod, bias)));
+}
+INTDEF (dwfl_module_dwarf_cfi)

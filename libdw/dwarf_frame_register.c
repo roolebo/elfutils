@@ -1,5 +1,5 @@
-/* Internal definitions for interface for libebl.
-   Copyright (C) 2000-2009 Red Hat, Inc.
+/* Get register location expression for frame.
+   Copyright (C) 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -47,57 +47,98 @@
    Network licensing program, please visit www.openinventionnetwork.com
    <http://www.openinventionnetwork.com>.  */
 
-#ifndef _LIBEBLP_H
-#define _LIBEBLP_H 1
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
 
-#include <gelf.h>
-#include <libasm.h>
-#include <libebl.h>
-#include <libintl.h>
+#include "cfi.h"
+#include <dwarf.h>
 
-
-/* Backend handle.  */
-struct ebl
+int
+dwarf_frame_register (fs, regno, ops_mem, ops, nops)
+     Dwarf_Frame *fs;
+     int regno;
+     Dwarf_Op ops_mem[2];
+     Dwarf_Op **ops;
+     size_t *nops;
 {
-  /* Machine name.  */
-  const char *name;
+  /* Maybe there was a previous error.  */
+  if (fs == NULL)
+    return -1;
 
-  /* Emulation name.  */
-  const char *emulation;
+  if (unlikely (regno < 0))
+    {
+      __libdw_seterrno (DWARF_E_INVALID_ACCESS);
+      return -1;
+    }
 
-  /* ELF machine, class, and data encoding.  */
-  uint_fast16_t machine;
-  uint_fast8_t class;
-  uint_fast8_t data;
+  int result = 0;		/* A location, not a value.  */
 
-  /* The libelf handle (if known).  */
-  Elf *elf;
+  if (unlikely ((size_t) regno >= fs->nregs))
+    goto default_rule;
 
-  /* See ebl-hooks.h for the declarations of the hook functions.  */
-# define EBLHOOK(name) (*name)
-# include "ebl-hooks.h"
-# undef EBLHOOK
+  const struct dwarf_frame_register *reg = &fs->regs[regno];
 
-  /* Size of entry in Sysv-style hash table.  */
-  int sysvhash_entrysize;
+  switch (reg->rule)
+    {
+    case reg_unspecified:
+    default_rule:
+      /* Use the default rule for registers not yet mentioned in CFI.  */
+      if (fs->cache->default_same_value)
+	goto same_value;
+      /*FALLTHROUGH*/
+    case reg_undefined:
+      /* The value is known to be unavailable.  */
+      result = 1;
+      /*FALLTHROUGH*/
+    case reg_same_value:
+    same_value:
+      /* The location is not known here, but the caller might know it.  */
+      *ops = NULL;
+      *nops = 0;
+      break;
 
-  /* Internal data.  */
-  void *dlhandle;
-};
+    case reg_val_offset:
+      result = 1;		/* A value, not a location.  */
+      /*FALLTHROUGH*/
+    case reg_offset:
+      ops_mem[0] = (Dwarf_Op) { .atom = DW_OP_call_frame_cfa };
+      ops_mem[1] = (Dwarf_Op) { .atom = DW_OP_plus_uconst,
+				.number = reg->value };
+      *ops = ops_mem;
+      *nops = reg->value == 0 ? 1 : 2;
+      break;
 
+    case reg_register:
+      ops_mem[0] = (Dwarf_Op) { .atom = DW_OP_regx, .number = reg->value };
+      *ops = ops_mem;
+      *nops = 1;
+      break;
 
-/* Type of the initialization functions in the backend modules.  */
-typedef const char *(*ebl_bhinit_t) (Elf *, GElf_Half, Ebl *, size_t);
+    case reg_val_expression:
+      result = 1;		/* A value, not a location.  */
+      /*FALLTHROUGH*/
+    case reg_expression:
+      {
+	unsigned int address_size = (fs->cache->e_ident[EI_CLASS] == ELFCLASS32
+				     ? 4 : 8);
 
+	Dwarf_Block block;
+	const uint8_t *p = fs->cache->data->d.d_buf + reg->value;
+	get_uleb128 (block.length, p);
+	block.data = (void *) p;
 
-/* gettext helper macros.  */
-#undef _
-#define _(Str) dgettext ("elfutils", Str)
+	/* Parse the expression into internal form.  */
+	if (__libdw_intern_expression (NULL,
+				       fs->cache->other_byte_order,
+				       address_size,
+				       &fs->cache->expr_tree,
+				       &block, ops, nops,
+				       IDX_debug_frame) < 0)
+	  result = -1;
+	break;
+      }
+    }
 
-
-/* LEB128 constant helper macros.  */
-#define ULEB128_7(x)	(BUILD_BUG_ON_ZERO ((x) >= (1U << 7)) + (x))
-
-#define BUILD_BUG_ON_ZERO(x) (sizeof (char [(x) ? -1 : 1]) - 1)
-
-#endif	/* libeblP.h */
+  return result;
+}

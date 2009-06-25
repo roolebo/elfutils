@@ -186,19 +186,32 @@ union unaligned
     int64_t s8;
   } __attribute__ ((packed));
 
+# define read_2ubyte_unaligned(Dbg, Addr) \
+  read_2ubyte_unaligned_1 ((Dbg)->other_byte_order, (Addr))
+# define read_2sbyte_unaligned(Dbg, Addr) \
+  read_2sbyte_unaligned_1 ((Dbg)->other_byte_order, (Addr))
+# define read_4ubyte_unaligned(Dbg, Addr) \
+  read_4ubyte_unaligned_1 ((Dbg)->other_byte_order, (Addr))
+# define read_4sbyte_unaligned(Dbg, Addr) \
+  read_4sbyte_unaligned_1 ((Dbg)->other_byte_order, (Addr))
+# define read_8ubyte_unaligned(Dbg, Addr) \
+  read_8ubyte_unaligned_1 ((Dbg)->other_byte_order, (Addr))
+# define read_8sbyte_unaligned(Dbg, Addr) \
+  read_8sbyte_unaligned_1 ((Dbg)->other_byte_order, (Addr))
+
 static inline uint16_t
-read_2ubyte_unaligned (Dwarf *dbg, const void *p)
+read_2ubyte_unaligned_1 (bool other_byte_order, const void *p)
 {
   const union unaligned *up = p;
-  if (dbg->other_byte_order)
+  if (unlikely (other_byte_order))
     return bswap_16 (up->u2);
   return up->u2;
 }
 static inline int16_t
-read_2sbyte_unaligned (Dwarf *dbg, const void *p)
+read_2sbyte_unaligned_1 (bool other_byte_order, const void *p)
 {
   const union unaligned *up = p;
-  if (dbg->other_byte_order)
+  if (unlikely (other_byte_order))
     return (int16_t) bswap_16 (up->u2);
   return up->s2;
 }
@@ -210,35 +223,35 @@ read_4ubyte_unaligned_noncvt (const void *p)
   return up->u4;
 }
 static inline uint32_t
-read_4ubyte_unaligned (Dwarf *dbg, const void *p)
+read_4ubyte_unaligned_1 (bool other_byte_order, const void *p)
 {
   const union unaligned *up = p;
-  if (dbg->other_byte_order)
+  if (unlikely (other_byte_order))
     return bswap_32 (up->u4);
   return up->u4;
 }
 static inline int32_t
-read_4sbyte_unaligned (Dwarf *dbg, const void *p)
+read_4sbyte_unaligned_1 (bool other_byte_order, const void *p)
 {
   const union unaligned *up = p;
-  if (dbg->other_byte_order)
+  if (unlikely (other_byte_order))
     return (int32_t) bswap_32 (up->u4);
   return up->s4;
 }
 
 static inline uint64_t
-read_8ubyte_unaligned (Dwarf *dbg, const void *p)
+read_8ubyte_unaligned_1 (bool other_byte_order, const void *p)
 {
   const union unaligned *up = p;
-  if (dbg->other_byte_order)
+  if (unlikely (other_byte_order))
     return bswap_64 (up->u8);
   return up->u8;
 }
 static inline int64_t
-read_8sbyte_unaligned (Dwarf *dbg, const void *p)
+read_8sbyte_unaligned_1 (bool other_byte_order, const void *p)
 {
   const union unaligned *up = p;
-  if (dbg->other_byte_order)
+  if (unlikely (other_byte_order))
     return (int64_t) bswap_64 (up->u8);
   return up->s8;
 }

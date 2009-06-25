@@ -552,6 +552,20 @@ extern int dwfl_module_register_names (Dwfl_Module *mod,
 				       void *arg);
 
 
+/* Find the CFI for this module.  Returns NULL if there is no CFI.
+   On success, fills in *BIAS with the difference between addresses
+   within the loaded module and those in the CFI referring to it.
+   The pointer returned can be used until the module is cleaned up.
+   Calling these more than once returns the same pointers.
+
+   dwfl_module_dwarf_cfi gets the '.debug_frame' information found with the
+   rest of the DWARF information.  dwfl_module_eh_cfi gets the '.eh_frame'
+   information found linked into the text.  A module might have either or
+   both.  */
+extern Dwarf_CFI *dwfl_module_dwarf_cfi (Dwfl_Module *mod, Dwarf_Addr *bias);
+extern Dwarf_CFI *dwfl_module_eh_cfi (Dwfl_Module *mod, Dwarf_Addr *bias);
+
+
 #ifdef __cplusplus
 }
 #endif

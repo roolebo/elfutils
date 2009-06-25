@@ -111,6 +111,7 @@ static const char *errmsgs[] =
     [DWARF_E_NO_FLAG] = N_("no flag value"),
     [DWARF_E_INVALID_OFFSET] = N_("invalid offset"),
     [DWARF_E_NO_DEBUG_RANGES] = N_(".debug_ranges section missing"),
+    [DWARF_E_INVALID_CFI] = N_("invalid CFI section"),
   };
 #define nerrmsgs (sizeof (errmsgs) / sizeof (errmsgs[0]))
 

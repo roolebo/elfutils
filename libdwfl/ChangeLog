@@ -1,5 +1,13 @@
 2009-07-08  Roland McGrath  <roland@redhat.com>
 
+	* dwfl_module_dwarf_cfi.c: New file.
+	* dwfl_module_eh_cfi.c: New file.
+	* Makefile.am (libdwfl_a_SOURCES): Add them.
+	* libdwflP.h (struct Dwfl_Module): New members `dwarf_cfi', `eh_cfi.
+	Add INTDECL for dwfl_module_eh_cfi, dwfl_module_dwarf_cfi.
+
+2009-07-08  Roland McGrath  <roland@redhat.com>
+
 	* libdwflP.h (struct Dwfl_Module): Reorder members to pack better.
 
 2009-06-18  Mark Wielaard  <mjw@redhat.com>
@@ -733,7 +741,7 @@
 2006-09-05  Roland McGrath  <roland@redhat.com>
 
 	* derelocate.c (cache_sections): Use alloca instead of variable-sized
-	auto array, in function already alloca.
+	auto array, in function already using alloca.
 
 2006-08-14  Roland McGrath  <roland@redhat.com>
 

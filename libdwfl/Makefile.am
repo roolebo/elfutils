@@ -68,6 +68,7 @@ libdwfl_a_SOURCES = dwfl_begin.c dwfl_end.c dwfl_error.c dwfl_version.c \
 		    dwfl_module_getsrc_file.c \
 		    libdwfl_crc32.c libdwfl_crc32_file.c \
 		    elf-from-memory.c \
+		    dwfl_module_dwarf_cfi.c dwfl_module_eh_cfi.c \
 		    dwfl_module_getsym.c \
 		    dwfl_module_addrname.c dwfl_module_addrsym.c \
 		    dwfl_module_return_value_location.c \

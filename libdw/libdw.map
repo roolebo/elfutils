@@ -194,3 +194,18 @@ ELFUTILS_0.138 {
   local:
     *;
 } ELFUTILS_0.136;
+
+ELFUTILS_0.142 {
+  global:
+    dwarf_next_cfi;
+    dwarf_getcfi;
+    dwarf_getcfi_elf;
+    dwarf_cfi_addrframe;
+    dwarf_cfi_end;
+    dwarf_frame_cfa;
+    dwarf_frame_register;
+    dwarf_frame_info;
+
+    dwfl_module_dwarf_cfi;
+    dwfl_module_eh_cfi;
+} ELFUTILS_0.138;

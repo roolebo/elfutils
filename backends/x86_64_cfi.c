@@ -1,7 +1,6 @@
-/* Initialization of x86-64 specific backend library.
-   Copyright (C) 2002-2009 Red Hat, Inc.
+/* x86-64 ABI-specified defaults for DWARF CFI.
+   Copyright (C) 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by the
@@ -28,35 +27,34 @@
 # include <config.h>
 #endif
 
-#define BACKEND		x86_64_
-#define RELOC_PREFIX	R_X86_64_
+#include <dwarf.h>
+
+#define BACKEND x86_64_
 #include "libebl_CPU.h"
 
-/* This defines the common reloc hooks based on x86_64_reloc.def.  */
-#include "common-reloc.c"
-
-const char *
-x86_64_init (elf, machine, eh, ehlen)
-     Elf *elf __attribute__ ((unused));
-     GElf_Half machine __attribute__ ((unused));
-     Ebl *eh;
-     size_t ehlen;
+int
+x86_64_abi_cfi (Ebl *ebl __attribute__ ((unused)), Dwarf_CIE *abi_info)
 {
-  /* Check whether the Elf_BH object has a sufficent size.  */
-  if (ehlen < sizeof (Ebl))
-    return NULL;
+  static const uint8_t abi_cfi[] =
+    {
+      /* Call-saved regs.  */
+      DW_CFA_same_value, ULEB128_7 (0), /* %rbx */
+      DW_CFA_same_value, ULEB128_7 (6), /* %rbp */
+      DW_CFA_same_value, ULEB128_7 (12), /* %r12 */
+      DW_CFA_same_value, ULEB128_7 (13), /* %r13 */
+      DW_CFA_same_value, ULEB128_7 (14), /* %r14 */
+      DW_CFA_same_value, ULEB128_7 (15), /* %r15 */
+      DW_CFA_same_value, ULEB128_7 (16), /* %r16 */
 
-  /* We handle it.  */
-  eh->name = "AMD x86-64";
-  x86_64_init_reloc (eh);
-  HOOK (eh, reloc_simple_type);
-  HOOK (eh, core_note);
-  HOOK (eh, return_value_location);
-  HOOK (eh, register_info);
-  HOOK (eh, syscall_abi);
-  HOOK (eh, auxv_info);
-  HOOK (eh, disasm);
-  HOOK (eh, abi_cfi);
+      /* The CFA is the SP.  */
+      DW_CFA_val_offset, ULEB128_7 (7), ULEB128_7 (0),
+    };
 
-  return MODVERSION;
+  abi_info->initial_instructions = abi_cfi;
+  abi_info->initial_instructions_end = &abi_cfi[sizeof abi_cfi];
+  abi_info->data_alignment_factor = 8;
+
+  abi_info->return_address_register = 16; /* %rip */
+
+  return 0;
 }

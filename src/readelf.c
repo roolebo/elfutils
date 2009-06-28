@@ -100,6 +100,8 @@ static const struct argp_option options[] =
     0 },
 
   { NULL, 0, NULL, 0, N_("Output control:"), 0 },
+  { "numeric-addresses", 'N', NULL, 0,
+    N_("Do not find symbol names for addresses in DWARF data"), 0 },
 
   { NULL, 0, NULL, 0, NULL, 0 }
 };
@@ -164,6 +166,9 @@ static bool print_archive_index;
 
 /* True if any of the control options except print_archive_index is set.  */
 static bool any_control_option;
+
+/* True if we should print addresses from DWARF in symbolic form.  */
+static bool print_address_names = true;
 
 /* Select printing of debugging sections.  */
 static enum section_e
@@ -405,6 +410,9 @@ parse_opt (int key, char *arg,
     case 'x':
       add_dump_section (arg);
       any_control_option = true;
+      break;
+    case 'N':
+      print_address_names = false;
       break;
     case ARGP_KEY_NO_ARGS:
       fputs (gettext ("Missing file name.\n"), stderr);
@@ -3061,7 +3069,8 @@ format_dwarf_addr (Dwfl_Module *dwflmod,
 {
   /* See if there is a name we can give for this address.  */
   GElf_Sym sym;
-  const char *name = dwfl_module_addrsym (dwflmod, address, &sym, NULL);
+  const char *name = print_address_names
+    ? dwfl_module_addrsym (dwflmod, address, &sym, NULL) : NULL;
   if (name != NULL)
     sym.st_value = address - sym.st_value;
 

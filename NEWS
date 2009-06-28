@@ -4,6 +4,8 @@ libelf: Add elf_getshdrnum alias for elf_getshnum and elf_getshdrstrndx alias
         for elf_getshstrndx and deprecate original names.  Sun screwed up
         their implementation and asked for a solution.
 
+readelf: Add -N option, speeds up DWARF printing without address->name lookups.
+
 Version 0.141:
 
 libebl: sparc backend fixes;

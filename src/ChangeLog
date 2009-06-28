@@ -1,3 +1,9 @@
+2009-06-28  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (print_address_names): New static variable.
+	(options, parse_opt): Grok -N/--numeric-addresses to clear it.
+	(format_dwarf_addr): Don't look up name if !print_address_names.
+
 2009-06-13  Ulrich Drepper  <drepper@redhat.com>
 
 	* ldgeneric.c: Don't use deprecated libelf functions.

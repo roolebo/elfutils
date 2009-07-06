@@ -4315,6 +4315,27 @@ print_debug_ranges_section (Dwfl_Module *dwflmod,
     }
 }
 
+#define REGNAMESZ 16
+static const char *
+register_info (Ebl *ebl, unsigned int regno, const Ebl_Register_Location *loc,
+	       char name[REGNAMESZ], int *bits, int *type)
+{
+  const char *set;
+  const char *pfx;
+  int ignore;
+  ssize_t n = ebl_register_info (ebl, regno, name, REGNAMESZ, &pfx, &set,
+				 bits ?: &ignore, type ?: &ignore);
+  if (n <= 0)
+    {
+      snprintf (name, sizeof name, "reg%u", loc->regno);
+      if (bits != NULL)
+	*bits = loc->bits;
+      if (type != NULL)
+	*type = DW_ATE_unsigned;
+      set = "??? unrecognized registers";
+    }
+  return set;
+}
 
 static void
 print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
@@ -4322,14 +4343,11 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 		   int data_align, unsigned int ptr_size, Dwfl_Module *dwflmod,
 		   Ebl *ebl, Dwarf *dbg)
 {
-  char regnamebuf[16];
+  char regnamebuf[REGNAMESZ];
   const char *regname (unsigned int regno)
   {
-    const char *str;
-    int i;
-    return (ebl_register_info (ebl, regno, regnamebuf, sizeof (regnamebuf),
-			       &str, &str, &i, &i) < 0
-	    ? "???" : regnamebuf);
+    register_info (ebl, regno, NULL, regnamebuf, NULL, NULL);
+    return regnamebuf;
   }
 
   puts ("\n   Program:");
@@ -6867,17 +6885,10 @@ handle_core_register (Ebl *ebl, Elf *core, int maxregname,
 
   for (int reg = regloc->regno; reg < regloc->regno + regloc->count; ++reg)
     {
-      const char *pfx;
-      const char *set;
-      char name[16];
+      char name[REGNAMESZ];
       int bits;
       int type;
-      ssize_t n = ebl_register_info (ebl, reg, name, sizeof name,
-				     &pfx, &set, &bits, &type);
-      if (n <= 0)
-	error (EXIT_FAILURE, 0,
-	       gettext ("unable to handle register number %d"),
-	       regloc->regno);
+      register_info (ebl, reg, regloc, name, &bits, &type);
 
 #define TYPES								      \
       BITS (8, BYTE, "%4" PRId8, "0x%.2" PRIx8, 4);			      \
@@ -6965,10 +6976,10 @@ struct register_info
 {
   const Ebl_Register_Location *regloc;
   const char *set;
-  char name[16];
-  Dwarf_Half regno;
-  uint8_t bits;
-  uint8_t type;
+  char name[REGNAMESZ];
+  int regno;
+  int bits;
+  int type;
 };
 
 static int
@@ -7022,8 +7033,12 @@ handle_core_registers (Ebl *ebl, Elf *core, const void *desc,
 
   ssize_t maxnreg = ebl_register_info (ebl, 0, NULL, 0, NULL, NULL, NULL, NULL);
   if (maxnreg <= 0)
-    error (EXIT_FAILURE, 0,
-	   gettext ("cannot get register info: %s"), elf_errmsg (-1));
+    {
+      for (size_t i = 0; i < nregloc; ++i)
+	if (maxnreg < reglocs[i].regno + reglocs[i].count)
+	  maxnreg = reglocs[i].regno + reglocs[i].count;
+      assert (maxnreg > 0);
+    }
 
   struct register_info regs[maxnreg];
   memset (regs, 0, sizeof regs);
@@ -7039,20 +7054,9 @@ handle_core_registers (Ebl *ebl, Elf *core, const void *desc,
 	if (reg > maxreg)
 	  maxreg = reg;
 	struct register_info *info = &regs[reg];
-
-	const char *pfx;
-	int bits;
-	int type;
-	ssize_t n = ebl_register_info (ebl, reg, info->name, sizeof info->name,
-				       &pfx, &info->set, &bits, &type);
-	if (n <= 0)
-	  error (EXIT_FAILURE, 0,
-		 gettext ("cannot register info: %s"), elf_errmsg (-1));
-
 	info->regloc = &reglocs[i];
-	info->regno = reg;
-	info->bits = bits;
-	info->type = type;
+	info->set = register_info (ebl, reg, &reglocs[i],
+				   info->name, &info->bits, &info->type);
       }
   qsort (regs, maxreg + 1, sizeof regs[0], &compare_registers);
 

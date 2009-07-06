@@ -1,3 +1,9 @@
+2009-07-06  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (register_info): New function.  Handle unknown register #s.
+	(print_cfa_program): Use it.
+	(handle_core_register, handle_core_registers): Likewise.
+
 2009-06-28  Roland McGrath  <roland@redhat.com>
 
 	* readelf.c (print_address_names): New static variable.

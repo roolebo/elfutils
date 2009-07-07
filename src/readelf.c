@@ -4332,7 +4332,15 @@ register_info (Ebl *ebl, unsigned int regno, const Ebl_Register_Location *loc,
 	*bits = loc->bits;
       if (type != NULL)
 	*type = DW_ATE_unsigned;
-      set = "??? unrecognized registers";
+      set = "??? unrecognized";
+    }
+  else
+    {
+      if (bits != NULL && *bits <= 0)
+	*bits = loc->bits;
+      if (type != NULL && *type == DW_ATE_void)
+	*type = DW_ATE_unsigned;
+
     }
   return set;
 }

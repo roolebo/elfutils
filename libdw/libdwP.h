@@ -226,6 +226,8 @@ typedef struct Dwarf_Fileinfo_s Dwarf_Fileinfo;
 
 struct Dwarf_Line_s
 {
+  Dwarf_Files *files;
+
   Dwarf_Addr addr;
   unsigned int file;
   int line;
@@ -235,8 +237,6 @@ struct Dwarf_Line_s
   unsigned int end_sequence:1;
   unsigned int prologue_end:1;
   unsigned int epilogue_begin:1;
-
-  Dwarf_Files *files;
 };
 
 struct Dwarf_Lines_s

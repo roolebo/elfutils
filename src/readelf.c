@@ -7063,6 +7063,7 @@ handle_core_registers (Ebl *ebl, Elf *core, const void *desc,
 	  maxreg = reg;
 	struct register_info *info = &regs[reg];
 	info->regloc = &reglocs[i];
+	info->regno = reg;
 	info->set = register_info (ebl, reg, &reglocs[i],
 				   info->name, &info->bits, &info->type);
       }

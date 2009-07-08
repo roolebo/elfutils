@@ -1,3 +1,7 @@
+2009-07-08  Roland McGrath  <roland@redhat.com>
+
+	* libdwflP.h (struct Dwfl_Module): Reorder members to pack better.
+
 2009-06-18  Mark Wielaard  <mjw@redhat.com>
 
 	* dwfl_report_elf.c (__libdwfl_report_elf): Return NULL on overlap.

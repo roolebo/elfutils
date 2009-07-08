@@ -151,10 +151,6 @@ struct Dwfl_Module
   char *name;			/* Iterator name for this module.  */
   GElf_Addr low_addr, high_addr;
 
-  void *build_id_bits;		/* malloc'd copy of build ID bits.  */
-  GElf_Addr build_id_vaddr;	/* Address where they reside, 0 if unknown.  */
-  int build_id_len;		/* -1 for prior failure, 0 if unset.  */
-
   struct dwfl_file main, debug;
   Ebl *ebl;
   GElf_Half e_type;		/* GElf_Ehdr.e_type cache.  */
@@ -167,19 +163,25 @@ struct Dwfl_Module
   size_t syments;		/* sh_size / sh_entsize of that section.  */
   Elf_Data *symstrdata;		/* Data for its string table.  */
   Elf_Data *symxndxdata;	/* Data in the extended section index table. */
-  Dwfl_Error symerr;		/* Previous failure to load symbols.  */
 
   Dwarf *dw;			/* libdw handle for its debugging info.  */
-  Dwfl_Error dwerr;		/* Previous failure to load info.  */
+
+  Dwfl_Error symerr;		/* Previous failure to load symbols.  */
+  Dwfl_Error dwerr;		/* Previous failure to load DWARF.  */
 
   /* Known CU's in this module.  */
   struct dwfl_cu *first_cu, **cu;
-  unsigned int ncu;
 
   void *lazy_cu_root;		/* Table indexed by Dwarf_Off of CU.  */
-  unsigned int lazycu;		/* Possible users, deleted when none left.  */
 
   struct dwfl_arange *aranges;	/* Mapping of addresses in module to CUs.  */
+
+  void *build_id_bits;		/* malloc'd copy of build ID bits.  */
+  GElf_Addr build_id_vaddr;	/* Address where they reside, 0 if unknown.  */
+  int build_id_len;		/* -1 for prior failure, 0 if unset.  */
+
+  unsigned int ncu;
+  unsigned int lazycu;		/* Possible users, deleted when none left.  */
   unsigned int naranges;
 
   int segment;			/* Index of first segment table entry.  */

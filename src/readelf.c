@@ -5135,9 +5135,20 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
       const char *valuestr = NULL;
       switch (attr)
 	{
+	/* This case can take either a constant or a loclistptr. */
+	case DW_AT_data_member_location:
+	  if (form != DW_FORM_data4 && form != DW_FORM_data8)
+	    {
+	      printf ("           %*s%-20s %" PRIxMAX "\n",
+		      (int) (level * 2), "", dwarf_attr_string (attr),
+		      (uintmax_t) num);
+	      return DWARF_CB_OK;
+	    }
+	  /* else fallthrough */
+
+	/* These cases always take a loclistptr and no constant. */
 	case DW_AT_location:
 	case DW_AT_data_location:
-	case DW_AT_data_member_location:
 	case DW_AT_vtable_elem_location:
 	case DW_AT_string_length:
 	case DW_AT_use_location:

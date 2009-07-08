@@ -1,3 +1,9 @@
+2009-07-08  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_getlocation.c (check_constant_offset): New function.
+	(dwarf_getlocation, dwarf_getlocation_addr): Call it to
+	handle DW_AT_data_member_location of data[48] as constant offset.
+
 2009-06-18  Roland McGrath  <roland@redhat.com>
 
 	* libdwP.h (__libdw_read_address_inc): Constify.

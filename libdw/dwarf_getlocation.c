@@ -55,6 +55,7 @@
 #include <dwarf.h>
 #include <search.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include <libdwP.h>
 
@@ -107,6 +108,57 @@ loc_compare (const void *p1, const void *p2)
     return -1;
   if ((uintptr_t) l1->addr > (uintptr_t) l2->addr)
     return 1;
+
+  return 0;
+}
+
+/* DW_AT_data_member_location can be a constant as well as a loclistptr.
+   Only data[48] indicate a loclistptr.  */
+static int
+check_constant_offset (Dwarf_Attribute *attr,
+		       Dwarf_Op **llbuf, size_t *listlen)
+{
+  if (attr->code != DW_AT_data_member_location
+      || attr->form == DW_FORM_data4
+      || attr->form == DW_FORM_data8)
+    return 1;
+
+  /* Check whether we already cached this location.  */
+  struct loc_s fake = { .addr = attr->valp };
+  struct loc_s **found = tfind (&fake, &attr->cu->locs, loc_compare);
+
+  if (found == NULL)
+    {
+      Dwarf_Word offset;
+      if (INTUSE(dwarf_formudata) (attr, &offset) != 0)
+	return -1;
+
+      Dwarf_Op *result = libdw_alloc (attr->cu->dbg,
+				      Dwarf_Op, sizeof (Dwarf_Op), 1);
+
+      result->atom = DW_OP_plus_uconst;
+      result->number = offset;
+      result->number2 = 0;
+      result->offset = 0;
+
+      /* Insert a record in the search tree so we can find it again later.  */
+      struct loc_s *newp = libdw_alloc (attr->cu->dbg,
+					struct loc_s, sizeof (struct loc_s),
+					1);
+      newp->addr = attr->valp;
+      newp->loc = result;
+      newp->nloc = 1;
+
+      found = tsearch (newp, &attr->cu->locs, loc_compare);
+    }
+
+  assert ((*found)->nloc == 1);
+
+  if (llbuf != NULL)
+    {
+      *llbuf = (*found)->loc;
+      *listlen = 1;
+    }
 
   return 0;
 }
@@ -333,6 +385,10 @@ dwarf_getlocation (attr, llbuf, listlen)
      Dwarf_Op **llbuf;
      size_t *listlen;
 {
+  int result = check_constant_offset (attr, llbuf, listlen);
+  if (result != 1)
+    return result;
+
   if (! attr_ok (attr))
     return -1;
 
@@ -377,6 +433,10 @@ dwarf_getlocation_addr (attr, address, llbufs, listlens, maxlocs)
       __libdw_seterrno (error);
       return -1;
     }
+
+  int result = check_constant_offset (attr, &llbufs[0], &listlens[0]);
+  if (result != 1)
+    return result ?: 1;
 
   unsigned char *endp;
   unsigned char *readp = __libdw_formptr (attr, IDX_debug_loc,

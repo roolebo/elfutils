@@ -1,5 +1,5 @@
 /* Return symbol binding name.
-   Copyright (C) 2001, 2002 Red Hat, Inc.
+   Copyright (C) 2001, 2002, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -78,8 +78,14 @@ ebl_symbol_binding_name (ebl, binding, buf, len)
 	res = stb_names[binding];
       else
 	{
+	  char *ident;
+
 	  if (binding >= STB_LOPROC && binding <= STB_HIPROC)
 	    snprintf (buf, len, "LOPROC+%d", binding - STB_LOPROC);
+	  else if (binding == STB_GNU_UNIQUE
+		   && (ident = elf_getident (ebl->elf, NULL)) != NULL
+		   && ident[EI_OSABI] == ELFOSABI_LINUX)
+	    return "GNU_UNIQUE";
 	  else if (binding >= STB_LOOS && binding <= STB_HIOS)
 	    snprintf (buf, len, "LOOS+%d", binding - STB_LOOS);
 	  else

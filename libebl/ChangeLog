@@ -1,3 +1,11 @@
+2009-07-08  Ulrich Drepper  <drepper@redhat.com>
+
+	* eblsymbolbindingname.c (ebl_symbol_binding_name): Handle
+	STB_GNU_UNIQUE.
+
+	* eblsymboltypename.c (ebl_symbol_type_name): Only handle STT_GNU_IFUNC
+	if the binary is marked as being for Linux.
+
 2009-04-01  Roland McGrath  <roland@redhat.com>
 
 	* eblsymboltypename.c (ebl_symbol_type_name): Add STT_GNU_IFUNC.

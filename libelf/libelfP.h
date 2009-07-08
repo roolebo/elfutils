@@ -281,6 +281,14 @@ typedef struct Elf_Data_Chunk
 /* The ELF descriptor.  */
 struct Elf
 {
+  /* Address to which the file was mapped.  NULL if not mapped.  */
+  void *map_address;
+
+  /* When created for an archive member this points to the descriptor
+     for the archive. */
+  Elf *parent;
+  Elf *next;             /* Used in list of archive descriptors.  */
+
   /* What kind of file is underneath (ELF file, archive...).  */
   Elf_Kind kind;
 
@@ -300,34 +308,21 @@ struct Elf
      for an (yet) unknown size.  */
   size_t maximum_size;
 
-  /* Address to which the file was mapped.  NULL if not mapped.  */
-  void *map_address;
-
   /* Describes the way the memory was allocated and if the dirty bit is
      signalled it means that the whole file has to be rewritten since
      the layout changed.  */
   int flags;
 
-  /* When created for an archive member this points to the descriptor
-     for the archive. */
-  Elf *parent;
-
-  /* Lock to handle multithreaded programs.  */
-  rwlock_define (,lock);
-
   /* Reference counting for the descriptor.  */
   int ref_count;
 
-  struct Elf *next;             /* Used in list of archive descriptors.  */
+  /* Lock to handle multithreaded programs.  */
+  rwlock_define (,lock);
 
   union
   {
     struct
     {
-      int ehdr_flags;		/* Flags (dirty) for ELF header.  */
-      int phdr_flags;		/* Flags (dirty|malloc) for program header.  */
-      int shdr_malloced;	/* Nonzero if shdr array was allocated.  */
-
       /* The next fields are only useful when testing for ==/!= NULL.  */
       void *ehdr;
       void *shdr;
@@ -339,16 +334,15 @@ struct Elf
       Elf_Data_Chunk *rawchunks; /* List of elf_getdata_rawchunk results.  */
       unsigned int scnincr;	/* Number of sections allocate the last
 				   time.  */
+      int ehdr_flags;		/* Flags (dirty) for ELF header.  */
+      int phdr_flags;		/* Flags (dirty|malloc) for program header.  */
+      int shdr_malloced;	/* Nonzero if shdr array was allocated.  */
       off64_t sizestr_offset;	/* Offset of the size string in the parent
 				   if this is an archive member.  */
     } elf;
 
     struct
     {
-      int ehdr_flags;		/* Flags (dirty) for ELF header.  */
-      int phdr_flags;		/* Flags (dirty|malloc) for program header.  */
-      int shdr_malloced;	/* Nonzero if shdr array was allocated.  */
-
       Elf32_Ehdr *ehdr;		/* Pointer to the ELF header.  This is
 				   never malloced.  */
       Elf32_Shdr *shdr;		/* Used when reading from a file.  */
@@ -359,6 +353,9 @@ struct Elf
       Elf_Data_Chunk *rawchunks; /* List of elf_getdata_rawchunk results.  */
       unsigned int scnincr;	/* Number of sections allocate the last
 				   time.  */
+      int ehdr_flags;		/* Flags (dirty) for ELF header.  */
+      int phdr_flags;		/* Flags (dirty|malloc) for program header.  */
+      int shdr_malloced;	/* Nonzero if shdr array was allocated.  */
       off64_t sizestr_offset;	/* Offset of the size string in the parent
 				   if this is an archive member.  */
       Elf32_Ehdr ehdr_mem;	/* Memory used for ELF header when not
@@ -371,10 +368,6 @@ struct Elf
 
     struct
     {
-      int ehdr_flags;		/* Flags (dirty) for ELF header.  */
-      int phdr_flags;		/* Flags (dirty|malloc) for program header.  */
-      int shdr_malloced;	/* Nonzero if shdr array was allocated.  */
-
       Elf64_Ehdr *ehdr;		/* Pointer to the ELF header.  This is
 				   never malloced.  */
       Elf64_Shdr *shdr;		/* Used when reading from a file.  */
@@ -385,6 +378,9 @@ struct Elf
       Elf_Data_Chunk *rawchunks; /* List of elf_getdata_rawchunk results.  */
       unsigned int scnincr;	/* Number of sections allocate the last
 				   time.  */
+      int ehdr_flags;		/* Flags (dirty) for ELF header.  */
+      int phdr_flags;		/* Flags (dirty|malloc) for program header.  */
+      int shdr_malloced;	/* Nonzero if shdr array was allocated.  */
       off64_t sizestr_offset;	/* Offset of the size string in the parent
 				   if this is an archive member.  */
       Elf64_Ehdr ehdr_mem;	/* Memory used for ELF header when not
@@ -396,8 +392,7 @@ struct Elf
 
     struct
     {
-      int has_index;		/* Set when file has index.  0 means
-				   undecided, > 0 means it has one.  */
+      Elf *children;		/* List of all descriptors for this archive. */
       Elf_Arsym *ar_sym;	/* Symbol table returned by elf_getarsym.  */
       size_t ar_sym_num;	/* Number of entries in `ar_sym'.  */
       char *long_names;		/* If no index is available but long names
@@ -411,7 +406,6 @@ struct Elf
       char ar_name[16];		/* NUL terminated ar_name of elf_ar_hdr.  */
       char raw_name[17];	/* This is a buffer for the NUL terminated
 				   named raw_name used in the elf_ar_hdr.  */
-      struct Elf *children;	/* List of all descriptors for this archive. */
     } ar;
   } state;
 

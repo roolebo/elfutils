@@ -243,6 +243,7 @@ __libdw_intern_expression (Dwarf *dbg,
 	case DW_OP_nop:
 	case DW_OP_push_object_address:
 	case DW_OP_call_ref:
+	case DW_OP_call_frame_cfa:
 	  /* No operand.  */
 	  break;
 

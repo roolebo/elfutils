@@ -377,8 +377,9 @@ check_elf_header (Ebl *ebl, GElf_Ehdr *ehdr, size_t size)
     ERROR (gettext ("unknown ELF header version number e_ident[%d] == %d\n"),
 	   EI_VERSION, ehdr->e_ident[EI_VERSION]);
 
-  /* We currently don't handle any OS ABIs.  */
-  if (ehdr->e_ident[EI_OSABI] != ELFOSABI_NONE)
+  /* We currently don't handle any OS ABIs other than Linux.  */
+  if (ehdr->e_ident[EI_OSABI] != ELFOSABI_NONE
+      && ehdr->e_ident[EI_OSABI] != ELFOSABI_LINUX)
     ERROR (gettext ("unsupported OS ABI e_ident[%d] == '%s'\n"),
 	   EI_OSABI,
 	   ebl_osabi_name (ebl, ehdr->e_ident[EI_OSABI], buf, sizeof (buf)));
@@ -705,9 +706,16 @@ section [%2d] '%s': symbol %zu: invalid section index\n"),
 	ERROR (gettext ("section [%2d] '%s': symbol %zu: unknown type\n"),
 	       idx, section_name (ebl, idx), cnt);
 
-      if (GELF_ST_BIND (sym->st_info) >= STB_NUM)
+      if (GELF_ST_BIND (sym->st_info) >= STB_NUM
+	  && !ebl_symbol_binding_name (ebl, GELF_ST_BIND (sym->st_info), NULL,
+				       0))
 	ERROR (gettext ("\
 section [%2d] '%s': symbol %zu: unknown symbol binding\n"),
+	       idx, section_name (ebl, idx), cnt);
+      if (GELF_ST_BIND (sym->st_info) == STB_GNU_UNIQUE
+	  && GELF_ST_TYPE (sym->st_info) != STT_OBJECT)
+	ERROR (gettext ("\
+section [%2d] '%s': symbol %zu: unique symbol not of object type\n"),
 	       idx, section_name (ebl, idx), cnt);
 
       if (xndx == SHN_COMMON)

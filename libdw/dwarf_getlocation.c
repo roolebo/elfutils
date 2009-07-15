@@ -244,6 +244,8 @@ __libdw_intern_expression (Dwarf *dbg,
 	case DW_OP_push_object_address:
 	case DW_OP_call_ref:
 	case DW_OP_call_frame_cfa:
+	case DW_OP_form_tls_address:
+	case DW_OP_GNU_push_tls_address:
 	  /* No operand.  */
 	  break;
 
@@ -334,6 +336,12 @@ __libdw_intern_expression (Dwarf *dbg,
 	  /* XXX Check size.  */
 	  get_uleb128 (newloc->number, data);
 	  get_sleb128 (newloc->number2, data);
+	  break;
+
+	case DW_OP_bit_piece:
+	  /* XXX Check size.  */
+	  get_uleb128 (newloc->number, data);
+	  get_uleb128 (newloc->number2, data);
 	  break;
 
 	default:

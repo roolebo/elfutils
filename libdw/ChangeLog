@@ -1,5 +1,10 @@
 2009-07-16  Roland McGrath  <roland@redhat.com>
 
+	* dwarf_formudata.c (__libdw_formptr): Handle DW_FORM_sec_offset,
+	reject others when CU's version > 3.
+
+	* dwarf_formflag.c: Handle DW_FORM_flag_present.
+
 	* dwarf.h: Add DW_OP_{implicit,stack}_value from DWARF 4 draft.
 	Also DW_TAG_type_unit and DW_TAG_rvalue_reference_type.
 	Also DW_AT_signature, DW_AT_main_subprogram, DW_AT_data_bit_offset,

@@ -1,5 +1,5 @@
 /* Return flag represented by attribute.
-   Copyright (C) 2004 Red Hat, Inc.
+   Copyright (C) 2004-2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
@@ -63,6 +63,12 @@ dwarf_formflag (attr, return_bool)
 {
   if (attr == NULL)
     return -1;
+
+  if (attr->form == DW_FORM_flag_present)
+    {
+      *return_bool = true;
+      return 0;
+    }
 
   if (unlikely (attr->form != DW_FORM_flag))
     {

@@ -1,5 +1,5 @@
 /* Return unsigned constant represented by attribute.
-   Copyright (C) 2003, 2005 Red Hat, Inc.
+   Copyright (C) 2003-2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -71,6 +71,15 @@ __libdw_formptr (Dwarf_Attribute *attr, int sec_index,
     }
 
   Dwarf_Word offset;
+  if (attr->form == DW_FORM_sec_offset)
+    {
+      if (__libdw_read_offset (attr->cu->dbg, IDX_debug_info, attr->valp,
+			       attr->cu->offset_size, &offset, sec_index, 0))
+	return NULL;
+    }
+  else if (attr->cu->version > 3)
+    goto invalid;
+
   switch (attr->form)
     {
     case DW_FORM_data4:
@@ -90,6 +99,7 @@ __libdw_formptr (Dwarf_Attribute *attr, int sec_index,
   unsigned char *endp = d->d_buf + d->d_size;
   if (unlikely (readp >= endp))
     {
+    invalid:
       __libdw_seterrno (DWARF_E_INVALID_DWARF);
       return NULL;
     }

@@ -1,3 +1,8 @@
+2009-07-20  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_getlocation.c (__libdw_intern_expression):
+	Handle DW_OP_stack_value.
+
 2009-07-16  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_formudata.c (__libdw_formptr): Handle DW_FORM_sec_offset,

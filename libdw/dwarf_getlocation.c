@@ -245,6 +245,7 @@ __libdw_intern_expression (Dwarf *dbg,
 	case DW_OP_call_ref:
 	case DW_OP_call_frame_cfa:
 	case DW_OP_form_tls_address:
+	case DW_OP_GNU_push_tls_address:
 	case DW_OP_stack_value:
 	  /* No operand.  */
 	  break;

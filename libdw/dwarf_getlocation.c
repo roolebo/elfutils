@@ -167,7 +167,7 @@ int
 internal_function
 __libdw_intern_expression (Dwarf *dbg,
 			   bool other_byte_order, unsigned int address_size,
-			   void **cache, const Dwarf_Block *block,
+			   void **cache, const Dwarf_Block *block, bool valuep,
 			   Dwarf_Op **llbuf, size_t *listlen, int sec_index)
 {
   /* Check whether we already looked at this list.  */
@@ -178,6 +178,12 @@ __libdw_intern_expression (Dwarf *dbg,
       /* We already saw it.  */
       *llbuf = (*found)->loc;
       *listlen = (*found)->nloc;
+
+      if (valuep)
+	{
+	  assert (*listlen > 1);
+	  assert ((*llbuf)[*listlen - 1].atom == DW_OP_stack_value);
+	}
 
       return 0;
     }
@@ -358,6 +364,19 @@ __libdw_intern_expression (Dwarf *dbg,
       goto invalid;
     }
 
+  if (valuep)
+    {
+      struct loclist *newloc;
+      newloc = (struct loclist *) alloca (sizeof (struct loclist));
+      newloc->atom = DW_OP_stack_value;
+      newloc->number = 0;
+      newloc->number2 = 0;
+      newloc->offset = data - block->data;
+      newloc->next = loclist;
+      loclist = newloc;
+      ++n;
+    }
+
   /* Allocate the array.  */
   Dwarf_Op *result;
   if (dbg != NULL)
@@ -420,8 +439,8 @@ getlocation (struct Dwarf_CU *cu, const Dwarf_Block *block,
 	     Dwarf_Op **llbuf, size_t *listlen, int sec_index)
 {
   return __libdw_intern_expression (cu->dbg, cu->dbg->other_byte_order,
-				    cu->address_size, &cu->locs,
-				    block, llbuf, listlen, sec_index);
+				    cu->address_size, &cu->locs, block, false,
+				    llbuf, listlen, sec_index);
 }
 
 int

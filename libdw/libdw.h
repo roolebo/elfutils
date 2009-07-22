@@ -750,34 +750,36 @@ extern int dwarf_cfi_addrframe (Dwarf_CFI *cache,
 extern int dwarf_frame_info (Dwarf_Frame *frame,
 			     Dwarf_Addr *start, Dwarf_Addr *end, bool *signalp);
 
-/* Deliver a DWARF expression that yields the Canonical Frame Address at
-   this frame state.  Returns -1 for errors, or the number of operations
-   stored at *OPS.  That pointer can be used only as long as FRAME is alive
-   and unchanged.  Returns zero if the CFA cannot be determined here.  */
-extern int dwarf_frame_cfa (Dwarf_Frame *frame, Dwarf_Op **ops)
+/* Return a DWARF expression that yields the Canonical Frame Address at
+   this frame state.  Returns -1 for errors, or zero for success, with
+   *NOPS set to the number of operations stored at *OPS.  That pointer
+   can be used only as long as FRAME is alive and unchanged.  *NOPS is
+   zero if the CFA cannot be determined here.  Note that if nonempty,
+   *OPS is a DWARF expression, not a location description--append
+   DW_OP_stack_value to a get a location description for the CFA.  */
+extern int dwarf_frame_cfa (Dwarf_Frame *frame, Dwarf_Op **ops, size_t *nops)
   __nonnull_attribute__ (2);
 
-/* Deliver a DWARF expression that yields the location or value of
-   DWARF register number REGNO in the state described by FRAME.
+/* Deliver a DWARF location description that yields the location or
+   value of DWARF register number REGNO in the state described by FRAME.
 
-   Returns -1 for errors, 0 if REGNO has an accessible location,
-   or 1 if REGNO has only a computable value.  Stores at *NOPS
-   the number of operations in the array stored at *OPS.
-   With return value 0, this is a DWARF location expression.
-   With return value 1, this is a DWARF expression that computes the value.
+   Returns -1 for errors or zero for success, setting *NOPS to the
+   number of operations in the array stored at *OPS.  Note the last
+   operation is DW_OP_stack_value if there is no mutable location but
+   only a computable value.
 
-   Return value 1 with *NOPS zero means CFI says the caller's REGNO is
-   "undefined" here, i.e. it's call-clobbered and cannot be recovered.
+   *NOPS zero with *OPS set to OPS_MEM means CFI says the caller's
+   REGNO is "undefined", i.e. it's call-clobbered and cannot be recovered.
 
-   Return value 0 with *NOPS zero means CFI says the caller's REGNO is
-   "same_value" here, i.e. this frame did not change it; ask the caller
-   frame where to find it.
+   *NOPS zero with *OPS set to a null pointer means CFI says the
+   caller's REGNO is "same_value", i.e. this frame did not change it;
+   ask the caller frame where to find it.
 
    For common simple expressions *OPS is OPS_MEM.  For arbitrary DWARF
    expressions in the CFI, *OPS is an internal pointer that can be used as
    long as the Dwarf_CFI used to create FRAME remains alive.  */
 extern int dwarf_frame_register (Dwarf_Frame *frame, int regno,
-				 Dwarf_Op ops_mem[2],
+				 Dwarf_Op ops_mem[3],
 				 Dwarf_Op **ops, size_t *nops)
   __nonnull_attribute__ (3, 4, 5);
 

@@ -1,3 +1,19 @@
+2009-07-22  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_frame_cfa.c: Change calling convention.
+	* libdw.h: Update decl.
+
+	* dwarf_frame_register.c: Change calling/return-value convention for
+	value-only results and undefined/same_value.
+	* libdw.h: Update decl.
+
+	* dwarf_getlocation.c (__libdw_intern_expression): Take new bool
+	argument, append DW_OP_stack_value if set.  Don't take NOPS argument,
+	return that value instead.
+	(getlocation): Update caller.
+	* dwarf_frame_cfa.c: Likewise.
+	* libdwP.h: Update decl.
+
 2009-07-21  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_getsrc_file.c: Ignore a CU that just has no DW_AT_stmt_list.

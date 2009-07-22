@@ -1,3 +1,11 @@
+2009-07-21  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_getsrc_file.c: Ignore a CU that just has no DW_AT_stmt_list.
+	Fix loop iteration after skipping a bogus or useless CU.
+
+	* dwarf_entry_breakpoints.c: Handle 0 dwarf_errno () as harmless
+	absence, not DWARF_E_NO_DEBUG_LINE.
+
 2009-07-20  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_getlocation.c (__libdw_intern_expression):

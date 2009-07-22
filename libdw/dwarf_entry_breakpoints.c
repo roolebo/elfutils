@@ -1,5 +1,5 @@
 /* Find entry breakpoint locations for a function.
-   Copyright (C) 2005, 2008 Red Hat, Inc.
+   Copyright (C) 2005-2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -93,7 +93,7 @@ dwarf_entry_breakpoints (die, bkpts)
   if (INTUSE(dwarf_getsrclines) (&cudie, &lines, &nlines) < 0)
     {
       int error = INTUSE (dwarf_errno) ();
-      if (error == DWARF_E_NO_DEBUG_LINE)
+      if (error == 0)		/* CU has no DW_AT_stmt_list.  */
 	return entrypc_bkpt ();
       __libdw_seterrno (error);
       return -1;

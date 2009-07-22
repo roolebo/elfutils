@@ -1,5 +1,5 @@
 /* Find line information for given file/line/column triple.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005-2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -74,11 +74,11 @@ dwarf_getsrc_file (Dwarf *dbg, const char *fname, int lineno, int column,
   size_t cur_match = 0;
   Dwarf_Line **match = *nsrcs == 0 ? NULL : *srcsp;
 
-  Dwarf_Off off = 0;
   size_t cuhl;
   Dwarf_Off noff;
-
-  while (INTUSE(dwarf_nextcu) (dbg, off, &noff, &cuhl, NULL, NULL, NULL) == 0)
+  for (Dwarf_Off off = 0;
+       INTUSE(dwarf_nextcu) (dbg, off, &noff, &cuhl, NULL, NULL, NULL) == 0;
+       off = noff)
     {
       Dwarf_Die cudie_mem;
       Dwarf_Die *cudie = INTUSE(dwarf_offdie) (dbg, off + cuhl, &cudie_mem);
@@ -89,7 +89,14 @@ dwarf_getsrc_file (Dwarf *dbg, const char *fname, int lineno, int column,
       Dwarf_Lines *lines;
       size_t nlines;
       if (INTUSE(dwarf_getsrclines) (cudie, &lines, &nlines) != 0)
-	return -1;
+	{
+	  /* Ignore a CU that just has no DW_AT_stmt_list at all.  */
+	  int error = INTUSE(dwarf_errno) ();
+	  if (error == 0)
+	    continue;
+	  __libdw_seterrno (error);
+	  return -1;
+	}
 
       /* Search through all the line number records for a matching
 	 file and line/column number.  If any of the numbers is zero,
@@ -175,8 +182,6 @@ dwarf_getsrc_file (Dwarf *dbg, const char *fname, int lineno, int column,
 	 already, there is no need to go on to the next CU.  */
       if (cur_match == max_match)
 	break;
-
-      off = noff;
     }
 
   if (cur_match > 0)

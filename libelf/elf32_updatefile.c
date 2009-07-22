@@ -336,10 +336,13 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 
 		/* If there is a gap, fill it.  */
 		if (scn_start + dl->data.d.d_off > last_position
-		    && ((previous_scn_changed && dl->data.d.d_off == 0)
+		    && (dl->data.d.d_off == 0
 			|| ((scn->flags | dl->flags | elf->flags)
 			    & ELF_F_DIRTY) != 0))
-		  fill_mmap (dl->data.d.d_off);
+		  {
+		    fill_mmap (dl->data.d.d_off);
+		    last_position = scn_start + dl->data.d.d_off;
+		  }
 
 		if ((scn->flags | dl->flags | elf->flags) & ELF_F_DIRTY)
 		  {

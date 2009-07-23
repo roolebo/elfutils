@@ -10,6 +10,10 @@ elflint: Add support for STB_GNU_UNIQUE.
 
 readelf: Add -N option, speeds up DWARF printing without address->name lookups.
 
+libdw: Add support for decoding DWARF CFI into location description form.
+       Handle some new DWARF 3 expression operations previously omitted.
+       Basic handling of some new encodings slated for DWARF 4.
+
 Version 0.141:
 
 libebl: sparc backend fixes;

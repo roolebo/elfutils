@@ -3880,6 +3880,8 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
       [DW_OP_form_tls_address] = "form_tls_address",
       [DW_OP_call_frame_cfa] = "call_frame_cfa",
       [DW_OP_bit_piece] = "bit_piece",
+      [DW_OP_implicit_value] = "implicit_value",
+      [DW_OP_stack_value] = "stack_value",
     };
 
   if (len == 0)
@@ -4090,6 +4092,19 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  len -= 2;
 	  data += 2;
 	  offset += 3;
+	  break;
+
+	case DW_OP_implicit_value:
+	  start = data;
+	  get_uleb128 (uleb, data); /* XXX check overrun */
+	  printf ("%*s[%4" PRIuMAX "] %s %u (",
+		  indent, "", (uintmax_t) offset, known[op], uleb);
+	  NEED (uleb);
+	  while (uleb-- > 0)
+	    printf ("%02x ", *data++);
+	  fputs (")\n", stdout);
+	  len -= data - start;
+	  offset += 1 + (data - start);
 	  break;
 
 	default:

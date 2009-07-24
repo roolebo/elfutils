@@ -3723,6 +3723,22 @@ dwarf_discr_list_string (unsigned int code)
 
 
 static void
+print_block (size_t n, const void *block)
+{
+  if (n == 0)
+    puts (_("empty block"));
+  else
+    {
+      printf (_("%zu byte block:"), n);
+      const unsigned char *data = block;
+      do
+	printf (" %02x", *data++);
+      while (--n > 0);
+      putchar ('\n');
+    }
+}
+
+static void
 print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	   unsigned int addrsize, Dwarf_Word len, const unsigned char *data)
 {
@@ -4097,12 +4113,11 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	case DW_OP_implicit_value:
 	  start = data;
 	  get_uleb128 (uleb, data); /* XXX check overrun */
-	  printf ("%*s[%4" PRIuMAX "] %s %u (",
-		  indent, "", (uintmax_t) offset, known[op], uleb);
+	  printf ("%*s[%4" PRIuMAX "] %s: ",
+		  indent, "", (uintmax_t) offset, known[op]);
 	  NEED (uleb);
-	  while (uleb-- > 0)
-	    printf ("%02x ", *data++);
-	  fputs (")\n", stdout);
+	  print_block (uleb, data);
+	  data += uleb;
 	  len -= data - start;
 	  offset += 1 + (data - start);
 	  break;
@@ -5244,9 +5259,9 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
       if (unlikely (dwarf_formblock (attrp, &block) != 0))
 	goto attrval_out;
 
-      printf ("           %*s%-20s %" PRIxMAX " byte block\n",
-	      (int) (level * 2), "", dwarf_attr_string (attr),
-	      (uintmax_t) block.length);
+      printf ("           %*s%-20s ",
+	      (int) (level * 2), "", dwarf_attr_string (attr));
+      print_block (block.length, block.data);
 
       switch (attr)
 	{

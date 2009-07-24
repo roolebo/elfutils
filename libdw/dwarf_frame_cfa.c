@@ -56,46 +56,41 @@
 #include <stdlib.h>
 
 int
-dwarf_frame_cfa (fs, ops)
+dwarf_frame_cfa (fs, ops, nops)
      Dwarf_Frame *fs;
      Dwarf_Op **ops;
+     size_t *nops;
 {
   /* Maybe there was a previous error.  */
   if (fs == NULL)
     return -1;
 
+  int result = 0;
   switch (fs->cfa_rule)
     {
     case cfa_undefined:
       *ops = NULL;
-      return 0;
+      *nops = 0;
+      break;
 
     case cfa_offset:
       /* The Dwarf_Op was already fully initialized by execute_cfi.  */
       *ops = &fs->cfa_data.offset;
-      return 1;
+      *nops = 1;
+      break;
 
     case cfa_expr:
-      {
-	unsigned int address_size = (fs->cache->e_ident[EI_CLASS] == ELFCLASS32
-				     ? 4 : 8);
-	size_t nops;
-
-	/* Parse the expression into internal form.  */
-	int result = __libdw_intern_expression (NULL,
-						fs->cache->other_byte_order,
-						address_size,
-						&fs->cache->expr_tree,
-						&fs->cfa_data.expr,
-						ops, &nops,
-						IDX_debug_frame);
-	return result ?: (int) nops;
-      }
+      /* Parse the expression into internal form.  */
+      result = __libdw_intern_expression
+	(NULL, fs->cache->other_byte_order,
+	 fs->cache->e_ident[EI_CLASS] == ELFCLASS32 ? 4 : 8,
+	 &fs->cache->expr_tree, &fs->cfa_data.expr, false,
+	 ops, nops, IDX_debug_frame);
+      break;
 
     default:
       abort ();
     }
 
-  /*NOTREACHED*/
-  return -1;
+  return result;
 }

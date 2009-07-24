@@ -125,10 +125,11 @@ handle_cfi (Dwfl *dwfl, const char *which, Dwarf_CFI *cfi,
 	    ra_regno, signalp ? " (signal frame)" : "");
 
   Dwarf_Op *cfa_ops;
-  int cfa_nops = dwarf_frame_cfa (stuff->frame, &cfa_ops);
+  size_t cfa_nops;
+  result = dwarf_frame_cfa (stuff->frame, &cfa_ops, &cfa_nops);
 
   printf ("\tCFA ");
-  print_detail (cfa_nops < 0 ? -1 : 1, cfa_ops, cfa_nops, stuff->bias);
+  print_detail (result, cfa_ops, cfa_nops, stuff->bias);
 
   (void) dwfl_module_register_names (dwfl_addrmodule (dwfl, pc),
 				     &print_register, stuff);

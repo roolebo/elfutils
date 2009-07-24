@@ -58,7 +58,7 @@ int
 dwarf_frame_register (fs, regno, ops_mem, ops, nops)
      Dwarf_Frame *fs;
      int regno;
-     Dwarf_Op ops_mem[2];
+     Dwarf_Op ops_mem[3];
      Dwarf_Op **ops;
      size_t *nops;
 {
@@ -72,7 +72,8 @@ dwarf_frame_register (fs, regno, ops_mem, ops, nops)
       return -1;
     }
 
-  int result = 0;		/* A location, not a value.  */
+  *ops = ops_mem;
+  *nops = 0;
 
   if (unlikely ((size_t) regno >= fs->nregs))
     goto default_rule;
@@ -89,35 +90,32 @@ dwarf_frame_register (fs, regno, ops_mem, ops, nops)
       /*FALLTHROUGH*/
     case reg_undefined:
       /* The value is known to be unavailable.  */
-      result = 1;
-      /*FALLTHROUGH*/
+      break;
+
     case reg_same_value:
     same_value:
       /* The location is not known here, but the caller might know it.  */
       *ops = NULL;
-      *nops = 0;
       break;
 
-    case reg_val_offset:
-      result = 1;		/* A value, not a location.  */
-      /*FALLTHROUGH*/
     case reg_offset:
-      ops_mem[0] = (Dwarf_Op) { .atom = DW_OP_call_frame_cfa };
-      ops_mem[1] = (Dwarf_Op) { .atom = DW_OP_plus_uconst,
-				.number = reg->value };
+    case reg_val_offset:
+      ops_mem[(*nops)++] = (Dwarf_Op) { .atom = DW_OP_call_frame_cfa };
+      if (reg->value != 0)
+	ops_mem[(*nops)++] = (Dwarf_Op) { .atom = DW_OP_plus_uconst,
+					  .number = reg->value };
+      if (reg->rule == reg_val_offset)
+	/* A value, not a location.  */
+	ops_mem[(*nops)++] = (Dwarf_Op) { .atom = DW_OP_stack_value };
       *ops = ops_mem;
-      *nops = reg->value == 0 ? 1 : 2;
       break;
 
     case reg_register:
-      ops_mem[0] = (Dwarf_Op) { .atom = DW_OP_regx, .number = reg->value };
-      *ops = ops_mem;
-      *nops = 1;
+      ops_mem[(*nops)++] = (Dwarf_Op) { .atom = DW_OP_regx,
+					.number = reg->value };
       break;
 
     case reg_val_expression:
-      result = 1;		/* A value, not a location.  */
-      /*FALLTHROUGH*/
     case reg_expression:
       {
 	unsigned int address_size = (fs->cache->e_ident[EI_CLASS] == ELFCLASS32
@@ -132,13 +130,13 @@ dwarf_frame_register (fs, regno, ops_mem, ops, nops)
 	if (__libdw_intern_expression (NULL,
 				       fs->cache->other_byte_order,
 				       address_size,
-				       &fs->cache->expr_tree,
-				       &block, ops, nops,
-				       IDX_debug_frame) < 0)
-	  result = -1;
+				       &fs->cache->expr_tree, &block,
+				       reg->rule == reg_val_expression,
+				       ops, nops, IDX_debug_frame) < 0)
+	  return -1;
 	break;
       }
     }
 
-  return result;
+  return 0;
 }

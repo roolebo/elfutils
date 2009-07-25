@@ -124,7 +124,7 @@ endif
 ld_LDFLAGS = -rdynamic
 elflint_LDADD  = $(libebl) $(libelf) $(libeu) $(libmudflap) -ldl
 findtextrel_LDADD = $(libdw) $(libelf) $(libmudflap)
-addr2line_LDADD = $(libdw) $(libmudflap)
+addr2line_LDADD = $(libdw) $(libelf) $(libmudflap)
 elfcmp_LDADD = $(libebl) $(libelf) $(libmudflap) -ldl
 objdump_LDADD  = $(libasm) $(libebl) $(libelf) $(libeu) $(libmudflap) -ldl
 ranlib_LDADD = libar.a $(libelf) $(libeu) $(libmudflap)

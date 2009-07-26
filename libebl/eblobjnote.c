@@ -1,5 +1,5 @@
 /* Print contents of object file note.
-   Copyright (C) 2002, 2007 Red Hat, Inc.
+   Copyright (C) 2002, 2007, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -79,6 +79,13 @@ ebl_object_note (ebl, name, type, descsz, desc)
 	      printf ("%02" PRIx8, (uint8_t) desc[i]);
 	    printf ("%02" PRIx8 "\n", (uint8_t) desc[i]);
 	  }
+	break;
+
+      case NT_GNU_GOLD_VERSION:
+	if (strcmp (name, "GNU") == 0 && descsz > 0)
+	  /* A non-null terminated version string.  */
+	  printf ("%s%.*s\n",
+		  gettext (" Version String: "), (int) descsz, desc);
 	break;
 
       case NT_GNU_ABI_TAG:

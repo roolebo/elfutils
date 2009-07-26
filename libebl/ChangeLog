@@ -1,3 +1,8 @@
+2009-07-26  Mark Wielaard  <mjw@redhat.com>
+
+	* eblobjnotetypename.c (ebl_object_note_type_name): Recognize
+	NT_GNU_GOLD_VERSION.
+
 2009-07-08  Roland McGrath  <roland@redhat.com>
 
 	* ebl-hooks.h: Add abi_cfi hook.

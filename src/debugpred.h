@@ -30,7 +30,7 @@
 extern const unsigned long int __start_predict_data;
 extern const unsigned long int __stop_predict_data;
 extern const unsigned long int __start_predict_line;
-extern const char *__start_predict_file;
+extern const char *const __start_predict_file;
 
 static void
 __attribute__ ((destructor))
@@ -39,7 +39,7 @@ predprint (void)
   const unsigned long int *s = &__start_predict_data;
   const unsigned long int *e = &__stop_predict_data;
   const unsigned long int *sl = &__start_predict_line;
-  const char **sf = &__start_predict_file;
+  const char *const *sf = &__start_predict_file;
   while (s < e)
     {
       if (s[0] != 0 || s[1] != 0)

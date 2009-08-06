@@ -352,7 +352,8 @@ ebl_strtabfinalize (struct Ebl_Strtab *st, Elf_Data *data)
      the offset members of the elfstrent records.  */
   char *endp = (char *) data->d_buf + nulllen;
   size_t copylen = nulllen;
-  copystrings (st->root, &endp, &copylen);
+  if (st->root)
+    copystrings (st->root, &endp, &copylen);
   assert (copylen == st->total + nulllen);
 }
 

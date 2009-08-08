@@ -1,5 +1,5 @@
 /* Return byte size attribute of DIE.
-   Copyright (C) 2003, 2005 Red Hat, Inc.
+   Copyright (C) 2003, 2005, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -63,7 +63,7 @@ dwarf_bytesize (die)
   Dwarf_Attribute attr_mem;
   Dwarf_Word value;
 
-  return INTUSE(dwarf_formudata) (INTUSE(dwarf_attr) (die, DW_AT_byte_size,
-						      &attr_mem),
+  return INTUSE(dwarf_formudata) (INTUSE(dwarf_attr_integrate)
+				  (die, DW_AT_byte_size, &attr_mem),
 				  &value) == 0 ? (int) value : -1;
 }

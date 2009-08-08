@@ -1,5 +1,5 @@
 /* Return file name containing definition of the given function.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -63,8 +63,9 @@ dwarf_decl_file (Dwarf_Die *die)
   Dwarf_Attribute attr_mem;
   Dwarf_Sword idx = 0;
 
-  if (INTUSE(dwarf_formsdata) (INTUSE(dwarf_attr) (die, DW_AT_decl_file,
-						   &attr_mem), &idx) != 0)
+  if (INTUSE(dwarf_formsdata) (INTUSE(dwarf_attr_integrate)
+			       (die, DW_AT_decl_file, &attr_mem),
+			       &idx) != 0)
     return NULL;
 
   /* Zero means no source file information available.  */

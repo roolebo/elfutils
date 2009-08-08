@@ -1,3 +1,13 @@
+2009-08-07  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_arrayorder.c: Use dwarf_attr_integrate.
+	* dwarf_srclang.c: Likewise.
+	* dwarf_decl_file.c: Likewise.
+	* dwarf_decl_line.c (__libdw_attr_intval): Likewise.
+	* dwarf_bytesize.c: Likewise.
+	* dwarf_bitsize.c: Likewise.
+	* dwarf_bitoffset.c: Likewise.
+
 2009-07-22  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_frame_cfa.c: Change calling convention.

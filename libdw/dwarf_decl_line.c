@@ -1,5 +1,5 @@
 /* Get line number of beginning of given function.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -71,8 +71,9 @@ __libdw_attr_intval (Dwarf_Die *die, int *linep, int attval)
   Dwarf_Attribute attr_mem;
   Dwarf_Sword line;
 
-  int res = INTUSE(dwarf_formsdata) (INTUSE(dwarf_attr) (die, attval,
-							 &attr_mem), &line);
+  int res = INTUSE(dwarf_formsdata) (INTUSE(dwarf_attr_integrate)
+				     (die, attval, &attr_mem),
+				     &line);
   if (res == 0)
     {
       assert (line >= 0 && line <= INT_MAX);

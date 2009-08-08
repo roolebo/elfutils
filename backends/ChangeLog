@@ -1,3 +1,8 @@
+2009-08-07  Roland McGrath  <roland@redhat.com>
+
+	* x86_64_reloc.def: Add PC64, GOTOFF64, GOTPC32, GOTPC32_TLSDESC,
+	TLSDESC_CALL, TLSDESC.
+
 2009-07-08  Roland McGrath  <roland@redhat.com>
 
 	* x86_64_cfi.c (x86_64_abi_cfi): New file.

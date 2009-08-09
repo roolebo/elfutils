@@ -67,3 +67,5 @@ dwarf_arrayorder (die)
 				  (die, DW_AT_ordering, &attr_mem),
 				  &value) == 0 ? (int) value : -1;
 }
+OLD_VERSION (dwarf_arrayorder, ELFUTILS_0.122)
+NEW_VERSION (dwarf_arrayorder, ELFUTILS_0.143)

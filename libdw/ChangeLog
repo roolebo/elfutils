@@ -1,3 +1,17 @@
+2009-08-09  Roland McGrath  <roland@redhat.com>
+
+	* libdw.map (ELFUTILS_0.143): New version set,
+	inherits from ELFUTILS_0.142.
+	* dwarf_arrayorder.c: Use OLD_VERSION and NEW_VERSION to define an
+	alias in the ELFUTILS_0.122 version set and the default in the new set.
+	* dwarf_srclang.c: Likewise.
+	* dwarf_decl_file.c: Likewise.
+	* dwarf_decl_line.c: Likewise.
+	* dwarf_decl_column.c: Likewise.
+	* dwarf_bytesize.c: Likewise.
+	* dwarf_bitsize.c: Likewise.
+	* dwarf_bitoffset.c: Likewise.
+
 2009-08-07  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_arrayorder.c: Use dwarf_attr_integrate.

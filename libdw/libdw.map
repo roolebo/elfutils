@@ -209,3 +209,19 @@ ELFUTILS_0.142 {
     dwfl_module_dwarf_cfi;
     dwfl_module_eh_cfi;
 } ELFUTILS_0.138;
+
+ELFUTILS_0.143 {
+  global:
+    # Replaced ELFUTILS_0.122 versions.  Both versions point to the
+    # same implementation, but users of the new symbol version can
+    # presume that they use dwarf_attr_integrate properly.
+    dwarf_arrayorder;
+    dwarf_bitoffset;
+    dwarf_bitsize;
+    dwarf_bytesize;
+    dwarf_decl_column;
+    dwarf_decl_file;
+    dwarf_decl_line;
+    dwarf_srclang;
+
+} ELFUTILS_0.142;

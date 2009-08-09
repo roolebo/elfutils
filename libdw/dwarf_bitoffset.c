@@ -67,3 +67,5 @@ dwarf_bitoffset (die)
 				  (die, DW_AT_bit_offset, &attr_mem),
 				  &value) == 0 ? (int) value : -1;
 }
+OLD_VERSION (dwarf_bitoffset, ELFUTILS_0.122)
+NEW_VERSION (dwarf_bitoffset, ELFUTILS_0.143)

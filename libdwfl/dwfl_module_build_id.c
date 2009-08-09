@@ -150,8 +150,8 @@ __libdwfl_find_build_id (Dwfl_Module *mod, bool set, Elf *elf)
 }
 
 int
-__dwfl_module_build_id (Dwfl_Module *mod,
-			const unsigned char **bits, GElf_Addr *vaddr)
+dwfl_module_build_id (Dwfl_Module *mod,
+		      const unsigned char **bits, GElf_Addr *vaddr)
 {
   if (mod == NULL)
     return -1;
@@ -174,24 +174,20 @@ __dwfl_module_build_id (Dwfl_Module *mod,
   *vaddr = mod->build_id_vaddr;
   return mod->build_id_len;
 }
+INTDEF (dwfl_module_build_id)
+NEW_VERSION (dwfl_module_build_id, ELFUTILS_0.138)
+
 #ifdef SHARED
-extern __typeof__ (dwfl_module_build_id) INTUSE(dwfl_module_build_id)
-     __attribute__ ((alias ("__dwfl_module_build_id")));
-asm (".symver "
-     "__dwfl_module_build_id, dwfl_module_build_id@@ELFUTILS_0.138");
+COMPAT_VERSION (dwfl_module_build_id, ELFUTILS_0.130, vaddr_at_end)
 
 int
-_BUG_COMPAT_dwfl_module_build_id (Dwfl_Module *mod,
-				  const unsigned char **bits, GElf_Addr *vaddr)
+_compat_vaddr_at_end_dwfl_module_build_id (Dwfl_Module *mod,
+					   const unsigned char **bits,
+					   GElf_Addr *vaddr)
 {
   int result = INTUSE(dwfl_module_build_id) (mod, bits, vaddr);
   if (result > 0)
     *vaddr += (result + 3) & -4;
   return result;
 }
-asm (".symver "
-     "_BUG_COMPAT_dwfl_module_build_id, dwfl_module_build_id@ELFUTILS_0.130");
-#else
-extern __typeof__ (dwfl_module_build_id) dwfl_module_build_id
-     __attribute__ ((alias ("__dwfl_module_build_id")));
 #endif

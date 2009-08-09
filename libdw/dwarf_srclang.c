@@ -67,3 +67,5 @@ dwarf_srclang (die)
 				  (die, DW_AT_language, &attr_mem),
 				  &value) == 0 ? (int) value : -1;
 }
+OLD_VERSION (dwarf_srclang, ELFUTILS_0.122)
+NEW_VERSION (dwarf_srclang, ELFUTILS_0.143)

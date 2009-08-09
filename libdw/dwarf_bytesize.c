@@ -67,3 +67,5 @@ dwarf_bytesize (die)
 				  (die, DW_AT_byte_size, &attr_mem),
 				  &value) == 0 ? (int) value : -1;
 }
+OLD_VERSION (dwarf_bytesize, ELFUTILS_0.122)
+NEW_VERSION (dwarf_bytesize, ELFUTILS_0.143)

@@ -1,5 +1,5 @@
 /* Get column number of beginning of given declaration.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005-2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -61,3 +61,5 @@ dwarf_decl_column (Dwarf_Die *decl, int *colp)
 {
   return __libdw_attr_intval (decl, colp, DW_AT_decl_column);
 }
+OLD_VERSION (dwarf_decl_column, ELFUTILS_0.122)
+NEW_VERSION (dwarf_decl_column, ELFUTILS_0.143)

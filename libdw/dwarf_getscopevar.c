@@ -1,5 +1,5 @@
 /* Find a named variable or parameter within given scopes.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005-2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -129,9 +129,7 @@ dwarf_getscopevar (Dwarf_Die *scopes, int nscopes,
 	      }
 
 	    /* Only get here for a variable or parameter.  Check the name.  */
-	    Dwarf_Attribute attr_mem;
-	    const char *diename = INTUSE(dwarf_formstring)
-	      (INTUSE(dwarf_attr_integrate) (result, DW_AT_name, &attr_mem));
+	    const char *diename = INTUSE(dwarf_diename) (result);
 	    if (diename != NULL && !strcmp (name, diename))
 	      {
 		/* We have a matching name.  */

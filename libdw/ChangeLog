@@ -1,3 +1,7 @@
+2009-08-10  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_getscopevar.c: Use dwarf_diename.
+
 2009-08-09  Roland McGrath  <roland@redhat.com>
 
 	* libdw.map (ELFUTILS_0.143): New version set,

@@ -114,7 +114,7 @@ libelf_so_SOURCES =
 libelf.so: libelf_pic.a libelf.map
 	$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
 		-Wl,--version-script,$(srcdir)/libelf.map,--no-undefined \
-		-Wl,--soname,$@.$(VERSION),-z,-defs,-z,relro $(libelf_so_LDLIBS)
+		-Wl,--soname,$@.$(VERSION),-z,defs,-z,relro $(libelf_so_LDLIBS)
 	if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
 	ln -fs $@ $@.$(VERSION)
 

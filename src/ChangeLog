@@ -1,3 +1,8 @@
+2009-08-21  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (attr_callback): Use print_block only when we don't use
+	print_ops.
+
 2009-08-14  Roland McGrath  <roland@redhat.com>
 
 	* ar.c (do_oper_extract): Use pathconf instead of statfs.

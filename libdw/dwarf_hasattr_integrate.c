@@ -68,6 +68,8 @@ dwarf_hasattr_integrate (Dwarf_Die *die, unsigned int search_name)
       Dwarf_Attribute *attr = INTUSE(dwarf_attr) (die, DW_AT_abstract_origin,
 						  &attr_mem);
       if (attr == NULL)
+	attr = INTUSE(dwarf_attr) (die, DW_AT_specification, &attr_mem);
+      if (attr == NULL)
 	break;
 
       die = INTUSE(dwarf_formref_die) (attr, &die_mem);

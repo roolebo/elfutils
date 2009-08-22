@@ -1,3 +1,7 @@
+2009-08-21  Josh Stone  <jistone@redhat.com>
+
+	* dwarf_hasattr_integrate.c: Integrate DW_AT_specification too.
+
 2009-08-10  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_getscopevar.c: Use dwarf_diename.

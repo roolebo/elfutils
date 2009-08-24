@@ -3065,14 +3065,12 @@ print_attributes (Ebl *ebl, const GElf_Ehdr *ehdr)
 
 static char *
 format_dwarf_addr (Dwfl_Module *dwflmod,
-		   int address_size, Dwarf_Addr address, bool tls)
+		   int address_size, Dwarf_Addr address)
 {
   /* See if there is a name we can give for this address.  */
   GElf_Sym sym;
   const char *name = print_address_names
-    ? ((tls ? dwfl_module_addrsym_tls : dwfl_module_addrsym)
-       (dwflmod, address, &sym, NULL))
-    : NULL;
+    ? dwfl_module_addrsym (dwflmod, address, &sym, NULL) : NULL;
   if (name != NULL)
     sym.st_value = address - sym.st_value;
 
@@ -3934,10 +3932,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 
 	  if (op == DW_OP_addr)
 	    {
-	      char *a = format_dwarf_addr
-		(dwflmod, 0, addr,
-		 len > 0 && (*data == DW_OP_GNU_push_tls_address
-			     || *data == DW_OP_form_tls_address));
+	      char *a = format_dwarf_addr (dwflmod, 0, addr);
 	      printf ("%*s[%4" PRIuMAX "] %s %s\n",
 		      indent, "", (uintmax_t) offset, known[op], a);
 	      free (a);
@@ -4327,7 +4322,7 @@ print_debug_ranges_section (Dwfl_Module *dwflmod,
 
       if (begin == (Dwarf_Addr) -1l) /* Base address entry.  */
 	{
-	  char *b = format_dwarf_addr (dwflmod, address_size, end, false);
+	  char *b = format_dwarf_addr (dwflmod, address_size, end);
 	  printf (gettext (" [%6tx]  base address %s\n"), offset, b);
 	  free (b);
 	}
@@ -4335,8 +4330,8 @@ print_debug_ranges_section (Dwfl_Module *dwflmod,
 	first = true;
       else
 	{
-	  char *b = format_dwarf_addr (dwflmod, address_size, begin, false);
-	  char *e = format_dwarf_addr (dwflmod, address_size, end, false);
+	  char *b = format_dwarf_addr (dwflmod, address_size, begin);
+	  char *e = format_dwarf_addr (dwflmod, address_size, end);
 	  /* We have an address range entry.  */
 	  if (first)		/* First address range entry in a list.  */
 	    printf (gettext (" [%6tx]  %s..%s\n"), offset, b, e);
@@ -5125,8 +5120,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 		   dwarf_errmsg (-1));
 	    return DWARF_CB_ABORT;
 	  }
-	char *a = format_dwarf_addr (cbargs->dwflmod, cbargs->addrsize,
-				     addr, false);
+	char *a = format_dwarf_addr (cbargs->dwflmod, cbargs->addrsize, addr);
 	printf ("           %*s%-20s %s\n",
 		(int) (level * 2), "", dwarf_attr_string (attr), a);
 	free (a);
@@ -5663,7 +5657,7 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl,
 	      line += line_increment;
 	      address += address_increment;
 
-	      char *a = format_dwarf_addr (dwflmod, 0, address, false);
+	      char *a = format_dwarf_addr (dwflmod, 0, address);
 	      printf (gettext ("\
  special opcode %u: address+%u = %s, line%+d = %zu\n"),
 		      opcode, address_increment, a, line_increment, line);
@@ -5703,7 +5697,7 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl,
 		  else
 		    address = read_8ubyte_unaligned_inc (dbg, linep);
 		  {
-		    char *a = format_dwarf_addr (dwflmod, 0, address, false);
+		    char *a = format_dwarf_addr (dwflmod, 0, address);
 		    printf (gettext ("set address to %s\n"), a);
 		    free (a);
 		  }
@@ -5755,7 +5749,7 @@ define new file: dir=%u, mtime=%" PRIu64 ", length=%" PRIu64 ", name=%s\n"),
 		  get_uleb128 (u128, linep);
 		  address += minimum_instr_len * u128;
 		  {
-		    char *a = format_dwarf_addr (dwflmod, 0, address, false);
+		    char *a = format_dwarf_addr (dwflmod, 0, address);
 		    printf (gettext ("advance address by %u to %s\n"),
 			    u128, a);
 		    free (a);
@@ -5807,7 +5801,7 @@ define new file: dir=%u, mtime=%" PRIu64 ", length=%" PRIu64 ", name=%s\n"),
 			  * ((255 - opcode_base) / line_range));
 		  address += u128;
 		  {
-		    char *a = format_dwarf_addr (dwflmod, 0, address, false);
+		    char *a = format_dwarf_addr (dwflmod, 0, address);
 		    printf (gettext ("advance address by constant %u to %s\n"),
 			    u128, a);
 		    free (a);
@@ -5823,7 +5817,7 @@ define new file: dir=%u, mtime=%" PRIu64 ", length=%" PRIu64 ", name=%s\n"),
 		  u128 = read_2ubyte_unaligned_inc (dbg, linep);
 		  address += u128;
 		  {
-		    char *a = format_dwarf_addr (dwflmod, 0, address, false);
+		    char *a = format_dwarf_addr (dwflmod, 0, address);
 		    printf (gettext ("\
 advance address by fixed value %u to %s\n"),
 			    u128, a);
@@ -5919,7 +5913,7 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
 
       if (begin == (Dwarf_Addr) -1l) /* Base address entry.  */
 	{
-	  char *b = format_dwarf_addr (dwflmod, address_size, end, false);
+	  char *b = format_dwarf_addr (dwflmod, address_size, end);
 	  printf (gettext (" [%6tx]  base address %s\n"), offset, b);
 	  free (b);
 	}
@@ -5930,8 +5924,8 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
 	  /* We have a location expression entry.  */
 	  uint_fast16_t len = read_2ubyte_unaligned_inc (dbg, readp);
 
-	  char *b = format_dwarf_addr (dwflmod, address_size, begin, false);
-	  char *e = format_dwarf_addr (dwflmod, address_size, end, false);
+	  char *b = format_dwarf_addr (dwflmod, address_size, begin);
+	  char *e = format_dwarf_addr (dwflmod, address_size, end);
 
 	  if (first)		/* First entry in a list.  */
 	    printf (gettext (" [%6tx]  %s..%s"), offset, b, e);

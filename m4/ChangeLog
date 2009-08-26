@@ -1,3 +1,7 @@
+2009-08-26  Roland McGrath  <roland@redhat.com>
+
+	* zip.m4 (eu_ZIPLIB): Don't apply lib/LIB suffix to args.
+
 2009-02-01  Roland McGrath  <roland@redhat.com>
 
 	* zip.m4: Fix --with/--without argument handling.

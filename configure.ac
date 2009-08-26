@@ -203,8 +203,9 @@ dnl Test for zlib and bzlib, gives ZLIB/BZLIB .am
 dnl conditional and config.h USE_ZLIB/USE_BZLIB #define.
 save_LIBS="$LIBS"
 LIBS=
-eu_ZIPLIB(z,Z,z,gzdirect,gzip)
-eu_ZIPLIB(bz,BZ,bz2,BZ2_bzdopen,bzip2)
+eu_ZIPLIB(zlib,ZLIB,z,gzdirect,gzip)
+eu_ZIPLIB(bzlib,BZLIB,bz2,BZ2_bzdopen,bzip2)
+eu_ZIPLIB(lzma,LZMA,lzma,lzma_auto_decoder,[LZMA (xz)])
 zip_LIBS="$LIBS"
 LIBS="$save_LIBS"
 AC_SUBST([zip_LIBS])

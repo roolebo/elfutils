@@ -1,5 +1,12 @@
 2009-08-26  Roland McGrath  <roland@redhat.com>
 
+	* open.c [USE_LZMA]: Try __libdw_unlzma.
+	* libdwflP.h: Declare it.
+	(DWFL_ERRORS): Add DWFL_E_LZMA.
+	* gzip.c [LZMA]: Implement liblzma version for XZ file format.
+	* lzma.c: New file.
+	* Makefile.am [LZMA] (libdwfl_a_SOURCES): Add it.
+
 	* gzip.c (mapped_zImage): Limit scan to 32kb.
 	Make this unconditional, support bzip2 kernel images too.
 	(unzip): Use direct inflate method for non-mmap case too.

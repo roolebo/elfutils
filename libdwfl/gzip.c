@@ -52,7 +52,19 @@
 
 #include <unistd.h>
 
-#ifdef BZLIB
+#ifdef LZMA
+# define USE_INFLATE	1
+# include <lzma.h>
+# define unzip		__libdw_unlzma
+# define DWFL_E_ZLIB	DWFL_E_LZMA
+# define MAGIC		"\xFD" "7zXZ\0"
+# define Z(what)	LZMA_##what
+# define LZMA_ERRNO	LZMA_PROG_ERROR
+# define z_stream	lzma_stream
+# define inflateInit(z)	lzma_auto_decoder (z, 1 << 30, 0)
+# define do_inflate(z)	lzma_code (z, LZMA_RUN)
+# define inflateEnd(z)	lzma_end (z)
+#elif defined BZLIB
 # define USE_INFLATE	1
 # include <bzlib.h>
 # define unzip		__libdw_bunzip2
@@ -62,13 +74,8 @@
 # define BZ_ERRNO	BZ_IO_ERROR
 # define z_stream	bz_stream
 # define inflateInit(z)	BZ2_bzDecompressInit (z, 0, 0)
-# define inflate(z, f)	BZ2_bzDecompress (z)
+# define do_inflate(z)	BZ2_bzDecompress (z)
 # define inflateEnd(z)	BZ2_bzDecompressEnd (z)
-# define gzFile		BZFILE *
-# define gzdopen	BZ2_bzdopen
-# define gzread		BZ2_bzread
-# define gzclose	BZ2_bzclose
-# define gzerror	BZ2_bzerror
 #else
 # define USE_INFLATE	0
 # define crc32		loser_crc32
@@ -136,7 +143,7 @@ unzip (int fd, off64_t start_offset,
   }
   inline void smaller_buffer (size_t end)
   {
-    buffer = realloc (buffer, end) ?: buffer;
+    buffer = realloc (buffer, end) ?: end == 0 ? NULL : buffer;
     size = end;
   }
 
@@ -192,7 +199,10 @@ unzip (int fd, off64_t start_offset,
   z_stream z = { .next_in = mapped, .avail_in = mapped_size };
   int result = inflateInit (&z);
   if (result != Z (OK))
-    return zlib_fail (result);
+    {
+      inflateEnd (&z);
+      return zlib_fail (result);
+    }
 
   do
     {
@@ -200,7 +210,10 @@ unzip (int fd, off64_t start_offset,
 	{
 	  ssize_t n = pread_retry (fd, input_buffer, READ_SIZE, input_pos);
 	  if (unlikely (n < 0))
-	    return zlib_fail (Z (IO_ERROR));
+	    {
+	      inflateEnd (&z);
+	      return zlib_fail (Z (ERRNO));
+	    }
 	  z.next_in = input_buffer;
 	  z.avail_in = n;
 	  input_pos += n;
@@ -217,7 +230,7 @@ unzip (int fd, off64_t start_offset,
 	  z.avail_out = size - pos;
 	}
     }
-  while ((result = inflate (&z, Z_SYNC_FLUSH)) == Z (OK));
+  while ((result = do_inflate (&z)) == Z (OK));
 
 #ifdef BZLIB
   uint64_t total_out = (((uint64_t) z.total_out_hi32 << 32)

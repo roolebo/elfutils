@@ -82,6 +82,9 @@ endif
 if BZLIB
 libdwfl_a_SOURCES += bzip2.c
 endif
+if LZMA
+libdwfl_a_SOURCES += lzma.c
+endif
 
 if MUDFLAP
 libdwfl = libdwfl.a $(libdw) $(libebl) $(libelf) $(libeu)

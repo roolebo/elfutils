@@ -61,6 +61,10 @@
 # define __libdw_bunzip2(...)	false
 #endif
 
+#if !USE_LZMA
+# define __libdw_unlzma(...)	false
+#endif
+
 /* Always consumes *ELF, never consumes FD.
    Replaces *ELF on success.  */
 static Dwfl_Error
@@ -70,7 +74,7 @@ decompress (int fd __attribute__ ((unused)), Elf **elf)
   void *buffer = NULL;
   size_t size = 0;
 
-#if USE_ZLIB || USE_BZLIB
+#if USE_ZLIB || USE_BZLIB || USE_LZMA
   const off64_t offset = (*elf)->start_offset;
   void *const mapped = ((*elf)->map_address == NULL ? NULL
 			: (*elf)->map_address + (*elf)->start_offset);
@@ -81,6 +85,8 @@ decompress (int fd __attribute__ ((unused)), Elf **elf)
   error = __libdw_gunzip (fd, offset, mapped, mapped_size, &buffer, &size);
   if (error == DWFL_E_BADELF)
     error = __libdw_bunzip2 (fd, offset, mapped, mapped_size, &buffer, &size);
+  if (error == DWFL_E_BADELF)
+    error = __libdw_unlzma (fd, offset, mapped, mapped_size, &buffer, &size);
 #endif
 
   elf_end (*elf);

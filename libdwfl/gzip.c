@@ -53,7 +53,6 @@
 
 #ifdef BZLIB
 # define inflate_groks_header	true
-# define mapped_zImage(...)	false
 # include <bzlib.h>
 # define unzip		__libdw_bunzip2
 # define DWFL_E_ZLIB	DWFL_E_BZLIB
@@ -74,13 +73,15 @@
 # define unzip		__libdw_gunzip
 # define MAGIC		"\037\213"
 # define Z(what)	Z_##what
+#endif
 
 /* We can also handle Linux kernel zImage format in a very hackish way.
-   If it looks like one, we actually just scan the image for the gzip
-   magic bytes to figure out where the gzip image starts.  */
+   If it looks like one, we actually just scan the image for the right
+   magic bytes to figure out where the compressed image starts.  */
 
-# define LINUX_MAGIC_OFFSET	514
-# define LINUX_MAGIC		"HdrS"
+#define LINUX_MAGIC_OFFSET	514
+#define LINUX_MAGIC		"HdrS"
+#define LINUX_MAX_SCAN		32768
 
 static bool
 mapped_zImage (off64_t *start_offset, void **mapped, size_t *mapped_size)
@@ -90,8 +91,10 @@ mapped_zImage (off64_t *start_offset, void **mapped, size_t *mapped_size)
       && !memcmp (*mapped + LINUX_MAGIC_OFFSET,
 		  LINUX_MAGIC, sizeof LINUX_MAGIC - 1))
     {
-      void *p = memmem (*mapped + pos, *mapped_size - pos,
-			MAGIC, sizeof MAGIC - 1);
+      size_t scan = *mapped_size - pos;
+      if (scan > LINUX_MAX_SCAN)
+	scan = LINUX_MAX_SCAN;
+      void *p = memmem (*mapped + pos, scan, MAGIC, sizeof MAGIC - 1);
       if (p != NULL)
 	{
 	  *start_offset += p - *mapped;
@@ -102,7 +105,6 @@ mapped_zImage (off64_t *start_offset, void **mapped, size_t *mapped_size)
     }
   return false;
 }
-#endif
 
 /* If this is not a compressed image, return DWFL_E_BADELF.
    If we uncompressed it into *WHOLE, *WHOLE_SIZE, return DWFL_E_NOERROR.

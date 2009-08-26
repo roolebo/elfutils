@@ -1,3 +1,8 @@
+2009-08-26  Roland McGrath  <roland@redhat.com>
+
+	* gzip.c (mapped_zImage): Limit scan to 32kb.
+	Make this unconditional, support bzip2 kernel images too.
+
 2009-08-09  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_module_build_id.c: Use new macros for versioned definitions.

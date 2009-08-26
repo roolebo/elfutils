@@ -1,5 +1,10 @@
 2009-08-26  Roland McGrath  <roland@redhat.com>
 
+	* gzip.c (find_zImage_payload): New function, broken out of ...
+	(mapped_zImage): ... here.  Call it.
+	(find_zImage_payload) [LZMA]: Match LZMA-compressed kernels with
+	stupid method of just trying the decoder.
+
 	* open.c [USE_LZMA]: Try __libdw_unlzma.
 	* libdwflP.h: Declare it.
 	(DWFL_ERRORS): Add DWFL_E_LZMA.

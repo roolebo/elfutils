@@ -93,6 +93,34 @@
 #define LINUX_MAGIC		"HdrS"
 #define LINUX_MAX_SCAN		32768
 
+static void *
+find_zImage_payload (void *buffer, size_t size)
+{
+  void *p = memmem (buffer, size, MAGIC, sizeof MAGIC - 1);
+#ifdef LZMA
+  /* The raw LZMA format doesn't have any helpful header magic bytes to
+     match.  So instead we just consider any byte that could possibly be
+     the start of an LZMA header, and try feeding the input to the decoder
+     to see if it likes the data.  */
+  if (p == NULL)
+    for (; size > 0; ++buffer, --size)
+      if (*(uint8_t *) buffer < (9 * 5 * 5))
+	{
+	  uint8_t dummy[512];
+	  lzma_stream z = { .next_in = buffer, .avail_in = size,
+			    .next_out = dummy, .avail_out = sizeof dummy };
+	  int result = lzma_alone_decoder (&z, 1 << 30);
+	  if (result != LZMA_OK)
+	    break;
+	  result = lzma_code (&z, LZMA_RUN);
+	  lzma_end (&z);
+	  if (result == LZMA_OK)
+	    return buffer;
+	}
+#endif
+  return p;
+}
+
 static bool
 mapped_zImage (off64_t *start_offset, void **mapped, size_t *mapped_size)
 {
@@ -104,7 +132,7 @@ mapped_zImage (off64_t *start_offset, void **mapped, size_t *mapped_size)
       size_t scan = *mapped_size - pos;
       if (scan > LINUX_MAX_SCAN)
 	scan = LINUX_MAX_SCAN;
-      void *p = memmem (*mapped + pos, scan, MAGIC, sizeof MAGIC - 1);
+      void *p = find_zImage_payload (*mapped + pos, scan);
       if (p != NULL)
 	{
 	  *start_offset += p - *mapped;

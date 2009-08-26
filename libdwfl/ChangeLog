@@ -2,6 +2,8 @@
 
 	* gzip.c (mapped_zImage): Limit scan to 32kb.
 	Make this unconditional, support bzip2 kernel images too.
+	(unzip): Use direct inflate method for non-mmap case too.
+	Only zlib uses the stream method.
 
 2009-08-09  Roland McGrath  <roland@redhat.com>
 

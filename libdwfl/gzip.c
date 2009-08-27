@@ -57,7 +57,8 @@
 # include <lzma.h>
 # define unzip		__libdw_unlzma
 # define DWFL_E_ZLIB	DWFL_E_LZMA
-# define MAGIC		"\xFD" "7zXZ\0"
+# define MAGIC		"\xFD" "7zXZ\0" /* XZ file format.  */
+# define MAGIC2		"\x5d\0"	/* Raw LZMA format.  */
 # define Z(what)	LZMA_##what
 # define LZMA_ERRNO	LZMA_PROG_ERROR
 # define z_stream	lzma_stream
@@ -85,70 +86,14 @@
 # define Z(what)	Z_##what
 #endif
 
-/* We can also handle Linux kernel zImage format in a very hackish way.
-   If it looks like one, we actually just scan the image for the right
-   magic bytes to figure out where the compressed image starts.  */
-
-#define LINUX_MAGIC_OFFSET	514
-#define LINUX_MAGIC		"HdrS"
-#define LINUX_MAX_SCAN		32768
-
-static void *
-find_zImage_payload (void *buffer, size_t size)
-{
-  void *p = memmem (buffer, size, MAGIC, sizeof MAGIC - 1);
-#ifdef LZMA
-  /* The raw LZMA format doesn't have any helpful header magic bytes to
-     match.  So instead we just consider any byte that could possibly be
-     the start of an LZMA header, and try feeding the input to the decoder
-     to see if it likes the data.  */
-  if (p == NULL)
-    for (; size > 0; ++buffer, --size)
-      if (*(uint8_t *) buffer < (9 * 5 * 5))
-	{
-	  uint8_t dummy[512];
-	  lzma_stream z = { .next_in = buffer, .avail_in = size,
-			    .next_out = dummy, .avail_out = sizeof dummy };
-	  int result = lzma_alone_decoder (&z, 1 << 30);
-	  if (result != LZMA_OK)
-	    break;
-	  result = lzma_code (&z, LZMA_RUN);
-	  lzma_end (&z);
-	  if (result == LZMA_OK)
-	    return buffer;
-	}
-#endif
-  return p;
-}
-
-static bool
-mapped_zImage (off64_t *start_offset, void **mapped, size_t *mapped_size)
-{
-  const size_t pos = LINUX_MAGIC_OFFSET + sizeof LINUX_MAGIC;
-  if (*mapped_size > pos
-      && !memcmp (*mapped + LINUX_MAGIC_OFFSET,
-		  LINUX_MAGIC, sizeof LINUX_MAGIC - 1))
-    {
-      size_t scan = *mapped_size - pos;
-      if (scan > LINUX_MAX_SCAN)
-	scan = LINUX_MAX_SCAN;
-      void *p = find_zImage_payload (*mapped + pos, scan);
-      if (p != NULL)
-	{
-	  *start_offset += p - *mapped;
-	  *mapped_size = *mapped + *mapped_size - p,
-	  *mapped = p;
-	  return true;
-	}
-    }
-  return false;
-}
-
 #define READ_SIZE		(1 << 20)
 
 /* If this is not a compressed image, return DWFL_E_BADELF.
    If we uncompressed it into *WHOLE, *WHOLE_SIZE, return DWFL_E_NOERROR.
-   Otherwise return an error for bad compressed data or I/O failure.  */
+   Otherwise return an error for bad compressed data or I/O failure.
+   If we return an error after reading the first part of the file,
+   leave that portion malloc'd in *WHOLE, *WHOLE_SIZE.  If *WHOLE
+   is not null on entry, we'll use it in lieu of repeating a read.  */
 
 Dwfl_Error internal_function
 unzip (int fd, off64_t start_offset,
@@ -176,45 +121,66 @@ unzip (int fd, off64_t start_offset,
   }
 
   void *input_buffer = NULL;
-  off_t input_pos;
+  off_t input_pos = 0;
+
+  inline Dwfl_Error fail (Dwfl_Error failure)
+  {
+    if (input_pos == (off_t) mapped_size)
+      *whole = input_buffer;
+    else
+      {
+	free (input_buffer);
+	*whole = NULL;
+      }
+    free (buffer);
+    return failure;
+  }
 
   inline Dwfl_Error zlib_fail (int result)
   {
-    Dwfl_Error failure = DWFL_E_ZLIB;
     switch (result)
       {
       case Z (MEM_ERROR):
-	failure = DWFL_E_NOMEM;
-	break;
+	return fail (DWFL_E_NOMEM);
       case Z (ERRNO):
-	failure = DWFL_E_ERRNO;
-	break;
+	return fail (DWFL_E_ERRNO);
+      default:
+	return fail (DWFL_E_ZLIB);
       }
-    free (buffer);
-    free (input_buffer);
-    *whole = NULL;
-    return failure;
   }
 
   if (mapped == NULL)
     {
-      input_buffer = malloc (READ_SIZE);
-      if (unlikely (input_buffer == NULL))
-	return DWFL_E_NOMEM;
+      if (*whole == NULL)
+	{
+	  input_buffer = malloc (READ_SIZE);
+	  if (unlikely (input_buffer == NULL))
+	    return DWFL_E_NOMEM;
 
-      ssize_t n = pread_retry (fd, input_buffer, READ_SIZE, 0);
-      if (unlikely (n < 0))
-	return zlib_fail (Z (ERRNO));
+	  ssize_t n = pread_retry (fd, input_buffer, READ_SIZE, start_offset);
+	  if (unlikely (n < 0))
+	    return zlib_fail (Z (ERRNO));
 
-      input_pos = n;
-      mapped = input_buffer;
-      mapped_size = n;
+	  input_pos = n;
+	  mapped = input_buffer;
+	  mapped_size = n;
+	}
+      else
+	{
+	  input_buffer = *whole;
+	  input_pos = mapped_size = *whole_size;
+	}
     }
 
+#define NOMAGIC(magic) \
+  (mapped_size <= sizeof magic || memcmp (mapped, magic, sizeof magic - 1))
+
   /* First, look at the header.  */
-  if ((mapped_size <= sizeof MAGIC
-       || memcmp (mapped, MAGIC, sizeof MAGIC - 1))
-      && !mapped_zImage (&start_offset, &mapped, &mapped_size))
+  if (NOMAGIC (MAGIC)
+#ifdef MAGIC2
+      && NOMAGIC (MAGIC2)
+#endif
+      )
     /* Not a compressed file.  */
     return DWFL_E_BADELF;
 
@@ -236,7 +202,8 @@ unzip (int fd, off64_t start_offset,
     {
       if (z.avail_in == 0 && input_buffer != NULL)
 	{
-	  ssize_t n = pread_retry (fd, input_buffer, READ_SIZE, input_pos);
+	  ssize_t n = pread_retry (fd, input_buffer, READ_SIZE,
+				   start_offset + input_pos);
 	  if (unlikely (n < 0))
 	    {
 	      inflateEnd (&z);
@@ -308,37 +275,12 @@ unzip (int fd, off64_t start_offset,
 
   if (result == DWFL_E_NOERROR && gzdirect (zf))
     {
-      bool found = false;
-      char buf[sizeof LINUX_MAGIC - 1];
-      gzseek (zf, start_offset + LINUX_MAGIC_OFFSET, SEEK_SET);
-      int n = gzread (zf, buf, sizeof buf);
-      if (n == sizeof buf
-	  && !memcmp (buf, LINUX_MAGIC, sizeof LINUX_MAGIC - 1))
-	while (gzread (zf, buf, sizeof MAGIC - 1) == sizeof MAGIC - 1)
-	  if (!memcmp (buf, MAGIC, sizeof MAGIC - 1))
-	    {
-	      start_offset = gztell (zf) - (sizeof MAGIC - 1);
-	      found = true;
-	      break;
-	    }
-	  else if (gztell (zf) > LINUX_MAX_SCAN)
-	    break;
       gzclose (zf);
-      if (found)
-	{
-	  result = open_stream ();
-	  if (result == DWFL_E_NOERROR && unlikely (gzdirect (zf)))
-	    {
-	      gzclose (zf);
-	      result = DWFL_E_BADELF;
-	    }
-	}
-      else
-	result = DWFL_E_BADELF;
+      return fail (DWFL_E_BADELF);
     }
 
   if (result != DWFL_E_NOERROR)
-    return result;
+    return fail (result);
 
   ptrdiff_t pos = 0;
   while (1)
@@ -364,6 +306,8 @@ unzip (int fd, off64_t start_offset,
   gzclose (zf);
   smaller_buffer (pos);
 #endif
+
+  free (input_buffer);
 
   *whole = buffer;
   *whole_size = size;

@@ -65,8 +65,7 @@
 # define __libdw_unlzma(...)	false
 #endif
 
-/* Always consumes *ELF, never consumes FD.
-   Replaces *ELF on success.  */
+/* Consumes and replaces *ELF only on success.  */
 static Dwfl_Error
 decompress (int fd __attribute__ ((unused)), Elf **elf)
 {
@@ -77,7 +76,7 @@ decompress (int fd __attribute__ ((unused)), Elf **elf)
 #if USE_ZLIB || USE_BZLIB || USE_LZMA
   const off64_t offset = (*elf)->start_offset;
   void *const mapped = ((*elf)->map_address == NULL ? NULL
-			: (*elf)->map_address + (*elf)->start_offset);
+			: (*elf)->map_address + offset);
   const size_t mapped_size = (*elf)->maximum_size;
   if (mapped_size == 0)
     return error;
@@ -89,9 +88,6 @@ decompress (int fd __attribute__ ((unused)), Elf **elf)
     error = __libdw_unlzma (fd, offset, mapped, mapped_size, &buffer, &size);
 #endif
 
-  elf_end (*elf);
-  *elf = NULL;
-
   if (error == DWFL_E_NOERROR)
     {
       if (unlikely (size == 0))
@@ -101,17 +97,45 @@ decompress (int fd __attribute__ ((unused)), Elf **elf)
 	}
       else
 	{
-	  *elf = elf_memory (buffer, size);
-	  if (*elf == NULL)
+	  Elf *memelf = elf_memory (buffer, size);
+	  if (memelf == NULL)
 	    {
 	      error = DWFL_E_LIBELF;
 	      free (buffer);
 	    }
 	  else
-	    (*elf)->flags |= ELF_F_MALLOCED;
+	    {
+	      memelf->flags |= ELF_F_MALLOCED;
+	      elf_end (*elf);
+	      *elf = memelf;
+	    }
 	}
     }
+  else
+    free (buffer);
 
+  return error;
+}
+
+static Dwfl_Error
+what_kind (int fd, Elf **elfp, Elf_Kind *kind, bool *close_fd)
+{
+  Dwfl_Error error = DWFL_E_NOERROR;
+  *kind = elf_kind (*elfp);
+  if (unlikely (*kind == ELF_K_NONE))
+    {
+      if (unlikely (*elfp == NULL))
+	error = DWFL_E_LIBELF;
+      else
+	{
+	  error = decompress (fd, elfp);
+	  if (error == DWFL_E_NOERROR)
+	    {
+	      *close_fd = true;
+	      *kind = elf_kind (*elfp);
+	    }
+	}
+    }
   return error;
 }
 
@@ -119,21 +143,40 @@ Dwfl_Error internal_function
 __libdw_open_file (int *fdp, Elf **elfp, bool close_on_fail, bool archive_ok)
 {
   bool close_fd = false;
-  Dwfl_Error error = DWFL_E_NOERROR;
 
   Elf *elf = elf_begin (*fdp, ELF_C_READ_MMAP_PRIVATE, NULL);
-  Elf_Kind kind = elf_kind (elf);
-  if (unlikely (kind == ELF_K_NONE))
+
+  Elf_Kind kind;
+  Dwfl_Error error = what_kind (*fdp, &elf, &kind, &close_fd);
+  if (error == DWFL_E_BADELF)
     {
-      if (unlikely (elf == NULL))
-	error = DWFL_E_LIBELF;
-      else
+      /* It's not an ELF file or a compressed file.
+	 See if it's an image with a header preceding the real file.  */
+
+      off64_t offset = elf->start_offset;
+      error = __libdw_image_header (*fdp, &offset,
+				    (elf->map_address == NULL ? NULL
+				     : elf->map_address + offset),
+				    elf->maximum_size);
+      if (error == DWFL_E_NOERROR)
 	{
-	  error = decompress (*fdp, &elf);
-	  if (error == DWFL_E_NOERROR)
+	  /* Pure evil.  libelf needs some better interfaces.  */
+	  elf->kind = ELF_K_AR;
+	  elf->state.ar.elf_ar_hdr.ar_name = "libdwfl is faking you out";
+	  elf->state.ar.elf_ar_hdr.ar_size = elf->maximum_size - offset;
+	  elf->state.ar.offset = offset - sizeof (struct ar_hdr);
+	  Elf *subelf = elf_begin (-1, ELF_C_READ_MMAP_PRIVATE, elf);
+	  elf->kind = ELF_K_NONE;
+	  if (unlikely (subelf == NULL))
+	    error = DWFL_E_LIBELF;
+	  else
 	    {
-	      close_fd = true;
-	      kind = elf_kind (elf);
+	      subelf->parent = NULL;
+	      subelf->flags |= elf->flags & (ELF_F_MMAPPED | ELF_F_MALLOCED);
+	      elf->flags &= ~(ELF_F_MMAPPED | ELF_F_MALLOCED);
+	      elf_end (elf);
+	      elf = subelf;
+	      error = what_kind (*fdp, &elf, &kind, &close_fd);
 	    }
 	}
     }
@@ -141,10 +184,12 @@ __libdw_open_file (int *fdp, Elf **elfp, bool close_on_fail, bool archive_ok)
   if (error == DWFL_E_NOERROR
       && kind != ELF_K_ELF
       && !(archive_ok && kind == ELF_K_AR))
+    error = DWFL_E_BADELF;
+
+  if (error != DWFL_E_NOERROR)
     {
       elf_end (elf);
       elf = NULL;
-      error = DWFL_E_BADELF;
     }
 
   if (error == DWFL_E_NOERROR ? close_fd : close_on_fail)

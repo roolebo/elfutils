@@ -1,3 +1,17 @@
+2009-08-27  Roland McGrath  <roland@redhat.com>
+
+	* image-header.c: New file.
+	* Makefile.am (libdwfl_a_SOURCES): Add it.
+	* libdwflP.h: Declare __libdw_image_header.
+	* open.c (decompress): Don't consume ELF on failure.
+	(what_kind): New function, broken out of ...
+	(__libdw_open_file): ... here.  Call it.
+	If it fails, try __libdw_image_header and then try what_kind again.
+
+	* gzip.c (unzip): Reuse *WHOLE as first INPUT_BUFFER,
+	leave it behind for next decompressor.
+	* open.c (decompress): Free BUFFER on failure.
+
 2009-08-26  Roland McGrath  <roland@redhat.com>
 
 	* gzip.c (find_zImage_payload): New function, broken out of ...

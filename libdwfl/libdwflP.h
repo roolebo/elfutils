@@ -344,6 +344,11 @@ extern Dwfl_Error __libdw_unlzma (int fd, off64_t start_offset,
 				  void **whole, size_t *whole_size)
   internal_function;
 
+/* Skip the image header before a file image: updates *START_OFFSET.  */
+extern Dwfl_Error __libdw_image_header (int fd, off64_t *start_offset,
+					void *mapped, size_t mapped_size)
+  internal_function;
+
 /* Open Elf handle on *FDP.  This handles decompression and checks
    elf_kind.  Succeed only for ELF_K_ELF, or also ELF_K_AR if ARCHIVE_OK.
    Returns DWFL_E_NOERROR and sets *ELFP on success, resets *FDP to -1 if

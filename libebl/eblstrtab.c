@@ -101,9 +101,11 @@ struct Ebl_Strtab
 };
 
 
-/* Cache for the pagesize.  We correct this value a bit so that `malloc'
-   is not allocating more than a page.  */
+/* Cache for the pagesize.  */
 static size_t ps;
+/* We correct this value a bit so that `malloc' is not allocating more
+   than a page. */
+#define MALLOC_OVERHEAD (2 * sizeof (void *))
 
 
 struct Ebl_Strtab *
@@ -111,8 +113,8 @@ ebl_strtabinit (bool nullstr)
 {
   if (ps == 0)
     {
-      ps = sysconf (_SC_PAGESIZE) - 2 * sizeof (void *);
-      assert (sizeof (struct memoryblock) < ps);
+      ps = sysconf (_SC_PAGESIZE);
+      assert (sizeof (struct memoryblock) < ps - MALLOC_OVERHEAD);
     }
 
   struct Ebl_Strtab *ret
@@ -135,8 +137,11 @@ ebl_strtabinit (bool nullstr)
 static int
 morememory (struct Ebl_Strtab *st, size_t len)
 {
-  if (len < ps)
-    len = ps;
+  size_t overhead = offsetof (struct memoryblock, memory);
+  len += overhead + MALLOC_OVERHEAD;
+
+  /* Allocate nearest multiple of pagesize >= len.  */
+  len = ((len / ps) + (len % ps != 0)) * ps - MALLOC_OVERHEAD;
 
   struct memoryblock *newmem = (struct memoryblock *) malloc (len);
   if (newmem == NULL)
@@ -145,7 +150,7 @@ morememory (struct Ebl_Strtab *st, size_t len)
   newmem->next = st->memory;
   st->memory = newmem;
   st->backp = newmem->memory;
-  st->left = len - offsetof (struct memoryblock, memory);
+  st->left = len - overhead;
 
   return 0;
 }

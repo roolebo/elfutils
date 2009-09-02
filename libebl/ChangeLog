@@ -1,3 +1,8 @@
+2009-09-02  Petr Machata  <pmachata@redhat.com>
+
+	* libebl/eblstrtab.c (morememory): Allocate memory in multiples of
+	pagesize.
+
 2009-08-06  Petr Machata  <pmachata@redhat.com>
 
 	* libebl/eblstrtab.c (ebl_strtabfinalize): Only call copystrings

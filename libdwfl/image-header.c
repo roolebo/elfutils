@@ -112,7 +112,7 @@ __libdw_image_header (int fd, off64_t *start_offset,
 	  offset += ((*(uint8_t *) (header + H_SETUP_SECTS) ?: 4) + 1) * 512;
 
 	  if (offset > H_END && offset < mapped_size
-	      && mapped_size - length >= offset)
+	      && mapped_size - offset >= length)
 	    {
 	      /* It looks kosher.  Use it!  */
 	      *start_offset += offset;

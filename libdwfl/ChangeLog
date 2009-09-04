@@ -1,3 +1,7 @@
+2009-09-04  Roland McGrath  <roland@redhat.com>
+
+	* image-header.c (__libdw_image_header): Fix tranposed comparison.
+
 2009-08-27  Roland McGrath  <roland@redhat.com>
 
 	* image-header.c: New file.

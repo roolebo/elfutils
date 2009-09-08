@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ja\n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2009-08-31 16:46+0000\n"
+"POT-Creation-Date: 2009-09-08 04:30+0000\n"
 "PO-Revision-Date: 2009-09-01 09:37+0900\n"
 "Last-Translator: Kiyoto Hashida <khashida@redhat.com>\n"
 "Language-Team: Japanese <jp@li.org>\n"
@@ -180,7 +180,8 @@ msgid "only relocatable files can contain section groups"
 msgstr ""
 
 #: ../libelf/elf_error.c:241
-msgid "program header only allowed in executables, shared objects, and core files"
+msgid ""
+"program header only allowed in executables, shared objects, and core files"
 msgstr ""
 
 #: ../libelf/elf_error.c:248
@@ -1288,7 +1289,8 @@ msgid "Program Headers:"
 msgstr ""
 
 #: ../src/readelf.c:941
-msgid "  Type           Offset   VirtAddr   PhysAddr   FileSiz  MemSiz   Flg Align"
+msgid ""
+"  Type           Offset   VirtAddr   PhysAddr   FileSiz  MemSiz   Flg Align"
 msgstr ""
 
 #: ../src/readelf.c:944
@@ -1827,7 +1829,8 @@ msgstr ""
 
 #: ../src/readelf.c:4266
 #, c-format
-msgid " [%*zu] start: %0#*<PRIx64>, length: %5<PRIu64>, CU DIE offset: %6<PRId64>\n"
+msgid ""
+" [%*zu] start: %0#*<PRIx64>, length: %5<PRIu64>, CU DIE offset: %6<PRId64>\n"
 msgstr ""
 
 #: ../src/readelf.c:4285
@@ -2617,7 +2620,8 @@ msgid "Same as --whole-archive."
 msgstr ""
 
 #: ../src/ld.c:112
-msgid "Default rules of extracting from archive; weak references are not enough."
+msgid ""
+"Default rules of extracting from archive; weak references are not enough."
 msgstr ""
 
 #: ../src/ld.c:116
@@ -3429,7 +3433,8 @@ msgstr ""
 
 #: ../src/elflint.c:553
 #, c-format
-msgid "section [%2d] '%s': section group [%2zu] '%s' does not preceed group member\n"
+msgid ""
+"section [%2d] '%s': section group [%2zu] '%s' does not preceed group member\n"
 msgstr ""
 
 #: ../src/elflint.c:569 ../src/elflint.c:1412 ../src/elflint.c:1462
@@ -3522,7 +3527,8 @@ msgstr ""
 
 #: ../src/elflint.c:725
 #, c-format
-msgid "section [%2d] '%s': symbol %zu: COMMON only allowed in relocatable files\n"
+msgid ""
+"section [%2d] '%s': symbol %zu: COMMON only allowed in relocatable files\n"
 msgstr ""
 
 #: ../src/elflint.c:729
@@ -3532,7 +3538,8 @@ msgstr ""
 
 #: ../src/elflint.c:733
 #, c-format
-msgid "section [%2d] '%s': symbol %zu: function in COMMON section is nonsense\n"
+msgid ""
+"section [%2d] '%s': symbol %zu: function in COMMON section is nonsense\n"
 msgstr ""
 
 #: ../src/elflint.c:765
@@ -3563,7 +3570,8 @@ msgstr ""
 
 #: ../src/elflint.c:817
 #, c-format
-msgid "section [%2d] '%s': symbol %zu: TLS symbol but no TLS program header entry\n"
+msgid ""
+"section [%2d] '%s': symbol %zu: TLS symbol but no TLS program header entry\n"
 msgstr ""
 
 #: ../src/elflint.c:825
@@ -3810,7 +3818,8 @@ msgstr ""
 
 #: ../src/elflint.c:1653
 #, c-format
-msgid "section [%2d] '%s': entry %zu: DT_PLTREL value must be DT_REL or DT_RELA\n"
+msgid ""
+"section [%2d] '%s': entry %zu: DT_PLTREL value must be DT_REL or DT_RELA\n"
 msgstr ""
 
 #: ../src/elflint.c:1675
@@ -3822,7 +3831,8 @@ msgstr ""
 
 #: ../src/elflint.c:1718
 #, c-format
-msgid "section [%2d] '%s': entry %zu: %s value must point into loaded segment\n"
+msgid ""
+"section [%2d] '%s': entry %zu: %s value must point into loaded segment\n"
 msgstr ""
 
 #: ../src/elflint.c:1733
@@ -3870,12 +3880,14 @@ msgstr ""
 
 #: ../src/elflint.c:1851
 #, c-format
-msgid "section [%2d] '%s': only relocatable files can have extended section index\n"
+msgid ""
+"section [%2d] '%s': only relocatable files can have extended section index\n"
 msgstr ""
 
 #: ../src/elflint.c:1861
 #, c-format
-msgid "section [%2d] '%s': extended section index section not for symbol table\n"
+msgid ""
+"section [%2d] '%s': extended section index section not for symbol table\n"
 msgstr ""
 
 #: ../src/elflint.c:1866
@@ -3917,7 +3929,8 @@ msgstr ""
 
 #: ../src/elflint.c:1935 ../src/elflint.c:1976
 #, c-format
-msgid "section [%2d] '%s': hash table section is too small (is %ld, expected %ld)\n"
+msgid ""
+"section [%2d] '%s': hash table section is too small (is %ld, expected %ld)\n"
 msgstr ""
 
 #: ../src/elflint.c:1947 ../src/elflint.c:1988
@@ -3959,7 +3972,8 @@ msgstr ""
 
 #: ../src/elflint.c:2069
 #, c-format
-msgid "section [%2d] '%s': hash chain for bucket %zu lower than symbol index bias\n"
+msgid ""
+"section [%2d] '%s': hash chain for bucket %zu lower than symbol index bias\n"
 msgstr ""
 
 #: ../src/elflint.c:2090
@@ -3971,7 +3985,8 @@ msgstr ""
 
 #: ../src/elflint.c:2101
 #, c-format
-msgid "section [%2d] '%s': hash value for symbol %u in chain for bucket %zu wrong\n"
+msgid ""
+"section [%2d] '%s': hash value for symbol %u in chain for bucket %zu wrong\n"
 msgstr ""
 
 #: ../src/elflint.c:2132
@@ -3981,7 +3996,8 @@ msgstr ""
 
 #: ../src/elflint.c:2137
 #, c-format
-msgid "section [%2d] '%s': symbol reference in chain for bucket %zu out of bounds\n"
+msgid ""
+"section [%2d] '%s': symbol reference in chain for bucket %zu out of bounds\n"
 msgstr ""
 
 #: ../src/elflint.c:2143
@@ -4047,7 +4063,8 @@ msgstr ""
 
 #: ../src/elflint.c:2377
 #, c-format
-msgid "section [%2d] '%s': section groups only allowed in relocatable object files\n"
+msgid ""
+"section [%2d] '%s': section groups only allowed in relocatable object files\n"
 msgstr ""
 
 #: ../src/elflint.c:2388
@@ -4178,12 +4195,14 @@ msgstr ""
 
 #: ../src/elflint.c:2763
 #, c-format
-msgid "section [%2d] '%s': symbol %d: version index %d is for defined version\n"
+msgid ""
+"section [%2d] '%s': symbol %d: version index %d is for defined version\n"
 msgstr ""
 
 #: ../src/elflint.c:2773
 #, c-format
-msgid "section [%2d] '%s': symbol %d: version index %d is for requested version\n"
+msgid ""
+"section [%2d] '%s': symbol %d: version index %d is for requested version\n"
 msgstr ""
 
 #: ../src/elflint.c:2825
@@ -4244,7 +4263,8 @@ msgstr ""
 
 #: ../src/elflint.c:2925
 #, c-format
-msgid "section [%2d] '%s': auxiliary entry %d of entry %d has wrong next field\n"
+msgid ""
+"section [%2d] '%s': auxiliary entry %d of entry %d has wrong next field\n"
 msgstr ""
 
 #: ../src/elflint.c:2941 ../src/elflint.c:3099
@@ -4289,7 +4309,8 @@ msgstr ""
 
 #: ../src/elflint.c:3068
 #, c-format
-msgid "section [%2d] '%s': entry %d has invalid name reference in auxiliary data\n"
+msgid ""
+"section [%2d] '%s': entry %d has invalid name reference in auxiliary data\n"
 msgstr ""
 
 #: ../src/elflint.c:3083
@@ -4319,7 +4340,8 @@ msgstr ""
 
 #: ../src/elflint.c:3171
 #, c-format
-msgid "section [%2d] '%s': offset %zu: zero length field in attribute section\n"
+msgid ""
+"section [%2d] '%s': offset %zu: zero length field in attribute section\n"
 msgstr ""
 
 #: ../src/elflint.c:3180
@@ -4334,7 +4356,8 @@ msgstr ""
 
 #: ../src/elflint.c:3209
 #, c-format
-msgid "section [%2d] '%s': offset %zu: endless ULEB128 in attribute subsection tag\n"
+msgid ""
+"section [%2d] '%s': offset %zu: endless ULEB128 in attribute subsection tag\n"
 msgstr ""
 
 #: ../src/elflint.c:3218
@@ -4344,18 +4367,21 @@ msgstr ""
 
 #: ../src/elflint.c:3227
 #, c-format
-msgid "section [%2d] '%s': offset %zu: zero length field in attribute subsection\n"
+msgid ""
+"section [%2d] '%s': offset %zu: zero length field in attribute subsection\n"
 msgstr ""
 
 #: ../src/elflint.c:3240
 #, c-format
-msgid "section [%2d] '%s': offset %zu: invalid length in attribute subsection\n"
+msgid ""
+"section [%2d] '%s': offset %zu: invalid length in attribute subsection\n"
 msgstr ""
 
 #. Tag_File
 #: ../src/elflint.c:3251
 #, c-format
-msgid "section [%2d] '%s': offset %zu: attribute subsection has unexpected tag %u\n"
+msgid ""
+"section [%2d] '%s': offset %zu: attribute subsection has unexpected tag %u\n"
 msgstr ""
 
 #: ../src/elflint.c:3269
@@ -4375,7 +4401,8 @@ msgstr ""
 
 #: ../src/elflint.c:3297
 #, c-format
-msgid "section [%2d] '%s': offset %zu: unrecognized %s attribute value %<PRIu64>\n"
+msgid ""
+"section [%2d] '%s': offset %zu: unrecognized %s attribute value %<PRIu64>\n"
 msgstr ""
 
 #: ../src/elflint.c:3307
@@ -4385,7 +4412,8 @@ msgstr ""
 
 #: ../src/elflint.c:3313
 #, c-format
-msgid "section [%2d] '%s': offset %zu: extra bytes after last attribute section\n"
+msgid ""
+"section [%2d] '%s': offset %zu: extra bytes after last attribute section\n"
 msgstr ""
 
 #: ../src/elflint.c:3402
@@ -4469,7 +4497,8 @@ msgstr ""
 
 #: ../src/elflint.c:3513
 #, c-format
-msgid "section [%2zu] '%s' has wrong flags: expected %s and possibly %s, is %s\n"
+msgid ""
+"section [%2zu] '%s' has wrong flags: expected %s and possibly %s, is %s\n"
 msgstr ""
 
 #: ../src/elflint.c:3531
@@ -4479,7 +4508,8 @@ msgstr ""
 
 #: ../src/elflint.c:3537 ../src/elflint.c:3569
 #, c-format
-msgid "section [%2zu] '%s' has SHF_ALLOC flag set but there is no loadable segment\n"
+msgid ""
+"section [%2zu] '%s' has SHF_ALLOC flag set but there is no loadable segment\n"
 msgstr ""
 
 #: ../src/elflint.c:3542 ../src/elflint.c:3574
@@ -4491,7 +4521,8 @@ msgstr ""
 
 #: ../src/elflint.c:3550
 #, c-format
-msgid "section [%2zu] '%s' is extension section index table in non-object file\n"
+msgid ""
+"section [%2zu] '%s' is extension section index table in non-object file\n"
 msgstr ""
 
 #: ../src/elflint.c:3593
@@ -4511,7 +4542,8 @@ msgstr ""
 
 #: ../src/elflint.c:3622
 #, c-format
-msgid "section [%2zu] '%s' contains invalid processor-specific flag(s) %#<PRIx64>\n"
+msgid ""
+"section [%2zu] '%s' contains invalid processor-specific flag(s) %#<PRIx64>\n"
 msgstr ""
 
 #: ../src/elflint.c:3629
@@ -4587,7 +4619,8 @@ msgstr ""
 
 #: ../src/elflint.c:3764
 #, c-format
-msgid "section [%2zu] '%s': alloc flag set but section not in any loaded segment\n"
+msgid ""
+"section [%2zu] '%s': alloc flag set but section not in any loaded segment\n"
 msgstr ""
 
 #: ../src/elflint.c:3770
@@ -4599,7 +4632,8 @@ msgstr ""
 
 #: ../src/elflint.c:3778
 #, c-format
-msgid "section [%2zu] '%s': relocatable files cannot have dynamic symbol tables\n"
+msgid ""
+"section [%2zu] '%s': relocatable files cannot have dynamic symbol tables\n"
 msgstr ""
 
 #: ../src/elflint.c:3829
@@ -4614,7 +4648,8 @@ msgstr ""
 
 #: ../src/elflint.c:3863
 #, c-format
-msgid "loadable segment [%u] is executable but contains no executable sections\n"
+msgid ""
+"loadable segment [%u] is executable but contains no executable sections\n"
 msgstr ""
 
 #: ../src/elflint.c:3869
@@ -4646,7 +4681,8 @@ msgstr ""
 
 #: ../src/elflint.c:3960
 #, c-format
-msgid "section [%2d] '%s': unknown core file note type %<PRIu32> at offset %Zu\n"
+msgid ""
+"section [%2d] '%s': unknown core file note type %<PRIu32> at offset %Zu\n"
 msgstr ""
 
 #: ../src/elflint.c:3983
@@ -4656,7 +4692,8 @@ msgstr ""
 
 #: ../src/elflint.c:3987
 #, c-format
-msgid "section [%2d] '%s': unknown object file note type %<PRIu32> at offset %Zu\n"
+msgid ""
+"section [%2d] '%s': unknown object file note type %<PRIu32> at offset %Zu\n"
 msgstr ""
 
 #: ../src/elflint.c:4004
@@ -4691,7 +4728,8 @@ msgstr ""
 
 #: ../src/elflint.c:4075
 #, c-format
-msgid "only executables, shared objects, and core files can have program headers\n"
+msgid ""
+"only executables, shared objects, and core files can have program headers\n"
 msgstr ""
 
 #: ../src/elflint.c:4090
@@ -4859,7 +4897,8 @@ msgstr ""
 
 #. Short description of program.
 #: ../src/addr2line.c:84
-msgid "Locate source files and line information for ADDRs (in a.out by default)."
+msgid ""
+"Locate source files and line information for ADDRs (in a.out by default)."
 msgstr ""
 
 #. Strings for arguments in help texts.
@@ -4966,7 +5005,8 @@ msgstr ""
 
 #: ../src/findtextrel.c:570
 #, c-format
-msgid "the file containing the function '%s' is not compiled with -fpic/-fPIC\n"
+msgid ""
+"the file containing the function '%s' is not compiled with -fpic/-fPIC\n"
 msgstr ""
 
 #: ../src/findtextrel.c:577 ../src/findtextrel.c:597
@@ -4985,7 +5025,8 @@ msgstr ""
 
 #: ../src/findtextrel.c:605
 #, c-format
-msgid "a relocation modifies memory at offset %llu in a write-protected segment\n"
+msgid ""
+"a relocation modifies memory at offset %llu in a write-protected segment\n"
 msgstr ""
 
 #: ../src/elfcmp.c:69
@@ -5423,7 +5464,8 @@ msgstr ""
 
 #: ../src/unstrip.c:1882
 #, c-format
-msgid "DWARF data in '%s' not adjusted for prelinking bias; consider prelink -u"
+msgid ""
+"DWARF data in '%s' not adjusted for prelinking bias; consider prelink -u"
 msgstr ""
 
 #: ../src/unstrip.c:1901 ../src/unstrip.c:1941 ../src/unstrip.c:1953
@@ -5565,4 +5607,3 @@ msgstr ""
 #, c-format
 msgid "cannot disassemble"
 msgstr ""
-

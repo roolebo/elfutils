@@ -1,3 +1,7 @@
+2009-09-08  Roland McGrath  <roland@redhat.com>
+
+	* ar.c (main): Fix typo in message format.
+
 2009-08-21  Roland McGrath  <roland@redhat.com>
 
 	* readelf.c (attr_callback): Use print_block only when we don't use

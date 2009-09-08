@@ -233,7 +233,7 @@ MEMBER parameter required for 'a', 'b', and 'i' modifiers"));
 
   if ((dont_replace_existing || allow_truncate_fname)
       && unlikely (operation != oper_extract))
-    error (1, 0, gettext ("'%' is only meaningful with the 'x' option"),
+    error (1, 0, gettext ("'%c' is only meaningful with the 'x' option"),
 	   dont_replace_existing ? 'C' : 'T');
 
   /* There must at least be one more parameter specifying the archive.   */

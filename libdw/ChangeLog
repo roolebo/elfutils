@@ -1,3 +1,7 @@
+2009-09-09  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_getcfi.c (dwarf_getcfi): Clear cfi->ebl.
+
 2009-08-21  Josh Stone  <jistone@redhat.com>
 
 	* dwarf_hasattr_integrate.c: Integrate DW_AT_specification too.

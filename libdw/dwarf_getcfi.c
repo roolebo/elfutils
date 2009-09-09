@@ -84,6 +84,8 @@ dwarf_getcfi (dbg)
       cfi->next_offset = 0;
       cfi->cie_tree = cfi->fde_tree = cfi->expr_tree = NULL;
 
+      cfi->ebl = NULL;
+
       dbg->cfi = cfi;
     }
 

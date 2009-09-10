@@ -76,6 +76,16 @@ struct loc_s
   size_t nloc;
 };
 
+/* Known DW_OP_implicit_value blocks already decoded.
+   This overlaps struct loc_s exactly, but only the
+   first member really has to match.  */
+struct loc_block_s
+{
+  void *addr;
+  unsigned char *data;
+  size_t length;
+};
+
 /* Valid indeces for the section data.  */
 enum
   {

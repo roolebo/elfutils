@@ -1,3 +1,11 @@
+2009-09-10  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_getlocation.c (store_implicit_value): New function.
+	(__libdw_intern_expression): Use it, handle DW_OP_implicit_value.
+	(dwarf_getlocation_implicit_value): New function.
+	* libdw.h: Declare it.
+	* libdw.map (ELFUTILS_0.143): Add it.
+
 2009-09-09  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_getcfi.c (dwarf_getcfi): Clear cfi->ebl.

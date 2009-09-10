@@ -112,6 +112,42 @@ loc_compare (const void *p1, const void *p2)
   return 0;
 }
 
+/* For each DW_OP_implicit_value, we store a special entry in the cache.
+   This points us directly to the block data for later fetching.  */
+static void
+store_implicit_value (Dwarf *dbg, void **cache, Dwarf_Op *op,
+		      unsigned char *data)
+{
+  struct loc_block_s *block = libdw_alloc (dbg, struct loc_block_s,
+					   sizeof (struct loc_block_s), 1);
+  block->addr = op;
+  block->data = data + op->number2;
+  block->length = op->number;
+  (void) tsearch (block, cache, loc_compare);
+}
+
+int
+dwarf_getlocation_implicit_value (attr, op, return_block)
+     Dwarf_Attribute *attr;
+     Dwarf_Op *op;
+     Dwarf_Block *return_block;
+{
+  if (attr == NULL)
+    return -1;
+
+  struct loc_block_s fake = { .addr = op };
+  struct loc_block_s **found = tfind (&fake, &attr->cu->locs, loc_compare);
+  if (unlikely (found == NULL))
+    {
+      __libdw_seterrno (DWARF_E_NO_BLOCK);
+      return -1;
+    }
+
+  return_block->length = (*found)->length;
+  return_block->data = (*found)->data;
+  return 0;
+}
+
 /* DW_AT_data_member_location can be a constant as well as a loclistptr.
    Only data[48] indicate a loclistptr.  */
 static int
@@ -351,6 +387,19 @@ __libdw_intern_expression (Dwarf *dbg,
 	  get_uleb128 (newloc->number2, data);
 	  break;
 
+	case DW_OP_implicit_value:
+	  /* This cannot be used in a CFI expression.  */
+	  if (unlikely (dbg == NULL))
+	    goto invalid;
+
+	  /* XXX Check size.  */
+	  get_uleb128 (newloc->number, data); /* Block length.  */
+	  if (unlikely ((Dwarf_Word) (end_data - data) < newloc->number))
+	    goto invalid;
+	  newloc->number2 = data - block->data; /* Relative block offset.  */
+	  data += newloc->number;		/* Skip the block.  */
+	  break;
+
 	default:
 	  goto invalid;
 	}
@@ -398,20 +447,21 @@ __libdw_intern_expression (Dwarf *dbg,
 
   do
     {
-      /* We populate the array from the back since the list is
-         backwards.  */
+      /* We populate the array from the back since the list is backwards.  */
       --n;
       result[n].atom = loclist->atom;
       result[n].number = loclist->number;
       result[n].number2 = loclist->number2;
       result[n].offset = loclist->offset;
 
+      if (result[n].atom == DW_OP_implicit_value)
+	store_implicit_value (dbg, cache, &result[n], block->data);
+
       loclist = loclist->next;
     }
   while (n > 0);
 
-  /* Insert a record in the search tree so that we can find it again
-     later.  */
+  /* Insert a record in the search tree so that we can find it again later.  */
   struct loc_s *newp;
   if (dbg != NULL)
     newp = libdw_alloc (dbg, struct loc_s, sizeof (struct loc_s), 1);

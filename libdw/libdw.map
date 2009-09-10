@@ -212,6 +212,8 @@ ELFUTILS_0.142 {
 
 ELFUTILS_0.143 {
   global:
+    dwarf_getlocation_implicit_value;
+
     # Replaced ELFUTILS_0.122 versions.  Both versions point to the
     # same implementation, but users of the new symbol version can
     # presume that they use dwarf_attr_integrate properly.

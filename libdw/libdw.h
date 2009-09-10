@@ -623,6 +623,15 @@ extern int dwarf_getlocation_addr (Dwarf_Attribute *attr, Dwarf_Addr address,
 				   Dwarf_Op **exprs, size_t *exprlens,
 				   size_t nlocs);
 
+/* Return the block associated with a DW_OP_implicit_value operation.
+   The OP pointer must point into an expression that dwarf_getlocation
+   or dwarf_getlocation_addr has returned given the same ATTR.  */
+extern int dwarf_getlocation_implicit_value (Dwarf_Attribute *attr,
+					     Dwarf_Op *op,
+					     Dwarf_Block *return_block)
+  __nonnull_attribute__ (2, 3);
+
+
 
 /* Return scope DIEs containing PC address.
    Sets *SCOPES to a malloc'd array of Dwarf_Die structures,

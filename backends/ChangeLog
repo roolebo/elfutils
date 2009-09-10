@@ -1,3 +1,7 @@
+2009-09-10  Mark Wielaard  <mjw@redhat.com>
+
+	* sparc_retval.c: Fix license header.
+
 2009-08-07  Roland McGrath  <roland@redhat.com>
 
 	* x86_64_reloc.def: Add PC64, GOTOFF64, GOTPC32, GOTPC32_TLSDESC,

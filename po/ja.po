@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: ja\n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
 "POT-Creation-Date: 2009-09-08 08:28+0000\n"
-"PO-Revision-Date: 2009-09-08 19:37+0900\n"
+"PO-Revision-Date: 2009-09-11 23:30+0900\n"
 "Last-Translator: Hyu_gabaru Ryu_ichi <hyu_gabaru@yahoo.co.jp>\n"
 "Language-Team: Japanese <jp@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -2068,21 +2068,23 @@ msgstr "DIE オフセットを得られません: %s"
 #, c-format
 msgid "cannot get tag of DIE at offset %<PRIu64> in section '%s': %s"
 msgstr ""
+"セクション '%2$s' 中のオフセット %1$<PRIu64> の DIE のタグを得られません"
+": %3$s"
 
 #: ../src/readelf.c:5406
 #, c-format
 msgid "cannot get next DIE: %s\n"
-msgstr ""
+msgstr "次の DIE を得られません: %s\n"
 
 #: ../src/readelf.c:5413
 #, c-format
 msgid "cannot get next DIE: %s"
-msgstr ""
+msgstr "次の DIE を得られません: %s"
 
 #: ../src/readelf.c:5448
 #, c-format
 msgid "cannot get line data section data: %s"
-msgstr ""
+msgstr "ラインデータセクションデータを得られません: %s"
 
 #: ../src/readelf.c:5461
 #, c-format
@@ -2090,6 +2092,8 @@ msgid ""
 "\n"
 "Table at offset %Zu:\n"
 msgstr ""
+"\n"
+"オフセット %Zu のテーブル:\n"
 
 #. Print what we got so far.
 #: ../src/readelf.c:5513
@@ -2107,24 +2111,36 @@ msgid ""
 "\n"
 "Opcodes:\n"
 msgstr ""
+"\n"
+" 長さ:             %<PRIu64>\n"
+" DWARF バージョン: %<PRIuFAST16>\n"
+" プロローグ長:     %<PRIu64>\n"
+" 最小命令長:       %<PRIuFAST8>\n"
+" もし '%s' なら初期値: %<PRIuFAST8>\n"
+" 行ベース:         %<PRIdFAST8>\n"
+" 行範囲:           %<PRIuFAST8>\n"
+" 命令コードベース: %<PRIuFAST8>\n"
+"\n"
+"命令コード:\n"
 
 #: ../src/readelf.c:5532
 #, c-format
 msgid "invalid data at offset %tu in section [%zu] '%s'"
-msgstr ""
+msgstr "セクション [%2$zu] '%3$s' 中のオフセット %1$tu に不当なデータ"
 
 #: ../src/readelf.c:5547
 #, c-format
 msgid "  [%*<PRIuFAST8>]  %hhu argument\n"
 msgid_plural "  [%*<PRIuFAST8>]  %hhu arguments\n"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "  [%*<PRIuFAST8>]  %hhu パラメーター\n"
 
 #: ../src/readelf.c:5555
 msgid ""
 "\n"
 "Directory table:"
 msgstr ""
+"\n"
+"ディレクトリーテーブル:"
 
 #: ../src/readelf.c:5571
 msgid ""
@@ -2132,96 +2148,102 @@ msgid ""
 "File name table:\n"
 " Entry Dir   Time      Size      Name"
 msgstr ""
+"\n"
+"ファイル名テーブル:\n"
+" Entry Dir   時刻     大きさ    名前"
 
 #: ../src/readelf.c:5600
 msgid ""
 "\n"
 "Line number statements:"
 msgstr ""
+"\n"
+"行   番号   文:"
 
 #: ../src/readelf.c:5661
 #, c-format
 msgid " special opcode %u: address+%u = %s, line%+d = %zu\n"
-msgstr ""
+msgstr " 特殊命令コード %u: アドレス+%u = %s, 行%+d = %zu\n"
 
 #: ../src/readelf.c:5681
 #, c-format
 msgid " extended opcode %u: "
-msgstr ""
+msgstr " 拡張命令コード %u: "
 
 #: ../src/readelf.c:5686
 msgid "end of sequence"
-msgstr ""
+msgstr "列の終わり"
 
 #: ../src/readelf.c:5701
 #, c-format
 msgid "set address to %s\n"
-msgstr ""
+msgstr "アドレスを %s に設定する\n"
 
 #: ../src/readelf.c:5722
 #, c-format
 msgid "define new file: dir=%u, mtime=%<PRIu64>, length=%<PRIu64>, name=%s\n"
 msgstr ""
+"新ファイルを定義する: dir=%u、mtime=%<PRIu64>、長さh=%<PRIu64>、名前=%s\n"
 
 #. Unknown, ignore it.
 #: ../src/readelf.c:5731
 msgid "unknown opcode"
-msgstr ""
+msgstr "不明な命令コード"
 
 #. Takes no argument.
 #: ../src/readelf.c:5743
 msgid " copy"
-msgstr ""
+msgstr "複写"
 
 #: ../src/readelf.c:5753
 #, c-format
 msgid "advance address by %u to %s\n"
-msgstr ""
+msgstr "アドレスを %u だけ進めて %s にする\n"
 
 #: ../src/readelf.c:5764
 #, c-format
 msgid " advance line by constant %d to %<PRId64>\n"
-msgstr ""
+msgstr "行を定数 %d だけ進めて %<PRId64> にする\n"
 
 #: ../src/readelf.c:5772
 #, c-format
 msgid " set file to %<PRIu64>\n"
-msgstr ""
+msgstr " ファイルを %<PRIu64> に設定する\n"
 
 #: ../src/readelf.c:5782
 #, c-format
 msgid " set column to %<PRIu64>\n"
-msgstr ""
+msgstr "カラムを %<PRIu64> に設定する\n"
 
 #: ../src/readelf.c:5789
 #, c-format
 msgid " set '%s' to %<PRIuFAST8>\n"
-msgstr ""
+msgstr " '%s' を %<PRIuFAST8> に設定する\n"
 
 #. Takes no argument.
 #: ../src/readelf.c:5795
 msgid " set basic block flag"
-msgstr ""
+msgstr "基本ブロックフラグを設定する"
 
 #: ../src/readelf.c:5805
 #, c-format
 msgid "advance address by constant %u to %s\n"
-msgstr ""
+msgstr "アドレスを定数 %u だけ済めて %s にする\n"
 
 #: ../src/readelf.c:5821
 #, c-format
 msgid "advance address by fixed value %u to %s\n"
-msgstr ""
+msgstr "アドレスを固定値 %u だけ進めて %s にする\n"
 
 #. Takes no argument.
 #: ../src/readelf.c:5830
 msgid " set prologue end flag"
-msgstr ""
+msgstr "プロローグ終了フラグを設定する"
 
 #. Takes no argument.
 #: ../src/readelf.c:5835
 msgid " set epilogue begin flag"
-msgstr ""
+msgstr "エピローグ開始フラグを設定する"
 
 #. This is a new opcode the generator but not we know about.
 #. Read the parameters associated with it but then discard
@@ -2230,29 +2252,28 @@ msgstr ""
 #, c-format
 msgid " unknown opcode with %<PRIu8> parameter:"
 msgid_plural " unknown opcode with %<PRIu8> parameters:"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] " %<PRIu8> 個のパラメーターのある不明な命令コード:"
 
 #: ../src/readelf.c:5876
 #, c-format
 msgid "cannot get .debug_loc content: %s"
-msgstr ""
+msgstr ".debug_loc の内容を得られません: %s"
 
 #. First entry in a list.
 #: ../src/readelf.c:5931
 #, c-format
 msgid " [%6tx]  %s..%s"
-msgstr ""
+msgstr " [%6tx]  %s..%s"
 
 #: ../src/readelf.c:5933
 #, c-format
 msgid "           %s..%s"
-msgstr ""
+msgstr "           %s..%s"
 
 #: ../src/readelf.c:5986
 #, c-format
 msgid "cannot get macro information section data: %s"
-msgstr ""
+msgstr "マクロ情報セクションのデータを得られません: %s"
 
 #: ../src/readelf.c:6065
 #, c-format

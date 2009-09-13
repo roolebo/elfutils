@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ja\n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2009-09-08 08:28+0000\n"
+"POT-Creation-Date: 2009-09-13 02:52+0000\n"
 "PO-Revision-Date: 2009-09-13 15:32+0900\n"
 "Last-Translator: Hyu_gabaru Ryu_ichi <hyu_gabaru@yahoo.co.jp>\n"
 "Language-Team: Japanese <jp@li.org>\n"
@@ -185,8 +185,8 @@ msgstr "リロケータブルファイルのみセクショングループを含
 msgid ""
 "program header only allowed in executables, shared objects, and core files"
 msgstr ""
-"プログラムヘッダーはエクゼキュータブルか、共用オブジェクト、コアファイルに"
-"のみ認められています"
+"プログラムヘッダーはエクゼキュータブルか、共用オブジェクト、コアファイルにの"
+"み認められています"
 
 #: ../libelf/elf_error.c:248
 msgid "file has no program header"
@@ -361,7 +361,7 @@ msgstr "選択オプションを入力してください:"
 
 #: ../libdwfl/argp-std.c:68
 msgid "Find addresses in FILE"
-msgstr "ファイル中のアドレスを探す"
+msgstr "ふぁいる 中のアドレスを探す"
 
 #: ../libdwfl/argp-std.c:70
 msgid "Find addresses from signatures found in COREFILE"
@@ -376,8 +376,8 @@ msgid ""
 "Find addresses in files mapped as read from FILE in Linux /proc/PID/maps "
 "format"
 msgstr ""
-"Linux の /proc/PID/maps 形式の FILE から読み込んだものに対応するファイルの"
-"アドレスを探す"
+"Linux の /proc/PID/maps 形式の ふぁいる から読み込んだものに対応するファイルのア"
+"ドレスを探す"
 
 #: ../libdwfl/argp-std.c:76
 msgid "Find addresses in the running kernel"
@@ -776,8 +776,8 @@ msgid ""
 "Use the output format FORMAT.  FORMAT can be `bsd', `sysv' or `posix'.  The "
 "default is `sysv'"
 msgstr ""
-"出力形式として FORMATを使う。FORMAT は `bsd'か、`sysv'、`posix' のどれか。"
-"省略値は `sysv'"
+"出力形式として FORMATを使う。FORMAT は `bsd'か、`sysv'、`posix' のどれか。省"
+"略値は `sysv'"
 
 #: ../src/nm.c:92
 msgid "Same as --format=bsd"
@@ -823,13 +823,13 @@ msgstr "雑則:"
 #. Short description of program.
 #: ../src/nm.c:108
 msgid "List symbols from FILEs (a.out by default)."
-msgstr "ファイルからシンボルを表示 (デフォルトではa.out)。"
+msgstr "ふぁいる からシンボルを表示 (デフォルトではa.out)。"
 
 #. Strings for arguments in help texts.
 #: ../src/nm.c:111 ../src/size.c:92 ../src/strip.c:96 ../src/findtextrel.c:84
 #: ../src/strings.c:92 ../src/objdump.c:80
 msgid "[FILE...]"
-msgstr "[ファイル...]"
+msgstr "[ふぁいる...]"
 
 #: ../src/nm.c:136 ../src/size.c:117 ../src/strip.c:120 ../src/objdump.c:105
 #, c-format
@@ -1041,7 +1041,7 @@ msgstr "ELF ファイルから人間が読める形で情報を印刷する。"
 #. Strings for arguments in help texts.
 #: ../src/readelf.c:114 ../src/elflint.c:85
 msgid "FILE..."
-msgstr "ファイル..."
+msgstr "ふぁいる..."
 
 #: ../src/readelf.c:266 ../src/elflint.c:158
 #, c-format
@@ -1338,8 +1338,8 @@ msgid ""
 "  Type           Offset   VirtAddr           PhysAddr           FileSiz  "
 "MemSiz   Flg Align"
 msgstr ""
-"  タイプ         オフセ   仮想アドレス       物理アドレス      ファイル量"
-"メモ量   Flg 調整 "
+"  タイプ         オフセ   仮想アドレス       物理アドレス      ファイル量メモ"
+"量   Flg 調整 "
 
 #: ../src/readelf.c:984
 #, c-format
@@ -1385,8 +1385,8 @@ msgid_plural ""
 "Section group [%2zu] '%s' with signature '%s' contains %zu entries:\n"
 msgstr[0] ""
 "\n"
-"署名 '%3$s' を持つセクショングループ [%1$2zu] '%2$s' には %4$zu 個の"
-"項目があります:\n"
+"署名 '%3$s' を持つセクショングループ [%1$2zu] '%2$s' には %4$zu 個の項目があ"
+"ります:\n"
 
 #: ../src/readelf.c:1163
 msgid "<INVALID SYMBOL>"
@@ -1409,8 +1409,8 @@ msgid_plural ""
 msgstr[0] ""
 "\n"
 "動的セグメントには %lu 個の項目があります:\n"
-" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク:"
-" [%2u] '%s'\n"
+" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: [%"
+"2u] '%s'\n"
 
 #: ../src/readelf.c:1340
 msgid "  Type              Value\n"
@@ -1462,8 +1462,8 @@ msgid_plural ""
 "contains %d entries:\n"
 msgstr[0] ""
 "\n"
-"オフセット %5$#0<PRIx64> のセクション [%3$2u] '%4$s' 用のリロケーション"
-"セクション [%1$2zu] '%2$s' には %6$d 個の項目があります:\n"
+"オフセット %5$#0<PRIx64> のセクション [%3$2u] '%4$s' 用のリロケーションセク"
+"ション [%1$2zu] '%2$s' には %6$d 個の項目があります:\n"
 
 #. The .rel.dyn section does not refer to a specific section but
 #. instead of section index zero.  Do not try to print a section
@@ -1568,10 +1568,9 @@ msgid_plural ""
 " Addr: %#0*<PRIx64>  Offset: %#08<PRIx64>  Link to section: [%2u] '%s'\n"
 msgstr[0] ""
 "\n"
-"セクション [%2u] '%s' を必要とするバージョンには %d 個の項目が"
-"あります:\n"
-" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク:"
-" [%2u] '%s'\n"
+"セクション [%2u] '%s' を必要とするバージョンには %d 個の項目があります:\n"
+" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: [%"
+"2u] '%s'\n"
 
 #: ../src/readelf.c:2200
 #, c-format
@@ -1596,8 +1595,8 @@ msgid_plural ""
 msgstr[0] ""
 "\n"
 "バージョン定義セクション [%2u] '%s' には %d 個の項目があります:\n"
-" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク:"
-" [%2u] '%s'\n"
+" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: [%"
+"2u] '%s'\n"
 
 #: ../src/readelf.c:2274
 #, c-format
@@ -1622,8 +1621,8 @@ msgid_plural ""
 msgstr[0] ""
 "\n"
 "バージョンシンボルセクション [%2u] '%s' には %d 個の項目があります:\n"
-" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク:"
-" [%2u] '%s'"
+" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: [%"
+"2u] '%s'"
 
 #: ../src/readelf.c:2551
 msgid "   0 *local*                     "
@@ -1648,10 +1647,11 @@ msgid_plural ""
 msgstr[0] ""
 "\n"
 "セクション [%2u] '%s' のバケット一覧の長さの柱状図(合計 %d バケット):\n"
-" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク:"
-" [%2u] '%s'\n"
+" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: [%"
+"2u] '%s'\n"
 
 #: ../src/readelf.c:2610
+#, non-c-format
 msgid " Length  Number  % of total  Coverage\n"
 msgstr " 長さ    数      全体の%     範囲    \n"
 
@@ -1686,8 +1686,8 @@ msgid ""
 " Bitmask Size: %zu bytes  %<PRIuFAST32>%% bits set  2nd hash shift: %u\n"
 msgstr ""
 " シンボルの偏り: %u\n"
-" ビットマスクの大きさ: %zu バイト  %<PRIuFAST32>%% ビット設定 "
-"第2ハッシュシフト: %u\n"
+" ビットマスクの大きさ: %zu バイト  %<PRIuFAST32>%% ビット設定 第2ハッシュシフ"
+"ト: %u\n"
 
 #: ../src/readelf.c:2861
 #, c-format
@@ -1699,16 +1699,16 @@ msgid_plural ""
 "Library list section [%2zu] '%s' at offset %#0<PRIx64> contains %d entries:\n"
 msgstr[0] ""
 "\n"
-"オフセット %3$#0<PRIx64> のライブラリー一覧セクション [%1$2zu] '%2$s' には "
-"%4$d 個の項目があります:\n"
+"オフセット %3$#0<PRIx64> のライブラリー一覧セクション [%1$2zu] '%2$s' には %4"
+"$d 個の項目があります:\n"
 
 #: ../src/readelf.c:2875
 msgid ""
 "       Library                       Time Stamp          Checksum Version "
 "Flags"
 msgstr ""
-"       ライブラリー                  タイムスタンプ      チェックサム "
-"バージョン フラグ"
+"       ライブラリー                  タイムスタンプ      チェックサム バー"
+"ジョン フラグ"
 
 #: ../src/readelf.c:2925
 #, c-format
@@ -1718,8 +1718,8 @@ msgid ""
 "#0<PRIx64>:\n"
 msgstr ""
 "\n"
-"オフセット %4$#0<PRIx64> の %3$<PRIu64> バイトのオブジェクト属性セクション"
-" [%1$2zu] '%2$s':\n"
+"オフセット %4$#0<PRIx64> の %3$<PRIu64> バイトのオブジェクト属性セクション [%"
+"1$2zu] '%2$s':\n"
 
 #: ../src/readelf.c:2941
 msgid "  Owner          Size\n"
@@ -1908,8 +1908,8 @@ msgid_plural ""
 "DWARF section [%2zu] '%s' at offset %#<PRIx64> contains %zu entries:\n"
 msgstr[0] ""
 "\n"
-"オフセット %3$#<PRIx64> の DWARF セクション [%1$2zu] '%2$s' には %4$zu "
-"個の項目があります:\n"
+"オフセット %3$#<PRIx64> の DWARF セクション [%1$2zu] '%2$s' には %4$zu 個の項"
+"目があります:\n"
 
 #: ../src/readelf.c:4264
 #, c-format
@@ -2039,7 +2039,7 @@ msgid ""
 " [Offset]\n"
 msgstr ""
 "\n"
-"オフセット %3$#<PRIx64> の DWARF セクション [%1$2zu] '%2$s':\n" 
+"オフセット %3$#<PRIx64> の DWARF セクション [%1$2zu] '%2$s':\n"
 " [オフセット]\n"
 
 #: ../src/readelf.c:5340
@@ -2050,8 +2050,8 @@ msgid ""
 "<PRIu8>, Offset size: %<PRIu8>\n"
 msgstr ""
 " オフセット %1$<PRIu64> のコンパイル単位:\n"
-" バージョン: %2$<PRIu16>、略語セクションオフセット: %3$<PRIu64>、アドレスの"
-"大きさ: %4$<PRIu8>、オフセットの大きさ: %5$<PRIu8>\n"
+" バージョン: %2$<PRIu16>、略語セクションオフセット: %3$<PRIu64>、アドレスの大"
+"きさ: %4$<PRIu8>、オフセットの大きさ: %5$<PRIu8>\n"
 
 #: ../src/readelf.c:5358
 #, c-format
@@ -2068,8 +2068,8 @@ msgstr "DIE オフセットを得られません: %s"
 #, c-format
 msgid "cannot get tag of DIE at offset %<PRIu64> in section '%s': %s"
 msgstr ""
-"セクション '%2$s' 中のオフセット %1$<PRIu64> の DIE のタグを得られません"
-": %3$s"
+"セクション '%2$s' 中のオフセット %1$<PRIu64> の DIE のタグを得られません: %3"
+"$s"
 
 #: ../src/readelf.c:5406
 #, c-format
@@ -2286,6 +2286,8 @@ msgid " [%5d] DIE offset: %6<PRId64>, CU DIE offset: %6<PRId64>, name: %s\n"
 msgstr ""
 " [%5d] DIE オフセット: %6<PRId64>, CU DIE オフセット: %6<PRId64>, 名前: %s\n"
 
+# # "オフセット %3$#<PRIx64> の DWARF セクション [%1$2zu] '%2$s':\n"
+# # " %4$*s  文字列\n" がエラーになるのは何故? 取り敢えず fuzzy扱い
 #: ../src/readelf.c:6172
 #, fuzzy, c-format
 msgid ""
@@ -2296,8 +2298,7 @@ msgstr ""
 "\n"
 "オフセット %3$#<PRIx64> の DWARF セクション [%1$2zu] '%2$s':\n"
 " %4$*s  文字列\n"
-## "オフセット %3$#<PRIx64> の DWARF セクション [%1$2zu] '%2$s':\n"
-## " %4$*s  文字列\n"
+
 
 #: ../src/readelf.c:6186
 #, c-format
@@ -2403,8 +2404,8 @@ msgid ""
 "Note section [%2zu] '%s' of %<PRIu64> bytes at offset %#0<PRIx64>:\n"
 msgstr ""
 "\n"
-"オフセット %4$#0<PRIx64> の %3$<PRIu64> バイトのノートセクション [%1$2zu] "
-"'%2$s':\n"
+"オフセット %4$#0<PRIx64> の %3$<PRIu64> バイトのノートセクション [%1$2zu] '%2"
+"$s':\n"
 
 #: ../src/readelf.c:7364
 #, c-format
@@ -2436,8 +2437,8 @@ msgid ""
 "Hex dump of section [%Zu] '%s', %<PRIu64> bytes at offset %#0<PRIx64>:\n"
 msgstr ""
 "\n"
-"オフセット %4$#0<PRIx64> のセクション [%1$Zu] '%2$s' の16進ダンプ、"
-"%3$<PRIu64> バイト:\n" 
+"オフセット %4$#0<PRIx64> のセクション [%1$Zu] '%2$s' の16進ダンプ、%3"
+"$<PRIu64> バイト:\n"
 
 #: ../src/readelf.c:7433
 #, c-format
@@ -2455,8 +2456,8 @@ msgid ""
 "String section [%Zu] '%s' contains %<PRIu64> bytes at offset %#0<PRIx64>:\n"
 msgstr ""
 "\n"
-"オフセット %4$#0<PRIx64> 文字列セクション [%1$Zu] '%2$s' には %3$<PRIu64> "
-"バイトあります:\n"
+"オフセット %4$#0<PRIx64> 文字列セクション [%1$Zu] '%2$s' には %3$<PRIu64> バ"
+"イトあります:\n"
 
 #: ../src/readelf.c:7489
 #, c-format
@@ -2552,7 +2553,7 @@ msgstr "合計の大きさを表示 (bsd のみ)"
 #. Short description of program.
 #: ../src/size.c:88
 msgid "List section sizes of FILEs (a.out by default)."
-msgstr "FILE のセクションの大きさの一覧 (省略値は a.out)"
+msgstr "ふぁいる のセクションの大きさの一覧 (省略値は a.out)"
 
 #: ../src/size.c:269
 #, c-format
@@ -2580,15 +2581,15 @@ msgstr "(合計)\n"
 
 #: ../src/strip.c:73
 msgid "Place stripped output into FILE"
-msgstr "はぎ取った出力を FILE に置く"
+msgstr "はぎ取った出力を ふぁいる に置く"
 
 #: ../src/strip.c:74
 msgid "Extract the removed sections into FILE"
-msgstr "抽出した取り除いたセクションを FILE に置く"
+msgstr "抽出した取り除いたセクションを ふぁいる に置く"
 
 #: ../src/strip.c:75
 msgid "Embed name FILE instead of -f argument"
-msgstr "-f パラメーターの代わりに 名前 FILE を有効にする"
+msgstr "-f パラメーターの代わりに 名前 ふぁいる を有効にする"
 
 #: ../src/strip.c:79
 msgid "Remove all debugging symbols"
@@ -2689,300 +2690,303 @@ msgstr "セクションヘッダーセクションを生成している間: %s"
 #: ../src/strip.c:999
 #, c-format
 msgid "cannot allocate section data: %s"
-msgstr ""
+msgstr "セクションデータを割り当てられません: %s"
 
 #: ../src/strip.c:1058
 #, c-format
 msgid "while create section header string table: %s"
-msgstr ""
+msgstr "セクションヘッダー文字列テーブルを生成中: %s"
 
 #: ../src/strip.c:1592 ../src/strip.c:1689
 #, c-format
 msgid "while writing '%s': %s"
-msgstr ""
+msgstr "'%s' を書込み中: %s"
 
 #: ../src/strip.c:1603
 #, c-format
 msgid "while creating '%s'"
-msgstr ""
+msgstr "'%s' を生成中"
 
 #: ../src/strip.c:1615
 #, c-format
 msgid "while computing checksum for debug information"
-msgstr ""
+msgstr "デバッグ情報のチェックサムを計算中"
 
 #: ../src/strip.c:1675
 #, c-format
 msgid "%s: error while reading the file: %s"
-msgstr ""
+msgstr "%s: ファイルを読込み中にエラー: %s"
 
 #: ../src/strip.c:1721 ../src/strip.c:1728
 #, c-format
 msgid "error while finishing '%s': %s"
-msgstr ""
+msgstr "'%s' の終了中にエラー: %s"
 
 #: ../src/strip.c:1751 ../src/strip.c:1808
 #, c-format
 msgid "cannot set access and modification date of '%s'"
-msgstr ""
+msgstr "'%s' のアクセスと変更日付を設定できません"
 
 #: ../src/ld.c:87
 msgid "Input File Control:"
-msgstr ""
+msgstr "入力ファイル制御:"
 
 #: ../src/ld.c:89
 msgid "Include whole archives in the output from now on."
-msgstr ""
+msgstr "今から出力中の全アーカイブを含める。"
 
 #: ../src/ld.c:91
 msgid "Stop including the whole arhives in the output."
-msgstr ""
+msgstr "出力中の全アーカイブを含めるのを止める。"
 
 #: ../src/ld.c:92 ../src/ld.c:106 ../src/ld.c:184
 msgid "FILE"
-msgstr ""
+msgstr "ふぁいる"
 
 #: ../src/ld.c:93
 msgid "Start a group."
-msgstr ""
+msgstr "グループの開始。"
 
 #: ../src/ld.c:94
 msgid "End a group."
-msgstr ""
+msgstr "グループの終了。"
 
 #: ../src/ld.c:95
 msgid "PATH"
-msgstr ""
+msgstr "パス"
 
 #: ../src/ld.c:96
 msgid "Add PATH to list of directories files are searched in."
-msgstr ""
+msgstr "ファイルが検索されるディレクトリーの一覧にPATHを追加する。"
 
 #: ../src/ld.c:98
 msgid "Only set DT_NEEDED for following dynamic libs if actually used"
 msgstr ""
+"実際に使用されるのなら以下のダイナミックライブラリーに DT_NEEDED を設定する"
 
 #: ../src/ld.c:100
 msgid "Always set DT_NEEDED for following dynamic libs"
-msgstr ""
+msgstr "以下のダイナミックライブラリーに常に DT_NEEDED を設定する"
 
 #: ../src/ld.c:102
 msgid "Ignore LD_LIBRARY_PATH environment variable."
-msgstr ""
+msgstr "LD_LIBRARY_PATH 環境変数を無視する。"
 
 #: ../src/ld.c:105
 msgid "Output File Control:"
-msgstr ""
+msgstr "出力ファイル制御:"
 
 #: ../src/ld.c:106
 msgid "Place output in FILE."
-msgstr ""
+msgstr "出力を ふぁいる に置く。"
 
 #: ../src/ld.c:109
 msgid "Object is marked to not use default search path at runtime."
-msgstr ""
+msgstr "オブジェクトは実行時に省略値の検索パスを使わないと記されています。"
 
 #: ../src/ld.c:111
 msgid "Same as --whole-archive."
-msgstr ""
+msgstr "--whole-archive と同じ。"
 
 #: ../src/ld.c:112
 msgid ""
 "Default rules of extracting from archive; weak references are not enough."
 msgstr ""
+"アーカイブから抽出する時の省略値の規則: 弱い参照では十分ではありません。"
 
 #: ../src/ld.c:116
 msgid "Weak references cause extraction from archive."
-msgstr ""
+msgstr "弱い参照はアーカイブから抽出します。"
 
 #: ../src/ld.c:118
 msgid "Allow multiple definitions; first is used."
-msgstr ""
+msgstr "複数の定義を認めます: 最初を使用します。"
 
 #: ../src/ld.c:120
 msgid "Disallow/allow undefined symbols in DSOs."
-msgstr ""
+msgstr "DSO 中の未定義のシンボルを認めない/認める。"
 
 #: ../src/ld.c:123
 msgid "Object requires immediate handling of $ORIGIN."
-msgstr ""
+msgstr "オブジェクトには %ORIGIN の直接ハンドルが必要です。"
 
 #: ../src/ld.c:125
 msgid "Relocation will not be processed lazily."
-msgstr ""
+msgstr "リロケーションは遅延処理されません。"
 
 #: ../src/ld.c:127
 msgid "Object cannot be unloaded at runtime."
-msgstr ""
+msgstr "オプションは実行時にはアンロードできません。"
 
 #: ../src/ld.c:129
 msgid "Mark object to be initialized first."
-msgstr ""
+msgstr "オブジェクトは最初に初期化されると記します。"
 
 #: ../src/ld.c:131
 msgid "Enable/disable lazy-loading flag for following dependencies."
-msgstr ""
+msgstr "以下の依存性のための遅延ロードを有効/無効にします。"
 
 #: ../src/ld.c:133
 msgid "Mark object as not loadable with 'dlopen'."
-msgstr ""
+msgstr "'dlopen' でロードできないと記します。"
 
 #: ../src/ld.c:135
 msgid "Ignore/record dependencies on unused DSOs."
-msgstr ""
+msgstr "使用されない DSO の依存性を無視/記録します。"
 
 #: ../src/ld.c:137
 msgid "Generated DSO will be a system library."
-msgstr ""
+msgstr "生成された DSO はシステムライブラリーになります。"
 
 #: ../src/ld.c:138
 msgid "ADDRESS"
-msgstr ""
+msgstr "アドレス"
 
 #: ../src/ld.c:138
 msgid "Set entry point address."
-msgstr ""
+msgstr "入口点アドレスを設定します。"
 
 #: ../src/ld.c:141
 msgid "Do not link against shared libraries."
-msgstr ""
+msgstr "共用ライブラリーに対してリンクを設定してはいけません。"
 
 #: ../src/ld.c:144
 msgid "Prefer linking against shared libraries."
-msgstr ""
+msgstr "共用ライブラリーに対してリンクを好みます。"
 
 #: ../src/ld.c:145
 msgid "Export all dynamic symbols."
-msgstr ""
+msgstr "全ダイナミックシンボルをエクスポートします。"
 
 #: ../src/ld.c:146
 msgid "Strip all symbols."
-msgstr ""
+msgstr "全シンボルを取り除きます。"
 
 #: ../src/ld.c:147
 msgid "Strip debugging symbols."
-msgstr ""
+msgstr "デバッグシンボルを取り除きます。"
 
 #: ../src/ld.c:149
 msgid "Assume pagesize for the target system to be SIZE."
-msgstr ""
+msgstr "ターゲットシステムのページサイズを SIZE と見做します。"
 
 #: ../src/ld.c:151
 msgid "Set runtime DSO search path."
-msgstr ""
+msgstr "実行時 DSO 検索パスを設定します。"
 
 #: ../src/ld.c:154
 msgid "Set link time DSO search path."
-msgstr ""
+msgstr "リンク時 DSO 検索パスを設定します。"
 
 #: ../src/ld.c:155
 msgid "Generate dynamic shared object."
-msgstr ""
+msgstr "動的共用オブジェクトを生成します。"
 
 #: ../src/ld.c:156
 msgid "Generate relocatable object."
-msgstr ""
+msgstr "リロケータブルオブジェクトを生成します。"
 
 #: ../src/ld.c:159
 msgid "Causes symbol not assigned to a version be reduced to local."
-msgstr ""
+msgstr "バージョンが指定されていないシンボルはローカルに減少します。"
 
 #: ../src/ld.c:160
 msgid "Remove unused sections."
-msgstr ""
+msgstr "使用されていないセクションを取り除きます。"
 
 #: ../src/ld.c:163
 msgid "Don't remove unused sections."
-msgstr ""
+msgstr "利用されていていセクションを取り除いてはいけません。"
 
 #: ../src/ld.c:164
 msgid "Set soname of shared object."
-msgstr ""
+msgstr "共用ライブラリーの so 名を設定します。"
 
 #: ../src/ld.c:165
 msgid "Set the dynamic linker name."
-msgstr ""
+msgstr "動的リンカーの名前を設定します。"
 
 #: ../src/ld.c:168
 msgid "Add/suppress addition indentifying link-editor to .comment section."
 msgstr ""
+".comment セクションにリンクエディターを識別する追加情報を追加/抑止します。"
 
 #: ../src/ld.c:171
 msgid "Create .eh_frame_hdr section"
-msgstr ""
+msgstr ".eh_frame_hdr セクションを生成します"
 
 #: ../src/ld.c:173
 msgid "Set hash style to sysv, gnu or both."
-msgstr ""
+msgstr "ハッシュ形式を sysvか、gnu、両方のどれかに設定します。"
 
 #: ../src/ld.c:175
 msgid "Generate build ID note (md5, sha1 (default), uuid)."
-msgstr ""
+msgstr "ビルド ID ノート (md5、sh1 (省略値)、uuid) を生成します。"
 
 #: ../src/ld.c:177
 msgid "Linker Operation Control:"
-msgstr ""
+msgstr "リンカー操作制御:"
 
 #: ../src/ld.c:178
 msgid "Verbose messages."
-msgstr ""
+msgstr "饒舌メッセージ。"
 
 #: ../src/ld.c:179
 msgid "Trace file opens."
-msgstr ""
+msgstr "ファイルのオープンを追跡します。"
 
 #: ../src/ld.c:181
 msgid "Trade speed for less memory usage"
-msgstr ""
+msgstr "速度と引き換えにメモリー使用量を減らします"
 
 #: ../src/ld.c:182
 msgid "LEVEL"
-msgstr ""
+msgstr "れべる"
 
 #: ../src/ld.c:183
 msgid "Set optimization level to LEVEL."
-msgstr ""
+msgstr "最適化レベルを れべる に設定します。"
 
 #: ../src/ld.c:184
 msgid "Use linker script in FILE."
-msgstr ""
+msgstr "ふぁいる でリンカースクリプトを使用します。"
 
 #: ../src/ld.c:187
 msgid "Select to get parser debug information"
-msgstr ""
+msgstr "パーサーのデバッグ情報を得るように選択します"
 
 #: ../src/ld.c:190
 msgid "Read version information from FILE."
-msgstr ""
+msgstr "ふぁいる からバージョン情報を読みます。"
 
 #: ../src/ld.c:191
 msgid "Set emulation to NAME."
-msgstr ""
+msgstr "エミュレーションを なまえ に設定します。"
 
 #. Short description of program.
 #: ../src/ld.c:197
 msgid "Combine object and archive files."
-msgstr ""
+msgstr "オブジェクトとアーカイブファイルを一体化します。"
 
 #. Strings for arguments in help texts.
 #: ../src/ld.c:200
 msgid "[FILE]..."
-msgstr ""
+msgstr "[ふぁいる]..."
 
 #: ../src/ld.c:333
 #, c-format
 msgid "At least one input file needed"
-msgstr ""
+msgstr "少なくとも 1 つの入力ファイルが必要です"
 
 #: ../src/ld.c:349
 #, c-format
 msgid "error while preparing linking"
-msgstr ""
+msgstr "リンクの準備中にエラー"
 
 #: ../src/ld.c:356
 #, c-format
 msgid "cannot open linker script '%s'"
-msgstr ""
+msgstr "リンカースクリプト '%s' を開けません"
 
 #: ../src/ld.c:397
 #, c-format
@@ -5694,8 +5698,8 @@ msgstr ""
 
 #: ../src/unstrip.c:2247
 msgid ""
-"Combine stripped files with separate symbols and debug information.\vThe "
-"first form puts the result in DEBUG-FILE if -o was not given.\n"
+"Combine stripped files with separate symbols and debug information.The first "
+"form puts the result in DEBUG-FILE if -o was not given.\n"
 "\n"
 "MODULE arguments give file name patterns matching modules to process.\n"
 "With -f these match the file name of the main (stripped) file (slashes are "

@@ -2,6 +2,7 @@ Version 0.143:
 
 libdw: Various convenience functions for individual attributes now use
        dwarf_attr_integrate to look up indirect inherited attributes.
+       Location expression handling now supports DW_OP_implicit_value.
 
 libdwfl: Support automatic decompression of files in XZ format,
 	 and of Linux kernel images made with bzip2 or LZMA (as well as gzip).

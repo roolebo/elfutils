@@ -627,7 +627,7 @@ extern int dwarf_getlocation_addr (Dwarf_Attribute *attr, Dwarf_Addr address,
    The OP pointer must point into an expression that dwarf_getlocation
    or dwarf_getlocation_addr has returned given the same ATTR.  */
 extern int dwarf_getlocation_implicit_value (Dwarf_Attribute *attr,
-					     Dwarf_Op *op,
+					     const Dwarf_Op *op,
 					     Dwarf_Block *return_block)
   __nonnull_attribute__ (2, 3);
 

@@ -129,13 +129,13 @@ store_implicit_value (Dwarf *dbg, void **cache, Dwarf_Op *op,
 int
 dwarf_getlocation_implicit_value (attr, op, return_block)
      Dwarf_Attribute *attr;
-     Dwarf_Op *op;
+     const Dwarf_Op *op;
      Dwarf_Block *return_block;
 {
   if (attr == NULL)
     return -1;
 
-  struct loc_block_s fake = { .addr = op };
+  struct loc_block_s fake = { .addr = (void *) op };
   struct loc_block_s **found = tfind (&fake, &attr->cu->locs, loc_compare);
   if (unlikely (found == NULL))
     {

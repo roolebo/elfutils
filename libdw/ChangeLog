@@ -1,3 +1,9 @@
+2009-09-17  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_getlocation.c (dwarf_getlocation_implicit_value): Make OP
+	argument a pointer to const.
+	* libdw.h: Update decl.
+
 2009-09-10  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_getlocation.c (store_implicit_value): New function.

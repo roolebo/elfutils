@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ja\n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2009-09-13 02:52+0000\n"
-"PO-Revision-Date: 2009-09-13 15:32+0900\n"
+"POT-Creation-Date: 2009-09-19 19:37+0000\n"
+"PO-Revision-Date: 2009-09-20 15:32+0900\n"
 "Last-Translator: Hyu_gabaru Ryu_ichi <hyu_gabaru@yahoo.co.jp>\n"
 "Language-Team: Japanese <jp@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -376,8 +376,8 @@ msgid ""
 "Find addresses in files mapped as read from FILE in Linux /proc/PID/maps "
 "format"
 msgstr ""
-"Linux の /proc/PID/maps 形式の ふぁいる から読み込んだものに対応するファイルのア"
-"ドレスを探す"
+"Linux の /proc/PID/maps 形式の ふぁいる から読み込んだものに対応するファイル"
+"のアドレスを探す"
 
 #: ../libdwfl/argp-std.c:76
 msgid "Find addresses in the running kernel"
@@ -1651,7 +1651,7 @@ msgstr[0] ""
 "2u] '%s'\n"
 
 #: ../src/readelf.c:2610
-#, non-c-format
+#, fuzzy, c-format
 msgid " Length  Number  % of total  Coverage\n"
 msgstr " 長さ    数      全体の%     範囲    \n"
 
@@ -2298,7 +2298,6 @@ msgstr ""
 "\n"
 "オフセット %3$#<PRIx64> の DWARF セクション [%1$2zu] '%2$s':\n"
 " %4$*s  文字列\n"
-
 
 #: ../src/readelf.c:6186
 #, c-format
@@ -2991,139 +2990,141 @@ msgstr "リンカースクリプト '%s' を開けません"
 #: ../src/ld.c:397
 #, c-format
 msgid "-( without matching -)"
-msgstr ""
+msgstr "-( 何も一致しない -)"
 
 #: ../src/ld.c:572 ../src/ld.c:610
 #, c-format
 msgid "only one option of -G and -r is allowed"
-msgstr ""
+msgstr "-G か -r のどちらかひとつのオプションだけ認められます"
 
 #: ../src/ld.c:594
 #, c-format
 msgid "more than one '-m' parameter"
-msgstr ""
+msgstr "-m パラメーターが1つを越えています"
 
 #: ../src/ld.c:604 ../src/ld.c:1013
 #, c-format
 msgid "unknown option `-%c %s'"
-msgstr ""
+msgstr "不明なオプション `%c %s'"
 
 #: ../src/ld.c:646
 #, c-format
 msgid "invalid page size value '%s': ignored"
-msgstr ""
+msgstr "不当なページサイズ値 '%s': 無視しました"
 
 #: ../src/ld.c:687
 #, c-format
 msgid "invalid hash style '%s'"
-msgstr ""
+msgstr "不当なハッシュスタイル '%s'"
 
 #: ../src/ld.c:697
 #, c-format
 msgid "invalid build-ID style '%s'"
-msgstr ""
+msgstr "不当なビルド-ID スタイル '%s'"
 
 #: ../src/ld.c:785
 #, c-format
 msgid "More than one output file name given."
-msgstr ""
+msgstr "ひとつを越える出力ファイル名が与えられました。"
 
 #: ../src/ld.c:802
 #, c-format
 msgid "Invalid optimization level `%s'"
-msgstr ""
+msgstr "不当な最適化レベル `%s'"
 
 #: ../src/ld.c:850
 #, c-format
 msgid "nested -( -) groups are not allowed"
-msgstr ""
+msgstr "ネストされた -( -) グループは認められません"
 
 #: ../src/ld.c:869
 #, c-format
 msgid "-) without matching -("
-msgstr ""
+msgstr "対応する -( がない -)"
 
 #: ../src/ld.c:1046
 #, c-format
 msgid "unknown option '-%c %s'"
-msgstr ""
+msgstr "不明なオプション '-%c %s'"
 
 #: ../src/ld.c:1150
 #, c-format
 msgid "could not find input file to determine output file format"
-msgstr ""
+msgstr "出力ファイル形式を決定するための入力ファイルが見つかりません"
 
 #: ../src/ld.c:1152
 #, c-format
 msgid "try again with an appropriate '-m' parameter"
-msgstr ""
+msgstr "適切な '-m' パラメーターを付けて再試行してください"
 
 #: ../src/ld.c:1446
 #, c-format
 msgid "cannot read version script '%s'"
-msgstr ""
+msgstr "バージョンスクリプト '%s' を読めません"
 
 #. The symbol is already defined and now again
 #. in the linker script.  This is an error.
 #: ../src/ld.c:1512 ../src/ld.c:1551
 #, c-format
 msgid "duplicate definition of '%s' in linker script"
-msgstr ""
+msgstr "リンカースクリプトに '%s' の重複定義"
 
 #: ../src/ldgeneric.c:209 ../src/ldgeneric.c:5151
 #, c-format
 msgid "cannot create string table"
-msgstr ""
+msgstr "文字列テーブルを生成できません"
 
 #: ../src/ldgeneric.c:255
 #, c-format
 msgid "cannot load ld backend library '%s': %s"
-msgstr ""
+msgstr "ld バックエンドライブラリー '%s' をロードできません: %s"
 
 #: ../src/ldgeneric.c:265
 #, c-format
 msgid "cannot find init function in ld backend library '%s': %s"
-msgstr ""
+msgstr "ld バックエンドライブラリー '%s' に初期化機能が見つかりません: %s "
 
 #: ../src/ldgeneric.c:310
 #, c-format
 msgid "%s listed more than once as input"
-msgstr ""
+msgstr "入力に %s が 1回を越えて書かれています"
 
 #: ../src/ldgeneric.c:424
 #, c-format
 msgid "%s (for -l%s)\n"
-msgstr ""
+msgstr "%s (-l%s 用)\n"
 
 #: ../src/ldgeneric.c:425
 #, c-format
 msgid "%s (for DT_NEEDED %s)\n"
-msgstr ""
+msgstr "%s (DT_NEEDED %s 用)\n"
 
 #: ../src/ldgeneric.c:573
 #, c-format
 msgid "Warning: type of `%s' changed from %s in %s to %s in %s"
-msgstr ""
+msgstr "警告: `%1$s' のタイプが %3$s の %2$s から %5$s の %4$s に変更されました"
 
 #: ../src/ldgeneric.c:586
 #, c-format
 msgid "Warning: size of `%s' changed from %<PRIu64> in %s to %<PRIu64> in %s"
 msgstr ""
+"警告: `%1$s の大きさが %3$s の %2$<PRIu64> から %5$s の %4$<PRIu64> に"
+"変更されました"
 
 #: ../src/ldgeneric.c:677
 #, c-format
 msgid "(%s+%#<PRIx64>): multiple definition of %s `%s'\n"
-msgstr ""
+msgstr "(%s+%#<PRIx64>): %s の複数定義 '%s'\n"
 
 #: ../src/ldgeneric.c:700
 #, c-format
 msgid "(%s+%#<PRIx64>): first defined here\n"
-msgstr ""
+msgstr "(%s+%#<PRIx64>): 最初の定義はここ\n"
 
 #: ../src/ldgeneric.c:819
 #, c-format
 msgid "%s: cannot get section group data: %s"
-msgstr ""
+msgstr "%s: セクショングループデータを得られません: %s"
 
 #. If we come here no section group contained the given section
 #. despite the SHF_GROUP flag.  This is an error in the input
@@ -3132,11 +3133,13 @@ msgstr ""
 #, c-format
 msgid "%s: section '%s' with group flag set does not belong to any group"
 msgstr ""
+"%s: グループフラグが設定されているセクション '%s' はどのグループにも"
+"属していません"
 
 #: ../src/ldgeneric.c:885
 #, c-format
 msgid "%s: section [%2d] '%s' is not in the correct section group"
-msgstr ""
+msgstr "%s: セクション [%2d] '%s& は正しいセクショングループに入っていません"
 
 #. This should never happen.
 #: ../src/ldgeneric.c:1156 ../src/ldgeneric.c:1413 ../src/ldgeneric.c:1422
@@ -3144,22 +3147,22 @@ msgstr ""
 #: ../src/ldgeneric.c:2005
 #, c-format
 msgid "%s: invalid ELF file (%s:%d)\n"
-msgstr ""
+msgstr "%s: 不当な ELF ファイル (%s:%d)\n"
 
 #: ../src/ldgeneric.c:1250
 #, c-format
 msgid "%s: only files of type ET_REL might contain section groups"
-msgstr ""
+msgstr "%s: タイプ ET_REL のファイルのみセクショングループを含むことができます"
 
 #: ../src/ldgeneric.c:1302
 #, c-format
 msgid "%s: cannot determine signature of section group [%2zd] '%s': %s"
-msgstr ""
+msgstr "%s: セクショングループ [%2zd] '%s' の署名を決定できません: %s"
 
 #: ../src/ldgeneric.c:1314
 #, c-format
 msgid "%s: cannot get content of section group [%2zd] '%s': %s'"
-msgstr ""
+msgstr "%s: セクショングループ [%2zd] '%s' の内容を得られません: %s'"
 
 #: ../src/ldgeneric.c:1328
 #, c-format
@@ -3167,46 +3170,48 @@ msgid ""
 "%s: group member %zu of section group [%2zd] '%s' has too high index: %"
 "<PRIu32>"
 msgstr ""
+"%1$s: セクショングループ [%3$2zd] '%4$s' のグループメンバー %2$zu は大きすぎる"
+"インデックスを持っています: %5$<PRIu32>"
 
 #: ../src/ldgeneric.c:1350
 #, c-format
 msgid "%s: section '%s' has unknown type: %d"
-msgstr ""
+msgstr "%s: セクション '%s' は不明なタイプを持っています: %d"
 
 #: ../src/ldgeneric.c:1729
 #, c-format
 msgid "cannot get descriptor for ELF file (%s:%d): %s\n"
-msgstr ""
+msgstr "ELF ファイル (%s:%d) のための記述子を得られません: %s\n"
 
 #: ../src/ldgeneric.c:1899
 #, c-format
 msgid "cannot read archive `%s': %s"
-msgstr ""
+msgstr "アーカイブ `%s' を読めません: %s"
 
 #: ../src/ldgeneric.c:2020
 #, c-format
 msgid "file of type %s cannot be linked in\n"
-msgstr ""
+msgstr "%s のファイルタイプがリンクされていません\n"
 
 #: ../src/ldgeneric.c:2032
 #, c-format
 msgid "%s: input file incompatible with ELF machine type %s\n"
-msgstr ""
+msgstr "%s: 入力ファイルは ELF マシンタイプ %s と互換性がありません\n"
 
 #: ../src/ldgeneric.c:2044
 #, c-format
 msgid "%s: cannot get section header string table index: %s\n"
-msgstr ""
+msgstr "%s: セクションヘッダー文字列テーブルインデックスを得られません: %s\n"
 
 #: ../src/ldgeneric.c:2073
 #, c-format
 msgid "cannot use DSO '%s' when generating relocatable object file"
-msgstr ""
+msgstr "リロケータブルオブジェクトファイル生成時に DSO '%s' を使えません"
 
 #: ../src/ldgeneric.c:2158
 #, c-format
 msgid "input file '%s' ignored"
-msgstr ""
+msgstr "入力ファイル '%s' を無視しました"
 
 #. XXX The error message should get better.  It should use
 #. the debugging information if present to tell where in the
@@ -3214,17 +3219,17 @@ msgstr ""
 #: ../src/ldgeneric.c:2372
 #, c-format
 msgid "undefined symbol `%s' in %s"
-msgstr ""
+msgstr "%2$s 中に未定義のシンボル `%1$s'"
 
 #: ../src/ldgeneric.c:2702
 #, c-format
 msgid "cannot create ELF descriptor for output file: %s"
-msgstr ""
+msgstr "出力ファイル用の ELF 記述子を生成できません: %s"
 
 #: ../src/ldgeneric.c:2709
 #, c-format
 msgid "could not create ELF header for output file: %s"
-msgstr ""
+msgstr "出力ファイル用の ELF ヘッダーを生成できませんでした: %s"
 
 #: ../src/ldgeneric.c:3224 ../src/ldgeneric.c:3294 ../src/ldgeneric.c:3330
 #: ../src/ldgeneric.c:4457 ../src/ldgeneric.c:4506 ../src/ldgeneric.c:4538
@@ -3232,12 +3237,12 @@ msgstr ""
 #: ../src/ldgeneric.c:5131 ../src/ldgeneric.c:5600 ../src/ldgeneric.c:5612
 #, c-format
 msgid "cannot create section for output file: %s"
-msgstr ""
+msgstr "出力ファイル用のセクションを生成できません: %s"
 
 #: ../src/ldgeneric.c:3444
 #, c-format
 msgid "address computation expression contains variable '%s'"
-msgstr ""
+msgstr "アドレス計算式が変数 '%s' を含んでいます"
 
 #: ../src/ldgeneric.c:3489
 #, c-format
@@ -3245,133 +3250,137 @@ msgid ""
 "argument '%<PRIuMAX>' of ALIGN in address computation expression is no power "
 "of two"
 msgstr ""
+"アドレス計算式中の ALIGN のパラメーター %<PRIuMAX> が 2 の累乗ではありません"
 
 #: ../src/ldgeneric.c:3684
 #, c-format
 msgid "cannot find entry symbol '%s': defaulting to %#0*<PRIx64>"
 msgstr ""
+"エントリーシンボル '%s' が見つかりません: デフォルトの %#0*<PRIx64> にします"
 
 #: ../src/ldgeneric.c:3690
 #, c-format
 msgid "no entry symbol specified: defaulting to %#0*<PRIx64>"
 msgstr ""
+"エントリーシンボルが指定されていません: デフォルトの %#0*<PRIx64> にします"
 
 #: ../src/ldgeneric.c:3920
 #, c-format
 msgid "cannot create GNU hash table section for output file: %s"
-msgstr ""
+msgstr "出力ファイル用の GNU ハッシュテーブルセクションを生成できません: %s"
 
 #: ../src/ldgeneric.c:4071
 #, c-format
 msgid "cannot create hash table section for output file: %s"
-msgstr ""
+msgstr "出力ファイル用のハッシュテーブルセクションを生成できません: %s"
 
 #: ../src/ldgeneric.c:4114
 #, c-format
 msgid "cannot create build ID section: %s"
-msgstr ""
+msgstr "ビルド ID セクションを生成できません: %s"
 
 #: ../src/ldgeneric.c:4191
 #, c-format
 msgid "cannot convert section data to file format: %s"
-msgstr ""
+msgstr "セクションデータをファイル形式に変換できません: %s"
 
 #: ../src/ldgeneric.c:4200
 #, c-format
 msgid "cannot convert section data to memory format: %s"
-msgstr ""
+msgstr "セクションデータをメモリー形式に変換できません: %s"
 
 #: ../src/ldgeneric.c:4261
 #, c-format
 msgid "cannot read enough data for UUID"
-msgstr ""
+msgstr "UUID に十分なデータを読めません"
 
 #: ../src/ldgeneric.c:4358 ../src/ldgeneric.c:4379 ../src/ldgeneric.c:4408
 #: ../src/ldgeneric.c:6062
 #, c-format
 msgid "cannot create symbol table for output file: %s"
-msgstr ""
+msgstr "出力ファイル用のシンボルテーブルを生成できません: %s"
 
 #: ../src/ldgeneric.c:5300 ../src/ldgeneric.c:5852
 #, c-format
 msgid "section index too large in dynamic symbol table"
-msgstr ""
+msgstr "動的シンボルテーブルのセクションインデックスが大きすぎます"
 
 #: ../src/ldgeneric.c:5745
 #, c-format
 msgid "cannot create versioning section: %s"
-msgstr ""
+msgstr "バージョニングセクションを生成できません: %s"
 
 #: ../src/ldgeneric.c:5818
 #, c-format
 msgid "cannot create dynamic symbol table for output file: %s"
-msgstr ""
+msgstr "出力ファイル用の動的シンボルテーブルを生成できません: %s"
 
 #: ../src/ldgeneric.c:5994
 #, c-format
 msgid "cannot create versioning data: %s"
-msgstr ""
+msgstr "バージョニングデータを生成できません: %s"
 
 #: ../src/ldgeneric.c:6094 ../src/ldgeneric.c:6107 ../src/ldgeneric.c:6171
 #: ../src/ldgeneric.c:6179
 #, c-format
 msgid "cannot create section header string section: %s"
-msgstr ""
+msgstr "セクションヘッダー文字列セクションを生成できません: %s"
 
 #: ../src/ldgeneric.c:6101
 #, c-format
 msgid "cannot create section header string section"
-msgstr ""
+msgstr "セクションヘッダー文字列セクションを生成できません"
 
 #: ../src/ldgeneric.c:6259
 #, c-format
 msgid "cannot create program header: %s"
-msgstr ""
+msgstr "プログラムヘッダーを生成できません: %s"
 
 #: ../src/ldgeneric.c:6267
 #, c-format
 msgid "while determining file layout: %s"
-msgstr ""
+msgstr "ファイルレイアウトを決定中: %s"
 
 #: ../src/ldgeneric.c:6388
 #, c-format
 msgid "internal error: non-nobits section follows nobits section"
-msgstr ""
+msgstr "内部エラー: 非 nobits セクションが nobits セクションに続きます"
 
 #: ../src/ldgeneric.c:6925
 #, c-format
 msgid "cannot get header of 0th section: %s"
-msgstr ""
+msgstr "0番目のセクションのヘッダーを得られません: %s"
 
 #: ../src/ldgeneric.c:6941 ../src/unstrip.c:1807
 #, c-format
 msgid "cannot update ELF header: %s"
-msgstr ""
+msgstr "ELF ヘッダーを更新できません: %s"
 
 #: ../src/ldgeneric.c:6972
 #, c-format
 msgid "linker backend didn't specify function to relocate section"
 msgstr ""
+"リンカーバックエンドがセクションをリロケートするための機能を指定していません"
 
 #: ../src/ldgeneric.c:6984
 #, c-format
 msgid "while writing output file: %s"
-msgstr ""
+msgstr "出力ファイルに書込み中: %s"
 
 #: ../src/ldgeneric.c:6989
 #, c-format
 msgid "while finishing output file: %s"
-msgstr ""
+msgstr "出力ファイルの仕上げ中: %s"
 
 #: ../src/ldgeneric.c:6995
 #, c-format
 msgid "cannot stat output file"
-msgstr ""
+msgstr "出力ファイルを stat できません"
 
 #: ../src/ldgeneric.c:7011
 #, c-format
 msgid "WARNING: temporary output file overwritten before linking finished"
-msgstr ""
+msgstr "警告: リンクを仕上げる前に一時出力ファイルが上書きされました"
 
 #. This cannot be implemented generally.  There should have been a
 #. machine dependent implementation and we should never have arrived
@@ -3381,219 +3390,221 @@ msgstr ""
 #: ../src/ldgeneric.c:7141
 #, c-format
 msgid "no machine specific '%s' implementation"
-msgstr ""
+msgstr "マシン固有の '%s' 実装はありません"
 
 #: ../src/i386_ld.c:210
 #, c-format
 msgid "cannot allocate PLT section: %s"
-msgstr ""
+msgstr "PLT セクションを割り当てられません: %s"
 
 #: ../src/i386_ld.c:232
 #, c-format
 msgid "cannot allocate PLTREL section: %s"
-msgstr ""
+msgstr "PLTREL セクションを割り当てられません: %s"
 
 #: ../src/i386_ld.c:253
 #, c-format
 msgid "cannot allocate GOT section: %s"
-msgstr ""
+msgstr "GOT セクションを割り当てられません: %s"
 
 #: ../src/i386_ld.c:274
 #, c-format
 msgid "cannot allocate GOTPLT section: %s"
-msgstr ""
+msgstr "GOTPLT セクションを割り当てられません: %s"
 
 #: ../src/i386_ld.c:661
 #, c-format
 msgid "initial-executable TLS relocation cannot be used "
-msgstr ""
+msgstr "最初に実行される TLS リロケーションが使用されません "
 
 #: ../src/ldscript.y:178
 msgid "mode for segment invalid\n"
-msgstr ""
+msgstr "セグメント用のモードが不当です\n"
 
 #: ../src/ldscript.y:465
 #, c-format
 msgid "while reading version script '%s': %s at line %d"
-msgstr ""
+msgstr "バージョンスクリプト '%1$s' 読込み中: %3$d 行目の %2$s"
 
 #: ../src/ldscript.y:466
 #, c-format
 msgid "while reading linker script '%s': %s at line %d"
-msgstr ""
+msgstr "リンカースクリプト '%1$s' 読込み中: %3$d 行目の %2$s"
 
 #: ../src/ldscript.y:745
 #, c-format
 msgid "symbol '%s' in declared both local and global for unnamed version"
-msgstr ""
+msgstr "名前なしバージョン用のローカルとグローバルで宣言されたシンボル '%s'"
 
 #: ../src/ldscript.y:747
 #, c-format
 msgid "symbol '%s' in declared both local and global for version '%s'"
-msgstr ""
+msgstr "バージョン '%2$s' 用のローカルとグローバルで宣言されたシンボル '%1$s'"
 
 #: ../src/ldscript.y:767 ../src/ldscript.y:774
 #, c-format
 msgid "default visibility set as local and global"
-msgstr ""
+msgstr "ローカルとグローバルに設定されたデフォルトの可視性"
 
 #: ../src/elflint.c:71
 msgid "Be extremely strict, flag level 2 features."
-msgstr ""
+msgstr "非常に厳密にやってください、フラグレベル 2 機能。"
 
 #: ../src/elflint.c:72
 msgid "Do not print anything if successful"
-msgstr ""
+msgstr "成功したら何も印刷しない"
 
 #: ../src/elflint.c:73
 msgid "Binary is a separate debuginfo file"
-msgstr ""
+msgstr "バイナリーは別の debuginfo ファイルです"
 
 #: ../src/elflint.c:75
 msgid ""
 "Binary has been created with GNU ld and is therefore known to be broken in "
 "certain ways"
 msgstr ""
+"バイナリーは GNU ld で作成され、従ってある方法で壊れているのが知られている"
 
 #. Short description of program.
 #: ../src/elflint.c:81
 msgid "Pedantic checking of ELF files compliance with gABI/psABI spec."
-msgstr ""
+msgstr "ELF ファイルが gABI/psABI 仕様へ準拠しているかの厳密なチェック。"
 
 #: ../src/elflint.c:165
 #, c-format
 msgid "cannot generate Elf descriptor: %s\n"
-msgstr ""
+msgstr "Elf 記述子を生成できません: %s\n"
 
 #: ../src/elflint.c:184
 #, c-format
 msgid "error while closing Elf descriptor: %s\n"
-msgstr ""
+msgstr "Elf 記述子を閉じている時にエラー: %s\n"
 
 #: ../src/elflint.c:188
 msgid "No errors"
-msgstr ""
+msgstr "エラーはありません"
 
 #: ../src/elflint.c:301
 #, c-format
 msgid " error while freeing sub-ELF descriptor: %s\n"
-msgstr ""
+msgstr "副-ELF 記述子を解放している時にエラー: %s\n"
 
 #. We cannot do anything.
 #: ../src/elflint.c:309
 #, c-format
 msgid "Not an ELF file - it has the wrong magic bytes at the start\n"
-msgstr ""
+msgstr "ELF ファイルではありません - 最初に誤ったマジックバイトがあります\n"
 
 #: ../src/elflint.c:368
 #, c-format
 msgid "e_ident[%d] == %d is no known class\n"
-msgstr ""
+msgstr "e_ident[%d] == %d は既知のクラスではありません\n"
 
 #: ../src/elflint.c:373
 #, c-format
 msgid "e_ident[%d] == %d is no known data encoding\n"
-msgstr ""
+msgstr "e_ident[%d] == %d は既知のデータエンコードではありません\n"
 
 #: ../src/elflint.c:377
 #, c-format
 msgid "unknown ELF header version number e_ident[%d] == %d\n"
-msgstr ""
+msgstr "不明な ELF ヘッダーバージョン数 e_ident[%d] == %d\n"
 
 #: ../src/elflint.c:383
 #, c-format
 msgid "unsupported OS ABI e_ident[%d] == '%s'\n"
-msgstr ""
+msgstr "不明な OS ABI e_ident[%d] == '%s'\n"
 
 #: ../src/elflint.c:389
 #, c-format
 msgid "unsupport ABI version e_ident[%d] == %d\n"
-msgstr ""
+msgstr "不明な ABI バージョン e_ident[%d] == %d\n"
 
 #: ../src/elflint.c:394
 #, c-format
 msgid "e_ident[%zu] is not zero\n"
-msgstr ""
+msgstr "e_ident[%zu] がゼロではありません\n"
 
 #: ../src/elflint.c:399
 #, c-format
 msgid "unknown object file type %d\n"
-msgstr ""
+msgstr "不明なオブジェクトファイルタイプ %d\n"
 
 #: ../src/elflint.c:406
 #, c-format
 msgid "unknown machine type %d\n"
-msgstr ""
+msgstr "不明なマシンタイプ %d\n"
 
 #: ../src/elflint.c:410
 #, c-format
 msgid "unknown object file version\n"
-msgstr ""
+msgstr "不明なオブジェクトファイルバージョン\n"
 
 #: ../src/elflint.c:416
 #, c-format
 msgid "invalid program header offset\n"
-msgstr ""
+msgstr "不当なプログラムヘッダーオフセット\n"
 
 #: ../src/elflint.c:418
 #, c-format
 msgid "executables and DSOs cannot have zero program header offset\n"
 msgstr ""
+"実行ファイルと DSO はプログラムヘッダーオフセットが 0 であってはいけません\n"
 
 #: ../src/elflint.c:422
 #, c-format
 msgid "invalid number of program header entries\n"
-msgstr ""
+msgstr "プログラムヘッダー項目数として不当な数\n"
 
 #: ../src/elflint.c:430
 #, c-format
 msgid "invalid section header table offset\n"
-msgstr ""
+msgstr "不当なセクションヘッダーテーブルオフセット\n"
 
 #: ../src/elflint.c:433
 #, c-format
 msgid "section header table must be present\n"
-msgstr ""
+msgstr "セクションヘッダーテーブルがなければなりません\n"
 
 #: ../src/elflint.c:447
 #, c-format
 msgid "invalid number of section header table entries\n"
-msgstr ""
+msgstr "セクションヘッダーテーブル項目数として不当な数\n"
 
 #: ../src/elflint.c:464
 #, c-format
 msgid "invalid section header index\n"
-msgstr ""
+msgstr "不当なセクションヘッダーインデックス\n"
 
 #: ../src/elflint.c:469
 #, c-format
 msgid "invalid machine flags: %s\n"
-msgstr ""
+msgstr "不当なマシンフラグ: %s\n"
 
 #: ../src/elflint.c:476 ../src/elflint.c:493
 #, c-format
 msgid "invalid ELF header size: %hd\n"
-msgstr ""
+msgstr "不当な ELF ヘッダーサイズ: %hd\n"
 
 #: ../src/elflint.c:479 ../src/elflint.c:496
 #, c-format
 msgid "invalid program header size: %hd\n"
-msgstr ""
+msgstr "不当なプログラムヘッダーサイズ: %hd\n"
 
 #: ../src/elflint.c:482 ../src/elflint.c:499
 #, c-format
 msgid "invalid program header position or size\n"
-msgstr ""
+msgstr "不当なプログラムヘッダー位置かサイズ\n"
 
 #: ../src/elflint.c:485 ../src/elflint.c:502
 #, c-format
 msgid "invalid section header size: %hd\n"
-msgstr ""
+msgstr "不当なセクションヘッダーサイズ: %hd\n"
 
 #: ../src/elflint.c:488 ../src/elflint.c:505
 #, c-format
 msgid "invalid section header position or size\n"
-msgstr ""
+msgstr "不当なセクションヘッダー位置かサイズ\n"
 
 #: ../src/elflint.c:549
 #, c-format
@@ -3601,12 +3612,16 @@ msgid ""
 "section [%2d] '%s': section with SHF_GROUP flag set not part of a section "
 "group\n"
 msgstr ""
+"セクション [%2d] '%s': SHF_GROUP フラグのあるセクションにセクショングループ"
+"の一部分が設定されていません\n"
 
 #: ../src/elflint.c:553
 #, c-format
 msgid ""
 "section [%2d] '%s': section group [%2zu] '%s' does not preceed group member\n"
 msgstr ""
+"セクション [%2d] '%s': セクショングループ [%2zu] '%s' がグループメンバーを"
+"継続していません\n"
 
 #: ../src/elflint.c:569 ../src/elflint.c:1412 ../src/elflint.c:1462
 #: ../src/elflint.c:1571 ../src/elflint.c:2165 ../src/elflint.c:2679
@@ -3614,7 +3629,7 @@ msgstr ""
 #: ../src/elflint.c:4040
 #, c-format
 msgid "section [%2d] '%s': cannot get section data\n"
-msgstr ""
+msgstr "セクション [%2d] '%s': セクションデータを得られません\n"
 
 #: ../src/elflint.c:582 ../src/elflint.c:1578
 #, c-format
@@ -3622,6 +3637,8 @@ msgid ""
 "section [%2d] '%s': referenced as string table for section [%2d] '%s' but "
 "type is not SHT_STRTAB\n"
 msgstr ""
+"セクション [%2d] '%s': セクション [%2d] '%s' 用の文字列テーブルとして参照"
+"されていますが、タイプが SHT_STRTAB ではありません\n"
 
 #: ../src/elflint.c:605
 #, c-format
@@ -3629,37 +3646,39 @@ msgid ""
 "section [%2d] '%s': symbol table cannot have more than one extended index "
 "section\n"
 msgstr ""
+"セクション [%2d] '%s': シンボルテーブルは 1 個を越える拡張インデックス"
+"セクションを持てません\n"
 
 #: ../src/elflint.c:616
 #, c-format
 msgid "section [%2u] '%s': entry size is does not match ElfXX_Sym\n"
-msgstr ""
+msgstr "セクション [%2u] '%s': 項目サイズが ElfXX_Sym と一致しません\n"
 
 #: ../src/elflint.c:625
 #, c-format
 msgid "section [%2d] '%s': cannot get symbol %d: %s\n"
-msgstr ""
+msgstr "セクション [%2d] '%s': シンボル %d を得られません: %s\n"
 
 #: ../src/elflint.c:630 ../src/elflint.c:633 ../src/elflint.c:636
 #: ../src/elflint.c:639 ../src/elflint.c:642 ../src/elflint.c:645
 #, c-format
 msgid "section [%2d] '%s': '%s' in zeroth entry not zero\n"
-msgstr ""
+msgstr "セクション [%2d] '%s': 0番目の項目にある '%s' ゼロではありません\n"
 
 #: ../src/elflint.c:648
 #, c-format
 msgid "section [%2d] '%s': XINDEX for zeroth entry not zero\n"
-msgstr ""
+msgstr "セクション [%2d] '%s': 0番目の項目用の XINDEX がゼロではありません\n"
 
 #: ../src/elflint.c:658
 #, c-format
 msgid "section [%2d] '%s': cannot get symbol %zu: %s\n"
-msgstr ""
+msgstr "セクション [%2d] '%s': シンボル %zu を得られません: %s\n"
 
 #: ../src/elflint.c:667
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: invalid name value\n"
-msgstr ""
+msgstr "セクション [%2d] '%s': シンボル %zu: 不当な名前の値\n"
 
 #: ../src/elflint.c:680
 #, c-format
@@ -3667,6 +3686,8 @@ msgid ""
 "section [%2d] '%s': symbol %zu: too large section index but no extended "
 "section index section\n"
 msgstr ""
+"セクション [%2d] '%s': シンボル %zu: 大きすぎるセクションインデックスだが、"
+"拡張セクションインデックスセクションがありません\n"
 
 #: ../src/elflint.c:686
 #, c-format
@@ -3674,49 +3695,60 @@ msgid ""
 "section [%2d] '%s': symbol %zu: XINDEX used for index which would fit in "
 "st_shndx (%<PRIu32>)\n"
 msgstr ""
+"セクション [%2d] '%s': シンボル %zu: st_shndx (%<PRIu32>) に適合する"
+"インデックス用に使われる XINDEX\n"
 
 #. || sym->st_shndx > SHN_HIRESERVE  always false
 #: ../src/elflint.c:698
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: invalid section index\n"
-msgstr ""
+msgstr "セクション [%2d] '%s': シンボル %zu: 不当なセクションインデックス\n"
 
 #: ../src/elflint.c:706
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: unknown type\n"
-msgstr ""
+msgstr "セクション [%2d] '%s': シンボル %zu: 不明なタイプ\n"
 
 #: ../src/elflint.c:712
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: unknown symbol binding\n"
-msgstr ""
+msgstr "セクション [%2d] '%s': シンボル %zu: 不明なシンボルバインディング\n"
 
 #: ../src/elflint.c:717
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: unique symbol not of object type\n"
 msgstr ""
+"セクション [%2d] '%s': シンボル %zu: オブジェクトタイプと異なる固有の"
+"シンボル\n"
 
 #: ../src/elflint.c:725
 #, c-format
 msgid ""
 "section [%2d] '%s': symbol %zu: COMMON only allowed in relocatable files\n"
 msgstr ""
+"セクション [%2d] '%s': シンボル %zu: COMMON はリロケータブルファイル内のみ"
+"で許されます\n"
 
 #: ../src/elflint.c:729
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: local COMMON symbols are nonsense\n"
 msgstr ""
+"セクション [%2d] '%s': シンボル %zu: ローカルな COMMON シンボルは意味が"
+"ありません\n"
 
 #: ../src/elflint.c:733
 #, c-format
 msgid ""
 "section [%2d] '%s': symbol %zu: function in COMMON section is nonsense\n"
 msgstr ""
+"セクション [%2d] '%s': シンボル %zu: COMMON セクションの機能は意味が"
+"ありません\n"
 
 #: ../src/elflint.c:765
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: st_value out of bounds\n"
 msgstr ""
+"セクション [%2d] '%s': シンボル %zu: st_value 境界外\n"
 
 #: ../src/elflint.c:771 ../src/elflint.c:796 ../src/elflint.c:839
 #, c-format

@@ -3756,6 +3756,8 @@ msgid ""
 "section [%2d] '%s': symbol %zu does not fit completely in referenced section "
 "[%2d] '%s'\n"
 msgstr ""
+"セクション [%2d] '%s': シンボル %zu は参照されるセクション [%2d] '%s' とは"
+"完全に一致しません\n"
 
 #: ../src/elflint.c:780
 #, c-format
@@ -3763,6 +3765,8 @@ msgid ""
 "section [%2d] '%s': symbol %zu: referenced section [%2d] '%s' does not have "
 "SHF_TLS flag set\n"
 msgstr ""
+"セクション [%2d] '%s': シンボル %zu: 参照されるセクション [%2d] '%s' は "
+"SHF_TLS フラグが設定されていません\n"
 
 #: ../src/elflint.c:790 ../src/elflint.c:832
 #, c-format
@@ -3770,12 +3774,16 @@ msgid ""
 "section [%2d] '%s': symbol %zu: st_value out of bounds of referenced section "
 "[%2d] '%s'\n"
 msgstr ""
+"セクション [%2d] '%s': シンボル %zu: st_value 参照されるセクション "
+"[%2d] '%s' の境界外\n"
 
 #: ../src/elflint.c:817
 #, c-format
 msgid ""
 "section [%2d] '%s': symbol %zu: TLS symbol but no TLS program header entry\n"
 msgstr ""
+"セクション [%2d] '%s': シンボル %zu: TLS プログラムヘッダー項目がない TLS "
+"シンボル\n"
 
 #: ../src/elflint.c:825
 #, c-format
@@ -3783,6 +3791,8 @@ msgid ""
 "section [%2d] '%s': symbol %zu: st_value short of referenced section [%2d] '%"
 "s'\n"
 msgstr ""
+"セクション [%2d] '%s': シンボル %zu: 参照されるセクション [%2d] '%s' の"
+"st_value 不足\n"
 
 #: ../src/elflint.c:852
 #, c-format
@@ -3790,6 +3800,8 @@ msgid ""
 "section [%2d] '%s': symbol %zu: local symbol outside range described in "
 "sh_info\n"
 msgstr ""
+"セクション [%2d] '%s': シンボル %zu: sh_info に記述された範囲外のローカル"
+"シンボル\n"
 
 #: ../src/elflint.c:859
 #, c-format
@@ -3797,11 +3809,14 @@ msgid ""
 "section [%2d] '%s': symbol %zu: non-local symbol outside range described in "
 "sh_info\n"
 msgstr ""
+"セクション [%2d] '%s': シンボル %zu: sh_info に記述された範囲外の非ローカル"
+"シンボル\n"
 
 #: ../src/elflint.c:866
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: non-local section symbol\n"
 msgstr ""
+"セクション [%2d] '%s': シンボル %zu: 非ローカルセクションシンボル\n"
 
 #: ../src/elflint.c:916
 #, c-format
@@ -3809,6 +3824,8 @@ msgid ""
 "section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to bad section [%"
 "2d]\n"
 msgstr ""
+"セクション [%2d] '%s': _GLOBAL_OFFSET_TABLE_ シンボルが間違ったセクション [%"
+"2d] を参照しています\n"
 
 #: ../src/elflint.c:923
 #, c-format
@@ -3816,6 +3833,8 @@ msgid ""
 "section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to section [%2d] '%"
 "s'\n"
 msgstr ""
+"セクション [%2d] '%s': _GLOBAL_OFFSET_TABLE_ シンボルはセクション [%2d] '%s' "
+"を参照しています\n"
 
 #. This test is more strict than the psABIs which
 #. usually allow the symbol to be in the middle of
@@ -3826,6 +3845,8 @@ msgid ""
 "section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol value %#<PRIx64> does not "
 "match %s section address %#<PRIx64>\n"
 msgstr ""
+"セクション [%2d] '%s': _GLOBAL_OFFSET_TABLE_ シンボル値 %#<PRIx64> は"
+" %s のセクションアドレス %#<PRIx64> と一致しません\n"
 
 #: ../src/elflint.c:946
 #, c-format
@@ -3833,6 +3854,8 @@ msgid ""
 "section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol size %<PRIu64> does not "
 "match %s section size %<PRIu64>\n"
 msgstr ""
+"セクション [%2d] '%s': _GLOBAL_OFFSET_TABLE_ シンボルサイズ %<PRIu64> は"
+" %s のセクションサイズ %<PRIu64> と一致しません\n"
 
 #: ../src/elflint.c:954
 #, c-format
@@ -3840,6 +3863,8 @@ msgid ""
 "section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol present, but no .got "
 "section\n"
 msgstr ""
+"セクション [%2d] '%s': _GLOBAL_OFFSET_TABLE_ シンボルはありますが、.got "
+"セクションがありません\n"
 
 #: ../src/elflint.c:970
 #, c-format
@@ -3847,6 +3872,8 @@ msgid ""
 "section [%2d] '%s': _DYNAMIC_ symbol value %#<PRIx64> does not match dynamic "
 "segment address %#<PRIx64>\n"
 msgstr ""
+"セクション [%2d] '%s': _DYNAMIC_ シンボル値 %#<PRIx64> は動的セグメント"
+"アドレス %#<PRIx64> と一致しません\n"
 
 #: ../src/elflint.c:977
 #, c-format
@@ -3854,6 +3881,8 @@ msgid ""
 "section [%2d] '%s': _DYNAMIC symbol size %<PRIu64> does not match dynamic "
 "segment size %<PRIu64>\n"
 msgstr ""
+"セクション [%2d] '%s': _DYNAMIC シンボルサイズ %<PRIu64> は動的セグメント"
+"サイズ %<PRIu64> と一致しません\n"
 
 #: ../src/elflint.c:990
 #, c-format
@@ -3861,21 +3890,25 @@ msgid ""
 "section [%2d] '%s': symbol %zu: symbol in dynamic symbol table with non-"
 "default visibility\n"
 msgstr ""
+"セクション [%2d] '%s': シンボル %zu: 省略以外の可視性を持った動的シンボル"
+"テーブル中のシンボル\n"
 
 #: ../src/elflint.c:994
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: unknown bit set in st_other\n"
 msgstr ""
+"セクション [%2d] '%s': シンボル %zu: st_other 中に設定された不明なビット\n"
 
 #: ../src/elflint.c:1039
 #, c-format
 msgid "section [%2d] '%s': DT_RELCOUNT used for this RELA section\n"
 msgstr ""
+"セクション [%2d] '%s': この RELA セクション用に使われる DT_RELCOUNT\n"
 
 #: ../src/elflint.c:1048 ../src/elflint.c:1100
 #, c-format
 msgid "section [%2d] '%s': DT_RELCOUNT value %d too high for this section\n"
-msgstr ""
+msgstr "セクション [%2d] '%s': このセクション用には高すぎる DT_RELCOUNT 値 %d\n"
 
 #: ../src/elflint.c:1073 ../src/elflint.c:1125
 #, c-format
@@ -3883,6 +3916,8 @@ msgid ""
 "section [%2d] '%s': relative relocations after index %d as specified by "
 "DT_RELCOUNT\n"
 msgstr ""
+"セクション [%2d] '%s': UT_RELOCOUNT で指定されたインデックス %d 後の相対"
+"リロケーション\n"
 
 #: ../src/elflint.c:1079 ../src/elflint.c:1131
 #, c-format
@@ -3890,46 +3925,54 @@ msgid ""
 "section [%2d] '%s': non-relative relocation at index %zu; DT_RELCOUNT "
 "specified %d relative relocations\n"
 msgstr ""
+"セクション [%2d] '%s': インデックス %zu での非相対リロケーション; "
+" %d 相対リロケーションで指定された DT_RELCOUNT\n"
 
 #: ../src/elflint.c:1091
 #, c-format
 msgid "section [%2d] '%s': DT_RELACOUNT used for this REL section\n"
-msgstr ""
+msgstr "セクション [%2d] '%s': この REL セクション用に使われる DT_RELACOUNT\n"
 
 #: ../src/elflint.c:1173
 #, c-format
 msgid "section [%2d] '%s': invalid destination section index\n"
 msgstr ""
+"セクション [%2d] '%s': 不当な宛先セクションインデックス\n"
 
 #: ../src/elflint.c:1186
 #, c-format
 msgid "section [%2d] '%s': invalid destination section type\n"
-msgstr ""
+msgstr "セクション [%2d] '%s': 不当な宛先セクションタイプ\n"
 
 #: ../src/elflint.c:1194
 #, c-format
 msgid "section [%2d] '%s': sh_info should be zero\n"
-msgstr ""
+msgstr "セクション [%2d] '%s': sh_info はゼロでなければなりません\n"
 
 #: ../src/elflint.c:1201
 #, c-format
 msgid "section [%2d] '%s': no relocations for merge-able sections possible\n"
 msgstr ""
+"セクション [%2d] '%s': マージできるセクションのリロケーションは不可能です\n"
 
 #: ../src/elflint.c:1208
 #, c-format
 msgid "section [%2d] '%s': section entry size does not match ElfXX_Rela\n"
 msgstr ""
+"セクション [%2d] '%s': セクション項目サイズが ElfXX_Rela と一致しません\n"
 
 #: ../src/elflint.c:1268
 #, c-format
 msgid "text relocation flag set but there is no read-only segment\n"
 msgstr ""
+"テキストリロケーションフラグが設定されていますが、読込み専用セグメントが"
+"ありません\n"
 
 #: ../src/elflint.c:1295
 #, c-format
 msgid "section [%2d] '%s': relocation %zu: invalid type\n"
 msgstr ""
+"セクション [%2d] '%s': リロケーション %zu: 不当なタイプ\n"
 
 #: ../src/elflint.c:1303
 #, c-format
@@ -3937,11 +3980,13 @@ msgid ""
 "section [%2d] '%s': relocation %zu: relocation type invalid for the file "
 "type\n"
 msgstr ""
+"セクション [%2d] '%s': リロケーション %zu: このファイル用のリロケーション"
+"タイプは不当です\n"
 
 #: ../src/elflint.c:1311
 #, c-format
 msgid "section [%2d] '%s': relocation %zu: invalid symbol index\n"
-msgstr ""
+msgstr "セクション [%2d] '%s': リロケーション %zu: 不当なシンボルインデックス\n"
 
 #: ../src/elflint.c:1329
 #, c-format
@@ -3949,11 +3994,13 @@ msgid ""
 "section [%2d] '%s': relocation %zu: only symbol '_GLOBAL_OFFSET_TABLE_' can "
 "be used with %s\n"
 msgstr ""
+"セクション [%2d] '%s': リロケーション %zu: シンボル '_GLOBAL_OFFSET_TABLE_' "
+"のみが %s と一緒に使用できます\n"
 
 #: ../src/elflint.c:1346
 #, c-format
 msgid "section [%2d] '%s': relocation %zu: offset out of bounds\n"
-msgstr ""
+msgstr "セクション [%2d] '%s': リロケーション %zu: オフセット境界外\n"
 
 #: ../src/elflint.c:1361
 #, c-format
@@ -3961,6 +4008,8 @@ msgid ""
 "section [%2d] '%s': relocation %zu: copy relocation against symbol of type %"
 "s\n"
 msgstr ""
+"セクション [%2d] '%s': リロケーション %zu: タイプ %s のシンボルに対する"
+"コピーリロケーション\n"
 
 #: ../src/elflint.c:1382
 #, c-format
@@ -3968,11 +4017,15 @@ msgid ""
 "section [%2d] '%s': relocation %zu: read-only section modified but text "
 "relocation flag not set\n"
 msgstr ""
+"セクション [%2d] '%s': リロケーション %zu: 読込み専用セクションが変更され"
+"ましたが、テキストリロケーションフラグが設定されていません\n"
 
 #: ../src/elflint.c:1397
 #, c-format
 msgid "section [%2d] '%s': relocations are against loaded and unloaded data\n"
 msgstr ""
+"セクション [%2d] '%s': リロケーションがロードされたデータとロードされなかった"
+"データに対してです\n"
 
 #: ../src/elflint.c:1436 ../src/elflint.c:1486
 #, c-format

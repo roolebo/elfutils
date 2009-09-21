@@ -1,3 +1,9 @@
+2009-09-21  Ulrich Drepper  <drepper@redhat.com>
+
+	* elflint.c (special_sections): Allow MERGE and STRINGS flags to be
+	set for .comment section.
+	Patch by Mark Wielaard <mjw@redhat.com>.
+
 2009-09-08  Roland McGrath  <roland@redhat.com>
 
 	* ar.c (main): Fix typo in message format.

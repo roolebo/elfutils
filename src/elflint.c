@@ -785,7 +785,7 @@ section [%2d] '%s': symbol %zu: referenced section [%2d] '%s' does not have SHF_
 		  if (ehdr->e_type == ET_REL)
 		    {
 		      /* For object files the symbol value must fall
-                         into the section.  */
+			 into the section.  */
 		      if (sym->st_value > destshdr->sh_size)
 			ERROR (gettext ("\
 section [%2d] '%s': symbol %zu: st_value out of bounds of referenced section [%2d] '%s'\n"),
@@ -3330,7 +3330,7 @@ static const struct
   {
     /* See figure 4-14 in the gABI.  */
     { ".bss", 5, SHT_NOBITS, exact, SHF_ALLOC | SHF_WRITE, 0 },
-    { ".comment", 8, SHT_PROGBITS, exact, 0, 0 },
+    { ".comment", 8, SHT_PROGBITS, atleast, 0, SHF_MERGE | SHF_STRINGS },
     { ".data", 6, SHT_PROGBITS, exact, SHF_ALLOC | SHF_WRITE, 0 },
     { ".data1", 7, SHT_PROGBITS, exact, SHF_ALLOC | SHF_WRITE, 0 },
     { ".debug_str", 11, SHT_PROGBITS, exact_or_gnuld, SHF_MERGE | SHF_STRINGS, 0 },

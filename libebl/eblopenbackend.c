@@ -659,6 +659,9 @@ default_debugscn_p (const char *name)
       ".debug_macinfo",
       /* DWARF 3 */
       ".debug_ranges",
+      ".debug_pubtypes",
+      /* DWARF 4 */
+      ".debug_types",
       /* SGI/MIPS DWARF 2 extensions */
       ".debug_weaknames",
       ".debug_funcnames",

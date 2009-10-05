@@ -1,3 +1,8 @@
+2009-10-05  Roland McGrath  <roland@redhat.com>
+
+	* eblopenbackend.c (default_debugscn_p): Match .debug_pubtypes and
+	.debug_types too.
+
 2009-09-02  Petr Machata  <pmachata@redhat.com>
 
 	* libebl/eblstrtab.c (morememory): Allocate memory in multiples of

@@ -84,8 +84,8 @@ ebl_object_note (ebl, name, type, descsz, desc)
       case NT_GNU_GOLD_VERSION:
 	if (strcmp (name, "GNU") == 0 && descsz > 0)
 	  /* A non-null terminated version string.  */
-	  printf ("%s%.*s\n",
-		  gettext (" Version String: "), (int) descsz, desc);
+	  printf (gettext ("    Linker version: %.*s\n"),
+		  (int) descsz, desc);
 	break;
 
       case NT_GNU_ABI_TAG:

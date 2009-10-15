@@ -1,5 +1,5 @@
 /* Helper functions for form handling.
-   Copyright (C) 2003, 2004, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2003-2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -78,6 +78,7 @@ __libdw_form_val_len (Dwarf *dbg, struct Dwarf_CU *cu, unsigned int form,
       break;
 
     case DW_FORM_strp:
+    case DW_FORM_sec_offset:
       result = cu->offset_size;
       break;
 
@@ -94,9 +95,14 @@ __libdw_form_val_len (Dwarf *dbg, struct Dwarf_CU *cu, unsigned int form,
       break;
 
     case DW_FORM_block:
+    case DW_FORM_exprloc:
       saved = valp;
       get_uleb128 (u128, valp);
       result = u128 + (valp - saved);
+      break;
+
+    case DW_FORM_flag_present:
+      result = 0;
       break;
 
     case DW_FORM_ref1:
@@ -117,6 +123,7 @@ __libdw_form_val_len (Dwarf *dbg, struct Dwarf_CU *cu, unsigned int form,
 
     case DW_FORM_data8:
     case DW_FORM_ref8:
+    case DW_FORM_ref_sig8:
       result = 8;
       break;
 

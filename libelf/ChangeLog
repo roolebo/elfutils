@@ -1,3 +1,8 @@
+2009-10-23  Lubomir Rintel  <lkundrak@v3.sk>
+
+	* elf32_updatefile.c (fill_mmap): When starting past shdr_end, start
+	filling from section start, not shdr_end.
+
 2009-11-10  Roland McGrath  <roland@redhat.com>
 
 	* elf_readall.c (__libelf_readall): Fetch file size if not yet known.

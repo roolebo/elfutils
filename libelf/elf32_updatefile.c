@@ -322,8 +322,11 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 
 	    if (last_position + written != scn_start + offset
 		&& shdr_end < scn_start + offset)
-	      memset (shdr_end, __libelf_fill_byte,
-		      scn_start + offset - shdr_end);
+	      {
+		char *fill_start = MAX (shdr_end, scn_start);
+		memset (fill_start, __libelf_fill_byte,
+			scn_start + offset - fill_start);
+	      }
 	  }
 
 	  if (scn->data_list_rear != NULL)

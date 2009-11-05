@@ -378,11 +378,7 @@ report_r_debug (uint_fast8_t elfclass, uint_fast8_t elfdata,
 	 the same area, find that existing module to adjust.
 	 The l_ld address is the only one we know for sure
 	 to be within the module's own segments (its .dynamic).  */
-      Dwfl_Module *mod;
-      int segndx = INTUSE(dwfl_addrsegment) (dwfl, l_ld, &mod);
-      if (unlikely (segndx < 0))
-	return release_buffer (-1);
-
+      Dwfl_Module *mod = INTUSE(dwfl_addrmodule) (dwfl, l_ld);
       if (mod != NULL)
 	{
 	  /* We have a module.  We can give it a better name from l_name.  */

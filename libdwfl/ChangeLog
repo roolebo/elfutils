@@ -1,3 +1,7 @@
+2009-11-05  Roland McGrath  <roland@redhat.com>
+
+	* link_map.c (report_r_debug): Skip entries with l_ld==0.
+
 2009-09-04  Roland McGrath  <roland@redhat.com>
 
 	* image-header.c (__libdw_image_header): Fix tranposed comparison.

@@ -346,6 +346,11 @@ report_r_debug (uint_fast8_t elfclass, uint_fast8_t elfdata,
       GElf_Addr l_ld = addrs[2];
       next = addrs[3];
 
+      /* If a clobbered or truncated memory image has no useful pointer,
+	 just skip this element.  */
+      if (l_ld == 0)
+	continue;
+
       /* Fetch the string at the l_name address.  */
       const char *name = NULL;
       if (buffer != NULL

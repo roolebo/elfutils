@@ -84,6 +84,10 @@ elf_next (elf)
   /* Get the next archive header.  */
   ret = __libelf_next_arhdr_wrlock (parent) != 0 ? ELF_C_NULL : elf->cmd;
 
+  /* If necessary, mark the archive header as unusable.  */
+  if (ret == ELF_C_NULL)
+      parent->state.ar.elf_ar_hdr.ar_name = NULL;
+
   rwlock_unlock (parent->lock);
 
   return ret;

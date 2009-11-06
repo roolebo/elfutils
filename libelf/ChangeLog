@@ -1,3 +1,8 @@
+2009-11-06  Mark Wielaard  <mjw@redhat.com>
+
+	* elf_next.c (elf_next): Mark the archive header as unusable when
+	there is no next ar element.
+
 2009-08-12  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (libelf.so): Use -Wl,-z,defs not -defs.

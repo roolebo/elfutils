@@ -1,5 +1,5 @@
 /* Read all of the file associated with the descriptor.
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2005 Red Hat, Inc.
+   Copyright (C) 1998-2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -54,6 +54,7 @@
 
 #include <errno.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include <system.h>
 #include "libelfP.h"
@@ -102,11 +103,29 @@ __libelf_readall (elf)
   /* If the file is not mmap'ed and not previously loaded, do it now.  */
   if (elf->map_address == NULL)
     {
-      char *mem;
+      char *mem = NULL;
 
       /* If this is an archive and we have derived descriptors get the
 	 locks for all of them.  */
       libelf_acquire_all (elf);
+
+      if (elf->maximum_size == ~((size_t) 0))
+	{
+	  /* We don't yet know how large the file is.   Determine that now.  */
+	  struct stat st;
+
+	  if (fstat (elf->fildes, &st) < 0)
+	    goto read_error;
+
+	  if (sizeof (size_t) >= sizeof (st.st_size)
+	      || st.st_size <= ~((size_t) 0))
+	    elf->maximum_size = (size_t) st.st_size;
+	  else
+	    {
+	      errno = EOVERFLOW;
+	      goto read_error;
+	    }
+	}
 
       /* Allocate all the memory we need.  */
       mem = (char *) malloc (elf->maximum_size);
@@ -119,6 +138,7 @@ __libelf_readall (elf)
 			!= elf->maximum_size))
 	    {
 	      /* Something went wrong.  */
+	    read_error:
 	      __libelf_seterrno (ELF_E_READ_ERROR);
 	      free (mem);
 	    }

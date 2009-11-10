@@ -1,3 +1,7 @@
+2009-11-10  Roland McGrath  <roland@redhat.com>
+
+	* elf_readall.c (__libelf_readall): Fetch file size if not yet known.
+
 2009-11-06  Mark Wielaard  <mjw@redhat.com>
 
 	* elf_next.c (elf_next): Mark the archive header as unusable when

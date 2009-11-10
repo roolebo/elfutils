@@ -1,5 +1,5 @@
 /* Advance in archive to next element.
-   Copyright (C) 1998, 1999, 2000, 2002 Red Hat, Inc.
+   Copyright (C) 1998-2009 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -86,7 +86,7 @@ elf_next (elf)
 
   /* If necessary, mark the archive header as unusable.  */
   if (ret == ELF_C_NULL)
-      parent->state.ar.elf_ar_hdr.ar_name = NULL;
+    parent->state.ar.elf_ar_hdr.ar_name = NULL;
 
   rwlock_unlock (parent->lock);
 

@@ -1,3 +1,8 @@
+2009-11-12  Petr Machata  <pmachata@redhat.com>
+
+	* core-file.c (dwfl_elf_phdr_memory_callback): Only load ahead if
+	the chunk is both offset-contiguous and vaddr-contiguous.
+
 2009-11-05  Roland McGrath  <roland@redhat.com>
 
 	* link_map.c (report_r_debug): Skip entries with l_ld==0.

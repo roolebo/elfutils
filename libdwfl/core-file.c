@@ -283,7 +283,16 @@ dwfl_elf_phdr_memory_callback (Dwfl *dwfl, int ndx,
 	 || ((phdr.p_vaddr + phdr.p_memsz + align - 1) & -align) <= vaddr);
 
   GElf_Off start = vaddr - phdr.p_vaddr + phdr.p_offset;
-  GElf_Off end = (phdr.p_offset + phdr.p_filesz + align - 1) & -align;
+  GElf_Off end;
+  GElf_Addr end_vaddr;
+
+  inline void update_end ()
+  {
+    end = (phdr.p_offset + phdr.p_filesz + align - 1) & -align;
+    end_vaddr = (phdr.p_vaddr + phdr.p_memsz + align - 1) & -align;
+  }
+
+  update_end ();
 
   /* Use following contiguous segments to get towards SIZE.  */
   inline bool more (size_t size)
@@ -299,11 +308,12 @@ dwfl_elf_phdr_memory_callback (Dwfl *dwfl, int ndx,
 
 	if (phdr.p_type == PT_LOAD)
 	  {
-	    if (phdr.p_offset > end)
+	    if (phdr.p_offset > end
+		|| phdr.p_vaddr > end_vaddr)
 	      /* It's discontiguous!  */
 	      return false;
 
-	    end = (phdr.p_offset + phdr.p_filesz + align - 1) & -align;
+	    update_end ();
 	  }
       }
     return true;

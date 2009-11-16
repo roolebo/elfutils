@@ -1,3 +1,8 @@
+2009-11-16  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (print_string_section): Punt SHT_NOBITS like empty
+	sections, just as dump_data_section already does.
+
 2009-09-21  Ulrich Drepper  <drepper@redhat.com>
 
 	* elflint.c (special_sections): Allow MERGE and STRINGS flags to be

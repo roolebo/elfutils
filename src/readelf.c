@@ -7429,36 +7429,38 @@ dump_data_section (Elf_Scn *scn, const GElf_Shdr *shdr, const char *name)
 static void
 print_string_section (Elf_Scn *scn, const GElf_Shdr *shdr, const char *name)
 {
-  if (shdr->sh_size == 0)
-    printf (gettext ("\nSection [%Zu] '%s' is empty.\n"),
+  if (shdr->sh_size == 0 || shdr->sh_type == SHT_NOBITS)
+    printf (gettext ("\nSection [%Zu] '%s' has no strings to dump.\n"),
 	    elf_ndxscn (scn), name);
-
-  Elf_Data *data = elf_rawdata (scn, NULL);
-  if (data == NULL)
-    error (0, 0, gettext ("cannot get data for section [%Zu] '%s': %s"),
-	   elf_ndxscn (scn), name, elf_errmsg (-1));
   else
     {
-      printf (gettext ("\nString section [%Zu] '%s' contains %" PRIu64
-		       " bytes at offset %#0" PRIx64 ":\n"),
-	      elf_ndxscn (scn), name,
-	      shdr->sh_size, shdr->sh_offset);
-
-      const char *start = data->d_buf;
-      const char *const limit = start + data->d_size;
-      do
+      Elf_Data *data = elf_rawdata (scn, NULL);
+      if (data == NULL)
+	error (0, 0, gettext ("cannot get data for section [%Zu] '%s': %s"),
+	       elf_ndxscn (scn), name, elf_errmsg (-1));
+      else
 	{
-	  const char *end = memchr (start, '\0', limit - start);
-	  const size_t pos = start - (const char *) data->d_buf;
-	  if (unlikely (end == NULL))
+	  printf (gettext ("\nString section [%Zu] '%s' contains %" PRIu64
+			   " bytes at offset %#0" PRIx64 ":\n"),
+		  elf_ndxscn (scn), name,
+		  shdr->sh_size, shdr->sh_offset);
+
+	  const char *start = data->d_buf;
+	  const char *const limit = start + data->d_size;
+	  do
 	    {
-	      printf ("  [%6Zx]- %.*s\n",
-		      pos, (int) (limit - start), start);
-	      break;
-	    }
-	  printf ("  [%6Zx]  %s\n", pos, start);
-	  start = end + 1;
-	} while (start < limit);
+	      const char *end = memchr (start, '\0', limit - start);
+	      const size_t pos = start - (const char *) data->d_buf;
+	      if (unlikely (end == NULL))
+		{
+		  printf ("  [%6Zx]- %.*s\n",
+			  pos, (int) (limit - start), start);
+		  break;
+		}
+	      printf ("  [%6Zx]  %s\n", pos, start);
+	      start = end + 1;
+	    } while (start < limit);
+	}
     }
 }
 

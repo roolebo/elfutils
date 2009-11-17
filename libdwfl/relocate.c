@@ -302,6 +302,10 @@ relocate_section (Dwfl_Module *mod, Elf *relocated, const GElf_Ehdr *ehdr,
   if (tname == NULL)
     return DWFL_E_LIBELF;
 
+  if (unlikely (tshdr->sh_type == SHT_NOBITS) || unlikely (tshdr->sh_size == 0))
+    /* No contents to relocate.  */
+    return DWFL_E_NOERROR;
+
   if (debugscn && ! ebl_debugscn_p (mod->ebl, tname))
     /* This relocation section is not for a debugging section.
        Nothing to do here.  */

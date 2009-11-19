@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: elfutils.master.es\n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2009-09-08 08:28+0000\n"
-"PO-Revision-Date: 2009-09-08 11:42-0300\n"
-"Last-Translator: Domingo Becker <domingobecker@gmail.com>\n"
+"POT-Creation-Date: 2009-11-19 08:39+0000\n"
+"PO-Revision-Date: 2009-11-19 09:52-0300\n"
+"Last-Translator: Claudio Rodrigo Pereyra Diaz <claudio@pereyradiaz.com.ar>\n"
 "Language-Team: Spanish <fedora-trans-es@redhat.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -453,9 +453,11 @@ msgstr "<desconocido>: %#<PRIx64>"
 msgid "    Build ID: "
 msgstr "    Build ID: "
 
-#: ../libebl/eblobjnote.c:88
-msgid " Version String: "
-msgstr "Cadena versión:"
+#. A non-null terminated version string.
+#: ../libebl/eblobjnote.c:87
+#, c-format
+msgid "    Linker version: %.*s\n"
+msgstr "    Versión del Enlazador: %.*s\n"
 
 #: ../libebl/eblobjnote.c:136
 #, c-format
@@ -978,8 +980,8 @@ msgstr "No se puede crear el árbol de búsqueda"
 #: ../src/readelf.c:2913
 #: ../src/readelf.c:6476
 #: ../src/readelf.c:7329
-#: ../src/readelf.c:7474
-#: ../src/readelf.c:7543
+#: ../src/readelf.c:7476
+#: ../src/readelf.c:7545
 #: ../src/size.c:425
 #: ../src/size.c:499
 #: ../src/strip.c:482
@@ -1095,7 +1097,7 @@ msgstr "Muestra información específica de la arquitectura (si es que la hay)"
 
 #: ../src/readelf.c:93
 msgid "Dump the uninterpreted contents of SECTION, by number or name"
-msgstr "Descarga los contenidos no interpretados de SECCIÓN, por número o nombre"
+msgstr "Vuelca los contenidos no interpretados de SECCIÓN, por número o nombre"
 
 #: ../src/readelf.c:95
 msgid "Print string contents of sections"
@@ -1401,7 +1403,7 @@ msgstr "No se puede encontrar la sección: %s"
 
 #: ../src/readelf.c:881
 #: ../src/readelf.c:1035
-#: ../src/readelf.c:7494
+#: ../src/readelf.c:7496
 #: ../src/unstrip.c:352
 #: ../src/unstrip.c:376
 #: ../src/unstrip.c:426
@@ -1780,8 +1782,8 @@ msgstr[1] ""
 
 #: ../src/readelf.c:2610
 #, c-format
-msgid " Length  Number  %% of total  Coverage\n"
-msgstr " Longitud   Número  %% del total  Cobertura\n"
+msgid " Length  Number  %s of total  Coverage\n"
+msgstr " Longitud   Número  %s del total  Cobertura\n"
 
 #: ../src/readelf.c:2612
 #, c-format
@@ -1844,7 +1846,7 @@ msgid ""
 "Object attributes section [%2zu] '%s' of %<PRIu64> bytes at offset %#0<PRIx64>:\n"
 msgstr ""
 "\n"
-"Sección de atributos de objeto [%2zu] '%s' de %<PRIu64> bytes en compensación %#0<PRIx64>:\n"
+"Sección de atributos de objeto [%2zu] '%s' de %<PRIu64> bytes con desplazamiento %#0<PRIx64>:\n"
 
 #: ../src/readelf.c:2941
 msgid "  Owner          Size\n"
@@ -2549,10 +2551,10 @@ msgid ""
 "Section [%Zu] '%s' has no data to dump.\n"
 msgstr ""
 "\n"
-"Sección [%Zu] '%s' no tiene datos para vaciar.\n"
+"Sección [%Zu] '%s' no tiene datos para volcar.\n"
 
 #: ../src/readelf.c:7416
-#: ../src/readelf.c:7438
+#: ../src/readelf.c:7439
 #, c-format
 msgid "cannot get data for section [%Zu] '%s': %s"
 msgstr "no se pueden obtener datos para sección [%Zu] '%s': %s"
@@ -2564,18 +2566,18 @@ msgid ""
 "Hex dump of section [%Zu] '%s', %<PRIu64> bytes at offset %#0<PRIx64>:\n"
 msgstr ""
 "\n"
-"Vaciado Hex de sección [%Zu] '%s', %<PRIu64> bytes en compensación %#0<PRIx64>:\n"
+"Volcado Hex de sección [%Zu] '%s', %<PRIu64> bytes en compensación %#0<PRIx64>:\n"
 
 #: ../src/readelf.c:7433
 #, c-format
 msgid ""
 "\n"
-"Section [%Zu] '%s' is empty.\n"
+"Section [%Zu] '%s' has no strings to dump.\n"
 msgstr ""
 "\n"
-"Sección [%Zu] '%s' está vacía.\n"
+"Sección [%Zu] '%s' no tiene datos para volcar.\n"
 
-#: ../src/readelf.c:7442
+#: ../src/readelf.c:7443
 #, c-format
 msgid ""
 "\n"
@@ -2584,7 +2586,7 @@ msgstr ""
 "\n"
 "Sección de cadena [%Zu] '%s' contiene %<PRIu64> bytes en compensación %#0<PRIx64>:\n"
 
-#: ../src/readelf.c:7489
+#: ../src/readelf.c:7491
 #, c-format
 msgid ""
 "\n"
@@ -2593,7 +2595,7 @@ msgstr ""
 "\n"
 "sección [%lu] no existe"
 
-#: ../src/readelf.c:7515
+#: ../src/readelf.c:7517
 #, c-format
 msgid ""
 "\n"
@@ -2602,12 +2604,12 @@ msgstr ""
 "\n"
 "sección '%s' no existe"
 
-#: ../src/readelf.c:7576
+#: ../src/readelf.c:7578
 #, c-format
 msgid "cannot get symbol index of archive '%s': %s"
 msgstr "no se puede obtener el índice de símbolo de archivo '%s': %s"
 
-#: ../src/readelf.c:7579
+#: ../src/readelf.c:7581
 #, c-format
 msgid ""
 "\n"
@@ -2616,7 +2618,7 @@ msgstr ""
 "\n"
 "Archivo '%s' no tiene índice de símbolo\n"
 
-#: ../src/readelf.c:7583
+#: ../src/readelf.c:7585
 #, c-format
 msgid ""
 "\n"
@@ -2625,12 +2627,12 @@ msgstr ""
 "\n"
 "Índice de archivo '%s' tiene %Zu entradas:\n"
 
-#: ../src/readelf.c:7601
+#: ../src/readelf.c:7603
 #, c-format
 msgid "cannot extract member at offset %Zu in '%s': %s"
 msgstr "no es posible extraer miembro en compensación %Zu en '%s': %s"
 
-#: ../src/readelf.c:7606
+#: ../src/readelf.c:7608
 #, c-format
 msgid "Archive member '%s' contains:\n"
 msgstr "Miembro de archivo contiene '%s':\n"
@@ -5867,4 +5869,13 @@ msgstr "Contenido de la sección %s:\n"
 #, c-format
 msgid "cannot disassemble"
 msgstr "No se puede desensamblar"
+
+#~ msgid " Version String: "
+#~ msgstr "Cadena versión:"
+#~ msgid ""
+#~ "\n"
+#~ "Section [%Zu] '%s' is empty.\n"
+#~ msgstr ""
+#~ "\n"
+#~ "Sección [%Zu] '%s' está vacía.\n"
 

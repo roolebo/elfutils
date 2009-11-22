@@ -1,3 +1,8 @@
+2009-11-21  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_getlocation.c (check_constant_offset): Return 1 for all
+	non-constant forms.
+
 2009-10-15  Roland McGrath  <roland@redhat.com>
 
 	* libdw_form.c (__libdw_form_val_len): Grok DW_FORM_sec_offset,

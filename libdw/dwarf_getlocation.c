@@ -154,10 +154,28 @@ static int
 check_constant_offset (Dwarf_Attribute *attr,
 		       Dwarf_Op **llbuf, size_t *listlen)
 {
-  if (attr->code != DW_AT_data_member_location
-      || attr->form == DW_FORM_data4
-      || attr->form == DW_FORM_data8)
+  if (attr->code != DW_AT_data_member_location)
     return 1;
+
+  switch (attr->form)
+    {
+      /* Punt for any non-constant form.  */
+    default:
+      return 1;
+
+    case DW_FORM_data1:
+    case DW_FORM_data2:
+    case DW_FORM_sdata:
+    case DW_FORM_udata:
+      break;
+
+    case DW_FORM_data4:
+    case DW_FORM_data8:
+      /* These are loclistptr, not constants.
+	 XXX check cu->version > 3???
+      */
+      return 1;
+    }
 
   /* Check whether we already cached this location.  */
   struct loc_s fake = { .addr = attr->valp };

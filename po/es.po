@@ -1,23 +1,23 @@
-# translation of elfutils.master.es.po to Spanish
 # Fedora Spanish Translation of elfutils.
 #
 # Domingo Becker <domingobecker@gmail.com>, 2009.
-# Héctor Daniel Cabrera <h.daniel.cabrera@gmail.com>, 2009.
+# Héctor Daniel Cabrera <logan@fedoraproject.org>, 2009.
 # Gladys Guerrero Lozano <gguerrer@redhat.com>, 2009.
 msgid ""
 msgstr ""
 "Project-Id-Version: elfutils.master.es\n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2009-11-19 08:39+0000\n"
-"PO-Revision-Date: 2009-11-19 09:52-0300\n"
-"Last-Translator: Claudio Rodrigo Pereyra Diaz <claudio@pereyradiaz.com.ar>\n"
-"Language-Team: Spanish <fedora-trans-es@redhat.com>\n"
+"POT-Creation-Date: 2009-11-27 08:28+0000\n"
+"PO-Revision-Date: 2009-11-27 11:05-0300\n"
+"Last-Translator: Héctor Daniel Cabrera <logan@fedoraproject.org>\n"
+"Language-Team: Fedora Spanish <fedora-trans-es@redhat.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: Spanish\n"
 "X-Generator: Lokalize 1.0\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Country: ARGENTINA\n"
 
 #: ../lib/xmalloc.c:51
 #: ../lib/xmalloc.c:65
@@ -1781,9 +1781,9 @@ msgstr[1] ""
 " Dirección: %#0*<PRIx64>  Compensación: %#08<PRIx64>  Enlace a sección: [%2u] '%s'\n"
 
 #: ../src/readelf.c:2610
-#, c-format
-msgid " Length  Number  %s of total  Coverage\n"
-msgstr " Longitud   Número  %s del total  Cobertura\n"
+#, fuzzy, c-format
+msgid " Length  Number  % of total  Coverage\n"
+msgstr " Longitud  Número  % del total  Cobertura\n"
 
 #: ../src/readelf.c:2612
 #, c-format

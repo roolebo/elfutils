@@ -1,3 +1,8 @@
+Version 0.144:
+
+readelf: Don't give errors for missing info under -a.
+	 Handle Linux "VMCOREINFO" notes under -n.
+
 Version 0.143:
 
 libdw: Various convenience functions for individual attributes now use

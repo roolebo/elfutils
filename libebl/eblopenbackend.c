@@ -1,5 +1,5 @@
 /* Generate ELF backend handle.
-   Copyright (C) 2000-2009 Red Hat, Inc.
+   Copyright (C) 2000-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -186,7 +186,7 @@ static const char *default_core_note_type_name (uint32_t, char *buf,
 						size_t len);
 static const char *default_object_note_type_name (uint32_t, char *buf,
 						  size_t len);
-static int default_core_note (GElf_Word n_type, GElf_Word descsz,
+static int default_core_note (const GElf_Nhdr *nhdr, const char *name,
 			      GElf_Word *regs_offset, size_t *nregloc,
 			      const Ebl_Register_Location **reglocs,
 			      size_t *nitems, const Ebl_Core_Item **);
@@ -604,8 +604,8 @@ default_auxv_info (GElf_Xword a_type __attribute__ ((unused)),
 }
 
 static int
-default_core_note (GElf_Word n_type __attribute__ ((unused)),
-		   GElf_Word descsz __attribute__ ((unused)),
+default_core_note (const GElf_Nhdr *nhdr __attribute__ ((unused)),
+		   const char *name __attribute__ ((unused)),
 		   GElf_Word *ro __attribute__ ((unused)),
 		   size_t *nregloc  __attribute__ ((unused)),
 		   const Ebl_Register_Location **reglocs

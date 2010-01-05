@@ -1,5 +1,5 @@
 /* Describe known core note formats.
-   Copyright (C) 2007 Red Hat, Inc.
+   Copyright (C) 2007, 2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -61,19 +61,19 @@
 
 
 int
-ebl_core_note (ebl, n_type, descsz,
+ebl_core_note (ebl, nhdr, name,
 	       regs_offset, nregloc, reglocs, nitems, items)
      Ebl *ebl;
-     GElf_Word n_type;
-     GElf_Word descsz;
+     const GElf_Nhdr *nhdr;
+     const char *name;
      GElf_Word *regs_offset;
      size_t *nregloc;
      const Ebl_Register_Location **reglocs;
      size_t *nitems;
      const Ebl_Core_Item **items;
 {
-  int result = ebl->core_note (n_type, descsz, regs_offset, nregloc, reglocs,
-			       nitems, items);
+  int result = ebl->core_note (nhdr, name,
+			       regs_offset, nregloc, reglocs, nitems, items);
   if (result == 0)
     {
       /* The machine specific function did not know this type.  */
@@ -81,7 +81,7 @@ ebl_core_note (ebl, n_type, descsz,
       *regs_offset = 0;
       *nregloc = 0;
       *reglocs = NULL;
-      switch (n_type)
+      switch (nhdr->n_type)
 	{
 #define ITEMS(type, table)				\
 	  case type:					\

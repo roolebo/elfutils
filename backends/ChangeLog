@@ -1,3 +1,12 @@
+2010-01-04  Roland McGrath  <roland@redhat.com>
+
+	* linux-core-note.c (vmcoreinfo_items): New static const variable.
+	(EBLHOOK(core_note)): Update arguments for new protocol.
+	Validate the name as "CORE" or "LINUX" for known n_type cases.
+	Handle name "VMCOREINFO" n_type=0 with vmcoreinfo_items.
+	* i386_corenote.c (EXTRA_NOTES): Update parameter usage.
+	* x86_corenote.c (EXTRA_NOTES_IOPERM): Likewise.
+
 2009-09-10  Mark Wielaard  <mjw@redhat.com>
 
 	* sparc_retval.c: Fix license header.

@@ -6643,11 +6643,11 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
 	  convsize = count * size;
 	  *repeated_size -= convsize;
 	}
-      else
+      else if (item->count != 0 || item->format != '\n')
 	*repeated_size -= size;
     }
 
-  desc = convert (core, item->type, count, data, desc + item->offset, convsize);
+  convert (core, item->type, count, data, desc + item->offset, convsize);
 
   Elf_Type type = item->type;
   if (type == ELF_T_ADDR)
@@ -6791,6 +6791,33 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
     case 's':
       colno = print_core_item (colno, ',', ITEM_WRAP_COLUMN, 0, item->name,
 			       count, "%.*s", (int) count, value.Byte);
+      break;
+
+    case '\n':
+      /* This is a list of strings separated by '\n'.  */
+      assert (item->count == 0);
+      assert (repeated_size != NULL);
+      assert (item->name == NULL);
+      if (unlikely (item->offset >= *repeated_size))
+	break;
+
+      const char *s = desc + item->offset;
+      size = *repeated_size - item->offset;
+      *repeated_size = 0;
+      while (size > 0)
+	{
+	  const char *eol = memchr (s, '\n', size);
+	  int len = size;
+	  if (eol != NULL)
+	    len = eol - s;
+	  printf ("%*s%.*s\n", ITEM_INDENT, "", len, s);
+	  if (eol == NULL)
+	    break;
+	  size -= eol + 1 - s;
+	  s = eol + 1;
+	}
+
+      colno = ITEM_WRAP_COLUMN;
       break;
 
     default:
@@ -7237,7 +7264,8 @@ handle_auxv_note (Ebl *ebl, Elf *core, GElf_Word descsz, GElf_Off desc_pos)
 }
 
 static void
-handle_core_note (Ebl *ebl, const GElf_Nhdr *nhdr, const void *desc)
+handle_core_note (Ebl *ebl, const GElf_Nhdr *nhdr,
+		  const char *name, const void *desc)
 {
   GElf_Word regs_offset;
   size_t nregloc;
@@ -7245,7 +7273,7 @@ handle_core_note (Ebl *ebl, const GElf_Nhdr *nhdr, const void *desc)
   size_t nitems;
   const Ebl_Core_Item *items;
 
-  if (! ebl_core_note (ebl, nhdr->n_type, nhdr->n_descsz,
+  if (! ebl_core_note (ebl, nhdr, name,
 		       &regs_offset, &nregloc, &reglocs, &nitems, &items))
     return;
 
@@ -7302,11 +7330,14 @@ handle_notes_data (Ebl *ebl, const GElf_Ehdr *ehdr,
 	{
 	  if (ehdr->e_type == ET_CORE)
 	    {
-	      if (nhdr.n_type == NT_AUXV)
+	      if (nhdr.n_type == NT_AUXV
+		  && (nhdr.n_namesz == 4 /* Broken old Linux kernels.  */
+		      || (nhdr.n_namesz == 5 && name[4] == '\0'))
+		  && !memcmp (name, "CORE", 4))
 		handle_auxv_note (ebl, ebl->elf, nhdr.n_descsz,
 				  start + desc_offset);
 	      else
-		handle_core_note (ebl, &nhdr, desc);
+		handle_core_note (ebl, &nhdr, name, desc);
 	    }
 	  else
 	    ebl_object_note (ebl, name, nhdr.n_type, nhdr.n_descsz, desc);

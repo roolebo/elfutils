@@ -1,5 +1,9 @@
 2010-01-04  Roland McGrath  <roland@redhat.com>
 
+	* readelf.c (handle_notes_data): Grab NT_AUXV only for name "CORE".
+	(handle_core_note): Pass NHDR and NAME to ebl_core_note.
+	(handle_core_item): Handle .format of '\n' as \n-separated strings.
+
 	* readelf.c (implicit_debug_sections): New variable.
 	(parse_opt): Set it instead of print_debug_sections for -a.
 	OR them together for print_debug check.

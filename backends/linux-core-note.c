@@ -1,5 +1,5 @@
 /* Common core note type descriptions for Linux.
-   Copyright (C) 2007, 2008 Red Hat, Inc.
+   Copyright (C) 2007-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -22,6 +22,8 @@
    included package.  Should you wish to participate in the Open Invention
    Network licensing program, please visit www.openinventionnetwork.com
    <http://www.openinventionnetwork.com>.  */
+
+#include <string.h>
 
 /* The including CPU_corenote.c file provides prstatus_regs and
    defines macros ULONG, [PUG]ID_T, and ALIGN_*, TYPE_*.
@@ -163,23 +165,61 @@ static const Ebl_Core_Item prpsinfo_items[] =
     FIELD (command, CHAR, psargs, 's', .count = PRARGSZ),
   };
 
+static const Ebl_Core_Item vmcoreinfo_items[] =
+  {
+    {
+      .type = ELF_T_BYTE, .format = '\n'
+    }
+  };
+
 #undef	FIELD
 
 int
-EBLHOOK(core_note) (n_type, descsz,
-		    regs_offset, nregloc, reglocs, nitems, items)
-     GElf_Word n_type;
-     GElf_Word descsz;
+EBLHOOK(core_note) (nhdr, name, regs_offset, nregloc, reglocs, nitems, items)
+     const GElf_Nhdr *nhdr;
+     const char *name;
      GElf_Word *regs_offset;
      size_t *nregloc;
      const Ebl_Register_Location **reglocs;
      size_t *nitems;
      const Ebl_Core_Item **items;
 {
-  switch (n_type)
+  switch (nhdr->n_namesz)
+    {
+    case sizeof "CORE" - 1:	/* Buggy old Linux kernels.  */
+      if (memcmp (name, "CORE", nhdr->n_namesz) == 0)
+	break;
+      return 0;
+
+    case sizeof "CORE":
+      if (memcmp (name, "CORE", nhdr->n_namesz) == 0)
+	break;
+      /* Buggy old Linux kernels didn't terminate "LINUX".
+         Fall through.  */
+
+    case sizeof "LINUX":
+      if (memcmp (name, "LINUX", nhdr->n_namesz) == 0)
+	break;
+      return 0;
+
+    case sizeof "VMCOREINFO":
+      if (nhdr->n_type != 0
+	  || memcmp (name, "VMCOREINFO", sizeof "VMCOREINFO") != 0)
+	return 0;
+      *regs_offset = 0;
+      *nregloc = 0;
+      *nitems = 1;
+      *items = vmcoreinfo_items;
+      return 1;
+
+    default:
+      return 0;
+    }
+
+  switch (nhdr->n_type)
     {
     case NT_PRSTATUS:
-      if (descsz != sizeof (struct EBLHOOK(prstatus)))
+      if (nhdr->n_descsz != sizeof (struct EBLHOOK(prstatus)))
 	return 0;
       *regs_offset = offsetof (struct EBLHOOK(prstatus), pr_reg);
       *nregloc = sizeof prstatus_regs / sizeof prstatus_regs[0];
@@ -189,7 +229,7 @@ EBLHOOK(core_note) (n_type, descsz,
       return 1;
 
     case NT_PRPSINFO:
-      if (descsz != sizeof (struct EBLHOOK(prpsinfo)))
+      if (nhdr->n_descsz != sizeof (struct EBLHOOK(prpsinfo)))
 	return 0;
       *regs_offset = 0;
       *nregloc = 0;
@@ -200,7 +240,7 @@ EBLHOOK(core_note) (n_type, descsz,
 
 #define EXTRA_REGSET(type, size, table)					      \
     case type:								      \
-      if (descsz != size)						      \
+      if (nhdr->n_descsz != size)					      \
 	return 0;							      \
       *regs_offset = 0;							      \
       *nregloc = sizeof table / sizeof table[0];			      \

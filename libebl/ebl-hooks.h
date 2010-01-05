@@ -1,5 +1,5 @@
 /* Backend hook signatures internal interface for libebl.
-   Copyright (C) 2000-2009 Red Hat, Inc.
+   Copyright (C) 2000-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -114,8 +114,8 @@ const char *EBLHOOK(core_note_type_name) (uint32_t, char *, size_t);
 const char *EBLHOOK(object_note_type_name) (uint32_t, char *, size_t);
 
 /* Describe core note format.  */
-int EBLHOOK(core_note) (GElf_Word, GElf_Word, GElf_Word *, size_t *,
-			const Ebl_Register_Location **,
+int EBLHOOK(core_note) (const GElf_Nhdr *, const char *,
+			GElf_Word *, size_t *, const Ebl_Register_Location **,
 			size_t *, const Ebl_Core_Item **);
 
 /* Handle object file note.  */

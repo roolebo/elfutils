@@ -1,5 +1,5 @@
 /* x86-specific core note handling, pieces common to x86-64 and i386.
-   Copyright (C) 2005, 2008 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -25,7 +25,8 @@
 
 #define	EXTRA_NOTES_IOPERM \
   case NT_386_IOPERM: \
-    return ioperm_info (descsz, regs_offset, nregloc, reglocs, nitems, items);
+    return ioperm_info (nhdr->n_descsz, \
+			regs_offset, nregloc, reglocs, nitems, items);
 
 static int
 ioperm_info (GElf_Word descsz, GElf_Word *regs_offset,

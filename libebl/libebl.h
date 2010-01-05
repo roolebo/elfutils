@@ -1,5 +1,5 @@
 /* Interface for libebl.
-   Copyright (C) 2000, 2001-2009 Red Hat, Inc.
+   Copyright (C) 2000-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -379,13 +379,13 @@ typedef struct
   bool thread_identifier;
 } Ebl_Core_Item;
 
-/* Describe the format of a core file note with type field matching N_TYPE
-   and descriptor size matching DESCSZ.  */
-extern int ebl_core_note (Ebl *ebl, GElf_Word n_type, GElf_Word descsz,
+/* Describe the format of a core file note with the given header and NAME.
+   NAME is not guaranteed terminated, it's NHDR->n_namesz raw bytes.  */
+extern int ebl_core_note (Ebl *ebl, const GElf_Nhdr *nhdr, const char *name,
 			  GElf_Word *regs_offset, size_t *nregloc,
 			  const Ebl_Register_Location **reglocs,
 			  size_t *nitems, const Ebl_Core_Item **items)
-  __nonnull_attribute__ (1, 4, 5, 6, 7, 8);
+  __nonnull_attribute__ (1, 2, 3, 4, 5, 6, 7, 8);
 
 /* Describe the auxv type number.  */
 extern int ebl_auxv_info (Ebl *ebl, GElf_Xword a_type,

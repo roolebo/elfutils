@@ -1,3 +1,11 @@
+2010-01-04  Roland McGrath  <roland@redhat.com>
+
+	* eblcorenote.c (ebl_core_note): Take GElf_Nhdr * and name data
+	pointer instead of only n_type and n_descsz.
+	* libebl.h: Update declaration.
+	* ebl-hooks.h: Update core_note hook signature.
+	* eblopenbackend.c (default_core_note): Likewise.
+
 2009-10-14  Roland McGrath  <roland@redhat.com>
 
 	* eblobjnote.c (ebl_object_note): Clean up NT_GNU_GOLD_VERSION printing.

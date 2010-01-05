@@ -191,7 +191,7 @@ static enum section_e
 		 | section_info | section_line | section_loc
 		 | section_pubnames | section_str | section_macinfo
 		 | section_ranges | section_exception)
-} print_debug_sections;
+} print_debug_sections, implicit_debug_sections;
 
 /* Select hex dumping of sections.  */
 static struct section_argument *dump_data_sections;
@@ -312,7 +312,7 @@ parse_opt (int key, char *arg,
       print_histogram = true;
       print_arch = true;
       print_notes = true;
-      print_debug_sections |= section_exception;
+      implicit_debug_sections |= section_exception;
       add_dump_section (".strtab", true);
       add_dump_section (".dynstr", true);
       add_dump_section (".comment", true);
@@ -684,7 +684,7 @@ process_elf_file (Dwfl_Module *dwflmod, int fd)
     dump_data (pure_ebl);
   if (string_sections != NULL)
     dump_strings (ebl);
-  if (print_debug_sections != 0)
+  if ((print_debug_sections | implicit_debug_sections) != 0)
     print_debug (dwflmod, ebl, ehdr);
   if (print_notes)
     handle_notes (pure_ebl, ehdr);
@@ -6469,8 +6469,9 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
   Dwarf *dbg = dwfl_module_getdwarf (dwflmod, &dwbias);
   if (dbg == NULL)
     {
-      error (0, 0, gettext ("cannot get debug context descriptor: %s"),
-	     dwfl_errmsg (-1));
+      if (print_debug_sections != 0)
+	error (0, 0, gettext ("cannot get debug context descriptor: %s"),
+	       dwfl_errmsg (-1));
       return;
     }
 
@@ -6525,7 +6526,8 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
 	  for (n = 0; n < ndebug_sections; ++n)
 	    if (strcmp (name, debug_sections[n].name) == 0)
 	      {
-		if (print_debug_sections & debug_sections[n].bitmask)
+		if ((print_debug_sections | implicit_debug_sections)
+		    & debug_sections[n].bitmask)
 		  debug_sections[n].fp (dwflmod, ebl, ehdr, scn, shdr, dbg);
 		break;
 	      }

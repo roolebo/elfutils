@@ -255,6 +255,14 @@ enum
     DW_AT_body_begin = 0x2105,
     DW_AT_body_end = 0x2106,
     DW_AT_GNU_vector = 0x2107,
+    DW_AT_GNU_guarded_by = 0x2108,
+    DW_AT_GNU_pt_guarded_by = 0x2109,
+    DW_AT_GNU_guarded = 0x210a,
+    DW_AT_GNU_pt_guarded = 0x210b,
+    DW_AT_GNU_locks_excluded = 0x210c,
+    DW_AT_GNU_exclusive_locks_required = 0x210d,
+    DW_AT_GNU_shared_locks_required = 0x210e,
+    DW_AT_GNU_odr_signature = 0x210f,
     DW_AT_GNU_template_name = 0x2110,
 
     DW_AT_hi_user = 0x3fff

@@ -1,5 +1,7 @@
 2010-01-05  Roland McGrath  <roland@redhat.com>
 
+	* dwarf.h: Add some more DW_AT_GNU_* types from gcc.
+
 	* dwarf.h: Add DW_AT_GNU_vector, DW_AT_GNU_template_name.
 
 2009-11-21  Roland McGrath  <roland@redhat.com>

@@ -3446,6 +3446,14 @@ dwarf_attr_string (unsigned int attrnum)
 	result = "body_end";
 	break;
 
+      case DW_AT_GNU_vector:
+	result = "GNU_vector";
+	break;
+
+      case DW_AT_GNU_template_name:
+	result = "GNU_template_name";
+	break;
+
       default:
 	if (attrnum < DW_AT_lo_user)
 	  snprintf (buf, sizeof buf, gettext ("unknown attribute %hx"),

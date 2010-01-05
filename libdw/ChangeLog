@@ -1,3 +1,7 @@
+2010-01-05  Roland McGrath  <roland@redhat.com>
+
+	* dwarf.h: Add DW_AT_GNU_vector, DW_AT_GNU_template_name.
+
 2009-11-21  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_getlocation.c (check_constant_offset): Return 1 for all

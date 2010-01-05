@@ -1,5 +1,5 @@
 /* This file defines standard DWARF types, structures, and macros.
-   Copyright (C) 2000,2002,2005,2006,2007,2008,2009 Red Hat, Inc.
+   Copyright (C) 2000-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -228,6 +228,7 @@ enum
     DW_AT_const_expr = 0x6c,
 
     DW_AT_lo_user = 0x2000,
+
     DW_AT_MIPS_fde = 0x2001,
     DW_AT_MIPS_loop_begin = 0x2002,
     DW_AT_MIPS_tail_loop_begin = 0x2003,
@@ -245,12 +246,17 @@ enum
     DW_AT_MIPS_allocatable_dopetype = 0x200f,
     DW_AT_MIPS_assumed_shape_dopetype = 0x2010,
     DW_AT_MIPS_assumed_size = 0x2011,
+
+    /* GNU extensions.  */
     DW_AT_sf_names = 0x2101,
     DW_AT_src_info = 0x2102,
     DW_AT_mac_info = 0x2103,
     DW_AT_src_coords = 0x2104,
     DW_AT_body_begin = 0x2105,
     DW_AT_body_end = 0x2106,
+    DW_AT_GNU_vector = 0x2107,
+    DW_AT_GNU_template_name = 0x2110,
+
     DW_AT_hi_user = 0x3fff
   };
 

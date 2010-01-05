@@ -1,5 +1,8 @@
 2010-01-04  Roland McGrath  <roland@redhat.com>
 
+	* readelf.c (options): Repartition into set implied by -a and others.
+	Correct -a text to match reality.
+
 	* readelf.c (struct section_argument): Add bool member 'implicit'.
 	(parse_opt): Set it for -a cases, clear it for -x args.
 	(for_each_section_argument): Don't complain about a missing section by

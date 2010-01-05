@@ -69,8 +69,9 @@ ARGP_PROGRAM_BUG_ADDRESS_DEF = PACKAGE_BUGREPORT;
 /* Definitions of arguments for argp functions.  */
 static const struct argp_option options[] =
 {
-  { NULL, 0, NULL, 0, N_("Output selection:"), 0 },
-  { "all", 'a', NULL, 0, N_("Equivalent to: -e -h -l"), 0 },
+  { NULL, 0, NULL, 0, N_("ELF output selection:"), 0 },
+  { "all", 'a', NULL, 0,
+    N_("All these plus -p .strtab -p .dynstr -p .comment"), 0 },
   { "dynamic", 'd', NULL, 0, N_("Display the dynamic segment"), 0 },
   { "file-header", 'h', NULL, 0, N_("Display the ELF file header"), 0 },
   { "histogram", 'I', NULL, 0,
@@ -78,17 +79,21 @@ static const struct argp_option options[] =
   { "program-headers", 'l', NULL, 0, N_("Display the program headers"), 0 },
   { "segments", 'l', NULL, OPTION_ALIAS | OPTION_HIDDEN, NULL, 0 },
   { "relocs", 'r', NULL, 0, N_("Display relocations"), 0 },
-  { "section-headers", 'S', NULL, 0, N_("Display the sections' header"), 0 },
+  { "section-headers", 'S', NULL, 0, N_("Display the sections' headers"), 0 },
   { "sections", 'S', NULL, OPTION_ALIAS | OPTION_HIDDEN, NULL, 0 },
   { "symbols", 's', NULL, 0, N_("Display the symbol table"), 0 },
   { "version-info", 'V', NULL, 0, N_("Display versioning information"), 0 },
+  { "notes", 'n', NULL, 0, N_("Display the ELF notes"), 0 },
+  { "arch-specific", 'A', NULL, 0,
+    N_("Display architecture specific information, if any"), 0 },
+  { "exception", 'e', NULL, 0,
+    N_("Display sections for exception handling"), 0 },
+
+  { NULL, 0, NULL, 0, N_("Additional output selection:"), 0 },
   { "debug-dump", 'w', "SECTION", OPTION_ARG_OPTIONAL,
     N_("Display DWARF section content.  SECTION can be one of abbrev, "
        "aranges, frame, info, loc, line, ranges, pubnames, str, macinfo, "
        "or exception"), 0 },
-  { "notes", 'n', NULL, 0, N_("Display the core notes"), 0 },
-  { "arch-specific", 'A', NULL, 0,
-    N_("Display architecture specific information (if any)"), 0 },
   { "hex-dump", 'x', "SECTION", 0,
     N_("Dump the uninterpreted contents of SECTION, by number or name"), 0 },
   { "strings", 'p', "SECTION", OPTION_ARG_OPTIONAL,
@@ -96,8 +101,6 @@ static const struct argp_option options[] =
   { "string-dump", 'p', NULL, OPTION_ALIAS | OPTION_HIDDEN, NULL, 0 },
   { "archive-index", 'c', NULL, 0,
     N_("Display the symbol index of an archive"), 0 },
-  { "exception", 'e', NULL, 0, N_("Display sections for exception handling"),
-    0 },
 
   { NULL, 0, NULL, 0, N_("Output control:"), 0 },
   { "numeric-addresses", 'N', NULL, 0,

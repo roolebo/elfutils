@@ -1,5 +1,5 @@
 /* Print information from ELF file in human-readable form.
-   Copyright (C) 1999-2008, 2009 Red Hat, Inc.
+   Copyright (C) 1999-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1999.
 
@@ -202,6 +202,7 @@ struct section_argument
 {
   struct section_argument *next;
   const char *arg;
+  bool implicit;
 };
 
 /* Number of sections in the file.  */
@@ -282,11 +283,12 @@ static error_t
 parse_opt (int key, char *arg,
 	   struct argp_state *state __attribute__ ((unused)))
 {
-  void add_dump_section (const char *name)
+  void add_dump_section (const char *name, bool implicit)
   {
     struct section_argument *a = xmalloc (sizeof *a);
     a->arg = name;
     a->next = NULL;
+    a->implicit = implicit;
     struct section_argument ***tailp
       = key == 'x' ? &dump_data_sections_tail : &string_sections_tail;
     **tailp = a;
@@ -308,9 +310,9 @@ parse_opt (int key, char *arg,
       print_arch = true;
       print_notes = true;
       print_debug_sections |= section_exception;
-      add_dump_section (".strtab");
-      add_dump_section (".dynstr");
-      add_dump_section (".comment");
+      add_dump_section (".strtab", true);
+      add_dump_section (".dynstr", true);
+      add_dump_section (".comment", true);
       any_control_option = true;
       break;
     case 'A':
@@ -408,7 +410,7 @@ parse_opt (int key, char *arg,
 	}
       /* Fall through.  */
     case 'x':
-      add_dump_section (arg);
+      add_dump_section (arg, false);
       any_control_option = true;
       break;
     case 'N':
@@ -7514,7 +7516,8 @@ for_each_section_argument (Elf *elf, const struct section_argument *list,
 
 	  if (unlikely (scn == NULL))
 	    {
-	      error (0, 0, gettext ("\nsection '%s' does not exist"), a->arg);
+	      if (!a->implicit)
+		error (0, 0, gettext ("\nsection '%s' does not exist"), a->arg);
 	      continue;
 	    }
 	}

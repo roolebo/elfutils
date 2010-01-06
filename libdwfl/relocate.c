@@ -191,7 +191,10 @@ relocate_getsym (Dwfl_Module *mod,
     {
     case SHN_ABS:
     case SHN_UNDEF:
+      return DWFL_E_NOERROR;
+
     case SHN_COMMON:
+      sym->st_value = 0;	/* Value is size, not helpful. */
       return DWFL_E_NOERROR;
     }
 
@@ -350,7 +353,8 @@ relocate_section (Dwfl_Module *mod, Elf *relocated, const GElf_Ehdr *ehdr,
 	  {
 	    /* Maybe we can figure it out anyway.  */
 	    error = resolve_symbol (mod, reloc_symtab, &sym, shndx);
-	    if (error != DWFL_E_NOERROR)
+	    if (error != DWFL_E_NOERROR
+		&& !(error == DWFL_E_RELUNDEF && shndx == SHN_COMMON))
 	      return error;
 	  }
 

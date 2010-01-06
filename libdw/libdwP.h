@@ -1,5 +1,5 @@
 /* Internal definitions for libdwarf.
-   Copyright (C) 2002-2009 Red Hat, Inc.
+   Copyright (C) 2002-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -595,6 +595,7 @@ unsigned char * __libdw_formptr (Dwarf_Attribute *attr, int sec_index,
 
 
 /* Aliases to avoid PLTs.  */
+INTDECL (dwarf_aggregate_size)
 INTDECL (dwarf_attr)
 INTDECL (dwarf_attr_integrate)
 INTDECL (dwarf_begin_elf)
@@ -624,6 +625,7 @@ INTDECL (dwarf_nextcu)
 INTDECL (dwarf_offdie)
 INTDECL (dwarf_ranges)
 INTDECL (dwarf_siblingof)
+INTDECL (dwarf_srclang)
 INTDECL (dwarf_tag)
 
 #endif	/* libdwP.h */

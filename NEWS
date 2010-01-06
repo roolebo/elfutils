@@ -1,5 +1,8 @@
 Version 0.144:
 
+libdw: New function dwarf_aggregate_size for computing (constant) type
+       sizes, including array_type cases with nontrivial calculation.
+
 readelf: Don't give errors for missing info under -a.
 	 Handle Linux "VMCOREINFO" notes under -n.
 

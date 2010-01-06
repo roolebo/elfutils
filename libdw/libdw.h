@@ -1,5 +1,5 @@
 /* Interfaces for libdw.
-   Copyright (C) 2002-2009 Red Hat, Inc.
+   Copyright (C) 2002-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -362,7 +362,7 @@ extern int dwarf_child (Dwarf_Die *die, Dwarf_Die *result)
    Returns 1 if no sibling could be found and, if RESULT is not
    the same as DIE, it sets RESULT->addr to the address of the
    (non-sibling) DIE that follows this one, or NULL if this DIE
-   was the last one in the cokmpilation unit.  */
+   was the last one in the compilation unit.  */
 extern int dwarf_siblingof (Dwarf_Die *die, Dwarf_Die *result)
      __nonnull_attribute__ (2);
 
@@ -631,6 +631,11 @@ extern int dwarf_getlocation_implicit_value (Dwarf_Attribute *attr,
 					     Dwarf_Block *return_block)
   __nonnull_attribute__ (2, 3);
 
+
+/* Compute the byte-size of a type DIE according to DWARF rules.
+   For most types, this is just DW_AT_byte_size.
+   For DW_TAG_array_type it can apply much more complex rules.  */
+extern int dwarf_aggregate_size (Dwarf_Die *die, Dwarf_Word *size);
 
 
 /* Return scope DIEs containing PC address.

@@ -1,5 +1,5 @@
 /* Function return value location for Linux/PPC64 ABI.
-   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -52,6 +52,13 @@ static const Dwarf_Op loc_fpreg[] =
 #define nloc_fpreg	1
 #define nloc_fp2regs	4
 #define nloc_fp4regs	8
+
+/* vr2.  */
+static const Dwarf_Op loc_vmxreg[] =
+  {
+    { .atom = DW_OP_regx, .number = 1124 + 2 }
+  };
+#define nloc_vmxreg	1
 
 /* The return value is a structure and is actually stored in stack space
    passed in a hidden argument by the caller.  But, the compiler
@@ -150,11 +157,21 @@ ppc64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
       *locp = loc_aggregate;
       return nloc_aggregate;
 
-    case DW_TAG_string_type:
     case DW_TAG_array_type:
-      if (dwarf_formudata (dwarf_attr_integrate (typedie, DW_AT_byte_size,
-						 &attr_mem), &size) == 0
-	  && size <= 8)
+      {
+	bool is_vector;
+	if (dwarf_formflag (dwarf_attr_integrate (typedie, DW_AT_GNU_vector,
+						  &attr_mem), &is_vector) == 0
+	    && is_vector)
+	  {
+	    *locp = loc_vmxreg;
+	    return nloc_vmxreg;
+	  }
+      }
+      /* Fall through.  */
+
+    case DW_TAG_string_type:
+      if (dwarf_aggregate_size (typedie, &size) == 0 && size <= 8)
 	{
 	  if (tag == DW_TAG_array_type)
 	    {

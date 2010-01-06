@@ -1,5 +1,5 @@
 /* Function return value location for IA64 ABI.
-   Copyright (C) 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2006-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -89,7 +89,8 @@ static const Dwarf_Op loc_aggregate[] =
 /* If this type is an HFA small enough to be returned in FP registers,
    return the number of registers to use.  Otherwise 9, or -1 for errors.  */
 static int
-hfa_type (Dwarf_Die *typedie, const Dwarf_Op **locp, int fpregs_used)
+hfa_type (Dwarf_Die *typedie, Dwarf_Word size,
+	  const Dwarf_Op **locp, int fpregs_used)
 {
   /* Descend the type structure, counting elements and finding their types.
      If we find a datum that's not an FP type (and not quad FP), punt.
@@ -114,10 +115,6 @@ hfa_type (Dwarf_Die *typedie, const Dwarf_Op **locp, int fpregs_used)
       return -1;
 
     case DW_TAG_base_type:;
-      int size = dwarf_bytesize (typedie);
-      if (size < 0)
-	return -1;
-
       Dwarf_Word encoding;
       if (dwarf_formudata (dwarf_attr_integrate (typedie, DW_AT_encoding,
 						 &attr_mem), &encoding) != 0)
@@ -178,9 +175,13 @@ hfa_type (Dwarf_Die *typedie, const Dwarf_Op **locp, int fpregs_used)
 							     DW_AT_type,
 							     &attr_mem),
 				       &child_type_mem);
+		Dwarf_Word child_size;
+		if (dwarf_aggregate_size (child_typedie, &child_size) != 0)
+		  return -1;
 		if (tag == DW_TAG_union_type)
 		  {
-		    int used = hfa_type (child_typedie, locp, fpregs_used);
+		    int used = hfa_type (child_typedie, child_size,
+					 locp, fpregs_used);
 		    if (used < 0 || used > 8)
 		      return used;
 		    if (used > max_used)
@@ -188,7 +189,8 @@ hfa_type (Dwarf_Die *typedie, const Dwarf_Op **locp, int fpregs_used)
 		  }
 		else
 		  {
-		    fpregs_used = hfa_type (child_typedie, locp, fpregs_used);
+		    fpregs_used = hfa_type (child_typedie, child_size,
+					    locp, fpregs_used);
 		    if (fpregs_used < 0 || fpregs_used > 8)
 		      return fpregs_used;
 		  }
@@ -200,10 +202,7 @@ hfa_type (Dwarf_Die *typedie, const Dwarf_Op **locp, int fpregs_used)
 	}
       break;
 
-    case DW_TAG_array_type:;
-      size = dwarf_bytesize (typedie);
-      if (size < 0)
-	return 9;
+    case DW_TAG_array_type:
       if (size == 0)
 	break;
 
@@ -212,14 +211,16 @@ hfa_type (Dwarf_Die *typedie, const Dwarf_Op **locp, int fpregs_used)
 	= dwarf_formref_die (dwarf_attr_integrate (typedie, DW_AT_type,
 						   &attr_mem),
 			     &base_type_mem);
+      Dwarf_Word base_size;
+      if (dwarf_aggregate_size (base_typedie, &base_size) != 0)
+	return -1;
 
-      int used = hfa_type (base_typedie, locp, 0);
+      int used = hfa_type (base_typedie, base_size, locp, 0);
       if (used < 0 || used > 8)
 	return used;
       if (size % (*locp)[1].number != 0)
 	return 0;
-      size /= (*locp)[1].number;
-      fpregs_used += used * size;
+      fpregs_used += used * (size / (*locp)[1].number);
       break;
 
     default:
@@ -346,13 +347,12 @@ ia64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
     case DW_TAG_class_type:
     case DW_TAG_union_type:
     case DW_TAG_array_type:
-      if (dwarf_formudata (dwarf_attr_integrate (typedie, DW_AT_byte_size,
-						 &attr_mem), &size) != 0)
+      if (dwarf_aggregate_size (typedie, &size) != 0)
 	return -1;
 
       /* If this qualifies as an homogeneous floating-point aggregate
 	 (HFA), then it should be returned in FP regs. */
-      int nfpreg = hfa_type (typedie, locp, 0);
+      int nfpreg = hfa_type (typedie, size, locp, 0);
       if (nfpreg < 0)
 	return nfpreg;
       else if (nfpreg > 0 && nfpreg <= 8)

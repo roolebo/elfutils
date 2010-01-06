@@ -1,5 +1,5 @@
 /* Function return value location for Linux/PPC ABI.
-   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007, 2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -38,14 +38,17 @@
 #define SVR4_STRUCT_RETURN 0
 
 
-/* r3, or pair r3, r4.  */
+/* r3, or pair r3, r4, or quad r3-r6.  */
 static const Dwarf_Op loc_intreg[] =
   {
     { .atom = DW_OP_reg3 }, { .atom = DW_OP_piece, .number = 4 },
     { .atom = DW_OP_reg4 }, { .atom = DW_OP_piece, .number = 4 },
+    { .atom = DW_OP_reg5 }, { .atom = DW_OP_piece, .number = 4 },
+    { .atom = DW_OP_reg6 }, { .atom = DW_OP_piece, .number = 4 },
   };
 #define nloc_intreg	1
 #define nloc_intregpair	4
+#define nloc_intregquad	8
 
 /* f1.  */
 static const Dwarf_Op loc_fpreg[] =
@@ -53,6 +56,13 @@ static const Dwarf_Op loc_fpreg[] =
     { .atom = DW_OP_regx, .number = 33 }
   };
 #define nloc_fpreg	1
+
+/* vr2.  */
+static const Dwarf_Op loc_vmxreg[] =
+  {
+    { .atom = DW_OP_regx, .number = 1124 + 2 }
+  };
+#define nloc_vmxreg	1
 
 /* The return value is a structure and is actually stored in stack space
    passed in a hidden argument by the caller.  But, the compiler
@@ -63,6 +73,13 @@ static const Dwarf_Op loc_aggregate[] =
   };
 #define nloc_aggregate 1
 
+
+/* XXX We should check the SHT_GNU_ATTRIBUTES bits here (or in ppc_init).  */
+static bool
+ppc_altivec_abi (void)
+{
+  return true;
+}
 
 int
 ppc_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
@@ -143,13 +160,32 @@ ppc_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
       *locp = loc_aggregate;
       return nloc_aggregate;
 
+    case DW_TAG_array_type:
+      {
+	bool is_vector;
+	if (dwarf_formflag (dwarf_attr_integrate (typedie, DW_AT_GNU_vector,
+						  &attr_mem), &is_vector) == 0
+	    && is_vector
+	    && dwarf_aggregate_size (typedie, &size) == 0)
+	  switch (size)
+	    {
+	    case 16:
+	      if (ppc_altivec_abi ())
+		{
+		  *locp = loc_vmxreg;
+		  return nloc_vmxreg;
+		}
+	      *locp = loc_intreg;
+	      return nloc_intregquad;
+	    }
+      }
+      /* Fall through.  */
+
     case DW_TAG_structure_type:
     case DW_TAG_class_type:
     case DW_TAG_union_type:
-    case DW_TAG_array_type:
       if (SVR4_STRUCT_RETURN
-	  && dwarf_formudata (dwarf_attr_integrate (typedie, DW_AT_byte_size,
-						    &attr_mem), &size) == 0
+	  && dwarf_aggregate_size (typedie, &size) == 0
 	  && size > 0 && size <= 8)
 	goto intreg;
       goto aggregate;

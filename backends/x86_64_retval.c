@@ -1,5 +1,5 @@
 /* Function return value location for Linux/x86-64 ABI.
-   Copyright (C) 2005, 2007 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -181,9 +181,8 @@ x86_64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
     case DW_TAG_class_type:
     case DW_TAG_union_type:
     case DW_TAG_array_type:
-      if (dwarf_formudata (dwarf_attr_integrate (typedie, DW_AT_byte_size,
-						 &attr_mem), &size) != 0)
-	return -1;
+      if (dwarf_aggregate_size (typedie, &size) != 0)
+	goto large;
       if (size > 16)
 	goto large;
 

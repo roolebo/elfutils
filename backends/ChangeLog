@@ -1,3 +1,15 @@
+2010-01-05  Roland McGrath  <roland@redhat.com>
+
+	* arm_retval.c (arm_return_value_location): Use dwarf_aggregate_size.
+	* ia64_retval.c (ia64_return_value_location): Likewise.
+	* ppc_retval.c (ppc_return_value_location): Likewise.
+	* ppc64_retval.c (ppc64_return_value_location): Likewise.
+	* sparc_retval.c (sparc_return_value_location): Likewise.
+
+	* ppc64_retval.c (ppc64_return_value_location):
+	Use vr2 for DW_TAG_array_type with DW_AT_GNU_vector.
+	* ppc_retval.c (ppc_return_value_location): Likewise.
+
 2010-01-04  Roland McGrath  <roland@redhat.com>
 
 	* linux-core-note.c (vmcoreinfo_items): New static const variable.

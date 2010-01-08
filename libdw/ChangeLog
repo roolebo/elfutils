@@ -1,3 +1,7 @@
+2010-01-07  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_getcfi_elf.c (getcfi_phdr): Use elf_getphdrnum.
+
 2010-01-05  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_aggregate_size.c: New file.

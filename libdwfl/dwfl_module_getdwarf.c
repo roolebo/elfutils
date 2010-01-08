@@ -1,5 +1,5 @@
 /* Find debugging and symbol information for a module in libdwfl.
-   Copyright (C) 2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -95,19 +95,25 @@ open_elf (Dwfl_Module *mod, struct dwfl_file *file)
      sh_addr of any program sections refer to.  */
   file->bias = 0;
   if (mod->e_type != ET_EXEC)
-    for (uint_fast16_t i = 0; i < ehdr->e_phnum; ++i)
-      {
-	GElf_Phdr ph_mem;
-	GElf_Phdr *ph = gelf_getphdr (file->elf, i, &ph_mem);
-	if (ph == NULL)
-	  goto elf_error;
-	if (ph->p_type == PT_LOAD)
-	  {
-	    file->bias = ((mod->low_addr & -ph->p_align)
-			  - (ph->p_vaddr & -ph->p_align));
-	    break;
-	  }
-      }
+    {
+      size_t phnum;
+      if (unlikely (elf_getphdrnum (file->elf, &phnum) != 0))
+	goto elf_error;
+
+      for (size_t i = 0; i < phnum; ++i)
+	{
+	  GElf_Phdr ph_mem;
+	  GElf_Phdr *ph = gelf_getphdr (file->elf, i, &ph_mem);
+	  if (ph == NULL)
+	    goto elf_error;
+	  if (ph->p_type == PT_LOAD)
+	    {
+	      file->bias = ((mod->low_addr & -ph->p_align)
+			    - (ph->p_vaddr & -ph->p_align));
+	      break;
+	    }
+	}
+    }
 
   mod->e_type = ehdr->e_type;
 
@@ -285,11 +291,11 @@ load_symtab (struct dwfl_file *file, struct dwfl_file **symfile,
 /* Translate addresses into file offsets.
    OFFS[*] start out zero and remain zero if unresolved.  */
 static void
-find_offsets (Elf *elf, const GElf_Ehdr *ehdr, size_t n,
+find_offsets (Elf *elf, size_t phnum, size_t n,
 	      GElf_Addr addrs[n], GElf_Off offs[n])
 {
   size_t unsolved = n;
-  for (uint_fast16_t i = 0; i < ehdr->e_phnum; ++i)
+  for (size_t i = 0; i < phnum; ++i)
     {
       GElf_Phdr phdr_mem;
       GElf_Phdr *phdr = gelf_getphdr (elf, i, &phdr_mem);
@@ -313,7 +319,11 @@ find_dynsym (Dwfl_Module *mod)
   GElf_Ehdr ehdr_mem;
   GElf_Ehdr *ehdr = gelf_getehdr (mod->main.elf, &ehdr_mem);
 
-  for (uint_fast16_t i = 0; i < ehdr->e_phnum; ++i)
+  size_t phnum;
+  if (unlikely (elf_getphdrnum (mod->main.elf, &phnum) != 0))
+    return;
+
+  for (size_t i = 0; i < phnum; ++i)
     {
       GElf_Phdr phdr_mem;
       GElf_Phdr *phdr = gelf_getphdr (mod->main.elf, i, &phdr_mem);
@@ -380,7 +390,7 @@ find_dynsym (Dwfl_Module *mod)
 
 	  /* Translate pointers into file offsets.  */
 	  GElf_Off offs[i_max] = { 0, };
-	  find_offsets (mod->main.elf, ehdr, i_max, addrs, offs);
+	  find_offsets (mod->main.elf, phnum, i_max, addrs, offs);
 
 	  /* Figure out the size of the symbol table.  */
 	  if (offs[i_hash] != 0)

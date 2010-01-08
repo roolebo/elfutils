@@ -1,5 +1,5 @@
 /* Return build ID information for a module.
-   Copyright (C) 2007, 2008, 2009 Red Hat, Inc.
+   Copyright (C) 2007-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -107,12 +107,14 @@ __libdwfl_find_build_id (Dwfl_Module *mod, bool set, Elf *elf)
       /* No sections, have to look for phdrs.  */
       GElf_Ehdr ehdr_mem;
       GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);
-      if (unlikely (ehdr == NULL))
+      size_t phnum;
+      if (unlikely (ehdr == NULL)
+	  || unlikely (elf_getphdrnum (elf, &phnum) != 0))
 	{
 	  __libdwfl_seterrno (DWFL_E_LIBELF);
 	  return -1;
 	}
-      for (uint_fast16_t i = 0; result == 0 && i < ehdr_mem.e_phnum; ++i)
+      for (size_t i = 0; result == 0 && i < phnum; ++i)
 	{
 	  GElf_Phdr phdr_mem;
 	  GElf_Phdr *phdr = gelf_getphdr (elf, i, &phdr_mem);

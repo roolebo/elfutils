@@ -1,5 +1,5 @@
 /* Core file handling.
-   Copyright (C) 2008, 2009 Red Hat, Inc.
+   Copyright (C) 2008-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -141,24 +141,17 @@ elf_begin_rand (Elf *parent, loff_t offset, loff_t size, loff_t *next)
 
 
 int
-dwfl_report_core_segments (Dwfl *dwfl, Elf *elf, const GElf_Ehdr *ehdr,
-			   GElf_Phdr *notes)
+dwfl_report_core_segments (Dwfl *dwfl, Elf *elf, size_t phnum, GElf_Phdr *notes)
 {
   if (unlikely (dwfl == NULL))
     return -1;
-
-  if (unlikely (elf == NULL) || unlikely (ehdr == NULL))
-    {
-      __libdw_seterrno (DWFL_E_LIBELF);
-      return -1;
-    }
 
   int result = 0;
 
   if (notes != NULL)
     notes->p_type = PT_NULL;
 
-  for (int ndx = 0; result >= 0 && ndx < ehdr->e_phnum; ++ndx)
+  for (size_t ndx = 0; result >= 0 && ndx < phnum; ++ndx)
     {
       GElf_Phdr phdr_mem;
       GElf_Phdr *phdr = gelf_getphdr (elf, ndx, &phdr_mem);
@@ -414,8 +407,15 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const GElf_Ehdr *ehdr)
 {
   GElf_Phdr notes_phdr;
 
+  size_t phnum;
+  if (unlikely (ehdr == NULL) || unlikely (elf_getphdrnum (elf, &phnum) != 0))
+    {
+      __libdw_seterrno (DWFL_E_LIBELF);
+      return -1;
+    }
+
   /* First report each PT_LOAD segment.  */
-  int ndx = dwfl_report_core_segments (dwfl, elf, ehdr, &notes_phdr);
+  int ndx = dwfl_report_core_segments (dwfl, elf, phnum, &notes_phdr);
   if (unlikely (ndx <= 0))
     return ndx;
 
@@ -430,7 +430,7 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const GElf_Ehdr *ehdr)
 	return seg;
       ndx = seg > ndx ? seg : ndx + 1;
     }
-  while (ndx < ehdr->e_phnum);
+  while (ndx < (int) phnum);
 
   /* Next, we should follow the chain from DT_DEBUG.  */
 

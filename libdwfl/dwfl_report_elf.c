@@ -1,5 +1,5 @@
 /* Report a module to libdwfl based on ELF program headers.
-   Copyright (C) 2005, 2007, 2009 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -187,8 +187,11 @@ __libdwfl_report_elf (Dwfl *dwfl, const char *name, const char *file_name,
       base = 0;
 
     case ET_DYN:
-    default:
-      for (uint_fast16_t i = 0; i < ehdr->e_phnum; ++i)
+    default:;
+      size_t phnum;
+      if (unlikely (elf_getphdrnum (elf, &phnum) != 0))
+	goto elf_error;
+      for (size_t i = 0; i < phnum; ++i)
 	{
 	  GElf_Phdr phdr_mem, *ph = gelf_getphdr (elf, i, &phdr_mem);
 	  if (unlikely (ph == NULL))
@@ -203,7 +206,7 @@ __libdwfl_report_elf (Dwfl *dwfl, const char *name, const char *file_name,
 	}
       bias = base;
 
-      for (uint_fast16_t i = ehdr->e_phnum; i-- > 0;)
+      for (size_t i = phnum; i-- > 0;)
 	{
 	  GElf_Phdr phdr_mem, *ph = gelf_getphdr (elf, i, &phdr_mem);
 	  if (unlikely (ph == NULL))

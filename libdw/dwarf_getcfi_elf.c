@@ -1,5 +1,5 @@
 /* Get CFI from ELF file's exception-handling info.
-   Copyright (C) 2009 Red Hat, Inc.
+   Copyright (C) 2009-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -208,9 +208,11 @@ getcfi_gnu_eh_frame (Elf *elf, const GElf_Ehdr *ehdr, const GElf_Phdr *phdr)
 static Dwarf_CFI *
 getcfi_phdr (Elf *elf, const GElf_Ehdr *ehdr)
 {
-  const uint_fast16_t phnum = ehdr->e_phnum;
+  size_t phnum;
+  if (unlikely (elf_getphdrnum (elf, &phnum) != 0))
+    return NULL;
 
-  for (uint_fast16_t i = 0; i < phnum; ++i)
+  for (size_t i = 0; i < phnum; ++i)
     {
       GElf_Phdr phdr_mem;
       GElf_Phdr *phdr = gelf_getphdr (elf, i, &phdr_mem);

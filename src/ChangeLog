@@ -1,5 +1,12 @@
 2010-01-07  Roland McGrath  <roland@redhat.com>
 
+	* readelf.c (print_ehdr): Handle PN_XNUM.
+	(phnum): New static variable.
+	(process_elf_file): Set it with elf_getphdrnum.
+	(print_phdr): Use phnum instead of EHDR->e_phnum.
+	(print_dynamic, handle_notes): Likewise.
+	(handle_relocs_rel, handle_relocs_rela): Likewise.
+
 	* elfcmp.c (main): Use elf_getshdrnum and elf_getphdrnum.
 
 	* elflint.c (phnum): New static variable.

@@ -1,3 +1,13 @@
+2010-01-07  Roland McGrath  <roland@redhat.com>
+
+	* elfcmp.c (main): Use elf_getshdrnum and elf_getphdrnum.
+
+	* elflint.c (phnum): New static variable.
+	(check_elf_header): Set it, handling PN_XNUM.
+	Use that in place of EHDR->e_phnum throughout.
+	(check_symtab, check_reloc_shdr, check_dynamic): Likewise.
+	(unknown_dependency_p, check_sections, check_program_header): Likewise.
+
 2010-01-05  Roland McGrath  <roland@redhat.com>
 
 	* readelf.c (dwarf_attr_string): Match DW_AT_GNU_vector and

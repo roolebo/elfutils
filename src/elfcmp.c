@@ -1,5 +1,5 @@
 /* Compare relevant content of two ELF files.
-   Copyright (C) 2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -188,6 +188,39 @@ main (int argc, char *argv[])
     {
       if (! quiet)
 	error (0, 0, gettext ("%s %s diff: ELF header"), fname1, fname2);
+      result = 1;
+      goto out;
+    }
+
+  size_t shnum1;
+  size_t shnum2;
+  if (unlikely (elf_getshdrnum (elf1, &shnum1) != 0))
+    error (2, 0, gettext ("cannot get section count of '%s': %s"),
+	   fname1, elf_errmsg (-1));
+  if (unlikely (elf_getshdrnum (elf2, &shnum2) != 0))
+    error (2, 0, gettext ("cannot get section count of '%s': %s"),
+	   fname2, elf_errmsg (-1));
+  if (unlikely (shnum1 != shnum2))
+    {
+      if (! quiet)
+	error (0, 0, gettext ("%s %s diff: section count"), fname1, fname2);
+      result = 1;
+      goto out;
+    }
+
+  size_t phnum1;
+  size_t phnum2;
+  if (unlikely (elf_getphdrnum (elf1, &phnum1) != 0))
+    error (2, 0, gettext ("cannot get program header count of '%s': %s"),
+	   fname1, elf_errmsg (-1));
+  if (unlikely (elf_getphdrnum (elf2, &phnum2) != 0))
+    error (2, 0, gettext ("cannot get program header count of '%s': %s"),
+	   fname2, elf_errmsg (-1));
+  if (unlikely (phnum1 != phnum2))
+    {
+      if (! quiet)
+	error (0, 0, gettext ("%s %s diff: program header count"),
+	       fname1, fname2);
       result = 1;
       goto out;
     }
@@ -410,7 +443,7 @@ main (int argc, char *argv[])
       ehdr_region.next = &phdr_region;
 
       phdr_region.from = ehdr1->e_phoff;
-      phdr_region.to = ehdr1->e_phoff + ehdr1->e_phnum * ehdr1->e_phentsize;
+      phdr_region.to = ehdr1->e_phoff + phnum1 * ehdr1->e_phentsize;
       phdr_region.next = regions;
 
       regions = &ehdr_region;
@@ -445,7 +478,7 @@ main (int argc, char *argv[])
     }
 
   /* Compare the program header tables.  */
-  for (int ndx = 0; ndx < ehdr1->e_phnum; ++ndx)
+  for (unsigned int ndx = 0; ndx < phnum1; ++ndx)
     {
       GElf_Phdr phdr1_mem;
       GElf_Phdr *phdr1 = gelf_getphdr (elf1, ndx, &phdr1_mem);

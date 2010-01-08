@@ -1,5 +1,5 @@
 /* Pedantic checking of ELF files compliance with gABI/psABI spec.
-   Copyright (C) 2001,2002,2003,2004,2005,2006,2007,2008,2009 Red Hat, Inc.
+   Copyright (C) 2001-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -343,8 +343,9 @@ static const int valid_e_machine[] =
   (sizeof (valid_e_machine) / sizeof (valid_e_machine[0]))
 
 
-/* Number of sections.  */
+/* Numbers of sections and program headers.  */
 static unsigned int shnum;
+static unsigned int phnum;
 
 
 static void
@@ -464,6 +465,24 @@ invalid number of section header table entries\n"));
 	ERROR (gettext ("invalid section header index\n"));
     }
 
+  phnum = ehdr->e_phnum;
+  if (ehdr->e_phnum == PN_XNUM)
+    {
+      /* Get the header of the zeroth section.  The sh_info field
+	 might contain the phnum count.  */
+      GElf_Shdr shdr_mem;
+      GElf_Shdr *shdr = gelf_getshdr (elf_getscn (ebl->elf, 0), &shdr_mem);
+      if (shdr != NULL)
+	{
+	  /* The error will be reported later.  */
+	  if (shdr->sh_info < PN_XNUM)
+	    ERROR (gettext ("\
+invalid number of program header table entries\n"));
+	  else
+	    phnum = shdr->sh_info;
+	}
+    }
+
   /* Check the e_flags field.  */
   if (!ebl_machine_flag_check (ebl, ehdr->e_flags))
     ERROR (gettext ("invalid machine flags: %s\n"),
@@ -478,13 +497,13 @@ invalid number of section header table entries\n"));
       if (ehdr->e_phentsize != 0 && ehdr->e_phentsize != sizeof (Elf32_Phdr))
 	ERROR (gettext ("invalid program header size: %hd\n"),
 	       ehdr->e_phentsize);
-      else if (ehdr->e_phoff + ehdr->e_phnum * ehdr->e_phentsize > size)
+      else if (ehdr->e_phoff + phnum * ehdr->e_phentsize > size)
 	ERROR (gettext ("invalid program header position or size\n"));
 
       if (ehdr->e_shentsize != 0 && ehdr->e_shentsize != sizeof (Elf32_Shdr))
 	ERROR (gettext ("invalid section header size: %hd\n"),
 	       ehdr->e_shentsize);
-      else if (ehdr->e_shoff + ehdr->e_shnum * ehdr->e_shentsize > size)
+      else if (ehdr->e_shoff + shnum * ehdr->e_shentsize > size)
 	ERROR (gettext ("invalid section header position or size\n"));
     }
   else if (gelf_getclass (ebl->elf) == ELFCLASS64)
@@ -495,7 +514,7 @@ invalid number of section header table entries\n"));
       if (ehdr->e_phentsize != 0 && ehdr->e_phentsize != sizeof (Elf64_Phdr))
 	ERROR (gettext ("invalid program header size: %hd\n"),
 	       ehdr->e_phentsize);
-      else if (ehdr->e_phoff + ehdr->e_phnum * ehdr->e_phentsize > size)
+      else if (ehdr->e_phoff + phnum * ehdr->e_phentsize > size)
 	ERROR (gettext ("invalid program header position or size\n"));
 
       if (ehdr->e_shentsize != 0 && ehdr->e_shentsize != sizeof (Elf64_Shdr))
@@ -802,16 +821,16 @@ section [%2d] '%s': symbol %zu does not fit completely in referenced section [%2
 		    {
 		      GElf_Phdr phdr_mem;
 		      GElf_Phdr *phdr = NULL;
-		      int pcnt;
+		      unsigned int pcnt;
 
-		      for (pcnt = 0; pcnt < ehdr->e_phnum; ++pcnt)
+		      for (pcnt = 0; pcnt < phnum; ++pcnt)
 			{
 			  phdr = gelf_getphdr (ebl->elf, pcnt, &phdr_mem);
 			  if (phdr != NULL && phdr->p_type == PT_TLS)
 			    break;
 			}
 
-		      if (pcnt == ehdr->e_phnum)
+		      if (pcnt == phnum)
 			{
 			  if (no_pt_tls++ == 0)
 			    ERROR (gettext ("\
@@ -959,7 +978,7 @@ section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol present, but no .got section\n"
 	    /* Check that address and size match the dynamic section.
 	       We locate the dynamic section via the program header
 	       entry.  */
-	    for (int pcnt = 0; pcnt < ehdr->e_phnum; ++pcnt)
+	    for (unsigned int pcnt = 0; pcnt < phnum; ++pcnt)
 	      {
 		GElf_Phdr phdr_mem;
 		GElf_Phdr *phdr = gelf_getphdr (ebl->elf, pcnt, &phdr_mem);
@@ -1216,7 +1235,7 @@ section [%2d] '%s': section entry size does not match ElfXX_Rel\n"),
      the loaded segments are and b) which are read-only.  This will
      also allow us to determine whether the same reloc section is
      modifying loaded and not loaded segments.  */
-  for (int i = 0; i < ehdr->e_phnum; ++i)
+  for (unsigned int i = 0; i < phnum; ++i)
     {
       GElf_Phdr phdr_mem;
       GElf_Phdr *phdr = gelf_getphdr (ebl->elf, i, &phdr_mem);
@@ -1703,7 +1722,7 @@ section [%2d] '%s': entry %zu: pointer does not match address of section [%2d] '
 	case DT_VERNEED:
 	case DT_VERSYM:
 	check_addr:
-	  for (n = 0; n < ehdr->e_phnum; ++n)
+	  for (n = 0; n < phnum; ++n)
 	    {
 	      GElf_Phdr phdr_mem;
 	      GElf_Phdr *phdr = gelf_getphdr (ebl->elf, n, &phdr_mem);
@@ -1712,7 +1731,7 @@ section [%2d] '%s': entry %zu: pointer does not match address of section [%2d] '
 		  && phdr->p_vaddr + phdr->p_memsz > dyn->d_un.d_ptr)
 		break;
 	    }
-	  if (unlikely (n >= ehdr->e_phnum))
+	  if (unlikely (n >= phnum))
 	    {
 	      char buf[50];
 	      ERROR (gettext ("\
@@ -2780,18 +2799,18 @@ section [%2d] '%s': symbol %d: version index %d is for requested version\n"),
 
 
 static int
-unknown_dependency_p (Elf *elf, GElf_Ehdr *ehdr, const char *fname)
+unknown_dependency_p (Elf *elf, const char *fname)
 {
   GElf_Phdr phdr_mem;
   GElf_Phdr *phdr = NULL;
 
-  int i;
-  for (i = 0; i < ehdr->e_phnum; ++i)
+  unsigned int i;
+  for (i = 0; i < phnum; ++i)
     if ((phdr = gelf_getphdr (elf, i, &phdr_mem)) != NULL
 	&& phdr->p_type == PT_DYNAMIC)
       break;
 
-  if (i == ehdr->e_phnum)
+  if (i == phnum)
     return 1;
   assert (phdr != NULL);
   Elf_Scn *scn = gelf_offscn (elf, phdr->p_offset);
@@ -2819,7 +2838,7 @@ unknown_dependency_p (Elf *elf, GElf_Ehdr *ehdr, const char *fname)
 static unsigned int nverneed;
 
 static void
-check_verneed (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Shdr *shdr, int idx)
+check_verneed (Ebl *ebl, GElf_Shdr *shdr, int idx)
 {
   if (++nverneed == 2)
     ERROR (gettext ("more than one version reference section present\n"));
@@ -2874,7 +2893,7 @@ section [%2d] '%s': entry %d has invalid file reference\n"),
 	}
 
       /* Check that there is a DT_NEEDED entry for the referenced library.  */
-      if (unknown_dependency_p (ebl->elf, ehdr, libname))
+      if (unknown_dependency_p (ebl->elf, libname))
 	ERROR (gettext ("\
 section [%2d] '%s': entry %d references unknown dependency\n"),
 	       idx, section_name (ebl, idx), cnt);
@@ -3412,8 +3431,6 @@ check_sections (Ebl *ebl, GElf_Ehdr *ehdr)
 	ERROR (gettext ("zeroth section has nonzero address\n"));
       if (shdr->sh_offset != 0)
 	ERROR (gettext ("zeroth section has nonzero offset\n"));
-      if (shdr->sh_info != 0)
-	ERROR (gettext ("zeroth section has nonzero info field\n"));
       if (shdr->sh_addralign != 0)
 	ERROR (gettext ("zeroth section has nonzero align value\n"));
       if (shdr->sh_entsize != 0)
@@ -3426,9 +3443,13 @@ zeroth section has nonzero size value while ELF header has nonzero shnum value\n
       if (shdr->sh_link != 0 && ehdr->e_shstrndx != SHN_XINDEX)
 	ERROR (gettext ("\
 zeroth section has nonzero link value while ELF header does not signal overflow in shstrndx\n"));
+
+      if (shdr->sh_info != 0 && ehdr->e_phnum != PN_XNUM)
+	ERROR (gettext ("\
+zeroth section has nonzero link value while ELF header does not signal overflow in phnum\n"));
     }
 
-  int *segment_flags = xcalloc (ehdr->e_phnum, sizeof segment_flags[0]);
+  int *segment_flags = xcalloc (phnum, sizeof segment_flags[0]);
 
   bool dot_interp_section = false;
 
@@ -3695,11 +3716,11 @@ section [%2zu] '%s' is both executable and writable\n"),
 	{
 	  /* Make sure the section is contained in a loaded segment
 	     and that the initialization part matches NOBITS sections.  */
-	  int pcnt;
+	  unsigned int pcnt;
 	  GElf_Phdr phdr_mem;
 	  GElf_Phdr *phdr;
 
-	  for (pcnt = 0; pcnt < ehdr->e_phnum; ++pcnt)
+	  for (pcnt = 0; pcnt < phnum; ++pcnt)
 	    if ((phdr = gelf_getphdr (ebl->elf, pcnt, &phdr_mem)) != NULL
 		&& ((phdr->p_type == PT_LOAD
 		     && (shdr->sh_flags & SHF_TLS) == 0)
@@ -3760,7 +3781,7 @@ section [%2zu] '%s' is writable in unwritable segment %d\n"),
 		break;
 	      }
 
-	  if (pcnt == ehdr->e_phnum)
+	  if (pcnt == phnum)
 	    ERROR (gettext ("\
 section [%2zu] '%s': alloc flag set but section not in any loaded segment\n"),
 		   cnt, section_name (ebl, cnt));
@@ -3831,7 +3852,7 @@ section [%2zu] '%s': relocatable files cannot have dynamic symbol tables\n"),
 	  break;
 
 	case SHT_GNU_verneed:
-	  check_verneed (ebl, ehdr, shdr, cnt);
+	  check_verneed (ebl, shdr, cnt);
 	  break;
 
 	case SHT_GNU_verdef:
@@ -3852,7 +3873,7 @@ section [%2zu] '%s': relocatable files cannot have dynamic symbol tables\n"),
     ERROR (gettext ("INTERP program header entry but no .interp section\n"));
 
   if (!is_debuginfo)
-    for (int pcnt = 0; pcnt < ehdr->e_phnum; ++pcnt)
+    for (unsigned int pcnt = 0; pcnt < phnum; ++pcnt)
       {
 	GElf_Phdr phdr_mem;
 	GElf_Phdr *phdr = gelf_getphdr (ebl->elf, pcnt, &phdr_mem);
@@ -4079,7 +4100,7 @@ only executables, shared objects, and core files can have program headers\n"));
   int num_pt_tls = 0;
   int num_pt_relro = 0;
 
-  for (int cnt = 0; cnt < ehdr->e_phnum; ++cnt)
+  for (unsigned int cnt = 0; cnt < phnum; ++cnt)
     {
       GElf_Phdr phdr_mem;
       GElf_Phdr *phdr;
@@ -4154,8 +4175,8 @@ more than one GNU_RELRO entry in program header\n"));
 	  else
 	    {
 	      /* Check that the region is in a writable segment.  */
-	      int inner;
-	      for (inner = 0; inner < ehdr->e_phnum; ++inner)
+	      unsigned int inner;
+	      for (inner = 0; inner < phnum; ++inner)
 		{
 		  GElf_Phdr phdr2_mem;
 		  GElf_Phdr *phdr2;
@@ -4180,7 +4201,7 @@ loadable segment [%u] flags do not match GNU_RELRO [%u] flags\n"),
 		    }
 		}
 
-	      if (inner >= ehdr->e_phnum)
+	      if (inner >= phnum)
 		ERROR (gettext ("\
 %s segment not contained in a loaded segment\n"), "GNU_RELRO");
 	    }
@@ -4188,8 +4209,8 @@ loadable segment [%u] flags do not match GNU_RELRO [%u] flags\n"),
       else if (phdr->p_type == PT_PHDR)
 	{
 	  /* Check that the region is in a writable segment.  */
-	  int inner;
-	  for (inner = 0; inner < ehdr->e_phnum; ++inner)
+	  unsigned int inner;
+	  for (inner = 0; inner < phnum; ++inner)
 	    {
 	      GElf_Phdr phdr2_mem;
 	      GElf_Phdr *phdr2;
@@ -4203,7 +4224,7 @@ loadable segment [%u] flags do not match GNU_RELRO [%u] flags\n"),
 		break;
 	    }
 
-	  if (inner >= ehdr->e_phnum)
+	  if (inner >= phnum)
 	    ERROR (gettext ("\
 %s segment not contained in a loaded segment\n"), "PHDR");
 

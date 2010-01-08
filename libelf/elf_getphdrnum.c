@@ -1,7 +1,6 @@
-/* Return program header table entry.
-   Copyright (C) 1998-2010 Red Hat, Inc.
+/* Return number of program headers in the ELF file.
+   Copyright (C) 2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by the
@@ -52,111 +51,65 @@
 # include <config.h>
 #endif
 
+#include <assert.h>
 #include <gelf.h>
-#include <string.h>
-#include <stdbool.h>
+#include <stddef.h>
 
 #include "libelfP.h"
 
 
-GElf_Phdr *
-gelf_getphdr (elf, ndx, dst)
+int
+__elf_getphdrnum_rdlock (elf, dst)
      Elf *elf;
-     int ndx;
-     GElf_Phdr *dst;
+     size_t *dst;
 {
-  GElf_Phdr *result = NULL;
+ if (unlikely (elf->state.elf64.ehdr == NULL))
+   {
+     /* Maybe no ELF header was created yet.  */
+     __libelf_seterrno (ELF_E_WRONG_ORDER_EHDR);
+     return -1;
+   }
+
+ *dst = (elf->class == ELFCLASS32
+	 ? elf->state.elf32.ehdr->e_phnum
+	 : elf->state.elf64.ehdr->e_phnum);
+
+ if (*dst == PN_XNUM)
+   {
+     const Elf_ScnList *const scns = (elf->class == ELFCLASS32
+				      ? &elf->state.elf32.scns
+				      : &elf->state.elf64.scns);
+
+     /* If there are no section headers, perhaps this is really just 65536
+	written without PN_XNUM support.  Either that or it's bad data.  */
+
+     if (likely (scns->cnt > 0))
+       *dst = (elf->class == ELFCLASS32
+	       ? scns->data[0].shdr.e32->sh_info
+	       : scns->data[0].shdr.e64->sh_info);
+   }
+
+ return 0;
+}
+
+int
+elf_getphdrnum (elf, dst)
+     Elf *elf;
+     size_t *dst;
+{
+  int result;
 
   if (elf == NULL)
-    return NULL;
+    return -1;
 
   if (unlikely (elf->kind != ELF_K_ELF))
     {
       __libelf_seterrno (ELF_E_INVALID_HANDLE);
-      return NULL;
-    }
-
-  if (dst == NULL)
-    {
-      __libelf_seterrno (ELF_E_INVALID_OPERAND);
-      return NULL;
+      return -1;
     }
 
   rwlock_rdlock (elf->lock);
-
-  if (elf->class == ELFCLASS32)
-    {
-      /* Copy the elements one-by-one.  */
-      Elf32_Phdr *phdr = elf->state.elf32.phdr;
-
-      if (phdr == NULL)
-	{
-	  rwlock_unlock (elf->lock);
-	  phdr = INTUSE(elf32_getphdr) (elf);
-	  if (phdr == NULL)
-	    /* The error number is already set.  */
-	    return NULL;
-	  rwlock_rdlock (elf->lock);
-	}
-
-      /* Test whether the index is ok.  */
-      size_t phnum;
-      if (ndx >= elf->state.elf32.ehdr->e_phnum
-	  && (elf->state.elf32.ehdr->e_phnum != PN_XNUM
-	      || __elf_getphdrnum_rdlock (elf, &phnum) != 0
-	      || (size_t) ndx >= phnum))
-	{
-	  __libelf_seterrno (ELF_E_INVALID_INDEX);
-	  goto out;
-	}
-
-      /* We know the result now.  */
-      result = dst;
-
-      /* Now correct the pointer to point to the correct element.  */
-      phdr += ndx;
-
-#define COPY(Name) result->Name = phdr->Name
-      COPY (p_type);
-      COPY (p_offset);
-      COPY (p_vaddr);
-      COPY (p_paddr);
-      COPY (p_filesz);
-      COPY (p_memsz);
-      COPY (p_flags);
-      COPY (p_align);
-    }
-  else
-    {
-      /* Copy the elements one-by-one.  */
-      Elf64_Phdr *phdr = elf->state.elf64.phdr;
-
-      if (phdr == NULL)
-	{
-	  rwlock_unlock (elf->lock);
-	  phdr = INTUSE(elf64_getphdr) (elf);
-	  if (phdr == NULL)
-	    /* The error number is already set.  */
-	    return NULL;
-	  rwlock_rdlock (elf->lock);
-	}
-
-      /* Test whether the index is ok.  */
-      size_t phnum;
-      if (ndx >= elf->state.elf64.ehdr->e_phnum
-	  && (elf->state.elf64.ehdr->e_phnum != PN_XNUM
-	      || __elf_getphdrnum_rdlock (elf, &phnum) != 0
-	      || (size_t) ndx >= phnum))
-	{
-	  __libelf_seterrno (ELF_E_INVALID_INDEX);
-	  goto out;
-	}
-
-      /* We only have to copy the data.  */
-      result = memcpy (dst, phdr + ndx, sizeof (GElf_Phdr));
-    }
-
- out:
+  result = __elf_getphdrnum_rdlock (elf, dst);
   rwlock_unlock (elf->lock);
 
   return result;

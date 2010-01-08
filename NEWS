@@ -1,5 +1,8 @@
 Version 0.144:
 
+libelf: New function elf_getphdrnum.
+	Now support using more than 65536 program headers in a file.
+
 libdw: New function dwarf_aggregate_size for computing (constant) type
        sizes, including array_type cases with nontrivial calculation.
 

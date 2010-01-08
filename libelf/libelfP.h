@@ -1,5 +1,5 @@
 /* Internal interfaces for libelf.
-   Copyright (C) 1998-2003, 2005, 2006, 2007, 2009 Red Hat, Inc.
+   Copyright (C) 1998-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -530,6 +530,8 @@ extern Elf_Scn *__elf32_offscn_internal (Elf *__elf, Elf32_Off __offset)
      attribute_hidden;
 extern Elf_Scn *__elf64_offscn_internal (Elf *__elf, Elf64_Off __offset)
      attribute_hidden;
+extern int __elf_getphdrnum_rdlock (Elf *__elf, size_t *__dst)
+     internal_function;
 extern int __elf_getshdrnum_rdlock (Elf *__elf, size_t *__dst)
      internal_function;
 extern int __elf_getshdrstrndx_internal (Elf *__elf, size_t *__dst)

@@ -1,3 +1,23 @@
+2010-01-07  Roland McGrath  <roland@redhat.com>
+
+	* elf32_getphdr.c: Use __elf_getphdrnum_rdlock.
+	* gelf_getphdr.c: Likewise.
+	* gelf_update_phdr.c: Likewise.
+	* elf32_updatefile.c (__elf32_updatemmap, __elf32_updatefile): Likewise.
+	* elf32_updatenull.c (__elf32_updatenull_wrlock): Likewise.
+	* elf32_newphdr.c: Clear section 0's sh_info when resetting e_phnum.
+	If COUNT is too large, use store PN_XNUM instead and set sh_info.
+	* elf_begin.c (file_read_elf): Always allocate space we can use later
+	for section 0 if doing RDWR.
+
+	* elf_getphdrnum.c: New file.
+	* Makefile.am (libelf_a_SOURCES): Add it.
+	* libelf.h: Declare elf_getphdrnum.
+	* libelfP.h: Declare __elf_getphdrnum_rdlock.
+	* libelf.map (ELFUTILS_1.6): New set, add elf_getphdrnum.
+
+	* elf.h: Update from glibc.
+
 2009-10-23  Lubomir Rintel  <lkundrak@v3.sk>
 
 	* elf32_updatefile.c (fill_mmap): When starting past shdr_end, start

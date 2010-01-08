@@ -1,5 +1,5 @@
 /* Create new ELF program header table.
-   Copyright (C) 1999, 2000, 2002 Red Hat, Inc.
+   Copyright (C) 1999-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -79,6 +79,12 @@ elfw2(LIBELFBITS,newphdr) (elf, count)
       return NULL;
     }
 
+  if (unlikely ((ElfW2(LIBELFBITS,Word)) count != count))
+    {
+      __libelf_seterrno (ELF_E_INVALID_OPERAND);
+      return NULL;
+    }
+
   rwlock_wrlock (elf->lock);
 
   if (elf->class == 0)
@@ -110,6 +116,10 @@ elfw2(LIBELFBITS,newphdr) (elf, count)
 	  elf->state.ELFW(elf,LIBELFBITS).phdr = NULL;
 	  /* Set the `e_phnum' member to the new value.  */
 	  elf->state.ELFW(elf,LIBELFBITS).ehdr->e_phnum = 0;
+	  /* Also clear any old PN_XNUM extended value.  */
+	  if (elf->state.ELFW(elf,LIBELFBITS).scns.cnt > 0)
+	    elf->state.ELFW(elf,LIBELFBITS).scns.data[0]
+	      .shdr.ELFW(e,LIBELFBITS)->sh_info = 0;
 	  /* Also set the size.  */
 	  elf->state.ELFW(elf,LIBELFBITS).ehdr->e_phentsize =
 	    sizeof (ElfW2(LIBELFBITS,Phdr));
@@ -122,6 +132,7 @@ elfw2(LIBELFBITS,newphdr) (elf, count)
       result = NULL;
     }
   else if (elf->state.ELFW(elf,LIBELFBITS).ehdr->e_phnum != count
+	   || count == PN_XNUM
 	   || elf->state.ELFW(elf,LIBELFBITS).phdr == NULL)
     {
       /* Allocate a new program header with the appropriate number of
@@ -135,10 +146,24 @@ elfw2(LIBELFBITS,newphdr) (elf, count)
 	{
 	  /* Now set the result.  */
 	  elf->state.ELFW(elf,LIBELFBITS).phdr = result;
+	  if (count >= PN_XNUM)
+	    {
+	      /* We have to write COUNT into the zeroth section's sh_info.  */
+	      Elf_Scn *scn0 = &elf->state.ELFW(elf,LIBELFBITS).scns.data[0];
+	      if (elf->state.ELFW(elf,LIBELFBITS).scns.cnt == 0)
+		{
+		  assert (elf->state.ELFW(elf,LIBELFBITS).scns.max > 0);
+		  elf->state.ELFW(elf,LIBELFBITS).scns.cnt = 1;
+		}
+	      scn0->shdr.ELFW(e,LIBELFBITS)->sh_info = count;
+	      scn0->shdr_flags |= ELF_F_DIRTY;
+	      elf->state.ELFW(elf,LIBELFBITS).ehdr->e_phnum = PN_XNUM;
+	    }
+	  else
+	    /* Set the `e_phnum' member to the new value.  */
+	    elf->state.ELFW(elf,LIBELFBITS).ehdr->e_phnum = count;
 	  /* Clear the whole memory.  */
 	  memset (result, '\0', count * sizeof (ElfW2(LIBELFBITS,Phdr)));
-	  /* Set the `e_phnum' member to the new value.  */
-	  elf->state.ELFW(elf,LIBELFBITS).ehdr->e_phnum = count;
 	  /* Also set the size.  */
 	  elf->state.ELFW(elf,LIBELFBITS).ehdr->e_phentsize =
 	    elf_typesize (LIBELFBITS, ELF_T_PHDR, 1);
@@ -161,6 +186,7 @@ elfw2(LIBELFBITS,newphdr) (elf, count)
       elf->state.ELFW(elf,LIBELFBITS).phdr_flags |= ELF_F_DIRTY;
 
       result = elf->state.ELFW(elf,LIBELFBITS).phdr;
+      memset (result, '\0', count * sizeof (ElfW2(LIBELFBITS,Phdr)));
     }
 
  out:

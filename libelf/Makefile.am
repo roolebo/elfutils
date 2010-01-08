@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 1996-2006, 2007, 2008, 2009 Red Hat, Inc.
+## Copyright (C) 1996-2010 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -91,7 +91,7 @@ libelf_a_SOURCES = elf_version.c elf_hash.c elf_error.c elf_fill.c \
 		   gelf_update_versym.c gelf_update_verneed.c \
 		   gelf_update_vernaux.c gelf_update_verdef.c \
 		   gelf_update_verdaux.c \
-		   elf_getshdrnum.c elf_getshdrstrndx.c \
+		   elf_getphdrnum.c elf_getshdrnum.c elf_getshdrstrndx.c \
 		   gelf_checksum.c elf32_checksum.c elf64_checksum.c \
 		   libelf_crc32.c libelf_next_prime.c \
 		   elf_clone.c \

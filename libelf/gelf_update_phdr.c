@@ -1,5 +1,5 @@
 /* Update program header program header table entry.
-   Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
+   Copyright (C) 2000-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -101,7 +101,11 @@ gelf_update_phdr (Elf *elf, int ndx, GElf_Phdr *src)
 	}
 
       /* Test whether the index is ok.  */
-      if (unlikely (ndx >= elf->state.elf32.ehdr->e_phnum))
+      size_t phnum;
+      if (ndx >= elf->state.elf32.ehdr->e_phnum
+	  && (elf->state.elf32.ehdr->e_phnum != PN_XNUM
+	      || __elf_getphdrnum_rdlock (elf, &phnum) != 0
+	      || (size_t) ndx >= phnum))
 	{
 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
 	  goto out;
@@ -134,7 +138,11 @@ gelf_update_phdr (Elf *elf, int ndx, GElf_Phdr *src)
 	}
 
       /* Test whether the index is ok.  */
-      if (unlikely (ndx >= elf->state.elf64.ehdr->e_phnum))
+      size_t phnum;
+      if (ndx >= elf->state.elf64.ehdr->e_phnum
+	  && (elf->state.elf64.ehdr->e_phnum != PN_XNUM
+	      || __elf_getphdrnum_rdlock (elf, &phnum) != 0
+	      || (size_t) ndx >= phnum))
 	{
 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
 	  goto out;

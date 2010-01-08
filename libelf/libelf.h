@@ -1,5 +1,5 @@
 /* Interface for libelf.
-   Copyright (C) 1998-2000, 2002, 2004-2007, 2009 Red Hat, Inc.
+   Copyright (C) 1998-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -219,6 +219,12 @@ extern Elf64_Ehdr *elf64_getehdr (Elf *__elf);
 extern Elf32_Ehdr *elf32_newehdr (Elf *__elf);
 /* Similar but this time the binary calls is ELFCLASS64.  */
 extern Elf64_Ehdr *elf64_newehdr (Elf *__elf);
+
+/* Get the number of program headers in the ELF file.  If the file uses
+   more headers than can be represented in the e_phnum field of the ELF
+   header the information from the sh_info field in the zeroth section
+   header is used.  */
+extern int elf_getphdrnum (Elf *__elf, size_t *__dst);
 
 /* Retrieve class-dependent program header table.  */
 extern Elf32_Phdr *elf32_getphdr (Elf *__elf);

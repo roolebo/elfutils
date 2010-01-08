@@ -1,5 +1,5 @@
 /* Write changed data structures.
-   Copyright (C) 2000, 2001, 2002, 2004, 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright (C) 2000-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -165,6 +165,10 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
       previous_scn_changed = elf->state.ELFW(elf,LIBELFBITS).phdr == NULL;
     }
 
+  size_t phnum;
+  if (unlikely (__elf_getphdrnum_rdlock (elf, &phnum) != 0))
+    return -1;
+
   /* Write out the program header table.  */
   if (elf->state.ELFW(elf,LIBELFBITS).phdr != NULL
       && ((elf->state.ELFW(elf,LIBELFBITS).phdr_flags | elf->flags)
@@ -195,12 +199,12 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 	  /* Do the real work.  */
 	  (*fctp) (elf->map_address + elf->start_offset + ehdr->e_phoff,
 		   elf->state.ELFW(elf,LIBELFBITS).phdr,
-		   sizeof (ElfW2(LIBELFBITS,Phdr)) * ehdr->e_phnum, 1);
+		   sizeof (ElfW2(LIBELFBITS,Phdr)) * phnum, 1);
 	}
       else
 	memcpy (elf->map_address + elf->start_offset + ehdr->e_phoff,
 		elf->state.ELFW(elf,LIBELFBITS).phdr,
-		sizeof (ElfW2(LIBELFBITS,Phdr)) * ehdr->e_phnum);
+		sizeof (ElfW2(LIBELFBITS,Phdr)) * phnum);
 
       elf->state.ELFW(elf,LIBELFBITS).phdr_flags &= ~ELF_F_DIRTY;
 
@@ -214,8 +218,7 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
   char *last_position = ((char *) elf->map_address + elf->start_offset
 			 + MAX (elf_typesize (LIBELFBITS, ELF_T_EHDR, 1),
 				ehdr->e_phoff)
-			 + elf_typesize (LIBELFBITS, ELF_T_PHDR,
-					 ehdr->e_phnum));
+			 + elf_typesize (LIBELFBITS, ELF_T_PHDR, phnum));
 
   /* Write all the sections.  Well, only those which are modified.  */
   if (shnum > 0)
@@ -563,6 +566,10 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
   assert (sizeof (ElfW2(LIBELFBITS,Phdr))
 	  == elf_typesize (LIBELFBITS, ELF_T_PHDR, 1));
 
+  size_t phnum;
+  if (unlikely (__elf_getphdrnum_rdlock (elf, &phnum) != 0))
+    return -1;
+
   /* Write out the program header table.  */
   if (elf->state.ELFW(elf,LIBELFBITS).phdr != NULL
       && ((elf->state.ELFW(elf,LIBELFBITS).phdr_flags | elf->flags)
@@ -592,7 +599,7 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 
 	  /* Allocate sufficient memory.  */
 	  tmp_phdr = (ElfW2(LIBELFBITS,Phdr) *)
-	    malloc (sizeof (ElfW2(LIBELFBITS,Phdr)) * ehdr->e_phnum);
+	    malloc (sizeof (ElfW2(LIBELFBITS,Phdr)) * phnum);
 	  if (tmp_phdr == NULL)
 	    {
 	      __libelf_seterrno (ELF_E_NOMEM);
@@ -601,14 +608,14 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 
 	  /* Write the converted ELF header in a temporary buffer.  */
 	  (*fctp) (tmp_phdr, elf->state.ELFW(elf,LIBELFBITS).phdr,
-		   sizeof (ElfW2(LIBELFBITS,Phdr)) * ehdr->e_phnum, 1);
+		   sizeof (ElfW2(LIBELFBITS,Phdr)) * phnum, 1);
 
 	  /* This is the buffer we want to write.  */
 	  out_phdr = tmp_phdr;
 	}
 
       /* Write out the ELF header.  */
-      size_t phdr_size = sizeof (ElfW2(LIBELFBITS,Phdr)) * ehdr->e_phnum;
+      size_t phdr_size = sizeof (ElfW2(LIBELFBITS,Phdr)) * phnum;
       if (unlikely ((size_t) pwrite_retry (elf->fildes, out_phdr,
 					   phdr_size, ehdr->e_phoff)
 		    != phdr_size))
@@ -633,8 +640,7 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
   if (elf->state.ELFW(elf,LIBELFBITS).phdr == NULL)
     last_offset = elf_typesize (LIBELFBITS, ELF_T_EHDR, 1);
   else
-    last_offset = (ehdr->e_phoff
-		   + sizeof (ElfW2(LIBELFBITS,Phdr)) * ehdr->e_phnum);
+    last_offset = (ehdr->e_phoff + sizeof (ElfW2(LIBELFBITS,Phdr)) * phnum);
 
   /* Write all the sections.  Well, only those which are modified.  */
   if (shnum > 0)

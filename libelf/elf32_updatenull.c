@@ -1,5 +1,5 @@
 /* Update data structures for changes.
-   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009 Red Hat, Inc.
+   Copyright (C) 2000-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -164,13 +164,17 @@ __elfw2(LIBELFBITS,updatenull_wrlock) (Elf *elf, int *change_bop, size_t shnum)
 	  return -1;
 	}
 
+      size_t phnum;
+      if (unlikely (__elf_getphdrnum_rdlock (elf, &phnum) != 0))
+	return -1;
+
       if (elf->flags & ELF_F_LAYOUT)
 	{
 	  /* The user is supposed to fill out e_phoff.  Use it and
 	     e_phnum to determine the maximum extend.  */
 	  size = MAX ((size_t) size,
 		      ehdr->e_phoff
-		      + elf_typesize (LIBELFBITS, ELF_T_PHDR, ehdr->e_phnum));
+		      + elf_typesize (LIBELFBITS, ELF_T_PHDR, phnum));
 	}
       else
 	{
@@ -179,7 +183,7 @@ __elfw2(LIBELFBITS,updatenull_wrlock) (Elf *elf, int *change_bop, size_t shnum)
 			     ehdr_flags);
 
 	  /* We need no alignment here.  */
-	  size += elf_typesize (LIBELFBITS, ELF_T_PHDR, ehdr->e_phnum);
+	  size += elf_typesize (LIBELFBITS, ELF_T_PHDR, phnum);
 	}
     }
 

@@ -1,5 +1,5 @@
 /* Get ELF program header table.
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2006 Red Hat, Inc.
+   Copyright (C) 1998-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -94,7 +94,9 @@ __elfw2(LIBELFBITS,getphdr_wrlock) (elf)
       ElfW2(LIBELFBITS,Ehdr) *ehdr = elf->state.ELFW(elf,LIBELFBITS).ehdr;
 
       /* If no program header exists return NULL.  */
-      size_t phnum = ehdr->e_phnum;
+      size_t phnum;
+      if (__elf_getphdrnum_rdlock (elf, &phnum) != 0)
+	goto out;
       if (phnum == 0)
 	{
 	  __libelf_seterrno (ELF_E_NO_PHDR);

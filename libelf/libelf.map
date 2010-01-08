@@ -133,3 +133,8 @@ ELFUTILS_1.5 {
   global:
     elf_getshdrnum; elf_getshdrstrndx;
 } ELFUTILS_1.4;
+
+ELFUTILS_1.6 {
+  global:
+    elf_getphdrnum;
+} ELFUTILS_1.5;

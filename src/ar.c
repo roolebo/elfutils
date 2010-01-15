@@ -1,5 +1,5 @@
 /* Create, modify, and extract from archives.
-   Copyright (C) 2005, 2007, 2009 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -45,6 +45,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
 #include <sys/time.h>
 
 #include <system.h>

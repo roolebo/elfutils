@@ -49,6 +49,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <sys/param.h>
+#include <sys/stat.h>
 
 #include <system.h>
 #include "../libelf/libelfP.h"

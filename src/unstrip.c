@@ -1,5 +1,5 @@
 /* Combine stripped files with separate symbols and debug information.
-   Copyright (C) 2007, 2009 Red Hat, Inc.
+   Copyright (C) 2007-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Roland McGrath <roland@redhat.com>, 2007.
 
@@ -52,6 +52,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include <gelf.h>
 #include <libebl.h>

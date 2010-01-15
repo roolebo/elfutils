@@ -1,5 +1,5 @@
 /* Discard section not used at runtime from object files.
-   Copyright (C) 2000-2008, 2009 Red Hat, Inc.
+   Copyright (C) 2000-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -46,6 +46,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/param.h>
+#include <sys/stat.h>
 #include <sys/time.h>
 
 #include <elf-knowledge.h>

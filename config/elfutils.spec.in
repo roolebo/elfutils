@@ -183,6 +183,15 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
+* Thu Jan 14 2010  <drepper@redhat.com> 0.144-1
+- libelf: New function elf_getphdrnum. 	Now support using more than 
+  65536 program headers in a file.
+- libdw: New function dwarf_aggregate_size for computing (constant) 
+  type        sizes, including array_type cases with nontrivial 
+  calculation.
+- readelf: Don't give errors for missing info under -a. 	 
+  Handle Linux "VMCOREINFO" notes under -n.
+
 * Mon Sep 21 2009  <drepper@redhat.com> 0.143-1
 - libdw: Various convenience functions for individual attributes now 
   use dwarf_attr_integrate to look up indirect inherited 

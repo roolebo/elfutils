@@ -4705,8 +4705,7 @@ print_encoding_base (const char *pfx, unsigned int fde_encoding)
     {
       unsigned int w = fde_encoding;
 
-      if (w & 0xf)
-	w = print_encoding (w);
+      w = print_encoding (w);
 
       if (w & 0x70)
 	{
@@ -4728,6 +4727,10 @@ static const unsigned char *
 read_encoded (unsigned int encoding, const unsigned char *readp,
 	      const unsigned char *const endp, uint64_t *res, Dwarf *dbg)
 {
+  if ((encoding & 0xf) == DW_EH_PE_absptr)
+    encoding = gelf_getclass (dbg->elf) == ELFCLASS32
+      ? DW_EH_PE_udata4 : DW_EH_PE_udata8;
+
   switch (encoding & 0xf)
     {
     case DW_EH_PE_uleb128:
@@ -4915,6 +4918,9 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	      unsigned int augmentationlen;
 	      get_uleb128 (augmentationlen, readp);
 
+	      if (augmentationlen > dataend - readp)
+		error (1, 0, gettext ("invalid augmentation length"));
+
 	      const char *hdr = "Augmentation data:";
 	      const char *cp = augmentation + 1;
 	      while (*cp != '\0')
@@ -4941,51 +4947,27 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 		      const unsigned char *startp = readp;
 		      unsigned int encoding = *readp++;
 		      uint64_t val = 0;
-		      int64_t sval = 0;
-		      bool is_signed = false;
-
-		      switch (encoding & 0xf)
-			{
-			case DW_EH_PE_uleb128:
-			  get_uleb128 (val, readp);
-			  break;
-			case DW_EH_PE_sleb128:
-			  get_sleb128 (sval, readp);
-			  is_signed = true;
-			  break;
-			case DW_EH_PE_udata2:
-			  val = read_2ubyte_unaligned_inc (dbg, readp);
-			  break;
-			case DW_EH_PE_udata4:
-			  val = read_4ubyte_unaligned_inc (dbg, readp);
-			  break;
-			case DW_EH_PE_udata8:
-			  val = read_8ubyte_unaligned_inc (dbg, readp);
-			  break;
-			case DW_EH_PE_sdata2:
-			  val = read_2sbyte_unaligned_inc (dbg, readp);
-			  is_signed = true;
-			  break;
-			case DW_EH_PE_sdata4:
-			  val = read_4sbyte_unaligned_inc (dbg, readp);
-			  is_signed = true;
-			  break;
-			case DW_EH_PE_sdata8:
-			  val = read_8sbyte_unaligned_inc (dbg, readp);
-			  is_signed = true;
-			  break;
-			default:
-			  error (1, 0,
-				 gettext ("invalid augmentation encoding"));
-			}
+		      readp = read_encoded (encoding, readp,
+					    readp - 1 + augmentationlen,
+					    &val, dbg);
 
 		      while (++startp < readp)
 			printf ("%#x ", *startp);
 
-		      if (is_signed)
-			printf ("(%" PRId64 ")\n", sval);
-		      else
-			printf ("(%" PRIu64 ")\n", val);
+		      putchar ('(');
+		      print_encoding (encoding);
+		      putchar (' ');
+		      switch (encoding & 0xf)
+			{
+			case DW_EH_PE_sleb128:
+			case DW_EH_PE_sdata2:
+			case DW_EH_PE_sdata4:
+			  printf ("%" PRId64 ")\n", val);
+			  break;
+			default:
+			  printf ("%#" PRIx64 ")\n", val);
+			  break;
+			}
 		    }
 		  else
 		    printf ("(%x)\n", *readp++);

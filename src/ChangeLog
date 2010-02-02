@@ -1,3 +1,11 @@
+2010-02-02  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (print_encoding_base): Handle DW_EH_PE_absptr (zero).
+	(read_encoded): Likewise.
+	(print_debug_frame_section): Check for bogus augmentation length.
+	For P augmentation, use read_encoded, print the encoding description,
+	and use hex for unsigned values.
+
 2010-01-15  Roland McGrath  <roland@redhat.com>
 
 	* ar.c: Include <sys/stat.h>.

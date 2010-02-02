@@ -80,7 +80,10 @@ dwfl_module_dwarf_cfi (mod, bias)
     return NULL;
 
   if (mod->dwarf_cfi != NULL)
-    return mod->dwarf_cfi;
+    {
+      *bias = mod->debug.bias;
+      return mod->dwarf_cfi;
+    }
 
   return __libdwfl_set_cfi (mod, &mod->dwarf_cfi,
 			    INTUSE(dwarf_getcfi)

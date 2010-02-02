@@ -1,3 +1,8 @@
+2010-02-02  Mark Wielaard  <mjw@redhat.com>
+
+	* dwfl_module_dwarf_cfi.c (dwfl_module_dwarf_cfi): Always set bias.
+	* dwfl_module_eh_cfi.c (dwfl_module_eh_cfi): Likewise
+
 2010-01-07  Roland McGrath  <roland@redhat.com>
 
 	* core-file.c (dwfl_core_file_report): Use elf_getphdrnum.

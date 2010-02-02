@@ -59,7 +59,10 @@ dwfl_module_eh_cfi (mod, bias)
     return NULL;
 
   if (mod->eh_cfi != NULL)
-    return mod->eh_cfi;
+    {
+      *bias = mod->main.bias;
+      return mod->eh_cfi;
+    }
 
   __libdwfl_getelf (mod);
   if (mod->elferr != DWFL_E_NOERROR)

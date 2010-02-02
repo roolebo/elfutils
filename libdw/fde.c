@@ -115,7 +115,7 @@ intern_fde (Dwarf_CFI *cache, const Dwarf_FDE *entry)
 	 before its actual instruction stream.  */
       Dwarf_Word len;
       get_uleb128 (len, fde->instructions);
-      if ((Dwarf_Word) (fde->instructions_end < fde->instructions) < len)
+      if ((Dwarf_Word) (fde->instructions_end - fde->instructions) < len)
 	{
 	  free (fde);
 	  __libdw_seterrno (DWARF_E_INVALID_DWARF);

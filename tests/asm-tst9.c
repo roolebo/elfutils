@@ -1,4 +1,4 @@
-/* Copyright (C) 2002, 2005 Red Hat, Inc.
+/* Copyright (C) 2002-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -211,19 +211,19 @@ main (void)
 
   for (cnt = 1; cnt < 3; ++cnt)
     {
-      Elf_Scn *scn;
+      Elf_Scn *escn;
       GElf_Shdr shdr_mem;
       GElf_Shdr *shdr;
 
-      scn = elf_getscn (elf, cnt);
-      if (scn == NULL)
+      escn = elf_getscn (elf, cnt);
+      if (escn == NULL)
 	{
 	  printf ("cannot get section %Zd: %s\n", cnt, elf_errmsg (-1));
 	  result = 1;
 	  continue;
 	}
 
-      shdr = gelf_getshdr (scn, &shdr_mem);
+      shdr = gelf_getshdr (escn, &shdr_mem);
       if (shdr == NULL)
 	{
 	  printf ("cannot get section header for section %Zd: %s\n",
@@ -303,7 +303,7 @@ main (void)
 
       if (cnt == 1)
 	{
-	  Elf_Data *data = elf_getdata (scn, NULL);
+	  Elf_Data *data = elf_getdata (escn, NULL);
 
 	  if (data == NULL)
 	    {

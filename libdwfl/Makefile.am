@@ -2,7 +2,7 @@
 ##
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
+## Copyright (C) 2005-2010 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -26,19 +26,10 @@
 ## Network licensing program, please visit www.openinventionnetwork.com
 ## <http://www.openinventionnetwork.com>.
 ##
-DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H
-if MUDFLAP
-AM_CFLAGS = -fmudflap
-else
-AM_CFLAGS =
-endif
-AM_CFLAGS += -Wall -Werror -Wshadow -Wunused -Wformat=2 -Wextra -std=gnu99
-INCLUDES = -I. -I$(srcdir) -I$(srcdir)/../libelf -I$(srcdir)/../libebl \
-	   -I$(srcdir)/../libdw -I.. -I$(srcdir)/../lib
+include $(top_srcdir)/config/eu.am
+INCLUDES += -I$(srcdir) -I$(srcdir)/../libelf -I$(srcdir)/../libebl \
+	   -I$(srcdir)/../libdw
 VERSION = 1
-
-COMPILE.os = $(filter-out -fprofile-arcs, $(filter-out -ftest-coverage, \
-						       $(COMPILE)))
 
 noinst_LIBRARIES = libdwfl.a
 if !MUDFLAP
@@ -90,7 +81,6 @@ if MUDFLAP
 libdwfl = libdwfl.a $(libdw) $(libebl) $(libelf) $(libeu)
 libdw = ../libdw/libdw.a
 libelf = ../libelf/libelf.a
-libmudflap = -lmudflap
 else
 libdwfl = $(libdw)
 libdw = ../libdw/libdw.so
@@ -99,20 +89,11 @@ endif
 libebl = ../libebl/libebl.a
 libeu = ../lib/libeu.a
 
-
 if !MUDFLAP
 libdwfl_pic_a_SOURCES =
 am_libdwfl_pic_a_OBJECTS = $(libdwfl_a_SOURCES:.c=.os)
-
-%.os: %.c %.o
-	if $(COMPILE.os) -c -o $@ -fpic -DPIC -DSHARED -MT $@ -MD -MP \
-	   -MF "$(DEPDIR)/$*.Tpo" `test -f '$<' || echo '$(srcdir)/'`$<; \
-	then cat "$(DEPDIR)/$*.Tpo" >> "$(DEPDIR)/$*.Po"; \
-	     rm -f "$(DEPDIR)/$*.Tpo"; \
-	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
-	fi
 endif
 
 noinst_HEADERS = libdwflP.h
 
-CLEANFILES = $(am_libdwfl_pic_a_OBJECTS)
+CLEANFILES += $(am_libdwfl_pic_a_OBJECTS)

@@ -24,21 +24,13 @@
 ## Network licensing program, please visit www.openinventionnetwork.com
 ## <http://www.openinventionnetwork.com>.
 ##
-DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H -DIS_LIBDW
-if MUDFLAP
-AM_CFLAGS = -fmudflap
-else
-AM_CFLAGS =
-endif
+include $(top_srcdir)/config/eu.am
+DEFS += -DIS_LIBDW
 if BUILD_STATIC
 AM_CFLAGS += -fpic
 endif
-AM_CFLAGS += -Wall -Werror -Wshadow -Wunused -Wformat=2 -Wextra -std=gnu99
-INCLUDES = -I. -I$(srcdir) -I$(srcdir)/../libelf -I.. -I$(srcdir)/../lib
+INCLUDES += -I$(srcdir)/../libelf
 VERSION = 1
-
-COMPILE.os = $(filter-out -fprofile-arcs, $(filter-out -ftest-coverage, \
-						       $(COMPILE)))
 
 lib_LIBRARIES = libdw.a
 if !MUDFLAP
@@ -117,14 +109,6 @@ libdw.so: $(srcdir)/libdw.map libdw_pic.a \
 	if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
 	ln -fs $@ $@.$(VERSION)
 
-%.os: %.c %.o
-	if $(COMPILE.os) -c -o $@ -fpic -DPIC -DSHARED -MT $@ -MD -MP \
-	   -MF "$(DEPDIR)/$*.Tpo" `test -f '$<' || echo '$(srcdir)/'`$<; \
-	then cat "$(DEPDIR)/$*.Tpo" >> "$(DEPDIR)/$*.Po"; \
-	     rm -f "$(DEPDIR)/$*.Tpo"; \
-	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
-	fi
-
 install: install-am libdw.so
 	$(mkinstalldirs) $(DESTDIR)$(libdir)
 	$(INSTALL_PROGRAM) libdw.so $(DESTDIR)$(libdir)/libdw-$(PACKAGE_VERSION).so
@@ -145,4 +129,4 @@ noinst_HEADERS = libdwP.h memory-access.h dwarf_abbrev_hash.h \
 
 EXTRA_DIST = libdw.map
 
-MOSTLYCLEANFILES = $(am_libdw_pic_a_OBJECTS) *.gcno *.gcda libdw.so.$(VERSION)
+MOSTLYCLEANFILES = $(am_libdw_pic_a_OBJECTS) libdw.so.$(VERSION)

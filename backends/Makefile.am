@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2000-2009 Red Hat, Inc.
+## Copyright (C) 2000-2010 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -24,17 +24,9 @@
 ## Network licensing program, please visit www.openinventionnetwork.com
 ## <http://www.openinventionnetwork.com>.
 ##
-DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H -DOBJDIR=\"$(shell pwd)\"
-if MUDFLAP
-AM_CFLAGS = -fmudflap
-else
-AM_CFLAGS =
-endif
-AM_CFLAGS += -fpic -Wall -Wshadow -Werror -Wunused -Wextra -Wformat=2 \
-	     -std=gnu99
-INCLUDES = -I$(srcdir) -I$(top_srcdir)/libebl -I$(top_srcdir)/libasm \
-	   -I$(top_srcdir)/libelf -I$(top_srcdir)/libdw \
-	   -I$(top_srcdir)/lib -I..
+include $(top_srcdir)/config/eu.am
+INCLUDES += -I$(top_srcdir)/libebl -I$(top_srcdir)/libasm \
+	   -I$(top_srcdir)/libelf -I$(top_srcdir)/libdw
 
 
 modules = i386 sh x86_64 ia64 alpha arm sparc ppc ppc64 s390
@@ -49,16 +41,10 @@ noinst_DATA = $(libebl_pic:_pic.a=.so)
 if MUDFLAP
 libelf = ../libelf/libelf.a
 libdw = ../libdw/libdw.a
-libmudflap = -lmudflap
 else
 libelf = ../libelf/libelf.so
 libdw = ../libdw/libdw.so
-libmudflap =
 endif
-
-
-textrel_check = if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
-
 
 i386_SRCS = i386_init.c i386_symbol.c i386_corenote.c i386_cfi.c \
 	    i386_retval.c i386_regs.c i386_auxv.c i386_syscall.c
@@ -125,13 +111,6 @@ libebl_x86_64.so: $(cpu_x86_64)
 libebl_%.map: Makefile
 	echo 'ELFUTILS_$(PACKAGE_VERSION) { global: $*_init; local: *; };' > $@
 
-%.os: %.c
-	if $(COMPILE) -c -o $@ -fpic -DPIC -DSHARED -MT $@ -MD -MP \
-	  -MF "$(DEPDIR)/$*.Tpo" `test -f '$<' || echo '$(srcdir)/'`$<; \
-	then mv -f "$(DEPDIR)/$*.Tpo" "$(DEPDIR)/$*.Po"; \
-	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
-	fi
-
 install: install-am install-ebl-modules
 install-ebl-modules:
 	$(mkinstalldirs) $(DESTDIR)$(libdir)/$(LIBEBL_SUBDIR)
@@ -150,6 +129,5 @@ uninstall: uninstall-am
 noinst_HEADERS = libebl_CPU.h common-reloc.c linux-core-note.c x86_corenote.c
 EXTRA_DIST = $(foreach m,$(modules),$($(m)_SRCS)) $(modules:=_reloc.def)
 
-CLEANFILES = *.gcno *.gcda \
-	     $(foreach m,$(modules),\
-		       libebl_$(m).so $(am_libebl_$(m)_pic_a_OBJECTS))
+CLEANFILES += $(foreach m,$(modules),\
+			libebl_$(m).so $(am_libebl_$(m)_pic_a_OBJECTS))

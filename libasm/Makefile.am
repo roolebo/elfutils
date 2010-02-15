@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2002, 2004, 2005, 2006, 2008, 2009 Red Hat, Inc.
+## Copyright (C) 2002-2010 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -24,21 +24,11 @@
 ## Network licensing program, please visit www.openinventionnetwork.com
 ## <http://www.openinventionnetwork.com>.
 ##
-DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H
-if MUDFLAP
-AM_CFLAGS = -fmudflap
-else
-AM_CFLAGS =
-endif
-AM_CFLAGS += -std=gnu99 -Wall -Wshadow -Werror -Wunused -Wextra -Wformat=2
-INCLUDES = -I. -I$(srcdir) -I.. \
-	   -I$(top_srcdir)/libelf -I$(top_srcdir)/libebl -I$(top_srcdir)/libdw\
-	   -I$(top_srcdir)/lib
+include $(top_srcdir)/config/eu.am
+INCLUDES += -I$(top_srcdir)/libelf -I$(top_srcdir)/libebl -I$(top_srcdir)/libdw
+
 GCC_INCLUDE = -I$(shell $(CC) -print-file-name=include)
 VERSION = 1
-
-COMPILE.os = $(filter-out -fprofile-arcs, $(filter-out -ftest-coverage, \
-						       $(COMPILE)))
 
 lib_LIBRARIES = libasm.a
 if !MUDFLAP
@@ -79,15 +69,6 @@ libasm.so: libasm_pic.a libasm.map
 	if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
 	ln -fs $@ $@.$(VERSION)
 
-
-%.os: %.c %.o
-	if $(COMPILE.os) -c -o $@ -fpic -DPIC -DSHARED -MT $@ -MD -MP \
-	  -MF "$(DEPDIR)/$*.Tpo" `test -f '$<' || echo '$(srcdir)/'`$<; \
-	then cat "$(DEPDIR)/$*.Tpo" >> "$(DEPDIR)/$*.Po"; \
-	     rm -f "$(DEPDIR)/$*.Tpo"; \
-	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
-	fi
-
 install: install-am libasm.so
 	$(mkinstalldirs) $(DESTDIR)$(libdir)
 	$(INSTALL_PROGRAM) libasm.so $(DESTDIR)$(libdir)/libasm-$(PACKAGE_VERSION).so
@@ -104,4 +85,4 @@ endif
 noinst_HEADERS = libasmP.h symbolhash.h
 EXTRA_DIST = libasm.map
 
-CLEANFILES = $(am_libasm_pic_a_OBJECTS) *.gcno *.gcda libasm.so.$(VERSION)
+CLEANFILES += $(am_libasm_pic_a_OBJECTS) libasm.so.$(VERSION)

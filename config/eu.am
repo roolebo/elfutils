@@ -1,6 +1,6 @@
-## Process this file with automake to create Makefile.in
+## Common automake fragments for elfutils subdirectory makefiles.
 ##
-## Copyright (C) 1996-2010 Red Hat, Inc.
+## Copyright (C) 2010 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -14,7 +14,7 @@
 ##
 ## You should have received a copy of the GNU General Public License along
 ## with Red Hat elfutils; if not, write to the Free Software Foundation,
-## Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301 USA.
+## Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 ##
 ## Red Hat elfutils is an included package of the Open Invention Network.
 ## An included package of the Open Invention Network is a package for which
@@ -24,19 +24,37 @@
 ## Network licensing program, please visit www.openinventionnetwork.com
 ## <http://www.openinventionnetwork.com>.
 ##
-include $(top_srcdir)/config/eu.am
-AM_CFLAGS += -fpic
-INCLUDES += -I$(srcdir)/../libelf
 
-noinst_LIBRARIES = libeu.a
+DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H
+INCLUDES = -I. -I$(srcdir) -I$(top_srcdir)/lib -I..
+AM_CFLAGS = -std=gnu99 -Wall -Wshadow \
+	    $(if $($(*F)_no_Werror),,-Werror) \
+	    $(if $($(*F)_no_Wunused),,-Wunused -Wextra) \
+	    $(if $($(*F)_no_Wformat),-Wno-format,-Wformat=2) \
+	    $($(*F)_CFLAGS)
 
-libeu_a_SOURCES = xstrndup.c xmalloc.c next_prime.c \
-		  crc32.c crc32_file.c md5.c sha1.c
-
-noinst_HEADERS = fixedsizehash.h system.h dynamicsizehash.h list.h md5.h \
-		 sha1.h eu-config.h
-EXTRA_DIST = dynamicsizehash.c
-
-if !GPROF
-xmalloc_CFLAGS = -ffunction-sections
+if MUDFLAP
+AM_CFLAGS += -fmudflap
+libmudflap = -lmudflap
+else
+libmudflap =
 endif
+
+COMPILE.os = $(filter-out -fprofile-arcs -ftest-coverage $(no_mudflap.os),\
+	     		  $(COMPILE))
+
+%.os: %.c %.o
+if AMDEP
+	if $(COMPILE.os) -c -o $@ -fpic -DPIC -DSHARED -MT $@ -MD -MP \
+	  -MF "$(DEPDIR)/$*.Tpo" `test -f '$<' || echo '$(srcdir)/'`$<; \
+	then cat "$(DEPDIR)/$*.Tpo" >> "$(DEPDIR)/$*.Po"; \
+	     rm -f "$(DEPDIR)/$*.Tpo"; \
+	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
+	fi
+else
+	$(COMPILE.os) -c -o $@ -fpic -DPIC -DSHARED $<
+endif
+
+CLEANFILES = *.gcno *.gcda
+
+textrel_check = if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi

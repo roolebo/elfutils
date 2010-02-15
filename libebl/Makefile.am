@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2000-2009 Red Hat, Inc.
+## Copyright (C) 2000-2010 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -24,19 +24,10 @@
 ## Network licensing program, please visit www.openinventionnetwork.com
 ## <http://www.openinventionnetwork.com>.
 ##
-DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H -DOBJDIR=\"$(shell pwd)\"
-if MUDFLAP
-AM_CFLAGS = -fmudflap
-else
-AM_CFLAGS =
-endif
-AM_CFLAGS += -fpic -Wall -Wshadow -Werror -Wunused -Wextra -Wformat=2 \
-	     -std=gnu99
-
-INCLUDES = -I$(srcdir) -I$(top_srcdir)/libelf -I$(top_srcdir)/libdw \
-	   -I$(top_srcdir)/lib -I.. -I$(srcdir)/../libasm
+include $(top_srcdir)/config/eu.am
+AM_CFLAGS += -fpic
+INCLUDES += -I$(srcdir)/../libelf -I$(srcdir)/../libdw -I$(srcdir)/../libasm
 VERSION = 1
-PACKAGE_VERSION = @PACKAGE_VERSION@
 LIBEBL_SUBDIR = @LIBEBL_SUBDIR@
 
 lib_LIBRARIES = libebl.a
@@ -63,15 +54,6 @@ gen_SOURCES = eblopenbackend.c eblclosebackend.c eblstrtab.c \
 
 libebl_a_SOURCES = $(gen_SOURCES)
 
-
-%.os: %.c %.o
-	if $(COMPILE) -c -o $@ -fpic -DPIC -DSHARED -MT $@ -MD -MP \
-	  -MF "$(DEPDIR)/$*.Tpo" `test -f '$<' || echo '$(srcdir)/'`$<; \
-	then cat "$(DEPDIR)/$*.Tpo" >> "$(DEPDIR)/$*.Po"; \
-	     rm -f "$(DEPDIR)/$*.Tpo"; \
-	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
-	fi
-
 noinst_HEADERS = libeblP.h ebl-hooks.h
 
-CLEANFILES = $(am_libebl_pic_a_OBJECTS) *.gcno *.gcda
+CLEANFILES += $(am_libebl_pic_a_OBJECTS)

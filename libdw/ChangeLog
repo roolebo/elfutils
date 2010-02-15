@@ -1,3 +1,7 @@
+2010-02-15  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am: Use config/eu.am for common stuff.
+
 2010-02-02  Mark Wielaard  <mjw@redhat.com>
 
 	* fde.c (intern_fde): Fix length check for sized_augmentation_data.

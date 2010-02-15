@@ -1,3 +1,7 @@
+2010-02-15  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am: Use config/eu.am for common stuff.
+
 2009-04-14  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am (AM_CFLAGS): Add -fdollars-in-identifiers; it is not the

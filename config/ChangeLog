@@ -1,3 +1,7 @@
+2010-02-15  Roland McGrath  <roland@redhat.com>
+
+	* eu.am: New file.
+
 2009-04-19  Roland McGrath  <roland@redhat.com>
 
 	* version.h.in: Revert last change.

@@ -1,5 +1,7 @@
 2010-02-15  Roland McGrath  <roland@redhat.com>
 
+	* Makefile.am: Use config/eu.am for common stuff.
+
 	* readelf.c (print_debug_frame_section): Add a cast to avoid sign
 	mismatch in comparison.
 

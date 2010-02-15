@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2002, 2004, 2005, 2007, 2008, 2009 Red Hat, Inc.
+## Copyright (C) 2002-2010 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -24,25 +24,13 @@
 ## Network licensing program, please visit www.openinventionnetwork.com
 ## <http://www.openinventionnetwork.com>.
 ##
-DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H
-if MUDFLAP
-AM_CFLAGS = -fmudflap
-else
-AM_CFLAGS =
-endif
-AM_CFLAGS += -Wall -Wshadow -Wunused -Wextra -std=gnu99 -fpic \
-	     -fdollars-in-identifiers \
-	     $($(*F)_CFLAGS) \
-	     $(if $($(*F)_no_Werror),,-Werror)
-INCLUDES = -I$(srcdir) -I$(srcdir)/../lib -I$(srcdir)/../libelf \
-	   -I$(srcdir)/../libebl -I$(srcdir)/../libdw -I$(srcdir)/../libasm
+include $(top_srcdir)/config/eu.am
+INCLUDES += -I$(srcdir)/../libelf -I$(srcdir)/../libebl \
+	    -I$(srcdir)/../libdw -I$(srcdir)/../libasm
+AM_CFLAGS += -fpic -fdollars-in-identifiers
 LEXCOMPILE = $(LEX) $(LFLAGS) $(AM_LFLAGS) -P$(<F:lex.l=)
 LEX_OUTPUT_ROOT = lex.$(<F:lex.l=)
 AM_YFLAGS = -p$(<F:parse.y=)
-
-if MUDFLAP
-libmudflap = -lmudflap
-endif
 
 noinst_LIBRARIES = libcpu_i386.a libcpu_x86_64.a
 noinst_PROGRAMS = i386_gendis
@@ -81,4 +69,4 @@ noinst_HEADERS = memory-access.h i386_parse.h i386_data.h
 
 EXTRA_DIST = defs/i386
 
-CLEANFILES = i386.mnemonics i386_dis.h x86_64.mnemonics x86_64_dis.h
+CLEANFILES += i386.mnemonics i386_dis.h x86_64.mnemonics x86_64_dis.h

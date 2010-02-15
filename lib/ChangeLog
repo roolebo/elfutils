@@ -1,3 +1,7 @@
+2010-02-15  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am: Use config/eu.am for common stuff.
+
 2009-08-09  Roland McGrath  <roland@redhat.com>
 
 	* eu-config.h (OLD_VERSION, NEW_VERSION, COMPAT_VERSION): New macros.

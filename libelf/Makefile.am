@@ -24,24 +24,12 @@
 ## Network licensing program, please visit www.openinventionnetwork.com
 ## <http://www.openinventionnetwork.com>.
 ##
-DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H
-if MUDFLAP
-AM_CFLAGS = -fmudflap
-else
-AM_CFLAGS =
-endif
+include $(top_srcdir)/config/eu.am
 if BUILD_STATIC
 AM_CFLAGS += -fpic
 endif
-AM_CFLAGS += -Wall -Wshadow -Werror -Wunused -Wextra -Wformat=2 -std=gnu99 \
-	     $($(*F)_CFLAGS)
-INCLUDES = -I$(srcdir) -I$(top_srcdir)/lib -I..
 GCC_INCLUDE = -I$(shell $(CC) -print-file-name=include)
 VERSION = 1
-PACKAGE_VERSION = @PACKAGE_VERSION@
-
-COMPILE.os = $(filter-out -fprofile-arcs, $(filter-out -ftest-coverage, \
-						       $(COMPILE)))
 
 lib_LIBRARIES = libelf.a
 if !MUDFLAP
@@ -118,14 +106,6 @@ libelf.so: libelf_pic.a libelf.map
 	if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
 	ln -fs $@ $@.$(VERSION)
 
-%.os: %.c %.o
-	if $(COMPILE.os) -c -o $@ -fpic -DPIC -DSHARED -MT $@ -MD -MP \
-	  -MF "$(DEPDIR)/$*.Tpo" `test -f '$<' || echo '$(srcdir)/'`$<; \
-	then cat "$(DEPDIR)/$*.Tpo" >> "$(DEPDIR)/$*.Po"; \
-	     rm -f "$(DEPDIR)/$*.Tpo"; \
-	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
-	fi
-
 install: install-am libelf.so
 	$(mkinstalldirs) $(DESTDIR)$(libdir)
 	$(INSTALL_PROGRAM) libelf.so $(DESTDIR)$(libdir)/libelf-$(PACKAGE_VERSION).so
@@ -142,4 +122,4 @@ noinst_HEADERS = elf.h abstract.h common.h exttypes.h gelf_xlate.h libelfP.h \
 		 version_xlate.h gnuhash_xlate.h note_xlate.h dl-hash.h
 EXTRA_DIST = libelf.map
 
-CLEANFILES = $(am_libelf_pic_a_OBJECTS) *.gcno *.gcda libelf.so.$(VERSION)
+CLEANFILES += $(am_libelf_pic_a_OBJECTS) libelf.so.$(VERSION)

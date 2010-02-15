@@ -1,5 +1,7 @@
 2010-02-15  Roland McGrath  <roland@redhat.com>
 
+	* Makefile.am: Use config/eu.am for common stuff.
+
 	* find-debuginfo.c (find_debuginfo_in_path): Fix uninitialized
 	variable in failure path.
 

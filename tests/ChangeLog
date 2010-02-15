@@ -1,5 +1,7 @@
 2010-02-15  Roland McGrath  <roland@redhat.com>
 
+	* Makefile.am: Use config/eu.am for common stuff.
+
 	* asm-tst9.c (main): Rename local to avoid shadowing another local.
 
 2009-07-22  Roland McGrath  <roland@redhat.com>

@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 1996-2009 Red Hat, Inc.
+## Copyright (C) 1996-2010 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -24,26 +24,22 @@
 ## Network licensing program, please visit www.openinventionnetwork.com
 ## <http://www.openinventionnetwork.com>.
 ##
-DEFS = -DHAVE_CONFIG_H -D_GNU_SOURCE
+include $(top_srcdir)/config/eu.am
 if MUDFLAP
-AM_CFLAGS = -Wall -Werror -Wextra -std=gnu99 -fmudflap\
-	    $(if $($(*F)_no_Wformat),-Wno-format,-Wformat=2)
 BUILD_RPATH = \$$ORIGIN/../backends
 else
-AM_CFLAGS = -Wall -Werror -Wextra -std=gnu99 \
-	    $(if $($(*F)_no_Wformat),-Wno-format,-Wformat=2)
 BUILT_RPATH = \$$ORIGIN/../libasm:\$$ORIGIN/../libdw:\$$ORIGIN/../backends:\$$ORIGIN/../libelf
 endif
 
 AM_LDFLAGS =
 
 if !STANDALONE
-INCLUDES = -I$(top_srcdir)/libasm -I$(top_srcdir)/libdw \
-	   -I$(top_srcdir)/libdwfl \
-	   -I$(top_srcdir)/libebl -I$(top_srcdir)/libelf \
-	   -I$(top_srcdir)/lib -I..
+INCLUDES += -I$(top_srcdir)/libasm -I$(top_srcdir)/libdw \
+	    -I$(top_srcdir)/libdwfl \
+	    -I$(top_srcdir)/libebl -I$(top_srcdir)/libelf \
+	    -I$(top_srcdir)/lib -I..
 AM_LDFLAGS += -Wl,-rpath-link,../libasm:../libdw:../libelf
-endif !STANDALONE
+endif
 
 if TESTS_RPATH
 AM_LDFLAGS += -Wl,-rpath,$(BUILT_RPATH)
@@ -161,7 +157,6 @@ endif !STANDALONE
 
 if MUDFLAP
 static_build = yes
-libmudflap = -lmudflap
 endif
 
 if STANDALONE
@@ -233,10 +228,8 @@ dwfl_bug_report_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
 dwfl_bug_getmodules_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
 dwfl_addr_sect_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
 sha1_tst_LDADD = $(libeu) $(libmudflap)
-dwarf_getmacros_LDADD = $(libdw)
+dwarf_getmacros_LDADD = $(libdw) $(libmudflap)
 addrcfi_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
-
-CLEANFILES = xxx *.gcno *.gcda *gconv
 
 if GCOV
 check: check-am coverage

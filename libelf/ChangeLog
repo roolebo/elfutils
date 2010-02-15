@@ -1,3 +1,7 @@
+2010-02-15  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am: Use config/eu.am for common stuff.
+
 2010-01-07  Roland McGrath  <roland@redhat.com>
 
 	* elf32_getphdr.c: Use __elf_getphdrnum_rdlock.

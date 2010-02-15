@@ -4918,7 +4918,7 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	      unsigned int augmentationlen;
 	      get_uleb128 (augmentationlen, readp);
 
-	      if (augmentationlen > dataend - readp)
+	      if (augmentationlen > (size_t) (dataend - readp))
 		error (1, 0, gettext ("invalid augmentation length"));
 
 	      const char *hdr = "Augmentation data:";

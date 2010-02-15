@@ -1,5 +1,5 @@
 /* Standard find_debuginfo callback for libdwfl.
-   Copyright (C) 2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -198,7 +198,7 @@ find_debuginfo_in_path (Dwfl_Module *mod, const char *file_name,
 	  break;
 	}
 
-      char *fname;
+      char *fname = NULL;
       int fd = try_open (dir, subdir, debuglink_file, &fname);
       if (fd < 0)
 	switch (errno)

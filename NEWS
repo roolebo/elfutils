@@ -1,3 +1,15 @@
+Version 0.145:
+
+Fix build with --disable-dependency-tracking.
+
+Fix build with most recent glibc headers.
+
+libdw: Fix CFI decoding.
+
+libdwfl: Fix address bias returned by CFI accessors.
+
+readelf: Fix CFI decoding.
+
 Version 0.144:
 
 libelf: New function elf_getphdrnum.

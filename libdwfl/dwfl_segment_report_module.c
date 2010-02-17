@@ -1,5 +1,5 @@
 /* Sniff out modules from ELF headers visible in memory segments.
-   Copyright (C) 2008, 2009 Red Hat, Inc.
+   Copyright (C) 2008-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -73,19 +73,28 @@
 #endif
 
 
-/* Return user segment index closest to ADDR but not above it.  */
+/* Return user segment index closest to ADDR but not above it.
+   If NEXT, return the closest to ADDR but not below it.  */
 static int
-addr_segndx (Dwfl *dwfl, size_t segment, GElf_Addr addr)
+addr_segndx (Dwfl *dwfl, size_t segment, GElf_Addr addr, bool next)
 {
-  int ndx = dwfl->lookup_segndx[segment];
+  int ndx = -1;
   do
     {
       if (dwfl->lookup_segndx[segment] >= 0)
 	ndx = dwfl->lookup_segndx[segment];
-      ++segment;
+      if (++segment >= dwfl->lookup_elts - 1)
+	return next ? ndx + 1 : ndx;
     }
-  while (segment < dwfl->lookup_elts - 1
-	 && dwfl->lookup_addr[segment] < addr);
+  while (dwfl->lookup_addr[segment] < addr);
+
+  if (next)
+    {
+      while (dwfl->lookup_segndx[segment] < 0)
+	if (++segment >= dwfl->lookup_elts - 1)
+	  return ndx + 1;
+      ndx = dwfl->lookup_segndx[segment];
+    }
 
   return ndx;
 }
@@ -148,7 +157,7 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
       {
 	*data = NULL;
 	*data_size = filesz;
-	return segment_read (addr_segndx (dwfl, segment, vaddr),
+	return segment_read (addr_segndx (dwfl, segment, vaddr, false),
 			     data, data_size, vaddr, filesz);
       }
 
@@ -437,10 +446,8 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
   dyn_vaddr += bias;
 
   /* Our return value now says to skip the segments contained
-     within the module.
-     XXX handle gaps
-  */
-  ndx = addr_segndx (dwfl, segment, module_end);
+     within the module.  */
+  ndx = addr_segndx (dwfl, segment, module_end, true);
 
   /* Examine its .dynamic section to get more interesting details.
      If it has DT_SONAME, we'll use that as the module name.
@@ -599,7 +606,7 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
       {
 	void *into = contents + offset;
 	size_t read_size = size;
-	(void) segment_read (addr_segndx (dwfl, segment, vaddr),
+	(void) segment_read (addr_segndx (dwfl, segment, vaddr, false),
 			     &into, &read_size, vaddr, size);
       }
 

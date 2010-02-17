@@ -1,3 +1,10 @@
+2010-02-17  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_segment_report_module.c (addr_segndx): Take new flag argument.
+	If set, find the first index not below ADDR.
+	(dwfl_segment_report_module): Update callers.
+	Pass true when calculating return value.
+
 2010-02-15  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am: Use config/eu.am for common stuff.

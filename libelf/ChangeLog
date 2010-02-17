@@ -1,3 +1,9 @@
+2010-02-17  Roland McGrath  <roland@redhat.com>
+
+	* elf_begin.c (file_read_elf): Leave section rawdata_base and
+	data_base pointers null when [sh_offset,sh_size) points outside
+	the mapped file.
+
 2010-02-15  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am: Use config/eu.am for common stuff.

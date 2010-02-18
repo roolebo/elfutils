@@ -96,20 +96,18 @@ libebl_s390_pic_a_SOURCES = $(s390_SRCS)
 am_libebl_s390_pic_a_OBJECTS = $(s390_SRCS:.c=.os)
 
 
-libebl_%.so: libebl_%_pic.a libebl_%.map $(libelf) $(libdw) \
-	     $(cpu_$(@:libebl_%.so=%)
-	$(LINK) -shared -o $@ -Wl,--whole-archive,$<\
-		$(cpu_$(@:libebl_%.so=%)) -Wl,--no-whole-archive \
-		-Wl,--version-script,$(word 2,$^) \
+libebl_%.so libebl_%.map: libebl_%_pic.a $(libelf) $(libdw)
+	@rm -f $(@:.so=.map)
+	echo 'ELFUTILS_$(PACKAGE_VERSION) { global: $*_init; local: *; };' \
+	  > $(@:.so=.map)
+	$(LINK) -shared -o $(@:.map=.so) \
+		-Wl,--whole-archive $< $(cpu_$*) -Wl,--no-whole-archive \
+		-Wl,--version-script,$(@:.so=.map) \
 		-Wl,-z,defs -Wl,--as-needed $(libelf) $(libdw) $(libmudflap)
 	$(textrel_check)
 
-# XXX Should not be needed...
 libebl_i386.so: $(cpu_i386)
 libebl_x86_64.so: $(cpu_x86_64)
-
-libebl_%.map: Makefile
-	echo 'ELFUTILS_$(PACKAGE_VERSION) { global: $*_init; local: *; };' > $@
 
 install: install-am install-ebl-modules
 install-ebl-modules:
@@ -130,4 +128,5 @@ noinst_HEADERS = libebl_CPU.h common-reloc.c linux-core-note.c x86_corenote.c
 EXTRA_DIST = $(foreach m,$(modules),$($(m)_SRCS)) $(modules:=_reloc.def)
 
 CLEANFILES += $(foreach m,$(modules),\
-			libebl_$(m).so $(am_libebl_$(m)_pic_a_OBJECTS))
+			libebl_$(m).map libebl_$(m).so \
+			$(am_libebl_$(m)_pic_a_OBJECTS))

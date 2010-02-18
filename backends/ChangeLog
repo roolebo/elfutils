@@ -1,3 +1,9 @@
+2010-02-18  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (libebl_%.so): Use multi-target pattern rule instead of
+	intermediate dependency file for libebl_%.map, working around apparent
+	make -j timing-sensitive bugs.
+
 2010-02-15  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am: Use config/eu.am for common stuff.

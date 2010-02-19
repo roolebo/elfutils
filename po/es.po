@@ -1,14 +1,16 @@
-# Fedora Spanish Translation of elfutils.
+# Fedora Spanish Translation of elfutils.master.
+# This file is distributed under the same license as the elfutils.master package.
 #
 # Domingo Becker <domingobecker@gmail.com>, 2009.
-# Héctor Daniel Cabrera <logan@fedoraproject.org>, 2009.
 # Gladys Guerrero Lozano <gguerrer@redhat.com>, 2009.
+# Héctor Daniel Cabrera <logan@fedoraproject.org>, 2009, 2010.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: elfutils.master.es\n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2010-02-05 09:42+0000\n"
-"PO-Revision-Date: 2010-02-05 12:20-0300\n"
+"POT-Creation-Date: 2010-02-19 09:13+0000\n"
+"PO-Revision-Date: 2010-02-19 12:47-0300\n"
 "Last-Translator: Héctor Daniel Cabrera <logan@fedoraproject.org>\n"
 "Language-Team: Fedora Spanish <fedora-trans-es@redhat.com>\n"
 "MIME-Version: 1.0\n"
@@ -1799,9 +1801,9 @@ msgstr[1] ""
 " Dirección: %#0*<PRIx64>  Compensación: %#08<PRIx64>  Enlace a sección: [%2u] '%s'\n"
 
 #: ../src/readelf.c:2634
-#, fuzzy, c-format
+#, c-format
 msgid " Length  Number  % of total  Coverage\n"
-msgstr " Longitud  Número  % de total  Cobertura\n"
+msgstr " Longitud  Número  % of total  Cobertura\n"
 
 #: ../src/readelf.c:2636
 #, c-format

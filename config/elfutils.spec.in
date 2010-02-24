@@ -183,6 +183,15 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
+* Tue Feb 23 2010 Ulrich Drepper <drepper@redhat.com> 0.145-1
+- Fix build with --disable-dependency-tracking.
+- Fix build with most recent glibc headers.
+- libelf: More robust to bogus section headers.
+- libdw: Fix CFI decoding.
+- libdwfl: Fix address bias returned by CFI accessors. 	 Fix core 
+  file module layout identification.
+- readelf: Fix CFI decoding.
+
 * Thu Jan 14 2010  <drepper@redhat.com> 0.144-1
 - libelf: New function elf_getphdrnum. 	Now support using more than 
   65536 program headers in a file.

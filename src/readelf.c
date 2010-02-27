@@ -570,13 +570,14 @@ process_file (int fd, const char *fname, bool only_one)
   if (dwfl_report_offline (dwfl, fname, fname, dwfl_fd) == NULL)
     {
       struct stat64 st;
-      if (fstat64 (fd, &st) != 0)
+      if (fstat64 (dwfl_fd, &st) != 0)
 	error (0, errno, gettext ("cannot stat input file"));
       else if (unlikely (st.st_size == 0))
 	error (0, 0, gettext ("input file is empty"));
       else
 	error (0, 0, gettext ("failed reading '%s': %s"),
 	       fname, dwfl_errmsg (-1));
+      close (dwfl_fd);		/* Consumed on success, not on failure.  */
     }
   else
     {

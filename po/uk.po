@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2010-03-08 09:23+0000\n"
-"PO-Revision-Date: 2010-03-08 17:12+0200\n"
+"POT-Creation-Date: 2010-03-10 09:26+0000\n"
+"PO-Revision-Date: 2010-03-10 20:15+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <translation@linux.org.ua>\n"
 "MIME-Version: 1.0\n"
@@ -42,7 +42,7 @@ msgstr "невизначений тип"
 
 #: ../libelf/elf_error.c:96
 msgid "invalid `Elf' handle"
-msgstr ""
+msgstr "некоректний дескриптор «Elf»"
 
 #: ../libelf/elf_error.c:100
 msgid "invalid size of source operand"
@@ -125,7 +125,7 @@ msgstr "некоректний розділ"
 
 #: ../libelf/elf_error.c:180
 msgid "executable header not created first"
-msgstr ""
+msgstr "заголовок виконуваного файла не було створено першим"
 
 #: ../libelf/elf_error.c:184
 msgid "file descriptor disabled"
@@ -137,7 +137,7 @@ msgstr ""
 
 #: ../libelf/elf_error.c:196
 msgid "cannot manipulate null section"
-msgstr ""
+msgstr "не можна оперувати нульовим розділом"
 
 #: ../libelf/elf_error.c:200
 msgid "data/scn mismatch"
@@ -158,7 +158,7 @@ msgstr "невідоме кодування даних"
 
 #: ../libelf/elf_error.c:216
 msgid "section `sh_size' too small for data"
-msgstr ""
+msgstr "розділ «sh_size» є замалим для даних"
 
 #: ../libelf/elf_error.c:220
 msgid "invalid section alignment"
@@ -170,7 +170,7 @@ msgstr "некоректна розмірність запису розділу"
 
 #: ../libelf/elf_error.c:228
 msgid "update() for write on read-only file"
-msgstr ""
+msgstr "update() для запису придатного лише для читання файла"
 
 #: ../libelf/elf_error.c:232
 msgid "no such file"
@@ -178,16 +178,18 @@ msgstr "такого файла не виявлено"
 
 #: ../libelf/elf_error.c:236
 msgid "only relocatable files can contain section groups"
-msgstr ""
+msgstr "містити групи розділів можуть лише придатні до пересування файли"
 
 #: ../libelf/elf_error.c:241
 msgid ""
 "program header only allowed in executables, shared objects, and core files"
 msgstr ""
+"заголовок програми можна використовувати лише у виконуваних файлах, об’єктах "
+"спільного використання та файлах ядра"
 
 #: ../libelf/elf_error.c:248
 msgid "file has no program header"
-msgstr ""
+msgstr "у файлі немає заголовка програми"
 
 #: ../libelf/elf_error.c:253 ../libdw/dwarf_error.c:112
 msgid "invalid offset"
@@ -326,7 +328,7 @@ msgstr ""
 
 #: ../libdw/dwarf_error.c:107
 msgid "no block data"
-msgstr ""
+msgstr "немає блокових даних"
 
 #: ../libdw/dwarf_error.c:108
 msgid "invalid line index"
@@ -334,11 +336,11 @@ msgstr "некоректний номер рядка"
 
 #: ../libdw/dwarf_error.c:109
 msgid "invalid address range index"
-msgstr ""
+msgstr "некоректний індекс діапазону адрес"
 
 #: ../libdw/dwarf_error.c:110
 msgid "no matching address range"
-msgstr ""
+msgstr "не виявлено відповідного діапазону адрес"
 
 #: ../libdw/dwarf_error.c:111
 msgid "no flag value"
@@ -346,7 +348,7 @@ msgstr ""
 
 #: ../libdw/dwarf_error.c:113
 msgid ".debug_ranges section missing"
-msgstr ""
+msgstr "немає розділу .debug_ranges"
 
 #: ../libdw/dwarf_error.c:114
 msgid "invalid CFI section"
@@ -362,21 +364,23 @@ msgstr "Знайти адреси у ФАЙЛІ"
 
 #: ../libdwfl/argp-std.c:70
 msgid "Find addresses from signatures found in COREFILE"
-msgstr ""
+msgstr "Знайти адреси за сигнатурами з файла COREFILE"
 
 #: ../libdwfl/argp-std.c:72
 msgid "Find addresses in files mapped into process PID"
-msgstr ""
+msgstr "Знайти адреси у файлах, відображених на процес з PID"
 
 #: ../libdwfl/argp-std.c:74
 msgid ""
 "Find addresses in files mapped as read from FILE in Linux /proc/PID/maps "
 "format"
 msgstr ""
+"Знайти адреси у файлах, відображених як read за ФАЙЛОМ у форматі "
+"/proc/PID/maps Linux"
 
 #: ../libdwfl/argp-std.c:76
 msgid "Find addresses in the running kernel"
-msgstr ""
+msgstr "Знайти адреси у запущеному ядрі"
 
 #: ../libdwfl/argp-std.c:78
 msgid "Kernel with all modules"
@@ -384,11 +388,12 @@ msgstr "Ядро з усіма модулями"
 
 #: ../libdwfl/argp-std.c:80
 msgid "Search path for separate debuginfo files"
-msgstr ""
+msgstr "Шукати у вказаному каталозі окремі файли debuginfo"
 
 #: ../libdwfl/argp-std.c:163
 msgid "only one of -e, -p, -k, -K, or --core allowed"
 msgstr ""
+"можна використовувати лише один за параметрів: -e, -p, -k, -K або --core"
 
 #: ../libdwfl/argp-std.c:223
 #, c-format
@@ -414,7 +419,7 @@ msgstr "не вдалося виявити ядро або модулі"
 
 #: ../libebl/eblbackendname.c:63
 msgid "No backend"
-msgstr ""
+msgstr "Немає сервера"
 
 #: ../libebl/eblcorenotetypename.c:107 ../libebl/eblobjecttypename.c:78
 #: ../libebl/eblobjnotetypename.c:86 ../libebl/eblosabiname.c:98
@@ -431,7 +436,7 @@ msgstr "<невідомо>: %#<PRIx64>"
 #: ../libebl/eblobjnote.c:76
 #, c-format
 msgid "    Build ID: "
-msgstr ""
+msgstr "    Ід. збирання: "
 
 #. A non-null terminated version string.
 #: ../libebl/eblobjnote.c:87
@@ -575,7 +580,7 @@ msgstr ""
 #: ../src/ar.c:237
 #, c-format
 msgid "'%c' is only meaningful with the 'x' option"
-msgstr ""
+msgstr "«%c» має сенс лише у разі використання параметра «x»"
 
 #: ../src/ar.c:243
 #, c-format
@@ -593,6 +598,11 @@ msgid ""
 "This is free software; see the source for copying conditions.  There is NO\n"
 "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
 msgstr ""
+"© Red Hat, Inc., %s\n"
+"Це програмне забезпечення є вільним, умови копіювання викладено у його "
+"початкових кодах. Умовами ліцензування програми НЕ передбачено "
+"жодних гарантій, зокрема гарантій працездатності або придатності для певної "
+"мети.\n"
 
 #: ../src/ar.c:294 ../src/nm.c:258 ../src/readelf.c:454 ../src/size.c:224
 #: ../src/strip.c:209 ../src/ld.c:962 ../src/elflint.c:244
@@ -601,82 +611,82 @@ msgstr ""
 #: ../src/objdump.c:186
 #, c-format
 msgid "Written by %s.\n"
-msgstr ""
+msgstr "Автор — %s.\n"
 
 #: ../src/ar.c:314
 #, c-format
 msgid "More than one operation specified"
-msgstr ""
+msgstr "Вказано більше за одну дію"
 
 #: ../src/ar.c:404
 #, c-format
 msgid "cannot open archive '%s'"
-msgstr ""
+msgstr "не вдалося відкрити архів «%s»"
 
 #: ../src/ar.c:414
 #, c-format
 msgid "cannot open archive '%s': %s"
-msgstr ""
+msgstr "не вдалося відкрити архів «%s»: %s"
 
 #: ../src/ar.c:418
 #, c-format
 msgid "%s: not an archive file"
-msgstr ""
+msgstr "%s: не є файлом архіву"
 
 #: ../src/ar.c:422
 #, c-format
 msgid "cannot stat archive '%s'"
-msgstr ""
+msgstr "не вдалося отримати дані архіву «%s» за допомогою stat"
 
 #: ../src/ar.c:434
 #, c-format
 msgid "no entry %s in archive\n"
-msgstr ""
+msgstr "у архіві немає запису %s\n"
 
 #: ../src/ar.c:487 ../src/ar.c:929 ../src/ar.c:1129
 #, c-format
 msgid "cannot create hash table"
-msgstr ""
+msgstr "не вдалося створити таблицю хешів"
 
 #: ../src/ar.c:494 ../src/ar.c:936 ../src/ar.c:1138
 #, c-format
 msgid "cannot insert into hash table"
-msgstr ""
+msgstr "не вдалося вставити запис до таблиці хешів"
 
 #: ../src/ar.c:502 ../src/ranlib.c:176
 #, c-format
 msgid "cannot stat '%s'"
-msgstr ""
+msgstr "не вдалося отримати дані з «%s» за допомогою stat"
 
 #: ../src/ar.c:598
 #, c-format
 msgid "cannot read content of %s: %s"
-msgstr ""
+msgstr "не вдалося прочитати вміст з %s: %s"
 
 #: ../src/ar.c:641
 #, c-format
 msgid "cannot open %.*s"
-msgstr ""
+msgstr "не вдалося відкрити %.*s"
 
 #: ../src/ar.c:663
 #, c-format
 msgid "failed to write %s"
-msgstr ""
+msgstr "не вдалося записати %s"
 
 #: ../src/ar.c:675
 #, c-format
 msgid "cannot change mode of %s"
-msgstr ""
+msgstr "не вдалося змінити права доступу до %s"
 
 #: ../src/ar.c:691
 #, c-format
 msgid "cannot change modification time of %s"
-msgstr ""
+msgstr "не вдалося змінити часову мітку зміни %s"
 
 #: ../src/ar.c:737
 #, c-format
 msgid "cannot rename temporary file to %.*s"
-msgstr ""
+msgstr "не вдалося перейменувати файл тимчасових даних на %.*s"
 
 #: ../src/ar.c:773 ../src/ar.c:1021 ../src/ar.c:1419 ../src/ranlib.c:250
 #, c-format
@@ -686,76 +696,76 @@ msgstr "не вдалося створити файл"
 #: ../src/ar.c:1220
 #, c-format
 msgid "position member %s not found"
-msgstr ""
+msgstr "не виявлено елемента позиції %s"
 
 #: ../src/ar.c:1230
 #, c-format
 msgid "%s: no entry %s in archive!\n"
-msgstr ""
+msgstr "%s: у архіві немає запису %s!\n"
 
 #: ../src/ar.c:1259 ../src/ldgeneric.c:519 ../src/objdump.c:257
 #, c-format
 msgid "cannot open %s"
-msgstr ""
+msgstr "не вдалося відкрити %s"
 
 #: ../src/ar.c:1264
 #, c-format
 msgid "cannot stat %s"
-msgstr ""
+msgstr "не вдалося отримати дані %s за допомогою stat"
 
 #: ../src/ar.c:1270
 #, c-format
 msgid "%s is no regular file"
-msgstr ""
+msgstr "%s не є звичайним файлом"
 
 #: ../src/ar.c:1283
 #, c-format
 msgid "cannot get ELF descriptor for %s: %s\n"
-msgstr ""
+msgstr "не вдалося отримати дескриптор ELF для %s: %s\n"
 
 #: ../src/ar.c:1302
 #, c-format
 msgid "cannot read %s: %s"
-msgstr ""
+msgstr "не вдалося прочитати %s: %s"
 
 #. The archive is too big.
 #: ../src/arlib.c:215
 #, c-format
 msgid "the archive '%s' is too large"
-msgstr ""
+msgstr "розмір архіву «%s» є занадто великим"
 
 #: ../src/arlib.c:228
 #, c-format
 msgid "cannot read ELF header of %s(%s): %s"
-msgstr ""
+msgstr "не вдалося прочитати заголовок ELF з %s(%s): %s"
 
 #: ../src/nm.c:74 ../src/strip.c:73
 msgid "Output selection:"
-msgstr ""
+msgstr "Вибір виводу:"
 
 #: ../src/nm.c:75
 msgid "Display debugger-only symbols"
-msgstr ""
+msgstr "Показувати лише діагностичні символи"
 
 #: ../src/nm.c:76
 msgid "Display only defined symbols"
-msgstr ""
+msgstr "Показувати лише визначені символи"
 
 #: ../src/nm.c:79
 msgid "Display dynamic symbols instead of normal symbols"
-msgstr ""
+msgstr "Показувати динамічні символи замість звичайних символів"
 
 #: ../src/nm.c:80
 msgid "Display only external symbols"
-msgstr ""
+msgstr "Показувати лише зовнішні символи"
 
 #: ../src/nm.c:81
 msgid "Display only undefined symbols"
-msgstr ""
+msgstr "Показувати лише невизначені символи"
 
 #: ../src/nm.c:83
 msgid "Include index for symbols from archive members"
-msgstr ""
+msgstr "Включити покажчик для символів з елементів архіву"
 
 #: ../src/nm.c:85 ../src/size.c:66
 msgid "Output format:"
@@ -763,7 +773,7 @@ msgstr "Формат виводу:"
 
 #: ../src/nm.c:87
 msgid "Print name of the input file before every symbol"
-msgstr ""
+msgstr "Виводити перед кожним символом назву вхідного файла"
 
 #: ../src/nm.c:90
 msgid ""
@@ -773,11 +783,11 @@ msgstr ""
 
 #: ../src/nm.c:92
 msgid "Same as --format=bsd"
-msgstr ""
+msgstr "Те саме, що і --format=bsd"
 
 #: ../src/nm.c:93
 msgid "Same as --format=posix"
-msgstr ""
+msgstr "Те саме, що і --format=posix"
 
 #: ../src/nm.c:94 ../src/size.c:72
 msgid "Use RADIX for printing symbol values"
@@ -789,7 +799,7 @@ msgstr ""
 
 #: ../src/nm.c:96
 msgid "Print size of defined symbols"
-msgstr ""
+msgstr "Вивести розмір визначених символів"
 
 #: ../src/nm.c:98 ../src/size.c:80 ../src/strip.c:78 ../src/unstrip.c:81
 msgid "Output options:"
@@ -797,15 +807,15 @@ msgstr "Параметри виводу:"
 
 #: ../src/nm.c:99
 msgid "Sort symbols numerically by address"
-msgstr ""
+msgstr "Числове впорядкування символів за адресою"
 
 #: ../src/nm.c:101
 msgid "Do not sort the symbols"
-msgstr ""
+msgstr "Не впорядковувати символи"
 
 #: ../src/nm.c:102
 msgid "Reverse the sense of the sort"
-msgstr ""
+msgstr "Змінити порядок на протилежний"
 
 #: ../src/nm.c:103 ../src/addr2line.c:75 ../src/findtextrel.c:75
 #: ../src/elfcmp.c:75 ../src/strings.c:83
@@ -815,7 +825,7 @@ msgstr "Інше:"
 #. Short description of program.
 #: ../src/nm.c:108
 msgid "List symbols from FILEs (a.out by default)."
-msgstr ""
+msgstr "Показати список символів з ФАЙЛів (типово з a.out)."
 
 #. Strings for arguments in help texts.
 #: ../src/nm.c:111 ../src/size.c:92 ../src/strip.c:97 ../src/findtextrel.c:84
@@ -826,7 +836,7 @@ msgstr "[ФАЙЛ...]"
 #: ../src/nm.c:136 ../src/size.c:117 ../src/strip.c:121 ../src/objdump.c:105
 #, c-format
 msgid "%s: INTERNAL ERROR %d (%s-%s): %s"
-msgstr ""
+msgstr "%s: ВНУТРІШНЯ ПОМИЛКА %d (%s-%s): %s"
 
 #: ../src/nm.c:363 ../src/size.c:301 ../src/strip.c:433 ../src/strip.c:468
 #: ../src/ldgeneric.c:1767 ../src/ldgeneric.c:4257 ../src/findtextrel.c:229
@@ -834,18 +844,18 @@ msgstr ""
 #: ../src/unstrip.c:1900 ../src/unstrip.c:1929
 #, c-format
 msgid "cannot open '%s'"
-msgstr ""
+msgstr "не вдалося відкрити «%s»"
 
 #: ../src/nm.c:380 ../src/nm.c:392 ../src/size.c:317 ../src/size.c:326
 #: ../src/size.c:337 ../src/strip.c:1816
 #, c-format
 msgid "while closing '%s'"
-msgstr ""
+msgstr "під час закриття «%s»"
 
 #: ../src/nm.c:402 ../src/strip.c:359 ../src/objdump.c:296
 #, c-format
 msgid "%s: File format not recognized"
-msgstr ""
+msgstr "%s: не вдалося розпізнати формат файла"
 
 #. Note: 0 is no valid offset.
 #: ../src/nm.c:442
@@ -853,31 +863,33 @@ msgid ""
 "\n"
 "Archive index:"
 msgstr ""
+"\n"
+"Покажчик архіву:"
 
 #: ../src/nm.c:451
 #, c-format
 msgid "invalid offset %zu for symbol %s"
-msgstr ""
+msgstr "некоректне зміщення %zu для символу %s"
 
 #: ../src/nm.c:456
 #, c-format
 msgid "%s in %s\n"
-msgstr ""
+msgstr "%s у %s\n"
 
 #: ../src/nm.c:464
 #, c-format
 msgid "cannot reset archive offset to beginning"
-msgstr ""
+msgstr "не вдалося відновити зміщення початку архіву"
 
 #: ../src/nm.c:488 ../src/objdump.c:344
 #, c-format
 msgid "%s%s%s: file format not recognized"
-msgstr ""
+msgstr "%s%s%s: не вдалося розпізнати формат файла"
 
 #: ../src/nm.c:700
 #, c-format
 msgid "cannot create search tree"
-msgstr ""
+msgstr "не вдалося створити дерево пошуку"
 
 #: ../src/nm.c:740 ../src/nm.c:1002 ../src/readelf.c:885 ../src/readelf.c:1028
 #: ../src/readelf.c:1169 ../src/readelf.c:1351 ../src/readelf.c:1549
@@ -898,6 +910,10 @@ msgid ""
 "Symbols from %s:\n"
 "\n"
 msgstr ""
+"\n"
+"\n"
+"Символи з %s:\n"
+"\n"
 
 #: ../src/nm.c:768
 #, c-format
@@ -907,6 +923,10 @@ msgid ""
 "Symbols from %s[%s]:\n"
 "\n"
 msgstr ""
+"\n"
+"\n"
+"Символи з %s[%s]:\n"
+"\n"
 
 #. The header line.
 #: ../src/nm.c:771
@@ -930,16 +950,16 @@ msgstr ""
 #: ../src/nm.c:1255
 #, c-format
 msgid "%s%s%s%s: Invalid operation"
-msgstr ""
+msgstr "%s%s%s%s: некоректна дія"
 
 #: ../src/nm.c:1312
 #, c-format
 msgid "%s%s%s: no symbols"
-msgstr ""
+msgstr "%s%s%s: немає символів"
 
 #: ../src/readelf.c:73
 msgid "ELF output selection:"
-msgstr ""
+msgstr "Вибір виводу ELF:"
 
 #: ../src/readelf.c:75
 msgid "All these plus -p .strtab -p .dynstr -p .comment"
@@ -947,11 +967,11 @@ msgstr ""
 
 #: ../src/readelf.c:76
 msgid "Display the dynamic segment"
-msgstr ""
+msgstr "Показувати динамічний сегмент"
 
 #: ../src/readelf.c:77
 msgid "Display the ELF file header"
-msgstr ""
+msgstr "Показувати заголовок файла ELF"
 
 #: ../src/readelf.c:79
 msgid "Display histogram of bucket list lengths"
@@ -959,39 +979,39 @@ msgstr ""
 
 #: ../src/readelf.c:80
 msgid "Display the program headers"
-msgstr ""
+msgstr "Показувати заголовки програми"
 
 #: ../src/readelf.c:82
 msgid "Display relocations"
-msgstr ""
+msgstr "Показувати переміщення"
 
 #: ../src/readelf.c:83
 msgid "Display the sections' headers"
-msgstr ""
+msgstr "Показувати заголовки розділів"
 
 #: ../src/readelf.c:85
 msgid "Display the symbol table"
-msgstr ""
+msgstr "Показувати таблицю символів"
 
 #: ../src/readelf.c:86
 msgid "Display versioning information"
-msgstr ""
+msgstr "Показувати відомості щодо версії"
 
 #: ../src/readelf.c:87
 msgid "Display the ELF notes"
-msgstr ""
+msgstr "Показувати нотатки ELF"
 
 #: ../src/readelf.c:89
 msgid "Display architecture specific information, if any"
-msgstr ""
+msgstr "Показувати специфічні для архітектури дані, якщо такі буде виявлено"
 
 #: ../src/readelf.c:91
 msgid "Display sections for exception handling"
-msgstr ""
+msgstr "Показувати розділи для обробки виключень"
 
 #: ../src/readelf.c:93
 msgid "Additional output selection:"
-msgstr ""
+msgstr "Додатковий вибір виводу:"
 
 #: ../src/readelf.c:95
 msgid ""
@@ -1005,24 +1025,24 @@ msgstr ""
 
 #: ../src/readelf.c:101
 msgid "Print string contents of sections"
-msgstr ""
+msgstr "Виводити вміст рядків розділів"
 
 #: ../src/readelf.c:104
 msgid "Display the symbol index of an archive"
-msgstr ""
+msgstr "Показувати покажчик символів архіву"
 
 #: ../src/readelf.c:106
 msgid "Output control:"
-msgstr ""
+msgstr "Керування виводом:"
 
 #: ../src/readelf.c:108
 msgid "Do not find symbol names for addresses in DWARF data"
-msgstr ""
+msgstr "Не шукати назви символів для адресу у даних DWARF"
 
 #. Short description of program.
 #: ../src/readelf.c:114
 msgid "Print information from ELF file in human-readable form."
-msgstr ""
+msgstr "Виводити відомості з файла ELF у придатному для читання форматі."
 
 #. Strings for arguments in help texts.
 #: ../src/readelf.c:118 ../src/elflint.c:86
@@ -1037,7 +1057,7 @@ msgstr "не вдалося відкрити вхідний файл."
 #: ../src/readelf.c:401
 #, c-format
 msgid "Unknown DWARF debug section `%s'.\n"
-msgstr ""
+msgstr "Невідомий діагностичний розділ DWARF «%s».\n"
 
 #: ../src/readelf.c:425 ../src/elflint.c:223
 msgid "Missing file name.\n"
@@ -1045,89 +1065,89 @@ msgstr "Не вказано назви файла.\n"
 
 #: ../src/readelf.c:430 ../src/objdump.c:236
 msgid "No operation specified.\n"
-msgstr ""
+msgstr "Не вказано дії.\n"
 
 #: ../src/readelf.c:465
 #, c-format
 msgid "cannot generate Elf descriptor: %s"
-msgstr ""
+msgstr "не вдалося створити дескриптор Elf: %s"
 
 #: ../src/readelf.c:477
 #, c-format
 msgid "'%s' is not an archive, cannot print archive index"
-msgstr ""
+msgstr "«%s» не є архівом, виведення покажчика архіву неможливе"
 
 #: ../src/readelf.c:482
 #, c-format
 msgid "error while closing Elf descriptor: %s"
-msgstr ""
+msgstr "помилка під час спроби закриття дескриптора Elf: %s"
 
 #: ../src/readelf.c:574
 #, c-format
 msgid "cannot stat input file"
-msgstr ""
+msgstr "не вдалося отримати дані з вхідного файла за допомогою stat"
 
 #: ../src/readelf.c:576
 #, c-format
 msgid "input file is empty"
-msgstr ""
+msgstr "вхідний файл є порожнім"
 
 #: ../src/readelf.c:578
 #, c-format
 msgid "failed reading '%s': %s"
-msgstr ""
+msgstr "не вдалося прочитати «%s»: %s"
 
 #: ../src/readelf.c:614
 #, c-format
 msgid "cannot read ELF header: %s"
-msgstr ""
+msgstr "не вдалося прочитати заголовок ELF: %s"
 
 #: ../src/readelf.c:622
 #, c-format
 msgid "cannot create EBL handle"
-msgstr ""
+msgstr "не вдалося створити дескриптор EBL"
 
 #: ../src/readelf.c:629 ../src/strip.c:543 ../src/ldgeneric.c:661
 #: ../src/ldgeneric.c:1122
 #, c-format
 msgid "cannot determine number of sections: %s"
-msgstr ""
+msgstr "не вдалося визначити кількість розділів: %s"
 
 #: ../src/readelf.c:635
 #, c-format
 msgid "cannot determine number of program headers: %s"
-msgstr ""
+msgstr "не вдалося визначити кількість заголовків програми: %s"
 
 #: ../src/readelf.c:721
 msgid "NONE (None)"
-msgstr ""
+msgstr "NONE (Немає)"
 
 #: ../src/readelf.c:722
 msgid "REL (Relocatable file)"
-msgstr ""
+msgstr "REL (Придатний до переміщення файл)"
 
 #: ../src/readelf.c:723
 msgid "EXEC (Executable file)"
-msgstr ""
+msgstr "EXEC (Виконуваний файл)"
 
 #: ../src/readelf.c:724
 msgid "DYN (Shared object file)"
-msgstr ""
+msgstr "DYN (Файл об’єктів спільного використання)"
 
 #: ../src/readelf.c:725
 msgid "CORE (Core file)"
-msgstr ""
+msgstr "CORE (Файл ядра)"
 
 #: ../src/readelf.c:730
 #, c-format
 msgid "OS Specific: (%x)\n"
-msgstr ""
+msgstr "ОС-специфічне: (%x)\n"
 
 #. && e_type <= ET_HIPROC always true
 #: ../src/readelf.c:732
 #, c-format
 msgid "Processor Specific: (%x)\n"
-msgstr ""
+msgstr "Специфічне для процесора: (%x)\n"
 
 #: ../src/readelf.c:742
 msgid ""
@@ -1161,12 +1181,12 @@ msgstr "(поточний)"
 #: ../src/readelf.c:763
 #, c-format
 msgid "  OS/ABI:                            %s\n"
-msgstr ""
+msgstr "  ОС/ABI:                            %s\n"
 
 #: ../src/readelf.c:766
 #, c-format
 msgid "  ABI Version:                       %hhd\n"
-msgstr ""
+msgstr "  Версія ABI:                       %hhd\n"
 
 #: ../src/readelf.c:769
 msgid "  Type:                              "
@@ -1175,41 +1195,41 @@ msgstr "  Тип:                                "
 #: ../src/readelf.c:772
 #, c-format
 msgid "  Machine:                           %s\n"
-msgstr ""
+msgstr "  Архітектура:                       %s\n"
 
 #: ../src/readelf.c:774
 #, c-format
 msgid "  Version:                           %d %s\n"
-msgstr ""
+msgstr "  Версія:                            %d %s\n"
 
 #: ../src/readelf.c:778
 #, c-format
 msgid "  Entry point address:               %#<PRIx64>\n"
-msgstr ""
+msgstr "  Адреса вхідної точки:              %#<PRIx64>\n"
 
 #: ../src/readelf.c:781
 #, c-format
 msgid "  Start of program headers:          %<PRId64> %s\n"
-msgstr ""
+msgstr "  Початок заголовків програм:      %<PRId64> %s\n"
 
 #: ../src/readelf.c:782 ../src/readelf.c:785
 msgid "(bytes into file)"
-msgstr ""
+msgstr "(байтів у файл)"
 
 #: ../src/readelf.c:784
 #, c-format
 msgid "  Start of section headers:          %<PRId64> %s\n"
-msgstr ""
+msgstr "  Початок заголовків розділів:     %<PRId64> %s\n"
 
 #: ../src/readelf.c:787
 #, c-format
 msgid "  Flags:                             %s\n"
-msgstr ""
+msgstr "  Прапорці:                          %s\n"
 
 #: ../src/readelf.c:790
 #, c-format
 msgid "  Size of this header:               %<PRId16> %s\n"
-msgstr ""
+msgstr "  Розмір цього заголовка:            %<PRId16> %s\n"
 
 #: ../src/readelf.c:791 ../src/readelf.c:794 ../src/readelf.c:811
 msgid "(bytes)"
@@ -1218,17 +1238,17 @@ msgstr "(байтів)"
 #: ../src/readelf.c:793
 #, c-format
 msgid "  Size of program header entries:    %<PRId16> %s\n"
-msgstr ""
+msgstr "  Розмір записів заголовка програми:  %<PRId16> %s\n"
 
 #: ../src/readelf.c:796
 #, c-format
 msgid "  Number of program headers entries: %<PRId16>"
-msgstr ""
+msgstr "  Кількість записів заголовків програми: %<PRId16>"
 
 #: ../src/readelf.c:803
 #, c-format
 msgid " (%<PRIu32> in [0].sh_info)"
-msgstr ""
+msgstr " (%<PRIu32> у [0].sh_info)"
 
 #: ../src/readelf.c:806 ../src/readelf.c:823 ../src/readelf.c:837
 msgid " ([0] not available)"
@@ -1237,23 +1257,23 @@ msgstr " ([0] недоступний)"
 #: ../src/readelf.c:810
 #, c-format
 msgid "  Size of section header entries:    %<PRId16> %s\n"
-msgstr ""
+msgstr "  Розмір записів заголовків розділів:  %<PRId16> %s\n"
 
 #: ../src/readelf.c:813
 #, c-format
 msgid "  Number of section headers entries: %<PRId16>"
-msgstr ""
+msgstr "  Кількість записів заголовків розділів: %<PRId16>"
 
 #: ../src/readelf.c:820
 #, c-format
 msgid " (%<PRIu32> in [0].sh_size)"
-msgstr ""
+msgstr " (%<PRIu32> у [0].sh_size)"
 
 #. We managed to get the zeroth section.
 #: ../src/readelf.c:833
 #, c-format
 msgid " (%<PRIu32> in [0].sh_link)"
-msgstr ""
+msgstr " (%<PRIu32> у [0].sh_link)"
 
 #: ../src/readelf.c:841
 #, c-format
@@ -1278,7 +1298,7 @@ msgstr ""
 
 #: ../src/readelf.c:887
 msgid "Section Headers:"
-msgstr ""
+msgstr "Заголовки розділів:"
 
 #: ../src/readelf.c:890
 msgid ""
@@ -1295,7 +1315,7 @@ msgstr ""
 #: ../src/readelf.c:899 ../src/readelf.c:1052
 #, c-format
 msgid "cannot get section: %s"
-msgstr ""
+msgstr "не вдалося отримати розділ: %s"
 
 #: ../src/readelf.c:906 ../src/readelf.c:1060 ../src/readelf.c:7544
 #: ../src/unstrip.c:353 ../src/unstrip.c:377 ../src/unstrip.c:427

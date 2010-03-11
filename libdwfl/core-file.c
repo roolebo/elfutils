@@ -403,18 +403,17 @@ dwfl_elf_phdr_memory_callback (Dwfl *dwfl, int ndx,
 }
 
 int
-dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const GElf_Ehdr *ehdr)
+dwfl_core_file_report (Dwfl *dwfl, Elf *elf)
 {
-  GElf_Phdr notes_phdr;
-
   size_t phnum;
-  if (unlikely (ehdr == NULL) || unlikely (elf_getphdrnum (elf, &phnum) != 0))
+  if (unlikely (elf_getphdrnum (elf, &phnum) != 0))
     {
-      __libdw_seterrno (DWFL_E_LIBELF);
+      __libdwfl_seterrno (DWFL_E_LIBELF);
       return -1;
     }
 
   /* First report each PT_LOAD segment.  */
+  GElf_Phdr notes_phdr;
   int ndx = dwfl_report_core_segments (dwfl, elf, phnum, &notes_phdr);
   if (unlikely (ndx <= 0))
     return ndx;

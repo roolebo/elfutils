@@ -1,5 +1,5 @@
 /* Internal definitions for libdwfl.
-   Copyright (C) 2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -399,10 +399,6 @@ extern int dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 extern int dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 				 Dwfl_Memory_Callback *memory_callback,
 				 void *memory_callback_arg);
-
-/* Examine an ET_CORE file and report modules based on its contents.  */
-extern int dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const GElf_Ehdr *ehdr);
-
 
 
 /* Avoid PLT entries.  */

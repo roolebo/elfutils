@@ -1,5 +1,5 @@
 /* Interfaces for libdwfl.
-   Copyright (C) 2005-2009 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -359,6 +359,15 @@ extern int dwfl_linux_kernel_report_offline (Dwfl *dwfl, const char *release,
 					     int (*predicate) (const char *,
 							       const char *));
 
+/* Examine an ET_CORE file and report modules based on its contents.
+   This can follow a dwfl_report_offline call to bootstrap the
+   DT_DEBUG method of following the dynamic linker link_map chain, in
+   case the core file does not contain enough of the executable's text
+   segment to locate its PT_DYNAMIC in the dump.  This might call
+   dwfl_report_elf on file names found in the dump if reading some
+   link_map files is the only way to ascertain those modules' addresses.
+   Returns the number of modules reported, or -1 for errors.  */
+extern int dwfl_core_file_report (Dwfl *dwfl, Elf *elf);
 
 /* Call dwfl_report_module for each file mapped into the address space of PID.
    Returns zero on success, -1 if dwfl_report_module failed,

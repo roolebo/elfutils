@@ -1,3 +1,7 @@
+2010-03-10  Roland McGrath  <roland@redhat.com>
+
+	* libdw.map (ELFUTILS_0.146): New set.  Add dwfl_core_file_report.
+
 2010-02-15  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am: Use config/eu.am for common stuff.

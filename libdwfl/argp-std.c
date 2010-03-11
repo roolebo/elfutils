@@ -1,5 +1,5 @@
 /* Standard argp argument parsers for tools using libdwfl.
-   Copyright (C) 2005, 2007, 2008, 2009 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -225,9 +225,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	    return error == DWFL_E_ERRNO ? errno : EIO;
 	  }
 
-	GElf_Ehdr ehdr;
-	int result = INTUSE(dwfl_core_file_report) (dwfl, core,
-						    gelf_getehdr (core, &ehdr));
+	int result = INTUSE(dwfl_core_file_report) (dwfl, core);
 	if (result < 0)
 	  {
 	    elf_end (core);

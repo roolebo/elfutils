@@ -1,5 +1,7 @@
 Version 0.146:
 
+libdwfl: New function dwfl_core_file_report.
+
 Version 0.145:
 
 Fix build with --disable-dependency-tracking.

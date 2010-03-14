@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
 "POT-Creation-Date: 2010-03-13 13:59+0000\n"
-"PO-Revision-Date: 2010-03-13 20:46+0200\n"
+"PO-Revision-Date: 2010-03-14 19:33+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <translation@linux.org.ua>\n"
 "MIME-Version: 1.0\n"
@@ -133,7 +133,7 @@ msgstr "дескриптор файла вимкнено"
 
 #: ../libelf/elf_error.c:188
 msgid "archive/member fildes mismatch"
-msgstr ""
+msgstr "невідповідність полів архів/елемент"
 
 #: ../libelf/elf_error.c:196
 msgid "cannot manipulate null section"
@@ -141,7 +141,7 @@ msgstr "не можна оперувати нульовим розділом"
 
 #: ../libelf/elf_error.c:200
 msgid "data/scn mismatch"
-msgstr ""
+msgstr "невідповідність полів data/scn"
 
 #: ../libelf/elf_error.c:204
 msgid "invalid section header"
@@ -323,7 +323,7 @@ msgstr "некоректна адреса"
 
 #: ../libdw/dwarf_error.c:106
 msgid "no location list value"
-msgstr ""
+msgstr "немає значення списку адрес"
 
 #: ../libdw/dwarf_error.c:107
 msgid "no block data"
@@ -343,7 +343,7 @@ msgstr "не виявлено відповідного діапазону адр
 
 #: ../libdw/dwarf_error.c:111
 msgid "no flag value"
-msgstr ""
+msgstr "немає значення прапорця"
 
 #: ../libdw/dwarf_error.c:113
 msgid ".debug_ranges section missing"
@@ -1727,7 +1727,7 @@ msgstr ""
 #: ../src/readelf.c:2675 ../src/readelf.c:2717 ../src/readelf.c:2758
 #, c-format
 msgid "cannot get data for section %d: %s"
-msgstr ""
+msgstr "не вдалося отримати дані для розділу %d: %s"
 
 #: ../src/readelf.c:2812
 #, c-format
@@ -2218,7 +2218,7 @@ msgstr ""
 #: ../src/readelf.c:5787
 #, c-format
 msgid " set file to %<PRIu64>\n"
-msgstr ""
+msgstr " встановити файл у %<PRIu64>\n"
 
 #: ../src/readelf.c:5797
 #, c-format
@@ -2228,7 +2228,7 @@ msgstr " встановити значення стовпчика %<PRIu64>\n"
 #: ../src/readelf.c:5804
 #, c-format
 msgid " set '%s' to %<PRIuFAST8>\n"
-msgstr ""
+msgstr " встановити «%s» у %<PRIuFAST8>\n"
 
 #. Takes no argument.
 #: ../src/readelf.c:5810
@@ -2238,12 +2238,12 @@ msgstr ""
 #: ../src/readelf.c:5820
 #, c-format
 msgid "advance address by constant %u to %s\n"
-msgstr ""
+msgstr "збільшити адресу на сталу величину %u до %s\n"
 
 #: ../src/readelf.c:5836
 #, c-format
 msgid "advance address by fixed value %u to %s\n"
-msgstr ""
+msgstr "збільшити адресу на фіксовану величину %u до %s\n"
 
 #. Takes no argument.
 #: ../src/readelf.c:5845
@@ -2416,7 +2416,7 @@ msgstr ""
 #: ../src/readelf.c:7464 ../src/readelf.c:7487
 #, c-format
 msgid "cannot get data for section [%Zu] '%s': %s"
-msgstr ""
+msgstr "не вдалося отримати дані для розділу [%Zu] «%s»: %s"
 
 #: ../src/readelf.c:7468
 #, c-format
@@ -2468,6 +2468,8 @@ msgid ""
 "\n"
 "Archive '%s' has no symbol index\n"
 msgstr ""
+"\n"
+"У архіві «%s» немає покажчика символів\n"
 
 #: ../src/readelf.c:7634
 #, c-format
@@ -2899,7 +2901,7 @@ msgstr ""
 
 #: ../src/ld.c:177
 msgid "Linker Operation Control:"
-msgstr ""
+msgstr "Керування роботою компонувальника:"
 
 #: ../src/ld.c:178
 msgid "Verbose messages."
@@ -2919,11 +2921,11 @@ msgstr "РІВЕНЬ"
 
 #: ../src/ld.c:183
 msgid "Set optimization level to LEVEL."
-msgstr ""
+msgstr "Встановити рівень оптимізації РІВЕНЬ."
 
 #: ../src/ld.c:184
 msgid "Use linker script in FILE."
-msgstr ""
+msgstr "Використати скрипт компонування у ФАЙЛі."
 
 #: ../src/ld.c:187
 msgid "Select to get parser debug information"
@@ -2931,7 +2933,7 @@ msgstr ""
 
 #: ../src/ld.c:190
 msgid "Read version information from FILE."
-msgstr ""
+msgstr "Прочитати відомості щодо версії з ФАЙЛа."
 
 #: ../src/ld.c:191
 msgid "Set emulation to NAME."
@@ -2950,17 +2952,17 @@ msgstr "[ФАЙЛ]..."
 #: ../src/ld.c:333
 #, c-format
 msgid "At least one input file needed"
-msgstr ""
+msgstr "Потрібен принаймні один файл вхідних даних"
 
 #: ../src/ld.c:349
 #, c-format
 msgid "error while preparing linking"
-msgstr ""
+msgstr "помилка під час приготування до компонування"
 
 #: ../src/ld.c:356
 #, c-format
 msgid "cannot open linker script '%s'"
-msgstr ""
+msgstr "не вдалося відкрити скрипт компонування «%s»"
 
 #: ../src/ld.c:397
 #, c-format
@@ -2975,37 +2977,37 @@ msgstr ""
 #: ../src/ld.c:594
 #, c-format
 msgid "more than one '-m' parameter"
-msgstr ""
+msgstr "декілька параметрів «-m»"
 
 #: ../src/ld.c:604 ../src/ld.c:1013
 #, c-format
 msgid "unknown option `-%c %s'"
-msgstr ""
+msgstr "невідомий параметр «-%c %s»"
 
 #: ../src/ld.c:646
 #, c-format
 msgid "invalid page size value '%s': ignored"
-msgstr ""
+msgstr "некоректне значення розміру сторінки «%s»: проігноровано"
 
 #: ../src/ld.c:687
 #, c-format
 msgid "invalid hash style '%s'"
-msgstr ""
+msgstr "некоректний формат хешування «%s»"
 
 #: ../src/ld.c:697
 #, c-format
 msgid "invalid build-ID style '%s'"
-msgstr ""
+msgstr "некоректний формат ідентифікатора збирання «%s»"
 
 #: ../src/ld.c:785
 #, c-format
 msgid "More than one output file name given."
-msgstr ""
+msgstr "Вказано декілька назв файлів виведення даних."
 
 #: ../src/ld.c:802
 #, c-format
 msgid "Invalid optimization level `%s'"
-msgstr ""
+msgstr "Некоректний рівень оптимізації «%s»"
 
 #: ../src/ld.c:850
 #, c-format
@@ -3015,44 +3017,45 @@ msgstr ""
 #: ../src/ld.c:869
 #, c-format
 msgid "-) without matching -("
-msgstr ""
+msgstr "-) без відповідника -("
 
 #: ../src/ld.c:1046
 #, c-format
 msgid "unknown option '-%c %s'"
-msgstr ""
+msgstr "невідомий параметр «-%c %s»"
 
 #: ../src/ld.c:1150
 #, c-format
 msgid "could not find input file to determine output file format"
 msgstr ""
+"не вдалося виявити файл вхідних даних для визначення формату файла вихідних даних"
 
 #: ../src/ld.c:1152
 #, c-format
 msgid "try again with an appropriate '-m' parameter"
-msgstr ""
+msgstr "повторіть спробу з належним параметром «-m»"
 
 #: ../src/ld.c:1446
 #, c-format
 msgid "cannot read version script '%s'"
-msgstr ""
+msgstr "не вдалося прочитати скрипт версій «%s»"
 
 #. The symbol is already defined and now again
 #. in the linker script.  This is an error.
 #: ../src/ld.c:1512 ../src/ld.c:1551
 #, c-format
 msgid "duplicate definition of '%s' in linker script"
-msgstr ""
+msgstr "повторне визначення «%s» у скрипті компонування"
 
 #: ../src/ldgeneric.c:209 ../src/ldgeneric.c:5151
 #, c-format
 msgid "cannot create string table"
-msgstr ""
+msgstr "не вдалося створити таблицю рядків"
 
 #: ../src/ldgeneric.c:255
 #, c-format
 msgid "cannot load ld backend library '%s': %s"
-msgstr ""
+msgstr "не вдалося завантажити бібліотеку сервера ld «%s»: %s"
 
 #: ../src/ldgeneric.c:265
 #, c-format
@@ -3062,7 +3065,7 @@ msgstr ""
 #: ../src/ldgeneric.c:310
 #, c-format
 msgid "%s listed more than once as input"
-msgstr ""
+msgstr "%s вказано декілька разів як джерело даних"
 
 #: ../src/ldgeneric.c:424
 #, c-format
@@ -3087,12 +3090,12 @@ msgstr ""
 #: ../src/ldgeneric.c:677
 #, c-format
 msgid "(%s+%#<PRIx64>): multiple definition of %s `%s'\n"
-msgstr ""
+msgstr "(%s+%#<PRIx64>): повторне визначення %s «%s»\n"
 
 #: ../src/ldgeneric.c:700
 #, c-format
 msgid "(%s+%#<PRIx64>): first defined here\n"
-msgstr ""
+msgstr "(%s+%#<PRIx64>): вперше визначено тут\n"
 
 #: ../src/ldgeneric.c:819
 #, c-format
@@ -3118,7 +3121,7 @@ msgstr ""
 #: ../src/ldgeneric.c:2005
 #, c-format
 msgid "%s: invalid ELF file (%s:%d)\n"
-msgstr ""
+msgstr "%s: некоректний файл ELF (%s:%d)\n"
 
 #: ../src/ldgeneric.c:1250
 #, c-format
@@ -3128,12 +3131,12 @@ msgstr ""
 #: ../src/ldgeneric.c:1302
 #, c-format
 msgid "%s: cannot determine signature of section group [%2zd] '%s': %s"
-msgstr ""
+msgstr "%s: не вдалося визначити підпис групи розділів [%2zd] «%s»: %s"
 
 #: ../src/ldgeneric.c:1314
 #, c-format
 msgid "%s: cannot get content of section group [%2zd] '%s': %s'"
-msgstr ""
+msgstr "%s: не вдалося отримати вміст групи розділів [%2zd] «%s»: %s'"
 
 #: ../src/ldgeneric.c:1328
 #, c-format
@@ -3145,7 +3148,7 @@ msgstr ""
 #: ../src/ldgeneric.c:1350
 #, c-format
 msgid "%s: section '%s' has unknown type: %d"
-msgstr ""
+msgstr "%s: розділ «%s» належить до невідомого типу: %d"
 
 #: ../src/ldgeneric.c:1729
 #, c-format
@@ -3155,22 +3158,22 @@ msgstr ""
 #: ../src/ldgeneric.c:1899
 #, c-format
 msgid "cannot read archive `%s': %s"
-msgstr ""
+msgstr "не вдалося прочитати архів «%s»: %s"
 
 #: ../src/ldgeneric.c:2020
 #, c-format
 msgid "file of type %s cannot be linked in\n"
-msgstr ""
+msgstr "файл типу %s не можна скомпонувати у\n"
 
 #: ../src/ldgeneric.c:2032
 #, c-format
 msgid "%s: input file incompatible with ELF machine type %s\n"
-msgstr ""
+msgstr "%s: файл вхідних даних несумісний з типом архітектури ELF %s\n"
 
 #: ../src/ldgeneric.c:2044
 #, c-format
 msgid "%s: cannot get section header string table index: %s\n"
-msgstr ""
+msgstr "%s: не вдалося отримати покажчик таблиці рядків заголовка розділу: %s\n"
 
 #: ../src/ldgeneric.c:2073
 #, c-format
@@ -3180,7 +3183,7 @@ msgstr ""
 #: ../src/ldgeneric.c:2158
 #, c-format
 msgid "input file '%s' ignored"
-msgstr ""
+msgstr "файл вхідних даних «%s» проігноровано"
 
 #. XXX The error message should get better.  It should use
 #. the debugging information if present to tell where in the
@@ -3188,12 +3191,12 @@ msgstr ""
 #: ../src/ldgeneric.c:2372
 #, c-format
 msgid "undefined symbol `%s' in %s"
-msgstr ""
+msgstr "невизначений символ «%s» у %s"
 
 #: ../src/ldgeneric.c:2702
 #, c-format
 msgid "cannot create ELF descriptor for output file: %s"
-msgstr ""
+msgstr "не вдалося створити дескриптор ELF для файла вихідних даних: %s"
 
 #: ../src/ldgeneric.c:2709
 #, c-format
@@ -3206,7 +3209,7 @@ msgstr ""
 #: ../src/ldgeneric.c:5131 ../src/ldgeneric.c:5600 ../src/ldgeneric.c:5612
 #, c-format
 msgid "cannot create section for output file: %s"
-msgstr ""
+msgstr "не вдалося створити розділ для файла вихідних даних: %s"
 
 #: ../src/ldgeneric.c:3444
 #, c-format
@@ -3258,13 +3261,13 @@ msgstr ""
 #: ../src/ldgeneric.c:4261
 #, c-format
 msgid "cannot read enough data for UUID"
-msgstr ""
+msgstr "не вдалося прочитати достатньо даних для встановлення UUID"
 
 #: ../src/ldgeneric.c:4358 ../src/ldgeneric.c:4379 ../src/ldgeneric.c:4408
 #: ../src/ldgeneric.c:6062
 #, c-format
 msgid "cannot create symbol table for output file: %s"
-msgstr ""
+msgstr "не вдалося створити таблицю символів для файла вихідних даних: %s"
 
 #: ../src/ldgeneric.c:5300 ../src/ldgeneric.c:5852
 #, c-format
@@ -3280,11 +3283,12 @@ msgstr ""
 #, c-format
 msgid "cannot create dynamic symbol table for output file: %s"
 msgstr ""
+"не вдалося створити динамічну таблицю символів для файла вихідних даних: %s"
 
 #: ../src/ldgeneric.c:5994
 #, c-format
 msgid "cannot create versioning data: %s"
-msgstr ""
+msgstr "не вдалося створити даних версії: %s"
 
 #: ../src/ldgeneric.c:6094 ../src/ldgeneric.c:6107 ../src/ldgeneric.c:6171
 #: ../src/ldgeneric.c:6179
@@ -3300,12 +3304,12 @@ msgstr ""
 #: ../src/ldgeneric.c:6259
 #, c-format
 msgid "cannot create program header: %s"
-msgstr ""
+msgstr "не вдалося створити заголовок програми: %s"
 
 #: ../src/ldgeneric.c:6267
 #, c-format
 msgid "while determining file layout: %s"
-msgstr ""
+msgstr "під час визначення компонування файла: %s"
 
 #: ../src/ldgeneric.c:6388
 #, c-format
@@ -3330,17 +3334,17 @@ msgstr ""
 #: ../src/ldgeneric.c:6984
 #, c-format
 msgid "while writing output file: %s"
-msgstr ""
+msgstr "під час запису файла вихідних даних: %s"
 
 #: ../src/ldgeneric.c:6989
 #, c-format
 msgid "while finishing output file: %s"
-msgstr ""
+msgstr "під час закриття файла вихідних даних: %s"
 
 #: ../src/ldgeneric.c:6995
 #, c-format
 msgid "cannot stat output file"
-msgstr ""
+msgstr "не вдалося обробити stat файл виводу даних"
 
 #: ../src/ldgeneric.c:7011
 #, c-format
@@ -3417,7 +3421,7 @@ msgstr ""
 
 #: ../src/elflint.c:73
 msgid "Do not print anything if successful"
-msgstr ""
+msgstr "Не виводити ніяких даних у разі успіху"
 
 #: ../src/elflint.c:74
 msgid "Binary is a separate debuginfo file"
@@ -3437,16 +3441,16 @@ msgstr ""
 #: ../src/elflint.c:166
 #, c-format
 msgid "cannot generate Elf descriptor: %s\n"
-msgstr ""
+msgstr "не вдалося створити дескриптор Elf: %s\n"
 
 #: ../src/elflint.c:185
 #, c-format
 msgid "error while closing Elf descriptor: %s\n"
-msgstr ""
+msgstr "помилка під час спроби закриття дескриптора Elf: %s\n"
 
 #: ../src/elflint.c:189
 msgid "No errors"
-msgstr ""
+msgstr "Без помилок"
 
 #: ../src/elflint.c:302
 #, c-format
@@ -3482,27 +3486,27 @@ msgstr ""
 #: ../src/elflint.c:391
 #, c-format
 msgid "unsupport ABI version e_ident[%d] == %d\n"
-msgstr ""
+msgstr "непідтримувана версія ABI e_ident[%d] == %d\n"
 
 #: ../src/elflint.c:396
 #, c-format
 msgid "e_ident[%zu] is not zero\n"
-msgstr ""
+msgstr "e_ident[%zu] не дорівнює нулеві\n"
 
 #: ../src/elflint.c:401
 #, c-format
 msgid "unknown object file type %d\n"
-msgstr ""
+msgstr "невідомий тип об’єктних файлів %d\n"
 
 #: ../src/elflint.c:408
 #, c-format
 msgid "unknown machine type %d\n"
-msgstr ""
+msgstr "невідомий тип архітектури %d\n"
 
 #: ../src/elflint.c:412
 #, c-format
 msgid "unknown object file version\n"
-msgstr ""
+msgstr "невідома версія об’єктних файлів\n"
 
 #: ../src/elflint.c:418
 #, c-format
@@ -5753,4 +5757,5 @@ msgstr "Вміст розділу %s:\n"
 #, c-format
 msgid "cannot disassemble"
 msgstr "не вдалося дизасемблювати"
+
 

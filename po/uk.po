@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
 "POT-Creation-Date: 2010-03-15 07:59+0000\n"
-"PO-Revision-Date: 2010-03-17 21:10+0200\n"
+"PO-Revision-Date: 2010-03-18 21:55+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <translation@linux.org.ua>\n"
 "Language: uk\n"
@@ -1870,8 +1870,14 @@ msgid_plural ""
 "\n"
 "Library list section [%2zu] '%s' at offset %#0<PRIx64> contains %d entries:\n"
 msgstr[0] ""
+"\n"
+"Розділ списку бібліотек [%2zu] «%s» за зміщенням %#0<PRIx64> містить %d запис:\n"
 msgstr[1] ""
+"\n"
+"Розділ списку бібліотек [%2zu] «%s» за зміщенням %#0<PRIx64> містить %d записи:\n"
 msgstr[2] ""
+"\n"
+"Розділ списку бібліотек [%2zu] «%s» за зміщенням %#0<PRIx64> містить %d записів:\n"
 
 #: ../src/readelf.c:2900
 msgid "       Library                       Time Stamp          Checksum Version Flags"
@@ -2011,7 +2017,7 @@ msgstr "порожній блок"
 #: ../src/readelf.c:3765
 #, c-format
 msgid "%zu byte block:"
-msgstr ""
+msgstr "%zu-байтовий блок:"
 
 #: ../src/readelf.c:4174
 #, c-format
@@ -2025,6 +2031,9 @@ msgid ""
 "DWARF section [%2zu] '%s' at offset %#<PRIx64>:\n"
 " [ Code]\n"
 msgstr ""
+"\n"
+"Розділ DWARF [%2zu] «%s» зі зміщенням %#<PRIx64>:\n"
+" [ Код]\n"
 
 #: ../src/readelf.c:4194
 #, c-format
@@ -2043,7 +2052,7 @@ msgstr " *** помилка під час читання скорочення: %
 #: ../src/readelf.c:4223
 #, c-format
 msgid " [%5u] offset: %<PRId64>, children: %s, tag: %s\n"
-msgstr ""
+msgstr " [%5u] зміщення: %<PRId64>, дочірній: %s, мітка: %s\n"
 
 #: ../src/readelf.c:4226
 msgid "yes"
@@ -2096,6 +2105,8 @@ msgid ""
 "\n"
 "DWARF section [%2zu] '%s' at offset %#<PRIx64>:\n"
 msgstr ""
+"\n"
+"Розділ DWARF [%2zu] «%s» зі зміщенням %#<PRIx64>:\n"
 
 #: ../src/readelf.c:4337
 #: ../src/readelf.c:5910
@@ -2212,7 +2223,7 @@ msgstr ""
 #: ../src/readelf.c:5373
 #, c-format
 msgid "cannot get DIE at offset %<PRIu64> in section '%s': %s"
-msgstr ""
+msgstr "не вдалося отримати DIE за зміщенням %<PRIu64> у розділі «%s»: %s"
 
 #: ../src/readelf.c:5384
 #, c-format
@@ -2222,7 +2233,7 @@ msgstr "не вдалося отримати зміщення DIE: %s"
 #: ../src/readelf.c:5392
 #, c-format
 msgid "cannot get tag of DIE at offset %<PRIu64> in section '%s': %s"
-msgstr ""
+msgstr "не вдалося отримати мітку DIE за зміщенням %<PRIu64> у розділі «%s»: %s"
 
 #: ../src/readelf.c:5421
 #, c-format
@@ -2310,7 +2321,7 @@ msgstr ""
 #: ../src/readelf.c:5696
 #, c-format
 msgid " extended opcode %u: "
-msgstr ""
+msgstr " розширений код операції %u: "
 
 #: ../src/readelf.c:5701
 msgid "end of sequence"
@@ -2379,12 +2390,12 @@ msgstr "збільшити адресу на фіксовану величину
 #. Takes no argument.
 #: ../src/readelf.c:5845
 msgid " set prologue end flag"
-msgstr ""
+msgstr " встановити прапорець кінця вступу"
 
 #. Takes no argument.
 #: ../src/readelf.c:5850
 msgid " set epilogue begin flag"
-msgstr ""
+msgstr " встановити прапорець початку епілогу"
 
 #. This is a new opcode the generator but not we know about.
 #. Read the parameters associated with it but then discard
@@ -2435,6 +2446,9 @@ msgid ""
 "DWARF section [%2zu] '%s' at offset %#<PRIx64>:\n"
 " %*s  String\n"
 msgstr ""
+"\n"
+"Розділ DWARF [%2zu] «%s» зі зміщенням %#<PRIx64>:\n"
+" %*s  Рядок\n"
 
 #: ../src/readelf.c:6201
 #, c-format
@@ -3558,7 +3572,7 @@ msgstr ""
 #: ../src/ldscript.y:465
 #, c-format
 msgid "while reading version script '%s': %s at line %d"
-msgstr ""
+msgstr "під час читання скрипту версій «%s»: %s у рядку %d"
 
 #: ../src/ldscript.y:466
 #, c-format
@@ -3750,12 +3764,12 @@ msgstr "некоректне розташування або розмір заг
 #: ../src/elflint.c:569
 #, c-format
 msgid "section [%2d] '%s': section with SHF_GROUP flag set not part of a section group\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: розділ з встановленим прапорцем SHF_GROUP не є частиною групи розділів\n"
 
 #: ../src/elflint.c:573
 #, c-format
 msgid "section [%2d] '%s': section group [%2zu] '%s' does not preceed group member\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: групу розділів [%2zu] «%s» мало бути визначено до розділу-елемента цієї групи\n"
 
 #: ../src/elflint.c:589
 #: ../src/elflint.c:1432
@@ -3775,12 +3789,12 @@ msgstr "розділ [%2d] «%s»: не вдалося отримати дані
 #: ../src/elflint.c:1598
 #, c-format
 msgid "section [%2d] '%s': referenced as string table for section [%2d] '%s' but type is not SHT_STRTAB\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: надано посилання на таблицю рядків розділу [%2d] «%s», але типом даних не є SHT_STRTAB\n"
 
 #: ../src/elflint.c:625
 #, c-format
 msgid "section [%2d] '%s': symbol table cannot have more than one extended index section\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: у таблиці символів не може бути більше одного розширеного розділу покажчика\n"
 
 #: ../src/elflint.c:636
 #, c-format
@@ -3800,96 +3814,96 @@ msgstr "розділ [%2d] «%s»: не вдалося отримати симв
 #: ../src/elflint.c:665
 #, c-format
 msgid "section [%2d] '%s': '%s' in zeroth entry not zero\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: «%s» у нульовому записі не є нулем\n"
 
 #: ../src/elflint.c:668
 #, c-format
 msgid "section [%2d] '%s': XINDEX for zeroth entry not zero\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: XINDEX для нульового запису не є нулем\n"
 
 #: ../src/elflint.c:678
 #, c-format
 msgid "section [%2d] '%s': cannot get symbol %zu: %s\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: не вдалося отримати символ %zu: %s\n"
 
 #: ../src/elflint.c:687
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: invalid name value\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: символ %zu: некоректне значення назви\n"
 
 #: ../src/elflint.c:700
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: too large section index but no extended section index section\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: символ %zu: занадто великий покажчик розділу за умови, що не визначено розділу розширеного покажчика розділів\n"
 
 #: ../src/elflint.c:706
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: XINDEX used for index which would fit in st_shndx (%<PRIu32>)\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: символ %zu: XINDEX використано для індексування, яке не відповідає st_shndx (%<PRIu32>)\n"
 
 #. || sym->st_shndx > SHN_HIRESERVE  always false
 #: ../src/elflint.c:718
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: invalid section index\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: символ %zu: некоректний індекс розділу\n"
 
 #: ../src/elflint.c:726
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: unknown type\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: символ %zu: невідомий тип\n"
 
 #: ../src/elflint.c:732
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: unknown symbol binding\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: символ %zu: невідома прив’язка символу\n"
 
 #: ../src/elflint.c:737
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: unique symbol not of object type\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: символ %zu: унікальний символ, що не належить до типу об’єктів\n"
 
 #: ../src/elflint.c:745
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: COMMON only allowed in relocatable files\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: символ %zu: COMMON можна використовувати лише у файлах, придатних до переміщення\n"
 
 #: ../src/elflint.c:749
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: local COMMON symbols are nonsense\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: символ %zu: використання локальних символів COMMON позбавлене сенсу\n"
 
 #: ../src/elflint.c:753
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: function in COMMON section is nonsense\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: символ %zu: використання функції у розділі COMMON позбавлене сенсу\n"
 
 #: ../src/elflint.c:785
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: st_value out of bounds\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: символ %zu: значення st_value поза можливим діапазоном\n"
 
 #: ../src/elflint.c:791
 #: ../src/elflint.c:816
 #: ../src/elflint.c:859
 #, c-format
 msgid "section [%2d] '%s': symbol %zu does not fit completely in referenced section [%2d] '%s'\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: символ %zu не повністю відповідає розділу, на який посилається, [%2d] «%s»\n"
 
 #: ../src/elflint.c:800
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: referenced section [%2d] '%s' does not have SHF_TLS flag set\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: символ %zu: для розділу посилання [%2d] «%s» не встановлено прапорець SHF_TLS\n"
 
 #: ../src/elflint.c:810
 #: ../src/elflint.c:852
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: st_value out of bounds of referenced section [%2d] '%s'\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: символ %zu: значення st_value поза межами розділу посилання, [%2d] «%s»\n"
 
 #: ../src/elflint.c:837
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: TLS symbol but no TLS program header entry\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: символ %zu: символ TLS без запису заголовка програми TLS\n"
 
 #: ../src/elflint.c:845
 #, c-format
@@ -3909,17 +3923,17 @@ msgstr "розділ [%2d] «%s»: символ %zu: у sh_info описано �
 #: ../src/elflint.c:886
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: non-local section symbol\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: символ %zu: нелокальний символ розділу\n"
 
 #: ../src/elflint.c:936
 #, c-format
 msgid "section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to bad section [%2d]\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: символ _GLOBAL_OFFSET_TABLE_  посилається на помилковий розділ, [%2d]\n"
 
 #: ../src/elflint.c:943
 #, c-format
 msgid "section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to section [%2d] '%s'\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: символ _GLOBAL_OFFSET_TABLE_  посилається на розділ [%2d] '%s'\n"
 
 #. This test is more strict than the psABIs which
 #. usually allow the symbol to be in the middle of
@@ -3937,7 +3951,7 @@ msgstr ""
 #: ../src/elflint.c:974
 #, c-format
 msgid "section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol present, but no .got section\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: виявлено символ _GLOBAL_OFFSET_TABLE_, але не виявлено розділу .got\n"
 
 #: ../src/elflint.c:990
 #, c-format
@@ -4010,7 +4024,7 @@ msgstr ""
 #: ../src/elflint.c:1228
 #, c-format
 msgid "section [%2d] '%s': section entry size does not match ElfXX_Rela\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: розмірність запису розділу не відповідає ElfXX_Rela\n"
 
 #: ../src/elflint.c:1288
 #, c-format
@@ -4020,7 +4034,7 @@ msgstr ""
 #: ../src/elflint.c:1315
 #, c-format
 msgid "section [%2d] '%s': relocation %zu: invalid type\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: переміщення %zu: некоректний тип\n"
 
 #: ../src/elflint.c:1323
 #, c-format
@@ -4030,7 +4044,7 @@ msgstr ""
 #: ../src/elflint.c:1331
 #, c-format
 msgid "section [%2d] '%s': relocation %zu: invalid symbol index\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: переміщення %zu: некоректний індекс символу\n"
 
 #: ../src/elflint.c:1349
 #, c-format
@@ -4040,7 +4054,7 @@ msgstr ""
 #: ../src/elflint.c:1366
 #, c-format
 msgid "section [%2d] '%s': relocation %zu: offset out of bounds\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: переміщення %zu: зміщення за межі діапазону\n"
 
 #: ../src/elflint.c:1381
 #, c-format
@@ -4061,17 +4075,17 @@ msgstr ""
 #: ../src/elflint.c:1506
 #, c-format
 msgid "section [%2d] '%s': cannot get relocation %zu: %s\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: не вдалося отримати зміщення %zu: %s\n"
 
 #: ../src/elflint.c:1586
 #, c-format
 msgid "more than one dynamic section present\n"
-msgstr ""
+msgstr "вказано більше одного динамічного розділу\n"
 
 #: ../src/elflint.c:1604
 #, c-format
 msgid "section [%2d] '%s': section entry size does not match ElfXX_Dyn\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: розмірність запису розділу не відповідає ElfXX_Dyn\n"
 
 #: ../src/elflint.c:1609
 #: ../src/elflint.c:1901
@@ -4082,7 +4096,7 @@ msgstr "розділ [%2d] «%s»: sh_info не є нульовим\n"
 #: ../src/elflint.c:1619
 #, c-format
 msgid "section [%2d] '%s': cannot get dynamic section entry %zu: %s\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: не вдалося отримати запис динамічного розділу %zu: %s\n"
 
 #: ../src/elflint.c:1627
 #, c-format
@@ -4092,7 +4106,7 @@ msgstr ""
 #: ../src/elflint.c:1634
 #, c-format
 msgid "section [%2d] '%s': entry %zu: unknown tag\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: запис %zu: невідома мітка\n"
 
 #: ../src/elflint.c:1645
 #, c-format
@@ -4128,17 +4142,17 @@ msgstr ""
 #: ../src/elflint.c:1801
 #, c-format
 msgid "section [%2d] '%s': contains %s entry but not %s\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: містить запис %s, але не %s\n"
 
 #: ../src/elflint.c:1785
 #, c-format
 msgid "section [%2d] '%s': mandatory tag %s not present\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: немає обов’язкової мітки %s\n"
 
 #: ../src/elflint.c:1794
 #, c-format
 msgid "section [%2d] '%s': no hash section present\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: не виявлено розділу хешів\n"
 
 #: ../src/elflint.c:1809
 #: ../src/elflint.c:1816
@@ -4155,7 +4169,7 @@ msgstr ""
 #: ../src/elflint.c:1836
 #, c-format
 msgid "section [%2d] '%s': non-DSO file marked as dependency during prelink\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: під час попереднього компонування як залежність позначено файл, який не є файлом DSO\n"
 
 #: ../src/elflint.c:1847
 #: ../src/elflint.c:1851
@@ -4163,7 +4177,7 @@ msgstr ""
 #: ../src/elflint.c:1859
 #, c-format
 msgid "section [%2d] '%s': %s tag missing in prelinked executable\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: у попередньо скомпонованому виконуваному файлі не міститься мітки %s\n"
 
 #: ../src/elflint.c:1871
 #, c-format
@@ -4183,12 +4197,12 @@ msgstr "не вдалося отримати дані для розділу си
 #: ../src/elflint.c:1889
 #, c-format
 msgid "section [%2d] '%s': entry size does not match Elf32_Word\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: розмірність запису не відповідає Elf32_Word\n"
 
 #: ../src/elflint.c:1896
 #, c-format
 msgid "section [%2d] '%s': extended index table too small for symbol table\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: розширена таблиця покажчика замала для таблиці символів\n"
 
 #: ../src/elflint.c:1911
 #, c-format
@@ -4198,7 +4212,7 @@ msgstr ""
 #: ../src/elflint.c:1922
 #, c-format
 msgid "symbol 0 should have zero extended section index\n"
-msgstr ""
+msgstr "символу 0 має відповідати нульовий індекс розширеного розділу\n"
 
 #: ../src/elflint.c:1934
 #, c-format
@@ -4208,7 +4222,7 @@ msgstr "не вдалося отримати дані для символу %zu\
 #: ../src/elflint.c:1939
 #, c-format
 msgid "extended section index is %<PRIu32> but symbol index is not XINDEX\n"
-msgstr ""
+msgstr "індекс розширеного розділу дорівнює %<PRIu32>, але індекс символу не є XINDEX\n"
 
 #: ../src/elflint.c:1955
 #: ../src/elflint.c:1996
@@ -4231,7 +4245,7 @@ msgstr ""
 #: ../src/elflint.c:1982
 #, c-format
 msgid "section [%2d] '%s': hash chain reference %zu out of bounds\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: посилання ланцюжка хешів %zu лежить поза межами діапазону\n"
 
 #: ../src/elflint.c:2023
 #, c-format
@@ -4357,12 +4371,12 @@ msgstr ""
 #: ../src/elflint.c:2424
 #, c-format
 msgid "section [%2d] '%s': sh_flags not zero\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: sh_flags не є нульовим\n"
 
 #: ../src/elflint.c:2431
 #, c-format
 msgid "section [%2d] '%s': cannot get symbol for signature\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: не вдалося отримати символ для підпису\n"
 
 #: ../src/elflint.c:2436
 #, c-format
@@ -4372,12 +4386,12 @@ msgstr ""
 #: ../src/elflint.c:2442
 #, c-format
 msgid "section [%2d] '%s': sh_flags not set correctly\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: для sh_flags встановлено помилкове значення\n"
 
 #: ../src/elflint.c:2448
 #, c-format
 msgid "section [%2d] '%s': cannot get data: %s\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: не вдалося отримати дані: %s\n"
 
 #: ../src/elflint.c:2457
 #, c-format
@@ -4402,7 +4416,7 @@ msgstr ""
 #: ../src/elflint.c:2483
 #, c-format
 msgid "section [%2d] '%s': unknown section group flags\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: невідомі прапорці групи розділів\n"
 
 #: ../src/elflint.c:2495
 #, c-format
@@ -4794,7 +4808,7 @@ msgstr ""
 #: ../src/elflint.c:3651
 #, c-format
 msgid "section [%2zu] '%s' contains unknown flag(s) %#<PRIx64>\n"
-msgstr ""
+msgstr "розділ [%2zu] «%s» містить невідомі прапорці %#<PRIx64>\n"
 
 #: ../src/elflint.c:3659
 #, c-format
@@ -4899,7 +4913,7 @@ msgstr ""
 #: ../src/elflint.c:3915
 #, c-format
 msgid "duplicate version index %d\n"
-msgstr ""
+msgstr "дублікат індексу версії %d\n"
 
 #: ../src/elflint.c:3929
 #, c-format

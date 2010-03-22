@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
 "POT-Creation-Date: 2010-03-15 07:59+0000\n"
-"PO-Revision-Date: 2010-03-18 21:55+0200\n"
+"PO-Revision-Date: 2010-03-22 19:31+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <translation@linux.org.ua>\n"
 "Language: uk\n"
@@ -1776,7 +1776,7 @@ msgstr "  %#06x: Версія:  %hd  Прап.: %s  Індекс: %hd К-ть: %
 #: ../src/readelf.c:2314
 #, c-format
 msgid "  %#06x: Parent %d: %s\n"
-msgstr ""
+msgstr "  %#06x: батьківський %d: %s\n"
 
 #: ../src/readelf.c:2546
 #, c-format
@@ -1820,13 +1820,22 @@ msgid_plural ""
 "Histogram for bucket list length in section [%2u] '%s' (total of %d buckets):\n"
 " Addr: %#0*<PRIx64>  Offset: %#08<PRIx64>  Link to section: [%2u] '%s'\n"
 msgstr[0] ""
+"\n"
+"Гістограма довжин списків блоків у розділі [%2u] «%s» (загальні дані за %d блоком):\n"
+" Адр.: %#0*<PRIx64>  Зміщ.: %#08<PRIx64>  Посилання на розділ: [%2u] «%s»\n"
 msgstr[1] ""
+"\n"
+"Гістограма довжин списків блоків у розділі [%2u] «%s» (загальні дані за %d блоками):\n"
+" Адр.: %#0*<PRIx64>  Зміщ.: %#08<PRIx64>  Посилання на розділ: [%2u] «%s»\n"
 msgstr[2] ""
+"\n"
+"Гістограма довжин списків блоків у розділі [%2u] «%s» (загальні дані за %d блоками):\n"
+" Адр.: %#0*<PRIx64>  Зміщ.: %#08<PRIx64>  Посилання на розділ: [%2u] «%s»\n"
 
 #: ../src/readelf.c:2635
 #, c-format
 msgid " Length  Number  % of total  Coverage\n"
-msgstr ""
+msgstr " Довжина Номер   % oвід загал. Покриття\n"
 
 #: ../src/readelf.c:2637
 #, c-format
@@ -1881,7 +1890,7 @@ msgstr[2] ""
 
 #: ../src/readelf.c:2900
 msgid "       Library                       Time Stamp          Checksum Version Flags"
-msgstr ""
+msgstr "       Бібліотека                    Часовий штамп       Версія суми      Прапорці"
 
 #: ../src/readelf.c:2950
 #, c-format
@@ -1889,6 +1898,8 @@ msgid ""
 "\n"
 "Object attributes section [%2zu] '%s' of %<PRIu64> bytes at offset %#0<PRIx64>:\n"
 msgstr ""
+"\n"
+"Розділ атрибутів об’єктів [%2zu] «%s» з %<PRIu64> байтів за зміщенням %#0<PRIx64>:\n"
 
 #: ../src/readelf.c:2966
 msgid "  Owner          Size\n"
@@ -2076,8 +2087,14 @@ msgid_plural ""
 "\n"
 "DWARF section [%2zu] '%s' at offset %#<PRIx64> contains %zu entries:\n"
 msgstr[0] ""
+"\n"
+"Розділ DWARF [%2zu] «%s» за зміщенням %#<PRIx64> містить %zu запис:\n"
 msgstr[1] ""
+"\n"
+"Розділ DWARF [%2zu] «%s» за зміщенням %#<PRIx64> містить %zu записи:\n"
 msgstr[2] ""
+"\n"
+"Розділ DWARF [%2zu] «%s» за зміщенням %#<PRIx64> містить %zu записів:\n"
 
 #: ../src/readelf.c:4297
 #, c-format
@@ -2087,7 +2104,7 @@ msgstr " [%*zu] ???\n"
 #: ../src/readelf.c:4299
 #, c-format
 msgid " [%*zu] start: %0#*<PRIx64>, length: %5<PRIu64>, CU DIE offset: %6<PRId64>\n"
-msgstr ""
+msgstr " [%*zu] початок: %0#*<PRIx64>, довжина: %5<PRIu64>, зміщення CU DIE: %6<PRId64>\n"
 
 #: ../src/readelf.c:4318
 #, c-format
@@ -2145,6 +2162,8 @@ msgid ""
 "\n"
 "Call frame information section [%2zu] '%s' at offset %#<PRIx64>:\n"
 msgstr ""
+"\n"
+"Розділ відомостей щодо вікна викликів [%2zu] «%s» за зміщенням %#<PRIx64>:\n"
 
 #: ../src/readelf.c:4832
 #: ../src/readelf.c:5485
@@ -2158,6 +2177,8 @@ msgid ""
 "\n"
 " [%6tx] Zero terminator\n"
 msgstr ""
+"\n"
+" [%6tx] нульовий переривач\n"
 
 #: ../src/readelf.c:4923
 #, c-format
@@ -2219,6 +2240,8 @@ msgid ""
 " Compilation unit at offset %<PRIu64>:\n"
 " Version: %<PRIu16>, Abbreviation section offset: %<PRIu64>, Address size: %<PRIu8>, Offset size: %<PRIu8>\n"
 msgstr ""
+" Модуль компіляції за зміщенням %<PRIu64>:\n"
+" Версія: %<PRIu16>, Зміщення розділу скорочень: %<PRIu64>, Адреса: %<PRIu8>, Зміщення: %<PRIu8>\n"
 
 #: ../src/readelf.c:5373
 #, c-format
@@ -2275,6 +2298,17 @@ msgid ""
 "\n"
 "Opcodes:\n"
 msgstr ""
+"\n"
+" Довжина:                    %<PRIu64>\n"
+" Версія DWARF:               %<PRIuFAST16>\n"
+" Довжина вступу:             %<PRIu64>\n"
+" Мінімальна довж. інстр.:    %<PRIuFAST8>\n"
+" Поч. знач., якщо «%s»: %<PRIuFAST8>\n"
+" Основа рядків:              %<PRIdFAST8>\n"
+" Діапазон рядків:            %<PRIuFAST8>\n"
+" Основа кодів операцій:      %<PRIuFAST8>\n"
+"\n"
+"Коди операцій:\n"
 
 #: ../src/readelf.c:5547
 #, c-format
@@ -2312,11 +2346,13 @@ msgid ""
 "\n"
 "Line number statements:"
 msgstr ""
+"\n"
+"Оператори номерів рядків:"
 
 #: ../src/readelf.c:5676
 #, c-format
 msgid " special opcode %u: address+%u = %s, line%+d = %zu\n"
-msgstr ""
+msgstr " спеціальний код операції %u: адреса+%u = %s, рядок%+d = %zu\n"
 
 #: ../src/readelf.c:5696
 #, c-format
@@ -2335,7 +2371,7 @@ msgstr "встановити адресу у значення %s\n"
 #: ../src/readelf.c:5737
 #, c-format
 msgid "define new file: dir=%u, mtime=%<PRIu64>, length=%<PRIu64>, name=%s\n"
-msgstr ""
+msgstr "визначення нового файла: dir=%u, mtime=%<PRIu64>, довжина=%<PRIu64>, назва=%s\n"
 
 #. Unknown, ignore it.
 #: ../src/readelf.c:5746
@@ -2355,7 +2391,7 @@ msgstr "збільшення адреси на %u до %s\n"
 #: ../src/readelf.c:5779
 #, c-format
 msgid " advance line by constant %d to %<PRId64>\n"
-msgstr ""
+msgstr " просувати рядок на сталу %d до %<PRId64>\n"
 
 #: ../src/readelf.c:5787
 #, c-format
@@ -2375,7 +2411,7 @@ msgstr " встановити «%s» у %<PRIuFAST8>\n"
 #. Takes no argument.
 #: ../src/readelf.c:5810
 msgid " set basic block flag"
-msgstr ""
+msgstr " встановити прапорець базового блоку"
 
 #: ../src/readelf.c:5820
 #, c-format
@@ -2427,7 +2463,7 @@ msgstr "           %s..%s"
 #: ../src/readelf.c:6001
 #, c-format
 msgid "cannot get macro information section data: %s"
-msgstr ""
+msgstr "не вдалося отримати дані розділу відомостей щодо макросів: %s"
 
 #: ../src/readelf.c:6080
 #, c-format
@@ -2437,7 +2473,7 @@ msgstr "%*s*** незавершений рядок наприкінці розд
 #: ../src/readelf.c:6148
 #, c-format
 msgid " [%5d] DIE offset: %6<PRId64>, CU DIE offset: %6<PRId64>, name: %s\n"
-msgstr ""
+msgstr " [%5d] зміщення DIE: %6<PRId64>, зміщення CU DIE: %6<PRId64>, назва: %s\n"
 
 #: ../src/readelf.c:6187
 #, c-format
@@ -2461,6 +2497,8 @@ msgid ""
 "\n"
 "Call frame search table section [%2zu] '.eh_frame_hdr':\n"
 msgstr ""
+"\n"
+"Розділ таблиці пошуку вікон виклику [%2zu] '.eh_frame_hdr':\n"
 
 #: ../src/readelf.c:6323
 #, c-format
@@ -2468,6 +2506,8 @@ msgid ""
 "\n"
 "Exception handling table section [%2zu] '.gcc_except_table':\n"
 msgstr ""
+"\n"
+"Розділ таблиці обробки виключень [%2zu] '.gcc_except_table':\n"
 
 #: ../src/readelf.c:6346
 #, c-format
@@ -2482,13 +2522,15 @@ msgstr " Кодування TType:     %#x "
 #: ../src/readelf.c:6372
 #, c-format
 msgid " Call site encoding:  %#x "
-msgstr ""
+msgstr " Кодування місця виклику:%#x "
 
 #: ../src/readelf.c:6385
 msgid ""
 "\n"
 " Call site table:"
 msgstr ""
+"\n"
+" Таблиця місця виклику:"
 
 #: ../src/readelf.c:6399
 #, c-format
@@ -2498,6 +2540,10 @@ msgid ""
 "        Landing pad:       %#<PRIx64>\n"
 "        Action:            %u\n"
 msgstr ""
+" [%4u] Поч. місця виклику:   %#<PRIx64>\n"
+"        Довж. місця виклику:  %<PRIu64>\n"
+"        Місце застосування:   %#<PRIx64>\n"
+"        Дія:                  %u\n"
 
 #: ../src/readelf.c:6459
 #, c-format
@@ -2513,7 +2559,7 @@ msgstr "не вдалося отримати дескриптор контекс
 #: ../src/readelf.c:7211
 #, c-format
 msgid "cannot convert core note data: %s"
-msgstr ""
+msgstr "не вдалося перетворити дані запису ядра: %s"
 
 #: ../src/readelf.c:6951
 #, c-format
@@ -2536,7 +2582,7 @@ msgstr "  %-13.*s  %9<PRId32>  %s\n"
 #: ../src/readelf.c:7362
 #, c-format
 msgid "cannot get content of note section: %s"
-msgstr ""
+msgstr "не вдалося отримати вміст розділу записів: %s"
 
 #: ../src/readelf.c:7389
 #, c-format
@@ -2544,6 +2590,8 @@ msgid ""
 "\n"
 "Note section [%2zu] '%s' of %<PRIu64> bytes at offset %#0<PRIx64>:\n"
 msgstr ""
+"\n"
+"Розділ записів (note) [%2zu] «%s» з %<PRIu64> байтів за зміщенням %#0<PRIx64>:\n"
 
 #: ../src/readelf.c:7412
 #, c-format
@@ -2551,6 +2599,8 @@ msgid ""
 "\n"
 "Note segment of %<PRIu64> bytes at offset %#0<PRIx64>:\n"
 msgstr ""
+"\n"
+"Сегмент записів з %<PRIu64> байтів за зміщенням %#0<PRIx64>:\n"
 
 #: ../src/readelf.c:7458
 #, c-format
@@ -2573,6 +2623,8 @@ msgid ""
 "\n"
 "Hex dump of section [%Zu] '%s', %<PRIu64> bytes at offset %#0<PRIx64>:\n"
 msgstr ""
+"\n"
+"Шіст. дамп розділу [%Zu] «%s», %<PRIu64> байтів за зміщенням %#0<PRIx64>:\n"
 
 #: ../src/readelf.c:7481
 #, c-format
@@ -2589,6 +2641,8 @@ msgid ""
 "\n"
 "String section [%Zu] '%s' contains %<PRIu64> bytes at offset %#0<PRIx64>:\n"
 msgstr ""
+"\n"
+"Розділ рядків [%Zu] «%s» містить %<PRIu64> байтів за зміщенням %#0<PRIx64>:\n"
 
 #: ../src/readelf.c:7539
 #, c-format
@@ -2634,7 +2688,7 @@ msgstr ""
 #: ../src/readelf.c:7652
 #, c-format
 msgid "cannot extract member at offset %Zu in '%s': %s"
-msgstr ""
+msgstr "не вдалося видобути елемент за зміщенням %Zu у «%s»: %s"
 
 #: ../src/readelf.c:7657
 #, c-format
@@ -2643,7 +2697,7 @@ msgstr "Елемент архіву «%s» містить:\n"
 
 #: ../src/size.c:68
 msgid "Use the output format FORMAT.  FORMAT can be `bsd' or `sysv'.  The default is `bsd'"
-msgstr ""
+msgstr "Використовувати формат виводу ФОРМАТ. ФОРМАТом може бути «bsd» або «sysv». Типовим є значення «bsd»"
 
 #: ../src/size.c:70
 msgid "Same as `--format=sysv'"
@@ -2701,11 +2755,11 @@ msgstr "%s: не вдалося розпізнати формат файла"
 #: ../src/size.c:589
 #, c-format
 msgid " (ex %s)"
-msgstr ""
+msgstr " (прикл. %s)"
 
 #: ../src/size.c:614
 msgid "(TOTALS)\n"
-msgstr ""
+msgstr "(ЗАГАЛОМ)\n"
 
 #: ../src/strip.c:74
 msgid "Place stripped output into FILE"
@@ -2717,7 +2771,7 @@ msgstr "Видобути вилучені розділи до ФАЙЛа"
 
 #: ../src/strip.c:76
 msgid "Embed name FILE instead of -f argument"
-msgstr ""
+msgstr "Вбудувати назву ФАЙЛа замість аргументу -f"
 
 #: ../src/strip.c:80
 msgid "Remove all debugging symbols"
@@ -2733,7 +2787,7 @@ msgstr "Вилучити розділ .comment"
 
 #: ../src/strip.c:89
 msgid "Relax a few rules to handle slightly broken ELF files"
-msgstr ""
+msgstr "Знехтувати декількома правилами для обробки трохи пошкоджених файлів ELF"
 
 #. Short description of program.
 #: ../src/strip.c:94
@@ -2743,7 +2797,7 @@ msgstr "Відкинути символи з об’єктних файлів"
 #: ../src/strip.c:186
 #, c-format
 msgid "Only one input file allowed together with '-o' and '-f'"
-msgstr ""
+msgstr "Разом з «-o» або «-f» можна використовувати лише один файл вхідних даних"
 
 #: ../src/strip.c:222
 #, c-format
@@ -2900,7 +2954,7 @@ msgstr "Додати ШЛЯХ до списку каталогів, у яких 
 
 #: ../src/ld.c:98
 msgid "Only set DT_NEEDED for following dynamic libs if actually used"
-msgstr ""
+msgstr "Встановлювати DT_NEEDED лише для наступних динамічних бібліотек, якщо він справді використовується"
 
 #: ../src/ld.c:100
 msgid "Always set DT_NEEDED for following dynamic libs"
@@ -2944,11 +2998,11 @@ msgstr "Заборонити/Дозволити невизначені симв�
 
 #: ../src/ld.c:123
 msgid "Object requires immediate handling of $ORIGIN."
-msgstr ""
+msgstr "Об’єкт вимагає негайної обробки $ORIGIN."
 
 #: ../src/ld.c:125
 msgid "Relocation will not be processed lazily."
-msgstr ""
+msgstr "Переміщення не буде оброблятися у лінивому режимі."
 
 #: ../src/ld.c:127
 msgid "Object cannot be unloaded at runtime."
@@ -2960,7 +3014,7 @@ msgstr "Позначити об’єкт, як такий, що потребує
 
 #: ../src/ld.c:131
 msgid "Enable/disable lazy-loading flag for following dependencies."
-msgstr ""
+msgstr "Увімкнути/Вимкнути прапорець лінивого завантаження для наведених нижче залежностей."
 
 #: ../src/ld.c:133
 msgid "Mark object as not loadable with 'dlopen'."
@@ -3008,11 +3062,11 @@ msgstr "Вважати розмір сторінки для системи пр�
 
 #: ../src/ld.c:151
 msgid "Set runtime DSO search path."
-msgstr ""
+msgstr "Встановити шлях пошуку DSO під час запуску."
 
 #: ../src/ld.c:154
 msgid "Set link time DSO search path."
-msgstr ""
+msgstr "Встановити шлях пошуку DSO під час компонування."
 
 #: ../src/ld.c:155
 msgid "Generate dynamic shared object."
@@ -3024,7 +3078,7 @@ msgstr "Створити придатний для переміщення об�
 
 #: ../src/ld.c:159
 msgid "Causes symbol not assigned to a version be reduced to local."
-msgstr ""
+msgstr "Спричиняє перетворення символів, не прив’язаних до версії, на локальні."
 
 #: ../src/ld.c:160
 msgid "Remove unused sections."
@@ -3044,7 +3098,7 @@ msgstr "Встановити назву динамічного компонув�
 
 #: ../src/ld.c:168
 msgid "Add/suppress addition indentifying link-editor to .comment section."
-msgstr ""
+msgstr "Додати/Придушити додавання ідентифікації редактора компонування до розділу .comment."
 
 #: ../src/ld.c:171
 msgid "Create .eh_frame_hdr section"
@@ -3056,7 +3110,7 @@ msgstr "Встановити формат хешування у значення
 
 #: ../src/ld.c:175
 msgid "Generate build ID note (md5, sha1 (default), uuid)."
-msgstr ""
+msgstr "Створити запису ідентифікатора збирання (md5, sha1 (типовий), uuid)."
 
 #: ../src/ld.c:177
 msgid "Linker Operation Control:"
@@ -3068,7 +3122,7 @@ msgstr "Докладні повідомлення."
 
 #: ../src/ld.c:179
 msgid "Trace file opens."
-msgstr ""
+msgstr "Спостерігати за відкриттями файлів."
 
 #: ../src/ld.c:181
 msgid "Trade speed for less memory usage"
@@ -3088,7 +3142,7 @@ msgstr "Використати скрипт компонування у ФАЙЛ
 
 #: ../src/ld.c:187
 msgid "Select to get parser debug information"
-msgstr ""
+msgstr "Позначте, щоб отримати діагностичні дані обробника"
 
 #: ../src/ld.c:190
 msgid "Read version information from FILE."
@@ -3247,7 +3301,7 @@ msgstr "Попередження: тип «%s» змінився з %s у %s н�
 #: ../src/ldgeneric.c:586
 #, c-format
 msgid "Warning: size of `%s' changed from %<PRIu64> in %s to %<PRIu64> in %s"
-msgstr ""
+msgstr "Попередження: розмір «%s» змінено з %<PRIu64> у %s на %<PRIu64> у %s"
 
 #: ../src/ldgeneric.c:677
 #, c-format
@@ -3270,7 +3324,7 @@ msgstr "%s: не вдалося отримати дані групи розді�
 #: ../src/ldgeneric.c:840
 #, c-format
 msgid "%s: section '%s' with group flag set does not belong to any group"
-msgstr ""
+msgstr "%s: розділ «%s» з встановленим прапорцем групи не належить жодній групі"
 
 #: ../src/ldgeneric.c:885
 #, c-format
@@ -3307,7 +3361,7 @@ msgstr "%s: не вдалося отримати вміст групи розд�
 #: ../src/ldgeneric.c:1328
 #, c-format
 msgid "%s: group member %zu of section group [%2zd] '%s' has too high index: %<PRIu32>"
-msgstr ""
+msgstr "%s: елемент групи %zu групи розділів [%2zd] «%s» має надто високий індекс: %<PRIu32>"
 
 #: ../src/ldgeneric.c:1350
 #, c-format
@@ -3342,7 +3396,7 @@ msgstr "%s: не вдалося отримати покажчик таблиці
 #: ../src/ldgeneric.c:2073
 #, c-format
 msgid "cannot use DSO '%s' when generating relocatable object file"
-msgstr ""
+msgstr "не вдалося використати DSO «%s» під час створення придатного до переміщення об’єктного файла"
 
 #: ../src/ldgeneric.c:2158
 #, c-format
@@ -3391,7 +3445,7 @@ msgstr "вираз обчислення адреси містить змінну
 #: ../src/ldgeneric.c:3489
 #, c-format
 msgid "argument '%<PRIuMAX>' of ALIGN in address computation expression is no power of two"
-msgstr ""
+msgstr "значення «%<PRIuMAX>» ALIGN у виразі обчислення адреси не є степенем двійки"
 
 #: ../src/ldgeneric.c:3684
 #, c-format
@@ -3445,7 +3499,7 @@ msgstr "не вдалося створити таблицю символів д�
 #: ../src/ldgeneric.c:5852
 #, c-format
 msgid "section index too large in dynamic symbol table"
-msgstr ""
+msgstr "у таблиці динамічних символів покажчик є занадто великим"
 
 #: ../src/ldgeneric.c:5745
 #, c-format
@@ -3538,7 +3592,7 @@ msgstr "ПОПЕРЕДЖЕННЯ: файл тимчасового виводу �
 #: ../src/ldgeneric.c:7141
 #, c-format
 msgid "no machine specific '%s' implementation"
-msgstr ""
+msgstr "не специфічна для архітектури реалізація «%s»"
 
 #: ../src/i386_ld.c:210
 #, c-format
@@ -3563,11 +3617,11 @@ msgstr "не вдалося розмістити розділ GOTPLT: %s"
 #: ../src/i386_ld.c:661
 #, c-format
 msgid "initial-executable TLS relocation cannot be used "
-msgstr ""
+msgstr "не можна використовувати переміщення TLS у початковому виконуваному файлі"
 
 #: ../src/ldscript.y:178
 msgid "mode for segment invalid\n"
-msgstr ""
+msgstr "режим сегмента є некоректним\n"
 
 #: ../src/ldscript.y:465
 #, c-format
@@ -3582,12 +3636,12 @@ msgstr "під час читання скрипту компонування «%
 #: ../src/ldscript.y:745
 #, c-format
 msgid "symbol '%s' in declared both local and global for unnamed version"
-msgstr ""
+msgstr "символ «%s» оголошено локально і на загальному рівні для версії без назви"
 
 #: ../src/ldscript.y:747
 #, c-format
 msgid "symbol '%s' in declared both local and global for version '%s'"
-msgstr ""
+msgstr "символ «%s» оголошено локально і на загальному рівні для версії «%s»"
 
 #: ../src/ldscript.y:767
 #: ../src/ldscript.y:774
@@ -3597,7 +3651,7 @@ msgstr "типову видимість визначено як локальну
 
 #: ../src/elflint.c:72
 msgid "Be extremely strict, flag level 2 features."
-msgstr ""
+msgstr "Висока строгість, увімкнути можливості рівня 2."
 
 #: ../src/elflint.c:73
 msgid "Do not print anything if successful"
@@ -3605,16 +3659,16 @@ msgstr "Не виводити ніяких даних у разі успіху"
 
 #: ../src/elflint.c:74
 msgid "Binary is a separate debuginfo file"
-msgstr ""
+msgstr "Бінарний файл є окремим файлом debuginfo"
 
 #: ../src/elflint.c:76
 msgid "Binary has been created with GNU ld and is therefore known to be broken in certain ways"
-msgstr ""
+msgstr "Бінарний файл було створено за допомогою GNU ld, тому він, очевидно, є до певної міри неправильним"
 
 #. Short description of program.
 #: ../src/elflint.c:82
 msgid "Pedantic checking of ELF files compliance with gABI/psABI spec."
-msgstr ""
+msgstr "Педантична перевірка файлів ELF на сумісність зі специфікаціями gABI/psABI."
 
 #: ../src/elflint.c:166
 #, c-format
@@ -3694,7 +3748,7 @@ msgstr "некоректне зміщення заголовка програм�
 #: ../src/elflint.c:420
 #, c-format
 msgid "executables and DSOs cannot have zero program header offset\n"
-msgstr ""
+msgstr "виконувані файли і DSO не можуть містити заголовка програми з нульовим зміщенням\n"
 
 #: ../src/elflint.c:424
 #, c-format
@@ -3908,7 +3962,7 @@ msgstr "розділ [%2d] «%s»: символ %zu: символ TLS без з�
 #: ../src/elflint.c:845
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: st_value short of referenced section [%2d] '%s'\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: символ %zu: значення st_value перед розділом посилання, [%2d] «%s»\n"
 
 #: ../src/elflint.c:872
 #, c-format
@@ -3941,12 +3995,12 @@ msgstr "розділ [%2d] «%s»: символ _GLOBAL_OFFSET_TABLE_  поси�
 #: ../src/elflint.c:959
 #, c-format
 msgid "section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol value %#<PRIx64> does not match %s section address %#<PRIx64>\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: значення символу _GLOBAL_OFFSET_TABLE_ %#<PRIx64> не відповідає адресі розділу %s %#<PRIx64>\n"
 
 #: ../src/elflint.c:966
 #, c-format
 msgid "section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol size %<PRIu64> does not match %s section size %<PRIu64>\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: розмір символу _GLOBAL_OFFSET_TABLE_ %<PRIu64> не відповідає розміру розділу %s %<PRIu64>\n"
 
 #: ../src/elflint.c:974
 #, c-format
@@ -3956,12 +4010,12 @@ msgstr "розділ [%2d] «%s»: виявлено символ _GLOBAL_OFFSET_
 #: ../src/elflint.c:990
 #, c-format
 msgid "section [%2d] '%s': _DYNAMIC_ symbol value %#<PRIx64> does not match dynamic segment address %#<PRIx64>\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: значення символу _DYNAMIC_ %#<PRIx64> не відповідає адресі динамічного сегмента %#<PRIx64>\n"
 
 #: ../src/elflint.c:997
 #, c-format
 msgid "section [%2d] '%s': _DYNAMIC symbol size %<PRIu64> does not match dynamic segment size %<PRIu64>\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: розмір символу _DYNAMIC %<PRIu64> не відповідає розміру динамічного сегмента %<PRIu64>\n"
 
 #: ../src/elflint.c:1010
 #, c-format
@@ -4019,7 +4073,7 @@ msgstr "розділ [%2d] «%s»: sh_info має бути нульовим\n"
 #: ../src/elflint.c:1221
 #, c-format
 msgid "section [%2d] '%s': no relocations for merge-able sections possible\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: переміщення у придатних до об’єднання розділах неможливе\n"
 
 #: ../src/elflint.c:1228
 #, c-format
@@ -4029,7 +4083,7 @@ msgstr "розділ [%2d] «%s»: розмірність запису розд�
 #: ../src/elflint.c:1288
 #, c-format
 msgid "text relocation flag set but there is no read-only segment\n"
-msgstr ""
+msgstr "встановлено прапорець переміщення тексту, але сегмент придатний лише до читання\n"
 
 #: ../src/elflint.c:1315
 #, c-format
@@ -4039,7 +4093,7 @@ msgstr "розділ [%2d] «%s»: переміщення %zu: некорект�
 #: ../src/elflint.c:1323
 #, c-format
 msgid "section [%2d] '%s': relocation %zu: relocation type invalid for the file type\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: переміщення %zu: некоректний тип переміщення для типу файла\n"
 
 #: ../src/elflint.c:1331
 #, c-format
@@ -4049,7 +4103,7 @@ msgstr "розділ [%2d] «%s»: переміщення %zu: некорект�
 #: ../src/elflint.c:1349
 #, c-format
 msgid "section [%2d] '%s': relocation %zu: only symbol '_GLOBAL_OFFSET_TABLE_' can be used with %s\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: переміщення %zu: з %s можна використовувати лише символ «_GLOBAL_OFFSET_TABLE_»\n"
 
 #: ../src/elflint.c:1366
 #, c-format
@@ -4059,7 +4113,7 @@ msgstr "розділ [%2d] «%s»: переміщення %zu: зміщення 
 #: ../src/elflint.c:1381
 #, c-format
 msgid "section [%2d] '%s': relocation %zu: copy relocation against symbol of type %s\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: переміщення %zu: переміщення копіювання для символу типу %s\n"
 
 #: ../src/elflint.c:1402
 #, c-format
@@ -4285,7 +4339,7 @@ msgstr ""
 #: ../src/elflint.c:2152
 #, c-format
 msgid "section [%2d] '%s': hash chain for bucket %zu out of bounds\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: ланцюжок хешів для блоку %zu лежить поза межами діапазону\n"
 
 #: ../src/elflint.c:2157
 #, c-format
@@ -4300,7 +4354,7 @@ msgstr ""
 #: ../src/elflint.c:2176
 #, c-format
 msgid "section [%2d] '%s': relocatable files cannot have hash tables\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: придатні до переміщення файли не можуть містити таблиць хешів\n"
 
 #: ../src/elflint.c:2194
 #, c-format
@@ -4310,7 +4364,7 @@ msgstr ""
 #: ../src/elflint.c:2202
 #, c-format
 msgid "section [%2d] '%s': hash table entry size incorrect\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: розмірність запису таблиці хешів є некоректною\n"
 
 #: ../src/elflint.c:2207
 #, c-format
@@ -4331,7 +4385,7 @@ msgstr ""
 #: ../src/elflint.c:2342
 #, c-format
 msgid "section [%2zu] '%s': reference to symbol index 0\n"
-msgstr ""
+msgstr "розділ [%2zu] «%s»: посилання на індекс символів 0\n"
 
 #: ../src/elflint.c:2349
 #, c-format
@@ -4356,7 +4410,7 @@ msgstr ""
 #: ../src/elflint.c:2408
 #, c-format
 msgid "section [%2d] '%s': cannot get symbol table: %s\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: не вдалося отримати таблицю символів: %s\n"
 
 #: ../src/elflint.c:2413
 #, c-format
@@ -4366,7 +4420,7 @@ msgstr ""
 #: ../src/elflint.c:2419
 #, c-format
 msgid "section [%2d] '%s': invalid symbol index in sh_info\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: некоректний індекс символу у sh_info\n"
 
 #: ../src/elflint.c:2424
 #, c-format
@@ -4406,12 +4460,12 @@ msgstr ""
 #: ../src/elflint.c:2468
 #, c-format
 msgid "section [%2d] '%s': section group without member\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: група розділів без елементів\n"
 
 #: ../src/elflint.c:2472
 #, c-format
 msgid "section [%2d] '%s': section group with only one member\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: група розділів, що містить лише один елемент\n"
 
 #: ../src/elflint.c:2483
 #, c-format
@@ -4441,7 +4495,7 @@ msgstr ""
 #: ../src/elflint.c:2524
 #, c-format
 msgid "section [%2d] '%s' is contained in more than one section group\n"
-msgstr ""
+msgstr "розділ [%2d] «%s» міститься у більше ніж одній групі розділів\n"
 
 #: ../src/elflint.c:2713
 #, c-format
@@ -4456,22 +4510,22 @@ msgstr ""
 #: ../src/elflint.c:2740
 #, c-format
 msgid "section [%2d] '%s': symbol %d: cannot read version data\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: символ %d: не вдалося прочитати дані щодо версії\n"
 
 #: ../src/elflint.c:2756
 #, c-format
 msgid "section [%2d] '%s': symbol %d: local symbol with global scope\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: символ %d: локальний символ у загальному контексті\n"
 
 #: ../src/elflint.c:2764
 #, c-format
 msgid "section [%2d] '%s': symbol %d: local symbol with version\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: символ %d: локальний символ з версією\n"
 
 #: ../src/elflint.c:2778
 #, c-format
 msgid "section [%2d] '%s': symbol %d: invalid version index %d\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: символ %d: некоректний індекс версії %d\n"
 
 #: ../src/elflint.c:2783
 #, c-format
@@ -4509,12 +4563,12 @@ msgstr ""
 #: ../src/elflint.c:2890
 #, c-format
 msgid "section [%2d] '%s': entry %d has invalid file reference\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: запис %d містить некоректне посилання на файл\n"
 
 #: ../src/elflint.c:2898
 #, c-format
 msgid "section [%2d] '%s': entry %d references unknown dependency\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: запис %d посилається на невідому залежність\n"
 
 #: ../src/elflint.c:2910
 #, c-format
@@ -4555,7 +4609,7 @@ msgstr ""
 #: ../src/elflint.c:3019
 #, c-format
 msgid "section [%2d] '%s': more than one BASE definition\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: повторне визначення BASE\n"
 
 #: ../src/elflint.c:3023
 #, c-format
@@ -4681,7 +4735,7 @@ msgstr ""
 #: ../src/elflint.c:3333
 #, c-format
 msgid "section [%2d] '%s': offset %zu: extra bytes after last attribute section\n"
-msgstr ""
+msgstr "розділ [%2d] «%s»: зміщення %zu: зайві байти після останнього розділу атрибутів\n"
 
 #: ../src/elflint.c:3422
 #, c-format

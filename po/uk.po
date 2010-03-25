@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
 "POT-Creation-Date: 2010-03-15 07:59+0000\n"
-"PO-Revision-Date: 2010-03-24 20:22+0200\n"
+"PO-Revision-Date: 2010-03-25 18:44+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <translation@linux.org.ua>\n"
 "Language: uk\n"
@@ -5316,7 +5316,7 @@ msgstr "файл, що містить функцію «%s», ймовірно, �
 #: ../src/findtextrel.c:585
 #, c-format
 msgid "either the file containing the function '%s' or the file containing the function '%s' is not compiled with -fpic/-fPIC\n"
-msgstr ""
+msgstr "файл, що містить функцію «%s», або файл, що містить функцію «%s», зібрано без параметрів -fpic/-fPIC\n"
 
 #: ../src/findtextrel.c:605
 #, c-format
@@ -5329,11 +5329,11 @@ msgstr "Параметри керування:"
 
 #: ../src/elfcmp.c:70
 msgid "Control treatment of gaps in loadable segments [ignore|match] (default: ignore)"
-msgstr ""
+msgstr "Керування обробкою проміжків у придатних до завантаження сегментах [ignore|match] (типово, ignore)"
 
 #: ../src/elfcmp.c:72
 msgid "Ignore permutation of buckets in SHT_HASH section"
-msgstr ""
+msgstr "Ігнорувати переставляння блоків у розділі SHT_HASH"
 
 #: ../src/elfcmp.c:73
 msgid "Output nothing; yield exit status only"
@@ -5401,64 +5401,64 @@ msgstr "не вдалося отримати вміст розділу %zu у «
 #: ../src/elfcmp.c:337
 #, c-format
 msgid "cannot get symbol in '%s': %s"
-msgstr ""
+msgstr "не вдалося отримати символ у «%s»: %s"
 
 #: ../src/elfcmp.c:358
 #, c-format
 msgid "%s %s differ: symbol table [%zu]"
-msgstr ""
+msgstr "%s %s diff: таблиця символів [%zu]"
 
 #: ../src/elfcmp.c:361
 #, c-format
 msgid "%s %s differ: symbol table [%zu,%zu]"
-msgstr ""
+msgstr "%s %s diff: таблиця символів [%zu,%zu]"
 
 #: ../src/elfcmp.c:409
 #, c-format
 msgid "%s %s differ: section [%zu] '%s' content"
-msgstr ""
+msgstr "%s %s diff: розділ [%zu] «%s», вміст"
 
 #: ../src/elfcmp.c:413
 #, c-format
 msgid "%s %s differ: section [%zu,%zu] '%s' content"
-msgstr ""
+msgstr "%s %s diff: розділ [%zu,%zu] «%s», вміст"
 
 #: ../src/elfcmp.c:429
 #, c-format
 msgid "%s %s differ: unequal amount of important sections"
-msgstr ""
+msgstr "%s %s diff: невідповідність об’ємів важливих розділів"
 
 #: ../src/elfcmp.c:463
 #: ../src/elfcmp.c:468
 #, c-format
 msgid "cannot load data of '%s': %s"
-msgstr ""
+msgstr "не вдалося завантажити дані «%s»: %s"
 
 #: ../src/elfcmp.c:487
 #: ../src/elfcmp.c:493
 #, c-format
 msgid "cannot get program header entry %d of '%s': %s"
-msgstr ""
+msgstr "не вдалося отримати запис заголовка програми %d «%s»: %s"
 
 #: ../src/elfcmp.c:499
 #, c-format
 msgid "%s %s differ: program header %d"
-msgstr ""
+msgstr "%s %s diff: заголовок програми %d"
 
 #: ../src/elfcmp.c:524
 #, c-format
 msgid "%s %s differ: gap"
-msgstr ""
+msgstr "%s %s diff: проміжок"
 
 #: ../src/elfcmp.c:583
 #, c-format
 msgid "Invalid value '%s' for --gaps parameter."
-msgstr ""
+msgstr "Некоректне значення «%s» параметра --gaps."
 
 #: ../src/elfcmp.c:616
 #, c-format
 msgid "cannot create EBL descriptor for '%s'"
-msgstr ""
+msgstr "не вдалося створити дескриптор EBL для «%s»"
 
 #: ../src/elfcmp.c:634
 #, c-format
@@ -5468,7 +5468,7 @@ msgstr "не вдалося отримати заголовок розділу %
 #: ../src/elfcmp.c:644
 #, c-format
 msgid "cannot get content of section %zu: %s"
-msgstr ""
+msgstr "не вдалося отримати вміст розділу %zu: %s"
 
 #: ../src/elfcmp.c:654
 #: ../src/elfcmp.c:668
@@ -5479,7 +5479,7 @@ msgstr "не вдалося отримати переміщення: %s"
 #. Short description of program.
 #: ../src/ranlib.c:74
 msgid "Generate an index to speed access to archives."
-msgstr ""
+msgstr "Створювати покажчик для пришвидшення доступу до архівів."
 
 #. Strings for arguments in help texts.
 #: ../src/ranlib.c:77
@@ -5499,7 +5499,7 @@ msgstr "«%s» не є архівом"
 #: ../src/ranlib.c:229
 #, c-format
 msgid "error while freeing sub-ELF descriptor: %s"
-msgstr ""
+msgstr "помилка під час спроби вивільнення дескриптора під-ELF: %s"
 
 #: ../src/strings.c:70
 msgid "Output Selection:"
@@ -5507,23 +5507,23 @@ msgstr "Вибір виводу:"
 
 #: ../src/strings.c:71
 msgid "Scan entire file, not only loaded sections"
-msgstr ""
+msgstr "Шукати у всьому файлі, а не лише у завантажених розділах"
 
 #: ../src/strings.c:73
 msgid "Only NUL-terminated sequences of MIN-LEN characters or more are printed"
-msgstr ""
+msgstr "Буде виведено лише послідовності з не менше, ніж MIN-LEN символів, що завершуються на NUL"
 
 #: ../src/strings.c:74
 msgid "Select character size and endianess: s = 7-bit, S = 8-bit, {b,l} = 16-bit, {B,L} = 32-bit"
-msgstr ""
+msgstr "Визначення розмірності та порядку бітів символів: s = 7-бітові, S = 8-бітові, {b,l} = 16-бітові, {B,L} = 32-бітові"
 
 #: ../src/strings.c:78
 msgid "Print name of the file before each string."
-msgstr ""
+msgstr "Виводити назву файла перед кожним рядком."
 
 #: ../src/strings.c:80
 msgid "Print location of the string in base 8, 10, or 16 respectively."
-msgstr ""
+msgstr "Виводити адресу рядка за основами 8, 10 та 16, відповідно."
 
 #: ../src/strings.c:81
 msgid "Alias for --radix=o"
@@ -5532,42 +5532,42 @@ msgstr "Замінник --radix=o"
 #. Short description of program.
 #: ../src/strings.c:88
 msgid "Print the strings of printable characters in files."
-msgstr ""
+msgstr "Вивести рядки файлів з символів, придатних для друку."
 
 #: ../src/strings.c:268
 #: ../src/strings.c:303
 #, c-format
 msgid "invalid value '%s' for %s parameter"
-msgstr ""
+msgstr "некоректне значення «%s» параметра %s"
 
 #: ../src/strings.c:314
 #, c-format
 msgid "invalid minimum length of matched string size"
-msgstr ""
+msgstr "некоректна мінімальна довжина розмірності рядка для порівняння"
 
 #: ../src/strings.c:601
 #, c-format
 msgid "lseek64 failed"
-msgstr ""
+msgstr "помилка lseek64"
 
 #: ../src/strings.c:616
 #: ../src/strings.c:680
 #, c-format
 msgid "re-mmap failed"
-msgstr ""
+msgstr "помилка повторного використання mmap"
 
 #: ../src/strings.c:653
 #, c-format
 msgid "mprotect failed"
-msgstr ""
+msgstr "помилка mprotect"
 
 #: ../src/unstrip.c:78
 msgid "Match MODULE against file names, not module names"
-msgstr ""
+msgstr "Встановити відповідність МОДУЛЯ назвам файлів, а не назвам модулів names"
 
 #: ../src/unstrip.c:79
 msgid "Silently skip unfindable files"
-msgstr ""
+msgstr "Пропустити незнайдені файли без додаткових повідомлень"
 
 #: ../src/unstrip.c:82
 msgid "Place output into FILE"
@@ -5575,108 +5575,108 @@ msgstr "Вивести дані у ФАЙЛ"
 
 #: ../src/unstrip.c:84
 msgid "Create multiple output files under DIRECTORY"
-msgstr ""
+msgstr "Створити декілька файлів виведених даних у КАТАЛОЗІ"
 
 #: ../src/unstrip.c:85
 msgid "Use module rather than file names"
-msgstr ""
+msgstr "Використовувати назви модулів, а не файлів"
 
 #: ../src/unstrip.c:87
 msgid "Create output for modules that have no separate debug information"
-msgstr ""
+msgstr "Вивести дані для модулів, які не містять окремих діагностичних відомостей"
 
 #: ../src/unstrip.c:90
 msgid "Apply relocations to section contents in ET_REL files"
-msgstr ""
+msgstr "Застосувати переміщення до вмісту розділів у файлах ET_REL"
 
 #: ../src/unstrip.c:92
 msgid "Only list module and file names, build IDs"
-msgstr ""
+msgstr "Вивести лише список назв модулів, файлів, побудувати ідентифікатори"
 
 #: ../src/unstrip.c:134
 #, c-format
 msgid "-d option specified twice"
-msgstr ""
+msgstr "параметр -d вказано двічі"
 
 #: ../src/unstrip.c:166
 #, c-format
 msgid "only one of -o or -d allowed"
-msgstr ""
+msgstr "можна використовувати лише один з параметрів: -o або -d"
 
 #: ../src/unstrip.c:175
 #, c-format
 msgid "-n cannot be used with explicit files or -o or -d"
-msgstr ""
+msgstr "-n не можна використовувати з файлами, заданими явно, або параметрами -o і -d"
 
 #: ../src/unstrip.c:190
 #, c-format
 msgid "output directory '%s'"
-msgstr ""
+msgstr "каталог виведення даних «%s»"
 
 #: ../src/unstrip.c:199
 #, c-format
 msgid "exactly two file arguments are required"
-msgstr ""
+msgstr "як аргументи має бути вказано точно два файла"
 
 #: ../src/unstrip.c:205
 #, c-format
 msgid "-m, -a, -R, and -i options not allowed with explicit files"
-msgstr ""
+msgstr "для файлів, заданих явно, не можна використовувати параметри -m, -a, -R і -i"
 
 #: ../src/unstrip.c:218
 #, c-format
 msgid "-o or -d is required when using implicit files"
-msgstr ""
+msgstr "якщо використовуються файли, задані неявно, слід додавати параметр -o або -d"
 
 #: ../src/unstrip.c:254
 #, c-format
 msgid "cannot create ELF header: %s"
-msgstr ""
+msgstr "не вдалося створити заголовок ELF: %s"
 
 #: ../src/unstrip.c:259
 #, c-format
 msgid "cannot copy ELF header: %s"
-msgstr ""
+msgstr "не вдалося скопіювати заголовок ELF: %s"
 
 #: ../src/unstrip.c:264
 #: ../src/unstrip.c:1817
 #, c-format
 msgid "cannot create program headers: %s"
-msgstr ""
+msgstr "не вдалося створити заголовки програми: %s"
 
 #: ../src/unstrip.c:270
 #, c-format
 msgid "cannot copy program header: %s"
-msgstr ""
+msgstr "не вдалося скопіювати заголовок програми: %s"
 
 #: ../src/unstrip.c:280
 #, c-format
 msgid "cannot copy section header: %s"
-msgstr ""
+msgstr "не вдалося скопіювати заголовок розділу: %s"
 
 #: ../src/unstrip.c:283
 #: ../src/unstrip.c:1505
 #, c-format
 msgid "cannot get section data: %s"
-msgstr ""
+msgstr "не вдалося отримати дані розділу: %s"
 
 #: ../src/unstrip.c:285
 #: ../src/unstrip.c:1507
 #, c-format
 msgid "cannot copy section data: %s"
-msgstr ""
+msgstr "не вдалося скопіювати дані розділу: %s"
 
 #: ../src/unstrip.c:309
 #, c-format
 msgid "cannot create directory '%s'"
-msgstr ""
+msgstr "не вдалося створити каталог «%s»"
 
 #: ../src/unstrip.c:349
 #: ../src/unstrip.c:763
 #: ../src/unstrip.c:1540
 #, c-format
 msgid "cannot get symbol table entry: %s"
-msgstr ""
+msgstr "не вдалося отримати запис таблиці символів: %s"
 
 #: ../src/unstrip.c:365
 #: ../src/unstrip.c:580
@@ -5687,7 +5687,7 @@ msgstr ""
 #: ../src/unstrip.c:1715
 #, c-format
 msgid "cannot update symbol table: %s"
-msgstr ""
+msgstr "не вдалося оновити таблицю символів: %s"
 
 #: ../src/unstrip.c:382
 #: ../src/unstrip.c:432
@@ -5698,119 +5698,119 @@ msgstr ""
 #: ../src/unstrip.c:1791
 #, c-format
 msgid "cannot update section header: %s"
-msgstr ""
+msgstr "не вдалося оновити заголовок розділу: %s"
 
 #: ../src/unstrip.c:408
 #: ../src/unstrip.c:419
 #, c-format
 msgid "cannot update relocation: %s"
-msgstr ""
+msgstr "не вдалося оновити переміщення: %s"
 
 #: ../src/unstrip.c:507
 #, c-format
 msgid "cannot get symbol version: %s"
-msgstr ""
+msgstr "не вдалося отримати версію символу: %s"
 
 #: ../src/unstrip.c:519
 #, c-format
 msgid "unexpected section type in [%Zu] with sh_link to symtab"
-msgstr ""
+msgstr "неочікуваний тип розділу у [%Zu] з посиланням sh_link на symtab"
 
 #: ../src/unstrip.c:769
 #, c-format
 msgid "invalid string offset in symbol [%Zu]"
-msgstr ""
+msgstr "некоректне зміщення рядка у символі [%Zu]"
 
 #: ../src/unstrip.c:911
 #: ../src/unstrip.c:1248
 #, c-format
 msgid "cannot read section [%Zu] name: %s"
-msgstr ""
+msgstr "не вдалося прочитати назву розділу [%Zu]: %s"
 
 #: ../src/unstrip.c:952
 #: ../src/unstrip.c:971
 #: ../src/unstrip.c:1004
 #, c-format
 msgid "cannot read '.gnu.prelink_undo' section: %s"
-msgstr ""
+msgstr "не вдалося прочитати розділ «.gnu.prelink_undo»: %s"
 
 #: ../src/unstrip.c:992
 #, c-format
 msgid "invalid contents in '%s' section"
-msgstr ""
+msgstr "некоректний вміст розділу «%s»"
 
 #: ../src/unstrip.c:1047
 #: ../src/unstrip.c:1370
 #, c-format
 msgid "cannot find matching section for [%Zu] '%s'"
-msgstr ""
+msgstr "не вдалося знайти відповідний розділ для [%Zu] «%s»"
 
 #: ../src/unstrip.c:1171
 #: ../src/unstrip.c:1186
 #: ../src/unstrip.c:1451
 #, c-format
 msgid "cannot add section name to string table: %s"
-msgstr ""
+msgstr "не вдалося додати назву розділу до таблиці рядків: %s"
 
 #: ../src/unstrip.c:1195
 #, c-format
 msgid "cannot update section header string table data: %s"
-msgstr ""
+msgstr "не вдалося оновити дані заголовка розділу у таблиці рядків: %s"
 
 #: ../src/unstrip.c:1223
 #: ../src/unstrip.c:1227
 #, c-format
 msgid "cannot get section header string table section index: %s"
-msgstr ""
+msgstr "не вдалося визначити індекс розділу заголовка розділу у таблиці рядків: %s"
 
 #: ../src/unstrip.c:1231
 #: ../src/unstrip.c:1235
 #: ../src/unstrip.c:1466
 #, c-format
 msgid "cannot get section count: %s"
-msgstr ""
+msgstr "не вдалося отримати кількість розділів: %s"
 
 #: ../src/unstrip.c:1293
 #: ../src/unstrip.c:1385
 #, c-format
 msgid "cannot read section header string table: %s"
-msgstr ""
+msgstr "не вдалося прочитати таблицю рядків заголовка розділу: %s"
 
 #: ../src/unstrip.c:1445
 #, c-format
 msgid "cannot add new section: %s"
-msgstr ""
+msgstr "не вдалося додати новий розділ: %s"
 
 #: ../src/unstrip.c:1548
 #, c-format
 msgid "symbol [%Zu] has invalid section index"
-msgstr ""
+msgstr "символ [%Zu] має некоректний індекс розділу"
 
 #: ../src/unstrip.c:1800
 #, c-format
 msgid "cannot get ELF header: %s"
-msgstr ""
+msgstr "не вдалося отримати заголовок ELF: %s"
 
 #: ../src/unstrip.c:1827
 #, c-format
 msgid "cannot update program header: %s"
-msgstr ""
+msgstr "не вдалося оновити заголовок програми: %s"
 
 #: ../src/unstrip.c:1832
 #: ../src/unstrip.c:1911
 #, c-format
 msgid "cannot write output file: %s"
-msgstr ""
+msgstr "не вдалося записати файл виведених даних: %s"
 
 #: ../src/unstrip.c:1880
 #, c-format
 msgid "DWARF data not adjusted for prelinking bias; consider prelink -u"
-msgstr ""
+msgstr "Дані DWARF не скориговано відповідно до відхилення перед компонуванням; спробуйте виправити це командою prelink -u"
 
 #: ../src/unstrip.c:1883
 #, c-format
 msgid "DWARF data in '%s' not adjusted for prelinking bias; consider prelink -u"
-msgstr ""
+msgstr "Дані DWARF у «%s» не скориговано відповідно до відхилення перед компонуванням; спробуйте виправити це командою prelink -u"
 
 #: ../src/unstrip.c:1902
 #: ../src/unstrip.c:1942
@@ -5818,42 +5818,42 @@ msgstr ""
 #: ../src/unstrip.c:2034
 #, c-format
 msgid "cannot create ELF descriptor: %s"
-msgstr ""
+msgstr "не вдалося створити дескриптор ELF: %s"
 
 #: ../src/unstrip.c:1960
 #, c-format
 msgid "'%s' and '%s' do not seem to match"
-msgstr ""
+msgstr "«%s» і «%s» не відповідають одне одному"
 
 #: ../src/unstrip.c:1991
 #, c-format
 msgid "cannot find stripped file for module '%s': %s"
-msgstr ""
+msgstr "не вдалося знайти очищений файл для модуля «%s»: %s"
 
 #: ../src/unstrip.c:1995
 #, c-format
 msgid "cannot open stripped file '%s' for module '%s': %s"
-msgstr ""
+msgstr "не вдалося відкрити очищений файл «%s» для модуля «%s»: %s"
 
 #: ../src/unstrip.c:2010
 #, c-format
 msgid "cannot find debug file for module '%s': %s"
-msgstr ""
+msgstr "не вдалося знайти файл діагностичних даних для модуля «%s»: %s"
 
 #: ../src/unstrip.c:2014
 #, c-format
 msgid "cannot open debug file '%s' for module '%s': %s"
-msgstr ""
+msgstr "не вдалося відкрити файл діагностичних даних «%s» для модуля «%s»: %s"
 
 #: ../src/unstrip.c:2027
 #, c-format
 msgid "module '%s' file '%s' is not stripped"
-msgstr ""
+msgstr "у модулі «%s» файл «%s» не очищено strip"
 
 #: ../src/unstrip.c:2058
 #, c-format
 msgid "cannot cache section addresses for module '%s': %s"
-msgstr ""
+msgstr "не вдалося кешувати адреси розділів для модуля «%s»: %s"
 
 #: ../src/unstrip.c:2191
 #, c-format
@@ -5870,6 +5870,8 @@ msgid ""
 "STRIPPED-FILE DEBUG-FILE\n"
 "[MODULE...]"
 msgstr ""
+"ОЧИЩЕНИЙ-ФАЙЛ ФАЙЛ-DEBUG\n"
+"[МОДУЛЬ...]"
 
 #: ../src/unstrip.c:2248
 msgid ""
@@ -5884,6 +5886,17 @@ msgid ""
 "\tSTART+SIZE BUILDID FILE DEBUGFILE MODULENAME\n"
 "START and SIZE are hexadecimal giving the address bounds of the module.  BUILDID is hexadecimal for the build ID bits, or - if no ID is known; the hexadecimal may be followed by @0xADDR giving the address where the ID resides if that is known.  FILE is the file name found for the module, or - if none was found, or . if an ELF image is available but not from any named file.  DEBUGFILE is the separate debuginfo file name, or - if no debuginfo was found, or . if FILE contains the debug information."
 msgstr ""
+"Комбінувати очищені файли з окремими даними щодо символів та діагностичними даними.\vЗа використання першої форми команди, результати буде виведено до ФАЙЛА-DEBUG, якщо не файл виведених даних не вказано параметром -o.\n"
+"\n"
+"За допомогою аргументів МОДУЛЬ можна вказати шаблони назв файлів модулів, які слід обробити.\n"
+"З -f ці назви модулів відповідатимуть назві основного (очищеного strip) файла (похилі риски не є спеціальними символами), якщо ж -f не вказано, назви вважатимуться простими назвами модулів. Якщо аргументів не буде вказано, програма обробить всі знайдені модулі.\n"
+"\n"
+"Вказані модулі буде записано до файлів у КАТАЛОЗІ-ВИВОДУ, зі створенням, за потреби, підкаталогів. З параметром -m файли виведених даних створюватимуться за назвами модулів, якщо ж цього параметра вказано не буде, програма створюватиме файл з назвою основного файла у основному КАТАЛОЗІ-ВИВОДУ.\n"
+"\n"
+"Якщо буде вказано параметр -n, дані до файлів не виводитимуться, програма виведе для кожного модуля до стандартного виводу такі дані:\n"
+"\tПОЧАТОК+РОЗМІР ІДЕНТИФІКАТОР-ЗБИРАННЯ ФАЙЛ ФАЙЛ-DEBUG НАЗВА-МОДУЛЯ\n"
+"ПОЧАТОК і РОЗМІР буде виведено як шістнадцяткові числа у межах адресного простору модуля. ІДЕНТИФІКАТОР-ЗБИРАННЯ — це шістнадцяткове число, що відповідає бітам ідентифікатора збирання, або «-», якщо ідентифікатор невідомий; за шістнадцятковим числом може слідувати @0xАДРЕСА, яка вказує місце розташування ідентифікатора, якщо воно відоме. ФАЙЛ відповідає назві файла, знайденого для модуля, або «-», якщо файл не знайдено, і «.», якщо вдалося знайти образ ELF, але без жодного файла з назвою. "
+"ФАЙЛ-DEBUG — назва окремого файла діагностичних даних або «-», якщо файла діагностичних даних не вдалося знайти, і «.», якщо ФАЙЛ сам містить діагностичні дані."
 
 #: ../src/objdump.c:61
 msgid "Mode selection:"
@@ -5927,6 +5940,9 @@ msgid ""
 "RELOCATION RECORDS FOR [%s]:\n"
 "%-*s TYPE                 VALUE\n"
 msgstr ""
+"\n"
+"ЗАПИСИ ПЕРЕМІЩЕННЯ ДЛЯ [%s]:\n"
+"%-*s ТИП                  ЗНАЧЕННЯ\n"
 
 #: ../src/objdump.c:513
 msgid "OFFSET"

@@ -1,3 +1,8 @@
+2010-04-01  Petr Machata  <pmachata@redhat.com>
+
+	* elf_getdata.c (__elf_getdata_rdlock): Initialize data.s for data
+	that do not need a conversion.
+
 2010-03-11  Roland McGrath  <roland@redhat.com>
 
 	* elf.h: Update from glibc.

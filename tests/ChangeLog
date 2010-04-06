@@ -1,3 +1,10 @@
+2010-04-01  Petr Machata  <pmachata@redhat.com>
+
+	* test-flag-nobits.c: New test.
+	* run-test-flag-nobits.sh: And its wrapper.
+	* Makefile.am (noinst_PROGRAMS, TESTS): Add them.
+	(test_flag_nobits_LDADD): New variable.
+
 2010-02-15  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am: Use config/eu.am for common stuff.

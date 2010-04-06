@@ -1,5 +1,5 @@
 /* Report modules by examining dynamic linker data structures.
-   Copyright (C) 2008, 2009 Red Hat, Inc.
+   Copyright (C) 2008-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -123,8 +123,7 @@ auxv_format_probe (const void *auxv, size_t size,
     return false;
   }
 
-  size_t i;
-  for (i = 0; i < size / sizeof (Elf64_auxv_t); ++i)
+  for (size_t i = 0; i < size / sizeof (Elf64_auxv_t); ++i)
     {
       if (check64 (i))
 	{
@@ -132,18 +131,12 @@ auxv_format_probe (const void *auxv, size_t size,
 	  return true;
 	}
 
-      if (check32 (i))
+      if (check32 (i * 2) || check32 (i * 2 + 1))
 	{
 	  *elfclass = ELFCLASS32;
 	  return true;
 	}
     }
-  for (; i < size / sizeof (Elf64_auxv_t); ++i)
-    if (check32 (i))
-      {
-	*elfclass = ELFCLASS32;
-	return true;
-      }
 
   return false;
 }

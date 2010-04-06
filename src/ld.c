@@ -1,4 +1,4 @@
-/* Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009 Red Hat, Inc.
+/* Copyright (C) 2001-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -88,7 +88,7 @@ static const struct argp_option options[] =
   { "whole-archive", ARGP_whole_archive, NULL, 0,
     N_("Include whole archives in the output from now on."), 0 },
   { "no-whole-archive", ARGP_no_whole_archive, NULL, 0,
-    N_("Stop including the whole arhives in the output."), 0 },
+    N_("Stop including the whole archives in the output."), 0 },
   { NULL, 'l', N_("FILE"), OPTION_HIDDEN, NULL, 0 },
   { "start-group", '(', NULL, 0, N_("Start a group."), 0 },
   { "end-group", ')', NULL, 0, N_("End a group."), 0 },

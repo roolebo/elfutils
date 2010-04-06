@@ -1,5 +1,5 @@
 /* Error handling in libelf.
-   Copyright (C) 1998,1999,2000,2002,2003,2004,2005,2006,2009 Red Hat, Inc.
+   Copyright (C) 1998-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -185,10 +185,10 @@ static const char msgstr[] =
   "\0"
 #define ELF_E_FD_MISMATCH_IDX \
   (ELF_E_FD_DISABLED_IDX + sizeof "file descriptor disabled")
-  N_("archive/member fildes mismatch")
+  N_("archive/member file descriptor mismatch")
   "\0"
 #define ELF_E_OFFSET_RANGE_IDX \
-  (ELF_E_FD_MISMATCH_IDX + sizeof "archive/member fildes mismatch")
+  (ELF_E_FD_MISMATCH_IDX + sizeof "archive/member file descriptor mismatch")
   N_("offset out of range")
   "\0"
 #define ELF_E_NOT_NUL_SECTION_IDX \

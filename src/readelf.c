@@ -2632,6 +2632,7 @@ print_hash_info (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx,
     {
       uint64_t success = 0;
 
+      /* xgettext:no-c-format */
       fputs_unlocked (gettext ("\
  Length  Number  % of total  Coverage\n"), stdout);
       printf (gettext ("      0  %6" PRIu32 "      %5.1f%%\n"),

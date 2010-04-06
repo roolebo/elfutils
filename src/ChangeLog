@@ -1,3 +1,11 @@
+2010-04-06  Roland McGrath  <roland@redhat.com>
+
+	* ld.c (options): Fix some typos in messages.
+	* elflint.c (check_scn_group, check_group): Likewise.
+	* ldscript.y (add_id_list): Likewise.
+	* readelf.c (print_hash_info): Add xgettext:no-c-format magic comment
+	before translated string containing a literal %.
+
 2010-02-26  Roland McGrath  <roland@redhat.com>
 
 	* readelf.c (process_file): Don't leak an fd in failure case.

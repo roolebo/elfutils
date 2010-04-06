@@ -571,7 +571,7 @@ section [%2d] '%s': section with SHF_GROUP flag set not part of a section group\
 	       idx, section_name (ebl, idx));
       else
 	ERROR (gettext ("\
-section [%2d] '%s': section group [%2zu] '%s' does not preceed group member\n"),
+section [%2d] '%s': section group [%2zu] '%s' does not precede group member\n"),
 	       idx, section_name (ebl, idx),
 	       cnt, section_name (ebl, cnt));
     }
@@ -2434,7 +2434,7 @@ section [%2d] '%s': cannot get symbol for signature\n"),
       else if (strcmp (elf_strptr (ebl->elf, symshdr->sh_link, sym->st_name),
 		       "") == 0)
 	ERROR (gettext ("\
-section [%2d] '%s': signature symbol canot be empty string\n"),
+section [%2d] '%s': signature symbol cannot be empty string\n"),
 	       idx, section_name (ebl, idx));
 
       if (be_strict

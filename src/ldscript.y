@@ -1,6 +1,6 @@
 %{
 /* Parser for linker scripts.
-   Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2001-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -743,9 +743,9 @@ add_id_list (const char *versionname, struct id_list *runp, _Bool local)
 	    if (defp != NULL && defp->u.s.local != local)
 	      error (EXIT_FAILURE, 0, versionname[0] == '\0'
 		     ? gettext ("\
-symbol '%s' in declared both local and global for unnamed version")
+symbol '%s' is declared both local and global for unnamed version")
 		     : gettext ("\
-symbol '%s' in declared both local and global for version '%s'"),
+symbol '%s' is declared both local and global for version '%s'"),
 		     runp->id, versionname);
 	  }
 	else

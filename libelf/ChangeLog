@@ -1,3 +1,8 @@
+2010-04-06  Roland McGrath  <roland@redhat.com>
+
+	* elf_error.c (ELF_E_FD_MISMATCH_IDX): Avoid nonobvious abbreviation
+	in error message.
+
 2010-04-01  Petr Machata  <pmachata@redhat.com>
 
 	* elf_getdata.c (__elf_getdata_rdlock): Initialize data.s for data

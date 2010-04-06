@@ -467,9 +467,12 @@ __elf_getdata_rdlock (scn, data)
 			scn->rawdata.d.d_size, scn->rawdata.d.d_type);
 	}
       else
-	/* This is an empty or NOBITS section.  There is no buffer but
-	   the size information etc is important.  */
-	scn->data_list.data.d = scn->rawdata.d;
+	{
+	  /* This is an empty or NOBITS section.  There is no buffer but
+	     the size information etc is important.  */
+	  scn->data_list.data.d = scn->rawdata.d;
+	  scn->data_list.data.s = scn;
+	}
 
       scn->data_list_rear = &scn->data_list;
     }

@@ -1,5 +1,5 @@
 /* List the relocation types for arm.  -*- C -*-
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -26,8 +26,8 @@
 /*	    NAME,		REL|EXEC|DYN	*/
 
 RELOC_TYPE (NONE,		REL) /* It really is used in ET_REL on ARM.  */
-RELOC_TYPE (PC24,		REL)
-RELOC_TYPE (ABS32,		REL)
+RELOC_TYPE (PC24,		REL|EXEC|DYN)
+RELOC_TYPE (ABS32,		REL|EXEC|DYN)
 RELOC_TYPE (REL32,		REL)
 RELOC_TYPE (PC13,		REL)
 RELOC_TYPE (ABS16,		REL)

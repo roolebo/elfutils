@@ -1,3 +1,7 @@
+2010-04-10  Ulrich Drepper  <drepper@redhat.com>
+
+	* msg_tst.c: Adjust expected error message.
+
 2010-04-01  Petr Machata  <pmachata@redhat.com>
 
 	* test-flag-nobits.c: New test.

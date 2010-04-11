@@ -64,7 +64,7 @@ static struct
     { ELF_E_INVALID_COMMAND, "invalid command" },
     { ELF_E_WRONG_ORDER_EHDR, "executable header not created first" },
     { ELF_E_FD_DISABLED, "file descriptor disabled" },
-    { ELF_E_FD_MISMATCH, "archive/member fildes mismatch" },
+    { ELF_E_FD_MISMATCH, "archive/member file descriptor mismatch" },
     { ELF_E_OFFSET_RANGE, "offset out of range" },
     { ELF_E_NOT_NUL_SECTION, "cannot manipulate null section" },
     { ELF_E_DATA_MISMATCH, "data/scn mismatch" },

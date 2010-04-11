@@ -54,3 +54,38 @@ sh_reloc_simple_type (Ebl *ebl __attribute__ ((unused)), int type)
       return ELF_T_NUM;
     }
 }
+
+/* Check whether machine flags are valid.  */
+bool
+sh_machine_flag_check (GElf_Word flags)
+{
+  switch (flags & EF_SH_MACH_MASK)
+    {
+    case EF_SH_UNKNOWN:
+    case EF_SH1:
+    case EF_SH2:
+    case EF_SH3:
+    case EF_SH_DSP:
+    case EF_SH3_DSP:
+    case EF_SH4AL_DSP:
+    case EF_SH3E:
+    case EF_SH4:
+    case EF_SH2E:
+    case EF_SH4A:
+    case EF_SH2A:
+    case EF_SH4_NOFPU:
+    case EF_SH4A_NOFPU:
+    case EF_SH4_NOMMU_NOFPU:
+    case EF_SH2A_NOFPU:
+    case EF_SH3_NOMMU:
+    case EF_SH2A_SH4_NOFPU:
+    case EF_SH2A_SH3_NOFPU:
+    case EF_SH2A_SH4:
+    case EF_SH2A_SH3E:
+      break;
+    default:
+      return false;
+    }
+
+  return ((flags &~ (EF_SH_MACH_MASK)) == 0);
+}

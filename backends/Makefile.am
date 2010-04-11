@@ -52,7 +52,7 @@ cpu_i386 = ../libcpu/libcpu_i386.a
 libebl_i386_pic_a_SOURCES = $(i386_SRCS)
 am_libebl_i386_pic_a_OBJECTS = $(i386_SRCS:.c=.os)
 
-sh_SRCS = sh_init.c sh_symbol.c
+sh_SRCS = sh_init.c sh_symbol.c sh_corenote.c sh_regs.c sh_retval.c
 libebl_sh_pic_a_SOURCES = $(sh_SRCS)
 am_libebl_sh_pic_a_OBJECTS = $(sh_SRCS:.c=.os)
 

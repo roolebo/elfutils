@@ -1,3 +1,12 @@
+2010-04-10  Matt Fleming  <matt@console-pimps.org>
+
+	* sh_corenote.c: New file.
+	* sh_regs.c: New file.
+	* sh_retval.c: New file.
+	* sh_symbol.c (sh_machine_flag_check): New function.
+	* Makefile.am (sh_SRCS): Add new files.
+	* sh_init.c (sh_init): Add initializers.
+
 2010-04-07  Roland McGrath  <roland@redhat.com>
 
 	* arm_reloc.def: Accept PC24 and ABS32 in EXEC|DYN too.

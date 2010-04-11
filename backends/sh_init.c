@@ -51,6 +51,11 @@ sh_init (elf, machine, eh, ehlen)
   eh->name = "Hitachi SH";
   sh_init_reloc (eh);
   HOOK (eh, reloc_simple_type);
+  HOOK (eh, gotpc_reloc_check);
+  HOOK (eh, machine_flag_check);
+  HOOK (eh, core_note);
+  HOOK (eh, register_info);
+  HOOK (eh, return_value_location);
 
   return MODVERSION;
 }

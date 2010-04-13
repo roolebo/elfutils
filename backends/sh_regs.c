@@ -1,6 +1,7 @@
 /* Register names and numbers for SH DWARF.
-   Copyright (C) 2010 Matt Fleming <matt@console-pimps.org>
+   Copyright (C) 2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
+   Contributed by Matt Fleming <matt@console-pimps.org>.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by the

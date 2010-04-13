@@ -1,6 +1,6 @@
-2010-04-10  Matt Fleming  <matt@console-pimps.org>
+2010-04-13  Roland McGrath  <roland@redhat.com>
 
-	* elf.h: Add SH specific ELF header flags.
+	* elf.h: Update from glibc.
 
 2010-04-06  Roland McGrath  <roland@redhat.com>
 

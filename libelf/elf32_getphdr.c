@@ -105,7 +105,7 @@ __elfw2(LIBELFBITS,getphdr_wrlock) (elf)
 
       size_t size = phnum * sizeof (ElfW2(LIBELFBITS,Phdr));
 
-      if (ehdr->e_phoff < elf->maximum_size
+      if (ehdr->e_phoff > elf->maximum_size
 	  || elf->maximum_size - ehdr->e_phoff < size)
 	{
 	  __libelf_seterrno (ELF_E_INVALID_DATA);

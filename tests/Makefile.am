@@ -116,7 +116,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-find-prologues.sh run-allregs.sh run-native-test.sh \
 	     run-addrname-test.sh run-dwfl-bug-offline-rel.sh \
 	     run-dwfl-addr-sect.sh run-early-offscn.sh \
-	     run-dwarf-getmacros.sh \
+	     run-dwarf-getmacros.sh run-test-flag-nobits.sh \
 	     testfile15.bz2 testfile15.debug.bz2 \
 	     testfile16.bz2 testfile16.debug.bz2 \
 	     testfile17.bz2 testfile17.debug.bz2 \

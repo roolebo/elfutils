@@ -6731,16 +6731,25 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
 	  {
 	    unsigned int bit = ((void *) i - data) * 8;
 	    unsigned int w = negate ? ~*i : *i;
+	    unsigned int run = 0;
 	    while (w != 0)
 	      {
 		int n = ffs (w);
 		w >>= n;
 		bit += n;
 
-		if (lastbit + 1 != bit)
-		  p += sprintf (p, "-%u,%u", lastbit - bias, bit - bias);
-		else if (lastbit == 0)
-		  p += sprintf (p, "%u", bit - bias);
+		if (lastbit + 1 == bit)
+		  ++run;
+		else
+		  {
+		    if (lastbit == 0)
+		      p += sprintf (p, "%u", bit - bias);
+		    else if (run == 0)
+		      p += sprintf (p, ",%u", bit - bias);
+		    else
+		      p += sprintf (p, "-%u,%u", lastbit - bias, bit - bias);
+		    run = 0;
+		  }
 
 		lastbit = bit;
 	      }

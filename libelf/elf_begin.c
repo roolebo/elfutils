@@ -326,11 +326,9 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 	  elf->state.elf32.ehdr = ehdr;
 	  elf->state.elf32.shdr
 	    = (Elf32_Shdr *) ((char *) ehdr + ehdr->e_shoff);
-	  if (ehdr->e_phnum > 0)
-	    /* Assign a value only if there really is a program
-	       header.  Otherwise the value remains NULL.  */
-	    elf->state.elf32.phdr
-	      = (Elf32_Phdr *) ((char *) ehdr + ehdr->e_phoff);
+
+	  /* Don't precache the phdr pointer here.
+	     elf32_getphdr will validate it against the size when asked.  */
 
 	  for (size_t cnt = 0; cnt < scncnt; ++cnt)
 	    {
@@ -414,11 +412,9 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 	  elf->state.elf64.ehdr = ehdr;
 	  elf->state.elf64.shdr
 	    = (Elf64_Shdr *) ((char *) ehdr + ehdr->e_shoff);
-	  if (ehdr->e_phnum > 0)
-	    /* Assign a value only if there really is a program
-	       header.  Otherwise the value remains NULL.  */
-	    elf->state.elf64.phdr
-	      = (Elf64_Phdr *) ((char *) ehdr + ehdr->e_phoff);
+
+	  /* Don't precache the phdr pointer here.
+	     elf64_getphdr will validate it against the size when asked.  */
 
 	  for (size_t cnt = 0; cnt < scncnt; ++cnt)
 	    {

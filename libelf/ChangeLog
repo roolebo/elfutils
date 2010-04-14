@@ -1,3 +1,8 @@
+2010-04-14  Roland McGrath  <roland@redhat.com>
+
+	* elf32_getphdr.c: Check for e_phoff/size outside the file bounds.
+	* elf_begin.c (file_read_elf): Don't set .phdr here.
+
 2010-04-13  Roland McGrath  <roland@redhat.com>
 
 	* elf.h: Update from glibc.

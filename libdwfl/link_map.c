@@ -329,7 +329,13 @@ report_r_debug (uint_fast8_t elfclass, uint_fast8_t elfdata,
 
   Dwfl_Module **lastmodp = &dwfl->modulelist;
   int result = 0;
-  while (next != 0)
+
+  /* There can't be more elements in the link_map list than there are
+     segments.  DWFL->lookup_elts is probably twice that number, so it
+     is certainly above the upper bound.  If we iterate too many times,
+     there must be a loop in the pointers due to link_map clobberation.  */
+  size_t iterations = 0;
+  while (next != 0 && ++iterations < dwfl->lookup_elts)
     {
       if (read_addrs (next, 4))
 	return release_buffer (-1);
@@ -798,7 +804,7 @@ dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 			   ? elf32_xlatetom : elf64_xlatetom)
 			  (&out, &in, elfdata) != NULL))
 		{
-		  /* We are looking for PT_DYNAMIC.  */
+		  /* We are looking for DT_DEBUG.  */
 		  const union
 		  {
 		    Elf32_Dyn d32[dyn_filesz / sizeof (Elf32_Dyn)];

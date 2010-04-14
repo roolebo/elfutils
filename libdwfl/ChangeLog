@@ -1,3 +1,8 @@
+2010-04-14  Roland McGrath  <roland@redhat.com>
+
+	* link_map.c (report_r_debug): Limit iterations on the l_next chain to
+	an upper bound on sane possible number of elements.
+
 2010-03-11  Roland McGrath  <roland@redhat.com>
 
 	* link_map.c (auxv_format_probe): Fix scanning loop, so we really scan

@@ -1,3 +1,9 @@
+2010-04-14  Roland McGrath  <roland@redhat.com>
+
+	* gettext.m4: Upgrade to gettext-0.17.
+	* iconv.m4: Upgrade to gettext-0.17.
+	* po.m4: Upgrade to gettext-0.17.
+
 2009-08-26  Roland McGrath  <roland@redhat.com>
 
 	* zip.m4 (eu_ZIPLIB): Don't apply lib/LIB suffix to args.

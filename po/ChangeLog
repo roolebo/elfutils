@@ -1,3 +1,10 @@
+2010-04-14  Roland McGrath  <roland@redhat.com>
+
+	* POTFILES.in: Add libdwfl/libdwflP.h.
+
+	* LINGUAS: New file.
+	* Makefile.in.in: Upgrade to gettext-0.17.
+
 2009-01-23  Ulrich Drepper  <drepper@redhat.com>
 
 	* Makevars (XGETTEXT_OPTIONS): Add --flag option for argp_error.

@@ -1,3 +1,7 @@
+2010-04-15  Roland McGrath  <roland@redhat.com>
+
+	* eu.am (DEFS): Add -DLOCALEDIR=... here.
+
 2010-02-15  Roland McGrath  <roland@redhat.com>
 
 	* eu.am: New file.

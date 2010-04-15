@@ -90,14 +90,6 @@ LDFLAGS="$save_LDFLAGS"])
 AS_IF([test "x$ac_cv_tls" != xyes],
       AC_MSG_ERROR([__thread support required]))
 
-LOCALEDIR=$localedir
-AC_SUBST(LOCALEDIR)
-AC_DEFINE_UNQUOTED(LOCALEDIR, "$LOCALEDIR")
-AH_TEMPLATE([LOCALEDIR], [Directory to place translation files in.])
-
-DATADIRNAME=$datadir
-AC_SUBST(DATADIRNAME)
-
 dnl This test must come as early as possible after the compiler configuration
 dnl tests, because the choice of the file model can (in principle) affect
 dnl whether functions and headers are available, whether they work, etc.

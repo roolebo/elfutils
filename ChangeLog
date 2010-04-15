@@ -1,3 +1,7 @@
+2010-04-15  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac (LOCALEDIR): Use $localedir, not $datadir.
+
 2009-09-21  Ulrich Drepper  <drepper@redhat.com>
 
 	* configure.ac: Update for more modern autoconf.

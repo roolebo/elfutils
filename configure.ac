@@ -90,7 +90,7 @@ LDFLAGS="$save_LDFLAGS"])
 AS_IF([test "x$ac_cv_tls" != xyes],
       AC_MSG_ERROR([__thread support required]))
 
-LOCALEDIR=$datadir
+LOCALEDIR=$localedir
 AC_SUBST(LOCALEDIR)
 AC_DEFINE_UNQUOTED(LOCALEDIR, "$LOCALEDIR")
 AH_TEMPLATE([LOCALEDIR], [Directory to place translation files in.])

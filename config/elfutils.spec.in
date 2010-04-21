@@ -183,6 +183,9 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
+* Wed Apr 21 2010  <drepper@redhat.com> 0.146-1
+- libdwfl: New function dwfl_core_file_report.
+
 * Tue Feb 23 2010 Ulrich Drepper <drepper@redhat.com> 0.145-1
 - Fix build with --disable-dependency-tracking.
 - Fix build with most recent glibc headers.

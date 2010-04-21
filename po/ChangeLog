@@ -1,3 +1,8 @@
+2010-04-21  Ulrich Drepper  <drepper@redhat.com>
+
+	* LINGUAS: Remove fr.po, it.po, nl.po, ru.po, zh_CN.  The files
+	contain no translations at all.
+
 2010-04-14  Roland McGrath  <roland@redhat.com>
 
 	* POTFILES.in: Add libdwfl/libdwflP.h.

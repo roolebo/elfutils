@@ -1,5 +1,9 @@
 2010-04-22  Roland McGrath  <roland@redhat.com>
 
+	* cfi.c (execute_cfi): Track last-set CFA regno and offset even
+	through DW_CFA_def_cfa_expression so DW_CFA_def_cfa_* can reset
+	to an offset rule and respecify only one or the other.
+
 	* cfi.c (execute_cfi): Never return without cleanup.
 	Free FS on failure.
 	(cie_cache_initial_state): Adjust caller to expect that free.

@@ -1,5 +1,5 @@
 /* Test program for CFI handling.
-   Copyright (C) 2009 Red Hat, Inc.
+   Copyright (C) 2009-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -100,7 +100,7 @@ handle_cfi (Dwfl *dwfl, const char *which, Dwarf_CFI *cfi,
   int result = dwarf_cfi_addrframe (cfi, pc - stuff->bias, &stuff->frame);
   if (result != 0)
     {
-      error (0, 0, "dwarf_addrframe (%s): %s", which, dwfl_errmsg (-1));
+      error (0, 0, "dwarf_cfi_addrframe (%s): %s", which, dwarf_errmsg (-1));
       return 1;
     }
 

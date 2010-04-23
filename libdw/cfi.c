@@ -1,5 +1,5 @@
 /* CFI program execution.
-   Copyright (C) 2009 Red Hat, Inc.
+   Copyright (C) 2009-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -76,7 +76,8 @@ duplicate_frame_state (const Dwarf_Frame *original,
   return copy;
 }
 
-/* Returns a DWARF_E_* error code, usually NOERROR or INVALID_CFI.  */
+/* Returns a DWARF_E_* error code, usually NOERROR or INVALID_CFI.
+   Frees *STATE on failure.  */
 static int
 execute_cfi (Dwarf_CFI *cache,
 	     const struct dwarf_cie *cie,
@@ -152,10 +153,11 @@ execute_cfi (Dwarf_CFI *cache,
 	  goto advance_loc;
 
 	case DW_CFA_set_loc:
-	  if (unlikely (read_encoded_value (cache, cie->fde_encoding, &program,
-					    &loc)))
-	    return INTUSE(dwarf_errno) ();
-	  break;
+	  if (likely (!read_encoded_value (cache, cie->fde_encoding,
+					   &program, &loc)))
+	    break;
+	  result = INTUSE(dwarf_errno) ();
+	  goto out;
 
 	  /* Now all following cases affect this row, but do not touch LOC.
 	     These cases end with 'continue'.  We only get out of the
@@ -323,8 +325,8 @@ execute_cfi (Dwarf_CFI *cache,
 	    cfi_assert (prev != NULL);
 	    free (fs);
 	    fs = prev;
+	    continue;
 	  }
-	  continue;
 
 	case DW_CFA_nop:
 	  continue;
@@ -395,8 +397,10 @@ execute_cfi (Dwarf_CFI *cache,
       free (prev);
     }
 
-  if (result == DWARF_E_NOERROR)
+  if (likely (result == DWARF_E_NOERROR))
     *state = fs;
+  else
+    free (fs);
 
   return result;
 }
@@ -458,16 +462,13 @@ cie_cache_initial_state (Dwarf_CFI *cache, struct dwarf_cie *cie)
 			  cie->initial_instructions_end, false,
 			  0, (Dwarf_Addr) -1l);
 
-  if (unlikely (result != DWARF_E_NOERROR))
+  if (likely (result == DWARF_E_NOERROR))
     {
-      free (cie_fs);
-      return result;
+      /* Now we have the initial state of things that all
+	 FDEs using this CIE will start from.  */
+      cie_fs->cache = cache;
+      cie->initial_state = cie_fs;
     }
-
-  /* Now we have the initial state of things that all
-     FDEs using this CIE will start from.  */
-  cie_fs->cache = cache;
-  cie->initial_state = cie_fs;
 
   return result;
 }
@@ -491,9 +492,7 @@ __libdw_frame_at_address (Dwarf_CFI *cache, struct dwarf_fde *fde,
       result = execute_cfi (cache, fde->cie, &fs,
 			    fde->instructions, fde->instructions_end, false,
 			    fde->start, address);
-      if (unlikely (result != DWARF_E_NOERROR))
-	free (fs);
-      else
+      if (likely (result == DWARF_E_NOERROR))
 	*frame = fs;
     }
   return result;

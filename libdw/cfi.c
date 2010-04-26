@@ -124,12 +124,6 @@ execute_cfi (Dwarf_CFI *cache,
     fs->regs[regno].value = (r_value);			\
   } while (0)
 
-  /* These are the last-set values from DW_CFA_def_cfa* operations.
-     They are hidden by a DW_CFA_def_cfa_expression operation but can
-     pop out again if DW_CFA_def_cfa_* is used afterwards.  */
-  Dwarf_Word last_cfa_regno = -1;
-  Dwarf_Word last_cfa_offset = -1;
-
   while (program < end)
     {
       uint8_t opcode = *program++;
@@ -170,47 +164,39 @@ execute_cfi (Dwarf_CFI *cache,
 	     switch block for the row-copying (LOC-moving) cases above.  */
 
 	case DW_CFA_def_cfa:
-	  get_uleb128 (last_cfa_regno, program);
-	  get_uleb128 (last_cfa_offset, program);
+	  get_uleb128 (operand, program);
+	  get_uleb128 (offset, program);
 	def_cfa:
-	  cfi_assert (last_cfa_regno != (Dwarf_Word) -1);
-	  cfi_assert (last_cfa_offset != (Dwarf_Word) -1);
 	  fs->cfa_rule = cfa_offset;
-	  fs->cfa_val_reg = last_cfa_regno;
-	  fs->cfa_val_offset = last_cfa_offset;
+	  fs->cfa_val_reg = operand;
+	  fs->cfa_val_offset = offset;
 	  /* Prime the rest of the Dwarf_Op so dwarf_frame_cfa can use it.  */
 	  fs->cfa_data.offset.atom = DW_OP_bregx;
 	  fs->cfa_data.offset.offset = 0;
 	  continue;
 
 	case DW_CFA_def_cfa_register:
-	  get_uleb128 (last_cfa_regno, program);
-	  if (fs->cfa_rule == cfa_expr)
-	    goto def_cfa;
-	  else
-	    cfi_assert (fs->cfa_rule == cfa_offset);
-	  fs->cfa_val_reg = last_cfa_regno;
+	  get_uleb128 (regno, program);
+	  cfi_assert (fs->cfa_rule == cfa_offset);
+	  fs->cfa_val_reg = regno;
 	  continue;
 
 	case DW_CFA_def_cfa_sf:
-	  get_uleb128 (last_cfa_regno, program);
+	  get_uleb128 (operand, program);
 	  get_sleb128 (sf_offset, program);
 	  offset = sf_offset * cie->data_alignment_factor;
 	  goto def_cfa;
 
 	case DW_CFA_def_cfa_offset:
-	  get_uleb128 (last_cfa_offset, program);
+	  get_uleb128 (offset, program);
 	def_cfa_offset:
-	  if (fs->cfa_rule == cfa_expr)
-	    goto def_cfa;
-	  else
-	    cfi_assert (fs->cfa_rule == cfa_offset);
-	  fs->cfa_val_offset = last_cfa_offset;
+	  cfi_assert (fs->cfa_rule == cfa_offset);
+	  fs->cfa_val_offset = offset;
 	  continue;
 
 	case DW_CFA_def_cfa_offset_sf:
 	  get_sleb128 (sf_offset, program);
-	  last_cfa_offset = sf_offset * cie->data_alignment_factor;
+	  offset = sf_offset * cie->data_alignment_factor;
 	  goto def_cfa_offset;
 
 	case DW_CFA_def_cfa_expression:

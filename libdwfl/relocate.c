@@ -1,5 +1,5 @@
 /* Relocate debug information.
-   Copyright (C) 2005-2009 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -325,6 +325,15 @@ relocate_section (Dwfl_Module *mod, Elf *relocated, const GElf_Ehdr *ehdr,
   {
     /* First see if this is a reloc we can handle.
        If we are skipping it, don't bother resolving the symbol.  */
+
+    if (unlikely (rtype == 0))
+      /* In some odd situations, the linker can leave R_*_NONE relocs
+	 behind.  This is probably bogus ld -r behavior, but the only
+	 cases it's known to appear in are harmless: DWARF data
+	 referring to addresses in a section that has been discarded.
+	 So we just pretend it's OK without further relocation.  */
+      return DWFL_E_NOERROR;
+
     Elf_Type type = ebl_reloc_simple_type (mod->ebl, rtype);
     if (unlikely (type == ELF_T_NUM))
       return DWFL_E_BADRELTYPE;

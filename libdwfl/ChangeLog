@@ -1,3 +1,9 @@
+2010-04-26  Roland McGrath  <roland@redhat.com>
+
+	* relocate.c (relocate_section): Treat R_*_NONE reloc as no reloc.
+	Works around probably-wrong ld -r behavior for case of a DWARF address
+	constant that refers to a discarded SHF_ALLOC section.
+
 2010-04-14  Roland McGrath  <roland@redhat.com>
 
 	* link_map.c (report_r_debug): Limit iterations on the l_next chain to

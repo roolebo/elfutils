@@ -1,3 +1,12 @@
+2010-04-26  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_getlocation.c (__libdw_intern_expression): Take new arg CFAP.
+	Prepend DW_OP_call_frame_cfa if true.
+	(getlocation): Update caller.
+	* dwarf_frame_cfa.c (dwarf_frame_cfa): Likewise.
+	* dwarf_frame_register.c (dwarf_frame_register): Likewise.
+	* libdwP.h: Update decl.
+
 2010-04-22  Roland McGrath  <roland@redhat.com>
 
 	* cfi.c (execute_cfi): Track last-set CFA regno and offset even

@@ -433,10 +433,10 @@ extern int __libdw_intern_expression (Dwarf *dbg,
 				      bool other_byte_order,
 				      unsigned int address_size,
 				      void **cache, const Dwarf_Block *block,
-				      bool valuep,
+				      bool cfap, bool valuep,
 				      Dwarf_Op **llbuf, size_t *listlen,
 				      int sec_index)
-  __nonnull_attribute__ (4, 5, 7, 8) internal_function;
+  __nonnull_attribute__ (4, 5, 8, 9) internal_function;
 
 
 /* Return error code of last failing function call.  This value is kept

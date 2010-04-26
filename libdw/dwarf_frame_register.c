@@ -1,5 +1,5 @@
 /* Get register location expression for frame.
-   Copyright (C) 2009 Red Hat, Inc.
+   Copyright (C) 2009-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -131,7 +131,7 @@ dwarf_frame_register (fs, regno, ops_mem, ops, nops)
 				       fs->cache->other_byte_order,
 				       address_size,
 				       &fs->cache->expr_tree, &block,
-				       reg->rule == reg_val_expression,
+				       true, reg->rule == reg_val_expression,
 				       ops, nops, IDX_debug_frame) < 0)
 	  return -1;
 	break;

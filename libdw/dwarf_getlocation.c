@@ -1,5 +1,5 @@
 /* Return location expression list.
-   Copyright (C) 2000-2009 Red Hat, Inc.
+   Copyright (C) 2000-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -221,7 +221,8 @@ int
 internal_function
 __libdw_intern_expression (Dwarf *dbg,
 			   bool other_byte_order, unsigned int address_size,
-			   void **cache, const Dwarf_Block *block, bool valuep,
+			   void **cache, const Dwarf_Block *block,
+			   bool cfap, bool valuep,
 			   Dwarf_Op **llbuf, size_t *listlen, int sec_index)
 {
   /* Check whether we already looked at this list.  */
@@ -444,6 +445,9 @@ __libdw_intern_expression (Dwarf *dbg,
       ++n;
     }
 
+  if (cfap)
+    ++n;
+
   /* Allocate the array.  */
   Dwarf_Op *result;
   if (dbg != NULL)
@@ -462,6 +466,16 @@ __libdw_intern_expression (Dwarf *dbg,
   /* Store the result.  */
   *llbuf = result;
   *listlen = n;
+
+  if (cfap)
+    {
+      /* Synthesize the operation to push the CFA before the expression.  */
+      --n;
+      result[0].atom = DW_OP_call_frame_cfa;
+      result[0].number = 0;
+      result[0].number2 = 0;
+      result[0].offset = -1;
+    }
 
   do
     {
@@ -507,7 +521,8 @@ getlocation (struct Dwarf_CU *cu, const Dwarf_Block *block,
 	     Dwarf_Op **llbuf, size_t *listlen, int sec_index)
 {
   return __libdw_intern_expression (cu->dbg, cu->dbg->other_byte_order,
-				    cu->address_size, &cu->locs, block, false,
+				    cu->address_size, &cu->locs, block,
+				    false, false,
 				    llbuf, listlen, sec_index);
 }
 

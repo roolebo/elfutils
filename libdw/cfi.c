@@ -117,6 +117,12 @@ execute_cfi (Dwarf_CFI *cache,
       return true;
     }
 
+  inline void require_cfa_offset (void)
+  {
+    if (unlikely (fs->cfa_rule != cfa_offset))
+      fs->cfa_rule = cfa_invalid;
+  }
+
 #define register_rule(regno, r_rule, r_value) do {	\
     if (unlikely (! enough_registers (regno)))		\
       goto out;						\
@@ -177,7 +183,7 @@ execute_cfi (Dwarf_CFI *cache,
 
 	case DW_CFA_def_cfa_register:
 	  get_uleb128 (regno, program);
-	  cfi_assert (fs->cfa_rule == cfa_offset);
+	  require_cfa_offset ();
 	  fs->cfa_val_reg = regno;
 	  continue;
 
@@ -190,7 +196,7 @@ execute_cfi (Dwarf_CFI *cache,
 	case DW_CFA_def_cfa_offset:
 	  get_uleb128 (offset, program);
 	def_cfa_offset:
-	  cfi_assert (fs->cfa_rule == cfa_offset);
+	  require_cfa_offset ();
 	  fs->cfa_val_offset = offset;
 	  continue;
 

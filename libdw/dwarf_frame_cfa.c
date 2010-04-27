@@ -88,6 +88,11 @@ dwarf_frame_cfa (fs, ops, nops)
 	 ops, nops, IDX_debug_frame);
       break;
 
+    case cfa_invalid:
+      __libdw_seterrno (DWARF_E_INVALID_CFI);
+      result = -1;
+      break;
+
     default:
       abort ();
     }

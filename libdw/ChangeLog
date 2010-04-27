@@ -1,5 +1,10 @@
 2010-04-26  Roland McGrath  <roland@redhat.com>
 
+	* cfi.h (struct Dwarf_Frame_s): Add cfa_invalid alternative in cfa_rule.
+	* cfi.c (execute_cfi): Set that instead of doing cfi_assert for
+	DW_CFA_def_cfa_{offset*,register} when a non-offset rule is in force.
+	* dwarf_frame_cfa.c (dwarf_frame_cfa): Handle cfa_invalid.
+
 	* dwarf_getlocation.c (__libdw_intern_expression): Take new arg CFAP.
 	Prepend DW_OP_call_frame_cfa if true.
 	(getlocation): Update caller.

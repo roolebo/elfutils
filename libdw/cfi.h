@@ -1,5 +1,5 @@
 /* Internal definitions for libdw CFI interpreter.
-   Copyright (C) 2009 Red Hat, Inc.
+   Copyright (C) 2009-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -191,8 +191,11 @@ struct Dwarf_Frame_s
      which has the return_address_register and signal_frame flag.  */
   struct dwarf_fde *fde;
 
-  /* The CFA is unknown, is R+N, or is computed by a DWARF expression.  */
-  enum { cfa_undefined, cfa_offset, cfa_expr } cfa_rule;
+  /* The CFA is unknown, is R+N, or is computed by a DWARF expression.
+     A bogon in the CFI can indicate an invalid/incalculable rule.
+     We store that as cfa_invalid rather than barfing when processing it,
+     so callers can ignore the bogon unless they really need that CFA.  */
+  enum { cfa_undefined, cfa_offset, cfa_expr, cfa_invalid } cfa_rule;
   union
   {
     Dwarf_Op offset;

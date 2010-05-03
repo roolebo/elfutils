@@ -1,3 +1,9 @@
+Version 0.147:
+
+libdw: Fixes in CFI handling, best possible handling of bogus CFA ops.
+
+libdwfl: Ignore R_*_NONE relocs, works around old (binutils) ld -r bugs.
+
 Version 0.146:
 
 libdwfl: New function dwfl_core_file_report.

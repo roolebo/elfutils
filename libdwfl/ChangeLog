@@ -1,3 +1,9 @@
+2010-05-04  Roland McGrath  <roland@redhat.com>
+
+	* core-file.c (dwfl_core_file_report): Return any nonzero count of
+	modules reported, even if link_map grovelling failed and only sniffing
+	found anything.
+
 2010-04-26  Roland McGrath  <roland@redhat.com>
 
 	* relocate.c (relocate_section): Treat R_*_NONE reloc as no reloc.

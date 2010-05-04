@@ -419,6 +419,7 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf)
     return ndx;
 
   /* Now sniff segment contents for modules.  */
+  int sniffed = 0;
   ndx = 0;
   do
     {
@@ -427,7 +428,13 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf)
 					    core_file_read_eagerly, elf);
       if (unlikely (seg < 0))
 	return seg;
-      ndx = seg > ndx ? seg : ndx + 1;
+      if (seg > ndx)
+	{
+	  ndx = seg;
+	  ++sniffed;
+	}
+      else
+	++ndx;
     }
   while (ndx < (int) phnum);
 
@@ -465,7 +472,13 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf)
   /* Now we have NT_AUXV contents.  From here on this processing could be
      used for a live process with auxv read from /proc.  */
 
-  return dwfl_link_map_report (dwfl, auxv, auxv_size,
-			       dwfl_elf_phdr_memory_callback, elf);
+  int listed = dwfl_link_map_report (dwfl, auxv, auxv_size,
+				     dwfl_elf_phdr_memory_callback, elf);
+
+  /* We return the number of modules we found if we found any.
+     If we found none, we return -1 instead of 0 if there was an
+     error rather than just nothing found.  If link_map handling
+     failed, we still have the sniffed modules.  */
+  return sniffed == 0 || listed > sniffed ? listed : sniffed;
 }
 INTDEF (dwfl_core_file_report)

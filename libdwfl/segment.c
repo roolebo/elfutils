@@ -1,5 +1,5 @@
 /* Manage address space lookup table for libdwfl.
-   Copyright (C) 2008, 2009 Red Hat, Inc.
+   Copyright (C) 2008, 2009, 2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -107,13 +107,14 @@ insert (Dwfl *dwfl, size_t i, GElf_Addr start, GElf_Addr end, int segndx)
 
   if (unlikely (i < dwfl->lookup_elts))
     {
-      memcpy (&dwfl->lookup_addr[i + need], &dwfl->lookup_addr[i],
-	      need * sizeof dwfl->lookup_addr[0]);
-      memcpy (&dwfl->lookup_segndx[i + need], &dwfl->lookup_segndx[i],
-	      need * sizeof dwfl->lookup_segndx[0]);
+      const size_t move = dwfl->lookup_elts - i;
+      memmove (&dwfl->lookup_addr[i + need], &dwfl->lookup_addr[i],
+	       move * sizeof dwfl->lookup_addr[0]);
+      memmove (&dwfl->lookup_segndx[i + need], &dwfl->lookup_segndx[i],
+	       move * sizeof dwfl->lookup_segndx[0]);
       if (dwfl->lookup_module != NULL)
-	memcpy (&dwfl->lookup_module[i + need], &dwfl->lookup_module[i],
-		need * sizeof dwfl->lookup_module[0]);
+	memmove (&dwfl->lookup_module[i + need], &dwfl->lookup_module[i],
+		 move * sizeof dwfl->lookup_module[0]);
     }
 
   if (need_start)
@@ -167,11 +168,14 @@ static bool
 reify_segments (Dwfl *dwfl)
 {
   int hint = -1;
+  int highest = -1;
+  bool fixup = false;
   for (Dwfl_Module *mod = dwfl->modulelist; mod != NULL; mod = mod->next)
     if (! mod->gc)
       {
 	const GElf_Addr start = segment_start (dwfl, mod->low_addr);
 	const GElf_Addr end = segment_end (dwfl, mod->high_addr);
+	bool resized = false;
 
 	int idx = lookup (dwfl, start, hint);
 	if (unlikely (idx < 0))
@@ -180,6 +184,7 @@ reify_segments (Dwfl *dwfl)
 	    if (unlikely (insert (dwfl, 0, start, end, -1)))
 	      return true;
 	    idx = 0;
+	    resized = true;
 	  }
 	else if (dwfl->lookup_addr[idx] > start)
 	  {
@@ -188,6 +193,7 @@ reify_segments (Dwfl *dwfl)
 				  dwfl->lookup_segndx[idx])))
 	      return true;
 	    ++idx;
+	    resized = true;
 	  }
 	else if (dwfl->lookup_addr[idx] < start)
 	  {
@@ -196,14 +202,18 @@ reify_segments (Dwfl *dwfl)
 	    if (unlikely (insert (dwfl, idx + 1, start, end, -1)))
 	      return true;
 	    ++idx;
+	    resized = true;
 	  }
 
 	if ((size_t) idx + 1 < dwfl->lookup_elts
-	    && end < dwfl->lookup_addr[idx + 1]
+	    && end < dwfl->lookup_addr[idx + 1])
+	  {
 	    /* The module ends in the middle of this segment.  Split it.  */
-	    && unlikely (insert (dwfl, idx + 1,
-				 end, dwfl->lookup_addr[idx + 1], -1)))
-	  return true;
+	    if (unlikely (insert (dwfl, idx + 1,
+				  end, dwfl->lookup_addr[idx + 1], -1)))
+	      return true;
+	    resized = true;
+	  }
 
 	if (dwfl->lookup_module == NULL)
 	  {
@@ -221,8 +231,22 @@ reify_segments (Dwfl *dwfl)
 	  dwfl->lookup_module[idx++] = mod;
 	while ((size_t) idx < dwfl->lookup_elts
 	       && dwfl->lookup_addr[idx] < end);
+	assert (dwfl->lookup_module[mod->segment] == mod);
+
+	if (resized && idx - 1 >= highest)
+	  /* Expanding the lookup tables invalidated backpointers
+	     we've already stored.  Reset those ones.  */
+	  fixup = true;
+
+	highest = idx - 1;
 	hint = (size_t) idx < dwfl->lookup_elts ? idx : -1;
       }
+
+  if (fixup)
+    /* Reset backpointer indices invalidated by table insertions.  */
+    for (size_t idx = 0; idx < dwfl->lookup_elts; ++idx)
+      if (dwfl->lookup_module[idx] != NULL)
+	dwfl->lookup_module[idx]->segment = idx;
 
   return false;
 }

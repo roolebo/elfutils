@@ -1,5 +1,9 @@
 2010-05-04  Roland McGrath  <roland@redhat.com>
 
+	* segment.c (insert): Fix moving of values following insertion.
+	(reify_segments): Fix up MOD->segment backpointer indices after
+	later insertions in the main loop invalidate them.
+
 	* link_map.c (dwfl_link_map_report): Detect bias of embedded phdrs and
 	apply it to PT_DYNAMIC p_vaddr so we handle a PIE correctly.
 

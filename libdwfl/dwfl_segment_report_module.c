@@ -453,18 +453,24 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 
   /* Examine its .dynamic section to get more interesting details.
      If it has DT_SONAME, we'll use that as the module name.
+     If it has a DT_DEBUG, then it's actually a PIE rather than a DSO.
      We need its DT_STRTAB and DT_STRSZ to decipher DT_SONAME,
      and they also tell us the essential portion of the file
      for fetching symbols.  */
   GElf_Addr soname_stroff = 0;
   GElf_Addr dynstr_vaddr = 0;
   GElf_Xword dynstrsz = 0;
+  bool execlike = false;
   inline bool consider_dyn (GElf_Sxword tag, GElf_Xword val)
   {
     switch (tag)
       {
       default:
 	return false;
+
+      case DT_DEBUG:
+	execlike = true;
+	break;
 
       case DT_SONAME:
 	soname_stroff = val;
@@ -522,7 +528,7 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 
   /* We'll use the name passed in or a stupid default if not DT_SONAME.  */
   if (name == NULL)
-    name = ehdr.e32.e_type == ET_EXEC ? "[exe]" : "[dso]";
+    name = ehdr.e32.e_type == ET_EXEC ? "[exe]" : execlike ? "[pie]" : "[dso]";
 
   void *soname = NULL;
   size_t soname_size = 0;

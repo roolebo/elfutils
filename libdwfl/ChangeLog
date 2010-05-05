@@ -1,5 +1,8 @@
 2010-05-04  Roland McGrath  <roland@redhat.com>
 
+	* link_map.c (dwfl_link_map_report): Detect bias of embedded phdrs and
+	apply it to PT_DYNAMIC p_vaddr so we handle a PIE correctly.
+
 	* core-file.c (dwfl_core_file_report): Return any nonzero count of
 	modules reported, even if link_map grovelling failed and only sniffing
 	found anything.

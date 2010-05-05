@@ -684,6 +684,33 @@ dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
       /* If we found the phdr dimensions, search phdrs for PT_DYNAMIC.  */
       GElf_Addr dyn_vaddr = 0;
       GElf_Xword dyn_filesz = 0;
+      GElf_Addr dyn_bias = (GElf_Addr) -1;
+
+      inline bool consider_phdr (GElf_Word type,
+				 GElf_Addr vaddr, GElf_Xword filesz)
+      {
+	switch (type)
+	  {
+	  case PT_PHDR:
+	    if (dyn_bias == (GElf_Addr) -1
+		/* Do a sanity check on the putative address.  */
+		&& ((vaddr & (dwfl->segment_align - 1))
+		    == (phdr & (dwfl->segment_align - 1))))
+	      {
+		dyn_bias = phdr - vaddr;
+		return dyn_vaddr != 0;
+	      }
+	    break;
+
+	  case PT_DYNAMIC:
+	    dyn_vaddr = vaddr;
+	    dyn_filesz = filesz;
+	    return dyn_bias != (GElf_Addr) -1;
+	  }
+
+	return false;
+      }
+
       if (phdr != 0 && phnum != 0)
 	{
 	  Dwfl_Module *phdr_mod;
@@ -725,22 +752,18 @@ dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 		  if (elfclass == ELFCLASS32)
 		    {
 		      for (size_t i = 0; i < phnum; ++i)
-			if (u->p32[i].p_type == PT_DYNAMIC)
-			  {
-			    dyn_vaddr = u->p32[i].p_vaddr;
-			    dyn_filesz = u->p32[i].p_filesz;
-			    break;
-			  }
+			if (consider_phdr (u->p32[i].p_type,
+					   u->p32[i].p_vaddr,
+					   u->p32[i].p_filesz))
+			  break;
 		    }
 		  else
 		    {
 		      for (size_t i = 0; i < phnum; ++i)
-			if (u->p64[i].p_type == PT_DYNAMIC)
-			  {
-			    dyn_vaddr = u->p64[i].p_vaddr;
-			    dyn_filesz = u->p64[i].p_filesz;
-			    break;
-			  }
+			if (consider_phdr (u->p64[i].p_type,
+					   u->p64[i].p_vaddr,
+					   u->p64[i].p_filesz))
+			  break;
 		    }
 		}
 
@@ -775,6 +798,9 @@ dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
       /* If we found PT_DYNAMIC, search it for DT_DEBUG.  */
       if (dyn_filesz != 0)
 	{
+	  if (dyn_bias != (GElf_Addr) -1)
+	    dyn_vaddr += dyn_bias;
+
 	  Elf_Data in =
 	    {
 	      .d_type = ELF_T_DYN,

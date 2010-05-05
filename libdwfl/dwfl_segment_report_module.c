@@ -111,7 +111,9 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
   if (segment >= dwfl->lookup_elts)
     segment = dwfl->lookup_elts - 1;
 
-  while (segment > 0 && dwfl->lookup_segndx[segment] > ndx)
+  while (segment > 0
+	 && (dwfl->lookup_segndx[segment] > ndx
+	     || dwfl->lookup_segndx[segment] == -1))
     --segment;
 
   while (dwfl->lookup_segndx[segment] < ndx)

@@ -1,5 +1,8 @@
 2010-05-04  Roland McGrath  <roland@redhat.com>
 
+	* dwfl_segment_report_module.c (dwfl_segment_report_module):
+	Fix jump-start of NDX-finding loop.
+
 	* segment.c (insert): Fix moving of values following insertion.
 	(reify_segments): Fix up MOD->segment backpointer indices after
 	later insertions in the main loop invalidate them.

@@ -1,5 +1,7 @@
 2010-05-06  Roland McGrath  <roland@redhat.com>
 
+	* segment.c (insert): Clear inserted elements of DWFL->lookup_module.
+
 	* libdwflP.h (DWFL_ERRORS): Add WRONG_ID_ELF.
 	* dwfl_build_id_find_elf.c: Set MOD->main.valid when there is a build
 	ID but we didn't find a file.

@@ -121,6 +121,8 @@ insert (Dwfl *dwfl, size_t i, GElf_Addr start, GElf_Addr end, int segndx)
     {
       dwfl->lookup_addr[i] = start;
       dwfl->lookup_segndx[i] = segndx;
+      if (dwfl->lookup_module != NULL)
+	dwfl->lookup_module[i] = NULL;
       ++i;
     }
   else
@@ -130,6 +132,8 @@ insert (Dwfl *dwfl, size_t i, GElf_Addr start, GElf_Addr end, int segndx)
     {
       dwfl->lookup_addr[i] = end;
       dwfl->lookup_segndx[i] = -1;
+      if (dwfl->lookup_module != NULL)
+	dwfl->lookup_module[i] = NULL;
     }
 
   dwfl->lookup_elts += need;

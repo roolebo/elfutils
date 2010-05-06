@@ -1,3 +1,17 @@
+2010-05-06  Roland McGrath  <roland@redhat.com>
+
+	* libdwflP.h (DWFL_ERRORS): Add WRONG_ID_ELF.
+	* dwfl_build_id_find_elf.c: Set MOD->main.valid when there is a build
+	ID but we didn't find a file.
+	* dwfl_module_getdwarf.c (__libdwfl_getelf): When that's set, check
+	and refuse any fallback file-by-name if it lacks the matching ID.
+
+	* dwfl_error.c (dwfl_errno): Add INTDEF.
+	* libdwflP.h: Add INTDECL.
+
+	* dwfl_module_getdwarf.c (open_elf): Do elf_end and clear FILE->elf in
+	failure cases.
+
 2010-05-04  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_segment_report_module.c: Use "[pie]" rather than "[dso]" for an

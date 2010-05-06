@@ -75,6 +75,8 @@ open_elf (Dwfl_Module *mod, struct dwfl_file *file)
     }
   else if (unlikely (elf_kind (file->elf) != ELF_K_ELF))
     {
+      elf_end (file->elf);
+      file->elf = NULL;
       close (file->fd);
       file->fd = -1;
       return DWFL_E_BADELF;
@@ -84,6 +86,8 @@ open_elf (Dwfl_Module *mod, struct dwfl_file *file)
   if (ehdr == NULL)
     {
     elf_error:
+      elf_end (file->elf);
+      file->elf = NULL;
       close (file->fd);
       file->fd = -1;
       return DWFL_E (LIBELF, elf_errno ());
@@ -137,15 +141,54 @@ __libdwfl_getelf (Dwfl_Module *mod)
   mod->main.fd = (*mod->dwfl->callbacks->find_elf) (MODCB_ARGS (mod),
 						    &mod->main.name,
 						    &mod->main.elf);
+  const bool fallback = mod->main.elf == NULL && mod->main.fd < 0;
   mod->elferr = open_elf (mod, &mod->main);
+  if (mod->elferr != DWFL_E_NOERROR)
+    return;
 
-  if (mod->elferr == DWFL_E_NOERROR && !mod->main.valid)
+  if (!mod->main.valid)
     {
       /* Clear any explicitly reported build ID, just in case it was wrong.
 	 We'll fetch it from the file when asked.  */
       free (mod->build_id_bits);
       mod->build_id_bits = NULL;
       mod->build_id_len = 0;
+    }
+  else if (fallback)
+    {
+      /* We have an authoritative build ID for this module, so
+	 don't use a file by name that doesn't match that ID.  */
+
+      assert (mod->build_id_len > 0);
+
+      switch (__builtin_expect (__libdwfl_find_build_id (mod, false,
+							 mod->main.elf), 2))
+	{
+	case 2:
+	  /* Build ID matches as it should. */
+	  return;
+
+	case -1:			/* ELF error.  */
+	  mod->elferr = INTUSE(dwfl_errno) ();
+	  break;
+
+	case 0:			/* File has no build ID note.  */
+	case 1:			/* FIle has a build ID that does not match.  */
+	  mod->elferr = DWFL_E_WRONG_ID_ELF;
+	  break;
+
+	default:
+	  abort ();
+	}
+
+      /* We get here when it was the right ELF file.  Clear it out.  */
+      elf_end (mod->main.elf);
+      mod->main.elf = NULL;
+      if (mod->main.fd >= 0)
+	{
+	  close (mod->main.fd);
+	  mod->main.fd = -1;
+	}
     }
 }
 

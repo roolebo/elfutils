@@ -93,7 +93,8 @@
   DWFL_ERROR (TRUNCATED, N_("image truncated"))				      \
   DWFL_ERROR (ALREADY_ELF, N_("ELF file opened"))			      \
   DWFL_ERROR (BADELF, N_("not a valid ELF file"))			      \
-  DWFL_ERROR (WEIRD_TYPE, N_("cannot handle DWARF type description"))
+  DWFL_ERROR (WEIRD_TYPE, N_("cannot handle DWARF type description"))	      \
+  DWFL_ERROR (WRONG_ID_ELF, N_("ELF file does not match build ID"))
 
 #define DWFL_ERROR(name, text) DWFL_E_##name,
 typedef enum { DWFL_ERRORS DWFL_E_NUM } Dwfl_Error;
@@ -404,6 +405,7 @@ extern int dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 /* Avoid PLT entries.  */
 INTDECL (dwfl_begin)
 INTDECL (dwfl_errmsg)
+INTDECL (dwfl_errno)
 INTDECL (dwfl_addrmodule)
 INTDECL (dwfl_addrsegment)
 INTDECL (dwfl_addrdwarf)

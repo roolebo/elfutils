@@ -1,5 +1,5 @@
 /* Find an ELF file for a module from its build ID.
-   Copyright (C) 2007, 2008, 2009 Red Hat, Inc.
+   Copyright (C) 2007-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -160,6 +160,12 @@ dwfl_build_id_find_elf (Dwfl_Module *mod,
       free (*file_name);
       *file_name = NULL;
     }
+  else if (errno == 0 && mod->build_id_len > 0)
+    /* Setting this with no file yet loaded is a marker that
+       the build ID is authoritative even if we also know a
+       putative *FILE_NAME.  */
+    mod->main.valid = true;
+
   return fd;
 }
 INTDEF (dwfl_build_id_find_elf)

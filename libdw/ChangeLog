@@ -1,3 +1,18 @@
+2010-07-26  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_getlocation_implicit_pointer.c: New file.
+	* Makefile.am (libdw_a_SOURCES): Add it.
+	* libdw.map (ELFUTILS_0.149): New set.
+	Add dwarf_getlocation_implicit_pointer.
+	* libdw.h: Declare it.
+
+	* dwarf_offdie.c (do_offdie): Renamed to __libdw_offdie, made global.
+	(dwarf_offdie, dwarf_offdie_types): Update callers.
+	* libdwP.h: Declare it.
+
+	* dwarf.h: Add DW_OP_GNU_implicit_pointer.
+	* dwarf_getlocation.c (__libdw_intern_expression): Handle it.
+
 2010-08-24  Roland McGrath  <roland@redhat.com>
 
 	* libdw.map (ELFUTILS_0.149): New set.  Add dwfl_dwarf_line.

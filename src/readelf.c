@@ -3969,6 +3969,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
       [DW_OP_bit_piece] = "bit_piece",
       [DW_OP_implicit_value] = "implicit_value",
       [DW_OP_stack_value] = "stack_value",
+      [DW_OP_GNU_implicit_pointer] = "GNU_implicit_pointer",
     };
 
   if (len == 0)
@@ -4207,6 +4208,28 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  NEED (uleb);
 	  print_block (uleb, data);
 	  data += uleb;
+	  CONSUME (data - start);
+	  offset += 1 + (data - start);
+	  break;
+
+	case DW_OP_GNU_implicit_pointer:
+	  /* DIE offset operand.  */
+	  start = data;
+	  NEED (ref_size + 1);
+	  if (ref_size == 4)
+	    addr = read_4ubyte_unaligned (dbg, data);
+	  else
+	    {
+	      assert (ref_size == 8);
+	      addr = read_8ubyte_unaligned (dbg, data);
+	    }
+	  data += ref_size;
+	  /* Byte offset operand.  */
+	  get_sleb128 (sleb, data); /* XXX check overrun */
+
+	  printf ("%*s[%4" PRIuMAX "] %s %#" PRIxMAX ", %+" PRId64 "\n",
+		  indent, "", (intmax_t) offset,
+		  known[op], (uintmax_t) addr, sleb);
 	  CONSUME (data - start);
 	  offset += 1 + (data - start);
 	  break;

@@ -456,6 +456,10 @@ extern int __libdw_intern_expression (Dwarf *dbg,
 				      int sec_index)
   __nonnull_attribute__ (5, 6, 9, 10) internal_function;
 
+extern Dwarf_Die *__libdw_offdie (Dwarf *dbg, Dwarf_Off offset,
+				  Dwarf_Die *result, bool debug_types)
+  internal_function;
+
 
 /* Return error code of last failing function call.  This value is kept
    separately for each thread.  */

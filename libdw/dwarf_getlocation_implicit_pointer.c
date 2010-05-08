@@ -1,7 +1,6 @@
-/* Return DIE at given offset.
-   Copyright (C) 2002-2010 Red Hat, Inc.
+/* Return associated attribute for DW_OP_GNU_implicit_pointer.
+   Copyright (C) 2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by the
@@ -52,60 +51,36 @@
 # include <config.h>
 #endif
 
-#include <string.h>
 #include "libdwP.h"
+#include <dwarf.h>
 
 
-Dwarf_Die *
-internal_function
-__libdw_offdie (Dwarf *dbg, Dwarf_Off offset, Dwarf_Die *result,
-		bool debug_types)
+int
+dwarf_getlocation_implicit_pointer (attr, op, result)
+     Dwarf_Attribute *attr;
+     const Dwarf_Op *op;
+     Dwarf_Attribute *result;
 {
-  if (dbg == NULL)
-    return NULL;
+  if (attr == NULL)
+    return -1;
 
-  Elf_Data *const data = dbg->sectiondata[debug_types ? IDX_debug_types
-					  : IDX_debug_info];
-  if (offset >= data->d_size)
+  if (unlikely (op->atom != DW_OP_GNU_implicit_pointer))
     {
-      __libdw_seterrno (DWARF_E_INVALID_DWARF);
-      return NULL;
+      __libdw_seterrno (DWARF_E_INVALID_ACCESS);
+      return -1;
     }
 
-  /* Clear the entire DIE structure.  This signals we have not yet
-     determined any of the information.  */
-  memset (result, '\0', sizeof (Dwarf_Die));
+  Dwarf_Die die;
+  if (__libdw_offdie (attr->cu->dbg, op->number, &die,
+		      attr->cu->type_offset != 0) == NULL)
+    return -1;
 
-  result->addr = (char *) data->d_buf + offset;
-
-  /* Get the CU.  */
-  result->cu = __libdw_findcu (dbg, offset, debug_types);
-  if (result->cu == NULL)
+  if (INTUSE(dwarf_attr) (&die, DW_AT_location, result) == NULL
+      && INTUSE(dwarf_attr) (&die, DW_AT_const_value, result) == NULL)
     {
-      /* This should never happen.  The input file is malformed.  */
       __libdw_seterrno (DWARF_E_INVALID_DWARF);
-      result = NULL;
+      return -1;
     }
 
-  return result;
-}
-
-
-Dwarf_Die *
-dwarf_offdie (dbg, offset, result)
-     Dwarf *dbg;
-     Dwarf_Off offset;
-     Dwarf_Die *result;
-{
-  return __libdw_offdie (dbg, offset, result, false);
-}
-INTDEF(dwarf_offdie)
-
-Dwarf_Die *
-dwarf_offdie_types (dbg, offset, result)
-     Dwarf *dbg;
-     Dwarf_Off offset;
-     Dwarf_Die *result;
-{
-  return __libdw_offdie (dbg, offset, result, true);
+  return 0;
 }

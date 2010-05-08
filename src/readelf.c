@@ -3774,7 +3774,8 @@ print_block (size_t n, const void *block)
 
 static void
 print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
-	   unsigned int addrsize, Dwarf_Word len, const unsigned char *data)
+	   unsigned int addrsize, unsigned int offset_size,
+	   Dwarf_Word len, const unsigned char *data)
 {
   static const char *const known[] =
     {
@@ -3949,7 +3950,6 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 
       switch (op)
 	{
-	case DW_OP_call_ref:
 	case DW_OP_addr:;
 	  /* Address operand.  */
 	  Dwarf_Word addr;
@@ -3964,18 +3964,31 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  data += addrsize;
 	  len -= addrsize;
 
-	  if (op == DW_OP_addr)
-	    {
-	      char *a = format_dwarf_addr (dwflmod, 0, addr);
-	      printf ("%*s[%4" PRIuMAX "] %s %s\n",
-		      indent, "", (uintmax_t) offset, known[op], a);
-	      free (a);
-	    }
-	  else
-	    printf ("%*s[%4" PRIuMAX "] %s %#" PRIxMAX "\n",
-		    indent, "", (uintmax_t) offset,
-		    known[op], (uintmax_t) addr);
+	  char *a = format_dwarf_addr (dwflmod, 0, addr);
+	  printf ("%*s[%4" PRIuMAX "] %s %s\n",
+		  indent, "", (uintmax_t) offset, known[op], a);
+	  free (a);
+
 	  offset += 1 + addrsize;
+	  break;
+
+	case DW_OP_call_ref:
+	  /* Offset operand.  */
+	  NEED (offset_size);
+	  if (offset_size == 4)
+	    addr = read_4ubyte_unaligned (dbg, data);
+	  else
+	    {
+	      assert (offset_size == 8);
+	      addr = read_8ubyte_unaligned (dbg, data);
+	    }
+	  data += offset_size;
+	  len -= offset_size;
+
+	  printf ("%*s[%4" PRIuMAX "] %s %#" PRIxMAX "\n",
+		  indent, "", (uintmax_t) offset,
+		  known[op], (uintmax_t) addr);
+	  offset += 1 + offset_size;
 	  break;
 
 	case DW_OP_deref_size:
@@ -4520,7 +4533,7 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    // XXX overflow check
 	    get_uleb128 (op1, readp);	/* Length of DW_FORM_block.  */
 	    printf ("     def_cfa_expression %" PRIu64 "\n", op1);
-	    print_ops (dwflmod, dbg, 10, 10, ptr_size, op1, readp);
+	    print_ops (dwflmod, dbg, 10, 10, ptr_size, 0, op1, readp);
 	    readp += op1;
 	    break;
 	  case DW_CFA_expression:
@@ -4529,7 +4542,7 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    get_uleb128 (op2, readp);	/* Length of DW_FORM_block.  */
 	    printf ("     expression r%" PRIu64 " (%s) \n",
 		    op1, regname (op1));
-	    print_ops (dwflmod, dbg, 10, 10, ptr_size, op2, readp);
+	    print_ops (dwflmod, dbg, 10, 10, ptr_size, 0, op2, readp);
 	    readp += op2;
 	    break;
 	  case DW_CFA_offset_extended_sf:
@@ -4572,7 +4585,7 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    get_uleb128 (op2, readp);	/* Length of DW_FORM_block.  */
 	    printf ("     val_expression r%" PRIu64 " (%s)\n",
 		    op1, regname (op1));
-	    print_ops (dwflmod, dbg, 10, 10, ptr_size, op2, readp);
+	    print_ops (dwflmod, dbg, 10, 10, ptr_size, 0, op2, readp);
 	    readp += op2;
 	    break;
 	  case DW_CFA_MIPS_advance_loc8:
@@ -5098,6 +5111,7 @@ struct attrcb_args
   Dwarf *dbg;
   int level;
   unsigned int addrsize;
+  unsigned int offset_size;
   Dwarf_Off cu_offset;
 };
 
@@ -5301,7 +5315,8 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	case DW_AT_upper_bound:
 	  print_ops (cbargs->dwflmod, cbargs->dbg,
 		     12 + level * 2, 12 + level * 2,
-		     cbargs->addrsize, block.length, block.data);
+		     cbargs->addrsize, cbargs->offset_size,
+		     block.length, block.data);
 	  break;
 
 	default:
@@ -5359,11 +5374,14 @@ print_debug_info_section (Dwfl_Module *dwflmod,
 	  (uint64_t) offset, /*version*/2, abbroffset, addrsize, offsize);
 
 
-  struct attrcb_args args;
-  args.dwflmod = dwflmod;
-  args.dbg = dbg;
-  args.addrsize = addrsize;
-  args.cu_offset = offset;
+  struct attrcb_args args =
+    {
+      .dwflmod = dwflmod,
+      .dbg = dbg,
+      .addrsize = addrsize,
+      .offset_size = offsize,
+      .cu_offset = offset
+    };
 
   offset += cuhl;
 
@@ -5900,6 +5918,10 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
 
   size_t address_size = ehdr->e_ident[EI_CLASS] == ELFCLASS32 ? 4 : 8;
 
+  /* XXX This is wrong!  We can only know the right size given the CU that
+     points to this location list.  */
+  size_t offset_size = 4;
+
   bool first = true;
   unsigned char *readp = data->d_buf;
   while (readp < (unsigned char *) data->d_buf + data->d_size)
@@ -5952,7 +5974,7 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
 	  free (e);
 
 	  print_ops (dwflmod, dbg, 1, 18 + (address_size * 4),
-		     address_size, len, readp);
+		     address_size, offset_size, len, readp);
 
 	  first = false;
 	  readp += len;

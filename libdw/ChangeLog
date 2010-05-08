@@ -1,3 +1,12 @@
+2010-05-08  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_getlocation.c (__libdw_intern_expression): Take new argument
+	REF_SIZE.  Use that to handle DW_OP_call_ref correctly.
+	(getlocation): Update caller.
+	* dwarf_frame_cfa.c (dwarf_frame_cfa): Likewise.
+	* dwarf_frame_register.c (dwarf_frame_register): Likewise.
+	* libdwP.h: Update decl.
+
 2010-04-26  Roland McGrath  <roland@redhat.com>
 
 	* cfi.h (struct Dwarf_Frame_s): Add cfa_invalid alternative in cfa_rule.

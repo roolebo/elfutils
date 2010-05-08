@@ -219,8 +219,8 @@ check_constant_offset (Dwarf_Attribute *attr,
 
 int
 internal_function
-__libdw_intern_expression (Dwarf *dbg,
-			   bool other_byte_order, unsigned int address_size,
+__libdw_intern_expression (Dwarf *dbg, bool other_byte_order,
+			   unsigned int address_size, unsigned int ref_size,
 			   void **cache, const Dwarf_Block *block,
 			   bool cfap, bool valuep,
 			   Dwarf_Op **llbuf, size_t *listlen, int sec_index)
@@ -272,6 +272,13 @@ __libdw_intern_expression (Dwarf *dbg,
 	    return -1;
 	  break;
 
+	case DW_OP_call_ref:
+	  /* DW_FORM_ref_addr, depends on offset size of CU.  */
+	  if (__libdw_read_offset_inc (dbg, sec_index, &data, ref_size,
+				       &newloc->number, IDX_debug_info, 0))
+	    return -1;
+	  break;
+
 	case DW_OP_deref:
 	case DW_OP_dup:
 	case DW_OP_drop:
@@ -303,7 +310,6 @@ __libdw_intern_expression (Dwarf *dbg,
 	case DW_OP_reg0 ... DW_OP_reg31:
 	case DW_OP_nop:
 	case DW_OP_push_object_address:
-	case DW_OP_call_ref:
 	case DW_OP_call_frame_cfa:
 	case DW_OP_form_tls_address:
 	case DW_OP_GNU_push_tls_address:
@@ -521,7 +527,10 @@ getlocation (struct Dwarf_CU *cu, const Dwarf_Block *block,
 	     Dwarf_Op **llbuf, size_t *listlen, int sec_index)
 {
   return __libdw_intern_expression (cu->dbg, cu->dbg->other_byte_order,
-				    cu->address_size, &cu->locs, block,
+				    cu->address_size, (cu->version == 2
+						       ? cu->address_size
+						       : cu->offset_size),
+				    &cu->locs, block,
 				    false, false,
 				    llbuf, listlen, sec_index);
 }

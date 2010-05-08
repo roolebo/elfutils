@@ -1,5 +1,5 @@
 /* Get CFA expression for frame.
-   Copyright (C) 2009 Red Hat, Inc.
+   Copyright (C) 2009-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -83,7 +83,7 @@ dwarf_frame_cfa (fs, ops, nops)
       /* Parse the expression into internal form.  */
       result = __libdw_intern_expression
 	(NULL, fs->cache->other_byte_order,
-	 fs->cache->e_ident[EI_CLASS] == ELFCLASS32 ? 4 : 8,
+	 fs->cache->e_ident[EI_CLASS] == ELFCLASS32 ? 4 : 8, 4,
 	 &fs->cache->expr_tree, &fs->cfa_data.expr, false, false,
 	 ops, nops, IDX_debug_frame);
       break;

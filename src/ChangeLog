@@ -1,3 +1,12 @@
+2010-05-08  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (print_ops): Take new arg OFFSET_SIZE.
+	Use that for DW_OP_call_ref, not ADDRSIZE.
+	(print_cfa_program): Update caller.
+	(struct attrcb_args): Add offset_size field.
+	(attr_callback): Use it for print_ops call.
+	(print_debug_info_section): Initialize it.
+
 2010-04-14  Roland McGrath  <roland@redhat.com>
 
 	* readelf.c (handle_core_item): Fix bitmask printing.

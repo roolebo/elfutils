@@ -129,7 +129,7 @@ dwarf_frame_register (fs, regno, ops_mem, ops, nops)
 	/* Parse the expression into internal form.  */
 	if (__libdw_intern_expression (NULL,
 				       fs->cache->other_byte_order,
-				       address_size,
+				       address_size, 4,
 				       &fs->cache->expr_tree, &block,
 				       true, reg->rule == reg_val_expression,
 				       ops, nops, IDX_debug_frame) < 0)

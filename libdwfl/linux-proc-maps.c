@@ -1,5 +1,5 @@
 /* Standard libdwfl callbacks for debugging a live Linux process.
-   Copyright (C) 2005, 2007, 2008 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -70,7 +70,7 @@
 /* Search /proc/PID/auxv for the AT_SYSINFO_EHDR tag.  */
 
 static int
-find_sysinfo_ehdr (pid_t pid, GElf_Addr *sysinfo_ehdr)
+grovel_auxv (pid_t pid, Dwfl *dwfl, GElf_Addr *sysinfo_ehdr)
 {
   char *fname;
   if (asprintf (&fname, PROCAUXVFMT, pid) < 0)
@@ -100,18 +100,30 @@ find_sysinfo_ehdr (pid_t pid, GElf_Addr *sysinfo_ehdr)
 		if (d.a32[i].a_type == AT_SYSINFO_EHDR)
 		  {
 		    *sysinfo_ehdr = d.a32[i].a_un.a_val;
-		    nread = 0;
-		    break;
+		    if (dwfl->segment_align > 1)
+		      {
+			nread = 0;
+			break;
+		      }
 		  }
+		else if (d.a32[i].a_type == AT_PAGESZ
+			 && dwfl->segment_align <= 1)
+		  dwfl->segment_align = d.a32[i].a_un.a_val;
 	      break;
 	    case 8:
 	      for (size_t i = 0; (char *) &d.a64[i] < &d.buffer[nread]; ++i)
 		if (d.a64[i].a_type == AT_SYSINFO_EHDR)
 		  {
 		    *sysinfo_ehdr = d.a64[i].a_un.a_val;
-		    nread = 0;
-		    break;
+		    if (dwfl->segment_align > 1)
+		      {
+			nread = 0;
+			break;
+		      }
 		  }
+		else if (d.a64[i].a_type == AT_PAGESZ
+			 && dwfl->segment_align <= 1)
+		  dwfl->segment_align = d.a64[i].a_un.a_val;
 	      break;
 	    default:
 	      abort ();
@@ -238,7 +250,7 @@ dwfl_linux_proc_report (Dwfl *dwfl, pid_t pid)
 
   /* We'll notice the AT_SYSINFO_EHDR address specially when we hit it.  */
   GElf_Addr sysinfo_ehdr = 0;
-  int result = find_sysinfo_ehdr (pid, &sysinfo_ehdr);
+  int result = grovel_auxv (pid, dwfl, &sysinfo_ehdr);
   if (result != 0)
     return result;
 

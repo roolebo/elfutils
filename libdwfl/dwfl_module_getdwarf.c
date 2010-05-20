@@ -112,8 +112,16 @@ open_elf (Dwfl_Module *mod, struct dwfl_file *file)
 	    goto elf_error;
 	  if (ph->p_type == PT_LOAD)
 	    {
-	      file->bias = ((mod->low_addr & -ph->p_align)
-			    - (ph->p_vaddr & -ph->p_align));
+	      GElf_Addr align = mod->dwfl->segment_align;
+	      if (align <= 1)
+		{
+		  if ((mod->low_addr & (ph->p_align - 1)) == 0)
+		    align = ph->p_align;
+		  else
+		    align = ((GElf_Addr) 1 << ffsll (mod->low_addr)) >> 1;
+		}
+
+	      file->bias = ((mod->low_addr & -align) - (ph->p_vaddr & -align));
 	      break;
 	    }
 	}

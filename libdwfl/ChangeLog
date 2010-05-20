@@ -1,3 +1,12 @@
+2010-05-20  Roland McGrath  <roland@redhat.com>
+
+	* linux-proc-maps.c (find_sysinfo_ehdr): Renamed to ...
+	(grovel_auxv): ... this.  Take DWFL argument.
+	(dwfl_linux_proc_report): Update caller.
+
+	* dwfl_module_getdwarf.c (open_elf): Calculate alignment for bias
+	based on dwfl->segment_align or manifest alignment of MOD->low_addr.
+
 2010-05-19  Roland McGrath  <roland@redhat.com>
 
 	* linux-kernel-modules.c (intuit_kernel_bounds): Rewritten.

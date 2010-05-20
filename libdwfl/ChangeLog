@@ -1,3 +1,7 @@
+2010-05-19  Roland McGrath  <roland@redhat.com>
+
+	* linux-kernel-modules.c (intuit_kernel_bounds): Rewritten.
+
 2010-05-06  Roland McGrath  <roland@redhat.com>
 
 	* segment.c (insert): Clear inserted elements of DWFL->lookup_module.

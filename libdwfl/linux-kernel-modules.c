@@ -1,5 +1,5 @@
 /* Standard libdwfl callbacks for debugging the running Linux kernel.
-   Copyright (C) 2005-2009 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -411,41 +411,40 @@ intuit_kernel_bounds (Dwarf_Addr *start, Dwarf_Addr *end, Dwarf_Addr *notes)
 
   char *line = NULL;
   size_t linesz = 0;
-  size_t n = getline (&line, &linesz, f);
-  Dwarf_Addr first;
+  size_t n;
   char *p = NULL;
-  int result = 0;
-  if (n > 0 && (first = strtoull (line, &p, 16)) > 0 && p > line)
-    {
-      Dwarf_Addr last = 0;
-      while ((n = getline (&line, &linesz, f)) > 1 && line[n - 2] != ']')
-	{
-	  p = NULL;
-	  last = strtoull (line, &p, 16);
-	  if (p == NULL || p == line || last == 0)
-	    {
-	      result = -1;
-	      break;
-	    }
+  const char *type;
 
-	  if (*notes == 0)
-	    {
-	      const char *sym = (strsep (&p, " \t\n")
-				 ? strsep (&p, " \t\n") : NULL);
-	      if (sym != NULL && !strcmp (sym, "__start_notes"))
-		*notes = last;
-	    }
-	}
-      if ((n == 0 && feof_unlocked (f)) || (n > 1 && line[n - 2] == ']'))
-	{
-	  Dwarf_Addr round_kernel = sysconf (_SC_PAGE_SIZE);
-	  first &= -(Dwarf_Addr) round_kernel;
-	  last += round_kernel - 1;
-	  last &= -(Dwarf_Addr) round_kernel;
-	  *start = first;
-	  *end = last;
-	  result = 0;
-	}
+  inline bool read_address (Dwarf_Addr *addr)
+  {
+    if ((n = getline (&line, &linesz, f)) < 1 || line[n - 2] == ']')
+      return false;
+    *addr = strtoull (line, &p, 16);
+    p += strspn (p, " \t");
+    type = strsep (&p, " \t\n");
+    if (type == NULL)
+      return false;
+    return p != NULL && p != line;
+  }
+
+  int result;
+  do
+    result = read_address (start) ? 0 : -1;
+  while (result == 0 && strchr ("TtRr", *type) == NULL);
+
+  if (result == 0)
+    {
+      *end = *start;
+      while (read_address (end))
+	if (*notes == 0 && !strcmp (p, "__start_notes\n"))
+	  *notes = *end;
+
+      Dwarf_Addr round_kernel = sysconf (_SC_PAGE_SIZE);
+      *start &= -(Dwarf_Addr) round_kernel;
+      *end += round_kernel - 1;
+      *end &= -(Dwarf_Addr) round_kernel;
+      if (*start >= *end || *end - *start < round_kernel)
+	result = -1;
     }
   free (line);
 

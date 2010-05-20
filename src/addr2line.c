@@ -1,5 +1,5 @@
 /* Locate source files and line information for given addresses
-   Copyright (C) 2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -374,7 +374,7 @@ find_symbol (Dwfl_Module *mod,
   for (int i = 1; i < n; ++i)
     {
       const char *symbol_name = dwfl_module_getsym (mod, i, symbol, NULL);
-      if (symbol_name == NULL)
+      if (symbol_name == NULL || symbol_name[0] == '\0')
 	continue;
       switch (GELF_ST_TYPE (symbol->st_info))
 	{
@@ -445,15 +445,23 @@ handle_address (const char *string, Dwfl *dwfl)
   if (endp == string)
     {
       bool parsed = false;
-      int n;
+      int i, j;
       char *name = NULL;
-      if (sscanf (string, "(%m[^)])%" PRIiMAX "%n", &name, &addr, &n) == 2
-	  && string[n] == '\0')
+      if (sscanf (string, "(%m[^)])%" PRIiMAX "%n", &name, &addr, &i) == 2
+	  && string[i] == '\0')
 	parsed = adjust_to_section (name, &addr, dwfl);
-      else if (sscanf (string, "%m[^-+]%" PRIiMAX "%n", &name, &addr, &n) == 2
-	       && string[n] == '\0')
+      switch (sscanf (string, "%m[^-+]%n%" PRIiMAX "%n", &name, &i, &addr, &j))
 	{
-	  /* It was symbol+offset.  */
+	default:
+	  break;
+	case 1:
+	  addr = 0;
+	  j = i;
+	case 2:
+	  if (string[j] != '\0')
+	    break;
+
+	  /* It was symbol[+offset].  */
 	  GElf_Sym sym;
 	  void *arg[2] = { name, &sym };
 	  (void) dwfl_getmodules (dwfl, &find_symbol, arg, 0);
@@ -469,6 +477,7 @@ handle_address (const char *string, Dwfl *dwfl)
 	      addr += sym.st_value;
 	      parsed = true;
 	    }
+	  break;
 	}
 
       free (name);

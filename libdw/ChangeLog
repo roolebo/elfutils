@@ -1,3 +1,8 @@
+2010-05-27  Roland McGrath  <roland@redhat.com>
+
+	* dwarf.h: Add DW_AT_enum_class, DW_AT_linkage_name,
+	DW_TAG_template_alias, DW_LANG_Python, DW_LNE_set_discriminator.
+
 2010-05-08  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_getlocation.c (__libdw_intern_expression): Take new argument

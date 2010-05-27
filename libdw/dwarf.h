@@ -113,11 +113,15 @@ enum
     DW_TAG_shared_type = 0x40,
     DW_TAG_type_unit = 0x41,
     DW_TAG_rvalue_reference_type = 0x42,
+    DW_TAG_template_alias = 0x43,
+
     DW_TAG_lo_user = 0x4080,
+
     DW_TAG_MIPS_loop = 0x4081,
     DW_TAG_format_label = 0x4101,
     DW_TAG_function_template = 0x4102,
     DW_TAG_class_template = 0x4103,
+
     DW_TAG_hi_user = 0xffff
   };
 
@@ -226,6 +230,8 @@ enum
     DW_AT_main_subprogram = 0x6a,
     DW_AT_data_bit_offset = 0x6b,
     DW_AT_const_expr = 0x6c,
+    DW_AT_enum_class = 0x6d,
+    DW_AT_linkage_name = 0x6e,
 
     DW_AT_lo_user = 0x2000,
 
@@ -565,6 +571,7 @@ enum
     DW_LANG_ObjC_plus_plus = 0x0011, /* Objective-C++ */
     DW_LANG_UPC = 0x0012,	     /* Unified Parallel C */
     DW_LANG_D = 0x0013,		     /* D */
+    DW_LANG_Python = 0x00134,	     /* Python */
 
     DW_LANG_lo_user = 0x8000,
     DW_LANG_Mips_Assembler = 0x8001,
@@ -643,6 +650,7 @@ enum
     DW_LNE_end_sequence = 1,
     DW_LNE_set_address = 2,
     DW_LNE_define_file = 3,
+    DW_LNE_set_discriminator = 4,
 
     DW_LNE_lo_user = 128,
     DW_LNE_hi_user = 255

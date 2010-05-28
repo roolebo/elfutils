@@ -2167,7 +2167,7 @@ get_ver_flags (unsigned int flags)
   if (flags & VER_FLG_WEAK)
     {
       if (endp != buf)
-        endp = stpcpy (endp, "| ");
+	endp = stpcpy (endp, "| ");
 
       endp = stpcpy (endp, "WEAK ");
     }
@@ -2657,7 +2657,7 @@ print_hash_info (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx,
 
       printf (gettext ("\
  Average number of tests:   successful lookup: %f\n\
-                          unsuccessful lookup: %f\n"),
+			  unsuccessful lookup: %f\n"),
 	      (double) success / (double) nzero_counts,
 	      (double) nzero_counts / (double) nbucket);
     }
@@ -5151,8 +5151,9 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	    return DWARF_CB_ABORT;
 	  }
 	char *a = format_dwarf_addr (cbargs->dwflmod, cbargs->addrsize, addr);
-	printf ("           %*s%-20s %s\n",
-		(int) (level * 2), "", dwarf_attr_string (attr), a);
+	printf ("           %*s%-20s (%s) %s\n",
+		(int) (level * 2), "", dwarf_attr_string (attr),
+		dwarf_form_string (form), a);
 	free (a);
       }
       break;
@@ -5163,8 +5164,9 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
       const char *str = dwarf_formstring (attrp);
       if (unlikely (str == NULL))
 	goto attrval_out;
-      printf ("           %*s%-20s \"%s\"\n",
-	      (int) (level * 2), "", dwarf_attr_string (attr), str);
+      printf ("           %*s%-20s (%s) \"%s\"\n",
+	      (int) (level * 2), "", dwarf_attr_string (attr),
+	      dwarf_form_string (form), str);
       break;
 
     case DW_FORM_ref_addr:
@@ -5177,9 +5179,9 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
       if (unlikely (dwarf_formref_die (attrp, &ref) == NULL))
 	goto attrval_out;
 
-      printf ("           %*s%-20s [%6" PRIxMAX "]\n",
+      printf ("           %*s%-20s (%s) [%6" PRIxMAX "]\n",
 	      (int) (level * 2), "", dwarf_attr_string (attr),
-	      (uintmax_t) dwarf_dieoffset (&ref));
+	      dwarf_form_string (form), (uintmax_t) dwarf_dieoffset (&ref));
       break;
 
     case DW_FORM_udata:
@@ -5199,9 +5201,9 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	case DW_AT_data_member_location:
 	  if (form != DW_FORM_data4 && form != DW_FORM_data8)
 	    {
-	      printf ("           %*s%-20s %" PRIxMAX "\n",
+	      printf ("           %*s%-20s (%s) %" PRIxMAX "\n",
 		      (int) (level * 2), "", dwarf_attr_string (attr),
-		      (uintmax_t) num);
+		      dwarf_form_string (form), (uintmax_t) num);
 	      return DWARF_CB_OK;
 	    }
 	  /* else fallthrough */
@@ -5215,15 +5217,15 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	case DW_AT_frame_base:
 	case DW_AT_return_addr:
 	case DW_AT_static_link:
-	  printf ("           %*s%-20s location list [%6" PRIxMAX "]\n",
+	  printf ("           %*s%-20s (%s) location list [%6" PRIxMAX "]\n",
 		  (int) (level * 2), "", dwarf_attr_string (attr),
-		  (uintmax_t) num);
+		  dwarf_form_string (form), (uintmax_t) num);
 	  return DWARF_CB_OK;
 
 	case DW_AT_ranges:
-	  printf ("           %*s%-20s range list [%6" PRIxMAX "]\n",
+	  printf ("           %*s%-20s (%s) range list [%6" PRIxMAX "]\n",
 		  (int) (level * 2), "", dwarf_attr_string (attr),
-		  (uintmax_t) num);
+		  dwarf_form_string (form), (uintmax_t) num);
 	  return DWARF_CB_OK;
 
 	case DW_AT_language:
@@ -5262,13 +5264,13 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	}
 
       if (valuestr == NULL)
-	printf ("           %*s%-20s %" PRIuMAX "\n",
+	printf ("           %*s%-20s (%s) %" PRIuMAX "\n",
 		(int) (level * 2), "", dwarf_attr_string (attr),
-		(uintmax_t) num);
+		dwarf_form_string (form), (uintmax_t) num);
       else
-	printf ("           %*s%-20s %s (%" PRIuMAX ")\n",
+	printf ("           %*s%-20s (%s) %s (%" PRIuMAX ")\n",
 		(int) (level * 2), "", dwarf_attr_string (attr),
-		valuestr, (uintmax_t) num);
+		dwarf_form_string (form), valuestr, (uintmax_t) num);
       break;
 
     case DW_FORM_flag:;
@@ -5276,9 +5278,9 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
       if (unlikely (dwarf_formflag (attrp, &flag) != 0))
 	goto attrval_out;
 
-      printf ("           %*s%-20s %s\n",
+      printf ("           %*s%-20s (%s) %s\n",
 	      (int) (level * 2), "", dwarf_attr_string (attr),
-	      nl_langinfo (flag ? YESSTR : NOSTR));
+	      dwarf_form_string (form), nl_langinfo (flag ? YESSTR : NOSTR));
       break;
 
     case DW_FORM_block4:
@@ -5289,8 +5291,9 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
       if (unlikely (dwarf_formblock (attrp, &block) != 0))
 	goto attrval_out;
 
-      printf ("           %*s%-20s ",
-	      (int) (level * 2), "", dwarf_attr_string (attr));
+      printf ("           %*s%-20s (%s) ",
+	      (int) (level * 2), "", dwarf_attr_string (attr),
+	      dwarf_form_string (form));
 
       switch (attr)
 	{
@@ -5326,7 +5329,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
       break;
 
     default:
-      printf ("           %*s%-20s [form: %d] ???\n",
+      printf ("           %*s%-20s (form: %#x) ???\n",
 	      (int) (level * 2), "", dwarf_attr_string (attr),
 	      (int) form);
       break;
@@ -5529,7 +5532,7 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl,
       /* Next the minimum instruction length.  */
       uint_fast8_t minimum_instr_len = *linep++;
 
-        /* Then the flag determining the default value of the is_stmt
+	/* Then the flag determining the default value of the is_stmt
 	   register.  */
       uint_fast8_t default_is_stmt = *linep++;
 
@@ -5679,7 +5682,7 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl,
 		 is computed with
 
 		 opcode = (desired line increment - line_base)
-		           + (line_range * address advance) + opcode_base
+			   + (line_range * address advance) + opcode_base
 	      */
 	      int line_increment = (line_base
 				    + (opcode - opcode_base) % line_range);
@@ -6091,9 +6094,9 @@ print_debug_macinfo_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	case DW_MACINFO_undef:
 	case DW_MACINFO_vendor_ext:
 	  /*  For the first two opcodes the parameters are
-	        line, string
+		line, string
 	      For the latter
-	        number, string.
+		number, string.
 	      We can treat these cases together.  */
 	  get_uleb128 (u128, readp);
 

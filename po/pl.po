@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pl\n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2010-05-27 02:21+0000\n"
-"PO-Revision-Date: 2010-06-27 21:09+0200\n"
+"POT-Creation-Date: 2010-05-28 21:36+0000\n"
+"PO-Revision-Date: 2010-05-28 23:37+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <trans-pl@lists.fedoraproject.org>\n"
 "MIME-Version: 1.0\n"
@@ -196,7 +196,7 @@ msgstr "brak wartości flagi"
 
 #: ../libdw/dwarf_error.c:112 ../libelf/elf_error.c:253
 msgid "invalid offset"
-msgstr "nieprawidłowe wyrównanie"
+msgstr "nieprawidłowy offset"
 
 #: ../libdw/dwarf_error.c:113
 msgid ".debug_ranges section missing"
@@ -315,7 +315,7 @@ msgstr "r_offset jest fałszywe"
 #: ../libdwfl/libdwflP.h:84 ../libelf/elf_error.c:132
 #: ../libelf/elf_error.c:192
 msgid "offset out of range"
-msgstr "wyrównanie spoza zakresu"
+msgstr "offset spoza zakresu"
 
 #: ../libdwfl/libdwflP.h:85
 msgid "relocation refers to undefined symbol"
@@ -503,7 +503,7 @@ msgstr "dane/scn nie zgadzają się"
 msgid "invalid section header"
 msgstr "nieprawidłowy nagłówek sekcji"
 
-#: ../libelf/elf_error.c:208 ../src/readelf.c:6264 ../src/readelf.c:6365
+#: ../libelf/elf_error.c:208 ../src/readelf.c:6267 ../src/readelf.c:6368
 #, c-format
 msgid "invalid data"
 msgstr "nieprawidłowe dane"
@@ -537,17 +537,15 @@ msgid "only relocatable files can contain section groups"
 msgstr "tylko relokowalne pliki mogą zawierać grupy sekcji"
 
 #: ../libelf/elf_error.c:241
-#, fuzzy
 msgid ""
 "program header only allowed in executables, shared objects, and core files"
 msgstr ""
-"tylko pliki wykonywalne, obiektów dzielonych i core mogą mieć nagłówki "
-"programu\n"
+"tylko pliki wykonywalne, obiektów współdzielone i pliki core mogą mieć "
+"nagłówki programu"
 
 #: ../libelf/elf_error.c:248
-#, fuzzy
 msgid "file has no program header"
-msgstr "Wyświetlenie nagłówków programu"
+msgstr "plik nie posiada nagłówków programu"
 
 #: ../src/addr2line.c:66
 msgid "Output selection options:"
@@ -555,24 +553,23 @@ msgstr "Opcje wyboru wyjścia:"
 
 #: ../src/addr2line.c:67
 msgid "Show only base names of source files"
-msgstr "Pokazywanie tylko podstawowych nazw plików źródłowych"
+msgstr "Wyświetla tylko podstawowe nazwy plików źródłowych"
 
 #: ../src/addr2line.c:69
 msgid "Show absolute file names using compilation directory"
-msgstr "Pokazywanie bezwzględnych nazw plików z użyciem katalogu kompilacji"
+msgstr "Wyświetla bezwzględne nazwy plików używając katalogu kompilacji"
 
 #: ../src/addr2line.c:70
 msgid "Also show function names"
-msgstr "Pokazywanie dodatkowo nazw funkcji"
+msgstr "Wyświetla także nazwy funkcji"
 
 #: ../src/addr2line.c:71
-#, fuzzy
 msgid "Also show symbol or section names"
-msgstr "Pokazywanie dodatkowo nazw funkcji"
+msgstr "Wyświetla także nazwy symboli ub sekcji"
 
 #: ../src/addr2line.c:73
 msgid "Treat addresses as offsets relative to NAME section."
-msgstr ""
+msgstr "Traktuje adresy jako offsety względne do sekcji NAZWA."
 
 #: ../src/addr2line.c:75 ../src/elfcmp.c:75 ../src/findtextrel.c:75
 #: ../src/nm.c:103 ../src/strings.c:83
@@ -584,7 +581,7 @@ msgstr "Różne:"
 msgid ""
 "Locate source files and line information for ADDRs (in a.out by default)."
 msgstr ""
-"Odnajdywanie plików źródłowych i informacji o linii dla ADRESU (domyślnie w "
+"Odnajdywanie plików źródłowych i informacji o wierszu dla ADRESU (domyślne w "
 "a.out)."
 
 #. Strings for arguments in help texts.
@@ -621,22 +618,22 @@ msgstr "Napisane przez %s.\n"
 #: ../src/addr2line.c:405
 #, c-format
 msgid "Section syntax requires exactly one module"
-msgstr ""
+msgstr "Składnia sekcji wymaga dokładnie jednego modułu"
 
 #: ../src/addr2line.c:428
 #, c-format
 msgid "offset %#<PRIxMAX> lies outside section '%s'"
-msgstr ""
+msgstr "offset %#<PRIxMAX> leży poza sekcją \"%s\""
 
 #: ../src/addr2line.c:469
-#, fuzzy, c-format
+#, c-format
 msgid "cannot find symbol '%s'"
-msgstr "nie można pobrać symbolu w '%s': %s"
+msgstr "nie można odnaleźć symbolu \"%s\""
 
 #: ../src/addr2line.c:474
 #, c-format
 msgid "offset %#<PRIxMAX> lies outside contents of '%s'"
-msgstr ""
+msgstr "offset %#<PRIxMAX> leży poza zawartością \"%s\""
 
 #: ../src/ar.c:76
 msgid "Commands:"
@@ -644,69 +641,67 @@ msgstr "Polecenia:"
 
 #: ../src/ar.c:77
 msgid "Delete files from archive."
-msgstr ""
+msgstr "Usuwa pliki z archiwum."
 
 #: ../src/ar.c:78
-#, fuzzy
 msgid "Move files in archive."
-msgstr "'%s' nie jest archiwum"
+msgstr "Przenosi pliki w archiwum."
 
 #: ../src/ar.c:79
-#, fuzzy
 msgid "Print files in archive."
-msgstr "'%s' nie jest archiwum"
+msgstr "Wyświetla pliki w archiwum."
 
 #: ../src/ar.c:80
 msgid "Quick append files to archive."
-msgstr ""
+msgstr "Szybko dodaje pliki do archiwum."
 
 #: ../src/ar.c:82
 msgid "Replace existing or insert new file into archive."
-msgstr ""
+msgstr "Zastępuje istniejący lub umieszcza nowy plik w archiwum."
 
 #: ../src/ar.c:83
 msgid "Display content of archive."
-msgstr ""
+msgstr "Wyświetla zawartość archiwum."
 
 #: ../src/ar.c:84
 msgid "Extract files from archive."
-msgstr ""
+msgstr "Wypakowuje pliki z archiwum."
 
 #: ../src/ar.c:86
 msgid "Command Modifiers:"
-msgstr ""
+msgstr "Modyfikatory poleceń:"
 
 #: ../src/ar.c:87
 msgid "Preserve original dates."
-msgstr ""
+msgstr "Zachowuje pierwotne daty."
 
 #: ../src/ar.c:88
 msgid "Use instance [COUNT] of name."
-msgstr ""
+msgstr "Używa wystąpienia [LICZNIK] nazwy."
 
 #: ../src/ar.c:90
 msgid "Do not replace existing files with extracted files."
-msgstr ""
+msgstr "Nie zastępuje istniejących plików wypakowanymi plikami."
 
 #: ../src/ar.c:91
 msgid "Allow filename to be truncated if necessary."
-msgstr ""
+msgstr "Zezwala na skrócenie nazwy pliku, jeśli jest to wymagane."
 
 #: ../src/ar.c:93
 msgid "Provide verbose output."
-msgstr ""
+msgstr "Wyświetla więcej informacji."
 
 #: ../src/ar.c:94
 msgid "Force regeneration of symbol table."
-msgstr ""
+msgstr "Wymusza ponowne utworzenie tablicy symboli."
 
 #: ../src/ar.c:95
 msgid "Insert file after [MEMBER]."
-msgstr ""
+msgstr "Umieszcza plik po [ELEMENCIE]."
 
 #: ../src/ar.c:96
 msgid "Insert file before [MEMBER]."
-msgstr ""
+msgstr "Umieszcza plik przed [ELEMENTEM]."
 
 #: ../src/ar.c:97
 msgid "Same as -b."
@@ -714,26 +709,25 @@ msgstr "To samo, co -b."
 
 #: ../src/ar.c:98
 msgid "Suppress message when library has to be created."
-msgstr ""
+msgstr "Zmniejsza komunikat, jeśli biblioteka musi zostać utworzona."
 
 #: ../src/ar.c:100
 msgid "Use full path for file matching."
-msgstr ""
+msgstr "Używa pełnej ścieżki do dopasowywania plików."
 
 #: ../src/ar.c:101
 msgid "Update only older files in archive."
-msgstr ""
+msgstr "Aktualizuje tylko starsze pliki w archiwum."
 
 #. Short description of program.
 #: ../src/ar.c:107
-#, fuzzy
 msgid "Create, modify, and extract from archives."
-msgstr "Słabe odwołania powodują wyciągnięcie z archiwum."
+msgstr "Tworzenie, modyfikowanie i wypakowywanie archiwów."
 
 #. Strings for arguments in help texts.
 #: ../src/ar.c:110
 msgid "[MEMBER] [COUNT] ARCHIVE [FILE...]"
-msgstr ""
+msgstr "[ELEMENT] [LICZNIK] ARCHIWUM [PLIK...]"
 
 #: ../src/ar.c:192
 #, c-format
@@ -776,14 +770,14 @@ msgid "More than one operation specified"
 msgstr "Nie podano operacji.\n"
 
 #: ../src/ar.c:404
-#, fuzzy, c-format
+#, c-format
 msgid "cannot open archive '%s'"
-msgstr "nie można otworzyć '%s'"
+msgstr "nie można otworzyć archiwum \"%s\""
 
 #: ../src/ar.c:414
-#, fuzzy, c-format
+#, c-format
 msgid "cannot open archive '%s': %s"
-msgstr "nie można odczytać archiwum `%s': %s"
+msgstr "nie można otworzyć archiwum \"%s\": %s"
 
 #: ../src/ar.c:418
 #, fuzzy, c-format
@@ -791,14 +785,14 @@ msgid "%s: not an archive file"
 msgstr "Łączenie plików obiektów i archiwów."
 
 #: ../src/ar.c:422
-#, fuzzy, c-format
+#, c-format
 msgid "cannot stat archive '%s'"
-msgstr "nie można wykonać stat na '%s'"
+msgstr "nie można wykonać stat na archiwum \"%s\""
 
 #: ../src/ar.c:434
-#, fuzzy, c-format
+#, c-format
 msgid "no entry %s in archive\n"
-msgstr "'%s' nie jest archiwum"
+msgstr "brak wpisu %s w archiwum\n"
 
 #: ../src/ar.c:487 ../src/ar.c:929 ../src/ar.c:1129
 #, fuzzy, c-format
@@ -813,7 +807,7 @@ msgstr "nie można utworzyć tabeli łańcuchów"
 #: ../src/ar.c:502 ../src/ranlib.c:176
 #, c-format
 msgid "cannot stat '%s'"
-msgstr "nie można wykonać stat na '%s'"
+msgstr "nie można wykonać stat na \"%s\""
 
 #: ../src/ar.c:598
 #, fuzzy, c-format
@@ -821,14 +815,14 @@ msgid "cannot read content of %s: %s"
 msgstr "nie można pobrać zawartości sekcji %zu: %s"
 
 #: ../src/ar.c:641
-#, fuzzy, c-format
+#, c-format
 msgid "cannot open %.*s"
-msgstr "nie można otworzyć %s"
+msgstr "nie można otworzyć %.*s"
 
 #: ../src/ar.c:663
 #, c-format
 msgid "failed to write %s"
-msgstr ""
+msgstr "zapisanie %s nie powiodło się"
 
 #: ../src/ar.c:675
 #, fuzzy, c-format
@@ -838,7 +832,7 @@ msgstr "nie można zmienić uprawnień pliku wyjściowego"
 #: ../src/ar.c:691
 #, fuzzy, c-format
 msgid "cannot change modification time of %s"
-msgstr "nie można ustawić czasu dostępu i modyfikacji '%s'"
+msgstr "nie można ustawić czasu dostępu i modyfikacji %s"
 
 #: ../src/ar.c:737
 #, fuzzy, c-format
@@ -858,7 +852,7 @@ msgstr ""
 #: ../src/ar.c:1230
 #, fuzzy, c-format
 msgid "%s: no entry %s in archive!\n"
-msgstr "'%s' nie jest archiwum"
+msgstr "%s nie jest archiwum"
 
 #: ../src/ar.c:1259 ../src/ldgeneric.c:519 ../src/objdump.c:257
 #, c-format
@@ -868,7 +862,7 @@ msgstr "nie można otworzyć %s"
 #: ../src/ar.c:1264
 #, fuzzy, c-format
 msgid "cannot stat %s"
-msgstr "nie można wykonać stat na '%s'"
+msgstr "nie można wykonać stat na %s"
 
 #: ../src/ar.c:1270
 #, fuzzy, c-format
@@ -878,7 +872,7 @@ msgstr "to nie jest zwykły plik"
 #: ../src/ar.c:1283
 #, fuzzy, c-format
 msgid "cannot get ELF descriptor for %s: %s\n"
-msgstr "nie można utworzyć deskryptora ELF dla '%s': %s"
+msgstr "nie można utworzyć deskryptora ELF dla %s: %s"
 
 #: ../src/ar.c:1302
 #, fuzzy, c-format
@@ -894,7 +888,7 @@ msgstr ""
 #: ../src/arlib.c:228
 #, fuzzy, c-format
 msgid "cannot read ELF header of %s(%s): %s"
-msgstr "nie można pobrać nagłówka ELF '%s': %s"
+msgstr "nie można pobrać nagłówka ELF %s: %s"
 
 #: ../src/elfcmp.c:69
 msgid "Control options:"
@@ -933,7 +927,7 @@ msgstr "Błędna liczba parametrów.\n"
 #: ../src/elfcmp.c:168 ../src/elfcmp.c:173
 #, c-format
 msgid "cannot get ELF header of '%s': %s"
-msgstr "nie można pobrać nagłówka ELF '%s': %s"
+msgstr "nie można pobrać nagłówka ELF \"%s\": %s"
 
 #: ../src/elfcmp.c:190
 #, c-format
@@ -953,7 +947,7 @@ msgstr "%s %s różnią się: nagłówek sekcji"
 #: ../src/elfcmp.c:214 ../src/elfcmp.c:217
 #, fuzzy, c-format
 msgid "cannot get program header count of '%s': %s"
-msgstr "nie można pobrać wpisu nagłówka programu %d z '%s': %s"
+msgstr "nie można pobrać wpisu nagłówka programu %d z \"%s\": %s"
 
 #: ../src/elfcmp.c:222
 #, fuzzy, c-format
@@ -968,12 +962,12 @@ msgstr "%s %s różnią się: nagłówek sekcji"
 #: ../src/elfcmp.c:309 ../src/elfcmp.c:315
 #, c-format
 msgid "cannot get content of section %zu in '%s': %s"
-msgstr "nie można pobrać zawartości sekcji %zu w '%s': %s"
+msgstr "nie można pobrać zawartości sekcji %zu w \"%s\": %s"
 
 #: ../src/elfcmp.c:331 ../src/elfcmp.c:337
 #, c-format
 msgid "cannot get symbol in '%s': %s"
-msgstr "nie można pobrać symbolu w '%s': %s"
+msgstr "nie można pobrać symbolu w \"%s\": %s"
 
 #: ../src/elfcmp.c:358
 #, c-format
@@ -988,12 +982,12 @@ msgstr "%s %s różnią się: tabela symboli [%zu,%zu]"
 #: ../src/elfcmp.c:409
 #, c-format
 msgid "%s %s differ: section [%zu] '%s' content"
-msgstr "%s %s różnią się: zawartość sekcji [%zu] '%s'"
+msgstr "%s %s różnią się: zawartość sekcji [%zu] \"%s\""
 
 #: ../src/elfcmp.c:413
 #, c-format
 msgid "%s %s differ: section [%zu,%zu] '%s' content"
-msgstr "%s %s różnią się: zawartość sekcji [%zu,%zu] '%s'"
+msgstr "%s %s różnią się: zawartość sekcji [%zu,%zu] \"%s\""
 
 #: ../src/elfcmp.c:429
 #, c-format
@@ -1003,12 +997,12 @@ msgstr "%s %s różnią się: różna liczba ważnych sekcji"
 #: ../src/elfcmp.c:463 ../src/elfcmp.c:468
 #, c-format
 msgid "cannot load data of '%s': %s"
-msgstr "nie można odczytać danych z '%s': %s"
+msgstr "nie można odczytać danych z \"%s\": %s"
 
 #: ../src/elfcmp.c:487 ../src/elfcmp.c:493
 #, c-format
 msgid "cannot get program header entry %d of '%s': %s"
-msgstr "nie można pobrać wpisu nagłówka programu %d z '%s': %s"
+msgstr "nie można pobrać wpisu nagłówka programu %d z \"%s\": %s"
 
 #: ../src/elfcmp.c:499
 #, c-format
@@ -1023,7 +1017,7 @@ msgstr "%s %s różnią się: luka"
 #: ../src/elfcmp.c:583
 #, c-format
 msgid "Invalid value '%s' for --gaps parameter."
-msgstr "Błędna wartość '%s' dla parametru --gaps."
+msgstr "Błędna wartość \"%s\" dla parametru --gaps."
 
 #: ../src/elfcmp.c:607 ../src/findtextrel.c:229 ../src/ldgeneric.c:1767
 #: ../src/ldgeneric.c:4257 ../src/nm.c:363 ../src/ranlib.c:169
@@ -1031,17 +1025,17 @@ msgstr "Błędna wartość '%s' dla parametru --gaps."
 #: ../src/strip.c:468 ../src/unstrip.c:1900 ../src/unstrip.c:1929
 #, c-format
 msgid "cannot open '%s'"
-msgstr "nie można otworzyć '%s'"
+msgstr "nie można otworzyć \"%s\""
 
 #: ../src/elfcmp.c:611 ../src/findtextrel.c:236 ../src/ranlib.c:186
 #, c-format
 msgid "cannot create ELF descriptor for '%s': %s"
-msgstr "nie można utworzyć deskryptora ELF dla '%s': %s"
+msgstr "nie można utworzyć deskryptora ELF dla \"%s\": %s"
 
 #: ../src/elfcmp.c:616
 #, c-format
 msgid "cannot create EBL descriptor for '%s'"
-msgstr "nie można utworzyć deskryptora EBL dla '%s'"
+msgstr "nie można utworzyć deskryptora EBL dla \"%s\""
 
 #: ../src/elfcmp.c:634
 #, c-format
@@ -1141,7 +1135,7 @@ msgstr "nieznany numer wersji nagłówka ELF e_ident[%d] == %d\n"
 #: ../src/elflint.c:385
 #, c-format
 msgid "unsupported OS ABI e_ident[%d] == '%s'\n"
-msgstr "nieobsługiwane OS ABI e_ident[%d] == '%s'\n"
+msgstr "nieobsługiwane OS ABI e_ident[%d] == \"%s\"\n"
 
 #: ../src/elflint.c:391
 #, c-format
@@ -1245,14 +1239,15 @@ msgid ""
 "section [%2d] '%s': section with SHF_GROUP flag set not part of a section "
 "group\n"
 msgstr ""
-"sekcja [%2d] '%s': sekcja z flagą SHF_GROUP nie jest częścią grupy sekcji\n"
+"sekcja [%2d] \"%s\": sekcja z flagą SHF_GROUP nie jest częścią grupy sekcji\n"
 
 #: ../src/elflint.c:573
 #, fuzzy, c-format
 msgid ""
 "section [%2d] '%s': section group [%2zu] '%s' does not precede group member\n"
 msgstr ""
-"sekcja [%2d] '%s': grupa sekcji [%2zu] '%s' nie poprzedza elementu grupy\n"
+"sekcja [%2d] \"%s\": grupa sekcji [%2zu] \"%s\" nie poprzedza elementu "
+"grupy\n"
 
 #: ../src/elflint.c:589 ../src/elflint.c:1432 ../src/elflint.c:1482
 #: ../src/elflint.c:1591 ../src/elflint.c:2185 ../src/elflint.c:2699
@@ -1260,7 +1255,7 @@ msgstr ""
 #: ../src/elflint.c:4062
 #, c-format
 msgid "section [%2d] '%s': cannot get section data\n"
-msgstr "sekcja [%2d] '%s': nie można pobrać danych sekcji\n"
+msgstr "sekcja [%2d] \"%s\": nie można pobrać danych sekcji\n"
 
 #: ../src/elflint.c:602 ../src/elflint.c:1598
 #, c-format
@@ -1268,8 +1263,8 @@ msgid ""
 "section [%2d] '%s': referenced as string table for section [%2d] '%s' but "
 "type is not SHT_STRTAB\n"
 msgstr ""
-"sekcja [%2d] '%s': użyta jako tabela łańcuchów dla sekcji [%2d] '%s', ale "
-"nie jest typu SHT_STRTAB\n"
+"sekcja [%2d] \"%s\": użyta jako tabela łańcuchów dla sekcji [%2d] \"%s\", "
+"ale nie jest typu SHT_STRTAB\n"
 
 #: ../src/elflint.c:625
 #, c-format
@@ -1277,39 +1272,39 @@ msgid ""
 "section [%2d] '%s': symbol table cannot have more than one extended index "
 "section\n"
 msgstr ""
-"sekcja [%2d] '%s': tabela symboli nie może mieć więcej niż jednej "
+"sekcja [%2d] \"%s\": tabela symboli nie może mieć więcej niż jednej "
 "rozszerzonej sekcji indeksów\n"
 
 #: ../src/elflint.c:636
 #, fuzzy, c-format
 msgid "section [%2u] '%s': entry size is does not match ElfXX_Sym\n"
-msgstr "sekcja [%2zu] '%s': rozmiar wpisu nie zgadza się z ElfXX_Sym\n"
+msgstr "sekcja [%2zu] \"%s\": rozmiar wpisu nie zgadza się z ElfXX_Sym\n"
 
 #: ../src/elflint.c:645
 #, c-format
 msgid "section [%2d] '%s': cannot get symbol %d: %s\n"
-msgstr "sekcja [%2d] '%s': nie można pobrać symbolu %d: %s\n"
+msgstr "sekcja [%2d] \"%s\": nie można pobrać symbolu %d: %s\n"
 
 #: ../src/elflint.c:650 ../src/elflint.c:653 ../src/elflint.c:656
 #: ../src/elflint.c:659 ../src/elflint.c:662 ../src/elflint.c:665
 #, c-format
 msgid "section [%2d] '%s': '%s' in zeroth entry not zero\n"
-msgstr "sekcja [%2d] '%s': '%s' w zerowym wpisie nie jest zerem\n"
+msgstr "sekcja [%2d] \"%s\": \"%s\" w zerowym wpisie nie jest zerem\n"
 
 #: ../src/elflint.c:668
 #, c-format
 msgid "section [%2d] '%s': XINDEX for zeroth entry not zero\n"
-msgstr "sekcja [%2d] '%s': XINDEX dla zerowego wpisu nie jest zerem\n"
+msgstr "sekcja [%2d] \"%s\": XINDEX dla zerowego wpisu nie jest zerem\n"
 
 #: ../src/elflint.c:678
 #, c-format
 msgid "section [%2d] '%s': cannot get symbol %zu: %s\n"
-msgstr "sekcja [%2d] '%s': nie można pobrać symbolu %zu: %s\n"
+msgstr "sekcja [%2d] \"%s\": nie można pobrać symbolu %zu: %s\n"
 
 #: ../src/elflint.c:687
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: invalid name value\n"
-msgstr "sekcja [%2d] '%s': symbol %zu: błędna wartość nazwy\n"
+msgstr "sekcja [%2d] \"%s\": symbol %zu: błędna wartość nazwy\n"
 
 #: ../src/elflint.c:700
 #, c-format
@@ -1317,7 +1312,7 @@ msgid ""
 "section [%2d] '%s': symbol %zu: too large section index but no extended "
 "section index section\n"
 msgstr ""
-"sekcja [%2d] '%s': symbol %zu: zbyt duży indeks sekcji, ale nie ma sekcji "
+"sekcja [%2d] \"%s\": symbol %zu: zbyt duży indeks sekcji, ale nie ma sekcji "
 "rozszerzonych indeksów sekcji\n"
 
 #: ../src/elflint.c:706
@@ -1326,53 +1321,53 @@ msgid ""
 "section [%2d] '%s': symbol %zu: XINDEX used for index which would fit in "
 "st_shndx (%<PRIu32>)\n"
 msgstr ""
-"sekcja [%2d] '%s': symbol %zu: XINDEX użyty dla indeksu, który zmieściłby "
+"sekcja [%2d] \"%s\": symbol %zu: XINDEX użyty dla indeksu, który zmieściłby "
 "się w st_shndx (%<PRIu32>)\n"
 
 #. || sym->st_shndx > SHN_HIRESERVE  always false
 #: ../src/elflint.c:718
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: invalid section index\n"
-msgstr "sekcja [%2d] '%s': symbol %zu: błędny indeks sekcji\n"
+msgstr "sekcja [%2d] \"%s\": symbol %zu: błędny indeks sekcji\n"
 
 #: ../src/elflint.c:726
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: unknown type\n"
-msgstr "sekcja [%2d] '%s': symbol %zu: nieznany typ\n"
+msgstr "sekcja [%2d] \"%s\": symbol %zu: nieznany typ\n"
 
 #: ../src/elflint.c:732
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: unknown symbol binding\n"
-msgstr "sekcja [%2d] '%s': symbol %zu: nieznane dowiązanie symbolu\n"
+msgstr "sekcja [%2d] \"%s\": symbol %zu: nieznane dowiązanie symbolu\n"
 
 #: ../src/elflint.c:737
 #, fuzzy, c-format
 msgid "section [%2d] '%s': symbol %zu: unique symbol not of object type\n"
-msgstr "sekcja [%2d] '%s': symbol %zu: nieznany typ\n"
+msgstr "sekcja [%2d] \"%s\": symbol %zu: nieznany typ\n"
 
 #: ../src/elflint.c:745
 #, c-format
 msgid ""
 "section [%2d] '%s': symbol %zu: COMMON only allowed in relocatable files\n"
 msgstr ""
-"sekcja [%2d] '%s': symbol %zu: COMMON dopuszczalne tylko w plikach "
+"sekcja [%2d] \"%s\": symbol %zu: COMMON dopuszczalne tylko w plikach "
 "relokowalnych\n"
 
 #: ../src/elflint.c:749
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: local COMMON symbols are nonsense\n"
-msgstr "sekcja [%2d] '%s': symbol %zu: lokalne symbole COMMON to nonsens\n"
+msgstr "sekcja [%2d] \"%s\": symbol %zu: lokalne symbole COMMON to nonsens\n"
 
 #: ../src/elflint.c:753
 #, c-format
 msgid ""
 "section [%2d] '%s': symbol %zu: function in COMMON section is nonsense\n"
-msgstr "sekcja [%2d] '%s': symbol %zu: funkcja w sekcji COMMON to nonsens\n"
+msgstr "sekcja [%2d] \"%s\": symbol %zu: funkcja w sekcji COMMON to nonsens\n"
 
 #: ../src/elflint.c:785
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: st_value out of bounds\n"
-msgstr "sekcja [%2d] '%s': symbol %zu: st_value spoza zakresu\n"
+msgstr "sekcja [%2d] \"%s\": symbol %zu: st_value spoza zakresu\n"
 
 #: ../src/elflint.c:791 ../src/elflint.c:816 ../src/elflint.c:859
 #, c-format
@@ -1380,8 +1375,8 @@ msgid ""
 "section [%2d] '%s': symbol %zu does not fit completely in referenced section "
 "[%2d] '%s'\n"
 msgstr ""
-"sekcja [%2d] '%s': symbol %zu nie mieści się w całości we wskazywanej sekcji "
-"[%2d] '%s'\n"
+"sekcja [%2d] \"%s\": symbol %zu nie mieści się w całości we wskazywanej "
+"sekcji [%2d] \"%s\"\n"
 
 #: ../src/elflint.c:800
 #, c-format
@@ -1389,7 +1384,7 @@ msgid ""
 "section [%2d] '%s': symbol %zu: referenced section [%2d] '%s' does not have "
 "SHF_TLS flag set\n"
 msgstr ""
-"sekcja [%2d] '%s': symbol %zu: wskazywana sekcja [%2d] '%s' nie ma "
+"sekcja [%2d] \"%s\": symbol %zu: wskazywana sekcja [%2d] \"%s\" nie ma "
 "ustawionej flagi SHF_TLS\n"
 
 #: ../src/elflint.c:810 ../src/elflint.c:852
@@ -1398,15 +1393,15 @@ msgid ""
 "section [%2d] '%s': symbol %zu: st_value out of bounds of referenced section "
 "[%2d] '%s'\n"
 msgstr ""
-"sekcja [%2d] '%s': symbol %zu: st_value spoza zakresu wskazywanej sekcji [%"
-"2d] '%s'\n"
+"sekcja [%2d] \"%s\": symbol %zu: st_value spoza zakresu wskazywanej sekcji [%"
+"2d] \"%s\"\n"
 
 #: ../src/elflint.c:837
 #, c-format
 msgid ""
 "section [%2d] '%s': symbol %zu: TLS symbol but no TLS program header entry\n"
 msgstr ""
-"sekcja [%2d] '%s': symbol %zu: symbol TLS ale brak wpisu TLS nagłówka "
+"sekcja [%2d] \"%s\": symbol %zu: symbol TLS ale brak wpisu TLS nagłówka "
 "programu\n"
 
 #: ../src/elflint.c:845
@@ -1415,7 +1410,8 @@ msgid ""
 "section [%2d] '%s': symbol %zu: st_value short of referenced section [%2d] '%"
 "s'\n"
 msgstr ""
-"sekcja [%2d] '%s': symbol %zu: st_value pomija wskazywaną sekcję [%2d] '%s'\n"
+"sekcja [%2d] \"%s\": symbol %zu: st_value pomija wskazywaną sekcję [%2d] \"%s"
+"\"\n"
 
 #: ../src/elflint.c:872
 #, c-format
@@ -1423,7 +1419,7 @@ msgid ""
 "section [%2d] '%s': symbol %zu: local symbol outside range described in "
 "sh_info\n"
 msgstr ""
-"sekcja [%2d] '%s': symbol %zu: symbol lokalny spoza zakresu określonego w "
+"sekcja [%2d] \"%s\": symbol %zu: symbol lokalny spoza zakresu określonego w "
 "sh_info\n"
 
 #: ../src/elflint.c:879
@@ -1432,13 +1428,13 @@ msgid ""
 "section [%2d] '%s': symbol %zu: non-local symbol outside range described in "
 "sh_info\n"
 msgstr ""
-"sekcja [%2d] '%s': symbol %zu: symbol nie-lokalny spoza zakresu określonego "
-"w sh_info\n"
+"sekcja [%2d] \"%s\": symbol %zu: symbol nie-lokalny spoza zakresu "
+"określonego w sh_info\n"
 
 #: ../src/elflint.c:886
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: non-local section symbol\n"
-msgstr "sekcja [%2d] '%s': symbol %zu: nie-lokalny symbol sekcji\n"
+msgstr "sekcja [%2d] \"%s\": symbol %zu: nie-lokalny symbol sekcji\n"
 
 #: ../src/elflint.c:936
 #, fuzzy, c-format
@@ -1446,7 +1442,7 @@ msgid ""
 "section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to bad section [%"
 "2d]\n"
 msgstr ""
-"sekcja [%2d] '%s': symbol _GLOBAL_OFFSET_TABLE_ odnosi się do złej sekcji\n"
+"sekcja [%2d] \"%s\": symbol _GLOBAL_OFFSET_TABLE_ odnosi się do złej sekcji\n"
 
 #: ../src/elflint.c:943
 #, fuzzy, c-format
@@ -1454,7 +1450,7 @@ msgid ""
 "section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to section [%2d] '%"
 "s'\n"
 msgstr ""
-"sekcja [%2d] '%s': symbol _GLOBAL_OFFSET_TABLE_ odnosi się do złej sekcji\n"
+"sekcja [%2d] \"%s\": symbol _GLOBAL_OFFSET_TABLE_ odnosi się do złej sekcji\n"
 
 #. This test is more strict than the psABIs which
 #. usually allow the symbol to be in the middle of
@@ -1465,7 +1461,7 @@ msgid ""
 "section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol value %#<PRIx64> does not "
 "match %s section address %#<PRIx64>\n"
 msgstr ""
-"sekcja [%2d] '%s': wartość symbolu _GLOBAL_OFFSET_TABLE_ %#<PRIx64> nie "
+"sekcja [%2d] \"%s\": wartość symbolu _GLOBAL_OFFSET_TABLE_ %#<PRIx64> nie "
 "pasuje do adresu sekcji %s %#<PRIx64>\n"
 
 #: ../src/elflint.c:966
@@ -1474,7 +1470,7 @@ msgid ""
 "section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol size %<PRIu64> does not "
 "match %s section size %<PRIu64>\n"
 msgstr ""
-"sekcja [%2d] '%s': rozmiar symbolu _GLOBAL_OFFSET_TABLE_ %<PRIu64> nie "
+"sekcja [%2d] \"%s\": rozmiar symbolu _GLOBAL_OFFSET_TABLE_ %<PRIu64> nie "
 "pasuje do rozmiaru sekcji %s %<PRIu64>\n"
 
 #: ../src/elflint.c:974
@@ -1483,7 +1479,7 @@ msgid ""
 "section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol present, but no .got "
 "section\n"
 msgstr ""
-"sekcja [%2d] '%s': symbol _GLOBAL_OFFSET_TABLE_ istnieje, ale brak sekcji ."
+"sekcja [%2d] \"%s\": symbol _GLOBAL_OFFSET_TABLE_ istnieje, ale brak sekcji ."
 "got\n"
 
 #: ../src/elflint.c:990
@@ -1492,8 +1488,8 @@ msgid ""
 "section [%2d] '%s': _DYNAMIC_ symbol value %#<PRIx64> does not match dynamic "
 "segment address %#<PRIx64>\n"
 msgstr ""
-"sekcja [%2d] '%s': wartość symbolu _DYNAMIC_ %#<PRIx64> nie pasuje do adresu "
-"segmentu dynamicznego %#<PRIx64>\n"
+"sekcja [%2d] \"%s\": wartość symbolu _DYNAMIC_ %#<PRIx64> nie pasuje do "
+"adresu segmentu dynamicznego %#<PRIx64>\n"
 
 #: ../src/elflint.c:997
 #, c-format
@@ -1501,7 +1497,7 @@ msgid ""
 "section [%2d] '%s': _DYNAMIC symbol size %<PRIu64> does not match dynamic "
 "segment size %<PRIu64>\n"
 msgstr ""
-"sekcja [%2d] '%s': rozmiar symbolu _DYNAMIC_ %<PRIu64> nie pasuje do "
+"sekcja [%2d] \"%s\": rozmiar symbolu _DYNAMIC_ %<PRIu64> nie pasuje do "
 "rozmiaru segmentu dynamicznego %<PRIu64>\n"
 
 #: ../src/elflint.c:1010
@@ -1509,22 +1505,22 @@ msgstr ""
 msgid ""
 "section [%2d] '%s': symbol %zu: symbol in dynamic symbol table with non-"
 "default visibility\n"
-msgstr "sekcja [%2d] '%s': symbol %d: symbol lokalny z zakresem globalnym\n"
+msgstr "sekcja [%2d] \"%s\": symbol %d: symbol lokalny z zakresem globalnym\n"
 
 #: ../src/elflint.c:1014
 #, fuzzy, c-format
 msgid "section [%2d] '%s': symbol %zu: unknown bit set in st_other\n"
-msgstr "sekcja [%2d] '%s': symbol %zu: nieznany typ\n"
+msgstr "sekcja [%2d] \"%s\": symbol %zu: nieznany typ\n"
 
 #: ../src/elflint.c:1059
 #, c-format
 msgid "section [%2d] '%s': DT_RELCOUNT used for this RELA section\n"
-msgstr "sekcja [%2d] '%s': wartość DT_RELCOUNT użyta dla tej sekcji RELA\n"
+msgstr "sekcja [%2d] \"%s\": wartość DT_RELCOUNT użyta dla tej sekcji RELA\n"
 
 #: ../src/elflint.c:1068 ../src/elflint.c:1120
 #, c-format
 msgid "section [%2d] '%s': DT_RELCOUNT value %d too high for this section\n"
-msgstr "sekcja [%2d] '%s': wartość DT_RELCOUNT %d zbyt duża dla tej sekcji\n"
+msgstr "sekcja [%2d] \"%s\": wartość DT_RELCOUNT %d zbyt duża dla tej sekcji\n"
 
 #: ../src/elflint.c:1093 ../src/elflint.c:1145
 #, c-format
@@ -1532,7 +1528,7 @@ msgid ""
 "section [%2d] '%s': relative relocations after index %d as specified by "
 "DT_RELCOUNT\n"
 msgstr ""
-"sekcja [%2d] '%s': relokacje względne po indeksie %d określonym przez "
+"sekcja [%2d] \"%s\": relokacje względne po indeksie %d określonym przez "
 "DT_RELCOUNT\n"
 
 #: ../src/elflint.c:1099 ../src/elflint.c:1151
@@ -1541,38 +1537,39 @@ msgid ""
 "section [%2d] '%s': non-relative relocation at index %zu; DT_RELCOUNT "
 "specified %d relative relocations\n"
 msgstr ""
-"sekcja [%2d] '%s': relokacja bezwzględna pod indeksem %zu; DT_RELCOUNT "
+"sekcja [%2d] \"%s\": relokacja bezwzględna pod indeksem %zu; DT_RELCOUNT "
 "określił %d relokacji względnych\n"
 
 #: ../src/elflint.c:1111
 #, c-format
 msgid "section [%2d] '%s': DT_RELACOUNT used for this REL section\n"
-msgstr "sekcja [%2d] '%s': DT_RELACOUNT użyte dla tej sekcji REL\n"
+msgstr "sekcja [%2d] \"%s\": DT_RELACOUNT użyte dla tej sekcji REL\n"
 
 #: ../src/elflint.c:1193
 #, c-format
 msgid "section [%2d] '%s': invalid destination section index\n"
-msgstr "sekcja [%2d] '%s': błędny indeks sekcji docelowej\n"
+msgstr "sekcja [%2d] \"%s\": błędny indeks sekcji docelowej\n"
 
 #: ../src/elflint.c:1206
 #, c-format
 msgid "section [%2d] '%s': invalid destination section type\n"
-msgstr "sekcja [%2d] '%s': błędny typ sekcji docelowej\n"
+msgstr "sekcja [%2d] \"%s\": błędny typ sekcji docelowej\n"
 
 #: ../src/elflint.c:1214
 #, c-format
 msgid "section [%2d] '%s': sh_info should be zero\n"
-msgstr "sekcja [%2d] '%s': sh_info nie jest zerem\n"
+msgstr "sekcja [%2d] \"%s\": sh_info nie jest zerem\n"
 
 #: ../src/elflint.c:1221
 #, c-format
 msgid "section [%2d] '%s': no relocations for merge-able sections possible\n"
-msgstr "sekcja [%2d] '%s': relokacje dla sekcji złączalnych niemożliwe\n"
+msgstr "sekcja [%2d] \"%s\": relokacje dla sekcji złączalnych niemożliwe\n"
 
 #: ../src/elflint.c:1228
 #, c-format
 msgid "section [%2d] '%s': section entry size does not match ElfXX_Rela\n"
-msgstr "sekcja [%2d] '%s': rozmiar wpisu sekcji nie zgadza się z ElfXX_Rela\n"
+msgstr ""
+"sekcja [%2d] \"%s\": rozmiar wpisu sekcji nie zgadza się z ElfXX_Rela\n"
 
 #: ../src/elflint.c:1288
 #, c-format
@@ -1583,7 +1580,7 @@ msgstr ""
 #: ../src/elflint.c:1315
 #, c-format
 msgid "section [%2d] '%s': relocation %zu: invalid type\n"
-msgstr "sekcja [%2d] '%s': relokacja %zu: błędny typ\n"
+msgstr "sekcja [%2d] \"%s\": relokacja %zu: błędny typ\n"
 
 #: ../src/elflint.c:1323
 #, c-format
@@ -1591,12 +1588,13 @@ msgid ""
 "section [%2d] '%s': relocation %zu: relocation type invalid for the file "
 "type\n"
 msgstr ""
-"sekcja [%2d] '%s': relokacja %zu: typ relokacji błędny dla tego typu pliku\n"
+"sekcja [%2d] \"%s\": relokacja %zu: typ relokacji błędny dla tego typu "
+"pliku\n"
 
 #: ../src/elflint.c:1331
 #, c-format
 msgid "section [%2d] '%s': relocation %zu: invalid symbol index\n"
-msgstr "sekcja [%2d] '%s': relokacja %zu: błędny indeks symbolu\n"
+msgstr "sekcja [%2d] \"%s\": relokacja %zu: błędny indeks symbolu\n"
 
 #: ../src/elflint.c:1349
 #, c-format
@@ -1604,13 +1602,13 @@ msgid ""
 "section [%2d] '%s': relocation %zu: only symbol '_GLOBAL_OFFSET_TABLE_' can "
 "be used with %s\n"
 msgstr ""
-"sekcja [%2d] '%s': relokacja %zu: z %s można użyć tylko symbolu "
+"sekcja [%2d] \"%s\": relokacja %zu: z %s można użyć tylko symbolu "
 "'_GLOBAL_OFFSET_TABLE_'\n"
 
 #: ../src/elflint.c:1366
 #, c-format
 msgid "section [%2d] '%s': relocation %zu: offset out of bounds\n"
-msgstr "sekcja [%2d] '%s': relokacja %zu: offset spoza zakresu\n"
+msgstr "sekcja [%2d] \"%s\": relokacja %zu: offset spoza zakresu\n"
 
 #: ../src/elflint.c:1381
 #, c-format
@@ -1618,7 +1616,8 @@ msgid ""
 "section [%2d] '%s': relocation %zu: copy relocation against symbol of type %"
 "s\n"
 msgstr ""
-"sekcja [%2d] '%s': relokacja %zu: relokacja kopii względem symbolu typu %s\n"
+"sekcja [%2d] \"%s\": relokacja %zu: relokacja kopii względem symbolu typu %"
+"s\n"
 
 #: ../src/elflint.c:1402
 #, c-format
@@ -1626,19 +1625,19 @@ msgid ""
 "section [%2d] '%s': relocation %zu: read-only section modified but text "
 "relocation flag not set\n"
 msgstr ""
-"sekcja [%2d] '%s': relokacja %zu: sekcja tylko do odczytu modyfikowana, ale "
-"flaga relokacji tekstu nie ustawiona\n"
+"sekcja [%2d] \"%s\": relokacja %zu: sekcja tylko do odczytu modyfikowana, "
+"ale flaga relokacji tekstu nie ustawiona\n"
 
 #: ../src/elflint.c:1417
 #, c-format
 msgid "section [%2d] '%s': relocations are against loaded and unloaded data\n"
 msgstr ""
-"sekcja [%2d] '%s': relokacje względem wczytanych i niewczytanych danych\n"
+"sekcja [%2d] \"%s\": relokacje względem wczytanych i niewczytanych danych\n"
 
 #: ../src/elflint.c:1456 ../src/elflint.c:1506
 #, c-format
 msgid "section [%2d] '%s': cannot get relocation %zu: %s\n"
-msgstr "sekcja [%2d] '%s': nie można pobrać relokacji %zu: %s\n"
+msgstr "sekcja [%2d] \"%s\": nie można pobrać relokacji %zu: %s\n"
 
 #: ../src/elflint.c:1586
 #, c-format
@@ -1648,44 +1647,46 @@ msgstr "obecna więcej niż jedna sekcja dynamiczna\n"
 #: ../src/elflint.c:1604
 #, c-format
 msgid "section [%2d] '%s': section entry size does not match ElfXX_Dyn\n"
-msgstr "sekcja [%2d] '%s': rozmiar wpisu sekcji nie zgadza się z ElfXX_Dyn\n"
+msgstr "sekcja [%2d] \"%s\": rozmiar wpisu sekcji nie zgadza się z ElfXX_Dyn\n"
 
 #: ../src/elflint.c:1609 ../src/elflint.c:1901
 #, c-format
 msgid "section [%2d] '%s': sh_info not zero\n"
-msgstr "sekcja [%2d] '%s': sh_info nie jest zerem\n"
+msgstr "sekcja [%2d] \"%s\": sh_info nie jest zerem\n"
 
 #: ../src/elflint.c:1619
 #, c-format
 msgid "section [%2d] '%s': cannot get dynamic section entry %zu: %s\n"
-msgstr "sekcja [%2d] '%s': nie można pobrać wpisu %zu sekcji dynamicznej: %s\n"
+msgstr ""
+"sekcja [%2d] \"%s\": nie można pobrać wpisu %zu sekcji dynamicznej: %s\n"
 
 #: ../src/elflint.c:1627
 #, c-format
 msgid "section [%2d] '%s': non-DT_NULL entries follow DT_NULL entry\n"
-msgstr "sekcja [%2d] '%s': wpisy nie-DT_NULL występują po wpisie DT_NULL\n"
+msgstr "sekcja [%2d] \"%s\": wpisy nie-DT_NULL występują po wpisie DT_NULL\n"
 
 #: ../src/elflint.c:1634
 #, c-format
 msgid "section [%2d] '%s': entry %zu: unknown tag\n"
-msgstr "sekcja [%2d] '%s': wpis %zu: nieznany znacznik\n"
+msgstr "sekcja [%2d] \"%s\": wpis %zu: nieznany znacznik\n"
 
 #: ../src/elflint.c:1645
 #, c-format
 msgid "section [%2d] '%s': entry %zu: more than one entry with tag %s\n"
-msgstr "sekcja [%2d] '%s': wpis %zu: więcej niż jeden wpis ze znacznikiem %s\n"
+msgstr ""
+"sekcja [%2d] \"%s\": wpis %zu: więcej niż jeden wpis ze znacznikiem %s\n"
 
 #: ../src/elflint.c:1655
 #, c-format
 msgid "section [%2d] '%s': entry %zu: level 2 tag %s used\n"
-msgstr "sekcja [%2d] '%s': wpis %zu: użyto znacznika %s poziomu 2\n"
+msgstr "sekcja [%2d] \"%s\": wpis %zu: użyto znacznika %s poziomu 2\n"
 
 #: ../src/elflint.c:1673
 #, c-format
 msgid ""
 "section [%2d] '%s': entry %zu: DT_PLTREL value must be DT_REL or DT_RELA\n"
 msgstr ""
-"sekcja [%2d] '%s': wpis %zu: wartością DT_PLTREL musi być DT_REL lub "
+"sekcja [%2d] \"%s\": wpis %zu: wartością DT_PLTREL musi być DT_REL lub "
 "DT_RELA\n"
 
 #: ../src/elflint.c:1695
@@ -1694,15 +1695,15 @@ msgid ""
 "section [%2d] '%s': entry %zu: pointer does not match address of section [%"
 "2d] '%s' referenced by sh_link\n"
 msgstr ""
-"sekcja [%2d] '%s': wpis %zu: wskaźnik nie pasuje do adresu sekcji [%2d] '%s' "
-"wskazywanej przez sh_link\n"
+"sekcja [%2d] \"%s\": wpis %zu: wskaźnik nie pasuje do adresu sekcji [%2d] \"%"
+"s\" wskazywanej przez sh_link\n"
 
 #: ../src/elflint.c:1738
 #, c-format
 msgid ""
 "section [%2d] '%s': entry %zu: %s value must point into loaded segment\n"
 msgstr ""
-"sekcja [%2d] '%s': wpis %zu: wartość %s musi wskazywać na załadowany "
+"sekcja [%2d] \"%s\": wpis %zu: wartość %s musi wskazywać na załadowany "
 "segment\n"
 
 #: ../src/elflint.c:1753
@@ -1711,40 +1712,40 @@ msgid ""
 "section [%2d] '%s': entry %zu: %s value must be valid offset in section [%"
 "2d] '%s'\n"
 msgstr ""
-"sekcja [%2d] '%s': wpis %zu: wartość %s musi być poprawnym offsetem w sekcji "
-"[%2d] '%s'\n"
+"sekcja [%2d] \"%s\": wpis %zu: wartość %s musi być poprawnym offsetem w "
+"sekcji [%2d] \"%s\"\n"
 
 #: ../src/elflint.c:1773 ../src/elflint.c:1801
 #, c-format
 msgid "section [%2d] '%s': contains %s entry but not %s\n"
-msgstr "sekcja [%2d] '%s': zawiera wpis %s, ale nie %s\n"
+msgstr "sekcja [%2d] \"%s\": zawiera wpis %s, ale nie %s\n"
 
 #: ../src/elflint.c:1785
 #, c-format
 msgid "section [%2d] '%s': mandatory tag %s not present\n"
-msgstr "sekcja [%2d] '%s': brak obowiązkowego znacznika %s\n"
+msgstr "sekcja [%2d] \"%s\": brak obowiązkowego znacznika %s\n"
 
 #: ../src/elflint.c:1794
 #, c-format
 msgid "section [%2d] '%s': no hash section present\n"
-msgstr "sekcja [%2d] '%s': brak sekcji haszy\n"
+msgstr "sekcja [%2d] \"%s\": brak sekcji haszy\n"
 
 #: ../src/elflint.c:1809 ../src/elflint.c:1816
 #, c-format
 msgid "section [%2d] '%s': not all of %s, %s, and %s are present\n"
-msgstr "sekcja [%2d] '%s': nie wszystkie z %s, %s i %s są obecne\n"
+msgstr "sekcja [%2d] \"%s\": nie wszystkie z %s, %s i %s są obecne\n"
 
 #: ../src/elflint.c:1826 ../src/elflint.c:1830
 #, c-format
 msgid "section [%2d] '%s': %s tag missing in DSO marked during prelinking\n"
 msgstr ""
-"sekcja [%2d] '%s': brak znacznika %s w DSO zaznaczonym przy prelinkowaniu\n"
+"sekcja [%2d] \"%s\": brak znacznika %s w DSO zaznaczonym przy prelinkowaniu\n"
 
 #: ../src/elflint.c:1836
 #, c-format
 msgid "section [%2d] '%s': non-DSO file marked as dependency during prelink\n"
 msgstr ""
-"sekcja [%2d] '%s': plik nie-DSO zaznaczony jako zależność przy "
+"sekcja [%2d] \"%s\": plik nie-DSO zaznaczony jako zależność przy "
 "prelinkowaniu\n"
 
 #: ../src/elflint.c:1847 ../src/elflint.c:1851 ../src/elflint.c:1855
@@ -1752,14 +1753,15 @@ msgstr ""
 #, c-format
 msgid "section [%2d] '%s': %s tag missing in prelinked executable\n"
 msgstr ""
-"sekcja [%2d] '%s': brak znacznika %s w prelinkowanym programie wykonywalnym\n"
+"sekcja [%2d] \"%s\": brak znacznika %s w prelinkowanym programie "
+"wykonywalnym\n"
 
 #: ../src/elflint.c:1871
 #, c-format
 msgid ""
 "section [%2d] '%s': only relocatable files can have extended section index\n"
 msgstr ""
-"sekcja [%2d] '%s': tylko pliki relokowalne mogą mieć rozszerzoną sekcję "
+"sekcja [%2d] \"%s\": tylko pliki relokowalne mogą mieć rozszerzoną sekcję "
 "indeksów\n"
 
 #: ../src/elflint.c:1881
@@ -1767,7 +1769,7 @@ msgstr ""
 msgid ""
 "section [%2d] '%s': extended section index section not for symbol table\n"
 msgstr ""
-"sekcja [%2d] '%s': sekcja rozszerzonych indeksów sekcji nie dla tabeli "
+"sekcja [%2d] \"%s\": sekcja rozszerzonych indeksów sekcji nie dla tabeli "
 "symboli\n"
 
 #: ../src/elflint.c:1886
@@ -1778,13 +1780,14 @@ msgstr "nie można pobrać danych dla sekcji symboli\n"
 #: ../src/elflint.c:1889
 #, c-format
 msgid "section [%2d] '%s': entry size does not match Elf32_Word\n"
-msgstr "sekcja [%2d] '%s': rozmiar wpisu nie zgadza się z Elf32_Word\n"
+msgstr "sekcja [%2d] \"%s\": rozmiar wpisu nie zgadza się z Elf32_Word\n"
 
 #: ../src/elflint.c:1896
 #, c-format
 msgid "section [%2d] '%s': extended index table too small for symbol table\n"
 msgstr ""
-"sekcja [%2d] '%s': tabela rozszerzonych indeksów za mała dla tabeli symboli\n"
+"sekcja [%2d] \"%s\": tabela rozszerzonych indeksów za mała dla tabeli "
+"symboli\n"
 
 #: ../src/elflint.c:1911
 #, c-format
@@ -1792,8 +1795,8 @@ msgid ""
 "section [%2d] '%s': extended section index in section [%2zu] '%s' refers to "
 "same symbol table\n"
 msgstr ""
-"sekcja [%2d] '%s': rozszerzony indeks sekcji w sekcji [%2zu] '%s' odwołuje "
-"się do tej samej tabeli symboli\n"
+"sekcja [%2d] \"%s\": rozszerzony indeks sekcji w sekcji [%2zu] \"%s\" "
+"odwołuje się do tej samej tabeli symboli\n"
 
 #: ../src/elflint.c:1922
 #, c-format
@@ -1816,34 +1819,34 @@ msgstr ""
 msgid ""
 "section [%2d] '%s': hash table section is too small (is %ld, expected %ld)\n"
 msgstr ""
-"sekcja [%2d] '%s': sekcja tablicy haszującej jest zbyt mała (%ld, oczekiwano "
-"%ld)\n"
+"sekcja [%2d] \"%s\": sekcja tablicy haszującej jest zbyt mała (%ld, "
+"oczekiwano %ld)\n"
 
 #: ../src/elflint.c:1967 ../src/elflint.c:2008
 #, c-format
 msgid "section [%2d] '%s': chain array too large\n"
-msgstr "sekcja [%2d] '%s': tablica łańcuchowa zbyt duża\n"
+msgstr "sekcja [%2d] \"%s\": tablica łańcuchowa zbyt duża\n"
 
 #: ../src/elflint.c:1976 ../src/elflint.c:2017
 #, c-format
 msgid "section [%2d] '%s': hash bucket reference %zu out of bounds\n"
-msgstr "sekcja [%2d] '%s': odwołanie do kubełka hasza %zu spoza zakresu\n"
+msgstr "sekcja [%2d] \"%s\": odwołanie do kubełka hasza %zu spoza zakresu\n"
 
 #: ../src/elflint.c:1982
 #, c-format
 msgid "section [%2d] '%s': hash chain reference %zu out of bounds\n"
-msgstr "sekcja [%2d] '%s': odwołanie do łańcucha hasza %zu spoza zakresu\n"
+msgstr "sekcja [%2d] \"%s\": odwołanie do łańcucha hasza %zu spoza zakresu\n"
 
 #: ../src/elflint.c:2023
 #, c-format
 msgid "section [%2d] '%s': hash chain reference %<PRIu64> out of bounds\n"
 msgstr ""
-"sekcja [%2d] '%s': odwołanie do łańcucha hasza %<PRIu64> spoza zakresu\n"
+"sekcja [%2d] \"%s\": odwołanie do łańcucha hasza %<PRIu64> spoza zakresu\n"
 
 #: ../src/elflint.c:2038
 #, c-format
 msgid "section [%2d] '%s': bitmask size not power of 2: %u\n"
-msgstr "sekcja [%2d] '%s': rozmiar maski bitowej nie jest potęgą 2: %u\n"
+msgstr "sekcja [%2d] \"%s\": rozmiar maski bitowej nie jest potęgą 2: %u\n"
 
 #: ../src/elflint.c:2049
 #, c-format
@@ -1851,21 +1854,21 @@ msgid ""
 "section [%2d] '%s': hash table section is too small (is %ld, expected at "
 "least%ld)\n"
 msgstr ""
-"sekcja [%2d] '%s': sekcja tablicy haszującej jest zbyt mała (%ld, oczekiwano "
-"co najmniej %ld)\n"
+"sekcja [%2d] \"%s\": sekcja tablicy haszującej jest zbyt mała (%ld, "
+"oczekiwano co najmniej %ld)\n"
 
 #: ../src/elflint.c:2057
 #, c-format
 msgid "section [%2d] '%s': 2nd hash function shift too big: %u\n"
 msgstr ""
-"sekcja [%2d] '%s': drugie przesunięcie funkcji haszującej zbyt duże: %u\n"
+"sekcja [%2d] \"%s\": drugie przesunięcie funkcji haszującej zbyt duże: %u\n"
 
 #: ../src/elflint.c:2089
 #, c-format
 msgid ""
 "section [%2d] '%s': hash chain for bucket %zu lower than symbol index bias\n"
 msgstr ""
-"sekcja [%2d] '%s': łańcuch haszujący dla kubełka %zu mniejszy niż "
+"sekcja [%2d] \"%s\": łańcuch haszujący dla kubełka %zu mniejszy niż "
 "przesunięcie indeksu symboli\n"
 
 #: ../src/elflint.c:2110
@@ -1874,7 +1877,7 @@ msgid ""
 "section [%2d] '%s': symbol %u referenced in chain for bucket %zu is "
 "undefined\n"
 msgstr ""
-"sekcja [%2d] '%s': symbol %u wskazywany w łańcuchu dla kubełka %zu jest "
+"sekcja [%2d] \"%s\": symbol %u wskazywany w łańcuchu dla kubełka %zu jest "
 "niezdefiniowany\n"
 
 #: ../src/elflint.c:2121
@@ -1882,49 +1885,49 @@ msgstr ""
 msgid ""
 "section [%2d] '%s': hash value for symbol %u in chain for bucket %zu wrong\n"
 msgstr ""
-"sekcja [%2d] '%s': wartość hasza dla symbolu %u w łańcuchu dla kubełka %zu "
+"sekcja [%2d] \"%s\": wartość hasza dla symbolu %u w łańcuchu dla kubełka %zu "
 "jest błędna\n"
 
 #: ../src/elflint.c:2152
 #, c-format
 msgid "section [%2d] '%s': hash chain for bucket %zu out of bounds\n"
-msgstr "sekcja [%2d] '%s': łańcuch hasza dla kubełka %zu spoza zakresu\n"
+msgstr "sekcja [%2d] \"%s\": łańcuch hasza dla kubełka %zu spoza zakresu\n"
 
 #: ../src/elflint.c:2157
 #, c-format
 msgid ""
 "section [%2d] '%s': symbol reference in chain for bucket %zu out of bounds\n"
 msgstr ""
-"sekcja [%2d] '%s': odwołanie do symbolu w łańcuchu dla kubełka %zu spoza "
+"sekcja [%2d] \"%s\": odwołanie do symbolu w łańcuchu dla kubełka %zu spoza "
 "zakresu\n"
 
 #: ../src/elflint.c:2163
 #, c-format
 msgid "section [%2d] '%s': bitmask does not match names in the hash table\n"
 msgstr ""
-"sekcja [%2d] '%s': maska bitowa nie pasuje do nazw w tablicy haszującej\n"
+"sekcja [%2d] \"%s\": maska bitowa nie pasuje do nazw w tablicy haszującej\n"
 
 #: ../src/elflint.c:2176
 #, c-format
 msgid "section [%2d] '%s': relocatable files cannot have hash tables\n"
 msgstr ""
-"sekcja [%2d] '%s': pliki relokowalne nie mogą mieć tablic haszujących\n"
+"sekcja [%2d] \"%s\": pliki relokowalne nie mogą mieć tablic haszujących\n"
 
 #: ../src/elflint.c:2194
 #, c-format
 msgid "section [%2d] '%s': hash table not for dynamic symbol table\n"
 msgstr ""
-"sekcja [%2d] '%s': tablica haszująca nie dla tabeli dynamicznych symboli\n"
+"sekcja [%2d] \"%s\": tablica haszująca nie dla tabeli dynamicznych symboli\n"
 
 #: ../src/elflint.c:2202
 #, c-format
 msgid "section [%2d] '%s': hash table entry size incorrect\n"
-msgstr "sekcja [%2d] '%s': niepoprawny rozmiar wpisu tablicy haszującej\n"
+msgstr "sekcja [%2d] \"%s\": niepoprawny rozmiar wpisu tablicy haszującej\n"
 
 #: ../src/elflint.c:2207
 #, c-format
 msgid "section [%2d] '%s': not marked to be allocated\n"
-msgstr "sekcja [%2d] '%s': nie oznaczona do przydzielenia\n"
+msgstr "sekcja [%2d] \"%s\": nie oznaczona do przydzielenia\n"
 
 #: ../src/elflint.c:2212
 #, c-format
@@ -1932,18 +1935,19 @@ msgid ""
 "section [%2d] '%s': hash table has not even room for initial administrative "
 "entries\n"
 msgstr ""
-"sekcja [%2d] '%s': tablica haszująca nie ma miejsca nawet na początkowe "
+"sekcja [%2d] \"%s\": tablica haszująca nie ma miejsca nawet na początkowe "
 "wpisy administracyjne\n"
 
 #: ../src/elflint.c:2260
 #, c-format
 msgid "sh_link in hash sections [%2zu] '%s' and [%2zu] '%s' not identical\n"
-msgstr "sh_link w sekcjach hash [%2zu] '%s' i [%2zu] '%s' nie są identyczne\n"
+msgstr ""
+"sh_link w sekcjach hash [%2zu] \"%s\" i [%2zu] \"%s\" nie są identyczne\n"
 
 #: ../src/elflint.c:2338 ../src/elflint.c:2342
 #, c-format
 msgid "section [%2zu] '%s': reference to symbol index 0\n"
-msgstr "sekcja [%2zu] '%s': odwołanie do symbolu o indeksie 0\n"
+msgstr "sekcja [%2zu] \"%s\": odwołanie do symbolu o indeksie 0\n"
 
 #: ../src/elflint.c:2349
 #, c-format
@@ -1951,8 +1955,8 @@ msgid ""
 "symbol %d referenced in new hash table in [%2zu] '%s' but not in old hash "
 "table in [%2zu] '%s'\n"
 msgstr ""
-"symbol %d wymieniony w nowej tablicy haszującej w [%2zu] '%s', ale nie w "
-"starej tablicy haszującej [%2zu] '%s'\n"
+"symbol %d wymieniony w nowej tablicy haszującej w [%2zu] \"%s\", ale nie w "
+"starej tablicy haszującej [%2zu] \"%s\"\n"
 
 #: ../src/elflint.c:2361
 #, c-format
@@ -1960,105 +1964,105 @@ msgid ""
 "symbol %d referenced in old hash table in [%2zu] '%s' but not in new hash "
 "table in [%2zu] '%s'\n"
 msgstr ""
-"symbol %d wymieniony w starej tablicy haszującej w [%2zu] '%s', ale nie w "
-"nowej tablicy haszującej w [%2zu] '%s'\n"
+"symbol %d wymieniony w starej tablicy haszującej w [%2zu] \"%s\", ale nie w "
+"nowej tablicy haszującej w [%2zu] \"%s\"\n"
 
 #: ../src/elflint.c:2377
 #, c-format
 msgid "section [%2d] '%s': nonzero sh_%s for NULL section\n"
-msgstr "sekcja [%2d] '%s': niezerowe sh_%s dla sekcji NULL\n"
+msgstr "sekcja [%2d] \"%s\": niezerowe sh_%s dla sekcji NULL\n"
 
 #: ../src/elflint.c:2397
 #, c-format
 msgid ""
 "section [%2d] '%s': section groups only allowed in relocatable object files\n"
 msgstr ""
-"sekcja [%2d] '%s': w plikach obiektów relokowalnych dozwolone są tylko grupy "
-"sekcji\n"
+"sekcja [%2d] \"%s\": w plikach obiektów relokowalnych dozwolone są tylko "
+"grupy sekcji\n"
 
 #: ../src/elflint.c:2408
 #, c-format
 msgid "section [%2d] '%s': cannot get symbol table: %s\n"
-msgstr "sekcja [%2d] '%s': nie można pobrać tabeli symboli: %s\n"
+msgstr "sekcja [%2d] \"%s\": nie można pobrać tabeli symboli: %s\n"
 
 #: ../src/elflint.c:2413
 #, c-format
 msgid "section [%2d] '%s': section reference in sh_link is no symbol table\n"
 msgstr ""
-"sekcja [%2d] '%s': odwołanie do sekcji w sh_link nie ma tabeli symboli\n"
+"sekcja [%2d] \"%s\": odwołanie do sekcji w sh_link nie ma tabeli symboli\n"
 
 #: ../src/elflint.c:2419
 #, c-format
 msgid "section [%2d] '%s': invalid symbol index in sh_info\n"
-msgstr "sekcja [%2d] '%s': błędny indeks symbolu w sh_info\n"
+msgstr "sekcja [%2d] \"%s\": błędny indeks symbolu w sh_info\n"
 
 #: ../src/elflint.c:2424
 #, c-format
 msgid "section [%2d] '%s': sh_flags not zero\n"
-msgstr "sekcja [%2d] '%s': niezerowe sh_flags\n"
+msgstr "sekcja [%2d] \"%s\": niezerowe sh_flags\n"
 
 #: ../src/elflint.c:2431
 #, fuzzy, c-format
 msgid "section [%2d] '%s': cannot get symbol for signature\n"
-msgstr "sekcja [%2d] '%s': nie można pobrać symbolu %d: %s\n"
+msgstr "sekcja [%2d] \"%s\": nie można pobrać symbolu %d: %s\n"
 
 #: ../src/elflint.c:2436
 #, fuzzy, c-format
 msgid "section [%2d] '%s': signature symbol cannot be empty string\n"
-msgstr "sekcja [%2d] '%s': symbol %d: nie można odczytać danych wersji\n"
+msgstr "sekcja [%2d] \"%s\": symbol %d: nie można odczytać danych wersji\n"
 
 #: ../src/elflint.c:2442
 #, c-format
 msgid "section [%2d] '%s': sh_flags not set correctly\n"
-msgstr "sekcja [%2d] '%s': sh_flags nie ustawione poprawnie\n"
+msgstr "sekcja [%2d] \"%s\": sh_flags nie ustawione poprawnie\n"
 
 #: ../src/elflint.c:2448
 #, c-format
 msgid "section [%2d] '%s': cannot get data: %s\n"
-msgstr "sekcja [%2d] '%s': nie można pobrać danych: %s\n"
+msgstr "sekcja [%2d] \"%s\": nie można pobrać danych: %s\n"
 
 #: ../src/elflint.c:2457
 #, c-format
 msgid "section [%2d] '%s': section size not multiple of sizeof(Elf32_Word)\n"
 msgstr ""
-"sekcja [%2d] '%s': rozmiar sekcji nie jest wielokrotnością sizeof"
+"sekcja [%2d] \"%s\": rozmiar sekcji nie jest wielokrotnością sizeof"
 "(Elf32_Word)\n"
 
 #: ../src/elflint.c:2462
 #, c-format
 msgid "section [%2d] '%s': section group without flags word\n"
-msgstr "sekcja [%2d] '%s': grupa sekcji bez słowa flag\n"
+msgstr "sekcja [%2d] \"%s\": grupa sekcji bez słowa flag\n"
 
 #: ../src/elflint.c:2468
 #, c-format
 msgid "section [%2d] '%s': section group without member\n"
-msgstr "sekcja [%2d] '%s': grupa sekcji bez elementów\n"
+msgstr "sekcja [%2d] \"%s\": grupa sekcji bez elementów\n"
 
 #: ../src/elflint.c:2472
 #, c-format
 msgid "section [%2d] '%s': section group with only one member\n"
-msgstr "sekcja [%2d] '%s': grupa sekcji z tylko jednym elementem\n"
+msgstr "sekcja [%2d] \"%s\": grupa sekcji z tylko jednym elementem\n"
 
 #: ../src/elflint.c:2483
 #, c-format
 msgid "section [%2d] '%s': unknown section group flags\n"
-msgstr "sekcja [%2d] '%s': nieznane flagi grupy sekcji\n"
+msgstr "sekcja [%2d] \"%s\": nieznane flagi grupy sekcji\n"
 
 #: ../src/elflint.c:2495
 #, c-format
 msgid "section [%2d] '%s': section index %Zu out of range\n"
-msgstr "sekcja [%2d] '%s': indeks sekcji %Zu spoza zakresu\n"
+msgstr "sekcja [%2d] \"%s\": indeks sekcji %Zu spoza zakresu\n"
 
 #: ../src/elflint.c:2504
 #, c-format
 msgid "section [%2d] '%s': cannot get section header for element %zu: %s\n"
 msgstr ""
-"sekcja [%2d] '%s': nie można pobrać nagłówka sekcji dla elementu %zu: %s\n"
+"sekcja [%2d] \"%s\": nie można pobrać nagłówka sekcji dla elementu %zu: %s\n"
 
 #: ../src/elflint.c:2511
 #, c-format
 msgid "section [%2d] '%s': section group contains another group [%2d] '%s'\n"
-msgstr "sekcja [%2d] '%s': grupa sekcji zawiera inną grupę [%2d] '%s'\n"
+msgstr "sekcja [%2d] \"%s\": grupa sekcji zawiera inną grupę [%2d] \"%s\"\n"
 
 #: ../src/elflint.c:2517
 #, c-format
@@ -2066,13 +2070,13 @@ msgid ""
 "section [%2d] '%s': element %Zu references section [%2d] '%s' without "
 "SHF_GROUP flag set\n"
 msgstr ""
-"sekcja [%2d] '%s': element %Zu odwołuje się do sekcji [%2d] '%s' bez flagi "
-"SHF_GROUP\n"
+"sekcja [%2d] \"%s\": element %Zu odwołuje się do sekcji [%2d] \"%s\" bez "
+"flagi SHF_GROUP\n"
 
 #: ../src/elflint.c:2524
 #, c-format
 msgid "section [%2d] '%s' is contained in more than one section group\n"
-msgstr "sekcja [%2d] '%s' jest zawarta w więcej niż jednej grupie sekcji\n"
+msgstr "sekcja [%2d] \"%s\" jest zawarta w więcej niż jednej grupie sekcji\n"
 
 #: ../src/elflint.c:2713
 #, c-format
@@ -2080,7 +2084,7 @@ msgid ""
 "section [%2d] '%s' refers in sh_link to section [%2d] '%s' which is no "
 "dynamic symbol table\n"
 msgstr ""
-"sekcja [%2d] '%s' odwołuje się w sh_link do sekcji [%2d] '%s', która nie "
+"sekcja [%2d] \"%s\" odwołuje się w sh_link do sekcji [%2d] \"%s\", która nie "
 "jest tabelą symboli dynamicznych\n"
 
 #: ../src/elflint.c:2724
@@ -2089,34 +2093,34 @@ msgid ""
 "section [%2d] '%s' has different number of entries than symbol table [%2d] '%"
 "s'\n"
 msgstr ""
-"sekcja [%2d] '%s' ma inną liczbę wpisów niż tabela symboli [%2d] '%s'\n"
+"sekcja [%2d] \"%s\" ma inną liczbę wpisów niż tabela symboli [%2d] \"%s\"\n"
 
 #: ../src/elflint.c:2740
 #, c-format
 msgid "section [%2d] '%s': symbol %d: cannot read version data\n"
-msgstr "sekcja [%2d] '%s': symbol %d: nie można odczytać danych wersji\n"
+msgstr "sekcja [%2d] \"%s\": symbol %d: nie można odczytać danych wersji\n"
 
 #: ../src/elflint.c:2756
 #, c-format
 msgid "section [%2d] '%s': symbol %d: local symbol with global scope\n"
-msgstr "sekcja [%2d] '%s': symbol %d: symbol lokalny z zakresem globalnym\n"
+msgstr "sekcja [%2d] \"%s\": symbol %d: symbol lokalny z zakresem globalnym\n"
 
 #: ../src/elflint.c:2764
 #, c-format
 msgid "section [%2d] '%s': symbol %d: local symbol with version\n"
-msgstr "sekcja [%2d] '%s': symbol %d: symbol lokalny z wersją\n"
+msgstr "sekcja [%2d] \"%s\": symbol %d: symbol lokalny z wersją\n"
 
 #: ../src/elflint.c:2778
 #, c-format
 msgid "section [%2d] '%s': symbol %d: invalid version index %d\n"
-msgstr "sekcja [%2d] '%s': symbol %d: błędny indeks wersji %d\n"
+msgstr "sekcja [%2d] \"%s\": symbol %d: błędny indeks wersji %d\n"
 
 #: ../src/elflint.c:2783
 #, c-format
 msgid ""
 "section [%2d] '%s': symbol %d: version index %d is for defined version\n"
 msgstr ""
-"sekcja [%2d] '%s': symbol %d: indeks wersji %d jest dla wersji "
+"sekcja [%2d] \"%s\": symbol %d: indeks wersji %d jest dla wersji "
 "zdefiniowanej\n"
 
 #: ../src/elflint.c:2793
@@ -2124,7 +2128,7 @@ msgstr ""
 msgid ""
 "section [%2d] '%s': symbol %d: version index %d is for requested version\n"
 msgstr ""
-"sekcja [%2d] '%s': symbol %d: indeks wersji %d jest dla wersji żądanej\n"
+"sekcja [%2d] \"%s\": symbol %d: indeks wersji %d jest dla wersji żądanej\n"
 
 #: ../src/elflint.c:2845
 #, c-format
@@ -2134,32 +2138,32 @@ msgstr "obecna więcej niż jedna sekcja odniesienia wersji\n"
 #: ../src/elflint.c:2853 ../src/elflint.c:2982
 #, c-format
 msgid "section [%2d] '%s': sh_link does not link to string table\n"
-msgstr "sekcja [%2d] '%s': sh_link nie łączy się z tabelą łańcuchów\n"
+msgstr "sekcja [%2d] \"%s\": sh_link nie łączy się z tabelą łańcuchów\n"
 
 #: ../src/elflint.c:2876 ../src/elflint.c:3034
 #, c-format
 msgid "section [%2d] '%s': entry %d has wrong version %d\n"
-msgstr "sekcja [%2d] '%s': wpis %d ma złą wersję %d\n"
+msgstr "sekcja [%2d] \"%s\": wpis %d ma złą wersję %d\n"
 
 #: ../src/elflint.c:2882 ../src/elflint.c:3040
 #, c-format
 msgid "section [%2d] '%s': entry %d has wrong offset of auxiliary data\n"
-msgstr "sekcja [%2d] '%s': wpis %d ma zły offset dla danych dodatkowych\n"
+msgstr "sekcja [%2d] \"%s\": wpis %d ma zły offset dla danych dodatkowych\n"
 
 #: ../src/elflint.c:2890
 #, c-format
 msgid "section [%2d] '%s': entry %d has invalid file reference\n"
-msgstr "sekcja [%2d] '%s': symbol %d ma błędne odniesienie do pliku\n"
+msgstr "sekcja [%2d] \"%s\": symbol %d ma błędne odniesienie do pliku\n"
 
 #: ../src/elflint.c:2898
 #, c-format
 msgid "section [%2d] '%s': entry %d references unknown dependency\n"
-msgstr "sekcja [%2d] '%s': wpis %d odnosi się do nieznanej zależności\n"
+msgstr "sekcja [%2d] \"%s\": wpis %d odnosi się do nieznanej zależności\n"
 
 #: ../src/elflint.c:2910
 #, c-format
 msgid "section [%2d] '%s': auxiliary entry %d of entry %d has unknown flag\n"
-msgstr "sekcja [%2d] '%s': wpis dodatkowy %d do wpisu %d ma nieznaną flagę\n"
+msgstr "sekcja [%2d] \"%s\": wpis dodatkowy %d do wpisu %d ma nieznaną flagę\n"
 
 #: ../src/elflint.c:2917
 #, c-format
@@ -2167,7 +2171,7 @@ msgid ""
 "section [%2d] '%s': auxiliary entry %d of entry %d has invalid name "
 "reference\n"
 msgstr ""
-"sekcja [%2d] '%s': wpis dodatkowy %d do wpisu %d ma błędne odniesienie do "
+"sekcja [%2d] \"%s\": wpis dodatkowy %d do wpisu %d ma błędne odniesienie do "
 "nazwy\n"
 
 #: ../src/elflint.c:2924
@@ -2176,8 +2180,8 @@ msgid ""
 "section [%2d] '%s': auxiliary entry %d of entry %d has wrong hash value: %"
 "#x, expected %#x\n"
 msgstr ""
-"sekcja [%2d] '%s': wpis dodatkowy %d do wpisu %d ma złą wartość hasza: %#x, "
-"oczekiwano %#x\n"
+"sekcja [%2d] \"%s\": wpis dodatkowy %d do wpisu %d ma złą wartość hasza: %"
+"#x, oczekiwano %#x\n"
 
 #: ../src/elflint.c:2934
 #, c-format
@@ -2185,20 +2189,20 @@ msgid ""
 "section [%2d] '%s': auxiliary entry %d of entry %d has duplicate version "
 "name '%s'\n"
 msgstr ""
-"sekcja [%2d] '%s': wpis dodatkowy %d do wpisu %d ma powtórzoną nazwę wersji "
-"'%s'\n"
+"sekcja [%2d] \"%s\": wpis dodatkowy %d do wpisu %d ma powtórzoną nazwę "
+"wersji \"%s\"\n"
 
 #: ../src/elflint.c:2945
 #, c-format
 msgid ""
 "section [%2d] '%s': auxiliary entry %d of entry %d has wrong next field\n"
 msgstr ""
-"sekcja [%2d] '%s': wpis dodatkowy %d do wpisu %d ma złe następne pole\n"
+"sekcja [%2d] \"%s\": wpis dodatkowy %d do wpisu %d ma złe następne pole\n"
 
 #: ../src/elflint.c:2961 ../src/elflint.c:3119
 #, c-format
 msgid "section [%2d] '%s': entry %d has invalid offset to next entry\n"
-msgstr "sekcja [%2d] '%s': wpis %d ma błędny offset do następnego wpisu\n"
+msgstr "sekcja [%2d] \"%s\": wpis %d ma błędny offset do następnego wpisu\n"
 
 #: ../src/elflint.c:2974
 #, c-format
@@ -2208,143 +2212,150 @@ msgstr "obecna więcej niż jedna sekcja definicji wersji\n"
 #: ../src/elflint.c:3019
 #, c-format
 msgid "section [%2d] '%s': more than one BASE definition\n"
-msgstr "sekcja [%2d] '%s': jest więcej niż jedna definicja BASE\n"
+msgstr "sekcja [%2d] \"%s\": jest więcej niż jedna definicja BASE\n"
 
 #: ../src/elflint.c:3023
 #, c-format
 msgid "section [%2d] '%s': BASE definition must have index VER_NDX_GLOBAL\n"
-msgstr "sekcja [%2d] '%s': definicja BASE musi mieć indeks VER_NDX_GLOBAL\n"
+msgstr "sekcja [%2d] \"%s\": definicja BASE musi mieć indeks VER_NDX_GLOBAL\n"
 
 #: ../src/elflint.c:3029
 #, c-format
 msgid "section [%2d] '%s': entry %d has unknown flag\n"
-msgstr "sekcja [%2d] '%s': wpis %d ma nieznaną flagę\n"
+msgstr "sekcja [%2d] \"%s\": wpis %d ma nieznaną flagę\n"
 
 #: ../src/elflint.c:3053
 #, c-format
 msgid "section [%2d] '%s': entry %d has invalid name reference\n"
-msgstr "sekcja [%2d] '%s': wpis %d ma błędne odniesienie do nazwy\n"
+msgstr "sekcja [%2d] \"%s\": wpis %d ma błędne odniesienie do nazwy\n"
 
 #: ../src/elflint.c:3060
 #, c-format
 msgid "section [%2d] '%s': entry %d has wrong hash value: %#x, expected %#x\n"
-msgstr "sekcja [%2d] '%s': wpis %d ma złą wartość hasza: %#x, oczekiwano %#x\n"
+msgstr ""
+"sekcja [%2d] \"%s\": wpis %d ma złą wartość hasza: %#x, oczekiwano %#x\n"
 
 #: ../src/elflint.c:3069
 #, c-format
 msgid "section [%2d] '%s': entry %d has duplicate version name '%s'\n"
-msgstr "sekcja [%2d] '%s': wpis %d ma powtórzoną nazwę wersji '%s'\n"
+msgstr "sekcja [%2d] \"%s\": wpis %d ma powtórzoną nazwę wersji \"%s\"\n"
 
 #: ../src/elflint.c:3088
 #, c-format
 msgid ""
 "section [%2d] '%s': entry %d has invalid name reference in auxiliary data\n"
 msgstr ""
-"sekcja [%2d] '%s': wpis %d ma błędne odniesienie do nazwy w danych "
+"sekcja [%2d] \"%s\": wpis %d ma błędne odniesienie do nazwy w danych "
 "dodatkowych\n"
 
 #: ../src/elflint.c:3103
 #, c-format
 msgid "section [%2d] '%s': entry %d has wrong next field in auxiliary data\n"
-msgstr "sekcja [%2d] '%s': wpis %d ma złe następne pole w danych dodatkowych\n"
+msgstr ""
+"sekcja [%2d] \"%s\": wpis %d ma złe następne pole w danych dodatkowych\n"
 
 #: ../src/elflint.c:3125
 #, c-format
 msgid "section [%2d] '%s': no BASE definition\n"
-msgstr "sekcja [%2d] '%s': brak definicji BASE\n"
+msgstr "sekcja [%2d] \"%s\": brak definicji BASE\n"
 
 #: ../src/elflint.c:3141
 #, c-format
 msgid "section [%2d] '%s': unknown parent version '%s'\n"
-msgstr "sekcja [%2d] '%s': nieznana wersja rodzica '%s'\n"
+msgstr "sekcja [%2d] \"%s\": nieznana wersja rodzica \"%s\"\n"
 
 #: ../src/elflint.c:3154
 #, fuzzy, c-format
 msgid "section [%2d] '%s': empty object attributes section\n"
-msgstr "sekcja [%2d] '%s': nie można pobrać danych sekcji\n"
+msgstr "sekcja [%2d] \"%s\": nie można pobrać danych sekcji\n"
 
 #: ../src/elflint.c:3175
 #, fuzzy, c-format
 msgid "section [%2d] '%s': unrecognized attribute format\n"
-msgstr "sekcja [%2d] '%s': zawiera wpis %s, ale nie %s\n"
+msgstr "sekcja [%2d] \"%s\": zawiera wpis %s, ale nie %s\n"
 
 #: ../src/elflint.c:3191
 #, fuzzy, c-format
 msgid ""
 "section [%2d] '%s': offset %zu: zero length field in attribute section\n"
-msgstr "sekcja [%2d] '%s': wpis %d ma złe następne pole w danych dodatkowych\n"
+msgstr ""
+"sekcja [%2d] \"%s\": wpis %d ma złe następne pole w danych dodatkowych\n"
 
 #: ../src/elflint.c:3200
 #, fuzzy, c-format
 msgid "section [%2d] '%s': offset %zu: invalid length in attribute section\n"
-msgstr "sekcja [%2d] '%s': błędny typ sekcji docelowej\n"
+msgstr "sekcja [%2d] \"%s\": błędny typ sekcji docelowej\n"
 
 #: ../src/elflint.c:3212
 #, fuzzy, c-format
 msgid "section [%2d] '%s': offset %zu: unterminated vendor name string\n"
-msgstr "sekcja [%2d] '%s': wpis %zu: nieznany znacznik\n"
+msgstr "sekcja [%2d] \"%s\": wpis %zu: nieznany znacznik\n"
 
 #: ../src/elflint.c:3229
 #, fuzzy, c-format
 msgid ""
 "section [%2d] '%s': offset %zu: endless ULEB128 in attribute subsection tag\n"
-msgstr "sekcja [%2d] '%s': symbol %zu: błędny indeks sekcji\n"
+msgstr "sekcja [%2d] \"%s\": symbol %zu: błędny indeks sekcji\n"
 
 #: ../src/elflint.c:3238
 #, fuzzy, c-format
 msgid "section [%2d] '%s': offset %zu: truncated attribute section\n"
-msgstr "sekcja [%2d] '%s': symbol %zu: błędny indeks sekcji\n"
+msgstr "sekcja [%2d] \"%s\": symbol %zu: błędny indeks sekcji\n"
 
 #: ../src/elflint.c:3247
 #, fuzzy, c-format
 msgid ""
 "section [%2d] '%s': offset %zu: zero length field in attribute subsection\n"
-msgstr "sekcja [%2d] '%s': wpis %zu: użyto znacznika %s poziomu 2\n"
+msgstr "sekcja [%2d] \"%s\": wpis %zu: użyto znacznika %s poziomu 2\n"
 
 #: ../src/elflint.c:3260
 #, fuzzy, c-format
 msgid ""
 "section [%2d] '%s': offset %zu: invalid length in attribute subsection\n"
-msgstr "sekcja [%2d] '%s': błędny typ sekcji docelowej\n"
+msgstr "sekcja [%2d] \"%s\": błędny typ sekcji docelowej\n"
 
 #. Tag_File
 #: ../src/elflint.c:3271
 #, fuzzy, c-format
 msgid ""
 "section [%2d] '%s': offset %zu: attribute subsection has unexpected tag %u\n"
-msgstr "sekcja [%2d] '%s': wpis %zu: więcej niż jeden wpis ze znacznikiem %s\n"
+msgstr ""
+"sekcja [%2d] \"%s\": wpis %zu: więcej niż jeden wpis ze znacznikiem %s\n"
 
 #: ../src/elflint.c:3289
 #, fuzzy, c-format
 msgid "section [%2d] '%s': offset %zu: endless ULEB128 in attribute tag\n"
-msgstr "sekcja [%2d] '%s': wpis %zu: więcej niż jeden wpis ze znacznikiem %s\n"
+msgstr ""
+"sekcja [%2d] \"%s\": wpis %zu: więcej niż jeden wpis ze znacznikiem %s\n"
 
 #: ../src/elflint.c:3300
 #, fuzzy, c-format
 msgid "section [%2d] '%s': offset %zu: unterminated string in attribute\n"
-msgstr "sekcja [%2d] '%s': symbol %zu: błędny indeks sekcji\n"
+msgstr "sekcja [%2d] \"%s\": symbol %zu: błędny indeks sekcji\n"
 
 #: ../src/elflint.c:3313
 #, fuzzy, c-format
 msgid "section [%2d] '%s': offset %zu: unrecognized attribute tag %u\n"
-msgstr "sekcja [%2d] '%s': wpis %zu: więcej niż jeden wpis ze znacznikiem %s\n"
+msgstr ""
+"sekcja [%2d] \"%s\": wpis %zu: więcej niż jeden wpis ze znacznikiem %s\n"
 
 #: ../src/elflint.c:3317
 #, fuzzy, c-format
 msgid ""
 "section [%2d] '%s': offset %zu: unrecognized %s attribute value %<PRIu64>\n"
-msgstr "sekcja [%2d] '%s': symbol %zu: błędna wartość nazwy\n"
+msgstr "sekcja [%2d] \"%s\": symbol %zu: błędna wartość nazwy\n"
 
 #: ../src/elflint.c:3327
 #, fuzzy, c-format
 msgid "section [%2d] '%s': offset %zu: vendor '%s' unknown\n"
-msgstr "sekcja [%2d] '%s': wpis %zu: nieznany znacznik\n"
+msgstr "sekcja [%2d] \"%s\": wpis %zu: nieznany znacznik\n"
 
 #: ../src/elflint.c:3333
 #, fuzzy, c-format
 msgid ""
 "section [%2d] '%s': offset %zu: extra bytes after last attribute section\n"
-msgstr "sekcja [%2d] '%s': wpis %zu: więcej niż jeden wpis ze znacznikiem %s\n"
+msgstr ""
+"sekcja [%2d] \"%s\": wpis %zu: więcej niż jeden wpis ze znacznikiem %s\n"
 
 #: ../src/elflint.c:3422
 #, c-format
@@ -2416,7 +2427,7 @@ msgstr ""
 #: ../src/elflint.c:3466
 #, c-format
 msgid "cannot get section header for section [%2zu] '%s': %s\n"
-msgstr "nie można pobrać nagłówka sekcji dla sekcji [%2zu] '%s': %s\n"
+msgstr "nie można pobrać nagłówka sekcji dla sekcji [%2zu] \"%s\": %s\n"
 
 #: ../src/elflint.c:3475
 #, c-format
@@ -2426,51 +2437,53 @@ msgstr "sekcja [%2zu]: błędna nazwa\n"
 #: ../src/elflint.c:3502
 #, c-format
 msgid "section [%2d] '%s' has wrong type: expected %s, is %s\n"
-msgstr "sekcja [%2d] '%s' ma zły typ: oczekiwano %s, jest %s\n"
+msgstr "sekcja [%2d] \"%s\" ma zły typ: oczekiwano %s, jest %s\n"
 
 #: ../src/elflint.c:3518
 #, c-format
 msgid "section [%2zu] '%s' has wrong flags: expected %s, is %s\n"
-msgstr "sekcja [%2zu] '%s' ma złe flagi: oczekiwano %s, jest %s\n"
+msgstr "sekcja [%2zu] \"%s\" ma złe flagi: oczekiwano %s, jest %s\n"
 
 #: ../src/elflint.c:3535
 #, c-format
 msgid ""
 "section [%2zu] '%s' has wrong flags: expected %s and possibly %s, is %s\n"
 msgstr ""
-"sekcja [%2zu] '%s' ma złe flagi: oczekiwano %s i być może %s, jest %s\n"
+"sekcja [%2zu] \"%s\" ma złe flagi: oczekiwano %s i być może %s, jest %s\n"
 
 #: ../src/elflint.c:3553
 #, c-format
 msgid "section [%2zu] '%s' present in object file\n"
-msgstr "sekcja [%2zu] '%s' obecna w pliku obiektu\n"
+msgstr "sekcja [%2zu] \"%s\" obecna w pliku obiektu\n"
 
 #: ../src/elflint.c:3559 ../src/elflint.c:3591
 #, c-format
 msgid ""
 "section [%2zu] '%s' has SHF_ALLOC flag set but there is no loadable segment\n"
 msgstr ""
-"sekcja [%2zu] '%s' ma flagę SHF_ALLOC, ale nie ma segmentu ładowalnego\n"
+"sekcja [%2zu] \"%s\" ma flagę SHF_ALLOC, ale nie ma segmentu ładowalnego\n"
 
 #: ../src/elflint.c:3564 ../src/elflint.c:3596
 #, c-format
 msgid ""
 "section [%2zu] '%s' has SHF_ALLOC flag not set but there are loadable "
 "segments\n"
-msgstr "sekcja [%2zu] '%s' nie ma flagi SHF_ALLOC, ale są segmenty ładowalne\n"
+msgstr ""
+"sekcja [%2zu] \"%s\" nie ma flagi SHF_ALLOC, ale są segmenty ładowalne\n"
 
 #: ../src/elflint.c:3572
 #, c-format
 msgid ""
 "section [%2zu] '%s' is extension section index table in non-object file\n"
 msgstr ""
-"sekcja [%2zu] '%s' jest tabelą indeksów sekcji rozszerzeń w pliku nie-"
+"sekcja [%2zu] \"%s\" jest tabelą indeksów sekcji rozszerzeń w pliku nie-"
 "obiektowym\n"
 
 #: ../src/elflint.c:3615
 #, c-format
 msgid "section [%2zu] '%s': size not multiple of entry size\n"
-msgstr "sekcja [%2zu] '%s': rozmiar nie jest wielokrotnością rozmiaru wpisu\n"
+msgstr ""
+"sekcja [%2zu] \"%s\": rozmiar nie jest wielokrotnością rozmiaru wpisu\n"
 
 #: ../src/elflint.c:3620
 #, c-format
@@ -2480,58 +2493,61 @@ msgstr "nie można pobrać nagłówka sekcji\n"
 #: ../src/elflint.c:3630
 #, c-format
 msgid "section [%2zu] '%s' has unsupported type %d\n"
-msgstr "sekcja [%2zu] '%s' ma nieobsługiwany typ %d\n"
+msgstr "sekcja [%2zu] \"%s\" ma nieobsługiwany typ %d\n"
 
 #: ../src/elflint.c:3644
 #, c-format
 msgid ""
 "section [%2zu] '%s' contains invalid processor-specific flag(s) %#<PRIx64>\n"
 msgstr ""
-"sekcja [%2zu] '%s' zawiera błędne flagi specyficzne dla procesora %"
+"sekcja [%2zu] \"%s\" zawiera błędne flagi specyficzne dla procesora %"
 "#<PRIx64>\n"
 
 #: ../src/elflint.c:3651
 #, c-format
 msgid "section [%2zu] '%s' contains unknown flag(s) %#<PRIx64>\n"
-msgstr "sekcja [%2zu] '%s' zawiera nieznane flagi %#<PRIx64>\n"
+msgstr "sekcja [%2zu] \"%s\" zawiera nieznane flagi %#<PRIx64>\n"
 
 #: ../src/elflint.c:3659
 #, c-format
 msgid "section [%2zu] '%s': thread-local data sections address not zero\n"
 msgstr ""
-"sekcja [%2zu] '%s': adres sekcji danych lokalnych dla wątków nie jest zerem\n"
+"sekcja [%2zu] \"%s\": adres sekcji danych lokalnych dla wątków nie jest "
+"zerem\n"
 
 #: ../src/elflint.c:3667
 #, c-format
 msgid "section [%2zu] '%s': invalid section reference in link value\n"
-msgstr "sekcja [%2zu] '%s': błędne odwołanie do sekcji w wartości dowiązania\n"
+msgstr ""
+"sekcja [%2zu] \"%s\": błędne odwołanie do sekcji w wartości dowiązania\n"
 
 #: ../src/elflint.c:3672
 #, c-format
 msgid "section [%2zu] '%s': invalid section reference in info value\n"
 msgstr ""
-"sekcja [%2zu] '%s': błędne odwołanie do sekcji w wartości informacyjnej\n"
+"sekcja [%2zu] \"%s\": błędne odwołanie do sekcji w wartości informacyjnej\n"
 
 #: ../src/elflint.c:3679
 #, c-format
 msgid "section [%2zu] '%s': strings flag set without merge flag\n"
-msgstr "sekcja [%2zu] '%s': flaga łańcuchów ustawiona bez flagi merge\n"
+msgstr "sekcja [%2zu] \"%s\": flaga łańcuchów ustawiona bez flagi merge\n"
 
 #: ../src/elflint.c:3684
 #, c-format
 msgid "section [%2zu] '%s': merge flag set but entry size is zero\n"
 msgstr ""
-"sekcja [%2zu] '%s': flaga merge ustawiona, ale rozmiar wpisu jest zerowy\n"
+"sekcja [%2zu] \"%s\": flaga merge ustawiona, ale rozmiar wpisu jest zerowy\n"
 
 #: ../src/elflint.c:3702
 #, fuzzy, c-format
 msgid "section [%2zu] '%s' has unexpected type %d for an executable section\n"
-msgstr "sekcja [%2zu] '%s' ma nieobsługiwany typ %d\n"
+msgstr "sekcja [%2zu] \"%s\" ma nieobsługiwany typ %d\n"
 
 #: ../src/elflint.c:3711
 #, fuzzy, c-format
 msgid "section [%2zu] '%s' is both executable and writable\n"
-msgstr "sekcja [%2zu] '%s': rozmiar nie jest wielokrotnością rozmiaru wpisu\n"
+msgstr ""
+"sekcja [%2zu] \"%s\": rozmiar nie jest wielokrotnością rozmiaru wpisu\n"
 
 #: ../src/elflint.c:3738
 #, c-format
@@ -2539,8 +2555,8 @@ msgid ""
 "section [%2zu] '%s' not fully contained in segment of program header entry %"
 "d\n"
 msgstr ""
-"sekcja [%2zu] '%s' nie jest w całości zawarta w segmencie wpisu %d nagłówka "
-"programu\n"
+"sekcja [%2zu] \"%s\" nie jest w całości zawarta w segmencie wpisu %d "
+"nagłówka programu\n"
 
 #: ../src/elflint.c:3746
 #, c-format
@@ -2548,8 +2564,8 @@ msgid ""
 "section [%2zu] '%s' has type NOBITS but is read from the file in segment of "
 "program header entry %d\n"
 msgstr ""
-"sekcja [%2zu] '%s' ma typ NOBITS, a jest czytana z pliku w segmencie wpisu %"
-"d nagłówka programu\n"
+"sekcja [%2zu] \"%s\" ma typ NOBITS, a jest czytana z pliku w segmencie wpisu "
+"%d nagłówka programu\n"
 
 #: ../src/elflint.c:3755
 #, c-format
@@ -2557,27 +2573,28 @@ msgid ""
 "section [%2zu] '%s' has not type NOBITS but is not read from the file in "
 "segment of program header entry %d\n"
 msgstr ""
-"sekcja [%2zu] '%s' nie ma typu NOBITS, a nie jest czytana z pliku w "
+"sekcja [%2zu] \"%s\" nie ma typu NOBITS, a nie jest czytana z pliku w "
 "segmencie wpisu %d nagłówka programu\n"
 
 #: ../src/elflint.c:3766
 #, fuzzy, c-format
 msgid "section [%2zu] '%s' is executable in nonexecutable segment %d\n"
 msgstr ""
-"sekcja [%2zu] '%s' jest tabelą indeksów sekcji rozszerzeń w pliku nie-"
+"sekcja [%2zu] \"%s\" jest tabelą indeksów sekcji rozszerzeń w pliku nie-"
 "obiektowym\n"
 
 #: ../src/elflint.c:3776
 #, fuzzy, c-format
 msgid "section [%2zu] '%s' is writable in unwritable segment %d\n"
-msgstr "sekcja [%2zu] '%s': rozmiar nie jest wielokrotnością rozmiaru wpisu\n"
+msgstr ""
+"sekcja [%2zu] \"%s\": rozmiar nie jest wielokrotnością rozmiaru wpisu\n"
 
 #: ../src/elflint.c:3786
 #, c-format
 msgid ""
 "section [%2zu] '%s': alloc flag set but section not in any loaded segment\n"
 msgstr ""
-"sekcja [%2zu] '%s': ma flagę alloc, ale sekcja nie jest w żadnym segmencie "
+"sekcja [%2zu] \"%s\": ma flagę alloc, ale sekcja nie jest w żadnym segmencie "
 "ładowalnym\n"
 
 #: ../src/elflint.c:3792
@@ -2586,7 +2603,7 @@ msgid ""
 "section [%2zu] '%s': ELF header says this is the section header string table "
 "but type is not SHT_TYPE\n"
 msgstr ""
-"sekcja [%2zu] '%s': według nagłówka ELF to jest tabela łańcuchów nagłówków "
+"sekcja [%2zu] \"%s\": według nagłówka ELF to jest tabela łańcuchów nagłówków "
 "sekcji, ale typ nie jest SHT_TYPE\n"
 
 #: ../src/elflint.c:3800
@@ -2594,7 +2611,7 @@ msgstr ""
 msgid ""
 "section [%2zu] '%s': relocatable files cannot have dynamic symbol tables\n"
 msgstr ""
-"sekcja [%2zu] '%s': pliki relokowalne nie mogą mieć tabeli symboli "
+"sekcja [%2zu] \"%s\": pliki relokowalne nie mogą mieć tabeli symboli "
 "dynamicznych\n"
 
 #: ../src/elflint.c:3851
@@ -2688,7 +2705,7 @@ msgstr "phdr[%d]: brak zdefiniowanych wpisów note dla typu pliku\n"
 #: ../src/elflint.c:4076
 #, fuzzy, c-format
 msgid "section [%2d] '%s': cannot get content of note section\n"
-msgstr "sekcja [%2d] '%s': nie można pobrać danych sekcji\n"
+msgstr "sekcja [%2d] \"%s\": nie można pobrać danych sekcji\n"
 
 #: ../src/elflint.c:4079
 #, fuzzy, c-format
@@ -2788,7 +2805,7 @@ msgstr ""
 #: ../src/elflint.c:4286
 #, fuzzy, c-format
 msgid "section [%2zu] '%s' must be allocated\n"
-msgstr "sekcja [%2d] '%s': nie oznaczona do przydzielenia\n"
+msgstr "sekcja [%2d] \"%s\": nie oznaczona do przydzielenia\n"
 
 #: ../src/elflint.c:4290
 #, c-format
@@ -2798,7 +2815,7 @@ msgstr ""
 #: ../src/elflint.c:4293
 #, fuzzy, c-format
 msgid "section [%2zu] '%s' must not be writable\n"
-msgstr "sekcja [%2zu] '%s' obecna w pliku obiektu\n"
+msgstr "sekcja [%2zu] \"%s\" obecna w pliku obiektu\n"
 
 #: ../src/elflint.c:4298
 #, c-format
@@ -2808,7 +2825,7 @@ msgstr ""
 #: ../src/elflint.c:4301
 #, fuzzy, c-format
 msgid "section [%2zu] '%s' must not be executable\n"
-msgstr "sekcja [%2zu] '%s' obecna w pliku obiektu\n"
+msgstr "sekcja [%2zu] \"%s\" obecna w pliku obiektu\n"
 
 #: ../src/elflint.c:4312
 #, c-format
@@ -2872,12 +2889,12 @@ msgstr "[PLIK...]"
 #: ../src/findtextrel.c:246
 #, c-format
 msgid "cannot get ELF header '%s': %s"
-msgstr "nie można pobrać nagłówka ELF '%s': %s"
+msgstr "nie można pobrać nagłówka ELF \"%s\": %s"
 
 #: ../src/findtextrel.c:257
 #, c-format
 msgid "'%s' is not a DSO or PIE"
-msgstr "'%s' nie jest DSO ani PIE"
+msgstr "\"%s\" nie jest DSO ani PIE"
 
 #: ../src/findtextrel.c:274
 #, c-format
@@ -2892,7 +2909,7 @@ msgstr "nie można odczytać sekcji dynamicznej: %s"
 #: ../src/findtextrel.c:307
 #, c-format
 msgid "no text relocations reported in '%s'"
-msgstr "brak relokacji tekstu w '%s'"
+msgstr "brak relokacji tekstu w \"%s\""
 
 #: ../src/findtextrel.c:319
 #, c-format
@@ -2912,12 +2929,12 @@ msgstr "nie można pobrać nagłówka sekcji dla sekcji %Zu: %s"
 #: ../src/findtextrel.c:409
 #, c-format
 msgid "cannot get symbol table section %zu in '%s': %s"
-msgstr "nie można pobrać sekcji tabeli symboli %zu w '%s': %s"
+msgstr "nie można pobrać sekcji tabeli symboli %zu w \"%s\": %s"
 
 #: ../src/findtextrel.c:429 ../src/findtextrel.c:452
 #, c-format
 msgid "cannot get relocation at index %d in section %zu in '%s': %s"
-msgstr "nie można pobrać relokacji pod indeksem %d w sekcji %zu w '%s': %s"
+msgstr "nie można pobrać relokacji pod indeksem %d w sekcji %zu w \"%s\": %s"
 
 #: ../src/findtextrel.c:517
 #, c-format
@@ -2928,7 +2945,8 @@ msgstr "%s nie został skompilowany z -fpic/-fPIC\n"
 #, c-format
 msgid ""
 "the file containing the function '%s' is not compiled with -fpic/-fPIC\n"
-msgstr "plik zawierający funkcję '%s' nie został skompilowany z -fpic/-fPIC\n"
+msgstr ""
+"plik zawierający funkcję \"%s\" nie został skompilowany z -fpic/-fPIC\n"
 
 #: ../src/findtextrel.c:577 ../src/findtextrel.c:597
 #, c-format
@@ -2936,7 +2954,7 @@ msgid ""
 "the file containing the function '%s' might not be compiled with -fpic/-"
 "fPIC\n"
 msgstr ""
-"plik zawierający funkcję '%s' mógł nie zostać skompilowany z -fpic/-fPIC\n"
+"plik zawierający funkcję \"%s\" mógł nie zostać skompilowany z -fpic/-fPIC\n"
 
 #: ../src/findtextrel.c:585
 #, c-format
@@ -2944,8 +2962,8 @@ msgid ""
 "either the file containing the function '%s' or the file containing the "
 "function '%s' is not compiled with -fpic/-fPIC\n"
 msgstr ""
-"plik zawierający funkcję '%s' lub plik zawierający funkcję '%s' nie został "
-"skompilowany z -fpic/-fPIC\n"
+"plik zawierający funkcję \"%s\" lub plik zawierający funkcję \"%s\" nie "
+"został skompilowany z -fpic/-fPIC\n"
 
 #: ../src/findtextrel.c:605
 #, c-format
@@ -3244,7 +3262,7 @@ msgstr "błąd podczas przygotowywania linkowania"
 #: ../src/ld.c:356
 #, c-format
 msgid "cannot open linker script '%s'"
-msgstr "nie można otworzyć skryptu linkera '%s'"
+msgstr "nie można otworzyć skryptu linkera \"%s\""
 
 #: ../src/ld.c:397
 #, c-format
@@ -3269,12 +3287,12 @@ msgstr "nieznana opcja `-%c %s'"
 #: ../src/ld.c:646
 #, c-format
 msgid "invalid page size value '%s': ignored"
-msgstr "błędna wartość rozmiaru strony '%s': zignorowano"
+msgstr "błędna wartość rozmiaru strony \"%s\": zignorowano"
 
 #: ../src/ld.c:687
 #, fuzzy, c-format
 msgid "invalid hash style '%s'"
-msgstr "błędne flagi maszyny: %s\n"
+msgstr "błędne flagi maszyny: \"%s\"\n"
 
 #: ../src/ld.c:697
 #, c-format
@@ -3320,14 +3338,14 @@ msgstr "proszę spróbować jeszcze raz z odpowiednim parametrem '-m'"
 #: ../src/ld.c:1446
 #, c-format
 msgid "cannot read version script '%s'"
-msgstr "nie można odczytać skryptu wersji '%s'"
+msgstr "nie można odczytać skryptu wersji \"%s\""
 
 #. The symbol is already defined and now again
 #. in the linker script.  This is an error.
 #: ../src/ld.c:1512 ../src/ld.c:1551
 #, c-format
 msgid "duplicate definition of '%s' in linker script"
-msgstr "powtórzona definicja '%s' w skrypcie linkera"
+msgstr "powtórzona definicja \"%s\" w skrypcie linkera"
 
 #: ../src/ldgeneric.c:209 ../src/ldgeneric.c:5151
 #, c-format
@@ -3337,12 +3355,12 @@ msgstr "nie można utworzyć tabeli łańcuchów"
 #: ../src/ldgeneric.c:255
 #, c-format
 msgid "cannot load ld backend library '%s': %s"
-msgstr "nie można odczytać biblioteki backendu ld '%s': %s"
+msgstr "nie można odczytać biblioteki backendu ld \"%s\": %s"
 
 #: ../src/ldgeneric.c:265
 #, c-format
 msgid "cannot find init function in ld backend library '%s': %s"
-msgstr "nie można znaleźć funkcji init w bibliotece backendu ld '%s': %s"
+msgstr "nie można znaleźć funkcji init w bibliotece backendu ld \"%s\": %s"
 
 #: ../src/ldgeneric.c:310
 #, c-format
@@ -3396,12 +3414,12 @@ msgstr "%s: nie można pobrać danych grupy sekcji: %s"
 #: ../src/ldgeneric.c:840
 #, c-format
 msgid "%s: section '%s' with group flag set does not belong to any group"
-msgstr "%s: sekcja '%s' z ustawioną flagą grupy nie należy do żadnej grupy"
+msgstr "%s: sekcja \"%s\" z ustawioną flagą grupy nie należy do żadnej grupy"
 
 #: ../src/ldgeneric.c:885
 #, fuzzy, c-format
 msgid "%s: section [%2d] '%s' is not in the correct section group"
-msgstr "%s: sekcja [%2d] '%s' jest w więcej niż jednej grupie sekcji"
+msgstr "%s: sekcja [%2d] \"%s\" jest w więcej niż jednej grupie sekcji"
 
 #. This should never happen.
 #: ../src/ldgeneric.c:1156 ../src/ldgeneric.c:1413 ../src/ldgeneric.c:1422
@@ -3419,24 +3437,24 @@ msgstr "%s: tylko pliki typu ET_REL mogą zawierać grupy sekcji"
 #: ../src/ldgeneric.c:1302
 #, c-format
 msgid "%s: cannot determine signature of section group [%2zd] '%s': %s"
-msgstr "%s: nie można określić sygnatury grupy sekcji [%2zd] '%s': %s"
+msgstr "%s: nie można określić sygnatury grupy sekcji [%2zd] \"%s\": %s"
 
 #: ../src/ldgeneric.c:1314
 #, fuzzy, c-format
 msgid "%s: cannot get content of section group [%2zd] '%s': %s'"
-msgstr "%s: nie można określić sygnatury grupy sekcji [%2zd] '%s': %s"
+msgstr "%s: nie można określić sygnatury grupy sekcji [%2zd] \"%s\": %s"
 
 #: ../src/ldgeneric.c:1328
 #, fuzzy, c-format
 msgid ""
 "%s: group member %zu of section group [%2zd] '%s' has too high index: %"
 "<PRIu32>"
-msgstr "%s: nie można określić sygnatury grupy sekcji [%2zd] '%s': %s"
+msgstr "%s: nie można określić sygnatury grupy sekcji [%2zd] \"%s\": %s"
 
 #: ../src/ldgeneric.c:1350
 #, c-format
 msgid "%s: section '%s' has unknown type: %d"
-msgstr "%s: sekcja '%s' ma nieznany typ: %d"
+msgstr "%s: sekcja \"%s\" ma nieznany typ: %d"
 
 #: ../src/ldgeneric.c:1729
 #, c-format
@@ -3467,12 +3485,12 @@ msgstr "%s: nie można pobrać indeksu tabeli łańcuchów nagłówków sekcji: 
 #, c-format
 msgid "cannot use DSO '%s' when generating relocatable object file"
 msgstr ""
-"nie można użyć DSO '%s' podczas generowania pliku obiektu relokowalnego"
+"nie można użyć DSO \"%s\" podczas generowania pliku obiektu relokowalnego"
 
 #: ../src/ldgeneric.c:2158
 #, c-format
 msgid "input file '%s' ignored"
-msgstr "plik wejściowy '%s' zignorowany"
+msgstr "plik wejściowy \"%s\" zignorowany"
 
 #. XXX The error message should get better.  It should use
 #. the debugging information if present to tell where in the
@@ -3503,7 +3521,7 @@ msgstr "nie można utworzyć sekcji dla pliku wyjściowego: %s"
 #: ../src/ldgeneric.c:3444
 #, c-format
 msgid "address computation expression contains variable '%s'"
-msgstr "wyrażenie obliczenia adresu zawiera zmienną '%s'"
+msgstr "wyrażenie obliczenia adresu zawiera zmienną \"%s\""
 
 #: ../src/ldgeneric.c:3489
 #, c-format
@@ -3518,7 +3536,7 @@ msgstr ""
 #, c-format
 msgid "cannot find entry symbol '%s': defaulting to %#0*<PRIx64>"
 msgstr ""
-"nie można znaleźć symbolu wejściowego '%s': użycie domyślnego %#0*<PRIx64>"
+"nie można znaleźć symbolu wejściowego \"%s\": użycie domyślnego %#0*<PRIx64>"
 
 #: ../src/ldgeneric.c:3690
 #, c-format
@@ -3652,7 +3670,7 @@ msgstr ""
 #: ../src/ldgeneric.c:7141
 #, c-format
 msgid "no machine specific '%s' implementation"
-msgstr "brak implementacji '%s' specyficznej dla maszyny"
+msgstr "brak implementacji \"%s\" specyficznej dla maszyny"
 
 #: ../src/ldscript.y:178
 msgid "mode for segment invalid\n"
@@ -3661,25 +3679,25 @@ msgstr "błędne atrybuty dla segmentu\n"
 #: ../src/ldscript.y:465
 #, c-format
 msgid "while reading version script '%s': %s at line %d"
-msgstr "podczas odczytu skryptu wersji '%s': %s w linii %d"
+msgstr "podczas odczytu skryptu wersji \"%s\": %s w linii %d"
 
 #: ../src/ldscript.y:466
 #, c-format
 msgid "while reading linker script '%s': %s at line %d"
-msgstr "podczas odczytu skryptu linkera '%s': %s w linii %d"
+msgstr "podczas odczytu skryptu linkera \"%s\": %s w linii %d"
 
 #: ../src/ldscript.y:745
 #, fuzzy, c-format
 msgid "symbol '%s' is declared both local and global for unnamed version"
 msgstr ""
-"symbol '%s' zadeklarowany jednocześnie lokalny i globalny dla nienazwanej "
+"symbol \"%s\" zadeklarowany jednocześnie lokalny i globalny dla nienazwanej "
 "wersji"
 
 #: ../src/ldscript.y:747
 #, fuzzy, c-format
 msgid "symbol '%s' is declared both local and global for version '%s'"
 msgstr ""
-"symbol '%s' zadeklarowany jednocześnie lokalny i globalny dla wersji '%s'"
+"symbol \"%s\" zadeklarowany jednocześnie lokalny i globalny dla wersji \"%s\""
 
 #: ../src/ldscript.y:767 ../src/ldscript.y:774
 #, c-format
@@ -3780,7 +3798,7 @@ msgstr "%s: BŁĄD WEWNĘTRZNY %d (%s-%s): %s"
 #: ../src/size.c:337 ../src/strip.c:1816
 #, c-format
 msgid "while closing '%s'"
-msgstr "podczas zamykania '%s'"
+msgstr "podczas zamykania \"%s\""
 
 #: ../src/nm.c:402 ../src/objdump.c:296 ../src/strip.c:359
 #, c-format
@@ -3826,8 +3844,8 @@ msgstr "nie można utworzyć drzewa wyszukiwania"
 #: ../src/readelf.c:1549 ../src/readelf.c:1735 ../src/readelf.c:1945
 #: ../src/readelf.c:2199 ../src/readelf.c:2265 ../src/readelf.c:2343
 #: ../src/readelf.c:2841 ../src/readelf.c:2877 ../src/readelf.c:2939
-#: ../src/readelf.c:6515 ../src/readelf.c:7409 ../src/readelf.c:7556
-#: ../src/readelf.c:7626 ../src/size.c:425 ../src/size.c:499
+#: ../src/readelf.c:6518 ../src/readelf.c:7412 ../src/readelf.c:7559
+#: ../src/readelf.c:7629 ../src/size.c:425 ../src/size.c:499
 #: ../src/strip.c:483
 #, c-format
 msgid "cannot get section header string table index"
@@ -3930,7 +3948,7 @@ msgstr "Nie podano operacji.\n"
 #: ../src/objdump.c:274 ../src/objdump.c:286
 #, fuzzy, c-format
 msgid "while close `%s'"
-msgstr "podczas zamykania '%s'"
+msgstr "podczas zamykania \"%s\""
 
 #: ../src/objdump.c:379 ../src/readelf.c:1644 ../src/readelf.c:1818
 msgid "INVALID SYMBOL"
@@ -3980,7 +3998,7 @@ msgstr "Wymagana nazwa archiwum"
 #: ../src/ranlib.c:194
 #, c-format
 msgid "'%s' is no archive"
-msgstr "'%s' nie jest archiwum"
+msgstr "\"%s\" nie jest archiwum"
 
 #: ../src/ranlib.c:229
 #, c-format
@@ -4344,7 +4362,7 @@ msgstr ""
 msgid "cannot get section: %s"
 msgstr "nie można pobrać sekcji: %s"
 
-#: ../src/readelf.c:906 ../src/readelf.c:1060 ../src/readelf.c:7576
+#: ../src/readelf.c:906 ../src/readelf.c:1060 ../src/readelf.c:7579
 #: ../src/unstrip.c:353 ../src/unstrip.c:377 ../src/unstrip.c:427
 #: ../src/unstrip.c:536 ../src/unstrip.c:553 ../src/unstrip.c:591
 #: ../src/unstrip.c:789 ../src/unstrip.c:1057 ../src/unstrip.c:1244
@@ -4404,13 +4422,13 @@ msgid_plural ""
 "COMDAT section group [%2zu] '%s' with signature '%s' contains %zu entries:\n"
 msgstr[0] ""
 "\n"
-"Grupa sekcji COMDAT [%2zu] '%s' z sygnaturą '%s' zawiera %zu wpis:\n"
+"Grupa sekcji COMDAT [%2zu] \"%s\" z sygnaturą \"%s\" zawiera %zu wpis:\n"
 msgstr[1] ""
 "\n"
-"Grupa sekcji COMDAT [%2zu] '%s' z sygnaturą '%s' zawiera %zu wpisy:\n"
+"Grupa sekcji COMDAT [%2zu] \"%s\" z sygnaturą \"%s\" zawiera %zu wpisy:\n"
 msgstr[2] ""
 "\n"
-"Grupa sekcji COMDAT [%2zu] '%s' z sygnaturą '%s' zawiera %zu wpisów:\n"
+"Grupa sekcji COMDAT [%2zu] \"%s\" z sygnaturą \"%s\" zawiera %zu wpisów:\n"
 
 #: ../src/readelf.c:1180
 #, c-format
@@ -4422,13 +4440,13 @@ msgid_plural ""
 "Section group [%2zu] '%s' with signature '%s' contains %zu entries:\n"
 msgstr[0] ""
 "\n"
-"Grupa sekcji [%2zu] '%s' z sygnaturą '%s' zawiera %zu wpis:\n"
+"Grupa sekcji [%2zu] \"%s\" z sygnaturą \"%s\" zawiera %zu wpis:\n"
 msgstr[1] ""
 "\n"
-"Grupa sekcji [%2zu] '%s' z sygnaturą '%s' zawiera %zu wpisy:\n"
+"Grupa sekcji [%2zu] \"%s\" z sygnaturą \"%s\" zawiera %zu wpisy:\n"
 msgstr[2] ""
 "\n"
-"Grupa sekcji [%2zu] '%s' z sygnaturą '%s' zawiera %zu wpisów:\n"
+"Grupa sekcji [%2zu] \"%s\" z sygnaturą \"%s\" zawiera %zu wpisów:\n"
 
 #: ../src/readelf.c:1188
 msgid "<INVALID SYMBOL>"
@@ -4514,16 +4532,16 @@ msgid_plural ""
 "contains %d entries:\n"
 msgstr[0] ""
 "\n"
-"Sekcja relokacji [%2zu] '%s' dla sekcji [%2u] '%s' pod offsetem %#0<PRIx64> "
-"zawiera %d wpis:\n"
+"Sekcja relokacji [%2zu] \"%s\" dla sekcji [%2u] \"%s\" pod offsetem %"
+"#0<PRIx64> zawiera %d wpis:\n"
 msgstr[1] ""
 "\n"
-"Sekcja relokacji [%2zu] '%s' dla sekcji [%2u] '%s' pod offsetem %#0<PRIx64> "
-"zawiera %d wpisy:\n"
+"Sekcja relokacji [%2zu] \"%s\" dla sekcji [%2u] \"%s\" pod offsetem %"
+"#0<PRIx64> zawiera %d wpisy:\n"
 msgstr[2] ""
 "\n"
-"Sekcja relokacji [%2zu] '%s' dla sekcji [%2u] '%s' pod offsetem %#0<PRIx64> "
-"zawiera %d wpisów:\n"
+"Sekcja relokacji [%2zu] \"%s\" dla sekcji [%2u] \"%s\" pod offsetem %"
+"#0<PRIx64> zawiera %d wpisów:\n"
 
 #. The .rel.dyn section does not refer to a specific section but
 #. instead of section index zero.  Do not try to print a section
@@ -4538,13 +4556,13 @@ msgid_plural ""
 "Relocation section [%2u] '%s' at offset %#0<PRIx64> contains %d entries:\n"
 msgstr[0] ""
 "\n"
-"Sekcja relokacji [%2u] '%s' pod offsetem %#0<PRIx64> zawiera %d wpis:\n"
+"Sekcja relokacji [%2u] \"%s\" pod offsetem %#0<PRIx64> zawiera %d wpis:\n"
 msgstr[1] ""
 "\n"
-"Sekcja relokacji [%2u] '%s' pod offsetem %#0<PRIx64> zawiera %d wpisy:\n"
+"Sekcja relokacji [%2u] \"%s\" pod offsetem %#0<PRIx64> zawiera %d wpisy:\n"
 msgstr[2] ""
 "\n"
-"Sekcja relokacji [%2u] '%s' pod offsetem %#0<PRIx64> zawiera %d wpisów:\n"
+"Sekcja relokacji [%2u] \"%s\" pod offsetem %#0<PRIx64> zawiera %d wpisów:\n"
 
 #: ../src/readelf.c:1577
 msgid "  Offset      Type                 Value       Name\n"
@@ -4580,21 +4598,21 @@ msgid_plural ""
 "Symbol table [%2u] '%s' contains %u entries:\n"
 msgstr[0] ""
 "\n"
-"Tabela symboli [%2u] '%s' zawiera %u wpis:\n"
+"Tabela symboli [%2u] \"%s\" zawiera %u wpis:\n"
 msgstr[1] ""
 "\n"
-"Tabela symboli [%2u] '%s' zawiera %u wpisy:\n"
+"Tabela symboli [%2u] \"%s\" zawiera %u wpisy:\n"
 msgstr[2] ""
 "\n"
-"Tabela symboli [%2u] '%s' zawiera %u wpisów:\n"
+"Tabela symboli [%2u] \"%s\" zawiera %u wpisów:\n"
 
 #: ../src/readelf.c:1958
 #, c-format
 msgid " %lu local symbol  String table: [%2u] '%s'\n"
 msgid_plural " %lu local symbols  String table: [%2u] '%s'\n"
-msgstr[0] " %lu symbol lokalny     Tabela łańcuchów: [%2u] '%s'\n"
-msgstr[1] " %lu symbole lokalne    Tabela łańcuchów: [%2u] '%s'\n"
-msgstr[2] " %lu symboli lokalnych  Tabela łańcuchów: [%2u] '%s'\n"
+msgstr[0] " %lu symbol lokalny     Tabela łańcuchów: [%2u] \"%s\"\n"
+msgstr[1] " %lu symbole lokalne    Tabela łańcuchów: [%2u] \"%s\"\n"
+msgstr[2] " %lu symboli lokalnych  Tabela łańcuchów: [%2u] \"%s\"\n"
 
 #: ../src/readelf.c:1968
 msgid "  Num:    Value   Size Type    Bind   Vis          Ndx Name\n"
@@ -4623,7 +4641,7 @@ msgid "| <unknown>"
 msgstr "| <nieznany>"
 
 #: ../src/readelf.c:2202
-#, c-format
+#, fuzzy, c-format
 msgid ""
 "\n"
 "Version needs section [%2u] '%s' contains %d entry:\n"
@@ -4670,17 +4688,17 @@ msgid_plural ""
 " Addr: %#0*<PRIx64>  Offset: %#08<PRIx64>  Link to section: [%2u] '%s'\n"
 msgstr[0] ""
 "\n"
-"Sekcja definicji wersji [%2u] '%s' zawiera %d wpis:\n"
+"Sekcja definicji wersji [%2u] \"%s\" zawiera %d wpis:\n"
 " Adres: %#0*<PRIx64>  Offset: %#08<PRIx64>  Dowiązanie do sekcji: [%2u] '%"
 "s'\n"
 msgstr[1] ""
 "\n"
-"Sekcja definicji wersji [%2u] '%s' zawiera %d wpisy:\n"
+"Sekcja definicji wersji [%2u] \"%s\" zawiera %d wpisy:\n"
 " Adres: %#0*<PRIx64>  Offset: %#08<PRIx64>  Dowiązanie do sekcji: [%2u] '%"
 "s'\n"
 msgstr[2] ""
 "\n"
-"Sekcja definicji wersji [%2u] '%s' zawiera %d wpisów:\n"
+"Sekcja definicji wersji [%2u] \"%s\" zawiera %d wpisów:\n"
 " Adres: %#0*<PRIx64>  Offset: %#08<PRIx64>  Dowiązanie do sekcji: [%2u] '%"
 "s'\n"
 
@@ -4707,16 +4725,19 @@ msgid_plural ""
 " Addr: %#0*<PRIx64>  Offset: %#08<PRIx64>  Link to section: [%2u] '%s'"
 msgstr[0] ""
 "\n"
-"Sekcja symboli wersji [%2u] '%s' zawiera %d wpis:\n"
-" Adres: %#0*<PRIx64>  Offset: %#08<PRIx64>  Dowiązanie do sekcji: [%2u] '%s'"
+"Sekcja symboli wersji [%2u] \"%s\" zawiera %d wpis:\n"
+" Adres: %#0*<PRIx64>  Offset: %#08<PRIx64>  Dowiązanie do sekcji: [%2u] \"%s"
+"\""
 msgstr[1] ""
 "\n"
-"Sekcja symboli wersji [%2u] '%s' zawiera %d wpisy:\n"
-" Adres: %#0*<PRIx64>  Offset: %#08<PRIx64>  Dowiązanie do sekcji: [%2u] '%s'"
+"Sekcja symboli wersji [%2u] \"%s\" zawiera %d wpisy:\n"
+" Adres: %#0*<PRIx64>  Offset: %#08<PRIx64>  Dowiązanie do sekcji: [%2u] \"%s"
+"\""
 msgstr[2] ""
 "\n"
-"Sekcja symboli wersji [%2u] '%s' zawiera %d wpisów:\n"
-" Adres: %#0*<PRIx64>  Offset: %#08<PRIx64>  Dowiązanie do sekcji: [%2u] '%s'"
+"Sekcja symboli wersji [%2u] \"%s\" zawiera %d wpisów:\n"
+" Adres: %#0*<PRIx64>  Offset: %#08<PRIx64>  Dowiązanie do sekcji: [%2u] \"%s"
+"\""
 
 #: ../src/readelf.c:2576
 msgid "   0 *local*                     "
@@ -4740,19 +4761,19 @@ msgid_plural ""
 " Addr: %#0*<PRIx64>  Offset: %#08<PRIx64>  Link to section: [%2u] '%s'\n"
 msgstr[0] ""
 "\n"
-"Histogram dla długości listy kubełków w sekcji [%2u] '%s' (w sumie %d "
+"Histogram dla długości listy kubełków w sekcji [%2u] \"%s\" (w sumie %d "
 "kubełek):\n"
 " Adres: %#0*<PRIx64>  Offset: %#08<PRIx64>  Dowiązanie do sekcji: [%2u] '%"
 "s'\n"
 msgstr[1] ""
 "\n"
-"Histogram dla długości listy kubełków w sekcji [%2u] '%s' (w sumie %d "
+"Histogram dla długości listy kubełków w sekcji [%2u] \"%s\" (w sumie %d "
 "kubełki):\n"
 " Adres: %#0*<PRIx64>  Offset: %#08<PRIx64>  Dowiązanie do sekcji: [%2u] '%"
 "s'\n"
 msgstr[2] ""
 "\n"
-"Histogram dla długości listy kubełków w sekcji [%2u] '%s' (w sumie %d "
+"Histogram dla długości listy kubełków w sekcji [%2u] \"%s\" (w sumie %d "
 "kubełków):\n"
 " Adres: %#0*<PRIx64>  Offset: %#08<PRIx64>  Dowiązanie do sekcji: [%2u] '%"
 "s'\n"
@@ -4773,10 +4794,10 @@ msgid "%7d  %6<PRIu32>      %5.1f%%    %5.1f%%\n"
 msgstr "%7d  %6<PRIu32>      %5.1f%%    %5.1f%%\n"
 
 #: ../src/readelf.c:2658
-#, c-format
+#, fuzzy, c-format
 msgid ""
 " Average number of tests:   successful lookup: %f\n"
-"                          unsuccessful lookup: %f\n"
+"\t\t\t  unsuccessful lookup: %f\n"
 msgstr ""
 " Średnia liczba testów:   udane wyszukania: %f\n"
 "                       nieudane wyszukania: %f\n"
@@ -4806,15 +4827,15 @@ msgid_plural ""
 "Library list section [%2zu] '%s' at offset %#0<PRIx64> contains %d entries:\n"
 msgstr[0] ""
 "\n"
-"Sekcja listy bibliotek [%2zu] '%s' pod offsetem %#0<PRIx64> zawiera %d "
+"Sekcja listy bibliotek [%2zu] \"%s\" pod offsetem %#0<PRIx64> zawiera %d "
 "wpis:\n"
 msgstr[1] ""
 "\n"
-"Sekcja listy bibliotek [%2zu] '%s' pod offsetem %#0<PRIx64> zawiera %d "
+"Sekcja listy bibliotek [%2zu] \"%s\" pod offsetem %#0<PRIx64> zawiera %d "
 "wpisy:\n"
 msgstr[2] ""
 "\n"
-"Sekcja listy bibliotek [%2zu] '%s' pod offsetem %#0<PRIx64> zawiera %d "
+"Sekcja listy bibliotek [%2zu] \"%s\" pod offsetem %#0<PRIx64> zawiera %d "
 "wpisów:\n"
 
 #: ../src/readelf.c:2901
@@ -4977,7 +4998,7 @@ msgid ""
 " [ Code]\n"
 msgstr ""
 "\n"
-"Sekcja DWARF '%s' pod offsetem %#<PRIx64>:\n"
+"Sekcja DWARF \"%s\" pod offsetem %#<PRIx64>:\n"
 " [ Kod]\n"
 
 #: ../src/readelf.c:4208
@@ -5022,13 +5043,13 @@ msgid_plural ""
 "DWARF section [%2zu] '%s' at offset %#<PRIx64> contains %zu entries:\n"
 msgstr[0] ""
 "\n"
-"Sekcja DWARF '%s' pod offsetem %#<PRIx64> zawiera %zu wpis:\n"
+"Sekcja DWARF \"%s\" pod offsetem %#<PRIx64> zawiera %zu wpis:\n"
 msgstr[1] ""
 "\n"
-"Sekcja DWARF '%s' pod offsetem %#<PRIx64> zawiera %zu wpisy:\n"
+"Sekcja DWARF \"%s\" pod offsetem %#<PRIx64> zawiera %zu wpisy:\n"
 msgstr[2] ""
 "\n"
-"Sekcja DWARF '%s' pod offsetem %#<PRIx64> zawiera %zu wpisów:\n"
+"Sekcja DWARF \"%s\" pod offsetem %#<PRIx64> zawiera %zu wpisów:\n"
 
 #: ../src/readelf.c:4311
 #, c-format
@@ -5047,22 +5068,22 @@ msgstr ""
 msgid "cannot get .debug_ranges content: %s"
 msgstr "nie można pobrać zawartości .debug_ranges: %s"
 
-#: ../src/readelf.c:4337 ../src/readelf.c:4823 ../src/readelf.c:5470
-#: ../src/readelf.c:5915 ../src/readelf.c:6014 ../src/readelf.c:6186
+#: ../src/readelf.c:4337 ../src/readelf.c:4823 ../src/readelf.c:5473
+#: ../src/readelf.c:5918 ../src/readelf.c:6017 ../src/readelf.c:6189
 #, fuzzy, c-format
 msgid ""
 "\n"
 "DWARF section [%2zu] '%s' at offset %#<PRIx64>:\n"
 msgstr ""
 "\n"
-"Sekcja DWARF '%s' pod offsetem %#<PRIx64>:\n"
+"Sekcja DWARF \"%s\" pod offsetem %#<PRIx64>:\n"
 
-#: ../src/readelf.c:4351 ../src/readelf.c:5933
+#: ../src/readelf.c:4351 ../src/readelf.c:5936
 #, c-format
 msgid " [%6tx]  <INVALID DATA>\n"
 msgstr ""
 
-#: ../src/readelf.c:4373 ../src/readelf.c:5955
+#: ../src/readelf.c:4373 ../src/readelf.c:5958
 #, c-format
 msgid " [%6tx]  base address %s\n"
 msgstr ""
@@ -5079,7 +5100,7 @@ msgstr " [%6tx]  %s..%s\n"
 msgid "           %s..%s\n"
 msgstr "           %s..%s\n"
 
-#: ../src/readelf.c:4812 ../src/readelf.c:6252 ../src/readelf.c:6354
+#: ../src/readelf.c:4812 ../src/readelf.c:6255 ../src/readelf.c:6357
 #, fuzzy, c-format
 msgid "cannot get %s content: %s"
 msgstr "nie można pobrać sekcji: %s"
@@ -5091,12 +5112,12 @@ msgid ""
 "Call frame information section [%2zu] '%s' at offset %#<PRIx64>:\n"
 msgstr ""
 "\n"
-"Sekcja relokacji [%2u] '%s' pod offsetem %#0<PRIx64> zawiera %d wpis:\n"
+"Sekcja relokacji [%2u] \"%s\" pod offsetem %#0<PRIx64> zawiera %d wpis:\n"
 
-#: ../src/readelf.c:4846 ../src/readelf.c:5504
+#: ../src/readelf.c:4846 ../src/readelf.c:5507
 #, c-format
 msgid "invalid data in section [%zu] '%s'"
-msgstr "błędne dane w sekcji [%zu] '%s'"
+msgstr "błędne dane w sekcji [%zu] \"%s\""
 
 #: ../src/readelf.c:4868
 #, c-format
@@ -5128,7 +5149,7 @@ msgstr ""
 msgid " (end offset: %#<PRIx64>)"
 msgstr ""
 "\n"
-"Sekcja DWARF '%s' pod offsetem %#<PRIx64>:\n"
+"Sekcja DWARF \"%s\" pod offsetem %#<PRIx64>:\n"
 
 #: ../src/readelf.c:5081
 #, c-format
@@ -5150,7 +5171,7 @@ msgstr "nie można pobrać formy atrybutu: %s"
 msgid "cannot get attribute value: %s"
 msgstr "nie można pobrać wartości atrybutu: %s"
 
-#: ../src/readelf.c:5346
+#: ../src/readelf.c:5349
 #, fuzzy, c-format
 msgid ""
 "\n"
@@ -5158,10 +5179,10 @@ msgid ""
 " [Offset]\n"
 msgstr ""
 "\n"
-"Sekcja DWARF '%s' pod offsetem %#<PRIx64>:\n"
+"Sekcja DWARF \"%s\" pod offsetem %#<PRIx64>:\n"
 " [Offset]\n"
 
-#: ../src/readelf.c:5371
+#: ../src/readelf.c:5374
 #, c-format
 msgid ""
 " Compilation unit at offset %<PRIu64>:\n"
@@ -5172,38 +5193,38 @@ msgstr ""
 " Wersja: %<PRIu16>, offset sekcji skrótów: %<PRIu64>, rozmiar adresu: %"
 "<PRIu8>, rozmiar offsetu: %<PRIu8>\n"
 
-#: ../src/readelf.c:5392
+#: ../src/readelf.c:5395
 #, c-format
 msgid "cannot get DIE at offset %<PRIu64> in section '%s': %s"
-msgstr "nie można pobrać DIE pod offsetem %<PRIu64> w sekcji '%s': %s"
+msgstr "nie można pobrać DIE pod offsetem %<PRIu64> w sekcji \"%s\": %s"
 
-#: ../src/readelf.c:5403
+#: ../src/readelf.c:5406
 #, c-format
 msgid "cannot get DIE offset: %s"
 msgstr "nie można pobrać offsetu DIE: %s"
 
-#: ../src/readelf.c:5411
+#: ../src/readelf.c:5414
 #, c-format
 msgid "cannot get tag of DIE at offset %<PRIu64> in section '%s': %s"
 msgstr ""
-"nie można pobrać znacznika DIE pod offsetem %<PRIu64> w sekcji '%s': %s"
+"nie można pobrać znacznika DIE pod offsetem %<PRIu64> w sekcji \"%s\": %s"
 
-#: ../src/readelf.c:5440
+#: ../src/readelf.c:5443
 #, c-format
 msgid "cannot get next DIE: %s\n"
 msgstr "nie można pobrać następnego DIE: %s\n"
 
-#: ../src/readelf.c:5447
+#: ../src/readelf.c:5450
 #, c-format
 msgid "cannot get next DIE: %s"
 msgstr "nie można pobrać następnego DIE: %s"
 
-#: ../src/readelf.c:5482
+#: ../src/readelf.c:5485
 #, c-format
 msgid "cannot get line data section data: %s"
 msgstr "nie można pobrać danych sekcji danych linii: %s"
 
-#: ../src/readelf.c:5495
+#: ../src/readelf.c:5498
 #, c-format
 msgid ""
 "\n"
@@ -5213,7 +5234,7 @@ msgstr ""
 "Tabela pod offsetem %Zu:\n"
 
 #. Print what we got so far.
-#: ../src/readelf.c:5547
+#: ../src/readelf.c:5550
 #, c-format
 msgid ""
 "\n"
@@ -5233,19 +5254,19 @@ msgstr ""
 " Wersja DWARF:                 %<PRIuFAST16>\n"
 " Długość prologu:              %<PRIu64>\n"
 " Minimalna długość instrukcji: %<PRIuFAST8>\n"
-" Początkowa wartość '%s': %<PRIuFAST8>\n"
+" Początkowa wartość \"%s\": %<PRIuFAST8>\n"
 " Początek linii:               %<PRIdFAST8>\n"
 " Przedział linii:              %<PRIuFAST8>\n"
 " Początek instrukcji:          %<PRIuFAST8>\n"
 "\n"
 "Instrukcje:\n"
 
-#: ../src/readelf.c:5566
+#: ../src/readelf.c:5569
 #, fuzzy, c-format
 msgid "invalid data at offset %tu in section [%zu] '%s'"
-msgstr "błędne dane w sekcji [%zu] '%s'"
+msgstr "błędne dane w sekcji [%zu] \"%s\""
 
-#: ../src/readelf.c:5581
+#: ../src/readelf.c:5584
 #, c-format
 msgid "  [%*<PRIuFAST8>]  %hhu argument\n"
 msgid_plural "  [%*<PRIuFAST8>]  %hhu arguments\n"
@@ -5253,7 +5274,7 @@ msgstr[0] "  [%*<PRIuFAST8>]  %hhu argument\n"
 msgstr[1] "  [%*<PRIuFAST8>]  %hhu argumenty\n"
 msgstr[2] "  [%*<PRIuFAST8>]  %hhu argumentów\n"
 
-#: ../src/readelf.c:5589
+#: ../src/readelf.c:5592
 msgid ""
 "\n"
 "Directory table:"
@@ -5261,7 +5282,7 @@ msgstr ""
 "\n"
 "Tabela katalogu:"
 
-#: ../src/readelf.c:5605
+#: ../src/readelf.c:5608
 msgid ""
 "\n"
 "File name table:\n"
@@ -5271,7 +5292,7 @@ msgstr ""
 "Tabela nazw plików:\n"
 " Wpis Kat    Czas      Rozmiar   Nazwa"
 
-#: ../src/readelf.c:5634
+#: ../src/readelf.c:5637
 msgid ""
 "\n"
 "Line number statements:"
@@ -5279,26 +5300,26 @@ msgstr ""
 "\n"
 "Instrukcje numerów linii:"
 
-#: ../src/readelf.c:5695
+#: ../src/readelf.c:5698
 #, fuzzy, c-format
 msgid " special opcode %u: address+%u = %s, line%+d = %zu\n"
 msgstr " instrukcja specjalna %u: adres+%u = %#<PRIx64>, linia%+d = %zu\n"
 
-#: ../src/readelf.c:5715
+#: ../src/readelf.c:5718
 #, c-format
 msgid " extended opcode %u: "
 msgstr " instrukcja rozszerzona %u: "
 
-#: ../src/readelf.c:5720
+#: ../src/readelf.c:5723
 msgid "end of sequence"
 msgstr "koniec sekwencji"
 
-#: ../src/readelf.c:5735
+#: ../src/readelf.c:5738
 #, fuzzy, c-format
 msgid "set address to %s\n"
 msgstr "ustawienie adresu na %#<PRIx64>\n"
 
-#: ../src/readelf.c:5756
+#: ../src/readelf.c:5759
 #, c-format
 msgid "define new file: dir=%u, mtime=%<PRIu64>, length=%<PRIu64>, name=%s\n"
 msgstr ""
@@ -5306,69 +5327,69 @@ msgstr ""
 "s\n"
 
 #. Unknown, ignore it.
-#: ../src/readelf.c:5765
+#: ../src/readelf.c:5768
 msgid "unknown opcode"
 msgstr "nieznany kod instrukcji"
 
 #. Takes no argument.
-#: ../src/readelf.c:5777
+#: ../src/readelf.c:5780
 msgid " copy"
 msgstr " kopiowanie"
 
-#: ../src/readelf.c:5787
+#: ../src/readelf.c:5790
 #, fuzzy, c-format
 msgid "advance address by %u to %s\n"
 msgstr " zwiększenie adresu o %u do %#<PRIx64>\n"
 
-#: ../src/readelf.c:5798
+#: ../src/readelf.c:5801
 #, c-format
 msgid " advance line by constant %d to %<PRId64>\n"
 msgstr " zwiększenie linii o stałą %d do %<PRId64>\n"
 
-#: ../src/readelf.c:5806
+#: ../src/readelf.c:5809
 #, c-format
 msgid " set file to %<PRIu64>\n"
 msgstr " ustawienie pliku na %<PRIu64>\n"
 
-#: ../src/readelf.c:5816
+#: ../src/readelf.c:5819
 #, c-format
 msgid " set column to %<PRIu64>\n"
 msgstr " ustawienie kolumny na %<PRIu64>\n"
 
-#: ../src/readelf.c:5823
+#: ../src/readelf.c:5826
 #, c-format
 msgid " set '%s' to %<PRIuFAST8>\n"
-msgstr " ustawienie '%s' na %<PRIuFAST8>\n"
+msgstr " ustawienie \"%s\" na %<PRIuFAST8>\n"
 
 #. Takes no argument.
-#: ../src/readelf.c:5829
+#: ../src/readelf.c:5832
 msgid " set basic block flag"
 msgstr " ustawienie podstawowej flagi bloku"
 
-#: ../src/readelf.c:5839
+#: ../src/readelf.c:5842
 #, fuzzy, c-format
 msgid "advance address by constant %u to %s\n"
 msgstr " zwiększenie adresu o stałą %u do %#<PRIx64>\n"
 
-#: ../src/readelf.c:5855
+#: ../src/readelf.c:5858
 #, fuzzy, c-format
 msgid "advance address by fixed value %u to %s\n"
 msgstr " zwiększenie adresu o stałą wartość %u do %#<PRIx64>\n"
 
 #. Takes no argument.
-#: ../src/readelf.c:5864
+#: ../src/readelf.c:5867
 msgid " set prologue end flag"
 msgstr " ustawienie flagi końca prologu"
 
 #. Takes no argument.
-#: ../src/readelf.c:5869
+#: ../src/readelf.c:5872
 msgid " set epilogue begin flag"
 msgstr " ustawienie flagi początku epilogu"
 
 #. This is a new opcode the generator but not we know about.
 #. Read the parameters associated with it but then discard
 #. everything.  Read all the parameters for this opcode.
-#: ../src/readelf.c:5878
+#: ../src/readelf.c:5881
 #, c-format
 msgid " unknown opcode with %<PRIu8> parameter:"
 msgid_plural " unknown opcode with %<PRIu8> parameters:"
@@ -5376,38 +5397,38 @@ msgstr[0] " nieznana instrukcja z %<PRIu8> parametrem:"
 msgstr[1] " nieznana instrukcja z %<PRIu8> parametrami:"
 msgstr[2] " nieznana instrukcja z %<PRIu8> parametrami:"
 
-#: ../src/readelf.c:5910
+#: ../src/readelf.c:5913
 #, c-format
 msgid "cannot get .debug_loc content: %s"
 msgstr "nie można pobrać zawartości .debug_log: %s"
 
 #. First entry in a list.
-#: ../src/readelf.c:5969
+#: ../src/readelf.c:5972
 #, c-format
 msgid " [%6tx]  %s..%s"
 msgstr " [%6tx]  %s..%s"
 
-#: ../src/readelf.c:5971
+#: ../src/readelf.c:5974
 #, c-format
 msgid "           %s..%s"
 msgstr "           %s..%s"
 
-#: ../src/readelf.c:6024
+#: ../src/readelf.c:6027
 #, c-format
 msgid "cannot get macro information section data: %s"
 msgstr "nie można pobrać danych sekcji informacji o makrach: %s"
 
-#: ../src/readelf.c:6103
+#: ../src/readelf.c:6106
 #, c-format
 msgid "%*s*** non-terminated string at end of section"
 msgstr "%*s*** niezakończony łańcuch na końcu sekcji"
 
-#: ../src/readelf.c:6171
+#: ../src/readelf.c:6174
 #, c-format
 msgid " [%5d] DIE offset: %6<PRId64>, CU DIE offset: %6<PRId64>, name: %s\n"
 msgstr " [%5d] offset DIE: %6<PRId64>, offset CU DIE: %6<PRId64>, nazwa: %s\n"
 
-#: ../src/readelf.c:6210
+#: ../src/readelf.c:6213
 #, fuzzy, c-format
 msgid ""
 "\n"
@@ -5415,50 +5436,50 @@ msgid ""
 " %*s  String\n"
 msgstr ""
 "\n"
-"Sekcja DWARF '%s' pod offsetem %#<PRIx64>:\n"
+"Sekcja DWARF \"%s\" pod offsetem %#<PRIx64>:\n"
 " %*s  Łańcuch\n"
 
-#: ../src/readelf.c:6224
+#: ../src/readelf.c:6227
 #, c-format
 msgid " *** error while reading strings: %s\n"
 msgstr " *** błąd podczas odczytu łańcuchów: %s\n"
 
-#: ../src/readelf.c:6244
+#: ../src/readelf.c:6247
 #, c-format
 msgid ""
 "\n"
 "Call frame search table section [%2zu] '.eh_frame_hdr':\n"
 msgstr ""
 
-#: ../src/readelf.c:6346
+#: ../src/readelf.c:6349
 #, c-format
 msgid ""
 "\n"
 "Exception handling table section [%2zu] '.gcc_except_table':\n"
 msgstr ""
 
-#: ../src/readelf.c:6369
+#: ../src/readelf.c:6372
 #, c-format
 msgid " LPStart encoding:    %#x "
 msgstr ""
 
-#: ../src/readelf.c:6381
+#: ../src/readelf.c:6384
 #, c-format
 msgid " TType encoding:      %#x "
 msgstr ""
 
-#: ../src/readelf.c:6395
+#: ../src/readelf.c:6398
 #, c-format
 msgid " Call site encoding:  %#x "
 msgstr ""
 
-#: ../src/readelf.c:6408
+#: ../src/readelf.c:6411
 msgid ""
 "\n"
 " Call site table:"
 msgstr ""
 
-#: ../src/readelf.c:6422
+#: ../src/readelf.c:6425
 #, c-format
 msgid ""
 " [%4u] Call site start:   %#<PRIx64>\n"
@@ -5467,43 +5488,43 @@ msgid ""
 "        Action:            %u\n"
 msgstr ""
 
-#: ../src/readelf.c:6482
+#: ../src/readelf.c:6485
 #, fuzzy, c-format
 msgid "invalid TType encoding"
 msgstr "błędny indeks linii"
 
-#: ../src/readelf.c:6506
+#: ../src/readelf.c:6509
 #, c-format
 msgid "cannot get debug context descriptor: %s"
 msgstr "nie można pobrać deskryptora kontekstu debugowego: %s"
 
-#: ../src/readelf.c:6642 ../src/readelf.c:7243
+#: ../src/readelf.c:6645 ../src/readelf.c:7246
 #, fuzzy, c-format
 msgid "cannot convert core note data: %s"
 msgstr "nie można pobrać zawartości sekcji notatki: %s"
 
-#: ../src/readelf.c:6983
+#: ../src/readelf.c:6986
 #, c-format
 msgid ""
 "\n"
 "%*s... <repeats %u more times> ..."
 msgstr ""
 
-#: ../src/readelf.c:7342
+#: ../src/readelf.c:7345
 msgid "  Owner          Data size  Type\n"
 msgstr "  Właściciel     Rozmiar danych  Typ\n"
 
-#: ../src/readelf.c:7360
+#: ../src/readelf.c:7363
 #, c-format
 msgid "  %-13.*s  %9<PRId32>  %s\n"
 msgstr "  %-13.*s  %9<PRId32>  %s\n"
 
-#: ../src/readelf.c:7394
+#: ../src/readelf.c:7397
 #, c-format
 msgid "cannot get content of note section: %s"
 msgstr "nie można pobrać zawartości sekcji notatki: %s"
 
-#: ../src/readelf.c:7421
+#: ../src/readelf.c:7424
 #, fuzzy, c-format
 msgid ""
 "\n"
@@ -5512,7 +5533,7 @@ msgstr ""
 "\n"
 "Segment notatki o długości %<PRId64> bajtów pod offsetem %#0<PRIx64>:\n"
 
-#: ../src/readelf.c:7444
+#: ../src/readelf.c:7447
 #, fuzzy, c-format
 msgid ""
 "\n"
@@ -5521,19 +5542,19 @@ msgstr ""
 "\n"
 "Segment notatki o długości %<PRId64> bajtów pod offsetem %#0<PRIx64>:\n"
 
-#: ../src/readelf.c:7490
+#: ../src/readelf.c:7493
 #, fuzzy, c-format
 msgid ""
 "\n"
 "Section [%Zu] '%s' has no data to dump.\n"
-msgstr "sekcja [%2zu] '%s' ma nieobsługiwany typ %d\n"
+msgstr "sekcja [%2zu] \"%s\" ma nieobsługiwany typ %d\n"
 
-#: ../src/readelf.c:7496 ../src/readelf.c:7519
+#: ../src/readelf.c:7499 ../src/readelf.c:7522
 #, fuzzy, c-format
 msgid "cannot get data for section [%Zu] '%s': %s"
 msgstr "nie można pobrać danych dla sekcji %d: %s"
 
-#: ../src/readelf.c:7500
+#: ../src/readelf.c:7503
 #, fuzzy, c-format
 msgid ""
 "\n"
@@ -5542,14 +5563,14 @@ msgstr ""
 "\n"
 "Segment notatki o długości %<PRId64> bajtów pod offsetem %#0<PRIx64>:\n"
 
-#: ../src/readelf.c:7513
+#: ../src/readelf.c:7516
 #, fuzzy, c-format
 msgid ""
 "\n"
 "Section [%Zu] '%s' has no strings to dump.\n"
-msgstr "sekcja [%2zu] '%s' ma nieobsługiwany typ %d\n"
+msgstr "sekcja [%2zu] \"%s\" ma nieobsługiwany typ %d\n"
 
-#: ../src/readelf.c:7523
+#: ../src/readelf.c:7526
 #, fuzzy, c-format
 msgid ""
 "\n"
@@ -5558,45 +5579,45 @@ msgstr ""
 "\n"
 "Segment notatki o długości %<PRId64> bajtów pod offsetem %#0<PRIx64>:\n"
 
-#: ../src/readelf.c:7571
+#: ../src/readelf.c:7574
 #, c-format
 msgid ""
 "\n"
 "section [%lu] does not exist"
 msgstr ""
 
-#: ../src/readelf.c:7598
+#: ../src/readelf.c:7601
 #, fuzzy, c-format
 msgid ""
 "\n"
 "section '%s' does not exist"
-msgstr "sekcja [%2d] '%s': brak obowiązkowego znacznika %s\n"
-
-#: ../src/readelf.c:7659
-#, fuzzy, c-format
-msgid "cannot get symbol index of archive '%s': %s"
-msgstr "nie można pobrać symbolu w '%s': %s"
+msgstr "sekcja [%2d] \"%s\": brak obowiązkowego znacznika %s\n"
 
 #: ../src/readelf.c:7662
+#, fuzzy, c-format
+msgid "cannot get symbol index of archive '%s': %s"
+msgstr "nie można pobrać symbolu w \"%s\": %s"
+
+#: ../src/readelf.c:7665
 #, c-format
 msgid ""
 "\n"
 "Archive '%s' has no symbol index\n"
 msgstr ""
 
-#: ../src/readelf.c:7666
+#: ../src/readelf.c:7669
 #, c-format
 msgid ""
 "\n"
 "Index of archive '%s' has %Zu entries:\n"
 msgstr ""
 
-#: ../src/readelf.c:7684
+#: ../src/readelf.c:7687
 #, fuzzy, c-format
 msgid "cannot extract member at offset %Zu in '%s': %s"
-msgstr "nie można pobrać zawartości sekcji %zu w '%s': %s"
+msgstr "nie można pobrać zawartości sekcji %zu w \"%s\": %s"
 
-#: ../src/readelf.c:7689
+#: ../src/readelf.c:7692
 #, c-format
 msgid "Archive member '%s' contains:\n"
 msgstr ""
@@ -5711,7 +5732,7 @@ msgstr "Wypisanie łańcuchów znaków drukowalnych w plikach."
 #: ../src/strings.c:268 ../src/strings.c:303
 #, c-format
 msgid "invalid value '%s' for %s parameter"
-msgstr "błędna wartość '%s' dla parametru %s"
+msgstr "błędna wartość \"%s\" dla parametru %s"
 
 #: ../src/strings.c:314
 #, c-format
@@ -5794,12 +5815,12 @@ msgstr "Opcja -R obsługuje tylko sekcję .comment"
 #: ../src/strip.c:298 ../src/strip.c:322
 #, c-format
 msgid "cannot stat input file '%s'"
-msgstr "nie można wykonać stat na pliku wejściowym '%s'"
+msgstr "nie można wykonać stat na pliku wejściowym \"%s\""
 
 #: ../src/strip.c:312
 #, c-format
 msgid "while opening '%s'"
-msgstr "podczas otwierania '%s'"
+msgstr "podczas otwierania \"%s\""
 
 #: ../src/strip.c:350
 #, c-format
@@ -5814,12 +5835,12 @@ msgstr "nie można otworzyć backendu EBL"
 #: ../src/strip.c:498 ../src/strip.c:522
 #, c-format
 msgid "cannot create new file '%s': %s"
-msgstr "nie można utworzyć nowego pliku '%s': %s"
+msgstr "nie można utworzyć nowego pliku \"%s\": %s"
 
 #: ../src/strip.c:582
 #, c-format
 msgid "illformed file '%s'"
-msgstr "plik '%s' ma zły format"
+msgstr "plik \"%s\" ma zły format"
 
 #: ../src/strip.c:869 ../src/strip.c:956
 #, c-format
@@ -5834,7 +5855,7 @@ msgstr "%s: błąd podczas tworzenia nagłówka ELF: %s"
 #: ../src/strip.c:943
 #, c-format
 msgid "while preparing output for '%s'"
-msgstr "podczas przygotowywania wyjścia dla '%s'"
+msgstr "podczas przygotowywania wyjścia dla \"%s\""
 
 #: ../src/strip.c:994 ../src/strip.c:1050
 #, c-format
@@ -5854,12 +5875,12 @@ msgstr "podczas tworzenia tabeli łańcuchów nagłówka sekcji: %s"
 #: ../src/strip.c:1593 ../src/strip.c:1690
 #, c-format
 msgid "while writing '%s': %s"
-msgstr "podczas zapisu '%s': %s"
+msgstr "podczas zapisywania \"%s\": %s"
 
 #: ../src/strip.c:1604
 #, c-format
 msgid "while creating '%s'"
-msgstr "podczas tworzenia `%s'"
+msgstr "podczas tworzenia \"%s\""
 
 #: ../src/strip.c:1616
 #, c-format
@@ -5874,12 +5895,12 @@ msgstr "%s: błąd podczas odczytu pliku: %s"
 #: ../src/strip.c:1722 ../src/strip.c:1729
 #, c-format
 msgid "error while finishing '%s': %s"
-msgstr "błąd podczas kończenia '%s': %s"
+msgstr "błąd podczas kończenia \"%s\": %s"
 
 #: ../src/strip.c:1752 ../src/strip.c:1809
 #, c-format
 msgid "cannot set access and modification date of '%s'"
-msgstr "nie można ustawić czasu dostępu i modyfikacji '%s'"
+msgstr "nie można ustawić czasu dostępu i modyfikacji \"%s\""
 
 #: ../src/unstrip.c:78
 msgid "Match MODULE against file names, not module names"
@@ -5933,7 +5954,7 @@ msgstr ""
 #: ../src/unstrip.c:190
 #, c-format
 msgid "output directory '%s'"
-msgstr ""
+msgstr "katalog wyjściowy \"%s\""
 
 #: ../src/unstrip.c:199
 #, c-format
@@ -5988,12 +6009,12 @@ msgstr "nie można przydzielić danych sekcji: %s"
 #: ../src/unstrip.c:309
 #, fuzzy, c-format
 msgid "cannot create directory '%s'"
-msgstr "nie można utworzyć deskryptora EBL dla '%s'"
+msgstr "nie można utworzyć deskryptora EBL dla \"%s\""
 
 #: ../src/unstrip.c:349 ../src/unstrip.c:763 ../src/unstrip.c:1540
 #, fuzzy, c-format
 msgid "cannot get symbol table entry: %s"
-msgstr "nie można pobrać sekcji tabeli symboli %zu w '%s': %s"
+msgstr "nie można pobrać sekcji tabeli symboli %zu w \"%s\": %s"
 
 #: ../src/unstrip.c:365 ../src/unstrip.c:580 ../src/unstrip.c:601
 #: ../src/unstrip.c:613 ../src/unstrip.c:1561 ../src/unstrip.c:1691
@@ -6017,7 +6038,7 @@ msgstr "nie można pobrać relokacji: %s"
 #: ../src/unstrip.c:507
 #, fuzzy, c-format
 msgid "cannot get symbol version: %s"
-msgstr "nie można pobrać symbolu w '%s': %s"
+msgstr "nie można pobrać symbolu w \"%s\": %s"
 
 #: ../src/unstrip.c:519
 #, c-format
@@ -6047,7 +6068,7 @@ msgstr "błędna sekcja .debug_line"
 #: ../src/unstrip.c:1047 ../src/unstrip.c:1370
 #, fuzzy, c-format
 msgid "cannot find matching section for [%Zu] '%s'"
-msgstr "błędne dane w sekcji [%zu] '%s'"
+msgstr "błędne dane w sekcji [%zu] \"%s\""
 
 #: ../src/unstrip.c:1171 ../src/unstrip.c:1186 ../src/unstrip.c:1451
 #, fuzzy, c-format
@@ -6082,7 +6103,7 @@ msgstr "nie można pobrać sekcji: %s"
 #: ../src/unstrip.c:1548
 #, fuzzy, c-format
 msgid "symbol [%Zu] has invalid section index"
-msgstr "sekcja [%2d] '%s': symbol %zu: błędny indeks sekcji\n"
+msgstr "sekcja [%2d] \"%s\": symbol %zu: błędny indeks sekcji\n"
 
 #: ../src/unstrip.c:1800
 #, fuzzy, c-format
@@ -6114,7 +6135,7 @@ msgstr ""
 #: ../src/unstrip.c:2034
 #, fuzzy, c-format
 msgid "cannot create ELF descriptor: %s"
-msgstr "nie można utworzyć deskryptora ELF dla '%s': %s"
+msgstr "nie można utworzyć deskryptora ELF dla \"%s\": %s"
 
 #: ../src/unstrip.c:1960
 #, c-format
@@ -6124,32 +6145,32 @@ msgstr ""
 #: ../src/unstrip.c:1991
 #, fuzzy, c-format
 msgid "cannot find stripped file for module '%s': %s"
-msgstr "nie można utworzyć nowego pliku '%s': %s"
+msgstr "nie można utworzyć nowego pliku \"%s\": %s"
 
 #: ../src/unstrip.c:1995
 #, fuzzy, c-format
 msgid "cannot open stripped file '%s' for module '%s': %s"
-msgstr "nie można utworzyć nowego pliku '%s': %s"
+msgstr "nie można utworzyć nowego pliku \"%s\": %s"
 
 #: ../src/unstrip.c:2010
 #, fuzzy, c-format
 msgid "cannot find debug file for module '%s': %s"
-msgstr "nie można utworzyć nowego pliku '%s': %s"
+msgstr "nie można utworzyć nowego pliku \"%s\": %s"
 
 #: ../src/unstrip.c:2014
 #, fuzzy, c-format
 msgid "cannot open debug file '%s' for module '%s': %s"
-msgstr "nie można utworzyć nowego pliku '%s': %s"
+msgstr "nie można utworzyć nowego pliku \"%s\": %s"
 
 #: ../src/unstrip.c:2027
 #, fuzzy, c-format
 msgid "module '%s' file '%s' is not stripped"
-msgstr "plik wejściowy '%s' zignorowany"
+msgstr "plik wejściowy \"%s\" zignorowany"
 
 #: ../src/unstrip.c:2058
 #, fuzzy, c-format
 msgid "cannot cache section addresses for module '%s': %s"
-msgstr "nie można pobrać nagłówka sekcji dla sekcji [%2zu] '%s': %s\n"
+msgstr "nie można pobrać nagłówka sekcji dla sekcji [%2zu] \"%s\": %s\n"
 
 #: ../src/unstrip.c:2191
 #, fuzzy, c-format

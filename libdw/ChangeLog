@@ -1,7 +1,7 @@
-2010-05-28  Ulrich Drepper  <drepper@redhat.com>
+2010-05-28  Eduardo Santiago  <santiago@redhat.com>
 
-	* dwarf_getlocation.c (dwarf_getlocation): Move attr_ok call back to
-	the front.
+	* dwarf_getlocation.c (dwarf_getlocation): Do attr_ok check first
+	thing.
 
 2010-05-27  Roland McGrath  <roland@redhat.com>
 

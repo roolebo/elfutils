@@ -1,3 +1,8 @@
+2010-05-28  Ulrich Drepper  <drepper@redhat.com>
+
+	* dwarf_getlocation.c (dwarf_getlocation): Move attr_ok call back to
+	the front.
+
 2010-05-27  Roland McGrath  <roland@redhat.com>
 
 	* dwarf.h: Add DW_AT_enum_class, DW_AT_linkage_name,
@@ -1329,4 +1334,4 @@
 
 2003-08-11  Ulrich Drepper  <drepper@redhat.com>
 
-        * Moved to CVS archive.
+	* Moved to CVS archive.

@@ -541,12 +541,12 @@ dwarf_getlocation (attr, llbuf, listlen)
      Dwarf_Op **llbuf;
      size_t *listlen;
 {
+  if (! attr_ok (attr))
+    return -1;
+
   int result = check_constant_offset (attr, llbuf, listlen);
   if (result != 1)
     return result;
-
-  if (! attr_ok (attr))
-    return -1;
 
   /* If it has a block form, it's a single location expression.  */
   Dwarf_Block block;

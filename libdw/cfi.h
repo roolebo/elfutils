@@ -54,8 +54,6 @@
 #include "libelfP.h"
 struct ebl;
 
-#define dwarf_cfi_cie_p(entry)	((entry)->cie.CIE_id == DW_CIE_ID_64)
-
 /* Cached CIE representation.  */
 struct dwarf_cie
 {

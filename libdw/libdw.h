@@ -247,6 +247,8 @@ typedef union
   Dwarf_FDE fde;
 } Dwarf_CFI_Entry;
 
+#define dwarf_cfi_cie_p(entry)	((entry)->cie.CIE_id == DW_CIE_ID_64)
+
 /* Opaque type representing a frame state described by CFI.  */
 typedef struct Dwarf_Frame_s Dwarf_Frame;
 

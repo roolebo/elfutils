@@ -1,5 +1,10 @@
 2010-05-31  Mark Wielaard  <mjw@redhat.com>
 
+	* cfi.h (dwarf_cfi_cie_p): Move definition from here, to ..
+	* libdw.h (dwarf_cfi_cie_p): ... here.
+
+2010-05-31  Mark Wielaard  <mjw@redhat.com>
+
 	* dwarf.h: Fix DW_LANG_Python constant.
 
 2010-05-28  Eduardo Santiago  <santiago@redhat.com>

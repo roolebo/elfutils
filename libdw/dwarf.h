@@ -571,7 +571,7 @@ enum
     DW_LANG_ObjC_plus_plus = 0x0011, /* Objective-C++ */
     DW_LANG_UPC = 0x0012,	     /* Unified Parallel C */
     DW_LANG_D = 0x0013,		     /* D */
-    DW_LANG_Python = 0x00134,	     /* Python */
+    DW_LANG_Python = 0x0014,	     /* Python */
 
     DW_LANG_lo_user = 0x8000,
     DW_LANG_Mips_Assembler = 0x8001,

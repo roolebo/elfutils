@@ -1,5 +1,5 @@
 /* Find CU for given offset.
-   Copyright (C) 2003, 2004, 2005, 2007 Red Hat, Inc.
+   Copyright (C) 2003-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -121,8 +121,8 @@ __libdw_findcu (dbg, start)
 			   + (2 * offset_size - 4));
       uint16_t version = read_2ubyte_unaligned (dbg, bytes);
 
-      /* We only know how to handle the DWARF version 2 and 3 formats.  */
-      if (unlikely (version != 2) && unlikely (version != 3))
+      /* We only know how to handle the DWARF version 2 through 4 formats.  */
+      if (unlikely (version < 2) || unlikely (version > 4))
 	goto invalid;
 
       /* Create an entry for this CU.  */

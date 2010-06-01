@@ -1,3 +1,7 @@
+2010-06-01  Roland McGrath  <roland@redhat.com>
+
+	* libdw_findcu.c (__libdw_findcu): Accept version 4.
+
 2010-05-31  Mark Wielaard  <mjw@redhat.com>
 
 	* cfi.h (dwarf_cfi_cie_p): Move definition from here, to ..

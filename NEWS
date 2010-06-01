@@ -1,5 +1,7 @@
 Version 0.148:
 
+libdw: Accept DWARF 4 format.
+
 libdwfl: Fixes in core-file handling, support cores from PIEs.
 	 When working from build IDs, don't open a named file that mismatches.
 

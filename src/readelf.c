@@ -6503,12 +6503,15 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
   /* Before we start the real work get a debug context descriptor.  */
   Dwarf_Addr dwbias;
   Dwarf *dbg = dwfl_module_getdwarf (dwflmod, &dwbias);
+  Dwarf dummy_dbg = { .other_byte_order = MY_ELFDATA != ehdr->e_ident[EI_DATA] };
   if (dbg == NULL)
     {
-      if (print_debug_sections != 0)
+      if ((print_debug_sections & ~section_exception) != 0)
 	error (0, 0, gettext ("cannot get debug context descriptor: %s"),
 	       dwfl_errmsg (-1));
-      return;
+      if ((print_debug_sections & section_exception) == 0)
+	return;
+      dbg = &dummy_dbg;
     }
 
   /* Get the section header string table index.  */

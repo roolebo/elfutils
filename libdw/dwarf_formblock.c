@@ -1,5 +1,5 @@
 /* Return block represented by attribute.
-   Copyright (C) 2004, 2005 Red Hat, Inc.
+   Copyright (C) 2004-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
@@ -84,6 +84,7 @@ dwarf_formblock (attr, return_block)
       break;
 
     case DW_FORM_block:
+    case DW_FORM_exprloc:
       datap = attr->valp;
       get_uleb128 (return_block->length, datap);
       return_block->data = (unsigned char *) datap;

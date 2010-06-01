@@ -3515,7 +3515,11 @@ dwarf_form_string (unsigned int form)
       [DW_FORM_ref4] = "ref4",
       [DW_FORM_ref8] = "ref8",
       [DW_FORM_ref_udata] = "ref_udata",
-      [DW_FORM_indirect] = "indirect"
+      [DW_FORM_indirect] = "indirect",
+      [DW_FORM_sec_offset] = "sec_offset",
+      [DW_FORM_exprloc] = "exprloc",
+      [DW_FORM_flag_present] = "flag_present",
+      [DW_FORM_ref_sig8] = "ref_sig8"
     };
   const unsigned int nknown_forms = (sizeof (known_forms)
 				     / sizeof (known_forms[0]));
@@ -5184,6 +5188,10 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	      dwarf_form_string (form), (uintmax_t) dwarf_dieoffset (&ref));
       break;
 
+    case DW_FORM_sec_offset:
+      attrp->form = cbargs->offset_size == 8 ? DW_FORM_data8 : DW_FORM_data4;
+      /* Fall through.  */
+
     case DW_FORM_udata:
     case DW_FORM_sdata:
     case DW_FORM_data8:
@@ -5199,7 +5207,8 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	{
 	/* This case can take either a constant or a loclistptr. */
 	case DW_AT_data_member_location:
-	  if (form != DW_FORM_data4 && form != DW_FORM_data8)
+	  if (form != DW_FORM_data4 && form != DW_FORM_data8
+	      && form != DW_FORM_sec_offset) /* XXX not data[48] if CU v4! */
 	    {
 	      printf ("           %*s%-20s (%s) %" PRIxMAX "\n",
 		      (int) (level * 2), "", dwarf_attr_string (attr),
@@ -5283,6 +5292,13 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	      dwarf_form_string (form), nl_langinfo (flag ? YESSTR : NOSTR));
       break;
 
+    case DW_FORM_flag_present:
+      printf ("           %*s%-20s (%s) %s\n",
+	      (int) (level * 2), "", dwarf_attr_string (attr),
+	      dwarf_form_string (form), nl_langinfo (YESSTR));
+      break;
+
+    case DW_FORM_exprloc:
     case DW_FORM_block4:
     case DW_FORM_block2:
     case DW_FORM_block1:
@@ -5297,6 +5313,14 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 
       switch (attr)
 	{
+	default:
+	  if (form != DW_FORM_exprloc)
+	    {
+	      print_block (block.length, block.data);
+	      break;
+	    }
+	  /* Fall through.  */
+
 	case DW_AT_location:
 	case DW_AT_data_location:
 	case DW_AT_data_member_location:
@@ -5320,10 +5344,6 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 		     12 + level * 2, 12 + level * 2,
 		     cbargs->addrsize, cbargs->offset_size,
 		     block.length, block.data);
-	  break;
-
-	default:
-	  print_block (block.length, block.data);
 	  break;
 	}
       break;

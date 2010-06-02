@@ -5188,6 +5188,13 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	      dwarf_form_string (form), (uintmax_t) dwarf_dieoffset (&ref));
       break;
 
+    case DW_FORM_ref_sig8:
+      printf ("           %*s%-20s (%s) {%6" PRIx64 "}\n",
+	      (int) (level * 2), "", dwarf_attr_string (attr),
+	      dwarf_form_string (form),
+	      read_8ubyte_unaligned (attrp->cu->dbg, attrp->valp));
+      break;
+
     case DW_FORM_sec_offset:
       attrp->form = cbargs->offset_size == 8 ? DW_FORM_data8 : DW_FORM_data4;
       /* Fall through.  */

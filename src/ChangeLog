@@ -2,7 +2,7 @@
 
 	* readelf.c (dwarf_form_string): Handle DWARF 4 forms.
 	(attr_callback): Handle DW_FORM_flag_present, DW_FORM_exprloc,
-	DW_FORM_sec_offset.
+	DW_FORM_sec_offset, DW_FORM_ref_sig8.
 
 	* readelf.c (print_debug): Don't bail if libdw setup fails.
 	Suppress complaint if we only want .eh_frame anyway.

@@ -1,5 +1,7 @@
 2010-06-01  Roland McGrath  <roland@redhat.com>
 
+	* dwarf_formudata.c (__libdw_formptr): Fix DW_FORM_sec_offset handling.
+
 	* dwarf_formblock.c (dwarf_formblock): Handle DW_FORM_exprloc.
 
 	* libdw_findcu.c (__libdw_findcu): Accept version 4.

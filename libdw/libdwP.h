@@ -61,9 +61,6 @@
 #define _(Str) dgettext ("elfutils", Str)
 
 
-/* Version of the DWARF specification we support.  */
-#define DWARF_VERSION 3
-
 /* Version of the CIE format.  */
 #define CIE_VERSION 1
 

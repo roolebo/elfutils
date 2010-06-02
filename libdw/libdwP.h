@@ -61,10 +61,6 @@
 #define _(Str) dgettext ("elfutils", Str)
 
 
-/* Version of the CIE format.  */
-#define CIE_VERSION 1
-
-
 /* Known location expressions already decoded.  */
 struct loc_s
 {

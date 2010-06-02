@@ -1,5 +1,7 @@
 2010-06-01  Roland McGrath  <roland@redhat.com>
 
+	* libdwP.h (CIE_VERSION): Remove unused macro.
+
 	* dwarf_getsrclines.c: Fix version field test.
 	* libdwP.h (DWARF_VERSION): Remove useless macro.
 

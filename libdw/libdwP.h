@@ -83,6 +83,7 @@ struct loc_block_s
 enum
   {
     IDX_debug_info = 0,
+    IDX_debug_types,
     IDX_debug_abbrev,
     IDX_debug_aranges,
     IDX_debug_line,
@@ -90,10 +91,6 @@ enum
     IDX_debug_loc,
     IDX_debug_pubnames,
     IDX_debug_str,
-    IDX_debug_funcnames,
-    IDX_debug_typenames,
-    IDX_debug_varnames,
-    IDX_debug_weaknames,
     IDX_debug_macinfo,
     IDX_debug_ranges,
     IDX_last

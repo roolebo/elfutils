@@ -1,5 +1,8 @@
 2010-06-01  Roland McGrath  <roland@redhat.com>
 
+	* libdwP.h: Remove unused IDX_debug_*names, add IDX_debug_types.
+	* dwarf_begin_elf.c (dwarf_scnnames): Likewise.
+
 	* libdwP.h (CIE_VERSION): Remove unused macro.
 
 	* dwarf_getsrclines.c: Fix version field test.

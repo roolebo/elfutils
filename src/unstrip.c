@@ -1234,6 +1234,10 @@ copy_elided_sections (Elf *unstripped, Elf *stripped,
   ELF_CHECK (elf_getshdrnum (stripped, &stripped_shnum) == 0,
 	     _("cannot get section count: %s"));
 
+  if (unlikely (stripped_shnum > unstripped_shnum))
+    error (EXIT_FAILURE, 0, _("\
+more sections in stripped file than debug file -- arguments reversed?"));
+
   /* Cache the stripped file's section details.  */
   struct section sections[stripped_shnum - 1];
   Elf_Scn *scn = NULL;

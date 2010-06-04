@@ -1,3 +1,8 @@
+2010-06-04  Roland McGrath  <roland@redhat.com>
+
+	* unstrip.c (copy_elided_sections): Bail if stripped file has more
+	sections than unstripped file, rather than getting confused later.
+
 2010-06-01  Roland McGrath  <roland@redhat.com>
 
 	* readelf.c (dwarf_form_string): Handle DWARF 4 forms.

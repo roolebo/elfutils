@@ -1,5 +1,10 @@
 2010-06-04  Roland McGrath  <roland@redhat.com>
 
+	* unstrip.c (update_shdr): New function.
+	(update_sh_size): Call it instead of gelf_update_shdr.
+	(adjust_relocs, add_new_section_symbols): Likewise.
+	(new_shstrtab, copy_elided_sections): Likewise.
+
 	* unstrip.c (copy_elided_sections): Bail if stripped file has more
 	sections than unstripped file, rather than getting confused later.
 

@@ -1,3 +1,10 @@
+2010-06-14  Roland McGrath  <roland@redhat.com>
+
+	* find-debuginfo.c (try_open): Take new arg MAIN_STAT.  Compare
+	candidate file to that st_dev/st_ino and pretend it didn't exist
+	if they match.
+	(find_debuginfo_in_path): Update caller, pass main file's info.
+
 2010-05-20  Roland McGrath  <roland@redhat.com>
 
 	* linux-proc-maps.c (find_sysinfo_ehdr): Renamed to ...

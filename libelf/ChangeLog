@@ -1,3 +1,9 @@
+2010-06-14  Ulrich Drepper  <drepper@redhat.com>
+
+	* gelf_update_shdr.c: Implicitly set ELF_F_DIRTY bit.
+	* gelf_update_phdr.c: Likewise.
+	* gelf_update_ehdr.c: Likewise.
+
 2010-04-14  Roland McGrath  <roland@redhat.com>
 
 	* elf32_getphdr.c: Check for e_phoff/size outside the file bounds.
@@ -763,4 +769,4 @@
 
 2003-08-11  Ulrich Drepper  <drepper@redhat.com>
 
-        * Moved to CVS archive.
+	* Moved to CVS archive.

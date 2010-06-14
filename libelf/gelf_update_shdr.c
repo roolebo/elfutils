@@ -1,5 +1,5 @@
 /* Update section header.
-   Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -119,6 +119,9 @@ gelf_update_shdr (Elf_Scn *scn, GElf_Shdr *src)
       /* We only have to copy the data.  */
       (void) memcpy (shdr, src, sizeof (GElf_Shdr));
     }
+
+  /* Mark the section header as modified.  */
+  scn->shdr_flags |= ELF_F_DIRTY;
 
   result = 1;
 

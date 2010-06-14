@@ -1,5 +1,5 @@
 /* Update ELF header.
-   Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -126,6 +126,9 @@ gelf_update_ehdr (Elf *elf, GElf_Ehdr *src)
       /* Just copy the data.  */
       memcpy (ehdr, src, sizeof (Elf64_Ehdr));
     }
+
+  /* Mark the ELF header as modified.  */
+  elf->state.elf.ehdr_flags |= ELF_F_DIRTY;
 
   result = 1;
 

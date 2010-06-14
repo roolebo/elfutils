@@ -152,6 +152,9 @@ gelf_update_phdr (Elf *elf, int ndx, GElf_Phdr *src)
       memcpy (phdr + ndx, src, sizeof (Elf64_Phdr));
     }
 
+  /* Mark the program header as modified.  */
+  elf->state.elf.phdr_flags |= ELF_F_DIRTY;
+
   result = 1;
 
  out:

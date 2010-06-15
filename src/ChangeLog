@@ -1,3 +1,8 @@
+2010-06-14  Roland McGrath  <roland@redhat.com>
+
+	* unstrip.c (copy_elided_sections): Make sure all sections' data have
+	been read in before we write anything out.
+
 2010-06-04  Roland McGrath  <roland@redhat.com>
 
 	* unstrip.c (update_shdr): New function.

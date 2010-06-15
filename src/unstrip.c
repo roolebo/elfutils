@@ -1781,6 +1781,15 @@ more sections in stripped file than debug file -- arguments reversed?"));
 	    GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
 	    ELF_CHECK (shdr != NULL, _("cannot get section header: %s"));
 
+	    /* We must make sure we have read in the data of all sections
+	       beforehand and marked them to be written out.  When we're
+	       modifying the existing file in place, we might overwrite
+	       this part of the file before we get to handling the section.  */
+
+	    ELF_CHECK (elf_flagdata (elf_getdata (scn, NULL),
+				     ELF_C_SET, ELF_F_DIRTY),
+		       _("cannot read section data: %s"));
+
 	    if (skip_reloc
 		&& (shdr->sh_type == SHT_REL || shdr->sh_type == SHT_RELA))
 	      continue;
@@ -1813,7 +1822,8 @@ more sections in stripped file than debug file -- arguments reversed?"));
 
 	    placed[i] = true;
 	  }
-    } while (skip_reloc);
+    }
+  while (skip_reloc);
 
   if (stripped_ehdr->e_phnum > 0)
     ELF_CHECK (gelf_newphdr (unstripped, stripped_ehdr->e_phnum),

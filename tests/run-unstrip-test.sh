@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2007 Red Hat, Inc.
+# Copyright (C) 2007-2010 Red Hat, Inc.
 # This file is part of Red Hat elfutils.
 #
 # Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -30,7 +30,7 @@ stripped=${stripped:-testfile17}
 debugfile=${debugfile:-${stripped}.debug}
 
 testfiles $original $stripped $debugfile
-tempfiles testfile.unstrip
+tempfiles testfile.unstrip testfile.inplace
 
 # These are old reference output from run-test-strip6.sh, when
 # strip left the .debug file with unchanged sh_size in
@@ -40,3 +40,12 @@ tempfiles testfile.unstrip
 testrun ../src/unstrip -o testfile.unstrip $stripped $debugfile
 
 testrun ../src/elfcmp --hash-inexact $original testfile.unstrip
+
+# Also test modifying the file in place.
+
+rm -f testfile.inplace
+cp $debugfile testfile.inplace
+chmod 644 testfile.inplace
+testrun ../src/unstrip $stripped testfile.inplace
+
+testrun ../src/elfcmp --hash-inexact $original testfile.inplace

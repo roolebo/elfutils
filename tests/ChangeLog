@@ -1,3 +1,7 @@
+2010-06-04  Roland McGrath  <roland@redhat.com>
+
+	* run-unstrip-test.sh: Also test modifying the file in place.
+
 2010-04-22  Roland McGrath  <roland@redhat.com>
 
 	* addrcfi.c (handle_cfi): Fix function name in error message.

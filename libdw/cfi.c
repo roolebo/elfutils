@@ -369,6 +369,7 @@ execute_cfi (Dwarf_CFI *cache,
 	}
 
       /* We get here only for the cases that have just moved LOC.  */
+      cfi_assert (cie->initial_state != NULL);
       if (find_pc >= loc)
 	/* This advance has not yet reached FIND_PC.  */
 	fs->start = loc;

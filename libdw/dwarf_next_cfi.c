@@ -156,8 +156,8 @@ dwarf_next_cfi (e_ident, data, eh_frame_p, off, next_off, entry)
       ++bytes;
 
       /* The address size for CFI is implicit in the ELF class.  */
-      unsigned int address_size = e_ident[EI_CLASS] == ELFCLASS32 ? 4 : 8;
-      unsigned int segment_size = 0;
+      uint_fast8_t address_size = e_ident[EI_CLASS] == ELFCLASS32 ? 4 : 8;
+      uint_fast8_t segment_size = 0;
       if (version >= 4)
 	{
 	  if (unlikely (limit - bytes < 5))

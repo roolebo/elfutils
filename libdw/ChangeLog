@@ -1,3 +1,8 @@
+2010-06-16  Roland McGrath  <roland@redhat.com>
+
+	* cfi.c (execute_cfi): Barf on CIE initial instructions changing the
+	address.
+
 2010-06-15  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_formref.c (__libdw_formref): Diagnose DW_FORM_ref_sig8 like

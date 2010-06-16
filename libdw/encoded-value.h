@@ -1,5 +1,5 @@
 /* DW_EH_PE_* support for libdw unwinder.
-   Copyright (C) 2009 Red Hat, Inc.
+   Copyright (C) 2009-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -136,13 +136,13 @@ read_encoded_value (const Dwarf_CFI *cache, uint8_t encoding, const uint8_t **p,
       break;
     case DW_EH_PE_aligned:
       {
-	const size_t address_size
-	  = cache->e_ident[EI_CLASS] == ELFCLASS32 ? 4 : 8;
+	const size_t size = encoded_value_size (&cache->data->d, cache->e_ident,
+						encoding, *p);
 	size_t align = ((cache->frame_vaddr
 			 + (*p - (const uint8_t *) cache->data->d.d_buf))
-			& (address_size - 1));
+			& (size - 1));
 	if (align != 0)
-	  *p += address_size - align;
+	  *p += size - align;
 	break;
       }
 
@@ -163,24 +163,24 @@ read_encoded_value (const Dwarf_CFI *cache, uint8_t encoding, const uint8_t **p,
 
     case DW_EH_PE_udata4:
       if (__libdw_cfi_read_address_inc (cache, p, 4, &value))
-	return false;
+	return true;
       break;
 
     case DW_EH_PE_sdata4:
       if (__libdw_cfi_read_address_inc (cache, p, 4, &value))
-	return false;
+	return true;
       value = (Dwarf_Sword) (Elf32_Sword) value; /* Sign-extend.  */
       break;
 
     case DW_EH_PE_udata8:
     case DW_EH_PE_sdata8:
       if (__libdw_cfi_read_address_inc (cache, p, 8, &value))
-	return false;
+	return true;
       break;
 
     case DW_EH_PE_absptr:
       if (__libdw_cfi_read_address_inc (cache, p, 0, &value))
-	return false;
+	return true;
       break;
 
     case DW_EH_PE_uleb128:
@@ -196,6 +196,20 @@ read_encoded_value (const Dwarf_CFI *cache, uint8_t encoding, const uint8_t **p,
     }
 
   *result += value;
+
+  if (encoding & DW_EH_PE_indirect)
+    {
+      if (unlikely (*result < cache->frame_vaddr))
+	return true;
+      *result -= cache->frame_vaddr;
+      if (unlikely (*result > (cache->data->d.d_size
+			       - encoded_value_size (NULL, cache->e_ident,
+						     DW_EH_PE_absptr, NULL))))
+	return true;
+      const uint8_t *ptr = cache->data->d.d_buf + *result;
+      return __libdw_cfi_read_address_inc (cache, &ptr, 0, result);
+    }
+
   return false;
 }
 

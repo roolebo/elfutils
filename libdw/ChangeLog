@@ -1,5 +1,8 @@
 2010-06-16  Roland McGrath  <roland@redhat.com>
 
+	* encoded-value.h (read_encoded_value): Handle DW_EH_PE_indirect.
+	Don't assume DW_EH_PE_aligned refers to native address size.
+
 	* cfi.c (execute_cfi): Barf on CIE initial instructions changing the
 	address.
 

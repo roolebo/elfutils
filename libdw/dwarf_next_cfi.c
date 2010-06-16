@@ -1,5 +1,5 @@
 /* Advance to next CFI entry.
-   Copyright (C) 2009 Red Hat, Inc.
+   Copyright (C) 2009-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -145,15 +145,41 @@ dwarf_next_cfi (e_ident, data, eh_frame_p, off, next_off, entry)
       /* Read the version stamp.  Always an 8-bit value.  */
       uint8_t version = *bytes++;
 
-      if (version != 1 && version != 3)
+      if (version != 1 && (unlikely (version < 3) || unlikely (version > 4)))
 	goto invalid;
 
       entry->cie.augmentation = (const char *) bytes;
 
       bytes = memchr (bytes, '\0', limit - bytes);
-      if (bytes == NULL)
+      if (unlikely (bytes == NULL))
 	goto invalid;
       ++bytes;
+
+      /* The address size for CFI is implicit in the ELF class.  */
+      unsigned int address_size = e_ident[EI_CLASS] == ELFCLASS32 ? 4 : 8;
+      unsigned int segment_size = 0;
+      if (version >= 4)
+	{
+	  if (unlikely (limit - bytes < 5))
+	    goto invalid;
+	  /* XXX We don't actually support address_size not matching the class.
+	     To do so, we'd have to return it here so that intern_new_cie
+	     could use it choose a specific fde_encoding.  */
+	  if (unlikely (*bytes != address_size))
+	    {
+	      __libdw_seterrno (DWARF_E_VERSION);
+	      return -1;
+	    }
+	  address_size = *bytes++;
+	  segment_size = *bytes++;
+	  /* We don't actually support segment selectors.  We'd have to
+	     roll this into the fde_encoding bits or something.  */
+	  if (unlikely (segment_size != 0))
+	    {
+	      __libdw_seterrno (DWARF_E_VERSION);
+	      return -1;
+	    }
+	}
 
       const char *ap = entry->cie.augmentation;
 
@@ -161,9 +187,6 @@ dwarf_next_cfi (e_ident, data, eh_frame_p, off, next_off, entry)
 	 so it must be handled first.  */
       if (unlikely (ap[0] == 'e' && ap[1] == 'h'))
 	{
-	  /* The address size for CFI is implicit in the ELF class.  */
-	  unsigned int address_size = e_ident[EI_CLASS] == ELFCLASS32 ? 4 : 8;
-
 	  ap += 2;
 	  bytes += address_size;
 	}

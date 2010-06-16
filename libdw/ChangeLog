@@ -1,5 +1,7 @@
 2010-06-15  Roland McGrath  <roland@redhat.com>
 
+	* dwarf_next_cfi.c: Handle version 4 format.
+
 	* dwarf_getsrclines.c: Handle version 4 format.
 
 2010-06-01  Roland McGrath  <roland@redhat.com>

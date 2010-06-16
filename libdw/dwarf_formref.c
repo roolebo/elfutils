@@ -1,5 +1,5 @@
 /* Return reference offset represented by attribute.
-   Copyright (C) 2003, 2005, 2007, 2008 Red Hat, Inc.
+   Copyright (C) 2003-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -92,6 +92,7 @@ __libdw_formref (attr, return_offset)
       break;
 
     case DW_FORM_ref_addr:
+    case DW_FORM_ref_sig8:
       __libdw_seterrno (DWARF_E_INVALID_REFERENCE);
       return -1;
 

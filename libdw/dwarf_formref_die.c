@@ -1,5 +1,5 @@
 /* Look up the DIE in a reference-form attribute.
-   Copyright (C) 2005, 2007 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -75,6 +75,23 @@ dwarf_formref_die (attr, die_mem)
       if (__libdw_read_offset (attr->cu->dbg, IDX_debug_info, attr->valp,
 			       ref_size, &offset, IDX_debug_info, 0))
 	return NULL;
+    }
+  else if (attr->form == DW_FORM_ref_sig8)
+    {
+      /* This doesn't have an offset, but instead a value we
+	 have to match in the .debug_types type unit headers.  */
+
+      uint64_t sig = read_8ubyte_unaligned (attr->cu->dbg, attr->valp);
+
+      /* XXX We don't actually support this yet.  We need to parse
+	 .debug_types and keep a table keyed on signature.  */
+#if 0
+      return INTUSE(dwarf_typeunit) (attr->cu->dbg, sig, die_mem);
+#else
+      sig = sig;
+      __libdw_seterrno (DWARF_E_INVALID_REFERENCE);
+#endif
+      return NULL;
     }
   else
     {

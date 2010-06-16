@@ -44,7 +44,8 @@ pkginclude_HEADERS = libdw.h
 libdw_a_SOURCES = dwarf_begin.c dwarf_begin_elf.c dwarf_end.c dwarf_getelf.c \
 		  dwarf_getpubnames.c dwarf_getabbrev.c dwarf_tag.c \
 		  dwarf_error.c dwarf_nextcu.c dwarf_diename.c dwarf_offdie.c \
-		  dwarf_attr.c dwarf_formstring.c dwarf_abbrev_hash.c \
+		  dwarf_attr.c dwarf_formstring.c \
+		  dwarf_abbrev_hash.c dwarf_sig8_hash.c \
 		  dwarf_attr_integrate.c dwarf_hasattr_integrate.c \
 		  dwarf_child.c dwarf_haschildren.c dwarf_formaddr.c \
 		  dwarf_formudata.c dwarf_formsdata.c dwarf_lowpc.c \
@@ -125,7 +126,7 @@ endif
 libdw_a_LIBADD = $(addprefix ../libdwfl/,$(shell $(AR) t ../libdwfl/libdwfl.a))
 
 noinst_HEADERS = libdwP.h memory-access.h dwarf_abbrev_hash.h \
-		 cfi.h encoded-value.h
+		 dwarf_sig8_hash.h cfi.h encoded-value.h
 
 EXTRA_DIST = libdw.map
 

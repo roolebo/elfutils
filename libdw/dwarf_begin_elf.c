@@ -246,8 +246,10 @@ dwarf_begin_elf (elf, cmd, scngrp)
 
   /* Allocate the data structure.  */
   Dwarf *result = (Dwarf *) calloc (1, sizeof (Dwarf) + mem_default_size);
-  if (result == NULL)
+  if (unlikely (result == NULL)
+      || unlikely (Dwarf_Sig8_Hash_init (&result->sig8_hash, 11) < 0))
     {
+      free (result);
       __libdw_seterrno (DWARF_E_NOMEM);
       return NULL;
     }
@@ -267,7 +269,6 @@ dwarf_begin_elf (elf, cmd, scngrp)
 			    - offsetof (struct libdw_memblock, mem));
   result->mem_tail->remaining = result->mem_tail->size;
   result->mem_tail->prev = NULL;
-
 
   if (cmd == DWARF_C_READ || cmd == DWARF_C_RDWR)
     {

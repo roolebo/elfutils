@@ -553,7 +553,7 @@ dwarf_getlocation (attr, llbuf, listlen)
   if (INTUSE(dwarf_formblock) (attr, &block) != 0)
     return -1;
 
-  return getlocation (attr->cu, &block, llbuf, listlen, IDX_debug_info);
+  return getlocation (attr->cu, &block, llbuf, listlen, cu_sec_idx (attr->cu));
 }
 
 int
@@ -578,7 +578,7 @@ dwarf_getlocation_addr (attr, address, llbufs, listlens, maxlocs)
 	return 0;
       if (llbufs != NULL &&
 	  getlocation (attr->cu, &block, &llbufs[0], &listlens[0],
-		       IDX_debug_info) != 0)
+		       cu_sec_idx (attr->cu)) != 0)
 	return -1;
       return listlens[0] == 0 ? 0 : 1;
     }

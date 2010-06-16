@@ -1,5 +1,5 @@
 /* Release debugging handling context.
-   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2009 Red Hat, Inc.
+   Copyright (C) 2002-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -85,6 +85,8 @@ dwarf_end (dwarf)
       if (dwarf->cfi != NULL)
 	/* Clean up the CFI cache.  */
 	__libdw_destroy_frame_cache (dwarf->cfi);
+
+      Dwarf_Sig8_Hash_free (&dwarf->sig8_hash);
 
       /* The search tree for the CUs.  NB: the CU data itself is
 	 allocated separately, but the abbreviation hash tables need

@@ -1,5 +1,5 @@
 /* Return CU DIE containing given DIE.
-   Copyright (C) 2005, 2008 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -71,7 +71,8 @@ dwarf_diecu (die, result, address_sizep, offset_sizep)
 
   result->addr = ((char *) die->cu->dbg->sectiondata[IDX_debug_info]->d_buf
  		  + DIE_OFFSET_FROM_CU_OFFSET (die->cu->start,
-					       die->cu->offset_size));
+					       die->cu->offset_size,
+					       die->cu->type_offset != 0));
   result->cu = die->cu;
 
   if (address_sizep != NULL)

@@ -241,4 +241,5 @@ ELFUTILS_0.146 {
 ELFUTILS_0.148 {
   global:
     dwarf_cfi_validate_fde;
+    dwarf_next_unit;
 } ELFUTILS_0.146;

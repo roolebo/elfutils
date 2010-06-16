@@ -1,5 +1,5 @@
 /* Return sibling of given DIE.
-   Copyright (C) 2003, 2004, 2005, 2007, 2008 Red Hat, Inc.
+   Copyright (C) 2003-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -84,8 +84,7 @@ dwarf_siblingof (die, result)
   unsigned char *addr = this_die.addr;
   /* End of the buffer.  */
   unsigned char *endp
-    = ((unsigned char *) sibattr.cu->dbg->sectiondata[IDX_debug_info]->d_buf
-       + sibattr.cu->end);
+    = ((unsigned char *) cu_data (sibattr.cu)->d_buf + sibattr.cu->end);
 
   /* Search for the beginning of the next die on this level.  We
      must not return the dies for children of the given die.  */
@@ -103,8 +102,7 @@ dwarf_siblingof (die, result)
 	    return -1;
 
 	  /* Compute the next address.  */
-	  addr = ((unsigned char *)
-		  sibattr.cu->dbg->sectiondata[IDX_debug_info]->d_buf
+	  addr = ((unsigned char *) cu_data (sibattr.cu)->d_buf
 		  + sibattr.cu->start + offset);
 	}
       else if (unlikely (addr == NULL)

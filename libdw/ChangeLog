@@ -1,5 +1,49 @@
 2010-06-16  Roland McGrath  <roland@redhat.com>
 
+	* dwarf_formref_die.c: Use dwarf_offdie only for DW_FORM_ref_addr, so
+	we don't repeat a CU lookup we've already done.  Handle
+	DW_FORM_ref_sig8 using sig8_hash table and __libdw_intern_next_unit.
+
+	* libdw_findcu.c (__libdw_intern_next_unit): New function,
+	broken out of ...
+	(__libdw_findcu): ... here.  Call it.
+	* libdwP.h: Declare it.
+	(struct Dwarf): New member next_tu_offset.
+
+	* dwarf_sig8_hash.c: New file.
+	* dwarf_sig8_hash.h: New file.
+	* Makefile.am (libdw_a_SOURCES, noinst_HEADERS): Add them.
+	* dwarf_abbrev_hash.c: Include dwarf_sig8_hash.h before
+	defining NO_UNDEF.
+	* libdwP.h (struct Dwarf): New member sig8_hash.
+	* dwarf_begin_elf.c: Call Dwarf_Sig8_Hash_init on it.
+	* dwarf_end.c: Call Dwarf_Sig8_Hash_free on it.
+
+	* dwarf_nextcu.c (dwarf_next_unit): New function, broken out of ...
+	(dwarf_nextcu): ... here.  Call it.
+	* libdw.h: Declare it.
+	* libdwP.h: Add INTDECL.
+	* libdw_findcu.c (__libdw_findcu): Use it instead of dwarf_nextcu.
+	* libdw.map (ELFUTILS_0.148): New set, add dwarf_next_unit.
+
+	* libdwP.h (cu_sec_idx, cu_data): New functions.
+	Use .debug_types when CU is a TU.
+	* dwarf_cuoffset.c: Use that instead of assuming IDX_debug_info.
+	* dwarf_siblingof.c: Likewise.
+	* dwarf_formstring.c: Likewise.
+	* dwarf_formudata.c (__libdw_formptr, dwarf_formudata): Likewise.
+	* dwarf_getlocation.c (dwarf_getlocation): Likewise.
+	(dwarf_getlocation_addr): Likewise.
+
+	* libdwP.h (struct Dwarf_CU): Add new members type_offset, type_sig8.
+	(DIE_OFFSET_FROM_CU_OFFSET): Take flag argument; if true, compute
+	.debug_types header size instead of .debug_info header size.
+	(CUDIE): Use it.
+	* dwarf_diecu.c: Update caller.
+	* dwarf_getaranges.c: Likewise.
+	* dwarf_nextcu.c: Likewise.
+	* libdw_findcu.c (__libdw_findcu): Initialize new members.
+
 	* fde.c (fde_by_offset): Renamed to ...
 	(__libdw_fde_by_offset): ... this, made global and internal_function.
 	Don't take ADDRESS argument.

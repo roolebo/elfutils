@@ -1,4 +1,4 @@
-/* Copyright (C) 2000, 2001, 2002, 2005 Red Hat, Inc.
+/* Copyright (C) 2000-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -67,7 +67,7 @@
 static size_t
 lookup (htab, hval, val)
      NAME *htab;
-     unsigned long int hval;
+     HASHTYPE hval;
      TYPE val __attribute__ ((unused));
 {
   /* First hash function: simply take the modul but prevent zero.  */
@@ -75,7 +75,7 @@ lookup (htab, hval, val)
 
   if (htab->table[idx].hashval != 0)
     {
-      unsigned long int hash;
+      HASHTYPE hash;
 
       if (htab->table[idx].hashval == hval
 	  && COMPARE (htab->table[idx].data, val) == 0)
@@ -103,7 +103,7 @@ lookup (htab, hval, val)
 
 
 static void
-insert_entry_2 (NAME *htab, unsigned long int hval, size_t idx, TYPE data)
+insert_entry_2 (NAME *htab, HASHTYPE hval, size_t idx, TYPE data)
 {
 #ifdef ITERATE
   if (htab->table[idx].hashval == 0)
@@ -137,7 +137,7 @@ insert_entry_2 (NAME *htab, unsigned long int hval, size_t idx, TYPE data)
       __typeof__ (htab->first) runp;
 # endif
 #else
-      unsigned long int old_size = htab->size;
+      size_t old_size = htab->size;
 #endif
 #define _TABLE(name) \
       name##_ent *table = htab->table
@@ -198,7 +198,7 @@ int
   name##_init
 INIT(NAME) (htab, init_size)
      NAME *htab;
-     unsigned long int init_size;
+     size_t init_size;
 {
   /* We need the size to be a prime.  */
   init_size = next_prime (init_size);
@@ -235,7 +235,7 @@ int
   name##_insert
 INSERT(NAME) (htab, hval, data)
      NAME *htab;
-     unsigned long int hval;
+     HASHTYPE hval;
      TYPE data;
 {
   size_t idx;
@@ -262,7 +262,7 @@ int
   name##_overwrite
 INSERT(NAME) (htab, hval, data)
      NAME *htab;
-     unsigned long int hval;
+     HASHTYPE hval;
      TYPE data;
 {
   size_t idx;
@@ -285,7 +285,7 @@ TYPE
   name##_find
 FIND(NAME) (htab, hval, val)
      NAME *htab;
-     unsigned long int hval;
+     HASHTYPE hval;
      TYPE val;
 {
   size_t idx;

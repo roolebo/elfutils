@@ -1,4 +1,4 @@
-/* Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
+/* Copyright (C) 2000-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -57,6 +57,7 @@
    The following macros if present select features:
 
    ITERATE   iterating over the table entries is possible
+   HASHTYPE  integer type for hash values, default unsigned long int
  */
 
 
@@ -69,6 +70,10 @@
 # define NEXT(name)
 #endif
 
+#ifndef HASHTYPE
+# define HASHTYPE unsigned long int
+#endif
+
 
 /* Defined separately.  */
 extern size_t next_prime (size_t seed);
@@ -78,7 +83,7 @@ extern size_t next_prime (size_t seed);
 #define _DYNHASHENTTYPE(name) \
   typedef struct name##_ent						      \
   {									      \
-    unsigned long int hashval;						      \
+    HASHTYPE hashval;							      \
     TYPE data;								      \
     NEXT (name)								      \
   } name##_ent
@@ -90,8 +95,8 @@ DYNHASHENTTYPE (NAME);
 #define _DYNHASHTYPE(name) \
 typedef struct								      \
 {									      \
-  unsigned long int size;						      \
-  unsigned long int filled;						      \
+  size_t size;								      \
+  size_t filled;							      \
   name##_ent *table;							      \
   FIRST	(name)								      \
 } name
@@ -102,19 +107,19 @@ DYNHASHTYPE (NAME);
 
 #define _FUNCTIONS(name) \
 /* Initialize the hash table.  */					      \
-extern int name##_init (name *htab, unsigned long int init_size);	      \
+extern int name##_init (name *htab, size_t init_size);			      \
 									      \
 /* Free resources allocated for hash table.  */				      \
 extern int name##_free (name *htab);					      \
 									      \
 /* Insert new entry.  */						      \
-extern int name##_insert (name *htab, unsigned long int hval, TYPE data);     \
+extern int name##_insert (name *htab, HASHTYPE hval, TYPE data);	      \
 									      \
 /* Insert new entry, possibly overwrite old entry.  */			      \
-extern int name##_overwrite (name *htab, unsigned long int hval, TYPE data);  \
+extern int name##_overwrite (name *htab, HASHTYPE hval, TYPE data);	      \
 									      \
 /* Find entry in hash table.  */					      \
-extern TYPE name##_find (name *htab, unsigned long int hval, TYPE val);
+extern TYPE name##_find (name *htab, HASHTYPE hval, TYPE val);
 #define FUNCTIONS(name) _FUNCTIONS (name)
 FUNCTIONS (NAME)
 

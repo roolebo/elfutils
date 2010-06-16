@@ -1,5 +1,5 @@
 /* Keeping track of DWARF compilation units in libdwfl.
-   Copyright (C) 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -172,7 +172,8 @@ less_lazy (Dwfl_Module *mod)
 static inline Dwarf_Off
 cudie_offset (const struct dwfl_cu *cu)
 {
-  return cu->die.cu->start + 3 * cu->die.cu->offset_size - 4 + 3;
+  return DIE_OFFSET_FROM_CU_OFFSET (cu->die.cu->start, cu->die.cu->offset_size,
+				    cu->die.cu->type_sig8 != 0);
 }
 
 static int
@@ -273,7 +274,7 @@ __libdwfl_nextcu (Dwfl_Module *mod, struct dwfl_cu *lastcu,
       size_t cuhdrsz;
       Dwarf_Off nextoff;
       int end = INTUSE(dwarf_nextcu) (mod->dw, cuoff, &nextoff, &cuhdrsz,
-					NULL, NULL, NULL);
+				      NULL, NULL, NULL);
       if (end < 0)
 	return DWFL_E_LIBDW;
       if (end > 0)

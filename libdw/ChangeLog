@@ -1,5 +1,7 @@
 2010-06-16  Roland McGrath  <roland@redhat.com>
 
+	* dwarf_next_cfi.c: Fix version 4 return_address_register decoding.
+
 	* fde.c (fde_by_offset): Renamed to ...
 	(__libdw_fde_by_offset): ... this, made global and internal_function.
 	Don't take ADDRESS argument.

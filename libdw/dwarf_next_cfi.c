@@ -194,7 +194,7 @@ dwarf_next_cfi (e_ident, data, eh_frame_p, off, next_off, entry)
       get_uleb128 (entry->cie.code_alignment_factor, bytes);
       get_sleb128 (entry->cie.data_alignment_factor, bytes);
 
-      if (version == 3)		/* DWARF 3 */
+      if (version >= 3)		/* DWARF 3+ */
 	get_uleb128 (entry->cie.return_address_register, bytes);
       else			/* DWARF 2 */
 	entry->cie.return_address_register = *bytes++;

@@ -1,5 +1,5 @@
 /* CIE reading.
-   Copyright (C) 2009 Red Hat, Inc.
+   Copyright (C) 2009-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -53,6 +53,7 @@
 
 #include "cfi.h"
 #include "encoded-value.h"
+#include <assert.h>
 #include <search.h>
 #include <stdlib.h>
 
@@ -133,6 +134,29 @@ intern_new_cie (Dwarf_CFI *cache, Dwarf_Off offset, const Dwarf_CIE *info)
 	}
       /* We only get here when we need to bail out.  */
       break;
+    }
+
+  if ((cie->fde_encoding & 0x0f) == DW_EH_PE_absptr)
+    {
+      /* Canonicalize encoding to a specific size.  */
+      assert (DW_EH_PE_absptr == 0);
+
+      /* XXX should get from dwarf_next_cfi with v4 header.  */
+      uint_fast8_t address_size
+	= cache->e_ident[EI_CLASS] == ELFCLASS32 ? 4 : 8;
+      switch (address_size)
+	{
+	case 8:
+	  cie->fde_encoding |= DW_EH_PE_udata8;
+	  break;
+	case 4:
+	  cie->fde_encoding |= DW_EH_PE_udata4;
+	  break;
+	default:
+	  free (cie);
+	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
+	  return NULL;
+	}
     }
 
   /* Save the initial instructions to be played out into initial state.  */

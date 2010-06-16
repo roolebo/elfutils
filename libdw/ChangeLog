@@ -1,5 +1,8 @@
 2010-06-16  Roland McGrath  <roland@redhat.com>
 
+	* cie.c (intern_new_cie): Canonicalize DW_EH_PE_absptr FDE encoding to
+	either DW_EH_PE_udata8 or DW_EH_PE_udata4.
+
 	* encoded-value.h (read_encoded_value): Handle DW_EH_PE_indirect.
 	Don't assume DW_EH_PE_aligned refers to native address size.
 

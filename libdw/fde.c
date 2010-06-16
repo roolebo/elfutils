@@ -1,5 +1,5 @@
 /* FDE reading.
-   Copyright (C) 2009 Red Hat, Inc.
+   Copyright (C) 2009-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -139,8 +139,9 @@ intern_fde (Dwarf_CFI *cache, const Dwarf_FDE *entry)
   return fde;
 }
 
-static struct dwarf_fde *
-fde_by_offset (Dwarf_CFI *cache, Dwarf_Addr address, Dwarf_Off offset)
+struct dwarf_fde *
+internal_function
+__libdw_fde_by_offset (Dwarf_CFI *cache, Dwarf_Off offset)
 {
   Dwarf_CFI_Entry entry;
   Dwarf_Off next_offset;
@@ -166,10 +167,6 @@ fde_by_offset (Dwarf_CFI *cache, Dwarf_Addr address, Dwarf_Off offset)
   /* If this happened to be what we would have read next, notice it.  */
   if (cache->next_offset == offset)
     cache->next_offset = next_offset;
-
-  /* Sanity check the address range.  */
-  if (address < fde->start || address >= fde->end)
-    goto invalid;
 
   return fde;
 }
@@ -254,7 +251,15 @@ __libdw_find_fde (Dwarf_CFI *cache, Dwarf_Addr address)
       Dwarf_Off offset = binary_search_fde (cache, address);
       if (offset == (Dwarf_Off) -1l)
 	goto no_match;
-      return fde_by_offset (cache, address, offset);
+      struct dwarf_fde *fde = __libdw_fde_by_offset (cache, offset);
+      if (unlikely (fde != NULL)
+	  /* Sanity check the address range.  */
+	  && unlikely (address < fde->start || address >= fde->end))
+	{
+	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
+	  return NULL;
+	}
+      return fde;
     }
 
   /* It's not there.  Read more CFI entries until we find it.  */

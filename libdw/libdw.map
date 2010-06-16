@@ -237,3 +237,8 @@ ELFUTILS_0.146 {
   global:
     dwfl_core_file_report;
 } ELFUTILS_0.144;
+
+ELFUTILS_0.148 {
+  global:
+    dwarf_cfi_validate_fde;
+} ELFUTILS_0.146;

@@ -1,5 +1,14 @@
 2010-06-16  Roland McGrath  <roland@redhat.com>
 
+	* fde.c (fde_by_offset): Renamed to ...
+	(__libdw_fde_by_offset): ... this, made global and internal_function.
+	Don't take ADDRESS argument.
+	(__libdw_find_fde): Update caller.  Do address sanity check here.
+	* cfi.h: Declare __libdw_fde_by_offset.
+	* cfi.c (dwarf_cfi_validate_fde): New function.
+	* libdw.h: Declare it.
+	* libdw.map (ELFUTILS_0.148): Add it.
+
 	* cie.c (intern_new_cie): Canonicalize DW_EH_PE_absptr FDE encoding to
 	either DW_EH_PE_udata8 or DW_EH_PE_udata4.
 

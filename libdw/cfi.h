@@ -227,6 +227,11 @@ extern struct dwarf_fde *__libdw_find_fde (Dwarf_CFI *cache,
 					   Dwarf_Addr address)
   __nonnull_attribute__ (1) internal_function;
 
+/* Look for an FDE by its offset in the section.  */
+extern struct dwarf_fde *__libdw_fde_by_offset (Dwarf_CFI *cache,
+						Dwarf_Off offset)
+  __nonnull_attribute__ (1) internal_function;
+
 /* Process the FDE that contains the given PC address,
    to yield the frame state when stopped there.
    The return value is a DWARF_E_* error code.  */

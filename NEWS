@@ -1,8 +1,8 @@
 Version 0.148:
 
-libdw: Accept DWARF 4 format.
-
-libdw: New function dwarf_cfi_validate_fde.
+libdw: Accept DWARF 4 formats.
+       New functions dwarf_lineisa, dwarf_linediscriminator, dwarf_lineop_index.
+       New function dwarf_cfi_validate_fde.
 
 libdwfl: Fixes in core-file handling, support cores from PIEs.
 	 When working from build IDs, don't open a named file that mismatches.

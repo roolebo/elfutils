@@ -563,6 +563,9 @@ extern int dwarf_getsrc_file (Dwarf *dbg, const char *fname, int line, int col,
 /* Return line address.  */
 extern int dwarf_lineaddr (Dwarf_Line *line, Dwarf_Addr *addrp);
 
+/* Return line VLIW operation index.  */
+extern int dwarf_lineop_index (Dwarf_Line *line, unsigned int *op_indexp);
+
 /* Return line number.  */
 extern int dwarf_lineno (Dwarf_Line *line, int *linep)
      __nonnull_attribute__ (2);
@@ -589,6 +592,14 @@ extern int dwarf_lineprologueend (Dwarf_Line *line, bool *flagp)
 
 /* Return true if record is for beginning of epilogue.  */
 extern int dwarf_lineepiloguebegin (Dwarf_Line *line, bool *flagp)
+     __nonnull_attribute__ (2);
+
+/* Return instruction-set architecture in this record.  */
+extern int dwarf_lineisa (Dwarf_Line *line, unsigned int *isap)
+     __nonnull_attribute__ (2);
+
+/* Return code path discriminator in this record.  */
+extern int dwarf_linediscriminator (Dwarf_Line *line, unsigned int *discp)
      __nonnull_attribute__ (2);
 
 

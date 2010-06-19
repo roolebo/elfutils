@@ -1,3 +1,17 @@
+2010-06-17  Roland McGrath  <roland@redhat.com>
+
+	* libdwP.h (struct Dwarf_Line_s): Add members isa, discriminator, and
+	op_index.
+	* dwarf_getsrclines.c (dwarf_getsrclines): Move NEW_FILE macro guts
+	into an inner inline function.  Set new fields.  Check all fields for
+	overflow when setting.
+	* dwarf_lineisa.c: New file.
+	* dwarf_linediscriminator.c: New file.
+	* dwarf_lineop_index.c: New file.
+	* Makefile.am (libdw_a_SOURCES): Add them.
+	* libdw.map (ELFUTILS_0.148): Add them.
+	* libdw.h: Declare them.
+
 2010-06-16  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_next_cfi.c: Fix version 4 return_address_register decoding.

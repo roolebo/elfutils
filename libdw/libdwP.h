@@ -240,6 +240,12 @@ struct Dwarf_Line_s
   unsigned int end_sequence:1;
   unsigned int prologue_end:1;
   unsigned int epilogue_begin:1;
+  /* The remaining bit fields are not flags, but hold values presumed to be
+     small.  All the flags and other bit fields should add up to 48 bits
+     to give the whole struct a nice round size.  */
+  unsigned int op_index:8;
+  unsigned int isa:8;
+  unsigned int discriminator:24;
 };
 
 struct Dwarf_Lines_s

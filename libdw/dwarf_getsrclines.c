@@ -86,34 +86,6 @@ compare_lines (const void *a, const void *b)
   return (*p1)->addr - (*p2)->addr;
 }
 
-
-/* Adds a new line to the matrix.  We cannot define a function because
-   we want to use alloca.  */
-#define NEW_LINE(end_seq) \
-  do {									      \
-    /* Add the new line.  */						      \
-    new_line = (struct linelist *) alloca (sizeof (struct linelist));	      \
-									      \
-    /* Set the line information.  */					      \
-    new_line->line.addr = address;					      \
-    /* new_line->line.op_index = op_index; */				      \
-    new_line->line.file = file;						      \
-    new_line->line.line = line;						      \
-    new_line->line.column = column;					      \
-    new_line->line.is_stmt = is_stmt;					      \
-    new_line->line.basic_block = basic_block;				      \
-    new_line->line.end_sequence = end_seq;				      \
-    new_line->line.prologue_end = prologue_end;				      \
-    new_line->line.epilogue_begin = epilogue_begin;			      \
-    /* new_line->line.isa = isa; */				      	      \
-    /* new_line->line.discriminator = discriminator; */		      	      \
-									      \
-    new_line->next = linelist;						      \
-    linelist = new_line;						      \
-    ++nlinelist;							      \
-  } while (0)
-
-
 int
 dwarf_getsrclines (Dwarf_Die *cudie, Dwarf_Lines **lines, size_t *nlines)
 {
@@ -351,11 +323,11 @@ dwarf_getsrclines (Dwarf_Die *cudie, Dwarf_Lines **lines, size_t *nlines)
 
         /* We are about to process the statement program.  Initialize the
 	   state machine registers (see 6.2.2 in the v2.1 specification).  */
-      Dwarf_Word address = 0;
+      Dwarf_Word addr = 0;
       unsigned int op_index = 0;
-      size_t file = 1;
-      size_t line = 1;
-      size_t column = 0;
+      unsigned int file = 1;
+      int line = 1;
+      unsigned int column = 0;
       uint_fast8_t is_stmt = default_is_stmt;
       bool basic_block = false;
       bool prologue_end = false;
@@ -367,17 +339,61 @@ dwarf_getsrclines (Dwarf_Die *cudie, Dwarf_Lines **lines, size_t *nlines)
 	 or DW_LNS_advance_pc (as per DWARF4 6.2.5.1).  */
       inline void advance_pc (unsigned int op_advance)
       {
-	address += minimum_instr_len * ((op_index + op_advance)
-					/ max_ops_per_instr);
+	addr += minimum_instr_len * ((op_index + op_advance)
+				     / max_ops_per_instr);
 	op_index = (op_index + op_advance) % max_ops_per_instr;
       }
 
       /* Process the instructions.  */
       struct linelist *linelist = NULL;
       unsigned int nlinelist = 0;
+
+      /* Adds a new line to the matrix.
+	 We cannot simply define a function because we want to use alloca.  */
+#define NEW_LINE(end_seq)						\
+      do {								\
+	if (unlikely (add_new_line (alloca (sizeof (struct linelist)),	\
+				    end_seq)))				\
+	  goto invalid_data;						\
+      } while (0)
+
+      inline bool add_new_line (struct linelist *new_line, bool end_sequence)
+      {
+	/* Set the line information.  For some fields we use bitfields,
+	   so we would lose information if the encoded values are too large.
+	   Check just for paranoia, and call the data "invalid" if it
+	   violates our assumptions on reasonable limits for the values.  */
+#define SET(field)							      \
+	do {								      \
+	  new_line->line.field = field;					      \
+	  if (unlikely (new_line->line.field != field))			      \
+	    return true;						      \
+        } while (0)
+
+	SET (addr);
+	SET (op_index);
+	SET (file);
+	SET (line);
+	SET (column);
+	SET (is_stmt);
+	SET (basic_block);
+	SET (end_sequence);
+	SET (prologue_end);
+	SET (epilogue_begin);
+	SET (isa);
+	SET (discriminator);
+
+#undef SET
+
+	new_line->next = linelist;
+	linelist = new_line;
+	++nlinelist;
+
+	return false;
+      }
+
       while (linep < lineendp)
 	{
-	  struct linelist *new_line;
 	  unsigned int opcode;
 	  unsigned int u128;
 	  int s128;
@@ -433,7 +449,7 @@ dwarf_getsrclines (Dwarf_Die *cudie, Dwarf_Lines **lines, size_t *nlines)
 		  NEW_LINE (1);
 
 		  /* Reset the registers.  */
-		  address = 0;
+		  addr = 0;
 		  op_index = 0;
 		  file = 1;
 		  line = 1;
@@ -454,7 +470,7 @@ dwarf_getsrclines (Dwarf_Die *cudie, Dwarf_Lines **lines, size_t *nlines)
 		  if (unlikely (lineendp - linep < cu->address_size))
 		    goto invalid_data;
 		  if (__libdw_read_address_inc (dbg, IDX_debug_line, &linep,
-						cu->address_size, &address))
+						cu->address_size, &addr))
 		    goto out;
 		  break;
 
@@ -609,7 +625,7 @@ dwarf_getsrclines (Dwarf_Die *cudie, Dwarf_Lines **lines, size_t *nlines)
 		      || unlikely (lineendp - linep < 2))
 		    goto invalid_data;
 
-		  address += read_2ubyte_unaligned_inc (dbg, linep);
+		  addr += read_2ubyte_unaligned_inc (dbg, linep);
 		  op_index = 0;
 		  break;
 

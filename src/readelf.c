@@ -5559,6 +5559,9 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl,
       /* Next the minimum instruction length.  */
       uint_fast8_t minimum_instr_len = *linep++;
 
+      /* Next the maximum operations per instruction, in version 4 format.  */
+      uint_fast8_t max_ops_per_instr = version < 4 ? 1 : *linep++;
+
 	/* Then the flag determining the default value of the is_stmt
 	   register.  */
       uint_fast8_t default_is_stmt = *linep++;
@@ -5579,6 +5582,7 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl,
 		       " DWARF version:              %" PRIuFAST16 "\n"
 		       " Prologue length:            %" PRIu64 "\n"
 		       " Minimum instruction length: %" PRIuFAST8 "\n"
+		       " Maximum operations per instruction: %" PRIuFAST8 "\n"
 		       " Initial value if '%s': %" PRIuFAST8 "\n"
 		       " Line base:                  %" PRIdFAST8 "\n"
 		       " Line range:                 %" PRIuFAST8 "\n"
@@ -5586,7 +5590,8 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl,
 		       "\n"
 		       "Opcodes:\n"),
 	      (uint64_t) unit_length, version, (uint64_t) header_length,
-	      minimum_instr_len, "is_stmt", default_is_stmt, line_base,
+	      minimum_instr_len, max_ops_per_instr,
+	      "is_stmt", default_is_stmt, line_base,
 	      line_range, opcode_base);
 
       if (unlikely (linep + opcode_base - 1 >= lineendp))
@@ -5663,6 +5668,7 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl,
 
       puts (gettext ("\nLine number statements:"));
       Dwarf_Word address = 0;
+      unsigned int op_index = 0;
       size_t line = 1;
       uint_fast8_t is_stmt = default_is_stmt;
 
@@ -5694,6 +5700,20 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl,
 	    }
 	}
 
+      /* Apply the "operation advance" from a special opcode
+	 or DW_LNS_advance_pc (as per DWARF4 6.2.5.1).  */
+      unsigned int op_addr_advance;
+      bool show_op_index;
+      inline void advance_pc (unsigned int op_advance)
+      {
+	op_addr_advance = minimum_instr_len * ((op_index + op_advance)
+					       / max_ops_per_instr);
+	address += op_advance;
+	show_op_index = (op_index > 0 ||
+			 (op_index + op_advance) % max_ops_per_instr > 0);
+	op_index = (op_index + op_advance) % max_ops_per_instr;
+      }
+
       while (linep < lineendp)
 	{
 	  unsigned int u128;
@@ -5713,18 +5733,21 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl,
 	      */
 	      int line_increment = (line_base
 				    + (opcode - opcode_base) % line_range);
-	      unsigned int address_increment = (minimum_instr_len
-						* ((opcode - opcode_base)
-						   / line_range));
 
 	      /* Perform the increments.  */
 	      line += line_increment;
-	      address += address_increment;
+	      advance_pc ((opcode - opcode_base) / line_range);
 
 	      char *a = format_dwarf_addr (dwflmod, 0, address);
-	      printf (gettext ("\
+	      if (show_op_index)
+		printf (gettext ("\
+ special opcode %u: address+%u = %s, op_index = %u, line%+d = %zu\n"),
+			opcode, op_addr_advance, a, op_index,
+			line_increment, line);
+	      else
+		printf (gettext ("\
  special opcode %u: address+%u = %s, line%+d = %zu\n"),
-		      opcode, address_increment, a, line_increment, line);
+			opcode, op_addr_advance, a, line_increment, line);
 	      free (a);
 	    }
 	  else if (opcode == 0)
@@ -5751,11 +5774,13 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl,
 
 		  /* Reset the registers we care about.  */
 		  address = 0;
+		  op_index = 0;
 		  line = 1;
 		  is_stmt = default_is_stmt;
 		  break;
 
 		case DW_LNE_set_address:
+		  op_index = 0;
 		  if (address_size == 4)
 		    address = read_4ubyte_unaligned_inc (dbg, linep);
 		  else
@@ -5790,6 +5815,15 @@ define new file: dir=%u, mtime=%" PRIu64 ", length=%" PRIu64 ", name=%s\n"),
 		  }
 		  break;
 
+		case DW_LNE_set_discriminator:
+		  /* Takes one ULEB128 parameter, the discriminator.  */
+		  if (unlikely (standard_opcode_lengths[opcode] != 1))
+		    goto invalid_unit;
+
+		  get_uleb128 (u128, linep);
+		  printf (gettext (" set discriminator to %u\n"), u128);
+		  break;
+
 		default:
 		  /* Unknown, ignore it.  */
 		  puts (gettext ("unknown opcode"));
@@ -5797,7 +5831,7 @@ define new file: dir=%u, mtime=%" PRIu64 ", length=%" PRIu64 ", name=%s\n"),
 		  break;
 		}
 	    }
-	  else if (opcode <= DW_LNS_set_epilogue_begin)
+	  else if (opcode <= DW_LNS_set_isa)
 	    {
 	      /* This is a known standard opcode.  */
 	      switch (opcode)
@@ -5811,11 +5845,16 @@ define new file: dir=%u, mtime=%" PRIu64 ", length=%" PRIu64 ", name=%s\n"),
 		  /* Takes one uleb128 parameter which is added to the
 		     address.  */
 		  get_uleb128 (u128, linep);
-		  address += minimum_instr_len * u128;
+		  advance_pc (u128);
 		  {
 		    char *a = format_dwarf_addr (dwflmod, 0, address);
-		    printf (gettext ("advance address by %u to %s\n"),
-			    u128, a);
+		    if (show_op_index)
+		      printf (gettext ("\
+advance address by %u to %s, op_index to %u\n"),
+			      op_addr_advance, a, op_index);
+		    else
+		      printf (gettext ("advance address by %u to %s\n"),
+			      op_addr_advance, a);
 		    free (a);
 		  }
 		  break;
@@ -5861,13 +5900,17 @@ define new file: dir=%u, mtime=%" PRIu64 ", length=%" PRIu64 ", name=%s\n"),
 
 		case DW_LNS_const_add_pc:
 		  /* Takes no argument.  */
-		  u128 = (minimum_instr_len
-			  * ((255 - opcode_base) / line_range));
-		  address += u128;
+		  advance_pc ((255 - opcode_base) / line_range);
 		  {
 		    char *a = format_dwarf_addr (dwflmod, 0, address);
-		    printf (gettext ("advance address by constant %u to %s\n"),
-			    u128, a);
+		    if (show_op_index)
+		      printf (gettext ("\
+advance address by constant %u to %s, op_index to %u\n"),
+			      op_addr_advance, a, op_index);
+		    else
+		      printf (gettext ("\
+advance address by constant %u to %s\n"),
+			      op_addr_advance, a);
 		    free (a);
 		  }
 		  break;
@@ -5880,6 +5923,7 @@ define new file: dir=%u, mtime=%" PRIu64 ", length=%" PRIu64 ", name=%s\n"),
 
 		  u128 = read_2ubyte_unaligned_inc (dbg, linep);
 		  address += u128;
+		  op_index = 0;
 		  {
 		    char *a = format_dwarf_addr (dwflmod, 0, address);
 		    printf (gettext ("\
@@ -5897,6 +5941,14 @@ advance address by fixed value %u to %s\n"),
 		case DW_LNS_set_epilogue_begin:
 		  /* Takes no argument.  */
 		  puts (gettext (" set epilogue begin flag"));
+		  break;
+
+		case DW_LNS_set_isa:
+		  /* Takes one uleb128 parameter which is stored in isa.  */
+		  if (unlikely (standard_opcode_lengths[opcode] != 1))
+		    goto invalid_unit;
+
+		  printf (gettext (" set isa to %u\n"), u128);
 		  break;
 		}
 	    }

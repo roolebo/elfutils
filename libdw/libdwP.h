@@ -327,7 +327,7 @@ struct Dwarf_CU
   ((Dwarf_Die)								      \
    {									      \
      .cu = (fromcu),							      \
-     .addr = ((char *) (fromcu)->dbg->sectiondata[IDX_debug_info]->d_buf      \
+     .addr = ((char *) cu_data (fromcu)->d_buf				      \
 	      + DIE_OFFSET_FROM_CU_OFFSET ((fromcu)->start,		      \
 					   (fromcu)->offset_size,	      \
 					   (fromcu)->type_offset != 0))	      \

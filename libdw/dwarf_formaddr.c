@@ -1,5 +1,5 @@
 /* Return address represented by attribute.
-   Copyright (C) 2003, 2005 Red Hat, Inc.
+   Copyright (C) 2003-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -71,7 +71,7 @@ dwarf_formaddr (attr, return_addr)
     }
 
   if (__libdw_read_address (attr->cu->dbg,
-			    IDX_debug_info, attr->valp,
+			    cu_sec_idx (attr->cu), attr->valp,
 			    attr->cu->address_size, return_addr))
     return -1;
 

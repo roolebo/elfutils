@@ -95,9 +95,10 @@ dwarf_formblock (attr, return_block)
       return -1;
     }
 
-  if (return_block->data + return_block->length
-      > ((unsigned char *) attr->cu->dbg->sectiondata[IDX_debug_info]->d_buf
-	 + attr->cu->dbg->sectiondata[IDX_debug_info]->d_size))
+  if (unlikely (cu_data (attr->cu)->d_size
+		- (return_block->data
+		   - (unsigned char *) cu_data (attr->cu)->d_buf)
+		< return_block->length))
     {
       /* Block does not fit.  */
       __libdw_seterrno (DWARF_E_INVALID_DWARF);

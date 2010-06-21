@@ -1,3 +1,11 @@
+2010-06-20  Roland McGrath  <roland@redhat.com>
+
+	* libdwP.h (CUDIE): Use cu_data.
+	* dwarf_formblock.c: Likewise.
+	* dwarf_formref_die.c: Likewise.
+	* dwarf_diecu.c: Use CUDIE macro.
+	* dwarf_formaddr.c: Use cu_sec_idx.
+
 2010-06-16  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_formref_die.c: Use dwarf_offdie only for DW_FORM_ref_addr, so

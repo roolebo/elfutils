@@ -114,7 +114,7 @@ dwarf_formref_die (attr, result)
       if (unlikely (__libdw_formref (attr, &offset) != 0))
 	return NULL;
 
-      data = cu->dbg->sectiondata[IDX_debug_info];
+      data = cu_data (cu);
     }
 
   if (unlikely (data->d_size - cu->start <= offset))

@@ -247,4 +247,5 @@ ELFUTILS_0.148 {
     dwarf_lineop_index;
 
     dwarf_next_unit;
+    dwarf_offdie_types;
 } ELFUTILS_0.146;

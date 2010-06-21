@@ -1,13 +1,13 @@
 Version 0.148:
 
-libdw: Accept DWARF 4 formats.
+libdw: Accept DWARF 4 format: new functions dwarf_next_unit, dwarf_offdie_types.
        New functions dwarf_lineisa, dwarf_linediscriminator, dwarf_lineop_index.
        New function dwarf_cfi_validate_fde.
 
 libdwfl: Fixes in core-file handling, support cores from PIEs.
 	 When working from build IDs, don't open a named file that mismatches.
 
-readelf: Handle some DWARF 4 format bits.
+readelf: Handle DWARF 4 formats.
 
 Version 0.147:
 

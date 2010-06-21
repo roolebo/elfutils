@@ -1,5 +1,16 @@
 2010-06-20  Roland McGrath  <roland@redhat.com>
 
+	* libdw_findcu.c (__libdw_findcu): Take new flag argument,
+	to search TUs instead of CUs.
+	* libdwP.h: Update decl.
+	(struct Dwarf): New member tu_tree.
+	* dwarf_end.c (dwarf_end): Clean up tu_tree.
+	* dwarf_offdie.c (do_offdie): New function, broken out of ...
+	(dwarf_offdie): ... here.
+	(dwarf_offdie_types): New function.
+	* libdw.h: Declare it.
+	* libdw.map (ELFUTILS_0.148): Add it.
+
 	* libdwP.h (CUDIE): Use cu_data.
 	* dwarf_formblock.c: Likewise.
 	* dwarf_formref_die.c: Likewise.

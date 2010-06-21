@@ -180,7 +180,8 @@ static enum section_e
   section_abbrev = 1,		/* .debug_abbrev  */
   section_aranges = 2,		/* .debug_aranges  */
   section_frame = 4,		/* .debug_frame or .eh_frame & al.  */
-  section_info = 8,		/* .debug_info  */
+  section_info = 8,		/* .debug_info, .debug_types  */
+  section_types = section_info,
   section_line = 16,		/* .debug_line  */
   section_loc = 32,		/* .debug_loc  */
   section_pubnames = 64,	/* .debug_pubnames  */
@@ -5385,17 +5386,19 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
   return DWARF_CB_OK;
 }
 
-
 static void
-print_debug_info_section (Dwfl_Module *dwflmod,
-			  Ebl *ebl __attribute__ ((unused)),
-			  GElf_Ehdr *ehdr __attribute__ ((unused)),
-			  Elf_Scn *scn,
-			  GElf_Shdr *shdr, Dwarf *dbg)
+print_debug_units (Dwfl_Module *dwflmod,
+		   Ebl *ebl __attribute__ ((unused)),
+		   GElf_Ehdr *ehdr __attribute__ ((unused)),
+		   Elf_Scn *scn,
+		   GElf_Shdr *shdr, Dwarf *dbg,
+		   bool debug_types)
 {
+  const char *secname = debug_types ? ".debug_types" : ".debug_info";
+
   printf (gettext ("\
 \nDWARF section [%2zu] '%s' at offset %#" PRIx64 ":\n [Offset]\n"),
-	  elf_ndxscn (scn), ".debug_info", (uint64_t) shdr->sh_offset);
+	  elf_ndxscn (scn), secname, (uint64_t) shdr->sh_offset);
 
   /* If the section is empty we don't have to do anything.  */
   if (shdr->sh_size == 0)
@@ -5408,20 +5411,34 @@ print_debug_info_section (Dwfl_Module *dwflmod,
 
   /* New compilation unit.  */
   size_t cuhl;
-  //Dwarf_Half version;
+  Dwarf_Half version;
   Dwarf_Off abbroffset;
   uint8_t addrsize;
   uint8_t offsize;
   Dwarf_Off nextcu;
+  uint64_t typesig;
+  Dwarf_Off typeoff;
  next_cu:
-  if (dwarf_nextcu (dbg, offset, &nextcu, &cuhl, &abbroffset, &addrsize,
-		    &offsize) != 0)
+  if (dwarf_next_unit (dbg, offset, &nextcu, &cuhl, &version,
+		       &abbroffset, &addrsize, &offsize,
+		       debug_types ? &typesig : NULL,
+		       debug_types ? &typeoff : NULL) != 0)
     goto do_return;
 
-  printf (gettext (" Compilation unit at offset %" PRIu64 ":\n"
-		   " Version: %" PRIu16 ", Abbreviation section offset: %"
-		   PRIu64 ", Address size: %" PRIu8 ", Offset size: %" PRIu8 "\n"),
-	  (uint64_t) offset, /*version*/2, abbroffset, addrsize, offsize);
+  if (debug_types)
+    printf (gettext (" Type unit at offset %" PRIu64 ":\n"
+		     " Version: %" PRIu16 ", Abbreviation section offset: %"
+		     PRIu64 ", Address size: %" PRIu8 ", Offset size: %" PRIu8
+		     "\n Type signature: %#" PRIx64
+		     ", Type offset: %" PRIu64 "\n"),
+	    (uint64_t) offset, version, abbroffset, addrsize, offsize,
+	    typesig, (uint64_t) typeoff);
+  else
+    printf (gettext (" Compilation unit at offset %" PRIu64 ":\n"
+		     " Version: %" PRIu16 ", Abbreviation section offset: %"
+		     PRIu64 ", Address size: %" PRIu8 ", Offset size: %" PRIu8
+		     "\n"),
+	    (uint64_t) offset, version, abbroffset, addrsize, offsize);
 
 
   struct attrcb_args args =
@@ -5437,11 +5454,12 @@ print_debug_info_section (Dwfl_Module *dwflmod,
 
   int level = 0;
 
-  if (unlikely (dwarf_offdie (dbg, offset, &dies[level]) == NULL))
+  if (unlikely ((debug_types ? dwarf_offdie_types : dwarf_offdie)
+		(dbg, offset, &dies[level]) == NULL))
     {
       error (0, 0, gettext ("cannot get DIE at offset %" PRIu64
 			    " in section '%s': %s"),
-	     (uint64_t) offset, ".debug_info", dwarf_errmsg (-1));
+	     (uint64_t) offset, secname, dwarf_errmsg (-1));
       goto do_return;
     }
 
@@ -5460,7 +5478,7 @@ print_debug_info_section (Dwfl_Module *dwflmod,
 	{
 	  error (0, 0, gettext ("cannot get tag of DIE at offset %" PRIu64
 				" in section '%s': %s"),
-		 (uint64_t) offset, ".debug_info", dwarf_errmsg (-1));
+		 (uint64_t) offset, secname, dwarf_errmsg (-1));
 	  goto do_return;
 	}
 
@@ -5509,6 +5527,20 @@ print_debug_info_section (Dwfl_Module *dwflmod,
 
  do_return:
   free (dies);
+}
+
+static void
+print_debug_info_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
+			  Elf_Scn *scn, GElf_Shdr *shdr, Dwarf *dbg)
+{
+  print_debug_units (dwflmod, ebl, ehdr, scn, shdr, dbg, false);
+}
+
+static void
+print_debug_types_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
+			   Elf_Scn *scn, GElf_Shdr *shdr, Dwarf *dbg)
+{
+  print_debug_units (dwflmod, ebl, ehdr, scn, shdr, dbg, true);
 }
 
 
@@ -6642,6 +6674,7 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
 	      NEW_SECTION (aranges),
 	      NEW_SECTION (frame),
 	      NEW_SECTION (info),
+	      NEW_SECTION (types),
 	      NEW_SECTION (line),
 	      NEW_SECTION (loc),
 	      NEW_SECTION (pubnames),

@@ -63,7 +63,7 @@ dwarf_next_unit (dwarf, off, next_off, header_sizep, versionp, abbrev_offsetp,
      Dwarf_Off off;
      Dwarf_Off *next_off;
      size_t *header_sizep;
-     uint16_t *versionp;
+     Dwarf_Half *versionp;
      Dwarf_Off *abbrev_offsetp;
      uint8_t *address_sizep;
      uint8_t *offset_sizep;

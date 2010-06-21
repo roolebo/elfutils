@@ -1,5 +1,5 @@
 /* Return DIE at given offset.
-   Copyright (C) 2002, 2003, 2005 Red Hat, Inc.
+   Copyright (C) 2002-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -56,16 +56,15 @@
 #include "libdwP.h"
 
 
-Dwarf_Die *
-dwarf_offdie (dbg, offset, result)
-     Dwarf *dbg;
-     Dwarf_Off offset;
-     Dwarf_Die *result;
+static Dwarf_Die *
+do_offdie (Dwarf *dbg, Dwarf_Off offset, Dwarf_Die *result, bool debug_types)
 {
   if (dbg == NULL)
     return NULL;
 
-  if (offset >= dbg->sectiondata[IDX_debug_info]->d_size)
+  Elf_Data *const data = dbg->sectiondata[debug_types ? IDX_debug_types
+					  : IDX_debug_info];
+  if (offset >= data->d_size)
     {
       __libdw_seterrno (DWARF_E_INVALID_DWARF);
       return NULL;
@@ -75,10 +74,10 @@ dwarf_offdie (dbg, offset, result)
      determined any of the information.  */
   memset (result, '\0', sizeof (Dwarf_Die));
 
-  result->addr = (char *) dbg->sectiondata[IDX_debug_info]->d_buf + offset;
+  result->addr = (char *) data->d_buf + offset;
 
   /* Get the CU.  */
-  result->cu = __libdw_findcu (dbg, offset);
+  result->cu = __libdw_findcu (dbg, offset, debug_types);
   if (result->cu == NULL)
     {
       /* This should never happen.  The input file is malformed.  */
@@ -88,4 +87,23 @@ dwarf_offdie (dbg, offset, result)
 
   return result;
 }
+
+
+Dwarf_Die *
+dwarf_offdie (dbg, offset, result)
+     Dwarf *dbg;
+     Dwarf_Off offset;
+     Dwarf_Die *result;
+{
+  return do_offdie (dbg, offset, result, false);
+}
 INTDEF(dwarf_offdie)
+
+Dwarf_Die *
+dwarf_offdie_types (dbg, offset, result)
+     Dwarf *dbg;
+     Dwarf_Off offset;
+     Dwarf_Die *result;
+{
+  return do_offdie (dbg, offset, result, true);
+}

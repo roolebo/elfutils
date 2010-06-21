@@ -171,9 +171,10 @@ struct Dwarf
   void *cu_tree;
   Dwarf_Off next_cu_offset;
 
-  /* Hash table for .debug_types type units.  */
-  Dwarf_Sig8_Hash sig8_hash;
+  /* Search tree and sig8 hash table for .debug_types type units.  */
+  void *tu_tree;
   Dwarf_Off next_tu_offset;
+  Dwarf_Sig8_Hash sig8_hash;
 
   /* Address ranges.  */
   Dwarf_Aranges *aranges;
@@ -389,7 +390,7 @@ extern struct Dwarf_CU *__libdw_intern_next_unit (Dwarf *dbg, bool debug_types)
      __nonnull_attribute__ (1) internal_function;
 
 /* Find CU for given offset.  */
-extern struct Dwarf_CU *__libdw_findcu (Dwarf *dbg, Dwarf_Off offset)
+extern struct Dwarf_CU *__libdw_findcu (Dwarf *dbg, Dwarf_Off offset, bool tu)
      __nonnull_attribute__ (1) internal_function;
 
 /* Return tag of given DIE.  */

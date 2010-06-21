@@ -136,17 +136,22 @@ findcu_cb (const void *arg1, const void *arg2)
 }
 
 struct Dwarf_CU *
-__libdw_findcu (dbg, start)
+__libdw_findcu (dbg, start, debug_types)
      Dwarf *dbg;
      Dwarf_Off start;
+     bool debug_types;
 {
+  void **tree = debug_types ? &dbg->tu_tree : &dbg->cu_tree;
+  Dwarf_Off *next_offset
+    = debug_types ? &dbg->next_tu_offset : &dbg->next_cu_offset;
+
   /* Maybe we already know that CU.  */
   struct Dwarf_CU fake = { .start = start, .end = 0 };
-  struct Dwarf_CU **found = tfind (&fake, &dbg->cu_tree, findcu_cb);
+  struct Dwarf_CU **found = tfind (&fake, tree, findcu_cb);
   if (found != NULL)
     return *found;
 
-  if (start < dbg->next_cu_offset)
+  if (start < *next_offset)
     {
       __libdw_seterrno (DWARF_E_INVALID_DWARF);
       return NULL;
@@ -155,22 +160,22 @@ __libdw_findcu (dbg, start)
   /* No.  Then read more CUs.  */
   while (1)
     {
-      Dwarf_Off oldoff = dbg->next_cu_offset;
-      struct Dwarf_CU *newp = __libdw_intern_next_unit (dbg, false);
+      Dwarf_Off oldoff = *next_offset;
+      struct Dwarf_CU *newp = __libdw_intern_next_unit (dbg, debug_types);
       if (newp == NULL)
 	return NULL;
 
       /* Add the new entry to the search tree.  */
-      if (tsearch (newp, &dbg->cu_tree, findcu_cb) == NULL)
+      if (tsearch (newp, tree, findcu_cb) == NULL)
 	{
 	  /* Something went wrong.  Undo the operation.  */
-	  dbg->next_cu_offset = oldoff;
+	  *next_offset = oldoff;
 	  __libdw_seterrno (DWARF_E_NOMEM);
 	  return NULL;
 	}
 
       /* Is this the one we are looking for?  */
-      if (start < dbg->next_cu_offset)
+      if (start < *next_offset)
 	// XXX Match exact offset.
 	return newp;
     }

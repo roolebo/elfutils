@@ -298,7 +298,7 @@ extern int dwarf_nextcu (Dwarf *dwarf, Dwarf_Off off, Dwarf_Off *next_off,
    null, this reads a type unit from the .debug_types section; otherwise
    this reads a CU from the .debug_info section.  */
 extern int dwarf_next_unit (Dwarf *dwarf, Dwarf_Off off, Dwarf_Off *next_off,
-			    size_t *header_sizep, uint16_t *versionp,
+			    size_t *header_sizep, Dwarf_Half *versionp,
 			    Dwarf_Off *abbrev_offsetp,
 			    uint8_t *address_sizep, uint8_t *offset_sizep,
 			    uint64_t *type_signaturep, Dwarf_Off *type_offsetp)
@@ -346,9 +346,14 @@ extern Dwarf_CFI *dwarf_getcfi_elf (Elf *elf);
 extern int dwarf_cfi_end (Dwarf_CFI *cache);
 
 
-/* Return DIE at given offset.  */
+/* Return DIE at given offset in .debug_types section.  */
 extern Dwarf_Die *dwarf_offdie (Dwarf *dbg, Dwarf_Off offset,
 				Dwarf_Die *result) __nonnull_attribute__ (3);
+
+/* Return DIE at given offset in .debug_types section.  */
+extern Dwarf_Die *dwarf_offdie_types (Dwarf *dbg, Dwarf_Off offset,
+				      Dwarf_Die *result)
+     __nonnull_attribute__ (3);
 
 /* Return offset of DIE.  */
 extern Dwarf_Off dwarf_dieoffset (Dwarf_Die *die);

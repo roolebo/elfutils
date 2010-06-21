@@ -1,7 +1,6 @@
-/* Return string associated with given attribute.
-   Copyright (C) 2003-2010 Red Hat, Inc.
+/* Hash table for DWARF .debug_types section content.
+   Copyright (C) 2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by the
@@ -48,41 +47,13 @@
    Network licensing program, please visit www.openinventionnetwork.com
    <http://www.openinventionnetwork.com>.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#ifndef _DWARF_SIG8_HASH_H
+#define _DWARF_SIG8_HASH_H	1
 
-#include <dwarf.h>
-#include "libdwP.h"
+#define NAME Dwarf_Sig8_Hash
+#define TYPE struct Dwarf_CU *
+#define COMPARE(a, b) (0)
 
+#include <dynamicsizehash.h>
 
-const char *
-dwarf_formstring (attrp)
-     Dwarf_Attribute *attrp;
-{
-  /* Ignore earlier errors.  */
-  if (attrp == NULL)
-    return NULL;
-
-  /* We found it.  Now determine where the string is stored.  */
-  if (attrp->form == DW_FORM_string)
-    /* A simple inlined string.  */
-    return (const char *) attrp->valp;
-
-  Dwarf *dbg = attrp->cu->dbg;
-
-  if (unlikely (attrp->form != DW_FORM_strp)
-      || dbg->sectiondata[IDX_debug_str] == NULL)
-    {
-      __libdw_seterrno (DWARF_E_NO_STRING);
-      return NULL;
-    }
-
-  uint64_t off;
-  if (__libdw_read_offset (dbg, cu_sec_idx (attrp->cu), attrp->valp,
-			   attrp->cu->offset_size, &off, IDX_debug_str, 1))
-    return NULL;
-
-  return (const char *) dbg->sectiondata[IDX_debug_str]->d_buf + off;
-}
-INTDEF(dwarf_formstring)
+#endif	/* dwarf_sig8_hash.h */

@@ -1,3 +1,9 @@
+2010-06-16  Roland McGrath  <roland@redhat.com>
+
+	* dynamicsizehash.h (HASHTYPE): New macro.
+	(struct): Use size_t for table sizes.
+	* dynamicsizehash.c: Likewise.  Use HASHTYPE for hash values.
+
 2010-02-15  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am: Use config/eu.am for common stuff.

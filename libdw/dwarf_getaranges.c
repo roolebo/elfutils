@@ -1,5 +1,5 @@
 /* Return list address ranges.
-   Copyright (C) 2000-2009 Red Hat, Inc.
+   Copyright (C) 2000-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -199,7 +199,8 @@ dwarf_getaranges (dbg, aranges, naranges)
 	  else
 	    offset_size = 4;
 	  new_arange->arange.offset = DIE_OFFSET_FROM_CU_OFFSET (offset,
-								 offset_size);
+								 offset_size,
+								 false);
 
 	  /* Sanity-check the data.  */
 	  if (new_arange->arange.offset

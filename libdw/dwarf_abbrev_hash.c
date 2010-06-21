@@ -1,5 +1,5 @@
 /* Implementation of hash table for DWARF .debug_abbrev section content.
-   Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
+   Copyright (C) 2000-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -52,6 +52,7 @@
 # include <config.h>
 #endif
 
+#include "dwarf_sig8_hash.h"
 #define NO_UNDEF
 #include "libdwP.h"
 

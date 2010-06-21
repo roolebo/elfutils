@@ -245,4 +245,6 @@ ELFUTILS_0.148 {
     dwarf_lineisa;
     dwarf_linediscriminator;
     dwarf_lineop_index;
+
+    dwarf_next_unit;
 } ELFUTILS_0.146;

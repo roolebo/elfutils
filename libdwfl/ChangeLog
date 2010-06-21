@@ -1,3 +1,7 @@
+2010-06-16  Roland McGrath  <roland@redhat.com>
+
+	* cu.c (cudie_offset): Use DIE_OFFSET_FROM_CU_OFFSET macro.
+
 2010-06-14  Roland McGrath  <roland@redhat.com>
 
 	* find-debuginfo.c (try_open): Take new arg MAIN_STAT.  Compare

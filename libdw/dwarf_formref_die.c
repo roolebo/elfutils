@@ -51,56 +51,81 @@
 # include <config.h>
 #endif
 
+#include <string.h>
 #include "libdwP.h"
 #include <dwarf.h>
 
 
 Dwarf_Die *
-dwarf_formref_die (attr, die_mem)
+dwarf_formref_die (attr, result)
      Dwarf_Attribute *attr;
-     Dwarf_Die *die_mem;
+     Dwarf_Die *result;
 {
   if (attr == NULL)
     return NULL;
+
+  struct Dwarf_CU *cu = attr->cu;
 
   Dwarf_Off offset;
   if (attr->form == DW_FORM_ref_addr)
     {
       /* This has an absolute offset.  */
 
-      uint8_t ref_size = (attr->cu->version == 2
-			  ? attr->cu->address_size
-			  : attr->cu->offset_size);
+      uint8_t ref_size = (cu->version == 2
+			  ? cu->address_size
+			  : cu->offset_size);
 
-      if (__libdw_read_offset (attr->cu->dbg, IDX_debug_info, attr->valp,
+      if (__libdw_read_offset (cu->dbg, IDX_debug_info, attr->valp,
 			       ref_size, &offset, IDX_debug_info, 0))
 	return NULL;
+
+      return INTUSE(dwarf_offdie) (cu->dbg, offset, result);
     }
-  else if (attr->form == DW_FORM_ref_sig8)
+
+  Elf_Data *data;
+  if (attr->form == DW_FORM_ref_sig8)
     {
       /* This doesn't have an offset, but instead a value we
 	 have to match in the .debug_types type unit headers.  */
 
-      uint64_t sig = read_8ubyte_unaligned (attr->cu->dbg, attr->valp);
+      uint64_t sig = read_8ubyte_unaligned (cu->dbg, attr->valp);
+      cu = Dwarf_Sig8_Hash_find (&cu->dbg->sig8_hash, sig, NULL);
+      if (cu == NULL)
+	/* Not seen before.  We have to scan through the type units.  */
+	do
+	  {
+	    cu = __libdw_intern_next_unit (attr->cu->dbg, true);
+	    if (cu == NULL)
+	      {
+		__libdw_seterrno (INTUSE(dwarf_errno) ()
+				  ?: DWARF_E_INVALID_REFERENCE);
+		return NULL;
+	      }
+	    Dwarf_Sig8_Hash_insert (&cu->dbg->sig8_hash, sig, cu);
+	  }
+	while (cu->type_sig8 != sig);
 
-      /* XXX We don't actually support this yet.  We need to parse
-	 .debug_types and keep a table keyed on signature.  */
-#if 0
-      return INTUSE(dwarf_typeunit) (attr->cu->dbg, sig, die_mem);
-#else
-      sig = sig;
-      __libdw_seterrno (DWARF_E_INVALID_REFERENCE);
-#endif
-      return NULL;
+      data = cu->dbg->sectiondata[IDX_debug_types];
+      offset = cu->type_offset;
     }
   else
     {
       /* Other forms produce an offset from the CU.  */
       if (unlikely (__libdw_formref (attr, &offset) != 0))
 	return NULL;
-      offset += attr->cu->start;
+
+      data = cu->dbg->sectiondata[IDX_debug_info];
     }
 
-  return INTUSE(dwarf_offdie) (attr->cu->dbg, offset, die_mem);
+  if (unlikely (data->d_size - cu->start <= offset))
+    {
+      __libdw_seterrno (DWARF_E_INVALID_DWARF);
+      return NULL;
+    }
+
+  memset (result, '\0', sizeof (Dwarf_Die));
+  result->addr = (char *) data->d_buf + cu->start + offset;
+  result->cu = cu;
+  return result;
 }
 INTDEF (dwarf_formref_die)

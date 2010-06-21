@@ -139,6 +139,8 @@ enum
 };
 
 
+#include "dwarf_sig8_hash.h"
+
 /* This is the structure representing the debugging state.  */
 struct Dwarf
 {
@@ -168,6 +170,10 @@ struct Dwarf
   /* Search tree for the CUs.  */
   void *cu_tree;
   Dwarf_Off next_cu_offset;
+
+  /* Hash table for .debug_types type units.  */
+  Dwarf_Sig8_Hash sig8_hash;
+  Dwarf_Off next_tu_offset;
 
   /* Address ranges.  */
   Dwarf_Aranges *aranges;
@@ -279,6 +285,10 @@ struct Dwarf_CU
   uint8_t offset_size;
   uint16_t version;
 
+  /* Zero if this is a normal CU.  Nonzero if it is a type unit.  */
+  size_t type_offset;
+  uint64_t type_sig8;
+
   /* Hash table for the abbreviations.  */
   Dwarf_Abbrev_Hash abbrev_hash;
   /* Offset of the first abbreviation.  */
@@ -301,21 +311,27 @@ struct Dwarf_CU
         LEN       VER     OFFSET    ADDR
       4-bytes + 2-bytes + 4-bytes + 1-byte  for 32-bit dwarf
      12-bytes + 2-bytes + 8-bytes + 1-byte  for 64-bit dwarf
+   or in .debug_types, 			     SIGNATURE TYPE-OFFSET
+      4-bytes + 2-bytes + 4-bytes + 1-byte + 8-bytes + 4-bytes  for 32-bit
+     12-bytes + 2-bytes + 8-bytes + 1-byte + 8-bytes + 8-bytes  for 64-bit
 
    Note the trick in the computation.  If the offset_size is 4
    the '- 4' term changes the '3 *' into a '2 *'.  If the
    offset_size is 8 it accounts for the 4-byte escape value
    used at the start of the length.  */
-#define DIE_OFFSET_FROM_CU_OFFSET(cu_offset, offset_size) \
-  ((cu_offset) + 3 * (offset_size) - 4 + 3)
+#define DIE_OFFSET_FROM_CU_OFFSET(cu_offset, offset_size, type_unit)	\
+  ((type_unit) ? ((cu_offset) + 4 * (offset_size) - 4 + 3 + 8)		\
+   : ((cu_offset) + 3 * (offset_size) - 4 + 3))
 
-#define CUDIE(fromcu) \
+#define CUDIE(fromcu)							      \
   ((Dwarf_Die)								      \
    {									      \
      .cu = (fromcu),							      \
      .addr = ((char *) (fromcu)->dbg->sectiondata[IDX_debug_info]->d_buf      \
-	      + (fromcu)->start + 3 * (fromcu)->offset_size - 4 + 3),	      \
-   })
+	      + DIE_OFFSET_FROM_CU_OFFSET ((fromcu)->start,		      \
+					   (fromcu)->offset_size,	      \
+					   (fromcu)->type_offset != 0))	      \
+   })									      \
 
 
 /* Macro information.  */
@@ -367,6 +383,10 @@ extern void *__libdw_allocate (Dwarf *dbg, size_t minsize, size_t align)
 
 /* Default OOM handler.  */
 extern void __libdw_oom (void) __attribute ((noreturn, visibility ("hidden")));
+
+/* Allocate the internal data for a unit not seen before.  */
+extern struct Dwarf_CU *__libdw_intern_next_unit (Dwarf *dbg, bool debug_types)
+     __nonnull_attribute__ (1) internal_function;
 
 /* Find CU for given offset.  */
 extern struct Dwarf_CU *__libdw_findcu (Dwarf *dbg, Dwarf_Off offset)
@@ -573,6 +593,18 @@ __libdw_read_offset (Dwarf *dbg,
   return __libdw_offset_in_section (dbg, sec_ret, *ret, size);
 }
 
+static inline size_t
+cu_sec_idx (struct Dwarf_CU *cu)
+{
+  return cu->type_offset == 0 ? IDX_debug_info : IDX_debug_types;
+}
+
+static inline Elf_Data *
+cu_data (struct Dwarf_CU *cu)
+{
+  return cu->dbg->sectiondata[cu_sec_idx (cu)];
+}
+
 /* Read up begin/end pair and increment read pointer.
     - If it's normal range record, set up *BEGINP and *ENDP and return 0.
     - If it's base address selection record, set up *BASEP and return 1.
@@ -619,6 +651,7 @@ INTDECL (dwarf_haspc)
 INTDECL (dwarf_highpc)
 INTDECL (dwarf_lowpc)
 INTDECL (dwarf_nextcu)
+INTDECL (dwarf_next_unit)
 INTDECL (dwarf_offdie)
 INTDECL (dwarf_ranges)
 INTDECL (dwarf_siblingof)

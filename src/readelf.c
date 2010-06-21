@@ -4834,8 +4834,9 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
     const char *augmentation;
     unsigned int code_alignment_factor;
     unsigned int data_alignment_factor;
-    unsigned int fde_encoding;
-    unsigned int lsda_encoding;
+    uint8_t address_size;
+    uint8_t fde_encoding;
+    uint8_t lsda_encoding;
     struct cieinfo *next;
   } *cies = NULL;
 
@@ -4905,6 +4906,16 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	  if (unlikely (readp == NULL))
 	    goto invalid_data;
 	  ++readp;
+
+	  uint_fast8_t segment_size = 0;
+	  if (version >= 4)
+	    {
+	      if (cieend - readp < 5)
+		goto invalid_data;
+	      ptr_size = *readp++;
+	      segment_size = *readp++;
+	    }
+
 	  // XXX Check overflow
 	  get_uleb128 (code_alignment_factor, readp);
 	  // XXX Check overflow
@@ -4924,12 +4935,17 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	  printf ("\n [%6tx] CIE length=%" PRIu64 "\n"
 		  "   CIE_id:                   %" PRIu64 "\n"
 		  "   version:                  %u\n"
-		  "   augmentation:             \"%s\"\n"
-		  "   code_alignment_factor:    %u\n"
+		  "   augmentation:             \"%s\"\n",
+		  offset, (uint64_t) unit_length, (uint64_t) cie_id,
+		  version, augmentation);
+	  if (version >= 4)
+	    printf ("   address_size:             %u\n"
+		    "   segment_size:             %u\n",
+		    ptr_size, segment_size);
+	  printf ("   code_alignment_factor:    %u\n"
 		  "   data_alignment_factor:    %d\n"
 		  "   return_address_register:  %u\n",
-		  offset, (uint64_t) unit_length, (uint64_t) cie_id,
-		  version, augmentation, code_alignment_factor,
+		  code_alignment_factor,
 		  data_alignment_factor, return_address_register);
 
 	  if (augmentation[0] == 'z')
@@ -4995,15 +5011,19 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 		}
 	    }
 
-	  struct cieinfo *newp = alloca (sizeof (*newp));
-	  newp->cie_offset = offset;
-	  newp->augmentation = augmentation;
-	  newp->fde_encoding = fde_encoding;
-	  newp->lsda_encoding = lsda_encoding;
-	  newp->code_alignment_factor = code_alignment_factor;
-	  newp->data_alignment_factor = data_alignment_factor;
-	  newp->next = cies;
-	  cies = newp;
+	  if (likely (ptr_size == 4 || ptr_size == 8))
+	    {
+	      struct cieinfo *newp = alloca (sizeof (*newp));
+	      newp->cie_offset = offset;
+	      newp->augmentation = augmentation;
+	      newp->fde_encoding = fde_encoding;
+	      newp->lsda_encoding = lsda_encoding;
+	      newp->address_size = ptr_size;
+	      newp->code_alignment_factor = code_alignment_factor;
+	      newp->data_alignment_factor = data_alignment_factor;
+	      newp->next = cies;
+	      cies = newp;
+	    }
 	}
       else
 	{
@@ -5024,7 +5044,7 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	  /* Initialize from CIE data.  */
 	  fde_encoding = cie->fde_encoding;
 	  lsda_encoding = cie->lsda_encoding;
-	  ptr_size = encoded_ptr_size (fde_encoding, ptr_size);
+	  ptr_size = encoded_ptr_size (fde_encoding, cie->address_size);
 	  code_alignment_factor = cie->code_alignment_factor;
 	  data_alignment_factor = cie->data_alignment_factor;
 

@@ -1,6 +1,8 @@
 2010-06-21  Roland McGrath  <roland@redhat.com>
 
 	* readelf.c (dwarf_tag_string): Handle new v4 tags.
+	(dwarf_attr_string): Add new attributes.
+	(dwarf_tag_string): Handle DW_TAG_GNU_*.
 
 	* readelf.c (print_ops): Use 64-bit types for LEB128 operands.
 	(print_cfa_program): Likewise.

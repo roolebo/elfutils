@@ -1,5 +1,7 @@
 2010-06-21  Roland McGrath  <roland@redhat.com>
 
+	* dwarf.h: Add DW_TAG_GNU_* constants.
+
 	* memory-access.h (get_sleb128_rest_return): Fix sign extension for
 	10-byte case.
 

@@ -3259,6 +3259,26 @@ dwarf_tag_string (unsigned int tag)
 	result = "class_template";
 	break;
 
+      case DW_TAG_GNU_BINCL:
+	result = "GNU_BINCL";
+	break;
+
+      case DW_TAG_GNU_EINCL:
+	result = "GNU_EINCL";
+	break;
+
+      case DW_TAG_GNU_template_template_param:
+	result = "GNU_template_template_param";
+	break;
+
+      case DW_TAG_GNU_template_parameter_pack:
+	result = "GNU_template_parameter_pack";
+	break;
+
+      case DW_TAG_GNU_formal_parameter_pack:
+	result = "GNU_formal_parameter_pack";
+	break;
+
       default:
 	if (tag < DW_TAG_lo_user)
 	  snprintf (buf, sizeof buf, gettext ("unknown tag %hx"), tag);
@@ -3366,6 +3386,12 @@ dwarf_attr_string (unsigned int attrnum)
       [DW_AT_elemental] = "elemental",
       [DW_AT_pure] = "pure",
       [DW_AT_recursive] = "recursive",
+      [DW_AT_signature] = "signature",
+      [DW_AT_main_subprogram] = "main_subprogram",
+      [DW_AT_data_bit_offset] = "data_bit_offset",
+      [DW_AT_const_expr] = "const_expr",
+      [DW_AT_enum_class] = "enum_class",
+      [DW_AT_linkage_name] = "linkage_name",
     };
   const unsigned int nknown_attrs = (sizeof (known_attrs)
 				     / sizeof (known_attrs[0]));

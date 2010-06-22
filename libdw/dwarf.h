@@ -122,6 +122,13 @@ enum
     DW_TAG_function_template = 0x4102,
     DW_TAG_class_template = 0x4103,
 
+    DW_TAG_GNU_BINCL = 0x4104,
+    DW_TAG_GNU_EINCL = 0x4105,
+
+    DW_TAG_GNU_template_template_param = 0x4106,
+    DW_TAG_GNU_template_parameter_pack = 0x4107,
+    DW_TAG_GNU_formal_parameter_pack = 0x4108,
+
     DW_TAG_hi_user = 0xffff
   };
 

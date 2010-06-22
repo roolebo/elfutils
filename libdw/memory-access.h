@@ -1,5 +1,5 @@
 /* Unaligned memory access functionality.
-   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2009 Red Hat, Inc.
+   Copyright (C) 2000-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -90,7 +90,7 @@
     _v |= (uint64_t) (__b & 0x7f) << (nth * 7);				      \
     if (likely ((__b & 0x80) == 0))					      \
       {									      \
-	var = (_v << (64 - (nth * 7) - 7) >> (64 - (nth * 7) - 7));	      \
+	var = (_v << (64 - (nth * 7) - 7)) >> (64 - (nth * 7) - 7);	      \
         break;					 			      \
       }									      \
     else do {} while (0)
@@ -109,9 +109,13 @@
       {									      \
 	get_sleb128_step (var, *addrp, i, return var);			      \
       }									      \
-    /* Other implementations set VALUE to INT_MAX in this		      \
-       case.  So we better do this as well.  */				      \
-    return INT64_MAX;							      \
+    __b = *(*addrp)++;							      \
+    if (likely ((__b & 0x80) == 0))					      \
+      return var | ((uint64_t) __b << 63);				      \
+    else								      \
+      /* Other implementations set VALUE to INT_MAX in this		      \
+	 case.  So we better do this as well.  */			      \
+      return INT64_MAX;							      \
   } while (0)
 
 #ifdef IS_LIBDW
@@ -122,14 +126,14 @@ extern int64_t __libdw_get_sleb128 (int64_t acc, unsigned int i,
 				    const unsigned char **addrp)
      internal_function attribute_hidden;
 #else
-static uint64_t
+static inline uint64_t
 __attribute__ ((unused))
 __libdw_get_uleb128 (uint64_t acc, unsigned int i, const unsigned char **addrp)
 {
   unsigned char __b;
   get_uleb128_rest_return (acc, i, addrp);
 }
-static int64_t
+static inline int64_t
 __attribute__ ((unused))
 __libdw_get_sleb128 (int64_t acc, unsigned int i, const unsigned char **addrp)
 {

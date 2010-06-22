@@ -3227,6 +3227,9 @@ dwarf_tag_string (unsigned int tag)
       [DW_TAG_mutable_type] = "mutable_type",
       [DW_TAG_condition] = "condition",
       [DW_TAG_shared_type] = "shared_type",
+      [DW_TAG_type_unit] = "type_unit",
+      [DW_TAG_rvalue_reference_type] = "rvalue_reference_type",
+      [DW_TAG_template_alias] = "template_alias",
     };
   const unsigned int nknown_tags = (sizeof (known_tags)
 				    / sizeof (known_tags[0]));
@@ -4092,9 +4095,9 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	case DW_OP_plus_uconst:
 	case DW_OP_constu:;
 	  const unsigned char *start = data;
-	  unsigned int uleb;
+	  uint64_t uleb;
 	  get_uleb128 (uleb, data); /* XXX check overrun */
-	  printf ("%*s[%4" PRIuMAX "] %s %u\n",
+	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu64 "\n",
 		  indent, "", (uintmax_t) offset, known[op], uleb);
 	  len -= data - start;
 	  offset += 1 + (data - start);
@@ -4102,10 +4105,10 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 
 	case DW_OP_bit_piece:
 	  start = data;
-	  unsigned int uleb2;
+	  uint64_t uleb2;
 	  get_uleb128 (uleb, data); /* XXX check overrun */
 	  get_uleb128 (uleb2, data); /* XXX check overrun */
-	  printf ("%*s[%4" PRIuMAX "] %s %u, %u\n",
+	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu64 ", %" PRIu64 "\n",
 		  indent, "", (uintmax_t) offset, known[op], uleb, uleb2);
 	  len -= data - start;
 	  offset += 1 + (data - start);
@@ -4115,9 +4118,9 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	case DW_OP_breg0 ... DW_OP_breg31:
 	case DW_OP_consts:
 	  start = data;
-	  unsigned int sleb;
+	  int64_t sleb;
 	  get_sleb128 (sleb, data); /* XXX check overrun */
-	  printf ("%*s[%4" PRIuMAX "] %s %d\n",
+	  printf ("%*s[%4" PRIuMAX "] %s %" PRId64 "\n",
 		  indent, "", (uintmax_t) offset, known[op], sleb);
 	  len -= data - start;
 	  offset += 1 + (data - start);
@@ -4127,7 +4130,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  start = data;
 	  get_uleb128 (uleb, data); /* XXX check overrun */
 	  get_sleb128 (sleb, data); /* XXX check overrun */
-	  printf ("%*s[%4" PRIuMAX "] %s %u %d\n",
+	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu64 " %" PRId64 "\n",
 		  indent, "", (uintmax_t) offset, known[op], uleb, sleb);
 	  len -= data - start;
 	  offset += 1 + (data - start);
@@ -4615,10 +4618,10 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 		opcode & 0x3f, pc += (opcode & 0x3f) * code_align);
       else if (opcode < DW_CFA_restore)
 	{
-	  unsigned int offset;
+	  uint64_t offset;
 	  // XXX overflow check
 	  get_uleb128 (offset, readp);
-	  printf ("     offset r%u (%s) at cfa%+d\n",
+	  printf ("     offset r%u (%s) at cfa%+" PRId64 "\n",
 		  opcode & 0x3f, regname (opcode & 0x3f), offset * data_align);
 	}
       else
@@ -5430,7 +5433,7 @@ print_debug_units (Dwfl_Module *dwflmod,
 		     " Version: %" PRIu16 ", Abbreviation section offset: %"
 		     PRIu64 ", Address size: %" PRIu8 ", Offset size: %" PRIu8
 		     "\n Type signature: %#" PRIx64
-		     ", Type offset: %" PRIu64 "\n"),
+		     ", Type offset: %#" PRIx64 "\n"),
 	    (uint64_t) offset, version, abbroffset, addrsize, offsize,
 	    typesig, (uint64_t) typeoff);
   else

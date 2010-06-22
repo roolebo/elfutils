@@ -6029,6 +6029,7 @@ advance address by fixed value %u to %s\n"),
 		  if (unlikely (standard_opcode_lengths[opcode] != 1))
 		    goto invalid_unit;
 
+		  get_uleb128 (u128, linep);
 		  printf (gettext (" set isa to %u\n"), u128);
 		  break;
 		}

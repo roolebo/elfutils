@@ -433,9 +433,9 @@ dwarf_getsrclines (Dwarf_Die *cudie, Dwarf_Lines **lines, size_t *nlines)
 		goto invalid_data;
 
 	      /* The length.  */
-	      unsigned int len = *linep++;
+	      uint_fast8_t len = *linep++;
 
-	      if (unlikely (lineendp - linep < len))
+	      if (unlikely ((size_t) (lineendp - linep) < len))
 		goto invalid_data;
 
 	      /* The sub-opcode.  */
@@ -530,7 +530,7 @@ dwarf_getsrclines (Dwarf_Die *cudie, Dwarf_Lines **lines, size_t *nlines)
 
 		default:
 		  /* Unknown, ignore it.  */
-		  if (unlikely (lineendp - (linep - 1)) < len)
+		  if (unlikely ((size_t) (lineendp - (linep - 1)) < len))
 		    goto invalid_data;
 		  linep += len - 1;
 		  break;

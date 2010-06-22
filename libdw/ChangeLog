@@ -1,3 +1,8 @@
+2010-06-22  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_getsrclines.c: Fix signed comparison warning in extended
+	opcode parsing.
+
 2010-06-21  Roland McGrath  <roland@redhat.com>
 
 	* dwarf.h: Add DW_TAG_GNU_* constants.

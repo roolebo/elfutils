@@ -825,20 +825,6 @@ extern int dwarf_frame_register (Dwarf_Frame *frame, int regno,
 				 Dwarf_Op **ops, size_t *nops)
   __nonnull_attribute__ (3, 4, 5);
 
-/* Look up the FDE described at OFFSET bytes into the CFI section,
-   and validate it by decoding the FDE fully.  Returns -1 for errors.
-   On success, returns the maximum DWARF register number that this
-   FDE describes and fills *START and *END with the PC address range
-   this FDE covers, *SIGNALP with whether this is a signal frame, and
-   *ENCODING with the pointer encoding used in this FDE.  This is not
-   necessarily the exact encoding byte given in the augmentation string;
-   it will describe the exact address size used (DW_EH_PE_udata4 or
-   DW_EH_PE_udata8) if a DW_EH_PE_absptr encoding is being used.  */
-extern int dwarf_cfi_validate_fde (Dwarf_CFI *cache,
-				   Dwarf_Off offset,
-				   Dwarf_Addr *start, Dwarf_Addr *end,
-				   bool *signalp, uint8_t *encoding);
-
 
 /* Return error code of last failing function call.  This value is kept
    separately for each thread.  */

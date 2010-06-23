@@ -240,8 +240,6 @@ ELFUTILS_0.146 {
 
 ELFUTILS_0.148 {
   global:
-    dwarf_cfi_validate_fde;
-
     dwarf_lineisa;
     dwarf_linediscriminator;
     dwarf_lineop_index;

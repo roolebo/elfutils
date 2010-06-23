@@ -1,3 +1,9 @@
+2010-06-23  Roland McGrath  <roland@redhat.com>
+
+	* cfi.c (dwarf_cfi_validate_fde): Function removed.
+	* libdw.h: Remove it.
+	* libdw.map: Likewise.
+
 2010-06-22  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_getlocation.c (check_constant_offset): data[48] are constant.

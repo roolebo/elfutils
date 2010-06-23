@@ -165,16 +165,11 @@ check_constant_offset (Dwarf_Attribute *attr,
 
     case DW_FORM_data1:
     case DW_FORM_data2:
+    case DW_FORM_data4:
+    case DW_FORM_data8:
     case DW_FORM_sdata:
     case DW_FORM_udata:
       break;
-
-    case DW_FORM_data4:
-    case DW_FORM_data8:
-      /* These are loclistptr, not constants.
-	 XXX check cu->version > 3???
-      */
-      return 1;
     }
 
   /* Check whether we already cached this location.  */

@@ -1,5 +1,7 @@
 2010-06-22  Roland McGrath  <roland@redhat.com>
 
+	* dwarf_getlocation.c (check_constant_offset): data[48] are constant.
+
 	* dwarf_getsrclines.c: Fix signed comparison warning in extended
 	opcode parsing.
 

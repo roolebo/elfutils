@@ -16,7 +16,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software Foundation,
 dnl Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 dnl
-AC_INIT([Red Hat elfutils],[0.147],[http://bugzilla.redhat.com/bugzilla/],[elfutils])
+AC_INIT([Red Hat elfutils],[0.148],[http://bugzilla.redhat.com/bugzilla/],[elfutils])
 
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_FILES([config/Makefile])
@@ -275,7 +275,7 @@ case "$eu_version" in
       0[[0-9]][[0-9]][[0-9]]) eu_version="${eu_version#0}$eu_extra_version" ;;
 [[0-9]][[0-9]][[0-9]][[0-9]]) eu_version="${eu_version}$eu_extra_version" ;;
 [[0-9]][[0-9]][[0-9]])	      eu_version="${eu_version}0$eu_extra_version" ;;
-[[0-9]][[0-9]])   	      eu_version="${eu_version}00$eu_extra_version";;
+[[0-9]][[0-9]])	  	      eu_version="${eu_version}00$eu_extra_version";;
 *) AC_MSG_ERROR([confused by version number '$PACKAGE_VERSION']) ;;
 esac
 

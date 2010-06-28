@@ -183,6 +183,15 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
+* Mon Jun 28 2010  <drepper@redhat.com> 0.148-1
+- libdw: Accept DWARF 4 format: new functions dwarf_next_unit, 
+  dwarf_offdie_types.        New functions dwarf_lineisa, 
+  dwarf_linediscriminator, dwarf_lineop_index.
+- libdwfl: Fixes in core-file handling, support cores from PIEs. 
+  	 When working from build IDs, don't open a named file that 
+  mismatches.
+- readelf: Handle DWARF 4 formats.
+
 * Mon May  3 2010 Ulrich Drepper <drepper@redhat.com> 0.147-1
 - libdw: Fixes in CFI handling, best possible handling of bogus CFA
   ops.

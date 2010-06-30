@@ -627,7 +627,7 @@ dwfl_linux_kernel_find_elf (Dwfl_Module *mod,
     {
       int fd = INTUSE(dwfl_build_id_find_elf) (mod, NULL, NULL, 0,
 					       file_name, elfp);
-      if (fd >= 0 || errno != 0)
+      if (fd >= 0 || mod->main.elf != NULL || errno != 0)
 	return fd;
     }
 

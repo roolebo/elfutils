@@ -3,6 +3,8 @@
 	* linux-kernel-modules.c (dwfl_linux_kernel_find_elf): Don't be
 	confused by -1 return from dwfl_build_id_find_elf after it opened
 	the Elf handle.
+	* find-debuginfo.c (dwfl_standard_find_debuginfo): Likewise for
+	dwfl_build_id_find_debuginfo.
 
 2010-06-16  Roland McGrath  <roland@redhat.com>
 

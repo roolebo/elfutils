@@ -1,5 +1,5 @@
 /* Print the strings of printable characters in files.
-   Copyright (C) 2005, 2006, 2007, 2009 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -169,9 +169,9 @@ main (int argc, char *argv[])
   if (remaining == argc)
     /* We read from standard input.  This we cannot do for a
        structured file.  */
-    result = read_fd (STDOUT_FILENO,
+    result = read_fd (STDIN_FILENO,
 		      print_file_name ? "{standard input}" : NULL,
-		      fstat64 (STDOUT_FILENO, &st) == 0
+		      (fstat64 (STDIN_FILENO, &st) == 0 && S_ISREG (st.st_mode))
 		      ? st.st_size : INT64_C (0x7fffffffffffffff));
   else
     do
@@ -548,17 +548,17 @@ read_block_no_mmap (int fd, const char *fname, off64_t from, off64_t fdlen)
       size_t nb = (size_t) n + ntrailer;
       if (nb >= min_len_bytes)
 	{
-	  /* We only use complete charactesr.  */
+	  /* We only use complete characters.  */
 	  nb &= ~(bytes_per_char - 1);
 
 	  process_chunk (fname, buf, from + nb, nb, &unprinted);
 
-	  /* If the last bytes of the buffer (module the character
+	  /* If the last bytes of the buffer (modulo the character
 	     size) have been printed we are not copying them.  */
 	  size_t to_keep = unprinted != NULL ? 0 : min_len_bytes;
 
-	  memmove (buf, buf + nb - to_keep, to_keep + nb);
-	  ntrailer = to_keep + nb;
+	  memmove (buf, buf + nb - to_keep, to_keep);
+	  ntrailer = to_keep;
 	  from += nb;
 	}
       else
@@ -578,8 +578,6 @@ read_block_no_mmap (int fd, const char *fname, off64_t from, off64_t fdlen)
 static int
 read_block (int fd, const char *fname, off64_t fdlen, off64_t from, off64_t to)
 {
-  assert ((off64_t) min_len_bytes < fdlen);
-
   if (elfmap == NULL)
     {
       /* We need a completely new mapping.  */
@@ -597,11 +595,13 @@ read_block (int fd, const char *fname, off64_t fdlen, off64_t from, off64_t to)
 	 read pointer.  */
       // XXX Eventually add flag which avoids this if the position
       // XXX is known to match.
-      if (lseek64 (fd, from, SEEK_SET) != from)
+      if (from != 0 && lseek64 (fd, from, SEEK_SET) != from)
 	error (EXIT_FAILURE, errno, gettext ("lseek64 failed"));
 
       return read_block_no_mmap (fd, fname, from, to - from);
     }
+
+  assert ((off64_t) min_len_bytes < fdlen);
 
   if (to < (off64_t) elfmap_off || from > (off64_t) (elfmap_off + elfmap_size))
     {

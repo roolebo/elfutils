@@ -1,3 +1,10 @@
+2010-06-30  Roland McGrath  <roland@redhat.com>
+
+	* strings.c (main): Use STDIN_FILENO, not STDOUT_FILENO.
+	Ignore st_size for a non-S_ISREG file descriptor.
+	(read_block): Move assert after no-mmap bail-out.
+	(read_block_no_mmap): Fix size calculations for moving buffer remnant.
+
 2010-06-22  Roland McGrath  <roland@redhat.com>
 
 	* readelf.c (print_debug_line_section): Fix braino in DW_LNS_set_isa.

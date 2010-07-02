@@ -1,3 +1,8 @@
+2010-07-02  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (print_debug_frame_section): Use format_dwarf_addr for
+	initial_location.
+
 2010-06-30  Roland McGrath  <roland@redhat.com>
 
 	* strings.c (main): Use STDIN_FILENO, not STDOUT_FILENO.

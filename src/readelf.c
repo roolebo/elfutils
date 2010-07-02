@@ -5084,12 +5084,14 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	  Dwarf_Word address_range
 	    = read_ubyte_unaligned_inc (ptr_size, dbg, readp);
 
+	  char *a = format_dwarf_addr (dwflmod, cie->address_size,
+				       initial_location);
 	  printf ("\n [%6tx] FDE length=%" PRIu64 " cie=[%6tx]\n"
 		  "   CIE_pointer:              %" PRIu64 "\n"
-		  "   initial_location:         %#" PRIx64,
+		  "   initial_location:         %s",
 		  offset, (uint64_t) unit_length,
-		  cie->cie_offset, (uint64_t) cie_id,
-		  (uint64_t) initial_location);
+		  cie->cie_offset, (uint64_t) cie_id, a);
+	  free (a);
 	  if ((fde_encoding & 0x70) == DW_EH_PE_pcrel)
 	    {
 	      vma_base = (((uint64_t) shdr->sh_offset

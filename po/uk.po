@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2010-06-28 12:08-0700\n"
+"POT-Creation-Date: 2010-07-02 13:49-0700\n"
 "PO-Revision-Date: 2010-06-22 20:44+0300\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <kde-i18n-doc@kde.org>\n"
@@ -499,7 +499,7 @@ msgstr "невідповідність полів data/scn"
 msgid "invalid section header"
 msgstr "некоректний заголовок розділу"
 
-#: libelf/elf_error.c:208 src/readelf.c:6428 src/readelf.c:6529
+#: libelf/elf_error.c:208 src/readelf.c:6430 src/readelf.c:6531
 #, c-format
 msgid "invalid data"
 msgstr "некоректні дані"
@@ -3863,7 +3863,7 @@ msgstr "не вдалося створити дерево пошуку"
 #: src/readelf.c:1029 src/readelf.c:1170 src/readelf.c:1352 src/readelf.c:1550
 #: src/readelf.c:1736 src/readelf.c:1946 src/readelf.c:2200 src/readelf.c:2266
 #: src/readelf.c:2344 src/readelf.c:2842 src/readelf.c:2878 src/readelf.c:2940
-#: src/readelf.c:6682 src/readelf.c:7577 src/readelf.c:7724 src/readelf.c:7794
+#: src/readelf.c:6684 src/readelf.c:7579 src/readelf.c:7726 src/readelf.c:7796
 #: src/size.c:425 src/size.c:499 src/strip.c:483
 #, c-format
 msgid "cannot get section header string table index"
@@ -4366,7 +4366,7 @@ msgstr ""
 msgid "cannot get section: %s"
 msgstr "не вдалося отримати розділ: %s"
 
-#: src/readelf.c:907 src/readelf.c:1061 src/readelf.c:7744 src/unstrip.c:353
+#: src/readelf.c:907 src/readelf.c:1061 src/readelf.c:7746 src/unstrip.c:353
 #: src/unstrip.c:384 src/unstrip.c:433 src/unstrip.c:541 src/unstrip.c:558
 #: src/unstrip.c:594 src/unstrip.c:792 src/unstrip.c:1060 src/unstrip.c:1250
 #: src/unstrip.c:1311 src/unstrip.c:1433 src/unstrip.c:1486 src/unstrip.c:1593
@@ -5050,8 +5050,8 @@ msgstr ""
 msgid "cannot get .debug_ranges content: %s"
 msgstr "не вдалося отримати дані .debug_ranges: %s"
 
-#: src/readelf.c:4371 src/readelf.c:4857 src/readelf.c:5581 src/readelf.c:6079
-#: src/readelf.c:6178 src/readelf.c:6350
+#: src/readelf.c:4371 src/readelf.c:4857 src/readelf.c:5583 src/readelf.c:6081
+#: src/readelf.c:6180 src/readelf.c:6352
 #, c-format
 msgid ""
 "\n"
@@ -5060,12 +5060,12 @@ msgstr ""
 "\n"
 "Розділ DWARF [%2zu] «%s» зі зміщенням %#<PRIx64>:\n"
 
-#: src/readelf.c:4385 src/readelf.c:6097
+#: src/readelf.c:4385 src/readelf.c:6099
 #, c-format
 msgid " [%6tx]  <INVALID DATA>\n"
 msgstr " [%6tx]  <НЕКОРЕКТНІ ДАНІ>\n"
 
-#: src/readelf.c:4407 src/readelf.c:6119
+#: src/readelf.c:4407 src/readelf.c:6121
 #, c-format
 msgid " [%6tx]  base address %s\n"
 msgstr " [%6tx]  базова адреса %s\n"
@@ -5080,7 +5080,7 @@ msgstr " [%6tx]  %s..%s\n"
 msgid "           %s..%s\n"
 msgstr "           %s..%s\n"
 
-#: src/readelf.c:4846 src/readelf.c:6416 src/readelf.c:6518
+#: src/readelf.c:4846 src/readelf.c:6418 src/readelf.c:6520
 #, c-format
 msgid "cannot get %s content: %s"
 msgstr "не вдалося отримати дані %s: %s"
@@ -5094,7 +5094,7 @@ msgstr ""
 "\n"
 "Розділ відомостей щодо вікна викликів [%2zu] «%s» за зміщенням %#<PRIx64>:\n"
 
-#: src/readelf.c:4881 src/readelf.c:5615
+#: src/readelf.c:4881 src/readelf.c:5617
 #, c-format
 msgid "invalid data in section [%zu] '%s'"
 msgstr "некоректні дані у розділі [%zu] «%s»"
@@ -5121,37 +5121,37 @@ msgstr "Кодування адреси FDE: "
 msgid "LSDA pointer encoding: "
 msgstr "Кодування вказівника LSDA: "
 
-#: src/readelf.c:5101
+#: src/readelf.c:5103
 #, c-format
 msgid " (offset: %#<PRIx64>)"
 msgstr " (зміщення: %#<PRIx64>)"
 
-#: src/readelf.c:5108
+#: src/readelf.c:5110
 #, c-format
 msgid " (end offset: %#<PRIx64>)"
 msgstr " (зміщення від кінця: %#<PRIx64>)"
 
-#: src/readelf.c:5135
+#: src/readelf.c:5137
 #, c-format
 msgid "   %-26sLSDA pointer: %#<PRIx64>\n"
 msgstr "   %-26sвказівник LSDA: %#<PRIx64>\n"
 
-#: src/readelf.c:5182
+#: src/readelf.c:5184
 #, c-format
 msgid "cannot get attribute code: %s"
 msgstr "не вдалося отримати код атрибута: %s"
 
-#: src/readelf.c:5190
+#: src/readelf.c:5192
 #, c-format
 msgid "cannot get attribute form: %s"
 msgstr "не вдалося отримати форму атрибута: %s"
 
-#: src/readelf.c:5203
+#: src/readelf.c:5205
 #, c-format
 msgid "cannot get attribute value: %s"
 msgstr "не вдалося отримати значення атрибута: %s"
 
-#: src/readelf.c:5428
+#: src/readelf.c:5430
 #, c-format
 msgid ""
 "\n"
@@ -5162,7 +5162,7 @@ msgstr ""
 "Розділ DWARF [%2zu] «%s» за зміщенням %#<PRIx64>:\n"
 " [Зміщення]\n"
 
-#: src/readelf.c:5458
+#: src/readelf.c:5460
 #, c-format
 msgid ""
 " Type unit at offset %<PRIu64>:\n"
@@ -5175,7 +5175,7 @@ msgstr ""
 "Зміщення: %<PRIu8>\n"
 " Підпис типу: %#<PRIx64>, Зміщення типу: %#<PRIx64>\n"
 
-#: src/readelf.c:5466
+#: src/readelf.c:5468
 #, c-format
 msgid ""
 " Compilation unit at offset %<PRIu64>:\n"
@@ -5186,37 +5186,37 @@ msgstr ""
 " Версія: %<PRIu16>, Зміщення розділу скорочень: %<PRIu64>, Адреса: %<PRIu8>, "
 "Зміщення: %<PRIu8>\n"
 
-#: src/readelf.c:5489
+#: src/readelf.c:5491
 #, c-format
 msgid "cannot get DIE at offset %<PRIu64> in section '%s': %s"
 msgstr "не вдалося отримати DIE за зміщенням %<PRIu64> у розділі «%s»: %s"
 
-#: src/readelf.c:5500
+#: src/readelf.c:5502
 #, c-format
 msgid "cannot get DIE offset: %s"
 msgstr "не вдалося отримати зміщення DIE: %s"
 
-#: src/readelf.c:5508
+#: src/readelf.c:5510
 #, c-format
 msgid "cannot get tag of DIE at offset %<PRIu64> in section '%s': %s"
 msgstr "не вдалося отримати мітку DIE за зміщенням %<PRIu64> у розділі «%s»: %s"
 
-#: src/readelf.c:5537
+#: src/readelf.c:5539
 #, c-format
 msgid "cannot get next DIE: %s\n"
 msgstr "не вдалося визначити наступний DIE: %s\n"
 
-#: src/readelf.c:5544
+#: src/readelf.c:5546
 #, c-format
 msgid "cannot get next DIE: %s"
 msgstr "не вдалося визначити наступний DIE: %s"
 
-#: src/readelf.c:5593
+#: src/readelf.c:5595
 #, c-format
 msgid "cannot get line data section data: %s"
 msgstr "не вдалося отримати дані розділу лінійних даних: %s"
 
-#: src/readelf.c:5606
+#: src/readelf.c:5608
 #, c-format
 msgid ""
 "\n"
@@ -5225,7 +5225,7 @@ msgstr ""
 "\n"
 "Таблиця за зміщенням %Zu:\n"
 
-#: src/readelf.c:5661
+#: src/readelf.c:5663
 #, c-format
 msgid ""
 "\n"
@@ -5254,12 +5254,12 @@ msgstr ""
 "\n"
 "Коди операцій:\n"
 
-#: src/readelf.c:5682
+#: src/readelf.c:5684
 #, c-format
 msgid "invalid data at offset %tu in section [%zu] '%s'"
 msgstr "некоректні дані зі зміщенням %tu у розділі [%zu] «%s»"
 
-#: src/readelf.c:5697
+#: src/readelf.c:5699
 #, c-format
 msgid "  [%*<PRIuFAST8>]  %hhu argument\n"
 msgid_plural "  [%*<PRIuFAST8>]  %hhu arguments\n"
@@ -5267,7 +5267,7 @@ msgstr[0] "  [%*<PRIuFAST8>]  %hhu аргумент\n"
 msgstr[1] "  [%*<PRIuFAST8>]  %hhu аргументи\n"
 msgstr[2] "  [%*<PRIuFAST8>]  %hhu аргументів\n"
 
-#: src/readelf.c:5705
+#: src/readelf.c:5707
 msgid ""
 "\n"
 "Directory table:"
@@ -5275,7 +5275,7 @@ msgstr ""
 "\n"
 "Таблиця каталогу:"
 
-#: src/readelf.c:5721
+#: src/readelf.c:5723
 msgid ""
 "\n"
 "File name table:\n"
@@ -5285,7 +5285,7 @@ msgstr ""
 "Таблиця назв файлів:\n"
 " Запис Кат   Час       Розмір    Назва"
 
-#: src/readelf.c:5750
+#: src/readelf.c:5752
 msgid ""
 "\n"
 "Line number statements:"
@@ -5293,115 +5293,115 @@ msgstr ""
 "\n"
 "Оператори номерів рядків:"
 
-#: src/readelf.c:5824
+#: src/readelf.c:5826
 #, c-format
 msgid " special opcode %u: address+%u = %s, op_index = %u, line%+d = %zu\n"
 msgstr ""
 " спеціальний код операції %u: адреса+%u = %s, індекс_оп = %u, рядок%+d = %"
 "zu\n"
 
-#: src/readelf.c:5829
+#: src/readelf.c:5831
 #, c-format
 msgid " special opcode %u: address+%u = %s, line%+d = %zu\n"
 msgstr " спеціальний код операції %u: адреса+%u = %s, рядок%+d = %zu\n"
 
-#: src/readelf.c:5849
+#: src/readelf.c:5851
 #, c-format
 msgid " extended opcode %u: "
 msgstr " розширений код операції %u: "
 
-#: src/readelf.c:5854
+#: src/readelf.c:5856
 msgid "end of sequence"
 msgstr "кінець послідовності"
 
-#: src/readelf.c:5871
+#: src/readelf.c:5873
 #, c-format
 msgid "set address to %s\n"
 msgstr "встановити адресу у значення %s\n"
 
-#: src/readelf.c:5892
+#: src/readelf.c:5894
 #, c-format
 msgid "define new file: dir=%u, mtime=%<PRIu64>, length=%<PRIu64>, name=%s\n"
 msgstr ""
 "визначення нового файла: dir=%u, mtime=%<PRIu64>, довжина=%<PRIu64>, назва=%"
 "s\n"
 
-#: src/readelf.c:5905
+#: src/readelf.c:5907
 #, c-format
 msgid " set discriminator to %u\n"
 msgstr " встановити розрізнення для %u\n"
 
-#: src/readelf.c:5910
+#: src/readelf.c:5912
 msgid "unknown opcode"
 msgstr "невідомий код операції"
 
-#: src/readelf.c:5922
+#: src/readelf.c:5924
 msgid " copy"
 msgstr " копія"
 
-#: src/readelf.c:5933
+#: src/readelf.c:5935
 #, c-format
 msgid "advance address by %u to %s, op_index to %u\n"
 msgstr "збільшення адреси на %u до %s, індекс_оп до %u\n"
 
-#: src/readelf.c:5937
+#: src/readelf.c:5939
 #, c-format
 msgid "advance address by %u to %s\n"
 msgstr "збільшення адреси на %u до %s\n"
 
-#: src/readelf.c:5948
+#: src/readelf.c:5950
 #, c-format
 msgid " advance line by constant %d to %<PRId64>\n"
 msgstr " просувати рядок на сталу %d до %<PRId64>\n"
 
-#: src/readelf.c:5956
+#: src/readelf.c:5958
 #, c-format
 msgid " set file to %<PRIu64>\n"
 msgstr " встановити файл у %<PRIu64>\n"
 
-#: src/readelf.c:5966
+#: src/readelf.c:5968
 #, c-format
 msgid " set column to %<PRIu64>\n"
 msgstr " встановити значення стовпчика %<PRIu64>\n"
 
-#: src/readelf.c:5973
+#: src/readelf.c:5975
 #, c-format
 msgid " set '%s' to %<PRIuFAST8>\n"
 msgstr " встановити «%s» у %<PRIuFAST8>\n"
 
-#: src/readelf.c:5979
+#: src/readelf.c:5981
 msgid " set basic block flag"
 msgstr " встановити прапорець базового блоку"
 
-#: src/readelf.c:5988
+#: src/readelf.c:5990
 #, c-format
 msgid "advance address by constant %u to %s, op_index to %u\n"
 msgstr "збільшити адресу на сталу величину %u до %s,  індекс_оп до %u\n"
 
-#: src/readelf.c:5992
+#: src/readelf.c:5994
 #, c-format
 msgid "advance address by constant %u to %s\n"
 msgstr "збільшити адресу на сталу величину %u до %s\n"
 
-#: src/readelf.c:6010
+#: src/readelf.c:6012
 #, c-format
 msgid "advance address by fixed value %u to %s\n"
 msgstr "збільшити адресу на фіксовану величину %u до %s\n"
 
-#: src/readelf.c:6019
+#: src/readelf.c:6021
 msgid " set prologue end flag"
 msgstr " встановити прапорець кінця вступу"
 
-#: src/readelf.c:6024
+#: src/readelf.c:6026
 msgid " set epilogue begin flag"
 msgstr " встановити прапорець початку епілогу"
 
-#: src/readelf.c:6033
+#: src/readelf.c:6035
 #, c-format
 msgid " set isa to %u\n"
 msgstr " встановити isa у %u\n"
 
-#: src/readelf.c:6042
+#: src/readelf.c:6044
 #, c-format
 msgid " unknown opcode with %<PRIu8> parameter:"
 msgid_plural " unknown opcode with %<PRIu8> parameters:"
@@ -5409,38 +5409,38 @@ msgstr[0] " невідомий код операції з %<PRIu8> параме�
 msgstr[1] " невідомий код операції з %<PRIu8> параметрами:"
 msgstr[2] " невідомий код операції з %<PRIu8> параметрами:"
 
-#: src/readelf.c:6074
+#: src/readelf.c:6076
 #, c-format
 msgid "cannot get .debug_loc content: %s"
 msgstr "не вдалося отримати вміст .debug_loc: %s"
 
-#: src/readelf.c:6133
+#: src/readelf.c:6135
 #, c-format
 msgid " [%6tx]  %s..%s"
 msgstr " [%6tx]  %s..%s"
 
-#: src/readelf.c:6135
+#: src/readelf.c:6137
 #, c-format
 msgid "           %s..%s"
 msgstr "           %s..%s"
 
-#: src/readelf.c:6188
+#: src/readelf.c:6190
 #, c-format
 msgid "cannot get macro information section data: %s"
 msgstr "не вдалося отримати дані розділу відомостей щодо макросів: %s"
 
-#: src/readelf.c:6267
+#: src/readelf.c:6269
 #, c-format
 msgid "%*s*** non-terminated string at end of section"
 msgstr "%*s*** незавершений рядок наприкінці розділу"
 
-#: src/readelf.c:6335
+#: src/readelf.c:6337
 #, c-format
 msgid " [%5d] DIE offset: %6<PRId64>, CU DIE offset: %6<PRId64>, name: %s\n"
 msgstr ""
 " [%5d] зміщення DIE: %6<PRId64>, зміщення CU DIE: %6<PRId64>, назва: %s\n"
 
-#: src/readelf.c:6374
+#: src/readelf.c:6376
 #, c-format
 msgid ""
 "\n"
@@ -5451,12 +5451,12 @@ msgstr ""
 "Розділ DWARF [%2zu] «%s» зі зміщенням %#<PRIx64>:\n"
 " %*s  Рядок\n"
 
-#: src/readelf.c:6388
+#: src/readelf.c:6390
 #, c-format
 msgid " *** error while reading strings: %s\n"
 msgstr " *** помилка під час читання рядків: %s\n"
 
-#: src/readelf.c:6408
+#: src/readelf.c:6410
 #, c-format
 msgid ""
 "\n"
@@ -5465,7 +5465,7 @@ msgstr ""
 "\n"
 "Розділ таблиці пошуку вікон виклику [%2zu] '.eh_frame_hdr':\n"
 
-#: src/readelf.c:6510
+#: src/readelf.c:6512
 #, c-format
 msgid ""
 "\n"
@@ -5474,22 +5474,22 @@ msgstr ""
 "\n"
 "Розділ таблиці обробки виключень [%2zu] '.gcc_except_table':\n"
 
-#: src/readelf.c:6533
+#: src/readelf.c:6535
 #, c-format
 msgid " LPStart encoding:    %#x "
 msgstr " Кодування LPStart:   %#x "
 
-#: src/readelf.c:6545
+#: src/readelf.c:6547
 #, c-format
 msgid " TType encoding:      %#x "
 msgstr " Кодування TType:     %#x "
 
-#: src/readelf.c:6559
+#: src/readelf.c:6561
 #, c-format
 msgid " Call site encoding:  %#x "
 msgstr " Кодування місця виклику:%#x "
 
-#: src/readelf.c:6572
+#: src/readelf.c:6574
 msgid ""
 "\n"
 " Call site table:"
@@ -5497,7 +5497,7 @@ msgstr ""
 "\n"
 " Таблиця місця виклику:"
 
-#: src/readelf.c:6586
+#: src/readelf.c:6588
 #, c-format
 msgid ""
 " [%4u] Call site start:   %#<PRIx64>\n"
@@ -5510,22 +5510,22 @@ msgstr ""
 "        Місце застосування:   %#<PRIx64>\n"
 "        Дія:                  %u\n"
 
-#: src/readelf.c:6646
+#: src/readelf.c:6648
 #, c-format
 msgid "invalid TType encoding"
 msgstr "некоректне кодування TType"
 
-#: src/readelf.c:6671
+#: src/readelf.c:6673
 #, c-format
 msgid "cannot get debug context descriptor: %s"
 msgstr "не вдалося отримати дескриптор контексту зневаджування: %s"
 
-#: src/readelf.c:6810 src/readelf.c:7411
+#: src/readelf.c:6812 src/readelf.c:7413
 #, c-format
 msgid "cannot convert core note data: %s"
 msgstr "не вдалося перетворити дані запису ядра: %s"
 
-#: src/readelf.c:7151
+#: src/readelf.c:7153
 #, c-format
 msgid ""
 "\n"
@@ -5534,21 +5534,21 @@ msgstr ""
 "\n"
 "%*s... <повторюється %u разів> ..."
 
-#: src/readelf.c:7510
+#: src/readelf.c:7512
 msgid "  Owner          Data size  Type\n"
 msgstr "  Власник        Розм. даних Тип\n"
 
-#: src/readelf.c:7528
+#: src/readelf.c:7530
 #, c-format
 msgid "  %-13.*s  %9<PRId32>  %s\n"
 msgstr "  %-13.*s  %9<PRId32>  %s\n"
 
-#: src/readelf.c:7562
+#: src/readelf.c:7564
 #, c-format
 msgid "cannot get content of note section: %s"
 msgstr "не вдалося отримати вміст розділу записів: %s"
 
-#: src/readelf.c:7589
+#: src/readelf.c:7591
 #, c-format
 msgid ""
 "\n"
@@ -5558,7 +5558,7 @@ msgstr ""
 "Розділ записів (note) [%2zu] «%s» з %<PRIu64> байтів за зміщенням %"
 "#0<PRIx64>:\n"
 
-#: src/readelf.c:7612
+#: src/readelf.c:7614
 #, c-format
 msgid ""
 "\n"
@@ -5567,7 +5567,7 @@ msgstr ""
 "\n"
 "Сегмент записів з %<PRIu64> байтів за зміщенням %#0<PRIx64>:\n"
 
-#: src/readelf.c:7658
+#: src/readelf.c:7660
 #, c-format
 msgid ""
 "\n"
@@ -5576,12 +5576,12 @@ msgstr ""
 "\n"
 "У розділі [%Zu] «%s» не міститься даних для створення дампу.\n"
 
-#: src/readelf.c:7664 src/readelf.c:7687
+#: src/readelf.c:7666 src/readelf.c:7689
 #, c-format
 msgid "cannot get data for section [%Zu] '%s': %s"
 msgstr "не вдалося отримати дані для розділу [%Zu] «%s»: %s"
 
-#: src/readelf.c:7668
+#: src/readelf.c:7670
 #, c-format
 msgid ""
 "\n"
@@ -5590,7 +5590,7 @@ msgstr ""
 "\n"
 "Шіст. дамп розділу [%Zu] «%s», %<PRIu64> байтів за зміщенням %#0<PRIx64>:\n"
 
-#: src/readelf.c:7681
+#: src/readelf.c:7683
 #, c-format
 msgid ""
 "\n"
@@ -5599,7 +5599,7 @@ msgstr ""
 "\n"
 "У розділі [%Zu] «%s» не міститься рядків для створення дампу.\n"
 
-#: src/readelf.c:7691
+#: src/readelf.c:7693
 #, c-format
 msgid ""
 "\n"
@@ -5608,7 +5608,7 @@ msgstr ""
 "\n"
 "Розділ рядків [%Zu] «%s» містить %<PRIu64> байтів за зміщенням %#0<PRIx64>:\n"
 
-#: src/readelf.c:7739
+#: src/readelf.c:7741
 #, c-format
 msgid ""
 "\n"
@@ -5617,7 +5617,7 @@ msgstr ""
 "\n"
 "розділу [%lu] не існує"
 
-#: src/readelf.c:7766
+#: src/readelf.c:7768
 #, c-format
 msgid ""
 "\n"
@@ -5626,12 +5626,12 @@ msgstr ""
 "\n"
 "розділу «%s» не існує"
 
-#: src/readelf.c:7827
+#: src/readelf.c:7829
 #, c-format
 msgid "cannot get symbol index of archive '%s': %s"
 msgstr "не вдалося отримати покажчик символів архіву «%s»: %s"
 
-#: src/readelf.c:7830
+#: src/readelf.c:7832
 #, c-format
 msgid ""
 "\n"
@@ -5640,7 +5640,7 @@ msgstr ""
 "\n"
 "У архіві «%s» немає покажчика символів\n"
 
-#: src/readelf.c:7834
+#: src/readelf.c:7836
 #, c-format
 msgid ""
 "\n"
@@ -5649,12 +5649,12 @@ msgstr ""
 "\n"
 "Покажчик архіву «%s» містить %Zu записів:\n"
 
-#: src/readelf.c:7852
+#: src/readelf.c:7854
 #, c-format
 msgid "cannot extract member at offset %Zu in '%s': %s"
 msgstr "не вдалося видобути елемент за зміщенням %Zu у «%s»: %s"
 
-#: src/readelf.c:7857
+#: src/readelf.c:7859
 #, c-format
 msgid "Archive member '%s' contains:\n"
 msgstr "Елемент архіву «%s» містить:\n"
@@ -5777,7 +5777,7 @@ msgstr "некоректне значення «%s» параметра %s"
 msgid "invalid minimum length of matched string size"
 msgstr "некоректна мінімальна довжина розмірності рядка для порівняння"
 
-#: src/strings.c:601
+#: src/strings.c:599
 #, c-format
 msgid "lseek64 failed"
 msgstr "помилка lseek64"

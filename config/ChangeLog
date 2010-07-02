@@ -1,3 +1,8 @@
+2010-07-02  Ulrich Drepper  <drepper@redhat.com>
+
+	* elfutils.spec.in: Add more BuildRequires.
+	Ship the .mo files with the libelf subpackage.
+
 2010-04-15  Roland McGrath  <roland@redhat.com>
 
 	* eu.am (DEFS): Add -DLOCALEDIR=... here.

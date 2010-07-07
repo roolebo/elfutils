@@ -1,3 +1,7 @@
+2010-07-07  Roland McGrath  <roland@redhat.com>
+
+	* eblopenbackend.c (default_debugscn_p): Match .gdb_index section.
+
 2010-02-15  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am: Use config/eu.am for common stuff.

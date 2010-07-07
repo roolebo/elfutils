@@ -662,6 +662,8 @@ default_debugscn_p (const char *name)
       ".debug_pubtypes",
       /* DWARF 4 */
       ".debug_types",
+      /* GDB DWARF 4 extension */
+      ".gdb_index",
       /* SGI/MIPS DWARF 2 extensions */
       ".debug_weaknames",
       ".debug_funcnames",

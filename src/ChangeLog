@@ -1,3 +1,13 @@
+2010-07-26  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (print_ops): Take new argument for CU version.
+	Fix DW_OP_call_ref decoding to depend on it.
+	(print_debug_loc_section): Update caller.
+	(print_cfa_program): Take new argument, pass it down.
+	(print_debug_frame_section): Update caller.
+	(struct attrcb_args): New member version.
+	(print_debug_units): Initialize it.
+
 2010-07-02  Roland McGrath  <roland@redhat.com>
 
 	* readelf.c (print_debug_frame_section): Use format_dwarf_addr for

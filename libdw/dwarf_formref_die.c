@@ -101,7 +101,7 @@ dwarf_formref_die (attr, result)
 				  ?: DWARF_E_INVALID_REFERENCE);
 		return NULL;
 	      }
-	    Dwarf_Sig8_Hash_insert (&cu->dbg->sig8_hash, sig, cu);
+	    Dwarf_Sig8_Hash_insert (&cu->dbg->sig8_hash, cu->type_sig8, cu);
 	  }
 	while (cu->type_sig8 != sig);
 

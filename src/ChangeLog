@@ -1,3 +1,8 @@
+2010-08-11  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (for_each_section_argument): Process all sections with
+	matching name, not just the first.
+
 2010-07-26  Roland McGrath  <roland@redhat.com>
 
 	* readelf.c (print_ops): Take new argument for CU version.

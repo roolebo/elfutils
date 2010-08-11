@@ -7758,6 +7758,7 @@ for_each_section_argument (Elf *elf, const struct section_argument *list,
 	{
 	  /* Need to look up the section by name.  */
 	  scn = NULL;
+	  bool found = false;
 	  while ((scn = elf_nextscn (elf, scn)) != NULL)
 	    {
 	      if (gelf_getshdr (scn, &shdr_mem) == NULL)
@@ -7766,18 +7767,15 @@ for_each_section_argument (Elf *elf, const struct section_argument *list,
 	      if (name == NULL)
 		continue;
 	      if (!strcmp (name, a->arg))
-		break;
+		{
+		  found = true;
+		  (*dump) (scn, &shdr_mem, name);
+		}
 	    }
 
-	  if (unlikely (scn == NULL))
-	    {
-	      if (!a->implicit)
-		error (0, 0, gettext ("\nsection '%s' does not exist"), a->arg);
-	      continue;
-	    }
+	  if (unlikely (!found) && !a->implicit)
+	    error (0, 0, gettext ("\nsection '%s' does not exist"), a->arg);
 	}
-
-      (*dump) (scn, &shdr_mem, name);
     }
 }
 

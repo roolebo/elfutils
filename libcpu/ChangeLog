@@ -1,3 +1,9 @@
+2010-08-16  Roland McGrath  <roland@redhat.com>
+
+	* Makefile.am (%_defs): New pattern rule.
+	(%_dis.h, %.mnemonics): Define as pattern rules using %_defs input.
+	(CLEANFILES): Include all those files.
+
 2010-02-15  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am: Use config/eu.am for common stuff.

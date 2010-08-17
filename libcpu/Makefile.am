@@ -43,15 +43,15 @@ i386_gendis_SOURCES = i386_gendis.c i386_lex.l i386_parse.y
 i386_disasm.o: i386.mnemonics i386_dis.h
 x86_64_disasm.o: x86_64.mnemonics x86_64_dis.h i386_disasm.c
 
-i386_dis.h: i386_gendis $(srcdir)/defs/i386
-	m4 -Di386 -DDISASSEMBLER $(srcdir)/defs/i386 | ./i386_gendis - > $@
-x86_64_dis.h: i386_gendis $(srcdir)/defs/i386
-	m4 -Dx86_64 -DDISASSEMBLER $(srcdir)/defs/i386 | ./i386_gendis - > $@
+%_defs: $(srcdir)/defs/i386
+	m4 -D$* -DDISASSEMBLER $< > $@
 
-i386.mnemonics x86_64.mnemonics: %.mnemonics: $(srcdir)/defs/i386
-	m4 -D$(@:.mnemonics=) -DDISASSEMBLER $^ \
-	| sed '1,/^%%/d;/^#/d;/^[[:space:]]*$$/d;s/[^:]*:\([^[:space:]]*\).*/MNE(\1)/;s/{[^}]*}//g;/INVALID/d' \
-	| sort -u > $@
+%_dis.h: %_defs i386_gendis
+	./i386_gendis $< > $@
+
+%.mnemonics: %_defs
+	sed '1,/^%%/d;/^#/d;/^[[:space:]]*$$/d;s/[^:]*:\([^[:space:]]*\).*/MNE(\1)/;s/{[^}]*}//g;/INVALID/d' \
+	  $< | sort -u > $@
 
 i386_lex_no_Werror = yes
 
@@ -69,4 +69,4 @@ noinst_HEADERS = memory-access.h i386_parse.h i386_data.h
 
 EXTRA_DIST = defs/i386
 
-CLEANFILES += i386.mnemonics i386_dis.h x86_64.mnemonics x86_64_dis.h
+CLEANFILES += $(foreach P,i386 x86_64,$P_defs $P.mnemonics $P_dis.h)

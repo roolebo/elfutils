@@ -398,9 +398,7 @@ report_r_debug (uint_fast8_t elfclass, uint_fast8_t elfdata,
 	     the full file name from l_name.  Opening the file by this
 	     name will be the fallback when no build ID match is found.
 	     XXX hook for sysroot */
-	  if (name != NULL
-	      && mod->main.elf == NULL
-	      && mod->main.name == NULL)
+	  if (name != NULL && mod->main.name == NULL)
 	    mod->main.name = strdup (name);
 	}
       else if (name != NULL)

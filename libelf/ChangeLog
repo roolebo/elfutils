@@ -1,3 +1,12 @@
+2010-08-18  Roland McGrath  <roland@redhat.com>
+
+	* gelf_fsize.c (__libelf_type_sizes): Add entries for ELF_T_LIB
+	and ELF_T_GNUHASH.
+	Reported by Mark Hatle <mark.hatle@windriver.com>.
+
+	* exttypes.h: Add cases for ElfNN_Lib.
+	Reported by Mark Hatle <mark.hatle@windriver.com>.
+
 2010-06-14  Ulrich Drepper  <drepper@redhat.com>
 
 	* gelf_update_shdr.c: Implicitly set ELF_F_DIRTY bit.

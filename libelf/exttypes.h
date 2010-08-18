@@ -1,5 +1,5 @@
 /* External ELF types.
-   Copyright (C) 1998, 1999, 2000, 2002, 2007 Red Hat, Inc.
+   Copyright (C) 1998-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -94,6 +94,7 @@ Verneed32 (Ext_);
 Vernaux32 (Ext_);
 Syminfo32 (Ext_);
 Move32 (Ext_);
+Lib32 (Ext_);
 auxv_t32 (Ext_);
 
 Ehdr64 (Ext_);
@@ -110,6 +111,7 @@ Verneed64 (Ext_);
 Vernaux64 (Ext_);
 Syminfo64 (Ext_);
 Move64 (Ext_);
+Lib64 (Ext_);
 auxv_t64 (Ext_);
 
 #undef START

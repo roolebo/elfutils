@@ -1,5 +1,5 @@
 /* Return the size of an object file type.
-   Copyright (C) 1998, 1999, 2000, 2002, 2007 Red Hat, Inc.
+   Copyright (C) 1998-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -61,7 +61,7 @@
 /* These are the sizes for all the known types.  */
 const size_t __libelf_type_sizes[EV_NUM - 1][ELFCLASSNUM - 1][ELF_T_NUM] =
 {
-  /* We have no entry for EV_NONE siince we have to set an error.  */
+  /* We have no entry for EV_NONE since we have to set an error.  */
   [EV_CURRENT - 1] = {
     [ELFCLASS32 - 1] = {
 #define TYPE_SIZES(LIBELFBITS) \
@@ -87,7 +87,9 @@ const size_t __libelf_type_sizes[EV_NUM - 1][ELFCLASSNUM - 1][ELF_T_NUM] =
       [ELF_T_NHDR]	= sizeof (ElfW2(LIBELFBITS, Ext_Nhdr)),		      \
       [ELF_T_SYMINFO]	= sizeof (ElfW2(LIBELFBITS, Ext_Syminfo)),	      \
       [ELF_T_MOVE]	= sizeof (ElfW2(LIBELFBITS, Ext_Move)),		      \
-      [ELF_T_AUXV]	= sizeof (ElfW2(LIBELFBITS, Ext_auxv_t))
+      [ELF_T_LIB]	= sizeof (ElfW2(LIBELFBITS, Ext_Lib)),		      \
+      [ELF_T_AUXV]	= sizeof (ElfW2(LIBELFBITS, Ext_auxv_t)),	      \
+      [ELF_T_GNUHASH]	= ELFW2(LIBELFBITS, FSZ_WORD)
       TYPE_SIZES (32)
     },
     [ELFCLASS64 - 1] = {

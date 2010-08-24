@@ -69,6 +69,7 @@ static const struct argp_option options[] =
     N_("Show absolute file names using compilation directory"), 0 },
   { "functions", 'f', NULL, 0, N_("Also show function names"), 0 },
   { "symbols", 'S', NULL, 0, N_("Also show symbol or section names"), 0 },
+  { "flags", 'F', NULL, 0, N_("Also show line table flags"), 0 },
   { "section", 'j', "NAME", 0,
     N_("Treat addresses as offsets relative to NAME section."), 0 },
 
@@ -108,6 +109,9 @@ static bool only_basenames;
 
 /* True if absolute file names based on DW_AT_comp_dir should be shown.  */
 static bool use_comp_dir;
+
+/* True if line flags should be shown.  */
+static bool show_flags;
 
 /* True if function names should be shown.  */
 static bool show_functions;
@@ -217,6 +221,10 @@ parse_opt (int key, char *arg, struct argp_state *state)
 
     case 'f':
       show_functions = true;
+      break;
+
+    case 'F':
+      show_flags = true;
       break;
 
     case 'S':
@@ -521,11 +529,41 @@ handle_address (const char *string, Dwfl *dwfl)
 	}
 
       if (linecol != 0)
-	printf ("%s%s%s:%d:%d\n",
+	printf ("%s%s%s:%d:%d",
 		comp_dir, comp_dir_sep, src, lineno, linecol);
       else
-	printf ("%s%s%s:%d\n",
+	printf ("%s%s%s:%d",
 		comp_dir, comp_dir_sep, src, lineno);
+
+      if (show_flags)
+	{
+	  Dwarf_Addr bias;
+	  Dwarf_Line *info = dwfl_dwarf_line (line, &bias);
+	  assert (info != NULL);
+
+	  inline void show (int (*get) (Dwarf_Line *, bool *),
+			    const char *note)
+	  {
+	    bool flag;
+	    if ((*get) (info, &flag) == 0 && flag)
+	      fputs (note, stdout);
+	  }
+	  inline void show_int (int (*get) (Dwarf_Line *, unsigned int *),
+				const char *name)
+	  {
+	    unsigned int val;
+	    if ((*get) (info, &val) == 0 && val != 0)
+	      printf (" (%s %u)", name, val);
+	  }
+
+	  show (&dwarf_linebeginstatement, " (is_stmt)");
+	  show (&dwarf_lineblock, " (basic_block)");
+	  show (&dwarf_lineprologueend, " (prologue_end)");
+	  show (&dwarf_lineepiloguebegin, " (epilogue_begin)");
+	  show_int (&dwarf_lineisa, "isa");
+	  show_int (&dwarf_linediscriminator, "discriminator");
+	}
+      putchar ('\n');
     }
   else
     puts ("??:0");

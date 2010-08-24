@@ -1,3 +1,9 @@
+Version 0.149:
+
+libdwfl: New function dwfl_dwarf_line.
+
+addr2line: New flag -F/--flags to print DWARF more line information details.
+
 Version 0.148:
 
 libdw: Accept DWARF 4 format: new functions dwarf_next_unit, dwarf_offdie_types.

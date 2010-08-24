@@ -527,6 +527,9 @@ extern const char *dwfl_lineinfo (Dwfl_Line *line, Dwarf_Addr *addr,
 				  int *linep, int *colp,
 				  Dwarf_Word *mtime, Dwarf_Word *length);
 
+  /* Return the equivalent Dwarf_Line and the bias to apply to its address.  */
+extern Dwarf_Line *dwfl_dwarf_line (Dwfl_Line *line, Dwarf_Addr *bias);
+
 /* Return the compilation directory (AT_comp_dir) from this line's CU.  */
 extern const char *dwfl_line_comp_dir (Dwfl_Line *line);
 

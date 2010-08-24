@@ -1,3 +1,8 @@
+2010-08-24  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_dwarf_line.c: New file.
+	* Makefile.am (libdwfl_a_SOURCES): Add it.
+
 2010-08-18  Roland McGrath  <roland@redhat.com>
 
 	* link_map.c (report_r_debug): Use found name if we have no name,

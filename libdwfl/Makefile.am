@@ -53,7 +53,7 @@ libdwfl_a_SOURCES = dwfl_begin.c dwfl_end.c dwfl_error.c dwfl_version.c \
 		    cu.c dwfl_module_nextcu.c dwfl_nextcu.c dwfl_cumodule.c \
 		    dwfl_module_addrdie.c dwfl_addrdie.c \
 		    lines.c dwfl_lineinfo.c dwfl_line_comp_dir.c \
-		    dwfl_linemodule.c dwfl_linecu.c \
+		    dwfl_linemodule.c dwfl_linecu.c dwfl_dwarf_line.c \
 		    dwfl_getsrclines.c dwfl_onesrcline.c \
 		    dwfl_module_getsrc.c dwfl_getsrc.c \
 		    dwfl_module_getsrc_file.c \

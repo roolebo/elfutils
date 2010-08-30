@@ -3977,7 +3977,8 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
       return;
     }
 
-#define NEED(n) if (len < n) goto invalid;
+#define NEED(n)		if (len < (Dwarf_Word) (n)) goto invalid
+#define CONSUME(n)	NEED (n); else len -= (n)
 
   Dwarf_Word offset = 0;
   while (len-- > 0)
@@ -3998,7 +3999,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	      addr = read_8ubyte_unaligned (dbg, data);
 	    }
 	  data += addrsize;
-	  len -= addrsize;
+	  CONSUME (addrsize);
 
 	  char *a = format_dwarf_addr (dwflmod, 0, addr);
 	  printf ("%*s[%4" PRIuMAX "] %s %s\n",
@@ -4019,7 +4020,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	      addr = read_8ubyte_unaligned (dbg, data);
 	    }
 	  data += ref_size;
-	  len -= ref_size;
+	  CONSUME (ref_size);
 
 	  printf ("%*s[%4" PRIuMAX "] %s %#" PRIxMAX "\n",
 		  indent, "", (uintmax_t) offset,
@@ -4047,7 +4048,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu16 "\n",
 		  indent, "", (uintmax_t) offset,
 		  known[op], read_2ubyte_unaligned (dbg, data));
-	  len -= 2;
+	  CONSUME (2);
 	  data += 2;
 	  offset += 3;
 	  break;
@@ -4058,7 +4059,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu32 "\n",
 		  indent, "", (uintmax_t) offset,
 		  known[op], read_4ubyte_unaligned (dbg, data));
-	  len -= 4;
+	  CONSUME (4);
 	  data += 4;
 	  offset += 5;
 	  break;
@@ -4069,7 +4070,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu64 "\n",
 		  indent, "", (uintmax_t) offset,
 		  known[op], read_8ubyte_unaligned (dbg, data));
-	  len -= 8;
+	  CONSUME (8);
 	  data += 8;
 	  offset += 9;
 	  break;
@@ -4091,7 +4092,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRId16 "\n",
 		  indent, "", (uintmax_t) offset,
 		  known[op], read_2sbyte_unaligned (dbg, data));
-	  len -= 2;
+	  CONSUME (2);
 	  data += 2;
 	  offset += 3;
 	  break;
@@ -4102,7 +4103,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRId32 "\n",
 		  indent, "", (uintmax_t) offset,
 		  known[op], read_4sbyte_unaligned (dbg, data));
-	  len -= 4;
+	  CONSUME (4);
 	  data += 4;
 	  offset += 5;
 	  break;
@@ -4113,7 +4114,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRId64 "\n",
 		  indent, "", (uintmax_t) offset,
 		  known[op], read_8sbyte_unaligned (dbg, data));
-	  len -= 8;
+	  CONSUME (8);
 	  data += 8;
 	  offset += 9;
 	  break;
@@ -4124,21 +4125,23 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	case DW_OP_constu:;
 	  const unsigned char *start = data;
 	  uint64_t uleb;
+	  NEED (1);
 	  get_uleb128 (uleb, data); /* XXX check overrun */
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu64 "\n",
 		  indent, "", (uintmax_t) offset, known[op], uleb);
-	  len -= data - start;
+	  CONSUME (data - start);
 	  offset += 1 + (data - start);
 	  break;
 
 	case DW_OP_bit_piece:
 	  start = data;
 	  uint64_t uleb2;
+	  NEED (2);
 	  get_uleb128 (uleb, data); /* XXX check overrun */
 	  get_uleb128 (uleb2, data); /* XXX check overrun */
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu64 ", %" PRIu64 "\n",
 		  indent, "", (uintmax_t) offset, known[op], uleb, uleb2);
-	  len -= data - start;
+	  CONSUME (data - start);
 	  offset += 1 + (data - start);
 	  break;
 
@@ -4147,20 +4150,22 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	case DW_OP_consts:
 	  start = data;
 	  int64_t sleb;
+	  NEED (1);
 	  get_sleb128 (sleb, data); /* XXX check overrun */
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRId64 "\n",
 		  indent, "", (uintmax_t) offset, known[op], sleb);
-	  len -= data - start;
+	  CONSUME (data - start);
 	  offset += 1 + (data - start);
 	  break;
 
 	case DW_OP_bregx:
 	  start = data;
+	  NEED (2);
 	  get_uleb128 (uleb, data); /* XXX check overrun */
 	  get_sleb128 (sleb, data); /* XXX check overrun */
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu64 " %" PRId64 "\n",
 		  indent, "", (uintmax_t) offset, known[op], uleb, sleb);
-	  len -= data - start;
+	  CONSUME (data - start);
 	  offset += 1 + (data - start);
 	  break;
 
@@ -4169,7 +4174,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu16 "\n",
 		  indent, "", (uintmax_t) offset, known[op],
 		  read_2ubyte_unaligned (dbg, data));
-	  len -= 2;
+	  CONSUME (2);
 	  offset += 3;
 	  break;
 
@@ -4178,7 +4183,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu32 "\n",
 		  indent, "", (uintmax_t) offset, known[op],
 		  read_4ubyte_unaligned (dbg, data));
-	  len -= 4;
+	  CONSUME (4);
 	  offset += 5;
 	  break;
 
@@ -4188,20 +4193,21 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIuMAX "\n",
 		  indent, "", (uintmax_t) offset, known[op],
 		  (uintmax_t) (offset + read_2sbyte_unaligned (dbg, data)));
-	  len -= 2;
+	  CONSUME (2);
 	  data += 2;
 	  offset += 3;
 	  break;
 
 	case DW_OP_implicit_value:
 	  start = data;
+	  NEED (1);
 	  get_uleb128 (uleb, data); /* XXX check overrun */
 	  printf ("%*s[%4" PRIuMAX "] %s: ",
 		  indent, "", (uintmax_t) offset, known[op]);
 	  NEED (uleb);
 	  print_block (uleb, data);
 	  data += uleb;
-	  len -= data - start;
+	  CONSUME (data - start);
 	  offset += 1 + (data - start);
 	  break;
 
@@ -6097,7 +6103,8 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
 
   bool first = true;
   unsigned char *readp = data->d_buf;
-  while (readp < (unsigned char *) data->d_buf + data->d_size)
+  unsigned char *const endp = (unsigned char *) data->d_buf + data->d_size;
+  while (readp < endp)
     {
       ptrdiff_t offset = readp - (unsigned char *) data->d_buf;
 
@@ -6145,6 +6152,12 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
 
 	  free (b);
 	  free (e);
+
+	  if (endp - readp <= (ptrdiff_t) len)
+	    {
+	      fputs (gettext ("   <INVALID DATA>\n"), stdout);
+	      break;
+	    }
 
 	  print_ops (dwflmod, dbg, 1, 18 + (address_size * 4),
 		     3 /*XXX*/, address_size, offset_size, len, readp);

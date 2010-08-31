@@ -1,5 +1,22 @@
 2010-08-30  Roland McGrath  <roland@redhat.com>
 
+	Print .debug_loc/.debug_ranges with cognizance of actual DIE uses.
+	* readelf.c (parse_opt): Add section_info to implicit_debug_sections
+	for ranges, loc.
+	(struct listptr, struct listptr_table): New types.
+	(compare_listptr, reset_listptr, sort_listptr): New functions.
+	(notice_listptr, skip_listptr_hole): New functions.
+	(struct attrcb_args): Add silent member.
+	(attr_callback): Call notice_listptr for loclistptr and rangelistptr.
+	Suppress output if silent, but still call notice_listptr.
+	(print_debug_units): Suppress output if section_info not requested.
+	(print_debug_loc_section): Call sort_listptr, skip_listptr_hole.
+	(print_debug_ranges_section): Likewise.
+	(print_debug): Call reset_listptr on both tables.
+
+	* readelf.c (print_debug_ranges_section): Print empty list.
+	(print_debug_loc_section): Likewise.
+
 	* readelf.c (print_debug_loc_section): Check for bogus length
 	before calling print_ops.
 	(print_ops): Check harder for bogus data that would read off end.

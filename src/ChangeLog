@@ -1,3 +1,7 @@
+2010-07-26  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (print_ops): Handle DW_OP_GNU_implicit_pointer.
+
 2010-08-30  Roland McGrath  <roland@redhat.com>
 
 	Print .debug_loc/.debug_ranges with cognizance of actual DIE uses.
@@ -114,6 +118,7 @@
 	(struct attrcb_args): Add offset_size field.
 	(attr_callback): Use it for print_ops call.
 	(print_debug_info_section): Initialize it.
+	(print_ops): Likewise.
 
 2010-04-14  Roland McGrath  <roland@redhat.com>
 

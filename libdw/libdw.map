@@ -250,5 +250,7 @@ ELFUTILS_0.148 {
 
 ELFUTILS_0.149 {
   global:
+    dwarf_getlocation_implicit_pointer;
+
     dwfl_dwarf_line;
 } ELFUTILS_0.148;

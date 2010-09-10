@@ -420,6 +420,15 @@ __libdw_intern_expression (Dwarf *dbg, bool other_byte_order,
 	  data += newloc->number;		/* Skip the block.  */
 	  break;
 
+	case DW_OP_GNU_implicit_pointer:
+	  /* DW_FORM_ref_addr, depends on offset size of CU.  */
+	  if (__libdw_read_offset_inc (dbg, sec_index, &data, ref_size,
+				       &newloc->number, IDX_debug_info, 0))
+	    return -1;
+	  /* XXX Check size.  */
+	  get_uleb128 (newloc->number2, data); /* Byte offset.  */
+	  break;
+
 	default:
 	  goto invalid;
 	}

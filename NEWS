@@ -1,5 +1,8 @@
 Version 0.149:
 
+libdw: Decode new DW_OP_GNU_implicit_pointer operation;
+       new function dwarf_getlocation_implicit_pointer.
+
 libdwfl: New function dwfl_dwarf_line.
 
 addr2line: New flag -F/--flags to print DWARF more line information details.

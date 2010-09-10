@@ -5,7 +5,7 @@ libdw: Decode new DW_OP_GNU_implicit_pointer operation;
 
 libdwfl: New function dwfl_dwarf_line.
 
-addr2line: New flag -F/--flags to print DWARF more line information details.
+addr2line: New flag -F/--flags to print more DWARF line information details.
 
 strip: -g recognizes .gdb_index as a debugging section.
 

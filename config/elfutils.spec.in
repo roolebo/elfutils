@@ -188,6 +188,14 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
+* Mon Sep 13 2010  <drepper@redhat.com> 0.149-1
+- libdw: Decode new DW_OP_GNU_implicit_pointer operation;        new 
+  function dwarf_getlocation_implicit_pointer.
+- libdwfl: New function dwfl_dwarf_line.
+- addr2line: New flag -F/--flags to print more DWARF line information 
+  details.
+- strip: -g recognizes .gdb_index as a debugging section.
+
 * Mon Jun 28 2010  <drepper@redhat.com> 0.148-1
 - libdw: Accept DWARF 4 format: new functions dwarf_next_unit, 
   dwarf_offdie_types.        New functions dwarf_lineisa, 

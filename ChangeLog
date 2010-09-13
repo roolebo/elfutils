@@ -1,3 +1,8 @@
+2010-09-13  Ulrich Drepper  <drepper@redhat.com>
+
+	* configure.ac (ALL_LINGUAS): Add languages which have some
+	translations.
+
 2010-04-15  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac (LOCALEDIR, DATADIRNAME): Removed.

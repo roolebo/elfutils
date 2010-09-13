@@ -56,7 +56,7 @@ AS_IF([test "$use_locks" = yes], [AC_DEFINE(USE_LOCKS)])
 AH_TEMPLATE([USE_LOCKS], [Defined if libraries should be thread-safe.])
 
 dnl Add all the languages for which translations are available.
-ALL_LINGUAS=
+ALL_LINGUAS="de es ja pl uk"
 
 AC_PROG_CC
 AC_PROG_RANLIB

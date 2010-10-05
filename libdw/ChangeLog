@@ -1,3 +1,8 @@
+2010-10-05  Roland McGrath  <roland@redhat.com>
+
+	* dwarf_getaranges.c: Use malloc rather than alloca,
+	since the total number of elements can be quite huge.
+
 2010-07-26  Roland McGrath  <roland@redhat.com>
 
 	* dwarf_getlocation_implicit_pointer.c: New file.

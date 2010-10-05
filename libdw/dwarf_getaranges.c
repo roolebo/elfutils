@@ -67,9 +67,9 @@ struct arangelist
 static int
 compare_aranges (const void *a, const void *b)
 {
-  Dwarf_Arange *const *p1 = a, *const *p2 = b;
-  Dwarf_Arange *l1 = *p1, *l2 = *p2;
-  return l1->addr - l2->addr;
+  struct arangelist *const *p1 = a, *const *p2 = b;
+  struct arangelist *l1 = *p1, *l2 = *p2;
+  return l1->arange.addr - l2->arange.addr;
 }
 
 int
@@ -145,6 +145,13 @@ dwarf_getaranges (dbg, aranges, naranges)
 	{
 	invalid:
 	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
+	fail:
+	  while (arangelist != NULL)
+	    {
+	      struct arangelist *next = arangelist->next;
+	      free (arangelist);
+	      arangelist = next;
+	    }
 	  return -1;
 	}
 
@@ -152,7 +159,7 @@ dwarf_getaranges (dbg, aranges, naranges)
       if (__libdw_read_offset_inc (dbg,
 				   IDX_debug_aranges, &readp,
 				   length_bytes, &offset, IDX_debug_info, 4))
-	return -1;
+	goto fail;
 
       unsigned int address_size = *readp++;
       if (address_size != 4 && address_size != 8)
@@ -173,7 +180,7 @@ dwarf_getaranges (dbg, aranges, naranges)
 
 	  if (__libdw_read_address_inc (dbg, IDX_debug_aranges, &readp,
 					address_size, &range_address))
-	    return -1;
+	    goto fail;
 
 	  if (address_size == 4)
 	    range_length = read_4ubyte_unaligned_inc (dbg, readp);
@@ -184,8 +191,14 @@ dwarf_getaranges (dbg, aranges, naranges)
 	  if (range_address == 0 && range_length == 0)
 	    break;
 
-	  struct arangelist *new_arange =
-	    (struct arangelist *) alloca (sizeof (struct arangelist));
+	  /* We don't use alloca for these temporary structures because
+	     the total number of them can be quite large.  */
+	  struct arangelist *new_arange = malloc (sizeof *new_arange);
+	  if (unlikely (new_arange == NULL))
+	    {
+	      __libdw_seterrno (DWARF_E_NOMEM);
+	      goto fail;
+	    }
 
 	  new_arange->arange.addr = range_address;
 	  new_arange->arange.length = range_length;
@@ -202,19 +215,20 @@ dwarf_getaranges (dbg, aranges, naranges)
 								 offset_size,
 								 false);
 
-	  /* Sanity-check the data.  */
-	  if (new_arange->arange.offset
-	      >= dbg->sectiondata[IDX_debug_info]->d_size)
-	    goto invalid;
-
 	  new_arange->next = arangelist;
 	  arangelist = new_arange;
 	  ++narangelist;
+
+	  /* Sanity-check the data.  */
+	  if (unlikely (new_arange->arange.offset
+			>= dbg->sectiondata[IDX_debug_info]->d_size))
+	    goto invalid;
 	}
     }
 
   if (narangelist == 0)
     {
+      assert (arangelist == NULL);
       if (naranges != NULL)
 	*naranges = 0;
       *aranges = NULL;
@@ -230,9 +244,9 @@ dwarf_getaranges (dbg, aranges, naranges)
      We'll write the pointers in the end of the buffer, and then
      copy into the buffer from the beginning so the overlap works.  */
   assert (sizeof (Dwarf_Arange) >= sizeof (Dwarf_Arange *));
-  Dwarf_Arange **sortaranges = (buf + sizeof (Dwarf_Aranges)
-				+ ((sizeof (Dwarf_Arange)
-				    - sizeof (Dwarf_Arange *)) * narangelist));
+  struct arangelist **sortaranges
+    = (buf + sizeof (Dwarf_Aranges)
+       + ((sizeof (Dwarf_Arange) - sizeof sortaranges[0]) * narangelist));
 
   /* The list is in LIFO order and usually they come in clumps with
      ascending addresses.  So fill from the back to probably start with
@@ -240,7 +254,7 @@ dwarf_getaranges (dbg, aranges, naranges)
   unsigned int i = narangelist;
   while (i-- > 0)
     {
-      sortaranges[i] = &arangelist->arange;
+      sortaranges[i] = arangelist;
       arangelist = arangelist->next;
     }
   assert (arangelist == NULL);
@@ -258,7 +272,11 @@ dwarf_getaranges (dbg, aranges, naranges)
   if (naranges != NULL)
     *naranges = narangelist;
   for (i = 0; i < narangelist; ++i)
-    (*aranges)->info[i] = *sortaranges[i];
+    {
+      struct arangelist *elt = sortaranges[i];
+      (*aranges)->info[i] = elt->arange;
+      free (elt);
+    }
 
   return 0;
 }

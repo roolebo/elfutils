@@ -1,5 +1,5 @@
 /* Function return value location for Linux/i386 ABI.
-   Copyright (C) 2005, 2007 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -38,7 +38,7 @@
 static const Dwarf_Op loc_intreg[] =
   {
     { .atom = DW_OP_reg0 }, { .atom = DW_OP_piece, .number = 4 },
-    { .atom = DW_OP_reg1 }, { .atom = DW_OP_piece, .number = 4 },
+    { .atom = DW_OP_reg2 }, { .atom = DW_OP_piece, .number = 4 },
   };
 #define nloc_intreg	1
 #define nloc_intregpair	4

@@ -1,5 +1,5 @@
 /* Locate source files or functions which caused text relocations.
-   Copyright (C) 2005, 2006, 2007, 2009 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -262,6 +262,8 @@ process_file (const char *fname, bool more_than_one)
      the symbol table.  */
   Elf_Scn *symscn = NULL;
   Elf_Scn *scn = NULL;
+  bool seen_dynamic = false;
+  bool have_textrel = false;
   while ((scn = elf_nextscn (elf, scn)) != NULL)
     {
       /* Handle the section if it is a symbol table.  */
@@ -297,17 +299,27 @@ process_file (const char *fname, bool more_than_one)
 	      if (dyn->d_tag == DT_TEXTREL
 		  || (dyn->d_tag == DT_FLAGS
 		      && (dyn->d_un.d_val & DF_TEXTREL) != 0))
-		goto have_textrel;
+		have_textrel = true;
 	    }
+
+	  seen_dynamic = true;
+	  if (symscn != NULL)
+	    break;
 	}
       else if (shdr->sh_type == SHT_SYMTAB)
-	symscn = scn;
+	{
+	  symscn = scn;
+	  if (seen_dynamic)
+	    break;
+	}
     }
 
-  error (0, 0, gettext ("no text relocations reported in '%s'"), fname);
-  return 1;
+  if (!have_textrel)
+    {
+      error (0, 0, gettext ("no text relocations reported in '%s'"), fname);
+      return 1;
+    }
 
- have_textrel:;
   int fd2 = -1;
   Elf *elf2 = NULL;
   /* Get the address ranges for the loaded segments.  */

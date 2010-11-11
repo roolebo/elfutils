@@ -1,3 +1,8 @@
+2010-11-10  Roland McGrath  <roland@redhat.com>
+
+	* findtextrel.c (process_file): Don't assume order of sections.
+	Reported by Mike Hommey <mh@glandium.org>.
+
 2010-07-26  Roland McGrath  <roland@redhat.com>
 
 	* readelf.c (print_ops): Handle DW_OP_GNU_implicit_pointer.

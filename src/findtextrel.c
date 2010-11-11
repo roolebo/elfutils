@@ -264,7 +264,8 @@ process_file (const char *fname, bool more_than_one)
   Elf_Scn *scn = NULL;
   bool seen_dynamic = false;
   bool have_textrel = false;
-  while ((scn = elf_nextscn (elf, scn)) != NULL)
+  while ((scn = elf_nextscn (elf, scn)) != NULL
+	 && (!seen_dynamic || symscn == NULL))
     {
       /* Handle the section if it is a symbol table.  */
       GElf_Shdr shdr_mem;
@@ -278,39 +279,40 @@ process_file (const char *fname, bool more_than_one)
 	  goto err_elf_close;
 	}
 
-      if (shdr->sh_type == SHT_DYNAMIC)
+      switch (shdr->sh_type)
 	{
-	  Elf_Data *data = elf_getdata (scn, NULL);
-
-	  for (size_t cnt = 0; cnt < shdr->sh_size / shdr->sh_entsize;
-	       ++cnt)
+	case SHT_DYNAMIC:
+	  if (!seen_dynamic)
 	    {
-	      GElf_Dyn dynmem;
-	      GElf_Dyn *dyn;
+	      seen_dynamic = true;
 
-	      dyn = gelf_getdyn (data, cnt, &dynmem);
-	      if (dyn == NULL)
+	      Elf_Data *data = elf_getdata (scn, NULL);
+
+	      for (size_t cnt = 0; cnt < shdr->sh_size / shdr->sh_entsize;
+		   ++cnt)
 		{
-		  error (0, 0, gettext ("cannot read dynamic section: %s"),
-			 elf_errmsg (-1));
-		  goto err_elf_close;
+		  GElf_Dyn dynmem;
+		  GElf_Dyn *dyn;
+
+		  dyn = gelf_getdyn (data, cnt, &dynmem);
+		  if (dyn == NULL)
+		    {
+		      error (0, 0, gettext ("cannot read dynamic section: %s"),
+			     elf_errmsg (-1));
+		      goto err_elf_close;
+		    }
+
+		  if (dyn->d_tag == DT_TEXTREL
+		      || (dyn->d_tag == DT_FLAGS
+			  && (dyn->d_un.d_val & DF_TEXTREL) != 0))
+		    have_textrel = true;
 		}
-
-	      if (dyn->d_tag == DT_TEXTREL
-		  || (dyn->d_tag == DT_FLAGS
-		      && (dyn->d_un.d_val & DF_TEXTREL) != 0))
-		have_textrel = true;
 	    }
+	  break;
 
-	  seen_dynamic = true;
-	  if (symscn != NULL)
-	    break;
-	}
-      else if (shdr->sh_type == SHT_SYMTAB)
-	{
+	case SHT_SYMTAB:
 	  symscn = scn;
-	  if (seen_dynamic)
-	    break;
+	  break;
 	}
     }
 

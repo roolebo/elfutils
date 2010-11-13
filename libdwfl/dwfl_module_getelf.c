@@ -1,5 +1,5 @@
 /* Find debugging and symbol information for a module in libdwfl.
-   Copyright (C) 2009 Red Hat, Inc.
+   Copyright (C) 2009-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -78,7 +78,7 @@ dwfl_module_getelf (Dwfl_Module *mod, GElf_Addr *loadbase)
 	    }
 	}
 
-      *loadbase = mod->main.bias;
+      *loadbase = dwfl_adjusted_address (mod, 0);
       return mod->main.elf;
     }
 

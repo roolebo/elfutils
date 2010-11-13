@@ -59,6 +59,6 @@ dwfl_dwarf_line (Dwfl_Line *line, Dwarf_Addr *bias)
   struct dwfl_cu *cu = dwfl_linecu (line);
   const Dwarf_Line *info = &cu->die.cu->lines->info[line->idx];
 
-  *bias = cu->mod->debug.bias;
+  *bias = dwfl_adjusted_dwarf_addr (cu->mod, 0);
   return (Dwarf_Line *) info;
 }

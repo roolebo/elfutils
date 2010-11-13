@@ -93,35 +93,23 @@ open_elf (Dwfl_Module *mod, struct dwfl_file *file)
       return DWFL_E (LIBELF, elf_errno ());
     }
 
-  /* The addresses in an ET_EXEC file are absolute.  The lowest p_vaddr of
-     the main file can differ from that of the debug file due to prelink.
-     But that doesn't not change addresses that symbols, debuginfo, or
-     sh_addr of any program sections refer to.  */
-  file->bias = 0;
-  if (mod->e_type != ET_EXEC)
+  if (mod->e_type != ET_REL)
     {
       size_t phnum;
       if (unlikely (elf_getphdrnum (file->elf, &phnum) != 0))
 	goto elf_error;
 
+      file->vaddr = file->address_sync = 0;
       for (size_t i = 0; i < phnum; ++i)
 	{
 	  GElf_Phdr ph_mem;
 	  GElf_Phdr *ph = gelf_getphdr (file->elf, i, &ph_mem);
-	  if (ph == NULL)
+	  if (unlikely (ph == NULL))
 	    goto elf_error;
 	  if (ph->p_type == PT_LOAD)
 	    {
-	      GElf_Addr align = mod->dwfl->segment_align;
-	      if (align <= 1)
-		{
-		  if ((mod->low_addr & (ph->p_align - 1)) == 0)
-		    align = ph->p_align;
-		  else
-		    align = ((GElf_Addr) 1 << ffsll (mod->low_addr)) >> 1;
-		}
-
-	      file->bias = ((mod->low_addr & -align) - (ph->p_vaddr & -align));
+	      file->vaddr = ph->p_vaddr & -ph->p_align;
+	      file->address_sync = ph->p_vaddr + ph->p_memsz;
 	      break;
 	    }
 	}
@@ -130,7 +118,7 @@ open_elf (Dwfl_Module *mod, struct dwfl_file *file)
   mod->e_type = ehdr->e_type;
 
   /* Relocatable Linux kernels are ET_EXEC but act like ET_DYN.  */
-  if (mod->e_type == ET_EXEC && file->bias != 0)
+  if (mod->e_type == ET_EXEC && file->vaddr != mod->low_addr)
     mod->e_type = ET_DYN;
 
   return DWFL_E_NOERROR;
@@ -198,6 +186,8 @@ __libdwfl_getelf (Dwfl_Module *mod)
 	  mod->main.fd = -1;
 	}
     }
+
+  mod->main_bias = mod->e_type == ET_REL ? 0 : mod->low_addr - mod->main.vaddr;
 }
 
 /* Search an ELF file for a ".gnu_debuglink" section.  */
@@ -733,7 +723,7 @@ find_dw (Dwfl_Module *mod)
     {
     case DWFL_E_NOERROR:
       mod->debug.elf = mod->main.elf;
-      mod->debug.bias = mod->main.bias;
+      mod->debug.address_sync = mod->main.address_sync;
       return;
 
     case DWFL_E_NO_DWARF:
@@ -782,7 +772,7 @@ dwfl_module_getdwarf (Dwfl_Module *mod, Dwarf_Addr *bias)
 	    (void) __libdwfl_relocate (mod, mod->debug.elf, false);
 	}
 
-      *bias = mod->debug.bias;
+      *bias = dwfl_adjusted_dwarf_addr (mod, 0);
       return mod->dw;
     }
 

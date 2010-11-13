@@ -1,5 +1,5 @@
 /* Return information about a module.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -66,9 +66,11 @@ dwfl_module_info (Dwfl_Module *mod, void ***userdata,
     *end = mod->high_addr;
 
   if (dwbias)
-    *dwbias = mod->debug.elf == NULL ? (Dwarf_Addr) -1 : mod->debug.bias;
+    *dwbias = (mod->debug.elf == NULL ? (Dwarf_Addr) -1
+	       : dwfl_adjusted_dwarf_addr (mod, 0));
   if (symbias)
-    *symbias = mod->symfile == NULL ? (Dwarf_Addr) -1 : mod->symfile->bias;
+    *symbias = (mod->symfile == NULL ? (Dwarf_Addr) -1
+		: dwfl_adjusted_st_value (mod, 0));
 
   if (mainfile)
     *mainfile = mod->main.name;

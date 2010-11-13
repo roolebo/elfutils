@@ -140,7 +140,22 @@ struct dwfl_file
   bool relocated;		/* Partial relocation of all sections done.  */
 
   Elf *elf;
-  GElf_Addr bias;		/* Actual load address - p_vaddr.  */
+
+  /* This is the lowest p_vaddr in this ELF file, aligned to p_align.
+     For a file without phdrs, this is zero.  */
+  GElf_Addr vaddr;
+
+  /* This is an address chosen for synchronization between the main file
+     and the debug file.  In a file without phdrs, this is zero.  In
+     other files it is the address at the end of the first PT_LOAD
+     segment.  When prelink converts REL to RELA in an ET_DYN file, it
+     expands the space between the beginning of the segment and the
+     actual code/data addresses.  Since that change wasn't made in the
+     debug file, the distance from p_vaddr to an address of interest (in
+     an st_value or DWARF data) now differs between the main and debug
+     files.  The distance from address_sync to an address of interest
+     remains consistent.  */
+  GElf_Addr address_sync;
 };
 
 struct Dwfl_Module
@@ -154,6 +169,7 @@ struct Dwfl_Module
   GElf_Addr low_addr, high_addr;
 
   struct dwfl_file main, debug;
+  GElf_Addr main_bias;
   Ebl *ebl;
   GElf_Half e_type;		/* GElf_Ehdr.e_type cache.  */
   Dwfl_Error elferr;		/* Previous failure to open main file.  */
@@ -235,6 +251,50 @@ dwfl_linecu_inline (const Dwfl_Line *line)
   return lines->cu;
 }
 #define dwfl_linecu dwfl_linecu_inline
+
+static inline GElf_Addr
+dwfl_adjusted_address (Dwfl_Module *mod, GElf_Addr addr)
+{
+  return addr + mod->main_bias;
+}
+
+static inline GElf_Addr
+dwfl_deadjust_address (Dwfl_Module *mod, GElf_Addr addr)
+{
+  return addr - mod->main_bias;
+}
+
+static inline Dwarf_Addr
+dwfl_adjusted_dwarf_addr (Dwfl_Module *mod, Dwarf_Addr addr)
+{
+  return dwfl_adjusted_address (mod, (addr
+				      - mod->debug.address_sync
+				      + mod->main.address_sync));
+}
+
+static inline Dwarf_Addr
+dwfl_deadjust_dwarf_addr (Dwfl_Module *mod, Dwarf_Addr addr)
+{
+  return (dwfl_deadjust_address (mod, addr)
+	  - mod->main.address_sync
+	  + mod->debug.address_sync);
+}
+
+static inline GElf_Addr
+dwfl_adjusted_st_value (Dwfl_Module *mod, GElf_Addr addr)
+{
+  if (mod->symfile == &mod->main)
+    return dwfl_adjusted_address (mod, addr);
+  return dwfl_adjusted_dwarf_addr (mod, addr);
+}
+
+static inline GElf_Addr
+dwfl_deadjust_st_value (Dwfl_Module *mod, GElf_Addr addr)
+{
+  if (mod->symfile == &mod->main)
+    return dwfl_deadjust_address (mod, addr);
+  return dwfl_deadjust_dwarf_addr (mod, addr);
+}
 
 /* This describes a contiguous address range that lies in a single CU.
    We condense runs of Dwarf_Arange entries for the same CU into this.  */

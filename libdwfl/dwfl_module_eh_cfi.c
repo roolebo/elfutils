@@ -1,5 +1,5 @@
 /* Find EH CFI for a module in libdwfl.
-   Copyright (C) 2009 Red Hat, Inc.
+   Copyright (C) 2009-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -60,7 +60,7 @@ dwfl_module_eh_cfi (mod, bias)
 
   if (mod->eh_cfi != NULL)
     {
-      *bias = mod->main.bias;
+      *bias = dwfl_adjusted_address (mod, 0);
       return mod->eh_cfi;
     }
 
@@ -71,7 +71,7 @@ dwfl_module_eh_cfi (mod, bias)
       return NULL;
     }
 
-  *bias = mod->main.bias;
+  *bias = dwfl_adjusted_address (mod, 0);
   return __libdwfl_set_cfi (mod, &mod->eh_cfi,
 			    INTUSE(dwarf_getcfi_elf) (mod->main.elf));
 }

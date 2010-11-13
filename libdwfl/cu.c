@@ -106,7 +106,7 @@ addrarange (Dwfl_Module *mod, Dwarf_Addr addr, struct dwfl_arange **arange)
     }
 
   /* The address must be inside the module to begin with.  */
-  addr -= mod->debug.bias;
+  addr = dwfl_deadjust_dwarf_addr (mod, addr);
 
   /* The ranges are sorted by address, so we can use binary search.  */
   size_t l = 0, u = mod->naranges;

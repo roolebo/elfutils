@@ -124,7 +124,7 @@ __libdwfl_find_build_id (Dwfl_Module *mod, bool set, Elf *elf)
 							phdr->p_offset,
 							phdr->p_filesz,
 							ELF_T_NHDR),
-				  phdr->p_vaddr + mod->main.bias);
+				  dwfl_adjusted_address (mod, phdr->p_vaddr));
 	}
     }
   else
@@ -139,7 +139,7 @@ __libdwfl_find_build_id (Dwfl_Module *mod, bool set, Elf *elf)
 	    if (!(shdr->sh_flags & SHF_ALLOC))
 	      vaddr = NO_VADDR;
 	    else if (mod->e_type != ET_REL)
-	      vaddr = shdr->sh_addr + mod->main.bias;
+	      vaddr = dwfl_adjusted_address (mod, shdr->sh_addr);
 	    else if (__libdwfl_relocate_value (mod, elf, &shstrndx,
 					       elf_ndxscn (scn), &vaddr))
 	      vaddr = NO_VADDR;

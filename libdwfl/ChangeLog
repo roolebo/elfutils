@@ -1,3 +1,51 @@
+2010-11-12  Roland McGrath  <roland@redhat.com>
+
+	* libdwflP.h (struct Dwfl_Module): New member main_bias.
+	(dwfl_adjusted_address, dwfl_deadjust_address): Use it.
+	* dwfl_module_getdwarf.c (__libdwfl_getelf): Initialize it.
+
+	* libdwflP.h (dwfl_deadjust_address): New function.
+	(dwfl_deadjust_dwarf_addr, dwfl_deadjust_st_value): New functions.
+	* cu.c (addrarange): Use dwfl_deadjust_dwarf_addr.
+	* dwfl_module_addrsym.c: Use dwfl_deadjust_st_value.
+
+2010-11-11  Roland McGrath  <roland@redhat.com>
+
+	* libdwflP.h (struct dwfl_file): Remove bias member.
+	Add vaddr and address_sync members instead.
+	(dwfl_adjusted_address): Calculate using vaddr.
+	(dwfl_adjusted_dwarf_addr): Calculate using address_sync and call that.
+	(dwfl_adjusted_st_value): Use one of those calls.
+	* dwfl_module_getdwarf.c (open_elf): Initialize vaddr and address_sync.
+	* dwfl_segment_report_module.c (dwfl_segment_report_module): Likewise.
+	* derelocate.c (dwfl_module_relocations): Update ET_EXEC assertions.
+	* link_map.c (consider_executable): Adjust only MOD->low_addr for
+	detected PIE bias change.
+
+	* libdwflP.h (dwfl_adjusted_dwarf_addr): New function.
+	* dwfl_module_info.c: Use it.
+	* cu.c (addrarange): Likewise.
+	* dwfl_dwarf_line.c: Likewise.
+	* dwfl_module_dwarf_cfi.c: Likewise.
+	* dwfl_lineinfo.c: Likewise.
+	* dwfl_nextcu.c: Likewise.
+	* dwfl_module_getdwarf.c (dwfl_module_getdwarf): Likewise.
+
+	* libdwflP.h (dwfl_adjusted_st_value): New function.
+	* relocate.c (resolve_symbol): Use it.
+	* dwfl_module_getsym.c: Likewise.
+	* dwfl_module_addrsym.c: Likewise.
+	* dwfl_module_info.c: Likewise.
+
+	* libdwflP.h (dwfl_adjusted_address): New function.
+	* dwfl_module_build_id.c (__libdwfl_find_build_id): Use it.
+	* relocate.c (__libdwfl_relocate_value): Likewise.
+	* derelocate.c (cache_sections): Likewise.
+	(dwfl_module_address_section): Likewise.
+	* dwfl_module_getelf.c: Likewise.
+	* dwfl_module_eh_cfi.c: Likewise.
+	* link_map.c (consider_executable): Likewise.
+
 2010-08-24  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_dwarf_line.c: New file.

@@ -1,5 +1,5 @@
 /* Find DWARF CFI for a module in libdwfl.
-   Copyright (C) 2009 Red Hat, Inc.
+   Copyright (C) 2009-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -81,7 +81,7 @@ dwfl_module_dwarf_cfi (mod, bias)
 
   if (mod->dwarf_cfi != NULL)
     {
-      *bias = mod->debug.bias;
+      *bias = dwfl_adjusted_dwarf_addr (mod, 0);
       return mod->dwarf_cfi;
     }
 

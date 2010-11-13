@@ -1,5 +1,5 @@
 /* Iterate through DWARF compilation units across all modules.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -75,7 +75,7 @@ dwfl_nextcu (Dwfl *dwfl, Dwarf_Die *lastcu, Dwarf_Addr *bias)
 
       if (cu != NULL)
 	{
-	  *bias = mod->debug.bias;
+	  *bias = dwfl_adjusted_dwarf_addr (mod, 0);
 	  return &cu->die;
 	}
 

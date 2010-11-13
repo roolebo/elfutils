@@ -270,6 +270,7 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
   /* Collect the unbiased bounds of the module here.  */
   GElf_Addr module_start = -1l;
   GElf_Addr module_end = 0;
+  GElf_Addr module_address_sync = 0;
 
   /* If we see PT_DYNAMIC, record it here.  */
   GElf_Addr dyn_vaddr = 0;
@@ -400,9 +401,11 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 	    found_bias = true;
 	  }
 
-	vaddr &= -align;
-	if (vaddr < module_start)
-	  module_start = vaddr;
+	if ((vaddr & -align) < module_start)
+	  {
+	    module_start = vaddr & -align;
+	    module_address_sync = vaddr + memsz;
+	  }
 
 	if (module_end < vaddr_end)
 	  module_end = vaddr_end;
@@ -662,7 +665,8 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
     {
       /* Install the file in the module.  */
       mod->main.elf = elf;
-      mod->main.bias = bias;
+      mod->main.vaddr = module_start - bias;
+      mod->main.address_sync = module_address_sync;
     }
 
   return finish ();

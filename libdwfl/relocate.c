@@ -99,7 +99,7 @@ __libdwfl_relocate_value (Dwfl_Module *mod, Elf *elf, size_t *shstrndx,
 
   if (refshdr->sh_flags & SHF_ALLOC)
     /* Apply the adjustment.  */
-    *value += refshdr->sh_addr + mod->main.bias;
+    *value += dwfl_adjusted_address (mod, refshdr->sh_addr);
 
   return DWFL_E_NOERROR;
 }
@@ -275,7 +275,7 @@ resolve_symbol (Dwfl_Module *referer, struct reloc_symtab_cache *symtab,
 
 		if (m->e_type != ET_REL)
 		  {
-		    sym->st_value += m->symfile->bias;
+		    sym->st_value = dwfl_adjusted_st_value (m, sym->st_value);
 		    return DWFL_E_NOERROR;
 		  }
 

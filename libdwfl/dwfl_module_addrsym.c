@@ -1,5 +1,5 @@
 /* Find debugging and symbol information for a module in libdwfl.
-   Copyright (C) 2005, 2006, 2007, 2008 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -71,7 +71,7 @@ dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr addr,
       /* Figure out what section ADDR lies in.  */
       if (addr_shndx == SHN_UNDEF)
 	{
-	  GElf_Addr mod_addr = addr - mod->symfile->bias;
+	  GElf_Addr mod_addr = dwfl_deadjust_st_value (mod, addr);
 	  Elf_Scn *scn = NULL;
 	  addr_shndx = SHN_ABS;
 	  while ((scn = elf_nextscn (mod->symfile->elf, scn)) != NULL)

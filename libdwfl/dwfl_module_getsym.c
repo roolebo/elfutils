@@ -1,5 +1,5 @@
 /* Find debugging and symbol information for a module in libdwfl.
-   Copyright (C) 2006,2007,2009 Red Hat, Inc.
+   Copyright (C) 2006-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -114,7 +114,7 @@ dwfl_module_getsym (Dwfl_Module *mod, int ndx,
 	}
       else if (alloc)
 	/* Apply the bias to the symbol value.  */
-	sym->st_value += mod->symfile->bias;
+	sym->st_value = dwfl_adjusted_st_value (mod, sym->st_value);
       break;
     }
 

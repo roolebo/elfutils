@@ -515,11 +515,11 @@ consider_executable (Dwfl_Module *mod, GElf_Addr at_phdr, GElf_Addr at_entry,
 
 	      /* If we're changing the module's address range,
 		 we've just invalidated the module lookup table.  */
-	      if (bias != mod->main.bias)
+	      GElf_Addr mod_bias = dwfl_adjusted_address (mod, 0);
+	      if (bias != mod_bias)
 		{
-		  mod->low_addr -= mod->main.bias;
-		  mod->high_addr -= mod->main.bias;
-		  mod->main.bias = bias;
+		  mod->low_addr -= mod_bias;
+		  mod->high_addr -= mod_bias;
 		  mod->low_addr += bias;
 		  mod->high_addr += bias;
 
@@ -554,7 +554,7 @@ consider_executable (Dwfl_Module *mod, GElf_Addr at_phdr, GElf_Addr at_entry,
   if (d_val_vaddr != 0)
     {
       /* Now we have the final address from which to read &r_debug.  */
-      d_val_vaddr += mod->main.bias;
+      d_val_vaddr = dwfl_adjusted_address (mod, d_val_vaddr);
 
       void *buffer = NULL;
       size_t buffer_available = addrsize (ehdr.e_ident[EI_CLASS]);

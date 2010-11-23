@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ja\n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2010-09-13 09:45-0700\n"
+"POT-Creation-Date: 2010-11-22 22:08-0500\n"
 "PO-Revision-Date: 2009-09-20 15:32+0900\n"
 "Last-Translator: Hyu_gabaru Ryu_ichi <hyu_gabaru@yahoo.co.jp>\n"
 "Language-Team: Japanese <jp@li.org>\n"
@@ -2765,72 +2765,72 @@ msgstr ""
 msgid "'%s' is not a DSO or PIE"
 msgstr ""
 
-#: src/findtextrel.c:274
+#: src/findtextrel.c:277
 #, c-format
 msgid "getting get section header of section %zu: %s"
 msgstr ""
 
-#: src/findtextrel.c:292
+#: src/findtextrel.c:300
 #, c-format
 msgid "cannot read dynamic section: %s"
 msgstr ""
 
-#: src/findtextrel.c:307
+#: src/findtextrel.c:321
 #, c-format
 msgid "no text relocations reported in '%s'"
 msgstr ""
 
-#: src/findtextrel.c:319
+#: src/findtextrel.c:333
 #, c-format
 msgid "while reading ELF file"
 msgstr ""
 
-#: src/findtextrel.c:328 src/findtextrel.c:345
+#: src/findtextrel.c:342 src/findtextrel.c:359
 #, c-format
 msgid "cannot get program header index at offset %d: %s"
 msgstr ""
 
-#: src/findtextrel.c:397
+#: src/findtextrel.c:411
 #, c-format
 msgid "cannot get section header of section %Zu: %s"
 msgstr ""
 
-#: src/findtextrel.c:409
+#: src/findtextrel.c:423
 #, c-format
 msgid "cannot get symbol table section %zu in '%s': %s"
 msgstr ""
 
-#: src/findtextrel.c:429 src/findtextrel.c:452
+#: src/findtextrel.c:443 src/findtextrel.c:466
 #, c-format
 msgid "cannot get relocation at index %d in section %zu in '%s': %s"
 msgstr ""
 
-#: src/findtextrel.c:517
+#: src/findtextrel.c:531
 #, c-format
 msgid "%s not compiled with -fpic/-fPIC\n"
 msgstr ""
 
-#: src/findtextrel.c:570
+#: src/findtextrel.c:584
 #, c-format
 msgid ""
 "the file containing the function '%s' is not compiled with -fpic/-fPIC\n"
 msgstr ""
 
-#: src/findtextrel.c:577 src/findtextrel.c:597
+#: src/findtextrel.c:591 src/findtextrel.c:611
 #, c-format
 msgid ""
 "the file containing the function '%s' might not be compiled with -fpic/-"
 "fPIC\n"
 msgstr ""
 
-#: src/findtextrel.c:585
+#: src/findtextrel.c:599
 #, c-format
 msgid ""
 "either the file containing the function '%s' or the file containing the "
 "function '%s' is not compiled with -fpic/-fPIC\n"
 msgstr ""
 
-#: src/findtextrel.c:605
+#: src/findtextrel.c:619
 #, c-format
 msgid ""
 "a relocation modifies memory at offset %llu in a write-protected segment\n"

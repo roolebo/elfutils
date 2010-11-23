@@ -188,6 +188,13 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
+* Mon Nov 22 2010  <drepper@redhat.com> 0.150-1
+- libdw: Fix for handling huge .debug_aranges section.
+- libdwfl: Fix for handling prelinked DSO with separate debug file.
+- findtextrel: Fix diagnostics to work with usual section ordering.
+- libebl: i386 backend fix for multi-register integer return value 
+  location.
+
 * Mon Sep 13 2010  <drepper@redhat.com> 0.149-1
 - libdw: Decode new DW_OP_GNU_implicit_pointer operation;        new 
   function dwarf_getlocation_implicit_pointer.

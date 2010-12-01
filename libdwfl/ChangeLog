@@ -1,3 +1,7 @@
+2010-11-30  Roland McGrath  <roland@redhat.com>
+
+	* derelocate.c (dwfl_module_relocations): Remove over-eager assert.
+
 2010-11-12  Roland McGrath  <roland@redhat.com>
 
 	* libdwflP.h (struct Dwfl_Module): New member main_bias.

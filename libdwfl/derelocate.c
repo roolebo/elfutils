@@ -1,5 +1,5 @@
 /* Recover relocatibility for addresses computed from debug information.
-   Copyright (C) 2005-2009 Red Hat, Inc.
+   Copyright (C) 2005-2010 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -240,7 +240,6 @@ dwfl_module_relocations (Dwfl_Module *mod)
 
     case ET_EXEC:
       assert (mod->main.vaddr == mod->low_addr);
-      assert (mod->debug.address_sync == mod->main.address_sync);
       break;
     }
 

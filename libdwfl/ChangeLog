@@ -1,3 +1,10 @@
+2011-01-04  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_getdwarf.c (open_elf): Enhance address_sync calculation
+	logic to consider section addresses, the better to survive all the
+	possible prelink machinations.
+	* libdwflP.h (struct dwfl_file): Comment change.
+
 2010-11-30  Roland McGrath  <roland@redhat.com>
 
 	* derelocate.c (dwfl_module_relocations): Remove over-eager assert.

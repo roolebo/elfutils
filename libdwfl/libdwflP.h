@@ -1,5 +1,5 @@
 /* Internal definitions for libdwfl.
-   Copyright (C) 2005-2010 Red Hat, Inc.
+   Copyright (C) 2005-2011 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -146,15 +146,7 @@ struct dwfl_file
   GElf_Addr vaddr;
 
   /* This is an address chosen for synchronization between the main file
-     and the debug file.  In a file without phdrs, this is zero.  In
-     other files it is the address at the end of the first PT_LOAD
-     segment.  When prelink converts REL to RELA in an ET_DYN file, it
-     expands the space between the beginning of the segment and the
-     actual code/data addresses.  Since that change wasn't made in the
-     debug file, the distance from p_vaddr to an address of interest (in
-     an st_value or DWARF data) now differs between the main and debug
-     files.  The distance from address_sync to an address of interest
-     remains consistent.  */
+     and the debug file.  See dwfl_module_getdwarf.c for how it's chosen.  */
   GElf_Addr address_sync;
 };
 

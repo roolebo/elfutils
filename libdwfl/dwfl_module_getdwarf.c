@@ -1,5 +1,5 @@
 /* Find debugging and symbol information for a module in libdwfl.
-   Copyright (C) 2005-2010 Red Hat, Inc.
+   Copyright (C) 2005-2011 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -95,10 +95,58 @@ open_elf (Dwfl_Module *mod, struct dwfl_file *file)
 
   if (mod->e_type != ET_REL)
     {
+      /* In any non-ET_REL file, we compute the "synchronization address".
+
+	 We start with the address at the end of the first PT_LOAD
+	 segment.  When prelink converts REL to RELA in an ET_DYN
+	 file, it expands the space between the beginning of the
+	 segment and the actual code/data addresses.  Since that
+	 change wasn't made in the debug file, the distance from
+	 p_vaddr to an address of interest (in an st_value or DWARF
+	 data) now differs between the main and debug files.  The
+	 distance from address_sync to an address of interest remains
+	 consistent.
+
+	 If there are no section headers at all (full stripping), then
+	 the end of the first segment is a valid synchronization address.
+	 This cannot happen in a prelinked file, since prelink itself
+	 relies on section headers for prelinking and for undoing it.
+	 (If you do full stripping on a prelinked file, then you get what
+	 you deserve--you can neither undo the prelinking, nor expect to
+	 line it up with a debug file separated before prelinking.)
+
+	 However, when prelink processes an ET_EXEC file, it can do
+	 something different.  There it juggles the "special" sections
+	 (SHT_DYNSYM et al) to make space for the additional prelink
+	 special sections.  Sometimes it will do this by moving a special
+	 section like .dynstr after the real program sections in the
+	 first PT_LOAD segment--i.e. to the end.  That changes the end
+	 address of the segment, so it no longer lines up correctly and
+	 is not a valid synchronization address to use.
+
+	 So, instead we use a method based on the section headers.  We
+	 look at the allocated SHT_PROGBITS (or SHT_NOBITS) sections.
+	 (Most every file will have some SHT_PROGBITS sections, but it's
+	 possible to have one with nothing but .bss, i.e. SHT_NOBITS.)
+	 The special sections that can be moved around have different
+	 sh_type values--except for .interp, the section that became the
+	 PT_INTERP segment.  So we exclude the SHT_PROGBITS section whose
+	 address matches the PT_INTERP p_vaddr.
+
+	 Since the debug file will always have section headers, we must
+	 choose a method of examining section headers that will also line
+	 up with the end of the first PT_LOAD segment, in case the main
+	 file was fully stripped so we are synchronizing between a
+	 PT_LOAD-based and a section-based calculation.  To that end, we
+	 use the highest section end address that lies inside the first
+	 segment.  If none does, then we use the highest end address of
+	 any non-special section.  */
+
       size_t phnum;
       if (unlikely (elf_getphdrnum (file->elf, &phnum) != 0))
 	goto elf_error;
 
+      GElf_Addr interp = 0;
       file->vaddr = file->address_sync = 0;
       for (size_t i = 0; i < phnum; ++i)
 	{
@@ -106,12 +154,52 @@ open_elf (Dwfl_Module *mod, struct dwfl_file *file)
 	  GElf_Phdr *ph = gelf_getphdr (file->elf, i, &ph_mem);
 	  if (unlikely (ph == NULL))
 	    goto elf_error;
-	  if (ph->p_type == PT_LOAD)
+	  switch (ph->p_type)
 	    {
-	      file->vaddr = ph->p_vaddr & -ph->p_align;
-	      file->address_sync = ph->p_vaddr + ph->p_memsz;
+	    case PT_INTERP:
+	      interp = ph->p_vaddr;
 	      break;
+	    case PT_LOAD:
+	      if (file->address_sync == 0)
+		{
+		  file->vaddr = ph->p_vaddr & -ph->p_align;
+		  file->address_sync = ph->p_vaddr + ph->p_memsz;
+		}
+	      break;
+	    default:
+	      continue;
 	    }
+	  if (interp != 0 && file->address_sync != 0)
+	    break;
+	}
+
+      if (file->address_sync != 0)
+	{
+	  GElf_Addr highest_end = 0;
+	  GElf_Addr highest_end_in_seg = 0;
+	  Elf_Scn *scn = NULL;
+	  while ((scn = elf_nextscn (file->elf, scn)) != NULL)
+	    {
+	      GElf_Shdr sh_mem;
+	      GElf_Shdr *sh = gelf_getshdr (scn, &sh_mem);
+	      if (unlikely (sh == NULL))
+		goto elf_error;
+	      if ((sh->sh_flags & SHF_ALLOC)
+		  && ((sh->sh_type == SHT_PROGBITS && sh->sh_addr != interp)
+		      || sh->sh_type == SHT_NOBITS))
+		{
+		  const GElf_Addr sh_end = sh->sh_addr + sh->sh_size;
+		  if (sh_end > highest_end)
+		    highest_end = sh_end;
+		  if (sh_end <= file->address_sync
+		      && sh_end > highest_end_in_seg)
+		    highest_end_in_seg = sh_end;
+		}
+	    }
+	  if (highest_end_in_seg >= file->vaddr && highest_end_in_seg != 0)
+	    file->address_sync = highest_end_in_seg;
+	  else if (highest_end != 0)
+	    file->address_sync = highest_end;
 	}
     }
 

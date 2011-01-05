@@ -1,3 +1,8 @@
+2011-01-05  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* elf_getdata_rawchunk.c (elf_getdata_rawchunk): Fix off64_t overflow
+	when MAXIMUM_SIZE == ~0.
+
 2010-08-18  Roland McGrath  <roland@redhat.com>
 
 	* gelf_fsize.c (__libelf_type_sizes): Add entries for ELF_T_LIB

@@ -1,5 +1,5 @@
 /* Discard section not used at runtime from object files.
-   Copyright (C) 2000-2010 Red Hat, Inc.
+   Copyright (C) 2000-2011 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -672,9 +672,10 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
   */
   for (cnt = 1; cnt < shnum; ++cnt)
     /* Check whether the section can be removed.  */
-    if (ebl_section_strip_p (ebl, ehdr, &shdr_info[cnt].shdr,
-			     shdr_info[cnt].name, remove_comment,
-			     remove_debug))
+    if (remove_shdrs ? !(shdr_info[cnt].shdr.sh_flags & SHF_ALLOC)
+	: ebl_section_strip_p (ebl, ehdr, &shdr_info[cnt].shdr,
+			       shdr_info[cnt].name, remove_comment,
+			       remove_debug))
       {
 	/* For now assume this section will be removed.  */
 	shdr_info[cnt].idx = 0;
@@ -978,7 +979,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
     goto fail_close;
 
   /* Create the reference to the file with the debug info.  */
-  if (debug_fname != NULL)
+  if (debug_fname != NULL && !remove_shdrs)
     {
       /* Add the section header string table section name.  */
       shdr_info[cnt].se = ebl_strtabadd (shst, ".gnu_debuglink", 15);
@@ -1588,15 +1589,6 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
      we can actually write out the debug file.  */
   if (debug_fname != NULL)
     {
-      uint32_t debug_crc;
-      Elf_Data debug_crc_data =
-	{
-	  .d_type = ELF_T_WORD,
-	  .d_buf = &debug_crc,
-	  .d_size = sizeof (debug_crc),
-	  .d_version = EV_CURRENT
-	};
-
       /* Finally write the file.  */
       if (unlikely (elf_update (debugelf, ELF_C_WRITE) == -1))
 	{
@@ -1619,21 +1611,33 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
       /* The temporary file does not exist anymore.  */
       tmp_debug_fname = NULL;
 
-      /* Compute the checksum which we will add to the executable.  */
-      if (crc32_file (debug_fd, &debug_crc) != 0)
+      if (!remove_shdrs)
 	{
-	  error (0, errno,
-		 gettext ("while computing checksum for debug information"));
-	  unlink (debug_fname);
-	  result = 1;
-	  goto fail_close;
-	}
+	  uint32_t debug_crc;
+	  Elf_Data debug_crc_data =
+	    {
+	      .d_type = ELF_T_WORD,
+	      .d_buf = &debug_crc,
+	      .d_size = sizeof (debug_crc),
+	      .d_version = EV_CURRENT
+	    };
 
-      /* Store it in the debuglink section data.  */
-      if (unlikely (gelf_xlatetof (newelf, &debuglink_crc_data,
-				   &debug_crc_data, ehdr->e_ident[EI_DATA])
-		    != &debuglink_crc_data))
-	INTERNAL_ERROR (fname);
+	  /* Compute the checksum which we will add to the executable.  */
+	  if (crc32_file (debug_fd, &debug_crc) != 0)
+	    {
+	      error (0, errno, gettext ("\
+while computing checksum for debug information"));
+	      unlink (debug_fname);
+	      result = 1;
+	      goto fail_close;
+	    }
+
+	  /* Store it in the debuglink section data.  */
+	  if (unlikely (gelf_xlatetof (newelf, &debuglink_crc_data,
+				       &debug_crc_data, ehdr->e_ident[EI_DATA])
+			!= &debuglink_crc_data))
+	    INTERNAL_ERROR (fname);
+	}
     }
 
   /* Finally finish the ELF header.  Fill in the fields not handled by

@@ -1,3 +1,8 @@
+2011-01-06  Roland McGrath  <roland@redhat.com>
+
+	* strip.c (handle_elf): Under --strip-sections, remove all
+	non-allocated sections and never generate .gnu_debuglink.
+
 2011-01-04  Roland McGrath  <roland@redhat.com>
 
 	* strip.c (remove_shdrs): New variable.

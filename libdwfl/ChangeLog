@@ -1,3 +1,11 @@
+2011-01-11  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_getdwarf.c (open_elf): Remove section-based
+	address_sync fixup from here.
+	(find_prelink_address_sync): New function.
+	(find_debuginfo): Call it.
+	* libdwflP.h (DWFL_ERRORS): Add BAD_PRELINK error.
+
 2011-01-04  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_module_getdwarf.c (open_elf): Enhance address_sync calculation

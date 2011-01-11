@@ -94,7 +94,8 @@
   DWFL_ERROR (ALREADY_ELF, N_("ELF file opened"))			      \
   DWFL_ERROR (BADELF, N_("not a valid ELF file"))			      \
   DWFL_ERROR (WEIRD_TYPE, N_("cannot handle DWARF type description"))	      \
-  DWFL_ERROR (WRONG_ID_ELF, N_("ELF file does not match build ID"))
+  DWFL_ERROR (WRONG_ID_ELF, N_("ELF file does not match build ID"))	      \
+  DWFL_ERROR (BAD_PRELINK, N_("corrupt .gnu.prelink_undo section data"))
 
 #define DWFL_ERROR(name, text) DWFL_E_##name,
 typedef enum { DWFL_ERRORS DWFL_E_NUM } Dwfl_Error;

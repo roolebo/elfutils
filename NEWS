@@ -1,3 +1,9 @@
+Version 0.151
+
+libdwfl: Fix for more prelink cases with separate debug file.
+
+strip: New flag --strip-sections to remove section headers entirely.
+
 Version 0.150
 
 libdw: Fix for handling huge .debug_aranges section.

@@ -1,3 +1,13 @@
+2011-01-10  Josh Stone  <jistone@redhat.com>
+
+	* run-prelink-addr-test.sh: New test for prelinked addrs.
+	* Makefile.am (TESTS, EXTRA_DIST): Add it.
+	* testfile52.so.bz2, testfile52.so.debug.bz2: New data files.
+	* testfile52.prelink.so.bz2: New data file, shows REL->RELA.
+	* testfile53.bz2, testfile53.debug.bz2: New data files.
+	* testfile53.prelink.bz2: New data file, shows ET_EXEC remap.
+	* Makefile.am (EXTRA_DIST): Add them.
+
 2010-06-04  Roland McGrath  <roland@redhat.com>
 
 	* run-unstrip-test.sh: Also test modifying the file in place.

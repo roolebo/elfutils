@@ -83,7 +83,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-dwfl-bug-offline-rel.sh run-dwfl-addr-sect.sh \
 	run-disasm-x86.sh run-disasm-x86-64.sh \
 	run-early-offscn.sh run-dwarf-getmacros.sh \
-	run-test-flag-nobits.sh
+	run-test-flag-nobits.sh run-prelink-addr-test.sh
 # run-show-ciefde.sh
 
 if !STANDALONE
@@ -139,7 +139,10 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile44.S.bz2 testfile44.expect.bz2 run-disasm-x86.sh \
 	     testfile45.S.bz2 testfile45.expect.bz2 run-disasm-x86-64.sh \
 	     testfile46.bz2 testfile47.bz2 testfile48.bz2 testfile48.debug.bz2 \
-	     testfile49.bz2 testfile50.bz2 testfile51.bz2
+	     testfile49.bz2 testfile50.bz2 testfile51.bz2 \
+	     run-prelink-addr-test.sh testfile52.so.bz2 testfile52.so.debug.bz2 \
+	     testfile52.prelink.so.bz2 testfile53.bz2 testfile53.debug.bz2 \
+	     testfile53.prelink.bz2
 
 installed_TESTS_ENVIRONMENT = libdir=$(DESTDIR)$(libdir) \
 			      bindir=$(DESTDIR)$(bindir) \

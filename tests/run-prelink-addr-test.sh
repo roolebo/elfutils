@@ -135,3 +135,74 @@ main+0x2
 main+0x3
 /home/jistone/src/elfutils/tests/testfile53-64.c:2
 EOF
+
+
+# testfile54.c:
+#   extern void * stdin;
+#   static void * pstdin = &stdin;
+#   void * const foo = &pstdin;
+#
+# gcc -m32 -g -shared -nostartfiles testfile54-32.c -o testfile54-32.so
+# eu-strip -f testfile54-32.so.debug testfile54-32.so
+# cp testfile54-32.so testfile54-32.prelink.so
+# prelink -N testfile54-32.prelink.so
+# cp testfile54-32.so testfile54-32.noshdrs.so
+# prelink -r 0x42000000 testfile54-32.noshdrs.so
+# eu-strip --remove-comment --strip-sections testfile54-32.noshdrs.so
+testfiles testfile54-32.so testfile54-32.so.debug
+testfiles testfile54-32.prelink.so testfile54-32.noshdrs.so
+tempfiles testmaps54-32
+
+cat > testmaps54-32 <<EOF
+00111000-00112000 r--p 00000000 fd:01 1 `pwd`/testfile54-32.so
+00112000-00113000 rw-p 00000000 fd:01 1 `pwd`/testfile54-32.so
+41000000-41001000 r--p 00000000 fd:01 2 `pwd`/testfile54-32.prelink.so
+41001000-41002000 rw-p 00000000 fd:01 2 `pwd`/testfile54-32.prelink.so
+42000000-42001000 r--p 00000000 fd:01 3 `pwd`/testfile54-32.noshdrs.so
+42001000-42002000 rw-p 00000000 fd:01 3 `pwd`/testfile54-32.noshdrs.so
+EOF
+
+testrun_compare ../src/addr2line -S -M testmaps54-32 \
+    0x1111fc 0x1122a4 0x410001fd 0x410012a5 0x420001fe <<\EOF
+foo
+??:0
+pstdin
+??:0
+foo+0x1
+??:0
+pstdin+0x1
+??:0
+foo+0x2
+??:0
+EOF
+
+# Repeat testfile64 in 64-bit
+testfiles testfile54-64.so testfile54-64.so.debug
+testfiles testfile54-64.prelink.so testfile54-64.noshdrs.so
+tempfiles testmaps54-64
+
+cat > testmaps54-64 <<EOF
+1000000000-1000001000 r--p 00000000 fd:11 1 `pwd`/testfile54-64.so
+1000001000-1000200000 ---p 00001000 fd:11 1 `pwd`/testfile54-64.so
+1000200000-1000201000 rw-p 00000000 fd:11 1 `pwd`/testfile54-64.so
+3000000000-3000001000 r--p 00000000 fd:11 2 `pwd`/testfile54-64.prelink.so
+3000001000-3000200000 ---p 00001000 fd:11 2 `pwd`/testfile54-64.prelink.so
+3000200000-3000201000 rw-p 00000000 fd:11 2 `pwd`/testfile54-64.prelink.so
+3800000000-3800001000 r--p 00000000 fd:11 3 `pwd`/testfile54-64.noshdrs.so
+3800001000-3800200000 ---p 00001000 fd:11 3 `pwd`/testfile54-64.noshdrs.so
+3800200000-3800201000 rw-p 00000000 fd:11 3 `pwd`/testfile54-64.noshdrs.so
+EOF
+
+testrun_compare ../src/addr2line -S -M testmaps54-64 \
+    0x10000002f8 0x1000200448 0x30000002f9 0x3000200449 0x38000002fa <<\EOF
+foo
+??:0
+pstdin
+??:0
+foo+0x1
+??:0
+pstdin+0x1
+??:0
+foo+0x2
+??:0
+EOF

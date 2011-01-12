@@ -1,5 +1,12 @@
 2011-01-11  Josh Stone  <jistone@redhat.com>
 
+	* run-prelink-addr-test.sh: Add testfile54, 32 and 64-bit.
+	* testfile54-32.so.bz2, testfile54-32.so.debug.bz2,
+	testfile54-32.prelink.so.bz2, testfile54-32.noshdrs.so.bz2,
+	testfile54-64.so.bz2, testfile54-64.so.debug.bz2,
+	testfile54-64.prelink.so.bz2, testfile54-64.noshdrs.so.bz2: New.
+	* Makefile.am (EXTRA_DIST): Add and update all.
+
 	* run-prelink-addr-test.sh: Run 32 and 64-bit testfile53 tests.
 	* testfile53.bz2, testfile53.debug.bz2,
 	testfile53.prelink.bz2: Deleted, so...

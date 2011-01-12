@@ -30,34 +30,66 @@
 #   #include <stdlib.h>
 #   int foo() { exit(0); }
 #
-# gcc -m32 -g -shared testfile52.c -o testfile52.so
-# eu-strip -f testfile52.so.debug testfile52.so
-# cp testfile52.so testfile52.prelink.so
-# prelink -N testfile52.prelink.so
+# gcc -m32 -g -shared testfile52-32.c -o testfile52-32.so
+# eu-strip -f testfile52-32.so.debug testfile52-32.so
+# cp testfile52-32.so testfile52-32.prelink.so
+# prelink -N testfile52-32.prelink.so
+# cp testfile52-32.so testfile52-32.noshdrs.so
+# prelink -r 0x42000000 testfile52-32.noshdrs.so
+# eu-strip --remove-comment --strip-sections testfile52-32.noshdrs.so
 
-testfiles testfile52.so testfile52.prelink.so testfile52.so.debug
-tempfiles testmaps52
+testfiles testfile52-32.so testfile52-32.so.debug
+testfiles testfile52-32.prelink.so testfile52-32.noshdrs.so
+tempfiles testmaps52-32
 
-cat > testmaps52 <<EOF
-00110000-00111000 r-xp 00000000 00:00 0 [vdso]
-00111000-00112000 r-xp 00000000 fd:01 1 `pwd`/testfile52.so
-00112000-00113000 rw-p 00000000 fd:01 1 `pwd`/testfile52.so
-41000000-41001000 r-xp 00000000 fd:01 2 `pwd`/testfile52.prelink.so
-41001000-41002000 rw-p 00000000 fd:01 2 `pwd`/testfile52.prelink.so
-4718e000-47191000 rw-p 00000000 00:00 0
-f7fda000-f7fdb000 rw-p 00000000 00:00 0
-f7ffd000-f7ffe000 rw-p 00000000 00:00 0
-fffdd000-ffffe000 rw-p 00000000 00:00 0 [stack]
+cat > testmaps52-32 <<EOF
+00111000-00112000 r-xp 00000000 fd:01 1 `pwd`/testfile52-32.so
+00112000-00113000 rw-p 00000000 fd:01 1 `pwd`/testfile52-32.so
+41000000-41001000 r-xp 00000000 fd:01 2 `pwd`/testfile52-32.prelink.so
+41001000-41002000 rw-p 00000000 fd:01 2 `pwd`/testfile52-32.prelink.so
+42000000-42001000 r-xp 00000000 fd:01 3 `pwd`/testfile52-32.noshdrs.so
+42001000-42002000 rw-p 00000000 fd:01 3 `pwd`/testfile52-32.noshdrs.so
 EOF
 
 # Prior to commit 1743d7f, libdwfl would fail on the second address,
 # because it didn't notice that prelink added a 0x20-byte offset from
 # what the .debug file reports.
-testrun_compare ../src/addr2line -S -M testmaps52 0x11140c 0x4100042d <<\EOF
+testrun_compare ../src/addr2line -S -M testmaps52-32 \
+    0x11140c 0x4100042d 0x4200040e <<\EOF
 foo
-/home/jistone/src/elfutils/tests/testfile52.c:2
+/home/jistone/src/elfutils/tests/testfile52-32.c:2
 foo+0x1
-/home/jistone/src/elfutils/tests/testfile52.c:2
+/home/jistone/src/elfutils/tests/testfile52-32.c:2
+foo+0x2
+??:0
+EOF
+
+# Repeat testfile52 for -m64.  The particular REL>RELA issue doesn't exist, but
+# we'll make sure the rest works anyway.
+testfiles testfile52-64.so testfile52-64.so.debug
+testfiles testfile52-64.prelink.so testfile52-64.noshdrs.so
+tempfiles testmaps52-64
+
+cat > testmaps52-64 <<EOF
+1000000000-1000001000 r-xp 00000000 fd:11 1 `pwd`/testfile52-64.so
+1000001000-1000200000 ---p 00001000 fd:11 1 `pwd`/testfile52-64.so
+1000200000-1000201000 rw-p 00000000 fd:11 1 `pwd`/testfile52-64.so
+3000000000-3000001000 r-xp 00000000 fd:11 2 `pwd`/testfile52-64.prelink.so
+3000001000-3000200000 ---p 00001000 fd:11 2 `pwd`/testfile52-64.prelink.so
+3000200000-3000201000 rw-p 00000000 fd:11 2 `pwd`/testfile52-64.prelink.so
+3800000000-3800001000 r-xp 00000000 fd:11 3 `pwd`/testfile52-64.noshdrs.so
+3800001000-3800200000 ---p 00001000 fd:11 3 `pwd`/testfile52-64.noshdrs.so
+3800200000-3800201000 rw-p 00000000 fd:11 3 `pwd`/testfile52-64.noshdrs.so
+EOF
+
+testrun_compare ../src/addr2line -S -M testmaps52-64 \
+    0x100000056c 0x300000056d 0x380000056e <<\EOF
+foo
+/home/jistone/src/elfutils/tests/testfile52-64.c:2
+foo+0x1
+/home/jistone/src/elfutils/tests/testfile52-64.c:2
+foo+0x2
+??:0
 EOF
 
 

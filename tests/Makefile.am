@@ -140,9 +140,12 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile45.S.bz2 testfile45.expect.bz2 run-disasm-x86-64.sh \
 	     testfile46.bz2 testfile47.bz2 testfile48.bz2 testfile48.debug.bz2 \
 	     testfile49.bz2 testfile50.bz2 testfile51.bz2 \
-	     run-prelink-addr-test.sh testfile52.so.bz2 testfile52.so.debug.bz2 \
-	     testfile52.prelink.so.bz2 testfile53.bz2 testfile53.debug.bz2 \
-	     testfile53.prelink.bz2
+	     run-prelink-addr-test.sh \
+	     testfile52-32.so.bz2 testfile52-32.so.debug.bz2 \
+	     testfile52-32.prelink.so.bz2 testfile52-32.noshdrs.so.bz2 \
+	     testfile52-64.so.bz2 testfile52-64.so.debug.bz2 \
+	     testfile52-64.prelink.so.bz2 testfile52-64.noshdrs.so.bz2 \
+	     testfile53.bz2 testfile53.debug.bz2 testfile53.prelink.bz2
 
 installed_TESTS_ENVIRONMENT = libdir=$(DESTDIR)$(libdir) \
 			      bindir=$(DESTDIR)$(bindir) \

@@ -40,7 +40,8 @@
 
 testfiles testfile52-32.so testfile52-32.so.debug
 testfiles testfile52-32.prelink.so testfile52-32.noshdrs.so
-tempfiles testmaps52-32
+tempfiles testmaps52-32 testfile52-32.noshdrs.so.debug
+ln -s testfile52-32.so.debug testfile52-32.noshdrs.so.debug
 
 cat > testmaps52-32 <<EOF
 00111000-00112000 r-xp 00000000 fd:01 1 `pwd`/testfile52-32.so
@@ -61,14 +62,15 @@ foo
 foo+0x1
 /home/jistone/src/elfutils/tests/testfile52-32.c:2
 foo+0x2
-??:0
+/home/jistone/src/elfutils/tests/testfile52-32.c:2
 EOF
 
 # Repeat testfile52 for -m64.  The particular REL>RELA issue doesn't exist, but
 # we'll make sure the rest works anyway.
 testfiles testfile52-64.so testfile52-64.so.debug
 testfiles testfile52-64.prelink.so testfile52-64.noshdrs.so
-tempfiles testmaps52-64
+tempfiles testmaps52-64 testfile52-64.noshdrs.so.debug
+ln -s testfile52-64.so.debug testfile52-64.noshdrs.so.debug
 
 cat > testmaps52-64 <<EOF
 1000000000-1000001000 r-xp 00000000 fd:11 1 `pwd`/testfile52-64.so
@@ -89,7 +91,7 @@ foo
 foo+0x1
 /home/jistone/src/elfutils/tests/testfile52-64.c:2
 foo+0x2
-??:0
+/home/jistone/src/elfutils/tests/testfile52-64.c:2
 EOF
 
 
@@ -151,7 +153,8 @@ EOF
 # eu-strip --remove-comment --strip-sections testfile54-32.noshdrs.so
 testfiles testfile54-32.so testfile54-32.so.debug
 testfiles testfile54-32.prelink.so testfile54-32.noshdrs.so
-tempfiles testmaps54-32
+tempfiles testmaps54-32 testfile54-32.noshdrs.so.debug
+ln -s testfile54-32.so.debug testfile54-32.noshdrs.so.debug
 
 cat > testmaps54-32 <<EOF
 00111000-00112000 r--p 00000000 fd:01 1 `pwd`/testfile54-32.so
@@ -179,7 +182,8 @@ EOF
 # Repeat testfile64 in 64-bit
 testfiles testfile54-64.so testfile54-64.so.debug
 testfiles testfile54-64.prelink.so testfile54-64.noshdrs.so
-tempfiles testmaps54-64
+tempfiles testmaps54-64 testfile54-64.noshdrs.so.debug
+ln -s testfile54-64.so.debug testfile54-64.noshdrs.so.debug
 
 cat > testmaps54-64 <<EOF
 1000000000-1000001000 r--p 00000000 fd:11 1 `pwd`/testfile54-64.so

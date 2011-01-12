@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ja\n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2010-11-22 22:08-0500\n"
+"POT-Creation-Date: 2011-01-12 17:51-0500\n"
 "PO-Revision-Date: 2009-09-20 15:32+0900\n"
 "Last-Translator: Hyu_gabaru Ryu_ichi <hyu_gabaru@yahoo.co.jp>\n"
 "Language-Team: Japanese <jp@li.org>\n"
@@ -365,6 +365,11 @@ msgstr "Elf 記述子を生成できません: %s"
 msgid "ELF file does not match build ID"
 msgstr ""
 
+#: libdwfl/libdwflP.h:98
+#, fuzzy
+msgid "corrupt .gnu.prelink_undo section data"
+msgstr "ラインデータセクションデータを得られません: %s"
+
 #: libebl/eblbackendname.c:63
 msgid "No backend"
 msgstr "バックエンドがありません"
@@ -596,7 +601,7 @@ msgstr ""
 #: src/addr2line.c:189 src/ar.c:289 src/elfcmp.c:555 src/elflint.c:239
 #: src/findtextrel.c:170 src/ld.c:957 src/nm.c:253 src/objdump.c:181
 #: src/ranlib.c:136 src/readelf.c:456 src/size.c:219 src/strings.c:227
-#: src/strip.c:204 src/unstrip.c:234
+#: src/strip.c:210 src/unstrip.c:234
 #, c-format
 msgid ""
 "Copyright (C) %s Red Hat, Inc.\n"
@@ -610,7 +615,7 @@ msgstr ""
 #: src/addr2line.c:194 src/ar.c:294 src/elfcmp.c:560 src/elflint.c:244
 #: src/findtextrel.c:175 src/ld.c:962 src/nm.c:258 src/objdump.c:186
 #: src/ranlib.c:141 src/readelf.c:461 src/size.c:224 src/strings.c:232
-#: src/strip.c:209 src/unstrip.c:239
+#: src/strip.c:215 src/unstrip.c:239
 #, c-format
 msgid "Written by %s.\n"
 msgstr "%s によって書かれました。\n"
@@ -1014,7 +1019,7 @@ msgstr ""
 
 #: src/elfcmp.c:607 src/findtextrel.c:229 src/ldgeneric.c:1767
 #: src/ldgeneric.c:4257 src/nm.c:363 src/ranlib.c:169 src/size.c:301
-#: src/strings.c:183 src/strip.c:433 src/strip.c:468 src/unstrip.c:1913
+#: src/strings.c:183 src/strip.c:443 src/strip.c:478 src/unstrip.c:1913
 #: src/unstrip.c:1942
 #, c-format
 msgid "cannot open '%s'"
@@ -2751,7 +2756,7 @@ msgid "Locate source of text relocations in FILEs (a.out by default)."
 msgstr ""
 
 #: src/findtextrel.c:84 src/nm.c:111 src/objdump.c:80 src/size.c:92
-#: src/strings.c:92 src/strip.c:97
+#: src/strings.c:92 src/strip.c:100
 msgid "[FILE...]"
 msgstr "[ふぁいる...]"
 
@@ -3244,7 +3249,7 @@ msgstr ""
 "警告: `%1$s の大きさが %3$s の %2$<PRIu64> から %5$s の %4$<PRIu64> に変更さ"
 "れました"
 
-#: src/ldgeneric.c:661 src/ldgeneric.c:1122 src/readelf.c:636 src/strip.c:543
+#: src/ldgeneric.c:661 src/ldgeneric.c:1122 src/readelf.c:636 src/strip.c:553
 #, c-format
 msgid "cannot determine number of sections: %s"
 msgstr "セクション数を決定できません: %s"
@@ -3549,7 +3554,7 @@ msgstr "バージョン '%2$s' 用のローカルとグローバルで宣言さ�
 msgid "default visibility set as local and global"
 msgstr "ローカルとグローバルに設定されたデフォルトの可視性"
 
-#: src/nm.c:74 src/strip.c:73
+#: src/nm.c:74 src/strip.c:74
 msgid "Output selection:"
 msgstr "出力選択:"
 
@@ -3613,7 +3618,7 @@ msgstr "弱いシンボルに印を点ける"
 msgid "Print size of defined symbols"
 msgstr "定義されたシンボルの印刷サイズ"
 
-#: src/nm.c:98 src/size.c:80 src/strip.c:78 src/unstrip.c:81
+#: src/nm.c:98 src/size.c:80 src/strip.c:79 src/unstrip.c:81
 msgid "Output options:"
 msgstr "出力オプション:"
 
@@ -3633,18 +3638,18 @@ msgstr "並べ替えの意味を逆にする"
 msgid "List symbols from FILEs (a.out by default)."
 msgstr "ふぁいる からシンボルを表示 (デフォルトではa.out)。"
 
-#: src/nm.c:136 src/objdump.c:105 src/size.c:117 src/strip.c:121
+#: src/nm.c:136 src/objdump.c:105 src/size.c:117 src/strip.c:124
 #, c-format
 msgid "%s: INTERNAL ERROR %d (%s-%s): %s"
 msgstr "%s: 内部エラー %d (%s-%s): %s"
 
 #: src/nm.c:380 src/nm.c:392 src/size.c:317 src/size.c:326 src/size.c:337
-#: src/strip.c:1816
+#: src/strip.c:1878
 #, c-format
 msgid "while closing '%s'"
 msgstr "'%s' を閉じている最中"
 
-#: src/nm.c:402 src/objdump.c:296 src/strip.c:359
+#: src/nm.c:402 src/objdump.c:296 src/strip.c:369
 #, c-format
 msgid "%s: File format not recognized"
 msgstr "%s: ファイル形式を認識できませんでした"
@@ -3687,7 +3692,7 @@ msgstr "検索ツリーを生成できません"
 #: src/readelf.c:1742 src/readelf.c:1952 src/readelf.c:2206 src/readelf.c:2272
 #: src/readelf.c:2350 src/readelf.c:2848 src/readelf.c:2884 src/readelf.c:2946
 #: src/readelf.c:6934 src/readelf.c:7832 src/readelf.c:7979 src/readelf.c:8047
-#: src/size.c:425 src/size.c:499 src/strip.c:483
+#: src/size.c:425 src/size.c:499 src/strip.c:493
 #, c-format
 msgid "cannot get section header string table index"
 msgstr "セクションヘッダー文字列テーブル索引が得られません"
@@ -5555,149 +5560,158 @@ msgstr ""
 msgid "mprotect failed"
 msgstr ""
 
-#: src/strip.c:74
+#: src/strip.c:75
 msgid "Place stripped output into FILE"
 msgstr "はぎ取った出力を ふぁいる に置く"
 
-#: src/strip.c:75
+#: src/strip.c:76
 msgid "Extract the removed sections into FILE"
 msgstr "抽出した取り除いたセクションを ふぁいる に置く"
 
-#: src/strip.c:76
+#: src/strip.c:77
 msgid "Embed name FILE instead of -f argument"
 msgstr "-f パラメーターの代わりに 名前 ふぁいる を有効にする"
 
-#: src/strip.c:80
+#: src/strip.c:81
 msgid "Remove all debugging symbols"
 msgstr "デバッグ用のシンボルを全て取り除く"
 
-#: src/strip.c:84
+#: src/strip.c:85
+msgid "Remove section headers (not recommended)"
+msgstr ""
+
+#: src/strip.c:87
 msgid "Copy modified/access timestamps to the output"
 msgstr "修正/アクセスタイムスタンプを出力へ複写する"
 
-#: src/strip.c:86
+#: src/strip.c:89
 msgid "Remove .comment section"
 msgstr ".comment セクションを取り除く"
 
-#: src/strip.c:89
+#: src/strip.c:92
 msgid "Relax a few rules to handle slightly broken ELF files"
 msgstr "少し壊れた ELF ファイルを取り扱うためにルールを少し緩和する"
 
-#: src/strip.c:94
+#: src/strip.c:97
 msgid "Discard symbols from object files."
 msgstr "オブジェクトファイルからシンボルを破棄する"
 
-#: src/strip.c:186
+#: src/strip.c:192
 #, c-format
 msgid "Only one input file allowed together with '-o' and '-f'"
 msgstr "'-o' と '-f' と一緒の場合は入力ファイルは 1 つしか認められません"
 
-#: src/strip.c:222
+#: src/strip.c:228
 #, c-format
 msgid "-f option specified twice"
 msgstr "-f オプションが 2 回指定されています"
 
-#: src/strip.c:231
+#: src/strip.c:237
 #, c-format
 msgid "-F option specified twice"
 msgstr "-F オプションが 2 回指定されています"
 
-#: src/strip.c:240 src/unstrip.c:125
+#: src/strip.c:246 src/unstrip.c:125
 #, c-format
 msgid "-o option specified twice"
 msgstr "-o オプションが 2 回指定されています"
 
-#: src/strip.c:260
+#: src/strip.c:266
 #, c-format
 msgid "-R option supports only .comment section"
 msgstr "-R オプションは .comment セクションのみをサポートします"
 
-#: src/strip.c:298 src/strip.c:322
+#: src/strip.c:308 src/strip.c:332
 #, c-format
 msgid "cannot stat input file '%s'"
 msgstr "入力ファイル '%s' を stat できません"
 
-#: src/strip.c:312
+#: src/strip.c:322
 #, c-format
 msgid "while opening '%s'"
 msgstr "'%s' を開いている間"
 
-#: src/strip.c:350
+#: src/strip.c:360
 #, c-format
 msgid "%s: cannot use -o or -f when stripping archive"
 msgstr "%s: アーカイブから抜き出している時は -o や -f は使えません"
 
-#: src/strip.c:448
+#: src/strip.c:458
 #, c-format
 msgid "cannot open EBL backend"
 msgstr "EBL バックエンドを開けません"
 
-#: src/strip.c:498 src/strip.c:522
+#: src/strip.c:508 src/strip.c:532
 #, c-format
 msgid "cannot create new file '%s': %s"
 msgstr "新しいファイル '%s' を生成できません: %s"
 
-#: src/strip.c:582
+#: src/strip.c:592
 #, c-format
 msgid "illformed file '%s'"
 msgstr "不適格なファイル '%s'"
 
-#: src/strip.c:869 src/strip.c:956
+#: src/strip.c:880 src/strip.c:967
 #, c-format
 msgid "while generating output file: %s"
 msgstr "出力ファイルを生成している間: %s"
 
-#: src/strip.c:929 src/strip.c:1668
+#: src/strip.c:940 src/strip.c:1683
 #, c-format
 msgid "%s: error while creating ELF header: %s"
 msgstr "%s: ELF ヘッダーを生成している間にエラー: %s"
 
-#: src/strip.c:943
+#: src/strip.c:954
 #, c-format
 msgid "while preparing output for '%s'"
 msgstr "'%s' のための出力を準備している間"
 
-#: src/strip.c:994 src/strip.c:1050
+#: src/strip.c:1005 src/strip.c:1061
 #, c-format
 msgid "while create section header section: %s"
 msgstr "セクションヘッダーセクションを生成している間: %s"
 
-#: src/strip.c:1000
+#: src/strip.c:1011
 #, c-format
 msgid "cannot allocate section data: %s"
 msgstr "セクションデータを割り当てられません: %s"
 
-#: src/strip.c:1059
+#: src/strip.c:1070
 #, c-format
 msgid "while create section header string table: %s"
 msgstr "セクションヘッダー文字列テーブルを生成中: %s"
 
-#: src/strip.c:1593 src/strip.c:1690
+#: src/strip.c:1595 src/strip.c:1705
 #, c-format
 msgid "while writing '%s': %s"
 msgstr "'%s' を書込み中: %s"
 
-#: src/strip.c:1604
+#: src/strip.c:1606
 #, c-format
 msgid "while creating '%s'"
 msgstr "'%s' を生成中"
 
-#: src/strip.c:1616
+#: src/strip.c:1628
 #, c-format
 msgid "while computing checksum for debug information"
 msgstr "デバッグ情報のチェックサムを計算中"
 
-#: src/strip.c:1676
+#: src/strip.c:1691
 #, c-format
 msgid "%s: error while reading the file: %s"
 msgstr "%s: ファイルを読込み中にエラー: %s"
 
-#: src/strip.c:1722 src/strip.c:1729
+#: src/strip.c:1730 src/strip.c:1750
+#, fuzzy, c-format
+msgid "while writing '%s'"
+msgstr "'%s' を書込み中: %s"
+
+#: src/strip.c:1784 src/strip.c:1791
 #, c-format
 msgid "error while finishing '%s': %s"
 msgstr "'%s' の終了中にエラー: %s"
 
-#: src/strip.c:1752 src/strip.c:1809
+#: src/strip.c:1814 src/strip.c:1871
 #, c-format
 msgid "cannot set access and modification date of '%s'"
 msgstr "'%s' のアクセスと変更日付を設定できません"

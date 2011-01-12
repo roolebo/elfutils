@@ -188,7 +188,11 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
-* Mon Nov 22 2010  <drepper@redhat.com> 0.150-1
+* Wed Jan 12 2011  <drepper@gmail.com> 0.151-1
+- libdwfl: Fix for more prelink cases with separate debug file.
+- strip: New flag --strip-sections to remove section headers entirely.
+
+* Mon Nov 22 2010  <drepper@gmail.com> 0.150-1
 - libdw: Fix for handling huge .debug_aranges section.
 - libdwfl: Fix for handling prelinked DSO with separate debug file.
 - findtextrel: Fix diagnostics to work with usual section ordering.

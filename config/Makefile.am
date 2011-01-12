@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
 ## Configure input file for elfutils.
 ##
-## Copyright (C) 2004, 2005, 2008, 2009 Red Hat, Inc.
+## Copyright (C) 2004, 2005, 2008, 2009, 2011 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -33,7 +33,7 @@ $(srcdir)/elfutils.spec.in: $(top_srcdir)/NEWS
 	date +'* %a %b %e %Y' | tr '[\n]' '[ ]' > $$tmpname; \
 	getent passwd "$$(whoami)" | \
 	  awk 'BEGIN {FS=":"} { printf $$5; exit 0}' >> $$tmpname; \
-	echo -n " <$$(whoami)@redhat.com> " >> $$tmpname; \
+	echo -n " <$$(whoami)@gmail.com> " >> $$tmpname; \
 	awk '\
 	  $$1 == "Version" && started { exit } \
 	  $$1 == "Version" { started=1; line=""; sub(/:/,"",$$2); \

@@ -1,7 +1,7 @@
 2011-01-12  Roland McGrath  <roland@redhat.com>
 
 	* run-prelink-addr-test.sh: Make symlinks to find .debug files
-	corresponding to noshdrs files.
+	corresponding to .noshdrs files.
 
 2011-01-11  Josh Stone  <jistone@redhat.com>
 

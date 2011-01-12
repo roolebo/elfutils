@@ -153,8 +153,10 @@ EOF
 # eu-strip --remove-comment --strip-sections testfile54-32.noshdrs.so
 testfiles testfile54-32.so testfile54-32.so.debug
 testfiles testfile54-32.prelink.so testfile54-32.noshdrs.so
-tempfiles testmaps54-32 testfile54-32.noshdrs.so.debug
-ln -s testfile54-32.so.debug testfile54-32.noshdrs.so.debug
+tempfiles testmaps54-32
+
+# Note we have no testfile54-32.noshdrs.so.debug link here, so
+# this is testing finding the symbols in .dynsym via PT_DYNAMIC.
 
 cat > testmaps54-32 <<EOF
 00111000-00112000 r--p 00000000 fd:01 1 `pwd`/testfile54-32.so
@@ -182,8 +184,10 @@ EOF
 # Repeat testfile64 in 64-bit
 testfiles testfile54-64.so testfile54-64.so.debug
 testfiles testfile54-64.prelink.so testfile54-64.noshdrs.so
-tempfiles testmaps54-64 testfile54-64.noshdrs.so.debug
-ln -s testfile54-64.so.debug testfile54-64.noshdrs.so.debug
+tempfiles testmaps54-64
+
+# Note we have no testfile54-64.noshdrs.so.debug link here, so
+# this is testing finding the symbols in .dynsym via PT_DYNAMIC.
 
 cat > testmaps54-64 <<EOF
 1000000000-1000001000 r--p 00000000 fd:11 1 `pwd`/testfile54-64.so

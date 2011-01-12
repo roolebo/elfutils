@@ -1,5 +1,14 @@
 2011-01-11  Josh Stone  <jistone@redhat.com>
 
+	* run-prelink-addr-test.sh: Run 32 and 64-bit testfile53 tests.
+	* testfile53.bz2, testfile53.debug.bz2,
+	testfile53.prelink.bz2: Deleted, so...
+	* testfile53-64.bz2, testfile53-64.debug.bz2,
+	testfile53-64.prelink.bz2: Recreated with 64-bit names.
+	* testfile53-32.bz2, testfile53-32.debug.bz2,
+	testfile53-32.prelink.bz2: New in 32-bit.
+	* Makefile.am (EXTRA_DIST): Add and update all.
+
 	* run-prelink-addr-test.sh: Run 32 and 64-bit testfile52 tests.
 	* testfile52.so.bz2, testfile52.so.debug.bz2,
 	testfile52.prelink.so.bz2: Deleted, so...

@@ -94,26 +94,44 @@ EOF
 
 
 # testfile53.c:
-#   char foo[2000];
+#   char foo[0x1000];
 #   int main() { return 0; }
 #
-# gcc -g testfile53.c -o testfile53
-# eu-strip -f testfile53.debug testfile53
-# cp testfile53 testfile53.prelinked
-# prelink -N testfile53.prelinked
-testfiles testfile53 testfile53.prelink testfile53.debug
+# gcc -m32 -g testfile53-32.c -o testfile53-32
+# eu-strip -f testfile53-32.debug testfile53-32
+# cp testfile53-32 testfile53-32.prelink
+# prelink -N testfile53-32.prelink
+testfiles testfile53-32 testfile53-32.debug testfile53-32.prelink
 
-testrun_compare ../src/addr2line -S -e testfile53 0x400474 0x400475 <<\EOF
+testrun_compare ../src/addr2line -S -e testfile53-32 0x8048394 0x8048395 <<\EOF
 main
-/home/jistone/src/elfutils/tests/testfile53.c:2
+/home/jistone/src/elfutils/tests/testfile53-32.c:2
 main+0x1
-/home/jistone/src/elfutils/tests/testfile53.c:2
+/home/jistone/src/elfutils/tests/testfile53-32.c:2
 EOF
 
 # prelink shuffled some of the sections, but .text is in the same place.
-testrun_compare ../src/addr2line -S -e testfile53.prelink 0x400476 0x400477 <<\EOF
+testrun_compare ../src/addr2line -S -e testfile53-32.prelink 0x8048396 0x8048397 <<\EOF
 main+0x2
-/home/jistone/src/elfutils/tests/testfile53.c:2
+/home/jistone/src/elfutils/tests/testfile53-32.c:2
 main+0x3
-/home/jistone/src/elfutils/tests/testfile53.c:2
+/home/jistone/src/elfutils/tests/testfile53-32.c:2
+EOF
+
+# Repeat testfile53 in 64-bit, except use foo[0x800] to achieve the same
+# prelink section shuffling.
+testfiles testfile53-64 testfile53-64.debug testfile53-64.prelink
+
+testrun_compare ../src/addr2line -S -e testfile53-64 0x400474 0x400475 <<\EOF
+main
+/home/jistone/src/elfutils/tests/testfile53-64.c:2
+main+0x1
+/home/jistone/src/elfutils/tests/testfile53-64.c:2
+EOF
+
+testrun_compare ../src/addr2line -S -e testfile53-64.prelink 0x400476 0x400477 <<\EOF
+main+0x2
+/home/jistone/src/elfutils/tests/testfile53-64.c:2
+main+0x3
+/home/jistone/src/elfutils/tests/testfile53-64.c:2
 EOF

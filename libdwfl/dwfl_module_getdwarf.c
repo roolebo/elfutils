@@ -395,11 +395,29 @@ find_prelink_address_sync (Dwfl_Module *mod)
      the SHT_PROGBITS section whose address matches the PT_INTERP p_vaddr.
      For this reason, we must examine the phdrs first to find PT_INTERP.  */
 
+  GElf_Addr main_interp = 0;
+  {
+    size_t main_phnum;
+    if (unlikely (elf_getphdrnum (mod->main.elf, &main_phnum)))
+      return DWFL_E_LIBELF;
+    for (size_t i = 0; i < main_phnum; ++i)
+      {
+	GElf_Phdr phdr;
+	if (unlikely (gelf_getphdr (mod->main.elf, i, &phdr) == NULL))
+	  return DWFL_E_LIBELF;
+	if (phdr.p_type == PT_INTERP)
+	  {
+	    main_interp = phdr.p_vaddr;
+	    break;
+	  }
+      }
+  }
+
   src.d_buf += src.d_size;
   src.d_type = ELF_T_PHDR;
   src.d_size = phnum * phentsize;
 
-  GElf_Addr interp = 0;
+  GElf_Addr undo_interp = 0;
   {
     union
     {
@@ -416,7 +434,7 @@ find_prelink_address_sync (Dwfl_Module *mod)
 	for (uint_fast16_t i = 0; i < phnum; ++i)
 	  if (phdr.p32[i].p_type == PT_INTERP)
 	    {
-	      interp = phdr.p32[i].p_vaddr;
+	      undo_interp = phdr.p32[i].p_vaddr;
 	      break;
 	    }
       }
@@ -425,11 +443,14 @@ find_prelink_address_sync (Dwfl_Module *mod)
 	for (uint_fast16_t i = 0; i < phnum; ++i)
 	  if (phdr.p64[i].p_type == PT_INTERP)
 	    {
-	      interp = phdr.p64[i].p_vaddr;
+	      undo_interp = phdr.p64[i].p_vaddr;
 	      break;
 	    }
       }
   }
+
+  if (unlikely ((main_interp == 0) != (undo_interp == 0)))
+    return DWFL_E_BAD_PRELINK;
 
   src.d_buf += src.d_size;
   src.d_type = ELF_T_SHDR;
@@ -455,7 +476,8 @@ find_prelink_address_sync (Dwfl_Module *mod)
 
   GElf_Addr highest;
 
-  inline void consider_shdr (GElf_Word sh_type,
+  inline void consider_shdr (GElf_Addr interp,
+			     GElf_Word sh_type,
 			     GElf_Xword sh_flags,
 			     GElf_Addr sh_addr)
   {
@@ -476,7 +498,7 @@ find_prelink_address_sync (Dwfl_Module *mod)
       GElf_Shdr *sh = gelf_getshdr (scn, &sh_mem);
       if (unlikely (sh == NULL))
 	return DWFL_E_LIBELF;
-      consider_shdr (sh->sh_type, sh->sh_flags, sh->sh_addr);
+      consider_shdr (main_interp, sh->sh_type, sh->sh_flags, sh->sh_addr);
     }
   if (highest > mod->main.vaddr)
     {
@@ -485,12 +507,12 @@ find_prelink_address_sync (Dwfl_Module *mod)
       highest = 0;
       if (ehdr.e32.e_ident[EI_CLASS] == ELFCLASS32)
 	for (size_t i = 0; i < shnum - 1; ++i)
-	  consider_shdr (shdr.s32[i].sh_type, shdr.s32[i].sh_flags,
-			 shdr.s32[i].sh_addr);
+	  consider_shdr (undo_interp, shdr.s32[i].sh_type,
+			 shdr.s32[i].sh_flags, shdr.s32[i].sh_addr);
       else
 	for (size_t i = 0; i < shnum - 1; ++i)
-	  consider_shdr (shdr.s64[i].sh_type, shdr.s64[i].sh_flags,
-			 shdr.s64[i].sh_addr);
+	  consider_shdr (undo_interp, shdr.s64[i].sh_type,
+			 shdr.s64[i].sh_flags, shdr.s64[i].sh_addr);
 
       if (highest > mod->debug.vaddr)
 	mod->debug.address_sync = highest;

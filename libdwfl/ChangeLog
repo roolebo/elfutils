@@ -1,5 +1,8 @@
 2011-02-01  Roland McGrath  <roland@redhat.com>
 
+	* dwfl_module_getdwarf.c (find_prelink_address_sync): Discover
+	PT_INTERP p_vaddr separately from main phdrs and undo phdrs.
+
 	* dwfl_module_getdwarf.c (find_prelink_address_sync): Fix pasto in
 	last change, so we recognize PT_INTERP in ELFCLASS64 correctly.
 

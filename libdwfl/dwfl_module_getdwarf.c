@@ -423,9 +423,9 @@ find_prelink_address_sync (Dwfl_Module *mod)
     else
       {
 	for (uint_fast16_t i = 0; i < phnum; ++i)
-	  if (phdr.p32[i].p_type == PT_INTERP)
+	  if (phdr.p64[i].p_type == PT_INTERP)
 	    {
-	      interp = phdr.p32[i].p_vaddr;
+	      interp = phdr.p64[i].p_vaddr;
 	      break;
 	    }
       }

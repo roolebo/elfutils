@@ -1,3 +1,8 @@
+2011-02-01  Roland McGrath  <roland@redhat.com>
+
+	* dwfl_module_getdwarf.c (find_prelink_address_sync): Fix pasto in
+	last change, so we recognize PT_INTERP in ELFCLASS64 correctly.
+
 2011-01-11  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_module_getdwarf.c (open_elf): Remove section-based

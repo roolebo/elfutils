@@ -1,5 +1,8 @@
 2011-02-01  Roland McGrath  <roland@redhat.com>
 
+	* dwfl_module_getdwarf.c (find_prelink_address_sync): Use the
+	section-end address as the synchronization point, rather than sh_addr.
+
 	* dwfl_module_getdwarf.c (find_prelink_address_sync): Discover
 	PT_INTERP p_vaddr separately from main phdrs and undo phdrs.
 

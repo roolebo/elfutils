@@ -472,21 +472,32 @@ find_prelink_address_sync (Dwfl_Module *mod)
      file sections as they are after prelinking, to calculate the
      synchronization address of the main file.  Then we'll apply that
      same method to the saved section headers, to calculate the matching
-     synchronization address of the debug file.  */
+     synchronization address of the debug file.
+
+     The method is to consider SHF_ALLOC sections that are either
+     SHT_PROGBITS or SHT_NOBITS, excluding the section whose sh_addr
+     matches the PT_INTERP p_vaddr.  The special sections that can be
+     moved by prelink have other types, except for .interp (which
+     becomes PT_INTERP).  The "real" sections cannot move as such, but
+     .bss can be split into .dynbss and .bss, with the total memory
+     image remaining the same but being spread across the two sections.
+     So we consider the highest section end, which still matches up.  */
 
   GElf_Addr highest;
 
   inline void consider_shdr (GElf_Addr interp,
 			     GElf_Word sh_type,
 			     GElf_Xword sh_flags,
-			     GElf_Addr sh_addr)
+			     GElf_Addr sh_addr,
+			     GElf_Xword sh_size)
   {
     if ((sh_flags & SHF_ALLOC)
 	&& ((sh_type == SHT_PROGBITS && sh_addr != interp)
 	    || sh_type == SHT_NOBITS))
       {
-	if (sh_addr > highest)
-	  highest = sh_addr;
+	const GElf_Addr sh_end = sh_addr + sh_size;
+	if (sh_end > highest)
+	  highest = sh_end;
       }
   }
 
@@ -498,7 +509,8 @@ find_prelink_address_sync (Dwfl_Module *mod)
       GElf_Shdr *sh = gelf_getshdr (scn, &sh_mem);
       if (unlikely (sh == NULL))
 	return DWFL_E_LIBELF;
-      consider_shdr (main_interp, sh->sh_type, sh->sh_flags, sh->sh_addr);
+      consider_shdr (main_interp, sh->sh_type, sh->sh_flags,
+		     sh->sh_addr, sh->sh_size);
     }
   if (highest > mod->main.vaddr)
     {
@@ -507,12 +519,12 @@ find_prelink_address_sync (Dwfl_Module *mod)
       highest = 0;
       if (ehdr.e32.e_ident[EI_CLASS] == ELFCLASS32)
 	for (size_t i = 0; i < shnum - 1; ++i)
-	  consider_shdr (undo_interp, shdr.s32[i].sh_type,
-			 shdr.s32[i].sh_flags, shdr.s32[i].sh_addr);
+	  consider_shdr (undo_interp, shdr.s32[i].sh_type, shdr.s32[i].sh_flags,
+			 shdr.s32[i].sh_addr, shdr.s32[i].sh_size);
       else
 	for (size_t i = 0; i < shnum - 1; ++i)
-	  consider_shdr (undo_interp, shdr.s64[i].sh_type,
-			 shdr.s64[i].sh_flags, shdr.s64[i].sh_addr);
+	  consider_shdr (undo_interp, shdr.s64[i].sh_type, shdr.s64[i].sh_flags,
+			 shdr.s64[i].sh_addr, shdr.s64[i].sh_size);
 
       if (highest > mod->debug.vaddr)
 	mod->debug.address_sync = highest;

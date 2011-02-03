@@ -1,3 +1,11 @@
+2011-02-02  Josh Stone  <jistone@redhat.com>
+
+	* run-prelink-addr-test.sh: Add testfile55, 32 and 64-bit.
+	* testfile55-64.bz2, testfile55-64.debug.bz2,
+	testfile55-64.prelink.bz2, testfile55-32.bz2,
+	testfile55-32.debug.bz2, testfile55-32.prelink.bz2: New.
+	* Makefile.am (EXTRA_DIST): Add and update all.
+
 2011-01-12  Roland McGrath  <roland@redhat.com>
 
 	* run-prelink-addr-test.sh: Make symlinks to find .debug files

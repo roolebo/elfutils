@@ -214,3 +214,47 @@ pstdin+0x1
 foo+0x2
 ??:0
 EOF
+
+
+# testfile55.c:
+#   extern void *stdin;
+#   int main() { return !stdin; }
+#
+# gcc -m32 -g testfile55-32.c -o testfile55-32
+# eu-strip -f testfile55-32.debug testfile55-32
+# cp testfile55-32 testfile55-32.prelink
+# prelink -N testfile55-32.prelink
+testfiles testfile55-32 testfile55-32.debug testfile55-32.prelink
+
+testrun_compare ../src/addr2line -S -e testfile55-32 0x80483b4 0x80483b5 <<\EOF
+main
+/home/jistone/src/elfutils/tests/testfile55-32.c:2
+main+0x1
+/home/jistone/src/elfutils/tests/testfile55-32.c:2
+EOF
+
+# prelink splits .bss into .dynbss+.bss, so the start of .bss changes, but the
+# total size remains the same, and .text doesn't move at all.
+testrun_compare ../src/addr2line -S -e testfile55-32.prelink 0x80483b6 0x80483b7 <<\EOF
+main+0x2
+/home/jistone/src/elfutils/tests/testfile55-32.c:2
+main+0x3
+/home/jistone/src/elfutils/tests/testfile55-32.c:2
+EOF
+
+# Repeat testfile55 in 64-bit
+testfiles testfile55-64 testfile55-64.debug testfile55-64.prelink
+
+testrun_compare ../src/addr2line -S -e testfile55-64 0x4004b4 0x4004b5 <<\EOF
+main
+/home/jistone/src/elfutils/tests/testfile55-64.c:2
+main+0x1
+/home/jistone/src/elfutils/tests/testfile55-64.c:2
+EOF
+
+testrun_compare ../src/addr2line -S -e testfile55-64.prelink 0x4004b6 0x4004b7 <<\EOF
+main+0x2
+/home/jistone/src/elfutils/tests/testfile55-64.c:2
+main+0x3
+/home/jistone/src/elfutils/tests/testfile55-64.c:2
+EOF

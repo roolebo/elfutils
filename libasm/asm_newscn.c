@@ -1,5 +1,5 @@
 /* Create new section in output file.
-   Copyright (C) 2002, 2005 Red Hat, Inc.
+   Copyright (C) 2002-2011 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -162,7 +162,6 @@ asm_newscn (ctx, scnname, type, flags)
      GElf_Xword flags;
 {
   size_t scnname_len = strlen (scnname) + 1;
-  unsigned long int hval;
   AsmScn_t *result;
 
   /* If no context is given there might be an earlier error.  */
@@ -179,8 +178,6 @@ asm_newscn (ctx, scnname, type, flags)
       __libasm_seterrno (ASM_E_INVALID);
       return NULL;
     }
-
-  hval = elf_hash (scnname);
 
   rwlock_wrlock (ctx->lock);
 

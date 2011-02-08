@@ -1,3 +1,7 @@
+2011-02-08  Roland McGrath  <roland@redhat.com>
+
+	* asm_newscn.c (asm_newscn): Remove unused variable.
+
 2010-02-15  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am: Use config/eu.am for common stuff.

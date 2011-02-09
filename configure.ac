@@ -63,8 +63,8 @@ AM_PROG_LEX
 AC_CACHE_CHECK([for gcc with C99 support], ac_cv_c99, [dnl
 old_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS -std=gnu99"
-AC_COMPILE_IFELSE([dnl
-int foo (int a) { for (int i = 0; i < a; ++i) if (i % 4) break; int s = a; }],
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([dnl
+int foo (int a) { for (int i = 0; i < a; ++i) if (i % 4) break; int s = a; }])],
 		  ac_cv_c99=yes, ac_cv_c99=no)
 CFLAGS="$old_CFLAGS"])
 AS_IF([test "x$ac_cv_c99" != xyes],

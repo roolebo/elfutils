@@ -1,5 +1,7 @@
 2011-02-08  Roland McGrath  <roland@redhat.com>
 
+	* ldscript.y (filename_id_star): Remove unused variable.
+
 	* unstrip.c (copy_elided_sections): Remove unused variable.
 
 	* elflint.c (check_dynamic): Remove unused variables.

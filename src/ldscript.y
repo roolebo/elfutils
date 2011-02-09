@@ -1,6 +1,6 @@
 %{
 /* Parser for linker scripts.
-   Copyright (C) 2001-2010 Red Hat, Inc.
+   Copyright (C) 2001-2011 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -802,12 +802,9 @@ add_versions (struct version *versions)
 
   do
     {
-      struct version *oldp;
-
       add_id_list (versions->versionname, versions->local_names, true);
       add_id_list (versions->versionname, versions->global_names, false);
 
-      oldp = versions;
       versions = versions->next;
     }
   while (versions != NULL);

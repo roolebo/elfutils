@@ -1,3 +1,7 @@
+2011-02-08  Roland McGrath  <roland@redhat.com>
+
+	* configure.ac (ALL_LINGUAS): Remove variable, now obsolete.
+
 2010-09-13  Ulrich Drepper  <drepper@redhat.com>
 
 	* configure.ac (ALL_LINGUAS): Add languages which have some

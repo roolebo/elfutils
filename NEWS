@@ -1,5 +1,7 @@
 Version 0.152
 
+Various build and warning nits fixed for newest GCC and Autoconf.
+
 libdwfl: Yet another prelink-related fix for another regression.
 
 Version 0.151

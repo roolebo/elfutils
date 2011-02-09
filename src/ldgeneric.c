@@ -1,4 +1,4 @@
-/* Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009 Red Hat, Inc.
+/* Copyright (C) 2001-2011 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -285,12 +285,10 @@ static int
 check_for_duplicate2 (struct usedfiles *newp, struct usedfiles *list)
 {
   struct usedfiles *first;
-  struct usedfiles *prevp;
 
   if (list == NULL)
     return 0;
 
-  prevp = list;
   list = first = list->next;
   do
     {

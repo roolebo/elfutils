@@ -1574,10 +1574,6 @@ check_dynamic (Ebl *ebl, GElf_Ehdr *ehdr, GElf_Shdr *shdr, int idx)
       [DT_STRSZ] = true,
       [DT_SYMENT] = true
     };
-  GElf_Addr reladdr = 0;
-  GElf_Word relsz = 0;
-  GElf_Addr pltreladdr = 0;
-  GElf_Word pltrelsz = 0;
 
   memset (has_dt, '\0', sizeof (has_dt));
   memset (has_val_dt, '\0', sizeof (has_val_dt));
@@ -1674,15 +1670,6 @@ section [%2d] '%s': entry %zu: level 2 tag %s used\n"),
 	ERROR (gettext ("\
 section [%2d] '%s': entry %zu: DT_PLTREL value must be DT_REL or DT_RELA\n"),
 	       idx, section_name (ebl, idx), cnt);
-
-      if (dyn->d_tag == DT_REL)
-	reladdr = dyn->d_un.d_ptr;
-      if (dyn->d_tag == DT_RELSZ)
-	relsz = dyn->d_un.d_val;
-      if (dyn->d_tag == DT_JMPREL)
-	pltreladdr = dyn->d_un.d_ptr;
-      if (dyn->d_tag == DT_PLTRELSZ)
-	pltrelsz = dyn->d_un.d_val;
 
       /* Check that addresses for entries are in loaded segments.  */
       switch (dyn->d_tag)

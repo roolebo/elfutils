@@ -1,5 +1,7 @@
 2011-02-08  Roland McGrath  <roland@redhat.com>
 
+	* unstrip.c (copy_elided_sections): Remove unused variable.
+
 	* elflint.c (check_dynamic): Remove unused variables.
 
 	* elflint.c (check_symtab): Warn about missing xndx section only once.

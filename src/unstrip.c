@@ -1,5 +1,5 @@
 /* Combine stripped files with separate symbols and debug information.
-   Copyright (C) 2007-2010 Red Hat, Inc.
+   Copyright (C) 2007-2011 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Roland McGrath <roland@redhat.com>, 2007.
 
@@ -1301,7 +1301,6 @@ more sections in stripped file than debug file -- arguments reversed?"));
   /* Match each debuginfo section with its corresponding stripped section.  */
   bool check_prelink = false;
   Elf_Scn *unstripped_symtab = NULL;
-  size_t unstripped_strtab_ndx = SHN_UNDEF;
   size_t alloc_avail = 0;
   scn = NULL;
   while ((scn = elf_nextscn (unstripped, scn)) != NULL)
@@ -1313,7 +1312,6 @@ more sections in stripped file than debug file -- arguments reversed?"));
       if (shdr->sh_type == SHT_SYMTAB)
 	{
 	  unstripped_symtab = scn;
-	  unstripped_strtab_ndx = shdr->sh_link;
 	  continue;
 	}
 

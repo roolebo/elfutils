@@ -1,3 +1,8 @@
+2011-02-11  Roland McGrath  <roland@redhat.com>
+
+	* linux-kernel-modules.c (try_kernel_name): Try .gz, .bz2, .xz
+	suffixes if corresponding decompression support is enabled.
+
 2011-02-01  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_module_getdwarf.c (find_prelink_address_sync): Use the

@@ -1,5 +1,5 @@
 /* Standard libdwfl callbacks for debugging the running Linux kernel.
-   Copyright (C) 2005-2010 Red Hat, Inc.
+   Copyright (C) 2005-2011 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -78,6 +78,19 @@
 #define MODULE_SECT_NAME_LEN 32	/* Minimum any linux/module.h has had.  */
 
 
+static const char *vmlinux_suffixes[] =
+  {
+#ifdef USE_ZLIB
+    ".gz",
+#endif
+#ifdef USE_BZLIB
+    ".bz2",
+#endif
+#ifdef USE_LZMA
+    ".xz",
+#endif
+  };
+
 /* Try to open the given file as it is or under the debuginfo directory.  */
 static int
 try_kernel_name (Dwfl *dwfl, char **fname, bool try_debug)
@@ -91,6 +104,7 @@ try_kernel_name (Dwfl *dwfl, char **fname, bool try_debug)
 	       ? *dwfl->callbacks->debuginfo_path : NULL)
 	      ?: DEFAULT_DEBUGINFO_PATH)[0] == ':') ? -1
 	    : TEMP_FAILURE_RETRY (open64 (*fname, O_RDONLY)));
+
   if (fd < 0)
     {
       char *debugfname = NULL;
@@ -106,8 +120,36 @@ try_kernel_name (Dwfl *dwfl, char **fname, bool try_debug)
 	fd = INTUSE(dwfl_standard_find_debuginfo) (&fakemod, NULL, NULL, 0,
 						   *fname, NULL, 0,
 						   &debugfname);
+      if (debugfname != NULL)
+	{
+	  free (*fname);
+	  *fname = debugfname;
+	}
+    }
+
+  if (fd < 0)
+    for (size_t i = 0;
+	 i < sizeof vmlinux_suffixes / sizeof vmlinux_suffixes[0];
+	 ++i)
+      {
+	char *zname;
+	if (asprintf (&zname, "%s%s", *fname, vmlinux_suffixes[i]) > 0)
+	  {
+	    fd = TEMP_FAILURE_RETRY (open64 (zname, O_RDONLY));
+	    if (fd < 0)
+	      free (zname);
+	    else
+	      {
+		free (*fname);
+		*fname = zname;
+	      }
+	  }
+      }
+
+  if (fd < 0)
+    {
       free (*fname);
-      *fname = debugfname;
+      *fname = NULL;
     }
 
   return fd;

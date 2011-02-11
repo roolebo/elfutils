@@ -3,6 +3,7 @@ Version 0.152
 Various build and warning nits fixed for newest GCC and Autoconf.
 
 libdwfl: Yet another prelink-related fix for another regression.
+	 Look for Linux kernel images in files named with compression suffixes.
 
 elfcmp: New flag --ignore-build-id to ignore differing build ID bits.
 	New flag -l/--verbose to print all differences.

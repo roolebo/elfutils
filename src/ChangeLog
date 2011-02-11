@@ -1,3 +1,11 @@
+2011-02-11  Roland McGrath  <roland@redhat.com>
+
+	* elfcmp.c (ignore_build_id): New variable.
+	(options, parse_opt): Grok --ignore-build-id to set it.
+	(main): For SHT_NOTE sections, compare note details rather than raw
+	bytes.  Under --ignore-build-id, don't complain about differing build
+	ID contents if lengths match.
+
 2011-02-08  Roland McGrath  <roland@redhat.com>
 
 	* ldscript.y (filename_id_star): Remove unused variable.

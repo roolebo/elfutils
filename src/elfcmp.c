@@ -1,5 +1,5 @@
 /* Compare relevant content of two ELF files.
-   Copyright (C) 2005-2010 Red Hat, Inc.
+   Copyright (C) 2005-2011 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -62,6 +62,7 @@ ARGP_PROGRAM_BUG_ADDRESS_DEF = PACKAGE_BUGREPORT;
 /* Values for the parameters which have no short form.  */
 #define OPT_GAPS		0x100
 #define OPT_HASH_INEXACT	0x101
+#define OPT_IGNORE_BUILD_ID	0x102
 
 /* Definitions of arguments for argp functions.  */
 static const struct argp_option options[] =
@@ -70,6 +71,8 @@ static const struct argp_option options[] =
   { "gaps", OPT_GAPS, "ACTION", 0, N_("Control treatment of gaps in loadable segments [ignore|match] (default: ignore)"), 0 },
   { "hash-inexact", OPT_HASH_INEXACT, NULL, 0,
     N_("Ignore permutation of buckets in SHT_HASH section"), 0 },
+  { "ignore-build-id", OPT_IGNORE_BUILD_ID, NULL, 0,
+    N_("Ignore differences in build ID"), 0 },
   { "quiet", 'q', NULL, 0, N_("Output nothing; yield exit status only"), 0 },
 
   { NULL, 0, NULL, 0, N_("Miscellaneous:"), 0 },
@@ -114,6 +117,9 @@ static bool quiet;
 
 /* True iff SHT_HASH treatment should be generous.  */
 static bool hash_inexact;
+
+/* True iff build ID notes should be ignored.  */
+static bool ignore_build_id;
 
 static bool hash_content_equivalent (size_t entsize, Elf_Data *, Elf_Data *);
 
@@ -385,6 +391,109 @@ main (int argc, char *argv[])
 	    }
 	  break;
 
+	case SHT_NOTE:
+	  /* Parse the note format and compare the notes themselves.  */
+	  {
+	    GElf_Nhdr note1;
+	    GElf_Nhdr note2;
+
+	    size_t off1 = 0;
+	    size_t off2 = 0;
+	    size_t name_offset;
+	    size_t desc_offset;
+	    while (off1 < data1->d_size
+		   && (off1 = gelf_getnote (data1, off1, &note1,
+					    &name_offset, &desc_offset)) > 0)
+	      {
+		const char *name1 = data1->d_buf + name_offset;
+		const void *desc1 = data1->d_buf + desc_offset;
+		if (off2 >= data2->d_size)
+		  {
+		    if (! quiet)
+		      error (0, 0, gettext ("\
+%s %s differ: section [%zu] '%s' number of notes"),
+			     fname1, fname2, elf_ndxscn (scn1), sname1);
+		    result = 1;
+		    goto out;
+		  }
+		off2 = gelf_getnote (data2, off2, &note2,
+				     &name_offset, &desc_offset);
+		if (off2 == 0)
+		  error (2, 0, gettext ("\
+cannot read note section [%zu] '%s' in '%s': %s"),
+			 elf_ndxscn (scn2), sname2, fname2, elf_errmsg (-1));
+		const char *name2 = data2->d_buf + name_offset;
+		const void *desc2 = data2->d_buf + desc_offset;
+
+		if (note1.n_namesz != note2.n_namesz
+		    || memcmp (name1, name2, note1.n_namesz))
+		  {
+		    if (! quiet)
+		      error (0, 0, gettext ("\
+%s %s differ: section [%zu] '%s' note name"),
+			     fname1, fname2, elf_ndxscn (scn1), sname1);
+		    result = 1;
+		    goto out;
+		  }
+		if (note1.n_type != note2.n_type)
+		  {
+		    if (! quiet)
+		      error (0, 0, gettext ("\
+%s %s differ: section [%zu] '%s' note '%s' type"),
+			     fname1, fname2, elf_ndxscn (scn1), sname1, name1);
+		    result = 1;
+		    goto out;
+		  }
+		if (note1.n_descsz != note2.n_descsz
+		    || memcmp (desc1, desc2, note1.n_descsz))
+		  {
+		    if (note1.n_type == NT_GNU_BUILD_ID
+			&& note1.n_namesz == sizeof "GNU"
+			&& !memcmp (name1, "GNU", sizeof "GNU"))
+		      {
+			if (note1.n_descsz != note2.n_descsz)
+			  {
+			    if (! quiet)
+			      error (0, 0, gettext ("\
+%s %s differ: build ID length"),
+				     fname1, fname2);
+			    result = 1;
+			    goto out;
+			  }
+			else if (! ignore_build_id)
+			  {
+			    if (! quiet)
+			      error (0, 0, gettext ("\
+%s %s differ: build ID content"),
+				     fname1, fname2);
+			    result = 1;
+			    goto out;
+			  }
+		      }
+		    else
+		      {
+			if (! quiet)
+			  error (0, 0, gettext ("\
+%s %s differ: section [%zu] '%s' note '%s' content"),
+				 fname1, fname2, elf_ndxscn (scn1), sname1,
+				 name1);
+			result = 1;
+			goto out;
+		      }
+		  }
+	      }
+	    if (off2 < data2->d_size)
+	      {
+		if (! quiet)
+		  error (0, 0, gettext ("\
+%s %s differ: section [%zu] '%s' number of notes"),
+			 fname1, fname2, elf_ndxscn (scn1), sname1);
+		result = 1;
+		goto out;
+	      }
+	  }
+	  break;
+
 	default:
 	  /* Compare the section content byte for byte.  */
 	  assert (shdr1->sh_type == SHT_NOBITS
@@ -590,6 +699,10 @@ parse_opt (int key, char *arg,
 
     case OPT_HASH_INEXACT:
       hash_inexact = true;
+      break;
+
+    case OPT_IGNORE_BUILD_ID:
+      ignore_build_id = true;
       break;
 
     default:

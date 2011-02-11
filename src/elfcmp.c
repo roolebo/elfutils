@@ -68,6 +68,8 @@ ARGP_PROGRAM_BUG_ADDRESS_DEF = PACKAGE_BUGREPORT;
 static const struct argp_option options[] =
 {
   { NULL, 0, NULL, 0, N_("Control options:"), 0 },
+  { "verbose", 'l', NULL, 0,
+    N_("Output all differences, not just the first"), 0 },
   { "gaps", OPT_GAPS, "ACTION", 0, N_("Control treatment of gaps in loadable segments [ignore|match] (default: ignore)"), 0 },
   { "hash-inexact", OPT_HASH_INEXACT, NULL, 0,
     N_("Ignore permutation of buckets in SHT_HASH section"), 0 },
@@ -115,6 +117,9 @@ struct region
 /* Nonzero if only exit status is wanted.  */
 static bool quiet;
 
+/* True iff multiple differences should be output.  */
+static bool verbose;
+
 /* True iff SHT_HASH treatment should be generous.  */
 static bool hash_inexact;
 
@@ -148,6 +153,9 @@ main (int argc, char *argv[])
       exit (1);
     }
 
+  if (quiet)
+    verbose = false;
+
   /* Comparing the files is done in two phases:
      1. compare all sections.  Sections which are irrelevant (i.e., if
         strip would remove them) are ignored.  Some section types are
@@ -179,6 +187,15 @@ main (int argc, char *argv[])
     error (2, 0, gettext ("cannot get ELF header of '%s': %s"),
 	   fname2, elf_errmsg (-1));
 
+#define DIFFERENCE							      \
+  do									      \
+    {									      \
+      result = 1;							      \
+      if (! verbose)							      \
+	goto out;							      \
+    }									      \
+  while (0)
+
   /* Compare the ELF headers.  */
   if (unlikely (memcmp (ehdr1->e_ident, ehdr2->e_ident, EI_NIDENT) != 0
 		|| ehdr1->e_type != ehdr2->e_type
@@ -194,8 +211,7 @@ main (int argc, char *argv[])
     {
       if (! quiet)
 	error (0, 0, gettext ("%s %s diff: ELF header"), fname1, fname2);
-      result = 1;
-      goto out;
+      DIFFERENCE;
     }
 
   size_t shnum1;
@@ -210,8 +226,7 @@ main (int argc, char *argv[])
     {
       if (! quiet)
 	error (0, 0, gettext ("%s %s diff: section count"), fname1, fname2);
-      result = 1;
-      goto out;
+      DIFFERENCE;
     }
 
   size_t phnum1;
@@ -227,8 +242,7 @@ main (int argc, char *argv[])
       if (! quiet)
 	error (0, 0, gettext ("%s %s diff: program header count"),
 	       fname1, fname2);
-      result = 1;
-      goto out;
+      DIFFERENCE;
     }
 
   /* Iterate over all sections.  We expect the sections in the two
@@ -283,11 +297,9 @@ main (int argc, char *argv[])
 	 location.  */
       if (unlikely (strcmp (sname1, sname2) != 0))
 	{
-	header_mismatch:
-	  error (0, 0, gettext ("%s %s differ: section header"),
-		 fname1, fname2);
-	  result = 1;
-	  goto out;
+	  error (0, 0, gettext ("%s %s differ: section [%zu], [%zu] name"),
+		 fname1, fname2, elf_ndxscn (scn1), elf_ndxscn (scn2));
+	  DIFFERENCE;
 	}
 
       /* We ignore certain sections.  */
@@ -307,7 +319,11 @@ main (int argc, char *argv[])
 	  || shdr1->sh_info != shdr2->sh_info
 	  || shdr1->sh_addralign != shdr2->sh_addralign
 	  || shdr1->sh_entsize != shdr2->sh_entsize)
-	goto header_mismatch;
+	{
+	  error (0, 0, gettext ("%s %s differ: section [%zu] '%s' header"),
+		 fname1, fname2, elf_ndxscn (scn1), sname1);
+	  DIFFERENCE;
+	}
 
       Elf_Data *data1 = elf_getdata (scn1, NULL);
       if (data1 == NULL)
@@ -369,8 +385,8 @@ main (int argc, char *argv[])
 			       fname1, fname2, elf_ndxscn (scn1),
 			       elf_ndxscn (scn2));
 		    }
-		  result = 1;
-		  goto out;
+		  DIFFERENCE;
+		  break;
 		}
 
 	      if (sym1->st_shndx == SHN_UNDEF
@@ -413,8 +429,7 @@ main (int argc, char *argv[])
 		      error (0, 0, gettext ("\
 %s %s differ: section [%zu] '%s' number of notes"),
 			     fname1, fname2, elf_ndxscn (scn1), sname1);
-		    result = 1;
-		    goto out;
+		    DIFFERENCE;
 		  }
 		off2 = gelf_getnote (data2, off2, &note2,
 				     &name_offset, &desc_offset);
@@ -432,8 +447,7 @@ cannot read note section [%zu] '%s' in '%s': %s"),
 		      error (0, 0, gettext ("\
 %s %s differ: section [%zu] '%s' note name"),
 			     fname1, fname2, elf_ndxscn (scn1), sname1);
-		    result = 1;
-		    goto out;
+		    DIFFERENCE;
 		  }
 		if (note1.n_type != note2.n_type)
 		  {
@@ -441,8 +455,7 @@ cannot read note section [%zu] '%s' in '%s': %s"),
 		      error (0, 0, gettext ("\
 %s %s differ: section [%zu] '%s' note '%s' type"),
 			     fname1, fname2, elf_ndxscn (scn1), sname1, name1);
-		    result = 1;
-		    goto out;
+		    DIFFERENCE;
 		  }
 		if (note1.n_descsz != note2.n_descsz
 		    || memcmp (desc1, desc2, note1.n_descsz))
@@ -457,8 +470,7 @@ cannot read note section [%zu] '%s' in '%s': %s"),
 			      error (0, 0, gettext ("\
 %s %s differ: build ID length"),
 				     fname1, fname2);
-			    result = 1;
-			    goto out;
+			    DIFFERENCE;
 			  }
 			else if (! ignore_build_id)
 			  {
@@ -466,8 +478,7 @@ cannot read note section [%zu] '%s' in '%s': %s"),
 			      error (0, 0, gettext ("\
 %s %s differ: build ID content"),
 				     fname1, fname2);
-			    result = 1;
-			    goto out;
+			    DIFFERENCE;
 			  }
 		      }
 		    else
@@ -477,8 +488,7 @@ cannot read note section [%zu] '%s' in '%s': %s"),
 %s %s differ: section [%zu] '%s' note '%s' content"),
 				 fname1, fname2, elf_ndxscn (scn1), sname1,
 				 name1);
-			result = 1;
-			goto out;
+			DIFFERENCE;
 		      }
 		  }
 	      }
@@ -488,8 +498,7 @@ cannot read note section [%zu] '%s' in '%s': %s"),
 		  error (0, 0, gettext ("\
 %s %s differ: section [%zu] '%s' number of notes"),
 			 fname1, fname2, elf_ndxscn (scn1), sname1);
-		result = 1;
-		goto out;
+		DIFFERENCE;
 	      }
 	  }
 	  break;
@@ -524,8 +533,7 @@ cannot read note section [%zu] '%s' in '%s': %s"),
 			   fname1, fname2, elf_ndxscn (scn1),
 			   elf_ndxscn (scn2), sname1);
 		}
-	      result = 1;
-	      goto out;
+	      DIFFERENCE;
 	    }
 	  break;
 	}
@@ -537,8 +545,7 @@ cannot read note section [%zu] '%s' in '%s': %s"),
 	error (0, 0,
 	       gettext ("%s %s differ: unequal amount of important sections"),
 	       fname1, fname2);
-      result = 1;
-      goto out;
+      DIFFERENCE;
     }
 
   /* We we look at gaps, create artificial ones for the parts of the
@@ -607,8 +614,7 @@ cannot read note section [%zu] '%s' in '%s': %s"),
 	  if (! quiet)
 	    error (0, 0, gettext ("%s %s differ: program header %d"),
 		   fname1, fname2, ndx);
-	  result = 1;
-	  goto out;
+	  DIFFERENCE;
 	}
 
       if (gaps != gaps_ignore && phdr1->p_type == PT_LOAD)
@@ -632,8 +638,8 @@ cannot read note section [%zu] '%s' in '%s': %s"),
 		      if (!quiet)
 			error (0, 0, gettext ("%s %s differ: gap"),
 			       fname1, fname2);
-		      result = 1;
-		      goto out;
+		      DIFFERENCE;
+		      break;
 		    }
 
 		}
@@ -679,6 +685,10 @@ parse_opt (int key, char *arg,
     {
     case 'q':
       quiet = true;
+      break;
+
+    case 'l':
+      verbose = true;
       break;
 
     case OPT_GAPS:

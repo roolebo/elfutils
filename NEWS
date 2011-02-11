@@ -5,6 +5,7 @@ Various build and warning nits fixed for newest GCC and Autoconf.
 libdwfl: Yet another prelink-related fix for another regression.
 
 elfcmp: New flag --ignore-build-id to ignore differing build ID bits.
+	New flag -l/--verbose to print all differences.
 
 Version 0.151
 

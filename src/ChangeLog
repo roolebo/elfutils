@@ -1,5 +1,9 @@
 2011-02-11  Roland McGrath  <roland@redhat.com>
 
+	* elfcmp.c (verbose): New variable.
+	(options, parse_opt): Grok -l/--verbose to set it.
+	(main): Under -l, keep going after first difference.
+
 	* elfcmp.c (ignore_build_id): New variable.
 	(options, parse_opt): Grok --ignore-build-id to set it.
 	(main): For SHT_NOTE sections, compare note details rather than raw

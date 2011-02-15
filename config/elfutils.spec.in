@@ -188,6 +188,14 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
+* Tue Feb 15 2011  <drepper@gmail.com> 0.152-1
+- Various build and warning nits fixed for newest GCC and Autoconf.
+- libdwfl: Yet another prelink-related fix for another regression. 
+  	 Look for Linux kernel images in files named with compression 
+  suffixes.
+- elfcmp: New flag --ignore-build-id to ignore differing build ID 
+  bits. 	New flag -l/--verbose to print all differences.
+
 * Wed Jan 12 2011  <drepper@gmail.com> 0.151-1
 - libdwfl: Fix for more prelink cases with separate debug file.
 - strip: New flag --strip-sections to remove section headers entirely.

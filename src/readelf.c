@@ -1,5 +1,5 @@
 /* Print information from ELF file in human-readable form.
-   Copyright (C) 1999-2010 Red Hat, Inc.
+   Copyright (C) 1999-2011 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1999.
 
@@ -3505,6 +3505,10 @@ dwarf_attr_string (unsigned int attrnum)
 
       case DW_AT_GNU_vector:
 	result = "GNU_vector";
+	break;
+
+      case DW_AT_GNU_odr_signature:
+	result = "GNU_odr_signature";
 	break;
 
       case DW_AT_GNU_template_name:

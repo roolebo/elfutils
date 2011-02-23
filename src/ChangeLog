@@ -1,3 +1,7 @@
+2011-02-23  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (dwarf_attr_string): Grok DW_AT_GNU_odr_signature.
+
 2011-02-11  Roland McGrath  <roland@redhat.com>
 
 	* elfcmp.c (verbose): New variable.

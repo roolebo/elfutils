@@ -1,5 +1,5 @@
 /* Release debugging handling context.
-   Copyright (C) 2002-2010 Red Hat, Inc.
+   Copyright (C) 2002-2011 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -54,6 +54,8 @@
 
 #include <search.h>
 #include <stdlib.h>
+#include <assert.h>
+#include <string.h>
 
 #include "libdwP.h"
 #include "cfi.h"
@@ -75,6 +77,24 @@ cu_free (void *arg)
   tdestroy (p->locs, noop_free);
 }
 
+
+#if USE_ZLIB
+void
+internal_function
+__libdw_free_zdata (Dwarf *dwarf)
+{
+  unsigned int gzip_mask = dwarf->sectiondata_gzip_mask;
+  while (gzip_mask != 0)
+    {
+      int i = ffs (gzip_mask);
+      assert (i > 0);
+      --i;
+      assert (i < IDX_last);
+      free (dwarf->sectiondata[i]);
+      gzip_mask &= ~(1U << i);
+    }
+}
+#endif
 
 int
 dwarf_end (dwarf)
@@ -105,6 +125,8 @@ dwarf_end (dwarf)
 
       /* Free the pubnames helper structure.  */
       free (dwarf->pubnames_sets);
+
+      __libdw_free_zdata (dwarf);
 
       /* Free the ELF descriptor if necessary.  */
       if (dwarf->free_elf)

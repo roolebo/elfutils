@@ -1,5 +1,5 @@
 /* Create descriptor from ELF descriptor for processing file.
-   Copyright (C) 2002-2010 Red Hat, Inc.
+   Copyright (C) 2002-2011 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -61,6 +61,13 @@
 
 #include "libdwP.h"
 
+#if USE_ZLIB
+# include <endian.h>
+# define crc32		loser_crc32
+# include <zlib.h>
+# undef crc32
+#endif
+
 
 /* Section names.  */
 static const char dwarf_scnnames[IDX_last][17] =
@@ -117,6 +124,7 @@ check_section (Dwarf *result, GElf_Ehdr *ehdr, Elf_Scn *scn, bool inscngrp)
     {
       /* The section name must be valid.  Otherwise is the ELF file
 	 invalid.  */
+      __libdw_free_zdata (result);
       __libdw_seterrno (DWARF_E_INVALID_ELF);
       free (result);
       return NULL;
@@ -141,6 +149,76 @@ check_section (Dwarf *result, GElf_Ehdr *ehdr, Elf_Scn *scn, bool inscngrp)
 
 	break;
       }
+#if USE_ZLIB
+    else if (scnname[0] == '.' && scnname[1] == 'z'
+	     && strcmp (&scnname[2], &dwarf_scnnames[cnt][1]) == 0)
+      {
+	/* A compressed section.  */
+
+	if (unlikely (result->sectiondata[cnt] != NULL))
+	  /* A section appears twice.  That's bad.  We ignore the section.  */
+	  break;
+
+	/* Get the section data.  */
+	Elf_Data *data = elf_getdata (scn, NULL);
+	if (data != NULL && data->d_size != 0)
+	  {
+	    /* There is a 12-byte header of "ZLIB" followed by
+	       an 8-byte big-endian size.  */
+
+	    if (unlikely (data->d_size < 4 + 8)
+		|| unlikely (memcmp (data->d_buf, "ZLIB", 4) != 0))
+	      break;
+
+	    uint64_t size;
+	    memcpy (&size, data->d_buf + 4, sizeof size);
+	    size = be64toh (size);
+
+	    Elf_Data *zdata = malloc (sizeof (Elf_Data) + size);
+	    if (unlikely (zdata == NULL))
+	      break;
+
+	    zdata->d_buf = &zdata[1];
+	    zdata->d_type = ELF_T_BYTE;
+	    zdata->d_version = EV_CURRENT;
+	    zdata->d_size = size;
+	    zdata->d_off = 0;
+	    zdata->d_align = 1;
+
+	    z_stream z =
+	      {
+		.next_in = data->d_buf + 4 + 8,
+		.avail_in = data->d_size - 4 - 8,
+		.next_out = zdata->d_buf,
+		.avail_out = zdata->d_size
+	      };
+	    int zrc = inflateInit (&z);
+	    while (z.avail_in > 0 && likely (zrc == Z_OK))
+	      {
+		z.next_out = zdata->d_buf + (zdata->d_size - z.avail_out);
+		zrc = inflate (&z, Z_FINISH);
+		if (unlikely (zrc != Z_STREAM_END))
+		  {
+		    zrc = Z_DATA_ERROR;
+		    break;
+		  }
+		zrc = inflateReset (&z);
+	      }
+	    if (likely (zrc == Z_OK))
+	      zrc = inflateEnd (&z);
+
+	    if (unlikely (zrc != Z_OK) || unlikely (z.avail_out != 0))
+	      free (zdata);
+	    else
+	      {
+		result->sectiondata[cnt] = zdata;
+		result->sectiondata_gzip_mask |= 1U << cnt;
+	      }
+	  }
+
+	break;
+      }
+#endif
 
   return result;
 }
@@ -159,6 +237,7 @@ valid_p (Dwarf *result)
   if (likely (result != NULL)
       && unlikely (result->sectiondata[IDX_debug_info] == NULL))
     {
+      __libdw_free_zdata (result);
       __libdw_seterrno (DWARF_E_NO_DWARF);
       free (result);
       result = NULL;
@@ -189,6 +268,7 @@ scngrp_read (Dwarf *result, Elf *elf, GElf_Ehdr *ehdr, Elf_Scn *scngrp)
   if (data == NULL)
     {
       /* We cannot read the section content.  Fail!  */
+      __libdw_free_zdata (result);
       free (result);
       return NULL;
     }
@@ -204,6 +284,7 @@ scngrp_read (Dwarf *result, Elf *elf, GElf_Ehdr *ehdr, Elf_Scn *scngrp)
 	{
 	  /* A section group refers to a non-existing section.  Should
 	     never happen.  */
+	  __libdw_free_zdata (result);
 	  __libdw_seterrno (DWARF_E_INVALID_ELF);
 	  free (result);
 	  return NULL;

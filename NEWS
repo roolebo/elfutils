@@ -1,3 +1,7 @@
+Version 0.153
+
+libdw: Support reading .zdebug_* DWARF sections compressed via zlib.
+
 Version 0.152
 
 Various build and warning nits fixed for newest GCC and Autoconf.

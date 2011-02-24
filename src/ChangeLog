@@ -1,5 +1,19 @@
 2011-02-23  Roland McGrath  <roland@redhat.com>
 
+	* readelf.c (section_name): New function.
+	(print_debug_abbrev_section): Use it instead of constant.
+	(print_debug_aranges_section): Likewise.
+	(print_debug_ranges_section): Likewise.
+	(print_debug_units): Likewise.
+	(print_debug_line_section): Likewise.
+	(print_debug_loc_section): Likewise.
+	(print_debug_macinfo_section): Likewise.
+	(print_debug_pubnames_section): Likewise.
+	(print_debug_str_section): Likewise.
+	(print_debug) [USE_ZLIB]: Match .zdebug_* sections too.
+	(print_debug_abbrev_section): Use decoded d_size, not sh_size.
+	(print_debug_str_section): Likewise.
+
 	* readelf.c (dwarf_attr_string): Grok DW_AT_GNU_odr_signature.
 
 2011-02-11  Roland McGrath  <roland@redhat.com>

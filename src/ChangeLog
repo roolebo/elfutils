@@ -1,3 +1,8 @@
+2011-02-25  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (dwarf_attr_string): Add DW_AT_GNU_* handling.
+	(dwarf_form_string): Properly format and return unknown form.
+
 2011-02-23  Roland McGrath  <roland@redhat.com>
 
 	* readelf.c (section_name): New function.

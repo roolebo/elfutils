@@ -3514,6 +3514,34 @@ dwarf_attr_string (unsigned int attrnum)
 	result = "GNU_vector";
 	break;
 
+      case DW_AT_GNU_guarded_by:
+	result = "GNU_guarded_by";
+	break;
+
+      case DW_AT_GNU_pt_guarded_by:
+	result = "GNU_pt_guarded_by";
+	break;
+
+      case DW_AT_GNU_guarded:
+	result = "GNU_guarded";
+	break;
+
+      case DW_AT_GNU_pt_guarded:
+	result = "GNU_pt_guarded";
+	break;
+
+      case DW_AT_GNU_locks_excluded:
+	result = "GNU_locks_excluded";
+	break;
+
+      case DW_AT_GNU_exclusive_locks_required:
+	result = "GNU_exclusive_locks_required";
+	break;
+
+      case DW_AT_GNU_shared_locks_required:
+	result = "GNU_shared_locks_required";
+	break;
+
       case DW_AT_GNU_odr_signature:
 	result = "GNU_odr_signature";
 	break;
@@ -3566,7 +3594,7 @@ dwarf_form_string (unsigned int form)
       [DW_FORM_sec_offset] = "sec_offset",
       [DW_FORM_exprloc] = "exprloc",
       [DW_FORM_flag_present] = "flag_present",
-      [DW_FORM_ref_sig8] = "ref_sig8"
+      [DW_FORM_ref_sig8] = "ref_sig8",
     };
   const unsigned int nknown_forms = (sizeof (known_forms)
 				     / sizeof (known_forms[0]));
@@ -3577,8 +3605,11 @@ dwarf_form_string (unsigned int form)
     result = known_forms[form];
 
   if (unlikely (result == NULL))
-    snprintf (buf, sizeof buf, gettext ("unknown form %" PRIx64),
-	      (uint64_t) form);
+    {
+      snprintf (buf, sizeof buf, gettext ("unknown form %#" PRIx64),
+		(uint64_t) form);
+      result = buf;
+    }
 
   return result;
 }

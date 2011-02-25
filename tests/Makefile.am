@@ -28,7 +28,7 @@ include $(top_srcdir)/config/eu.am
 if MUDFLAP
 BUILD_RPATH = \$$ORIGIN/../backends
 else
-BUILT_RPATH = \$$ORIGIN/../libasm:\$$ORIGIN/../libdw:\$$ORIGIN/../backends:\$$ORIGIN/../libelf
+BUILD_RPATH = \$$ORIGIN/../libasm:\$$ORIGIN/../libdw:\$$ORIGIN/../backends:\$$ORIGIN/../libelf
 endif
 
 AM_LDFLAGS =
@@ -42,7 +42,7 @@ AM_LDFLAGS += -Wl,-rpath-link,../libasm:../libdw:../libelf
 endif
 
 if TESTS_RPATH
-AM_LDFLAGS += -Wl,-rpath,$(BUILT_RPATH)
+AM_LDFLAGS += -Wl,-rpath,$(BUILD_RPATH)
 tests_rpath = yes
 else
 tests_rpath = no

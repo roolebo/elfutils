@@ -76,7 +76,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-addrscopes.sh run-strings-test.sh run-funcscopes.sh \
 	run-find-prologues.sh run-allregs.sh \
 	run-readelf-test1.sh run-readelf-test2.sh run-readelf-test3.sh \
-	run-readelf-test4.sh \
+	run-readelf-test4.sh run-readelf-twofiles.sh \
 	run-native-test.sh run-bug1-test.sh \
 	dwfl-bug-addr-overflow run-addrname-test.sh \
 	dwfl-bug-fd-leak dwfl-bug-report \

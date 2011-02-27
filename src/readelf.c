@@ -4363,6 +4363,7 @@ static void
 reset_listptr (struct listptr_table *table)
 {
   free (table->table);
+  table->table = NULL;
   table->n = table->alloc = 0;
 }
 

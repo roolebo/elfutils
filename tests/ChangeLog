@@ -1,3 +1,8 @@
+2011-02-27  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* Makefile.am (TESTS): Add run-readelf-twofiles.sh.
+	* run-readelf-twofiles.sh: New file.
+
 2011-02-02  Josh Stone  <jistone@redhat.com>
 
 	* run-prelink-addr-test.sh: Add testfile55, 32 and 64-bit.

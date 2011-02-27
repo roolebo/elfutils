@@ -1,3 +1,7 @@
+2011-02-27  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* readelf.c (reset_listptr): Clear TABLE->TABLE.
+
 2011-02-25  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (dwarf_attr_string): Add DW_AT_GNU_* handling.

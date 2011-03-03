@@ -3,6 +3,10 @@
 	* Makefile.am (TESTS): Add run-readelf-twofiles.sh.
 	* run-readelf-twofiles.sh: New file.
 
+2011-02-25  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (BUILD_RPATH): Be consistent in naming.
+
 2011-02-02  Josh Stone  <jistone@redhat.com>
 
 	* run-prelink-addr-test.sh: Add testfile55, 32 and 64-bit.

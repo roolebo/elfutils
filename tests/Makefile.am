@@ -57,7 +57,7 @@ noinst_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  dwfl-bug-addr-overflow arls dwfl-bug-fd-leak \
 		  dwfl-addr-sect dwfl-bug-report early-offscn \
 		  dwfl-bug-getmodules dwarf-getmacros addrcfi \
-		  test-flag-nobits
+		  test-flag-nobits dwarf-getstring
 asm_TESTS = asm-tst1 asm-tst2 asm-tst3 asm-tst4 asm-tst5 \
 	    asm-tst6 asm-tst7 asm-tst8 asm-tst9
 
@@ -83,7 +83,8 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-dwfl-bug-offline-rel.sh run-dwfl-addr-sect.sh \
 	run-disasm-x86.sh run-disasm-x86-64.sh \
 	run-early-offscn.sh run-dwarf-getmacros.sh \
-	run-test-flag-nobits.sh run-prelink-addr-test.sh
+	run-test-flag-nobits.sh run-prelink-addr-test.sh \
+	run-dwarf-getstring.sh
 # run-show-ciefde.sh
 
 if !STANDALONE
@@ -117,6 +118,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-addrname-test.sh run-dwfl-bug-offline-rel.sh \
 	     run-dwfl-addr-sect.sh run-early-offscn.sh \
 	     run-dwarf-getmacros.sh run-test-flag-nobits.sh \
+	     run-dwarf-getstring.sh \
 	     testfile15.bz2 testfile15.debug.bz2 \
 	     testfile16.bz2 testfile16.debug.bz2 \
 	     testfile17.bz2 testfile17.debug.bz2 \
@@ -246,6 +248,7 @@ dwfl_bug_getmodules_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
 dwfl_addr_sect_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
 sha1_tst_LDADD = $(libeu) $(libmudflap)
 dwarf_getmacros_LDADD = $(libdw) $(libmudflap)
+dwarf_getstring_LDADD = $(libdw) $(libmudflap)
 addrcfi_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
 test_flag_nobits_LDADD = $(libelf) $(libmudflap)
 

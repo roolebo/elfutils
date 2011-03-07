@@ -1,3 +1,9 @@
+2011-04-02  Marek Polacek  <mpolacek@redhat.com>
+
+	* dwarf-getstring.c: New test.
+	* run-dwarf-getstring.sh: And its wrapper.
+	* Makefile.am (EXTRA_DIST): Add and update all.
+
 2011-02-27  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* Makefile.am (TESTS): Add run-readelf-twofiles.sh.

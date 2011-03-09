@@ -1,3 +1,7 @@
+2011-03-09  Petr Machata  <pmachata@redhat.com>
+
+	* libdw/dwarf_child.c (dwarf_child): Check for section overrun.
+
 2011-02-23  Roland McGrath  <roland@redhat.com>
 
 	* libdwP.h (struct Dwarf) [USE_ZLIB]: New member sectiondata_gzip_mask.

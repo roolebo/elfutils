@@ -61,6 +61,10 @@ open_elf (Dwfl_Module *mod, struct dwfl_file *file)
 {
   if (file->elf == NULL)
     {
+      /* CBFAIL uses errno if it's set, so clear it first in case we don't
+	 set it with an open failure below.  */
+      errno = 0;
+
       /* If there was a pre-primed file name left that the callback left
 	 behind, try to open that file name.  */
       if (file->fd < 0 && file->name != NULL)

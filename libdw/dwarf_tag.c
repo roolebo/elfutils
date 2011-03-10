@@ -1,5 +1,5 @@
 /* Return tag of given DIE.
-   Copyright (C) 2003, 2004, 2005, 2006, 2008 Red Hat, Inc.
+   Copyright (C) 2003-2011 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -60,6 +60,10 @@ internal_function
 __libdw_findabbrev (struct Dwarf_CU *cu, unsigned int code)
 {
   Dwarf_Abbrev *abb;
+
+  /* Abbreviation code can never have a value of 0.  */
+  if (unlikely (code == 0))
+    return DWARF_END_ABBREV;
 
   /* See whether the entry is already in the hash table.  */
   abb = Dwarf_Abbrev_Hash_find (&cu->abbrev_hash, code, NULL);

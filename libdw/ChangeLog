@@ -1,3 +1,8 @@
+2011-03-10  Petr Machata  <pmachata@redhat.com>
+
+	* libdw/dwarf_tag.c (__libdw_findabbrev): Reject requests for
+	abbreviation with code 0.
+
 2011-03-09  Petr Machata  <pmachata@redhat.com>
 
 	* libdw/dwarf_child.c (dwarf_child): Check for section overrun.

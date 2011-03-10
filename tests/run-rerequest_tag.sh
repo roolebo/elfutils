@@ -27,7 +27,6 @@
 
 testfiles testfile56
 
-testrun_compare ./rerequest_tag testfile56 <<\EOF
-EOF
+testrun ./rerequest_tag testfile56
 
 exit 0

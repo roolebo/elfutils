@@ -30,14 +30,15 @@
 #include <string.h>
 #include <assert.h>
 
-int main(int argc, char *argv[])
+int
+main (int argc, char **argv)
 {
   assert (argc > 1);
 
-  int i = open(argv[1], O_RDONLY);
+  int i = open (argv[1], O_RDONLY);
   assert (i >= 0);
 
-  Dwarf *dw = dwarf_begin(i, DWARF_C_READ);
+  Dwarf *dw = dwarf_begin (i, DWARF_C_READ);
   assert (dw != NULL);
 
   Dwarf_Die die_mem, *die;

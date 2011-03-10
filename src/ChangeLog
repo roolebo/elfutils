@@ -1,3 +1,7 @@
+2011-03-10  Mark Wielaard  <mjw@redhat.com>
+
+	* elflint.c (check_symtab): Use ebl_check_st_other_bits.
+
 2011-02-27  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* readelf.c (reset_listptr): Clear TABLE->TABLE.

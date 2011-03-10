@@ -1,3 +1,12 @@
+2011-03-10  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (gen_SOURCES): Add eblstother.c.
+	* eblstother.c: New file.
+	* ebl-hooks.h: Add check_st_other_bits hook.
+	* eblopenbackend.c (default_check_st_other_bits): New function.
+	(fill_defaults): Hook default_check_st_other_bits.
+	* libebl.h (ebl_check_st_other_bits): New prototype.
+
 2010-07-07  Roland McGrath  <roland@redhat.com>
 
 	* eblopenbackend.c (default_debugscn_p): Match .gdb_index section.

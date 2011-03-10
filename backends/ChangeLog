@@ -1,3 +1,8 @@
+2011-03-09  Mark Wielaard  <mjw@redhat.com>
+
+	* alpha_init.c (alpha_init): Initialize check_st_other_bits hook.
+	* alpha_symbol.c (alpha_check_st_other_bits): New function.
+
 2011-03-09  Roland McGrath  <roland@redhat.com>
 
 	* alpha_symbol.c (alpha_check_special_symbol): New function.

@@ -1011,7 +1011,7 @@ section [%2d] '%s': _DYNAMIC symbol size %" PRIu64 " does not match dynamic segm
 	ERROR (gettext ("\
 section [%2d] '%s': symbol %zu: symbol in dynamic symbol table with non-default visibility\n"),
 	       idx, section_name (ebl, idx), cnt);
-      if ((sym->st_other ^ GELF_ST_VISIBILITY (sym->st_other)) != 0)
+      if (! ebl_check_st_other_bits (ebl, sym->st_other))
 	ERROR (gettext ("\
 section [%2d] '%s': symbol %zu: unknown bit set in st_other\n"),
 	       idx, section_name (ebl, idx), cnt);

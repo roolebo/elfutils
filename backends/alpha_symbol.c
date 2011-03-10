@@ -141,3 +141,13 @@ alpha_check_special_symbol (Elf *elf __attribute__ ((unused)),
 
   return false;
 }
+
+/* Check whether only valid bits are set on the st_other symbol flag.
+   Standard ST_VISIBILITY have already been masked off.  */
+bool
+alpha_check_st_other_bits (unsigned char st_other)
+{
+  return ((((st_other & STO_ALPHA_STD_GPLOAD) == STO_ALPHA_NOPV)
+	   || ((st_other & STO_ALPHA_STD_GPLOAD) == STO_ALPHA_STD_GPLOAD))
+	  && (st_other &~ STO_ALPHA_STD_GPLOAD) == 0);
+}

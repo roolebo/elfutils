@@ -1,5 +1,5 @@
 /* Generate ELF backend handle.
-   Copyright (C) 2000-2010 Red Hat, Inc.
+   Copyright (C) 2000-2011 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -202,6 +202,7 @@ static bool default_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr,
 					  const GElf_Sym *sym,
 					  const char *name,
 					  const GElf_Shdr *destshdr);
+static bool default_check_st_other_bits (unsigned char st_other);
 static bool default_check_special_section (Ebl *, int,
 					   const GElf_Shdr *, const char *);
 static bool default_bss_plt_p (Elf *elf, GElf_Ehdr *ehdr);
@@ -253,6 +254,7 @@ fill_defaults (Ebl *result)
   result->none_reloc_p = default_none_reloc_p;
   result->relative_reloc_p = default_relative_reloc_p;
   result->check_special_symbol = default_check_special_symbol;
+  result->check_st_other_bits = default_check_st_other_bits;
   result->bss_plt_p = default_bss_plt_p;
   result->return_value_location = default_return_value_location;
   result->register_info = default_register_info;
@@ -696,6 +698,13 @@ default_check_special_symbol (Elf *elf __attribute__ ((unused)),
 {
   return false;
 }
+
+static bool
+default_check_st_other_bits (unsigned char st_other __attribute__ ((unused)))
+{
+  return false;
+}
+
 
 static bool
 default_bss_plt_p (Elf *elf __attribute__ ((unused)),

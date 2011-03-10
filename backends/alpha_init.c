@@ -57,6 +57,7 @@ alpha_init (elf, machine, eh, ehlen)
   HOOK (eh, machine_section_flag_check);
   HOOK (eh, check_special_section);
   HOOK (eh, check_special_symbol);
+  HOOK (eh, check_st_other_bits);
   HOOK (eh, register_info);
   HOOK (eh, core_note);
   HOOK (eh, auxv_info);

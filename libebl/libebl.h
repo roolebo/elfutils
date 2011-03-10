@@ -168,6 +168,9 @@ extern bool ebl_check_special_symbol (Ebl *ebl, GElf_Ehdr *ehdr,
 				      const GElf_Sym *sym, const char *name,
 				      const GElf_Shdr *destshdr);
 
+/* Check whether only valid bits are set on the st_other symbol flag.  */
+extern bool ebl_check_st_other_bits (Ebl *ebl, unsigned char st_other);
+
 /* Return combined section header flags value.  */
 extern GElf_Word ebl_sh_flags_combine (Ebl *ebl, GElf_Word flags1,
 				       GElf_Word flags2);

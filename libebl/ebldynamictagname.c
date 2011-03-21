@@ -100,7 +100,7 @@ ebl_dynamic_tag_name (ebl, tag, buf, len)
 	{
 	  static const char *addrrntags[] =
 	    {
-	      "GNU_HASH", "TLSDESC_PLT", "TLSDESC_DOT",
+	      "GNU_HASH", "TLSDESC_PLT", "TLSDESC_GOT",
 	      "GNU_CONFLICT", "GNU_LIBLIST", "CONFIG", "DEPAUDIT", "AUDIT",
 	      "PLTPAD", "MOVETAB", "SYMINFO"
 	    };

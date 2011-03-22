@@ -1,3 +1,7 @@
+2011-03-22  Marek Polacek  <mpolacek@redhat.com>
+
+	* readelf.c (handle_dynamic): Don't segfault at DT_PLTREL case.
+
 2011-03-10  Mark Wielaard  <mjw@redhat.com>
 
 	* elflint.c (check_symtab): Use ebl_check_st_other_bits.

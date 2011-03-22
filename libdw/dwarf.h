@@ -128,6 +128,8 @@ enum
     DW_TAG_GNU_template_template_param = 0x4106,
     DW_TAG_GNU_template_parameter_pack = 0x4107,
     DW_TAG_GNU_formal_parameter_pack = 0x4108,
+    DW_TAG_GNU_call_site = 0x4109,
+    DW_TAG_GNU_call_site_parameter = 0x410a,
 
     DW_TAG_hi_user = 0xffff
   };
@@ -277,6 +279,14 @@ enum
     DW_AT_GNU_shared_locks_required = 0x210e,
     DW_AT_GNU_odr_signature = 0x210f,
     DW_AT_GNU_template_name = 0x2110,
+    DW_AT_GNU_call_site_value = 0x2111,
+    DW_AT_GNU_call_site_data_value = 0x2112,
+    DW_AT_GNU_call_site_target = 0x2113,
+    DW_AT_GNU_call_site_target_clobbered = 0x2114,
+    DW_AT_GNU_tail_call = 0x2115,
+    DW_AT_GNU_all_tail_call_sites = 0x2116,
+    DW_AT_GNU_all_call_sites = 0x2117,
+    DW_AT_GNU_all_source_call_sites = 0x2118,
 
     DW_AT_hi_user = 0x3fff
   };
@@ -476,6 +486,7 @@ enum
     DW_OP_GNU_uninit = 0xf0,
     DW_OP_GNU_encoded_addr = 0xf1,
     DW_OP_GNU_implicit_pointer = 0xf2,
+    DW_OP_GNU_entry_value = 0xf3,
 
     DW_OP_lo_user = 0xe0,	/* Implementation-defined range start.  */
     DW_OP_hi_user = 0xff	/* Implementation-defined range end.  */

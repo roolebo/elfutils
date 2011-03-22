@@ -3292,6 +3292,14 @@ dwarf_tag_string (unsigned int tag)
 	result = "GNU_formal_parameter_pack";
 	break;
 
+      case DW_TAG_GNU_call_site:
+	result = "DW_TAG_GNU_call_site";
+	break;
+
+      case DW_TAG_GNU_call_site_parameter:
+	result = "DW_TAG_GNU_call_site_parameter";
+	break;
+
       default:
 	if (tag < DW_TAG_lo_user)
 	  snprintf (buf, sizeof buf, gettext ("unknown tag %hx"), tag);
@@ -3548,6 +3556,38 @@ dwarf_attr_string (unsigned int attrnum)
 
       case DW_AT_GNU_template_name:
 	result = "GNU_template_name";
+	break;
+
+      case DW_AT_GNU_call_site_value:
+	result = "GNU_call_site_value";
+	break;
+
+      case DW_AT_GNU_call_site_data_value:
+	result = "GNU_call_site_data_value";
+	break;
+
+      case DW_AT_GNU_call_site_target:
+	result = "GNU_call_site_target";
+	break;
+
+      case DW_AT_GNU_call_site_target_clobbered:
+	result = "GNU_call_site_target_clobbered";
+	break;
+
+      case DW_AT_GNU_tail_call:
+	result = "GNU_tail_call";
+	break;
+
+      case DW_AT_GNU_all_tail_call_sites:
+	result = "GNU_all_tail_call_sites";
+	break;
+
+      case DW_AT_GNU_all_call_sites:
+	result = "GNU_all_call_sites";
+	break;
+
+      case DW_AT_GNU_all_source_call_sites:
+	result = "GNU_all_source_call_sites";
 	break;
 
       default:
@@ -4018,6 +4058,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
       [DW_OP_implicit_value] = "implicit_value",
       [DW_OP_stack_value] = "stack_value",
       [DW_OP_GNU_implicit_pointer] = "GNU_implicit_pointer",
+      [DW_OP_GNU_entry_value] = "GNU_entry_value",
     };
 
   if (len == 0)
@@ -4278,6 +4319,21 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  printf ("%*s[%4" PRIuMAX "] %s %#" PRIxMAX ", %+" PRId64 "\n",
 		  indent, "", (intmax_t) offset,
 		  known[op], (uintmax_t) addr, sleb);
+	  CONSUME (data - start);
+	  offset += 1 + (data - start);
+	  break;
+
+	case DW_OP_GNU_entry_value:
+	  /* Size plus expression block.  */
+	  start = data;
+	  NEED (1);
+	  get_uleb128 (uleb, data); /* XXX check overrun */
+	  printf ("%*s[%4" PRIuMAX "] %s:\n",
+		  indent, "", (uintmax_t) offset, known[op]);
+	  NEED (uleb);
+	  print_ops (dwflmod, dbg, indent + 6, indent + 6, vers,
+		     addrsize, offset_size, uleb, data);
+	  data += uleb;
 	  CONSUME (data - start);
 	  offset += 1 + (data - start);
 	  break;
@@ -5533,6 +5589,10 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	case DW_AT_frame_base:
 	case DW_AT_return_addr:
 	case DW_AT_static_link:
+	case DW_AT_GNU_call_site_value:
+	case DW_AT_GNU_call_site_data_value:
+	case DW_AT_GNU_call_site_target:
+	case DW_AT_GNU_call_site_target_clobbered:
 	  notice_listptr (section_loc, &known_loclistptr,
 			  cbargs->addrsize, cbargs->offset_size, num);
 	  if (!cbargs->silent)
@@ -5662,6 +5722,11 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	case DW_AT_count:
 	case DW_AT_lower_bound:
 	case DW_AT_upper_bound:
+	case DW_AT_GNU_call_site_value:
+	case DW_AT_GNU_call_site_data_value:
+	case DW_AT_GNU_call_site_target:
+	case DW_AT_GNU_call_site_target_clobbered:
+	  putchar ('\n');
 	  print_ops (cbargs->dwflmod, cbargs->dbg,
 		     12 + level * 2, 12 + level * 2,
 		     cbargs->version, cbargs->addrsize, cbargs->offset_size,

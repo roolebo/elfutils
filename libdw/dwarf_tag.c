@@ -90,6 +90,11 @@ __libdw_findabbrev (struct Dwarf_CU *cu, unsigned int code)
 	  break;
       }
 
+  /* This is our second (or third, etc.) call to __libdw_findabbrev
+     and the code is invalid.  */
+  if (unlikely (abb == NULL))
+    abb = DWARF_END_ABBREV;
+
   return abb;
 }
 

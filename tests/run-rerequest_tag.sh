@@ -25,8 +25,9 @@
 
 . $srcdir/test-subr.sh
 
-testfiles testfile56
+testfiles testfile56 testfile57
 
 testrun ./rerequest_tag testfile56
+testrun ./rerequest_tag testfile57
 
 exit 0

@@ -6142,12 +6142,14 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
       while (linep < lineendp)
 	{
+	  size_t offset = linep - (const unsigned char *) data->d_buf;
 	  unsigned int u128;
 	  int s128;
 
 	  /* Read the opcode.  */
 	  unsigned int opcode = *linep++;
 
+	  printf (" [%6" PRIx64 "]", (uint64_t)offset);
 	  /* Is this a special opcode?  */
 	  if (likely (opcode >= opcode_base))
 	    {
@@ -6196,7 +6198,7 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	      switch (opcode)
 		{
 		case DW_LNE_end_sequence:
-		  puts (gettext ("end of sequence"));
+		  puts (gettext (" end of sequence"));
 
 		  /* Reset the registers we care about.  */
 		  address = 0;
@@ -6213,7 +6215,7 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 		    address = read_8ubyte_unaligned_inc (dbg, linep);
 		  {
 		    char *a = format_dwarf_addr (dwflmod, 0, address);
-		    printf (gettext ("set address to %s\n"), a);
+		    printf (gettext (" set address to %s\n"), a);
 		    free (a);
 		  }
 		  break;
@@ -6235,7 +6237,7 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 		    get_uleb128 (filelength, linep);
 
 		    printf (gettext ("\
-define new file: dir=%u, mtime=%" PRIu64 ", length=%" PRIu64 ", name=%s\n"),
+ define new file: dir=%u, mtime=%" PRIu64 ", length=%" PRIu64 ", name=%s\n"),
 			    diridx, (uint64_t) mtime, (uint64_t) filelength,
 			    fname);
 		  }
@@ -6252,7 +6254,7 @@ define new file: dir=%u, mtime=%" PRIu64 ", length=%" PRIu64 ", name=%s\n"),
 
 		default:
 		  /* Unknown, ignore it.  */
-		  puts (gettext ("unknown opcode"));
+		  puts (gettext (" unknown opcode"));
 		  linep += len - 1;
 		  break;
 		}
@@ -6276,10 +6278,10 @@ define new file: dir=%u, mtime=%" PRIu64 ", length=%" PRIu64 ", name=%s\n"),
 		    char *a = format_dwarf_addr (dwflmod, 0, address);
 		    if (show_op_index)
 		      printf (gettext ("\
-advance address by %u to %s, op_index to %u\n"),
+ advance address by %u to %s, op_index to %u\n"),
 			      op_addr_advance, a, op_index);
 		    else
-		      printf (gettext ("advance address by %u to %s\n"),
+		      printf (gettext (" advance address by %u to %s\n"),
 			      op_addr_advance, a);
 		    free (a);
 		  }
@@ -6331,11 +6333,11 @@ advance address by %u to %s, op_index to %u\n"),
 		    char *a = format_dwarf_addr (dwflmod, 0, address);
 		    if (show_op_index)
 		      printf (gettext ("\
-advance address by constant %u to %s, op_index to %u\n"),
+ advance address by constant %u to %s, op_index to %u\n"),
 			      op_addr_advance, a, op_index);
 		    else
 		      printf (gettext ("\
-advance address by constant %u to %s\n"),
+ advance address by constant %u to %s\n"),
 			      op_addr_advance, a);
 		    free (a);
 		  }
@@ -6353,7 +6355,7 @@ advance address by constant %u to %s\n"),
 		  {
 		    char *a = format_dwarf_addr (dwflmod, 0, address);
 		    printf (gettext ("\
-advance address by fixed value %u to %s\n"),
+ advance address by fixed value %u to %s\n"),
 			    u128, a);
 		    free (a);
 		  }

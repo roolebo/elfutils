@@ -1,3 +1,8 @@
+2011-03-24  Petr Machata  <pmachata@redhat.com>
+
+	* readelf.c (print_debug_line_section): Emit initial space for all
+	opcode lines.  Print offset in front of each opcode.
+
 2011-03-22  Marek Polacek  <mpolacek@redhat.com>
 
 	* readelf.c (handle_dynamic): Don't segfault at DT_PLTREL case.

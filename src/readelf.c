@@ -1445,8 +1445,10 @@ handle_dynamic (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 	  printf ("%" PRId64 "\n", dyn->d_un.d_val);
 	  break;
 
-	case DT_PLTREL:
-	  puts (ebl_dynamic_tag_name (ebl, dyn->d_un.d_val, NULL, 0));
+	case DT_PLTREL:;
+	  const char *tagname = ebl_dynamic_tag_name (ebl, dyn->d_un.d_val,
+						      NULL, 0);
+	  puts (tagname ?: "???");
 	  break;
 
 	case DT_FLAGS:

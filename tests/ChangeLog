@@ -1,4 +1,11 @@
-2011-04-02  Marek Polacek  <mpolacek@redhat.com>
+2011-03-28  Marek Polacek  <mpolacek@redhat.com>
+
+	* alldts.c: New file.
+	* run-alldts.sh: Use it.
+	* Makefile.am (TESTS, EXTRA_DIST, noinst_PROGRAMS): Add them.
+	(alldts_LDADD): New variable.
+
+2011-03-02  Marek Polacek  <mpolacek@redhat.com>
 
 	* dwarf-getstring.c: New test.
 	* run-dwarf-getstring.sh: And its wrapper.

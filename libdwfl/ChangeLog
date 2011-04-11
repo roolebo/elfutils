@@ -1,3 +1,9 @@
+2011-04-11  Mark Wielaard  <mjw@redhat.com>
+
+	* linux-kernel-modules.c (vmlinux_suffixes): Guard definition
+	by check for zlib, bzlib or lzma defines to check it isn't empty.
+	(try_kernel_name): Use same guard for use of vmlinux_suffixes.
+
 2011-03-08  Roland McGrath  <roland@redhat.com>
 
 	* dwfl_module_getdwarf.c (open_elf): Clear errno before CBFAIL.

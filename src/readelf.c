@@ -93,8 +93,8 @@ static const struct argp_option options[] =
   { NULL, 0, NULL, 0, N_("Additional output selection:"), 0 },
   { "debug-dump", 'w', "SECTION", OPTION_ARG_OPTIONAL,
     N_("Display DWARF section content.  SECTION can be one of abbrev, "
-       "aranges, frame, info, loc, line, ranges, pubnames, str, macinfo, "
-       "or exception"), 0 },
+       "aranges, frame, gdb_index, info, loc, line, ranges, pubnames, str, "
+       "macinfo, or exception"), 0 },
   { "hex-dump", 'x', "SECTION", 0,
     N_("Dump the uninterpreted contents of SECTION, by number or name"), 0 },
   { "strings", 'p', "SECTION", OPTION_ARG_OPTIONAL,
@@ -189,10 +189,11 @@ static enum section_e
   section_macinfo = 256,	/* .debug_macinfo  */
   section_ranges = 512, 	/* .debug_ranges  */
   section_exception = 1024,	/* .eh_frame & al.  */
+  section_gdb_index = 2048,	/* .gdb_index  */
   section_all = (section_abbrev | section_aranges | section_frame
 		 | section_info | section_line | section_loc
 		 | section_pubnames | section_str | section_macinfo
-		 | section_ranges | section_exception)
+		 | section_ranges | section_exception | section_gdb_index)
 } print_debug_sections, implicit_debug_sections;
 
 /* Select hex dumping of sections.  */
@@ -403,6 +404,8 @@ parse_opt (int key, char *arg,
 	print_debug_sections |= section_macinfo;
       else if (strcmp (arg, "exception") == 0)
 	print_debug_sections |= section_exception;
+      else if (strcmp (arg, "gdb_index") == 0)
+	print_debug_sections |= section_gdb_index;
       else
 	{
 	  fprintf (stderr, gettext ("Unknown DWARF debug section `%s'.\n"),
@@ -7022,6 +7025,205 @@ print_debug_exception_table (Dwfl_Module *dwflmod __attribute__ ((unused)),
     }
 }
 
+/* Print the content of the '.gdb_index' section.
+   http://sourceware.org/gdb/current/onlinedocs/gdb/Index-Section-Format.html
+*/
+static void
+print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
+			 Elf_Scn *scn, GElf_Shdr *shdr, Dwarf *dbg)
+{
+  printf (gettext ("\nGDB section [%2zu] '%s' at offset %#" PRIx64
+		   " contains %" PRId64 " bytes :\n"),
+	  elf_ndxscn (scn), section_name (ebl, ehdr, shdr),
+	  (uint64_t) shdr->sh_offset, (uint64_t) shdr->sh_size);
+
+  Elf_Data *data = elf_rawdata (scn, NULL);
+
+  if (unlikely (data == NULL))
+    {
+      error (0, 0, gettext ("cannot get %s content: %s"),
+	     ".gdb_index", elf_errmsg (-1));
+      return;
+    }
+
+  // .gdb_index is always in little endian.
+  Dwarf dummy_dbg = { .other_byte_order = MY_ELFDATA != ELFDATA2LSB };
+  dbg = &dummy_dbg;
+
+  const unsigned char *readp = data->d_buf;
+  const unsigned char *const dataend = readp + data->d_size;
+
+  if (unlikely (readp + 4 > dataend))
+    {
+    invalid_data:
+      error (0, 0, gettext ("invalid data"));
+      return;
+    }
+
+  int32_t vers = read_4ubyte_unaligned (dbg, readp);
+  printf (gettext (" Version:         %" PRId32 "\n"), vers);
+
+  // The only difference between version 4 and version 5 is the
+  // hash used for generating the table.
+  if (vers < 4 || vers > 5)
+    {
+      printf (gettext ("  unknown version, cannot parse section\n"));
+      return;
+    }
+
+  readp += 4;
+  if (unlikely (readp + 4 > dataend))
+    goto invalid_data;
+
+  uint32_t cu_off = read_4ubyte_unaligned (dbg, readp);
+  printf (gettext (" CU offset:       %#" PRIx32 "\n"), cu_off);
+
+  readp += 4;
+  if (unlikely (readp + 4 > dataend))
+    goto invalid_data;
+
+  uint32_t tu_off = read_4ubyte_unaligned (dbg, readp);
+  printf (gettext (" TU offset:       %#" PRIx32 "\n"), tu_off);
+
+  readp += 4;
+  if (unlikely (readp + 4 > dataend))
+    goto invalid_data;
+
+  uint32_t addr_off = read_4ubyte_unaligned (dbg, readp);
+  printf (gettext (" address offset:  %#" PRIx32 "\n"), addr_off);
+
+  readp += 4;
+  if (unlikely (readp + 4 > dataend))
+    goto invalid_data;
+
+  uint32_t sym_off = read_4ubyte_unaligned (dbg, readp);
+  printf (gettext (" symbol offset:   %#" PRIx32 "\n"), sym_off);
+
+  readp += 4;
+  if (unlikely (readp + 4 > dataend))
+    goto invalid_data;
+
+  uint32_t const_off = read_4ubyte_unaligned (dbg, readp);
+  printf (gettext (" constant offset: %#" PRIx32 "\n"), const_off);
+
+  readp = data->d_buf + cu_off;
+
+  const unsigned char *nextp = data->d_buf + tu_off;
+  size_t nr = (nextp - readp) / 16;
+
+  printf (gettext ("\n CU list at offset %#" PRIx32
+		   " contains %zu entries:\n"),
+	  cu_off, nr);
+
+  size_t n = 0;
+  while (readp + 16 <= dataend && n < nr)
+    {
+      uint64_t off = read_8ubyte_unaligned (dbg, readp);
+      readp += 8;
+
+      uint64_t len = read_8ubyte_unaligned (dbg, readp);
+      readp += 8;
+
+      printf (" [%4zu] start: %0#8" PRIx64
+	      ", length: %5" PRIu64 "\n", n, off, len);
+      n++;
+    }
+
+  readp = data->d_buf + tu_off;
+  nextp = data->d_buf + addr_off;
+  nr = (nextp - readp) / 24;
+
+  printf (gettext ("\n TU list at offset %#" PRIx32
+		   " contains %zu entries:\n"),
+	  tu_off, nr);
+
+  n = 0;
+  while (readp + 24 <= dataend && n < nr)
+    {
+      uint64_t off = read_8ubyte_unaligned (dbg, readp);
+      readp += 8;
+
+      uint64_t type = read_8ubyte_unaligned (dbg, readp);
+      readp += 8;
+
+      uint64_t sig = read_8ubyte_unaligned (dbg, readp);
+      readp += 8;
+
+      printf (" [%4zu] CU offset: %5" PRId64
+	      ", type offset: %5" PRId64
+	      ", signature: %0#8" PRIx64 "\n", n, off, type, sig);
+      n++;
+    }
+
+  readp = data->d_buf + addr_off;
+  nextp = data->d_buf + sym_off;
+  nr = (nextp - readp) / 20;
+
+  printf (gettext ("\n Address list at offset %#" PRIx32
+		   " contains %zu entries:\n"),
+	  addr_off, nr);
+
+  n = 0;
+  while (readp + 20 <= dataend && n < nr)
+    {
+      uint64_t low = read_8ubyte_unaligned (dbg, readp);
+      readp += 8;
+
+      uint64_t high = read_8ubyte_unaligned (dbg, readp);
+      readp += 8;
+
+      uint32_t idx = read_4ubyte_unaligned (dbg, readp);
+      readp += 4;
+
+      char *l = format_dwarf_addr (dwflmod, 8, low);
+      char *h = format_dwarf_addr (dwflmod, 8, high - 1);
+      printf (" [%4zu] %s..%s, CU index: %5" PRId32 "\n",
+	      n, l, h, idx);
+      n++;
+    }
+
+  readp = data->d_buf + sym_off;
+  nextp = data->d_buf + const_off;
+  nr = (nextp - readp) / 8;
+
+  printf (gettext ("\n Symbol table at offset %#" PRIx32
+		   " contains %zu slots:\n"),
+	  addr_off, nr);
+
+  n = 0;
+  while (readp + 8 <= dataend && n < nr)
+    {
+      uint32_t name = read_4ubyte_unaligned (dbg, readp);
+      readp += 4;
+
+      uint32_t vector = read_4ubyte_unaligned (dbg, readp);
+      readp += 4;
+
+      if (name != 0 || vector != 0)
+	{
+	  const unsigned char *sym = data->d_buf + const_off + name;
+	  if (unlikely (sym > dataend))
+	    goto invalid_data;
+
+	  printf (" [%4zu] symbol: %s, CUs: ", n, sym);
+
+	  const unsigned char *readcus = data->d_buf + const_off + vector;
+	  if (unlikely (readcus + 8 > dataend))
+	    goto invalid_data;
+
+	  uint32_t cus = read_4ubyte_unaligned (dbg, readcus);
+	  while (cus--)
+	    {
+	      uint32_t cu;
+	      readcus += 4;
+	      cu = read_4ubyte_unaligned (dbg, readcus);
+	      printf ("%" PRId32 "%s", cu, ((cus > 0) ? ", " : ""));
+	    }
+	  printf ("\n");
+	}
+      n++;
+    }
+}
 
 static void
 print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
@@ -7081,7 +7283,8 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
 	      { ".eh_frame_hdr", section_frame | section_exception,
 		print_debug_frame_hdr_section },
 	      { ".gcc_except_table", section_frame | section_exception,
-		print_debug_exception_table }
+		print_debug_exception_table },
+	      { ".gdb_index", section_gdb_index, print_gdb_index_section }
 	    };
 	  const int ndebug_sections = (sizeof (debug_sections)
 				       / sizeof (debug_sections[0]));

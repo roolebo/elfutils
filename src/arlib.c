@@ -61,7 +61,7 @@ arlib_init (void)
   /* Using snprintf here has a problem: the call always wants to add a
      NUL byte.  We could use a trick whereby we specify the target
      buffer size longer than it is and this would not actually fail,
-     since all the fields are consecutive and we fill them in in
+     since all the fields are consecutive and we fill them in
      sequence (i.e., the NUL byte gets overwritten).  But
      _FORTIFY_SOURCE=2 would not let us play these games.  Therefore
      we play it safe.  */

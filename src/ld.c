@@ -1465,7 +1465,7 @@ static void
 create_lscript_symbols (void)
 {
   /* Walk through the data from the linker script and generate all the
-     symbols which are required to be present and and those marked
+     symbols which are required to be present and those marked
      with PROVIDE if there is a undefined reference.  */
   if (ld_state.output_segments == NULL)
     return;

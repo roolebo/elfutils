@@ -251,7 +251,7 @@ struct Elf_Scn
   char *rawdata_base;		/* The unmodified data of the section.  */
   char *data_base;		/* The converted data of the section.  */
 
-  struct Elf_ScnList *list;	/* Pointer the the section list element the
+  struct Elf_ScnList *list;	/* Pointer to the section list element the
 				   data is in.  */
 };
 

@@ -5854,9 +5854,8 @@ section index too large in dynamic symbol table"));
 
 	     - the symbol is for a file
 	     - it is not externally visible (internal, hidden)
-	     - if export_all_dynamic is not set and is only defined in
-	       the executable (i.e., it is defined, but not (also) in
-	       in DSO)
+	     - export_all_dynamic is not set and the symbol is only defined
+	       in the executable (i.e., it is defined, but not (also) in DSO)
 
 	     Set symstrent[cnt] to NULL in case an entry is ignored.  */
 	  if (XELF_ST_TYPE (sym->st_info) == STT_FILE

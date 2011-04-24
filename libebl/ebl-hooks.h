@@ -111,7 +111,8 @@ const char *EBLHOOK(osabi_name) (int, char *, size_t);
 const char *EBLHOOK(core_note_type_name) (uint32_t, char *, size_t);
 
 /* Name of a note entry type for object files.  */
-const char *EBLHOOK(object_note_type_name) (uint32_t, char *, size_t);
+const char *EBLHOOK(object_note_type_name) (const char *, uint32_t,
+					    char *, size_t);
 
 /* Describe core note format.  */
 int EBLHOOK(core_note) (const GElf_Nhdr *, const char *,

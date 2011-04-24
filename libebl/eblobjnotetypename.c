@@ -1,5 +1,5 @@
 /* Return note type name.
-   Copyright (C) 2002, 2007, 2009 Red Hat, Inc.
+   Copyright (C) 2002, 2007, 2009, 2011 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -54,20 +54,28 @@
 
 #include <inttypes.h>
 #include <stdio.h>
+#include <string.h>
 #include <libeblP.h>
 
 
 const char *
-ebl_object_note_type_name (ebl, type, buf, len)
+ebl_object_note_type_name (ebl, name, type, buf, len)
      Ebl *ebl;
+     const char *name;
      uint32_t type;
      char *buf;
      size_t len;
 {
-  const char *res = ebl->object_note_type_name (type, buf, len);
+  const char *res = ebl->object_note_type_name (name, type, buf, len);
 
   if (res == NULL)
     {
+      if (strcmp (name, "stapsdt") == 0)
+	{
+	  snprintf (buf, len, "Version: %" PRIu32, type);
+	  return buf;
+	}
+
       static const char *knowntypes[] =
 	{
 #define KNOWNSTYPE(name) [NT_##name] = #name

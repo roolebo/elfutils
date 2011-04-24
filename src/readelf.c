@@ -7904,7 +7904,7 @@ handle_notes_data (Ebl *ebl, const GElf_Ehdr *ehdr,
 	      ehdr->e_type == ET_CORE
 	      ? ebl_core_note_type_name (ebl, nhdr.n_type,
 					 buf, sizeof (buf))
-	      : ebl_object_note_type_name (ebl, nhdr.n_type,
+	      : ebl_object_note_type_name (ebl, name, nhdr.n_type,
 					   buf2, sizeof (buf2)));
 
       /* Filter out invalid entries.  */

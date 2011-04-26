@@ -177,13 +177,13 @@ dwarf_child (die, result)
 
   /* RESULT can be the same as DIE.  So preserve what we need.  */
   struct Dwarf_CU *cu = die->cu;
+  Elf_Data *cu_sec = cu_data (cu);
 
   /* It's kosher (just suboptimal) to have a null entry first thing (7.5.3).
      So if this starts with ULEB128 of 0 (even with silly encoding of 0),
      it is a kosher null entry and we do not really have any children.  */
   const unsigned char *code = addr;
-  const unsigned char *endp = (cu->dbg->sectiondata[IDX_debug_info]->d_buf
-			       + cu->dbg->sectiondata[IDX_debug_info]->d_size);
+  const unsigned char *endp = (cu_sec->d_buf + cu_sec->d_size);
   while (1)
     {
       if (unlikely (code >= endp)) /* Truncated section.  */

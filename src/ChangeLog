@@ -1,3 +1,11 @@
+2011-04-14  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (options): Add gdb_index.
+	(section_e): Define section_gdb_index.
+	(parse_opt): Recognize gdb_index debug-dump argument.
+	(print_gdb_index_section): New function.
+	(print_debug): Add gdb_index to debug_sections.
+
 2011-03-24  Petr Machata  <pmachata@redhat.com>
 
 	* readelf.c (print_debug_line_section): Emit initial space for all

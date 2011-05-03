@@ -184,8 +184,9 @@ extern const char *ebl_core_note_type_name (Ebl *ebl, uint32_t type, char *buf,
 					    size_t len);
 
 /* Return name of the note section type for an object file.  */
-extern const char *ebl_object_note_type_name (Ebl *ebl, uint32_t type,
-					      char *buf, size_t len);
+extern const char *ebl_object_note_type_name (Ebl *ebl, const char *name,
+					      uint32_t type, char *buf,
+					      size_t len);
 
 /* Print information about object note if available.  */
 extern void ebl_object_note (Ebl *ebl, const char *name, uint32_t type,

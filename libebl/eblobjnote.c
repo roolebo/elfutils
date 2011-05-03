@@ -1,5 +1,5 @@
 /* Print contents of object file note.
-   Copyright (C) 2002, 2007, 2009 Red Hat, Inc.
+   Copyright (C) 2002, 2007, 2009, 2011 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -68,6 +68,94 @@ ebl_object_note (ebl, name, type, descsz, desc)
 {
   if (! ebl->object_note (name, type, descsz, desc))
     /* The machine specific function did not know this type.  */
+
+    if (strcmp ("stapsdt", name) == 0)
+      {
+	if (type != 3)
+	  {
+	    printf (gettext ("unknown SDT version %u\n"), type);
+	    return;
+	  }
+
+	/* Descriptor starts with three addresses, pc, base ref and
+	   semaphore.  Then three zero terminated strings provider,
+	   name and arguments.  */
+
+	union
+	{
+	  Elf64_Addr a64[3];
+	  Elf32_Addr a32[3];
+	} addrs;
+
+	size_t addrs_size = gelf_fsize (ebl->elf, ELF_T_ADDR, 3, EV_CURRENT);
+	if (descsz < addrs_size + 3)
+	  {
+	  invalid_sdt:
+	    printf (gettext ("invalid SDT probe descriptor\n"));
+	    return;
+	  }
+
+	Elf_Data src =
+	  {
+	    .d_type = ELF_T_ADDR, .d_version = EV_CURRENT,
+	    .d_buf = (void *) desc, .d_size = addrs_size
+	  };
+
+	Elf_Data dst =
+	  {
+	    .d_type = ELF_T_ADDR, .d_version = EV_CURRENT,
+	    .d_buf = &addrs, .d_size = addrs_size
+	  };
+
+	if (gelf_xlatetom (ebl->elf, &dst, &src,
+			   elf_getident (ebl->elf, NULL)[EI_DATA]) == NULL)
+	  {
+	    printf ("%s\n", elf_errmsg (-1));
+	    return;
+	  }
+
+	const char *provider = desc + addrs_size;
+	const char *pname = memchr (provider, '\0', desc + descsz - provider);
+	if (pname == NULL)
+	  goto invalid_sdt;
+
+	++pname;
+	const char *args = memchr (pname, '\0', desc + descsz - pname);
+	if (args == NULL ||
+	    memchr (++args, '\0', desc + descsz - pname) != desc + descsz - 1)
+	  goto invalid_sdt;
+
+	GElf_Addr pc;
+	GElf_Addr base;
+	GElf_Addr sem;
+	if (gelf_getclass (ebl->elf) == ELFCLASS32)
+	  {
+	    pc = addrs.a32[0];
+	    base = addrs.a32[1];
+	    sem = addrs.a32[2];
+	  }
+	else
+	  {
+	    pc = addrs.a64[0];
+	    base = addrs.a64[1];
+	    sem = addrs.a64[2];
+	  }
+
+	printf (gettext ("    PC: "));
+	printf ("%#" PRIx64 ",", pc);
+	printf (gettext (" Base: "));
+	printf ("%#" PRIx64 ",", base);
+	printf (gettext (" Semaphore: "));
+	printf ("%#" PRIx64 "\n", sem);
+	printf (gettext ("    Provider: "));
+	printf ("%s,", provider);
+	printf (gettext (" Name: "));
+	printf ("%s,", pname);
+	printf (gettext (" Args: "));
+	printf ("'%s'\n", args);
+	return;
+      }
+
     switch (type)
       {
       case NT_GNU_BUILD_ID:

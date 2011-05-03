@@ -184,8 +184,8 @@ static const char *default_osabi_name (int ignore, char *buf, size_t len);
 static void default_destr (struct ebl *ignore);
 static const char *default_core_note_type_name (uint32_t, char *buf,
 						size_t len);
-static const char *default_object_note_type_name (uint32_t, char *buf,
-						  size_t len);
+static const char *default_object_note_type_name (const char *name, uint32_t,
+						  char *buf, size_t len);
 static int default_core_note (const GElf_Nhdr *nhdr, const char *name,
 			      GElf_Word *regs_offset, size_t *nregloc,
 			      const Ebl_Register_Location **reglocs,
@@ -619,7 +619,8 @@ default_core_note (const GElf_Nhdr *nhdr __attribute__ ((unused)),
 }
 
 static const char *
-default_object_note_type_name (uint32_t ignore __attribute__ ((unused)),
+default_object_note_type_name (const char *name __attribute__ ((unused)),
+			       uint32_t ignore __attribute__ ((unused)),
 			       char *buf __attribute__ ((unused)),
 			       size_t len __attribute__ ((unused)))
 {

@@ -706,7 +706,7 @@ compare_sections_rel (const void *a, const void *b)
   return compare_sections (a, b, true);
 }
 
-int
+static int
 compare_sections_nonrel (const void *a, const void *b)
 {
   return compare_sections (a, b, false);

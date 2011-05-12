@@ -718,8 +718,7 @@ sym_name (Elf *elf, GElf_Word strndx, GElf_Word st_name, char buf[], size_t n)
 
 /* Show symbols in SysV format.  */
 static void
-show_symbols_sysv (Ebl *ebl, GElf_Word strndx,
-		   const char *prefix, const char *fname, const char *fullname,
+show_symbols_sysv (Ebl *ebl, GElf_Word strndx, const char *fullname,
 		   GElf_SymX *syms, size_t nsyms, int longest_name,
 		   int longest_where)
 {
@@ -762,10 +761,7 @@ show_symbols_sysv (Ebl *ebl, GElf_Word strndx,
   int digits = length_map[gelf_getclass (ebl->elf) - 1][radix];
 
   /* We always print this prolog.  */
-  if (prefix == NULL || 1)
-    printf (gettext ("\n\nSymbols from %s:\n\n"), fullname);
-  else
-    printf (gettext ("\n\nSymbols from %s[%s]:\n\n"), prefix, fname);
+  printf (gettext ("\n\nSymbols from %s:\n\n"), fullname);
 
   /* The header line.  */
   printf (gettext ("%*s%-*s %-*s Class  Type     %-*s %*s Section\n\n"),
@@ -1185,9 +1181,8 @@ show_symbols (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, Elf_Scn *xndxscn,
   switch (format)
     {
     case format_sysv:
-      show_symbols_sysv (ebl, shdr->sh_link, prefix, fname,
-			 fullname, sym_mem, nentries, longest_name,
-			 longest_where);
+      show_symbols_sysv (ebl, shdr->sh_link, fullname, sym_mem, nentries,
+			 longest_name, longest_where);
       break;
 
     case format_bsd:

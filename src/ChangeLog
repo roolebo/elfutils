@@ -1,3 +1,12 @@
+2011-05-23  Mark Wielaard  <mjw@redhat.com>
+
+	* strip.c (OPT_RELOC_DEBUG): New option.
+	(argp_option): Add new --reloc-debug-sections option.
+	(main): Check new option.
+	(parse_opt): Likewise.
+	(handle_elf): Remove any relocations between debug sections
+	in ET_REL for the debug file when requested.
+
 2011-05-18  Mark Wielaard  <mjw@redhat.com>
 
 	* strip.c (handle_elf): Make sure all sections of a removed group

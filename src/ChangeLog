@@ -1,3 +1,8 @@
+2011-05-17  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (dwarf_tag_string): Fixup DW_TAG_GNU_call_site and
+	DW_TAG_GNU_call_site_parameter return strings.
+
 2011-05-11  Marek Polacek  <mpolacek@redhat.com>
 
 	* nm.c (show_symbols_sysv): Remove unused if/else, remove

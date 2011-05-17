@@ -3298,11 +3298,11 @@ dwarf_tag_string (unsigned int tag)
 	break;
 
       case DW_TAG_GNU_call_site:
-	result = "DW_TAG_GNU_call_site";
+	result = "GNU_call_site";
 	break;
 
       case DW_TAG_GNU_call_site_parameter:
-	result = "DW_TAG_GNU_call_site_parameter";
+	result = "GNU_call_site_parameter";
 	break;
 
       default:

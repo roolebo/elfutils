@@ -1,3 +1,10 @@
+2011-05-18  Mark Wielaard  <mjw@redhat.com>
+
+	* strip.c (handle_elf): Make sure all sections of a removed group
+	section are removed too. Don't discard SHT_GROUP sections, copy
+	section table before it gets modified. Section group signature
+	symbols don't have to be retained.
+
 2011-05-16  Jakub Jelinek  <jakub@redhat.com>
 
 	* readelf.c (print_ops): Handle DW_OP_GNU_const_type,

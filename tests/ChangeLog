@@ -1,3 +1,11 @@
+2011-05-18  Mark Wielaard  <mjw@redhat.com>
+
+	* run-strip-groups.sh: New test.
+	* testfile58.bz2: New test file.
+	* Makefile.am (EXTRA_DIST): Add testfile58.bz2.
+	(TESTS): Add run-strip-groups.sh.
+	(EXTRA_DIST): Likewise.
+
 2011-03-28  Marek Polacek  <mpolacek@redhat.com>
 
 	* alldts.c: New file.

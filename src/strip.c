@@ -726,6 +726,22 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 		   || shdr_info[cnt].shdr.sh_type == SHT_RELA)
 		  && shdr_info[shdr_info[cnt].shdr.sh_info].idx != 0)
 		shdr_info[cnt].idx = 1;
+
+	      /* If a group section is marked as being removed make
+		 sure all the sections it contains are being removed, too.  */
+	      if (shdr_info[cnt].shdr.sh_type == SHT_GROUP)
+		{
+		  Elf32_Word *grpref;
+		  grpref = (Elf32_Word *) shdr_info[cnt].data->d_buf;
+		  for (size_t in = 1;
+		       in < shdr_info[cnt].data->d_size / sizeof (Elf32_Word);
+		       ++in)
+		    if (shdr_info[grpref[in]].idx != 0)
+		      {
+			shdr_info[cnt].idx = 1;
+			break;
+		      }
+		}
 	    }
 
 	  if (shdr_info[cnt].idx == 1)
@@ -883,6 +899,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	  bool discard_section = (shdr_info[cnt].idx > 0
 				  && shdr_info[cnt].debug_data == NULL
 				  && shdr_info[cnt].shdr.sh_type != SHT_NOTE
+				  && shdr_info[cnt].shdr.sh_type != SHT_GROUP
 				  && cnt != ehdr->e_shstrndx);
 
 	  /* Set the section header in the new file.  */
@@ -912,7 +929,8 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	  *debugdata = *shdr_info[cnt].data;
 	  if (discard_section)
 	    debugdata->d_buf = NULL;
-	  else if (shdr_info[cnt].debug_data != NULL)
+	  else if (shdr_info[cnt].debug_data != NULL
+		   || shdr_info[cnt].shdr.sh_type == SHT_GROUP)
 	    {
 	      /* Copy the original data before it gets modified.  */
 	      shdr_info[cnt].debug_data = debugdata;
@@ -1261,9 +1279,15 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 		      }
 		    else if (debug_fname == NULL
 			     || shdr_info[cnt].debug_data == NULL)
-		      /* This is a section symbol for a section which has
-			 been removed.  */
-		      assert (GELF_ST_TYPE (sym->st_info) == STT_SECTION);
+		      /* This is a section or group signature symbol
+			 for a section which has been removed.  */
+		      {
+			size_t sidx = (sym->st_shndx != SHN_XINDEX
+					? sym->st_shndx : xshndx);
+			assert (GELF_ST_TYPE (sym->st_info) == STT_SECTION
+				|| (shdr_info[sidx].shdr.sh_type == SHT_GROUP
+				    && shdr_info[sidx].shdr.sh_info == inner));
+		      }
 		  }
 
 		if (destidx != inner)

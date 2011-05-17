@@ -70,7 +70,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	newscn run-strip-test.sh run-strip-test2.sh \
 	run-strip-test3.sh run-strip-test4.sh run-strip-test5.sh \
 	run-strip-test6.sh run-strip-test7.sh run-strip-test8.sh \
-	run-unstrip-test.sh run-unstrip-test2.sh \
+	run-strip-groups.sh run-unstrip-test.sh run-unstrip-test2.sh \
 	run-ecp-test.sh run-ecp-test2.sh run-alldts.sh \
 	run-elflint-test.sh run-elflint-self.sh run-ranlib-test.sh \
 	run-ranlib-test2.sh run-ranlib-test3.sh run-ranlib-test4.sh \
@@ -110,7 +110,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile13.bz2 run-strip-test3.sh run-allfcts.sh \
 	     run-line2addr.sh run-elflint-test.sh testfile14.bz2 \
 	     run-strip-test4.sh run-strip-test5.sh run-strip-test6.sh \
-	     run-strip-test7.sh run-strip-test8.sh \
+	     run-strip-test7.sh run-strip-test8.sh run-strip-groups.sh \
 	     run-unstrip-test.sh run-unstrip-test2.sh \
 	     run-elflint-self.sh run-ranlib-test.sh run-ranlib-test2.sh \
 	     run-ranlib-test3.sh run-ranlib-test4.sh \
@@ -158,7 +158,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile55-32.bz2 testfile55-32.debug.bz2 \
 	     testfile55-32.prelink.bz2 testfile55-64.bz2 \
 	     testfile55-64.debug.bz2 testfile55-64.prelink.bz2 \
-	     testfile56.bz2 testfile57.bz2
+	     testfile56.bz2 testfile57.bz2 testfile58.bz2
 
 installed_TESTS_ENVIRONMENT = libdir=$(DESTDIR)$(libdir) \
 			      bindir=$(DESTDIR)$(bindir) \

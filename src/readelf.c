@@ -4064,6 +4064,11 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
       [DW_OP_stack_value] = "stack_value",
       [DW_OP_GNU_implicit_pointer] = "GNU_implicit_pointer",
       [DW_OP_GNU_entry_value] = "GNU_entry_value",
+      [DW_OP_GNU_const_type] = "GNU_const_type",
+      [DW_OP_GNU_regval_type] = "GNU_regval_type",
+      [DW_OP_GNU_deref_type] = "GNU_deref_type",
+      [DW_OP_GNU_convert] = "GNU_convert",
+      [DW_OP_GNU_reinterpret] = "GNU_reinterpret",
     };
 
   if (len == 0)
@@ -4339,6 +4344,55 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  print_ops (dwflmod, dbg, indent + 6, indent + 6, vers,
 		     addrsize, offset_size, uleb, data);
 	  data += uleb;
+	  CONSUME (data - start);
+	  offset += 1 + (data - start);
+	  break;
+
+	case DW_OP_GNU_const_type:
+	  /* DIE offset, size plus block.  */
+	  start = data;
+	  NEED (2);
+	  get_uleb128 (uleb, data); /* XXX check overrun */
+	  uint8_t usize = *(uint8_t *) data++;
+	  NEED (usize);
+	  printf ("%*s[%4" PRIuMAX "] %s [%6" PRIxMAX "] ",
+		  indent, "", (uintmax_t) offset, known[op], uleb);
+	  print_block (usize, data);
+	  data += usize;
+	  CONSUME (data - start);
+	  offset += 1 + (data - start);
+	  break;
+
+	case DW_OP_GNU_regval_type:
+	  start = data;
+	  NEED (2);
+	  get_uleb128 (uleb, data); /* XXX check overrun */
+	  get_uleb128 (uleb2, data); /* XXX check overrun */
+	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu64 " %#" PRIx64 "\n",
+		  indent, "", (uintmax_t) offset, known[op], uleb, uleb2);
+	  CONSUME (data - start);
+	  offset += 1 + (data - start);
+	  break;
+
+	case DW_OP_GNU_deref_type:
+	  start = data;
+	  NEED (2);
+	  usize = *(uint8_t *) data++;
+	  get_uleb128 (uleb, data); /* XXX check overrun */
+	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu8 " [%6" PRIxMAX "]\n",
+		  indent, "", (uintmax_t) offset,
+		  known[op], usize, uleb);
+	  CONSUME (data - start);
+	  offset += 1 + (data - start);
+	  break;
+
+	case DW_OP_GNU_convert:
+	case DW_OP_GNU_reinterpret:
+	  start = data;
+	  NEED (1);
+	  get_uleb128 (uleb, data); /* XXX check overrun */
+	  printf ("%*s[%4" PRIuMAX "] %s [%6" PRIxMAX "]\n",
+		  indent, "", (uintmax_t) offset, known[op], uleb);
 	  CONSUME (data - start);
 	  offset += 1 + (data - start);
 	  break;

@@ -1,3 +1,9 @@
+2011-05-16  Jakub Jelinek  <jakub@redhat.com>
+
+	* dwarf.h (DW_OP_GNU_const_type, DW_OP_GNU_regval_type,
+	DW_OP_GNU_deref_type, DW_OP_GNU_convert, DW_OP_GNU_reinterpret):
+	New.
+
 2011-04-26  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_child (dwarf_child): Sanity check end of section against

@@ -1,5 +1,5 @@
 /* This file defines standard DWARF types, structures, and macros.
-   Copyright (C) 2000-2010 Red Hat, Inc.
+   Copyright (C) 2000-2011 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -487,6 +487,11 @@ enum
     DW_OP_GNU_encoded_addr = 0xf1,
     DW_OP_GNU_implicit_pointer = 0xf2,
     DW_OP_GNU_entry_value = 0xf3,
+    DW_OP_GNU_const_type = 0xf4,
+    DW_OP_GNU_regval_type = 0xf5,
+    DW_OP_GNU_deref_type = 0xf6,
+    DW_OP_GNU_convert = 0xf7,
+    DW_OP_GNU_reinterpret = 0xf9,
 
     DW_OP_lo_user = 0xe0,	/* Implementation-defined range start.  */
     DW_OP_hi_user = 0xff	/* Implementation-defined range end.  */

@@ -1,3 +1,9 @@
+2011-05-24  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (EXTRA_DIST): Add hello_s390.ko.bz2.
+	* run-strip-reloc.sh: Add hello_s390.ko testcase.
+	* hello_s390.ko.bz2: New test file.
+
 2011-05-23  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (TESTS): Add run-strip-reloc.sh.

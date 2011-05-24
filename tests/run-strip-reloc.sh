@@ -25,7 +25,7 @@
 
 . $srcdir/test-subr.sh
 
-testfiles hello_i386.ko hello_x86_64.ko hello_ppc64.ko
+testfiles hello_i386.ko hello_x86_64.ko hello_ppc64.ko hello_s390.ko
 
 status=0
 runtest() {
@@ -106,6 +106,7 @@ runtest() {
 runtest hello_i386.ko 1
 runtest hello_x86_64.ko 1
 runtest hello_ppc64.ko 1
+runtest hello_s390.ko 1
 
 # self test, shouldn't impact non-ET_REL files at all.
 runtest ../src/strip 0

@@ -113,7 +113,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-strip-test4.sh run-strip-test5.sh run-strip-test6.sh \
 	     run-strip-test7.sh run-strip-test8.sh run-strip-groups.sh \
 	     run-strip-reloc.sh hello_i386.ko.bz2 hello_x86_64.ko.bz2 \
-	     hello_ppc64.ko.bz2 \
+	     hello_ppc64.ko.bz2 hello_s390.ko.bz2 \
 	     run-unstrip-test.sh run-unstrip-test2.sh \
 	     run-elflint-self.sh run-ranlib-test.sh run-ranlib-test2.sh \
 	     run-ranlib-test3.sh run-ranlib-test4.sh \

@@ -1682,7 +1682,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	      /* Apply one relocation.  Returns true when trivial
 		 relocation actually done.  */
 	      bool relocate (GElf_Addr offset, const GElf_Sxword addend,
-			     int rtype, int symndx)
+			     bool is_rela, int rtype, int symndx)
 	      {
 		/* R_*_NONE relocs can always just be removed.  */
 		if (rtype == 0)
@@ -1704,80 +1704,98 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 		GElf_Sym *sym = gelf_getsymshndx (symdata, xndxdata,
 						  symndx, &sym_mem,
 						  &xndx);
-		if (GELF_ST_TYPE (sym->st_info) == STT_SECTION)
+		Elf32_Word sec = (sym->st_shndx == SHN_XINDEX
+				  ? xndx : sym->st_shndx);
+		if (ebl_debugscn_p (ebl, shdr_info[sec].name))
 		  {
-		    Elf32_Word sec = (sym->st_shndx == SHN_XINDEX
-				      ? xndx : sym->st_shndx);
-		    if (ebl_debugscn_p (ebl, shdr_info[sec].name))
-		      {
-			size_t size;
-			switch (type)
-			  {
-#define DO_TYPE(NAME, Name)					\
-			    case ELF_T_##NAME:			\
-			      size = sizeof (GElf_##Name);	\
-			      break;
-			    TYPES;
-#undef DO_TYPE
-			  default:
-			    return false;
-			  }
-
-			if (offset + size > tdata->d_size)
-			  error (0, 0, gettext ("bad relocation"));
-
-			/* For SHT_REL sections this is all that needs
-			   to be checked.  The addend is contained in
-			   the original data at the offset already.
-			   And the (section) symbol address is zero.
-			   So just remove the relocation, it isn't
-			   needed anymore.  */
-			if (addend == 0)
-			  return true;
+		    size_t size;
 
 #define DO_TYPE(NAME, Name) GElf_##Name Name;
-			union { TYPES; } tmpbuf;
+		    union { TYPES; } tmpbuf;
 #undef DO_TYPE
-			Elf_Data tmpdata =
-			  {
-			    .d_type = type,
-			    .d_buf = &tmpbuf,
-			    .d_size = size,
-			    .d_version = EV_CURRENT,
-			  };
-			Elf_Data rdata =
-			  {
-			    .d_type = type,
-			    .d_buf = tdata->d_buf + offset,
-			    .d_size = size,
-			    .d_version = EV_CURRENT,
-			  };
 
-			/* For SHT_RELA sections we just take the
-			   addend and put it into the relocation slot.
-			   The (section) symbol address can be
-			   ignored, since it is zero.  */
-			switch (type)
-			  {
+		    switch (type)
+		      {
 #define DO_TYPE(NAME, Name)				\
-			    case ELF_T_##NAME:		\
-			      tmpbuf.Name = addend;	\
-			      break;
-			    TYPES;
+			case ELF_T_##NAME:		\
+			  size = sizeof (GElf_##Name);	\
+			  tmpbuf.Name = 0;		\
+			  break;
+			TYPES;
 #undef DO_TYPE
-			  default:
-			    abort ();
-			  }
-
-			Elf_Data *s = gelf_xlatetof (debugelf, &rdata,
-						     &tmpdata,
-						     ehdr->e_ident[EI_DATA]);
-			if (s == NULL)
-			  INTERNAL_ERROR (fname);
-			assert (s == &rdata);
-
-			return true;
+		      default:
+			return false;
 		      }
+
+		    if (offset + size > tdata->d_size)
+		      error (0, 0, gettext ("bad relocation"));
+
+		    /* When the symbol value is zero then for SHT_REL
+		       sections this is all that needs to be checked.
+		       The addend is contained in the original data at
+		       the offset already.  So if the (section) symbol
+		       address is zero and the given addend is zero
+		       just remove the relocation, it isn't needed
+		       anymore.  */
+		    if (addend == 0 && sym->st_value == 0)
+		      return true;
+
+		    Elf_Data tmpdata =
+		      {
+			.d_type = type,
+			.d_buf = &tmpbuf,
+			.d_size = size,
+			.d_version = EV_CURRENT,
+		      };
+		    Elf_Data rdata =
+		      {
+			.d_type = type,
+			.d_buf = tdata->d_buf + offset,
+			.d_size = size,
+			.d_version = EV_CURRENT,
+		      };
+
+		    GElf_Addr value = sym->st_value;
+		    if (is_rela)
+		      {
+			/* For SHT_RELA sections we just take the
+			   given addend and add it to the value.  */
+			value += addend;
+		      }
+		    else
+		      {
+			/* For SHT_REL sections we have to peek at
+			   what is already in the section at the given
+			   offset to get the addend.  */
+			Elf_Data *d = gelf_xlatetom (debugelf, &tmpdata,
+						     &rdata,
+						     ehdr->e_ident[EI_DATA]);
+			if (d == NULL)
+			  INTERNAL_ERROR (fname);
+			assert (d == &tmpdata);
+		      }
+
+		    switch (type)
+		      {
+#define DO_TYPE(NAME, Name)					\
+			case ELF_T_##NAME:			\
+			  tmpbuf.Name += (GElf_##Name) value;	\
+			  break;
+			TYPES;
+#undef DO_TYPE
+		      default:
+			abort ();
+		      }
+
+		    /* Now finally put in the new value.  */
+		    Elf_Data *s = gelf_xlatetof (debugelf, &rdata,
+						 &tmpdata,
+						 ehdr->e_ident[EI_DATA]);
+		    if (s == NULL)
+		      INTERNAL_ERROR (fname);
+		    assert (s == &rdata);
+
+		    return true;
 		  }
 		return false;
 	      }
@@ -1789,7 +1807,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 		  {
 		    GElf_Rel rel_mem;
 		    GElf_Rel *r = gelf_getrel (reldata, relidx, &rel_mem);
-		    if (! relocate (r->r_offset, 0,
+		    if (! relocate (r->r_offset, 0, false,
 				    GELF_R_TYPE (r->r_info),
 				    GELF_R_SYM (r->r_info)))
 		      {
@@ -1803,7 +1821,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 		  {
 		    GElf_Rela rela_mem;
 		    GElf_Rela *r = gelf_getrela (reldata, relidx, &rela_mem);
-		    if (! relocate (r->r_offset, r->r_addend,
+		    if (! relocate (r->r_offset, r->r_addend, true,
 				    GELF_R_TYPE (r->r_info),
 				    GELF_R_SYM (r->r_info)))
 		      {

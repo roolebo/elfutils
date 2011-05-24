@@ -1,5 +1,13 @@
 2011-05-23  Mark Wielaard  <mjw@redhat.com>
 
+	* strip.c (relocate): Take new arguments is_rela to indicate
+	whether the relocation is from a SHT_REL or SHT_RELA section. 
+	Relocate against any debug section symbol, not just STT_SECTION
+	symbols. For SHT_REL relocations, fetch addend from offset and
+	add it to symbol value if not zero.
+
+2011-05-23  Mark Wielaard  <mjw@redhat.com>
+
 	* strip.c (OPT_RELOC_DEBUG): New option.
 	(argp_option): Add new --reloc-debug-sections option.
 	(main): Check new option.

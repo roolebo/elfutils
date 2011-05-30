@@ -1,3 +1,8 @@
+2011-05-30  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (EXTRA_DIST): Add run-readelf-twofiles.sh and
+	run-rerequest_tag.sh
+
 2011-05-24  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (EXTRA_DIST): Add hello_s390.ko.bz2.

@@ -122,7 +122,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-addrname-test.sh run-dwfl-bug-offline-rel.sh \
 	     run-dwfl-addr-sect.sh run-early-offscn.sh \
 	     run-dwarf-getmacros.sh run-test-flag-nobits.sh \
-	     run-dwarf-getstring.sh run-alldts.sh \
+	     run-dwarf-getstring.sh run-rerequest_tag.sh run-alldts.sh \
 	     testfile15.bz2 testfile15.debug.bz2 \
 	     testfile16.bz2 testfile16.debug.bz2 \
 	     testfile17.bz2 testfile17.debug.bz2 \
@@ -133,7 +133,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile26.bz2 testfile27.bz2 \
 	     coverage.sh test-subr.sh test-wrapper.sh \
 	     run-readelf-test1.sh run-readelf-test2.sh run-readelf-test3.sh \
-	     run-readelf-test4.sh \
+	     run-readelf-test4.sh run-readelf-twofiles.sh \
 	     run-bug1-test.sh testfile28.bz2 testfile28.rdwr.bz2 \
 	     testfile29.bz2 testfile29.rdwr.bz2 \
 	     testfile30.bz2 testfile31.bz2 testfile32.bz2 testfile33.bz2 \

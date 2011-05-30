@@ -1727,7 +1727,8 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 			return false;
 		      }
 
-		    if (offset + size > tdata->d_size)
+		    if (offset > tdata->d_size
+			|| tdata->d_size - offset < size)
 		      error (0, 0, gettext ("bad relocation"));
 
 		    /* When the symbol value is zero then for SHT_REL

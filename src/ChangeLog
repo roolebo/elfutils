@@ -1,3 +1,7 @@
+2011-05-30  Mark Wielaard  <mjw@redhat.com>
+
+	* strip.c (relocate): Make offset check overflow-proof.
+
 2011-05-23  Mark Wielaard  <mjw@redhat.com>
 
 	* strip.c (relocate): Take new arguments is_rela to indicate

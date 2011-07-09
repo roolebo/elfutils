@@ -1,6 +1,8 @@
 2011-07-09  Roland McGrath  <roland@hack.frob.com>
 
-       * ar.c (parse_opt): Grok -u.
+	* readelf.c (options, parse_opt): Grok -W/--wide and ignore it.
+
+	* ar.c (parse_opt): Grok -u.
 
 2011-05-30  Mark Wielaard  <mjw@redhat.com>
 

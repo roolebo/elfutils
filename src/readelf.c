@@ -106,7 +106,8 @@ static const struct argp_option options[] =
   { NULL, 0, NULL, 0, N_("Output control:"), 0 },
   { "numeric-addresses", 'N', NULL, 0,
     N_("Do not find symbol names for addresses in DWARF data"), 0 },
-
+  { "wide", 'W', NULL, 0,
+    N_("Ignored for compatibility (lines always wide)"), 0 },
   { NULL, 0, NULL, 0, NULL, 0 }
 };
 
@@ -443,6 +444,8 @@ parse_opt (int key, char *arg,
 		     program_invocation_short_name);
 	  exit (EXIT_FAILURE);
 	}
+      break;
+    case 'W':			/* Ignored.  */
       break;
     default:
       return ARGP_ERR_UNKNOWN;

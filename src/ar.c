@@ -1,5 +1,5 @@
 /* Create, modify, and extract from archives.
-   Copyright (C) 2005-2010 Red Hat, Inc.
+   Copyright (C) 2005-2011 Red Hat, Inc.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -378,6 +378,10 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
 
     case 'T':
       allow_truncate_fname = true;
+      break;
+
+    case 'u':
+      update_newer = true;
       break;
 
     case 'v':

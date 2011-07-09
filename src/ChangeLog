@@ -1,3 +1,7 @@
+2011-07-09  Roland McGrath  <roland@hack.frob.com>
+
+       * ar.c (parse_opt): Grok -u.
+
 2011-05-30  Mark Wielaard  <mjw@redhat.com>
 
 	* strip.c (relocate): Make offset check overflow-proof.
@@ -5,7 +9,7 @@
 2011-05-23  Mark Wielaard  <mjw@redhat.com>
 
 	* strip.c (relocate): Take new arguments is_rela to indicate
-	whether the relocation is from a SHT_REL or SHT_RELA section. 
+	whether the relocation is from a SHT_REL or SHT_RELA section.
 	Relocate against any debug section symbol, not just STT_SECTION
 	symbols. For SHT_REL relocations, fetch addend from offset and
 	add it to symbol value if not zero.

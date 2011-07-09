@@ -1,3 +1,13 @@
+2011-07-09  Roland McGrath  <roland@hack.frob.com>
+
+	* sha1.c (be64_copy): New function.
+	(sha1_finish_ctx): Use it.
+	* md5.c (le64_copy): New function.
+	(md5_finish_ctx): Use it.
+	* system.h (LE32, BE32): New macros, using <endian.h> and <byteswap.h>.
+	* md5.c (SWAP): Use LE32.
+	* sha1.c (SWAP): Use BE32.
+
 2010-06-16  Roland McGrath  <roland@redhat.com>
 
 	* dynamicsizehash.h (HASHTYPE): New macro.

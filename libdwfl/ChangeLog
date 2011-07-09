@@ -1,3 +1,7 @@
+2011-07-09  Roland McGrath  <roland@hack.frob.com>
+
+	* image-header.c (LE32): Macro removed (now in lib/system.h).
+
 2011-04-11  Mark Wielaard  <mjw@redhat.com>
 
 	* linux-kernel-modules.c (vmlinux_suffixes): Guard definition

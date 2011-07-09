@@ -58,7 +58,7 @@ noinst_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  dwfl-addr-sect dwfl-bug-report early-offscn \
 		  dwfl-bug-getmodules dwarf-getmacros addrcfi \
 		  test-flag-nobits dwarf-getstring rerequest_tag \
-		  alldts
+		  alldts md5-sha1-test
 asm_TESTS = asm-tst1 asm-tst2 asm-tst3 asm-tst4 asm-tst5 \
 	    asm-tst6 asm-tst7 asm-tst8 asm-tst9
 
@@ -90,8 +90,8 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 # run-show-ciefde.sh
 
 if !STANDALONE
-noinst_PROGRAMS += msg_tst sha1-tst
-TESTS += msg_tst sha1-tst
+noinst_PROGRAMS += msg_tst md5-sha1-test
+TESTS += msg_tst md5-sha1-test
 endif
 
 if HAVE_LIBASM
@@ -251,13 +251,13 @@ dwfl_bug_fd_leak_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
 dwfl_bug_report_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
 dwfl_bug_getmodules_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
 dwfl_addr_sect_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
-sha1_tst_LDADD = $(libeu) $(libmudflap)
 dwarf_getmacros_LDADD = $(libdw) $(libmudflap)
 dwarf_getstring_LDADD = $(libdw) $(libmudflap)
 addrcfi_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
 test_flag_nobits_LDADD = $(libelf) $(libmudflap)
 rerequest_tag_LDADD = $(libdw) $(libmudflap)
 alldts_LDADD = $(libebl) $(libelf) $(libmudflap)
+md5_sha1_test_LDADD = $(libeu)
 
 if GCOV
 check: check-am coverage

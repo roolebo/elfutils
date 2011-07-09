@@ -1,5 +1,5 @@
 /* Declarations for common convenience functions.
-   Copyright (C) 2006, 2009 Red Hat, Inc.
+   Copyright (C) 2006-2011 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -51,6 +51,18 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <endian.h>
+#include <byteswap.h>
+
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+# define LE32(n)	(n)
+# define BE32(n)	bswap_32 (n)
+#elif __BYTE_ORDER == __BIG_ENDIAN
+# define BE32(n)	(n)
+# define LE32(n)	bswap_32 (n)
+#else
+# error "Unknown byte order"
+#endif
 
 extern void *xmalloc (size_t) __attribute__ ((__malloc__));
 extern void *xcalloc (size_t, size_t) __attribute__ ((__malloc__));

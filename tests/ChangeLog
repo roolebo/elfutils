@@ -1,3 +1,13 @@
+2011-07-09  Roland McGrath  <roland@hack.frob.com>
+
+	* sha1-tst.c: File removed.
+	* Makefile.am (noinst_PROGRAMS, TESTS): Remove it.
+	(sha1_tst_LDADD): Variable removed.
+
+	* md5-sha1-test.c: New file.
+	* Makefile.am [!STANDALONE] (noinst_PROGRAMS, TESTS): Add it.
+	(md5_sha1_test_LDADD): New variable.
+
 2011-05-30  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (EXTRA_DIST): Add run-readelf-twofiles.sh and

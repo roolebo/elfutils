@@ -1,5 +1,5 @@
 /* Linux kernel image support for libdwfl.
-   Copyright (C) 2009 Red Hat, Inc.
+   Copyright (C) 2009-2011 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -55,10 +55,8 @@
 
 #if BYTE_ORDER == LITTLE_ENDIAN
 # define LE16(x)	(x)
-# define LE32(x)	(x)
 #else
 # define LE16(x)	bswap_16 (x)
-# define LE32(x)	bswap_32 (x)
 #endif
 
 /* See Documentation/x86/boot.txt in Linux kernel sources

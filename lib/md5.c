@@ -1,6 +1,6 @@
 /* Functions to compute MD5 message digest of files or memory blocks.
    according to the definition of MD5 in RFC 1321 from April 1992.
-   Copyright (C) 1995,1996,1997,1999,2000,2001,2005 Red Hat, Inc.
+   Copyright (C) 1995-2011 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1995.
 
@@ -29,20 +29,14 @@
 # include <config.h>
 #endif
 
-#include <endian.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 
 #include "md5.h"
+#include "system.h"
 
-#if __BYTE_ORDER == __BIG_ENDIAN
-# define SWAP(n)							\
-    (((n) << 24) | (((n) & 0xff00) << 8) | (((n) >> 8) & 0xff00) | ((n) >> 24))
-#else
-# define SWAP(n) (n)
-#endif
-
+#define SWAP(n) LE32 (n)
 
 /* This array contains the bytes used to pad the buffer to the next
    64-byte boundary.  (RFC 1321, 3.1: Step 1)  */
@@ -82,6 +76,16 @@ md5_read_ctx (ctx, resbuf)
   return resbuf;
 }
 
+static void
+le64_copy (char *dest, uint64_t x)
+{
+  for (size_t i = 0; i < 8; ++i)
+    {
+      dest[i] = (uint8_t) x;
+      x >>= 8;
+    }
+}
+
 /* Process the remaining bytes in the internal buffer and the usual
    prolog according to the standard and write the result to RESBUF.
 
@@ -105,9 +109,10 @@ md5_finish_ctx (ctx, resbuf)
   memcpy (&ctx->buffer[bytes], fillbuf, pad);
 
   /* Put the 64-bit file length in *bits* at the end of the buffer.  */
-  *(md5_uint32 *) &ctx->buffer[bytes + pad] = SWAP (ctx->total[0] << 3);
-  *(md5_uint32 *) &ctx->buffer[bytes + pad + 4] = SWAP ((ctx->total[1] << 3) |
-							(ctx->total[0] >> 29));
+  const uint64_t bit_length = ((ctx->total[0] << 3)
+			       + ((uint64_t) ((ctx->total[1] << 3) |
+					      (ctx->total[0] >> 29)) << 32));
+  le64_copy (&ctx->buffer[bytes + pad], bit_length);
 
   /* Process last bytes.  */
   md5_process_block (ctx->buffer, bytes + pad + 8, ctx);

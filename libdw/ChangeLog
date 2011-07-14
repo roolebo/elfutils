@@ -1,3 +1,7 @@
+2011-07-14  Mark Wielaard  <mjw@redhat.com>
+
+	* libdw.h (dwarf_offdie): Fix documentation to mention .debug_info.
+
 2011-05-16  Jakub Jelinek  <jakub@redhat.com>
 
 	* dwarf.h (DW_OP_GNU_const_type, DW_OP_GNU_regval_type,

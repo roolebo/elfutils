@@ -346,7 +346,7 @@ extern Dwarf_CFI *dwarf_getcfi_elf (Elf *elf);
 extern int dwarf_cfi_end (Dwarf_CFI *cache);
 
 
-/* Return DIE at given offset in .debug_types section.  */
+/* Return DIE at given offset in .debug_info section.  */
 extern Dwarf_Die *dwarf_offdie (Dwarf *dbg, Dwarf_Off offset,
 				Dwarf_Die *result) __nonnull_attribute__ (3);
 

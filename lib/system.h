@@ -102,4 +102,9 @@ extern int crc32_file (int fd, uint32_t *resp);
 #define ARGP_PROGRAM_BUG_ADDRESS_DEF \
   const char *const apba__ __asm ("argp_program_bug_address")
 
+
+/* The demangler from libstdc++.  */
+extern char *__cxa_demangle (const char *mangled_name, char *output_buffer,
+			     size_t *length, int *status);
+
 #endif /* system.h */

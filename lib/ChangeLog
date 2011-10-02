@@ -1,3 +1,7 @@
+2011-10-02  Ulrich Drepper  <drepper@gmail.com>
+
+	* system.h: Declare __cxa_demangle.
+
 2011-07-09  Roland McGrath  <roland@hack.frob.com>
 
 	* sha1.c (be64_copy): New function.

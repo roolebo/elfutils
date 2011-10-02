@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 1996-2010 Red Hat, Inc.
+## Copyright (C) 1996-2011 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -92,6 +92,10 @@ endif
 libebl = ../libebl/libebl.a
 libeu = ../lib/libeu.a
 
+if DEMANGLE
+demanglelib = -lstdc++
+endif
+
 nm_no_Wformat = yes
 size_no_Wformat = yes
 strings_no_Wformat = yes
@@ -100,7 +104,8 @@ addr2line_no_Wformat = yes
 ldgeneric_no_Wunused = yes
 
 readelf_LDADD = $(libdw) $(libebl) $(libelf) $(libeu) $(libmudflap) -ldl
-nm_LDADD = $(libdw) $(libebl) $(libelf) $(libeu) $(libmudflap) -ldl
+nm_LDADD = $(libdw) $(libebl) $(libelf) $(libeu) $(libmudflap) -ldl \
+	   $(demanglelib)
 size_LDADD = $(libelf) $(libeu) $(libmudflap)
 strip_LDADD = $(libebl) $(libelf) $(libeu) $(libmudflap) -ldl
 ld_LDADD = $(libebl) $(libelf) $(libeu) $(libmudflap) -ldl
@@ -154,8 +159,8 @@ installcheck-binPROGRAMS: $(bin_PROGRAMS)
 	  for opt in --help --version; do \
 	    if LD_LIBRARY_PATH=$(DESTDIR)$(libdir) \
 	       $(DESTDIR)$(bindir)/$$f $$opt > c$${pid}_.out 2> c$${pid}_.err \
-	         && test -n "`cat c$${pid}_.out`" \
-	         && test -z "`cat c$${pid}_.err`"; then :; \
+		 && test -n "`cat c$${pid}_.out`" \
+		 && test -z "`cat c$${pid}_.err`"; then :; \
 	    else echo "$$f does not support $$opt" 1>&2; bad=1; fi; \
 	  done; \
 	done; rm -f c$${pid}_.???; exit $$bad
@@ -171,6 +176,6 @@ make-debug-archive: $(srcdir)/make-debug-archive.in
 	sed -e "s,@UNSTRIP@,$$UNSTRIP,g" -e "s,@AR@,$$AR,g" \
 	    -e "s%[@]PACKAGE_NAME[@]%$(PACKAGE_NAME)%g" \
 	    -e "s%[@]PACKAGE_VERSION[@]%$(PACKAGE_VERSION)%g" \
- 	    $(srcdir)/make-debug-archive.in > $@.new
+	    $(srcdir)/make-debug-archive.in > $@.new
 	chmod +x $@.new
 	mv -f $@.new $@

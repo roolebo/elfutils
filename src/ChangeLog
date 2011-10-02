@@ -1,3 +1,15 @@
+2011-10-02  Ulrich Drepper  <drepper@gmail.com>
+
+	* Makefile.am (demanglelib): Define.
+	(nm_LDADD): Add demanglelib.
+	* nm.c (options): Add -C option.
+	(demangle): Define as global variable.
+	(parse_opt): Recognize -C.
+	(show_symbols_sysv): Handle demangling.
+	(show_symbols_bad): Likewise.
+	(show_symbols_posix): Likewise.
+	(show_symbols): Likewise.
+
 2011-07-09  Roland McGrath  <roland@hack.frob.com>
 
 	* readelf.c (options, parse_opt): Grok -W/--wide and ignore it.

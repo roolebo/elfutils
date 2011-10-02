@@ -1,3 +1,7 @@
+2011-10-02  Ulrich Drepper  <drepper@gmail.com>
+
+	* configure.ac: Check for __cxa_demangle in libstdc++.
+
 2011-02-08  Roland McGrath  <roland@redhat.com>
 
 	* configure.ac (C99 check): Use AC_LANG_SOURCE.

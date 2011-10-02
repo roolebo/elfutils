@@ -172,7 +172,7 @@ test "$use_mudflap" = yes -o "$use_gprof" = yes -o "$use_gcov" = yes])
 
 AC_ARG_ENABLE([tests-rpath],
 AS_HELP_STRING([--enable-tests-rpath],[build $ORIGIN-using rpath into tests]),
- 	       [tests_use_rpath=yes], [tests_use_rpath=no])
+	       [tests_use_rpath=yes], [tests_use_rpath=no])
 AM_CONDITIONAL(TESTS_RPATH, test "$tests_use_rpath" = yes)
 
 LIBEBL_SUBDIR="$PACKAGE"
@@ -194,6 +194,10 @@ eu_ZIPLIB(lzma,LZMA,lzma,lzma_auto_decoder,[LZMA (xz)])
 zip_LIBS="$LIBS"
 LIBS="$save_LIBS"
 AC_SUBST([zip_LIBS])
+
+AC_CHECK_LIB([stdc++], [__cxa_demangle], [dnl
+AC_DEFINE([USE_DEMANGLE], [1], [Defined if demangling is enabled])])
+AM_CONDITIONAL(DEMANGLE, test "$ac_cv_lib_stdcpp___cxa_demangle" = yes)
 
 dnl The directories with content.
 

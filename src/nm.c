@@ -1,5 +1,5 @@
 /* Print symbol information from ELF file in human-readable form.
-   Copyright (C) 2000-2008, 2009 Red Hat, Inc.
+   Copyright (C) 2000-2008, 2009, 2011 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -100,6 +100,10 @@ static const struct argp_option options[] =
     0 },
   { "no-sort", 'p', NULL, 0, N_("Do not sort the symbols"), 0 },
   { "reverse-sort", 'r', NULL, 0, N_("Reverse the sense of the sort"), 0 },
+#ifdef USE_DEMANGLE
+  { "demangle", 'C', NULL, 0,
+    N_("Decode low-level symbol names into source code names"), 0 },
+#endif
   { NULL, 0, NULL, 0, N_("Miscellaneous:"), 0 },
   { NULL, 0, NULL, 0, NULL, 0 }
 };
@@ -174,6 +178,11 @@ static bool print_armap;
 
 /* If true reverse sorting.  */
 static bool reverse_sort;
+
+#ifdef USE_DEMANGLE
+/* If true demangle symbols.  */
+static bool demangle;
+#endif
 
 /* Type of the section we are printing.  */
 static GElf_Word symsec_type = SHT_SYMTAB;
@@ -269,6 +278,12 @@ parse_opt (int key, char *arg,
     case 'a':
       /* XXX */
       break;
+
+#ifdef USE_DEMANGLE
+    case 'C':
+      demangle = true;
+      break;
+#endif
 
     case 'f':
       if (strcmp (arg, "bsd") == 0)
@@ -783,12 +798,30 @@ show_symbols_sysv (Ebl *ebl, GElf_Word strndx, const char *fullname,
   else
     fmtstr = "%-*s|%0*" PRIo64 "|%-6s|%-8s|%*" PRIo64 "|%*s|%s\n";
 
+#ifdef USE_DEMANGLE
+  size_t demangle_buffer_len = 0;
+  char *demangle_buffer = NULL;
+#endif
+
   /* Iterate over all symbols.  */
   for (cnt = 0; cnt < nsyms; ++cnt)
     {
       char symstrbuf[50];
       const char *symstr = sym_name (ebl->elf, strndx, syms[cnt].sym.st_name,
 				     symstrbuf, sizeof symstrbuf);
+
+#ifdef USE_DEMANGLE
+      /* Demangle if necessary.  */
+      if (demangle)
+	{
+	  int status = -1;
+	  char *dmsymstr = __cxa_demangle (symstr, demangle_buffer,
+					   &demangle_buffer_len, &status);
+
+	  if (status == 0)
+	    symstr = dmsymstr;
+	}
+#endif
 
       char symbindbuf[50];
       char symtypebuf[50];
@@ -815,6 +848,10 @@ show_symbols_sysv (Ebl *ebl, GElf_Word strndx, const char *fullname,
 				secnamebuf, sizeof (secnamebuf), scnnames,
 				shnum));
     }
+
+#ifdef USE_DEMANGLE
+  free (demangle_buffer);
+#endif
 
   if (scnnames_malloced)
     free (scnnames);
@@ -863,6 +900,11 @@ show_symbols_bsd (Elf *elf, GElf_Word strndx,
       [radix_octal] = "%2$0*1$" PRIo64 " %7$0*6$" PRIo64 " %3$c%4$s %5$s\n"
     };
 
+#ifdef USE_DEMANGLE
+  size_t demangle_buffer_len = 0;
+  char *demangle_buffer = NULL;
+#endif
+
   /* Iterate over all symbols.  */
   for (size_t cnt = 0; cnt < nsyms; ++cnt)
     {
@@ -875,6 +917,19 @@ show_symbols_bsd (Elf *elf, GElf_Word strndx,
 	 much information we leave them out.  */
       if (symstr[0] == '\0')
 	continue;
+
+#ifdef USE_DEMANGLE
+      /* Demangle if necessary.  */
+      if (demangle)
+	{
+	  int status = -1;
+	  char *dmsymstr = __cxa_demangle (symstr, demangle_buffer,
+					   &demangle_buffer_len, &status);
+
+	  if (status == 0)
+	    symstr = dmsymstr;
+	}
+#endif
 
       /* If we have to precede the line with the file name.  */
       if (print_file_name)
@@ -902,6 +957,10 @@ show_symbols_bsd (Elf *elf, GElf_Word strndx,
 		symstr,
 		digits, (uint64_t) syms[cnt].sym.st_size);
     }
+
+#ifdef USE_DEMANGLE
+  free (demangle_buffer);
+#endif
 }
 
 
@@ -922,6 +981,11 @@ show_symbols_posix (Elf *elf, GElf_Word strndx, const char *prefix,
 
   int digits = length_map[gelf_getclass (elf) - 1][radix];
 
+#ifdef USE_DEMANGLE
+  size_t demangle_buffer_len = 0;
+  char *demangle_buffer = NULL;
+#endif
+
   /* Iterate over all symbols.  */
   for (size_t cnt = 0; cnt < nsyms; ++cnt)
     {
@@ -934,6 +998,19 @@ show_symbols_posix (Elf *elf, GElf_Word strndx, const char *prefix,
 	 much information we leave them out.  */
       if (symstr[0] == '\0')
 	continue;
+
+#ifdef USE_DEMANGLE
+      /* Demangle if necessary.  */
+      if (demangle)
+	{
+	  int status = -1;
+	  char *dmsymstr = __cxa_demangle (symstr, demangle_buffer,
+					   &demangle_buffer_len, &status);
+
+	  if (status == 0)
+	    symstr = dmsymstr;
+	}
+#endif
 
       /* If we have to precede the line with the file name.  */
       if (print_file_name)
@@ -952,6 +1029,10 @@ show_symbols_posix (Elf *elf, GElf_Word strndx, const char *prefix,
 	      digits, syms[cnt].sym.st_value,
 	      digits, syms[cnt].sym.st_size);
     }
+
+#ifdef USE_DEMANGLE
+  free (demangle_buffer);
+#endif
 }
 
 
@@ -1053,6 +1134,10 @@ show_symbols (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, Elf_Scn *xndxscn,
     INTERNAL_ERROR (fullname);
 
   /* Iterate over all symbols.  */
+#ifdef USE_DEMANGLE
+  size_t demangle_buffer_len = 0;
+  char *demangle_buffer = NULL;
+#endif
   int longest_name = 4;
   int longest_where = 4;
   size_t nentries_used = 0;
@@ -1065,7 +1150,7 @@ show_symbols (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, Elf_Scn *xndxscn,
 	INTERNAL_ERROR (fullname);
 
       /* Filter out administrative symbols without a name and those
-	 deselected by ther user with command line options.  */
+	 deselected by the user with command line options.  */
       if ((hide_undefined && sym->st_shndx == SHN_UNDEF)
 	  || (hide_defined && sym->st_shndx != SHN_UNDEF)
 	  || (hide_local && GELF_ST_BIND (sym->st_info) == STB_LOCAL))
@@ -1078,6 +1163,19 @@ show_symbols (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, Elf_Scn *xndxscn,
 					   sym->st_name);
 	  if (symstr == NULL)
 	    continue;
+
+#ifdef USE_DEMANGLE
+	  /* Demangle if necessary.  */
+	  if (demangle)
+	    {
+	      int status = -1;
+	      char *dmsymstr = __cxa_demangle (symstr, demangle_buffer,
+					       &demangle_buffer_len, &status);
+
+	      if (status == 0)
+		symstr = dmsymstr;
+	    }
+#endif
 
 	  longest_name = MAX ((size_t) longest_name, strlen (symstr));
 
@@ -1133,7 +1231,7 @@ show_symbols (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, Elf_Scn *xndxscn,
 		}
 	    }
 
-	  /* Try to find the symol among the local symbols.  */
+	  /* Try to find the symbol among the local symbols.  */
 	  if (sym_mem[nentries_used].where[0] == '\0')
 	    {
 	      struct local_name fake =
@@ -1164,6 +1262,9 @@ show_symbols (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, Elf_Scn *xndxscn,
       /* We use this entry.  */
       ++nentries_used;
     }
+#ifdef USE_DEMANGLE
+  free (demangle_buffer);
+#endif
   /* Now we know the exact number.  */
   nentries = nentries_used;
 

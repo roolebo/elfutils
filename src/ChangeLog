@@ -1,3 +1,20 @@
+2011-10-03  Ulrich Drepper  <drepper@gmail.com>
+
+	* nm.c: Recognize option --mark-special.  Still recognize --mark-weak
+	but don't show it in help anymore.
+	(mark_special): Renamed from mark_weak.
+	(parse_opt): Adjust.
+	(class_type_char): Take additional parameters for ELF file and ELF
+	header.  Treat TLS symbols like objects.
+	In case of D symbols, show u for unique symbols, R for symbols in
+	read-only sections, B for symbols in BSS sections.
+	(show_symbols_bad): Take additional parameters for ELF file and ELF
+	header.  Adjust for class_type_char change.  Show TLS symbols with
+	@ after them in case --mark-special is selected.
+	(show_symbols_posix): Likewise.
+	(show_symbols): Adjust calls to show_symbols_bsd and
+	show_symbols_posix.
+
 2011-10-02  Ulrich Drepper  <drepper@gmail.com>
 
 	* Makefile.am (demanglelib): Define.

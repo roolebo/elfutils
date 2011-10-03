@@ -65,8 +65,8 @@ ARGP_PROGRAM_BUG_ADDRESS_DEF = PACKAGE_BUGREPORT;
 
 
 /* Values for the parameters which have no short form.  */
-#define OPT_DEFINED	0x100
-#define OPT_MARK_WEAK	0x101
+#define OPT_DEFINED		0x100
+#define OPT_MARK_SPECIAL	0x101
 
 /* Definitions of arguments for argp functions.  */
 static const struct argp_option options[] =
@@ -92,7 +92,8 @@ static const struct argp_option options[] =
   { NULL, 'B', NULL, 0, N_("Same as --format=bsd"), 0 },
   { "portability", 'P', NULL, 0, N_("Same as --format=posix"), 0 },
   { "radix", 't', "RADIX", 0, N_("Use RADIX for printing symbol values"), 0 },
-  { "mark-weak", OPT_MARK_WEAK, NULL, 0, N_("Mark weak symbols"), 0 },
+  { "mark-special", OPT_MARK_SPECIAL, NULL, 0, N_("Mark special symbols"), 0 },
+  { "mark-weak", OPT_MARK_SPECIAL, NULL, OPTION_HIDDEN, "", 0 },
   { "print-size", 'S', NULL, 0, N_("Print size of defined symbols"), 0 },
 
   { NULL, 0, NULL, 0, N_("Output options:"), 0 },
@@ -203,9 +204,12 @@ static enum
   radix_octal
 } radix;
 
-/* If nonzero weak symbols are distinguished from global symbols by adding
-   a `*' after the identifying letter for the symbol class and type.  */
-static bool mark_weak;
+/* If nonzero mark special symbols:
+   - weak symbols are distinguished from global symbols by adding
+     a `*' after the identifying letter for the symbol class and type.
+   - TLS symbols are distinguished from normal symbols by adding
+     a '@' after the identifying letter for the symbol class and type.  */
+static bool mark_special;
 
 
 int
@@ -344,8 +348,8 @@ parse_opt (int key, char *arg,
       hide_defined = false;
       break;
 
-    case OPT_MARK_WEAK:
-      mark_weak = true;
+    case OPT_MARK_SPECIAL:
+      mark_special = true;
       break;
 
     case 'S':
@@ -859,7 +863,7 @@ show_symbols_sysv (Ebl *ebl, GElf_Word strndx, const char *fullname,
 
 
 static char
-class_type_char (GElf_Sym *sym)
+class_type_char (Elf *elf, const GElf_Ehdr *ehdr, GElf_Sym *sym)
 {
   int local_p = GELF_ST_BIND (sym->st_info) == STB_LOCAL;
 
@@ -871,14 +875,35 @@ class_type_char (GElf_Sym *sym)
     /* Undefined symbols must be global.  */
     return 'U';
 
-  char result = "NDTSFB          "[GELF_ST_TYPE (sym->st_info)];
+  char result = "NDTSFBD         "[GELF_ST_TYPE (sym->st_info)];
+
+  if (result == 'D')
+    {
+      /* Special handling: unique data symbols.  */
+      if (ehdr->e_ident[EI_OSABI] == ELFOSABI_LINUX
+	  && GELF_ST_BIND (sym->st_info) == STB_GNU_UNIQUE)
+	result = 'u';
+      else
+	{
+	  GElf_Shdr shdr_mem;
+	  GElf_Shdr *shdr = gelf_getshdr (elf_getscn (elf, sym->st_shndx),
+					  &shdr_mem);
+	  if (shdr != NULL)
+	    {
+	      if ((shdr->sh_flags & SHF_WRITE) == 0)
+		result = 'R';
+	      else if (shdr->sh_type == SHT_NOBITS)
+		result = 'B';
+	    }
+	}
+    }
 
   return local_p ? tolower (result) : result;
 }
 
 
 static void
-show_symbols_bsd (Elf *elf, GElf_Word strndx,
+show_symbols_bsd (Elf *elf, const GElf_Ehdr *ehdr, GElf_Word strndx,
 		  const char *prefix, const char *fname, const char *fullname,
 		  GElf_SymX *syms, size_t nsyms)
 {
@@ -941,18 +966,22 @@ show_symbols_bsd (Elf *elf, GElf_Word strndx,
       if (syms[cnt].sym.st_shndx == SHN_UNDEF)
 	printf ("%*s U%s %s\n",
 		digits, "",
-		mark_weak
-		? (GELF_ST_BIND (syms[cnt].sym.st_info) == STB_WEAK
-		   ? "*" : " ")
+		mark_special
+		? (GELF_ST_TYPE (syms[cnt].sym.st_info) == STT_TLS
+		   ? "@"
+		   : (GELF_ST_BIND (syms[cnt].sym.st_info) == STB_WEAK
+		      ? "*" : " "))
 		: "",
 		symstr);
       else
 	printf (print_size ? sfmtstrs[radix] : fmtstrs[radix],
 		digits, syms[cnt].sym.st_value,
-		class_type_char (&syms[cnt].sym),
-		mark_weak
-		? (GELF_ST_BIND (syms[cnt].sym.st_info) == STB_WEAK
-		   ? "*" : " ")
+		class_type_char (elf, ehdr, &syms[cnt].sym),
+		mark_special
+		? (GELF_ST_TYPE (syms[cnt].sym.st_info) == STT_TLS
+		   ? "@"
+		   : (GELF_ST_BIND (syms[cnt].sym.st_info) == STB_WEAK
+		      ? "*" : " "))
 		: "",
 		symstr,
 		digits, (uint64_t) syms[cnt].sym.st_size);
@@ -965,8 +994,9 @@ show_symbols_bsd (Elf *elf, GElf_Word strndx,
 
 
 static void
-show_symbols_posix (Elf *elf, GElf_Word strndx, const char *prefix,
-		    const char *fullname, GElf_SymX *syms, size_t nsyms)
+show_symbols_posix (Elf *elf, const GElf_Ehdr *ehdr, GElf_Word strndx,
+		    const char *prefix, const char *fullname, GElf_SymX *syms,
+		    size_t nsyms)
 {
   if (prefix != NULL && ! print_file_name)
     printf ("%s:\n", fullname);
@@ -1022,9 +1052,12 @@ show_symbols_posix (Elf *elf, GElf_Word strndx, const char *prefix,
 
       printf (fmtstr,
 	      symstr,
-	      class_type_char (&syms[cnt].sym),
-	      mark_weak
-	      ? (GELF_ST_BIND (syms[cnt].sym.st_info) == STB_WEAK ? "*" : " ")
+	      class_type_char (elf, ehdr, &syms[cnt].sym),
+	      mark_special
+	      ? (GELF_ST_TYPE (syms[cnt].sym.st_info) == STT_TLS
+		 ? "@"
+		 : (GELF_ST_BIND (syms[cnt].sym.st_info) == STB_WEAK
+		    ? "*" : " "))
 	      : "",
 	      digits, syms[cnt].sym.st_value,
 	      digits, syms[cnt].sym.st_size);
@@ -1287,15 +1320,15 @@ show_symbols (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, Elf_Scn *xndxscn,
       break;
 
     case format_bsd:
-      show_symbols_bsd (ebl->elf, shdr->sh_link, prefix, fname, fullname,
+      show_symbols_bsd (ebl->elf, ehdr, shdr->sh_link, prefix, fname, fullname,
 			sym_mem, nentries);
       break;
 
     case format_posix:
     default:
       assert (format == format_posix);
-      show_symbols_posix (ebl->elf, shdr->sh_link, prefix, fullname, sym_mem,
-			  nentries);
+      show_symbols_posix (ebl->elf, ehdr, shdr->sh_link, prefix, fullname,
+			  sym_mem, nentries);
       break;
     }
 

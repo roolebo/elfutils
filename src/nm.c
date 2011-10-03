@@ -794,13 +794,13 @@ show_symbols_sysv (Ebl *ebl, GElf_Word strndx, const char *fullname,
 	  longest_where, sgettext ("sysv|Line"));
 
   /* Which format string to use (different radix for numbers).  */
-  const char *fmtstr;
+  const char *number_fmtstr;
   if (radix == radix_hex)
-    fmtstr = "%-*s|%0*" PRIx64 "|%-6s|%-8s|%*" PRIx64 "|%*s|%s\n";
+    number_fmtstr = "%0*" PRIx64;
   else if (radix == radix_decimal)
-    fmtstr = "%-*s|%*" PRId64 "|%-6s|%-8s|%*" PRId64 "|%*s|%s\n";
+    number_fmtstr = "%0*" PRId64;
   else
-    fmtstr = "%-*s|%0*" PRIo64 "|%-6s|%-8s|%*" PRIo64 "|%*s|%s\n";
+    number_fmtstr = "%0*" PRIo64;
 
 #ifdef USE_DEMANGLE
   size_t demangle_buffer_len = 0;
@@ -808,8 +808,12 @@ show_symbols_sysv (Ebl *ebl, GElf_Word strndx, const char *fullname,
 #endif
 
   /* Iterate over all symbols.  */
-  for (cnt = 0; cnt < nsyms; ++cnt)
+  for (cnt = 1; cnt < nsyms; ++cnt)
     {
+      /* In this format SECTION entries are not printed.  */
+      if (GELF_ST_TYPE (syms[cnt].sym.st_info) == STT_SECTION)
+	continue;
+
       char symstrbuf[50];
       const char *symstr = sym_name (ebl->elf, strndx, syms[cnt].sym.st_name,
 				     symstrbuf, sizeof symstrbuf);
@@ -830,6 +834,8 @@ show_symbols_sysv (Ebl *ebl, GElf_Word strndx, const char *fullname,
       char symbindbuf[50];
       char symtypebuf[50];
       char secnamebuf[1024];
+      char addressbuf[(64 + 2) / 3 + 1];
+      char sizebuf[(64 + 2) / 3 + 1];
 
       /* If we have to precede the line with the file name.  */
       if (print_file_name)
@@ -838,16 +844,26 @@ show_symbols_sysv (Ebl *ebl, GElf_Word strndx, const char *fullname,
 	  putchar_unlocked (':');
 	}
 
+      /* Covert the address.  */
+      if (syms[cnt].sym.st_shndx == SHN_UNDEF)
+	addressbuf[0] = sizebuf[0] = '\0';
+      else
+	{
+	  snprintf (addressbuf, sizeof (addressbuf), number_fmtstr,
+		    digits, syms[cnt].sym.st_value);
+	  snprintf (sizebuf, sizeof (sizebuf), number_fmtstr,
+		    digits, syms[cnt].sym.st_size);
+	}
+
       /* Print the actual string.  */
-      printf (fmtstr,
-	      longest_name, symstr,
-	      digits, syms[cnt].sym.st_value,
+      printf ("%-*s|%s|%-6s|%-8s|%s|%*s|%s\n",
+	      longest_name, symstr, addressbuf,
 	      ebl_symbol_binding_name (ebl,
 				       GELF_ST_BIND (syms[cnt].sym.st_info),
 				       symbindbuf, sizeof (symbindbuf)),
 	      ebl_symbol_type_name (ebl, GELF_ST_TYPE (syms[cnt].sym.st_info),
 				    symtypebuf, sizeof (symtypebuf)),
-	      digits, syms[cnt].sym.st_size, longest_where, syms[cnt].where,
+	      sizebuf, longest_where, syms[cnt].where,
 	      ebl_section_name (ebl, syms[cnt].sym.st_shndx, syms[cnt].xndx,
 				secnamebuf, sizeof (secnamebuf), scnnames,
 				shnum));

@@ -14,6 +14,8 @@
 	(show_symbols_posix): Likewise.
 	(show_symbols): Adjust calls to show_symbols_bsd and
 	show_symbols_posix.
+	(show_symbols_sysv): Avoid printing adress and size for undefined
+	symbols.
 
 2011-10-02  Ulrich Drepper  <drepper@gmail.com>
 

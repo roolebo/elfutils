@@ -4787,7 +4787,7 @@ register_info (Ebl *ebl, unsigned int regno, const Ebl_Register_Location *loc,
 				 bits ?: &ignore, type ?: &ignore);
   if (n <= 0)
     {
-      snprintf (name, sizeof name, "reg%u", loc->regno);
+      snprintf (name, REGNAMESZ, "reg%u", loc->regno);
       if (bits != NULL)
 	*bits = loc->bits;
       if (type != NULL)

@@ -255,7 +255,7 @@ AC_SUBST([eu_version])
 
 # 1.234<whatever> -> 1234<whatever>
 case "$PACKAGE_VERSION" in
-[[0-9]].*) eu_version="${PACKAGE_VERSION/./}" ;;
+[[0-9]].*) eu_version=`echo "$PACKAGE_VERSION" | sed 's@\.@@'` ;;
 *)     	   AC_MSG_ERROR([confused by version number '$PACKAGE_VERSION']) ;;
 esac
 case "$eu_version" in
@@ -284,6 +284,6 @@ case "$eu_version" in
 esac
 
 # Round up to the next release API (x.y) version.
-[eu_version=$[($eu_version + 999) / 1000]]
+eu_version=$(( (eu_version + 999) / 1000 ))
 
 AC_OUTPUT

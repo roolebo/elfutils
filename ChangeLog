@@ -1,3 +1,9 @@
+2011-10-08  Roland McGrath  <roland@hack.frob.com>
+
+	* configure.ac (eu_version): Use sed instead of ${x/y/z} syntax.
+	Use POSIX.2 $((...)) syntax instead of $[...].
+	Reported by Mike Frysinger <vapier@gentoo.org>.
+
 2011-10-08  Mike Frysinger  <vapier@gentoo.org>
 
 	* configure.ac: Fix use of AC_ARG_ENABLE to handle $enableval correctly.

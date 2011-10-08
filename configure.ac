@@ -49,7 +49,7 @@ AC_CANONICAL_HOST
 
 AC_ARG_ENABLE([thread-safety],
 AS_HELP_STRING([--enable-thread-safety], [enable thread safety of libraries]),
-use_tls=locks, use_locks=no)
+use_locks=$enableval, use_locks=no)
 AM_CONDITIONAL(USE_LOCKS, test "$use_locks" = yes)
 AS_IF([test "$use_locks" = yes], [AC_DEFINE(USE_LOCKS)])
 
@@ -143,15 +143,18 @@ fi
 AM_CONDITIONAL(MUDFLAP, test "$use_mudflap" = yes)
 
 dnl enable debugging of branch prediction.
-use_debugpred=0
 AC_ARG_ENABLE([debugpred],
 AS_HELP_STRING([--enable-debugpred],[build binaries with support to debug branch prediction]),
-[use_debugpred=1], [use_debugpred=0])
+[use_debugpred=$enableval], [use_debugpred=no])
+case $use_debugpred in
+ yes) use_debugpred=1 ;;
+ *)   use_debugpred=0 ;;
+esac
 AC_SUBST([DEBUGPRED], $use_debugpred)
 
 dnl Enable gprof suport.
 AC_ARG_ENABLE([gprof],
-AS_HELP_STRING([--enable-gprof],[build binaries with gprof support]), [use_gprof=yes], [use_gprof=no])
+AS_HELP_STRING([--enable-gprof],[build binaries with gprof support]), [use_gprof=$enableval], [use_gprof=no])
 if test "$use_gprof" = yes; then
   CFLAGS="$CFLAGS -pg"
   LDFLAGS="$LDFLAGS -pg"
@@ -160,7 +163,7 @@ AM_CONDITIONAL(GPROF, test "$use_gprof" = yes)
 
 # Enable gcov suport.
 AC_ARG_ENABLE([gcov],
-AS_HELP_STRING([--enable-gcov],[build binaries with gcov support]), [use_gcov=yes], [use_gcov=no])
+AS_HELP_STRING([--enable-gcov],[build binaries with gcov support]), [use_gcov=$enableval], [use_gcov=no])
 if test "$use_gcov" = yes; then
   CFLAGS="$CFLAGS -fprofile-arcs -ftest-coverage"
   LDFLAGS="$LDFLAGS -fprofile-arcs"
@@ -172,7 +175,7 @@ test "$use_mudflap" = yes -o "$use_gprof" = yes -o "$use_gcov" = yes])
 
 AC_ARG_ENABLE([tests-rpath],
 AS_HELP_STRING([--enable-tests-rpath],[build $ORIGIN-using rpath into tests]),
-	       [tests_use_rpath=yes], [tests_use_rpath=no])
+	       [tests_use_rpath=$enableval], [tests_use_rpath=no])
 AM_CONDITIONAL(TESTS_RPATH, test "$tests_use_rpath" = yes)
 
 LIBEBL_SUBDIR="$PACKAGE"

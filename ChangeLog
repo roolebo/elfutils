@@ -1,3 +1,7 @@
+2011-10-08  Mike Frysinger  <vapier@gentoo.org>
+
+	* configure.ac: Fix use of AC_ARG_ENABLE to handle $enableval correctly.
+
 2011-10-02  Ulrich Drepper  <drepper@gmail.com>
 
 	* configure.ac: Check for __cxa_demangle in libstdc++.

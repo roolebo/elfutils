@@ -33,6 +33,7 @@ config/missing
 config/ylwrap
 configure
 elfutils.spec
+libcpu/*_dis.h
 libdw/known-dwarf.h
 po/en@boldquot.po
 po/en@quot.po

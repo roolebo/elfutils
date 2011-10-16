@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2002-2010 Red Hat, Inc.
+## Copyright (C) 2002-2011 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -33,21 +33,26 @@ LEX_OUTPUT_ROOT = lex.$(<F:lex.l=)
 AM_YFLAGS = -p$(<F:parse.y=)
 
 noinst_LIBRARIES = libcpu_i386.a libcpu_x86_64.a
-noinst_PROGRAMS = i386_gendis
 
-libcpu_i386_a_SOURCES = i386_disasm.c
-libcpu_x86_64_a_SOURCES = x86_64_disasm.c
+libcpu_i386_a_SOURCES = i386_disasm.c i386_dis.h
+libcpu_x86_64_a_SOURCES = x86_64_disasm.c x86_64_dis.h
 
 i386_gendis_SOURCES = i386_gendis.c i386_lex.l i386_parse.y
 
-i386_disasm.o: i386.mnemonics i386_dis.h
-x86_64_disasm.o: x86_64.mnemonics x86_64_dis.h i386_disasm.c
+i386_disasm.o: i386.mnemonics $(srcdir)/i386_dis.h
+x86_64_disasm.o: x86_64.mnemonics $(srcdir)/x86_64_dis.h
 
 %_defs: $(srcdir)/defs/i386
 	m4 -D$* -DDISASSEMBLER $< > $@
 
-%_dis.h: %_defs i386_gendis
+if MAINTAINER_MODE
+noinst_HEADERS = memory-access.h i386_parse.h i386_data.h
+
+noinst_PROGRAMS = i386_gendis
+
+$(srcdir)/%_dis.h: %_defs i386_gendis
 	./i386_gendis $< > $@
+endif
 
 %.mnemonics: %_defs
 	sed '1,/^%%/d;/^#/d;/^[[:space:]]*$$/d;s/[^:]*:\([^[:space:]]*\).*/MNE(\1)/;s/{[^}]*}//g;/INVALID/d' \
@@ -64,8 +69,6 @@ i386_lex.o: i386_parse.h
 i386_gendis_LDADD = $(libeu) -lm $(libmudflap)
 
 i386_parse.h: i386_parse.c ;
-
-noinst_HEADERS = memory-access.h i386_parse.h i386_data.h
 
 EXTRA_DIST = defs/i386
 

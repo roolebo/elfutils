@@ -90,6 +90,9 @@ compare_secrefs (const void *a, const void *b)
 static int
 cache_sections (Dwfl_Module *mod)
 {
+  if (likely (mod->reloc_info != NULL))
+    return mod->reloc_info->count;
+
   struct secref *refs = NULL;
   size_t nrefs = 0;
 
@@ -227,9 +230,6 @@ dwfl_module_relocations (Dwfl_Module *mod)
   if (mod == NULL)
     return -1;
 
-  if (mod->reloc_info != NULL)
-    return mod->reloc_info->count;
-
   switch (mod->e_type)
     {
     case ET_REL:
@@ -269,7 +269,7 @@ dwfl_module_relocation_info (Dwfl_Module *mod, unsigned int idx,
       return NULL;
     }
 
-  if (unlikely (mod->reloc_info == NULL) && cache_sections (mod) < 0)
+  if (cache_sections (mod) < 0)
     return NULL;
 
   struct dwfl_relocation *sections = mod->reloc_info;
@@ -318,7 +318,7 @@ check_module (Dwfl_Module *mod)
 static int
 find_section (Dwfl_Module *mod, Dwarf_Addr *addr)
 {
-  if (unlikely (mod->reloc_info == NULL) && cache_sections (mod) < 0)
+  if (cache_sections (mod) < 0)
     return -1;
 
   struct dwfl_relocation *sections = mod->reloc_info;

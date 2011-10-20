@@ -1,3 +1,10 @@
+2011-10-20  Mark Wielaard  <mjw@redhat.com>
+
+	* derelocate.c (cache_sections): Intern mod->reloc_info check.
+	(dwfl_module_relocations): Don't check mod->reloc_info.
+	(dwfl_module_relocation_info): Likewise.
+	(find_section): Likewise.
+
 2011-07-09  Roland McGrath  <roland@hack.frob.com>
 
 	* image-header.c (LE32): Macro removed (now in lib/system.h).

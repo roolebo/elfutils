@@ -1,3 +1,12 @@
+2011-10-16  Roland McGrath  <roland@hack.frob.com>
+
+	* Makefile.am (libcpu_i386_a_SOURCES): Add i386_dis.h.
+	(libcpu_x86_64_a_SOURCES): Add x86_64_dis.h.
+	(i386_disasm.o, x86_64_disasm.o): Depend on those in $(srcdir).
+	(%_dis.h): Renamed target pattern to ...
+	($(srcdir)/%_dis.h): ... this.
+	(noinst_HEADERS, noinst_PROGRAMS): Put under [MAINTAINER_MODE].
+
 2010-08-16  Roland McGrath  <roland@redhat.com>
 
 	* Makefile.am (%_defs): New pattern rule.

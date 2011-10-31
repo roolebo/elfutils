@@ -1,3 +1,7 @@
+2011-11-31  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (known-dwarf.h): Run gawk on config/known-dwarf.awk.
+
 2011-07-14  Mark Wielaard  <mjw@redhat.com>
 
 	* libdw.h (dwarf_offdie): Fix documentation to mention .debug_info.

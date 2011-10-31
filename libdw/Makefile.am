@@ -90,7 +90,7 @@ if MAINTAINER_MODE
 BUILT_SOURCES = $(srcdir)/known-dwarf.h
 MAINTAINERCLEANFILES = $(srcdir)/known-dwarf.h
 $(srcdir)/known-dwarf.h: $(top_srcdir)/config/known-dwarf.awk $(srcdir)/dwarf.h
-	$(AWK) -f $^ > $@.new
+	gawk -f $^ > $@.new
 	mv -f $@.new $@
 endif
 

@@ -1,3 +1,7 @@
+2011-10-31  Mark Wielaard  <mjw@redhat.com>
+
+	* known-dwarf.awk: Use gawk.
+
 2010-07-02  Ulrich Drepper  <drepper@redhat.com>
 
 	* elfutils.spec.in: Add more BuildRequires.

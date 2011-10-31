@@ -1,4 +1,4 @@
-#!/bin/awk -f
+#!/bin/gawk -f
 
 $1 == "enum" { set = ""; next }
 

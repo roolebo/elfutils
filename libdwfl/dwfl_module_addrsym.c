@@ -1,5 +1,5 @@
 /* Find debugging and symbol information for a module in libdwfl.
-   Copyright (C) 2005-2010 Red Hat, Inc.
+   Copyright (C) 2005-2011 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -105,68 +105,83 @@ dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr addr,
   GElf_Addr min_label = 0;
 
   /* Look through the symbol table for a matching symbol.  */
-  for (int i = 1; i < syments; ++i)
+  inline void search_table (int start, int end)
     {
-      GElf_Sym sym;
-      GElf_Word shndx;
-      const char *name = INTUSE(dwfl_module_getsym) (mod, i, &sym, &shndx);
-      if (name != NULL && name[0] != '\0'
-	  && sym.st_shndx != SHN_UNDEF
-	  && sym.st_value <= addr
-	  && GELF_ST_TYPE (sym.st_info) != STT_SECTION
-	  && GELF_ST_TYPE (sym.st_info) != STT_FILE
-	  && GELF_ST_TYPE (sym.st_info) != STT_TLS)
+      for (int i = start; i < end; ++i)
 	{
-	  /* Even if we don't choose this symbol, its existence excludes
-	     any sizeless symbol (assembly label) that is below its upper
-	     bound.  */
-	  if (sym.st_value + sym.st_size > min_label)
-	    min_label = sym.st_value + sym.st_size;
-
-	  if (sym.st_size == 0 || addr - sym.st_value < sym.st_size)
+	  GElf_Sym sym;
+	  GElf_Word shndx;
+	  const char *name = INTUSE(dwfl_module_getsym) (mod, i, &sym, &shndx);
+	  if (name != NULL && name[0] != '\0'
+	      && sym.st_shndx != SHN_UNDEF
+	      && sym.st_value <= addr
+	      && GELF_ST_TYPE (sym.st_info) != STT_SECTION
+	      && GELF_ST_TYPE (sym.st_info) != STT_FILE
+	      && GELF_ST_TYPE (sym.st_info) != STT_TLS)
 	    {
-	      /* This symbol is a better candidate than the current one
-		 if it's closer to ADDR or is global when it was local.  */
-	      if (closest_name == NULL
-		  || closest_sym->st_value < sym.st_value
-		  || (GELF_ST_BIND (closest_sym->st_info)
-		      < GELF_ST_BIND (sym.st_info)))
+	      /* Even if we don't choose this symbol, its existence excludes
+		 any sizeless symbol (assembly label) that is below its upper
+		 bound.  */
+	      if (sym.st_value + sym.st_size > min_label)
+		min_label = sym.st_value + sym.st_size;
+
+	      if (sym.st_size == 0 || addr - sym.st_value < sym.st_size)
 		{
-		  if (sym.st_size != 0)
+		  /* This symbol is a better candidate than the current one
+		     if it's closer to ADDR or is global when it was local.  */
+		  if (closest_name == NULL
+		      || closest_sym->st_value < sym.st_value
+		      || (GELF_ST_BIND (closest_sym->st_info)
+			  < GELF_ST_BIND (sym.st_info)))
+		    {
+		      if (sym.st_size != 0)
+			{
+			  *closest_sym = sym;
+			  closest_shndx = shndx;
+			  closest_name = name;
+			}
+		      else if (closest_name == NULL
+			       && sym.st_value >= min_label
+			       && same_section (&sym, shndx))
+			{
+			  /* Handwritten assembly symbols sometimes have no
+			     st_size.  If no symbol with proper size includes
+			     the address, we'll use the closest one that is in
+			     the same section as ADDR.  */
+			  sizeless_sym = sym;
+			  sizeless_shndx = shndx;
+			  sizeless_name = name;
+			}
+		    }
+		  /* When the beginning of its range is no closer,
+		     the end of its range might be.  But do not
+		     replace a global symbol with a local!  */
+		  else if (sym.st_size != 0
+			   && closest_sym->st_value == sym.st_value
+			   && closest_sym->st_size > sym.st_size
+			   && (GELF_ST_BIND (closest_sym->st_info)
+			       <= GELF_ST_BIND (sym.st_info)))
 		    {
 		      *closest_sym = sym;
 		      closest_shndx = shndx;
 		      closest_name = name;
 		    }
-		  else if (closest_name == NULL
-			   && sym.st_value >= min_label
-			   && same_section (&sym, shndx))
-		    {
-		      /* Handwritten assembly symbols sometimes have no
-			 st_size.  If no symbol with proper size includes
-			 the address, we'll use the closest one that is in
-			 the same section as ADDR.  */
-		      sizeless_sym = sym;
-		      sizeless_shndx = shndx;
-		      sizeless_name = name;
-		    }
-		}
-	      /* When the beginning of its range is no closer,
-		 the end of its range might be.  But do not
-		 replace a global symbol with a local!  */
-	      else if (sym.st_size != 0
-		       && closest_sym->st_value == sym.st_value
-		       && closest_sym->st_size > sym.st_size
-		       && (GELF_ST_BIND (closest_sym->st_info)
-			   <= GELF_ST_BIND (sym.st_info)))
-		{
-		  *closest_sym = sym;
-		  closest_shndx = shndx;
-		  closest_name = name;
 		}
 	    }
 	}
     }
+
+  /* First go through global symbols.  mod->first_global is setup by
+     dwfl_module_getsymtab to the index of the first global symbol in
+     the module's symbol table, or -1 when unknown.  All symbols with
+     local binding come first in the symbol table, then all globals.  */
+  search_table (mod->first_global < 0 ? 1 : mod->first_global, syments);
+
+  /* If we found nothing searching the global symbols, then try the locals.
+     Unless we have a global sizeless symbol that matches exactly.  */
+  if (closest_name == NULL && mod->first_global > 1
+      && (sizeless_name == NULL || sizeless_sym.st_value != addr))
+    search_table (1, mod->first_global);
 
   /* If we found no proper sized symbol to use, fall back to the best
      candidate sizeless symbol we found, if any.  */

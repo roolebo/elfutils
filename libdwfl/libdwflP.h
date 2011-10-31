@@ -172,6 +172,7 @@ struct Dwfl_Module
   struct dwfl_file *symfile;	/* Either main or debug.  */
   Elf_Data *symdata;		/* Data in the ELF symbol table section.  */
   size_t syments;		/* sh_size / sh_entsize of that section.  */
+  int first_global;		/* Index of first global symbol of table.  */
   Elf_Data *symstrdata;		/* Data for its string table.  */
   Elf_Data *symxndxdata;	/* Data in the extended section index table. */
 

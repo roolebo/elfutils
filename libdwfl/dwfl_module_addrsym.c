@@ -138,7 +138,9 @@ dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr addr,
 		      closest_shndx = shndx;
 		      closest_name = name;
 		    }
-		  else if (same_section (&sym, shndx))
+		  else if (closest_name == NULL
+			   && sym.st_value >= min_label
+			   && same_section (&sym, shndx))
 		    {
 		      /* Handwritten assembly symbols sometimes have no
 			 st_size.  If no symbol with proper size includes

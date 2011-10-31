@@ -1,3 +1,8 @@
+2011-11-31  Mark Wielaard  <mjw@redhat.com>
+
+	* dwfl_module_addrsym.c (dwfl_module_addrsym): Only update
+	sizeless_sym if needed and closer to desired addr.
+
 2011-10-20  Mark Wielaard  <mjw@redhat.com>
 
 	* derelocate.c (cache_sections): Intern mod->reloc_info check.

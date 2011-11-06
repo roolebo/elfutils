@@ -4,6 +4,8 @@ libdw: Support reading .zdebug_* DWARF sections compressed via zlib.
 
 nm: Support C++ demangling.
 
+ar: Support D modifier for "deterministic output" with no uid/gid/mtime info.
+
 Version 0.152
 
 Various build and warning nits fixed for newest GCC and Autoconf.

@@ -1,5 +1,9 @@
 2011-11-05  Roland McGrath  <roland@hack.frob.com>
 
+	* ar.c (deterministic_output): New flag variable.
+	(options, parse_opt): Grok -D to set it.
+	(do_oper_insert): When set, use zero from mtime, uid, and gid.
+
 	* ar.c (do_oper_insert): Fix check on elf_rawfile return value.
 
 2011-10-04  Marek Polacek  <mpolacek@redhat.com>

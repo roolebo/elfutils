@@ -95,6 +95,8 @@ static const struct argp_option options[] =
   { NULL, 'a', NULL, 0, N_("Insert file after [MEMBER]."), 0 },
   { NULL, 'b', NULL, 0, N_("Insert file before [MEMBER]."), 0 },
   { NULL, 'i', NULL, 0, N_("Same as -b."), 0 },
+  { NULL, 'D', NULL, 0,
+    N_("Use zero for uid, gid, and date in archive members."), 0 },
   { NULL, 'c', NULL, 0, N_("Suppress message when library has to be created."),
     0 },
   { NULL, 'P', NULL, 0, N_("Use full path for file matching."), 0 },
@@ -141,6 +143,7 @@ static bool allow_truncate_fname;
 static bool force_symtab;
 static bool suppress_create_msg;
 static bool full_path;
+static bool deterministic_output;
 static bool update_newer;
 static enum { ipos_none, ipos_before, ipos_after } ipos;
 
@@ -378,6 +381,10 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
 
     case 'T':
       allow_truncate_fname = true;
+      break;
+
+    case 'D':
+      deterministic_output = true;
       break;
 
     case 'u':
@@ -1295,9 +1302,9 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
 			found[cnt]->old_off == -1l ? 'a' : 'r', argv[cnt]);
 
 	      found[cnt]->elf = newelf;
-	      found[cnt]->sec = newst.st_mtime;
-	      found[cnt]->uid = newst.st_uid;
-	      found[cnt]->gid = newst.st_gid;
+	      found[cnt]->sec = deterministic_output ? 0 : newst.st_mtime;
+	      found[cnt]->uid = deterministic_output ? 0 : newst.st_uid;
+	      found[cnt]->gid = deterministic_output ? 0 : newst.st_gid;
 	      found[cnt]->mode = newst.st_mode;
 	      found[cnt]->name = bname;
 

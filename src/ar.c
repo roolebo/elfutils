@@ -1302,7 +1302,8 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
 	      found[cnt]->name = bname;
 
 	      found[cnt]->mem = elf_rawfile (newelf, &found[cnt]->size);
-	      if (found[cnt] == NULL || elf_cntl (newelf, ELF_C_FDDONE) != 0)
+	      if (found[cnt]->mem == NULL
+		  || elf_cntl (newelf, ELF_C_FDDONE) != 0)
 		error (EXIT_FAILURE, 0, gettext ("cannot read %s: %s"),
 		       argv[cnt], elf_errmsg (-1));
 

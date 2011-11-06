@@ -1,3 +1,7 @@
+2011-11-05  Roland McGrath  <roland@hack.frob.com>
+
+	* ar.c (do_oper_insert): Fix check on elf_rawfile return value.
+
 2011-10-04  Marek Polacek  <mpolacek@redhat.com>
 
 	* readelf.c (register_info): Assume the right size of an array.

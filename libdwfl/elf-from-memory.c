@@ -1,5 +1,5 @@
 /* Reconstruct an ELF file by reading the segments out of remote memory.
-   Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 2005-2011 Red Hat, Inc.
    This file is part of Red Hat elfutils.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -244,11 +244,11 @@ elf_from_remote_memory (GElf_Addr ehdr_vma,
       break;
 
     case ELFCLASS64:
-      if (elf32_xlatetom (&xlateto, &xlatefrom,
-			  ehdr.e32.e_ident[EI_DATA]) == NULL)
+      if (elf64_xlatetom (&xlateto, &xlatefrom,
+			  ehdr.e64.e_ident[EI_DATA]) == NULL)
 	goto libelf_error;
       for (uint_fast16_t i = 0; i < phnum; ++i)
-	if (phdrs.p32[i].p_type == PT_LOAD)
+	if (phdrs.p64[i].p_type == PT_LOAD)
 	  handle_segment (phdrs.p64[i].p_vaddr, phdrs.p64[i].p_offset,
 			  phdrs.p64[i].p_filesz, phdrs.p64[i].p_align);
       break;

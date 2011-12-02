@@ -1,3 +1,9 @@
+2011-12-02  Roland McGrath  <roland@hack.frob.com>
+
+	* elf-from-memory.c (elf_from_remote_memory): Fix ELFCLASS64 case
+	to use elf64_xlatetom and PHDRS.p64.
+	Reported by Serge Pavlov <serge.pavlov.at.gnu@gmail.com>.
+
 2011-11-31  Mark Wielaard  <mjw@redhat.com>
 
 	* dwfl_module_addrsym.c (dwfl_module_addrsym): First search all

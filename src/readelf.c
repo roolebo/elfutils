@@ -7288,7 +7288,11 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
   /* Before we start the real work get a debug context descriptor.  */
   Dwarf_Addr dwbias;
   Dwarf *dbg = dwfl_module_getdwarf (dwflmod, &dwbias);
-  Dwarf dummy_dbg = { .other_byte_order = MY_ELFDATA != ehdr->e_ident[EI_DATA] };
+  Dwarf dummy_dbg =
+    {
+      .elf = ebl->elf,
+      .other_byte_order = MY_ELFDATA != ehdr->e_ident[EI_DATA]
+    };
   if (dbg == NULL)
     {
       if ((print_debug_sections & ~section_exception) != 0)

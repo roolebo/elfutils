@@ -1,3 +1,8 @@
+2011-12-20  Roland McGrath  <roland@hack.frob.com>
+
+	* readelf.c (print_debug): Initialize DUMMY_DBG.elf.
+	Reported by Karel Klic <kklic@redhat.com>.
+
 2011-11-05  Roland McGrath  <roland@hack.frob.com>
 
 	* ar.c (deterministic_output): New flag variable.

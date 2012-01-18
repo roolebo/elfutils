@@ -1,4 +1,4 @@
-/* Copyright (C) 2002, 2004, 2005 Red Hat, Inc.
+/* Copyright (C) 2002-2012 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -113,8 +113,7 @@ main (void)
     }
 
   if (result == 0)
-    result = WEXITSTATUS (system ("\
-env LD_LIBRARY_PATH=../libelf ../src/elflint -q asm-tst5-out.o"));
+    result = WEXITSTATUS (system ("../src/elflint -q asm-tst5-out.o"));
 
   /* We don't need the file anymore.  */
   unlink (fname);

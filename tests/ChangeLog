@@ -1,3 +1,11 @@
+2012-01-18  Roland McGrath  <roland@hack.frob.com>
+
+	* asm-tst4.c (main): Don't set LD_LIBRARY_PATH in system invocation;
+	it will have been inherited correctly from the test harness.
+	* asm-tst5.c (main): Likewise.
+	* asm-tst6.c (main): Likewise.
+	Reported by Serge Pavlov <serge.pavlov.at.gnu@gmail.com>.
+
 2011-07-09  Roland McGrath  <roland@hack.frob.com>
 
 	* sha1-tst.c: File removed.

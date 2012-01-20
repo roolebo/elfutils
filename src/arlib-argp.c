@@ -97,5 +97,5 @@ static const struct argp argp =
 const struct argp_child arlib_argp_children[] =
   {
     { &argp, 0, "", 2 },
-    { NULL, }
+    { NULL, 0, NULL, 0 }
   };

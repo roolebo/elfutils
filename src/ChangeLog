@@ -1,5 +1,7 @@
 2012-01-20  Roland McGrath  <roland@hack.frob.com>
 
+	* ar.c (main): Handle oper_none as usage error.
+
 	* arlib-argp.c (options, parse_opt): Grok -U as inverse of -D.
 
 	* ranlib.c (argp): Use arlib_argp_children.

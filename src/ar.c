@@ -252,6 +252,13 @@ MEMBER parameter required for 'a', 'b', and 'i' modifiers"));
   int status;
   switch (operation)
     {
+    case oper_none:
+      error (0, 0, gettext ("command option required"));
+      argp_help (&argp, stderr, ARGP_HELP_STD_ERR,
+                 program_invocation_short_name);
+      status = 1;
+      break;
+
     case oper_list:
     case oper_print:
       status = do_oper_extract (operation, arfname, argv, argc, -1);

@@ -35,6 +35,8 @@ static const struct argp_option options[] =
   {
     { NULL, 'D', NULL, 0,
       N_("Use zero for uid, gid, and date in archive members."), 0 },
+    { NULL, 'U', NULL, 0,
+      N_("Use actual uid, gid, and date in archive members."), 0 },
 
     { NULL, 0, NULL, 0, NULL, 0 }
   };
@@ -47,6 +49,10 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
     {
     case 'D':
       arlib_deterministic_output = true;
+      break;
+
+    case 'U':
+      arlib_deterministic_output = false;
       break;
 
     default:

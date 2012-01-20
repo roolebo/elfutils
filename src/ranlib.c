@@ -1,5 +1,5 @@
 /* Generate an index to speed access to archives.
-   Copyright (C) 2005, 2006, 2007, 2009 Red Hat, Inc.
+   Copyright (C) 2005-2012 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -79,7 +79,7 @@ static const char args_doc[] = N_("ARCHIVE");
 /* Data structure to communicate with argp functions.  */
 static const struct argp argp =
 {
-  options, NULL, args_doc, doc, NULL, NULL, NULL
+  options, NULL, args_doc, doc, arlib_argp_children, NULL, NULL
 };
 
 

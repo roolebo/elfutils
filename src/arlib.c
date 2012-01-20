@@ -1,5 +1,5 @@
 /* Functions to handle creation of Linux archives.
-   Copyright (C) 2007 Red Hat, Inc.
+   Copyright (C) 2007-2012 Red Hat, Inc.
    Written by Ulrich Drepper <drepper@redhat.com>, 2007.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -69,7 +69,8 @@ arlib_init (void)
   memcpy (ar_hdr.ar_date, tmpbuf,
 	  snprintf (tmpbuf, sizeof (tmpbuf), "%-*lld",
 		    (int) sizeof (ar_hdr.ar_date),
-		    (long long int) time (NULL)));
+                    (arlib_deterministic_output ? 0
+                     : (long long int) time (NULL))));
   assert ((sizeof (struct ar_hdr)  % sizeof (uint32_t)) == 0);
 
   /* Note the string for the ar_uid and ar_gid cases is longer than

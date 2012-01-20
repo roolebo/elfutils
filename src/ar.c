@@ -73,7 +73,7 @@ ARGP_PROGRAM_BUG_ADDRESS_DEF = PACKAGE_BUGREPORT;
 /* Definitions of arguments for argp functions.  */
 static const struct argp_option options[] =
 {
-  { NULL, 0, NULL, 0, N_("Commands:"), 0 },
+  { NULL, 0, NULL, 0, N_("Commands:"), 1 },
   { NULL, 'd', NULL, 0, N_("Delete files from archive."), 0 },
   { NULL, 'm', NULL, 0, N_("Move files in archive."), 0 },
   { NULL, 'p', NULL, 0, N_("Print files in archive."), 0 },
@@ -83,7 +83,7 @@ static const struct argp_option options[] =
   { NULL, 't', NULL, 0, N_("Display content of archive."), 0 },
   { NULL, 'x', NULL, 0, N_("Extract files from archive."), 0 },
 
-  { NULL, 0, NULL, 0, N_("Command Modifiers:"), 0 },
+  { NULL, 0, NULL, 0, N_("Command Modifiers:"), 2 },
   { NULL, 'o', NULL, 0, N_("Preserve original dates."), 0 },
   { NULL, 'N', NULL, 0, N_("Use instance [COUNT] of name."), 0 },
   { NULL, 'C', NULL, 0,
@@ -95,8 +95,6 @@ static const struct argp_option options[] =
   { NULL, 'a', NULL, 0, N_("Insert file after [MEMBER]."), 0 },
   { NULL, 'b', NULL, 0, N_("Insert file before [MEMBER]."), 0 },
   { NULL, 'i', NULL, 0, N_("Same as -b."), 0 },
-  { NULL, 'D', NULL, 0,
-    N_("Use zero for uid, gid, and date in archive members."), 0 },
   { NULL, 'c', NULL, 0, N_("Suppress message when library has to be created."),
     0 },
   { NULL, 'P', NULL, 0, N_("Use full path for file matching."), 0 },
@@ -117,7 +115,7 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state);
 /* Data structure to communicate with argp functions.  */
 static struct argp argp =
 {
-  options, parse_opt, args_doc, doc, NULL, NULL, NULL
+  options, parse_opt, args_doc, doc, arlib_argp_children, NULL, NULL
 };
 
 
@@ -143,7 +141,6 @@ static bool allow_truncate_fname;
 static bool force_symtab;
 static bool suppress_create_msg;
 static bool full_path;
-static bool deterministic_output;
 static bool update_newer;
 static enum { ipos_none, ipos_before, ipos_after } ipos;
 
@@ -381,10 +378,6 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
 
     case 'T':
       allow_truncate_fname = true;
-      break;
-
-    case 'D':
-      deterministic_output = true;
       break;
 
     case 'u':
@@ -1302,9 +1295,9 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
 			found[cnt]->old_off == -1l ? 'a' : 'r', argv[cnt]);
 
 	      found[cnt]->elf = newelf;
-	      found[cnt]->sec = deterministic_output ? 0 : newst.st_mtime;
-	      found[cnt]->uid = deterministic_output ? 0 : newst.st_uid;
-	      found[cnt]->gid = deterministic_output ? 0 : newst.st_gid;
+	      found[cnt]->sec = arlib_deterministic_output ? 0 : newst.st_mtime;
+	      found[cnt]->uid = arlib_deterministic_output ? 0 : newst.st_uid;
+	      found[cnt]->gid = arlib_deterministic_output ? 0 : newst.st_gid;
 	      found[cnt]->mode = newst.st_mode;
 	      found[cnt]->name = bname;
 

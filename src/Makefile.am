@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 1996-2011 Red Hat, Inc.
+## Copyright (C) 1996-2012 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -67,7 +67,7 @@ endif
 ld_SOURCES = ld.c ldgeneric.c ldlex.l ldscript.y symbolhash.c sectionhash.c \
 	     versionhash.c
 
-libar_a_SOURCES = arlib.c arlib2.c
+libar_a_SOURCES = arlib.c arlib2.c arlib-argp.c
 
 noinst_HEADERS = ld.h symbolhash.h sectionhash.h versionhash.h \
 		 ldscript.h xelf.h unaligned.h

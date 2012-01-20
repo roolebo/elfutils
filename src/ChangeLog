@@ -1,3 +1,18 @@
+2012-01-20  Roland McGrath  <roland@hack.frob.com>
+
+	* ranlib.c (argp): Use arlib_argp_children.
+
+	* arlib.c (arlib_init): Obey arlib_deterministic_output.
+
+	* arlib-argp.c: New file.
+	* Makefile.am (libar_a_SOURCES): Add it.
+	* arlib.h (arlib_deterministic_output, arlib_argp_children):
+	Declare new variables.
+	* ar.c (deterministic_output): Variable removed.
+	(do_oper_insert): Use arlib_deterministic_output instead.
+	(options, parse_opt): Don't handle -D here.  Add group numbers.
+	(argp): Use arlib_argp_children.
+
 2011-12-20  Roland McGrath  <roland@hack.frob.com>
 
 	* readelf.c (print_debug): Initialize DUMMY_DBG.elf.

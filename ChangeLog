@@ -1,3 +1,7 @@
+2012-01-20  Roland McGrath  <roland@hack.frob.com>
+
+	* configure.ac: Handle --enable-deterministic-archives.
+
 2011-10-08  Roland McGrath  <roland@hack.frob.com>
 
 	* configure.ac (eu_version): Use sed instead of ${x/y/z} syntax.

@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl Configure input file for elfutils.                     -*-autoconf-*-
 dnl
-dnl Copyright (C) 1996-2011 Red Hat, Inc.
+dnl Copyright (C) 1996-2012 Red Hat, Inc.
 dnl
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -46,6 +46,17 @@ AC_CONFIG_FILES([elfutils.spec:config/elfutils.spec.in])
 
 
 AC_CANONICAL_HOST
+
+AC_ARG_ENABLE(deterministic-archives,
+[AS_HELP_STRING([--enable-deterministic-archives],
+		[ar and ranlib default to -D behavior])], [
+if test "${enableval}" = no; then
+  default_ar_deterministic=false
+else
+  default_ar_deterministic=true
+fi], [default_ar_deterministic=false])
+AC_DEFINE_UNQUOTED(DEFAULT_AR_DETERMINISTIC, $default_ar_deterministic,
+		   [Should ar and ranlib use -D behavior by default?])
 
 AC_ARG_ENABLE([thread-safety],
 AS_HELP_STRING([--enable-thread-safety], [enable thread safety of libraries]),

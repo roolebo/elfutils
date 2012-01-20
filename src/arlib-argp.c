@@ -27,9 +27,11 @@
 #endif
 
 #include <argp.h>
+#include <libintl.h>
+
 #include "arlib.h"
 
-bool arlib_deterministic_output;
+bool arlib_deterministic_output = DEFAULT_AR_DETERMINISTIC;
 
 static const struct argp_option options[] =
   {
@@ -61,9 +63,35 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
   return 0;
 }
 
+static char *
+help_filter (int key, const char *text, void *input __attribute__ ((unused)))
+{
+  inline char *text_for_default (void)
+  {
+    char *new_text;
+    if (unlikely (asprintf (&new_text, gettext ("%s (default)"), text) < 0))
+      return (char *) text;
+    return new_text;
+  }
+
+  switch (key)
+    {
+    case 'D':
+      if (DEFAULT_AR_DETERMINISTIC)
+        return text_for_default ();
+      break;
+    case 'U':
+      if (! DEFAULT_AR_DETERMINISTIC)
+        return text_for_default ();
+      break;
+    }
+
+  return (char *) text;
+}
+
 static const struct argp argp =
   {
-    options, parse_opt, NULL, NULL, NULL, NULL, NULL
+    options, parse_opt, NULL, NULL, NULL, help_filter, NULL
   };
 
 const struct argp_child arlib_argp_children[] =

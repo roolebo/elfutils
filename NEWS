@@ -6,6 +6,8 @@ nm: Support C++ demangling.
 
 ar: Support D modifier for "deterministic output" with no uid/gid/mtime info.
     The U modifier is the inverse.
+    elfutils can be configured with the --enable-deterministic-archives
+    option to make the D behavior the default when U is not specified.
 ranlib: Support -D and -U flags with same meaning.
 
 Version 0.152

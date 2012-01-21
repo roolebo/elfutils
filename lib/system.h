@@ -49,6 +49,7 @@
 #ifndef LIB_SYSTEM_H
 #define LIB_SYSTEM_H	1
 
+#include <argp.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <endian.h>
@@ -106,5 +107,38 @@ extern int crc32_file (int fd, uint32_t *resp);
 /* The demangler from libstdc++.  */
 extern char *__cxa_demangle (const char *mangled_name, char *output_buffer,
 			     size_t *length, int *status);
+
+
+
+/* Color handling.  */
+
+/* Command line parser.  */
+extern const struct argp color_argp;
+
+/* Coloring mode.  */
+enum color_enum
+  {
+    color_never = 0,
+    color_always,
+    color_auto
+  } __attribute__ ((packed));
+extern enum color_enum color_mode;
+
+/* Colors to use for the various components.  */
+extern char *color_address;
+extern char *color_bytes;
+extern char *color_mnemonic;
+extern char *color_operand1;
+extern char *color_operand2;
+extern char *color_operand3;
+extern char *color_label;
+extern char *color_undef;
+extern char *color_undef_tls;
+extern char *color_undef_weak;
+extern char *color_symbol;
+extern char *color_tls;
+extern char *color_weak;
+
+extern const char color_off[];
 
 #endif /* system.h */

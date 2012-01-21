@@ -1,3 +1,10 @@
+2012-01-21  Ulrich Drepper  <drepper@gmail.com>
+
+	* Makefile.am (libeu_a_SOURCES): Add color.c.
+	* system.h: Declare color_argp.  Define color_enum.  Declare
+	color_* variables.
+	* color.c: New file.
+
 2011-10-02  Ulrich Drepper  <drepper@gmail.com>
 
 	* system.h: Declare __cxa_demangle.

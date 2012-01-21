@@ -118,10 +118,17 @@ static const char args_doc[] = N_("[FILE...]");
 /* Prototype for option handler.  */
 static error_t parse_opt (int key, char *arg, struct argp_state *state);
 
+/* Parser children.  */
+static struct argp_child argp_children[] =
+  {
+    { &color_argp, 0, N_("Output formatting"), 2 },
+    { NULL, 0, NULL, 0}
+  };
+
 /* Data structure to communicate with argp functions.  */
 static struct argp argp =
 {
-  options, parse_opt, args_doc, doc, NULL, NULL, NULL
+  options, parse_opt, args_doc, doc, argp_children, NULL, NULL
 };
 
 
@@ -267,7 +274,7 @@ print_version (FILE *stream, struct argp_state *state __attribute__ ((unused)))
 Copyright (C) %s Red Hat, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
-"), "2009");
+"), "2011");
   fprintf (stream, gettext ("Written by %s.\n"), "Ulrich Drepper");
 }
 
@@ -458,7 +465,7 @@ handle_ar (int fd, Elf *elf, const char *prefix, const char *fname,
 	  Elf_Arhdr *arhdr = NULL;
 	  size_t arhdr_off = 0;	/* Note: 0 is no valid offset.  */
 
-	  puts (gettext("\nArchive index:"));
+	  fputs_unlocked (gettext("\nArchive index:\n"), stdout);
 
 	  while (arsym->as_off != 0)
 	    {
@@ -930,15 +937,15 @@ show_symbols_bsd (Elf *elf, const GElf_Ehdr *ehdr, GElf_Word strndx,
 
   static const char *const fmtstrs[] =
     {
-      [radix_hex] = "%0*" PRIx64 " %c%s %s\n",
-      [radix_decimal] = "%*" PRId64 " %c%s %s\n",
-      [radix_octal] = "%0*" PRIo64 " %c%s %s\n"
+      [radix_hex] = "%8$s%2$0*1$" PRIx64 "%10$s %9$s%3$c%4$s %5$s",
+      [radix_decimal] = "%8$s%*" PRId64 "%10$s %9$s%3$c%4$s %5$s",
+      [radix_octal] = "%8$s%2$0*1$" PRIo64 "%10$s %9$s%3$c%4$s %5$s"
     };
   static const char *const sfmtstrs[] =
     {
-      [radix_hex] = "%2$0*1$" PRIx64 " %7$0*6$" PRIx64 " %3$c%4$s %5$s\n",
-      [radix_decimal] = "%2$*1$" PRId64 " %7$*6$" PRId64 " %3$c%4$s %5$s\n",
-      [radix_octal] = "%2$0*1$" PRIo64 " %7$0*6$" PRIo64 " %3$c%4$s %5$s\n"
+      [radix_hex] = "%8$s%2$0*1$" PRIx64 "%10$s %7$0*6$" PRIx64 " %9$s%3$c%4$s %5$s",
+      [radix_decimal] = "%8$s%2$*1$" PRId64 "%10$s %7$*6$" PRId64 " %9$s%3$c%4$s %5$s",
+      [radix_octal] = "%8$s%2$0*1$" PRIo64 "%10$s %7$0*6$" PRIo64 " %9$s%3$c%4$s %5$s"
     };
 
 #ifdef USE_DEMANGLE
@@ -957,6 +964,10 @@ show_symbols_bsd (Elf *elf, const GElf_Ehdr *ehdr, GElf_Word strndx,
 	 not very well parseable.  Since these entries don't carry
 	 much information we leave them out.  */
       if (symstr[0] == '\0')
+	continue;
+
+      /* We do not print the entries for files.  */
+      if (GELF_ST_TYPE (syms[cnt].sym.st_info) == STT_FILE)
 	continue;
 
 #ifdef USE_DEMANGLE
@@ -979,28 +990,53 @@ show_symbols_bsd (Elf *elf, const GElf_Ehdr *ehdr, GElf_Word strndx,
 	  putchar_unlocked (':');
 	}
 
+      bool is_tls = GELF_ST_TYPE (syms[cnt].sym.st_info) == STT_TLS;
+      bool is_weak = GELF_ST_BIND (syms[cnt].sym.st_info) == STB_WEAK;
+      const char *marker = (mark_special
+			    ? (is_tls ? "@" : (is_weak ? "*" : " ")) : "");
+
       if (syms[cnt].sym.st_shndx == SHN_UNDEF)
-	printf ("%*s U%s %s\n",
-		digits, "",
-		mark_special
-		? (GELF_ST_TYPE (syms[cnt].sym.st_info) == STT_TLS
-		   ? "@"
-		   : (GELF_ST_BIND (syms[cnt].sym.st_info) == STB_WEAK
-		      ? "*" : " "))
-		: "",
-		symstr);
+	{
+	  const char *color = "";
+	  if (color_mode)
+	    {
+	      if (is_tls)
+		color = color_undef_tls;
+	      else if (is_weak)
+		color = color_undef_weak;
+	      else
+		color = color_undef;
+	    }
+
+	  printf ("%*s %sU%s %s", digits, "", color, marker, symstr);
+	}
       else
-	printf (print_size ? sfmtstrs[radix] : fmtstrs[radix],
-		digits, syms[cnt].sym.st_value,
-		class_type_char (elf, ehdr, &syms[cnt].sym),
-		mark_special
-		? (GELF_ST_TYPE (syms[cnt].sym.st_info) == STT_TLS
-		   ? "@"
-		   : (GELF_ST_BIND (syms[cnt].sym.st_info) == STB_WEAK
-		      ? "*" : " "))
-		: "",
-		symstr,
-		digits, (uint64_t) syms[cnt].sym.st_size);
+	{
+	  const char *color = "";
+	  if (color_mode)
+	    {
+	      if (is_tls)
+		color = color_tls;
+	      else if (is_weak)
+		color = color_weak;
+	      else
+		color = color_symbol;
+	    }
+
+	  printf (print_size && syms[cnt].sym.st_size != 0
+		  ? sfmtstrs[radix] : fmtstrs[radix],
+		  digits, syms[cnt].sym.st_value,
+		  class_type_char (elf, ehdr, &syms[cnt].sym), marker,
+		  symstr,
+		  digits, (uint64_t) syms[cnt].sym.st_size,
+		  color_mode ? color_address : "",
+		  color,
+		  color_mode ? color_off : "");
+	}
+
+      if (color_mode)
+	fputs_unlocked (color_off, stdout);
+      putchar_unlocked ('\n');
     }
 
 #ifdef USE_DEMANGLE

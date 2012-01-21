@@ -1,5 +1,5 @@
 /* Disassembler for x86.
-   Copyright (C) 2007, 2008, 2009 Red Hat, Inc.
+   Copyright (C) 2007, 2008, 2009, 2011 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2007.
 
@@ -293,11 +293,18 @@ struct output_data
 
 #define ADD_STRING(str) \
   do {									      \
+    const char *_str0 = (str);						      \
+    size_t _len0 = strlen (_str0);					      \
+    ADD_NSTRING (_str0, _len0);						      \
+  } while (0)
+
+#define ADD_NSTRING(str, len) \
+  do {									      \
     const char *_str = (str);						      \
-    size_t _len = strlen (_str);					      \
+    size_t _len = (len);						      \
     if (unlikely (bufcnt + _len > bufsize))				      \
       goto enomem;							      \
-    memcpy (buf + bufcnt, str, _len);					      \
+    memcpy (buf + bufcnt, _str, _len);					      \
     bufcnt += _len;							      \
   } while (0)
 
@@ -615,6 +622,10 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 
 	  unsigned long string_end_idx = 0;
 	  fmt = save_fmt;
+	  const char *deferred_start = NULL;
+	  size_t deferred_len = 0;
+	  // XXX Can we get this from color.c?
+	  static const char color_off[] = "\e[0m";
 	  while (*fmt != '\0')
 	    {
 	      if (*fmt != '%')
@@ -657,6 +668,22 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 			  goto do_ret;
 			}
 		    }
+		  else if (ch == '\e' && *fmt == '[')
+		    {
+		      deferred_start = fmt - 1;
+		      do
+			++fmt;
+		      while (*fmt != 'm' && *fmt != '\0');
+
+		      if (*fmt == 'm')
+			{
+			  deferred_len = ++fmt - deferred_start;
+			  continue;
+			}
+
+		      fmt = deferred_start + 1;
+		      deferred_start = NULL;
+		    }
 		  ADD_CHAR (ch);
 		  continue;
 		}
@@ -672,6 +699,7 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		  prec = prec * 10 + (*fmt - '0');
 
 	      size_t start_idx = bufcnt;
+	      size_t non_printing = 0;
 	      switch (*fmt++)
 		{
 		  char mnebuf[16];
@@ -796,6 +824,12 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		  else
 		    str = mnestr.str + mneidx[instrtab[cnt].mnemonic];
 
+		  if (deferred_start != NULL)
+		    {
+		      ADD_NSTRING (deferred_start, deferred_len);
+		      non_printing += deferred_len;
+		    }
+
 		  ADD_STRING (str);
 
 		  switch (instrtab[cnt].suffix)
@@ -879,6 +913,12 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		      abort ();
 		    }
 
+		  if (deferred_start != NULL)
+		    {
+		      ADD_STRING (color_off);
+		      non_printing += strlen (color_off);
+		    }
+
 		  string_end_idx = bufcnt;
 		  break;
 
@@ -886,6 +926,12 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		  if (prec == 1 && instrtab[cnt].fct1 != 0)
 		    {
 		      /* First parameter.  */
+		      if (deferred_start != NULL)
+			{
+			  ADD_NSTRING (deferred_start, deferred_len);
+			  non_printing += deferred_len;
+			}
+
 		      if (instrtab[cnt].str1 != 0)
 			ADD_STRING (op1_str
 				    + op1_str_idx[instrtab[cnt].str1 - 1]);
@@ -902,11 +948,23 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		      if (r > 0)
 			goto enomem;
 
+		      if (deferred_start != NULL)
+			{
+			  ADD_STRING (color_off);
+			  non_printing += strlen (color_off);
+			}
+
 		      string_end_idx = bufcnt;
 		    }
 		  else if (prec == 2 && instrtab[cnt].fct2 != 0)
 		    {
 		      /* Second parameter.  */
+		      if (deferred_start != NULL)
+			{
+			  ADD_NSTRING (deferred_start, deferred_len);
+			  non_printing += deferred_len;
+			}
+
 		      if (instrtab[cnt].str2 != 0)
 			ADD_STRING (op2_str
 				    + op2_str_idx[instrtab[cnt].str2 - 1]);
@@ -923,11 +981,23 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		      if (r > 0)
 			goto enomem;
 
+		      if (deferred_start != NULL)
+			{
+			  ADD_STRING (color_off);
+			  non_printing += strlen (color_off);
+			}
+
 		      string_end_idx = bufcnt;
 		    }
 		  else if (prec == 3 && instrtab[cnt].fct3 != 0)
 		    {
 		      /* Third parameter.  */
+		      if (deferred_start != NULL)
+			{
+			  ADD_NSTRING (deferred_start, deferred_len);
+			  non_printing += deferred_len;
+			}
+
 		      if (instrtab[cnt].str3 != 0)
 			ADD_STRING (op3_str
 				    + op3_str_idx[instrtab[cnt].str3 - 1]);
@@ -948,6 +1018,12 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 		      if (r > 0)
 			goto enomem;
 
+		      if (deferred_start != NULL)
+			{
+			  ADD_STRING (color_off);
+			  non_printing += strlen (color_off);
+			}
+
 		      string_end_idx = bufcnt;
 		    }
 		  else
@@ -960,12 +1036,18 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 
 		case 'a':
 		  /* Pad to requested column.  */
-		  while (bufcnt < (size_t) width)
+		  while (bufcnt - non_printing < (size_t) width)
 		    ADD_CHAR (' ');
 		  width = 0;
 		  break;
 
 		case 'l':
+		  if (deferred_start != NULL)
+		    {
+		      ADD_NSTRING (deferred_start, deferred_len);
+		      non_printing += deferred_len;
+		    }
+
 		  if (output_data.labelbuf != NULL
 		      && output_data.labelbuf[0] != '\0')
 		    {
@@ -1005,11 +1087,21 @@ i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 
 		      output_data.symaddr_use = addr_none;
 		    }
+		  if (deferred_start != NULL)
+		    {
+		      ADD_STRING (color_off);
+		      non_printing += strlen (color_off);
+		    }
 		  break;
+
+		default:
+		  abort ();
 		}
 
+	      deferred_start = NULL;
+
 	      /* Pad according to the specified width.  */
-	      while (bufcnt + prefix_size < start_idx + width)
+	      while (bufcnt + prefix_size - non_printing < start_idx + width)
 		ADD_CHAR (' ');
 	      prefix_size = 0;
 	    }

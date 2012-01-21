@@ -1,3 +1,17 @@
+2012-01-21  Ulrich Drepper  <drepper@gmail.com>
+
+	* nm.c (argp_children): Define.
+	(argp): Hook up argp_children.
+	(handle_ar): Optimize puts call.
+	(show_symbols_bsd): Use positional parameters to also print color
+	codes.  Don't print STT_FILE symbols.
+	* objdump.c (options): Improve help text.
+	(argp_children): Define.
+	(argp): Hook up argp_children.
+	(disasm_info): Add elements for color codes.
+	(disasm_output): Print color codes as well.
+	(show_disasm): Set up disasm_info data for callback.
+
 2012-01-20  Roland McGrath  <roland@hack.frob.com>
 
 	* arlib-argp.c (arlib_deterministic_output): Initialize from

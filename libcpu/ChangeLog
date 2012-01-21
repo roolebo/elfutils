@@ -1,3 +1,8 @@
+2012-01-21  Ulrich Drepper  <drepper@gmail.com>
+
+	* i386_disasm.c (ADD_NSTRING): Define.
+	(i386_disasm): Print color codes in the appropriate places.
+
 2011-10-16  Roland McGrath  <roland@hack.frob.com>
 
 	* Makefile.am (libcpu_i386_a_SOURCES): Add i386_dis.h.

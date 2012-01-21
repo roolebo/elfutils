@@ -1,4 +1,4 @@
-/* Copyright (C) 2001-2010 Red Hat, Inc.
+/* Copyright (C) 2001-2010, 2012 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -411,8 +411,8 @@ main (int argc, char *argv[])
       load_needed ();
 
       /* At this point all object files and DSOs are read.  If there
-         are still undefined symbols left they might have to be
-         synthesized from the linker script.  */
+	 are still undefined symbols left they might have to be
+	 synthesized from the linker script.  */
       create_lscript_symbols ();
 
       /* Now that we have loaded all the object files we can determine
@@ -958,7 +958,7 @@ print_version (FILE *stream, struct argp_state *state __attribute__ ((unused)))
 Copyright (C) %s Red Hat, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
-"), "2009");
+"), "2012");
   fprintf (stream, gettext ("Written by %s.\n"), "Ulrich Drepper");
 }
 
@@ -1478,7 +1478,7 @@ create_lscript_symbols (void)
       for (orule = segment->output_rules; orule != NULL; orule = orule->next)
 	if (orule->tag == output_assignment
 	    /* The assignments to "." (i.e., the PC) have to be
-               ignored here.  */
+	       ignored here.  */
 	    && strcmp (orule->val.assignment->variable, ".") != 0)
 	  {
 	    struct symbol *s = ld_state.unresolved;
@@ -1519,7 +1519,7 @@ duplicate definition of '%s' in linker script"),
 	      }
 
 	    /* If the symbol only has to be provided if it is needed,
-               ignore it here since it is not undefined.  */
+	       ignore it here since it is not undefined.  */
 	    if (orule->val.assignment->provide_flag)
 	      continue;
 

@@ -1,5 +1,5 @@
 /* Create, modify, and extract from archives.
-   Copyright (C) 2005-2011 Red Hat, Inc.
+   Copyright (C) 2005-2012 Red Hat, Inc.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
    Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -255,7 +255,7 @@ MEMBER parameter required for 'a', 'b', and 'i' modifiers"));
     case oper_none:
       error (0, 0, gettext ("command option required"));
       argp_help (&argp, stderr, ARGP_HELP_STD_ERR,
-                 program_invocation_short_name);
+		 program_invocation_short_name);
       status = 1;
       break;
 
@@ -297,7 +297,7 @@ print_version (FILE *stream, struct argp_state *state __attribute__ ((unused)))
 Copyright (C) %s Red Hat, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
-"), "2009");
+"), "2012");
   fprintf (stream, gettext ("Written by %s.\n"), "Ulrich Drepper");
 }
 

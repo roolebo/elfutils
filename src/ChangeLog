@@ -1,5 +1,20 @@
 2012-01-21  Ulrich Drepper  <drepper@gmail.com>
 
+	* addr2line.c: Update copyright year.
+	* ar.c: Likewise.
+	* elfcmp.c: Likewise.
+	* elflint.c: Likewise.
+	* findtextrel.c: Likewise.
+	* ld.c: Likewise.
+	* nm.c: Likewise.
+	* objdump.c: Likewise.
+	* ranlib.c: Likewise.
+	* readelf.c: Likewise.
+	* size.c: Likewise.
+	* strings.c: Likewise.
+	* strip.c: Likewise.
+	* unstrip.c: Likewise.
+
 	* nm.c (argp_children): Define.
 	(argp): Hook up argp_children.
 	(handle_ar): Optimize puts call.

@@ -1,5 +1,5 @@
 /* Combine stripped files with separate symbols and debug information.
-   Copyright (C) 2007-2011 Red Hat, Inc.
+   Copyright (C) 2007-2012 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Roland McGrath <roland@redhat.com>, 2007.
 
@@ -235,7 +235,7 @@ print_version (FILE *stream, struct argp_state *state __attribute__ ((unused)))
 Copyright (C) %s Red Hat, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
-"), "2009");
+"), "2012");
   fprintf (stream, gettext ("Written by %s.\n"), "Roland McGrath");
 }
 

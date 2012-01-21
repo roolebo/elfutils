@@ -1,5 +1,5 @@
 /* Discard section not used at runtime from object files.
-   Copyright (C) 2000-2011 Red Hat, Inc.
+   Copyright (C) 2000-2012 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -222,7 +222,7 @@ print_version (FILE *stream, struct argp_state *state __attribute__ ((unused)))
 Copyright (C) %s Red Hat, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
-"), "2009");
+"), "2012");
   fprintf (stream, gettext ("Written by %s.\n"), "Ulrich Drepper");
 }
 
@@ -1145,7 +1145,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	    shdr_info[shdr_info[cnt].shdr.sh_info].idx;
 
 	/* Get the data from the old file if necessary.  We already
-           created the data for the section header string table.  */
+	   created the data for the section header string table.  */
 	if (cnt < shnum)
 	  {
 	    if (shdr_info[cnt].data == NULL)

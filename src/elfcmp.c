@@ -1,5 +1,5 @@
 /* Compare relevant content of two ELF files.
-   Copyright (C) 2005-2011 Red Hat, Inc.
+   Copyright (C) 2005-2012 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -158,10 +158,10 @@ main (int argc, char *argv[])
 
   /* Comparing the files is done in two phases:
      1. compare all sections.  Sections which are irrelevant (i.e., if
-        strip would remove them) are ignored.  Some section types are
+	strip would remove them) are ignored.  Some section types are
 	handled special.
      2. all parts of the loadable segments which are not parts of any
-        section is compared according to the rules of the --gaps option.
+	section is compared according to the rules of the --gaps option.
   */
   int result = 0;
   elf_version (EV_CURRENT);
@@ -671,7 +671,7 @@ print_version (FILE *stream, struct argp_state *state __attribute__ ((unused)))
 Copyright (C) %s Red Hat, Inc.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
-"), "2009");
+"), "2012");
   fprintf (stream, gettext ("Written by %s.\n"), "Ulrich Drepper");
 }
 

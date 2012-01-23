@@ -14,13 +14,11 @@ ar: Support D modifier for "deterministic output" with no uid/gid/mtime info.
 ranlib: Support -D and -U flags with same meaning.
 
 readelf: Improve output of -wline. Add support for printing SDT elf notes.
-         Add printing of .gdb_index section. 
+         Add printing of .gdb_index section.
+	 Support for typed DWARF stack, call_site and entry_value.
 
 strip: Add --reloc-debug-sections option.
        Improved SHT_GROUP sections handling.
-
-Add support for typed dwarf stack, call_site and entry_value to dwarf.h
-and readelf.
 
 Version 0.152
 

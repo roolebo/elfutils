@@ -1,3 +1,7 @@
+2012-01-31  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_formudata.c (dwarf_formudata): Handle DW_FORM_sec_offset.
+
 2011-11-31  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (known-dwarf.h): Run gawk on config/known-dwarf.awk.

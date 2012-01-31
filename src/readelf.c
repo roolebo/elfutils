@@ -5612,9 +5612,6 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
       break;
 
     case DW_FORM_sec_offset:
-      attrp->form = cbargs->offset_size == 8 ? DW_FORM_data8 : DW_FORM_data4;
-      /* Fall through.  */
-
     case DW_FORM_udata:
     case DW_FORM_sdata:
     case DW_FORM_data8:

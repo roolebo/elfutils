@@ -1,5 +1,5 @@
 /* Return unsigned constant represented by attribute.
-   Copyright (C) 2003-2010 Red Hat, Inc.
+   Copyright (C) 2003-2012 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -134,11 +134,83 @@ dwarf_formudata (attr, return_uval)
 
     case DW_FORM_data4:
     case DW_FORM_data8:
-      if (__libdw_read_address (attr->cu->dbg, cu_sec_idx (attr->cu),
-				attr->valp,
-				attr->form == DW_FORM_data4 ? 4 : 8,
-				return_uval))
-	return -1;
+    case DW_FORM_sec_offset:
+      /* Before DWARF4 data4 and data8 are pure constants unless the
+	 attribute also allows offsets (*ptr classes), since DWARF4
+	 they are always just constants (start_scope is special though,
+	 since it only could express a rangelist since DWARF4).  */
+      if (attr->form == DW_FORM_sec_offset
+	  || (attr->cu->version < 4 && attr->code != DW_AT_start_scope))
+	{
+	  switch (attr->code)
+	    {
+	    case DW_AT_data_member_location:
+	    case DW_AT_frame_base:
+	    case DW_AT_location:
+	    case DW_AT_return_addr:
+	    case DW_AT_segment:
+	    case DW_AT_static_link:
+	    case DW_AT_string_length:
+	    case DW_AT_use_location:
+	    case DW_AT_vtable_elem_location:
+	      /* loclistptr */
+	      if (__libdw_formptr (attr, IDX_debug_loc,
+				   DWARF_E_NO_LOCLIST, NULL,
+				   return_uval) == NULL)
+		return -1;
+	      break;
+
+	    case DW_AT_macro_info:
+	      /* macptr */
+	      if (__libdw_formptr (attr, IDX_debug_macinfo,
+				   DWARF_E_NO_ENTRY, NULL,
+				   return_uval) == NULL)
+		return -1;
+	      break;
+
+	    case DW_AT_ranges:
+	    case DW_AT_start_scope:
+	      /* rangelistptr */
+	      if (__libdw_formptr (attr, IDX_debug_ranges,
+				   DWARF_E_NO_DEBUG_RANGES, NULL,
+				   return_uval) == NULL)
+		return -1;
+	      break;
+
+	    case DW_AT_stmt_list:
+	      /* lineptr */
+	      if (__libdw_formptr (attr, IDX_debug_line,
+				   DWARF_E_NO_DEBUG_LINE, NULL,
+				   return_uval) == NULL)
+		return -1;
+	      break;
+
+	    default:
+	      /* sec_offset can only be used by one of the above attrs.  */
+	      if (attr->form == DW_FORM_sec_offset)
+		{
+		  __libdw_seterrno (DWARF_E_INVALID_DWARF);
+		  return -1;
+		}
+
+	      /* Not one of the special attributes, just a constant.  */
+	      if (__libdw_read_address (attr->cu->dbg, cu_sec_idx (attr->cu),
+					attr->valp,
+					attr->form == DW_FORM_data4 ? 4 : 8,
+					return_uval))
+		return -1;
+	      break;
+	    }
+	}
+      else
+	{
+	  /* We are dealing with a constant data4 or data8.  */
+	  if (__libdw_read_address (attr->cu->dbg, cu_sec_idx (attr->cu),
+				    attr->valp,
+				    attr->form == DW_FORM_data4 ? 4 : 8,
+				    return_uval))
+	    return -1;
+	}
       break;
 
     case DW_FORM_sdata:

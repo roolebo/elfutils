@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2005 Red Hat, Inc.
+# Copyright (C) 2005-2012 Red Hat, Inc.
 # This file is part of Red Hat elfutils.
 #
 # Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -46,6 +46,8 @@ else
   elfutils_testrun=built
 fi
 
+old_path="${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH"
+
 case "$1" in
 *.sh)
   export built_library_path program_transform_name elfutils_testrun
@@ -53,15 +55,14 @@ case "$1" in
   ;;
 *)
   if [ $elfutils_testrun = built ]; then
-    LD_LIBRARY_PATH="$built_library_path${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH"
-    export LD_LIBRARY_PATH
+    LD_LIBRARY_PATH="$built_library_path$old_path"
   elif [ $elfutils_tests_rpath = yes ]; then
     echo >&2 installcheck not possible with --enable-tests-rpath
     exit 77
   elif [ "x$libdir" != x/usr/lib ] && [ "x$libdir" != x/usr/lib64 ]; then
-    LD_LIBRARY_PATH="$libdir${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH"
-    export LD_LIBRARY_PATH
+    LD_LIBRARY_PATH="${libdir}:${libdir}/elfutils$old_path"
   fi
+  export LD_LIBRARY_PATH
   ;;
 esac
 

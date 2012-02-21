@@ -1,6 +1,7 @@
 2012-02-21  Roland McGrath  <roland@hack.frob.com>
 
 	* test-wrapper.sh: Add ${libdir}/elfutils to LD_LIBRARY_PATH.
+	* test-subr.sh (installed_testrun): Likewise.
 
 2012-01-18  Roland McGrath  <roland@hack.frob.com>
 

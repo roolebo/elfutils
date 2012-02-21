@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2005, 2007, 2008 Red Hat, Inc.
+# Copyright (C) 2005-2012 Red Hat, Inc.
 # This file is part of Red Hat elfutils.
 #
 # Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -99,7 +99,8 @@ installed_testrun()
     ;;
   esac
   if [ "${libdir}" != /usr/lib ] && [ "${libdir}" != /usr/lib64 ]; then
-    LD_LIBRARY_PATH="${libdir}${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH" \
+    LD_LIBRARY_PATH="${libdir}:${libdir}/elfutils\
+${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH" \
     $program ${1+"$@"}
   else
     $program ${1+"$@"}

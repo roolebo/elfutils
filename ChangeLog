@@ -1,3 +1,7 @@
+2012-01-23  Mark Wielaard  <mjw@redhat.com>
+
+	* configure.ac: Set version to 0.153, update copyright years.
+
 2012-01-20  Roland McGrath  <roland@hack.frob.com>
 
 	* configure.ac: Handle --enable-deterministic-archives.

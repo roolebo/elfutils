@@ -190,6 +190,21 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
+* Thu Feb 23 2012 Mark Wielaard <mjw@redhat.com> 0.153-1
+- libdw: Support reading .zdebug_* DWARF sections compressed via zlib.
+- libdwfl: Speed up dwfl_module_addrsym.
+- nm: Support C++ demangling.
+- ar: Support D modifier for "deterministic output" with no 
+  uid/gid/mtime info.     The U modifier is the inverse.     elfutils 
+  can be configured with the --enable-deterministic-archives     option 
+  to make the D behavior the default when U is not specified.
+- ranlib: Support -D and -U flags with same meaning.
+- readelf: Improve output of -wline. Add support for printing SDT elf 
+  notes.          Add printing of .gdb_index section. 	 Support for 
+  typed DWARF stack, call_site and entry_value.
+- strip: Add --reloc-debug-sections option.        Improved SHT_GROUP 
+  sections handling.
+
 * Tue Feb 15 2011  <drepper@gmail.com> 0.152-1
 - Various build and warning nits fixed for newest GCC and Autoconf.
 - libdwfl: Yet another prelink-related fix for another regression.

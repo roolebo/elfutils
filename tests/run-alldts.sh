@@ -26,7 +26,7 @@
 . $srcdir/test-subr.sh
 
 # This will produce "testfile-alldts" file
-./alldts
+testrun ./alldts
 
 testrun_compare ../src/readelf -d testfile-alldts <<\EOF
 

@@ -1,3 +1,7 @@
+2012-02-21  Kurt Roeckx  <kurt@roeckx.be>
+
+	* run-alldts.sh: testrun ./alldts.
+
 2012-02-21  Roland McGrath  <roland@hack.frob.com>
 
 	* test-wrapper.sh: Add ${libdir}/elfutils to LD_LIBRARY_PATH.

@@ -1,3 +1,8 @@
+2012-02-24  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (CLEANFILES): Move %_dis.h to...
+	(MAINTAINERCLEANFILES): here.
+
 2012-01-21  Ulrich Drepper  <drepper@gmail.com>
 
 	* i386_disasm.c (ADD_NSTRING): Define.

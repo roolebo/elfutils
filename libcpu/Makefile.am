@@ -72,4 +72,5 @@ i386_parse.h: i386_parse.c ;
 
 EXTRA_DIST = defs/i386
 
-CLEANFILES += $(foreach P,i386 x86_64,$P_defs $P.mnemonics $P_dis.h)
+CLEANFILES += $(foreach P,i386 x86_64,$P_defs $P.mnemonics)
+MAINTAINERCLEANFILES = $(foreach P,i386 x86_64, $P_dis.h)

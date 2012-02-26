@@ -241,6 +241,7 @@ elf_end (elf)
 	munmap (elf->map_address, elf->maximum_size);
     }
 
+  rwlock_unlock (elf->lock);
   rwlock_fini (elf->lock);
 
   /* Finally the descriptor itself.  */

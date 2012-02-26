@@ -1,3 +1,7 @@
+2011-02-26  Mark Wielaard  <mjw@redhat.com>
+
+	* elf_end.c (elf_end): Call rwlock_unlock before rwlock_fini.
+
 2011-01-05  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* elf_getdata_rawchunk.c (elf_getdata_rawchunk): Fix off64_t overflow

@@ -1,3 +1,13 @@
+2012-03-21  Tom Tromey  <tromey@redhat.com>
+
+	* typeiter.c: New file.
+	* run-typeiter.sh: New file.
+	* testfile59.bz2: New file.
+	* Makefile.am (noinst_PROGRAMS): Add typeiter.
+	(TESTS): Add run-typeiter.sh.
+	(EXTRA_DIST): Add run-typeiter.sh, testfile59.bz2.
+	(typeiter_LDADD): New variable.
+
 2012-02-21  Kurt Roeckx  <kurt@roeckx.be>
 
 	* run-alldts.sh: testrun ./alldts.

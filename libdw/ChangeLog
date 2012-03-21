@@ -1,3 +1,9 @@
+2012-03-19  Tom Tromey  <tromey@redhat.com>
+
+	* libdw_findcu.c (findcu_cb): Move earlier.
+	(__libdw_intern_next_unit): Add new CU to search tree here...
+	(__libdw_findcu): ... not here.
+
 2012-01-31  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_formudata.c (dwarf_formudata): Handle DW_FORM_sec_offset.

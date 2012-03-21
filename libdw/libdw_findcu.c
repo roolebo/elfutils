@@ -56,6 +56,31 @@
 #include <search.h>
 #include "libdwP.h"
 
+static int
+findcu_cb (const void *arg1, const void *arg2)
+{
+  struct Dwarf_CU *cu1 = (struct Dwarf_CU *) arg1;
+  struct Dwarf_CU *cu2 = (struct Dwarf_CU *) arg2;
+
+  /* Find out which of the two arguments is the search value.  It has
+     end offset 0.  */
+  if (cu1->end == 0)
+    {
+      if (cu1->start < cu2->start)
+	return -1;
+      if (cu1->start >= cu2->end)
+	return 1;
+    }
+  else
+    {
+      if (cu2->start < cu1->start)
+	return 1;
+      if (cu2->start >= cu1->end)
+	return -1;
+    }
+
+  return 0;
+}
 
 struct Dwarf_CU *
 internal_function
@@ -65,6 +90,7 @@ __libdw_intern_next_unit (dbg, debug_types)
 {
   Dwarf_Off *const offsetp
     = debug_types ? &dbg->next_tu_offset : &dbg->next_cu_offset;
+  void **tree = debug_types ? &dbg->tu_tree : &dbg->cu_tree;
 
   Dwarf_Off oldoff = *offsetp;
   uint16_t version;
@@ -105,34 +131,16 @@ __libdw_intern_next_unit (dbg, debug_types)
   newp->lines = NULL;
   newp->locs = NULL;
 
+  /* Add the new entry to the search tree.  */
+  if (tsearch (newp, tree, findcu_cb) == NULL)
+    {
+      /* Something went wrong.  Undo the operation.  */
+      *offsetp = oldoff;
+      __libdw_seterrno (DWARF_E_NOMEM);
+      return NULL;
+    }
+
   return newp;
-}
-
-
-static int
-findcu_cb (const void *arg1, const void *arg2)
-{
-  struct Dwarf_CU *cu1 = (struct Dwarf_CU *) arg1;
-  struct Dwarf_CU *cu2 = (struct Dwarf_CU *) arg2;
-
-  /* Find out which of the two arguments is the search value.  It has
-     end offset 0.  */
-  if (cu1->end == 0)
-    {
-      if (cu1->start < cu2->start)
-	return -1;
-      if (cu1->start >= cu2->end)
-	return 1;
-    }
-  else
-    {
-      if (cu2->start < cu1->start)
-	return 1;
-      if (cu2->start >= cu1->end)
-	return -1;
-    }
-
-  return 0;
 }
 
 struct Dwarf_CU *
@@ -160,19 +168,9 @@ __libdw_findcu (dbg, start, debug_types)
   /* No.  Then read more CUs.  */
   while (1)
     {
-      Dwarf_Off oldoff = *next_offset;
       struct Dwarf_CU *newp = __libdw_intern_next_unit (dbg, debug_types);
       if (newp == NULL)
 	return NULL;
-
-      /* Add the new entry to the search tree.  */
-      if (tsearch (newp, tree, findcu_cb) == NULL)
-	{
-	  /* Something went wrong.  Undo the operation.  */
-	  *next_offset = oldoff;
-	  __libdw_seterrno (DWARF_E_NOMEM);
-	  return NULL;
-	}
 
       /* Is this the one we are looking for?  */
       if (start < *next_offset)

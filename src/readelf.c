@@ -7118,8 +7118,9 @@ print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
   printf (gettext (" Version:         %" PRId32 "\n"), vers);
 
   // The only difference between version 4 and version 5 is the
-  // hash used for generating the table.
-  if (vers < 4 || vers > 5)
+  // hash used for generating the table.  Version 6 contains symbols
+  // for inlined functions, older versions didn't.
+  if (vers < 4 || vers > 6)
     {
       printf (gettext ("  unknown version, cannot parse section\n"));
       return;

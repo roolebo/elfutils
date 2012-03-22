@@ -1,3 +1,7 @@
+2012-03-21  Roland McGrath  <roland@hack.frob.com>
+
+	* elf-knowledge.h (SECTION_STRIP_P): Remove < SHT_NUM check.
+
 2011-02-26  Mark Wielaard  <mjw@redhat.com>
 
 	* elf_end.c (elf_end): Call rwlock_unlock before rwlock_fini.

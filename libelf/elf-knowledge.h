@@ -1,5 +1,5 @@
 /* Accumulation of various pieces of knowledge about ELF.
-   Copyright (C) 2000, 2001, 2002, 2003, 2005 Red Hat, Inc.
+   Copyright (C) 2000-2012 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -65,10 +65,7 @@
        || (strncmp (name, ".gnu.warning.", sizeof ".gnu.warning." - 1) != 0   \
 	   /* We remove .comment sections only if explicitly told to do so. */\
 	   && (remove_comment						      \
-	       || strcmp (name, ".comment") != 0)))			      \
-   /* So far we do not remove any of the non-standard sections.		      \
-      XXX Maybe in future.  */						      \
-   && (shdr)->sh_type < SHT_NUM)
+	       || strcmp (name, ".comment") != 0))))
 
 
 /* Test whether `sh_info' field in section header contains a section

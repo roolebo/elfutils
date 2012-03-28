@@ -1,3 +1,10 @@
+2012-03-28  Roland McGrath  <roland@hack.frob.com>
+
+	* dwfl_segment_report_module.c
+	(dwfl_segment_report_module: read_portion): Don't use existing buffer
+	when FILESZ is zero (string mode) and available portion doesn't hold
+	a terminated string.
+
 2011-12-02  Roland McGrath  <roland@hack.frob.com>
 
 	* elf-from-memory.c (elf_from_remote_memory): Fix ELFCLASS64 case

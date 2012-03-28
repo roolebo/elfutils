@@ -1,3 +1,9 @@
+2012-03-28  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_debug_abbrev_section): Check there is Dwarf
+	section data.
+	(print_debug_str_section): Likewise.
+
 2012-03-21  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (print_gdb_index_section): Accept version 6.

@@ -4566,13 +4566,16 @@ print_debug_abbrev_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 			    Ebl *ebl, GElf_Ehdr *ehdr,
 			    Elf_Scn *scn, GElf_Shdr *shdr, Dwarf *dbg)
 {
+  const size_t sh_size = (dbg->sectiondata[IDX_debug_abbrev] ?
+			  dbg->sectiondata[IDX_debug_abbrev]->d_size : 0);
+
   printf (gettext ("\nDWARF section [%2zu] '%s' at offset %#" PRIx64 ":\n"
 		   " [ Code]\n"),
 	  elf_ndxscn (scn), section_name (ebl, ehdr, shdr),
 	  (uint64_t) shdr->sh_offset);
 
   Dwarf_Off offset = 0;
-  while (offset < dbg->sectiondata[IDX_debug_abbrev]->d_size)
+  while (offset < sh_size)
     {
       printf (gettext ("\nAbbreviation section at offset %" PRIu64 ":\n"),
 	      offset);
@@ -6781,7 +6784,8 @@ print_debug_str_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 			 Ebl *ebl, GElf_Ehdr *ehdr,
 			 Elf_Scn *scn, GElf_Shdr *shdr, Dwarf *dbg)
 {
-  const size_t sh_size = dbg->sectiondata[IDX_debug_str]->d_size;
+  const size_t sh_size = (dbg->sectiondata[IDX_debug_str] ?
+			  dbg->sectiondata[IDX_debug_str]->d_size : 0);
 
   /* Compute floor(log16(shdr->sh_size)).  */
   GElf_Addr tmp = sh_size;

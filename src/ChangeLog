@@ -1,3 +1,7 @@
+2012-03-28  Roland McGrath  <roland@hack.frob.com>
+
+	* elflint.c (special_sections): Accept SHF_INFO_LINK for reloc sections.
+
 2012-03-28  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (print_debug_abbrev_section): Check there is Dwarf

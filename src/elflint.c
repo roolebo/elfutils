@@ -3357,8 +3357,8 @@ static const struct
     { ".note", 6, SHT_NOTE, atleast, 0, SHF_ALLOC },
     { ".plt", 5, SHT_PROGBITS, unused, 0, 0 }, // XXX more tests
     { ".preinit_array", 15, SHT_PREINIT_ARRAY, exact, SHF_ALLOC | SHF_WRITE, 0 },
-    { ".rela", 5, SHT_RELA, atleast, 0, SHF_ALLOC }, // XXX more tests
-    { ".rel", 4, SHT_REL, atleast, 0, SHF_ALLOC }, // XXX more tests
+    { ".rela", 5, SHT_RELA, atleast, 0, SHF_ALLOC | SHF_INFO_LINK }, // XXX more tests
+    { ".rel", 4, SHT_REL, atleast, 0, SHF_ALLOC | SHF_INFO_LINK }, // XXX more tests
     { ".rodata", 8, SHT_PROGBITS, atleast, SHF_ALLOC, SHF_MERGE | SHF_STRINGS },
     { ".rodata1", 9, SHT_PROGBITS, atleast, SHF_ALLOC, SHF_MERGE | SHF_STRINGS },
     { ".shstrtab", 10, SHT_STRTAB, exact, 0, 0 },

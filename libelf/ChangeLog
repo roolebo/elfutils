@@ -1,3 +1,8 @@
+2012-04-02  Mark Wielaard  <mjw@redhat.com>
+
+	* elf32_offscn.c: Do not match SHT_NOBITS sections at OFFSET unless
+	there are no nonempty sections at that offset.
+
 2012-03-21  Roland McGrath  <roland@hack.frob.com>
 
 	* elf-knowledge.h (SECTION_STRIP_P): Remove < SHT_NUM check.

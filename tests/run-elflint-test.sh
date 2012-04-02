@@ -44,4 +44,8 @@ testrun ../src/elflint -q --gnu-ld testfile42
 testfiles testfile46
 testrun ../src/elflint -q testfile46
 
+# see also run-readelf-d.sh
+testfiles testlib_dynseg.so
+testrun ../src/elflint -q --gnu-ld testlib_dynseg.so
+
 exit 0

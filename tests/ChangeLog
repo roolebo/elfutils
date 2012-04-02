@@ -1,5 +1,12 @@
 2012-04-02  Mark Wielaard  <mjw@redhat.com>
 
+	* Makefile.am (TESTS): Add run-unstrip-n.sh.
+	(EXTRA_DIST): Add testcore-rtlib.bz2 and run-unstrip-n.sh.
+	* run-unstrip-n.sh: New test.
+	* testcore-rtlib.bz2: New testfile.
+
+2012-04-02  Mark Wielaard  <mjw@redhat.com>
+
 	* Makefile.am (TESTS): Add run-readelf-d.sh.
 	(EXTRA_DIST): Add testlib_dynseg.so.bz2 and run-readelf-d.sh.
 	* run-readelf-d.sh: New test.

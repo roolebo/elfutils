@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 1996-2011 Red Hat, Inc.
+## Copyright (C) 1996-2012 Red Hat, Inc.
 ## This file is part of Red Hat elfutils.
 ##
 ## Red Hat elfutils is free software; you can redistribute it and/or modify
@@ -87,7 +87,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-early-offscn.sh run-dwarf-getmacros.sh \
 	run-test-flag-nobits.sh run-prelink-addr-test.sh \
 	run-dwarf-getstring.sh run-rerequest_tag.sh run-typeiter.sh \
-	run-readelf-d.sh
+	run-readelf-d.sh run-unstrip-n.sh
 # run-show-ciefde.sh
 
 if !STANDALONE
@@ -164,7 +164,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile55-64.debug.bz2 testfile55-64.prelink.bz2 \
 	     testfile56.bz2 testfile57.bz2 testfile58.bz2 \
 	     run-typeiter.sh testfile59.bz2 \
-	     run-readelf-d.sh testlib_dynseg.so.bz2
+	     run-readelf-d.sh testlib_dynseg.so.bz2 \
+	     run-unstrip-n.sh testcore-rtlib.bz2
 
 installed_TESTS_ENVIRONMENT = libdir=$(DESTDIR)$(libdir) \
 			      bindir=$(DESTDIR)$(bindir) \

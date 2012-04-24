@@ -1,3 +1,8 @@
+2012-04-24  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_ops): Add DW_OP_GNU_push_tls_address,
+	DW_OP_GNU_uinit and DW_OP_GNU_encoded_addr.
+
 2012-03-28  Roland McGrath  <roland@hack.frob.com>
 
 	* elflint.c (special_sections): Accept SHF_INFO_LINK for reloc sections.

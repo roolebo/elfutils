@@ -88,7 +88,6 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-test-flag-nobits.sh run-prelink-addr-test.sh \
 	run-dwarf-getstring.sh run-rerequest_tag.sh run-typeiter.sh \
 	run-readelf-d.sh run-unstrip-n.sh
-# run-show-ciefde.sh
 
 if !STANDALONE
 noinst_PROGRAMS += msg_tst md5-sha1-test
@@ -104,7 +103,7 @@ endif
 EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-show-die-info.sh run-get-files.sh run-get-lines.sh \
 	     run-get-pubnames.sh run-get-aranges.sh \
-	     run-show-ciefde.sh run-show-abbrev.sh run-strip-test.sh \
+	     run-show-abbrev.sh run-strip-test.sh \
 	     run-strip-test2.sh run-ecp-test.sh run-ecp-test2.sh \
 	     testfile.bz2 testfile2.bz2 testfile3.bz2 testfile4.bz2 \
 	     testfile5.bz2 testfile6.bz2 testfile7.bz2 testfile8.bz2 \

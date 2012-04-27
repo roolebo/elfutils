@@ -1,3 +1,8 @@
+2012-04-27  Mark Wielaard  <mjw@redhat.com>
+
+	* libdw/dwarf_highpc.c (dwarf_highpc): Handle DW_AT_high_pc being
+	a constant offset from DW_AT_low_pc.
+
 2012-03-19  Tom Tromey  <tromey@redhat.com>
 
 	* libdw_findcu.c (findcu_cb): Move earlier.

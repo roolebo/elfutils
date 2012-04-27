@@ -58,7 +58,7 @@ noinst_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  dwfl-addr-sect dwfl-bug-report early-offscn \
 		  dwfl-bug-getmodules dwarf-getmacros addrcfi \
 		  test-flag-nobits dwarf-getstring rerequest_tag \
-		  alldts md5-sha1-test typeiter
+		  alldts md5-sha1-test typeiter low_high_pc
 asm_TESTS = asm-tst1 asm-tst2 asm-tst3 asm-tst4 asm-tst5 \
 	    asm-tst6 asm-tst7 asm-tst8 asm-tst9
 
@@ -87,7 +87,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-early-offscn.sh run-dwarf-getmacros.sh \
 	run-test-flag-nobits.sh run-prelink-addr-test.sh \
 	run-dwarf-getstring.sh run-rerequest_tag.sh run-typeiter.sh \
-	run-readelf-d.sh run-unstrip-n.sh
+	run-readelf-d.sh run-unstrip-n.sh run-low_high_pc.sh
 
 if !STANDALONE
 noinst_PROGRAMS += msg_tst md5-sha1-test
@@ -164,7 +164,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile56.bz2 testfile57.bz2 testfile58.bz2 \
 	     run-typeiter.sh testfile59.bz2 \
 	     run-readelf-d.sh testlib_dynseg.so.bz2 \
-	     run-unstrip-n.sh testcore-rtlib.bz2
+	     run-unstrip-n.sh testcore-rtlib.bz2 \
+	     run-low_high_pc.sh testfile_low_high_pc.bz2
 
 installed_TESTS_ENVIRONMENT = libdir=$(DESTDIR)$(libdir) \
 			      bindir=$(DESTDIR)$(bindir) \
@@ -262,6 +263,7 @@ rerequest_tag_LDADD = $(libdw) $(libmudflap)
 alldts_LDADD = $(libebl) $(libelf) $(libmudflap)
 md5_sha1_test_LDADD = $(libeu)
 typeiter_LDADD = $(libdw) $(libelf) $(libmudflap)
+low_high_pc_LDADD = $(libdw) $(libelf) $(libmudflap)
 
 if GCOV
 check: check-am coverage

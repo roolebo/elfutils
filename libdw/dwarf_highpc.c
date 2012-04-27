@@ -1,5 +1,5 @@
 /* Return high PC attribute of DIE.
-   Copyright (C) 2003, 2005 Red Hat, Inc.
+   Copyright (C) 2003, 2005, 2012 Red Hat, Inc.
    This file is part of Red Hat elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -61,10 +61,29 @@ dwarf_highpc (die, return_addr)
      Dwarf_Die *die;
      Dwarf_Addr *return_addr;
 {
-  Dwarf_Attribute attr_mem;
+  Dwarf_Attribute attr_high_mem;
+  Dwarf_Attribute *attr_high = INTUSE(dwarf_attr) (die, DW_AT_high_pc,
+						   &attr_high_mem);
+  if (attr_high == NULL)
+    return -1;
 
-  return INTUSE(dwarf_formaddr) (INTUSE(dwarf_attr) (die, DW_AT_high_pc,
-						     &attr_mem),
-				 return_addr);
+  if (attr_high->form == DW_FORM_addr)
+    return INTUSE(dwarf_formaddr) (attr_high, return_addr);
+
+  /* DWARF 4 allows high_pc to be a constant offset from low_pc. */
+  Dwarf_Attribute attr_low_mem;
+  if (INTUSE(dwarf_formaddr) (INTUSE(dwarf_attr) (die, DW_AT_low_pc,
+						  &attr_low_mem),
+			      return_addr) == 0)
+    {
+      Dwarf_Word uval;
+      if (INTUSE(dwarf_formudata) (attr_high, &uval) == 0)
+	{
+	  *return_addr += uval;
+	  return 0;
+	}
+      __libdw_seterrno (DWARF_E_NO_ADDR);
+    }
+  return -1;
 }
 INTDEF(dwarf_highpc)

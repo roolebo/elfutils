@@ -1,3 +1,7 @@
+Version 0.154
+
+libdw: dwarf_highpc function now handles DWARF 4 DW_AT_high_pc constant form.
+
 Version 0.153
 
 libdw: Support reading .zdebug_* DWARF sections compressed via zlib.

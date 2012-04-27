@@ -1,3 +1,11 @@
+2012-04-27  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (TESTS): Add run-low_high_pc.sh
+	(EXTRA_DIST): Add run-low_high_pc.sh and testfile_low_high_pc.bz2
+	(noinst_PROGRAMS): Add low_high_pc.
+	(low_high_pc_LDADD): New variable.
+	* low_high_pc.c: New test.
+
 2012-04-26  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (EXTRA_DIST): Remove run-show-ciefde.sh.

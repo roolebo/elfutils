@@ -72,9 +72,12 @@ handle_die (Dwarf_Die *die, void *arg)
   if (dwarf_highpc (die, &highpc) != 0 && dwarf_hasattr (die, DW_AT_high_pc))
     fail (off, name, "has DW_AT_high_pc but dwarf_highpc fails");
 
+  /* GCC < 4.7 had a bug where no code CUs got a highpc == lowpc.
+     Allow that, because it is not the main purpose of this test.  */
   if (dwarf_hasattr (die, DW_AT_low_pc)
       && dwarf_hasattr (die, DW_AT_high_pc)
-      && highpc <= lowpc)
+      && highpc <= lowpc
+      && ! (dwarf_tag (die) == DW_TAG_compile_unit && highpc == lowpc))
     {
       printf("lowpc: %lx, highpc: %lx\n", lowpc, highpc);
       fail (off, name, "highpc <= lowpc");

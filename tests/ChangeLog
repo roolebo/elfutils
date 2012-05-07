@@ -1,3 +1,7 @@
+2012-05-07  Mark Wielaard  <mjw@redhat.com>
+
+	* low_high_pc.c: Allow highpc == lowpc for CU DIEs for buggy GCC.
+
 2012-04-27  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (TESTS): Add run-low_high_pc.sh

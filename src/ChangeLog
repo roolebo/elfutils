@@ -1,3 +1,8 @@
+2012-05-09  Roland McGrath  <roland@hack.frob.com>
+
+	* elflint (check_sections): Allow zero sized sections at (filesz) end
+	of segment. And make check overflow-proofed.
+
 2012-04-24  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (print_ops): Add DW_OP_GNU_push_tls_address,

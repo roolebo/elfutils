@@ -169,13 +169,14 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 
 installed_TESTS_ENVIRONMENT = libdir=$(DESTDIR)$(libdir) \
 			      bindir=$(DESTDIR)$(bindir) \
+			      LC_ALL=C LANG=C \
 			      $(srcdir)/test-wrapper.sh \
 			      installed $(tests_rpath) \
 			      $(program_transform_name)
 if STANDALONE
 TESTS_ENVIRONMENT = $(installed_TESTS_ENVIRONMENT)
 else !STANDALONE
-TESTS_ENVIRONMENT = $(srcdir)/test-wrapper.sh \
+TESTS_ENVIRONMENT = LC_ALL=C LANG=C $(srcdir)/test-wrapper.sh \
 		    ../libdw:../backends:../libelf:../libasm
 
 installcheck-local:

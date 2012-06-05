@@ -3,7 +3,7 @@ Summary: A collection of utilities and DSOs to handle compiled objects
 Name: elfutils
 Version: @PACKAGE_VERSION@
 Release: 1
-License: GPLv2 with exceptions
+License: GPLv3+ and (GPLv2+ or LGPLv3+)
 Group: Development/Tools
 Source: elfutils-%{version}.tar.bz2
 Obsoletes: libelf libelf-devel
@@ -41,6 +41,7 @@ handling.
 %package devel
 Summary: Development libraries to handle compiled objects.
 Group: Development/Tools
+License: GPLv2+ or LGPLv3+
 Requires: elfutils = %{version}-%{release}
 Requires: elfutils-libelf-devel = %{version}-%{release}
 
@@ -54,6 +55,7 @@ assembler interface.
 %package devel-static
 Summary: Static archives to handle compiled objects.
 Group: Development/Tools
+License: GPLv2+ or LGPLv3+
 Requires: elfutils-devel = %{version}-%{release}
 
 %description devel-static
@@ -63,6 +65,7 @@ with the code the handle compiled objects.
 %package libelf
 Summary: Library to read and write ELF files.
 Group: Development/Tools
+License: GPLv2+ or LGPLv3+
 
 %description libelf
 The elfutils-libelf package provides a DSO which allows reading and
@@ -73,6 +76,7 @@ elfutils package use it also to generate new ELF files.
 %package libelf-devel
 Summary: Development support for libelf
 Group: Development/Tools
+License: GPLv2+ or LGPLv3+
 Requires: elfutils-libelf = %{version}-%{release}
 Conflicts: libelf-devel
 
@@ -85,6 +89,7 @@ different sections of an ELF file.
 %package libelf-devel-static
 Summary: Static archive of libelf
 Group: Development/Tools
+License: GPLv2+ or LGPLv3+
 Requires: elfutils-libelf-devel = %{version}-%{release}
 Conflicts: libelf-devel
 
@@ -132,7 +137,7 @@ rm -rf ${RPM_BUILD_ROOT}
 
 %files
 %defattr(-,root,root)
-%doc README TODO
+%doc COPYING COPYING-GPLV2 COPYING-LGPLV3 README TODO CONTRIBUTING
 %{_bindir}/eu-elflint
 %{_bindir}/eu-nm
 %{_bindir}/eu-readelf

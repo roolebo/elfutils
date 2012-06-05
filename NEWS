@@ -2,6 +2,10 @@ Version 0.154
 
 libdw: dwarf_highpc function now handles DWARF 4 DW_AT_high_pc constant form.
 
+The license is now GPLv2/LGPLv3+ for the libraries and GPLv3+ for stand-alone
+programs. There is now also a formal CONTRIBUTING document describing how to
+submit patches.
+
 Version 0.153
 
 libdw: Support reading .zdebug_* DWARF sections compressed via zlib.

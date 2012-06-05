@@ -3,20 +3,21 @@ dnl Configure input file for elfutils.                     -*-autoconf-*-
 dnl
 dnl Copyright (C) 1996-2012 Red Hat, Inc.
 dnl
-dnl This program is free software; you can redistribute it and/or modify
-dnl it under the terms of the GNU General Public License as published by
-dnl the Free Software Foundation, version 2.
+dnl This file is part of elfutils.
 dnl
-dnl This program is distributed in the hope that it will be useful,
-dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
-dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-dnl GNU General Public License for more details.
+dnl  This file is free software; you can redistribute it and/or modify
+dnl  it under the terms of the GNU General Public License as published by
+dnl  the Free Software Foundation; either version 3 of the License, or
+dnl  (at your option) any later version.
 dnl
-dnl You should have received a copy of the GNU General Public License
-dnl along with this program; if not, write to the Free Software Foundation,
-dnl Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+dnl  elfutils is distributed in the hope that it will be useful, but
+dnl  WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+dnl  GNU General Public License for more details.
 dnl
-AC_INIT([Red Hat elfutils],[0.153],[http://bugzilla.redhat.com/bugzilla/],[elfutils])
+dnl  You should have received a copy of the GNU General Public License
+dnl  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+AC_INIT([elfutils],[0.153],[http://bugzilla.redhat.com/bugzilla/],[elfutils])
 
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_FILES([config/Makefile])

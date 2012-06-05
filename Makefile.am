@@ -2,28 +2,21 @@
 ## Configure input file for elfutils.
 ##
 ## Copyright (C) 1996-2002, 2003, 2004, 2005, 2006, 2008, 2009 Red Hat, Inc.
-## This file is part of Red Hat elfutils.
 ##
-## Red Hat elfutils is free software; you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by the
-## Free Software Foundation; version 2 of the License.
+## This file is part of elfutils.
 ##
-## Red Hat elfutils is distributed in the hope that it will be useful, but
+## This file is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation; either version 3 of the License, or
+## (at your option) any later version.
+##
+## elfutils is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
 ##
-## You should have received a copy of the GNU General Public License along
-## with Red Hat elfutils; if not, write to the Free Software Foundation,
-## Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301 USA.
-##
-## Red Hat elfutils is an included package of the Open Invention Network.
-## An included package of the Open Invention Network is a package for which
-## Open Invention Network licensees cross-license their patents.  No patent
-## license is granted, either expressly or impliedly, by designation as an
-## included package.  Should you wish to participate in the Open Invention
-## Network licensing program, please visit www.openinventionnetwork.com
-## <http://www.openinventionnetwork.com>.
+## You should have received a copy of the GNU General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ACLOCAL_AMFLAGS = -I m4
 
@@ -33,7 +26,8 @@ pkginclude_HEADERS = version.h
 SUBDIRS = config m4 lib libelf libebl libdwfl libdw libcpu libasm backends \
 	  src po tests
 
-EXTRA_DIST = elfutils.spec GPG-KEY NOTES EXCEPTION
+EXTRA_DIST = elfutils.spec GPG-KEY NOTES CONTRIBUTING \
+	     COPYING COPYING-GPLV2 COPYING-LGPLV3
 
 # Make sure the test install uses lib64 when $LIB will yield lib64.
 # Make sure the test build uses the same compiler, which on e.g. ppc64

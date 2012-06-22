@@ -1,3 +1,7 @@
+2012-05-07  Mark Wielaard  <mjw@redhat.com>
+
+	* low_high_pc.c: Use proper inttypes in printf formats.
+
 2012-05-11  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (TESTS_ENVIRONMENT): Set LC_ALL and LANG to C.

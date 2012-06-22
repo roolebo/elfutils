@@ -43,7 +43,7 @@ static struct args *args;
 static void
 fail(Dwarf_Off off, const char *name, const char *msg)
 {
-  printf("%s: [%lx] '%s' %s\n", args->file, off, name, msg);
+  printf("%s: [%" PRIx64 "] '%s' %s\n", args->file, off, name, msg);
   exit(-1);
 }
 
@@ -71,7 +71,7 @@ handle_die (Dwarf_Die *die, void *arg)
       && highpc <= lowpc
       && ! (dwarf_tag (die) == DW_TAG_compile_unit && highpc == lowpc))
     {
-      printf("lowpc: %lx, highpc: %lx\n", lowpc, highpc);
+      printf("lowpc: %" PRIx64 ", highpc: %" PRIx64 "lx\n", lowpc, highpc);
       fail (off, name, "highpc <= lowpc");
     }
 

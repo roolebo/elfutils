@@ -4167,7 +4167,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  // XXX value might be modified by relocation
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu64 "\n",
 		  indent, "", (uintmax_t) offset,
-		  known[op], read_8ubyte_unaligned (dbg, data));
+		  known[op], (uint64_t) read_8ubyte_unaligned (dbg, data));
 	  CONSUME (8);
 	  data += 8;
 	  offset += 9;
@@ -5606,7 +5606,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
       printf ("           %*s%-20s (%s) {%6" PRIx64 "}\n",
 	      (int) (level * 2), "", dwarf_attr_string (attr),
 	      dwarf_form_string (form),
-	      read_8ubyte_unaligned (attrp->cu->dbg, attrp->valp));
+	      (uint64_t) read_8ubyte_unaligned (attrp->cu->dbg, attrp->valp));
       break;
 
     case DW_FORM_sec_offset:

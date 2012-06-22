@@ -1,3 +1,8 @@
+2012-06-22  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_ops): Cast printf PRIu/x64 arguments to uint64_t
+	for gcc 4.7 -Wformat.
+
 2012-05-09  Roland McGrath  <roland@hack.frob.com>
 
 	* elflint (check_sections): Allow zero sized sections at (filesz) end

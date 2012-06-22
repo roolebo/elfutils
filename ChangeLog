@@ -1,3 +1,7 @@
+2012-06-22  Mark Wielaard  <mjw@redhat.com>
+
+	* configure.ac: Set version to 0.154.
+
 2012-01-24  Mark Wielaard  <mjw@redhat.com>
 
 	* COPYING: Fix address. Updated version from gnulib.

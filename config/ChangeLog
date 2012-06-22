@@ -1,3 +1,7 @@
+2012-06-22  Mark Wielaard  <mjw@redhat.com>
+
+	* config/elfutils.spec.in: Update for 0.154.
+
 2012-02-23  Mark Wielaard  <mjw@redhat.com>
 
 	* config/elfutils.spec.in: Update for 0.153.

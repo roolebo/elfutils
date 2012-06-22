@@ -195,6 +195,17 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
+* Fri Jun 22 2012 Mark Wielaard <mjw@redhat.com> 0.154-1
+- libelf: [g]elf[32|64]_offscn() do not match SHT_NOBITS sections at 
+  OFFSET.
+- libdw: dwarf_highpc function now handles DWARF 4 DW_AT_high_pc 
+  constant form.        Fix bug using dwarf_next_unit to iterate over 
+  .debug_types.
+- elflint: Now accepts gold linker produced executables.
+- The license is now GPLv2/LGPLv3+ for the libraries and GPLv3+ for 
+  stand-alone programs. There is now also a formal CONTRIBUTING 
+  document describing how to submit patches.
+
 * Thu Feb 23 2012 Mark Wielaard <mjw@redhat.com> 0.153-1
 - libdw: Support reading .zdebug_* DWARF sections compressed via zlib.
 - libdwfl: Speed up dwfl_module_addrsym.

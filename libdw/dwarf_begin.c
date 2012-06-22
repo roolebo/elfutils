@@ -98,3 +98,4 @@ dwarf_begin (fd, cmd)
 
   return result;
 }
+INTDEF(dwarf_begin)

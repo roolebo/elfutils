@@ -1,3 +1,14 @@
+2012-06-27  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (TESTS): Add run-readelf-dwz-multi.sh.
+	(EXTRA_DIST): Add run-readelf-dwz-multi.sh,
+	libtestfile_multi_shared.so.bz2, testfile_multi.dwz.bz2 and
+	testfile_multi_main.bz2.
+	* run-readelf-dwz-multi.sh: New test.
+	* libtestfile_multi_shared.so.bz2: New testfile.
+	* testfile_multi.dwz.bz2: New testifle.
+	* testfile_multi_main.bz2: New testifle.
+
 2012-08-01  Petr Machata  <pmachata@redhat.com>
 
 	* run-test-archive64.sh: New test.

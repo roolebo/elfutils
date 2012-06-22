@@ -46,7 +46,7 @@ dwarf_formref_die (attr, result)
   struct Dwarf_CU *cu = attr->cu;
 
   Dwarf_Off offset;
-  if (attr->form == DW_FORM_ref_addr)
+  if (attr->form == DW_FORM_ref_addr || attr->form == DW_FORM_GNU_ref_alt)
     {
       /* This has an absolute offset.  */
 
@@ -54,11 +54,20 @@ dwarf_formref_die (attr, result)
 			  ? cu->address_size
 			  : cu->offset_size);
 
-      if (__libdw_read_offset (cu->dbg, IDX_debug_info, attr->valp,
+      Dwarf *dbg_ret = (attr->form == DW_FORM_GNU_ref_alt
+			? cu->dbg->alt_dwarf : cu->dbg);
+
+      if (dbg_ret == NULL)
+	{
+	  __libdw_seterrno (DWARF_E_NO_ALT_DEBUGLINK);
+	  return NULL;
+	}
+
+      if (__libdw_read_offset (cu->dbg, dbg_ret, IDX_debug_info, attr->valp,
 			       ref_size, &offset, IDX_debug_info, 0))
 	return NULL;
 
-      return INTUSE(dwarf_offdie) (cu->dbg, offset, result);
+      return INTUSE(dwarf_offdie) (dbg_ret, offset, result);
     }
 
   Elf_Data *data;

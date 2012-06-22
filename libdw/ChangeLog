@@ -1,3 +1,30 @@
+2012-06-27  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf.h: Add DW_FORM_GNU_ref_alt and DW_FORM_GNU_strp_alt.
+	* dwarf_begin.c (dwarf_begin): Add INTDEF.
+	* dwarf_begin_elf.c (__check_build_id): New internal_function.
+	(try_debugaltlink): New function.
+	(open_debugaltlink): Likewise.
+	(check_section): Try open_debugaltlink for .gnu_debugaltlink.
+	* dwarf_end.c (dwarf_end): Free the alternative Dwarf descriptor if
+	necessary.
+	* dwarf_error.c (errmsgs): Add DWARF_E_NO_ALT_DEBUGLINK.
+	* dwarf_formref.c (__libdw_formref): Using DW_FORM_GNU_ref_alt
+	is an error here.
+	* dwarf_formref_die.c (dwarf_formref_die): Handle DW_FORM_GNU_ref_alt.
+	* dwarf_formstring.c (dwarf_formstring): Handle DW_FORM_GNU_strp_alt.
+	* dwarf_formudata.c (__libdw_formptr): Adjust __libdw_read_offset
+	calls.
+	* dwarf_getpubnames.c (get_offsets): Adjust __libdw_read_offset call.
+	* libdwP.h: Add DWARF_E_NO_ALT_DEBUGLINK.
+	(struct Dwarf): Add alt_dwarf and free_alt fields.
+	(__libdw_read_offset): Add dbg_ret argument, use to check with
+	__libdw_offset_in_section.
+	(__check_build_id): New function declaration.
+	(dwarf_begin): Define as INTDECL.
+	* libdw_form.c (__libdw_form_val_len): Handle DW_FORM_GNU_ref_alt
+	and DW_FORM_GNU_strp_alt.
+
 2012-07-19  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf.h: Add DW_OP_GNU_parameter_ref.

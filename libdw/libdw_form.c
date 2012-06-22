@@ -58,6 +58,8 @@ __libdw_form_val_len (Dwarf *dbg, struct Dwarf_CU *cu, unsigned int form,
 
     case DW_FORM_strp:
     case DW_FORM_sec_offset:
+    case DW_FORM_GNU_ref_alt:
+    case DW_FORM_GNU_strp_alt:
       result = cu->offset_size;
       break;
 

@@ -299,7 +299,10 @@ enum
     DW_FORM_sec_offset = 0x17,
     DW_FORM_exprloc = 0x18,
     DW_FORM_flag_present = 0x19,
-    DW_FORM_ref_sig8 = 0x20
+    DW_FORM_ref_sig8 = 0x20,
+
+    DW_FORM_GNU_ref_alt = 0x1f20, /* offset in alternate .debuginfo.  */
+    DW_FORM_GNU_strp_alt = 0x1f21 /* offset in alternate .debug_str. */
   };
 
 

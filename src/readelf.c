@@ -3651,6 +3651,20 @@ dwarf_form_string (unsigned int form)
 
   if (likely (form < nknown_forms))
     result = known_forms[form];
+  else
+    {
+      /* GNU extensions use vendor numbers.  */
+      switch (form)
+	{
+	case DW_FORM_GNU_ref_alt:
+	  result = "GNU_ref_alt";
+	  break;
+
+	case DW_FORM_GNU_strp_alt:
+	  result = "GNU_strp_alt";
+	  break;
+	}
+    }
 
   if (unlikely (result == NULL))
     {
@@ -5593,6 +5607,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
     case DW_FORM_indirect:
     case DW_FORM_strp:
     case DW_FORM_string:
+    case DW_FORM_GNU_strp_alt:
       if (cbargs->silent)
 	break;
       const char *str = dwarf_formstring (attrp);
@@ -5608,7 +5623,8 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
     case DW_FORM_ref8:
     case DW_FORM_ref4:
     case DW_FORM_ref2:
-    case DW_FORM_ref1:;
+    case DW_FORM_ref1:
+    case DW_FORM_GNU_ref_alt:
       if (cbargs->silent)
 	break;
       Dwarf_Die ref;

@@ -49,8 +49,17 @@ dwarf_formstring (attrp)
     return (const char *) attrp->valp;
 
   Dwarf *dbg = attrp->cu->dbg;
+  Dwarf *dbg_ret = attrp->form == DW_FORM_GNU_strp_alt ? dbg->alt_dwarf : dbg;
 
-  if (unlikely (attrp->form != DW_FORM_strp)
+  if (unlikely (dbg_ret == NULL))
+    {
+      __libdw_seterrno (DWARF_E_NO_ALT_DEBUGLINK);
+      return NULL;
+    }
+
+
+  if (unlikely (attrp->form != DW_FORM_strp
+		   && attrp->form != DW_FORM_GNU_strp_alt)
       || dbg->sectiondata[IDX_debug_str] == NULL)
     {
       __libdw_seterrno (DWARF_E_NO_STRING);
@@ -58,10 +67,10 @@ dwarf_formstring (attrp)
     }
 
   uint64_t off;
-  if (__libdw_read_offset (dbg, cu_sec_idx (attrp->cu), attrp->valp,
+  if (__libdw_read_offset (dbg, dbg_ret, cu_sec_idx (attrp->cu), attrp->valp,
 			   attrp->cu->offset_size, &off, IDX_debug_str, 1))
     return NULL;
 
-  return (const char *) dbg->sectiondata[IDX_debug_str]->d_buf + off;
+  return (const char *) dbg_ret->sectiondata[IDX_debug_str]->d_buf + off;
 }
 INTDEF(dwarf_formstring)

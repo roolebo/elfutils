@@ -52,7 +52,8 @@ __libdw_formptr (Dwarf_Attribute *attr, int sec_index,
   Dwarf_Word offset;
   if (attr->form == DW_FORM_sec_offset)
     {
-      if (__libdw_read_offset (attr->cu->dbg, cu_sec_idx (attr->cu), attr->valp,
+      if (__libdw_read_offset (attr->cu->dbg, attr->cu->dbg,
+			       cu_sec_idx (attr->cu), attr->valp,
 			       attr->cu->offset_size, &offset, sec_index, 0))
 	return NULL;
     }
@@ -63,7 +64,8 @@ __libdw_formptr (Dwarf_Attribute *attr, int sec_index,
       {
       case DW_FORM_data4:
       case DW_FORM_data8:
-	if (__libdw_read_offset (attr->cu->dbg, cu_sec_idx (attr->cu),
+	if (__libdw_read_offset (attr->cu->dbg, attr->cu->dbg,
+				 cu_sec_idx (attr->cu),
 				 attr->valp,
 				 attr->form == DW_FORM_data4 ? 4 : 8,
 				 &offset, sec_index, 0))

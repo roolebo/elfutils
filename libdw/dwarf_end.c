@@ -111,6 +111,10 @@ dwarf_end (dwarf)
       if (dwarf->free_elf)
 	elf_end (dwarf->elf);
 
+      /* Free the alternative Dwarf descriptor if necessary.  */
+      if (dwarf->free_alt)
+	INTUSE (dwarf_end) (dwarf->alt_dwarf);
+
       /* Free the context descriptor.  */
       free (dwarf);
     }

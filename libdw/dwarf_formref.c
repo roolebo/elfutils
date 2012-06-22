@@ -72,6 +72,8 @@ __libdw_formref (attr, return_offset)
 
     case DW_FORM_ref_addr:
     case DW_FORM_ref_sig8:
+    case DW_FORM_GNU_ref_alt:
+      /* These aren't handled by dwarf_formref, only by dwarf_formref_die.  */
       __libdw_seterrno (DWARF_E_INVALID_REFERENCE);
       return -1;
 

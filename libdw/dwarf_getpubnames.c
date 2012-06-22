@@ -102,7 +102,8 @@ get_offsets (Dwarf *dbg)
 	}
 
       /* Get the CU offset.  */
-      if (__libdw_read_offset (dbg, IDX_debug_pubnames, readp + 2, len_bytes,
+      if (__libdw_read_offset (dbg, dbg, IDX_debug_pubnames,
+			       readp + 2, len_bytes,
 			       &mem[cnt].cu_offset, IDX_debug_info, 3))
 	/* Error has been already set in reader.  */
 	goto err_return;

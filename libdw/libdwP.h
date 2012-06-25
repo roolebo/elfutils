@@ -71,6 +71,7 @@ enum
     IDX_debug_pubnames,
     IDX_debug_str,
     IDX_debug_macinfo,
+    IDX_debug_macro,
     IDX_debug_ranges,
     IDX_last
   };

@@ -1,3 +1,9 @@
+2012-06-26  Mark Wielaard  <mjw@redhat.com>
+
+	* run-macro-test.sh: New test.
+	* testfile-macinfo.bz2: New testfile.
+	* testfile-macros.bz2: Likewise.
+
 2012-05-07  Mark Wielaard  <mjw@redhat.com>
 
 	* low_high_pc.c: Use proper inttypes in printf formats.

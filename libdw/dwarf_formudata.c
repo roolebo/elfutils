@@ -140,8 +140,16 @@ dwarf_formudata (attr, return_uval)
 	      break;
 
 	    case DW_AT_macro_info:
-	      /* macptr */
+	      /* macptr into .debug_macinfo */
 	      if (__libdw_formptr (attr, IDX_debug_macinfo,
+				   DWARF_E_NO_ENTRY, NULL,
+				   return_uval) == NULL)
+		return -1;
+	      break;
+
+	    case DW_AT_GNU_macros:
+	      /* macptr into .debug_macro */
+	      if (__libdw_formptr (attr, IDX_debug_macro,
 				   DWARF_E_NO_ENTRY, NULL,
 				   return_uval) == NULL)
 		return -1;

@@ -3590,6 +3590,10 @@ dwarf_attr_string (unsigned int attrnum)
 	result = "GNU_all_source_call_sites";
 	break;
 
+      case DW_AT_GNU_macros:
+	result = "GNU_macros";
+	break;
+
       default:
 	if (attrnum < DW_AT_lo_user)
 	  snprintf (buf, sizeof buf, gettext ("unknown attribute %hx"),

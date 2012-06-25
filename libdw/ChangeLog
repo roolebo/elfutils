@@ -1,3 +1,10 @@
+2012-06-26  Mark Wielaard  <mjw@redhat.com>
+
+	* libdwP.h: Add IDX_debug_macro.
+	* dwarf.h: Add DW_AT_GNU_macros.
+	* dwarf_begin_elf.c (dwarf_scnnames): Add .debug_macro.
+	* dwarf_formudata.c (dwarf_formudata): Recognize DW_AT_GNU_macros.
+
 2012-04-27  Mark Wielaard  <mjw@redhat.com>
 
 	* libdw/dwarf_highpc.c (dwarf_highpc): Handle DW_AT_high_pc being

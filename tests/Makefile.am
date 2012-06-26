@@ -40,7 +40,7 @@ else
 tests_rpath = no
 endif
 
-noinst_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
+check_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  showptable update1 update2 update3 update4 test-nlist \
 		  show-die-info get-files get-lines get-pubnames \
 		  get-aranges allfcts line2addr addrscopes funcscopes \
@@ -83,12 +83,12 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-macro-test.sh
 
 if !STANDALONE
-noinst_PROGRAMS += msg_tst md5-sha1-test
+check_PROGRAMS += msg_tst md5-sha1-test
 TESTS += msg_tst md5-sha1-test
 endif
 
 if HAVE_LIBASM
-noinst_PROGRAMS += $(asm_TESTS)
+check_PROGRAMS += $(asm_TESTS)
 TESTS += $(asm_TESTS)
 endif
 

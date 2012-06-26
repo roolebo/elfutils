@@ -1,3 +1,7 @@
+2012-06-26  Mike Frysinger  <vapier@gentoo.org>
+
+	* Makefile.am (check_PROGRAMS): Rename from noinst_PROGRAMS.
+
 2012-06-26  Mark Wielaard  <mjw@redhat.com>
 
 	* run-macro-test.sh: New test.

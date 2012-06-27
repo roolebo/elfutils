@@ -1,3 +1,7 @@
+2012-06-27  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf.h: Add DW_MACRO_GNU .debug_macro type encodings.
+
 2012-06-26  Mark Wielaard  <mjw@redhat.com>
 
 	* libdwP.h: Add IDX_debug_macro.

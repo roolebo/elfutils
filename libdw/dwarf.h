@@ -673,6 +673,21 @@ enum
   };
 
 
+/* DWARF debug_macro type encodings.  GNU/DWARF5 extension.  */
+enum
+  {
+    DW_MACRO_GNU_define = 0x01,
+    DW_MACRO_GNU_undef = 0x02,
+    DW_MACRO_GNU_start_file = 0x03,
+    DW_MACRO_GNU_end_file = 0x04,
+    DW_MACRO_GNU_define_indirect = 0x05,
+    DW_MACRO_GNU_undef_indirect = 0x06,
+    DW_MACRO_GNU_transparent_include = 0x07,
+    DW_MACRO_GNU_lo_user = 0xe0,
+    DW_MACRO_GNU_hi_user = 0xff
+  };
+
+
 /* DWARF call frame instruction encodings.  */
 enum
   {

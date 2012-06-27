@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2002-2011 Red Hat, Inc.
+## Copyright (C) 2002-2012 Red Hat, Inc.
 ## This file is part of elfutils.
 ##
 ## This file is free software; you can redistribute it and/or modify
@@ -55,6 +55,13 @@ noinst_PROGRAMS = i386_gendis
 
 $(srcdir)/%_dis.h: %_defs i386_gendis
 	./i386_gendis $< > $@
+
+else
+
+$(srcdir)/%_dis.h:
+	@echo '*** missing $@; configure with --enable-maintainer-mode'
+	@false
+
 endif
 
 %.mnemonics: %_defs

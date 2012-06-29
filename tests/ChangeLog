@@ -1,3 +1,10 @@
+2012-07-11  Mark Wielaard  <mjw@redhat.com>
+
+	* run-readelf-macro.sh: New test.
+	* testfilemacro.bz2: New testfile.
+	* Makefile.am (TESTS): Add run-readelf-macro.sh.
+	(EXTRA_DIST): Add run-readelf-macro.sh and testfilemacro.bz2.
+
 2012-06-26  Mark Wielaard  <mjw@redhat.com>
 
 	* run-macro-test.sh: New test.

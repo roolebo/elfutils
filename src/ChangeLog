@@ -1,3 +1,12 @@
+2012-07-11  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (options): Add macro to help of debug-dump.
+	(section_e): Add section_macro.
+	(section_all): Add section_macro.
+	(parse_opt): Handle macro.
+	(print_debug_macro_section): New function.
+	(print_debug): Add NEW_SECTION (macro).
+
 2012-06-26  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (dwarf_attr_string): Add DW_AT_GNU_macros.

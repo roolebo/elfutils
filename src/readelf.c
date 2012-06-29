@@ -7123,7 +7123,7 @@ print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
   // The only difference between version 4 and version 5 is the
   // hash used for generating the table.  Version 6 contains symbols
   // for inlined functions, older versions didn't.
-  if (vers < 4 || vers > 6)
+  if (vers < 4 || vers > 7)
     {
       printf (gettext ("  unknown version, cannot parse section\n"));
       return;
@@ -7167,14 +7167,14 @@ print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
   readp = data->d_buf + cu_off;
 
   const unsigned char *nextp = data->d_buf + tu_off;
-  size_t nr = (nextp - readp) / 16;
+  size_t cu_nr = (nextp - readp) / 16;
 
   printf (gettext ("\n CU list at offset %#" PRIx32
 		   " contains %zu entries:\n"),
-	  cu_off, nr);
+	  cu_off, cu_nr);
 
   size_t n = 0;
-  while (readp + 16 <= dataend && n < nr)
+  while (readp + 16 <= dataend && n < cu_nr)
     {
       uint64_t off = read_8ubyte_unaligned (dbg, readp);
       readp += 8;
@@ -7189,14 +7189,14 @@ print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
   readp = data->d_buf + tu_off;
   nextp = data->d_buf + addr_off;
-  nr = (nextp - readp) / 24;
+  size_t tu_nr = (nextp - readp) / 24;
 
   printf (gettext ("\n TU list at offset %#" PRIx32
 		   " contains %zu entries:\n"),
-	  tu_off, nr);
+	  tu_off, tu_nr);
 
   n = 0;
-  while (readp + 24 <= dataend && n < nr)
+  while (readp + 24 <= dataend && n < tu_nr)
     {
       uint64_t off = read_8ubyte_unaligned (dbg, readp);
       readp += 8;
@@ -7215,14 +7215,14 @@ print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
   readp = data->d_buf + addr_off;
   nextp = data->d_buf + sym_off;
-  nr = (nextp - readp) / 20;
+  size_t addr_nr = (nextp - readp) / 20;
 
   printf (gettext ("\n Address list at offset %#" PRIx32
 		   " contains %zu entries:\n"),
-	  addr_off, nr);
+	  addr_off, addr_nr);
 
   n = 0;
-  while (readp + 20 <= dataend && n < nr)
+  while (readp + 20 <= dataend && n < addr_nr)
     {
       uint64_t low = read_8ubyte_unaligned (dbg, readp);
       readp += 8;
@@ -7242,14 +7242,14 @@ print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
   readp = data->d_buf + sym_off;
   nextp = data->d_buf + const_off;
-  nr = (nextp - readp) / 8;
+  size_t sym_nr = (nextp - readp) / 8;
 
   printf (gettext ("\n Symbol table at offset %#" PRIx32
 		   " contains %zu slots:\n"),
-	  addr_off, nr);
+	  addr_off, sym_nr);
 
   n = 0;
-  while (readp + 8 <= dataend && n < nr)
+  while (readp + 8 <= dataend && n < sym_nr)
     {
       uint32_t name = read_4ubyte_unaligned (dbg, readp);
       readp += 4;
@@ -7272,10 +7272,42 @@ print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	  uint32_t cus = read_4ubyte_unaligned (dbg, readcus);
 	  while (cus--)
 	    {
-	      uint32_t cu;
+	      uint32_t cu_kind, cu, kind;
+	      bool is_static;
 	      readcus += 4;
-	      cu = read_4ubyte_unaligned (dbg, readcus);
-	      printf ("%" PRId32 "%s", cu, ((cus > 0) ? ", " : ""));
+	      cu_kind = read_4ubyte_unaligned (dbg, readcus);
+	      cu = cu_kind & ((1 << 24) - 1);
+	      kind = (cu_kind >> 28) & 7;
+	      is_static = cu_kind & (1 << 31);
+	      if (cu > cu_nr - 1)
+		printf ("%" PRId32 "T", cu - (uint32_t) cu_nr);
+	      else
+		printf ("%" PRId32, cu);
+	      if (kind != 0)
+		{
+		  printf (" (");
+		  switch (kind)
+		    {
+		    case 1:
+		      printf ("type");
+		      break;
+		    case 2:
+		      printf ("var");
+		      break;
+		    case 3:
+		      printf ("func");
+		      break;
+		    case 4:
+		      printf ("other");
+		      break;
+		    default:
+		      printf ("unknown-0x%" PRIx32, kind);
+		      break;
+		    }
+		  printf (":%c)", (is_static ? 'S' : 'G'));
+		}
+	      if (cus > 0)
+		printf (", ");
 	    }
 	  printf ("\n");
 	}

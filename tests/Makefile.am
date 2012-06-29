@@ -79,8 +79,8 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-early-offscn.sh run-dwarf-getmacros.sh \
 	run-test-flag-nobits.sh run-prelink-addr-test.sh \
 	run-dwarf-getstring.sh run-rerequest_tag.sh run-typeiter.sh \
-	run-readelf-d.sh run-unstrip-n.sh run-low_high_pc.sh \
-	run-macro-test.sh
+	run-readelf-d.sh run-readelf-gdb_index.sh run-unstrip-n.sh \
+	run-low_high_pc.sh run-macro-test.sh
 
 if !STANDALONE
 noinst_PROGRAMS += msg_tst md5-sha1-test
@@ -157,6 +157,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile56.bz2 testfile57.bz2 testfile58.bz2 \
 	     run-typeiter.sh testfile59.bz2 \
 	     run-readelf-d.sh testlib_dynseg.so.bz2 \
+	     run-readelf-gdb_index.sh testfilegdbindex5.bz2 \
+	     testfilegdbindex7.bz2 \
 	     run-unstrip-n.sh testcore-rtlib.bz2 \
 	     run-low_high_pc.sh testfile_low_high_pc.bz2 \
 	     run-macro-test.sh testfile-macinfo.bz2 testfile-macros.bz2

@@ -1,3 +1,12 @@
+2012-06-27  Mark Wielaard  <mjw@redhat.com>
+
+	* run-readelf-gdb-index.sh: New test.
+	* testfilegdbindex5.bz2: New testfile.
+	* testfilegdbindex7.bz2: Likewise.
+	* Makefile.am (TESTS): Add run-readelf-gdb-index.sh.
+	(EXTRA_DIST): run-readelf-gdb_index.sh, testfilegdbindex5.bz2 and
+	testfilegdbindex7.bz2.
+
 2012-06-26  Mark Wielaard  <mjw@redhat.com>
 
 	* run-macro-test.sh: New test.

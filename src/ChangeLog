@@ -1,3 +1,9 @@
+2012-07-10  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_gdb_index_section): Add version 7 support.
+	Keep track of cu_nr. Print kind and static/global flag for each
+	symbol. When a symbol is in the TU list add 'T'.
+
 2012-06-26  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (dwarf_attr_string): Add DW_AT_GNU_macros.

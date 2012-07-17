@@ -1,3 +1,8 @@
+2012-07-17  Mark Wielaard  <mjw@redhat.com>
+
+	* testcore-rtlib-ppc.bz2: New testfile.
+	* run-unstrip-n.sh: Check new ppc core testfile.
+
 2012-06-26  Mike Frysinger  <vapier@gentoo.org>
 
 	* Makefile.am (check_PROGRAMS): Rename from noinst_PROGRAMS.

@@ -1,5 +1,5 @@
 /* Convert from file to memory representation.
-   Copyright (C) 1998, 1999, 2000, 2002 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2012 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -59,7 +59,11 @@ elfw2(LIBELFBITS, xlatetom) (dest, src, encode)
 #endif
 
 
-  if (src->d_size % recsize != 0)
+  /* We shouldn't require integer number of records when processing
+     notes.  Payload bytes follow the header immediately, it's not an
+     array of records as is the case otherwise.  */
+  if (src->d_type != ELF_T_NHDR
+      && src->d_size % recsize != 0)
     {
       __libelf_seterrno (ELF_E_INVALID_DATA);
       return NULL;

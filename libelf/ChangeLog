@@ -1,3 +1,8 @@
+2012-07-17  Petr Machata  <pmachata@redhat.com>
+
+	* elf32_xlatetom.c (elfw2(LIBELFBITS, xlatetom)): Do not check for
+	integer number of records in case of ELF_T_NHDR.
+
 2012-04-02  Mark Wielaard  <mjw@redhat.com>
 
 	* elf32_offscn.c: Do not match SHT_NOBITS sections at OFFSET unless

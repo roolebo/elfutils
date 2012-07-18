@@ -1,5 +1,14 @@
 2012-07-19  Mark Wielaard  <mjw@redhat.com>
 
+	* Makefile.am (check_PROGRAMS): Add test-elf_cntl_gelf_getshdr.
+	(TESTS): Add run-elf_cntl_gelf_getshdr.sh.
+	(EXTRA_DIST): Likewise.
+	(test_elf_cntl_gelf_getshdr_LDADD): New.
+	test-elf_cntl_gelf_getshdr.c: New test program.
+	run-elf_cntl_gelf_getshdr.sh: New test script.
+
+2012-07-19  Mark Wielaard  <mjw@redhat.com>
+
 	* run-elflint-self.sh: runtests on ../backends/*so files.
 
 2012-07-19  Mark Wielaard  <mjw@redhat.com>

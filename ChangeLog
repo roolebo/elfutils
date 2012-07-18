@@ -1,3 +1,7 @@
+2012-07-24  Mark Wielaard  <mjw@redhat.com>
+
+	* TODO: Add note on shdrs after elf_cntl (ELF_C_FDREAD).
+
 2012-06-22  Mark Wielaard  <mjw@redhat.com>
 
 	* configure.ac: Set version to 0.154.

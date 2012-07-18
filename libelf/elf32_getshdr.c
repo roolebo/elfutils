@@ -1,5 +1,5 @@
 /* Return section header.
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2005, 2007, 2009 Red Hat, Inc.
+   Copyright (C) 1998-2002, 2005, 2007, 2009, 2012 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -80,11 +80,14 @@ load_shdr_wrlock (Elf_Scn *scn)
       ElfW2(LIBELFBITS,Shdr) *notcvt;
 
       /* All the data is already mapped.  If we could use it
-	 directly this would already have happened.  */
+	 directly this would already have happened.  Unless
+	 we allocated the memory ourselves and the ELF_F_MALLOCED
+	 flag is set.  */
       void *file_shdr = ((char *) elf->map_address
 			 + elf->start_offset + ehdr->e_shoff);
 
-      assert (ehdr->e_ident[EI_DATA] != MY_ELFDATA
+      assert ((elf->flags & ELF_F_MALLOCED)
+	      || ehdr->e_ident[EI_DATA] != MY_ELFDATA
 	      || (! ALLOW_UNALIGNED
 		  && ((uintptr_t) file_shdr
 		      & (__alignof__ (ElfW2(LIBELFBITS,Shdr)) - 1)) != 0));
@@ -92,7 +95,7 @@ load_shdr_wrlock (Elf_Scn *scn)
       /* Now copy the data and at the same time convert the byte order.  */
       if (ehdr->e_ident[EI_DATA] == MY_ELFDATA)
 	{
-	  assert (! ALLOW_UNALIGNED);
+	  assert ((elf->flags & ELF_F_MALLOCED) || ! ALLOW_UNALIGNED);
 	  memcpy (shdr, file_shdr, size);
 	}
       else

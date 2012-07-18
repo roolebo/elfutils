@@ -1,3 +1,8 @@
+2012-07-19  Mark Wielaard  <mjw@redhat.com>
+
+	* elf32_getshdr.c (load_shdr_wrlock): Add elf->flags & ELF_F_MALLOCED
+	to asserts.
+
 2012-07-17  Petr Machata  <pmachata@redhat.com>
 
 	* elf32_xlatetom.c (elfw2(LIBELFBITS, xlatetom)): Do not check for

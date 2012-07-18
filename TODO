@@ -29,6 +29,11 @@ Time-stamp: <2009-02-05 22:08:01 drepper>
    is allowed or the structure is aligned.  Use ELF_F_MALLOCED flag
    to differentiate.
 
+** shdrs after elf_cntl (ELF_C_FDREAD)
+
+   Similar to the above. After ELF_C_FDREAD the file is completely
+   in memory.  See also this mailing list thread:
+   https://fedorahosted.org/pipermail/elfutils-devel/2012-July/002368.html
 
 * libdw
 

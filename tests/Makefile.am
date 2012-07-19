@@ -71,6 +71,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-find-prologues.sh run-allregs.sh \
 	run-readelf-test1.sh run-readelf-test2.sh run-readelf-test3.sh \
 	run-readelf-test4.sh run-readelf-twofiles.sh \
+	run-readelf-macro.sh \
 	run-native-test.sh run-bug1-test.sh \
 	dwfl-bug-addr-overflow run-addrname-test.sh \
 	dwfl-bug-fd-leak dwfl-bug-report \
@@ -139,6 +140,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile45.S.bz2 testfile45.expect.bz2 run-disasm-x86-64.sh \
 	     testfile46.bz2 testfile47.bz2 testfile48.bz2 testfile48.debug.bz2 \
 	     testfile49.bz2 testfile50.bz2 testfile51.bz2 \
+	     run-readelf-macro.sh testfilemacro.bz2 \
 	     run-prelink-addr-test.sh \
 	     testfile52-32.so.bz2 testfile52-32.so.debug.bz2 \
 	     testfile52-32.prelink.so.bz2 testfile52-32.noshdrs.so.bz2 \

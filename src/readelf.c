@@ -86,7 +86,7 @@ static const struct argp_option options[] =
   { "debug-dump", 'w', "SECTION", OPTION_ARG_OPTIONAL,
     N_("Display DWARF section content.  SECTION can be one of abbrev, "
        "aranges, frame, gdb_index, info, loc, line, ranges, pubnames, str, "
-       "macinfo, or exception"), 0 },
+       "macinfo, macro or exception"), 0 },
   { "hex-dump", 'x', "SECTION", 0,
     N_("Dump the uninterpreted contents of SECTION, by number or name"), 0 },
   { "strings", 'p', "SECTION", OPTION_ARG_OPTIONAL,
@@ -183,10 +183,12 @@ static enum section_e
   section_ranges = 512, 	/* .debug_ranges  */
   section_exception = 1024,	/* .eh_frame & al.  */
   section_gdb_index = 2048,	/* .gdb_index  */
+  section_macro = 4096,		/* .debug_macro  */
   section_all = (section_abbrev | section_aranges | section_frame
 		 | section_info | section_line | section_loc
 		 | section_pubnames | section_str | section_macinfo
-		 | section_ranges | section_exception | section_gdb_index)
+		 | section_ranges | section_exception | section_gdb_index
+		 | section_macro)
 } print_debug_sections, implicit_debug_sections;
 
 /* Select hex dumping of sections.  */
@@ -395,6 +397,8 @@ parse_opt (int key, char *arg,
 	print_debug_sections |= section_str;
       else if (strcmp (arg, "macinfo") == 0)
 	print_debug_sections |= section_macinfo;
+      else if (strcmp (arg, "macro") == 0)
+	print_debug_sections |= section_macro;
       else if (strcmp (arg, "exception") == 0)
 	print_debug_sections |= section_exception;
       else if (strcmp (arg, "gdb_index") == 0)
@@ -6748,6 +6752,412 @@ print_debug_macinfo_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 }
 
 
+static void
+print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
+			   Ebl *ebl, GElf_Ehdr *ehdr,
+			   Elf_Scn *scn, GElf_Shdr *shdr, Dwarf *dbg)
+{
+  printf (gettext ("\
+\nDWARF section [%2zu] '%s' at offset %#" PRIx64 ":\n"),
+	  elf_ndxscn (scn), section_name (ebl, ehdr, shdr),
+	  (uint64_t) shdr->sh_offset);
+  putc_unlocked ('\n', stdout);
+
+  Elf_Data *data = elf_getdata (scn, NULL);
+  if (unlikely (data == NULL || data->d_buf == NULL))
+    {
+      error (0, 0, gettext ("cannot get macro information section data: %s"),
+	     elf_errmsg (-1));
+      return;
+    }
+
+  /* Get the source file information for all CUs.  Uses same
+     datastructure as macinfo.  But uses offset field to directly
+     match .debug_line offset.  And just stored in a list.  */
+  Dwarf_Off offset;
+  Dwarf_Off ncu = 0;
+  size_t hsize;
+  struct mac_culist *culist = NULL;
+  size_t nculist = 0;
+  while (dwarf_nextcu (dbg, offset = ncu, &ncu, &hsize, NULL, NULL, NULL) == 0)
+    {
+      Dwarf_Die cudie;
+      if (dwarf_offdie (dbg, offset + hsize, &cudie) == NULL)
+	continue;
+
+      Dwarf_Attribute attr;
+      if (dwarf_attr (&cudie, DW_AT_stmt_list, &attr) == NULL)
+	continue;
+
+      Dwarf_Word lineoff;
+      if (dwarf_formudata (&attr, &lineoff) != 0)
+	continue;
+
+      struct mac_culist *newp = (struct mac_culist *) alloca (sizeof (*newp));
+      newp->die = cudie;
+      newp->offset = lineoff;
+      newp->files = NULL;
+      newp->next = culist;
+      culist = newp;
+      ++nculist;
+    }
+
+  const unsigned char *readp = (const unsigned char *) data->d_buf;
+  const unsigned char *readendp = readp + data->d_size;
+
+  while (readp < readendp)
+    {
+      printf (gettext (" Offset:             0x%" PRIx64 "\n"),
+	      readp - (const unsigned char *) data->d_buf);
+
+      // Header, 2 byte version, 1 byte flag, optional .debug_line offset,
+      // optional vendor extension macro entry table.
+      if (readp + 2 > readendp)
+	{
+	invalid_data:
+	  error (0, 0, gettext ("invalid data"));
+	  return;
+	}
+      const uint16_t vers = read_2ubyte_unaligned_inc (dbg, readp);
+      printf (gettext (" Version:            %" PRIu16 "\n"), vers);
+
+      // Version 4 is the GNU extension for DWARF4.  DWARF5 will use version
+      // 5 when it gets standardized.
+      if (vers != 4)
+	{
+	  printf (gettext ("  unknown version, cannot parse section\n"));
+	  return;
+	}
+
+      if (readp + 1 > readendp)
+	goto invalid_data;
+      const unsigned char flag = *readp++;
+      printf (gettext (" Flag:               0x%" PRIx8 "\n"), flag);
+
+      unsigned int offset_len = (flag & 0x01) ? 8 : 4;
+      printf (gettext (" Offset length:      %" PRIu8 "\n"), offset_len);
+      Dwarf_Off line_offset = -1;
+      if (flag & 0x02)
+	{
+	  if (offset_len == 8)
+	    line_offset = read_8ubyte_unaligned_inc (dbg, readp);
+	  else
+	    line_offset = read_4ubyte_unaligned_inc (dbg, readp);
+	  printf (gettext (" .debug_line offset: 0x%" PRIx64 "\n"),
+		  line_offset);
+	}
+
+      const unsigned char *vendor[DW_MACRO_GNU_hi_user - DW_MACRO_GNU_lo_user];
+      if (flag & 0x04)
+	{
+	  // 1 byte length, for each item, 1 byte opcode, uleb128 number
+	  // of arguments, for each argument 1 byte form code.
+	  if (readp + 1 > readendp)
+	    goto invalid_data;
+	  unsigned int tlen = *readp++;
+	  printf (gettext ("  extension opcode table, %" PRIu8 " items:\n"),
+		  tlen);
+	  for (unsigned int i = 0; i < tlen; i++)
+	    {
+	      if (readp + 1 > readendp)
+		goto invalid_data;
+	      unsigned int opcode = *readp++;
+	      printf (gettext ("    [%" PRIx8 "]"), opcode);
+	      if (opcode < DW_MACRO_GNU_lo_user
+		  || opcode > DW_MACRO_GNU_hi_user)
+		goto invalid_data;
+	      // Record the start of description for this vendor opcode.
+	      // uleb128 nr args, 1 byte per arg form.
+	      vendor[opcode - DW_MACRO_GNU_lo_user] = readp;
+	      if (readp + 1 > readendp)
+		goto invalid_data;
+	      unsigned int args = *readp++;
+	      if (args > 0)
+		{
+		  printf (gettext (" %" PRIu8 " arguments:"), args);
+		  while (args > 0)
+		    {
+		      if (readp + 1 > readendp)
+			goto invalid_data;
+		      unsigned int form = *readp++;
+		      printf (" %s", dwarf_form_string (form));
+		      if (form != DW_FORM_data1
+			  && form != DW_FORM_data2
+			  && form != DW_FORM_data4
+			  && form != DW_FORM_data8
+			  && form != DW_FORM_sdata
+			  && form != DW_FORM_udata
+			  && form != DW_FORM_block
+			  && form != DW_FORM_block1
+			  && form != DW_FORM_block2
+			  && form != DW_FORM_block4
+			  && form != DW_FORM_flag
+			  && form != DW_FORM_string
+			  && form != DW_FORM_strp
+			  && form != DW_FORM_sec_offset)
+			goto invalid_data;
+		      args--;
+		      if (args > 0)
+			putchar_unlocked (',');
+		    }
+		}
+	      else
+		printf (gettext (" no arguments."));
+	      putchar_unlocked ('\n');
+	    }
+	}
+      putchar_unlocked ('\n');
+
+      int level = 1;
+      if (readp + 1 > readendp)
+	goto invalid_data;
+      unsigned int opcode = *readp++;
+      while (opcode != 0)
+	{
+	  unsigned int u128;
+	  unsigned int u128_2;
+	  const unsigned char *endp;
+	  uint64_t off;
+
+          switch (opcode)
+            {
+            case DW_MACRO_GNU_start_file:
+	      get_uleb128 (u128, readp);
+	      get_uleb128 (u128_2, readp);
+
+	      /* Find the CU DIE that matches this line offset.  */
+	      const char *fname = "???";
+	      if (line_offset != (Dwarf_Off) -1)
+		{
+		  struct mac_culist *cu = culist;
+		  while (cu != NULL && line_offset != cu->offset)
+		    cu = cu->next;
+		  if (cu != NULL)
+		    {
+		      if (cu->files == NULL
+			  && dwarf_getsrcfiles (&cu->die, &cu->files,
+						NULL) != 0)
+			cu->files = (Dwarf_Files *) -1l;
+
+		      if (cu->files != (Dwarf_Files *) -1l)
+			fname = (dwarf_filesrc (cu->files, u128_2,
+						NULL, NULL) ?: "???");
+		    }
+		}
+	      printf ("%*sstart_file %u, [%u] %s\n",
+		      level, "", u128, u128_2, fname);
+	      ++level;
+	      break;
+
+	    case DW_MACRO_GNU_end_file:
+	      --level;
+	      printf ("%*send_file\n", level, "");
+	      break;
+
+	    case DW_MACRO_GNU_define:
+	      get_uleb128 (u128, readp);
+	      endp = memchr (readp, '\0', readendp - readp);
+	      if (endp == NULL)
+		goto invalid_data;
+	      printf ("%*s#define %s, line %u\n",
+		      level, "", readp, u128);
+	      readp = endp + 1;
+	      break;
+
+	    case DW_MACRO_GNU_undef:
+	      get_uleb128 (u128, readp);
+	      endp = memchr (readp, '\0', readendp - readp);
+	      if (endp == NULL)
+		goto invalid_data;
+	      printf ("%*s#undef %s, line %u\n",
+		      level, "", readp, u128);
+	      readp = endp + 1;
+	      break;
+
+	    case DW_MACRO_GNU_define_indirect:
+	      get_uleb128 (u128, readp);
+	      if (readp + offset_len > readendp)
+		goto invalid_data;
+	      if (offset_len == 8)
+		off = read_8ubyte_unaligned_inc (dbg, readp);
+	      else
+		off = read_4ubyte_unaligned_inc (dbg, readp);
+	      printf ("%*s#define %s, line %u (indirect)\n",
+		      level, "", dwarf_getstring (dbg, off, NULL), u128);
+	      break;
+
+	    case DW_MACRO_GNU_undef_indirect:
+	      get_uleb128 (u128, readp);
+	      if (readp + offset_len > readendp)
+		goto invalid_data;
+	      if (offset_len == 8)
+		off = read_8ubyte_unaligned_inc (dbg, readp);
+	      else
+		off = read_4ubyte_unaligned_inc (dbg, readp);
+	      printf ("%*s#undef %s, line %u (indirect)\n",
+		      level, "", dwarf_getstring (dbg, off, NULL), u128);
+	      break;
+
+	    case DW_MACRO_GNU_transparent_include:
+	      if (readp + offset_len > readendp)
+		goto invalid_data;
+	      if (offset_len == 8)
+		off = read_8ubyte_unaligned_inc (dbg, readp);
+	      else
+		off = read_4ubyte_unaligned_inc (dbg, readp);
+	      printf ("%*s#include offset 0x%" PRIx64 "\n",
+		      level, "", off);
+	      break;
+
+	    default:
+	      printf ("%*svendor opcode 0x%" PRIx8, level, "", opcode);
+	      if (opcode < DW_MACRO_GNU_lo_user
+		  || opcode > DW_MACRO_GNU_lo_user
+		  || vendor[opcode - DW_MACRO_GNU_lo_user] == NULL)
+		goto invalid_data;
+
+	      const unsigned char *op_desc;
+	      op_desc = vendor[opcode - DW_MACRO_GNU_lo_user];
+
+	      // Just skip the arguments, we cannot really interpret them,
+	      // but print as much as we can.
+	      unsigned int args = *op_desc++;
+	      while (args > 0)
+		{
+		  unsigned int form = *op_desc++;
+		  Dwarf_Word val;
+		  switch (form)
+		    {
+		    case DW_FORM_data1:
+		      if (readp + 1 > readendp)
+			goto invalid_data;
+		      val = *readp++;
+		      printf (" %" PRIx8, (unsigned int) val);
+		      break;
+
+		    case DW_FORM_data2:
+		      if (readp + 2 > readendp)
+			goto invalid_data;
+		      val = read_2ubyte_unaligned_inc (dbg, readp);
+		      printf(" %" PRIx16, (unsigned int) val);
+		      break;
+
+		    case DW_FORM_data4:
+		      if (readp + 4 > readendp)
+			goto invalid_data;
+		      val = read_4ubyte_unaligned_inc (dbg, readp);
+		      printf (" %" PRIx32, (unsigned int) val);
+		      break;
+
+		    case DW_FORM_data8:
+		      if (readp + 8 > readendp)
+			goto invalid_data;
+		      val = read_8ubyte_unaligned_inc (dbg, readp);
+		      printf (" %" PRIx64, val);
+		      break;
+
+		    case DW_FORM_sdata:
+		      get_sleb128 (val, readp);
+		      printf (" %" PRIx64, val);
+		      break;
+
+		    case DW_FORM_udata:
+		      get_uleb128 (val, readp);
+		      printf (" %" PRIx64, val);
+		      break;
+
+		    case DW_FORM_block:
+		      get_uleb128 (val, readp);
+		      printf (" block[%" PRIu64 "]", val);
+		      if (readp + val > readendp)
+			goto invalid_data;
+		      readp += val;
+		      break;
+
+		    case DW_FORM_block1:
+		      if (readp + 1 > readendp)
+			goto invalid_data;
+		      val = *readp++;
+		      printf (" block[%" PRIu64 "]", val);
+		      if (readp + val > readendp)
+			goto invalid_data;
+		      break;
+
+		    case DW_FORM_block2:
+		      if (readp + 2 > readendp)
+			goto invalid_data;
+		      val = read_2ubyte_unaligned_inc (dbg, readp);
+		      printf (" block[%" PRIu64 "]", val);
+		      if (readp + val > readendp)
+			goto invalid_data;
+		      break;
+
+		    case DW_FORM_block4:
+		      if (readp + 2 > readendp)
+			goto invalid_data;
+		      val =read_4ubyte_unaligned_inc (dbg, readp);
+		      printf (" block[%" PRIu64 "]", val);
+		      if (readp + val > readendp)
+			goto invalid_data;
+		      break;
+
+		    case DW_FORM_flag:
+		      if (readp + 1 > readendp)
+			goto invalid_data;
+		      val = *readp++;
+		      printf (" %s", nl_langinfo (val != 0 ? YESSTR : NOSTR));
+		      break;
+
+		    case DW_FORM_string:
+		      endp = memchr (readp, '\0', readendp - readp);
+		      if (endp == NULL)
+			goto invalid_data;
+		      printf (" %s", readp);
+		      readp = endp + 1;
+		      break;
+
+		    case DW_FORM_strp:
+		      if (readp + offset_len > readendp)
+			goto invalid_data;
+		      if (offset_len == 8)
+			val = read_8ubyte_unaligned_inc (dbg, readp);
+		      else
+			val = read_4ubyte_unaligned_inc (dbg, readp);
+		      printf (" %s", dwarf_getstring (dbg, val, NULL));
+		      break;
+
+		    case DW_FORM_sec_offset:
+		      if (readp + offset_len > readendp)
+			goto invalid_data;
+		      if (offset_len == 8)
+			val = read_8ubyte_unaligned_inc (dbg, readp);
+		      else
+			val = read_4ubyte_unaligned_inc (dbg, readp);
+		      printf (" %" PRIx64, val);
+		      break;
+
+		      default:
+			error (0, 0, gettext ("vendor opcode not verified?"));
+			return;
+		    }
+
+		  args--;
+		  if (args > 0)
+		    putchar_unlocked (',');
+		}
+	      putchar_unlocked ('\n');
+	    }
+
+	  if (readp + 1 > readendp)
+	    goto invalid_data;
+	  opcode = *readp++;
+	  if (opcode == 0)
+	    putchar_unlocked ('\n');
+	}
+    }
+}
+
+
 /* Callback for printing global names.  */
 static int
 print_pubnames (Dwarf *dbg __attribute__ ((unused)), Dwarf_Global *global,
@@ -7371,6 +7781,7 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
 	      NEW_SECTION (pubnames),
 	      NEW_SECTION (str),
 	      NEW_SECTION (macinfo),
+	      NEW_SECTION (macro),
 	      NEW_SECTION (ranges),
 	      { ".eh_frame", section_frame | section_exception,
 		print_debug_frame_section },

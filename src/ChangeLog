@@ -1,3 +1,7 @@
+2012-07-19  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_ops): Handle DW_OP_GNU_parameter_ref.
+
 2012-07-11  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (options): Add macro to help of debug-dump.

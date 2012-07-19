@@ -1,3 +1,7 @@
+2012-07-19  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf.h: Add DW_OP_GNU_parameter_ref.
+
 2012-07-24  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf.h: Correct spelling of DW_LANG_ObjC.

@@ -51,4 +51,6 @@ testrun_compare ../src/unstrip -n --core=testcore-rtlib-ppc <<\EOF
 0xffb0000+0x50000 edec437a85026a1cf8cda94003706202733130c1@0xffb0124 /lib/ld.so.1 - ld.so.1
 EOF
 
+test_cleanup
+
 exit 0

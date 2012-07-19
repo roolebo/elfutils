@@ -161,7 +161,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-readelf-d.sh testlib_dynseg.so.bz2 \
 	     run-readelf-gdb_index.sh testfilegdbindex5.bz2 \
 	     testfilegdbindex7.bz2 \
-	     run-unstrip-n.sh testcore-rtlib.bz2 \
+	     run-unstrip-n.sh testcore-rtlib.bz2 testcore-rtlib-ppc.bz2 \
 	     run-low_high_pc.sh testfile_low_high_pc.bz2 \
 	     run-macro-test.sh testfile-macinfo.bz2 testfile-macros.bz2
 

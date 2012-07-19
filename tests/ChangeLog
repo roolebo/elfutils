@@ -1,5 +1,9 @@
 2012-07-19  Mark Wielaard  <mjw@redhat.com>
 
+	* run-elflint-self.sh: runtests on ../backends/*so files.
+
+2012-07-19  Mark Wielaard  <mjw@redhat.com>
+
 	* run-unstrip-n.sh: test_cleanup.
 	* Makefile.am (EXTRA_DIST): Add testcore-rtlib-ppc.bz2.
 

@@ -1,3 +1,8 @@
+Version 0.155
+
+libdw: dwarf.h corrected the DW_LANG_ObjC constant name (was DW_LANG_Objc).
+       Any existing sources using the old name will have to be updated.
+
 Version 0.154
 
 libelf: [g]elf[32|64]_offscn() do not match SHT_NOBITS sections at OFFSET.

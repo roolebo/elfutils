@@ -1,5 +1,11 @@
 2012-07-24  Mark Wielaard  <mjw@redhat.com>
 
+	* dwarf.h: Correct spelling of DW_LANG_ObjC.
+	* dwarf_aggregate_size.c (array_size): Use correct spelling of
+	DW_LANG_ObjC.
+
+2012-07-24  Mark Wielaard  <mjw@redhat.com>
+
 	* dwarf.h: Add DW_ATE_UTF.
 
 2012-06-27  Mark Wielaard  <mjw@redhat.com>

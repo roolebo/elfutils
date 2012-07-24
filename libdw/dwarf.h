@@ -572,7 +572,7 @@ enum
     DW_LANG_Ada95 = 0x000d,	     /* ISO Ada:1995 */
     DW_LANG_Fortran95 = 0x000e,	     /* ISO Fortran 95 */
     DW_LANG_PL1 = 0x000f,	     /* ISO PL/1:1976 */
-    DW_LANG_Objc = 0x0010,	     /* Objective-C */
+    DW_LANG_ObjC = 0x0010,	     /* Objective-C */
     DW_LANG_ObjC_plus_plus = 0x0011, /* Objective-C++ */
     DW_LANG_UPC = 0x0012,	     /* Unified Parallel C */
     DW_LANG_D = 0x0013,		     /* D */

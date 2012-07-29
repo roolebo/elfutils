@@ -1,3 +1,8 @@
+2012-07-29  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (dwarf_lang_string): Use DW_LANG_ObjC, not DW_LANG_Objc.
+	(print_ops): Use known[op], not op_name, for DW_OP_GNU_parameter_ref.
+
 2012-07-19  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (print_ops): Handle DW_OP_GNU_parameter_ref.

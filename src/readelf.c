@@ -3683,7 +3683,7 @@ dwarf_lang_string (unsigned int lang)
       [DW_LANG_Ada95] = "Ada95",
       [DW_LANG_Fortran95] = "Fortran95",
       [DW_LANG_PL1] = "PL1",
-      [DW_LANG_Objc] = "Objective C",
+      [DW_LANG_ObjC] = "Objective C",
       [DW_LANG_ObjC_plus_plus] = "Objective C++",
       [DW_LANG_UPC] = "UPC",
       [DW_LANG_D] = "D",
@@ -4408,7 +4408,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	     DW_TAG_formal_parameter.  */
 	  NEED (4);
 	  printf ("%*s[%4" PRIuMAX "] %s [%6" PRIxMAX "]\n",
-		  indent, "", (uintmax_t) offset, op_name,
+		  indent, "", (uintmax_t) offset, known[op],
 		  (uintmax_t) read_4ubyte_unaligned (dbg, data));
 	  CONSUME (4);
 	  data += 4;

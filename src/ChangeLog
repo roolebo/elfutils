@@ -1,3 +1,9 @@
+2012-07-30  Petr Machata  <pmachata@redhat.com>
+
+	* nm.c (show_symbols_bsd): Reorder arguments in {S,}FMTSTRS (and
+	corresponding printf) so that those that are referenced by only
+	one of the formatting strings are at the end.
+
 2012-07-29  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (dwarf_lang_string): Use DW_LANG_ObjC, not DW_LANG_Objc.

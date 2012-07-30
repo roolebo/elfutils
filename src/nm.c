@@ -929,15 +929,15 @@ show_symbols_bsd (Elf *elf, const GElf_Ehdr *ehdr, GElf_Word strndx,
 
   static const char *const fmtstrs[] =
     {
-      [radix_hex] = "%8$s%2$0*1$" PRIx64 "%10$s %9$s%3$c%4$s %5$s",
-      [radix_decimal] = "%8$s%*" PRId64 "%10$s %9$s%3$c%4$s %5$s",
-      [radix_octal] = "%8$s%2$0*1$" PRIo64 "%10$s %9$s%3$c%4$s %5$s"
+      [radix_hex] = "%6$s%2$0*1$" PRIx64 "%8$s %7$s%3$c%4$s %5$s",
+      [radix_decimal] = "%6$s%*" PRId64 "%8$s %7$s%3$c%4$s %5$s",
+      [radix_octal] = "%6$s%2$0*1$" PRIo64 "%8$s %7$s%3$c%4$s %5$s"
     };
   static const char *const sfmtstrs[] =
     {
-      [radix_hex] = "%8$s%2$0*1$" PRIx64 "%10$s %7$0*6$" PRIx64 " %9$s%3$c%4$s %5$s",
-      [radix_decimal] = "%8$s%2$*1$" PRId64 "%10$s %7$*6$" PRId64 " %9$s%3$c%4$s %5$s",
-      [radix_octal] = "%8$s%2$0*1$" PRIo64 "%10$s %7$0*6$" PRIo64 " %9$s%3$c%4$s %5$s"
+      [radix_hex] = "%6$s%2$0*1$" PRIx64 "%8$s %10$0*9$" PRIx64 " %7$s%3$c%4$s %5$s",
+      [radix_decimal] = "%6$s%2$*1$" PRId64 "%8$s %10$*9$" PRId64 " %7$s%3$c%4$s %5$s",
+      [radix_octal] = "%6$s%2$0*1$" PRIo64 "%8$s %10$0*9$" PRIo64 " %7$s%3$c%4$s %5$s"
     };
 
 #ifdef USE_DEMANGLE
@@ -1020,10 +1020,10 @@ show_symbols_bsd (Elf *elf, const GElf_Ehdr *ehdr, GElf_Word strndx,
 		  digits, syms[cnt].sym.st_value,
 		  class_type_char (elf, ehdr, &syms[cnt].sym), marker,
 		  symstr,
-		  digits, (uint64_t) syms[cnt].sym.st_size,
 		  color_mode ? color_address : "",
 		  color,
-		  color_mode ? color_off : "");
+		  color_mode ? color_off : "",
+		  digits, (uint64_t) syms[cnt].sym.st_size);
 	}
 
       if (color_mode)

@@ -115,8 +115,22 @@ testrun_on_self()
   exit_status=0
 
   for file in $self_test_files; do
-      testrun "$@" $file \
-	  || { echo "*** failure in $@ $file"; exit_status=1; }
+      testrun $* $file \
+	  || { echo "*** failure in $* $file"; exit_status=1; }
+  done
+
+  # Only exit if something failed
+  if test $exit_status != 0; then exit $exit_status; fi
+}
+
+# Same as above, but redirects stdout to /dev/null
+testrun_on_self_quiet()
+{
+  exit_status=0
+
+  for file in $self_test_files; do
+      testrun $* $file > /dev/null \
+	  || { echo "*** failure in $* $file"; exit_status=1; }
   done
 
   # Only exit if something failed

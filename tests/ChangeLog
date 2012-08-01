@@ -1,3 +1,10 @@
+2012-08-01  Petr Machata  <pmachata@redhat.com>
+
+	* run-test-archive64.sh: New test.
+	* testarchive64.a.bz2: New testfile.
+	* Makefile.am (TESTS): Add run-test-archive64.sh.
+	(EXTRA_DIST): Likewise.
+
 2012-08-01  Mark Wielaard  <mjw@redhat.com>
 
 	* run-nm-self.sh: New test.

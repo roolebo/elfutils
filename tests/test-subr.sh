@@ -103,3 +103,22 @@ program_transform()
 {
   echo "$*" | sed "${program_transform_name}"
 }
+
+self_test_files=`echo ../src/addr2line ../src/elfcmp ../src/elflint \
+../src/findtextrel ../src/ld ../src/nm ../src/objdump ../src/readelf \
+../src/size ../src/strip ../libelf/libelf.so ../libdw/libdw.so \
+../libasm/libasm.so ../backends/libebl_*.so`
+
+# Provide a command to run on all self-test files with testrun.
+testrun_on_self()
+{
+  exit_status=0
+
+  for file in $self_test_files; do
+      testrun "$@" $file \
+	  || { echo "*** failure in $@ $file"; exit_status=1; }
+  done
+
+  # Only exit if something failed
+  if test $exit_status != 0; then exit $exit_status; fi
+}

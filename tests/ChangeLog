@@ -1,3 +1,9 @@
+2012-08-01  Mark Wielaard  <mjw@redhat.com>
+
+	* test-subr.sh (self_test_files): New list of files.
+	(testrun_on_self): New function.
+	* run-elflint-self.sh: Use testrun_on_self.
+
 2012-07-19  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (check_PROGRAMS): Add test-elf_cntl_gelf_getshdr.

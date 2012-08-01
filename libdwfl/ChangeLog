@@ -1,3 +1,7 @@
+2012-08-01  Petr Machata  <pmachata@redhat.com>
+
+	* offline.c (process_archive_member): Ignore entry "/SYM64/".
+
 2012-03-28  Roland McGrath  <roland@hack.frob.com>
 
 	* dwfl_segment_report_module.c

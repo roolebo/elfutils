@@ -1,3 +1,11 @@
+2012-08-01  Petr Machata  <pmachata@redhat.com>
+
+	* elf_getarsym (read_number_entries): New function.
+	(elf_getarsym): Handle 64-bit symbol table, stored in special
+	entry named "/SYM64/".
+	* elf_begin.c (__libelf_next_arhdr_wrlock): Don't reject archive
+	because it contains 64-bit symbol table.
+
 2012-07-19  Mark Wielaard  <mjw@redhat.com>
 
 	* elf32_getshdr.c (load_shdr_wrlock): Add elf->flags & ELF_F_MALLOCED

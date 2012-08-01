@@ -1,5 +1,5 @@
 /* Recover relocatibility for addresses computed from debug information.
-   Copyright (C) 2005, 2006, 2007, 2008, 2009 Red Hat, Inc.
+   Copyright (C) 2005-2009, 2012 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -169,7 +169,8 @@ process_archive_member (Dwfl *dwfl, const char *name, const char *file_name,
       return ELF_C_NULL;
     }
 
-  if (!strcmp (h->ar_name, "/") || !strcmp (h->ar_name, "//"))
+  if (!strcmp (h->ar_name, "/") || !strcmp (h->ar_name, "//")
+      || !strcmp (h->ar_name, "/SYM64/"))
     {
     skip:;
       /* Skip this and go to the next.  */

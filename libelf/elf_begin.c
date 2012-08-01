@@ -1,5 +1,5 @@
 /* Create descriptor for processing file.
-   Copyright (C) 1998-2010 Red Hat, Inc.
+   Copyright (C) 1998-2010, 2012 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -787,6 +787,10 @@ __libelf_next_arhdr_wrlock (elf)
 	  && memcmp (ar_hdr->ar_name, "/               ", 16) == 0)
 	/* This is the index.  */
 	elf_ar_hdr->ar_name = memcpy (elf->state.ar.ar_name, "/", 2);
+      else if (ar_hdr->ar_name[1] == 'S'
+	       && memcmp (ar_hdr->ar_name, "/SYM64/         ", 16) == 0)
+	/* 64-bit index.  */
+	elf_ar_hdr->ar_name = memcpy (elf->state.ar.ar_name, "/SYM64/", 8);
       else if (ar_hdr->ar_name[1] == '/'
 	       && memcmp (ar_hdr->ar_name, "//              ", 16) == 0)
 	/* This is the array with the long names.  */

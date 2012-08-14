@@ -46,11 +46,6 @@
 #endif
 
 
-/* The SECTION_STRIP_P macro wants to call into libebl which we cannot
-   do and do not have to do here.  Provide a dummy replacement.  */
-#define ebl_debugscn_p(ebl, name) true
-
-
 #define process_block(crc, data) \
   __libelf_crc32 (crc, data->d_buf, data->d_size)
 

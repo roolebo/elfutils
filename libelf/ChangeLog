@@ -1,3 +1,8 @@
+2012-08-14  Mark Wielaard  <mjw@redhat.com>
+
+	* elf32_checksum.c (ebl_debugscn_p): Removed unused define and
+	confusing outdated comment.
+
 2012-08-01  Petr Machata  <pmachata@redhat.com>
 
 	* elf_getarsym (read_number_entries): New function.

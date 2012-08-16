@@ -1,3 +1,7 @@
+2012-08-16  Roland McGrath  <roland@hack.frob.com>
+
+	* elf.h: Update from glibc.
+
 2012-08-14  Mark Wielaard  <mjw@redhat.com>
 
 	* elf32_checksum.c (ebl_debugscn_p): Removed unused define and

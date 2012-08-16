@@ -1,6 +1,5 @@
 /* This file defines standard ELF types, structures, and macros.
-   Copyright (C) 1995-2003,2004,2005,2006,2007,2008,2009,2010
-	Free Software Foundation, Inc.
+   Copyright (C) 1995-2012 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -14,9 +13,8 @@
    Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
 
 #ifndef _ELF_H
 #define	_ELF_H 1
@@ -142,7 +140,8 @@ typedef struct
 #define ELFOSABI_SYSV		0	/* Alias.  */
 #define ELFOSABI_HPUX		1	/* HP-UX */
 #define ELFOSABI_NETBSD		2	/* NetBSD.  */
-#define ELFOSABI_LINUX		3	/* Linux.  */
+#define ELFOSABI_GNU		3	/* Object uses GNU ELF extensions.  */
+#define ELFOSABI_LINUX		ELFOSABI_GNU /* Compatibility alias.  */
 #define ELFOSABI_SOLARIS	6	/* Sun Solaris.  */
 #define ELFOSABI_AIX		7	/* IBM AIX.  */
 #define ELFOSABI_IRIX		8	/* SGI Irix.  */
@@ -250,7 +249,9 @@ typedef struct
 #define EM_OPENRISC	92		/* OpenRISC 32-bit embedded processor */
 #define EM_ARC_A5	93		/* ARC Cores Tangent-A5 */
 #define EM_XTENSA	94		/* Tensilica Xtensa Architecture */
-#define EM_NUM		95
+#define EM_TILEPRO	188		/* Tilera TILEPro */
+#define EM_TILEGX	191		/* Tilera TILE-Gx */
+#define EM_NUM		192
 
 /* If it is necessary to assign new unofficial EM_* values, please
    pick large random numbers (0x8523, 0xa7f2, etc.) to minimize the
@@ -1326,6 +1327,7 @@ typedef struct
 #define R_SPARC_H34		85
 #define R_SPARC_SIZE32		86
 #define R_SPARC_SIZE64		87
+#define R_SPARC_WDISP10		88
 #define R_SPARC_JMP_IREL	248
 #define R_SPARC_IRELATIVE	249
 #define R_SPARC_GNU_VTINHERIT	250
@@ -1338,17 +1340,6 @@ typedef struct
 
 #define DT_SPARC_REGISTER 0x70000001
 #define DT_SPARC_NUM	2
-
-/* Bits present in AT_HWCAP on SPARC.  */
-
-#define HWCAP_SPARC_FLUSH	1	/* The CPU supports flush insn.  */
-#define HWCAP_SPARC_STBAR	2
-#define HWCAP_SPARC_SWAP	4
-#define HWCAP_SPARC_MULDIV	8
-#define HWCAP_SPARC_V9		16	/* The CPU is v9, so v8plus is ok.  */
-#define HWCAP_SPARC_ULTRA3	32
-#define HWCAP_SPARC_BLKINIT	64	/* Sun4v with block-init/load-twin.  */
-#define HWCAP_SPARC_N2		128
 
 /* MIPS R3000 specific definitions.  */
 
@@ -2318,7 +2309,8 @@ typedef Elf32_Addr Elf32_Conflict;
 #define R_ARM_THM_PC22		10
 #define R_ARM_THM_PC8		11
 #define R_ARM_AMP_VCALL9	12
-#define R_ARM_SWI24		13
+#define R_ARM_SWI24		13	/* Obsolete static relocation.  */
+#define R_ARM_TLS_DESC		13      /* Dynamic relocation.  */
 #define R_ARM_THM_SWI8		14
 #define R_ARM_XPC25		15
 #define R_ARM_THM_XPC22		16
@@ -2339,6 +2331,10 @@ typedef Elf32_Addr Elf32_Conflict;
 #define R_ARM_LDR_SBREL_11_0	35
 #define R_ARM_ALU_SBREL_19_12	36
 #define R_ARM_ALU_SBREL_27_20	37
+#define R_ARM_TLS_GOTDESC	90
+#define R_ARM_TLS_CALL		91
+#define R_ARM_TLS_DESCSEQ	92
+#define R_ARM_THM_TLS_CALL	93
 #define R_ARM_GNU_VTENTRY	100
 #define R_ARM_GNU_VTINHERIT	101
 #define R_ARM_THM_PC11		102	/* thumb unconditional branch */
@@ -2353,6 +2349,8 @@ typedef Elf32_Addr Elf32_Conflict;
 					   static TLS block offset */
 #define R_ARM_TLS_LE32		108	/* 32 bit offset relative to static
 					   TLS block */
+#define	R_ARM_THM_TLS_DESCSEQ	129
+#define R_ARM_IRELATIVE		160
 #define R_ARM_RXPC25		249
 #define R_ARM_RSBREL32		250
 #define R_ARM_THM_RPC22		251
@@ -2629,8 +2627,9 @@ typedef Elf32_Addr Elf32_Conflict;
 #define R_390_GOTPLT20		59	/* 20 bit offset to jump slot.  */
 #define R_390_TLS_GOTIE20	60	/* 20 bit GOT offset for static TLS
 					   block offset.  */
+#define R_390_IRELATIVE         61      /* STT_GNU_IFUNC relocation.  */
 /* Keep this the last entry.  */
-#define R_390_NUM		61
+#define R_390_NUM		62
 
 
 /* CRIS relocations.  */
@@ -2705,8 +2704,9 @@ typedef Elf32_Addr Elf32_Conflict;
 					   descriptor.  */
 #define R_X86_64_TLSDESC        36	/* TLS descriptor.  */
 #define R_X86_64_IRELATIVE	37	/* Adjust indirectly by program base */
+#define R_X86_64_RELATIVE64	38	/* 64-bit adjust by program base */
 
-#define R_X86_64_NUM		38
+#define R_X86_64_NUM		39
 
 
 /* AM33 relocations.  */
@@ -2734,8 +2734,23 @@ typedef Elf32_Addr Elf32_Conflict;
 #define R_MN10300_GLOB_DAT	21	/* Create GOT entry.  */
 #define R_MN10300_JMP_SLOT	22	/* Create PLT entry.  */
 #define R_MN10300_RELATIVE	23	/* Adjust by program base.  */
-
-#define R_MN10300_NUM		24
+#define R_MN10300_TLS_GD	24	/* 32-bit offset for global dynamic.  */
+#define R_MN10300_TLS_LD	25	/* 32-bit offset for local dynamic.  */
+#define R_MN10300_TLS_LDO	26	/* Module-relative offset.  */
+#define R_MN10300_TLS_GOTIE	27	/* GOT offset for static TLS block
+					   offset.  */
+#define R_MN10300_TLS_IE	28	/* GOT address for static TLS block
+					   offset.  */
+#define R_MN10300_TLS_LE	29	/* Offset relative to static TLS
+					   block.  */
+#define R_MN10300_TLS_DTPMOD	30	/* ID of module containing symbol.  */
+#define R_MN10300_TLS_DTPOFF	31	/* Offset in module TLS block.  */
+#define R_MN10300_TLS_TPOFF	32	/* Offset in static TLS block.  */
+#define R_MN10300_SYM_DIFF	33	/* Adjustment for next reloc as needed
+					   by linker relaxation.  */
+#define R_MN10300_ALIGN		34	/* Alignment requirement for linker
+					   relaxation.  */
+#define R_MN10300_NUM		35
 
 
 /* M32R relocs.  */
@@ -2792,6 +2807,221 @@ typedef Elf32_Addr Elf32_Conflict;
 					   with signed low */
 #define R_M32R_GOTOFF_LO	64	/* Low 16 bit offset to GOT */
 #define R_M32R_NUM		256	/* Keep this the last entry. */
+
+
+/* TILEPro relocations.  */
+#define R_TILEPRO_NONE		0	/* No reloc */
+#define R_TILEPRO_32		1	/* Direct 32 bit */
+#define R_TILEPRO_16		2	/* Direct 16 bit */
+#define R_TILEPRO_8		3	/* Direct 8 bit */
+#define R_TILEPRO_32_PCREL	4	/* PC relative 32 bit */
+#define R_TILEPRO_16_PCREL	5	/* PC relative 16 bit */
+#define R_TILEPRO_8_PCREL	6	/* PC relative 8 bit */
+#define R_TILEPRO_LO16		7	/* Low 16 bit */
+#define R_TILEPRO_HI16		8	/* High 16 bit */
+#define R_TILEPRO_HA16		9	/* High 16 bit, adjusted */
+#define R_TILEPRO_COPY		10	/* Copy relocation */
+#define R_TILEPRO_GLOB_DAT	11	/* Create GOT entry */
+#define R_TILEPRO_JMP_SLOT	12	/* Create PLT entry */
+#define R_TILEPRO_RELATIVE	13	/* Adjust by program base */
+#define R_TILEPRO_BROFF_X1	14	/* X1 pipe branch offset */
+#define R_TILEPRO_JOFFLONG_X1	15	/* X1 pipe jump offset */
+#define R_TILEPRO_JOFFLONG_X1_PLT 16	/* X1 pipe jump offset to PLT */
+#define R_TILEPRO_IMM8_X0	17	/* X0 pipe 8-bit */
+#define R_TILEPRO_IMM8_Y0	18	/* Y0 pipe 8-bit */
+#define R_TILEPRO_IMM8_X1	19	/* X1 pipe 8-bit */
+#define R_TILEPRO_IMM8_Y1	20	/* Y1 pipe 8-bit */
+#define R_TILEPRO_MT_IMM15_X1	21	/* X1 pipe mtspr */
+#define R_TILEPRO_MF_IMM15_X1	22	/* X1 pipe mfspr */
+#define R_TILEPRO_IMM16_X0	23	/* X0 pipe 16-bit */
+#define R_TILEPRO_IMM16_X1	24	/* X1 pipe 16-bit */
+#define R_TILEPRO_IMM16_X0_LO	25	/* X0 pipe low 16-bit */
+#define R_TILEPRO_IMM16_X1_LO	26	/* X1 pipe low 16-bit */
+#define R_TILEPRO_IMM16_X0_HI	27	/* X0 pipe high 16-bit */
+#define R_TILEPRO_IMM16_X1_HI	28	/* X1 pipe high 16-bit */
+#define R_TILEPRO_IMM16_X0_HA	29	/* X0 pipe high 16-bit, adjusted */
+#define R_TILEPRO_IMM16_X1_HA	30	/* X1 pipe high 16-bit, adjusted */
+#define R_TILEPRO_IMM16_X0_PCREL 31	/* X0 pipe PC relative 16 bit */
+#define R_TILEPRO_IMM16_X1_PCREL 32	/* X1 pipe PC relative 16 bit */
+#define R_TILEPRO_IMM16_X0_LO_PCREL 33	/* X0 pipe PC relative low 16 bit */
+#define R_TILEPRO_IMM16_X1_LO_PCREL 34	/* X1 pipe PC relative low 16 bit */
+#define R_TILEPRO_IMM16_X0_HI_PCREL 35	/* X0 pipe PC relative high 16 bit */
+#define R_TILEPRO_IMM16_X1_HI_PCREL 36	/* X1 pipe PC relative high 16 bit */
+#define R_TILEPRO_IMM16_X0_HA_PCREL 37	/* X0 pipe PC relative ha() 16 bit */
+#define R_TILEPRO_IMM16_X1_HA_PCREL 38	/* X1 pipe PC relative ha() 16 bit */
+#define R_TILEPRO_IMM16_X0_GOT	39	/* X0 pipe 16-bit GOT offset */
+#define R_TILEPRO_IMM16_X1_GOT	40	/* X1 pipe 16-bit GOT offset */
+#define R_TILEPRO_IMM16_X0_GOT_LO 41	/* X0 pipe low 16-bit GOT offset */
+#define R_TILEPRO_IMM16_X1_GOT_LO 42	/* X1 pipe low 16-bit GOT offset */
+#define R_TILEPRO_IMM16_X0_GOT_HI 43	/* X0 pipe high 16-bit GOT offset */
+#define R_TILEPRO_IMM16_X1_GOT_HI 44	/* X1 pipe high 16-bit GOT offset */
+#define R_TILEPRO_IMM16_X0_GOT_HA 45	/* X0 pipe ha() 16-bit GOT offset */
+#define R_TILEPRO_IMM16_X1_GOT_HA 46	/* X1 pipe ha() 16-bit GOT offset */
+#define R_TILEPRO_MMSTART_X0	47	/* X0 pipe mm "start" */
+#define R_TILEPRO_MMEND_X0	48	/* X0 pipe mm "end" */
+#define R_TILEPRO_MMSTART_X1	49	/* X1 pipe mm "start" */
+#define R_TILEPRO_MMEND_X1	50	/* X1 pipe mm "end" */
+#define R_TILEPRO_SHAMT_X0	51	/* X0 pipe shift amount */
+#define R_TILEPRO_SHAMT_X1	52	/* X1 pipe shift amount */
+#define R_TILEPRO_SHAMT_Y0	53	/* Y0 pipe shift amount */
+#define R_TILEPRO_SHAMT_Y1	54	/* Y1 pipe shift amount */
+#define R_TILEPRO_DEST_IMM8_X1	55	/* X1 pipe destination 8-bit */
+/* Relocs 56-59 are currently not defined.  */
+#define R_TILEPRO_TLS_GD_CALL	60	/* "jal" for TLS GD */
+#define R_TILEPRO_IMM8_X0_TLS_GD_ADD 61	/* X0 pipe "addi" for TLS GD */
+#define R_TILEPRO_IMM8_X1_TLS_GD_ADD 62	/* X1 pipe "addi" for TLS GD */
+#define R_TILEPRO_IMM8_Y0_TLS_GD_ADD 63	/* Y0 pipe "addi" for TLS GD */
+#define R_TILEPRO_IMM8_Y1_TLS_GD_ADD 64	/* Y1 pipe "addi" for TLS GD */
+#define R_TILEPRO_TLS_IE_LOAD	65	/* "lw_tls" for TLS IE */
+#define R_TILEPRO_IMM16_X0_TLS_GD 66	/* X0 pipe 16-bit TLS GD offset */
+#define R_TILEPRO_IMM16_X1_TLS_GD 67	/* X1 pipe 16-bit TLS GD offset */
+#define R_TILEPRO_IMM16_X0_TLS_GD_LO 68	/* X0 pipe low 16-bit TLS GD offset */
+#define R_TILEPRO_IMM16_X1_TLS_GD_LO 69	/* X1 pipe low 16-bit TLS GD offset */
+#define R_TILEPRO_IMM16_X0_TLS_GD_HI 70	/* X0 pipe high 16-bit TLS GD offset */
+#define R_TILEPRO_IMM16_X1_TLS_GD_HI 71	/* X1 pipe high 16-bit TLS GD offset */
+#define R_TILEPRO_IMM16_X0_TLS_GD_HA 72	/* X0 pipe ha() 16-bit TLS GD offset */
+#define R_TILEPRO_IMM16_X1_TLS_GD_HA 73	/* X1 pipe ha() 16-bit TLS GD offset */
+#define R_TILEPRO_IMM16_X0_TLS_IE 74	/* X0 pipe 16-bit TLS IE offset */
+#define R_TILEPRO_IMM16_X1_TLS_IE 75	/* X1 pipe 16-bit TLS IE offset */
+#define R_TILEPRO_IMM16_X0_TLS_IE_LO 76	/* X0 pipe low 16-bit TLS IE offset */
+#define R_TILEPRO_IMM16_X1_TLS_IE_LO 77	/* X1 pipe low 16-bit TLS IE offset */
+#define R_TILEPRO_IMM16_X0_TLS_IE_HI 78	/* X0 pipe high 16-bit TLS IE offset */
+#define R_TILEPRO_IMM16_X1_TLS_IE_HI 79	/* X1 pipe high 16-bit TLS IE offset */
+#define R_TILEPRO_IMM16_X0_TLS_IE_HA 80	/* X0 pipe ha() 16-bit TLS IE offset */
+#define R_TILEPRO_IMM16_X1_TLS_IE_HA 81	/* X1 pipe ha() 16-bit TLS IE offset */
+#define R_TILEPRO_TLS_DTPMOD32	82	/* ID of module containing symbol */
+#define R_TILEPRO_TLS_DTPOFF32	83	/* Offset in TLS block */
+#define R_TILEPRO_TLS_TPOFF32	84	/* Offset in static TLS block */
+#define R_TILEPRO_IMM16_X0_TLS_LE 85	/* X0 pipe 16-bit TLS LE offset */
+#define R_TILEPRO_IMM16_X1_TLS_LE 86	/* X1 pipe 16-bit TLS LE offset */
+#define R_TILEPRO_IMM16_X0_TLS_LE_LO 87	/* X0 pipe low 16-bit TLS LE offset */
+#define R_TILEPRO_IMM16_X1_TLS_LE_LO 88	/* X1 pipe low 16-bit TLS LE offset */
+#define R_TILEPRO_IMM16_X0_TLS_LE_HI 89	/* X0 pipe high 16-bit TLS LE offset */
+#define R_TILEPRO_IMM16_X1_TLS_LE_HI 90	/* X1 pipe high 16-bit TLS LE offset */
+#define R_TILEPRO_IMM16_X0_TLS_LE_HA 91	/* X0 pipe ha() 16-bit TLS LE offset */
+#define R_TILEPRO_IMM16_X1_TLS_LE_HA 92	/* X1 pipe ha() 16-bit TLS LE offset */
+
+#define R_TILEPRO_GNU_VTINHERIT	128	/* GNU C++ vtable hierarchy */
+#define R_TILEPRO_GNU_VTENTRY	129	/* GNU C++ vtable member usage */
+
+#define R_TILEPRO_NUM		130
+
+
+/* TILE-Gx relocations.  */
+#define R_TILEGX_NONE		0	/* No reloc */
+#define R_TILEGX_64		1	/* Direct 64 bit */
+#define R_TILEGX_32		2	/* Direct 32 bit */
+#define R_TILEGX_16		3	/* Direct 16 bit */
+#define R_TILEGX_8		4	/* Direct 8 bit */
+#define R_TILEGX_64_PCREL	5	/* PC relative 64 bit */
+#define R_TILEGX_32_PCREL	6	/* PC relative 32 bit */
+#define R_TILEGX_16_PCREL	7	/* PC relative 16 bit */
+#define R_TILEGX_8_PCREL	8	/* PC relative 8 bit */
+#define R_TILEGX_HW0		9	/* hword 0 16-bit */
+#define R_TILEGX_HW1		10	/* hword 1 16-bit */
+#define R_TILEGX_HW2		11	/* hword 2 16-bit */
+#define R_TILEGX_HW3		12	/* hword 3 16-bit */
+#define R_TILEGX_HW0_LAST	13	/* last hword 0 16-bit */
+#define R_TILEGX_HW1_LAST	14	/* last hword 1 16-bit */
+#define R_TILEGX_HW2_LAST	15	/* last hword 2 16-bit */
+#define R_TILEGX_COPY		16	/* Copy relocation */
+#define R_TILEGX_GLOB_DAT	17	/* Create GOT entry */
+#define R_TILEGX_JMP_SLOT	18	/* Create PLT entry */
+#define R_TILEGX_RELATIVE	19	/* Adjust by program base */
+#define R_TILEGX_BROFF_X1	20	/* X1 pipe branch offset */
+#define R_TILEGX_JUMPOFF_X1	21	/* X1 pipe jump offset */
+#define R_TILEGX_JUMPOFF_X1_PLT	22	/* X1 pipe jump offset to PLT */
+#define R_TILEGX_IMM8_X0	23	/* X0 pipe 8-bit */
+#define R_TILEGX_IMM8_Y0	24	/* Y0 pipe 8-bit */
+#define R_TILEGX_IMM8_X1	25	/* X1 pipe 8-bit */
+#define R_TILEGX_IMM8_Y1	26	/* Y1 pipe 8-bit */
+#define R_TILEGX_DEST_IMM8_X1	27	/* X1 pipe destination 8-bit */
+#define R_TILEGX_MT_IMM14_X1	28	/* X1 pipe mtspr */
+#define R_TILEGX_MF_IMM14_X1	29	/* X1 pipe mfspr */
+#define R_TILEGX_MMSTART_X0	30	/* X0 pipe mm "start" */
+#define R_TILEGX_MMEND_X0	31	/* X0 pipe mm "end" */
+#define R_TILEGX_SHAMT_X0	32	/* X0 pipe shift amount */
+#define R_TILEGX_SHAMT_X1	33	/* X1 pipe shift amount */
+#define R_TILEGX_SHAMT_Y0	34	/* Y0 pipe shift amount */
+#define R_TILEGX_SHAMT_Y1	35	/* Y1 pipe shift amount */
+#define R_TILEGX_IMM16_X0_HW0	36	/* X0 pipe hword 0 */
+#define R_TILEGX_IMM16_X1_HW0	37	/* X1 pipe hword 0 */
+#define R_TILEGX_IMM16_X0_HW1	38	/* X0 pipe hword 1 */
+#define R_TILEGX_IMM16_X1_HW1	39	/* X1 pipe hword 1 */
+#define R_TILEGX_IMM16_X0_HW2	40	/* X0 pipe hword 2 */
+#define R_TILEGX_IMM16_X1_HW2	41	/* X1 pipe hword 2 */
+#define R_TILEGX_IMM16_X0_HW3	42	/* X0 pipe hword 3 */
+#define R_TILEGX_IMM16_X1_HW3	43	/* X1 pipe hword 3 */
+#define R_TILEGX_IMM16_X0_HW0_LAST 44	/* X0 pipe last hword 0 */
+#define R_TILEGX_IMM16_X1_HW0_LAST 45	/* X1 pipe last hword 0 */
+#define R_TILEGX_IMM16_X0_HW1_LAST 46	/* X0 pipe last hword 1 */
+#define R_TILEGX_IMM16_X1_HW1_LAST 47	/* X1 pipe last hword 1 */
+#define R_TILEGX_IMM16_X0_HW2_LAST 48	/* X0 pipe last hword 2 */
+#define R_TILEGX_IMM16_X1_HW2_LAST 49	/* X1 pipe last hword 2 */
+#define R_TILEGX_IMM16_X0_HW0_PCREL 50	/* X0 pipe PC relative hword 0 */
+#define R_TILEGX_IMM16_X1_HW0_PCREL 51	/* X1 pipe PC relative hword 0 */
+#define R_TILEGX_IMM16_X0_HW1_PCREL 52	/* X0 pipe PC relative hword 1 */
+#define R_TILEGX_IMM16_X1_HW1_PCREL 53	/* X1 pipe PC relative hword 1 */
+#define R_TILEGX_IMM16_X0_HW2_PCREL 54	/* X0 pipe PC relative hword 2 */
+#define R_TILEGX_IMM16_X1_HW2_PCREL 55	/* X1 pipe PC relative hword 2 */
+#define R_TILEGX_IMM16_X0_HW3_PCREL 56	/* X0 pipe PC relative hword 3 */
+#define R_TILEGX_IMM16_X1_HW3_PCREL 57	/* X1 pipe PC relative hword 3 */
+#define R_TILEGX_IMM16_X0_HW0_LAST_PCREL 58 /* X0 pipe PC-rel last hword 0 */
+#define R_TILEGX_IMM16_X1_HW0_LAST_PCREL 59 /* X1 pipe PC-rel last hword 0 */
+#define R_TILEGX_IMM16_X0_HW1_LAST_PCREL 60 /* X0 pipe PC-rel last hword 1 */
+#define R_TILEGX_IMM16_X1_HW1_LAST_PCREL 61 /* X1 pipe PC-rel last hword 1 */
+#define R_TILEGX_IMM16_X0_HW2_LAST_PCREL 62 /* X0 pipe PC-rel last hword 2 */
+#define R_TILEGX_IMM16_X1_HW2_LAST_PCREL 63 /* X1 pipe PC-rel last hword 2 */
+#define R_TILEGX_IMM16_X0_HW0_GOT 64	/* X0 pipe hword 0 GOT offset */
+#define R_TILEGX_IMM16_X1_HW0_GOT 65	/* X1 pipe hword 0 GOT offset */
+/* Relocs 66-71 are currently not defined.  */
+#define R_TILEGX_IMM16_X0_HW0_LAST_GOT 72 /* X0 pipe last hword 0 GOT offset */
+#define R_TILEGX_IMM16_X1_HW0_LAST_GOT 73 /* X1 pipe last hword 0 GOT offset */
+#define R_TILEGX_IMM16_X0_HW1_LAST_GOT 74 /* X0 pipe last hword 1 GOT offset */
+#define R_TILEGX_IMM16_X1_HW1_LAST_GOT 75 /* X1 pipe last hword 1 GOT offset */
+/* Relocs 76-77 are currently not defined.  */
+#define R_TILEGX_IMM16_X0_HW0_TLS_GD 78	/* X0 pipe hword 0 TLS GD offset */
+#define R_TILEGX_IMM16_X1_HW0_TLS_GD 79	/* X1 pipe hword 0 TLS GD offset */
+#define R_TILEGX_IMM16_X0_HW0_TLS_LE 80	/* X0 pipe hword 0 TLS LE offset */
+#define R_TILEGX_IMM16_X1_HW0_TLS_LE 81	/* X1 pipe hword 0 TLS LE offset */
+#define R_TILEGX_IMM16_X0_HW0_LAST_TLS_LE 82 /* X0 pipe last hword 0 LE off */
+#define R_TILEGX_IMM16_X1_HW0_LAST_TLS_LE 83 /* X1 pipe last hword 0 LE off */
+#define R_TILEGX_IMM16_X0_HW1_LAST_TLS_LE 84 /* X0 pipe last hword 1 LE off */
+#define R_TILEGX_IMM16_X1_HW1_LAST_TLS_LE 85 /* X1 pipe last hword 1 LE off */
+#define R_TILEGX_IMM16_X0_HW0_LAST_TLS_GD 86 /* X0 pipe last hword 0 GD off */
+#define R_TILEGX_IMM16_X1_HW0_LAST_TLS_GD 87 /* X1 pipe last hword 0 GD off */
+#define R_TILEGX_IMM16_X0_HW1_LAST_TLS_GD 88 /* X0 pipe last hword 1 GD off */
+#define R_TILEGX_IMM16_X1_HW1_LAST_TLS_GD 89 /* X1 pipe last hword 1 GD off */
+/* Relocs 90-91 are currently not defined.  */
+#define R_TILEGX_IMM16_X0_HW0_TLS_IE 92	/* X0 pipe hword 0 TLS IE offset */
+#define R_TILEGX_IMM16_X1_HW0_TLS_IE 93	/* X1 pipe hword 0 TLS IE offset */
+/* Relocs 94-99 are currently not defined.  */
+#define R_TILEGX_IMM16_X0_HW0_LAST_TLS_IE 100 /* X0 pipe last hword 0 IE off */
+#define R_TILEGX_IMM16_X1_HW0_LAST_TLS_IE 101 /* X1 pipe last hword 0 IE off */
+#define R_TILEGX_IMM16_X0_HW1_LAST_TLS_IE 102 /* X0 pipe last hword 1 IE off */
+#define R_TILEGX_IMM16_X1_HW1_LAST_TLS_IE 103 /* X1 pipe last hword 1 IE off */
+/* Relocs 104-105 are currently not defined.  */
+#define R_TILEGX_TLS_DTPMOD64	106	/* 64-bit ID of symbol's module */
+#define R_TILEGX_TLS_DTPOFF64	107	/* 64-bit offset in TLS block */
+#define R_TILEGX_TLS_TPOFF64	108	/* 64-bit offset in static TLS block */
+#define R_TILEGX_TLS_DTPMOD32	109	/* 32-bit ID of symbol's module */
+#define R_TILEGX_TLS_DTPOFF32	110	/* 32-bit offset in TLS block */
+#define R_TILEGX_TLS_TPOFF32	111	/* 32-bit offset in static TLS block */
+#define R_TILEGX_TLS_GD_CALL	112	/* "jal" for TLS GD */
+#define R_TILEGX_IMM8_X0_TLS_GD_ADD 113	/* X0 pipe "addi" for TLS GD */
+#define R_TILEGX_IMM8_X1_TLS_GD_ADD 114	/* X1 pipe "addi" for TLS GD */
+#define R_TILEGX_IMM8_Y0_TLS_GD_ADD 115	/* Y0 pipe "addi" for TLS GD */
+#define R_TILEGX_IMM8_Y1_TLS_GD_ADD 116	/* Y1 pipe "addi" for TLS GD */
+#define R_TILEGX_TLS_IE_LOAD	117	/* "ld_tls" for TLS IE */
+#define R_TILEGX_IMM8_X0_TLS_ADD 118	/* X0 pipe "addi" for TLS GD/IE */
+#define R_TILEGX_IMM8_X1_TLS_ADD 119	/* X1 pipe "addi" for TLS GD/IE */
+#define R_TILEGX_IMM8_Y0_TLS_ADD 120	/* Y0 pipe "addi" for TLS GD/IE */
+#define R_TILEGX_IMM8_Y1_TLS_ADD 121	/* Y1 pipe "addi" for TLS GD/IE */
+
+#define R_TILEGX_GNU_VTINHERIT	128	/* GNU C++ vtable hierarchy */
+#define R_TILEGX_GNU_VTENTRY	129	/* GNU C++ vtable member usage */
+
+#define R_TILEGX_NUM		130
 
 
 __END_DECLS

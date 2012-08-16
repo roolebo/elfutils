@@ -28,42 +28,24 @@
 #include ELFUTILS_HEADER(dwfl)
 #include <dwarf.h>
 
+#include "../libdw/known-dwarf.h"
 
 static const char *
 dwarf_encoding_string (unsigned int code)
 {
-  static const char *known[] =
+  static const char *const known[] =
     {
-      [DW_ATE_void] = "void",
-      [DW_ATE_address] = "address",
-      [DW_ATE_boolean] = "boolean",
-      [DW_ATE_complex_float] = "complex_float",
-      [DW_ATE_float] = "float",
-      [DW_ATE_signed] = "signed",
-      [DW_ATE_signed_char] = "signed_char",
-      [DW_ATE_unsigned] = "unsigned",
-      [DW_ATE_unsigned_char] = "unsigned_char",
-      [DW_ATE_imaginary_float] = "imaginary_float",
-      [DW_ATE_packed_decimal] = "packed_decimal",
-      [DW_ATE_numeric_string] = "numeric_string",
-      [DW_ATE_edited] = "edited",
-      [DW_ATE_signed_fixed] = "signed_fixed",
-      [DW_ATE_unsigned_fixed] = "unsigned_fixed",
-      [DW_ATE_decimal_float] = "decimal_float",
+#define ONE_KNOWN_DW_ATE(NAME, CODE) [CODE] = #NAME,
+      ALL_KNOWN_DW_ATE
+#undef ONE_KNOWN_DW_ATE
     };
 
-  if (code < sizeof (known) / sizeof (known[0]))
+  if (likely (code < sizeof (known) / sizeof (known[0])))
     return known[code];
 
-  if (code >= DW_ATE_lo_user && code <= DW_ATE_hi_user)
-    {
-      static char buf[30];
-      snprintf (buf, sizeof (buf), "lo_user+%u", code - DW_ATE_lo_user);
-      return buf;
-    }
-
-  return "???";
+  return NULL;
 }
+
 
 static int
 first_module (Dwfl_Module *mod,

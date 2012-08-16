@@ -1,3 +1,14 @@
+2012-08-16  Mark Wielaard  <mjw@redhat.com>
+
+	* allregs.c (dwarf_encoding_string): Rewritten using known-dwarf
+	macros.
+	* show-die-info.c (tagnames): Removed.
+	(attrs): Removed.
+	(dwarf_tag_string): New function using known-dwarf macros.
+	(dwarf_attr_string): Likewise.
+	(handle): Call dwarf_tag_string and dwarf_attr_string instead.
+	* run-readelf-dwz-multi.sh: Expect language C89, not ISO C89.
+
 2012-06-27  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (TESTS): Add run-readelf-dwz-multi.sh.

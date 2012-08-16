@@ -581,10 +581,10 @@ enum
     DW_LANG_UPC = 0x0012,	     /* Unified Parallel C */
     DW_LANG_D = 0x0013,		     /* D */
     DW_LANG_Python = 0x0014,	     /* Python */
-    DW_LANG_Go = 0x0016,	     /* Google's Go (provisionally in DWARF5) */
+    DW_LANG_Go = 0x0016,	     /* Go */
 
     DW_LANG_lo_user = 0x8000,
-    DW_LANG_Mips_Assembler = 0x8001,
+    DW_LANG_Mips_Assembler = 0x8001, /* Assembler */
     DW_LANG_hi_user = 0xffff
   };
 

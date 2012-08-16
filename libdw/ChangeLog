@@ -1,3 +1,9 @@
+2012-08-16  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (EXTRA_DIST): Add known-dwarf.h.
+	* dwarf.h (DW_LANG_Go): Update comment.
+	(DW_LANG_Mips_Assembler): Likewise.
+
 2012-06-27  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf.h: Add DW_FORM_GNU_ref_alt and DW_FORM_GNU_strp_alt.

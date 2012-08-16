@@ -66,7 +66,7 @@ DWARF section [28] '.debug_info' at offset 0x1078:
  Version: 4, Abbreviation section offset: 0, Address size: 8, Offset size: 4
  [     b]  compile_unit
            producer             (strp) "GNU C 4.7.0 20120507 (Red Hat 4.7.0-5) -mtune=generic -march=x86-64 -g"
-           language             (data1) ISO C89 (1)
+           language             (data1) C89 (1)
            name                 (strp) "main.c"
            comp_dir             (GNU_strp_alt) "/home/mark/src/tests/dwz"
            low_pc               (addr) 0x00000000004006ac <main>
@@ -124,7 +124,7 @@ DWARF section [25] '.debug_info' at offset 0x106c:
  Version: 4, Abbreviation section offset: 0, Address size: 8, Offset size: 4
  [     b]  compile_unit
            producer             (strp) "GNU C 4.7.0 20120507 (Red Hat 4.7.0-5) -fpreprocessed -mtune=generic -march=x86-64 -g -fPIC"
-           language             (data1) ISO C89 (1)
+           language             (data1) C89 (1)
            name                 (strp) "shared.c"
            comp_dir             (GNU_strp_alt) "/home/mark/src/tests/dwz"
            low_pc               (addr) +0x0000000000000670 <call_foo>

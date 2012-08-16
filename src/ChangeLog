@@ -1,3 +1,38 @@
+2012-08-16  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (dwarf_tag_name): Renamed from dwarf_tag_string.
+	Uses new dwarf_tag_string or adds ??? or lo_user+%#x when
+	appropriate.
+	(dwarf_attr_name): Likewise.
+	(dwarf_form_name): Likewise.
+	(dwarf_lang_name): Likewise.
+	(dwarf_inline_name): Likewise.
+	(dwarf_encoding_name): Likewise.
+	(dwarf_access_name): Likewise.
+	(dwarf_visibility_name): Likewise.
+	(dwarf_virtuality_name): Likewise.
+	(dwarf_identifier_case_name): Likewise.
+	(dwarf_calling_convention_name): Likewise.
+	(dwarf_ordering_name): Likewise.
+	(dwarf_discr_list_name): Likewise.
+	(print_ops): Remove KNOWN.  Use dwarf_locexpr_opcode_string.
+	(attr_callback): Call new dwarf_foobar_name instead of old
+	dwarf_foobar_string functions.
+	(dwarf_tag_string): New function using known-dwarf.h macros.
+	(dwarf_attr_string): Likewise.
+	(dwarf_form_string): Likewise.
+	(dwarf_lang_string): Likewise.
+	(dwarf_inline_string): Likewise.
+	(dwarf_encoding_string): Likewise.
+	(dwarf_access_string): Likewise.
+	(dwarf_visibility_string): Likewise.
+	(dwarf_virtuality_string): Likewise.
+	(dwarf_identifier_case_string): Likewise.
+	(dwarf_calling_convention_string): Likewise.
+	(dwarf_ordering_string): Likewise.
+	(dwarf_discr_list_string): Likewise.
+	(dwarf_locexpr_opcode_string): Likewise.
+
 2012-06-27  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (dwarf_form_string): Handle DW_FORM_GNU_ref_alt and

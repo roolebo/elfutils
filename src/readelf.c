@@ -51,6 +51,8 @@
 #include "../libdwfl/libdwflP.h"
 #include "../libdw/memory-access.h"
 
+#include "../libdw/known-dwarf.h"
+
 
 /* Name and version of program.  */
 static void print_version (FILE *stream, struct argp_state *state);
@@ -3184,539 +3186,58 @@ format_dwarf_addr (Dwfl_Module *dwflmod,
 static const char *
 dwarf_tag_string (unsigned int tag)
 {
-  static const char *const known_tags[]  =
+  switch (tag)
     {
-      [DW_TAG_array_type] = "array_type",
-      [DW_TAG_class_type] = "class_type",
-      [DW_TAG_entry_point] = "entry_point",
-      [DW_TAG_enumeration_type] = "enumeration_type",
-      [DW_TAG_formal_parameter] = "formal_parameter",
-      [DW_TAG_imported_declaration] = "imported_declaration",
-      [DW_TAG_label] = "label",
-      [DW_TAG_lexical_block] = "lexical_block",
-      [DW_TAG_member] = "member",
-      [DW_TAG_pointer_type] = "pointer_type",
-      [DW_TAG_reference_type] = "reference_type",
-      [DW_TAG_compile_unit] = "compile_unit",
-      [DW_TAG_string_type] = "string_type",
-      [DW_TAG_structure_type] = "structure_type",
-      [DW_TAG_subroutine_type] = "subroutine_type",
-      [DW_TAG_typedef] = "typedef",
-      [DW_TAG_union_type] = "union_type",
-      [DW_TAG_unspecified_parameters] = "unspecified_parameters",
-      [DW_TAG_variant] = "variant",
-      [DW_TAG_common_block] = "common_block",
-      [DW_TAG_common_inclusion] = "common_inclusion",
-      [DW_TAG_inheritance] = "inheritance",
-      [DW_TAG_inlined_subroutine] = "inlined_subroutine",
-      [DW_TAG_module] = "module",
-      [DW_TAG_ptr_to_member_type] = "ptr_to_member_type",
-      [DW_TAG_set_type] = "set_type",
-      [DW_TAG_subrange_type] = "subrange_type",
-      [DW_TAG_with_stmt] = "with_stmt",
-      [DW_TAG_access_declaration] = "access_declaration",
-      [DW_TAG_base_type] = "base_type",
-      [DW_TAG_catch_block] = "catch_block",
-      [DW_TAG_const_type] = "const_type",
-      [DW_TAG_constant] = "constant",
-      [DW_TAG_enumerator] = "enumerator",
-      [DW_TAG_file_type] = "file_type",
-      [DW_TAG_friend] = "friend",
-      [DW_TAG_namelist] = "namelist",
-      [DW_TAG_namelist_item] = "namelist_item",
-      [DW_TAG_packed_type] = "packed_type",
-      [DW_TAG_subprogram] = "subprogram",
-      [DW_TAG_template_type_parameter] = "template_type_parameter",
-      [DW_TAG_template_value_parameter] = "template_value_parameter",
-      [DW_TAG_thrown_type] = "thrown_type",
-      [DW_TAG_try_block] = "try_block",
-      [DW_TAG_variant_part] = "variant_part",
-      [DW_TAG_variable] = "variable",
-      [DW_TAG_volatile_type] = "volatile_type",
-      [DW_TAG_dwarf_procedure] = "dwarf_procedure",
-      [DW_TAG_restrict_type] = "restrict_type",
-      [DW_TAG_interface_type] = "interface_type",
-      [DW_TAG_namespace] = "namespace",
-      [DW_TAG_imported_module] = "imported_module",
-      [DW_TAG_unspecified_type] = "unspecified_type",
-      [DW_TAG_partial_unit] = "partial_unit",
-      [DW_TAG_imported_unit] = "imported_unit",
-      [DW_TAG_mutable_type] = "mutable_type",
-      [DW_TAG_condition] = "condition",
-      [DW_TAG_shared_type] = "shared_type",
-      [DW_TAG_type_unit] = "type_unit",
-      [DW_TAG_rvalue_reference_type] = "rvalue_reference_type",
-      [DW_TAG_template_alias] = "template_alias",
-    };
-  const unsigned int nknown_tags = (sizeof (known_tags)
-				    / sizeof (known_tags[0]));
-  static char buf[40];
-  const char *result = NULL;
-
-  if (likely (tag < nknown_tags))
-    result = known_tags[tag];
-
-  if (unlikely (result == NULL))
-    /* There are a few known extensions.  */
-    switch (tag)
-      {
-      case DW_TAG_MIPS_loop:
-	result = "MIPS_loop";
-	break;
-
-      case DW_TAG_format_label:
-	result = "format_label";
-	break;
-
-      case DW_TAG_function_template:
-	result = "function_template";
-	break;
-
-      case DW_TAG_class_template:
-	result = "class_template";
-	break;
-
-      case DW_TAG_GNU_BINCL:
-	result = "GNU_BINCL";
-	break;
-
-      case DW_TAG_GNU_EINCL:
-	result = "GNU_EINCL";
-	break;
-
-      case DW_TAG_GNU_template_template_param:
-	result = "GNU_template_template_param";
-	break;
-
-      case DW_TAG_GNU_template_parameter_pack:
-	result = "GNU_template_parameter_pack";
-	break;
-
-      case DW_TAG_GNU_formal_parameter_pack:
-	result = "GNU_formal_parameter_pack";
-	break;
-
-      case DW_TAG_GNU_call_site:
-	result = "GNU_call_site";
-	break;
-
-      case DW_TAG_GNU_call_site_parameter:
-	result = "GNU_call_site_parameter";
-	break;
-
-      default:
-	if (tag < DW_TAG_lo_user)
-	  snprintf (buf, sizeof buf, gettext ("unknown tag %hx"), tag);
-	else
-	  snprintf (buf, sizeof buf, gettext ("unknown user tag %hx"), tag);
-	result = buf;
-	break;
-      }
-
-  return result;
+#define ONE_KNOWN_DW_TAG(NAME, CODE) case CODE: return #NAME;
+      ALL_KNOWN_DW_TAG
+#undef ONE_KNOWN_DW_TAG
+    default:
+      return NULL;
+    }
 }
 
 
 static const char *
 dwarf_attr_string (unsigned int attrnum)
 {
-  static const char *const known_attrs[] =
+  switch (attrnum)
     {
-      [DW_AT_sibling] = "sibling",
-      [DW_AT_location] = "location",
-      [DW_AT_name] = "name",
-      [DW_AT_ordering] = "ordering",
-      [DW_AT_subscr_data] = "subscr_data",
-      [DW_AT_byte_size] = "byte_size",
-      [DW_AT_bit_offset] = "bit_offset",
-      [DW_AT_bit_size] = "bit_size",
-      [DW_AT_element_list] = "element_list",
-      [DW_AT_stmt_list] = "stmt_list",
-      [DW_AT_low_pc] = "low_pc",
-      [DW_AT_high_pc] = "high_pc",
-      [DW_AT_language] = "language",
-      [DW_AT_member] = "member",
-      [DW_AT_discr] = "discr",
-      [DW_AT_discr_value] = "discr_value",
-      [DW_AT_visibility] = "visibility",
-      [DW_AT_import] = "import",
-      [DW_AT_string_length] = "string_length",
-      [DW_AT_common_reference] = "common_reference",
-      [DW_AT_comp_dir] = "comp_dir",
-      [DW_AT_const_value] = "const_value",
-      [DW_AT_containing_type] = "containing_type",
-      [DW_AT_default_value] = "default_value",
-      [DW_AT_inline] = "inline",
-      [DW_AT_is_optional] = "is_optional",
-      [DW_AT_lower_bound] = "lower_bound",
-      [DW_AT_producer] = "producer",
-      [DW_AT_prototyped] = "prototyped",
-      [DW_AT_return_addr] = "return_addr",
-      [DW_AT_start_scope] = "start_scope",
-      [DW_AT_bit_stride] = "bit_stride",
-      [DW_AT_upper_bound] = "upper_bound",
-      [DW_AT_abstract_origin] = "abstract_origin",
-      [DW_AT_accessibility] = "accessibility",
-      [DW_AT_address_class] = "address_class",
-      [DW_AT_artificial] = "artificial",
-      [DW_AT_base_types] = "base_types",
-      [DW_AT_calling_convention] = "calling_convention",
-      [DW_AT_count] = "count",
-      [DW_AT_data_member_location] = "data_member_location",
-      [DW_AT_decl_column] = "decl_column",
-      [DW_AT_decl_file] = "decl_file",
-      [DW_AT_decl_line] = "decl_line",
-      [DW_AT_declaration] = "declaration",
-      [DW_AT_discr_list] = "discr_list",
-      [DW_AT_encoding] = "encoding",
-      [DW_AT_external] = "external",
-      [DW_AT_frame_base] = "frame_base",
-      [DW_AT_friend] = "friend",
-      [DW_AT_identifier_case] = "identifier_case",
-      [DW_AT_macro_info] = "macro_info",
-      [DW_AT_namelist_item] = "namelist_item",
-      [DW_AT_priority] = "priority",
-      [DW_AT_segment] = "segment",
-      [DW_AT_specification] = "specification",
-      [DW_AT_static_link] = "static_link",
-      [DW_AT_type] = "type",
-      [DW_AT_use_location] = "use_location",
-      [DW_AT_variable_parameter] = "variable_parameter",
-      [DW_AT_virtuality] = "virtuality",
-      [DW_AT_vtable_elem_location] = "vtable_elem_location",
-      [DW_AT_allocated] = "allocated",
-      [DW_AT_associated] = "associated",
-      [DW_AT_data_location] = "data_location",
-      [DW_AT_byte_stride] = "byte_stride",
-      [DW_AT_entry_pc] = "entry_pc",
-      [DW_AT_use_UTF8] = "use_UTF8",
-      [DW_AT_extension] = "extension",
-      [DW_AT_ranges] = "ranges",
-      [DW_AT_trampoline] = "trampoline",
-      [DW_AT_call_column] = "call_column",
-      [DW_AT_call_file] = "call_file",
-      [DW_AT_call_line] = "call_line",
-      [DW_AT_description] = "description",
-      [DW_AT_binary_scale] = "binary_scale",
-      [DW_AT_decimal_scale] = "decimal_scale",
-      [DW_AT_small] = "small",
-      [DW_AT_decimal_sign] = "decimal_sign",
-      [DW_AT_digit_count] = "digit_count",
-      [DW_AT_picture_string] = "picture_string",
-      [DW_AT_mutable] = "mutable",
-      [DW_AT_threads_scaled] = "threads_scaled",
-      [DW_AT_explicit] = "explicit",
-      [DW_AT_object_pointer] = "object_pointer",
-      [DW_AT_endianity] = "endianity",
-      [DW_AT_elemental] = "elemental",
-      [DW_AT_pure] = "pure",
-      [DW_AT_recursive] = "recursive",
-      [DW_AT_signature] = "signature",
-      [DW_AT_main_subprogram] = "main_subprogram",
-      [DW_AT_data_bit_offset] = "data_bit_offset",
-      [DW_AT_const_expr] = "const_expr",
-      [DW_AT_enum_class] = "enum_class",
-      [DW_AT_linkage_name] = "linkage_name",
-    };
-  const unsigned int nknown_attrs = (sizeof (known_attrs)
-				     / sizeof (known_attrs[0]));
-  static char buf[40];
-  const char *result = NULL;
-
-  if (likely (attrnum < nknown_attrs))
-    result = known_attrs[attrnum];
-
-  if (unlikely (result == NULL))
-    /* There are a few known extensions.  */
-    switch (attrnum)
-      {
-      case DW_AT_MIPS_fde:
-	result = "MIPS_fde";
-	break;
-
-      case DW_AT_MIPS_loop_begin:
-	result = "MIPS_loop_begin";
-	break;
-
-      case DW_AT_MIPS_tail_loop_begin:
-	result = "MIPS_tail_loop_begin";
-	break;
-
-      case DW_AT_MIPS_epilog_begin:
-	result = "MIPS_epilog_begin";
-	break;
-
-      case DW_AT_MIPS_loop_unroll_factor:
-	result = "MIPS_loop_unroll_factor";
-	break;
-
-      case DW_AT_MIPS_software_pipeline_depth:
-	result = "MIPS_software_pipeline_depth";
-	break;
-
-      case DW_AT_MIPS_linkage_name:
-	result = "MIPS_linkage_name";
-	break;
-
-      case DW_AT_MIPS_stride:
-	result = "MIPS_stride";
-	break;
-
-      case DW_AT_MIPS_abstract_name:
-	result = "MIPS_abstract_name";
-	break;
-
-      case DW_AT_MIPS_clone_origin:
-	result = "MIPS_clone_origin";
-	break;
-
-      case DW_AT_MIPS_has_inlines:
-	result = "MIPS_has_inlines";
-	break;
-
-      case DW_AT_MIPS_stride_byte:
-	result = "MIPS_stride_byte";
-	break;
-
-      case DW_AT_MIPS_stride_elem:
-	result = "MIPS_stride_elem";
-	break;
-
-      case DW_AT_MIPS_ptr_dopetype:
-	result = "MIPS_ptr_dopetype";
-	break;
-
-      case DW_AT_MIPS_allocatable_dopetype:
-	result = "MIPS_allocatable_dopetype";
-	break;
-
-      case DW_AT_MIPS_assumed_shape_dopetype:
-	result = "MIPS_assumed_shape_dopetype";
-	break;
-
-      case DW_AT_MIPS_assumed_size:
-	result = "MIPS_assumed_size";
-	break;
-
-      case DW_AT_sf_names:
-	result = "sf_names";
-	break;
-
-      case DW_AT_src_info:
-	result = "src_info";
-	break;
-
-      case DW_AT_mac_info:
-	result = "mac_info";
-	break;
-
-      case DW_AT_src_coords:
-	result = "src_coords";
-	break;
-
-      case DW_AT_body_begin:
-	result = "body_begin";
-	break;
-
-      case DW_AT_body_end:
-	result = "body_end";
-	break;
-
-      case DW_AT_GNU_vector:
-	result = "GNU_vector";
-	break;
-
-      case DW_AT_GNU_guarded_by:
-	result = "GNU_guarded_by";
-	break;
-
-      case DW_AT_GNU_pt_guarded_by:
-	result = "GNU_pt_guarded_by";
-	break;
-
-      case DW_AT_GNU_guarded:
-	result = "GNU_guarded";
-	break;
-
-      case DW_AT_GNU_pt_guarded:
-	result = "GNU_pt_guarded";
-	break;
-
-      case DW_AT_GNU_locks_excluded:
-	result = "GNU_locks_excluded";
-	break;
-
-      case DW_AT_GNU_exclusive_locks_required:
-	result = "GNU_exclusive_locks_required";
-	break;
-
-      case DW_AT_GNU_shared_locks_required:
-	result = "GNU_shared_locks_required";
-	break;
-
-      case DW_AT_GNU_odr_signature:
-	result = "GNU_odr_signature";
-	break;
-
-      case DW_AT_GNU_template_name:
-	result = "GNU_template_name";
-	break;
-
-      case DW_AT_GNU_call_site_value:
-	result = "GNU_call_site_value";
-	break;
-
-      case DW_AT_GNU_call_site_data_value:
-	result = "GNU_call_site_data_value";
-	break;
-
-      case DW_AT_GNU_call_site_target:
-	result = "GNU_call_site_target";
-	break;
-
-      case DW_AT_GNU_call_site_target_clobbered:
-	result = "GNU_call_site_target_clobbered";
-	break;
-
-      case DW_AT_GNU_tail_call:
-	result = "GNU_tail_call";
-	break;
-
-      case DW_AT_GNU_all_tail_call_sites:
-	result = "GNU_all_tail_call_sites";
-	break;
-
-      case DW_AT_GNU_all_call_sites:
-	result = "GNU_all_call_sites";
-	break;
-
-      case DW_AT_GNU_all_source_call_sites:
-	result = "GNU_all_source_call_sites";
-	break;
-
-      case DW_AT_GNU_macros:
-	result = "GNU_macros";
-	break;
-
-      default:
-	if (attrnum < DW_AT_lo_user)
-	  snprintf (buf, sizeof buf, gettext ("unknown attribute %hx"),
-		    attrnum);
-	else
-	  snprintf (buf, sizeof buf, gettext ("unknown user attribute %hx"),
-		    attrnum);
-	result = buf;
-	break;
-      }
-
-  return result;
+#define ONE_KNOWN_DW_AT(NAME, CODE) case CODE: return #NAME;
+      ALL_KNOWN_DW_AT
+#undef ONE_KNOWN_DW_AT
+    default:
+      return NULL;
+    }
 }
 
 
 static const char *
 dwarf_form_string (unsigned int form)
 {
-  static const char *const known_forms[] =
+  switch (form)
     {
-      [DW_FORM_addr] = "addr",
-      [DW_FORM_block2] = "block2",
-      [DW_FORM_block4] = "block4",
-      [DW_FORM_data2] = "data2",
-      [DW_FORM_data4] = "data4",
-      [DW_FORM_data8] = "data8",
-      [DW_FORM_string] = "string",
-      [DW_FORM_block] = "block",
-      [DW_FORM_block1] = "block1",
-      [DW_FORM_data1] = "data1",
-      [DW_FORM_flag] = "flag",
-      [DW_FORM_sdata] = "sdata",
-      [DW_FORM_strp] = "strp",
-      [DW_FORM_udata] = "udata",
-      [DW_FORM_ref_addr] = "ref_addr",
-      [DW_FORM_ref1] = "ref1",
-      [DW_FORM_ref2] = "ref2",
-      [DW_FORM_ref4] = "ref4",
-      [DW_FORM_ref8] = "ref8",
-      [DW_FORM_ref_udata] = "ref_udata",
-      [DW_FORM_indirect] = "indirect",
-      [DW_FORM_sec_offset] = "sec_offset",
-      [DW_FORM_exprloc] = "exprloc",
-      [DW_FORM_flag_present] = "flag_present",
-      [DW_FORM_ref_sig8] = "ref_sig8",
-    };
-  const unsigned int nknown_forms = (sizeof (known_forms)
-				     / sizeof (known_forms[0]));
-  static char buf[40];
-  const char *result = NULL;
-
-  if (likely (form < nknown_forms))
-    result = known_forms[form];
-  else
-    {
-      /* GNU extensions use vendor numbers.  */
-      switch (form)
-	{
-	case DW_FORM_GNU_ref_alt:
-	  result = "GNU_ref_alt";
-	  break;
-
-	case DW_FORM_GNU_strp_alt:
-	  result = "GNU_strp_alt";
-	  break;
-	}
+#define ONE_KNOWN_DW_FORM_DESC(NAME, CODE, DESC) ONE_KNOWN_DW_FORM (NAME, CODE)
+#define ONE_KNOWN_DW_FORM(NAME, CODE) case CODE: return #NAME;
+      ALL_KNOWN_DW_FORM
+#undef ONE_KNOWN_DW_FORM
+#undef ONE_KNOWN_DW_FORM_DESC
+    default:
+      return NULL;
     }
-
-  if (unlikely (result == NULL))
-    {
-      snprintf (buf, sizeof buf, gettext ("unknown form %#" PRIx64),
-		(uint64_t) form);
-      result = buf;
-    }
-
-  return result;
 }
 
 
 static const char *
 dwarf_lang_string (unsigned int lang)
 {
-  static const char *const known[] =
+  switch (lang)
     {
-      [DW_LANG_C89] = "ISO C89",
-      [DW_LANG_C] = "C",
-      [DW_LANG_Ada83] = "Ada83",
-      [DW_LANG_C_plus_plus] = "C++",
-      [DW_LANG_Cobol74] = "Cobol74",
-      [DW_LANG_Cobol85] = "Cobol85",
-      [DW_LANG_Fortran77] = "Fortran77",
-      [DW_LANG_Fortran90] = "Fortran90",
-      [DW_LANG_Pascal83] = "Pascal83",
-      [DW_LANG_Modula2] = "Modula2",
-      [DW_LANG_Java] = "Java",
-      [DW_LANG_C99] = "ISO C99",
-      [DW_LANG_Ada95] = "Ada95",
-      [DW_LANG_Fortran95] = "Fortran95",
-      [DW_LANG_PL1] = "PL1",
-      [DW_LANG_ObjC] = "Objective C",
-      [DW_LANG_ObjC_plus_plus] = "Objective C++",
-      [DW_LANG_UPC] = "UPC",
-      [DW_LANG_D] = "D",
-    };
-
-  if (likely (lang < sizeof (known) / sizeof (known[0])))
-    return known[lang];
-  else if (lang == DW_LANG_Mips_Assembler)
-    /* This language tag is used for assembler in general.  */
-    return "Assembler";
-
-  if (lang >= DW_LANG_lo_user && lang <= DW_LANG_hi_user)
-    {
-      static char buf[30];
-      snprintf (buf, sizeof (buf), "lo_user+%u", lang - DW_LANG_lo_user);
-      return buf;
+#define ONE_KNOWN_DW_LANG_DESC(NAME, CODE, DESC) case CODE: return #NAME;
+      ALL_KNOWN_DW_LANG
+#undef ONE_KNOWN_DW_LANG_DESC
+    default:
+      return NULL;
     }
-
-  return "???";
 }
 
 
@@ -3725,16 +3246,15 @@ dwarf_inline_string (unsigned int code)
 {
   static const char *const known[] =
     {
-      [DW_INL_not_inlined] = "not_inlined",
-      [DW_INL_inlined] = "inlined",
-      [DW_INL_declared_not_inlined] = "declared_not_inlined",
-      [DW_INL_declared_inlined] = "declared_inlined"
+#define ONE_KNOWN_DW_INL(NAME, CODE) [CODE] = #NAME,
+      ALL_KNOWN_DW_INL
+#undef ONE_KNOWN_DW_INL
     };
 
   if (likely (code < sizeof (known) / sizeof (known[0])))
     return known[code];
 
-  return "???";
+  return NULL;
 }
 
 
@@ -3743,35 +3263,15 @@ dwarf_encoding_string (unsigned int code)
 {
   static const char *const known[] =
     {
-      [DW_ATE_void] = "void",
-      [DW_ATE_address] = "address",
-      [DW_ATE_boolean] = "boolean",
-      [DW_ATE_complex_float] = "complex_float",
-      [DW_ATE_float] = "float",
-      [DW_ATE_signed] = "signed",
-      [DW_ATE_signed_char] = "signed_char",
-      [DW_ATE_unsigned] = "unsigned",
-      [DW_ATE_unsigned_char] = "unsigned_char",
-      [DW_ATE_imaginary_float] = "imaginary_float",
-      [DW_ATE_packed_decimal] = "packed_decimal",
-      [DW_ATE_numeric_string] = "numeric_string",
-      [DW_ATE_edited] = "edited",
-      [DW_ATE_signed_fixed] = "signed_fixed",
-      [DW_ATE_unsigned_fixed] = "unsigned_fixed",
-      [DW_ATE_decimal_float] = "decimal_float",
+#define ONE_KNOWN_DW_ATE(NAME, CODE) [CODE] = #NAME,
+      ALL_KNOWN_DW_ATE
+#undef ONE_KNOWN_DW_ATE
     };
 
   if (likely (code < sizeof (known) / sizeof (known[0])))
     return known[code];
 
-  if (code >= DW_ATE_lo_user && code <= DW_ATE_hi_user)
-    {
-      static char buf[30];
-      snprintf (buf, sizeof (buf), "lo_user+%u", code - DW_ATE_lo_user);
-      return buf;
-    }
-
-  return "???";
+  return NULL;
 }
 
 
@@ -3780,15 +3280,15 @@ dwarf_access_string (unsigned int code)
 {
   static const char *const known[] =
     {
-      [DW_ACCESS_public] = "public",
-      [DW_ACCESS_protected] = "protected",
-      [DW_ACCESS_private] = "private"
+#define ONE_KNOWN_DW_ACCESS(NAME, CODE) [CODE] = #NAME,
+      ALL_KNOWN_DW_ACCESS
+#undef ONE_KNOWN_DW_ACCESS
     };
 
   if (likely (code < sizeof (known) / sizeof (known[0])))
     return known[code];
 
-  return "???";
+  return NULL;
 }
 
 
@@ -3797,15 +3297,15 @@ dwarf_visibility_string (unsigned int code)
 {
   static const char *const known[] =
     {
-      [DW_VIS_local] = "local",
-      [DW_VIS_exported] = "exported",
-      [DW_VIS_qualified] = "qualified"
+#define ONE_KNOWN_DW_VIS(NAME, CODE) [CODE] = #NAME,
+      ALL_KNOWN_DW_VIS
+#undef ONE_KNOWN_DW_VIS
     };
 
   if (likely (code < sizeof (known) / sizeof (known[0])))
     return known[code];
 
-  return "???";
+  return NULL;
 }
 
 
@@ -3814,15 +3314,15 @@ dwarf_virtuality_string (unsigned int code)
 {
   static const char *const known[] =
     {
-      [DW_VIRTUALITY_none] = "none",
-      [DW_VIRTUALITY_virtual] = "virtual",
-      [DW_VIRTUALITY_pure_virtual] = "pure_virtual"
+#define ONE_KNOWN_DW_VIRTUALITY(NAME, CODE) [CODE] = #NAME,
+      ALL_KNOWN_DW_VIRTUALITY
+#undef ONE_KNOWN_DW_VIRTUALITY
     };
 
   if (likely (code < sizeof (known) / sizeof (known[0])))
     return known[code];
 
-  return "???";
+  return NULL;
 }
 
 
@@ -3831,16 +3331,15 @@ dwarf_identifier_case_string (unsigned int code)
 {
   static const char *const known[] =
     {
-      [DW_ID_case_sensitive] = "sensitive",
-      [DW_ID_up_case] = "up_case",
-      [DW_ID_down_case] = "down_case",
-      [DW_ID_case_insensitive] = "insensitive"
+#define ONE_KNOWN_DW_ID(NAME, CODE) [CODE] = #NAME,
+      ALL_KNOWN_DW_ID
+#undef ONE_KNOWN_DW_ID
     };
 
   if (likely (code < sizeof (known) / sizeof (known[0])))
     return known[code];
 
-  return "???";
+  return NULL;
 }
 
 
@@ -3849,22 +3348,15 @@ dwarf_calling_convention_string (unsigned int code)
 {
   static const char *const known[] =
     {
-      [DW_CC_normal] = "normal",
-      [DW_CC_program] = "program",
-      [DW_CC_nocall] = "nocall",
+#define ONE_KNOWN_DW_CC(NAME, CODE) [CODE] = #NAME,
+      ALL_KNOWN_DW_CC
+#undef ONE_KNOWN_DW_CC
     };
 
   if (likely (code < sizeof (known) / sizeof (known[0])))
     return known[code];
 
-  if (code >= DW_CC_lo_user && code <= DW_CC_hi_user)
-    {
-      static char buf[30];
-      snprintf (buf, sizeof (buf), "lo_user+%u", code - DW_CC_lo_user);
-      return buf;
-    }
-
-  return "???";
+  return NULL;
 }
 
 
@@ -3873,14 +3365,15 @@ dwarf_ordering_string (unsigned int code)
 {
   static const char *const known[] =
     {
-      [DW_ORD_row_major] = "row_major",
-      [DW_ORD_col_major] = "col_major"
+#define ONE_KNOWN_DW_ORD(NAME, CODE) [CODE] = #NAME,
+      ALL_KNOWN_DW_ORD
+#undef ONE_KNOWN_DW_ORD
     };
 
   if (likely (code < sizeof (known) / sizeof (known[0])))
     return known[code];
 
-  return "???";
+  return NULL;
 }
 
 
@@ -3889,14 +3382,168 @@ dwarf_discr_list_string (unsigned int code)
 {
   static const char *const known[] =
     {
-      [DW_DSC_label] = "label",
-      [DW_DSC_range] = "range"
+#define ONE_KNOWN_DW_DSC(NAME, CODE) [CODE] = #NAME,
+      ALL_KNOWN_DW_DSC
+#undef ONE_KNOWN_DW_DSC
     };
 
   if (likely (code < sizeof (known) / sizeof (known[0])))
     return known[code];
 
+  return NULL;
+}
+
+
+static const char *
+dwarf_locexpr_opcode_string (unsigned int code)
+{
+  static const char *const known[] =
+    {
+      /* Normally we can't affort building huge table of 64K entries,
+	 most of them zero, just because there are a couple defined
+	 values at the far end.  In case of opcodes, it's OK.  */
+#define ONE_KNOWN_DW_OP_DESC(NAME, CODE, DESC) ONE_KNOWN_DW_OP (NAME, CODE)
+#define ONE_KNOWN_DW_OP(NAME, CODE) [CODE] = #NAME,
+      ALL_KNOWN_DW_OP
+#undef ONE_KNOWN_DW_OP
+#undef ONE_KNOWN_DW_OP_DESC
+    };
+
+  if (likely (code < sizeof (known) / sizeof (known[0])))
+    return known[code];
+
+  return NULL;
+}
+
+
+/* Used by all dwarf_foo_name functions.  */
+static const char *
+string_or_unknown (const char *known, unsigned int code,
+                   unsigned int lo_user, unsigned int hi_user,
+		   bool print_unknown_num)
+{
+  static char unknown_buf[20];
+
+  if (likely (known != NULL))
+    return known;
+
+  if (lo_user != 0 && code >= lo_user && code <= hi_user)
+    {
+      snprintf (unknown_buf, sizeof unknown_buf, "lo_user+%#x",
+		code - lo_user);
+      return unknown_buf;
+    }
+
+  if (print_unknown_num)
+    {
+      snprintf (unknown_buf, sizeof unknown_buf, "??? (%#x)", code);
+      return unknown_buf;
+    }
+
   return "???";
+}
+
+
+static const char *
+dwarf_tag_name (unsigned int tag)
+{
+  const char *ret = dwarf_tag_string (tag);
+  return string_or_unknown (ret, tag, DW_TAG_lo_user, DW_TAG_hi_user, true);
+}
+
+static const char *
+dwarf_attr_name (unsigned int attr)
+{
+  const char *ret = dwarf_attr_string (attr);
+  return string_or_unknown (ret, attr, DW_AT_lo_user, DW_AT_hi_user, true);
+}
+
+
+static const char *
+dwarf_form_name (unsigned int form)
+{
+  const char *ret = dwarf_form_string (form);
+  return string_or_unknown (ret, form, 0, 0, true);
+}
+
+
+static const char *
+dwarf_lang_name (unsigned int lang)
+{
+  const char *ret = dwarf_lang_string (lang);
+  return string_or_unknown (ret, lang, DW_LANG_lo_user, DW_LANG_hi_user, false);
+}
+
+
+static const char *
+dwarf_inline_name (unsigned int code)
+{
+  const char *ret = dwarf_inline_string (code);
+  return string_or_unknown (ret, code, 0, 0, false);
+}
+
+
+static const char *
+dwarf_encoding_name (unsigned int code)
+{
+  const char *ret = dwarf_encoding_string (code);
+  return string_or_unknown (ret, code, DW_ATE_lo_user, DW_ATE_hi_user, false);
+}
+
+
+static const char *
+dwarf_access_name (unsigned int code)
+{
+  const char *ret = dwarf_access_string (code);
+  return string_or_unknown (ret, code, 0, 0, false);
+}
+
+
+static const char *
+dwarf_visibility_name (unsigned int code)
+{
+  const char *ret = dwarf_visibility_string (code);
+  return string_or_unknown (ret, code, 0, 0, false);
+}
+
+
+static const char *
+dwarf_virtuality_name (unsigned int code)
+{
+  const char *ret = dwarf_virtuality_string (code);
+  return string_or_unknown (ret, code, 0, 0, false);
+}
+
+
+static const char *
+dwarf_identifier_case_name (unsigned int code)
+{
+  const char *ret = dwarf_identifier_case_string (code);
+  return string_or_unknown (ret, code, 0, 0, false);
+}
+
+
+static const char *
+dwarf_calling_convention_name (unsigned int code)
+{
+  const char *ret = dwarf_calling_convention_string (code);
+  return string_or_unknown (ret, code, DW_CC_lo_user, DW_CC_hi_user, false);
+}
+
+
+static const char *
+dwarf_ordering_name (unsigned int code)
+{
+  const char *ret = dwarf_ordering_string (code);
+  return string_or_unknown (ret, code, 0, 0, false);
+}
+
+
+static const char *
+dwarf_discr_list_name (unsigned int code)
+{
+  const char *ret = dwarf_discr_list_string (code);
+  return string_or_unknown (ret, code, 0, 0, false);
 }
 
 
@@ -3923,174 +3570,6 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 {
   const unsigned int ref_size = vers < 3 ? addrsize : offset_size;
 
-  static const char *const known[] =
-    {
-      [DW_OP_addr] = "addr",
-      [DW_OP_deref] = "deref",
-      [DW_OP_const1u] = "const1u",
-      [DW_OP_const1s] = "const1s",
-      [DW_OP_const2u] = "const2u",
-      [DW_OP_const2s] = "const2s",
-      [DW_OP_const4u] = "const4u",
-      [DW_OP_const4s] = "const4s",
-      [DW_OP_const8u] = "const8u",
-      [DW_OP_const8s] = "const8s",
-      [DW_OP_constu] = "constu",
-      [DW_OP_consts] = "consts",
-      [DW_OP_dup] = "dup",
-      [DW_OP_drop] = "drop",
-      [DW_OP_over] = "over",
-      [DW_OP_pick] = "pick",
-      [DW_OP_swap] = "swap",
-      [DW_OP_rot] = "rot",
-      [DW_OP_xderef] = "xderef",
-      [DW_OP_abs] = "abs",
-      [DW_OP_and] = "and",
-      [DW_OP_div] = "div",
-      [DW_OP_minus] = "minus",
-      [DW_OP_mod] = "mod",
-      [DW_OP_mul] = "mul",
-      [DW_OP_neg] = "neg",
-      [DW_OP_not] = "not",
-      [DW_OP_or] = "or",
-      [DW_OP_plus] = "plus",
-      [DW_OP_plus_uconst] = "plus_uconst",
-      [DW_OP_shl] = "shl",
-      [DW_OP_shr] = "shr",
-      [DW_OP_shra] = "shra",
-      [DW_OP_xor] = "xor",
-      [DW_OP_bra] = "bra",
-      [DW_OP_eq] = "eq",
-      [DW_OP_ge] = "ge",
-      [DW_OP_gt] = "gt",
-      [DW_OP_le] = "le",
-      [DW_OP_lt] = "lt",
-      [DW_OP_ne] = "ne",
-      [DW_OP_skip] = "skip",
-      [DW_OP_lit0] = "lit0",
-      [DW_OP_lit1] = "lit1",
-      [DW_OP_lit2] = "lit2",
-      [DW_OP_lit3] = "lit3",
-      [DW_OP_lit4] = "lit4",
-      [DW_OP_lit5] = "lit5",
-      [DW_OP_lit6] = "lit6",
-      [DW_OP_lit7] = "lit7",
-      [DW_OP_lit8] = "lit8",
-      [DW_OP_lit9] = "lit9",
-      [DW_OP_lit10] = "lit10",
-      [DW_OP_lit11] = "lit11",
-      [DW_OP_lit12] = "lit12",
-      [DW_OP_lit13] = "lit13",
-      [DW_OP_lit14] = "lit14",
-      [DW_OP_lit15] = "lit15",
-      [DW_OP_lit16] = "lit16",
-      [DW_OP_lit17] = "lit17",
-      [DW_OP_lit18] = "lit18",
-      [DW_OP_lit19] = "lit19",
-      [DW_OP_lit20] = "lit20",
-      [DW_OP_lit21] = "lit21",
-      [DW_OP_lit22] = "lit22",
-      [DW_OP_lit23] = "lit23",
-      [DW_OP_lit24] = "lit24",
-      [DW_OP_lit25] = "lit25",
-      [DW_OP_lit26] = "lit26",
-      [DW_OP_lit27] = "lit27",
-      [DW_OP_lit28] = "lit28",
-      [DW_OP_lit29] = "lit29",
-      [DW_OP_lit30] = "lit30",
-      [DW_OP_lit31] = "lit31",
-      [DW_OP_reg0] = "reg0",
-      [DW_OP_reg1] = "reg1",
-      [DW_OP_reg2] = "reg2",
-      [DW_OP_reg3] = "reg3",
-      [DW_OP_reg4] = "reg4",
-      [DW_OP_reg5] = "reg5",
-      [DW_OP_reg6] = "reg6",
-      [DW_OP_reg7] = "reg7",
-      [DW_OP_reg8] = "reg8",
-      [DW_OP_reg9] = "reg9",
-      [DW_OP_reg10] = "reg10",
-      [DW_OP_reg11] = "reg11",
-      [DW_OP_reg12] = "reg12",
-      [DW_OP_reg13] = "reg13",
-      [DW_OP_reg14] = "reg14",
-      [DW_OP_reg15] = "reg15",
-      [DW_OP_reg16] = "reg16",
-      [DW_OP_reg17] = "reg17",
-      [DW_OP_reg18] = "reg18",
-      [DW_OP_reg19] = "reg19",
-      [DW_OP_reg20] = "reg20",
-      [DW_OP_reg21] = "reg21",
-      [DW_OP_reg22] = "reg22",
-      [DW_OP_reg23] = "reg23",
-      [DW_OP_reg24] = "reg24",
-      [DW_OP_reg25] = "reg25",
-      [DW_OP_reg26] = "reg26",
-      [DW_OP_reg27] = "reg27",
-      [DW_OP_reg28] = "reg28",
-      [DW_OP_reg29] = "reg29",
-      [DW_OP_reg30] = "reg30",
-      [DW_OP_reg31] = "reg31",
-      [DW_OP_breg0] = "breg0",
-      [DW_OP_breg1] = "breg1",
-      [DW_OP_breg2] = "breg2",
-      [DW_OP_breg3] = "breg3",
-      [DW_OP_breg4] = "breg4",
-      [DW_OP_breg5] = "breg5",
-      [DW_OP_breg6] = "breg6",
-      [DW_OP_breg7] = "breg7",
-      [DW_OP_breg8] = "breg8",
-      [DW_OP_breg9] = "breg9",
-      [DW_OP_breg10] = "breg10",
-      [DW_OP_breg11] = "breg11",
-      [DW_OP_breg12] = "breg12",
-      [DW_OP_breg13] = "breg13",
-      [DW_OP_breg14] = "breg14",
-      [DW_OP_breg15] = "breg15",
-      [DW_OP_breg16] = "breg16",
-      [DW_OP_breg17] = "breg17",
-      [DW_OP_breg18] = "breg18",
-      [DW_OP_breg19] = "breg19",
-      [DW_OP_breg20] = "breg20",
-      [DW_OP_breg21] = "breg21",
-      [DW_OP_breg22] = "breg22",
-      [DW_OP_breg23] = "breg23",
-      [DW_OP_breg24] = "breg24",
-      [DW_OP_breg25] = "breg25",
-      [DW_OP_breg26] = "breg26",
-      [DW_OP_breg27] = "breg27",
-      [DW_OP_breg28] = "breg28",
-      [DW_OP_breg29] = "breg29",
-      [DW_OP_breg30] = "breg30",
-      [DW_OP_breg31] = "breg31",
-      [DW_OP_regx] = "regx",
-      [DW_OP_fbreg] = "fbreg",
-      [DW_OP_bregx] = "bregx",
-      [DW_OP_piece] = "piece",
-      [DW_OP_deref_size] = "deref_size",
-      [DW_OP_xderef_size] = "xderef_size",
-      [DW_OP_nop] = "nop",
-      [DW_OP_push_object_address] = "push_object_address",
-      [DW_OP_call2] = "call2",
-      [DW_OP_call4] = "call4",
-      [DW_OP_call_ref] = "call_ref",
-      [DW_OP_form_tls_address] = "form_tls_address",
-      [DW_OP_call_frame_cfa] = "call_frame_cfa",
-      [DW_OP_bit_piece] = "bit_piece",
-      [DW_OP_implicit_value] = "implicit_value",
-      [DW_OP_stack_value] = "stack_value",
-      [DW_OP_GNU_push_tls_address] = "GNU_push_tls_address",
-      [DW_OP_GNU_uninit] = "GNU_uninit",
-      [DW_OP_GNU_encoded_addr] = "GNU_encoded_addr",
-      [DW_OP_GNU_implicit_pointer] = "GNU_implicit_pointer",
-      [DW_OP_GNU_entry_value] = "GNU_entry_value",
-      [DW_OP_GNU_const_type] = "GNU_const_type",
-      [DW_OP_GNU_regval_type] = "GNU_regval_type",
-      [DW_OP_GNU_deref_type] = "GNU_deref_type",
-      [DW_OP_GNU_convert] = "GNU_convert",
-      [DW_OP_GNU_reinterpret] = "GNU_reinterpret",
-    };
-
   if (len == 0)
     {
       printf ("%*s(empty)\n", indent, "");
@@ -4104,6 +3583,17 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
   while (len-- > 0)
     {
       uint_fast8_t op = *data++;
+
+      const char *op_name = dwarf_locexpr_opcode_string (op);
+      if (unlikely (op_name == NULL))
+	{
+	  static char buf[20];
+	  if (op >= DW_OP_lo_user)
+	    snprintf (buf, sizeof buf, "lo_user+%#x", op - DW_OP_lo_user);
+	  else
+	    snprintf (buf, sizeof buf, "??? (%#x)", op);
+	  op_name = buf;
+	}
 
       switch (op)
 	{
@@ -4123,7 +3613,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 
 	  char *a = format_dwarf_addr (dwflmod, 0, addr);
 	  printf ("%*s[%4" PRIuMAX "] %s %s\n",
-		  indent, "", (uintmax_t) offset, known[op], a);
+		  indent, "", (uintmax_t) offset, op_name, a);
 	  free (a);
 
 	  offset += 1 + addrsize;
@@ -4144,7 +3634,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 
 	  printf ("%*s[%4" PRIuMAX "] %s %#" PRIxMAX "\n",
 		  indent, "", (uintmax_t) offset,
-		  known[op], (uintmax_t) addr);
+		  op_name, (uintmax_t) addr);
 	  offset += 1 + ref_size;
 	  break;
 
@@ -4156,7 +3646,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  NEED (1);
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu8 "\n",
 		  indent, "", (uintmax_t) offset,
-		  known[op], *((uint8_t *) data));
+		  op_name, *((uint8_t *) data));
 	  ++data;
 	  --len;
 	  offset += 2;
@@ -4167,7 +3657,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  // XXX value might be modified by relocation
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu16 "\n",
 		  indent, "", (uintmax_t) offset,
-		  known[op], read_2ubyte_unaligned (dbg, data));
+		  op_name, read_2ubyte_unaligned (dbg, data));
 	  CONSUME (2);
 	  data += 2;
 	  offset += 3;
@@ -4178,7 +3668,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  // XXX value might be modified by relocation
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu32 "\n",
 		  indent, "", (uintmax_t) offset,
-		  known[op], read_4ubyte_unaligned (dbg, data));
+		  op_name, read_4ubyte_unaligned (dbg, data));
 	  CONSUME (4);
 	  data += 4;
 	  offset += 5;
@@ -4189,7 +3679,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  // XXX value might be modified by relocation
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu64 "\n",
 		  indent, "", (uintmax_t) offset,
-		  known[op], (uint64_t) read_8ubyte_unaligned (dbg, data));
+		  op_name, (uint64_t) read_8ubyte_unaligned (dbg, data));
 	  CONSUME (8);
 	  data += 8;
 	  offset += 9;
@@ -4200,7 +3690,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  // XXX value might be modified by relocation
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRId8 "\n",
 		  indent, "", (uintmax_t) offset,
-		  known[op], *((int8_t *) data));
+		  op_name, *((int8_t *) data));
 	  ++data;
 	  --len;
 	  offset += 2;
@@ -4211,7 +3701,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  // XXX value might be modified by relocation
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRId16 "\n",
 		  indent, "", (uintmax_t) offset,
-		  known[op], read_2sbyte_unaligned (dbg, data));
+		  op_name, read_2sbyte_unaligned (dbg, data));
 	  CONSUME (2);
 	  data += 2;
 	  offset += 3;
@@ -4222,7 +3712,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  // XXX value might be modified by relocation
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRId32 "\n",
 		  indent, "", (uintmax_t) offset,
-		  known[op], read_4sbyte_unaligned (dbg, data));
+		  op_name, read_4sbyte_unaligned (dbg, data));
 	  CONSUME (4);
 	  data += 4;
 	  offset += 5;
@@ -4233,7 +3723,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  // XXX value might be modified by relocation
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRId64 "\n",
 		  indent, "", (uintmax_t) offset,
-		  known[op], read_8sbyte_unaligned (dbg, data));
+		  op_name, read_8sbyte_unaligned (dbg, data));
 	  CONSUME (8);
 	  data += 8;
 	  offset += 9;
@@ -4248,7 +3738,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  NEED (1);
 	  get_uleb128 (uleb, data); /* XXX check overrun */
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu64 "\n",
-		  indent, "", (uintmax_t) offset, known[op], uleb);
+		  indent, "", (uintmax_t) offset, op_name, uleb);
 	  CONSUME (data - start);
 	  offset += 1 + (data - start);
 	  break;
@@ -4260,7 +3750,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  get_uleb128 (uleb, data); /* XXX check overrun */
 	  get_uleb128 (uleb2, data); /* XXX check overrun */
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu64 ", %" PRIu64 "\n",
-		  indent, "", (uintmax_t) offset, known[op], uleb, uleb2);
+		  indent, "", (uintmax_t) offset, op_name, uleb, uleb2);
 	  CONSUME (data - start);
 	  offset += 1 + (data - start);
 	  break;
@@ -4273,7 +3763,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  NEED (1);
 	  get_sleb128 (sleb, data); /* XXX check overrun */
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRId64 "\n",
-		  indent, "", (uintmax_t) offset, known[op], sleb);
+		  indent, "", (uintmax_t) offset, op_name, sleb);
 	  CONSUME (data - start);
 	  offset += 1 + (data - start);
 	  break;
@@ -4284,7 +3774,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  get_uleb128 (uleb, data); /* XXX check overrun */
 	  get_sleb128 (sleb, data); /* XXX check overrun */
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu64 " %" PRId64 "\n",
-		  indent, "", (uintmax_t) offset, known[op], uleb, sleb);
+		  indent, "", (uintmax_t) offset, op_name, uleb, sleb);
 	  CONSUME (data - start);
 	  offset += 1 + (data - start);
 	  break;
@@ -4292,7 +3782,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	case DW_OP_call2:
 	  NEED (2);
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu16 "\n",
-		  indent, "", (uintmax_t) offset, known[op],
+		  indent, "", (uintmax_t) offset, op_name,
 		  read_2ubyte_unaligned (dbg, data));
 	  CONSUME (2);
 	  offset += 3;
@@ -4301,7 +3791,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	case DW_OP_call4:
 	  NEED (4);
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu32 "\n",
-		  indent, "", (uintmax_t) offset, known[op],
+		  indent, "", (uintmax_t) offset, op_name,
 		  read_4ubyte_unaligned (dbg, data));
 	  CONSUME (4);
 	  offset += 5;
@@ -4311,7 +3801,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	case DW_OP_bra:
 	  NEED (2);
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIuMAX "\n",
-		  indent, "", (uintmax_t) offset, known[op],
+		  indent, "", (uintmax_t) offset, op_name,
 		  (uintmax_t) (offset + read_2sbyte_unaligned (dbg, data)));
 	  CONSUME (2);
 	  data += 2;
@@ -4323,7 +3813,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  NEED (1);
 	  get_uleb128 (uleb, data); /* XXX check overrun */
 	  printf ("%*s[%4" PRIuMAX "] %s: ",
-		  indent, "", (uintmax_t) offset, known[op]);
+		  indent, "", (uintmax_t) offset, op_name);
 	  NEED (uleb);
 	  print_block (uleb, data);
 	  data += uleb;
@@ -4348,7 +3838,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 
 	  printf ("%*s[%4" PRIuMAX "] %s %#" PRIxMAX ", %+" PRId64 "\n",
 		  indent, "", (intmax_t) offset,
-		  known[op], (uintmax_t) addr, sleb);
+		  op_name, (uintmax_t) addr, sleb);
 	  CONSUME (data - start);
 	  offset += 1 + (data - start);
 	  break;
@@ -4359,7 +3849,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  NEED (1);
 	  get_uleb128 (uleb, data); /* XXX check overrun */
 	  printf ("%*s[%4" PRIuMAX "] %s:\n",
-		  indent, "", (uintmax_t) offset, known[op]);
+		  indent, "", (uintmax_t) offset, op_name);
 	  NEED (uleb);
 	  print_ops (dwflmod, dbg, indent + 6, indent + 6, vers,
 		     addrsize, offset_size, uleb, data);
@@ -4376,7 +3866,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  uint8_t usize = *(uint8_t *) data++;
 	  NEED (usize);
 	  printf ("%*s[%4" PRIuMAX "] %s [%6" PRIxMAX "] ",
-		  indent, "", (uintmax_t) offset, known[op], uleb);
+		  indent, "", (uintmax_t) offset, op_name, uleb);
 	  print_block (usize, data);
 	  data += usize;
 	  CONSUME (data - start);
@@ -4389,7 +3879,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  get_uleb128 (uleb, data); /* XXX check overrun */
 	  get_uleb128 (uleb2, data); /* XXX check overrun */
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu64 " %#" PRIx64 "\n",
-		  indent, "", (uintmax_t) offset, known[op], uleb, uleb2);
+		  indent, "", (uintmax_t) offset, op_name, uleb, uleb2);
 	  CONSUME (data - start);
 	  offset += 1 + (data - start);
 	  break;
@@ -4401,7 +3891,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  get_uleb128 (uleb, data); /* XXX check overrun */
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu8 " [%6" PRIxMAX "]\n",
 		  indent, "", (uintmax_t) offset,
-		  known[op], usize, uleb);
+		  op_name, usize, uleb);
 	  CONSUME (data - start);
 	  offset += 1 + (data - start);
 	  break;
@@ -4412,7 +3902,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  NEED (1);
 	  get_uleb128 (uleb, data); /* XXX check overrun */
 	  printf ("%*s[%4" PRIuMAX "] %s [%6" PRIxMAX "]\n",
-		  indent, "", (uintmax_t) offset, known[op], uleb);
+		  indent, "", (uintmax_t) offset, op_name, uleb);
 	  CONSUME (data - start);
 	  offset += 1 + (data - start);
 	  break;
@@ -4422,7 +3912,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	     DW_TAG_formal_parameter.  */
 	  NEED (4);
 	  printf ("%*s[%4" PRIuMAX "] %s [%6" PRIxMAX "]\n",
-		  indent, "", (uintmax_t) offset, known[op],
+		  indent, "", (uintmax_t) offset, op_name,
 		  (uintmax_t) read_4ubyte_unaligned (dbg, data));
 	  CONSUME (4);
 	  data += 4;
@@ -4431,12 +3921,8 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 
 	default:
 	  /* No Operand.  */
-	  if (op < sizeof known / sizeof known[0] && known[op] != NULL)
-	    printf ("%*s[%4" PRIuMAX "] %s\n",
-		    indent, "", (uintmax_t) offset, known[op]);
-	  else
-	    printf ("%*s[%4" PRIuMAX "] %#x\n",
-		    indent, "", (uintmax_t) offset, op);
+	  printf ("%*s[%4" PRIuMAX "] %s\n",
+		  indent, "", (uintmax_t) offset, op_name);
 	  ++offset;
 	  break;
 	}
@@ -4446,7 +3932,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 
     invalid:
       printf (gettext ("%*s[%4" PRIuMAX "] %s  <TRUNCATED>\n"),
-	      indent, "", (uintmax_t) offset, known[op]);
+	      indent, "", (uintmax_t) offset, op_name);
       break;
     }
 }
@@ -4639,7 +4125,7 @@ print_debug_abbrev_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 			   ", children: %s, tag: %s\n"),
 		  code, (int64_t) offset,
 		  has_children ? gettext ("yes") : gettext ("no"),
-		  dwarf_tag_string (tag));
+		  dwarf_tag_name (tag));
 
 	  size_t cnt = 0;
 	  unsigned int name;
@@ -4649,7 +4135,7 @@ print_debug_abbrev_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 				      &name, &form, &enoffset) == 0)
 	    {
 	      printf ("          attr: %s, form: %s, offset: %#" PRIx64 "\n",
-		      dwarf_attr_string (name), dwarf_form_string (form),
+		      dwarf_attr_name (name), dwarf_form_name (form),
 		      (uint64_t) enoffset);
 
 	      ++cnt;
@@ -5598,8 +5084,8 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	    }
 	  char *a = format_dwarf_addr (cbargs->dwflmod, cbargs->addrsize, addr);
 	  printf ("           %*s%-20s (%s) %s\n",
-		  (int) (level * 2), "", dwarf_attr_string (attr),
-		  dwarf_form_string (form), a);
+		  (int) (level * 2), "", dwarf_attr_name (attr),
+		  dwarf_form_name (form), a);
 	  free (a);
 	}
       break;
@@ -5614,8 +5100,8 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
       if (unlikely (str == NULL))
 	goto attrval_out;
       printf ("           %*s%-20s (%s) \"%s\"\n",
-	      (int) (level * 2), "", dwarf_attr_string (attr),
-	      dwarf_form_string (form), str);
+	      (int) (level * 2), "", dwarf_attr_name (attr),
+	      dwarf_form_name (form), str);
       break;
 
     case DW_FORM_ref_addr:
@@ -5632,16 +5118,16 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	goto attrval_out;
 
       printf ("           %*s%-20s (%s) [%6" PRIxMAX "]\n",
-	      (int) (level * 2), "", dwarf_attr_string (attr),
-	      dwarf_form_string (form), (uintmax_t) dwarf_dieoffset (&ref));
+	      (int) (level * 2), "", dwarf_attr_name (attr),
+	      dwarf_form_name (form), (uintmax_t) dwarf_dieoffset (&ref));
       break;
 
     case DW_FORM_ref_sig8:
       if (cbargs->silent)
 	break;
       printf ("           %*s%-20s (%s) {%6" PRIx64 "}\n",
-	      (int) (level * 2), "", dwarf_attr_string (attr),
-	      dwarf_form_string (form),
+	      (int) (level * 2), "", dwarf_attr_name (attr),
+	      dwarf_form_name (form),
 	      (uint64_t) read_8ubyte_unaligned (attrp->cu->dbg, attrp->valp));
       break;
 
@@ -5667,8 +5153,8 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	    {
 	      if (!cbargs->silent)
 		printf ("           %*s%-20s (%s) %" PRIxMAX "\n",
-			(int) (level * 2), "", dwarf_attr_string (attr),
-			dwarf_form_string (form), (uintmax_t) num);
+			(int) (level * 2), "", dwarf_attr_name (attr),
+			dwarf_form_name (form), (uintmax_t) num);
 	      return DWARF_CB_OK;
 	    }
 	  /* else fallthrough */
@@ -5690,8 +5176,8 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 			  cbargs->addrsize, cbargs->offset_size, num);
 	  if (!cbargs->silent)
 	    printf ("           %*s%-20s (%s) location list [%6" PRIxMAX "]\n",
-		    (int) (level * 2), "", dwarf_attr_string (attr),
-		    dwarf_form_string (form), (uintmax_t) num);
+		    (int) (level * 2), "", dwarf_attr_name (attr),
+		    dwarf_form_name (form), (uintmax_t) num);
 	  return DWARF_CB_OK;
 
 	case DW_AT_ranges:
@@ -5699,39 +5185,39 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 			  cbargs->addrsize, cbargs->offset_size, num);
 	  if (!cbargs->silent)
 	    printf ("           %*s%-20s (%s) range list [%6" PRIxMAX "]\n",
-		    (int) (level * 2), "", dwarf_attr_string (attr),
-		    dwarf_form_string (form), (uintmax_t) num);
+		    (int) (level * 2), "", dwarf_attr_name (attr),
+		    dwarf_form_name (form), (uintmax_t) num);
 	  return DWARF_CB_OK;
 
 	case DW_AT_language:
-	  valuestr = dwarf_lang_string (num);
+	  valuestr = dwarf_lang_name (num);
 	  break;
 	case DW_AT_encoding:
-	  valuestr = dwarf_encoding_string (num);
+	  valuestr = dwarf_encoding_name (num);
 	  break;
 	case DW_AT_accessibility:
-	  valuestr = dwarf_access_string (num);
+	  valuestr = dwarf_access_name (num);
 	  break;
 	case DW_AT_visibility:
-	  valuestr = dwarf_visibility_string (num);
+	  valuestr = dwarf_visibility_name (num);
 	  break;
 	case DW_AT_virtuality:
-	  valuestr = dwarf_virtuality_string (num);
+	  valuestr = dwarf_virtuality_name (num);
 	  break;
 	case DW_AT_identifier_case:
-	  valuestr = dwarf_identifier_case_string (num);
+	  valuestr = dwarf_identifier_case_name (num);
 	  break;
 	case DW_AT_calling_convention:
-	  valuestr = dwarf_calling_convention_string (num);
+	  valuestr = dwarf_calling_convention_name (num);
 	  break;
 	case DW_AT_inline:
-	  valuestr = dwarf_inline_string (num);
+	  valuestr = dwarf_inline_name (num);
 	  break;
 	case DW_AT_ordering:
-	  valuestr = dwarf_ordering_string (num);
+	  valuestr = dwarf_ordering_name (num);
 	  break;
 	case DW_AT_discr_list:
-	  valuestr = dwarf_discr_list_string (num);
+	  valuestr = dwarf_discr_list_name (num);
 	  break;
 	default:
 	  /* Nothing.  */
@@ -5743,12 +5229,12 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 
       if (valuestr == NULL)
 	printf ("           %*s%-20s (%s) %" PRIuMAX "\n",
-		(int) (level * 2), "", dwarf_attr_string (attr),
-		dwarf_form_string (form), (uintmax_t) num);
+		(int) (level * 2), "", dwarf_attr_name (attr),
+		dwarf_form_name (form), (uintmax_t) num);
       else
 	printf ("           %*s%-20s (%s) %s (%" PRIuMAX ")\n",
-		(int) (level * 2), "", dwarf_attr_string (attr),
-		dwarf_form_string (form), valuestr, (uintmax_t) num);
+		(int) (level * 2), "", dwarf_attr_name (attr),
+		dwarf_form_name (form), valuestr, (uintmax_t) num);
       break;
 
     case DW_FORM_flag:
@@ -5759,16 +5245,16 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	goto attrval_out;
 
       printf ("           %*s%-20s (%s) %s\n",
-	      (int) (level * 2), "", dwarf_attr_string (attr),
-	      dwarf_form_string (form), nl_langinfo (flag ? YESSTR : NOSTR));
+	      (int) (level * 2), "", dwarf_attr_name (attr),
+	      dwarf_form_name (form), nl_langinfo (flag ? YESSTR : NOSTR));
       break;
 
     case DW_FORM_flag_present:
       if (cbargs->silent)
 	break;
       printf ("           %*s%-20s (%s) %s\n",
-	      (int) (level * 2), "", dwarf_attr_string (attr),
-	      dwarf_form_string (form), nl_langinfo (YESSTR));
+	      (int) (level * 2), "", dwarf_attr_name (attr),
+	      dwarf_form_name (form), nl_langinfo (YESSTR));
       break;
 
     case DW_FORM_exprloc:
@@ -5783,8 +5269,8 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	goto attrval_out;
 
       printf ("           %*s%-20s (%s) ",
-	      (int) (level * 2), "", dwarf_attr_string (attr),
-	      dwarf_form_string (form));
+	      (int) (level * 2), "", dwarf_attr_name (attr),
+	      dwarf_form_name (form));
 
       switch (attr)
 	{
@@ -5832,7 +5318,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
       if (cbargs->silent)
 	break;
       printf ("           %*s%-20s (form: %#x) ???\n",
-	      (int) (level * 2), "", dwarf_attr_string (attr),
+	      (int) (level * 2), "", dwarf_attr_name (attr),
 	      (int) form);
       break;
     }
@@ -5947,7 +5433,7 @@ print_debug_units (Dwfl_Module *dwflmod,
       if (!silent)
 	printf (" [%6" PRIx64 "]  %*s%s\n",
 		(uint64_t) offset, (int) (level * 2), "",
-		dwarf_tag_string (tag));
+		dwarf_tag_name (tag));
 
       /* Print the attribute values.  */
       args.level = level;

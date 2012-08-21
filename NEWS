@@ -1,7 +1,19 @@
 Version 0.155
 
+libelf: elf*_xlatetomd now works for cross-endian elf note data.
+        elf_getshdr now works consistently on non-mmaped ELF files after
+        calling elf_cntl(ELF_C_FDREAD).
+        Implement support for ar archives with 64-bit symbol table.
+
 libdw: dwarf.h corrected the DW_LANG_ObjC constant name (was DW_LANG_Objc).
        Any existing sources using the old name will have to be updated.
+       Add DW_MACRO_GNU .debug_macro type encodings constants, DW_ATE_UTF
+       and DW_OP_GNU_parameter_ref to dwarf.h.
+       Support for DWZ multifile forms DW_FORM_GNU_ref_alt/strp_alt.
+
+readelf: Add .debug_macro parsing support.
+         Add .gdb_index version 7 parsing support.
+         Recognize DW_OP_GNU_parameter_ref.
 
 Version 0.154
 

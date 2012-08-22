@@ -1,6 +1,6 @@
 Version 0.155
 
-libelf: elf*_xlatetomd now works for cross-endian elf note data.
+libelf: elf*_xlatetomd now works for cross-endian ELF note data.
         elf_getshdr now works consistently on non-mmaped ELF files after
         calling elf_cntl(ELF_C_FDREAD).
         Implement support for ar archives with 64-bit symbol table.

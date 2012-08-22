@@ -1,3 +1,7 @@
+2012-08-22  Jeff Kenton  <jkenton@tilera.com>
+
+	* elflint.c (valid_e_machine): Add EM_TILEGX and EM_TILEPRO.
+
 2012-08-16  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (dwarf_tag_name): Renamed from dwarf_tag_string.

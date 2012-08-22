@@ -1,3 +1,17 @@
+2012-08-22  Jeff Kenton  <jkenton@tilera.com>
+
+	* Makefile.am (modules): Add tilegx.
+	(libebl_pic): Add libebl_tilegx_pic.a.
+	(tilegx_SRCS): New variable.
+	(libebl_tilegx_pic_a_SOURCES): Likewise.
+	(am_libebl_tilegx_pic_a_OBJECTS): Likewise.
+	* tilegx_corenote.c: New file.
+	* tilegx_regs.c: New file.
+	* tilegx_reloc.def: New file.
+	* tilegx_init.c: New file.
+	* tilegx_retval.c: New file.
+	* tilegx_symbol.c: New file.
+
 2011-03-09  Mark Wielaard  <mjw@redhat.com>
 
 	* alpha_init.c (alpha_init): Initialize check_st_other_bits hook.

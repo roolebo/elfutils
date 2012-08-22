@@ -2584,4 +2584,73 @@ FPU registers:
 	 63: $fpcr (fpcr), unsigned 64 bits
 EOF
 
+regs_test testfile60 <<\EOF
+integer registers:
+	  0: r0 (r0), signed 64 bits
+	  1: r1 (r1), signed 64 bits
+	  2: r2 (r2), signed 64 bits
+	  3: r3 (r3), signed 64 bits
+	  4: r4 (r4), signed 64 bits
+	  5: r5 (r5), signed 64 bits
+	  6: r6 (r6), signed 64 bits
+	  7: r7 (r7), signed 64 bits
+	  8: r8 (r8), signed 64 bits
+	  9: r9 (r9), signed 64 bits
+	 10: r10 (r10), signed 64 bits
+	 11: r11 (r11), signed 64 bits
+	 12: r12 (r12), signed 64 bits
+	 13: r13 (r13), signed 64 bits
+	 14: r14 (r14), signed 64 bits
+	 15: r15 (r15), signed 64 bits
+	 16: r16 (r16), signed 64 bits
+	 17: r17 (r17), signed 64 bits
+	 18: r18 (r18), signed 64 bits
+	 19: r19 (r19), signed 64 bits
+	 20: r20 (r20), signed 64 bits
+	 21: r21 (r21), signed 64 bits
+	 22: r22 (r22), signed 64 bits
+	 23: r23 (r23), signed 64 bits
+	 24: r24 (r24), signed 64 bits
+	 25: r25 (r25), signed 64 bits
+	 26: r26 (r26), signed 64 bits
+	 27: r27 (r27), signed 64 bits
+	 28: r28 (r28), signed 64 bits
+	 29: r29 (r29), signed 64 bits
+	 30: r30 (r30), signed 64 bits
+	 31: r31 (r31), signed 64 bits
+	 32: r32 (r32), signed 64 bits
+	 33: r33 (r33), signed 64 bits
+	 34: r34 (r34), signed 64 bits
+	 35: r35 (r35), signed 64 bits
+	 36: r36 (r36), signed 64 bits
+	 37: r37 (r37), signed 64 bits
+	 38: r38 (r38), signed 64 bits
+	 39: r39 (r39), signed 64 bits
+	 40: r40 (r40), signed 64 bits
+	 41: r41 (r41), signed 64 bits
+	 42: r42 (r42), signed 64 bits
+	 43: r43 (r43), signed 64 bits
+	 44: r44 (r44), signed 64 bits
+	 45: r45 (r45), signed 64 bits
+	 46: r46 (r46), signed 64 bits
+	 47: r47 (r47), signed 64 bits
+	 48: r48 (r48), signed 64 bits
+	 49: r49 (r49), signed 64 bits
+	 50: r50 (r50), signed 64 bits
+	 51: r51 (r51), signed 64 bits
+	 52: r52 (r52), signed 64 bits
+	 53: tp (tp), address 64 bits
+	 54: sp (sp), address 64 bits
+	 55: lr (lr), address 64 bits
+	 56: sn (sn), unsigned 64 bits
+	 57: idn0 (idn0), unsigned 64 bits
+	 58: idn1 (idn1), unsigned 64 bits
+	 59: udn0 (udn0), unsigned 64 bits
+	 60: udn1 (udn1), unsigned 64 bits
+	 61: udn2 (udn2), unsigned 64 bits
+	 62: udn3 (udn3), unsigned 64 bits
+	 63: zero (zero), unsigned 64 bits
+	 64: pc (pc), address 64 bits
+EOF
+
 exit 0

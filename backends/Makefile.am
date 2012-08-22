@@ -1,6 +1,7 @@
 ## Process this file with automake to create Makefile.in
 ##
 ## Copyright (C) 2000-2010 Red Hat, Inc.
+## Copyright (C) 2012 Tilera Corporation
 ## This file is part of elfutils.
 ##
 ## This file is free software; you can redistribute it and/or modify
@@ -31,11 +32,11 @@ INCLUDES += -I$(top_srcdir)/libebl -I$(top_srcdir)/libasm \
 	   -I$(top_srcdir)/libelf -I$(top_srcdir)/libdw
 
 
-modules = i386 sh x86_64 ia64 alpha arm sparc ppc ppc64 s390
+modules = i386 sh x86_64 ia64 alpha arm sparc ppc ppc64 s390 tilegx
 libebl_pic = libebl_i386_pic.a libebl_sh_pic.a libebl_x86_64_pic.a \
 	     libebl_ia64_pic.a libebl_alpha_pic.a libebl_arm_pic.a \
 	     libebl_sparc_pic.a libebl_ppc_pic.a libebl_ppc64_pic.a \
-	     libebl_s390_pic.a
+	     libebl_s390_pic.a libebl_tilegx_pic.a
 noinst_LIBRARIES = $(libebl_pic)
 noinst_DATA = $(libebl_pic:_pic.a=.so)
 
@@ -96,6 +97,11 @@ am_libebl_ppc64_pic_a_OBJECTS = $(ppc64_SRCS:.c=.os)
 s390_SRCS = s390_init.c s390_symbol.c s390_regs.c s390_retval.c
 libebl_s390_pic_a_SOURCES = $(s390_SRCS)
 am_libebl_s390_pic_a_OBJECTS = $(s390_SRCS:.c=.os)
+
+tilegx_SRCS = tilegx_init.c tilegx_symbol.c tilegx_regs.c \
+              tilegx_retval.c tilegx_corenote.c
+libebl_tilegx_pic_a_SOURCES = $(tilegx_SRCS)
+am_libebl_tilegx_pic_a_OBJECTS = $(tilegx_SRCS:.c=.os)
 
 
 libebl_%.so libebl_%.map: libebl_%_pic.a $(libelf) $(libdw)

@@ -63,6 +63,7 @@ static const struct
   { "x86_64", "elf_x86_64", "x86_64", 6, EM_X86_64, ELFCLASS64, ELFDATA2LSB },
   { "ppc", "elf_ppc", "ppc", 3, EM_PPC, ELFCLASS32, ELFDATA2MSB },
   { "ppc64", "elf_ppc64", "ppc64", 5, EM_PPC64, ELFCLASS64, ELFDATA2MSB },
+  { "tilegx", "elf_tilegx", "tilegx", 6, EM_TILEGX, ELFCLASS64, ELFDATA2LSB },
   // XXX class and machine fields need to be filled in for all archs.
   { "sh", "elf_sh", "sh", 2, EM_SH, 0, 0 },
   { "arm", "ebl_arm", "arm", 3, EM_ARM, 0, 0 },

@@ -1,3 +1,8 @@
+2012-08-22  Jeff Kenton  <jkenton@tilera.com>
+
+	* testfile60.bz2: New testfile.
+	* run-allregs.sh: Run reg_test testfile60.
+
 2012-08-24  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (TESTS): Only add run-readelf-dwz-multi.sh if

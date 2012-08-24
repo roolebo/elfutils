@@ -1,3 +1,7 @@
+2012-08-24  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (EXTRA_DIST): Add testfile60.bz2.
+
 2012-08-22  Jeff Kenton  <jkenton@tilera.com>
 
 	* testfile60.bz2: New testfile.

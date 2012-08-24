@@ -175,7 +175,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-low_high_pc.sh testfile_low_high_pc.bz2 \
 	     run-macro-test.sh testfile-macinfo.bz2 testfile-macros.bz2 \
 	     run-elf_cntl_gelf_getshdr.sh \
-	     run-test-archive64.sh testarchive64.a.bz2
+	     run-test-archive64.sh testarchive64.a.bz2 \
+	     testfile60.bz2
 
 installed_TESTS_ENVIRONMENT = libdir=$(DESTDIR)$(libdir) \
 			      bindir=$(DESTDIR)$(bindir) \

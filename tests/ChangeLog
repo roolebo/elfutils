@@ -1,3 +1,8 @@
+2012-08-24  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (TESTS): Only add run-readelf-dwz-multi.sh if
+	ENABLE_DWZ.
+
 2012-08-16  Mark Wielaard  <mjw@redhat.com>
 
 	* allregs.c (dwarf_encoding_string): Rewritten using known-dwarf

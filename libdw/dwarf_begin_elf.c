@@ -71,6 +71,7 @@ static const char dwarf_scnnames[IDX_last][17] =
 };
 #define ndwarf_scnnames (sizeof (dwarf_scnnames) / sizeof (dwarf_scnnames[0]))
 
+#ifdef ENABLE_DWZ
 internal_function int
 __check_build_id (Dwarf *dw, const uint8_t *build_id, const size_t id_len)
 {
@@ -175,6 +176,7 @@ open_debugaltlink (Dwarf *result, const char *alt_name,
   result->alt_dwarf = NULL;
   return result;
 }
+#endif /* ENABLE_DWZ */
 
 static Dwarf *
 check_section (Dwarf *result, GElf_Ehdr *ehdr, Elf_Scn *scn, bool inscngrp)
@@ -219,6 +221,7 @@ check_section (Dwarf *result, GElf_Ehdr *ehdr, Elf_Scn *scn, bool inscngrp)
       return NULL;
     }
 
+#ifdef ENABLE_DWZ
   /* For dwz multifile support, ignore if it looks wrong.  */
   if (strcmp (scnname, ".gnu_debugaltlink") == 0)
     {
@@ -232,7 +235,7 @@ check_section (Dwarf *result, GElf_Ehdr *ehdr, Elf_Scn *scn, bool inscngrp)
 	    return open_debugaltlink (result, alt_name, build_id + 1, id_len);
 	}
     }
-
+#endif /* ENABLE_DWZ */
 
   /* Recognize the various sections.  Most names start with .debug_.  */
   size_t cnt;

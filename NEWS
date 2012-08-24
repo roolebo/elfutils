@@ -9,7 +9,9 @@ libdw: dwarf.h corrected the DW_LANG_ObjC constant name (was DW_LANG_Objc).
        Any existing sources using the old name will have to be updated.
        Add DW_MACRO_GNU .debug_macro type encodings constants, DW_ATE_UTF
        and DW_OP_GNU_parameter_ref to dwarf.h.
-       Support for DWZ multifile forms DW_FORM_GNU_ref_alt/strp_alt.
+       Experimental support for DWZ multifile forms DW_FORM_GNU_ref_alt
+       and DW_FORM_GNU_strp_alt.  Disabled by default.  Use configure
+       --enable-dwz to test it.
 
 readelf: Add .debug_macro parsing support.
          Add .gdb_index version 7 parsing support.

@@ -67,6 +67,14 @@ AS_IF([test "$use_locks" = yes], [AC_DEFINE(USE_LOCKS)])
 
 AH_TEMPLATE([USE_LOCKS], [Defined if libraries should be thread-safe.])
 
+AC_ARG_ENABLE([dwz],
+AS_HELP_STRING([--enable-dwz], [enable experimental GNU ref_alt FORM, dwz multi file support in libdw]),
+enable_dwz=$enableval, enable_dwz=no)
+AM_CONDITIONAL(ENABLE_DWZ, test "$enable_dwz" = yes)
+AS_IF([test "$enable_dwz" = yes], [AC_DEFINE(ENABLE_DWZ)])
+
+AH_TEMPLATE([ENABLE_DWZ], [Defined if libdw should support GNU ref_alt FORM, dwz multi files.])
+
 AC_PROG_CC
 AC_PROG_RANLIB
 AC_PROG_YACC

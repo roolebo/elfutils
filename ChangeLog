@@ -1,3 +1,7 @@
+2012-08-24  Mark Wielaard  <mjw@redhat.com>
+
+	* configure.ac: Add --enable-dwz check, defaults to no.
+
 2012-07-24  Mark Wielaard  <mjw@redhat.com>
 
 	* TODO: Add note on shdrs after elf_cntl (ELF_C_FDREAD).

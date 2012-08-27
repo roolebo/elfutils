@@ -4305,9 +4305,12 @@ register_info (Ebl *ebl, unsigned int regno, const Ebl_Register_Location *loc,
 				 bits ?: &ignore, type ?: &ignore);
   if (n <= 0)
     {
-      snprintf (name, REGNAMESZ, "reg%u", loc->regno);
+      if (loc != NULL)
+	snprintf (name, REGNAMESZ, "reg%u", loc->regno);
+      else
+	snprintf (name, REGNAMESZ, "??? 0x%x", regno);
       if (bits != NULL)
-	*bits = loc->bits;
+	*bits = loc != NULL ? loc->bits : 0;
       if (type != NULL)
 	*type = DW_ATE_unsigned;
       set = "??? unrecognized";
@@ -4315,7 +4318,7 @@ register_info (Ebl *ebl, unsigned int regno, const Ebl_Register_Location *loc,
   else
     {
       if (bits != NULL && *bits <= 0)
-	*bits = loc->bits;
+	*bits = loc != NULL ? loc->bits : 0;
       if (type != NULL && *type == DW_ATE_void)
 	*type = DW_ATE_unsigned;
 

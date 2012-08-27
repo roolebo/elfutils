@@ -1,3 +1,7 @@
+2012-08-27  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (register_info): Handle loc == NULL.
+
 2012-08-22  Jeff Kenton  <jkenton@tilera.com>
 
 	* elflint.c (valid_e_machine): Add EM_TILEGX and EM_TILEPRO.

@@ -1,5 +1,9 @@
 2012-08-27  Mark Wielaard  <mjw@redhat.com>
 
+	* readelf.c (print_debug_macro_section): Print offset as PRIx64.
+
+2012-08-27  Mark Wielaard  <mjw@redhat.com>
+
 	* readelf.c (register_info): Handle loc == NULL.
 
 2012-08-22  Jeff Kenton  <jkenton@tilera.com>

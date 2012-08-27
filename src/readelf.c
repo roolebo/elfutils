@@ -6324,8 +6324,8 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 
   while (readp < readendp)
     {
-      printf (gettext (" Offset:             0x%zx\n"),
-	      readp - (const unsigned char *) data->d_buf);
+      printf (gettext (" Offset:             0x%" PRIx64 "\n"),
+	      (uint64_t) (readp - (const unsigned char *) data->d_buf));
 
       // Header, 2 byte version, 1 byte flag, optional .debug_line offset,
       // optional vendor extension macro entry table.

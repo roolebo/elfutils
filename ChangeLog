@@ -1,3 +1,7 @@
+2012-08-27  Mark Wielaard  <mjw@redhat.com>
+
+	* configure.ac: Set version to 0.155.
+
 2012-08-24  Mark Wielaard  <mjw@redhat.com>
 
 	* configure.ac: Add --enable-dwz check, defaults to no.

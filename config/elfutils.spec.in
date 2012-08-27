@@ -195,6 +195,23 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
+* Fri Aug 24 2012 Mark Wielaard <mjw@redhat.com> 0.155-1
+- libelf: elf*_xlatetomd now works for cross-endian ELF note data.    
+       elf_getshdr now works consistently on non-mmaped ELF files after 
+          calling elf_cntl(ELF_C_FDREAD).         Implement support for 
+  ar archives with 64-bit symbol table.
+- libdw: dwarf.h corrected the DW_LANG_ObjC constant name (was 
+  DW_LANG_Objc).        Any existing sources using the old name will 
+  have to be updated.        Add DW_MACRO_GNU .debug_macro type 
+  encodings constants, DW_ATE_UTF        and DW_OP_GNU_parameter_ref to 
+  dwarf.h.        Experimental support for DWZ multifile forms 
+  DW_FORM_GNU_ref_alt        and DW_FORM_GNU_strp_alt.  Disabled by 
+  default.  Use configure        --enable-dwz to test it.
+- readelf: Add .debug_macro parsing support.          Add .gdb_index 
+  version 7 parsing support.          Recognize DW_OP_GNU_parameter_ref.
+- backends: Add support for Tilera TILE-Gx processor.
+- translations: Updated Ukrainian translation.
+
 * Fri Jun 22 2012 Mark Wielaard <mjw@redhat.com> 0.154-1
 - libelf: [g]elf[32|64]_offscn() do not match SHT_NOBITS sections at 
   OFFSET.

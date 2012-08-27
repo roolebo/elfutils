@@ -17,6 +17,10 @@ readelf: Add .debug_macro parsing support.
          Add .gdb_index version 7 parsing support.
          Recognize DW_OP_GNU_parameter_ref.
 
+backends: Add support for Tilera TILE-Gx processor.
+
+translations: Updated Ukrainian translation.
+
 Version 0.154
 
 libelf: [g]elf[32|64]_offscn() do not match SHT_NOBITS sections at OFFSET.

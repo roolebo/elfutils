@@ -1,5 +1,5 @@
 /* Return note type name.
-   Copyright (C) 2002, 2007, 2008 Red Hat, Inc.
+   Copyright (C) 2002, 2007, 2008, 2012 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -78,8 +78,19 @@ ebl_core_note_type_name (ebl, type, buf, len)
 	    KNOWNSTYPE (PRXFPREG);
 	    KNOWNSTYPE (PPC_VMX);
 	    KNOWNSTYPE (PPC_SPE);
+	    KNOWNSTYPE (PPC_VSX);
 	    KNOWNSTYPE (386_TLS);
 	    KNOWNSTYPE (386_IOPERM);
+	    KNOWNSTYPE (X86_XSTATE);
+	    KNOWNSTYPE (S390_HIGH_GPRS);
+	    KNOWNSTYPE (S390_TIMER);
+	    KNOWNSTYPE (S390_TODCMP);
+	    KNOWNSTYPE (S390_TODPREG);
+	    KNOWNSTYPE (S390_CTRS);
+	    KNOWNSTYPE (S390_PREFIX);
+	    KNOWNSTYPE (S390_LAST_BREAK);
+	    KNOWNSTYPE (S390_SYSTEM_CALL);
+	    KNOWNSTYPE (ARM_VFP);
 #undef KNOWNSTYPE
 
 	  default:

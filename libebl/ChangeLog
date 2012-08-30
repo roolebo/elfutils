@@ -1,3 +1,9 @@
+2012-08-30  Petr Machata  <pmachata@redhat.com>
+
+	* eblcorenotetypename.c: Handle PPC_VSX, X86_XSTATE,
+	S390_HIGH_GPRS, S390_TIMER, S390_TODCMP, S390_TODPREG, S390_CTRS,
+	S390_PREFIX, S390_LAST_BREAK, S390_SYSTEM_CALL, and ARM_VFP.
+
 2012-08-22  Jeff Kenton  <jkenton@tilera.com>
 
 	* eblopenbackend.c (machines): Add tilegx.

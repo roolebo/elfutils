@@ -1,13 +1,13 @@
 # translation of pl.po to Polish
 # Jakub Bogusz <qboosh@pld-linux.org>, 2003-2007.
-# Piotr Drąg <piotrdrag@gmail.com>, 2010.
+# Piotr Drąg <piotrdrag@gmail.com>, 2010-2012.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: pl\n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
 "POT-Creation-Date: 2012-08-27 15:17+0200\n"
-"PO-Revision-Date: 2011-02-13 16:25+0100\n"
+"PO-Revision-Date: 2012-09-02 19:12+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <trans-pl@lists.fedoraproject.org>\n"
 "Language: pl\n"
@@ -206,7 +206,7 @@ msgstr "nieprawidłowa wersja CFI"
 
 #: libdw/dwarf_error.c:94
 msgid "no alternative debug link found"
-msgstr ""
+msgstr "nie odnaleziono alternatywnego dowiązania debugowania"
 
 #: libdwfl/argp-std.c:46 src/unstrip.c:2240
 msgid "Input selection options:"
@@ -382,44 +382,44 @@ msgid "<unknown>: %#<PRIx64>"
 msgstr "<nieznany>: %#<PRIx64>"
 
 #: libebl/eblobjnote.c:55
-#, fuzzy, c-format
+#, c-format
 msgid "unknown SDT version %u\n"
-msgstr "nieznana wersja"
+msgstr "nieznana wersja SDT %u\n"
 
 #: libebl/eblobjnote.c:73
-#, fuzzy, c-format
+#, c-format
 msgid "invalid SDT probe descriptor\n"
-msgstr "nieprawidłowy deskryptor pliku"
+msgstr "nieprawidłowy deskryptor sondy SDT\n"
 
 #: libebl/eblobjnote.c:123
 #, c-format
 msgid "    PC: "
-msgstr ""
+msgstr "    PC: "
 
 #: libebl/eblobjnote.c:125
 #, c-format
 msgid " Base: "
-msgstr ""
+msgstr " Podstawa: "
 
 #: libebl/eblobjnote.c:127
 #, c-format
 msgid " Semaphore: "
-msgstr ""
+msgstr " Semafor: "
 
 #: libebl/eblobjnote.c:129
 #, c-format
 msgid "    Provider: "
-msgstr ""
+msgstr "    Dostawca: "
 
 #: libebl/eblobjnote.c:131
 #, c-format
 msgid " Name: "
-msgstr ""
+msgstr " Nazwa: "
 
 #: libebl/eblobjnote.c:133
 #, c-format
 msgid " Args: "
-msgstr ""
+msgstr " Parametry: "
 
 #: libebl/eblobjnote.c:143
 #, c-format
@@ -809,7 +809,7 @@ msgstr "wymagana jest nazwa archiwum"
 #: src/ar.c:249
 #, c-format
 msgid "command option required"
-msgstr ""
+msgstr "wymagana jest opcja polecenia"
 
 #: src/ar.c:314
 #, c-format
@@ -958,7 +958,7 @@ msgstr "Ignorowanie permutacji kubełków w sekcji SHT_HASH"
 
 #: src/elfcmp.c:69
 msgid "Ignore differences in build ID"
-msgstr "Ignorowanie różnic w identyfikatorze budowania"
+msgstr "Ignorowanie różnic w identyfikatorze kopii"
 
 #: src/elfcmp.c:70
 msgid "Output nothing; yield exit status only"
@@ -1059,12 +1059,12 @@ msgstr "%s %s różnią się: sekcja [%zu] \"%s\" notatka \"%s\" typ"
 #: src/elfcmp.c:462
 #, c-format
 msgid "%s %s differ: build ID length"
-msgstr "%s %s różnią się: długość identyfikatora budowania"
+msgstr "%s %s różnią się: długość identyfikatora kopii"
 
 #: src/elfcmp.c:470
 #, c-format
 msgid "%s %s differ: build ID content"
-msgstr "%s %s różnią się: zawartość identyfikatora budowania"
+msgstr "%s %s różnią się: zawartość identyfikatora kopii"
 
 #: src/elfcmp.c:479
 #, c-format
@@ -3321,7 +3321,7 @@ msgstr "Ustawia styl sum kontrolnych na sysv, gnu lub oba."
 
 #: src/ld.c:167
 msgid "Generate build ID note (md5, sha1 (default), uuid)."
-msgstr "Tworzy wpis identyfikatora budowania (md5, sha1 (domyślnie), uuid)."
+msgstr "Tworzy wpis identyfikatora kopii (md5, sha1 (domyślnie), uuid)."
 
 #: src/ld.c:169
 msgid "Linker Operation Control:"
@@ -3672,7 +3672,7 @@ msgstr "nie można utworzyć sekcji tabeli mieszającej dla pliku wyjściowego: 
 #: src/ldgeneric.c:4104
 #, c-format
 msgid "cannot create build ID section: %s"
-msgstr "nie można utworzyć sekcji identyfikatora budowania: %s"
+msgstr "nie można utworzyć sekcji identyfikatora kopii: %s"
 
 #: src/ldgeneric.c:4181
 #, c-format
@@ -3876,9 +3876,8 @@ msgid "Use RADIX for printing symbol values"
 msgstr "Używa BAZY do wypisywania wartości symboli"
 
 #: src/nm.c:87
-#, fuzzy
 msgid "Mark special symbols"
-msgstr "Oznacza słabe symbole"
+msgstr "Oznacza specjalne symbole"
 
 #: src/nm.c:89
 msgid "Print size of defined symbols"
@@ -3902,16 +3901,15 @@ msgstr "Odwraca kierunek porządkowania"
 
 #: src/nm.c:98
 msgid "Decode low-level symbol names into source code names"
-msgstr ""
+msgstr "Dekoduje niskopoziomowe nazwy symboli na nazwy kodu źródłowego"
 
 #: src/nm.c:105
 msgid "List symbols from FILEs (a.out by default)."
 msgstr "Wyświetla listę symboli z PLIKU (domyślnie a.out)."
 
 #: src/nm.c:116 src/objdump.c:80
-#, fuzzy
 msgid "Output formatting"
-msgstr "Format wyjścia:"
+msgstr "Formatowanie wyjścia"
 
 #: src/nm.c:140 src/objdump.c:104 src/size.c:109 src/strip.c:120
 #, c-format
@@ -3930,13 +3928,12 @@ msgid "%s: File format not recognized"
 msgstr "%s: nie rozpoznano formatu pliku"
 
 #: src/nm.c:460
-#, fuzzy
 msgid ""
 "\n"
 "Archive index:\n"
 msgstr ""
 "\n"
-"Indeks archiwum:"
+"Indeks archiwum:\n"
 
 #: src/nm.c:469
 #, c-format
@@ -4032,9 +4029,8 @@ msgid "Display assembler code of executable sections"
 msgstr "Wyświetla kod asemblera sekcji wykonywalnych"
 
 #: src/objdump.c:60
-#, fuzzy
 msgid "Output content selection:"
-msgstr "Wybór opcji wyjścia:"
+msgstr "Wybór zawartości wyjścia:"
 
 #: src/objdump.c:62
 msgid "Only display information for section NAME."
@@ -4087,9 +4083,9 @@ msgid "cannot disassemble"
 msgstr "nie można deasemblować"
 
 #: src/objdump.c:736
-#, fuzzy, c-format
+#, c-format
 msgid "cannot allocate memory"
-msgstr "nie można przydzielić sekcji PLT: %s"
+msgstr "nie można przydzielić pamięci"
 
 #: src/ranlib.c:66
 msgid "Generate an index to speed access to archives."
@@ -4171,14 +4167,14 @@ msgid "Additional output selection:"
 msgstr "Dodatkowy wybór wyjścia:"
 
 #: src/readelf.c:89
-#, fuzzy
 msgid ""
 "Display DWARF section content.  SECTION can be one of abbrev, aranges, "
 "frame, gdb_index, info, loc, line, ranges, pubnames, str, macinfo, macro or "
 "exception"
 msgstr ""
 "Wyświetla zawartość sekcji DWARF. SEKCJA może być jednym z abbrev, aranges, "
-"frame, info, loc, line, ranges, pubnames, str, macinfo lub exception."
+"frame, gdb_index, info, loc, line, ranges, pubnames, str, macinfo, macro lub "
+"exception."
 
 #: src/readelf.c:93
 msgid "Dump the uninterpreted contents of SECTION, by number or name"
@@ -4202,7 +4198,7 @@ msgstr "Bez odnajdywania nazw symboli dla adresów w danych DWARF"
 
 #: src/readelf.c:104
 msgid "Ignored for compatibility (lines always wide)"
-msgstr ""
+msgstr "Ignorowane dla zgodności (wiersze są zawsze szerokie)"
 
 #: src/readelf.c:109
 msgid "Print information from ELF file in human-readable form."
@@ -5429,20 +5425,19 @@ msgid " extended opcode %u: "
 msgstr " instrukcja rozszerzona %u: "
 
 #: src/readelf.c:5781
-#, fuzzy
 msgid " end of sequence"
-msgstr "koniec sekwencji"
+msgstr " koniec sekwencji"
 
 #: src/readelf.c:5798
-#, fuzzy, c-format
+#, c-format
 msgid " set address to %s\n"
-msgstr "ustawienie adresu na %s\n"
+msgstr " ustawienie adresu na %s\n"
 
 #: src/readelf.c:5819
-#, fuzzy, c-format
+#, c-format
 msgid " define new file: dir=%u, mtime=%<PRIu64>, length=%<PRIu64>, name=%s\n"
 msgstr ""
-"definicja nowego pliku: dir=%u, mtime=%<PRIu64>, długość=%<PRIu64>, nazwa="
+" definicja nowego pliku: dir=%u, mtime=%<PRIu64>, długość=%<PRIu64>, nazwa="
 "%s\n"
 
 #: src/readelf.c:5832
@@ -5451,25 +5446,22 @@ msgid " set discriminator to %u\n"
 msgstr " ustawienie dyskryminatora na %u\n"
 
 #: src/readelf.c:5837
-#, fuzzy
 msgid " unknown opcode"
-msgstr "nieznana instrukcja"
+msgstr " nieznana instrukcja"
 
 #: src/readelf.c:5849
 msgid " copy"
 msgstr " kopiowanie"
 
 #: src/readelf.c:5860
-#, fuzzy, c-format
+#, c-format
 msgid " advance address by %u to %s, op_index to %u\n"
-msgstr ""
-"zwiększenie adresu o %u do %s, op_index do %u\n"
-"\n"
+msgstr " zwiększenie adresu o %u do %s, op_index do %u\n"
 
 #: src/readelf.c:5864
-#, fuzzy, c-format
+#, c-format
 msgid " advance address by %u to %s\n"
-msgstr "zwiększenie adresu o %u do %s\n"
+msgstr " zwiększenie adresu o %u do %s\n"
 
 #: src/readelf.c:5875
 #, c-format
@@ -5496,19 +5488,19 @@ msgid " set basic block flag"
 msgstr " ustawienie podstawowej flagi bloku"
 
 #: src/readelf.c:5915
-#, fuzzy, c-format
+#, c-format
 msgid " advance address by constant %u to %s, op_index to %u\n"
-msgstr "zwiększenie adresu o stałą %u do %s, op_index do %u\n"
+msgstr " zwiększenie adresu o stałą %u do %s, op_index do %u\n"
 
 #: src/readelf.c:5919
-#, fuzzy, c-format
+#, c-format
 msgid " advance address by constant %u to %s\n"
-msgstr "zwiększenie adresu o stałą %u do %s\n"
+msgstr " zwiększenie adresu o stałą %u do %s\n"
 
 #: src/readelf.c:5937
-#, fuzzy, c-format
+#, c-format
 msgid " advance address by fixed value %u to %s\n"
-msgstr "zwiększenie adresu o stałą wartość %u do %s\n"
+msgstr " zwiększenie adresu o stałą wartość %u do %s\n"
 
 #: src/readelf.c:5946
 msgid " set prologue end flag"
@@ -5561,59 +5553,59 @@ msgid "%*s*** non-terminated string at end of section"
 msgstr "%*s*** niezakończony ciąg na końcu sekcji"
 
 #: src/readelf.c:6327
-#, fuzzy, c-format
+#, c-format
 msgid " Offset:             0x%<PRIx64>\n"
-msgstr "  Właściciel          Rozmiar\n"
+msgstr " Offset:             0x%<PRIx64>\n"
 
 #: src/readelf.c:6339
-#, fuzzy, c-format
+#, c-format
 msgid " Version:            %<PRIu16>\n"
-msgstr "      %s: %<PRId64>\n"
+msgstr " Wersja:            %<PRIu16>\n"
 
 #: src/readelf.c:6345 src/readelf.c:7055
 #, c-format
 msgid "  unknown version, cannot parse section\n"
-msgstr ""
+msgstr "  nieznana wersja, nie można przetworzyć sekcji\n"
 
 #: src/readelf.c:6352
-#, fuzzy, c-format
+#, c-format
 msgid " Flag:               0x%<PRIx8>\n"
-msgstr "  Adres punktu wejściowego:          %#<PRIx64>\n"
+msgstr "  Flaga:               0x%<PRIx8>\n"
 
 #: src/readelf.c:6355
-#, fuzzy, c-format
+#, c-format
 msgid " Offset length:      %<PRIu8>\n"
-msgstr " (offset: %#<PRIx64>)"
+msgstr " Długość offsetu:      %<PRIu8>\n"
 
 #: src/readelf.c:6363
-#, fuzzy, c-format
+#, c-format
 msgid " .debug_line offset: 0x%<PRIx64>\n"
-msgstr " (kończący offset: %#<PRIx64>)"
+msgstr " Offset .debug_line: 0x%<PRIx64>\n"
 
 #: src/readelf.c:6375
-#, fuzzy, c-format
+#, c-format
 msgid "  extension opcode table, %<PRIu8> items:\n"
-msgstr " nieznana instrukcja z %<PRIu8> parametrem:"
+msgstr " tablica instrukcji rozszerzenia, %<PRIu8> elementów:\n"
 
 #: src/readelf.c:6382
 #, c-format
 msgid "    [%<PRIx8>]"
-msgstr ""
+msgstr "    [%<PRIx8>]"
 
 #: src/readelf.c:6394
-#, fuzzy, c-format
+#, c-format
 msgid " %<PRIu8> arguments:"
-msgstr "  [%*<PRIuFAST8>]  %hhu parametr\n"
+msgstr " Parametry %<PRIu8>:"
 
 #: src/readelf.c:6422
 #, c-format
 msgid " no arguments."
-msgstr ""
+msgstr " brak parametrów."
 
 #: src/readelf.c:6657
 #, c-format
 msgid "vendor opcode not verified?"
-msgstr ""
+msgstr "instrukcja producenta nie została sprawdzona?"
 
 #: src/readelf.c:6685
 #, c-format
@@ -5696,79 +5688,79 @@ msgid "invalid TType encoding"
 msgstr "nieprawidłowe kodowanie TType"
 
 #: src/readelf.c:7019
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 "GDB section [%2zu] '%s' at offset %#<PRIx64> contains %<PRId64> bytes :\n"
 msgstr ""
 "\n"
-"Sekcja DWARF [%2zu] \"%s\" pod offsetem %#<PRIx64> zawiera %zu wpis:\n"
+"Sekcja GDB [%2zu] \"%s\" pod offsetem %#<PRIx64> zawiera %<PRId64> bajtów:\n"
 
 #: src/readelf.c:7048
-#, fuzzy, c-format
+#, c-format
 msgid " Version:         %<PRId32>\n"
-msgstr "      %s: %<PRId64>\n"
+msgstr " Wersja:         %<PRId32>\n"
 
 #: src/readelf.c:7064
-#, fuzzy, c-format
+#, c-format
 msgid " CU offset:       %#<PRIx32>\n"
-msgstr " (offset: %#<PRIx64>)"
+msgstr " offset CU:       %#<PRIx32>\n"
 
 #: src/readelf.c:7071
-#, fuzzy, c-format
+#, c-format
 msgid " TU offset:       %#<PRIx32>\n"
-msgstr " (offset: %#<PRIx64>)"
+msgstr " offset TU:       %#<PRIx32>\n"
 
 #: src/readelf.c:7078
-#, fuzzy, c-format
+#, c-format
 msgid " address offset:  %#<PRIx32>\n"
-msgstr " (kończący offset: %#<PRIx64>)"
+msgstr " offset adresu:  %#<PRIx32>\n"
 
 #: src/readelf.c:7085
-#, fuzzy, c-format
+#, c-format
 msgid " symbol offset:   %#<PRIx32>\n"
-msgstr " (offset: %#<PRIx64>)"
+msgstr " offset symbolu:   %#<PRIx32>\n"
 
 #: src/readelf.c:7092
-#, fuzzy, c-format
+#, c-format
 msgid " constant offset: %#<PRIx32>\n"
-msgstr " (kończący offset: %#<PRIx64>)"
+msgstr " offset stałej: %#<PRIx32>\n"
 
 #: src/readelf.c:7099
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 " CU list at offset %#<PRIx32> contains %zu entries:\n"
 msgstr ""
 "\n"
-"Sekcja DWARF [%2zu] \"%s\" pod offsetem %#<PRIx64> zawiera %zu wpis:\n"
+" Lista CU pod offsetem %#<PRIx32> zawiera %zu wpisów:\n"
 
 #: src/readelf.c:7121
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 " TU list at offset %#<PRIx32> contains %zu entries:\n"
 msgstr ""
 "\n"
-"Sekcja DWARF [%2zu] \"%s\" pod offsetem %#<PRIx64> zawiera %zu wpis:\n"
+" Lista TU pod offsetem %#<PRIx32> zawiera %zu wpisów:\n"
 
 #: src/readelf.c:7147
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 " Address list at offset %#<PRIx32> contains %zu entries:\n"
 msgstr ""
 "\n"
-"Sekcja DWARF [%2zu] \"%s\" pod offsetem %#<PRIx64> zawiera %zu wpis:\n"
+" Lista adresów pod offsetem %#<PRIx32> zawiera %zu wpisów:\n"
 
 #: src/readelf.c:7174
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 " Symbol table at offset %#<PRIx32> contains %zu slots:\n"
 msgstr ""
 "\n"
-"Nieprawidłowa tabela symboli pod offsetem %#0<PRIx64>\n"
+" Tabela symboli pod offsetem %#<PRIx32> zawiera %zu gniazd:\n"
 
 #: src/readelf.c:7259
 #, c-format
@@ -6076,6 +6068,9 @@ msgid ""
 "sections are placed in a debug file (only relevant for ET_REL files, "
 "operation is not reversable, needs -f)"
 msgstr ""
+"Rozwiązuje wszystkie proste relokacje między sekcjami debugowania, jeśli "
+"usunięte sekcje zostały umieszczone w pliku debugowania (ma znaczenie tylko "
+"dla plików ET_REL, działanie jest nieodwracalne, wymaga użycia opcji -f)"
 
 #: src/strip.c:85
 msgid "Remove .comment section"
@@ -6092,7 +6087,7 @@ msgstr "Odrzuca symbole z plików obiektów."
 #: src/strip.c:181
 #, c-format
 msgid "--reloc-debug-sections used without -f"
-msgstr ""
+msgstr "Użyto --reloc-debug-sections bez opcji -f"
 
 #: src/strip.c:195
 #, c-format
@@ -6180,9 +6175,9 @@ msgid "while create section header string table: %s"
 msgstr "podczas tworzenia tabeli ciągów nagłówka sekcji: %s"
 
 #: src/strip.c:1724
-#, fuzzy, c-format
+#, c-format
 msgid "bad relocation"
-msgstr "Wyświetla relokacje"
+msgstr "błędna relokacja"
 
 #: src/strip.c:1841 src/strip.c:1951
 #, c-format
@@ -6251,7 +6246,7 @@ msgstr "Zastosowuje relokacje do zawartości sekcji w plikach ET_REL"
 
 #: src/unstrip.c:84
 msgid "Only list module and file names, build IDs"
-msgstr "Wyświetla tylko nazwy modułów i plików, identyfikatory budowania"
+msgstr "Wyświetla tylko nazwy modułów i plików, identyfikatory kopii"
 
 #: src/unstrip.c:126
 #, c-format
@@ -6562,41 +6557,13 @@ msgstr ""
 "\n"
 "Używając opcji -n żadne pliki nie zostają zapisane, a jeden wiersz do "
 "standardowego wyjścia dla każdego modułu:\n"
-"\tPOCZĄTEK+ROZMIAR IDENTYFIKATOR-BUDOWANIA PLIK PLIK-DEBUGOWANIA NAZWA-"
-"MODUŁU\n"
+"\tPOCZĄTEK+ROZMIAR IDENTYFIKATOR-KOPII PLIK PLIK-DEBUGOWANIA NAZWA-MODUŁU\n"
 "POCZĄTEK i ROZMIAR są liczbami szesnastkowymi podającymi zakres adresów "
-"modułu. IDENTYFIKATOR-BUDOWANIA jest liczbą szesnastkową dla bitów "
-"identyfikatora budowania lub \"-\", jeśli identyfikator jest nieznany; "
-"liczba szesnastkowa może być uzupełniona @0xADRES podającym adres, gdzie "
-"znajduje się identyfikator, jeśli jest to wiadome. PLIK jest nazwą pliku "
+"modułu. IDENTYFIKATOR-KOPII jest liczbą szesnastkową dla bitów "
+"identyfikatora kopii lub \"-\", jeśli identyfikator jest nieznany; liczba "
+"szesnastkowa może być uzupełniona @0xADRES podającym adres, gdzie znajduje "
+"się identyfikator, jeśli jest to wiadome. PLIK jest nazwą pliku "
 "odnalezionego dla modułu lub \"-\", jeśli go nie odnaleziono lub \".\", "
 "jeśli obraz ELF jest dostępny, ale nie z żadnego nazwanego pliku. PLIK-"
 "DEBUGOWANIA jest nazwą oddzielnego pliku debuginfo lub \"-\", jeśli nie "
 "odnaleziono debuginfo lub \".\", jeśli PLIK zawiera informacje debugowania."
-
-#~ msgid "unknown tag %hx"
-#~ msgstr "nieznany znacznik %hx"
-
-#~ msgid "unknown user tag %hx"
-#~ msgstr "nieznany znacznik użytkownika %hx"
-
-#~ msgid "unknown attribute %hx"
-#~ msgstr "nieznany atrybut %hx"
-
-#~ msgid "unknown user attribute %hx"
-#~ msgstr "nieznany atrybut użytkownika %hx"
-
-#, fuzzy
-#~ msgid "unknown form %#<PRIx64>"
-#~ msgstr "nieznana forma %<PRIx64>"
-
-#~ msgid ""
-#~ "\n"
-#~ "\n"
-#~ "Symbols from %s[%s]:\n"
-#~ "\n"
-#~ msgstr ""
-#~ "\n"
-#~ "\n"
-#~ "Symbole z %s[%s]:\n"
-#~ "\n"

@@ -58,7 +58,7 @@ static const Ebl_Register_Location fpregset_regs[] =
   {
     { .offset = 0, .regno = 96, .count = 8, .bits = 96 }, /* f0..f7 */
   };
-#define FPREGSET_SIZE	140
+#define FPREGSET_SIZE	116
 
 #define	ULONG			uint32_t
 #define PID_T			int32_t

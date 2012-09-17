@@ -1,3 +1,7 @@
+2012-09-17  Petr Machata  <pmachata@redhat.com>
+
+	* arm_corenote.c (FPREGSET_SIZE): Change to 116.
+
 2012-08-22  Jeff Kenton  <jkenton@tilera.com>
 
 	* Makefile.am (modules): Add tilegx.

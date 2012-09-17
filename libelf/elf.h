@@ -622,6 +622,15 @@ typedef struct
 #define NT_386_TLS	0x200		/* i386 TLS slots (struct user_desc) */
 #define NT_386_IOPERM	0x201		/* x86 io permission bitmap (1=deny) */
 #define NT_X86_XSTATE	0x202		/* x86 extended state using xsave */
+#define NT_S390_HIGH_GPRS	0x300	/* s390 upper register halves */
+#define NT_S390_TIMER	0x301		/* s390 timer register */
+#define NT_S390_TODCMP	0x302		/* s390 TOD clock comparator register */
+#define NT_S390_TODPREG	0x303		/* s390 TOD programmable register */
+#define NT_S390_CTRS	0x304		/* s390 control registers */
+#define NT_S390_PREFIX	0x305		/* s390 prefix register */
+#define NT_S390_LAST_BREAK	0x306	/* s390 breaking event address */
+#define NT_S390_SYSTEM_CALL	0x307	/* s390 system call restart data */
+#define NT_ARM_VFP	0x400		/* ARM VFP/NEON registers */
 
 /* Legal values for the note segment descriptor types for object files.  */
 
@@ -2249,6 +2258,9 @@ typedef Elf32_Addr Elf32_Conflict;
 #define EF_ARM_SOFT_FLOAT	0x200
 #define EF_ARM_VFP_FLOAT	0x400
 #define EF_ARM_MAVERICK_FLOAT	0x800
+
+#define EF_ARM_ABI_FLOAT_SOFT	0x200   /* NB conflicts with EF_ARM_SOFT_FLOAT */
+#define EF_ARM_ABI_FLOAT_HARD	0x400   /* NB conflicts with EF_ARM_VFP_FLOAT */
 
 
 /* Other constants defined in the ARM ELF spec. version B-01.  */

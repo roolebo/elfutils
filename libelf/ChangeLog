@@ -1,3 +1,7 @@
+2012-09-17  Petr Machata  <pmachata@redhat.com>
+
+	* elf.h: Update from glibc.
+
 2012-08-16  Roland McGrath  <roland@hack.frob.com>
 
 	* elf.h: Update from glibc.

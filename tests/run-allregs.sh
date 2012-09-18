@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2005, 2006, 2007 Red Hat, Inc.
+# Copyright (C) 2005, 2006, 2007, 2012 Red Hat, Inc.
 # This file is part of elfutils.
 #
 # This file is free software; you can redistribute it and/or modify
@@ -2651,6 +2651,77 @@ integer registers:
 	 62: udn3 (udn3), unsigned 64 bits
 	 63: zero (zero), unsigned 64 bits
 	 64: pc (pc), address 64 bits
+EOF
+
+regs_test testfile61 <<\EOF
+integer registers:
+	  0: r0 (r0), signed 32 bits
+	  1: r1 (r1), signed 32 bits
+	  2: r2 (r2), signed 32 bits
+	  3: r3 (r3), signed 32 bits
+	  4: r4 (r4), signed 32 bits
+	  5: r5 (r5), signed 32 bits
+	  6: r6 (r6), signed 32 bits
+	  7: r7 (r7), signed 32 bits
+	  8: r8 (r8), signed 32 bits
+	  9: r9 (r9), signed 32 bits
+	 10: r10 (r10), signed 32 bits
+	 11: r11 (r11), signed 32 bits
+	 12: r12 (r12), signed 32 bits
+	 13: sp (sp), address 32 bits
+	 14: lr (lr), address 32 bits
+	 15: pc (pc), address 32 bits
+	128: spsr (spsr), unsigned 32 bits
+FPA registers:
+	 16: f0 (f0), float 96 bits
+	 17: f1 (f1), float 96 bits
+	 18: f2 (f2), float 96 bits
+	 19: f3 (f3), float 96 bits
+	 20: f4 (f4), float 96 bits
+	 21: f5 (f5), float 96 bits
+	 22: f6 (f6), float 96 bits
+	 23: f7 (f7), float 96 bits
+	 96: f0 (f0), float 96 bits
+	 97: f1 (f1), float 96 bits
+	 98: f2 (f2), float 96 bits
+	 99: f3 (f3), float 96 bits
+	100: f4 (f4), float 96 bits
+	101: f5 (f5), float 96 bits
+	102: f6 (f6), float 96 bits
+	103: f7 (f7), float 96 bits
+VFP registers:
+	256: d0 (d0), float 64 bits
+	257: d1 (d1), float 64 bits
+	258: d2 (d2), float 64 bits
+	259: d3 (d3), float 64 bits
+	260: d4 (d4), float 64 bits
+	261: d5 (d5), float 64 bits
+	262: d6 (d6), float 64 bits
+	263: d7 (d7), float 64 bits
+	264: d8 (d8), float 64 bits
+	265: d9 (d9), float 64 bits
+	266: d10 (d10), float 64 bits
+	267: d11 (d11), float 64 bits
+	268: d12 (d12), float 64 bits
+	269: d13 (d13), float 64 bits
+	270: d14 (d14), float 64 bits
+	271: d15 (d15), float 64 bits
+	272: d16 (d16), float 64 bits
+	273: d17 (d17), float 64 bits
+	274: d18 (d18), float 64 bits
+	275: d19 (d19), float 64 bits
+	276: d20 (d20), float 64 bits
+	277: d21 (d21), float 64 bits
+	278: d22 (d22), float 64 bits
+	279: d23 (d23), float 64 bits
+	280: d24 (d24), float 64 bits
+	281: d25 (d25), float 64 bits
+	282: d26 (d26), float 64 bits
+	283: d27 (d27), float 64 bits
+	284: d28 (d28), float 64 bits
+	285: d29 (d29), float 64 bits
+	286: d30 (d30), float 64 bits
+	287: d31 (d31), float 64 bits
 EOF
 
 exit 0

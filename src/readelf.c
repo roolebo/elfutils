@@ -7699,7 +7699,11 @@ handle_core_items (Elf *core, const void *desc, size_t descsz,
   if (nitems == 1)
     {
       size_t size = descsz;
-      colno = handle_core_item (core, sorted_items[0], desc, colno, &size);
+      /* If this note contains registers as well as items, don't pass
+	 &size to express that we don't wish to repeat.  */
+      colno = handle_core_item (core, sorted_items[0], desc, colno,
+				size != 0 ? &size : NULL);
+
       if (size == 0)
 	return colno;
       desc += descsz - size;

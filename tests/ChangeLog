@@ -1,3 +1,10 @@
+2012-09-24  Petr Machata  <pmachata@redhat.com>
+
+	* testfile62.bz2: New testfile.
+	* run-readelf-vmcoreinfo.sh: New test.
+	* Makefile.am (TEST): Add run-readelf-vmcoreinfo.sh.
+	(EXTRA_DIST): Add testfile62.bz2 and run-readelf-vmcoreinfo.sh.
+
 2012-09-18  Petr Machata  <pmachata@redhat.com>
 
 	* testfile61.bz2: New testfile.

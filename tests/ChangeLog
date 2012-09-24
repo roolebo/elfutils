@@ -1,5 +1,12 @@
 2012-09-24  Petr Machata  <pmachata@redhat.com>
 
+	* testfile63.bz2: New testfile.
+	* run-readelf-mixed-corenote.sh: New test.
+	* Makefile.am (TEST): Add run-readelf-mixed-corenote.sh.
+	(EXTRA_DIST): Add testfile63.bz2 and run-readelf-mixed-corenote.sh.
+
+2012-09-24  Petr Machata  <pmachata@redhat.com>
+
 	* testfile62.bz2: New testfile.
 	* run-readelf-vmcoreinfo.sh: New test.
 	* Makefile.am (TEST): Add run-readelf-vmcoreinfo.sh.

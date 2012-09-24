@@ -84,7 +84,8 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-dwarf-getstring.sh run-rerequest_tag.sh run-typeiter.sh \
 	run-readelf-d.sh run-readelf-gdb_index.sh run-unstrip-n.sh \
 	run-low_high_pc.sh run-macro-test.sh run-elf_cntl_gelf_getshdr.sh \
-	run-test-archive64.sh run-readelf-vmcoreinfo.sh
+	run-test-archive64.sh run-readelf-vmcoreinfo.sh \
+	run-readelf-mixed-corenote.sh
 
 if !STANDALONE
 check_PROGRAMS += msg_tst md5-sha1-test
@@ -177,7 +178,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-elf_cntl_gelf_getshdr.sh \
 	     run-test-archive64.sh testarchive64.a.bz2 \
 	     testfile60.bz2 testfile61.bz2 \
-	     run-readelf-vmcoreinfo.sh testfile62.bz2
+	     run-readelf-vmcoreinfo.sh testfile62.bz2 \
+	     run-readelf-mixed-corenote.sh testfile63.bz2
 
 installed_TESTS_ENVIRONMENT = libdir=$(DESTDIR)$(libdir) \
 			      bindir=$(DESTDIR)$(bindir) \

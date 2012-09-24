@@ -252,6 +252,17 @@ EBLHOOK(core_note) (nhdr, name, regs_offset, nregloc, reglocs, nitems, items)
       *items = NULL;							      \
       return 1;
 
+#define EXTRA_REGSET_ITEMS(type, size, table, extra_items)		      \
+    case type:								      \
+      if (nhdr->n_descsz != size)					      \
+	return 0;							      \
+      *regs_offset = 0;							      \
+      *nregloc = sizeof table / sizeof table[0];			      \
+      *reglocs = table;							      \
+      *nitems = sizeof extra_items / sizeof extra_items[0];		      \
+      *items = extra_items;						      \
+      return 1;
+
 #ifdef FPREGSET_SIZE
     EXTRA_REGSET (NT_FPREGSET, FPREGSET_SIZE, fpregset_regs)
 #endif

@@ -1,3 +1,9 @@
+2012-09-24  Petr Machata  <pmachata@redhat.com>
+
+	* arm_corenote.c (vfp_items, vfp_regs): New const variables.
+	(EXTRA_NOTES): Use it for NT_ARM_VFP.
+	* linux-core-note.c (EXTRA_REGSET_ITEMS): New macro.
+
 2012-09-17  Petr Machata  <pmachata@redhat.com>
 
 	* arm_corenote.c (FPREGSET_SIZE): Change to 116.

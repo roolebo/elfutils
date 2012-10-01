@@ -58,4 +58,8 @@ case "$1" in
   ;;
 esac
 
+if [ "x$VALGRIND_CMD" != "x" ]; then
+  export VALGRIND_CMD
+fi
+
 exec "$@"

@@ -72,7 +72,7 @@ testrun()
 built_testrun()
 {
   LD_LIBRARY_PATH="${built_library_path}${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH"\
-  "$@"
+  $VALGRIND_CMD "$@"
 }
 
 installed_testrun()
@@ -93,9 +93,9 @@ installed_testrun()
   if [ "${libdir}" != /usr/lib ] && [ "${libdir}" != /usr/lib64 ]; then
     LD_LIBRARY_PATH="${libdir}:${libdir}/elfutils\
 ${LD_LIBRARY_PATH:+:}$LD_LIBRARY_PATH" \
-    $program ${1+"$@"}
+    $VALGRIND_CMD $program ${1+"$@"}
   else
-    $program ${1+"$@"}
+    $VALGRIND_CMD $program ${1+"$@"}
   fi
 }
 

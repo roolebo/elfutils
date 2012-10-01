@@ -1,3 +1,8 @@
+2012-10-01  Mark Wielaard  <mjw@redhat.com>
+
+	* configure.ac: Add --enable-valgrind check.
+	* Makefile.am (DISTCHECK_CONFIGURE_FLAGS): Add --enable-valgrind.
+
 2012-08-27  Mark Wielaard  <mjw@redhat.com>
 
 	* configure.ac: Set version to 0.155.

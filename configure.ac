@@ -190,6 +190,17 @@ if test "$use_gcov" = yes; then
 fi
 AM_CONDITIONAL(GCOV, test "$use_gcov" = yes)
 
+AC_ARG_ENABLE([valgrind],
+AS_HELP_STRING([--enable-valgrind],[run all tests under valgrind]),
+[use_valgrind=$enableval], [use_valgrind=no])
+if test "$use_valgrind" = yes; then
+  AC_CHECK_PROG(HAVE_VALGRIND, valgrind, yes, no)
+  if test "$HAVE_VALGRIND" = "no"; then
+    AC_MSG_ERROR([valgrind not found])
+  fi
+fi
+AM_CONDITIONAL(USE_VALGRIND, test "$use_valgrind" = yes)
+
 AM_CONDITIONAL(BUILD_STATIC, [dnl
 test "$use_mudflap" = yes -o "$use_gprof" = yes -o "$use_gcov" = yes])
 

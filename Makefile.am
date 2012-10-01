@@ -32,8 +32,10 @@ EXTRA_DIST = elfutils.spec GPG-KEY NOTES CONTRIBUTING \
 # Make sure the test install uses lib64 when $LIB will yield lib64.
 # Make sure the test build uses the same compiler, which on e.g. ppc64
 # determines which platform we are actually testing.
+# Run all tests under valgrind.
 DISTCHECK_CONFIGURE_FLAGS = \
 	--libdir=`echo $(libdir) | sed "s,^$(exec_prefix),$$dc_install_base,"`\
+	--enable-valgrind \
 	CC="$(CC)"
 
 distcheck-hook:

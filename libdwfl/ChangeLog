@@ -1,5 +1,10 @@
 2012-10-01  Mark Wielaard  <mjw@redhat.com>
 
+	* cu.c (cudie_offset): Don't use type_sig8, it might not be
+	initialized and these are always real CUs, never TUs.
+
+2012-10-01  Mark Wielaard  <mjw@redhat.com>
+
 	* derelocate.c (find_section): Check next section exists before
 	accessing it.
 

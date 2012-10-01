@@ -317,7 +317,7 @@ find_section (Dwfl_Module *mod, Dwarf_Addr *addr)
 	     inside the next one.  A section limit address can appear in
 	     line records.  */
 	  if (*addr == sections->refs[idx].end
-	      && idx < sections->count
+	      && idx + 1 < sections->count
 	      && *addr == sections->refs[idx + 1].start)
 	    ++idx;
 

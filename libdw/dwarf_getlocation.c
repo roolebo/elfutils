@@ -224,6 +224,21 @@ __libdw_intern_expression (Dwarf *dbg, bool other_byte_order,
 
   struct loclist *loclist = NULL;
   unsigned int n = 0;
+
+  if (cfap)
+    {
+      /* Synthesize the operation to push the CFA before the expression.  */
+      struct loclist *newloc;
+      newloc = (struct loclist *) alloca (sizeof (struct loclist));
+      newloc->atom = DW_OP_call_frame_cfa;
+      newloc->number = 0;
+      newloc->number2 = 0;
+      newloc->offset = -1;
+      newloc->next = loclist;
+      loclist = newloc;
+      ++n;
+    }
+
   /* Decode the opcodes.  It is possible in some situations to have a
      block of size zero.  */
   while (data < end_data)
@@ -434,9 +449,6 @@ __libdw_intern_expression (Dwarf *dbg, bool other_byte_order,
       ++n;
     }
 
-  if (cfap)
-    ++n;
-
   /* Allocate the array.  */
   Dwarf_Op *result;
   if (dbg != NULL)
@@ -455,16 +467,6 @@ __libdw_intern_expression (Dwarf *dbg, bool other_byte_order,
   /* Store the result.  */
   *llbuf = result;
   *listlen = n;
-
-  if (cfap)
-    {
-      /* Synthesize the operation to push the CFA before the expression.  */
-      --n;
-      result[0].atom = DW_OP_call_frame_cfa;
-      result[0].number = 0;
-      result[0].number2 = 0;
-      result[0].offset = -1;
-    }
 
   do
     {

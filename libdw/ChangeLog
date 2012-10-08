@@ -1,5 +1,11 @@
 2012-10-08  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
+	* dwarf_getlocation.c (__libdw_intern_expression) <cfap>: Make new
+	loclist element DW_OP_call_frame_cfa before decoding the opcodes.
+	Remove the later DW_OP_call_frame_cfa push to RESULT.
+
+2012-10-08  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
 	Code cleanup.
 	* fde.c (binary_search_fde): Remove always true <address >= start>
 	conditional.  Move L initialization upwards.

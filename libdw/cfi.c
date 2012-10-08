@@ -35,6 +35,7 @@
 #include "cfi.h"
 #include "memory-access.h"
 #include "encoded-value.h"
+#include "system.h"
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
@@ -89,6 +90,9 @@ execute_cfi (Dwarf_CFI *cache,
 	    }
 	  else
 	    {
+	      eu_static_assert (reg_unspecified == 0);
+	      memset (bigger->regs + bigger->nregs, 0,
+		      (reg + 1 - bigger->nregs) * sizeof bigger->regs[0]);
 	      bigger->nregs = reg + 1;
 	      fs = bigger;
 	    }

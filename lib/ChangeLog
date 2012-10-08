@@ -1,3 +1,7 @@
+2012-10-08  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* system.h (eu_static_assert): New macro.
+
 2012-01-21  Ulrich Drepper  <drepper@gmail.com>
 
 	* Makefile.am (libeu_a_SOURCES): Add color.c.

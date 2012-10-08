@@ -121,4 +121,11 @@ extern char *color_weak;
 
 extern const char color_off[];
 
+/* A static assertion.  This will cause a compile-time error if EXPR,
+   which must be a compile-time constant, is false.  */
+
+#define eu_static_assert(expr)						\
+  extern int never_defined_just_used_for_checking[(expr) ? 1 : -1]	\
+    __attribute__ ((unused))
+
 #endif /* system.h */

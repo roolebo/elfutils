@@ -1,3 +1,9 @@
+2012-10-08  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	Code cleanup.
+	* fde.c (binary_search_fde): Remove always true <address >= start>
+	conditional.  Move L initialization upwards.
+
 2012-08-24  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_begin_elf.c (check_section): Only probe for dwz multi files

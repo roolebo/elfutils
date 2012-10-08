@@ -181,32 +181,30 @@ binary_search_fde (Dwarf_CFI *cache, Dwarf_Addr address)
 	u = idx;
       else
 	{
+	  l = idx + 1;
+
 	  Dwarf_Addr fde;
 	  if (unlikely (read_encoded_value (&dummy_cfi,
 					    cache->search_table_encoding, &p,
 					    &fde)))
 	    break;
-	  if (address >= start)
+
+	  /* If this is the last entry, its upper bound is assumed to be
+	     the end of the module.
+	     XXX really should be end of containing PT_LOAD segment */
+	  if (l < cache->search_table_entries)
 	    {
-	      l = idx + 1;
-
-	      /* If this is the last entry, its upper bound is assumed to be
-		 the end of the module.
-		 XXX really should be end of containing PT_LOAD segment */
-	      if (l < cache->search_table_entries)
-		{
-		  /* Look at the start address in the following entry.  */
-		  Dwarf_Addr end;
-		  if (unlikely (read_encoded_value
-				(&dummy_cfi, cache->search_table_encoding, &p,
-				 &end)))
-		    break;
-		  if (address >= end)
-		    continue;
-		}
-
-	      return fde - cache->frame_vaddr;
+	      /* Look at the start address in the following entry.  */
+	      Dwarf_Addr end;
+	      if (unlikely (read_encoded_value
+			    (&dummy_cfi, cache->search_table_encoding, &p,
+			     &end)))
+		break;
+	      if (address >= end)
+		continue;
 	    }
+
+	  return fde - cache->frame_vaddr;
 	}
     }
 

@@ -34,6 +34,7 @@
 #include <stdint.h>
 #include <endian.h>
 #include <byteswap.h>
+#include <unistd.h>
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 # define LE32(n)	(n)
@@ -64,12 +65,61 @@ extern int crc32_file (int fd, uint32_t *resp);
 #define gettext_noop(Str) Str
 
 
-#define pwrite_retry(fd, buf,  len, off) \
-  TEMP_FAILURE_RETRY (pwrite (fd, buf, len, off))
-#define write_retry(fd, buf, n) \
-     TEMP_FAILURE_RETRY (write (fd, buf, n))
-#define pread_retry(fd, buf,  len, off) \
-  TEMP_FAILURE_RETRY (pread (fd, buf, len, off))
+static inline ssize_t __attribute__ ((unused))
+pwrite_retry (int fd, const void *buf, size_t len, off_t off)
+{
+  ssize_t recvd = 0;
+
+  do
+    {
+      ssize_t ret = TEMP_FAILURE_RETRY (pwrite (fd, buf + recvd, len - recvd,
+						off + recvd));
+      if (ret <= 0)
+	return ret < 0 ? ret : recvd;
+
+      recvd += ret;
+    }
+  while ((size_t) recvd < len);
+
+  return recvd;
+}
+
+static inline ssize_t __attribute__ ((unused))
+write_retry (int fd, const void *buf, size_t len)
+{
+  ssize_t recvd = 0;
+
+  do
+    {
+      ssize_t ret = TEMP_FAILURE_RETRY (write (fd, buf + recvd, len - recvd));
+      if (ret <= 0)
+	return ret < 0 ? ret : recvd;
+
+      recvd += ret;
+    }
+  while ((size_t) recvd < len);
+
+  return recvd;
+}
+
+static inline ssize_t __attribute__ ((unused))
+pread_retry (int fd, void *buf, size_t len, off_t off)
+{
+  ssize_t recvd = 0;
+
+  do
+    {
+      ssize_t ret = TEMP_FAILURE_RETRY (pread (fd, buf + recvd, len - recvd,
+					       off + recvd));
+      if (ret <= 0)
+	return ret < 0 ? ret : recvd;
+
+      recvd += ret;
+    }
+  while ((size_t) recvd < len);
+
+  return recvd;
+}
 
 
 /* We need define two variables, argp_program_version_hook and

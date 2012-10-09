@@ -1,3 +1,10 @@
+2012-10-09  Petr Machata  <pmachata@redhat.com>
+
+	* dwarf_getlocation.c (__libdw_intern_expression): Handle
+	DW_OP_GNU_parameter_ref, DW_OP_GNU_convert, DW_OP_GNU_reinterpret,
+	DW_OP_GNU_regval_type, DW_OP_GNU_entry_value,
+	DW_OP_GNU_deref_type, DW_OP_GNU_const_type.
+
 2012-10-08  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* cfi.c: New include system.h.

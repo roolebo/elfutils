@@ -1,3 +1,15 @@
+2012-10-12  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* readelf.c (ITEM_WRAP_COLUMN, REGISTER_WRAP_COLUMN): Merge to ...
+	(WRAP_COLUMN): ... here.
+	(print_core_item): Remove parameter format_max.  Update function
+	comment.  Replace FORMAT_MAX by the real output width.
+	(handle_core_item): Remove the FORMAT_MAX values in TYPES, DO_TYPE,
+	calls of print_core_item, remove variable maxfmt, change
+	ITEM_WRAP_COLUMN to WRAP_COLUMN.
+	(handle_core_register): Remove the FORMAT_MAX values in TYPES, BITS,
+	calls of print_core_item, change REGISTER_WRAP_COLUMN to WRAP_COLUMN.
+
 2012-10-11  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* readelf.c (handle_core_item) <b>: Make run an outer block variable.

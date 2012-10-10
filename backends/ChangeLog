@@ -1,3 +1,8 @@
+2012-10-12  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* linux-core-note.c (prstatus_items): Rename groups of sigpend and
+	sighold to signal2 and signal3.
+
 2012-09-24  Petr Machata  <pmachata@redhat.com>
 
 	* arm_corenote.c (vfp_items, vfp_regs): New const variables.

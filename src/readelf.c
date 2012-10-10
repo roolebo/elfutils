@@ -7337,24 +7337,35 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
 
 
 #define ITEM_INDENT		4
-#define ITEM_WRAP_COLUMN	150
-#define REGISTER_WRAP_COLUMN	75
+#define WRAP_COLUMN		75
 
-/* Print "NAME: FORMAT", wrapping when FORMAT_MAX chars of FORMAT would
-   make the line exceed ITEM_WRAP_COLUMN.  Unpadded numbers look better
-   for the core items.  But we do not want the line breaks to depend on
-   the particular values.  */
+/* Print "NAME: FORMAT", wrapping when output text would make the line
+   exceed WRAP_COLUMN.  Unpadded numbers look better for the core items
+   but this function is also used for registers which should be printed
+   aligned.  Fortunately registers output uses fixed fields width (such
+   as %11d) for the alignment.
+
+   Line breaks should not depend on the particular values although that
+   may happen in some cases of the core items.  */
+
 static unsigned int
-__attribute__ ((format (printf, 7, 8)))
+__attribute__ ((format (printf, 6, 7)))
 print_core_item (unsigned int colno, char sep, unsigned int wrap,
-		 size_t name_width, const char *name,
-		 size_t format_max, const char *format, ...)
+		 size_t name_width, const char *name, const char *format, ...)
 {
   size_t len = strlen (name);
   if (name_width < len)
     name_width = len;
 
-  size_t n = name_width + sizeof ": " - 1 + format_max;
+  char *out;
+  va_list ap;
+  va_start (ap, format);
+  int out_len = vasprintf (&out, format, ap);
+  va_end (ap);
+  if (out_len == -1)
+    error (EXIT_FAILURE, 0, _("memory exhausted"));
+
+  size_t n = name_width + sizeof ": " - 1 + out_len;
 
   if (colno == 0)
     {
@@ -7372,12 +7383,9 @@ print_core_item (unsigned int colno, char sep, unsigned int wrap,
       colno = ITEM_INDENT + n;
     }
 
-  printf ("%s: %*s", name, (int) (name_width - len), "");
+  printf ("%s: %*s%s", name, (int) (name_width - len), "", out);
 
-  va_list ap;
-  va_start (ap, format);
-  vprintf (format, ap);
-  va_end (ap);
+  free (out);
 
   return colno;
 }
@@ -7420,14 +7428,14 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
   uint_fast16_t count = item->count ?: 1;
 
 #define TYPES								      \
-  DO_TYPE (BYTE, Byte, "0x%.2" PRIx8, "%" PRId8, 4);			      \
-  DO_TYPE (HALF, Half, "0x%.4" PRIx16, "%" PRId16, 6);			      \
-  DO_TYPE (WORD, Word, "0x%.8" PRIx32, "%" PRId32, 11);			      \
-  DO_TYPE (SWORD, Sword, "%" PRId32, "%" PRId32, 11);			      \
-  DO_TYPE (XWORD, Xword, "0x%.16" PRIx64, "%" PRId64, 20);		      \
-  DO_TYPE (SXWORD, Sxword, "%" PRId64, "%" PRId64, 20)
+  DO_TYPE (BYTE, Byte, "0x%.2" PRIx8, "%" PRId8);			      \
+  DO_TYPE (HALF, Half, "0x%.4" PRIx16, "%" PRId16);			      \
+  DO_TYPE (WORD, Word, "0x%.8" PRIx32, "%" PRId32);			      \
+  DO_TYPE (SWORD, Sword, "%" PRId32, "%" PRId32);			      \
+  DO_TYPE (XWORD, Xword, "0x%.16" PRIx64, "%" PRId64);			      \
+  DO_TYPE (SXWORD, Sxword, "%" PRId64, "%" PRId64)
 
-#define DO_TYPE(NAME, Name, hex, dec, max) GElf_##Name Name[count]
+#define DO_TYPE(NAME, Name, hex, dec) GElf_##Name Name[count]
   union { TYPES; } value;
 #undef DO_TYPE
 
@@ -7459,10 +7467,10 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
       assert (count == 1);
       switch (type)
 	{
-#define DO_TYPE(NAME, Name, hex, dec, max)				      \
+#define DO_TYPE(NAME, Name, hex, dec)					      \
 	  case ELF_T_##NAME:						      \
-	    colno = print_core_item (colno, ',', ITEM_WRAP_COLUMN,	      \
-				     0, item->name, max, dec, value.Name[0]); \
+	    colno = print_core_item (colno, ',', WRAP_COLUMN,		      \
+				     0, item->name, dec, value.Name[0]); \
 	    break
 	  TYPES;
 #undef DO_TYPE
@@ -7475,10 +7483,10 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
       assert (count == 1);
       switch (type)
 	{
-#define DO_TYPE(NAME, Name, hex, dec, max)				      \
+#define DO_TYPE(NAME, Name, hex, dec)					      \
 	  case ELF_T_##NAME:						      \
-	    colno = print_core_item (colno, ',', ITEM_WRAP_COLUMN,	      \
-				     0, item->name, max, hex, value.Name[0]); \
+	    colno = print_core_item (colno, ',', WRAP_COLUMN,		      \
+				     0, item->name, hex, value.Name[0]);      \
 	    break
 	  TYPES;
 #undef DO_TYPE
@@ -7546,8 +7554,7 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
 	if (lastbit > 0 && run > 0 && lastbit + 1 != nbits)
 	  p += sprintf (p, "-%u", lastbit - bias);
 
-	colno = print_core_item (colno, ',', ITEM_WRAP_COLUMN, 0, item->name,
-				 4 + nbits * 4,
+	colno = print_core_item (colno, ',', WRAP_COLUMN, 0, item->name,
 				 negate ? "~<%s>" : "<%s>", printed);
       }
       break;
@@ -7557,14 +7564,12 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
       assert (count == 2);
       Dwarf_Word sec;
       Dwarf_Word usec;
-      size_t maxfmt = 7;
       switch (type)
 	{
-#define DO_TYPE(NAME, Name, hex, dec, max)				      \
+#define DO_TYPE(NAME, Name, hex, dec)					      \
 	  case ELF_T_##NAME:						      \
 	    sec = value.Name[0];					      \
 	    usec = value.Name[1];					      \
-	    maxfmt += max;						      \
 	    break
 	  TYPES;
 #undef DO_TYPE
@@ -7587,19 +7592,19 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
 	  else
 	    usec &= UINT32_MAX;
 	}
-      colno = print_core_item (colno, ',', ITEM_WRAP_COLUMN, 0, item->name,
-			       maxfmt, "%" PRIu64 ".%.6" PRIu64, sec, usec);
+      colno = print_core_item (colno, ',', WRAP_COLUMN, 0, item->name,
+			       "%" PRIu64 ".%.6" PRIu64, sec, usec);
       break;
 
     case 'c':
       assert (count == 1);
-      colno = print_core_item (colno, ',', ITEM_WRAP_COLUMN, 0, item->name,
-			       1, "%c", value.Byte[0]);
+      colno = print_core_item (colno, ',', WRAP_COLUMN, 0, item->name,
+			       "%c", value.Byte[0]);
       break;
 
     case 's':
-      colno = print_core_item (colno, ',', ITEM_WRAP_COLUMN, 0, item->name,
-			       count, "%.*s", (int) count, value.Byte);
+      colno = print_core_item (colno, ',', WRAP_COLUMN, 0, item->name,
+			       "%.*s", (int) count, value.Byte);
       break;
 
     case '\n':
@@ -7626,7 +7631,7 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
 	  s = eol + 1;
 	}
 
-      colno = ITEM_WRAP_COLUMN;
+      colno = WRAP_COLUMN;
       break;
 
     default:
@@ -7722,7 +7727,7 @@ handle_core_items (Elf *core, const void *desc, size_t descsz,
 	    colno = handle_core_item (core, *item, desc, colno, NULL);
 
 	  /* Force a line break at the end of the group.  */
-	  colno = ITEM_WRAP_COLUMN;
+	  colno = WRAP_COLUMN;
 	}
 
       if (descsz == 0)
@@ -7790,12 +7795,12 @@ handle_core_register (Ebl *ebl, Elf *core, int maxregname,
       register_info (ebl, reg, regloc, name, &bits, &type);
 
 #define TYPES								      \
-      BITS (8, BYTE, "%4" PRId8, "0x%.2" PRIx8, 4);			      \
-      BITS (16, HALF, "%6" PRId16, "0x%.4" PRIx16, 6);			      \
-      BITS (32, WORD, "%11" PRId32, " 0x%.8" PRIx32, 11);		      \
-      BITS (64, XWORD, "%20" PRId64, "  0x%.16" PRIx64, 20)
+      BITS (8, BYTE, "%4" PRId8, "0x%.2" PRIx8);			      \
+      BITS (16, HALF, "%6" PRId16, "0x%.4" PRIx16);			      \
+      BITS (32, WORD, "%11" PRId32, " 0x%.8" PRIx32);			      \
+      BITS (64, XWORD, "%20" PRId64, "  0x%.16" PRIx64)
 
-#define BITS(bits, xtype, sfmt, ufmt, max)				\
+#define BITS(bits, xtype, sfmt, ufmt)				\
       uint##bits##_t b##bits; int##bits##_t b##bits##s
       union { TYPES; uint64_t b128[2]; } value;
 #undef	BITS
@@ -7807,17 +7812,17 @@ handle_core_register (Ebl *ebl, Elf *core, int maxregname,
 	case DW_ATE_address:
 	  switch (bits)
 	    {
-#define BITS(bits, xtype, sfmt, ufmt, max)				      \
+#define BITS(bits, xtype, sfmt, ufmt)					      \
 	    case bits:							      \
 	      desc = convert (core, ELF_T_##xtype, 1, &value, desc, 0);	      \
 	      if (type == DW_ATE_signed)				      \
-		colno = print_core_item (colno, ' ', REGISTER_WRAP_COLUMN,    \
+		colno = print_core_item (colno, ' ', WRAP_COLUMN,	      \
 					 maxregname, name,		      \
-					 max, sfmt, value.b##bits##s);	      \
+					 sfmt, value.b##bits##s);	      \
 	      else							      \
-		colno = print_core_item (colno, ' ', REGISTER_WRAP_COLUMN,    \
+		colno = print_core_item (colno, ' ', WRAP_COLUMN,	      \
 					 maxregname, name,		      \
-					 max, ufmt, value.b##bits);	      \
+					 ufmt, value.b##bits);		      \
 	      break
 
 	    TYPES;
@@ -7826,9 +7831,9 @@ handle_core_register (Ebl *ebl, Elf *core, int maxregname,
 	      assert (type == DW_ATE_unsigned);
 	      desc = convert (core, ELF_T_XWORD, 2, &value, desc, 0);
 	      int be = elf_getident (core, NULL)[EI_DATA] == ELFDATA2MSB;
-	      colno = print_core_item (colno, ' ', REGISTER_WRAP_COLUMN,
+	      colno = print_core_item (colno, ' ', WRAP_COLUMN,
 				       maxregname, name,
-				       34, "0x%.16" PRIx64 "%.16" PRIx64,
+				       "0x%.16" PRIx64 "%.16" PRIx64,
 				       value.b128[!be], value.b128[be]);
 	      break;
 
@@ -7857,9 +7862,8 @@ handle_core_register (Ebl *ebl, Elf *core, int maxregname,
 	      *h++ = "0123456789abcdef"[bytes[idx] >> 4];
 	      *h++ = "0123456789abcdef"[bytes[idx] & 0xf];
 	    }
-	  colno = print_core_item (colno, ' ', REGISTER_WRAP_COLUMN,
-				   maxregname, name,
-				   2 + sizeof hex - 1, "0x%s", hex);
+	  colno = print_core_item (colno, ' ', WRAP_COLUMN,
+				   maxregname, name, "0x%s", hex);
 	  break;
 	}
       desc += regloc->pad;
@@ -7998,7 +8002,7 @@ handle_core_registers (Ebl *ebl, Elf *core, const void *desc,
 				      reg->regloc, desc, colno);
 
       /* Force a line break at the end of the group.  */
-      colno = REGISTER_WRAP_COLUMN;
+      colno = WRAP_COLUMN;
     }
 
   return colno;

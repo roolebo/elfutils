@@ -123,8 +123,10 @@ static const Ebl_Core_Item prstatus_items[] =
     FIELD (signal, INT, info.si_code, 'd'),
     FIELD (signal, INT, info.si_errno, 'd'),
     FIELD (signal, SHORT, cursig, 'd'),
-    FIELD (signal, ULONG, sigpend, 'B'),
-    FIELD (signal, ULONG, sighold, 'B'),
+
+    /* Use different group name for a newline delimiter.  */
+    FIELD (signal2, ULONG, sigpend, 'B'),
+    FIELD (signal3, ULONG, sighold, 'B'),
     FIELD (identity, PID_T, pid, 'd', .thread_identifier = true),
     FIELD (identity, PID_T, ppid, 'd'),
     FIELD (identity, PID_T, pgrp, 'd'),

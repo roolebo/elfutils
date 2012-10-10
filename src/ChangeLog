@@ -1,3 +1,8 @@
+2013-01-29  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* readelf.c (handle_core_items): Limit special repeated items handling
+	to single-item formats '\n', 'b' and 'B', assert OFFSET 0 there.
+
 2012-12-18  Mark Wielaard  <mark@bordewijk.wildebeest.org>
 
 	* readelf.c (ELF_INPUT_SECTION): New argp key value.

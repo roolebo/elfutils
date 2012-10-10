@@ -1,3 +1,10 @@
+2013-01-30  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* linux-proc-maps.c: Include system.h.
+	(PROCEXEFMT, get_pid_class): New.
+	(grovel_auxv): Detect 32-bit vs. 64-bit auxv, possibly call
+	get_pid_class.
+
 2013-01-23  Mark Wielaard  <mjw@redhat.com>
 
 	* dwfl_module_getdwarf.c (find_aux_sym): Don't substract one

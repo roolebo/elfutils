@@ -1,3 +1,16 @@
+2013-01-29  Jan Kratochvil  <jan.kratochvil@redhat.com>
+	    Roland McGrath <roland@hack.frob.com>
+
+	* Makefile.am (s390_SRCS): Add s390_corenote.c and s390x_corenote.c.
+	* linux-core-note.c (ALIGN_PR_REG): New definitions.
+	(struct EBLHOOK(prstatus)): Change field pr_reg to anonymous struct with
+	ALIGN_PR_REG.
+	(EXTRA_ITEMS): New macro.
+	* s390_corenote.c: New file.
+	* s390_init.c (s390x_core_note): New declaration.
+	(s390_init): Install s390x_core_note and s390_core_note.
+	* s390x_corenote.c: New file.
+
 2013-01-30  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* arm_corenote.c (vfp_items): Remove zero COUNT initializer.

@@ -37,6 +37,8 @@
 /* This defines the common reloc hooks based on arm_reloc.def.  */
 #include "common-reloc.c"
 
+extern __typeof (s390_core_note) s390x_core_note;
+
 
 const char *
 s390_init (elf, machine, eh, ehlen)
@@ -55,6 +57,10 @@ s390_init (elf, machine, eh, ehlen)
   HOOK (eh, reloc_simple_type);
   HOOK (eh, register_info);
   HOOK (eh, return_value_location);
+  if (eh->class == ELFCLASS64)
+    eh->core_note = s390x_core_note;
+  else
+    HOOK (eh, core_note);
 
   /* Only the 64-bit format uses the incorrect hash table entry size.  */
   if (eh->class == ELFCLASS64)

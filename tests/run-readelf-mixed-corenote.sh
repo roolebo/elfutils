@@ -84,4 +84,137 @@ Note segment of 892 bytes at offset 0x274:
     d30: 0x0000000000000000  d31: 0x0000000000000000
 EOF
 
+testfiles testfile67
+testrun_compare ../src/readelf -n testfile67 <<\EOF
+
+Note segment of 1044 bytes at offset 0xe8:
+  Owner          Data size  Type
+  CORE                 336  PRSTATUS
+    info.si_signo: 4, info.si_code: 0, info.si_errno: 0, cursig: 4
+    sigpend: <>
+    sighold: <>
+    pid: 805, ppid: 804, pgrp: 804, sid: 699
+    utime: 0.000042, stime: 0.000103, cutime: 0.000000, cstime: 0.000000
+    orig_r2: 2571552016, fpvalid: 1
+    pswm:   0x0705c00180000000  pswa:   0x00000000800000d6
+    r0:         4393751543808  r1:         4398002544388
+    r2:                    11  r3:            2571578208
+    r4:            2571702016  r5:         4398003235624
+    r6:            2571580768  r7:            2571702016
+    r8:            2571578208  r9:            2571552016
+    r10:           2571552016  r11:                    0
+    r12:        4398003499008  r13:           2148274656
+    r14:                    0  r15:        4398040761216
+    a0:   0x000003ff  a1:   0xfd54a6f0  a2:   0x00000000  a3:   0x00000000
+    a4:   0x00000000  a5:   0x00000000  a6:   0x00000000  a7:   0x00000000
+    a8:   0x00000000  a9:   0x00000000  a10:  0x00000000  a11:  0x00000000
+    a12:  0x00000000  a13:  0x00000000  a14:  0x00000000  a15:  0x00000000
+  CORE                 136  PRPSINFO
+    state: 0, sname: R, zomb: 0, nice: 0, flag: 0x0000000000400400
+    uid: 0, gid: 0, pid: 805, ppid: 804, pgrp: 804, sid: 699
+    fname: 1, psargs: ./1 
+  CORE                 304  AUXV
+    SYSINFO_EHDR: 0
+    HWCAP: 0x37f
+    PAGESZ: 4096
+    CLKTCK: 100
+    PHDR: 0x80000040
+    PHENT: 56
+    PHNUM: 2
+    BASE: 0
+    FLAGS: 0
+    ENTRY: 0x800000d4
+    UID: 0
+    EUID: 0
+    GID: 0
+    EGID: 0
+    SECURE: 0
+    RANDOM: 0x3ffffa8463c
+    EXECFN: 0x3ffffa85ff4
+    PLATFORM: 0x3ffffa8464c
+    NULL
+  CORE                 136  FPREGSET
+    fpc: 0x00000000
+    f0:  0x0000000000000040  f1:  0x4b00000000000000
+    f2:  0x0000000000000041  f3:  0x3ad50b5555555600
+    f4:  0x0000000000000000  f5:  0x0000000000000000
+    f6:  0x0000000000000000  f7:  0x0000000000000000
+    f8:  0x0000000000000000  f9:  0x0000000000000000
+    f10: 0x0000000000000000  f11: 0x0000000000000000
+    f12: 0x0000000000000000  f13: 0x0000000000000000
+    f14: 0x0000000000000000  f15: 0x0000000000000000
+  LINUX                  8  S390_LAST_BREAK
+    last_break: 0x000003fffd75ccbe
+  LINUX                  4  S390_SYSTEM_CALL
+    system_call: 0
+EOF
+
+testfiles testfile68
+testrun_compare ../src/readelf -n testfile68 <<\EOF
+
+Note segment of 852 bytes at offset 0x94:
+  Owner          Data size  Type
+  CORE                 224  PRSTATUS
+    info.si_signo: 4, info.si_code: 0, info.si_errno: 0, cursig: 4
+    sigpend: <>
+    sighold: <>
+    pid: 839, ppid: 838, pgrp: 838, sid: 699
+    utime: 0.000043, stime: 0.000102, cutime: 0.000000, cstime: 0.000000
+    orig_r2: -1723388288, fpvalid: 1
+    pswm:  0x070dc000  pswa:  0x8040009a
+    r0:            0  r1:    -43966716  r2:           11  r3:  -1723238816
+    r4:  -1723265280  r5:    -43275480  r6:  -1723245280  r7:  -1723265280
+    r8:  -1723238816  r9:  -1723388288  r10: -1723388288  r11:           0
+    r12:   -43012096  r13: -2146692640  r14:           0  r15:  2139883440
+    a0:   0x000003ff  a1:   0xfd54a6f0  a2:   0x00000000  a3:   0x00000000
+    a4:   0x00000000  a5:   0x00000000  a6:   0x00000000  a7:   0x00000000
+    a8:   0x00000000  a9:   0x00000000  a10:  0x00000000  a11:  0x00000000
+    a12:  0x00000000  a13:  0x00000000  a14:  0x00000000  a15:  0x00000000
+  CORE                 124  PRPSINFO
+    state: 0, sname: R, zomb: 0, nice: 0, flag: 0x00400400
+    uid: 0, gid: 0, pid: 839, ppid: 838, pgrp: 838, sid: 699
+    fname: 2, psargs: ./2 
+  CORE                 152  AUXV
+    SYSINFO_EHDR: 0
+    HWCAP: 0x37f
+    PAGESZ: 4096
+    CLKTCK: 100
+    PHDR: 0x400034
+    PHENT: 32
+    PHNUM: 2
+    BASE: 0
+    FLAGS: 0
+    ENTRY: 0x400098
+    UID: 0
+    EUID: 0
+    GID: 0
+    EGID: 0
+    SECURE: 0
+    RANDOM: 0x7f8c090c
+    EXECFN: 0x7f8c1ff4
+    PLATFORM: 0x7f8c091c
+    NULL
+  CORE                 136  FPREGSET
+    fpc: 0x00000000
+    f0:  0x0000000000000040  f1:  0x4b00000000000000
+    f2:  0x0000000000000041  f3:  0x3ad50b5555555600
+    f4:  0x0000000000000000  f5:  0x0000000000000000
+    f6:  0x0000000000000000  f7:  0x0000000000000000
+    f8:  0x0000000000000000  f9:  0x0000000000000000
+    f10: 0x0000000000000000  f11: 0x0000000000000000
+    f12: 0x0000000000000000  f13: 0x0000000000000000
+    f14: 0x0000000000000000  f15: 0x0000000000000000
+  LINUX                  8  S390_LAST_BREAK
+    last_break: 0xfd75ccbe
+  LINUX                  4  S390_SYSTEM_CALL
+    system_call: 0
+  LINUX                 64  S390_HIGH_GPRS
+    high_r0: 0x000003ff, high_r1: 0x000003ff, high_r2: 0x00000000
+    high_r3: 0x00000000, high_r4: 0x00000000, high_r5: 0x000003ff
+    high_r6: 0x00000000, high_r7: 0x00000000, high_r8: 0x00000000
+    high_r9: 0x00000000, high_r10: 0x00000000, high_r11: 0x00000000
+    high_r12: 0x000003ff, high_r13: 0x00000000, high_r14: 0x00000000
+    high_r15: 0x00000000
+EOF
+
 exit 0

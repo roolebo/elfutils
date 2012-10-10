@@ -1,5 +1,10 @@
 2012-10-10  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
+	* run-addrname-test.sh: New test for core vDSO bias.
+	* testfile65.bz2: New file.
+
+2012-10-10  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
 	* run-addrname-test.sh: New test for symbol preferences.
 	* testfile64.bz2: New file.
 

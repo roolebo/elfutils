@@ -650,6 +650,7 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
       mod->main.elf = elf;
       mod->main.vaddr = module_start - bias;
       mod->main.address_sync = module_address_sync;
+      mod->main_bias = bias;
     }
 
   return finish ();

@@ -1,5 +1,10 @@
 2012-10-10  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
+	* dwfl_segment_report_module.c (dwfl_segment_report_module):
+	Initialize mod->MAIN_BIAS.
+
+2012-10-10  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
 	* dwfl_module_addrsym.c (dwfl_module_addrsym): New function
 	binding_value.  Use it for both zero and non-zero size symbols
 	comparisons.

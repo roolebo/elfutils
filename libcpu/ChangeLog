@@ -1,3 +1,8 @@
+2012-10-10  Roland McGrath  <roland@hack.frob.com>
+
+	* Makefile.am (%_defs, $(srcdir)/%_dis.h): Redirect to temp file,
+	mv into place with separate command.
+
 2012-06-26  Roland McGrath  <roland@hack.frob.com>
 
 	* Makefile.am [!MAINTAINER_MODE] ($(srcdir)/%_dis.h): New rule.

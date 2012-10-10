@@ -46,7 +46,8 @@ i386_disasm.o: i386.mnemonics $(srcdir)/i386_dis.h
 x86_64_disasm.o: x86_64.mnemonics $(srcdir)/x86_64_dis.h
 
 %_defs: $(srcdir)/defs/i386
-	m4 -D$* -DDISASSEMBLER $< > $@
+	m4 -D$* -DDISASSEMBLER $< > $@T
+	mv -f $@T $@
 
 if MAINTAINER_MODE
 noinst_HEADERS = memory-access.h i386_parse.h i386_data.h
@@ -54,7 +55,8 @@ noinst_HEADERS = memory-access.h i386_parse.h i386_data.h
 noinst_PROGRAMS = i386_gendis
 
 $(srcdir)/%_dis.h: %_defs i386_gendis
-	./i386_gendis $< > $@
+	./i386_gendis $< > $@T
+	mv -f $@T $@
 
 else
 

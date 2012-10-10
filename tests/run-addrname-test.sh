@@ -292,4 +292,10 @@ l0local2
 ??:0
 EOF
 
+testfiles testfile65
+testrun_compare ../src/addr2line -S --core=testfile65 0x7fff94bffa30 <<\EOF
+__vdso_time
+??:0
+EOF
+
 exit 0

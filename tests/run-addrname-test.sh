@@ -211,4 +211,85 @@ local_outer+0x9
 ??:0
 EOF
 
+#	.macro global label size
+#\label:	.globl \label
+#	.size \label, \size
+#	.endm
+#	.macro weak label size
+#\label:	.weak \label
+#	.size \label, \size
+#	.endm
+#	.macro local label size
+#\label:	.size \label, \size
+#	.endm
+#	.macro offset val
+#	.ifne (. - _start) - \val
+#	.err
+#	.endif
+#	.byte \val
+#	.endm
+#
+#_start:
+#	offset 0
+#
+#	local glocal, 1
+#	weak gweak, 1
+#	global gglobal1, 2
+#	global gglobal2, 1
+#	global gglobal3, 1
+#	offset 1
+#	/* Symbols end here.  */
+#	offset 2
+#	/* gglobal1 ends here.  */
+#	offset 3
+#
+#	local g0local, 0
+#	weak g0weak, 0
+#	global g0global1, 0
+#	global g0global2, 0
+#	offset 4
+#
+#	local wlocal, 1
+#	weak wweak1, 2
+#	weak wweak2, 1
+#	weak wweak3, 1
+#	offset 5
+#	/* Symbols end here.  */
+#	offset 6
+#	/* wweak1 ends here.  */
+#	offset 7
+#
+#	local w0local, 0
+#	weak w0weak1, 0
+#	weak w0weak2, 0
+#	offset 8
+#
+#	local llocal1, 2
+#	local llocal2, 1
+#	local llocal3, 1
+#	offset 9
+#	/* Symbols end here.  */
+#	offset 10
+#	/* llocal1 ends here.  */
+#	offset 11
+#
+#	local l0local1, 0
+#	local l0local2, 0
+#	offset 12
+testfiles testfile64
+testrun_compare ../src/addr2line -S -e testfile64 1 4 5 8 9 12 <<\EOF
+gglobal2
+??:0
+g0global2
+??:0
+wweak2
+??:0
+w0weak2
+??:0
+llocal2
+??:0
+l0local2
+??:0
+EOF
+
 exit 0

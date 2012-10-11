@@ -1,3 +1,8 @@
+2012-10-11  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* readelf.c (handle_core_item) <b>: Make run an outer block variable.
+	Increase run only if LASTBIT != 0.  Print last element only if RUN > 0.
+
 2012-08-27  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (print_debug_macro_section): Print offset as PRIx64.

@@ -7515,19 +7515,19 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
 	  }
 
 	unsigned int lastbit = 0;
+	unsigned int run = 0;
 	for (const unsigned int *i = data;
 	     (void *) i < data + count * size; ++i)
 	  {
 	    unsigned int bit = ((void *) i - data) * 8;
 	    unsigned int w = negate ? ~*i : *i;
-	    unsigned int run = 0;
 	    while (w != 0)
 	      {
 		int n = ffs (w);
 		w >>= n;
 		bit += n;
 
-		if (lastbit + 1 == bit)
+		if (lastbit != 0 && lastbit + 1 == bit)
 		  ++run;
 		else
 		  {
@@ -7543,8 +7543,8 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
 		lastbit = bit;
 	      }
 	  }
-	if (lastbit > 0 && lastbit + 1 != nbits)
-	  p += sprintf (p, "-%u", nbits - bias);
+	if (lastbit > 0 && run > 0 && lastbit + 1 != nbits)
+	  p += sprintf (p, "-%u", lastbit - bias);
 
 	colno = print_core_item (colno, ',', ITEM_WRAP_COLUMN, 0, item->name,
 				 4 + nbits * 4,

@@ -1,3 +1,9 @@
+2012-10-12  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* ebl-hooks.h (abi_cfi): Extend its comment for return value.
+	* eblopenbackend.c (default_abi_cfi): Return -1.
+	* libebl.h (ebl_abi_cfi): Extend its comment for return value.
+
 2012-08-30  Petr Machata  <pmachata@redhat.com>
 
 	* eblcorenotetypename.c: Handle PPC_VSX, X86_XSTATE,

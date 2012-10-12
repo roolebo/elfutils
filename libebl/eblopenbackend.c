@@ -750,5 +750,5 @@ static int
 default_abi_cfi (Ebl *ebl __attribute__ ((unused)),
 		 Dwarf_CIE *abi_info __attribute__ ((unused)))
 {
-  return 0;
+  return -1;
 }

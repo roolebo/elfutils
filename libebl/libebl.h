@@ -267,7 +267,10 @@ extern int ebl_syscall_abi (Ebl *ebl, int *sp, int *pc,
    DWARF register number that identifies the actual PC in machine state.
    If there is no canonical DWARF register number with that meaning, it's
    left unchanged (callers usually initialize with (Dwarf_Word) -1).
-   This value is not used by CFI per se.  */
+   This value is not used by CFI per se.
+
+   Function returns 0 on success and -1 for error or unsupported by the
+   backend.  */
 extern int ebl_abi_cfi (Ebl *ebl, Dwarf_CIE *abi_info)
   __nonnull_attribute__ (2);
 

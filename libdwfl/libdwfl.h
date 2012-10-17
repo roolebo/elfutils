@@ -403,7 +403,8 @@ extern int dwfl_validate_address (Dwfl *dwfl,
    are found) for use with libelf.  If successful, fills in *BIAS
    with the difference between addresses within the loaded module
    and those in symbol tables or Dwarf information referring to it.  */
-extern Elf *dwfl_module_getelf (Dwfl_Module *, GElf_Addr *bias);
+extern Elf *dwfl_module_getelf (Dwfl_Module *, GElf_Addr *bias)
+  __nonnull_attribute__ (1, 2);
 
 /* Return the number of symbols in the module's symbol table,
    or -1 for errors.  */

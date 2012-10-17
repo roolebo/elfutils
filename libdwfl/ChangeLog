@@ -1,3 +1,7 @@
+2012-10-17  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* libdwfl.h (dwfl_module_getelf): Add __nonnull_attribute__.
+
 2012-10-10  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* dwfl_segment_report_module.c (dwfl_segment_report_module):

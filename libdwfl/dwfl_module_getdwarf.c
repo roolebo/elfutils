@@ -139,6 +139,43 @@ open_elf (Dwfl_Module *mod, struct dwfl_file *file)
   return DWFL_E_NOERROR;
 }
 
+/* We have an authoritative build ID for this module MOD, so don't use
+   a file by name that doesn't match that ID.  */
+static void
+mod_verify_build_id (Dwfl_Module *mod)
+{
+  assert (mod->build_id_len > 0);
+
+  switch (__builtin_expect (__libdwfl_find_build_id (mod, false,
+						     mod->main.elf), 2))
+    {
+    case 2:
+      /* Build ID matches as it should. */
+      return;
+
+    case -1:			/* ELF error.  */
+      mod->elferr = INTUSE(dwfl_errno) ();
+      break;
+
+    case 0:			/* File has no build ID note.  */
+    case 1:			/* FIle has a build ID that does not match.  */
+      mod->elferr = DWFL_E_WRONG_ID_ELF;
+      break;
+
+    default:
+      abort ();
+    }
+
+  /* We get here when it was the right ELF file.  Clear it out.  */
+  elf_end (mod->main.elf);
+  mod->main.elf = NULL;
+  if (mod->main.fd >= 0)
+    {
+      close (mod->main.fd);
+      mod->main.fd = -1;
+    }
+}
+
 /* Find the main ELF file for this module and open libelf on it.
    When we return success, MOD->main.elf and MOD->main.bias are set up.  */
 void
@@ -166,41 +203,7 @@ __libdwfl_getelf (Dwfl_Module *mod)
       mod->build_id_len = 0;
     }
   else if (fallback)
-    {
-      /* We have an authoritative build ID for this module, so
-	 don't use a file by name that doesn't match that ID.  */
-
-      assert (mod->build_id_len > 0);
-
-      switch (__builtin_expect (__libdwfl_find_build_id (mod, false,
-							 mod->main.elf), 2))
-	{
-	case 2:
-	  /* Build ID matches as it should. */
-	  return;
-
-	case -1:			/* ELF error.  */
-	  mod->elferr = INTUSE(dwfl_errno) ();
-	  break;
-
-	case 0:			/* File has no build ID note.  */
-	case 1:			/* FIle has a build ID that does not match.  */
-	  mod->elferr = DWFL_E_WRONG_ID_ELF;
-	  break;
-
-	default:
-	  abort ();
-	}
-
-      /* We get here when it was the right ELF file.  Clear it out.  */
-      elf_end (mod->main.elf);
-      mod->main.elf = NULL;
-      if (mod->main.fd >= 0)
-	{
-	  close (mod->main.fd);
-	  mod->main.fd = -1;
-	}
-    }
+    mod_verify_build_id (mod);
 
   mod->main_bias = mod->e_type == ET_REL ? 0 : mod->low_addr - mod->main.vaddr;
 }

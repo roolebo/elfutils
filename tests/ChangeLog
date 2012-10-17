@@ -1,3 +1,9 @@
+2012-10-17  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* run-addrname-test.sh: New test for DSO with build-id bias.
+	* testfile69.core.bz2: New file.
+	* testfile69.so.bz2: New file.
+
 2012-10-10  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* run-addrname-test.sh: New test for core vDSO bias.

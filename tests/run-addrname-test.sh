@@ -298,4 +298,12 @@ __vdso_time
 ??:0
 EOF
 
+testfiles testfile69.core testfile69.so
+testrun_compare ../src/addr2line --core=./testfile69.core -S 0x7f0bc6a33535 0x7f0bc6a33546 <<\EOF
+libstatic+0x9
+??:0
+libglobal+0x9
+??:0
+EOF
+
 exit 0

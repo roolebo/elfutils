@@ -1,3 +1,11 @@
+2012-11-29  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* run-addrname-test.sh: New test for PIE relocation.
+	* testfile70.core.bz2: New file.
+	* testfile70.exec.bz2: New file.
+	* Makefile.am (EXTRA_DIST): Add testfile70.core.bz2 and
+	testfile70.exec.bz2 .
+
 2012-10-27  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* Makefile.am (EXTRA_DIST): Add testfile64.bz2, testfile65.bz2,

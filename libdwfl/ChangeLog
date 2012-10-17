@@ -1,3 +1,19 @@
+2012-11-29  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* argp-std.c: Update Copyright year.
+	(offline_find_elf): New function.
+	(offline_callbacks): Use it for find_elf.
+	(struct parse_opt): New.
+	(parse_opt): New key ARGP_KEY_INIT.  In other make hook struct
+	parse_opt pointer from former Dwfl pointer.  Delay 'e and OPT_COREFILE
+	processing till ARGP_KEY_SUCCESS.  Initialize state->input already from
+	ARGP_KEY_SUCCESS.  Modify the cleanup in ARGP_KEY_ERROR.  Make the
+	final state->input initialization optional.
+	* dwfl_end.c: Update Copyright year.
+	(dwfl_end): Free executable_for_core.
+	* libdwflP.h: Update Copyright year.
+	(struct Dwfl): New field executable_for_core.
+
 2012-11-20  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* dwfl_report_elf.c (__libdwfl_report_elf): Simplify START and BIAS

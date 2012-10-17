@@ -306,4 +306,14 @@ libglobal+0x9
 ??:0
 EOF
 
+testfiles testfile70.exec testfile70.core
+testrun_compare ../src/addr2line -S -e testfile70.exec --core=testfile70.core 0x7ff2cfe9b6b5 <<\EOF
+main+0x9
+??:0
+EOF
+testrun_compare ../src/addr2line -S --core=testfile70.core -e testfile70.exec 0x7ff2cfe9b6b5 <<\EOF
+main+0x9
+??:0
+EOF
+
 exit 0

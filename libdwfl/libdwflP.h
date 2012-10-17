@@ -1,5 +1,5 @@
 /* Internal definitions for libdwfl.
-   Copyright (C) 2005-2011 Red Hat, Inc.
+   Copyright (C) 2005-2012 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -108,6 +108,8 @@ struct Dwfl
   GElf_Off lookup_tail_vaddr;
   GElf_Off lookup_tail_offset;
   int lookup_tail_ndx;
+
+  char *executable_for_core;	/* --executable if --core was specified.  */
 };
 
 #define OFFLINE_REDZONE		0x10000

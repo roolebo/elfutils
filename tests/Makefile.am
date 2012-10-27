@@ -179,7 +179,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-test-archive64.sh testarchive64.a.bz2 \
 	     testfile60.bz2 testfile61.bz2 \
 	     run-readelf-vmcoreinfo.sh testfile62.bz2 \
-	     run-readelf-mixed-corenote.sh testfile63.bz2
+	     run-readelf-mixed-corenote.sh testfile63.bz2 testfile64.bz2 \
+	     testfile65.bz2 testfile69.core.bz2 testfile69.so.bz2
 
 if USE_VALGRIND
 valgrind_cmd="valgrind -q --trace-children=yes --error-exitcode=1"

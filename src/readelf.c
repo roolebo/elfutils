@@ -3802,7 +3802,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  NEED (2);
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIuMAX "\n",
 		  indent, "", (uintmax_t) offset, op_name,
-		  (uintmax_t) (offset + read_2sbyte_unaligned (dbg, data)));
+		  (uintmax_t) (offset + read_2sbyte_unaligned (dbg, data) + 3));
 	  CONSUME (2);
 	  data += 2;
 	  offset += 3;

@@ -1,3 +1,8 @@
+2012-10-16  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_ops): DW_OP_skip and DW_OP_bra targets are
+	calculated beginning after the operand and 2-byte constant.
+
 2012-10-12  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* readelf.c (ITEM_WRAP_COLUMN, REGISTER_WRAP_COLUMN): Merge to ...

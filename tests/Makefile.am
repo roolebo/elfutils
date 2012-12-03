@@ -184,7 +184,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile70.core.bz2 testfile70.exec.bz2
 
 if USE_VALGRIND
-valgrind_cmd="valgrind -q --trace-children=yes --error-exitcode=1"
+valgrind_cmd="valgrind -q --trace-children=yes --error-exitcode=1 --run-libc-freeres=no"
 endif
 
 installed_TESTS_ENVIRONMENT = libdir=$(DESTDIR)$(libdir) \

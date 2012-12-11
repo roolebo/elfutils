@@ -1,3 +1,9 @@
+2012-12-11  Mark Wielaard  <mjw@redhat.com>
+
+	* linux-kernel-modules.c (report_kernel): Only free fname if
+	find_kernel_elf succeeds and allocates it.
+	(report_kernel_archive): Fix brackets around unlikely expression.
+
 2012-11-29  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* argp-std.c: Update Copyright year.

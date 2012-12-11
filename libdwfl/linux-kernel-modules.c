@@ -225,11 +225,11 @@ report_kernel (Dwfl *dwfl, const char **release,
 	    mod->e_type = ET_DYN;
 	}
 
+      free (fname);
+
       if (!report || result < 0)
 	close (fd);
     }
-
-  free (fname);
 
   return result;
 }
@@ -247,7 +247,7 @@ report_kernel_archive (Dwfl *dwfl, const char **release,
   char *archive;
   if (unlikely ((*release)[0] == '/'
 		? asprintf (&archive, "%s/debug.a", *release)
-		: asprintf (&archive, MODULEDIRFMT "/debug.a", *release)) < 0)
+		: asprintf (&archive, MODULEDIRFMT "/debug.a", *release) < 0))
     return ENOMEM;
 
   int fd = try_kernel_name (dwfl, &archive, false);

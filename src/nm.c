@@ -769,8 +769,9 @@ show_symbols_sysv (Ebl *ebl, GElf_Word strndx, const char *fullname,
 			       gelf_getshdr (scn, &shdr_mem)->sh_name);
       if (unlikely (name == NULL))
 	{
-	  name = alloca (sizeof "[invalid sh_name 0x12345678]");
-	  snprintf (name, sizeof name, "[invalid sh_name %#" PRIx32 "]",
+          const size_t bufsz = sizeof "[invalid sh_name 0x12345678]"
+	  name = alloca (bufsz);
+	  snprintf (name, bufsz, "[invalid sh_name %#" PRIx32 "]",
 		    gelf_getshdr (scn, &shdr_mem)->sh_name);
 	}
       scnnames[elf_ndxscn (scn)] = name;

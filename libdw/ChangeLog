@@ -1,3 +1,10 @@
+2012-12-18  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_begin_elf.c (valid_p): Call Dwarf_Sig8_Hash_free if invalid.
+	(check_section): Likewise on error.
+	(scngrp_read): Likewise.
+	(dwarf_begin_elf): Likewise.
+
 2012-10-09  Petr Machata  <pmachata@redhat.com>
 
 	* dwarf_getlocation.c (__libdw_intern_expression): Handle

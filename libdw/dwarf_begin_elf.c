@@ -216,6 +216,7 @@ check_section (Dwarf *result, GElf_Ehdr *ehdr, Elf_Scn *scn, bool inscngrp)
       /* The section name must be valid.  Otherwise is the ELF file
 	 invalid.  */
       __libdw_free_zdata (result);
+      Dwarf_Sig8_Hash_free (&result->sig8_hash);
       __libdw_seterrno (DWARF_E_INVALID_ELF);
       free (result);
       return NULL;
@@ -344,6 +345,7 @@ valid_p (Dwarf *result)
       && unlikely (result->sectiondata[IDX_debug_info] == NULL))
     {
       __libdw_free_zdata (result);
+      Dwarf_Sig8_Hash_free (&result->sig8_hash);
       __libdw_seterrno (DWARF_E_NO_DWARF);
       free (result);
       result = NULL;
@@ -375,6 +377,7 @@ scngrp_read (Dwarf *result, Elf *elf, GElf_Ehdr *ehdr, Elf_Scn *scngrp)
     {
       /* We cannot read the section content.  Fail!  */
       __libdw_free_zdata (result);
+      Dwarf_Sig8_Hash_free (&result->sig8_hash);
       free (result);
       return NULL;
     }
@@ -391,6 +394,7 @@ scngrp_read (Dwarf *result, Elf *elf, GElf_Ehdr *ehdr, Elf_Scn *scngrp)
 	  /* A section group refers to a non-existing section.  Should
 	     never happen.  */
 	  __libdw_free_zdata (result);
+	  Dwarf_Sig8_Hash_free (&result->sig8_hash);
 	  __libdw_seterrno (DWARF_E_INVALID_ELF);
 	  free (result);
 	  return NULL;
@@ -471,11 +475,13 @@ dwarf_begin_elf (elf, cmd, scngrp)
     }
   else if (cmd == DWARF_C_WRITE)
     {
+      Dwarf_Sig8_Hash_free (&result->sig8_hash);
       __libdw_seterrno (DWARF_E_UNIMPL);
       free (result);
       return NULL;
     }
 
+  Dwarf_Sig8_Hash_free (&result->sig8_hash);
   __libdw_seterrno (DWARF_E_INVALID_CMD);
   free (result);
   return NULL;

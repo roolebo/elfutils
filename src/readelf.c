@@ -4710,6 +4710,14 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
   (void) elf_getshdrstrndx (ebl->elf, &shstrndx);
   const char *scnname = elf_strptr (ebl->elf, shstrndx, shdr->sh_name);
 
+  /* Needed if we find PC-relative addresses.  */
+  GElf_Addr bias;
+  if (dwfl_module_getelf (dwflmod, &bias) == NULL)
+    {
+      error (0, 0, gettext ("cannot get ELF: %s"), dwfl_errmsg (-1));
+      return;
+    }
+
   Elf_Data *data = elf_rawdata (scn, NULL);
 
   if (unlikely (data == NULL))
@@ -4956,8 +4964,21 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	  Dwarf_Word address_range
 	    = read_ubyte_unaligned_inc (ptr_size, dbg, readp);
 
+	  /* pcrel for an FDE address is relative to the runtime
+	     address of the start_address field itself.  Sign extend
+	     if necessary to make sure the calculation is done on the
+	     full 64 bit address even when initial_location only holds
+	     the lower 32 bits.  */
+	  Dwarf_Addr pc_start = initial_location;
+	  if (ptr_size == 4)
+	    pc_start = (uint64_t) (int32_t) pc_start;
+	  if ((fde_encoding & 0x70) == DW_EH_PE_pcrel)
+	    pc_start += ((uint64_t) shdr->sh_addr
+			 + (base - (const unsigned char *) data->d_buf)
+			 - bias);
+
 	  char *a = format_dwarf_addr (dwflmod, cie->address_size,
-				       initial_location);
+				       pc_start);
 	  printf ("\n [%6tx] FDE length=%" PRIu64 " cie=[%6tx]\n"
 		  "   CIE_pointer:              %" PRIu64 "\n"
 		  "   initial_location:         %s",

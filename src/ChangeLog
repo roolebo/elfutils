@@ -1,3 +1,7 @@
+2012-12-21  Mark Wielaard  <mjw@redhat.com>
+
+	* addr2line (main): Call dwfl_end.
+
 2012-12-11  Roland McGrath  <roland@hack.frob.com>
 
 	* nm.c (show_symbols_sysv): Fix size passed to snprintf for invalid

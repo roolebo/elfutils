@@ -1,3 +1,8 @@
+2013-01-07  Roland McGrath  <roland@hack.frob.com>
+
+	* elf_getarsym.c (read_number_entries): Use memcpy instead of pointer
+	dereference so as not to assume the field is naturally aligned.
+
 2012-09-17  Petr Machata  <pmachata@redhat.com>
 
 	* elf.h: Update from glibc.

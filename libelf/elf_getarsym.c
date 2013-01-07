@@ -240,6 +240,9 @@ elf_getarsym (elf, ptr)
 	  else
 	    {
 	      file_data = (void *) (elf->map_address + off);
+	      if (!ALLOW_UNALIGNED
+		  && ((uintptr_t) file_data & -(uintptr_t) n) != 0)
+		file_data = memcpy (alloca (sz), elf->map_address + off, sz);
 	      str_data = (char *) (elf->map_address + off + sz);
 	    }
 

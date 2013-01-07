@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2011 Red Hat, Inc.
+# Copyright (C) 2011-2013 Red Hat, Inc.
 # This file is part of elfutils.
 #
 # This file is free software; you can redistribute it and/or modify
@@ -33,7 +33,7 @@
 testfiles testfile52-32.so testfile52-32.so.debug
 testfiles testfile52-32.prelink.so testfile52-32.noshdrs.so
 tempfiles testmaps52-32 testfile52-32.noshdrs.so.debug
-ln -s testfile52-32.so.debug testfile52-32.noshdrs.so.debug
+ln -snf testfile52-32.so.debug testfile52-32.noshdrs.so.debug
 
 cat > testmaps52-32 <<EOF
 00111000-00112000 r-xp 00000000 fd:01 1 `pwd`/testfile52-32.so
@@ -62,7 +62,7 @@ EOF
 testfiles testfile52-64.so testfile52-64.so.debug
 testfiles testfile52-64.prelink.so testfile52-64.noshdrs.so
 tempfiles testmaps52-64 testfile52-64.noshdrs.so.debug
-ln -s testfile52-64.so.debug testfile52-64.noshdrs.so.debug
+ln -snf testfile52-64.so.debug testfile52-64.noshdrs.so.debug
 
 cat > testmaps52-64 <<EOF
 1000000000-1000001000 r-xp 00000000 fd:11 1 `pwd`/testfile52-64.so

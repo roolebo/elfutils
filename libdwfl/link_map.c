@@ -1,5 +1,5 @@
 /* Report modules by examining dynamic linker data structures.
-   Copyright (C) 2008-2010 Red Hat, Inc.
+   Copyright (C) 2008-2013 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -28,6 +28,7 @@
 
 #include <config.h>
 #include "libdwflP.h"
+#include "../libdw/memory-access.h"
 
 #include <byteswap.h>
 #include <endian.h>
@@ -66,15 +67,22 @@ auxv_format_probe (const void *auxv, size_t size,
 
   inline bool check64 (size_t i)
   {
-    if (u->a64[i].a_type == BE64 (PROBE_TYPE)
-	&& u->a64[i].a_un.a_val == BE64 (PROBE_VAL64))
+    /* The AUXV pointer might not even be naturally aligned for 64-bit
+       data, because note payloads in a core file are not aligned.
+       But we assume the data is 32-bit aligned.  */
+
+    uint64_t type = read_8ubyte_unaligned_noncvt (&u->a64[i].a_type);
+    uint64_t val = read_8ubyte_unaligned_noncvt (&u->a64[i].a_un.a_val);
+
+    if (type == BE64 (PROBE_TYPE)
+	&& val == BE64 (PROBE_VAL64))
       {
 	*elfdata = ELFDATA2MSB;
 	return true;
       }
 
-    if (u->a64[i].a_type == LE64 (PROBE_TYPE)
-	&& u->a64[i].a_un.a_val == LE64 (PROBE_VAL64))
+    if (type == LE64 (PROBE_TYPE)
+	&& val == LE64 (PROBE_VAL64))
       {
 	*elfdata = ELFDATA2LSB;
 	return true;
@@ -618,29 +626,32 @@ dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
       GElf_Xword phent = 0;
       GElf_Xword phnum = 0;
 
-#define AUXV_SCAN(NN, BL) do					\
-	{							\
-	  const Elf##NN##_auxv_t *av = auxv;			\
-	  for (size_t i = 0; i < auxv_size / sizeof av[0]; ++i)	\
-	    {							\
-	      Elf##NN##_Addr val = BL##NN (av[i].a_un.a_val);	\
-	      if (av[i].a_type == BL##NN (AT_ENTRY))		\
-		entry = val;					\
-	      else if (av[i].a_type == BL##NN (AT_PHDR))	\
-		phdr = val;					\
-	      else if (av[i].a_type == BL##NN (AT_PHNUM))	\
-		phnum = val;					\
-	      else if (av[i].a_type == BL##NN (AT_PHENT))	\
-		phent = val;					\
-	      else if (av[i].a_type == BL##NN (AT_PAGESZ))	\
-		{						\
-		  if (val > 1					\
-		      && (dwfl->segment_align == 0		\
-			  || val < dwfl->segment_align))	\
-		    dwfl->segment_align = val;			\
-		}						\
-	    }							\
-	}							\
+#define READ_AUXV32(ptr)	read_4ubyte_unaligned_noncvt (ptr)
+#define READ_AUXV64(ptr)	read_8ubyte_unaligned_noncvt (ptr)
+#define AUXV_SCAN(NN, BL) do                                            \
+	{                                                               \
+	  const Elf##NN##_auxv_t *av = auxv;                            \
+	  for (size_t i = 0; i < auxv_size / sizeof av[0]; ++i)         \
+	    {                                                           \
+              uint##NN##_t type = READ_AUXV##NN (&av[i].a_type);        \
+              uint##NN##_t val = BL##NN (READ_AUXV##NN (&av[i].a_un.a_val)); \
+	      if (type == BL##NN (AT_ENTRY))                            \
+		entry = val;                                            \
+	      else if (type == BL##NN (AT_PHDR))                        \
+		phdr = val;                                             \
+	      else if (type == BL##NN (AT_PHNUM))                       \
+		phnum = val;                                            \
+	      else if (type == BL##NN (AT_PHENT))                       \
+		phent = val;                                            \
+	      else if (type == BL##NN (AT_PAGESZ))                      \
+		{                                                       \
+		  if (val > 1                                           \
+		      && (dwfl->segment_align == 0                      \
+			  || val < dwfl->segment_align))                \
+		    dwfl->segment_align = val;                          \
+		}                                                       \
+	    }                                                           \
+	}                                                               \
       while (0)
 
       if (elfclass == ELFCLASS32)

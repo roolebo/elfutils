@@ -1,3 +1,9 @@
+2013-01-07  Roland McGrath  <roland@hack.frob.com>
+
+	* memory-access.h
+	[ALLOW_UNALIGNED] (read_8ubyte_unaligned_noncvt): New macro.
+	[!ALLOW_UNALIGNED] (read_8ubyte_unaligned_noncvt): New inline function.
+
 2012-12-18  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_begin_elf.c (valid_p): Call Dwarf_Sig8_Hash_free if invalid.

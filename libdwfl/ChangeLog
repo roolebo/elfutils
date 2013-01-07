@@ -1,3 +1,9 @@
+2013-01-07  Roland McGrath  <roland@hack.frob.com>
+
+	* link_map.c (auxv_format_probe): Handle unaligned 64-bit data, but
+	still assume the data is at least 32-bit aligned anyway.
+	(dwfl_link_map_report): Handle unaligned auxv data.
+
 2012-12-11  Mark Wielaard  <mjw@redhat.com>
 
 	* linux-kernel-modules.c (report_kernel): Only free fname if

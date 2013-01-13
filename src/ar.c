@@ -919,7 +919,7 @@ do_oper_delete (const char *arfname, char **argv, int argc,
 		long int instance)
 {
   bool *found = alloca (sizeof (bool) * argc);
-  memset (found, '\0', sizeof (found));
+  memset (found, '\0', sizeof (bool) * argc);
 
   /* List of the files we keep.  */
   struct armem *to_copy = NULL;

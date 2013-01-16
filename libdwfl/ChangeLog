@@ -1,3 +1,30 @@
+2013-01-16  Mark Wielaard  <mjw@redhat.com>
+
+	* libdwflP.h (struct Dwfl_Module): Add aux_sym, aux_symdata,
+	aux_syments, aux_symstrdata, aux_symxndxdata and aux_first_global.
+	(dwfl_adjusted_aux_sym_addr): New function.
+	(dwfl_deadjust_aux_sym_addr): Likewise.
+	(dwfl_adjusted_st_value): Take and check symfile argument.
+	(dwfl_deadjust_st_value): Likewise.
+	* dwfl_module_getdwarf.c (find_prelink_address_sync): Take and
+	use dwfl_file as argument to set address_sync.
+	(find_debuginfo): Call find_prelink_address_sync with debug file.
+	(find_aux_sym): New function.
+	(find_symtab): Use find_aux_sym if all we have is the dynsym table
+	and fill in aux DwflModule fields.
+	(dwfl_module_getsymtab): Return syments plus aux_syments.
+	(load_symtab): Always set first_global.
+	* dwfl_module_addrsym.c (dwfl_module_addrsym): Check symfile
+	when using same_section. Calculate first_global based on both
+	mod->first_global and mod->aux_first_global.
+	* dwfl_module.c (__libdwfl_module_free): Free aux_sym.
+	* dwfl_module_getsym.c (dwfl_module_getsym): Use auxsym table
+	to retrieve symbol and name if necessary, making sure all locals
+	from any table come before any globals.
+	* dwfl_module_info.c (dwfl_module_info): Call dwfl_adjusted_st_value
+	with symfile.
+	* relocate.c (resolve_symbol): Likewise.
+
 2013-01-07  Roland McGrath  <roland@hack.frob.com>
 
 	* link_map.c (auxv_format_probe): Handle unaligned 64-bit data, but

@@ -1,5 +1,5 @@
 /* Find debugging and symbol information for a module in libdwfl.
-   Copyright (C) 2006-2010 Red Hat, Inc.
+   Copyright (C) 2006-2013 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -42,8 +42,55 @@ dwfl_module_getsym (Dwfl_Module *mod, int ndx,
 	return NULL;
     }
 
+  /* All local symbols should come before all global symbols.  If we
+     have an auxiliary table make sure all the main locals come first,
+     then all aux locals, then all main globals and finally all aux globals.
+     And skip the auxiliary table zero undefined entry.  */
   GElf_Word shndx;
-  sym = gelf_getsymshndx (mod->symdata, mod->symxndxdata, ndx, sym, &shndx);
+  int tndx = ndx;
+  struct dwfl_file *file;
+  Elf_Data *symdata;
+  Elf_Data *symxndxdata;
+  Elf_Data *symstrdata;
+  if (mod->aux_symdata == NULL
+      || ndx < mod->first_global)
+    {
+      /* main symbol table (locals).  */
+      tndx = ndx;
+      file = mod->symfile;
+      symdata = mod->symdata;
+      symxndxdata = mod->symxndxdata;
+      symstrdata = mod->symstrdata;
+    }
+  else if (ndx < mod->first_global + mod->aux_first_global - 1)
+    {
+      /* aux symbol table (locals).  */
+      tndx = ndx - mod->first_global + 1;
+      file = &mod->aux_sym;
+      symdata = mod->aux_symdata;
+      symxndxdata = mod->aux_symxndxdata;
+      symstrdata = mod->aux_symstrdata;
+    }
+  else if ((size_t) ndx < mod->syments + mod->aux_first_global - 1)
+    {
+      /* main symbol table (globals).  */
+      tndx = ndx - mod->aux_first_global + 1;
+      file = mod->symfile;
+      symdata = mod->symdata;
+      symxndxdata = mod->symxndxdata;
+      symstrdata = mod->symstrdata;
+    }
+  else
+    {
+      /* aux symbol table (globals).  */
+      tndx = ndx - mod->syments + 1;
+      file = &mod->aux_sym;
+      symdata = mod->aux_symdata;
+      symxndxdata = mod->aux_symxndxdata;
+      symstrdata = mod->aux_symstrdata;
+    }
+  sym = gelf_getsymshndx (symdata, symxndxdata, tndx, sym, &shndx);
+
   if (unlikely (sym == NULL))
     {
       __libdwfl_seterrno (DWFL_E_LIBELF);
@@ -60,7 +107,7 @@ dwfl_module_getsym (Dwfl_Module *mod, int ndx,
 	  || (sym->st_shndx < SHN_LORESERVE && sym->st_shndx != SHN_UNDEF)))
     {
       GElf_Shdr shdr_mem;
-      GElf_Shdr *shdr = gelf_getshdr (elf_getscn (mod->symfile->elf, shndx),
+      GElf_Shdr *shdr = gelf_getshdr (elf_getscn (file->elf, shndx),
 				      &shdr_mem);
       alloc = unlikely (shdr == NULL) || (shdr->sh_flags & SHF_ALLOC);
     }
@@ -82,7 +129,7 @@ dwfl_module_getsym (Dwfl_Module *mod, int ndx,
 	  /* In an ET_REL file, the symbol table values are relative
 	     to the section, not to the module's load base.  */
 	  size_t symshstrndx = SHN_UNDEF;
-	  Dwfl_Error result = __libdwfl_relocate_value (mod, mod->symfile->elf,
+	  Dwfl_Error result = __libdwfl_relocate_value (mod, file->elf,
 							&symshstrndx,
 							shndx, &sym->st_value);
 	  if (unlikely (result != DWFL_E_NOERROR))
@@ -93,15 +140,15 @@ dwfl_module_getsym (Dwfl_Module *mod, int ndx,
 	}
       else if (alloc)
 	/* Apply the bias to the symbol value.  */
-	sym->st_value = dwfl_adjusted_st_value (mod, sym->st_value);
+	sym->st_value = dwfl_adjusted_st_value (mod, file, sym->st_value);
       break;
     }
 
-  if (unlikely (sym->st_name >= mod->symstrdata->d_size))
+  if (unlikely (sym->st_name >= symstrdata->d_size))
     {
       __libdwfl_seterrno (DWFL_E_BADSTROFF);
       return NULL;
     }
-  return (const char *) mod->symstrdata->d_buf + sym->st_name;
+  return (const char *) symstrdata->d_buf + sym->st_name;
 }
 INTDEF (dwfl_module_getsym)

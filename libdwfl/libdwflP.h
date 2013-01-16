@@ -142,7 +142,7 @@ struct Dwfl_Module
   char *name;			/* Iterator name for this module.  */
   GElf_Addr low_addr, high_addr;
 
-  struct dwfl_file main, debug;
+  struct dwfl_file main, debug, aux_sym;
   GElf_Addr main_bias;
   Ebl *ebl;
   GElf_Half e_type;		/* GElf_Ehdr.e_type cache.  */
@@ -152,10 +152,15 @@ struct Dwfl_Module
 
   struct dwfl_file *symfile;	/* Either main or debug.  */
   Elf_Data *symdata;		/* Data in the ELF symbol table section.  */
+  Elf_Data *aux_symdata;	/* Data in the auxiliary ELF symbol table.  */
   size_t syments;		/* sh_size / sh_entsize of that section.  */
+  size_t aux_syments;		/* sh_size / sh_entsize of aux_sym section.  */
   int first_global;		/* Index of first global symbol of table.  */
+  int aux_first_global;		/* Index of first global of aux_sym table.  */
   Elf_Data *symstrdata;		/* Data for its string table.  */
+  Elf_Data *aux_symstrdata;	/* Data for aux_sym string table.  */
   Elf_Data *symxndxdata;	/* Data in the extended section index table. */
+  Elf_Data *aux_symxndxdata;	/* Data in the extended auxiliary table. */
 
   Dwarf *dw;			/* libdw handle for its debugging info.  */
 
@@ -255,20 +260,42 @@ dwfl_deadjust_dwarf_addr (Dwfl_Module *mod, Dwarf_Addr addr)
 	  + mod->debug.address_sync);
 }
 
-static inline GElf_Addr
-dwfl_adjusted_st_value (Dwfl_Module *mod, GElf_Addr addr)
+static inline Dwarf_Addr
+dwfl_adjusted_aux_sym_addr (Dwfl_Module *mod, Dwarf_Addr addr)
 {
-  if (mod->symfile == &mod->main)
-    return dwfl_adjusted_address (mod, addr);
-  return dwfl_adjusted_dwarf_addr (mod, addr);
+  return dwfl_adjusted_address (mod, (addr
+				      - mod->aux_sym.address_sync
+				      + mod->main.address_sync));
+}
+
+static inline Dwarf_Addr
+dwfl_deadjust_aux_sym_addr (Dwfl_Module *mod, Dwarf_Addr addr)
+{
+  return (dwfl_deadjust_address (mod, addr)
+	  - mod->main.address_sync
+	  + mod->aux_sym.address_sync);
 }
 
 static inline GElf_Addr
-dwfl_deadjust_st_value (Dwfl_Module *mod, GElf_Addr addr)
+dwfl_adjusted_st_value (Dwfl_Module *mod, struct dwfl_file *symfile,
+			GElf_Addr addr)
 {
-  if (mod->symfile == &mod->main)
+  if (symfile == &mod->main)
+    return dwfl_adjusted_address (mod, addr);
+  if (symfile == &mod->debug)
+    return dwfl_adjusted_dwarf_addr (mod, addr);
+  return dwfl_adjusted_aux_sym_addr (mod, addr);
+}
+
+static inline GElf_Addr
+dwfl_deadjust_st_value (Dwfl_Module *mod, struct dwfl_file *symfile,
+			GElf_Addr addr)
+{
+  if (symfile == &mod->main)
     return dwfl_deadjust_address (mod, addr);
-  return dwfl_deadjust_dwarf_addr (mod, addr);
+  if (symfile == &mod->debug)
+    return dwfl_deadjust_dwarf_addr (mod, addr);
+  return dwfl_deadjust_aux_sym_addr (mod, addr);
 }
 
 /* This describes a contiguous address range that lies in a single CU.

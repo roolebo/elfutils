@@ -49,7 +49,7 @@ dwfl_module_info (Dwfl_Module *mod, void ***userdata,
 	       : dwfl_adjusted_dwarf_addr (mod, 0));
   if (symbias)
     *symbias = (mod->symfile == NULL ? (Dwarf_Addr) -1
-		: dwfl_adjusted_st_value (mod, 0));
+		: dwfl_adjusted_st_value (mod, mod->symfile, 0));
 
   if (mainfile)
     *mainfile = mod->main.name;

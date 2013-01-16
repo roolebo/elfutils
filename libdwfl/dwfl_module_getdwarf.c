@@ -1,5 +1,5 @@
 /* Find debugging and symbol information for a module in libdwfl.
-   Copyright (C) 2005-2011 Red Hat, Inc.
+   Copyright (C) 2005-2012 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -31,6 +31,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "../libdw/libdwP.h"	/* DWARF_E_* values are here.  */
+#include "../libelf/libelfP.h"
 
 
 /* Open libelf FILE->fd and compute the load base of ELF as loaded in MOD.
@@ -285,7 +286,7 @@ find_debuglink (Elf *elf, GElf_Word *crc)
    looked like before prelink juggled them--when they still had a
    direct correspondence to the debug file.  */
 static Dwfl_Error
-find_prelink_address_sync (Dwfl_Module *mod)
+find_prelink_address_sync (Dwfl_Module *mod, struct dwfl_file *file)
 {
   /* The magic section is only identified by name.  */
   size_t shstrndx;
@@ -512,8 +513,8 @@ find_prelink_address_sync (Dwfl_Module *mod)
 	  consider_shdr (undo_interp, shdr.s64[i].sh_type, shdr.s64[i].sh_flags,
 			 shdr.s64[i].sh_addr, shdr.s64[i].sh_size);
 
-      if (highest > mod->debug.vaddr)
-	mod->debug.address_sync = highest;
+      if (highest > file->vaddr)
+	file->address_sync = highest;
       else
 	return DWFL_E_BAD_PRELINK;
     }
@@ -539,7 +540,7 @@ find_debuginfo (Dwfl_Module *mod)
 							   &mod->debug.name);
   Dwfl_Error result = open_elf (mod, &mod->debug);
   if (result == DWFL_E_NOERROR && mod->debug.address_sync != 0)
-    result = find_prelink_address_sync (mod);
+    result = find_prelink_address_sync (mod, &mod->debug);
   return result;
 }
 
@@ -579,6 +580,7 @@ load_symtab (struct dwfl_file *file, struct dwfl_file **symfile,
 	    *symfile = file;
 	    *strshndx = shdr->sh_link;
 	    *syments = shdr->sh_size / shdr->sh_entsize;
+	    *first_global = shdr->sh_info;
 	    break;
 
 	  case SHT_SYMTAB_SHNDX:
@@ -814,6 +816,135 @@ find_dynsym (Dwfl_Module *mod)
     }
 }
 
+/* Try to find the auxiliary symbol table embedded in the main elf file
+   section .gnu_debugdata.  Only matters if the symbol information comes
+   from the main file dynsym.  No harm done if not found.  */
+static void
+find_aux_sym (Dwfl_Module *mod __attribute__ ((unused)),
+	      Elf_Scn **aux_symscn __attribute__ ((unused)),
+	      Elf_Scn **aux_xndxscn __attribute__ ((unused)),
+	      GElf_Word *aux_strshndx __attribute__ ((unused)))
+{
+  /* Since a .gnu_debugdata section is compressed using lzma don't do
+     anything unless we have support for that.  */
+#if USE_LZMA
+  Elf *elf = mod->main.elf;
+
+  size_t shstrndx;
+  if (elf_getshdrstrndx (elf, &shstrndx) < 0)
+    return;
+
+  Elf_Scn *scn = NULL;
+  while ((scn = elf_nextscn (elf, scn)) != NULL)
+    {
+      GElf_Shdr shdr_mem;
+      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+      if (shdr == NULL)
+	return;
+
+      const char *name = elf_strptr (elf, shstrndx, shdr->sh_name);
+      if (name == NULL)
+	return;
+
+      if (!strcmp (name, ".gnu_debugdata"))
+	break;
+    }
+
+  if (scn == NULL)
+    return;
+
+  /* Found the .gnu_debugdata section.  Uncompress the lzma image and
+     turn it into an ELF image.  */
+  Elf_Data *rawdata = elf_rawdata (scn, NULL);
+  if (rawdata == NULL)
+    return;
+
+  Dwfl_Error error;
+  void *buffer = NULL;
+  size_t size = 0;
+  error = __libdw_unlzma (-1, 0, rawdata->d_buf, rawdata->d_size,
+			  &buffer, &size);
+  if (error == DWFL_E_NOERROR)
+    {
+      if (unlikely (size == 0))
+	free (buffer);
+      else
+	{
+	  mod->aux_sym.elf = elf_memory (buffer, size);
+	  if (mod->aux_sym.elf == NULL)
+	    free (buffer);
+	  else
+	    {
+	      mod->aux_sym.fd = -1;
+	      mod->aux_sym.elf->flags |= ELF_F_MALLOCED;
+	      if (open_elf (mod, &mod->aux_sym) != DWFL_E_NOERROR)
+		return;
+	      /* Don't trust the phdrs in the minisymtab elf file to be
+		 setup correctly.  The address_sync is equal to the main
+		 file it is embedded in at first.  The shdrs are setup
+		 OK to make find_prelink_address_sync () do the right
+		 thing if necessary though.  */
+	      mod->aux_sym.address_sync = mod->main.address_sync;
+	      if (mod->aux_sym.address_sync != 0)
+		{
+		  error = find_prelink_address_sync (mod, &mod->aux_sym);
+		  if (error != DWFL_E_NOERROR)
+		    {
+		      elf_end (mod->aux_sym.elf);
+		      mod->aux_sym.elf = NULL;
+		      return;
+		    }
+		}
+
+	      /* So far, so good. Get minisymtab table data and cache it. */
+	      bool minisymtab = false;
+	      scn = NULL;
+	      while ((scn = elf_nextscn (mod->aux_sym.elf, scn)) != NULL)
+		{
+		  GElf_Shdr shdr_mem, *shdr = gelf_getshdr (scn, &shdr_mem);
+		  if (shdr != NULL)
+		    switch (shdr->sh_type)
+		      {
+		      case SHT_SYMTAB:
+			minisymtab = true;
+			*aux_symscn = scn;
+			*aux_strshndx = shdr->sh_link;
+			mod->aux_syments = shdr->sh_size / shdr->sh_entsize - 1;
+			mod->aux_first_global = shdr->sh_info;
+			if (*aux_xndxscn != NULL)
+			  return;
+			break;
+
+		      case SHT_SYMTAB_SHNDX:
+			*aux_xndxscn = scn;
+			if (minisymtab)
+			  return;
+			break;
+
+		      default:
+			break;
+		      }
+		}
+
+	      if (minisymtab)
+		/* We found one, though no SHT_SYMTAB_SHNDX to go with it.  */
+		return;
+
+	      /* We found no SHT_SYMTAB, so everything else is bogus.  */
+	      *aux_xndxscn = NULL;
+	      *aux_strshndx = 0;
+	      mod->aux_syments = 0;
+	      elf_end (mod->aux_sym.elf);
+	      mod->aux_sym.elf = NULL;
+	      return;
+	    }
+	}
+    }
+  else
+    free (buffer);
+#endif
+}
+
 /* Try to find a symbol table in either MOD->main.elf or MOD->debug.elf.  */
 static void
 find_symtab (Dwfl_Module *mod)
@@ -827,11 +958,10 @@ find_symtab (Dwfl_Module *mod)
   if (mod->symerr != DWFL_E_NOERROR)
     return;
 
-  mod->first_global = -1; /* Unknown, unless explicitly set by load_symtab.  */
-
   /* First see if the main ELF file has the debugging information.  */
   Elf_Scn *symscn = NULL, *xndxscn = NULL;
-  GElf_Word strshndx;
+  Elf_Scn *aux_symscn = NULL, *aux_xndxscn = NULL;
+  GElf_Word strshndx, aux_strshndx = 0;
   mod->symerr = load_symtab (&mod->main, &mod->symfile, &symscn,
 			     &xndxscn, &mod->syments, &mod->first_global,
 			     &strshndx);
@@ -875,6 +1005,9 @@ find_symtab (Dwfl_Module *mod)
 	    {
 	      /* We still have the dynamic symbol table.  */
 	      mod->symerr = DWFL_E_NOERROR;
+
+	      /* The dynsym table might be extended by an auxiliary table.  */
+	      find_aux_sym (mod, &aux_symscn, &aux_xndxscn, &aux_strshndx);
 	      break;
 	    }
 
@@ -890,7 +1023,7 @@ find_symtab (Dwfl_Module *mod)
     {
     elferr:
       mod->symerr = DWFL_E (LIBELF, elf_errno ());
-      return;
+      goto aux_cleanup;
     }
 
   /* Cache the data; MOD->syments and MOD->first_global were set above.  */
@@ -912,6 +1045,39 @@ find_symtab (Dwfl_Module *mod)
   mod->symdata = elf_getdata (symscn, NULL);
   if (mod->symdata == NULL)
     goto elferr;
+
+  /* Cache any auxiliary symbol info, when it fails, just ignore aux_sym.  */
+  if (aux_symscn != NULL)
+    {
+      /* This does some sanity checks on the string table section.  */
+      if (elf_strptr (mod->aux_sym.elf, aux_strshndx, 0) == NULL)
+	{
+	aux_cleanup:
+	  mod->aux_syments = 0;
+	  elf_end (mod->aux_sym.elf);
+	  mod->aux_sym.elf = NULL;
+	  return;
+	}
+
+      mod->aux_symstrdata = elf_getdata (elf_getscn (mod->aux_sym.elf,
+						     aux_strshndx),
+					 NULL);
+      if (mod->aux_symstrdata == NULL)
+	goto aux_cleanup;
+
+      if (aux_xndxscn == NULL)
+	mod->aux_symxndxdata = NULL;
+      else
+	{
+	  mod->aux_symxndxdata = elf_getdata (xndxscn, NULL);
+	  if (mod->aux_symxndxdata == NULL)
+	    goto aux_cleanup;
+	}
+
+      mod->aux_symdata = elf_getdata (aux_symscn, NULL);
+      if (mod->aux_symdata == NULL)
+	goto aux_cleanup;
+    }
 }
 
 
@@ -1067,7 +1233,7 @@ dwfl_module_getsymtab (Dwfl_Module *mod)
 
   find_symtab (mod);
   if (mod->symerr == DWFL_E_NOERROR)
-    return mod->syments;
+    return mod->syments + mod->aux_syments;
 
   __libdwfl_seterrno (mod->symerr);
   return -1;

@@ -79,6 +79,7 @@ __libdwfl_module_free (Dwfl_Module *mod)
   if (mod->debug.elf != mod->main.elf)
     free_file (&mod->debug);
   free_file (&mod->main);
+  free_file (&mod->aux_sym);
 
   if (mod->build_id_bits != NULL)
     free (mod->build_id_bits);

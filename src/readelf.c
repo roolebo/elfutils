@@ -61,9 +61,16 @@ ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
 /* Bug report address.  */
 ARGP_PROGRAM_BUG_ADDRESS_DEF = PACKAGE_BUGREPORT;
 
+/* argp key value for --elf-section, non-ascii.  */
+#define ELF_INPUT_SECTION 256
+
 /* Definitions of arguments for argp functions.  */
 static const struct argp_option options[] =
 {
+  { NULL, 0, NULL, 0, N_("ELF input selection:"), 0 },
+  { "elf-section", ELF_INPUT_SECTION, "SECTION", OPTION_ARG_OPTIONAL,
+    N_("Use the named SECTION (default .gnu_debugdata) as (compressed) ELF "
+       "input data"), 0 },
   { NULL, 0, NULL, 0, N_("ELF output selection:"), 0 },
   { "all", 'a', NULL, 0,
     N_("All these plus -p .strtab -p .dynstr -p .comment"), 0 },
@@ -121,6 +128,8 @@ static struct argp argp =
   options, parse_opt, args_doc, doc, NULL, NULL, NULL
 };
 
+/* If non-null, the section from which we should read to (compressed) ELF.  */
+static const char *elf_input_section = NULL;
 
 /* Flags set by the option controlling the output.  */
 
@@ -445,6 +454,12 @@ parse_opt (int key, char *arg,
       break;
     case 'W':			/* Ignored.  */
       break;
+    case ELF_INPUT_SECTION:
+      if (arg == NULL)
+	elf_input_section = ".gnu_debugdata";
+      else
+	elf_input_section = arg;
+      break;
     default:
       return ARGP_ERR_UNKNOWN;
     }
@@ -465,6 +480,121 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
   fprintf (stream, gettext ("Written by %s.\n"), "Ulrich Drepper");
 }
 
+
+/* Create a file descriptor to read the data from the
+   elf_input_section given a file descriptor to an ELF file.  */
+static int
+open_input_section (int fd)
+{
+  size_t shnums;
+  size_t cnt;
+  size_t shstrndx;
+  Elf *elf = elf_begin (fd, ELF_C_READ_MMAP, NULL);
+  if (elf == NULL)
+    {
+      error (0, 0, gettext ("cannot generate Elf descriptor: %s"),
+	     elf_errmsg (-1));
+      return -1;
+    }
+
+  if (elf_getshdrnum (elf, &shnums) < 0)
+    {
+      error (0, 0, gettext ("cannot determine number of sections: %s"),
+	     elf_errmsg (-1));
+    open_error:
+      elf_end (elf);
+      return -1;
+    }
+
+  if (elf_getshdrstrndx (elf, &shstrndx) < 0)
+    {
+      error (0, 0, gettext ("cannot get section header string table index"));
+      goto open_error;
+    }
+
+  for (cnt = 0; cnt < shnums; ++cnt)
+    {
+      Elf_Scn *scn = elf_getscn (elf, cnt);
+      if (scn == NULL)
+	{
+	  error (0, 0, gettext ("cannot get section: %s"),
+		 elf_errmsg (-1));
+	  goto open_error;
+	}
+
+      GElf_Shdr shdr_mem;
+      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+      if (unlikely (shdr == NULL))
+	{
+	  error (0, 0, gettext ("cannot get section header: %s"),
+		 elf_errmsg (-1));
+	  goto open_error;
+	}
+
+      const char *sname = elf_strptr (elf, shstrndx, shdr->sh_name);
+      if (sname == NULL)
+	{
+	  error (0, 0, gettext ("cannot get section name"));
+	  goto open_error;
+	}
+
+      if (strcmp (sname, elf_input_section) == 0)
+	{
+	  Elf_Data *data = elf_rawdata (scn, NULL);
+	  if (data == NULL)
+	    {
+	      error (0, 0, gettext ("cannot get %s content: %s"),
+		     sname, elf_errmsg (-1));
+	      goto open_error;
+	    }
+
+	  /* Create (and immediately unlink) a temporary file to store
+	     section data in to create a file descriptor for it.  */
+	  const char *tmpdir = getenv ("TMPDIR") ?: P_tmpdir;
+	  static const char suffix[] = "/readelfXXXXXX";
+	  int tmplen = strlen (tmpdir) + sizeof (suffix);
+	  char *tempname = alloca (tmplen);
+	  sprintf (tempname, "%s%s", tmpdir, suffix);
+
+	  int sfd = mkstemp (tempname);
+	  if (sfd == -1)
+	    {
+	      error (0, 0, gettext ("cannot create temp file '%s'"),
+		     tempname);
+	      goto open_error;
+	    }
+	  unlink (tempname);
+
+	  ssize_t size = data->d_size;
+	  if (write_retry (sfd, data->d_buf, size) != size)
+	    {
+	      error (0, 0, gettext ("cannot write section data"));
+	      goto open_error;
+	    }
+
+	  if (elf_end (elf) != 0)
+	    {
+	      error (0, 0, gettext ("error while closing Elf descriptor: %s"),
+		     elf_errmsg (-1));
+	      return -1;
+	    }
+
+	  if (lseek (sfd, 0, SEEK_SET) == -1)
+	    {
+	      error (0, 0, gettext ("error while rewinding file descriptor"));
+	      return -1;
+	    }
+
+	  return sfd;
+	}
+    }
+
+  /* Named section not found.  */
+  if (elf_end (elf) != 0)
+    error (0, 0, gettext ("error while closing Elf descriptor: %s"),
+	   elf_errmsg (-1));
+  return -1;
+}
 
 /* Check if the file is an archive, and if so dump its index.  */
 static void
@@ -562,6 +692,21 @@ process_file (int fd, const char *fname, bool only_one)
   if (!any_control_option)
     return;
 
+  if (elf_input_section != NULL)
+    {
+      /* Replace fname and fd with section content. */
+      char *fnname = alloca (strlen (fname) + strlen (elf_input_section) + 2);
+      sprintf (fnname, "%s:%s", fname, elf_input_section);
+      fd = open_input_section (fd);
+      if (fd == -1)
+        {
+          error (0, 0, gettext ("No such section '%s' in '%s'"),
+		 elf_input_section, fname);
+          return;
+        }
+      fname = fnname;
+    }
+
   /* Duplicate an fd for dwfl_report_offline to swallow.  */
   int dwfl_fd = dup (fd);
   if (unlikely (dwfl_fd < 0))
@@ -606,6 +751,11 @@ process_file (int fd, const char *fname, bool only_one)
       dwfl_getmodules (dwfl, &process_dwflmod, &a, 0);
     }
   dwfl_end (dwfl);
+
+  /* Need to close the replaced fd if we created it.  Caller takes
+     care of original.  */
+  if (elf_input_section != NULL)
+    close (fd);
 }
 
 

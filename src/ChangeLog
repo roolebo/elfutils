@@ -1,3 +1,12 @@
+2012-12-18  Mark Wielaard  <mark@bordewijk.wildebeest.org>
+
+	* readelf.c (ELF_INPUT_SECTION): New argp key value.
+	(argp_option): Add elf-section.
+	(elf_input_section): New static.
+	(parse_opt): Handle ELF_INPUT_SECTION and set elf_input_section.
+	(open_input_section): New function.
+	(process_file): Call open_input_section if elf_input_section set.
+
 2013-01-13  David Abdurachmanov  <David.Abdurachmanov@cern.ch>
 
 	ar.c (do_oper_delete): Fix num passed to memset.

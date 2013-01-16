@@ -1,3 +1,12 @@
+2013-01-16  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (check_PROGRAMS): Add dwflsyms.
+	(TESTS): Add run-readelf-s.sh and run-dwflsyms.sh.
+	(EXTRA_DIST): Add run-readelf-s.sh, testfilebazdbg.bz2,
+	testfilebazdyn.bz2, testfilebazmin.bz2, testfilebazdbg.debug.bz2,
+	testfilebazmdb.bz2, testfilebaztab.bz2 and run-dwflsyms.sh.
+	(dwflsyms_LDADD): New variable.
+
 2013-01-07  Roland McGrath  <roland@hack.frob.com>
 
 	* run-prelink-addr-test.sh: Use ln -snf.

@@ -4094,6 +4094,7 @@ struct listptr
   bool addr64:1;
   bool dwarf64:1;
   bool warned:1;
+  Dwarf_Addr base;
 };
 
 #define listptr_offset_size(p)	((p)->dwarf64 ? 8 : 4)
@@ -4127,6 +4128,13 @@ compare_listptr (const void *a, const void *b, void *arg)
 		 gettext ("%s %#" PRIx64 " used with different offset sizes"),
 		 name, (uint64_t) p1->offset);
 	}
+      if (p1->base != p2->base)
+	{
+	  p1->warned = p2->warned = true;
+	  error (0, 0,
+		 gettext ("%s %#" PRIx64 " used with different base addresses"),
+		 name, (uint64_t) p1->offset);
+	}
     }
 
   return 0;
@@ -4153,7 +4161,7 @@ reset_listptr (struct listptr_table *table)
 static void
 notice_listptr (enum section_e section, struct listptr_table *table,
 		uint_fast8_t address_size, uint_fast8_t offset_size,
-		Dwarf_Off offset)
+		Dwarf_Addr base, Dwarf_Off offset)
 {
   if (print_debug_sections & section)
     {
@@ -4173,7 +4181,8 @@ notice_listptr (enum section_e section, struct listptr_table *table,
 	{
 	  .addr64 = address_size == 8,
 	  .dwarf64 = offset_size == 8,
-	  .offset = offset
+	  .offset = offset,
+	  .base = base
 	};
       assert (p->offset == offset);
     }
@@ -4190,7 +4199,8 @@ sort_listptr (struct listptr_table *table, const char *name)
 static bool
 skip_listptr_hole (struct listptr_table *table, size_t *idxp,
 		   uint_fast8_t *address_sizep, uint_fast8_t *offset_sizep,
-		   ptrdiff_t offset, unsigned char **readp, unsigned char *endp)
+		   Dwarf_Addr *base, ptrdiff_t offset,
+		   unsigned char **readp, unsigned char *endp)
 {
   if (table->n == 0)
     return false;
@@ -4221,6 +4231,8 @@ skip_listptr_hole (struct listptr_table *table, size_t *idxp,
     *address_sizep = listptr_address_size (p);
   if (offset_sizep != NULL)
     *offset_sizep = listptr_offset_size (p);
+  if (base != NULL)
+    *base = p->base;
 
   return false;
 }
@@ -4382,6 +4394,7 @@ print_debug_ranges_section (Dwfl_Module *dwflmod,
   uint_fast8_t address_size = ehdr->e_ident[EI_CLASS] == ELFCLASS32 ? 4 : 8;
 
   bool first = true;
+  Dwarf_Addr base = 0;
   unsigned char *const endp = (unsigned char *) data->d_buf + data->d_size;
   unsigned char *readp = data->d_buf;
   while (readp < endp)
@@ -4389,7 +4402,7 @@ print_debug_ranges_section (Dwfl_Module *dwflmod,
       ptrdiff_t offset = readp - (unsigned char *) data->d_buf;
 
       if (first && skip_listptr_hole (&known_rangelistptr, &listptr_idx,
-				      &address_size, NULL,
+				      &address_size, NULL, &base,
 				      offset, &readp, endp))
 	continue;
 
@@ -4419,6 +4432,7 @@ print_debug_ranges_section (Dwfl_Module *dwflmod,
 	  char *b = format_dwarf_addr (dwflmod, address_size, end);
 	  printf (gettext (" [%6tx]  base address %s\n"), offset, b);
 	  free (b);
+	  base = end;
 	}
       else if (begin == 0 && end == 0) /* End of list entry.  */
 	{
@@ -4428,8 +4442,8 @@ print_debug_ranges_section (Dwfl_Module *dwflmod,
 	}
       else
 	{
-	  char *b = format_dwarf_addr (dwflmod, address_size, begin);
-	  char *e = format_dwarf_addr (dwflmod, address_size, end);
+	  char *b = format_dwarf_addr (dwflmod, address_size, base + begin);
+	  char *e = format_dwarf_addr (dwflmod, address_size, base + end);
 	  /* We have an address range entry.  */
 	  if (first)		/* First address range entry in a list.  */
 	    printf (gettext (" [%6tx]  %s..%s\n"), offset, b, e);
@@ -5214,7 +5228,7 @@ struct attrcb_args
   unsigned int version;
   unsigned int addrsize;
   unsigned int offset_size;
-  Dwarf_Off cu_offset;
+  Dwarf_Addr cu_base;
 };
 
 
@@ -5347,7 +5361,8 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	case DW_AT_GNU_call_site_target:
 	case DW_AT_GNU_call_site_target_clobbered:
 	  notice_listptr (section_loc, &known_loclistptr,
-			  cbargs->addrsize, cbargs->offset_size, num);
+			  cbargs->addrsize, cbargs->offset_size,
+			  cbargs->cu_base, num);
 	  if (!cbargs->silent)
 	    printf ("           %*s%-20s (%s) location list [%6" PRIxMAX "]\n",
 		    (int) (level * 2), "", dwarf_attr_name (attr),
@@ -5356,7 +5371,8 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 
 	case DW_AT_ranges:
 	  notice_listptr (section_ranges, &known_rangelistptr,
-			  cbargs->addrsize, cbargs->offset_size, num);
+			  cbargs->addrsize, cbargs->offset_size,
+			  cbargs->cu_base, num);
 	  if (!cbargs->silent)
 	    printf ("           %*s%-20s (%s) range list [%6" PRIxMAX "]\n",
 		    (int) (level * 2), "", dwarf_attr_name (attr),
@@ -5565,8 +5581,7 @@ print_debug_units (Dwfl_Module *dwflmod,
       .silent = silent,
       .version = version,
       .addrsize = addrsize,
-      .offset_size = offsize,
-      .cu_offset = offset
+      .offset_size = offsize
     };
 
   offset += cuhl;
@@ -5581,6 +5596,19 @@ print_debug_units (Dwfl_Module *dwflmod,
 			      " in section '%s': %s"),
 	       (uint64_t) offset, secname, dwarf_errmsg (-1));
       goto do_return;
+    }
+
+  /* Find the base address of the compilation unit.  It will
+     normally be specified by DW_AT_low_pc.  In DWARF-3 draft 4,
+     the base address could be overridden by DW_AT_entry_pc.  It's
+     been removed, but GCC emits DW_AT_entry_pc and not DW_AT_lowpc
+     for compilation units with discontinuous ranges.  */
+  if (unlikely (dwarf_lowpc (&dies[0], &args.cu_base) != 0))
+    {
+      Dwarf_Attribute attr_mem;
+      if (dwarf_formaddr (dwarf_attr (&dies[0], DW_AT_entry_pc, &attr_mem),
+			  &args.cu_base) != 0)
+	args.cu_base = 0;
     }
 
   do
@@ -6186,6 +6214,7 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
   uint_fast8_t offset_size = 4;
 
   bool first = true;
+  Dwarf_Addr base = 0;
   unsigned char *readp = data->d_buf;
   unsigned char *const endp = (unsigned char *) data->d_buf + data->d_size;
   while (readp < endp)
@@ -6193,7 +6222,7 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
       ptrdiff_t offset = readp - (unsigned char *) data->d_buf;
 
       if (first && skip_listptr_hole (&known_loclistptr, &listptr_idx,
-				      &address_size, &offset_size,
+				      &address_size, &offset_size, &base,
 				      offset, &readp, endp))
 	continue;
 
@@ -6223,6 +6252,7 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
 	  char *b = format_dwarf_addr (dwflmod, address_size, end);
 	  printf (gettext (" [%6tx]  base address %s\n"), offset, b);
 	  free (b);
+	  base = end;
 	}
       else if (begin == 0 && end == 0) /* End of list entry.  */
 	{
@@ -6235,8 +6265,8 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
 	  /* We have a location expression entry.  */
 	  uint_fast16_t len = read_2ubyte_unaligned_inc (dbg, readp);
 
-	  char *b = format_dwarf_addr (dwflmod, address_size, begin);
-	  char *e = format_dwarf_addr (dwflmod, address_size, end);
+	  char *b = format_dwarf_addr (dwflmod, address_size, base + begin);
+	  char *e = format_dwarf_addr (dwflmod, address_size, base + end);
 
 	  if (first)		/* First entry in a list.  */
 	    printf (gettext (" [%6tx]  %s..%s"), offset, b, e);

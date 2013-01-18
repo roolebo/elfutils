@@ -1,3 +1,16 @@
+2013-01-18  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (struct listptr): Add base Dwarf_Addr field.
+	(compare_listptr): Warn for same offset with different base.
+	(notice_listptr): Take base argument and set it.
+	(skip_listptr_hole): Likewise.
+	(struct attrcb_args): Removed unused cu_offset field.
+	Add cu_base Dwarf_Addr field.
+	(attr_callback): Call notice_listptr with cbargs->cu_base.
+	(print_debug_units): Set args.cu_base.
+	(print_debug_ranges_section): Get base and use for format_dwarf_addr.
+	(print_debug_loc_section): Likewise.
+
 2013-01-29  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* readelf.c (handle_core_items): Limit special repeated items handling

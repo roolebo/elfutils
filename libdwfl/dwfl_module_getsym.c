@@ -48,6 +48,7 @@ dwfl_module_getsym (Dwfl_Module *mod, int ndx,
      And skip the auxiliary table zero undefined entry.  */
   GElf_Word shndx;
   int tndx = ndx;
+  int skip_aux_zero = (mod->syments > 0 && mod->aux_syments > 0) ? 1 : 0;
   struct dwfl_file *file;
   Elf_Data *symdata;
   Elf_Data *symxndxdata;
@@ -62,19 +63,19 @@ dwfl_module_getsym (Dwfl_Module *mod, int ndx,
       symxndxdata = mod->symxndxdata;
       symstrdata = mod->symstrdata;
     }
-  else if (ndx < mod->first_global + mod->aux_first_global - 1)
+  else if (ndx < mod->first_global + mod->aux_first_global - skip_aux_zero)
     {
       /* aux symbol table (locals).  */
-      tndx = ndx - mod->first_global + 1;
+      tndx = ndx - mod->first_global + skip_aux_zero;
       file = &mod->aux_sym;
       symdata = mod->aux_symdata;
       symxndxdata = mod->aux_symxndxdata;
       symstrdata = mod->aux_symstrdata;
     }
-  else if ((size_t) ndx < mod->syments + mod->aux_first_global - 1)
+  else if ((size_t) ndx < mod->syments + mod->aux_first_global - skip_aux_zero)
     {
       /* main symbol table (globals).  */
-      tndx = ndx - mod->aux_first_global + 1;
+      tndx = ndx - mod->aux_first_global + skip_aux_zero;
       file = mod->symfile;
       symdata = mod->symdata;
       symxndxdata = mod->symxndxdata;
@@ -83,7 +84,7 @@ dwfl_module_getsym (Dwfl_Module *mod, int ndx,
   else
     {
       /* aux symbol table (globals).  */
-      tndx = ndx - mod->syments + 1;
+      tndx = ndx - mod->syments + skip_aux_zero;
       file = &mod->aux_sym;
       symdata = mod->aux_symdata;
       symxndxdata = mod->aux_symxndxdata;

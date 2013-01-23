@@ -74,12 +74,33 @@
 #
 # - testfilebazmin (dynsym + gnu_debugdata)
 # objcopy --remove-section=.gnu_debuglink baz testfilebazmin
+#
+#
+# Special auxiliary only, can happen with static binaries.
+# - start.c
+#
+# extern int main (int argc, char ** argv);
+# void _start (void) { for (;;) main (1, 0); }
+#
+# gcc -g -c start.c
+# gcc -static -nostdlib -o bas foo.o bar.o start.o
+#
+# eu-strip --remove-comment -f bas.debug bas
+# nm bas.debug --format=posix --defined-only | awk '{ if ($2 == "T" || $2 == "t") print $1 }' | sort > funcsyms
+# objcopy -S --remove-section .gdb_index --remove-section .comment --keep-symbols=funcsyms bas.debug mini_debuginfo
+# rm -f mini_debuginfo.xz
+# xz mini_debuginfo
+# objcopy --add-section .gnu_debugdata=mini_debuginfo.xz bas
+# rm bas.debug
+# mv bas testfilebasmin
+
 
 testfiles testfilebaztab
 testfiles testfilebazdbg testfilebazdbg.debug
 testfiles testfilebazdyn
 testfiles testfilebazmdb
 testfiles testfilebazmin
+testfiles testfilebasmin
 
 tempfiles testfile.dynsym.in testfile.symtab.in testfile.minsym.in
 
@@ -252,5 +273,24 @@ cat testfile.dynsym.in \
 
 cat testfile.minsym.in \
   | testrun_compare ../src/readelf --elf-section -s testfilebazmin
+
+testrun_compare ../src/readelf -s testfilebasmin <<EOF
+EOF
+
+testrun_compare ../src/readelf --elf-section -s testfilebasmin <<\EOF
+
+Symbol table [ 6] '.symtab' contains 9 entries:
+ 6 local symbols  String table: [ 7] '.strtab'
+  Num:            Value   Size Type    Bind   Vis          Ndx Name
+    0: 0000000000000000      0 NOTYPE  LOCAL  DEFAULT    UNDEF 
+    1: 0000000000400168     18 FUNC    LOCAL  DEFAULT        2 foo
+    2: 0000000000400120      0 SECTION LOCAL  DEFAULT        1 
+    3: 0000000000400144      0 SECTION LOCAL  DEFAULT        2 
+    4: 00000000004001c0      0 SECTION LOCAL  DEFAULT        3 
+    5: 0000000000600258      0 SECTION LOCAL  DEFAULT        4 
+    6: 00000000004001a8     21 FUNC    GLOBAL DEFAULT        2 _start
+    7: 0000000000400144     33 FUNC    GLOBAL DEFAULT        2 main
+    8: 000000000040017a     44 FUNC    GLOBAL DEFAULT        2 bar
+EOF
 
 exit 0

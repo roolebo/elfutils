@@ -1,3 +1,16 @@
+2013-01-23  Mark Wielaard  <mjw@redhat.com>
+
+	* dwfl_module_getdwarf.c (find_aux_sym): Don't substract one
+	from aux_syments by default.
+	(find_symtab): Also succeed when only aux_symdata is found.
+	When no symtab is found always try to load auxiliary table.
+	(dwfl_module_getsymtab): Substract one from result when both
+	tables have symbols.
+	* dwfl_module_getsym.c (dwfl_module_getsym): Only skip auxiliary
+	zero entry when both tables have symbols.
+	* dwfl_module_addrsym.c (dwfl_module_addrsym): Only substract
+	one from first_global when both tables have symbols.
+
 2013-01-16  Mark Wielaard  <mjw@redhat.com>
 
 	* libdwflP.h (struct Dwfl_Module): Add aux_sym, aux_symdata,

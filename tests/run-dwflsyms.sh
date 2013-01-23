@@ -25,6 +25,7 @@ testfiles testfilebazdbg testfilebazdbg.debug
 testfiles testfilebazdyn
 testfiles testfilebazmdb
 testfiles testfilebazmin
+testfiles testfilebasmin
 
 tempfiles testfile.dynsym.in testfile.symtab.in testfile.minsym.in dwflsyms.out
 
@@ -189,5 +190,17 @@ cat testfile.symtab.in \
 
 cat testfile.minsym.in \
   | testrun_compare ./dwflsyms -e testfilebazmin
+
+testrun_compare ./dwflsyms -e testfilebasmin <<\EOF
+   0: NOTYPE	LOCAL	 (0) 0
+   1: FUNC	LOCAL	foo (18) 0x400168
+   2: SECTION	LOCAL	 (0) 0x400120
+   3: SECTION	LOCAL	 (0) 0x400144
+   4: SECTION	LOCAL	 (0) 0x4001c0
+   5: SECTION	LOCAL	 (0) 0x600258
+   6: FUNC	GLOBAL	_start (21) 0x4001a8
+   7: FUNC	GLOBAL	main (33) 0x400144
+   8: FUNC	GLOBAL	bar (44) 0x40017a
+EOF
 
 exit 0

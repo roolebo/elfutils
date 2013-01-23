@@ -1,3 +1,10 @@
+2013-01-23  Mark Wielaard  <mjw@redhat.com>
+
+	* testfilebasmin.bz2: New testfile.
+	* Makefile.am (EXTRA_DIST): Add testfilebasmin.bz2.
+	* run-readelf-s.sh: Test testfilebasmin.
+	* run-dwflsyms.sh: Likewise.
+
 2013-01-16  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (check_PROGRAMS): Add dwflsyms.

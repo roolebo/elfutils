@@ -909,7 +909,7 @@ find_aux_sym (Dwfl_Module *mod __attribute__ ((unused)),
 			minisymtab = true;
 			*aux_symscn = scn;
 			*aux_strshndx = shdr->sh_link;
-			mod->aux_syments = shdr->sh_size / shdr->sh_entsize - 1;
+			mod->aux_syments = shdr->sh_size / shdr->sh_entsize;
 			mod->aux_first_global = shdr->sh_info;
 			if (*aux_xndxscn != NULL)
 			  return;
@@ -949,7 +949,7 @@ find_aux_sym (Dwfl_Module *mod __attribute__ ((unused)),
 static void
 find_symtab (Dwfl_Module *mod)
 {
-  if (mod->symdata != NULL	/* Already done.  */
+  if (mod->symdata != NULL || mod->aux_symdata != NULL	/* Already done.  */
       || mod->symerr != DWFL_E_NOERROR) /* Cached previous failure.  */
     return;
 
@@ -1001,14 +1001,21 @@ find_symtab (Dwfl_Module *mod)
 	  break;
 
 	case DWFL_E_NO_SYMTAB:
+	  /* There might be an auxiliary table.  */
+	  find_aux_sym (mod, &aux_symscn, &aux_xndxscn, &aux_strshndx);
+
 	  if (symscn != NULL)
 	    {
 	      /* We still have the dynamic symbol table.  */
 	      mod->symerr = DWFL_E_NOERROR;
-
-	      /* The dynsym table might be extended by an auxiliary table.  */
-	      find_aux_sym (mod, &aux_symscn, &aux_xndxscn, &aux_strshndx);
 	      break;
+	    }
+
+	  if (aux_symscn != NULL)
+	    {
+	      /* We still have the auxiliary symbol table.  */
+	      mod->symerr = DWFL_E_NOERROR;
+	      goto aux_cache;
 	    }
 
 	  /* Last ditch, look for dynamic symbols without section headers.  */
@@ -1049,6 +1056,7 @@ find_symtab (Dwfl_Module *mod)
   /* Cache any auxiliary symbol info, when it fails, just ignore aux_sym.  */
   if (aux_symscn != NULL)
     {
+  aux_cache:
       /* This does some sanity checks on the string table section.  */
       if (elf_strptr (mod->aux_sym.elf, aux_strshndx, 0) == NULL)
 	{
@@ -1233,7 +1241,9 @@ dwfl_module_getsymtab (Dwfl_Module *mod)
 
   find_symtab (mod);
   if (mod->symerr == DWFL_E_NOERROR)
-    return mod->syments + mod->aux_syments;
+    /* We will skip the auxiliary zero entry if there is another one.  */
+    return (mod->syments + mod->aux_syments
+	    - (mod->syments > 0 && mod->aux_syments > 0 ? 1 : 0));
 
   __libdwfl_seterrno (mod->symerr);
   return -1;

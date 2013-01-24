@@ -1,3 +1,17 @@
+2013-01-24  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (argp_option): Add unresolved-address-offsets, U.
+	(print_unresolved_addresses): New static.
+	(parse_opt): Handle 'U', set print_unprocessed_values.
+	(format_dwarf_addr): Take and handle new raw argument.
+	(print_ops): Call format_dwarf_addr with raw offset values.
+	(print_debug_ranges_section): Likewise.
+	(print_debug_frame_section): Likewise.
+	(attr_callback): Likewise.
+	(print_debug_line_section): Likewise.
+	(print_debug_loc_section): Likewise.
+	(print_gdb_index_section): Likewise.
+
 2013-01-18  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (struct listptr): Add base Dwarf_Addr field.

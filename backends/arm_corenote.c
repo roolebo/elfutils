@@ -84,7 +84,7 @@ static const Ebl_Core_Item vfp_items[] =
     {
       .name = "fpscr", .group = "register",
       .offset = 0,
-      .count = 0, .type = ELF_T_WORD, .format = 'x',
+      .type = ELF_T_WORD, .format = 'x',
     },
   };
 

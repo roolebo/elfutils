@@ -1,3 +1,10 @@
+2013-01-30  Mark Wielaard  <mjw@redhat.com>
+
+	* testfileloc.bz2: New testfile.
+	* run-readelf-loc.sh: New test.
+	* Makefile.am (TESTS): Add run-readelf-loc.sh.
+	(EXTRA_DIST): Add run-readelf-loc.sh and testfileloc.bz2.
+
 2013-01-29  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* run-readelf-mixed-corenote.sh: New testcase for readelf -n of s390

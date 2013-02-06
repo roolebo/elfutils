@@ -45,5 +45,11 @@ extern const char *EBLHOOK(init) (Elf *elf, GElf_Half machine,
 
 extern bool (*generic_debugscn_p) (const char *) attribute_hidden;
 
+/* Helper for retval.  Return dwarf_tag (die), but calls return -1
+   if there where previous errors that leave die NULL.  */
+#define DWARF_TAG_OR_RETURN(die)  \
+  ({ Dwarf_Die *_die = (die);	  \
+     if (_die == NULL) return -1; \
+     dwarf_tag (_die); })
 
 #endif	/* libebl_CPU.h */

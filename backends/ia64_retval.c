@@ -109,7 +109,7 @@ hfa_type (Dwarf_Die *typedie, Dwarf_Word size,
       return fpregs_used + nregs;
     }
 
-  int tag = dwarf_tag (typedie);
+  int tag = DWARF_TAG_OR_RETURN (typedie);
   switch (tag)
     {
       Dwarf_Attribute attr_mem;
@@ -248,7 +248,7 @@ ia64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
 
   Dwarf_Die die_mem;
   Dwarf_Die *typedie = dwarf_formref_die (attr, &die_mem);
-  int tag = dwarf_tag (typedie);
+  int tag = DWARF_TAG_OR_RETURN (typedie);
 
   /* Follow typedefs and qualifiers to get to the actual type.  */
   while (tag == DW_TAG_typedef
@@ -257,7 +257,7 @@ ia64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
     {
       attr = dwarf_attr (typedie, DW_AT_type, &attr_mem);
       typedie = dwarf_formref_die (attr, &die_mem);
-      tag = dwarf_tag (typedie);
+      tag = DWARF_TAG_OR_RETURN (typedie);
     }
 
   Dwarf_Word size;
@@ -271,7 +271,7 @@ ia64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
 	{
 	  attr = dwarf_attr_integrate (typedie, DW_AT_type, &attr_mem);
 	  typedie = dwarf_formref_die (attr, &die_mem);
-	  tag = dwarf_tag (typedie);
+	  tag = DWARF_TAG_OR_RETURN (typedie);
 	}
       /* Fall through.  */
 

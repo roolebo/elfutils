@@ -1,3 +1,20 @@
+2013-02-06  Mark Wielaard  <mjw@redhat.com>
+
+	* libebl_CPU.h (DWARF_TAG_OR_RETURN): New macro.
+	* backends/alpha_retval.c (alpha_return_value_location): Use new
+	DWARF_TAG_OR_RETURN macro instead of dwarf_tag ().
+	* backends/arm_retval.c (arm_return_value_location): Likewise.
+	* backends/i386_retval.c (i386_return_value_location): Likewise.
+	* backends/ia64_retval.c (hfa_type): Likewise.
+	(ia64_return_value_location): Likewise.
+	* backends/ppc64_retval.c (ppc64_return_value_location): Likewise.
+	* backends/ppc_retval.c (ppc_return_value_location): Likewise.
+	* backends/s390_retval.c (s390_return_value_location): Likewise.
+	* backends/sh_retval.c (sh_return_value_location): Likewise.
+	* backends/sparc_retval.c (sparc_return_value_location): Likewise.
+	* backends/tilegx_retval.c (tilegx_return_value_location): Likewise.
+	* backends/x86_64_retval.c (x86_64_return_value_location): Likewise.
+
 2013-01-29  Jan Kratochvil  <jan.kratochvil@redhat.com>
 	    Roland McGrath <roland@hack.frob.com>
 

@@ -767,15 +767,22 @@ section [%2d] '%s': symbol %zu: function in COMMON section is nonsense\n"),
 			{
 			  /* GNU ld has severe bugs.  When it decides to remove
 			     empty sections it leaves symbols referencing them
-			     behind.  These are symbols in .symtab.  */
+			     behind.  These are symbols in .symtab or .dynsym
+			     and for the named symbols have zero size.  See
+			     sourceware PR13621.  */
 			  if (!gnuld
-			      || strcmp (section_name (ebl, idx), ".symtab")
+			      || (strcmp (section_name (ebl, idx), ".symtab")
+			          && strcmp (section_name (ebl, idx),
+					     ".dynsym"))
+			      || sym->st_size != 0
 			      || (strcmp (name, "__preinit_array_start") != 0
 				  && strcmp (name, "__preinit_array_end") != 0
 				  && strcmp (name, "__init_array_start") != 0
 				  && strcmp (name, "__init_array_end") != 0
 				  && strcmp (name, "__fini_array_start") != 0
-				  && strcmp (name, "__fini_array_end") != 0))
+				  && strcmp (name, "__fini_array_end") != 0
+				  && strcmp (name, "__bss_start") != 0
+				  && strcmp (name, "__TMC_END__") != 0))
 			    ERROR (gettext ("\
 section [%2d] '%s': symbol %zu: st_value out of bounds\n"),
 				   idx, section_name (ebl, idx), cnt);

@@ -1,3 +1,10 @@
+2013-02-06  Mark Wielaard  <mjw@redhat.com>
+
+	* elflint.c (check_symtab): Add __bss_start and __TMC_END__ to the
+	list of symbols allowed to have out of section values because of
+	GNU ld bugs in either .symtab or .dynsym, but only when they are
+	zero sized.
+
 2013-01-24  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (argp_option): Add unresolved-address-offsets, U.

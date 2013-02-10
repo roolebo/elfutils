@@ -210,7 +210,6 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	  {
 	    FILE *f = fopen (arg, "r");
 	    if (f == NULL)
-	    nofile:
 	      {
 		int code = errno;
 		argp_failure (state, EXIT_FAILURE, code,
@@ -298,7 +297,12 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	  {
 	    int fd = open64 (opt->core, O_RDONLY);
 	    if (fd < 0)
-	      goto nofile;
+	      {
+		int code = errno;
+		argp_failure (state, EXIT_FAILURE, code,
+			      "cannot open '%s'", opt->core);
+		return code;
+	      }
 
 	    Elf *core;
 	    Dwfl_Error error = __libdw_open_file (&fd, &core, true, false);
@@ -333,7 +337,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	else if (opt->e)
 	  {
 	    if (INTUSE(dwfl_report_offline) (dwfl, "", opt->e, -1) == NULL)
-	      return fail (dwfl, -1, arg);
+	      return fail (dwfl, -1, opt->e);
 	  }
 
 	/* One of the three flavors has done dwfl_begin and some reporting

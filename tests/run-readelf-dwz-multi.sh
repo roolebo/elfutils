@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2012 Red Hat, Inc.
+# Copyright (C) 2012, 2013 Red Hat, Inc.
 # This file is part of elfutils.
 #
 # This file is free software; you can redistribute it and/or modify
@@ -56,7 +56,27 @@
 # gcc -g -o testfile_multi_main -L. -ltestfile_multi_shared main.c -Wl,-rpath,.
 # dwz -m testfile_multi.dwz testfile_multi_main libtestfile_multi_shared.so
 
+# main.c
+#
+# struct foobarbaz
+# {
+#   int counter;
+#   char *bookstore;
+# };
+#
+# int
+# main (int argc, char **argv)
+# {
+#   struct foobarbaz fbb;
+#   return 0;
+# }
+
+# gcc -g -o testfile-dwzstr main.c
+# cp testfile-dwzstr testfile-dwzstr.alt
+# dwz -m testfile-dwzstr.multi testfile-dwzstr testfile-dwzstr.alt
+
 testfiles libtestfile_multi_shared.so testfile_multi_main testfile_multi.dwz
+testfiles testfile-dwzstr testfile-dwzstr.multi
 
 testrun_compare ../src/readelf --debug-dump=info testfile_multi_main <<\EOF
 
@@ -151,6 +171,57 @@ DWARF section [25] '.debug_info' at offset 0x106c:
                type                 (GNU_ref_alt) [    76]
                location             (exprloc) 
                 [   0] fbreg -24
+EOF
+
+testrun_compare ../src/readelf --debug-dump=info testfile-dwzstr <<\EOF
+
+DWARF section [28] '.debug_info' at offset 0x1088:
+ [Offset]
+ Compilation unit at offset 0:
+ Version: 4, Abbreviation section offset: 0, Address size: 8, Offset size: 4
+ [     b]  compile_unit
+           producer             (GNU_strp_alt) "GNU C 4.7.2 20121109 (Red Hat 4.7.2-8) -mtune=generic -march=x86-64 -g"
+           language             (data1) C89 (1)
+           name                 (GNU_strp_alt) "main.c"
+           comp_dir             (GNU_strp_alt) "/home/mark/src/tests"
+           low_pc               (addr) 0x00000000004004ec <main>
+           high_pc              (udata) 18
+           stmt_list            (sec_offset) 0
+ [    26]    imported_unit
+             import               (GNU_ref_alt) [     b]
+ [    2b]    subprogram
+             external             (flag_present) 
+             name                 (GNU_strp_alt) "main"
+             decl_file            (data1) 1
+             decl_line            (data1) 8
+             prototyped           (flag_present) 
+             type                 (GNU_ref_alt) [    30]
+             low_pc               (addr) 0x00000000004004ec <main>
+             high_pc              (udata) 18
+             frame_base           (exprloc) 
+              [   0] call_frame_cfa
+             GNU_all_call_sites   (flag_present) 
+ [    41]      formal_parameter
+               name                 (GNU_strp_alt) "argc"
+               decl_file            (data1) 1
+               decl_line            (data1) 8
+               type                 (GNU_ref_alt) [    30]
+               location             (exprloc) 
+                [   0] fbreg -36
+ [    4f]      formal_parameter
+               name                 (GNU_strp_alt) "argv"
+               decl_file            (data1) 1
+               decl_line            (data1) 8
+               type                 (GNU_ref_alt) [    41]
+               location             (exprloc) 
+                [   0] fbreg -48
+ [    5d]      variable
+               name                 (string) "fbb"
+               decl_file            (data1) 1
+               decl_line            (data1) 10
+               type                 (GNU_ref_alt) [    14]
+               location             (exprloc) 
+                [   0] fbreg -32
 EOF
 
 exit 0

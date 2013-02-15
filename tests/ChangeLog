@@ -1,3 +1,11 @@
+2013-02-15  Mark Wielaard  <mjw@redhat.com>
+
+	* testfile-dwzstr.bz2: New testfile.
+	* testfile-dwzstr.multi.bz2: Likewise.
+	* run-readelf-dwz-multi.sh: Add readelf testfile-dwzstr test.
+	* Makefile.am (EXTRA_DIST): Add testfile-dwzstr.bz2 and
+	testfile-dwzstr.multi.bz2.
+
 2013-01-30  Mark Wielaard  <mjw@redhat.com>
 
 	* testfileloc.bz2: New testfile.

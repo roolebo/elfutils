@@ -154,6 +154,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-readelf-loc.sh testfileloc.bz2 \
 	     run-readelf-dwz-multi.sh libtestfile_multi_shared.so.bz2 \
 	     testfile_multi.dwz.bz2 testfile_multi_main.bz2 \
+	     testfile-dwzstr.bz2 testfile-dwzstr.multi.bz2 \
 	     run-prelink-addr-test.sh \
 	     testfile52-32.so.bz2 testfile52-32.so.debug.bz2 \
 	     testfile52-32.prelink.so.bz2 testfile52-32.noshdrs.so.bz2 \

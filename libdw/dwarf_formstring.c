@@ -1,5 +1,5 @@
 /* Return string associated with given attribute.
-   Copyright (C) 2003-2010 Red Hat, Inc.
+   Copyright (C) 2003-2010, 2013 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -60,7 +60,7 @@ dwarf_formstring (attrp)
 
   if (unlikely (attrp->form != DW_FORM_strp
 		   && attrp->form != DW_FORM_GNU_strp_alt)
-      || dbg->sectiondata[IDX_debug_str] == NULL)
+      || dbg_ret->sectiondata[IDX_debug_str] == NULL)
     {
       __libdw_seterrno (DWARF_E_NO_STRING);
       return NULL;

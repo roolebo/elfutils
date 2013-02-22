@@ -1,3 +1,8 @@
+2013-02-22  Mark Wielaard  <mjw@redhat.com>
+
+	* open.c (__libdw_gunzip,__libdw_bunzip2,__libdw_unlzma): Define
+	as DWFL_E_BADELF when not used.
+
 2013-02-10  Mark Wielaard  <mjw@redhat.com>
 
 	* argp-std.c (parse_opt): Use opt->core and opt->e explicitly in

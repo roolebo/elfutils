@@ -33,15 +33,15 @@
 #include <unistd.h>
 
 #if !USE_ZLIB
-# define __libdw_gunzip(...)	false
+# define __libdw_gunzip(...)	DWFL_E_BADELF
 #endif
 
 #if !USE_BZLIB
-# define __libdw_bunzip2(...)	false
+# define __libdw_bunzip2(...)	DWFL_E_BADELF
 #endif
 
 #if !USE_LZMA
-# define __libdw_unlzma(...)	false
+# define __libdw_unlzma(...)	DWFL_E_BADELF
 #endif
 
 /* Consumes and replaces *ELF only on success.  */

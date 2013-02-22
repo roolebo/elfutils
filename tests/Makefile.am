@@ -83,7 +83,6 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-test-flag-nobits.sh run-prelink-addr-test.sh \
 	run-dwarf-getstring.sh run-rerequest_tag.sh run-typeiter.sh \
 	run-readelf-d.sh run-readelf-gdb_index.sh run-unstrip-n.sh \
-	run-readelf-s.sh run-dwflsyms.sh \
 	run-low_high_pc.sh run-macro-test.sh run-elf_cntl_gelf_getshdr.sh \
 	run-test-archive64.sh run-readelf-vmcoreinfo.sh \
 	run-readelf-mixed-corenote.sh
@@ -91,6 +90,10 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 if !STANDALONE
 check_PROGRAMS += msg_tst md5-sha1-test
 TESTS += msg_tst md5-sha1-test
+endif
+
+if LZMA
+TESTS += run-readelf-s.sh run-dwflsyms.sh
 endif
 
 if HAVE_LIBASM

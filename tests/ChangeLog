@@ -1,3 +1,8 @@
+2013-02-22  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (TESTS): Remove run-readelf-s.sh and run-dwflsyms.sh.
+	(LZMA): Add run-readelf-s.sh and run-dwflsyms.sh to TESTS.
+
 2013-02-15  Mark Wielaard  <mjw@redhat.com>
 
 	* testfile-dwzstr.bz2: New testfile.

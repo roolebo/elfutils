@@ -1,3 +1,8 @@
+2013-02-24  Mark Wielaard  <mjw@redhat.com>
+
+	* elflint.c (check_symtab): Add __bss_start__ to the list of symbols
+	allowed to have out of section values because of GNU ld bugs.
+
 2013-02-06  Mark Wielaard  <mjw@redhat.com>
 
 	* elflint.c (check_symtab): Add __bss_start and __TMC_END__ to the

@@ -311,7 +311,7 @@ process_file (const char *fname, bool more_than_one)
   if (!have_textrel)
     {
       error (0, 0, gettext ("no text relocations reported in '%s'"), fname);
-      return 1;
+      goto err_elf_close;
     }
 
   int fd2 = -1;

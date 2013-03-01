@@ -1,3 +1,10 @@
+2013-03-01  Mark Wielaard  <mjw@redhat.com>
+
+	* findtextrel.c (process_file): Release ELF and close file when not
+	text relocations are found.
+	* strip.c (handle_elf): Track memory used for .debuglink section data
+	and free when done.
+
 2013-02-24  Mark Wielaard  <mjw@redhat.com>
 
 	* elflint.c (check_symtab): Add __bss_start__ to the list of symbols

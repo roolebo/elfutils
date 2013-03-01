@@ -432,6 +432,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
   Elf_Data debuglink_crc_data;
   bool any_symtab_changes = false;
   Elf_Data *shstrtab_data = NULL;
+  void *debuglink_buf = NULL;
 
   /* Create the full name of the file.  */
   if (prefix != NULL)
@@ -1046,7 +1047,8 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
       shdr_info[cnt].data->d_align = 4;
       shdr_info[cnt].shdr.sh_size = shdr_info[cnt].data->d_size
 	= crc_offset + 4;
-      shdr_info[cnt].data->d_buf = xcalloc (1, shdr_info[cnt].data->d_size);
+      debuglink_buf = xcalloc (1, shdr_info[cnt].data->d_size);
+      shdr_info[cnt].data->d_buf = debuglink_buf;
 
       strcpy (shdr_info[cnt].data->d_buf, debug_basename);
 
@@ -2012,6 +2014,9 @@ while computing checksum for debug information"));
 	    if (shdr_info[cnt].debug_data != NULL)
 	      free (shdr_info[cnt].debug_data->d_buf);
 	  }
+
+      /* Free data we allocated for the .gnu_debuglink section. */
+      free (debuglink_buf);
 
       /* Free the memory.  */
       if ((shnum + 2) * sizeof (struct shdr_info) > MAX_STACK_ALLOC)

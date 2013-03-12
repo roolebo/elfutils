@@ -1,3 +1,11 @@
+2013-03-12  Mark Wielaard  <mjw@redhat.com>
+
+	* run-dwfllines.sh: New test.
+	* dwfllines.c: New test program.
+	* Makefile.am (TESTS): Add run-dwfllines.sh.
+	(EXTRA_DIST): Likewise.
+	(dwfllines_LDADD): New variable.
+
 2013-02-22  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (TESTS): Remove run-readelf-s.sh and run-dwflsyms.sh.

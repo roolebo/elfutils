@@ -1,5 +1,5 @@
 /* Fetch source line information for CU.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2013 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -44,5 +44,5 @@ dwfl_getsrclines (Dwarf_Die *cudie, size_t *nlines)
     }
 
   *nlines = cu->die.cu->lines->nlines;
-  return -1;
+  return 0;
 }

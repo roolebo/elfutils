@@ -1,3 +1,8 @@
+2013-03-12  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_getsrcfiles.c (dwarf_getsrcfiles): Allow DW_TAG_partial_unit.
+	* dwarf_getsrclines.c (dwarf_getsrclines): Likewise.
+
 2013-02-15  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_formstring.c (dwarf_formstring): Check dbg_ret->sectiondata,

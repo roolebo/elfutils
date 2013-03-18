@@ -1,5 +1,5 @@
 /* Print information from ELF file in human-readable form.
-   Copyright (C) 1999-2012 Red Hat, Inc.
+   Copyright (C) 1999-2013 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1999.
 
@@ -7272,8 +7272,10 @@ print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
   // The only difference between version 4 and version 5 is the
   // hash used for generating the table.  Version 6 contains symbols
-  // for inlined functions, older versions didn't.
-  if (vers < 4 || vers > 7)
+  // for inlined functions, older versions didn't.  Version 7 adds
+  // symbol kinds.  Version 8 just indicates that it correctly includes
+  // TUs for symbols.
+  if (vers < 4 || vers > 8)
     {
       printf (gettext ("  unknown version, cannot parse section\n"));
       return;

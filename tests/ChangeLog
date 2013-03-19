@@ -1,3 +1,14 @@
+2013-03-20  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* Makefile.am (check_PROGRAMS): Add dwfl-report-elf-align.
+	(TESTS): Add run-dwfl-report-elf-align.sh.
+	(EXTRA_DIST): Add run-dwfl-report-elf-align.sh and
+	testfile-dwfl-report-elf-align-shlib.so.bz2 .
+	(dwfl_report_elf_align_LDADD): New.
+	* dwfl-report-elf-align.c: New file.
+	* run-dwfl-report-elf-align.sh: New file.
+	* testfile-dwfl-report-elf-align-shlib.so.bz2: New file.
+
 2013-03-12  Mark Wielaard  <mjw@redhat.com>
 
 	* run-dwfllines.sh: New test.

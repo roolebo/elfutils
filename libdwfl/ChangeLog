@@ -1,3 +1,7 @@
+2013-03-20  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* dwfl_report_elf.c (__libdwfl_report_elf): Remove BASE aligning.
+
 2013-03-12  Mark Wielaard  <mjw@redhat.com>
 
 	* dwfl_getsrclines.c (dwfl_getsrclines): Return 0 on success.

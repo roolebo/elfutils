@@ -181,8 +181,6 @@ __libdwfl_report_elf (Dwfl *dwfl, const char *name, const char *file_name,
 	    {
 	      vaddr = ph->p_vaddr & -ph->p_align;
 	      address_sync = ph->p_vaddr + ph->p_memsz;
-	      if ((base & (ph->p_align - 1)) != 0)
-		base = (base + ph->p_align - 1) & -ph->p_align;
 	      start = base + vaddr;
 	      break;
 	    }

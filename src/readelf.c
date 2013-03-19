@@ -7389,6 +7389,8 @@ print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
       char *h = format_dwarf_addr (dwflmod, 8, high - 1, high);
       printf (" [%4zu] %s..%s, CU index: %5" PRId32 "\n",
 	      n, l, h, idx);
+      free (l);
+      free (h);
       n++;
     }
 

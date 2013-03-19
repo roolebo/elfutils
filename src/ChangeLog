@@ -1,3 +1,7 @@
+2013-03-19  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_gdb_index_section): Free format_dwarf_addr results.
+
 2013-03-18  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (print_gdb_index_section): Accept version 8.

@@ -1,3 +1,10 @@
+2013-03-25  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (attrcb_args): Add Dwarf_Die.
+	(attr_callback): When highpc is in constant form also print as
+	address.
+	(print_debug_units): Set args.die.
+
 2013-03-19  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (print_gdb_index_section): Free format_dwarf_addr results.

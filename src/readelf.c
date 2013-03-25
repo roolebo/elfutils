@@ -5242,6 +5242,7 @@ struct attrcb_args
 {
   Dwfl_Module *dwflmod;
   Dwarf *dbg;
+  Dwarf_Die *die;
   int level;
   bool silent;
   unsigned int version;
@@ -5437,7 +5438,19 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
       if (cbargs->silent)
 	break;
 
-      if (valuestr == NULL)
+      /* When highpc is in constant form it is relative to lowpc.
+	 In that case also show the address.  */
+      Dwarf_Addr highpc;
+      if (attr == DW_AT_high_pc && dwarf_highpc (cbargs->die, &highpc) == 0)
+	{
+	  char *a = format_dwarf_addr (cbargs->dwflmod, cbargs->addrsize,
+				       highpc, highpc);
+	  printf ("           %*s%-20s (%s) %" PRIuMAX " (%s)\n",
+		  (int) (level * 2), "", dwarf_attr_name (attr),
+		  dwarf_form_name (form), (uintmax_t) num, a);
+	  free (a);
+	}
+      else if (valuestr == NULL)
 	printf ("           %*s%-20s (%s) %" PRIuMAX "\n",
 		(int) (level * 2), "", dwarf_attr_name (attr),
 		dwarf_form_name (form), (uintmax_t) num);
@@ -5659,6 +5672,7 @@ print_debug_units (Dwfl_Module *dwflmod,
 
       /* Print the attribute values.  */
       args.level = level;
+      args.die = &dies[level];
       (void) dwarf_getattrs (&dies[level], attr_callback, &args, 0);
 
       /* Make room for the next level's DIE.  */

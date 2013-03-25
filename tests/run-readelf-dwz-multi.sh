@@ -90,7 +90,7 @@ DWARF section [28] '.debug_info' at offset 0x1078:
            name                 (strp) "main.c"
            comp_dir             (GNU_strp_alt) "/home/mark/src/tests/dwz"
            low_pc               (addr) 0x00000000004006ac <main>
-           high_pc              (udata) 44
+           high_pc              (udata) 44 (0x00000000004006d8)
            stmt_list            (sec_offset) 0
  [    26]    imported_unit
              import               (GNU_ref_alt) [     b]
@@ -105,7 +105,7 @@ DWARF section [28] '.debug_info' at offset 0x1078:
              prototyped           (flag_present) 
              type                 (GNU_ref_alt) [    3e]
              low_pc               (addr) 0x00000000004006ac <main>
-             high_pc              (udata) 44
+             high_pc              (udata) 44 (0x00000000004006d8)
              frame_base           (exprloc) 
               [   0] call_frame_cfa
              GNU_all_tail_call_sites (flag_present) 
@@ -148,7 +148,7 @@ DWARF section [25] '.debug_info' at offset 0x106c:
            name                 (strp) "shared.c"
            comp_dir             (GNU_strp_alt) "/home/mark/src/tests/dwz"
            low_pc               (addr) +0x0000000000000670 <call_foo>
-           high_pc              (udata) 23
+           high_pc              (udata) 23 (+0x0000000000000687)
            stmt_list            (sec_offset) 0
  [    26]    imported_unit
              import               (GNU_ref_alt) [     b]
@@ -160,7 +160,7 @@ DWARF section [25] '.debug_info' at offset 0x106c:
              prototyped           (flag_present) 
              type                 (GNU_ref_alt) [    3e]
              low_pc               (addr) +0x0000000000000670 <call_foo>
-             high_pc              (udata) 23
+             high_pc              (udata) 23 (+0x0000000000000687)
              frame_base           (exprloc) 
               [   0] call_frame_cfa
              GNU_all_call_sites   (flag_present) 
@@ -185,7 +185,7 @@ DWARF section [28] '.debug_info' at offset 0x1088:
            name                 (GNU_strp_alt) "main.c"
            comp_dir             (GNU_strp_alt) "/home/mark/src/tests"
            low_pc               (addr) 0x00000000004004ec <main>
-           high_pc              (udata) 18
+           high_pc              (udata) 18 (0x00000000004004fe)
            stmt_list            (sec_offset) 0
  [    26]    imported_unit
              import               (GNU_ref_alt) [     b]
@@ -197,7 +197,7 @@ DWARF section [28] '.debug_info' at offset 0x1088:
              prototyped           (flag_present) 
              type                 (GNU_ref_alt) [    30]
              low_pc               (addr) 0x00000000004004ec <main>
-             high_pc              (udata) 18
+             high_pc              (udata) 18 (0x00000000004004fe)
              frame_base           (exprloc) 
               [   0] call_frame_cfa
              GNU_all_call_sites   (flag_present) 

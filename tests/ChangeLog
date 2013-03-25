@@ -1,5 +1,12 @@
 2013-03-25  Mark Wielaard  <mjw@redhat.com>
 
+	* run-readelf-aranges.sh: New test.
+	* testfilefoobarbaz.bz2: New test file.
+	* Makefile.am (TESTS): Add run-readelf-aranges.sh.
+	(EXTRA_DIST): Add run-readelf-aranges.sh and testfilefoobarbaz.bz2.
+
+2013-03-25  Mark Wielaard  <mjw@redhat.com>
+
 	* run-readelf-dwz-multi.sh: Expect high_pc also as address.
 
 2013-03-20  Jan Kratochvil  <jan.kratochvil@redhat.com>

@@ -94,8 +94,8 @@ static const struct argp_option options[] =
   { NULL, 0, NULL, 0, N_("Additional output selection:"), 0 },
   { "debug-dump", 'w', "SECTION", OPTION_ARG_OPTIONAL,
     N_("Display DWARF section content.  SECTION can be one of abbrev, "
-       "aranges, frame, gdb_index, info, loc, line, ranges, pubnames, str, "
-       "macinfo, macro or exception"), 0 },
+       "aranges, decodedaranges, frame, gdb_index, info, loc, line, ranges, "
+       "pubnames, str, macinfo, macro or exception"), 0 },
   { "hex-dump", 'x', "SECTION", 0,
     N_("Dump the uninterpreted contents of SECTION, by number or name"), 0 },
   { "strings", 'p', "SECTION", OPTION_ARG_OPTIONAL,
@@ -182,6 +182,9 @@ static bool print_address_names = true;
 
 /* True if we should print raw values instead of relativized addresses.  */
 static bool print_unresolved_addresses = false;
+
+/* True if we should print the .debug_aranges section using libdw.  */
+static bool decodedaranges = false;
 
 /* Select printing of debugging sections.  */
 static enum section_e
@@ -391,6 +394,11 @@ parse_opt (int key, char *arg,
 	print_debug_sections |= section_abbrev;
       else if (strcmp (arg, "aranges") == 0)
 	print_debug_sections |= section_aranges;
+      else if (strcmp (arg, "decodedaranges") == 0)
+	{
+	  print_debug_sections |= section_aranges;
+	  decodedaranges = true;
+	}
       else if (strcmp (arg, "ranges") == 0)
 	{
 	  print_debug_sections |= section_ranges;
@@ -4330,9 +4338,8 @@ print_debug_abbrev_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
    not have to know a bit about the structure of the section, libdwarf
    takes care of it.  */
 static void
-print_debug_aranges_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
-			     Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn,
-			     GElf_Shdr *shdr, Dwarf *dbg)
+print_decoded_aranges_section (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn,
+			       GElf_Shdr *shdr, Dwarf *dbg)
 {
   Dwarf_Aranges *aranges;
   size_t cnt;
@@ -4383,6 +4390,166 @@ print_debug_aranges_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 		(uint64_t) start, (uint64_t) length, (int64_t) offset);
     }
 }
+
+
+/* Print content of DWARF .debug_aranges section.  */
+static void
+print_debug_aranges_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
+			     Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn,
+			     GElf_Shdr *shdr, Dwarf *dbg)
+{
+  if (decodedaranges)
+    {
+      print_decoded_aranges_section (ebl, ehdr, scn, shdr, dbg);
+      return;
+    }
+
+  Elf_Data *data = elf_rawdata (scn, NULL);
+
+  if (unlikely (data == NULL))
+    {
+      error (0, 0, gettext ("cannot get .debug_aranges content: %s"),
+	     elf_errmsg (-1));
+      return;
+    }
+
+  printf (gettext ("\
+\nDWARF section [%2zu] '%s' at offset %#" PRIx64 ":\n"),
+	  elf_ndxscn (scn), section_name (ebl, ehdr, shdr),
+	  (uint64_t) shdr->sh_offset);
+
+  const unsigned char *readp = data->d_buf;
+  const unsigned char *readendp = readp + data->d_size;
+
+  while (readp < readendp)
+    {
+      const unsigned char *hdrstart = readp;
+      size_t start_offset = hdrstart - (const unsigned char *) data->d_buf;
+
+      printf (gettext ("\nTable at offset %Zu:\n"), start_offset);
+      if (readp + 4 > readendp)
+	{
+	invalid_data:
+	  error (0, 0, gettext ("invalid data in section [%zu] '%s'"),
+		 elf_ndxscn (scn), section_name (ebl, ehdr, shdr));
+	  return;
+	}
+
+      Dwarf_Word length = read_4ubyte_unaligned_inc (dbg, readp);
+      unsigned int length_bytes = 4;
+      if (length == DWARF3_LENGTH_64_BIT)
+	{
+	  if (readp + 8 > readendp)
+	    goto invalid_data;
+	  length = read_8ubyte_unaligned_inc (dbg, readp);
+	  length_bytes = 8;
+	}
+
+      const unsigned char *nexthdr = readp + length;
+      printf (gettext ("\n Length:        %6" PRIu64 "\n"),
+	      (uint64_t) length);
+
+      if (nexthdr > readendp)
+	goto invalid_data;
+
+      if (length == 0)
+	continue;
+
+      if (readp + 2 > readendp)
+	goto invalid_data;
+      uint_fast16_t version = read_2ubyte_unaligned_inc (dbg, readp);
+      printf (gettext (" DWARF version: %6" PRIuFAST16 "\n"),
+	      version);
+      if (version != 2)
+	{
+	  error (0, 0, gettext ("unsupported aranges version"));
+	  goto next_table;
+	}
+
+      Dwarf_Word offset;
+      if (readp + length_bytes > readendp)
+	goto invalid_data;
+      if (length_bytes == 8)
+	offset = read_8ubyte_unaligned_inc (dbg, readp);
+      else
+	offset = read_4ubyte_unaligned_inc (dbg, readp);
+      printf (gettext (" CU offset:     %6" PRIx64 "\n"),
+	      (uint64_t) offset);
+
+      if (readp + 1 > readendp)
+	goto invalid_data;
+      unsigned int address_size = *readp++;
+      printf (gettext (" Address size:  %6" PRIu64 "\n"),
+	      (uint64_t) address_size);
+      if (address_size != 4 && address_size != 8)
+	{
+	  error (0, 0, gettext ("unsupported address size"));
+	  goto next_table;
+	}
+
+      unsigned int segment_size = *readp++;
+      printf (gettext (" Segment size:  %6" PRIu64 "\n\n"),
+	      (uint64_t) segment_size);
+      if (segment_size != 0 && segment_size != 4 && segment_size != 8)
+	{
+	  error (0, 0, gettext ("unsupported segment size"));
+	  goto next_table;
+	}
+
+      /* Round the address to the next multiple of 2*address_size.  */
+      readp += ((2 * address_size - ((readp - hdrstart) % (2 * address_size)))
+		% (2 * address_size));
+
+      while (readp < nexthdr)
+	{
+	  Dwarf_Word range_address;
+	  Dwarf_Word range_length;
+	  Dwarf_Word segment = 0;
+	  if (readp + 2 * address_size + segment_size > readendp)
+	    goto invalid_data;
+	  if (address_size == 4)
+	    {
+	      range_address = read_4ubyte_unaligned_inc (dbg, readp);
+	      range_length = read_4ubyte_unaligned_inc (dbg, readp);
+	    }
+	  else
+	    {
+	      range_address = read_8ubyte_unaligned_inc (dbg, readp);
+	      range_length = read_8ubyte_unaligned_inc (dbg, readp);
+	    }
+
+	  if (segment_size == 4)
+	    segment = read_4ubyte_unaligned_inc (dbg, readp);
+	  else if (segment_size == 8)
+	    segment = read_8ubyte_unaligned_inc (dbg, readp);
+
+	  if (range_address == 0 && range_length == 0 && segment == 0)
+	    break;
+
+	  char *b = format_dwarf_addr (dwflmod, address_size, range_address,
+				       range_address);
+	  char *e = format_dwarf_addr (dwflmod, address_size,
+				       range_address + range_length - 1,
+				       range_length);
+	  if (segment_size != 0)
+	    printf (gettext ("   %s..%s (%" PRIx64 ")\n"), b, e,
+		    (uint64_t) segment);
+	  else
+	    printf (gettext ("   %s..%s\n"), b, e);
+	  free (b);
+	  free (e);
+	}
+
+    next_table:
+      if (readp != nexthdr)
+	{
+	  size_t padding = nexthdr - readp;
+	  printf (gettext ("   %Zu padding bytes\n"), padding);
+	  readp = nexthdr;
+	}
+    }
+}
+
 
 /* Print content of DWARF .debug_ranges section.  */
 static void

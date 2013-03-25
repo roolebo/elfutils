@@ -1,5 +1,14 @@
 2013-03-25  Mark Wielaard  <mjw@redhat.com>
 
+	* readelf.c (argp_option): Add decodedaranges.
+	(decodedaranges): New boolean initialized to false.
+	(parse_opt): Set decodedaranges when arg is decodedaranges.
+	(print_debug_aranges_section): Reimplemented and original
+	implementation renamed to...
+	(print_decoded_aranges_section): this.
+
+2013-03-25  Mark Wielaard  <mjw@redhat.com>
+
 	* readelf.c (attrcb_args): Add Dwarf_Die.
 	(attr_callback): When highpc is in constant form also print as
 	address.

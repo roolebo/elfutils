@@ -94,8 +94,8 @@ static const struct argp_option options[] =
   { NULL, 0, NULL, 0, N_("Additional output selection:"), 0 },
   { "debug-dump", 'w', "SECTION", OPTION_ARG_OPTIONAL,
     N_("Display DWARF section content.  SECTION can be one of abbrev, "
-       "aranges, decodedaranges, frame, gdb_index, info, loc, line, ranges, "
-       "pubnames, str, macinfo, macro or exception"), 0 },
+       "aranges, decodedaranges, frame, gdb_index, info, loc, line, "
+       "decodedline, ranges, pubnames, str, macinfo, macro or exception"), 0 },
   { "hex-dump", 'x', "SECTION", 0,
     N_("Dump the uninterpreted contents of SECTION, by number or name"), 0 },
   { "strings", 'p', "SECTION", OPTION_ARG_OPTIONAL,
@@ -185,6 +185,9 @@ static bool print_unresolved_addresses = false;
 
 /* True if we should print the .debug_aranges section using libdw.  */
 static bool decodedaranges = false;
+
+/* True if we should print the .debug_aranges section using libdw.  */
+static bool decodedline = false;
 
 /* Select printing of debugging sections.  */
 static enum section_e
@@ -415,6 +418,11 @@ parse_opt (int key, char *arg,
 	}
       else if (strcmp (arg, "line") == 0)
 	print_debug_sections |= section_line;
+      else if (strcmp (arg, "decodedline") == 0)
+	{
+	  print_debug_sections |= section_line;
+	  decodedline = true;
+	}
       else if (strcmp (arg, "pubnames") == 0)
 	print_debug_sections |= section_pubnames;
       else if (strcmp (arg, "str") == 0)
@@ -5899,9 +5907,95 @@ print_debug_types_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
 
 static void
+print_decoded_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
+			    Elf_Scn *scn, GElf_Shdr *shdr, Dwarf *dbg)
+{
+  printf (gettext ("\
+\nDWARF section [%2zu] '%s' at offset %#" PRIx64 ":\n\n"),
+	  elf_ndxscn (scn), section_name (ebl, ehdr, shdr),
+	  (uint64_t) shdr->sh_offset);
+
+  size_t address_size
+    = elf_getident (ebl->elf, NULL)[EI_CLASS] == ELFCLASS32 ? 4 : 8;
+
+  Dwarf_Off cuoffset;
+  Dwarf_Off ncuoffset = 0;
+  size_t hsize;
+  while (dwarf_nextcu (dbg, cuoffset = ncuoffset, &ncuoffset, &hsize,
+		       NULL, NULL, NULL) == 0)
+    {
+      Dwarf_Die cudie;
+      if (dwarf_offdie (dbg, cuoffset + hsize, &cudie) == NULL)
+	continue;
+
+      size_t nlines;
+      Dwarf_Lines *lines;
+      if (dwarf_getsrclines (&cudie, &lines, &nlines) != 0)
+	continue;
+
+      printf (" CU [%" PRIx64 "] %s\n",
+	      dwarf_dieoffset (&cudie), dwarf_diename (&cudie));
+      printf ("  line:col SBPE* disc isa op address"
+	      " (Statement Block Prologue Epilogue *End)\n");
+      const char *last_file = "";
+      for (size_t n = 0; n < nlines; n++)
+	{
+	  Dwarf_Line *line = dwarf_onesrcline (lines, n);
+	  Dwarf_Word mtime, length;
+	  const char *file = dwarf_linesrc (line, &mtime, &length);
+	  if (strcmp (last_file, file) != 0)
+	    {
+	      printf ("  %s (mtime: %" PRIu64 ", length: %" PRIu64 ")\n",
+		      file, mtime, length);
+	      last_file = file;
+	    }
+
+	  int lineno, colno;
+	  bool statement, endseq, block, prologue_end, epilogue_begin;
+	  unsigned int lineop, isa, disc;
+	  Dwarf_Addr address;
+	  dwarf_lineaddr (line, &address);
+	  dwarf_lineno (line, &lineno);
+	  dwarf_linecol (line, &colno);
+	  dwarf_lineop_index (line, &lineop);
+	  dwarf_linebeginstatement (line, &statement);
+	  dwarf_lineendsequence (line, &endseq);
+	  dwarf_lineblock (line, &block);
+	  dwarf_lineprologueend (line, &prologue_end);
+	  dwarf_lineepiloguebegin (line, &epilogue_begin);
+	  dwarf_lineisa (line, &isa);
+	  dwarf_linediscriminator (line, &disc);
+
+	  /* End sequence is special, it is one byte past.  */
+	  char *a = format_dwarf_addr (dwflmod, address_size,
+				       address - (endseq ? 1 : 0), address);
+	  printf ("  %4d:%-3d %c%c%c%c%c %4d %3d %2d %s\n",
+		  lineno, colno,
+		  (statement ? 'S' : ' '),
+		  (block ? 'B' : ' '),
+		  (prologue_end ? 'P' : ' '),
+		  (epilogue_begin ? 'E' : ' '),
+		  (endseq ? '*' : ' '),
+		  disc, isa, lineop, a);
+	  free (a);
+
+	  if (endseq)
+	    printf("\n");
+	}
+    }
+}
+
+
+static void
 print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 			  Elf_Scn *scn, GElf_Shdr *shdr, Dwarf *dbg)
 {
+  if (decodedline)
+    {
+      print_decoded_line_section (dwflmod, ebl, ehdr, scn, shdr, dbg);
+      return;
+    }
+
   printf (gettext ("\
 \nDWARF section [%2zu] '%s' at offset %#" PRIx64 ":\n"),
 	  elf_ndxscn (scn), section_name (ebl, ehdr, shdr),

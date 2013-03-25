@@ -1,5 +1,14 @@
 2013-03-25  Mark Wielaard  <mjw@redhat.com>
 
+	* readelf.c (argp_options): Add decodedline.
+	(decodedline): New boolean initialized to false.
+	(parse_opt): Set decodedline when arg is decodedline.
+	(print_decoded_line_section): New function.
+	(print_debug_line_section): Call print_decoded_line_section when
+	decodedline is true.
+
+2013-03-25  Mark Wielaard  <mjw@redhat.com>
+
 	* readelf.c (argp_option): Add decodedaranges.
 	(decodedaranges): New boolean initialized to false.
 	(parse_opt): Set decodedaranges when arg is decodedaranges.

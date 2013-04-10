@@ -1,3 +1,9 @@
+2013-04-10  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_formref_die.c (dwarf_formref_die): Reference size is only
+	equal to address size when we have a DW_FORM_ref_addr for DWARF
+	version 2.
+
 2013-03-25  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_getsrclines.c (dwarf_getsrclines): Mark highest address as

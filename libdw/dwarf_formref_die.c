@@ -50,7 +50,7 @@ dwarf_formref_die (attr, result)
     {
       /* This has an absolute offset.  */
 
-      uint8_t ref_size = (cu->version == 2
+      uint8_t ref_size = (cu->version == 2 && attr->form == DW_FORM_ref_addr
 			  ? cu->address_size
 			  : cu->offset_size);
 

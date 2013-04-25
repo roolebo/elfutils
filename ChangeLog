@@ -1,3 +1,8 @@
+2013-04-25  Mark Wielaard  <mjw@redhat.com>
+
+	* .gitignore: Add config/test-driver as installed by automake 1.13.
+	* configure.ac (AM_INIT_AUTOMAKE): Require at least automake 1.11.
+
 2012-10-01  Mark Wielaard  <mjw@redhat.com>
 
 	* configure.ac: Add --enable-valgrind check.

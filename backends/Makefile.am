@@ -28,7 +28,7 @@
 ## the GNU Lesser General Public License along with this program.  If
 ## not, see <http://www.gnu.org/licenses/>.
 include $(top_srcdir)/config/eu.am
-INCLUDES += -I$(top_srcdir)/libebl -I$(top_srcdir)/libasm \
+AM_CPPFLAGS += -I$(top_srcdir)/libebl -I$(top_srcdir)/libasm \
 	   -I$(top_srcdir)/libelf -I$(top_srcdir)/libdw
 
 

@@ -30,7 +30,7 @@
 ## not, see <http://www.gnu.org/licenses/>.
 ##
 include $(top_srcdir)/config/eu.am
-INCLUDES += -I$(srcdir) -I$(srcdir)/../libelf -I$(srcdir)/../libebl \
+AM_CPPFLAGS += -I$(srcdir) -I$(srcdir)/../libelf -I$(srcdir)/../libebl \
 	   -I$(srcdir)/../libdw
 VERSION = 1
 

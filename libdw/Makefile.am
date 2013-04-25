@@ -32,7 +32,7 @@ DEFS += -DIS_LIBDW
 if BUILD_STATIC
 AM_CFLAGS += -fpic
 endif
-INCLUDES += -I$(srcdir)/../libelf
+AM_CPPFLAGS += -I$(srcdir)/../libelf
 VERSION = 1
 
 lib_LIBRARIES = libdw.a

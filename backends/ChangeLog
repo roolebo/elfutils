@@ -1,3 +1,7 @@
+2013-04-24  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am: Use AM_CPPFLAGS instead of INCLUDES.
+
 2013-02-06  Mark Wielaard  <mjw@redhat.com>
 
 	* libebl_CPU.h (DWARF_TAG_OR_RETURN): New macro.

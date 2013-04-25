@@ -1,3 +1,7 @@
+2013-04-24  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am: Use AM_CPPFLAGS instead of INCLUDES.
+
 2012-10-10  Roland McGrath  <roland@hack.frob.com>
 
 	* Makefile.am (%_defs, $(srcdir)/%_dis.h): Redirect to temp file,

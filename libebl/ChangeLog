@@ -1,3 +1,7 @@
+2013-04-24  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am: Use AM_CPPFLAGS instead of INCLUDES.
+
 2012-10-12  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* ebl-hooks.h (abi_cfi): Extend its comment for return value.

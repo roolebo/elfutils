@@ -26,7 +26,7 @@ endif
 AM_LDFLAGS =
 
 if !STANDALONE
-INCLUDES += -I$(top_srcdir)/libasm -I$(top_srcdir)/libdw \
+AM_CPPFLAGS += -I$(top_srcdir)/libasm -I$(top_srcdir)/libdw \
 	    -I$(top_srcdir)/libdwfl \
 	    -I$(top_srcdir)/libebl -I$(top_srcdir)/libelf \
 	    -I$(top_srcdir)/lib -I..

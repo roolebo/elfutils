@@ -29,7 +29,7 @@
 ##
 include $(top_srcdir)/config/eu.am
 AM_CFLAGS += -fpic
-INCLUDES += -I$(srcdir)/../libelf
+AM_CPPFLAGS += -I$(srcdir)/../libelf
 
 noinst_LIBRARIES = libeu.a
 

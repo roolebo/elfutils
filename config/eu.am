@@ -30,7 +30,7 @@
 ##
 
 DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H -DLOCALEDIR='"${localedir}"'
-INCLUDES = -I. -I$(srcdir) -I$(top_srcdir)/lib -I..
+AM_CPPFLAGS = -I. -I$(srcdir) -I$(top_srcdir)/lib -I..
 AM_CFLAGS = -std=gnu99 -Wall -Wshadow \
 	    $(if $($(*F)_no_Werror),,-Werror) \
 	    $(if $($(*F)_no_Wunused),,-Wunused -Wextra) \

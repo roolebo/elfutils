@@ -28,7 +28,7 @@
 ## not, see <http://www.gnu.org/licenses/>.
 ##
 include $(top_srcdir)/config/eu.am
-INCLUDES += -I$(srcdir)/../libelf -I$(srcdir)/../libebl \
+AM_CPPFLAGS += -I$(srcdir)/../libelf -I$(srcdir)/../libebl \
 	    -I$(srcdir)/../libdw -I$(srcdir)/../libasm
 AM_CFLAGS += -fpic -fdollars-in-identifiers
 LEXCOMPILE = $(LEX) $(LFLAGS) $(AM_LFLAGS) -P$(<F:lex.l=)

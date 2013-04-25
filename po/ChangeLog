@@ -1,3 +1,7 @@
+2013-04-24  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.in.in: Upgrade to gettext-0.18.2.
+
 2012-08-27  Mark Wielaard  <mjw@redhat.com>
 
 	* *.po: Update for 0.155.

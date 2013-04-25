@@ -1,3 +1,7 @@
+2013-04-24  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am: Use AM_CPPFLAGS instead of INCLUDES.
+
 2013-03-20  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* dwfl_report_elf.c (__libdwfl_report_elf): Remove BASE aligning.

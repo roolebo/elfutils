@@ -1,3 +1,7 @@
+2013-04-24  Mark Wielaard  <mjw@redhat.com>
+
+	* eu.am: Use AM_CPPFLAGS instead of INCLUDES.
+
 2012-08-27  Mark Wielaard  <mjw@redhat.com>
 
 	* config/elfutils.spec.in: Update for 0.155.

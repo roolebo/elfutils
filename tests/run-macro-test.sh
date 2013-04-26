@@ -31,6 +31,7 @@
 # gcc -gstrict-dwarf -gdwarf-4 -g3 -o testfile-macinfo macro.c
 
 testfiles testfile-macinfo testfile-macros
+tempfiles readelf.macros.out
 
 status=0
 
@@ -47,7 +48,5 @@ testrun ${abs_top_builddir}/src/readelf --debug-dump=info testfile-macros \
 testrun_compare cat readelf.macros.out <<\EOF
            GNU_macros           (sec_offset) 0
 EOF
-
-rm -f readelf.macros.out
 
 exit $status

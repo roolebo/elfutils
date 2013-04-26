@@ -19,6 +19,9 @@
 
 testfiles hello_i386.ko hello_x86_64.ko hello_ppc64.ko hello_s390.ko
 
+tempfiles readelf.out readelf.out1 readelf.out2
+tempfiles out.stripped1 out.debug1 out.stripped2 out.debug2
+
 status=0
 runtest() {
   infile=$1
@@ -61,8 +64,6 @@ runtest() {
 
   testrun_compare cat readelf.out1 < readelf.out2 ||
   { echo "*** failure readelf -w compare $infile"; status=1; }
-
-  rm -f $outfile1 $debugfile1 $outfile2 $debugfile2 readelf.out*
 }
 
 # Most simple hello world kernel module for various architectures.

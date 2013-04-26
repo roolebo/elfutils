@@ -17,6 +17,8 @@
 
 . $srcdir/test-subr.sh
 
+tempfiles testfile-alldts
+
 # This will produce "testfile-alldts" file
 testrun ${abs_builddir}/alldts
 
@@ -92,7 +94,5 @@ Dynamic segment contains 66 entries:
   AUXILIARY         0xdeadbeef
   FILTER            0xdeadbeef
 EOF
-
-rm -f testfile-alldts
 
 exit 0

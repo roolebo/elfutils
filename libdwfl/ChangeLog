@@ -1,3 +1,8 @@
+2013-04-26  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* link_map.c (BE32, BE64, LE32, LE64): Delete the definitions, move
+	them to lib/system.h.
+
 2013-04-24  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am: Use AM_CPPFLAGS instead of INCLUDES.

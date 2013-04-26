@@ -39,18 +39,6 @@
 #define PROBE_VAL32	sizeof (Elf32_Phdr)
 #define PROBE_VAL64	sizeof (Elf64_Phdr)
 
-#if BYTE_ORDER == BIG_ENDIAN
-# define BE32(x)	(x)
-# define BE64(x)	(x)
-# define LE32(x)	bswap_32 (x)
-# define LE64(x)	bswap_64 (x)
-#else
-# define LE32(x)	(x)
-# define LE64(x)	(x)
-# define BE32(x)	bswap_32 (x)
-# define BE64(x)	bswap_64 (x)
-#endif
-
 
 /* Examine an auxv data block and determine its format.
    Return true iff we figured it out.  */

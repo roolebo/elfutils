@@ -1,3 +1,8 @@
+2013-04-26  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* system.h (LE64, BE64): Move here the definitions from
+	libdwfl/link_map.c.
+
 2013-04-24  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am: Use AM_CPPFLAGS instead of INCLUDES.

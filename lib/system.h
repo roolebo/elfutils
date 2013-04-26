@@ -38,10 +38,14 @@
 
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 # define LE32(n)	(n)
+# define LE64(n)	(n)
 # define BE32(n)	bswap_32 (n)
+# define BE64(n)	bswap_64 (n)
 #elif __BYTE_ORDER == __BIG_ENDIAN
 # define BE32(n)	(n)
+# define BE64(n)	(n)
 # define LE32(n)	bswap_32 (n)
+# define LE64(n)	bswap_64 (n)
 #else
 # error "Unknown byte order"
 #endif

@@ -23,7 +23,7 @@ indexed=${indexed:-testfile19.index}
 
 testfiles $original $indexed
 
-testrun ../src/ranlib $original
+testrun ${abs_top_builddir}/src/ranlib $original
 
 if test -z "$noindex"; then
   # The date in the index is different.  The reference file has it blanked

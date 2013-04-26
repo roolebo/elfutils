@@ -21,7 +21,7 @@
 files="testfile `seq 2 9 | while read n; do echo testfile$n; done`"
 testfiles $files
 
-testrun_compare ../src/strings -tx -f $files <<\EOF
+testrun_compare ${abs_top_builddir}/src/strings -tx -f $files <<\EOF
 testfile:      f4 /lib/ld-linux.so.2
 testfile:     1c9 __gmon_start__
 testfile:     1d8 libc.so.6

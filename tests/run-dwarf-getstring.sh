@@ -19,7 +19,7 @@
 
 testfiles testfile11
 
-testrun_compare ./dwarf-getstring testfile11 <<\EOF
+testrun_compare ${abs_builddir}/dwarf-getstring testfile11 <<\EOF
 _ZNSbIwSt11char_traitsIwESaIwEE13_S_copy_charsEPwS3_S3_
 itimerspec
 _G_int32_t

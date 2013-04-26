@@ -26,7 +26,7 @@
 #  ar cru testarchive64.a aaa.o bbb.o ccc.o
 testfiles testarchive64.a
 
-testrun_compare ../src/readelf -c testarchive64.a <<\EOF
+testrun_compare ${abs_top_builddir}/src/readelf -c testarchive64.a <<\EOF
 
 Index of archive 'testarchive64.a' has 7 entries:
 Archive member 'aaa.o' contains:

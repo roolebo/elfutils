@@ -19,7 +19,7 @@
 
 testfiles testfile62
 
-testrun_compare ../src/readelf -n testfile62 <<\EOF
+testrun_compare ${abs_top_builddir}/src/readelf -n testfile62 <<\EOF
 
 Note segment of 2104 bytes at offset 0x158:
   Owner          Data size  Type

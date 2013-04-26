@@ -19,7 +19,7 @@
 
 testfiles testfile22
 
-testrun_compare ./addrscopes -e testfile22 0x8048353 <<\EOF
+testrun_compare ${abs_builddir}/addrscopes -e testfile22 0x8048353 <<\EOF
 0x8048353:
     tests/foo.c (0x11): 0x8048348 (tests/foo.c:5) .. 0x804837e (tests/foo.c:16)
         global                        [    be]
@@ -30,7 +30,7 @@ EOF
 test_cleanup
 
 testfiles testfile24
-testrun_compare ./addrscopes -e testfile24 0x804834e <<\EOF
+testrun_compare ${abs_builddir}/addrscopes -e testfile24 0x804834e <<\EOF
 0x804834e:
     inline-test.c (0x11): 0x8048348 (/home/roland/build/stock-elfutils/inline-test.c:7) .. 0x8048364 (/home/roland/build/stock-elfutils/inline-test.c:16)
         add (0x1d): 0x804834e (/home/roland/build/stock-elfutils/inline-test.c:3) .. 0x8048350 (/home/roland/build/stock-elfutils/inline-test.c:9)

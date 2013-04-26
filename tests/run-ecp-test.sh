@@ -21,7 +21,7 @@
 testfiles testfile10
 tempfiles testfile10.tmp
 
-testrun ./ecp testfile10 testfile10.tmp
+testrun ${abs_builddir}/ecp testfile10 testfile10.tmp
 
 cmp testfile10 testfile10.tmp
 

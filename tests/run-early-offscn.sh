@@ -19,6 +19,6 @@
 
 testfiles testfile
 
-testrun ./early-offscn testfile 0x500
+testrun ${abs_builddir}/early-offscn testfile 0x500
 
 exit 0

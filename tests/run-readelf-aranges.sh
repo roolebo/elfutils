@@ -111,7 +111,7 @@
 
 testfiles testfilefoobarbaz
 
-testrun_compare ../src/readelf --debug-dump=aranges testfilefoobarbaz <<EOF
+testrun_compare ${abs_top_builddir}/src/readelf --debug-dump=aranges testfilefoobarbaz <<EOF
 
 DWARF section [27] '.debug_aranges' at offset 0x1044:
 
@@ -148,7 +148,7 @@ Table at offset 72:
    0x08048340 <nobaz>..0x0804834a <nobaz+0xa>
 EOF
 
-testrun_compare ../src/readelf --debug-dump=decodedaranges testfilefoobarbaz <<\EOF
+testrun_compare ${abs_top_builddir}/src/readelf --debug-dump=decodedaranges testfilefoobarbaz <<\EOF
 
 DWARF section [27] '.debug_aranges' at offset 0x1044 contains 5 entries:
  [0] start: 0x080482f0, length:    52, CU DIE offset:     11

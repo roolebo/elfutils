@@ -65,7 +65,7 @@
 
 testfiles testfilegdbindex5 testfilegdbindex7
 
-testrun_compare ../src/readelf --debug-dump=gdb_index testfilegdbindex5 <<\EOF
+testrun_compare ${abs_top_builddir}/src/readelf --debug-dump=gdb_index testfilegdbindex5 <<\EOF
 
 GDB section [33] '.gdb_index' at offset 0xe76 contains 8383 bytes :
  Version:         5
@@ -96,7 +96,7 @@ GDB section [33] '.gdb_index' at offset 0xe76 contains 8383 bytes :
  [ 754] symbol: int, CUs: 0
 EOF
 
-testrun_compare ../src/readelf --debug-dump=gdb_index testfilegdbindex7 <<\EOF
+testrun_compare ${abs_top_builddir}/src/readelf --debug-dump=gdb_index testfilegdbindex7 <<\EOF
 
 GDB section [33] '.gdb_index' at offset 0xe76 contains 8399 bytes :
  Version:         7

@@ -59,7 +59,7 @@
 
 testfiles testfilemacro
 
-testrun_compare ../src/readelf --debug-dump=macro testfilemacro <<\EOF
+testrun_compare ${abs_top_builddir}/src/readelf --debug-dump=macro testfilemacro <<\EOF
 
 DWARF section [32] '.debug_macro' at offset 0x2480:
 

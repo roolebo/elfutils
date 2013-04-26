@@ -22,11 +22,16 @@
 
 set -e
 
+# Each test runs in its own directory to make sure they can run in parallel.
+test_dir="test-$$"
+mkdir -p "$test_dir"
+pushd "$test_dir" > /dev/null
+
 #LC_ALL=C
 #export LC_ALL
 
 remove_files=
-trap 'rm -f $remove_files' 0
+trap 'rm -f $remove_files; popd > /dev/null; rmdir $test_dir' 0
 
 tempfiles()
 {
@@ -36,7 +41,7 @@ tempfiles()
 testfiles()
 {
   for file; do
-    bunzip2 -c $srcdir/${file}.bz2 > ${file} 2>/dev/null || exit 77
+    bunzip2 -c ${abs_srcdir}/${file}.bz2 > ${file} 2>/dev/null || exit 77
     remove_files="$remove_files $file"
   done
 }
@@ -80,13 +85,13 @@ installed_testrun()
   program="$1"
   shift
   case "$program" in
-  ./*)
+  ${abs_builddir}/*)
     if [ "x$elfutils_tests_rpath" != xno ]; then
       echo >&2 installcheck not possible with --enable-tests-rpath
       exit 77
     fi
     ;;
-  ../*)
+  ${abs_top_builddir}/src/*)
     program=${bindir}/`program_transform ${program##*/}`
     ;;
   esac
@@ -104,10 +109,12 @@ program_transform()
   echo "$*" | sed "${program_transform_name}"
 }
 
-self_test_files=`echo ../src/addr2line ../src/elfcmp ../src/elflint \
-../src/findtextrel ../src/ld ../src/nm ../src/objdump ../src/readelf \
-../src/size ../src/strip ../libelf/libelf.so ../libdw/libdw.so \
-../libasm/libasm.so ../backends/libebl_*.so`
+self_test_files=`echo ${abs_top_builddir}/src/addr2line \
+${abs_top_builddir}/src/elfcmp ${abs_top_builddir}/src/elflint \
+${abs_top_builddir}/src/nm ${abs_top_builddir}/src/objdump \
+${abs_top_builddir}/src/readelf ${abs_top_builddir}/src/size \
+${abs_top_builddir}/src/strip ${abs_top_builddir}/libelf/libelf.so \
+${abs_top_builddir}/libdw/libdw.so ${abs_top_builddir}/backends/libebl_*.so`
 
 # Provide a command to run on all self-test files with testrun.
 testrun_on_self()

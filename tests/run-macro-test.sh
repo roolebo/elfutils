@@ -34,14 +34,14 @@ testfiles testfile-macinfo testfile-macros
 
 status=0
 
-testrun ../src/readelf --debug-dump=info testfile-macinfo \
+testrun ${abs_top_builddir}/src/readelf --debug-dump=info testfile-macinfo \
 	| grep macro_info > readelf.macros.out ||
   { echo "*** failure readelf --debug-dump=info testfile-macinfo"; status=1; }
 testrun_compare cat readelf.macros.out <<\EOF
            macro_info           (sec_offset) 0
 EOF
 
-testrun ../src/readelf --debug-dump=info testfile-macros \
+testrun ${abs_top_builddir}/src/readelf --debug-dump=info testfile-macros \
 	| grep GNU_macros > readelf.macros.out ||
   { echo "*** failure readelf --debug-dump=info testfile-macros"; status=1; }
 testrun_compare cat readelf.macros.out <<\EOF

@@ -19,7 +19,7 @@
 
 testfiles testfile19.index
 
-testrun_compare ../src/readelf -c testfile19.index <<\EOF
+testrun_compare ${abs_top_builddir}/src/readelf -c testfile19.index <<\EOF
 
 Index of archive 'testfile19.index' has 4 entries:
 Archive member 'u1.o' contains:

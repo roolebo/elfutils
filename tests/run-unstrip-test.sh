@@ -29,15 +29,15 @@ tempfiles testfile.unstrip testfile.inplace
 # stripped sections that shrank in the stripped file.  strip
 # no longer does that, but unstrip must still handle it.
 
-testrun ../src/unstrip -o testfile.unstrip $stripped $debugfile
+testrun ${abs_top_builddir}/src/unstrip -o testfile.unstrip $stripped $debugfile
 
-testrun ../src/elfcmp --hash-inexact $original testfile.unstrip
+testrun ${abs_top_builddir}/src/elfcmp --hash-inexact $original testfile.unstrip
 
 # Also test modifying the file in place.
 
 rm -f testfile.inplace
 cp $debugfile testfile.inplace
 chmod 644 testfile.inplace
-testrun ../src/unstrip $stripped testfile.inplace
+testrun ${abs_top_builddir}/src/unstrip $stripped testfile.inplace
 
-testrun ../src/elfcmp --hash-inexact $original testfile.inplace
+testrun ${abs_top_builddir}/src/elfcmp --hash-inexact $original testfile.inplace

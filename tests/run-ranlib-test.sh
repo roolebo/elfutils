@@ -30,7 +30,7 @@ EOF
 
 cp ranlib-test.a ranlib-test.a-copy
 
-testrun ../src/ranlib ranlib-test.a
+testrun ${abs_top_builddir}/src/ranlib ranlib-test.a
 
 # The ranlib call should not have changed anything.
 cmp ranlib-test.a ranlib-test.a-copy

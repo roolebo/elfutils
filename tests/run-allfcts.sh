@@ -20,7 +20,7 @@
 
 testfiles testfile testfile2 testfile8
 
-testrun_compare ./allfcts testfile testfile2 testfile8 <<\EOF
+testrun_compare ${abs_builddir}/allfcts testfile testfile2 testfile8 <<\EOF
 /home/drepper/gnu/new-bu/build/ttt/m.c:5:main
 /home/drepper/gnu/new-bu/build/ttt/b.c:4:bar
 /home/drepper/gnu/new-bu/build/ttt/f.c:3:foo

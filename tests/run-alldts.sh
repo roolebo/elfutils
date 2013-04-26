@@ -18,9 +18,9 @@
 . $srcdir/test-subr.sh
 
 # This will produce "testfile-alldts" file
-testrun ./alldts
+testrun ${abs_builddir}/alldts
 
-testrun_compare ../src/readelf -d testfile-alldts <<\EOF
+testrun_compare ${abs_top_builddir}/src/readelf -d testfile-alldts <<\EOF
 
 Dynamic segment contains 66 entries:
  Addr: 0x000001a0  Offset: 0x000078  Link to section: [ 0] ''

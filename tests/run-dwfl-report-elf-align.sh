@@ -38,7 +38,7 @@ testfiles testfile-dwfl-report-elf-align-shlib.so
 # 0x7f3560c92585 = 0x7f3560c92000 + 0x585
 # where 0x585 is any address inside the shlib function: 0x57c .. 0x57c + 11 -1
 
-testrun ./dwfl-report-elf-align ./testfile-dwfl-report-elf-align-shlib.so \
+testrun ${abs_builddir}/dwfl-report-elf-align ./testfile-dwfl-report-elf-align-shlib.so \
 				0x7f3560c92000 0x7f3560c92585 shlib
 
 exit 0

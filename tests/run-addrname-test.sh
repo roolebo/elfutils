@@ -19,7 +19,7 @@
 
 testfiles testfile34 testfile38 testfile41 testfile49
 
-testrun_compare ../src/addr2line -f -e testfile34 \
+testrun_compare ${abs_top_builddir}/src/addr2line -f -e testfile34 \
 				 0x08048074 0x08048075 0x08048076 \
 				 0x08049078 0x08048080 0x08049080 <<\EOF
 foo
@@ -36,7 +36,7 @@ _end
 ??:0
 EOF
 
-testrun_compare ../src/addr2line -S -e testfile38 0x02 0x10a 0x211 0x31a <<\EOF
+testrun_compare ${abs_top_builddir}/src/addr2line -S -e testfile38 0x02 0x10a 0x211 0x31a <<\EOF
 t1_global_outer+0x2
 ??:0
 t2_global_symbol+0x2
@@ -47,7 +47,7 @@ t3_global_after_0+0x1
 ??:0
 EOF
 
-testrun_compare ../src/addr2line -S -e testfile41 0x1 0x104 <<\EOF
+testrun_compare ${abs_top_builddir}/src/addr2line -S -e testfile41 0x1 0x104 <<\EOF
 small_global_at_large_global+0x1
 ??:0
 small_global_first_at_large_global+0x1
@@ -69,7 +69,7 @@ cat > testmaps <<EOF
 ffffffffff600000-ffffffffff601000 r-xp 00000000 00:00 0                  [vsyscall]
 EOF
 
-testrun_compare ../src/addr2line -S -M testmaps 0x40047c 0x10009db <<\EOF
+testrun_compare ${abs_top_builddir}/src/addr2line -S -M testmaps 0x40047c 0x10009db <<\EOF
 caller+0x14
 /home/drepper/local/elfutils-build/20050425/v.c:11
 foo+0xb
@@ -135,7 +135,7 @@ EOF
 #	nop #10
 #	.size local_outer, . - local_outer
 #	nop #11
-testrun_compare ../src/addr2line -S -e testfile49 \
+testrun_compare ${abs_top_builddir}/src/addr2line -S -e testfile49 \
     		0 1 2 3 4 5 6 7 8 9 \
 		0x100 0x101 0x102 0x103 0x104 0x105 \
 		0x106 0x107 0x108 0x109 0x10a 0x10b \
@@ -277,7 +277,7 @@ EOF
 #	local l0local2, 0
 #	offset 12
 testfiles testfile64
-testrun_compare ../src/addr2line -S -e testfile64 1 4 5 8 9 12 <<\EOF
+testrun_compare ${abs_top_builddir}/src/addr2line -S -e testfile64 1 4 5 8 9 12 <<\EOF
 gglobal2
 ??:0
 g0global2
@@ -293,13 +293,13 @@ l0local2
 EOF
 
 testfiles testfile65
-testrun_compare ../src/addr2line -S --core=testfile65 0x7fff94bffa30 <<\EOF
+testrun_compare ${abs_top_builddir}/src/addr2line -S --core=testfile65 0x7fff94bffa30 <<\EOF
 __vdso_time
 ??:0
 EOF
 
 testfiles testfile69.core testfile69.so
-testrun_compare ../src/addr2line --core=./testfile69.core -S 0x7f0bc6a33535 0x7f0bc6a33546 <<\EOF
+testrun_compare ${abs_top_builddir}/src/addr2line --core=./testfile69.core -S 0x7f0bc6a33535 0x7f0bc6a33546 <<\EOF
 libstatic+0x9
 ??:0
 libglobal+0x9
@@ -307,11 +307,11 @@ libglobal+0x9
 EOF
 
 testfiles testfile70.exec testfile70.core
-testrun_compare ../src/addr2line -S -e testfile70.exec --core=testfile70.core 0x7ff2cfe9b6b5 <<\EOF
+testrun_compare ${abs_top_builddir}/src/addr2line -S -e testfile70.exec --core=testfile70.core 0x7ff2cfe9b6b5 <<\EOF
 main+0x9
 ??:0
 EOF
-testrun_compare ../src/addr2line -S --core=testfile70.core -e testfile70.exec 0x7ff2cfe9b6b5 <<\EOF
+testrun_compare ${abs_top_builddir}/src/addr2line -S --core=testfile70.core -e testfile70.exec 0x7ff2cfe9b6b5 <<\EOF
 main+0x9
 ??:0
 EOF

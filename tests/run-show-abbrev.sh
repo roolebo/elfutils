@@ -20,7 +20,7 @@
 
 testfiles testfile testfile2
 
-testrun_compare ./show-abbrev testfile testfile2 <<\EOF
+testrun_compare ${abs_builddir}/show-abbrev testfile testfile2 <<\EOF
 abbrev[0]: code = 1, tag = 17, children = 1
 abbrev[0]: attr[0]: code = 16, form = 6, offset = 0
 abbrev[0]: attr[1]: code = 18, form = 1, offset = 2

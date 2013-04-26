@@ -20,7 +20,7 @@
 
 testfiles testfile testfile2
 
-testrun_compare ./get-lines testfile testfile2 <<\EOF
+testrun_compare ${abs_builddir}/get-lines testfile testfile2 <<\EOF
 cuhl = 11, o = 0, asz = 4, osz = 4, ncu = 191
  5 lines
 804842c: /home/drepper/gnu/new-bu/build/ttt/m.c:5:0: is_stmt:yes, end_seq:no, bb:no, prologue:no, epilogue:no

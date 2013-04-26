@@ -19,7 +19,7 @@
 
 testfiles testfile testfile2
 
-testrun_compare ./dwfllines -e testfile <<\EOF
+testrun_compare ${abs_builddir}/dwfllines -e testfile <<\EOF
 mod:  CU: [b] m.c
 0 0x804842c /home/drepper/gnu/new-bu/build/ttt/m.c:5:0
  time: 0, len: 0, idx: 0, b: 1, e: 0, pe: 0, eb: 0, block: 0, isa: 0, disc: 0
@@ -51,7 +51,7 @@ mod:  CU: [15fc] f.c
  time: 0, len: 0, idx: 0, b: 1, e: 1, pe: 0, eb: 0, block: 0, isa: 0, disc: 0
 EOF
 
-testrun_compare ./dwfllines -e testfile2 <<\EOF
+testrun_compare ${abs_builddir}/dwfllines -e testfile2 <<\EOF
 mod:  CU: [b] b.c
 0 0x10000470 /shoggoth/drepper/b.c:4:0
  time: 0, len: 0, idx: 0, b: 1, e: 0, pe: 0, eb: 0, block: 0, isa: 0, disc: 0
@@ -83,6 +83,6 @@ mod:  CU: [9e4] m.c
  time: 0, len: 0, idx: 0, b: 1, e: 1, pe: 0, eb: 0, block: 0, isa: 0, disc: 0
 EOF
 
-testrun_on_self_quiet ./dwfllines -e
+testrun_on_self_quiet ${abs_builddir}/dwfllines -e
 
 exit 0

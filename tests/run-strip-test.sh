@@ -27,30 +27,30 @@ test x$stripped = xtestfile.temp || testfiles $stripped $debugfile
 
 tempfiles testfile.temp testfile.debug.temp testfile.unstrip
 
-testrun ../src/strip -o testfile.temp $debugout $original
+testrun ${abs_top_builddir}/src/strip -o testfile.temp $debugout $original
 
 status=0
 
 cmp $stripped testfile.temp || status=$?
 
 # Check elflint and the expected result.
-testrun ../src/elflint -q testfile.temp || status=$?
+testrun ${abs_top_builddir}/src/elflint -q testfile.temp || status=$?
 
 test -z "$debugfile" || {
 cmp $debugfile testfile.debug.temp || status=$?
 
 # Check elflint and the expected result.
-testrun ../src/elflint -q -d testfile.debug.temp || status=$?
+testrun ${abs_top_builddir}/src/elflint -q -d testfile.debug.temp || status=$?
 
 # Now test unstrip recombining those files.
-testrun ../src/unstrip -o testfile.unstrip testfile.temp testfile.debug.temp
+testrun ${abs_top_builddir}/src/unstrip -o testfile.unstrip testfile.temp testfile.debug.temp
 
 # Check that it came back whole.
-testrun ../src/elfcmp --hash-inexact $original testfile.unstrip
+testrun ${abs_top_builddir}/src/elfcmp --hash-inexact $original testfile.unstrip
 }
 
 tempfiles testfile.sections
-testrun ../src/readelf -S testfile.temp > testfile.sections || status=$?
+testrun ${abs_top_builddir}/src/readelf -S testfile.temp > testfile.sections || status=$?
 fgrep ' .debug_' testfile.sections && status=1
 
 exit $status

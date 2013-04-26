@@ -25,10 +25,10 @@
 # gcc -g -o main main.c
 testfiles testfile_low_high_pc
 
-testrun ./low_high_pc -e ./testfile_low_high_pc
-testrun ./low_high_pc -e ./low_high_pc
-testrun ./low_high_pc -e ../src/strip
-testrun ./low_high_pc -e ../src/strip.o
-testrun ./low_high_pc -e ../libelf/libelf.so
+testrun ${abs_builddir}/low_high_pc -e ./testfile_low_high_pc
+testrun ${abs_builddir}/low_high_pc -e ${abs_builddir}/low_high_pc
+testrun ${abs_builddir}/low_high_pc -e ${abs_top_builddir}/src/strip
+testrun ${abs_builddir}/low_high_pc -e ${abs_top_builddir}/src/strip.o
+testrun ${abs_builddir}/low_high_pc -e ${abs_top_builddir}/libelf/libelf.so
 
 exit 0

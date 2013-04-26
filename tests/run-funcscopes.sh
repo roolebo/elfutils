@@ -19,7 +19,7 @@
 
 testfiles testfile25
 
-testrun_compare ./funcscopes -e testfile25 incr <<\EOF
+testrun_compare ${abs_builddir}/funcscopes -e testfile25 incr <<\EOF
 testfile25: 0x8048000 .. 0x8049528
     inline-test.c (0x11): 0x8048348 (/home/roland/build/stock-elfutils/inline-test.c:7) .. 0x804834f (/home/roland/build/stock-elfutils/inline-test.c:9)
         incr (0x2e): 0x8048348 (/home/roland/build/stock-elfutils/inline-test.c:7) .. 0x804834f (/home/roland/build/stock-elfutils/inline-test.c:9)

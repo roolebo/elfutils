@@ -22,7 +22,7 @@ regs_test()
   tempfiles good.regs
   cat > good.regs
   testfiles "$@"
-  for f; do testrun_compare ./allregs -e $f < good.regs; done
+  for f; do testrun_compare ${abs_builddir}/allregs -e $f < good.regs; done
   test_cleanup
 }
 

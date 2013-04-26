@@ -33,7 +33,7 @@
 
 testfiles testcore-rtlib testcore-rtlib-ppc
 
-testrun_compare ../src/unstrip -n --core=testcore-rtlib <<\EOF
+testrun_compare ${abs_top_builddir}/src/unstrip -n --core=testcore-rtlib <<\EOF
 0x8048000+0x2000 f1c600bc36cb91bf01f9a63a634ecb79aa4c3199@0x8048178 . - [exe]
 0xf77d6000+0x1000 676560b1b765cde9c2e53f134f4ee354ea894747@0xf77d6210 . - linux-gate.so.1
 0xf77b3000+0x9000 c6c5b5e35ab9589d4762ac85b4bd56b1b2720e37@0xf77b3164 /lib/librt.so.1 - librt.so.1
@@ -42,7 +42,7 @@ testrun_compare ../src/unstrip -n --core=testcore-rtlib <<\EOF
 0xf77d7000+0x21000 6d2cb32650054f1c176d01d48713a4a5e5e84c1a@0xf77d7124 /lib/ld-linux.so.2 - ld-linux.so.2
 EOF
 
-testrun_compare ../src/unstrip -n --core=testcore-rtlib-ppc <<\EOF
+testrun_compare ${abs_top_builddir}/src/unstrip -n --core=testcore-rtlib-ppc <<\EOF
 0x10000000+0x20000 979b7a26747cc09bd84a42b311b5288c704baea5@0x10000174 . - [exe]
 0x100000+0x10000 708b900b05176964512a6b0fe90c2a0c9d73d726@0x100334 . - linux-vdso32.so.1
 0xfd50000+0x30000 3f7d21508470322d2f47acddc20ab10516edba99@0xfd50164 /lib/librt.so.1 - librt.so.1

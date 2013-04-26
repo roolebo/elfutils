@@ -18,13 +18,13 @@
 . $srcdir/test-subr.sh
 
 # However we open the elf file, the shdrs should be the same.
-testrun ./test-elf_cntl_gelf_getshdr READ test-elf_cntl_gelf_getshdr \
+testrun ${abs_builddir}/test-elf_cntl_gelf_getshdr READ ${abs_builddir}/test-elf_cntl_gelf_getshdr \
   > test_shdr.out
 
-testrun_compare ./test-elf_cntl_gelf_getshdr MMAP test-elf_cntl_gelf_getshdr \
+testrun_compare ${abs_builddir}/test-elf_cntl_gelf_getshdr MMAP ${abs_builddir}/test-elf_cntl_gelf_getshdr \
   < test_shdr.out
 
-testrun_compare ./test-elf_cntl_gelf_getshdr FDREAD test-elf_cntl_gelf_getshdr \
+testrun_compare ${abs_builddir}/test-elf_cntl_gelf_getshdr FDREAD ${abs_builddir}/test-elf_cntl_gelf_getshdr \
   < test_shdr.out
 
 rm -f test_shdr.out

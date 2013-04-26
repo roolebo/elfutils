@@ -22,7 +22,7 @@
 
 testfiles testfilefoobarbaz
 
-testrun_compare ../src/readelf --debug-dump=line testfilefoobarbaz <<EOF
+testrun_compare ${abs_top_builddir}/src/readelf --debug-dump=line testfilefoobarbaz <<EOF
 
 DWARF section [30] '.debug_line' at offset 0x15f6:
 
@@ -197,7 +197,7 @@ Line number statements:
  [   10e] extended opcode 1:  end of sequence
 EOF
 
-testrun_compare ../src/readelf --debug-dump=decodedline testfilefoobarbaz <<\EOF
+testrun_compare ${abs_top_builddir}/src/readelf --debug-dump=decodedline testfilefoobarbaz <<\EOF
 
 DWARF section [30] '.debug_line' at offset 0x15f6:
 

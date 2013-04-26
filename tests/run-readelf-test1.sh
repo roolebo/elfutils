@@ -26,7 +26,7 @@ testfiles testfile3
 
 tempfiles testfile.temp
 
-testrun ../src/readelf -r testfile3 > testfile.temp
+testrun ${abs_top_builddir}/src/readelf -r testfile3 > testfile.temp
 
 diff -u - testfile.temp <<EOF
 

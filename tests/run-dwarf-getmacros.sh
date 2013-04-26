@@ -19,7 +19,7 @@
 
 testfiles testfile51
 
-testrun_compare ./dwarf-getmacros testfile51 0xb <<\EOF
+testrun_compare ${abs_builddir}/dwarf-getmacros testfile51 0xb <<\EOF
 __STDC__ 1
 __STDC_HOSTED__ 1
 __GNUC__ 4
@@ -152,7 +152,7 @@ __DECIMAL_BID_FORMAT__ 1
 macro1 ble
 EOF
 
-testrun_compare ./dwarf-getmacros testfile51 0x84 <<\EOF
+testrun_compare ${abs_builddir}/dwarf-getmacros testfile51 0x84 <<\EOF
 __STDC__ 1
 __STDC_HOSTED__ 1
 __GNUC__ 4

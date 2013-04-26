@@ -20,13 +20,13 @@
 testfiles testfile testfile11 testfile22 testfile24 \
 	  testfile25 testfile3 testfile4 testfile5 testfile6
 
-testrun_compare ./find-prologues -e testfile <<\EOF
+testrun_compare ${abs_builddir}/find-prologues -e testfile <<\EOF
 main             0x000000000804842c 0x0000000008048432
 bar              0x000000000804845c 0x000000000804845f
 foo              0x0000000008048468 0x000000000804846b
 EOF
 
-testrun_compare ./find-prologues -e testfile11 <<\EOF
+testrun_compare ${abs_builddir}/find-prologues -e testfile11 <<\EOF
 main             0x00000000080489b8 0x00000000080489cd
 gnu_obj_2        0x0000000008048c9e 0x0000000008048ca4
 gnu_obj_3        0x0000000008048cd8 0x0000000008048cde
@@ -37,27 +37,27 @@ gnu_obj_1        0x0000000008048d8a 0x0000000008048d8d
 ~invalid_argument 0x0000000008048db2 0x0000000008048db8
 EOF
 
-testrun_compare ./find-prologues -e testfile22 <<\EOF
+testrun_compare ${abs_builddir}/find-prologues -e testfile22 <<\EOF
 function         0x0000000008048348 0x000000000804834e
 main             0x000000000804835b 0x0000000008048377
 EOF
 
-testrun_compare ./find-prologues -e testfile24 <<\EOF
+testrun_compare ${abs_builddir}/find-prologues -e testfile24 <<\EOF
 incr             0x0000000008048348 0x000000000804834e
 main             0x0000000008048354 0x0000000008048360
 EOF
 
-testrun_compare ./find-prologues -e testfile25 <<\EOF
+testrun_compare ${abs_builddir}/find-prologues -e testfile25 <<\EOF
 incr             0x0000000008048348 0x000000000804834c
 EOF
 
-testrun_compare ./find-prologues -e testfile3 <<\EOF
+testrun_compare ${abs_builddir}/find-prologues -e testfile3 <<\EOF
 main             0x000000000804842c 0x0000000008048433
 bar              0x0000000008048458 0x000000000804845b
 foo              0x0000000008048464 0x0000000008048467
 EOF
 
-testrun_compare ./find-prologues -e testfile4 <<\EOF
+testrun_compare ${abs_builddir}/find-prologues -e testfile4 <<\EOF
 get              0x00000000080493fc 0x0000000008049402
 main             0x0000000008049498 0x000000000804949e
 a                0x000000000804d85c 0x000000000804d85c
@@ -65,13 +65,13 @@ __tfPCc          0x000000000804d86c 0x000000000804d872
 __tfCc           0x000000000804d8a4 0x000000000804d8a4
 EOF
 
-testrun_compare ./find-prologues -e testfile5 <<\EOF
+testrun_compare ${abs_builddir}/find-prologues -e testfile5 <<\EOF
 bar              0x000000000804842c 0x000000000804842f
 foo              0x0000000008048438 0x000000000804843b
 main             0x0000000008048444 0x000000000804844a
 EOF
 
-testrun_compare ./find-prologues -e testfile6 <<\EOF
+testrun_compare ${abs_builddir}/find-prologues -e testfile6 <<\EOF
 main             0x00000000080489b8 0x00000000080489cd
 gnu_obj_2        0x0000000008048c9e 0x0000000008048ca4
 gnu_obj_3        0x0000000008048cd8 0x0000000008048cde

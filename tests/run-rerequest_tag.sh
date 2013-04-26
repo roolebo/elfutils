@@ -19,7 +19,7 @@
 
 testfiles testfile56 testfile57
 
-testrun ./rerequest_tag testfile56
-testrun ./rerequest_tag testfile57
+testrun ${abs_builddir}/rerequest_tag testfile56
+testrun ${abs_builddir}/rerequest_tag testfile57
 
 exit 0

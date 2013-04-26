@@ -21,6 +21,6 @@
 testfiles testfile2
 tempfiles testfile2.tmp
 
-testrun ./ecp testfile2 testfile2.tmp
+testrun ${abs_builddir}/ecp testfile2 testfile2.tmp
 
 exit 0

@@ -43,7 +43,7 @@
 
 testfiles testfile59
 
-testrun_compare ./typeiter testfile59 <<\EOF
+testrun_compare ${abs_builddir}/typeiter testfile59 <<\EOF
 ok
 EOF
 

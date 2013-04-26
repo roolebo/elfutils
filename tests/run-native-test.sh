@@ -70,8 +70,8 @@ native_test()
   test $native -eq 0 || testrun "$@" -p $native > /dev/null
 }
 
-native_test ./allregs
-native_test ./funcretval
+native_test ${abs_builddir}/allregs
+native_test ${abs_builddir}/funcretval
 
 # We do this explicitly rather than letting the trap 0 cover it,
 # because as of version 3.1 bash prints the "Killed" report for

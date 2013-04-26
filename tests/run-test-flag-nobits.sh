@@ -19,4 +19,4 @@
 
 testfiles testfile
 
-testrun ./test-flag-nobits testfile
+testrun ${abs_builddir}/test-flag-nobits testfile

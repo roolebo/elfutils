@@ -28,18 +28,18 @@ runtest() {
   outfile2=out.stripped2
   debugfile2=out.debug2
 
-  testrun ../src/strip -o $outfile1 -f $debugfile1 $infile ||
+  testrun ${abs_top_builddir}/src/strip -o $outfile1 -f $debugfile1 $infile ||
   { echo "*** failure strip $infile"; status=1; }
 
-  testrun ../src/strip --reloc-debug-sections -o $outfile2 \
+  testrun ${abs_top_builddir}/src/strip --reloc-debug-sections -o $outfile2 \
 	-f $debugfile2 $infile ||
   { echo "*** failure strip --reloc-debug-sections $infile"; status=1; }
 
   # shouldn't make any difference for stripped files.
-  testrun ../src/readelf -a $outfile1 > readelf.out ||
+  testrun ${abs_top_builddir}/src/readelf -a $outfile1 > readelf.out ||
   { echo "*** failure readelf -a outfile1 $infile"; status=1; }
 
-  testrun_compare ../src/readelf -a $outfile2 < readelf.out ||
+  testrun_compare ${abs_top_builddir}/src/readelf -a $outfile2 < readelf.out ||
   { echo "*** failure compare stripped files $infile"; status=1; }
 
   # debug files however should be smaller, when ET_REL.
@@ -51,11 +51,11 @@ runtest() {
 
   # Strip of DWARF section lines, offset will not match.
   # Everything else should match.
-  testrun ../src/readelf -w $debugfile1 \
+  testrun ${abs_top_builddir}/src/readelf -w $debugfile1 \
 	| grep -v ^DWARF\ section > readelf.out1 ||
   { echo "*** failure readelf -w debugfile1 $infile"; status=1; }
 
-  testrun ../src/readelf -w $debugfile2 \
+  testrun ${abs_top_builddir}/src/readelf -w $debugfile2 \
 	| grep -v ^DWARF\ section > readelf.out2 ||
   { echo "*** failure readelf -w debugfile2 $infile"; status=1; }
 
@@ -101,7 +101,7 @@ runtest hello_ppc64.ko 1
 runtest hello_s390.ko 1
 
 # self test, shouldn't impact non-ET_REL files at all.
-runtest ../src/strip 0
-runtest ../src/strip.o 1
+runtest ${abs_top_builddir}/src/strip 0
+runtest ${abs_top_builddir}/src/strip.o 1
 
 exit $status

@@ -20,7 +20,7 @@
 
 testfiles testfile testfile2
 
-testrun_compare ./get-aranges testfile testfile2 <<\EOF
+testrun_compare ${abs_builddir}/get-aranges testfile testfile2 <<\EOF
 0x804842b: not in range
 CU name: "m.c"
 CU name: "m.c"

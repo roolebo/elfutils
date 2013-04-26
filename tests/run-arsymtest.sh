@@ -18,7 +18,7 @@
 
 . $srcdir/test-subr.sh
 
-lib=../libelf/libelf.a
+lib=${abs_top_builddir}/libelf/libelf.a
 okfile=arsymtest.ok
 tmpfile=arsymtest.tmp
 testfile=arsymtest.test
@@ -33,7 +33,7 @@ if test -f $lib; then
     sort > $okfile
 
     # Now run our program using libelf.
-    testrun ./arsymtest $lib $tmpfile || exit 1
+    testrun ${abs_builddir}/arsymtest $lib $tmpfile || exit 1
     sort $tmpfile > $testfile
 
     # Compare the outputs.

@@ -20,7 +20,7 @@
 
 testfiles testfile testfile2
 
-testrun_compare ./get-pubnames testfile testfile2 <<\EOF
+testrun_compare ${abs_builddir}/get-pubnames testfile testfile2 <<\EOF
  [ 0] "main", die: 104, cu: 11
 CU name: "m.c"
 object name: "main"

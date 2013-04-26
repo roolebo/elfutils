@@ -59,7 +59,7 @@
 testfiles testfileloc
 
 # Process values as offsets from base addresses and resolve to symbols.
-testrun_compare ../src/readelf --debug-dump=loc --debug-dump=ranges \
+testrun_compare ${abs_top_builddir}/src/readelf --debug-dump=loc --debug-dump=ranges \
   testfileloc<<\EOF
 
 DWARF section [33] '.debug_loc' at offset 0xd2a:
@@ -75,7 +75,7 @@ DWARF section [34] '.debug_ranges' at offset 0xd94:
 EOF
 
 # Don't resolve addresses to symbols.
-testrun_compare ../src/readelf -N --debug-dump=loc --debug-dump=ranges \
+testrun_compare ${abs_top_builddir}/src/readelf -N --debug-dump=loc --debug-dump=ranges \
   testfileloc<<\EOF
 
 DWARF section [33] '.debug_loc' at offset 0xd2a:
@@ -91,7 +91,7 @@ DWARF section [34] '.debug_ranges' at offset 0xd94:
 EOF
 
 # Produce "raw" unprocessed content.
-testrun_compare ../src/readelf -U --debug-dump=loc --debug-dump=ranges \
+testrun_compare ${abs_top_builddir}/src/readelf -U --debug-dump=loc --debug-dump=ranges \
   testfileloc<<\EOF
 
 DWARF section [33] '.debug_loc' at offset 0xd2a:

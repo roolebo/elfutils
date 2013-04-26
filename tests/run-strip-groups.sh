@@ -49,7 +49,7 @@ dbgfile=$infile.debug
 testfiles $infile
 tempfiles $outfile $dbgfile
 
-testrun ../src/strip -o $outfile -f $dbgfile $infile
-testrun ../src/elflint -q $infile
-testrun ../src/elflint -q $outfile
-testrun ../src/elflint -q -d $dbgfile
+testrun ${abs_top_builddir}/src/strip -o $outfile -f $dbgfile $infile
+testrun ${abs_top_builddir}/src/elflint -q $infile
+testrun ${abs_top_builddir}/src/elflint -q $outfile
+testrun ${abs_top_builddir}/src/elflint -q -d $dbgfile

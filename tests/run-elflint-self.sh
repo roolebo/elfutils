@@ -18,4 +18,4 @@
 
 . $srcdir/test-subr.sh
 
-testrun_on_self ../src/elflint --quiet --gnu-ld
+testrun_on_self ${abs_top_builddir}/src/elflint --quiet --gnu-ld

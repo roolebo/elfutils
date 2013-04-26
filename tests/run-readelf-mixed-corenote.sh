@@ -19,7 +19,7 @@
 
 testfiles testfile63
 
-testrun_compare ../src/readelf -n testfile63 <<\EOF
+testrun_compare ${abs_top_builddir}/src/readelf -n testfile63 <<\EOF
 
 Note segment of 892 bytes at offset 0x274:
   Owner          Data size  Type
@@ -85,7 +85,7 @@ Note segment of 892 bytes at offset 0x274:
 EOF
 
 testfiles testfile67
-testrun_compare ../src/readelf -n testfile67 <<\EOF
+testrun_compare ${abs_top_builddir}/src/readelf -n testfile67 <<\EOF
 
 Note segment of 1044 bytes at offset 0xe8:
   Owner          Data size  Type
@@ -150,7 +150,7 @@ Note segment of 1044 bytes at offset 0xe8:
 EOF
 
 testfiles testfile68
-testrun_compare ../src/readelf -n testfile68 <<\EOF
+testrun_compare ${abs_top_builddir}/src/readelf -n testfile68 <<\EOF
 
 Note segment of 852 bytes at offset 0x94:
   Owner          Data size  Type

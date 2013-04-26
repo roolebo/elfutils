@@ -19,7 +19,7 @@
 
 testfiles testfile28 testfile28.rdwr
 
-testrun ./rdwrmmap testfile28
+testrun ${abs_builddir}/rdwrmmap testfile28
 
 cmp testfile28 testfile28.rdwr
 
@@ -27,7 +27,7 @@ test_cleanup
 
 testfiles testfile29 testfile29.rdwr
 
-testrun ./rdwrmmap testfile29
+testrun ${abs_builddir}/rdwrmmap testfile29
 
 cmp testfile29 testfile29.rdwr
 

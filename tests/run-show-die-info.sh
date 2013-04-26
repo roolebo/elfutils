@@ -20,7 +20,7 @@
 
 testfiles testfile5 testfile2
 
-testrun_compare ./show-die-info testfile5 testfile2 <<\EOF
+testrun_compare ${abs_builddir}/show-die-info testfile5 testfile2 <<\EOF
 file: testfile5
 New CU: off = 0, hsize = 11, ab = 0, as = 4, os = 4
      DW_TAG_compile_unit

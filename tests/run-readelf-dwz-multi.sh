@@ -78,7 +78,7 @@
 testfiles libtestfile_multi_shared.so testfile_multi_main testfile_multi.dwz
 testfiles testfile-dwzstr testfile-dwzstr.multi
 
-testrun_compare ../src/readelf --debug-dump=info testfile_multi_main <<\EOF
+testrun_compare ${abs_top_builddir}/src/readelf --debug-dump=info testfile_multi_main <<\EOF
 
 DWARF section [28] '.debug_info' at offset 0x1078:
  [Offset]
@@ -136,7 +136,7 @@ DWARF section [28] '.debug_info' at offset 0x1078:
              type                 (ref_udata) [    2b]
 EOF
 
-testrun_compare ../src/readelf --debug-dump=info libtestfile_multi_shared.so <<\EOF
+testrun_compare ${abs_top_builddir}/src/readelf --debug-dump=info libtestfile_multi_shared.so <<\EOF
 
 DWARF section [25] '.debug_info' at offset 0x106c:
  [Offset]
@@ -173,7 +173,7 @@ DWARF section [25] '.debug_info' at offset 0x106c:
                 [   0] fbreg -24
 EOF
 
-testrun_compare ../src/readelf --debug-dump=info testfile-dwzstr <<\EOF
+testrun_compare ${abs_top_builddir}/src/readelf --debug-dump=info testfile-dwzstr <<\EOF
 
 DWARF section [28] '.debug_info' at offset 0x1088:
  [Offset]

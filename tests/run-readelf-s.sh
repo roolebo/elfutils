@@ -251,33 +251,33 @@ Symbol table [27] '.symtab' contains 35 entries:
 EOF
 
 cat testfile.dynsym.in testfile.symtab.in \
-  | testrun_compare ../src/readelf -s testfilebaztab
+  | testrun_compare ${abs_top_builddir}/src/readelf -s testfilebaztab
 
 cat testfile.dynsym.in \
-  | testrun_compare ../src/readelf -s testfilebazdbg
+  | testrun_compare ${abs_top_builddir}/src/readelf -s testfilebazdbg
 
 cat testfile.symtab.in \
-  | testrun_compare ../src/readelf -s testfilebazdbg.debug
+  | testrun_compare ${abs_top_builddir}/src/readelf -s testfilebazdbg.debug
 
 cat testfile.dynsym.in \
-  | testrun_compare ../src/readelf -s testfilebazdyn
+  | testrun_compare ${abs_top_builddir}/src/readelf -s testfilebazdyn
 
 cat testfile.dynsym.in \
-  | testrun_compare ../src/readelf -s testfilebazmdb
+  | testrun_compare ${abs_top_builddir}/src/readelf -s testfilebazmdb
 
 cat testfile.minsym.in \
-  | testrun_compare ../src/readelf --elf-section -s testfilebazmdb
+  | testrun_compare ${abs_top_builddir}/src/readelf --elf-section -s testfilebazmdb
 
 cat testfile.dynsym.in \
-  | testrun_compare ../src/readelf -s testfilebazmin
+  | testrun_compare ${abs_top_builddir}/src/readelf -s testfilebazmin
 
 cat testfile.minsym.in \
-  | testrun_compare ../src/readelf --elf-section -s testfilebazmin
+  | testrun_compare ${abs_top_builddir}/src/readelf --elf-section -s testfilebazmin
 
-testrun_compare ../src/readelf -s testfilebasmin <<EOF
+testrun_compare ${abs_top_builddir}/src/readelf -s testfilebasmin <<EOF
 EOF
 
-testrun_compare ../src/readelf --elf-section -s testfilebasmin <<\EOF
+testrun_compare ${abs_top_builddir}/src/readelf --elf-section -s testfilebasmin <<\EOF
 
 Symbol table [ 6] '.symtab' contains 9 entries:
  6 local symbols  String table: [ 7] '.strtab'

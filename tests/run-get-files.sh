@@ -20,7 +20,7 @@
 
 testfiles testfile testfile2
 
-testrun_compare ./get-files testfile testfile2 <<\EOF
+testrun_compare ${abs_builddir}/get-files testfile testfile2 <<\EOF
 cuhl = 11, o = 0, asz = 4, osz = 4, ncu = 191
  dirs[0] = "/home/drepper/gnu/new-bu/build/ttt"
  file[0] = "???"

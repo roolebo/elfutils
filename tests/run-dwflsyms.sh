@@ -177,21 +177,21 @@ cat > testfile.minsym.in <<\EOF
 EOF
 
 cat testfile.symtab.in \
-  | testrun_compare ./dwflsyms -e testfilebaztab
+  | testrun_compare ${abs_builddir}/dwflsyms -e testfilebaztab
 
 cat testfile.symtab.in \
-  | testrun_compare ./dwflsyms -e testfilebazdbg
+  | testrun_compare ${abs_builddir}/dwflsyms -e testfilebazdbg
 
 cat testfile.dynsym.in \
-  | testrun_compare ./dwflsyms -e testfilebazdyn
+  | testrun_compare ${abs_builddir}/dwflsyms -e testfilebazdyn
 
 cat testfile.symtab.in \
-  | testrun_compare ./dwflsyms -e testfilebazmdb
+  | testrun_compare ${abs_builddir}/dwflsyms -e testfilebazmdb
 
 cat testfile.minsym.in \
-  | testrun_compare ./dwflsyms -e testfilebazmin
+  | testrun_compare ${abs_builddir}/dwflsyms -e testfilebazmin
 
-testrun_compare ./dwflsyms -e testfilebasmin <<\EOF
+testrun_compare ${abs_builddir}/dwflsyms -e testfilebasmin <<\EOF
    0: NOTYPE	LOCAL	 (0) 0
    1: FUNC	LOCAL	foo (18) 0x400168
    2: SECTION	LOCAL	 (0) 0x400120

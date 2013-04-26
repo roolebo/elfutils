@@ -201,26 +201,41 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile-dwfl-report-elf-align-shlib.so.bz2
 
 if USE_VALGRIND
-valgrind_cmd="valgrind -q --trace-children=yes --error-exitcode=1 --run-libc-freeres=no"
+valgrind_cmd='valgrind -q --trace-children=yes --error-exitcode=1 --run-libc-freeres=no'
 endif
 
-installed_TESTS_ENVIRONMENT = libdir=$(DESTDIR)$(libdir) \
-			      bindir=$(DESTDIR)$(bindir) \
-			      LC_ALL=C LANG=C \
-			      VALGRIND_CMD=$(valgrind_cmd) \
-			      $(srcdir)/test-wrapper.sh \
-			      installed $(tests_rpath) \
-			      $(program_transform_name)
+
+installed_TESTS_ENVIRONMENT = libdir=$(DESTDIR)$(libdir); \
+			      bindir=$(DESTDIR)$(bindir); \
+			      LC_ALL=C; LANG=C; \
+			      VALGRIND_CMD=$(valgrind_cmd); \
+			      abs_srcdir=$(abs_srcdir); \
+			      abs_builddir=$(abs_builddir); \
+			      abs_top_builddir=$(abs_top_builddir); \
+			      export abs_srcdir; export abs_builddir; \
+			      export abs_top_builddir; \
+			      export libdir; export bindir; \
+			      export LC_ALL; export LANG; export VALGRIND_CMD;
+installed_LOG_COMPILER = $(abs_srcdir)/test-wrapper.sh \
+			 installed $(tests_rpath) \
+			 '$(program_transform_name)'
 if STANDALONE
 TESTS_ENVIRONMENT = $(installed_TESTS_ENVIRONMENT)
+LOG_COMPILER = $(installed_LOG_COMPILER)
 else !STANDALONE
-TESTS_ENVIRONMENT = LC_ALL=C LANG=C VALGRIND_CMD=$(valgrind_cmd) \
-		    $(srcdir)/test-wrapper.sh \
-		    ../libdw:../backends:../libelf:../libasm
+TESTS_ENVIRONMENT = LC_ALL=C; LANG=C; VALGRIND_CMD=$(valgrind_cmd); \
+		    abs_srcdir=$(abs_srcdir);  abs_builddir=$(abs_builddir); \
+		    abs_top_builddir=$(abs_top_builddir); \
+		    export abs_srcdir; export abs_builddir; \
+		    export abs_top_builddir; \
+		    export LC_ALL; export LANG; export VALGRIND_CMD;
+LOG_COMPILER = $(abs_srcdir)/test-wrapper.sh \
+	       $(abs_top_builddir)/libdw:$(abs_top_builddir)/backends:$(abs_top_builddir)/libelf:$(abs_top_builddir)/libasm
 
 installcheck-local:
 	$(MAKE) $(AM_MAKEFLAGS) \
-		TESTS_ENVIRONMENT='$(installed_TESTS_ENVIRONMENT)' check-TESTS
+		TESTS_ENVIRONMENT="$(installed_TESTS_ENVIRONMENT)" \
+		LOG_COMPILER="$(installed_LOG_COMPILER)" check-TESTS
 endif !STANDALONE
 
 if MUDFLAP

@@ -19,6 +19,6 @@
 
 testfiles testfile14
 
-testrun >/dev/null ../src/readelf -w testfile14 testfile14
+testrun >/dev/null ${abs_top_builddir}/src/readelf -w testfile14 testfile14
 
 exit 0

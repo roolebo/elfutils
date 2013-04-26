@@ -1,3 +1,17 @@
+2013-04-26  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (installed_TESTS_ENVIRONMENT): Export environment,
+	remove wrapper.
+	(TESTS_ENVIRONMENT): Likewise.
+	(installed_LOG_COMPILER): New variable defining wrapper.
+	(LOG_COMPILER): Likewise.
+	* run-*.sh: Fixup location of input and output files.
+	* test-subr.sh: Create test_dir, pushd to execute test in.
+	(trap): Remove test_dir.
+	(testfiles): Use abs_srcdir.
+	(installed_testrun): Match on abs_builddir or abs_top_builddir.
+	(self_test_files): Adjust path.
+
 2013-04-24  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am: Use AM_CPPFLAGS instead of INCLUDES.

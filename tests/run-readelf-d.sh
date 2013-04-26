@@ -32,7 +32,7 @@
 
 testfiles testlib_dynseg.so
 
-testrun_compare ../src/readelf -d testlib_dynseg.so <<\EOF
+testrun_compare ${abs_top_builddir}/src/readelf -d testlib_dynseg.so <<\EOF
 
 Dynamic segment contains 28 entries:
  Addr: 0x00000000000017e0  Offset: 0x0007e0  Link to section: [ 3] '.dynstr'

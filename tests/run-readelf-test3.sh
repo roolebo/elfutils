@@ -19,7 +19,7 @@
 
 testfiles testfile40.debug
 
-testrun_compare ../src/readelf -n testfile40.debug <<\EOF
+testrun_compare ${abs_top_builddir}/src/readelf -n testfile40.debug <<\EOF
 
 Note section [ 6] '.note' of 60 bytes at offset 0x120:
   Owner          Data size  Type

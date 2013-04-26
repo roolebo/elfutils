@@ -20,24 +20,24 @@
 
 testfiles testfile18
 
-testrun_compare ../src/elflint --gnu-ld testfile18 <<\EOF
+testrun_compare ${abs_top_builddir}/src/elflint --gnu-ld testfile18 <<\EOF
 section [ 8] '.rela.dyn': relocation 1: copy relocation against symbol of type FUNC
 EOF
 
 testfiles testfile32
-testrun ../src/elflint -q testfile32
+testrun ${abs_top_builddir}/src/elflint -q testfile32
 
 testfiles testfile33
-testrun ../src/elflint -q testfile33
+testrun ${abs_top_builddir}/src/elflint -q testfile33
 
 testfiles testfile42
-testrun ../src/elflint -q --gnu-ld testfile42
+testrun ${abs_top_builddir}/src/elflint -q --gnu-ld testfile42
 
 testfiles testfile46
-testrun ../src/elflint -q testfile46
+testrun ${abs_top_builddir}/src/elflint -q testfile46
 
 # see also run-readelf-d.sh
 testfiles testlib_dynseg.so
-testrun ../src/elflint -q --gnu-ld testlib_dynseg.so
+testrun ${abs_top_builddir}/src/elflint -q --gnu-ld testlib_dynseg.so
 
 exit 0

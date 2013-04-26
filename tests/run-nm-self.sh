@@ -20,7 +20,7 @@
 for what_arg in --debug-syms --defined-only --dynamic --extern-only; do
   for format_arg in --format=bsd --format=sysv --format=posix; do
     for out_arg in --numeric-sort --no-sort --reverse-sort; do
-      testrun_on_self_quiet ../src/nm $what_arg $format_arg $out_arg
+      testrun_on_self_quiet ${abs_top_builddir}/src/nm $what_arg $format_arg $out_arg
     done
   done
 done

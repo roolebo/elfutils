@@ -47,7 +47,7 @@ EOF
 # Prior to commit 1743d7f, libdwfl would fail on the second address,
 # because it didn't notice that prelink added a 0x20-byte offset from
 # what the .debug file reports.
-testrun_compare ../src/addr2line -S -M testmaps52-32 \
+testrun_compare ${abs_top_builddir}/src/addr2line -S -M testmaps52-32 \
     0x11140c 0x4100042d 0x4200040e <<\EOF
 foo
 /home/jistone/src/elfutils/tests/testfile52-32.c:2
@@ -76,7 +76,7 @@ cat > testmaps52-64 <<EOF
 3800200000-3800201000 rw-p 00000000 fd:11 3 `pwd`/testfile52-64.noshdrs.so
 EOF
 
-testrun_compare ../src/addr2line -S -M testmaps52-64 \
+testrun_compare ${abs_top_builddir}/src/addr2line -S -M testmaps52-64 \
     0x100000056c 0x300000056d 0x380000056e <<\EOF
 foo
 /home/jistone/src/elfutils/tests/testfile52-64.c:2
@@ -97,7 +97,7 @@ EOF
 # prelink -N testfile53-32.prelink
 testfiles testfile53-32 testfile53-32.debug testfile53-32.prelink
 
-testrun_compare ../src/addr2line -S -e testfile53-32 0x8048394 0x8048395 <<\EOF
+testrun_compare ${abs_top_builddir}/src/addr2line -S -e testfile53-32 0x8048394 0x8048395 <<\EOF
 main
 /home/jistone/src/elfutils/tests/testfile53-32.c:2
 main+0x1
@@ -105,7 +105,7 @@ main+0x1
 EOF
 
 # prelink shuffled some of the sections, but .text is in the same place.
-testrun_compare ../src/addr2line -S -e testfile53-32.prelink 0x8048396 0x8048397 <<\EOF
+testrun_compare ${abs_top_builddir}/src/addr2line -S -e testfile53-32.prelink 0x8048396 0x8048397 <<\EOF
 main+0x2
 /home/jistone/src/elfutils/tests/testfile53-32.c:2
 main+0x3
@@ -116,14 +116,14 @@ EOF
 # prelink section shuffling.
 testfiles testfile53-64 testfile53-64.debug testfile53-64.prelink
 
-testrun_compare ../src/addr2line -S -e testfile53-64 0x400474 0x400475 <<\EOF
+testrun_compare ${abs_top_builddir}/src/addr2line -S -e testfile53-64 0x400474 0x400475 <<\EOF
 main
 /home/jistone/src/elfutils/tests/testfile53-64.c:2
 main+0x1
 /home/jistone/src/elfutils/tests/testfile53-64.c:2
 EOF
 
-testrun_compare ../src/addr2line -S -e testfile53-64.prelink 0x400476 0x400477 <<\EOF
+testrun_compare ${abs_top_builddir}/src/addr2line -S -e testfile53-64.prelink 0x400476 0x400477 <<\EOF
 main+0x2
 /home/jistone/src/elfutils/tests/testfile53-64.c:2
 main+0x3
@@ -159,7 +159,7 @@ cat > testmaps54-32 <<EOF
 42001000-42002000 rw-p 00000000 fd:01 3 `pwd`/testfile54-32.noshdrs.so
 EOF
 
-testrun_compare ../src/addr2line -S -M testmaps54-32 \
+testrun_compare ${abs_top_builddir}/src/addr2line -S -M testmaps54-32 \
     0x1111fc 0x1122a4 0x410001fd 0x410012a5 0x420001fe <<\EOF
 foo
 ??:0
@@ -193,7 +193,7 @@ cat > testmaps54-64 <<EOF
 3800200000-3800201000 rw-p 00000000 fd:11 3 `pwd`/testfile54-64.noshdrs.so
 EOF
 
-testrun_compare ../src/addr2line -S -M testmaps54-64 \
+testrun_compare ${abs_top_builddir}/src/addr2line -S -M testmaps54-64 \
     0x10000002f8 0x1000200448 0x30000002f9 0x3000200449 0x38000002fa <<\EOF
 foo
 ??:0
@@ -218,7 +218,7 @@ EOF
 # prelink -N testfile55-32.prelink
 testfiles testfile55-32 testfile55-32.debug testfile55-32.prelink
 
-testrun_compare ../src/addr2line -S -e testfile55-32 0x80483b4 0x80483b5 <<\EOF
+testrun_compare ${abs_top_builddir}/src/addr2line -S -e testfile55-32 0x80483b4 0x80483b5 <<\EOF
 main
 /home/jistone/src/elfutils/tests/testfile55-32.c:2
 main+0x1
@@ -227,7 +227,7 @@ EOF
 
 # prelink splits .bss into .dynbss+.bss, so the start of .bss changes, but the
 # total size remains the same, and .text doesn't move at all.
-testrun_compare ../src/addr2line -S -e testfile55-32.prelink 0x80483b6 0x80483b7 <<\EOF
+testrun_compare ${abs_top_builddir}/src/addr2line -S -e testfile55-32.prelink 0x80483b6 0x80483b7 <<\EOF
 main+0x2
 /home/jistone/src/elfutils/tests/testfile55-32.c:2
 main+0x3
@@ -237,14 +237,14 @@ EOF
 # Repeat testfile55 in 64-bit
 testfiles testfile55-64 testfile55-64.debug testfile55-64.prelink
 
-testrun_compare ../src/addr2line -S -e testfile55-64 0x4004b4 0x4004b5 <<\EOF
+testrun_compare ${abs_top_builddir}/src/addr2line -S -e testfile55-64 0x4004b4 0x4004b5 <<\EOF
 main
 /home/jistone/src/elfutils/tests/testfile55-64.c:2
 main+0x1
 /home/jistone/src/elfutils/tests/testfile55-64.c:2
 EOF
 
-testrun_compare ../src/addr2line -S -e testfile55-64.prelink 0x4004b6 0x4004b7 <<\EOF
+testrun_compare ${abs_top_builddir}/src/addr2line -S -e testfile55-64.prelink 0x4004b6 0x4004b7 <<\EOF
 main+0x2
 /home/jistone/src/elfutils/tests/testfile55-64.c:2
 main+0x3

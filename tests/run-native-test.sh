@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2005, 2006 Red Hat, Inc.
+# Copyright (C) 2005, 2006, 2013 Red Hat, Inc.
 # This file is part of elfutils.
 #
 # This file is free software; you can redistribute it and/or modify
@@ -45,7 +45,14 @@ native_cleanup()
   test_cleanup
 }
 
-trap native_cleanup 0 1 2 15
+native_exit()
+{
+  native_cleanup
+  exit_cleanup
+}
+
+trap native_cleanup 1 2 15
+trap native_exit 0
 
 for cc in "$HOSTCC" "$HOST_CC" cc gcc "$CC"; do
   test "x$cc" != x || continue

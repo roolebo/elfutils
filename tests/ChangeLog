@@ -1,5 +1,12 @@
 2013-04-27  Mark Wielaard  <mjw@redhat.com>
 
+	* test-subr.sh (exit_cleanup): New function.
+	(trap): Use exit_cleanup as argument.
+	* run-native-test.sh (native_exit): New function.
+	(trap): For EXIT (0) use native_exit as argument.
+
+2013-04-27  Mark Wielaard  <mjw@redhat.com>
+
 	* update1.c (main): Use unique tempfile name and unlink file.
 	* update2.c (main): Likewise.
 	* update3.c (main): Likewise.

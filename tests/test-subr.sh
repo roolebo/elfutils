@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2005-2012 Red Hat, Inc.
+# Copyright (C) 2005-2013 Red Hat, Inc.
 # This file is part of elfutils.
 #
 # This file is free software; you can redistribute it and/or modify
@@ -31,7 +31,13 @@ pushd "$test_dir" > /dev/null
 #export LC_ALL
 
 remove_files=
-trap 'rm -f $remove_files; popd > /dev/null; rmdir $test_dir' 0
+
+# Tests that trap EXIT (0) themselves should call this explicitly.
+exit_cleanup()
+{
+  rm -f $remove_files; popd > /dev/null; rmdir $test_dir
+}
+trap exit_cleanup 0
 
 tempfiles()
 {

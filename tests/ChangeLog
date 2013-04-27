@@ -1,5 +1,12 @@
 2013-04-27  Mark Wielaard  <mjw@redhat.com>
 
+	* update1.c (main): Use unique tempfile name and unlink file.
+	* update2.c (main): Likewise.
+	* update3.c (main): Likewise.
+	* update4.c (main): Use unique tempfile name.
+
+2013-04-27  Mark Wielaard  <mjw@redhat.com>
+
 	* run-alldts.sh: Add testfile-alldts to tempfiles.
 	* run-elf_cntl_gelf_getshdr.sh: Add test_shdr.out to tempfiles.
 	* run-macro-test.sh: Add readelf.macros.out to tempfiles.

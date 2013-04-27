@@ -26,12 +26,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 
 int
 main (int argc, char *argv[] __attribute__ ((unused)))
 {
-  const char *fname = "xxx";
+  const char *fname = "xxx_update2";
   int fd;
   Elf *elf;
   Elf32_Ehdr *ehdr;
@@ -142,6 +143,8 @@ main (int argc, char *argv[] __attribute__ ((unused)))
       printf ("failure in elf_end: %s\n", elf_errmsg (-1));
       exit (1);
     }
+
+  unlink (fname);
 
   return 0;
 }

@@ -34,7 +34,7 @@
 int
 main (int argc, char *argv[] __attribute__ ((unused)))
 {
-  const char fname[] = "xxx";
+  const char fname[] = "xxx_update4";
   int fd;
   Elf *elf;
   Elf32_Ehdr *ehdr;

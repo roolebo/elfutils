@@ -170,12 +170,18 @@ asm (".section predict_data, \"aw\"; .previous\n"
        ".symver _compat." #version "." #name "," #name "@" #version);
 # define NEW_VERSION(name, version) \
   asm (".symver " #name "," #name "@@@" #version);
+# define COMPAT_VERSION_NEWPROTO(name, version, prefix) \
+  asm (".symver _compat." #version "." #name "," #name "@" #version); \
+  __typeof (_compat_##prefix##_##name) _compat_##prefix##_##name \
+    asm ("_compat." #version "." #name);
 # define COMPAT_VERSION(name, version, prefix) \
   asm (".symver _compat." #version "." #name "," #name "@" #version); \
   __typeof (name) _compat_##prefix##_##name asm ("_compat." #version "." #name);
 #else
 # define OLD_VERSION(name, version) /* Nothing for static linking.  */
 # define NEW_VERSION(name, version) /* Nothing for static linking.  */
+# define COMPAT_VERSION_NEWPROTO(name, version, prefix) \
+  error "should use #ifdef SHARED"
 # define COMPAT_VERSION(name, version, prefix) error "should use #ifdef SHARED"
 #endif
 

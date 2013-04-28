@@ -1,3 +1,7 @@
+2013-04-30  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* eu-config.h (COMPAT_VERSION_NEWPROTO): New.  Twice.
+
 2013-04-26  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* system.h (LE64, BE64): Move here the definitions from

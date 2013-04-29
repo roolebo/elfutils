@@ -1,3 +1,8 @@
+2013-04-29  Mark Wielaard  <mjw@redhat.com>
+
+	* test-subr.sh: Don't use pushd, just cd into test-dir.
+	(exit_cleanup): Don't use popd, just cd .. to get out.
+
 2013-04-27  Mark Wielaard  <mjw@redhat.com>
 
 	* test-subr.sh (exit_cleanup): New function.

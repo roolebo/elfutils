@@ -1,3 +1,7 @@
+2013-04-30  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* dwfl-report-elf-align.c: Use false add_p_vaddr for dwfl_report_elf.
+
 2013-04-29  Mark Wielaard  <mjw@redhat.com>
 
 	* test-subr.sh: Don't use pushd, just cd into test-dir.

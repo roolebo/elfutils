@@ -53,7 +53,7 @@ main (int argc, char **argv)
   uintptr_t base = strtoull (argv[2], &endptr, 0);
   assert (endptr && !*endptr);
 
-  Dwfl_Module *mod = dwfl_report_elf (dwfl, argv[1], argv[1], -1, base);
+  Dwfl_Module *mod = dwfl_report_elf (dwfl, argv[1], argv[1], -1, base, false);
   assert (mod != NULL);
 
   uintptr_t funcaddr = strtoull (argv[3], &endptr, 0);

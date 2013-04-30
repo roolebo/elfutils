@@ -1,3 +1,7 @@
+Version 0.156
+
+libdwfl: dwfl_report_elf has new parameter add_p_vaddr.
+
 Version 0.155
 
 libelf: elf*_xlatetomd now works for cross-endian ELF note data.

@@ -1,3 +1,19 @@
+2013-04-30  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* dwfl_report_elf.c (__libdwfl_report_elf): Add parameter add_p_vaddr.
+	Set it to true for ET_EXEC and ET_CORE.  Provide alternative
+	setup of START and BIAS if !ADD_P_VADDR.  Set END from BIAS, not BASE.
+	(dwfl_report_elf): Add parameter add_p_vaddr.  Pass it down.  Add
+	NEW_VERSION.
+	(_compat_without_add_p_vaddr_dwfl_report_elf) <SHARED>: New, with
+	COMPAT_VERSION.
+	* libdwfl.h (dwfl_report_elf): Add parameter add_p_vaddr.  Describe it.
+	* libdwflP.h (__libdwfl_report_elf): Add parameter add_p_vaddr.
+	* link_map.c (report_r_debug): Use true add_p_vaddr for dwfl_report_elf.
+	* linux-kernel-modules.c (report_kernel): Use false add_p_vaddr for
+	dwfl_report_elf.
+	* offline.c (process_elf): Use true add_p_vaddr for dwfl_report_elf.
+
 2013-04-27  Mark Wielaard  <mjw@redhat.com>
 
 	* link_map.c: #include system.h.

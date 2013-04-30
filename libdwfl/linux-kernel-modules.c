@@ -217,7 +217,7 @@ report_kernel (Dwfl *dwfl, const char **release,
       if (report)
 	{
 	  Dwfl_Module *mod = INTUSE(dwfl_report_elf) (dwfl, KERNEL_MODNAME,
-						      fname, fd, 0);
+						      fname, fd, 0, false);
 	  if (mod == NULL)
 	    result = -1;
 	  else

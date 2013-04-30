@@ -254,3 +254,9 @@ ELFUTILS_0.149 {
 
     dwfl_dwarf_line;
 } ELFUTILS_0.148;
+
+ELFUTILS_0.156 {
+  global:
+    # Replaced ELFUTILS_0.122 version, which has a wrapper without add_p_vaddr.
+    dwfl_report_elf;
+} ELFUTILS_0.149;

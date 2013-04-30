@@ -137,14 +137,21 @@ extern int dwfl_report_segment (Dwfl *dwfl, int ndx,
 extern Dwfl_Module *dwfl_report_module (Dwfl *dwfl, const char *name,
 					Dwarf_Addr start, Dwarf_Addr end);
 
-/* Report a module with start and end addresses computed from the ELF
-   program headers in the given file, plus BASE.  For an ET_REL file,
-   does a simple absolute section layout starting at BASE.
+/* Report a module to address BASE with start and end addresses computed
+   from the ELF program headers in the given file - see the table below.
    FD may be -1 to open FILE_NAME.  On success, FD is consumed by the
-   library, and the `find_elf' callback will not be used for this module.  */
+   library, and the `find_elf' callback will not be used for this module.
+	    ADD_P_VADDR  BASE
+   ET_EXEC  ignored      ignored
+   ET_DYN   false        absolute address where to place the file
+	    true         start address relative to ELF's phdr p_vaddr
+   ET_REL   ignored      absolute address where to place the file
+   ET_CORE  ignored      ignored
+   ET_DYN ELF phdr p_vaddr address can be non-zero if the shared library
+   has been prelinked by tool prelink(8).  */
 extern Dwfl_Module *dwfl_report_elf (Dwfl *dwfl, const char *name,
 				     const char *file_name, int fd,
-				     GElf_Addr base);
+				     GElf_Addr base, bool add_p_vaddr);
 
 /* Similar, but report the module for offline use.  All ET_EXEC files
    being reported must be reported before any relocatable objects.

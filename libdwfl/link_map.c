@@ -384,7 +384,7 @@ report_r_debug (uint_fast8_t elfclass, uint_fast8_t elfdata,
 
 	  // XXX hook for sysroot
 	  mod = INTUSE(dwfl_report_elf) (dwfl, basename (name),
-					 name, -1, l_addr);
+					 name, -1, l_addr, true);
 	}
 
       if (mod != NULL)

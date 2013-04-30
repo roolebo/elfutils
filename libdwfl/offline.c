@@ -127,7 +127,8 @@ process_elf (Dwfl *dwfl, const char *name, const char *file_name, int fd,
 	     Elf *elf)
 {
   Dwfl_Module *mod = __libdwfl_report_elf (dwfl, name, file_name, fd, elf,
-					   dwfl->offline_next_address, false);
+					   dwfl->offline_next_address, true,
+					   false);
   if (mod != NULL)
     {
       /* If this is an ET_EXEC file with fixed addresses, the address range

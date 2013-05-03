@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 1999, 2000, 2002, 2004, 2005 Red Hat, Inc.
+# Copyright (C) 1999, 2000, 2002, 2004, 2005, 2013 Red Hat, Inc.
 # This file is part of elfutils.
 # Written by Ulrich Drepper <drepper@redhat.com>, 1999.
 #
@@ -18,7 +18,7 @@
 
 . $srcdir/test-subr.sh
 
-testfiles testfile testfile2
+testfiles testfile testfile2 testfilenolines
 
 testrun_compare ${abs_builddir}/get-lines testfile testfile2 <<\EOF
 cuhl = 11, o = 0, asz = 4, osz = 4, ncu = 191
@@ -59,6 +59,33 @@ cuhl = 11, o = 267, asz = 4, osz = 4, ncu = 2680
 100004e8: /shoggoth/drepper/m.c:7:0: is_stmt:yes, end_seq:no, bb:no, prologue:no, epilogue:no
 100004f4: /shoggoth/drepper/m.c:8:0: is_stmt:yes, end_seq:no, bb:no, prologue:no, epilogue:no
 10000514: /shoggoth/drepper/m.c:8:0: is_stmt:yes, end_seq:yes, bb:no, prologue:no, epilogue:no
+EOF
+
+# - lines.c
+# int ft;
+#
+# int
+# main (int argc, char **argv)
+# {
+#   return ft - 42;
+# }
+#
+# - nolines.c
+# int ft = 42;
+#
+# gcc -g -c lines.c
+# gcc -g -c nolines.c
+# gcc -g -o testfilenolines lines.o nolines.o
+
+testrun_compare ${abs_builddir}/get-lines testfilenolines <<\EOF
+cuhl = 11, o = 0, asz = 8, osz = 4, ncu = 169
+ 4 lines
+400474: /home/mark/src/tests/lines.c:5:0: is_stmt:yes, end_seq:no, bb:no, prologue:no, epilogue:no
+40047f: /home/mark/src/tests/lines.c:6:0: is_stmt:yes, end_seq:no, bb:no, prologue:no, epilogue:no
+400488: /home/mark/src/tests/lines.c:7:0: is_stmt:yes, end_seq:no, bb:no, prologue:no, epilogue:no
+40048a: /home/mark/src/tests/lines.c:7:0: is_stmt:yes, end_seq:yes, bb:no, prologue:no, epilogue:no
+cuhl = 11, o = 125, asz = 8, osz = 4, ncu = 243
+ 0 lines
 EOF
 
 exit 0

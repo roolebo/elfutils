@@ -715,7 +715,8 @@ dwarf_getsrclines (Dwarf_Die *cudie, Dwarf_Lines **lines, size_t *nlines)
       /* Make sure the highest address for the CU is marked as end_sequence.
 	 This is required by the DWARF spec, but some compilers forget and
 	 dwfl_module_getsrc depends on it.  */
-      cu->lines->info[nlinelist - 1].end_sequence = 1;
+      if (nlinelist > 0)
+	cu->lines->info[nlinelist - 1].end_sequence = 1;
 
       /* Success.  */
       res = 0;

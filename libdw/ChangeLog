@@ -1,3 +1,8 @@
+2013-05-03  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_getsrclines.c (dwarf_getsrclines): Only set end_sequence
+	when nlinelist > 0.
+
 2013-04-28  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* libdw.map (ELFUTILS_0.156): New.

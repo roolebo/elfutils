@@ -198,7 +198,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile69.core.bz2 testfile69.so.bz2 \
 	     testfile70.core.bz2 testfile70.exec.bz2 \
 	     run-dwfllines.sh run-dwfl-report-elf-align.sh \
-	     testfile-dwfl-report-elf-align-shlib.so.bz2
+	     testfile-dwfl-report-elf-align-shlib.so.bz2 \
+	     testfilenolines
 
 if USE_VALGRIND
 valgrind_cmd='valgrind -q --trace-children=yes --error-exitcode=1 --run-libc-freeres=no'

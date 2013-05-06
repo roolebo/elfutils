@@ -4019,7 +4019,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  /* Byte offset operand.  */
 	  get_sleb128 (sleb, data); /* XXX check overrun */
 
-	  printf ("%*s[%4" PRIuMAX "] %s %#" PRIxMAX ", %+" PRId64 "\n",
+	  printf ("%*s[%4" PRIuMAX "] %s [%6" PRIxMAX "] %+" PRId64 "\n",
 		  indent, "", (intmax_t) offset,
 		  op_name, (uintmax_t) addr, sleb);
 	  CONSUME (data - start);

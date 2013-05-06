@@ -1,3 +1,8 @@
+2013-05-06  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_ops): Format first DW_OP_GNU_implicit_pointer
+	argument as DIE offset.
+
 2013-04-24  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am: Use AM_CPPFLAGS instead of INCLUDES.

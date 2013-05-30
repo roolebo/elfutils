@@ -1,3 +1,15 @@
+2013-11-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
+	    Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (i386_SRCS): Add i386_initreg.c.
+	(x86_64_SRCS): Add x86_64_initreg.c.
+	* i386_initreg.c: New file.
+	* i386_init.c (i386_init): Initialize frame_nregs and
+	set_initial_registers_tid.
+	* x86_64_initreg.c: New file.
+	* x86_64_init.c (x86_64_init): Initialize frame_nregs and
+	set_initial_registers_tid.
+
 2013-10-06  Mark Wielaard  <mjw@redhat.com>
 
 	* ppc_cfi.c (ppc_abi_cfi): Use DW_CFA_val_offset for reg1, not

@@ -1,3 +1,8 @@
+2013-11-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* configure.ac: New AC_CHECK_SIZEOF for long.  Call utrace_BIARCH, new
+	AC_SUBST for CC_BIARCH.
+
 2013-11-06  Mark Wielaard  <mjw@redhat.com>
 
 	* configure.ac (--enable-dwz): Add AC_MSG_WARN when disabled but

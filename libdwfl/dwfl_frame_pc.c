@@ -1,5 +1,5 @@
-/* Finish a session using libdwfl.
-   Copyright (C) 2005, 2008, 2012-2013 Red Hat, Inc.
+/* Get return address register value for frame.
+   Copyright (C) 2013 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -26,29 +26,38 @@
    the GNU Lesser General Public License along with this program.  If
    not, see <http://www.gnu.org/licenses/>.  */
 
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include "libdwflP.h"
 
-void
-dwfl_end (Dwfl *dwfl)
+bool
+dwfl_frame_pc (Dwfl_Frame *state, Dwarf_Addr *pc, bool *isactivation)
 {
-  if (dwfl == NULL)
-    return;
-
-  if (dwfl->process)
-    __libdwfl_process_free (dwfl->process);
-
-  free (dwfl->lookup_addr);
-  free (dwfl->lookup_module);
-  free (dwfl->lookup_segndx);
-
-  Dwfl_Module *next = dwfl->modulelist;
-  while (next != NULL)
+  assert (state->pc_state == DWFL_FRAME_STATE_PC_SET);
+  *pc = state->pc;
+  if (isactivation)
     {
-      Dwfl_Module *dead = next;
-      next = dead->next;
-      __libdwfl_module_free (dead);
+      /* Bottom frame?  */
+      if (state->initial_frame)
+	*isactivation = true;
+      /* *ISACTIVATION is logical union of whether current or previous frame
+	 state is SIGNAL_FRAME.  */
+      else if (state->signal_frame)
+	*isactivation = true;
+      else
+	{
+	  /* If the previous frame has unwound unsuccessfully just silently do
+	     not consider it could be a SIGNAL_FRAME.  */
+	  __libdwfl_frame_unwind (state);
+	  if (state->unwound == NULL
+	      || state->unwound->pc_state != DWFL_FRAME_STATE_PC_SET)
+	    *isactivation = false;
+	  else
+	    *isactivation = state->unwound->signal_frame;
+	}
     }
-
-  free (dwfl->executable_for_core);
-  free (dwfl);
+  return true;
 }
+INTDEF (dwfl_frame_pc)

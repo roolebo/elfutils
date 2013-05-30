@@ -1,5 +1,5 @@
-/* Finish a session using libdwfl.
-   Copyright (C) 2005, 2008, 2012-2013 Red Hat, Inc.
+/* Get Dwarf Frame state from modules present in DWFL.
+   Copyright (C) 2013 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -28,27 +28,30 @@
 
 #include "libdwflP.h"
 
-void
-dwfl_end (Dwfl *dwfl)
+bool
+dwfl_thread_state_registers (Dwfl_Thread *thread, const int firstreg,
+			     unsigned nregs, const Dwarf_Word *regs)
 {
-  if (dwfl == NULL)
-    return;
-
-  if (dwfl->process)
-    __libdwfl_process_free (dwfl->process);
-
-  free (dwfl->lookup_addr);
-  free (dwfl->lookup_module);
-  free (dwfl->lookup_segndx);
-
-  Dwfl_Module *next = dwfl->modulelist;
-  while (next != NULL)
-    {
-      Dwfl_Module *dead = next;
-      next = dead->next;
-      __libdwfl_module_free (dead);
-    }
-
-  free (dwfl->executable_for_core);
-  free (dwfl);
+  Dwfl_Frame *state = thread->unwound;
+  assert (state && state->unwound == NULL);
+  assert (state->initial_frame);
+  for (unsigned regno = firstreg; regno < firstreg + nregs; regno++)
+    if (! __libdwfl_frame_reg_set (state, regno, regs[regno - firstreg]))
+      {
+	__libdwfl_seterrno (DWFL_E_INVALID_REGISTER);
+	return false;
+      }
+  return true;
 }
+INTDEF(dwfl_thread_state_registers)
+
+void
+dwfl_thread_state_register_pc (Dwfl_Thread *thread, Dwarf_Word pc)
+{
+  Dwfl_Frame *state = thread->unwound;
+  assert (state && state->unwound == NULL);
+  assert (state->initial_frame);
+  state->pc = pc;
+  state->pc_state = DWFL_FRAME_STATE_PC_SET;
+}
+INTDEF(dwfl_thread_state_register_pc)

@@ -1,0 +1,282 @@
+/* Get Dwarf Frame state for target live PID process.
+   Copyright (C) 2013 Red Hat, Inc.
+   This file is part of elfutils.
+
+   This file is free software; you can redistribute it and/or modify
+   it under the terms of either
+
+     * the GNU Lesser General Public License as published by the Free
+       Software Foundation; either version 3 of the License, or (at
+       your option) any later version
+
+   or
+
+     * the GNU General Public License as published by the Free
+       Software Foundation; either version 2 of the License, or (at
+       your option) any later version
+
+   or both in parallel, as here.
+
+   elfutils is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received copies of the GNU General Public License and
+   the GNU Lesser General Public License along with this program.  If
+   not, see <http://www.gnu.org/licenses/>.  */
+
+#include "libdwflP.h"
+#include <sys/ptrace.h>
+#include <sys/wait.h>
+#include <dirent.h>
+#include <sys/syscall.h>
+#include <unistd.h>
+
+#ifndef MAX
+# define MAX(a, b) ((a) > (b) ? (a) : (b))
+#endif
+
+struct pid_arg
+{
+  DIR *dir;
+  /* It is 0 if not used.  */
+  pid_t tid_attached;
+};
+
+static bool
+linux_proc_pid_is_stopped (pid_t pid)
+{
+  char buffer[64];
+  FILE *procfile;
+  bool retval, have_state;
+
+  snprintf (buffer, sizeof (buffer), "/proc/%ld/status", (long) pid);
+  procfile = fopen (buffer, "r");
+  if (procfile == NULL)
+    return false;
+
+  have_state = false;
+  while (fgets (buffer, sizeof (buffer), procfile) != NULL)
+    if (strncmp (buffer, "State:", 6) == 0)
+      {
+	have_state = true;
+	break;
+      }
+  retval = (have_state && strstr (buffer, "T (stopped)") != NULL);
+  fclose (procfile);
+  return retval;
+}
+
+static bool
+ptrace_attach (pid_t tid)
+{
+  if (ptrace (PTRACE_ATTACH, tid, NULL, NULL) != 0)
+    {
+      __libdwfl_seterrno (DWFL_E_ERRNO);
+      return false;
+    }
+  if (linux_proc_pid_is_stopped (tid))
+    {
+      /* Make sure there is a SIGSTOP signal pending even when the process is
+	 already State: T (stopped).  Older kernels might fail to generate
+	 a SIGSTOP notification in that case in response to our PTRACE_ATTACH
+	 above.  Which would make the waitpid below wait forever.  So emulate
+	 it.  Since there can only be one SIGSTOP notification pending this is
+	 safe.  See also gdb/linux-nat.c linux_nat_post_attach_wait.  */
+      syscall (__NR_tkill, tid, SIGSTOP);
+      ptrace (PTRACE_CONT, tid, NULL, NULL);
+    }
+  for (;;)
+    {
+      int status;
+      if (waitpid (tid, &status, __WALL) != tid || !WIFSTOPPED (status))
+	{
+	  int saved_errno = errno;
+	  ptrace (PTRACE_DETACH, tid, NULL, NULL);
+	  errno = saved_errno;
+	  __libdwfl_seterrno (DWFL_E_ERRNO);
+	  return false;
+	}
+      if (WSTOPSIG (status) == SIGSTOP)
+	break;
+      if (ptrace (PTRACE_CONT, tid, NULL,
+		  (void *) (uintptr_t) WSTOPSIG (status)) != 0)
+	{
+	  int saved_errno = errno;
+	  ptrace (PTRACE_DETACH, tid, NULL, NULL);
+	  errno = saved_errno;
+	  __libdwfl_seterrno (DWFL_E_ERRNO);
+	  return false;
+	}
+    }
+  return true;
+}
+
+static bool
+pid_memory_read (Dwfl *dwfl, Dwarf_Addr addr, Dwarf_Word *result, void *arg)
+{
+  struct pid_arg *pid_arg = arg;
+  pid_t tid = pid_arg->tid_attached;
+  assert (tid > 0);
+  Dwfl_Process *process = dwfl->process;
+  if (ebl_get_elfclass (process->ebl) == ELFCLASS64)
+    {
+#if SIZEOF_LONG == 8
+      errno = 0;
+      *result = ptrace (PTRACE_PEEKDATA, tid, (void *) (uintptr_t) addr, NULL);
+      return errno == 0;
+#else /* SIZEOF_LONG != 8 */
+      /* This should not happen.  */
+      return false;
+#endif /* SIZEOF_LONG != 8 */
+    }
+#if SIZEOF_LONG == 8
+  /* We do not care about reads unaliged to 4 bytes boundary.
+     But 0x...ffc read of 8 bytes could overrun a page.  */
+  bool lowered = (addr & 4) != 0;
+  if (lowered)
+    addr -= 4;
+#endif /* SIZEOF_LONG == 8 */
+  errno = 0;
+  *result = ptrace (PTRACE_PEEKDATA, tid, (void *) (uintptr_t) addr, NULL);
+  if (errno != 0)
+    return false;
+#if SIZEOF_LONG == 8
+# if BYTE_ORDER == BIG_ENDIAN
+  if (! lowered)
+    *result >>= 32;
+# else
+  if (lowered)
+    *result >>= 32;
+# endif
+#endif /* SIZEOF_LONG == 8 */
+  *result &= 0xffffffff;
+  return true;
+}
+
+static pid_t
+pid_next_thread (Dwfl *dwfl __attribute__ ((unused)), void *dwfl_arg,
+		 void **thread_argp)
+{
+  struct pid_arg *pid_arg = dwfl_arg;
+  struct dirent *dirent;
+  do
+    {
+      errno = 0;
+      dirent = readdir (pid_arg->dir);
+      if (dirent == NULL)
+	{
+	  if (errno != 0)
+	    {
+	      __libdwfl_seterrno (DWFL_E_ERRNO);
+	      return -1;
+	    }
+	  return 0;
+	}
+    }
+  while (strcmp (dirent->d_name, ".") == 0
+	 || strcmp (dirent->d_name, "..") == 0);
+  char *end;
+  errno = 0;
+  long tidl = strtol (dirent->d_name, &end, 10);
+  if (errno != 0)
+    {
+      __libdwfl_seterrno (DWFL_E_ERRNO);
+      return -1;
+    }
+  pid_t tid = tidl;
+  if (tidl <= 0 || (end && *end) || tid != tidl)
+    {
+      __libdwfl_seterrno (DWFL_E_PARSE_PROC);
+      return -1;
+    }
+  *thread_argp = dwfl_arg;
+  return tid;
+}
+
+/* Implement the ebl_set_initial_registers_tid setfunc callback.  */
+
+static bool
+pid_thread_state_registers_cb (const int firstreg,
+			       unsigned nregs,
+			       const Dwarf_Word *regs,
+			       void *arg)
+{
+  Dwfl_Thread *thread = (Dwfl_Thread *) arg;
+  return INTUSE(dwfl_thread_state_registers) (thread, firstreg, nregs, regs);
+}
+
+static bool
+pid_set_initial_registers (Dwfl_Thread *thread, void *thread_arg)
+{
+  struct pid_arg *pid_arg = thread_arg;
+  assert (pid_arg->tid_attached == 0);
+  pid_t tid = INTUSE(dwfl_thread_tid) (thread);
+  if (! ptrace_attach (tid))
+    return false;
+  pid_arg->tid_attached = tid;
+  Dwfl_Process *process = thread->process;
+  Ebl *ebl = process->ebl;
+  return ebl_set_initial_registers_tid (ebl, tid,
+					pid_thread_state_registers_cb, thread);
+}
+
+static void
+pid_detach (Dwfl *dwfl __attribute__ ((unused)), void *dwfl_arg)
+{
+  struct pid_arg *pid_arg = dwfl_arg;
+  closedir (pid_arg->dir);
+  free (pid_arg);
+}
+
+static void
+pid_thread_detach (Dwfl_Thread *thread, void *thread_arg)
+{
+  struct pid_arg *pid_arg = thread_arg;
+  pid_t tid = INTUSE(dwfl_thread_tid) (thread);
+  assert (pid_arg->tid_attached == tid);
+  pid_arg->tid_attached = 0;
+  ptrace (PTRACE_DETACH, tid, NULL, NULL);
+}
+
+static const Dwfl_Thread_Callbacks pid_thread_callbacks =
+{
+  pid_next_thread,
+  pid_memory_read,
+  pid_set_initial_registers,
+  pid_detach,
+  pid_thread_detach,
+};
+
+bool
+internal_function
+__libdwfl_attach_state_for_pid (Dwfl *dwfl, pid_t pid)
+{
+  char dirname[64];
+  int i = snprintf (dirname, sizeof (dirname), "/proc/%ld/task", (long) pid);
+  assert (i > 0 && i < (ssize_t) sizeof (dirname) - 1);
+  DIR *dir = opendir (dirname);
+  if (dir == NULL)
+    {
+      __libdwfl_seterrno (DWFL_E_ERRNO);
+      return false;
+    }
+  struct pid_arg *pid_arg = malloc (sizeof *pid_arg);
+  if (pid_arg == NULL)
+    {
+      closedir (dir);
+      __libdwfl_seterrno (DWFL_E_NOMEM);
+      return false;
+    }
+  pid_arg->dir = dir;
+  pid_arg->tid_attached = 0;
+  if (! INTUSE(dwfl_attach_state) (dwfl, EM_NONE, pid, &pid_thread_callbacks,
+				   pid_arg))
+    {
+      closedir (dir);
+      free (pid_arg);
+      return false;
+    }
+  return true;
+}

@@ -1,5 +1,5 @@
 /* Internal definitions for libdwfl.
-   Copyright (C) 2005-2012 Red Hat, Inc.
+   Copyright (C) 2005-2013 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -42,6 +42,8 @@
 
 #include "../libdw/libdwP.h"	/* We need its INTDECLs.  */
 
+typedef struct Dwfl_Process Dwfl_Process;
+
 /* gettext helper macros.  */
 #define _(Str) dgettext ("elfutils", Str)
 
@@ -74,7 +76,20 @@
   DWFL_ERROR (BADELF, N_("not a valid ELF file"))			      \
   DWFL_ERROR (WEIRD_TYPE, N_("cannot handle DWARF type description"))	      \
   DWFL_ERROR (WRONG_ID_ELF, N_("ELF file does not match build ID"))	      \
-  DWFL_ERROR (BAD_PRELINK, N_("corrupt .gnu.prelink_undo section data"))
+  DWFL_ERROR (BAD_PRELINK, N_("corrupt .gnu.prelink_undo section data"))      \
+  DWFL_ERROR (LIBEBL_BAD, N_("Internal error due to ebl"))		      \
+  DWFL_ERROR (CORE_MISSING, N_("Missing data in core file"))		      \
+  DWFL_ERROR (INVALID_REGISTER, N_("Invalid register"))			      \
+  DWFL_ERROR (PROCESS_MEMORY_READ, N_("Error reading process memory"))	      \
+  DWFL_ERROR (PROCESS_NO_ARCH, N_("Couldn't find architecture of any ELF"))   \
+  DWFL_ERROR (PARSE_PROC, N_("Error parsing /proc filesystem"))		      \
+  DWFL_ERROR (INVALID_DWARF, N_("Invalid DWARF"))			      \
+  DWFL_ERROR (UNSUPPORTED_DWARF, N_("Unsupported DWARF"))		      \
+  DWFL_ERROR (NEXT_THREAD_FAIL, N_("Unable to find more threads"))	      \
+  DWFL_ERROR (ATTACH_STATE_CONFLICT, N_("Dwfl already has attached state"))   \
+  DWFL_ERROR (NO_ATTACH_STATE, N_("Dwfl has no attached state"))	      \
+  DWFL_ERROR (NO_UNWIND, N_("Unwinding not supported for this architecture")) \
+  DWFL_ERROR (INVALID_ARGUMENT, N_("Invalid argument"))
 
 #define DWFL_ERROR(name, text) DWFL_E_##name,
 typedef enum { DWFL_ERRORS DWFL_E_NUM } Dwfl_Error;
@@ -91,6 +106,8 @@ struct Dwfl
   const Dwfl_Callbacks *callbacks;
 
   Dwfl_Module *modulelist;    /* List in order used by full traversals.  */
+
+  Dwfl_Process *process;
 
   GElf_Addr offline_next_address;
 
@@ -189,7 +206,72 @@ struct Dwfl_Module
   bool gc;			/* Mark/sweep flag.  */
 };
 
+/* This holds information common for all the threads/tasks/TIDs of one process
+   for backtraces.  */
 
+struct Dwfl_Process
+{
+  struct Dwfl *dwfl;
+  pid_t pid;
+  const Dwfl_Thread_Callbacks *callbacks;
+  void *callbacks_arg;
+  struct ebl *ebl;
+  bool ebl_close:1;
+};
+
+/* See its typedef in libdwfl.h.  */
+
+struct Dwfl_Thread
+{
+  Dwfl_Process *process;
+  pid_t tid;
+  /* The current frame being unwound.  Initially it is the bottom frame.
+     Later the processed frames get freed and this pointer is updated.  */
+  Dwfl_Frame *unwound;
+  void *callbacks_arg;
+};
+
+/* See its typedef in libdwfl.h.  */
+
+struct Dwfl_Frame
+{
+  Dwfl_Thread *thread;
+  /* Previous (outer) frame.  */
+  Dwfl_Frame *unwound;
+  bool signal_frame : 1;
+  bool initial_frame : 1;
+  enum
+  {
+    /* This structure is still being initialized or there was an error
+       initializing it.  */
+    DWFL_FRAME_STATE_ERROR,
+    /* PC field is valid.  */
+    DWFL_FRAME_STATE_PC_SET,
+    /* PC field is undefined, this means the next (inner) frame was the
+       outermost frame.  */
+    DWFL_FRAME_STATE_PC_UNDEFINED
+  } pc_state;
+  /* Either initialized from appropriate REGS element or on some archs
+     initialized separately as the return address has no DWARF register.  */
+  Dwarf_Addr pc;
+  /* (1 << X) bitmask where 0 <= X < ebl_frame_nregs.  */
+  uint64_t regs_set[3];
+  /* REGS array size is ebl_frame_nregs.
+     REGS_SET tells which of the REGS are valid.  */
+  Dwarf_Addr regs[];
+};
+
+/* Fetch value from Dwfl_Frame->regs indexed by DWARF REGNO.
+   No error code is set if the function returns FALSE.  */
+bool __libdwfl_frame_reg_get (Dwfl_Frame *state, unsigned regno,
+			      Dwarf_Addr *val)
+  internal_function;
+
+/* Store value to Dwfl_Frame->regs indexed by DWARF REGNO.
+   No error code is set if the function returns FALSE.  */
+bool __libdwfl_frame_reg_set (Dwfl_Frame *state, unsigned regno,
+			      Dwarf_Addr val)
+  internal_function;
 
 /* Information cached about each CU in Dwfl_Module.dw.  */
 struct dwfl_cu
@@ -415,6 +497,33 @@ extern Dwfl_Module *__libdwfl_report_offline (Dwfl *dwfl, const char *name,
 								const char *))
   internal_function;
 
+/* Free PROCESS.  Unlink and free also any structures it references.  */
+extern void __libdwfl_process_free (Dwfl_Process *process)
+  internal_function;
+
+/* Update STATE->unwound for the unwound frame.
+   On error STATE->unwound == NULL
+   or STATE->unwound->pc_state == DWFL_FRAME_STATE_ERROR;
+   in such case dwfl_errno () is set.
+   If STATE->unwound->pc_state == DWFL_FRAME_STATE_PC_UNDEFINED
+   then STATE was the last valid frame.  */
+extern void __libdwfl_frame_unwind (Dwfl_Frame *state)
+  internal_function;
+
+/* Call dwfl_attach_state for PID, return true if successful.  */
+extern bool __libdwfl_attach_state_for_pid (Dwfl *dwfl, pid_t pid)
+  internal_function;
+
+/* Call dwfl_attach_state for CORE, return true if successful.  */
+extern bool __libdwfl_attach_state_for_core (Dwfl *dwfl, Elf *core)
+  internal_function;
+
+/* Align segment START downwards or END upwards addresses according to DWFL.  */
+extern GElf_Addr __libdwfl_segment_start (Dwfl *dwfl, GElf_Addr start)
+  internal_function;
+extern GElf_Addr __libdwfl_segment_end (Dwfl *dwfl, GElf_Addr end)
+  internal_function;
+
 /* Decompression wrappers: decompress whole file into memory.  */
 extern Dwfl_Error __libdw_gunzip  (int fd, off64_t start_offset,
 				   void *mapped, size_t mapped_size,
@@ -557,6 +666,16 @@ INTDECL (dwfl_offline_section_address)
 INTDECL (dwfl_module_relocate_address)
 INTDECL (dwfl_module_dwarf_cfi)
 INTDECL (dwfl_module_eh_cfi)
+INTDECL (dwfl_attach_state)
+INTDECL (dwfl_pid)
+INTDECL (dwfl_thread_dwfl)
+INTDECL (dwfl_thread_tid)
+INTDECL (dwfl_frame_thread)
+INTDECL (dwfl_thread_state_registers)
+INTDECL (dwfl_thread_state_register_pc)
+INTDECL (dwfl_getthreads)
+INTDECL (dwfl_thread_getframes)
+INTDECL (dwfl_frame_pc)
 
 /* Leading arguments standard to callbacks passed a Dwfl_Module.  */
 #define MODCB_ARGS(mod)	(mod), &(mod)->userdata, (mod)->name, (mod)->low_addr

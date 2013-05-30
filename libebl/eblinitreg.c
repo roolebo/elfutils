@@ -1,5 +1,5 @@
-/* Finish a session using libdwfl.
-   Copyright (C) 2005, 2008, 2012-2013 Red Hat, Inc.
+/* Fetch live process Dwfl_Frame from PID.
+   Copyright (C) 2013 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -26,29 +26,26 @@
    the GNU Lesser General Public License along with this program.  If
    not, see <http://www.gnu.org/licenses/>.  */
 
-#include "libdwflP.h"
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
 
-void
-dwfl_end (Dwfl *dwfl)
+#include <libeblP.h>
+#include <assert.h>
+
+bool
+ebl_set_initial_registers_tid (Ebl *ebl, pid_t tid,
+			       ebl_tid_registers_t *setfunc,
+			       void *arg)
 {
-  if (dwfl == NULL)
-    return;
+  /* Otherwise caller could not allocate THREAD frame of proper size.
+     If set_initial_registers_tid is unsupported then FRAME_NREGS is zero.  */
+  assert (ebl->set_initial_registers_tid != NULL);
+  return ebl->set_initial_registers_tid (tid, setfunc, arg);
+}
 
-  if (dwfl->process)
-    __libdwfl_process_free (dwfl->process);
-
-  free (dwfl->lookup_addr);
-  free (dwfl->lookup_module);
-  free (dwfl->lookup_segndx);
-
-  Dwfl_Module *next = dwfl->modulelist;
-  while (next != NULL)
-    {
-      Dwfl_Module *dead = next;
-      next = dead->next;
-      __libdwfl_module_free (dead);
-    }
-
-  free (dwfl->executable_for_core);
-  free (dwfl);
+size_t
+ebl_frame_nregs (Ebl *ebl)
+{
+  return ebl == NULL ? 0 : ebl->frame_nregs;
 }

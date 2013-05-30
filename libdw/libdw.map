@@ -259,6 +259,16 @@ ELFUTILS_0.156 {
   global:
     # Replaced ELFUTILS_0.122 version, which has a wrapper without add_p_vaddr.
     dwfl_report_elf;
+    dwfl_attach_state;
+    dwfl_pid;
+    dwfl_thread_dwfl;
+    dwfl_thread_tid;
+    dwfl_frame_thread;
+    dwfl_thread_state_registers;
+    dwfl_thread_state_register_pc;
+    dwfl_getthreads;
+    dwfl_thread_getframes;
+    dwfl_frame_pc;
 } ELFUTILS_0.149;
 
 ELFUTILS_0.157 {

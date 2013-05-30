@@ -1,4 +1,49 @@
 2013-11-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
+	    Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (libdwfl_a_SOURCES): Add dwfl_frame.c, frame_unwind.c,
+	dwfl_frame_pc.c, linux-pid-attach.c, linux-core-attach.c and
+	dwfl_frame_regs.c.
+	* core-file.c (dwfl_core_file_report): Call
+	__libdwfl_attach_state_for_core.
+	* dwfl_end.c (dwfl_end): Call __libdwfl_process_free.
+	* dwfl_frame.c: New file.
+	* frame_unwind.c: New file.
+	* dwfl_frame_pc.c: New file.
+	* linux-pid-attach.c: New file.
+	* linux-core-attach.c: New file.
+	* dwfl_frame_regs.c: New file.
+	* libdwfl.h (Dwfl_Thread, Dwfl_Frame): New typedefs.
+	(dwfl_core_file_report, dwfl_linux_proc_report): Extend comments.
+	(Dwfl_Thread_Callbacks): New definition.
+	(struct ebl, dwfl_attach_state, dwfl_pid, dwfl_thread_dwfl)
+	(dwfl_thread_tid, dwfl_frame_thread, dwfl_thread_state_registers)
+	(dwfl_thread_state_register_pc, dwfl_getthreads, dwfl_thread_getframes)
+	(dwfl_frame_pc): New declarations.
+	* libdwflP.h (Dwfl_Process): New typedef.
+	(LIBEBL_BAD, CORE_MISSING, INVALID_REGISTER, PROCESS_MEMORY_READ)
+	(PROCESS_NO_ARCH, PARSE_PROC, INVALID_DWARF, UNSUPPORTED_DWARF)
+	(NEXT_THREAD_FAIL, ATTACH_STATE_CONFLICT, NO_ATTACH_STATE, NO_UNWIND)
+	(INVALID_ARGUMENT): New DWFL_ERROR entries.
+	(struct Dwfl): New entry process.
+	(struct Dwfl_Process, struct Dwfl_Thread, struct Dwfl_Frame)
+	(__libdwfl_frame_reg_get, __libdwfl_frame_reg_set)
+	(__libdwfl_process_free, __libdwfl_frame_unwind)
+	(__libdwfl_attach_state_for_pid, __libdwfl_attach_state_for_core)
+	(__libdwfl_segment_start, __libdwfl_segment_end): New declarations.
+	(dwfl_attach_state, dwfl_pid, dwfl_thread_dwfl, dwfl_thread_tid)
+	(dwfl_frame_thread, dwfl_thread_state_registers)
+	(dwfl_thread_state_register_pc, dwfl_getthreads, dwfl_thread_getframes)
+	(dwfl_frame_pc): New INTDECL entries.
+	* linux-proc-maps.c (dwfl_linux_proc_report): Call
+	__libdwfl_attach_state_for_pid.
+	* segment.c (segment_start): Rename to ...
+	(__libdwfl_segment_start): ... here and make it internal_function.
+	(segment_end): Rename to ...
+	(__libdwfl_segment_end): ... here and make it internal_function.
+	(reify_segments, dwfl_report_segment): Rename them at the callers.
+
+2013-11-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* core-file.c (dwfl_core_file_report): Remove the use of MAX.
 

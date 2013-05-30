@@ -1,5 +1,5 @@
 /* Manage address space lookup table for libdwfl.
-   Copyright (C) 2008, 2009, 2010 Red Hat, Inc.
+   Copyright (C) 2008, 2009, 2010, 2013 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -28,16 +28,18 @@
 
 #include "libdwflP.h"
 
-static GElf_Addr
-segment_start (Dwfl *dwfl, GElf_Addr start)
+GElf_Addr
+internal_function
+__libdwfl_segment_start (Dwfl *dwfl, GElf_Addr start)
 {
   if (dwfl->segment_align > 1)
     start &= -dwfl->segment_align;
   return start;
 }
 
-static GElf_Addr
-segment_end (Dwfl *dwfl, GElf_Addr end)
+GElf_Addr
+internal_function
+__libdwfl_segment_end (Dwfl *dwfl, GElf_Addr end)
 {
   if (dwfl->segment_align > 1)
     end = (end + dwfl->segment_align - 1) & -dwfl->segment_align;
@@ -156,8 +158,8 @@ reify_segments (Dwfl *dwfl)
   for (Dwfl_Module *mod = dwfl->modulelist; mod != NULL; mod = mod->next)
     if (! mod->gc)
       {
-	const GElf_Addr start = segment_start (dwfl, mod->low_addr);
-	const GElf_Addr end = segment_end (dwfl, mod->high_addr);
+	const GElf_Addr start = __libdwfl_segment_start (dwfl, mod->low_addr);
+	const GElf_Addr end = __libdwfl_segment_end (dwfl, mod->high_addr);
 	bool resized = false;
 
 	int idx = lookup (dwfl, start, hint);
@@ -296,8 +298,9 @@ dwfl_report_segment (Dwfl *dwfl, int ndx, const GElf_Phdr *phdr, GElf_Addr bias,
       dwfl->lookup_module = NULL;
     }
 
-  GElf_Addr start = segment_start (dwfl, bias + phdr->p_vaddr);
-  GElf_Addr end = segment_end (dwfl, bias + phdr->p_vaddr + phdr->p_memsz);
+  GElf_Addr start = __libdwfl_segment_start (dwfl, bias + phdr->p_vaddr);
+  GElf_Addr end = __libdwfl_segment_end (dwfl,
+					 bias + phdr->p_vaddr + phdr->p_memsz);
 
   /* Coalesce into the last one if contiguous and matching.  */
   if (ndx != dwfl->lookup_tail_ndx

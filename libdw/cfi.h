@@ -1,5 +1,5 @@
 /* Internal definitions for libdw CFI interpreter.
-   Copyright (C) 2009-2010 Red Hat, Inc.
+   Copyright (C) 2009-2010, 2013 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -150,8 +150,8 @@ struct dwarf_frame_register
   Dwarf_Sword value:(sizeof (Dwarf_Sword) * 8 - 3);
 };
 
-/* This holds everything we know about the state of the frame
-   at a particular PC location described by an FDE.  */
+/* This holds instructions for unwinding frame at a particular PC location
+   described by an FDE.  */
 struct Dwarf_Frame_s
 {
   /* This frame description covers PC values in [start, end).  */

@@ -2,7 +2,7 @@
 ##
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2005-2010 Red Hat, Inc.
+## Copyright (C) 2005-2010, 2013 Red Hat, Inc.
 ## This file is part of elfutils.
 ##
 ## This file is free software; you can redistribute it and/or modify
@@ -68,7 +68,9 @@ libdwfl_a_SOURCES = dwfl_begin.c dwfl_end.c dwfl_error.c dwfl_version.c \
 		    dwfl_module_return_value_location.c \
 		    dwfl_module_register_names.c \
 		    dwfl_segment_report_module.c \
-		    link_map.c core-file.c open.c image-header.c
+		    link_map.c core-file.c open.c image-header.c \
+		    dwfl_frame.c frame_unwind.c dwfl_frame_pc.c \
+		    linux-pid-attach.c linux-core-attach.c dwfl_frame_regs.c
 
 if ZLIB
 libdwfl_a_SOURCES += gzip.c

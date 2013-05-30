@@ -1,5 +1,5 @@
 /* Initialization of x86-64 specific backend library.
-   Copyright (C) 2002-2009 Red Hat, Inc.
+   Copyright (C) 2002-2009, 2013 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -60,6 +60,9 @@ x86_64_init (elf, machine, eh, ehlen)
   HOOK (eh, auxv_info);
   HOOK (eh, disasm);
   HOOK (eh, abi_cfi);
+  /* gcc/config/ #define DWARF_FRAME_REGISTERS.  */
+  eh->frame_nregs = 17;
+  HOOK (eh, set_initial_registers_tid);
 
   return MODVERSION;
 }

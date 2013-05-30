@@ -1,5 +1,5 @@
 /* Interface for libebl.
-   Copyright (C) 2000-2010 Red Hat, Inc.
+   Copyright (C) 2000-2010, 2013 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -383,6 +383,26 @@ extern int ebl_auxv_info (Ebl *ebl, GElf_Xword a_type,
 			  const char **name, const char **format)
   __nonnull_attribute__ (1, 3, 4);
 
+/* Callback type for ebl_set_initial_registers_tid.  */
+typedef bool (ebl_tid_registers_t) (const int firstreg,
+				    unsigned nregs,
+				    const Dwarf_Word *regs,
+				    void *arg)
+  __nonnull_attribute__ (3);
+
+/* Callback to fetch process data from live TID.
+   EBL architecture has to have EBL_FRAME_NREGS > 0, otherwise the
+   backend doesn't support unwinding and this function call may crash.  */
+extern bool ebl_set_initial_registers_tid (Ebl *ebl,
+					   pid_t tid,
+					   ebl_tid_registers_t *setfunc,
+					   void *arg)
+  __nonnull_attribute__ (1, 3);
+
+/* Number of registers to allocate for ebl_set_initial_registers_tid.
+   EBL architecture can unwind iff EBL_FRAME_NREGS > 0.  */
+extern size_t ebl_frame_nregs (Ebl *ebl)
+  __nonnull_attribute__ (1);
 
 #ifdef __cplusplus
 }

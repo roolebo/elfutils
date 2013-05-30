@@ -1,5 +1,5 @@
 /* Backend hook signatures internal interface for libebl.
-   Copyright (C) 2000-2011 Red Hat, Inc.
+   Copyright (C) 2000-2011, 2013 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -154,6 +154,13 @@ int EBLHOOK(disasm) (const uint8_t **startp, const uint8_t *end,
 /* Supply the machine-specific state of CFI before CIE initial programs.
    Function returns 0 on success and -1 on error.  */
 int EBLHOOK(abi_cfi) (Ebl *ebl, Dwarf_CIE *abi_info);
+
+/* Fetch process data from live TID and call SETFUNC one or more times.
+   Method should be present only when EBL_FRAME_NREGS > 0, otherwise the
+   backend doesn't support unwinding.  */
+bool EBLHOOK(set_initial_registers_tid) (pid_t tid,
+					 ebl_tid_registers_t *setfunc,
+					 void *arg);
 
 /* Destructor for ELF backend handle.  */
 void EBLHOOK(destr) (struct ebl *);

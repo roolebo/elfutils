@@ -1,3 +1,11 @@
+2013-11-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* cfi.h (struct Dwarf_Frame_s): Make the comment more specific.
+	* libdw.map (ELFUTILS_0.156): Add dwfl_attach_state, dwfl_pid,
+	dwfl_thread_dwfl, dwfl_thread_tid, dwfl_frame_thread,
+	dwfl_thread_state_registers, dwfl_thread_state_register_pc,
+	dwfl_getthreads, dwfl_thread_getframes and dwfl_frame_pc.
+
 2013-11-01  Michael Forney  <mforney@mforney.org>
 
 	* Makefile.am (libdwfl_objects): New definition.

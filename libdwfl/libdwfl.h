@@ -1,5 +1,5 @@
 /* Interfaces for libdwfl.
-   Copyright (C) 2005-2010 Red Hat, Inc.
+   Copyright (C) 2005-2010, 2013 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -40,6 +40,14 @@ typedef struct Dwfl_Module Dwfl_Module;
 
 /* Handle describing a line record.  */
 typedef struct Dwfl_Line Dwfl_Line;
+
+/* This holds information common for all the frames of one backtrace for
+   a partical thread/task/TID.  Several threads belong to one Dwfl.  */
+typedef struct Dwfl_Thread Dwfl_Thread;
+
+/* This holds everything we know about the state of the frame at a particular
+   PC location described by an FDE belonging to Dwfl_Thread.  */
+typedef struct Dwfl_Frame Dwfl_Frame;
 
 /* Callbacks.  */
 typedef struct
@@ -353,11 +361,14 @@ extern int dwfl_linux_kernel_report_offline (Dwfl *dwfl, const char *release,
    supply non-NULL EXECUTABLE, otherwise dynamic libraries will not be loaded
    into the DWFL map.  This might call dwfl_report_elf on file names found in
    the dump if reading some link_map files is the only way to ascertain those
-   modules' addresses.
+   modules' addresses.  dwfl_attach_state is also called for DWFL,
+   dwfl_core_file_report does not fail if the dwfl_attach_state call has failed.
    Returns the number of modules reported, or -1 for errors.  */
 extern int dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const char *executable);
 
 /* Call dwfl_report_module for each file mapped into the address space of PID.
+   dwfl_attach_state is also called for DWFL, dwfl_linux_proc_report does
+   not fail if the dwfl_attach_state call has failed.
    Returns zero on success, -1 if dwfl_report_module failed,
    or an errno code if opening the kernel binary failed.  */
 extern int dwfl_linux_proc_report (Dwfl *dwfl, pid_t pid);
@@ -566,6 +577,128 @@ extern int dwfl_module_register_names (Dwfl_Module *mod,
 extern Dwarf_CFI *dwfl_module_dwarf_cfi (Dwfl_Module *mod, Dwarf_Addr *bias);
 extern Dwarf_CFI *dwfl_module_eh_cfi (Dwfl_Module *mod, Dwarf_Addr *bias);
 
+
+typedef struct
+{
+  /* Called to iterate through threads.  Returns next TID (thread ID) on
+     success, a negative number on failure and zero if there are no more
+     threads.  dwfl_errno () should be set if negative number has been
+     returned.  *THREAD_ARGP is NULL on first call, and may be optionally
+     set by the implementation. The value set by the implementation will
+     be passed in on the next call to NEXT_THREAD.  THREAD_ARGP is never
+     NULL.  *THREAD_ARGP will be passed to set_initial_registers or
+     thread_detach callbacks together with Dwfl_Thread *thread.  This
+     method must not be NULL.  */
+  pid_t (*next_thread) (Dwfl *dwfl, void *dwfl_arg, void **thread_argp)
+    __nonnull_attribute__ (1);
+
+  /* Called during unwinding to access memory (stack) state.  Returns true for
+     successfully read *RESULT or false and sets dwfl_errno () on failure.
+     This method may be NULL - in such case dwfl_thread_getframes will return
+     only the initial frame.  */
+  bool (*memory_read) (Dwfl *dwfl, Dwarf_Addr addr, Dwarf_Word *result,
+                       void *dwfl_arg)
+    __nonnull_attribute__ (1, 3);
+
+  /* Called on initial unwind to get the initial register state of the first
+     frame.  Should call dwfl_thread_state_registers, possibly multiple times
+     for different ranges and possibly also dwfl_thread_state_register_pc, to
+     fill in initial (DWARF) register values.  After this call, till at least
+     thread_detach is called, the thread is assumed to be frozen, so that it is
+     safe to unwind.  Returns true on success or false and sets dwfl_errno ()
+     on failure.  In the case of a failure thread_detach will not be called.
+     This method must not be NULL.  */
+  bool (*set_initial_registers) (Dwfl_Thread *thread, void *thread_arg)
+    __nonnull_attribute__ (1);
+
+  /* Called by dwfl_end.  All thread_detach method calls have been already
+     done.  This method may be NULL.  */
+  void (*detach) (Dwfl *dwfl, void *dwfl_arg)
+    __nonnull_attribute__ (1);
+
+  /* Called when unwinding is done.  No callback will be called after
+     this method has been called.  Iff set_initial_registers was called for
+     a TID and it returned success thread_detach will be called before the
+     detach method above.  This method may be NULL.  */
+  void (*thread_detach) (Dwfl_Thread *thread, void *thread_arg)
+    __nonnull_attribute__ (1);
+} Dwfl_Thread_Callbacks;
+
+/* PID is the process id associated with the DWFL state.  Architecture of DWFL
+   modules is specified by MACHINE.  Use EM_NONE to detect architecture from
+   DWFL.  If EBL is NULL the function will detect it from arbitrary Dwfl_Module
+   of DWFL.  DWFL_ARG is the callback backend state.  DWFL_ARG will be provided
+   to the callbacks.  *THREAD_CALLBACKS function pointers must remain valid
+   during lifetime of DWFL.  Function returns true on success,
+   false otherwise.  */
+bool dwfl_attach_state (Dwfl *dwfl, int machine, pid_t pid,
+                        const Dwfl_Thread_Callbacks *thread_callbacks,
+			void *dwfl_arg)
+  __nonnull_attribute__ (1, 4);
+
+/* Return PID for the process associated with DWFL.  Function returns -1 if
+   dwfl_attach_state was not called for DWFL.  */
+pid_t dwfl_pid (Dwfl *dwfl)
+  __nonnull_attribute__ (1);
+
+/* Return DWFL from which THREAD was created using dwfl_getthreads.  */
+Dwfl *dwfl_thread_dwfl (Dwfl_Thread *thread)
+  __nonnull_attribute__ (1);
+
+/* Return positive TID (thread ID) for THREAD.  This function never fails.  */
+pid_t dwfl_thread_tid (Dwfl_Thread *thread)
+  __nonnull_attribute__ (1);
+
+/* Return thread for frame STATE.  This function never fails.  */
+Dwfl_Thread *dwfl_frame_thread (Dwfl_Frame *state)
+  __nonnull_attribute__ (1);
+
+/* Called by Dwfl_Thread_Callbacks.set_initial_registers implementation.
+   For every known continuous block of registers <FIRSTREG..FIRSTREG+NREGS)
+   (inclusive..exclusive) set their content to REGS (array of NREGS items).
+   Function returns false if any of the registers has invalid number.  */
+bool dwfl_thread_state_registers (Dwfl_Thread *thread, const int firstreg,
+                                  unsigned nregs, const Dwarf_Word *regs)
+  __nonnull_attribute__ (1, 4);
+
+/* Called by Dwfl_Thread_Callbacks.set_initial_registers implementation.
+   If PC is not contained among DWARF registers passed by
+   dwfl_thread_state_registers on the target architecture pass the PC value
+   here.  */
+void dwfl_thread_state_register_pc (Dwfl_Thread *thread, Dwarf_Word pc)
+  __nonnull_attribute__ (1);
+
+/* Iterate through the threads for a process.  Returns zero if all threads have
+   been processed by the callback, returns -1 on error, or the value of the
+   callback when not DWARF_CB_OK.  -1 returned on error will set dwfl_errno ().
+   Keeps calling the callback with the next thread while the callback returns
+   DWARF_CB_OK, till there are no more threads.  */
+int dwfl_getthreads (Dwfl *dwfl,
+		     int (*callback) (Dwfl_Thread *thread, void *arg),
+		     void *arg)
+  __nonnull_attribute__ (1, 2);
+
+/* Iterate through the frames for a thread.  Returns zero if all frames
+   have been processed by the callback, returns -1 on error, or the value of
+   the callback when not DWARF_CB_OK.  -1 returned on error will
+   set dwfl_errno ().  Some systems return error instead of zero on end of the
+   backtrace, for cross-platform compatibility callers should consider error as
+   a zero.  Keeps calling the callback with the next frame while the callback
+   returns DWARF_CB_OK, till there are no more frames.  On start will call the
+   set_initial_registers callback and on return will call the detach_thread
+   callback of the Dwfl_Thread.  */
+int dwfl_thread_getframes (Dwfl_Thread *thread,
+			   int (*callback) (Dwfl_Frame *state, void *arg),
+			   void *arg)
+  __nonnull_attribute__ (1, 2);
+
+/* Return *PC (program counter) for thread-specific frame STATE.
+   Set *ISACTIVATION according to DWARF frame "activation" definition.
+   Typically you need to substract 1 from *PC if *ACTIVATION is false to safely
+   find function of the caller.  ACTIVATION may be NULL.  PC must not be NULL.
+   Function returns false if it failed to find *PC.  */
+bool dwfl_frame_pc (Dwfl_Frame *state, Dwarf_Addr *pc, bool *isactivation)
+  __nonnull_attribute__ (1, 2);
 
 #ifdef __cplusplus
 }

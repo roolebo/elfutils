@@ -1,3 +1,13 @@
+2013-11-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
+	    Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (gen_SOURCES): Add eblinitreg.c.
+	* ebl-hooks.h (set_initial_registers_tid): New entry.
+	* eblinitreg.c: New file.
+	* libebl.h (ebl_tid_registers_t): New definition.
+	(ebl_set_initial_registers_tid, ebl_frame_nregs): New declarations.
+	* libeblP.h (struct ebl): New entry frame_nregs.
+
 2013-10-06  Mark Wielaard  <mjw@redhat.com>
 
 	* libebl.h (ebl_abi_cfi): Document restrictions using register

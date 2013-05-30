@@ -1,5 +1,5 @@
 /* Internal definitions for interface for libebl.
-   Copyright (C) 2000-2009 Red Hat, Inc.
+   Copyright (C) 2000-2009, 2013 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -59,6 +59,10 @@ struct ebl
 
   /* Size of entry in Sysv-style hash table.  */
   int sysvhash_entrysize;
+
+  /* Number of registers to allocate for ebl_set_initial_registers_tid.
+     Ebl architecture can unwind iff FRAME_NREGS > 0.  */
+  size_t frame_nregs;
 
   /* Internal data.  */
   void *dlhandle;

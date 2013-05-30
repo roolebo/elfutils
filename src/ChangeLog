@@ -1,3 +1,9 @@
+2013-11-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* Makefile.am (bin_PROGRAMS): Add stack.
+	(stack_LDADD): New.
+	* stack.c: New file.
+
 2013-11-05  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (print_debug_ranges_section): Cast address to size_t

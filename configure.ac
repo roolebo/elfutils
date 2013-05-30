@@ -326,4 +326,15 @@ esac
 # Round up to the next release API (x.y) version.
 eu_version=$(( (eu_version + 999) / 1000 ))
 
+AC_CHECK_SIZEOF(long)
+
+# On a 64-bit host where can can use $CC -m32, we'll run two sets of tests.
+# Likewise in a 32-bit build on a host where $CC -m64 works.
+utrace_BIARCH
+# `$utrace_biarch' will be `-m64' even on an uniarch i386 machine.
+AS_IF([test $utrace_cv_cc_biarch = yes],
+      [CC_BIARCH="$CC $utrace_biarch"],
+      [CC_BIARCH="$CC"])
+AC_SUBST([CC_BIARCH])
+
 AC_OUTPUT

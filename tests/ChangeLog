@@ -1,3 +1,13 @@
+2013-05-30  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* Makefile.am (EXTRA_DIST): Add test-core-lib.so.bz2,
+	test-core.core.bz2 and test-core.exec.bz2.
+	* run-addrname-test.sh: New test for these files.
+	* run-unstrip-n.sh: Update expected output.  New test for these files.
+	* test-core-lib.so.bz2: New file.
+	* test-core.core.bz2: New file.
+	* test-core.exec.bz2: New file.
+
 2013-05-03  Mark Wielaard  <mjw@redhat.com>
 
 	* testfilenolines.bz2: New test file.

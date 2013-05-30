@@ -381,6 +381,19 @@ dwfl_elf_phdr_memory_callback (Dwfl *dwfl, int ndx,
   return true;
 }
 
+/* Free the contents of R_DEBUG_INFO without the R_DEBUG_INFO memory itself.  */
+
+static void
+clear_r_debug_info (struct r_debug_info *r_debug_info)
+{
+  while (r_debug_info->module != NULL)
+    {
+      struct r_debug_info_module *module = r_debug_info->module;
+      r_debug_info->module = module->next;
+      free (module);
+    }
+}
+
 int
 dwfl_core_file_report (Dwfl *dwfl, Elf *elf)
 {
@@ -396,26 +409,6 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf)
   int ndx = dwfl_report_core_segments (dwfl, elf, phnum, &notes_phdr);
   if (unlikely (ndx <= 0))
     return ndx;
-
-  /* Now sniff segment contents for modules.  */
-  int sniffed = 0;
-  ndx = 0;
-  do
-    {
-      int seg = dwfl_segment_report_module (dwfl, ndx, NULL,
-					    &dwfl_elf_phdr_memory_callback, elf,
-					    core_file_read_eagerly, elf);
-      if (unlikely (seg < 0))
-	return seg;
-      if (seg > ndx)
-	{
-	  ndx = seg;
-	  ++sniffed;
-	}
-      else
-	++ndx;
-    }
-  while (ndx < (int) phnum);
 
   /* Next, we should follow the chain from DT_DEBUG.  */
 
@@ -451,13 +444,43 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf)
   /* Now we have NT_AUXV contents.  From here on this processing could be
      used for a live process with auxv read from /proc.  */
 
+  struct r_debug_info r_debug_info;
+  memset (&r_debug_info, 0, sizeof r_debug_info);
   int listed = dwfl_link_map_report (dwfl, auxv, auxv_size,
-				     dwfl_elf_phdr_memory_callback, elf);
+				     dwfl_elf_phdr_memory_callback, elf,
+				     &r_debug_info);
+
+  /* Now sniff segment contents for modules hinted by information gathered
+     from DT_DEBUG.  */
+
+  int sniffed = 0;
+  ndx = 0;
+  do
+    {
+      int seg = dwfl_segment_report_module (dwfl, ndx, NULL,
+					    &dwfl_elf_phdr_memory_callback, elf,
+					    core_file_read_eagerly, elf,
+					    &r_debug_info);
+      if (unlikely (seg < 0))
+	{
+	  clear_r_debug_info (&r_debug_info);
+	  return seg;
+	}
+      if (seg > ndx)
+	{
+	  ndx = seg;
+	  ++sniffed;
+	}
+      else
+	++ndx;
+    }
+  while (ndx < (int) phnum);
+
+  clear_r_debug_info (&r_debug_info);
 
   /* We return the number of modules we found if we found any.
      If we found none, we return -1 instead of 0 if there was an
-     error rather than just nothing found.  If link_map handling
-     failed, we still have the sniffed modules.  */
-  return sniffed == 0 || listed > sniffed ? listed : sniffed;
+     error rather than just nothing found.  */
+  return sniffed || listed >= 0 ? listed + sniffed : listed;
 }
 INTDEF (dwfl_core_file_report)

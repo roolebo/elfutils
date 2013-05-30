@@ -1,3 +1,39 @@
+2013-05-30  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* argp-std.c (parse_opt) <ARGP_KEY_SUCCESS> <opt->core> <opt->e>: Set
+	executable_for_core before calling dwfl_core_file_report.
+	* core-file.c (clear_r_debug_info): New function.
+	(dwfl_core_file_report): Move raw segments reporting lower.  New
+	variable r_debug_info, pass it to dwfl_segment_report_module.  Call
+	clear_r_debug_info in the end.  Return sum of LISTED and SNIFFED.
+	* dwfl_module_build_id.c (check_notes): Move into
+	__libdwfl_find_elf_build_id.
+	(__libdwfl_find_build_id): Rename to ...
+	(__libdwfl_find_elf_build_id): ... here.  Add parameters build_id_bits,
+	build_id_elfaddr and build_id_len.  Verify MOD vs. ELF.
+	(__libdwfl_find_elf_build_id) (check_notes): Remove parameters mod and
+	set, rename data_vaddr to data_elfaddr.  Do not call found_build_id.
+	(__libdwfl_find_elf_build_id): Update the check_notes caller, do not
+	adjust its data_elfaddr parameter.
+	(__libdwfl_find_build_id): New wrapper of __libdwfl_find_elf_build_id.
+	* dwfl_segment_report_module.c (dwfl_segment_report_module): New
+	parameter r_debug_info.  New variable name_is_final.  Adjust addresses
+	according to R_DEBUG_INFO->MODULE.  Check conflicts against DWFL.
+	Do not overwrite NAME by SONAME if NAME_IS_FINAL.
+	* libdwflP.h (__libdwfl_find_elf_build_id): New declaration.
+	(struct r_debug_info_module, struct r_debug_info): New definitions.
+	(dwfl_segment_report_module, dwfl_link_map_report): Add parameter
+	r_debug_info.
+	* link_map.c: Include fcntl.h.
+	(report_r_debug): Add parameter r_debug_info, describe it in the
+	function comment.  Delete dwfl_addrmodule call and its dependent code.
+	Verify build-id before calling dwfl_report_elf, also supply
+	executable_for_core to it.  Store r_debug_info->module info when
+	appropriate.
+	(dwfl_link_map_report): Add parameter r_debug_info.  New variable
+	in_ok.  Try to read IN from EXECUTABLE_FOR_CORE.  Update report_r_debug
+	caller parameters.
+
 2013-04-30  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* dwfl_report_elf.c (__libdwfl_report_elf): Add parameter add_p_vaddr.

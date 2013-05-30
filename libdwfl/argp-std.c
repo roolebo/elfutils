@@ -295,6 +295,9 @@ parse_opt (int key, char *arg, struct argp_state *state)
 
 	if (opt->core)
 	  {
+	    if (opt->e)
+	      dwfl->executable_for_core = strdup (opt->e);
+
 	    int fd = open64 (opt->core, O_RDONLY);
 	    if (fd < 0)
 	      {
@@ -330,9 +333,6 @@ parse_opt (int key, char *arg, struct argp_state *state)
 			      _("No modules recognized in core file"));
 		return ENOENT;
 	      }
-
-	    if (opt->e)
-	      dwfl->executable_for_core = strdup (opt->e);
 	  }
 	else if (opt->e)
 	  {

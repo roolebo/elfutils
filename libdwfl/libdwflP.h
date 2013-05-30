@@ -362,6 +362,16 @@ extern Dwfl_Error __libdwfl_addrcu (Dwfl_Module *mod, Dwarf_Addr addr,
 extern Dwfl_Error __libdwfl_cu_getsrclines (struct dwfl_cu *cu)
   internal_function;
 
+/* Look in ELF for an NT_GNU_BUILD_ID note.  Store it to BUILD_ID_BITS,
+   its vaddr in ELF to BUILD_ID_VADDR (it is unrelocated, even if MOD is not
+   NULL) and store length to BUILD_ID_LEN.  Returns -1 for errors, 1 if it was
+   stored and 0 if no note is found.  MOD may be NULL, MOD must be non-NULL
+   only if ELF is ET_REL.  */
+extern int __libdwfl_find_elf_build_id (Dwfl_Module *mod, Elf *elf,
+					const void **build_id_bits,
+					GElf_Addr *build_id_elfaddr,
+					int *build_id_len);
+
 /* Look in ELF for an NT_GNU_BUILD_ID note.  If SET is true, store it
    in MOD and return its length.  If SET is false, instead compare it
    to that stored in MOD and return 2 if they match, 1 if they do not.
@@ -439,13 +449,29 @@ typedef bool Dwfl_Module_Callback (Dwfl_Module *mod, void **userdata,
 				   GElf_Off whole, GElf_Off contiguous,
 				   void *arg, Elf **elfp);
 
+/* One shared library (or executable) info from DT_DEBUG link map.  */
+struct r_debug_info_module
+{
+  struct r_debug_info_module *next;
+  GElf_Addr l_ld;
+  char name[0];
+};
+
+/* Information gathered from DT_DEBUG by dwfl_link_map_report hinted to
+   dwfl_segment_report_module.  */
+struct r_debug_info
+{
+  struct r_debug_info_module *module;
+};
+
 /* ...
  */
 extern int dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 				       Dwfl_Memory_Callback *memory_callback,
 				       void *memory_callback_arg,
 				       Dwfl_Module_Callback *read_eagerly,
-				       void *read_eagerly_arg);
+				       void *read_eagerly_arg,
+				       const struct r_debug_info *r_debug_info);
 
 /* Report a module for entry in the dynamic linker's struct link_map list.
    For each link_map entry, if an existing module resides at its address,
@@ -459,10 +485,14 @@ extern int dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
    only find where to begin if the correct executable file was
    previously reported and preloaded as with dwfl_report_elf.
 
+   Fill in R_DEBUG_INFO if it is not NULL.  It should be cleared by the
+   caller, this function does not touch fields it does not need to modify.
+
    Returns the number of modules found, or -1 for errors.  */
 extern int dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 				 Dwfl_Memory_Callback *memory_callback,
-				 void *memory_callback_arg);
+				 void *memory_callback_arg,
+				 struct r_debug_info *r_debug_info);
 
 
 /* Avoid PLT entries.  */

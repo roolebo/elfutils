@@ -316,4 +316,10 @@ main+0x9
 ??:0
 EOF
 
+testfiles test-core-lib.so test-core.core test-core.exec
+testrun_compare ${abs_top_builddir}/src/addr2line -S -e test-core.exec --core=test-core.core 0x7f67f2aaf619 <<\EOF
+libfunc+0x9
+??:0
+EOF
+
 exit 0

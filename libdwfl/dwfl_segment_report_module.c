@@ -83,7 +83,8 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 			    Dwfl_Memory_Callback *memory_callback,
 			    void *memory_callback_arg,
 			    Dwfl_Module_Callback *read_eagerly,
-			    void *read_eagerly_arg)
+			    void *read_eagerly_arg,
+			    const struct r_debug_info *r_debug_info)
 {
   size_t segment = ndx;
 
@@ -433,6 +434,47 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 
   dyn_vaddr += bias;
 
+  /* NAME found from link map has precedence over DT_SONAME possibly read
+     below.  */
+  bool name_is_final = false;
+
+  /* Try to match up DYN_VADDR against L_LD as found in link map.
+     Segments sniffing may guess invalid address as the first read-only memory
+     mapping may not be dumped to the core file (if ELF headers are not dumped)
+     and the ELF header is dumped first with the read/write mapping of the same
+     file at higher addresses.  */
+  if (r_debug_info != NULL)
+    for (const struct r_debug_info_module *module = r_debug_info->module;
+	 module != NULL; module = module->next)
+      if (module_start <= module->l_ld && module->l_ld < module_end)
+	{
+	  /* L_LD read from link map must be right while DYN_VADDR is unsafe.
+	     Therefore subtract DYN_VADDR and add L_LD to get a possibly
+	     corrective displacement for all addresses computed so far.  */
+	  GElf_Addr fixup = module->l_ld - dyn_vaddr;
+	  if ((fixup & (dwfl->segment_align - 1)) == 0
+	      && module_start + fixup <= module->l_ld
+	      && module->l_ld < module_end + fixup)
+	    {
+	      module_start += fixup;
+	      module_end += fixup;
+	      dyn_vaddr += fixup;
+	      bias += fixup;
+	      if (module->name[0] != '\0')
+		{
+		  name = module->name;
+		  name_is_final = true;
+		}
+	      break;
+	    }
+	}
+
+  /* Ignore this found module if it would conflict in address space with any
+     already existing module of DWFL.  */
+  for (Dwfl_Module *mod = dwfl->modulelist; mod != NULL; mod = mod->next)
+    if (module_end > mod->low_addr && module_start < mod->high_addr)
+      return finish ();
+
   /* Our return value now says to skip the segments contained
      within the module.  */
   ndx = addr_segndx (dwfl, segment, module_end, true);
@@ -518,7 +560,7 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 
   void *soname = NULL;
   size_t soname_size = 0;
-  if (dynstrsz != 0 && dynstr_vaddr != 0)
+  if (! name_is_final && dynstrsz != 0 && dynstr_vaddr != 0)
     {
       /* We know the bounds of the .dynstr section.
 

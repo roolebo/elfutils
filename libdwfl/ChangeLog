@@ -1,3 +1,8 @@
+2013-06-05  Mark Wielaard  <mjw@redhat.com>
+
+	* link_map.c (report_r_debug): Always call release_buffer after
+	memory_callback succeeded reading build_id.
+
 2013-05-30  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* argp-std.c (parse_opt) <ARGP_KEY_SUCCESS> <opt->core> <opt->e>: Set

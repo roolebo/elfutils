@@ -1,5 +1,5 @@
 /* This file defines standard ELF types, structures, and macros.
-   Copyright (C) 1995-2012 Free Software Foundation, Inc.
+   Copyright (C) 1995-2013 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -249,6 +249,7 @@ typedef struct
 #define EM_OPENRISC	92		/* OpenRISC 32-bit embedded processor */
 #define EM_ARC_A5	93		/* ARC Cores Tangent-A5 */
 #define EM_XTENSA	94		/* Tensilica Xtensa Architecture */
+#define EM_AARCH64	183		/* ARM AARCH64 */
 #define EM_TILEPRO	188		/* Tilera TILEPro */
 #define EM_TILEGX	191		/* Tilera TILE-Gx */
 #define EM_NUM		192
@@ -615,6 +616,10 @@ typedef struct
 #define NT_LWPSTATUS	16		/* Contains copy of lwpstatus struct */
 #define NT_LWPSINFO	17		/* Contains copy of lwpinfo struct */
 #define NT_PRFPXREG	20		/* Contains copy of fprxregset struct */
+#define NT_SIGINFO	0x53494749	/* Contains copy of siginfo_t,
+					   size might increase */
+#define NT_FILE		0x46494c45	/* Contains information about mapped
+					   files */
 #define NT_PRXFPREG	0x46e62b7f	/* Contains copy of user_fxsr_struct */
 #define NT_PPC_VMX	0x100		/* PowerPC Altivec/VMX registers */
 #define NT_PPC_SPE	0x101		/* PowerPC SPE/EVR registers */
@@ -630,7 +635,11 @@ typedef struct
 #define NT_S390_PREFIX	0x305		/* s390 prefix register */
 #define NT_S390_LAST_BREAK	0x306	/* s390 breaking event address */
 #define NT_S390_SYSTEM_CALL	0x307	/* s390 system call restart data */
+#define NT_S390_TDB	0x308		/* s390 transaction diagnostic block */
 #define NT_ARM_VFP	0x400		/* ARM VFP/NEON registers */
+#define NT_ARM_TLS	0x401		/* ARM TLS register */
+#define NT_ARM_HW_BREAK	0x402		/* ARM hardware breakpoint registers */
+#define NT_ARM_HW_WATCH	0x403		/* ARM hardware watchpoint registers */
 
 /* Legal values for the note segment descriptor types for object files.  */
 
@@ -794,6 +803,15 @@ typedef struct
 #define DF_1_ENDFILTEE	0x00004000	/* Filtee terminates filters search. */
 #define	DF_1_DISPRELDNE	0x00008000	/* Disp reloc applied at build time. */
 #define	DF_1_DISPRELPND	0x00010000	/* Disp reloc applied at run-time.  */
+#define	DF_1_NODIRECT	0x00020000	/* Object has no-direct binding. */
+#define	DF_1_IGNMULDEF	0x00040000
+#define	DF_1_NOKSYMS	0x00080000
+#define	DF_1_NOHDR	0x00100000
+#define	DF_1_EDITED	0x00200000	/* Object is modified after built.  */
+#define	DF_1_NORELOC	0x00400000
+#define	DF_1_SYMINTPOSE	0x00800000	/* Object has individual interposers.  */
+#define	DF_1_GLOBAUDIT	0x01000000	/* Global auditin required.  */
+#define	DF_1_SINGLETON	0x02000000	/* Singleton symbols are used.  */
 
 /* Flags for the feature selection in DT_FEATURE_1.  */
 #define DTF_1_PARINIT	0x00000001
@@ -1211,7 +1229,7 @@ typedef struct
 #define R_386_TLS_DTPMOD32 35		/* ID of module containing symbol */
 #define R_386_TLS_DTPOFF32 36		/* Offset in TLS block */
 #define R_386_TLS_TPOFF32  37		/* Negated offset in static TLS block */
-/* 38? */
+#define R_386_SIZE32	   38 		/* 32-bit symbol size */
 #define R_386_TLS_GOTDESC  39		/* GOT offset for TLS descriptor.  */
 #define R_386_TLS_DESC_CALL 40		/* Marker of call through TLS
 					   descriptor for
@@ -1347,102 +1365,104 @@ typedef struct
 
 /* For Sparc64, legal values for d_tag of Elf64_Dyn.  */
 
-#define DT_SPARC_REGISTER 0x70000001
-#define DT_SPARC_NUM	2
+#define DT_SPARC_REGISTER	0x70000001
+#define DT_SPARC_NUM		2
 
 /* MIPS R3000 specific definitions.  */
 
 /* Legal values for e_flags field of Elf32_Ehdr.  */
 
-#define EF_MIPS_NOREORDER   1		/* A .noreorder directive was used */
-#define EF_MIPS_PIC	    2		/* Contains PIC code */
-#define EF_MIPS_CPIC	    4		/* Uses PIC calling sequence */
-#define EF_MIPS_XGOT	    8
-#define EF_MIPS_64BIT_WHIRL 16
-#define EF_MIPS_ABI2	    32
-#define EF_MIPS_ABI_ON32    64
-#define EF_MIPS_ARCH	    0xf0000000	/* MIPS architecture level */
+#define EF_MIPS_NOREORDER	1     /* A .noreorder directive was used.  */
+#define EF_MIPS_PIC		2     /* Contains PIC code.  */
+#define EF_MIPS_CPIC		4     /* Uses PIC calling sequence.  */
+#define EF_MIPS_XGOT		8
+#define EF_MIPS_64BIT_WHIRL	16
+#define EF_MIPS_ABI2		32
+#define EF_MIPS_ABI_ON32	64
+#define EF_MIPS_ARCH		0xf0000000 /* MIPS architecture level.  */
 
 /* Legal values for MIPS architecture level.  */
 
-#define EF_MIPS_ARCH_1	    0x00000000	/* -mips1 code.  */
-#define EF_MIPS_ARCH_2	    0x10000000	/* -mips2 code.  */
-#define EF_MIPS_ARCH_3	    0x20000000	/* -mips3 code.  */
-#define EF_MIPS_ARCH_4	    0x30000000	/* -mips4 code.  */
-#define EF_MIPS_ARCH_5	    0x40000000	/* -mips5 code.  */
-#define EF_MIPS_ARCH_32	    0x60000000	/* MIPS32 code.  */
-#define EF_MIPS_ARCH_64	    0x70000000	/* MIPS64 code.  */
+#define EF_MIPS_ARCH_1		0x00000000 /* -mips1 code.  */
+#define EF_MIPS_ARCH_2		0x10000000 /* -mips2 code.  */
+#define EF_MIPS_ARCH_3		0x20000000 /* -mips3 code.  */
+#define EF_MIPS_ARCH_4		0x30000000 /* -mips4 code.  */
+#define EF_MIPS_ARCH_5		0x40000000 /* -mips5 code.  */
+#define EF_MIPS_ARCH_32		0x50000000 /* MIPS32 code.  */
+#define EF_MIPS_ARCH_64		0x60000000 /* MIPS64 code.  */
+#define EF_MIPS_ARCH_32R2	0x70000000 /* MIPS32r2 code.  */
+#define EF_MIPS_ARCH_64R2	0x80000000 /* MIPS64r2 code.  */
 
-/* The following are non-official names and should not be used.  */
+/* The following are unofficial names and should not be used.  */
 
-#define E_MIPS_ARCH_1	  0x00000000	/* -mips1 code.  */
-#define E_MIPS_ARCH_2	  0x10000000	/* -mips2 code.  */
-#define E_MIPS_ARCH_3	  0x20000000	/* -mips3 code.  */
-#define E_MIPS_ARCH_4	  0x30000000	/* -mips4 code.  */
-#define E_MIPS_ARCH_5	  0x40000000	/* -mips5 code.  */
-#define E_MIPS_ARCH_32	  0x60000000	/* MIPS32 code.  */
-#define E_MIPS_ARCH_64	  0x70000000	/* MIPS64 code.  */
+#define E_MIPS_ARCH_1		EF_MIPS_ARCH_1
+#define E_MIPS_ARCH_2		EF_MIPS_ARCH_2
+#define E_MIPS_ARCH_3		EF_MIPS_ARCH_3
+#define E_MIPS_ARCH_4		EF_MIPS_ARCH_4
+#define E_MIPS_ARCH_5		EF_MIPS_ARCH_5
+#define E_MIPS_ARCH_32		EF_MIPS_ARCH_32
+#define E_MIPS_ARCH_64		EF_MIPS_ARCH_64
 
 /* Special section indices.  */
 
-#define SHN_MIPS_ACOMMON    0xff00	/* Allocated common symbols */
-#define SHN_MIPS_TEXT	    0xff01	/* Allocated test symbols.  */
-#define SHN_MIPS_DATA	    0xff02	/* Allocated data symbols.  */
-#define SHN_MIPS_SCOMMON    0xff03	/* Small common symbols */
-#define SHN_MIPS_SUNDEFINED 0xff04	/* Small undefined symbols */
+#define SHN_MIPS_ACOMMON	0xff00	/* Allocated common symbols.  */
+#define SHN_MIPS_TEXT		0xff01	/* Allocated test symbols.  */
+#define SHN_MIPS_DATA		0xff02	/* Allocated data symbols.  */
+#define SHN_MIPS_SCOMMON 	0xff03	/* Small common symbols.  */
+#define SHN_MIPS_SUNDEFINED	0xff04	/* Small undefined symbols.  */
 
 /* Legal values for sh_type field of Elf32_Shdr.  */
 
-#define SHT_MIPS_LIBLIST       0x70000000 /* Shared objects used in link */
-#define SHT_MIPS_MSYM	       0x70000001
-#define SHT_MIPS_CONFLICT      0x70000002 /* Conflicting symbols */
-#define SHT_MIPS_GPTAB	       0x70000003 /* Global data area sizes */
-#define SHT_MIPS_UCODE	       0x70000004 /* Reserved for SGI/MIPS compilers */
-#define SHT_MIPS_DEBUG	       0x70000005 /* MIPS ECOFF debugging information*/
-#define SHT_MIPS_REGINFO       0x70000006 /* Register usage information */
-#define SHT_MIPS_PACKAGE       0x70000007
-#define SHT_MIPS_PACKSYM       0x70000008
-#define SHT_MIPS_RELD	       0x70000009
-#define SHT_MIPS_IFACE         0x7000000b
-#define SHT_MIPS_CONTENT       0x7000000c
-#define SHT_MIPS_OPTIONS       0x7000000d /* Miscellaneous options.  */
-#define SHT_MIPS_SHDR	       0x70000010
-#define SHT_MIPS_FDESC	       0x70000011
-#define SHT_MIPS_EXTSYM	       0x70000012
-#define SHT_MIPS_DENSE	       0x70000013
-#define SHT_MIPS_PDESC	       0x70000014
-#define SHT_MIPS_LOCSYM	       0x70000015
-#define SHT_MIPS_AUXSYM	       0x70000016
-#define SHT_MIPS_OPTSYM	       0x70000017
-#define SHT_MIPS_LOCSTR	       0x70000018
-#define SHT_MIPS_LINE	       0x70000019
-#define SHT_MIPS_RFDESC	       0x7000001a
-#define SHT_MIPS_DELTASYM      0x7000001b
-#define SHT_MIPS_DELTAINST     0x7000001c
-#define SHT_MIPS_DELTACLASS    0x7000001d
-#define SHT_MIPS_DWARF         0x7000001e /* DWARF debugging information.  */
-#define SHT_MIPS_DELTADECL     0x7000001f
-#define SHT_MIPS_SYMBOL_LIB    0x70000020
-#define SHT_MIPS_EVENTS	       0x70000021 /* Event section.  */
-#define SHT_MIPS_TRANSLATE     0x70000022
-#define SHT_MIPS_PIXIE	       0x70000023
-#define SHT_MIPS_XLATE	       0x70000024
-#define SHT_MIPS_XLATE_DEBUG   0x70000025
-#define SHT_MIPS_WHIRL	       0x70000026
-#define SHT_MIPS_EH_REGION     0x70000027
-#define SHT_MIPS_XLATE_OLD     0x70000028
-#define SHT_MIPS_PDR_EXCEPTION 0x70000029
+#define SHT_MIPS_LIBLIST	0x70000000 /* Shared objects used in link.  */
+#define SHT_MIPS_MSYM		0x70000001
+#define SHT_MIPS_CONFLICT	0x70000002 /* Conflicting symbols.  */
+#define SHT_MIPS_GPTAB		0x70000003 /* Global data area sizes.  */
+#define SHT_MIPS_UCODE		0x70000004 /* Reserved for SGI/MIPS compilers */
+#define SHT_MIPS_DEBUG		0x70000005 /* MIPS ECOFF debugging info.  */
+#define SHT_MIPS_REGINFO	0x70000006 /* Register usage information.  */
+#define SHT_MIPS_PACKAGE	0x70000007
+#define SHT_MIPS_PACKSYM	0x70000008
+#define SHT_MIPS_RELD		0x70000009
+#define SHT_MIPS_IFACE		0x7000000b
+#define SHT_MIPS_CONTENT	0x7000000c
+#define SHT_MIPS_OPTIONS	0x7000000d /* Miscellaneous options.  */
+#define SHT_MIPS_SHDR		0x70000010
+#define SHT_MIPS_FDESC		0x70000011
+#define SHT_MIPS_EXTSYM		0x70000012
+#define SHT_MIPS_DENSE		0x70000013
+#define SHT_MIPS_PDESC		0x70000014
+#define SHT_MIPS_LOCSYM		0x70000015
+#define SHT_MIPS_AUXSYM		0x70000016
+#define SHT_MIPS_OPTSYM		0x70000017
+#define SHT_MIPS_LOCSTR		0x70000018
+#define SHT_MIPS_LINE		0x70000019
+#define SHT_MIPS_RFDESC		0x7000001a
+#define SHT_MIPS_DELTASYM	0x7000001b
+#define SHT_MIPS_DELTAINST	0x7000001c
+#define SHT_MIPS_DELTACLASS	0x7000001d
+#define SHT_MIPS_DWARF		0x7000001e /* DWARF debugging information.  */
+#define SHT_MIPS_DELTADECL	0x7000001f
+#define SHT_MIPS_SYMBOL_LIB	0x70000020
+#define SHT_MIPS_EVENTS		0x70000021 /* Event section.  */
+#define SHT_MIPS_TRANSLATE	0x70000022
+#define SHT_MIPS_PIXIE		0x70000023
+#define SHT_MIPS_XLATE		0x70000024
+#define SHT_MIPS_XLATE_DEBUG	0x70000025
+#define SHT_MIPS_WHIRL		0x70000026
+#define SHT_MIPS_EH_REGION	0x70000027
+#define SHT_MIPS_XLATE_OLD	0x70000028
+#define SHT_MIPS_PDR_EXCEPTION	0x70000029
 
 /* Legal values for sh_flags field of Elf32_Shdr.  */
 
-#define SHF_MIPS_GPREL	 0x10000000	/* Must be part of global data area */
-#define SHF_MIPS_MERGE	 0x20000000
-#define SHF_MIPS_ADDR	 0x40000000
-#define SHF_MIPS_STRINGS 0x80000000
-#define SHF_MIPS_NOSTRIP 0x08000000
-#define SHF_MIPS_LOCAL	 0x04000000
-#define SHF_MIPS_NAMES	 0x02000000
-#define SHF_MIPS_NODUPE	 0x01000000
+#define SHF_MIPS_GPREL		0x10000000 /* Must be in global data area.  */
+#define SHF_MIPS_MERGE		0x20000000
+#define SHF_MIPS_ADDR		0x40000000
+#define SHF_MIPS_STRINGS	0x80000000
+#define SHF_MIPS_NOSTRIP	0x08000000
+#define SHF_MIPS_LOCAL		0x04000000
+#define SHF_MIPS_NAMES		0x02000000
+#define SHF_MIPS_NODUPE		0x01000000
 
 
 /* Symbol tables.  */
@@ -1464,23 +1484,23 @@ typedef union
 {
   struct
     {
-      Elf32_Word gt_current_g_value;	/* -G value used for compilation */
-      Elf32_Word gt_unused;		/* Not used */
-    } gt_header;			/* First entry in section */
+      Elf32_Word gt_current_g_value;	/* -G value used for compilation.  */
+      Elf32_Word gt_unused;		/* Not used.  */
+    } gt_header;			/* First entry in section.  */
   struct
     {
-      Elf32_Word gt_g_value;		/* If this value were used for -G */
-      Elf32_Word gt_bytes;		/* This many bytes would be used */
-    } gt_entry;				/* Subsequent entries in section */
+      Elf32_Word gt_g_value;		/* If this value were used for -G.  */
+      Elf32_Word gt_bytes;		/* This many bytes would be used.  */
+    } gt_entry;				/* Subsequent entries in section.  */
 } Elf32_gptab;
 
 /* Entry found in sections of type SHT_MIPS_REGINFO.  */
 
 typedef struct
 {
-  Elf32_Word	ri_gprmask;		/* General registers used */
-  Elf32_Word	ri_cprmask[4];		/* Coprocessor registers used */
-  Elf32_Sword	ri_gp_value;		/* $gp register value */
+  Elf32_Word ri_gprmask;		/* General registers used.  */
+  Elf32_Word ri_cprmask[4];		/* Coprocessor registers used.  */
+  Elf32_Sword ri_gp_value;		/* $gp register value.  */
 } Elf32_RegInfo;
 
 /* Entries found in sections of type SHT_MIPS_OPTIONS.  */
@@ -2306,26 +2326,42 @@ typedef Elf32_Addr Elf32_Conflict;
 #define SHT_ARM_ATTRIBUTES	(SHT_LOPROC + 3) /* ARM attributes section.  */
 
 
+/* AArch64 relocs.  */
+
+#define R_AARCH64_NONE            0	/* No relocation.  */
+#define R_AARCH64_ABS64         257	/* Direct 64 bit. */
+#define R_AARCH64_ABS32         258	/* Direct 32 bit.  */
+#define R_AARCH64_COPY         1024	/* Copy symbol at runtime.  */
+#define R_AARCH64_GLOB_DAT     1025	/* Create GOT entry.  */
+#define R_AARCH64_JUMP_SLOT    1026	/* Create PLT entry.  */
+#define R_AARCH64_RELATIVE     1027	/* Adjust by program base.  */
+#define R_AARCH64_TLS_DTPMOD64 1028	/* Module number, 64 bit.  */
+#define R_AARCH64_TLS_DTPREL64 1029	/* Module-relative offset, 64 bit.  */
+#define R_AARCH64_TLS_TPREL64  1030	/* TP-relative offset, 64 bit.  */
+#define R_AARCH64_TLSDESC      1031	/* TLS Descriptor.  */
+
 /* ARM relocs.  */
 
 #define R_ARM_NONE		0	/* No reloc */
-#define R_ARM_PC24		1	/* PC relative 26 bit branch */
+#define R_ARM_PC24		1	/* Deprecated PC relative 26
+					   bit branch.  */
 #define R_ARM_ABS32		2	/* Direct 32 bit  */
 #define R_ARM_REL32		3	/* PC relative 32 bit */
 #define R_ARM_PC13		4
 #define R_ARM_ABS16		5	/* Direct 16 bit */
 #define R_ARM_ABS12		6	/* Direct 12 bit */
-#define R_ARM_THM_ABS5		7
+#define R_ARM_THM_ABS5		7	/* Direct & 0x7C (LDR, STR).  */
 #define R_ARM_ABS8		8	/* Direct 8 bit */
 #define R_ARM_SBREL32		9
-#define R_ARM_THM_PC22		10
-#define R_ARM_THM_PC8		11
+#define R_ARM_THM_PC22		10	/* PC relative 24 bit (Thumb32 BL).  */
+#define R_ARM_THM_PC8		11	/* PC relative & 0x3FC
+					   (Thumb16 LDR, ADD, ADR).  */
 #define R_ARM_AMP_VCALL9	12
 #define R_ARM_SWI24		13	/* Obsolete static relocation.  */
 #define R_ARM_TLS_DESC		13      /* Dynamic relocation.  */
-#define R_ARM_THM_SWI8		14
-#define R_ARM_XPC25		15
-#define R_ARM_THM_XPC22		16
+#define R_ARM_THM_SWI8		14	/* Reserved.  */
+#define R_ARM_XPC25		15	/* Reserved.  */
+#define R_ARM_THM_XPC22		16	/* Reserved.  */
 #define R_ARM_TLS_DTPMOD32	17	/* ID of module containing symbol */
 #define R_ARM_TLS_DTPOFF32	18	/* Offset in TLS block */
 #define R_ARM_TLS_TPOFF32	19	/* Offset in static TLS block */
@@ -2336,21 +2372,109 @@ typedef Elf32_Addr Elf32_Conflict;
 #define R_ARM_GOTOFF		24	/* 32 bit offset to GOT */
 #define R_ARM_GOTPC		25	/* 32 bit PC relative offset to GOT */
 #define R_ARM_GOT32		26	/* 32 bit GOT entry */
-#define R_ARM_PLT32		27	/* 32 bit PLT address */
-#define R_ARM_ALU_PCREL_7_0	32
-#define R_ARM_ALU_PCREL_15_8	33
-#define R_ARM_ALU_PCREL_23_15	34
-#define R_ARM_LDR_SBREL_11_0	35
-#define R_ARM_ALU_SBREL_19_12	36
-#define R_ARM_ALU_SBREL_27_20	37
+#define R_ARM_PLT32		27	/* Deprecated, 32 bit PLT address.  */
+#define R_ARM_CALL		28	/* PC relative 24 bit (BL, BLX).  */
+#define R_ARM_JUMP24		29	/* PC relative 24 bit
+					   (B, BL<cond>).  */
+#define R_ARM_THM_JUMP24	30	/* PC relative 24 bit (Thumb32 B.W).  */
+#define R_ARM_BASE_ABS		31	/* Adjust by program base.  */
+#define R_ARM_ALU_PCREL_7_0	32	/* Obsolete.  */
+#define R_ARM_ALU_PCREL_15_8	33	/* Obsolete.  */
+#define R_ARM_ALU_PCREL_23_15	34	/* Obsolete.  */
+#define R_ARM_LDR_SBREL_11_0	35	/* Deprecated, prog. base relative.  */
+#define R_ARM_ALU_SBREL_19_12	36	/* Deprecated, prog. base relative.  */
+#define R_ARM_ALU_SBREL_27_20	37	/* Deprecated, prog. base relative.  */
+#define R_ARM_TARGET1		38
+#define R_ARM_SBREL31		39	/* Program base relative.  */
+#define R_ARM_V4BX		40
+#define R_ARM_TARGET2		41
+#define R_ARM_PREL31		42	/* 32 bit PC relative.  */
+#define R_ARM_MOVW_ABS_NC	43	/* Direct 16-bit (MOVW).  */
+#define R_ARM_MOVT_ABS		44	/* Direct high 16-bit (MOVT).  */
+#define R_ARM_MOVW_PREL_NC	45	/* PC relative 16-bit (MOVW).  */
+#define R_ARM_MOVT_PREL		46	/* PC relative (MOVT).  */
+#define R_ARM_THM_MOVW_ABS_NC	47	/* Direct 16 bit (Thumb32 MOVW).  */
+#define R_ARM_THM_MOVT_ABS	48	/* Direct high 16 bit
+					   (Thumb32 MOVT).  */
+#define R_ARM_THM_MOVW_PREL_NC	49	/* PC relative 16 bit
+					   (Thumb32 MOVW).  */
+#define R_ARM_THM_MOVT_PREL	50	/* PC relative high 16 bit
+					   (Thumb32 MOVT).  */
+#define R_ARM_THM_JUMP19	51	/* PC relative 20 bit
+					   (Thumb32 B<cond>.W).  */
+#define R_ARM_THM_JUMP6		52	/* PC relative X & 0x7E
+					   (Thumb16 CBZ, CBNZ).  */
+#define R_ARM_THM_ALU_PREL_11_0	53	/* PC relative 12 bit
+					   (Thumb32 ADR.W).  */
+#define R_ARM_THM_PC12		54	/* PC relative 12 bit
+					   (Thumb32 LDR{D,SB,H,SH}).  */
+#define R_ARM_ABS32_NOI		55	/* Direct 32-bit.  */
+#define R_ARM_REL32_NOI		56	/* PC relative 32-bit.  */
+#define R_ARM_ALU_PC_G0_NC	57	/* PC relative (ADD, SUB).  */
+#define R_ARM_ALU_PC_G0		58	/* PC relative (ADD, SUB).  */
+#define R_ARM_ALU_PC_G1_NC	59	/* PC relative (ADD, SUB).  */
+#define R_ARM_ALU_PC_G1		60	/* PC relative (ADD, SUB).  */
+#define R_ARM_ALU_PC_G2		61	/* PC relative (ADD, SUB).  */
+#define R_ARM_LDR_PC_G1		62	/* PC relative (LDR,STR,LDRB,STRB).  */
+#define R_ARM_LDR_PC_G2		63	/* PC relative (LDR,STR,LDRB,STRB).  */
+#define R_ARM_LDRS_PC_G0	64	/* PC relative (STR{D,H},
+					   LDR{D,SB,H,SH}).  */
+#define R_ARM_LDRS_PC_G1	65	/* PC relative (STR{D,H},
+					   LDR{D,SB,H,SH}).  */
+#define R_ARM_LDRS_PC_G2	66	/* PC relative (STR{D,H},
+					   LDR{D,SB,H,SH}).  */
+#define R_ARM_LDC_PC_G0		67	/* PC relative (LDC, STC).  */
+#define R_ARM_LDC_PC_G1		68	/* PC relative (LDC, STC).  */
+#define R_ARM_LDC_PC_G2		69	/* PC relative (LDC, STC).  */
+#define R_ARM_ALU_SB_G0_NC	70	/* Program base relative (ADD,SUB).  */
+#define R_ARM_ALU_SB_G0		71	/* Program base relative (ADD,SUB).  */
+#define R_ARM_ALU_SB_G1_NC	72	/* Program base relative (ADD,SUB).  */
+#define R_ARM_ALU_SB_G1		73	/* Program base relative (ADD,SUB).  */
+#define R_ARM_ALU_SB_G2		74	/* Program base relative (ADD,SUB).  */
+#define R_ARM_LDR_SB_G0		75	/* Program base relative (LDR,
+					   STR, LDRB, STRB).  */
+#define R_ARM_LDR_SB_G1		76	/* Program base relative
+					   (LDR, STR, LDRB, STRB).  */
+#define R_ARM_LDR_SB_G2		77	/* Program base relative
+					   (LDR, STR, LDRB, STRB).  */
+#define R_ARM_LDRS_SB_G0	78	/* Program base relative
+					   (LDR, STR, LDRB, STRB).  */
+#define R_ARM_LDRS_SB_G1	79	/* Program base relative
+					   (LDR, STR, LDRB, STRB).  */
+#define R_ARM_LDRS_SB_G2	80	/* Program base relative
+					   (LDR, STR, LDRB, STRB).  */
+#define R_ARM_LDC_SB_G0		81	/* Program base relative (LDC,STC).  */
+#define R_ARM_LDC_SB_G1		82	/* Program base relative (LDC,STC).  */
+#define R_ARM_LDC_SB_G2		83	/* Program base relative (LDC,STC).  */
+#define R_ARM_MOVW_BREL_NC	84	/* Program base relative 16
+					   bit (MOVW).  */
+#define R_ARM_MOVT_BREL		85	/* Program base relative high
+					   16 bit (MOVT).  */
+#define R_ARM_MOVW_BREL		86	/* Program base relative 16
+					   bit (MOVW).  */
+#define R_ARM_THM_MOVW_BREL_NC	87	/* Program base relative 16
+					   bit (Thumb32 MOVW).  */
+#define R_ARM_THM_MOVT_BREL	88	/* Program base relative high
+					   16 bit (Thumb32 MOVT).  */
+#define R_ARM_THM_MOVW_BREL	89	/* Program base relative 16
+					   bit (Thumb32 MOVW).  */
 #define R_ARM_TLS_GOTDESC	90
 #define R_ARM_TLS_CALL		91
-#define R_ARM_TLS_DESCSEQ	92
+#define R_ARM_TLS_DESCSEQ	92	/* TLS relaxation.  */
 #define R_ARM_THM_TLS_CALL	93
+#define R_ARM_PLT32_ABS		94
+#define R_ARM_GOT_ABS		95	/* GOT entry.  */
+#define R_ARM_GOT_PREL		96	/* PC relative GOT entry.  */
+#define R_ARM_GOT_BREL12	97	/* GOT entry relative to GOT
+					   origin (LDR).  */
+#define R_ARM_GOTOFF12		98	/* 12 bit, GOT entry relative
+					   to GOT origin (LDR, STR).  */
+#define R_ARM_GOTRELAX		99
 #define R_ARM_GNU_VTENTRY	100
 #define R_ARM_GNU_VTINHERIT	101
-#define R_ARM_THM_PC11		102	/* thumb unconditional branch */
-#define R_ARM_THM_PC9		103	/* thumb conditional branch */
+#define R_ARM_THM_PC11		102	/* PC relative & 0xFFE (Thumb16 B).  */
+#define R_ARM_THM_PC9		103	/* PC relative & 0x1FE
+					   (Thumb16 B/B<cond>).  */
 #define R_ARM_TLS_GD32		104	/* PC-rel 32 bit for global dynamic
 					   thread local data */
 #define R_ARM_TLS_LDM32		105	/* PC-rel 32 bit for local dynamic
@@ -2361,7 +2485,18 @@ typedef Elf32_Addr Elf32_Conflict;
 					   static TLS block offset */
 #define R_ARM_TLS_LE32		108	/* 32 bit offset relative to static
 					   TLS block */
-#define	R_ARM_THM_TLS_DESCSEQ	129
+#define R_ARM_TLS_LDO12		109	/* 12 bit relative to TLS
+					   block (LDR, STR).  */
+#define R_ARM_TLS_LE12		110	/* 12 bit relative to static
+					   TLS block (LDR, STR).  */
+#define R_ARM_TLS_IE12GP	111	/* 12 bit GOT entry relative
+					   to GOT origin (LDR).  */
+#define R_ARM_ME_TOO		128	/* Obsolete.  */
+#define R_ARM_THM_TLS_DESCSEQ	129
+#define R_ARM_THM_TLS_DESCSEQ16	129
+#define R_ARM_THM_TLS_DESCSEQ32	130
+#define R_ARM_THM_GOT_BREL12	131	/* GOT entry relative to GOT
+					   origin, 12 bit (Thumb32 LDR).  */
 #define R_ARM_IRELATIVE		160
 #define R_ARM_RXPC25		249
 #define R_ARM_RSBREL32		250
@@ -2986,12 +3121,18 @@ typedef Elf32_Addr Elf32_Conflict;
 #define R_TILEGX_IMM16_X1_HW2_LAST_PCREL 63 /* X1 pipe PC-rel last hword 2 */
 #define R_TILEGX_IMM16_X0_HW0_GOT 64	/* X0 pipe hword 0 GOT offset */
 #define R_TILEGX_IMM16_X1_HW0_GOT 65	/* X1 pipe hword 0 GOT offset */
-/* Relocs 66-71 are currently not defined.  */
+#define R_TILEGX_IMM16_X0_HW0_PLT_PCREL 66 /* X0 pipe PC-rel PLT hword 0 */
+#define R_TILEGX_IMM16_X1_HW0_PLT_PCREL 67 /* X1 pipe PC-rel PLT hword 0 */
+#define R_TILEGX_IMM16_X0_HW1_PLT_PCREL 68 /* X0 pipe PC-rel PLT hword 1 */
+#define R_TILEGX_IMM16_X1_HW1_PLT_PCREL 69 /* X1 pipe PC-rel PLT hword 1 */
+#define R_TILEGX_IMM16_X0_HW2_PLT_PCREL 70 /* X0 pipe PC-rel PLT hword 2 */
+#define R_TILEGX_IMM16_X1_HW2_PLT_PCREL 71 /* X1 pipe PC-rel PLT hword 2 */
 #define R_TILEGX_IMM16_X0_HW0_LAST_GOT 72 /* X0 pipe last hword 0 GOT offset */
 #define R_TILEGX_IMM16_X1_HW0_LAST_GOT 73 /* X1 pipe last hword 0 GOT offset */
 #define R_TILEGX_IMM16_X0_HW1_LAST_GOT 74 /* X0 pipe last hword 1 GOT offset */
 #define R_TILEGX_IMM16_X1_HW1_LAST_GOT 75 /* X1 pipe last hword 1 GOT offset */
-/* Relocs 76-77 are currently not defined.  */
+#define R_TILEGX_IMM16_X0_HW3_PLT_PCREL 76 /* X0 pipe PC-rel PLT hword 3 */
+#define R_TILEGX_IMM16_X1_HW3_PLT_PCREL 77 /* X1 pipe PC-rel PLT hword 3 */
 #define R_TILEGX_IMM16_X0_HW0_TLS_GD 78	/* X0 pipe hword 0 TLS GD offset */
 #define R_TILEGX_IMM16_X1_HW0_TLS_GD 79	/* X1 pipe hword 0 TLS GD offset */
 #define R_TILEGX_IMM16_X0_HW0_TLS_LE 80	/* X0 pipe hword 0 TLS LE offset */
@@ -3007,7 +3148,12 @@ typedef Elf32_Addr Elf32_Conflict;
 /* Relocs 90-91 are currently not defined.  */
 #define R_TILEGX_IMM16_X0_HW0_TLS_IE 92	/* X0 pipe hword 0 TLS IE offset */
 #define R_TILEGX_IMM16_X1_HW0_TLS_IE 93	/* X1 pipe hword 0 TLS IE offset */
-/* Relocs 94-99 are currently not defined.  */
+#define R_TILEGX_IMM16_X0_HW0_LAST_PLT_PCREL 94 /* X0 pipe PC-rel PLT last hword 0 */
+#define R_TILEGX_IMM16_X1_HW0_LAST_PLT_PCREL 95 /* X1 pipe PC-rel PLT last hword 0 */
+#define R_TILEGX_IMM16_X0_HW1_LAST_PLT_PCREL 96 /* X0 pipe PC-rel PLT last hword 1 */
+#define R_TILEGX_IMM16_X1_HW1_LAST_PLT_PCREL 97 /* X1 pipe PC-rel PLT last hword 1 */
+#define R_TILEGX_IMM16_X0_HW2_LAST_PLT_PCREL 98 /* X0 pipe PC-rel PLT last hword 2 */
+#define R_TILEGX_IMM16_X1_HW2_LAST_PLT_PCREL 99 /* X1 pipe PC-rel PLT last hword 2 */
 #define R_TILEGX_IMM16_X0_HW0_LAST_TLS_IE 100 /* X0 pipe last hword 0 IE off */
 #define R_TILEGX_IMM16_X1_HW0_LAST_TLS_IE 101 /* X1 pipe last hword 0 IE off */
 #define R_TILEGX_IMM16_X0_HW1_LAST_TLS_IE 102 /* X0 pipe last hword 1 IE off */

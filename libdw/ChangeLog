@@ -1,3 +1,11 @@
+2013-06-26  Mark Wielaard  <mjw@redhat.com>
+
+	* libdw_visit_scopes.c (__libdw_visit_scopes): Don't reject root
+	DIEs without children. Return an error whenever dwarf_child or
+	dwarf_siblingof return an error. Don't call recurse and increase
+	the depth for an imported unit. Walk the children of an imported
+	unit as if they are logical children of the parent root DIE.
+
 2013-05-03  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_getsrclines.c (dwarf_getsrclines): Only set end_sequence

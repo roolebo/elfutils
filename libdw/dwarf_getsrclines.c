@@ -75,6 +75,15 @@ dwarf_getsrclines (Dwarf_Die *cudie, Dwarf_Lines **lines, size_t *nlines)
 
   int res = -1;
 
+  struct linelist *linelist = NULL;
+  unsigned int nlinelist = 0;
+
+  /* If there are a large number of lines don't blow up the stack.
+     Keep track of the last malloced linelist record and free them
+     through the next pointer at the end.  */
+#define MAX_STACK_ALLOC 4096
+  struct linelist *malloc_linelist = NULL;
+
   /* Get the information if it is not already known.  */
   struct Dwarf_CU *const cu = cudie->cu;
   if (cu->lines == NULL)
@@ -325,20 +334,26 @@ dwarf_getsrclines (Dwarf_Die *cudie, Dwarf_Lines **lines, size_t *nlines)
       }
 
       /* Process the instructions.  */
-      struct linelist *linelist = NULL;
-      unsigned int nlinelist = 0;
 
       /* Adds a new line to the matrix.
 	 We cannot simply define a function because we want to use alloca.  */
 #define NEW_LINE(end_seq)						\
       do {								\
-	if (unlikely (add_new_line (alloca (sizeof (struct linelist)),	\
-				    end_seq)))				\
+	struct linelist *ll = (nlinelist < MAX_STACK_ALLOC		\
+			       ? alloca (sizeof (struct linelist))	\
+			       : malloc (sizeof (struct linelist)));	\
+	if (nlinelist >= MAX_STACK_ALLOC)				\
+	  malloc_linelist = ll;						\
+	if (unlikely (add_new_line (ll, end_seq)))			\
 	  goto invalid_data;						\
       } while (0)
 
       inline bool add_new_line (struct linelist *new_line, bool end_sequence)
       {
+	new_line->next = linelist;
+	linelist = new_line;
+	++nlinelist;
+
 	/* Set the line information.  For some fields we use bitfields,
 	   so we would lose information if the encoded values are too large.
 	   Check just for paranoia, and call the data "invalid" if it
@@ -364,10 +379,6 @@ dwarf_getsrclines (Dwarf_Die *cudie, Dwarf_Lines **lines, size_t *nlines)
 	SET (discriminator);
 
 #undef SET
-
-	new_line->next = linelist;
-	linelist = new_line;
-	++nlinelist;
 
 	return false;
       }
@@ -731,6 +742,14 @@ dwarf_getsrclines (Dwarf_Die *cudie, Dwarf_Lines **lines, size_t *nlines)
       *nlines = cu->lines->nlines;
     }
  out:
+
+  /* Free malloced line records, if any.  */
+  for (unsigned int i = MAX_STACK_ALLOC; i < nlinelist; i++)
+    {
+      struct linelist *ll = malloc_linelist->next;
+      free (malloc_linelist);
+      malloc_linelist = ll;
+    }
 
   // XXX Eventually: unlocking here.
 

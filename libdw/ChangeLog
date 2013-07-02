@@ -1,5 +1,11 @@
 2013-07-02  Mark Wielaard  <mjw@redhat.com>
 
+	* dwarf_getsrclines.c (dwarf_getsrclines): Add new stack allocation
+	limit MAX_STACK_ALLOC.  After MAX_STACK_ALLOC lines use malloc in
+	NEW_LINE macro.  Free malloced line records if any at the end.
+
+2013-07-02  Mark Wielaard  <mjw@redhat.com>
+
 	* dwarf_getcfi_elf.c (getcfi_shdr): Check sh_type == SHT_PROGBITS.
 
 2013-06-26  Mark Wielaard  <mjw@redhat.com>

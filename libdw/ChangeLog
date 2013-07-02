@@ -1,3 +1,7 @@
+2013-07-02  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_getcfi_elf.c (getcfi_shdr): Check sh_type == SHT_PROGBITS.
+
 2013-06-26  Mark Wielaard  <mjw@redhat.com>
 
 	* libdw_visit_scopes.c (__libdw_visit_scopes): Don't reject root

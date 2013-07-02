@@ -280,8 +280,13 @@ getcfi_shdr (Elf *elf, const GElf_Ehdr *ehdr)
 	      hdr_vaddr = shdr->sh_addr;
 	    }
 	  else if (!strcmp (name, ".eh_frame"))
-	    return getcfi_scn_eh_frame (elf, ehdr, scn, shdr,
-					hdr_scn, hdr_vaddr);
+	    {
+	      if (shdr->sh_type == SHT_PROGBITS)
+		return getcfi_scn_eh_frame (elf, ehdr, scn, shdr,
+					    hdr_scn, hdr_vaddr);
+	      else
+		return NULL;
+	    }
 	}
     }
 

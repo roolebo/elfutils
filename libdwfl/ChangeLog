@@ -1,3 +1,7 @@
+2013-07-02  Mark Wielaard  <mjw@redhat.com>
+
+	* relocate.c (__libdwfl_relocate_value): Remove mod->e_type assert.
+
 2013-06-05  Mark Wielaard  <mjw@redhat.com>
 
 	* link_map.c (report_r_debug): Always call release_buffer after

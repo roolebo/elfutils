@@ -1,3 +1,8 @@
+2013-07-02  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (EXTRA_DIST): Fix typo, forgot extension in
+	testfilenolines.bz2.
+
 2013-05-30  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* Makefile.am (EXTRA_DIST): Add test-core-lib.so.bz2,

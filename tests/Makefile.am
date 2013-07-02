@@ -199,7 +199,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile70.core.bz2 testfile70.exec.bz2 \
 	     run-dwfllines.sh run-dwfl-report-elf-align.sh \
 	     testfile-dwfl-report-elf-align-shlib.so.bz2 \
-	     testfilenolines test-core-lib.so.bz2 test-core.core.bz2 \
+	     testfilenolines.bz2 test-core-lib.so.bz2 test-core.core.bz2 \
 	     test-core.exec.bz2
 
 if USE_VALGRIND

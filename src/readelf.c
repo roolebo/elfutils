@@ -3749,7 +3749,7 @@ print_block (size_t n, const void *block)
 static void
 print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	   unsigned int vers, unsigned int addrsize, unsigned int offset_size,
-	   Dwarf_Word len, const unsigned char *data)
+	   struct Dwarf_CU *cu, Dwarf_Word len, const unsigned char *data)
 {
   const unsigned int ref_size = vers < 3 ? addrsize : offset_size;
 
@@ -4035,7 +4035,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 		  indent, "", (uintmax_t) offset, op_name);
 	  NEED (uleb);
 	  print_ops (dwflmod, dbg, indent + 6, indent + 6, vers,
-		     addrsize, offset_size, uleb, data);
+		     addrsize, offset_size, cu, uleb, data);
 	  data += uleb;
 	  CONSUME (data - start);
 	  offset += 1 + (data - start);
@@ -4094,9 +4094,11 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  /* 4 byte CU relative reference to the abstract optimized away
 	     DW_TAG_formal_parameter.  */
 	  NEED (4);
+	  uintmax_t param_off = (uintmax_t) read_4ubyte_unaligned (dbg, data);
+	  if (! print_unresolved_addresses && cu != NULL)
+	    param_off += cu->start;
 	  printf ("%*s[%4" PRIuMAX "] %s [%6" PRIxMAX "]\n",
-		  indent, "", (uintmax_t) offset, op_name,
-		  (uintmax_t) read_4ubyte_unaligned (dbg, data));
+		  indent, "", (uintmax_t) offset, op_name, param_off);
 	  CONSUME (4);
 	  data += 4;
 	  offset += 5;
@@ -4127,11 +4129,31 @@ struct listptr
   bool addr64:1;
   bool dwarf64:1;
   bool warned:1;
-  Dwarf_Addr base;
+  struct Dwarf_CU *cu;
 };
 
 #define listptr_offset_size(p)	((p)->dwarf64 ? 8 : 4)
 #define listptr_address_size(p)	((p)->addr64 ? 8 : 4)
+
+static Dwarf_Addr
+listptr_base (struct listptr *p)
+{
+  Dwarf_Addr base;
+  Dwarf_Die cu = CUDIE (p->cu);
+  /* Find the base address of the compilation unit.  It will normally
+     be specified by DW_AT_low_pc.  In DWARF-3 draft 4, the base
+     address could be overridden by DW_AT_entry_pc.  It's been
+     removed, but GCC emits DW_AT_entry_pc and not DW_AT_lowpc for
+     compilation units with discontinuous ranges.  */
+  if (unlikely (dwarf_lowpc (&cu, &base) != 0))
+    {
+      Dwarf_Attribute attr_mem;
+      if (dwarf_formaddr (dwarf_attr (&cu, DW_AT_entry_pc, &attr_mem),
+			  &base) != 0)
+	base = 0;
+    }
+  return base;
+}
 
 static int
 compare_listptr (const void *a, const void *b, void *arg)
@@ -4161,7 +4183,7 @@ compare_listptr (const void *a, const void *b, void *arg)
 		 gettext ("%s %#" PRIx64 " used with different offset sizes"),
 		 name, (uint64_t) p1->offset);
 	}
-      if (p1->base != p2->base)
+      if (listptr_base (p1) != listptr_base (p2))
 	{
 	  p1->warned = p2->warned = true;
 	  error (0, 0,
@@ -4194,7 +4216,7 @@ reset_listptr (struct listptr_table *table)
 static void
 notice_listptr (enum section_e section, struct listptr_table *table,
 		uint_fast8_t address_size, uint_fast8_t offset_size,
-		Dwarf_Addr base, Dwarf_Off offset)
+		struct Dwarf_CU *cu, Dwarf_Off offset)
 {
   if (print_debug_sections & section)
     {
@@ -4215,7 +4237,7 @@ notice_listptr (enum section_e section, struct listptr_table *table,
 	  .addr64 = address_size == 8,
 	  .dwarf64 = offset_size == 8,
 	  .offset = offset,
-	  .base = base
+	  .cu = cu
 	};
       assert (p->offset == offset);
     }
@@ -4232,7 +4254,7 @@ sort_listptr (struct listptr_table *table, const char *name)
 static bool
 skip_listptr_hole (struct listptr_table *table, size_t *idxp,
 		   uint_fast8_t *address_sizep, uint_fast8_t *offset_sizep,
-		   Dwarf_Addr *base, ptrdiff_t offset,
+		   Dwarf_Addr *base, struct Dwarf_CU **cu, ptrdiff_t offset,
 		   unsigned char **readp, unsigned char *endp)
 {
   if (table->n == 0)
@@ -4265,7 +4287,9 @@ skip_listptr_hole (struct listptr_table *table, size_t *idxp,
   if (offset_sizep != NULL)
     *offset_sizep = listptr_offset_size (p);
   if (base != NULL)
-    *base = p->base;
+    *base = listptr_base (p);
+  if (cu != NULL)
+    *cu = p->cu;
 
   return false;
 }
@@ -4594,7 +4618,7 @@ print_debug_ranges_section (Dwfl_Module *dwflmod,
       ptrdiff_t offset = readp - (unsigned char *) data->d_buf;
 
       if (first && skip_listptr_hole (&known_rangelistptr, &listptr_idx,
-				      &address_size, NULL, &base,
+				      &address_size, NULL, &base, NULL,
 				      offset, &readp, endp))
 	continue;
 
@@ -4796,7 +4820,8 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    // XXX overflow check
 	    get_uleb128 (op1, readp);	/* Length of DW_FORM_block.  */
 	    printf ("     def_cfa_expression %" PRIu64 "\n", op1);
-	    print_ops (dwflmod, dbg, 10, 10, version, ptr_size, 0, op1, readp);
+	    print_ops (dwflmod, dbg, 10, 10, version, ptr_size, 0, NULL,
+		       op1, readp);
 	    readp += op1;
 	    break;
 	  case DW_CFA_expression:
@@ -4805,7 +4830,8 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    get_uleb128 (op2, readp);	/* Length of DW_FORM_block.  */
 	    printf ("     expression r%" PRIu64 " (%s) \n",
 		    op1, regname (op1));
-	    print_ops (dwflmod, dbg, 10, 10, version, ptr_size, 0, op2, readp);
+	    print_ops (dwflmod, dbg, 10, 10, version, ptr_size, 0, NULL,
+		       op2, readp);
 	    readp += op2;
 	    break;
 	  case DW_CFA_offset_extended_sf:
@@ -4848,7 +4874,8 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    get_uleb128 (op2, readp);	/* Length of DW_FORM_block.  */
 	    printf ("     val_expression r%" PRIu64 " (%s)\n",
 		    op1, regname (op1));
-	    print_ops (dwflmod, dbg, 10, 10, version, ptr_size, 0, op2, readp);
+	    print_ops (dwflmod, dbg, 10, 10, version, ptr_size, 0,
+		       NULL, op2, readp);
 	    readp += op2;
 	    break;
 	  case DW_CFA_MIPS_advance_loc8:
@@ -5423,7 +5450,7 @@ struct attrcb_args
   unsigned int version;
   unsigned int addrsize;
   unsigned int offset_size;
-  Dwarf_Addr cu_base;
+  struct Dwarf_CU *cu;
 };
 
 
@@ -5558,7 +5585,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	case DW_AT_GNU_call_site_target_clobbered:
 	  notice_listptr (section_loc, &known_loclistptr,
 			  cbargs->addrsize, cbargs->offset_size,
-			  cbargs->cu_base, num);
+			  cbargs->cu, num);
 	  if (!cbargs->silent)
 	    printf ("           %*s%-20s (%s) location list [%6" PRIxMAX "]\n",
 		    (int) (level * 2), "", dwarf_attr_name (attr),
@@ -5568,7 +5595,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	case DW_AT_ranges:
 	  notice_listptr (section_ranges, &known_rangelistptr,
 			  cbargs->addrsize, cbargs->offset_size,
-			  cbargs->cu_base, num);
+			  cbargs->cu, num);
 	  if (!cbargs->silent)
 	    printf ("           %*s%-20s (%s) range list [%6" PRIxMAX "]\n",
 		    (int) (level * 2), "", dwarf_attr_name (attr),
@@ -5707,7 +5734,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	  print_ops (cbargs->dwflmod, cbargs->dbg,
 		     12 + level * 2, 12 + level * 2,
 		     cbargs->version, cbargs->addrsize, cbargs->offset_size,
-		     block.length, block.data);
+		     attrp->cu, block.length, block.data);
 	  break;
 	}
       break;
@@ -5806,18 +5833,7 @@ print_debug_units (Dwfl_Module *dwflmod,
       goto do_return;
     }
 
-  /* Find the base address of the compilation unit.  It will
-     normally be specified by DW_AT_low_pc.  In DWARF-3 draft 4,
-     the base address could be overridden by DW_AT_entry_pc.  It's
-     been removed, but GCC emits DW_AT_entry_pc and not DW_AT_lowpc
-     for compilation units with discontinuous ranges.  */
-  if (unlikely (dwarf_lowpc (&dies[0], &args.cu_base) != 0))
-    {
-      Dwarf_Attribute attr_mem;
-      if (dwarf_formaddr (dwarf_attr (&dies[0], DW_AT_entry_pc, &attr_mem),
-			  &args.cu_base) != 0)
-	args.cu_base = 0;
-    }
+  args.cu = dies[0].cu;
 
   do
     {
@@ -6509,6 +6525,7 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
   uint_fast8_t offset_size = 4;
 
   bool first = true;
+  struct Dwarf_CU *cu = NULL;
   Dwarf_Addr base = 0;
   unsigned char *readp = data->d_buf;
   unsigned char *const endp = (unsigned char *) data->d_buf + data->d_size;
@@ -6518,7 +6535,7 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
 
       if (first && skip_listptr_hole (&known_loclistptr, &listptr_idx,
 				      &address_size, &offset_size, &base,
-				      offset, &readp, endp))
+				      &cu, offset, &readp, endp))
 	continue;
 
       if (unlikely (data->d_size - offset < address_size * 2))
@@ -6580,7 +6597,7 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
 	    }
 
 	  print_ops (dwflmod, dbg, 1, 18 + (address_size * 4),
-		     3 /*XXX*/, address_size, offset_size, len, readp);
+		     3 /*XXX*/, address_size, offset_size, cu, len, readp);
 
 	  first = false;
 	  readp += len;

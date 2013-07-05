@@ -1,3 +1,20 @@
+2013-07-05  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_ops): Take CU as argument, use it to print
+	parameter_ref DIE offset.
+	(struct listptr): Replace base field with cu.
+	(listptr_base): New function.
+	(compare_listptr): Use listptr_base.
+	(notice_listptr): Take CU as argument.
+	(skip_listptr_hole): Likewise.
+	(print_debug_ranges_section): Pass NULL as CU to skip_listptr_hole.
+	(print_cfa_program): Pass NULL as CU to print_ops.
+	(struct attrcb_args): Replace cu_base field with cu.
+	(attr_callback): Pass cu not cu_base to notice_listptr.
+	(print_debug_units): Don't calculate base, just set cu.
+	(print_debug_loc_section): Pass cu to skip_listptr_hole and
+	print_ops.
+
 2013-05-06  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (print_ops): Format first DW_OP_GNU_implicit_pointer

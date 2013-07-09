@@ -4042,10 +4042,13 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  break;
 
 	case DW_OP_GNU_const_type:
-	  /* DIE offset, size plus block.  */
+	  /* uleb128 CU relative DW_TAG_base_type DIE offset, 1-byte
+	     unsigned size plus block.  */
 	  start = data;
 	  NEED (2);
 	  get_uleb128 (uleb, data); /* XXX check overrun */
+	  if (! print_unresolved_addresses && cu != NULL)
+	    uleb += cu->start;
 	  uint8_t usize = *(uint8_t *) data++;
 	  NEED (usize);
 	  printf ("%*s[%4" PRIuMAX "] %s [%6" PRIxMAX "] ",
@@ -4057,21 +4060,29 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  break;
 
 	case DW_OP_GNU_regval_type:
+	  /* uleb128 register number, uleb128 CU relative
+	     DW_TAG_base_type DIE offset.  */
 	  start = data;
 	  NEED (2);
 	  get_uleb128 (uleb, data); /* XXX check overrun */
 	  get_uleb128 (uleb2, data); /* XXX check overrun */
-	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu64 " %#" PRIx64 "\n",
+	  if (! print_unresolved_addresses && cu != NULL)
+	    uleb2 += cu->start;
+	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu64 " [%6" PRIx64 "]\n",
 		  indent, "", (uintmax_t) offset, op_name, uleb, uleb2);
 	  CONSUME (data - start);
 	  offset += 1 + (data - start);
 	  break;
 
 	case DW_OP_GNU_deref_type:
+	  /* 1-byte unsigned size of value, uleb128 CU relative
+	     DW_TAG_base_type DIE offset.  */
 	  start = data;
 	  NEED (2);
 	  usize = *(uint8_t *) data++;
 	  get_uleb128 (uleb, data); /* XXX check overrun */
+	  if (! print_unresolved_addresses && cu != NULL)
+	    uleb += cu->start;
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu8 " [%6" PRIxMAX "]\n",
 		  indent, "", (uintmax_t) offset,
 		  op_name, usize, uleb);
@@ -4081,9 +4092,13 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 
 	case DW_OP_GNU_convert:
 	case DW_OP_GNU_reinterpret:
+	  /* uleb128 CU relative offset to DW_TAG_base_type, or zero
+	     for conversion to untyped.  */
 	  start = data;
 	  NEED (1);
 	  get_uleb128 (uleb, data); /* XXX check overrun */
+	  if (uleb != 0 && ! print_unresolved_addresses && cu != NULL)
+	    uleb += cu->start;
 	  printf ("%*s[%4" PRIuMAX "] %s [%6" PRIxMAX "]\n",
 		  indent, "", (uintmax_t) offset, op_name, uleb);
 	  CONSUME (data - start);

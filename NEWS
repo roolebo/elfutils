@@ -1,62 +1,26 @@
 Version 0.156
 
 lib: New macro COMPAT_VERSION_NEWPROTO.
-     Fix pread and pwrite if they return incomplete data.
 
-libdw: Fix DW_CFA_expression parsing of initial pushed value.
-       Fix false error return on no matching CFI from __libdw_find_fde.
-       Fix uninitialized register contents memory in execute_cfi.
-       Handle GNU extension opcodes in dwarf_getlocation.
-       Handle FORM_GNU_strp_alt for files with string data only in dwz file.
-       srcfiles and srclines fixes for partial_units.
-       dwarf_getsrclines mark highest address as end_sequence.
-       dwarf_getsrclines don't set end_sequence when there are no lines.
-       libdw_visit_scopes: Don't recurse into imported unit children.
-       getcfi_scn_eh_frame: Don't crash when .eh_frame bits aren't there.
-       Don't blow up stack in dwarf_getsrclines with lots of lines.
+libdw: Handle GNU extension opcodes in dwarf_getlocation.
 
-libdwfl: dwfl_report_elf has new parameter add_p_vaddr.
-         Fix STB_GLOBAL over STB_WEAK preference in dwfl_module_addrsym.
-         Fix bias for vDSOs from core files.
-         Fix bias for DSOs loaded from core file with build-id.
-         Fix loading PIEs specified with both -e and --core.
-         Fix double free in Linux kernel modules reporting.
+libdwfl: Fix STB_GLOBAL over STB_WEAK preference in dwfl_module_addrsym.
          Add minisymtab support.
-         Fix 64-bit -> 32-bit vDSO reporting.
-         Try opening files with all installed compression libraries.
-         srcfiles and srclines fixes for partial_units.
-         Fix dwfl_report_elf BASE alignment.
          Add parameter add_p_vaddr to dwfl_report_elf.
          Use DT_DEBUG library search first.
-         Don't assert on mod->e_type in __libdwfl_relocate_value.
-
-libelf: Handle unaligned accesses.
 
 libebl: Handle new core note types in EBL.
-        Fix default_abi_cfi.
 
-backends: Fix FPREGSET_SIZE for ARM, interpret NT_ARM_VFP.
+backends: Interpret NT_ARM_VFP.
           Implement core file registers parsing for s390/s390x.
-          Check type DIE exists before calling dwarf_tag ().
 
 readelf: Add --elf-section input option to inspect an embedded ELF file.
          Add -U, --unresolved-address-offsets output control.
          Add --debug-dump=decodedline support.
          Accept version 8 .gdb_index section format.
-         Fix displaying bitmaps.
          Adjust output formatting width.
-         Fix DW_OP_skip and DW_OP_bra targets calculation.
-         Fix printing .eh_frame pcrel addresses.
-         Fix displayed location list addresses base.
          When highpc is in constant form print it also as address.
          Display raw .debug_aranges. Use libdw only for decodedaranges.
-         Format first DW_OP_GNU_implicit_pointer argument as DIE offset.
-         Print actual DW_OP_GNU_parameter_ref DIE offset.
-         Print actual DIE offsets of DW_OP_GNU_<type> ops.
-
-nm: Fix invalid symbol name message output.
-
-ar: Fix memory corruption.
 
 elflint: Add __bss_start__ to the list of allowed symbols.
 

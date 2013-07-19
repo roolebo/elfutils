@@ -1,3 +1,7 @@
+2013-07-19  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* libdwflP.h (__libdwfl_find_elf_build_id): Add internal_function.
+
 2013-07-02  Mark Wielaard  <mjw@redhat.com>
 
 	* relocate.c (__libdwfl_relocate_value): Remove mod->e_type assert.

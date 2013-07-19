@@ -370,7 +370,8 @@ extern Dwfl_Error __libdwfl_cu_getsrclines (struct dwfl_cu *cu)
 extern int __libdwfl_find_elf_build_id (Dwfl_Module *mod, Elf *elf,
 					const void **build_id_bits,
 					GElf_Addr *build_id_elfaddr,
-					int *build_id_len);
+					int *build_id_len)
+  internal_function;
 
 /* Look in ELF for an NT_GNU_BUILD_ID note.  If SET is true, store it
    in MOD and return its length.  If SET is false, instead compare it

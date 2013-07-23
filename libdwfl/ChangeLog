@@ -1,5 +1,9 @@
 2013-07-23  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
+	* libdwflP.h (__libdwfl_elf_address_range): Add internal_function.
+
+2013-07-23  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
 	* core-file.c (clear_r_debug_info): Close also ELF and FD.
 	(dwfl_core_file_report): Call __libdwfl_report_elf for
 	R_DEBUG_INFO.MODULE.

@@ -396,7 +396,7 @@ extern bool __libdwfl_elf_address_range (Elf *elf, GElf_Addr base,
 					 GElf_Addr *vaddrp,
 					 GElf_Addr *address_syncp,
 					 GElf_Addr *startp, GElf_Addr *endp,
-					 GElf_Addr *biasp, GElf_Half *e_typep);
+					 GElf_Addr *biasp, GElf_Half *e_typep)
   internal_function;
 
 /* Meat of dwfl_report_elf, given elf_begin just called.

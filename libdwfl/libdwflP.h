@@ -389,6 +389,16 @@ extern uint32_t __libdwfl_crc32 (uint32_t crc, unsigned char *buf, size_t len)
 extern int __libdwfl_crc32_file (int fd, uint32_t *resp) attribute_hidden;
 
 
+/* Given ELF and some parameters return TRUE if the *P return value parameters
+   have been successfully filled in.  Any of the *P parameters can be NULL.  */
+extern bool __libdwfl_elf_address_range (Elf *elf, GElf_Addr base,
+					 bool add_p_vaddr, bool sanity,
+					 GElf_Addr *vaddrp,
+					 GElf_Addr *address_syncp,
+					 GElf_Addr *startp, GElf_Addr *endp,
+					 GElf_Addr *biasp, GElf_Half *e_typep);
+  internal_function;
+
 /* Meat of dwfl_report_elf, given elf_begin just called.
    Consumes ELF on success, not on failure.  */
 extern Dwfl_Module *__libdwfl_report_elf (Dwfl *dwfl, const char *name,
@@ -454,7 +464,13 @@ typedef bool Dwfl_Module_Callback (Dwfl_Module *mod, void **userdata,
 struct r_debug_info_module
 {
   struct r_debug_info_module *next;
-  GElf_Addr l_ld;
+  /* FD is -1 iff ELF is NULL.  */
+  int fd;
+  Elf *elf;
+  GElf_Addr l_addr, l_ld;
+  /* START and END are both zero if not valid.  */
+  GElf_Addr start, end;
+  bool disk_file_has_build_id;
   char name[0];
 };
 
@@ -488,6 +504,8 @@ extern int dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 
    Fill in R_DEBUG_INFO if it is not NULL.  It should be cleared by the
    caller, this function does not touch fields it does not need to modify.
+   If R_DEBUG_INFO is not NULL then no modules get added to DWFL, caller
+   has to add them from filled in R_DEBUG_INFO.
 
    Returns the number of modules found, or -1 for errors.  */
 extern int dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,

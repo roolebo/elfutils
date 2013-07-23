@@ -224,7 +224,9 @@ addrsize (uint_fast8_t elfclass)
 
 /* Report a module for each struct link_map in the linked list at r_map
    in the struct r_debug at R_DEBUG_VADDR.  For r_debug_info description
-   see dwfl_link_map_report in libdwflP.h.
+   see dwfl_link_map_report in libdwflP.h.  If R_DEBUG_INFO is not NULL then no
+   modules get added to DWFL, caller has to add them from filled in
+   R_DEBUG_INFO.
 
    For each link_map entry, if an existing module resides at its address,
    this just modifies that module's name and suggested file name.  If
@@ -355,6 +357,28 @@ report_r_debug (uint_fast8_t elfclass, uint_fast8_t elfdata,
       if (iterations == 1 && dwfl->executable_for_core != NULL)
 	name = dwfl->executable_for_core;
 
+      struct r_debug_info_module *r_debug_info_module = NULL;
+      if (r_debug_info != NULL)
+	{
+	  /* Save link map information about valid shared library (or
+	     executable) which has not been found on disk.  */
+	  const char *name1 = name == NULL ? "" : name;
+	  r_debug_info_module = malloc (sizeof (*r_debug_info_module)
+					+ strlen (name1) + 1);
+	  if (r_debug_info_module == NULL)
+	    return release_buffer (result);
+	  r_debug_info_module->fd = -1;
+	  r_debug_info_module->elf = NULL;
+	  r_debug_info_module->l_addr = l_addr;
+	  r_debug_info_module->l_ld = l_ld;
+	  r_debug_info_module->start = 0;
+	  r_debug_info_module->end = 0;
+	  r_debug_info_module->disk_file_has_build_id = false;
+	  strcpy (r_debug_info_module->name, name1);
+	  r_debug_info_module->next = r_debug_info->module;
+	  r_debug_info->module = r_debug_info_module;
+	}
+
       Dwfl_Module *mod = NULL;
       if (name != NULL)
 	{
@@ -374,19 +398,15 @@ report_r_debug (uint_fast8_t elfclass, uint_fast8_t elfdata,
 
 		  /* FIXME: Bias L_ADDR should be computed from the prelink
 		     state in memory (when the file got loaded), not against
-		     the current on-disk file state as is computed below.
-
-		     This verification gives false positive if in-core ELF had
-		     build-id but on-disk ELF does not have any.  But we cannot
-		     reliably find ELF header and/or the ELF build id just from
-		     the link map (and checking core segments is also not
-		     reliable).  */
+		     the current on-disk file state as is computed below.  */
 
 		  if (__libdwfl_find_elf_build_id (NULL, elf, &build_id_bits,
 						   &build_id_elfaddr,
 						   &build_id_len) > 0
 		      && build_id_elfaddr != 0)
 		    {
+		      if (r_debug_info_module != NULL)
+			r_debug_info_module->disk_file_has_build_id = true;
 		      GElf_Addr build_id_vaddr = build_id_elfaddr + l_addr;
 		      release_buffer (0);
 		      int segndx = INTUSE(dwfl_addrsegment) (dwfl,
@@ -410,30 +430,37 @@ report_r_debug (uint_fast8_t elfclass, uint_fast8_t elfdata,
 		    }
 
 		  if (valid)
-		    // XXX hook for sysroot
-		    mod = __libdwfl_report_elf (dwfl, basename (name), name,
-						fd, elf, l_addr, true, true);
-		  if (mod == NULL)
 		    {
-		      elf_end (elf);
-		      close (fd);
+		      if (r_debug_info_module == NULL)
+			{
+			  // XXX hook for sysroot
+			  mod = __libdwfl_report_elf (dwfl, basename (name),
+						      name, fd, elf, l_addr,
+						      true, true);
+			  if (mod != NULL)
+			    {
+			      elf = NULL;
+			      fd = -1;
+			    }
+			}
+		      else if (__libdwfl_elf_address_range (elf, l_addr, true,
+							    true, NULL, NULL,
+						    &r_debug_info_module->start,
+						    &r_debug_info_module->end,
+							    NULL, NULL))
+			{
+			  r_debug_info_module->elf = elf;
+			  r_debug_info_module->fd = fd;
+			  elf = NULL;
+			  fd = -1;
+			}
 		    }
+		  if (elf != NULL)
+		    elf_end (elf);
+		  if (fd != -1)
+		    close (fd);
 		}
 	    }
-	}
-      if (r_debug_info != NULL && mod == NULL)
-	{
-	  /* Save link map information about valid shared library (or
-	     executable) which has not been found on disk.  */
-	  const char *base = name == NULL ? "" : basename (name);
-	  struct r_debug_info_module *module;
-	  module = malloc (sizeof (*module) + strlen (base) + 1);
-	  if (module == NULL)
-	    return release_buffer (result);
-	  module->l_ld = l_ld;
-	  strcpy (module->name, base);
-	  module->next = r_debug_info->module;
-	  r_debug_info->module = module;
 	}
 
       if (mod != NULL)

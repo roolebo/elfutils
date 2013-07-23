@@ -60,7 +60,12 @@ EOF
 # 0x03a000 0x00007fff1596c000 linux-vdso.so.1
 testfiles test-core.core test-core.exec
 rm -f test-core-lib.so
-testrun_compare ${abs_top_builddir}/src/unstrip -n -e test-core.exec --core=test-core.core <<\EOF
+outfile=test-core.out
+testrun_out $outfile ${abs_top_builddir}/src/unstrip -n -e test-core.exec --core=test-core.core
+outfile2=test-core.out2
+remove_files="$remove_files $outfile2"
+grep -v libc.so.6 $outfile | sort >$outfile2
+diff -u $outfile2 - <<EOF
 0x400000+0x202038 - test-core.exec - test-core.exec
 0x7f67f2aaf000+0x202000 - . - test-core-lib.so
 0x7fff1596c000+0x1000 a9cf37f53897b5468ee018655760be61b8633d3c@0x7fff1596c340 . - linux-vdso.so.1

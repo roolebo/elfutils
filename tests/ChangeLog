@@ -1,3 +1,8 @@
+2013-07-23  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* run-unstrip-n.sh (test-core.*): Ignore libc.so.6 entry and order of
+	the entries.
+
 2013-07-02  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (EXTRA_DIST): Fix typo, forgot extension in

@@ -1,3 +1,24 @@
+2013-07-23  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* core-file.c (clear_r_debug_info): Close also ELF and FD.
+	(dwfl_core_file_report): Call __libdwfl_report_elf for
+	R_DEBUG_INFO.MODULE.
+	* dwfl_report_elf.c (__libdwfl_elf_address_range): New function from
+	code of ...
+	(__libdwfl_report_elf): ... this function.  Call it.
+	* dwfl_segment_report_module.c: Include unistd.h.
+	(dwfl_segment_report_module): Use basename for MODULE->NAME.
+	Clear MODULE if it has no build-id and we have segment with build-id.
+	Ignore this segment only if MODULE still contains valid ELF.
+	* libdwflP.h (__libdwfl_elf_address_range): New declaration.
+	(struct r_debug_info_module): New fields fd, elf, l_addr, start, end
+	and disk_file_has_build_id.
+	(dwfl_link_map_report): Extend the comment.
+	* link_map.c (report_r_debug): Extend the comment.  Always fill in new
+	r_debug_info_module.  Initialize also the new r_debug_info_module
+	fields.  Remove one FIXME comment.  Call __libdwfl_elf_address_range
+	instead of __libdwfl_report_elf when R_DEBUG_INFO is not NULL.
+
 2013-07-19  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* libdwflP.h (__libdwfl_find_elf_build_id): Add internal_function.

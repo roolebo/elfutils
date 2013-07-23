@@ -390,6 +390,9 @@ clear_r_debug_info (struct r_debug_info *r_debug_info)
     {
       struct r_debug_info_module *module = r_debug_info->module;
       r_debug_info->module = module->next;
+      elf_end (module->elf);
+      if (module->fd != -1)
+	close (module->fd);
       free (module);
     }
 }
@@ -475,6 +478,43 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf)
 	++ndx;
     }
   while (ndx < (int) phnum);
+
+  /* Now report the modules from dwfl_link_map_report which were not filtered
+     out by dwfl_segment_report_module.  */
+
+  Dwfl_Module **lastmodp = &dwfl->modulelist;
+  while (*lastmodp != NULL)
+    lastmodp = &(*lastmodp)->next;
+  for (struct r_debug_info_module *module = r_debug_info.module;
+       module != NULL; module = module->next)
+    if (module->elf != NULL)
+      {
+	Dwfl_Module *mod;
+	mod = __libdwfl_report_elf (dwfl, basename (module->name), module->name,
+				    module->fd, module->elf, module->l_addr,
+				    true, true);
+	if (mod == NULL)
+	  continue;
+	module->elf = NULL;
+	module->fd = -1;
+	/* Move this module to the end of the list, so that we end
+	   up with a list in the same order as the link_map chain.  */
+	if (mod->next != NULL)
+	  {
+	    if (*lastmodp != mod)
+	      {
+		lastmodp = &dwfl->modulelist;
+		while (*lastmodp != mod)
+		  lastmodp = &(*lastmodp)->next;
+	      }
+	    *lastmodp = mod->next;
+	    mod->next = NULL;
+	    while (*lastmodp != NULL)
+	      lastmodp = &(*lastmodp)->next;
+	    *lastmodp = mod;
+	  }
+	lastmodp = &mod->next;
+      }
 
   clear_r_debug_info (&r_debug_info);
 

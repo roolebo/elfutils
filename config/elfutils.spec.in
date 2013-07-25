@@ -195,6 +195,28 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
+* Thu Jul 25 2013 Jan Kratochvil <jan.kratochvil@redhat.com> 0.156-1
+- lib: New macro COMPAT_VERSION_NEWPROTO.
+- libdw: Handle GNU extension opcodes in dwarf_getlocation.
+- libdwfl: Fix STB_GLOBAL over STB_WEAK preference in 
+  dwfl_module_addrsym.          Add minisymtab support.          Add 
+  parameter add_p_vaddr to dwfl_report_elf.          Use DT_DEBUG 
+  library search first.
+- libebl: Handle new core note types in EBL.
+- backends: Interpret NT_ARM_VFP.           Implement core file 
+  registers parsing for s390/s390x.
+- readelf: Add --elf-section input option to inspect an embedded ELF 
+  file.          Add -U, --unresolved-address-offsets output control.   
+         Add --debug-dump=decodedline support.          Accept version 
+  8 .gdb_index section format.          Adjust output formatting width. 
+           When highpc is in constant form print it also as address.    
+        Display raw .debug_aranges. Use libdw only for decodedaranges.
+- elflint: Add __bss_start__ to the list of allowed symbols.
+- tests: Add configure --enable-valgrind option to run all tests 
+  under valgrind.        Enable automake parallel-tests for make check.
+- translations: Updated Polish translation.
+- Updates for Automake 1.13.
+
 * Fri Aug 24 2012 Mark Wielaard <mjw@redhat.com> 0.155-1
 - libelf: elf*_xlatetomd now works for cross-endian ELF note data.    
        elf_getshdr now works consistently on non-mmaped ELF files after 

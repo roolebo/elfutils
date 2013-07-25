@@ -1,3 +1,9 @@
+2013-07-25  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* dwfl_segment_report_module.c (dwfl_segment_report_module): Check for
+	conflicts all the modules, not just the first one.  Compare L_LD if it
+	is equal, not if it is in a module address range.
+
 2013-07-23  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* libdwflP.h (__libdwfl_elf_address_range): Add internal_function.

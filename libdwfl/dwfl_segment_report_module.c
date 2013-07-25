@@ -470,28 +470,37 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 	    }
 	}
 
-  /* Ignore this found module if it would conflict in address space with any
-     already existing module of DWFL.  */
   if (r_debug_info != NULL)
-    for (struct r_debug_info_module *module = r_debug_info->module;
-	 module != NULL; module = module->next)
-      if ((module_end > module->start && module_start < module->end)
-          || (module_start <= module->l_ld && module->l_ld < module_end))
-	{
-	  if (! module->disk_file_has_build_id && build_id_len > 0)
-	    {
-	      if (module->elf != NULL)
-		{
-		  elf_end (module->elf);
-		  close (module->fd);
-		  module->elf = NULL;
-		  module->fd = -1;
-		}
-	      break;
-	    }
-	  else if (module->elf != NULL)
-	    return finish ();
-	}
+    {
+      bool skip_this_module = false;
+      for (struct r_debug_info_module *module = r_debug_info->module;
+	   module != NULL; module = module->next)
+	if ((module_end > module->start && module_start < module->end)
+	    || dyn_vaddr == module->l_ld)
+	  {
+	    if (! module->disk_file_has_build_id && build_id_len > 0)
+	      {
+		/* Module found in segments with build-id is more reliable
+		   than a module found via DT_DEBUG on disk without any
+		   build-id.   */
+		if (module->elf != NULL)
+		  {
+		    elf_end (module->elf);
+		    close (module->fd);
+		    module->elf = NULL;
+		    module->fd = -1;
+		  }
+	      }
+	    else if (module->elf != NULL)
+	      {
+		/* Ignore this found module if it would conflict in address
+		   space with any already existing module of DWFL.  */
+		skip_this_module = true;
+	      }
+	  }
+      if (skip_this_module)
+	return finish ();
+    }
 
   /* Our return value now says to skip the segments contained
      within the module.  */

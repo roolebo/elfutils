@@ -1,3 +1,8 @@
+2013-08-12  Mark Wielaard  <mjw@redhat.com>
+
+	* addr2line.c (main): If there is a newline char at end of buf,
+	then remove it.
+
 2013-07-05  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (print_ops): Take CU as argument, use it to print

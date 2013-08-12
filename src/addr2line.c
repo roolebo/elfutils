@@ -152,10 +152,14 @@ main (int argc, char *argv[])
 
       char *buf = NULL;
       size_t len = 0;
+      ssize_t chars;
       while (!feof_unlocked (stdin))
 	{
-	  if (getline (&buf, &len, stdin) < 0)
+	  if ((chars = getline (&buf, &len, stdin)) < 0)
 	    break;
+
+	  if (buf[chars - 1] == '\n')
+	    buf[chars - 1] = '\0';
 
 	  result = handle_address (buf, dwfl);
 	}

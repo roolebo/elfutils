@@ -1,5 +1,5 @@
 /* Locate source files and line information for given addresses
-   Copyright (C) 2005-2010, 2012 Red Hat, Inc.
+   Copyright (C) 2005-2010, 2012, 2013 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -64,6 +64,9 @@ static const struct argp_option options[] =
   { "flags", 'F', NULL, 0, N_("Also show line table flags"), 0 },
   { "section", 'j', "NAME", 0,
     N_("Treat addresses as offsets relative to NAME section."), 0 },
+  { "inlines", 'i', NULL, 0,
+    N_("Show all source locations that caused inline expansion of subroutines at the address."),
+    0 },
 
   { NULL, 0, NULL, 0, N_("Miscellaneous:"), 0 },
   /* Unsupported options.  */
@@ -113,6 +116,9 @@ static bool show_symbols;
 
 /* If non-null, take address parameters as relative to named section.  */
 static const char *just_section;
+
+/* True if all inlined subroutines of the current address should be shown.  */
+static bool show_inlines;
 
 
 int
@@ -230,6 +236,10 @@ parse_opt (int key, char *arg, struct argp_state *state)
 
     case 'j':
       just_section = arg;
+      break;
+
+    case 'i':
+      show_inlines = true;
       break;
 
     default:
@@ -351,6 +361,23 @@ print_addrsym (Dwfl_Module *mod, GElf_Addr addr)
     printf ("%s+%#" PRIx64 "\n", name, addr - s.st_value);
 }
 
+static void
+print_diesym (Dwarf_Die *die)
+{
+  Dwarf_Attribute attr;
+  const char *name;
+
+  name = dwarf_formstring (dwarf_attr_integrate (die, DW_AT_MIPS_linkage_name,
+						 &attr)
+			   ?: dwarf_attr_integrate (die, DW_AT_linkage_name,
+						    &attr));
+
+  if (name == NULL)
+    name = dwarf_diename (die) ?: "??";
+
+  puts (name);
+}
+
 static int
 see_one_module (Dwfl_Module *mod,
 		void **userdata __attribute__ ((unused)),
@@ -442,6 +469,30 @@ adjust_to_section (const char *name, uintmax_t *addr, Dwfl *dwfl)
   return false;
 }
 
+static void
+print_src (const char *src, int lineno, int linecol, Dwarf_Die *cu)
+{
+  const char *comp_dir = "";
+  const char *comp_dir_sep = "";
+
+  if (only_basenames)
+    src = basename (src);
+  else if (use_comp_dir && src[0] != '/')
+    {
+      Dwarf_Attribute attr;
+      comp_dir = dwarf_formstring (dwarf_attr (cu, DW_AT_comp_dir, &attr));
+      if (comp_dir != NULL)
+	comp_dir_sep = "/";
+    }
+
+  if (linecol != 0)
+    printf ("%s%s%s:%d:%d",
+	    comp_dir, comp_dir_sep, src, lineno, linecol);
+  else
+    printf ("%s%s%s:%d",
+	    comp_dir, comp_dir_sep, src, lineno);
+}
+
 static int
 handle_address (const char *string, Dwfl *dwfl)
 {
@@ -510,28 +561,11 @@ handle_address (const char *string, Dwfl *dwfl)
 
   const char *src;
   int lineno, linecol;
+
   if (line != NULL && (src = dwfl_lineinfo (line, &addr, &lineno, &linecol,
 					    NULL, NULL)) != NULL)
     {
-      const char *comp_dir = "";
-      const char *comp_dir_sep = "";
-
-      if (only_basenames)
-	src = basename (src);
-      else if (use_comp_dir && src[0] != '/')
-	{
-	  comp_dir = dwfl_line_comp_dir (line);
-	  if (comp_dir != NULL)
-	    comp_dir_sep = "/";
-	}
-
-      if (linecol != 0)
-	printf ("%s%s%s:%d:%d",
-		comp_dir, comp_dir_sep, src, lineno, linecol);
-      else
-	printf ("%s%s%s:%d",
-		comp_dir, comp_dir_sep, src, lineno);
-
+      print_src (src, lineno, linecol, dwfl_linecu (line));
       if (show_flags)
 	{
 	  Dwarf_Addr bias;
@@ -564,6 +598,72 @@ handle_address (const char *string, Dwfl *dwfl)
     }
   else
     puts ("??:0");
+
+  if (show_inlines)
+    {
+      Dwarf_Addr bias = 0;
+      Dwarf_Die *cudie = dwfl_module_addrdie (mod, addr, &bias);
+
+      Dwarf_Die *scopes;
+      int nscopes = dwarf_getscopes (cudie, addr - bias, &scopes);
+      if (nscopes < 0)
+	return 1;
+
+      if (nscopes > 0)
+	{
+	  Dwarf_Die subroutine;
+	  Dwarf_Off dieoff = dwarf_dieoffset (&scopes[0]);
+	  dwarf_offdie (dwfl_module_getdwarf (mod, &bias),
+			dieoff, &subroutine);
+	  free (scopes);
+
+	  nscopes = dwarf_getscopes_die (&subroutine, &scopes);
+	  if (nscopes > 1)
+	    {
+	      Dwarf_Die cu;
+	      Dwarf_Files *files;
+	      if (dwarf_diecu (&scopes[0], &cu, NULL, NULL) != NULL
+		  && dwarf_getsrcfiles (cudie, &files, NULL) == 0)
+		{
+		  for (int i = 0; i < nscopes - 1; i++)
+		    {
+		      Dwarf_Word val;
+		      Dwarf_Attribute attr;
+		      Dwarf_Die *die = &scopes[i];
+		      if (dwarf_tag (die) != DW_TAG_inlined_subroutine)
+			continue;
+
+		      if (show_functions)
+			print_diesym (&scopes[i + 1]);
+
+		      src = NULL;
+		      lineno = 0;
+		      linecol = 0;
+		      if (dwarf_formudata (dwarf_attr (die, DW_AT_call_file,
+						       &attr), &val) == 0)
+			src = dwarf_filesrc (files, val, NULL, NULL);
+
+		      if (dwarf_formudata (dwarf_attr (die, DW_AT_call_line,
+						       &attr), &val) == 0)
+			lineno = val;
+
+		      if (dwarf_formudata (dwarf_attr (die, DW_AT_call_column,
+						       &attr), &val) == 0)
+			linecol = val;
+
+		      if (src != NULL)
+			{
+			  print_src (src, lineno, linecol, &cu);
+			  putchar ('\n');
+			}
+		      else
+			puts ("??:0");
+		    }
+		}
+	    }
+	}
+      free (scopes);
+    }
 
   return 0;
 }

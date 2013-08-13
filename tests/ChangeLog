@@ -1,3 +1,11 @@
+2013-08-13  Mark Wielaard  <mjw@redhat.com>
+
+	* run-addr2line-i-test.sh: New test.
+	* testfile-inlines.bz2: New testfile.
+	* Makefile.am (EXTRA_DIST): Add run-addr2line-i-test.sh and
+	testfile-inlines.bz2.
+	(TESTS): Add run-addr2line-i-test.sh.
+
 2013-08-12  Mark Wielaard  <mjw@redhat.com>
 
 	* run-addr2line-test.sh: New test.

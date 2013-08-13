@@ -88,7 +88,8 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-low_high_pc.sh run-macro-test.sh run-elf_cntl_gelf_getshdr.sh \
 	run-test-archive64.sh run-readelf-vmcoreinfo.sh \
 	run-readelf-mixed-corenote.sh run-dwfllines.sh \
-	run-dwfl-report-elf-align.sh run-addr2line-test.sh
+	run-dwfl-report-elf-align.sh run-addr2line-test.sh \
+	run-addr2line-i-test.sh
 
 if !STANDALONE
 check_PROGRAMS += msg_tst md5-sha1-test
@@ -200,7 +201,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-dwfllines.sh run-dwfl-report-elf-align.sh \
 	     testfile-dwfl-report-elf-align-shlib.so.bz2 \
 	     testfilenolines.bz2 test-core-lib.so.bz2 test-core.core.bz2 \
-	     test-core.exec.bz2 run-addr2line-test.sh
+	     test-core.exec.bz2 run-addr2line-test.sh \
+	     run-addr2line-i-test.sh testfile-inlines.bz2
 
 if USE_VALGRIND
 valgrind_cmd='valgrind -q --trace-children=yes --error-exitcode=1 --run-libc-freeres=no'

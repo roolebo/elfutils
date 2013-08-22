@@ -216,8 +216,14 @@ report_kernel (Dwfl *dwfl, const char **release,
 
       if (report)
 	{
+	  /* Note that on some architectures (e.g. x86_64) the vmlinux
+	     is ET_EXEC, while on others (e.g. ppc64) it is ET_DYN.
+	     In both cases the phdr p_vaddr load address will be non-zero.
+	     We want the image to be placed as if it was ET_DYN, so
+	     pass true for add_p_vaddr which will do the right thing
+	     (in combination with a zero base) in either case.  */
 	  Dwfl_Module *mod = INTUSE(dwfl_report_elf) (dwfl, KERNEL_MODNAME,
-						      fname, fd, 0, false);
+						      fname, fd, 0, true);
 	  if (mod == NULL)
 	    result = -1;
 	  else

@@ -1,3 +1,8 @@
+2013-08-25  Mark Wielaard  <mjw@redhat.com>
+
+	* linux-kernel-modules.c (report_kernel): Pass add_p_vaddr as true
+	to dwfl_report_elf.
+
 2013-07-25  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* dwfl_segment_report_module.c (dwfl_segment_report_module): Check for

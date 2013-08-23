@@ -1,3 +1,15 @@
+2013-08-23  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_getlocation.c (attr_ok): Also accept DW_AT_segment.
+	(attr_base_address): New function.
+	(initial_offset_base): New function.
+	(getlocations_addr): New function. Taken from...
+	(dwarf_getlocation_addr): here. Use new initial_offset_base and
+	getlocations_addr.
+	(dwarf_getlocations): New function.
+	* libdw.h (dwarf_getlocations): New function definition.
+	* libdw.map (ELFUTILS_0.157): New.
+
 2013-07-02  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_getsrclines.c (dwarf_getsrclines): Add new stack allocation

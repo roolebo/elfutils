@@ -1,5 +1,5 @@
 /* Interfaces for libdw.
-   Copyright (C) 2002-2010 Red Hat, Inc.
+   Copyright (C) 2002-2010, 2013 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -629,6 +629,22 @@ extern int dwarf_getlocation (Dwarf_Attribute *attr, Dwarf_Op **expr,
 extern int dwarf_getlocation_addr (Dwarf_Attribute *attr, Dwarf_Addr address,
 				   Dwarf_Op **exprs, size_t *exprlens,
 				   size_t nlocs);
+
+/* Enumerate the locations ranges and descriptions covered by the
+   given attribute.  In the first call OFFSET should be zero and
+   *BASEP need not be initialized.  Returns -1 for errors, zero when
+   there are no more locations to report, or a nonzero OFFSET
+   value to pass to the next call.  Each subsequent call must preserve
+   *BASEP from the prior call.  Successful calls fill in *STARTP and
+   *ENDP with a contiguous address range and *EXPR with a pointer to
+   an array of operations with length *EXPRLEN.  If the attribute
+   describes a single location description and not a location list the
+   first call (with OFFSET zero) will return the location description
+   in *EXPR with *STARTP set to zero and *ENDP set to minus one.  */
+extern ptrdiff_t dwarf_getlocations (Dwarf_Attribute *attr,
+				     ptrdiff_t offset, Dwarf_Addr *basep,
+				     Dwarf_Addr *startp, Dwarf_Addr *endp,
+				     Dwarf_Op **expr, size_t *exprlen);
 
 /* Return the block associated with a DW_OP_implicit_value operation.
    The OP pointer must point into an expression that dwarf_getlocation

@@ -97,7 +97,8 @@ gelf_getauxv (data, ndx, dst)
 	  goto out;
 	}
 
-      *dst = ((GElf_auxv_t *) data_scn->d.d_buf)[ndx];
+      memcpy(dst, (char *) data_scn->d.d_buf + ndx * sizeof (GElf_auxv_t),
+	     sizeof (GElf_auxv_t));
     }
 
   result = dst;

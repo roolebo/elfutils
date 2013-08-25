@@ -1,3 +1,8 @@
+2013-08-25  Kurt Roeckx  <kurt@roeckx.be>
+
+	* gelf_getauxv.c (gelf_getauxv): Use memcpy instead of pointer
+	dereference to avoid alignment problems.
+
 2013-01-07  Roland McGrath  <roland@hack.frob.com>
 
 	* elf_getarsym.c (elf_getarsym): Copy FILE_DATA into stack space if it

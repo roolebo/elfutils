@@ -1,3 +1,13 @@
+2013-08-27  Mark Wielaard  <mjw@redhat.com>
+
+	* run-addrcfi.sh: New test.
+	* Makefile.am (TESTS): Add run-addrcfi.sh.
+	(EXTRA_DIST): Likewise.
+	* addrcfi.c (op_name): New function.
+	(print_detail): Call and print op_name. Check ops, not result
+	to check if this is "same value" or "undefined".
+	(handle_cfi): Make sure cfa_ops doesn't point to NULL.
+
 2013-08-13  Mark Wielaard  <mjw@redhat.com>
 
 	* run-addr2line-i-test.sh: New test.

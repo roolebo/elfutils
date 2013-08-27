@@ -1,5 +1,5 @@
 /* Test program for CFI handling.
-   Copyright (C) 2009-2010 Red Hat, Inc.
+   Copyright (C) 2009-2010, 2013 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -28,6 +28,25 @@
 #include <error.h>
 #include <string.h>
 
+#include "../libdw/known-dwarf.h"
+
+static const char *
+op_name (unsigned int code)
+{
+  static const char *const known[] =
+    {
+#define ONE_KNOWN_DW_OP_DESC(NAME, CODE, DESC) ONE_KNOWN_DW_OP (NAME, CODE)
+#define ONE_KNOWN_DW_OP(NAME, CODE) [CODE] = #NAME,
+      ALL_KNOWN_DW_OP
+#undef ONE_KNOWN_DW_OP
+#undef ONE_KNOWN_DW_OP_DESC
+    };
+
+  if (likely (code < sizeof (known) / sizeof (known[0])))
+    return known[code];
+
+  return NULL;
+}
 
 static void
 print_detail (int result, const Dwarf_Op *ops, size_t nops, Dwarf_Addr bias)
@@ -35,13 +54,13 @@ print_detail (int result, const Dwarf_Op *ops, size_t nops, Dwarf_Addr bias)
   if (result < 0)
     printf ("indeterminate (%s)\n", dwarf_errmsg (-1));
   else if (nops == 0)
-    printf ("%s\n", result == 0 ? "same_value" : "undefined");
+    printf ("%s\n", ops == NULL ? "same_value" : "undefined");
   else
     {
       printf ("%s expression:", result == 0 ? "location" : "value");
       for (size_t i = 0; i < nops; ++i)
 	{
-	  printf (" %#x", ops[i].atom);
+	  printf (" %s", op_name(ops[i].atom));
 	  if (ops[i].number2 == 0)
 	    {
 	      if (ops[i].atom == DW_OP_addr)
@@ -116,7 +135,10 @@ handle_cfi (Dwfl *dwfl, const char *which, Dwarf_CFI *cfi,
     printf ("\treturn address in reg%u%s\n",
 	    ra_regno, signalp ? " (signal frame)" : "");
 
-  Dwarf_Op *cfa_ops;
+  // Point cfa_ops to dummy to match print_detail expectations.
+  // (nops == 0 && cfa_ops != NULL => "undefined")
+  Dwarf_Op dummy;
+  Dwarf_Op *cfa_ops = &dummy;
   size_t cfa_nops;
   result = dwarf_frame_cfa (stuff->frame, &cfa_ops, &cfa_nops);
 

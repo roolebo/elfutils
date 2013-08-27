@@ -1,3 +1,13 @@
+2013-08-27  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* Makefile.am (ppc_SRCS, ppc64_SRCS): Add ppc_cfi.c.
+	(s390_SRCS): Add s390_cfi.c.
+	* ppc64_init.c (ppc64_init): Initialize abi_cfi.
+	* ppc_cfi.c: New file.
+	* ppc_init.c (ppc_init): Initialize abi_cfi.
+	* s390_cfi.c: New file.
+	* s390_init.c (s390_init): Initialize abi_cfi.
+
 2013-08-28  Mark Wielaard  <mjw@redhat.com>
 
 	* arm_regs.c (arm_register_info): Set *prefix to "".

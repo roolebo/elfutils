@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2000-2010 Red Hat, Inc.
+## Copyright (C) 2000-2010, 2013 Red Hat, Inc.
 ## Copyright (C) 2012 Tilera Corporation
 ## This file is part of elfutils.
 ##
@@ -85,17 +85,19 @@ libebl_sparc_pic_a_SOURCES = $(sparc_SRCS)
 am_libebl_sparc_pic_a_OBJECTS = $(sparc_SRCS:.c=.os)
 
 ppc_SRCS = ppc_init.c ppc_symbol.c ppc_retval.c ppc_regs.c \
-	   ppc_corenote.c ppc_auxv.c ppc_attrs.c ppc_syscall.c
+	   ppc_corenote.c ppc_auxv.c ppc_attrs.c ppc_syscall.c \
+	   ppc_cfi.c
 libebl_ppc_pic_a_SOURCES = $(ppc_SRCS)
 am_libebl_ppc_pic_a_OBJECTS = $(ppc_SRCS:.c=.os)
 
 ppc64_SRCS = ppc64_init.c ppc64_symbol.c ppc64_retval.c \
-	     ppc64_corenote.c ppc_regs.c ppc_auxv.c ppc_attrs.c ppc_syscall.c
+	     ppc64_corenote.c ppc_regs.c ppc_auxv.c ppc_attrs.c ppc_syscall.c \
+	     ppc_cfi.c
 libebl_ppc64_pic_a_SOURCES = $(ppc64_SRCS)
 am_libebl_ppc64_pic_a_OBJECTS = $(ppc64_SRCS:.c=.os)
 
 s390_SRCS = s390_init.c s390_symbol.c s390_regs.c s390_retval.c \
-	    s390_corenote.c s390x_corenote.c
+	    s390_corenote.c s390x_corenote.c s390_cfi.c
 libebl_s390_pic_a_SOURCES = $(s390_SRCS)
 am_libebl_s390_pic_a_OBJECTS = $(s390_SRCS:.c=.os)
 

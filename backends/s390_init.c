@@ -1,5 +1,5 @@
 /* Initialization of S/390 specific backend library.
-   Copyright (C) 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2013 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -61,6 +61,7 @@ s390_init (elf, machine, eh, ehlen)
     eh->core_note = s390x_core_note;
   else
     HOOK (eh, core_note);
+  HOOK (eh, abi_cfi);
 
   /* Only the 64-bit format uses the incorrect hash table entry size.  */
   if (eh->class == ELFCLASS64)

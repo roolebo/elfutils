@@ -1,3 +1,7 @@
+2013-08-28  Mark Wielaard  <mjw@redhat.com>
+
+	* gelf_getauxv.c (gelf_getauxv): Add missing whitespace.
+
 2013-08-27  Mark Wielaard  <mjw@redhat.com>
 
 	* gelf_getauxv.c (gelf_getauxv): Remove unnecessary casts to char *.

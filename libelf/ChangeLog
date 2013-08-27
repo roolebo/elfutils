@@ -1,3 +1,7 @@
+2013-08-27  Mark Wielaard  <mjw@redhat.com>
+
+	* gelf_getauxv.c (gelf_getauxv): Remove unnecessary casts to char *.
+
 2013-08-25  Kurt Roeckx  <kurt@roeckx.be>
 
 	* gelf_getauxv.c (gelf_getauxv): Use memcpy instead of pointer

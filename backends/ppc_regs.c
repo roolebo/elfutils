@@ -48,7 +48,7 @@ ppc_register_info (Ebl *ebl __attribute__ ((unused)),
   if (regno < 0 || regno > 1155 || namelen < 8)
     return -1;
 
-  *prefix = NULL;
+  *prefix = "";
   *bits = ebl->machine == EM_PPC64 ? 64 : 32;
   *type = (regno < 32 ? DW_ATE_signed
 	   : regno < 64 ? DW_ATE_float : DW_ATE_unsigned);

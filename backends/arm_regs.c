@@ -48,7 +48,7 @@ arm_register_info (Ebl *ebl __attribute__ ((unused)),
   if (regno < 0 || regno > 320 || namelen < 5)
     return -1;
 
-  *prefix = NULL;
+  *prefix = "";
   *bits = 32;
   *type = DW_ATE_signed;
   *setname = "integer";

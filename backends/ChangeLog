@@ -1,3 +1,9 @@
+2013-08-28  Mark Wielaard  <mjw@redhat.com>
+
+	* arm_regs.c (arm_register_info): Set *prefix to "".
+	* ppc_regs.c (ppc_register_info): Likewise.
+	* sh_regs.c (sh_register_info): Likewise.
+
 2013-04-24  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am: Use AM_CPPFLAGS instead of INCLUDES.

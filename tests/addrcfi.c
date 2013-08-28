@@ -107,6 +107,12 @@ static int
 handle_cfi (Dwfl *dwfl, const char *which, Dwarf_CFI *cfi,
 	    GElf_Addr pc, struct stuff *stuff)
 {
+  if (cfi == NULL)
+    {
+      printf ("handle_cfi no CFI (%s): %s\n", which, dwarf_errmsg (-1));
+      return -1;
+    }
+
   int result = dwarf_cfi_addrframe (cfi, pc - stuff->bias, &stuff->frame);
   if (result != 0)
     {

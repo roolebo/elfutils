@@ -1,5 +1,15 @@
 2013-08-28  Mark Wielaard  <mjw@redhat.com>
 
+	* addrcfi.c (handle_cfi): Handle .debug_frame or .eh_frame
+	completely missing.
+	* run-addrcfi.sh: Add case for EM_S390 ELFCLASS32 and ELFCLASS64.
+	* testfiles390.bz2: New testfile.
+	* testfiles390x.bz2: Likewise.
+	* Makefile.am (EXTRA_DIST): Add testfiles390.bz2 and
+	testfiles390x.bz2.
+
+2013-08-28  Mark Wielaard  <mjw@redhat.com>
+
 	* addrcfi.c (handle_cfi): Use printf not error.
 	* run-addrcfi.sh: Add case for EM_PPC and EM_PPC64.
 	* testfileppc32.bz2: New testfile.

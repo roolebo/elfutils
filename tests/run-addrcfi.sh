@@ -2342,3 +2342,157 @@ dwarf_cfi_addrframe (.eh_frame): no matching address range
 	vector reg1154 (vr30): undefined
 	vector reg1155 (vr31): undefined
 EOF
+
+# EM_S390 (ELFCLASS32) (function bar 0x4004d8)
+# Note. Only in .eh_frame, there is no .debug_frame.
+# Same as PPC above but with -m31.
+testfiles testfiles390
+testrun_compare ${abs_builddir}/addrcfi -e testfiles390 0x4004d8 <<\EOF
+.eh_frame has 0x4004d8 => [0x4004d8, 0x4004e8):
+	return address in reg14
+	CFA location expression: bregx(15,96)
+	integer reg0 (%r0): undefined
+	integer reg1 (%r1): undefined
+	integer reg2 (%r2): undefined
+	integer reg3 (%r3): undefined
+	integer reg4 (%r4): undefined
+	integer reg5 (%r5): undefined
+	integer reg6 (%r6): same_value
+	integer reg7 (%r7): same_value
+	integer reg8 (%r8): same_value
+	integer reg9 (%r9): same_value
+	integer reg10 (%r10): same_value
+	integer reg11 (%r11): same_value
+	integer reg12 (%r12): same_value
+	integer reg13 (%r13): same_value
+	integer reg14 (%r14): same_value
+	integer reg15 (%r15): same_value
+	FPU reg16 (%f0): undefined
+	FPU reg17 (%f2): undefined
+	FPU reg18 (%f4): undefined
+	FPU reg19 (%f6): undefined
+	FPU reg20 (%f1): undefined
+	FPU reg21 (%f3): undefined
+	FPU reg22 (%f5): undefined
+	FPU reg23 (%f7): undefined
+	FPU reg24 (%f8): same_value
+	FPU reg25 (%f10): same_value
+	FPU reg26 (%f12): same_value
+	FPU reg27 (%f14): same_value
+	FPU reg28 (%f9): same_value
+	FPU reg29 (%f11): same_value
+	FPU reg30 (%f13): same_value
+	FPU reg31 (%f15): same_value
+	control reg32 (%c0): undefined
+	control reg33 (%c1): undefined
+	control reg34 (%c2): undefined
+	control reg35 (%c3): undefined
+	control reg36 (%c4): undefined
+	control reg37 (%c5): undefined
+	control reg38 (%c6): undefined
+	control reg39 (%c7): undefined
+	control reg40 (%c8): undefined
+	control reg41 (%c9): undefined
+	control reg42 (%c10): undefined
+	control reg43 (%c11): undefined
+	control reg44 (%c12): undefined
+	control reg45 (%c13): undefined
+	control reg46 (%c14): undefined
+	control reg47 (%c15): undefined
+	access reg48 (%a0): undefined
+	access reg49 (%a1): undefined
+	access reg50 (%a2): undefined
+	access reg51 (%a3): undefined
+	access reg52 (%a4): undefined
+	access reg53 (%a5): undefined
+	access reg54 (%a6): undefined
+	access reg55 (%a7): undefined
+	access reg56 (%a8): undefined
+	access reg57 (%a9): undefined
+	access reg58 (%a10): undefined
+	access reg59 (%a11): undefined
+	access reg60 (%a12): undefined
+	access reg61 (%a13): undefined
+	access reg62 (%a14): undefined
+	access reg63 (%a15): undefined
+	control reg64 (%pswm): undefined
+	control reg65 (%pswa): undefined
+handle_cfi no CFI (.debug_frame): no error
+EOF
+
+# EM_S390 (ELFCLASS64) (function bar 0x0000000080000510)
+# Note. Only in .eh_frame, there is no .debug_frame.
+# Same as s390 above but without -m31.
+testfiles testfiles390x
+testrun_compare ${abs_builddir}/addrcfi -e testfiles390x 0x0000000080000510 <<\EOF
+.eh_frame has 0x80000510 => [0x80000510, 0x80000524):
+	return address in reg14
+	CFA location expression: bregx(15,160)
+	integer reg0 (%r0): undefined
+	integer reg1 (%r1): undefined
+	integer reg2 (%r2): undefined
+	integer reg3 (%r3): undefined
+	integer reg4 (%r4): undefined
+	integer reg5 (%r5): undefined
+	integer reg6 (%r6): same_value
+	integer reg7 (%r7): same_value
+	integer reg8 (%r8): same_value
+	integer reg9 (%r9): same_value
+	integer reg10 (%r10): same_value
+	integer reg11 (%r11): same_value
+	integer reg12 (%r12): same_value
+	integer reg13 (%r13): same_value
+	integer reg14 (%r14): same_value
+	integer reg15 (%r15): same_value
+	FPU reg16 (%f0): undefined
+	FPU reg17 (%f2): undefined
+	FPU reg18 (%f4): undefined
+	FPU reg19 (%f6): undefined
+	FPU reg20 (%f1): undefined
+	FPU reg21 (%f3): undefined
+	FPU reg22 (%f5): undefined
+	FPU reg23 (%f7): undefined
+	FPU reg24 (%f8): same_value
+	FPU reg25 (%f10): same_value
+	FPU reg26 (%f12): same_value
+	FPU reg27 (%f14): same_value
+	FPU reg28 (%f9): same_value
+	FPU reg29 (%f11): same_value
+	FPU reg30 (%f13): same_value
+	FPU reg31 (%f15): same_value
+	control reg32 (%c0): undefined
+	control reg33 (%c1): undefined
+	control reg34 (%c2): undefined
+	control reg35 (%c3): undefined
+	control reg36 (%c4): undefined
+	control reg37 (%c5): undefined
+	control reg38 (%c6): undefined
+	control reg39 (%c7): undefined
+	control reg40 (%c8): undefined
+	control reg41 (%c9): undefined
+	control reg42 (%c10): undefined
+	control reg43 (%c11): undefined
+	control reg44 (%c12): undefined
+	control reg45 (%c13): undefined
+	control reg46 (%c14): undefined
+	control reg47 (%c15): undefined
+	access reg48 (%a0): undefined
+	access reg49 (%a1): undefined
+	access reg50 (%a2): undefined
+	access reg51 (%a3): undefined
+	access reg52 (%a4): undefined
+	access reg53 (%a5): undefined
+	access reg54 (%a6): undefined
+	access reg55 (%a7): undefined
+	access reg56 (%a8): undefined
+	access reg57 (%a9): undefined
+	access reg58 (%a10): undefined
+	access reg59 (%a11): undefined
+	access reg60 (%a12): undefined
+	access reg61 (%a13): undefined
+	access reg62 (%a14): undefined
+	access reg63 (%a15): undefined
+	control reg64 (%pswm): undefined
+	control reg65 (%pswa): undefined
+handle_cfi no CFI (.debug_frame): no error
+EOF

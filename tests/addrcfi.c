@@ -25,7 +25,6 @@
 #include <stdio_ext.h>
 #include <locale.h>
 #include <stdlib.h>
-#include <error.h>
 #include <string.h>
 
 #include "../libdw/known-dwarf.h"
@@ -111,7 +110,7 @@ handle_cfi (Dwfl *dwfl, const char *which, Dwarf_CFI *cfi,
   int result = dwarf_cfi_addrframe (cfi, pc - stuff->bias, &stuff->frame);
   if (result != 0)
     {
-      error (0, 0, "dwarf_cfi_addrframe (%s): %s", which, dwarf_errmsg (-1));
+      printf ("dwarf_cfi_addrframe (%s): %s\n", which, dwarf_errmsg (-1));
       return 1;
     }
 

@@ -1,3 +1,12 @@
+2013-08-28  Mark Wielaard  <mjw@redhat.com>
+
+	* addrcfi.c (handle_cfi): Use printf not error.
+	* run-addrcfi.sh: Add case for EM_PPC and EM_PPC64.
+	* testfileppc32.bz2: New testfile.
+	* testfileppc64.bz2: Likewise.
+	* Makefile.am (EXTRA_DIST): Add testfileppc32.bz2 and
+	testfileppc64.bz2.
+
 2013-08-27  Mark Wielaard  <mjw@redhat.com>
 
 	* run-addrcfi.sh: New test.

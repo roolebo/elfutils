@@ -150,7 +150,7 @@ typedef Elf64_Lib GElf_Lib;
 extern int gelf_getclass (Elf *__elf);
 
 
-/* Return size of array of COUNT elemeents of the type denoted by TYPE
+/* Return size of array of COUNT elements of the type denoted by TYPE
    in the external representation.  The binary class is taken from ELF.
    The result is based on version VERSION of the ELF standard.  */
 extern size_t gelf_fsize (Elf *__elf, Elf_Type __type, size_t __count,

@@ -1,3 +1,7 @@
+2013-08-28  Namhyung Kim  <namhyung@gmail.com>
+
+	* gelf.h (gelf_fsize): Fix typo in comment.
+
 2013-08-28  Mark Wielaard  <mjw@redhat.com>
 
 	* gelf_getauxv.c (gelf_getauxv): Add missing whitespace.

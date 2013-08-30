@@ -95,13 +95,15 @@ loc_compare (const void *p1, const void *p2)
 /* For each DW_OP_implicit_value, we store a special entry in the cache.
    This points us directly to the block data for later fetching.  */
 static void
-store_implicit_value (Dwarf *dbg, void **cache, Dwarf_Op *op,
-		      unsigned char *data)
+store_implicit_value (Dwarf *dbg, void **cache, Dwarf_Op *op)
 {
   struct loc_block_s *block = libdw_alloc (dbg, struct loc_block_s,
 					   sizeof (struct loc_block_s), 1);
+  const unsigned char *data = (const unsigned char *) op->number2;
+  Dwarf_Word blength; // Ignored, equal to op->number.
+  get_uleb128 (blength, data);
   block->addr = op;
-  block->data = data + op->number2;
+  block->data = (unsigned char *) data;
   block->length = op->number;
   (void) tsearch (block, cache, loc_compare);
 }
@@ -412,11 +414,11 @@ __libdw_intern_expression (Dwarf *dbg, bool other_byte_order,
 	  if (unlikely (dbg == NULL))
 	    goto invalid;
 
+	  newloc->number2 = (Dwarf_Word) data; /* start of block inc. len.  */
 	  /* XXX Check size.  */
 	  get_uleb128 (newloc->number, data); /* Block length.  */
 	  if (unlikely ((Dwarf_Word) (end_data - data) < newloc->number))
 	    goto invalid;
-	  newloc->number2 = data - block->data; /* Relative block offset.  */
 	  data += newloc->number;		/* Skip the block.  */
 	  break;
 
@@ -437,17 +439,20 @@ __libdw_intern_expression (Dwarf *dbg, bool other_byte_order,
 	  break;
 
 	case DW_OP_GNU_const_type:
-	  /* XXX Check size.  */
-	  get_uleb128 (newloc->number, data);
-	  if (unlikely (data >= end_data))
-	    goto invalid;
-	  newloc->number2 = *data++; /* Block length.  */
-	  if (unlikely ((Dwarf_Word) (end_data - data) < newloc->number2))
-	    goto invalid;
-	  /* The third operand is relative block offset:
-		newloc->number3 = data - block->data;
-	     We don't support this at this point.  */
-	  data += newloc->number2;		/* Skip the block.  */
+	  {
+	    size_t size;
+
+	    /* XXX Check size.  */
+	    get_uleb128 (newloc->number, data);
+	    if (unlikely (data >= end_data))
+	      goto invalid;
+
+	    newloc->number2 = (Dwarf_Word) data; /* start of block inc. len.  */
+	    size = *data++;
+	    if (unlikely ((Dwarf_Word) (end_data - data) < size))
+	      goto invalid;
+	    data += size;		/* Skip the block.  */
+	  }
 	  break;
 
 	default:
@@ -505,7 +510,7 @@ __libdw_intern_expression (Dwarf *dbg, bool other_byte_order,
       result[n].offset = loclist->offset;
 
       if (result[n].atom == DW_OP_implicit_value)
-	store_implicit_value (dbg, cache, &result[n], block->data);
+	store_implicit_value (dbg, cache, &result[n]);
 
       loclist = loclist->next;
     }

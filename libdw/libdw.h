@@ -664,6 +664,29 @@ extern int dwarf_getlocation_implicit_pointer (Dwarf_Attribute *attr,
 					       Dwarf_Attribute *result)
   __nonnull_attribute__ (2, 3);
 
+/* Return the DIE associated with an operation such as
+   DW_OP_GNU_implicit_pointer, DW_OP_GNU_parameter_ref, DW_OP_GNU_convert,
+   DW_OP_GNU_reinterpret, DW_OP_GNU_const_type, DW_OP_GNU_regval_type or
+   DW_OP_GNU_deref_type.  The OP pointer must point into an expression that
+   dwarf_getlocation or dwarf_getlocation_addr has returned given the same
+   ATTR.  The RESULT is a DIE that expresses a type or value needed by the
+   given OP.  */
+extern int dwarf_getlocation_die (Dwarf_Attribute *attr,
+				  const Dwarf_Op *op,
+				  Dwarf_Die *result)
+  __nonnull_attribute__ (2, 3);
+
+/* Return the attribute expressing a value associated with an operation such
+   as DW_OP_implicit_value, DW_OP_GNU_entry_value or DW_OP_GNU_const_type.
+   The OP pointer must point into an expression that dwarf_getlocation
+   or dwarf_getlocation_addr has returned given the same ATTR.
+   The RESULT is a value expressed by an attribute such as DW_AT_location
+   or DW_AT_const_value.  */
+extern int dwarf_getlocation_attr (Dwarf_Attribute *attr,
+				   const Dwarf_Op *op,
+				   Dwarf_Attribute *result)
+  __nonnull_attribute__ (2, 3);
+
 
 /* Compute the byte-size of a type DIE according to DWARF rules.
    For most types, this is just DW_AT_byte_size.

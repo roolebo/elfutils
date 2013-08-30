@@ -1,5 +1,5 @@
 /* Internal definitions for libdwarf.
-   Copyright (C) 2002-2011 Red Hat, Inc.
+   Copyright (C) 2002-2011, 2013 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -654,6 +654,7 @@ INTDECL (dwarf_formudata)
 INTDECL (dwarf_getarange_addr)
 INTDECL (dwarf_getarangeinfo)
 INTDECL (dwarf_getaranges)
+INTDECL (dwarf_getlocation_die)
 INTDECL (dwarf_getsrcfiles)
 INTDECL (dwarf_getsrclines)
 INTDECL (dwarf_hasattr)

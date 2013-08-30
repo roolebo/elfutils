@@ -1,3 +1,22 @@
+2013-08-24  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_getlocation.c (store_implicit_value): Don't take data
+	as argument, get block data from op number2. Return false when
+	block data length and op number don't match up.
+	(__libdw_intern_expression): Store start of block for
+	DW_OP_implicit_value and DW_OP_GNU_entry_value instead of
+	relative data offset. Also store block start (including length)
+	for DW_OP_GNU_const_type. Don't pass data to store_implicit_value.
+	* dwarf_getlocation_attr.c: New file.
+	* dwarf_getlocation_die.c: Likewise.
+	* libdw.h (dwarf_getlocation_die): New function definition.
+	(dwarf_getlocation_attr): Likewise.
+	* libdwP.h: Declare internal dwarf_getlocation_die.
+	* libdw.map (ELFUTILS_0.157): Add dwarf_getlocation_die and
+	dwarf_getlocation_attr.
+	* Makefile.am (libdw_a_SOURCES): Add dwarf_getlocation_die.c and
+	dwarf_getlocation_attr.c.
+
 2013-08-23  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_getlocation.c (attr_ok): Also accept DW_AT_segment.

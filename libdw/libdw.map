@@ -264,4 +264,6 @@ ELFUTILS_0.156 {
 ELFUTILS_0.157 {
   global:
     dwarf_getlocations;
+    dwarf_getlocation_die;
+    dwarf_getlocation_attr;
 } ELFUTILS_0.156;

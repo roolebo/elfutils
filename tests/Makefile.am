@@ -52,7 +52,7 @@ check_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  test-flag-nobits dwarf-getstring rerequest_tag \
 		  alldts md5-sha1-test typeiter low_high_pc \
 		  test-elf_cntl_gelf_getshdr dwflsyms dwfllines \
-		  dwfl-report-elf-align
+		  dwfl-report-elf-align varlocs
 asm_TESTS = asm-tst1 asm-tst2 asm-tst3 asm-tst4 asm-tst5 \
 	    asm-tst6 asm-tst7 asm-tst8 asm-tst9
 
@@ -89,7 +89,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-test-archive64.sh run-readelf-vmcoreinfo.sh \
 	run-readelf-mixed-corenote.sh run-dwfllines.sh \
 	run-dwfl-report-elf-align.sh run-addr2line-test.sh \
-	run-addr2line-i-test.sh
+	run-addr2line-i-test.sh run-varlocs.sh
 
 if !STANDALONE
 check_PROGRAMS += msg_tst md5-sha1-test
@@ -205,7 +205,13 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-addr2line-i-test.sh testfile-inlines.bz2 \
 	     testfileppc32.bz2 testfileppc64.bz2 \
 	     testfiles390.bz2 testfiles390x.bz2 \
-	     testfilearm.bz2
+	     testfilearm.bz2 \
+	     run-varlocs.sh \
+	     testfile_const_type.c testfile_const_type.bz2 \
+	     testfile_implicit_pointer.c testfile_implicit_pointer.bz2 \
+	     testfile_parameter_ref.c testfile_parameter_ref.bz2 \
+	     testfile_entry_value.c testfile_entry_value.bz2 \
+	     testfile_implicit_value.c testfile_implicit_value.bz2
 
 if USE_VALGRIND
 valgrind_cmd='valgrind -q --trace-children=yes --error-exitcode=1 --run-libc-freeres=no'
@@ -330,6 +336,7 @@ test_elf_cntl_gelf_getshdr_LDADD = $(libelf) $(libmudflap)
 dwflsyms_LDADD = $(libdw) $(libelf) $(libmudflap)
 dwfllines_LDADD = $(libdw) $(libelf) $(libmudflap)
 dwfl_report_elf_align_LDADD = $(libdw) $(libmudflap)
+varlocs_LDADD = $(libdw) $(libelf) $(libmudflap)
 
 if GCOV
 check: check-am coverage

@@ -1,3 +1,26 @@
+2013-08-30  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (check_PROGRAMS): Add varlocs.
+	(TESTS): Add run-varlocs.sh.
+	(EXTRA_DIST): Add run-varlocs.sh, testfile_const_type.c,
+	testfile_const_type.bz2, testfile_implicit_pointer.c,
+	testfile_implicit_pointer.bz2, testfile_parameter_ref.c,
+	testfile_entry_value.c, testfile_entry_value.bz2,
+	testfile_implicit_value.c and testfile_implicit_value.bz2.
+	(varlocs_LDADD): New.
+	* run-varlocs: New test.
+	* testfile_const_type.c: New test source file.
+	* testfile_entry_value.c: Likewise.
+	* testfile_implicit_pointer.c: Likewise.
+	* testfile_implicit_value.c: Likewise.
+	* testfile_parameter_ref.c: Likewise.
+	* testfile_const_type.bz2: New test file.
+	* testfile_entry_value.bz2: Likewise.
+	* testfile_implicit_pointer.bz2: Likewise.
+	* testfile_implicit_value.bz2: Likewise.
+	* testfile_parameter_ref.bz2: Likewise.
+	* varlocs.c: New test source.
+
 2013-08-29  Mark Wielaard  <mjw@redhat.com>
 
 	* run-addrcfi.sh: Add case for EM_ARM.

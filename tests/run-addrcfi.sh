@@ -2496,3 +2496,79 @@ testrun_compare ${abs_builddir}/addrcfi -e testfiles390x 0x0000000080000510 <<\E
 	control reg65 (%pswa): undefined
 handle_cfi no CFI (.debug_frame): no error
 EOF
+
+# EM_ARM (function bar 0x00008510)
+# Note. Only in .debug_frame, the .eh_frame is actually empty.
+# Same as s390 and ppc above.
+testfiles testfilearm
+testrun_compare ${abs_builddir}/addrcfi -e testfilearm 0x00008510 <<\EOF
+dwarf_cfi_addrframe (.eh_frame): no matching address range
+.debug_frame has 0x8510 => [0x8510, 0x8524):
+	return address in reg14
+	CFA location expression: bregx(13)
+	integer reg0 (r0): undefined
+	integer reg1 (r1): undefined
+	integer reg2 (r2): undefined
+	integer reg3 (r3): undefined
+	integer reg4 (r4): same_value
+	integer reg5 (r5): same_value
+	integer reg6 (r6): same_value
+	integer reg7 (r7): same_value
+	integer reg8 (r8): same_value
+	integer reg9 (r9): undefined
+	integer reg10 (r10): same_value
+	integer reg11 (r11): same_value
+	integer reg12 (r12): undefined
+	integer reg13 (sp): undefined
+	integer reg14 (lr): same_value
+	integer reg15 (pc): location expression: regx(14)
+	FPA reg16 (f0): undefined
+	FPA reg17 (f1): undefined
+	FPA reg18 (f2): undefined
+	FPA reg19 (f3): undefined
+	FPA reg20 (f4): undefined
+	FPA reg21 (f5): undefined
+	FPA reg22 (f6): undefined
+	FPA reg23 (f7): undefined
+	FPA reg96 (f0): undefined
+	FPA reg97 (f1): undefined
+	FPA reg98 (f2): undefined
+	FPA reg99 (f3): undefined
+	FPA reg100 (f4): undefined
+	FPA reg101 (f5): undefined
+	FPA reg102 (f6): undefined
+	FPA reg103 (f7): undefined
+	integer reg128 (spsr): undefined
+	VFP reg256 (d0): undefined
+	VFP reg257 (d1): undefined
+	VFP reg258 (d2): undefined
+	VFP reg259 (d3): undefined
+	VFP reg260 (d4): undefined
+	VFP reg261 (d5): undefined
+	VFP reg262 (d6): undefined
+	VFP reg263 (d7): undefined
+	VFP reg264 (d8): same_value
+	VFP reg265 (d9): same_value
+	VFP reg266 (d10): same_value
+	VFP reg267 (d11): same_value
+	VFP reg268 (d12): same_value
+	VFP reg269 (d13): same_value
+	VFP reg270 (d14): same_value
+	VFP reg271 (d15): same_value
+	VFP reg272 (d16): undefined
+	VFP reg273 (d17): undefined
+	VFP reg274 (d18): undefined
+	VFP reg275 (d19): undefined
+	VFP reg276 (d20): undefined
+	VFP reg277 (d21): undefined
+	VFP reg278 (d22): undefined
+	VFP reg279 (d23): undefined
+	VFP reg280 (d24): undefined
+	VFP reg281 (d25): undefined
+	VFP reg282 (d26): undefined
+	VFP reg283 (d27): undefined
+	VFP reg284 (d28): undefined
+	VFP reg285 (d29): undefined
+	VFP reg286 (d30): undefined
+	VFP reg287 (d31): undefined
+EOF

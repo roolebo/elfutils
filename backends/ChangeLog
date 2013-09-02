@@ -1,3 +1,9 @@
+2013-08-29  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (arm_SRCS): Add arm_cfi.c.
+	* arm_cfi.c: New file.
+	* arm_init.c (arm_init): Initialize abi_cfi.
+
 2013-08-27  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* Makefile.am (ppc_SRCS, ppc64_SRCS): Add ppc_cfi.c.

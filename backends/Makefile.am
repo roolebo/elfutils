@@ -75,7 +75,7 @@ libebl_alpha_pic_a_SOURCES = $(alpha_SRCS)
 am_libebl_alpha_pic_a_OBJECTS = $(alpha_SRCS:.c=.os)
 
 arm_SRCS = arm_init.c arm_symbol.c arm_regs.c arm_corenote.c \
-	   arm_auxv.c arm_attrs.c arm_retval.c
+	   arm_auxv.c arm_attrs.c arm_retval.c arm_cfi.c
 libebl_arm_pic_a_SOURCES = $(arm_SRCS)
 am_libebl_arm_pic_a_OBJECTS = $(arm_SRCS:.c=.os)
 

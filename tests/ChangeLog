@@ -1,3 +1,9 @@
+2013-08-29  Mark Wielaard  <mjw@redhat.com>
+
+	* run-addrcfi.sh: Add case for EM_ARM.
+	* testfilearm.bz2: New testfile.
+	* Makefile.am (EXTRA_DIST): Add testfilesarm.bz2.
+
 2013-08-28  Mark Wielaard  <mjw@redhat.com>
 
 	* addrcfi.c (handle_cfi): Handle .debug_frame or .eh_frame

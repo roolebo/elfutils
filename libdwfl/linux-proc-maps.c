@@ -221,7 +221,6 @@ proc_maps_report (Dwfl *dwfl, FILE *f, GElf_Addr sysinfo_ehdr, pid_t pid)
 	    {
 	    bad_report:
 	      free (line);
-	      fclose (f);
 	      return -1;
 	    }
 

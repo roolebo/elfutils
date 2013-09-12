@@ -204,7 +204,10 @@ intern_cu (Dwfl_Module *mod, Dwarf_Off cuoff, struct dwfl_cu **result)
 	  /* XXX use non-searching lookup */
 	  Dwarf_Die *die = INTUSE(dwarf_offdie) (mod->dw, cuoff, &cu->die);
 	  if (die == NULL)
-	    return DWFL_E_LIBDW;
+	    {
+	      free (cu);
+	      return DWFL_E_LIBDW;
+	    }
 	  assert (die == &cu->die);
 
 	  struct dwfl_cu **newvec = realloc (mod->cu, ((mod->ncu + 1)

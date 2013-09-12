@@ -1,5 +1,9 @@
 2013-09-12  Mark Wielaard  <mjw@redhat.com>
 
+	* cu.c (intern_cu): If dwarf_offdie fails free cu.
+
+2013-09-12  Mark Wielaard  <mjw@redhat.com>
+
 	* linux-proc-maps.c (proc_maps_report): Don't fclose FILE in
 	bad_report.
 

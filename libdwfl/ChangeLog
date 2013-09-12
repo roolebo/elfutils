@@ -1,3 +1,8 @@
+2013-09-12  Mark Wielaard  <mjw@redhat.com>
+
+	* dwfl_module_getdwarf.c (find_symtab): Call elf_getdata with
+	aux_xndxscn, not xndxscn, for aux_symxndxdata.
+
 2013-08-25  Mark Wielaard  <mjw@redhat.com>
 
 	* linux-kernel-modules.c (report_kernel): Pass add_p_vaddr as true

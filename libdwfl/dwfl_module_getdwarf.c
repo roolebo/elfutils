@@ -1077,7 +1077,7 @@ find_symtab (Dwfl_Module *mod)
 	mod->aux_symxndxdata = NULL;
       else
 	{
-	  mod->aux_symxndxdata = elf_getdata (xndxscn, NULL);
+	  mod->aux_symxndxdata = elf_getdata (aux_xndxscn, NULL);
 	  if (mod->aux_symxndxdata == NULL)
 	    goto aux_cleanup;
 	}

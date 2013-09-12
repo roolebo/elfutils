@@ -83,7 +83,11 @@ intern_fde (Dwarf_CFI *cache, const Dwarf_FDE *entry)
 				    &fde->instructions, &fde->start))
       || unlikely (read_encoded_value (cache, cie->fde_encoding & 0x0f,
 				       &fde->instructions, &fde->end)))
-    return NULL;
+    {
+      free (fde);
+      __libdw_seterrno (DWARF_E_INVALID_DWARF);
+      return NULL;
+    }
   fde->end += fde->start;
 
   fde->cie = cie;

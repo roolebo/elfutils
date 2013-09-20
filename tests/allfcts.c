@@ -1,4 +1,4 @@
-/* Copyright (C) 2005 Red Hat, Inc.
+/* Copyright (C) 2005, 2013 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -34,7 +34,7 @@ cb (Dwarf_Die *func, void *arg __attribute__ ((unused)))
 
   printf ("%s:%d:%s\n", file, line, fct);
 
-  return DWARF_CB_OK;
+  return DWARF_CB_ABORT;
 }
 
 
@@ -57,7 +57,13 @@ main (int argc, char *argv[])
 	      Dwarf_Die die_mem;
 	      Dwarf_Die *die = dwarf_offdie (dbg, off + cuhl, &die_mem);
 
-	      (void) dwarf_getfuncs (die, cb, NULL, 0);
+	      /* Explicitly stop in the callback and then resume each time.  */
+	      ptrdiff_t doff = 0;
+	      do
+		{
+		  doff = dwarf_getfuncs (die, cb, NULL, doff);
+		}
+	      while (doff > 0);
 
 	      off = noff;
 	    }

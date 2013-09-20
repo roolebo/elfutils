@@ -1,3 +1,13 @@
+2013-09-20  Mark Wielaard  <mjw@redhat.com>
+
+	* allfcts.c (cb): Return DWARF_CB_ABORT.
+	(main): Iterate over all offsets returned by dwarf_getfuncs.
+	* run-allfcts.sh: Add nested_funcs and class_func testcases.
+	* testfile_nested_funcs.bz2: New test file.
+	* testfile_class_func.bz2: Likewise.
+	* Makefile.am (EXTRA_DIST): Add testfile_class_func.bz2 and
+	testfile_nested_funcs.bz2.
+
 2013-08-30  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (check_PROGRAMS): Add varlocs.

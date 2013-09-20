@@ -747,7 +747,16 @@ extern Dwarf_Arange *dwarf_getarange_addr (Dwarf_Aranges *aranges,
 
 
 
-/* Get functions in CUDIE.  */
+/* Get functions in CUDIE.  The given callback will be called for all
+   defining DW_TAG_subprograms in the CU DIE tree.  If the callback
+   returns DWARF_CB_ABORT the return value can be used as offset argument
+   to resume the function to find all remaining functions (this is not
+   really recommended, since it needs to rewalk the CU DIE tree first till
+   that offset is found again).  If the callback returns DWARF_CB_OK
+   dwarf_getfuncs will not return but keep calling the callback for each
+   function DIE it finds.  Pass zero for offset on the first call to walk
+   the full CU DIE tree.  If no more functions can be found and the callback
+   returned DWARF_CB_OK then the function returns zero.  */
 extern ptrdiff_t dwarf_getfuncs (Dwarf_Die *cudie,
 				 int (*callback) (Dwarf_Die *, void *),
 				 void *arg, ptrdiff_t offset);

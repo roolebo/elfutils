@@ -33,10 +33,9 @@
 #include "libdwP.h"
 #include <dwarf.h>
 
-enum die_class { ignore, match, match_inline, walk, imported };
 
-static enum die_class
-classify_die (Dwarf_Die *die)
+static bool
+may_have_scopes (Dwarf_Die *die)
 {
   switch (INTUSE(dwarf_tag) (die))
     {
@@ -48,31 +47,21 @@ classify_die (Dwarf_Die *die)
     case DW_TAG_catch_block:
     case DW_TAG_try_block:
     case DW_TAG_entry_point:
-      return match;
     case DW_TAG_inlined_subroutine:
-      return match_inline;
     case DW_TAG_subprogram:
-      /* This might be a concrete out-of-line instance of an inline, in
-	 which case it is not guaranteed to be owned by the right scope and
-	 we will search for its origin as for DW_TAG_inlined_subroutine.  */
-      return (INTUSE(dwarf_hasattr) (die, DW_AT_abstract_origin)
-	      ? match_inline : match);
+      return true;
 
       /* DIEs without addresses that can own DIEs with addresses.  */
     case DW_TAG_namespace:
     case DW_TAG_class_type:
     case DW_TAG_structure_type:
-      return walk;
-
-      /* Special indirection required.  */
-    case DW_TAG_imported_unit:
-      return imported;
+      return true;
 
       /* Other DIEs we have no reason to descend.  */
     default:
       break;
     }
-  return ignore;
+  return false;
 }
 
 int
@@ -104,7 +93,7 @@ __libdw_visit_scopes (depth, root, previsit, postvisit, arg)
 	   that unit are siblings of the other children.  So don't do
 	   a full recursion into the imported unit, but just walk the
 	   children in place before moving to the next real child.  */
-	while (classify_die (&child.die) == imported)
+	while (INTUSE(dwarf_tag) (&child.die) == DW_TAG_imported_unit)
 	  {
 	    Dwarf_Die orig_child_die = child.die;
 	    Dwarf_Attribute attr_mem;
@@ -134,23 +123,13 @@ __libdw_visit_scopes (depth, root, previsit, postvisit, arg)
 	      return result;
 	  }
 
-	if (!child.prune)
-	  switch (classify_die (&child.die))
-	    {
-	    case match:
-	    case match_inline:
-	    case walk:
-	      if (INTUSE(dwarf_haschildren) (&child.die))
-		{
-		  int result = recurse ();
-		  if (result != DWARF_CB_OK)
-		    return result;
-		}
-	      break;
-
-	    default:
-	      break;
-	    }
+	if (!child.prune && may_have_scopes (&child.die)
+	    && INTUSE(dwarf_haschildren) (&child.die))
+	  {
+	    int result = recurse ();
+	    if (result != DWARF_CB_OK)
+	      return result;
+	  }
 
 	if (postvisit != NULL)
 	  {

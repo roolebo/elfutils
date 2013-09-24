@@ -1,3 +1,11 @@
+2013-09-24  Josh Stone  <jistone@redhat.com>
+
+	* libdw_visit_scopes.c (classify_die): Removed.
+	(may_have_scopes): New function to replace classify_die.  There's no
+	need for full classification; just find tags that may contain scopes.
+	(__libdw_visit_scopes): Use a direct tag comparison for imported
+	units, and use may_have_scopes to test if recursion is needed.
+
 2013-09-20  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_getfuncs.c (visitor_info): New struct.

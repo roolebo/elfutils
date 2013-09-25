@@ -42,6 +42,7 @@
 #include <unistd.h>
 #include <sys/param.h>
 #include <sys/stat.h>
+#include <signal.h>
 
 #include <system.h>
 #include "../libelf/libelfP.h"
@@ -8616,6 +8617,104 @@ handle_auxv_note (Ebl *ebl, Elf *core, GElf_Word descsz, GElf_Off desc_pos)
     }
 }
 
+static bool
+buf_has_data (unsigned char const *ptr, unsigned char const *end, size_t sz)
+{
+  return ptr < end && (size_t) (end - ptr) >= sz;
+}
+
+static bool
+buf_read_int (Elf *core, unsigned char const **ptrp, unsigned char const *end,
+	      int *retp)
+{
+  if (! buf_has_data (*ptrp, end, 4))
+    return false;
+
+  *ptrp = convert (core, ELF_T_WORD, 1, retp, *ptrp, 4);
+  return true;
+}
+
+static bool
+buf_read_ulong (Elf *core, unsigned char const **ptrp, unsigned char const *end,
+		uint64_t *retp)
+{
+  size_t sz = gelf_fsize (core, ELF_T_ADDR, 1, EV_CURRENT);
+  if (! buf_has_data (*ptrp, end, sz))
+    return false;
+
+  union
+  {
+    uint64_t u64;
+    uint32_t u32;
+  } u;
+
+  *ptrp = convert (core, ELF_T_ADDR, 1, &u, *ptrp, sizeof u);
+
+  if (sz == 4)
+    *retp = u.u32;
+  else
+    *retp = u.u64;
+  return true;
+}
+
+static void
+handle_siginfo_note (Elf *core, GElf_Word descsz, GElf_Off desc_pos)
+{
+  Elf_Data *data = elf_getdata_rawchunk (core, desc_pos, descsz, ELF_T_BYTE);
+  if (data == NULL)
+    error (EXIT_FAILURE, 0,
+	   gettext ("cannot convert core note data: %s"), elf_errmsg (-1));
+
+  unsigned char const *ptr = data->d_buf;
+  unsigned char const *const end = data->d_buf + data->d_size;
+
+  /* Siginfo head is three ints: signal number, error number, origin
+     code.  */
+  int si_signo, si_errno, si_code;
+  if (! buf_read_int (core, &ptr, end, &si_signo)
+      || ! buf_read_int (core, &ptr, end, &si_errno)
+      || ! buf_read_int (core, &ptr, end, &si_code))
+    {
+    fail:
+      printf ("    Not enough data in NT_SIGINFO note.\n");
+      return;
+    }
+
+  /* Next is a pointer-aligned union of structures.  On 64-bit
+     machines, that implies a word of padding.  */
+  if (gelf_getclass (core) == ELFCLASS64)
+    ptr += 4;
+
+  printf ("    si_signo: %d, si_errno: %d, si_code: %d\n",
+	  si_signo, si_errno, si_code);
+
+  if (si_code > 0)
+    switch (si_signo)
+      {
+      case SIGILL:
+      case SIGFPE:
+      case SIGSEGV:
+      case SIGBUS:
+	{
+	  uint64_t addr;
+	  if (! buf_read_ulong (core, &ptr, end, &addr))
+	    goto fail;
+	  printf ("    fault address: %#" PRIx64 "\n", addr);
+	  break;
+	}
+      default:
+	;
+      }
+  else if (si_code == SI_USER)
+    {
+      int pid, uid;
+      if (! buf_read_int (core, &ptr, end, &pid)
+	  || ! buf_read_int (core, &ptr, end, &uid))
+	goto fail;
+      printf ("    sender PID: %d, sender UID: %d\n", pid, uid);
+    }
+}
+
 static void
 handle_core_note (Ebl *ebl, const GElf_Nhdr *nhdr,
 		  const char *name, const void *desc)
@@ -8689,6 +8788,10 @@ handle_notes_data (Ebl *ebl, const GElf_Ehdr *ehdr,
 		  && !memcmp (name, "CORE", 4))
 		handle_auxv_note (ebl, ebl->elf, nhdr.n_descsz,
 				  start + desc_offset);
+	      else if (nhdr.n_type == NT_SIGINFO
+		       && nhdr.n_namesz == 5 && strcmp (name, "CORE") == 0)
+		handle_siginfo_note (ebl->elf, nhdr.n_descsz,
+				     start + desc_offset);
 	      else
 		handle_core_note (ebl, &nhdr, name, desc);
 	    }

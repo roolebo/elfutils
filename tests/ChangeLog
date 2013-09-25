@@ -1,3 +1,9 @@
+2013-09-26  Petr Machata  <pmachata@redhat.com>
+
+	* Makefile.am (EXTRA_DIST): Add testfile71.bz2.
+	* run-readelf-mixed-corenote.sh: New test for this file.
+	* testfile71.bz2: New file.
+
 2013-09-20  Mark Wielaard  <mjw@redhat.com>
 
 	* allfcts.c (cb): Return DWARF_CB_ABORT.

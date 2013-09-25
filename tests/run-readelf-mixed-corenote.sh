@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2012 Red Hat, Inc.
+# Copyright (C) 2012, 2013 Red Hat, Inc.
 # This file is part of elfutils.
 #
 # This file is free software; you can redistribute it and/or modify
@@ -215,6 +215,63 @@ Note segment of 852 bytes at offset 0x94:
     high_r9: 0x00000000, high_r10: 0x00000000, high_r11: 0x00000000
     high_r12: 0x000003ff, high_r13: 0x00000000, high_r14: 0x00000000
     high_r15: 0x00000000
+EOF
+
+# To reproduce this core dump, do this on x86_64 machine with Linux
+# 3.7 or later:
+# $ gcc -x c <(echo 'int main () { return *(int *)0x12345678; }')
+# $ ./a.out
+testfiles testfile71
+testrun_compare ${abs_top_builddir}/src/readelf -n testfile71 <<\EOF
+
+Note segment of 1476 bytes at offset 0x430:
+  Owner          Data size  Type
+  CORE                 336  PRSTATUS
+    info.si_signo: 11, info.si_code: 0, info.si_errno: 0, cursig: 11
+    sigpend: <>
+    sighold: <>
+    pid: 9664, ppid: 2868, pgrp: 9664, sid: 2868
+    utime: 0.000000, stime: 0.004000, cutime: 0.000000, cstime: 0.000000
+    orig_rax: -1, fpvalid: 0
+    r15:                       0  r14:                       0
+    r13:         140734971656848  r12:                 4195328
+    rbp:      0x00007fff69fe39b0  rbx:                       0
+    r11:            266286012928  r10:         140734971656256
+    r9:                        0  r8:             266289790592
+    rax:               305419896  rcx:                 4195584
+    rdx:         140734971656872  rsi:         140734971656856
+    rdi:                       1  rip:      0x00000000004004f9
+    rflags:   0x0000000000010246  rsp:      0x00007fff69fe39b0
+    fs.base:   0x00007fa1c8933740  gs.base:   0x0000000000000000
+    cs: 0x0033  ss: 0x002b  ds: 0x0000  es: 0x0000  fs: 0x0000  gs: 0x0000
+  CORE                 136  PRPSINFO
+    state: 0, sname: R, zomb: 0, nice: 0, flag: 0x0000000000000200
+    uid: 1000, gid: 1000, pid: 9664, ppid: 2868, pgrp: 9664, sid: 2868
+    fname: a.out, psargs: ./a.out 
+  CORE                 128  SIGINFO
+    si_signo: 11, si_errno: 0, si_code: 1
+    fault address: 0x12345678
+  CORE                 304  AUXV
+    SYSINFO_EHDR: 0x7fff69ffe000
+    HWCAP: 0xafebfbff  <fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss tm pbe>
+    PAGESZ: 4096
+    CLKTCK: 100
+    PHDR: 0x400040
+    PHENT: 56
+    PHNUM: 9
+    BASE: 0
+    FLAGS: 0
+    ENTRY: 0x400400
+    UID: 1000
+    EUID: 1000
+    GID: 1000
+    EGID: 1000
+    SECURE: 0
+    RANDOM: 0x7fff69fe3d19
+    EXECFN: 0x7fff69fe4ff0
+    PLATFORM: 0x7fff69fe3d29
+    NULL
+  CORE                 469  FILE
 EOF
 
 exit 0

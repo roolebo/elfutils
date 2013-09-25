@@ -198,7 +198,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-readelf-mixed-corenote.sh testfile63.bz2 testfile64.bz2 \
 	     testfile65.bz2 testfile67.bz2 testfile68.bz2 \
 	     testfile69.core.bz2 testfile69.so.bz2 \
-	     testfile70.core.bz2 testfile70.exec.bz2 \
+	     testfile70.core.bz2 testfile70.exec.bz2 testfile71.bz2 \
 	     run-dwfllines.sh run-dwfl-report-elf-align.sh \
 	     testfile-dwfl-report-elf-align-shlib.so.bz2 \
 	     testfilenolines.bz2 test-core-lib.so.bz2 test-core.core.bz2 \

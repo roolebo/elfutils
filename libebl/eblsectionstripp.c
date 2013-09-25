@@ -1,5 +1,5 @@
 /* Check whether section can be stripped.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2013 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -51,7 +51,7 @@ ebl_section_strip_p (Ebl *ebl, const GElf_Ehdr *ehdr, const GElf_Shdr *shdr,
 	  Elf_Scn *scn_l = elf_getscn (ebl->elf, (shdr)->sh_info);
 	  GElf_Shdr shdr_mem_l;
 	  GElf_Shdr *shdr_l = gelf_getshdr (scn_l, &shdr_mem_l);
-	  if (shdr_l == NULL)
+	  if (shdr_l != NULL)
 	    {
 	      const char *s_l = elf_strptr (ebl->elf, ehdr->e_shstrndx,
 					    shdr_l->sh_name);

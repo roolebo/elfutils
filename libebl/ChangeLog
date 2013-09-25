@@ -1,3 +1,8 @@
+2013-09-26  Petr Machata  <pmachata@redhat.com>
+
+	* eblcorenotetypename.c: Handle NT_ARM_TLS, NT_ARM_HW_BREAK,
+	NT_ARM_HW_WATCH, NT_SIGINFO, NT_FILE.
+
 2013-09-25  Mark Wielaard  <mjw@redhat.com>
 
 	* eblsectionstripp.c (ebl_section_strip_p): Check shdr_l is not NULL.

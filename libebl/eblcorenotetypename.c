@@ -1,5 +1,5 @@
 /* Return note type name.
-   Copyright (C) 2002, 2007, 2008, 2012 Red Hat, Inc.
+   Copyright (C) 2002, 2007, 2008, 2012, 2013 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -91,6 +91,11 @@ ebl_core_note_type_name (ebl, type, buf, len)
 	    KNOWNSTYPE (S390_LAST_BREAK);
 	    KNOWNSTYPE (S390_SYSTEM_CALL);
 	    KNOWNSTYPE (ARM_VFP);
+	    KNOWNSTYPE (ARM_TLS);
+	    KNOWNSTYPE (ARM_HW_BREAK);
+	    KNOWNSTYPE (ARM_HW_WATCH);
+	    KNOWNSTYPE (SIGINFO);
+	    KNOWNSTYPE (FILE);
 #undef KNOWNSTYPE
 
 	  default:

@@ -1,5 +1,10 @@
 2013-09-26  Petr Machata  <pmachata@redhat.com>
 
+	* run-readelf-mixed-corenote.sh: Update output of testfile71
+	dump--readelf can newly decode the NT_FILE note.
+
+2013-09-26  Petr Machata  <pmachata@redhat.com>
+
 	* Makefile.am (EXTRA_DIST): Add testfile71.bz2.
 	* run-readelf-mixed-corenote.sh: New test for this file.
 	* testfile71.bz2: New file.

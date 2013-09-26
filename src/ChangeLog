@@ -1,5 +1,10 @@
 2013-09-26  Petr Machata  <pmachata@redhat.com>
 
+	* readelf.c (handle_file_note): New function.
+	(handle_notes_data): Call it to handle NT_FILE notes.
+
+2013-09-26  Petr Machata  <pmachata@redhat.com>
+
 	* readelf.c (handle_siginfo_note): New function.
 	(handle_notes_data): Call it to handle NT_SIGINFO notes.
 	(buf_read_int, buf_read_ulong, buf_has_data): New functions.

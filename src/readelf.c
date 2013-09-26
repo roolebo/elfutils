@@ -8716,6 +8716,53 @@ handle_siginfo_note (Elf *core, GElf_Word descsz, GElf_Off desc_pos)
 }
 
 static void
+handle_file_note (Elf *core, GElf_Word descsz, GElf_Off desc_pos)
+{
+  Elf_Data *data = elf_getdata_rawchunk (core, desc_pos, descsz, ELF_T_BYTE);
+  if (data == NULL)
+    error (EXIT_FAILURE, 0,
+	   gettext ("cannot convert core note data: %s"), elf_errmsg (-1));
+
+  unsigned char const *ptr = data->d_buf;
+  unsigned char const *const end = data->d_buf + data->d_size;
+
+  uint64_t count, page_size;
+  if (! buf_read_ulong (core, &ptr, end, &count)
+      || ! buf_read_ulong (core, &ptr, end, &page_size))
+    {
+    fail:
+      printf ("    Not enough data in NT_FILE note.\n");
+      return;
+    }
+
+  /* Where file names are stored.  */
+  unsigned char const *const fstart
+    = ptr + 3 * count * gelf_fsize (core, ELF_T_ADDR, 1, EV_CURRENT);
+  char const *fptr = (char *) fstart;
+
+  printf ("    %" PRId64 " files:\n", count);
+  for (uint64_t i = 0; i < count; ++i)
+    {
+      uint64_t mstart, mend, moffset;
+      if (! buf_read_ulong (core, &ptr, fstart, &mstart)
+	  || ! buf_read_ulong (core, &ptr, fstart, &mend)
+	  || ! buf_read_ulong (core, &ptr, fstart, &moffset))
+	goto fail;
+
+      const char *fnext = memchr (fptr, '\0', (char *) end - fptr);
+      if (fnext == NULL)
+	goto fail;
+
+      int ct = printf ("      %08" PRIx64 "-%08" PRIx64
+		       " %08" PRIx64 " %" PRId64,
+		       mstart, mend, moffset * page_size, mend - mstart);
+      printf ("%*s%s\n", ct > 50 ? 3 : 53 - ct, "", fptr);
+
+      fptr = fnext + 1;
+    }
+}
+
+static void
 handle_core_note (Ebl *ebl, const GElf_Nhdr *nhdr,
 		  const char *name, const void *desc)
 {
@@ -8788,10 +8835,22 @@ handle_notes_data (Ebl *ebl, const GElf_Ehdr *ehdr,
 		  && !memcmp (name, "CORE", 4))
 		handle_auxv_note (ebl, ebl->elf, nhdr.n_descsz,
 				  start + desc_offset);
-	      else if (nhdr.n_type == NT_SIGINFO
-		       && nhdr.n_namesz == 5 && strcmp (name, "CORE") == 0)
-		handle_siginfo_note (ebl->elf, nhdr.n_descsz,
-				     start + desc_offset);
+	      else if (nhdr.n_namesz == 5 && strcmp (name, "CORE") == 0)
+		switch (nhdr.n_type)
+		  {
+		  case NT_SIGINFO:
+		    handle_siginfo_note (ebl->elf, nhdr.n_descsz,
+					 start + desc_offset);
+		    break;
+
+		  case NT_FILE:
+		    handle_file_note (ebl->elf, nhdr.n_descsz,
+				      start + desc_offset);
+		    break;
+
+		  default:
+		    handle_core_note (ebl, &nhdr, name, desc);
+		  }
 	      else
 		handle_core_note (ebl, &nhdr, name, desc);
 	    }

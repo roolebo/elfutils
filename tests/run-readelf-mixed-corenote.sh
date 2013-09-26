@@ -272,6 +272,17 @@ Note segment of 1476 bytes at offset 0x430:
     PLATFORM: 0x7fff69fe3d29
     NULL
   CORE                 469  FILE
+    10 files:
+      00400000-00401000 00000000 4096                /home/petr/a.out
+      00600000-00601000 00000000 4096                /home/petr/a.out
+      00601000-00602000 00001000 4096                /home/petr/a.out
+      3dffa00000-3dffa21000 00000000 135168          /usr/lib64/ld-2.17.so
+      3dffc20000-3dffc21000 00020000 4096            /usr/lib64/ld-2.17.so
+      3dffc21000-3dffc22000 00021000 4096            /usr/lib64/ld-2.17.so
+      3dffe00000-3dfffb6000 00000000 1794048         /usr/lib64/libc-2.17.so
+      3dfffb6000-3e001b6000 001b6000 2097152         /usr/lib64/libc-2.17.so
+      3e001b6000-3e001ba000 001b6000 16384           /usr/lib64/libc-2.17.so
+      3e001ba000-3e001bc000 001ba000 8192            /usr/lib64/libc-2.17.so
 EOF
 
 exit 0

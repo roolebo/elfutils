@@ -8,14 +8,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ja\n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2013-07-23 17:36+0200\n"
+"POT-Creation-Date: 2013-09-27 12:57+0200\n"
 "PO-Revision-Date: 2009-09-20 15:32+0900\n"
 "Last-Translator: Hyu_gabaru Ryu_ichi <hyu_gabaru@yahoo.co.jp>\n"
 "Language-Team: Japanese <jp@li.org>\n"
-"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: ja\n"
 "X-Generator: KBabel 1.11.4\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
@@ -629,21 +629,27 @@ msgstr ""
 msgid "Treat addresses as offsets relative to NAME section."
 msgstr ""
 
-#: src/addr2line.c:68 src/elfcmp.c:72 src/findtextrel.c:67 src/nm.c:100
+#: src/addr2line.c:68
+msgid ""
+"Show all source locations that caused inline expansion of subroutines at the "
+"address."
+msgstr ""
+
+#: src/addr2line.c:71 src/elfcmp.c:72 src/findtextrel.c:67 src/nm.c:100
 #: src/strings.c:75
 msgid "Miscellaneous:"
 msgstr "雑則:"
 
-#: src/addr2line.c:77
+#: src/addr2line.c:80
 msgid ""
 "Locate source files and line information for ADDRs (in a.out by default)."
 msgstr ""
 
-#: src/addr2line.c:81
+#: src/addr2line.c:84
 msgid "[ADDR...]"
 msgstr ""
 
-#: src/addr2line.c:182 src/ar.c:289 src/elfcmp.c:662 src/elflint.c:231
+#: src/addr2line.c:192 src/ar.c:289 src/elfcmp.c:662 src/elflint.c:231
 #: src/findtextrel.c:162 src/ld.c:949 src/nm.c:265 src/objdump.c:181
 #: src/ranlib.c:128 src/readelf.c:499 src/size.c:211 src/strings.c:219
 #: src/strip.c:213 src/unstrip.c:226
@@ -657,7 +663,7 @@ msgstr ""
 "This is free software; see the source for copying conditions.  There is NO\n"
 "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
 
-#: src/addr2line.c:187 src/ar.c:294 src/elfcmp.c:667 src/elflint.c:236
+#: src/addr2line.c:197 src/ar.c:294 src/elfcmp.c:667 src/elflint.c:236
 #: src/findtextrel.c:167 src/ld.c:954 src/nm.c:270 src/objdump.c:186
 #: src/ranlib.c:133 src/readelf.c:504 src/size.c:216 src/strings.c:224
 #: src/strip.c:218 src/unstrip.c:231
@@ -665,22 +671,22 @@ msgstr ""
 msgid "Written by %s.\n"
 msgstr "%s によって書かれました。\n"
 
-#: src/addr2line.c:406
+#: src/addr2line.c:437
 #, c-format
 msgid "Section syntax requires exactly one module"
 msgstr ""
 
-#: src/addr2line.c:429
+#: src/addr2line.c:460
 #, c-format
 msgid "offset %#<PRIxMAX> lies outside section '%s'"
 msgstr ""
 
-#: src/addr2line.c:470
+#: src/addr2line.c:525
 #, c-format
 msgid "cannot find symbol '%s'"
 msgstr ""
 
-#: src/addr2line.c:475
+#: src/addr2line.c:530
 #, c-format
 msgid "offset %#<PRIxMAX> lies outside contents of '%s'"
 msgstr ""
@@ -1489,8 +1495,8 @@ msgid ""
 "section [%2d] '%s': symbol %zu: st_value out of bounds of referenced section "
 "[%2d] '%s'\n"
 msgstr ""
-"セクション [%2d] '%s': シンボル %zu: st_value 参照されるセクション [%2d] "
-"'%s' の境界外\n"
+"セクション [%2d] '%s': シンボル %zu: st_value 参照されるセクション [%2d] '%"
+"s' の境界外\n"
 
 #: src/elflint.c:839
 #, c-format
@@ -1503,8 +1509,8 @@ msgstr ""
 #: src/elflint.c:847
 #, c-format
 msgid ""
-"section [%2d] '%s': symbol %zu: st_value short of referenced section [%2d] "
-"'%s'\n"
+"section [%2d] '%s': symbol %zu: st_value short of referenced section [%2d] '%"
+"s'\n"
 msgstr ""
 "セクション [%2d] '%s': シンボル %zu: 参照されるセクション [%2d] '%s' の"
 "st_value 不足\n"
@@ -1535,17 +1541,17 @@ msgstr "セクション [%2d] '%s': シンボル %zu: 非ローカルセクシ�
 #: src/elflint.c:938
 #, c-format
 msgid ""
-"section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to bad section "
-"[%2d]\n"
+"section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to bad section [%"
+"2d]\n"
 msgstr ""
-"セクション [%2d] '%s': _GLOBAL_OFFSET_TABLE_ シンボルが間違ったセクション "
-"[%2d] を参照しています\n"
+"セクション [%2d] '%s': _GLOBAL_OFFSET_TABLE_ シンボルが間違ったセクション [%"
+"2d] を参照しています\n"
 
 #: src/elflint.c:945
 #, c-format
 msgid ""
-"section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to section [%2d] "
-"'%s'\n"
+"section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to section [%2d] '%"
+"s'\n"
 msgstr ""
 "セクション [%2d] '%s': _GLOBAL_OFFSET_TABLE_ シンボルはセクション [%2d] '%s' "
 "を参照しています\n"
@@ -1715,8 +1721,8 @@ msgstr "セクション [%2d] '%s': リロケーション %zu: オフセット�
 #: src/elflint.c:1383
 #, c-format
 msgid ""
-"section [%2d] '%s': relocation %zu: copy relocation against symbol of type "
-"%s\n"
+"section [%2d] '%s': relocation %zu: copy relocation against symbol of type %"
+"s\n"
 msgstr ""
 "セクション [%2d] '%s': リロケーション %zu: タイプ %s のシンボルに対するコピー"
 "リロケーション\n"
@@ -1791,8 +1797,8 @@ msgstr ""
 #: src/elflint.c:1684
 #, c-format
 msgid ""
-"section [%2d] '%s': entry %zu: pointer does not match address of section "
-"[%2d] '%s' referenced by sh_link\n"
+"section [%2d] '%s': entry %zu: pointer does not match address of section [%"
+"2d] '%s' referenced by sh_link\n"
 msgstr ""
 
 #: src/elflint.c:1727
@@ -1804,8 +1810,8 @@ msgstr ""
 #: src/elflint.c:1742
 #, c-format
 msgid ""
-"section [%2d] '%s': entry %zu: %s value must be valid offset in section "
-"[%2d] '%s'\n"
+"section [%2d] '%s': entry %zu: %s value must be valid offset in section [%"
+"2d] '%s'\n"
 msgstr ""
 
 #: src/elflint.c:1762 src/elflint.c:1790
@@ -2134,8 +2140,8 @@ msgstr ""
 #: src/elflint.c:2713
 #, c-format
 msgid ""
-"section [%2d] '%s' has different number of entries than symbol table [%2d] "
-"'%s'\n"
+"section [%2d] '%s' has different number of entries than symbol table [%2d] '%"
+"s'\n"
 msgstr ""
 
 #: src/elflint.c:2729
@@ -2215,8 +2221,8 @@ msgstr ""
 #: src/elflint.c:2913
 #, c-format
 msgid ""
-"section [%2d] '%s': auxiliary entry %d of entry %d has wrong hash value: "
-"%#x, expected %#x\n"
+"section [%2d] '%s': auxiliary entry %d of entry %d has wrong hash value: %"
+"#x, expected %#x\n"
 msgstr ""
 
 #: src/elflint.c:2923
@@ -2555,8 +2561,8 @@ msgstr ""
 #: src/elflint.c:3729
 #, c-format
 msgid ""
-"section [%2zu] '%s' not fully contained in segment of program header entry "
-"%d\n"
+"section [%2zu] '%s' not fully contained in segment of program header entry %"
+"d\n"
 msgstr ""
 
 #: src/elflint.c:3737
@@ -3405,8 +3411,8 @@ msgstr "%s: セクショングループ [%2zd] '%s' の内容を得られませ�
 #: src/ldgeneric.c:1318
 #, c-format
 msgid ""
-"%s: group member %zu of section group [%2zd] '%s' has too high index: "
-"%<PRIu32>"
+"%s: group member %zu of section group [%2zd] '%s' has too high index: %"
+"<PRIu32>"
 msgstr ""
 "%1$s: セクショングループ [%3$2zd] '%4$s' のグループメンバー %2$zu は大きすぎ"
 "るインデックスを持っています: %5$<PRIu32>"
@@ -4444,8 +4450,8 @@ msgid_plural ""
 msgstr[0] ""
 "\n"
 "動的セグメントには %lu 個の項目があります:\n"
-" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: "
-"[%2u] '%s'\n"
+" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: [%"
+"2u] '%s'\n"
 
 #: src/readelf.c:1557
 msgid "  Type              Value\n"
@@ -4592,8 +4598,8 @@ msgid_plural ""
 msgstr[0] ""
 "\n"
 "セクション [%2u] '%s' を必要とするバージョンには %d 個の項目があります:\n"
-" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: "
-"[%2u] '%s'\n"
+" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: [%"
+"2u] '%s'\n"
 
 #: src/readelf.c:2419
 #, c-format
@@ -4618,8 +4624,8 @@ msgid_plural ""
 msgstr[0] ""
 "\n"
 "バージョン定義セクション [%2u] '%s' には %d 個の項目があります:\n"
-" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: "
-"[%2u] '%s'\n"
+" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: [%"
+"2u] '%s'\n"
 
 #: src/readelf.c:2493
 #, c-format
@@ -4644,8 +4650,8 @@ msgid_plural ""
 msgstr[0] ""
 "\n"
 "バージョンシンボルセクション [%2u] '%s' には %d 個の項目があります:\n"
-" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: "
-"[%2u] '%s'"
+" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: [%"
+"2u] '%s'"
 
 #: src/readelf.c:2770
 msgid "   0 *local*                     "
@@ -4670,8 +4676,8 @@ msgid_plural ""
 msgstr[0] ""
 "\n"
 "セクション [%2u] '%s' のバケット一覧の長さの柱状図(合計 %d バケット):\n"
-" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: "
-"[%2u] '%s'\n"
+" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: [%"
+"2u] '%s'\n"
 
 #: src/readelf.c:2830
 #, fuzzy, no-c-format
@@ -4722,8 +4728,8 @@ msgid_plural ""
 "Library list section [%2zu] '%s' at offset %#0<PRIx64> contains %d entries:\n"
 msgstr[0] ""
 "\n"
-"オフセット %3$#0<PRIx64> のライブラリー一覧セクション [%1$2zu] '%2$s' には "
-"%4$d 個の項目があります:\n"
+"オフセット %3$#0<PRIx64> のライブラリー一覧セクション [%1$2zu] '%2$s' には %4"
+"$d 個の項目があります:\n"
 
 #: src/readelf.c:3095
 msgid ""
@@ -4737,12 +4743,12 @@ msgstr ""
 #, c-format
 msgid ""
 "\n"
-"Object attributes section [%2zu] '%s' of %<PRIu64> bytes at offset "
-"%#0<PRIx64>:\n"
+"Object attributes section [%2zu] '%s' of %<PRIu64> bytes at offset %"
+"#0<PRIx64>:\n"
 msgstr ""
 "\n"
-"オフセット %4$#0<PRIx64> の %3$<PRIu64> バイトのオブジェクト属性セクション "
-"[%1$2zu] '%2$s':\n"
+"オフセット %4$#0<PRIx64> の %3$<PRIu64> バイトのオブジェクト属性セクション [%"
+"1$2zu] '%2$s':\n"
 
 #: src/readelf.c:3161
 msgid "  Owner          Size\n"
@@ -5141,8 +5147,8 @@ msgstr ""
 #, fuzzy, c-format
 msgid ""
 " Type unit at offset %<PRIu64>:\n"
-" Version: %<PRIu16>, Abbreviation section offset: %<PRIu64>, Address size: "
-"%<PRIu8>, Offset size: %<PRIu8>\n"
+" Version: %<PRIu16>, Abbreviation section offset: %<PRIu64>, Address size: %"
+"<PRIu8>, Offset size: %<PRIu8>\n"
 " Type signature: %#<PRIx64>, Type offset: %#<PRIx64>\n"
 msgstr ""
 " オフセット %1$<PRIu64> のコンパイル単位:\n"
@@ -5153,8 +5159,8 @@ msgstr ""
 #, c-format
 msgid ""
 " Compilation unit at offset %<PRIu64>:\n"
-" Version: %<PRIu16>, Abbreviation section offset: %<PRIu64>, Address size: "
-"%<PRIu8>, Offset size: %<PRIu8>\n"
+" Version: %<PRIu16>, Abbreviation section offset: %<PRIu64>, Address size: %"
+"<PRIu8>, Offset size: %<PRIu8>\n"
 msgstr ""
 " オフセット %1$<PRIu64> のコンパイル単位:\n"
 " バージョン: %2$<PRIu16>、略語セクションオフセット: %3$<PRIu64>、アドレスの大"
@@ -5175,8 +5181,8 @@ msgstr "DIE オフセットを得られません: %s"
 #, c-format
 msgid "cannot get tag of DIE at offset %<PRIu64> in section '%s': %s"
 msgstr ""
-"セクション '%2$s' 中のオフセット %1$<PRIu64> の DIE のタグを得られません: "
-"%3$s"
+"セクション '%2$s' 中のオフセット %1$<PRIu64> の DIE のタグを得られません: %3"
+"$s"
 
 #: src/readelf.c:5900
 #, c-format
@@ -5668,8 +5674,8 @@ msgid ""
 "Note section [%2zu] '%s' of %<PRIu64> bytes at offset %#0<PRIx64>:\n"
 msgstr ""
 "\n"
-"オフセット %4$#0<PRIx64> の %3$<PRIu64> バイトのノートセクション [%1$2zu] "
-"'%2$s':\n"
+"オフセット %4$#0<PRIx64> の %3$<PRIu64> バイトのノートセクション [%1$2zu] '%2"
+"$s':\n"
 
 #: src/readelf.c:8755
 #, c-format
@@ -5701,8 +5707,8 @@ msgid ""
 "Hex dump of section [%Zu] '%s', %<PRIu64> bytes at offset %#0<PRIx64>:\n"
 msgstr ""
 "\n"
-"オフセット %4$#0<PRIx64> のセクション [%1$Zu] '%2$s' の16進ダン"
-"プ、%3$<PRIu64> バイト:\n"
+"オフセット %4$#0<PRIx64> のセクション [%1$Zu] '%2$s' の16進ダンプ、%3"
+"$<PRIu64> バイト:\n"
 
 #: src/readelf.c:8824
 #, fuzzy, c-format

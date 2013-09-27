@@ -195,6 +195,12 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
+* Fri Sep 27 2013 Mark Wielaard <mjw@redhat.com> 0.157-1
+- libdw: Add new functions dwarf_getlocations, dwarf_getlocation_attr 
+         and dwarf_getlocation_die.
+- addr2line: Support -i, --inlines output option.
+- backends: abi_cfi hook for arm, ppc and s390.
+
 * Thu Jul 25 2013 Jan Kratochvil <jan.kratochvil@redhat.com> 0.156-1
 - lib: New macro COMPAT_VERSION_NEWPROTO.
 - libdw: Handle GNU extension opcodes in dwarf_getlocation.

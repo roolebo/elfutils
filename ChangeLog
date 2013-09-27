@@ -1,3 +1,8 @@
+2013-09-27  Mark Wielaard  <mjw@redhat.com>
+
+	* configure.ac: Set version to 0.157.
+	* NEWS: Add entries for version 0.157.
+
 2013-09-20  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (DISTCHECK_CONFIGURE_FLAGS): Add --enable-dwz.

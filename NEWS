@@ -1,3 +1,12 @@
+Version 0.157
+
+libdw: Add new functions dwarf_getlocations, dwarf_getlocation_attr
+       and dwarf_getlocation_die.
+
+addr2line: Support -i, --inlines output option.
+
+backends: abi_cfi hook for arm, ppc and s390.
+
 Version 0.156
 
 lib: New macro COMPAT_VERSION_NEWPROTO.

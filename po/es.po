@@ -10,15 +10,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: elfutils.master.es\n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2013-07-23 17:36+0200\n"
+"POT-Creation-Date: 2013-09-27 12:57+0200\n"
 "PO-Revision-Date: 2011-01-10 15:17-0300\n"
 "Last-Translator: Claudio Rodrigo Pereyra Diaz <claudiorodrigo@pereyradiaz."
 "com.ar>\n"
 "Language-Team: Fedora Spanish <trans-es@lists.fedoraproject.org>\n"
-"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: es\n"
 "X-Poedit-Language: Spanish\n"
 "X-Generator: Lokalize 1.0\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -628,23 +628,29 @@ msgstr "También mostrar marcas de líneas de tabla"
 msgid "Treat addresses as offsets relative to NAME section."
 msgstr "Manejar direcciones como compensaciones relativas a sección de NOMBRE."
 
-#: src/addr2line.c:68 src/elfcmp.c:72 src/findtextrel.c:67 src/nm.c:100
+#: src/addr2line.c:68
+msgid ""
+"Show all source locations that caused inline expansion of subroutines at the "
+"address."
+msgstr ""
+
+#: src/addr2line.c:71 src/elfcmp.c:72 src/findtextrel.c:67 src/nm.c:100
 #: src/strings.c:75
 msgid "Miscellaneous:"
 msgstr "Misceláneos:"
 
-#: src/addr2line.c:77
+#: src/addr2line.c:80
 msgid ""
 "Locate source files and line information for ADDRs (in a.out by default)."
 msgstr ""
 "Localizar archivos fuente e información de línea para DIRECCIONES (en a.out "
 "por defecto)."
 
-#: src/addr2line.c:81
+#: src/addr2line.c:84
 msgid "[ADDR...]"
 msgstr "[DIREC...]"
 
-#: src/addr2line.c:182 src/ar.c:289 src/elfcmp.c:662 src/elflint.c:231
+#: src/addr2line.c:192 src/ar.c:289 src/elfcmp.c:662 src/elflint.c:231
 #: src/findtextrel.c:162 src/ld.c:949 src/nm.c:265 src/objdump.c:181
 #: src/ranlib.c:128 src/readelf.c:499 src/size.c:211 src/strings.c:219
 #: src/strip.c:213 src/unstrip.c:226
@@ -660,7 +666,7 @@ msgstr ""
 "garantía, ni siquiera para SU COMERCIALIZACIÓN o PARA SER USADO CON UN FIN "
 "DETERMINADO.\n"
 
-#: src/addr2line.c:187 src/ar.c:294 src/elfcmp.c:667 src/elflint.c:236
+#: src/addr2line.c:197 src/ar.c:294 src/elfcmp.c:667 src/elflint.c:236
 #: src/findtextrel.c:167 src/ld.c:954 src/nm.c:270 src/objdump.c:186
 #: src/ranlib.c:133 src/readelf.c:504 src/size.c:216 src/strings.c:224
 #: src/strip.c:218 src/unstrip.c:231
@@ -668,22 +674,22 @@ msgstr ""
 msgid "Written by %s.\n"
 msgstr "Escrito por %s.\n"
 
-#: src/addr2line.c:406
+#: src/addr2line.c:437
 #, c-format
 msgid "Section syntax requires exactly one module"
 msgstr "Sintaxis de sección requiere exactamente un módulo"
 
-#: src/addr2line.c:429
+#: src/addr2line.c:460
 #, c-format
 msgid "offset %#<PRIxMAX> lies outside section '%s'"
 msgstr "Compensación %#<PRIxMAX> se encuentra fuera de sección '%s'"
 
-#: src/addr2line.c:470
+#: src/addr2line.c:525
 #, c-format
 msgid "cannot find symbol '%s'"
 msgstr "no se puede encontrar símbolo '%s'"
 
-#: src/addr2line.c:475
+#: src/addr2line.c:530
 #, c-format
 msgid "offset %#<PRIxMAX> lies outside contents of '%s'"
 msgstr "compensación %#<PRIxMAX> se encuentra fuera de contenido de '%s'"
@@ -1510,8 +1516,8 @@ msgstr ""
 #: src/elflint.c:847
 #, c-format
 msgid ""
-"section [%2d] '%s': symbol %zu: st_value short of referenced section [%2d] "
-"'%s'\n"
+"section [%2d] '%s': symbol %zu: st_value short of referenced section [%2d] '%"
+"s'\n"
 msgstr ""
 "Sección [%2d] '%s': símbolo %zu: st_value falta sección de referencia [%2d] "
 "'%s'\n"
@@ -1542,8 +1548,8 @@ msgstr "Sección [%2d] '%s': símbolo %zu: símbolo de sección non-local\n"
 #: src/elflint.c:938
 #, c-format
 msgid ""
-"section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to bad section "
-"[%2d]\n"
+"section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to bad section [%"
+"2d]\n"
 msgstr ""
 "Sección [%2d] '%s': símbolo _GLOBAL_OFFSET_TABLE_ se refiere a sección "
 "errada [%2d]\n"
@@ -1551,8 +1557,8 @@ msgstr ""
 #: src/elflint.c:945
 #, c-format
 msgid ""
-"section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to section [%2d] "
-"'%s'\n"
+"section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to section [%2d] '%"
+"s'\n"
 msgstr ""
 "Sección [%2d] '%s': símbolo _GLOBAL_OFFSET_TABLE_ se refiere a sección [%2d] "
 "'%s'\n"
@@ -1719,8 +1725,8 @@ msgstr "Sección [%2d] '%s': reubicación %zu: compensación fuera de límites\n
 #: src/elflint.c:1383
 #, c-format
 msgid ""
-"section [%2d] '%s': relocation %zu: copy relocation against symbol of type "
-"%s\n"
+"section [%2d] '%s': relocation %zu: copy relocation against symbol of type %"
+"s\n"
 msgstr ""
 "Sección [%2d] '%s': reubicación %zu: reubicación de copia con símbolo de "
 "tipo %s\n"
@@ -1799,8 +1805,8 @@ msgstr ""
 #: src/elflint.c:1684
 #, c-format
 msgid ""
-"section [%2d] '%s': entry %zu: pointer does not match address of section "
-"[%2d] '%s' referenced by sh_link\n"
+"section [%2d] '%s': entry %zu: pointer does not match address of section [%"
+"2d] '%s' referenced by sh_link\n"
 msgstr ""
 "Sección [%2d] '%s': entrada %zu: puntero no coincide con dirección de "
 "sección [%2d] '%s' al que hace referencia sh_link\n"
@@ -1815,8 +1821,8 @@ msgstr ""
 #: src/elflint.c:1742
 #, c-format
 msgid ""
-"section [%2d] '%s': entry %zu: %s value must be valid offset in section "
-"[%2d] '%s'\n"
+"section [%2d] '%s': entry %zu: %s value must be valid offset in section [%"
+"2d] '%s'\n"
 msgstr ""
 "sección [%2d] '%s': entrada %zu: valor %s debe ser compensación válida en "
 "sección [%2d] '%s'\n"
@@ -1923,8 +1929,8 @@ msgstr ""
 msgid ""
 "section [%2d] '%s': hash table section is too small (is %ld, expected %ld)\n"
 msgstr ""
-"Sección [%2d] '%s': sección de tabla de dispersión es demasiado pequeña (es "
-"%ld, se espera %ld)\n"
+"Sección [%2d] '%s': sección de tabla de dispersión es demasiado pequeña (es %"
+"ld, se espera %ld)\n"
 
 #: src/elflint.c:1956 src/elflint.c:1997
 #, c-format
@@ -1962,8 +1968,8 @@ msgid ""
 "section [%2d] '%s': hash table section is too small (is %ld, expected at "
 "least%ld)\n"
 msgstr ""
-"Sección [%2d] '%s': sección de tabla de dispersión es demasiado pequeña (es "
-"%ld, se espera al menos least%ld)\n"
+"Sección [%2d] '%s': sección de tabla de dispersión es demasiado pequeña (es %"
+"ld, se espera al menos least%ld)\n"
 
 #: src/elflint.c:2046
 #, c-format
@@ -2207,8 +2213,8 @@ msgstr ""
 #: src/elflint.c:2713
 #, c-format
 msgid ""
-"section [%2d] '%s' has different number of entries than symbol table [%2d] "
-"'%s'\n"
+"section [%2d] '%s' has different number of entries than symbol table [%2d] '%"
+"s'\n"
 msgstr ""
 "Sección [%2d] '%s' tiene un número diferente de entradas a la de la tabla de "
 "símbolos [%2d] '%s'\n"
@@ -2302,8 +2308,8 @@ msgstr ""
 #: src/elflint.c:2913
 #, c-format
 msgid ""
-"section [%2d] '%s': auxiliary entry %d of entry %d has wrong hash value: "
-"%#x, expected %#x\n"
+"section [%2d] '%s': auxiliary entry %d of entry %d has wrong hash value: %"
+"#x, expected %#x\n"
 msgstr ""
 "Sección [%2d] '%s': entrada auxiliar %d de entrada %d tiene valor de "
 "dispersión: %#x, esperado %#x\n"
@@ -2489,8 +2495,8 @@ msgstr ""
 msgid ""
 "section [%2d] '%s': offset %zu: unrecognized %s attribute value %<PRIu64>\n"
 msgstr ""
-"Sección [%2d] '%s': compensación %zu: no reconocido %s valor de atributo "
-"%<PRIu64>\n"
+"Sección [%2d] '%s': compensación %zu: no reconocido %s valor de atributo %"
+"<PRIu64>\n"
 
 #: src/elflint.c:3316
 #, c-format
@@ -2650,8 +2656,8 @@ msgstr "sección [%2zu] '%s' tiene tipo %d incompatible \n"
 msgid ""
 "section [%2zu] '%s' contains invalid processor-specific flag(s) %#<PRIx64>\n"
 msgstr ""
-"Sección [%2zu] '%s' contiene bandera(s) de procesador-específico inválidas "
-"%#<PRIx64>\n"
+"Sección [%2zu] '%s' contiene bandera(s) de procesador-específico inválidas %"
+"#<PRIx64>\n"
 
 #: src/elflint.c:3640
 #, c-format
@@ -2703,8 +2709,8 @@ msgstr "Sección [%2zu] '%s' es tanto de ejecución como de escritura\n"
 #: src/elflint.c:3729
 #, c-format
 msgid ""
-"section [%2zu] '%s' not fully contained in segment of program header entry "
-"%d\n"
+"section [%2zu] '%s' not fully contained in segment of program header entry %"
+"d\n"
 msgstr ""
 "Sección [%2zu] '%s' no contenida totalmente en segmento de entrada de "
 "encabezamiento de programa %d\n"
@@ -3540,8 +3546,8 @@ msgstr "no se puede cargar biblioteca ID de segundo plano '%s': %s"
 #, c-format
 msgid "cannot find init function in ld backend library '%s': %s"
 msgstr ""
-"no se pudo encontrar la función init en la biblioteca ld de segundo plano "
-"'%s': %s"
+"no se pudo encontrar la función init en la biblioteca ld de segundo plano '%"
+"s': %s"
 
 #: src/ldgeneric.c:300
 #, c-format
@@ -3625,14 +3631,14 @@ msgstr ""
 #, c-format
 msgid "%s: cannot get content of section group [%2zd] '%s': %s'"
 msgstr ""
-"%s: no es posible obtener el contenido de la sección del grupo [%2zd] '%s': "
-"%s'"
+"%s: no es posible obtener el contenido de la sección del grupo [%2zd] '%s': %"
+"s'"
 
 #: src/ldgeneric.c:1318
 #, c-format
 msgid ""
-"%s: group member %zu of section group [%2zd] '%s' has too high index: "
-"%<PRIu32>"
+"%s: group member %zu of section group [%2zd] '%s' has too high index: %"
+"<PRIu32>"
 msgstr ""
 "%s el miembro del grupo %zu del grupo de sección [%2zd] '%s' posee el índice "
 "demasiado alto: %<PRIu32>"
@@ -3722,15 +3728,15 @@ msgstr ""
 #, c-format
 msgid "cannot find entry symbol '%s': defaulting to %#0*<PRIx64>"
 msgstr ""
-"no se puede encontrar símbolo de entrada '%s': predeterminada para "
-"%#0*<PRIx64>"
+"no se puede encontrar símbolo de entrada '%s': predeterminada para %"
+"#0*<PRIx64>"
 
 #: src/ldgeneric.c:3680
 #, c-format
 msgid "no entry symbol specified: defaulting to %#0*<PRIx64>"
 msgstr ""
-"no se ha especificado una entrada de símbolo: estableciendo por defecto a "
-"%#0*<PRIx64>"
+"no se ha especificado una entrada de símbolo: estableciendo por defecto a %"
+"#0*<PRIx64>"
 
 #: src/ldgeneric.c:3910
 #, c-format
@@ -4697,13 +4703,13 @@ msgid_plural ""
 msgstr[0] ""
 "\n"
 "Segmento dinámico contiene entrada %lu:\n"
-" Dirección: %#0*<PRIx64>  Compensación: %#08<PRIx64>  Enlace a sección: "
-"[%2u] '%s'\n"
+" Dirección: %#0*<PRIx64>  Compensación: %#08<PRIx64>  Enlace a sección: [%"
+"2u] '%s'\n"
 msgstr[1] ""
 "\n"
 "Segmento dinámico contiene entradas %lu:\n"
-" Dirección: %#0*<PRIx64>  Compensación: %#08<PRIx64>  Enlace a sección: "
-"[%2u] '%s'\n"
+" Dirección: %#0*<PRIx64>  Compensación: %#08<PRIx64>  Enlace a sección: [%"
+"2u] '%s'\n"
 
 #: src/readelf.c:1557
 msgid "  Type              Value\n"
@@ -4755,12 +4761,12 @@ msgid_plural ""
 "contains %d entries:\n"
 msgstr[0] ""
 "\n"
-"Sección de reubicación [%2zu] '%s' para sección [%2u] '%s' en compensación "
-"%#0<PRIx64> contiene entrada %d:\n"
+"Sección de reubicación [%2zu] '%s' para sección [%2u] '%s' en compensación %"
+"#0<PRIx64> contiene entrada %d:\n"
 msgstr[1] ""
 "\n"
-"Sección de reubicación [%2zu] '%s' para sección [%2u] '%s' en compensación "
-"%#0<PRIx64> contiene entradas %d:\n"
+"Sección de reubicación [%2zu] '%s' para sección [%2u] '%s' en compensación %"
+"#0<PRIx64> contiene entradas %d:\n"
 
 #: src/readelf.c:1761
 #, c-format
@@ -4862,13 +4868,13 @@ msgid_plural ""
 msgstr[0] ""
 "\n"
 "Sección de versión necesita [%2u] '%s' contiene entrada %d entry:\n"
-" Dirección: %#0*<PRIx64>  Compensación: %#08<PRIx64>  Enlace a sección: "
-"[%2u] '%s'\n"
+" Dirección: %#0*<PRIx64>  Compensación: %#08<PRIx64>  Enlace a sección: [%"
+"2u] '%s'\n"
 msgstr[1] ""
 "\n"
 "Versión necesita sección [%2u] '%s' contiene entrada %d:\n"
-" Dirección: %#0*<PRIx64>  Compensación: %#08<PRIx64>  Enlace a sección: "
-"[%2u] '%s'\n"
+" Dirección: %#0*<PRIx64>  Compensación: %#08<PRIx64>  Enlace a sección: [%"
+"2u] '%s'\n"
 
 #: src/readelf.c:2419
 #, c-format
@@ -4893,13 +4899,13 @@ msgid_plural ""
 msgstr[0] ""
 "\n"
 "Sección de definición de versión [%2u] '%s' contiene entrada %d:\n"
-" Dirección: %#0*<PRIx64>  Compensación: %#08<PRIx64>  Enlace a sección: "
-"[%2u] '%s'\n"
+" Dirección: %#0*<PRIx64>  Compensación: %#08<PRIx64>  Enlace a sección: [%"
+"2u] '%s'\n"
 msgstr[1] ""
 "\n"
 "Sección de definición de versión [%2u] '%s' contiene %d entrada:\n"
-" Dirección: %#0*<PRIx64>  Compensación: %#08<PRIx64>  Enlace a sección: "
-"[%2u] '%s'\n"
+" Dirección: %#0*<PRIx64>  Compensación: %#08<PRIx64>  Enlace a sección: [%"
+"2u] '%s'\n"
 
 #: src/readelf.c:2493
 #, c-format
@@ -4925,13 +4931,13 @@ msgid_plural ""
 msgstr[0] ""
 "\n"
 "Sección de versión de símbolos [%2u] '%s' contiene %d entrada:\n"
-" Dirección: %#0*<PRIx64>  Compensación: %#08<PRIx64>  Enlace a sección: "
-"[%2u] '%s'"
+" Dirección: %#0*<PRIx64>  Compensación: %#08<PRIx64>  Enlace a sección: [%"
+"2u] '%s'"
 msgstr[1] ""
 "\n"
 "Sección de versión de símbolos [%2u] '%s' contiene entradas %d:\n"
-" Dirección: %#0*<PRIx64>  Compensación: %#08<PRIx64>  Enlace a sección: "
-"[%2u] '%s'"
+" Dirección: %#0*<PRIx64>  Compensación: %#08<PRIx64>  Enlace a sección: [%"
+"2u] '%s'"
 
 #: src/readelf.c:2770
 msgid "   0 *local*                     "
@@ -4957,14 +4963,14 @@ msgstr[0] ""
 "\n"
 "Histograma para longitud de lista de cubeta en sección [%2u] '%s' (total de "
 "cubetas %d):\n"
-" Dirección: %#0*<PRIx64>  Compensación: %#08<PRIx64>  Enlace a sección: "
-"[%2u] '%s'\n"
+" Dirección: %#0*<PRIx64>  Compensación: %#08<PRIx64>  Enlace a sección: [%"
+"2u] '%s'\n"
 msgstr[1] ""
 "\n"
 "Histograma para longitud de lista de cubeta en sección [%2u] '%s' (total de "
 "cubetas %d):\n"
-" Dirección: %#0*<PRIx64>  Compensación: %#08<PRIx64>  Enlace a sección: "
-"[%2u] '%s'\n"
+" Dirección: %#0*<PRIx64>  Compensación: %#08<PRIx64>  Enlace a sección: [%"
+"2u] '%s'\n"
 
 #: src/readelf.c:2830
 #, no-c-format
@@ -5034,8 +5040,8 @@ msgstr ""
 #, c-format
 msgid ""
 "\n"
-"Object attributes section [%2zu] '%s' of %<PRIu64> bytes at offset "
-"%#0<PRIx64>:\n"
+"Object attributes section [%2zu] '%s' of %<PRIu64> bytes at offset %"
+"#0<PRIx64>:\n"
 msgstr ""
 "\n"
 "Sección de atributos de objeto [%2zu] '%s' de %<PRIu64> bytes con "
@@ -5242,8 +5248,8 @@ msgstr " [%*zu] ???\n"
 msgid ""
 " [%*zu] start: %0#*<PRIx64>, length: %5<PRIu64>, CU DIE offset: %6<PRId64>\n"
 msgstr ""
-" Inicio [%*zu]: %0#*<PRIx64>, longitud: %5<PRIu64>, compensación CU DIE: "
-"%6<PRId64>\n"
+" Inicio [%*zu]: %0#*<PRIx64>, longitud: %5<PRIu64>, compensación CU DIE: %"
+"6<PRId64>\n"
 
 #: src/readelf.c:4463 src/readelf.c:4617 src/readelf.c:5136 src/readelf.c:6030
 #: src/readelf.c:6531 src/readelf.c:6651 src/readelf.c:6807 src/readelf.c:7229
@@ -5370,8 +5376,8 @@ msgid ""
 "Call frame information section [%2zu] '%s' at offset %#<PRIx64>:\n"
 msgstr ""
 "\n"
-"Sección de información de marco de llamada [%2zu] '%s' en compensación "
-"%#<PRIx64>:\n"
+"Sección de información de marco de llamada [%2zu] '%s' en compensación %"
+"#<PRIx64>:\n"
 
 #: src/readelf.c:5182
 #, c-format
@@ -5440,8 +5446,8 @@ msgstr ""
 #, c-format
 msgid ""
 " Type unit at offset %<PRIu64>:\n"
-" Version: %<PRIu16>, Abbreviation section offset: %<PRIu64>, Address size: "
-"%<PRIu8>, Offset size: %<PRIu8>\n"
+" Version: %<PRIu16>, Abbreviation section offset: %<PRIu64>, Address size: %"
+"<PRIu8>, Offset size: %<PRIu8>\n"
 " Type signature: %#<PRIx64>, Type offset: %#<PRIx64>\n"
 msgstr ""
 "Tipo de unidad al compensar  %<PRIu64>:\n"
@@ -5453,8 +5459,8 @@ msgstr ""
 #, c-format
 msgid ""
 " Compilation unit at offset %<PRIu64>:\n"
-" Version: %<PRIu16>, Abbreviation section offset: %<PRIu64>, Address size: "
-"%<PRIu8>, Offset size: %<PRIu8>\n"
+" Version: %<PRIu16>, Abbreviation section offset: %<PRIu64>, Address size: %"
+"<PRIu8>, Offset size: %<PRIu8>\n"
 msgstr ""
 "Unidad de compilación en compensación %<PRIu64>:\n"
 " Versión: %<PRIu16>, Compensación de sección de abreviatura: %<PRIu64>,  "
@@ -5599,8 +5605,8 @@ msgstr "Establecer dirección a %s\n"
 #, fuzzy, c-format
 msgid " define new file: dir=%u, mtime=%<PRIu64>, length=%<PRIu64>, name=%s\n"
 msgstr ""
-"definir nuevo archivo: dir=%u, mtime=%<PRIu64>, longitud=%<PRIu64>, nombre="
-"%s\n"
+"definir nuevo archivo: dir=%u, mtime=%<PRIu64>, longitud=%<PRIu64>, nombre=%"
+"s\n"
 
 #: src/readelf.c:6357
 #, c-format
@@ -5998,8 +6004,8 @@ msgid ""
 "Hex dump of section [%Zu] '%s', %<PRIu64> bytes at offset %#0<PRIx64>:\n"
 msgstr ""
 "\n"
-"Volcado Hex de sección [%Zu] '%s', %<PRIu64> bytes en compensación "
-"%#0<PRIx64>:\n"
+"Volcado Hex de sección [%Zu] '%s', %<PRIu64> bytes en compensación %"
+"#0<PRIx64>:\n"
 
 #: src/readelf.c:8824
 #, c-format
@@ -6017,8 +6023,8 @@ msgid ""
 "String section [%Zu] '%s' contains %<PRIu64> bytes at offset %#0<PRIx64>:\n"
 msgstr ""
 "\n"
-"Sección de cadena [%Zu] '%s' contiene %<PRIu64> bytes en compensación "
-"%#0<PRIx64>:\n"
+"Sección de cadena [%Zu] '%s' contiene %<PRIu64> bytes en compensación %"
+"#0<PRIx64>:\n"
 
 #: src/readelf.c:8882
 #, c-format

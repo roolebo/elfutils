@@ -1,3 +1,7 @@
+2013-09-27  Mark Wielaard  <mjw@redhat.com>
+
+	* config/elfutils.spec.in: Update for 0.157.
+
 2013-07-25  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* config/elfutils.spec.in: Update for 0.156.

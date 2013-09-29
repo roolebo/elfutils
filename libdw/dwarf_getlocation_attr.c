@@ -50,19 +50,19 @@ dwarf_getlocation_attr (attr, op, result)
       case DW_OP_implicit_value:
 	result->code = DW_AT_const_value;
 	result->form = DW_FORM_block;
-	result->valp = (unsigned char *) op->number2;
+	result->valp = (unsigned char *) (uintptr_t) op->number2;
 	break;
 
       case DW_OP_GNU_entry_value:
 	result->code = DW_AT_location;
 	result->form = DW_FORM_exprloc;
-	result->valp = (unsigned char *) op->number2;
+	result->valp = (unsigned char *) (uintptr_t) op->number2;
 	break;
 
       case DW_OP_GNU_const_type:
 	result->code = DW_AT_const_value;
 	result->form = DW_FORM_block1;
-	result->valp = (unsigned char *) op->number2;
+	result->valp = (unsigned char *) (uintptr_t) op->number2;
 	break;
 
       case DW_OP_call2:

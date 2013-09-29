@@ -1,3 +1,12 @@
+2013-09-29  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_getlocation.c (store_implicit_value): Cast op->number2 to
+	uintptr_t before casting to char *.
+	(__libdw_intern_expression): Cast data to uintptr_t before casting
+	to Dwarf_Word.
+	* dwarf_getlocation_attr.c (dwarf_getlocation_attr): Cast
+	op->number2 to uintptr_t before casting to char *.
+
 2013-09-24  Josh Stone  <jistone@redhat.com>
 
 	* libdw_visit_scopes.c (classify_die): Removed.

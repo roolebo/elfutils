@@ -8,19 +8,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ja\n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2013-09-27 12:57+0200\n"
+"POT-Creation-Date: 2013-09-30 13:52+0200\n"
 "PO-Revision-Date: 2009-09-20 15:32+0900\n"
 "Last-Translator: Hyu_gabaru Ryu_ichi <hyu_gabaru@yahoo.co.jp>\n"
 "Language-Team: Japanese <jp@li.org>\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ja\n"
 "X-Generator: KBabel 1.11.4\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: lib/xmalloc.c:54 lib/xmalloc.c:68 lib/xmalloc.c:82 src/readelf.c:3016
-#: src/readelf.c:3364 src/readelf.c:7900 src/unstrip.c:2090 src/unstrip.c:2298
+#: lib/xmalloc.c:54 lib/xmalloc.c:68 lib/xmalloc.c:82 src/readelf.c:3017
+#: src/readelf.c:3365 src/readelf.c:7901 src/unstrip.c:2090 src/unstrip.c:2298
 #, c-format
 msgid "memory exhausted"
 msgstr "メモリー消費済み"
@@ -378,7 +378,7 @@ msgstr "ラインデータセクションデータを得られません: %s"
 msgid "No backend"
 msgstr "バックエンドがありません"
 
-#: libebl/eblcorenotetypename.c:97 libebl/eblobjecttypename.c:57
+#: libebl/eblcorenotetypename.c:102 libebl/eblobjecttypename.c:57
 #: libebl/eblobjnotetypename.c:73 libebl/eblosabiname.c:77
 #: libebl/eblsectionname.c:89 libebl/eblsectiontypename.c:119
 #: libebl/eblsegmenttypename.c:83
@@ -474,7 +474,7 @@ msgstr "ソース演算子の大きさが無効"
 msgid "invalid size of destination operand"
 msgstr "宛先演算子の大きさが無効"
 
-#: libelf/elf_error.c:87 src/readelf.c:5097
+#: libelf/elf_error.c:87 src/readelf.c:5098
 #, c-format
 msgid "invalid encoding"
 msgstr "無効なエンコード"
@@ -556,8 +556,8 @@ msgstr "データ/scnが不整合です"
 msgid "invalid section header"
 msgstr "不当なセクションヘッダー"
 
-#: libelf/elf_error.c:187 src/readelf.c:6865 src/readelf.c:7310
-#: src/readelf.c:7411 src/readelf.c:7573
+#: libelf/elf_error.c:187 src/readelf.c:6866 src/readelf.c:7311
+#: src/readelf.c:7412 src/readelf.c:7574
 #, c-format
 msgid "invalid data"
 msgstr "不当なデータ"
@@ -651,7 +651,7 @@ msgstr ""
 
 #: src/addr2line.c:192 src/ar.c:289 src/elfcmp.c:662 src/elflint.c:231
 #: src/findtextrel.c:162 src/ld.c:949 src/nm.c:265 src/objdump.c:181
-#: src/ranlib.c:128 src/readelf.c:499 src/size.c:211 src/strings.c:219
+#: src/ranlib.c:128 src/readelf.c:500 src/size.c:211 src/strings.c:219
 #: src/strip.c:213 src/unstrip.c:226
 #, c-format
 msgid ""
@@ -665,7 +665,7 @@ msgstr ""
 
 #: src/addr2line.c:197 src/ar.c:294 src/elfcmp.c:667 src/elflint.c:236
 #: src/findtextrel.c:167 src/ld.c:954 src/nm.c:270 src/objdump.c:186
-#: src/ranlib.c:133 src/readelf.c:504 src/size.c:216 src/strings.c:224
+#: src/ranlib.c:133 src/readelf.c:505 src/size.c:216 src/strings.c:224
 #: src/strip.c:218 src/unstrip.c:231
 #, c-format
 msgid "Written by %s.\n"
@@ -1177,11 +1177,11 @@ msgstr ""
 msgid "Pedantic checking of ELF files compliance with gABI/psABI spec."
 msgstr "ELF ファイルが gABI/psABI 仕様へ準拠しているかの厳密なチェック。"
 
-#: src/elflint.c:78 src/readelf.c:122
+#: src/elflint.c:78 src/readelf.c:123
 msgid "FILE..."
 msgstr "ふぁいる..."
 
-#: src/elflint.c:151 src/readelf.c:291
+#: src/elflint.c:151 src/readelf.c:292
 #, c-format
 msgid "cannot open input file"
 msgstr "入力ファイルを開けません"
@@ -1200,7 +1200,7 @@ msgstr "Elf 記述子を閉じている時にエラー: %s\n"
 msgid "No errors"
 msgstr "エラーはありません"
 
-#: src/elflint.c:215 src/readelf.c:467
+#: src/elflint.c:215 src/readelf.c:468
 msgid "Missing file name.\n"
 msgstr "ファイル名がありません。\n"
 
@@ -1495,8 +1495,8 @@ msgid ""
 "section [%2d] '%s': symbol %zu: st_value out of bounds of referenced section "
 "[%2d] '%s'\n"
 msgstr ""
-"セクション [%2d] '%s': シンボル %zu: st_value 参照されるセクション [%2d] '%"
-"s' の境界外\n"
+"セクション [%2d] '%s': シンボル %zu: st_value 参照されるセクション [%2d] "
+"'%s' の境界外\n"
 
 #: src/elflint.c:839
 #, c-format
@@ -1509,8 +1509,8 @@ msgstr ""
 #: src/elflint.c:847
 #, c-format
 msgid ""
-"section [%2d] '%s': symbol %zu: st_value short of referenced section [%2d] '%"
-"s'\n"
+"section [%2d] '%s': symbol %zu: st_value short of referenced section [%2d] "
+"'%s'\n"
 msgstr ""
 "セクション [%2d] '%s': シンボル %zu: 参照されるセクション [%2d] '%s' の"
 "st_value 不足\n"
@@ -1541,17 +1541,17 @@ msgstr "セクション [%2d] '%s': シンボル %zu: 非ローカルセクシ�
 #: src/elflint.c:938
 #, c-format
 msgid ""
-"section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to bad section [%"
-"2d]\n"
+"section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to bad section "
+"[%2d]\n"
 msgstr ""
-"セクション [%2d] '%s': _GLOBAL_OFFSET_TABLE_ シンボルが間違ったセクション [%"
-"2d] を参照しています\n"
+"セクション [%2d] '%s': _GLOBAL_OFFSET_TABLE_ シンボルが間違ったセクション "
+"[%2d] を参照しています\n"
 
 #: src/elflint.c:945
 #, c-format
 msgid ""
-"section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to section [%2d] '%"
-"s'\n"
+"section [%2d] '%s': _GLOBAL_OFFSET_TABLE_ symbol refers to section [%2d] "
+"'%s'\n"
 msgstr ""
 "セクション [%2d] '%s': _GLOBAL_OFFSET_TABLE_ シンボルはセクション [%2d] '%s' "
 "を参照しています\n"
@@ -1721,8 +1721,8 @@ msgstr "セクション [%2d] '%s': リロケーション %zu: オフセット�
 #: src/elflint.c:1383
 #, c-format
 msgid ""
-"section [%2d] '%s': relocation %zu: copy relocation against symbol of type %"
-"s\n"
+"section [%2d] '%s': relocation %zu: copy relocation against symbol of type "
+"%s\n"
 msgstr ""
 "セクション [%2d] '%s': リロケーション %zu: タイプ %s のシンボルに対するコピー"
 "リロケーション\n"
@@ -1797,8 +1797,8 @@ msgstr ""
 #: src/elflint.c:1684
 #, c-format
 msgid ""
-"section [%2d] '%s': entry %zu: pointer does not match address of section [%"
-"2d] '%s' referenced by sh_link\n"
+"section [%2d] '%s': entry %zu: pointer does not match address of section "
+"[%2d] '%s' referenced by sh_link\n"
 msgstr ""
 
 #: src/elflint.c:1727
@@ -1810,8 +1810,8 @@ msgstr ""
 #: src/elflint.c:1742
 #, c-format
 msgid ""
-"section [%2d] '%s': entry %zu: %s value must be valid offset in section [%"
-"2d] '%s'\n"
+"section [%2d] '%s': entry %zu: %s value must be valid offset in section "
+"[%2d] '%s'\n"
 msgstr ""
 
 #: src/elflint.c:1762 src/elflint.c:1790
@@ -2140,8 +2140,8 @@ msgstr ""
 #: src/elflint.c:2713
 #, c-format
 msgid ""
-"section [%2d] '%s' has different number of entries than symbol table [%2d] '%"
-"s'\n"
+"section [%2d] '%s' has different number of entries than symbol table [%2d] "
+"'%s'\n"
 msgstr ""
 
 #: src/elflint.c:2729
@@ -2221,8 +2221,8 @@ msgstr ""
 #: src/elflint.c:2913
 #, c-format
 msgid ""
-"section [%2d] '%s': auxiliary entry %d of entry %d has wrong hash value: %"
-"#x, expected %#x\n"
+"section [%2d] '%s': auxiliary entry %d of entry %d has wrong hash value: "
+"%#x, expected %#x\n"
 msgstr ""
 
 #: src/elflint.c:2923
@@ -2561,8 +2561,8 @@ msgstr ""
 #: src/elflint.c:3729
 #, c-format
 msgid ""
-"section [%2zu] '%s' not fully contained in segment of program header entry %"
-"d\n"
+"section [%2zu] '%s' not fully contained in segment of program header entry "
+"%d\n"
 msgstr ""
 
 #: src/elflint.c:3737
@@ -3353,8 +3353,8 @@ msgstr ""
 "警告: `%1$s の大きさが %3$s の %2$<PRIu64> から %5$s の %4$<PRIu64> に変更さ"
 "れました"
 
-#: src/ldgeneric.c:651 src/ldgeneric.c:1112 src/readelf.c:526
-#: src/readelf.c:814 src/strip.c:563
+#: src/ldgeneric.c:651 src/ldgeneric.c:1112 src/readelf.c:527
+#: src/readelf.c:815 src/strip.c:563
 #, c-format
 msgid "cannot determine number of sections: %s"
 msgstr "セクション数を決定できません: %s"
@@ -3411,8 +3411,8 @@ msgstr "%s: セクショングループ [%2zd] '%s' の内容を得られませ�
 #: src/ldgeneric.c:1318
 #, c-format
 msgid ""
-"%s: group member %zu of section group [%2zd] '%s' has too high index: %"
-"<PRIu32>"
+"%s: group member %zu of section group [%2zd] '%s' has too high index: "
+"%<PRIu32>"
 msgstr ""
 "%1$s: セクショングループ [%3$2zd] '%4$s' のグループメンバー %2$zu は大きすぎ"
 "るインデックスを持っています: %5$<PRIu32>"
@@ -3803,12 +3803,12 @@ msgstr "%s%s%s: ファイル形式を認識できません"
 msgid "cannot create search tree"
 msgstr "検索ツリーを生成できません"
 
-#: src/nm.c:757 src/nm.c:1157 src/objdump.c:787 src/readelf.c:535
-#: src/readelf.c:1070 src/readelf.c:1213 src/readelf.c:1361 src/readelf.c:1543
-#: src/readelf.c:1743 src/readelf.c:1929 src/readelf.c:2139 src/readelf.c:2393
-#: src/readelf.c:2459 src/readelf.c:2537 src/readelf.c:3035 src/readelf.c:3071
-#: src/readelf.c:3133 src/readelf.c:7804 src/readelf.c:8720 src/readelf.c:8867
-#: src/readelf.c:8935 src/size.c:417 src/size.c:491 src/strip.c:503
+#: src/nm.c:757 src/nm.c:1157 src/objdump.c:787 src/readelf.c:536
+#: src/readelf.c:1071 src/readelf.c:1214 src/readelf.c:1362 src/readelf.c:1544
+#: src/readelf.c:1744 src/readelf.c:1930 src/readelf.c:2140 src/readelf.c:2394
+#: src/readelf.c:2460 src/readelf.c:2538 src/readelf.c:3036 src/readelf.c:3072
+#: src/readelf.c:3134 src/readelf.c:7805 src/readelf.c:8882 src/readelf.c:9029
+#: src/readelf.c:9097 src/size.c:417 src/size.c:491 src/strip.c:503
 #, c-format
 msgid "cannot get section header string table index"
 msgstr "セクションヘッダー文字列テーブル索引が得られません"
@@ -3884,7 +3884,7 @@ msgstr ""
 msgid "Show information from FILEs (a.out by default)."
 msgstr ""
 
-#: src/objdump.c:236 src/readelf.c:472
+#: src/objdump.c:236 src/readelf.c:473
 msgid "No operation specified.\n"
 msgstr "操作が指定されていません。\n"
 
@@ -3893,11 +3893,11 @@ msgstr "操作が指定されていません。\n"
 msgid "while close `%s'"
 msgstr ""
 
-#: src/objdump.c:379 src/readelf.c:1838 src/readelf.c:2012
+#: src/objdump.c:379 src/readelf.c:1839 src/readelf.c:2013
 msgid "INVALID SYMBOL"
 msgstr "不当なシンボル"
 
-#: src/objdump.c:394 src/readelf.c:1869 src/readelf.c:2045
+#: src/objdump.c:394 src/readelf.c:1870 src/readelf.c:2046
 msgid "INVALID SECTION"
 msgstr "不当なセクション"
 
@@ -3951,78 +3951,78 @@ msgstr ""
 msgid "error while freeing sub-ELF descriptor: %s"
 msgstr ""
 
-#: src/readelf.c:70
+#: src/readelf.c:71
 #, fuzzy
 msgid "ELF input selection:"
 msgstr "出力選択:"
 
-#: src/readelf.c:72
+#: src/readelf.c:73
 msgid ""
 "Use the named SECTION (default .gnu_debugdata) as (compressed) ELF input data"
 msgstr ""
 
-#: src/readelf.c:74
+#: src/readelf.c:75
 #, fuzzy
 msgid "ELF output selection:"
 msgstr "出力選択:"
 
-#: src/readelf.c:76
+#: src/readelf.c:77
 msgid "All these plus -p .strtab -p .dynstr -p .comment"
 msgstr ""
 
-#: src/readelf.c:77
+#: src/readelf.c:78
 msgid "Display the dynamic segment"
 msgstr "動的セグメントを表示"
 
-#: src/readelf.c:78
+#: src/readelf.c:79
 msgid "Display the ELF file header"
 msgstr "ELF ファイルヘッダーを表示"
 
-#: src/readelf.c:80
+#: src/readelf.c:81
 msgid "Display histogram of bucket list lengths"
 msgstr "バケットリスト長の柱状図を表示"
 
-#: src/readelf.c:81
+#: src/readelf.c:82
 msgid "Display the program headers"
 msgstr "プログラムヘッダーを表示"
 
-#: src/readelf.c:83
+#: src/readelf.c:84
 msgid "Display relocations"
 msgstr "リロケーションを表示"
 
-#: src/readelf.c:84
+#: src/readelf.c:85
 #, fuzzy
 msgid "Display the sections' headers"
 msgstr "セクションのヘッダーを表示"
 
-#: src/readelf.c:86
+#: src/readelf.c:87
 msgid "Display the symbol table"
 msgstr "シンボルテーブルを表示"
 
-#: src/readelf.c:87
+#: src/readelf.c:88
 msgid "Display versioning information"
 msgstr "バージョニング情報の表示"
 
-#: src/readelf.c:88
+#: src/readelf.c:89
 #, fuzzy
 msgid "Display the ELF notes"
 msgstr "コアノートを表示"
 
-#: src/readelf.c:90
+#: src/readelf.c:91
 #, fuzzy
 msgid "Display architecture specific information, if any"
 msgstr "(もしあれば)アーキテクチャー固有の情報を表示"
 
-#: src/readelf.c:92
+#: src/readelf.c:93
 msgid "Display sections for exception handling"
 msgstr "例外を取り扱うためのセクションを表示"
 
-#: src/readelf.c:94
+#: src/readelf.c:95
 #, fuzzy
 msgid "Additional output selection:"
 msgstr "出力選択:"
 
-#: src/readelf.c:96
+#: src/readelf.c:97
 #, fuzzy
 msgid ""
 "Display DWARF section content.  SECTION can be one of abbrev, aranges, "
@@ -4032,56 +4032,56 @@ msgstr ""
 "DWARF セクションの内容を表示。SECTION は addrevか、aranges、frame、info、"
 "loc、ranges、pubnames、str、macinfo、exception のいずれかです"
 
-#: src/readelf.c:100
+#: src/readelf.c:101
 msgid "Dump the uninterpreted contents of SECTION, by number or name"
 msgstr "数字か名前で解釈できないセクションの内容をダンプする"
 
-#: src/readelf.c:102
+#: src/readelf.c:103
 msgid "Print string contents of sections"
 msgstr "セクションの文字列内容を印刷する"
 
-#: src/readelf.c:105
+#: src/readelf.c:106
 msgid "Display the symbol index of an archive"
 msgstr "アーカイブのシンボル索引を表示"
 
-#: src/readelf.c:107
+#: src/readelf.c:108
 msgid "Output control:"
 msgstr "出力制御:"
 
-#: src/readelf.c:109
+#: src/readelf.c:110
 msgid "Do not find symbol names for addresses in DWARF data"
 msgstr "DWARFデータ中のアドレスのためのシンボル名を探さない"
 
-#: src/readelf.c:111
+#: src/readelf.c:112
 #, fuzzy
 msgid ""
 "Display just offsets instead of resolving values to addresses in DWARF data"
 msgstr "DWARFデータ中のアドレスのためのシンボル名を探さない"
 
-#: src/readelf.c:113
+#: src/readelf.c:114
 msgid "Ignored for compatibility (lines always wide)"
 msgstr ""
 
-#: src/readelf.c:118
+#: src/readelf.c:119
 msgid "Print information from ELF file in human-readable form."
 msgstr "ELF ファイルから人間が読める形で情報を印刷する。"
 
-#: src/readelf.c:440
+#: src/readelf.c:441
 #, c-format
 msgid "Unknown DWARF debug section `%s'.\n"
 msgstr "不明な DWARF デバッグセクション `%s'.\n"
 
-#: src/readelf.c:519 src/readelf.c:630
+#: src/readelf.c:520 src/readelf.c:631
 #, c-format
 msgid "cannot generate Elf descriptor: %s"
 msgstr "Elf 記述子を生成できません: %s"
 
-#: src/readelf.c:544 src/readelf.c:1084 src/readelf.c:1237
+#: src/readelf.c:545 src/readelf.c:1085 src/readelf.c:1238
 #, c-format
 msgid "cannot get section: %s"
 msgstr "セクションを得られません: %s"
 
-#: src/readelf.c:553 src/readelf.c:1091 src/readelf.c:1245 src/readelf.c:8887
+#: src/readelf.c:554 src/readelf.c:1092 src/readelf.c:1246 src/readelf.c:9049
 #: src/unstrip.c:345 src/unstrip.c:376 src/unstrip.c:425 src/unstrip.c:533
 #: src/unstrip.c:550 src/unstrip.c:586 src/unstrip.c:784 src/unstrip.c:1052
 #: src/unstrip.c:1242 src/unstrip.c:1302 src/unstrip.c:1423 src/unstrip.c:1476
@@ -4090,108 +4090,108 @@ msgstr "セクションを得られません: %s"
 msgid "cannot get section header: %s"
 msgstr "セクションヘッダーを得られません: %s"
 
-#: src/readelf.c:561
+#: src/readelf.c:562
 #, fuzzy, c-format
 msgid "cannot get section name"
 msgstr "セクションを得られません: %s"
 
-#: src/readelf.c:570 src/readelf.c:5125 src/readelf.c:7298 src/readelf.c:7400
-#: src/readelf.c:7558
+#: src/readelf.c:571 src/readelf.c:5126 src/readelf.c:7299 src/readelf.c:7401
+#: src/readelf.c:7559
 #, c-format
 msgid "cannot get %s content: %s"
 msgstr "%s の内容を得られません: %s"
 
-#: src/readelf.c:586
+#: src/readelf.c:587
 #, fuzzy, c-format
 msgid "cannot create temp file '%s'"
 msgstr "新しいファイル '%s' を生成できません: %s"
 
-#: src/readelf.c:595
+#: src/readelf.c:596
 #, fuzzy, c-format
 msgid "cannot write section data"
 msgstr "セクションデータを割り当てられません: %s"
 
-#: src/readelf.c:601 src/readelf.c:618 src/readelf.c:647
+#: src/readelf.c:602 src/readelf.c:619 src/readelf.c:648
 #, c-format
 msgid "error while closing Elf descriptor: %s"
 msgstr "Elf 記述子を閉じている時にエラー: %s"
 
-#: src/readelf.c:608
+#: src/readelf.c:609
 #, fuzzy, c-format
 msgid "error while rewinding file descriptor"
 msgstr "Elf 記述子を閉じている時にエラー: %s"
 
-#: src/readelf.c:642
+#: src/readelf.c:643
 #, c-format
 msgid "'%s' is not an archive, cannot print archive index"
 msgstr "'%s' はアーカイブではなく、アーカイブ索引を印刷できません"
 
-#: src/readelf.c:727
+#: src/readelf.c:728
 #, fuzzy, c-format
 msgid "No such section '%s' in '%s'"
 msgstr "セクション [%Zu] '%s' からデータが得られません: %s"
 
-#: src/readelf.c:754
+#: src/readelf.c:755
 #, c-format
 msgid "cannot stat input file"
 msgstr "入力ファイルを stat できません"
 
-#: src/readelf.c:756
+#: src/readelf.c:757
 #, c-format
 msgid "input file is empty"
 msgstr "入力ファイルが空です"
 
-#: src/readelf.c:758
+#: src/readelf.c:759
 #, c-format
 msgid "failed reading '%s': %s"
 msgstr "'%s' の読込みに失敗: %s"
 
-#: src/readelf.c:799
+#: src/readelf.c:800
 #, c-format
 msgid "cannot read ELF header: %s"
 msgstr "ELF ヘッダーが読めません: %s"
 
-#: src/readelf.c:807
+#: src/readelf.c:808
 #, c-format
 msgid "cannot create EBL handle"
 msgstr "EBL ヘッダーを生成できません"
 
-#: src/readelf.c:820
+#: src/readelf.c:821
 #, fuzzy, c-format
 msgid "cannot determine number of program headers: %s"
 msgstr "セクション数を決定できません: %s"
 
-#: src/readelf.c:906
+#: src/readelf.c:907
 msgid "NONE (None)"
 msgstr "なし (なし)"
 
-#: src/readelf.c:907
+#: src/readelf.c:908
 msgid "REL (Relocatable file)"
 msgstr "REL (リロケータブルファイル)"
 
-#: src/readelf.c:908
+#: src/readelf.c:909
 msgid "EXEC (Executable file)"
 msgstr "(EXEC (実行ファイル)"
 
-#: src/readelf.c:909
+#: src/readelf.c:910
 msgid "DYN (Shared object file)"
 msgstr "DYN (共用オブジェクトファイル)"
 
-#: src/readelf.c:910
+#: src/readelf.c:911
 msgid "CORE (Core file)"
 msgstr "CORE (コアファイル)"
 
-#: src/readelf.c:915
+#: src/readelf.c:916
 #, c-format
 msgid "OS Specific: (%x)\n"
 msgstr "OS 固有: (%x)\n"
 
-#: src/readelf.c:917
+#: src/readelf.c:918
 #, c-format
 msgid "Processor Specific: (%x)\n"
 msgstr "プロセッサー固有: (%x)\n"
 
-#: src/readelf.c:927
+#: src/readelf.c:928
 msgid ""
 "ELF Header:\n"
 "  Magic:  "
@@ -4199,7 +4199,7 @@ msgstr ""
 "ELF ヘッダー:\n"
 " マジック: "
 
-#: src/readelf.c:931
+#: src/readelf.c:932
 #, c-format
 msgid ""
 "\n"
@@ -4208,117 +4208,117 @@ msgstr ""
 "\n"
 "  クラス:                            %s\n"
 
-#: src/readelf.c:936
+#: src/readelf.c:937
 #, c-format
 msgid "  Data:                              %s\n"
 msgstr "  データ:                            %s\n"
 
-#: src/readelf.c:942
+#: src/readelf.c:943
 #, c-format
 msgid "  Ident Version:                     %hhd %s\n"
 msgstr "  識別バージョン:                    %hhd %s\n"
 
-#: src/readelf.c:944 src/readelf.c:961
+#: src/readelf.c:945 src/readelf.c:962
 msgid "(current)"
 msgstr "(現在)"
 
-#: src/readelf.c:948
+#: src/readelf.c:949
 #, c-format
 msgid "  OS/ABI:                            %s\n"
 msgstr "  OS/ABI:                            %s\n"
 
-#: src/readelf.c:951
+#: src/readelf.c:952
 #, c-format
 msgid "  ABI Version:                       %hhd\n"
 msgstr "  ABI バージョン:                    %hhd\n"
 
-#: src/readelf.c:954
+#: src/readelf.c:955
 msgid "  Type:                              "
 msgstr "  タイプ:                            "
 
-#: src/readelf.c:957
+#: src/readelf.c:958
 #, c-format
 msgid "  Machine:                           %s\n"
 msgstr "  マシン :                           %s\n"
 
-#: src/readelf.c:959
+#: src/readelf.c:960
 #, c-format
 msgid "  Version:                           %d %s\n"
 msgstr "  バージョン:                        %d %s\n"
 
-#: src/readelf.c:963
+#: src/readelf.c:964
 #, c-format
 msgid "  Entry point address:               %#<PRIx64>\n"
 msgstr "  入口点アドレス     :               %#<PRIx64>\n"
 
-#: src/readelf.c:966
+#: src/readelf.c:967
 #, c-format
 msgid "  Start of program headers:          %<PRId64> %s\n"
 msgstr "  プログラムヘッダーの開始:          %<PRId64> %s\n"
 
-#: src/readelf.c:967 src/readelf.c:970
+#: src/readelf.c:968 src/readelf.c:971
 msgid "(bytes into file)"
 msgstr "(ファイルへのバイト数)"
 
-#: src/readelf.c:969
+#: src/readelf.c:970
 #, c-format
 msgid "  Start of section headers:          %<PRId64> %s\n"
 msgstr "  セクションヘッダーの開始:          %<PRId64> %s\n"
 
-#: src/readelf.c:972
+#: src/readelf.c:973
 #, c-format
 msgid "  Flags:                             %s\n"
 msgstr "  フラグ:                            %s\n"
 
-#: src/readelf.c:975
+#: src/readelf.c:976
 #, c-format
 msgid "  Size of this header:               %<PRId16> %s\n"
 msgstr "  このヘッダーの大きさ:              %<PRId16> %s\n"
 
-#: src/readelf.c:976 src/readelf.c:979 src/readelf.c:996
+#: src/readelf.c:977 src/readelf.c:980 src/readelf.c:997
 msgid "(bytes)"
 msgstr "(バイト)"
 
-#: src/readelf.c:978
+#: src/readelf.c:979
 #, c-format
 msgid "  Size of program header entries:    %<PRId16> %s\n"
 msgstr "  プログラムヘッダー項目の大きさ:%<PRId16> %s\n"
 
-#: src/readelf.c:981
+#: src/readelf.c:982
 #, fuzzy, c-format
 msgid "  Number of program headers entries: %<PRId16>"
 msgstr "  プログラムヘッダー項目の数 : %<PRId16>\n"
 
-#: src/readelf.c:988
+#: src/readelf.c:989
 #, fuzzy, c-format
 msgid " (%<PRIu32> in [0].sh_info)"
 msgstr "([0].sh_link の %<PRIu32>)"
 
-#: src/readelf.c:991 src/readelf.c:1008 src/readelf.c:1022
+#: src/readelf.c:992 src/readelf.c:1009 src/readelf.c:1023
 msgid " ([0] not available)"
 msgstr "([0]は使えません)"
 
-#: src/readelf.c:995
+#: src/readelf.c:996
 #, c-format
 msgid "  Size of section header entries:    %<PRId16> %s\n"
 msgstr "  セクションヘッダー項目の大きさ:%<PRId16> %s\n"
 
-#: src/readelf.c:998
+#: src/readelf.c:999
 #, c-format
 msgid "  Number of section headers entries: %<PRId16>"
 msgstr "  セクションヘッダー項目の数 : %<PRId16>"
 
-#: src/readelf.c:1005
+#: src/readelf.c:1006
 #, c-format
 msgid " (%<PRIu32> in [0].sh_size)"
 msgstr " ([0].sh_size の %<PRIu32>)"
 
-#: src/readelf.c:1018
+#: src/readelf.c:1019
 #, c-format
 msgid " (%<PRIu32> in [0].sh_link)"
 msgstr "([0].sh_link の %<PRIu32>)"
 
-#: src/readelf.c:1026
+#: src/readelf.c:1027
 #, c-format
 msgid ""
 "  Section header string table index: XINDEX%s\n"
@@ -4327,7 +4327,7 @@ msgstr ""
 "  セクションヘッダー文字列テーブル索引: XINDEX%s\n"
 "\n"
 
-#: src/readelf.c:1030
+#: src/readelf.c:1031
 #, c-format
 msgid ""
 "  Section header string table index: %<PRId16>\n"
@@ -4336,7 +4336,7 @@ msgstr ""
 "  セクションヘッダー文字列テーブル索引: %<PRId16>\n"
 "\n"
 
-#: src/readelf.c:1062
+#: src/readelf.c:1063
 #, c-format
 msgid ""
 "There are %d section headers, starting at offset %#<PRIx64>:\n"
@@ -4345,11 +4345,11 @@ msgstr ""
 "オフセット %2$#<PRIx64> から始まる %1$d 個のセクションヘッダーがあります:\n"
 "\n"
 
-#: src/readelf.c:1072
+#: src/readelf.c:1073
 msgid "Section Headers:"
 msgstr "セクションヘッダー:"
 
-#: src/readelf.c:1075
+#: src/readelf.c:1076
 msgid ""
 "[Nr] Name                 Type         Addr     Off    Size   ES Flags Lk "
 "Inf Al"
@@ -4357,7 +4357,7 @@ msgstr ""
 "[番] 名前                 タイプ       アドレス オフセ 大きさ ES フラグLk "
 "Inf Al"
 
-#: src/readelf.c:1077
+#: src/readelf.c:1078
 msgid ""
 "[Nr] Name                 Type         Addr             Off      Size     ES "
 "Flags Lk Inf Al"
@@ -4365,17 +4365,17 @@ msgstr ""
 "[番] 名前                 タイプ       アドレス         オフセ   大きさ   ES "
 "フラグLk Inf Al"
 
-#: src/readelf.c:1149
+#: src/readelf.c:1150
 msgid "Program Headers:"
 msgstr "プログラムヘッダー:"
 
-#: src/readelf.c:1151
+#: src/readelf.c:1152
 msgid ""
 "  Type           Offset   VirtAddr   PhysAddr   FileSiz  MemSiz   Flg Align"
 msgstr ""
 "  タイプ         オフセ   仮アドレス 物アドレス ファイ量 メモ量   Flg 調整 "
 
-#: src/readelf.c:1154
+#: src/readelf.c:1155
 msgid ""
 "  Type           Offset   VirtAddr           PhysAddr           FileSiz  "
 "MemSiz   Flg Align"
@@ -4383,12 +4383,12 @@ msgstr ""
 "  タイプ         オフセ   仮想アドレス       物理アドレス      ファイル量メモ"
 "量   Flg 調整 "
 
-#: src/readelf.c:1194
+#: src/readelf.c:1195
 #, c-format
 msgid "\t[Requesting program interpreter: %s]\n"
 msgstr "\t[プログラム割込みを要求: %s]\n"
 
-#: src/readelf.c:1215
+#: src/readelf.c:1216
 msgid ""
 "\n"
 " Section to Segment mapping:\n"
@@ -4398,12 +4398,12 @@ msgstr ""
 " セクションからセグメントへのマッビング:\n"
 "  セグメント セクション..."
 
-#: src/readelf.c:1226 src/unstrip.c:1827 src/unstrip.c:1866 src/unstrip.c:1873
+#: src/readelf.c:1227 src/unstrip.c:1827 src/unstrip.c:1866 src/unstrip.c:1873
 #, c-format
 msgid "cannot get program header: %s"
 msgstr "プログラムヘッダーを得られません: %s"
 
-#: src/readelf.c:1367
+#: src/readelf.c:1368
 #, c-format
 msgid ""
 "\n"
@@ -4416,7 +4416,7 @@ msgstr[0] ""
 "署名 '%3$s' を持つ COMDAT セクショングループ [%1$2zu] '%2$s' には %4$zu 個の"
 "項目があります:\n"
 
-#: src/readelf.c:1372
+#: src/readelf.c:1373
 #, c-format
 msgid ""
 "\n"
@@ -4429,15 +4429,15 @@ msgstr[0] ""
 "署名 '%3$s' を持つセクショングループ [%1$2zu] '%2$s' には %4$zu 個の項目があ"
 "ります:\n"
 
-#: src/readelf.c:1380
+#: src/readelf.c:1381
 msgid "<INVALID SYMBOL>"
 msgstr "<不当なシンボル>"
 
-#: src/readelf.c:1394
+#: src/readelf.c:1395
 msgid "<INVALID SECTION>"
 msgstr "<不当なセクション>"
 
-#: src/readelf.c:1545
+#: src/readelf.c:1546
 #, c-format
 msgid ""
 "\n"
@@ -4450,39 +4450,39 @@ msgid_plural ""
 msgstr[0] ""
 "\n"
 "動的セグメントには %lu 個の項目があります:\n"
-" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: [%"
-"2u] '%s'\n"
+" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: "
+"[%2u] '%s'\n"
 
-#: src/readelf.c:1557
+#: src/readelf.c:1558
 msgid "  Type              Value\n"
 msgstr "  タイプ            値\n"
 
-#: src/readelf.c:1581
+#: src/readelf.c:1582
 #, c-format
 msgid "Shared library: [%s]\n"
 msgstr "共用ライブラリー: [%s]\n"
 
-#: src/readelf.c:1586
+#: src/readelf.c:1587
 #, c-format
 msgid "Library soname: [%s]\n"
 msgstr "ライブラリー so 名: [%s]\n"
 
-#: src/readelf.c:1591
+#: src/readelf.c:1592
 #, c-format
 msgid "Library rpath: [%s]\n"
 msgstr "ライブラリー rパス: [%s]\n"
 
-#: src/readelf.c:1596
+#: src/readelf.c:1597
 #, c-format
 msgid "Library runpath: [%s]\n"
 msgstr "ライブラリー run パス: [%s]\n"
 
-#: src/readelf.c:1616
+#: src/readelf.c:1617
 #, c-format
 msgid "%<PRId64> (bytes)\n"
 msgstr "%<PRId64> (バイト)\n"
 
-#: src/readelf.c:1728 src/readelf.c:1914
+#: src/readelf.c:1729 src/readelf.c:1915
 #, c-format
 msgid ""
 "\n"
@@ -4491,7 +4491,7 @@ msgstr ""
 "\n"
 "オフセット %#0<PRIx64> に不当なシンボルテーブル\n"
 
-#: src/readelf.c:1746 src/readelf.c:1931
+#: src/readelf.c:1747 src/readelf.c:1932
 #, c-format
 msgid ""
 "\n"
@@ -4506,7 +4506,7 @@ msgstr[0] ""
 "オフセット %5$#0<PRIx64> のセクション [%3$2u] '%4$s' 用のリロケーションセク"
 "ション [%1$2zu] '%2$s' には %6$d 個の項目があります:\n"
 
-#: src/readelf.c:1761
+#: src/readelf.c:1762
 #, c-format
 msgid ""
 "\n"
@@ -4519,29 +4519,29 @@ msgstr[0] ""
 "オフセット %3$#0<PRIx64> のリロケーションセクション [%1$2u] '%2$s' には %4$d "
 "個の項目があります:\n"
 
-#: src/readelf.c:1771
+#: src/readelf.c:1772
 msgid "  Offset      Type                 Value       Name\n"
 msgstr "  オフセット  タイプ               値          名前\n"
 
-#: src/readelf.c:1773
+#: src/readelf.c:1774
 msgid "  Offset              Type                 Value               Name\n"
 msgstr "  オフセット          タイプ               値                  名前\n"
 
-#: src/readelf.c:1826 src/readelf.c:1837 src/readelf.c:1850 src/readelf.c:1868
-#: src/readelf.c:1880 src/readelf.c:1999 src/readelf.c:2011 src/readelf.c:2025
-#: src/readelf.c:2044 src/readelf.c:2057
+#: src/readelf.c:1827 src/readelf.c:1838 src/readelf.c:1851 src/readelf.c:1869
+#: src/readelf.c:1881 src/readelf.c:2000 src/readelf.c:2012 src/readelf.c:2026
+#: src/readelf.c:2045 src/readelf.c:2058
 msgid "<INVALID RELOC>"
 msgstr "<不当なRELOC>"
 
-#: src/readelf.c:1943
+#: src/readelf.c:1944
 msgid "  Offset      Type            Value       Addend Name\n"
 msgstr "  オフセット  タイプ          値          付加名\n"
 
-#: src/readelf.c:1945
+#: src/readelf.c:1946
 msgid "  Offset              Type            Value               Addend Name\n"
 msgstr "  オフセット          タイプ          値                  付加名\n"
 
-#: src/readelf.c:2146
+#: src/readelf.c:2147
 #, c-format
 msgid ""
 "\n"
@@ -4553,39 +4553,39 @@ msgstr[0] ""
 "\n"
 "シンボルテーブル [%2u] '%s' には %u 個の項目があります:\n"
 
-#: src/readelf.c:2152
+#: src/readelf.c:2153
 #, c-format
 msgid " %lu local symbol  String table: [%2u] '%s'\n"
 msgid_plural " %lu local symbols  String table: [%2u] '%s'\n"
 msgstr[0] " %lu ローカルシンボル文字列テーブル: [%2u] '%s'\n"
 
-#: src/readelf.c:2162
+#: src/readelf.c:2163
 msgid "  Num:    Value   Size Type    Bind   Vis          Ndx Name\n"
 msgstr "  数 :    値      大き タイプ  Bind   Vis          Ndx 名前\n"
 
-#: src/readelf.c:2164
+#: src/readelf.c:2165
 msgid "  Num:            Value   Size Type    Bind   Vis          Ndx Name\n"
 msgstr "  数 :            値      大き タイプ  Bind   Vis          Ndx 名前\n"
 
-#: src/readelf.c:2184
+#: src/readelf.c:2185
 #, c-format
 msgid "%5u: %0*<PRIx64> %6<PRId64> %-7s %-6s %-9s %6s %s"
 msgstr "%5u: %0*<PRIx64> %6<PRId64> %-7s %-6s %-9s %6s %s"
 
-#: src/readelf.c:2272
+#: src/readelf.c:2273
 #, c-format
 msgid "bad dynamic symbol"
 msgstr "不正な動的シンボル"
 
-#: src/readelf.c:2354
+#: src/readelf.c:2355
 msgid "none"
 msgstr "なし"
 
-#: src/readelf.c:2371
+#: src/readelf.c:2372
 msgid "| <unknown>"
 msgstr "| <不明>"
 
-#: src/readelf.c:2396
+#: src/readelf.c:2397
 #, c-format
 msgid ""
 "\n"
@@ -4598,20 +4598,20 @@ msgid_plural ""
 msgstr[0] ""
 "\n"
 "セクション [%2u] '%s' を必要とするバージョンには %d 個の項目があります:\n"
-" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: [%"
-"2u] '%s'\n"
+" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: "
+"[%2u] '%s'\n"
 
-#: src/readelf.c:2419
+#: src/readelf.c:2420
 #, c-format
 msgid "  %#06x: Version: %hu  File: %s  Cnt: %hu\n"
 msgstr "  %#06x: バージョン: %hu  ファイル: %s  数: %hu\n"
 
-#: src/readelf.c:2432
+#: src/readelf.c:2433
 #, c-format
 msgid "  %#06x: Name: %s  Flags: %s  Version: %hu\n"
 msgstr "  %#06x: 名前: %s  フラグ: %s  バージョン: %hu\n"
 
-#: src/readelf.c:2463
+#: src/readelf.c:2464
 #, c-format
 msgid ""
 "\n"
@@ -4624,20 +4624,20 @@ msgid_plural ""
 msgstr[0] ""
 "\n"
 "バージョン定義セクション [%2u] '%s' には %d 個の項目があります:\n"
-" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: [%"
-"2u] '%s'\n"
+" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: "
+"[%2u] '%s'\n"
 
-#: src/readelf.c:2493
+#: src/readelf.c:2494
 #, c-format
 msgid "  %#06x: Version: %hd  Flags: %s  Index: %hd  Cnt: %hd  Name: %s\n"
 msgstr "  %#06x: バージョン: %hd  フラグ: %s  索引: %hd  数: %hd  名前: %s\n"
 
-#: src/readelf.c:2508
+#: src/readelf.c:2509
 #, c-format
 msgid "  %#06x: Parent %d: %s\n"
 msgstr "  %#06x: 親 %d: %s\n"
 
-#: src/readelf.c:2740
+#: src/readelf.c:2741
 #, c-format
 msgid ""
 "\n"
@@ -4650,18 +4650,18 @@ msgid_plural ""
 msgstr[0] ""
 "\n"
 "バージョンシンボルセクション [%2u] '%s' には %d 個の項目があります:\n"
-" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: [%"
-"2u] '%s'"
+" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: "
+"[%2u] '%s'"
 
-#: src/readelf.c:2770
+#: src/readelf.c:2771
 msgid "   0 *local*                     "
 msgstr "   0 *ローカル*                  "
 
-#: src/readelf.c:2775
+#: src/readelf.c:2776
 msgid "   1 *global*                    "
 msgstr "   1 *グローバル*                "
 
-#: src/readelf.c:2806
+#: src/readelf.c:2807
 #, c-format
 msgid ""
 "\n"
@@ -4676,25 +4676,25 @@ msgid_plural ""
 msgstr[0] ""
 "\n"
 "セクション [%2u] '%s' のバケット一覧の長さの柱状図(合計 %d バケット):\n"
-" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: [%"
-"2u] '%s'\n"
+" アドレス: %#0*<PRIx64>  オフセット: %#08<PRIx64>  セクションへのリンク: "
+"[%2u] '%s'\n"
 
-#: src/readelf.c:2830
+#: src/readelf.c:2831
 #, fuzzy, no-c-format
 msgid " Length  Number  % of total  Coverage\n"
 msgstr " 長さ    数      全体の%     範囲    \n"
 
-#: src/readelf.c:2832
+#: src/readelf.c:2833
 #, c-format
 msgid "      0  %6<PRIu32>      %5.1f%%\n"
 msgstr "      0  %6<PRIu32>      %5.1f%%\n"
 
-#: src/readelf.c:2839
+#: src/readelf.c:2840
 #, c-format
 msgid "%7d  %6<PRIu32>      %5.1f%%    %5.1f%%\n"
 msgstr "%7d  %6<PRIu32>      %5.1f%%    %5.1f%%\n"
 
-#: src/readelf.c:2852
+#: src/readelf.c:2853
 #, fuzzy, c-format
 msgid ""
 " Average number of tests:   successful lookup: %f\n"
@@ -4703,12 +4703,12 @@ msgstr ""
 " テストの平均数: 検索成功: %f\n"
 "                 検索失敗: %f\n"
 
-#: src/readelf.c:2870 src/readelf.c:2912 src/readelf.c:2953
+#: src/readelf.c:2871 src/readelf.c:2913 src/readelf.c:2954
 #, c-format
 msgid "cannot get data for section %d: %s"
 msgstr "セクションからデータを得られません %d: %s"
 
-#: src/readelf.c:3007
+#: src/readelf.c:3008
 #, c-format
 msgid ""
 " Symbol Bias: %u\n"
@@ -4718,7 +4718,7 @@ msgstr ""
 " ビットマスクの大きさ: %zu バイト  %<PRIuFAST32>%% ビット設定 第2ハッシュシフ"
 "ト: %u\n"
 
-#: src/readelf.c:3081
+#: src/readelf.c:3082
 #, c-format
 msgid ""
 "\n"
@@ -4728,10 +4728,10 @@ msgid_plural ""
 "Library list section [%2zu] '%s' at offset %#0<PRIx64> contains %d entries:\n"
 msgstr[0] ""
 "\n"
-"オフセット %3$#0<PRIx64> のライブラリー一覧セクション [%1$2zu] '%2$s' には %4"
-"$d 個の項目があります:\n"
+"オフセット %3$#0<PRIx64> のライブラリー一覧セクション [%1$2zu] '%2$s' には "
+"%4$d 個の項目があります:\n"
 
-#: src/readelf.c:3095
+#: src/readelf.c:3096
 msgid ""
 "       Library                       Time Stamp          Checksum Version "
 "Flags"
@@ -4739,151 +4739,151 @@ msgstr ""
 "       ライブラリー                  タイムスタンプ      チェックサム バー"
 "ジョン フラグ"
 
-#: src/readelf.c:3145
+#: src/readelf.c:3146
 #, c-format
 msgid ""
 "\n"
-"Object attributes section [%2zu] '%s' of %<PRIu64> bytes at offset %"
-"#0<PRIx64>:\n"
+"Object attributes section [%2zu] '%s' of %<PRIu64> bytes at offset "
+"%#0<PRIx64>:\n"
 msgstr ""
 "\n"
-"オフセット %4$#0<PRIx64> の %3$<PRIu64> バイトのオブジェクト属性セクション [%"
-"1$2zu] '%2$s':\n"
+"オフセット %4$#0<PRIx64> の %3$<PRIu64> バイトのオブジェクト属性セクション "
+"[%1$2zu] '%2$s':\n"
 
-#: src/readelf.c:3161
+#: src/readelf.c:3162
 msgid "  Owner          Size\n"
 msgstr "  所有者         大きさ\n"
 
-#: src/readelf.c:3187
+#: src/readelf.c:3188
 #, c-format
 msgid "  %-13s  %4<PRIu32>\n"
 msgstr "  %-13s  %4<PRIu32>\n"
 
-#: src/readelf.c:3219
+#: src/readelf.c:3220
 #, c-format
 msgid "    %-4u %12<PRIu32>\n"
 msgstr "    %-4u %12<PRIu32>\n"
 
-#: src/readelf.c:3224
+#: src/readelf.c:3225
 #, c-format
 msgid "    File: %11<PRIu32>\n"
 msgstr "    ファイル: %11<PRIu32>\n"
 
-#: src/readelf.c:3259
+#: src/readelf.c:3260
 #, c-format
 msgid "      %s: %<PRId64>, %s\n"
 msgstr "      %s: %<PRId64>、%s\n"
 
-#: src/readelf.c:3262
+#: src/readelf.c:3263
 #, c-format
 msgid "      %s: %<PRId64>\n"
 msgstr "      %s: %<PRId64>\n"
 
-#: src/readelf.c:3265
+#: src/readelf.c:3266
 #, c-format
 msgid "      %s: %s\n"
 msgstr "      %s: %s\n"
 
-#: src/readelf.c:3272
+#: src/readelf.c:3273
 #, c-format
 msgid "      %u: %<PRId64>\n"
 msgstr "      %u: %<PRId64>\n"
 
-#: src/readelf.c:3275
+#: src/readelf.c:3276
 #, c-format
 msgid "      %u: %s\n"
 msgstr "      %u: %s\n"
 
-#: src/readelf.c:3320
+#: src/readelf.c:3321
 #, c-format
 msgid "%s+%#<PRIx64> <%s+%#<PRIx64>>"
 msgstr "%s+%#<PRIx64> <%s+%#<PRIx64>>"
 
-#: src/readelf.c:3323
+#: src/readelf.c:3324
 #, c-format
 msgid "%s+%#0*<PRIx64> <%s+%#<PRIx64>>"
 msgstr "%s+%#0*<PRIx64> <%s+%#<PRIx64>>"
 
-#: src/readelf.c:3328
+#: src/readelf.c:3329
 #, c-format
 msgid "%#<PRIx64> <%s+%#<PRIx64>>"
 msgstr "%#<PRIx64> <%s+%#<PRIx64>>"
 
-#: src/readelf.c:3331
+#: src/readelf.c:3332
 #, c-format
 msgid "%#0*<PRIx64> <%s+%#<PRIx64>>"
 msgstr "%#0*<PRIx64> <%s+%#<PRIx64>>"
 
-#: src/readelf.c:3337
+#: src/readelf.c:3338
 #, c-format
 msgid "%s+%#<PRIx64> <%s>"
 msgstr "%s+%#<PRIx64> <%s>"
 
-#: src/readelf.c:3340
+#: src/readelf.c:3341
 #, c-format
 msgid "%s+%#0*<PRIx64> <%s>"
 msgstr "%s+%#0*<PRIx64> <%s>"
 
-#: src/readelf.c:3344
+#: src/readelf.c:3345
 #, c-format
 msgid "%#<PRIx64> <%s>"
 msgstr "%#<PRIx64> <%s>"
 
-#: src/readelf.c:3347
+#: src/readelf.c:3348
 #, c-format
 msgid "%#0*<PRIx64> <%s>"
 msgstr "%#0*<PRIx64> <%s>"
 
-#: src/readelf.c:3352
+#: src/readelf.c:3353
 #, c-format
 msgid "%s+%#<PRIx64>"
 msgstr "%s+%#<PRIx64>"
 
-#: src/readelf.c:3355
+#: src/readelf.c:3356
 #, c-format
 msgid "%s+%#0*<PRIx64>"
 msgstr "%s+%#0*<PRIx64>"
 
-#: src/readelf.c:3737
+#: src/readelf.c:3738
 msgid "empty block"
 msgstr "空ブロック"
 
-#: src/readelf.c:3740
+#: src/readelf.c:3741
 #, c-format
 msgid "%zu byte block:"
 msgstr "%zu バイトのブロック:"
 
-#: src/readelf.c:4134
+#: src/readelf.c:4135
 #, c-format
 msgid "%*s[%4<PRIuMAX>] %s  <TRUNCATED>\n"
 msgstr "%*s[%4<PRIuMAX>] %s  <TRUNCATED>\n"
 
-#: src/readelf.c:4191
+#: src/readelf.c:4192
 #, c-format
 msgid "%s %#<PRIx64> used with different address sizes"
 msgstr ""
 
-#: src/readelf.c:4198
+#: src/readelf.c:4199
 #, c-format
 msgid "%s %#<PRIx64> used with different offset sizes"
 msgstr ""
 
-#: src/readelf.c:4205
+#: src/readelf.c:4206
 #, c-format
 msgid "%s %#<PRIx64> used with different base addresses"
 msgstr ""
 
-#: src/readelf.c:4287
+#: src/readelf.c:4288
 #, c-format
 msgid " [%6tx]  <UNUSED GARBAGE IN REST OF SECTION>\n"
 msgstr ""
 
-#: src/readelf.c:4295
+#: src/readelf.c:4296
 #, c-format
 msgid " [%6tx]  <UNUSED GARBAGE> ... %<PRIu64> bytes ...\n"
 msgstr ""
 
-#: src/readelf.c:4321
+#: src/readelf.c:4322
 #, c-format
 msgid ""
 "\n"
@@ -4894,7 +4894,7 @@ msgstr ""
 "オフセット %3$#<PRIx64> の DWARF セクション [%1$2zu] '%2$s':\n"
 " [ コード]\n"
 
-#: src/readelf.c:4329
+#: src/readelf.c:4330
 #, c-format
 msgid ""
 "\n"
@@ -4903,30 +4903,30 @@ msgstr ""
 "\n"
 "オフセット %<PRIu64> の略語セクション:\n"
 
-#: src/readelf.c:4342
+#: src/readelf.c:4343
 #, c-format
 msgid " *** error while reading abbreviation: %s\n"
 msgstr " *** 略語を読んでいる間にエラー: %s\n"
 
-#: src/readelf.c:4358
+#: src/readelf.c:4359
 #, c-format
 msgid " [%5u] offset: %<PRId64>, children: %s, tag: %s\n"
 msgstr " [%5u] オフセット: %<PRId64>、子: %s、タグ: %s\n"
 
-#: src/readelf.c:4361
+#: src/readelf.c:4362
 msgid "yes"
 msgstr "はい"
 
-#: src/readelf.c:4361
+#: src/readelf.c:4362
 msgid "no"
 msgstr "いいえ"
 
-#: src/readelf.c:4395 src/readelf.c:4458
+#: src/readelf.c:4396 src/readelf.c:4459
 #, c-format
 msgid "cannot get .debug_aranges content: %s"
 msgstr ".debug_aragnes の内容を得られません: %s"
 
-#: src/readelf.c:4400
+#: src/readelf.c:4401
 #, c-format
 msgid ""
 "\n"
@@ -4939,20 +4939,20 @@ msgstr[0] ""
 "オフセット %3$#<PRIx64> の DWARF セクション [%1$2zu] '%2$s' には %4$zu 個の項"
 "目があります:\n"
 
-#: src/readelf.c:4431
+#: src/readelf.c:4432
 #, c-format
 msgid " [%*zu] ???\n"
 msgstr " [%*zu] ???\n"
 
-#: src/readelf.c:4433
+#: src/readelf.c:4434
 #, c-format
 msgid ""
 " [%*zu] start: %0#*<PRIx64>, length: %5<PRIu64>, CU DIE offset: %6<PRId64>\n"
 msgstr ""
 " [%*zu] 開始: %0#*<PRIx64>、長さ: %5<PRIu64>、CU DIE オフセット: %6<PRId64>\n"
 
-#: src/readelf.c:4463 src/readelf.c:4617 src/readelf.c:5136 src/readelf.c:6030
-#: src/readelf.c:6531 src/readelf.c:6651 src/readelf.c:6807 src/readelf.c:7229
+#: src/readelf.c:4464 src/readelf.c:4618 src/readelf.c:5137 src/readelf.c:6031
+#: src/readelf.c:6532 src/readelf.c:6652 src/readelf.c:6808 src/readelf.c:7230
 #, c-format
 msgid ""
 "\n"
@@ -4961,7 +4961,7 @@ msgstr ""
 "\n"
 "オフセット %3$#<PRIx64> の DWARF セクション [%1$2zu] '%2$s':\n"
 
-#: src/readelf.c:4476 src/readelf.c:6056
+#: src/readelf.c:4477 src/readelf.c:6057
 #, c-format
 msgid ""
 "\n"
@@ -4970,108 +4970,108 @@ msgstr ""
 "\n"
 "オフセット %Zu のテーブル:\n"
 
-#: src/readelf.c:4480 src/readelf.c:5160 src/readelf.c:6065
+#: src/readelf.c:4481 src/readelf.c:5161 src/readelf.c:6066
 #, c-format
 msgid "invalid data in section [%zu] '%s'"
 msgstr "セクション [%zu] '%s' の不当なデータ"
 
-#: src/readelf.c:4496
+#: src/readelf.c:4497
 #, fuzzy, c-format
 msgid ""
 "\n"
 " Length:        %6<PRIu64>\n"
 msgstr " (オフセット: %#<PRIx64>)"
 
-#: src/readelf.c:4508
+#: src/readelf.c:4509
 #, fuzzy, c-format
 msgid " DWARF version: %6<PRIuFAST16>\n"
 msgstr "      %s: %<PRId64>\n"
 
-#: src/readelf.c:4512
+#: src/readelf.c:4513
 #, c-format
 msgid "unsupported aranges version"
 msgstr ""
 
-#: src/readelf.c:4523
+#: src/readelf.c:4524
 #, fuzzy, c-format
 msgid " CU offset:     %6<PRIx64>\n"
 msgstr " (オフセット: %#<PRIx64>)"
 
-#: src/readelf.c:4529
+#: src/readelf.c:4530
 #, fuzzy, c-format
 msgid " Address size:  %6<PRIu64>\n"
 msgstr " (終了オフセット: %#<PRIx64>)"
 
-#: src/readelf.c:4533
+#: src/readelf.c:4534
 #, fuzzy, c-format
 msgid "unsupported address size"
 msgstr "アドレス値ではありません"
 
-#: src/readelf.c:4538
+#: src/readelf.c:4539
 #, fuzzy, c-format
 msgid ""
 " Segment size:  %6<PRIu64>\n"
 "\n"
 msgstr " ファイルを %<PRIu64> に設定する\n"
 
-#: src/readelf.c:4542
+#: src/readelf.c:4543
 #, c-format
 msgid "unsupported segment size"
 msgstr ""
 
-#: src/readelf.c:4582
+#: src/readelf.c:4583
 #, fuzzy, c-format
 msgid "   %s..%s (%<PRIx64>)\n"
 msgstr "      %s: %<PRId64>\n"
 
-#: src/readelf.c:4585
+#: src/readelf.c:4586
 #, fuzzy, c-format
 msgid "   %s..%s\n"
 msgstr " [%6tx]  %s..%s\n"
 
-#: src/readelf.c:4594
+#: src/readelf.c:4595
 #, c-format
 msgid "   %Zu padding bytes\n"
 msgstr ""
 
-#: src/readelf.c:4612
+#: src/readelf.c:4613
 #, c-format
 msgid "cannot get .debug_ranges content: %s"
 msgstr ".degub_ranges の内容を得られません: %s"
 
-#: src/readelf.c:4642 src/readelf.c:6558
+#: src/readelf.c:4643 src/readelf.c:6559
 #, c-format
 msgid " [%6tx]  <INVALID DATA>\n"
 msgstr " [%6tx]  <不当なデータ>\n"
 
-#: src/readelf.c:4664 src/readelf.c:6580
+#: src/readelf.c:4665 src/readelf.c:6581
 #, c-format
 msgid " [%6tx]  base address %s\n"
 msgstr " [%6tx]  ベースアドレス %s\n"
 
-#: src/readelf.c:4671 src/readelf.c:6587
+#: src/readelf.c:4672 src/readelf.c:6588
 #, fuzzy, c-format
 msgid " [%6tx]  empty list\n"
 msgstr ""
 "\n"
 " [%6tx] ゼロ終端\n"
 
-#: src/readelf.c:4682
+#: src/readelf.c:4683
 #, c-format
 msgid " [%6tx]  %s..%s\n"
 msgstr " [%6tx]  %s..%s\n"
 
-#: src/readelf.c:4684
+#: src/readelf.c:4685
 #, c-format
 msgid "           %s..%s\n"
 msgstr "           %s..%s\n"
 
-#: src/readelf.c:5117
+#: src/readelf.c:5118
 #, fuzzy, c-format
 msgid "cannot get ELF: %s"
 msgstr "次の DIE を得られません: %s"
 
-#: src/readelf.c:5132
+#: src/readelf.c:5133
 #, c-format
 msgid ""
 "\n"
@@ -5080,7 +5080,7 @@ msgstr ""
 "\n"
 "オフセット %3$#<PRIx64> の フレーム情報呼出しセクション [%1$2zu] '%2$s':\n"
 
-#: src/readelf.c:5182
+#: src/readelf.c:5183
 #, c-format
 msgid ""
 "\n"
@@ -5089,50 +5089,50 @@ msgstr ""
 "\n"
 " [%6tx] ゼロ終端\n"
 
-#: src/readelf.c:5267
+#: src/readelf.c:5268
 #, fuzzy, c-format
 msgid "invalid augmentation length"
 msgstr "不当な拡大エンコード"
 
-#: src/readelf.c:5279
+#: src/readelf.c:5280
 msgid "FDE address encoding: "
 msgstr "FDE アドレスエンコード"
 
-#: src/readelf.c:5285
+#: src/readelf.c:5286
 msgid "LSDA pointer encoding: "
 msgstr "LSDA ポインターエンコード:"
 
-#: src/readelf.c:5396
+#: src/readelf.c:5397
 #, c-format
 msgid " (offset: %#<PRIx64>)"
 msgstr " (オフセット: %#<PRIx64>)"
 
-#: src/readelf.c:5403
+#: src/readelf.c:5404
 #, c-format
 msgid " (end offset: %#<PRIx64>)"
 msgstr " (終了オフセット: %#<PRIx64>)"
 
-#: src/readelf.c:5430
+#: src/readelf.c:5431
 #, c-format
 msgid "   %-26sLSDA pointer: %#<PRIx64>\n"
 msgstr "   %-26sLSDA ポインター: %#<PRIx64>\n"
 
-#: src/readelf.c:5482
+#: src/readelf.c:5483
 #, c-format
 msgid "cannot get attribute code: %s"
 msgstr "属性コードを得られません: %s"
 
-#: src/readelf.c:5491
+#: src/readelf.c:5492
 #, c-format
 msgid "cannot get attribute form: %s"
 msgstr "属性様式を得られません: %s"
 
-#: src/readelf.c:5506
+#: src/readelf.c:5507
 #, c-format
 msgid "cannot get attribute value: %s"
 msgstr "属性値を得られません: %s"
 
-#: src/readelf.c:5779
+#: src/readelf.c:5780
 #, c-format
 msgid ""
 "\n"
@@ -5143,58 +5143,58 @@ msgstr ""
 "オフセット %3$#<PRIx64> の DWARF セクション [%1$2zu] '%2$s':\n"
 " [オフセット]\n"
 
-#: src/readelf.c:5811
+#: src/readelf.c:5812
 #, fuzzy, c-format
 msgid ""
 " Type unit at offset %<PRIu64>:\n"
-" Version: %<PRIu16>, Abbreviation section offset: %<PRIu64>, Address size: %"
-"<PRIu8>, Offset size: %<PRIu8>\n"
+" Version: %<PRIu16>, Abbreviation section offset: %<PRIu64>, Address size: "
+"%<PRIu8>, Offset size: %<PRIu8>\n"
 " Type signature: %#<PRIx64>, Type offset: %#<PRIx64>\n"
 msgstr ""
 " オフセット %1$<PRIu64> のコンパイル単位:\n"
 " バージョン: %2$<PRIu16>、略語セクションオフセット: %3$<PRIu64>、アドレスの大"
 "きさ: %4$<PRIu8>、オフセットの大きさ: %5$<PRIu8>\n"
 
-#: src/readelf.c:5820
+#: src/readelf.c:5821
 #, c-format
 msgid ""
 " Compilation unit at offset %<PRIu64>:\n"
-" Version: %<PRIu16>, Abbreviation section offset: %<PRIu64>, Address size: %"
-"<PRIu8>, Offset size: %<PRIu8>\n"
+" Version: %<PRIu16>, Abbreviation section offset: %<PRIu64>, Address size: "
+"%<PRIu8>, Offset size: %<PRIu8>\n"
 msgstr ""
 " オフセット %1$<PRIu64> のコンパイル単位:\n"
 " バージョン: %2$<PRIu16>、略語セクションオフセット: %3$<PRIu64>、アドレスの大"
 "きさ: %4$<PRIu8>、オフセットの大きさ: %5$<PRIu8>\n"
 
-#: src/readelf.c:5845
+#: src/readelf.c:5846
 #, c-format
 msgid "cannot get DIE at offset %<PRIu64> in section '%s': %s"
 msgstr ""
 "セクション '%2$s' の オフセット %1$<PRIu64> の DIE を得られません: %3$s"
 
-#: src/readelf.c:5859
+#: src/readelf.c:5860
 #, c-format
 msgid "cannot get DIE offset: %s"
 msgstr "DIE オフセットを得られません: %s"
 
-#: src/readelf.c:5868
+#: src/readelf.c:5869
 #, c-format
 msgid "cannot get tag of DIE at offset %<PRIu64> in section '%s': %s"
 msgstr ""
-"セクション '%2$s' 中のオフセット %1$<PRIu64> の DIE のタグを得られません: %3"
-"$s"
+"セクション '%2$s' 中のオフセット %1$<PRIu64> の DIE のタグを得られません: "
+"%3$s"
 
-#: src/readelf.c:5900
+#: src/readelf.c:5901
 #, c-format
 msgid "cannot get next DIE: %s\n"
 msgstr "次の DIE を得られません: %s\n"
 
-#: src/readelf.c:5908
+#: src/readelf.c:5909
 #, c-format
 msgid "cannot get next DIE: %s"
 msgstr "次の DIE を得られません: %s"
 
-#: src/readelf.c:5944
+#: src/readelf.c:5945
 #, fuzzy, c-format
 msgid ""
 "\n"
@@ -5204,12 +5204,12 @@ msgstr ""
 "\n"
 "オフセット %3$#<PRIx64> の DWARF セクション [%1$2zu] '%2$s':\n"
 
-#: src/readelf.c:6043
+#: src/readelf.c:6044
 #, c-format
 msgid "cannot get line data section data: %s"
 msgstr "ラインデータセクションデータを得られません: %s"
 
-#: src/readelf.c:6111
+#: src/readelf.c:6112
 #, fuzzy, c-format
 msgid ""
 "\n"
@@ -5237,18 +5237,18 @@ msgstr ""
 "\n"
 "命令コード:\n"
 
-#: src/readelf.c:6132
+#: src/readelf.c:6133
 #, c-format
 msgid "invalid data at offset %tu in section [%zu] '%s'"
 msgstr "セクション [%2$zu] '%3$s' 中のオフセット %1$tu に不当なデータ"
 
-#: src/readelf.c:6147
+#: src/readelf.c:6148
 #, c-format
 msgid "  [%*<PRIuFAST8>]  %hhu argument\n"
 msgid_plural "  [%*<PRIuFAST8>]  %hhu arguments\n"
 msgstr[0] "  [%*<PRIuFAST8>]  %hhu パラメーター\n"
 
-#: src/readelf.c:6155
+#: src/readelf.c:6156
 msgid ""
 "\n"
 "Directory table:"
@@ -5256,7 +5256,7 @@ msgstr ""
 "\n"
 "ディレクトリーテーブル:"
 
-#: src/readelf.c:6171
+#: src/readelf.c:6172
 msgid ""
 "\n"
 "File name table:\n"
@@ -5266,7 +5266,7 @@ msgstr ""
 "ファイル名テーブル:\n"
 " Entry Dir   時刻     大きさ    名前"
 
-#: src/readelf.c:6200
+#: src/readelf.c:6201
 msgid ""
 "\n"
 "Line number statements:"
@@ -5274,205 +5274,205 @@ msgstr ""
 "\n"
 "行   番号   文:"
 
-#: src/readelf.c:6276
+#: src/readelf.c:6277
 #, fuzzy, c-format
 msgid " special opcode %u: address+%u = %s, op_index = %u, line%+d = %zu\n"
 msgstr " 特殊命令コード %u: アドレス+%u = %s, 行%+d = %zu\n"
 
-#: src/readelf.c:6281
+#: src/readelf.c:6282
 #, c-format
 msgid " special opcode %u: address+%u = %s, line%+d = %zu\n"
 msgstr " 特殊命令コード %u: アドレス+%u = %s, 行%+d = %zu\n"
 
-#: src/readelf.c:6301
+#: src/readelf.c:6302
 #, c-format
 msgid " extended opcode %u: "
 msgstr " 拡張命令コード %u: "
 
-#: src/readelf.c:6306
+#: src/readelf.c:6307
 #, fuzzy
 msgid " end of sequence"
 msgstr "列の終わり"
 
-#: src/readelf.c:6323
+#: src/readelf.c:6324
 #, fuzzy, c-format
 msgid " set address to %s\n"
 msgstr "アドレスを %s に設定する\n"
 
-#: src/readelf.c:6344
+#: src/readelf.c:6345
 #, fuzzy, c-format
 msgid " define new file: dir=%u, mtime=%<PRIu64>, length=%<PRIu64>, name=%s\n"
 msgstr ""
 "新ファイルを定義する: dir=%u、mtime=%<PRIu64>、長さh=%<PRIu64>、名前=%s\n"
 
-#: src/readelf.c:6357
+#: src/readelf.c:6358
 #, fuzzy, c-format
 msgid " set discriminator to %u\n"
 msgstr "カラムを %<PRIu64> に設定する\n"
 
-#: src/readelf.c:6362
+#: src/readelf.c:6363
 #, fuzzy
 msgid " unknown opcode"
 msgstr "不明な命令コード"
 
-#: src/readelf.c:6374
+#: src/readelf.c:6375
 msgid " copy"
 msgstr "複写"
 
-#: src/readelf.c:6385
+#: src/readelf.c:6386
 #, fuzzy, c-format
 msgid " advance address by %u to %s, op_index to %u\n"
 msgstr "アドレスを %u だけ進めて %s にする\n"
 
-#: src/readelf.c:6389
+#: src/readelf.c:6390
 #, fuzzy, c-format
 msgid " advance address by %u to %s\n"
 msgstr "アドレスを %u だけ進めて %s にする\n"
 
-#: src/readelf.c:6400
+#: src/readelf.c:6401
 #, c-format
 msgid " advance line by constant %d to %<PRId64>\n"
 msgstr "行を定数 %d だけ進めて %<PRId64> にする\n"
 
-#: src/readelf.c:6408
+#: src/readelf.c:6409
 #, c-format
 msgid " set file to %<PRIu64>\n"
 msgstr " ファイルを %<PRIu64> に設定する\n"
 
-#: src/readelf.c:6418
+#: src/readelf.c:6419
 #, c-format
 msgid " set column to %<PRIu64>\n"
 msgstr "カラムを %<PRIu64> に設定する\n"
 
-#: src/readelf.c:6425
+#: src/readelf.c:6426
 #, c-format
 msgid " set '%s' to %<PRIuFAST8>\n"
 msgstr " '%s' を %<PRIuFAST8> に設定する\n"
 
-#: src/readelf.c:6431
+#: src/readelf.c:6432
 msgid " set basic block flag"
 msgstr "基本ブロックフラグを設定する"
 
-#: src/readelf.c:6440
+#: src/readelf.c:6441
 #, fuzzy, c-format
 msgid " advance address by constant %u to %s, op_index to %u\n"
 msgstr "アドレスを定数 %u だけ済めて %s にする\n"
 
-#: src/readelf.c:6444
+#: src/readelf.c:6445
 #, fuzzy, c-format
 msgid " advance address by constant %u to %s\n"
 msgstr "アドレスを定数 %u だけ済めて %s にする\n"
 
-#: src/readelf.c:6462
+#: src/readelf.c:6463
 #, fuzzy, c-format
 msgid " advance address by fixed value %u to %s\n"
 msgstr "アドレスを固定値 %u だけ進めて %s にする\n"
 
-#: src/readelf.c:6471
+#: src/readelf.c:6472
 msgid " set prologue end flag"
 msgstr "プロローグ終了フラグを設定する"
 
-#: src/readelf.c:6476
+#: src/readelf.c:6477
 msgid " set epilogue begin flag"
 msgstr "エピローグ開始フラグを設定する"
 
-#: src/readelf.c:6485
+#: src/readelf.c:6486
 #, fuzzy, c-format
 msgid " set isa to %u\n"
 msgstr " ファイルを %<PRIu64> に設定する\n"
 
-#: src/readelf.c:6494
+#: src/readelf.c:6495
 #, c-format
 msgid " unknown opcode with %<PRIu8> parameter:"
 msgid_plural " unknown opcode with %<PRIu8> parameters:"
 msgstr[0] " %<PRIu8> 個のパラメーターのある不明な命令コード:"
 
-#: src/readelf.c:6526
+#: src/readelf.c:6527
 #, c-format
 msgid "cannot get .debug_loc content: %s"
 msgstr ".debug_loc の内容を得られません: %s"
 
-#: src/readelf.c:6601
+#: src/readelf.c:6602
 #, c-format
 msgid " [%6tx]  %s..%s"
 msgstr " [%6tx]  %s..%s"
 
-#: src/readelf.c:6603
+#: src/readelf.c:6604
 #, c-format
 msgid "           %s..%s"
 msgstr "           %s..%s"
 
-#: src/readelf.c:6610
+#: src/readelf.c:6611
 #, fuzzy
 msgid "   <INVALID DATA>\n"
 msgstr " [%6tx]  <不当なデータ>\n"
 
-#: src/readelf.c:6662 src/readelf.c:6816
+#: src/readelf.c:6663 src/readelf.c:6817
 #, c-format
 msgid "cannot get macro information section data: %s"
 msgstr "マクロ情報セクションのデータを得られません: %s"
 
-#: src/readelf.c:6741
+#: src/readelf.c:6742
 #, c-format
 msgid "%*s*** non-terminated string at end of section"
 msgstr "%*s*** 最後のセクションの終端していない文字列"
 
-#: src/readelf.c:6857
+#: src/readelf.c:6858
 #, fuzzy, c-format
 msgid " Offset:             0x%<PRIx64>\n"
 msgstr "  所有者         大きさ\n"
 
-#: src/readelf.c:6869
+#: src/readelf.c:6870
 #, fuzzy, c-format
 msgid " Version:            %<PRIu16>\n"
 msgstr "      %s: %<PRId64>\n"
 
-#: src/readelf.c:6875 src/readelf.c:7587
+#: src/readelf.c:6876 src/readelf.c:7588
 #, c-format
 msgid "  unknown version, cannot parse section\n"
 msgstr ""
 
-#: src/readelf.c:6882
+#: src/readelf.c:6883
 #, fuzzy, c-format
 msgid " Flag:               0x%<PRIx8>\n"
 msgstr "  入口点アドレス     :               %#<PRIx64>\n"
 
-#: src/readelf.c:6885
+#: src/readelf.c:6886
 #, fuzzy, c-format
 msgid " Offset length:      %<PRIu8>\n"
 msgstr " (オフセット: %#<PRIx64>)"
 
-#: src/readelf.c:6893
+#: src/readelf.c:6894
 #, fuzzy, c-format
 msgid " .debug_line offset: 0x%<PRIx64>\n"
 msgstr " (終了オフセット: %#<PRIx64>)"
 
-#: src/readelf.c:6905
+#: src/readelf.c:6906
 #, fuzzy, c-format
 msgid "  extension opcode table, %<PRIu8> items:\n"
 msgstr " %<PRIu8> 個のパラメーターのある不明な命令コード:"
 
-#: src/readelf.c:6912
+#: src/readelf.c:6913
 #, c-format
 msgid "    [%<PRIx8>]"
 msgstr ""
 
-#: src/readelf.c:6924
+#: src/readelf.c:6925
 #, fuzzy, c-format
 msgid " %<PRIu8> arguments:"
 msgstr "  [%*<PRIuFAST8>]  %hhu パラメーター\n"
 
-#: src/readelf.c:6952
+#: src/readelf.c:6953
 #, c-format
 msgid " no arguments."
 msgstr ""
 
-#: src/readelf.c:7187
+#: src/readelf.c:7188
 #, c-format
 msgid "vendor opcode not verified?"
 msgstr ""
 
-#: src/readelf.c:7215
+#: src/readelf.c:7216
 #, c-format
 msgid " [%5d] DIE offset: %6<PRId64>, CU DIE offset: %6<PRId64>, name: %s\n"
 msgstr ""
@@ -5480,7 +5480,7 @@ msgstr ""
 
 # # "オフセット %3$#<PRIx64> の DWARF セクション [%1$2zu] '%2$s':\n"
 # # " %4$*s  文字列\n" がエラーになるのは何故? 取り敢えず fuzzy扱い
-#: src/readelf.c:7256
+#: src/readelf.c:7257
 #, fuzzy, c-format
 msgid ""
 "\n"
@@ -5491,12 +5491,12 @@ msgstr ""
 "オフセット %3$#<PRIx64> の DWARF セクション [%1$2zu] '%2$s':\n"
 " %4$*s  文字列\n"
 
-#: src/readelf.c:7270
+#: src/readelf.c:7271
 #, c-format
 msgid " *** error while reading strings: %s\n"
 msgstr " *** 文字列の読込み中にエラー: %s\n"
 
-#: src/readelf.c:7290
+#: src/readelf.c:7291
 #, c-format
 msgid ""
 "\n"
@@ -5505,7 +5505,7 @@ msgstr ""
 "\n"
 "呼出しフレーム検索テーブルセクション [%2zu] '.eh_frame_hdr':\n"
 
-#: src/readelf.c:7392
+#: src/readelf.c:7393
 #, c-format
 msgid ""
 "\n"
@@ -5514,22 +5514,22 @@ msgstr ""
 "\n"
 "例外取扱いテーブルセクション [%2zu] '.gcc_except_table':\n"
 
-#: src/readelf.c:7415
+#: src/readelf.c:7416
 #, c-format
 msgid " LPStart encoding:    %#x "
 msgstr " LPStart コード化:    %#x "
 
-#: src/readelf.c:7427
+#: src/readelf.c:7428
 #, c-format
 msgid " TType encoding:      %#x "
 msgstr "TType コード化:       %#x "
 
-#: src/readelf.c:7441
+#: src/readelf.c:7442
 #, c-format
 msgid " Call site encoding:  %#x "
 msgstr "呼出しサイトコード化: %#x "
 
-#: src/readelf.c:7454
+#: src/readelf.c:7455
 msgid ""
 "\n"
 " Call site table:"
@@ -5537,7 +5537,7 @@ msgstr ""
 "\n"
 " 呼出しサイトテーブル:"
 
-#: src/readelf.c:7468
+#: src/readelf.c:7469
 #, c-format
 msgid ""
 " [%4u] Call site start:   %#<PRIx64>\n"
@@ -5550,12 +5550,12 @@ msgstr ""
 "        離着陸場:           %#<PRIx64>\n"
 "        行動:               %u\n"
 
-#: src/readelf.c:7528
+#: src/readelf.c:7529
 #, c-format
 msgid "invalid TType encoding"
 msgstr "不当な TType コード化"
 
-#: src/readelf.c:7549
+#: src/readelf.c:7550
 #, fuzzy, c-format
 msgid ""
 "\n"
@@ -5565,37 +5565,37 @@ msgstr ""
 "オフセット %3$#<PRIx64> の DWARF セクション [%1$2zu] '%2$s' には %4$zu 個の項"
 "目があります:\n"
 
-#: src/readelf.c:7578
+#: src/readelf.c:7579
 #, fuzzy, c-format
 msgid " Version:         %<PRId32>\n"
 msgstr "      %s: %<PRId64>\n"
 
-#: src/readelf.c:7596
+#: src/readelf.c:7597
 #, fuzzy, c-format
 msgid " CU offset:       %#<PRIx32>\n"
 msgstr " (オフセット: %#<PRIx64>)"
 
-#: src/readelf.c:7603
+#: src/readelf.c:7604
 #, fuzzy, c-format
 msgid " TU offset:       %#<PRIx32>\n"
 msgstr " (オフセット: %#<PRIx64>)"
 
-#: src/readelf.c:7610
+#: src/readelf.c:7611
 #, fuzzy, c-format
 msgid " address offset:  %#<PRIx32>\n"
 msgstr " (終了オフセット: %#<PRIx64>)"
 
-#: src/readelf.c:7617
+#: src/readelf.c:7618
 #, fuzzy, c-format
 msgid " symbol offset:   %#<PRIx32>\n"
 msgstr " (オフセット: %#<PRIx64>)"
 
-#: src/readelf.c:7624
+#: src/readelf.c:7625
 #, fuzzy, c-format
 msgid " constant offset: %#<PRIx32>\n"
 msgstr " (終了オフセット: %#<PRIx64>)"
 
-#: src/readelf.c:7631
+#: src/readelf.c:7632
 #, fuzzy, c-format
 msgid ""
 "\n"
@@ -5605,7 +5605,7 @@ msgstr ""
 "オフセット %3$#<PRIx64> の DWARF セクション [%1$2zu] '%2$s' には %4$zu 個の項"
 "目があります:\n"
 
-#: src/readelf.c:7653
+#: src/readelf.c:7654
 #, fuzzy, c-format
 msgid ""
 "\n"
@@ -5615,7 +5615,7 @@ msgstr ""
 "オフセット %3$#<PRIx64> の DWARF セクション [%1$2zu] '%2$s' には %4$zu 個の項"
 "目があります:\n"
 
-#: src/readelf.c:7679
+#: src/readelf.c:7680
 #, fuzzy, c-format
 msgid ""
 "\n"
@@ -5625,7 +5625,7 @@ msgstr ""
 "オフセット %3$#<PRIx64> の DWARF セクション [%1$2zu] '%2$s' には %4$zu 個の項"
 "目があります:\n"
 
-#: src/readelf.c:7708
+#: src/readelf.c:7709
 #, fuzzy, c-format
 msgid ""
 "\n"
@@ -5634,17 +5634,17 @@ msgstr ""
 "\n"
 "オフセット %#0<PRIx64> に不当なシンボルテーブル\n"
 
-#: src/readelf.c:7793
+#: src/readelf.c:7794
 #, c-format
 msgid "cannot get debug context descriptor: %s"
 msgstr "デバッグ内容記述子を得られません: %s"
 
-#: src/readelf.c:7951 src/readelf.c:8554
+#: src/readelf.c:7952 src/readelf.c:8555 src/readelf.c:8666 src/readelf.c:8724
 #, c-format
 msgid "cannot convert core note data: %s"
 msgstr "コアノートデータの変換ができません: %s"
 
-#: src/readelf.c:8295
+#: src/readelf.c:8296
 #, c-format
 msgid ""
 "\n"
@@ -5653,31 +5653,31 @@ msgstr ""
 "\n"
 "%*s... < %u 回の繰返し> ..."
 
-#: src/readelf.c:8653
+#: src/readelf.c:8799
 msgid "  Owner          Data size  Type\n"
 msgstr "  所有者         データ大きさタイプ\n"
 
-#: src/readelf.c:8671
+#: src/readelf.c:8817
 #, c-format
 msgid "  %-13.*s  %9<PRId32>  %s\n"
 msgstr "  %-13.*s  %9<PRId32>  %s\n"
 
-#: src/readelf.c:8705
+#: src/readelf.c:8867
 #, c-format
 msgid "cannot get content of note section: %s"
 msgstr "ノートセクションの内容を得られません: %s"
 
-#: src/readelf.c:8732
+#: src/readelf.c:8894
 #, c-format
 msgid ""
 "\n"
 "Note section [%2zu] '%s' of %<PRIu64> bytes at offset %#0<PRIx64>:\n"
 msgstr ""
 "\n"
-"オフセット %4$#0<PRIx64> の %3$<PRIu64> バイトのノートセクション [%1$2zu] '%2"
-"$s':\n"
+"オフセット %4$#0<PRIx64> の %3$<PRIu64> バイトのノートセクション [%1$2zu] "
+"'%2$s':\n"
 
-#: src/readelf.c:8755
+#: src/readelf.c:8917
 #, c-format
 msgid ""
 "\n"
@@ -5686,7 +5686,7 @@ msgstr ""
 "\n"
 "オフセット %2$#0<PRIx64> の %1$<PRIu64> バイトのノートセグメント:\n"
 
-#: src/readelf.c:8801
+#: src/readelf.c:8963
 #, c-format
 msgid ""
 "\n"
@@ -5695,22 +5695,22 @@ msgstr ""
 "\n"
 "セクション [%Zu] '%s' にはダンプすべきデータがありません。\n"
 
-#: src/readelf.c:8807 src/readelf.c:8830
+#: src/readelf.c:8969 src/readelf.c:8992
 #, c-format
 msgid "cannot get data for section [%Zu] '%s': %s"
 msgstr "セクション [%Zu] '%s' からデータが得られません: %s"
 
-#: src/readelf.c:8811
+#: src/readelf.c:8973
 #, c-format
 msgid ""
 "\n"
 "Hex dump of section [%Zu] '%s', %<PRIu64> bytes at offset %#0<PRIx64>:\n"
 msgstr ""
 "\n"
-"オフセット %4$#0<PRIx64> のセクション [%1$Zu] '%2$s' の16進ダンプ、%3"
-"$<PRIu64> バイト:\n"
+"オフセット %4$#0<PRIx64> のセクション [%1$Zu] '%2$s' の16進ダン"
+"プ、%3$<PRIu64> バイト:\n"
 
-#: src/readelf.c:8824
+#: src/readelf.c:8986
 #, fuzzy, c-format
 msgid ""
 "\n"
@@ -5719,7 +5719,7 @@ msgstr ""
 "\n"
 "セクション [%Zu] '%s' にはダンプすべきデータがありません。\n"
 
-#: src/readelf.c:8834
+#: src/readelf.c:8996
 #, c-format
 msgid ""
 "\n"
@@ -5729,7 +5729,7 @@ msgstr ""
 "オフセット %4$#0<PRIx64> 文字列セクション [%1$Zu] '%2$s' には %3$<PRIu64> バ"
 "イトあります:\n"
 
-#: src/readelf.c:8882
+#: src/readelf.c:9044
 #, c-format
 msgid ""
 "\n"
@@ -5738,7 +5738,7 @@ msgstr ""
 "\n"
 "セクション [%lu] がありません"
 
-#: src/readelf.c:8911
+#: src/readelf.c:9073
 #, c-format
 msgid ""
 "\n"
@@ -5747,12 +5747,12 @@ msgstr ""
 "\n"
 "セクション '%s' がありません"
 
-#: src/readelf.c:8968
+#: src/readelf.c:9130
 #, c-format
 msgid "cannot get symbol index of archive '%s': %s"
 msgstr "アーカイブのシンボル索引 '%s' を得られません: %s"
 
-#: src/readelf.c:8971
+#: src/readelf.c:9133
 #, c-format
 msgid ""
 "\n"
@@ -5761,7 +5761,7 @@ msgstr ""
 "\n"
 "アーカイブ '%s' にはシンボル索引がありません\n"
 
-#: src/readelf.c:8975
+#: src/readelf.c:9137
 #, c-format
 msgid ""
 "\n"
@@ -5770,12 +5770,12 @@ msgstr ""
 "\n"
 "アーカイブ '%s' の索引には %Zu 項目あります:\n"
 
-#: src/readelf.c:8993
+#: src/readelf.c:9155
 #, c-format
 msgid "cannot extract member at offset %Zu in '%s': %s"
 msgstr "'%2$s' の オフセット %1$Zu のメンバーを抽出できません: %3$s"
 
-#: src/readelf.c:8998
+#: src/readelf.c:9160
 #, c-format
 msgid "Archive member '%s' contains:\n"
 msgstr "アーカイブメンバー '%s' には以下があります:\n"

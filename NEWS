@@ -3,6 +3,8 @@ Version 0.157
 libdw: Add new functions dwarf_getlocations, dwarf_getlocation_attr
        and dwarf_getlocation_die.
 
+readelf: Show contents of NT_SIGINFO and NT_FILE core notes.
+
 addr2line: Support -i, --inlines output option.
 
 backends: abi_cfi hook for arm, ppc and s390.

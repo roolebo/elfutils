@@ -110,6 +110,9 @@ __libdw_intern_next_unit (dbg, debug_types)
   newp->lines = NULL;
   newp->locs = NULL;
 
+  if (debug_types)
+    Dwarf_Sig8_Hash_insert (&dbg->sig8_hash, type_sig8, newp);
+
   /* Add the new entry to the search tree.  */
   if (tsearch (newp, tree, findcu_cb) == NULL)
     {

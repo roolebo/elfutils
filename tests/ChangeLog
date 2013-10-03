@@ -1,3 +1,10 @@
+2013-10-03  Josh Stone  <jistone@redhat.com>
+
+	* typeiter2.c: New file, reversing typeiter.c.
+	* run-typeiter.sh: Also run typeiter2.
+	* Makefile.am (ckeck_PROGRAMS): Add typeiter2.
+	(typeiter2_LDADD): New variable.
+
 2013-09-26  Petr Machata  <pmachata@redhat.com>
 
 	* run-readelf-mixed-corenote.sh: Update output of testfile71

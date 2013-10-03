@@ -47,4 +47,8 @@ testrun_compare ${abs_builddir}/typeiter testfile59 <<\EOF
 ok
 EOF
 
+testrun_compare ${abs_builddir}/typeiter2 testfile59 <<\EOF
+ok
+EOF
+
 exit 0

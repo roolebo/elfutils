@@ -1,3 +1,9 @@
+2013-10-03  Josh Stone  <jistone@redhat.com>
+
+	* dwarf_formref_die.c (dwarf_formref_die): Don't hash the sig8 here.
+	* libdw_findcu.c (__libdw_intern_next_unit): Since this never revisits
+	a unit, make sure to always hash the sig8 here, so none are missed.
+
 2013-09-29  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_getlocation.c (store_implicit_value): Cast op->number2 to

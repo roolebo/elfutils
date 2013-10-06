@@ -1,3 +1,8 @@
+2013-10-06  Mark Wielaard  <mjw@redhat.com>
+
+	* libebl.h (ebl_abi_cfi): Document restrictions using register
+	rules.
+
 2013-09-26  Petr Machata  <pmachata@redhat.com>
 
 	* eblcorenotetypename.c: Handle NT_ARM_TLS, NT_ARM_HW_BREAK,

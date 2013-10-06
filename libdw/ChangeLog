@@ -1,3 +1,8 @@
+2013-10-06  Mark Wielaard  <mjw@redhat.com>
+
+	* cfi.c (execute_cfi): Make sure DW_CFA_expression and
+	DW_CFA_val_expression are not used with abi_cfi.
+
 2013-10-03  Josh Stone  <jistone@redhat.com>
 
 	* dwarf_formref_die.c (dwarf_formref_die): Don't hash the sig8 here.

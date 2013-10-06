@@ -1,3 +1,8 @@
+2013-10-06  Mark Wielaard  <mjw@redhat.com>
+
+	* ppc_cfi.c (ppc_abi_cfi): Use DW_CFA_val_offset for reg1, not
+	DW_CFA_val_expression.
+
 2013-08-29  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (arm_SRCS): Add arm_cfi.c.

@@ -257,6 +257,11 @@ extern int ebl_syscall_abi (Ebl *ebl, int *sp, int *pc,
    before each CIE's initial instructions.  It should set the
    data_alignment_factor member if it affects the initial instructions.
 
+   The callback should not use the register rules DW_CFA_expression or
+   DW_CFA_val_expression.  Defining the CFA using DW_CFA_def_cfa_expression
+   is allowed.  This is an implementation detail since register rules
+   store expressions as offsets from the .eh_frame or .debug_frame data.
+
    As a shorthand for some common cases, for this instruction stream
    we overload some CFI instructions that cannot be used in a CIE:
 

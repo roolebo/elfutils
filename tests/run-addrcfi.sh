@@ -299,7 +299,7 @@ dwarf_cfi_addrframe (.eh_frame): no matching address range
 	return address in reg65
 	CFA location expression: bregx(1)
 	integer reg0 (r0): undefined
-	integer reg1 (r1): location expression: call_frame_cfa nop stack_value
+	integer reg1 (r1): location expression: call_frame_cfa stack_value
 	integer reg2 (r2): same_value
 	integer reg3 (r3): undefined
 	integer reg4 (r4): undefined
@@ -1326,7 +1326,7 @@ dwarf_cfi_addrframe (.eh_frame): no matching address range
 	return address in reg65
 	CFA location expression: bregx(1)
 	integer reg0 (r0): undefined
-	integer reg1 (r1): location expression: call_frame_cfa nop stack_value
+	integer reg1 (r1): location expression: call_frame_cfa stack_value
 	integer reg2 (r2): same_value
 	integer reg3 (r3): undefined
 	integer reg4 (r4): undefined

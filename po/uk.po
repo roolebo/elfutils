@@ -2,13 +2,13 @@
 # Copyright (C) 2010 Free Software Foundation, Inc.
 # This file is distributed under the same license as the elfutils package.
 #
-# Yuri Chornoivan <yurchor@ukr.net>, 2010, 2011, 2012.
+# Yuri Chornoivan <yurchor@ukr.net>, 2010, 2011, 2012, 2013.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2013-09-30 13:52+0200\n"
-"PO-Revision-Date: 2012-08-11 17:59+0300\n"
+"POT-Creation-Date: 2013-10-09 17:57+0300\n"
+"PO-Revision-Date: 2013-10-09 17:50+0300\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <kde-i18n-uk@kde.org>\n"
 "Language: uk\n"
@@ -412,7 +412,7 @@ msgstr " Семафор:   "
 #: libebl/eblobjnote.c:129
 #, c-format
 msgid "    Provider: "
-msgstr " остачальник: "
+msgstr " Постачальник: "
 
 #: libebl/eblobjnote.c:131
 #, c-format
@@ -627,6 +627,8 @@ msgid ""
 "Show all source locations that caused inline expansion of subroutines at the "
 "address."
 msgstr ""
+"Показати усі місця у початковому коді, у яких було виявлено вбудоване "
+"розгортання підпрограм за вказаною адресою."
 
 #: src/addr2line.c:71 src/elfcmp.c:72 src/findtextrel.c:67 src/nm.c:100
 #: src/strings.c:75
@@ -4147,14 +4149,15 @@ msgid "error while freeing sub-ELF descriptor: %s"
 msgstr "помилка під час спроби вивільнення дескриптора під-ELF: %s"
 
 #: src/readelf.c:71
-#, fuzzy
 msgid "ELF input selection:"
-msgstr "Вибір виводу ELF:"
+msgstr "Вибір вихідних даних ELF:"
 
 #: src/readelf.c:73
 msgid ""
 "Use the named SECTION (default .gnu_debugdata) as (compressed) ELF input data"
 msgstr ""
+"Використовувати вказаний за іменем РОЗДІЛ (типово .gnu_debugdata) як "
+"(стиснені) вхідні дані ELF"
 
 #: src/readelf.c:75
 msgid "ELF output selection:"
@@ -4213,15 +4216,14 @@ msgid "Additional output selection:"
 msgstr "Додатковий вибір виводу:"
 
 #: src/readelf.c:97
-#, fuzzy
 msgid ""
 "Display DWARF section content.  SECTION can be one of abbrev, aranges, "
 "decodedaranges, frame, gdb_index, info, loc, line, decodedline, ranges, "
 "pubnames, str, macinfo, macro or exception"
 msgstr ""
 "Показати вміст розділу DWARF. Значенням РОЗДІЛ може бути abbrev, aranges, "
-"frame, gdb_index, info, loc, line, ranges, pubnames, str, macinfo, macro або "
-"exception"
+"decodedaranges, frame, gdb_index, info, loc, line, decodedline, ranges, "
+"pubnames, str, macinfo, macro або exception"
 
 #: src/readelf.c:101
 msgid "Dump the uninterpreted contents of SECTION, by number or name"
@@ -4243,13 +4245,12 @@ msgstr "Керування виводом:"
 
 #: src/readelf.c:110
 msgid "Do not find symbol names for addresses in DWARF data"
-msgstr "Не шукати назви символів для адресу у даних DWARF"
+msgstr "Не шукати назви символів для адрес у даних DWARF"
 
 #: src/readelf.c:112
-#, fuzzy
 msgid ""
 "Display just offsets instead of resolving values to addresses in DWARF data"
-msgstr "Не шукати назви символів для адресу у даних DWARF"
+msgstr "Показати лише зміщення, а не визначені значення адреси у даних DWARF"
 
 #: src/readelf.c:114
 msgid "Ignored for compatibility (lines always wide)"
@@ -4284,9 +4285,9 @@ msgid "cannot get section header: %s"
 msgstr "не вдалося отримати заголовок розділу: %s"
 
 #: src/readelf.c:562
-#, fuzzy, c-format
+#, c-format
 msgid "cannot get section name"
-msgstr "не вдалося отримати заголовок розділу\n"
+msgstr "не вдалося отримати назву розділу"
 
 #: src/readelf.c:571 src/readelf.c:5126 src/readelf.c:7299 src/readelf.c:7401
 #: src/readelf.c:7559
@@ -4295,14 +4296,14 @@ msgid "cannot get %s content: %s"
 msgstr "не вдалося отримати дані %s: %s"
 
 #: src/readelf.c:587
-#, fuzzy, c-format
+#, c-format
 msgid "cannot create temp file '%s'"
-msgstr "не вдалося створити файл «%s»: %s"
+msgstr "не вдалося створити файл тимчасових даних «%s»"
 
 #: src/readelf.c:596
-#, fuzzy, c-format
+#, c-format
 msgid "cannot write section data"
-msgstr "не вдалося прочитати дані розділу: %s"
+msgstr "не вдалося записати дані розділу"
 
 #: src/readelf.c:602 src/readelf.c:619 src/readelf.c:648
 #, c-format
@@ -4310,9 +4311,9 @@ msgid "error while closing Elf descriptor: %s"
 msgstr "помилка під час спроби закриття дескриптора Elf: %s"
 
 #: src/readelf.c:609
-#, fuzzy, c-format
+#, c-format
 msgid "error while rewinding file descriptor"
-msgstr "помилка під час спроби закриття дескриптора Elf: %s"
+msgstr "помилка під час повернення до початкового значення дескриптора файла"
 
 #: src/readelf.c:643
 #, c-format
@@ -4320,9 +4321,9 @@ msgid "'%s' is not an archive, cannot print archive index"
 msgstr "«%s» не є архівом, виведення покажчика архіву неможливе"
 
 #: src/readelf.c:728
-#, fuzzy, c-format
+#, c-format
 msgid "No such section '%s' in '%s'"
-msgstr "не вдалося прочитати розділ нотаток [%zu] «%s» у «%s»: %s"
+msgstr "У «%2$s» немає розділу «%1$s»"
 
 #: src/readelf.c:755
 #, c-format
@@ -5140,9 +5141,9 @@ msgid "%s %#<PRIx64> used with different offset sizes"
 msgstr "%s %#<PRIx64> використано з різними розмірами зміщень"
 
 #: src/readelf.c:4206
-#, fuzzy, c-format
+#, c-format
 msgid "%s %#<PRIx64> used with different base addresses"
-msgstr "%s %#<PRIx64> використано з різними розмірами адрес"
+msgstr "%s %#<PRIx64> використано з різними базовими адресами"
 
 #: src/readelf.c:4288
 #, c-format
@@ -5253,63 +5254,67 @@ msgid "invalid data in section [%zu] '%s'"
 msgstr "некоректні дані у розділі [%zu] «%s»"
 
 #: src/readelf.c:4497
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 " Length:        %6<PRIu64>\n"
-msgstr " Довжина зміщення:   %<PRIu8>\n"
+msgstr ""
+"\n"
+" Довжина:       %6<PRIu64>\n"
 
 #: src/readelf.c:4509
-#, fuzzy, c-format
+#, c-format
 msgid " DWARF version: %6<PRIuFAST16>\n"
-msgstr " Версія:             %<PRIu16>\n"
+msgstr " версія DWARF:  %6<PRIuFAST16>\n"
 
 #: src/readelf.c:4513
 #, c-format
 msgid "unsupported aranges version"
-msgstr ""
+msgstr "непідтримувана версія aranges"
 
 #: src/readelf.c:4524
-#, fuzzy, c-format
+#, c-format
 msgid " CU offset:     %6<PRIx64>\n"
-msgstr " зміщення CU:     %#<PRIx32>\n"
+msgstr " зміщення CU:     %6<PRIx64>\n"
 
 #: src/readelf.c:4530
-#, fuzzy, c-format
+#, c-format
 msgid " Address size:  %6<PRIu64>\n"
-msgstr " зміщення адреси: %#<PRIx32>\n"
+msgstr " Розмір адреси:  %6<PRIu64>\n"
 
 #: src/readelf.c:4534
-#, fuzzy, c-format
+#, c-format
 msgid "unsupported address size"
-msgstr "немає значення адреси"
+msgstr "непідтримуваний розмір адреси"
 
 #: src/readelf.c:4539
-#, fuzzy, c-format
+#, c-format
 msgid ""
 " Segment size:  %6<PRIu64>\n"
 "\n"
-msgstr " встановити файл у %<PRIu64>\n"
+msgstr ""
+" Розмір сегмента:  %6<PRIu64>\n"
+"\n"
 
 #: src/readelf.c:4543
 #, c-format
 msgid "unsupported segment size"
-msgstr ""
+msgstr "непідтримуваний розмір сегмента"
 
 #: src/readelf.c:4583
-#, fuzzy, c-format
+#, c-format
 msgid "   %s..%s (%<PRIx64>)\n"
-msgstr "      %s: %<PRId64>\n"
+msgstr "   %s..%s (%<PRIx64>)\n"
 
 #: src/readelf.c:4586
-#, fuzzy, c-format
+#, c-format
 msgid "   %s..%s\n"
-msgstr " [%6tx]  %s..%s\n"
+msgstr "   %s..%s\n"
 
 #: src/readelf.c:4595
 #, c-format
 msgid "   %Zu padding bytes\n"
-msgstr ""
+msgstr "   %Zu байтів доповнення\n"
 
 #: src/readelf.c:4613
 #, c-format
@@ -5342,9 +5347,9 @@ msgid "           %s..%s\n"
 msgstr "           %s..%s\n"
 
 #: src/readelf.c:5118
-#, fuzzy, c-format
+#, c-format
 msgid "cannot get ELF: %s"
-msgstr "не вдалося отримати заголовок ELF: %s"
+msgstr "не вдалося отримати ELF: %s"
 
 #: src/readelf.c:5133
 #, c-format
@@ -5469,7 +5474,7 @@ msgid "cannot get next DIE: %s"
 msgstr "не вдалося визначити наступний DIE: %s"
 
 #: src/readelf.c:5945
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 "DWARF section [%2zu] '%s' at offset %#<PRIx64>:\n"
@@ -5477,6 +5482,7 @@ msgid ""
 msgstr ""
 "\n"
 "Розділ DWARF [%2zu] «%s» зі зміщенням %#<PRIx64>:\n"
+"\n"
 
 #: src/readelf.c:6044
 #, c-format
@@ -5697,9 +5703,9 @@ msgid "%*s*** non-terminated string at end of section"
 msgstr "%*s*** незавершений рядок наприкінці розділу"
 
 #: src/readelf.c:6858
-#, fuzzy, c-format
+#, c-format
 msgid " Offset:             0x%<PRIx64>\n"
-msgstr " Зміщення:           0x%zx\n"
+msgstr " Зміщення:           0x%<PRIx64>\n"
 
 #: src/readelf.c:6870
 #, c-format

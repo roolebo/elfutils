@@ -1,3 +1,11 @@
+2013-10-10  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_getfuncs.c (struct visitor_info): Rename start_offset to
+	start_addr and rename last_offset to last_addr. Now both void *.
+	(tree_visitor): Use start_add and die_addr instead of start_offset
+	and die_offset.
+	(dwarf_getfuncs): Use last_addr instead of last_offset.
+
 2013-10-06  Mark Wielaard  <mjw@redhat.com>
 
 	* cfi.c (execute_cfi): Make sure DW_CFA_expression and

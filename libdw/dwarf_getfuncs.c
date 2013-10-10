@@ -43,11 +43,11 @@ struct visitor_info
   /* The user arg value to dwarf_getfuncs.  */
   void *arg;
 
-  /* The DIE offset where to (re)start the search.  Zero for all.  */
-  Dwarf_Off start_offset;
+  /* Addr of the DIE offset where to (re)start the search.  Zero for all.  */
+  void *start_addr;
 
-  /* Last subprogram DIE offset seen.  */
-  Dwarf_Off last_offset;
+  /* Last subprogram DIE addr seen.  */
+  void *last_addr;
 
   /* The CU only contains C functions.  Allows pruning of most subtrees.  */
   bool c_cu;
@@ -59,8 +59,8 @@ tree_visitor (unsigned int depth __attribute__ ((unused)),
 {
   struct visitor_info *const v = arg;
   Dwarf_Die *die = &chain->die;
-  Dwarf_Off start_offset = v->start_offset;
-  Dwarf_Off die_offset = INTUSE(dwarf_dieoffset) (die);
+  void *start_addr = v->start_addr;
+  void *die_addr = die->addr;
 
   /* Pure C CUs can only contain defining subprogram DIEs as direct
      children of the CU DIE or as nested function inside a normal C
@@ -75,11 +75,11 @@ tree_visitor (unsigned int depth __attribute__ ((unused)),
       return DWARF_CB_OK;
     }
 
-  /* Skip all DIEs till we found the (re)start offset.  */
-  if (start_offset != 0)
+  /* Skip all DIEs till we found the (re)start addr.  */
+  if (start_addr != NULL)
     {
-      if (die_offset == start_offset)
-	v->start_offset = 0;
+      if (die_addr == start_addr)
+	v->start_addr = NULL;
       return DWARF_CB_OK;
     }
 
@@ -88,7 +88,7 @@ tree_visitor (unsigned int depth __attribute__ ((unused)),
       || INTUSE(dwarf_hasattr) (die, DW_AT_declaration))
     return DWARF_CB_OK;
 
-  v->last_offset = die_offset;
+  v->last_addr = die_addr;
   return (*v->callback) (die, v->arg);
 }
 
@@ -105,13 +105,13 @@ dwarf_getfuncs (Dwarf_Die *cudie, int (*callback) (Dwarf_Die *, void *),
 	       || lang == DW_LANG_C
 	       || lang == DW_LANG_C99);
 
-  struct visitor_info v = { callback, arg, offset, 0, c_cu };
+  struct visitor_info v = { callback, arg, (void *) offset, NULL, c_cu };
   struct Dwarf_Die_Chain chain = { .die = CUDIE (cudie->cu),
 				   .parent = NULL };
   int res = __libdw_visit_scopes (0, &chain, &tree_visitor, NULL, &v);
 
   if (res == DWARF_CB_ABORT)
-    return v.last_offset;
+    return (ptrdiff_t) v.last_addr;
   else
     return res;
 }

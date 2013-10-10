@@ -1,3 +1,13 @@
+2013-10-10  Mark Wielaard  <mjw@redhat.com>
+	    Josh Stone  <jistone@redhat.com>
+
+	* run-allfcts-multi.sh: New test.
+	* test-offset-loop.bz2: New testfile.
+	* test-offset-loop.alt.bz2: New testfile.
+	* Makefile.am (TESTS): Add run-allcft-multi.sh if ENABLE_DWZ.
+	(EXTRA_DIST): Add run-allfcts-multi.sh, test-offset-loop.bz2 and
+	test-offset-loop.alt.bz2.
+
 2013-10-15  Mark Wielaard  <mjw@redhat.com>
 
 	* run-unstrip-M.sh: New test.

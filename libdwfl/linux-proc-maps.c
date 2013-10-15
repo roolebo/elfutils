@@ -232,7 +232,7 @@ proc_maps_report (Dwfl *dwfl, FILE *f, GElf_Addr sysinfo_ehdr, pid_t pid)
 	}
 
       char *file = line + nread + strspn (line + nread, " \t");
-      if (file[0] == '\0' || (ino == 0 && dmajor == 0 && dminor == 0))
+      if (file[0] != '/' || (ino == 0 && dmajor == 0 && dminor == 0))
 	/* This line doesn't indicate a file mapping.  */
 	continue;
 
@@ -373,7 +373,6 @@ dwfl_linux_proc_find_elf (Dwfl_Module *mod __attribute__ ((unused)),
       return -1;
     }
 
-  abort ();
   return -1;
 }
 INTDEF (dwfl_linux_proc_find_elf)

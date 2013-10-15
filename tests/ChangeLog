@@ -1,3 +1,9 @@
+2013-10-15  Mark Wielaard  <mjw@redhat.com>
+
+	* run-unstrip-M.sh: New test.
+	* Makefile.am (TESTS): Add run-unstrip-M.sh.
+	(EXTRA_DIST): Likewise.
+
 2013-10-06  Mark Wielaard  <mjw@redhat.com>
 
 	* run-addrcfi.sh: Remove nop from expected ppc and ppc64
@@ -7,7 +13,7 @@
 
 	* typeiter2.c: New file, reversing typeiter.c.
 	* run-typeiter.sh: Also run typeiter2.
-	* Makefile.am (ckeck_PROGRAMS): Add typeiter2.
+	* Makefile.am (check_PROGRAMS): Add typeiter2.
 	(typeiter2_LDADD): New variable.
 
 2013-09-26  Petr Machata  <pmachata@redhat.com>

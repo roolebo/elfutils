@@ -202,7 +202,7 @@ MEMBER parameter required for 'a', 'b', and 'i' modifiers"));
   if (instance_specifed)
     {
       /* Only valid for certain operations.  */
-      if (operation == oper_extract && operation == oper_delete)
+      if (operation != oper_extract && operation != oper_delete)
 	error (1, 0, gettext ("\
 'N' is only meaningful with the 'x' and 'd' options"));
 

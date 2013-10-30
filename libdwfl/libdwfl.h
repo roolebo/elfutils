@@ -349,11 +349,13 @@ extern int dwfl_linux_kernel_report_offline (Dwfl *dwfl, const char *release,
    This can follow a dwfl_report_offline call to bootstrap the
    DT_DEBUG method of following the dynamic linker link_map chain, in
    case the core file does not contain enough of the executable's text
-   segment to locate its PT_DYNAMIC in the dump.  This might call
-   dwfl_report_elf on file names found in the dump if reading some
-   link_map files is the only way to ascertain those modules' addresses.
+   segment to locate its PT_DYNAMIC in the dump.  In such case you need to
+   supply non-NULL EXECUTABLE, otherwise dynamic libraries will not be loaded
+   into the DWFL map.  This might call dwfl_report_elf on file names found in
+   the dump if reading some link_map files is the only way to ascertain those
+   modules' addresses.
    Returns the number of modules reported, or -1 for errors.  */
-extern int dwfl_core_file_report (Dwfl *dwfl, Elf *elf);
+extern int dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const char *executable);
 
 /* Call dwfl_report_module for each file mapped into the address space of PID.
    Returns zero on success, -1 if dwfl_report_module failed,

@@ -1,3 +1,7 @@
+2013-10-30  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* NEWS (Version 0.158): New.
+
 2013-09-30  Mark Wielaard  <mjw@redhat.com>
 
 	* NEWS: Update for readelf NT_SIGINFO and NT_FILE core notes.

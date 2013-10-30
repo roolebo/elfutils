@@ -398,13 +398,26 @@ clear_r_debug_info (struct r_debug_info *r_debug_info)
 }
 
 int
-dwfl_core_file_report (Dwfl *dwfl, Elf *elf)
+dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const char *executable)
 {
   size_t phnum;
   if (unlikely (elf_getphdrnum (elf, &phnum) != 0))
     {
       __libdwfl_seterrno (DWFL_E_LIBELF);
       return -1;
+    }
+
+  free (dwfl->executable_for_core);
+  if (executable == NULL)
+    dwfl->executable_for_core = NULL;
+  else
+    {
+      dwfl->executable_for_core = strdup (executable);
+      if (dwfl->executable_for_core == NULL)
+	{
+	  __libdwfl_seterrno (DWFL_E_NOMEM);
+	  return -1;
+	}
     }
 
   /* First report each PT_LOAD segment.  */
@@ -524,3 +537,16 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf)
   return sniffed || listed >= 0 ? listed + sniffed : listed;
 }
 INTDEF (dwfl_core_file_report)
+NEW_VERSION (dwfl_core_file_report, ELFUTILS_0.158)
+
+#ifdef SHARED
+int _compat_without_executable_dwfl_core_file_report (Dwfl *dwfl, Elf *elf);
+COMPAT_VERSION_NEWPROTO (dwfl_core_file_report, ELFUTILS_0.146,
+			 without_executable)
+
+int
+_compat_without_executable_dwfl_core_file_report (Dwfl *dwfl, Elf *elf)
+{
+  return dwfl_core_file_report (dwfl, elf, NULL);
+}
+#endif

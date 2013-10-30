@@ -1,3 +1,13 @@
+2013-10-30  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* argp-std.c (parse_opt): Use executable parameter of
+	dwfl_core_file_report.
+	* core-file.c (dwfl_core_file_report): Add parameter executable.  Set
+	it to DWFL.  Add NEW_VERSION for it.
+	(_compat_without_executable_dwfl_core_file_report): New.  Twice.
+	* libdwfl.h (dwfl_core_file_report): Add parameter executable, update
+	the function comment.
+
 2013-10-15  Mark Wielaard  <mjw@redhat.com>
 
 	* linux-proc-maps.c (proc_maps_report): Ignore non-absolute file

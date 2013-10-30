@@ -295,9 +295,6 @@ parse_opt (int key, char *arg, struct argp_state *state)
 
 	if (opt->core)
 	  {
-	    if (opt->e)
-	      dwfl->executable_for_core = strdup (opt->e);
-
 	    int fd = open64 (opt->core, O_RDONLY);
 	    if (fd < 0)
 	      {
@@ -317,7 +314,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
 		return error == DWFL_E_ERRNO ? errno : EIO;
 	      }
 
-	    int result = INTUSE(dwfl_core_file_report) (dwfl, core);
+	    int result = INTUSE(dwfl_core_file_report) (dwfl, core, opt->e);
 	    if (result < 0)
 	      {
 		elf_end (core);

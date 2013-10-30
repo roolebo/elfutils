@@ -1,3 +1,7 @@
+2013-10-30  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* libdw.map (ELFUTILS_0.158): New.
+
 2013-10-10  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_getfuncs.c (struct visitor_info): Rename start_offset to

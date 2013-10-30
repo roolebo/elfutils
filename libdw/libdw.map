@@ -267,3 +267,9 @@ ELFUTILS_0.157 {
     dwarf_getlocation_die;
     dwarf_getlocation_attr;
 } ELFUTILS_0.156;
+
+ELFUTILS_0.158 {
+  global:
+    # Replaced ELFUTILS_0.146 version, which has a wrapper without executable.
+    dwfl_core_file_report;
+} ELFUTILS_0.157;

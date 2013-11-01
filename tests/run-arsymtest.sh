@@ -28,7 +28,7 @@ tempfiles $okfile $tmpfile $testfile
 result=77
 if test -f $lib; then
     # Generate list using `nm' we check against.
-    nm -s $lib |
+    ${NM} -s $lib |
     sed -e '1,/^Arch/d' -e '/^$/,$d' |
     sort > $okfile
 

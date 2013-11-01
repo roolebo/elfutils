@@ -1,3 +1,8 @@
+2013-11-01  Michael Forney  <mforney@mforney.org>
+
+	* Makefile.am (TESTS_ENVIRONMENT): Use and export NM.
+	* run-arsymtest.sh: Use NM.
+
 2013-11-05  Mark Wielaard  <mjw@redhat.com>
 
 	* allfcts.c (main): Correct dwarf_getfuncs return value check.

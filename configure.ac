@@ -79,6 +79,10 @@ AC_PROG_CC
 AC_PROG_RANLIB
 AC_PROG_YACC
 AM_PROG_LEX
+# Only available since automake 1.12
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
+AC_CHECK_TOOL([READELF], [readelf])
+AC_CHECK_TOOL([NM], [nm])
 
 AC_CACHE_CHECK([for gcc with C99 support], ac_cv_c99, [dnl
 old_CFLAGS="$CFLAGS"

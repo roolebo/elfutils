@@ -113,7 +113,7 @@ libdw.so: $(srcdir)/libdw.map libdw_pic.a \
 		-Wl,--version-script,$<,--no-undefined \
 		-Wl,--whole-archive $(filter-out $<,$^) -Wl,--no-whole-archive\
 		-ldl $(zip_LIBS)
-	if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
+	if $(READELF) -d $@ | fgrep -q TEXTREL; then exit 1; fi
 	ln -fs $@ $@.$(VERSION)
 
 install: install-am libdw.so

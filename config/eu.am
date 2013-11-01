@@ -61,4 +61,4 @@ endif
 
 CLEANFILES = *.gcno *.gcda
 
-textrel_check = if readelf -d $@ | fgrep -q TEXTREL; then exit 1; fi
+textrel_check = if $(READELF) -d $@ | fgrep -q TEXTREL; then exit 1; fi

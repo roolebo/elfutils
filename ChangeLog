@@ -1,3 +1,7 @@
+2013-11-01  Michael Forney  <mforney@mforney.org>
+
+	* configure.ac: Call AM_PROG_AR and AC_CHECK_TOOL for readelf and nm.
+
 2013-10-30  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* NEWS (Version 0.158): New.

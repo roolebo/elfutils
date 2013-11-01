@@ -1,3 +1,7 @@
+2013-11-01  Michael Forney  <mforney@mforney.org>
+
+	* eu.am: Use READELF.
+
 2013-09-30  Mark Wielaard  <mjw@redhat.com>
 
 	* elfutils.spec.in: Update for readelf NT_SIGINFO and NT_FILE

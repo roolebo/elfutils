@@ -1,3 +1,7 @@
+2013-11-01  Michael Forney  <mforney@mforney.org>
+
+	* Makefile.am: Use READELF.
+
 2013-10-01  Petr Machata  <pmachata@redhat.com>
 
 	* elf.h: Update from glibc.

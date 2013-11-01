@@ -1,5 +1,10 @@
 2013-11-01  Michael Forney  <mforney@mforney.org>
 
+	* Makefile.am (libdwfl_objects): New definition.
+	(libdw_a_LIBADD): Use libdwfl_objects.
+
+2013-11-01  Michael Forney  <mforney@mforney.org>
+
 	* Makefile.am: Use READELF.
 
 2013-10-30  Jan Kratochvil  <jan.kratochvil@redhat.com>

@@ -129,7 +129,8 @@ uninstall: uninstall-am
 	rmdir --ignore-fail-on-non-empty $(DESTDIR)$(includedir)/elfutils
 endif
 
-libdw_a_LIBADD = $(addprefix ../libdwfl/,$(shell $(AR) t ../libdwfl/libdwfl.a))
+libdwfl_objects = $(shell $(AR) t ../libdwfl/libdwfl.a)
+libdw_a_LIBADD = $(addprefix ../libdwfl/,$(libdwfl_objects))
 
 noinst_HEADERS = libdwP.h memory-access.h dwarf_abbrev_hash.h \
 		 dwarf_sig8_hash.h cfi.h encoded-value.h

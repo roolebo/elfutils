@@ -1,3 +1,9 @@
+2013-11-05  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_debug_ranges_section): Cast address to size_t
+	before comparison.
+	(print_debug_loc_section): Likewise.
+
 2013-10-18  Mark Wielaard  <mjw@redhat.com>
 
 	* ar.c (main): Correct operation check when instance_specifed is set.

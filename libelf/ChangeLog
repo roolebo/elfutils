@@ -1,3 +1,8 @@
+2013-11-05  Mark Wielaard  <mjw@redhat.com>
+
+	* elf32_updatefile.c (elfXX_updatefile): Copy all section headers
+	if elf->flags dirty.
+
 2013-11-01  Michael Forney  <mforney@mforney.org>
 
 	* Makefile.am: Use READELF.

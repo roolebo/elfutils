@@ -1,3 +1,7 @@
+2013-11-05  Mark Wielaard  <mjw@redhat.com>
+
+	* allfcts.c (main): Correct dwarf_getfuncs return value check.
+
 2013-10-10  Mark Wielaard  <mjw@redhat.com>
 	    Josh Stone  <jistone@redhat.com>
 

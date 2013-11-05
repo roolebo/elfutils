@@ -63,7 +63,7 @@ main (int argc, char *argv[])
 		{
 		  doff = dwarf_getfuncs (die, cb, NULL, doff);
 		}
-	      while (doff > 0);
+	      while (doff != 0 && dwarf_errno () == 0);
 
 	      off = noff;
 	    }

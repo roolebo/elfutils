@@ -1,3 +1,8 @@
+2013-11-06  Mark Wielaard  <mjw@redhat.com>
+
+	* configure.ac (--enable-thread-safety): Add AC_MSG_WARN experimental
+	option.
+
 2013-11-01  Michael Forney  <mforney@mforney.org>
 
 	* configure.ac: Call AM_PROG_AR and AC_CHECK_TOOL for readelf and nm.

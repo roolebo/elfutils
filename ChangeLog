@@ -1,5 +1,10 @@
 2013-11-06  Mark Wielaard  <mjw@redhat.com>
 
+	* configure.ac (--enable-dwz): Add AC_MSG_WARN when disabled but
+	local system does have /usr/lib/debug/.dwz.
+
+2013-11-06  Mark Wielaard  <mjw@redhat.com>
+
 	* configure.ac (--enable-thread-safety): Add AC_MSG_WARN experimental
 	option.
 

@@ -75,6 +75,8 @@ AS_HELP_STRING([--enable-dwz], [enable experimental GNU ref_alt FORM, dwz multi 
 enable_dwz=$enableval, enable_dwz=no)
 AM_CONDITIONAL(ENABLE_DWZ, test "$enable_dwz" = yes)
 AS_IF([test "$enable_dwz" = yes], [AC_DEFINE(ENABLE_DWZ)])
+AS_IF([test "$enable_dwz" = no -a -d /usr/lib/debug/.dwz],
+      [AC_MSG_WARN([--enable-dwz disabled and /usr/lib/debug/.dwz exists, native tests might fail])])
 
 AH_TEMPLATE([ENABLE_DWZ], [Defined if libdw should support GNU ref_alt FORM, dwz multi files.])
 

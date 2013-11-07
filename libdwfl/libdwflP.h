@@ -467,7 +467,7 @@ struct r_debug_info_module
   /* FD is -1 iff ELF is NULL.  */
   int fd;
   Elf *elf;
-  GElf_Addr l_addr, l_ld;
+  GElf_Addr l_ld;
   /* START and END are both zero if not valid.  */
   GElf_Addr start, end;
   bool disk_file_has_build_id;

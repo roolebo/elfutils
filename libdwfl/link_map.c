@@ -369,7 +369,6 @@ report_r_debug (uint_fast8_t elfclass, uint_fast8_t elfdata,
 	    return release_buffer (result);
 	  r_debug_info_module->fd = -1;
 	  r_debug_info_module->elf = NULL;
-	  r_debug_info_module->l_addr = l_addr;
 	  r_debug_info_module->l_ld = l_ld;
 	  r_debug_info_module->start = 0;
 	  r_debug_info_module->end = 0;

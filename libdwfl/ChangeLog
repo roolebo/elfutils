@@ -1,5 +1,14 @@
 2013-11-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
+	Fix core files for re-prelink-ed files.
+	* core-file.c (dynamic_vaddr_get): New function.
+	(dwfl_core_file_report): New variable file_dynamic_vaddr.  Call
+	dynamic_vaddr_get instead of using L_ADDR.
+	* libdwflP.h (struct r_debug_info_module): Remove field l_addr.
+	* link_map.c (report_r_debug): Do not initialize l_addr.
+
+2013-11-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
 	Code cleanup.
 	* core-file.c (dwfl_core_file_report): Reindent block of code by
 	continue keyword.

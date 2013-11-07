@@ -397,6 +397,27 @@ clear_r_debug_info (struct r_debug_info *r_debug_info)
     }
 }
 
+static bool
+dynamic_vaddr_get (Elf *elf, GElf_Addr *vaddrp)
+{
+  size_t phnum;
+  if (unlikely (elf_getphdrnum (elf, &phnum) != 0))
+    return false;
+  for (size_t i = 0; i < phnum; ++i)
+    {
+      GElf_Phdr phdr_mem;
+      GElf_Phdr *phdr = gelf_getphdr (elf, i, &phdr_mem);
+      if (unlikely (phdr == NULL))
+	return false;
+      if (phdr->p_type == PT_DYNAMIC)
+	{
+	  *vaddrp = phdr->p_vaddr;
+	  return true;
+	}
+    }
+  return false;
+}
+
 int
 dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const char *executable)
 {
@@ -503,9 +524,13 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const char *executable)
     {
       if (module->elf == NULL)
 	continue;
+      GElf_Addr file_dynamic_vaddr;
+      if (! dynamic_vaddr_get (module->elf, &file_dynamic_vaddr))
+	continue;
       Dwfl_Module *mod;
       mod = __libdwfl_report_elf (dwfl, basename (module->name), module->name,
-				  module->fd, module->elf, module->l_addr,
+				  module->fd, module->elf,
+				  module->l_ld - file_dynamic_vaddr,
 				  true, true);
       if (mod == NULL)
 	continue;

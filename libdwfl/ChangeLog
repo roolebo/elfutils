@@ -1,3 +1,9 @@
+2013-11-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	Code cleanup.
+	* core-file.c (dwfl_core_file_report): Reindent block of code by
+	continue keyword.
+
 2013-10-30  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* argp-std.c (parse_opt): Use executable parameter of

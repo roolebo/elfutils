@@ -1,5 +1,9 @@
 2013-11-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
+	* core-file.c (dwfl_core_file_report): Remove the use of MAX.
+
+2013-11-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
 	* core-file.c (dwfl_core_file_report): Replaced variable sniffed by
 	retval.  Fix one forgotten LISTED increase.
 

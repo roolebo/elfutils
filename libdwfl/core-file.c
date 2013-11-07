@@ -486,7 +486,7 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const char *executable)
   int retval = dwfl_link_map_report (dwfl, auxv, auxv_size,
 				     dwfl_elf_phdr_memory_callback, elf,
 				     &r_debug_info);
-  int listed = MAX (0, retval);
+  int listed = retval > 0 ? retval : 0;
 
   /* Now sniff segment contents for modules hinted by information gathered
      from DT_DEBUG.  */

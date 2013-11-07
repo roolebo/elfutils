@@ -483,14 +483,14 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const char *executable)
 
   struct r_debug_info r_debug_info;
   memset (&r_debug_info, 0, sizeof r_debug_info);
-  int listed = dwfl_link_map_report (dwfl, auxv, auxv_size,
+  int retval = dwfl_link_map_report (dwfl, auxv, auxv_size,
 				     dwfl_elf_phdr_memory_callback, elf,
 				     &r_debug_info);
+  int listed = MAX (0, retval);
 
   /* Now sniff segment contents for modules hinted by information gathered
      from DT_DEBUG.  */
 
-  int sniffed = 0;
   ndx = 0;
   do
     {
@@ -506,7 +506,7 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const char *executable)
       if (seg > ndx)
 	{
 	  ndx = seg;
-	  ++sniffed;
+	  ++listed;
 	}
       else
 	++ndx;
@@ -534,6 +534,7 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const char *executable)
 				  true, true);
       if (mod == NULL)
 	continue;
+      ++listed;
       module->elf = NULL;
       module->fd = -1;
       /* Move this module to the end of the list, so that we end
@@ -560,7 +561,7 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const char *executable)
   /* We return the number of modules we found if we found any.
      If we found none, we return -1 instead of 0 if there was an
      error rather than just nothing found.  */
-  return sniffed || listed >= 0 ? listed + sniffed : listed;
+  return listed > 0 ? listed : retval;
 }
 INTDEF (dwfl_core_file_report)
 NEW_VERSION (dwfl_core_file_report, ELFUTILS_0.158)

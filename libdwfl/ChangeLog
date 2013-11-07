@@ -1,5 +1,10 @@
 2013-11-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
+	* core-file.c (dwfl_core_file_report): Replaced variable sniffed by
+	retval.  Fix one forgotten LISTED increase.
+
+2013-11-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
 	Fix core files for re-prelink-ed files.
 	* core-file.c (dynamic_vaddr_get): New function.
 	(dwfl_core_file_report): New variable file_dynamic_vaddr.  Call

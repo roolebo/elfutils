@@ -133,7 +133,7 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 	  (*fctp) ((char *) elf->map_address + elf->start_offset, ehdr,
 		   sizeof (ElfW2(LIBELFBITS,Ehdr)), 1);
 	}
-      else
+      else if (elf->map_address + elf->start_offset != ehdr)
 	memcpy (elf->map_address + elf->start_offset, ehdr,
 		sizeof (ElfW2(LIBELFBITS,Ehdr)));
 

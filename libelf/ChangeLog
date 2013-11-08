@@ -1,3 +1,8 @@
+2013-11-08  Mark Wielaard  <mjw@redhat.com>
+
+	* elf32_updatefile.c (elfXX_updatemmap): Only memcpy ehdr when not
+	already directly mmapped.
+
 2013-11-05  Mark Wielaard  <mjw@redhat.com>
 
 	* elf32_updatefile.c (elfXX_updatefile): Copy all section headers

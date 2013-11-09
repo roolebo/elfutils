@@ -1,3 +1,8 @@
+2013-11-09  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_getaranges.c (dwarf_getaranges): Read segment_size and
+	check that it is zero.
+
 2013-11-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* cfi.h (struct Dwarf_Frame_s): Make the comment more specific.

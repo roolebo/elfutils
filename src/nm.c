@@ -763,7 +763,8 @@ show_symbols_sysv (Ebl *ebl, GElf_Word strndx, const char *fullname,
     {
       GElf_Shdr shdr_mem;
 
-      assert (elf_ndxscn (scn) == cnt++);
+      assert (elf_ndxscn (scn) == cnt);
+      cnt++;
 
       char *name = elf_strptr (ebl->elf, shstrndx,
 			       gelf_getshdr (scn, &shdr_mem)->sh_name);

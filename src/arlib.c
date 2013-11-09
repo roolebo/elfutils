@@ -59,11 +59,11 @@ arlib_init (void)
      _FORTIFY_SOURCE=2 would not let us play these games.  Therefore
      we play it safe.  */
   char tmpbuf[sizeof (ar_hdr.ar_date) + 1];
-  memcpy (ar_hdr.ar_date, tmpbuf,
-	  snprintf (tmpbuf, sizeof (tmpbuf), "%-*lld",
+  int s = snprintf (tmpbuf, sizeof (tmpbuf), "%-*lld",
 		    (int) sizeof (ar_hdr.ar_date),
                     (arlib_deterministic_output ? 0
-                     : (long long int) time (NULL))));
+                     : (long long int) time (NULL)));
+  memcpy (ar_hdr.ar_date, tmpbuf, s);
   assert ((sizeof (struct ar_hdr)  % sizeof (uint32_t)) == 0);
 
   /* Note the string for the ar_uid and ar_gid cases is longer than
@@ -121,10 +121,10 @@ arlib_finalize (void)
 
       symtab.longnames = obstack_finish (&symtab.longnamesob);
 
-      memcpy (&((struct ar_hdr *) symtab.longnames)->ar_size, tmpbuf,
-	      snprintf (tmpbuf, sizeof (tmpbuf), "%-*zu",
+      int s = snprintf (tmpbuf, sizeof (tmpbuf), "%-*zu",
 			(int) sizeof (((struct ar_hdr *) NULL)->ar_size),
-			symtab.longnameslen - sizeof (struct ar_hdr)));
+			symtab.longnameslen - sizeof (struct ar_hdr));
+      memcpy (&((struct ar_hdr *) symtab.longnames)->ar_size, tmpbuf, s);
     }
 
   symtab.symsofflen = obstack_object_size (&symtab.symsoffob);

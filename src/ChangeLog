@@ -1,3 +1,10 @@
+2013-11-09  Mark Wielaard  <mjw@redhat.com>
+
+	* arlib.c (arlib_init): Call snprintf before using the result
+	with memcpy.
+	(arlib_finalize): Likewise.
+	* nm.c (show_symbols_sysv): Don't modify cnt inside assert.
+
 2013-11-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* Makefile.am (bin_PROGRAMS): Add stack.

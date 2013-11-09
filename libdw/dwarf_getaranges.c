@@ -144,9 +144,10 @@ dwarf_getaranges (dbg, aranges, naranges)
       if (address_size != 4 && address_size != 8)
 	goto invalid;
 
-      /* Ignore the segment size value.  */
-      // XXX Really?
-      (void) *readp++;
+      /* We don't actually support segment selectors.  */
+      unsigned int segment_size = *readp++;
+      if (segment_size != 0)
+	goto invalid;
 
       /* Round the address to the next multiple of 2*address_size.  */
       readp += ((2 * address_size - ((readp - hdrstart) % (2 * address_size)))

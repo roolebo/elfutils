@@ -1,3 +1,9 @@
+2013-11-10  Mark Wielaard  <mjw@redhat.com>
+
+	* stack.c: Use ARGP_PROGRAM_VERSION_HOOK_DEF and
+	ARGP_PROGRAM_BUG_ADDRESS_DEF.
+	(print_version): New function.
+
 2013-11-09  Mark Wielaard  <mjw@redhat.com>
 
 	* arlib.c (arlib_init): Call snprintf before using the result

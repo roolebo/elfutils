@@ -27,6 +27,15 @@
 #include <fcntl.h>
 #include ELFUTILS_HEADER(dwfl)
 
+#include <system.h>
+
+/* Name and version of program.  */
+static void print_version (FILE *stream, struct argp_state *state);
+ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
+
+/* Bug report address.  */
+ARGP_PROGRAM_BUG_ADDRESS_DEF = PACKAGE_BUGREPORT;
+
 static bool verbose = false;
 
 static int
@@ -90,6 +99,12 @@ thread_callback (Dwfl_Thread *thread, void *thread_arg __attribute__ ((unused)))
       abort ();
     }
   return DWARF_CB_OK;
+}
+
+static void
+print_version (FILE *stream, struct argp_state *state __attribute__ ((unused)))
+{
+  fprintf (stream, "stack (%s) %s\n", PACKAGE_NAME, PACKAGE_VERSION);
 }
 
 static error_t

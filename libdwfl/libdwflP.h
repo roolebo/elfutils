@@ -421,6 +421,13 @@ extern Dwfl_Error __libdwfl_relocate_value (Dwfl_Module *mod, Elf *elf,
 					    GElf_Addr *value)
      internal_function;
 
+/* See dwfl_module_getsym.  *FILEP will be set to the file of *SYM.
+   FILEP can be NULL.  */
+extern const char *__libdwfl_module_getsym (Dwfl_Module *mod, int ndx,
+					    GElf_Sym *sym, GElf_Word *shndxp,
+					    struct dwfl_file **filep)
+     internal_function;
+
 
 /* Ensure that MOD->ebl is set up.  */
 extern Dwfl_Error __libdwfl_module_getebl (Dwfl_Module *mod) internal_function;

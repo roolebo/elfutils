@@ -29,8 +29,10 @@
 #include "libdwflP.h"
 
 const char *
-dwfl_module_getsym (Dwfl_Module *mod, int ndx,
-		    GElf_Sym *sym, GElf_Word *shndxp)
+internal_function
+__libdwfl_module_getsym (Dwfl_Module *mod, int ndx,
+			 GElf_Sym *sym, GElf_Word *shndxp,
+			 struct dwfl_file **filep)
 {
   if (unlikely (mod == NULL))
     return NULL;
@@ -150,6 +152,15 @@ dwfl_module_getsym (Dwfl_Module *mod, int ndx,
       __libdwfl_seterrno (DWFL_E_BADSTROFF);
       return NULL;
     }
+  if (filep)
+    *filep = file;
   return (const char *) symstrdata->d_buf + sym->st_name;
+}
+
+const char *
+dwfl_module_getsym (Dwfl_Module *mod, int ndx,
+		    GElf_Sym *sym, GElf_Word *shndxp)
+{
+  return __libdwfl_module_getsym (mod, ndx, sym, shndxp, NULL);
 }
 INTDEF (dwfl_module_getsym)

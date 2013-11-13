@@ -86,20 +86,6 @@ dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr addr,
   /* Keep track of the lowest address a relevant sizeless symbol could have.  */
   GElf_Addr min_label = 0;
 
-  inline struct dwfl_file *i_to_symfile (int ndx)
-    {
-      int skip_aux_zero = (mod->syments > 0 && mod->aux_syments > 0) ? 1 : 0;
-      if (ndx < mod->first_global)
-	return mod->symfile;	// main symbol table (locals).
-      else if (ndx < mod->first_global + mod->aux_first_global - skip_aux_zero)
-	return &mod->aux_sym;	// aux symbol table (locals).
-      else if ((size_t) ndx
-	       < mod->syments + mod->aux_first_global - skip_aux_zero)
-	return mod->symfile;	// main symbol table (globals).
-      else
-	return &mod->aux_sym;	// aux symbol table (globals).
-    }
-
   /* Look through the symbol table for a matching symbol.  */
   inline void search_table (int start, int end)
     {
@@ -107,7 +93,9 @@ dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr addr,
 	{
 	  GElf_Sym sym;
 	  GElf_Word shndx;
-	  const char *name = INTUSE(dwfl_module_getsym) (mod, i, &sym, &shndx);
+	  struct dwfl_file *file;
+	  const char *name = __libdwfl_module_getsym (mod, i, &sym, &shndx,
+						      &file);
 	  if (name != NULL && name[0] != '\0'
 	      && sym.st_shndx != SHN_UNDEF
 	      && sym.st_value <= addr
@@ -152,7 +140,7 @@ dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr addr,
 			}
 		      else if (closest_name == NULL
 			       && sym.st_value >= min_label
-			       && same_section (&sym, i_to_symfile (i), shndx))
+			       && same_section (&sym, file, shndx))
 			{
 			  /* Handwritten assembly symbols sometimes have no
 			     st_size.  If no symbol with proper size includes

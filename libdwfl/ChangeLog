@@ -1,3 +1,14 @@
+2013-11-06  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	Provide __libdwfl_module_getsym to get dwfl_file *.
+	* dwfl_module_addrsym.c (dwfl_module_addrsym) (i_to_symfile): Remove.
+	(dwfl_module_addrsym) (search_table): New variable file.  Use
+	__libdwfl_module_getsym.  Use file.
+	* dwfl_module_getsym.c (dwfl_module_getsym): Rename to ...
+	(__libdwfl_module_getsym): ... here.  Add parameter filep.  Set it.
+	(dwfl_module_getsym): New wrapper.
+	* libdwflP.h (__libdwfl_module_getsym): New declaration.
+
 2013-11-13  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	Fix dwfl_module_addrsym for minidebuginfo.

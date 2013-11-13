@@ -1,3 +1,12 @@
+2013-11-13  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	Fix dwfl_module_addrsym for minidebuginfo.
+	* dwfl_module_addrsym.c (dwfl_module_addrsym): New variable
+	addr_symfile.
+	(dwfl_module_addrsym) (same_section): Use it.
+	(dwfl_module_addrsym) (i_to_symfile): New function.
+	(dwfl_module_addrsym) (search_table): Use it.
+
 2013-11-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
 	    Mark Wielaard  <mjw@redhat.com>
 

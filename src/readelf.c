@@ -8169,6 +8169,9 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
       colno = WRAP_COLUMN;
       break;
 
+    case 'h':
+      break;
+
     default:
       error (0, 0, "XXX not handling format '%c' for %s",
 	     item->format, item->name);

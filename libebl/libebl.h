@@ -384,10 +384,8 @@ extern int ebl_auxv_info (Ebl *ebl, GElf_Xword a_type,
   __nonnull_attribute__ (1, 3, 4);
 
 /* Callback type for ebl_set_initial_registers_tid.  */
-typedef bool (ebl_tid_registers_t) (const int firstreg,
-				    unsigned nregs,
-				    const Dwarf_Word *regs,
-				    void *arg)
+typedef bool (ebl_tid_registers_t) (int firstreg, unsigned nregs,
+				    const Dwarf_Word *regs, void *arg)
   __nonnull_attribute__ (3);
 
 /* Callback to fetch process data from live TID.

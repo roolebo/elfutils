@@ -657,7 +657,7 @@ Dwfl_Thread *dwfl_frame_thread (Dwfl_Frame *state)
    For every known continuous block of registers <FIRSTREG..FIRSTREG+NREGS)
    (inclusive..exclusive) set their content to REGS (array of NREGS items).
    Function returns false if any of the registers has invalid number.  */
-bool dwfl_thread_state_registers (Dwfl_Thread *thread, const int firstreg,
+bool dwfl_thread_state_registers (Dwfl_Thread *thread, int firstreg,
                                   unsigned nregs, const Dwarf_Word *regs)
   __nonnull_attribute__ (1, 4);
 

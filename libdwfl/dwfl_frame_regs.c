@@ -29,7 +29,7 @@
 #include "libdwflP.h"
 
 bool
-dwfl_thread_state_registers (Dwfl_Thread *thread, const int firstreg,
+dwfl_thread_state_registers (Dwfl_Thread *thread, int firstreg,
 			     unsigned nregs, const Dwarf_Word *regs)
 {
   Dwfl_Frame *state = thread->unwound;

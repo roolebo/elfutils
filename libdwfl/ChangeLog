@@ -1,5 +1,13 @@
 2013-11-14  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
+	Code cleanup: Remove const in prototype
+	* dwfl_frame_regs.c (dwfl_thread_state_registers): Remove const from
+	firstreg.
+	* libdwfl.h (dwfl_thread_state_registers): Likewise.
+	* linux-pid-attach.c (pid_thread_state_registers_cb): Likewise.
+
+2013-11-14  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
 	Fix dwfl_attach_state machine->elf.
 	* dwfl_frame.c (dwfl_attach_state): Change parameter machine to elf.
 	Call ebl_openbackend instead of ebl_openbackend_machine.

@@ -1,3 +1,8 @@
+2013-11-14  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	Code cleanup: Remove const in prototype
+	* libebl.h (ebl_tid_registers_t): Remove const from firstreg.
+
 2013-11-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
 	    Mark Wielaard  <mjw@redhat.com>
 

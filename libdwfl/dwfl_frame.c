@@ -131,7 +131,7 @@ process_alloc (Dwfl *dwfl)
 }
 
 bool
-dwfl_attach_state (Dwfl *dwfl, int machine, pid_t pid,
+dwfl_attach_state (Dwfl *dwfl, Elf *elf, pid_t pid,
 		   const Dwfl_Thread_Callbacks *thread_callbacks, void *arg)
 {
   if (thread_callbacks == NULL || thread_callbacks->next_thread == NULL
@@ -147,9 +147,9 @@ dwfl_attach_state (Dwfl *dwfl, int machine, pid_t pid,
     }
   Ebl *ebl;
   bool ebl_close;
-  if (machine != EM_NONE)
+  if (elf != NULL)
     {
-      ebl = ebl_openbackend_machine (machine);
+      ebl = ebl_openbackend (elf);
       ebl_close = true;
     }
   else

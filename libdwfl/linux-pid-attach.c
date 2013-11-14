@@ -271,7 +271,7 @@ __libdwfl_attach_state_for_pid (Dwfl *dwfl, pid_t pid)
     }
   pid_arg->dir = dir;
   pid_arg->tid_attached = 0;
-  if (! INTUSE(dwfl_attach_state) (dwfl, EM_NONE, pid, &pid_thread_callbacks,
+  if (! INTUSE(dwfl_attach_state) (dwfl, NULL, pid, &pid_thread_callbacks,
 				   pid_arg))
     {
       closedir (dir);

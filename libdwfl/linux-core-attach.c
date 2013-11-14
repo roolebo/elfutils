@@ -369,8 +369,8 @@ __libdwfl_attach_state_for_core (Dwfl *dwfl, Elf *core)
   core_arg->note_data = note_data;
   core_arg->thread_note_offset = 0;
   core_arg->ebl = ebl;
-  if (! INTUSE(dwfl_attach_state) (dwfl, ebl_get_elfmachine (ebl), pid,
-				   &core_thread_callbacks, core_arg))
+  if (! INTUSE(dwfl_attach_state) (dwfl, core, pid, &core_thread_callbacks,
+				   core_arg))
     {
       free (core_arg);
       ebl_closebackend (ebl);

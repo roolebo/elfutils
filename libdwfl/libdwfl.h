@@ -625,13 +625,13 @@ typedef struct
 } Dwfl_Thread_Callbacks;
 
 /* PID is the process id associated with the DWFL state.  Architecture of DWFL
-   modules is specified by MACHINE.  Use EM_NONE to detect architecture from
-   DWFL.  If EBL is NULL the function will detect it from arbitrary Dwfl_Module
-   of DWFL.  DWFL_ARG is the callback backend state.  DWFL_ARG will be provided
-   to the callbacks.  *THREAD_CALLBACKS function pointers must remain valid
-   during lifetime of DWFL.  Function returns true on success,
-   false otherwise.  */
-bool dwfl_attach_state (Dwfl *dwfl, int machine, pid_t pid,
+   modules is specified by ELF, ELF must remain valid during DWFL lifetime.
+   Use NULL ELF to detect architecture from DWFL, the function will then detect
+   it from arbitrary Dwfl_Module of DWFL.  DWFL_ARG is the callback backend
+   state.  DWFL_ARG will be provided to the callbacks.  *THREAD_CALLBACKS
+   function pointers must remain valid during lifetime of DWFL.  Function
+   returns true on success, false otherwise.  */
+bool dwfl_attach_state (Dwfl *dwfl, Elf *elf, pid_t pid,
                         const Dwfl_Thread_Callbacks *thread_callbacks,
 			void *dwfl_arg)
   __nonnull_attribute__ (1, 4);

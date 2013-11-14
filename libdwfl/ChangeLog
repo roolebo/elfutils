@@ -1,3 +1,15 @@
+2013-11-14  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	Fix dwfl_attach_state machine->elf.
+	* dwfl_frame.c (dwfl_attach_state): Change parameter machine to elf.
+	Call ebl_openbackend instead of ebl_openbackend_machine.
+	* libdwfl.h (dwfl_attach_state): Change parameter machine to elf.
+	Update the function description.
+	* linux-core-attach.c (__libdwfl_attach_state_for_core): Pass CORE to
+	dwfl_attach_state.
+	* linux-pid-attach.c (__libdwfl_attach_state_for_pid): Pass NULL to
+	dwfl_attach_state.
+
 2013-11-06  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	Provide __libdwfl_module_getsym to get dwfl_file *.

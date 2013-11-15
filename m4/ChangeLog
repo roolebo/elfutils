@@ -1,4 +1,5 @@
-2013-11-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
+2013-11-07  Roland McGrath  <roland@redhat.com>
+	    Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* biarch.m4: New file.
 

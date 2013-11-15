@@ -83,7 +83,7 @@ list_syms (struct Dwfl_Module *mod,
       GElf_Sym sym;
       GElf_Word shndxp;
       const char *name = dwfl_module_getsym (mod, ndx, &sym, &shndxp);
-      printf("%4d: %s\t%s\t%s (%" PRIu64 ") %#" PRIx64 "\n",
+      printf("%4d: %s\t%s\t%s (%" PRIu64 ") %#" PRIx64,
 	     ndx, gelf_type (&sym), gelf_bind (&sym), name,
 	     sym.st_size, sym.st_value);
 
@@ -97,7 +97,12 @@ list_syms (struct Dwfl_Module *mod,
 	  GElf_Word ashndxp;
 	  const char *aname = dwfl_module_addrsym (mod, addr, &asym, &ashndxp);
 	  assert (strcmp (name, aname) == 0);
+
+	  int res = dwfl_module_relocate_address (mod, &addr);
+	  assert (res != -1);
+	  printf(", rel: %#" PRIx64 "", addr);
 	}
+      printf ("\n");
     }
 
   return DWARF_CB_OK;

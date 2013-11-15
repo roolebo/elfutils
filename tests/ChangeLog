@@ -1,3 +1,15 @@
+2013-11-15  Mark Wielaard  <mjw@redhat.com>
+
+	* testfilebazmdb.bz2: Regenerated.
+	* testfilebazmin.bz2: Likewise.
+	* testfilebazdbg_pl.bz2: New testfile.
+	* testfilebazmin_pl.bz2: Likewise.
+	* Makefile.am (EXTRA_DIST): Add testfilebazdbg_pl.bz2 and
+	testfilebazmin_pl.bz2.
+	* dwflsyms.c (list_syms): Call dwfl_module_relocate_address and
+	print relative address of function symbols.
+	* run-dwflsyms.sh: Add prelink tests and adjust expected output.
+
 2013-11-01  Michael Forney  <mforney@mforney.org>
 
 	* Makefile.am (TESTS_ENVIRONMENT): Use and export NM.

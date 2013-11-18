@@ -1,3 +1,10 @@
+2013-11-18  Josh Stone  <jistone@redhat.com>
+
+	* testfilebazdbg_plr.bz2: New testfile.
+	* testfilebazmin_plr.bz2: Likewise.
+	* Makefile.am (EXTRA_DIST): Add the above files.
+	* run-dwflsyms.sh: Add prelink -r tests.
+
 2013-11-15  Mark Wielaard  <mjw@redhat.com>
 
 	* testfilebazmdb.bz2: Regenerated.

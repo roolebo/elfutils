@@ -190,6 +190,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfilebazmin.bz2 testfilebazdbg.debug.bz2 testfilebazmdb.bz2 \
 	     testfilebaztab.bz2 testfilebasmin.bz2 \
 	     testfilebazdbg_pl.bz2 testfilebazmin_pl.bz2 \
+	     testfilebazdbg_plr.bz2 testfilebazmin_plr.bz2 \
 	     run-dwflsyms.sh \
 	     run-unstrip-n.sh testcore-rtlib.bz2 testcore-rtlib-ppc.bz2 \
 	     run-low_high_pc.sh testfile_low_high_pc.bz2 \

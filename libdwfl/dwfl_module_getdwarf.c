@@ -816,6 +816,33 @@ find_dynsym (Dwfl_Module *mod)
     }
 }
 
+
+#if USE_LZMA
+/* Try to find the offset between the main file and .gnu_debugdata.  */
+static bool
+find_aux_address_sync (Dwfl_Module *mod)
+{
+  /* Don't trust the phdrs in the minisymtab elf file to be setup correctly.
+     The address_sync is equal to the main file it is embedded in at first.  */
+  mod->aux_sym.address_sync = mod->main.address_sync;
+
+  /* Adjust address_sync for the difference in entry addresses, attempting to
+     account for ELF relocation changes after aux was split.  */
+  GElf_Ehdr ehdr_main, ehdr_aux;
+  if (unlikely (gelf_getehdr (mod->main.elf, &ehdr_main) == NULL)
+      || unlikely (gelf_getehdr (mod->aux_sym.elf, &ehdr_aux) == NULL))
+    return false;
+  mod->aux_sym.address_sync += ehdr_aux.e_entry - ehdr_main.e_entry;
+
+  /* The shdrs are setup OK to make find_prelink_address_sync () do the right
+     thing, which is possibly more reliable, but it needs .gnu.prelink_undo.  */
+  if (mod->aux_sym.address_sync != 0)
+    return find_prelink_address_sync (mod, &mod->aux_sym) == DWFL_E_NOERROR;
+
+  return true;
+}
+#endif
+
 /* Try to find the auxiliary symbol table embedded in the main elf file
    section .gnu_debugdata.  Only matters if the symbol information comes
    from the main file dynsym.  No harm done if not found.  */
@@ -879,21 +906,11 @@ find_aux_sym (Dwfl_Module *mod __attribute__ ((unused)),
 	      mod->aux_sym.elf->flags |= ELF_F_MALLOCED;
 	      if (open_elf (mod, &mod->aux_sym) != DWFL_E_NOERROR)
 		return;
-	      /* Don't trust the phdrs in the minisymtab elf file to be
-		 setup correctly.  The address_sync is equal to the main
-		 file it is embedded in at first.  The shdrs are setup
-		 OK to make find_prelink_address_sync () do the right
-		 thing if necessary though.  */
-	      mod->aux_sym.address_sync = mod->main.address_sync;
-	      if (mod->aux_sym.address_sync != 0)
+	      if (! find_aux_address_sync (mod))
 		{
-		  error = find_prelink_address_sync (mod, &mod->aux_sym);
-		  if (error != DWFL_E_NOERROR)
-		    {
-		      elf_end (mod->aux_sym.elf);
-		      mod->aux_sym.elf = NULL;
-		      return;
-		    }
+		  elf_end (mod->aux_sym.elf);
+		  mod->aux_sym.elf = NULL;
+		  return;
 		}
 
 	      /* So far, so good. Get minisymtab table data and cache it. */

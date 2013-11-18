@@ -19,14 +19,18 @@
 
 # Tests dwfl_module_{addrsym,getsym,relocate_address}
 # See run-readelf-s.sh for how to generate test binaries.
+# In addition, *_pl files were created from their base file
+# with prelink -N, and *_plr with prelink -r 0x4200000000.
 
 testfiles testfilebaztab
 testfiles testfilebazdbg testfilebazdbg.debug
 testfiles testfilebazdbg_pl
+testfiles testfilebazdbg_plr
 testfiles testfilebazdyn
 testfiles testfilebazmdb
 testfiles testfilebazmin
 testfiles testfilebazmin_pl
+testfiles testfilebazmin_plr
 testfiles testfilebasmin
 
 tempfiles testfile.dynsym.in testfile.symtab.in testfile.minsym.in dwflsyms.out
@@ -328,6 +332,9 @@ cat testfile.symtab.in \
 cat testfile.symtab_pl.in \
   | testrun_compare ${abs_builddir}/dwflsyms -e testfilebazdbg_pl
 
+sed s/0x3000/0x4200/g testfile.symtab_pl.in \
+  | testrun_compare ${abs_builddir}/dwflsyms -e testfilebazdbg_plr
+
 cat testfile.dynsym.in \
   | testrun_compare ${abs_builddir}/dwflsyms -e testfilebazdyn
 
@@ -339,6 +346,9 @@ cat testfile.minsym.in \
 
 cat testfile.minsym_pl.in \
   | testrun_compare ${abs_builddir}/dwflsyms -e testfilebazmin_pl
+
+sed s/0x3000/0x4200/g testfile.minsym_pl.in \
+  | testrun_compare ${abs_builddir}/dwflsyms -e testfilebazmin_plr
 
 testrun_compare ${abs_builddir}/dwflsyms -e testfilebasmin <<\EOF
    0: NOTYPE	LOCAL	 (0) 0

@@ -1,3 +1,8 @@
+2013-11-18  Josh Stone  <jistone@redhat.com>
+
+	* dwfl_module_getdwarf.c (find_aux_address_sync): New function.
+	(find_aux_sym): Use it.
+
 2013-11-14  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	Code cleanup: Remove const in prototype

@@ -1,3 +1,11 @@
+2013-11-19  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	Compatibility with older kernels such as RHEL-6.
+	* linux-pid-attach.c (struct pid_arg): New field tid_was_stopped.
+	(ptrace_attach): New parameter tid_was_stoppedp.  Set it.
+	(pid_set_initial_registers): Pass tid_was_stopped.
+	(pid_thread_detach): Use tid_was_stopped.
+
 2013-11-18  Josh Stone  <jistone@redhat.com>
 
 	* dwfl_module_getdwarf.c (find_aux_address_sync): New function.

@@ -42,6 +42,8 @@ struct pid_arg
   DIR *dir;
   /* It is 0 if not used.  */
   pid_t tid_attached;
+  /* Valid only if TID_ATTACHED is not zero.  */
+  bool tid_was_stopped;
 };
 
 static bool
@@ -69,14 +71,15 @@ linux_proc_pid_is_stopped (pid_t pid)
 }
 
 static bool
-ptrace_attach (pid_t tid)
+ptrace_attach (pid_t tid, bool *tid_was_stoppedp)
 {
   if (ptrace (PTRACE_ATTACH, tid, NULL, NULL) != 0)
     {
       __libdwfl_seterrno (DWFL_E_ERRNO);
       return false;
     }
-  if (linux_proc_pid_is_stopped (tid))
+  *tid_was_stoppedp = linux_proc_pid_is_stopped (tid);
+  if (*tid_was_stoppedp)
     {
       /* Make sure there is a SIGSTOP signal pending even when the process is
 	 already State: T (stopped).  Older kernels might fail to generate
@@ -211,7 +214,7 @@ pid_set_initial_registers (Dwfl_Thread *thread, void *thread_arg)
   struct pid_arg *pid_arg = thread_arg;
   assert (pid_arg->tid_attached == 0);
   pid_t tid = INTUSE(dwfl_thread_tid) (thread);
-  if (! ptrace_attach (tid))
+  if (! ptrace_attach (tid, &pid_arg->tid_was_stopped))
     return false;
   pid_arg->tid_attached = tid;
   Dwfl_Process *process = thread->process;
@@ -235,7 +238,12 @@ pid_thread_detach (Dwfl_Thread *thread, void *thread_arg)
   pid_t tid = INTUSE(dwfl_thread_tid) (thread);
   assert (pid_arg->tid_attached == tid);
   pid_arg->tid_attached = 0;
-  ptrace (PTRACE_DETACH, tid, NULL, NULL);
+  /* This handling is needed only on older Linux kernels such as
+     2.6.32-358.23.2.el6.ppc64.  Later kernels such as 3.11.7-200.fc19.x86_64
+     remember the T (stopped) state themselves and no longer need to pass
+     SIGSTOP during PTRACE_DETACH.  */
+  ptrace (PTRACE_DETACH, tid, NULL,
+	  (void *) (intptr_t) (pid_arg->tid_was_stopped ? SIGSTOP : 0));
 }
 
 static const Dwfl_Thread_Callbacks pid_thread_callbacks =

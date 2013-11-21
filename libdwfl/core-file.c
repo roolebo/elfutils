@@ -397,8 +397,9 @@ clear_r_debug_info (struct r_debug_info *r_debug_info)
     }
 }
 
-static bool
-dynamic_vaddr_get (Elf *elf, GElf_Addr *vaddrp)
+bool
+internal_function
+__libdwfl_dynamic_vaddr_get (Elf *elf, GElf_Addr *vaddrp)
 {
   size_t phnum;
   if (unlikely (elf_getphdrnum (elf, &phnum) != 0))
@@ -525,7 +526,7 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const char *executable)
       if (module->elf == NULL)
 	continue;
       GElf_Addr file_dynamic_vaddr;
-      if (! dynamic_vaddr_get (module->elf, &file_dynamic_vaddr))
+      if (! __libdwfl_dynamic_vaddr_get (module->elf, &file_dynamic_vaddr))
 	continue;
       Dwfl_Module *mod;
       mod = __libdwfl_report_elf (dwfl, basename (module->name), module->name,

@@ -388,16 +388,14 @@ report_r_debug (uint_fast8_t elfclass, uint_fast8_t elfdata,
 	    {
 	      Elf *elf;
 	      Dwfl_Error error = __libdw_open_file (&fd, &elf, true, false);
-	      if (error == DWFL_E_NOERROR)
+	      GElf_Addr elf_dynamic_vaddr;
+	      if (error == DWFL_E_NOERROR
+		  && __libdwfl_dynamic_vaddr_get (elf, &elf_dynamic_vaddr))
 		{
 		  const void *build_id_bits;
 		  GElf_Addr build_id_elfaddr;
 		  int build_id_len;
 		  bool valid = true;
-
-		  /* FIXME: Bias L_ADDR should be computed from the prelink
-		     state in memory (when the file got loaded), not against
-		     the current on-disk file state as is computed below.  */
 
 		  if (__libdwfl_find_elf_build_id (NULL, elf, &build_id_bits,
 						   &build_id_elfaddr,
@@ -406,7 +404,9 @@ report_r_debug (uint_fast8_t elfclass, uint_fast8_t elfdata,
 		    {
 		      if (r_debug_info_module != NULL)
 			r_debug_info_module->disk_file_has_build_id = true;
-		      GElf_Addr build_id_vaddr = build_id_elfaddr + l_addr;
+		      GElf_Addr build_id_vaddr = (build_id_elfaddr
+						  - elf_dynamic_vaddr + l_ld);
+
 		      release_buffer (0);
 		      int segndx = INTUSE(dwfl_addrsegment) (dwfl,
 							     build_id_vaddr,

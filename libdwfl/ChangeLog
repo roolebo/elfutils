@@ -1,3 +1,15 @@
+2013-11-21  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	link_map: Use proper bias, not l_addr.
+	* core-file.c (dynamic_vaddr_get): Rename to ...
+	(__libdwfl_dynamic_vaddr_get): ... here, make it global,
+	internal_function.
+	(dwfl_core_file_report): Update name in the caller.
+	* libdwflP.h (__libdwfl_dynamic_vaddr_get): New declaration.
+	* link_map.c (report_r_debug): New variable elf_dynamic_vaddr.  Call
+	__libdwfl_dynamic_vaddr_get for it.  Remove L_ADDR FIXME comment.
+	Use ELF_DYNAMIC_VADDR instead of L_ADDR.
+
 2013-11-19  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	Compatibility with older kernels such as RHEL-6.

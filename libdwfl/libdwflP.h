@@ -558,6 +558,11 @@ extern Dwfl_Error __libdw_open_file (int *fdp, Elf **elfp,
 				     bool close_on_fail, bool archive_ok)
   internal_function;
 
+/* Fetch PT_DYNAMIC P_VADDR from ELF and store it to *VADDRP.  Return success.
+   *VADDRP is not modified if the function fails.  */
+extern bool __libdwfl_dynamic_vaddr_get (Elf *elf, GElf_Addr *vaddrp)
+  internal_function;
+
 /* These are working nicely for --core, but are not ready to be
    exported interfaces quite yet.  */
 

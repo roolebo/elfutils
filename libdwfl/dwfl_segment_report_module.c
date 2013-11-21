@@ -478,20 +478,40 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 	if ((module_end > module->start && module_start < module->end)
 	    || dyn_vaddr == module->l_ld)
 	  {
+	    bool close_elf = false;
 	    if (! module->disk_file_has_build_id && build_id_len > 0)
 	      {
 		/* Module found in segments with build-id is more reliable
 		   than a module found via DT_DEBUG on disk without any
 		   build-id.   */
 		if (module->elf != NULL)
+		  close_elf = true;
+	      }
+	    if (module->elf != NULL
+		&& module->disk_file_has_build_id && build_id_len > 0)
+	      {
+		const void *elf_build_id;
+		GElf_Addr elf_build_id_elfaddr;
+		int elf_build_id_len;
+
+		if (__libdwfl_find_elf_build_id (NULL, module->elf,
+						 &elf_build_id,
+						 &elf_build_id_elfaddr,
+						 &elf_build_id_len) > 0)
 		  {
-		    elf_end (module->elf);
-		    close (module->fd);
-		    module->elf = NULL;
-		    module->fd = -1;
+		    if (build_id_len != (size_t) elf_build_id_len
+			|| memcmp (build_id, elf_build_id, build_id_len) != 0)
+		      close_elf = true;
 		  }
 	      }
-	    else if (module->elf != NULL)
+	    if (close_elf)
+	      {
+		elf_end (module->elf);
+		close (module->fd);
+		module->elf = NULL;
+		module->fd = -1;
+	      }
+	    if (module->elf != NULL)
 	      {
 		/* Ignore this found module if it would conflict in address
 		   space with any already existing module of DWFL.  */

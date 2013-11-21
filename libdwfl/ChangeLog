@@ -1,5 +1,11 @@
 2013-11-21  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
+	* dwfl_segment_report_module.c (dwfl_segment_report_module): New
+	variable close_elf.  Call __libdwfl_find_elf_build_id and compare the
+	content, if possible.
+
+2013-11-21  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
 	link_map: Use proper bias, not l_addr.
 	* core-file.c (dynamic_vaddr_get): Rename to ...
 	(__libdwfl_dynamic_vaddr_get): ... here, make it global,

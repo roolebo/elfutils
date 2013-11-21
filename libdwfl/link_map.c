@@ -415,9 +415,11 @@ report_r_debug (uint_fast8_t elfclass, uint_fast8_t elfdata,
 						&buffer, &buffer_available,
 						build_id_vaddr, build_id_len,
 						memory_callback_arg))
-			/* File has valid build-id which cannot be verified
-			   in memory.  */
-			valid = false;
+			{
+			  /* File has valid build-id which cannot be read from
+			     memory.  This happens for core files without bit 4
+			     (0x10) set in Linux /proc/PID/coredump_filter.  */
+			}
 		      else
 			{
 			  if (memcmp (build_id_bits, buffer, build_id_len) != 0)

@@ -1,5 +1,11 @@
 2013-11-21  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
+	Fix non-build-id core files on build-id system.
+	* link_map.c (report_r_debug): Remove valid clearing if build-id cannot
+	be read from memory.
+
+2013-11-21  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
 	* dwfl_segment_report_module.c (dwfl_segment_report_module): New
 	variable close_elf.  Call __libdwfl_find_elf_build_id and compare the
 	content, if possible.

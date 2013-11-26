@@ -1,3 +1,11 @@
+2013-11-26  Mark Wielaard  <mjw@redhat.com>
+
+	* libdw.map (ELFUTILS_0.156): Move dwfl_attach_state, dwfl_pid,
+	dwfl_thread_dwfl, dwfl_thread_tid, dwfl_frame_thread,
+	dwfl_thread_state_registers, dwfl_thread_state_register_pc,
+	dwfl_getthreads, dwfl_thread_getframes and dwfl_frame_pc to ...
+	(ELFUTILS_0.158): ... here.
+
 2013-11-09  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_getaranges.c (dwarf_getaranges): Read segment_size and

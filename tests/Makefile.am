@@ -218,7 +218,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile_entry_value.c testfile_entry_value.bz2 \
 	     testfile_implicit_value.c testfile_implicit_value.bz2 \
 	     testfile_aarch64_core.bz2 \
-	     funcretval_test.c funcretval_test_aarch64.bz2
+	     run-funcretval.sh funcretval_test.c funcretval_test_aarch64.bz2
 
 if USE_VALGRIND
 valgrind_cmd='valgrind -q --trace-children=yes --error-exitcode=1 --run-libc-freeres=no'

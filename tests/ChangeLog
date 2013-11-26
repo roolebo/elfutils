@@ -1,3 +1,7 @@
+2013-11-26  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (EXTRA_DIST): Add run-funcretval.sh.
+
 2013-11-25  Petr Machata  <pmachata@redhat.com>
 
 	* testfile_aarch64_core.bz2, hello_aarch64.ko.bz2: New files.

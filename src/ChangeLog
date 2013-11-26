@@ -1,3 +1,7 @@
+2013-11-25  Petr Machata  <pmachata@redhat.com>
+
+	* elflint.c (valid_e_machine): Add EM_AARCH64.
+
 2013-11-14  Petr Machata  <pmachata@redhat.com>
 
 	* readelf.c (handle_core_item) <'h'>: New branch for handling

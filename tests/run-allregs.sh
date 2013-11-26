@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2005, 2006, 2007, 2012 Red Hat, Inc.
+# Copyright (C) 2005, 2006, 2007, 2012, 2013 Red Hat, Inc.
 # This file is part of elfutils.
 #
 # This file is free software; you can redistribute it and/or modify
@@ -2722,6 +2722,78 @@ VFP registers:
 	285: d29 (d29), float 64 bits
 	286: d30 (d30), float 64 bits
 	287: d31 (d31), float 64 bits
+EOF
+
+# See run-readelf-mixed-corenote.sh for instructions to regenerate
+# this core file.
+regs_test testfile_aarch64_core <<\EOF
+integer registers:
+	  0: x0 (x0), signed 64 bits
+	  1: x1 (x1), signed 64 bits
+	  2: x2 (x2), signed 64 bits
+	  3: x3 (x3), signed 64 bits
+	  4: x4 (x4), signed 64 bits
+	  5: x5 (x5), signed 64 bits
+	  6: x6 (x6), signed 64 bits
+	  7: x7 (x7), signed 64 bits
+	  8: x8 (x8), signed 64 bits
+	  9: x9 (x9), signed 64 bits
+	 10: x10 (x10), signed 64 bits
+	 11: x11 (x11), signed 64 bits
+	 12: x12 (x12), signed 64 bits
+	 13: x13 (x13), signed 64 bits
+	 14: x14 (x14), signed 64 bits
+	 15: x15 (x15), signed 64 bits
+	 16: x16 (x16), signed 64 bits
+	 17: x17 (x17), signed 64 bits
+	 18: x18 (x18), signed 64 bits
+	 19: x19 (x19), signed 64 bits
+	 20: x20 (x20), signed 64 bits
+	 21: x21 (x21), signed 64 bits
+	 22: x22 (x22), signed 64 bits
+	 23: x23 (x23), signed 64 bits
+	 24: x24 (x24), signed 64 bits
+	 25: x25 (x25), signed 64 bits
+	 26: x26 (x26), signed 64 bits
+	 27: x27 (x27), signed 64 bits
+	 28: x28 (x28), signed 64 bits
+	 29: x29 (x29), signed 64 bits
+	 30: x30 (x30), signed 64 bits
+	 31: sp (sp), address 64 bits
+	 33: elr (elr), address 64 bits
+FP/SIMD registers:
+	 64: v0 (v0), unsigned 128 bits
+	 65: v1 (v1), unsigned 128 bits
+	 66: v2 (v2), unsigned 128 bits
+	 67: v3 (v3), unsigned 128 bits
+	 68: v4 (v4), unsigned 128 bits
+	 69: v5 (v5), unsigned 128 bits
+	 70: v6 (v6), unsigned 128 bits
+	 71: v7 (v7), unsigned 128 bits
+	 72: v8 (v8), unsigned 128 bits
+	 73: v9 (v9), unsigned 128 bits
+	 74: v10 (v10), unsigned 128 bits
+	 75: v11 (v11), unsigned 128 bits
+	 76: v12 (v12), unsigned 128 bits
+	 77: v13 (v13), unsigned 128 bits
+	 78: v14 (v14), unsigned 128 bits
+	 79: v15 (v15), unsigned 128 bits
+	 80: v16 (v16), unsigned 128 bits
+	 81: v17 (v17), unsigned 128 bits
+	 82: v18 (v18), unsigned 128 bits
+	 83: v19 (v19), unsigned 128 bits
+	 84: v20 (v20), unsigned 128 bits
+	 85: v21 (v21), unsigned 128 bits
+	 86: v22 (v22), unsigned 128 bits
+	 87: v23 (v23), unsigned 128 bits
+	 88: v24 (v24), unsigned 128 bits
+	 89: v25 (v25), unsigned 128 bits
+	 90: v26 (v26), unsigned 128 bits
+	 91: v27 (v27), unsigned 128 bits
+	 92: v28 (v28), unsigned 128 bits
+	 93: v29 (v29), unsigned 128 bits
+	 94: v30 (v30), unsigned 128 bits
+	 95: v31 (v31), unsigned 128 bits
 EOF
 
 exit 0

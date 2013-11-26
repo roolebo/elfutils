@@ -32,11 +32,12 @@ AM_CPPFLAGS += -I$(top_srcdir)/libebl -I$(top_srcdir)/libasm \
 	   -I$(top_srcdir)/libelf -I$(top_srcdir)/libdw
 
 
-modules = i386 sh x86_64 ia64 alpha arm sparc ppc ppc64 s390 tilegx
-libebl_pic = libebl_i386_pic.a libebl_sh_pic.a libebl_x86_64_pic.a \
-	     libebl_ia64_pic.a libebl_alpha_pic.a libebl_arm_pic.a \
-	     libebl_sparc_pic.a libebl_ppc_pic.a libebl_ppc64_pic.a \
-	     libebl_s390_pic.a libebl_tilegx_pic.a
+modules = i386 sh x86_64 ia64 alpha arm aarch64 sparc ppc ppc64 s390 \
+	  tilegx
+libebl_pic = libebl_i386_pic.a libebl_sh_pic.a libebl_x86_64_pic.a    \
+	     libebl_ia64_pic.a libebl_alpha_pic.a libebl_arm_pic.a    \
+	     libebl_aarch64_pic.a libebl_sparc_pic.a libebl_ppc_pic.a \
+	     libebl_ppc64_pic.a libebl_s390_pic.a libebl_tilegx_pic.a
 noinst_LIBRARIES = $(libebl_pic)
 noinst_DATA = $(libebl_pic:_pic.a=.so)
 
@@ -80,6 +81,12 @@ arm_SRCS = arm_init.c arm_symbol.c arm_regs.c arm_corenote.c \
 	   arm_auxv.c arm_attrs.c arm_retval.c arm_cfi.c
 libebl_arm_pic_a_SOURCES = $(arm_SRCS)
 am_libebl_arm_pic_a_OBJECTS = $(arm_SRCS:.c=.os)
+
+aarch64_SRCS = aarch64_init.c aarch64_regs.c aarch64_symbol.c	\
+	       aarch64_corenote.c aarch64_retval.c
+libebl_aarch64_pic_a_SOURCES = $(aarch64_SRCS)
+am_libebl_aarch64_pic_a_OBJECTS = $(aarch64_SRCS:.c=.os)
+aarch64_regs_no_Wformat = yes
 
 sparc_SRCS = sparc_init.c sparc_symbol.c sparc_regs.c sparc_retval.c \
 	     sparc_corenote.c sparc64_corenote.c sparc_auxv.c

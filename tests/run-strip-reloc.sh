@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2011 Red Hat, Inc.
+# Copyright (C) 2011, 2013 Red Hat, Inc.
 # This file is part of elfutils.
 #
 # This file is free software; you can redistribute it and/or modify
@@ -17,7 +17,8 @@
 
 . $srcdir/test-subr.sh
 
-testfiles hello_i386.ko hello_x86_64.ko hello_ppc64.ko hello_s390.ko
+testfiles hello_i386.ko hello_x86_64.ko hello_ppc64.ko hello_s390.ko \
+	hello_aarch64.ko
 
 tempfiles readelf.out readelf.out1 readelf.out2
 tempfiles out.stripped1 out.debug1 out.stripped2 out.debug2
@@ -100,6 +101,7 @@ runtest hello_i386.ko 1
 runtest hello_x86_64.ko 1
 runtest hello_ppc64.ko 1
 runtest hello_s390.ko 1
+runtest hello_aarch64.ko 1
 
 # self test, shouldn't impact non-ET_REL files at all.
 runtest ${abs_top_builddir}/src/strip 0

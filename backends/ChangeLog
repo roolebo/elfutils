@@ -1,3 +1,17 @@
+2013-11-25  Petr Machata  <pmachata@redhat.com>
+
+	* Makefile.am (modules): Add aarch64.
+	(libebl_pic): Add libebl_aarch64_pic.a.
+	(aarch64_SRCS): New variable.
+	(libebl_aarch64_pic_a_SOURCES): Likewise.
+	(am_libebl_aarch64_pic_a_OBJECTS): Likewise.
+	(aarch64_regs_no_Wformat): Likewise.
+	* aarch64_corenote.c, aarch64_init.c: New files.
+	* aarch64_regs.c, aarch64_reloc.def: Likewise.
+	* aarch64_retval.c, aarch64_symbol.c: Likewise.
+	* libebl_CPU.h (dwarf_peel_type): New function.
+	(dwarf_peeled_die_type): Likewise.
+
 2013-11-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
 	    Mark Wielaard  <mjw@redhat.com>
 

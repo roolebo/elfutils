@@ -89,7 +89,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-test-archive64.sh run-readelf-vmcoreinfo.sh \
 	run-readelf-mixed-corenote.sh run-dwfllines.sh \
 	run-dwfl-report-elf-align.sh run-addr2line-test.sh \
-	run-addr2line-i-test.sh run-varlocs.sh
+	run-addr2line-i-test.sh run-varlocs.sh run-funcretval.sh
 
 if !STANDALONE
 check_PROGRAMS += msg_tst md5-sha1-test
@@ -124,7 +124,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-strip-test4.sh run-strip-test5.sh run-strip-test6.sh \
 	     run-strip-test7.sh run-strip-test8.sh run-strip-groups.sh \
 	     run-strip-reloc.sh hello_i386.ko.bz2 hello_x86_64.ko.bz2 \
-	     hello_ppc64.ko.bz2 hello_s390.ko.bz2 \
+	     hello_ppc64.ko.bz2 hello_s390.ko.bz2 hello_aarch64.ko.bz2 \
 	     run-unstrip-test.sh run-unstrip-test2.sh run-unstrip-M.sh\
 	     run-elflint-self.sh run-ranlib-test.sh run-ranlib-test2.sh \
 	     run-ranlib-test3.sh run-ranlib-test4.sh \
@@ -216,7 +216,9 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile_implicit_pointer.c testfile_implicit_pointer.bz2 \
 	     testfile_parameter_ref.c testfile_parameter_ref.bz2 \
 	     testfile_entry_value.c testfile_entry_value.bz2 \
-	     testfile_implicit_value.c testfile_implicit_value.bz2
+	     testfile_implicit_value.c testfile_implicit_value.bz2 \
+	     testfile_aarch64_core.bz2 \
+	     funcretval_test.c funcretval_test_aarch64.bz2
 
 if USE_VALGRIND
 valgrind_cmd='valgrind -q --trace-children=yes --error-exitcode=1 --run-libc-freeres=no'

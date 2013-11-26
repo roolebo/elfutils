@@ -1,5 +1,5 @@
 /* Generate ELF backend handle.
-   Copyright (C) 2000-2011 Red Hat, Inc.
+   Copyright (C) 2000-2013 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -131,6 +131,7 @@ static const struct
   { "openrisc", "elf_openrisc", "openrisc", 8, EM_OPENRISC, 0, 0 },
   { "arc", "elf_arc_a5", "arc_a5", 6, EM_ARC_A5, 0, 0 },
   { "xtensa", "elf_xtensa", "xtensa", 6, EM_XTENSA, 0, 0 },
+  { "aarch64", "elf_aarch64", "aarch64", 7, EM_AARCH64, ELFCLASS64, 0 },
 };
 #define nmachines (sizeof (machines) / sizeof (machines[0]))
 

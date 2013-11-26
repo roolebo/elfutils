@@ -1,5 +1,5 @@
 /* Common interface for libebl modules.
-   Copyright (C) 2000, 2001, 2002, 2003, 2005 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2003, 2005, 2013 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -29,6 +29,7 @@
 #ifndef _LIBEBL_CPU_H
 #define _LIBEBL_CPU_H 1
 
+#include <dwarf.h>
 #include <libeblP.h>
 
 #define EBLHOOK(name)	EBLHOOK_1(BACKEND, name)
@@ -51,5 +52,39 @@ extern bool (*generic_debugscn_p) (const char *) attribute_hidden;
   ({ Dwarf_Die *_die = (die);	  \
      if (_die == NULL) return -1; \
      dwarf_tag (_die); })
+
+/* Follow typedefs and qualifiers to get to the actual type.  */
+static inline int
+dwarf_peel_type (Dwarf_Die *typediep, Dwarf_Attribute *attrp)
+{
+  int tag = DWARF_TAG_OR_RETURN (typediep);
+  while (tag == DW_TAG_typedef
+	 || tag == DW_TAG_const_type || tag == DW_TAG_volatile_type
+	 || tag == DW_TAG_restrict_type || tag == DW_TAG_mutable_type)
+    {
+      attrp = dwarf_attr_integrate (typediep, DW_AT_type, attrp);
+      typediep = dwarf_formref_die (attrp, typediep);
+      tag = DWARF_TAG_OR_RETURN (typediep);
+    }
+
+  return tag;
+}
+
+/* Get a type die corresponding to DIE.  Peel CV qualifiers off
+   it.  */
+static inline int
+dwarf_peeled_die_type (Dwarf_Die *die, Dwarf_Die *result)
+{
+  Dwarf_Attribute attr_mem;
+  Dwarf_Attribute *attr = dwarf_attr_integrate (die, DW_AT_type, &attr_mem);
+  if (attr == NULL)
+    /* The function has no return value, like a `void' function in C.  */
+    return 0;
+
+  if (dwarf_formref_die (attr, result) == NULL)
+    return -1;
+
+  return dwarf_peel_type (result, attr);
+}
 
 #endif	/* libebl_CPU.h */

@@ -1,3 +1,7 @@
+2013-11-25  Petr Machata  <pmachata@redhat.com>
+
+	* eblopenbackend.c (machines): Add entry for AArch64.
+
 2013-11-14  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	Code cleanup: Remove const in prototype

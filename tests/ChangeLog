@@ -1,3 +1,14 @@
+2013-11-25  Petr Machata  <pmachata@redhat.com>
+
+	* testfile_aarch64_core.bz2, hello_aarch64.ko.bz2: New files.
+	* funcretval_test.c, funcretval_test_aarch64.bz2: Likewise.
+	* Makefile.am (EXTRA_DIST): Add these.
+	(TESTS): Add run-funcretval.sh.
+	* run-allregs.sh: Use testfile_aarch64_core.bz2 for a regs_test.
+	* run-readelf-mixed-corenote.sh: ... and for a readelf -n test.
+	* run-strip-reloc.sh: Add a test on hello_aarch64.ko.bz2.
+	* run-funcretval.sh: New file.
+
 2013-11-18  Josh Stone  <jistone@redhat.com>
 
 	* testfilebazdbg_plr.bz2: New testfile.

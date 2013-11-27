@@ -359,23 +359,21 @@ dwfl_deadjust_aux_sym_addr (Dwfl_Module *mod, Dwarf_Addr addr)
 }
 
 static inline GElf_Addr
-dwfl_adjusted_st_value (Dwfl_Module *mod, struct dwfl_file *symfile,
-			GElf_Addr addr)
+dwfl_adjusted_st_value (Dwfl_Module *mod, Elf *symelf, GElf_Addr addr)
 {
-  if (symfile == &mod->main)
+  if (symelf == mod->main.elf)
     return dwfl_adjusted_address (mod, addr);
-  if (symfile == &mod->debug)
+  if (symelf == mod->debug.elf)
     return dwfl_adjusted_dwarf_addr (mod, addr);
   return dwfl_adjusted_aux_sym_addr (mod, addr);
 }
 
 static inline GElf_Addr
-dwfl_deadjust_st_value (Dwfl_Module *mod, struct dwfl_file *symfile,
-			GElf_Addr addr)
+dwfl_deadjust_st_value (Dwfl_Module *mod, Elf *symelf, GElf_Addr addr)
 {
-  if (symfile == &mod->main)
+  if (symelf == mod->main.elf)
     return dwfl_deadjust_address (mod, addr);
-  if (symfile == &mod->debug)
+  if (symelf == mod->debug.elf)
     return dwfl_deadjust_dwarf_addr (mod, addr);
   return dwfl_deadjust_aux_sym_addr (mod, addr);
 }
@@ -420,14 +418,6 @@ extern Dwfl_Error __libdwfl_relocate_value (Dwfl_Module *mod, Elf *elf,
 					    Elf32_Word shndx,
 					    GElf_Addr *value)
      internal_function;
-
-/* See dwfl_module_getsym.  *FILEP will be set to the file of *SYM.
-   FILEP can be NULL.  */
-extern const char *__libdwfl_module_getsym (Dwfl_Module *mod, int ndx,
-					    GElf_Sym *sym, GElf_Word *shndxp,
-					    struct dwfl_file **filep)
-     internal_function;
-
 
 /* Ensure that MOD->ebl is set up.  */
 extern Dwfl_Error __libdwfl_module_getebl (Dwfl_Module *mod) internal_function;
@@ -648,10 +638,12 @@ INTDECL (dwfl_getmodules)
 INTDECL (dwfl_module_addrdie)
 INTDECL (dwfl_module_address_section)
 INTDECL (dwfl_module_addrsym)
+INTDECL (dwfl_module_addrsym_elf)
 INTDECL (dwfl_module_build_id)
 INTDECL (dwfl_module_getdwarf)
 INTDECL (dwfl_module_getelf)
 INTDECL (dwfl_module_getsym)
+INTDECL (dwfl_module_getsym_elf)
 INTDECL (dwfl_module_getsymtab)
 INTDECL (dwfl_module_getsrc)
 INTDECL (dwfl_module_report_build_id)

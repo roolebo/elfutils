@@ -283,4 +283,7 @@ ELFUTILS_0.158 {
     dwfl_getthreads;
     dwfl_thread_getframes;
     dwfl_frame_pc;
+
+    dwfl_module_addrsym_elf;
+    dwfl_module_getsym_elf;
 } ELFUTILS_0.157;

@@ -252,7 +252,7 @@ resolve_symbol (Dwfl_Module *referer, struct reloc_symtab_cache *symtab,
 
 		if (m->e_type != ET_REL)
 		  {
-		    sym->st_value = dwfl_adjusted_st_value (m, m->symfile,
+		    sym->st_value = dwfl_adjusted_st_value (m, m->symfile->elf,
 							    sym->st_value);
 		    return DWFL_E_NOERROR;
 		  }

@@ -32,8 +32,9 @@
    Never returns symbols at addresses above ADDR.  */
 
 const char *
-dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr addr,
-		     GElf_Sym *closest_sym, GElf_Word *shndxp)
+dwfl_module_addrsym_elf (Dwfl_Module *mod, GElf_Addr addr,
+			 GElf_Sym *closest_sym, GElf_Word *shndxp,
+			 Elf **elfp, Dwarf_Addr *biasp)
 {
   int syments = INTUSE(dwfl_module_getsymtab) (mod);
   if (syments < 0)
@@ -41,22 +42,21 @@ dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr addr,
 
   /* Return true iff we consider ADDR to lie in the same section as SYM.  */
   GElf_Word addr_shndx = SHN_UNDEF;
-  struct dwfl_file *addr_symfile = NULL;
-  inline bool same_section (const GElf_Sym *sym, struct dwfl_file *symfile,
-			    GElf_Word shndx)
+  Elf *addr_symelf = NULL;
+  inline bool same_section (const GElf_Sym *sym, Elf *symelf, GElf_Word shndx)
     {
       /* For absolute symbols and the like, only match exactly.  */
       if (shndx >= SHN_LORESERVE)
 	return sym->st_value == addr;
 
       /* Figure out what section ADDR lies in.  */
-      if (addr_shndx == SHN_UNDEF || addr_symfile != symfile)
+      if (addr_shndx == SHN_UNDEF || addr_symelf != symelf)
 	{
-	  GElf_Addr mod_addr = dwfl_deadjust_st_value (mod, symfile, addr);
+	  GElf_Addr mod_addr = dwfl_deadjust_st_value (mod, symelf, addr);
 	  Elf_Scn *scn = NULL;
 	  addr_shndx = SHN_ABS;
-	  addr_symfile = symfile;
-	  while ((scn = elf_nextscn (symfile->elf, scn)) != NULL)
+	  addr_symelf = symelf;
+	  while ((scn = elf_nextscn (symelf, scn)) != NULL)
 	    {
 	      GElf_Shdr shdr_mem;
 	      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
@@ -70,18 +70,20 @@ dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr addr,
 	    }
 	}
 
-      return shndx == addr_shndx && addr_symfile == symfile;
+      return shndx == addr_shndx && addr_symelf == symelf;
     }
 
   /* Keep track of the closest symbol we have seen so far.
      Here we store only symbols with nonzero st_size.  */
   const char *closest_name = NULL;
   GElf_Word closest_shndx = SHN_UNDEF;
+  Elf *closest_elf = NULL;
 
   /* Keep track of an eligible symbol with st_size == 0 as a fallback.  */
   const char *sizeless_name = NULL;
   GElf_Sym sizeless_sym = { 0, 0, 0, 0, 0, SHN_UNDEF };
   GElf_Word sizeless_shndx = SHN_UNDEF;
+  Elf *sizeless_elf = NULL;
 
   /* Keep track of the lowest address a relevant sizeless symbol could have.  */
   GElf_Addr min_label = 0;
@@ -93,9 +95,10 @@ dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr addr,
 	{
 	  GElf_Sym sym;
 	  GElf_Word shndx;
-	  struct dwfl_file *file;
-	  const char *name = __libdwfl_module_getsym (mod, i, &sym, &shndx,
-						      &file);
+	  Elf *elf;
+	  const char *name = INTUSE(dwfl_module_getsym_elf) (mod, i, &sym,
+							     &shndx, &elf,
+							     NULL);
 	  if (name != NULL && name[0] != '\0'
 	      && sym.st_shndx != SHN_UNDEF
 	      && sym.st_value <= addr
@@ -136,11 +139,12 @@ dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr addr,
 			{
 			  *closest_sym = sym;
 			  closest_shndx = shndx;
+			  closest_elf = elf;
 			  closest_name = name;
 			}
 		      else if (closest_name == NULL
 			       && sym.st_value >= min_label
-			       && same_section (&sym, file, shndx))
+			       && same_section (&sym, elf, shndx))
 			{
 			  /* Handwritten assembly symbols sometimes have no
 			     st_size.  If no symbol with proper size includes
@@ -148,6 +152,7 @@ dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr addr,
 			     the same section as ADDR.  */
 			  sizeless_sym = sym;
 			  sizeless_shndx = shndx;
+			  sizeless_elf = elf;
 			  sizeless_name = name;
 			}
 		    }
@@ -166,6 +171,7 @@ dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr addr,
 		    {
 		      *closest_sym = sym;
 		      closest_shndx = shndx;
+		      closest_elf = elf;
 		      closest_name = name;
 		    }
 		}
@@ -200,11 +206,26 @@ dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr addr,
     {
       *closest_sym = sizeless_sym;
       closest_shndx = sizeless_shndx;
+      closest_elf = sizeless_elf;
       closest_name = sizeless_name;
     }
 
   if (shndxp != NULL)
     *shndxp = closest_shndx;
+  if (elfp != NULL)
+    *elfp = closest_elf;
+  if (biasp != NULL)
+    *biasp = dwfl_adjusted_st_value (mod, closest_elf, 0);
   return closest_name;
+}
+INTDEF (dwfl_module_addrsym_elf)
+
+
+const char *
+dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr addr,
+		     GElf_Sym *closest_sym, GElf_Word *shndxp)
+{
+  return INTUSE(dwfl_module_addrsym_elf) (mod, addr, closest_sym, shndxp,
+					  NULL, NULL);
 }
 INTDEF (dwfl_module_addrsym)

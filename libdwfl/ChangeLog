@@ -1,3 +1,25 @@
+2013-11-27  Mark Wielaard  <mjw@redhat.com>
+
+	* dwfl_module_addrsym.c (dwfl_module_addrsym): Rename to and call...
+	(dwfl_module_addrsym_elf): this. Add elfp and biasp arguments,
+	keep track of symelf, addr_symelf, closest_elf and sizeless_elf
+	instead of tracking dwfl_files.
+	* dwfl_module_getsym.c (__libdwfl_module_getsym): Renamed to...
+	(dwfl_module_getsym_elf): ...this. Remove dwfl_file argument, add
+	new elfp and biasp arguments. Track elf instead of file.
+	(dwfl_module_getsym): Call dwfl_module_getsym_elf.
+	dwfl_module_info.c (dwfl_module_info): Pass elf to
+	dwfl_adjusted_st_value.
+	* libdwfl.h (dwfl_module_getsym): Document limitations of shndx.
+	(dwfl_module_getsym_elf): New function declaration.
+	(dwfl_module_addrsym_elf): Likewise.
+	* libdwflP.h (dwfl_module_addrsym_elf): INTDECL.
+	(dwfl_module_getsym_elf): Likewise.
+	(dwfl_adjusted_st_value): Take and check elf not dwfl_file.
+	(dwfl_deadjust_st_value): Likewise.
+	(__libdwfl_module_getsym): Removed.
+	* relocate.c (resolve_symbol): Pass elf to dwfl_adjusted_st_value.
+
 2013-11-21  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	Fix non-build-id core files on build-id system.

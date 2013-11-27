@@ -1,3 +1,13 @@
+2013-11-27  Mark Wielaard  <mjw@redhat.com>
+
+	* dwflsyms.c (gelf_bind_order): New function.
+	(elf_section_name): Likewise.
+	(addr_in_section): Likewise.
+	(list_syms): Use dwfl_module_getsym_elf and dwfl_module_addrsym_elf.
+	Refine assert using gelf_bind_order. Print elf_section_name. Check
+	bias with addr_in_section.
+	* run-dwflsyms.sh: Add section names to expected output.
+
 2013-11-26  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (EXTRA_DIST): Add run-funcretval.sh.

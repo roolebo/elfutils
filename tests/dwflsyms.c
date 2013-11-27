@@ -69,6 +69,42 @@ gelf_bind (GElf_Sym *sym)
 }
 
 static int
+gelf_bind_order (GElf_Sym *sym)
+{
+  switch (GELF_ST_BIND (sym->st_info))
+    {
+    case STB_LOCAL:
+      return 1;
+    case STB_WEAK:
+      return 2;
+    case STB_GLOBAL:
+      return 3;
+    default:
+      return 0;
+    }
+}
+
+static const char *
+elf_section_name (Elf *elf, GElf_Word shndx)
+{
+  GElf_Ehdr ehdr;
+  GElf_Shdr shdr;
+  Elf_Scn *scn = elf_getscn (elf, shndx);
+  gelf_getshdr (scn, &shdr);
+  gelf_getehdr (elf, &ehdr);
+  return elf_strptr (elf, ehdr.e_shstrndx, shdr.sh_name);
+}
+
+bool
+addr_in_section (Elf *elf, GElf_Word shndx, GElf_Addr addr)
+{
+  GElf_Shdr shdr;
+  Elf_Scn *scn = elf_getscn (elf, shndx);
+  gelf_getshdr (scn, &shdr);
+  return addr >= shdr.sh_addr && addr < shdr.sh_addr + shdr.sh_size;
+}
+
+static int
 list_syms (struct Dwfl_Module *mod,
 	   void **user __attribute__ ((unused)),
 	   const char *mod_name __attribute__ ((unused)),
@@ -82,7 +118,10 @@ list_syms (struct Dwfl_Module *mod,
     {
       GElf_Sym sym;
       GElf_Word shndxp;
-      const char *name = dwfl_module_getsym (mod, ndx, &sym, &shndxp);
+      Elf *elf;
+      Dwarf_Addr bias;
+      const char *name = dwfl_module_getsym_elf (mod, ndx, &sym, &shndxp,
+						 &elf, &bias);
       printf("%4d: %s\t%s\t%s (%" PRIu64 ") %#" PRIx64,
 	     ndx, gelf_type (&sym), gelf_bind (&sym), name,
 	     sym.st_size, sym.st_value);
@@ -92,15 +131,34 @@ list_syms (struct Dwfl_Module *mod,
 	 dwfl_module_getsym ().  */
       if (GELF_ST_TYPE (sym.st_info) == STT_FUNC && shndxp != SHN_UNDEF)
 	{
+	  /* Make sure the adjusted value really falls in the elf section. */
+          assert (addr_in_section (elf, shndxp, sym.st_value - bias));
+
 	  GElf_Addr addr = sym.st_value;
 	  GElf_Sym asym;
 	  GElf_Word ashndxp;
-	  const char *aname = dwfl_module_addrsym (mod, addr, &asym, &ashndxp);
-	  assert (strcmp (name, aname) == 0);
+	  Elf *aelf;
+	  Dwarf_Addr abias;
+	  const char *aname = dwfl_module_addrsym_elf (mod, addr, &asym,
+						       &ashndxp, &aelf, &abias);
+
+	  /* Make sure the adjusted value really falls in the elf section. */
+          assert (addr_in_section (aelf, ashndxp, asym.st_value - abias));
+
+	  /* Either they are the same symbol (name), the binding of
+	     asym is "stronger" (or equal) to sym or asym is more specific
+	     (has a lower address) than sym.  */
+	  assert ((strcmp (name, aname) == 0
+		   || gelf_bind_order (&asym) >= gelf_bind_order (&sym))
+		  && asym.st_value <= sym.st_value);
 
 	  int res = dwfl_module_relocate_address (mod, &addr);
 	  assert (res != -1);
-	  printf(", rel: %#" PRIx64 "", addr);
+	  if (shndxp < SHN_LORESERVE)
+	    printf(", rel: %#" PRIx64 " (%s)", addr,
+		   elf_section_name (elf, shndxp));
+	  else
+	    printf(", rel: %#" PRIx64 "", addr);
 	}
       printf ("\n");
     }

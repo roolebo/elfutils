@@ -436,9 +436,22 @@ extern int dwfl_module_getsymtab (Dwfl_Module *mod);
    an absolute value based on the module's location, when the symbol is in
    an SHF_ALLOC section.  If SHNDXP is non-null, it's set with the section
    index (whether from st_shndx or extended index table); in case of a
-   symbol in a non-allocated section, *SHNDXP is instead set to -1.  */
+   symbol in a non-allocated section, *SHNDXP is instead set to -1.
+   Note that since symbols can come from either the main, debug or auxiliary
+   ELF symbol file (either dynsym or symtab) the section index can only
+   be reliably used to compare against special section constants like
+   SHN_UNDEF or SHN_ABS.  */
 extern const char *dwfl_module_getsym (Dwfl_Module *mod, int ndx,
 				       GElf_Sym *sym, GElf_Word *shndxp)
+  __nonnull_attribute__ (3);
+
+/* Same as dwfl_module_getsym but also returns the ELF file, if not NULL,
+   that the symbol came from so the section index can be reliably used.
+   Fills in *BIAS, if not NULL, with the difference between addresses
+   within the loaded module and those in symbol tables of the ELF file. */
+extern const char *dwfl_module_getsym_elf (Dwfl_Module *mod, int ndx,
+				           GElf_Sym *sym, GElf_Word *shndxp,
+					   Elf **elfp, Dwarf_Addr *bias)
   __nonnull_attribute__ (3);
 
 /* Find the symbol that ADDRESS lies inside, and return its name.  */
@@ -448,6 +461,16 @@ extern const char *dwfl_module_addrname (Dwfl_Module *mod, GElf_Addr address);
    information as for dwfl_module_getsym (above).  */
 extern const char *dwfl_module_addrsym (Dwfl_Module *mod, GElf_Addr address,
 					GElf_Sym *sym, GElf_Word *shndxp)
+  __nonnull_attribute__ (3);
+
+/* Same as dwfl_module_addrsym but also returns the ELF file, if not NULL,
+   that the symbol came from so the section index can be reliably used.
+   Fills in *BIAS, if not NULL, with the difference between addresses
+   within the loaded module and those in symbol tables of the ELF file. */
+extern const char *dwfl_module_addrsym_elf (Dwfl_Module *mod,
+					    GElf_Addr address, GElf_Sym *sym,
+					    GElf_Word *shndxp, Elf **elfp,
+					    Dwarf_Addr *bias)
   __nonnull_attribute__ (3);
 
 /* Find the ELF section that *ADDRESS lies inside and return it.

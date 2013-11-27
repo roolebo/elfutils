@@ -29,10 +29,9 @@
 #include "libdwflP.h"
 
 const char *
-internal_function
-__libdwfl_module_getsym (Dwfl_Module *mod, int ndx,
-			 GElf_Sym *sym, GElf_Word *shndxp,
-			 struct dwfl_file **filep)
+dwfl_module_getsym_elf (Dwfl_Module *mod, int ndx,
+			GElf_Sym *sym, GElf_Word *shndxp,
+			Elf **elfp, Dwarf_Addr *biasp)
 {
   if (unlikely (mod == NULL))
     return NULL;
@@ -51,7 +50,7 @@ __libdwfl_module_getsym (Dwfl_Module *mod, int ndx,
   GElf_Word shndx;
   int tndx = ndx;
   int skip_aux_zero = (mod->syments > 0 && mod->aux_syments > 0) ? 1 : 0;
-  struct dwfl_file *file;
+  Elf *elf;
   Elf_Data *symdata;
   Elf_Data *symxndxdata;
   Elf_Data *symstrdata;
@@ -60,7 +59,7 @@ __libdwfl_module_getsym (Dwfl_Module *mod, int ndx,
     {
       /* main symbol table (locals).  */
       tndx = ndx;
-      file = mod->symfile;
+      elf = mod->symfile->elf;
       symdata = mod->symdata;
       symxndxdata = mod->symxndxdata;
       symstrdata = mod->symstrdata;
@@ -69,7 +68,7 @@ __libdwfl_module_getsym (Dwfl_Module *mod, int ndx,
     {
       /* aux symbol table (locals).  */
       tndx = ndx - mod->first_global + skip_aux_zero;
-      file = &mod->aux_sym;
+      elf = mod->aux_sym.elf;
       symdata = mod->aux_symdata;
       symxndxdata = mod->aux_symxndxdata;
       symstrdata = mod->aux_symstrdata;
@@ -78,7 +77,7 @@ __libdwfl_module_getsym (Dwfl_Module *mod, int ndx,
     {
       /* main symbol table (globals).  */
       tndx = ndx - mod->aux_first_global + skip_aux_zero;
-      file = mod->symfile;
+      elf = mod->symfile->elf;
       symdata = mod->symdata;
       symxndxdata = mod->symxndxdata;
       symstrdata = mod->symstrdata;
@@ -87,7 +86,7 @@ __libdwfl_module_getsym (Dwfl_Module *mod, int ndx,
     {
       /* aux symbol table (globals).  */
       tndx = ndx - mod->syments + skip_aux_zero;
-      file = &mod->aux_sym;
+      elf = mod->aux_sym.elf;
       symdata = mod->aux_symdata;
       symxndxdata = mod->aux_symxndxdata;
       symstrdata = mod->aux_symstrdata;
@@ -110,8 +109,7 @@ __libdwfl_module_getsym (Dwfl_Module *mod, int ndx,
 	  || (sym->st_shndx < SHN_LORESERVE && sym->st_shndx != SHN_UNDEF)))
     {
       GElf_Shdr shdr_mem;
-      GElf_Shdr *shdr = gelf_getshdr (elf_getscn (file->elf, shndx),
-				      &shdr_mem);
+      GElf_Shdr *shdr = gelf_getshdr (elf_getscn (elf, shndx), &shdr_mem);
       alloc = unlikely (shdr == NULL) || (shdr->sh_flags & SHF_ALLOC);
     }
 
@@ -132,7 +130,7 @@ __libdwfl_module_getsym (Dwfl_Module *mod, int ndx,
 	  /* In an ET_REL file, the symbol table values are relative
 	     to the section, not to the module's load base.  */
 	  size_t symshstrndx = SHN_UNDEF;
-	  Dwfl_Error result = __libdwfl_relocate_value (mod, file->elf,
+	  Dwfl_Error result = __libdwfl_relocate_value (mod, elf,
 							&symshstrndx,
 							shndx, &sym->st_value);
 	  if (unlikely (result != DWFL_E_NOERROR))
@@ -143,7 +141,7 @@ __libdwfl_module_getsym (Dwfl_Module *mod, int ndx,
 	}
       else if (alloc)
 	/* Apply the bias to the symbol value.  */
-	sym->st_value = dwfl_adjusted_st_value (mod, file, sym->st_value);
+	sym->st_value = dwfl_adjusted_st_value (mod, elf, sym->st_value);
       break;
     }
 
@@ -152,15 +150,18 @@ __libdwfl_module_getsym (Dwfl_Module *mod, int ndx,
       __libdwfl_seterrno (DWFL_E_BADSTROFF);
       return NULL;
     }
-  if (filep)
-    *filep = file;
+  if (elfp)
+    *elfp = elf;
+  if (biasp)
+    *biasp = dwfl_adjusted_st_value (mod, elf, 0);
   return (const char *) symstrdata->d_buf + sym->st_name;
 }
+INTDEF (dwfl_module_getsym_elf)
 
 const char *
 dwfl_module_getsym (Dwfl_Module *mod, int ndx,
 		    GElf_Sym *sym, GElf_Word *shndxp)
 {
-  return __libdwfl_module_getsym (mod, ndx, sym, shndxp, NULL);
+  return dwfl_module_getsym_elf (mod, ndx, sym, shndxp, NULL, NULL);
 }
 INTDEF (dwfl_module_getsym)

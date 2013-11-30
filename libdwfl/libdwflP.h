@@ -108,6 +108,7 @@ struct Dwfl
   Dwfl_Module *modulelist;    /* List in order used by full traversals.  */
 
   Dwfl_Process *process;
+  Dwfl_Error process_attach_error;
 
   GElf_Addr offline_next_address;
 

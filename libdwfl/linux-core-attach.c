@@ -264,37 +264,30 @@ static const Dwfl_Thread_Callbacks core_thread_callbacks =
   NULL, /* core_thread_detach */
 };
 
-bool
-internal_function
-__libdwfl_attach_state_for_core (Dwfl *dwfl, Elf *core)
+static Dwfl_Error
+attach_state_for_core (Dwfl *dwfl, Elf *core)
 {
   Ebl *ebl = ebl_openbackend (core);
   if (ebl == NULL)
-    {
-      __libdwfl_seterrno (DWFL_E_LIBEBL);
-      return false;
-    }
+    return DWFL_E_LIBEBL;
   size_t nregs = ebl_frame_nregs (ebl);
   if (nregs == 0)
     {
       ebl_closebackend (ebl);
-      __libdwfl_seterrno (DWFL_E_LIBEBL);
-      return false;
+      return DWFL_E_NO_UNWIND;
     }
   GElf_Ehdr ehdr_mem, *ehdr = gelf_getehdr (core, &ehdr_mem);
   if (ehdr == NULL)
     {
       ebl_closebackend (ebl);
-      __libdwfl_seterrno (DWFL_E_LIBELF);
-      return false;
+      return DWFL_E_LIBELF;
     }
   assert (ehdr->e_type == ET_CORE);
   size_t phnum;
   if (elf_getphdrnum (core, &phnum) < 0)
     {
       ebl_closebackend (ebl);
-      __libdwfl_seterrno (DWFL_E_LIBELF);
-      return false;
+      return DWFL_E_LIBELF;
     }
   pid_t pid = -1;
   Elf_Data *note_data = NULL;
@@ -311,8 +304,7 @@ __libdwfl_attach_state_for_core (Dwfl *dwfl, Elf *core)
   if (note_data == NULL)
     {
       ebl_closebackend (ebl);
-      __libdwfl_seterrno (DWFL_E_LIBELF);
-      return NULL;
+      return DWFL_E_LIBELF;
     }
   size_t offset = 0;
   GElf_Nhdr nhdr;
@@ -355,15 +347,13 @@ __libdwfl_attach_state_for_core (Dwfl *dwfl, Elf *core)
     {
       /* No valid NT_PRPSINFO recognized in this CORE.  */
       ebl_closebackend (ebl);
-      __libdwfl_seterrno (DWFL_E_BADELF);
-      return false;
+      return DWFL_E_BADELF;
     }
   struct core_arg *core_arg = malloc (sizeof *core_arg);
   if (core_arg == NULL)
     {
       ebl_closebackend (ebl);
-      __libdwfl_seterrno (DWFL_E_NOMEM);
-      return false;
+      return DWFL_E_NOMEM;
     }
   core_arg->core = core;
   core_arg->note_data = note_data;
@@ -372,8 +362,30 @@ __libdwfl_attach_state_for_core (Dwfl *dwfl, Elf *core)
   if (! INTUSE(dwfl_attach_state) (dwfl, core, pid, &core_thread_callbacks,
 				   core_arg))
     {
+      Dwfl_Error error = dwfl_errno ();
+      assert (error != DWFL_E_NOERROR);
       free (core_arg);
       ebl_closebackend (ebl);
+      return error;
+    }
+  return DWFL_E_NOERROR;
+}
+
+bool
+internal_function
+__libdwfl_attach_state_for_core (Dwfl *dwfl, Elf *core)
+{
+  if (dwfl->process != NULL)
+    {
+      __libdwfl_seterrno (DWFL_E_ATTACH_STATE_CONFLICT);
+      return false;
+    }
+  Dwfl_Error error = attach_state_for_core (dwfl, core);
+  assert ((dwfl->process != NULL) == (error == DWFL_E_NOERROR));
+  dwfl->process_attach_error = error;
+  if (error != DWFL_E_NOERROR)
+    {
+      __libdwfl_seterrno (error);
       return false;
     }
   return true;

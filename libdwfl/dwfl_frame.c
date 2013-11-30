@@ -200,7 +200,7 @@ dwfl_pid (Dwfl *dwfl)
 {
   if (dwfl->process == NULL)
     {
-      __libdwfl_seterrno (DWFL_E_NO_ATTACH_STATE);
+      __libdwfl_seterrno (dwfl->process_attach_error);
       return -1;
     }
   return dwfl->process->pid;
@@ -235,7 +235,7 @@ dwfl_getthreads (Dwfl *dwfl, int (*callback) (Dwfl_Thread *thread, void *arg),
   Dwfl_Process *process = dwfl->process;
   if (process == NULL)
     {
-      __libdwfl_seterrno (DWFL_E_NO_ATTACH_STATE);
+      __libdwfl_seterrno (dwfl->process_attach_error);
       return -1;
     }
 

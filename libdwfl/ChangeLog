@@ -1,3 +1,15 @@
+2013-11-30  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	Introduce process_attach_error.
+	* dwfl_begin.c (dwfl_begin): Initialize process_attach_error.
+	* dwfl_frame.c (dwfl_pid, dwfl_getthreads): Use PROCESS_ATTACH_ERROR if
+	PROCESS is NULL.
+	* libdwflP.h (struct Dwfl): New field process_attach_error.
+	* linux-core-attach.c (__libdwfl_attach_state_for_core): Rename to ...
+	(attach_state_for_core): ... here, make it static, change return type,
+	no longer use __libdwfl_seterrno.
+	(__libdwfl_attach_state_for_core): New wrapper for it.
+
 2013-11-27  Mark Wielaard  <mjw@redhat.com>
 
 	* dwfl_module_addrsym.c (dwfl_module_addrsym): Rename to and call...

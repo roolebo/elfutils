@@ -52,9 +52,22 @@ check_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  test-flag-nobits dwarf-getstring rerequest_tag \
 		  alldts md5-sha1-test typeiter typeiter2 low_high_pc \
 		  test-elf_cntl_gelf_getshdr dwflsyms dwfllines \
-		  dwfl-report-elf-align varlocs
+		  dwfl-report-elf-align varlocs backtrace backtrace-child \
+		  backtrace-data backtrace-dwarf
 asm_TESTS = asm-tst1 asm-tst2 asm-tst3 asm-tst4 asm-tst5 \
 	    asm-tst6 asm-tst7 asm-tst8 asm-tst9
+
+if BIARCH
+check_PROGRAMS += backtrace-child-biarch
+endif
+
+# Substitute $(COMPILE).
+backtrace-child-biarch: backtrace-child.c
+	$(CC_BIARCH) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+		     $(AM_CPPFLAGS) $(CPPFLAGS) \
+		     $(AM_CFLAGS) $(CFLAGS) $(backtrace_child_CFLAGS) \
+		     $(AM_LDFLAGS) $(LDFLAGS) $(backtrace_child_LDFLAGS) \
+		     -o $@ $<
 
 TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	update1 update2 update3 update4 \
@@ -89,7 +102,15 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-test-archive64.sh run-readelf-vmcoreinfo.sh \
 	run-readelf-mixed-corenote.sh run-dwfllines.sh \
 	run-dwfl-report-elf-align.sh run-addr2line-test.sh \
-	run-addr2line-i-test.sh run-varlocs.sh run-funcretval.sh
+	run-addr2line-i-test.sh run-varlocs.sh run-funcretval.sh \
+	run-backtrace-native.sh run-backtrace-data.sh run-backtrace-dwarf.sh \
+	run-backtrace-native-biarch.sh run-backtrace-native-core.sh \
+	run-backtrace-native-core-biarch.sh run-backtrace-core-x86_64.sh \
+	run-backtrace-core-i386.sh
+
+if !BIARCH
+export ELFUTILS_DISABLE_BIARCH = 1
+endif
 
 if !STANDALONE
 check_PROGRAMS += msg_tst md5-sha1-test
@@ -218,7 +239,13 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile_entry_value.c testfile_entry_value.bz2 \
 	     testfile_implicit_value.c testfile_implicit_value.bz2 \
 	     testfile_aarch64_core.bz2 \
-	     run-funcretval.sh funcretval_test.c funcretval_test_aarch64.bz2
+	     run-funcretval.sh funcretval_test.c funcretval_test_aarch64.bz2 \
+	     run-backtrace-data.sh run-backtrace-dwarf.sh cleanup-13.c \
+	     run-backtrace-native.sh run-backtrace-native-biarch.sh \
+	     run-backtrace-native-core.sh run-backtrace-native-core-biarch.sh \
+	     run-backtrace-core-x86_64.sh run-backtrace-core-i386.sh \
+	     backtrace-subr.sh backtrace.i386.core.bz2 backtrace.i386.exec.bz2 \
+	     backtrace.x86_64.core.bz2 backtrace.x86_64.exec.bz2
 
 if USE_VALGRIND
 valgrind_cmd='valgrind -q --trace-children=yes --error-exitcode=1 --run-libc-freeres=no'
@@ -347,6 +374,13 @@ dwflsyms_LDADD = $(libdw) $(libelf) $(libmudflap)
 dwfllines_LDADD = $(libdw) $(libelf) $(libmudflap)
 dwfl_report_elf_align_LDADD = $(libdw) $(libmudflap)
 varlocs_LDADD = $(libdw) $(libelf) $(libmudflap)
+backtrace_LDADD = $(libdw) $(libelf) $(libmudflap)
+# backtrace-child-biarch also uses those *_CFLAGS and *_LDLAGS variables:
+backtrace_child_CFLAGS = -fPIE
+backtrace_child_LDFLAGS = -pie -pthread
+backtrace_data_LDADD = $(libdw) $(libelf) $(libmudflap)
+backtrace_dwarf_CFLAGS = -Wno-unused-parameter
+backtrace_dwarf_LDADD = $(libdw) $(libelf) $(libmudflap)
 
 if GCOV
 check: check-am coverage

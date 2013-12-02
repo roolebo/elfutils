@@ -1,3 +1,7 @@
+2013-12-02  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* configure.ac (CC_BIARCH): Remove AS_IF for it.
+
 2013-11-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* configure.ac: New AC_CHECK_SIZEOF for long.  Call utrace_BIARCH, new

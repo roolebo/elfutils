@@ -1,3 +1,41 @@
+2013-12-02  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* Makefile.am (check_PROGRAMS): Add backtrace, backtrace-child,
+	backtrace-data and backtrace-dwarf.
+	(BUILT_SOURCES, clean-local, backtrace-child-biarch): New.
+	(TESTS): Add run-backtrace-native.sh, run-backtrace-data.sh,
+	run-backtrace-dwarf.sh, run-backtrace-native-biarch.sh,
+	run-backtrace-native-core.sh, run-backtrace-native-core-biarch.sh,
+	run-backtrace-core-x86_64.sh and run-backtrace-core-i386.sh.
+	<!BIARCH> Add export of ELFUTILS_DISABLE_BIARCH.
+	(EXTRA_DIST): Add run-backtrace-data.sh, run-backtrace-dwarf.sh,
+	cleanup-13.c, run-backtrace-native.sh, run-backtrace-native-biarch.sh,
+	run-backtrace-native-core.sh, run-backtrace-native-core-biarch.sh,
+	run-backtrace-core-x86_64.sh, run-backtrace-core-i386.sh,
+	backtrace-subr.sh, backtrace.i386.core.bz2, backtrace.i386.exec.bz2,
+	backtrace.x86_64.core.bz2, backtrace.x86_64.exec.bz2.
+	(backtrace_LDADD, backtrace_child_CFLAGS, backtrace_child_LDFLAGS)
+	(backtrace_data_LDADD, backtrace_dwarf_CFLAGS, backtrace_dwarf_LDADD):
+	New.
+	* backtrace-child.c: New file.
+	* backtrace-data.c: New file.
+	* backtrace-dwarf.c: New file.
+	* backtrace-subr.sh: New file.
+	* backtrace.c: New file.
+	* cleanup-13.c: New file.
+	* backtrace.i386.core.bz2: New file.
+	* backtrace.i386.exec.bz2: New file.
+	* backtrace.x86_64.core.bz2: New file.
+	* backtrace.x86_64.exec.bz2: New file.
+	* run-backtrace-core-i386.sh: New file.
+	* run-backtrace-core-x86_64.sh: New file.
+	* run-backtrace-native-biarch.sh: New file.
+	* run-backtrace-native-core-biarch.sh: New file.
+	* run-backtrace-native-core.sh: New file.
+	* run-backtrace-native.sh: New file.
+	* run-backtrace-data.sh: New file.
+	* run-backtrace-dwarf.sh: New file.
+
 2013-11-27  Mark Wielaard  <mjw@redhat.com>
 
 	* dwflsyms.c (gelf_bind_order): New function.

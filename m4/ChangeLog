@@ -1,3 +1,7 @@
+2013-12-02  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* biarch.m4 (utrace_BIARCH): Call AC_MSG_WARN if !BIARCH.
+
 2013-11-07  Roland McGrath  <roland@redhat.com>
 	    Jan Kratochvil  <jan.kratochvil@redhat.com>
 

@@ -1,3 +1,7 @@
+2013-12-04  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (backtrace-child-biarch): Add $(EXEEXT).
+
 2013-12-02  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* Makefile.am (check_PROGRAMS): Add backtrace, backtrace-child,

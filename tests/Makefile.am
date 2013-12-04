@@ -62,7 +62,7 @@ check_PROGRAMS += backtrace-child-biarch
 endif
 
 # Substitute $(COMPILE).
-backtrace-child-biarch: backtrace-child.c
+backtrace-child-biarch$(EXEEXT): backtrace-child.c
 	$(CC_BIARCH) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 		     $(AM_CPPFLAGS) $(CPPFLAGS) \
 		     $(AM_CFLAGS) $(CFLAGS) $(backtrace_child_CFLAGS) \

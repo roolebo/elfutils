@@ -1,3 +1,8 @@
+2013-12-05  Mark Wielaard  <mjw@redhat.com>
+
+	* backtrace-data.c (main): If unsupported also print to stderr.
+	* run-backtrace-dwarf.sh: Add check_unsupported and check_main.
+
 2013-12-04  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (backtrace-child-biarch): Add $(EXEEXT).

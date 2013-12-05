@@ -15,6 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-. $srcdir/test-subr.sh
+. $srcdir/backtrace-subr.sh
 
-testrun ${abs_builddir}/backtrace-dwarf
+tempfiles dwarf.{bt,err}
+(set +ex; testrun ${abs_builddir}/backtrace-dwarf 1>dwarf.bt 2>dwarf.err; true)
+cat dwarf.{bt,err}
+check_unsupported dwarf.err dwarf
+check_main dwarf.bt dwarf

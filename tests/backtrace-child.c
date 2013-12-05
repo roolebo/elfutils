@@ -93,7 +93,7 @@ static int ptraceme, gencore;
 
 /* Execution will arrive here from jmp by an artificial ptrace-spawn signal.  */
 
-static void
+static NOINLINE_NOCLONE void
 sigusr2 (int signo)
 {
   assert (signo == SIGUSR2);
@@ -105,6 +105,8 @@ sigusr2 (int signo)
     }
   /* Here we dump the core for --gencore.  */
   raise (SIGABRT);
+  /* Avoid tail call optimization for the raise call.  */
+  asm volatile ("");
 }
 
 static NOINLINE_NOCLONE void

@@ -1,3 +1,7 @@
+2013-12-09  Josh Stone  <jistone@redhat.com>
+
+	* .gitignore: Add config/ar-lib, installed due to AM_PROG_AR.
+
 2013-12-02  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* configure.ac (CC_BIARCH): Remove AS_IF for it.

@@ -25,6 +25,7 @@ config.h
 config.h.in
 config.log
 config.status
+config/ar-lib
 config/config.guess
 config/config.sub
 config/depcomp

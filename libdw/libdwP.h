@@ -34,6 +34,7 @@
 #include <stdbool.h>
 
 #include <libdw.h>
+#include <dwarf.h>
 
 
 /* gettext helper macros.  */
@@ -403,10 +404,39 @@ extern Dwarf_Abbrev *__libdw_getabbrev (Dwarf *dbg, struct Dwarf_CU *cu,
      __nonnull_attribute__ (1) internal_function;
 
 /* Helper functions for form handling.  */
-extern size_t __libdw_form_val_len (Dwarf *dbg, struct Dwarf_CU *cu,
-				    unsigned int form,
-				    const unsigned char *valp)
+extern size_t __libdw_form_val_compute_len (Dwarf *dbg, struct Dwarf_CU *cu,
+					    unsigned int form,
+					    const unsigned char *valp)
      __nonnull_attribute__ (1, 2, 4) internal_function;
+
+/* Find the length of a form attribute.  */
+static inline size_t
+__nonnull_attribute__ (1, 2, 4)
+__libdw_form_val_len (Dwarf *dbg, struct Dwarf_CU *cu,
+		      unsigned int form, const unsigned char *valp)
+{
+  /* Small lookup table of forms with fixed lengths.  Absent indexes are
+     initialized 0, so any truly desired 0 is set to 0x80 and masked.  */
+  static const uint8_t form_lengths[] =
+    {
+      [DW_FORM_flag_present] = 0x80,
+      [DW_FORM_data1] = 1, [DW_FORM_ref1] = 1, [DW_FORM_flag] = 1,
+      [DW_FORM_data2] = 2, [DW_FORM_ref2] = 2,
+      [DW_FORM_data4] = 4, [DW_FORM_ref4] = 4,
+      [DW_FORM_data8] = 8, [DW_FORM_ref8] = 8, [DW_FORM_ref_sig8] = 8,
+    };
+
+  /* Return immediately for forms with fixed lengths.  */
+  if (form < sizeof form_lengths / sizeof form_lengths[0])
+    {
+      uint8_t len = form_lengths[form];
+      if (len != 0)
+	return len & 0x7f; /* Mask to allow 0x80 -> 0.  */
+    }
+
+  /* Other forms require some computation.  */
+  return __libdw_form_val_compute_len (dbg, cu, form, valp);
+}
 
 /* Helper function for DW_FORM_ref* handling.  */
 extern int __libdw_formref (Dwarf_Attribute *attr, Dwarf_Off *return_offset)

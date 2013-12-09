@@ -1,3 +1,9 @@
+2013-12-09  Josh Stone  <jistone@redhat.com>
+
+	* libdw_form.c (__libdw_form_val_compute_len): Renamed function from
+	__libdw_form_val_len, now handling only non-constant form lengths.
+	* libdwP.h (__libdw_form_val_len): New inlined function.
+
 2013-12-09  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_getlocation.c (__libdw_intern_expression): Handle empty

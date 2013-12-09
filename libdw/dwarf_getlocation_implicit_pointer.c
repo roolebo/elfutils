@@ -34,6 +34,18 @@
 #include <dwarf.h>
 
 
+static unsigned char empty_exprloc = 0;
+
+void
+internal_function
+__libdw_empty_loc_attr (Dwarf_Attribute *attr, struct Dwarf_CU *cu )
+{
+  attr->code = DW_AT_location;
+  attr->form = DW_FORM_exprloc;
+  attr->valp = &empty_exprloc;
+  attr->cu = cu;
+}
+
 int
 dwarf_getlocation_implicit_pointer (attr, op, result)
      Dwarf_Attribute *attr;
@@ -57,8 +69,8 @@ dwarf_getlocation_implicit_pointer (attr, op, result)
   if (INTUSE(dwarf_attr) (&die, DW_AT_location, result) == NULL
       && INTUSE(dwarf_attr) (&die, DW_AT_const_value, result) == NULL)
     {
-      __libdw_seterrno (DWARF_E_INVALID_DWARF);
-      return -1;
+      __libdw_empty_loc_attr (result, attr->cu);
+      return 0;
     }
 
   return 0;

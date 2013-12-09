@@ -404,7 +404,7 @@ print_expr (Dwarf_Attribute *attr, Dwarf_Op *expr, Dwarf_Addr addr)
 	    int locs = dwarf_getlocation_addr (&attrval, addr,
 					       &exprval, &exprval_len, 1);
 	    if (locs == 0)
-	      printf ("<no location>"); // XXX should that be flagged?
+	      printf ("<no location>"); // This means "optimized out".
 	    else if (locs == 1)
 	      print_expr_block (&attrval, exprval, exprval_len, addr);
 	    else

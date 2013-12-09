@@ -1,3 +1,8 @@
+2013-12-09  Mark Wielaard  <mjw@redhat.com>
+
+	* varlocs.c (print_expr): Update comment to explain empty location
+	associated with DW_OP_GNU_implicit_pointer.
+
 2013-12-05  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	Fix test FAIL with -O2.

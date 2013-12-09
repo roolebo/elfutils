@@ -632,6 +632,10 @@ int __check_build_id (Dwarf *dw, const uint8_t *build_id, const size_t id_len)
   internal_function;
 #endif /* ENABLE_DWZ */
 
+/* Fills in the given attribute to point at an empty location expression.  */
+void __libdw_empty_loc_attr (Dwarf_Attribute *attr, struct Dwarf_CU *cu)
+  internal_function;
+
 
 /* Aliases to avoid PLTs.  */
 INTDECL (dwarf_aggregate_size)

@@ -1,3 +1,14 @@
+2013-12-09  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_getlocation.c (__libdw_intern_expression): Handle empty
+	location expressions.
+	* dwarf_getlocation_attr.c (dwarf_getlocation_attr): When no
+	location found, return empty location expression.
+	* dwarf_getlocation_implicit_pointer.c
+	(dwarf_getlocation_implicit_pointer): Likewise.
+	(__libdw_empty_loc_attr): New internal function.
+	* libdwP.h (__libdw_empty_loc_attr): Define.
+
 2013-11-27  Mark Wielaard  <mjw@redhat.com>
 
 	* libdw.map (ELFUTILS_0.158): Add dwfl_module_addrsym_elf and

@@ -74,8 +74,8 @@ dwarf_getlocation_attr (attr, op, result)
 	    return -1;
 	  if (INTUSE(dwarf_attr) (&die, DW_AT_location, result) == NULL)
 	    {
-	      __libdw_seterrno (DWARF_E_INVALID_DWARF);
-	      return -1;
+	      __libdw_empty_loc_attr (result, attr->cu);
+	      return 0;
 	    }
 	}
 	break;
@@ -88,8 +88,8 @@ dwarf_getlocation_attr (attr, op, result)
 	  if (INTUSE(dwarf_attr) (&die, DW_AT_location, result) == NULL
 	      && INTUSE(dwarf_attr) (&die, DW_AT_const_value, result) == NULL)
 	    {
-	      __libdw_seterrno (DWARF_E_INVALID_DWARF);
-	      return -1;
+	      __libdw_empty_loc_attr (result, attr->cu);
+	      return 0;
 	    }
 	}
 	break;

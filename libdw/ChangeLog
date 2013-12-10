@@ -1,3 +1,18 @@
+2013-12-10  Josh Stone  <jistone@redhat.com>
+
+	* memory-access.h (get_uleb128_rest_return): Removed.
+	(get_sleb128_rest_return): Removed.
+	(get_uleb128_step): Make this a self-contained block.
+	(get_sleb128_step): Ditto, and use a bitfield to extend signs.
+	(get_uleb128): Make this wholly implemented by __libdw_get_uleb128.
+	(get_sleb128): Make this wholly implemented by __libdw_get_sleb128.
+	(__libdw_get_uleb128): Simplify and inline for all callers.
+	(__libdw_get_sleb128): Ditto.
+	* dwarf_getlocation.c (store_implicit_value): Void the unused uleb128.
+	* memory-access.c: Delete file.
+	* Makefile.am (libdw_a_SOURCES): Remove it.
+	(DEFS): Remove the now unused -DIS_LIBDW.
+
 2013-12-09  Josh Stone  <jistone@redhat.com>
 
 	* libdw_form.c (__libdw_form_val_compute_len): Renamed function from

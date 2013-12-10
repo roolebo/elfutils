@@ -37,90 +37,59 @@
 
 /* Number decoding macros.  See 7.6 Variable Length Data.  */
 
-#define get_uleb128_step(var, addr, nth, break)				      \
-    __b = *(addr)++;							      \
-    var |= (uintmax_t) (__b & 0x7f) << (nth * 7);			      \
+#define len_leb128(var) ((8 * sizeof (var) + 6) / 7)
+
+#define get_uleb128_step(var, addr, nth)				      \
+  do {									      \
+    unsigned char __b = *(addr)++;					      \
+    (var) |= (typeof (var)) (__b & 0x7f) << ((nth) * 7);		      \
     if (likely ((__b & 0x80) == 0))					      \
-      break
-
-#define get_uleb128(var, addr)						      \
-  do {									      \
-    unsigned char __b;							      \
-    var = 0;								      \
-    get_uleb128_step (var, addr, 0, break);				      \
-    var = __libdw_get_uleb128 (var, 1, &(addr));			      \
+      return (var);							      \
   } while (0)
 
-#define get_uleb128_rest_return(var, i, addrp)				      \
-  do {									      \
-    for (; i < 10; ++i)							      \
-      {									      \
-	get_uleb128_step (var, *addrp, i, return var);			      \
-      }									      \
-    /* Other implementations set VALUE to UINT_MAX in this		      \
-       case.  So we better do this as well.  */				      \
-    return UINT64_MAX;							      \
-  } while (0)
+static inline uint64_t
+__libdw_get_uleb128 (const unsigned char **addrp)
+{
+  uint64_t acc = 0;
+  /* Unroll the first step to help the compiler optimize
+     for the common single-byte case.  */
+  get_uleb128_step (acc, *addrp, 0);
+  for (unsigned int i = 1; i < len_leb128 (acc); ++i)
+    get_uleb128_step (acc, *addrp, i);
+  /* Other implementations set VALUE to UINT_MAX in this
+     case.  So we better do this as well.  */
+  return UINT64_MAX;
+}
+
+#define get_uleb128(var, addr) ((var) = __libdw_get_uleb128 (&(addr)))
 
 /* The signed case is similar, but we sign-extend the result.  */
 
-#define get_sleb128_step(var, addr, nth, break)				      \
-    __b = *(addr)++;							      \
-    _v |= (uint64_t) (__b & 0x7f) << (nth * 7);				      \
+#define get_sleb128_step(var, addr, nth)				      \
+  do {									      \
+    unsigned char __b = *(addr)++;					      \
     if (likely ((__b & 0x80) == 0))					      \
       {									      \
-	var = (_v << (64 - (nth * 7) - 7)) >> (64 - (nth * 7) - 7);	      \
-        break;					 			      \
+	struct { signed int i:7; } __s = { .i = __b };			      \
+	(var) |= (typeof (var)) __s.i << ((nth) * 7);			      \
+	return (var);							      \
       }									      \
-    else do {} while (0)
-
-#define get_sleb128(var, addr)						      \
-  do {									      \
-    unsigned char __b;							      \
-    int64_t _v = 0;							      \
-    get_sleb128_step (var, addr, 0, break);				      \
-    var = __libdw_get_sleb128 (_v, 1, &(addr));				      \
+    (var) |= (typeof (var)) (__b & 0x7f) << ((nth) * 7);		      \
   } while (0)
 
-#define get_sleb128_rest_return(var, i, addrp)				      \
-  do {									      \
-    for (; i < 9; ++i)							      \
-      {									      \
-	get_sleb128_step (var, *addrp, i, return var);			      \
-      }									      \
-    __b = *(*addrp)++;							      \
-    if (likely ((__b & 0x80) == 0))					      \
-      return var | ((uint64_t) __b << 63);				      \
-    else								      \
-      /* Other implementations set VALUE to INT_MAX in this		      \
-	 case.  So we better do this as well.  */			      \
-      return INT64_MAX;							      \
-  } while (0)
-
-#ifdef IS_LIBDW
-extern uint64_t __libdw_get_uleb128 (uint64_t acc, unsigned int i,
-				     const unsigned char **addrp)
-     internal_function attribute_hidden;
-extern int64_t __libdw_get_sleb128 (int64_t acc, unsigned int i,
-				    const unsigned char **addrp)
-     internal_function attribute_hidden;
-#else
-static inline uint64_t
-__attribute__ ((unused))
-__libdw_get_uleb128 (uint64_t acc, unsigned int i, const unsigned char **addrp)
-{
-  unsigned char __b;
-  get_uleb128_rest_return (acc, i, addrp);
-}
 static inline int64_t
-__attribute__ ((unused))
-__libdw_get_sleb128 (int64_t acc, unsigned int i, const unsigned char **addrp)
+__libdw_get_sleb128 (const unsigned char **addrp)
 {
-  unsigned char __b;
-  int64_t _v = acc;
-  get_sleb128_rest_return (acc, i, addrp);
+  int64_t acc = 0;
+  /* Unrolling 0 like uleb128 didn't prove to benefit optimization.  */
+  for (unsigned int i = 0; i < len_leb128 (acc); ++i)
+    get_sleb128_step (acc, *addrp, i);
+  /* Other implementations set VALUE to INT_MAX in this
+     case.  So we better do this as well.  */
+  return INT64_MAX;
 }
-#endif
+
+#define get_sleb128(var, addr) ((var) = __libdw_get_sleb128 (&(addr)))
 
 
 /* We use simple memory access functions in case the hardware allows it.

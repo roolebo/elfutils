@@ -28,7 +28,6 @@
 ## not, see <http://www.gnu.org/licenses/>.
 ##
 include $(top_srcdir)/config/eu.am
-DEFS += -DIS_LIBDW
 if BUILD_STATIC
 AM_CFLAGS += -fpic
 endif
@@ -79,7 +78,7 @@ libdw_a_SOURCES = dwarf_begin.c dwarf_begin_elf.c dwarf_end.c dwarf_getelf.c \
 		  dwarf_getfuncs.c  \
 		  dwarf_decl_file.c dwarf_decl_line.c dwarf_decl_column.c \
 		  dwarf_func_inline.c dwarf_getsrc_file.c \
-		  libdw_findcu.c libdw_form.c libdw_alloc.c memory-access.c \
+		  libdw_findcu.c libdw_form.c libdw_alloc.c \
 		  libdw_visit_scopes.c \
 		  dwarf_entry_breakpoints.c \
 		  dwarf_next_cfi.c \

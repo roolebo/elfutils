@@ -1,3 +1,7 @@
+2013-12-12  Josh Stone  <jistone@redhat.com>
+
+	* dynamicsizehash.c (lookup): Add a shortcut around division.
+
 2013-04-30  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* eu-config.h (COMPAT_VERSION_NEWPROTO): New.  Twice.

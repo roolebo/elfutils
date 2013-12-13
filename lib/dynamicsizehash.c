@@ -49,8 +49,9 @@ lookup (htab, hval, val)
      HASHTYPE hval;
      TYPE val __attribute__ ((unused));
 {
-  /* First hash function: simply take the modul but prevent zero.  */
-  size_t idx = 1 + hval % htab->size;
+  /* First hash function: simply take the modul but prevent zero.  Small values
+     can skip the division, which helps performance when this is common.  */
+  size_t idx = 1 + (hval < htab->size ? hval : hval % htab->size);
 
   if (htab->table[idx].hashval != 0)
     {

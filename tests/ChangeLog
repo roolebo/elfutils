@@ -1,5 +1,9 @@
 2013-12-10  Mark Wielaard  <mjw@redhat.com>
 
+	* Makefile.am (backtrace_child_biarch_SOURCES): New backtrace-child.c.
+
+2013-12-10  Mark Wielaard  <mjw@redhat.com>
+
 	* Makefile.am (valgrind_cmd): Remove --trace-children=yes.
 	* backtrace-subr.sh (check_native_core): Disable valgrind while
 	dumping core.

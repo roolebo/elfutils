@@ -378,6 +378,7 @@ backtrace_LDADD = $(libdw) $(libelf) $(libmudflap)
 # backtrace-child-biarch also uses those *_CFLAGS and *_LDLAGS variables:
 backtrace_child_CFLAGS = -fPIE
 backtrace_child_LDFLAGS = -pie -pthread
+backtrace_child_biarch_SOURCES = backtrace-child.c
 backtrace_data_LDADD = $(libdw) $(libelf) $(libmudflap)
 backtrace_dwarf_CFLAGS = -Wno-unused-parameter
 backtrace_dwarf_LDADD = $(libdw) $(libelf) $(libmudflap)

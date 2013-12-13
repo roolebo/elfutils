@@ -104,7 +104,18 @@ check_native()
 check_native_core()
 {
   child=$1
+
+  # Disable valgrind while dumping core.
+  SAVED_VALGRIND_CMD="$VALGRIND_CMD"
+  unset VALGRIND_CMD
+
   core="core.`ulimit -c unlimited; set +ex; testrun ${abs_builddir}/$child --gencore; true`"
+
+  if [ "x$SAVED_VALGRIND_CMD" != "x" ]; then
+    VALGRIND_CMD="$SAVED_VALGRIND_CMD"
+    export VALGRIND_CMD
+  fi
+
   # Do not abort on non-zero exit code due to some warnings of ./backtrace
   # - see function check_err.
   tempfiles $core{,.{bt,err}}

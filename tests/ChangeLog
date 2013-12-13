@@ -1,3 +1,11 @@
+2013-12-10  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (valgrind_cmd): Remove --trace-children=yes.
+	* backtrace-subr.sh (check_native_core): Disable valgrind while
+	dumping core.
+	* run-backtrace-data.sh: Disable valgrind.
+	* run-backtrace-dwarf.sh: Likewise.
+
 2013-12-09  Mark Wielaard  <mjw@redhat.com>
 
 	* varlocs.c (print_expr): Update comment to explain empty location

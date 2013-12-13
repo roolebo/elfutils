@@ -248,7 +248,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     backtrace.x86_64.core.bz2 backtrace.x86_64.exec.bz2
 
 if USE_VALGRIND
-valgrind_cmd='valgrind -q --trace-children=yes --error-exitcode=1 --run-libc-freeres=no'
+valgrind_cmd='valgrind -q --error-exitcode=1 --run-libc-freeres=no'
 endif
 
 

@@ -17,6 +17,12 @@
 
 . $srcdir/backtrace-subr.sh
 
+# This test really cannot be run under valgrind, it tries to introspect
+# itself through ptrace and will find bits and pieces of valgrind.
+# On top of that valgrind also tries to read all the unwind info and
+# will warn and complain about various opcodes it doesn't understand...
+unset VALGRIND_CMD
+
 tempfiles dwarf.{bt,err}
 (set +ex; testrun ${abs_builddir}/backtrace-dwarf 1>dwarf.bt 2>dwarf.err; true)
 cat dwarf.{bt,err}

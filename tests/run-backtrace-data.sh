@@ -17,6 +17,10 @@
 
 . $srcdir/backtrace-subr.sh
 
+# This test really cannot be run under valgrind, it tries to introspect
+# its own maps and registers and will find valgrinds instead.
+unset VALGRIND_CMD
+
 tempfiles data.{bt,err}
 (set +ex; testrun ${abs_builddir}/backtrace-data 1>data.bt 2>data.err; true)
 cat data.{bt,err}

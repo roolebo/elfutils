@@ -580,6 +580,7 @@ handle_cfi (Dwfl_Frame *state, Dwarf_Addr pc, Dwarf_CFI *cfi, Dwarf_Addr bias)
       else
 	unwound->pc_state = DWFL_FRAME_STATE_PC_SET;
     }
+  free (frame);
 }
 
 void

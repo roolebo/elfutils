@@ -84,6 +84,12 @@ __libdwfl_module_free (Dwfl_Module *mod)
   if (mod->build_id_bits != NULL)
     free (mod->build_id_bits);
 
+  if (mod->reloc_info != NULL)
+    free (mod->reloc_info);
+
+  if (mod->eh_cfi != NULL)
+    dwarf_cfi_end (mod->eh_cfi);
+
   free (mod->name);
   free (mod);
 }

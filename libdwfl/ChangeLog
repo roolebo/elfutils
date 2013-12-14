@@ -1,3 +1,10 @@
+2013-12-14  Mark Wielaard  <mjw@redhat.com>
+
+	* dwfl_module.c (__libdwfl_module_free): Free mod->reloc_info if
+	allocated. Call dwarf_cfi_end on mod->eh_cfi if necessary.
+	* frame_unwind.c (handle_cfi): Free frame result from
+	dwarf_cfi_addrframe when done.
+
 2013-12-15  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	unwinder: ppc and ppc64

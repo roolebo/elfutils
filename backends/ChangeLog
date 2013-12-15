@@ -1,3 +1,14 @@
+2013-12-15  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	unwinder: ppc and ppc64
+	* Makefile.am (ppc_SRCS, ppc64_SRCS): Add ppc_initreg.c.
+	* ppc64_init.c (ppc64_init): Initialize also frame_nregs,
+	set_initial_registers_tid and dwarf_to_regno.
+	* ppc_corenote.c (PRSTATUS_REGSET_ITEMS) <nip>: Set PC_REGISTER.
+	* ppc_init.c (ppc64_init): Initialize also frame_nregs,
+	set_initial_registers_tid and dwarf_to_regno.
+	* ppc_initreg.c: New file.
+
 2013-11-25  Petr Machata  <pmachata@redhat.com>
 
 	* Makefile.am (modules): Add aarch64.

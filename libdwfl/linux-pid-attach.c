@@ -205,6 +205,14 @@ pid_thread_state_registers_cb (int firstreg, unsigned nregs,
 			       const Dwarf_Word *regs, void *arg)
 {
   Dwfl_Thread *thread = (Dwfl_Thread *) arg;
+  if (firstreg < 0)
+    {
+      assert (firstreg == -1);
+      assert (nregs == 1);
+      INTUSE(dwfl_thread_state_register_pc) (thread, *regs);
+      return true;
+    }
+  assert (nregs > 0);
   return INTUSE(dwfl_thread_state_registers) (thread, firstreg, nregs, regs);
 }
 

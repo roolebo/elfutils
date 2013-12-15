@@ -162,5 +162,9 @@ bool EBLHOOK(set_initial_registers_tid) (pid_t tid,
 					 ebl_tid_registers_t *setfunc,
 					 void *arg);
 
+/* Convert *REGNO as is in DWARF to a lower range suitable for
+   Dwarf_Frame->REGS indexing.  */
+bool EBLHOOK(dwarf_to_regno) (Ebl *ebl, unsigned *regno);
+
 /* Destructor for ELF backend handle.  */
 void EBLHOOK(destr) (struct ebl *);

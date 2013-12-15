@@ -1,3 +1,13 @@
+2013-12-15  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	unwinder: ppc and ppc64
+	* Makefile.am (gen_SOURCES): Add ebldwarftoregno.c.
+	* ebl-hooks.h (dwarf_to_regno): New.
+	* ebldwarftoregno.c: New file.
+	* libebl.h (Ebl_Core_Item): New field pc_register.
+	(ebl_tid_registers_t): Add FIRSTREG -1 to the comment.
+	(ebl_dwarf_to_regno): New.
+
 2013-11-25  Petr Machata  <pmachata@redhat.com>
 
 	* eblopenbackend.c (machines): Add entry for AArch64.

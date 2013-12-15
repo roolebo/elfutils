@@ -1,3 +1,13 @@
+2013-12-15  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	unwinder: ppc
+	* Makefile.am (TESTS): Add run-backtrace-core-ppc.sh.
+	(EXTRA_DIST): Add backtrace.ppc.core.bz2,
+	backtrace.ppc.exec.bz2 and run-backtrace-core-ppc.sh.
+	* backtrace.ppc.core.bz2: New file.
+	* backtrace.ppc.exec.bz2: New file.
+	* run-backtrace-core-ppc.sh: New file.
+
 2013-12-10  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (backtrace_child_biarch_SOURCES): New backtrace-child.c.

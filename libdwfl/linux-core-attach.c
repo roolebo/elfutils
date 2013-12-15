@@ -198,6 +198,32 @@ core_set_initial_registers (Dwfl_Thread *thread, void *thread_arg_voidp)
   }
   /* core_next_thread already found this TID there.  */
   assert (tid == INTUSE(dwfl_thread_tid) (thread));
+  for (item = items; item < items + nitems; item++)
+    if (item->pc_register)
+      break;
+  if (item < items + nitems)
+    {
+      Dwarf_Word pc;
+      switch (gelf_getclass (core) == ELFCLASS32 ? 32 : 64)
+      {
+	case 32:;
+	  uint32_t val32 = *(const uint32_t *) (desc + item->offset);
+	  val32 = (elf_getident (core, NULL)[EI_DATA] == ELFDATA2MSB
+		   ? be32toh (val32) : le32toh (val32));
+	  /* Do a host width conversion.  */
+	  pc = val32;
+	  break;
+	case 64:;
+	  uint64_t val64 = *(const uint64_t *) (desc + item->offset);
+	  val64 = (elf_getident (core, NULL)[EI_DATA] == ELFDATA2MSB
+		   ? be64toh (val64) : le64toh (val64));
+	  pc = val64;
+	  break;
+	default:
+	  abort ();
+      }
+      INTUSE(dwfl_thread_state_register_pc) (thread, pc);
+    }
   desc += regs_offset;
   for (size_t regloci = 0; regloci < nregloc; regloci++)
     {

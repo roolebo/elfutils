@@ -123,7 +123,7 @@ static const Ebl_Register_Location spe_regs[] =
   {									      \
     .name = "nip", .type = ELF_T_ADDR, .format = 'x',			      \
     .offset = offsetof (struct EBLHOOK(prstatus), pr_reg[32]),		      \
-    .group = "register"	       			  	       	 	      \
+    .group = "register", .pc_register = true				      \
   },								      	      \
   {									      \
     .name = "orig_gpr3", .type = TYPE_LONG, .format = 'd',		      \

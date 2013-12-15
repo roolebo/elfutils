@@ -52,6 +52,8 @@ internal_function
 __libdwfl_frame_reg_get (Dwfl_Frame *state, unsigned regno, Dwarf_Addr *val)
 {
   Ebl *ebl = state->thread->process->ebl;
+  if (! ebl_dwarf_to_regno (ebl, &regno))
+    return false;
   if (regno >= ebl_frame_nregs (ebl))
     return false;
   if ((state->regs_set[regno / sizeof (*state->regs_set) / 8]
@@ -67,6 +69,8 @@ internal_function
 __libdwfl_frame_reg_set (Dwfl_Frame *state, unsigned regno, Dwarf_Addr val)
 {
   Ebl *ebl = state->thread->process->ebl;
+  if (! ebl_dwarf_to_regno (ebl, &regno))
+    return false;
   if (regno >= ebl_frame_nregs (ebl))
     return false;
   /* For example i386 user_regs_struct has signed fields.  */

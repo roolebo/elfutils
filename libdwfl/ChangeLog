@@ -1,3 +1,13 @@
+2013-12-15  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	unwinder: ppc and ppc64
+	* frame_unwind.c (__libdwfl_frame_reg_get, __libdwfl_frame_reg_set):
+	Call ebl_dwarf_to_regno.
+	* linux-core-attach.c (core_set_initial_registers): Implement
+	pc_register support.
+	* linux-pid-attach.c (pid_thread_state_registers_cb): Implement
+	FIRSTREG -1.
+
 2013-11-30  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	Introduce process_attach_error.

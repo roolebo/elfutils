@@ -95,13 +95,13 @@ am_libebl_sparc_pic_a_OBJECTS = $(sparc_SRCS:.c=.os)
 
 ppc_SRCS = ppc_init.c ppc_symbol.c ppc_retval.c ppc_regs.c \
 	   ppc_corenote.c ppc_auxv.c ppc_attrs.c ppc_syscall.c \
-	   ppc_cfi.c
+	   ppc_cfi.c ppc_initreg.c
 libebl_ppc_pic_a_SOURCES = $(ppc_SRCS)
 am_libebl_ppc_pic_a_OBJECTS = $(ppc_SRCS:.c=.os)
 
 ppc64_SRCS = ppc64_init.c ppc64_symbol.c ppc64_retval.c \
 	     ppc64_corenote.c ppc_regs.c ppc_auxv.c ppc_attrs.c ppc_syscall.c \
-	     ppc_cfi.c
+	     ppc_cfi.c ppc_initreg.c
 libebl_ppc64_pic_a_SOURCES = $(ppc64_SRCS)
 am_libebl_ppc64_pic_a_OBJECTS = $(ppc64_SRCS:.c=.os)
 

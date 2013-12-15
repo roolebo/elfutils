@@ -65,6 +65,10 @@ ppc_init (elf, machine, eh, ehlen)
   HOOK (eh, auxv_info);
   HOOK (eh, check_object_attribute);
   HOOK (eh, abi_cfi);
+  /* gcc/config/ #define DWARF_FRAME_REGISTERS.  */
+  eh->frame_nregs = (114 - 1) + 32;
+  HOOK (eh, set_initial_registers_tid);
+  HOOK (eh, dwarf_to_regno);
 
   return MODVERSION;
 }

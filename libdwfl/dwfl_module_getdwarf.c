@@ -1266,3 +1266,26 @@ dwfl_module_getsymtab (Dwfl_Module *mod)
   return -1;
 }
 INTDEF (dwfl_module_getsymtab)
+
+int
+dwfl_module_getsymtab_first_global (Dwfl_Module *mod)
+{
+  if (mod == NULL)
+    return -1;
+
+  find_symtab (mod);
+  if (mod->symerr == DWFL_E_NOERROR)
+    {
+      /* All local symbols should come before all global symbols.  If
+	 we have an auxiliary table make sure all the main locals come
+	 first, then all aux locals, then all main globals and finally all
+	 aux globals.  And skip the auxiliary table zero undefined
+	 entry.  */
+      int skip_aux_zero = (mod->syments > 0 && mod->aux_syments > 0) ? 1 : 0;
+      return mod->first_global + mod->aux_first_global - skip_aux_zero;
+    }
+
+  __libdwfl_seterrno (mod->symerr);
+  return -1;
+}
+INTDEF (dwfl_module_getsymtab_first_global)

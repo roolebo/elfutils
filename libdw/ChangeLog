@@ -1,3 +1,7 @@
+2013-12-16  Mark Wielaard  <mjw@redhat.com>
+
+	* libdw.map (ELFUTILS_0.158): Add dwfl_module_getsymtab_first_global.
+
 2013-12-10  Josh Stone  <jistone@redhat.com>
 
 	* memory-access.h (get_uleb128_rest_return): Removed.

@@ -430,6 +430,13 @@ extern Elf *dwfl_module_getelf (Dwfl_Module *, GElf_Addr *bias)
    or -1 for errors.  */
 extern int dwfl_module_getsymtab (Dwfl_Module *mod);
 
+/* Return the index of the first global symbol in the module's symbol
+   table, or -1 for errors.  In each symbol table, all symbols with
+   STB_LOCAL binding precede the weak and global symbols.  This
+   function returns the symbol table index one greater than the last
+   local symbol.  */
+extern int dwfl_module_getsymtab_first_global (Dwfl_Module *mod);
+
 /* Fetch one entry from the module's symbol table.  On errors, returns
    NULL.  If successful, fills in *SYM and returns the string for st_name.
    This works like gelf_getsym except that st_value is always adjusted to

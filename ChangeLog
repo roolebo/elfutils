@@ -1,3 +1,7 @@
+2013-12-16  Mark Wielaard  <mjw@redhat.com>
+
+	* NEWS (libdwfl): Add dwfl_module_getsymtab_first_global.
+
 2013-12-09  Josh Stone  <jistone@redhat.com>
 
 	* .gitignore: Add config/ar-lib, installed due to AM_PROG_AR.

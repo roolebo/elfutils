@@ -1,3 +1,13 @@
+2013-12-16  Mark Wielaard  <mjw@redhat.com>
+
+	* libdwfl.h (dwfl_module_getsymtab_first_global): New function
+	definition.
+	* dwfl_module_getdwarf.c (dwfl_module_getsymtab_first_global): New
+	function.
+	* libdwflP.h (dwfl_module_getsymtab_first_global): New internal
+	function definition.
+	* dwfl_module_addrsym.c (dwfl_module_addrsym_elf): Use new function.
+
 2013-12-14  Mark Wielaard  <mjw@redhat.com>
 
 	* dwfl_module.c (__libdwfl_module_free): Free mod->reloc_info if

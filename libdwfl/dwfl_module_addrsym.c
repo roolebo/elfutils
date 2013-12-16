@@ -188,9 +188,9 @@ dwfl_module_addrsym_elf (Dwfl_Module *mod, GElf_Addr addr,
      come first in the symbol table, then all globals.  The zeroth,
      null entry, in the auxiliary table is skipped if there is a main
      table.  */
-  int first_global = mod->first_global + mod->aux_first_global;
-  if (mod->syments > 0 && mod->aux_syments > 0)
-    first_global--;
+  int first_global = INTUSE (dwfl_module_getsymtab_first_global) (mod);
+  if (first_global < 0)
+    return NULL;
   search_table (first_global == 0 ? 1 : first_global, syments);
 
   /* If we found nothing searching the global symbols, then try the locals.

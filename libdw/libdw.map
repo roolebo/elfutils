@@ -286,4 +286,5 @@ ELFUTILS_0.158 {
 
     dwfl_module_addrsym_elf;
     dwfl_module_getsym_elf;
+    dwfl_module_getsymtab_first_global;
 } ELFUTILS_0.157;

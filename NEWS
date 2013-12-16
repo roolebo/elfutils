@@ -1,6 +1,7 @@
 Version 0.158
 
 libdwfl: dwfl_core_file_report has new parameter executable.
+         New function dwfl_module_getsymtab_first_global.
 
 Version 0.157
 

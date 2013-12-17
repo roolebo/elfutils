@@ -1,3 +1,13 @@
+2013-12-17  Masatake YAMATO  <yamato@redhat.com>
+	    Mark Wielaard  <mjw@redhat.com>
+
+	* stack.c (show_activation, show_module, show_source): New variables.
+	(parse_opt): Set show_activation if -a option is given.
+	Set show_module if -m option is given. Set show_source if -s option
+	is given. Set all show booleans when -v option is given.
+	(main): Added `-a', `-m', `-s', and `-v' to the help message.
+	(frame_callback): Print module and source file information.
+
 2013-11-25  Petr Machata  <pmachata@redhat.com>
 
 	* elflint.c (valid_e_machine): Add EM_AARCH64.

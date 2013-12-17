@@ -36,7 +36,9 @@ ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
 /* Bug report address.  */
 ARGP_PROGRAM_BUG_ADDRESS_DEF = PACKAGE_BUGREPORT;
 
-static bool verbose = false;
+static bool show_activation = false;
+static bool show_module = false;
+static bool show_source = false;
 
 static int
 frame_callback (Dwfl_Frame *state, void *arg)
@@ -76,9 +78,44 @@ frame_callback (Dwfl_Frame *state, void *arg)
     width = 16;
 
   printf ("#%-2u 0x%0*" PRIx64, (*framenop)++, width, (uint64_t) pc);
-  if (verbose)
+
+  if (show_activation)
     printf ("%4s", ! isactivation ? "- 1" : "");
-  printf (" %s\n", symname);
+
+  if (symname != NULL)
+    printf (" %s", symname);
+
+  if (show_module)
+    {
+      const char* fname;
+
+      fname = dwfl_module_info(mod, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+      if (fname != NULL)
+	printf (" - %s", fname);
+    }
+
+  if (show_source)
+    {
+      Dwfl_Line *lineobj = dwfl_module_getsrc(mod, pc_adjusted);
+      if (lineobj)
+	{
+	  int line, col;
+	  const char* sname;
+	  line = col = -1;
+	  sname = dwfl_lineinfo (lineobj, NULL, &line, &col, NULL, NULL);
+	  if (sname != NULL)
+	    {
+	      printf ("\n    %s", sname);
+	      if (line > 0)
+		{
+		  printf (":%d", line);
+		  if (col > 0)
+		    printf (":%d", col);
+		}
+	    }
+	}
+    }
+  printf ("\n");
   return DWARF_CB_OK;
 }
 
@@ -117,8 +154,20 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
       state->child_inputs[0] = state->input;
       break;
 
+    case 'm':
+      show_module = true;
+      break;
+
+    case 's':
+      show_source = true;
+      break;
+
+    case 'a':
+      show_activation = true;
+      break;
+
     case 'v':
-      verbose = true;
+      show_activation = show_source = show_module = true;
       break;
 
     default:
@@ -140,7 +189,14 @@ main (int argc, char **argv)
 
   const struct argp_option options[] =
     {
-      { "verbose", 'v', NULL, 0, N_("Additionally show frames activation"), 0 },
+      { "activation",  'a', NULL, 0,
+	N_("Additionally show frame activation"), 0 },
+      { "module",  'm', NULL, 0,
+	N_("Additionally show module file information"), 0 },
+      { "source",  's', NULL, 0,
+	N_("Additionally show source file information"), 0 },
+      { "verbose", 'v', NULL, 0,
+	N_("Show all additional information (activation, module and source)"), 0 },
       { NULL, 0, NULL, 0, NULL, 0 }
     };
 
@@ -165,7 +221,7 @@ Only real user processes are supported, no kernel or process maps."),
   argp_parse (&argp, argc, argv, 0, &remaining, &dwfl);
   assert (dwfl != NULL);
   if (remaining != argc)
-    error (2, 0, "eu-stack [--debuginfo-path=<path>] {-p <process id>|"
+    error (2, 0, "eu-stack [-a] [-m] [-s] [-v] [--debuginfo-path=<path>] {-p <process id>|"
 		 "--core=<file> [--executable=<file>]|--help}");
 
   /* dwfl_linux_proc_report has been already called from dwfl_standard_argp's

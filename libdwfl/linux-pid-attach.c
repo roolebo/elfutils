@@ -164,6 +164,9 @@ pid_next_thread (Dwfl *dwfl __attribute__ ((unused)), void *dwfl_arg,
 {
   struct pid_arg *pid_arg = dwfl_arg;
   struct dirent *dirent;
+  /* Start fresh on first traversal. */
+  if (*thread_argp == NULL)
+    rewinddir (pid_arg->dir);
   do
     {
       errno = 0;

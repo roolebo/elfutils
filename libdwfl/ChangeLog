@@ -1,3 +1,7 @@
+2013-12-17  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* frame_unwind.c (handle_cfi): Call ebl_dwarf_to_regno for RA.
+
 2013-12-17  Mark Wielaard  <mjw@redhat.com>
 
 	* linux-pid-attach.c (pid_next_thread): Call rewinddir on first

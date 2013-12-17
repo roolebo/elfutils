@@ -539,7 +539,7 @@ handle_cfi (Dwfl_Frame *state, Dwarf_Addr pc, Dwarf_CFI *cfi, Dwarf_Addr bias)
 	    {
 	      /* REGNO is undefined.  */
 	      unsigned ra = frame->fde->cie->return_address_register;
-	      if (regno == ra)
+	      if (ebl_dwarf_to_regno (ebl, &ra) && regno == ra)
 		unwound->pc_state = DWFL_FRAME_STATE_PC_UNDEFINED;
 	      continue;
 	    }

@@ -1,3 +1,8 @@
+2013-12-17  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* backtrace-dwarf.c (executable, find_elf, dwfl_offline): Remove unused
+	code.
+
 2013-12-15  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	unwinder: ppc

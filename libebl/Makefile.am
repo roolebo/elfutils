@@ -54,7 +54,8 @@ gen_SOURCES = eblopenbackend.c eblclosebackend.c eblstrtab.c \
 	      eblreginfo.c eblnonerelocp.c eblrelativerelocp.c \
 	      eblsysvhashentrysize.c eblauxvinfo.c eblcheckobjattr.c \
 	      ebl_check_special_section.c ebl_syscall_abi.c eblabicfi.c \
-	      eblstother.c eblinitreg.c ebldwarftoregno.c
+	      eblstother.c eblinitreg.c ebldwarftoregno.c eblnormalizepc.c \
+	      eblunwind.c
 
 libebl_a_SOURCES = $(gen_SOURCES)
 

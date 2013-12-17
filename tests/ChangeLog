@@ -1,3 +1,18 @@
+2013-12-18  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	unwinder: s390 and s390x
+	* Makefile.am (TESTS): Add run-backtrace-core-s390x.sh and
+	run-backtrace-core-s390.sh.
+	(EXTRA_DIST): Add backtrace.s390x.core.bz2, backtrace.s390x.exec.bz2,
+	backtrace.s390.core.bz2, backtrace.s390.exec.bz2,
+	run-backtrace-core-s390x.sh and run-backtrace-core-s390.sh.
+	* backtrace.s390.core.bz2: New file.
+	* backtrace.s390.exec.bz2: New file.
+	* backtrace.s390x.core.bz2: New file.
+	* backtrace.s390x.exec.bz2: New file.
+	* run-backtrace-core-s390.sh: New file.
+	* run-backtrace-core-s390x.sh: New file.
+
 2013-12-17  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* backtrace-dwarf.c (executable, find_elf, dwfl_offline): Remove unused

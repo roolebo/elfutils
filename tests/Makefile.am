@@ -106,7 +106,8 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-backtrace-native.sh run-backtrace-data.sh run-backtrace-dwarf.sh \
 	run-backtrace-native-biarch.sh run-backtrace-native-core.sh \
 	run-backtrace-native-core-biarch.sh run-backtrace-core-x86_64.sh \
-	run-backtrace-core-i386.sh run-backtrace-core-ppc.sh
+	run-backtrace-core-i386.sh run-backtrace-core-ppc.sh \
+	run-backtrace-core-s390x.sh run-backtrace-core-s390.sh
 
 if !BIARCH
 export ELFUTILS_DISABLE_BIARCH = 1
@@ -247,7 +248,10 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     backtrace-subr.sh backtrace.i386.core.bz2 backtrace.i386.exec.bz2 \
 	     backtrace.x86_64.core.bz2 backtrace.x86_64.exec.bz2 \
 	     backtrace.ppc.core.bz2 backtrace.ppc.exec.bz2 \
-	     run-backtrace-core-ppc.sh
+	     run-backtrace-core-ppc.sh \
+	     backtrace.s390x.core.bz2 backtrace.s390x.exec.bz2 \
+	     backtrace.s390.core.bz2 backtrace.s390.exec.bz2 \
+	     run-backtrace-core-s390x.sh run-backtrace-core-s390.sh
 
 if USE_VALGRIND
 valgrind_cmd='valgrind -q --error-exitcode=1 --run-libc-freeres=no'

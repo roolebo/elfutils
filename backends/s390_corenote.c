@@ -47,13 +47,13 @@
 
 static const Ebl_Register_Location prstatus_regs[] =
   {
-#define GR(at, n, dwreg, b)						\
+#define GR(at, n, dwreg, b...)						\
     { .offset = at * BITS/8, .regno = dwreg, .count = n, .bits = b }
 
-    GR ( 0,  1, 64, BITS),		/* pswm */
-    GR ( 1,  1, 65, BITS),		/* pswa */
-    GR ( 2, 16,  0, BITS),		/* r0-r15 */
-    GR (18, 16, 48,   32),		/* ar0-ar15 */
+    GR ( 0,  1, 64, BITS),				/* pswm */
+    GR ( 1,  1, 65, BITS, .pc_register = true ),	/* pswa */
+    GR ( 2, 16,  0, BITS),				/* r0-r15 */
+    GR (18, 16, 48,   32),				/* ar0-ar15 */
 
 #undef	GR
   };

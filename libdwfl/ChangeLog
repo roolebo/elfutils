@@ -1,3 +1,15 @@
+2013-12-18  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	unwinder: s390 and s390x
+	* dwfl_frame_pc.c (dwfl_frame_pc): Call ebl_normalize_pc.
+	* frame_unwind.c (new_unwound): New function from ...
+	(handle_cfi): ... here.  Call it.
+	(setfunc, getfunc, readfunc): New functions.
+	(__libdwfl_frame_unwind): Call ebl_unwind with those functions.
+	* linux-core-attach.c (core_set_initial_registers): Always iterate
+	through the Ebl_Register_Location loop.  Call
+	dwfl_thread_state_register_pc there.
+
 2013-12-17  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* frame_unwind.c (handle_cfi): Call ebl_dwarf_to_regno for RA.

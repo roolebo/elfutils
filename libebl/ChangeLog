@@ -1,3 +1,15 @@
+2013-12-18  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	unwinder: s390 and s390x
+	* Makefile.am (gen_SOURCES): Add eblnormalizepc.c and eblunwind.c.
+	* ebl-hooks.h (normalize_pc, unwind): New.
+	* eblnormalizepc.c: New file.
+	* eblunwind.c: New file.
+	* libebl.h (Ebl_Register_Location): Add field pc_register.
+	(ebl_normalize_pc): New declaration.
+	(ebl_tid_registers_get_t, ebl_pid_memory_read_t): New definitions.
+	(ebl_unwind): New declaration.
+
 2013-12-15  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	unwinder: ppc and ppc64

@@ -494,6 +494,26 @@ expr_eval (Dwfl_Frame *state, Dwarf_Frame *frame, const Dwarf_Op *ops,
   return true;
 }
 
+static void
+new_unwound (Dwfl_Frame *state)
+{
+  assert (state->unwound == NULL);
+  Dwfl_Thread *thread = state->thread;
+  Dwfl_Process *process = thread->process;
+  Ebl *ebl = process->ebl;
+  size_t nregs = ebl_frame_nregs (ebl);
+  assert (nregs > 0);
+  Dwfl_Frame *unwound;
+  unwound = malloc (sizeof (*unwound) + sizeof (*unwound->regs) * nregs);
+  state->unwound = unwound;
+  unwound->thread = thread;
+  unwound->unwound = NULL;
+  unwound->signal_frame = false;
+  unwound->initial_frame = false;
+  unwound->pc_state = DWFL_FRAME_STATE_ERROR;
+  memset (unwound->regs_set, 0, sizeof (unwound->regs_set));
+}
+
 /* The logic is to call __libdwfl_seterrno for any CFI bytecode interpretation
    error so one can easily catch the problem with a debugger.  Still there are
    archs with invalid CFI for some registers where the registers are never used
@@ -508,20 +528,14 @@ handle_cfi (Dwfl_Frame *state, Dwarf_Addr pc, Dwarf_CFI *cfi, Dwarf_Addr bias)
       __libdwfl_seterrno (DWFL_E_LIBDW);
       return;
     }
+  new_unwound (state);
+  Dwfl_Frame *unwound = state->unwound;
+  unwound->signal_frame = frame->fde->cie->signal_frame;
   Dwfl_Thread *thread = state->thread;
   Dwfl_Process *process = thread->process;
   Ebl *ebl = process->ebl;
   size_t nregs = ebl_frame_nregs (ebl);
   assert (nregs > 0);
-  Dwfl_Frame *unwound;
-  unwound = malloc (sizeof (*unwound) + sizeof (*unwound->regs) * nregs);
-  state->unwound = unwound;
-  unwound->thread = thread;
-  unwound->unwound = NULL;
-  unwound->signal_frame = frame->fde->cie->signal_frame;
-  unwound->initial_frame = false;
-  unwound->pc_state = DWFL_FRAME_STATE_ERROR;
-  memset (unwound->regs_set, 0, sizeof (unwound->regs_set));
   for (unsigned regno = 0; regno < nregs; regno++)
     {
       Dwarf_Op reg_ops_mem[3], *reg_ops;
@@ -583,6 +597,47 @@ handle_cfi (Dwfl_Frame *state, Dwarf_Addr pc, Dwarf_CFI *cfi, Dwarf_Addr bias)
   free (frame);
 }
 
+static bool
+setfunc (int firstreg, unsigned nregs, const Dwarf_Word *regs, void *arg)
+{
+  Dwfl_Frame *state = arg;
+  Dwfl_Frame *unwound = state->unwound;
+  if (firstreg < 0)
+    {
+      assert (firstreg == -1);
+      assert (nregs == 1);
+      assert (unwound->pc_state == DWFL_FRAME_STATE_PC_UNDEFINED);
+      unwound->pc = *regs;
+      unwound->pc_state = DWFL_FRAME_STATE_PC_SET;
+      return true;
+    }
+  while (nregs--)
+    if (! __libdwfl_frame_reg_set (unwound, firstreg++, *regs++))
+      return false;
+  return true;
+}
+
+static bool
+getfunc (int firstreg, unsigned nregs, Dwarf_Word *regs, void *arg)
+{
+  Dwfl_Frame *state = arg;
+  assert (firstreg >= 0);
+  while (nregs--)
+    if (! __libdwfl_frame_reg_get (state, firstreg++, regs++))
+      return false;
+  return true;
+}
+
+static bool
+readfunc (Dwarf_Addr addr, Dwarf_Word *datap, void *arg)
+{
+  Dwfl_Frame *state = arg;
+  Dwfl_Thread *thread = state->thread;
+  Dwfl_Process *process = thread->process;
+  return process->callbacks->memory_read (process->dwfl, addr, datap,
+					  process->callbacks_arg);
+}
+
 void
 internal_function
 __libdwfl_frame_unwind (Dwfl_Frame *state)
@@ -619,4 +674,24 @@ __libdwfl_frame_unwind (Dwfl_Frame *state)
 	    return;
 	}
     }
+  assert (state->unwound == NULL);
+  Dwfl_Thread *thread = state->thread;
+  Dwfl_Process *process = thread->process;
+  Ebl *ebl = process->ebl;
+  new_unwound (state);
+  state->unwound->pc_state = DWFL_FRAME_STATE_PC_UNDEFINED;
+  // &Dwfl_Frame.signal_frame cannot be passed as it is a bitfield.
+  bool signal_frame = false;
+  if (! ebl_unwind (ebl, pc, setfunc, getfunc, readfunc, state, &signal_frame))
+    {
+      // Discard the unwind attempt.  During next __libdwfl_frame_unwind call
+      // we may have for example the appropriate Dwfl_Module already mapped.
+      assert (state->unwound->unwound == NULL);
+      free (state->unwound);
+      state->unwound = NULL;
+      // __libdwfl_seterrno has been called above.
+      return;
+    }
+  assert (state->unwound->pc_state == DWFL_FRAME_STATE_PC_SET);
+  state->unwound->signal_frame = signal_frame;
 }

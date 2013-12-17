@@ -356,6 +356,7 @@ typedef struct
   uint8_t bits;			/* Bits of data for one register.  */
   uint8_t pad;			/* Bytes of padding after register's data.  */
   Dwarf_Half count;		/* Consecutive register numbers here.  */
+  bool pc_register;
 } Ebl_Register_Location;
 
 /* Non-register data items in core notes.  */
@@ -409,6 +410,34 @@ extern size_t ebl_frame_nregs (Ebl *ebl)
    Dwarf_Frame->REGS indexing.  */
 extern bool ebl_dwarf_to_regno (Ebl *ebl, unsigned *regno)
   __nonnull_attribute__ (1, 2);
+
+/* Modify PC as fetched from inferior data into valid PC.  */
+extern void ebl_normalize_pc (Ebl *ebl, Dwarf_Addr *pc)
+  __nonnull_attribute__ (1, 2);
+
+/* Callback type for ebl_unwind's parameter getfunc.  */
+typedef bool (ebl_tid_registers_get_t) (int firstreg, unsigned nregs,
+					Dwarf_Word *regs, void *arg)
+  __nonnull_attribute__ (3);
+
+/* Callback type for ebl_unwind's parameter readfunc.  */
+typedef bool (ebl_pid_memory_read_t) (Dwarf_Addr addr, Dwarf_Word *data,
+				      void *arg)
+  __nonnull_attribute__ (3);
+
+/* Get previous frame state for an existing frame state.  Method is called only
+   if unwinder could not find CFI for current PC.  PC is for the
+   existing frame.  SETFUNC sets register in the previous frame.  GETFUNC gets
+   register from the existing frame.  Note that GETFUNC vs. SETFUNC act on
+   a disjunct set of registers.  READFUNC reads memory.  ARG has to be passed
+   for SETFUNC, GETFUNC and READFUNC.  *SIGNAL_FRAMEP is initialized to false,
+   it can be set to true if existing frame is a signal frame.  SIGNAL_FRAMEP is
+   never NULL.  */
+extern bool ebl_unwind (Ebl *ebl, Dwarf_Addr pc, ebl_tid_registers_t *setfunc,
+			ebl_tid_registers_get_t *getfunc,
+			ebl_pid_memory_read_t *readfunc, void *arg,
+			bool *signal_framep)
+  __nonnull_attribute__ (1, 3, 4, 5, 7);
 
 #ifdef __cplusplus
 }

@@ -1,3 +1,14 @@
+2013-12-18  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	unwinder: s390 and s390x
+	* Makefile.am (s390_SRCS): Add s390_initreg.c and s390_unwind.c.
+	* s390_corenote.c (prstatus_regs): Set PC_REGISTER.  Reindent all the
+	entries.
+	* s390_init.c (s390_init): Initialize frame_nregs,
+	set_initial_registers_tid, normalize_pc and unwind.
+	* s390_initreg.c: New file.
+	* s390_unwind.c: New file.
+
 2013-12-15  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	unwinder: ppc and ppc64

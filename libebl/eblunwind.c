@@ -1,4 +1,4 @@
-/* Get return address register value for frame.
+/* Get previous frame state for an existing frame state.
    Copyright (C) 2013 Red Hat, Inc.
    This file is part of elfutils.
 
@@ -30,35 +30,14 @@
 # include <config.h>
 #endif
 
-#include "libdwflP.h"
+#include <libeblP.h>
 
 bool
-dwfl_frame_pc (Dwfl_Frame *state, Dwarf_Addr *pc, bool *isactivation)
+ebl_unwind (Ebl *ebl, Dwarf_Addr pc, ebl_tid_registers_t *setfunc,
+	    ebl_tid_registers_get_t *getfunc, ebl_pid_memory_read_t *readfunc,
+	    void *arg, bool *signal_framep)
 {
-  assert (state->pc_state == DWFL_FRAME_STATE_PC_SET);
-  *pc = state->pc;
-  ebl_normalize_pc (state->thread->process->ebl, pc);
-  if (isactivation)
-    {
-      /* Bottom frame?  */
-      if (state->initial_frame)
-	*isactivation = true;
-      /* *ISACTIVATION is logical union of whether current or previous frame
-	 state is SIGNAL_FRAME.  */
-      else if (state->signal_frame)
-	*isactivation = true;
-      else
-	{
-	  /* If the previous frame has unwound unsuccessfully just silently do
-	     not consider it could be a SIGNAL_FRAME.  */
-	  __libdwfl_frame_unwind (state);
-	  if (state->unwound == NULL
-	      || state->unwound->pc_state != DWFL_FRAME_STATE_PC_SET)
-	    *isactivation = false;
-	  else
-	    *isactivation = state->unwound->signal_frame;
-	}
-    }
-  return true;
+  if (ebl == NULL || ebl->unwind == NULL)
+    return false;
+  return ebl->unwind (ebl, pc, setfunc, getfunc, readfunc, arg, signal_framep);
 }
-INTDEF (dwfl_frame_pc)

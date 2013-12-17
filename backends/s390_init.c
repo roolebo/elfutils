@@ -62,6 +62,15 @@ s390_init (elf, machine, eh, ehlen)
   else
     HOOK (eh, core_note);
   HOOK (eh, abi_cfi);
+  /* gcc/config/ #define DWARF_FRAME_REGISTERS 34.
+     But from the gcc/config/s390/s390.h "Register usage." comment it looks as
+     if #32 (Argument pointer) and #33 (Condition code) are not used for
+     unwinding.  */
+  eh->frame_nregs = 32;
+  HOOK (eh, set_initial_registers_tid);
+  if (eh->class == ELFCLASS32)
+    HOOK (eh, normalize_pc);
+  HOOK (eh, unwind);
 
   /* Only the 64-bit format uses the incorrect hash table entry size.  */
   if (eh->class == ELFCLASS64)

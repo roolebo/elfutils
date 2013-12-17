@@ -228,12 +228,12 @@ core_set_initial_registers (Dwfl_Thread *thread, void *thread_arg_voidp)
   for (size_t regloci = 0; regloci < nregloc; regloci++)
     {
       const Ebl_Register_Location *regloc = reglocs + regloci;
-      if (regloc->regno >= nregs)
+      // Iterate even regs out of NREGS range so that we can find pc_register.
+      if (regloc->bits != 32 && regloc->bits != 64)
 	continue;
-      assert (regloc->bits == 32 || regloc->bits == 64);
       const char *reg_desc = desc + regloc->offset;
       for (unsigned regno = regloc->regno;
-	   regno < MIN (regloc->regno + (regloc->count ?: 1U), nregs);
+	   regno < regloc->regno + (regloc->count ?: 1U);
 	   regno++)
 	{
 	  /* PPC provides DWARF register 65 irrelevant for
@@ -241,7 +241,8 @@ core_set_initial_registers (Dwfl_Thread *thread, void *thread_arg_voidp)
 	     LR (108) is provided earlier (in NT_PRSTATUS) than the # 65.
 	     FIXME: It depends now on their order in core notes.
 	     FIXME: It uses private function.  */
-	  if (__libdwfl_frame_reg_get (thread->unwound, regno, NULL))
+	  if (regno < nregs
+	      && __libdwfl_frame_reg_get (thread->unwound, regno, NULL))
 	    continue;
 	  Dwarf_Word val;
 	  switch (regloc->bits)
@@ -266,7 +267,10 @@ core_set_initial_registers (Dwfl_Thread *thread, void *thread_arg_voidp)
 	      abort ();
 	  }
 	  /* Registers not valid for CFI are just ignored.  */
-	  INTUSE(dwfl_thread_state_registers) (thread, regno, 1, &val);
+	  if (regno < nregs)
+	    INTUSE(dwfl_thread_state_registers) (thread, regno, 1, &val);
+	  if (regloc->pc_register)
+	    INTUSE(dwfl_thread_state_register_pc) (thread, val);
 	  reg_desc += regloc->pad;
 	}
     }

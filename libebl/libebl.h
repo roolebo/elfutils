@@ -439,6 +439,12 @@ extern bool ebl_unwind (Ebl *ebl, Dwarf_Addr pc, ebl_tid_registers_t *setfunc,
 			bool *signal_framep)
   __nonnull_attribute__ (1, 3, 4, 5, 7);
 
+/* Returns true if the value can be resolved to an address in an
+   allocated section, which will be returned in *ADDR
+   (e.g. function descriptor resolving)  */
+extern bool ebl_resolve_sym_value (Ebl *ebl, GElf_Addr *addr)
+   __nonnull_attribute__ (2);
+
 #ifdef __cplusplus
 }
 #endif

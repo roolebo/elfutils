@@ -1,5 +1,5 @@
-/* Find debugging and symbol information for a module in libdwfl.
-   Copyright (C) 2005, 2006, 2007, 2013 Red Hat, Inc.
+/* Resolve a symbol value to an allocated section of the Elf file.
+   Copyright (C) 2013 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -26,13 +26,18 @@
    the GNU Lesser General Public License along with this program.  If
    not, see <http://www.gnu.org/licenses/>.  */
 
-#include "libdwflP.h"
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
 
-const char *
-dwfl_module_addrname (Dwfl_Module *mod, GElf_Addr addr)
+#include <libeblP.h>
+#include <assert.h>
+
+bool
+ebl_resolve_sym_value (Ebl *ebl, GElf_Addr *addr)
 {
-  GElf_Off off;
-  GElf_Sym sym;
-  return INTUSE(dwfl_module_addrinfo) (mod, addr, &off, &sym,
-				       NULL, NULL, NULL);
+  if (ebl == NULL || ebl->resolve_sym_value == NULL)
+    return false;
+
+  return ebl->resolve_sym_value (ebl, addr);
 }

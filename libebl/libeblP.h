@@ -64,6 +64,11 @@ struct ebl
      Ebl architecture can unwind iff FRAME_NREGS > 0.  */
   size_t frame_nregs;
 
+  /* Function descriptor load address and table as used by
+     ebl_resolve_sym_value if available for this arch.  */
+  GElf_Addr fd_addr;
+  Elf_Data *fd_data;
+
   /* Internal data.  */
   void *dlhandle;
 };

@@ -362,4 +362,417 @@ testrun_compare ${abs_builddir}/dwflsyms -e testfilebasmin <<\EOF
    8: FUNC	GLOBAL	bar (44) 0x40017a, rel: 0x40017a (.text)
 EOF
 
+testfiles testfile66
+testrun_compare ${abs_builddir}/dwflsyms -e testfile66 <<\EOF
+   0: NOTYPE	LOCAL	 (0) 0
+   1: SECTION	LOCAL	 (0) 0x190
+   2: SECTION	LOCAL	 (0) 0x1a4
+   3: SECTION	LOCAL	 (0) 0x1c8
+   4: SECTION	LOCAL	 (0) 0x1f8
+   5: SECTION	LOCAL	 (0) 0x288
+   6: SECTION	LOCAL	 (0) 0x2a8
+   7: SECTION	LOCAL	 (0) 0x2d8
+   8: SECTION	LOCAL	 (0) 0x102e0
+   9: SECTION	LOCAL	 (0) 0x103d0
+  10: SECTION	LOCAL	 (0) 0x103e8
+  11: SECTION	LOCAL	 (0) 0x103e8
+  12: OBJECT	LOCAL	_DYNAMIC (0) 0x102e0
+  13: FUNC	GLOBAL	_start (4) 0x103d0, rel: 0x103d0 (.opd) [0x2d8, rel: 0 (.text)]
+  14: NOTYPE	GLOBAL	__bss_start (0) 0x103f0
+  15: NOTYPE	GLOBAL	_edata (0) 0x103f0
+  16: NOTYPE	GLOBAL	_end (0) 0x103f0
+EOF
+
+testfiles testfile66.core
+testrun_compare ${abs_builddir}/dwflsyms -e testfile66 --core=testfile66.core <<\EOF
+   0: NOTYPE	LOCAL	 (0) 0
+   1: SECTION	LOCAL	 (0) 0xfffb1af0410
+   2: NOTYPE	GLOBAL	__kernel_datapage_offset (0) 0xfffb1af05dc
+   3: OBJECT	GLOBAL	LINUX_2.6.15 (0) 0
+   4: NOTYPE	GLOBAL	__kernel_clock_getres (64) 0xfffb1af052c
+   5: NOTYPE	GLOBAL	__kernel_get_tbfreq (24) 0xfffb1af0620
+   6: NOTYPE	GLOBAL	__kernel_gettimeofday (84) 0xfffb1af0440
+   7: NOTYPE	GLOBAL	__kernel_sync_dicache (20) 0xfffb1af06c4
+   8: NOTYPE	GLOBAL	__kernel_sync_dicache_p5 (20) 0xfffb1af06c4
+   9: NOTYPE	GLOBAL	__kernel_sigtramp_rt64 (12) 0xfffb1af0418
+  10: NOTYPE	GLOBAL	__kernel_clock_gettime (152) 0xfffb1af0494
+  11: NOTYPE	GLOBAL	__kernel_get_syscall_map (44) 0xfffb1af05f4
+ld64.so.1: Callback returned failure
+   0: NOTYPE	LOCAL	 (0) 0
+   1: SECTION	LOCAL	 (0) 0x461b0190
+   2: SECTION	LOCAL	 (0) 0x461b01a4
+   3: SECTION	LOCAL	 (0) 0x461b01c8
+   4: SECTION	LOCAL	 (0) 0x461b01f8
+   5: SECTION	LOCAL	 (0) 0x461b0288
+   6: SECTION	LOCAL	 (0) 0x461b02a8
+   7: SECTION	LOCAL	 (0) 0x461b02d8
+   8: SECTION	LOCAL	 (0) 0x461c02e0
+   9: SECTION	LOCAL	 (0) 0x461c03d0
+  10: SECTION	LOCAL	 (0) 0x461c03e8
+  11: SECTION	LOCAL	 (0) 0x461c03e8
+  12: OBJECT	LOCAL	_DYNAMIC (0) 0x102e0
+  13: FUNC	GLOBAL	_start (4) 0x461c03d0, rel: 0x103d0 (.opd) [0x461b02d8, rel: 0 (.text)]
+  14: NOTYPE	GLOBAL	__bss_start (0) 0x103f0
+  15: NOTYPE	GLOBAL	_edata (0) 0x103f0
+  16: NOTYPE	GLOBAL	_end (0) 0x103f0
+EOF
+
+# Test the already present dot-prefixed names do not get duplicated.
+testfiles hello_ppc64.ko
+testrun_compare ${abs_builddir}/dwflsyms -e hello_ppc64.ko <<\EOF
+   0: NOTYPE	LOCAL	 (0) 0
+   1: SECTION	LOCAL	 (0) 0
+   2: SECTION	LOCAL	 (0) 0x94
+   3: SECTION	LOCAL	 (0) 0xba
+   4: SECTION	LOCAL	 (0) 0xd0
+   5: SECTION	LOCAL	 (0) 0x13a
+   6: SECTION	LOCAL	 (0) 0x13a
+   7: SECTION	LOCAL	 (0) 0x150
+   8: SECTION	LOCAL	 (0) 0x170
+   9: SECTION	LOCAL	 (0) 0x188
+  10: SECTION	LOCAL	 (0) 0x410
+  11: SECTION	LOCAL	 (0) 0x434
+  12: SECTION	LOCAL	 (0) 0x438
+  13: SECTION	LOCAL	 (0) 0x438
+  14: SECTION	LOCAL	 (0) 0
+  15: SECTION	LOCAL	 (0) 0
+  16: SECTION	LOCAL	 (0) 0
+  17: SECTION	LOCAL	 (0) 0
+  18: SECTION	LOCAL	 (0) 0
+  19: SECTION	LOCAL	 (0) 0
+  20: SECTION	LOCAL	 (0) 0
+  21: SECTION	LOCAL	 (0) 0
+  22: SECTION	LOCAL	 (0) 0
+  23: SECTION	LOCAL	 (0) 0
+  24: FILE	LOCAL	init.c (0) 0
+  25: FILE	LOCAL	exit.c (0) 0
+  26: FILE	LOCAL	hello.mod.c (0) 0
+  27: OBJECT	LOCAL	__mod_srcversion23 (35) 0xd0
+  28: OBJECT	LOCAL	__module_depends (9) 0xf8
+  29: OBJECT	LOCAL	__mod_vermagic5 (50) 0x108
+  30: OBJECT	GLOBAL	__this_module (648) 0x188
+  31: FUNC	GLOBAL	.cleanup_module (72) 0x4c, rel: 0x4c (.text)
+  32: FUNC	GLOBAL	cleanup_module (24) 0x160, rel: 0x10 (.opd)
+  33: NOTYPE	GLOBAL	.printk (0) 0
+  34: FUNC	GLOBAL	init_module (24) 0x150, rel: 0 (.opd)
+  35: NOTYPE	GLOBAL	._mcount (0) 0
+  36: FUNC	GLOBAL	.init_module (76) 0, rel: 0 (.text)
+  37: NOTYPE	GLOBAL	_mcount (0) 0
+EOF
+
+# Same test files as above, but now generated on ppc64.
+# ppc64 uses function descriptors to make things more "interesting".
+
+testfiles testfilebaztabppc64
+testfiles testfilebazdbgppc64 testfilebazdbgppc64.debug
+testfiles testfilebazdbgppc64_pl
+testfiles testfilebazdbgppc64_plr
+testfiles testfilebazdynppc64
+testfiles testfilebazmdbppc64
+testfiles testfilebazminppc64
+testfiles testfilebazminppc64_pl
+testfiles testfilebazminppc64_plr
+
+cat > testfile.symtab.in <<\EOF
+   0: NOTYPE	LOCAL	 (0) 0
+   1: SECTION	LOCAL	 (0) 0x238
+   2: SECTION	LOCAL	 (0) 0x24c
+   3: SECTION	LOCAL	 (0) 0x26c
+   4: SECTION	LOCAL	 (0) 0x290
+   5: SECTION	LOCAL	 (0) 0x2c0
+   6: SECTION	LOCAL	 (0) 0x3e0
+   7: SECTION	LOCAL	 (0) 0x488
+   8: SECTION	LOCAL	 (0) 0x4a0
+   9: SECTION	LOCAL	 (0) 0x4c0
+  10: SECTION	LOCAL	 (0) 0x820
+  11: SECTION	LOCAL	 (0) 0x850
+  12: SECTION	LOCAL	 (0) 0x8a0
+  13: SECTION	LOCAL	 (0) 0xd30
+  14: SECTION	LOCAL	 (0) 0xd4c
+  15: SECTION	LOCAL	 (0) 0xd50
+  16: SECTION	LOCAL	 (0) 0xd70
+  17: SECTION	LOCAL	 (0) 0x1fde0
+  18: SECTION	LOCAL	 (0) 0x1fde8
+  19: SECTION	LOCAL	 (0) 0x1fdf0
+  20: SECTION	LOCAL	 (0) 0x1fdf8
+  21: SECTION	LOCAL	 (0) 0x1fe20
+  22: SECTION	LOCAL	 (0) 0x20000
+  23: SECTION	LOCAL	 (0) 0x20010
+  24: SECTION	LOCAL	 (0) 0x200d8
+  25: SECTION	LOCAL	 (0) 0x20110
+  26: SECTION	LOCAL	 (0) 0x20158
+  27: SECTION	LOCAL	 (0) 0
+  28: SECTION	LOCAL	 (0) 0
+  29: SECTION	LOCAL	 (0) 0
+  30: SECTION	LOCAL	 (0) 0
+  31: SECTION	LOCAL	 (0) 0
+  32: SECTION	LOCAL	 (0) 0
+  33: SECTION	LOCAL	 (0) 0
+  34: FILE	LOCAL	crtstuff.c (0) 0
+  35: OBJECT	LOCAL	__JCR_LIST__ (0) 0x1fdf0
+  36: FUNC	LOCAL	deregister_tm_clones (0) 0x20040, rel: 0x20040 (.opd) [0x910, rel: 0x70 (.text)]
+  37: FUNC	LOCAL	register_tm_clones (0) 0x20050, rel: 0x20050 (.opd) [0x980, rel: 0xe0 (.text)]
+  38: FUNC	LOCAL	__do_global_dtors_aux (0) 0x20060, rel: 0x20060 (.opd) [0x9f0, rel: 0x150 (.text)]
+  39: OBJECT	LOCAL	completed.7711 (1) 0x20158
+  40: OBJECT	LOCAL	__do_global_dtors_aux_fini_array_entry (0) 0x1fde8
+  41: FUNC	LOCAL	frame_dummy (0) 0x20070, rel: 0x20070 (.opd) [0xa50, rel: 0x1b0 (.text)]
+  42: OBJECT	LOCAL	__frame_dummy_init_array_entry (0) 0x1fde0
+  43: FILE	LOCAL	foo.c (0) 0
+  44: FILE	LOCAL	bar.c (0) 0
+  45: OBJECT	LOCAL	b1 (4) 0x20004
+  46: FUNC	LOCAL	foo (76) 0x20090, rel: 0x20090 (.opd) [0xb34, rel: 0x294 (.text)]
+  47: FILE	LOCAL	crtstuff.c (0) 0
+  48: OBJECT	LOCAL	__FRAME_END__ (0) 0xe18
+  49: OBJECT	LOCAL	__JCR_END__ (0) 0x1fdf0
+  50: FILE	LOCAL	 (0) 0
+  51: NOTYPE	LOCAL	__glink_PLTresolve (0) 0xce8
+  52: NOTYPE	LOCAL	00000011.plt_call.__libc_start_main@@GLIBC_2.3 (0) 0x8a0
+  53: NOTYPE	LOCAL	00000011.plt_call.__cxa_finalize@@GLIBC_2.3 (0) 0x8b4
+  54: NOTYPE	LOCAL	__init_array_end (0) 0x1fde8
+  55: OBJECT	LOCAL	_DYNAMIC (0) 0x1fe20
+  56: NOTYPE	LOCAL	__init_array_start (0) 0x1fde0
+  57: FUNC	GLOBAL	__libc_csu_fini (16) 0x200c0, rel: 0x200c0 (.opd) [0xcd0, rel: 0x430 (.text)]
+  58: FUNC	GLOBAL	__libc_start_main@@GLIBC_2.3 (0) 0
+  59: NOTYPE	WEAK	_ITM_deregisterTMCloneTable (0) 0
+  60: NOTYPE	WEAK	data_start (0) 0x20000
+  61: NOTYPE	GLOBAL	_edata (0) 0x20110
+  62: FUNC	GLOBAL	bar (116) 0x200a0, rel: 0x200a0 (.opd) [0xb80, rel: 0x2e0 (.text)]
+  63: FUNC	GLOBAL	_fini (0) 0x20030, rel: 0x20030 (.opd) [0xd30, rel: 0 (.fini)]
+  64: NOTYPE	GLOBAL	__data_start (0) 0x20000
+  65: NOTYPE	WEAK	__gmon_start__ (0) 0
+  66: OBJECT	GLOBAL	__dso_handle (0) 0x1fe18
+  67: OBJECT	GLOBAL	_IO_stdin_used (4) 0xd4c
+  68: OBJECT	GLOBAL	b2 (4) 0x20008
+  69: FUNC	WEAK	__cxa_finalize@@GLIBC_2.3 (0) 0
+  70: FUNC	GLOBAL	__libc_csu_init (204) 0x200b0, rel: 0x200b0 (.opd) [0xc00, rel: 0x360 (.text)]
+  71: NOTYPE	GLOBAL	_end (0) 0x20160
+  72: FUNC	GLOBAL	_start (60) 0x20010, rel: 0x20010 (.opd) [0x8c8, rel: 0x28 (.text)]
+  73: NOTYPE	GLOBAL	__bss_start (0) 0x20110
+  74: FUNC	GLOBAL	main (128) 0x20080, rel: 0x20080 (.opd) [0xab4, rel: 0x214 (.text)]
+  75: NOTYPE	WEAK	_Jv_RegisterClasses (0) 0
+  76: OBJECT	GLOBAL	__TMC_END__ (0) 0x20010
+  77: NOTYPE	WEAK	_ITM_registerTMCloneTable (0) 0
+  78: FUNC	GLOBAL	_init (0) 0x20020, rel: 0x20020 (.opd) [0x850, rel: 0 (.init)]
+EOF
+
+cat > testfile.symtab_pl.in <<\EOF
+   0: NOTYPE	LOCAL	 (0) 0
+   1: SECTION	LOCAL	 (0) 0x8001000238
+   2: SECTION	LOCAL	 (0) 0x800100024c
+   3: SECTION	LOCAL	 (0) 0x800100026c
+   4: SECTION	LOCAL	 (0) 0x8001000290
+   5: SECTION	LOCAL	 (0) 0x80010002c0
+   6: SECTION	LOCAL	 (0) 0x80010003e0
+   7: SECTION	LOCAL	 (0) 0x8001000488
+   8: SECTION	LOCAL	 (0) 0x80010004a0
+   9: SECTION	LOCAL	 (0) 0x80010004c0
+  10: SECTION	LOCAL	 (0) 0x8001000820
+  11: SECTION	LOCAL	 (0) 0x8001000850
+  12: SECTION	LOCAL	 (0) 0x80010008a0
+  13: SECTION	LOCAL	 (0) 0x8001000d30
+  14: SECTION	LOCAL	 (0) 0x8001000d4c
+  15: SECTION	LOCAL	 (0) 0x8001000d50
+  16: SECTION	LOCAL	 (0) 0x8001000d70
+  17: SECTION	LOCAL	 (0) 0x800101fde0
+  18: SECTION	LOCAL	 (0) 0x800101fde8
+  19: SECTION	LOCAL	 (0) 0x800101fdf0
+  20: SECTION	LOCAL	 (0) 0x800101fdf8
+  21: SECTION	LOCAL	 (0) 0x800101fe20
+  22: SECTION	LOCAL	 (0) 0x8001020000
+  23: SECTION	LOCAL	 (0) 0x8001020010
+  24: SECTION	LOCAL	 (0) 0x80010200d8
+  25: SECTION	LOCAL	 (0) 0x8001020110
+  26: SECTION	LOCAL	 (0) 0x8001020158
+  27: SECTION	LOCAL	 (0) 0
+  28: SECTION	LOCAL	 (0) 0
+  29: SECTION	LOCAL	 (0) 0
+  30: SECTION	LOCAL	 (0) 0
+  31: SECTION	LOCAL	 (0) 0
+  32: SECTION	LOCAL	 (0) 0
+  33: SECTION	LOCAL	 (0) 0
+  34: FILE	LOCAL	crtstuff.c (0) 0
+  35: OBJECT	LOCAL	__JCR_LIST__ (0) 0x800101fdf0
+  36: FUNC	LOCAL	deregister_tm_clones (0) 0x8001020040, rel: 0x20040 (.opd) [0x8001000910, rel: 0x70 (.text)]
+  37: FUNC	LOCAL	register_tm_clones (0) 0x8001020050, rel: 0x20050 (.opd) [0x8001000980, rel: 0xe0 (.text)]
+  38: FUNC	LOCAL	__do_global_dtors_aux (0) 0x8001020060, rel: 0x20060 (.opd) [0x80010009f0, rel: 0x150 (.text)]
+  39: OBJECT	LOCAL	completed.7711 (1) 0x8001020158
+  40: OBJECT	LOCAL	__do_global_dtors_aux_fini_array_entry (0) 0x800101fde8
+  41: FUNC	LOCAL	frame_dummy (0) 0x8001020070, rel: 0x20070 (.opd) [0x8001000a50, rel: 0x1b0 (.text)]
+  42: OBJECT	LOCAL	__frame_dummy_init_array_entry (0) 0x800101fde0
+  43: FILE	LOCAL	foo.c (0) 0
+  44: FILE	LOCAL	bar.c (0) 0
+  45: OBJECT	LOCAL	b1 (4) 0x8001020004
+  46: FUNC	LOCAL	foo (76) 0x8001020090, rel: 0x20090 (.opd) [0x8001000b34, rel: 0x294 (.text)]
+  47: FILE	LOCAL	crtstuff.c (0) 0
+  48: OBJECT	LOCAL	__FRAME_END__ (0) 0x8001000e18
+  49: OBJECT	LOCAL	__JCR_END__ (0) 0x800101fdf0
+  50: FILE	LOCAL	 (0) 0
+  51: NOTYPE	LOCAL	__glink_PLTresolve (0) 0x8001000ce8
+  52: NOTYPE	LOCAL	00000011.plt_call.__libc_start_main@@GLIBC_2.3 (0) 0x80010008a0
+  53: NOTYPE	LOCAL	00000011.plt_call.__cxa_finalize@@GLIBC_2.3 (0) 0x80010008b4
+  54: NOTYPE	LOCAL	__init_array_end (0) 0x800101fde8
+  55: OBJECT	LOCAL	_DYNAMIC (0) 0x800101fe20
+  56: NOTYPE	LOCAL	__init_array_start (0) 0x800101fde0
+  57: FUNC	GLOBAL	__libc_csu_fini (16) 0x80010200c0, rel: 0x200c0 (.opd) [0x8001000cd0, rel: 0x430 (.text)]
+  58: FUNC	GLOBAL	__libc_start_main@@GLIBC_2.3 (0) 0
+  59: NOTYPE	WEAK	_ITM_deregisterTMCloneTable (0) 0
+  60: NOTYPE	WEAK	data_start (0) 0x8001020000
+  61: NOTYPE	GLOBAL	_edata (0) 0x8001020110
+  62: FUNC	GLOBAL	bar (116) 0x80010200a0, rel: 0x200a0 (.opd) [0x8001000b80, rel: 0x2e0 (.text)]
+  63: FUNC	GLOBAL	_fini (0) 0x8001020030, rel: 0x20030 (.opd) [0x8001000d30, rel: 0 (.fini)]
+  64: NOTYPE	GLOBAL	__data_start (0) 0x8001020000
+  65: NOTYPE	WEAK	__gmon_start__ (0) 0
+  66: OBJECT	GLOBAL	__dso_handle (0) 0x800101fe18
+  67: OBJECT	GLOBAL	_IO_stdin_used (4) 0x8001000d4c
+  68: OBJECT	GLOBAL	b2 (4) 0x8001020008
+  69: FUNC	WEAK	__cxa_finalize@@GLIBC_2.3 (0) 0
+  70: FUNC	GLOBAL	__libc_csu_init (204) 0x80010200b0, rel: 0x200b0 (.opd) [0x8001000c00, rel: 0x360 (.text)]
+  71: NOTYPE	GLOBAL	_end (0) 0x8001020160
+  72: FUNC	GLOBAL	_start (60) 0x8001020010, rel: 0x20010 (.opd) [0x80010008c8, rel: 0x28 (.text)]
+  73: NOTYPE	GLOBAL	__bss_start (0) 0x8001020110
+  74: FUNC	GLOBAL	main (128) 0x8001020080, rel: 0x20080 (.opd) [0x8001000ab4, rel: 0x214 (.text)]
+  75: NOTYPE	WEAK	_Jv_RegisterClasses (0) 0
+  76: OBJECT	GLOBAL	__TMC_END__ (0) 0x8001020010
+  77: NOTYPE	WEAK	_ITM_registerTMCloneTable (0) 0
+  78: FUNC	GLOBAL	_init (0) 0x8001020020, rel: 0x20020 (.opd) [0x8001000850, rel: 0 (.init)]
+EOF
+
+cat > testfile.dynsym.in <<\EOF
+   0: NOTYPE	LOCAL	 (0) 0
+   1: SECTION	LOCAL	 (0) 0x238
+   2: SECTION	LOCAL	 (0) 0x1fdf0
+   3: FUNC	GLOBAL	__libc_start_main (0) 0
+   4: NOTYPE	WEAK	_ITM_deregisterTMCloneTable (0) 0
+   5: NOTYPE	WEAK	__gmon_start__ (0) 0
+   6: FUNC	WEAK	__cxa_finalize (0) 0
+   7: NOTYPE	WEAK	_Jv_RegisterClasses (0) 0
+   8: NOTYPE	WEAK	_ITM_registerTMCloneTable (0) 0
+   9: NOTYPE	GLOBAL	_edata (0) 0x20110
+  10: NOTYPE	GLOBAL	_end (0) 0x20160
+  11: NOTYPE	GLOBAL	__bss_start (0) 0x20110
+EOF
+
+cat > testfile.minsym.in <<\EOF
+   0: NOTYPE	LOCAL	 (0) 0
+   1: SECTION	LOCAL	 (0) 0x238
+   2: SECTION	LOCAL	 (0) 0x1fdf0
+   3: OBJECT	LOCAL	__do_global_dtors_aux_fini_array_entry (0) 0x1fde8
+   4: OBJECT	LOCAL	__frame_dummy_init_array_entry (0) 0x1fde0
+   5: NOTYPE	LOCAL	__glink_PLTresolve (0) 0xce8
+   6: NOTYPE	LOCAL	00000011.plt_call.__libc_start_main@@GLIBC_2.3 (0) 0x8a0
+   7: NOTYPE	LOCAL	00000011.plt_call.__cxa_finalize@@GLIBC_2.3 (0) 0x8b4
+   8: NOTYPE	LOCAL	__init_array_end (0) 0x1fde8
+   9: NOTYPE	LOCAL	__init_array_start (0) 0x1fde0
+  10: SECTION	LOCAL	 (0) 0x238
+  11: SECTION	LOCAL	 (0) 0x24c
+  12: SECTION	LOCAL	 (0) 0x26c
+  13: SECTION	LOCAL	 (0) 0x290
+  14: SECTION	LOCAL	 (0) 0x2c0
+  15: SECTION	LOCAL	 (0) 0x3e0
+  16: SECTION	LOCAL	 (0) 0x488
+  17: SECTION	LOCAL	 (0) 0x4a0
+  18: SECTION	LOCAL	 (0) 0x4c0
+  19: SECTION	LOCAL	 (0) 0x820
+  20: SECTION	LOCAL	 (0) 0x850
+  21: SECTION	LOCAL	 (0) 0x8a0
+  22: SECTION	LOCAL	 (0) 0xd30
+  23: SECTION	LOCAL	 (0) 0xd4c
+  24: SECTION	LOCAL	 (0) 0xd50
+  25: SECTION	LOCAL	 (0) 0xd70
+  26: SECTION	LOCAL	 (0) 0x1fde0
+  27: SECTION	LOCAL	 (0) 0x1fde8
+  28: SECTION	LOCAL	 (0) 0x1fdf0
+  29: SECTION	LOCAL	 (0) 0x1fdf8
+  30: SECTION	LOCAL	 (0) 0x1fe20
+  31: SECTION	LOCAL	 (0) 0x20000
+  32: SECTION	LOCAL	 (0) 0x20010
+  33: SECTION	LOCAL	 (0) 0x200d8
+  34: SECTION	LOCAL	 (0) 0x20110
+  35: SECTION	LOCAL	 (0) 0x20158
+  36: FUNC	GLOBAL	__libc_start_main (0) 0
+  37: NOTYPE	WEAK	_ITM_deregisterTMCloneTable (0) 0
+  38: NOTYPE	WEAK	__gmon_start__ (0) 0
+  39: FUNC	WEAK	__cxa_finalize (0) 0
+  40: NOTYPE	WEAK	_Jv_RegisterClasses (0) 0
+  41: NOTYPE	WEAK	_ITM_registerTMCloneTable (0) 0
+  42: NOTYPE	GLOBAL	_edata (0) 0x20110
+  43: NOTYPE	GLOBAL	_end (0) 0x20160
+  44: NOTYPE	GLOBAL	__bss_start (0) 0x20110
+EOF
+
+cat > testfile.minsym_pl.in <<\EOF
+   0: NOTYPE	LOCAL	 (0) 0
+   1: SECTION	LOCAL	 (0) 0x8001000238
+   2: SECTION	LOCAL	 (0) 0x800101fdf0
+   3: OBJECT	LOCAL	__do_global_dtors_aux_fini_array_entry (0) 0x800101fde8
+   4: OBJECT	LOCAL	__frame_dummy_init_array_entry (0) 0x800101fde0
+   5: NOTYPE	LOCAL	__glink_PLTresolve (0) 0x8001000ce8
+   6: NOTYPE	LOCAL	00000011.plt_call.__libc_start_main@@GLIBC_2.3 (0) 0x80010008a0
+   7: NOTYPE	LOCAL	00000011.plt_call.__cxa_finalize@@GLIBC_2.3 (0) 0x80010008b4
+   8: NOTYPE	LOCAL	__init_array_end (0) 0x800101fde8
+   9: NOTYPE	LOCAL	__init_array_start (0) 0x800101fde0
+  10: SECTION	LOCAL	 (0) 0x8001000238
+  11: SECTION	LOCAL	 (0) 0x800100024c
+  12: SECTION	LOCAL	 (0) 0x800100026c
+  13: SECTION	LOCAL	 (0) 0x8001000290
+  14: SECTION	LOCAL	 (0) 0x80010002c0
+  15: SECTION	LOCAL	 (0) 0x80010003e0
+  16: SECTION	LOCAL	 (0) 0x8001000488
+  17: SECTION	LOCAL	 (0) 0x80010004a0
+  18: SECTION	LOCAL	 (0) 0x80010004c0
+  19: SECTION	LOCAL	 (0) 0x8001000820
+  20: SECTION	LOCAL	 (0) 0x8001000850
+  21: SECTION	LOCAL	 (0) 0x80010008a0
+  22: SECTION	LOCAL	 (0) 0x8001000d30
+  23: SECTION	LOCAL	 (0) 0x8001000d4c
+  24: SECTION	LOCAL	 (0) 0x8001000d50
+  25: SECTION	LOCAL	 (0) 0x8001000d70
+  26: SECTION	LOCAL	 (0) 0x800101fde0
+  27: SECTION	LOCAL	 (0) 0x800101fde8
+  28: SECTION	LOCAL	 (0) 0x800101fdf0
+  29: SECTION	LOCAL	 (0) 0x800101fdf8
+  30: SECTION	LOCAL	 (0) 0x800101fe20
+  31: SECTION	LOCAL	 (0) 0x8001020000
+  32: SECTION	LOCAL	 (0) 0x8001020010
+  33: SECTION	LOCAL	 (0) 0x80010200d8
+  34: SECTION	LOCAL	 (0) 0x8001020110
+  35: SECTION	LOCAL	 (0) 0x8001020158
+  36: FUNC	GLOBAL	__libc_start_main (0) 0
+  37: NOTYPE	WEAK	_ITM_deregisterTMCloneTable (0) 0
+  38: NOTYPE	WEAK	__gmon_start__ (0) 0
+  39: FUNC	WEAK	__cxa_finalize (0) 0
+  40: NOTYPE	WEAK	_Jv_RegisterClasses (0) 0
+  41: NOTYPE	WEAK	_ITM_registerTMCloneTable (0) 0
+  42: NOTYPE	GLOBAL	_edata (0) 0x8001020110
+  43: NOTYPE	GLOBAL	_end (0) 0x8001020160
+  44: NOTYPE	GLOBAL	__bss_start (0) 0x8001020110
+EOF
+
+cat testfile.symtab.in \
+  | testrun_compare ${abs_builddir}/dwflsyms -e testfilebaztabppc64
+
+cat testfile.symtab.in \
+  | testrun_compare ${abs_builddir}/dwflsyms -e testfilebazdbgppc64
+
+cat testfile.symtab_pl.in \
+  | testrun_compare ${abs_builddir}/dwflsyms -e testfilebazdbgppc64_pl
+
+sed s/0x8001/0x4200/g testfile.symtab_pl.in \
+  | testrun_compare ${abs_builddir}/dwflsyms -e testfilebazdbgppc64_plr
+
+cat testfile.dynsym.in \
+  | testrun_compare ${abs_builddir}/dwflsyms -e testfilebazdynppc64
+
+cat testfile.symtab.in \
+  | testrun_compare ${abs_builddir}/dwflsyms -e testfilebazmdbppc64
+
+cat testfile.minsym.in \
+  | testrun_compare ${abs_builddir}/dwflsyms -e testfilebazminppc64
+
+cat testfile.minsym_pl.in \
+  | testrun_compare ${abs_builddir}/dwflsyms -e testfilebazminppc64_pl
+
+sed s/0x8001/0x4200/g testfile.minsym_pl.in \
+  | testrun_compare ${abs_builddir}/dwflsyms -e testfilebazminppc64_plr
+
 exit 0

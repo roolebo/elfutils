@@ -3290,10 +3290,10 @@ format_dwarf_addr (Dwfl_Module *dwflmod,
 {
   /* See if there is a name we can give for this address.  */
   GElf_Sym sym;
+  GElf_Off off = 0;
   const char *name = (print_address_names && ! print_unresolved_addresses)
-    ? dwfl_module_addrsym (dwflmod, address, &sym, NULL) : NULL;
-  if (name != NULL)
-    sym.st_value = address - sym.st_value;
+    ? dwfl_module_addrinfo (dwflmod, address, &off, &sym, NULL, NULL, NULL)
+    : NULL;
 
   const char *scn;
   if (print_unresolved_addresses)
@@ -3314,24 +3314,24 @@ format_dwarf_addr (Dwfl_Module *dwflmod,
 
   char *result;
   if ((name != NULL
-       ? (sym.st_value != 0
+       ? (off != 0
 	  ? (scn != NULL
 	     ? (address_size == 0
 		? asprintf (&result,
 			    gettext ("%s+%#" PRIx64 " <%s+%#" PRIx64 ">"),
-			    scn, address, name, sym.st_value)
+			    scn, address, name, off)
 		: asprintf (&result,
 			    gettext ("%s+%#0*" PRIx64 " <%s+%#" PRIx64 ">"),
 			    scn, 2 + address_size * 2, address,
-			    name, sym.st_value))
+			    name, off))
 	     : (address_size == 0
 		? asprintf (&result,
 			    gettext ("%#" PRIx64 " <%s+%#" PRIx64 ">"),
-			    address, name, sym.st_value)
+			    address, name, off)
 		: asprintf (&result,
 			    gettext ("%#0*" PRIx64 " <%s+%#" PRIx64 ">"),
 			    2 + address_size * 2, address,
-			    name, sym.st_value)))
+			    name, off)))
 	  : (scn != NULL
 	     ? (address_size == 0
 		? asprintf (&result,

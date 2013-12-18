@@ -1,5 +1,12 @@
 2013-12-18  Mark Wielaard  <mjw@redhat.com>
 
+	* Makefile.am (ppc64_SRCS): Add ppc64_resolve_sym.c.
+	* ppc64_resolve_sym.c: New file.
+	* ppc64_init.c: Hook resolve_sym_value and find function descriptor
+	table.
+
+2013-12-18  Mark Wielaard  <mjw@redhat.com>
+
 	* s390_initreg.c (s390_set_initial_registers_tid): Use union
 	to avoid type-punning when assigning a double to a Dwarf_Word.
 

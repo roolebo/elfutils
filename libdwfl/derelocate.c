@@ -1,5 +1,5 @@
 /* Recover relocatibility for addresses computed from debug information.
-   Copyright (C) 2005-2010 Red Hat, Inc.
+   Copyright (C) 2005-2010, 2013 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -328,6 +328,17 @@ find_section (Dwfl_Module *mod, Dwarf_Addr *addr)
 
   __libdwfl_seterrno (DWFL_E (LIBDW, DWARF_E_NO_MATCH));
   return -1;
+}
+
+size_t
+internal_function
+__libdwfl_find_section_ndx (Dwfl_Module *mod, Dwarf_Addr *addr)
+{
+  int idx = find_section (mod, addr);
+  if (unlikely (idx == -1))
+    return SHN_UNDEF;
+
+  return elf_ndxscn (mod->reloc_info->refs[idx].scn);
 }
 
 int

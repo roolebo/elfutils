@@ -1,3 +1,34 @@
+2013-12-18  Mark Wielaard  <mjw@redhat.com>
+
+	* derelocate.c (__libdwfl_find_section_ndx): New internal function.
+	* dwfl_module_addrname.c (dwfl_module_addrname): Use
+	dwfl_module_addrinfo.
+	* dwfl_module_addrsym.c (dwfl_module_addrsym_elf): Replace with...
+	(__libdwfl_addrsym): ...this. Use __libdwfl_getsym, use value
+	for comparisons, not st_value. Fill in off. Search for both value
+	and the (adjusted) sym.st_value when different.
+	(dwfl_module_addrsym): Implement using __libdwfl_addrsym.
+	(dwfl_module_addrinfo): New function.
+	* dwfl_module_getsym.c (dwfl_module_getsym_elf): Replace with...
+	(__libdwfl_getsym): ...this. Use ebl_resolve_sym_value if requested
+	and possible. Adjust sym->st_value only when requested. Fill in addr
+	if available.
+	(dwfl_module_getsym_info): New function.
+	(dwfl_module_getsym): Use __libdwfl_getsym.
+	* libdwfl.h (dwfl_module_getsym_elf): Removed.
+	(dwfl_module_getsym_info): New function declaration.
+	(dwfl_module_addrinfo): Likewise.
+	(dwfl_module_addrsym): Add documentation describing differences
+	with addrinfo variants.
+	(dwfl_module_addrsym_elf): Removed.
+	* libdwflP.h (__libdwfl_getsym): New internal function declaration.
+	(__libdwfl_addrsym): Likewise.
+	(__libdwfl_find_section_ndx): Likewise.
+	(dwfl_module_addrinfo): New internal declaration.
+	(dwfl_module_getsym_info): Likewise.
+	(dwfl_module_addrsym_elf): Removed.
+	(dwfl_module_getsym_elf): Likewise.
+
 2013-12-18  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* argp-std.c (offline_find_elf): Remove.

@@ -284,7 +284,7 @@ ELFUTILS_0.158 {
     dwfl_thread_getframes;
     dwfl_frame_pc;
 
-    dwfl_module_addrsym_elf;
-    dwfl_module_getsym_elf;
     dwfl_module_getsymtab_first_global;
+    dwfl_module_addrinfo;
+    dwfl_module_getsym_info;
 } ELFUTILS_0.157;

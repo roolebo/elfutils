@@ -61,6 +61,7 @@ static const struct argp_option options[] =
     N_("Show absolute file names using compilation directory"), 0 },
   { "functions", 'f', NULL, 0, N_("Also show function names"), 0 },
   { "symbols", 'S', NULL, 0, N_("Also show symbol or section names"), 0 },
+  { "symbols-sections", 'x', NULL, 0, N_("Also show symbol and the section names"), 0 },
   { "flags", 'F', NULL, 0, N_("Also show line table flags"), 0 },
   { "section", 'j', "NAME", 0,
     N_("Treat addresses as offsets relative to NAME section."), 0 },
@@ -113,6 +114,9 @@ static bool show_functions;
 
 /* True if ELF symbol or section info should be shown.  */
 static bool show_symbols;
+
+/* True if section associated with a symbol address should be shown.  */
+static bool show_symbol_sections;
 
 /* If non-null, take address parameters as relative to named section.  */
 static const char *just_section;
@@ -234,6 +238,11 @@ parse_opt (int key, char *arg, struct argp_state *state)
       show_symbols = true;
       break;
 
+    case 'x':
+      show_symbols = true;
+      show_symbol_sections = true;
+      break;
+
     case 'j':
       just_section = arg;
       break;
@@ -342,8 +351,9 @@ static void
 print_addrsym (Dwfl_Module *mod, GElf_Addr addr)
 {
   GElf_Sym s;
-  GElf_Word shndx;
-  const char *name = dwfl_module_addrsym (mod, addr, &s, &shndx);
+  GElf_Off off;
+  const char *name = dwfl_module_addrinfo (mod, addr, &off, &s,
+					   NULL, NULL, NULL);
   if (name == NULL)
     {
       /* No symbol name.  Get a section name instead.  */
@@ -355,10 +365,34 @@ print_addrsym (Dwfl_Module *mod, GElf_Addr addr)
       else
 	printf ("(%s)+%#" PRIx64 "\n", name, addr);
     }
-  else if (addr == s.st_value)
-    puts (name);
   else
-    printf ("%s+%#" PRIx64 "\n", name, addr - s.st_value);
+    {
+      if (off == 0)
+	printf ("%s", name);
+      else
+	printf ("%s+%#" PRIx64 "", name, off);
+
+      // Also show section name for address.
+      if (show_symbol_sections)
+	{
+	  Dwarf_Addr ebias;
+	  Elf_Scn *scn = dwfl_module_address_section (mod, &addr, &ebias);
+	  if (scn != NULL)
+	    {
+	      GElf_Shdr shdr_mem;
+	      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+	      if (shdr != NULL)
+		{
+		  Elf *elf = dwfl_module_getelf (mod, &ebias);
+		  GElf_Ehdr ehdr;
+		  if (gelf_getehdr (elf, &ehdr) != NULL)
+		    printf (" (%s)", elf_strptr (elf, ehdr.e_shstrndx,
+						 shdr->sh_name));
+		}
+	    }
+	}
+      puts ("");
+    }
 }
 
 static void
@@ -401,11 +435,14 @@ find_symbol (Dwfl_Module *mod,
 {
   const char *looking_for = ((void **) arg)[0];
   GElf_Sym *symbol = ((void **) arg)[1];
+  GElf_Addr *value = ((void **) arg)[2];
 
   int n = dwfl_module_getsymtab (mod);
   for (int i = 1; i < n; ++i)
     {
-      const char *symbol_name = dwfl_module_getsym (mod, i, symbol, NULL);
+      const char *symbol_name = dwfl_module_getsym_info (mod, i, symbol,
+							 value, NULL, NULL,
+							 NULL);
       if (symbol_name == NULL || symbol_name[0] == '\0')
 	continue;
       switch (GELF_ST_TYPE (symbol->st_info))
@@ -519,7 +556,8 @@ handle_address (const char *string, Dwfl *dwfl)
 
 	  /* It was symbol[+offset].  */
 	  GElf_Sym sym;
-	  void *arg[2] = { name, &sym };
+	  GElf_Addr value = 0;
+	  void *arg[3] = { name, &sym, &value };
 	  (void) dwfl_getmodules (dwfl, &find_symbol, arg, 0);
 	  if (arg[0] != NULL)
 	    error (0, 0, gettext ("cannot find symbol '%s'"), name);
@@ -530,7 +568,7 @@ handle_address (const char *string, Dwfl *dwfl)
 		       gettext ("offset %#" PRIxMAX " lies outside"
 				" contents of '%s'"),
 		       addr, name);
-	      addr += sym.st_value;
+	      addr += value;
 	      parsed = true;
 	    }
 	  break;

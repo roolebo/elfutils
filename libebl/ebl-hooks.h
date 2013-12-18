@@ -183,5 +183,10 @@ bool EBLHOOK(unwind) (Ebl *ebl, Dwarf_Addr pc, ebl_tid_registers_t *setfunc,
 		      ebl_pid_memory_read_t *readfunc, void *arg,
 		      bool *signal_framep);
 
+/* Returns true if the value can be resolved to an address in an
+   allocated section, which will be returned in *SHNDXP.
+   (e.g. function descriptor resolving)  */
+bool EBLHOOK(resolve_sym_value) (Ebl *ebl, GElf_Addr *addr);
+
 /* Destructor for ELF backend handle.  */
 void EBLHOOK(destr) (struct ebl *);

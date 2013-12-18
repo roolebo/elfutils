@@ -1,4 +1,26 @@
 2013-12-18  Jan Kratochvil  <jan.kratochvil@redhat.com>
+	    Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (EXTRA_DIST): Add testfile66.bz2, testfile66.core.bz2
+	and testfilebaz*ppc64*.bz2 files.
+	* dwflsyms.c (list_syms): Remove unused from parameter mod_name.  Print
+	error on dwfl_module_getsymtab error.
+	(list_syms): Use dwfl_module_getsym and dwfl_module_getsym_info.
+	Compare values for non-ET_REL. Use dwfl_module_addrinfo.
+	Also print section of actual value if different from sym.
+	* run-addrname-test.sh (testfile66, testfile66.core): New tests.
+	Test addr2line -x by showing different sections for address and
+	found name in testfile66.
+	* run-dwflsyms.sh (testfile66, testfile66.core, hello_ppc64.ko,
+	testfilebaz*ppc64): New tests.
+	* testfile66.bz2, testfile66.core.bz2, testfilebazdbgppc64.bz2,
+	testfilebazdbgppc64.debug.bz2, testfilebazdbgppc64_pl.bz2,
+	testfilebazdbgppc64_plr.bz2, testfilebazdynppc64.bz2,
+	testfilebazmdbppc64.bz2, testfilebazminppc64.bz2,
+	testfilebazminppc64_pl.bz2, testfilebazminppc64_plr.bz2,
+	testfilebaztabppc64.bz2: New test files.
+
+2013-12-18  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	unwinder: s390 and s390x
 	* Makefile.am (TESTS): Add run-backtrace-core-s390x.sh and

@@ -1,3 +1,15 @@
+2013-12-18  Mark Wielaard  <mjw@redhat.com>
+
+	* addr2line.c (options): Add symbol-sections, 'x'.
+	(show_symbol_sections): New static bool.
+	(parse_opt): Handle 'x'.
+	(print_addrsym): Use dwfl_module_addrinfo value.r
+	Also show section of address with show_symbol_sections.
+	(find_symbol): Use dwfl_module_getsym_info and set value.
+	(handle_address): Request value and use it instead of sym.st_value.
+	* readelf.c (format_dwarf_addr): Use dwfl_module_addrinfo to get
+	name and offset.
+
 2013-12-17  Masatake YAMATO  <yamato@redhat.com>
 	    Mark Wielaard  <mjw@redhat.com>
 

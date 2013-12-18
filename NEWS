@@ -1,12 +1,15 @@
 Version 0.158
 
 libdwfl: dwfl_core_file_report has new parameter executable.
-         New function dwfl_module_getsymtab_first_global.
+         New functions dwfl_module_getsymtab_first_global,
+         dwfl_module_getsym_info and dwfl_module_addrinfo.
          Added unwinder with type Dwfl_Thread_Callbacks, opaque types
          Dwfl_Thread and Dwfl_Frame and functions dwfl_attach_state,
          dwfl_pid, dwfl_thread_dwfl, dwfl_thread_tid, dwfl_frame_thread,
          dwfl_thread_state_registers, dwfl_thread_state_register_pc,
          dwfl_getthreads, dwfl_thread_getframes and dwfl_frame_pc.
+
+addr2line: New option -x to show the section an address was found in.
 
 Version 0.157
 

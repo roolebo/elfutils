@@ -213,6 +213,11 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfilebaztab.bz2 testfilebasmin.bz2 \
 	     testfilebazdbg_pl.bz2 testfilebazmin_pl.bz2 \
 	     testfilebazdbg_plr.bz2 testfilebazmin_plr.bz2 \
+	     testfilebazdbgppc64.bz2 testfilebazdbgppc64.debug.bz2 \
+	     testfilebazdbgppc64_pl.bz2 testfilebazdbgppc64_plr.bz2 \
+	     testfilebazdynppc64.bz2 testfilebazmdbppc64.bz2 \
+	     testfilebazminppc64.bz2 testfilebazminppc64_pl.bz2 \
+	     testfilebazminppc64_plr.bz2 testfilebaztabppc64.bz2 \
 	     run-dwflsyms.sh \
 	     run-unstrip-n.sh testcore-rtlib.bz2 testcore-rtlib-ppc.bz2 \
 	     run-low_high_pc.sh testfile_low_high_pc.bz2 \
@@ -248,7 +253,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     backtrace-subr.sh backtrace.i386.core.bz2 backtrace.i386.exec.bz2 \
 	     backtrace.x86_64.core.bz2 backtrace.x86_64.exec.bz2 \
 	     backtrace.ppc.core.bz2 backtrace.ppc.exec.bz2 \
-	     run-backtrace-core-ppc.sh \
+	     run-backtrace-core-ppc.sh testfile66.bz2 testfile66.core.bz2 \
 	     backtrace.s390x.core.bz2 backtrace.s390x.exec.bz2 \
 	     backtrace.s390.core.bz2 backtrace.s390.exec.bz2 \
 	     run-backtrace-core-s390x.sh run-backtrace-core-s390.sh

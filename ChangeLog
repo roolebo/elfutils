@@ -1,3 +1,11 @@
+2013-12-17  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* NEWS (Version 0.158) (libdwfl): Added Dwfl_Thread_Callbacks,
+	Dwfl_Thread, Dwfl_Frame, dwfl_attach_state, dwfl_pid, dwfl_thread_dwfl,
+	dwfl_thread_tid, dwfl_frame_thread, dwfl_thread_state_registers,
+	dwfl_thread_state_register_pc, dwfl_getthreads, dwfl_thread_getframes
+	and dwfl_frame_pc.
+
 2013-12-16  Mark Wielaard  <mjw@redhat.com>
 
 	* NEWS (libdwfl): Add dwfl_module_getsymtab_first_global.

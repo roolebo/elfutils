@@ -68,8 +68,19 @@ s390_set_initial_registers_tid (pid_t tid __attribute__ ((unused)),
   eu_static_assert (sizeof user_regs.regs.fp_regs.fprs[0]
 		    == sizeof dwarf_regs[0]);
   for (unsigned u = 0; u < 16; u++)
-    dwarf_regs[u] = *((const __typeof (dwarf_regs[0]) *)
-		      &user_regs.regs.fp_regs.fprs[u]);
+    {
+      // Store the double bits as is in the Dwarf_Word without conversion.
+      union
+	{
+	  double d;
+	  Dwarf_Word w;
+	} fpr = { .d = user_regs.regs.fp_regs.fprs[u] };
+      dwarf_regs[u] = fpr.w;
+    }
+   if (! setfunc (16, 16, dwarf_regs, arg))
+     return false;
+   dwarf_regs[0] = user_regs.regs.psw.addr;
+
   if (! setfunc (16, 16, dwarf_regs, arg))
     return false;
   dwarf_regs[0] = user_regs.regs.psw.addr;

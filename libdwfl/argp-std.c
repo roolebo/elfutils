@@ -60,32 +60,6 @@ static const struct argp_option options[] =
   { NULL, 0, NULL, 0, NULL, 0 }
 };
 
-/* Wrapper to provide proper FILE_NAME for -e|--executable.  */
-static int
-offline_find_elf (Dwfl_Module *mod, void **userdata, const char *modname,
-		  Dwarf_Addr base, char **file_name, Elf **elfp)
-{
-  if (modname != NULL && (strcmp (modname, "[exe]") == 0
-			  || strcmp (modname, "[pie]") == 0)
-      && mod->dwfl->executable_for_core)
-    {
-      /* When both --core and --executable are given in whatever order
-	 dwfl_core_file_report is called first and this callback will replace
-	 the Dwfl_Module main.name with the recorded --executable file when the
-	 modname is [exe] or [pie] (which then triggers opening and reporting
-	 of the executable).  */
-      char *e_dup = strdup (mod->dwfl->executable_for_core);
-      if (e_dup)
-	{
-	  free (*file_name);
-	  *file_name = e_dup;
-	  return -1;
-	}
-    }
-  return INTUSE(dwfl_build_id_find_elf) (mod, userdata, modname, base,
-                                         file_name, elfp);
-}
-
 static char *debuginfo_path;
 
 static const Dwfl_Callbacks offline_callbacks =
@@ -96,7 +70,7 @@ static const Dwfl_Callbacks offline_callbacks =
     .section_address = INTUSE(dwfl_offline_section_address),
 
     /* We use this table for core files too.  */
-    .find_elf = offline_find_elf,
+    .find_elf = INTUSE(dwfl_build_id_find_elf),
   };
 
 static const Dwfl_Callbacks proc_callbacks =

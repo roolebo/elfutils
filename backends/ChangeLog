@@ -1,6 +1,6 @@
 2013-12-18  Mark Wielaard  <mjw@redhat.com>
 
-	* 390_initreg.c (s390_set_initial_registers_tid): Use union
+	* s390_initreg.c (s390_set_initial_registers_tid): Use union
 	to avoid type-punning when assigning a double to a Dwarf_Word.
 
 2013-12-18  Jan Kratochvil  <jan.kratochvil@redhat.com>

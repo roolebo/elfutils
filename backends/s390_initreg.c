@@ -77,9 +77,6 @@ s390_set_initial_registers_tid (pid_t tid __attribute__ ((unused)),
 	} fpr = { .d = user_regs.regs.fp_regs.fprs[u] };
       dwarf_regs[u] = fpr.w;
     }
-   if (! setfunc (16, 16, dwarf_regs, arg))
-     return false;
-   dwarf_regs[0] = user_regs.regs.psw.addr;
 
   if (! setfunc (16, 16, dwarf_regs, arg))
     return false;

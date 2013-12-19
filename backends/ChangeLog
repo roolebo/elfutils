@@ -1,3 +1,8 @@
+2013-12-19  Mark Wielaard  <mjw@redhat.com>
+
+	* aarch64_init.c (aarch64_init): Hook check_special_symbol.
+	* aarch64_symbol.c (aarch64_check_special_symbol): New function.
+
 2013-12-18  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (ppc64_SRCS): Add ppc64_resolve_sym.c.

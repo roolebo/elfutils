@@ -32,6 +32,7 @@
 
 #include <elf.h>
 #include <stddef.h>
+#include <string.h>
 
 #define BACKEND		aarch64_
 #include "libebl_CPU.h"
@@ -53,4 +54,31 @@ aarch64_reloc_simple_type (Ebl *ebl __attribute__ ((unused)), int type)
     default:
       return ELF_T_NUM;
     }
+}
+
+/* If this is the _GLOBAL_OFFSET_TABLE_ symbol, then it should point to
+   .got[0] even if there is a .got.plt section.  */
+bool
+aarch64_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr, const GElf_Sym *sym,
+                              const char *name, const GElf_Shdr *destshdr)
+{
+  if (name != NULL
+      && strcmp (name, "_GLOBAL_OFFSET_TABLE_") == 0)
+    {
+      const char *sname = elf_strptr (elf, ehdr->e_shstrndx, destshdr->sh_name);
+      if (sname != NULL && strcmp (sname, ".got.plt") == 0)
+	{
+	  Elf_Scn *scn = NULL;
+	  while ((scn = elf_nextscn (elf, scn)) != NULL)
+	    {
+	      GElf_Shdr shdr_mem;
+	      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+	      sname = elf_strptr (elf, ehdr->e_shstrndx, shdr->sh_name);
+	      if (sname != NULL && strcmp (sname, ".got") == 0)
+		return sym->st_value == shdr->sh_addr;
+	    }
+	}
+    }
+
+  return false;
 }

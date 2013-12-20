@@ -1,5 +1,5 @@
 /* Standard libdwfl callbacks for debugging the running Linux kernel.
-   Copyright (C) 2005-2011 Red Hat, Inc.
+   Copyright (C) 2005-2011, 2013 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -251,9 +251,10 @@ report_kernel_archive (Dwfl *dwfl, const char **release,
     return result;
 
   char *archive;
-  if (unlikely ((*release)[0] == '/'
-		? asprintf (&archive, "%s/debug.a", *release)
-		: asprintf (&archive, MODULEDIRFMT "/debug.a", *release) < 0))
+  int res = (((*release)[0] == '/')
+	     ? asprintf (&archive, "%s/debug.a", *release)
+	     : asprintf (&archive, MODULEDIRFMT "/debug.a", *release));
+  if (unlikely (res < 0))
     return ENOMEM;
 
   int fd = try_kernel_name (dwfl, &archive, false);

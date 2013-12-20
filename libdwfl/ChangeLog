@@ -1,3 +1,8 @@
+2013-12-20  Mark Wielaard  <mjw@redhat.com>
+
+	* linux-kernel-modules.c (report_kernel_archive): Correct nested
+	asprintf result check for debug.a.
+
 2013-12-18  Mark Wielaard  <mjw@redhat.com>
 
 	* derelocate.c (__libdwfl_find_section_ndx): New internal function.

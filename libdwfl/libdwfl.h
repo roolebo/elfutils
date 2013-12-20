@@ -662,6 +662,17 @@ typedef struct
   pid_t (*next_thread) (Dwfl *dwfl, void *dwfl_arg, void **thread_argp)
     __nonnull_attribute__ (1);
 
+  /* Called to get a specific thread.  Returns true if there is a
+     thread with the given thread id number, returns false if no such
+     thread exists and will set dwfl_errno in that case.  THREAD_ARGP
+     is never NULL.  *THREAD_ARGP will be passed to
+     set_initial_registers or thread_detach callbacks together with
+     Dwfl_Thread *thread.  This method may be NULL and will then be
+     emulated using the next_thread callback. */
+  bool (*get_thread) (Dwfl *dwfl, pid_t tid, void *dwfl_arg,
+		      void **thread_argp)
+    __nonnull_attribute__ (1);
+
   /* Called during unwinding to access memory (stack) state.  Returns true for
      successfully read *RESULT or false and sets dwfl_errno () on failure.
      This method may be NULL - in such case dwfl_thread_getframes will return
@@ -761,6 +772,16 @@ int dwfl_thread_getframes (Dwfl_Thread *thread,
 			   int (*callback) (Dwfl_Frame *state, void *arg),
 			   void *arg)
   __nonnull_attribute__ (1, 2);
+
+/* Like dwfl_thread_getframes, but specifying the thread by its unique
+   identifier number.  Returns zero if all frames have been processed
+   by the callback, returns -1 on error (and when no thread with
+   the given thread id number exists), or the value of the callback
+   when not DWARF_CB_OK.  -1 returned on error will set dwfl_errno ().  */
+int dwfl_getthread_frames (Dwfl *dwfl, pid_t tid,
+			   int (*callback) (Dwfl_Frame *thread, void *arg),
+			   void *arg)
+  __nonnull_attribute__ (1, 3);
 
 /* Return *PC (program counter) for thread-specific frame STATE.
    Set *ISACTIVATION according to DWARF frame "activation" definition.

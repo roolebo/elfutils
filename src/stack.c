@@ -39,6 +39,7 @@ ARGP_PROGRAM_BUG_ADDRESS_DEF = PACKAGE_BUGREPORT;
 static bool show_activation = false;
 static bool show_module = false;
 static bool show_source = false;
+static bool show_one_tid = false;
 
 static int
 frame_callback (Dwfl_Frame *state, void *arg)
@@ -170,6 +171,10 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
       show_activation = show_source = show_module = true;
       break;
 
+    case '1':
+      show_one_tid = true;
+      break;
+
     default:
       return ARGP_ERR_UNKNOWN;
     }
@@ -197,6 +202,8 @@ main (int argc, char **argv)
 	N_("Additionally show source file information"), 0 },
       { "verbose", 'v', NULL, 0,
 	N_("Show all additional information (activation, module and source)"), 0 },
+      { NULL, '1', NULL, 0,
+	N_("Show the backtrace of only one thread"), 0 },
       { NULL, 0, NULL, 0, NULL, 0 }
     };
 
@@ -221,23 +228,42 @@ Only real user processes are supported, no kernel or process maps."),
   argp_parse (&argp, argc, argv, 0, &remaining, &dwfl);
   assert (dwfl != NULL);
   if (remaining != argc)
-    error (2, 0, "eu-stack [-a] [-m] [-s] [-v] [--debuginfo-path=<path>] {-p <process id>|"
-		 "--core=<file> [--executable=<file>]|--help}");
+    error (2, 0, "eu-stack [-a] [-m] [-s] [-v] [-1] [--debuginfo-path=<path>]"
+	   " {-p <process id>|--core=<file> [--executable=<file>]|--help}");
 
   /* dwfl_linux_proc_report has been already called from dwfl_standard_argp's
      parse_opt function.  */
   if (dwfl_report_end (dwfl, NULL, NULL) != 0)
     error (2, 0, "dwfl_report_end: %s", dwfl_errmsg (-1));
 
-  switch (dwfl_getthreads (dwfl, thread_callback, NULL))
+  if (show_one_tid)
     {
-    case DWARF_CB_OK:
-      break;
-    case -1:
-      error (0, 0, "dwfl_getthreads: %s", dwfl_errmsg (-1));
-      break;
-    default:
-      abort ();
+      pid_t tid = dwfl_pid (dwfl);
+      unsigned frameno = 0;
+      switch (dwfl_getthread_frames (dwfl, tid, frame_callback, &frameno))
+	{
+	case DWARF_CB_OK:
+	  break;
+	case -1:
+	  error (0, 0, "dwfl_getthread_frames (%d): %s", tid,
+		 dwfl_errmsg (-1));
+	  break;
+	default:
+	  abort ();
+	}
+    }
+  else
+    {
+      switch (dwfl_getthreads (dwfl, thread_callback, NULL))
+	{
+	case DWARF_CB_OK:
+	  break;
+	case -1:
+	  error (0, 0, "dwfl_getthreads: %s", dwfl_errmsg (-1));
+	  break;
+	default:
+	  abort ();
+	}
     }
   dwfl_end (dwfl);
 

@@ -1,3 +1,8 @@
+2013-12-20  Mark Wielaard  <mjw@redhat.com>
+
+	* NEWS (libdwfl): Add dwfl_getthread_frames.
+	(stack): New entry.
+
 2013-12-18  Mark Wielaard  <mjw@redhat.com>
 
 	* NEWS (libdwfl): Add dwfl_module_getsym_info and

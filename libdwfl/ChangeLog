@@ -1,5 +1,21 @@
 2013-12-20  Mark Wielaard  <mjw@redhat.com>
 
+	* dwfl_frame.c (one_arg): New struct.
+	(get_one_thread_cb): New function.
+	(dwfl_getthread): Likewise.
+	(one_thread): New struct.
+	(get_one_thread_frames_cb): New function.
+	(dwfl_getthread_frames): Likewise.
+	* libdwfl.h (Dwfl_Thread_Callbacks): Add get_thread function.
+	(dwfl_getthread_frames): Likewise.
+	* libdwflP.h (dwfl_getthread_frames): New internal function declaration.
+	* linux-core-attach.c (core_thread_callbacks): Initialize get_thread
+	to NULL.
+	* linux-pid-attach.c (pid_getthread): New function.
+	(pid_thread_callbacks): Initialize get_thread to pid_getthread.
+
+2013-12-20  Mark Wielaard  <mjw@redhat.com>
+
 	* linux-kernel-modules.c (report_kernel_archive): Correct nested
 	asprintf result check for debug.a.
 

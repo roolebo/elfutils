@@ -288,6 +288,7 @@ core_detach (Dwfl *dwfl __attribute__ ((unused)), void *dwfl_arg)
 static const Dwfl_Thread_Callbacks core_thread_callbacks =
 {
   core_next_thread,
+  NULL, /* get_thread */
   core_memory_read,
   core_set_initial_registers,
   core_detach,

@@ -1,3 +1,10 @@
+2013-12-20  Mark Wielaard  <mjw@redhat.com>
+
+	* stack.c (show_one_tid): New static boolean.
+	(parse_opt): Handle '-1'.
+	(main): Add -1 to options. Call dwfl_getthread_frames when
+	show_one_tid is true.
+
 2013-12-18  Mark Wielaard  <mjw@redhat.com>
 
 	* addr2line.c (options): Add symbol-sections, 'x'.

@@ -201,6 +201,20 @@ pid_next_thread (Dwfl *dwfl __attribute__ ((unused)), void *dwfl_arg,
   return tid;
 }
 
+/* Just checks that the thread id exists.  */
+static bool
+pid_getthread (Dwfl *dwfl __attribute__ ((unused)), pid_t tid,
+	       void *dwfl_arg, void **thread_argp)
+{
+  *thread_argp = dwfl_arg;
+  if (kill (tid, 0) < 0)
+    {
+      __libdwfl_seterrno (DWFL_E_ERRNO);
+      return false;
+    }
+  return true;
+}
+
 /* Implement the ebl_set_initial_registers_tid setfunc callback.  */
 
 static bool
@@ -260,6 +274,7 @@ pid_thread_detach (Dwfl_Thread *thread, void *thread_arg)
 static const Dwfl_Thread_Callbacks pid_thread_callbacks =
 {
   pid_next_thread,
+  pid_getthread,
   pid_memory_read,
   pid_set_initial_registers,
   pid_detach,

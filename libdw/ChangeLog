@@ -1,3 +1,7 @@
+2013-12-20  Mark Wielaard  <mjw@redhat.com>
+
+	* libdw.map (ELFUTILS_0.158): Add dwfl_getthread_frames.
+
 2013-12-18  Mark Wielaard  <mjw@redhat.com>
 
 	* libdw.map (ELFUTILS_0.158): Remove dwfl_module_addrsym_elf and

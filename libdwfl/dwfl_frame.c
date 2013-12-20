@@ -273,6 +273,103 @@ dwfl_getthreads (Dwfl *dwfl, int (*callback) (Dwfl_Thread *thread, void *arg),
 }
 INTDEF(dwfl_getthreads)
 
+struct one_arg
+{
+  pid_t tid;
+  bool seen;
+  int (*callback) (Dwfl_Thread *thread, void *arg);
+  void *arg;
+  int ret;
+};
+
+static int
+get_one_thread_cb (Dwfl_Thread *thread, void *arg)
+{
+  struct one_arg *oa = (struct one_arg *) arg;
+  if (! oa->seen && INTUSE(dwfl_thread_tid) (thread) == oa->tid)
+    {
+      oa->seen = true;
+      oa->ret = oa->callback (thread, oa->arg);
+      return DWARF_CB_ABORT;
+    }
+
+  return DWARF_CB_OK;
+}
+
+/* Note not currently exported, will be when there are more Dwfl_Thread
+   properties to query.  Use dwfl_getthread_frames for now directly.  */
+static int
+getthread (Dwfl *dwfl, pid_t tid,
+	   int (*callback) (Dwfl_Thread *thread, void *arg),
+	   void *arg)
+{
+  Dwfl_Process *process = dwfl->process;
+  if (process == NULL)
+    {
+      __libdwfl_seterrno (dwfl->process_attach_error);
+      return -1;
+    }
+
+  if (process->callbacks->get_thread != NULL)
+    {
+      Dwfl_Thread thread;
+      thread.process = process;
+      thread.unwound = NULL;
+      thread.callbacks_arg = NULL;
+
+      if (process->callbacks->get_thread (dwfl, tid, process->callbacks_arg,
+					  &thread.callbacks_arg))
+	{
+	  int err;
+	  thread.tid = tid;
+	  err = callback (&thread, arg);
+	  thread_free_all_states (&thread);
+	  return err;
+	}
+
+      return -1;
+    }
+
+   struct one_arg oa = { .tid = tid, .callback = callback,
+			 .arg = arg, .seen = false };
+   int err = INTUSE(dwfl_getthreads) (dwfl, get_one_thread_cb, &oa);
+
+   if (err == DWARF_CB_ABORT && oa.seen)
+     return oa.ret;
+
+   if (err == DWARF_CB_OK && ! oa.seen)
+     {
+	errno = ESRCH;
+	__libdwfl_seterrno (DWFL_E_ERRNO);
+	return -1;
+     }
+
+   return err;
+}
+
+struct one_thread
+{
+  int (*callback) (Dwfl_Frame *frame, void *arg);
+  void *arg;
+};
+
+static int
+get_one_thread_frames_cb (Dwfl_Thread *thread, void *arg)
+{
+  struct one_thread *ot = (struct one_thread *) arg;
+  return INTUSE(dwfl_thread_getframes) (thread, ot->callback, ot->arg);
+}
+
+int
+dwfl_getthread_frames (Dwfl *dwfl, pid_t tid,
+		       int (*callback) (Dwfl_Frame *frame, void *arg),
+		       void *arg)
+{
+  struct one_thread ot = { .callback = callback, .arg = arg };
+  return getthread (dwfl, tid, get_one_thread_frames_cb, &ot);
+}
+INTDEF(dwfl_getthread_frames)
+
 int
 dwfl_thread_getframes (Dwfl_Thread *thread,
 		       int (*callback) (Dwfl_Frame *state, void *arg),

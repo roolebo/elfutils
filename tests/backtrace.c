@@ -118,7 +118,13 @@ callback_verify (pid_t tid, unsigned frameno, Dwarf_Addr pc,
       mod = dwfl_addrmodule (dwfl, pc);
       if (mod)
 	symname2 = dwfl_module_addrname (mod, pc);
-      assert (symname2 == NULL || strcmp (symname2, "backtracegen") != 0);
+
+      // Note that the following assert might in theory even fail on x86_64,
+      // there is no guarantee that the compiler doesn't reorder the
+      // instructions or even inserts some padding instructions at the end
+      // (which apparently happens on ppc64).
+      if (is_x86_64_native)
+        assert (symname2 == NULL || strcmp (symname2, "backtracegen") != 0);
       break;
   }
 }

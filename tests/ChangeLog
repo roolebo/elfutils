@@ -1,3 +1,8 @@
+2013-12-21  Mark Wielaard  <mjw@redhat.com>
+
+	* backtrace.c (callback_verify): Only assert that case 5 is the last
+	instruction of backtracegen on x86_64 native.
+
 2013-12-18  Jan Kratochvil  <jan.kratochvil@redhat.com>
 	    Mark Wielaard  <mjw@redhat.com>
 

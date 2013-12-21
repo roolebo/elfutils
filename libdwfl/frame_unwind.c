@@ -536,6 +536,12 @@ handle_cfi (Dwfl_Frame *state, Dwarf_Addr pc, Dwarf_CFI *cfi, Dwarf_Addr bias)
   Ebl *ebl = process->ebl;
   size_t nregs = ebl_frame_nregs (ebl);
   assert (nregs > 0);
+
+  /* The return register is special for setting the unwound->pc_state.  */
+  unsigned ra = frame->fde->cie->return_address_register;
+  bool ra_set = false;
+  ebl_dwarf_to_regno (ebl, &ra);
+
   for (unsigned regno = 0; regno < nregs; regno++)
     {
       Dwarf_Op reg_ops_mem[3], *reg_ops;
@@ -552,8 +558,7 @@ handle_cfi (Dwfl_Frame *state, Dwarf_Addr pc, Dwarf_CFI *cfi, Dwarf_Addr bias)
 	  if (reg_ops == reg_ops_mem)
 	    {
 	      /* REGNO is undefined.  */
-	      unsigned ra = frame->fde->cie->return_address_register;
-	      if (ebl_dwarf_to_regno (ebl, &ra) && regno == ra)
+	      if (regno == ra)
 		unwound->pc_state = DWFL_FRAME_STATE_PC_UNDEFINED;
 	      continue;
 	    }
@@ -576,10 +581,28 @@ handle_cfi (Dwfl_Frame *state, Dwarf_Addr pc, Dwarf_CFI *cfi, Dwarf_Addr bias)
 	     But PPC32 does not use such registers.  */
 	  continue;
 	}
+
+      /* This is another strange PPC[64] case.  There are two
+	 registers numbers that can represent the same DWARF return
+	 register number.  We only want one to actually set the return
+	 register value.  */
+      if (ra_set)
+	{
+	  unsigned r = regno;
+	  if (ebl_dwarf_to_regno (ebl, &r) && r == ra)
+	    continue;
+	}
+
       if (! __libdwfl_frame_reg_set (unwound, regno, regval))
 	{
 	  __libdwfl_seterrno (DWFL_E_INVALID_REGISTER);
 	  continue;
+	}
+      else if (! ra_set)
+	{
+	  unsigned r = regno;
+          if (ebl_dwarf_to_regno (ebl, &r) && r == ra)
+	    ra_set = true;
 	}
     }
   if (unwound->pc_state == DWFL_FRAME_STATE_ERROR

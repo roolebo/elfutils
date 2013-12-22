@@ -41,91 +41,122 @@ static bool show_module = false;
 static bool show_source = false;
 static bool show_one_tid = false;
 
+static unsigned maxframes = 64;
+
+struct frame
+{
+  Dwarf_Addr pc;
+  bool isactivation;
+};
+
+struct frames
+{
+  unsigned frames;
+  struct frame frame[];
+};
+
+static Dwfl *dwfl = NULL;
+
 static int
 frame_callback (Dwfl_Frame *state, void *arg)
 {
-  unsigned *framenop = arg;
-  Dwarf_Addr pc;
-  bool isactivation;
-  if (! dwfl_frame_pc (state, &pc, &isactivation))
+  struct frames *frames = (struct frames *) arg;
+  unsigned nr = frames->frames;
+  if (! dwfl_frame_pc (state, &frames->frame[nr].pc,
+		       &frames->frame[nr].isactivation))
     {
       error (0, 0, "%s", dwfl_errmsg (-1));
       return DWARF_CB_ABORT;
     }
-  Dwarf_Addr pc_adjusted = pc - (isactivation ? 0 : 1);
 
-  /* Get PC->SYMNAME.  */
-  Dwfl *dwfl = dwfl_thread_dwfl (dwfl_frame_thread (state));
-  Dwfl_Module *mod = dwfl_addrmodule (dwfl, pc_adjusted);
-  const char *symname = NULL;
-  if (mod)
-    symname = dwfl_module_addrname (mod, pc_adjusted);
+  frames->frames++;
+  if (frames->frames == maxframes)
+    return DWARF_CB_ABORT;
 
-  // Try to find the address wide if possible.
-  static int width = 0;
-  if (width == 0 && mod)
-    {
-      Dwarf_Addr bias;
-      Elf *elf = dwfl_module_getelf (mod, &bias);
-      if (elf)
-	{
-	  GElf_Ehdr ehdr_mem;
-	  GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);
-	  if (ehdr)
-	    width = ehdr->e_ident[EI_CLASS] == ELFCLASS32 ? 8 : 16;
-	}
-    }
-  if (width == 0)
-    width = 16;
-
-  printf ("#%-2u 0x%0*" PRIx64, (*framenop)++, width, (uint64_t) pc);
-
-  if (show_activation)
-    printf ("%4s", ! isactivation ? "- 1" : "");
-
-  if (symname != NULL)
-    printf (" %s", symname);
-
-  if (show_module)
-    {
-      const char* fname;
-
-      fname = dwfl_module_info(mod, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-      if (fname != NULL)
-	printf (" - %s", fname);
-    }
-
-  if (show_source)
-    {
-      Dwfl_Line *lineobj = dwfl_module_getsrc(mod, pc_adjusted);
-      if (lineobj)
-	{
-	  int line, col;
-	  const char* sname;
-	  line = col = -1;
-	  sname = dwfl_lineinfo (lineobj, NULL, &line, &col, NULL, NULL);
-	  if (sname != NULL)
-	    {
-	      printf ("\n    %s", sname);
-	      if (line > 0)
-		{
-		  printf (":%d", line);
-		  if (col > 0)
-		    printf (":%d", col);
-		}
-	    }
-	}
-    }
-  printf ("\n");
   return DWARF_CB_OK;
 }
 
+static void
+print_frames (struct frames *frames)
+{
+  for (unsigned nr = 0; nr < frames->frames; nr++)
+    {
+      Dwarf_Addr pc = frames->frame[nr].pc;
+      bool isactivation = frames->frame[nr].isactivation;
+      Dwarf_Addr pc_adjusted = pc - (isactivation ? 0 : 1);
+
+      /* Get PC->SYMNAME.  */
+      Dwfl_Module *mod = dwfl_addrmodule (dwfl, pc_adjusted);
+      const char *symname = NULL;
+      if (mod)
+	symname = dwfl_module_addrname (mod, pc_adjusted);
+
+      // Try to find the address wide if possible.
+      static int width = 0;
+      if (width == 0 && mod)
+	{
+	  Dwarf_Addr bias;
+	  Elf *elf = dwfl_module_getelf (mod, &bias);
+	  if (elf)
+	    {
+	      GElf_Ehdr ehdr_mem;
+	      GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);
+	      if (ehdr)
+		width = ehdr->e_ident[EI_CLASS] == ELFCLASS32 ? 8 : 16;
+	    }
+	}
+      if (width == 0)
+	width = 16;
+
+      printf ("#%-2u 0x%0*" PRIx64, nr, width, (uint64_t) pc);
+
+      if (show_activation)
+	printf ("%4s", ! isactivation ? "- 1" : "");
+
+      if (symname != NULL)
+	printf (" %s", symname);
+
+      if (show_module)
+	{
+	  const char* fname;
+	  fname = dwfl_module_info(mod,
+				   NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+	  if (fname != NULL)
+	    printf (" - %s", fname);
+	}
+
+      if (show_source)
+	{
+	  Dwfl_Line *lineobj = dwfl_module_getsrc(mod, pc_adjusted);
+	  if (lineobj)
+	    {
+	      int line, col;
+	      const char* sname;
+	      line = col = -1;
+	      sname = dwfl_lineinfo (lineobj, NULL, &line, &col, NULL, NULL);
+	      if (sname != NULL)
+		{
+		  printf ("\n    %s", sname);
+		  if (line > 0)
+		    {
+		      printf (":%d", line);
+		      if (col > 0)
+			printf (":%d", col);
+		    }
+		}
+	    }
+	}
+      printf ("\n");
+    }
+}
+
 static int
-thread_callback (Dwfl_Thread *thread, void *thread_arg __attribute__ ((unused)))
+thread_callback (Dwfl_Thread *thread, void *thread_arg)
 {
   printf ("TID %ld:\n", (long) dwfl_thread_tid (thread));
-  unsigned frameno = 0;
-  switch (dwfl_thread_getframes (thread, frame_callback, &frameno))
+  struct frames *frames = (struct frames *) thread_arg;
+  frames->frames = 0;
+  switch (dwfl_thread_getframes (thread, frame_callback, thread_arg))
     {
     case DWARF_CB_OK:
     case DWARF_CB_ABORT:
@@ -136,6 +167,7 @@ thread_callback (Dwfl_Thread *thread, void *thread_arg __attribute__ ((unused)))
     default:
       abort ();
     }
+  print_frames (frames);
   return DWARF_CB_OK;
 }
 
@@ -175,6 +207,15 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
       show_one_tid = true;
       break;
 
+    case 'n':
+      maxframes = atoi (arg);
+      if (maxframes == 0)
+	{
+	  argp_error (state, N_("-n MAXFRAMES should be 1 or higher."));
+	  return EINVAL;
+	}
+      break;
+
     default:
       return ARGP_ERR_UNKNOWN;
     }
@@ -204,6 +245,8 @@ main (int argc, char **argv)
 	N_("Show all additional information (activation, module and source)"), 0 },
       { NULL, '1', NULL, 0,
 	N_("Show the backtrace of only one thread"), 0 },
+      { NULL, 'n', "MAXFRAMES", 0,
+	N_("Show at most MAXFRAMES per thread (defaults to 64)"), 0 },
       { NULL, 0, NULL, 0, NULL, 0 }
     };
 
@@ -224,11 +267,11 @@ Only real user processes are supported, no kernel or process maps."),
     };
 
   int remaining;
-  Dwfl *dwfl = NULL;
   argp_parse (&argp, argc, argv, 0, &remaining, &dwfl);
   assert (dwfl != NULL);
   if (remaining != argc)
-    error (2, 0, "eu-stack [-a] [-m] [-s] [-v] [-1] [--debuginfo-path=<path>]"
+    error (2, 0, "eu-stack [-a] [-m] [-s] [-v] [-1] [-n MAXFRAMES]"
+	   " [--debuginfo-path=<path>]"
 	   " {-p <process id>|--core=<file> [--executable=<file>]|--help}");
 
   /* dwfl_linux_proc_report has been already called from dwfl_standard_argp's
@@ -236,11 +279,14 @@ Only real user processes are supported, no kernel or process maps."),
   if (dwfl_report_end (dwfl, NULL, NULL) != 0)
     error (2, 0, "dwfl_report_end: %s", dwfl_errmsg (-1));
 
+  struct frames *frames = malloc (sizeof (struct frames)
+				  + sizeof (struct frame) * maxframes);
+  frames->frames = 0;
+
   if (show_one_tid)
     {
       pid_t tid = dwfl_pid (dwfl);
-      unsigned frameno = 0;
-      switch (dwfl_getthread_frames (dwfl, tid, frame_callback, &frameno))
+      switch (dwfl_getthread_frames (dwfl, tid, frame_callback, frames))
 	{
 	case DWARF_CB_OK:
 	  break;
@@ -251,10 +297,11 @@ Only real user processes are supported, no kernel or process maps."),
 	default:
 	  abort ();
 	}
+      print_frames (frames);
     }
   else
     {
-      switch (dwfl_getthreads (dwfl, thread_callback, NULL))
+      switch (dwfl_getthreads (dwfl, thread_callback, frames))
 	{
 	case DWARF_CB_OK:
 	  break;
@@ -265,6 +312,7 @@ Only real user processes are supported, no kernel or process maps."),
 	  abort ();
 	}
     }
+  free (frames);
   dwfl_end (dwfl);
 
   return 0;

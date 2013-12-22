@@ -1,3 +1,19 @@
+2013-12-22  Mark Wielaard  <mjw@redhat.com>
+
+	* stack.c (maxframes): New static unsigned. Initialize to 64.
+	(struct frame): New struct.
+	(struct frames): Likewise.
+	(dwfl): New static Dwfl pointer.
+	(frame_callback): Use arg as struct frames and fill it next frame.
+	Return DWARF_CB_ABORT when maxframes has been reached. Move
+	printing of frame to...
+	(print_frames): ...here. New function.
+	(thread_callback): Use arg as struct frames and set frames to zero.
+	Call print_frames.
+	(parse_opt): Handle '-n'.
+	(main): Add -n to options. Allocate frames using maxframes. Pass
+	frames to frame_callback and thread_callback.
+
 2013-12-20  Mark Wielaard  <mjw@redhat.com>
 
 	* stack.c (show_one_tid): New static boolean.

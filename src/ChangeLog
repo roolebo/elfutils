@@ -1,3 +1,11 @@
+2013-12-23  Mark Wielaard  <mjw@redhat.com>
+
+	* stack.c (show_build_id): New static boolean.
+	(print_frames): Print module build-id, load address and pc offset
+	if show_build_id is true.
+	(parse_opt): Handle '-b'.
+	(main): Add -b to options.
+
 2013-12-22  Mark Wielaard  <mjw@redhat.com>
 
 	* stack.c (maxframes): New static unsigned. Initialize to 64.

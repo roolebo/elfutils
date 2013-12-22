@@ -38,6 +38,7 @@ ARGP_PROGRAM_BUG_ADDRESS_DEF = PACKAGE_BUGREPORT;
 
 static bool show_activation = false;
 static bool show_module = false;
+static bool show_build_id = false;
 static bool show_source = false;
 static bool show_one_tid = false;
 
@@ -116,13 +117,29 @@ print_frames (struct frames *frames)
       if (symname != NULL)
 	printf (" %s", symname);
 
+      const char* fname;
+      Dwarf_Addr start;
+      fname = dwfl_module_info(mod, NULL, &start,
+			       NULL, NULL, NULL, NULL, NULL);
       if (show_module)
 	{
-	  const char* fname;
-	  fname = dwfl_module_info(mod,
-				   NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 	  if (fname != NULL)
 	    printf (" - %s", fname);
+	}
+
+      if (show_build_id)
+	{
+	  const unsigned char *id;
+	  GElf_Addr id_vaddr;
+	  int id_len = dwfl_module_build_id (mod, &id, &id_vaddr);
+	  if (id_len > 0)
+	    {
+	      printf ("\n    [");
+	      do
+		printf ("%02" PRIx8, *id++);
+	      while (--id_len > 0);
+	      printf ("]@0x%0" PRIx64 "+%" PRIx64, start, pc_adjusted - start);
+	    }
 	}
 
       if (show_source)
@@ -203,6 +220,10 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
       show_activation = show_source = show_module = true;
       break;
 
+    case 'b':
+      show_build_id = true;
+      break;
+
     case '1':
       show_one_tid = true;
       break;
@@ -243,6 +264,8 @@ main (int argc, char **argv)
 	N_("Additionally show source file information"), 0 },
       { "verbose", 'v', NULL, 0,
 	N_("Show all additional information (activation, module and source)"), 0 },
+      { "build-id",  'b', NULL, 0,
+	N_("Show module build-id, load address and pc offset"), 0 },
       { NULL, '1', NULL, 0,
 	N_("Show the backtrace of only one thread"), 0 },
       { NULL, 'n', "MAXFRAMES", 0,
@@ -270,7 +293,7 @@ Only real user processes are supported, no kernel or process maps."),
   argp_parse (&argp, argc, argv, 0, &remaining, &dwfl);
   assert (dwfl != NULL);
   if (remaining != argc)
-    error (2, 0, "eu-stack [-a] [-m] [-s] [-v] [-1] [-n MAXFRAMES]"
+    error (2, 0, "eu-stack [-a] [-m] [-b] [-s] [-v] [-1] [-n MAXFRAMES]"
 	   " [--debuginfo-path=<path>]"
 	   " {-p <process id>|--core=<file> [--executable=<file>]|--help}");
 

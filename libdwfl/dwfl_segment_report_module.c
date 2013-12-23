@@ -427,7 +427,10 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
   /* We must have seen the segment covering offset 0, or else the ELF
      header we read at START was not produced by these program headers.  */
   if (unlikely (!found_bias))
-    return finish ();
+    {
+      free (build_id);
+      return finish ();
+    }
 
   /* Now we know enough to report a module for sure: its bounds.  */
   module_start += bias;
@@ -519,7 +522,10 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 	      }
 	  }
       if (skip_this_module)
-	return finish ();
+	{
+	  free (build_id);
+	  return finish ();
+	}
     }
 
   /* Our return value now says to skip the segments contained

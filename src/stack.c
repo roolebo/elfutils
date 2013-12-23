@@ -36,6 +36,10 @@ ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
 /* Bug report address.  */
 ARGP_PROGRAM_BUG_ADDRESS_DEF = PACKAGE_BUGREPORT;
 
+/* non-printable argp options.  */
+#define OPT_DEBUGINFO	0x100
+#define OPT_COREFILE	0x101
+
 static bool show_activation = false;
 static bool show_module = false;
 static bool show_build_id = false;
@@ -57,6 +61,25 @@ struct frames
 };
 
 static Dwfl *dwfl = NULL;
+static pid_t pid = 0;
+static int core_fd = -1;
+static Elf *core = NULL;
+static const char *exec = NULL;
+static char *debuginfo_path = NULL;
+
+static const Dwfl_Callbacks proc_callbacks =
+  {
+    .find_elf = dwfl_linux_proc_find_elf,
+    .find_debuginfo = dwfl_standard_find_debuginfo,
+    .debuginfo_path = &debuginfo_path,
+  };
+
+static const Dwfl_Callbacks core_callbacks =
+  {
+    .find_elf = dwfl_build_id_find_elf,
+    .find_debuginfo = dwfl_standard_find_debuginfo,
+    .debuginfo_path = &debuginfo_path,
+  };
 
 static int
 frame_callback (Dwfl_Frame *state, void *arg)
@@ -200,8 +223,28 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
 {
   switch (key)
     {
-    case ARGP_KEY_INIT:
-      state->child_inputs[0] = state->input;
+    case 'p':
+      pid = atoi (arg);
+      if (pid == 0)
+	argp_error (state, N_("-p PID should be a positive process id."));
+      break;
+
+    case OPT_COREFILE:
+      core_fd = open (arg, O_RDONLY);
+      if (core_fd < 0)
+	error (2, errno, N_("Cannot open core file '%s'."), arg);
+      elf_version (EV_CURRENT);
+      core = elf_begin (core_fd, ELF_C_READ_MMAP, NULL);
+      if (core == NULL)
+	error (2, 0, "core '%s' elf_begin: %s", arg, elf_errmsg(-1));
+      break;
+
+    case 'e':
+      exec = arg;
+      break;
+
+    case OPT_DEBUGINFO:
+      debuginfo_path = arg;
       break;
 
     case 'm':
@@ -237,6 +280,41 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
 	}
       break;
 
+    case ARGP_KEY_END:
+      if (core == NULL && exec != NULL)
+	argp_error (state,
+		    N_("-e EXEC needs a core given by --core."));
+
+      if (pid == 0 && show_one_tid == true)
+	argp_error (state,
+		    N_("-1 needs a thread id given by -p."));
+
+      if ((pid == 0 && core == NULL) || (pid != 0 && core != NULL))
+	argp_error (state,
+		    N_("One of -p PID or --core COREFILE should be given."));
+
+      if (pid != 0)
+	{
+	  dwfl = dwfl_begin (&proc_callbacks);
+	  if (dwfl == NULL)
+	    error (2, 0, "dwfl_begin: %s", dwfl_errmsg (-1));
+	  if (dwfl_linux_proc_report (dwfl, pid) != 0)
+	    error (2, 0, "dwfl_linux_proc_report: %s", dwfl_errmsg (-1));
+	}
+
+      if (core != NULL)
+	{
+	  dwfl = dwfl_begin (&core_callbacks);
+	  if (dwfl == NULL)
+	    error (2, 0, "dwfl_begin: %s", dwfl_errmsg (-1));
+	  if (dwfl_core_file_report (dwfl, core, exec) < 0)
+	    error (2, 0, "dwfl_core_file_report: %s", dwfl_errmsg (-1));
+	}
+
+      if (dwfl_report_end (dwfl, NULL, NULL) != 0)
+	error (2, 0, "dwfl_report_end: %s", dwfl_errmsg (-1));
+      break;
+
     default:
       return ARGP_ERR_UNKNOWN;
     }
@@ -256,6 +334,16 @@ main (int argc, char **argv)
 
   const struct argp_option options[] =
     {
+      { NULL, 0, NULL, 0, N_("Input selection options:"), 0 },
+      { "pid", 'p', "PID", 0,
+	N_("Show stack of process PID"), 0 },
+      { "core", OPT_COREFILE, "COREFILE", 0,
+	N_("Show stack found in COREFILE"), 0 },
+      {  "executable", 'e', "EXEC", 0, N_("(optional) EXECUTABLE that produced COREFILE"), 0 },
+      { "debuginfo-path", OPT_DEBUGINFO, "PATH", 0,
+	N_("Search path for separate debuginfo files"), 0 },
+
+      { NULL, 0, NULL, 0, N_("Output selection options:"), 0 },
       { "activation",  'a', NULL, 0,
 	N_("Additionally show frame activation"), 0 },
       { "module",  'm', NULL, 0,
@@ -269,38 +357,18 @@ main (int argc, char **argv)
       { NULL, '1', NULL, 0,
 	N_("Show the backtrace of only one thread"), 0 },
       { NULL, 'n', "MAXFRAMES", 0,
-	N_("Show at most MAXFRAMES per thread (defaults to 64)"), 0 },
+	N_("Show at most MAXFRAMES per thread (default 64)"), 0 },
       { NULL, 0, NULL, 0, NULL, 0 }
-    };
-
-  const struct argp_child children[] =
-    {
-      { .argp = dwfl_standard_argp () },
-      { .argp = NULL },
     };
 
   const struct argp argp =
     {
       .options = options,
       .parser = parse_opt,
-      .doc = N_("\
-Print a stack for each thread in a process or core file.\n\
-Only real user processes are supported, no kernel or process maps."),
-      .children = children
+      .doc = N_("Print a stack for each thread in a process or core file."),
     };
 
-  int remaining;
-  argp_parse (&argp, argc, argv, 0, &remaining, &dwfl);
-  assert (dwfl != NULL);
-  if (remaining != argc)
-    error (2, 0, "eu-stack [-a] [-m] [-b] [-s] [-v] [-1] [-n MAXFRAMES]"
-	   " [--debuginfo-path=<path>]"
-	   " {-p <process id>|--core=<file> [--executable=<file>]|--help}");
-
-  /* dwfl_linux_proc_report has been already called from dwfl_standard_argp's
-     parse_opt function.  */
-  if (dwfl_report_end (dwfl, NULL, NULL) != 0)
-    error (2, 0, "dwfl_report_end: %s", dwfl_errmsg (-1));
+  argp_parse (&argp, argc, argv, 0, NULL, NULL);
 
   struct frames *frames = malloc (sizeof (struct frames)
 				  + sizeof (struct frame) * maxframes);
@@ -308,13 +376,13 @@ Only real user processes are supported, no kernel or process maps."),
 
   if (show_one_tid)
     {
-      pid_t tid = dwfl_pid (dwfl);
-      switch (dwfl_getthread_frames (dwfl, tid, frame_callback, frames))
+      printf ("TID %d:\n", pid);
+      switch (dwfl_getthread_frames (dwfl, pid, frame_callback, frames))
 	{
 	case DWARF_CB_OK:
 	  break;
 	case -1:
-	  error (0, 0, "dwfl_getthread_frames (%d): %s", tid,
+	  error (0, 0, "dwfl_getthread_frames (%d): %s", pid,
 		 dwfl_errmsg (-1));
 	  break;
 	default:
@@ -324,6 +392,7 @@ Only real user processes are supported, no kernel or process maps."),
     }
   else
     {
+      printf ("PID %d - %s\n", dwfl_pid (dwfl), pid != 0 ? "process" : "core");
       switch (dwfl_getthreads (dwfl, thread_callback, frames))
 	{
 	case DWARF_CB_OK:
@@ -337,6 +406,12 @@ Only real user processes are supported, no kernel or process maps."),
     }
   free (frames);
   dwfl_end (dwfl);
+
+  if (core != NULL)
+    elf_end (core);
+
+  if (core_fd != -1)
+    close (core_fd);
 
   return 0;
 }

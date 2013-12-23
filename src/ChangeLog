@@ -1,5 +1,22 @@
 2013-12-23  Mark Wielaard  <mjw@redhat.com>
 
+	* stack.c (OPT_DEBUGINFO): New define.
+	(OPT_COREFILE): Likewise.
+	(pid): New static.
+	(core_fd): Likewise.
+	(core): Likewise.
+	(exec): Likewise.
+	(debuginfo_path): Likewise.
+	(parse_opt): Handle '-p', '--core', '-e' and '--debuginfo-path'.
+	Do argument sanity checking. Setup Dwfl.
+	(main): Add 'p', 'core', 'e' and 'debuginfo-path' to options.
+	Remove argp_child children, simplify argp doc, remove custom
+	usage message and construction of dwfl with dwfl_standard_argp.
+	Use pid directly as tid. close core and core_fd if opened. Print
+	pid of process or core.
+
+2013-12-23  Mark Wielaard  <mjw@redhat.com>
+
 	* stack.c (show_build_id): New static boolean.
 	(print_frames): Print module build-id, load address and pc offset
 	if show_build_id is true.

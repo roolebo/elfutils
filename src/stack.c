@@ -45,6 +45,10 @@ static bool show_module = false;
 static bool show_build_id = false;
 static bool show_source = false;
 static bool show_one_tid = false;
+static bool show_quiet = false;
+#ifdef USE_DEMANGLE
+static bool show_raw = false;
+#endif
 
 static unsigned maxframes = 64;
 
@@ -81,6 +85,11 @@ static const Dwfl_Callbacks core_callbacks =
     .debuginfo_path = &debuginfo_path,
   };
 
+#ifdef USE_DEMANGLE
+static size_t demangle_buffer_len = 0;
+static char *demangle_buffer = NULL;
+#endif
+
 static int
 frame_callback (Dwfl_Frame *state, void *arg)
 {
@@ -112,7 +121,7 @@ print_frames (struct frames *frames)
       /* Get PC->SYMNAME.  */
       Dwfl_Module *mod = dwfl_addrmodule (dwfl, pc_adjusted);
       const char *symname = NULL;
-      if (mod)
+      if (mod && ! show_quiet)
 	symname = dwfl_module_addrname (mod, pc_adjusted);
 
       // Try to find the address wide if possible.
@@ -138,7 +147,19 @@ print_frames (struct frames *frames)
 	printf ("%4s", ! isactivation ? "- 1" : "");
 
       if (symname != NULL)
-	printf (" %s", symname);
+	{
+#ifdef USE_DEMANGLE
+	  if (! show_raw)
+	    {
+	      int status = -1;
+	      char *dsymname = __cxa_demangle (symname, demangle_buffer,
+					       &demangle_buffer_len, &status);
+	      if (status == 0)
+		symname = demangle_buffer = dsymname;
+	    }
+#endif
+	  printf (" %s", symname);
+	}
 
       const char* fname;
       Dwarf_Addr start;
@@ -267,6 +288,16 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
       show_build_id = true;
       break;
 
+    case 'q':
+      show_quiet = true;
+      break;
+
+#ifdef USE_DEMANGLE
+    case 'r':
+      show_raw = true;
+      break;
+#endif
+
     case '1':
       show_one_tid = true;
       break;
@@ -352,6 +383,12 @@ main (int argc, char **argv)
 	N_("Additionally show source file information"), 0 },
       { "verbose", 'v', NULL, 0,
 	N_("Show all additional information (activation, module and source)"), 0 },
+      { "quiet", 'q', NULL, 0,
+	N_("Do not resolve address to function symbol name"), 0 },
+#ifdef USE_DEMANGLE
+      { "raw", 'r', NULL, 0,
+	N_("Show raw function symbol names, do not try to demangle names"), 0 },
+#endif
       { "build-id",  'b', NULL, 0,
 	N_("Show module build-id, load address and pc offset"), 0 },
       { NULL, '1', NULL, 0,
@@ -412,6 +449,10 @@ main (int argc, char **argv)
 
   if (core_fd != -1)
     close (core_fd);
+
+#ifdef USE_DEMANGLE
+  free (demangle_buffer);
+#endif
 
   return 0;
 }

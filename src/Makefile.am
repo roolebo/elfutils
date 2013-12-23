@@ -115,7 +115,8 @@ ranlib_LDADD = libar.a $(libelf) $(libeu) $(libmudflap)
 strings_LDADD = $(libelf) $(libeu) $(libmudflap)
 ar_LDADD = libar.a $(libelf) $(libeu) $(libmudflap)
 unstrip_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(libmudflap) -ldl
-stack_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(libmudflap) -ldl
+stack_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(libmudflap) -ldl \
+	      $(demanglelib)
 
 ldlex.o: ldscript.c
 ldlex_no_Werror = yes

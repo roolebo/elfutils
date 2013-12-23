@@ -1,5 +1,17 @@
 2013-12-23  Mark Wielaard  <mjw@redhat.com>
 
+	* Makefile.am (stack_LDADD): Add demanglelib.
+	* stack.c (show_quiet): New static boolean, default false.
+	(show_raw): Likewise.
+	(demangle_buffer_len): New static size_t.
+	(demangle_buffer): New static char *.
+	(print_frames): Don't resolve pc name if show_quiet. Demangle name
+	unless show_raw.
+	(parse_opt): Handle '-q' and '-r'.
+	(main): Add 'q' and 'r' to options. Free demangle_buffer.
+
+2013-12-23  Mark Wielaard  <mjw@redhat.com>
+
 	* stack.c (OPT_DEBUGINFO): New define.
 	(OPT_COREFILE): Likewise.
 	(pid): New static.

@@ -1,3 +1,8 @@
+2013-12-23  Mark Wielaard  <mjw@redhat.com>
+
+	* linux-pid-attach.c (__libdwfl_attach_state_for_pid): Report actual
+	pid (thread group leader) to dwfl_attach_state.
+
 2013-12-21  Mark Wielaard  <mjw@redhat.com>
 
 	* frame_unwind.c (handle_cfi): Track whether the return register

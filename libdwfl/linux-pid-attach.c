@@ -285,6 +285,30 @@ bool
 internal_function
 __libdwfl_attach_state_for_pid (Dwfl *dwfl, pid_t pid)
 {
+  char buffer[36];
+  FILE *procfile;
+
+  /* Make sure to report the actual PID (thread group leader) to
+     dwfl_attach_state.  */
+  snprintf (buffer, sizeof (buffer), "/proc/%ld/status", (long) pid);
+  procfile = fopen (buffer, "r");
+  if (procfile == NULL)
+    return false;
+
+  char *line = NULL;
+  size_t linelen = 0;
+  while (getline (&line, &linelen, procfile) >= 0)
+    if (strncmp (line, "Tgid:", 5) == 0)
+      {
+        pid = atoi (&line[5]);
+        break;
+      }
+  free (line);
+  fclose (procfile);
+
+  if (pid == 0)
+    return false;
+
   char dirname[64];
   int i = snprintf (dirname, sizeof (dirname), "/proc/%ld/task", (long) pid);
   assert (i > 0 && i < (ssize_t) sizeof (dirname) - 1);

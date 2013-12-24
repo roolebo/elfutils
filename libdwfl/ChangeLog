@@ -1,3 +1,9 @@
+2013-12-24  Mark Wielaard  <mjw@redhat.com>
+
+	* linux-core-attach.c (core_next_thread): Check whether thread_argp
+	is NULL. Reset core_arg->thread_note_offset and malloc a thread_arg
+	in that case. Free thread_arg if there are no more threads.
+
 2013-12-23  Mark Wielaard  <mjw@redhat.com>
 
 	* dwfl_segment_report_module.c (dwfl_segment_report_module): Free

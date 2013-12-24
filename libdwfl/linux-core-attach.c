@@ -106,6 +106,23 @@ core_next_thread (Dwfl *dwfl __attribute__ ((unused)), void *dwfl_arg,
   size_t desc_offset;
   Elf_Data *note_data = core_arg->note_data;
   size_t offset;
+
+  struct thread_arg *thread_arg;
+  if (*thread_argp == NULL)
+    {
+      core_arg->thread_note_offset = 0;
+      thread_arg = malloc (sizeof (*thread_arg));
+      if (thread_arg == NULL)
+	{
+	  __libdwfl_seterrno (DWFL_E_NOMEM);
+	  return -1;
+	}
+      thread_arg->core_arg = core_arg;
+      *thread_argp = thread_arg;
+    }
+  else
+    thread_arg = (struct thread_arg *) *thread_argp;
+
   while (offset = core_arg->thread_note_offset, offset < note_data->d_size
 	 && (core_arg->thread_note_offset = gelf_getnote (note_data, offset,
 							  &nhdr, &name_offset,
@@ -138,17 +155,11 @@ core_next_thread (Dwfl *dwfl __attribute__ ((unused)), void *dwfl_arg,
 		? be32toh (val32) : le32toh (val32));
       pid_t tid = (int32_t) val32;
       eu_static_assert (sizeof val32 <= sizeof tid);
-      struct thread_arg *thread_arg = malloc (sizeof (*thread_arg));
-      if (thread_arg == NULL)
-	{
-	  __libdwfl_seterrno (DWFL_E_NOMEM);
-	  return -1;
-	}
-      thread_arg->core_arg = core_arg;
       thread_arg->note_offset = offset;
-      *thread_argp = thread_arg;
       return tid;
     }
+
+  free (thread_arg);
   return 0;
 }
 

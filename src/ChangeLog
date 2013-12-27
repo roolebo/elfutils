@@ -1,3 +1,20 @@
+2013-12-27  Mark Wielaard  <mjw@redhat.com>
+
+	* stack.c (frames_shown): New static boolean.
+	(EXIT_OK,EXIT_ERROR,EXIT_BAD,EXIT_USAGES): New defines.
+	(frame_callback): Return -1 on error. Don't print error.
+	(print_frames): Add arguments, tid, dwflerr and what. Print tid.
+	If there was an error report it with address and module if possible.
+	Record whether any frames were actually printed.
+	(thread_callback): Collect tid and err, pass it to print_frames.
+	(parse_opt): Use EXIT_BAD for errors. On ARGP_KEY_END print errno
+	if dwfl_linux_proc_report returned it. Check whether we are properly
+	attached with dwfl_pid.
+	(main): Document exit status. Don't report DWARF_CB_ABORT from
+	callbacks as error. Pass real errors to print_frames. Return
+	EXIT_BAD if no frames could be shown. Return EXIT_ERROR if there
+	were any non-fatal errors.
+
 2013-12-23  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (stack_LDADD): Add demanglelib.

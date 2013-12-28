@@ -23,6 +23,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdio_ext.h>
+#include <string.h>
 #include <locale.h>
 #include <fcntl.h>
 #include ELFUTILS_HEADER(dwfl)
@@ -49,6 +50,7 @@ static bool show_quiet = false;
 #ifdef USE_DEMANGLE
 static bool show_raw = false;
 #endif
+static bool show_modules = false;
 
 static unsigned maxframes = 64;
 
@@ -103,6 +105,70 @@ static bool frames_shown = false;
 #define EXIT_USAGE 64
 
 static int
+get_addr_width (Dwfl_Module *mod)
+{
+  // Try to find the address wide if possible.
+  static int width = 0;
+  if (width == 0 && mod)
+    {
+      Dwarf_Addr bias;
+      Elf *elf = dwfl_module_getelf (mod, &bias);
+      if (elf)
+        {
+	  GElf_Ehdr ehdr_mem;
+	  GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);
+	  if (ehdr)
+	    width = ehdr->e_ident[EI_CLASS] == ELFCLASS32 ? 8 : 16;
+	}
+    }
+  if (width == 0)
+    width = 16;
+
+  return width;
+}
+
+static int
+module_callback (Dwfl_Module *mod, void **userdata __attribute__((unused)),
+		 const char *name, Dwarf_Addr start,
+		 void *arg __attribute__((unused)))
+{
+  /* Forces resolving of main elf and debug files. */
+  Dwarf_Addr bias;
+  Elf *elf = dwfl_module_getelf (mod, &bias);
+  Dwarf *dwarf = dwfl_module_getdwarf (mod, &bias);
+
+  Dwarf_Addr end;
+  const char *mainfile;
+  const char *debugfile;
+  const char *modname = dwfl_module_info (mod, NULL, NULL, &end, NULL,
+                                          NULL, &mainfile, &debugfile);
+  assert (strcmp (modname, name) == 0);
+
+  int width = get_addr_width (mod);
+  printf ("0x%0*" PRIx64 "-0x%0*" PRIx64 " %s\n",
+	  width, start, width, end, basename (name));
+
+  const unsigned char *id;
+  GElf_Addr id_vaddr;
+  int id_len = dwfl_module_build_id (mod, &id, &id_vaddr);
+  if (id_len > 0)
+    {
+      printf ("  [");
+      do
+	printf ("%02" PRIx8, *id++);
+      while (--id_len > 0);
+      printf ("]\n");
+    }
+
+  if (elf != NULL)
+    printf ("  %s\n", mainfile != NULL ? mainfile : "-");
+  if (dwarf != NULL)
+    printf ("  %s\n", debugfile != NULL ? debugfile : "-");
+
+  return DWARF_CB_OK;
+}
+
+static int
 frame_callback (Dwfl_Frame *state, void *arg)
 {
   struct frames *frames = (struct frames *) arg;
@@ -137,23 +203,7 @@ print_frames (struct frames *frames, pid_t tid, int dwflerr, const char *what)
       if (mod && ! show_quiet)
 	symname = dwfl_module_addrname (mod, pc_adjusted);
 
-      // Try to find the address wide if possible.
-      static int width = 0;
-      if (width == 0 && mod)
-	{
-	  Dwarf_Addr bias;
-	  Elf *elf = dwfl_module_getelf (mod, &bias);
-	  if (elf)
-	    {
-	      GElf_Ehdr ehdr_mem;
-	      GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);
-	      if (ehdr)
-		width = ehdr->e_ident[EI_CLASS] == ELFCLASS32 ? 8 : 16;
-	    }
-	}
-      if (width == 0)
-	width = 16;
-
+      int width = get_addr_width (mod);
       printf ("#%-2u 0x%0*" PRIx64, nr, width, (uint64_t) pc);
 
       if (show_activation)
@@ -350,6 +400,10 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
 	}
       break;
 
+    case 'l':
+      show_modules = true;
+      break;
+
     case ARGP_KEY_END:
       if (core == NULL && exec != NULL)
 	argp_error (state,
@@ -443,6 +497,8 @@ main (int argc, char **argv)
 	N_("Show the backtrace of only one thread"), 0 },
       { NULL, 'n', "MAXFRAMES", 0,
 	N_("Show at most MAXFRAMES per thread (default 64)"), 0 },
+      { "list-modules", 'l', NULL, 0,
+	N_("Show module memory map with build-id, elf and debug files detected"), 0 },
       { NULL, 0, NULL, 0, NULL, 0 }
     };
 
@@ -460,6 +516,14 @@ invoked with bad or missing arguments it will exit with return code 64.")
     };
 
   argp_parse (&argp, argc, argv, 0, NULL, NULL);
+
+  if (show_modules)
+    {
+      printf ("PID %d - %s module memory map\n", dwfl_pid (dwfl),
+	      pid != 0 ? "process" : "core");
+      if (dwfl_getmodules (dwfl, module_callback, NULL, 0) != 0)
+	error (EXIT_BAD, 0, "dwfl_getmodules: %s", dwfl_errmsg (-1));
+    }
 
   struct frames *frames = malloc (sizeof (struct frames)
 				  + sizeof (struct frame) * maxframes);

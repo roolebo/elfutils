@@ -1,3 +1,14 @@
+2013-12-28  Mark Wielaard  <mjw@redhat.com>
+
+	* stack.c (print_frames): Remove address width code and use...
+	(get_addr_width): ...this new function.
+	(show_modules): New static boolean.
+	(module_callback): New static function.
+	(parse_opt): Handle '-l'.
+	(main): Add 'l' to options. If show_modules then use dwfl_getmodules
+	with module_callback to show all detected modules and possible
+	build_id, elf and dwarf files.
+
 2013-12-27  Mark Wielaard  <mjw@redhat.com>
 
 	* stack.c (frames_shown): New static boolean.

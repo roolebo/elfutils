@@ -29,6 +29,7 @@
 #include "libdwflP.h"
 #include <inttypes.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdio_ext.h>
@@ -345,6 +346,14 @@ dwfl_linux_proc_find_elf (Dwfl_Module *mod __attribute__ ((unused)),
 {
   if (module_name[0] == '/')
     {
+      /* When this callback is used together with dwfl_linux_proc_report
+	 then we might see mappings of special character devices.  Make
+	 sure we only open and return regular files.  Special devices
+	 might hang on open or read.  */
+      struct stat sb;
+      if (stat (module_name, &sb) == -1 || (sb.st_mode & S_IFMT) != S_IFREG)
+	return -1;
+
       int fd = open64 (module_name, O_RDONLY);
       if (fd >= 0)
 	{

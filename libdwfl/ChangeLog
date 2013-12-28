@@ -1,3 +1,8 @@
+2013-12-28  Mark Wielaard  <mjw@redhat.com>
+
+	* linux-proc-maps.c (dwfl_linux_proc_find_elf): Don't return special
+	character device files, only regular files.
+
 2013-12-24  Mark Wielaard  <mjw@redhat.com>
 
 	* linux-core-attach.c (core_next_thread): Check whether thread_argp

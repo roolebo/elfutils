@@ -44,7 +44,6 @@ dwfl_begin (const Dwfl_Callbacks *callbacks)
     {
       dwfl->callbacks = callbacks;
       dwfl->offline_next_address = OFFLINE_REDZONE;
-      dwfl->process_attach_error = DWFL_E_NO_ATTACH_STATE;
     }
 
   return dwfl;

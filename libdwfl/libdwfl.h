@@ -361,16 +361,13 @@ extern int dwfl_linux_kernel_report_offline (Dwfl *dwfl, const char *release,
    supply non-NULL EXECUTABLE, otherwise dynamic libraries will not be loaded
    into the DWFL map.  This might call dwfl_report_elf on file names found in
    the dump if reading some link_map files is the only way to ascertain those
-   modules' addresses.  dwfl_attach_state is also called for DWFL,
-   dwfl_core_file_report does not fail if the dwfl_attach_state call has failed.
-   Returns the number of modules reported, or -1 for errors.  */
+   modules' addresses.  Returns the number of modules reported, or -1 for
+   errors.  */
 extern int dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const char *executable);
 
 /* Call dwfl_report_module for each file mapped into the address space of PID.
-   dwfl_attach_state is also called for DWFL, dwfl_linux_proc_report does
-   not fail if the dwfl_attach_state call has failed.
    Returns zero on success, -1 if dwfl_report_module failed,
-   or an errno code if opening the kernel binary failed.  */
+   or an errno code if opening the proc files failed.  */
 extern int dwfl_linux_proc_report (Dwfl *dwfl, pid_t pid);
 
 /* Similar, but reads an input stream in the format of Linux /proc/PID/maps
@@ -716,6 +713,23 @@ bool dwfl_attach_state (Dwfl *dwfl, Elf *elf, pid_t pid,
                         const Dwfl_Thread_Callbacks *thread_callbacks,
 			void *dwfl_arg)
   __nonnull_attribute__ (1, 4);
+
+/* Calls dwfl_attach_state with Dwfl_Thread_Callbacks setup for extracting
+   thread state from the ELF core file.  Returns the pid number extracted
+   from the core file, or -1 for errors.  */
+extern int dwfl_core_file_attach (Dwfl *dwfl, Elf *elf);
+
+/* Calls dwfl_attach_state with Dwfl_Thread_Callbacks setup for extracting
+   thread state from the proc file system.  Uses ptrace to attach and stop
+   the thread under inspection and detaches when thread_detach is called
+   and unwinding for the thread is done, unless ASSUME_PTRACE_STOPPED is
+   true.  If ASSUME_PTRACE_STOPPED is true the caller should make sure that
+   the thread is ptrace attached and stopped before unwinding by calling
+   either dwfl_thread_getframes or dwfl_getthread_frames.  Returns zero on
+   success, -1 if dwfl_attach_state failed, or an errno code if opening the
+   proc files failed.  */
+extern int dwfl_linux_proc_attach (Dwfl *dwfl, pid_t pid,
+				   bool assume_ptrace_stopped);
 
 /* Return PID for the process associated with DWFL.  Function returns -1 if
    dwfl_attach_state was not called for DWFL.  */

@@ -1,3 +1,9 @@
+2013-12-30  Mark Wielaard  <mjw@redhat.com>
+
+	* backtrace-dwarf.c (report_pid): Explicitly call
+	dwfl_linux_proc_attach and check for errors.
+	* backtrace.c (report_pid): Likewise.
+
 2013-12-21  Mark Wielaard  <mjw@redhat.com>
 
 	* backtrace.c (callback_verify): Only assert that case 5 is the last

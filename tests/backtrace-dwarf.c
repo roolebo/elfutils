@@ -41,6 +41,12 @@ report_pid (Dwfl *dwfl, pid_t pid)
 
   if (dwfl_report_end (dwfl, NULL, NULL) != 0)
     error (2, 0, "dwfl_report_end: %s", dwfl_errmsg (-1));
+
+  result = dwfl_linux_proc_attach (dwfl, pid, false);
+  if (result < 0)
+    error (2, 0, "dwfl_linux_proc_attach: %s", dwfl_errmsg (-1));
+  else if (result > 0)
+    error (2, result, "dwfl_linux_proc_attach");
 }
 
 static Dwfl *

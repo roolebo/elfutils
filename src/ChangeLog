@@ -1,3 +1,8 @@
+2013-12-30  Mark Wielaard  <mjw@redhat.com>
+
+	* stack.c (parse_opt): Explicitly call dwfl_linux_proc_attach
+	or dwfl_core_file_attach and check for errors.
+
 2013-12-28  Mark Wielaard  <mjw@redhat.com>
 
 	* stack.c (print_frames): Remove address width code and use...

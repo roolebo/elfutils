@@ -443,6 +443,22 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
       if (dwfl_report_end (dwfl, NULL, NULL) != 0)
 	error (EXIT_BAD, 0, "dwfl_report_end: %s", dwfl_errmsg (-1));
 
+      if (pid != 0)
+	{
+	  int err = dwfl_linux_proc_attach (dwfl, pid, false);
+	  if (err < 0)
+	    error (EXIT_BAD, 0, "dwfl_linux_proc_attach pid %d: %s", pid,
+		   dwfl_errmsg (-1));
+	  else if (err > 0)
+	    error (EXIT_BAD, err, "dwfl_linux_proc_attach pid %d", pid);
+	}
+
+      if (core != NULL)
+	{
+	  if (dwfl_core_file_attach (dwfl, core) < 0)
+	    error (EXIT_BAD, 0, "dwfl_core_file_report: %s", dwfl_errmsg (-1));
+	}
+
       /* Makes sure we are properly attached.  */
       if (dwfl_pid (dwfl) < 0)
 	error (EXIT_BAD, 0, "dwfl_pid: %s\n", dwfl_errmsg (-1));

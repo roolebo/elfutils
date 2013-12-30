@@ -1,3 +1,8 @@
+2013-12-30  Mark Wielaard  <mjw@redhat.com>
+
+	* libdw.map (ELFUTILS_0.158): Add dwfl_core_file_attach and
+	dwfl_linux_proc_attach.
+
 2013-12-20  Mark Wielaard  <mjw@redhat.com>
 
 	* libdw.map (ELFUTILS_0.158): Add dwfl_getthread_frames.

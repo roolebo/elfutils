@@ -108,7 +108,6 @@ struct Dwfl
   Dwfl_Module *modulelist;    /* List in order used by full traversals.  */
 
   Dwfl_Process *process;
-  Dwfl_Error process_attach_error;
 
   GElf_Addr offline_next_address;
 
@@ -531,14 +530,6 @@ extern void __libdwfl_process_free (Dwfl_Process *process)
 extern void __libdwfl_frame_unwind (Dwfl_Frame *state)
   internal_function;
 
-/* Call dwfl_attach_state for PID, return true if successful.  */
-extern bool __libdwfl_attach_state_for_pid (Dwfl *dwfl, pid_t pid)
-  internal_function;
-
-/* Call dwfl_attach_state for CORE, return true if successful.  */
-extern bool __libdwfl_attach_state_for_core (Dwfl *dwfl, Elf *core)
-  internal_function;
-
 /* Align segment START downwards or END upwards addresses according to DWFL.  */
 extern GElf_Addr __libdwfl_segment_start (Dwfl *dwfl, GElf_Addr start)
   internal_function;
@@ -657,6 +648,7 @@ INTDECL (dwfl_addrmodule)
 INTDECL (dwfl_addrsegment)
 INTDECL (dwfl_addrdwarf)
 INTDECL (dwfl_addrdie)
+INTDECL (dwfl_core_file_attach)
 INTDECL (dwfl_core_file_report)
 INTDECL (dwfl_getmodules)
 INTDECL (dwfl_module_addrdie)
@@ -685,6 +677,7 @@ INTDECL (dwfl_standard_find_debuginfo)
 INTDECL (dwfl_link_map_report)
 INTDECL (dwfl_linux_kernel_find_elf)
 INTDECL (dwfl_linux_kernel_module_section_address)
+INTDECL (dwfl_linux_proc_attach)
 INTDECL (dwfl_linux_proc_report)
 INTDECL (dwfl_linux_proc_maps_report)
 INTDECL (dwfl_linux_proc_find_elf)

@@ -170,6 +170,11 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	    int result = INTUSE(dwfl_linux_proc_report) (dwfl, atoi (arg));
 	    if (result != 0)
 	      return fail (dwfl, result, arg);
+
+	    result = INTUSE(dwfl_linux_proc_attach) (dwfl, atoi (arg), false);
+	    if (result != 0)
+	      /* Non-fatal to not be able to attach to process.  */
+	      failure (dwfl, result, _("cannot attach to process"));
 	    opt->dwfl = dwfl;
 	  }
 	else
@@ -295,6 +300,11 @@ parse_opt (int key, char *arg, struct argp_state *state)
 		close (fd);
 		return fail (dwfl, result, opt->core);
 	      }
+
+	    result = INTUSE(dwfl_core_file_attach) (dwfl, core);
+	    if (result < 0)
+	      /* Non-fatal to not be able to attach to core.  */
+	      failure (dwfl, result, _("cannot attach to core"));
 
 	    /* From now we leak FD and CORE.  */
 

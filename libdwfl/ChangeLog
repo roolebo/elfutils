@@ -1,3 +1,35 @@
+2013-12-30  Mark Wielaard  <mjw@redhat.com>
+
+	* argp-std.c (parse_opt): Call dwfl_linux_proc_attach and
+	dwfl_core_file_attach explicitly.
+	* core-file.c (dwfl_core_file_report): Don't call
+	__libdwfl_attach_state_for_core implicitly.
+	* dwfl_begin.c (dwfl_begin): Remove setting of process_attach_error.
+	* dwfl_frame.c (dwfl_pid): Set errno to DWFL_E_NO_ATTACH_STATE, not
+	process_attach_error.
+	(dwfl_getthreads): Likewise.
+	(getthread): Likewise.
+	* libdwfl.h (dwfl_core_file_report): Update documentation.
+	(dwfl_linux_proc_report): Likewise.
+	(dwfl_core_file_attach): New function declaration.
+	(dwfl_linux_proc_attach): Likewise.
+	* libdwflP.h (struct Dwfl): Remove process_attach_error.
+	(__libdwfl_attach_state_for_pid): Removed declaration.
+	(__libdwfl_attach_state_for_core): Likewise.
+	(dwfl_core_file_attach): New internal declaration.
+	(dwfl_linux_proc_attach): Likewise.
+	(attach_state_for_core): Renamed to...
+	(dwfl_core_file_attach): ...this. Change return type.
+	(__libdwfl_attach_state_for_core): Removed.
+	* linux-pid-attach.c (struct pid_arg): Add assume_ptrace_stopped.
+	(pid_set_initial_registers): Check assume_ptrace_stopped before
+	calling ptrace.
+	(pid_thread_detach): Likewise.
+	(__libdwfl_attach_state_for_pid): Renamed to...
+	(dwfl_linux_proc_attach): ...this. Adjust return type.
+	* linux-proc-maps.c (dwfl_linux_proc_report): Don't call
+	__libdwfl_attach_state_for_pid implicitly.
+
 2013-12-28  Mark Wielaard  <mjw@redhat.com>
 
 	* linux-proc-maps.c (dwfl_linux_proc_find_elf): Don't return special

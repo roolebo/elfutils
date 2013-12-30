@@ -288,4 +288,7 @@ ELFUTILS_0.158 {
     dwfl_module_getsymtab_first_global;
     dwfl_module_addrinfo;
     dwfl_module_getsym_info;
+
+    dwfl_core_file_attach;
+    dwfl_linux_proc_attach;
 } ELFUTILS_0.157;

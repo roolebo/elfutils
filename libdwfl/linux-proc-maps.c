@@ -301,13 +301,6 @@ dwfl_linux_proc_report (Dwfl *dwfl, pid_t pid)
 
   fclose (f);
 
-  if (result == 0)
-    {
-      /* Possible error is ignored, DWFL still may be useful for non-unwinding
-	 operations.  */
-      __libdwfl_attach_state_for_pid (dwfl, pid);
-    }
-
   return result;
 }
 INTDEF (dwfl_linux_proc_report)

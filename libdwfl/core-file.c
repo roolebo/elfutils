@@ -559,13 +559,6 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const char *executable)
 
   clear_r_debug_info (&r_debug_info);
 
-  if (listed > 0)
-    {
-      /* Possible error is ignored, DWFL still may be useful for non-unwinding
-	 operations.  */
-      __libdwfl_attach_state_for_core (dwfl, elf);
-    }
-
   /* We return the number of modules we found if we found any.
      If we found none, we return -1 instead of 0 if there was an
      error rather than just nothing found.  */

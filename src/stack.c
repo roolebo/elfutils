@@ -47,9 +47,7 @@ static bool show_build_id = false;
 static bool show_source = false;
 static bool show_one_tid = false;
 static bool show_quiet = false;
-#ifdef USE_DEMANGLE
 static bool show_raw = false;
-#endif
 static bool show_modules = false;
 
 static int maxframes = 2048;
@@ -395,11 +393,9 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
       show_quiet = true;
       break;
 
-#ifdef USE_DEMANGLE
     case 'r':
       show_raw = true;
       break;
-#endif
 
     case '1':
       show_one_tid = true;
@@ -517,10 +513,8 @@ main (int argc, char **argv)
 	N_("Show all additional information (activation, module and source)"), 0 },
       { "quiet", 'q', NULL, 0,
 	N_("Do not resolve address to function symbol name"), 0 },
-#ifdef USE_DEMANGLE
       { "raw", 'r', NULL, 0,
 	N_("Show raw function symbol names, do not try to demangle names"), 0 },
-#endif
       { "build-id",  'b', NULL, 0,
 	N_("Show module build-id, load address and pc offset"), 0 },
       { NULL, '1', NULL, 0,

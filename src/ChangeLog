@@ -1,5 +1,11 @@
 2014-01-02  Mark Wielaard  <mjw@redhat.com>
 
+	* stack.c (show_raw): Declare unconditionally.
+	(parse_opt): Handle '-r' unconditionally.
+	(main): Show "raw" option even without USE_DEMANGLE.
+
+2014-01-02  Mark Wielaard  <mjw@redhat.com>
+
 	* stack.c (print_frames): Print 0x before build-id hex-offset.
 
 2014-01-02  Mark Wielaard  <mjw@redhat.com>

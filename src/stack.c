@@ -255,7 +255,8 @@ print_frames (struct frames *frames, pid_t tid, int dwflerr, const char *what)
 	      do
 		printf ("%02" PRIx8, *id++);
 	      while (--id_len > 0);
-	      printf ("]@0x%0" PRIx64 "+%" PRIx64, start, pc_adjusted - start);
+	      printf ("]@0x%0" PRIx64 "+0x%" PRIx64,
+		      start, pc_adjusted - start);
 	    }
 	}
 

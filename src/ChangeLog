@@ -1,5 +1,9 @@
 2014-01-02  Mark Wielaard  <mjw@redhat.com>
 
+	* stack.c (print_frames): Print 0x before build-id hex-offset.
+
+2014-01-02  Mark Wielaard  <mjw@redhat.com>
+
 	* stack.c (maxframes): Increase to 2048.
 	(struct frames): Add allocated field.
 	(frame_callback): If frames used is frames allocated, realloc.

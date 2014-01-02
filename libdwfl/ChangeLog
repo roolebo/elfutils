@@ -1,3 +1,7 @@
+2014-01-02  Mark Wielaard  <mjw@redhat.com>
+
+	* linux-pid-attach.c (dwfl_linux_proc_attach): Use strtol, not atoi.
+
 2013-12-30  Mark Wielaard  <mjw@redhat.com>
 
 	* argp-std.c (parse_opt): Call dwfl_linux_proc_attach and

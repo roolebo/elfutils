@@ -306,8 +306,15 @@ dwfl_linux_proc_attach (Dwfl *dwfl, pid_t pid, bool assume_ptrace_stopped)
   while (getline (&line, &linelen, procfile) >= 0)
     if (strncmp (line, "Tgid:", 5) == 0)
       {
-        pid = atoi (&line[5]);
-        break;
+	errno = 0;
+	char *endptr;
+	long val = strtol (&line[5], &endptr, 10);
+	if ((errno == ERANGE && val == LONG_MAX)
+	    || *endptr != '\n' || val < 0 || val != (pid_t) val)
+	  pid = 0;
+	else
+	  pid = (pid_t) val;
+	break;
       }
   free (line);
   fclose (procfile);

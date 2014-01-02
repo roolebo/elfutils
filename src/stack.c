@@ -52,7 +52,7 @@ static bool show_raw = false;
 #endif
 static bool show_modules = false;
 
-static unsigned maxframes = 64;
+static int maxframes = 2048;
 
 struct frame
 {
@@ -62,8 +62,9 @@ struct frame
 
 struct frames
 {
-  unsigned frames;
-  struct frame frame[];
+  int frames;
+  int allocated;
+  struct frame *frame;
 };
 
 static Dwfl *dwfl = NULL;
@@ -172,7 +173,7 @@ static int
 frame_callback (Dwfl_Frame *state, void *arg)
 {
   struct frames *frames = (struct frames *) arg;
-  unsigned nr = frames->frames;
+  int nr = frames->frames;
   if (! dwfl_frame_pc (state, &frames->frame[nr].pc,
 		       &frames->frame[nr].isactivation))
     return -1;
@@ -180,6 +181,15 @@ frame_callback (Dwfl_Frame *state, void *arg)
   frames->frames++;
   if (frames->frames == maxframes)
     return DWARF_CB_ABORT;
+
+  if (frames->frames == frames->allocated)
+    {
+      frames->allocated *= 2;
+      frames->frame = realloc (frames->frame,
+			       sizeof (struct frame) * frames->allocated);
+      if (frames->frame == NULL)
+	error (EXIT_BAD, errno, "realloc frames.frame");
+    }
 
   return DWARF_CB_OK;
 }
@@ -191,7 +201,7 @@ print_frames (struct frames *frames, pid_t tid, int dwflerr, const char *what)
     frames_shown = true;
 
   printf ("TID %d:\n", tid);
-  for (unsigned nr = 0; nr < frames->frames; nr++)
+  for (int nr = 0; nr < frames->frames; nr++)
     {
       Dwarf_Addr pc = frames->frame[nr].pc;
       bool isactivation = frames->frame[nr].isactivation;
@@ -297,6 +307,9 @@ print_frames (struct frames *frames, pid_t tid, int dwflerr, const char *what)
       else
 	error (0, 0, "%s tid %d: %s", what, tid, dwfl_errmsg (dwflerr));
     }
+  else if (frames->frames > 0 && frames->frames == maxframes)
+    error (0, 0, "tid %d: shown max number of frames "
+	   "(%d, use -n 0 for unlimited)", tid, maxframes);
 }
 
 static int
@@ -393,9 +406,9 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
 
     case 'n':
       maxframes = atoi (arg);
-      if (maxframes == 0)
+      if (maxframes < 0)
 	{
-	  argp_error (state, N_("-n MAXFRAMES should be 1 or higher."));
+	  argp_error (state, N_("-n MAXFRAMES should be 0 or higher."));
 	  return EINVAL;
 	}
       break;
@@ -512,7 +525,7 @@ main (int argc, char **argv)
       { NULL, '1', NULL, 0,
 	N_("Show the backtrace of only one thread"), 0 },
       { NULL, 'n', "MAXFRAMES", 0,
-	N_("Show at most MAXFRAMES per thread (default 64)"), 0 },
+	N_("Show at most MAXFRAMES per thread (default 2048, use 0 for unlimited)"), 0 },
       { "list-modules", 'l', NULL, 0,
 	N_("Show module memory map with build-id, elf and debug files detected"), 0 },
       { NULL, 0, NULL, 0, NULL, 0 }
@@ -541,14 +554,17 @@ invoked with bad or missing arguments it will exit with return code 64.")
 	error (EXIT_BAD, 0, "dwfl_getmodules: %s", dwfl_errmsg (-1));
     }
 
-  struct frames *frames = malloc (sizeof (struct frames)
-				  + sizeof (struct frame) * maxframes);
-  frames->frames = 0;
+  struct frames frames;
+  frames.allocated = maxframes == 0 ? 2048 : maxframes;
+  frames.frames = 0;
+  frames.frame = malloc (sizeof (struct frame) * frames.allocated);
+  if (frames.frame == NULL)
+    error (EXIT_BAD, errno, "malloc frames.frame");
 
   if (show_one_tid)
     {
       int err = 0;
-      switch (dwfl_getthread_frames (dwfl, pid, frame_callback, frames))
+      switch (dwfl_getthread_frames (dwfl, pid, frame_callback, &frames))
 	{
 	case DWARF_CB_OK:
 	case DWARF_CB_ABORT:
@@ -559,12 +575,12 @@ invoked with bad or missing arguments it will exit with return code 64.")
 	default:
 	  abort ();
 	}
-      print_frames (frames, pid, err, "dwfl_getthread_frames");
+      print_frames (&frames, pid, err, "dwfl_getthread_frames");
     }
   else
     {
       printf ("PID %d - %s\n", dwfl_pid (dwfl), pid != 0 ? "process" : "core");
-      switch (dwfl_getthreads (dwfl, thread_callback, frames))
+      switch (dwfl_getthreads (dwfl, thread_callback, &frames))
 	{
 	case DWARF_CB_OK:
 	case DWARF_CB_ABORT:
@@ -576,7 +592,7 @@ invoked with bad or missing arguments it will exit with return code 64.")
 	  abort ();
 	}
     }
-  free (frames);
+  free (frames.frame);
   dwfl_end (dwfl);
 
   if (core != NULL)

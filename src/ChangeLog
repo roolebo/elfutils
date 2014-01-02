@@ -1,3 +1,13 @@
+2014-01-02  Mark Wielaard  <mjw@redhat.com>
+
+	* stack.c (maxframes): Increase to 2048.
+	(struct frames): Add allocated field.
+	(frame_callback): If frames used is frames allocated, realloc.
+	(print_frames): Show an error if maxframes has been reached.
+	(parse_opt): Allow -n 0 for unlimited frames.
+	(main): Document -n 0 and new default 2048 frames. Allocate initial
+	number of frames with malloc.
+
 2013-12-30  Mark Wielaard  <mjw@redhat.com>
 
 	* stack.c (parse_opt): Explicitly call dwfl_linux_proc_attach

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pl\n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2013-09-30 13:52+0200\n"
+"POT-Creation-Date: 2013-12-31 14:01+0100\n"
 "PO-Revision-Date: 2012-09-02 19:12+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <trans-pl@lists.fedoraproject.org>\n"
@@ -23,12 +23,12 @@ msgstr ""
 msgid "memory exhausted"
 msgstr "pamięć wyczerpana"
 
-#: libasm/asm_error.c:65 libdw/dwarf_error.c:58 libdwfl/libdwflP.h:49
+#: libasm/asm_error.c:65 libdw/dwarf_error.c:58 libdwfl/libdwflP.h:51
 #: libelf/elf_error.c:60
 msgid "no error"
 msgstr "brak błędu"
 
-#: libasm/asm_error.c:66 libdw/dwarf_error.c:67 libdwfl/libdwflP.h:51
+#: libasm/asm_error.c:66 libdw/dwarf_error.c:67 libdwfl/libdwflP.h:53
 #: libelf/elf_error.c:91
 msgid "out of memory"
 msgstr "brak pamięci"
@@ -67,7 +67,7 @@ msgstr "błąd podczas wyprowadzania danych"
 msgid "no backend support available"
 msgstr "brak dostępnej obsługi zaplecza"
 
-#: libasm/asm_error.c:84 libdw/dwarf_error.c:59 libdwfl/libdwflP.h:50
+#: libasm/asm_error.c:84 libdw/dwarf_error.c:59 libdwfl/libdwflP.h:52
 #: libelf/elf_error.c:63
 msgid "unknown error"
 msgstr "nieznany błąd"
@@ -164,7 +164,7 @@ msgstr "nieprawidłowa wersja DWARF"
 msgid "invalid directory index"
 msgstr "nieprawidłowy indeks katalogu"
 
-#: libdw/dwarf_error.c:84 libdwfl/libdwflP.h:70
+#: libdw/dwarf_error.c:84 libdwfl/libdwflP.h:72
 msgid "address out of range"
 msgstr "adres jest spoza zakresu"
 
@@ -184,7 +184,7 @@ msgstr "nieprawidłowy indeks wiersza"
 msgid "invalid address range index"
 msgstr "nieprawidłowy indeks zakresu adresów"
 
-#: libdw/dwarf_error.c:89 libdwfl/libdwflP.h:71
+#: libdw/dwarf_error.c:89 libdwfl/libdwflP.h:73
 msgid "no matching address range"
 msgstr "brak pasującego zakresu adresów"
 
@@ -244,126 +244,191 @@ msgstr "Jądro ze wszystkimi modułami"
 msgid "Search path for separate debuginfo files"
 msgstr "Wyszukuje ścieżkę dla oddzielnych plików debuginfo"
 
-#: libdwfl/argp-std.c:183
+#: libdwfl/argp-std.c:157
 msgid "only one of -e, -p, -k, -K, or --core allowed"
 msgstr "dopuszczalna jest tylko jedna z opcji -e, -p, -k, -K lub --core"
 
-#: libdwfl/argp-std.c:252
+#: libdwfl/argp-std.c:177
+#, fuzzy
+msgid "cannot attach to process"
+msgstr "nie można utworzyć drzewa wyszukiwania"
+
+#: libdwfl/argp-std.c:231
 msgid "cannot load kernel symbols"
 msgstr "nie można wczytać symboli jądra"
 
-#: libdwfl/argp-std.c:256
+#: libdwfl/argp-std.c:235
 msgid "cannot find kernel modules"
 msgstr "nie można odnaleźć modułów jądra"
 
-#: libdwfl/argp-std.c:273
+#: libdwfl/argp-std.c:252
 msgid "cannot find kernel or modules"
 msgstr "nie można odnaleźć jądra lub modułów"
 
-#: libdwfl/argp-std.c:315
+#: libdwfl/argp-std.c:291
 #, c-format
 msgid "cannot read ELF core file: %s"
 msgstr "nie można odczytać pliku core ELF: %s"
 
-#: libdwfl/argp-std.c:333
+#: libdwfl/argp-std.c:307
+#, fuzzy
+msgid "cannot attach to core"
+msgstr "nie można utworzyć drzewa wyszukiwania"
+
+#: libdwfl/argp-std.c:314
 msgid "No modules recognized in core file"
 msgstr "Nie rozpoznano żadnych modułów w pliku core"
 
-#: libdwfl/libdwflP.h:52
+#: libdwfl/libdwflP.h:54
 msgid "See errno"
 msgstr "Proszę zobaczyć errno"
 
-#: libdwfl/libdwflP.h:53
+#: libdwfl/libdwflP.h:55
 msgid "See elf_errno"
 msgstr "Proszę zobaczyć elf_errno"
 
-#: libdwfl/libdwflP.h:54
+#: libdwfl/libdwflP.h:56
 msgid "See dwarf_errno"
 msgstr "Proszę zobaczyć dwarf_errno"
 
-#: libdwfl/libdwflP.h:55
+#: libdwfl/libdwflP.h:57
 msgid "See ebl_errno (XXX missing)"
 msgstr "Proszę zobaczyć ebl_errno (brak XXX)"
 
-#: libdwfl/libdwflP.h:56
+#: libdwfl/libdwflP.h:58
 msgid "gzip decompression failed"
 msgstr "dekompresja gzip nie powiodła się"
 
-#: libdwfl/libdwflP.h:57
+#: libdwfl/libdwflP.h:59
 msgid "bzip2 decompression failed"
 msgstr "dekompresja bzip2 nie powiodła się"
 
-#: libdwfl/libdwflP.h:58
+#: libdwfl/libdwflP.h:60
 msgid "LZMA decompression failed"
 msgstr "dekompresja LZMA nie powiodła się"
 
-#: libdwfl/libdwflP.h:59
+#: libdwfl/libdwflP.h:61
 msgid "no support library found for machine"
 msgstr "nie odnaleziono biblioteki obsługi dla komputera"
 
-#: libdwfl/libdwflP.h:60
+#: libdwfl/libdwflP.h:62
 msgid "Callbacks missing for ET_REL file"
 msgstr "Brak wywołań zwrotnych dla pliku ET_REL"
 
-#: libdwfl/libdwflP.h:61
+#: libdwfl/libdwflP.h:63
 msgid "Unsupported relocation type"
 msgstr "Nieobsługiwany typ relokacji"
 
-#: libdwfl/libdwflP.h:62
+#: libdwfl/libdwflP.h:64
 msgid "r_offset is bogus"
 msgstr "r_offset jest fałszywe"
 
-#: libdwfl/libdwflP.h:63 libelf/elf_error.c:111 libelf/elf_error.c:171
+#: libdwfl/libdwflP.h:65 libelf/elf_error.c:111 libelf/elf_error.c:171
 msgid "offset out of range"
 msgstr "offset spoza zakresu"
 
-#: libdwfl/libdwflP.h:64
+#: libdwfl/libdwflP.h:66
 msgid "relocation refers to undefined symbol"
 msgstr "relokacja odnosi się do nieokreślonego symbolu"
 
-#: libdwfl/libdwflP.h:65
+#: libdwfl/libdwflP.h:67
 msgid "Callback returned failure"
 msgstr "Wywołanie zwrotne zwróciło niepowodzenie"
 
-#: libdwfl/libdwflP.h:66
+#: libdwfl/libdwflP.h:68
 msgid "No DWARF information found"
 msgstr "Nie odnaleziono informacji DWARF"
 
-#: libdwfl/libdwflP.h:67
+#: libdwfl/libdwflP.h:69
 msgid "No symbol table found"
 msgstr "Nie odnaleziono tabeli symboli"
 
-#: libdwfl/libdwflP.h:68
+#: libdwfl/libdwflP.h:70
 msgid "No ELF program headers"
 msgstr "Brak nagłówków programu ELF"
 
-#: libdwfl/libdwflP.h:69
+#: libdwfl/libdwflP.h:71
 msgid "address range overlaps an existing module"
 msgstr "zakres adresów pokrywa się z istniejącym modułem"
 
-#: libdwfl/libdwflP.h:72
+#: libdwfl/libdwflP.h:74
 msgid "image truncated"
 msgstr "skrócono obraz"
 
-#: libdwfl/libdwflP.h:73
+#: libdwfl/libdwflP.h:75
 msgid "ELF file opened"
 msgstr "otwarto plik ELF"
 
-#: libdwfl/libdwflP.h:74
+#: libdwfl/libdwflP.h:76
 msgid "not a valid ELF file"
 msgstr "nie jest prawidłowym plikiem ELF"
 
-#: libdwfl/libdwflP.h:75
+#: libdwfl/libdwflP.h:77
 msgid "cannot handle DWARF type description"
 msgstr "nie można obsłużyć opisu typu DWARF"
 
-#: libdwfl/libdwflP.h:76
+#: libdwfl/libdwflP.h:78
 msgid "ELF file does not match build ID"
 msgstr "plik ELF nie posiada pasującego identyfikatora kopii"
 
-#: libdwfl/libdwflP.h:77
+#: libdwfl/libdwflP.h:79
 msgid "corrupt .gnu.prelink_undo section data"
 msgstr "uszkodzone dane sekcji .gnu.prelink_undo"
+
+#: libdwfl/libdwflP.h:80
+msgid "Internal error due to ebl"
+msgstr ""
+
+#: libdwfl/libdwflP.h:81
+msgid "Missing data in core file"
+msgstr ""
+
+#: libdwfl/libdwflP.h:82
+#, fuzzy
+msgid "Invalid register"
+msgstr "nieprawidłowy parametr"
+
+#: libdwfl/libdwflP.h:83
+msgid "Error reading process memory"
+msgstr ""
+
+#: libdwfl/libdwflP.h:84
+msgid "Couldn't find architecture of any ELF"
+msgstr ""
+
+#: libdwfl/libdwflP.h:85
+msgid "Error parsing /proc filesystem"
+msgstr ""
+
+#: libdwfl/libdwflP.h:86
+#, fuzzy
+msgid "Invalid DWARF"
+msgstr "nieprawidłowy DWARF"
+
+#: libdwfl/libdwflP.h:87
+msgid "Unsupported DWARF"
+msgstr ""
+
+#: libdwfl/libdwflP.h:88
+msgid "Unable to find more threads"
+msgstr ""
+
+#: libdwfl/libdwflP.h:89
+msgid "Dwfl already has attached state"
+msgstr ""
+
+#: libdwfl/libdwflP.h:90
+msgid "Dwfl has no attached state"
+msgstr ""
+
+#: libdwfl/libdwflP.h:91
+msgid "Unwinding not supported for this architecture"
+msgstr ""
+
+#: libdwfl/libdwflP.h:92
+#, fuzzy
+msgid "Invalid argument"
+msgstr "nieprawidłowy parametr"
 
 #: libebl/eblbackendname.c:42
 msgid "No backend"
@@ -612,36 +677,41 @@ msgid "Also show symbol or section names"
 msgstr "Wyświetla także nazwy symboli ub sekcji"
 
 #: src/addr2line.c:64
+#, fuzzy
+msgid "Also show symbol and the section names"
+msgstr "Wyświetla także nazwy symboli ub sekcji"
+
+#: src/addr2line.c:65
 msgid "Also show line table flags"
 msgstr "Wyświetla także flagi tabeli wierszy"
 
-#: src/addr2line.c:66
+#: src/addr2line.c:67
 msgid "Treat addresses as offsets relative to NAME section."
 msgstr "Traktuje adresy jako offsety względne do sekcji NAZWA."
 
-#: src/addr2line.c:68
+#: src/addr2line.c:69
 msgid ""
 "Show all source locations that caused inline expansion of subroutines at the "
 "address."
 msgstr ""
 
-#: src/addr2line.c:71 src/elfcmp.c:72 src/findtextrel.c:67 src/nm.c:100
+#: src/addr2line.c:72 src/elfcmp.c:72 src/findtextrel.c:67 src/nm.c:100
 #: src/strings.c:75
 msgid "Miscellaneous:"
 msgstr "Różne:"
 
-#: src/addr2line.c:80
+#: src/addr2line.c:81
 msgid ""
 "Locate source files and line information for ADDRs (in a.out by default)."
 msgstr ""
 "Odnajdywanie plików źródłowych i informacji o wierszu dla ADRESU (domyślne w "
 "a.out)."
 
-#: src/addr2line.c:84
+#: src/addr2line.c:85
 msgid "[ADDR...]"
 msgstr "[ADRES...]"
 
-#: src/addr2line.c:192 src/ar.c:289 src/elfcmp.c:662 src/elflint.c:231
+#: src/addr2line.c:196 src/ar.c:289 src/elfcmp.c:662 src/elflint.c:231
 #: src/findtextrel.c:162 src/ld.c:949 src/nm.c:265 src/objdump.c:181
 #: src/ranlib.c:128 src/readelf.c:500 src/size.c:211 src/strings.c:219
 #: src/strip.c:213 src/unstrip.c:226
@@ -657,7 +727,7 @@ msgstr ""
 "BEZ JAKIEJKOLWIEK GWARANCJI, nawet domyślnej gwarancji PRZYDATNOŚCI\n"
 "HANDLOWEJ albo PRZYDATNOŚCI DO OKREŚLONYCH ZASTOSOWAŃ.\n"
 
-#: src/addr2line.c:197 src/ar.c:294 src/elfcmp.c:667 src/elflint.c:236
+#: src/addr2line.c:201 src/ar.c:294 src/elfcmp.c:667 src/elflint.c:236
 #: src/findtextrel.c:167 src/ld.c:954 src/nm.c:270 src/objdump.c:186
 #: src/ranlib.c:133 src/readelf.c:505 src/size.c:216 src/strings.c:224
 #: src/strip.c:218 src/unstrip.c:231
@@ -665,22 +735,22 @@ msgstr ""
 msgid "Written by %s.\n"
 msgstr "Napisane przez %s.\n"
 
-#: src/addr2line.c:437
+#: src/addr2line.c:474
 #, c-format
 msgid "Section syntax requires exactly one module"
 msgstr "Składnia sekcji wymaga dokładnie jednego modułu"
 
-#: src/addr2line.c:460
+#: src/addr2line.c:497
 #, c-format
 msgid "offset %#<PRIxMAX> lies outside section '%s'"
 msgstr "offset %#<PRIxMAX> leży poza sekcją \"%s\""
 
-#: src/addr2line.c:525
+#: src/addr2line.c:563
 #, c-format
 msgid "cannot find symbol '%s'"
 msgstr "nie można odnaleźć symbolu \"%s\""
 
-#: src/addr2line.c:530
+#: src/addr2line.c:568
 #, c-format
 msgid "offset %#<PRIxMAX> lies outside contents of '%s'"
 msgstr "offset %#<PRIxMAX> leży poza zawartością \"%s\""
@@ -3967,17 +4037,17 @@ msgstr "%s%s%s: nie rozpoznano formatu pliku"
 msgid "cannot create search tree"
 msgstr "nie można utworzyć drzewa wyszukiwania"
 
-#: src/nm.c:757 src/nm.c:1157 src/objdump.c:787 src/readelf.c:536
+#: src/nm.c:757 src/nm.c:1158 src/objdump.c:787 src/readelf.c:536
 #: src/readelf.c:1071 src/readelf.c:1214 src/readelf.c:1362 src/readelf.c:1544
 #: src/readelf.c:1744 src/readelf.c:1930 src/readelf.c:2140 src/readelf.c:2394
 #: src/readelf.c:2460 src/readelf.c:2538 src/readelf.c:3036 src/readelf.c:3072
-#: src/readelf.c:3134 src/readelf.c:7805 src/readelf.c:8882 src/readelf.c:9029
-#: src/readelf.c:9097 src/size.c:417 src/size.c:491 src/strip.c:503
+#: src/readelf.c:3134 src/readelf.c:7805 src/readelf.c:8885 src/readelf.c:9032
+#: src/readelf.c:9100 src/size.c:417 src/size.c:491 src/strip.c:503
 #, c-format
 msgid "cannot get section header string table index"
 msgstr "nie można uzyskać indeksu tabeli ciągów nagłówków sekcji"
 
-#: src/nm.c:783
+#: src/nm.c:784
 #, c-format
 msgid ""
 "\n"
@@ -3990,7 +4060,7 @@ msgstr ""
 "Symbole z %s:\n"
 "\n"
 
-#: src/nm.c:786
+#: src/nm.c:787
 #, c-format
 msgid ""
 "%*s%-*s %-*s Class  Type     %-*s %*s Section\n"
@@ -3999,22 +4069,22 @@ msgstr ""
 "%*s%-*s %-*s Klasa  Typ      %-*s %*s Sekcja\n"
 "\n"
 
-#: src/nm.c:1167
+#: src/nm.c:1168
 #, c-format
 msgid "%s: entry size in section `%s' is not what we expect"
 msgstr "%s: rozmiar wpisu w sekcji \"%s\" nie jest tym, czego oczekiwano"
 
-#: src/nm.c:1171
+#: src/nm.c:1172
 #, c-format
 msgid "%s: size of section `%s' is not multiple of entry size"
 msgstr "%s: rozmiar sekcji \"%s\" nie jest wielokrotnością rozmiaru wpisu"
 
-#: src/nm.c:1429
+#: src/nm.c:1430
 #, c-format
 msgid "%s%s%s%s: Invalid operation"
 msgstr "%s%s%s%s: nieprawidłowe działanie"
 
-#: src/nm.c:1486
+#: src/nm.c:1487
 #, c-format
 msgid "%s%s%s: no symbols"
 msgstr "%s%s%s: brak symboli"
@@ -4243,7 +4313,7 @@ msgstr "nie można utworzyć deskryptora ELF: %s"
 msgid "cannot get section: %s"
 msgstr "nie można uzyskać sekcji: %s"
 
-#: src/readelf.c:554 src/readelf.c:1092 src/readelf.c:1246 src/readelf.c:9049
+#: src/readelf.c:554 src/readelf.c:1092 src/readelf.c:1246 src/readelf.c:9052
 #: src/unstrip.c:345 src/unstrip.c:376 src/unstrip.c:425 src/unstrip.c:533
 #: src/unstrip.c:550 src/unstrip.c:586 src/unstrip.c:784 src/unstrip.c:1052
 #: src/unstrip.c:1242 src/unstrip.c:1302 src/unstrip.c:1423 src/unstrip.c:1476
@@ -5896,12 +5966,12 @@ msgstr ""
 msgid "cannot get debug context descriptor: %s"
 msgstr "nie można uzyskać deskryptora kontekstu debugowania: %s"
 
-#: src/readelf.c:7952 src/readelf.c:8555 src/readelf.c:8666 src/readelf.c:8724
+#: src/readelf.c:7952 src/readelf.c:8558 src/readelf.c:8669 src/readelf.c:8727
 #, c-format
 msgid "cannot convert core note data: %s"
 msgstr "nie można przekonwertować danych notatki core: %s"
 
-#: src/readelf.c:8296
+#: src/readelf.c:8299
 #, c-format
 msgid ""
 "\n"
@@ -5910,21 +5980,21 @@ msgstr ""
 "\n"
 "%*s... <powtarza się jeszcze %u razy>..."
 
-#: src/readelf.c:8799
+#: src/readelf.c:8802
 msgid "  Owner          Data size  Type\n"
 msgstr "  Właściciel     Rozmiar danych  Typ\n"
 
-#: src/readelf.c:8817
+#: src/readelf.c:8820
 #, c-format
 msgid "  %-13.*s  %9<PRId32>  %s\n"
 msgstr "  %-13.*s  %9<PRId32>  %s\n"
 
-#: src/readelf.c:8867
+#: src/readelf.c:8870
 #, c-format
 msgid "cannot get content of note section: %s"
 msgstr "nie można uzyskać zawartości sekcji notatki: %s"
 
-#: src/readelf.c:8894
+#: src/readelf.c:8897
 #, c-format
 msgid ""
 "\n"
@@ -5934,7 +6004,7 @@ msgstr ""
 "Segment notatki [%2zu] \"%s\" o długości %<PRIu64> bajtów pod offsetem "
 "%#0<PRIx64>:\n"
 
-#: src/readelf.c:8917
+#: src/readelf.c:8920
 #, c-format
 msgid ""
 "\n"
@@ -5943,7 +6013,7 @@ msgstr ""
 "\n"
 "Segment notatki o długości %<PRIu64> bajtów pod offsetem %#0<PRIx64>:\n"
 
-#: src/readelf.c:8963
+#: src/readelf.c:8966
 #, c-format
 msgid ""
 "\n"
@@ -5952,12 +6022,12 @@ msgstr ""
 "\n"
 "Sekcja [%Zu] \"%s\" nie posiada danych do zrzucenia.\n"
 
-#: src/readelf.c:8969 src/readelf.c:8992
+#: src/readelf.c:8972 src/readelf.c:8995
 #, c-format
 msgid "cannot get data for section [%Zu] '%s': %s"
 msgstr "nie można uzyskać danych dla sekcji [%Zu] \"%s\": %s"
 
-#: src/readelf.c:8973
+#: src/readelf.c:8976
 #, c-format
 msgid ""
 "\n"
@@ -5967,7 +6037,7 @@ msgstr ""
 "Segment zrzutu szesnastkowego [%Zu] \"%s\", %<PRIu64> bajtów pod offsetem "
 "%#0<PRIx64>:\n"
 
-#: src/readelf.c:8986
+#: src/readelf.c:8989
 #, c-format
 msgid ""
 "\n"
@@ -5976,7 +6046,7 @@ msgstr ""
 "\n"
 "Sekcja [%Zu] \"%s\" nie posiada ciągów do zrzucenia.\n"
 
-#: src/readelf.c:8996
+#: src/readelf.c:8999
 #, c-format
 msgid ""
 "\n"
@@ -5986,7 +6056,7 @@ msgstr ""
 "Sekcja ciągów [%Zu] \"%s\" zawiera %<PRIu64> bajtów pod offsetem "
 "%#0<PRIx64>:\n"
 
-#: src/readelf.c:9044
+#: src/readelf.c:9047
 #, c-format
 msgid ""
 "\n"
@@ -5995,7 +6065,7 @@ msgstr ""
 "\n"
 "sekcja [%lu] nie istnieje"
 
-#: src/readelf.c:9073
+#: src/readelf.c:9076
 #, c-format
 msgid ""
 "\n"
@@ -6004,12 +6074,12 @@ msgstr ""
 "\n"
 "sekcja \"%s\" nie istnieje"
 
-#: src/readelf.c:9130
+#: src/readelf.c:9133
 #, c-format
 msgid "cannot get symbol index of archive '%s': %s"
 msgstr "nie można uzyskać indeksu symboli archiwum \"%s\": %s"
 
-#: src/readelf.c:9133
+#: src/readelf.c:9136
 #, c-format
 msgid ""
 "\n"
@@ -6018,7 +6088,7 @@ msgstr ""
 "\n"
 "Archiwum \"%s\" nie posiada indeksu symboli\n"
 
-#: src/readelf.c:9137
+#: src/readelf.c:9140
 #, c-format
 msgid ""
 "\n"
@@ -6027,12 +6097,12 @@ msgstr ""
 "\n"
 "Indeks archiwum \"%s\" posiada %Zu wpisów:\n"
 
-#: src/readelf.c:9155
+#: src/readelf.c:9158
 #, c-format
 msgid "cannot extract member at offset %Zu in '%s': %s"
 msgstr "nie można wydobyć elementów pod offsetem %Zu w \"%s\": %s"
 
-#: src/readelf.c:9160
+#: src/readelf.c:9163
 #, c-format
 msgid "Archive member '%s' contains:\n"
 msgstr "Element archiwum \"%s\" zawiera:\n"

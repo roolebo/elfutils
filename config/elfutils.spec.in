@@ -195,6 +195,21 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
+* Fri Jan  3 2014 Mark Wielaard <mjw@redhat.com> 0.158-1
+- libdwfl: dwfl_core_file_report has new parameter executable.
+  New functions dwfl_module_getsymtab_first_global,
+  dwfl_module_getsym_info and dwfl_module_addrinfo.
+  Added unwinder with type Dwfl_Thread_Callbacks, opaque types
+  Dwfl_Thread and Dwfl_Frame and functions dwfl_attach_state,
+  dwfl_pid, dwfl_thread_dwfl, dwfl_thread_tid, dwfl_frame_thread,
+  dwfl_thread_state_registers, dwfl_thread_state_register_pc,
+  dwfl_getthread_frames, dwfl_getthreads, dwfl_thread_getframes
+  and dwfl_frame_pc.
+- addr2line: New option -x to show the section an address was found in.
+- stack: New utility that uses the new unwinder for processes and cores.
+- backends: Unwinder support for i386, x86_64, s390, s390x, ppc and ppc64.
+  aarch64 support.
+
 * Mon Sep 30 2013 Mark Wielaard <mjw@redhat.com> 0.157-1
 - libdw: Add new functions dwarf_getlocations, dwarf_getlocation_attr 
          and dwarf_getlocation_die.

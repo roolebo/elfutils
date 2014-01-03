@@ -14,6 +14,9 @@ addr2line: New option -x to show the section an address was found in.
 
 stack: New utility that uses the new unwinder for processes and cores.
 
+backends: Unwinder support for i386, x86_64, s390, s390x, ppc and ppc64.
+          aarch64 support.
+
 Version 0.157
 
 libdw: Add new functions dwarf_getlocations, dwarf_getlocation_attr

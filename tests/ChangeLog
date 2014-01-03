@@ -1,3 +1,9 @@
+2014-01-03  Mark Wielaard  <mjw@redhat.com>
+
+	* run-addrcfi.sh: Add case for EM_AARCH64.
+	* testfileaarch64.bz2: New testfile.
+	* Makefile.am (EXTRA_DIST): Add testfilesaarch64.bz2.
+
 2013-12-30  Mark Wielaard  <mjw@redhat.com>
 
 	* backtrace-dwarf.c (report_pid): Explicitly call

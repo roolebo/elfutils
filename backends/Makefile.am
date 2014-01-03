@@ -83,7 +83,7 @@ libebl_arm_pic_a_SOURCES = $(arm_SRCS)
 am_libebl_arm_pic_a_OBJECTS = $(arm_SRCS:.c=.os)
 
 aarch64_SRCS = aarch64_init.c aarch64_regs.c aarch64_symbol.c	\
-	       aarch64_corenote.c aarch64_retval.c
+	       aarch64_corenote.c aarch64_retval.c aarch64_cfi.c
 libebl_aarch64_pic_a_SOURCES = $(aarch64_SRCS)
 am_libebl_aarch64_pic_a_OBJECTS = $(aarch64_SRCS:.c=.os)
 aarch64_regs_no_Wformat = yes

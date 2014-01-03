@@ -2572,3 +2572,79 @@ dwarf_cfi_addrframe (.eh_frame): no matching address range
 	VFP reg286 (d30): undefined
 	VFP reg287 (d31): undefined
 EOF
+
+# EM_AARCH64 (function bar 0x400550)
+# Same as arm, 390 and ppc above.
+# Note missing coverage in .eh_frame.
+testfiles testfileaarch64
+testrun_compare ${abs_builddir}/addrcfi -e testfileaarch64 0x400550 <<\EOF
+dwarf_cfi_addrframe (.eh_frame): no matching address range
+.debug_frame has 0x400550 => [0x400550, 0x400568):
+	return address in reg30
+	CFA location expression: bregx(31)
+	integer reg0 (x0): undefined
+	integer reg1 (x1): undefined
+	integer reg2 (x2): undefined
+	integer reg3 (x3): undefined
+	integer reg4 (x4): undefined
+	integer reg5 (x5): undefined
+	integer reg6 (x6): undefined
+	integer reg7 (x7): undefined
+	integer reg8 (x8): undefined
+	integer reg9 (x9): undefined
+	integer reg10 (x10): undefined
+	integer reg11 (x11): undefined
+	integer reg12 (x12): undefined
+	integer reg13 (x13): undefined
+	integer reg14 (x14): undefined
+	integer reg15 (x15): undefined
+	integer reg16 (x16): undefined
+	integer reg17 (x17): undefined
+	integer reg18 (x18): undefined
+	integer reg19 (x19): same_value
+	integer reg20 (x20): same_value
+	integer reg21 (x21): same_value
+	integer reg22 (x22): same_value
+	integer reg23 (x23): same_value
+	integer reg24 (x24): same_value
+	integer reg25 (x25): same_value
+	integer reg26 (x26): same_value
+	integer reg27 (x27): same_value
+	integer reg28 (x28): same_value
+	integer reg29 (x29): same_value
+	integer reg30 (x30): same_value
+	integer reg31 (sp): undefined
+	integer reg33 (elr): undefined
+	FP/SIMD reg64 (v0): undefined
+	FP/SIMD reg65 (v1): undefined
+	FP/SIMD reg66 (v2): undefined
+	FP/SIMD reg67 (v3): undefined
+	FP/SIMD reg68 (v4): undefined
+	FP/SIMD reg69 (v5): undefined
+	FP/SIMD reg70 (v6): undefined
+	FP/SIMD reg71 (v7): undefined
+	FP/SIMD reg72 (v8): same_value
+	FP/SIMD reg73 (v9): same_value
+	FP/SIMD reg74 (v10): same_value
+	FP/SIMD reg75 (v11): same_value
+	FP/SIMD reg76 (v12): same_value
+	FP/SIMD reg77 (v13): same_value
+	FP/SIMD reg78 (v14): same_value
+	FP/SIMD reg79 (v15): same_value
+	FP/SIMD reg80 (v16): undefined
+	FP/SIMD reg81 (v17): undefined
+	FP/SIMD reg82 (v18): undefined
+	FP/SIMD reg83 (v19): undefined
+	FP/SIMD reg84 (v20): undefined
+	FP/SIMD reg85 (v21): undefined
+	FP/SIMD reg86 (v22): undefined
+	FP/SIMD reg87 (v23): undefined
+	FP/SIMD reg88 (v24): undefined
+	FP/SIMD reg89 (v25): undefined
+	FP/SIMD reg90 (v26): undefined
+	FP/SIMD reg91 (v27): undefined
+	FP/SIMD reg92 (v28): undefined
+	FP/SIMD reg93 (v29): undefined
+	FP/SIMD reg94 (v30): undefined
+	FP/SIMD reg95 (v31): undefined
+EOF

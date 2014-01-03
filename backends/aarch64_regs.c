@@ -57,7 +57,7 @@ aarch64_register_info (Ebl *ebl __attribute__ ((unused)),
     return s + 1;
   }
 
-  *prefix = NULL;
+  *prefix = "";
   *bits = 64;
 
   switch (regno)

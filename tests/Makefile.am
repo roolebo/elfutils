@@ -237,7 +237,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-addr2line-i-test.sh testfile-inlines.bz2 \
 	     testfileppc32.bz2 testfileppc64.bz2 \
 	     testfiles390.bz2 testfiles390x.bz2 \
-	     testfilearm.bz2 \
+	     testfilearm.bz2 testfileaarch64.bz2 \
 	     run-varlocs.sh \
 	     testfile_const_type.c testfile_const_type.bz2 \
 	     testfile_implicit_pointer.c testfile_implicit_pointer.bz2 \

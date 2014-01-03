@@ -1,3 +1,10 @@
+2014-01-03  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (aarch64_SRCS): Add aarch64_cfi.c.
+	* aarch64_cfi.c: New file.
+	* aarch64_init.c (aarch64_init): Hook abi_cfi.
+	* aarch64_regs.c (aarch64_register_info): Set *prefix to "".
+
 2013-12-19  Mark Wielaard  <mjw@redhat.com>
 
 	* aarch64_init.c (aarch64_init): Hook check_special_symbol.

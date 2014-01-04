@@ -1,5 +1,5 @@
 /* Initialization of PPC64 specific backend library.
-   Copyright (C) 2004, 2005, 2006, 2007, 2008, 2013 Red Hat, Inc.
+   Copyright (C) 2004, 2005, 2006, 2007, 2008, 2013, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
@@ -58,6 +58,7 @@ ppc64_init (elf, machine, eh, ehlen)
   HOOK (eh, reloc_simple_type);
   HOOK (eh, dynamic_tag_name);
   HOOK (eh, dynamic_tag_check);
+  HOOK (eh, machine_flag_check);
   HOOK (eh, copy_reloc_p);
   HOOK (eh, check_special_symbol);
   HOOK (eh, bss_plt_p);

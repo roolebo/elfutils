@@ -1,5 +1,5 @@
 /* PPC64 specific symbolic name handling.
-   Copyright (C) 2004, 2005 Red Hat, Inc.
+   Copyright (C) 2004, 2005, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
@@ -109,4 +109,14 @@ ppc64_bss_plt_p (Elf *elf __attribute__ ((unused)),
 		 GElf_Ehdr *ehdr __attribute__ ((unused)))
 {
   return true;
+}
+
+/* Check whether machine flags are valid.  PPC64 has three possible values:
+   0 - for unspecified ABI, or not using any specific ABI features.
+   1 - for the original ELF PPC64 ABI using function descriptors.
+   2 - for the revised ELFv2 PPC64 ABI without function descriptors.  */
+bool
+ppc64_machine_flag_check (GElf_Word flags)
+{
+  return flags == 0 || flags == 1 || flags == 2;
 }

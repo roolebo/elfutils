@@ -1,3 +1,8 @@
+2014-01-04  Mark Wielaard  <mjw@redhat.com>
+
+	* ppc64_symbol.c (ppc64_machine_flag_check): New function.
+	* ppc64_init.c (ppc64_init): Hook machine_flag_check.
+
 2014-01-03  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (aarch64_SRCS): Add aarch64_cfi.c.

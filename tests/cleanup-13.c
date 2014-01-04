@@ -283,30 +283,12 @@ extern char verify_it[sizeof (cfi_arch_program) - 0x80 < 0x3f80 ? 1 : -1];
 		: : "i" (sizeof (cfi_arch_program)))
 #endif
 #endif
-static _Unwind_Reason_Code
-force_unwind_stop (int version, _Unwind_Action actions,
-		   _Unwind_Exception_Class exc_class,
-		   struct _Unwind_Exception *exc_obj,
-		   struct _Unwind_Context *context,
-		   void *stop_parameter)
-{
-  if (actions & _UA_END_OF_STACK)
-    abort ();
-  return _URC_NO_REASON;
-}
+
+/* The original GCC testcase tests the runtime unwinder using
+   _Unwind_ForcedUnwind, we just inspect the child when it aborts.  */
 
 static void force_unwind ()
 {
-  struct _Unwind_Exception *exc = malloc (sizeof (*exc));
-  memset (&exc->exception_class, 0, sizeof (exc->exception_class));
-  exc->exception_cleanup = 0;
-
-#ifndef __USING_SJLJ_EXCEPTIONS__
-  _Unwind_ForcedUnwind (exc, force_unwind_stop, 0);
-#else
-  _Unwind_SjLj_ForcedUnwind (exc, force_unwind_stop, 0);
-#endif
-
   abort ();
 }
 

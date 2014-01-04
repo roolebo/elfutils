@@ -1,3 +1,9 @@
+2014-01-04  Mark Wielaard  <mjw@redhat.com>
+
+	* cleanup-13.c (force_unwind_stop): Removed.
+	(force_unwind): Just call abort. Don't setup _Unwind_Exception and
+	don't call _Unwind_ForcedUnwind.
+
 2014-01-03  Mark Wielaard  <mjw@redhat.com>
 
 	* run-addrcfi.sh: Add case for EM_AARCH64.

@@ -109,7 +109,8 @@ check_native_core()
   SAVED_VALGRIND_CMD="$VALGRIND_CMD"
   unset VALGRIND_CMD
 
-  core="core.`ulimit -c unlimited; set +ex; testrun ${abs_builddir}/$child --gencore; true`"
+  # Skip the test if we cannot adjust core ulimit.
+  core="core.`ulimit -c unlimited || exit 77; set +ex; testrun ${abs_builddir}/$child --gencore; true`"
 
   if [ "x$SAVED_VALGRIND_CMD" != "x" ]; then
     VALGRIND_CMD="$SAVED_VALGRIND_CMD"

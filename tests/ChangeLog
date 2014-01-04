@@ -1,5 +1,10 @@
 2014-01-04  Mark Wielaard  <mjw@redhat.com>
 
+	* backtrace-subr.sh (check_native_core): Skip, exit 77, the test
+	if we cannot adjust core ulimit.
+
+2014-01-04  Mark Wielaard  <mjw@redhat.com>
+
 	* cleanup-13.c (force_unwind_stop): Removed.
 	(force_unwind): Just call abort. Don't setup _Unwind_Exception and
 	don't call _Unwind_ForcedUnwind.

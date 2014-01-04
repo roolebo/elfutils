@@ -260,15 +260,6 @@ prepare_thread (pid_t pid2 __attribute__ ((unused)),
 #define tgkill(pid, tid, sig) syscall (__NR_tgkill, (pid), (tid), (sig))
 
 static void
-ptrace_detach_stopped (pid_t pid)
-{
-  errno = 0;
-  long l = ptrace (PTRACE_DETACH, pid, NULL, (void *) (intptr_t) SIGSTOP);
-  assert_perror (errno);
-  assert (l == 0);
-}
-
-static void
 report_pid (Dwfl *dwfl, pid_t pid)
 {
   int result = dwfl_linux_proc_report (dwfl, pid);
@@ -280,7 +271,7 @@ report_pid (Dwfl *dwfl, pid_t pid)
   if (dwfl_report_end (dwfl, NULL, NULL) != 0)
     error (2, 0, "dwfl_report_end: %s", dwfl_errmsg (-1));
 
-  result = dwfl_linux_proc_attach (dwfl, pid, false);
+  result = dwfl_linux_proc_attach (dwfl, pid, true);
   if (result < 0)
     error (2, 0, "dwfl_linux_proc_attach: %s", dwfl_errmsg (-1));
   else if (result > 0)
@@ -397,8 +388,6 @@ exec_dump (const char *exec)
       prepare_thread (pid2, jmp);
     }
   dwfl_end (dwfl);
-  ptrace_detach_stopped (pid);
-  ptrace_detach_stopped (pid2);
   check_tid = pid2;
   dwfl = pid_to_dwfl (pid);
   dump (dwfl);

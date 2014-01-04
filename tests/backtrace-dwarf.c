@@ -42,7 +42,7 @@ report_pid (Dwfl *dwfl, pid_t pid)
   if (dwfl_report_end (dwfl, NULL, NULL) != 0)
     error (2, 0, "dwfl_report_end: %s", dwfl_errmsg (-1));
 
-  result = dwfl_linux_proc_attach (dwfl, pid, false);
+  result = dwfl_linux_proc_attach (dwfl, pid, true);
   if (result < 0)
     error (2, 0, "dwfl_linux_proc_attach: %s", dwfl_errmsg (-1));
   else if (result > 0)
@@ -106,15 +106,6 @@ thread_callback (Dwfl_Thread *thread, void *thread_arg)
   error (1, 0, "dwfl_thread_getframes: %s", dwfl_errmsg (-1));
 }
 
-static void
-ptrace_detach_stopped (pid_t pid)
-{
-  errno = 0;
-  long l = ptrace (PTRACE_DETACH, pid, NULL, (void *) (intptr_t) SIGSTOP);
-  assert_perror (errno);
-  assert (l == 0);
-}
-
 int
 main (int argc __attribute__ ((unused)), char **argv)
 {
@@ -150,8 +141,6 @@ main (int argc __attribute__ ((unused)), char **argv)
   assert (got == pid);
   assert (WIFSTOPPED (status));
   assert (WSTOPSIG (status) == SIGABRT);
-
-  ptrace_detach_stopped (pid);
 
   Dwfl *dwfl = pid_to_dwfl (pid);
   dwfl_getthreads (dwfl, thread_callback, NULL);

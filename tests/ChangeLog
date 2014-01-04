@@ -1,5 +1,17 @@
 2014-01-04  Mark Wielaard  <mjw@redhat.com>
 
+	* backtrace-data.c (main): Don't assert if raise returns.
+	* backtrace-dwarf.c (report_pid): Call dwfl_linux_proc_attach with
+	assume_ptrace_attached true.
+	(ptrace_detach_stopped): Removed function.
+	(main): Don't call ptrace_detach_stopped.
+	* backtrace.c (ptrace_detach_stopped): Removed function.
+	(report_pid): Call dwfl_linux_proc_attach with assume_ptrace_attached
+	true.
+	(exec_dump): Don't call ptrace_detach_stopped.
+
+2014-01-04  Mark Wielaard  <mjw@redhat.com>
+
 	* backtrace-subr.sh (check_native_core): Skip, exit 77, the test
 	if we cannot adjust core ulimit.
 

@@ -278,7 +278,7 @@ main (int argc __attribute__ ((unused)), char **argv __attribute__ ((unused)))
       assert_perror (errno);
       assert (l == 0);
       raise (SIGUSR1);
-      assert (0);
+      return 0;
     default:
       break;
   }

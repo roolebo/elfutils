@@ -585,8 +585,9 @@ handle_cfi (Dwfl_Frame *state, Dwarf_Addr pc, Dwarf_CFI *cfi, Dwarf_Addr bias)
       /* This is another strange PPC[64] case.  There are two
 	 registers numbers that can represent the same DWARF return
 	 register number.  We only want one to actually set the return
-	 register value.  */
-      if (ra_set)
+	 register value.  But we always want to override the value if
+	 the register is the actual CIE return address register.  */
+      if (ra_set && regno != frame->fde->cie->return_address_register)
 	{
 	  unsigned r = regno;
 	  if (ebl_dwarf_to_regno (ebl, &r) && r == ra)

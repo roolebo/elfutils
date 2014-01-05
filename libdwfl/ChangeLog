@@ -1,3 +1,8 @@
+2014-01-05  Mark Wielaard  <mjw@redhat.com>
+
+	* frame_unwind.c (handle_cfi): Only skip resetting return register
+	if the regno is not the actual CIE return address register.
+
 2014-01-02  Mark Wielaard  <mjw@redhat.com>
 
 	* linux-pid-attach.c (dwfl_linux_proc_attach): Use strtol, not atoi.

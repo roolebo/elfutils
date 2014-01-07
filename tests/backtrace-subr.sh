@@ -111,6 +111,11 @@ check_native_core()
 
   # Skip the test if we cannot adjust core ulimit.
   core="core.`ulimit -c unlimited || exit 77; set +ex; testrun ${abs_builddir}/$child --gencore; true`"
+  # see if /proc/sys/kernel/core_uses_pid is set to 0
+  if [ -f core ]; then
+    mv core "$core"
+  fi
+  if [ ! -f "$core" ]; then exit 77; fi
 
   if [ "x$SAVED_VALGRIND_CMD" != "x" ]; then
     VALGRIND_CMD="$SAVED_VALGRIND_CMD"

@@ -1,3 +1,9 @@
+2014-01-07  Matthias Klose <doko@ubuntu.com>
+
+	* backtrace-subr.sh (check_native_core): Check to see if core file
+	was created without ".PID" extension, if so mv core to core.PID.
+	Skip test if no core file was created or could be found.
+
 2014-01-04  Mark Wielaard  <mjw@redhat.com>
 
 	* backtrace-data.c (main): Don't assert if raise returns.

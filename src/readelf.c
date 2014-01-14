@@ -6896,6 +6896,7 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	}
 
       const unsigned char *vendor[DW_MACRO_GNU_hi_user - DW_MACRO_GNU_lo_user];
+      memset (vendor, 0, sizeof vendor);
       if (flag & 0x04)
 	{
 	  // 1 byte length, for each item, 1 byte opcode, uleb128 number

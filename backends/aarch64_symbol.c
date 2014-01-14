@@ -73,9 +73,12 @@ aarch64_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr, const GElf_Sym *sym,
 	    {
 	      GElf_Shdr shdr_mem;
 	      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
-	      sname = elf_strptr (elf, ehdr->e_shstrndx, shdr->sh_name);
-	      if (sname != NULL && strcmp (sname, ".got") == 0)
-		return sym->st_value == shdr->sh_addr;
+	      if (shdr != NULL)
+		{
+		  sname = elf_strptr (elf, ehdr->e_shstrndx, shdr->sh_name);
+		  if (sname != NULL && strcmp (sname, ".got") == 0)
+		    return sym->st_value == shdr->sh_addr;
+		}
 	    }
 	}
     }

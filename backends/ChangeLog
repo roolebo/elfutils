@@ -1,3 +1,8 @@
+2014-01-14  Mark Wielaard  <mjw@redhat.com>
+
+	* aarch64_symbol.c (aarch64_check_special_symbol): Check shdr is
+	not NULL before usage.
+
 2014-01-04  Mark Wielaard  <mjw@redhat.com>
 
 	* ppc64_symbol.c (ppc64_machine_flag_check): New function.

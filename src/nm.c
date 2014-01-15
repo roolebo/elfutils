@@ -820,8 +820,8 @@ show_symbols_sysv (Ebl *ebl, GElf_Word strndx, const char *fullname,
 				     symstrbuf, sizeof symstrbuf);
 
 #ifdef USE_DEMANGLE
-      /* Demangle if necessary.  */
-      if (demangle)
+      /* Demangle if necessary.  Require GNU v3 ABI by the "_Z" prefix.  */
+      if (demangle && symstr[0] == '_' && symstr[1] == 'Z')
 	{
 	  int status = -1;
 	  char *dmsymstr = __cxa_demangle (symstr, demangle_buffer,
@@ -965,8 +965,8 @@ show_symbols_bsd (Elf *elf, const GElf_Ehdr *ehdr, GElf_Word strndx,
 	continue;
 
 #ifdef USE_DEMANGLE
-      /* Demangle if necessary.  */
-      if (demangle)
+      /* Demangle if necessary.  Require GNU v3 ABI by the "_Z" prefix.  */
+      if (demangle && symstr[0] == '_' && symstr[1] == 'Z')
 	{
 	  int status = -1;
 	  char *dmsymstr = __cxa_demangle (symstr, demangle_buffer,
@@ -1076,8 +1076,8 @@ show_symbols_posix (Elf *elf, const GElf_Ehdr *ehdr, GElf_Word strndx,
 	continue;
 
 #ifdef USE_DEMANGLE
-      /* Demangle if necessary.  */
-      if (demangle)
+      /* Demangle if necessary.  Require GNU v3 ABI by the "_Z" prefix.  */
+      if (demangle && symstr[0] == '_' && symstr[1] == 'Z')
 	{
 	  int status = -1;
 	  char *dmsymstr = __cxa_demangle (symstr, demangle_buffer,
@@ -1244,8 +1244,8 @@ show_symbols (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, Elf_Scn *xndxscn,
 	    continue;
 
 #ifdef USE_DEMANGLE
-	  /* Demangle if necessary.  */
-	  if (demangle)
+	  /* Demangle if necessary.  Require GNU v3 ABI by the "_Z" prefix.  */
+	  if (demangle && symstr[0] == '_' && symstr[1] == 'Z')
 	    {
 	      int status = -1;
 	      char *dmsymstr = __cxa_demangle (symstr, demangle_buffer,

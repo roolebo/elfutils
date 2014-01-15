@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 1996-2013 Red Hat, Inc.
+## Copyright (C) 1996-2014 Red Hat, Inc.
 ## This file is part of elfutils.
 ##
 ## This file is free software; you can redistribute it and/or modify
@@ -107,10 +107,15 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-backtrace-native-biarch.sh run-backtrace-native-core.sh \
 	run-backtrace-native-core-biarch.sh run-backtrace-core-x86_64.sh \
 	run-backtrace-core-i386.sh run-backtrace-core-ppc.sh \
-	run-backtrace-core-s390x.sh run-backtrace-core-s390.sh
+	run-backtrace-core-s390x.sh run-backtrace-core-s390.sh \
+	run-backtrace-demangle.sh
 
 if !BIARCH
 export ELFUTILS_DISABLE_BIARCH = 1
+endif
+
+if !DEMANGLE
+export ELFUTILS_DISABLE_DEMANGLE = 1
 endif
 
 if !STANDALONE
@@ -256,7 +261,10 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-backtrace-core-ppc.sh testfile66.bz2 testfile66.core.bz2 \
 	     backtrace.s390x.core.bz2 backtrace.s390x.exec.bz2 \
 	     backtrace.s390.core.bz2 backtrace.s390.exec.bz2 \
-	     run-backtrace-core-s390x.sh run-backtrace-core-s390.sh
+	     run-backtrace-core-s390x.sh run-backtrace-core-s390.sh \
+	     run-backtrace-demangle.sh testfile-backtrace-demangle.bz2 \
+	     testfile-backtrace-demangle.cc \
+	     testfile-backtrace-demangle.core.bz2
 
 if USE_VALGRIND
 valgrind_cmd='valgrind -q --error-exitcode=1 --run-libc-freeres=no'

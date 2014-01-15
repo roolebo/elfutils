@@ -1,3 +1,10 @@
+2014-01-15  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	Fix corruption of non-C++ symbols by the demangler.
+	* nm.c (show_symbols_sysv, show_symbols_bsd, show_symbols_posix)
+	(show_symbols): Check for _Z.
+	* stack.c (print_frames) <USE_DEMANGLE>: Check for _Z.
+
 2014-01-02  Mark Wielaard  <mjw@redhat.com>
 
 	* stack.c (show_raw): Declare unconditionally.

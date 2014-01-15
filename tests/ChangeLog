@@ -1,3 +1,17 @@
+2014-01-15  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	Fix corruption of non-C++ symbols by the demangler.
+	* Makefile.am (TESTS): Add run-backtrace-demangle.sh.
+	<!DEMANGLE>: Add ELFUTILS_DISABLE_DEMANGLE export.
+	(EXTRA_DIST): Add run-backtrace-demangle.sh,
+	testfile-backtrace-demangle.bz2, testfile-backtrace-demangle.cc,
+	testfile-backtrace-demangle.core.bz2.
+	* backtrace-demangle.cc: New file.
+	* run-backtrace-demangle.sh: New file.
+	* testfile-backtrace-demangle.bz2: New file.
+	* testfile-backtrace-demangle.cc: New file.
+	* testfile-backtrace-demangle.core.bz2: New file.
+
 2014-01-07  Matthias Klose <doko@ubuntu.com>
 
 	* backtrace-subr.sh (check_native_core): Check to see if core file

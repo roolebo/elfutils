@@ -1,5 +1,5 @@
 /* Unwinding of frames like gstack/pstack.
-   Copyright (C) 2013 Red Hat, Inc.
+   Copyright (C) 2013-2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -220,7 +220,8 @@ print_frames (struct frames *frames, pid_t tid, int dwflerr, const char *what)
       if (symname != NULL)
 	{
 #ifdef USE_DEMANGLE
-	  if (! show_raw)
+	  // Require GNU v3 ABI by the "_Z" prefix.
+	  if (! show_raw && symname[0] == '_' && symname[1] == 'Z')
 	    {
 	      int status = -1;
 	      char *dsymname = __cxa_demangle (symname, demangle_buffer,

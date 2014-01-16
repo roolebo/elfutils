@@ -20,13 +20,22 @@ if test -n "$ELFUTILS_DISABLE_DEMANGLE"; then
 fi
 
 . $srcdir/backtrace-subr.sh
-set -x
 
 child=testfile-backtrace-demangle
 testfiles $child{,.core}
 tempfiles $child.{bt,err}
-testrun ${abs_top_builddir}/src/stack -e $child --core $child.core >$child.bt 2>$child.err
+
+# There can be more than 3 frames, but depending on the system/installed
+# glibc we might not be able to unwind fully till the end.
+# cxxfunc -> f -> main
+# Expect to see the top two and a warning that there are more frames
+# (exit code 1)
+testrun ${abs_top_builddir}/src/stack -n 2 -e $child --core $child.core >$child.bt 2>$child.err || exitcode=$?
 cat $child.{bt,err}
+if test $exitcode != 1 || ! grep "shown max number of frames" $child.err; then
+  echo >&2 $2: expected more than 2 frames
+  false
+fi
 if ! grep -w f $child.bt; then
   echo >&2 $2: no f
   false

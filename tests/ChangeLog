@@ -1,5 +1,12 @@
 2014-01-16  Mark Wielaard  <mjw@redhat.com>
 
+	* run-nm-self.sh: Don't use testrun_on_self_quiet but just testrun
+	on one ET_REL, one ET_EXEC and one ET_DYN file.
+	* test-subr.sh (self_test_files): Add two ET_REL files, only add
+	two libebl ET_DYN backend files.
+
+2014-01-16  Mark Wielaard  <mjw@redhat.com>
+
 	* run-backtrace-demangle.sh: Check exitcode and max number of frames.
 
 2014-01-18  Jan Kratochvil  <jan.kratochvil@redhat.com>

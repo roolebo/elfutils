@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2005-2013 Red Hat, Inc.
+# Copyright (C) 2005-2014 Red Hat, Inc.
 # This file is part of elfutils.
 #
 # This file is free software; you can redistribute it and/or modify
@@ -118,9 +118,12 @@ program_transform()
 self_test_files=`echo ${abs_top_builddir}/src/addr2line \
 ${abs_top_builddir}/src/elfcmp ${abs_top_builddir}/src/elflint \
 ${abs_top_builddir}/src/nm ${abs_top_builddir}/src/objdump \
-${abs_top_builddir}/src/readelf ${abs_top_builddir}/src/size \
-${abs_top_builddir}/src/strip ${abs_top_builddir}/libelf/libelf.so \
-${abs_top_builddir}/libdw/libdw.so ${abs_top_builddir}/backends/libebl_*.so`
+${abs_top_builddir}/src/readelf \
+${abs_top_builddir}/src/size.o ${abs_top_builddir}/src/strip.o \
+${abs_top_builddir}/libelf/libelf.so \
+${abs_top_builddir}/libdw/libdw.so \
+${abs_top_builddir}/backends/libebl_i386.so \
+${abs_top_builddir}/backends/libebl_x86_64.so`
 
 # Provide a command to run on all self-test files with testrun.
 testrun_on_self()

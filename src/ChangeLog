@@ -1,3 +1,12 @@
+2014-01-17  Jakub Jelinek  <jakub@redhat.com>
+
+	* elflint.c (section_name): Return "<invalid>" instead of
+	crashing on invalid section name.
+	(check_symtab, is_rel_dyn, check_rela, check_rel, check_dynamic,
+	check_symtab_shndx, check_hash, check_versym): Robustify.
+	(check_hash): Don't check entries beyond end of section.
+	(check_note): Don't crash if gelf_rawchunk fails.
+
 2014-01-17  Petr Machata  <pmachata@redhat.com>
 
 	* readelf.c (handle_dynamic, handle_relocs_rel)

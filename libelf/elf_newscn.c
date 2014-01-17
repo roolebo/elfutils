@@ -1,5 +1,5 @@
 /* Append new section.
-   Copyright (C) 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2005, 2009, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -83,10 +83,18 @@ elf_newscn (elf)
   else
     {
       /* We must allocate a new element.  */
-      Elf_ScnList *newp;
+      Elf_ScnList *newp = NULL;
 
       assert (elf->state.elf.scnincr > 0);
 
+      if (
+#if SIZE_MAX <= 4294967295U
+	  likely (elf->state.elf.scnincr
+		  < SIZE_MAX / 2 / sizeof (Elf_Scn) - sizeof (Elf_ScnList))
+#else
+	  1
+#endif
+	  )
       newp = (Elf_ScnList *) calloc (sizeof (Elf_ScnList)
 				     + ((elf->state.elf.scnincr *= 2)
 					* sizeof (Elf_Scn)), 1);

@@ -1,5 +1,5 @@
 /* Write changed data structures.
-   Copyright (C) 2000-2010 Red Hat, Inc.
+   Copyright (C) 2000-2010, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -202,6 +202,9 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
   /* Write all the sections.  Well, only those which are modified.  */
   if (shnum > 0)
     {
+      if (unlikely (shnum > SIZE_MAX / sizeof (Elf_Scn *)))
+	return 1;
+
       Elf_ScnList *list = &elf->state.ELFW(elf,LIBELFBITS).scns;
       Elf_Scn **scns = (Elf_Scn **) alloca (shnum * sizeof (Elf_Scn *));
       char *const shdr_start = ((char *) elf->map_address + elf->start_offset
@@ -624,6 +627,10 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
   /* Write all the sections.  Well, only those which are modified.  */
   if (shnum > 0)
     {
+      if (unlikely (shnum > SIZE_MAX / (sizeof (Elf_Scn *)
+					+ sizeof (ElfW2(LIBELFBITS,Shdr)))))
+	return 1;
+
       off_t shdr_offset = elf->start_offset + ehdr->e_shoff;
 #if EV_NUM != 2
       xfct_t shdr_fctp = __elf_xfctstom[__libelf_version - 1][EV_CURRENT - 1][ELFW(ELFCLASS, LIBELFBITS) - 1][ELF_T_SHDR];

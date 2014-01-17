@@ -1,5 +1,5 @@
 /* Create descriptor for processing file.
-   Copyright (C) 1998-2010, 2012 Red Hat, Inc.
+   Copyright (C) 1998-2010, 2012, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -144,7 +144,8 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
 
       if (unlikely (result == 0) && ehdr.e32->e_shoff != 0)
 	{
-	  if (ehdr.e32->e_shoff + sizeof (Elf32_Shdr) > maxsize)
+	  if (unlikely (ehdr.e32->e_shoff >= maxsize)
+	      || unlikely (maxsize - ehdr.e32->e_shoff < sizeof (Elf32_Shdr)))
 	    /* Cannot read the first section header.  */
 	    return 0;
 
@@ -192,7 +193,8 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
 
       if (unlikely (result == 0) && ehdr.e64->e_shoff != 0)
 	{
-	  if (ehdr.e64->e_shoff + sizeof (Elf64_Shdr) > maxsize)
+	  if (unlikely (ehdr.e64->e_shoff >= maxsize)
+	      || unlikely (ehdr.e64->e_shoff + sizeof (Elf64_Shdr) > maxsize))
 	    /* Cannot read the first section header.  */
 	    return 0;
 
@@ -264,6 +266,15 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
     /* Could not determine the number of sections.  */
     return NULL;
 
+  /* Check for too many sections.  */
+  if (e_ident[EI_CLASS] == ELFCLASS32)
+    {
+      if (scncnt > SIZE_MAX / (sizeof (Elf_Scn) + sizeof (Elf32_Shdr)))
+	return NULL;
+    }
+  else if (scncnt > SIZE_MAX / (sizeof (Elf_Scn) + sizeof (Elf64_Shdr)))
+    return NULL;
+
   /* We can now allocate the memory.  Even if there are no section headers,
      we allocate space for a zeroth section in case we need it later.  */
   const size_t scnmax = (scncnt ?: (cmd == ELF_C_RDWR || cmd == ELF_C_RDWR_MMAP)
@@ -303,6 +314,16 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 	{
 	  /* We can use the mmapped memory.  */
 	  elf->state.elf32.ehdr = ehdr;
+
+	  if (unlikely (ehdr->e_shoff >= maxsize)
+	      || unlikely (maxsize - ehdr->e_shoff
+			   < scncnt * sizeof (Elf32_Shdr)))
+	    {
+	    free_and_out:
+	      free (elf);
+	      __libelf_seterrno (ELF_E_INVALID_FILE);
+	      return NULL;
+	    }
 	  elf->state.elf32.shdr
 	    = (Elf32_Shdr *) ((char *) ehdr + ehdr->e_shoff);
 
@@ -389,6 +410,11 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 	{
 	  /* We can use the mmapped memory.  */
 	  elf->state.elf64.ehdr = ehdr;
+
+	  if (unlikely (ehdr->e_shoff >= maxsize)
+	      || unlikely (ehdr->e_shoff
+			   + scncnt * sizeof (Elf32_Shdr) > maxsize))
+	    goto free_and_out;
 	  elf->state.elf64.shdr
 	    = (Elf64_Shdr *) ((char *) ehdr + ehdr->e_shoff);
 

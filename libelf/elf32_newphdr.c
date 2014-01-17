@@ -1,5 +1,5 @@
 /* Create new ELF program header table.
-   Copyright (C) 1999-2010 Red Hat, Inc.
+   Copyright (C) 1999-2010, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -114,6 +114,12 @@ elfw2(LIBELFBITS,newphdr) (elf, count)
 	   || count == PN_XNUM
 	   || elf->state.ELFW(elf,LIBELFBITS).phdr == NULL)
     {
+      if (unlikely (count > SIZE_MAX / sizeof (ElfW2(LIBELFBITS,Phdr))))
+	{
+	  result = NULL;
+	  goto out;
+	}
+
       /* Allocate a new program header with the appropriate number of
 	 elements.  */
       result = (ElfW2(LIBELFBITS,Phdr) *)

@@ -1,4 +1,27 @@
 2014-01-17  Jakub Jelinek  <jakub@redhat.com>
+	    Roland McGrath  <roland@redhat.com>
+
+	* libelfP.h (INVALID_NDX): Define.
+	* gelf_getdyn.c (gelf_getdyn): Use it.  Remove ndx < 0 test if any.
+	* gelf_getlib.c (gelf_getlib): Likewise.
+	* gelf_getmove.c (gelf_getmove): Likewise.
+	* gelf_getrel.c (gelf_getrel): Likewise.
+	* gelf_getrela.c (gelf_getrela): Likewise.
+	* gelf_getsym.c (gelf_getsym): Likewise.
+	* gelf_getsyminfo.c (gelf_getsyminfo): Likewise.
+	* gelf_getsymshndx.c (gelf_getsymshndx): Likewise.
+	* gelf_getversym.c (gelf_getversym): Likewise.
+	* gelf_update_dyn.c (gelf_update_dyn): Likewise.
+	* gelf_update_lib.c (gelf_update_lib): Likewise.
+	* gelf_update_move.c (gelf_update_move): Likewise.
+	* gelf_update_rel.c (gelf_update_rel): Likewise.
+	* gelf_update_rela.c (gelf_update_rela): Likewise.
+	* gelf_update_sym.c (gelf_update_sym): Likewise.
+	* gelf_update_syminfo.c (gelf_update_syminfo): Likewise.
+	* gelf_update_symshndx.c (gelf_update_symshndx): Likewise.
+	* gelf_update_versym.c (gelf_update_versym): Likewise.
+
+2014-01-17  Jakub Jelinek  <jakub@redhat.com>
 
 	* elf32_getphdr.c (elfw2(LIBELFBITS,getphdr)): Check if program header
 	table fits into object's bounds.

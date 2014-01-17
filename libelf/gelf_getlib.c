@@ -1,5 +1,5 @@
 /* Get library from table at the given index.
-   Copyright (C) 2004 Red Hat, Inc.
+   Copyright (C) 2004, 2005, 2009, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
@@ -65,7 +65,7 @@ gelf_getlib (data, ndx, dst)
   /* The data is already in the correct form.  Just make sure the
      index is OK.  */
   GElf_Lib *result = NULL;
-  if (unlikely ((ndx + 1) * sizeof (GElf_Lib) > data->d_size))
+  if (INVALID_NDX (ndx, GElf_Lib, data))
     __libelf_seterrno (ELF_E_INVALID_INDEX);
   else
     {

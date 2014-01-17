@@ -1,5 +1,5 @@
 /* Update move structure at the given index.
-   Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2005, 2009, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -54,8 +54,7 @@ gelf_update_move (data, ndx, src)
   assert (sizeof (GElf_Move) == sizeof (Elf64_Move));
 
   /* Check whether we have to resize the data buffer.  */
-  if (unlikely (ndx < 0)
-      || unlikely ((ndx + 1) * sizeof (GElf_Move) > data_scn->d.d_size))
+  if (INVALID_NDX (ndx, GElf_Move, &data_scn->d))
     {
       __libelf_seterrno (ELF_E_INVALID_INDEX);
       return 0;

@@ -1,5 +1,5 @@
 /* Get symbol information from symbol table at the given index.
-   Copyright (C) 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright (C) 1999, 2000, 2001, 2002, 2005, 2009, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1999.
 
@@ -69,7 +69,7 @@ gelf_getsym (data, ndx, dst)
 	 table entries has to be adopted.  The user better has provided
 	 a buffer where we can store the information.  While copying the
 	 data we are converting the format.  */
-      if (unlikely ((ndx + 1) * sizeof (Elf32_Sym) > data->d_size))
+      if (INVALID_NDX (ndx, Elf32_Sym, data))
 	{
 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
 	  goto out;
@@ -98,7 +98,7 @@ gelf_getsym (data, ndx, dst)
 
       /* The data is already in the correct form.  Just make sure the
 	 index is OK.  */
-      if (unlikely ((ndx + 1) * sizeof (GElf_Sym) > data->d_size))
+      if (INVALID_NDX (ndx, GElf_Sym, data))
 	{
 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
 	  goto out;

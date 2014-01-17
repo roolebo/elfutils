@@ -1,5 +1,5 @@
 /* Update library in table at the given index.
-   Copyright (C) 2004 Red Hat, Inc.
+   Copyright (C) 2004, 2005, 2009, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
@@ -47,12 +47,6 @@ gelf_update_lib (data, ndx, src)
   if (data == NULL)
     return 0;
 
-  if (unlikely (ndx < 0))
-    {
-      __libelf_seterrno (ELF_E_INVALID_INDEX);
-      return 0;
-    }
-
   Elf_Data_Scn *data_scn = (Elf_Data_Scn *) data;
   if (unlikely (data_scn->d.d_type != ELF_T_LIB))
     {
@@ -66,7 +60,7 @@ gelf_update_lib (data, ndx, src)
 
   /* Check whether we have to resize the data buffer.  */
   int result = 0;
-  if (unlikely ((ndx + 1) * sizeof (Elf64_Lib) > data_scn->d.d_size))
+  if (INVALID_NDX (ndx, Elf64_Lib, &data_scn->d))
     __libelf_seterrno (ELF_E_INVALID_INDEX);
   else
     {

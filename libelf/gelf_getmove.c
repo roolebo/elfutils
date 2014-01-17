@@ -1,5 +1,5 @@
 /* Get move structure at the given index.
-   Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2005, 2009, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -62,7 +62,7 @@ gelf_getmove (data, ndx, dst)
 
   /* The data is already in the correct form.  Just make sure the
      index is OK.  */
-  if (unlikely ((ndx + 1) * sizeof (GElf_Move) > data->d_size))
+  if (INVALID_NDX (ndx, GElf_Move, data))
     {
       __libelf_seterrno (ELF_E_INVALID_INDEX);
       goto out;

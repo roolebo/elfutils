@@ -1,5 +1,5 @@
 /* Get REL relocation information at given index.
-   Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2005, 2009, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -50,12 +50,6 @@ gelf_getrel (data, ndx, dst)
   if (data_scn == NULL)
     return NULL;
 
-  if (unlikely (ndx < 0))
-    {
-      __libelf_seterrno (ELF_E_INVALID_INDEX);
-      return NULL;
-    }
-
   if (unlikely (data_scn->d.d_type != ELF_T_REL))
     {
       __libelf_seterrno (ELF_E_INVALID_HANDLE);
@@ -72,7 +66,7 @@ gelf_getrel (data, ndx, dst)
   if (scn->elf->class == ELFCLASS32)
     {
       /* We have to convert the data.  */
-      if (unlikely ((ndx + 1) * sizeof (Elf32_Rel) > data_scn->d.d_size))
+      if (INVALID_NDX (ndx, Elf32_Rel, &data_scn->d))
 	{
 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
 	  result = NULL;
@@ -92,7 +86,7 @@ gelf_getrel (data, ndx, dst)
     {
       /* Simply copy the data after we made sure we are actually getting
 	 correct data.  */
-      if (unlikely ((ndx + 1) * sizeof (Elf64_Rel) > data_scn->d.d_size))
+      if (INVALID_NDX (ndx, Elf64_Rel, &data_scn->d))
 	{
 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
 	  result = NULL;

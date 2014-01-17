@@ -1,6 +1,6 @@
 /* Get symbol information and separate section index from symbol table
    at the given index.
-   Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2005, 2009, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -69,7 +69,7 @@ gelf_getsymshndx (symdata, shndxdata, ndx, dst, dstshndx)
      section index table.  */
   if (likely (shndxdata_scn != NULL))
     {
-      if (unlikely ((ndx + 1) * sizeof (Elf32_Word) > shndxdata_scn->d.d_size))
+      if (INVALID_NDX (ndx, Elf32_Word, &shndxdata_scn->d))
 	{
 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
 	  goto out;
@@ -89,7 +89,7 @@ gelf_getsymshndx (symdata, shndxdata, ndx, dst, dstshndx)
 	 table entries has to be adopted.  The user better has provided
 	 a buffer where we can store the information.  While copying the
 	 data we are converting the format.  */
-      if (unlikely ((ndx + 1) * sizeof (Elf32_Sym) > symdata->d_size))
+      if (INVALID_NDX (ndx, Elf32_Sym, symdata))
 	{
 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
 	  goto out;
@@ -118,7 +118,7 @@ gelf_getsymshndx (symdata, shndxdata, ndx, dst, dstshndx)
 
       /* The data is already in the correct form.  Just make sure the
 	 index is OK.  */
-      if (unlikely ((ndx + 1) * sizeof (GElf_Sym) > symdata->d_size))
+      if (INVALID_NDX (ndx, GElf_Sym, symdata))
 	{
 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
 	  goto out;

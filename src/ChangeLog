@@ -1,3 +1,9 @@
+2014-01-17  Roland McGrath  <roland@redhat.com>
+
+	* readelf.c (handle_dynamic, handle_symtab): Check for bogus sh_link.
+	(handle_verneed, handle_verdef, handle_versym, handle_hash): Likewise.
+	(handle_scngrp): Check for bogus sh_info.
+
 2014-01-17  Jakub Jelinek  <jakub@redhat.com>
 
 	* elflint.c (section_name): Return "<invalid>" instead of

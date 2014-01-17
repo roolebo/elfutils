@@ -1364,6 +1364,8 @@ handle_scngrp (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
   Elf32_Word *grpref = (Elf32_Word *) data->d_buf;
 
   GElf_Sym sym_mem;
+  GElf_Sym *sym = gelf_getsym (symdata, shdr->sh_info, &sym_mem);
+
   printf ((grpref[0] & GRP_COMDAT)
 	  ? ngettext ("\
 \nCOMDAT section group [%2zu] '%s' with signature '%s' contains %zu entry:\n",
@@ -1376,8 +1378,8 @@ handle_scngrp (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 		      data->d_size / sizeof (Elf32_Word) - 1),
 	  elf_ndxscn (scn),
 	  elf_strptr (ebl->elf, shstrndx, shdr->sh_name),
-	  elf_strptr (ebl->elf, symshdr->sh_link,
-		      gelf_getsym (symdata, shdr->sh_info, &sym_mem)->st_name)
+	  (sym == NULL ? NULL
+	   : elf_strptr (ebl->elf, symshdr->sh_link, sym->st_name))
 	  ?: gettext ("<INVALID SYMBOL>"),
 	  data->d_size / sizeof (Elf32_Word) - 1);
 
@@ -1528,7 +1530,8 @@ static void
 handle_dynamic (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 {
   int class = gelf_getclass (ebl->elf);
-  GElf_Shdr glink;
+  GElf_Shdr glink_mem;
+  GElf_Shdr *glink;
   Elf_Data *data;
   size_t cnt;
   size_t shstrndx;
@@ -1560,9 +1563,7 @@ handle_dynamic (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 	  class == ELFCLASS32 ? 10 : 18, shdr->sh_addr,
 	  shdr->sh_offset,
 	  (int) shdr->sh_link,
-	  elf_strptr (ebl->elf, shstrndx,
-		      gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
-				    &glink)->sh_name));
+	  elf_strptr (ebl->elf, shstrndx, glink->sh_name));
   fputs_unlocked (gettext ("  Type              Value\n"), stdout);
 
   for (cnt = 0; cnt < shdr->sh_size / sh_entsize; ++cnt)
@@ -2149,6 +2150,13 @@ handle_symtab (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
 
+  GElf_Shdr glink_mem;
+  GElf_Shdr *glink = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
+				   &glink_mem);
+  if (glink == NULL)
+    error (EXIT_FAILURE, 0, gettext ("invalid sh_link value in section %Zu"),
+	   elf_ndxscn (scn));
+
   /* Now we can compute the number of entries in the section.  */
   unsigned int nsyms = data->d_size / (class == ELFCLASS32
 				       ? sizeof (Elf32_Sym)
@@ -2159,15 +2167,12 @@ handle_symtab (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 		    nsyms),
 	  (unsigned int) elf_ndxscn (scn),
 	  elf_strptr (ebl->elf, shstrndx, shdr->sh_name), nsyms);
-  GElf_Shdr glink;
   printf (ngettext (" %lu local symbol  String table: [%2u] '%s'\n",
 		    " %lu local symbols  String table: [%2u] '%s'\n",
 		    shdr->sh_info),
 	  (unsigned long int) shdr->sh_info,
 	  (unsigned int) shdr->sh_link,
-	  elf_strptr (ebl->elf, shstrndx,
-		      gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
-				    &glink)->sh_name));
+	  elf_strptr (ebl->elf, shstrndx, glink->sh_name));
 
   fputs_unlocked (class == ELFCLASS32
 		  ? gettext ("\
@@ -2403,7 +2408,13 @@ handle_verneed (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
 
-  GElf_Shdr glink;
+  GElf_Shdr glink_mem;
+  GElf_Shdr *glink = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
+				   &glink_mem);
+  if (glink == NULL)
+    error (EXIT_FAILURE, 0, gettext ("invalid sh_link value in section %Zu"),
+	   elf_ndxscn (scn));
+
   printf (ngettext ("\
 \nVersion needs section [%2u] '%s' contains %d entry:\n Addr: %#0*" PRIx64 "  Offset: %#08" PRIx64 "  Link to section: [%2u] '%s'\n",
 		    "\
@@ -2414,9 +2425,7 @@ handle_verneed (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 	  class == ELFCLASS32 ? 10 : 18, shdr->sh_addr,
 	  shdr->sh_offset,
 	  (unsigned int) shdr->sh_link,
-	  elf_strptr (ebl->elf, shstrndx,
-		      gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
-				    &glink)->sh_name));
+	  elf_strptr (ebl->elf, shstrndx, glink->sh_name));
 
   unsigned int offset = 0;
   for (int cnt = shdr->sh_info; --cnt >= 0; )
@@ -2469,8 +2478,14 @@ handle_verdef (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
 
+  GElf_Shdr glink_mem;
+  GElf_Shdr *glink = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
+				   &glink_mem);
+  if (glink == NULL)
+    error (EXIT_FAILURE, 0, gettext ("invalid sh_link value in section %Zu"),
+	   elf_ndxscn (scn));
+
   int class = gelf_getclass (ebl->elf);
-  GElf_Shdr glink;
   printf (ngettext ("\
 \nVersion definition section [%2u] '%s' contains %d entry:\n Addr: %#0*" PRIx64 "  Offset: %#08" PRIx64 "  Link to section: [%2u] '%s'\n",
 		    "\
@@ -2482,9 +2497,7 @@ handle_verdef (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 	  class == ELFCLASS32 ? 10 : 18, shdr->sh_addr,
 	  shdr->sh_offset,
 	  (unsigned int) shdr->sh_link,
-	  elf_strptr (ebl->elf, shstrndx,
-		      gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
-				    &glink)->sh_name));
+	  elf_strptr (ebl->elf, shstrndx, glink->sh_name));
 
   unsigned int offset = 0;
   for (int cnt = shdr->sh_info; --cnt >= 0; )
@@ -2755,7 +2768,6 @@ handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 	   elf_ndxscn (scn));
 
   /* Print the header.  */
-  GElf_Shdr glink;
   printf (ngettext ("\
 \nVersion symbols section [%2u] '%s' contains %d entry:\n Addr: %#0*" PRIx64 "  Offset: %#08" PRIx64 "  Link to section: [%2u] '%s'",
 		    "\
@@ -2767,9 +2779,7 @@ handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 	  class == ELFCLASS32 ? 10 : 18, shdr->sh_addr,
 	  shdr->sh_offset,
 	  (unsigned int) shdr->sh_link,
-	  elf_strptr (ebl->elf, shstrndx,
-		      gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
-				    &glink)->sh_name));
+	  elf_strptr (ebl->elf, shstrndx, glink->sh_name));
 
   /* Now we can finally look at the actual contents of this section.  */
   for (unsigned int cnt = 0; cnt < shdr->sh_size / sh_entsize; ++cnt)
@@ -2821,7 +2831,17 @@ print_hash_info (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx,
   for (Elf32_Word cnt = 0; cnt < nbucket; ++cnt)
     ++counts[lengths[cnt]];
 
-  GElf_Shdr glink;
+  GElf_Shdr glink_mem;
+  GElf_Shdr *glink = gelf_getshdr (elf_getscn (ebl->elf,
+					       shdr->sh_link),
+				   &glink_mem);
+  if (glink == NULL)
+    {
+      error (0, 0, gettext ("invalid sh_link value in section %Zu"),
+	     elf_ndxscn (scn));
+      return;
+    }
+
   printf (ngettext ("\
 \nHistogram for bucket list length in section [%2u] '%s' (total of %d bucket):\n Addr: %#0*" PRIx64 "  Offset: %#08" PRIx64 "  Link to section: [%2u] '%s'\n",
 		    "\
@@ -2834,9 +2854,7 @@ print_hash_info (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx,
 	  shdr->sh_addr,
 	  shdr->sh_offset,
 	  (unsigned int) shdr->sh_link,
-	  elf_strptr (ebl->elf, shstrndx,
-		      gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
-				    &glink)->sh_name));
+	  elf_strptr (ebl->elf, shstrndx, glink->sh_name));
 
   if (extrastr != NULL)
     fputs (extrastr, stdout);
@@ -4414,6 +4432,16 @@ print_decoded_aranges_section (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn,
     {
       error (0, 0, gettext ("cannot get .debug_aranges content: %s"),
 	     dwarf_errmsg (-1));
+      return;
+    }
+
+  GElf_Shdr glink_mem;
+  GElf_Shdr *glink;
+  glink = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link), &glink_mem);
+  if (glink == NULL)
+    {
+      error (0, 0, gettext ("invalid sh_link value in section %Zu"),
+	     elf_ndxscn (scn));
       return;
     }
 

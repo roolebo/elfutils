@@ -1,3 +1,8 @@
+2014-01-17  Petr Machata  <pmachata@redhat.com>
+
+	* relocate.c (relocate_section): Use gelf_fsize instead of relying
+	on shdr->sh_entsize.
+
 2014-01-05  Mark Wielaard  <mjw@redhat.com>
 
 	* frame_unwind.c (handle_cfi): Only skip resetting return register

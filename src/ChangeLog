@@ -1,3 +1,9 @@
+2014-01-17  Petr Machata  <pmachata@redhat.com>
+
+	* readelf.c (handle_dynamic, handle_relocs_rel)
+	(handle_relocs_rela, handle_versym, print_liblist):
+	Use gelf_fsize instead of relying on shdr->sh_entsize.
+
 2014-01-14  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (print_debug_macro_section): Clear vendor array before

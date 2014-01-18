@@ -1,3 +1,9 @@
+2014-01-18  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	Fix false FAILs on testsuite with ulimit -c unlimited.
+	* backtrace-child.c (sigusr2): Call pthread_exit.
+	(main): Return, do not call abort.
+
 2014-01-15  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	Fix corruption of non-C++ symbols by the demangler.

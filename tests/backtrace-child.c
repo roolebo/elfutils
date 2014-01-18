@@ -100,7 +100,10 @@ sigusr2 (int signo)
   if (! gencore)
     {
       raise (SIGUSR1);
-      /* It should not be reached.  */
+      /* Do not return as stack may be invalid due to ptrace-patched PC to the
+	 jmp function.  */
+      pthread_exit (NULL);
+      /* Not reached.  */
       abort ();
     }
   /* Here we dump the core for --gencore.  */
@@ -218,6 +221,5 @@ main (int argc UNUSED, char **argv)
     pthread_join (thread, NULL);
   else
     raise (SIGUSR2);
-  /* Not reached.  */
-  abort ();
+  return 0;
 }

@@ -642,7 +642,7 @@ handle_address (const char *string, Dwfl *dwfl)
       Dwarf_Addr bias = 0;
       Dwarf_Die *cudie = dwfl_module_addrdie (mod, addr, &bias);
 
-      Dwarf_Die *scopes;
+      Dwarf_Die *scopes = NULL;
       int nscopes = dwarf_getscopes (cudie, addr - bias, &scopes);
       if (nscopes < 0)
 	return 1;

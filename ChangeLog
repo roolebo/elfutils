@@ -1,3 +1,7 @@
+2014-01-20  Mark Wielaard  <mjw@redhat.com>
+
+	* NEWS (Version 0.159): New. Add stack -d.
+
 2014-01-03  Mark Wielaard  <mjw@redhat.com>
 
 	* configure.ac: Set version to 0.158.

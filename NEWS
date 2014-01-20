@@ -1,3 +1,7 @@
+Version 0.159
+
+stack: New option -d, --debugname to lookup DWARF debuginfo name for frame.
+
 Version 0.158
 
 libdwfl: dwfl_core_file_report has new parameter executable.

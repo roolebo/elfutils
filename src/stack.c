@@ -28,6 +28,7 @@
 #include <fcntl.h>
 #include ELFUTILS_HEADER(dwfl)
 
+#include <dwarf.h>
 #include <system.h>
 
 /* Name and version of program.  */
@@ -49,6 +50,7 @@ static bool show_one_tid = false;
 static bool show_quiet = false;
 static bool show_raw = false;
 static bool show_modules = false;
+static bool show_debugname = false;
 
 static int maxframes = 2048;
 
@@ -192,6 +194,23 @@ frame_callback (Dwfl_Frame *state, void *arg)
   return DWARF_CB_OK;
 }
 
+static const char*
+die_name (Dwarf_Die *die)
+{
+  Dwarf_Attribute attr;
+  const char *name;
+  name = dwarf_formstring (dwarf_attr_integrate (die,
+						 DW_AT_MIPS_linkage_name,
+						 &attr)
+			   ?: dwarf_attr_integrate (die,
+						    DW_AT_linkage_name,
+						    &attr));
+  if (name == NULL)
+    name = dwarf_diename (die);
+
+  return name;
+}
+
 static void
 print_frames (struct frames *frames, pid_t tid, int dwflerr, const char *what)
 {
@@ -209,7 +228,31 @@ print_frames (struct frames *frames, pid_t tid, int dwflerr, const char *what)
       Dwfl_Module *mod = dwfl_addrmodule (dwfl, pc_adjusted);
       const char *symname = NULL;
       if (mod && ! show_quiet)
-	symname = dwfl_module_addrname (mod, pc_adjusted);
+	{
+	  if (show_debugname)
+	    {
+	      Dwarf_Addr bias = 0;
+	      Dwarf_Die *cudie = dwfl_module_addrdie (mod, pc_adjusted, &bias);
+	      Dwarf_Die *scopes = NULL;
+	      int nscopes = dwarf_getscopes (cudie, pc_adjusted - bias,
+					     &scopes);
+
+	      /* Find the first function-like DIE with a name in scope.  */
+	      for (int i = 0; symname == NULL && i < nscopes; i++)
+		{
+		  Dwarf_Die *scope = &scopes[i];
+		  int tag = dwarf_tag (scope);
+		  if (tag == DW_TAG_subprogram
+		      || tag == DW_TAG_inlined_subroutine
+		      || tag == DW_TAG_entry_point)
+		    symname = die_name (scope);
+		}
+	      free (scopes);
+	    }
+
+	  if (symname == NULL)
+	    symname = dwfl_module_addrname (mod, pc_adjusted);
+	}
 
       int width = get_addr_width (mod);
       printf ("#%-2u 0x%0*" PRIx64, nr, width, (uint64_t) pc);
@@ -382,8 +425,12 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
       show_activation = true;
       break;
 
+    case 'd':
+      show_debugname = true;
+      break;
+
     case 'v':
-      show_activation = show_source = show_module = true;
+      show_activation = show_source = show_module = show_debugname = true;
       break;
 
     case 'b':
@@ -506,12 +553,15 @@ main (int argc, char **argv)
       { NULL, 0, NULL, 0, N_("Output selection options:"), 0 },
       { "activation",  'a', NULL, 0,
 	N_("Additionally show frame activation"), 0 },
+      { "debugname",  'd', NULL, 0,
+	N_("Additionally try to lookup DWARF debuginfo name for frame address"),
+	0 },
       { "module",  'm', NULL, 0,
 	N_("Additionally show module file information"), 0 },
       { "source",  's', NULL, 0,
 	N_("Additionally show source file information"), 0 },
       { "verbose", 'v', NULL, 0,
-	N_("Show all additional information (activation, module and source)"), 0 },
+	N_("Show all additional information (activation, debugname, module and source)"), 0 },
       { "quiet", 'q', NULL, 0,
 	N_("Do not resolve address to function symbol name"), 0 },
       { "raw", 'r', NULL, 0,

@@ -1,5 +1,15 @@
 2014-01-20  Mark Wielaard  <mjw@redhat.com>
 
+	* stack.c (show_debugname): New static boolean.
+	(die_name): New function.
+	(print_frames): If show_debugname is true set symname to the
+	first function-like DIE with a name in scope for the address in
+	the debuginfo.
+	(parse_opt): Handle '-d'.
+	(main): Add 'd' to options.
+
+2014-01-20  Mark Wielaard  <mjw@redhat.com>
+
 	* addr2line.c (handle_address): Initialize scopes to NULL.
 
 2014-01-17  Roland McGrath  <roland@redhat.com>

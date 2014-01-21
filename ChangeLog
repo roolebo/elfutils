@@ -1,3 +1,7 @@
+2014-01-21  Mark Wielaard  <mjw@redhat.com>
+
+	* NEWS (Version 0.159): Add stack -i.
+
 2014-01-20  Mark Wielaard  <mjw@redhat.com>
 
 	* NEWS (Version 0.159): New. Add stack -d.

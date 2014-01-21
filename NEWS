@@ -1,6 +1,7 @@
 Version 0.159
 
 stack: New option -d, --debugname to lookup DWARF debuginfo name for frame.
+       New option -i, --inlines to show inlined frames using DWARF debuginfo.
 
 Version 0.158
 

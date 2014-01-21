@@ -1,3 +1,14 @@
+2014-01-21  Mark Wielaard  <mjw@redhat.com>
+
+	* stack.c (show_inlines): New static boolean.
+	(print_frame): New function split out from...
+	(print_frames): ..here. If show_inlines is true and we found a
+	DIE for the frame address, call print_inline_frames otherwise
+	call print_frame. Keep track of and track frame_nr.
+	(print_inline_frames): New function.
+	(parse_opt): Handle '-i'.
+	(main): Add 'i' to options.
+
 2014-01-27  Mark Wielaard  <mjw@redhat.com>
 
 	* stack.c (maxframes): Initialize to 256.

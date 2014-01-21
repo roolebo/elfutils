@@ -108,7 +108,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-backtrace-native-core-biarch.sh run-backtrace-core-x86_64.sh \
 	run-backtrace-core-i386.sh run-backtrace-core-ppc.sh \
 	run-backtrace-core-s390x.sh run-backtrace-core-s390.sh \
-	run-backtrace-demangle.sh run-stack-d-test.sh
+	run-backtrace-demangle.sh run-stack-d-test.sh run-stack-i-test.sh
 
 if !BIARCH
 export ELFUTILS_DISABLE_BIARCH = 1
@@ -265,7 +265,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-backtrace-demangle.sh testfile-backtrace-demangle.bz2 \
 	     testfile-backtrace-demangle.cc \
 	     testfile-backtrace-demangle.core.bz2 \
-	     run-stack-d-test.sh \
+	     run-stack-d-test.sh run-stack-i-test.sh \
 	     testfiledwarfinlines.bz2 testfiledwarfinlines.core.bz2
 
 if USE_VALGRIND

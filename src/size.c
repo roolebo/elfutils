@@ -1,5 +1,5 @@
 /* Print size information from ELF file.
-   Copyright (C) 2000-2007,2009,2012 Red Hat, Inc.
+   Copyright (C) 2000-2007,2009,2012,2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -441,14 +441,6 @@ show_sysv (Elf *elf, const char *prefix, const char *fname,
 	  digits - 2, sgettext ("sysv|size"),
 	  digits, sgettext ("sysv|addr"));
 
-  const char *fmtstr;
-  if (radix == radix_hex)
-    fmtstr = "%-*s %*" PRIx64 " %*" PRIx64 "\n";
-  else if (radix == radix_decimal)
-    fmtstr = "%-*s %*" PRId64 " %*" PRId64 "\n";
-  else
-    fmtstr = "%-*s %*" PRIo64 " %*" PRIo64 "\n";
-
   /* Iterate over all sections.  */
   GElf_Off total = 0;
   while ((scn = elf_nextscn (elf, scn)) != NULL)
@@ -459,7 +451,11 @@ show_sysv (Elf *elf, const char *prefix, const char *fname,
       /* Ignore all sections which are not used at runtime.  */
       if ((shdr->sh_flags & SHF_ALLOC) != 0)
 	{
-	  printf (fmtstr,
+	  printf ((radix == radix_hex
+		   ? "%-*s %*" PRIx64 " %*" PRIx64 "\n"
+		   : (radix == radix_decimal
+		      ? "%-*s %*" PRId64 " %*" PRId64 "\n"
+		      : "%-*s %*" PRIo64 " %*" PRIo64 "\n")),
 		  maxlen, elf_strptr (elf, shstrndx, shdr->sh_name),
 		  digits - 2, shdr->sh_size,
 		  digits, shdr->sh_addr);
@@ -490,14 +486,6 @@ show_sysv_one_line (Elf *elf)
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
 
-  const char *fmtstr;
-  if (radix == radix_hex)
-    fmtstr = "%" PRIx64 "(%s)";
-  else if (radix == radix_decimal)
-    fmtstr = "%" PRId64 "(%s)";
-  else
-    fmtstr = "%" PRIo64 "(%s)";
-
   /* Iterate over all sections.  */
   GElf_Off total = 0;
   bool first = true;
@@ -515,8 +503,10 @@ show_sysv_one_line (Elf *elf)
 	fputs_unlocked (" + ", stdout);
       first = false;
 
-      printf (fmtstr, shdr->sh_size,
-	      elf_strptr (elf, shstrndx, shdr->sh_name));
+      printf ((radix == radix_hex ? "%" PRIx64 "(%s)"
+	       : (radix == radix_decimal ? "%" PRId64 "(%s)"
+		  : "%" PRIo64 "(%s)")),
+	      shdr->sh_size, elf_strptr (elf, shstrndx, shdr->sh_name));
 
       total += shdr->sh_size;
     }

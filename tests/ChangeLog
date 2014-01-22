@@ -1,3 +1,7 @@
+2014-01-22  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (line2addr_no_Wformat): Removed.
+
 2014-01-21  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (TESTS): Add run-stack-i-test.sh.

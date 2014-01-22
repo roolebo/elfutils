@@ -355,7 +355,6 @@ get_lines_LDADD = $(libdw) $(libelf) $(libmudflap)
 get_files_LDADD = $(libdw) $(libelf) $(libmudflap)
 get_aranges_LDADD = $(libdw) $(libelf) $(libmudflap)
 allfcts_LDADD = $(libdw) $(libelf) $(libmudflap)
-line2addr_no_Wformat = yes
 line2addr_LDADD = $(libdw) $(libmudflap)
 addrscopes_LDADD = $(libdw) $(libmudflap)
 funcscopes_LDADD = $(libdw) $(libmudflap)

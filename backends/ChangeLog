@@ -1,3 +1,13 @@
+2014-01-22  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (aarch64_regs_no_Wformat): Removed.
+	* aarch64_regs.c (regtype): Add bool nr argument. snprintf arg
+	when nr is true.
+	(regtyper): New function.
+	(regtypen): Likewise.
+	(aarch64_register_info): Call either regtyper or regtypen not
+	regtype directly.
+
 2014-01-14  Mark Wielaard  <mjw@redhat.com>
 
 	* aarch64_symbol.c (aarch64_check_special_symbol): Check shdr is

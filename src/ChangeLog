@@ -1,3 +1,21 @@
+2014-01-22  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (nm_no_Wformat): Removed.
+	(size_no_Wformat): Likewise.
+	(strings_no_Wformat): Likewise.
+	(addr2line_no_Wformat): Likewise.
+	* size.c (show_sysv): Use fmtstr directly as literal in printf.
+	(show_sysv_one_line): Likewise.
+	* strings.c (locfmt): Removed.
+	(radix): New static enum.
+	(parse_opt): Set radix, not locfmt.
+	(process_chunk_mb): Use fmtstr directly as literal in printf based
+	on radix.
+	(process_chunk): Likewise.
+	* nm.c (show_symbols_sysv): Use fmtstr directly as literal in printf.
+	(show_symbols_bsd): Likewise.
+	(show_symbols_posix): Likewise.
+
 2014-01-21  Mark Wielaard  <mjw@redhat.com>
 
 	* stack.c (show_inlines): New static boolean.

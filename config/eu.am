@@ -1,6 +1,6 @@
 ## Common automake fragments for elfutils subdirectory makefiles.
 ##
-## Copyright (C) 2010 Red Hat, Inc.
+## Copyright (C) 2010, 2014 Red Hat, Inc.
 ##
 ## This file is part of elfutils.
 ##
@@ -31,10 +31,9 @@
 
 DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H -DLOCALEDIR='"${localedir}"'
 AM_CPPFLAGS = -I. -I$(srcdir) -I$(top_srcdir)/lib -I..
-AM_CFLAGS = -std=gnu99 -Wall -Wshadow \
+AM_CFLAGS = -std=gnu99 -Wall -Wshadow -Wformat=2 \
 	    $(if $($(*F)_no_Werror),,-Werror) \
 	    $(if $($(*F)_no_Wunused),,-Wunused -Wextra) \
-	    $(if $($(*F)_no_Wformat),-Wno-format,-Wformat=2) \
 	    $($(*F)_CFLAGS)
 
 if MUDFLAP

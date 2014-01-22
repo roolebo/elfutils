@@ -1,3 +1,7 @@
+2014-01-22  Mark Wielaard  <mjw@redhat.com>
+
+	* eu.am (AM_CFLAGS): Unconditionally add -Wformat=2.
+
 2014-01-03  Mark Wielaard  <mjw@redhat.com>
 
 	* elfutils.spec.in: Update for 0.158.

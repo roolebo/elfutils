@@ -1,5 +1,5 @@
 /* Print symbol information from ELF file in human-readable form.
-   Copyright (C) 2000-2008, 2009, 2011, 2012 Red Hat, Inc.
+   Copyright (C) 2000-2008, 2009, 2011, 2012, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -794,15 +794,6 @@ show_symbols_sysv (Ebl *ebl, GElf_Word strndx, const char *fullname,
 	  /* TRANS: the "sysv|" parts makes the string unique.  */
 	  longest_where, sgettext ("sysv|Line"));
 
-  /* Which format string to use (different radix for numbers).  */
-  const char *number_fmtstr;
-  if (radix == radix_hex)
-    number_fmtstr = "%0*" PRIx64;
-  else if (radix == radix_decimal)
-    number_fmtstr = "%0*" PRId64;
-  else
-    number_fmtstr = "%0*" PRIo64;
-
 #ifdef USE_DEMANGLE
   size_t demangle_buffer_len = 0;
   char *demangle_buffer = NULL;
@@ -850,9 +841,15 @@ show_symbols_sysv (Ebl *ebl, GElf_Word strndx, const char *fullname,
 	addressbuf[0] = sizebuf[0] = '\0';
       else
 	{
-	  snprintf (addressbuf, sizeof (addressbuf), number_fmtstr,
+	  snprintf (addressbuf, sizeof (addressbuf),
+		    (radix == radix_hex ? "%0*" PRIx64
+		     : (radix == radix_decimal ? "%0*" PRId64
+			: "%0*" PRIo64)),
 		    digits, syms[cnt].sym.st_value);
-	  snprintf (sizebuf, sizeof (sizebuf), number_fmtstr,
+	  snprintf (sizebuf, sizeof (sizebuf),
+		    (radix == radix_hex ? "%0*" PRIx64
+		     : (radix == radix_decimal ? "%0*" PRId64
+			: "%0*" PRIo64)),
 		    digits, syms[cnt].sym.st_size);
 	}
 
@@ -929,19 +926,6 @@ show_symbols_bsd (Elf *elf, const GElf_Ehdr *ehdr, GElf_Word strndx,
   if (prefix != NULL && ! print_file_name)
     printf ("\n%s:\n", fname);
 
-  static const char *const fmtstrs[] =
-    {
-      [radix_hex] = "%6$s%2$0*1$" PRIx64 "%8$s %7$s%3$c%4$s %5$s",
-      [radix_decimal] = "%6$s%*" PRId64 "%8$s %7$s%3$c%4$s %5$s",
-      [radix_octal] = "%6$s%2$0*1$" PRIo64 "%8$s %7$s%3$c%4$s %5$s"
-    };
-  static const char *const sfmtstrs[] =
-    {
-      [radix_hex] = "%6$s%2$0*1$" PRIx64 "%8$s %10$0*9$" PRIx64 " %7$s%3$c%4$s %5$s",
-      [radix_decimal] = "%6$s%2$*1$" PRId64 "%8$s %10$*9$" PRId64 " %7$s%3$c%4$s %5$s",
-      [radix_octal] = "%6$s%2$0*1$" PRIo64 "%8$s %10$0*9$" PRIo64 " %7$s%3$c%4$s %5$s"
-    };
-
 #ifdef USE_DEMANGLE
   size_t demangle_buffer_len = 0;
   char *demangle_buffer = NULL;
@@ -1016,16 +1000,41 @@ show_symbols_bsd (Elf *elf, const GElf_Ehdr *ehdr, GElf_Word strndx,
 	      else
 		color = color_symbol;
 	    }
-
-	  printf (print_size && syms[cnt].sym.st_size != 0
-		  ? sfmtstrs[radix] : fmtstrs[radix],
-		  digits, syms[cnt].sym.st_value,
-		  class_type_char (elf, ehdr, &syms[cnt].sym), marker,
-		  symstr,
-		  color_mode ? color_address : "",
-		  color,
-		  color_mode ? color_off : "",
-		  digits, (uint64_t) syms[cnt].sym.st_size);
+	  if (print_size && syms[cnt].sym.st_size != 0)
+	    {
+#define HEXFMT "%6$s%2$0*1$" PRIx64 "%8$s %10$0*9$" PRIx64 " %7$s%3$c%4$s %5$s"
+#define DECFMT "%6$s%2$*1$" PRId64 "%8$s %10$*9$" PRId64 " %7$s%3$c%4$s %5$s"
+#define OCTFMT "%6$s%2$0*1$" PRIo64 "%8$s %10$0*9$" PRIo64 " %7$s%3$c%4$s %5$s"
+	      printf ((radix == radix_hex ? HEXFMT
+		       : (radix == radix_decimal ? DECFMT : OCTFMT)),
+		      digits, syms[cnt].sym.st_value,
+		      class_type_char (elf, ehdr, &syms[cnt].sym), marker,
+		      symstr,
+		      color_mode ? color_address : "",
+		      color,
+		      color_mode ? color_off : "",
+		      digits, (uint64_t) syms[cnt].sym.st_size);
+#undef HEXFMT
+#undef DECFMT
+#undef OCTFMT
+	    }
+	  else
+	    {
+#define HEXFMT "%6$s%2$0*1$" PRIx64 "%8$s %7$s%3$c%4$s %5$s"
+#define DECFMT "%6$s%2$*1$" PRId64 "%8$s %7$s%3$c%4$s %5$s"
+#define OCTFMT "%6$s%2$0*1$" PRIo64 "%8$s %7$s%3$c%4$s %5$s"
+	      printf ((radix == radix_hex ? HEXFMT
+		       : (radix == radix_decimal ? DECFMT : OCTFMT)),
+		      digits, syms[cnt].sym.st_value,
+		      class_type_char (elf, ehdr, &syms[cnt].sym), marker,
+		      symstr,
+		      color_mode ? color_address : "",
+		      color,
+		      color_mode ? color_off : "");
+#undef HEXFMT
+#undef DECFMT
+#undef OCTFMT
+	    }
 	}
 
       if (color_mode)
@@ -1046,14 +1055,6 @@ show_symbols_posix (Elf *elf, const GElf_Ehdr *ehdr, GElf_Word strndx,
 {
   if (prefix != NULL && ! print_file_name)
     printf ("%s:\n", fullname);
-
-  const char *fmtstr;
-  if (radix == radix_hex)
-    fmtstr = "%s %c%s %0*" PRIx64 " %0*" PRIx64 "\n";
-  else if (radix == radix_decimal)
-    fmtstr = "%s %c%s %*" PRId64 " %*" PRId64 "\n";
-  else
-    fmtstr = "%s %c%s %0*" PRIo64 " %0*" PRIo64 "\n";
 
   int digits = length_map[gelf_getclass (elf) - 1][radix];
 
@@ -1096,7 +1097,11 @@ show_symbols_posix (Elf *elf, const GElf_Ehdr *ehdr, GElf_Word strndx,
 	  putchar_unlocked (' ');
 	}
 
-      printf (fmtstr,
+      printf ((radix == radix_hex
+	       ? "%s %c%s %0*" PRIx64 " %0*" PRIx64 "\n"
+	       : (radix == radix_decimal
+		  ? "%s %c%s %*" PRId64 " %*" PRId64 "\n"
+		  : "%s %c%s %0*" PRIo64 " %0*" PRIo64 "\n")),
 	      symstr,
 	      class_type_char (elf, ehdr, &syms[cnt].sym),
 	      mark_special

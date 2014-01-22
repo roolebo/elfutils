@@ -1,5 +1,5 @@
 /* Register names and numbers for AArch64 DWARF.
-   Copyright (C) 2013 Red Hat, Inc.
+   Copyright (C) 2013, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -47,14 +47,30 @@ aarch64_register_info (Ebl *ebl __attribute__ ((unused)),
     return 128;
 
   ssize_t
-  regtype (const char *setname, int type, const char *fmt, int arg)
+  regtype (const char *setname, int type, const char *rname, bool nr, int arg)
   {
     *setnamep = setname;
     *typep = type;
-    int s = snprintf (name, namelen, fmt, arg);
+    int s;
+    if (nr)
+      s = snprintf (name, namelen, "%s%d", rname, arg);
+    else
+      s = snprintf (name, namelen, "%s", rname);
     if (s < 0 || (unsigned) s >= namelen)
       return -1;
     return s + 1;
+  }
+
+  ssize_t
+  regtyper (const char *setname, int type, const char *rname)
+  {
+    return regtype (setname, type, rname, false, 0);
+  }
+
+  ssize_t
+  regtypen (const char *setname, int type, const char *rname, int arg)
+  {
+    return regtype (setname, type, rname, true, arg);
   }
 
   *prefix = "";
@@ -63,16 +79,16 @@ aarch64_register_info (Ebl *ebl __attribute__ ((unused)),
   switch (regno)
     {
     case 0 ... 30:
-      return regtype ("integer", DW_ATE_signed, "x%d", regno);
+      return regtypen ("integer", DW_ATE_signed, "x", regno);
 
     case 31:
-      return regtype ("integer", DW_ATE_address, "sp", 0);
+      return regtyper ("integer", DW_ATE_address, "sp");
 
     case 32:
       return 0;
 
     case 33:
-      return regtype ("integer", DW_ATE_address, "elr", 0);
+      return regtyper ("integer", DW_ATE_address, "elr");
 
     case 34 ... 63:
       return 0;
@@ -84,7 +100,7 @@ aarch64_register_info (Ebl *ebl __attribute__ ((unused)),
 	 integers.  128-bit quad-word is the only singular value that
 	 covers the whole register, so mark the register thus.  */
       *bits = 128;
-      return regtype ("FP/SIMD", DW_ATE_unsigned, "v%d", regno - 64);
+      return regtypen ("FP/SIMD", DW_ATE_unsigned, "v", regno - 64);
 
     case 96 ... 127:
       return 0;

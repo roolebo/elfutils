@@ -1,3 +1,7 @@
+2014-01-25  Mark Wielaard  <mjw@redhat.com>
+
+	* arm_cfi.c (arm_abi_cfi): Restore SP (r13) from CFA.
+
 2014-01-24  Mark Wielaard  <mjw@redhat.com>
 
 	* arm_reloc.def: Update list.

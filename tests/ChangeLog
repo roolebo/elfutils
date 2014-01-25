@@ -1,3 +1,8 @@
+2014-01-25  Mark Wielaard  <mjw@redhat.com>
+
+	* run-addrcfi.sh (EM_ARM): Change reg13 (sp) from undefined to
+	location expression: call_frame_cfa stack_value.
+
 2014-01-22  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (line2addr_no_Wformat): Removed.

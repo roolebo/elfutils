@@ -2519,7 +2519,7 @@ dwarf_cfi_addrframe (.eh_frame): no matching address range
 	integer reg10 (r10): same_value
 	integer reg11 (r11): same_value
 	integer reg12 (r12): undefined
-	integer reg13 (sp): undefined
+	integer reg13 (sp): location expression: call_frame_cfa stack_value
 	integer reg14 (lr): same_value
 	integer reg15 (pc): location expression: regx(14)
 	FPA reg16 (f0): undefined

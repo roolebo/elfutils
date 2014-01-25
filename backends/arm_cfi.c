@@ -54,6 +54,9 @@ arm_abi_cfi (Ebl *ebl __attribute__ ((unused)), Dwarf_CIE *abi_info)
          Stack Pointer (r13) as setup in the previous frame. */
       DW_CFA_def_cfa, ULEB128_7 (13), ULEB128_7 (0),
 
+      /* The Stack Pointer (r13) is restored from CFA address by default.  */
+      DW_CFA_val_offset, ULEB128_7 (13), ULEB128_7 (0),
+
 #define SV(n) DW_CFA_same_value, ULEB128_7 (n)
       /* Callee-saved regs r4-r8, r10, r11.  */
       SV (4), SV (5), SV (6), SV (7), SV (8), SV (10), SV (11),

@@ -1,5 +1,5 @@
 /* Initialization of Arm specific backend library.
-   Copyright (C) 2002, 2005, 2009, 2013 Red Hat, Inc.
+   Copyright (C) 2002, 2005, 2009, 2013, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -63,6 +63,10 @@ arm_init (elf, machine, eh, ehlen)
   HOOK (eh, check_object_attribute);
   HOOK (eh, return_value_location);
   HOOK (eh, abi_cfi);
+
+  /* We only unwind the core integer registers.  */
+  eh->frame_nregs = 16;
+  HOOK (eh, set_initial_registers_tid);
 
   return MODVERSION;
 }

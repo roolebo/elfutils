@@ -1,3 +1,7 @@
+2014-01-26  Mark Wielaard  <mjw@redhat.com>
+
+	* backtrace-subr.sh (check_unsupported): Special case arm*.
+
 2014-01-25  Mark Wielaard  <mjw@redhat.com>
 
 	* run-addrcfi.sh (EM_ARM): Change reg13 (sp) from undefined to

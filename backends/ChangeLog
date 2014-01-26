@@ -1,3 +1,10 @@
+2014-01-26  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (arm_SRCS): Add arm_initreg.c.
+	* arm_init.c (arm_init): Define frame_nregs and hook
+	set_initial_registers_tid.
+	* arm_initreg.c: New file.
+
 2014-01-25  Mark Wielaard  <mjw@redhat.com>
 
 	* arm_cfi.c (arm_abi_cfi): Restore SP (r13) from CFA.

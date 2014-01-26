@@ -74,6 +74,18 @@ check_unsupported()
     echo >&2 $testname: arch not supported
     exit 77
   fi
+
+  # ARM is special. It is supported, but it doesn't use .eh_frame by default
+  # making the native tests fail unless debuginfo (for glibc) is installed
+  # and we can fall back on .debug_frame for the CFI.
+  case "`uname -m`" in
+    arm* )
+      if grep 'dwfl_thread_getframes: No DWARF information found' $1; then
+	echo >&2 $testname: arm needs debuginfo installed for all libraries
+	exit 77
+      fi
+    ;;
+  esac
 }
 
 check_core()

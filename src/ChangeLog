@@ -1,3 +1,9 @@
+2014-01-27  Mark Wielaard  <mjw@redhat.com>
+
+	* stack.c (maxframes): Initialize to 256.
+	(main): Document new default in options. Document magic number
+	used in frames.allocated initialization.
+
 2014-01-20  Mark Wielaard  <mjw@redhat.com>
 
 	* stack.c (show_debugname): New static boolean.

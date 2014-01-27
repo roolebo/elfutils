@@ -52,7 +52,7 @@ static bool show_raw = false;
 static bool show_modules = false;
 static bool show_debugname = false;
 
-static int maxframes = 2048;
+static int maxframes = 256;
 
 struct frame
 {
@@ -571,7 +571,7 @@ main (int argc, char **argv)
       { NULL, '1', NULL, 0,
 	N_("Show the backtrace of only one thread"), 0 },
       { NULL, 'n', "MAXFRAMES", 0,
-	N_("Show at most MAXFRAMES per thread (default 2048, use 0 for unlimited)"), 0 },
+	N_("Show at most MAXFRAMES per thread (default 256, use 0 for unlimited)"), 0 },
       { "list-modules", 'l', NULL, 0,
 	N_("Show module memory map with build-id, elf and debug files detected"), 0 },
       { NULL, 0, NULL, 0, NULL, 0 }
@@ -601,6 +601,8 @@ invoked with bad or missing arguments it will exit with return code 64.")
     }
 
   struct frames frames;
+  /* When maxframes is zero, then 2048 is just the initial allocation
+     that will be increased using realloc in framecallback ().  */
   frames.allocated = maxframes == 0 ? 2048 : maxframes;
   frames.frames = 0;
   frames.frame = malloc (sizeof (struct frame) * frames.allocated);

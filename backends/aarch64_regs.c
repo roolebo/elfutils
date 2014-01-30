@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <dwarf.h>
+#include <stdarg.h>
 
 #define BACKEND aarch64_
 #include "libebl_CPU.h"
@@ -46,31 +47,21 @@ aarch64_register_info (Ebl *ebl __attribute__ ((unused)),
   if (name == NULL)
     return 128;
 
+  __attribute__ ((format (printf, 3, 4)))
   ssize_t
-  regtype (const char *setname, int type, const char *rname, bool nr, int arg)
+  regtype (const char *setname, int type, const char *fmt, ...)
   {
     *setnamep = setname;
     *typep = type;
-    int s;
-    if (nr)
-      s = snprintf (name, namelen, "%s%d", rname, arg);
-    else
-      s = snprintf (name, namelen, "%s", rname);
+
+    va_list ap;
+    va_start (ap, fmt);
+    int s = vsnprintf (name, namelen, fmt, ap);
+    va_end(ap);
+
     if (s < 0 || (unsigned) s >= namelen)
       return -1;
     return s + 1;
-  }
-
-  ssize_t
-  regtyper (const char *setname, int type, const char *rname)
-  {
-    return regtype (setname, type, rname, false, 0);
-  }
-
-  ssize_t
-  regtypen (const char *setname, int type, const char *rname, int arg)
-  {
-    return regtype (setname, type, rname, true, arg);
   }
 
   *prefix = "";
@@ -79,16 +70,16 @@ aarch64_register_info (Ebl *ebl __attribute__ ((unused)),
   switch (regno)
     {
     case 0 ... 30:
-      return regtypen ("integer", DW_ATE_signed, "x", regno);
+      return regtype ("integer", DW_ATE_signed, "x%d", regno);
 
     case 31:
-      return regtyper ("integer", DW_ATE_address, "sp");
+      return regtype ("integer", DW_ATE_address, "sp");
 
     case 32:
       return 0;
 
     case 33:
-      return regtyper ("integer", DW_ATE_address, "elr");
+      return regtype ("integer", DW_ATE_address, "elr");
 
     case 34 ... 63:
       return 0;
@@ -100,7 +91,7 @@ aarch64_register_info (Ebl *ebl __attribute__ ((unused)),
 	 integers.  128-bit quad-word is the only singular value that
 	 covers the whole register, so mark the register thus.  */
       *bits = 128;
-      return regtypen ("FP/SIMD", DW_ATE_unsigned, "v", regno - 64);
+      return regtype ("FP/SIMD", DW_ATE_unsigned, "v%d", regno - 64);
 
     case 96 ... 127:
       return 0;

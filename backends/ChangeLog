@@ -1,3 +1,11 @@
+2014-01-30  Petr Machata  <pmachata@redhat.com>
+
+	* aarch64_regs.c (aarch64_register_info.regtype): Make this
+	variadic printf-like function.  Call one vsnprintf instead of two
+	snprintf's.
+	(regtyper, regtypen): Drop.
+	(aarch64_register_info): Adjust callers.
+
 2014-01-26  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (arm_SRCS): Add arm_initreg.c.

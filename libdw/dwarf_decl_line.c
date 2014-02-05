@@ -50,15 +50,20 @@ int internal_function
 __libdw_attr_intval (Dwarf_Die *die, int *linep, int attval)
 {
   Dwarf_Attribute attr_mem;
-  Dwarf_Sword line;
+  Dwarf_Word line;
 
-  int res = INTUSE(dwarf_formsdata) (INTUSE(dwarf_attr_integrate)
+  int res = INTUSE(dwarf_formudata) (INTUSE(dwarf_attr_integrate)
 				     (die, attval, &attr_mem),
 				     &line);
   if (res == 0)
     {
-      assert (line >= 0 && line <= INT_MAX);
-      *linep = line;
+      if (line > INT_MAX)
+	{
+	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
+	  res = -1;
+	}
+      else
+	*linep = line;
     }
 
   return res;

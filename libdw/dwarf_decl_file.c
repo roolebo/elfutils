@@ -40,9 +40,9 @@ const char *
 dwarf_decl_file (Dwarf_Die *die)
 {
   Dwarf_Attribute attr_mem;
-  Dwarf_Sword idx = 0;
+  Dwarf_Word idx = 0;
 
-  if (INTUSE(dwarf_formsdata) (INTUSE(dwarf_attr_integrate)
+  if (INTUSE(dwarf_formudata) (INTUSE(dwarf_attr_integrate)
 			       (die, DW_AT_decl_file, &attr_mem),
 			       &idx) != 0)
     return NULL;

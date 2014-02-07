@@ -1191,7 +1191,10 @@ print_phdr (Ebl *ebl, GElf_Ehdr *ehdr)
 	  size_t maxsize;
 	  char *filedata = elf_rawfile (ebl->elf, &maxsize);
 
-	  if (filedata != NULL && phdr->p_offset < maxsize)
+	  if (filedata != NULL && phdr->p_offset < maxsize
+	      && phdr->p_filesz <= maxsize - phdr->p_offset
+	      && memchr (filedata + phdr->p_offset, '\0',
+			 phdr->p_filesz) != NULL)
 	    printf (gettext ("\t[Requesting program interpreter: %s]\n"),
 		    filedata + phdr->p_offset);
 	}

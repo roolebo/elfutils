@@ -1,3 +1,8 @@
+2014-02-07  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_phdr): Check phdr->p_filesz and make sure
+	interpreter string is zero terminated before calling printf.
+
 2014-01-22  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (nm_no_Wformat): Removed.

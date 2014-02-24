@@ -1,3 +1,9 @@
+2014-02-24  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf (print_phdr): Check there is a SHT_PROGBITS section at the
+	offset given by p_offsets for a PT_INTERP segment before trying to
+	display the interpreter string.
+
 2014-02-07  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (print_phdr): Check phdr->p_filesz and make sure

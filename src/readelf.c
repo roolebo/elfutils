@@ -1187,11 +1187,25 @@ print_phdr (Ebl *ebl, GElf_Ehdr *ehdr)
 
       if (phdr->p_type == PT_INTERP)
 	{
-	  /* We can show the user the name of the interpreter.  */
+	  /* If we are sure the file offset is valid then we can show
+	     the user the name of the interpreter.  We check whether
+	     there is a section at the file offset.  Normally there
+	     would be a section called ".interp".  But in separate
+	     .debug files it is a NOBITS section (and so doesn't match
+	     with gelf_offscn).  Which probably means the offset is
+	     not valid another reason could be because the ELF file
+	     just doesn't contain any section headers, in that case
+	     just play it safe and don't display anything.  */
+
+	  Elf_Scn *scn = gelf_offscn (ebl->elf, phdr->p_offset);
+	  GElf_Shdr shdr_mem;
+	  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+
 	  size_t maxsize;
 	  char *filedata = elf_rawfile (ebl->elf, &maxsize);
 
-	  if (filedata != NULL && phdr->p_offset < maxsize
+	  if (shdr != NULL && shdr->sh_type == SHT_PROGBITS
+	      && filedata != NULL && phdr->p_offset < maxsize
 	      && phdr->p_filesz <= maxsize - phdr->p_offset
 	      && memchr (filedata + phdr->p_offset, '\0',
 			 phdr->p_filesz) != NULL)

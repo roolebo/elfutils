@@ -1,3 +1,8 @@
+2014-02-26  Mark Wielaard  <mjw@redhat.com>
+
+	* elf-from-memory.c (elf_from_remote_memory): Check against p64
+	p_type in case ELFCLASS64, not against p32 p_type.
+
 2014-01-17  Petr Machata  <pmachata@redhat.com>
 
 	* relocate.c (relocate_section): Use gelf_fsize instead of relying

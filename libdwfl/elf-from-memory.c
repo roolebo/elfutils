@@ -301,7 +301,7 @@ elf_from_remote_memory (GElf_Addr ehdr_vma,
 
     case ELFCLASS64:
       for (uint_fast16_t i = 0; i < phnum; ++i)
-	if (phdrs.p32[i].p_type == PT_LOAD)
+	if (phdrs.p64[i].p_type == PT_LOAD)
 	  if (handle_segment (phdrs.p64[i].p_vaddr, phdrs.p64[i].p_offset,
 			      phdrs.p64[i].p_filesz, phdrs.p64[i].p_align))
 	    goto read_error;

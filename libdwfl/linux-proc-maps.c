@@ -241,7 +241,8 @@ proc_maps_report (Dwfl *dwfl, FILE *f, GElf_Addr sysinfo_ehdr, pid_t pid)
 	  && ino == last_ino && dmajor == last_dmajor && dminor == last_dminor)
 	{
 	  /* This is another portion of the same file's mapping.  */
-	  assert (!strcmp (last_file, file));
+	  if (strcmp (last_file, file) != 0)
+	    goto bad_report;
 	  high = end;
 	}
       else

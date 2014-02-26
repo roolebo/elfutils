@@ -1,5 +1,9 @@
 2014-02-26  Mark Wielaard  <mjw@redhat.com>
 
+	* linux-proc-maps.c (proc_maps_report): Don't assert on bad input.
+
+2014-02-26  Mark Wielaard  <mjw@redhat.com>
+
 	* elf-from-memory.c (elf_from_remote_memory): Check against p64
 	p_type in case ELFCLASS64, not against p32 p_type.
 

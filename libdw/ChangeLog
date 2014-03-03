@@ -1,3 +1,9 @@
+2014-03-03  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	Fix abort() on missing section headers.
+	* dwarf_begin_elf.c (check_section): Replace abort call by goto err.
+	New label err to return NULL.
+
 2014-02-05  Josh Stone  <jistone@redhat.com>
 
 	* dwarf_decl_file.c (dwarf_decl_file): Read the idx as unsigned.

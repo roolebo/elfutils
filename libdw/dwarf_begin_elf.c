@@ -187,9 +187,9 @@ check_section (Dwarf *result, GElf_Ehdr *ehdr, Elf_Scn *scn, bool inscngrp)
   /* Get the section header data.  */
   shdr = gelf_getshdr (scn, &shdr_mem);
   if (shdr == NULL)
-    /* This should never happen.  If it does something is
-       wrong in the libelf library.  */
-    abort ();
+    /* We may read /proc/PID/mem with only program headers mapped and section
+       headers out of the mapped pages.  */
+    goto err;
 
   /* Ignore any SHT_NOBITS sections.  Debugging sections should not
      have been stripped, but in case of a corrupt file we won't try
@@ -215,6 +215,7 @@ check_section (Dwarf *result, GElf_Ehdr *ehdr, Elf_Scn *scn, bool inscngrp)
     {
       /* The section name must be valid.  Otherwise is the ELF file
 	 invalid.  */
+    err:
       __libdw_free_zdata (result);
       Dwarf_Sig8_Hash_free (&result->sig8_hash);
       __libdw_seterrno (DWARF_E_INVALID_ELF);

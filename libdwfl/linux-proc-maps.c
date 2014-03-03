@@ -1,5 +1,5 @@
 /* Standard libdwfl callbacks for debugging a live Linux process.
-   Copyright (C) 2005-2010, 2013 Red Hat, Inc.
+   Copyright (C) 2005-2010, 2013, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -321,6 +321,7 @@ read_proc_memory (void *arg, void *data, GElf_Addr address,
 }
 
 extern Elf *elf_from_remote_memory (GElf_Addr ehdr_vma,
+				    GElf_Xword pagesize,
 				    GElf_Addr *loadbasep,
 				    ssize_t (*read_memory) (void *arg,
 							    void *data,
@@ -375,7 +376,8 @@ dwfl_linux_proc_find_elf (Dwfl_Module *mod __attribute__ ((unused)),
       if (fd < 0)
 	return -1;
 
-      *elfp = elf_from_remote_memory (base, NULL, &read_proc_memory, &fd);
+      *elfp = elf_from_remote_memory (base, getpagesize (), NULL,
+				      &read_proc_memory, &fd);
 
       close (fd);
 

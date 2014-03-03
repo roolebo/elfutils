@@ -1,3 +1,12 @@
+2014-03-03  Mark Wielaard  <mjw@redhat.com>
+
+	* elf-from-memory.c (elf_from_remote_memory): Take pagesize as
+	argument. Free buffer when detecting bad elf. Check PT_LOAD
+	alignment requirements on first handle_segment pass. Calculate
+	loadbase, start and end of segment using pagesize, not p_align.
+	* linux-proc-maps.c (dwfl_linux_proc_find_elf): Provide pagesize
+	to elf_from_remote_memory.
+
 2014-02-26  Mark Wielaard  <mjw@redhat.com>
 
 	* linux-proc-maps.c (proc_maps_report): Don't assert on bad input.

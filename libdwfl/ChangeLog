@@ -1,3 +1,10 @@
+2014-03-03  Mark Wielaard  <mjw@redhat.com>
+
+	* elf-from-memory.c (elf_from_remote_memory): Keep track of
+	segments_end_mem. Pass memsz to first handle_segment pass. Only
+	extend contents_size and use shdrs if only file bits are in
+	segment.
+
 2014-03-11  Josh Stone  <jistone@redhat.com>
 
 	* dwfl_module_getdwarf.c (open_elf): Only explicitly set

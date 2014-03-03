@@ -196,6 +196,7 @@ elf_from_remote_memory (GElf_Addr ehdr_vma,
   /* Scan for PT_LOAD segments to find the total size of the file image.  */
   size_t contents_size = 0;
   GElf_Off segments_end = 0;
+  GElf_Off segments_end_mem = 0;
   GElf_Addr loadbase = ehdr_vma;
   bool found_base = false;
   switch (ehdr.e32.e_ident[EI_CLASS])
@@ -205,7 +206,8 @@ elf_from_remote_memory (GElf_Addr ehdr_vma,
 	 found_base yet).  Returns true if sanity checking failed,
 	 false otherwise.  */
       inline bool handle_segment (GElf_Addr vaddr, GElf_Off offset,
-				  GElf_Xword filesz, GElf_Xword palign)
+				  GElf_Xword filesz, GElf_Xword memsz,
+				  GElf_Xword palign)
 	{
 	  /* Sanity check the alignment requirements.  */
 	  if ((palign & (pagesize - 1)) != 0
@@ -225,6 +227,7 @@ elf_from_remote_memory (GElf_Addr ehdr_vma,
 	    }
 
 	  segments_end = offset + filesz;
+	  segments_end_mem = offset + memsz;
 	  return false;
 	}
 
@@ -235,7 +238,8 @@ elf_from_remote_memory (GElf_Addr ehdr_vma,
       for (uint_fast16_t i = 0; i < phnum; ++i)
 	if (phdrs.p32[i].p_type == PT_LOAD)
 	  if (handle_segment (phdrs.p32[i].p_vaddr, phdrs.p32[i].p_offset,
-			      phdrs.p32[i].p_filesz, phdrs.p32[i].p_align))
+			      phdrs.p32[i].p_filesz, phdrs.p32[i].p_memsz,
+			      phdrs.p32[i].p_align))
 	    goto bad_elf;
       break;
 
@@ -246,7 +250,8 @@ elf_from_remote_memory (GElf_Addr ehdr_vma,
       for (uint_fast16_t i = 0; i < phnum; ++i)
 	if (phdrs.p64[i].p_type == PT_LOAD)
 	  if (handle_segment (phdrs.p64[i].p_vaddr, phdrs.p64[i].p_offset,
-			      phdrs.p64[i].p_filesz, phdrs.p64[i].p_align))
+			      phdrs.p64[i].p_filesz, phdrs.p64[i].p_memsz,
+			      phdrs.p64[i].p_align))
 	    goto bad_elf;
       break;
 
@@ -257,9 +262,11 @@ elf_from_remote_memory (GElf_Addr ehdr_vma,
 
   /* Trim the last segment so we don't bother with zeros in the last page
      that are off the end of the file.  However, if the extra bit in that
-     page includes the section headers, keep them.  */
+     page includes the section headers and the memory isn't extended (which
+     might indicate it will have been reused otherwise), keep them.  */
   if ((GElf_Off) contents_size > segments_end
-      && (GElf_Off) contents_size >= shdrs_end)
+      && (GElf_Off) contents_size >= shdrs_end
+      && segments_end == segments_end_mem)
     {
       contents_size = segments_end;
       if ((GElf_Off) contents_size < shdrs_end)

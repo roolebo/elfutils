@@ -157,11 +157,17 @@ dwfl_attach_state (Dwfl *dwfl, Elf *elf, pid_t pid,
       ebl = NULL;
       for (Dwfl_Module *mod = dwfl->modulelist; mod != NULL; mod = mod->next)
 	{
-	  /* Reading of the vDSO module may fail as /proc/PID/mem is unreadable
-	     without PTRACE_ATTACH and we may not be PTRACE_ATTACH-ed now.
-	     MOD would not be re-read later to unwind it when we are already
-	     PTRACE_ATTACH-ed to PID.  */
-	  if (strncmp (mod->name, "[vdso: ", 7) == 0)
+	  /* Reading of the vDSO or (deleted) modules may fail as
+	     /proc/PID/mem is unreadable without PTRACE_ATTACH and
+	     we may not be PTRACE_ATTACH-ed now.  MOD would not be
+	     re-read later to unwind it when we are already
+	     PTRACE_ATTACH-ed to PID.  This happens when this function
+	     is called from dwfl_linux_proc_attach with elf == NULL.
+	     __libdwfl_module_getebl will call __libdwfl_getelf which
+	     will call the find_elf callback.  */
+	  if (strncmp (mod->name, "[vdso: ", 7) == 0
+	      || strcmp (strrchr (mod->name, ' ') ?: "",
+			 " (deleted)") == 0)
 	    continue;
 	  Dwfl_Error error = __libdwfl_module_getebl (mod);
 	  if (error != DWFL_E_NOERROR)

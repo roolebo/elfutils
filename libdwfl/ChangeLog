@@ -1,3 +1,23 @@
+2014-03-04  Mark Wielaard  <mjw@redhat.com>
+
+	* libdwflP.h (struct __libdwfl_pid_arg): Moved here and renamed from
+	linux-pid-attach.c (struct pid_arg).
+	(__libdwfl_get_pid_arg): New internal function declaration.
+	(__libdwfl_ptrace_attach): Likewise.
+	(__libdwfl_ptrace_detach): Likewise.
+	* dwfl_frame.c (dwfl_attach_state): Add "(deleted)" files to the
+	special exception modules that cannot be checked at this point.
+	* linux-pid-attach.c (struct pid_arg): Moved to libdwflP.h
+	(ptrace_attach): Renamed to...
+	(__libdwfl_ptrace_attach): New internal function.
+	(__libdwfl_ptrace_detach): Likewise. Extracted from ...
+	(pid_thread_detach): Call __libdwfl_ptrace_detach now.
+	(__libdwfl_get_pid_arg): New internal function.
+	* linux-proc-maps.c (dwfl_linux_proc_find_elf): Check if special
+	module name contains "(deleted)" and dwfl_pid gives an attached
+	pid. If pid is set and try to (re)use ptrace attach state of
+	process before reading memory.
+
 2014-03-03  Mark Wielaard  <mjw@redhat.com>
 
 	* elf-from-memory.c (elf_from_remote_memory): Take pagesize as

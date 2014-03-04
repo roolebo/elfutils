@@ -339,42 +339,66 @@ dwfl_linux_proc_find_elf (Dwfl_Module *mod __attribute__ ((unused)),
 			  const char *module_name, Dwarf_Addr base,
 			  char **file_name, Elf **elfp)
 {
+  int pid = -1;
   if (module_name[0] == '/')
     {
       /* When this callback is used together with dwfl_linux_proc_report
 	 then we might see mappings of special character devices.  Make
 	 sure we only open and return regular files.  Special devices
-	 might hang on open or read.  */
+	 might hang on open or read.  (deleted) files are super special.
+	 The image might come from memory if we are attached.  */
       struct stat sb;
       if (stat (module_name, &sb) == -1 || (sb.st_mode & S_IFMT) != S_IFREG)
-	return -1;
-
-      int fd = open64 (module_name, O_RDONLY);
-      if (fd >= 0)
 	{
-	  *file_name = strdup (module_name);
-	  if (*file_name == NULL)
-	    {
-	      close (fd);
-	      return ENOMEM;
-	    }
+	  if (strcmp (strrchr (module_name, ' ') ?: "", " (deleted)") == 0)
+	    pid = INTUSE(dwfl_pid) (mod->dwfl);
+	  else
+	    return -1;
 	}
-      return fd;
+
+      if (pid == -1)
+	{
+	  int fd = open64 (module_name, O_RDONLY);
+	  if (fd >= 0)
+	    {
+	      *file_name = strdup (module_name);
+	      if (*file_name == NULL)
+		{
+		  close (fd);
+		  return ENOMEM;
+		}
+	    }
+	  return fd;
+	}
     }
 
-  int pid;
-  if (sscanf (module_name, "[vdso: %d]", &pid) == 1)
+  if (pid != -1 || sscanf (module_name, "[vdso: %d]", &pid) == 1)
     {
       /* Special case for in-memory ELF image.  */
 
+      bool detach = false;
+      bool tid_was_stopped = false;
+      struct __libdwfl_pid_arg *pid_arg = __libdwfl_get_pid_arg (mod->dwfl);
+      if (pid_arg != NULL && ! pid_arg->assume_ptrace_stopped)
+	{
+	  /* If any thread is already attached we are fine.  Read
+	     through that thread.  It doesn't have to be the main
+	     thread pid.  */
+	  pid_t tid = pid_arg->tid_attached;
+	  if (tid != 0)
+	    pid = tid;
+	  else
+	    detach = __libdwfl_ptrace_attach (pid, &tid_was_stopped);
+	}
+
       char *fname;
       if (asprintf (&fname, PROCMEMFMT, pid) < 0)
-	return -1;
+	goto detach;
 
       int fd = open64 (fname, O_RDONLY);
       free (fname);
       if (fd < 0)
-	return -1;
+	goto detach;
 
       *elfp = elf_from_remote_memory (base, getpagesize (), NULL,
 				      &read_proc_memory, &fd);
@@ -382,6 +406,10 @@ dwfl_linux_proc_find_elf (Dwfl_Module *mod __attribute__ ((unused)),
       close (fd);
 
       *file_name = NULL;
+
+    detach:
+      if (detach)
+	__libdwfl_ptrace_detach (pid, tid_was_stopped);
       return -1;
     }
 

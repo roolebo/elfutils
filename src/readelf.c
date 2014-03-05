@@ -5732,14 +5732,34 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 		  dwarf_form_name (form), (uintmax_t) num, a);
 	  free (a);
 	}
-      else if (valuestr == NULL)
-	printf ("           %*s%-20s (%s) %" PRIuMAX "\n",
-		(int) (level * 2), "", dwarf_attr_name (attr),
-		dwarf_form_name (form), (uintmax_t) num);
       else
-	printf ("           %*s%-20s (%s) %s (%" PRIuMAX ")\n",
-		(int) (level * 2), "", dwarf_attr_name (attr),
-		dwarf_form_name (form), valuestr, (uintmax_t) num);
+	{
+	  Dwarf_Sword snum = 0;
+	  if (form == DW_FORM_sdata)
+	    if (unlikely (dwarf_formsdata (attrp, &snum) != 0))
+	      goto attrval_out;
+
+	  if (valuestr == NULL)
+	    {
+	      printf ("           %*s%-20s (%s)",
+		      (int) (level * 2), "", dwarf_attr_name (attr),
+		      dwarf_form_name (form));
+	      if (form == DW_FORM_sdata)
+		printf (" %" PRIdMAX "\n", (intmax_t) snum);
+	      else
+		printf (" %" PRIuMAX "\n", (uintmax_t) num);
+	    }
+	  else
+	    {
+	      printf ("           %*s%-20s (%s) %s",
+		      (int) (level * 2), "", dwarf_attr_name (attr),
+		      dwarf_form_name (form), valuestr);
+	      if (form == DW_FORM_sdata)
+		printf (" (%" PRIdMAX ")\n", (intmax_t) snum);
+	      else
+		printf (" (%" PRIuMAX ")\n", (uintmax_t) num);
+	    }
+	}
       break;
 
     case DW_FORM_flag:

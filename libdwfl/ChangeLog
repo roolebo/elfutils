@@ -1,3 +1,8 @@
+2014-03-11  Josh Stone  <jistone@redhat.com>
+
+	* dwfl_module_getdwarf.c (open_elf): Only explicitly set
+	mod->e_type when processing the main ELF file.
+
 2014-03-04  Mark Wielaard  <mjw@redhat.com>
 
 	* libdwflP.h (struct __libdwfl_pid_arg): Moved here and renamed from

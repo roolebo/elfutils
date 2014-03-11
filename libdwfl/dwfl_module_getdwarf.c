@@ -1,5 +1,5 @@
 /* Find debugging and symbol information for a module in libdwfl.
-   Copyright (C) 2005-2012 Red Hat, Inc.
+   Copyright (C) 2005-2012, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -77,7 +77,7 @@ open_elf (Dwfl_Module *mod, struct dwfl_file *file)
       return DWFL_E (LIBELF, elf_errno ());
     }
 
-  if (mod->e_type != ET_REL)
+  if (ehdr->e_type != ET_REL)
     {
       /* In any non-ET_REL file, we compute the "synchronization address".
 
@@ -131,11 +131,24 @@ open_elf (Dwfl_Module *mod, struct dwfl_file *file)
 	}
     }
 
-  mod->e_type = ehdr->e_type;
+  /* We only want to set the module e_type explictly once, derived from
+     the main ELF file.  (It might be changed for the kernel, because
+     that is special - see below.)  open_elf is always called first for
+     the main ELF file, because both find_dw and find_symtab call
+     __libdwfl_getelf first to open the main file.  So don't let debug
+     or aux files override the module e_type.  The kernel heuristic
+     below could otherwise trigger for non-kernel/non-main files, since
+     their phdrs might not match the actual load addresses.  */
+  if (file == &mod->main)
+    {
+      mod->e_type = ehdr->e_type;
 
-  /* Relocatable Linux kernels are ET_EXEC but act like ET_DYN.  */
-  if (mod->e_type == ET_EXEC && file->vaddr != mod->low_addr)
-    mod->e_type = ET_DYN;
+      /* Relocatable Linux kernels are ET_EXEC but act like ET_DYN.  */
+      if (mod->e_type == ET_EXEC && file->vaddr != mod->low_addr)
+	mod->e_type = ET_DYN;
+    }
+  else
+    assert (mod->main.elf != NULL);
 
   return DWFL_E_NOERROR;
 }

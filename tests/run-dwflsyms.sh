@@ -32,6 +32,7 @@ testfiles testfilebazmin
 testfiles testfilebazmin_pl
 testfiles testfilebazmin_plr
 testfiles testfilebasmin
+testfiles testfilebaxmin
 
 tempfiles testfile.dynsym.in testfile.symtab.in testfile.minsym.in dwflsyms.out
 tempfiles testfile.symtab_pl.in testfile.minsym_pl.in 
@@ -360,6 +361,53 @@ testrun_compare ${abs_builddir}/dwflsyms -e testfilebasmin <<\EOF
    6: FUNC	GLOBAL	_start (21) 0x4001a8, rel: 0x4001a8 (.text)
    7: FUNC	GLOBAL	main (33) 0x400144, rel: 0x400144 (.text)
    8: FUNC	GLOBAL	bar (44) 0x40017a, rel: 0x40017a (.text)
+EOF
+
+testrun_compare ${abs_builddir}/dwflsyms -e testfilebaxmin <<\EOF
+   0: NOTYPE	LOCAL	 (0) 0
+   1: FUNC	LOCAL	deregister_tm_clones (0) 0x400430, rel: 0x400430 (.text)
+   2: FUNC	LOCAL	register_tm_clones (0) 0x400460, rel: 0x400460 (.text)
+   3: FUNC	LOCAL	__do_global_dtors_aux (0) 0x4004a0, rel: 0x4004a0 (.text)
+   4: OBJECT	LOCAL	__do_global_dtors_aux_fini_array_entry (0) 0x600e18
+   5: FUNC	LOCAL	frame_dummy (0) 0x4004c0, rel: 0x4004c0 (.text)
+   6: OBJECT	LOCAL	__frame_dummy_init_array_entry (0) 0x600e10
+   7: FUNC	LOCAL	foo (20) 0x4004f0, rel: 0x4004f0 (.text)
+   8: NOTYPE	LOCAL	__init_array_end (0) 0x600e18
+   9: NOTYPE	LOCAL	__init_array_start (0) 0x600e10
+  10: SECTION	LOCAL	 (0) 0x400238
+  11: SECTION	LOCAL	 (0) 0x400254
+  12: SECTION	LOCAL	 (0) 0x400274
+  13: SECTION	LOCAL	 (0) 0x400298
+  14: SECTION	LOCAL	 (0) 0x4002b8
+  15: SECTION	LOCAL	 (0) 0x400300
+  16: SECTION	LOCAL	 (0) 0x400338
+  17: SECTION	LOCAL	 (0) 0x400340
+  18: SECTION	LOCAL	 (0) 0x400360
+  19: SECTION	LOCAL	 (0) 0x400378
+  20: SECTION	LOCAL	 (0) 0x4003a8
+  21: SECTION	LOCAL	 (0) 0x4003d0
+  22: SECTION	LOCAL	 (0) 0x400400
+  23: SECTION	LOCAL	 (0) 0x4005c4
+  24: SECTION	LOCAL	 (0) 0x4005d0
+  25: SECTION	LOCAL	 (0) 0x4005e0
+  26: SECTION	LOCAL	 (0) 0x400628
+  27: SECTION	LOCAL	 (0) 0x600e10
+  28: SECTION	LOCAL	 (0) 0x600e18
+  29: SECTION	LOCAL	 (0) 0x600e20
+  30: SECTION	LOCAL	 (0) 0x600e28
+  31: SECTION	LOCAL	 (0) 0x600ff8
+  32: SECTION	LOCAL	 (0) 0x601000
+  33: SECTION	LOCAL	 (0) 0x601028
+  34: SECTION	LOCAL	 (0) 0x601034
+  35: FUNC	GLOBAL	__libc_start_main (0) 0
+  36: NOTYPE	WEAK	__gmon_start__ (0) 0
+  37: FUNC	GLOBAL	__libc_csu_fini (2) 0x4005c0, rel: 0x4005c0 (.text)
+  38: FUNC	GLOBAL	bar (40) 0x400504, rel: 0x400504 (.text)
+  39: FUNC	GLOBAL	_fini (0) 0x4005c4, rel: 0x4005c4 (.fini)
+  40: FUNC	GLOBAL	__libc_csu_init (101) 0x400550, rel: 0x400550 (.text)
+  41: FUNC	GLOBAL	_start (0) 0x400400, rel: 0x400400 (.text)
+  42: FUNC	GLOBAL	main (35) 0x40052c, rel: 0x40052c (.text)
+  43: FUNC	GLOBAL	_init (0) 0x4003a8, rel: 0x4003a8 (.init)
 EOF
 
 testfiles testfile66

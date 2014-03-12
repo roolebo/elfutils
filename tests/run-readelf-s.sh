@@ -93,6 +93,23 @@
 # objcopy --add-section .gnu_debugdata=mini_debuginfo.xz bas
 # rm bas.debug
 # mv bas testfilebasmin
+#
+#
+# Make sure that find_aux_sym doesn't corrupt relocations, avoiding a kernel
+# heuristic that forces ET_EXEC->ET_DYN.  NB: ld.gold doesn't seem to produce
+# the mismatched load addrs between the main file and the mini_debuginfo, so
+# this is forcing ld.bfd.
+#
+# gcc -g -o bax foo.c bar.c -fuse-ld=bfd
+# eu-strip --remove-comment -f bax.debug bax
+# nm -D bax --format=posix --defined-only | awk '{ print $1 }' | sort > dynsyms
+# nm bax.debug --format=posix --defined-only | awk '{ if ($2 == "T" || $2 == "t") print $1 }' | sort > funcsyms
+# comm -13 dynsyms funcsyms > keep_symbols
+# objcopy -S --remove-section .gdb_index --remove-section .comment --keep-symbols=keep_symbols bax.debug mini_debuginfo
+# rm -f mini_debuginfo.xz
+# xz mini_debuginfo
+# objcopy --add-section .gnu_debugdata=mini_debuginfo.xz bax
+# objcopy --remove-section=.gnu_debuglink bax testfilebaxmin
 
 
 testfiles testfilebaztab
@@ -101,6 +118,7 @@ testfiles testfilebazdyn
 testfiles testfilebazmdb
 testfiles testfilebazmin
 testfiles testfilebasmin
+testfiles testfilebaxmin
 
 tempfiles testfile.dynsym.in testfile.symtab.in testfile.minsym.in
 
@@ -296,6 +314,65 @@ Symbol table [ 6] '.symtab' contains 9 entries:
     6: 00000000004001a8     21 FUNC    GLOBAL DEFAULT        2 _start
     7: 0000000000400144     33 FUNC    GLOBAL DEFAULT        2 main
     8: 000000000040017a     44 FUNC    GLOBAL DEFAULT        2 bar
+EOF
+
+testrun_compare ${abs_top_builddir}/src/readelf -s testfilebaxmin <<EOF
+
+Symbol table [ 5] '.dynsym' contains 3 entries:
+ 1 local symbol  String table: [ 6] '.dynstr'
+  Num:            Value   Size Type    Bind   Vis          Ndx Name
+    0: 0000000000000000      0 NOTYPE  LOCAL  DEFAULT    UNDEF 
+    1: 0000000000000000      0 FUNC    GLOBAL DEFAULT    UNDEF __libc_start_main@GLIBC_2.2.5 (2)
+    2: 0000000000000000      0 NOTYPE  WEAK   DEFAULT    UNDEF __gmon_start__
+EOF
+
+testrun_compare ${abs_top_builddir}/src/readelf --elf-section -s testfilebaxmin <<\EOF
+
+Symbol table [27] '.symtab' contains 42 entries:
+ 35 local symbols  String table: [28] '.strtab'
+  Num:            Value   Size Type    Bind   Vis          Ndx Name
+    0: 0000000000000000      0 NOTYPE  LOCAL  DEFAULT    UNDEF 
+    1: 0000000000400430      0 FUNC    LOCAL  DEFAULT       13 deregister_tm_clones
+    2: 0000000000400460      0 FUNC    LOCAL  DEFAULT       13 register_tm_clones
+    3: 00000000004004a0      0 FUNC    LOCAL  DEFAULT       13 __do_global_dtors_aux
+    4: 0000000000600e18      0 OBJECT  LOCAL  DEFAULT       19 __do_global_dtors_aux_fini_array_entry
+    5: 00000000004004c0      0 FUNC    LOCAL  DEFAULT       13 frame_dummy
+    6: 0000000000600e10      0 OBJECT  LOCAL  DEFAULT       18 __frame_dummy_init_array_entry
+    7: 00000000004004f0     20 FUNC    LOCAL  DEFAULT       13 foo
+    8: 0000000000600e18      0 NOTYPE  LOCAL  DEFAULT       18 __init_array_end
+    9: 0000000000600e10      0 NOTYPE  LOCAL  DEFAULT       18 __init_array_start
+   10: 0000000000400238      0 SECTION LOCAL  DEFAULT        1 
+   11: 0000000000400254      0 SECTION LOCAL  DEFAULT        2 
+   12: 0000000000400274      0 SECTION LOCAL  DEFAULT        3 
+   13: 0000000000400298      0 SECTION LOCAL  DEFAULT        4 
+   14: 00000000004002b8      0 SECTION LOCAL  DEFAULT        5 
+   15: 0000000000400300      0 SECTION LOCAL  DEFAULT        6 
+   16: 0000000000400338      0 SECTION LOCAL  DEFAULT        7 
+   17: 0000000000400340      0 SECTION LOCAL  DEFAULT        8 
+   18: 0000000000400360      0 SECTION LOCAL  DEFAULT        9 
+   19: 0000000000400378      0 SECTION LOCAL  DEFAULT       10 
+   20: 00000000004003a8      0 SECTION LOCAL  DEFAULT       11 
+   21: 00000000004003d0      0 SECTION LOCAL  DEFAULT       12 
+   22: 0000000000400400      0 SECTION LOCAL  DEFAULT       13 
+   23: 00000000004005c4      0 SECTION LOCAL  DEFAULT       14 
+   24: 00000000004005d0      0 SECTION LOCAL  DEFAULT       15 
+   25: 00000000004005e0      0 SECTION LOCAL  DEFAULT       16 
+   26: 0000000000400628      0 SECTION LOCAL  DEFAULT       17 
+   27: 0000000000600e10      0 SECTION LOCAL  DEFAULT       18 
+   28: 0000000000600e18      0 SECTION LOCAL  DEFAULT       19 
+   29: 0000000000600e20      0 SECTION LOCAL  DEFAULT       20 
+   30: 0000000000600e28      0 SECTION LOCAL  DEFAULT       21 
+   31: 0000000000600ff8      0 SECTION LOCAL  DEFAULT       22 
+   32: 0000000000601000      0 SECTION LOCAL  DEFAULT       23 
+   33: 0000000000601028      0 SECTION LOCAL  DEFAULT       24 
+   34: 0000000000601034      0 SECTION LOCAL  DEFAULT       25 
+   35: 00000000004005c0      2 FUNC    GLOBAL DEFAULT       13 __libc_csu_fini
+   36: 0000000000400504     40 FUNC    GLOBAL DEFAULT       13 bar
+   37: 00000000004005c4      0 FUNC    GLOBAL DEFAULT       14 _fini
+   38: 0000000000400550    101 FUNC    GLOBAL DEFAULT       13 __libc_csu_init
+   39: 0000000000400400      0 FUNC    GLOBAL DEFAULT       13 _start
+   40: 000000000040052c     35 FUNC    GLOBAL DEFAULT       13 main
+   41: 00000000004003a8      0 FUNC    GLOBAL DEFAULT       11 _init
 EOF
 
 exit 0

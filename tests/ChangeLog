@@ -1,3 +1,10 @@
+2014-03-11  Josh Stone  <jistone@redhat.com>
+
+	* testfilebaxmin.bz2: New testfile.
+	* Makefile.am (EXTRA_DIST): Add testfilebaxmin.bz2.
+	* run-readelf-s.sh: Test testfilebaxmin.
+	* run-dwflsyms.sh: Likewise.
+
 2014-01-26  Mark Wielaard  <mjw@redhat.com>
 
 	* backtrace-subr.sh (check_unsupported): Special case arm*.

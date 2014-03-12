@@ -215,7 +215,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfilegdbindex7.bz2 \
 	     run-readelf-s.sh testfilebazdbg.bz2 testfilebazdyn.bz2 \
 	     testfilebazmin.bz2 testfilebazdbg.debug.bz2 testfilebazmdb.bz2 \
-	     testfilebaztab.bz2 testfilebasmin.bz2 \
+	     testfilebaztab.bz2 testfilebasmin.bz2 testfilebaxmin.bz2 \
 	     testfilebazdbg_pl.bz2 testfilebazmin_pl.bz2 \
 	     testfilebazdbg_plr.bz2 testfilebazmin_plr.bz2 \
 	     testfilebazdbgppc64.bz2 testfilebazdbgppc64.debug.bz2 \

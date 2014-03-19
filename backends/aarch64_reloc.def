@@ -1,5 +1,5 @@
 /* List the relocation types for AArch64.  -*- C -*-
-   Copyright (C) 2013 Red Hat, Inc.
+   Copyright (C) 2013, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -28,8 +28,8 @@
 
 /*	    NAME,		REL|EXEC|DYN	*/
 
-RELOC_TYPE (ABS64,		EXEC|DYN)
-RELOC_TYPE (ABS32,		EXEC|DYN)
+RELOC_TYPE (ABS64,		REL|EXEC|DYN)
+RELOC_TYPE (ABS32,		REL|EXEC|DYN)
 RELOC_TYPE (COPY,		EXEC)
 RELOC_TYPE (GLOB_DAT,		EXEC|DYN)
 RELOC_TYPE (JUMP_SLOT,		EXEC|DYN)

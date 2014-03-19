@@ -1,3 +1,8 @@
+2014-03-19  Mark Wielaard  <mjw@redhat.com>
+
+	* aarch64_reloc.def: AARCH64_ABS32 and AARCH64_ABS64 are also valid
+	in ET_REL.
+
 2014-01-30  Petr Machata  <pmachata@redhat.com>
 
 	* aarch64_regs.c (aarch64_register_info.regtype): Make this

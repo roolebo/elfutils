@@ -1,3 +1,8 @@
+2014-03-28  Jean Pihet  <jean.pihet@linaro.org>
+
+	* arm_initreg.c (arm_set_initial_registers_tid): Handle compat mode.
+	ARM compatible code running on AARCH64.
+
 2014-03-19  Mark Wielaard  <mjw@redhat.com>
 
 	* aarch64_reloc.def: AARCH64_ABS32 and AARCH64_ABS64 are also valid

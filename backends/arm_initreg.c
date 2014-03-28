@@ -36,6 +36,12 @@
 # include <sys/ptrace.h>
 #endif
 
+#ifdef __aarch64__
+# include <linux/uio.h>
+# include <sys/user.h>
+# include <sys/ptrace.h>
+#endif
+
 #define BACKEND arm_
 #include "libebl_CPU.h"
 
@@ -44,15 +50,39 @@ arm_set_initial_registers_tid (pid_t tid __attribute__ ((unused)),
 			  ebl_tid_registers_t *setfunc __attribute__ ((unused)),
 			       void *arg __attribute__ ((unused)))
 {
-#if ! defined __arm__
+#if !defined __arm__ && !defined __aarch64__
   return false;
-#else
+#else	/* __arm__ || __aarch64__ */
+#if defined __arm__
   struct user_regs user_regs;
   if (ptrace (PTRACE_GETREGS, tid, NULL, &user_regs) != 0)
     return false;
+
   Dwarf_Word dwarf_regs[16];
+  /* R0..R12 SP LR PC */
   for (int i = 0; i < 16; i++)
     dwarf_regs[i] = user_regs.uregs[i];
+
   return setfunc (0, 16, dwarf_regs, arg);
+#elif defined __aarch64__
+  /* Compat mode: arm compatible code running on aarch64 */
+  int i;
+  struct user_pt_regs gregs;
+  struct iovec iovec;
+  iovec.iov_base = &gregs;
+  iovec.iov_len = sizeof (gregs);
+  if (ptrace (PTRACE_GETREGSET, tid, NT_PRSTATUS, &iovec) != 0)
+    return false;
+
+  Dwarf_Word dwarf_regs[16];
+  /* R0..R12 SP LR PC, encoded as 32 bit quantities */
+  uint32_t *u32_ptr = (uint32_t *) &gregs.regs[0];
+  for (i = 0; i < 16; i++)
+    dwarf_regs[i] = u32_ptr[i];
+
+  return setfunc (0, 16, dwarf_regs, arg);
+#else
+# error "source file error, it cannot happen"
+#endif
 #endif
 }

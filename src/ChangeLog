@@ -1,3 +1,14 @@
+2014-04-09  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_debug_aranges_section): Don't get the raw section
+	data, use the possibly decompressed .[z]debug sectiondata.
+	(print_debug_ranges_section): Likewise.
+	(print_debug_frame_section): Likewise.
+	(print_debug_line_section): Likewise.
+	(print_debug_loc_section): Likewise.
+	(print_debug_macinfo_section): Likewise.
+	(print_debug_macro_section): Likewise.
+
 2014-04-10  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (buf_read_ulong): Pass actual long size to convert.

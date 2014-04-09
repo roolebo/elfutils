@@ -1,3 +1,12 @@
+2014-04-09  Mark Wielaard  <mjw@redhat.com>
+
+	* run-readelf-zdebug.sh: New test.
+	* testfile-debug.bz2: New testfile.
+	* testfile-zdebug.bz2: New testfile.
+	* Makefile.am (TESTS): Add run-readelf-zdebug.sh if ZLIB.
+	(EXTRA_DIST): Add run-readelf-zdebug.sh, testfile-debug.bz2 and
+	testfile-zdebug.bz2.
+
 2014-04-10  Mark Wielaard  <mjw@redhat.com>
 
 	* testfile_i686_core.bz2: New test file.

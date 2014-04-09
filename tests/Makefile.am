@@ -128,6 +128,10 @@ if LZMA
 TESTS += run-readelf-s.sh run-dwflsyms.sh
 endif
 
+if ZLIB
+TESTS += run-readelf-zdebug.sh
+endif
+
 if HAVE_LIBASM
 check_PROGRAMS += $(asm_TESTS)
 TESTS += $(asm_TESTS)
@@ -269,7 +273,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile-backtrace-demangle.cc \
 	     testfile-backtrace-demangle.core.bz2 \
 	     run-stack-d-test.sh run-stack-i-test.sh \
-	     testfiledwarfinlines.bz2 testfiledwarfinlines.core.bz2
+	     testfiledwarfinlines.bz2 testfiledwarfinlines.core.bz2 \
+	     run-readelf-zdebug.sh testfile-debug.bz2 testfile-zdebug.bz2
 
 if USE_VALGRIND
 valgrind_cmd='valgrind -q --error-exitcode=1 --run-libc-freeres=no'

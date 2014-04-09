@@ -1,5 +1,5 @@
 /* Create descriptor from ELF descriptor for processing file.
-   Copyright (C) 2002-2011 Red Hat, Inc.
+   Copyright (C) 2002-2011, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -281,6 +281,12 @@ check_section (Dwarf *result, GElf_Ehdr *ehdr, Elf_Scn *scn, bool inscngrp)
 	    uint64_t size;
 	    memcpy (&size, data->d_buf + 4, sizeof size);
 	    size = be64toh (size);
+
+	    /* Check for unsigned overflow so malloc always allocated
+	       enough memory for both the Elf_Data header and the
+	       uncompressed section data.  */
+	    if (unlikely (sizeof (Elf_Data) + size < size))
+	      break;
 
 	    Elf_Data *zdata = malloc (sizeof (Elf_Data) + size);
 	    if (unlikely (zdata == NULL))

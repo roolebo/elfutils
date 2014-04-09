@@ -64,7 +64,8 @@ static const Ebl_Register_Location prstatus_regs[] =
     .name = "pc", .type = ELF_T_XWORD, .format = 'x',			\
     .offset = (offsetof (struct EBLHOOK(prstatus), pr_reg)		\
 	       + PRSTATUS_REGS_SIZE - 16),				\
-    .group = "register"							\
+    .group = "register",						\
+    .pc_register = true							\
   },									\
   {									\
     .name = "pstate", .type = ELF_T_XWORD, .format = 'x',		\

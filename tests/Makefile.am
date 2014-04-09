@@ -108,6 +108,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-backtrace-native-core-biarch.sh run-backtrace-core-x86_64.sh \
 	run-backtrace-core-i386.sh run-backtrace-core-ppc.sh \
 	run-backtrace-core-s390x.sh run-backtrace-core-s390.sh \
+	run-backtrace-core-aarch64.sh \
 	run-backtrace-demangle.sh run-stack-d-test.sh run-stack-i-test.sh
 
 if !BIARCH
@@ -262,6 +263,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     backtrace.s390x.core.bz2 backtrace.s390x.exec.bz2 \
 	     backtrace.s390.core.bz2 backtrace.s390.exec.bz2 \
 	     run-backtrace-core-s390x.sh run-backtrace-core-s390.sh \
+	     run-backtrace-core-aarch64.sh \
+	     backtrace.aarch64.core.bz2 backtrace.aarch64.exec.bz2 \
 	     run-backtrace-demangle.sh testfile-backtrace-demangle.bz2 \
 	     testfile-backtrace-demangle.cc \
 	     testfile-backtrace-demangle.core.bz2 \

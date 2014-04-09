@@ -59,5 +59,11 @@ aarch64_init (elf, machine, eh, ehlen)
   HOOK (eh, check_special_symbol);
   HOOK (eh, abi_cfi);
 
+  /* X0-X30 (31 regs) + SP + 1 Reserved + ELR, 30 Reserved regs (34-43)
+     + V0-V31 (32 regs, least significant 64 bits only)
+     + ALT_FRAME_RETURN_COLUMN (used when LR isn't used) = 97 DWARF regs. */
+  eh->frame_nregs = 97;
+  HOOK (eh, set_initial_registers_tid);
+
   return MODVERSION;
 }

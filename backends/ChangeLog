@@ -1,3 +1,10 @@
+2014-04-09  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (aarch64_SRCS): Add aarch64_initreg.c.
+	* aarch64_corenote.c (prstatus_regs): Mark pc_register.
+	* aarch64_init.c: Assign frame_nregs. Hook set_initial_registers_tid.
+	* aarch64_initreg: New file.
+
 2014-03-28  Jean Pihet  <jean.pihet@linaro.org>
 
 	* arm_initreg.c (arm_set_initial_registers_tid): Handle compat mode.

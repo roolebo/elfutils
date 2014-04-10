@@ -1,3 +1,9 @@
+2014-04-10  Mark Wielaard  <mjw@redhat.com>
+
+	* testfile_i686_core.bz2: New test file.
+	* run-readelf-mixed-corenote.sh: Add testfile_i686_core test.
+	* Makefile.am (EXTRA_DIST): Add testfile_i686_core.bz2
+
 2014-04-09  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (TESTS): Add run-backtrace-core-aarch64.sh.

@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2012, 2013 Red Hat, Inc.
+# Copyright (C) 2012, 2013, 2014 Red Hat, Inc.
 # This file is part of elfutils.
 #
 # This file is free software; you can redistribute it and/or modify
@@ -423,6 +423,71 @@ Note segment of 2512 bytes at offset 0x270:
     DBGWVR13_EL1: 0x0000000000000000, DBGWCR13_EL1: 0x00000000
     DBGWVR14_EL1: 0x0000000000000000, DBGWCR14_EL1: 0x00000000
     DBGWVR15_EL1: 0x0000000000000000, DBGWCR15_EL1: 0x00000000
+EOF
+
+# To reproduce this core dump, do this on an i686 machine:
+# $ gcc -x c <(echo 'int main () { return *(int *)0x12345678; }')
+# $ ./a.out
+testfiles testfile_i686_core
+testrun_compare ${abs_top_builddir}/src/readelf -n testfile_i686_core <<\EOF
+
+Note segment of 1000 bytes at offset 0x214:
+  Owner          Data size  Type
+  CORE                 144  PRSTATUS
+    info.si_signo: 11, info.si_code: 0, info.si_errno: 0, cursig: 11
+    sigpend: <>
+    sighold: <>
+    pid: 27395, ppid: 1130, pgrp: 27395, sid: 1130
+    utime: 0.000000, stime: 0.001000, cutime: 0.000000, cstime: 0.000000
+    orig_eax: -1, fpvalid: 0
+    ebx:     1334976512  ecx:    -1239415396  edx:    -1079283900
+    esi:              0  edi:              0  ebp:     0xbfab6f18
+    eax:      305419896  eip:     0x08048408  eflags:  0x00010246
+    esp:     0xbfab6f18
+    ds: 0x007b  es: 0x007b  fs: 0x0000  gs: 0x0033  cs: 0x0073  ss: 0x007b
+  CORE                 124  PRPSINFO
+    state: 0, sname: R, zomb: 0, nice: 0, flag: 0x00000200
+    uid: 1000, gid: 1000, pid: 27395, ppid: 1130, pgrp: 27395, sid: 1130
+    fname: a.out, psargs: ./a.out 
+  CORE                 128  SIGINFO
+    si_signo: 11, si_errno: 0, si_code: 1
+    fault address: 0x12345678
+  CORE                 160  AUXV
+    SYSINFO: 0xb77fc414
+    SYSINFO_EHDR: 0xb77fc000
+    HWCAP: 0x780abfd  <fpu de pse tsc msr pae mce cx8 apic sep pge cmov mmx fxsr sse sse2>
+    PAGESZ: 4096
+    CLKTCK: 100
+    PHDR: 0x8048034
+    PHENT: 32
+    PHNUM: 9
+    BASE: 0
+    FLAGS: 0
+    ENTRY: 0x80482f0
+    UID: 1000
+    EUID: 1000
+    GID: 1000
+    EGID: 1000
+    SECURE: 0
+    RANDOM: 0xbfab70eb
+    EXECFN: 0xbfab7ff4
+    PLATFORM: 0xbfab70fb
+    NULL
+  CORE                 275  FILE
+    9 files:
+      08048000-08049000 00000000 4096                /tmp/a.out
+      08049000-0804a000 00000000 4096                /tmp/a.out
+      0804a000-0804b000 00001000 4096                /tmp/a.out
+      4f744000-4f763000 00000000 126976              /usr/lib/ld-2.18.so
+      4f764000-4f765000 0001f000 4096                /usr/lib/ld-2.18.so
+      4f765000-4f766000 00020000 4096                /usr/lib/ld-2.18.so
+      4f768000-4f920000 00000000 1802240             /usr/lib/libc-2.18.so
+      4f920000-4f922000 001b8000 8192                /usr/lib/libc-2.18.so
+      4f922000-4f923000 001ba000 4096                /usr/lib/libc-2.18.so
+  LINUX                 48  386_TLS
+    index: 6, base: 0xb77da700, limit: 0x000fffff, flags: 0x00000051
+    index: 7, base: 0x00000000, limit: 0x00000000, flags: 0x00000028
+    index: 8, base: 0x00000000, limit: 0x00000000, flags: 0x00000028
 EOF
 
 exit 0

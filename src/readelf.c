@@ -8736,7 +8736,7 @@ buf_read_ulong (Elf *core, unsigned char const **ptrp, unsigned char const *end,
     uint32_t u32;
   } u;
 
-  *ptrp = convert (core, ELF_T_ADDR, 1, &u, *ptrp, sizeof u);
+  *ptrp = convert (core, ELF_T_ADDR, 1, &u, *ptrp, sz);
 
   if (sz == 4)
     *retp = u.u32;

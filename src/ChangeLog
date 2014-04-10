@@ -1,3 +1,7 @@
+2014-04-10  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (buf_read_ulong): Pass actual long size to convert.
+
 2014-03-05  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (attr_callback): Print DW_FORM_sdata values as signed

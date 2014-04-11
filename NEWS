@@ -3,6 +3,9 @@ Version 0.159
 stack: New option -d, --debugname to lookup DWARF debuginfo name for frame.
        New option -i, --inlines to show inlined frames using DWARF debuginfo.
 
+libdwelf: New libdwelf.h header for libdw.so DWARF ELF Low-level Functions.
+          New function dwelf_elf_gnu_debuglink.
+
 Version 0.158
 
 libdwfl: dwfl_core_file_report has new parameter executable.

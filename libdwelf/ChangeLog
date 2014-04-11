@@ -1,0 +1,6 @@
+2014-04-11  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am: New file.
+	* libdwelf.h: Likewise.
+	* libdwelfP.h: Likewise.
+	* dwelf_elf_gnu_debuglink.c: Likewise.

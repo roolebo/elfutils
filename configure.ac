@@ -237,6 +237,9 @@ AC_CONFIG_FILES([libelf/Makefile])
 dnl Higher-level ELF support library.
 AC_CONFIG_FILES([libebl/Makefile])
 
+dnl DWARF-ELF Lower-level Functions support library.
+AC_CONFIG_FILES([libdwelf/Makefile])
+
 dnl DWARF library.
 AC_CONFIG_FILES([libdw/Makefile])
 

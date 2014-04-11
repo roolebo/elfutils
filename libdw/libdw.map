@@ -292,3 +292,8 @@ ELFUTILS_0.158 {
     dwfl_core_file_attach;
     dwfl_linux_proc_attach;
 } ELFUTILS_0.157;
+
+ELFUTILS_0.159 {
+  global:
+    dwelf_elf_gnu_debuglink;
+} ELFUTILS_0.158;

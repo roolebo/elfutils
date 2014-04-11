@@ -1,3 +1,10 @@
+2014-04-11  Mark Wielaard  <mjw@redhat.com>
+
+	* libdw.map (ELFUTILS_0.159): New. Add dwelf_elf_gnu_debuglink.
+	* Makefile.am (libdw.so): Depend on libdwelf_pic.a.
+	(libdwelf_objects): New variable.
+	(libdw_a_LIBADD): Add libdwelf objects.
+
 2014-04-22  Mark Wielaard  <mjw@redhat.com>
 
 	* memory-access.h (get_sleb128_step): Remove undefined behavior

@@ -31,7 +31,7 @@
 ##
 include $(top_srcdir)/config/eu.am
 AM_CPPFLAGS += -I$(srcdir) -I$(srcdir)/../libelf -I$(srcdir)/../libebl \
-	   -I$(srcdir)/../libdw
+	   -I$(srcdir)/../libdw -I$(srcdir)/../libdwelf
 VERSION = 1
 
 noinst_LIBRARIES = libdwfl.a

@@ -1,3 +1,10 @@
+2014-04-11  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (AM_CPPFLAGS): Add libdwelf.
+	* libdwflP.h: Include libdwelfP.h.
+	* dwfl_module_getdwarf.c (find_debuglink): Moved to libdwelf.
+	(find_debuginfo): Use dwelf_elf_gnu_debuglink.
+
 2014-04-22  Mark Wielaard  <mjw@redhat.com>
 
 	* frame_unwind.c (__libdwfl_frame_reg_get): Use uint64_t when

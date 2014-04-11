@@ -42,6 +42,7 @@
 #include <string.h>
 
 #include "../libdw/libdwP.h"	/* We need its INTDECLs.  */
+#include "../libdwelf/libdwelfP.h"
 
 typedef struct Dwfl_Process Dwfl_Process;
 

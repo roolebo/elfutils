@@ -99,7 +99,7 @@ libdw_pic_a_SOURCES =
 am_libdw_pic_a_OBJECTS = $(libdw_a_SOURCES:.c=.os)
 
 libdw_so_SOURCES =
-libdw.so$(EXEEXT): $(srcdir)/libdw.map libdw_pic.a \
+libdw.so$(EXEEXT): $(srcdir)/libdw.map libdw_pic.a ../libdwelf/libdwelf_pic.a \
 	  ../libdwfl/libdwfl_pic.a ../libebl/libebl.a \
 	  ../libelf/libelf.so
 # The rpath is necessary for libebl because its $ORIGIN use will
@@ -126,6 +126,9 @@ uninstall: uninstall-am
 
 libdwfl_objects = $(shell $(AR) t ../libdwfl/libdwfl.a)
 libdw_a_LIBADD = $(addprefix ../libdwfl/,$(libdwfl_objects))
+
+libdwelf_objects = $(shell $(AR) t ../libdwelf/libdwelf.a)
+libdw_a_LIBADD += $(addprefix ../libdwelf/,$(libdwelf_objects))
 
 noinst_HEADERS = libdwP.h memory-access.h dwarf_abbrev_hash.h \
 		 dwarf_sig8_hash.h cfi.h encoded-value.h

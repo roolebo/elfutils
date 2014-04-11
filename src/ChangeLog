@@ -1,3 +1,7 @@
+2014-04-11  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (AM_CPPFLAGS): Add -I libdwelf.
+
 2014-04-22  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (handle_core_item): Make sure variable length array

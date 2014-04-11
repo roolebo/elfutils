@@ -222,66 +222,6 @@ __libdwfl_getelf (Dwfl_Module *mod)
   mod->main_bias = mod->e_type == ET_REL ? 0 : mod->low_addr - mod->main.vaddr;
 }
 
-/* Search an ELF file for a ".gnu_debuglink" section.  */
-static const char *
-find_debuglink (Elf *elf, GElf_Word *crc)
-{
-  size_t shstrndx;
-  if (elf_getshdrstrndx (elf, &shstrndx) < 0)
-    return NULL;
-
-  Elf_Scn *scn = NULL;
-  while ((scn = elf_nextscn (elf, scn)) != NULL)
-    {
-      GElf_Shdr shdr_mem;
-      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
-      if (shdr == NULL)
-	return NULL;
-
-      const char *name = elf_strptr (elf, shstrndx, shdr->sh_name);
-      if (name == NULL)
-	return NULL;
-
-      if (!strcmp (name, ".gnu_debuglink"))
-	break;
-    }
-
-  if (scn == NULL)
-    return NULL;
-
-  /* Found the .gnu_debuglink section.  Extract its contents.  */
-  Elf_Data *rawdata = elf_rawdata (scn, NULL);
-  if (rawdata == NULL)
-    return NULL;
-
-  Elf_Data crcdata =
-    {
-      .d_type = ELF_T_WORD,
-      .d_buf = crc,
-      .d_size = sizeof *crc,
-      .d_version = EV_CURRENT,
-    };
-  Elf_Data conv =
-    {
-      .d_type = ELF_T_WORD,
-      .d_buf = rawdata->d_buf + rawdata->d_size - sizeof *crc,
-      .d_size = sizeof *crc,
-      .d_version = EV_CURRENT,
-    };
-
-  GElf_Ehdr ehdr_mem;
-  GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);
-  if (ehdr == NULL)
-    return NULL;
-
-  Elf_Data *d = gelf_xlatetom (elf, &crcdata, &conv, ehdr->e_ident[EI_DATA]);
-  if (d == NULL)
-    return NULL;
-  assert (d == &crcdata);
-
-  return rawdata->d_buf;
-}
-
 /* If the main file might have been prelinked, then we need to
    discover the correct synchronization address between the main and
    debug files.  Because of prelink's section juggling, we cannot rely
@@ -544,7 +484,9 @@ find_debuginfo (Dwfl_Module *mod)
     return DWFL_E_NOERROR;
 
   GElf_Word debuglink_crc = 0;
-  const char *debuglink_file = find_debuglink (mod->main.elf, &debuglink_crc);
+  const char *debuglink_file;
+  debuglink_file = INTUSE(dwelf_elf_gnu_debuglink) (mod->main.elf,
+						    &debuglink_crc);
 
   mod->debug.fd = (*mod->dwfl->callbacks->find_debuginfo) (MODCB_ARGS (mod),
 							   mod->main.name,

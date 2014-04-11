@@ -1,3 +1,9 @@
+2014-04-11  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (SUBDIRS): Add libdwelf.
+	* configure.ac (AC_CONFIG_FILES): Add libdwelf/Makefile.
+	* NEWS: Add note about libdwelf.
+
 2014-04-13  Mark Wielaard  <mjw@redhat.com>
 
 	* configure.ac: Remove mudflap enable arg and MUDFLAP conditional.

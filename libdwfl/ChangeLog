@@ -1,3 +1,9 @@
+2014-03-14  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am: Remove !MUDFLAP and MUDFLAP conditions.
+	Remove libelf and libdw definitions when MUDFLAP is defined.
+	* argp-std.c (__libdwfl_argp_mudflap_options): Removed.
+
 2014-03-03  Mark Wielaard  <mjw@redhat.com>
 
 	* elf-from-memory.c (elf_from_remote_memory): Keep track of

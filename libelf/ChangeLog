@@ -1,3 +1,10 @@
+2014-04-13  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am: Remove !MUDFLAP conditions.
+	* elf_begin.c (read_file): Don't clear use_mmap when _MUDFLAP is
+	defined.
+	* elf_update.c (write_file): Remove _MUDFLAP condition.
+
 2014-01-17  Jakub Jelinek  <jakub@redhat.com>
 	    Roland McGrath  <roland@redhat.com>
 

@@ -35,10 +35,8 @@ AM_CPPFLAGS += -I$(srcdir)/../libelf
 VERSION = 1
 
 lib_LIBRARIES = libdw.a
-if !MUDFLAP
 noinst_LIBRARIES = libdw_pic.a
 noinst_PROGRAMS = $(noinst_LIBRARIES:_pic.a=.so)
-endif
 
 include_HEADERS = dwarf.h
 pkginclude_HEADERS = libdw.h
@@ -97,12 +95,11 @@ $(srcdir)/known-dwarf.h: $(top_srcdir)/config/known-dwarf.awk $(srcdir)/dwarf.h
 	mv -f $@.new $@
 endif
 
-if !MUDFLAP
 libdw_pic_a_SOURCES =
 am_libdw_pic_a_OBJECTS = $(libdw_a_SOURCES:.c=.os)
 
 libdw_so_SOURCES =
-libdw.so: $(srcdir)/libdw.map libdw_pic.a \
+libdw.so$(EXEEXT): $(srcdir)/libdw.map libdw_pic.a \
 	  ../libdwfl/libdwfl_pic.a ../libebl/libebl.a \
 	  ../libelf/libelf.so
 # The rpath is necessary for libebl because its $ORIGIN use will
@@ -126,7 +123,6 @@ uninstall: uninstall-am
 	rm -f $(DESTDIR)$(libdir)/libdw.so.$(VERSION)
 	rm -f $(DESTDIR)$(libdir)/libdw.so
 	rmdir --ignore-fail-on-non-empty $(DESTDIR)$(includedir)/elfutils
-endif
 
 libdwfl_objects = $(shell $(AR) t ../libdwfl/libdwfl.a)
 libdw_a_LIBADD = $(addprefix ../libdwfl/,$(libdwfl_objects))

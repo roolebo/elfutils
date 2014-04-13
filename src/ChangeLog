@@ -1,3 +1,9 @@
+2014-03-13  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am: Remove no_mudflap.os. Remove libmudflap from all
+	LDADD lines.
+	* strings.c (process_chunk): Remove _MUDFLAP condition.
+
 2014-04-09  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (print_debug_aranges_section): Don't get the raw section

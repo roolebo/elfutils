@@ -1,3 +1,8 @@
+2014-04-13  Mark Wielaard  <mjw@redhat.com>
+
+	* eu.am (AM_CFLAGS): Don't add -fmudflap.
+	(COMPILE.os): Don't remove no_mudflap.os.
+
 2014-01-22  Mark Wielaard  <mjw@redhat.com>
 
 	* eu.am (AM_CFLAGS): Unconditionally add -Wformat=2.

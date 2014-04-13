@@ -1,3 +1,7 @@
+2014-04-13  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am: Remove !MUDFLAP conditions.
+
 2014-04-09  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_begin_elf.c (check_section): Check for unsigned overflow

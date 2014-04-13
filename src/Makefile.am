@@ -25,8 +25,6 @@ AM_CPPFLAGS += -I$(srcdir)/../libelf -I$(srcdir)/../libebl \
 
 AM_LDFLAGS = -Wl,-rpath-link,../libelf:../libdw
 
-no_mudflap.os = -fmudflap
-
 YACC = @YACC@ -d
 AM_YFLAGS = -pld
 AM_LFLAGS = -Pld -olex.yy.c
@@ -91,28 +89,27 @@ endif
 # XXX While the file is not finished, don't warn about this
 ldgeneric_no_Wunused = yes
 
-readelf_LDADD = $(libdw) $(libebl) $(libelf) $(libeu) $(libmudflap) -ldl
-nm_LDADD = $(libdw) $(libebl) $(libelf) $(libeu) $(libmudflap) -ldl \
+readelf_LDADD = $(libdw) $(libebl) $(libelf) $(libeu) -ldl
+nm_LDADD = $(libdw) $(libebl) $(libelf) $(libeu) -ldl \
 	   $(demanglelib)
-size_LDADD = $(libelf) $(libeu) $(libmudflap)
-strip_LDADD = $(libebl) $(libelf) $(libeu) $(libmudflap) -ldl
-ld_LDADD = $(libebl) $(libelf) $(libeu) $(libmudflap) -ldl
+size_LDADD = $(libelf) $(libeu)
+strip_LDADD = $(libebl) $(libelf) $(libeu) -ldl
+ld_LDADD = $(libebl) $(libelf) $(libeu) -ldl
 if NATIVE_LD
 # -ldl is always needed for libebl.
 ld_LDADD += libld_elf.a
 endif
 ld_LDFLAGS = -rdynamic
-elflint_LDADD  = $(libebl) $(libelf) $(libeu) $(libmudflap) -ldl
-findtextrel_LDADD = $(libdw) $(libelf) $(libmudflap)
-addr2line_LDADD = $(libdw) $(libelf) $(libmudflap)
-elfcmp_LDADD = $(libebl) $(libelf) $(libmudflap) -ldl
-objdump_LDADD  = $(libasm) $(libebl) $(libelf) $(libeu) $(libmudflap) -ldl
-ranlib_LDADD = libar.a $(libelf) $(libeu) $(libmudflap)
-strings_LDADD = $(libelf) $(libeu) $(libmudflap)
-ar_LDADD = libar.a $(libelf) $(libeu) $(libmudflap)
-unstrip_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(libmudflap) -ldl
-stack_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(libmudflap) -ldl \
-	      $(demanglelib)
+elflint_LDADD  = $(libebl) $(libelf) $(libeu) -ldl
+findtextrel_LDADD = $(libdw) $(libelf)
+addr2line_LDADD = $(libdw) $(libelf)
+elfcmp_LDADD = $(libebl) $(libelf) -ldl
+objdump_LDADD  = $(libasm) $(libebl) $(libelf) $(libeu) -ldl
+ranlib_LDADD = libar.a $(libelf) $(libeu)
+strings_LDADD = $(libelf) $(libeu)
+ar_LDADD = libar.a $(libelf) $(libeu)
+unstrip_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) -ldl
+stack_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) -ldl $(demanglelib)
 
 ldlex.o: ldscript.c
 ldlex_no_Werror = yes

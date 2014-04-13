@@ -50,7 +50,6 @@ AM_CONDITIONAL(HAVE_LIBASM, [test $have_libasm = yes])
 AM_CONDITIONAL(STANDALONE, true)
 AM_CONDITIONAL(BUILD_STATIC, false)
 AM_CONDITIONAL(TESTS_RPATH, false)
-AM_CONDITIONAL(MUDFLAP, false)
 AM_CONDITIONAL(GCOV, false)
 
 dnl Text of the config.h file.

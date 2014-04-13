@@ -69,14 +69,10 @@ write_file (Elf *elf, off_t size, int change_bo, size_t shnum)
   /* Try to map the file if this isn't done yet.  */
   if (elf->map_address == NULL && elf->cmd == ELF_C_WRITE_MMAP)
     {
-#if _MUDFLAP
-      /* Mudflap doesn't grok that our mmap'd data is ok.  */
-#else
       elf->map_address = mmap (NULL, size, PROT_READ | PROT_WRITE,
 			       MAP_SHARED, elf->fildes, 0);
       if (unlikely (elf->map_address == MAP_FAILED))
 	elf->map_address = NULL;
-#endif
     }
 
   if (elf->map_address != NULL)

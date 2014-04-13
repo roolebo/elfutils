@@ -1,3 +1,8 @@
+2014-04-13  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am: Remove libelf and libdw definitions when MUDFLAP
+	is defined. Remove libmudflap from LINK line.
+
 2014-04-09  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (aarch64_SRCS): Add aarch64_initreg.c.

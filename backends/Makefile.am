@@ -42,13 +42,8 @@ noinst_LIBRARIES = $(libebl_pic)
 noinst_DATA = $(libebl_pic:_pic.a=.so)
 
 
-if MUDFLAP
-libelf = ../libelf/libelf.a
-libdw = ../libdw/libdw.a
-else
 libelf = ../libelf/libelf.so
 libdw = ../libdw/libdw.so
-endif
 
 i386_SRCS = i386_init.c i386_symbol.c i386_corenote.c i386_cfi.c \
 	    i386_retval.c i386_regs.c i386_auxv.c i386_syscall.c \
@@ -124,7 +119,7 @@ libebl_%.so libebl_%.map: libebl_%_pic.a $(libelf) $(libdw)
 	$(LINK) -shared -o $(@:.map=.so) \
 		-Wl,--whole-archive $< $(cpu_$*) -Wl,--no-whole-archive \
 		-Wl,--version-script,$(@:.so=.map) \
-		-Wl,-z,defs -Wl,--as-needed $(libelf) $(libdw) $(libmudflap)
+		-Wl,-z,defs -Wl,--as-needed $(libelf) $(libdw)
 	$(textrel_check)
 
 libebl_i386.so: $(cpu_i386)

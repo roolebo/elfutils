@@ -151,26 +151,6 @@ dnl Support to work around automake's inflexible dependency generation.
 dnl See src/Makefile.am for more information.
 AM_CONDITIONAL(NEVER, false)
 
-dnl Enable debugging via mudflap.  This option will cause most libraries
-dnl to be built as archives which are statically linked into the applications.
-dnl All code, as far as possible, is compiled instrumented to catch all
-dnl the bugs valgrind is able to catch.
-use_mudflap=no
-AC_ARG_ENABLE([mudflap],
-AS_HELP_STRING([--enable-mudflap],
-[build binaries with mudflap instrumentation]), [dnl
-if test "x$enable_mudflap" = xyes; then
-  # Check whether the compiler support -fmudflap.
-  old_CFLAGS="$CFLAGS"
-  CFLAGS="$CFLAGS -fmudflap"
-  AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[]])],[use_mudflap=yes],[use_mudflap=fail])
-  CFLAGS="$old_CFLAGS"
-fi])
-if test "$use_mudflap" = fail; then
-  AC_MSG_FAILURE([--enable-mudflap requires a compiler which understands this option])
-fi
-AM_CONDITIONAL(MUDFLAP, test "$use_mudflap" = yes)
-
 dnl enable debugging of branch prediction.
 AC_ARG_ENABLE([debugpred],
 AS_HELP_STRING([--enable-debugpred],[build binaries with support to debug branch prediction]),
@@ -211,7 +191,7 @@ fi
 AM_CONDITIONAL(USE_VALGRIND, test "$use_valgrind" = yes)
 
 AM_CONDITIONAL(BUILD_STATIC, [dnl
-test "$use_mudflap" = yes -o "$use_gprof" = yes -o "$use_gcov" = yes])
+test "$use_gprof" = yes -o "$use_gcov" = yes])
 
 AC_ARG_ENABLE([tests-rpath],
 AS_HELP_STRING([--enable-tests-rpath],[build $ORIGIN-using rpath into tests]),

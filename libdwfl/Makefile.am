@@ -35,9 +35,7 @@ AM_CPPFLAGS += -I$(srcdir) -I$(srcdir)/../libelf -I$(srcdir)/../libebl \
 VERSION = 1
 
 noinst_LIBRARIES = libdwfl.a
-if !MUDFLAP
 noinst_LIBRARIES += libdwfl_pic.a
-endif
 
 pkginclude_HEADERS = libdwfl.h
 
@@ -82,22 +80,14 @@ if LZMA
 libdwfl_a_SOURCES += lzma.c
 endif
 
-if MUDFLAP
-libdwfl = libdwfl.a $(libdw) $(libebl) $(libelf) $(libeu)
-libdw = ../libdw/libdw.a
-libelf = ../libelf/libelf.a
-else
 libdwfl = $(libdw)
 libdw = ../libdw/libdw.so
 libelf = ../libelf/libelf.so
-endif
 libebl = ../libebl/libebl.a
 libeu = ../lib/libeu.a
 
-if !MUDFLAP
 libdwfl_pic_a_SOURCES =
 am_libdwfl_pic_a_OBJECTS = $(libdwfl_a_SOURCES:.c=.os)
-endif
 
 noinst_HEADERS = libdwflP.h
 

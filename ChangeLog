@@ -1,3 +1,7 @@
+2014-04-13  Mark Wielaard  <mjw@redhat.com>
+
+	* configure.ac: Remove mudflap enable arg and MUDFLAP conditional.
+
 2014-01-21  Mark Wielaard  <mjw@redhat.com>
 
 	* NEWS (Version 0.159): Add stack -i.

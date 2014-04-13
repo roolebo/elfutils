@@ -17,11 +17,7 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 include $(top_srcdir)/config/eu.am
-if MUDFLAP
-BUILD_RPATH = \$$ORIGIN/../backends
-else
 BUILD_RPATH = \$$ORIGIN/../libasm:\$$ORIGIN/../libdw:\$$ORIGIN/../backends:\$$ORIGIN/../libelf
-endif
 
 AM_LDFLAGS =
 
@@ -316,10 +312,6 @@ installcheck-local:
 		LOG_COMPILER="$(installed_LOG_COMPILER)" check-TESTS
 endif !STANDALONE
 
-if MUDFLAP
-static_build = yes
-endif
-
 if STANDALONE
 libdw = -ldw
 libelf = -lelf
@@ -339,77 +331,77 @@ libebl = ../libebl/libebl.a
 libeu = ../lib/libeu.a
 endif !STANDALONE
 
-arextract_LDADD = $(libelf) $(libmudflap)
-arsymtest_LDADD = $(libelf) $(libmudflap)
-newfile_LDADD = $(libelf) $(libmudflap)
-saridx_LDADD = $(libelf) $(libmudflap)
-scnnames_LDADD = $(libelf) $(libmudflap)
-sectiondump_LDADD = $(libelf) $(libmudflap)
-showptable_LDADD = $(libelf) $(libmudflap)
-hash_LDADD = $(libelf) $(libmudflap)
-test_nlist_LDADD = $(libelf) $(libmudflap)
-msg_tst_LDADD = $(libelf) $(libmudflap)
-newscn_LDADD = $(libelf) $(libmudflap)
-early_offscn_LDADD = $(libelf) $(libmudflap)
-ecp_LDADD = $(libelf) $(libmudflap)
-update1_LDADD = $(libelf) $(libmudflap)
-update2_LDADD = $(libelf) $(libmudflap)
-update3_LDADD = $(libebl) $(libelf) $(libmudflap)
-update4_LDADD = $(libebl) $(libelf) $(libmudflap)
-show_die_info_LDADD = $(libdw) $(libelf) $(libmudflap)
-get_pubnames_LDADD = $(libdw) $(libelf) $(libmudflap)
-show_abbrev_LDADD = $(libdw) $(libelf) $(libmudflap)
-get_lines_LDADD = $(libdw) $(libelf) $(libmudflap)
-get_files_LDADD = $(libdw) $(libelf) $(libmudflap)
-get_aranges_LDADD = $(libdw) $(libelf) $(libmudflap)
-allfcts_LDADD = $(libdw) $(libelf) $(libmudflap)
-line2addr_LDADD = $(libdw) $(libmudflap)
-addrscopes_LDADD = $(libdw) $(libmudflap)
-funcscopes_LDADD = $(libdw) $(libmudflap)
-funcretval_LDADD = $(libdw) $(libmudflap)
-allregs_LDADD = $(libdw) $(libmudflap)
-find_prologues_LDADD = $(libdw) $(libmudflap)
-#show_ciefde_LDADD = ../libdwarf/libdwarf.so $(libelf) $(libmudflap)
-asm_tst1_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl
-asm_tst2_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl
-asm_tst3_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl
-asm_tst4_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl
-asm_tst5_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl
-asm_tst6_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl
-asm_tst7_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl
-asm_tst8_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl
-asm_tst9_LDADD = $(libasm) $(libebl) $(libelf) $(libmudflap) -ldl
-dwflmodtest_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
-rdwrmmap_LDADD = $(libelf) $(libmudflap)
-dwfl_bug_addr_overflow_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
-arls_LDADD = $(libelf) $(libmudflap)
-dwfl_bug_fd_leak_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
-dwfl_bug_report_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
-dwfl_bug_getmodules_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
-dwfl_addr_sect_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
-dwarf_getmacros_LDADD = $(libdw) $(libmudflap)
-dwarf_getstring_LDADD = $(libdw) $(libmudflap)
-addrcfi_LDADD = $(libdw) $(libebl) $(libelf) $(libmudflap) -ldl
-test_flag_nobits_LDADD = $(libelf) $(libmudflap)
-rerequest_tag_LDADD = $(libdw) $(libmudflap)
-alldts_LDADD = $(libebl) $(libelf) $(libmudflap)
+arextract_LDADD = $(libelf)
+arsymtest_LDADD = $(libelf)
+newfile_LDADD = $(libelf)
+saridx_LDADD = $(libelf)
+scnnames_LDADD = $(libelf)
+sectiondump_LDADD = $(libelf)
+showptable_LDADD = $(libelf)
+hash_LDADD = $(libelf)
+test_nlist_LDADD = $(libelf)
+msg_tst_LDADD = $(libelf)
+newscn_LDADD = $(libelf)
+early_offscn_LDADD = $(libelf)
+ecp_LDADD = $(libelf)
+update1_LDADD = $(libelf)
+update2_LDADD = $(libelf)
+update3_LDADD = $(libebl) $(libelf)
+update4_LDADD = $(libebl) $(libelf)
+show_die_info_LDADD = $(libdw) $(libelf)
+get_pubnames_LDADD = $(libdw) $(libelf)
+show_abbrev_LDADD = $(libdw) $(libelf)
+get_lines_LDADD = $(libdw) $(libelf)
+get_files_LDADD = $(libdw) $(libelf)
+get_aranges_LDADD = $(libdw) $(libelf)
+allfcts_LDADD = $(libdw) $(libelf)
+line2addr_LDADD = $(libdw)
+addrscopes_LDADD = $(libdw)
+funcscopes_LDADD = $(libdw)
+funcretval_LDADD = $(libdw)
+allregs_LDADD = $(libdw)
+find_prologues_LDADD = $(libdw)
+#show_ciefde_LDADD = ../libdwarf/libdwarf.so $(libelf)
+asm_tst1_LDADD = $(libasm) $(libebl) $(libelf) -ldl
+asm_tst2_LDADD = $(libasm) $(libebl) $(libelf) -ldl
+asm_tst3_LDADD = $(libasm) $(libebl) $(libelf) -ldl
+asm_tst4_LDADD = $(libasm) $(libebl) $(libelf) -ldl
+asm_tst5_LDADD = $(libasm) $(libebl) $(libelf) -ldl
+asm_tst6_LDADD = $(libasm) $(libebl) $(libelf) -ldl
+asm_tst7_LDADD = $(libasm) $(libebl) $(libelf) -ldl
+asm_tst8_LDADD = $(libasm) $(libebl) $(libelf) -ldl
+asm_tst9_LDADD = $(libasm) $(libebl) $(libelf) -ldl
+dwflmodtest_LDADD = $(libdw) $(libebl) $(libelf) -ldl
+rdwrmmap_LDADD = $(libelf)
+dwfl_bug_addr_overflow_LDADD = $(libdw) $(libebl) $(libelf) -ldl
+arls_LDADD = $(libelf)
+dwfl_bug_fd_leak_LDADD = $(libdw) $(libebl) $(libelf) -ldl
+dwfl_bug_report_LDADD = $(libdw) $(libebl) $(libelf) -ldl
+dwfl_bug_getmodules_LDADD = $(libdw) $(libebl) $(libelf) -ldl
+dwfl_addr_sect_LDADD = $(libdw) $(libebl) $(libelf) -ldl
+dwarf_getmacros_LDADD = $(libdw)
+dwarf_getstring_LDADD = $(libdw)
+addrcfi_LDADD = $(libdw) $(libebl) $(libelf) -ldl
+test_flag_nobits_LDADD = $(libelf)
+rerequest_tag_LDADD = $(libdw)
+alldts_LDADD = $(libebl) $(libelf)
 md5_sha1_test_LDADD = $(libeu)
-typeiter_LDADD = $(libdw) $(libelf) $(libmudflap)
-typeiter2_LDADD = $(libdw) $(libelf) $(libmudflap)
-low_high_pc_LDADD = $(libdw) $(libelf) $(libmudflap)
-test_elf_cntl_gelf_getshdr_LDADD = $(libelf) $(libmudflap)
-dwflsyms_LDADD = $(libdw) $(libelf) $(libmudflap)
-dwfllines_LDADD = $(libdw) $(libelf) $(libmudflap)
-dwfl_report_elf_align_LDADD = $(libdw) $(libmudflap)
-varlocs_LDADD = $(libdw) $(libelf) $(libmudflap)
-backtrace_LDADD = $(libdw) $(libelf) $(libmudflap)
+typeiter_LDADD = $(libdw) $(libelf)
+typeiter2_LDADD = $(libdw) $(libelf)
+low_high_pc_LDADD = $(libdw) $(libelf)
+test_elf_cntl_gelf_getshdr_LDADD = $(libelf)
+dwflsyms_LDADD = $(libdw) $(libelf)
+dwfllines_LDADD = $(libdw) $(libelf)
+dwfl_report_elf_align_LDADD = $(libdw)
+varlocs_LDADD = $(libdw) $(libelf)
+backtrace_LDADD = $(libdw) $(libelf)
 # backtrace-child-biarch also uses those *_CFLAGS and *_LDLAGS variables:
 backtrace_child_CFLAGS = -fPIE
 backtrace_child_LDFLAGS = -pie -pthread
 backtrace_child_biarch_SOURCES = backtrace-child.c
-backtrace_data_LDADD = $(libdw) $(libelf) $(libmudflap)
+backtrace_data_LDADD = $(libdw) $(libelf)
 backtrace_dwarf_CFLAGS = -Wno-unused-parameter
-backtrace_dwarf_LDADD = $(libdw) $(libelf) $(libmudflap)
+backtrace_dwarf_LDADD = $(libdw) $(libelf)
 
 if GCOV
 check: check-am coverage

@@ -1,3 +1,9 @@
+2014-03-14  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am: Remove MUDFLAP conditions. Remove libmudflap from all
+	LDADD lines.
+	* configure.ac: Remove MUDFLAP conditional.
+
 2014-04-09  Mark Wielaard  <mjw@redhat.com>
 
 	* run-readelf-zdebug.sh: New test.

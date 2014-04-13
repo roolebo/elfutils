@@ -591,11 +591,6 @@ read_file (int fildes, off_t offset, size_t maxsize,
 		  || cmd == ELF_C_WRITE_MMAP
 		  || cmd == ELF_C_READ_MMAP_PRIVATE);
 
-#if _MUDFLAP
-  /* Mudflap doesn't grok that our mmap'd data is ok.  */
-  use_mmap = 0;
-#endif
-
   if (use_mmap)
     {
       if (parent == NULL)

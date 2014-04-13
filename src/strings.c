@@ -465,13 +465,6 @@ process_chunk (const char *fname, const unsigned char *buf, off64_t to,
 static void *
 map_file (int fd, off64_t start_off, off64_t fdlen, size_t *map_sizep)
 {
-#if _MUDFLAP
-  (void) fd;
-  (void) start_off;
-  (void) fdlen;
-  (void) map_sizep;
-  return MAP_FAILED;
-#else
   /* Maximum size we mmap.  We use an #ifdef to avoid overflows on
      32-bit machines.  64-bit machines these days do not have usable
      address spaces larger than about 43 bits.  Not that any file
@@ -513,7 +506,6 @@ map_file (int fd, off64_t start_off, off64_t fdlen, size_t *map_sizep)
 
   *map_sizep = map_size;
   return mem;
-#endif
 }
 
 

@@ -36,15 +36,7 @@ AM_CFLAGS = -std=gnu99 -Wall -Wshadow -Wformat=2 \
 	    $(if $($(*F)_no_Wunused),,-Wunused -Wextra) \
 	    $($(*F)_CFLAGS)
 
-if MUDFLAP
-AM_CFLAGS += -fmudflap
-libmudflap = -lmudflap
-else
-libmudflap =
-endif
-
-COMPILE.os = $(filter-out -fprofile-arcs -ftest-coverage $(no_mudflap.os),\
-	     		  $(COMPILE))
+COMPILE.os = $(filter-out -fprofile-arcs -ftest-coverage, $(COMPILE))
 
 %.os: %.c %.o
 if AMDEP

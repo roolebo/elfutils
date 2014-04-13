@@ -365,15 +365,3 @@ dwfl_standard_argp (void)
 {
   return &libdwfl_argp;
 }
-
-#ifdef _MUDFLAP
-/* In the absence of a mudflap wrapper for argp_parse, or a libc compiled
-   with -fmudflap, we'll see spurious errors for using the struct argp_state
-   on argp_parse's stack.  */
-
-void __attribute__ ((constructor))
-__libdwfl_argp_mudflap_options (void)
-{
-  __mf_set_options ("-heur-stack-bound");
-}
-#endif

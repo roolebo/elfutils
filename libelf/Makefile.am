@@ -35,10 +35,8 @@ GCC_INCLUDE = -I$(shell $(CC) -print-file-name=include)
 VERSION = 1
 
 lib_LIBRARIES = libelf.a
-if !MUDFLAP
 noinst_LIBRARIES = libelf_pic.a
 noinst_PROGRAMS = $(noinst_LIBRARIES:_pic.a=.so)
-endif
 include_HEADERS = libelf.h gelf.h nlist.h
 
 pkginclude_HEADERS = elf-knowledge.h
@@ -92,7 +90,6 @@ libelf_a_SOURCES = elf_version.c elf_hash.c elf_error.c elf_fill.c \
 		   elf_gnu_hash.c \
 		   elf_scnshndx.c
 
-if !MUDFLAP
 libelf_pic_a_SOURCES =
 am_libelf_pic_a_OBJECTS = $(libelf_a_SOURCES:.c=.os)
 
@@ -102,7 +99,7 @@ libelf_so_LDLIBS += -lpthread
 endif
 
 libelf_so_SOURCES =
-libelf.so: libelf_pic.a libelf.map
+libelf.so$(EXEEXT): libelf_pic.a libelf.map
 	$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
 		-Wl,--version-script,$(srcdir)/libelf.map,--no-undefined \
 		-Wl,--soname,$@.$(VERSION),-z,defs,-z,relro $(libelf_so_LDLIBS)
@@ -119,7 +116,6 @@ uninstall: uninstall-am
 	rm -f $(DESTDIR)$(libdir)/libelf-$(PACKAGE_VERSION).so
 	rm -f $(DESTDIR)$(libdir)/libelf.so.$(VERSION)
 	rm -f $(DESTDIR)$(libdir)/libelf.so
-endif
 
 noinst_HEADERS = elf.h abstract.h common.h exttypes.h gelf_xlate.h libelfP.h \
 		 version_xlate.h gnuhash_xlate.h note_xlate.h dl-hash.h

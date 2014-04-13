@@ -1,3 +1,7 @@
+2014-04-13  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am: Remove !MUDFLAP conditions.
+
 2013-04-24  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am: Use AM_CPPFLAGS instead of INCLUDES.

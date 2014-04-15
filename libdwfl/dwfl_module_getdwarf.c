@@ -27,12 +27,120 @@
    not, see <http://www.gnu.org/licenses/>.  */
 
 #include "libdwflP.h"
+#include <inttypes.h>
 #include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
 #include "../libdw/libdwP.h"	/* DWARF_E_* values are here.  */
 #include "../libelf/libelfP.h"
 
+#ifdef ENABLE_DWZ
+internal_function int
+__check_build_id (Dwarf *dw, const uint8_t *build_id, const size_t id_len)
+{
+  if (dw == NULL)
+    return -1;
+
+  Elf *elf = dw->elf;
+  Elf_Scn *scn = elf_nextscn (elf, NULL);
+  if (scn == NULL)
+    return -1;
+
+  do
+    {
+      GElf_Shdr shdr_mem;
+      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+      if (likely (shdr != NULL) && shdr->sh_type == SHT_NOTE)
+	{
+	  size_t pos = 0;
+	  GElf_Nhdr nhdr;
+	  size_t name_pos;
+	  size_t desc_pos;
+	  Elf_Data *data = elf_getdata (scn, NULL);
+	  while ((pos = gelf_getnote (data, pos, &nhdr, &name_pos,
+				      &desc_pos)) > 0)
+	    if (nhdr.n_type == NT_GNU_BUILD_ID
+	        && nhdr.n_namesz == sizeof "GNU"
+		&& ! memcmp (data->d_buf + name_pos, "GNU", sizeof "GNU"))
+	      return (nhdr.n_descsz == id_len
+		      && ! memcmp (data->d_buf + desc_pos,
+				   build_id, id_len)) ? 0 : 1;
+        }
+      }
+    while ((scn = elf_nextscn (elf, scn)) != NULL);
+
+  return -1;
+}
+
+/* Try to open an debug alt link by name, checking build_id.
+   Marks free_alt on success, return NULL on failure.  */
+static Dwarf *
+try_debugaltlink (Dwarf *result, const char *try_name,
+		   const uint8_t *build_id, const size_t id_len)
+{
+  int fd = open (try_name, O_RDONLY);
+  if (fd > 0)
+    {
+      Dwarf *alt_dwarf = INTUSE (dwarf_begin) (fd, DWARF_C_READ);
+      if (alt_dwarf != NULL)
+	{
+	  Elf *elf = alt_dwarf->elf;
+	  if (__check_build_id (alt_dwarf, build_id, id_len) == 0
+	      && elf_cntl (elf, ELF_C_FDREAD) == 0)
+	    {
+	      close (fd);
+	      INTUSE (dwarf_setalt) (result, alt_dwarf);
+	      result->free_alt = true;
+	      return result;
+	    }
+	  INTUSE (dwarf_end) (result->alt_dwarf);
+	}
+      close (fd);
+    }
+  return NULL;
+}
+
+/* For dwz multifile support, ignore if it looks wrong.  */
+static Dwarf *
+open_debugaltlink (Dwarf *result, const char *alt_name,
+		   const uint8_t *build_id, const size_t id_len)
+{
+  /* First try the name itself, it is either an absolute path or
+     a relative one.  Sadly we don't know relative from where at
+     this point.  */
+  if (try_debugaltlink (result, alt_name, build_id, id_len) != NULL)
+    return result;
+
+  /* Lets try based on the build-id.  This is somewhat distro specific,
+     we are following the Fedora implementation described at
+  https://fedoraproject.org/wiki/Releases/FeatureBuildId#Find_files_by_build_ID
+   */
+#define DEBUG_PREFIX "/usr/lib/debug/.build-id/"
+#define PREFIX_LEN sizeof (DEBUG_PREFIX)
+  char id_name[PREFIX_LEN + 1 + id_len * 2 + sizeof ".debug" - 1];
+  strcpy (id_name, DEBUG_PREFIX);
+  int n = snprintf (&id_name[PREFIX_LEN  - 1],
+		    4, "%02" PRIx8 "/", (uint8_t) build_id[0]);
+  assert (n == 3);
+  for (size_t i = 1; i < id_len; ++i)
+    {
+      n = snprintf (&id_name[PREFIX_LEN - 1 + 3 + (i - 1) * 2],
+		    3, "%02" PRIx8, (uint8_t) build_id[i]);
+      assert (n == 2);
+    }
+  strcpy (&id_name[PREFIX_LEN - 1 + 3 + (id_len - 1) * 2],
+	  ".debug");
+
+  if (try_debugaltlink (result, id_name, build_id, id_len))
+    return result;
+
+  /* Everything failed, mark this Dwarf as not having an alternate,
+     but don't fail the load.  The user may want to set it by hand
+     before usage.  */
+  result->alt_dwarf = NULL;
+  return result;
+}
+#endif /* ENABLE_DWZ */
 
 /* Open libelf FILE->fd and compute the load base of ELF as loaded in MOD.
    When we return success, FILE->elf and FILE->vaddr are set up.  */
@@ -1121,6 +1229,19 @@ load_dw (Dwfl_Module *mod, struct dwfl_file *debugfile)
       int err = INTUSE(dwarf_errno) ();
       return err == DWARF_E_NO_DWARF ? DWFL_E_NO_DWARF : DWFL_E (LIBDW, err);
     }
+
+#ifdef ENABLE_DWZ
+  /* For dwz multifile support, ignore if it looks wrong.  */
+  {
+    const void *build_id;
+    const char *alt_name;
+    size_t id_len = INTUSE (dwelf_dwarf_gnu_debugaltlink) (mod->dw,
+							   &alt_name,
+							   &build_id);
+    if (id_len > 0)
+      open_debugaltlink (mod->dw, alt_name, build_id, id_len);
+  }
+#endif /* ENABLE_DWZ */
 
   /* Until we have iterated through all CU's, we might do lazy lookups.  */
   mod->lazycu = 1;

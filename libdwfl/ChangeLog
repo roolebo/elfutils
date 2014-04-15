@@ -1,3 +1,11 @@
+2014-04-15  Florian Weimer  <fweimer@redhat.com>
+
+	* dwfl_module_getdwarf.c (__check_build_id): Moved from libdw.
+	(try_debugaltlink): Likewise.
+	(open_debugaltlink): Likewise.
+	(load_dw): Locate alternate debug information using
+	dwelf_dwarf_gnu_debugaltlink and call open_debugaltlink.
+
 2014-04-11  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (AM_CPPFLAGS): Add libdwelf.

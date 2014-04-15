@@ -1,3 +1,9 @@
+2014-04-15  Florian Weimer  <fweimer@redhat.com>
+
+	* dwarf_begin_elf.c (__check_build_id, try_debugaltlink)
+	(open_debugaltlink): Move to libdwfl.
+	(check_section): Do not locate alternate debuginfo.
+
 2014-04-24  Florian Weimer  <fweimer@redhat.com>
 
 	* libdw.map (ELFUTILS_0.159): Export dwelf_dwarf_gnu_debugaltlink.

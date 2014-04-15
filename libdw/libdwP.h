@@ -74,6 +74,7 @@ enum
     IDX_debug_macinfo,
     IDX_debug_macro,
     IDX_debug_ranges,
+    IDX_gnu_debugaltlink,
     IDX_last
   };
 

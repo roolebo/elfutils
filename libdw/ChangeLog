@@ -1,3 +1,11 @@
+2014-04-15  Florian Weimer  <fweimer@redhat.com>
+
+	* libdwP.h (enum IDX_gnu_debugaltlink): New.
+	* dwarf_begin_elf.c (dwarf_scnnames): Increase string size and add
+	.gnu_debugaltlink.
+	(check_section): Obtain .gnu_debugaltlink section from the
+	setiondata array.
+
 2014-04-11  Mark Wielaard  <mjw@redhat.com>
 
 	* libdw.map (ELFUTILS_0.159): New. Add dwelf_elf_gnu_debuglink.

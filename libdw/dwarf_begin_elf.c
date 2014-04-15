@@ -54,7 +54,7 @@
 
 
 /* Section names.  */
-static const char dwarf_scnnames[IDX_last][17] =
+static const char dwarf_scnnames[IDX_last][18] =
 {
   [IDX_debug_info] = ".debug_info",
   [IDX_debug_types] = ".debug_types",
@@ -67,7 +67,8 @@ static const char dwarf_scnnames[IDX_last][17] =
   [IDX_debug_str] = ".debug_str",
   [IDX_debug_macinfo] = ".debug_macinfo",
   [IDX_debug_macro] = ".debug_macro",
-  [IDX_debug_ranges] = ".debug_ranges"
+  [IDX_debug_ranges] = ".debug_ranges",
+  [IDX_gnu_debugaltlink] = ".gnu_debugaltlink"
 };
 #define ndwarf_scnnames (sizeof (dwarf_scnnames) / sizeof (dwarf_scnnames[0]))
 
@@ -223,22 +224,6 @@ check_section (Dwarf *result, GElf_Ehdr *ehdr, Elf_Scn *scn, bool inscngrp)
       return NULL;
     }
 
-#ifdef ENABLE_DWZ
-  /* For dwz multifile support, ignore if it looks wrong.  */
-  if (strcmp (scnname, ".gnu_debugaltlink") == 0)
-    {
-      Elf_Data *data = elf_getdata (scn, NULL);
-      if (data != NULL && data->d_size != 0)
-	{
-	  const char *alt_name = data->d_buf;
-	  const void *build_id = memchr (data->d_buf, '\0', data->d_size);
-	  const int id_len = data->d_size - (build_id - data->d_buf + 1);
-	  if (alt_name && build_id && id_len > 0)
-	    return open_debugaltlink (result, alt_name, build_id + 1, id_len);
-	}
-    }
-#endif /* ENABLE_DWZ */
-
   /* Recognize the various sections.  Most names start with .debug_.  */
   size_t cnt;
   for (cnt = 0; cnt < ndwarf_scnnames; ++cnt)
@@ -333,6 +318,18 @@ check_section (Dwarf *result, GElf_Ehdr *ehdr, Elf_Scn *scn, bool inscngrp)
 	break;
       }
 #endif
+
+#ifdef ENABLE_DWZ
+  Elf_Data *data = result->sectiondata[IDX_gnu_debugaltlink];
+  if (data != NULL && data->d_size != 0)
+    {
+      const char *alt_name = data->d_buf;
+      const void *build_id = memchr (data->d_buf, '\0', data->d_size);
+      const int id_len = data->d_size - (build_id - data->d_buf + 1);
+      if (alt_name && build_id && id_len > 0)
+	return open_debugaltlink (result, alt_name, build_id + 1, id_len);
+    }
+#endif /* ENABLE_DWZ */
 
   return result;
 }

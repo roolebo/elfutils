@@ -85,7 +85,8 @@ libdw_a_SOURCES = dwarf_begin.c dwarf_begin_elf.c dwarf_end.c dwarf_getelf.c \
 		  dwarf_cfi_addrframe.c \
 		  dwarf_getcfi.c dwarf_getcfi_elf.c dwarf_cfi_end.c \
 		  dwarf_aggregate_size.c dwarf_getlocation_implicit_pointer.c \
-		  dwarf_getlocation_die.c dwarf_getlocation_attr.c
+		  dwarf_getlocation_die.c dwarf_getlocation_attr.c \
+		  dwarf_getalt.c dwarf_setalt.c
 
 if MAINTAINER_MODE
 BUILT_SOURCES = $(srcdir)/known-dwarf.h

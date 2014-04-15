@@ -1,3 +1,12 @@
+2014-04-22  Florian Weimer  <fweimer@redhat.com>
+
+	* dwarf_getalt.c, dwarf_setalt.c: New files.
+	* Makefile.am (libdw_a_SOURCES): Add them.
+	* libdw.h (dwarf_getalt, dwarf_setalt): Add function declarations.
+	* libdwP.h (dwarf_getalt, dwarf_setalt): Add internal function
+	declarations.
+	* libdw.map (ELFUTILS_0.159): Export the two new functions.
+
 2014-04-15  Florian Weimer  <fweimer@redhat.com>
 
 	* libdwP.h (enum IDX_gnu_debugaltlink): New.

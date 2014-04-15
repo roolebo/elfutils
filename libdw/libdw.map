@@ -295,5 +295,7 @@ ELFUTILS_0.158 {
 
 ELFUTILS_0.159 {
   global:
+    dwarf_getalt;
+    dwarf_setalt;
     dwelf_elf_gnu_debuglink;
 } ELFUTILS_0.158;

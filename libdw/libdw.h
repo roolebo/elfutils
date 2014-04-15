@@ -260,6 +260,18 @@ extern Dwarf *dwarf_begin_elf (Elf *elf, Dwarf_Cmd cmd, Elf_Scn *scngrp);
 /* Retrieve ELF descriptor used for DWARF access.  */
 extern Elf *dwarf_getelf (Dwarf *dwarf);
 
+/* Retrieves the DWARF descriptor for debugaltlink data.  Returns NULL
+   if no alternate debug data has been supplied.  */
+extern Dwarf *dwarf_getalt (Dwarf *main);
+
+/* Provides the data referenced by the .gnu_debugaltlink section.  The
+   caller should check that MAIN and ALT match (i.e., they have the
+   same build ID).  It is the responsibility of the caller to ensure
+   that the data referenced by ALT stays valid while it is used by
+   MAIN, until dwarf_setalt is called on MAIN with a different
+   descriptor, or dwarf_end.  */
+extern void dwarf_setalt (Dwarf *main, Dwarf *alt);
+
 /* Release debugging handling context.  */
 extern int dwarf_end (Dwarf *dwarf);
 

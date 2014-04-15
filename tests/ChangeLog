@@ -1,5 +1,11 @@
 2014-04-24  Florian Weimer  <fweimer@redhat.com>
 
+	* allfcts.c (setup_alt): New function.
+	(main): Call it.  Implementation additional error checking and
+	reporting.
+
+2014-04-24  Florian Weimer  <fweimer@redhat.com>
+
 	* debugaltlink.c, run-debugaltlink.sh: New files.
 	* Makefile.am (check_PROGRAMS): Add debugaltlink.
 	(TESTS): Add run-debugaltlink.sh.

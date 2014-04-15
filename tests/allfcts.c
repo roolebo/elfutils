@@ -18,8 +18,10 @@
 # include <config.h>
 #endif
 
+#include <err.h>
 #include <fcntl.h>
 #include ELFUTILS_HEADER(dw)
+#include ELFUTILS_HEADER(dwelf)
 #include <stdio.h>
 #include <unistd.h>
 
@@ -37,6 +39,28 @@ cb (Dwarf_Die *func, void *arg __attribute__ ((unused)))
   return DWARF_CB_ABORT;
 }
 
+static Dwarf *
+setup_alt (Dwarf *main)
+{
+  const char *alt_name;
+  const void *build_id;
+  ssize_t ret = dwelf_dwarf_gnu_debugaltlink (main, &alt_name, &build_id);
+  if (ret == 0)
+    return NULL;
+  if (ret == -1)
+    errx (1, "dwelf_dwarf_gnu_debugaltlink: %s", dwarf_errmsg (-1));
+  int fd = open (alt_name, O_RDONLY);
+  if (fd < 0)
+    err (1, "open (%s)", alt_name);
+  Dwarf *dbg_alt = dwarf_begin (fd, DWARF_C_READ);
+  if (dbg_alt == NULL)
+    errx (1, "dwarf_begin (%s): %s", alt_name, dwarf_errmsg (-1));
+  if (elf_cntl (dwarf_getelf (dbg_alt), ELF_C_FDREAD) != 0)
+    errx (1, "elf_cntl (%s, ELF_C_FDREAD): %s", alt_name, elf_errmsg (-1));
+  close (fd);
+  dwarf_setalt (main, dbg_alt);
+  return dbg_alt;
+}
 
 int
 main (int argc, char *argv[])
@@ -44,6 +68,8 @@ main (int argc, char *argv[])
   for (int i = 1; i < argc; ++i)
     {
       int fd = open (argv[i], O_RDONLY);
+      if (fd < 0)
+	err (1, "open (%s)", argv[i]);
 
       Dwarf *dbg = dwarf_begin (fd, DWARF_C_READ);
       if (dbg != NULL)
@@ -51,6 +77,7 @@ main (int argc, char *argv[])
 	  Dwarf_Off off = 0;
 	  size_t cuhl;
 	  Dwarf_Off noff;
+	  Dwarf *dbg_alt = setup_alt (dbg);
 
 	  while (dwarf_nextcu (dbg, off, &noff, &cuhl, NULL, NULL, NULL) == 0)
 	    {
@@ -62,14 +89,20 @@ main (int argc, char *argv[])
 	      do
 		{
 		  doff = dwarf_getfuncs (die, cb, NULL, doff);
+		  if (dwarf_errno () != 0)
+		    errx (1, "dwarf_getfuncs (%s): %s",
+			  argv[i], dwarf_errmsg (-1));
 		}
-	      while (doff != 0 && dwarf_errno () == 0);
+	      while (doff != 0);
 
 	      off = noff;
 	    }
 
+	  dwarf_end (dbg_alt);
 	  dwarf_end (dbg);
 	}
+      else
+	errx (1, "dwarf_begin (%s): %s", argv[i], dwarf_errmsg (-1));
 
       close (fd);
     }

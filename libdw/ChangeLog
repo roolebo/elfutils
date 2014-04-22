@@ -1,3 +1,8 @@
+2014-04-22  Mark Wielaard  <mjw@redhat.com>
+
+	* memory-access.h (get_sleb128_step): Remove undefined behavior
+	of left shifting a signed value. Replace it with a multiplication.
+
 2014-04-13  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am: Remove !MUDFLAP conditions.

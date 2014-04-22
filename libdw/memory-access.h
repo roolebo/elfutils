@@ -1,5 +1,5 @@
 /* Unaligned memory access functionality.
-   Copyright (C) 2000-2013 Red Hat, Inc.
+   Copyright (C) 2000-2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -71,7 +71,7 @@ __libdw_get_uleb128 (const unsigned char **addrp)
     if (likely ((__b & 0x80) == 0))					      \
       {									      \
 	struct { signed int i:7; } __s = { .i = __b };			      \
-	(var) |= (typeof (var)) __s.i << ((nth) * 7);			      \
+	(var) |= (typeof (var)) __s.i * ((typeof (var)) 1 << ((nth) * 7));    \
 	return (var);							      \
       }									      \
     (var) |= (typeof (var)) (__b & 0x7f) << ((nth) * 7);		      \

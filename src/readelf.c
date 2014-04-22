@@ -7827,7 +7827,7 @@ print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	      cu_kind = read_4ubyte_unaligned (dbg, readcus);
 	      cu = cu_kind & ((1 << 24) - 1);
 	      kind = (cu_kind >> 28) & 7;
-	      is_static = cu_kind & (1 << 31);
+	      is_static = cu_kind & (1U << 31);
 	      if (cu > cu_nr - 1)
 		printf ("%" PRId32 "T", cu - (uint32_t) cu_nr);
 	      else

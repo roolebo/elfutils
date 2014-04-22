@@ -1,3 +1,8 @@
+2014-04-22  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_gdb_index_section): Use unsigned int for 31 bits
+	left shift.
+
 2014-03-13  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am: Remove no_mudflap.os. Remove libmudflap from all

@@ -57,7 +57,7 @@ __libdwfl_frame_reg_get (Dwfl_Frame *state, unsigned regno, Dwarf_Addr *val)
   if (regno >= ebl_frame_nregs (ebl))
     return false;
   if ((state->regs_set[regno / sizeof (*state->regs_set) / 8]
-       & (1U << (regno % (sizeof (*state->regs_set) * 8)))) == 0)
+       & ((uint64_t) 1U << (regno % (sizeof (*state->regs_set) * 8)))) == 0)
     return false;
   if (val)
     *val = state->regs[regno];
@@ -77,7 +77,7 @@ __libdwfl_frame_reg_set (Dwfl_Frame *state, unsigned regno, Dwarf_Addr val)
   if (ebl_get_elfclass (ebl) == ELFCLASS32)
     val &= 0xffffffff;
   state->regs_set[regno / sizeof (*state->regs_set) / 8] |=
-			      (1U << (regno % (sizeof (*state->regs_set) * 8)));
+		((uint64_t) 1U << (regno % (sizeof (*state->regs_set) * 8)));
   state->regs[regno] = val;
   return true;
 }

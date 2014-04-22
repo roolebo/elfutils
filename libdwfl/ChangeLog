@@ -1,3 +1,9 @@
+2014-04-22  Mark Wielaard  <mjw@redhat.com>
+
+	* frame_unwind.c (__libdwfl_frame_reg_get): Use uint64_t when
+	checking bits.
+	(__libdwfl_frame_reg_set): Likewise.
+
 2014-04-22  Kurt Roeckx  <kurt@roeckx.be>
 
 	* linux-pid-attach.c: Make linux only.

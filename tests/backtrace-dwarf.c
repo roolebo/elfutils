@@ -25,6 +25,18 @@
 #include <sys/ptrace.h>
 #include ELFUTILS_HEADER(dwfl)
 
+#ifndef __linux__
+
+int
+main (int argc __attribute__ ((unused)), char **argv)
+{
+  fprintf (stderr, "%s: Unwinding not supported for this architecture\n",
+           argv[0]);
+  return 77;
+}
+
+#else /* __linux__ */
+
 static void cleanup_13_abort (void);
 #define main cleanup_13_main
 #include "cleanup-13.c"
@@ -148,3 +160,6 @@ main (int argc __attribute__ ((unused)), char **argv)
   /* There is an exit (0) call if we find the "main" frame,  */
   error (1, 0, "dwfl_getthreads: %s", dwfl_errmsg (-1));
 }
+
+#endif /* ! __linux__ */
+

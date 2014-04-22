@@ -38,6 +38,18 @@
 #include <argp.h>
 #include ELFUTILS_HEADER(dwfl)
 
+#ifndef __linux__
+
+int
+main (int argc __attribute__ ((unused)), char **argv)
+{
+  fprintf (stderr, "%s: Unwinding not supported for this architecture\n",
+	   argv[0]);
+  return 77;
+}
+
+#else /* __linux__ */
+
 static int
 dump_modules (Dwfl_Module *mod, void **userdata __attribute__ ((unused)),
 	      const char *name, Dwarf_Addr start,
@@ -451,3 +463,6 @@ main (int argc __attribute__ ((unused)), char **argv)
   dwfl_end (dwfl);
   return 0;
 }
+
+#endif /* ! __linux__ */
+

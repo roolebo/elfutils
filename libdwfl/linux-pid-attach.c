@@ -37,6 +37,7 @@
 # define MAX(a, b) ((a) > (b) ? (a) : (b))
 #endif
 
+#ifdef __linux__
 
 static bool
 linux_proc_pid_is_stopped (pid_t pid)
@@ -354,3 +355,87 @@ __libdwfl_get_pid_arg (Dwfl *dwfl)
 
   return NULL;
 }
+
+#else	/* __linux__ */
+
+static pid_t
+pid_next_thread (Dwfl *dwfl __attribute__ ((unused)),
+	         void *dwfl_arg __attribute__ ((unused)),
+		 void **thread_argp __attribute__ ((unused)))
+{
+  errno = ENOSYS;
+  __libdwfl_seterrno (DWFL_E_ERRNO);
+  return -1;
+}
+
+static bool
+pid_getthread (Dwfl *dwfl __attribute__ ((unused)),
+	       pid_t tid __attribute__ ((unused)),
+	       void *dwfl_arg __attribute__ ((unused)),
+	       void **thread_argp __attribute__ ((unused)))
+{
+  errno = ENOSYS;
+  __libdwfl_seterrno (DWFL_E_ERRNO);
+  return false;
+}
+
+static bool
+pid_memory_read (Dwfl *dwfl __attribute__ ((unused)),
+                 Dwarf_Addr addr __attribute__ ((unused)),
+	         Dwarf_Word *result __attribute__ ((unused)),
+	         void *arg __attribute__ ((unused)))
+{
+  errno = ENOSYS;
+  __libdwfl_seterrno (DWFL_E_ERRNO);
+  return false;
+}
+
+static bool
+pid_set_initial_registers (Dwfl_Thread *thread __attribute__ ((unused)),
+			   void *thread_arg __attribute__ ((unused)))
+{
+  errno = ENOSYS;
+  __libdwfl_seterrno (DWFL_E_ERRNO);
+  return false;
+}
+
+static void
+pid_detach (Dwfl *dwfl __attribute__ ((unused)),
+	    void *dwfl_arg __attribute__ ((unused)))
+{
+}
+
+static void
+pid_thread_detach (Dwfl_Thread *thread __attribute__ ((unused)),
+		  void *thread_arg __attribute__ ((unused)))
+{
+}
+
+static const Dwfl_Thread_Callbacks pid_thread_callbacks =
+{
+  pid_next_thread,
+  pid_getthread,
+  pid_memory_read,
+  pid_set_initial_registers,
+  pid_detach,
+  pid_thread_detach,
+};
+
+int
+dwfl_linux_proc_attach (Dwfl *dwfl __attribute__ ((unused)),
+			pid_t pid __attribute__ ((unused)),
+			bool assume_ptrace_stopped __attribute__ ((unused)))
+{
+  return ENOSYS;
+}
+INTDEF (dwfl_linux_proc_attach)
+
+struct __libdwfl_pid_arg *
+internal_function
+__libdwfl_get_pid_arg (Dwfl *dwfl __attribute__ ((unused)))
+{
+  return NULL;
+}
+
+#endif /* ! __linux __ */
+

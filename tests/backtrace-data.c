@@ -40,7 +40,7 @@
 #include <string.h>
 #include ELFUTILS_HEADER(dwfl)
 
-#ifndef __x86_64__
+#if !defined(__x86_64__) || !defined(__linux__)
 
 int
 main (int argc __attribute__ ((unused)), char **argv)
@@ -50,7 +50,7 @@ main (int argc __attribute__ ((unused)), char **argv)
   return 77;
 }
 
-#else /* __x86_64__ */
+#else /* __x86_64__ && __linux__ */
 
 /* The only arch specific code is set_initial_registers.  */
 

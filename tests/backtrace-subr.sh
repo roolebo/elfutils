@@ -96,6 +96,7 @@ check_core()
   echo ./backtrace ./backtrace.$arch.{exec,core}
   testrun ${abs_builddir}/backtrace -e ./backtrace.$arch.exec --core=./backtrace.$arch.core 1>backtrace.$arch.bt 2>backtrace.$arch.err || true
   cat backtrace.$arch.{bt,err}
+  check_unsupported backtrace.$arch.err backtrace.$arch.core
   check_all backtrace.$arch.{bt,err} backtrace.$arch.core
 }
 

@@ -1,3 +1,11 @@
+2014-04-22  Kurt Roeckx  <kurt@roeckx.be>
+
+	* backtrace.c: Make Linux only.
+	* backtrace-child.c: Make Linux only.
+	* backtrace-data.c: Make Linux only.
+	* backtrace-dwarf.c: Make Linux only.
+	* backtrace-subr.sh: Skip core file unwinding tests when not supported.
+
 2014-03-14  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am: Remove MUDFLAP conditions. Remove libmudflap from all

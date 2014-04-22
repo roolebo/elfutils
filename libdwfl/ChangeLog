@@ -1,3 +1,7 @@
+2014-04-22  Kurt Roeckx  <kurt@roeckx.be>
+
+	* linux-pid-attach.c: Make linux only.
+
 2014-03-14  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am: Remove !MUDFLAP and MUDFLAP conditions.

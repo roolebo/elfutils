@@ -1,3 +1,8 @@
+2014-04-22  Kurt Roeckx  <kurt@roeckx.be>
+
+	* i386_initreg.c: Make Linux only.
+	* x86_64_initreg.c: Make Linux only.
+
 2014-04-13  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am: Remove libelf and libdw definitions when MUDFLAP

@@ -79,6 +79,18 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#ifndef __linux__
+
+int
+main (int argc __attribute__ ((unused)), char **argv)
+{
+  fprintf (stderr, "%s: Unwinding not supported for this architecture\n",
+           argv[0]);
+  return 77;
+}
+
+#else /* __linux__ */
+
 #if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
 #define NOINLINE_NOCLONE __attribute__ ((noinline, noclone))
 #else
@@ -223,3 +235,6 @@ main (int argc UNUSED, char **argv)
     raise (SIGUSR2);
   return 0;
 }
+
+#endif /* ! __linux__ */
+

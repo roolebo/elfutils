@@ -44,7 +44,7 @@ x86_64_set_initial_registers_tid (pid_t tid __attribute__ ((unused)),
 			  ebl_tid_registers_t *setfunc __attribute__ ((unused)),
 				  void *arg __attribute__ ((unused)))
 {
-#ifndef __x86_64__
+#if !defined(__x86_64__) || !defined(__linux__)
   return false;
 #else /* __x86_64__ */
   struct user_regs_struct user_regs;

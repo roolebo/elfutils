@@ -8128,7 +8128,7 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
       const unsigned int bias = item->format == 'b';
 
       {
-	char printed[(negate ? nbits - pop : pop) * 16];
+	char printed[(negate ? nbits - pop : pop) * 16 + 1];
 	char *p = printed;
 	*p = '\0';
 

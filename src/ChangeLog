@@ -1,5 +1,10 @@
 2014-04-22  Mark Wielaard  <mjw@redhat.com>
 
+	* readelf.c (handle_core_item): Make sure variable length array
+	contains at least enough space for terminating zero char.
+
+2014-04-22  Mark Wielaard  <mjw@redhat.com>
+
 	* readelf.c (print_gdb_index_section): Use unsigned int for 31 bits
 	left shift.
 

@@ -27,7 +27,7 @@ for what_arg in --debug-syms --defined-only --dynamic --extern-only; do
     for out_arg in --numeric-sort --no-sort --reverse-sort; do
       for self_file in $ET_REL $ET_EXEC $ET_DYN; do
 	# --dynamic doesn't make sense for ET_REL.
-	if ! test "$what_arg" == "--dynamic" -a "$self_file" == "$ET_REL"; then
+	if ! test "$what_arg" = "--dynamic" -a "$self_file" = "$ET_REL"; then
 	  testrun ${abs_top_builddir}/src/nm $what_arg $format_arg $out_arg $self_file > /dev/null
 	fi
       done

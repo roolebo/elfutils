@@ -1,3 +1,7 @@
+2014-03-23  Mark Wielaard  <mjw@redhat.com>
+
+	* run-nm-self.sh: Use test = not == for string comparisons.
+
 2014-04-22  Kurt Roeckx  <kurt@roeckx.be>
 
 	* backtrace.c: Make Linux only.

@@ -47,6 +47,16 @@ extern "C" {
    section or some other error occured.  */
 extern const char *dwelf_elf_gnu_debuglink (Elf *elf, GElf_Word *crc);
 
+/* Returns the name and build ID from the .gnu_debugaltlink section if
+   found in the ELF.  On success, pointers to the name and build ID
+   are written to *NAMEP and *BUILDID_P, and the positive length of
+   the build ID is returned.  Returns 0 if the ELF lacks a
+   .gnu_debugaltlink section.  Returns -1 in case of malformed data or
+   other errors.  */
+extern ssize_t dwelf_dwarf_gnu_debugaltlink (Dwarf *dwarf,
+					     const char **namep,
+					     const void **build_idp);
+
 #ifdef __cplusplus
 }
 #endif

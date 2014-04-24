@@ -49,7 +49,7 @@ check_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  alldts md5-sha1-test typeiter typeiter2 low_high_pc \
 		  test-elf_cntl_gelf_getshdr dwflsyms dwfllines \
 		  dwfl-report-elf-align varlocs backtrace backtrace-child \
-		  backtrace-data backtrace-dwarf debuglink
+		  backtrace-data backtrace-dwarf debuglink debugaltlink
 asm_TESTS = asm-tst1 asm-tst2 asm-tst3 asm-tst4 asm-tst5 \
 	    asm-tst6 asm-tst7 asm-tst8 asm-tst9
 
@@ -86,7 +86,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-readelf-macro.sh run-readelf-loc.sh \
 	run-readelf-aranges.sh run-readelf-line.sh \
 	run-native-test.sh run-bug1-test.sh \
-	run-debuglink.sh \
+	run-debuglink.sh run-debugaltlink.sh \
 	dwfl-bug-addr-overflow run-addrname-test.sh \
 	dwfl-bug-fd-leak dwfl-bug-report \
 	run-dwfl-bug-offline-rel.sh run-dwfl-addr-sect.sh \
@@ -176,7 +176,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-readelf-test1.sh run-readelf-test2.sh run-readelf-test3.sh \
 	     run-readelf-test4.sh run-readelf-twofiles.sh \
 	     run-bug1-test.sh testfile28.bz2 testfile28.rdwr.bz2 \
-	     run-debuglink.sh \
+	     run-debuglink.sh run-debugaltlink.sh \
 	     testfile29.bz2 testfile29.rdwr.bz2 \
 	     testfile30.bz2 testfile31.bz2 testfile32.bz2 testfile33.bz2 \
 	     testfile34.bz2 testfile35.bz2 testfile35.debug.bz2 \
@@ -405,6 +405,7 @@ backtrace_data_LDADD = $(libdw) $(libelf)
 backtrace_dwarf_CFLAGS = -Wno-unused-parameter
 backtrace_dwarf_LDADD = $(libdw) $(libelf)
 debuglink_LDADD = $(libdw) $(libelf)
+debugaltlink_LDADD = $(libdw) $(libelf)
 
 if GCOV
 check: check-am coverage

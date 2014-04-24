@@ -1,3 +1,7 @@
+2014-04-24  Florian Weimer  <fweimer@redhat.com>
+
+	* libdw.map (ELFUTILS_0.159): Export dwelf_dwarf_gnu_debugaltlink.
+
 2014-04-22  Florian Weimer  <fweimer@redhat.com>
 
 	* dwarf_getalt.c, dwarf_setalt.c: New files.

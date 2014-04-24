@@ -1,4 +1,4 @@
-/* Internal definitions for libdwelf. DWARF ELF Low-level Functions.
+/* Returns the file name and build ID stored in the .gnu_altdebuglink if found.
    Copyright (C) 2014 Red Hat, Inc.
    This file is part of elfutils.
 
@@ -26,16 +26,37 @@
    the GNU Lesser General Public License along with this program.  If
    not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef _LIBDWELFP_H
-#define _LIBDWELFP_H	1
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
 
-#include <libdwelf.h>
-#include "../libdw/libdwP.h"	/* We need its INTDECLs.  */
-#include <assert.h>
-#include <string.h>
+#include "libdwelfP.h"
 
-/* Avoid PLT entries.  */
-INTDECL (dwelf_elf_gnu_debuglink)
-INTDECL (dwelf_dwarf_gnu_debugaltlink)
+ssize_t
+dwelf_dwarf_gnu_debugaltlink (Dwarf *dwarf,
+			      const char **name_p,
+			      const void **build_idp)
+{
+  Elf_Data *data = dwarf->sectiondata[IDX_gnu_debugaltlink];
+  if (data == NULL)
+    {
+      return 0;
+    }
 
-#endif	/* libdwelfP.h */
+  const void *ptr = memchr (data->d_buf, '\0', data->d_size);
+  if (ptr == NULL)
+    {
+      __libdw_seterrno (DWARF_E_INVALID_ELF);
+      return -1;
+    }
+  size_t build_id_len = data->d_size - (ptr - data->d_buf + 1);
+  if (build_id_len == 0 || (size_t) (ssize_t) build_id_len != build_id_len)
+    {
+      __libdw_seterrno (DWARF_E_INVALID_ELF);
+      return -1;
+    }
+  *name_p = data->d_buf;
+  *build_idp = ptr + 1;
+  return build_id_len;
+}
+INTDEF(dwelf_dwarf_gnu_debugaltlink)

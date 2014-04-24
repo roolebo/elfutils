@@ -38,7 +38,7 @@ noinst_LIBRARIES = libdwelf.a libdwelf_pic.a
 pkginclude_HEADERS = libdwelf.h
 noinst_HEADERS = libdwelfP.h
 
-libdwelf_a_SOURCES = dwelf_elf_gnu_debuglink.c
+libdwelf_a_SOURCES = dwelf_elf_gnu_debuglink.c dwelf_dwarf_gnu_debugaltlink.c
 
 libdwelf = $(libdw)
 

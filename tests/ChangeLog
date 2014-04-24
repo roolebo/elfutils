@@ -1,3 +1,10 @@
+2014-04-24  Florian Weimer  <fweimer@redhat.com>
+
+	* debugaltlink.c, run-debugaltlink.sh: New files.
+	* Makefile.am (check_PROGRAMS): Add debugaltlink.
+	(TESTS): Add run-debugaltlink.sh.
+	(debugaltlink_LDADD): New variable.
+
 2014-04-11  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (AM_CPPFLAGS): Add -I libdwelf.

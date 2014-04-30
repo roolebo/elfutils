@@ -299,4 +299,5 @@ ELFUTILS_0.159 {
     dwarf_setalt;
     dwelf_dwarf_gnu_debugaltlink;
     dwelf_elf_gnu_debuglink;
+    dwelf_elf_gnu_build_id;
 } ELFUTILS_0.158;

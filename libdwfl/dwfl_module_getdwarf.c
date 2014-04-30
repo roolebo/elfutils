@@ -42,34 +42,13 @@ __check_build_id (Dwarf *dw, const uint8_t *build_id, const size_t id_len)
     return -1;
 
   Elf *elf = dw->elf;
-  Elf_Scn *scn = elf_nextscn (elf, NULL);
-  if (scn == NULL)
+  const void *elf_build_id;
+  ssize_t elf_id_len = INTUSE(dwelf_elf_gnu_build_id) (elf, &elf_build_id);
+  if (elf_id_len < 0)
     return -1;
 
-  do
-    {
-      GElf_Shdr shdr_mem;
-      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
-      if (likely (shdr != NULL) && shdr->sh_type == SHT_NOTE)
-	{
-	  size_t pos = 0;
-	  GElf_Nhdr nhdr;
-	  size_t name_pos;
-	  size_t desc_pos;
-	  Elf_Data *data = elf_getdata (scn, NULL);
-	  while ((pos = gelf_getnote (data, pos, &nhdr, &name_pos,
-				      &desc_pos)) > 0)
-	    if (nhdr.n_type == NT_GNU_BUILD_ID
-	        && nhdr.n_namesz == sizeof "GNU"
-		&& ! memcmp (data->d_buf + name_pos, "GNU", sizeof "GNU"))
-	      return (nhdr.n_descsz == id_len
-		      && ! memcmp (data->d_buf + desc_pos,
-				   build_id, id_len)) ? 0 : 1;
-        }
-      }
-    while ((scn = elf_nextscn (elf, scn)) != NULL);
-
-  return -1;
+  return (id_len == (size_t) elf_id_len
+	  && memcmp (build_id, elf_build_id, id_len) == 0) ? 0 : 1;
 }
 
 /* Try to open an debug alt link by name, checking build_id.

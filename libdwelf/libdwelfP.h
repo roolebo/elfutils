@@ -37,5 +37,6 @@
 /* Avoid PLT entries.  */
 INTDECL (dwelf_elf_gnu_debuglink)
 INTDECL (dwelf_dwarf_gnu_debugaltlink)
+INTDECL (dwelf_elf_gnu_build_id)
 
 #endif	/* libdwelfP.h */

@@ -494,13 +494,12 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 		&& module->disk_file_has_build_id && build_id_len > 0)
 	      {
 		const void *elf_build_id;
-		GElf_Addr elf_build_id_elfaddr;
-		int elf_build_id_len;
+		ssize_t elf_build_id_len;
 
-		if (__libdwfl_find_elf_build_id (NULL, module->elf,
-						 &elf_build_id,
-						 &elf_build_id_elfaddr,
-						 &elf_build_id_len) > 0)
+		/* If there is a build id in the elf file, check it.  */
+		elf_build_id_len = INTUSE(dwelf_elf_gnu_build_id) (module->elf,
+								&elf_build_id);
+		if (elf_build_id_len > 0)
 		  {
 		    if (build_id_len != (size_t) elf_build_id_len
 			|| memcmp (build_id, elf_build_id, build_id_len) != 0)

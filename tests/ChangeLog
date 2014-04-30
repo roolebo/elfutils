@@ -1,3 +1,11 @@
+2014-04-30  Mark Wielaard  <mjw@redhat.com>
+
+	* buildid.c, buildid.sh, testfile42_noshdrs.bz2: New files.
+	* Makefile.am (check_PROGRAMS): Add buildid.
+	(TESTS): Add run-buildid.sh.
+	(EXTRA_DISTS): Add run-buildid.sh and testfile42_noshdrs.bz2.
+	(buildid_LDADD): New variable.
+
 2014-04-24  Florian Weimer  <fweimer@redhat.com>
 
 	* allfcts.c (setup_alt): New function.

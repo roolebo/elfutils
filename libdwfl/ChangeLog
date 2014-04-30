@@ -1,3 +1,13 @@
+2014-04-30  Mark Wielaard  <mjw@redhat.com>
+
+	* dwfl_module_build_id.c (__libdwfl_find_elf_build_id): Moved to
+	dwelf_elf_gnu_build_id.c.
+	(__libdwfl_find_build_id): Add assert to make sure mod is never NULL.
+	* dwfl_segment_report_module.c (dwfl_segment_report_module): Call
+	dwelf_elf_gnu_build_id directly instead of __libdwfl_find_build_id.
+	* dwfl_module_getdwarf.c (__check_build_id): Implement using
+	dwelf_elf_gnu_build_id.
+
 2014-04-15  Florian Weimer  <fweimer@redhat.com>
 
 	* dwfl_module_getdwarf.c (__check_build_id): Moved from libdw.

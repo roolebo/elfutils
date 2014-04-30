@@ -57,6 +57,14 @@ extern ssize_t dwelf_dwarf_gnu_debugaltlink (Dwarf *dwarf,
 					     const char **namep,
 					     const void **build_idp);
 
+/* Returns the build ID as found in a NT_GNU_BUILD_ID note from either
+   a SHT_NOTE section or from a PT_NOTE segment if the ELF file
+   doesn't contain any section headers.  On success a pointer to the
+   build ID is written to *BUILDID_P, and the positive length of the
+   build ID is returned.  Returns 0 if the ELF lacks a NT_GNU_BUILD_ID
+   note.  Returns -1 in case of malformed data or other errors.  */
+extern ssize_t dwelf_elf_gnu_build_id (Elf *elf, const void **build_idp);
+
 #ifdef __cplusplus
 }
 #endif

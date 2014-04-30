@@ -30,7 +30,8 @@
 ## not, see <http://www.gnu.org/licenses/>.
 ##
 include $(top_srcdir)/config/eu.am
-AM_CPPFLAGS += -I$(srcdir)/../libelf -I$(srcdir)/../libdw
+AM_CPPFLAGS += -I$(srcdir)/../libelf -I$(srcdir)/../libdw \
+	       -I$(srcdir)/../libdwfl -I$(srcdir)/../libebl
 VERSION = 1
 
 noinst_LIBRARIES = libdwelf.a libdwelf_pic.a
@@ -38,7 +39,8 @@ noinst_LIBRARIES = libdwelf.a libdwelf_pic.a
 pkginclude_HEADERS = libdwelf.h
 noinst_HEADERS = libdwelfP.h
 
-libdwelf_a_SOURCES = dwelf_elf_gnu_debuglink.c dwelf_dwarf_gnu_debugaltlink.c
+libdwelf_a_SOURCES = dwelf_elf_gnu_debuglink.c dwelf_dwarf_gnu_debugaltlink.c \
+	dwelf_elf_gnu_build_id.c
 
 libdwelf = $(libdw)
 

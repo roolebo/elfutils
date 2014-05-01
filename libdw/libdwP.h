@@ -1,5 +1,5 @@
 /* Internal definitions for libdwarf.
-   Copyright (C) 2002-2011, 2013 Red Hat, Inc.
+   Copyright (C) 2002-2011, 2013, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -146,9 +146,6 @@ struct Dwarf
 
   /* If true, we allocated the ELF descriptor ourselves.  */
   bool free_elf;
-
-  /* If true, we allocated the Dwarf descriptor for alt_dwarf ourselves.  */
-  bool free_alt;
 
   /* Information for traversing the .debug_pubnames section.  This is
      an array and separately allocated with malloc.  */

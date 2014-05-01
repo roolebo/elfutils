@@ -693,18 +693,32 @@ process_dwflmod (Dwfl_Module *dwflmod,
   return DWARF_CB_OK;
 }
 
-/* Stub libdwfl callback, only the ELF handle already open is ever used.  */
+/* Stub libdwfl callback, only the ELF handle already open is ever used.
+   Only used for finding the alternate debug file if the Dwarf comes from
+   the main file.  We are not interested in separate debuginfo.  */
 static int
-find_no_debuginfo (Dwfl_Module *mod __attribute__ ((unused)),
-		   void **userdata __attribute__ ((unused)),
-		   const char *modname __attribute__ ((unused)),
-		   Dwarf_Addr base __attribute__ ((unused)),
-		   const char *file_name __attribute__ ((unused)),
-		   const char *debuglink_file __attribute__ ((unused)),
-		   GElf_Word debuglink_crc __attribute__ ((unused)),
-		   char **debuginfo_file_name __attribute__ ((unused)))
+find_no_debuginfo (Dwfl_Module *mod,
+		   void **userdata,
+		   const char *modname,
+		   Dwarf_Addr base,
+		   const char *file_name,
+		   const char *debuglink_file,
+		   GElf_Word debuglink_crc,
+		   char **debuginfo_file_name)
 {
-  return -1;
+  Dwarf_Addr dwbias;
+  dwfl_module_info (mod, NULL, NULL, NULL, &dwbias, NULL, NULL, NULL);
+
+  /* We are only interested if the Dwarf has been setup on the main
+     elf file but is only missing the alternate debug link.  If dwbias
+     hasn't even been setup, this is searching for separate debuginfo
+     for the main elf.  We don't care in that case.  */
+  if (dwbias == (Dwarf_Addr) -1)
+    return -1;
+
+  return dwfl_standard_find_debuginfo (mod, userdata, modname, base,
+				       file_name, debuglink_file,
+				       debuglink_crc, debuginfo_file_name);
 }
 
 /* Process one input file.  */

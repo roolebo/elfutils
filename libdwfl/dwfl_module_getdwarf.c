@@ -34,99 +34,10 @@
 #include "../libdw/libdwP.h"	/* DWARF_E_* values are here.  */
 #include "../libelf/libelfP.h"
 
-#ifdef ENABLE_DWZ
-internal_function int
-__check_build_id (Dwarf *dw, const uint8_t *build_id, const size_t id_len)
-{
-  if (dw == NULL)
-    return -1;
-
-  Elf *elf = dw->elf;
-  const void *elf_build_id;
-  ssize_t elf_id_len = INTUSE(dwelf_elf_gnu_build_id) (elf, &elf_build_id);
-  if (elf_id_len < 0)
-    return -1;
-
-  return (id_len == (size_t) elf_id_len
-	  && memcmp (build_id, elf_build_id, id_len) == 0) ? 0 : 1;
-}
-
-/* Try to open an debug alt link by name, checking build_id.
-   Marks free_alt on success, return NULL on failure.  */
-static Dwarf *
-try_debugaltlink (Dwarf *result, const char *try_name,
-		   const uint8_t *build_id, const size_t id_len)
-{
-  int fd = open (try_name, O_RDONLY);
-  if (fd > 0)
-    {
-      Dwarf *alt_dwarf = INTUSE (dwarf_begin) (fd, DWARF_C_READ);
-      if (alt_dwarf != NULL)
-	{
-	  Elf *elf = alt_dwarf->elf;
-	  if (__check_build_id (alt_dwarf, build_id, id_len) == 0
-	      && elf_cntl (elf, ELF_C_FDREAD) == 0)
-	    {
-	      close (fd);
-	      INTUSE (dwarf_setalt) (result, alt_dwarf);
-	      result->free_alt = true;
-	      return result;
-	    }
-	  INTUSE (dwarf_end) (result->alt_dwarf);
-	}
-      close (fd);
-    }
-  return NULL;
-}
-
-/* For dwz multifile support, ignore if it looks wrong.  */
-static Dwarf *
-open_debugaltlink (Dwarf *result, const char *alt_name,
-		   const uint8_t *build_id, const size_t id_len)
-{
-  /* First try the name itself, it is either an absolute path or
-     a relative one.  Sadly we don't know relative from where at
-     this point.  */
-  if (try_debugaltlink (result, alt_name, build_id, id_len) != NULL)
-    return result;
-
-  /* Lets try based on the build-id.  This is somewhat distro specific,
-     we are following the Fedora implementation described at
-  https://fedoraproject.org/wiki/Releases/FeatureBuildId#Find_files_by_build_ID
-   */
-#define DEBUG_PREFIX "/usr/lib/debug/.build-id/"
-#define PREFIX_LEN sizeof (DEBUG_PREFIX)
-  char id_name[PREFIX_LEN + 1 + id_len * 2 + sizeof ".debug" - 1];
-  strcpy (id_name, DEBUG_PREFIX);
-  int n = snprintf (&id_name[PREFIX_LEN  - 1],
-		    4, "%02" PRIx8 "/", (uint8_t) build_id[0]);
-  assert (n == 3);
-  for (size_t i = 1; i < id_len; ++i)
-    {
-      n = snprintf (&id_name[PREFIX_LEN - 1 + 3 + (i - 1) * 2],
-		    3, "%02" PRIx8, (uint8_t) build_id[i]);
-      assert (n == 2);
-    }
-  strcpy (&id_name[PREFIX_LEN - 1 + 3 + (id_len - 1) * 2],
-	  ".debug");
-
-  if (try_debugaltlink (result, id_name, build_id, id_len))
-    return result;
-
-  /* Everything failed, mark this Dwarf as not having an alternate,
-     but don't fail the load.  The user may want to set it by hand
-     before usage.  */
-  result->alt_dwarf = NULL;
-  return result;
-}
-#endif /* ENABLE_DWZ */
-
-/* Open libelf FILE->fd and compute the load base of ELF as loaded in MOD.
-   When we return success, FILE->elf and FILE->vaddr are set up.  */
 static inline Dwfl_Error
-open_elf (Dwfl_Module *mod, struct dwfl_file *file)
+open_elf_file (Elf **elf, int *fd, char **name)
 {
-  if (file->elf == NULL)
+  if (*elf == NULL)
     {
       /* CBFAIL uses errno if it's set, so clear it first in case we don't
 	 set it with an open failure below.  */
@@ -134,24 +45,35 @@ open_elf (Dwfl_Module *mod, struct dwfl_file *file)
 
       /* If there was a pre-primed file name left that the callback left
 	 behind, try to open that file name.  */
-      if (file->fd < 0 && file->name != NULL)
-	file->fd = TEMP_FAILURE_RETRY (open64 (file->name, O_RDONLY));
+      if (*fd < 0 && *name != NULL)
+	*fd = TEMP_FAILURE_RETRY (open64 (*name, O_RDONLY));
 
-      if (file->fd < 0)
+      if (*fd < 0)
 	return CBFAIL;
 
-      Dwfl_Error error = __libdw_open_file (&file->fd, &file->elf, true, false);
-      if (error != DWFL_E_NOERROR)
-	return error;
+      return __libdw_open_file (fd, elf, true, false);
     }
-  else if (unlikely (elf_kind (file->elf) != ELF_K_ELF))
+  else if (unlikely (elf_kind (*elf) != ELF_K_ELF))
     {
-      elf_end (file->elf);
-      file->elf = NULL;
-      close (file->fd);
-      file->fd = -1;
+      elf_end (*elf);
+      *elf = NULL;
+      close (*fd);
+      *fd = -1;
       return DWFL_E_BADELF;
     }
+
+  /* Elf file already open and looks fine.  */
+  return DWFL_E_NOERROR;
+}
+
+/* Open libelf FILE->fd and compute the load base of ELF as loaded in MOD.
+   When we return success, FILE->elf and FILE->vaddr are set up.  */
+static inline Dwfl_Error
+open_elf (Dwfl_Module *mod, struct dwfl_file *file)
+{
+  Dwfl_Error error = open_elf_file (&file->elf, &file->fd, &file->name);
+  if (error != DWFL_E_NOERROR)
+    return error;
 
   GElf_Ehdr ehdr_mem, *ehdr = gelf_getehdr (file->elf, &ehdr_mem);
   if (ehdr == NULL)
@@ -586,6 +508,57 @@ find_debuginfo (Dwfl_Module *mod)
   return result;
 }
 
+#ifdef ENABLE_DWZ
+/* Try to find the alternative debug link for the given DWARF and set
+   it if found.  Only called when mod->dw is already setup but still
+   might need an alternative (dwz multi) debug file.  filename is either
+   the main or debug name from which the Dwarf was created. */
+static void
+find_debug_altlink (Dwfl_Module *mod, const char *filename)
+{
+  assert (mod->dw != NULL);
+
+  const char *altname;
+  const void *build_id;
+  ssize_t build_id_len = INTUSE(dwelf_dwarf_gnu_debugaltlink) (mod->dw,
+							       &altname,
+							       &build_id);
+
+  if (build_id_len > 0)
+    {
+      /* We could store altfile in the module, but don't really need it.  */
+      char *altfile = NULL;
+      mod->alt_fd = (*mod->dwfl->callbacks->find_debuginfo) (MODCB_ARGS (mod),
+							     filename,
+							     altname,
+							     0,
+							     &altfile);
+
+      /* The (internal) callbacks might just set mod->alt_elf directly
+	 because they open the Elf anyway for sanity checking.
+	 Otherwise open either the given file name or use the fd
+	 returned.  */
+      Dwfl_Error error = open_elf_file (&mod->alt_elf, &mod->alt_fd,
+					&altfile);
+      if (error == DWFL_E_NOERROR)
+	{
+	  mod->alt = INTUSE(dwarf_begin_elf) (mod->alt_elf,
+					      DWARF_C_READ, NULL);
+	  if (mod->alt == NULL)
+	    {
+	      elf_end (mod->alt_elf);
+	      mod->alt_elf = NULL;
+	      close (mod->alt_fd);
+	      mod->alt_fd = -1;
+	    }
+	  else
+	    dwarf_setalt (mod->dw, mod->alt);
+	}
+
+      free (altfile); /* See above, we don't really need it.  */
+    }
+}
+#endif /* ENABLE_DWZ */
 
 /* Try to find a symbol table in FILE.
    Returns DWFL_E_NOERROR if a proper one is found.
@@ -1209,19 +1182,6 @@ load_dw (Dwfl_Module *mod, struct dwfl_file *debugfile)
       return err == DWARF_E_NO_DWARF ? DWFL_E_NO_DWARF : DWFL_E (LIBDW, err);
     }
 
-#ifdef ENABLE_DWZ
-  /* For dwz multifile support, ignore if it looks wrong.  */
-  {
-    const void *build_id;
-    const char *alt_name;
-    size_t id_len = INTUSE (dwelf_dwarf_gnu_debugaltlink) (mod->dw,
-							   &alt_name,
-							   &build_id);
-    if (id_len > 0)
-      open_debugaltlink (mod->dw, alt_name, build_id, id_len);
-  }
-#endif /* ENABLE_DWZ */
-
   /* Until we have iterated through all CU's, we might do lazy lookups.  */
   mod->lazycu = 1;
 
@@ -1248,6 +1208,13 @@ find_dw (Dwfl_Module *mod)
     case DWFL_E_NOERROR:
       mod->debug.elf = mod->main.elf;
       mod->debug.address_sync = mod->main.address_sync;
+
+#ifdef ENABLE_DWZ
+      /* The Dwarf might need an alt debug file, find that now after
+	 everything about the debug file has been setup (the
+	 find_debuginfo callback might need it).  */
+      find_debug_altlink (mod, mod->main.name);
+#endif /* ENABLE_DWZ */
       return;
 
     case DWFL_E_NO_DWARF:
@@ -1263,6 +1230,17 @@ find_dw (Dwfl_Module *mod)
     {
     case DWFL_E_NOERROR:
       mod->dwerr = load_dw (mod, &mod->debug);
+      if (mod->dwerr == DWFL_E_NOERROR)
+	{
+#ifdef ENABLE_DWZ
+	  /* The Dwarf might need an alt debug file, find that now after
+	     everything about the debug file has been setup (the
+	     find_debuginfo callback might need it).  */
+	  find_debug_altlink (mod, mod->debug.name);
+#endif /* ENABLE_DWZ */
+	  return;
+	}
+
       break;
 
     case DWFL_E_CB:		/* The find_debuginfo hook failed.  */

@@ -35,9 +35,6 @@
 void
 dwarf_setalt (Dwarf *main, Dwarf *alt)
 {
-  if (main->free_alt)
-    INTUSE (dwarf_end) (main->alt_dwarf);
-  main->free_alt = false;
   main->alt_dwarf = alt;
 }
 INTDEF (dwarf_setalt)

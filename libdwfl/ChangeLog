@@ -1,3 +1,36 @@
+2014-05-01  Mark Wielaard  <mjw@redhat.com>
+
+	* libdwflP.h (struct Dwfl_Module): Add alt, alt_fd and alt_elf fields.
+	(__libdwfl_open_mod_by_build_id): Renamed __libdwfl_open_by_build_id.
+	(__libdwfl_open_by_build_id): New declaration that takes an explicit
+	build-id.
+	* dwfl_build_id_find_debuginfo.c (dwfl_build_id_find_debuginfo): If
+	we already have the Dwarf then look for the alt dwz multi file by
+	build-id.
+	* dwfl_build_id_find_elf.c (__libdwfl_open_by_build_id): Add the
+	build-id we are looking for as argument.
+	(__libdwfl_open_mod_by_build_id): New function, calls
+	__libdwfl_open_by_build_id.
+	(dwfl_build_id_find_elf): Call __libdwfl_open_mod_by_build_id.
+	* dwfl_module.c (__libdwfl_module_free): Release alt, alt_elf and
+	close alt_fd if necessary.
+	* dwfl_module_getdwarf.c (__check_build_id): Removed.
+	(try_debugaltlink): Removed.
+	(open_debugaltlink): Removed.
+	(open_elf_file): First half of open_elf that just opens the elf
+	file but doesn't setup the load address.
+	(open_elf): Call open_elf_file.
+	(find_debug_altlink): New function.
+	(load_dw): Remove loading of dwz multifile.
+	(find_dw): Call find_debug_altlink.
+	* find-debuginfo.c (validate): Handle alt debug case using
+	dwelf_dwarf_gnu_debugaltlink and mod->alt_elf.
+	(find_debuginfo_in_path): Handle alt debug files possibly in .dwz
+	subdirs.
+	* linux-kernel-modules.c (try_kernel_name): Use fakemod.debug.name
+	to store name to find by dwfl_standard_find_debuginfo instead of
+	allocating an extra variable on stack.
+
 2014-04-30  Mark Wielaard  <mjw@redhat.com>
 
 	* dwfl_module_build_id.c (__libdwfl_find_elf_build_id): Moved to

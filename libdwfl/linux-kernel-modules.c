@@ -1,5 +1,5 @@
 /* Standard libdwfl callbacks for debugging the running Linux kernel.
-   Copyright (C) 2005-2011, 2013 Red Hat, Inc.
+   Copyright (C) 2005-2011, 2013, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -88,23 +88,22 @@ try_kernel_name (Dwfl *dwfl, char **fname, bool try_debug)
 
   if (fd < 0)
     {
-      char *debugfname = NULL;
       Dwfl_Module fakemod = { .dwfl = dwfl };
       /* First try the file's unadorned basename as DEBUGLINK_FILE,
 	 to look for "vmlinux" files.  */
       fd = INTUSE(dwfl_standard_find_debuginfo) (&fakemod, NULL, NULL, 0,
 						 *fname, basename (*fname), 0,
-						 &debugfname);
+						 &fakemod.debug.name);
       if (fd < 0 && try_debug)
 	/* Next, let the call use the default of basename + ".debug",
 	   to look for "vmlinux.debug" files.  */
 	fd = INTUSE(dwfl_standard_find_debuginfo) (&fakemod, NULL, NULL, 0,
 						   *fname, NULL, 0,
-						   &debugfname);
-      if (debugfname != NULL)
+						   &fakemod.debug.name);
+      if (fakemod.debug.name != NULL)
 	{
 	  free (*fname);
-	  *fname = debugfname;
+	  *fname = fakemod.debug.name;
 	}
     }
 

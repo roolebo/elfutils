@@ -1,5 +1,5 @@
 /* Standard find_debuginfo callback for libdwfl.
-   Copyright (C) 2005-2010 Red Hat, Inc.
+   Copyright (C) 2005-2010, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -84,6 +84,45 @@ check_crc (int fd, GElf_Word debuglink_crc)
 static bool
 validate (Dwfl_Module *mod, int fd, bool check, GElf_Word debuglink_crc)
 {
+  /* For alt debug files always check the build-id from the Dwarf and alt.  */
+  if (mod->dw != NULL)
+    {
+      bool valid = false;
+      const void *build_id;
+      const char *altname;
+      ssize_t build_id_len = INTUSE(dwelf_dwarf_gnu_debugaltlink) (mod->dw,
+								   &altname,
+								   &build_id);
+      if (build_id_len > 0)
+	{
+	  /* We need to open an Elf handle on the file so we can check its
+	     build ID note for validation.  Backdoor the handle into the
+	     module data structure since we had to open it early anyway.  */
+	  Dwfl_Error error = __libdw_open_file (&fd, &mod->alt_elf,
+						false, false);
+	  if (error != DWFL_E_NOERROR)
+	    __libdwfl_seterrno (error);
+	  else
+	    {
+	      const void *alt_build_id;
+	      ssize_t alt_len = INTUSE(dwelf_elf_gnu_build_id) (mod->alt_elf,
+								&alt_build_id);
+	      if (alt_len > 0 && alt_len == build_id_len
+		  && memcmp (build_id, alt_build_id, alt_len) == 0)
+		valid = true;
+	      else
+		{
+		  /* A mismatch!  */
+		  elf_end (mod->alt_elf);
+		  mod->alt_elf = NULL;
+		  close (fd);
+		  fd = -1;
+		}
+	    }
+	}
+      return valid;
+    }
+
   /* If we have a build ID, check only that.  */
   if (mod->build_id_len > 0)
     {
@@ -124,7 +163,9 @@ find_debuginfo_in_path (Dwfl_Module *mod, const char *file_name,
   const char *file_basename = file_name == NULL ? NULL : basename (file_name);
   if (debuglink_file == NULL)
     {
-      if (file_basename == NULL)
+      /* For a alt debug multi file we need a name, for a separate debug
+	 name we may be able to fall back on file_basename.debug.  */
+      if (file_basename == NULL || mod->dw != NULL)
 	{
 	  errno = 0;
 	  return -1;
@@ -174,38 +215,67 @@ find_debuginfo_in_path (Dwfl_Module *mod, const char *file_name,
 	check = *p++ == '+';
       check = check && cancheck;
 
-      const char *dir, *subdir;
+      const char *dir, *subdir, *file;
       switch (p[0])
 	{
 	case '\0':
 	  /* An empty entry says to try the main file's directory.  */
 	  dir = file_dirname;
 	  subdir = NULL;
+	  file = debuglink_file;
 	  break;
 	case '/':
 	  /* An absolute path says to look there for a subdirectory
-	     named by the main file's absolute directory.
-	     This cannot be applied to a relative file name.  */
-	  if (file_dirname == NULL || file_dirname[0] != '/')
+	     named by the main file's absolute directory.  This cannot
+	     be applied to a relative file name.  For alt debug files
+	     it means to look for the basename file in that dir or the
+	     .dwz subdir (see below).  */
+	  if (mod->dw == NULL
+	      && (file_dirname == NULL || file_dirname[0] != '/'))
 	    continue;
 	  dir = p;
-	  subdir = file_dirname + 1;
+	  if (mod->dw == NULL)
+	    {
+	      subdir = file_dirname + 1;
+	      file = debuglink_file;
+	    }
+	  else
+	    {
+	      subdir = NULL;
+	      file = basename (debuglink_file);
+	    }
 	  break;
 	default:
 	  /* A relative path says to try a subdirectory of that name
 	     in the main file's directory.  */
 	  dir = file_dirname;
 	  subdir = p;
+	  file = debuglink_file;
 	  break;
 	}
 
       char *fname = NULL;
-      int fd = try_open (&main_stat, dir, subdir, debuglink_file, &fname);
+      int fd = try_open (&main_stat, dir, subdir, file, &fname);
       if (fd < 0)
 	switch (errno)
 	  {
 	  case ENOENT:
 	  case ENOTDIR:
+	    /* If we are looking for the alt file also try the .dwz subdir.
+	       But only if this is the empty or absolute path.  */
+	    if (mod->dw != NULL && (p[0] == '\0' || p[0] == '/'))
+	      {
+		fd = try_open (&main_stat, dir, ".dwz",
+			       basename (file), &fname);
+		if (fd < 0)
+		  {
+		    if (errno != ENOENT && errno != ENOTDIR)
+		      return -1;
+		    else
+		      continue;
+		  }
+		break;
+	      }
 	    continue;
 	  default:
 	    return -1;
@@ -240,11 +310,21 @@ dwfl_standard_find_debuginfo (Dwfl_Module *mod,
   GElf_Addr vaddr;
   if (INTUSE(dwfl_module_build_id) (mod, &bits, &vaddr) > 0)
     {
+      /* Dropping most arguments means we cannot rely on them in
+	 dwfl_build_id_find_debuginfo.  But leave it that way since
+	 some user code out there also does this, so we'll have to
+	 handle it anyway.  */
       int fd = INTUSE(dwfl_build_id_find_debuginfo) (mod,
 						     NULL, NULL, 0,
 						     NULL, NULL, 0,
 						     debuginfo_file_name);
-      if (fd >= 0 || mod->debug.elf != NULL || errno != 0)
+
+      /* Did the build_id callback find something or report an error?
+         Then we are done.  Otherwise fallback on path based search.  */
+      if (fd >= 0
+	  || (mod->dw == NULL && mod->debug.elf != NULL)
+	  || (mod->dw != NULL && mod->alt_elf != NULL)
+	  || errno != 0)
 	return fd;
     }
 

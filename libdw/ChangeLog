@@ -1,3 +1,9 @@
+2014-05-01  Mark Wielaard  <mjw@redhat.com>
+
+	* libdwP.h (struct Dwarf): Remove free_alt.
+	* dwarf_end.c (dwarf_end): Don't check free_alt, don't end alt_dwarf.
+	* dwarf_setalt.c (dwarf_setalt): Don't check or set free_alt.
+
 2014-04-30  Mark Wielaard  <mjw@redhat.com>
 
 	* libdw.map (ELFUTILS_0.159): Add dwelf_elf_gnu_build_id.

@@ -182,6 +182,9 @@ struct Dwfl_Module
   Elf_Data *aux_symxndxdata;	/* Data in the extended auxiliary table. */
 
   Dwarf *dw;			/* libdw handle for its debugging info.  */
+  Dwarf *alt;			/* Dwarf used for dwarf_setalt, or NULL.  */
+  int alt_fd; 			/* descriptor, only valid when alt != NULL.  */
+  Elf *alt_elf; 		/* Elf for alt Dwarf.  */
 
   Dwfl_Error symerr;		/* Previous failure to load symbols.  */
   Dwfl_Error dwerr;		/* Previous failure to load DWARF.  */
@@ -518,8 +521,13 @@ extern int __libdwfl_find_build_id (Dwfl_Module *mod, bool set, Elf *elf)
   internal_function;
 
 /* Open a main or debuginfo file by its build ID, returns the fd.  */
+extern int __libdwfl_open_mod_by_build_id (Dwfl_Module *mod, bool debug,
+					   char **file_name) internal_function;
+
+/* Same, but takes an explicit build_id, can also be used for alt debug.  */
 extern int __libdwfl_open_by_build_id (Dwfl_Module *mod, bool debug,
-				       char **file_name) internal_function;
+				       char **file_name, const size_t id_len,
+				       const uint8_t *id) internal_function;
 
 extern uint32_t __libdwfl_crc32 (uint32_t crc, unsigned char *buf, size_t len)
   attribute_hidden;

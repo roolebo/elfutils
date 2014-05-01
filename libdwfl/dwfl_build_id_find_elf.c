@@ -1,5 +1,5 @@
 /* Find an ELF file for a module from its build ID.
-   Copyright (C) 2007-2010 Red Hat, Inc.
+   Copyright (C) 2007-2010, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -34,17 +34,9 @@
 
 int
 internal_function
-__libdwfl_open_by_build_id (Dwfl_Module *mod, bool debug, char **file_name)
+__libdwfl_open_by_build_id (Dwfl_Module *mod, bool debug, char **file_name,
+			    const size_t id_len, const uint8_t *id)
 {
-  /* If *FILE_NAME was primed into the module, leave it there
-     as the fallback when we have nothing to offer.  */
-  errno = 0;
-  if (mod->build_id_len <= 0)
-    return -1;
-
-  const size_t id_len = mod->build_id_len;
-  const uint8_t *id = mod->build_id_bits;
-
   /* Search debuginfo_path directories' .build-id/ subdirectories.  */
 
   char id_name[sizeof "/.build-id/" + 1 + id_len * 2 + sizeof ".debug" - 1];
@@ -109,6 +101,22 @@ __libdwfl_open_by_build_id (Dwfl_Module *mod, bool debug, char **file_name)
 }
 
 int
+internal_function
+__libdwfl_open_mod_by_build_id (Dwfl_Module *mod, bool debug, char **file_name)
+{
+  /* If *FILE_NAME was primed into the module, leave it there
+     as the fallback when we have nothing to offer.  */
+  errno = 0;
+  if (mod->build_id_len <= 0)
+    return -1;
+
+  const size_t id_len = mod->build_id_len;
+  const uint8_t *id = mod->build_id_bits;
+
+  return __libdwfl_open_by_build_id (mod, debug, file_name, id_len, id);
+}
+
+int
 dwfl_build_id_find_elf (Dwfl_Module *mod,
 			void **userdata __attribute__ ((unused)),
 			const char *modname __attribute__ ((unused)),
@@ -133,7 +141,7 @@ dwfl_build_id_find_elf (Dwfl_Module *mod,
 	    close (fd);
 	}
     }
-  int fd = __libdwfl_open_by_build_id (mod, false, file_name);
+  int fd = __libdwfl_open_mod_by_build_id (mod, false, file_name);
   if (fd >= 0)
     {
       Dwfl_Error error = __libdw_open_file (&fd, elfp, true, false);

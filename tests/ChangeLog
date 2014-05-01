@@ -1,3 +1,8 @@
+2014-05-01  Mark Wielaard  <mjw@redhat.com>
+
+	* run-readelf-dwz-multi.sh: Add tests with alt debug files in .dwz
+	subdir.
+
 2014-04-30  Mark Wielaard  <mjw@redhat.com>
 
 	* buildid.c, buildid.sh, testfile42_noshdrs.bz2: New files.

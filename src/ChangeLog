@@ -1,3 +1,8 @@
+2014-05-01  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (find_no_debuginfo): Call dwfl_standard_find_debuginfo
+	if looking for alternate debug file.
+
 2014-04-11  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (AM_CPPFLAGS): Add -I libdwelf.

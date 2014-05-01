@@ -1,5 +1,5 @@
 /* Release debugging handling context.
-   Copyright (C) 2002-2011 Red Hat, Inc.
+   Copyright (C) 2002-2011, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -110,10 +110,6 @@ dwarf_end (dwarf)
       /* Free the ELF descriptor if necessary.  */
       if (dwarf->free_elf)
 	elf_end (dwarf->elf);
-
-      /* Free the alternative Dwarf descriptor if necessary.  */
-      if (dwarf->free_alt)
-	INTUSE (dwarf_end) (dwarf->alt_dwarf);
 
       /* Free the context descriptor.  */
       free (dwarf);

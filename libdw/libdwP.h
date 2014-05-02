@@ -652,14 +652,6 @@ unsigned char * __libdw_formptr (Dwarf_Attribute *attr, int sec_index,
 				 Dwarf_Off *offsetp)
   internal_function;
 
-#ifdef ENABLE_DWZ
-/* Checks that the build_id of the underlying Elf matches the expected.
-   Returns zero on match, -1 on error or no build_id found or 1 when
-   build_id doesn't match.  */
-int __check_build_id (Dwarf *dw, const uint8_t *build_id, const size_t id_len)
-  internal_function;
-#endif /* ENABLE_DWZ */
-
 /* Fills in the given attribute to point at an empty location expression.  */
 void __libdw_empty_loc_attr (Dwarf_Attribute *attr, struct Dwarf_CU *cu)
   internal_function;

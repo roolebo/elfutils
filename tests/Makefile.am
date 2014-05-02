@@ -108,7 +108,8 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-backtrace-core-i386.sh run-backtrace-core-ppc.sh \
 	run-backtrace-core-s390x.sh run-backtrace-core-s390.sh \
 	run-backtrace-core-aarch64.sh \
-	run-backtrace-demangle.sh run-stack-d-test.sh run-stack-i-test.sh
+	run-backtrace-demangle.sh run-stack-d-test.sh run-stack-i-test.sh \
+	run-readelf-dwz-multi.sh run-allfcts-multi.sh
 
 if !BIARCH
 export ELFUTILS_DISABLE_BIARCH = 1
@@ -135,11 +136,6 @@ if HAVE_LIBASM
 check_PROGRAMS += $(asm_TESTS)
 TESTS += $(asm_TESTS)
 endif
-
-if ENABLE_DWZ
-TESTS += run-readelf-dwz-multi.sh run-allfcts-multi.sh
-endif
-
 
 EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-show-die-info.sh run-get-files.sh run-get-lines.sh \

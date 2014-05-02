@@ -1,3 +1,10 @@
+2014-05-02  Mark Wielaard  <mjw@redhat.com>
+
+	* NEWS: Add note about dwz support no longer being experimental and
+	new helper functions.
+	* configure.ac: Remove --enable-dwz.
+	* Makefile.am (DISTCHECK_CONFIGURE_FLAGS): Remove --enable-dwz.
+
 2014-04-11  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (SUBDIRS): Add libdwelf.

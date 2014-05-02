@@ -508,7 +508,6 @@ find_debuginfo (Dwfl_Module *mod)
   return result;
 }
 
-#ifdef ENABLE_DWZ
 /* Try to find the alternative debug link for the given DWARF and set
    it if found.  Only called when mod->dw is already setup but still
    might need an alternative (dwz multi) debug file.  filename is either
@@ -558,7 +557,6 @@ find_debug_altlink (Dwfl_Module *mod, const char *filename)
       free (altfile); /* See above, we don't really need it.  */
     }
 }
-#endif /* ENABLE_DWZ */
 
 /* Try to find a symbol table in FILE.
    Returns DWFL_E_NOERROR if a proper one is found.
@@ -1209,12 +1207,10 @@ find_dw (Dwfl_Module *mod)
       mod->debug.elf = mod->main.elf;
       mod->debug.address_sync = mod->main.address_sync;
 
-#ifdef ENABLE_DWZ
       /* The Dwarf might need an alt debug file, find that now after
 	 everything about the debug file has been setup (the
 	 find_debuginfo callback might need it).  */
       find_debug_altlink (mod, mod->main.name);
-#endif /* ENABLE_DWZ */
       return;
 
     case DWFL_E_NO_DWARF:
@@ -1232,12 +1228,10 @@ find_dw (Dwfl_Module *mod)
       mod->dwerr = load_dw (mod, &mod->debug);
       if (mod->dwerr == DWFL_E_NOERROR)
 	{
-#ifdef ENABLE_DWZ
 	  /* The Dwarf might need an alt debug file, find that now after
 	     everything about the debug file has been setup (the
 	     find_debuginfo callback might need it).  */
 	  find_debug_altlink (mod, mod->debug.name);
-#endif /* ENABLE_DWZ */
 	  return;
 	}
 

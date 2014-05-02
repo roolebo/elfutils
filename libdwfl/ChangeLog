@@ -1,3 +1,8 @@
+2014-05-02  Mark Wielaard  <mjw@redhat.com>
+
+	* dwfl_module_getdwarf: Remove ENABLE_DWZ ifdefs so find_debug_altlink
+	is always called.
+
 2014-05-01  Mark Wielaard  <mjw@redhat.com>
 
 	* libdwflP.h (struct Dwfl_Module): Add alt, alt_fd and alt_elf fields.

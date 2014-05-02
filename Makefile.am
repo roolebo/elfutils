@@ -35,7 +35,7 @@ EXTRA_DIST = elfutils.spec GPG-KEY NOTES CONTRIBUTING \
 # Run all tests under valgrind.
 DISTCHECK_CONFIGURE_FLAGS = \
 	--libdir=`echo $(libdir) | sed "s,^$(exec_prefix),$$dc_install_base,"`\
-	--enable-valgrind --enable-dwz \
+	--enable-valgrind \
 	CC="$(CC)"
 
 distcheck-hook:

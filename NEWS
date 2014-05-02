@@ -4,7 +4,16 @@ stack: New option -d, --debugname to lookup DWARF debuginfo name for frame.
        New option -i, --inlines to show inlined frames using DWARF debuginfo.
 
 libdwelf: New libdwelf.h header for libdw.so DWARF ELF Low-level Functions.
-          New function dwelf_elf_gnu_debuglink.
+          New function dwelf_elf_gnu_debuglink, dwelf_dwarf_gnu_debugaltlink,
+	  and dwelf_elf_gnu_build_id.
+
+libdw: Support for DWZ multifile forms DW_FORM_GNU_ref_alt and
+       DW_FORM_GNU_strp_alt is now enabled by default and no longer
+       experimental. Added new functions dwarf_getalt and dwarf_setalt
+       to get or set the alternative debug file used for the alt FORMs.
+
+libdwfl: The dwfl_build_id_find_debuginfo and dwfl_standard_find_debuginfo
+         functions will now try to resolve and set the alternative debug file.
 
 Version 0.158
 

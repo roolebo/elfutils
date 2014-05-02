@@ -1,3 +1,8 @@
+2014-05-02  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (TESTS): run-readelf-dwz-multi.sh and
+	run-allfcts-multi.sh are now added unconditionally.
+
 2014-05-01  Mark Wielaard  <mjw@redhat.com>
 
 	* run-readelf-dwz-multi.sh: Add tests with alt debug files in .dwz

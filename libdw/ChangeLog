@@ -1,3 +1,7 @@
+2014-05-02  Mark Wielaard  <mjw@redhat.com>
+
+	* libdwP.h (__check_build_id): Removed now unused.
+
 2014-05-01  Mark Wielaard  <mjw@redhat.com>
 
 	* libdwP.h (struct Dwarf): Remove free_alt.

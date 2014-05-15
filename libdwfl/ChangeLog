@@ -1,3 +1,7 @@
+2014-05-15  Mark Wielaard  <mjw@redhat.com>
+
+	* linux-proc-maps.c (grovel_auxv): Close fd on error.
+
 2014-05-02  Mark Wielaard  <mjw@redhat.com>
 
 	* dwfl_module_getdwarf: Remove ENABLE_DWZ ifdefs so find_debug_altlink

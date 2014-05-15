@@ -116,7 +116,11 @@ grovel_auxv (pid_t pid, Dwfl *dwfl, GElf_Addr *sysinfo_ehdr)
       eu_static_assert (sizeof d.a64 == sizeof d.a32);
       nread = pread_retry (fd, d.a64, sizeof d.a64, offset);
       if (nread < 0)
-	return errno;
+	{
+	  int ret = errno;
+	  close (fd);
+	  return ret;
+	}
       for (size_t a32i = 0; a32i < nread / sizeof d.a32[0]; a32i++)
 	{
 	  const Elf32_auxv_t *a32 = d.a32 + a32i;

@@ -11,9 +11,19 @@ libdw: Support for DWZ multifile forms DW_FORM_GNU_ref_alt and
        DW_FORM_GNU_strp_alt is now enabled by default and no longer
        experimental. Added new functions dwarf_getalt and dwarf_setalt
        to get or set the alternative debug file used for the alt FORMs.
+       The dwfl_linux_proc_find_elf callback will now find ELF from
+       process memory for (deleted) files if the Dwfl has process state
+       attached.
 
 libdwfl: The dwfl_build_id_find_debuginfo and dwfl_standard_find_debuginfo
          functions will now try to resolve and set the alternative debug file.
+
+backends: Add CFI unwinding for arm. Relies on .debug_frame.
+          Add arm process initial register state compatible mode to AARCH64.
+          Add aarch64 native and core unwind support.
+
+other: All separate elfutils-robustify patches have been merged.
+       CVE-2014-0172 Check overflow before calling malloc to uncompress data.
 
 Version 0.158
 

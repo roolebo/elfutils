@@ -1,3 +1,8 @@
+2014-05-17  Mark Wielaard  <mjw@redhat.com>
+
+	* configure.ac: Set version to 0.159.
+	* NEWS: Add entries for version 0.159.
+
 2014-05-02  Mark Wielaard  <mjw@redhat.com>
 
 	* NEWS: Add note about dwz support no longer being experimental and

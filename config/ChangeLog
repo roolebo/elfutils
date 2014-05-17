@@ -1,3 +1,8 @@
+2014-05-17  Mark Wielaard  <mjw@redhat.com>
+
+	* elfutils.spec.in: Update for 0.159.
+	(%files devel): Add libdwelf.h.
+
 2014-04-13  Mark Wielaard  <mjw@redhat.com>
 
 	* eu.am (AM_CFLAGS): Don't add -fmudflap.

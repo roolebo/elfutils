@@ -21,7 +21,7 @@
 #define NOINLINE_NOCLONE __attribute__ ((noinline))
 #endif
 
-static void NOINLINE_NOCLONE
+void NOINLINE_NOCLONE
 cxxfunc (int i)
 {
   *(volatile int *)0=0;
@@ -31,7 +31,7 @@ cxxfunc (int i)
 
 extern "C"
 {
-  static void NOINLINE_NOCLONE
+  void NOINLINE_NOCLONE
   f (void)
   {
     cxxfunc(1);

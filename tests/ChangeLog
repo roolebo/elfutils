@@ -1,3 +1,10 @@
+2014-05-18  Mark Wielaard  <mjw@redhat.com>
+
+	* testfile-backtrace-demangle.cc (cxxfunc): Make non-static.
+	(f): Likewise.
+	* testfile-backtrace-demangle.bz2: Regenerate.
+	* testfile-backtrace-demangle.core.bz2: Likewise.
+
 2014-05-02  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (TESTS): run-readelf-dwz-multi.sh and

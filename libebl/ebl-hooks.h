@@ -1,5 +1,5 @@
 /* Backend hook signatures internal interface for libebl.
-   Copyright (C) 2000-2011, 2013 Red Hat, Inc.
+   Copyright (C) 2000-2011, 2013, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -104,6 +104,9 @@ bool EBLHOOK(object_note) (const char *, uint32_t, uint32_t, const char *);
 /* Check object attribute.  */
 bool EBLHOOK(check_object_attribute) (Ebl *, const char *, int, uint64_t,
 				      const char **, const char **);
+
+/* Check reloc target section type.  */
+bool EBLHOOK(check_reloc_target_type) (Ebl *, Elf64_Word);
 
 /* Describe auxv element type.  */
 int EBLHOOK(auxv_info) (GElf_Xword, const char **, const char **);

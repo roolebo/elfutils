@@ -179,6 +179,9 @@ extern bool ebl_check_object_attribute (Ebl *ebl, const char *vendor,
 					const char **tag_name,
 					const char **value_name);
 
+/* Check whether a section type is a valid reloc target.  */
+extern bool ebl_check_reloc_target_type (Ebl *ebl, Elf64_Word sh_type);
+
 
 /* Check section name for being that of a debug informatino section.  */
 extern bool ebl_debugscn_p (Ebl *ebl, const char *name);

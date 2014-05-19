@@ -1,3 +1,10 @@
+2014-05-19  Mark Wielaard  <mjw@redhat.com>
+
+	* arm_init.c (arm_init): Hook check_reloc_target_type.
+	* arm_symbol.c (arm_check_reloc_target_type): New function.
+	* ia64_init.c (ia64_init): Hook check_reloc_target_type.
+	* ia64_symbol.c (ia64_check_reloc_target_type): New function.
+
 2014-04-22  Kurt Roeckx  <kurt@roeckx.be>
 
 	* i386_initreg.c: Make Linux only.

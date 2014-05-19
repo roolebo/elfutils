@@ -1,5 +1,5 @@
 /* IA-64 specific symbolic name handling.
-   Copyright (C) 2002-2009 Red Hat, Inc.
+   Copyright (C) 2002-2009, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -147,4 +147,11 @@ ia64_reloc_simple_type (Ebl *ebl, int type)
     }
 
   return ELF_T_NUM;
+}
+
+/* The SHT_IA_64_UNWIND section type is a valid target for relocation.  */
+bool
+ia64_check_reloc_target_type (Ebl *ebl __attribute__ ((unused)), Elf64_Word sh_type)
+{
+  return sh_type == SHT_IA_64_UNWIND;
 }

@@ -1,3 +1,13 @@
+2014-05-19  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (gen_SOURCES): Add eblcheckreloctargettype.c.
+	* eblcheckreloctargettype.c: New file.
+	* ebl-hooks.h (check_reloc_target_type): New hook.
+	* eblopenbackend.c (default_check_reloc_target_type): New function.
+	(fill_defaults): Assign default_check_reloc_target_type to
+	check_reloc_target_type.
+	* libebl.h (ebl_check_reloc_target_type): New function definition.
+
 2013-12-18  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (gen_SOURCES): Add eblresolvesym.c.

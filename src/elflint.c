@@ -1216,8 +1216,7 @@ check_reloc_shdr (Ebl *ebl, const GElf_Ehdr *ehdr, const GElf_Shdr *shdr,
 				 destshdr_memp);
       if (*destshdrp != NULL)
 	{
-	  if((*destshdrp)->sh_type != SHT_PROGBITS
-	     && (*destshdrp)->sh_type != SHT_NOBITS)
+	  if(! ebl_check_reloc_target_type (ebl, (*destshdrp)->sh_type))
 	    {
 	      reldyn = is_rel_dyn (ebl, ehdr, idx, shdr, true);
 	      if (!reldyn)

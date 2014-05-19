@@ -1,5 +1,5 @@
 /* Arm specific symbolic name handling.
-   Copyright (C) 2002-2009 Red Hat, Inc.
+   Copyright (C) 2002-2009, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -121,4 +121,11 @@ arm_reloc_simple_type (Ebl *ebl __attribute__ ((unused)), int type)
     default:
       return ELF_T_NUM;
     }
+}
+
+/* The SHT_ARM_EXIDX section type is a valid target for relocation.  */
+bool
+arm_check_reloc_target_type (Ebl *ebl __attribute__ ((unused)), Elf64_Word sh_type)
+{
+  return sh_type == SHT_ARM_EXIDX;
 }

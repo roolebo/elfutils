@@ -63,6 +63,7 @@ arm_init (elf, machine, eh, ehlen)
   HOOK (eh, check_object_attribute);
   HOOK (eh, return_value_location);
   HOOK (eh, abi_cfi);
+  HOOK (eh, check_reloc_target_type);
 
   /* We only unwind the core integer registers.  */
   eh->frame_nregs = 16;

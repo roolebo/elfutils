@@ -1,3 +1,7 @@
+2014-05-19  Mark Wielaard  <mjw@redhat.com>
+
+	* elflint.c (check_reloc_shdr): Check ebl_check_reloc_target_type.
+
 2014-05-01  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (find_no_debuginfo): Call dwfl_standard_find_debuginfo

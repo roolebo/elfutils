@@ -1,5 +1,10 @@
 2014-05-26  Mark Wielaard  <mjw@redhat.com>
 
+	* unstrip.c (find_alloc_sections_prelink): Allow non-split .bss
+	section when sh_size of the original and undo .bss section are equal.
+
+2014-05-26  Mark Wielaard  <mjw@redhat.com>
+
 	* unstrip.c (options): Add --force, -F.
 	(struct arg_info): Add bool force.
 	(parse_opt): Handle 'F', set force.

@@ -1125,10 +1125,11 @@ find_alloc_sections_prelink (Elf *debug, Elf_Data *debug_shstrtab,
 		      && (sec->shdr.sh_type == undo_sec->shdr.sh_type
 			  || (sec->shdr.sh_type == SHT_PROGBITS
 			      && undo_sec->shdr.sh_type == SHT_NOBITS))
-		      && sec->shdr.sh_size < undo_sec->shdr.sh_size
+		      && sec->shdr.sh_size <= undo_sec->shdr.sh_size
 		      && (!strcmp (sec->name, ".bss")
 			  || !strcmp (sec->name, ".sbss"))
-		      && (split_bss = sec) > sections)))
+		      && (sec->shdr.sh_size == undo_sec->shdr.sh_size
+			  || (split_bss = sec) > sections))))
 	    {
 	      sec->outscn = undo_sec->outscn;
 	      undo_sec = NULL;

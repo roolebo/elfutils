@@ -1,5 +1,5 @@
 /* Combine stripped files with separate symbols and debug information.
-   Copyright (C) 2007-2012 Red Hat, Inc.
+   Copyright (C) 2007-2012, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Roland McGrath <roland@redhat.com>, 2007.
 
@@ -82,6 +82,9 @@ static const struct argp_option options[] =
     N_("Apply relocations to section contents in ET_REL files"), 0 },
   { "list-only", 'n', NULL, 0,
     N_("Only list module and file names, build IDs"), 0 },
+ { "force", 'F', NULL, 0,
+    N_("Force combining files even if some ELF headers don't seem to match"),
+   0 },
   { NULL, 0, NULL, 0, NULL, 0 }
 };
 
@@ -97,6 +100,7 @@ struct arg_info
   bool modnames;
   bool match_files;
   bool relocate;
+  bool force;
 };
 
 /* Handle program arguments.  */
@@ -146,6 +150,9 @@ parse_opt (int key, char *arg, struct argp_state *state)
       break;
     case 'R':
       info->relocate = true;
+      break;
+    case 'F':
+      info->force = true;
       break;
 
     case ARGP_KEY_ARGS:
@@ -1935,9 +1942,20 @@ open_file (const char *file, bool writable)
 
 /* Handle a pair of files we need to open by name.  */
 static void
-handle_explicit_files (const char *output_file, bool create_dirs,
+handle_explicit_files (const char *output_file, bool create_dirs, bool force,
 		       const char *stripped_file, const char *unstripped_file)
 {
+
+  /* Warn, and exit if not forced to continue, if some ELF header
+     sanity check for the stripped and unstripped files failed.  */
+  void warn (const char *msg)
+  {
+    error (force ? 0 : EXIT_FAILURE, 0, "%s'%s' and '%s' %s%s.",
+	   force ? _("WARNING: ") : "",
+	   stripped_file, unstripped_file, msg,
+	   force ? "" : _(", use --force"));
+  }
+
   int stripped_fd = open_file (stripped_file, false);
   Elf *stripped = elf_begin (stripped_fd, ELF_C_READ, NULL);
   GElf_Ehdr stripped_ehdr;
@@ -1956,12 +1974,18 @@ handle_explicit_files (const char *output_file, bool create_dirs,
       ELF_CHECK (gelf_getehdr (unstripped, &unstripped_ehdr),
 		 _("cannot create ELF descriptor: %s"));
 
-      if (memcmp (stripped_ehdr.e_ident, unstripped_ehdr.e_ident, EI_NIDENT)
-	  || stripped_ehdr.e_type != unstripped_ehdr.e_type
-	  || stripped_ehdr.e_machine != unstripped_ehdr.e_machine
-	  || stripped_ehdr.e_phnum != unstripped_ehdr.e_phnum)
-	error (EXIT_FAILURE, 0, _("'%s' and '%s' do not seem to match"),
-	       stripped_file, unstripped_file);
+      if (memcmp (stripped_ehdr.e_ident,
+		  unstripped_ehdr.e_ident, EI_NIDENT) != 0)
+	warn (_("ELF header identification (e_ident) different"));
+
+      if (stripped_ehdr.e_type != unstripped_ehdr.e_type)
+	warn (_("ELF header type (e_type) different"));
+
+      if (stripped_ehdr.e_machine != unstripped_ehdr.e_machine)
+	warn (_("ELF header machine type (e_machine) different"));
+
+      if (stripped_ehdr.e_phnum < unstripped_ehdr.e_phnum)
+	warn (_("stripped program header (e_phnum) smaller than unstripped"));
     }
 
   handle_file (output_file, create_dirs, stripped, &stripped_ehdr, unstripped);
@@ -1976,7 +2000,7 @@ handle_explicit_files (const char *output_file, bool create_dirs,
 
 /* Handle a pair of files opened implicitly by libdwfl for one module.  */
 static void
-handle_dwfl_module (const char *output_file, bool create_dirs,
+handle_dwfl_module (const char *output_file, bool create_dirs, bool force,
 		    Dwfl_Module *mod, bool all, bool ignore, bool relocate)
 {
   GElf_Addr bias;
@@ -2048,7 +2072,7 @@ handle_dwfl_module (const char *output_file, bool create_dirs,
 	  (void) dwfl_module_info (mod, NULL, NULL, NULL, NULL, NULL,
 				   &stripped_file, &unstripped_file);
 
-	  handle_explicit_files (output_file, create_dirs,
+	  handle_explicit_files (output_file, create_dirs, force,
 				 stripped_file, unstripped_file);
 	  return;
 	}
@@ -2068,7 +2092,7 @@ handle_dwfl_module (const char *output_file, bool create_dirs,
 
 /* Handle one module being written to the output directory.  */
 static void
-handle_output_dir_module (const char *output_dir, Dwfl_Module *mod,
+handle_output_dir_module (const char *output_dir, Dwfl_Module *mod, bool force,
 			  bool all, bool ignore, bool modnames, bool relocate)
 {
   if (! modnames)
@@ -2089,7 +2113,7 @@ handle_output_dir_module (const char *output_dir, Dwfl_Module *mod,
   if (asprintf (&output_file, "%s/%s", output_dir, modnames ? name : file) < 0)
     error (EXIT_FAILURE, 0, _("memory exhausted"));
 
-  handle_dwfl_module (output_file, true, mod, all, ignore, relocate);
+  handle_dwfl_module (output_file, true, force, mod, all, ignore, relocate);
 }
 
 
@@ -2201,12 +2225,12 @@ handle_implicit_modules (const struct arg_info *info)
     {
       if (next (offset) != 0)
 	error (EXIT_FAILURE, 0, _("matched more than one module"));
-      handle_dwfl_module (info->output_file, false, mmi.found,
+      handle_dwfl_module (info->output_file, false, info->force, mmi.found,
 			  info->all, info->ignore, info->relocate);
     }
   else
     do
-      handle_output_dir_module (info->output_dir, mmi.found,
+      handle_output_dir_module (info->output_dir, mmi.found, info->force,
 				info->all, info->ignore,
 				info->modnames, info->relocate);
     while ((offset = next (offset)) > 0);
@@ -2296,11 +2320,12 @@ or - if no debuginfo was found, or . if FILE contains the debug information.\
 	  char *file;
 	  if (asprintf (&file, "%s/%s", info.output_dir, info.args[0]) < 0)
 	    error (EXIT_FAILURE, 0, _("memory exhausted"));
-	  handle_explicit_files (file, true, info.args[0], info.args[1]);
+	  handle_explicit_files (file, true, info.force,
+				 info.args[0], info.args[1]);
 	  free (file);
 	}
       else
-	handle_explicit_files (info.output_file, false,
+	handle_explicit_files (info.output_file, false, info.force,
 			       info.args[0], info.args[1]);
     }
   else

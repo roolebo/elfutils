@@ -1,3 +1,8 @@
+Version 0.160
+
+unstrip: New option -F, --force to combining files even if some ELF headers
+         don't seem to match.
+
 Version 0.159
 
 stack: New option -d, --debugname to lookup DWARF debuginfo name for frame.

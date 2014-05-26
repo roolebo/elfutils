@@ -1,3 +1,18 @@
+2014-05-26  Mark Wielaard  <mjw@redhat.com>
+
+	* unstrip.c (options): Add --force, -F.
+	(struct arg_info): Add bool force.
+	(parse_opt): Handle 'F', set force.
+	(handle_explicit_files): Add force argument, add warn function,
+	separate check ehdr field checks, use warn.
+	(handle_dwfl_module): Add force argument, pass on to
+	handle_explicit_files.
+	(handle_output_dir_module): Add force argument, pass on to
+	handle_dwfl_module.
+	(handle_implicit_modules): Pass info->force to handle_dwfl_module and
+	handle_output_dir_module.
+	(main): Pass info.force to handle_explicit_files.
+
 2014-05-19  Mark Wielaard  <mjw@redhat.com>
 
 	* elflint.c (check_reloc_shdr): Check ebl_check_reloc_target_type.

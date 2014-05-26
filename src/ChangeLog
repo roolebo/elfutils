@@ -1,5 +1,10 @@
 2014-05-26  Mark Wielaard  <mjw@redhat.com>
 
+	* readelf.c (handle_relocs_rela): Print header like handle_relocs_rel
+	does, when sh_info == 0.
+
+2014-05-26  Mark Wielaard  <mjw@redhat.com>
+
 	* unstrip.c (find_alloc_sections_prelink): Allow non-split .bss
 	section when sh_size of the original and undo .bss section are equal.
 

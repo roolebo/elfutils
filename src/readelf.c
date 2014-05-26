@@ -1971,7 +1971,8 @@ handle_relocs_rela (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, GElf_Shdr *shdr)
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
 
-  printf (ngettext ("\
+  if (shdr->sh_info != 0)
+    printf (ngettext ("\
 \nRelocation section [%2zu] '%s' for section [%2u] '%s' at offset %#0" PRIx64 " contains %d entry:\n",
 		    "\
 \nRelocation section [%2zu] '%s' for section [%2u] '%s' at offset %#0" PRIx64 " contains %d entries:\n",
@@ -1982,6 +1983,19 @@ handle_relocs_rela (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, GElf_Shdr *shdr)
 	  elf_strptr (ebl->elf, shstrndx, destshdr->sh_name),
 	  shdr->sh_offset,
 	  nentries);
+  else
+    /* The .rela.dyn section does not refer to a specific section but
+       instead of section index zero.  Do not try to print a section
+       name.  */
+    printf (ngettext ("\
+\nRelocation section [%2u] '%s' at offset %#0" PRIx64 " contains %d entry:\n",
+		    "\
+\nRelocation section [%2u] '%s' at offset %#0" PRIx64 " contains %d entries:\n",
+		      nentries),
+	    (unsigned int) elf_ndxscn (scn),
+	    elf_strptr (ebl->elf, shstrndx, shdr->sh_name),
+	    shdr->sh_offset,
+	    nentries);
   fputs_unlocked (class == ELFCLASS32
 		  ? gettext ("\
   Offset      Type            Value       Addend Name\n")

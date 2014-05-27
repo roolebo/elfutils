@@ -7962,8 +7962,10 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
 				       / sizeof (debug_sections[0]));
 	  const char *name = elf_strptr (ebl->elf, shstrndx,
 					 shdr->sh_name);
-	  int n;
+	  if (name == NULL)
+	    continue;
 
+	  int n;
 	  for (n = 0; n < ndebug_sections; ++n)
 	    if (strcmp (name, debug_sections[n].name) == 0
 #if USE_ZLIB

@@ -1,3 +1,7 @@
+2014-07-18  Mark Wielaard  <mjw@redhat.com>
+
+	* configure.ac (AC_CHECK_TYPE): Test for struct user_regs_struct.
+
 2014-05-26  Mark Wielaard  <mjw@redhat.com>
 
 	* NEWS: New section 0.160. Add unstrip --force.

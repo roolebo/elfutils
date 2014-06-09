@@ -40,6 +40,10 @@
 # include <linux/uio.h>
 # include <sys/user.h>
 # include <sys/ptrace.h>
+/* Deal with old glibc defining user_pt_regs instead of user_regs_struct.  */
+# ifndef HAVE_SYS_USER_REGS
+#  define user_regs_struct user_pt_regs
+# endif
 #endif
 
 #define BACKEND arm_
@@ -67,7 +71,7 @@ arm_set_initial_registers_tid (pid_t tid __attribute__ ((unused)),
 #elif defined __aarch64__
   /* Compat mode: arm compatible code running on aarch64 */
   int i;
-  struct user_pt_regs gregs;
+  struct user_regs_struct gregs;
   struct iovec iovec;
   iovec.iov_base = &gregs;
   iovec.iov_len = sizeof (gregs);

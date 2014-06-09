@@ -1,5 +1,5 @@
 /* Fetch live process registers from TID.
-   Copyright (C) 2013 Red Hat, Inc.
+   Copyright (C) 2013, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -36,6 +36,11 @@
 # include <linux/uio.h>
 # include <sys/user.h>
 # include <sys/ptrace.h>
+/* Deal with old glibc defining user_pt_regs instead of user_regs_struct.  */
+# ifndef HAVE_SYS_USER_REGS
+#  define user_regs_struct user_pt_regs
+#  define user_fpsimd_struct user_fpsimd_state
+# endif
 #endif
 
 #define BACKEND aarch64_
@@ -51,7 +56,7 @@ aarch64_set_initial_registers_tid (pid_t tid __attribute__ ((unused)),
 #else /* __aarch64__ */
 
   /* General registers.  */
-  struct user_pt_regs gregs;
+  struct user_regs_struct gregs;
   struct iovec iovec;
   iovec.iov_base = &gregs;
   iovec.iov_len = sizeof (gregs);
@@ -69,7 +74,7 @@ aarch64_set_initial_registers_tid (pid_t tid __attribute__ ((unused)),
   /* ELR cannot be found.  */
 
   /* FP registers (only 64bits are used).  */
-  struct user_fpsimd_state fregs;
+  struct user_fpsimd_struct fregs;
   iovec.iov_base = &fregs;
   iovec.iov_len = sizeof (fregs);
   if (ptrace (PTRACE_GETREGSET, tid, NT_FPREGSET, &iovec) != 0)

@@ -1,3 +1,12 @@
+2014-07-18  Kyle McMartin  <kyle@redhat.com>
+	    Mark Wielaard  <mjw@redhat.com>
+
+	* aarch64_initreg.c: Check HAVE_SYS_USER_REGS.
+	(aarch64_set_initial_registers_tid): Use user_regs_struct and
+	user_fpsimd_struct.
+	* arm_initreg.c: Check HAVE_SYS_USER_REGS.
+	(arm_set_initial_registers_tid): Use user_regs_struct in compat mode.
+
 2014-07-04  Menanteau Guy  <menantea@linux.vnet.ibm.com>
 	    Mark Wielaard  <mjw@redhat.com>
 

@@ -1,3 +1,8 @@
+2014-06-10  Mark Wielaard  <mjw@redhat.com>
+
+	* argp-std.c (parse_opt): Ignore errors from dwfl_core_file_attach
+	or dwfl_linux_proc_attach.
+
 2014-05-15  Mark Wielaard  <mjw@redhat.com>
 
 	* linux-proc-maps.c (grovel_auxv): Close fd on error.

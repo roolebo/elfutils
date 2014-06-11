@@ -1,5 +1,5 @@
 /* Get Dwarf Frame state for target core file.
-   Copyright (C) 2013 Red Hat, Inc.
+   Copyright (C) 2013, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -309,33 +309,41 @@ static const Dwfl_Thread_Callbacks core_thread_callbacks =
 int
 dwfl_core_file_attach (Dwfl *dwfl, Elf *core)
 {
+  Dwfl_Error err = DWFL_E_NOERROR;
   Ebl *ebl = ebl_openbackend (core);
   if (ebl == NULL)
     {
-      __libdwfl_seterrno (DWFL_E_LIBEBL);
+      err = DWFL_E_LIBEBL;
+    fail_err:
+      if (dwfl->process == NULL && dwfl->attacherr == DWFL_E_NOERROR)
+	dwfl->attacherr = __libdwfl_canon_error (err);
+      __libdwfl_seterrno (err);
       return -1;
     }
   size_t nregs = ebl_frame_nregs (ebl);
   if (nregs == 0)
     {
-      __libdwfl_seterrno (DWFL_E_NO_UNWIND);
+      err = DWFL_E_NO_UNWIND;
+    fail:
       ebl_closebackend (ebl);
-      return -1;
+      goto fail_err;
     }
   GElf_Ehdr ehdr_mem, *ehdr = gelf_getehdr (core, &ehdr_mem);
   if (ehdr == NULL)
     {
-      __libdwfl_seterrno (DWFL_E_LIBELF);
-      ebl_closebackend (ebl);
-      return -1;
+      err = DWFL_E_LIBELF;
+      goto fail;
     }
-  assert (ehdr->e_type == ET_CORE);
+  if (ehdr->e_type != ET_CORE)
+    {
+      err = DWFL_E_NO_CORE_FILE;
+      goto fail;
+    }
   size_t phnum;
   if (elf_getphdrnum (core, &phnum) < 0)
     {
-      __libdwfl_seterrno (DWFL_E_LIBELF);
-      ebl_closebackend (ebl);
-      return -1;
+      err = DWFL_E_LIBELF;
+      goto fail;
     }
   pid_t pid = -1;
   Elf_Data *note_data = NULL;
@@ -351,8 +359,8 @@ dwfl_core_file_attach (Dwfl *dwfl, Elf *core)
     }
   if (note_data == NULL)
     {
-      ebl_closebackend (ebl);
-      return DWFL_E_LIBELF;
+      err = DWFL_E_LIBELF;
+      goto fail;
     }
   size_t offset = 0;
   GElf_Nhdr nhdr;
@@ -394,16 +402,14 @@ dwfl_core_file_attach (Dwfl *dwfl, Elf *core)
   if (pid == -1)
     {
       /* No valid NT_PRPSINFO recognized in this CORE.  */
-      __libdwfl_seterrno (DWFL_E_BADELF);
-      ebl_closebackend (ebl);
-      return -1;
+      err = DWFL_E_BADELF;
+      goto fail;
     }
   struct core_arg *core_arg = malloc (sizeof *core_arg);
   if (core_arg == NULL)
     {
-      __libdwfl_seterrno (DWFL_E_NOMEM);
-      ebl_closebackend (ebl);
-      return -1;
+      err = DWFL_E_NOMEM;
+      goto fail;
     }
   core_arg->core = core;
   core_arg->note_data = note_data;

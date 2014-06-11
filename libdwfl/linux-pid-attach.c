@@ -290,13 +290,23 @@ dwfl_linux_proc_attach (Dwfl *dwfl, pid_t pid, bool assume_ptrace_stopped)
 {
   char buffer[36];
   FILE *procfile;
+  int err = 0; /* The errno to return and set for dwfl->attcherr.  */
 
   /* Make sure to report the actual PID (thread group leader) to
      dwfl_attach_state.  */
   snprintf (buffer, sizeof (buffer), "/proc/%ld/status", (long) pid);
   procfile = fopen (buffer, "r");
   if (procfile == NULL)
-    return errno;
+    {
+      err = errno;
+    fail:
+      if (dwfl->process == NULL && dwfl->attacherr == DWFL_E_NOERROR)
+	{
+	  errno = err;
+	  dwfl->attacherr = __libdwfl_canon_error (DWFL_E_ERRNO);
+	}
+      return err;
+    }
 
   char *line = NULL;
   size_t linelen = 0;
@@ -317,19 +327,26 @@ dwfl_linux_proc_attach (Dwfl *dwfl, pid_t pid, bool assume_ptrace_stopped)
   fclose (procfile);
 
   if (pid == 0)
-    return ESRCH;
+    {
+      err = ESRCH;
+      goto fail;
+    }
 
   char dirname[64];
   int i = snprintf (dirname, sizeof (dirname), "/proc/%ld/task", (long) pid);
   assert (i > 0 && i < (ssize_t) sizeof (dirname) - 1);
   DIR *dir = opendir (dirname);
   if (dir == NULL)
-    return errno;
+    {
+      err = errno;
+      goto fail;
+    }
   struct __libdwfl_pid_arg *pid_arg = malloc (sizeof *pid_arg);
   if (pid_arg == NULL)
     {
       closedir (dir);
-      return ENOMEM;
+      err = ENOMEM;
+      goto fail;
     }
   pid_arg->dir = dir;
   pid_arg->tid_attached = 0;

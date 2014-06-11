@@ -1,3 +1,8 @@
+2014-06-11  Mark Wielaard  <mjw@redhat.com>
+
+	* backtrace.c (main): Check that Dwfl was attached by calling
+	dwfl_pid and printing the error when it is not.
+
 2014-05-18  Mark Wielaard  <mjw@redhat.com>
 
 	* testfile-backtrace-demangle.cc (cxxfunc): Make non-static.

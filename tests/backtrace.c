@@ -1,5 +1,5 @@
 /* Test program for unwinding of frames.
-   Copyright (C) 2013 Red Hat, Inc.
+   Copyright (C) 2013, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -459,6 +459,9 @@ main (int argc __attribute__ ((unused)), char **argv)
     };
   (void) argp_parse (&argp, argc, argv, 0, NULL, &dwfl);
   assert (dwfl != NULL);
+  /* We want to make sure the dwfl was properly attached.  */
+  if (dwfl_pid (dwfl) < 0)
+    error (2, 0, "dwfl_pid: %s", dwfl_errmsg (-1));
   dump (dwfl);
   dwfl_end (dwfl);
   return 0;

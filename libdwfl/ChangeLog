@@ -1,3 +1,16 @@
+2014-06-11  Mark Wielaard  <mjw@redhat.com>
+
+	* dwfl_frame.c (__libdwfl_process_free): Reset dwfl->attacherr.
+	(dwfl_attach_state): Set dwfl->attacherr.
+	(dwfl_pid): Check and return dwfl->attacherr if set.
+	(dwfl_getthreads): Likewise.
+	(getthread): Likewise.
+	* libdwflP.h: Add DWFL_E_NO_CORE_FILE.
+	(struct Dwfl): Add attacherr field.
+	* linux-core-attach.c (dwfl_core_file_attach): Set dwfl->attacherr.
+	Don't assert if ELF file is not ET_CORE, just return error.
+	* linux-pid-attach.c (dwfl_linux_proc_attach): Set dwfl->attacherr.
+
 2014-06-10  Mark Wielaard  <mjw@redhat.com>
 
 	* argp-std.c (parse_opt): Ignore errors from dwfl_core_file_attach

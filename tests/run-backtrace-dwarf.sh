@@ -26,5 +26,5 @@ unset VALGRIND_CMD
 tempfiles dwarf.{bt,err}
 (set +ex; testrun ${abs_builddir}/backtrace-dwarf 1>dwarf.bt 2>dwarf.err; true)
 cat dwarf.{bt,err}
-check_unsupported dwarf.err dwarf
+check_native_unsupported dwarf.err dwarf
 check_main dwarf.bt dwarf

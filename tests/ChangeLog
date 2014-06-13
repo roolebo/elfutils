@@ -1,5 +1,10 @@
 2014-06-13  Mark Wielaard  <mjw@redhat.com>
 
+	* backtrace.c (callback_verify): Accept "__libc_do_syscall" as first
+	frame symname.
+
+2014-06-13  Mark Wielaard  <mjw@redhat.com>
+
 	* backtrace-subr.sh (check_native_unsupported): New function.
 	(check_native): Call it.
 	(check_native_core): Likewise.

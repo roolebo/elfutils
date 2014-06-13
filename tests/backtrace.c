@@ -98,7 +98,8 @@ callback_verify (pid_t tid, unsigned frameno, Dwarf_Addr pc,
   {
     case 0:
       if (! reduce_frameno && symname
-	       && strcmp (symname, "__kernel_vsyscall") == 0)
+	       && (strcmp (symname, "__kernel_vsyscall") == 0
+		   || strcmp (symname, "__libc_do_syscall") == 0))
 	reduce_frameno = true;
       else
 	assert (symname && strcmp (symname, "raise") == 0);

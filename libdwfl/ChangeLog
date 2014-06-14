@@ -1,3 +1,8 @@
+2014-06-17  Mark Wielaard  <mjw@redhat.com>
+
+	* frame_unwind.c (handle_cfi): Use ebl_func_addr_mask.
+	* dwfl_module_getsym.c (__libdwfl_getsym): Likewise.
+
 2014-06-15  Mark Wielaard  <mjw@redhat.com>
 
 	* linux-core-attach.c (core_memory_read): Use libdw/memory-access.h

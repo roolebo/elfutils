@@ -1,5 +1,5 @@
 /* Get previous frame state for an existing frame state.
-   Copyright (C) 2013 Red Hat, Inc.
+   Copyright (C) 2013, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -581,6 +581,10 @@ handle_cfi (Dwfl_Frame *state, Dwarf_Addr pc, Dwarf_CFI *cfi, Dwarf_Addr bias)
 	     But PPC32 does not use such registers.  */
 	  continue;
 	}
+
+      /* Some architectures encode some extra info in the return address.  */
+      if (regno == frame->fde->cie->return_address_register)
+	regval &= ebl_func_addr_mask (ebl);
 
       /* This is another strange PPC[64] case.  There are two
 	 registers numbers that can represent the same DWARF return

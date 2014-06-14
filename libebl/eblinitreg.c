@@ -1,5 +1,5 @@
 /* Fetch live process Dwfl_Frame from PID.
-   Copyright (C) 2013 Red Hat, Inc.
+   Copyright (C) 2013, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -48,4 +48,11 @@ size_t
 ebl_frame_nregs (Ebl *ebl)
 {
   return ebl == NULL ? 0 : ebl->frame_nregs;
+}
+
+GElf_Addr
+ebl_func_addr_mask (Ebl *ebl)
+{
+  return ((ebl == NULL || ebl->func_addr_mask == 0)
+	  ? ~(GElf_Addr)0 : ebl->func_addr_mask);
 }

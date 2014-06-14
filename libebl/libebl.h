@@ -1,5 +1,5 @@
 /* Interface for libebl.
-   Copyright (C) 2000-2010, 2013 Red Hat, Inc.
+   Copyright (C) 2000-2010, 2013, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -408,6 +408,17 @@ extern bool ebl_set_initial_registers_tid (Ebl *ebl,
    EBL architecture can unwind iff EBL_FRAME_NREGS > 0.  */
 extern size_t ebl_frame_nregs (Ebl *ebl)
   __nonnull_attribute__ (1);
+
+/* Mask to use for function symbol or unwind return addresses in case
+   the architecture adds some extra non-address bits to it.  This is
+   different from ebl_resolve_sym_value which only works for actual
+   symbol addresses (in non-ET_REL files) that might resolve to an
+   address in a different section.  ebl_func_addr_mask is called to
+   turn a given function value into the a real address or offset (the
+   original value might not be a real address).  This works for all
+   cases where an actual function address (or offset in ET_REL symbol
+   tables) is needed.  */
+extern GElf_Addr ebl_func_addr_mask (Ebl *ebl);
 
 /* Convert *REGNO as is in DWARF to a lower range suitable for
    Dwarf_Frame->REGS indexing.  */

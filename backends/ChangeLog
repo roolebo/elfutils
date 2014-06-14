@@ -1,3 +1,7 @@
+2014-06-17  Mark Wielaard  <mjw@redhat.com>
+
+	* arm_init.c (arm_init): Set func_addr_mask.
+
 2014-06-20  Petr Machata  <pmachata@redhat.com>
 
 	* alpha_retval.c (alpha_return_value_location): Call

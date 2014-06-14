@@ -1,5 +1,5 @@
 /* Internal definitions for interface for libebl.
-   Copyright (C) 2000-2009, 2013 Red Hat, Inc.
+   Copyright (C) 2000-2009, 2013, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -63,6 +63,12 @@ struct ebl
   /* Number of registers to allocate for ebl_set_initial_registers_tid.
      Ebl architecture can unwind iff FRAME_NREGS > 0.  */
   size_t frame_nregs;
+
+  /* Mask to use to turn a function value into a real function address
+     in case the architecture adds some extra non-address bits to it.
+     If not initialized (0) then ebl_func_addr_mask will return ~0,
+     otherwise it should be the actual mask to use.  */
+  GElf_Addr func_addr_mask;
 
   /* Function descriptor load address and table as used by
      ebl_resolve_sym_value if available for this arch.  */

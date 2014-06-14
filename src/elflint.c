@@ -768,12 +768,18 @@ section [%2d] '%s': symbol %zu: function in COMMON section is nonsense\n"),
 	    {
 	      GElf_Addr sh_addr = (ehdr->e_type == ET_REL ? 0
 				   : destshdr->sh_addr);
+	      GElf_Addr st_value;
+	      if (GELF_ST_TYPE (sym->st_info) == STT_FUNC
+		  || (GELF_ST_TYPE (sym->st_info) == STT_GNU_IFUNC))
+		st_value = sym->st_value & ebl_func_addr_mask (ebl);
+	      else
+		st_value = sym->st_value;
 	      if (GELF_ST_TYPE (sym->st_info) != STT_TLS)
 		{
 		  if (! ebl_check_special_symbol (ebl, ehdr, sym, name,
 						  destshdr))
 		    {
-		      if (sym->st_value - sh_addr > destshdr->sh_size)
+		      if (st_value - sh_addr > destshdr->sh_size)
 			{
 			  /* GNU ld has severe bugs.  When it decides to remove
 			     empty sections it leaves symbols referencing them
@@ -798,7 +804,7 @@ section [%2d] '%s': symbol %zu: function in COMMON section is nonsense\n"),
 section [%2d] '%s': symbol %zu: st_value out of bounds\n"),
 				   idx, section_name (ebl, idx), cnt);
 			}
-		      else if ((sym->st_value - sh_addr
+		      else if ((st_value - sh_addr
 				+ sym->st_size) > destshdr->sh_size)
 			ERROR (gettext ("\
 section [%2d] '%s': symbol %zu does not fit completely in referenced section [%2d] '%s'\n"),
@@ -818,12 +824,12 @@ section [%2d] '%s': symbol %zu: referenced section [%2d] '%s' does not have SHF_
 		    {
 		      /* For object files the symbol value must fall
 			 into the section.  */
-		      if (sym->st_value > destshdr->sh_size)
+		      if (st_value > destshdr->sh_size)
 			ERROR (gettext ("\
 section [%2d] '%s': symbol %zu: st_value out of bounds of referenced section [%2d] '%s'\n"),
 			       idx, section_name (ebl, idx), cnt,
 			       (int) xndx, section_name (ebl, xndx));
-		      else if (sym->st_value + sym->st_size
+		      else if (st_value + sym->st_size
 			       > destshdr->sh_size)
 			ERROR (gettext ("\
 section [%2d] '%s': symbol %zu does not fit completely in referenced section [%2d] '%s'\n"),
@@ -852,20 +858,20 @@ section [%2d] '%s': symbol %zu: TLS symbol but no TLS program header entry\n"),
 			}
 		      else
 			{
-			  if (sym->st_value
+			  if (st_value
 			      < destshdr->sh_offset - phdr->p_offset)
 			    ERROR (gettext ("\
 section [%2d] '%s': symbol %zu: st_value short of referenced section [%2d] '%s'\n"),
 				   idx, section_name (ebl, idx), cnt,
 				   (int) xndx, section_name (ebl, xndx));
-			  else if (sym->st_value
+			  else if (st_value
 				   > (destshdr->sh_offset - phdr->p_offset
 				      + destshdr->sh_size))
 			    ERROR (gettext ("\
 section [%2d] '%s': symbol %zu: st_value out of bounds of referenced section [%2d] '%s'\n"),
 				   idx, section_name (ebl, idx), cnt,
 				   (int) xndx, section_name (ebl, xndx));
-			  else if (sym->st_value + sym->st_size
+			  else if (st_value + sym->st_size
 				   > (destshdr->sh_offset - phdr->p_offset
 				      + destshdr->sh_size))
 			    ERROR (gettext ("\

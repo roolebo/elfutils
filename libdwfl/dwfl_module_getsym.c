@@ -1,5 +1,5 @@
 /* Find debugging and symbol information for a module in libdwfl.
-   Copyright (C) 2006-2013 Red Hat, Inc.
+   Copyright (C) 2006-2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -119,7 +119,7 @@ __libdwfl_getsym (Dwfl_Module *mod, int ndx, GElf_Sym *sym, GElf_Addr *addr,
      descriptors).  */
 
   char *ident;
-  GElf_Addr st_value = sym->st_value;
+  GElf_Addr st_value = sym->st_value & ebl_func_addr_mask (mod->ebl);
   *resolved = false;
   if (! adjust_st_value && mod->e_type != ET_REL && alloc
       && (GELF_ST_TYPE (sym->st_info) == STT_FUNC

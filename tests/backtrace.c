@@ -148,6 +148,13 @@ frame_callback (Dwfl_Frame *state, void *frame_arg)
   int *framenop = frame_arg;
   Dwarf_Addr pc;
   bool isactivation;
+
+  if (*framenop > 16)
+    {
+      error (0, 0, "Too many frames: %d\n", *framenop);
+      return DWARF_CB_ABORT;
+    }
+
   if (! dwfl_frame_pc (state, &pc, &isactivation))
     {
       error (0, 0, "%s", dwfl_errmsg (-1));

@@ -30,6 +30,8 @@
 #include <fcntl.h>
 #include "system.h"
 
+#include "../libdw/memory-access.h"
+
 #ifndef MIN
 # define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
@@ -83,12 +85,10 @@ core_memory_read (Dwfl *dwfl, Dwarf_Addr addr, Dwarf_Word *result,
 	  return false;
 	}
       assert (data->d_size == bytes);
-      /* FIXME: Currently any arch supported for unwinding supports
-	 unaligned access.  */
       if (bytes == 8)
-	*result = *(const uint64_t *) data->d_buf;
+	*result = read_8ubyte_unaligned_noncvt (data->d_buf);
       else
-	*result = *(const uint32_t *) data->d_buf;
+	*result = read_4ubyte_unaligned_noncvt (data->d_buf);
       return true;
     }
   __libdwfl_seterrno (DWFL_E_ADDR_OUTOFRANGE);
@@ -150,7 +150,7 @@ core_next_thread (Dwfl *dwfl __attribute__ ((unused)), void *dwfl_arg,
 	  break;
       if (item == items + nitems)
 	continue;
-      uint32_t val32 = *(const uint32_t *) (desc + item->offset);
+      uint32_t val32 = read_4ubyte_unaligned_noncvt (desc + item->offset);
       val32 = (elf_getident (core, NULL)[EI_DATA] == ELFDATA2MSB
 		? be32toh (val32) : le32toh (val32));
       pid_t tid = (int32_t) val32;
@@ -201,7 +201,7 @@ core_set_initial_registers (Dwfl_Thread *thread, void *thread_arg_voidp)
   assert (item < items + nitems);
   pid_t tid;
   {
-    uint32_t val32 = *(const uint32_t *) (desc + item->offset);
+    uint32_t val32 = read_4ubyte_unaligned_noncvt (desc + item->offset);
     val32 = (elf_getident (core, NULL)[EI_DATA] == ELFDATA2MSB
 	     ? be32toh (val32) : le32toh (val32));
     tid = (int32_t) val32;
@@ -218,14 +218,14 @@ core_set_initial_registers (Dwfl_Thread *thread, void *thread_arg_voidp)
       switch (gelf_getclass (core) == ELFCLASS32 ? 32 : 64)
       {
 	case 32:;
-	  uint32_t val32 = *(const uint32_t *) (desc + item->offset);
+	  uint32_t val32 = read_4ubyte_unaligned_noncvt (desc + item->offset);
 	  val32 = (elf_getident (core, NULL)[EI_DATA] == ELFDATA2MSB
 		   ? be32toh (val32) : le32toh (val32));
 	  /* Do a host width conversion.  */
 	  pc = val32;
 	  break;
 	case 64:;
-	  uint64_t val64 = *(const uint64_t *) (desc + item->offset);
+	  uint64_t val64 = read_8ubyte_unaligned_noncvt (desc + item->offset);
 	  val64 = (elf_getident (core, NULL)[EI_DATA] == ELFDATA2MSB
 		   ? be64toh (val64) : le64toh (val64));
 	  pc = val64;
@@ -259,7 +259,7 @@ core_set_initial_registers (Dwfl_Thread *thread, void *thread_arg_voidp)
 	  switch (regloc->bits)
 	  {
 	    case 32:;
-	      uint32_t val32 = *(const uint32_t *) reg_desc;
+	      uint32_t val32 = read_4ubyte_unaligned_noncvt (reg_desc);
 	      reg_desc += sizeof val32;
 	      val32 = (elf_getident (core, NULL)[EI_DATA] == ELFDATA2MSB
 		       ? be32toh (val32) : le32toh (val32));
@@ -267,7 +267,7 @@ core_set_initial_registers (Dwfl_Thread *thread, void *thread_arg_voidp)
 	      val = val32;
 	      break;
 	    case 64:;
-	      uint64_t val64 = *(const uint64_t *) reg_desc;
+	      uint64_t val64 = read_8ubyte_unaligned_noncvt (reg_desc);
 	      reg_desc += sizeof val64;
 	      val64 = (elf_getident (core, NULL)[EI_DATA] == ELFDATA2MSB
 		       ? be64toh (val64) : le64toh (val64));
@@ -392,7 +392,7 @@ dwfl_core_file_attach (Dwfl *dwfl, Elf *core)
 	  break;
       if (item == items + nitems)
 	continue;
-      uint32_t val32 = *(const uint32_t *) (desc + item->offset);
+      uint32_t val32 = read_4ubyte_unaligned_noncvt (desc + item->offset);
       val32 = (elf_getident (core, NULL)[EI_DATA] == ELFDATA2MSB
 		? be32toh (val32) : le32toh (val32));
       pid = (int32_t) val32;

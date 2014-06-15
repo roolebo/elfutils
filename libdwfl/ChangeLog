@@ -1,3 +1,12 @@
+2014-06-15  Mark Wielaard  <mjw@redhat.com>
+
+	* linux-core-attach.c (core_memory_read): Use libdw/memory-access.h
+	macros read_4ubyte_unaligned_noncvt and read_8ubyte_unaligned_noncvt
+	to read possibly unaligned data.
+	(core_next_thread): Likewise.
+	(core_set_initial_registers): Likewise.
+	(dwfl_core_file_attach): Likewise.
+
 2014-06-11  Mark Wielaard  <mjw@redhat.com>
 
 	* dwfl_frame.c (__libdwfl_process_free): Reset dwfl->attacherr.

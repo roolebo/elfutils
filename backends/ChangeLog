@@ -1,3 +1,8 @@
+2014-06-18  Mark Wielaard  <mjw@redhat.com>
+
+	* libebl_CPU.h (dwarf_peel_type): Remove DW_TAG_mutable_type
+	handling.
+
 2014-06-17  Mark Wielaard  <mjw@redhat.com>
 
 	* arm_init.c (arm_init): Set func_addr_mask.

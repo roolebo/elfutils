@@ -1,5 +1,5 @@
 /* Common interface for libebl modules.
-   Copyright (C) 2000, 2001, 2002, 2003, 2005, 2013 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2003, 2005, 2013, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -60,7 +60,7 @@ dwarf_peel_type (Dwarf_Die *typediep, Dwarf_Attribute *attrp)
   int tag = DWARF_TAG_OR_RETURN (typediep);
   while (tag == DW_TAG_typedef
 	 || tag == DW_TAG_const_type || tag == DW_TAG_volatile_type
-	 || tag == DW_TAG_restrict_type || tag == DW_TAG_mutable_type)
+	 || tag == DW_TAG_restrict_type)
     {
       attrp = dwarf_attr_integrate (typediep, DW_AT_type, attrp);
       typediep = dwarf_formref_die (attrp, typediep);

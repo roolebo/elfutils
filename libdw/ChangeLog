@@ -1,3 +1,7 @@
+2014-06-18  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf.h: Remove DW_TAG_mutable_type.
+
 2014-05-02  Mark Wielaard  <mjw@redhat.com>
 
 	* libdwP.h (__check_build_id): Removed now unused.

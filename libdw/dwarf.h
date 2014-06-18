@@ -1,5 +1,5 @@
 /* This file defines standard DWARF types, structures, and macros.
-   Copyright (C) 2000-2011 Red Hat, Inc.
+   Copyright (C) 2000-2011, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -87,7 +87,7 @@ enum
     DW_TAG_unspecified_type = 0x3b,
     DW_TAG_partial_unit = 0x3c,
     DW_TAG_imported_unit = 0x3d,
-    DW_TAG_mutable_type = 0x3e,
+    /* 0x3e reserved.  */
     DW_TAG_condition = 0x3f,
     DW_TAG_shared_type = 0x40,
     DW_TAG_type_unit = 0x41,

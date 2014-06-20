@@ -1,3 +1,18 @@
+2014-06-20  Petr Machata  <pmachata@redhat.com>
+
+	* alpha_retval.c (alpha_return_value_location): Call
+	dwarf_peeled_die_type instead of inlining equivalent code.
+	* arm_retval.c (arm_return_value_location): Likewise.
+	* i386_retval.c (i386_return_value_location): Likewise.
+	* ia64_retval.c (ia64_return_value_location): Likewise.
+	* ppc64_retval.c (ppc64_return_value_location): Likewise.
+	* ppc_retval.c (ppc_return_value_location): Likewise.
+	* s390_retval.c (s390_return_value_location): Likewise.
+	* sh_retval.c (sh_return_value_location): Likewise.
+	* sparc_retval.c (sparc_return_value_location): Likewise.
+	* tilegx_retval.c (tilegx_return_value_location): Likewise.
+	* x86_64_retval.c (x86_64_return_value_location): Likewise.
+
 2014-05-19  Mark Wielaard  <mjw@redhat.com>
 
 	* arm_init.c (arm_init): Hook check_reloc_target_type.

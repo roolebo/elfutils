@@ -1,5 +1,5 @@
 /* Function return value location for Linux/x86-64 ABI.
-   Copyright (C) 2005-2010 Red Hat, Inc.
+   Copyright (C) 2005-2010, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -81,27 +81,10 @@ x86_64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
 {
   /* Start with the function's type, and get the DW_AT_type attribute,
      which is the type of the return value.  */
-
-  Dwarf_Attribute attr_mem;
-  Dwarf_Attribute *attr = dwarf_attr_integrate (functypedie, DW_AT_type,
-						&attr_mem);
-  if (attr == NULL)
-    /* The function has no return value, like a `void' function in C.  */
-    return 0;
-
-  Dwarf_Die die_mem;
-  Dwarf_Die *typedie = dwarf_formref_die (attr, &die_mem);
-  int tag = DWARF_TAG_OR_RETURN (typedie);
-
-  /* Follow typedefs and qualifiers to get to the actual type.  */
-  while (tag == DW_TAG_typedef
-	 || tag == DW_TAG_const_type || tag == DW_TAG_volatile_type
-	 || tag == DW_TAG_restrict_type || tag == DW_TAG_mutable_type)
-    {
-      attr = dwarf_attr_integrate (typedie, DW_AT_type, &attr_mem);
-      typedie = dwarf_formref_die (attr, &die_mem);
-      tag = DWARF_TAG_OR_RETURN (typedie);
-    }
+  Dwarf_Die die_mem, *typedie = &die_mem;
+  int tag = dwarf_peeled_die_type (functypedie, typedie);
+  if (tag <= 0)
+    return tag;
 
   Dwarf_Word size;
   switch (tag)
@@ -112,6 +95,7 @@ x86_64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
     case DW_TAG_subrange_type:
       if (! dwarf_hasattr_integrate (typedie, DW_AT_byte_size))
 	{
+	  Dwarf_Attribute attr_mem, *attr;
 	  attr = dwarf_attr_integrate (typedie, DW_AT_type, &attr_mem);
 	  typedie = dwarf_formref_die (attr, &die_mem);
 	  tag = DWARF_TAG_OR_RETURN (typedie);
@@ -122,16 +106,21 @@ x86_64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
     case DW_TAG_enumeration_type:
     case DW_TAG_pointer_type:
     case DW_TAG_ptr_to_member_type:
-      if (dwarf_formudata (dwarf_attr_integrate (typedie, DW_AT_byte_size,
-						 &attr_mem), &size) != 0)
-	{
-	  if (tag == DW_TAG_pointer_type || tag == DW_TAG_ptr_to_member_type)
-	    size = 8;
-	  else
-	    return -1;
-	}
+      {
+	Dwarf_Attribute attr_mem;
+	if (dwarf_formudata (dwarf_attr_integrate (typedie, DW_AT_byte_size,
+						   &attr_mem), &size) != 0)
+	  {
+	    if (tag == DW_TAG_pointer_type || tag == DW_TAG_ptr_to_member_type)
+	      size = 8;
+	    else
+	      return -1;
+	  }
+      }
+
       if (tag == DW_TAG_base_type)
 	{
+	  Dwarf_Attribute attr_mem;
 	  Dwarf_Word encoding;
 	  if (dwarf_formudata (dwarf_attr_integrate (typedie, DW_AT_encoding,
 						     &attr_mem),

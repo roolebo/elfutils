@@ -1,3 +1,7 @@
+2014-06-24  Kurt Roeckx  <kurt@roeckx.be>
+
+	* linux-pid-attach.c: Make it build on non linux hosts.
+
 2014-06-17  Mark Wielaard  <mjw@redhat.com>
 
 	* frame_unwind.c (handle_cfi): Use ebl_func_addr_mask.

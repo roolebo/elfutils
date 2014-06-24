@@ -396,6 +396,16 @@ pid_getthread (Dwfl *dwfl __attribute__ ((unused)),
   return false;
 }
 
+bool
+internal_function
+__libdwfl_ptrace_attach (pid_t tid __attribute__ ((unused)),
+			 bool *tid_was_stoppedp __attribute__ ((unused)))
+{
+  errno = ENOSYS;
+  __libdwfl_seterrno (DWFL_E_ERRNO);
+  return false;
+}
+
 static bool
 pid_memory_read (Dwfl *dwfl __attribute__ ((unused)),
                  Dwarf_Addr addr __attribute__ ((unused)),
@@ -419,6 +429,13 @@ pid_set_initial_registers (Dwfl_Thread *thread __attribute__ ((unused)),
 static void
 pid_detach (Dwfl *dwfl __attribute__ ((unused)),
 	    void *dwfl_arg __attribute__ ((unused)))
+{
+}
+
+void
+internal_function
+__libdwfl_ptrace_detach (pid_t tid __attribute__ ((unused)),
+			 bool tid_was_stopped __attribute__ ((unused)))
 {
 }
 

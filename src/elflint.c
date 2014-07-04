@@ -799,7 +799,8 @@ section [%2d] '%s': symbol %zu: function in COMMON section is nonsense\n"),
 				  && strcmp (name, "__fini_array_end") != 0
 				  && strcmp (name, "__bss_start") != 0
 				  && strcmp (name, "__bss_start__") != 0
-				  && strcmp (name, "__TMC_END__") != 0))
+				  && strcmp (name, "__TMC_END__") != 0
+				  && strcmp (name, ".TOC.") != 0))
 			    ERROR (gettext ("\
 section [%2d] '%s': symbol %zu: st_value out of bounds\n"),
 				   idx, section_name (ebl, idx), cnt);

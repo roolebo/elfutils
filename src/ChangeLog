@@ -1,3 +1,9 @@
+2014-07-04  Menanteau Guy  <menantea@linux.vnet.ibm.com>
+	    Mark Wielaard  <mjw@redhat.com>
+
+	* elflint (check_symtab): Add ".TOC." to the list of possibly
+	dangling symbols because of sourceware PR13621.
+
 2014-06-14  Mark Wielaard  <mjw@redhat.com>
 
 	* elflint (check_symtab): Use ebl_func_addr_mask on st_value.

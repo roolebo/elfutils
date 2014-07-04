@@ -1,3 +1,14 @@
+2014-07-04  Menanteau Guy  <menantea@linux.vnet.ibm.com>
+	    Mark Wielaard  <mjw@redhat.com>
+
+	* ppc64_init.c (ppc64_init): Hook check_st_other_bits.
+	* ppc64_reloc.def: TLSGD, TLSLD, TOCSAVE, ADDR16_HIGH, ADDR16_HIGHA,
+	TPREL16_HIGH, TPREL16_HIGHA, DTPREL16_HIGH, DTPREL16_HIGHA, JMP_IREL,
+	IRELATIVE, REL16, REL16_LO, REL16_HI and REL16_HA.
+	* ppc64_symbol.c (ppc64_dynamic_tag_name): Recognize DT_PPC64_OPT.
+	(ppc64_dynamic_tag_check): Likewise.
+	(ppc64_check_st_other_bits): New function.
+
 2014-07-04  Mark Wielaard  <mjw@redhat.com>
 
 	* aarch64_retval.c (aarch64_return_value_location): Handle

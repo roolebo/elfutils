@@ -61,6 +61,7 @@ ppc64_init (elf, machine, eh, ehlen)
   HOOK (eh, machine_flag_check);
   HOOK (eh, copy_reloc_p);
   HOOK (eh, check_special_symbol);
+  HOOK (eh, check_st_other_bits);
   HOOK (eh, bss_plt_p);
   HOOK (eh, return_value_location);
   HOOK (eh, register_info);

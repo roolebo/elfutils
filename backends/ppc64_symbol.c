@@ -72,6 +72,8 @@ ppc64_dynamic_tag_name (int64_t tag, char *buf __attribute__ ((unused)),
       return "PPC64_OPD";
     case DT_PPC64_OPDSZ:
       return "PPC64_OPDSZ";
+    case DT_PPC64_OPT:
+      return "PPC64_OPT";
     default:
       break;
     }
@@ -84,7 +86,8 @@ ppc64_dynamic_tag_check (int64_t tag)
 {
   return (tag == DT_PPC64_GLINK
 	  || tag == DT_PPC64_OPD
-	  || tag == DT_PPC64_OPDSZ);
+	  || tag == DT_PPC64_OPDSZ
+	  || tag == DT_PPC64_OPT);
 }
 
 
@@ -119,4 +122,10 @@ bool
 ppc64_machine_flag_check (GElf_Word flags)
 {
   return flags == 0 || flags == 1 || flags == 2;
+}
+
+bool
+ppc64_check_st_other_bits (unsigned char st_other)
+{
+  return (PPC64_LOCAL_ENTRY_OFFSET (st_other) != 0);
 }

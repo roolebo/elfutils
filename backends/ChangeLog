@@ -1,3 +1,8 @@
+2014-07-04  Mark Wielaard  <mjw@redhat.com>
+
+	* aarch64_retval.c (aarch64_return_value_location): Handle
+	DW_ATE_boolean.
+
 2014-06-18  Mark Wielaard  <mjw@redhat.com>
 
 	* libebl_CPU.h (dwarf_peel_type): Remove DW_TAG_mutable_type

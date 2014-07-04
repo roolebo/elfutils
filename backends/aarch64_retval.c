@@ -357,6 +357,7 @@ aarch64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
 		 size of the argument is less than or equal to 8 bytes
 		 [...] the argument is copied to the least significant
 		 bits in x[NGRN].  */
+	    case DW_ATE_boolean:
 	    case DW_ATE_signed:
 	    case DW_ATE_unsigned:
 	    case DW_ATE_unsigned_char:

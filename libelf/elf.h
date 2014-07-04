@@ -1,5 +1,5 @@
 /* This file defines standard ELF types, structures, and macros.
-   Copyright (C) 1995-2013 Free Software Foundation, Inc.
+   Copyright (C) 1995-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -2252,6 +2252,17 @@ typedef Elf32_Addr Elf32_Conflict;
 #define R_PPC64_DTPREL16_HIGHERA 104 /* half16	(sym+add)@dtprel@highera */
 #define R_PPC64_DTPREL16_HIGHEST 105 /* half16	(sym+add)@dtprel@highest */
 #define R_PPC64_DTPREL16_HIGHESTA 106 /* half16	(sym+add)@dtprel@highesta */
+#define R_PPC64_TLSGD		107 /* none	(sym+add)@tlsgd */
+#define R_PPC64_TLSLD		108 /* none	(sym+add)@tlsld */
+#define R_PPC64_TOCSAVE		109 /* none */
+
+/* Added when HA and HI relocs were changed to report overflows.  */
+#define R_PPC64_ADDR16_HIGH	110
+#define R_PPC64_ADDR16_HIGHA	111
+#define R_PPC64_TPREL16_HIGH	112
+#define R_PPC64_TPREL16_HIGHA	113
+#define R_PPC64_DTPREL16_HIGH	114
+#define R_PPC64_DTPREL16_HIGHA	115
 
 /* GNU extension to support local ifunc.  */
 #define R_PPC64_JMP_IREL	247
@@ -2261,11 +2272,28 @@ typedef Elf32_Addr Elf32_Conflict;
 #define R_PPC64_REL16_HI	251	/* half16   (sym+add-.)@h */
 #define R_PPC64_REL16_HA	252	/* half16   (sym+add-.)@ha */
 
+/* e_flags bits specifying ABI.
+   1 for original function descriptor using ABI,
+   2 for revised ABI without function descriptors,
+   0 for unspecified or not using any features affected by the differences.  */
+#define EF_PPC64_ABI	3
+
 /* PowerPC64 specific values for the Dyn d_tag field.  */
 #define DT_PPC64_GLINK  (DT_LOPROC + 0)
 #define DT_PPC64_OPD	(DT_LOPROC + 1)
 #define DT_PPC64_OPDSZ	(DT_LOPROC + 2)
+#define DT_PPC64_OPT	(DT_LOPROC + 3)
 #define DT_PPC64_NUM    3
+
+/* PowerPC64 specific values for the DT_PPC64_OPT Dyn entry.  */
+#define PPC64_OPT_TLS		1
+#define PPC64_OPT_MULTI_TOC	2
+
+/* PowerPC64 specific values for the Elf64_Sym st_other field.  */
+#define STO_PPC64_LOCAL_BIT	5
+#define STO_PPC64_LOCAL_MASK	(7 << STO_PPC64_LOCAL_BIT)
+#define PPC64_LOCAL_ENTRY_OFFSET(other)				\
+ (((1 << (((other) & STO_PPC64_LOCAL_MASK) >> STO_PPC64_LOCAL_BIT)) >> 2) << 2)
 
 
 /* ARM specific declarations */

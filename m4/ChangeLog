@@ -1,3 +1,8 @@
+2014-07-14  Mark Wielaard  <mjw@redhat.com>
+
+	* biarch.m4 (utrace_BIARCH): Set biarch-no for cross-compile using
+	AC_RUN_IFELSE extra argument.
+
 2013-12-02  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* biarch.m4 (utrace_BIARCH): Call AC_MSG_WARN if !BIARCH.

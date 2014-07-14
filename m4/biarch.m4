@@ -40,7 +40,7 @@ AC_CACHE_CHECK([whether $biarch_CC makes executables we can run],
 save_CC="$CC"
 CC="$biarch_CC"
 AC_RUN_IFELSE([AC_LANG_PROGRAM([], [])],
-	      utrace_cv_cc_biarch=yes, utrace_cv_cc_biarch=no)
+	      utrace_cv_cc_biarch=yes, utrace_cv_cc_biarch=no, utrace_cv_cc_biarch=no)
 CC="$save_CC"])], [utrace_cv_cc_biarch=no])
 AS_IF([test $utrace_cv_cc_biarch != yes], [dnl
 AC_MSG_WARN([not running biarch tests, $biarch_CC does not work])])])

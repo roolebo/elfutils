@@ -1,3 +1,9 @@
+2014-07-24  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	Fix report_r_debug for prelinked libraries.
+	* link_map.c (report_r_debug): Comment out variable l_addr.
+	Use instead new variable base recalculated from l_ld.
+
 2014-06-24  Kurt Roeckx  <kurt@roeckx.be>
 
 	* linux-pid-attach.c: Make it build on non linux hosts.

@@ -321,7 +321,11 @@ report_r_debug (uint_fast8_t elfclass, uint_fast8_t elfdata,
       if (read_addrs (next, 4))
 	return release_buffer (-1);
 
-      GElf_Addr l_addr = addrs[0];
+      /* Unused: l_addr is the difference between the address in memory
+         and the ELF file when the core was created. We need to
+         recalculate the difference below because the ELF file we use
+         might be differently pre-linked.  */
+      // GElf_Addr l_addr = addrs[0];
       GElf_Addr l_name = addrs[1];
       GElf_Addr l_ld = addrs[2];
       next = addrs[3];
@@ -432,11 +436,14 @@ report_r_debug (uint_fast8_t elfclass, uint_fast8_t elfdata,
 
 		  if (valid)
 		    {
+		      // It is like l_addr but it handles differently prelinked
+		      // files at core dumping vs. core loading time.
+		      GElf_Addr base = l_ld - elf_dynamic_vaddr;
 		      if (r_debug_info_module == NULL)
 			{
 			  // XXX hook for sysroot
 			  mod = __libdwfl_report_elf (dwfl, basename (name),
-						      name, fd, elf, l_addr,
+						      name, fd, elf, base,
 						      true, true);
 			  if (mod != NULL)
 			    {
@@ -444,7 +451,7 @@ report_r_debug (uint_fast8_t elfclass, uint_fast8_t elfdata,
 			      fd = -1;
 			    }
 			}
-		      else if (__libdwfl_elf_address_range (elf, l_addr, true,
+		      else if (__libdwfl_elf_address_range (elf, base, true,
 							    true, NULL, NULL,
 						    &r_debug_info_module->start,
 						    &r_debug_info_module->end,

@@ -302,6 +302,9 @@ check_suffix (const FTSENT *f, size_t namelen)
 #if USE_BZLIB
   TRY (".ko.bz2");
 #endif
+#if USE_LZMA
+  TRY (".ko.xz");
+#endif
 
   return 0;
 

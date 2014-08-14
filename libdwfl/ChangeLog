@@ -1,3 +1,7 @@
+2014-08-14  Mark Wielaard  <mjw@redhat.com>
+
+	* linux-kernel-modules.c (check-suffix): Also TRY .ko.xz.
+
 2014-07-24  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	Fix report_r_debug for prelinked libraries.

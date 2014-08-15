@@ -1,3 +1,11 @@
+2014-08-15  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_cu_getdwarf.c: New file.
+	* Makefile.am (libdw_a_SOURCES): Add dwarf_cu_getdwarf.c.
+	* libdw.h (Dwarf_CU): New typedef.
+	(dwarf_cu_getdwarf): New function declaration.
+	* libdw.map (ELFUTILS_0.160): New. Add dwarf_cu_getdwarf.
+
 2014-06-18  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf.h: Remove DW_TAG_mutable_type.

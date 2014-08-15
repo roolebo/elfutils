@@ -1,5 +1,5 @@
 /* Interfaces for libdw.
-   Copyright (C) 2002-2010, 2013 Red Hat, Inc.
+   Copyright (C) 2002-2010, 2013, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -112,6 +112,7 @@ typedef struct Dwarf_Aranges_s Dwarf_Aranges;
 
 /* CU representation.  */
 struct Dwarf_CU;
+typedef struct Dwarf_CU Dwarf_CU;
 
 /* Macro information.  */
 typedef struct Dwarf_Macro_s Dwarf_Macro;
@@ -259,6 +260,12 @@ extern Dwarf *dwarf_begin_elf (Elf *elf, Dwarf_Cmd cmd, Elf_Scn *scngrp);
 
 /* Retrieve ELF descriptor used for DWARF access.  */
 extern Elf *dwarf_getelf (Dwarf *dwarf);
+
+/* Retieve DWARF descriptor used for a Dwarf_Die or Dwarf_Attribute.
+   A Dwarf_Die or a Dwarf_Attribute is associated with a particular
+   Dwarf_CU handle.  This function returns the DWARF descriptor for
+   that Dwarf_CU.  */
+extern Dwarf *dwarf_cu_getdwarf (Dwarf_CU *cu);
 
 /* Retrieves the DWARF descriptor for debugaltlink data.  Returns NULL
    if no alternate debug data has been supplied.  */

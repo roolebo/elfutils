@@ -1,5 +1,7 @@
 Version 0.160
 
+libdw: New function dwarf_cu_getdwarf.
+
 unstrip: New option -F, --force to combining files even if some ELF headers
          don't seem to match.
 

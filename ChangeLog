@@ -1,5 +1,9 @@
 2014-08-15  Mark Wielaard  <mjw@redhat.com>
 
+	* NEWS: Add dwarf_cu_die.
+
+2014-08-15  Mark Wielaard  <mjw@redhat.com>
+
 	* NEWS: Add dwarf_cu_getdwarf.
 
 2014-07-18  Mark Wielaard  <mjw@redhat.com>

@@ -305,4 +305,5 @@ ELFUTILS_0.159 {
 ELFUTILS_0.160 {
   global:
     dwarf_cu_getdwarf;
+    dwarf_cu_die;
 } ELFUTILS_0.159;

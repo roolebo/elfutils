@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2002-2010, 2012 Red Hat, Inc.
+## Copyright (C) 2002-2010, 2012, 2014 Red Hat, Inc.
 ## This file is part of elfutils.
 ##
 ## This file is free software; you can redistribute it and/or modify
@@ -86,7 +86,8 @@ libdw_a_SOURCES = dwarf_begin.c dwarf_begin_elf.c dwarf_end.c dwarf_getelf.c \
 		  dwarf_getcfi.c dwarf_getcfi_elf.c dwarf_cfi_end.c \
 		  dwarf_aggregate_size.c dwarf_getlocation_implicit_pointer.c \
 		  dwarf_getlocation_die.c dwarf_getlocation_attr.c \
-		  dwarf_getalt.c dwarf_setalt.c dwarf_cu_getdwarf.c
+		  dwarf_getalt.c dwarf_setalt.c dwarf_cu_getdwarf.c \
+		  dwarf_cu_die.c
 
 if MAINTAINER_MODE
 BUILT_SOURCES = $(srcdir)/known-dwarf.h

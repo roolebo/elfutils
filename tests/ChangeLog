@@ -1,3 +1,12 @@
+2014-08-28  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* Makefile.am (check_PROGRAMS): Add deleted and deleted-lib.so.
+	(TESTS, EXTRA_DIST): Add run-deleted.sh.
+	(deleted_LDADD, deleted_lib_so_LDFLAGS, deleted_lib_so_CFLAGS): New.
+	* deleted-lib.c: New file.
+	* deleted.c: New file.
+	* run-deleted.sh: New file.
+
 2014-06-15  Mark Wielaard  <mjw@redhat.com>
 
 	* backtrace.c (frame_callback): Error on seeing more than 16 frames.

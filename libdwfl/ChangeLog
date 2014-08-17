@@ -1,3 +1,9 @@
+2014-08-28  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* dwfl_module_getdwarf.c (find_offsets): Add parameter main_bias, use
+	it.
+	(find_dynsym): Pass the new parameter main_bias.
+
 2014-08-14  Mark Wielaard  <mjw@redhat.com>
 
 	* linux-kernel-modules.c (check-suffix): Also TRY .ko.xz.

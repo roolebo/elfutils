@@ -621,7 +621,7 @@ load_symtab (struct dwfl_file *file, struct dwfl_file **symfile,
 /* Translate addresses into file offsets.
    OFFS[*] start out zero and remain zero if unresolved.  */
 static void
-find_offsets (Elf *elf, size_t phnum, size_t n,
+find_offsets (Elf *elf, GElf_Addr main_bias, size_t phnum, size_t n,
 	      GElf_Addr addrs[n], GElf_Off offs[n])
 {
   size_t unsolved = n;
@@ -632,10 +632,10 @@ find_offsets (Elf *elf, size_t phnum, size_t n,
       if (phdr != NULL && phdr->p_type == PT_LOAD && phdr->p_memsz > 0)
 	for (size_t j = 0; j < n; ++j)
 	  if (offs[j] == 0
-	      && addrs[j] >= phdr->p_vaddr
-	      && addrs[j] - phdr->p_vaddr < phdr->p_filesz)
+	      && addrs[j] >= phdr->p_vaddr + main_bias
+	      && addrs[j] - (phdr->p_vaddr + main_bias) < phdr->p_filesz)
 	    {
-	      offs[j] = addrs[j] - phdr->p_vaddr + phdr->p_offset;
+	      offs[j] = addrs[j] - (phdr->p_vaddr + main_bias) + phdr->p_offset;
 	      if (--unsolved == 0)
 		break;
 	    }
@@ -720,7 +720,8 @@ find_dynsym (Dwfl_Module *mod)
 
 	  /* Translate pointers into file offsets.  */
 	  GElf_Off offs[i_max] = { 0, };
-	  find_offsets (mod->main.elf, phnum, i_max, addrs, offs);
+	  find_offsets (mod->main.elf, mod->main_bias, phnum, i_max, addrs,
+			offs);
 
 	  /* Figure out the size of the symbol table.  */
 	  if (offs[i_hash] != 0)

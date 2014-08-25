@@ -1,9 +1,14 @@
 Version 0.160
 
 libdw: New functions dwarf_cu_getdwarf, dwarf_cu_die.
+       dwarf.h remove non-existing DW_TAG_mutable_type.
+
+libdwfl: Handle LZMA .ko.xz compressed kernel modules.
 
 unstrip: New option -F, --force to combining files even if some ELF headers
          don't seem to match.
+
+backends: Handle ARM THUMB functions. Add support for ppc64le ELFv2 abi.
 
 Version 0.159
 

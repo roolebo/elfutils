@@ -1,3 +1,9 @@
+2014-08-25  Mark Wielaard  <mjw@redhat.com>
+
+	* configure.ac: Set version to 0.160.
+	* NEWS: Add removal of DW_TAG_mutable_type, LZMA .ko.xz kernel
+	module support, ARM THUMB functions and ppc64le ELFv2 abi backends.
+
 2014-08-15  Mark Wielaard  <mjw@redhat.com>
 
 	* NEWS: Add dwarf_cu_die.

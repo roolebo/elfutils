@@ -1,3 +1,7 @@
+2014-08-25  Josh Stone  <jistone@redhat.com>
+
+	* Makefile.am: Prevent premature @AR@ replacement in a sed expression.
+
 2014-07-04  Menanteau Guy  <menantea@linux.vnet.ibm.com>
 	    Mark Wielaard  <mjw@redhat.com>
 

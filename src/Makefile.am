@@ -160,7 +160,7 @@ MAINTAINERCLEANFILES = ldlex.c ldscript.c ldscript.h
 make-debug-archive: $(srcdir)/make-debug-archive.in
 	UNSTRIP=$(bindir)/`echo unstrip | sed '$(transform)'`; \
 	AR=$(bindir)/`echo ar | sed '$(transform)'`; \
-	sed -e "s,@UNSTRIP@,$$UNSTRIP,g" -e "s,@AR@,$$AR,g" \
+	sed -e "s,[@]UNSTRIP[@],$$UNSTRIP,g" -e "s,[@]AR[@],$$AR,g" \
 	    -e "s%[@]PACKAGE_NAME[@]%$(PACKAGE_NAME)%g" \
 	    -e "s%[@]PACKAGE_VERSION[@]%$(PACKAGE_VERSION)%g" \
 	    $(srcdir)/make-debug-archive.in > $@.new

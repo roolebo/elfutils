@@ -646,6 +646,12 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 
   Dwfl_Module *mod = INTUSE(dwfl_report_module) (dwfl, name,
 						 module_start, module_end);
+
+  // !execlike && ET_EXEC is PIE.
+  // execlike && !ET_EXEC is a static executable.
+  if (mod != NULL && (execlike || ehdr.e32.e_type == ET_EXEC))
+    mod->is_executable = true;
+
   if (likely (mod != NULL) && build_id != NULL
       && unlikely (INTUSE(dwfl_module_report_build_id) (mod,
 							build_id,

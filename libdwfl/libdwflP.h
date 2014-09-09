@@ -211,6 +211,7 @@ struct Dwfl_Module
 
   int segment;			/* Index of first segment table entry.  */
   bool gc;			/* Mark/sweep flag.  */
+  bool is_executable;		/* Use Dwfl::executable_for_core?  */
 };
 
 /* This holds information common for all the threads/tasks/TIDs of one process

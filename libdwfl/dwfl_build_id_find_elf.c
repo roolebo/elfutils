@@ -124,13 +124,12 @@ dwfl_build_id_find_elf (Dwfl_Module *mod,
 			char **file_name, Elf **elfp)
 {
   *elfp = NULL;
-  if (modname != NULL && mod->dwfl->executable_for_core != NULL
-      && (strcmp (modname, "[exe]") == 0 || strcmp (modname, "[pie]") == 0))
+  if (mod->is_executable && mod->dwfl->executable_for_core != NULL)
     {
       /* When dwfl_core_file_report was called with a non-NULL executable file
 	 name this callback will replace the Dwfl_Module main.name with the
-	 recorded executable file when the modname is [exe] or [pie] (which
-	 then triggers opening and reporting of the executable).  */
+	 recorded executable file when MOD was identified as main executable
+	 (which then triggers opening and reporting of the executable).  */
       int fd = open64 (mod->dwfl->executable_for_core, O_RDONLY);
       if (fd >= 0)
 	{

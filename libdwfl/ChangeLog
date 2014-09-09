@@ -1,3 +1,10 @@
+2014-09-18  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* dwfl_build_id_find_elf.c (dwfl_build_id_find_elf): Use IS_EXECUTABLE.
+	* dwfl_segment_report_module.c (dwfl_segment_report_module): Set
+	IS_EXECUTABLE.
+	* libdwflP.h (struct Dwfl_Module): New field is_executable.
+
 2014-08-28  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* dwfl_module_getdwarf.c (find_offsets): Add parameter main_bias, use

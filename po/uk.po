@@ -375,63 +375,59 @@ msgstr "дані розділу «.gnu.prelink_undo» пошкоджено"
 
 #: libdwfl/libdwflP.h:82
 msgid "Internal error due to ebl"
-msgstr ""
+msgstr "Внутрішня помилка через ebl"
 
 #: libdwfl/libdwflP.h:83
 msgid "Missing data in core file"
-msgstr ""
+msgstr "У файлі ядра не вистачає даних"
 
 #: libdwfl/libdwflP.h:84
-#, fuzzy
 msgid "Invalid register"
-msgstr "некоректний параметр"
+msgstr "Некоректний регістр"
 
 #: libdwfl/libdwflP.h:85
 msgid "Error reading process memory"
-msgstr ""
+msgstr "Помилка під час спроби читання пам’яті процесу"
 
 #: libdwfl/libdwflP.h:86
 msgid "Couldn't find architecture of any ELF"
-msgstr ""
+msgstr "Не вдалося знайти хоч якусь архітектуру ELF"
 
 #: libdwfl/libdwflP.h:87
 msgid "Error parsing /proc filesystem"
-msgstr ""
+msgstr "Помилка під час спроби обробки файлової системи /proc"
 
 #: libdwfl/libdwflP.h:88
-#, fuzzy
 msgid "Invalid DWARF"
-msgstr "некоректний запис DWARF"
+msgstr "Некоректний запис DWARF"
 
 #: libdwfl/libdwflP.h:89
 msgid "Unsupported DWARF"
-msgstr ""
+msgstr "Непідтримуваний запис DWARF"
 
 #: libdwfl/libdwflP.h:90
 msgid "Unable to find more threads"
-msgstr ""
+msgstr "Не вдалося знайти додаткові потоки"
 
 #: libdwfl/libdwflP.h:91
 msgid "Dwfl already has attached state"
-msgstr ""
+msgstr "Dwfl уже перебуває у стані долучення до процесу"
 
 #: libdwfl/libdwflP.h:92
 msgid "Dwfl has no attached state"
-msgstr ""
+msgstr "Dwfl не перебуває у стані долучення до процесу"
 
 #: libdwfl/libdwflP.h:93
 msgid "Unwinding not supported for this architecture"
-msgstr ""
+msgstr "Для цієї архітектури розгортання не передбачено"
 
 #: libdwfl/libdwflP.h:94
-#, fuzzy
 msgid "Invalid argument"
-msgstr "некоректний параметр"
+msgstr "Некоректний аргумент"
 
 #: libdwfl/libdwflP.h:95
-#, fuzzy
 msgid "Not an ET_CORE ELF file"
-msgstr "не є коректним файлом ELF"
+msgstr "Не є файлом ET_CORE ELF"
 
 #: libebl/eblbackendname.c:42
 msgid "No backend"
@@ -680,7 +676,6 @@ msgid "Also show symbol or section names"
 msgstr "Показувати також назви символів та розділів"
 
 #: src/addr2line.c:64
-#, fuzzy
 msgid "Also show symbol and the section names"
 msgstr "Показувати також назви символів та розділів"
 
@@ -2036,13 +2031,13 @@ msgid "section [%2d] '%s': bitmask size not power of 2: %u\n"
 msgstr "розділ [%2d] «%s»: розмір бітової маски не є степенем 2: %u\n"
 
 #: src/elflint.c:2092
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "section [%2d] '%s': hash table section is too small (is %ld, expected at "
 "least %ld)\n"
 msgstr ""
-"розділ [%2d] «%s»: розділ таблиці хешів занадто малий (розмір %ld, мало бути "
-"не менше %ld)\n"
+"розділ [%2d] «%s»: розділ таблиці хешів є надто малим (маємо %ld, мало бути "
+"принаймні %ld)\n"
 
 #: src/elflint.c:2100
 #, c-format
@@ -6523,6 +6518,8 @@ msgstr "Вивести лише список назв модулів, файлі
 #: src/unstrip.c:86
 msgid "Force combining files even if some ELF headers don't seem to match"
 msgstr ""
+"Примусово поєднати файли, навіть якщо буде встановлено невідповідність "
+"якихось із заголовків ELF"
 
 #: src/unstrip.c:130
 #, c-format

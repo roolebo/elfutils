@@ -1,5 +1,5 @@
 /* Return location expression list.
-   Copyright (C) 2000-2010, 2013 Red Hat, Inc.
+   Copyright (C) 2000-2010, 2013, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -57,6 +57,10 @@ attr_ok (Dwarf_Attribute *attr)
     case DW_AT_return_addr:
     case DW_AT_static_link:
     case DW_AT_segment:
+    case DW_AT_GNU_call_site_value:
+    case DW_AT_GNU_call_site_data_value:
+    case DW_AT_GNU_call_site_target:
+    case DW_AT_GNU_call_site_target_clobbered:
       break;
 
     default:

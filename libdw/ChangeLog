@@ -1,3 +1,9 @@
+2014-09-10  Petr Machata  <pmachata@redhat.com>
+
+	* dwarf_getlocation.c (attr_ok): Also accept
+	DW_AT_GNU_call_site_value, DW_AT_GNU_call_site_data_value,
+	DW_AT_GNU_call_site_target, DW_AT_GNU_call_site_target_clobbered.
+
 2014-08-15  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_cu_die.c: New file.

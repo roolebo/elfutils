@@ -1,3 +1,8 @@
+2014-09-10  Petr Machata  <pmachata@redhat.com>
+
+	* elf_begin (read_unmmaped_file): Call __libelf_seterrno if the
+	file is unreadable.
+
 2014-07-07  Mark Wielaard  <mjw@redhat.com>
 
 	* elf.h: Update from glibc.

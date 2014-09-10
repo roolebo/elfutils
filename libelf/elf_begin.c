@@ -550,9 +550,12 @@ read_unmmaped_file (int fildes, off_t offset, size_t maxsize, Elf_Cmd cmd,
 				    maxsize),
 			       offset);
   if (unlikely (nread == -1))
-    /* We cannot even read the head of the file.  Maybe FILDES is associated
-       with an unseekable device.  This is nothing we can handle.  */
-    return NULL;
+    {
+      /* We cannot even read the head of the file.  Maybe FILDES is associated
+	 with an unseekable device.  This is nothing we can handle.  */
+      __libelf_seterrno (ELF_E_INVALID_FILE);
+      return NULL;
+    }
 
   /* See what kind of object we have here.  */
   Elf_Kind kind = determine_kind (mem.header, nread);

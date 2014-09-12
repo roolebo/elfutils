@@ -1,3 +1,11 @@
+2014-09-12  Petr Machata  <pmachata@redhat.com>
+
+	* memory-access.h (read_ubyte_unaligned_inc): Allow only 4- and
+	8-byte quantities.  Consequently, rename to...
+	(read_addr_unaligned_inc): ... this.
+	(read_sbyte_unaligned_inc, read_ubyte_unaligned): Drop.
+	(read_sbyte_unaligned): Drop.
+
 2014-09-10  Petr Machata  <pmachata@redhat.com>
 
 	* dwarf_getlocation.c (attr_ok): Also accept

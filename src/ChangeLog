@@ -1,3 +1,9 @@
+2014-09-12  Petr Machata  <pmachata@redhat.com>
+
+	* readelf.c (encoded_ptr_size): In the switch statement, change
+	magic constants 3 and 4 to DW_EH_PE_* counterparts.  Still accept
+	0.  Print diagnostic for anything else.
+
 2014-08-25  Josh Stone  <jistone@redhat.com>
 
 	* Makefile.am: Prevent premature @AR@ replacement in a sed expression.

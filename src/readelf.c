@@ -5026,15 +5026,17 @@ encoded_ptr_size (int encoding, unsigned int ptr_size)
 {
   switch (encoding & 7)
     {
-    case 2:
-      return 2;
-    case 3:
+    case DW_EH_PE_udata4:
       return 4;
-    case 4:
+    case DW_EH_PE_udata8:
       return 8;
-    default:
+    case 0:
       return ptr_size;
     }
+
+  fprintf (stderr, "Unsupported pointer encoding: %#x, "
+	   "assuming pointer size of %d.\n", encoding, ptr_size);
+  return ptr_size;
 }
 
 
@@ -5455,9 +5457,9 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
 	  const unsigned char *base = readp;
 	  // XXX There are sometimes relocations for this value
-	  initial_location = read_ubyte_unaligned_inc (ptr_size, dbg, readp);
+	  initial_location = read_addr_unaligned_inc (ptr_size, dbg, readp);
 	  Dwarf_Word address_range
-	    = read_ubyte_unaligned_inc (ptr_size, dbg, readp);
+	    = read_addr_unaligned_inc (ptr_size, dbg, readp);
 
 	  /* pcrel for an FDE address is relative to the runtime
 	     address of the start_address field itself.  Sign extend

@@ -219,17 +219,6 @@ read_8sbyte_unaligned_1 (bool other_byte_order, const void *p)
 #endif	/* allow unaligned */
 
 
-#define read_ubyte_unaligned(Nbytes, Dbg, Addr) \
-  ((Nbytes) == 2 ? read_2ubyte_unaligned (Dbg, Addr)			      \
-   : (Nbytes) == 4 ? read_4ubyte_unaligned (Dbg, Addr)			      \
-   : read_8ubyte_unaligned (Dbg, Addr))
-
-#define read_sbyte_unaligned(Nbytes, Dbg, Addr) \
-  ((Nbytes) == 2 ? read_2sbyte_unaligned (Dbg, Addr)			      \
-   : (Nbytes) == 4 ? read_4sbyte_unaligned (Dbg, Addr)			      \
-   : read_8sbyte_unaligned (Dbg, Addr))
-
-
 #define read_2ubyte_unaligned_inc(Dbg, Addr) \
   ({ uint16_t t_ = read_2ubyte_unaligned (Dbg, Addr);			      \
      Addr = (__typeof (Addr)) (((uintptr_t) (Addr)) + 2);		      \
@@ -258,14 +247,9 @@ read_8sbyte_unaligned_1 (bool other_byte_order, const void *p)
      t_; })
 
 
-#define read_ubyte_unaligned_inc(Nbytes, Dbg, Addr) \
-  ((Nbytes) == 2 ? read_2ubyte_unaligned_inc (Dbg, Addr)		      \
-   : (Nbytes) == 4 ? read_4ubyte_unaligned_inc (Dbg, Addr)		      \
-   : read_8ubyte_unaligned_inc (Dbg, Addr))
-
-#define read_sbyte_unaligned_inc(Nbytes, Dbg, Addr) \
-  ((Nbytes) == 2 ? read_2sbyte_unaligned_inc (Dbg, Addr)		      \
-   : (Nbytes) == 4 ? read_4sbyte_unaligned_inc (Dbg, Addr)		      \
-   : read_8sbyte_unaligned_inc (Dbg, Addr))
+#define read_addr_unaligned_inc(Nbytes, Dbg, Addr)			\
+  (assert ((Nbytes) == 4 || (Nbytes) == 8),				\
+    ((Nbytes) == 4 ? read_4ubyte_unaligned_inc (Dbg, Addr)		\
+     : read_8ubyte_unaligned_inc (Dbg, Addr)))
 
 #endif	/* memory-access.h */

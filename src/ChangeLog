@@ -1,3 +1,7 @@
+2014-09-14  Petr Machata  <pmachata@redhat.com>
+
+	* readelf.c (handle_relocs_rela): Typo fix, test DESTSHDR properly.
+
 2014-09-12  Petr Machata  <pmachata@redhat.com>
 
 	* readelf.c (encoded_ptr_size): In the switch statement, change

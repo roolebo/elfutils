@@ -1,3 +1,8 @@
+2014-09-23  Mark Wielaard  <mjw@redhat.com>
+
+	* dwfl_segment_report_module.c (dwfl_segment_report_module):
+	Extract ei_class, ei_data and e_type early and use the result.
+
 2014-09-18  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* dwfl_build_id_find_elf.c (dwfl_build_id_find_elf): Use IS_EXECUTABLE.

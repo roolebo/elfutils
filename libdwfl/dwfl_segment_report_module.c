@@ -1,5 +1,5 @@
 /* Sniff out modules from ELF headers visible in memory segments.
-   Copyright (C) 2008-2012 Red Hat, Inc.
+   Copyright (C) 2008-2012, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -161,6 +161,10 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
   }
 
   /* Extract the information we need from the file header.  */
+  const unsigned char *e_ident;
+  unsigned char ei_class;
+  unsigned char ei_data;
+  uint16_t e_type;
   union
   {
     Elf32_Ehdr e32;
@@ -183,13 +187,16 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
       .d_size = sizeof ehdr,
       .d_version = EV_CURRENT,
     };
-  switch (((const unsigned char *) buffer)[EI_CLASS])
+  e_ident = ((const unsigned char *) buffer);
+  ei_class = e_ident[EI_CLASS];
+  ei_data = e_ident[EI_DATA];
+  switch (ei_class)
     {
     case ELFCLASS32:
       xlatefrom.d_size = sizeof (Elf32_Ehdr);
-      if (elf32_xlatetom (&xlateto, &xlatefrom,
-			  ((const unsigned char *) buffer)[EI_DATA]) == NULL)
+      if (elf32_xlatetom (&xlateto, &xlatefrom, ei_data) == NULL)
 	return finish ();
+      e_type = ehdr.e32.e_type;
       phoff = ehdr.e32.e_phoff;
       phnum = ehdr.e32.e_phnum;
       phentsize = ehdr.e32.e_phentsize;
@@ -200,9 +207,9 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 
     case ELFCLASS64:
       xlatefrom.d_size = sizeof (Elf64_Ehdr);
-      if (elf64_xlatetom (&xlateto, &xlatefrom,
-			  ((const unsigned char *) buffer)[EI_DATA]) == NULL)
+      if (elf64_xlatetom (&xlateto, &xlatefrom, ei_data) == NULL)
 	return finish ();
+      e_type = ehdr.e64.e_type;
       phoff = ehdr.e64.e_phoff;
       phnum = ehdr.e64.e_phnum;
       phentsize = ehdr.e64.e_phentsize;
@@ -281,7 +288,7 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
     assert (sizeof (Elf32_Nhdr) == sizeof (Elf64_Nhdr));
 
     void *notes;
-    if (ehdr.e32.e_ident[EI_DATA] == MY_ELFDATA)
+    if (ei_data == MY_ELFDATA)
       notes = data;
     else
       {
@@ -397,10 +404,9 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 	break;
       }
   }
-  if (ehdr.e32.e_ident[EI_CLASS] == ELFCLASS32)
+  if (ei_class == ELFCLASS32)
     {
-      if (elf32_xlatetom (&xlateto, &xlatefrom,
-			  ehdr.e32.e_ident[EI_DATA]) == NULL)
+      if (elf32_xlatetom (&xlateto, &xlatefrom, ei_data) == NULL)
 	found_bias = false;	/* Trigger error check.  */
       else
 	for (uint_fast16_t i = 0; i < phnum; ++i)
@@ -411,8 +417,7 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
     }
   else
     {
-      if (elf64_xlatetom (&xlateto, &xlatefrom,
-			  ehdr.e32.e_ident[EI_DATA]) == NULL)
+      if (elf64_xlatetom (&xlateto, &xlatefrom, ei_data) == NULL)
 	found_bias = false;	/* Trigger error check.  */
       else
 	for (uint_fast16_t i = 0; i < phnum; ++i)
@@ -568,7 +573,7 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
     return soname_stroff != 0 && dynstr_vaddr != 0 && dynstrsz != 0;
   }
 
-  const size_t dyn_entsize = (ehdr.e32.e_ident[EI_CLASS] == ELFCLASS32
+  const size_t dyn_entsize = (ei_class == ELFCLASS32
 			      ? sizeof (Elf32_Dyn) : sizeof (Elf64_Dyn));
   void *dyn_data = NULL;
   size_t dyn_data_size = 0;
@@ -587,18 +592,16 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
       xlateto.d_buf = &dyn;
       xlateto.d_size = sizeof dyn;
 
-      if (ehdr.e32.e_ident[EI_CLASS] == ELFCLASS32)
+      if (ei_class == ELFCLASS32)
 	{
-	  if (elf32_xlatetom (&xlateto, &xlatefrom,
-			      ehdr.e32.e_ident[EI_DATA]) != NULL)
+	  if (elf32_xlatetom (&xlateto, &xlatefrom, ei_data) != NULL)
 	    for (size_t i = 0; i < dyn_filesz / sizeof dyn.d32[0]; ++i)
 	      if (consider_dyn (dyn.d32[i].d_tag, dyn.d32[i].d_un.d_val))
 		break;
 	}
       else
 	{
-	  if (elf64_xlatetom (&xlateto, &xlatefrom,
-			      ehdr.e32.e_ident[EI_DATA]) != NULL)
+	  if (elf64_xlatetom (&xlateto, &xlatefrom, ei_data) != NULL)
 	    for (size_t i = 0; i < dyn_filesz / sizeof dyn.d64[0]; ++i)
 	      if (consider_dyn (dyn.d64[i].d_tag, dyn.d64[i].d_un.d_val))
 		break;
@@ -608,7 +611,7 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 
   /* We'll use the name passed in or a stupid default if not DT_SONAME.  */
   if (name == NULL)
-    name = ehdr.e32.e_type == ET_EXEC ? "[exe]" : execlike ? "[pie]" : "[dso]";
+    name = e_type == ET_EXEC ? "[exe]" : execlike ? "[pie]" : "[dso]";
 
   void *soname = NULL;
   size_t soname_size = 0;
@@ -716,7 +719,7 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 	      final_read (offset, vaddr + bias, filesz);
 	  }
 
-	  if (ehdr.e32.e_ident[EI_CLASS] == ELFCLASS32)
+	  if (ei_class == ELFCLASS32)
 	    for (uint_fast16_t i = 0; i < phnum; ++i)
 	      read_phdr (phdrs.p32[i].p_type, phdrs.p32[i].p_vaddr,
 			 phdrs.p32[i].p_offset, phdrs.p32[i].p_filesz);

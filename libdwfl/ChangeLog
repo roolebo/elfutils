@@ -1,3 +1,19 @@
+2014-09-26  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	Support NT_FILE for locating files.
+	* core-file.c (dwfl_core_file_report): New variables note_file and
+	note_file_size, set them and pass them to dwfl_segment_report_module.
+	* dwfl_segment_report_module.c: Include common.h and fcntl.h.
+	(buf_has_data, buf_read_ulong, handle_file_note): New functions.
+	(invalid_elf): New function from code of dwfl_segment_report_module.
+	(dwfl_segment_report_module): Add parameters note_file and
+	note_file_size.  New variables elf and fd, clean them up in finish.
+	Move some code to invalid_elf.  Call handle_file_note, if it found
+	a name verify the file by invalid_elf.  Protect elf and fd against
+	cleanup by finish if we found the file for new Dwfl_Module.
+	* libdwflP.h (dwfl_segment_report_module): Add parameters note_file and
+	note_file_size.
+
 2014-09-23  Mark Wielaard  <mjw@redhat.com>
 
 	* dwfl_segment_report_module.c (dwfl_segment_report_module):

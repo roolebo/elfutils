@@ -660,6 +660,8 @@ extern int dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 				       void *memory_callback_arg,
 				       Dwfl_Module_Callback *read_eagerly,
 				       void *read_eagerly_arg,
+				       const void *note_file,
+				       size_t note_file_size,
 				       const struct r_debug_info *r_debug_info);
 
 /* Report a module for entry in the dynamic linker's struct link_map list.

@@ -1,3 +1,15 @@
+2014-09-26  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	Support NT_FILE for locating files.
+	* Makefile.am (TESTS): Add run-linkmap-cut.sh.
+	(EXTRA_DIST): Add run-linkmap-cut.sh, linkmap-cut-lib.so.bz2,
+	linkmap-cut.bz2 and linkmap-cut.core.bz2 .
+	* linkmap-cut-lib.so.bz2: New file.
+	* linkmap-cut.bz2: New file.
+	* linkmap-cut.core.bz2: New file.
+	* run-linkmap-cut.sh: New file.
+	* run-unstrip-n.sh: Update its expected output.
+
 2014-08-28  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* Makefile.am (check_PROGRAMS): Add deleted and deleted-lib.so.

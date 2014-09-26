@@ -451,7 +451,9 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const char *executable)
   /* Next, we should follow the chain from DT_DEBUG.  */
 
   const void *auxv = NULL;
+  const void *note_file = NULL;
   size_t auxv_size = 0;
+  size_t note_file_size = 0;
   if (likely (notes_phdr.p_type == PT_NOTE))
     {
       /* PT_NOTE -> NT_AUXV -> AT_PHDR -> PT_DYNAMIC -> DT_DEBUG */
@@ -468,13 +470,19 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const char *executable)
 	  size_t desc_pos;
 	  while ((pos = gelf_getnote (notes, pos, &nhdr,
 				      &name_pos, &desc_pos)) > 0)
-	    if (nhdr.n_type == NT_AUXV
-		&& nhdr.n_namesz == sizeof "CORE"
+	    if (nhdr.n_namesz == sizeof "CORE"
 		&& !memcmp (notes->d_buf + name_pos, "CORE", sizeof "CORE"))
 	      {
-		auxv = notes->d_buf + desc_pos;
-		auxv_size = nhdr.n_descsz;
-		break;
+		if (nhdr.n_type == NT_AUXV)
+		  {
+		    auxv = notes->d_buf + desc_pos;
+		    auxv_size = nhdr.n_descsz;
+		  }
+		if (nhdr.n_type == NT_FILE)
+		  {
+		    note_file = notes->d_buf + desc_pos;
+		    note_file_size = nhdr.n_descsz;
+		  }
 	      }
 	}
     }
@@ -498,6 +506,7 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const char *executable)
       int seg = dwfl_segment_report_module (dwfl, ndx, NULL,
 					    &dwfl_elf_phdr_memory_callback, elf,
 					    core_file_read_eagerly, elf,
+					    note_file, note_file_size,
 					    &r_debug_info);
       if (unlikely (seg < 0))
 	{

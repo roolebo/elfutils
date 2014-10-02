@@ -1,3 +1,9 @@
+2014-10-02  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_aggregate_size.c (aggregate_size): Return CU address_size
+	for sizeless DW_TAG_pointer_type, DW_TAG_reference_type or
+	DW_TAG_rvalue_reference_type.
+
 2014-09-12  Petr Machata  <pmachata@redhat.com>
 
 	* memory-access.h (read_ubyte_unaligned_inc): Allow only 4- and

@@ -1,3 +1,15 @@
+2014-10-02  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (check_PROGRAMS): Add aggregate_size.c.
+	(TESTS): Add run-aggregate-size.sh.
+	(EXTRA_DIST): Add run-aggregate-size.sh, testfile-sizes1.o.bz2
+	and testfile-sizes2.o.bz2.
+	(aggregate_size_LDADD): New variable.
+	* aggregate_size.c: New file.
+	* run-aggregate-size.sh: New test.
+	* testfile-sizes1.o.bz2: New test file.
+	* testfile-sizes2.o.bz2: Likewise.
+
 2014-09-26  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	Support NT_FILE for locating files.

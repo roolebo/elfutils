@@ -1,5 +1,5 @@
 /* Compute size of an aggregate type from DWARF.
-   Copyright (C) 2010 Red Hat, Inc.
+   Copyright (C) 2010, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -205,6 +205,14 @@ aggregate_size (Dwarf_Die *die, Dwarf_Word *size, Dwarf_Die *type_mem)
 
     case DW_TAG_array_type:
       return array_size (die, size, &attr_mem, type_mem);
+
+    /* Assume references and pointers have pointer size if not given an
+       explicit DW_AT_byte_size.  */
+    case DW_TAG_pointer_type:
+    case DW_TAG_reference_type:
+    case DW_TAG_rvalue_reference_type:
+      *size = die->cu->address_size;
+      return 0;
     }
 
   /* Most types must give their size directly.  */

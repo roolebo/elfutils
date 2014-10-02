@@ -19,10 +19,18 @@
 
 tempfiles deleted deleted-lib.so
 cp -p ${abs_builddir}/deleted ${abs_builddir}/deleted-lib.so .
+
+# We don't want to run the deleted process under valgrind then
+# stack will see the valgrind process backtrace.
+OLD_VALGRIND_CMD="$VALGRIND_CMD"
+unset VALGRIND_CMD
+
 pid=$(testrun ${abs_builddir}/deleted)
 sleep 1
 rm -f deleted deleted-lib.so
 tempfiles bt
+
+set VALGRIND_CMD="$OLD_VALGRIND_CMD"
 # It may have non-zero exit code with:
 # .../elfutils/src/stack: dwfl_thread_getframes tid 26376 at 0x4006c8 in .../elfutils/tests/deleted: no matching address range
 testrun ${abs_top_builddir}/src/stack -p $pid >bt || true

@@ -1,5 +1,9 @@
 2014-10-02  Mark Wielaard  <mjw@redhat.com>
 
+	* run-deleted.sh: Unset VALGRIND_CMD before running deleted.
+
+2014-10-02  Mark Wielaard  <mjw@redhat.com>
+
 	* Makefile.am (check_PROGRAMS): Add aggregate_size.c.
 	(TESTS): Add run-aggregate-size.sh.
 	(EXTRA_DIST): Add run-aggregate-size.sh, testfile-sizes1.o.bz2

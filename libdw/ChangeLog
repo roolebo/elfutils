@@ -1,3 +1,7 @@
+2014-10-05  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf.h: Add DW_AT_GNU_deleted.
+
 2014-10-02  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_aggregate_size.c (aggregate_size): Return CU address_size

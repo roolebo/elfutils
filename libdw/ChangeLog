@@ -1,3 +1,13 @@
+2014-10-06  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (libdw_a_SOURCES): Add dwarf_peel_type.c.
+	* dwarf_aggregate_size.c (get_type): Use dwarf_peel_type.
+	(aggregate_size): Likewise. Add old and new version.
+	* dwarf_peel_type.c: New file.
+	* libdw.h (dwarf_peel_type): New function declaration.
+	* libdwP.h (dwarf_peel_type): New internal declaration.
+	* libdw.map (ELFUTILS_0.161): New section.
+
 2014-10-15  Petr Machata  <pmachata@redhat.com>
 
 	* libdwP.h (struct Dwarf_Files_s.cu): Drop field.

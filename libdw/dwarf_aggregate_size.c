@@ -37,8 +37,13 @@
 static Dwarf_Die *
 get_type (Dwarf_Die *die, Dwarf_Attribute *attr_mem, Dwarf_Die *type_mem)
 {
-  return INTUSE(dwarf_formref_die)
+  Dwarf_Die *type = INTUSE(dwarf_formref_die)
     (INTUSE(dwarf_attr_integrate) (die, DW_AT_type, attr_mem), type_mem);
+
+  if (INTUSE(dwarf_peel_type) (type, type) != 0)
+    return NULL;
+
+  return type;
 }
 
 static int
@@ -198,7 +203,6 @@ aggregate_size (Dwarf_Die *die, Dwarf_Word *size, Dwarf_Die *type_mem)
 
   switch (INTUSE(dwarf_tag) (die))
     {
-    case DW_TAG_typedef:
     case DW_TAG_subrange_type:
       return aggregate_size (get_type (die, &attr_mem, type_mem),
 			     size, type_mem); /* Tail call.  */
@@ -225,6 +229,12 @@ dwarf_aggregate_size (die, size)
      Dwarf_Word *size;
 {
   Dwarf_Die type_mem;
+
+  if (INTUSE (dwarf_peel_type) (die, die) != 0)
+    return -1;
+
   return aggregate_size (die, size, &type_mem);
 }
 INTDEF (dwarf_aggregate_size)
+OLD_VERSION (dwarf_aggregate_size, ELFUTILS_0.144)
+NEW_VERSION (dwarf_aggregate_size, ELFUTILS_0.161)

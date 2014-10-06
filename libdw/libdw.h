@@ -398,6 +398,24 @@ extern int dwarf_child (Dwarf_Die *die, Dwarf_Die *result)
 extern int dwarf_siblingof (Dwarf_Die *die, Dwarf_Die *result)
      __nonnull_attribute__ (2);
 
+/* For type aliases and qualifier type DIEs follow the DW_AT_type
+   attribute (recursively) and return the underlying type Dwarf_Die.
+   Returns 0 when RESULT contains a Dwarf_Die (possibly equal to the
+   given DIE) that isn't a type alias or qualifier type.  Returns 1
+   when RESULT contains a type alias or qualifier Dwarf_Die that
+   couldn't be peeled further (it doesn't have a DW_TAG_type
+   attribute).  Returns -1 when an error occured.
+
+   The current DWARF specification defines one type alias tag
+   (DW_TAG_typedef) and three qualifier type tags (DW_TAG_const_type,
+   DW_TAG_volatile_type, DW_TAG_restrict_type).  A future version of
+   this function might peel other alias or qualifier type tags if a
+   future DWARF version or GNU extension defines other type aliases or
+   qualifier type tags that don't modify or change the structural
+   layout of the underlying type.  */
+extern int dwarf_peel_type (Dwarf_Die *die, Dwarf_Die *result)
+    __nonnull_attribute__ (2);
+
 /* Check whether the DIE has children.  */
 extern int dwarf_haschildren (Dwarf_Die *die) __nonnull_attribute__ (1);
 

@@ -275,7 +275,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-readelf-zdebug.sh testfile-debug.bz2 testfile-zdebug.bz2 \
 	     run-deleted.sh run-linkmap-cut.sh linkmap-cut-lib.so.bz2 \
 	     linkmap-cut.bz2 linkmap-cut.core.bz2 \
-	     run-aggregate-size.sh testfile-sizes1.o.bz2 testfile-sizes2.o.bz2
+	     run-aggregate-size.sh testfile-sizes1.o.bz2 testfile-sizes2.o.bz2 \
+	     testfile-sizes3.o.bz2
 
 if USE_VALGRIND
 valgrind_cmd='valgrind -q --error-exitcode=1 --run-libc-freeres=no'

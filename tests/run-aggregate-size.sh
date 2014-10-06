@@ -38,7 +38,31 @@
 # gcc -g -c -o testfile-sizes1.o sizes.c
 # clang -g -c -o testfile-sizes2.o sizes.c
 
-testfiles testfile-sizes1.o testfile-sizes2.o
+# const char c;
+# volatile int i;
+# const volatile long l;
+#
+# void * restrict v;
+#
+# struct s
+# {
+#   const char *a;
+#   volatile int i;
+# } s;
+#
+# const char ca[16];
+# volatile int ia[32];
+# const volatile void * const volatile restrict va[64];
+# struct s sa[8];
+#
+# typedef const int foo;
+# typedef volatile foo bar;
+# foo f;
+# bar b;
+#
+# gcc -std=c99 -g -c -o testfile-sizes3.o sizes.c
+
+testfiles testfile-sizes1.o testfile-sizes2.o testfile-sizes3.o
 
 testrun_compare ${abs_builddir}/aggregate_size -e testfile-sizes1.o <<\EOF
 c size 1
@@ -62,6 +86,20 @@ ca size 16
 ia size 128
 va size 512
 sa size 128
+EOF
+
+testrun_compare ${abs_builddir}/aggregate_size -e testfile-sizes3.o <<\EOF
+c size 1
+i size 4
+l size 8
+v size 8
+s size 16
+ca size 16
+ia size 128
+va size 512
+sa size 128
+f size 4
+b size 4
 EOF
 
 exit 0

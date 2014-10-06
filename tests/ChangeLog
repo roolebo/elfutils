@@ -1,3 +1,9 @@
+2014-10-06  Mark Wielaard  <mjw@redhat.com>
+
+	* run-aggregate-size.sh: Add testfile-sizes3.o test case.
+	* testfile-sizes3.o.bz2: New test file.
+	* Makefile.am (EXTRA_DIST): Add testfile-sizes3.o.bz2.
+
 2014-10-02  Mark Wielaard  <mjw@redhat.com>
 
 	* run-deleted.sh: Unset VALGRIND_CMD before running deleted.

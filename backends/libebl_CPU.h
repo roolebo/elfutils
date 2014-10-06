@@ -53,23 +53,6 @@ extern bool (*generic_debugscn_p) (const char *) attribute_hidden;
      if (_die == NULL) return -1; \
      dwarf_tag (_die); })
 
-/* Follow typedefs and qualifiers to get to the actual type.  */
-static inline int
-dwarf_peel_type (Dwarf_Die *typediep, Dwarf_Attribute *attrp)
-{
-  int tag = DWARF_TAG_OR_RETURN (typediep);
-  while (tag == DW_TAG_typedef
-	 || tag == DW_TAG_const_type || tag == DW_TAG_volatile_type
-	 || tag == DW_TAG_restrict_type)
-    {
-      attrp = dwarf_attr_integrate (typediep, DW_AT_type, attrp);
-      typediep = dwarf_formref_die (attrp, typediep);
-      tag = DWARF_TAG_OR_RETURN (typediep);
-    }
-
-  return tag;
-}
-
 /* Get a type die corresponding to DIE.  Peel CV qualifiers off
    it.  */
 static inline int
@@ -84,7 +67,10 @@ dwarf_peeled_die_type (Dwarf_Die *die, Dwarf_Die *result)
   if (dwarf_formref_die (attr, result) == NULL)
     return -1;
 
-  return dwarf_peel_type (result, attr);
+  if (dwarf_peel_type (result, result) != 0)
+    return -1;
+
+  return DWARF_TAG_OR_RETURN (result);
 }
 
 #endif	/* libebl_CPU.h */

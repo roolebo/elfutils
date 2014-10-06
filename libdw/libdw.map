@@ -307,3 +307,13 @@ ELFUTILS_0.160 {
     dwarf_cu_getdwarf;
     dwarf_cu_die;
 } ELFUTILS_0.159;
+
+ELFUTILS_0.161 {
+  global:
+    dwarf_peel_type;
+
+    # Replaced ELFUTILS_0.144 version.  Both versions point to the
+    # same implementation, but users of the new symbol version can
+    # presume that it uses dwarf_peel_type.
+    dwarf_aggregate_size;
+} ELFUTILS_0.160;

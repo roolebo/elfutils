@@ -209,7 +209,6 @@ struct Dwarf_Abbrev
 /* Files in line information records.  */
 struct Dwarf_Files_s
   {
-    struct Dwarf_CU *cu;
     unsigned int ndirs;
     unsigned int nfiles;
     struct Dwarf_Fileinfo_s

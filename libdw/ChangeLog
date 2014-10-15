@@ -1,3 +1,8 @@
+2014-10-15  Petr Machata  <pmachata@redhat.com>
+
+	* libdwP.h (struct Dwarf_Files_s.cu): Drop field.
+	* dwarf_getsrclines.c (dwarf_getsrclines): Don't set it.
+
 2014-10-05  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf.h: Add DW_AT_GNU_deleted.

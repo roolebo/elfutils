@@ -1,3 +1,10 @@
+2014-09-10  Petr Machata  <pmachata@redhat.com>
+
+	* dwarf-getmacros.c: Update to use the new macro iteration
+	interfaces.
+	* run-dwarf-getmacros.sh: Adjust, add a test that uses
+	testfile-macros.
+
 2014-10-06  Mark Wielaard  <mjw@redhat.com>
 
 	* run-aggregate-size.sh: Add testfile-sizes3.o test case.

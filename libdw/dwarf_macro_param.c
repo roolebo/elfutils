@@ -1,7 +1,6 @@
-/* Return first macro parameter.
-   Copyright (C) 2005, 2014 Red Hat, Inc.
+/* Return a given parameter of a macro.
+   Copyright (C) 2014 Red Hat, Inc.
    This file is part of elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
    This file is free software; you can redistribute it and/or modify
    it under the terms of either
@@ -33,16 +32,15 @@
 
 #include "libdwP.h"
 
-
 int
-dwarf_macro_param1 (Dwarf_Macro *macro, Dwarf_Word *paramp)
+dwarf_macro_param (Dwarf_Macro *macro, size_t idx, Dwarf_Attribute *ret)
 {
   if (macro == NULL)
     return -1;
 
-  Dwarf_Attribute param;
-  if (dwarf_macro_param (macro, 0, &param) != 0)
+  if (idx >= libdw_macro_nforms (macro))
     return -1;
 
-  return dwarf_formudata (&param, paramp);
+  *ret = macro->attributes[idx];
+  return 0;
 }

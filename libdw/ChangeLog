@@ -1,3 +1,42 @@
+2014-09-10  Petr Machata  <pmachata@redhat.com>
+
+	* dwarf_macro_getparamcnt.c: New file.
+	* dwarf_macro_param.c: New file.
+	* dwarf_macro_getsrcfiles.c: New file.
+	* Makefile.am (libdw_a_SOURCES): Add the new files.
+	* libdwP.h (struct files_lines_s): New structure.
+	(DWARF_E_INVALID_OPCODE): New enumerator.
+	(struct Dwarf): New fields macro_ops, files_lines.
+	(Dwarf_Macro_Op_Proto, Dwarf_Macro_Op_Table): New structures for
+	keeping macro opcode prototypes in.
+	(Dwarf_Macro_s): Redefine from scratch.
+	(__libdw_getsrclines, __libdw_getcompdir, libdw_macro_nforms): New
+	internal interfaces.
+	* dwarf_error.c (errmsgs): Add a message for
+	DWARF_E_INVALID_OPCODE.
+	* dwarf_end.c (dwarf_end): Destroy struct Dwarf.macro_ops and
+	files_lines.
+	* libdw.h (dwarf_getmacros_off, dwarf_macro_getparamcnt)
+	(dwarf_macro_getsrcfiles, dwarf_macro_param): New public
+	interfaces.
+	* dwarf_getmacros.c (dwarf_getmacros_off): New function,
+	(get_offset_from, macro_op_compare, build_table)
+	(init_macinfo_table, get_macinfo_table, get_table_for_offset)
+	(cache_op_table, read_macros, gnu_macros_getmacros_off)
+	(macro_info_getmacros_off, do_dwarf_getmacros_die): New helper
+	functions.
+	(dwarf_getmacros): Adjust to dispatch to the new interfaces.
+	* dwarf_getsrclines.c (read_srclines): New function with guts
+	taken from dwarf_getsrclines.
+	(__libdw_getsrclines): Likewise.
+	(__libdw_getcompdir, files_lines_compare): New functions.
+	(dwarf_getsrclines): Make it dispatch to the new interfaces.
+	* dwarf_macro_param1.c (dwarf_macro_param1): Adjust to dispatch to
+	the new interfaces.
+	* dwarf_macro_param2.c (dwarf_macro_param2): Likewise.
+	* libdw.map (ELFUTILS_0.161): New. Add dwarf_getmacros_off,
+	dwarf_macro_getsrcfiles, dwarf_macro_getparamcnt, dwarf_macro_param.
+
 2014-10-06  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (libdw_a_SOURCES): Add dwarf_peel_type.c.

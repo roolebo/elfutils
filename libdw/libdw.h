@@ -844,25 +844,87 @@ extern int dwarf_func_inline_instances (Dwarf_Die *func,
 extern int dwarf_entry_breakpoints (Dwarf_Die *die, Dwarf_Addr **bkpts);
 
 
-/* Call callback function for each of the macro information entry for
-   the CU.  */
+/* Iterate through the macro unit referenced by CUDIE and call
+   CALLBACK for each macro information entry.  Keeps iterating while
+   CALLBACK returns DWARF_CB_OK.  If the callback returns
+   DWARF_CB_ABORT, it stops iterating and returns a continuation
+   token, which can be used to restart the iteration at the point
+   where it ended.  A TOKEN of 0 starts the iteration.  Returns -1 for
+   errors or 0 if there are no more macro entries.
+
+   Note that the Dwarf_Macro pointer passed to the callback is only
+   valid for the duration of the callback invocation.
+
+   Note that this interface will refuse to serve opcode 0xff from
+   .debug_macro sections.  Such opcode is considered invalid and will
+   cause dwarf_getmacros to return with error.  Note that this should
+   be no limitation as of now, as DW_MACRO_GNU_* domain doesn't
+   allocate 0xff.  It is however a theoretical possibility with future
+   Dwarf standards.  */
 extern ptrdiff_t dwarf_getmacros (Dwarf_Die *cudie,
 				  int (*callback) (Dwarf_Macro *, void *),
-				  void *arg, ptrdiff_t offset)
+				  void *arg, ptrdiff_t token)
      __nonnull_attribute__ (2);
 
-/* Return macro opcode.  */
+/* This is similar in operation to dwarf_getmacros, but selects the
+   unit to iterate through by offset instead of by CU, and always
+   iterates .debug_macro.  This can be used for handling
+   DW_MACRO_GNU_transparent_include's or similar opcodes.
+
+   It is not appropriate to obtain macro unit offset by hand from a CU
+   DIE and then request iteration through this interface.  The reason
+   for this is that if a dwarf_macro_getsrcfiles is later called,
+   there would be no way to figure out what DW_AT_comp_dir was present
+   on the CU DIE, and file names referenced in either the macro unit
+   itself, or the .debug_line unit that it references, might be wrong.
+   Use dwarf_getmacro.  */
+extern ptrdiff_t dwarf_getmacros_off (Dwarf *dbg, Dwarf_Off macoff,
+				      int (*callback) (Dwarf_Macro *, void *),
+				      void *arg, ptrdiff_t token)
+  __nonnull_attribute__ (3);
+
+/* Get the source files used by the macro entry.  You shouldn't assume
+   that Dwarf_Files references will remain valid after MACRO becomes
+   invalid.  (Which is to say it's only valid within the
+   dwarf_getmacros* callback.)  Returns 0 for success or a negative
+   value in case of an error.  */
+extern int dwarf_macro_getsrcfiles (Dwarf *dbg, Dwarf_Macro *macro,
+				    Dwarf_Files **files, size_t *nfiles)
+  __nonnull_attribute__ (2, 3, 4);
+
+/* Return macro opcode.  That's a constant that can be either from
+   DW_MACINFO_* domain or DW_MACRO_GNU_* domain.  The two domains have
+   compatible values, so it's OK to use either of them for
+   comparisons.  The only differences is 0xff, which currently is
+   never served from .debug_macro, and can thus be safely assumed to
+   mean DW_MACINFO_vendor_ext.  */
 extern int dwarf_macro_opcode (Dwarf_Macro *macro, unsigned int *opcodep)
      __nonnull_attribute__ (2);
 
-/* Return first macro parameter.  */
+/* Get number of parameters of MACRO and store it to *PARAMCNTP.  */
+extern int dwarf_macro_getparamcnt (Dwarf_Macro *macro, size_t *paramcntp);
+
+/* Get IDX-th parameter of MACRO (numbered from zero), and stores it
+   to *ATTRIBUTE.  Returns 0 on success or -1 for errors.
+
+   After a successful call, you can query ATTRIBUTE by dwarf_whatform
+   to determine which of the dwarf_formX calls to make to get actual
+   value out of ATTRIBUTE.  Note that calling dwarf_whatattr is not
+   meaningful for pseudo-attributes formed this way.  */
+extern int dwarf_macro_param (Dwarf_Macro *macro, size_t idx,
+			      Dwarf_Attribute *attribute);
+
+/* Return macro parameter with index 0.  This will return -1 if the
+   parameter is not an integral value.  Use dwarf_macro_param for more
+   general access.  */
 extern int dwarf_macro_param1 (Dwarf_Macro *macro, Dwarf_Word *paramp)
      __nonnull_attribute__ (2);
 
-/* Return second macro parameter.  */
+/* Return macro parameter with index 1.  This will return -1 if the
+   parameter is not an integral or string value.  Use
+   dwarf_macro_param for more general access.  */
 extern int dwarf_macro_param2 (Dwarf_Macro *macro, Dwarf_Word *paramp,
 			       const char **strp);
-
 
 /* Compute what's known about a call frame when the PC is at ADDRESS.
    Returns 0 for success or -1 for errors.

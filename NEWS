@@ -2,6 +2,13 @@ Version 0.161
 
 libdw: New function dwarf_peel_type. dwarf_aggregate_size now uses
        dwarf_peel_type to also provide the sizes of qualified types.
+       dwarf_getmacros will now serve either of .debug_macro and
+       .debug_macinfo transparently.  New interfaces
+       dwarf_getmacros_off, dwarf_macro_getsrcfiles,
+       dwarf_macro_getparamcnt, and dwarf_macro_param are available
+       for more generalized inspection of macros and their parameters.
+
+XXX: Fix serving of 0xff based on what ends up in Dwarf 5.
 
 Version 0.160
 

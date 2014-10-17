@@ -59,6 +59,14 @@ struct loc_block_s
   size_t length;
 };
 
+/* Already decoded .debug_line units.  */
+struct files_lines_s
+{
+  Dwarf_Off debug_line_offset;
+  Dwarf_Files *files;
+  Dwarf_Lines *lines;
+};
+
 /* Valid indeces for the section data.  */
 enum
   {
@@ -118,7 +126,8 @@ enum
   DWARF_E_INVALID_OFFSET,
   DWARF_E_NO_DEBUG_RANGES,
   DWARF_E_INVALID_CFI,
-  DWARF_E_NO_ALT_DEBUGLINK
+  DWARF_E_NO_ALT_DEBUGLINK,
+  DWARF_E_INVALID_OPCODE,
 };
 
 
@@ -166,6 +175,12 @@ struct Dwarf
   void *tu_tree;
   Dwarf_Off next_tu_offset;
   Dwarf_Sig8_Hash sig8_hash;
+
+  /* Search tree for .debug_macro operator tables.  */
+  void *macro_ops;
+
+  /* Search tree for decoded .debug_line units.  */
+  void *files_lines;
 
   /* Address ranges.  */
   Dwarf_Aranges *aranges;
@@ -325,18 +340,58 @@ struct Dwarf_CU
    })									      \
 
 
-/* Macro information.  */
+/* Prototype of a single .debug_macro operator.  */
+typedef struct
+{
+  Dwarf_Word nforms;
+  unsigned char const *forms;
+} Dwarf_Macro_Op_Proto;
+
+/* Prototype table.  */
+typedef struct
+{
+  /* Offset of .debug_macro section.  */
+  Dwarf_Off offset;
+
+  /* Offset of associated .debug_line section.  */
+  Dwarf_Off line_offset;
+
+  /* The source file information.  */
+  Dwarf_Files *files;
+
+  /* If this macro unit was opened through dwarf_getmacros or
+     dwarf_getmacros_die, this caches value of DW_AT_comp_dir, if
+     present.  */
+  const char *comp_dir;
+
+  /* Header length.  */
+  Dwarf_Half header_len;
+
+  uint16_t version;
+  bool is_64bit;
+  uint8_t sec_index;	/* IDX_debug_macro or IDX_debug_macinfo.  */
+
+  /* Shows where in TABLE each opcode is defined.  Since opcode 0 is
+     never used, it stores index of opcode X in X-1'th element.  The
+     value of 0xff means not stored at all.  */
+  unsigned char opcodes[255];
+
+  /* Individual opcode prototypes.  */
+  Dwarf_Macro_Op_Proto table[];
+} Dwarf_Macro_Op_Table;
+
 struct Dwarf_Macro_s
 {
-  unsigned int opcode;
-  Dwarf_Word param1;
-  union
-  {
-    Dwarf_Word u;
-    const char *s;
-  } param2;
+  Dwarf_Macro_Op_Table *table;
+  Dwarf_Attribute *attributes;
+  uint8_t opcode;
 };
 
+static inline Dwarf_Word
+libdw_macro_nforms (Dwarf_Macro *macro)
+{
+  return macro->table->table[macro->table->opcodes[macro->opcode - 1]].nforms;
+}
 
 /* We have to include the file at this point because the inline
    functions access internals of the Dwarf structure.  */
@@ -654,6 +709,20 @@ unsigned char * __libdw_formptr (Dwarf_Attribute *attr, int sec_index,
 /* Fills in the given attribute to point at an empty location expression.  */
 void __libdw_empty_loc_attr (Dwarf_Attribute *attr, struct Dwarf_CU *cu)
   internal_function;
+
+/* Load .debug_line unit at DEBUG_LINE_OFFSET.  COMP_DIR is a value of
+   DW_AT_comp_dir or NULL if that attribute is not available.  Caches
+   the loaded unit and optionally set *LINESP and/or *FILESP (if not
+   NULL) with loaded information.  Returns 0 for success or a negative
+   value for failure.  */
+int __libdw_getsrclines (Dwarf *dbg, Dwarf_Off debug_line_offset,
+			 const char *comp_dir, unsigned address_size,
+			 Dwarf_Lines **linesp, Dwarf_Files **filesp)
+  internal_function
+  __nonnull_attribute__ (1);
+
+/* Load and return value of DW_AT_comp_dir from CUDIE.  */
+const char *__libdw_getcompdir (Dwarf_Die *cudie);
 
 
 /* Aliases to avoid PLTs.  */

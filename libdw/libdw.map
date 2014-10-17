@@ -316,4 +316,9 @@ ELFUTILS_0.161 {
     # same implementation, but users of the new symbol version can
     # presume that it uses dwarf_peel_type.
     dwarf_aggregate_size;
+
+    dwarf_getmacros_off;
+    dwarf_macro_getsrcfiles;
+    dwarf_macro_getparamcnt;
+    dwarf_macro_param;
 } ELFUTILS_0.160;

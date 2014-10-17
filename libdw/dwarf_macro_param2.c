@@ -1,5 +1,5 @@
 /* Return second macro parameter.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -40,10 +40,16 @@ dwarf_macro_param2 (Dwarf_Macro *macro, Dwarf_Word *paramp, const char **strp)
   if (macro == NULL)
     return -1;
 
-  if (paramp != NULL)
-    *paramp = macro->param2.u;
-  if (strp != NULL)
-    *strp = macro->param2.s;
+  Dwarf_Attribute param;
+  if (dwarf_macro_param (macro, 1, &param) != 0)
+    return -1;
 
-  return 0;
+  if (param.form == DW_FORM_string
+      || param.form == DW_FORM_strp)
+    {
+      *strp = dwarf_formstring (&param);
+      return 0;
+    }
+  else
+    return dwarf_formudata (&param, paramp);
 }

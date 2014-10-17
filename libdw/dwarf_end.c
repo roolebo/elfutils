@@ -93,6 +93,12 @@ dwarf_end (dwarf)
       tdestroy (dwarf->cu_tree, cu_free);
       tdestroy (dwarf->tu_tree, cu_free);
 
+      /* Search tree for macro opcode tables.  */
+      tdestroy (dwarf->macro_ops, noop_free);
+
+      /* Search tree for decoded .debug_lines units.  */
+      tdestroy (dwarf->files_lines, noop_free);
+
       struct libdw_memblock *memp = dwarf->mem_tail;
       /* The first block is allocated together with the Dwarf object.  */
       while (memp->prev != NULL)

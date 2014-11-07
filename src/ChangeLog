@@ -1,3 +1,9 @@
+2014-11-07  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (handle_sysv_hash): Sanity check section contents.
+	(handle_sysv_hash64): Likewise.
+	(handle_gnu_hash): Likewise.
+
 2014-09-14  Petr Machata  <pmachata@redhat.com>
 
 	* readelf.c (handle_relocs_rela): Typo fix, test DESTSHDR properly.

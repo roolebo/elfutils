@@ -2954,8 +2954,21 @@ handle_sysv_hash (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx)
       return;
     }
 
+  if (unlikely (data->d_size < 2 * sizeof (Elf32_Word)))
+    {
+    invalid_data:
+      error (0, 0, gettext ("invalid data in sysv.hash section %d"),
+	     (int) elf_ndxscn (scn));
+      return;
+    }
+
   Elf32_Word nbucket = ((Elf32_Word *) data->d_buf)[0];
   Elf32_Word nchain = ((Elf32_Word *) data->d_buf)[1];
+
+  uint64_t used_buf = (2ULL + nchain + nbucket) * sizeof (Elf32_Word);
+  if (used_buf > data->d_size)
+    goto invalid_data;
+
   Elf32_Word *bucket = &((Elf32_Word *) data->d_buf)[2];
   Elf32_Word *chain = &((Elf32_Word *) data->d_buf)[2 + nbucket];
 
@@ -2996,8 +3009,21 @@ handle_sysv_hash64 (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx)
       return;
     }
 
+  if (unlikely (data->d_size < 2 * sizeof (Elf64_Xword)))
+    {
+    invalid_data:
+      error (0, 0, gettext ("invalid data in sysv.hash64 section %d"),
+	     (int) elf_ndxscn (scn));
+      return;
+    }
+
   Elf64_Xword nbucket = ((Elf64_Xword *) data->d_buf)[0];
   Elf64_Xword nchain = ((Elf64_Xword *) data->d_buf)[1];
+
+  uint64_t used_buf = (2ULL + nchain + nbucket) * sizeof (Elf64_Xword);
+  if (used_buf > data->d_size)
+    goto invalid_data;
+
   Elf64_Xword *bucket = &((Elf64_Xword *) data->d_buf)[2];
   Elf64_Xword *chain = &((Elf64_Xword *) data->d_buf)[2 + nbucket];
 
@@ -3037,17 +3063,36 @@ handle_gnu_hash (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx)
       return;
     }
 
+  if (unlikely (data->d_size < 4 * sizeof (Elf32_Word)))
+    {
+    invalid_data:
+      error (0, 0, gettext ("invalid data in gnu.hash section %d"),
+	     (int) elf_ndxscn (scn));
+      return;
+    }
+
   Elf32_Word nbucket = ((Elf32_Word *) data->d_buf)[0];
   Elf32_Word symbias = ((Elf32_Word *) data->d_buf)[1];
 
   /* Next comes the size of the bitmap.  It's measured in words for
      the architecture.  It's 32 bits for 32 bit archs, and 64 bits for
-     64 bit archs.  */
+     64 bit archs.  There is always a bloom filter present, so zero is
+     an invalid value.  */
   Elf32_Word bitmask_words = ((Elf32_Word *) data->d_buf)[2];
   if (gelf_getclass (ebl->elf) == ELFCLASS64)
     bitmask_words *= 2;
 
+  if (bitmask_words == 0)
+    goto invalid_data;
+
   Elf32_Word shift = ((Elf32_Word *) data->d_buf)[3];
+
+  /* Is there still room for the sym chain?
+     Use uint64_t calculation to prevent 32bit overlow.  */
+  uint64_t used_buf = (4ULL + bitmask_words + nbucket) * sizeof (Elf32_Word);
+  uint32_t max_nsyms = (data->d_size - used_buf) / sizeof (Elf32_Word);
+  if (used_buf > data->d_size)
+    goto invalid_data;
 
   uint32_t *lengths = (uint32_t *) xcalloc (nbucket, sizeof (uint32_t));
 
@@ -3068,6 +3113,8 @@ handle_gnu_hash (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx)
 	    ++nsyms;
 	    if (maxlength < ++lengths[cnt])
 	      ++maxlength;
+	    if (inner > max_nsyms)
+	      goto invalid_data;
 	  }
 	while ((chain[inner++] & 1) == 0);
       }

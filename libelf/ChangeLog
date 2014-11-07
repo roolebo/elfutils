@@ -1,3 +1,9 @@
+2014-11-07  Mark Wielaard  <mjw@redhat.com>
+
+	* elf_begin.c (file_read_elf): Correct sh_size check.
+	* elf_getdata.c (__libelf_set_rawdata_wrlock): Check for unsigned
+	overflow.
+
 2014-09-10  Petr Machata  <pmachata@redhat.com>
 
 	* elf_begin (read_unmmaped_file): Call __libelf_seterrno if the

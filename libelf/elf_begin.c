@@ -337,8 +337,8 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 	      elf->state.elf32.scns.data[cnt].shdr.e32 =
 		&elf->state.elf32.shdr[cnt];
 	      if (likely (elf->state.elf32.shdr[cnt].sh_offset < maxsize)
-		  && likely (maxsize - elf->state.elf32.shdr[cnt].sh_offset
-			     <= elf->state.elf32.shdr[cnt].sh_size))
+		  && likely (elf->state.elf32.shdr[cnt].sh_size
+			     <= maxsize - elf->state.elf32.shdr[cnt].sh_offset))
 		elf->state.elf32.scns.data[cnt].rawdata_base =
 		  elf->state.elf32.scns.data[cnt].data_base =
 		  ((char *) map_address + offset
@@ -428,8 +428,8 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 	      elf->state.elf64.scns.data[cnt].shdr.e64 =
 		&elf->state.elf64.shdr[cnt];
 	      if (likely (elf->state.elf64.shdr[cnt].sh_offset < maxsize)
-		  && likely (maxsize - elf->state.elf64.shdr[cnt].sh_offset
-			     <= elf->state.elf64.shdr[cnt].sh_size))
+		  && likely (elf->state.elf64.shdr[cnt].sh_size
+			     <= maxsize - elf->state.elf64.shdr[cnt].sh_offset))
 		elf->state.elf64.scns.data[cnt].rawdata_base =
 		  elf->state.elf64.scns.data[cnt].data_base =
 		  ((char *) map_address + offset

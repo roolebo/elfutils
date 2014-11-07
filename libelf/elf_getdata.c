@@ -243,8 +243,11 @@ __libelf_set_rawdata_wrlock (Elf_Scn *scn)
       if (elf->map_address != NULL)
 	{
 	  /* First see whether the information in the section header is
-	     valid and it does not ask for too much.  */
-	  if (unlikely (offset + size > elf->maximum_size))
+	     valid and it does not ask for too much.  Check for unsigned
+	     overflow.  */
+	  if (unlikely (offset + size > elf->maximum_size
+			|| (offset + size + elf->maximum_size
+			    < elf->maximum_size)))
 	    {
 	      /* Something is wrong.  */
 	      __libelf_seterrno (ELF_E_INVALID_SECTION_HEADER);

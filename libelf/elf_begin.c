@@ -799,7 +799,7 @@ __libelf_next_arhdr_wrlock (elf)
     }
 
   /* Copy the raw name over to a NUL terminated buffer.  */
-  *((char *) __mempcpy (elf->state.ar.raw_name, ar_hdr->ar_name, 16)) = '\0';
+  *((char *) mempcpy (elf->state.ar.raw_name, ar_hdr->ar_name, 16)) = '\0';
 
   elf_ar_hdr = &elf->state.ar.elf_ar_hdr;
 
@@ -895,7 +895,7 @@ __libelf_next_arhdr_wrlock (elf)
       const char *string = ar_hdr->FIELD;				      \
       if (ar_hdr->FIELD[sizeof (ar_hdr->FIELD) - 1] != ' ')		      \
 	{								      \
-	  *((char *) __mempcpy (buf, ar_hdr->FIELD, sizeof (ar_hdr->FIELD)))  \
+	  *((char *) mempcpy (buf, ar_hdr->FIELD, sizeof (ar_hdr->FIELD)))  \
 	    = '\0';							      \
 	  string = buf;							      \
 	}								      \

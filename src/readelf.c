@@ -2716,7 +2716,9 @@ handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 
       /* Allocate the array.  */
       vername = (const char **) alloca (nvername * sizeof (const char *));
+      memset(vername, 0, nvername * sizeof (const char *));
       filename = (const char **) alloca (nvername * sizeof (const char *));
+      memset(filename, 0, nvername * sizeof (const char *));
 
       /* Run through the data structures again and collect the strings.  */
       if (defscn != NULL)

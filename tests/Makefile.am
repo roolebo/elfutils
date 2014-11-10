@@ -50,7 +50,7 @@ check_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  test-elf_cntl_gelf_getshdr dwflsyms dwfllines \
 		  dwfl-report-elf-align varlocs backtrace backtrace-child \
 		  backtrace-data backtrace-dwarf debuglink debugaltlink \
-		  buildid deleted deleted-lib.so aggregate_size
+		  buildid deleted deleted-lib.so aggregate_size vdsosyms
 
 asm_TESTS = asm-tst1 asm-tst2 asm-tst3 asm-tst4 asm-tst5 \
 	    asm-tst6 asm-tst7 asm-tst8 asm-tst9
@@ -110,7 +110,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-backtrace-core-aarch64.sh \
 	run-backtrace-demangle.sh run-stack-d-test.sh run-stack-i-test.sh \
 	run-readelf-dwz-multi.sh run-allfcts-multi.sh run-deleted.sh \
-	run-linkmap-cut.sh run-aggregate-size.sh
+	run-linkmap-cut.sh run-aggregate-size.sh vdsosyms
 
 if !BIARCH
 export ELFUTILS_DISABLE_BIARCH = 1
@@ -415,6 +415,7 @@ deleted_LDADD = ./deleted-lib.so
 deleted_lib_so_LDFLAGS = -shared -rdynamic
 deleted_lib_so_CFLAGS = -fPIC
 aggregate_size_LDADD = $(libdw) $(libelf)
+vdsosyms_LDADD = $(libdw) $(libelf)
 
 if GCOV
 check: check-am coverage

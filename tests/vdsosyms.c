@@ -1,0 +1,101 @@
+/* Test program for getting symbol table from vdso module.
+   Copyright (C) 2014 Red Hat, Inc.
+   This file is part of elfutils.
+
+   This file is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
+
+   elfutils is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+
+#include <config.h>
+#include <assert.h>
+#include <errno.h>
+#include <error.h>
+#include <inttypes.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include ELFUTILS_HEADER(dwfl)
+
+#ifndef __linux__
+int
+main (int argc __attribute__ ((unused)), char **argv)
+{
+  printf ("Getting the vdso is unsupported.\n");
+  return 77;
+}
+#else /* __linux__ */
+static bool vdso_seen = false;
+
+static int
+module_callback (Dwfl_Module *mod, void **userdata __attribute__((unused)),
+		 const char *name, Dwarf_Addr start __attribute__((unused)),
+		 void *arg __attribute__((unused)))
+{
+  /* We can only recognize the vdso by inspecting the "magic name".  */
+  if (strncmp ("[vdso: ", name, 7) == 0)
+    {
+      int syms = dwfl_module_getsymtab (mod);
+      printf ("vdso syms: %d\n", syms);
+      if (syms < 0)
+	error (2, 0, "dwfl_module_getsymtab: %s", dwfl_errmsg (-1));
+      vdso_seen = true;
+
+      for (int i = 0; i < syms; i++)
+	{
+	  GElf_Sym sym;
+	  GElf_Addr addr;
+	  const char *sname = dwfl_module_getsym_info (mod, i, &sym, &addr,
+						       NULL, NULL, NULL);
+	  assert (sname != NULL);
+	  printf ("%d: '%s' %" PRIx64 " (%" PRIx64 ")\n",
+		  i, sname, sym.st_value, addr);
+	}
+    }
+
+  return DWARF_CB_OK;
+}
+
+int
+main (int argc __attribute__ ((unused)), char **argv __attribute__ ((unused)))
+{
+  static char *debuginfo_path;
+  static const Dwfl_Callbacks proc_callbacks =
+    {
+      .find_debuginfo = dwfl_standard_find_debuginfo,
+      .debuginfo_path = &debuginfo_path,
+
+      .find_elf = dwfl_linux_proc_find_elf,
+    };
+  Dwfl *dwfl = dwfl_begin (&proc_callbacks);
+  if (dwfl == NULL)
+    error (2, 0, "dwfl_begin: %s", dwfl_errmsg (-1));
+
+  /* Take our parent as "arbitrary" process to inspect.  */
+  pid_t pid = getppid();
+
+  int result = dwfl_linux_proc_report (dwfl, pid);
+  if (result < 0)
+    error (2, 0, "dwfl_linux_proc_report: %s", dwfl_errmsg (-1));
+  else if (result > 0)
+    error (2, result, "dwfl_linux_proc_report");
+
+  if (dwfl_report_end (dwfl, NULL, NULL) != 0)
+    error (2, 0, "dwfl_report_end: %s", dwfl_errmsg (-1));
+
+  if (dwfl_getmodules (dwfl, module_callback, NULL, 0) != 0)
+    error (1, 0, "dwfl_getmodules: %s", dwfl_errmsg (-1));
+
+  return vdso_seen ? 0 : -1;
+}
+
+#endif /* ! __linux__ */

@@ -1,3 +1,10 @@
+2014-11-10  Mark Wielaard  <mjw@redhat.com>
+
+	* vdsosyms.c: New test.
+	* Makefile.am (check_PROGRAMS): Add vdsosyms.
+	(TESTS): Likewise.
+	(vdsosyms_LDADD): New variable.
+
 2014-09-10  Petr Machata  <pmachata@redhat.com>
 
 	* dwarf-getmacros.c: Update to use the new macro iteration

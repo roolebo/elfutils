@@ -428,7 +428,7 @@ read_srclines (Dwarf *dbg,
 		 apporiate for the target machine.  We use the
 		 address size field from the CU header.  */
 	      op_index = 0;
-	      if (unlikely (lineendp - linep < address_size))
+	      if (unlikely (lineendp - linep < (uint8_t) address_size))
 		goto invalid_data;
 	      if (__libdw_read_address_inc (dbg, IDX_debug_line, &linep,
 					    address_size, &addr))
@@ -730,6 +730,7 @@ files_lines_compare (const void *p1, const void *p2)
 }
 
 int
+internal_function
 __libdw_getsrclines (Dwarf *dbg, Dwarf_Off debug_line_offset,
 		     const char *comp_dir, unsigned address_size,
 		     Dwarf_Lines **linesp, Dwarf_Files **filesp)

@@ -1,3 +1,9 @@
+2014-11-11  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_getsrclines.c (read_srclines): Do address_size comparison
+	explicitly as uint8_t.
+	(__libdw_getsrclines): Add internal_function to declaration.
+
 2014-09-10  Petr Machata  <pmachata@redhat.com>
 
 	* dwarf_macro_getparamcnt.c: New file.

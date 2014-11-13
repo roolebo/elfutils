@@ -1,3 +1,8 @@
+2014-11-13  Mark Wielaard  <mjw@redhat.com>
+
+	* elf_getdata.c (__libelf_set_rawdata_wrlock): Fix unsigned overflow
+	check.
+
 2014-11-08  Mark Wielaard  <mjw@redhat.com>
 
 	* elf_begin.c (__libelf_next_arhdr_wrlock): Use mempcpy not __mempcpy.

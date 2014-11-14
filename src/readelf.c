@@ -5332,6 +5332,10 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	  continue;
 	}
 
+      Dwarf_Word maxsize = dataend - readp;
+      if (unlikely (unit_length > maxsize))
+	goto invalid_data;
+
       unsigned int ptr_size = ehdr->e_ident[EI_CLASS] == ELFCLASS32 ? 4 : 8;
 
       ptrdiff_t start = readp - (unsigned char *) data->d_buf;
@@ -5413,7 +5417,11 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	      get_uleb128 (augmentationlen, readp);
 
 	      if (augmentationlen > (size_t) (dataend - readp))
-		error (1, 0, gettext ("invalid augmentation length"));
+		{
+		  error (0, 0, gettext ("invalid augmentation length"));
+		  readp = cieend;
+		  continue;
+		}
 
 	      const char *hdr = "Augmentation data:";
 	      const char *cp = augmentation + 1;
@@ -5560,6 +5568,13 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	    {
 	      unsigned int augmentationlen;
 	      get_uleb128 (augmentationlen, readp);
+
+	      if (augmentationlen > (size_t) (dataend - readp))
+		{
+		  error (0, 0, gettext ("invalid augmentation length"));
+		  readp = cieend;
+		  continue;
+		}
 
 	      if (augmentationlen > 0)
 		{

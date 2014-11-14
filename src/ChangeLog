@@ -1,5 +1,10 @@
 2014-11-14  Mark Wielaard  <mjw@redhat.com>
 
+	* readelf.c (print_debug_frame_section): Sanity Check CIE
+	unit_length and augmentationlen.
+
+2014-11-14  Mark Wielaard  <mjw@redhat.com>
+
 	* readelf.c (handle_versym): Check def == NULL before use.
 
 2014-11-08  Mark Wielaard  <mjw@redhat.com>

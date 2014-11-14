@@ -575,6 +575,8 @@ load_symtab (struct dwfl_file *file, struct dwfl_file **symfile,
 	switch (shdr->sh_type)
 	  {
 	  case SHT_SYMTAB:
+	    if (shdr->sh_entsize == 0)
+	      break;
 	    symtab = true;
 	    *symscn = scn;
 	    *symfile = file;
@@ -589,6 +591,8 @@ load_symtab (struct dwfl_file *file, struct dwfl_file **symfile,
 	    if (symtab)
 	      break;
 	    /* Use this if need be, but keep looking for SHT_SYMTAB.  */
+	    if (shdr->sh_entsize == 0)
+	      break;
 	    *symscn = scn;
 	    *symfile = file;
 	    *strshndx = shdr->sh_link;

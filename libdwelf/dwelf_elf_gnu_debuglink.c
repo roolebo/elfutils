@@ -60,7 +60,7 @@ dwelf_elf_gnu_debuglink (Elf *elf, GElf_Word *crc)
 
   /* Found the .gnu_debuglink section.  Extract its contents.  */
   Elf_Data *rawdata = elf_rawdata (scn, NULL);
-  if (rawdata == NULL)
+  if (rawdata == NULL || rawdata->d_buf == NULL)
     return NULL;
 
   /* The CRC comes after the zero-terminated file name,

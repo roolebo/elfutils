@@ -2744,11 +2744,14 @@ handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 	      /* Get the data at the next offset.  */
 	      GElf_Verdef defmem;
 	      GElf_Verdef *def = gelf_getverdef (defdata, offset, &defmem);
+	      if (unlikely (def == NULL))
+		break;
+
 	      GElf_Verdaux auxmem;
 	      GElf_Verdaux *aux = gelf_getverdaux (defdata,
 						   offset + def->vd_aux,
 						   &auxmem);
-	      if (unlikely (def == NULL || aux == NULL))
+	      if (unlikely (aux == NULL))
 		break;
 
 	      vername[def->vd_ndx & 0x7fff]

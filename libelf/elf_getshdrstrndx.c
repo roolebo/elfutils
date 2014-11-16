@@ -92,6 +92,13 @@ elf_getshdrstrndx (elf, dst)
 	  if (elf->class == ELFCLASS32)
 	    {
 	      size_t offset;
+	      if (unlikely (elf->state.elf32.scns.cnt == 0))
+		{
+		  /* Cannot use SHN_XINDEX without section headers.  */
+		  __libelf_seterrno (ELF_E_INVALID_SECTION_HEADER);
+		  result = -1;
+		  goto out;
+		}
 
 	      if (elf->state.elf32.scns.data[0].shdr.e32 != NULL)
 		{
@@ -146,6 +153,14 @@ elf_getshdrstrndx (elf, dst)
 	    }
 	  else
 	    {
+	      if (unlikely (elf->state.elf64.scns.cnt == 0))
+		{
+		  /* Cannot use SHN_XINDEX without section headers.  */
+		  __libelf_seterrno (ELF_E_INVALID_SECTION_HEADER);
+		  result = -1;
+		  goto out;
+		}
+
 	      if (elf->state.elf64.scns.data[0].shdr.e64 != NULL)
 		{
 		  num = elf->state.elf64.scns.data[0].shdr.e64->sh_link;

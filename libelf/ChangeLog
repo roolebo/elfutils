@@ -1,5 +1,10 @@
 2014-11-16  Mark Wielaard  <mjw@redhat.com>
 
+	* elf_getshdrstrndx.c: Check there are section headers before
+	handling SHN_XINDEX.
+
+2014-11-16  Mark Wielaard  <mjw@redhat.com>
+
 	* elf32_getphdr.c (getphdr_wrlock): Check e_phoff isn't zero.
 	Check for too many pheaders.
 	* elf_getphdrnum.c (__elf_getphdrnum_rdlock): Check section zero

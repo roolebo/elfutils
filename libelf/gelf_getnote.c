@@ -73,16 +73,21 @@ gelf_getnote (data, offset, result, name_offset, desc_offset)
       const GElf_Nhdr *n = data->d_buf + offset;
       offset += sizeof *n;
 
+      /* Include padding.  Check below for overflow.  */
       GElf_Word namesz = NOTE_ALIGN (n->n_namesz);
       GElf_Word descsz = NOTE_ALIGN (n->n_descsz);
 
-      if (unlikely (data->d_size - offset < namesz))
+      if (unlikely (offset > data->d_size
+		    || data->d_size - offset < namesz
+		    || (namesz == 0 && n->n_namesz != 0)))
 	offset = 0;
       else
 	{
 	  *name_offset = offset;
 	  offset += namesz;
-	  if (unlikely (data->d_size - offset < descsz))
+	  if (unlikely (offset > data->d_size
+			|| data->d_size - offset < descsz
+			|| (descsz == 0 && n->n_descsz != 0)))
 	    offset = 0;
 	  else
 	    {

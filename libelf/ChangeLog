@@ -1,5 +1,9 @@
 2014-11-16  Mark Wielaard  <mjw@redhat.com>
 
+	* gelf_getnote.c (gelf_getnote): Check padding overflow.
+
+2014-11-16  Mark Wielaard  <mjw@redhat.com>
+
 	* elf_getdata.c (__libelf_set_rawdata_wrlock): Declare offset, size
 	and align as Elf64_Off and Elf64_Xword not size_t.
 

@@ -1,5 +1,11 @@
 2014-11-16  Mark Wielaard  <mjw@redhat.com>
 
+	* readelf (process_elf_file): Set phnum to zero if there aren't
+	actually any pheaders.
+	(print_phdr): Check there actually is a phdr.
+
+2014-11-16  Mark Wielaard  <mjw@redhat.com>
+
 	* readelf.c (print_cfa_program): Check block len before calling
 	print_ops.
 

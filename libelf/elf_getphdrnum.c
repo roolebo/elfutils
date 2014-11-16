@@ -1,5 +1,5 @@
 /* Return number of program headers in the ELF file.
-   Copyright (C) 2010 Red Hat, Inc.
+   Copyright (C) 2010, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -62,10 +62,18 @@ __elf_getphdrnum_rdlock (elf, dst)
      /* If there are no section headers, perhaps this is really just 65536
 	written without PN_XNUM support.  Either that or it's bad data.  */
 
-     if (likely (scns->cnt > 0))
-       *dst = (elf->class == ELFCLASS32
-	       ? scns->data[0].shdr.e32->sh_info
-	       : scns->data[0].shdr.e64->sh_info);
+     if (elf->class == ELFCLASS32)
+       {
+	 if (likely (scns->cnt > 0
+		     && elf->state.elf32.scns.data[0].shdr.e32 != NULL))
+	   *dst = scns->data[0].shdr.e32->sh_info;
+       }
+     else
+       {
+	 if (likely (scns->cnt > 0
+		     && elf->state.elf64.scns.data[0].shdr.e64 != NULL))
+	   *dst = scns->data[0].shdr.e64->sh_info;
+       }
    }
 
  return 0;

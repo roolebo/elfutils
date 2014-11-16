@@ -76,15 +76,17 @@ __elfw2(LIBELFBITS,getphdr_wrlock) (elf)
       size_t phnum;
       if (__elf_getphdrnum_rdlock (elf, &phnum) != 0)
 	goto out;
-      if (phnum == 0)
+      if (phnum == 0 || ehdr->e_phoff == 0)
 	{
 	  __libelf_seterrno (ELF_E_NO_PHDR);
 	  goto out;
 	}
 
+      /* Check this doesn't overflow.  */
       size_t size = phnum * sizeof (ElfW2(LIBELFBITS,Phdr));
 
-      if (ehdr->e_phoff > elf->maximum_size
+      if (phnum > SIZE_MAX / sizeof (ElfW2(LIBELFBITS,Phdr))
+	  || ehdr->e_phoff > elf->maximum_size
 	  || elf->maximum_size - ehdr->e_phoff < size)
 	{
 	  __libelf_seterrno (ELF_E_INVALID_DATA);

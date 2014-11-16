@@ -835,6 +835,11 @@ process_elf_file (Dwfl_Module *dwflmod, int fd)
 	   gettext ("cannot determine number of program headers: %s"),
 	   elf_errmsg (-1));
 
+  /* If there isn't actually a program header then set phnum to zero.
+     Don't do any extra work.  gelf_getphdr will always return NULL.  */
+  if (ehdr->e_phoff == 0)
+    phnum = 0;
+
   /* For an ET_REL file, libdwfl has adjusted the in-core shdrs
      and may have applied relocation to some sections.
      So we need to get a fresh Elf handle on the file to display those.  */
@@ -1157,7 +1162,7 @@ There are %d section headers, starting at offset %#" PRIx64 ":\n\
 static void
 print_phdr (Ebl *ebl, GElf_Ehdr *ehdr)
 {
-  if (ehdr->e_phnum == 0)
+  if (ehdr->e_phnum == 0 || ehdr->e_phoff == 0)
     /* No program header, this is OK in relocatable objects.  */
     return;
 

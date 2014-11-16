@@ -4980,6 +4980,12 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    // XXX overflow check
 	    get_uleb128 (op1, readp);	/* Length of DW_FORM_block.  */
 	    printf ("     def_cfa_expression %" PRIu64 "\n", op1);
+	    if ((uint64_t) (endp - readp) < op1)
+	      {
+	    invalid:
+	        fputs (gettext ("         <INVALID DATA>\n"), stdout);
+		return;
+	      }
 	    print_ops (dwflmod, dbg, 10, 10, version, ptr_size, 0, NULL,
 		       op1, readp);
 	    readp += op1;
@@ -4990,6 +4996,8 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    get_uleb128 (op2, readp);	/* Length of DW_FORM_block.  */
 	    printf ("     expression r%" PRIu64 " (%s) \n",
 		    op1, regname (op1));
+	    if ((uint64_t) (endp - readp) < op1)
+	      goto invalid;
 	    print_ops (dwflmod, dbg, 10, 10, version, ptr_size, 0, NULL,
 		       op2, readp);
 	    readp += op2;
@@ -5034,6 +5042,8 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    get_uleb128 (op2, readp);	/* Length of DW_FORM_block.  */
 	    printf ("     val_expression r%" PRIu64 " (%s)\n",
 		    op1, regname (op1));
+	    if ((uint64_t) (endp - readp) < op2)
+	      goto invalid;
 	    print_ops (dwflmod, dbg, 10, 10, version, ptr_size, 0,
 		       NULL, op2, readp);
 	    readp += op2;

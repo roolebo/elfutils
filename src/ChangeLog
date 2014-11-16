@@ -1,3 +1,8 @@
+2014-11-16  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_cfa_program): Check block len before calling
+	print_ops.
+
 2014-11-14  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (print_debug_frame_section): Sanity Check CIE

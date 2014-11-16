@@ -170,9 +170,9 @@ int
 internal_function
 __libelf_set_rawdata_wrlock (Elf_Scn *scn)
 {
-  size_t offset;
-  size_t size;
-  size_t align;
+  Elf64_Off offset;
+  Elf64_Xword size;
+  Elf64_Xword align;
   int type;
   Elf *elf = scn->elf;
 

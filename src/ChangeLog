@@ -1,3 +1,8 @@
+2014-11-17  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_debug_frame_section): Warn if ptr_size is not 4
+	or 8 instead of just calling print_cfa_program.
+
 2014-11-16  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf (process_elf_file): Set phnum to zero if there aren't

@@ -5626,9 +5626,12 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	}
 
       /* Handle the initialization instructions.  */
-      print_cfa_program (readp, cieend, vma_base, code_alignment_factor,
-			 data_alignment_factor, version, ptr_size,
-			 dwflmod, ebl, dbg);
+      if (ptr_size != 4 && ptr_size !=8)
+	printf ("invalid CIE pointer size (%u), must be 4 or 8.\n", ptr_size);
+      else
+	print_cfa_program (readp, cieend, vma_base, code_alignment_factor,
+			   data_alignment_factor, version, ptr_size,
+			   dwflmod, ebl, dbg);
       readp = cieend;
     }
 }

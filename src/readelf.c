@@ -2505,10 +2505,16 @@ handle_verneed (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 		  get_ver_flags (aux->vna_flags),
 		  (unsigned short int) aux->vna_other);
 
+	  if (aux->vna_next == 0)
+	    break;
+
 	  auxoffset += aux->vna_next;
 	}
 
       /* Find the next offset.  */
+      if (need->vn_next == 0)
+	break;
+
       offset += need->vn_next;
     }
 }
@@ -2583,10 +2589,15 @@ handle_verdef (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 		  auxoffset, cnt2,
 		  elf_strptr (ebl->elf, shdr->sh_link, aux->vda_name));
 
+	  if (aux->vda_next == 0)
+	    break;
+
 	  auxoffset += aux->vda_next;
 	}
 
       /* Find the next offset.  */
+      if (def->vd_next == 0)
+	break;
       offset += def->vd_next;
     }
 }
@@ -2665,6 +2676,8 @@ handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 
 	      nvername = MAX (nvername, (size_t) (def->vd_ndx & 0x7fff));
 
+	      if (def->vd_next == 0)
+		break;
 	      offset += def->vd_next;
 	    }
 	}
@@ -2709,9 +2722,13 @@ handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 		  nvername = MAX (nvername,
 				  (size_t) (aux->vna_other & 0x7fff));
 
+		  if (aux->vna_next == 0)
+		    break;
 		  auxoffset += aux->vna_next;
 		}
 
+	      if (need->vn_next == 0)
+		break;
 	      offset += need->vn_next;
 	    }
 	}
@@ -2763,6 +2780,8 @@ handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 		= elf_strptr (ebl->elf, defshdr->sh_link, aux->vda_name);
 	      filename[def->vd_ndx & 0x7fff] = NULL;
 
+	      if (def->vd_next == 0)
+		break;
 	      offset += def->vd_next;
 	    }
 	}
@@ -2800,9 +2819,13 @@ handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 		  filename[aux->vna_other & 0x7fff]
 		    = elf_strptr (ebl->elf, needshdr->sh_link, need->vn_file);
 
+		  if (aux->vna_next == 0)
+		    break;
 		  auxoffset += aux->vna_next;
 		}
 
+	      if (need->vn_next == 0)
+		break;
 	      offset += need->vn_next;
 	    }
 	}
@@ -2863,10 +2886,11 @@ handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 	default:
 	  n = printf ("%4d%c%s",
 		      *sym & 0x7fff, *sym & 0x8000 ? 'h' : ' ',
-		      (unsigned int) (*sym & 0x7fff) < nvername
+		      (vername != NULL
+		       && (unsigned int) (*sym & 0x7fff) < nvername)
 		      ? vername[*sym & 0x7fff] : "???");
 	  if ((unsigned int) (*sym & 0x7fff) < nvername
-	      && filename[*sym & 0x7fff] != NULL)
+	      && filename != NULL && filename[*sym & 0x7fff] != NULL)
 	    n += printf ("(%s)", filename[*sym & 0x7fff]);
 	  printf ("%*s", MAX (0, 33 - (int) n), " ");
 	  break;

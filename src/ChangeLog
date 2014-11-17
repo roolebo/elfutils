@@ -1,5 +1,12 @@
 2014-11-17  Mark Wielaard  <mjw@redhat.com>
 
+	* readelf.c (handle_verneed): Check vna_next and vn_next exist.
+	(handle_verdef): Check vda_next and vd_next exist.
+	(handle_versym): Check vd_next, vna_next and vn_next exist.
+	Check vername and filename are not NULL before use.
+
+2014-11-17  Mark Wielaard  <mjw@redhat.com>
+
 	* elfcmp.c (main): Check section names are NULL before use.
 	* objdump.c (section_match): Likewise.
 	* size.c (show_sysv): Likewise.

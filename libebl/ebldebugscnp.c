@@ -1,5 +1,5 @@
 /* Check section name for being that of a debug informatino section.
-   Copyright (C) 2002 Red Hat, Inc.
+   Copyright (C) 2002, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -40,5 +40,5 @@ ebl_debugscn_p (ebl, name)
      Ebl *ebl;
      const char *name;
 {
-  return ebl->debugscn_p (name);
+  return name != NULL && ebl->debugscn_p (name);
 }

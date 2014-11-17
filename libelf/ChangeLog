@@ -1,3 +1,7 @@
+2014-11-17  Mark Wielaard  <mjw@redhat.com>
+
+	* elf-knowledge.h (SECTION_STRIP_P): Check name is not NULL.
+
 2014-11-16  Mark Wielaard  <mjw@redhat.com>
 
 	* elf_getshdrstrndx.c: Check there are section headers before

@@ -1,5 +1,5 @@
 /* Accumulation of various pieces of knowledge about ELF.
-   Copyright (C) 2000-2012 Red Hat, Inc.
+   Copyright (C) 2000-2012, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -41,7 +41,8 @@
    && (shdr)->sh_type != SHT_NOTE					      \
    && (((shdr)->sh_type) != SHT_PROGBITS				      \
        /* Never remove .gnu.warning.* sections.  */			      \
-       || (strncmp (name, ".gnu.warning.", sizeof ".gnu.warning." - 1) != 0   \
+       || (name != NULL							      \
+	   && strncmp (name, ".gnu.warning.", sizeof ".gnu.warning." - 1) != 0\
 	   /* We remove .comment sections only if explicitly told to do so. */\
 	   && (remove_comment						      \
 	       || strcmp (name, ".comment") != 0))))

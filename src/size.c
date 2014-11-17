@@ -427,10 +427,9 @@ show_sysv (Elf *elf, const char *prefix, const char *fname,
 	INTERNAL_ERROR (fullname);
 
       /* Ignore all sections which are not used at runtime.  */
-      if ((shdr->sh_flags & SHF_ALLOC) != 0)
-	maxlen = MAX (maxlen,
-		      (int) strlen (elf_strptr (elf, shstrndx,
-						shdr->sh_name)));
+      const char *name = elf_strptr (elf, shstrndx, shdr->sh_name);
+      if (name != NULL && (shdr->sh_flags & SHF_ALLOC) != 0)
+	maxlen = MAX (maxlen, (int) strlen (name));
     }
 
   fputs_unlocked (fname, stdout);

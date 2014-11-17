@@ -90,13 +90,16 @@ ppc64_init (elf, machine, eh, ehlen)
 	      if (opd_shdr != NULL
 		  && (opd_shdr->sh_flags & SHF_ALLOC) != 0
 		  && opd_shdr->sh_type == SHT_PROGBITS
-		  && opd_shdr->sh_size > 0
-		  && strcmp (elf_strptr (elf, ehdr->e_shstrndx,
-					 opd_shdr->sh_name), ".opd") == 0)
+		  && opd_shdr->sh_size > 0)
 		{
-		  eh->fd_addr = opd_shdr->sh_addr;
-		  eh->fd_data = elf_getdata (scn, NULL);
-		  break;
+		  const char *name = elf_strptr (elf, ehdr->e_shstrndx,
+						 opd_shdr->sh_name);
+		  if (name != NULL && strcmp (name, ".opd") == 0)
+		    {
+		      eh->fd_addr = opd_shdr->sh_addr;
+		      eh->fd_data = elf_getdata (scn, NULL);
+		      break;
+		    }
 		}
 	    }
 	}

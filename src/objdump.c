@@ -1,5 +1,5 @@
 /* Print information from ELF file in human-readable form.
-   Copyright (C) 2005, 2006, 2007, 2009, 2011, 2012 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007, 2009, 2011, 2012, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -460,13 +460,13 @@ section_match (Elf *elf, uint32_t scnndx, GElf_Shdr *shdr, size_t shstrndx)
     return true;
 
   struct section_list *runp = section_list;
+  const char *name = elf_strptr (elf, shstrndx, shdr->sh_name);
 
   do
     {
       if (runp->is_name)
 	{
-	  if (strcmp (runp->name,
-		      elf_strptr (elf, shstrndx, shdr->sh_name)) == 0)
+	  if (name && strcmp (runp->name, name) == 0)
 	    return true;
 	}
       else

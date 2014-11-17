@@ -1,5 +1,5 @@
 /* Compare relevant content of two ELF files.
-   Copyright (C) 2005-2012 Red Hat, Inc.
+   Copyright (C) 2005-2012, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -355,7 +355,8 @@ main (int argc, char *argv[])
 					      sym1->st_name);
 	      const char *name2 = elf_strptr (elf2, shdr2->sh_link,
 					      sym2->st_name);
-	      if (unlikely (strcmp (name1, name2) != 0
+	      if (unlikely (name1 == NULL || name2 == NULL
+			    || strcmp (name1, name2) != 0
 			    || sym1->st_value != sym2->st_value
 			    || (sym1->st_size != sym2->st_size
 				&& sym1->st_shndx != SHN_UNDEF)

@@ -1,3 +1,7 @@
+2014-11-17  Mark Wielaard  <mjw@redhat.com>
+
+	* ebldebugscnp.c (ebl_debugscn_p): Check name is not NULL.
+
 2014-06-17  Mark Wielaard  <mjw@redhat.com>
 
 	* eblinitreg.c (ebl_func_addr_mask): New function.

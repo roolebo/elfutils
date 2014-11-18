@@ -1083,7 +1083,7 @@ find_symtab (Dwfl_Module *mod)
 
   mod->symstrdata = elf_getdata (elf_getscn (mod->symfile->elf, strshndx),
 				 NULL);
-  if (mod->symstrdata == NULL)
+  if (mod->symstrdata == NULL || mod->symstrdata->d_buf == NULL)
     goto elferr;
 
   if (xndxscn == NULL)
@@ -1091,12 +1091,18 @@ find_symtab (Dwfl_Module *mod)
   else
     {
       mod->symxndxdata = elf_getdata (xndxscn, NULL);
-      if (mod->symxndxdata == NULL)
+      if (mod->symxndxdata == NULL || mod->symxndxdata->d_buf == NULL)
 	goto elferr;
     }
 
   mod->symdata = elf_getdata (symscn, NULL);
-  if (mod->symdata == NULL)
+  if (mod->symdata == NULL || mod->symdata->d_buf == NULL)
+    goto elferr;
+
+  // Sanity check number of symbols.
+  GElf_Shdr shdr_mem, *shdr = gelf_getshdr (symscn, &shdr_mem);
+  if (mod->syments > mod->symdata->d_size / shdr->sh_entsize
+      || (size_t) mod->first_global > mod->syments)
     goto elferr;
 
   /* Cache any auxiliary symbol info, when it fails, just ignore aux_sym.  */
@@ -1116,7 +1122,7 @@ find_symtab (Dwfl_Module *mod)
       mod->aux_symstrdata = elf_getdata (elf_getscn (mod->aux_sym.elf,
 						     aux_strshndx),
 					 NULL);
-      if (mod->aux_symstrdata == NULL)
+      if (mod->aux_symstrdata == NULL || mod->aux_symstrdata->d_buf == NULL)
 	goto aux_cleanup;
 
       if (aux_xndxscn == NULL)
@@ -1124,12 +1130,19 @@ find_symtab (Dwfl_Module *mod)
       else
 	{
 	  mod->aux_symxndxdata = elf_getdata (aux_xndxscn, NULL);
-	  if (mod->aux_symxndxdata == NULL)
+	  if (mod->aux_symxndxdata == NULL
+	      || mod->aux_symxndxdata->d_buf == NULL)
 	    goto aux_cleanup;
 	}
 
       mod->aux_symdata = elf_getdata (aux_symscn, NULL);
-      if (mod->aux_symdata == NULL)
+      if (mod->aux_symdata == NULL || mod->aux_symdata->d_buf == NULL)
+	goto aux_cleanup;
+
+      // Sanity check number of aux symbols.
+      shdr = gelf_getshdr (aux_symscn, &shdr_mem);
+      if (mod->aux_syments > mod->aux_symdata->d_size / shdr->sh_entsize
+	  || (size_t) mod->aux_first_global > mod->aux_syments)
 	goto aux_cleanup;
     }
 }

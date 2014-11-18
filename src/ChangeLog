@@ -1,3 +1,8 @@
+2014-11-18  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_cfa_program): Fix sanity check of DW_FORM_block
+	length.
+
 2014-11-17  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (handle_verneed): Check vna_next and vn_next exist.

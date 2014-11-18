@@ -61,7 +61,7 @@ elf_cvt_Verdef (void *dest, const void *src, size_t len, int encode)
       GElf_Verdaux *asrc;
 
       /* Test for correct offset.  */
-      if (def_offset + sizeof (GElf_Verdef) > len)
+      if (def_offset > len || len - def_offset < sizeof (GElf_Verdef))
 	return;
 
       /* Work the tree from the first record.  */
@@ -90,7 +90,7 @@ elf_cvt_Verdef (void *dest, const void *src, size_t len, int encode)
 	  GElf_Verdaux *adest;
 
 	  /* Test for correct offset.  */
-	  if (aux_offset + sizeof (GElf_Verdaux) > len)
+	  if (aux_offset > len || len - aux_offset < sizeof (GElf_Verdaux))
 	    return;
 
 	  adest = (GElf_Verdaux *) ((char *) dest + aux_offset);
@@ -155,7 +155,7 @@ elf_cvt_Verneed (void *dest, const void *src, size_t len, int encode)
       GElf_Vernaux *asrc;
 
       /* Test for correct offset.  */
-      if (need_offset + sizeof (GElf_Verneed) > len)
+      if (need_offset > len || len - need_offset < sizeof (GElf_Verneed))
 	return;
 
       /* Work the tree from the first record.  */
@@ -182,7 +182,7 @@ elf_cvt_Verneed (void *dest, const void *src, size_t len, int encode)
 	  GElf_Vernaux *adest;
 
 	  /* Test for correct offset.  */
-	  if (aux_offset + sizeof (GElf_Vernaux) > len)
+	  if (aux_offset > len || len - aux_offset < sizeof (GElf_Vernaux))
 	    return;
 
 	  adest = (GElf_Vernaux *) ((char *) dest + aux_offset);

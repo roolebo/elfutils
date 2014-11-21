@@ -110,7 +110,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-backtrace-core-aarch64.sh \
 	run-backtrace-demangle.sh run-stack-d-test.sh run-stack-i-test.sh \
 	run-readelf-dwz-multi.sh run-allfcts-multi.sh run-deleted.sh \
-	run-linkmap-cut.sh run-aggregate-size.sh vdsosyms
+	run-linkmap-cut.sh run-aggregate-size.sh vdsosyms run-readelf-A.sh
 
 if !BIARCH
 export ELFUTILS_DISABLE_BIARCH = 1
@@ -276,7 +276,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-deleted.sh run-linkmap-cut.sh linkmap-cut-lib.so.bz2 \
 	     linkmap-cut.bz2 linkmap-cut.core.bz2 \
 	     run-aggregate-size.sh testfile-sizes1.o.bz2 testfile-sizes2.o.bz2 \
-	     testfile-sizes3.o.bz2
+	     testfile-sizes3.o.bz2 \
+	     run-readelf-A.sh testfileppc32attrs.o.bz2
 
 if USE_VALGRIND
 valgrind_cmd='valgrind -q --error-exitcode=1 --run-libc-freeres=no'

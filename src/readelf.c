@@ -3309,11 +3309,12 @@ print_attributes (Ebl *ebl, const GElf_Ehdr *ehdr)
 	      shdr->sh_size, shdr->sh_offset);
 
       Elf_Data *data = elf_rawdata (scn, NULL);
-      if (data == NULL)
+      if (unlikely (data == NULL || data->d_size == 0))
 	return;
 
       const unsigned char *p = data->d_buf;
 
+      /* There is only one 'version', A.  */
       if (unlikely (*p++ != 'A'))
 	return;
 
@@ -3324,8 +3325,10 @@ print_attributes (Ebl *ebl, const GElf_Ehdr *ehdr)
 	return (const unsigned char *) data->d_buf + data->d_size - p;
       }
 
+      /* Loop over the sections.  */
       while (left () >= 4)
 	{
+	  /* Section length.  */
 	  uint32_t len;
 	  memcpy (&len, p, sizeof len);
 
@@ -3335,19 +3338,23 @@ print_attributes (Ebl *ebl, const GElf_Ehdr *ehdr)
 	  if (unlikely (len > left ()))
 	    break;
 
+	  /* Section vendor name.  */
 	  const unsigned char *name = p + sizeof len;
 	  p += len;
 
 	  unsigned const char *q = memchr (name, '\0', len);
 	  if (unlikely (q == NULL))
-	    continue;
+	    break;
 	  ++q;
 
 	  printf (gettext ("  %-13s  %4" PRIu32 "\n"), name, len);
 
+	  bool gnu_vendor = (q - name == sizeof "gnu"
+			     && !memcmp (name, "gnu", sizeof "gnu"));
+
+	  /* Loop over subsections.  */
 	  if (shdr->sh_type != SHT_GNU_ATTRIBUTES
-	      || (q - name == sizeof "gnu"
-		  && !memcmp (name, "gnu", sizeof "gnu")))
+	      || gnu_vendor)
 	    while (q < p)
 	      {
 		const unsigned char *const sub = q;
@@ -3366,7 +3373,10 @@ print_attributes (Ebl *ebl, const GElf_Ehdr *ehdr)
 		if (MY_ELFDATA != ehdr->e_ident[EI_DATA])
 		  CONVERT (subsection_len);
 
-		if (unlikely (p - sub < (ptrdiff_t) subsection_len))
+		/* Don't overflow, ptrdiff_t might be 32bits, but signed.  */
+		if (unlikely (subsection_len == 0
+			      || subsection_len >= (uint32_t) PTRDIFF_MAX
+			      || p - sub < (ptrdiff_t) subsection_len))
 		  break;
 
 		const unsigned char *r = q + sizeof subsection_len;
@@ -3375,6 +3385,7 @@ print_attributes (Ebl *ebl, const GElf_Ehdr *ehdr)
 		switch (subsection_tag)
 		  {
 		  default:
+		    /* Unknown subsection, print and skip.  */
 		    printf (gettext ("    %-4u %12" PRIu32 "\n"),
 			    subsection_tag, subsection_len);
 		    break;
@@ -3390,16 +3401,30 @@ print_attributes (Ebl *ebl, const GElf_Ehdr *ehdr)
 			if (unlikely (r >= q))
 			  break;
 
+			/* GNU style tags have either a uleb128 value,
+			   when lowest bit is not set, or a string
+			   when the lowest bit is set.
+			   "compatibility" (32) is special.  It has
+			   both a string and a uleb128 value.  For
+			   non-gnu we assume 6 till 31 only take ints.
+			   XXX see arm backend, do we need a separate
+			   hook?  */
 			uint64_t value = 0;
 			const char *string = NULL;
-			if (tag == 32 || (tag & 1) == 0)
+			if (tag == 32 || (tag & 1) == 0
+			    || (! gnu_vendor && (tag > 5 && tag < 32)))
 			  {
 			    get_uleb128 (value, r);
 			    if (r > q)
 			      break;
 			  }
-			if (tag == 32 || (tag & 1) != 0)
+			if (tag == 32
+			    || ((tag & 1) != 0
+				&& (gnu_vendor
+				    || (! gnu_vendor && tag > 32)))
+			    || (! gnu_vendor && tag > 3 && tag < 6))
 			  {
+			    string = (const char *) r;
 			    r = memchr (r, '\0', q - r);
 			    if (r == NULL)
 			      break;
@@ -3426,7 +3451,10 @@ print_attributes (Ebl *ebl, const GElf_Ehdr *ehdr)
 			  }
 			else
 			  {
-			    assert (tag != 32);
+			    /* For "gnu" vendor 32 "compatibility" has
+			       already been handled above.  */
+			    assert (tag != 32
+				    || strcmp ((const char *) name, "gnu"));
 			    if (string == NULL)
 			      printf (gettext ("      %u: %" PRId64 "\n"),
 				      tag, value);

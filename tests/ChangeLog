@@ -1,3 +1,10 @@
+2014-11-21  Mark Wielaard  <mjw@redhat.com>
+
+	* run-readelf-A.sh: New test.
+	* testfileppc32attrs.o.bz2: New test file.
+	* Makefile.am (TESTS): Add run-readelf-A.sh.
+	(EXTRA_DIST): Add run-readelf-A.sh and testfileppc32attrs.o.bz2.
+
 2014-11-10  Mark Wielaard  <mjw@redhat.com>
 
 	* vdsosyms.c: New test.

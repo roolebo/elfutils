@@ -1,3 +1,10 @@
+2014-11-21  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_attributes): Guard against empty section.
+	Document attribute format. Break when vendor name isn't terminated.
+	Add overflow check for subsection_len. Handle both gnu and non-gnu
+	attribute tags.
+
 2014-11-22  Mark Wielaard  <mjw@redhat.com>
 
 	* elflint.c (check_sections): Call ebl_bss_plt_p without ehdr.

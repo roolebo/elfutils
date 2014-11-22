@@ -1,5 +1,5 @@
 /* Locate source files or functions which caused text relocations.
-   Copyright (C) 2005-2010, 2012 Red Hat, Inc.
+   Copyright (C) 2005-2010, 2012, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -324,14 +324,20 @@ process_file (const char *fname, bool more_than_one)
   if (segments == NULL)
     error (1, errno, gettext ("while reading ELF file"));
 
-  for (int i = 0; i < ehdr->e_phnum; ++i)
+  size_t phnum;
+  if (elf_getphdrnum (elf, &phnum) != 0)
+    error (1, 0, gettext ("cannot get program header count: %s"),
+           elf_errmsg (-1));
+
+
+  for (size_t i = 0; i < phnum; ++i)
     {
       GElf_Phdr phdr_mem;
       GElf_Phdr *phdr = gelf_getphdr (elf, i, &phdr_mem);
       if (phdr == NULL)
 	{
 	  error (0, 0,
-		 gettext ("cannot get program header index at offset %d: %s"),
+		 gettext ("cannot get program header index at offset %zd: %s"),
 		 i, elf_errmsg (-1));
 	  result = 1;
 	  goto next;
@@ -349,7 +355,7 @@ process_file (const char *fname, bool more_than_one)
 	      if (segments == NULL)
 		{
 		  error (0, 0, gettext ("\
-cannot get program header index at offset %d: %s"),
+cannot get program header index at offset %zd: %s"),
 			 i, elf_errmsg (-1));
 		  result = 1;
 		  goto next;

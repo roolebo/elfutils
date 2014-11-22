@@ -1,3 +1,8 @@
+2014-11-22  Mark Wielaard  <mjw@redhat.com>
+
+	* link_map.c (consider_executable): Use elf_getphdrnum.
+	(dwfl_link_map_report): Likewise.
+
 2014-11-18  Mark Wielaard  <mjw@redhat.com>
 
 	* dwfl_module_getdwarf.c (find_symtab): Sanity check the data buffer,

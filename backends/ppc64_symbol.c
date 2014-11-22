@@ -108,8 +108,7 @@ ppc64_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr,
 
 /* Check if backend uses a bss PLT in this file.  */
 bool
-ppc64_bss_plt_p (Elf *elf __attribute__ ((unused)),
-		 GElf_Ehdr *ehdr __attribute__ ((unused)))
+ppc64_bss_plt_p (Elf *elf __attribute__ ((unused)))
 {
   return true;
 }

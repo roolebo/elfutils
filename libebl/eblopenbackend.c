@@ -186,7 +186,7 @@ static bool default_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr,
 static bool default_check_st_other_bits (unsigned char st_other);
 static bool default_check_special_section (Ebl *, int,
 					   const GElf_Shdr *, const char *);
-static bool default_bss_plt_p (Elf *elf, GElf_Ehdr *ehdr);
+static bool default_bss_plt_p (Elf *elf);
 static int default_return_value_location (Dwarf_Die *functypedie,
 					  const Dwarf_Op **locops);
 static ssize_t default_register_info (Ebl *ebl,
@@ -693,8 +693,7 @@ default_check_st_other_bits (unsigned char st_other __attribute__ ((unused)))
 
 
 static bool
-default_bss_plt_p (Elf *elf __attribute__ ((unused)),
-		   GElf_Ehdr *ehdr __attribute__ ((unused)))
+default_bss_plt_p (Elf *elf __attribute__ ((unused)))
 {
   return false;
 }

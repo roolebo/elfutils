@@ -201,7 +201,7 @@ extern bool ebl_section_strip_p (Ebl *ebl, const GElf_Ehdr *ehdr,
 				 bool remove_comment, bool only_remove_debug);
 
 /* Check if backend uses a bss PLT in this file.  */
-extern bool ebl_bss_plt_p (Ebl *ebl, GElf_Ehdr *ehdr);
+extern bool ebl_bss_plt_p (Ebl *ebl);
 
 /* Return size of entry in SysV-style hash table.  */
 extern int ebl_sysvhash_entrysize (Ebl *ebl);

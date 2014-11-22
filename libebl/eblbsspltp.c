@@ -1,5 +1,5 @@
 /* Check if backend uses a bss PLT.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -35,9 +35,8 @@
 
 
 bool
-ebl_bss_plt_p (ebl, ehdr)
+ebl_bss_plt_p (ebl)
      Ebl *ebl;
-     GElf_Ehdr *ehdr;
 {
-  return ebl == NULL ? false : ebl->bss_plt_p (ebl->elf, ehdr);
+  return ebl == NULL ? false : ebl->bss_plt_p (ebl->elf);
 }

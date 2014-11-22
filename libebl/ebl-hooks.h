@@ -132,7 +132,7 @@ bool EBLHOOK(check_special_symbol) (Elf *, GElf_Ehdr *, const GElf_Sym *,
 bool EBLHOOK(check_st_other_bits) (unsigned char st_other);
 
 /* Check if backend uses a bss PLT in this file.  */
-bool EBLHOOK(bss_plt_p) (Elf *, GElf_Ehdr *);
+bool EBLHOOK(bss_plt_p) (Elf *);
 
 /* Return location expression to find return value given the
    DW_AT_type DIE of a DW_TAG_subprogram DIE.  */

@@ -3532,7 +3532,7 @@ cannot get section header for section [%2zu] '%s': %s\n"),
 
 		GElf_Word good_type = special_sections[s].type;
 		if (IS_KNOWN_SPECIAL (s, ".plt", false)
-		    && ebl_bss_plt_p (ebl, ehdr))
+		    && ebl_bss_plt_p (ebl))
 		  good_type = SHT_NOBITS;
 
 		/* In a debuginfo file, any normal section can be SHT_NOBITS.

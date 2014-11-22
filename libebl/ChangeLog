@@ -1,3 +1,10 @@
+2014-11-22  Mark Wielaard  <mjw@redhat.com>
+
+	* ebl-hooks.h (bss_plt_p): Remove ehdr argument.
+	* eblbsspltp.c (ebl_bss_plt_p): Likewise.
+	* eblopenbackend.c (default_bss_plt_p): Likewise.
+	* libebl.h (ebl_bss_plt_p): Likewise.
+
 2014-11-17  Mark Wielaard  <mjw@redhat.com>
 
 	* ebldebugscnp.c (ebl_debugscn_p): Check name is not NULL.

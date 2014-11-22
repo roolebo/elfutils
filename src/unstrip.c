@@ -241,7 +241,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 #define ELF_CHECK(call, msg)						      \
   do									      \
     {									      \
-      if (!(call)) 							      \
+      if (unlikely (!(call)))						      \
 	error (EXIT_FAILURE, 0, msg, elf_errmsg (-1));			      \
     } while (0)
 
@@ -257,13 +257,17 @@ copy_elf (Elf *outelf, Elf *inelf)
   ELF_CHECK (gelf_update_ehdr (outelf, ehdr),
 	     _("cannot copy ELF header: %s"));
 
-  if (ehdr->e_phnum > 0)
+  size_t phnum;
+  ELF_CHECK (elf_getphdrnum (inelf, &phnum) == 0,
+	     _("cannot get number of program headers: %s"));
+
+  if (phnum > 0)
     {
-      ELF_CHECK (gelf_newphdr (outelf, ehdr->e_phnum),
+      ELF_CHECK (gelf_newphdr (outelf, phnum),
 		 _("cannot create program headers: %s"));
 
       GElf_Phdr phdr_mem;
-      for (uint_fast16_t i = 0; i < ehdr->e_phnum; ++i)
+      for (size_t i = 0; i < phnum; ++i)
 	ELF_CHECK (gelf_update_phdr (outelf, i,
 				     gelf_getphdr (inelf, i, &phdr_mem)),
 		   _("cannot copy program header: %s"));
@@ -1823,12 +1827,16 @@ more sections in stripped file than debug file -- arguments reversed?"));
     }
   while (skip_reloc);
 
-  if (stripped_ehdr->e_phnum > 0)
-    ELF_CHECK (gelf_newphdr (unstripped, stripped_ehdr->e_phnum),
+  size_t phnum;
+  ELF_CHECK (elf_getphdrnum (stripped, &phnum) == 0,
+	     _("cannot get number of program headers: %s"));
+
+  if (phnum > 0)
+    ELF_CHECK (gelf_newphdr (unstripped, phnum),
 	       _("cannot create program headers: %s"));
 
   /* Copy each program header from the stripped file.  */
-  for (uint_fast16_t i = 0; i < stripped_ehdr->e_phnum; ++i)
+  for (size_t i = 0; i < phnum; ++i)
     {
       GElf_Phdr phdr_mem;
       GElf_Phdr *phdr = gelf_getphdr (stripped, i, &phdr_mem);
@@ -1863,11 +1871,15 @@ handle_file (const char *output_file, bool create_dirs,
 	     Elf *stripped, const GElf_Ehdr *stripped_ehdr,
 	     Elf *unstripped)
 {
+  size_t phnum;
+  ELF_CHECK (elf_getphdrnum (stripped, &phnum) == 0,
+	     _("cannot get number of program headers: %s"));
+
   /* Determine the address bias between the debuginfo file and the main
      file, which may have been modified by prelinking.  */
   GElf_Addr bias = 0;
   if (unstripped != NULL)
-    for (uint_fast16_t i = 0; i < stripped_ehdr->e_phnum; ++i)
+    for (size_t i = 0; i < phnum; ++i)
       {
 	GElf_Phdr phdr_mem;
 	GElf_Phdr *phdr = gelf_getphdr (stripped, i, &phdr_mem);

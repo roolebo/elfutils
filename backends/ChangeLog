@@ -1,3 +1,10 @@
+2014-11-22  Mark Wielaard  <mjw@redhat.com>
+
+	* ppc64_symbol.c (ppc64_bss_plt_p): Remove ehdr argument.
+	* ppc_symbol.c (find_dyn_got): Likewise. Use elf_getphdrnum.
+	(ppc_check_special_symbol): Call find_dyn_got without ehdr.
+	(ppc_bss_plt_p): Remove ehdr argument.
+
 2014-11-17  Mark Wielaard  <mjw@redhat.com>
 
 	* ppc64_init.c (ppc64_init): Check section name is not NULL.

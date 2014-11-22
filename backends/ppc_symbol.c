@@ -1,5 +1,5 @@
 /* PPC specific symbolic name handling.
-   Copyright (C) 2004, 2005, 2007 Red Hat, Inc.
+   Copyright (C) 2004, 2005, 2007, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
@@ -81,9 +81,13 @@ ppc_dynamic_tag_check (int64_t tag)
 
 /* Look for DT_PPC_GOT.  */
 static bool
-find_dyn_got (Elf *elf, GElf_Ehdr *ehdr, GElf_Addr *addr)
+find_dyn_got (Elf *elf, GElf_Addr *addr)
 {
-  for (int i = 0; i < ehdr->e_phnum; ++i)
+  size_t phnum;
+  if (elf_getphdrnum (elf, &phnum) != 0)
+    return false;
+
+  for (size_t i = 0; i < phnum; ++i)
     {
       GElf_Phdr phdr_mem;
       GElf_Phdr *phdr = gelf_getphdr (elf, i, &phdr_mem);
@@ -127,7 +131,7 @@ ppc_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr, const GElf_Sym *sym,
     {
       /* In -msecure-plt mode, DT_PPC_GOT is present and must match.  */
       GElf_Addr gotaddr;
-      if (find_dyn_got (elf, ehdr, &gotaddr))
+      if (find_dyn_got (elf, &gotaddr))
 	return sym->st_value == gotaddr;
 
       /* In -mbss-plt mode, any place in the section is valid.  */
@@ -154,8 +158,8 @@ ppc_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr, const GElf_Sym *sym,
 
 /* Check if backend uses a bss PLT in this file.  */
 bool
-ppc_bss_plt_p (Elf *elf, GElf_Ehdr *ehdr)
+ppc_bss_plt_p (Elf *elf)
 {
   GElf_Addr addr;
-  return ! find_dyn_got (elf, ehdr, &addr);
+  return ! find_dyn_got (elf, &addr);
 }

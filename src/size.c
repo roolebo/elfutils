@@ -600,14 +600,13 @@ show_bsd_totals (void)
 static void
 show_segments (Elf *elf, const char *fullname)
 {
-  GElf_Ehdr ehdr_mem;
-  GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);
-  if (ehdr == NULL)
+  size_t phnum;
+  if (elf_getphdrnum (elf, &phnum) != 0)
     INTERNAL_ERROR (fullname);
 
   GElf_Off total = 0;
   bool first = true;
-  for (size_t cnt = 0; cnt < ehdr->e_phnum; ++cnt)
+  for (size_t cnt = 0; cnt < phnum; ++cnt)
     {
       GElf_Phdr phdr_mem;
       GElf_Phdr *phdr;

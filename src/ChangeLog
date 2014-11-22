@@ -1,3 +1,15 @@
+2014-11-22  Mark Wielaard  <mjw@redhat.com>
+
+	* elflint.c (check_sections): Call ebl_bss_plt_p without ehdr.
+	* findtextrel.c (process_file): Use elf_getphdrnum.
+	* readelf.c (process_elf_file): Remove redundant ehdr->e_phoff check.
+	(print_phdr): Check phnum.
+	* size.c (show_segments): Use elf_getphdrnum.
+	* strip.c (handle_elf): Likewise.
+	* unstrip.c (copy_elf): Likewise.
+	(copy_elided_sections): Likewise.
+	(handle_file): Likewise.
+
 2014-11-18  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (print_cfa_program): Fix sanity check of DW_FORM_block

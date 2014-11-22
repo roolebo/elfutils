@@ -1,5 +1,5 @@
 /* Report modules by examining dynamic linker data structures.
-   Copyright (C) 2008-2013 Red Hat, Inc.
+   Copyright (C) 2008-2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -533,7 +533,11 @@ consider_executable (Dwfl_Module *mod, GElf_Addr at_phdr, GElf_Addr at_entry,
      address where &r_debug was written at runtime.  */
   GElf_Xword align = mod->dwfl->segment_align;
   GElf_Addr d_val_vaddr = 0;
-  for (uint_fast16_t i = 0; i < ehdr.e_phnum; ++i)
+  size_t phnum;
+  if (elf_getphdrnum (mod->main.elf, &phnum) != 0)
+    return 0;
+
+  for (size_t i = 0; i < phnum; ++i)
     {
       GElf_Phdr phdr_mem;
       GElf_Phdr *phdr = gelf_getphdr (mod->main.elf, i, &phdr_mem);
@@ -813,7 +817,15 @@ dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 		  __libdwfl_seterrno (DWFL_E_LIBELF);
 		  return false;
 		}
-	      if (ehdr->e_phnum != phnum || ehdr->e_phentsize != phent)
+	      size_t e_phnum;
+	      if (elf_getphdrnum (elf, &e_phnum) != 0)
+		{
+		  elf_end (elf);
+		  close (fd);
+		  __libdwfl_seterrno (DWFL_E_LIBELF);
+		  return false;
+		}
+	      if (e_phnum != phnum || ehdr->e_phentsize != phent)
 		{
 		  elf_end (elf);
 		  close (fd);

@@ -1,5 +1,5 @@
 /* Return specific DWARF attribute of a DIE.
-   Copyright (C) 2003, 2005 Red Hat, Inc.
+   Copyright (C) 2003, 2005, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -50,6 +50,6 @@ dwarf_attr (die, search_name, result)
   /* Always fill in the CU information.  */
   result->cu = die->cu;
 
-  return result->code == search_name ? result : NULL;
+  return result->valp != NULL && result->code == search_name ? result : NULL;
 }
 INTDEF(dwarf_attr)

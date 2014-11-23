@@ -1,5 +1,5 @@
 /* Return sibling of given DIE.
-   Copyright (C) 2003-2010 Red Hat, Inc.
+   Copyright (C) 2003-2010, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -72,7 +72,7 @@ dwarf_siblingof (die, result)
       /* Find the end of the DIE or the sibling attribute.  */
       addr = __libdw_find_attr (&this_die, DW_AT_sibling, &sibattr.code,
 				&sibattr.form);
-      if (sibattr.code == DW_AT_sibling)
+      if (addr != NULL && sibattr.code == DW_AT_sibling)
 	{
 	  Dwarf_Off offset;
 	  sibattr.valp = addr;

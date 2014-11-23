@@ -1,5 +1,5 @@
 /* Check whether given DIE has specific attribute.
-   Copyright (C) 2003, 2005 Red Hat, Inc.
+   Copyright (C) 2003, 2005, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -45,8 +45,8 @@ dwarf_hasattr (die, search_name)
 
   /* Search for the attribute with the given name.  */
   unsigned int code;
-  (void) __libdw_find_attr (die, search_name, &code, NULL);
+  unsigned char *addr = __libdw_find_attr (die, search_name, &code, NULL);
 
-  return code == search_name;
+  return addr != NULL && code == search_name;
 }
 INTDEF (dwarf_hasattr)

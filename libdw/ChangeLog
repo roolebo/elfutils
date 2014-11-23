@@ -1,5 +1,11 @@
 2014-11-23  Mark Wielaard  <mjw@redhat.com>
 
+	* dwarf_attr.c (dwarf_attr): Check __libdw_find_attr return value.
+	* dwarf_hasattr.c (dwarf_hasattr): Likewise.
+	* dwarf_siblingof.c (dwarf_siblingof): Likewise.
+
+2014-11-23  Mark Wielaard  <mjw@redhat.com>
+
 	* dwarf_getabbrev.c (__libdw_getabbrev): Don't assert on bad DWARF.
 	Set libdw errno and return NULL.
 

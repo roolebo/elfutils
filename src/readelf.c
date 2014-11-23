@@ -4693,7 +4693,7 @@ print_debug_aranges_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
       printf (gettext ("\n Length:        %6" PRIu64 "\n"),
 	      (uint64_t) length);
 
-      if (nexthdr > readendp)
+      if (unlikely (length > readendp - readp))
 	goto invalid_data;
 
       if (length == 0)

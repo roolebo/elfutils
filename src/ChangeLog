@@ -1,3 +1,8 @@
+2014-11-23  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_debug_aranges_section): Check length to catch
+	nexthdr overflow.
+
 2014-11-21  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (print_attributes): Guard against empty section.

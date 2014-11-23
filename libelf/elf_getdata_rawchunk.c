@@ -1,5 +1,5 @@
 /* Return converted data from raw chunk of ELF file.
-   Copyright (C) 2007 Red Hat, Inc.
+   Copyright (C) 2007, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -57,8 +57,9 @@ elf_getdata_rawchunk (elf, offset, size, type)
       return NULL;
     }
 
-  if (unlikely (offset < 0 || offset + (off64_t) size < offset
-		|| offset + size > elf->maximum_size))
+  if (unlikely (offset < 0 || (uint64_t) offset > elf->maximum_size
+		|| elf->maximum_size - (uint64_t) offset < size))
+
     {
       /* Invalid request.  */
       __libelf_seterrno (ELF_E_INVALID_OP);

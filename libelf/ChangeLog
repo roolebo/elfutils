@@ -1,5 +1,10 @@
 2014-11-23  Mark Wielaard  <mjw@redhat.com>
 
+	* elf_getdata_rawchunk.c (elf_getdata_rawchunk): Change signed
+	overflow check to unsigned.
+
+2014-11-23  Mark Wielaard  <mjw@redhat.com>
+
 	* note_xlate.h (elf_cvt_note): Copy over any leftover data if
 	src != dest. The data is probably part of truncated name/desc.
 

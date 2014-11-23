@@ -1,3 +1,8 @@
+2014-11-23  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_getabbrev.c (__libdw_getabbrev): Don't assert on bad DWARF.
+	Set libdw errno and return NULL.
+
 2014-11-24  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf.h (DW_LANG_C_plus_plus_11): Added.

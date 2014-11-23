@@ -1,5 +1,5 @@
 /* Get abbreviation at given offset.
-   Copyright (C) 2003, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2003, 2004, 2005, 2006, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -31,7 +31,6 @@
 # include <config.h>
 #endif
 
-#include <assert.h>
 #include <dwarf.h>
 #include "libdwP.h"
 
@@ -97,7 +96,13 @@ __libdw_getabbrev (dbg, cu, offset, lengthp, result)
     {
       foundit = true;
 
-      assert (abb->offset == offset);
+      if (unlikely (abb->offset != offset))
+	{
+	  /* A duplicate abbrev code at a different offset,
+	     that should never happen.  */
+	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
+	  return NULL;
+	}
 
       /* If the caller doesn't need the length we are done.  */
       if (lengthp == NULL)

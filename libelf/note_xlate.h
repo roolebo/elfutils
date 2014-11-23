@@ -1,5 +1,5 @@
 /* Conversion functions for notes.
-   Copyright (C) 2007, 2009 Red Hat, Inc.
+   Copyright (C) 2007, 2009, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -56,4 +56,9 @@ elf_cvt_note (void *dest, const void *src, size_t len, int encode)
       src += namesz + descsz;
       dest += namesz + descsz;
     }
+
+    /* Copy opver any leftover data unconcerted.  Probably part of
+       truncated name/desc data.  */
+    if (unlikely (len > 0) && src != dest)
+      memcpy (dest, src, len);
 }

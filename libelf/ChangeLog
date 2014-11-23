@@ -1,3 +1,8 @@
+2014-11-23  Mark Wielaard  <mjw@redhat.com>
+
+	* note_xlate.h (elf_cvt_note): Copy over any leftover data if
+	src != dest. The data is probably part of truncated name/desc.
+
 2014-11-22  Mark Wielaard  <mjw@redhat.com>
 
 	* elf_getphdrnum.c (elf_getphdrnum): Sanity check the

@@ -1,3 +1,8 @@
+2014-11-24  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_debug_line_section): Check line_range is not zero
+	before usage.
+
 2014-11-23  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (print_debug_aranges_section): Check length to catch

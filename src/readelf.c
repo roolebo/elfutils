@@ -6507,6 +6507,9 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	  /* Is this a special opcode?  */
 	  if (likely (opcode >= opcode_base))
 	    {
+	      if (unlikely (line_range == 0))
+		goto invalid_unit;
+
 	      /* Yes.  Handling this is quite easy since the opcode value
 		 is computed with
 
@@ -6682,6 +6685,10 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
 		case DW_LNS_const_add_pc:
 		  /* Takes no argument.  */
+
+		  if (unlikely (line_range == 0))
+		    goto invalid_unit;
+
 		  advance_pc ((255 - opcode_base) / line_range);
 		  {
 		    char *a = format_dwarf_addr (dwflmod, 0, address, address);

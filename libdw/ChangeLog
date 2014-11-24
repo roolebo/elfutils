@@ -1,3 +1,8 @@
+2014-11-24  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_getsrclines.c (read_srclines): Check line_range is not zero
+	before usage.
+
 2014-11-23  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_attr.c (dwarf_attr): Check __libdw_find_attr return value.

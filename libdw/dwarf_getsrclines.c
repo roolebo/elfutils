@@ -365,6 +365,9 @@ read_srclines (Dwarf *dbg,
       /* Is this a special opcode?  */
       if (likely (opcode >= opcode_base))
 	{
+	  if (unlikely (line_range == 0))
+	    goto invalid_data;
+
 	  /* Yes.  Handling this is quite easy since the opcode value
 	     is computed with
 
@@ -574,6 +577,9 @@ read_srclines (Dwarf *dbg,
 	    case DW_LNS_const_add_pc:
 	      /* Takes no argument.  */
 	      if (unlikely (standard_opcode_lengths[opcode] != 0))
+		goto invalid_data;
+
+	      if (unlikely (line_range == 0))
 		goto invalid_data;
 
 	      advance_pc ((255 - opcode_base) / line_range);

@@ -103,12 +103,16 @@ array_size (Dwarf_Die *die, Dwarf_Word *size,
 		    case DW_LANG_C:
 		    case DW_LANG_C89:
 		    case DW_LANG_C99:
+		    case DW_LANG_C11:
 		    case DW_LANG_C_plus_plus:
+		    case DW_LANG_C_plus_plus_11:
+		    case DW_LANG_C_plus_plus_14:
 		    case DW_LANG_ObjC:
 		    case DW_LANG_ObjC_plus_plus:
 		    case DW_LANG_Java:
 		    case DW_LANG_D:
 		    case DW_LANG_UPC:
+		    case DW_LANG_Go:
 		      lower = 0;
 		      break;
 

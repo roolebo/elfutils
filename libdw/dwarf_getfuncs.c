@@ -103,7 +103,8 @@ dwarf_getfuncs (Dwarf_Die *cudie, int (*callback) (Dwarf_Die *, void *),
   int lang = INTUSE(dwarf_srclang) (cudie);
   bool c_cu = (lang == DW_LANG_C89
 	       || lang == DW_LANG_C
-	       || lang == DW_LANG_C99);
+	       || lang == DW_LANG_C99
+	       || lang == DW_LANG_C11);
 
   struct visitor_info v = { callback, arg, (void *) offset, NULL, c_cu };
   struct Dwarf_Die_Chain chain = { .die = CUDIE (cudie->cu),

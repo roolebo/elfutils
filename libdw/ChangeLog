@@ -1,3 +1,14 @@
+2014-11-24  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf.h (DW_LANG_C_plus_plus_11): Added.
+	(DW_LANG_C11): Likewise.
+	(DW_LANG_C_plus_plus_14): Likewise.
+	* dwarf_aggregate_size.c (array_size): Handle DW_LANG_C11,
+	DW_LANG_C_plus_plus_11, DW_LANG_C_plus_plus_14 and DW_LANG_Go
+	lower bound.
+	* dwarf_getfuncs.c (dwarf_getfuncs): Set c_cu to true for
+	DW_LANG_C11.
+
 2014-11-26  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf.h (DW_AT_noreturn): Added.

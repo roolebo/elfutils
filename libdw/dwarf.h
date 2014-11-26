@@ -221,6 +221,9 @@ enum
     DW_AT_enum_class = 0x6d,
     DW_AT_linkage_name = 0x6e,
 
+    /* DWARF5 attribute values.  */
+    DW_AT_noreturn = 0x87,
+
     DW_AT_lo_user = 0x2000,
 
     DW_AT_MIPS_fde = 0x2001,

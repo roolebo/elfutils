@@ -1,3 +1,8 @@
+2014-11-26  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_debug_aranges_section): Cast Dwarf_Word length
+	to ptrdiff_t for comparison.
+
 2014-11-24  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (print_debug_line_section): Check line_range is not zero

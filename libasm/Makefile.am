@@ -66,7 +66,7 @@ libasm.so$(EXEEXT): libasm_pic.a libasm.map
 		-Wl,--version-script,$(srcdir)/libasm.map,--no-undefined \
 		-Wl,--soname,$@.$(VERSION) \
 		../libebl/libebl.a ../libelf/libelf.so  $(libasm_so_LDLIBS)
-	if $(READELF) -d $@ | fgrep -q TEXTREL; then exit 1; fi
+	$(textrel_check)
 	ln -fs $@ $@.$(VERSION)
 
 install: install-am libasm.so

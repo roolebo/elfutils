@@ -212,6 +212,11 @@ AC_CHECK_LIB([stdc++], [__cxa_demangle], [dnl
 AC_DEFINE([USE_DEMANGLE], [1], [Defined if demangling is enabled])])
 AM_CONDITIONAL(DEMANGLE, test "$ac_cv_lib_stdcpp___cxa_demangle" = yes)
 
+AC_ARG_ENABLE([textrelcheck],
+AS_HELP_STRING([--disable-textrelcheck],
+               [Disable textrelcheck being a fatal error]))
+AM_CONDITIONAL(FATAL_TEXTREL, [test "x$enable_textrelcheck" != "xno"])
+
 dnl The directories with content.
 
 dnl Documentation.

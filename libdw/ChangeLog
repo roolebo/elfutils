@@ -1,5 +1,9 @@
 2014-11-27  Mark Wielaard  <mjw@redhat.com>
 
+	* Makefile.am (libdw.so): Use textrel_check.
+
+2014-11-27  Mark Wielaard  <mjw@redhat.com>
+
 	* dwarf_getcfi_elf.c (getcfi_gnu_eh_frame): Initialize
 	search_table_entries and search_table_encoding.
 

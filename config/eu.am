@@ -52,4 +52,10 @@ endif
 
 CLEANFILES = *.gcno *.gcda
 
-textrel_check = if $(READELF) -d $@ | fgrep -q TEXTREL; then exit 1; fi
+textrel_msg = echo "WARNING: TEXTREL found in '$@'"
+if FATAL_TEXTREL
+textrel_found = $(textrel_msg); exit 1
+else
+textrel_found = $(textrel_msg)
+endif
+textrel_check = if $(READELF) -d $@ | fgrep -q TEXTREL; then $(textrel_found); fi

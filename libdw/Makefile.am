@@ -113,7 +113,7 @@ libdw.so$(EXEEXT): $(srcdir)/libdw.map libdw_pic.a ../libdwelf/libdwelf_pic.a \
 		-Wl,--version-script,$<,--no-undefined \
 		-Wl,--whole-archive $(filter-out $<,$^) -Wl,--no-whole-archive\
 		-ldl $(zip_LIBS)
-	if $(READELF) -d $@ | fgrep -q TEXTREL; then exit 1; fi
+	$(textrel_check)
 	ln -fs $@ $@.$(VERSION)
 
 install: install-am libdw.so

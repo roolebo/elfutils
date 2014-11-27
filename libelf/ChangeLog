@@ -1,3 +1,7 @@
+2014-11-27  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (libelf.so): Use textrel_check.
+
 2014-11-23  Mark Wielaard  <mjw@redhat.com>
 
 	* elf_getdata_rawchunk.c (elf_getdata_rawchunk): Change signed

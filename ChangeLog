@@ -1,3 +1,7 @@
+2014-11-27  Mark Wielaard  <mjw@redhat.com>
+
+	* configure.ac: Add --disable-textrelcheck.
+
 2014-10-06  Mark Wielaard  <mjw@redhat.com>
 
 	* NEWS: New section 0.161. Add dwarf_peel_type.

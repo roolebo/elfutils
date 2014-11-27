@@ -1,3 +1,8 @@
+2014-11-27  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_getcfi_elf.c (getcfi_gnu_eh_frame): Initialize
+	search_table_entries and search_table_encoding.
+
 2014-11-24  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_getsrclines.c (read_srclines): Check line_range is not zero

@@ -1,5 +1,5 @@
 /* Get CFI from ELF file's exception-handling info.
-   Copyright (C) 2009-2010 Red Hat, Inc.
+   Copyright (C) 2009-2010, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -140,8 +140,8 @@ getcfi_gnu_eh_frame (Elf *elf, const GElf_Ehdr *ehdr, const GElf_Phdr *phdr)
     }
 
   Dwarf_Addr eh_frame_ptr;
-  size_t search_table_entries;
-  uint8_t search_table_encoding;
+  size_t search_table_entries = 0;
+  uint8_t search_table_encoding = 0;
   const uint8_t *search_table = parse_eh_frame_hdr (data->d_buf, phdr->p_filesz,
 						    phdr->p_vaddr, ehdr,
 						    &eh_frame_ptr,

@@ -1,3 +1,7 @@
+2014-11-27  Mark Wielaard  <mjw@redhat.com>
+
+	* vdsosyms.c (main): Call dwfl_linux_proc_attach.
+
 2014-11-21  Mark Wielaard  <mjw@redhat.com>
 
 	* run-readelf-A.sh: New test.

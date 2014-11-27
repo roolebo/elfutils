@@ -89,6 +89,13 @@ main (int argc __attribute__ ((unused)), char **argv __attribute__ ((unused)))
   else if (result > 0)
     error (2, result, "dwfl_linux_proc_report");
 
+  /* Also explicitly attach for older kernels (cannot read vdso otherwise).  */
+  result = dwfl_linux_proc_attach (dwfl, pid, false);
+  if (result < 0)
+    error (2, 0, "dwfl_linux_proc_attach: %s", dwfl_errmsg (-1));
+  else if (result > 0)
+    error (2, result, "dwfl_linux_proc_attach");
+
   if (dwfl_report_end (dwfl, NULL, NULL) != 0)
     error (2, 0, "dwfl_report_end: %s", dwfl_errmsg (-1));
 

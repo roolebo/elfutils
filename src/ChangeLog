@@ -1,3 +1,10 @@
+2014-11-28  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (handle_relocs_rel): Don't reuse destshdr to store
+	section header of a relocation against a STT_SECTION symbol. Use
+	a new local variable secshdr.
+	(handle_relocs_rela): Likewise.
+
 2014-11-26  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (print_debug_aranges_section): Cast Dwarf_Word length

@@ -1894,12 +1894,15 @@ handle_relocs_rel (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, GElf_Shdr *shdr)
 		    elf_strptr (ebl->elf, symshdr->sh_link, sym->st_name));
 	  else
 	    {
-	      destshdr = gelf_getshdr (elf_getscn (ebl->elf,
-						   sym->st_shndx == SHN_XINDEX
-						   ? xndx : sym->st_shndx),
-				       &destshdr_mem);
+	      /* This is a relocation against a STT_SECTION symbol.  */
+	      GElf_Shdr secshdr_mem;
+	      GElf_Shdr *secshdr;
+	      secshdr = gelf_getshdr (elf_getscn (ebl->elf,
+						  sym->st_shndx == SHN_XINDEX
+						  ? xndx : sym->st_shndx),
+				      &secshdr_mem);
 
-	      if (unlikely (destshdr == NULL))
+	      if (unlikely (secshdr == NULL))
 		printf ("  %#0*" PRIx64 "  %-20s <%s %ld>\n",
 			class == ELFCLASS32 ? 10 : 18, rel->r_offset,
 			ebl_reloc_type_check (ebl, GELF_R_TYPE (rel->r_info))
@@ -1921,7 +1924,7 @@ handle_relocs_rel (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, GElf_Shdr *shdr)
 					       buf, sizeof (buf)) + 2
 			: gettext ("<INVALID RELOC>"),
 			class == ELFCLASS32 ? 10 : 18, sym->st_value,
-			elf_strptr (ebl->elf, shstrndx, destshdr->sh_name));
+			elf_strptr (ebl->elf, shstrndx, secshdr->sh_name));
 	    }
 	}
     }
@@ -2085,12 +2088,15 @@ handle_relocs_rela (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, GElf_Shdr *shdr)
 		    elf_strptr (ebl->elf, symshdr->sh_link, sym->st_name));
 	  else
 	    {
-	      destshdr = gelf_getshdr (elf_getscn (ebl->elf,
-						   sym->st_shndx == SHN_XINDEX
-						   ? xndx : sym->st_shndx),
-				       &destshdr_mem);
+	      /* This is a relocation against a STT_SECTION symbol.  */
+	      GElf_Shdr secshdr_mem;
+	      GElf_Shdr *secshdr;
+	      secshdr = gelf_getshdr (elf_getscn (ebl->elf,
+						  sym->st_shndx == SHN_XINDEX
+						  ? xndx : sym->st_shndx),
+				      &secshdr_mem);
 
-	      if (unlikely (destshdr == NULL))
+	      if (unlikely (secshdr == NULL))
 		printf ("  %#0*" PRIx64 "  %-15s <%s %ld>\n",
 			class == ELFCLASS32 ? 10 : 18, rel->r_offset,
 			ebl_reloc_type_check (ebl, GELF_R_TYPE (rel->r_info))
@@ -2114,7 +2120,7 @@ handle_relocs_rela (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, GElf_Shdr *shdr)
 			: gettext ("<INVALID RELOC>"),
 			class == ELFCLASS32 ? 10 : 18, sym->st_value,
 			rel->r_addend,
-			elf_strptr (ebl->elf, shstrndx, destshdr->sh_name));
+			elf_strptr (ebl->elf, shstrndx, secshdr->sh_name));
 	    }
 	}
     }

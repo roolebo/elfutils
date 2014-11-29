@@ -1,3 +1,9 @@
+2014-11-29  Mark Wielaard  <mjw@redhat.com>
+
+	* relocate.c (relocate_section): Check relocation section and target
+	section data don't overlap any of the ELF headers.
+	(relocate): Check for offset + size overflow.
+
 2014-11-22  Mark Wielaard  <mjw@redhat.com>
 
 	* link_map.c (consider_executable): Use elf_getphdrnum.

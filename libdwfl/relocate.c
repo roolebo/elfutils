@@ -297,6 +297,43 @@ relocate_section (Dwfl_Module *mod, Elf *relocated, const GElf_Ehdr *ehdr,
   if (tdata == NULL)
     return DWFL_E_LIBELF;
 
+  /* If either the section that needs the relocation applied, or the
+     section that the relocations come from overlap one of the ehdrs,
+     shdrs or phdrs data then we refuse to do the relocations.  It
+     isn't illegal for ELF section data to overlap the header data,
+     but updating the (relocation) data might corrupt the in-memory
+     libelf headers causing strange corruptions or errors.  */
+  if (unlikely (shdr->sh_offset < ehdr->e_ehsize
+		|| tshdr->sh_offset < ehdr->e_ehsize))
+    return DWFL_E_BADELF;
+
+  GElf_Off shdrs_start = ehdr->e_shoff;
+  size_t shnums;
+  if (elf_getshdrnum (relocated, &shnums) < 0)
+    return DWFL_E_LIBELF;
+  /* Overflows will have been checked by elf_getshdrnum/get|rawdata.  */
+  GElf_Off shdrs_end = shdrs_start + shnums * ehdr->e_shentsize;
+  if (unlikely ((shdrs_start < shdr->sh_offset + shdr->sh_size
+		 && shdr->sh_offset < shdrs_end)
+		|| (shdrs_start < tshdr->sh_offset + tshdr->sh_size
+		    && tshdr->sh_offset < shdrs_end)))
+    return DWFL_E_BADELF;
+
+  GElf_Off phdrs_start = ehdr->e_phoff;
+  size_t phnums;
+  if (elf_getphdrnum (relocated, &phnums) < 0)
+    return DWFL_E_LIBELF;
+  if (phdrs_start != 0 && phnums != 0)
+    {
+      /* Overflows will have been checked by elf_getphdrnum/get|rawdata.  */
+      GElf_Off phdrs_end = phdrs_start + phnums * ehdr->e_phentsize;
+      if (unlikely ((phdrs_start < shdr->sh_offset + shdr->sh_size
+		     && shdr->sh_offset < phdrs_end)
+		    || (phdrs_start < tshdr->sh_offset + tshdr->sh_size
+			&& tshdr->sh_offset < phdrs_end)))
+	return DWFL_E_BADELF;
+    }
+
   /* Apply one relocation.  Returns true for any invalid data.  */
   Dwfl_Error relocate (GElf_Addr offset, const GElf_Sxword *addend,
 		       int rtype, int symndx)
@@ -365,7 +402,7 @@ relocate_section (Dwfl_Module *mod, Elf *relocated, const GElf_Ehdr *ehdr,
 	return DWFL_E_BADRELTYPE;
       }
 
-    if (offset + size > tdata->d_size)
+    if (offset > tdata->d_size || tdata->d_size - offset < size)
       return DWFL_E_BADRELOFF;
 
 #define DO_TYPE(NAME, Name) GElf_##Name Name;

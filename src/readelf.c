@@ -3055,8 +3055,10 @@ handle_sysv_hash64 (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx)
   Elf64_Xword nbucket = ((Elf64_Xword *) data->d_buf)[0];
   Elf64_Xword nchain = ((Elf64_Xword *) data->d_buf)[1];
 
-  uint64_t used_buf = (2ULL + nchain + nbucket) * sizeof (Elf64_Xword);
-  if (used_buf > data->d_size)
+  uint64_t maxwords = data->d_size / sizeof (Elf64_Xword);
+  if (maxwords < 2
+      || maxwords - 2 < nbucket
+      || maxwords - 2 - nbucket < nchain)
     goto invalid_data;
 
   Elf64_Xword *bucket = &((Elf64_Xword *) data->d_buf)[2];

@@ -1,3 +1,7 @@
+2014-11-30  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (handle_sysv_hash64): Fix overflow check.
+
 2014-11-28  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (handle_relocs_rel): Don't reuse destshdr to store

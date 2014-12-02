@@ -34,9 +34,9 @@ mac (Dwarf_Macro *macro, void *dbg)
 {
   static int level = 0;
 
-  switch (({ unsigned int opcode;
-	     dwarf_macro_opcode (macro, &opcode);
-	     opcode; }))
+  unsigned int opcode;
+  dwarf_macro_opcode (macro, &opcode);
+  switch (opcode)
     {
     case DW_MACRO_GNU_transparent_include:
       {
@@ -50,7 +50,7 @@ mac (Dwarf_Macro *macro, void *dbg)
 
 	printf ("%*sinclude %#" PRIx64 "\n", level, "", w);
 	++level;
-	include (dbg, w, 0);
+	include (dbg, w, DWARF_GETMACROS_START);
 	--level;
 	printf ("%*s/include\n", level, "");
 	break;
@@ -88,6 +88,19 @@ mac (Dwarf_Macro *macro, void *dbg)
 	printf ("%*s%s\n", level, "", value);
 	break;
       }
+
+    case DW_MACINFO_undef:
+    case DW_MACRO_GNU_undef_indirect:
+      break;
+
+    default:
+      {
+	size_t paramcnt;
+	dwarf_macro_getparamcnt (macro, &paramcnt);
+	printf ("%*sopcode %u with %zd arguments\n",
+		level, "", opcode, paramcnt);
+	break;
+      }
     }
 
   return DWARF_CB_ABORT;
@@ -105,17 +118,19 @@ include (Dwarf *dbg, Dwarf_Off macoff, ptrdiff_t token)
 }
 
 int
-main (int argc __attribute__ ((unused)), char *argv[])
+main (int argc, char *argv[])
 {
+  assert (argc >= 3);
   const char *name = argv[1];
   ptrdiff_t cuoff = strtol (argv[2], NULL, 0);
+  bool new_style = argc > 3;
 
   int fd = open (name, O_RDONLY);
   Dwarf *dbg = dwarf_begin (fd, DWARF_C_READ);
 
   Dwarf_Die cudie_mem, *cudie = dwarf_offdie (dbg, cuoff, &cudie_mem);
 
-  for (ptrdiff_t off = 0;
+  for (ptrdiff_t off = new_style ? DWARF_GETMACROS_START : 0;
        (off = dwarf_getmacros (cudie, mac, dbg, off)); )
     if (off == -1)
       {

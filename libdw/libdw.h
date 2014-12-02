@@ -32,6 +32,7 @@
 #include <gelf.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 
 
 #if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 3)
@@ -845,22 +846,24 @@ extern int dwarf_entry_breakpoints (Dwarf_Die *die, Dwarf_Addr **bkpts);
 
 
 /* Iterate through the macro unit referenced by CUDIE and call
-   CALLBACK for each macro information entry.  Keeps iterating while
-   CALLBACK returns DWARF_CB_OK.  If the callback returns
-   DWARF_CB_ABORT, it stops iterating and returns a continuation
-   token, which can be used to restart the iteration at the point
-   where it ended.  A TOKEN of 0 starts the iteration.  Returns -1 for
-   errors or 0 if there are no more macro entries.
+   CALLBACK for each macro information entry.  To start the iteration,
+   one would pass DWARF_GETMACROS_START for TOKEN.
+
+   The iteration continues while CALLBACK returns DWARF_CB_OK.  If the
+   callback returns DWARF_CB_ABORT, the iteration stops and a
+   continuation token is returned, which can be used to restart the
+   iteration at the point where it ended.  Returns -1 for errors or 0
+   if there are no more macro entries.
 
    Note that the Dwarf_Macro pointer passed to the callback is only
    valid for the duration of the callback invocation.
 
-   Note that this interface will refuse to serve opcode 0xff from
-   .debug_macro sections.  Such opcode is considered invalid and will
-   cause dwarf_getmacros to return with error.  Note that this should
-   be no limitation as of now, as DW_MACRO_GNU_* domain doesn't
-   allocate 0xff.  It is however a theoretical possibility with future
-   Dwarf standards.  */
+   For backward compatibility, a token of 0 is accepted for starting
+   the iteration as well, but in that case this interface will refuse
+   to serve opcode 0xff from .debug_macro sections.  Such opcode would
+   be considered invalid and would cause dwarf_getmacros to return
+   with error.  */
+#define DWARF_GETMACROS_START PTRDIFF_MIN
 extern ptrdiff_t dwarf_getmacros (Dwarf_Die *cudie,
 				  int (*callback) (Dwarf_Macro *, void *),
 				  void *arg, ptrdiff_t token)
@@ -871,13 +874,16 @@ extern ptrdiff_t dwarf_getmacros (Dwarf_Die *cudie,
    iterates .debug_macro.  This can be used for handling
    DW_MACRO_GNU_transparent_include's or similar opcodes.
 
+   TOKEN value of DWARF_GETMACROS_START can be used to start the
+   iteration.
+
    It is not appropriate to obtain macro unit offset by hand from a CU
    DIE and then request iteration through this interface.  The reason
    for this is that if a dwarf_macro_getsrcfiles is later called,
    there would be no way to figure out what DW_AT_comp_dir was present
    on the CU DIE, and file names referenced in either the macro unit
    itself, or the .debug_line unit that it references, might be wrong.
-   Use dwarf_getmacro.  */
+   Use dwarf_getmacros.  */
 extern ptrdiff_t dwarf_getmacros_off (Dwarf *dbg, Dwarf_Off macoff,
 				      int (*callback) (Dwarf_Macro *, void *),
 				      void *arg, ptrdiff_t token)
@@ -895,9 +901,11 @@ extern int dwarf_macro_getsrcfiles (Dwarf *dbg, Dwarf_Macro *macro,
 /* Return macro opcode.  That's a constant that can be either from
    DW_MACINFO_* domain or DW_MACRO_GNU_* domain.  The two domains have
    compatible values, so it's OK to use either of them for
-   comparisons.  The only differences is 0xff, which currently is
-   never served from .debug_macro, and can thus be safely assumed to
-   mean DW_MACINFO_vendor_ext.  */
+   comparisons.  The only differences is 0xff, which could be either
+   DW_MACINFO_vendor_ext or a vendor-defined DW_MACRO_* constant.  One
+   would need to look if the CU DIE which the iteration was requested
+   for has attribute DW_AT_macro_info, or either of DW_AT_GNU_macros
+   or DW_AT_macros to differentiate the two interpretations.  */
 extern int dwarf_macro_opcode (Dwarf_Macro *macro, unsigned int *opcodep)
      __nonnull_attribute__ (2);
 

@@ -384,13 +384,57 @@ read_macros (Dwarf *dbg, int sec_index,
   return 0;
 }
 
+/* Token layout:
+
+   - The highest bit is used for distinguishing between callers that
+     know that opcode 0xff may have one of two incompatible meanings.
+     The mask that we use for selecting this bit is
+     DWARF_GETMACROS_START.
+
+   - The rest of the token (31 or 63 bits) encodes address inside the
+     macro unit.
+
+   Besides, token value of 0 signals end of iteration and -1 is
+   reserved for signaling errors.  That means it's impossible to
+   represent maximum offset of a .debug_macro unit to new-style
+   callers (which in practice decreases the permissible macro unit
+   size by another 1 byte).  */
+
+static ptrdiff_t
+token_from_offset (ptrdiff_t offset, bool accept_0xff)
+{
+  if (offset == -1 || offset == 0)
+    return offset;
+
+  /* Make sure the offset didn't overflow into the flag bit.  */
+  if ((offset & DWARF_GETMACROS_START) != 0)
+    {
+      __libdw_seterrno (DWARF_E_TOO_BIG);
+      return -1;
+    }
+
+  if (accept_0xff)
+    offset |= DWARF_GETMACROS_START;
+
+  return offset;
+}
+
+static ptrdiff_t
+offset_from_token (ptrdiff_t token, bool *accept_0xffp)
+{
+  *accept_0xffp = (token & DWARF_GETMACROS_START) != 0;
+  token &= ~DWARF_GETMACROS_START;
+
+  return token;
+}
+
 static ptrdiff_t
 gnu_macros_getmacros_off (Dwarf *dbg, Dwarf_Off macoff,
 			  int (*callback) (Dwarf_Macro *, void *),
-			  void *arg, ptrdiff_t token, bool accept_0xff,
+			  void *arg, ptrdiff_t offset, bool accept_0xff,
 			  Dwarf_Die *cudie)
 {
-  assert (token <= 0);
+  assert (offset >= 0);
 
   if (macoff >= dbg->sectiondata[IDX_debug_macro]->d_size)
     {
@@ -398,23 +442,19 @@ gnu_macros_getmacros_off (Dwarf *dbg, Dwarf_Off macoff,
       return -1;
     }
 
-  ptrdiff_t ret = read_macros (dbg, IDX_debug_macro, macoff,
-			       callback, arg, -token, accept_0xff, cudie);
-  if (ret == -1)
-    return -1;
-  else
-    return -ret;
+  return read_macros (dbg, IDX_debug_macro, macoff,
+		      callback, arg, offset, accept_0xff, cudie);
 }
 
 static ptrdiff_t
 macro_info_getmacros_off (Dwarf *dbg, Dwarf_Off macoff,
 			  int (*callback) (Dwarf_Macro *, void *),
-			  void *arg, ptrdiff_t token, Dwarf_Die *cudie)
+			  void *arg, ptrdiff_t offset, Dwarf_Die *cudie)
 {
-  assert (token >= 0);
+  assert (offset >= 0);
 
   return read_macros (dbg, IDX_debug_macinfo, macoff,
-		      callback, arg, token, true, cudie);
+		      callback, arg, offset, true, cudie);
 }
 
 ptrdiff_t
@@ -428,21 +468,22 @@ dwarf_getmacros_off (Dwarf *dbg, Dwarf_Off macoff,
       return -1;
     }
 
-  /* We use token values > 0 for iteration through .debug_macinfo and
-     values < 0 for iteration through .debug_macro.  Return value of
-     -1 also signifies an error, but that's fine, because .debug_macro
-     always contains at least three bytes of headers and after
-     iterating one opcode, we should never see anything above -4.  */
-  assert (token <= 0);
+  bool accept_0xff;
+  ptrdiff_t offset = offset_from_token (token, &accept_0xff);
+  assert (accept_0xff);
 
-  return gnu_macros_getmacros_off (dbg, macoff, callback, arg, token, true,
-				   NULL);
+  offset = gnu_macros_getmacros_off (dbg, macoff, callback, arg, offset,
+				     accept_0xff, NULL);
+
+  return token_from_offset (offset, accept_0xff);
 }
 
-static ptrdiff_t
-do_dwarf_getmacros_die (Dwarf_Die *cudie, Dwarf_Off *macoffp,
-			int (*callback) (Dwarf_Macro *, void *),
-			void *arg, ptrdiff_t token, bool accept_0xff)
+ptrdiff_t
+dwarf_getmacros (cudie, callback, arg, token)
+     Dwarf_Die *cudie;
+     int (*callback) (Dwarf_Macro *, void *);
+     void *arg;
+     ptrdiff_t token;
 {
   if (cudie == NULL)
     {
@@ -450,50 +491,6 @@ do_dwarf_getmacros_die (Dwarf_Die *cudie, Dwarf_Off *macoffp,
       return -1;
     }
 
-  if (token > 0 && macoffp != NULL)
-    /* A continuation call from DW_AT_macro_info iteration, meaning
-       *MACOFF contains previously-cached offset.  */
-    return macro_info_getmacros_off (cudie->cu->dbg, *macoffp,
-				     callback, arg, token, cudie);
-
-  /* A fresh start of DW_AT_macro_info iteration, or a continuation
-     thereof without a cache.  */
-  if (token > 0
-      || (token == 0 && dwarf_hasattr (cudie, DW_AT_macro_info)))
-    {
-      Dwarf_Word macoff;
-      if (macoffp == NULL)
-	macoffp = &macoff;
-      if (get_offset_from (cudie, DW_AT_macro_info, macoffp) != 0)
-	return -1;
-      return macro_info_getmacros_off (cudie->cu->dbg, *macoffp,
-				       callback, arg, token, cudie);
-    }
-
-  if (token < 0 && macoffp != NULL)
-    /* A continuation call from DW_AT_GNU_macros iteration.  */
-    return gnu_macros_getmacros_off (cudie->cu->dbg, *macoffp,
-				     callback, arg, token, accept_0xff,
-				     cudie);
-
-  /* Likewise without cache, or iteration start.  */
-  Dwarf_Word macoff;
-  if (macoffp == NULL)
-    macoffp = &macoff;
-  if (get_offset_from (cudie, DW_AT_GNU_macros, macoffp) != 0)
-    return -1;
-  return gnu_macros_getmacros_off (cudie->cu->dbg, *macoffp,
-				   callback, arg, token, accept_0xff,
-				   cudie);
-}
-
-ptrdiff_t
-dwarf_getmacros (die, callback, arg, offset)
-     Dwarf_Die *die;
-     int (*callback) (Dwarf_Macro *, void *);
-     void *arg;
-     ptrdiff_t offset;
-{
   /* This function might be called from a code that expects to see
      DW_MACINFO_* opcodes, not DW_MACRO_{GNU_,}* ones.  It is fine to
      serve most DW_MACRO_{GNU_,}* opcodes to such code, because those
@@ -511,7 +508,33 @@ dwarf_getmacros (die, callback, arg, offset)
      some small probability that the two opcodes would look
      superficially similar enough that a client would be confused and
      misbehave as a result.  For this reason, we refuse to serve
-     through this interface 0xff's originating from .debug_macro.  */
+     through this interface 0xff's originating from .debug_macro
+     unless the TOKEN that we obtained indicates the call originates
+     from a new-style caller.  See above for details on what
+     information is encoded into tokens.  */
 
-  return do_dwarf_getmacros_die (die, NULL, callback, arg, offset, false);
+  bool accept_0xff;
+  ptrdiff_t offset = offset_from_token (token, &accept_0xff);
+
+  /* DW_AT_macro_info */
+  if (dwarf_hasattr (cudie, DW_AT_macro_info))
+    {
+      Dwarf_Word macoff;
+      if (get_offset_from (cudie, DW_AT_macro_info, &macoff) != 0)
+	return -1;
+      offset = macro_info_getmacros_off (cudie->cu->dbg, macoff,
+					 callback, arg, offset, cudie);
+    }
+  else
+    {
+      /* DW_AT_GNU_macros, DW_AT_macros */
+      Dwarf_Word macoff;
+      if (get_offset_from (cudie, DW_AT_GNU_macros, &macoff) != 0)
+	return -1;
+      offset = gnu_macros_getmacros_off (cudie->cu->dbg, macoff,
+					 callback, arg, offset, accept_0xff,
+					 cudie);
+    }
+
+  return token_from_offset (offset, accept_0xff);
 }

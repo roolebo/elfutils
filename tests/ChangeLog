@@ -1,3 +1,13 @@
+2014-12-02  Petr Machata  <pmachata@redhat.com>
+
+	* dwarf-getmacros.c (mac): Skip over DW_MACINFO_undef,
+	DW_MACRO_GNU_undef_indirect opcodes.  Add a default branch.
+	(main): Initialize off to DWARF_GETMACROS_START when an extra
+	command line argument is passed.
+	* testfile-macros-0xff.bz2: New test case.
+	* testfile-macros-0xff.s: New file (source for the above).
+	* run-dwarf-getmacros.sh: Add two tests.
+
 2014-11-27  Mark Wielaard  <mjw@redhat.com>
 
 	* vdsosyms.c (main): Call dwfl_linux_proc_attach.

@@ -696,4 +696,15 @@ file /home/mark/src/tests/macro.c
 /file
 EOF
 
+testfiles testfile-macros-0xff
+testrun_compare ${abs_builddir}/dwarf-getmacros testfile-macros-0xff 0xb <<\EOF
+invalid opcode
+EOF
+testrun_compare ${abs_builddir}/dwarf-getmacros testfile-macros-0xff 0xb '' <<\EOF
+opcode 255 with 0 arguments
+file /home/petr/proj/elfutils/master/elfutils/x.c
+ FOO 0
+/file
+EOF
+
 exit 0

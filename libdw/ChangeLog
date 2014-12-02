@@ -1,3 +1,10 @@
+2014-12-02  Petr Machata  <pmachata@redhat.com>
+
+	* dwarf_getmacros.c (token_from_offset, offset_from_token): New
+	helper functions.
+	(do_dwarf_getmacros_die): Merge into dwarf_getmacros.
+	* libdw.h (DWARF_GETMACROS_START): New macro.
+
 2014-11-27  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (libdw.so): Use textrel_check.

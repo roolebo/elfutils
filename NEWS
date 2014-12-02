@@ -8,8 +8,6 @@ libdw: New function dwarf_peel_type. dwarf_aggregate_size now uses
        dwarf_macro_getparamcnt, and dwarf_macro_param are available
        for more generalized inspection of macros and their parameters.
 
-XXX: Fix serving of 0xff based on what ends up in Dwarf 5.
-
 Version 0.160
 
 libdw: New functions dwarf_cu_getdwarf, dwarf_cu_die.

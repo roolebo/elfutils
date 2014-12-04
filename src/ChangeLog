@@ -1,3 +1,10 @@
+2014-12-04  Mark Wielaard  <mjw@redhat.com>
+
+	* objdump.c (show_relocs_x): Make sure destshdr exists.
+	(show_relocs_rel): Don't rely on shdr->sh_entsize, use gelf_fsize.
+	(show_relocs_rela): Likewise.
+	(show_relocs): Make sure destshdr, symshdr and symdata exists.
+
 2014-11-30  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (handle_sysv_hash64): Fix overflow check.

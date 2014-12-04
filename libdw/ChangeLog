@@ -1,3 +1,13 @@
+2014-12-04  Mark Wielaard  <mjw@redhat.com>
+
+	* libdwP.h (__libdw_form_val_compute_len): Add endp argument.
+	(__libdw_form_val_len): Likewise and check len doesn't overflow.
+	* libdw_form.c (__libdw_form_val_compute_len): Likewise.
+	* dwarf_child.c (__libdw_find_attr): Call __libdw_form_val_len
+	with endp.
+	* dwarf_getattrs.c (dwarf_getattrs): Likewise.
+	* dwarf_getmacros.c (read_macros): Likewise and check for errors.
+
 2014-12-02  Petr Machata  <pmachata@redhat.com>
 
 	* dwarf_getmacros.c (token_from_offset, offset_from_token): New

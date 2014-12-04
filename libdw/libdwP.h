@@ -458,14 +458,16 @@ extern Dwarf_Abbrev *__libdw_getabbrev (Dwarf *dbg, struct Dwarf_CU *cu,
 /* Helper functions for form handling.  */
 extern size_t __libdw_form_val_compute_len (Dwarf *dbg, struct Dwarf_CU *cu,
 					    unsigned int form,
-					    const unsigned char *valp)
-     __nonnull_attribute__ (1, 2, 4) internal_function;
+					    const unsigned char *valp,
+					    const unsigned char *endp)
+     __nonnull_attribute__ (1, 2, 4, 5) internal_function;
 
 /* Find the length of a form attribute.  */
 static inline size_t
-__nonnull_attribute__ (1, 2, 4)
+__nonnull_attribute__ (1, 2, 4, 5)
 __libdw_form_val_len (Dwarf *dbg, struct Dwarf_CU *cu,
-		      unsigned int form, const unsigned char *valp)
+		      unsigned int form, const unsigned char *valp,
+		      const unsigned char *endp)
 {
   /* Small lookup table of forms with fixed lengths.  Absent indexes are
      initialized 0, so any truly desired 0 is set to 0x80 and masked.  */
@@ -483,11 +485,19 @@ __libdw_form_val_len (Dwarf *dbg, struct Dwarf_CU *cu,
     {
       uint8_t len = form_lengths[form];
       if (len != 0)
-	return len & 0x7f; /* Mask to allow 0x80 -> 0.  */
+	{
+	  len &= 0x7f; /* Mask to allow 0x80 -> 0.  */
+	  if (unlikely (len > (size_t) (endp - valp)))
+	    {
+	      __libdw_seterrno (DWARF_E_INVALID_DWARF);
+	      return -1;
+	    }
+	  return len;
+	}
     }
 
   /* Other forms require some computation.  */
-  return __libdw_form_val_compute_len (dbg, cu, form, valp);
+  return __libdw_form_val_compute_len (dbg, cu, form, valp, endp);
 }
 
 /* Helper function for DW_FORM_ref* handling.  */

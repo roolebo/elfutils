@@ -367,8 +367,12 @@ read_macros (Dwarf *dbg, int sec_index,
 	  attributes[i].valp = (void *) readp;
 	  attributes[i].cu = &fake_cu;
 
-	  readp += __libdw_form_val_len (dbg, &fake_cu,
-					 proto->forms[i], readp);
+	  size_t len = __libdw_form_val_len (dbg, &fake_cu,
+					     proto->forms[i], readp, endp);
+	  if (len == (size_t) -1)
+	    return -1;
+
+	  readp += len;
 	}
 
       Dwarf_Macro macro = {

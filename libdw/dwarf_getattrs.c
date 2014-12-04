@@ -1,5 +1,5 @@
 /* Get attributes of the DIE.
-   Copyright (C) 2004, 2005, 2008, 2009 Red Hat, Inc.
+   Copyright (C) 2004, 2005, 2008, 2009, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
@@ -67,12 +67,13 @@ dwarf_getattrs (Dwarf_Die *die, int (*callback) (Dwarf_Attribute *, void *),
 
   /* Go over the list of attributes.  */
   Dwarf *dbg = die->cu->dbg;
+  const unsigned char *endp;
+  endp = ((const unsigned char *) dbg->sectiondata[IDX_debug_abbrev]->d_buf
+	  + dbg->sectiondata[IDX_debug_abbrev]->d_size);
   while (1)
     {
       /* Are we still in bounds?  */
-      if (unlikely (attrp
-		    >= ((unsigned char *) dbg->sectiondata[IDX_debug_abbrev]->d_buf
-			+ dbg->sectiondata[IDX_debug_abbrev]->d_size)))
+      if (unlikely (attrp >= endp))
 	goto invalid_dwarf;
 
       /* Get attribute name and form.  */
@@ -111,13 +112,13 @@ dwarf_getattrs (Dwarf_Die *die, int (*callback) (Dwarf_Attribute *, void *),
       if (attr.form != 0)
 	{
 	  size_t len = __libdw_form_val_len (dbg, die->cu, attr.form,
-					     die_addr);
+					     die_addr, endp);
 
 	  if (unlikely (len == (size_t) -1l))
 	    /* Something wrong with the file.  */
 	    return -1l;
 
-	  // XXX We need better boundary checks.
+	  // __libdw_form_val_len will have done a bounds check.
 	  die_addr += len;
 	}
     }

@@ -1,5 +1,5 @@
 /* Return child of current DIE.
-   Copyright (C) 2003-2011 Red Hat, Inc.
+   Copyright (C) 2003-2011, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -104,7 +104,8 @@ __libdw_find_attr (Dwarf_Die *die, unsigned int search_name,
       /* Skip over the rest of this attribute (if there is any).  */
       if (attr_form != 0)
 	{
-	  size_t len = __libdw_form_val_len (dbg, die->cu, attr_form, readp);
+	  size_t len = __libdw_form_val_len (dbg, die->cu, attr_form, readp,
+					     endp);
 
 	  if (unlikely (len == (size_t) -1l))
 	    {
@@ -112,7 +113,7 @@ __libdw_find_attr (Dwarf_Die *die, unsigned int search_name,
 	      break;
 	    }
 
-	  // XXX We need better boundary checks.
+	  // __libdw_form_val_len will have done a bounds check.
 	  readp += len;
 	}
     }

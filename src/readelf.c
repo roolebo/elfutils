@@ -3999,6 +3999,8 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 
 	case DW_OP_call_ref:
 	  /* Offset operand.  */
+	  if (ref_size == 0)
+	    goto invalid; /* Cannot be used in CFA.  */
 	  NEED (ref_size);
 	  if (ref_size == 4)
 	    addr = read_4ubyte_unaligned (dbg, data);
@@ -4203,6 +4205,8 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  /* DIE offset operand.  */
 	  start = data;
 	  NEED (ref_size + 1);
+	  if (ref_size == 0)
+	    goto invalid; /* Cannot be used in CFA.  */
 	  if (ref_size == 4)
 	    addr = read_4ubyte_unaligned (dbg, data);
 	  else

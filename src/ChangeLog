@@ -1,3 +1,8 @@
+2014-12-07  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_ops): Handle zero ref_size for DW_OP_call_ref
+	and DW_OP_GNU_implicit_pointer.
+
 2014-12-04  Mark Wielaard  <mjw@redhat.com>
 
 	* objdump.c (show_relocs_x): Make sure destshdr exists.

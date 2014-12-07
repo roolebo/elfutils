@@ -309,8 +309,9 @@ relocate_section (Dwfl_Module *mod, Elf *relocated, const GElf_Ehdr *ehdr,
      isn't illegal for ELF section data to overlap the header data,
      but updating the (relocation) data might corrupt the in-memory
      libelf headers causing strange corruptions or errors.  */
-  if (unlikely (shdr->sh_offset < ehdr->e_ehsize
-		|| tshdr->sh_offset < ehdr->e_ehsize))
+  size_t ehsize = gelf_fsize (relocated, ELF_T_EHDR, 1, EV_CURRENT);
+  if (unlikely (shdr->sh_offset < ehsize
+		|| tshdr->sh_offset < ehsize))
     return DWFL_E_BADELF;
 
   GElf_Off shdrs_start = ehdr->e_shoff;
@@ -318,7 +319,8 @@ relocate_section (Dwfl_Module *mod, Elf *relocated, const GElf_Ehdr *ehdr,
   if (elf_getshdrnum (relocated, &shnums) < 0)
     return DWFL_E_LIBELF;
   /* Overflows will have been checked by elf_getshdrnum/get|rawdata.  */
-  GElf_Off shdrs_end = shdrs_start + shnums * ehdr->e_shentsize;
+  size_t shentsize = gelf_fsize (relocated, ELF_T_SHDR, 1, EV_CURRENT);
+  GElf_Off shdrs_end = shdrs_start + shnums * shentsize;
   if (unlikely ((shdrs_start < shdr->sh_offset + shdr->sh_size
 		 && shdr->sh_offset < shdrs_end)
 		|| (shdrs_start < tshdr->sh_offset + tshdr->sh_size
@@ -332,7 +334,8 @@ relocate_section (Dwfl_Module *mod, Elf *relocated, const GElf_Ehdr *ehdr,
   if (phdrs_start != 0 && phnums != 0)
     {
       /* Overflows will have been checked by elf_getphdrnum/get|rawdata.  */
-      GElf_Off phdrs_end = phdrs_start + phnums * ehdr->e_phentsize;
+      size_t phentsize = gelf_fsize (relocated, ELF_T_PHDR, 1, EV_CURRENT);
+      GElf_Off phdrs_end = phdrs_start + phnums * phentsize;
       if (unlikely ((phdrs_start < shdr->sh_offset + shdr->sh_size
 		     && shdr->sh_offset < phdrs_end)
 		    || (phdrs_start < tshdr->sh_offset + tshdr->sh_size

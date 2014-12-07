@@ -38,6 +38,12 @@ internal_function
 __libdwfl_relocate_value (Dwfl_Module *mod, Elf *elf, size_t *shstrndx,
 			  Elf32_Word shndx, GElf_Addr *value)
 {
+  /* No adjustment needed for section zero, it is never loaded.
+     Handle it first, just in case the ELF file has strange section
+     zero flags set.  */
+  if (shndx == 0)
+    return DWFL_E_NOERROR;
+
   Elf_Scn *refscn = elf_getscn (elf, shndx);
   GElf_Shdr refshdr_mem, *refshdr = gelf_getshdr (refscn, &refshdr_mem);
   if (refshdr == NULL)

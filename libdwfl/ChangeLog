@@ -1,3 +1,9 @@
+2014-12-07  Mark Wielaard  <mjw@redhat.com>
+
+	* offline.c (dwfl_offline_section_address): Assert shndx is not zero.
+	* relocate.c (__libdwfl_relocate_value): Don't relocate against
+	section zero.
+
 2014-11-29  Mark Wielaard  <mjw@redhat.com>
 
 	* relocate.c (relocate_section): Check relocation section and target

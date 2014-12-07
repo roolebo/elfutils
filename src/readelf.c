@@ -6506,6 +6506,14 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	op_index = (op_index + op_advance) % max_ops_per_instr;
       }
 
+      if (max_ops_per_instr == 0)
+	{
+	  error (0, 0,
+		 gettext ("invalid maximum operations per instruction is zero"));
+	  linep = lineendp;
+	  continue;
+	}
+
       while (linep < lineendp)
 	{
 	  size_t offset = linep - (const unsigned char *) data->d_buf;

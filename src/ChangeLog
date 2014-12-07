@@ -1,5 +1,10 @@
 2014-12-07  Mark Wielaard  <mjw@redhat.com>
 
+	* readelf.c (print_debug_line_section): max_ops_per_instr cannot
+	be zero.
+
+2014-12-07  Mark Wielaard  <mjw@redhat.com>
+
 	* readelf.c (print_ops): Handle zero ref_size for DW_OP_call_ref
 	and DW_OP_GNU_implicit_pointer.
 

@@ -1,3 +1,8 @@
+2014-12-08  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_debug_exception_table): Report invalid data if
+	action table doesn't immediately follow call site table.
+
 2014-12-10  Josh Stone  <jistone@redhat.com>
 
 	* addr2line.c (get_diename): New, get linkage_name or name.

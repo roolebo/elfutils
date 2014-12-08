@@ -7748,7 +7748,8 @@ print_debug_exception_table (Dwfl_Module *dwflmod __attribute__ ((unused)),
 		       "        Action:            %u\n"),
 	      u++, call_site_start, call_site_length, landing_pad, action);
     }
-  assert (readp == action_table);
+  if (readp != action_table)
+    goto invalid_data;
 
   unsigned int max_ar_filter = 0;
   if (max_action > 0)

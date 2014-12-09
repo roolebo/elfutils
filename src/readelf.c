@@ -9017,9 +9017,13 @@ handle_file_note (Elf *core, GElf_Word descsz, GElf_Off desc_pos)
       return;
     }
 
+  size_t addrsize = gelf_fsize (core, ELF_T_ADDR, 1, EV_CURRENT);
+  uint64_t maxcount = (size_t) (end - ptr) / (3 * addrsize);
+  if (count > maxcount)
+    goto fail;
+
   /* Where file names are stored.  */
-  unsigned char const *const fstart
-    = ptr + 3 * count * gelf_fsize (core, ELF_T_ADDR, 1, EV_CURRENT);
+  unsigned char const *const fstart = ptr + 3 * count * addrsize;
   char const *fptr = (char *) fstart;
 
   printf ("    %" PRId64 " files:\n", count);

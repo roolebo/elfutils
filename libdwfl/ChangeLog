@@ -1,3 +1,8 @@
+2014-12-09  Mark Wielaard  <mjw@redhat.com>
+
+	* dwfl_segment_report_module.c (handle_file_note): Check count doesn't
+	overflow.
+
 2014-12-07  Mark Wielaard  <mjw@redhat.com>
 
 	* relocate.c (relocate_section): Sanity check section overlap against

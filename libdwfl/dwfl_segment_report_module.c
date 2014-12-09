@@ -158,6 +158,10 @@ handle_file_note (GElf_Addr module_start, GElf_Addr module_end,
   if (! buf_read_ulong (ei_data, sz, &ptr, end, NULL)) // page_size
     return NULL;
 
+  uint64_t maxcount = (size_t) (end - ptr) / (3 * sz);
+  if (count > maxcount)
+    return NULL;
+
   /* Where file names are stored.  */
   const char *fptr = ptr + 3 * count * sz;
 

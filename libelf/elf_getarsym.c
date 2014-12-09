@@ -186,7 +186,7 @@ elf_getarsym (elf, ptr)
 #if SIZE_MAX <= 4294967295U
 	  || n >= SIZE_MAX / sizeof (Elf_Arsym)
 #endif
-	  || n * w > index_size)
+	  || n > index_size / w)
 	{
 	  /* This index table cannot be right since it does not fit into
 	     the file.  */

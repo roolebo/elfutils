@@ -1,3 +1,7 @@
+2014-12-09  Mark Wielaard  <mjw@redhat.com>
+
+	* elf_getarsym.c (elf_getarsym): Make sure n * w doesn't overflow.
+
 2014-11-27  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (libelf.so): Use textrel_check.

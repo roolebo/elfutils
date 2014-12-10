@@ -1,3 +1,7 @@
+2014-12-10  Josh Stone  <jistone@redhat.com>
+
+	* addr2line.c (handle_address): Find the proper inline parents.
+
 2014-12-07  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (print_debug_line_section): max_ops_per_instr cannot

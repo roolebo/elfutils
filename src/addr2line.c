@@ -672,7 +672,23 @@ handle_address (const char *string, Dwfl *dwfl)
 			continue;
 
 		      if (show_functions)
-			print_diesym (&scopes[i + 1]);
+			{
+			  /* Search for the parent inline or function.  It
+			     might not be directly above this inline -- e.g.
+			     there could be a lexical_block in between.  */
+			  for (int j = i + 1; j < nscopes; j++)
+			    {
+			      Dwarf_Die *parent = &scopes[j];
+			      int tag = dwarf_tag (parent);
+			      if (tag == DW_TAG_inlined_subroutine
+				  || tag == DW_TAG_entry_point
+				  || tag == DW_TAG_subprogram)
+				{
+				  print_diesym (parent);
+				  break;
+				}
+			    }
+			}
 
 		      src = NULL;
 		      lineno = 0;

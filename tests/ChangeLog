@@ -1,3 +1,8 @@
+2014-12-10  Josh Stone  <jistone@redhat.com>
+
+	* run-addr2line-i-test.sh: Test 0x5f0 to make sure linkage_name is
+	preferred over the plain die name.
+
 2014-12-02  Petr Machata  <pmachata@redhat.com>
 
 	* dwarf-getmacros.c (mac): Skip over DW_MACINFO_undef,

@@ -103,7 +103,7 @@ testrun_compare ${abs_top_builddir}/src/addr2line -i -e testfile-inlines 0x00000
 EOF
 
 # All together now (plus function names).
-testrun_compare ${abs_top_builddir}/src/addr2line -f -i -e testfile-inlines 0x00000000000005a0 0x00000000000005a1 0x00000000000005b0 0x00000000000005b1 0x00000000000005c0 0x00000000000005d0 0x00000000000005e0 0x00000000000005e1 0x00000000000005f1 0x00000000000005f2 <<\EOF
+testrun_compare ${abs_top_builddir}/src/addr2line -f -i -e testfile-inlines 0x00000000000005a0 0x00000000000005a1 0x00000000000005b0 0x00000000000005b1 0x00000000000005c0 0x00000000000005d0 0x00000000000005e0 0x00000000000005e1 0x00000000000005f0 0x00000000000005f1 0x00000000000005f2 <<\EOF
 foobar
 /tmp/x.cpp:5
 foobar
@@ -132,6 +132,8 @@ baz
 /tmp/x.cpp:20
 _Z3foov
 /tmp/x.cpp:26
+_Z2fuv
+/tmp/x.cpp:31
 fubar inlined at /tmp/x.cpp:32 in _Z2fuv
 /tmp/x.cpp:10
 _Z2fuv

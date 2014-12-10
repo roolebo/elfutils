@@ -1,5 +1,12 @@
 2014-12-10  Josh Stone  <jistone@redhat.com>
 
+	* addr2line.c (get_diename): New, get linkage_name or name.
+	* addr2line.c (print_dwarf_function): Use get_diename.
+	* addr2line.c (handle_address): Likewise.
+	* addr2line.c (print_diesym): Removed.
+
+2014-12-10  Josh Stone  <jistone@redhat.com>
+
 	* addr2line.c (handle_address): Find the proper inline parents.
 
 2014-12-07  Mark Wielaard  <mjw@redhat.com>

@@ -258,6 +258,23 @@ parse_opt (int key, char *arg, struct argp_state *state)
 }
 
 
+static const char *
+get_diename (Dwarf_Die *die)
+{
+  Dwarf_Attribute attr;
+  const char *name;
+
+  name = dwarf_formstring (dwarf_attr_integrate (die, DW_AT_MIPS_linkage_name,
+						 &attr)
+			   ?: dwarf_attr_integrate (die, DW_AT_linkage_name,
+						    &attr));
+
+  if (name == NULL)
+    name = dwarf_diename (die) ?: "??";
+
+  return name;
+}
+
 static bool
 print_dwarf_function (Dwfl_Module *mod, Dwarf_Addr addr)
 {
@@ -274,7 +291,7 @@ print_dwarf_function (Dwfl_Module *mod, Dwarf_Addr addr)
       {
       case DW_TAG_subprogram:
 	{
-	  const char *name = dwarf_diename (&scopes[i]);
+	  const char *name = get_diename (&scopes[i]);
 	  if (name == NULL)
 	    return false;
 	  puts (name);
@@ -283,7 +300,7 @@ print_dwarf_function (Dwfl_Module *mod, Dwarf_Addr addr)
 
       case DW_TAG_inlined_subroutine:
 	{
-	  const char *name = dwarf_diename (&scopes[i]);
+	  const char *name = get_diename (&scopes[i]);
 	  if (name == NULL)
 	    return false;
 	  printf ("%s inlined", name);
@@ -393,23 +410,6 @@ print_addrsym (Dwfl_Module *mod, GElf_Addr addr)
 	}
       puts ("");
     }
-}
-
-static void
-print_diesym (Dwarf_Die *die)
-{
-  Dwarf_Attribute attr;
-  const char *name;
-
-  name = dwarf_formstring (dwarf_attr_integrate (die, DW_AT_MIPS_linkage_name,
-						 &attr)
-			   ?: dwarf_attr_integrate (die, DW_AT_linkage_name,
-						    &attr));
-
-  if (name == NULL)
-    name = dwarf_diename (die) ?: "??";
-
-  puts (name);
 }
 
 static int
@@ -684,7 +684,7 @@ handle_address (const char *string, Dwfl *dwfl)
 				  || tag == DW_TAG_entry_point
 				  || tag == DW_TAG_subprogram)
 				{
-				  print_diesym (parent);
+				  puts (get_diename (parent));
 				  break;
 				}
 			    }

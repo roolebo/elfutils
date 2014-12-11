@@ -5490,7 +5490,7 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	      unsigned int augmentationlen;
 	      get_uleb128 (augmentationlen, readp);
 
-	      if (augmentationlen > (size_t) (dataend - readp))
+	      if (augmentationlen > (size_t) (cieend - readp))
 		{
 		  error (0, 0, gettext ("invalid augmentation length"));
 		  readp = cieend;
@@ -5499,7 +5499,7 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
 	      const char *hdr = "Augmentation data:";
 	      const char *cp = augmentation + 1;
-	      while (*cp != '\0')
+	      while (*cp != '\0' && cp < augmentation + augmentationlen + 1)
 		{
 		  printf ("   %-26s%#x ", hdr, *readp);
 		  hdr = "";
@@ -5655,7 +5655,8 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 		  const char *hdr = "Augmentation data:";
 		  const char *cp = cie->augmentation + 1;
 		  unsigned int u = 0;
-		  while (*cp != '\0')
+		  while (*cp != '\0'
+			 && cp < cie->augmentation + augmentationlen + 1)
 		    {
 		      if (*cp == 'L')
 			{

@@ -1,5 +1,9 @@
 2014-12-11  Mark Wielaard  <mjw@redhat.com>
 
+	* elf_begin.c (file_read_elf): Correct ELF64 section offset check.
+
+2014-12-11  Mark Wielaard  <mjw@redhat.com>
+
 	* elf_begin.c (read_long_names): Check for offset overflow.
 	(__libelf_next_arhdr_wrlock): Likewise. Sanity check the ar_size.
 	Don't allow it to go beyond end of file.

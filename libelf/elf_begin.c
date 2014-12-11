@@ -412,8 +412,8 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 	  elf->state.elf64.ehdr = ehdr;
 
 	  if (unlikely (ehdr->e_shoff >= maxsize)
-	      || unlikely (ehdr->e_shoff
-			   + scncnt * sizeof (Elf32_Shdr) > maxsize))
+	      || unlikely (maxsize - ehdr->e_shoff
+			   < scncnt * sizeof (Elf64_Shdr)))
 	    goto free_and_out;
 	  elf->state.elf64.shdr
 	    = (Elf64_Shdr *) ((char *) ehdr + ehdr->e_shoff);

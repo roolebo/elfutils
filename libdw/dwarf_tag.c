@@ -1,5 +1,5 @@
 /* Return tag of given DIE.
-   Copyright (C) 2003-2011 Red Hat, Inc.
+   Copyright (C) 2003-2011, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -82,24 +82,14 @@ int
 dwarf_tag (die)
      Dwarf_Die *die;
 {
-  /* Do we already know the abbreviation?  */
-  if (die->abbrev == NULL)
-    {
-      /* Get the abbreviation code.  */
-      unsigned int u128;
-      const unsigned char *addr = die->addr;
-      get_uleb128 (u128, addr);
-
-      /* Find the abbreviation.  */
-      die->abbrev = __libdw_findabbrev (die->cu, u128);
-    }
-
-  if (unlikely (die->abbrev == DWARF_END_ABBREV))
+  /* Find the abbreviation entry.  */
+  Dwarf_Abbrev *abbrevp = __libdw_dieabbrev (die, NULL);
+  if (unlikely (abbrevp == DWARF_END_ABBREV))
     {
       __libdw_seterrno (DWARF_E_INVALID_DWARF);
       return DW_TAG_invalid;
     }
 
-  return die->abbrev->tag;
+  return abbrevp->tag;
 }
 INTDEF(dwarf_tag)

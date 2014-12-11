@@ -44,21 +44,11 @@ __libdw_find_attr (Dwarf_Die *die, unsigned int search_name,
 		   unsigned int *codep, unsigned int *formp)
 {
   Dwarf *dbg = die->cu->dbg;
-  const unsigned char *readp = (unsigned char *) die->addr;
-
-  /* First we have to get the abbreviation code so that we can decode
-     the data in the DIE.  */
-  unsigned int abbrev_code;
-  get_uleb128 (abbrev_code, readp);
+  const unsigned char *readp;
 
   /* Find the abbreviation entry.  */
-  Dwarf_Abbrev *abbrevp = die->abbrev;
-  if (abbrevp == NULL)
-    {
-      abbrevp = __libdw_findabbrev (die->cu, abbrev_code);
-      die->abbrev = abbrevp ?: DWARF_END_ABBREV;
-    }
-  if (unlikely (die->abbrev == DWARF_END_ABBREV))
+  Dwarf_Abbrev *abbrevp = __libdw_dieabbrev (die, &readp);
+  if (unlikely (abbrevp == DWARF_END_ABBREV))
     {
     invalid_dwarf:
       __libdw_seterrno (DWARF_E_INVALID_DWARF);
@@ -70,7 +60,7 @@ __libdw_find_attr (Dwarf_Die *die, unsigned int search_name,
     = ((unsigned char *) dbg->sectiondata[IDX_debug_abbrev]->d_buf
        + dbg->sectiondata[IDX_debug_abbrev]->d_size);
 
-  const unsigned char *attrp = die->abbrev->attrp;
+  const unsigned char *attrp = abbrevp->attrp;
   while (1)
     {
       /* Are we still in bounds?  This test needs to be refined.  */
@@ -137,20 +127,20 @@ dwarf_child (die, result)
   if (die == NULL)
     return -1;
 
-  /* Skip past the last attribute.  */
-  void *addr = NULL;
+  /* Find the abbreviation entry.  */
+  Dwarf_Abbrev *abbrevp = __libdw_dieabbrev (die, NULL);
+  if (unlikely (abbrevp == DWARF_END_ABBREV))
+    {
+      __libdw_seterrno (DWARF_E_INVALID_DWARF);
+      return -1;
+    }
 
-  /* If we already know there are no children do not search.  */
-  if (die->abbrev != DWARF_END_ABBREV
-      && (die->abbrev == NULL || die->abbrev->has_children))
-    addr = __libdw_find_attr (die, INVALID, NULL, NULL);
-  if (unlikely (die->abbrev == (Dwarf_Abbrev *) -1l))
-    return -1;
-
-  /* Make sure the DIE really has children.  */
-  if (! die->abbrev->has_children)
-    /* There cannot be any children.  */
+  /* If there are no children, do not search.  */
+  if (! abbrevp->has_children)
     return 1;
+
+  /* Skip past the last attribute.  */
+  void *addr = __libdw_find_attr (die, INVALID, NULL, NULL);
 
   if (addr == NULL)
     return -1;

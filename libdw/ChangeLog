@@ -1,3 +1,11 @@
+2014-12-10  Josh Stone  <jistone@redhat.com>
+
+	* libdwP.h (__libdw_dieabbrev): New die->abbrev lookup function.
+	* dwarf_child.c (__libdw_find_attr, dwarf_child): Use it.
+	* dwarf_getattrs.c (dwarf_getattrs): Likewise.
+	* dwarf_haschildren.c (dwarf_haschildren): Likewise.
+	* dwarf_tag.c (dwarf_tag): Likewise.
+
 2014-12-04  Mark Wielaard  <mjw@redhat.com>
 
 	* libdwP.h (__libdw_form_val_compute_len): Add endp argument.

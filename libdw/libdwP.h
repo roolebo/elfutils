@@ -444,7 +444,7 @@ extern struct Dwarf_CU *__libdw_intern_next_unit (Dwarf *dbg, bool debug_types)
 extern struct Dwarf_CU *__libdw_findcu (Dwarf *dbg, Dwarf_Off offset, bool tu)
      __nonnull_attribute__ (1) internal_function;
 
-/* Return tag of given DIE.  */
+/* Get abbreviation with given code.  */
 extern Dwarf_Abbrev *__libdw_findabbrev (struct Dwarf_CU *cu,
 					 unsigned int code)
      __nonnull_attribute__ (1) internal_function;
@@ -454,6 +454,29 @@ extern Dwarf_Abbrev *__libdw_getabbrev (Dwarf *dbg, struct Dwarf_CU *cu,
 					Dwarf_Off offset, size_t *lengthp,
 					Dwarf_Abbrev *result)
      __nonnull_attribute__ (1) internal_function;
+
+/* Get abbreviation of given DIE, and optionally set *READP to the DIE memory
+   just past the abbreviation code.  */
+static inline Dwarf_Abbrev *
+__nonnull_attribute__ (1)
+__libdw_dieabbrev (Dwarf_Die *die, const unsigned char **readp)
+{
+  /* Do we need to get the abbreviation, or need to read after the code?  */
+  if (die->abbrev == NULL || readp != NULL)
+    {
+      /* Get the abbreviation code.  */
+      unsigned int code;
+      const unsigned char *addr = die->addr;
+      get_uleb128 (code, addr);
+      if (readp != NULL)
+	*readp = addr;
+
+      /* Find the abbreviation.  */
+      if (die->abbrev == NULL)
+	die->abbrev = __libdw_findabbrev (die->cu, code);
+    }
+  return die->abbrev;
+}
 
 /* Helper functions for form handling.  */
 extern size_t __libdw_form_val_compute_len (Dwarf *dbg, struct Dwarf_CU *cu,

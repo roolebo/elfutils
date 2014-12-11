@@ -44,17 +44,12 @@ dwarf_getattrs (Dwarf_Die *die, int (*callback) (Dwarf_Attribute *, void *),
   if (unlikely (offset == 1))
     return 1;
 
-  const unsigned char *die_addr = die->addr;
+  const unsigned char *die_addr;
 
-  /* Get the abbreviation code.  */
-  unsigned int u128;
-  get_uleb128 (u128, die_addr);
+  /* Find the abbreviation entry.  */
+  Dwarf_Abbrev *abbrevp = __libdw_dieabbrev (die, &die_addr);
 
-  if (die->abbrev == NULL)
-    /* Find the abbreviation.  */
-    die->abbrev = __libdw_findabbrev (die->cu, u128);
-
-  if (unlikely (die->abbrev == DWARF_END_ABBREV))
+  if (unlikely (abbrevp == DWARF_END_ABBREV))
     {
     invalid_dwarf:
       __libdw_seterrno (DWARF_E_INVALID_DWARF);
@@ -62,8 +57,8 @@ dwarf_getattrs (Dwarf_Die *die, int (*callback) (Dwarf_Attribute *, void *),
     }
 
   /* This is where the attributes start.  */
-  const unsigned char *attrp = die->abbrev->attrp;
-  const unsigned char *const offset_attrp = die->abbrev->attrp + offset;
+  const unsigned char *attrp = abbrevp->attrp;
+  const unsigned char *const offset_attrp = abbrevp->attrp + offset;
 
   /* Go over the list of attributes.  */
   Dwarf *dbg = die->cu->dbg;
@@ -105,7 +100,7 @@ dwarf_getattrs (Dwarf_Die *die, int (*callback) (Dwarf_Attribute *, void *),
 	    /* Return the offset of the start of the attribute, so that
 	       dwarf_getattrs() can be restarted from this point if the
 	       caller so desires.  */
-	    return remembered_attrp - die->abbrev->attrp;
+	    return remembered_attrp - abbrevp->attrp;
 	}
 
       /* Skip over the rest of this attribute (if there is any).  */

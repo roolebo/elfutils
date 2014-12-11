@@ -1,3 +1,7 @@
+2014-12-11  Mark Wielaard  <mjw@redhat.com>
+
+	* libdw_findcu.c (__libdw_intern_next_unit): Sanity check offset.
+
 2014-12-13  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_getaranges.c (compare_aranges): Make sure Dwarf_Addr

@@ -1,5 +1,5 @@
 /* Return offset of DIE in CU.
-   Copyright (C) 2003-2010 Red Hat, Inc.
+   Copyright (C) 2003-2010, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -41,5 +41,5 @@ dwarf_cuoffset (die)
 {
   return (die == NULL
 	  ? (Dwarf_Off) -1l
-	  : (die->addr - cu_data (die->cu)->d_buf - die->cu->start));
+	  : (Dwarf_Off) (die->addr - die->cu->startp));
 }

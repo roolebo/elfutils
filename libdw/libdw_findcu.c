@@ -1,5 +1,5 @@
 /* Find CU for given offset.
-   Copyright (C) 2003-2010 Red Hat, Inc.
+   Copyright (C) 2003-2010, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -112,6 +112,10 @@ __libdw_intern_next_unit (dbg, debug_types)
 
   if (debug_types)
     Dwarf_Sig8_Hash_insert (&dbg->sig8_hash, type_sig8, newp);
+
+  void *buf = cu_data (newp)->d_buf;
+  newp->startp = buf + newp->start;
+  newp->endp = buf + newp->end;
 
   /* Add the new entry to the search tree.  */
   if (tsearch (newp, tree, findcu_cb) == NULL)

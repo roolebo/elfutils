@@ -310,6 +310,10 @@ struct Dwarf_CU
 
   /* Known location lists.  */
   void *locs;
+
+  /* Memory boundaries of this CU.  */
+  void *startp;
+  void *endp;
 };
 
 /* Compute the offset of a CU's first DIE from its offset.  This

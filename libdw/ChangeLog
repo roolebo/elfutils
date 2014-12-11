@@ -1,5 +1,14 @@
 2014-12-10  Josh Stone  <jistone@redhat.com>
 
+	* libdwP.h (Dwarf_CU): Add startp and endp boundaries.
+	* libdw_findcu.c (__libdw_intern_next_unit): Set startp and endp.
+	* dwarf_child.c (dwarf_child): Use cu->endp.
+	* dwarf_cuoffset.c (dwarf_cuoffset): Use cu->startp.
+	* dwarf_dieoffset.c (dwarf_dieoffset): Use cu->startp.
+	* dwarf_siblingof.c (dwarf_siblingof): Use both.
+
+2014-12-10  Josh Stone  <jistone@redhat.com>
+
 	* dwarf_hasattr.c (dwarf_hasattr): Just walk abbrev for presence.
 
 2014-12-10  Josh Stone  <jistone@redhat.com>

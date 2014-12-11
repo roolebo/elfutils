@@ -1,5 +1,9 @@
 2014-12-10  Josh Stone  <jistone@redhat.com>
 
+	* dwarf_hasattr.c (dwarf_hasattr): Just walk abbrev for presence.
+
+2014-12-10  Josh Stone  <jistone@redhat.com>
+
 	* libdwP.h (__libdw_dieabbrev): New die->abbrev lookup function.
 	* dwarf_child.c (__libdw_find_attr, dwarf_child): Use it.
 	* dwarf_getattrs.c (dwarf_getattrs): Likewise.

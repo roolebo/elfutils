@@ -43,10 +43,44 @@ dwarf_hasattr (die, search_name)
   if (die == NULL)
     return 0;
 
-  /* Search for the attribute with the given name.  */
-  unsigned int code;
-  unsigned char *addr = __libdw_find_attr (die, search_name, &code, NULL);
+  /* Find the abbreviation entry.  */
+  Dwarf_Abbrev *abbrevp = __libdw_dieabbrev (die, NULL);
+  if (unlikely (abbrevp == DWARF_END_ABBREV))
+    {
+    invalid_dwarf:
+      __libdw_seterrno (DWARF_E_INVALID_DWARF);
+      return 0;
+    }
 
-  return addr != NULL && code == search_name;
+  Dwarf *dbg = die->cu->dbg;
+
+  /* Search the name attribute.  */
+  unsigned char *const endp
+    = ((unsigned char *) dbg->sectiondata[IDX_debug_abbrev]->d_buf
+       + dbg->sectiondata[IDX_debug_abbrev]->d_size);
+
+  const unsigned char *attrp = abbrevp->attrp;
+  while (1)
+    {
+      /* Are we still in bounds?  This test needs to be refined.  */
+      if (unlikely (attrp + 1 >= endp))
+	goto invalid_dwarf;
+
+      /* Get attribute name and form.
+
+	 XXX We don't check whether this reads beyond the end of the
+	 section.  */
+      unsigned int attr_name;
+      get_uleb128 (attr_name, attrp);
+      unsigned int attr_form;
+      get_uleb128 (attr_form, attrp);
+
+      /* We can stop if we found the attribute with value zero.  */
+      if (attr_name == 0 || attr_form == 0)
+	return 0;
+
+      if (attr_name == search_name)
+	return 1;
+    }
 }
 INTDEF (dwarf_hasattr)

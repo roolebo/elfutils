@@ -7710,7 +7710,8 @@ print_debug_exception_table (Dwfl_Module *dwflmod __attribute__ ((unused)),
       unsigned int ttype_base_offset;
       get_uleb128 (ttype_base_offset, readp);
       printf (" TType base offset:   %#x\n", ttype_base_offset);
-      ttype_base = readp + ttype_base_offset;
+      if ((size_t) (dataend - readp) > ttype_base_offset)
+        ttype_base = readp + ttype_base_offset;
     }
 
   if (unlikely (readp + 1 > dataend))
@@ -7757,6 +7758,12 @@ print_debug_exception_table (Dwfl_Module *dwflmod __attribute__ ((unused)),
     {
       puts ("\n Action table:");
 
+      if ((size_t) (dataend - action_table) < max_action + 1)
+	{
+	  fputs (gettext ("   <INVALID DATA>\n"), stdout);
+	  return;
+	}
+
       const unsigned char *const action_table_end
 	= action_table + max_action + 1;
 
@@ -7784,7 +7791,7 @@ print_debug_exception_table (Dwfl_Module *dwflmod __attribute__ ((unused)),
       while (readp < action_table_end);
     }
 
-  if (max_ar_filter > 0)
+  if (max_ar_filter > 0 && ttype_base != NULL)
     {
       puts ("\n TType table:");
 

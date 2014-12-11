@@ -1,3 +1,9 @@
+2014-12-11  Mark Wielaard  <mjw@redhat.com>
+
+	* elf_begin.c (read_long_names): Check for offset overflow.
+	(__libelf_next_arhdr_wrlock): Likewise. Sanity check the ar_size.
+	Don't allow it to go beyond end of file.
+
 2014-12-09  Mark Wielaard  <mjw@redhat.com>
 
 	* elf_getarsym.c (elf_getarsym): Make sure n * w doesn't overflow.

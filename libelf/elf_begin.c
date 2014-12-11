@@ -673,7 +673,8 @@ read_long_names (Elf *elf)
     {
       if (elf->map_address != NULL)
 	{
-	  if (offset + sizeof (struct ar_hdr) > elf->maximum_size)
+	  if ((size_t) offset > elf->maximum_size
+	      || elf->maximum_size - offset < sizeof (struct ar_hdr))
 	    return NULL;
 
 	  /* The data is mapped.  */
@@ -767,8 +768,10 @@ __libelf_next_arhdr_wrlock (elf)
   if (elf->map_address != NULL)
     {
       /* See whether this entry is in the file.  */
-      if (unlikely (elf->state.ar.offset + sizeof (struct ar_hdr)
-		    > elf->start_offset + elf->maximum_size))
+      if (unlikely ((size_t) elf->state.ar.offset
+		    > elf->start_offset + elf->maximum_size
+		    || (elf->start_offset + elf->maximum_size
+			- elf->state.ar.offset) < sizeof (struct ar_hdr)))
 	{
 	  /* This record is not anymore in the file.  */
 	  __libelf_seterrno (ELF_E_RANGE);
@@ -911,6 +914,12 @@ __libelf_next_arhdr_wrlock (elf)
   INT_FIELD (ar_gid);
   INT_FIELD (ar_mode);
   INT_FIELD (ar_size);
+
+  /* Truncated file?  */
+  size_t maxsize;
+  maxsize = elf->maximum_size - elf->state.ar.offset - sizeof (struct ar_hdr);
+  if ((size_t) elf_ar_hdr->ar_size > maxsize)
+    elf_ar_hdr->ar_size = maxsize;
 
   return 0;
 }

@@ -416,7 +416,7 @@ debugaltlink_LDADD = $(libdw) $(libelf)
 buildid_LDADD = $(libdw) $(libelf)
 deleted_LDADD = ./deleted-lib.so
 deleted_lib_so_LDFLAGS = -shared -rdynamic
-deleted_lib_so_CFLAGS = -fPIC
+deleted_lib_so_CFLAGS = -fPIC -fasynchronous-unwind-tables
 aggregate_size_LDADD = $(libdw) $(libelf)
 vdsosyms_LDADD = $(libdw) $(libelf)
 

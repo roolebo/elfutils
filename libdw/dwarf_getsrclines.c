@@ -50,6 +50,7 @@ struct linelist
 {
   Dwarf_Line line;
   struct linelist *next;
+  size_t sequence;
 };
 
 
@@ -57,14 +58,24 @@ struct linelist
 static int
 compare_lines (const void *a, const void *b)
 {
-  Dwarf_Line *const *p1 = a;
-  Dwarf_Line *const *p2 = b;
+  struct linelist *const *p1 = a;
+  struct linelist *const *p2 = b;
+  struct linelist *list1 = *p1;
+  struct linelist *list2 = *p2;
+  Dwarf_Line *line1 = &list1->line;
+  Dwarf_Line *line2 = &list2->line;
 
-  if ((*p1)->addr == (*p2)->addr)
-    /* An end_sequence marker precedes a normal record at the same address.  */
-    return (*p2)->end_sequence - (*p1)->end_sequence;
+  if (line1->addr != line2->addr)
+    return (line1->addr < line2->addr) ? -1 : 1;
 
-  return (*p1)->addr - (*p2)->addr;
+  /* An end_sequence marker precedes a normal record at the same address.  */
+  if (line1->end_sequence != line2->end_sequence)
+    return line2->end_sequence - line1->end_sequence;
+
+  /* Otherwise, the linelist sequence maintains a stable sort.  */
+  return (list1->sequence < list2->sequence) ? -1
+    : (list1->sequence > list2->sequence) ? 1
+    : 0;
 }
 
 static int
@@ -76,7 +87,7 @@ read_srclines (Dwarf *dbg,
   int res = -1;
 
   struct linelist *linelist = NULL;
-  unsigned int nlinelist = 0;
+  size_t nlinelist = 0;
 
   /* If there are a large number of lines don't blow up the stack.
      Keep track of the last malloced linelist record and free them
@@ -321,6 +332,7 @@ read_srclines (Dwarf *dbg,
   inline bool add_new_line (struct linelist *new_line, bool end_sequence)
   {
     new_line->next = linelist;
+    new_line->sequence = nlinelist;
     linelist = new_line;
     ++nlinelist;
 
@@ -660,24 +672,22 @@ read_srclines (Dwarf *dbg,
   if (filesp != NULL)
     *filesp = files;
 
-  void *buf = libdw_alloc (dbg, Dwarf_Lines, (sizeof (Dwarf_Lines)
-					      + (sizeof (Dwarf_Line)
-						 * nlinelist)), 1);
+  size_t buf_size = (sizeof (Dwarf_Lines) + (sizeof (Dwarf_Line) * nlinelist));
+  void *buf = libdw_alloc (dbg, Dwarf_Lines, buf_size, 1);
 
   /* First use the buffer for the pointers, and sort the entries.
      We'll write the pointers in the end of the buffer, and then
      copy into the buffer from the beginning so the overlap works.  */
-  assert (sizeof (Dwarf_Line) >= sizeof (Dwarf_Line *));
-  Dwarf_Line **sortlines = (buf + sizeof (Dwarf_Lines)
-			    + ((sizeof (Dwarf_Line)
-				- sizeof (Dwarf_Line *)) * nlinelist));
+  assert (sizeof (Dwarf_Line) >= sizeof (struct linelist *));
+  struct linelist **sortlines = (buf + buf_size
+				 - sizeof (struct linelist **) * nlinelist);
 
   /* The list is in LIFO order and usually they come in clumps with
      ascending addresses.  So fill from the back to probably start with
      runs already in order before we sort.  */
-  for (unsigned int i = nlinelist; i-- > 0; )
+  for (size_t i = nlinelist; i-- > 0; )
     {
-      sortlines[i] = &linelist->line;
+      sortlines[i] = linelist;
       linelist = linelist->next;
     }
   assert (linelist == NULL);
@@ -690,9 +700,9 @@ read_srclines (Dwarf *dbg,
      of SORTLINES by the time we're reading the later ones.  */
   Dwarf_Lines *lines = buf;
   lines->nlines = nlinelist;
-  for (unsigned int i = 0; i < nlinelist; ++i)
+  for (size_t i = 0; i < nlinelist; ++i)
     {
-      lines->info[i] = *sortlines[i];
+      lines->info[i] = sortlines[i]->line;
       lines->info[i].files = files;
     }
 
@@ -711,7 +721,7 @@ read_srclines (Dwarf *dbg,
 
  out:
   /* Free malloced line records, if any.  */
-  for (unsigned int i = MAX_STACK_ALLOC; i < nlinelist; i++)
+  for (size_t i = MAX_STACK_ALLOC; i < nlinelist; i++)
     {
       struct linelist *ll = malloc_linelist->next;
       free (malloc_linelist);

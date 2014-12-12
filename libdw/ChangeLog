@@ -1,3 +1,10 @@
+2014-12-11  Josh Stone  <jistone@redhat.com>
+
+	* dwarf_getsrclines.c (struct linelist): Add sequence.
+	(compare_lines): Take linelists, and break ties by sequence.
+	(read_srclines): Use linelists for sorting.
+	(read_srclines::add_new_line): Set sequence.
+
 2014-12-10  Josh Stone  <jistone@redhat.com>
 
 	* libdwP.h (Dwarf_CU): Add startp and endp boundaries.

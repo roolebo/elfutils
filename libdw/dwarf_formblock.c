@@ -1,5 +1,5 @@
 /* Return block represented by attribute.
-   Copyright (C) 2004-2010 Red Hat, Inc.
+   Copyright (C) 2004-2010, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
@@ -43,28 +43,37 @@ dwarf_formblock (attr, return_block)
   if (attr == NULL)
     return -1;
 
-  const unsigned char *datap;
+  const unsigned char *datap = attr->valp;
+  const unsigned char *endp = attr->cu->endp;
 
   switch (attr->form)
     {
     case DW_FORM_block1:
+      if (unlikely (endp - datap < 1))
+	goto invalid;
       return_block->length = *(uint8_t *) attr->valp;
       return_block->data = attr->valp + 1;
       break;
 
     case DW_FORM_block2:
+      if (unlikely (endp - datap < 2))
+	goto invalid;
       return_block->length = read_2ubyte_unaligned (attr->cu->dbg, attr->valp);
       return_block->data = attr->valp + 2;
       break;
 
     case DW_FORM_block4:
+      if (unlikely (endp - datap < 4))
+	goto invalid;
       return_block->length = read_4ubyte_unaligned (attr->cu->dbg, attr->valp);
       return_block->data = attr->valp + 4;
       break;
 
     case DW_FORM_block:
     case DW_FORM_exprloc:
-      datap = attr->valp;
+      if (unlikely (endp - datap < 1))
+	goto invalid;
+      // XXX bounds check
       get_uleb128 (return_block->length, datap);
       return_block->data = (unsigned char *) datap;
       break;
@@ -74,12 +83,10 @@ dwarf_formblock (attr, return_block)
       return -1;
     }
 
-  if (unlikely (cu_data (attr->cu)->d_size
-		- (return_block->data
-		   - (unsigned char *) cu_data (attr->cu)->d_buf)
-		< return_block->length))
+  if (unlikely (return_block->length > (size_t) (endp - return_block->data)))
     {
       /* Block does not fit.  */
+    invalid:
       __libdw_seterrno (DWARF_E_INVALID_DWARF);
       return -1;
     }

@@ -1,5 +1,5 @@
 /* Return DWARF attribute associated with a location expression op.
-   Copyright (C) 2013 Red Hat, Inc.
+   Copyright (C) 2013, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -33,6 +33,24 @@
 #include <dwarf.h>
 #include <libdwP.h>
 
+static Dwarf_CU *
+attr_form_cu (Dwarf_Attribute *attr)
+{
+  /* If the attribute has block/expr form the data comes from the
+     .debug_info from the same cu as the attr.  Otherwise it comes from
+     the .debug_loc data section.  */
+  switch (attr->form)
+    {
+    case DW_FORM_block1:
+    case DW_FORM_block2:
+    case DW_FORM_block4:
+    case DW_FORM_block:
+    case DW_FORM_exprloc:
+      return attr->cu;
+    default:
+      return attr->cu->dbg->fake_loc_cu;
+    }
+}
 
 int
 dwarf_getlocation_attr (attr, op, result)
@@ -43,26 +61,27 @@ dwarf_getlocation_attr (attr, op, result)
   if (attr == NULL)
     return -1;
 
-  result->cu = attr->cu;
-
   switch (op->atom)
     {
       case DW_OP_implicit_value:
 	result->code = DW_AT_const_value;
 	result->form = DW_FORM_block;
 	result->valp = (unsigned char *) (uintptr_t) op->number2;
+	result->cu = attr_form_cu (attr);
 	break;
 
       case DW_OP_GNU_entry_value:
 	result->code = DW_AT_location;
 	result->form = DW_FORM_exprloc;
 	result->valp = (unsigned char *) (uintptr_t) op->number2;
+	result->cu = attr_form_cu (attr);
 	break;
 
       case DW_OP_GNU_const_type:
 	result->code = DW_AT_const_value;
 	result->form = DW_FORM_block1;
 	result->valp = (unsigned char *) (uintptr_t) op->number2;
+	result->cu = attr_form_cu (attr);
 	break;
 
       case DW_OP_call2:
@@ -74,7 +93,7 @@ dwarf_getlocation_attr (attr, op, result)
 	    return -1;
 	  if (INTUSE(dwarf_attr) (&die, DW_AT_location, result) == NULL)
 	    {
-	      __libdw_empty_loc_attr (result, attr->cu);
+	      __libdw_empty_loc_attr (result);
 	      return 0;
 	    }
 	}
@@ -88,7 +107,7 @@ dwarf_getlocation_attr (attr, op, result)
 	  if (INTUSE(dwarf_attr) (&die, DW_AT_location, result) == NULL
 	      && INTUSE(dwarf_attr) (&die, DW_AT_const_value, result) == NULL)
 	    {
-	      __libdw_empty_loc_attr (result, attr->cu);
+	      __libdw_empty_loc_attr (result);
 	      return 0;
 	    }
 	}

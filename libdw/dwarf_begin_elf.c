@@ -235,6 +235,28 @@ valid_p (Dwarf *result)
       result = NULL;
     }
 
+  if (result != NULL && result->sectiondata[IDX_debug_loc] != NULL)
+    {
+      result->fake_loc_cu = (Dwarf_CU *) calloc (1, sizeof (Dwarf_CU));
+      if (unlikely (result->fake_loc_cu == NULL))
+	{
+	  __libdw_free_zdata (result);
+	  Dwarf_Sig8_Hash_free (&result->sig8_hash);
+	  __libdw_seterrno (DWARF_E_NOMEM);
+	  free (result);
+	  result = NULL;
+	}
+      else
+	{
+	  result->fake_loc_cu->dbg = result;
+	  result->fake_loc_cu->startp
+	    = result->sectiondata[IDX_debug_loc]->d_buf;
+	  result->fake_loc_cu->endp
+	    = (result->sectiondata[IDX_debug_loc]->d_buf
+	       + result->sectiondata[IDX_debug_loc]->d_size);
+	}
+    }
+
   return result;
 }
 

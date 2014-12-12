@@ -188,6 +188,10 @@ struct Dwarf
   /* Cached info from the CFI section.  */
   struct Dwarf_CFI_s *cfi;
 
+  /* Fake loc CU.  Used when synthesizing attributes for Dwarf_Ops that
+     came from a location list entry in dwarf_getlocation_attr.  */
+  struct Dwarf_CU *fake_loc_cu;
+
   /* Internal memory handling.  This is basically a simplified
      reimplementation of obstacks.  Unfortunately the standard obstack
      implementation is not usable in libraries.  */
@@ -337,7 +341,7 @@ struct Dwarf_CU
   ((Dwarf_Die)								      \
    {									      \
      .cu = (fromcu),							      \
-     .addr = ((char *) cu_data (fromcu)->d_buf				      \
+     .addr = ((char *) fromcu->dbg->sectiondata[cu_sec_idx (fromcu)]->d_buf   \
 	      + DIE_OFFSET_FROM_CU_OFFSET ((fromcu)->start,		      \
 					   (fromcu)->offset_size,	      \
 					   (fromcu)->type_offset != 0))	      \
@@ -483,18 +487,16 @@ __libdw_dieabbrev (Dwarf_Die *die, const unsigned char **readp)
 }
 
 /* Helper functions for form handling.  */
-extern size_t __libdw_form_val_compute_len (Dwarf *dbg, struct Dwarf_CU *cu,
+extern size_t __libdw_form_val_compute_len (struct Dwarf_CU *cu,
 					    unsigned int form,
-					    const unsigned char *valp,
-					    const unsigned char *endp)
-     __nonnull_attribute__ (1, 2, 4, 5) internal_function;
+					    const unsigned char *valp)
+     __nonnull_attribute__ (1, 3) internal_function;
 
 /* Find the length of a form attribute.  */
 static inline size_t
-__nonnull_attribute__ (1, 2, 4, 5)
-__libdw_form_val_len (Dwarf *dbg, struct Dwarf_CU *cu,
-		      unsigned int form, const unsigned char *valp,
-		      const unsigned char *endp)
+__nonnull_attribute__ (1, 3)
+__libdw_form_val_len (struct Dwarf_CU *cu, unsigned int form,
+		      const unsigned char *valp)
 {
   /* Small lookup table of forms with fixed lengths.  Absent indexes are
      initialized 0, so any truly desired 0 is set to 0x80 and masked.  */
@@ -513,6 +515,7 @@ __libdw_form_val_len (Dwarf *dbg, struct Dwarf_CU *cu,
       uint8_t len = form_lengths[form];
       if (len != 0)
 	{
+	  const unsigned char *endp = cu->endp;
 	  len &= 0x7f; /* Mask to allow 0x80 -> 0.  */
 	  if (unlikely (len > (size_t) (endp - valp)))
 	    {
@@ -524,7 +527,7 @@ __libdw_form_val_len (Dwarf *dbg, struct Dwarf_CU *cu,
     }
 
   /* Other forms require some computation.  */
-  return __libdw_form_val_compute_len (dbg, cu, form, valp, endp);
+  return __libdw_form_val_compute_len (cu, form, valp);
 }
 
 /* Helper function for DW_FORM_ref* handling.  */
@@ -721,12 +724,6 @@ cu_sec_idx (struct Dwarf_CU *cu)
   return cu->type_offset == 0 ? IDX_debug_info : IDX_debug_types;
 }
 
-static inline Elf_Data *
-cu_data (struct Dwarf_CU *cu)
-{
-  return cu->dbg->sectiondata[cu_sec_idx (cu)];
-}
-
 /* Read up begin/end pair and increment read pointer.
     - If it's normal range record, set up *BEGINP and *ENDP and return 0.
     - If it's base address selection record, set up *BASEP and return 1.
@@ -744,7 +741,7 @@ unsigned char * __libdw_formptr (Dwarf_Attribute *attr, int sec_index,
   internal_function;
 
 /* Fills in the given attribute to point at an empty location expression.  */
-void __libdw_empty_loc_attr (Dwarf_Attribute *attr, struct Dwarf_CU *cu)
+void __libdw_empty_loc_attr (Dwarf_Attribute *attr)
   internal_function;
 
 /* Load .debug_line unit at DEBUG_LINE_OFFSET.  COMP_DIR is a value of

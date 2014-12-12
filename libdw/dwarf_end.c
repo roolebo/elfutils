@@ -117,6 +117,9 @@ dwarf_end (dwarf)
       if (dwarf->free_elf)
 	elf_end (dwarf->elf);
 
+      /* Free the fake location list CU.  */
+      free (dwarf->fake_loc_cu);
+
       /* Free the context descriptor.  */
       free (dwarf);
     }

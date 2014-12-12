@@ -354,6 +354,8 @@ read_macros (Dwarf *dbg, int sec_index,
 	.dbg = dbg,
 	.version = 4,
 	.offset_size = table->is_64bit ? 8 : 4,
+	.startp = (void *) startp + offset,
+	.endp = (void *) endp,
       };
 
       Dwarf_Attribute attributes[proto->nforms];
@@ -367,8 +369,7 @@ read_macros (Dwarf *dbg, int sec_index,
 	  attributes[i].valp = (void *) readp;
 	  attributes[i].cu = &fake_cu;
 
-	  size_t len = __libdw_form_val_len (dbg, &fake_cu,
-					     proto->forms[i], readp, endp);
+	  size_t len = __libdw_form_val_len (&fake_cu, proto->forms[i], readp);
 	  if (len == (size_t) -1)
 	    return -1;
 

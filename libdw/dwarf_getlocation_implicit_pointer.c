@@ -35,15 +35,17 @@
 
 
 static unsigned char empty_exprloc = 0;
+static Dwarf_CU empty_cu = { .startp = &empty_exprloc,
+			     .endp = &empty_exprloc + 1 };
 
 void
 internal_function
-__libdw_empty_loc_attr (Dwarf_Attribute *attr, struct Dwarf_CU *cu )
+__libdw_empty_loc_attr (Dwarf_Attribute *attr)
 {
   attr->code = DW_AT_location;
   attr->form = DW_FORM_exprloc;
   attr->valp = &empty_exprloc;
-  attr->cu = cu;
+  attr->cu = &empty_cu;
 }
 
 int
@@ -69,7 +71,7 @@ dwarf_getlocation_implicit_pointer (attr, op, result)
   if (INTUSE(dwarf_attr) (&die, DW_AT_location, result) == NULL
       && INTUSE(dwarf_attr) (&die, DW_AT_const_value, result) == NULL)
     {
-      __libdw_empty_loc_attr (result, attr->cu);
+      __libdw_empty_loc_attr (result);
       return 0;
     }
 

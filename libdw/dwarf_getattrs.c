@@ -106,9 +106,7 @@ dwarf_getattrs (Dwarf_Die *die, int (*callback) (Dwarf_Attribute *, void *),
       /* Skip over the rest of this attribute (if there is any).  */
       if (attr.form != 0)
 	{
-	  size_t len = __libdw_form_val_len (dbg, die->cu, attr.form,
-					     die_addr, endp);
-
+	  size_t len = __libdw_form_val_len (die->cu, attr.form, die_addr);
 	  if (unlikely (len == (size_t) -1l))
 	    /* Something wrong with the file.  */
 	    return -1l;

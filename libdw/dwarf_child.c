@@ -94,9 +94,7 @@ __libdw_find_attr (Dwarf_Die *die, unsigned int search_name,
       /* Skip over the rest of this attribute (if there is any).  */
       if (attr_form != 0)
 	{
-	  size_t len = __libdw_form_val_len (dbg, die->cu, attr_form, readp,
-					     endp);
-
+	  size_t len = __libdw_form_val_len (die->cu, attr_form, readp);
 	  if (unlikely (len == (size_t) -1l))
 	    {
 	      readp = NULL;

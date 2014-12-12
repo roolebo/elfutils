@@ -1,3 +1,31 @@
+2014-12-12  Mark Wielaard  <mjw@redhat.com>
+
+	* libdwP.h (struct Dwarf): Add fake_loc_cu.
+	(cu_data): Removed.
+	(DIE_OFFSET_FROM_CU_OFFSET): Don't use cu_data, use cu_sec_idx.
+	(__libdw_form_val_compute_len): Drop dbg and endp arguments.
+	(__libdw_form_val_len): Likewise.
+	* libdw_form.c (__libdw_form_val_compute_len): Likewise.
+	* libdw_findcu.c (__libdw_intern_next_unit): Don't use cu_data, use
+	the already found data buffer directly.
+	* dwarf_begin_elf.c (valid_p): Setup fake_loc_cu.
+	* dwarf_end.c (dwarf_end): Free fake_loc_cu.
+	* dwarf_child.c (__libdw_find_attr): Call __libdw_form_val_len with
+	just cu.
+	* dwarf_getattrs.c (dwarf_getattrs): Likewise.
+	* dwarf_formblock.c (dwarf_formblock): Add bounds checking.
+	* dwarf_getlocation_attr.c (attr_form_cu): New function.
+	(dwarf_getlocation_attr): Use attr_form_cu to set result->cu.
+	(getlocation): Handle empty blocks immediately.
+	* dwarf_getlocation_implicit_pointer.c (empty_cu): New static var.
+	(__libdw_empty_loc_attr): Drop cu argument, use empty_cu.
+	(dwarf_getlocation_implicit_pointer): Call __libdw_empty_loc_attr with
+	one argument.
+	* dwarf_getmacros.c (read_macros): Also setup startp and endp for
+	fake_cu. Call __libdw_form_val_len with just fake_cu.
+	* dwarf_formref_die.c (dwarf_formref_die): Don't use cu_data, get
+	datap and size directly from cu startp and endp.
+
 2014-12-11  Mark Wielaard  <mjw@redhat.com>
 
 	* libdw_findcu.c (__libdw_intern_next_unit): Sanity check offset.

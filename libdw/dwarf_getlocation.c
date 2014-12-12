@@ -555,6 +555,14 @@ static int
 getlocation (struct Dwarf_CU *cu, const Dwarf_Block *block,
 	     Dwarf_Op **llbuf, size_t *listlen, int sec_index)
 {
+  /* Empty location expressions don't have any ops to intern.
+     Note that synthetic empty_cu doesn't have an associated DWARF dbg.  */
+  if (block->length == 0)
+    {
+      *listlen = 0;
+      return 0;
+    }
+
   return __libdw_intern_expression (cu->dbg, cu->dbg->other_byte_order,
 				    cu->address_size, (cu->version == 2
 						       ? cu->address_size

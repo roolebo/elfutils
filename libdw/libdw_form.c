@@ -39,11 +39,11 @@
 
 size_t
 internal_function
-__libdw_form_val_compute_len (Dwarf *dbg, struct Dwarf_CU *cu,
-			      unsigned int form, const unsigned char *valp,
-			      const unsigned char *endp)
+__libdw_form_val_compute_len (struct Dwarf_CU *cu, unsigned int form,
+			      const unsigned char *valp)
 {
   const unsigned char *startp = valp;
+  const unsigned char *endp = cu->endp;
   Dwarf_Word u128;
   size_t result;
 
@@ -75,13 +75,13 @@ __libdw_form_val_compute_len (Dwarf *dbg, struct Dwarf_CU *cu,
     case DW_FORM_block2:
       if (unlikely ((size_t) (endp - startp) < 2))
 	goto invalid;
-      result = read_2ubyte_unaligned (dbg, valp) + 2;
+      result = read_2ubyte_unaligned (cu->dbg, valp) + 2;
       break;
 
     case DW_FORM_block4:
       if (unlikely ((size_t) (endp - startp) < 4))
 	goto invalid;
-      result = read_4ubyte_unaligned (dbg, valp) + 4;
+      result = read_4ubyte_unaligned (cu->dbg, valp) + 4;
       break;
 
     case DW_FORM_block:
@@ -112,7 +112,7 @@ __libdw_form_val_compute_len (Dwarf *dbg, struct Dwarf_CU *cu,
     case DW_FORM_indirect:
       get_uleb128 (u128, valp);
       // XXX Is this really correct?
-      result = __libdw_form_val_len (dbg, cu, u128, valp, endp);
+      result = __libdw_form_val_len (cu, u128, valp);
       if (result != (size_t) -1)
 	result += valp - startp;
       else

@@ -1,3 +1,8 @@
+2014-12-11  Josh Stone  <jistone@redhat.com>
+
+	* dwfl_module_getsrc.c (dwfl_module_getsrc): Return the *last* line
+	record <= addr, rather than returning immediately on matches.
+
 2014-12-09  Mark Wielaard  <mjw@redhat.com>
 
 	* dwfl_segment_report_module.c (handle_file_note): Check count doesn't

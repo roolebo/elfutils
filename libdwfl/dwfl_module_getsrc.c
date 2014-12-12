@@ -1,5 +1,5 @@
 /* Find source location for PC address in module.
-   Copyright (C) 2005, 2008 Red Hat, Inc.
+   Copyright (C) 2005, 2008, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -42,32 +42,35 @@ dwfl_module_getsrc (Dwfl_Module *mod, Dwarf_Addr addr)
     error = __libdwfl_cu_getsrclines (cu);
   if (likely (error == DWFL_E_NOERROR))
     {
-      /* Now we look at the module-relative address.  */
-      addr -= bias;
-
-      /* The lines are sorted by address, so we can use binary search.  */
-      size_t l = 0, u = cu->die.cu->lines->nlines;
-      while (l < u)
+      Dwarf_Lines *lines = cu->die.cu->lines;
+      size_t nlines = lines->nlines;
+      if (nlines > 0)
 	{
-	  size_t idx = (l + u) / 2;
-	  if (addr < cu->die.cu->lines->info[idx].addr)
-	    u = idx;
-	  else if (addr > cu->die.cu->lines->info[idx].addr)
-	    l = idx + 1;
-	  else
-	    return &cu->lines->idx[idx];
+	  /* This is guaranteed for us by libdw read_srclines.  */
+	  assert(lines->info[nlines - 1].end_sequence);
+
+	  /* Now we look at the module-relative address.  */
+	  addr -= bias;
+
+	  /* The lines are sorted by address, so we can use binary search.  */
+	  size_t l = 0, u = nlines - 1;
+	  while (l < u)
+	    {
+	      size_t idx = u - (u - l) / 2;
+	      Dwarf_Line *line = &lines->info[idx];
+	      if (addr < line->addr)
+		u = idx - 1;
+	      else
+		l = idx;
+	    }
+
+	  /* The last line which is less than or equal to addr is what we want,
+	     except with an end_sequence which can only be strictly equal.  */
+	  Dwarf_Line *line = &lines->info[l];
+	  if (line->addr == addr
+	      || (! line->end_sequence && line->addr < addr))
+	    return &cu->lines->idx[l];
 	}
-
-      if (cu->die.cu->lines->nlines > 0)
-	assert (cu->die.cu->lines->info
-		[cu->die.cu->lines->nlines - 1].end_sequence);
-
-      /* If none were equal, the closest one below is what we want.
-	 We never want the last one, because it's the end-sequence
-	 marker with an address at the high bound of the CU's code.  */
-      if (u > 0 && u < cu->die.cu->lines->nlines
-	  && addr > cu->die.cu->lines->info[u - 1].addr)
-	return &cu->lines->idx[u - 1];
 
       error = DWFL_E_ADDR_OUTOFRANGE;
     }

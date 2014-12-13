@@ -1,3 +1,8 @@
+2014-12-13  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_getaranges.c (compare_aranges): Make sure Dwarf_Addr
+	difference doesn't wrap around before returning as int.
+
 2014-12-11  Josh Stone  <jistone@redhat.com>
 
 	* dwarf_getsrclines.c (struct linelist): Add sequence.

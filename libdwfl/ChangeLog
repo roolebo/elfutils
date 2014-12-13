@@ -1,3 +1,8 @@
+2014-12-13  Mark Wielaard  <mjw@redhat.com>
+
+	* cu.c (cudie_offset): Make sure Dwarf_Off difference doesn't
+	wrap around before returning as int.
+
 2014-12-11  Josh Stone  <jistone@redhat.com>
 
 	* dwfl_module_getsrc.c (dwfl_module_getsrc): Return the *last* line

@@ -162,7 +162,9 @@ cudie_offset (const struct dwfl_cu *cu)
 static int
 compare_cukey (const void *a, const void *b)
 {
-  return cudie_offset (a) - cudie_offset (b);
+  Dwarf_Off a_off = cudie_offset (a);
+  Dwarf_Off b_off = cudie_offset (b);
+  return (a_off < b_off) ? -1 : ((a_off > b_off) ? 1 : 0);
 }
 
 /* Intern the CU if necessary.  */

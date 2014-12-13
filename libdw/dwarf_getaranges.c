@@ -48,7 +48,9 @@ compare_aranges (const void *a, const void *b)
 {
   struct arangelist *const *p1 = a, *const *p2 = b;
   struct arangelist *l1 = *p1, *l2 = *p2;
-  return l1->arange.addr - l2->arange.addr;
+  if (l1->arange.addr != l2->arange.addr)
+    return (l1->arange.addr < l2->arange.addr) ? -1 : 1;
+  return 0;
 }
 
 int

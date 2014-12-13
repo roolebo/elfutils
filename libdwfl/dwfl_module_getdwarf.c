@@ -768,7 +768,15 @@ find_dynsym (Dwfl_Module *mod)
 					      * sizeof (Elf32_Word)
 					      * header->maskwords));
 
-		    data = elf_getdata_rawchunk (mod->main.elf, buckets_at,
+		    // elf_getdata_rawchunk takes a size_t, make sure it
+		    // doesn't overflow.
+#if SIZE_MAX <= UINT32_MAX
+		    if (nbuckets > SIZE_MAX / sizeof (Elf32_Word))
+		      data = NULL;
+		    else
+#endif
+		      data
+			 = elf_getdata_rawchunk (mod->main.elf, buckets_at,
 						 nbuckets * sizeof (Elf32_Word),
 						 ELF_T_WORD);
 		    if (data != NULL && symndx < nbuckets)

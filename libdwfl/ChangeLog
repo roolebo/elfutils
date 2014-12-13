@@ -1,5 +1,10 @@
 2014-12-13  Mark Wielaard  <mjw@redhat.com>
 
+	* dwfl_module_getdwarf.c (find_dynsym): elf_getdata_rawchunk takes
+	a size_t, make sure it doesn't overflow.
+
+2014-12-13  Mark Wielaard  <mjw@redhat.com>
+
 	* cu.c (cudie_offset): Make sure Dwarf_Off difference doesn't
 	wrap around before returning as int.
 

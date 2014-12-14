@@ -1,5 +1,5 @@
 /* DW_EH_PE_* support for libdw unwinder.
-   Copyright (C) 2009-2010 Red Hat, Inc.
+   Copyright (C) 2009-2010, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -163,11 +163,13 @@ read_encoded_value (const Dwarf_CFI *cache, uint8_t encoding, const uint8_t **p,
       break;
 
     case DW_EH_PE_uleb128:
-      get_uleb128 (value, *p);
+      // XXX we trust there is enough data.
+      get_uleb128 (value, *p, *p + len_leb128 (Dwarf_Addr));
       break;
 
     case DW_EH_PE_sleb128:
-      get_sleb128 (value, *p);
+      // XXX we trust there is enough data.
+      get_sleb128 (value, *p, *p + len_leb128 (Dwarf_Addr));
       break;
 
     default:

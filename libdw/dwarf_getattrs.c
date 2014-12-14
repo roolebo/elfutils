@@ -75,9 +75,10 @@ dwarf_getattrs (Dwarf_Die *die, int (*callback) (Dwarf_Attribute *, void *),
       Dwarf_Attribute attr;
       const unsigned char *remembered_attrp = attrp;
 
-      // XXX Fix bound checks
-      get_uleb128 (attr.code, attrp);
-      get_uleb128 (attr.form, attrp);
+      get_uleb128 (attr.code, attrp, endp);
+      if (unlikely (attrp >= endp))
+	goto invalid_dwarf;
+      get_uleb128 (attr.form, attrp, endp);
 
       /* We can stop if we found the attribute with value zero.  */
       if (attr.code == 0 && attr.form == 0)

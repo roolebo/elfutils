@@ -48,20 +48,21 @@
   } while (0)
 
 static inline uint64_t
-__libdw_get_uleb128 (const unsigned char **addrp)
+__libdw_get_uleb128 (const unsigned char **addrp, const unsigned char *end)
 {
   uint64_t acc = 0;
   /* Unroll the first step to help the compiler optimize
      for the common single-byte case.  */
   get_uleb128_step (acc, *addrp, 0);
-  for (unsigned int i = 1; i < len_leb128 (acc); ++i)
+  for (unsigned int i = 1; i < len_leb128 (acc) && *addrp < end; ++i)
     get_uleb128_step (acc, *addrp, i);
   /* Other implementations set VALUE to UINT_MAX in this
      case.  So we better do this as well.  */
   return UINT64_MAX;
 }
 
-#define get_uleb128(var, addr) ((var) = __libdw_get_uleb128 (&(addr)))
+/* Note, addr needs to me smaller than end. */
+#define get_uleb128(var, addr, end) ((var) = __libdw_get_uleb128 (&(addr), end))
 
 /* The signed case is similar, but we sign-extend the result.  */
 
@@ -78,18 +79,18 @@ __libdw_get_uleb128 (const unsigned char **addrp)
   } while (0)
 
 static inline int64_t
-__libdw_get_sleb128 (const unsigned char **addrp)
+__libdw_get_sleb128 (const unsigned char **addrp, const unsigned char *end)
 {
   int64_t acc = 0;
   /* Unrolling 0 like uleb128 didn't prove to benefit optimization.  */
-  for (unsigned int i = 0; i < len_leb128 (acc); ++i)
+  for (unsigned int i = 0; i < len_leb128 (acc) && *addrp < end; ++i)
     get_sleb128_step (acc, *addrp, i);
   /* Other implementations set VALUE to INT_MAX in this
      case.  So we better do this as well.  */
   return INT64_MAX;
 }
 
-#define get_sleb128(var, addr) ((var) = __libdw_get_sleb128 (&(addr)))
+#define get_sleb128(var, addr, end) ((var) = __libdw_get_sleb128 (&(addr), end))
 
 
 /* We use simple memory access functions in case the hardware allows it.

@@ -1,3 +1,38 @@
+2014-12-14  Mark Wielaard  <mjw@redhat.com>
+
+	* cfi.c (execute_cfi): Add program bounds checks.
+	* dwarf_child.c (__libdw_find_attr): Add attrp bounds checks.
+	* dwarf_formblock.c (dwarf_formblock): Call get_uleb128 with endp.
+	* dwarf_formref.c (__libdw_formref): Add datap bounds checks.
+	* dwarf_formsdata.c (dwarf_formsdata): Likewise.
+	* dwarf_formudata.c (dwarf_formudata): Likewise.
+	* dwarf_frame_register.c (dwarf_frame_register): Call get_uleb128
+	with end of data buf.
+	* dwarf_getabbrev.c (__libdw_getabbrev): Add abbrevp bounds checks.
+	* dwarf_getabbrevattr.c (dwarf_getabbrevattr): Assume get_uleb128
+	call gets enough data.
+	* dwarf_getattrs,c (dwarf_getattrs): Call get_uleb128 with endp.
+	* dwarf_getlocation.c (store_implicit_value): Call get_uleb128
+	with enough data.
+	(__libdw_intern_expression): Call get_uleb128/get_sleb128 with
+	end_data.
+	* dwarf_getmacros.c (get_table_for_offset): Add nforms bounds check.
+	* dwarf_getsrclines.c (read_srclines): Bounds check linep and call
+	get_uleb128 with lineendp.
+	* dwarf_hasattr.c (dwarf_hasattr): Bounds check attrp and call
+	get_uleb128 with endp.
+	* dwarf_next_cfi.c (dwarf_next_cfi): Bounds check bytes and call
+	get_uleb128/get_sleb128 with limit.
+	* encoded-value.h (read_encoded_value): Assume get_uleb128 and
+	get_sleb128 get called with enough data.
+	* fde.c (intern_fde): Call get_uleb128 with instructions_end.
+	* libdwP.h (__libdw_dieabbrev): Call get_uleb128 with die->cu->endp.
+	* libdw_form.c (__libdw_form_val_compute_len): Call get_uleb128 with
+	endp.
+	* memory-access.h (__libdw_get_uleb128): Take an extra endp.
+	Don't call get_uleb128_step if out of data.
+	(__libdw_get_sleb128): Likewise for get_sleb128_step.
+
 2014-12-12  Mark Wielaard  <mjw@redhat.com>
 
 	* libdwP.h (struct Dwarf): Add fake_loc_cu.

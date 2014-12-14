@@ -1,5 +1,5 @@
 /* Get specific attribute of abbreviation.
-   Copyright (C) 2003, 2004, 2005 Red Hat, Inc.
+   Copyright (C) 2003, 2004, 2005, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -57,9 +57,10 @@ dwarf_getabbrevattr (abbrev, idx, namep, formp, offsetp)
     {
       start_attrp = attrp;
 
-      /* Attribute code and form are encoded as ULEB128 values.  */
-      get_uleb128 (name, attrp);
-      get_uleb128 (form, attrp);
+      /* Attribute code and form are encoded as ULEB128 values.i
+         XXX We have no way to bounds check.  */
+      get_uleb128 (name, attrp, attrp + len_leb128 (name));
+      get_uleb128 (form, attrp, attrp + len_leb128 (form));
 
       /* If both values are zero the index is out of range.  */
       if (name == 0 && form == 0)

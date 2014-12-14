@@ -1,5 +1,5 @@
 /* FDE reading.
-   Copyright (C) 2009-2010 Red Hat, Inc.
+   Copyright (C) 2009-2010, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -97,7 +97,7 @@ intern_fde (Dwarf_CFI *cache, const Dwarf_FDE *entry)
       /* The CIE augmentation says the FDE has a DW_FORM_block
 	 before its actual instruction stream.  */
       Dwarf_Word len;
-      get_uleb128 (len, fde->instructions);
+      get_uleb128 (len, fde->instructions, fde->instructions_end);
       if ((Dwarf_Word) (fde->instructions_end - fde->instructions) < len)
 	{
 	  free (fde);

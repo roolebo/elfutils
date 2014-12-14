@@ -215,13 +215,16 @@ get_table_for_offset (Dwarf *dbg, Dwarf_Word macoff,
 	  unsigned opcode = *readp++;
 
 	  Dwarf_Macro_Op_Proto e;
-	  get_uleb128 (e.nforms, readp); // XXX checking
+	  if (readp >= endp)
+	    goto invalid;
+	  get_uleb128 (e.nforms, readp, endp);
 	  e.forms = readp;
 	  op_protos[opcode - 1] = e;
 
 	  readp += e.nforms;
 	  if (readp > endp)
 	    {
+	    invalid:
 	      __libdw_seterrno (DWARF_E_INVALID_DWARF);
 	      return NULL;
 	    }

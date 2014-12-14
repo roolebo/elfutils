@@ -1,5 +1,5 @@
 /* Return reference offset represented by attribute.
-   Copyright (C) 2003-2010 Red Hat, Inc.
+   Copyright (C) 2003-2010, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -39,7 +39,8 @@ __libdw_formref (attr, return_offset)
      Dwarf_Attribute *attr;
      Dwarf_Off *return_offset;
 {
-  const unsigned char *datap;
+  const unsigned char *datap = attr->valp;
+  const unsigned char *endp = attr->cu->endp;
 
   if (attr->valp == NULL)
     {
@@ -50,24 +51,37 @@ __libdw_formref (attr, return_offset)
   switch (attr->form)
     {
     case DW_FORM_ref1:
+      if (datap + 1 > endp)
+	{
+	invalid:
+	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
+	  return -1;
+	}
       *return_offset = *attr->valp;
       break;
 
     case DW_FORM_ref2:
+      if (datap + 2 > endp)
+	goto invalid;
       *return_offset = read_2ubyte_unaligned (attr->cu->dbg, attr->valp);
       break;
 
     case DW_FORM_ref4:
+      if (datap + 4 > endp)
+	goto invalid;
       *return_offset = read_4ubyte_unaligned (attr->cu->dbg, attr->valp);
       break;
 
     case DW_FORM_ref8:
+      if (datap + 8 > endp)
+	goto invalid;
       *return_offset = read_8ubyte_unaligned (attr->cu->dbg, attr->valp);
       break;
 
     case DW_FORM_ref_udata:
-      datap = attr->valp;
-      get_uleb128 (*return_offset, datap);
+      if (datap + 1 > endp)
+	goto invalid;
+      get_uleb128 (*return_offset, datap, endp);
       break;
 
     case DW_FORM_ref_addr:

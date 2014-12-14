@@ -73,8 +73,7 @@ dwarf_formblock (attr, return_block)
     case DW_FORM_exprloc:
       if (unlikely (endp - datap < 1))
 	goto invalid;
-      // XXX bounds check
-      get_uleb128 (return_block->length, datap);
+      get_uleb128 (return_block->length, datap, endp);
       return_block->data = (unsigned char *) datap;
       break;
 

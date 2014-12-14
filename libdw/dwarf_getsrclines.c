@@ -240,7 +240,9 @@ read_srclines (Dwarf *dbg,
 
       /* Then the index.  */
       Dwarf_Word diridx;
-      get_uleb128 (diridx, linep);
+      if (unlikely (linep >= lineendp))
+	goto invalid_data;
+      get_uleb128 (diridx, linep, lineendp);
       if (unlikely (diridx >= ndirlist))
 	{
 	  __libdw_seterrno (DWARF_E_INVALID_DIR_IDX);
@@ -272,10 +274,14 @@ read_srclines (Dwarf *dbg,
 	}
 
       /* Next comes the modification time.  */
-      get_uleb128 (new_file->info.mtime, linep);
+      if (unlikely (linep >= lineendp))
+	goto invalid_data;
+      get_uleb128 (new_file->info.mtime, linep, lineendp);
 
       /* Finally the length of the file.  */
-      get_uleb128 (new_file->info.length, linep);
+      if (unlikely (linep >= lineendp))
+	goto invalid_data;
+      get_uleb128 (new_file->info.length, linep, lineendp);
 
       new_file->next = filelist;
       filelist = new_file;
@@ -460,11 +466,17 @@ read_srclines (Dwarf *dbg,
 		linep = endp + 1;
 
 		unsigned int diridx;
-		get_uleb128 (diridx, linep);
+		if (unlikely (linep >= lineendp))
+		  goto invalid_data;
+		get_uleb128 (diridx, linep, lineendp);
 		Dwarf_Word mtime;
-		get_uleb128 (mtime, linep);
+		if (unlikely (linep >= lineendp))
+		  goto invalid_data;
+		get_uleb128 (mtime, linep, lineendp);
 		Dwarf_Word filelength;
-		get_uleb128 (filelength, linep);
+		if (unlikely (linep >= lineendp))
+		  goto invalid_data;
+		get_uleb128 (filelength, linep, lineendp);
 
 		struct filelist *new_file =
 		  (struct filelist *) alloca (sizeof (*new_file));
@@ -501,7 +513,9 @@ read_srclines (Dwarf *dbg,
 	      if (unlikely (standard_opcode_lengths[opcode] != 1))
 		goto invalid_data;
 
-	      get_uleb128 (discriminator, linep);
+	      if (unlikely (linep >= lineendp))
+		goto invalid_data;
+	      get_uleb128 (discriminator, linep, lineendp);
 	      break;
 
 	    default:
@@ -538,7 +552,9 @@ read_srclines (Dwarf *dbg,
 	      if (unlikely (standard_opcode_lengths[opcode] != 1))
 		goto invalid_data;
 
-	      get_uleb128 (u128, linep);
+	      if (unlikely (linep >= lineendp))
+		goto invalid_data;
+	      get_uleb128 (u128, linep, lineendp);
 	      advance_pc (u128);
 	      break;
 
@@ -548,7 +564,9 @@ read_srclines (Dwarf *dbg,
 	      if (unlikely (standard_opcode_lengths[opcode] != 1))
 		goto invalid_data;
 
-	      get_sleb128 (s128, linep);
+	      if (unlikely (linep >= lineendp))
+		goto invalid_data;
+	      get_sleb128 (s128, linep, lineendp);
 	      line += s128;
 	      break;
 
@@ -557,7 +575,9 @@ read_srclines (Dwarf *dbg,
 	      if (unlikely (standard_opcode_lengths[opcode] != 1))
 		goto invalid_data;
 
-	      get_uleb128 (u128, linep);
+	      if (unlikely (linep >= lineendp))
+		goto invalid_data;
+	      get_uleb128 (u128, linep, lineendp);
 	      file = u128;
 	      break;
 
@@ -566,7 +586,9 @@ read_srclines (Dwarf *dbg,
 	      if (unlikely (standard_opcode_lengths[opcode] != 1))
 		goto invalid_data;
 
-	      get_uleb128 (u128, linep);
+	      if (unlikely (linep >= lineendp))
+		goto invalid_data;
+	      get_uleb128 (u128, linep, lineendp);
 	      column = u128;
 	      break;
 
@@ -629,7 +651,9 @@ read_srclines (Dwarf *dbg,
 	      if (unlikely (standard_opcode_lengths[opcode] != 1))
 		goto invalid_data;
 
-	      get_uleb128 (isa, linep);
+	      if (unlikely (linep >= lineendp))
+		goto invalid_data;
+	      get_uleb128 (isa, linep, lineendp);
 	      break;
 	    }
 	}
@@ -639,7 +663,11 @@ read_srclines (Dwarf *dbg,
 	     Read the parameters associated with it but then discard
 	     everything.  Read all the parameters for this opcode.  */
 	  for (int n = standard_opcode_lengths[opcode]; n > 0; --n)
-	    get_uleb128 (u128, linep);
+	    {
+	      if (unlikely (linep >= lineendp))
+		goto invalid_data;
+	      get_uleb128 (u128, linep, lineendp);
+	    }
 
 	  /* Next round, ignore this opcode.  */
 	  continue;

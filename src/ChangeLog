@@ -1,3 +1,16 @@
+2014-12-14  Mark Wielaard  <mjw@redhat.com>
+
+	* elflint.c (check_attributes): Call get_uleb128 with end pointer.
+	* readelf.c (print_attributes): Likewise.
+	(print_ops): Likewise and also for get_sleb128.
+	(print_cfa_program): Likewise and add more readp bounds checks.
+	(read_encoded): Likewise.
+	(print_debug_frame_section): Likewise.
+	(print_debug_line_section): Likewise.
+	(print_debug_macinfo_section): Likewise.
+	(print_debug_macro_section): Likewise.
+	(print_debug_exception_table): Likewise.
+
 2014-12-16  Mark Wielaard  <mjw@redhat.com>
 
 	* elfcmp.c (compare_Elf32_Word): Make sure (unsigned) Elf32_Word

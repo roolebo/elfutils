@@ -1,5 +1,5 @@
 /* Return signed constant represented by attribute.
-   Copyright (C) 2003, 2005 Red Hat, Inc.
+   Copyright (C) 2003, 2005, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -43,34 +43,49 @@ dwarf_formsdata (attr, return_sval)
   if (attr == NULL)
     return -1;
 
-  const unsigned char *datap;
+  const unsigned char *datap = attr->valp;
+  const unsigned char *endp = attr->cu->endp;
 
   switch (attr->form)
     {
     case DW_FORM_data1:
+      if (datap + 1 > endp)
+	{
+	invalid:
+	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
+	  return -1;
+	}
       *return_sval = *attr->valp;
       break;
 
     case DW_FORM_data2:
+      if (datap + 2 > endp)
+	goto invalid;
       *return_sval = read_2ubyte_unaligned (attr->cu->dbg, attr->valp);
       break;
 
     case DW_FORM_data4:
+      if (datap + 4 > endp)
+	goto invalid;
       *return_sval = read_4ubyte_unaligned (attr->cu->dbg, attr->valp);
       break;
 
     case DW_FORM_data8:
+      if (datap + 8 > endp)
+	goto invalid;
       *return_sval = read_8ubyte_unaligned (attr->cu->dbg, attr->valp);
       break;
 
     case DW_FORM_sdata:
-      datap = attr->valp;
-      get_sleb128 (*return_sval, datap);
+      if (datap + 1 > endp)
+	goto invalid;
+      get_sleb128 (*return_sval, datap, endp);
       break;
 
     case DW_FORM_udata:
-      datap = attr->valp;
-      get_uleb128 (*return_sval, datap);
+      if (datap + 1 > endp)
+	goto invalid;
+      get_uleb128 (*return_sval, datap, endp);
       break;
 
     default:

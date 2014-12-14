@@ -1,5 +1,5 @@
 /* Return unsigned constant represented by attribute.
-   Copyright (C) 2003-2012 Red Hat, Inc.
+   Copyright (C) 2003-2012, 2014 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -101,15 +101,24 @@ dwarf_formudata (attr, return_uval)
   if (attr == NULL)
     return -1;
 
-  const unsigned char *datap;
+  const unsigned char *datap = attr->valp;
+  const unsigned char *endp = attr->cu->endp;
 
   switch (attr->form)
     {
     case DW_FORM_data1:
+      if (datap + 1 > endp)
+	{
+	invalid:
+	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
+	  return -1;
+	}
       *return_uval = *attr->valp;
       break;
 
     case DW_FORM_data2:
+      if (datap + 2 > endp)
+	goto invalid;
       *return_uval = read_2ubyte_unaligned (attr->cu->dbg, attr->valp);
       break;
 
@@ -203,13 +212,15 @@ dwarf_formudata (attr, return_uval)
       break;
 
     case DW_FORM_sdata:
-      datap = attr->valp;
-      get_sleb128 (*return_uval, datap);
+      if (datap + 1 > endp)
+	goto invalid;
+      get_sleb128 (*return_uval, datap, endp);
       break;
 
     case DW_FORM_udata:
-      datap = attr->valp;
-      get_uleb128 (*return_uval, datap);
+      if (datap + 1 > endp)
+	goto invalid;
+      get_uleb128 (*return_uval, datap, endp);
       break;
 
     default:

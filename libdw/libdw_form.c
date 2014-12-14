@@ -86,8 +86,7 @@ __libdw_form_val_compute_len (struct Dwarf_CU *cu, unsigned int form,
 
     case DW_FORM_block:
     case DW_FORM_exprloc:
-      // XXX overflow check
-      get_uleb128 (u128, valp);
+      get_uleb128 (u128, valp, endp);
       result = u128 + (valp - startp);
       break;
 
@@ -104,13 +103,12 @@ __libdw_form_val_compute_len (struct Dwarf_CU *cu, unsigned int form,
     case DW_FORM_sdata:
     case DW_FORM_udata:
     case DW_FORM_ref_udata:
-      // XXX overflow check
-      get_uleb128 (u128, valp);
+      get_uleb128 (u128, valp, endp);
       result = valp - startp;
       break;
 
     case DW_FORM_indirect:
-      get_uleb128 (u128, valp);
+      get_uleb128 (u128, valp, endp);
       // XXX Is this really correct?
       result = __libdw_form_val_len (cu, u128, valp);
       if (result != (size_t) -1)

@@ -475,7 +475,7 @@ __libdw_dieabbrev (Dwarf_Die *die, const unsigned char **readp)
       /* Get the abbreviation code.  */
       unsigned int code;
       const unsigned char *addr = die->addr;
-      get_uleb128 (code, addr);
+      get_uleb128 (code, addr, die->cu->endp);
       if (readp != NULL)
 	*readp = addr;
 

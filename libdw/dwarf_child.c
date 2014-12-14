@@ -63,18 +63,16 @@ __libdw_find_attr (Dwarf_Die *die, unsigned int search_name,
   const unsigned char *attrp = abbrevp->attrp;
   while (1)
     {
-      /* Are we still in bounds?  This test needs to be refined.  */
-      if (unlikely (attrp + 1 >= endp))
+      /* Get attribute name and form.  */
+      if (unlikely (attrp >= endp))
 	goto invalid_dwarf;
-
-      /* Get attribute name and form.
-
-	 XXX We don't check whether this reads beyond the end of the
-	 section.  */
       unsigned int attr_name;
-      get_uleb128 (attr_name, attrp);
+      get_uleb128 (attr_name, attrp, endp);
+
+      if (unlikely (attrp >= endp))
+	goto invalid_dwarf;
       unsigned int attr_form;
-      get_uleb128 (attr_form, attrp);
+      get_uleb128 (attr_form, attrp, endp);
 
       /* We can stop if we found the attribute with value zero.  */
       if (attr_name == 0 && attr_form == 0)

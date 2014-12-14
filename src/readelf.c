@@ -3368,7 +3368,7 @@ print_attributes (Ebl *ebl, const GElf_Ehdr *ehdr)
 		const unsigned char *const sub = q;
 
 		unsigned int subsection_tag;
-		get_uleb128 (subsection_tag, q);
+		get_uleb128 (subsection_tag, q, p);
 		if (unlikely (q >= p))
 		  break;
 
@@ -3405,7 +3405,7 @@ print_attributes (Ebl *ebl, const GElf_Ehdr *ehdr)
 		    while (r < q)
 		      {
 			unsigned int tag;
-			get_uleb128 (tag, r);
+			get_uleb128 (tag, r, q);
 			if (unlikely (r >= q))
 			  break;
 
@@ -3422,7 +3422,7 @@ print_attributes (Ebl *ebl, const GElf_Ehdr *ehdr)
 			if (tag == 32 || (tag & 1) == 0
 			    || (! gnu_vendor && (tag > 5 && tag < 32)))
 			  {
-			    get_uleb128 (value, r);
+			    get_uleb128 (value, r, q);
 			    if (r > q)
 			      break;
 			  }
@@ -4116,7 +4116,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  const unsigned char *start = data;
 	  uint64_t uleb;
 	  NEED (1);
-	  get_uleb128 (uleb, data); /* XXX check overrun */
+	  get_uleb128 (uleb, data, data + len);
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu64 "\n",
 		  indent, "", (uintmax_t) offset, op_name, uleb);
 	  CONSUME (data - start);
@@ -4126,9 +4126,10 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	case DW_OP_bit_piece:
 	  start = data;
 	  uint64_t uleb2;
-	  NEED (2);
-	  get_uleb128 (uleb, data); /* XXX check overrun */
-	  get_uleb128 (uleb2, data); /* XXX check overrun */
+	  NEED (1);
+	  get_uleb128 (uleb, data, data + len);
+	  NEED (1);
+	  get_uleb128 (uleb2, data, data + len);
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu64 ", %" PRIu64 "\n",
 		  indent, "", (uintmax_t) offset, op_name, uleb, uleb2);
 	  CONSUME (data - start);
@@ -4141,7 +4142,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  start = data;
 	  int64_t sleb;
 	  NEED (1);
-	  get_sleb128 (sleb, data); /* XXX check overrun */
+	  get_sleb128 (sleb, data, data + len);
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRId64 "\n",
 		  indent, "", (uintmax_t) offset, op_name, sleb);
 	  CONSUME (data - start);
@@ -4150,9 +4151,10 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 
 	case DW_OP_bregx:
 	  start = data;
-	  NEED (2);
-	  get_uleb128 (uleb, data); /* XXX check overrun */
-	  get_sleb128 (sleb, data); /* XXX check overrun */
+	  NEED (1);
+	  get_uleb128 (uleb, data, data + len);
+	  NEED (1);
+	  get_sleb128 (sleb, data, data + len);
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu64 " %" PRId64 "\n",
 		  indent, "", (uintmax_t) offset, op_name, uleb, sleb);
 	  CONSUME (data - start);
@@ -4191,7 +4193,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	case DW_OP_implicit_value:
 	  start = data;
 	  NEED (1);
-	  get_uleb128 (uleb, data); /* XXX check overrun */
+	  get_uleb128 (uleb, data, data + len);
 	  printf ("%*s[%4" PRIuMAX "] %s: ",
 		  indent, "", (uintmax_t) offset, op_name);
 	  NEED (uleb);
@@ -4216,7 +4218,8 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	    }
 	  data += ref_size;
 	  /* Byte offset operand.  */
-	  get_sleb128 (sleb, data); /* XXX check overrun */
+	  NEED (1);
+	  get_sleb128 (sleb, data, data + len);
 
 	  printf ("%*s[%4" PRIuMAX "] %s [%6" PRIxMAX "] %+" PRId64 "\n",
 		  indent, "", (intmax_t) offset,
@@ -4229,7 +4232,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  /* Size plus expression block.  */
 	  start = data;
 	  NEED (1);
-	  get_uleb128 (uleb, data); /* XXX check overrun */
+	  get_uleb128 (uleb, data, data + len);
 	  printf ("%*s[%4" PRIuMAX "] %s:\n",
 		  indent, "", (uintmax_t) offset, op_name);
 	  NEED (uleb);
@@ -4244,10 +4247,11 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  /* uleb128 CU relative DW_TAG_base_type DIE offset, 1-byte
 	     unsigned size plus block.  */
 	  start = data;
-	  NEED (2);
-	  get_uleb128 (uleb, data); /* XXX check overrun */
+	  NEED (1);
+	  get_uleb128 (uleb, data, data + len);
 	  if (! print_unresolved_addresses && cu != NULL)
 	    uleb += cu->start;
+	  NEED (1);
 	  uint8_t usize = *(uint8_t *) data++;
 	  NEED (usize);
 	  printf ("%*s[%4" PRIuMAX "] %s [%6" PRIxMAX "] ",
@@ -4262,9 +4266,10 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  /* uleb128 register number, uleb128 CU relative
 	     DW_TAG_base_type DIE offset.  */
 	  start = data;
-	  NEED (2);
-	  get_uleb128 (uleb, data); /* XXX check overrun */
-	  get_uleb128 (uleb2, data); /* XXX check overrun */
+	  NEED (1);
+	  get_uleb128 (uleb, data, data + len);
+	  NEED (1);
+	  get_uleb128 (uleb2, data, data + len);
 	  if (! print_unresolved_addresses && cu != NULL)
 	    uleb2 += cu->start;
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu64 " [%6" PRIx64 "]\n",
@@ -4277,9 +4282,10 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  /* 1-byte unsigned size of value, uleb128 CU relative
 	     DW_TAG_base_type DIE offset.  */
 	  start = data;
-	  NEED (2);
+	  NEED (1);
 	  usize = *(uint8_t *) data++;
-	  get_uleb128 (uleb, data); /* XXX check overrun */
+	  NEED (1);
+	  get_uleb128 (uleb, data, data + len);
 	  if (! print_unresolved_addresses && cu != NULL)
 	    uleb += cu->start;
 	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu8 " [%6" PRIxMAX "]\n",
@@ -4295,7 +4301,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	     for conversion to untyped.  */
 	  start = data;
 	  NEED (1);
-	  get_uleb128 (uleb, data); /* XXX check overrun */
+	  get_uleb128 (uleb, data, data + len);
 	  if (uleb != 0 && ! print_unresolved_addresses && cu != NULL)
 	    uleb += cu->start;
 	  printf ("%*s[%4" PRIuMAX "] %s [%6" PRIxMAX "]\n",
@@ -4965,8 +4971,7 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    puts ("     nop");
 	    break;
 	  case DW_CFA_set_loc:
-	    // XXX overflow check
-	    get_uleb128 (op1, readp);
+	    get_uleb128 (op1, readp, endp);
 	    op1 += vma_base;
 	    printf ("     set_loc %" PRIu64 "\n", op1 * code_align);
 	    break;
@@ -4976,43 +4981,46 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    ++readp;
 	    break;
 	  case DW_CFA_advance_loc2:
+	    if ((uint64_t) (endp - readp) < 2)
+	      goto invalid;
 	    op1 = read_2ubyte_unaligned_inc (dbg, readp);
 	    printf ("     advance_loc2 %" PRIu64 " to %#" PRIx64 "\n",
 		    op1, pc += op1 * code_align);
 	    break;
 	  case DW_CFA_advance_loc4:
+	    if ((uint64_t) (endp - readp) < 4)
+	      goto invalid;
 	    op1 = read_4ubyte_unaligned_inc (dbg, readp);
 	    printf ("     advance_loc4 %" PRIu64 " to %#" PRIx64 "\n",
 		    op1, pc += op1 * code_align);
 	    break;
 	  case DW_CFA_offset_extended:
-	    // XXX overflow check
-	    get_uleb128 (op1, readp);
-	    get_uleb128 (op2, readp);
+	    get_uleb128 (op1, readp, endp);
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
+	    get_uleb128 (op2, readp, endp);
 	    printf ("     offset_extended r%" PRIu64 " (%s) at cfa%+" PRId64
 		    "\n",
 		    op1, regname (op1), op2 * data_align);
 	    break;
 	  case DW_CFA_restore_extended:
-	    // XXX overflow check
-	    get_uleb128 (op1, readp);
+	    get_uleb128 (op1, readp, endp);
 	    printf ("     restore_extended r%" PRIu64 " (%s)\n",
 		    op1, regname (op1));
 	    break;
 	  case DW_CFA_undefined:
-	    // XXX overflow check
-	    get_uleb128 (op1, readp);
+	    get_uleb128 (op1, readp, endp);
 	    printf ("     undefined r%" PRIu64 " (%s)\n", op1, regname (op1));
 	    break;
 	  case DW_CFA_same_value:
-	    // XXX overflow check
-	    get_uleb128 (op1, readp);
+	    get_uleb128 (op1, readp, endp);
 	    printf ("     same_value r%" PRIu64 " (%s)\n", op1, regname (op1));
 	    break;
 	  case DW_CFA_register:
-	    // XXX overflow check
-	    get_uleb128 (op1, readp);
-	    get_uleb128 (op2, readp);
+	    get_uleb128 (op1, readp, endp);
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
+	    get_uleb128 (op2, readp, endp);
 	    printf ("     register r%" PRIu64 " (%s) in r%" PRIu64 " (%s)\n",
 		    op1, regname (op1), op2, regname (op2));
 	    break;
@@ -5023,26 +5031,24 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    puts ("     restore_state");
 	    break;
 	  case DW_CFA_def_cfa:
-	    // XXX overflow check
-	    get_uleb128 (op1, readp);
-	    get_uleb128 (op2, readp);
+	    get_uleb128 (op1, readp, endp);
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
+	    get_uleb128 (op2, readp, endp);
 	    printf ("     def_cfa r%" PRIu64 " (%s) at offset %" PRIu64 "\n",
 		    op1, regname (op1), op2);
 	    break;
 	  case DW_CFA_def_cfa_register:
-	    // XXX overflow check
-	    get_uleb128 (op1, readp);
+	    get_uleb128 (op1, readp, endp);
 	    printf ("     def_cfa_register r%" PRIu64 " (%s)\n",
 		    op1, regname (op1));
 	    break;
 	  case DW_CFA_def_cfa_offset:
-	    // XXX overflow check
-	    get_uleb128 (op1, readp);
+	    get_uleb128 (op1, readp, endp);
 	    printf ("     def_cfa_offset %" PRIu64 "\n", op1);
 	    break;
 	  case DW_CFA_def_cfa_expression:
-	    // XXX overflow check
-	    get_uleb128 (op1, readp);	/* Length of DW_FORM_block.  */
+	    get_uleb128 (op1, readp, endp);	/* Length of DW_FORM_block.  */
 	    printf ("     def_cfa_expression %" PRIu64 "\n", op1);
 	    if ((uint64_t) (endp - readp) < op1)
 	      {
@@ -5055,9 +5061,10 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    readp += op1;
 	    break;
 	  case DW_CFA_expression:
-	    // XXX overflow check
-	    get_uleb128 (op1, readp);
-	    get_uleb128 (op2, readp);	/* Length of DW_FORM_block.  */
+	    get_uleb128 (op1, readp, endp);
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
+	    get_uleb128 (op2, readp, endp);	/* Length of DW_FORM_block.  */
 	    printf ("     expression r%" PRIu64 " (%s) \n",
 		    op1, regname (op1));
 	    if ((uint64_t) (endp - readp) < op2)
@@ -5067,43 +5074,49 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    readp += op2;
 	    break;
 	  case DW_CFA_offset_extended_sf:
-	    // XXX overflow check
-	    get_uleb128 (op1, readp);
-	    get_sleb128 (sop2, readp);
+	    get_uleb128 (op1, readp, endp);
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
+	    get_sleb128 (sop2, readp, endp);
 	    printf ("     offset_extended_sf r%" PRIu64 " (%s) at cfa%+"
 		    PRId64 "\n",
 		    op1, regname (op1), sop2 * data_align);
 	    break;
 	  case DW_CFA_def_cfa_sf:
-	    // XXX overflow check
-	    get_uleb128 (op1, readp);
-	    get_sleb128 (sop2, readp);
+	    get_uleb128 (op1, readp, endp);
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
+	    get_sleb128 (sop2, readp, endp);
 	    printf ("     def_cfa_sf r%" PRIu64 " (%s) at offset %" PRId64 "\n",
 		    op1, regname (op1), sop2 * data_align);
 	    break;
 	  case DW_CFA_def_cfa_offset_sf:
-	    // XXX overflow check
-	    get_sleb128 (sop1, readp);
+	    get_sleb128 (sop1, readp, endp);
 	    printf ("     def_cfa_offset_sf %" PRId64 "\n", sop1 * data_align);
 	    break;
 	  case DW_CFA_val_offset:
 	    // XXX overflow check
-	    get_uleb128 (op1, readp);
-	    get_uleb128 (op2, readp);
+	    get_uleb128 (op1, readp, endp);
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
+	    get_uleb128 (op2, readp, endp);
 	    printf ("     val_offset %" PRIu64 " at offset %" PRIu64 "\n",
 		    op1, op2 * data_align);
 	    break;
 	  case DW_CFA_val_offset_sf:
 	    // XXX overflow check
-	    get_uleb128 (op1, readp);
-	    get_sleb128 (sop2, readp);
+	    get_uleb128 (op1, readp, endp);
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
+	    get_sleb128 (sop2, readp, endp);
 	    printf ("     val_offset_sf %" PRIu64 " at offset %" PRId64 "\n",
 		    op1, sop2 * data_align);
 	    break;
 	  case DW_CFA_val_expression:
-	    // XXX overflow check
-	    get_uleb128 (op1, readp);
-	    get_uleb128 (op2, readp);	/* Length of DW_FORM_block.  */
+	    get_uleb128 (op1, readp, endp);
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
+	    get_uleb128 (op2, readp, endp);	/* Length of DW_FORM_block.  */
 	    printf ("     val_expression r%" PRIu64 " (%s)\n",
 		    op1, regname (op1));
 	    if ((uint64_t) (endp - readp) < op2)
@@ -5113,6 +5126,8 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    readp += op2;
 	    break;
 	  case DW_CFA_MIPS_advance_loc8:
+	    if ((uint64_t) (endp - readp) < 8)
+	      goto invalid;
 	    op1 = read_8ubyte_unaligned_inc (dbg, readp);
 	    printf ("     MIPS_advance_loc8 %" PRIu64 " to %#" PRIx64 "\n",
 		    op1, pc += op1 * code_align);
@@ -5121,8 +5136,7 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    puts ("     GNU_window_save");
 	    break;
 	  case DW_CFA_GNU_args_size:
-	    // XXX overflow check
-	    get_uleb128 (op1, readp);
+	    get_uleb128 (op1, readp, endp);
 	    printf ("     args_size %" PRIu64 "\n", op1);
 	    break;
 	  default:
@@ -5135,8 +5149,7 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
       else if (opcode < DW_CFA_restore)
 	{
 	  uint64_t offset;
-	  // XXX overflow check
-	  get_uleb128 (offset, readp);
+	  get_uleb128 (offset, readp, endp);
 	  printf ("     offset r%u (%s) at cfa%+" PRId64 "\n",
 		  opcode & 0x3f, regname (opcode & 0x3f), offset * data_align);
 	}
@@ -5275,12 +5288,10 @@ read_encoded (unsigned int encoding, const unsigned char *readp,
   switch (encoding & 0xf)
     {
     case DW_EH_PE_uleb128:
-      // XXX buffer overrun check
-      get_uleb128 (*res, readp);
+      get_uleb128 (*res, readp, endp);
       break;
     case DW_EH_PE_sleb128:
-      // XXX buffer overrun check
-      get_sleb128 (*res, readp);
+      get_sleb128 (*res, readp, endp);
       break;
     case DW_EH_PE_udata2:
       if (readp + 2 > endp)
@@ -5453,21 +5464,24 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	      segment_size = *readp++;
 	    }
 
-	  // XXX Check overflow
-	  get_uleb128 (code_alignment_factor, readp);
-	  // XXX Check overflow
-	  get_sleb128 (data_alignment_factor, readp);
+	  if (cieend - readp < 1)
+	    goto invalid_data;
+	  get_uleb128 (code_alignment_factor, readp, cieend);
+	  if (cieend - readp < 1)
+	    goto invalid_data;
+	  get_sleb128 (data_alignment_factor, readp, cieend);
 
 	  /* In some variant for unwind data there is another field.  */
 	  if (strcmp (augmentation, "eh") == 0)
 	    readp += ehdr->e_ident[EI_CLASS] == ELFCLASS32 ? 4 : 8;
 
 	  unsigned int return_address_register;
+	  if (cieend - readp < 1)
+	    goto invalid_data;
 	  if (unlikely (version == 1))
 	    return_address_register = *readp++;
 	  else
-	    // XXX Check overflow
-	    get_uleb128 (return_address_register, readp);
+	    get_uleb128 (return_address_register, readp, cieend);
 
 	  printf ("\n [%6tx] CIE length=%" PRIu64 "\n"
 		  "   CIE_id:                   %" PRIu64 "\n"
@@ -5488,7 +5502,7 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	  if (augmentation[0] == 'z')
 	    {
 	      unsigned int augmentationlen;
-	      get_uleb128 (augmentationlen, readp);
+	      get_uleb128 (augmentationlen, readp, cieend);
 
 	      if (augmentationlen > (size_t) (cieend - readp))
 		{
@@ -5641,9 +5655,11 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	  if (cie->augmentation[0] == 'z')
 	    {
 	      unsigned int augmentationlen;
-	      get_uleb128 (augmentationlen, readp);
+	      if (cieend - readp < 1)
+		goto invalid_data;
+	      get_uleb128 (augmentationlen, readp, cieend);
 
-	      if (augmentationlen > (size_t) (dataend - readp))
+	      if (augmentationlen > (size_t) (cieend - readp))
 		{
 		  error (0, 0, gettext ("invalid augmentation length"));
 		  readp = cieend;
@@ -6443,15 +6459,21 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
 	  /* Then the index.  */
 	  unsigned int diridx;
-	  get_uleb128 (diridx, linep);
+	  if (lineendp - linep < 1)
+	    goto invalid_unit;
+	  get_uleb128 (diridx, linep, lineendp);
 
 	  /* Next comes the modification time.  */
 	  unsigned int mtime;
-	  get_uleb128 (mtime, linep);
+	  if (lineendp - linep < 1)
+	    goto invalid_unit;
+	  get_uleb128 (mtime, linep, lineendp);
 
 	  /* Finally the length of the file.  */
 	  unsigned int fsize;
-	  get_uleb128 (fsize, linep);
+	  if (lineendp - linep < 1)
+	    goto invalid_unit;
+	  get_uleb128 (fsize, linep, lineendp);
 
 	  printf (" %-5u %-5u %-9u %-9u %s\n",
 		  cnt, diridx, mtime, fsize, fname);
@@ -6608,11 +6630,17 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 		    linep = endp + 1;
 
 		    unsigned int diridx;
-		    get_uleb128 (diridx, linep);
+		    if (lineendp - linep < 1)
+		      goto invalid_unit;
+		    get_uleb128 (diridx, linep, lineendp);
 		    Dwarf_Word mtime;
-		    get_uleb128 (mtime, linep);
+		    if (lineendp - linep < 1)
+		      goto invalid_unit;
+		    get_uleb128 (mtime, linep, lineendp);
 		    Dwarf_Word filelength;
-		    get_uleb128 (filelength, linep);
+		    if (lineendp - linep < 1)
+		      goto invalid_unit;
+		    get_uleb128 (filelength, linep, lineendp);
 
 		    printf (gettext ("\
  define new file: dir=%u, mtime=%" PRIu64 ", length=%" PRIu64 ", name=%s\n"),
@@ -6626,7 +6654,7 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 		  if (unlikely (standard_opcode_lengths[opcode] != 1))
 		    goto invalid_unit;
 
-		  get_uleb128 (u128, linep);
+		  get_uleb128 (u128, linep, lineendp);
 		  printf (gettext (" set discriminator to %u\n"), u128);
 		  break;
 
@@ -6650,7 +6678,7 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 		case DW_LNS_advance_pc:
 		  /* Takes one uleb128 parameter which is added to the
 		     address.  */
-		  get_uleb128 (u128, linep);
+		  get_uleb128 (u128, linep, lineendp);
 		  advance_pc (u128);
 		  {
 		    char *a = format_dwarf_addr (dwflmod, 0, address, address);
@@ -6668,7 +6696,7 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 		case DW_LNS_advance_line:
 		  /* Takes one sleb128 parameter which is added to the
 		     line.  */
-		  get_sleb128 (s128, linep);
+		  get_sleb128 (s128, linep, lineendp);
 		  line += s128;
 		  printf (gettext ("\
  advance line by constant %d to %" PRId64 "\n"),
@@ -6677,7 +6705,7 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
 		case DW_LNS_set_file:
 		  /* Takes one uleb128 parameter which is stored in file.  */
-		  get_uleb128 (u128, linep);
+		  get_uleb128 (u128, linep, lineendp);
 		  printf (gettext (" set file to %" PRIu64 "\n"),
 			  (uint64_t) u128);
 		  break;
@@ -6687,7 +6715,7 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 		  if (unlikely (standard_opcode_lengths[opcode] != 1))
 		    goto invalid_unit;
 
-		  get_uleb128 (u128, linep);
+		  get_uleb128 (u128, linep, lineendp);
 		  printf (gettext (" set column to %" PRIu64 "\n"),
 			  (uint64_t) u128);
 		  break;
@@ -6758,7 +6786,7 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 		  if (unlikely (standard_opcode_lengths[opcode] != 1))
 		    goto invalid_unit;
 
-		  get_uleb128 (u128, linep);
+		  get_uleb128 (u128, linep, lineendp);
 		  printf (gettext (" set isa to %u\n"), u128);
 		  break;
 		}
@@ -6774,7 +6802,7 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 		      standard_opcode_lengths[opcode]);
 	      for (int n = standard_opcode_lengths[opcode]; n > 0; --n)
 		{
-		  get_uleb128 (u128, linep);
+		  get_uleb128 (u128, linep, lineendp);
 		  if (n != standard_opcode_lengths[opcode])
 		    putc_unlocked (',', stdout);
 		  printf (" %u", u128);
@@ -7010,7 +7038,7 @@ print_debug_macinfo_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	      For the latter
 		number, string.
 	      We can treat these cases together.  */
-	  get_uleb128 (u128, readp);
+	  get_uleb128 (u128, readp, readendp);
 
 	  endp = memchr (readp, '\0', readendp - readp);
 	  if (unlikely (endp == NULL))
@@ -7035,8 +7063,15 @@ print_debug_macinfo_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 
 	case DW_MACINFO_start_file:
 	  /* The two parameters are line and file index, in this order.  */
-	  get_uleb128 (u128, readp);
-	  get_uleb128 (u128_2, readp);
+	  get_uleb128 (u128, readp, readendp);
+	  if (readendp - readp < 1)
+	    {
+	      printf (gettext ("\
+%*s*** missing DW_MACINFO_start_file argument at end of section"),
+		      level, "");
+	      return;
+	    }
+	  get_uleb128 (u128_2, readp, readendp);
 
 	  /* Find the CU DIE for this file.  */
 	  size_t macoff = readp - (const unsigned char *) data->d_buf;
@@ -7247,8 +7282,10 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
           switch (opcode)
             {
             case DW_MACRO_GNU_start_file:
-	      get_uleb128 (u128, readp);
-	      get_uleb128 (u128_2, readp);
+	      get_uleb128 (u128, readp, readendp);
+	      if (readp >= readendp)
+		goto invalid_data;
+	      get_uleb128 (u128_2, readp, readendp);
 
 	      /* Find the CU DIE that matches this line offset.  */
 	      const char *fname = "???";
@@ -7280,7 +7317,7 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	      break;
 
 	    case DW_MACRO_GNU_define:
-	      get_uleb128 (u128, readp);
+	      get_uleb128 (u128, readp, readendp);
 	      endp = memchr (readp, '\0', readendp - readp);
 	      if (endp == NULL)
 		goto invalid_data;
@@ -7290,7 +7327,7 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	      break;
 
 	    case DW_MACRO_GNU_undef:
-	      get_uleb128 (u128, readp);
+	      get_uleb128 (u128, readp, readendp);
 	      endp = memchr (readp, '\0', readendp - readp);
 	      if (endp == NULL)
 		goto invalid_data;
@@ -7300,7 +7337,7 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	      break;
 
 	    case DW_MACRO_GNU_define_indirect:
-	      get_uleb128 (u128, readp);
+	      get_uleb128 (u128, readp, readendp);
 	      if (readp + offset_len > readendp)
 		goto invalid_data;
 	      if (offset_len == 8)
@@ -7312,7 +7349,7 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	      break;
 
 	    case DW_MACRO_GNU_undef_indirect:
-	      get_uleb128 (u128, readp);
+	      get_uleb128 (u128, readp, readendp);
 	      if (readp + offset_len > readendp)
 		goto invalid_data;
 	      if (offset_len == 8)
@@ -7382,17 +7419,17 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 		      break;
 
 		    case DW_FORM_sdata:
-		      get_sleb128 (val, readp);
+		      get_sleb128 (val, readp, readendp);
 		      printf (" %" PRIx64, val);
 		      break;
 
 		    case DW_FORM_udata:
-		      get_uleb128 (val, readp);
+		      get_uleb128 (val, readp, readendp);
 		      printf (" %" PRIx64, val);
 		      break;
 
 		    case DW_FORM_block:
-		      get_uleb128 (val, readp);
+		      get_uleb128 (val, readp, readendp);
 		      printf (" block[%" PRIu64 "]", val);
 		      if (readp + val > readendp)
 			goto invalid_data;
@@ -7708,7 +7745,7 @@ print_debug_exception_table (Dwfl_Module *dwflmod __attribute__ ((unused)),
   if (ttype_encoding != DW_EH_PE_omit)
     {
       unsigned int ttype_base_offset;
-      get_uleb128 (ttype_base_offset, readp);
+      get_uleb128 (ttype_base_offset, readp, dataend);
       printf (" TType base offset:   %#x\n", ttype_base_offset);
       if ((size_t) (dataend - readp) > ttype_base_offset)
         ttype_base = readp + ttype_base_offset;
@@ -7720,7 +7757,7 @@ print_debug_exception_table (Dwfl_Module *dwflmod __attribute__ ((unused)),
   printf (gettext (" Call site encoding:  %#x "), call_site_encoding);
   print_encoding_base ("", call_site_encoding);
   unsigned int call_site_table_len;
-  get_uleb128 (call_site_table_len, readp);
+  get_uleb128 (call_site_table_len, readp, dataend);
 
   const unsigned char *const action_table = readp + call_site_table_len;
   if (unlikely (action_table > dataend))
@@ -7742,7 +7779,7 @@ print_debug_exception_table (Dwfl_Module *dwflmod __attribute__ ((unused)),
       readp = read_encoded (call_site_encoding, readp, dataend,
 			    &landing_pad, dbg);
       unsigned int action;
-      get_uleb128 (action, readp);
+      get_uleb128 (action, readp, dataend);
       max_action = MAX (action, max_action);
       printf (gettext (" [%4u] Call site start:   %#" PRIx64 "\n"
 		       "        Call site length:  %" PRIu64 "\n"
@@ -7771,11 +7808,11 @@ print_debug_exception_table (Dwfl_Module *dwflmod __attribute__ ((unused)),
       do
 	{
 	  int ar_filter;
-	  get_sleb128 (ar_filter, readp);
+	  get_sleb128 (ar_filter, readp, action_table_end);
 	  if (ar_filter > 0 && (unsigned int) ar_filter > max_ar_filter)
 	    max_ar_filter = ar_filter;
 	  int ar_disp;
-	  get_sleb128 (ar_disp, readp);
+	  get_sleb128 (ar_disp, readp, action_table_end);
 
 	  printf (" [%4u] ar_filter:  % d\n"
 		  "        ar_disp:    % -5d",

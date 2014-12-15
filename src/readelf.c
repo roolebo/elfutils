@@ -4426,7 +4426,8 @@ reset_listptr (struct listptr_table *table)
   table->n = table->alloc = 0;
 }
 
-static void
+/* Returns false if offset doesn't fit.  See struct listptr.  */
+static bool
 notice_listptr (enum section_e section, struct listptr_table *table,
 		uint_fast8_t address_size, uint_fast8_t offset_size,
 		struct Dwarf_CU *cu, Dwarf_Off offset)
@@ -4452,8 +4453,14 @@ notice_listptr (enum section_e section, struct listptr_table *table,
 	  .offset = offset,
 	  .cu = cu
 	};
-      assert (p->offset == offset);
+
+      if (p->offset != offset)
+	{
+	  table->n--;
+	  return false;
+	}
     }
+  return true;
 }
 
 static void
@@ -5849,23 +5856,29 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	case DW_AT_GNU_call_site_data_value:
 	case DW_AT_GNU_call_site_target:
 	case DW_AT_GNU_call_site_target_clobbered:
-	  notice_listptr (section_loc, &known_loclistptr,
-			  cbargs->addrsize, cbargs->offset_size,
-			  cbargs->cu, num);
-	  if (!cbargs->silent)
-	    printf ("           %*s%-20s (%s) location list [%6" PRIxMAX "]\n",
-		    (int) (level * 2), "", dwarf_attr_name (attr),
-		    dwarf_form_name (form), (uintmax_t) num);
+	  {
+	    bool nlpt = notice_listptr (section_loc, &known_loclistptr,
+					cbargs->addrsize, cbargs->offset_size,
+					cbargs->cu, num);
+	    if (!cbargs->silent)
+	      printf ("           %*s%-20s (%s) location list [%6" PRIxMAX "]%s\n",
+		      (int) (level * 2), "", dwarf_attr_name (attr),
+		      dwarf_form_name (form), (uintmax_t) num,
+		      nlpt ? "" : " <WARNING offset too big>");
+	  }
 	  return DWARF_CB_OK;
 
 	case DW_AT_ranges:
-	  notice_listptr (section_ranges, &known_rangelistptr,
-			  cbargs->addrsize, cbargs->offset_size,
-			  cbargs->cu, num);
-	  if (!cbargs->silent)
-	    printf ("           %*s%-20s (%s) range list [%6" PRIxMAX "]\n",
-		    (int) (level * 2), "", dwarf_attr_name (attr),
-		    dwarf_form_name (form), (uintmax_t) num);
+	  {
+	    bool nlpt = notice_listptr (section_ranges, &known_rangelistptr,
+					cbargs->addrsize, cbargs->offset_size,
+					cbargs->cu, num);
+	    if (!cbargs->silent)
+	      printf ("           %*s%-20s (%s) range list [%6" PRIxMAX "]%s\n",
+		      (int) (level * 2), "", dwarf_attr_name (attr),
+		      dwarf_form_name (form), (uintmax_t) num,
+		      nlpt ? "" : " <WARNING offset too big>");
+	  }
 	  return DWARF_CB_OK;
 
 	case DW_AT_language:

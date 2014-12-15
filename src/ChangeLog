@@ -1,5 +1,11 @@
 2014-12-15  Mark Wielaard  <mjw@redhat.com>
 
+	* readelf.c (notice_listptr): Return false if offset doesn't fit
+	in 61-bits.
+	(attr_callback): Warn if loclist or rangelist offset doesn't fit.
+
+2014-12-15  Mark Wielaard  <mjw@redhat.com>
+
 	* readelf.c (print_ops): Don't assert when addr_size or ref_size
 	is not 4 or 8, just report invalid data.
 

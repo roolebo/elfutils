@@ -3981,11 +3981,10 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  NEED (addrsize);
 	  if (addrsize == 4)
 	    addr = read_4ubyte_unaligned (dbg, data);
+	  else if (addrsize == 8)
+	    addr = read_8ubyte_unaligned (dbg, data);
 	  else
-	    {
-	      assert (addrsize == 8);
-	      addr = read_8ubyte_unaligned (dbg, data);
-	    }
+	    goto invalid;
 	  data += addrsize;
 	  CONSUME (addrsize);
 
@@ -3999,16 +3998,13 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 
 	case DW_OP_call_ref:
 	  /* Offset operand.  */
-	  if (ref_size == 0)
+	  if (ref_size != 4 && ref_size != 8)
 	    goto invalid; /* Cannot be used in CFA.  */
 	  NEED (ref_size);
 	  if (ref_size == 4)
 	    addr = read_4ubyte_unaligned (dbg, data);
 	  else
-	    {
-	      assert (ref_size == 8);
-	      addr = read_8ubyte_unaligned (dbg, data);
-	    }
+	    addr = read_8ubyte_unaligned (dbg, data);
 	  data += ref_size;
 	  CONSUME (ref_size);
 
@@ -4206,16 +4202,13 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	case DW_OP_GNU_implicit_pointer:
 	  /* DIE offset operand.  */
 	  start = data;
-	  NEED (ref_size + 1);
-	  if (ref_size == 0)
+	  NEED (ref_size);
+	  if (ref_size != 4 && ref_size != 8)
 	    goto invalid; /* Cannot be used in CFA.  */
 	  if (ref_size == 4)
 	    addr = read_4ubyte_unaligned (dbg, data);
 	  else
-	    {
-	      assert (ref_size == 8);
-	      addr = read_8ubyte_unaligned (dbg, data);
-	    }
+	    addr = read_8ubyte_unaligned (dbg, data);
 	  data += ref_size;
 	  /* Byte offset operand.  */
 	  NEED (1);

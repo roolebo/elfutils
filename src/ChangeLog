@@ -1,5 +1,10 @@
 2014-12-15  Mark Wielaard  <mjw@redhat.com>
 
+	* readelf.c (print_ops): Don't assert when addr_size or ref_size
+	is not 4 or 8, just report invalid data.
+
+2014-12-15  Mark Wielaard  <mjw@redhat.com>
+
 	* readelf.c (print_gdb_index_section): Add more bounds checks.
 
 2014-12-15  Mark Wielaard  <mjw@redhat.com>

@@ -734,10 +734,14 @@ read_long_names (Elf *elf)
       runp = newp;
       while (1)
         {
+	  char *startp = runp;
 	  runp = (char *) memchr (runp, '/', newp + len - runp);
 	  if (runp == NULL)
-	    /* This was the last entry.  */
-	    break;
+	    {
+	      /* This was the last entry.  Clear any left overs.  */
+	      memset (startp, '\0', newp + len - startp);
+	      break;
+	    }
 
 	  /* NUL-terminate the string.  */
 	  *runp = '\0';

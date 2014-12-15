@@ -6609,6 +6609,8 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
 		case DW_LNE_set_address:
 		  op_index = 0;
+		  if (unlikely ((size_t) (lineendp - linep) < address_size))
+		    goto invalid_unit;
 		  if (address_size == 4)
 		    address = read_4ubyte_unaligned_inc (dbg, linep);
 		  else

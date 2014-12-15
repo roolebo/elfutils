@@ -1,3 +1,8 @@
+2014-12-15  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_debug_line_section): Check there is enough room
+	for DW_LNE_set_address argument.
+
 2014-12-14  Mark Wielaard  <mjw@redhat.com>
 
 	* elflint.c (check_attributes): Call get_uleb128 with end pointer.

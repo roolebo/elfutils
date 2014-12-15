@@ -1,7 +1,7 @@
 2014-12-15  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_getpubnames.c (get_offsets): Make sure whole unit fall inside
-	section data.
+	section data. Set error to DWARF_E_NO_ENTRY if cnt is zero.
 	(dwarf_getpubnames): Make sure section data contains string zero
 	terminator.
 

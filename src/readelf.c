@@ -6333,6 +6333,8 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
       printf (gettext ("\nTable at offset %Zu:\n"), start_offset);
 
+      if (unlikely (linep + 4 > lineendp))
+	goto invalid_data;
       Dwarf_Word unit_length = read_4ubyte_unaligned_inc (dbg, linep);
       unsigned int length = 4;
       if (unlikely (unit_length == 0xffffffff))

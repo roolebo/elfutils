@@ -88,9 +88,11 @@ get_offsets (Dwarf *dbg)
       /* Now we know the offset of the first offset/name pair.  */
       mem[cnt].set_start = readp + 2 + 2 * len_bytes - startp;
       mem[cnt].address_len = len_bytes;
-      if (mem[cnt].set_start >= dbg->sectiondata[IDX_debug_pubnames]->d_size)
+      size_t max_size = dbg->sectiondata[IDX_debug_pubnames]->d_size;
+      if (mem[cnt].set_start >= max_size
+	  || len - (2 + 2 * len_bytes) > max_size - mem[cnt].set_start)
 	/* Something wrong, the first entry is beyond the end of
-	   the section.  */
+	   the section.  Or the length of the whole unit is too big.  */
 	break;
 
       /* Read the version.  It better be two for now.  */
@@ -184,6 +186,8 @@ dwarf_getpubnames (dbg, callback, arg, offset)
 
   unsigned char *startp
     = (unsigned char *) dbg->sectiondata[IDX_debug_pubnames]->d_buf;
+  unsigned char *endp
+    = startp + dbg->sectiondata[IDX_debug_pubnames]->d_size;
   unsigned char *readp = startp + offset;
   while (1)
     {
@@ -208,7 +212,13 @@ dwarf_getpubnames (dbg, callback, arg, offset)
 	  gl.die_offset += dbg->pubnames_sets[cnt].cu_offset;
 
 	  gl.name = (char *) readp;
-	  readp = (unsigned char *) rawmemchr (gl.name, '\0') + 1;
+	  readp = (unsigned char *) memchr (gl.name, '\0', endp - readp);
+	  if (unlikely (readp == NULL))
+	    {
+	      __libdw_seterrno (DWARF_E_INVALID_DWARF);
+	      return -1l;
+	    }
+	  readp++;
 
 	  /* We found name and DIE offset.  Report it.  */
 	  if (callback (dbg, &gl, arg) != DWARF_CB_OK)

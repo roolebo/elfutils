@@ -8048,21 +8048,23 @@ print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
       if (name != 0 || vector != 0)
 	{
 	  const unsigned char *sym = data->d_buf + const_off + name;
-	  if (unlikely (sym > dataend))
+	  if (unlikely (sym > dataend
+			|| memchr (sym, '\0', dataend - sym) == NULL))
 	    goto invalid_data;
 
 	  printf (" [%4zu] symbol: %s, CUs: ", n, sym);
 
 	  const unsigned char *readcus = data->d_buf + const_off + vector;
-	  if (unlikely (readcus + 8 > dataend))
+	  if (unlikely (readcus + 4 > dataend))
 	    goto invalid_data;
-
 	  uint32_t cus = read_4ubyte_unaligned (dbg, readcus);
 	  while (cus--)
 	    {
 	      uint32_t cu_kind, cu, kind;
 	      bool is_static;
 	      readcus += 4;
+	      if (unlikely (readcus + 4 > dataend))
+		goto invalid_data;
 	      cu_kind = read_4ubyte_unaligned (dbg, readcus);
 	      cu = cu_kind & ((1 << 24) - 1);
 	      kind = (cu_kind >> 28) & 7;

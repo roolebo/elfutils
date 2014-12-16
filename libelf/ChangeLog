@@ -1,5 +1,9 @@
 2014-12-15  Mark Wielaard  <mjw@redhat.com>
 
+	* elf_getarsym.c (elf_getarsym): Check index_size doesn't overflow.
+
+2014-12-15  Mark Wielaard  <mjw@redhat.com>
+
 	* elf_begin.c (read_long_names): Clear any garbage left in the
 	name table.
 

@@ -2,6 +2,7 @@
 
 	* readelf.c (print_debug_line_section): Correct overflow check for
 	unit_length.
+	(print_debug_aranges_section): Correct overflow check for length.
 
 2014-12-15  Mark Wielaard  <mjw@redhat.com>
 

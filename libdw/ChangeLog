@@ -1,5 +1,10 @@
 2014-12-16  Mark Wielaard  <mjw@redhat.com>
 
+	* dwarf_getsrclines.c (read_srclines): Check diridx is valid under
+	DW_LNE_define_file.
+
+2014-12-16  Mark Wielaard  <mjw@redhat.com>
+
 	* dwarf_getpubnames.c (dwarf_getpubnames): Make sure there is enough
 	space to read die offset.
 

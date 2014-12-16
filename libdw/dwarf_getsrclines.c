@@ -469,6 +469,11 @@ read_srclines (Dwarf *dbg,
 		if (unlikely (linep >= lineendp))
 		  goto invalid_data;
 		get_uleb128 (diridx, linep, lineendp);
+		if (unlikely (diridx >= ndirlist))
+		  {
+		    __libdw_seterrno (DWARF_E_INVALID_DIR_IDX);
+		    goto invalid_data;
+		  }
 		Dwarf_Word mtime;
 		if (unlikely (linep >= lineendp))
 		  goto invalid_data;

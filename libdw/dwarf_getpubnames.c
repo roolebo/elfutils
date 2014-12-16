@@ -199,6 +199,8 @@ dwarf_getpubnames (dbg, callback, arg, offset)
       while (1)
 	{
 	  /* READP points to the next offset/name pair.  */
+	  if (readp + dbg->pubnames_sets[cnt].address_len > endp)
+	    goto invalid_dwarf;
 	  if (dbg->pubnames_sets[cnt].address_len == 4)
 	    gl.die_offset = read_4ubyte_unaligned_inc (dbg, readp);
 	  else
@@ -215,6 +217,7 @@ dwarf_getpubnames (dbg, callback, arg, offset)
 	  readp = (unsigned char *) memchr (gl.name, '\0', endp - readp);
 	  if (unlikely (readp == NULL))
 	    {
+	    invalid_dwarf:
 	      __libdw_seterrno (DWARF_E_INVALID_DWARF);
 	      return -1l;
 	    }

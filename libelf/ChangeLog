@@ -1,3 +1,8 @@
+2014-12-16  Mark Wielaard  <mjw@redhat.com>
+
+	* elf_begin.c (read_long_names): Make sure long_names len fits
+	in mapped ELF file.
+
 2014-12-15  Mark Wielaard  <mjw@redhat.com>
 
 	* elf_getarsym.c (elf_getarsym): Check index_size doesn't overflow.

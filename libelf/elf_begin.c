@@ -708,11 +708,15 @@ read_long_names (Elf *elf)
       char *runp;
 
       if (elf->map_address != NULL)
-	/* Simply copy it over.  */
-	elf->state.ar.long_names = (char *) memcpy (newp,
-						    elf->map_address + offset
-						    + sizeof (struct ar_hdr),
-						    len);
+	{
+	  if (len > elf->maximum_size - offset - sizeof (struct ar_hdr))
+	    goto too_much;
+	  /* Simply copy it over.  */
+	  elf->state.ar.long_names = (char *) memcpy (newp,
+						      elf->map_address + offset
+						      + sizeof (struct ar_hdr),
+						      len);
+	}
       else
 	{
 	  if (unlikely ((size_t) pread_retry (elf->fildes, newp, len,
@@ -720,6 +724,7 @@ read_long_names (Elf *elf)
 					      + sizeof (struct ar_hdr))
 			!= len))
 	    {
+	    too_much:
 	      /* We were not able to read all data.  */
 	      free (newp);
 	      elf->state.ar.long_names = NULL;

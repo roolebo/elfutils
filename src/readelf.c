@@ -6357,8 +6357,8 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	}
 
       /* Check whether we have enough room in the section.  */
-      if (unit_length < 2 + length + 5 * 1
-	  || unlikely (linep + unit_length > lineendp))
+      if (unlikely (unit_length > (size_t) (lineendp - linep)
+	  || unit_length < 2 + length + 5 * 1))
 	goto invalid_data;
       lineendp = linep + unit_length;
 

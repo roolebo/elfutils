@@ -811,8 +811,7 @@ compare_Elf32_Word (const void *p1, const void *p2)
 {
   const Elf32_Word *w1 = p1;
   const Elf32_Word *w2 = p2;
-  assert (sizeof (int) >= sizeof (*w1));
-  return (int) *w1 - (int) *w2;
+  return *w1 < *w2 ? -1 : *w1 > *w2 ? 1 : 0;
 }
 
 static int

@@ -1,3 +1,8 @@
+2014-12-16  Mark Wielaard  <mjw@redhat.com>
+
+	* elfcmp.c (compare_Elf32_Word): Make sure (unsigned) Elf32_Word
+	difference doesn't wrap around before returning as int.
+
 2014-12-11  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (print_debug_exception_table): Check TType base offset

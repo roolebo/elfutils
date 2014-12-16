@@ -6256,9 +6256,19 @@ print_decoded_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
       for (size_t n = 0; n < nlines; n++)
 	{
 	  Dwarf_Line *line = dwarf_onesrcline (lines, n);
+	  if (line == NULL)
+	    {
+	      printf ("  dwarf_onesrcline: %s\n", dwarf_errmsg (-1));
+	      continue;
+	    }
 	  Dwarf_Word mtime, length;
 	  const char *file = dwarf_linesrc (line, &mtime, &length);
-	  if (strcmp (last_file, file) != 0)
+	  if (file == NULL)
+	    {
+	      printf ("  <%s> (mtime: ?, length: ?)\n", dwarf_errmsg (-1));
+	      last_file = "";
+	    }
+	  else if (strcmp (last_file, file) != 0)
 	    {
 	      printf ("  %s (mtime: %" PRIu64 ", length: %" PRIu64 ")\n",
 		      file, mtime, length);

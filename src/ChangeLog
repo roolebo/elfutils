@@ -1,5 +1,10 @@
 2014-12-16  Mark Wielaard  <mjw@redhat.com>
 
+	* readelf.c (print_decoded_line_section): Print dwarf_errmsg if
+	dwarf_onesrcline or dwarf_linesrc fails.
+
+2014-12-16  Mark Wielaard  <mjw@redhat.com>
+
 	* readelf.c (print_debug_line_section): Correct overflow check for
 	unit_length.
 	(print_debug_aranges_section): Correct overflow check for length.

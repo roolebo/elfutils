@@ -1,3 +1,8 @@
+2014-12-16  Mark Wielaard  <mjw@redhat.com>
+
+	* memory-access.h (__libdw_get_sleb128): Unroll the first step to help
+	the compiler optimize for the common single-byte case.
+
 2014-12-15  Josh Stone  <jistone@redhat.com>
 
 	* memory-access.h (__libdw_max_len_leb128): New.

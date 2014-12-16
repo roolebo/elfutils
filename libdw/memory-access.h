@@ -94,9 +94,12 @@ __libdw_get_sleb128 (const unsigned char **addrp, const unsigned char *end)
 {
   int64_t acc = 0;
 
-  /* Unrolling 0 like uleb128 didn't prove to benefit optimization.  */
-  const size_t max = __libdw_max_len_leb128 (*addrp, end);
-  for (size_t i = 0; i < max; ++i)
+  /* Unroll the first step to help the compiler optimize
+     for the common single-byte case.  */
+  get_sleb128_step (acc, *addrp, 0);
+
+  const size_t max = __libdw_max_len_leb128 (*addrp - 1, end);
+  for (size_t i = 1; i < max; ++i)
     get_sleb128_step (acc, *addrp, i);
   /* Other implementations set VALUE to INT_MAX in this
      case.  So we better do this as well.  */

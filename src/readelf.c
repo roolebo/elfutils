@@ -4971,11 +4971,15 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    puts ("     nop");
 	    break;
 	  case DW_CFA_set_loc:
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
 	    get_uleb128 (op1, readp, endp);
 	    op1 += vma_base;
 	    printf ("     set_loc %" PRIu64 "\n", op1 * code_align);
 	    break;
 	  case DW_CFA_advance_loc1:
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
 	    printf ("     advance_loc1 %u to %#" PRIx64 "\n",
 		    *readp, pc += *readp * code_align);
 	    ++readp;
@@ -4995,6 +4999,8 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 		    op1, pc += op1 * code_align);
 	    break;
 	  case DW_CFA_offset_extended:
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
 	    get_uleb128 (op1, readp, endp);
 	    if ((uint64_t) (endp - readp) < 1)
 	      goto invalid;
@@ -5004,19 +5010,27 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 		    op1, regname (op1), op2 * data_align);
 	    break;
 	  case DW_CFA_restore_extended:
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
 	    get_uleb128 (op1, readp, endp);
 	    printf ("     restore_extended r%" PRIu64 " (%s)\n",
 		    op1, regname (op1));
 	    break;
 	  case DW_CFA_undefined:
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
 	    get_uleb128 (op1, readp, endp);
 	    printf ("     undefined r%" PRIu64 " (%s)\n", op1, regname (op1));
 	    break;
 	  case DW_CFA_same_value:
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
 	    get_uleb128 (op1, readp, endp);
 	    printf ("     same_value r%" PRIu64 " (%s)\n", op1, regname (op1));
 	    break;
 	  case DW_CFA_register:
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
 	    get_uleb128 (op1, readp, endp);
 	    if ((uint64_t) (endp - readp) < 1)
 	      goto invalid;
@@ -5031,6 +5045,8 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    puts ("     restore_state");
 	    break;
 	  case DW_CFA_def_cfa:
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
 	    get_uleb128 (op1, readp, endp);
 	    if ((uint64_t) (endp - readp) < 1)
 	      goto invalid;
@@ -5039,15 +5055,21 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 		    op1, regname (op1), op2);
 	    break;
 	  case DW_CFA_def_cfa_register:
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
 	    get_uleb128 (op1, readp, endp);
 	    printf ("     def_cfa_register r%" PRIu64 " (%s)\n",
 		    op1, regname (op1));
 	    break;
 	  case DW_CFA_def_cfa_offset:
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
 	    get_uleb128 (op1, readp, endp);
 	    printf ("     def_cfa_offset %" PRIu64 "\n", op1);
 	    break;
 	  case DW_CFA_def_cfa_expression:
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
 	    get_uleb128 (op1, readp, endp);	/* Length of DW_FORM_block.  */
 	    printf ("     def_cfa_expression %" PRIu64 "\n", op1);
 	    if ((uint64_t) (endp - readp) < op1)
@@ -5061,6 +5083,8 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    readp += op1;
 	    break;
 	  case DW_CFA_expression:
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
 	    get_uleb128 (op1, readp, endp);
 	    if ((uint64_t) (endp - readp) < 1)
 	      goto invalid;
@@ -5074,6 +5098,8 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    readp += op2;
 	    break;
 	  case DW_CFA_offset_extended_sf:
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
 	    get_uleb128 (op1, readp, endp);
 	    if ((uint64_t) (endp - readp) < 1)
 	      goto invalid;
@@ -5083,6 +5109,8 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 		    op1, regname (op1), sop2 * data_align);
 	    break;
 	  case DW_CFA_def_cfa_sf:
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
 	    get_uleb128 (op1, readp, endp);
 	    if ((uint64_t) (endp - readp) < 1)
 	      goto invalid;
@@ -5091,11 +5119,14 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 		    op1, regname (op1), sop2 * data_align);
 	    break;
 	  case DW_CFA_def_cfa_offset_sf:
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
 	    get_sleb128 (sop1, readp, endp);
 	    printf ("     def_cfa_offset_sf %" PRId64 "\n", sop1 * data_align);
 	    break;
 	  case DW_CFA_val_offset:
-	    // XXX overflow check
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
 	    get_uleb128 (op1, readp, endp);
 	    if ((uint64_t) (endp - readp) < 1)
 	      goto invalid;
@@ -5104,7 +5135,8 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 		    op1, op2 * data_align);
 	    break;
 	  case DW_CFA_val_offset_sf:
-	    // XXX overflow check
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
 	    get_uleb128 (op1, readp, endp);
 	    if ((uint64_t) (endp - readp) < 1)
 	      goto invalid;
@@ -5113,6 +5145,8 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 		    op1, sop2 * data_align);
 	    break;
 	  case DW_CFA_val_expression:
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
 	    get_uleb128 (op1, readp, endp);
 	    if ((uint64_t) (endp - readp) < 1)
 	      goto invalid;
@@ -5136,6 +5170,8 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	    puts ("     GNU_window_save");
 	    break;
 	  case DW_CFA_GNU_args_size:
+	    if ((uint64_t) (endp - readp) < 1)
+	      goto invalid;
 	    get_uleb128 (op1, readp, endp);
 	    printf ("     args_size %" PRIu64 "\n", op1);
 	    break;
@@ -5149,6 +5185,8 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
       else if (opcode < DW_CFA_restore)
 	{
 	  uint64_t offset;
+	  if ((uint64_t) (endp - readp) < 1)
+	    goto invalid;
 	  get_uleb128 (offset, readp, endp);
 	  printf ("     offset r%u (%s) at cfa%+" PRId64 "\n",
 		  opcode & 0x3f, regname (opcode & 0x3f), offset * data_align);

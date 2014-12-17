@@ -1,3 +1,8 @@
+2014-12-17  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_cfa_program): Add bounds check before each op that
+	takes at least one argument.
+
 2014-12-16  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (print_decoded_line_section): Print dwarf_errmsg if

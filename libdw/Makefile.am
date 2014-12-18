@@ -113,7 +113,7 @@ libdw.so$(EXEEXT): $(srcdir)/libdw.map libdw_pic.a ../libdwelf/libdwelf_pic.a \
 		-Wl,--version-script,$<,--no-undefined \
 		-Wl,--whole-archive $(filter-out $<,$^) -Wl,--no-whole-archive\
 		-ldl $(zip_LIBS)
-	$(textrel_check)
+	@$(textrel_check)
 	ln -fs $@ $@.$(VERSION)
 
 install: install-am libdw.so

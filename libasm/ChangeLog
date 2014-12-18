@@ -1,4 +1,8 @@
-2014-01127  Mark Wielaard  <mjw@redhat.com>
+2014-12-18  Ulrich Drepper  <drepper@gmail.com>
+
+	* Makefile.am: Suppress output of textrel_check command.
+
+2014-11-27  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (libasm.so): Use textrel_check.
 

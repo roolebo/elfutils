@@ -127,7 +127,7 @@ libld_elf_i386.so: libld_elf_i386_pic.a libld_elf_i386.map
 	$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
 		$(libelf) $(libeu) \
 		-Wl,--version-script,$(srcdir)/libld_elf_i386.map
-	$(textrel_check)
+	@$(textrel_check)
 endif
 
 # Special rule to make it possible to define libld_elf_a_SOURCES as we do.

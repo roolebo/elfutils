@@ -120,7 +120,7 @@ libebl_%.so libebl_%.map: libebl_%_pic.a $(libelf) $(libdw)
 		-Wl,--whole-archive $< $(cpu_$*) -Wl,--no-whole-archive \
 		-Wl,--version-script,$(@:.so=.map) \
 		-Wl,-z,defs -Wl,--as-needed $(libelf) $(libdw)
-	$(textrel_check)
+	@$(textrel_check)
 
 libebl_i386.so: $(cpu_i386)
 libebl_x86_64.so: $(cpu_x86_64)

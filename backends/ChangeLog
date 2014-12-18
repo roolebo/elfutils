@@ -1,3 +1,7 @@
+2014-12-18  Ulrich Drepper  <drepper@gmail.com>
+
+	* Makefile.am: Suppress output of textrel_check command.
+
 2014-11-22  Mark Wielaard  <mjw@redhat.com>
 
 	* ppc64_symbol.c (ppc64_bss_plt_p): Remove ehdr argument.

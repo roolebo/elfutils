@@ -196,6 +196,17 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
+* Thu Dec 18 2014 Mark Wielaard <mjw@redhat.com> 0.161-1
+- libdw: New function dwarf_peel_type. dwarf_aggregate_size now uses
+  dwarf_peel_type to also provide the sizes of qualified types.
+  dwarf_getmacros will now serve either of .debug_macro and
+  .debug_macinfo transparently.  New interfaces dwarf_getmacros_off,
+  dwarf_macro_getsrcfiles, dwarf_macro_getparamcnt, and
+  dwarf_macro_param are available for more generalized inspection of
+  macros and their parameters.
+  dwarf.h: Add DW_AT_GNU_deleted, DW_AT_noreturn, DW_LANG_C11,
+  DW_LANG_C_plus_plus_11 and DW_LANG_C_plus_plus_14.
+
 * Mon Aug 25 2014 Mark Wielaard <mjw@redhat.com> 0.160-1
 - libdw: New functions dwarf_cu_getdwarf, dwarf_cu_die.
   dwarf.h remove non-existing DW_TAG_mutable_type.

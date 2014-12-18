@@ -1,3 +1,7 @@
+2014-12-18  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (EXTRA_DIST): Add testfile-macros-0xff.bz2.
+
 2014-12-12  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (deleted_lib_so_CFLAGS): Add

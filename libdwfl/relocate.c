@@ -206,7 +206,8 @@ resolve_symbol (Dwfl_Module *referer, struct reloc_symtab_cache *symtab,
 	  symtab->symstrdata = elf_getdata (elf_getscn (symtab->symelf,
 							symtab->strtabndx),
 					    NULL);
-	  if (unlikely (symtab->symstrdata == NULL))
+	  if (unlikely (symtab->symstrdata == NULL
+			|| symtab->symstrdata->d_buf == NULL))
 	    return DWFL_E_LIBELF;
 	}
       if (unlikely (sym->st_name >= symtab->symstrdata->d_size))

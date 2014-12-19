@@ -1,5 +1,9 @@
 2014-12-19  Mark Wielaard  <mjw@redhat.com>
 
+	* dwfl_module_getdwarf.c (find_symtab): Always try find_dynsym last.
+
+2014-12-19  Mark Wielaard  <mjw@redhat.com>
+
 	* elf-from-memory.c (handle_segment): Remove palign sanity check.
 
 2014-12-18  Mark Wielaard  <mjw@redhat.com>

@@ -1084,7 +1084,7 @@ find_symtab (Dwfl_Module *mod)
     {
     elferr:
       mod->symerr = DWFL_E (LIBELF, elf_errno ());
-      goto aux_cleanup;
+      goto aux_cleanup; /* This cleans up some more and tries find_dynsym.  */
     }
 
   /* Cache the data; MOD->syments and MOD->first_global were set above.  */
@@ -1124,6 +1124,9 @@ find_symtab (Dwfl_Module *mod)
 	  mod->aux_syments = 0;
 	  elf_end (mod->aux_sym.elf);
 	  mod->aux_sym.elf = NULL;
+	  /* We thought we had something through shdrs, but it failed...
+	     Last ditch, look for dynamic symbols without section headers.  */
+	  find_dynsym (mod);
 	  return;
 	}
 

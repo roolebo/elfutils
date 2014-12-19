@@ -1,5 +1,12 @@
 2014-12-19  Mark Wielaard  <mjw@redhat.com>
 
+	* vdsosyms.c (vdso_seen): Removed.
+	(vdso_syms): New global.
+	(module_callback): Set and check vdso_syms.
+	(main): Return value depends on vdso_syms.
+
+2014-12-19  Mark Wielaard  <mjw@redhat.com>
+
 	* backtrace-subr.sh (check_native_unsupported): Relax special ARM
 	grep a little.
 	* run-deleted.sh: Call check_native_unsupported.

@@ -34,7 +34,7 @@ main (int argc __attribute__ ((unused)), char **argv)
   return 77;
 }
 #else /* __linux__ */
-static bool vdso_seen = false;
+static int vdso_syms = 0;
 
 static int
 module_callback (Dwfl_Module *mod, void **userdata __attribute__((unused)),
@@ -42,15 +42,15 @@ module_callback (Dwfl_Module *mod, void **userdata __attribute__((unused)),
 		 void *arg __attribute__((unused)))
 {
   /* We can only recognize the vdso by inspecting the "magic name".  */
+  printf ("module name: %s\n", name);
   if (strncmp ("[vdso: ", name, 7) == 0)
     {
-      int syms = dwfl_module_getsymtab (mod);
-      printf ("vdso syms: %d\n", syms);
-      if (syms < 0)
+      vdso_syms = dwfl_module_getsymtab (mod);
+      printf ("vdso syms: %d\n", vdso_syms);
+      if (vdso_syms < 0)
 	error (2, 0, "dwfl_module_getsymtab: %s", dwfl_errmsg (-1));
-      vdso_seen = true;
 
-      for (int i = 0; i < syms; i++)
+      for (int i = 0; i < vdso_syms; i++)
 	{
 	  GElf_Sym sym;
 	  GElf_Addr addr;
@@ -102,7 +102,8 @@ main (int argc __attribute__ ((unused)), char **argv __attribute__ ((unused)))
   if (dwfl_getmodules (dwfl, module_callback, NULL, 0) != 0)
     error (1, 0, "dwfl_getmodules: %s", dwfl_errmsg (-1));
 
-  return vdso_seen ? 0 : -1;
+  /* No symbols is ok, then we haven't seen the vdso at all on this arch.  */
+  return vdso_syms >= 0 ? 0 : -1;
 }
 
 #endif /* ! __linux__ */

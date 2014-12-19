@@ -87,7 +87,7 @@ check_native_unsupported()
   # and we can fall back on .debug_frame for the CFI.
   case "`uname -m`" in
     arm* )
-      if grep 'dwfl_thread_getframes: No DWARF information found' $err; then
+      if egrep 'dwfl_thread_getframes(.*)No DWARF information found' $err; then
 	echo >&2 $testname: arm needs debuginfo installed for all libraries
 	exit 77
       fi

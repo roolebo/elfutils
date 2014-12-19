@@ -1,3 +1,9 @@
+2014-12-19  Mark Wielaard  <mjw@redhat.com>
+
+	* backtrace-subr.sh (check_native_unsupported): Relax special ARM
+	grep a little.
+	* run-deleted.sh: Call check_native_unsupported.
+
 2014-12-18  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (EXTRA_DIST): Add testfile-macros-0xff.bz2.

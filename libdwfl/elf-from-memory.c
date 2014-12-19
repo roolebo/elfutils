@@ -206,12 +206,10 @@ elf_from_remote_memory (GElf_Addr ehdr_vma,
 	 found_base yet).  Returns true if sanity checking failed,
 	 false otherwise.  */
       inline bool handle_segment (GElf_Addr vaddr, GElf_Off offset,
-				  GElf_Xword filesz, GElf_Xword memsz,
-				  GElf_Xword palign)
+				  GElf_Xword filesz, GElf_Xword memsz)
 	{
-	  /* Sanity check the alignment requirements.  */
-	  if ((palign & (pagesize - 1)) != 0
-	      || ((vaddr - offset) & (palign - 1)) != 0)
+	  /* Sanity check the segment load aligns with the pagesize.  */
+	  if (((vaddr - offset) & (pagesize - 1)) != 0)
 	    return true;
 
 	  GElf_Off segment_end = ((offset + filesz + pagesize - 1)
@@ -238,8 +236,7 @@ elf_from_remote_memory (GElf_Addr ehdr_vma,
       for (uint_fast16_t i = 0; i < phnum; ++i)
 	if (phdrs.p32[i].p_type == PT_LOAD)
 	  if (handle_segment (phdrs.p32[i].p_vaddr, phdrs.p32[i].p_offset,
-			      phdrs.p32[i].p_filesz, phdrs.p32[i].p_memsz,
-			      phdrs.p32[i].p_align))
+			      phdrs.p32[i].p_filesz, phdrs.p32[i].p_memsz))
 	    goto bad_elf;
       break;
 
@@ -250,8 +247,7 @@ elf_from_remote_memory (GElf_Addr ehdr_vma,
       for (uint_fast16_t i = 0; i < phnum; ++i)
 	if (phdrs.p64[i].p_type == PT_LOAD)
 	  if (handle_segment (phdrs.p64[i].p_vaddr, phdrs.p64[i].p_offset,
-			      phdrs.p64[i].p_filesz, phdrs.p64[i].p_memsz,
-			      phdrs.p64[i].p_align))
+			      phdrs.p64[i].p_filesz, phdrs.p64[i].p_memsz))
 	    goto bad_elf;
       break;
 

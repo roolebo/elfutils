@@ -1,3 +1,7 @@
+2014-12-19  Mark Wielaard  <mjw@redhat.com>
+
+	* elf-from-memory.c (handle_segment): Remove palign sanity check.
+
 2014-12-18  Mark Wielaard  <mjw@redhat.com>
 
 	* relocate.c (resolve_symbol): Make sure symstrdata->d_buf != NULL.

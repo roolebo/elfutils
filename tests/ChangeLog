@@ -1,5 +1,9 @@
 2014-12-19  Mark Wielaard  <mjw@redhat.com>
 
+	* run-deleted.sh: Don't check libfunc on ppc64.
+
+2014-12-19  Mark Wielaard  <mjw@redhat.com>
+
 	* vdsosyms.c (vdso_seen): Removed.
 	(vdso_syms): New global.
 	(module_callback): Set and check vdso_syms.

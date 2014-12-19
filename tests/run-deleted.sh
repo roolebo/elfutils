@@ -38,5 +38,11 @@ cat bt bt.err
 kill -9 $pid
 wait
 check_native_unsupported bt.err deleted
-grep -qw libfunc bt
+# For PPC64 we need access to the OPD table which we get through the shdrs
+# (see backends/ppc64_init.c) but for the deleted-lib we only have phdrs.
+# So we don't have the name of the function. But since we should find
+# the EH_FRAME through phdrs just fine, we can unwind into main.
+if test "`uname -m`" != "ppc64"; then
+  grep -qw libfunc bt
+fi
 grep -qw main bt

@@ -1,5 +1,10 @@
 2014-12-20  Mark Wielaard  <mjw@redhat.com>
 
+	* readelf.c (print_debug_macinfo_section): Mark cus sentinel files
+	as -1 non-existent. Check macoff against sentinel cus.
+
+2014-12-20  Mark Wielaard  <mjw@redhat.com>
+
 	* readelf.c (print_debug_exception_table): Add max_action overflow
 	check. Check action_table_end before reading slib128. Check
 	max_ar_filter underflow.

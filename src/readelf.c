@@ -7061,6 +7061,7 @@ print_debug_macinfo_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 							 * sizeof (*cus));
   /* Add sentinel.  */
   cus[nculist].offset = data->d_size;
+  cus[nculist].files = (Dwarf_Files *) -1l;
   if (nculist > 0)
     {
       for (size_t cnt = nculist - 1; culist != NULL; --cnt)
@@ -7136,7 +7137,7 @@ print_debug_macinfo_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	  const char *fname = "???";
 	  if (macoff >= cus[0].offset)
 	    {
-	      while (macoff >= cus[1].offset)
+	      while (macoff >= cus[1].offset && cus[1].offset != data->d_size)
 		++cus;
 
 	      if (cus[0].files == NULL

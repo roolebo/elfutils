@@ -7853,8 +7853,10 @@ print_debug_exception_table (Dwfl_Module *dwflmod __attribute__ ((unused)),
     {
       puts ("\n Action table:");
 
-      if ((size_t) (dataend - action_table) < max_action + 1)
+      size_t maxdata = (size_t) (dataend - action_table);
+      if (max_action > maxdata || maxdata - max_action < 1)
 	{
+	invalid_action_table:
 	  fputs (gettext ("   <INVALID DATA>\n"), stdout);
 	  return;
 	}
@@ -7870,6 +7872,8 @@ print_debug_exception_table (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	  if (ar_filter > 0 && (unsigned int) ar_filter > max_ar_filter)
 	    max_ar_filter = ar_filter;
 	  int ar_disp;
+	  if (readp >= action_table_end)
+	    goto invalid_action_table;
 	  get_sleb128 (ar_disp, readp, action_table_end);
 
 	  printf (" [%4u] ar_filter:  % d\n"
@@ -7888,6 +7892,7 @@ print_debug_exception_table (Dwfl_Module *dwflmod __attribute__ ((unused)),
 
   if (max_ar_filter > 0 && ttype_base != NULL)
     {
+      unsigned char dsize;
       puts ("\n TType table:");
 
       // XXX Not *4, size of encoding;
@@ -7895,20 +7900,25 @@ print_debug_exception_table (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	{
 	case DW_EH_PE_udata2:
 	case DW_EH_PE_sdata2:
-	  readp = ttype_base - max_ar_filter * 2;
+	  dsize = 2;
 	  break;
 	case DW_EH_PE_udata4:
 	case DW_EH_PE_sdata4:
-	  readp = ttype_base - max_ar_filter * 4;
+	  dsize = 4;
 	  break;
 	case DW_EH_PE_udata8:
 	case DW_EH_PE_sdata8:
-	  readp = ttype_base - max_ar_filter * 8;
+	  dsize = 8;
 	  break;
 	default:
 	  error (1, 0, gettext ("invalid TType encoding"));
 	}
 
+      if (max_ar_filter
+	  > (size_t) (ttype_base - (const unsigned char *) data->d_buf) / dsize)
+	goto invalid_data;
+
+      readp = ttype_base - max_ar_filter * dsize;
       do
 	{
 	  uint64_t ttype;

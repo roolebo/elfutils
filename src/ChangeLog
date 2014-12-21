@@ -1,3 +1,9 @@
+2014-12-20  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_debug_exception_table): Add max_action overflow
+	check. Check action_table_end before reading slib128. Check
+	max_ar_filter underflow.
+
 2014-12-18  Ulrich Drepper  <drepper@gmail.com>
 
 	* Makefile.am: Suppress output of textrel_check command.

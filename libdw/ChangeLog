@@ -1,3 +1,9 @@
+2014-12-24  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_getsrc_die.c (dwarf_getsrc_die): Return the last line record
+	smaller than or equal to addr, rather than returning immediately on
+	a match.
+
 2015-01-07  Mark Wielaard  <mjw@redhat.com>
 
 	* cfi.h (struct Dwarf_CFI_s): Add search_table_len.

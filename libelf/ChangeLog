@@ -1,3 +1,8 @@
+2014-12-25  Mark Wielaard  <mjw@redhat.com>
+
+	* elf_begin.c (__libelf_next_arhdr_wrlock): ar_size cannot be
+	negative. Include start_offset in maxsize.
+
 2014-12-28  Alexander Cherepanov  <cherepan@mccme.ru>
 
 	* elf_begin.c (read_long_names): Don't miss '/' right after

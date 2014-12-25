@@ -921,9 +921,16 @@ __libelf_next_arhdr_wrlock (elf)
   INT_FIELD (ar_mode);
   INT_FIELD (ar_size);
 
+  if (elf_ar_hdr->ar_size < 0)
+    {
+      __libelf_seterrno (ELF_E_INVALID_ARCHIVE);
+      return -1;
+    }
+
   /* Truncated file?  */
   size_t maxsize;
-  maxsize = elf->maximum_size - elf->state.ar.offset - sizeof (struct ar_hdr);
+  maxsize = (elf->start_offset + elf->maximum_size
+	     - elf->state.ar.offset - sizeof (struct ar_hdr));
   if ((size_t) elf_ar_hdr->ar_size > maxsize)
     elf_ar_hdr->ar_size = maxsize;
 

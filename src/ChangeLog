@@ -1,5 +1,10 @@
 2014-12-26  Mark Wielaard  <mjw@redhat.com>
 
+	* strings.c (read_elf): Produce error when section data falls outside
+	file.
+
+2014-12-26  Mark Wielaard  <mjw@redhat.com>
+
 	* nm.c (show_symbols): Guard against divide by zero in error check.
 	Add section index number in error message.
 

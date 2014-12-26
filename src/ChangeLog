@@ -1,5 +1,10 @@
 2014-12-26  Mark Wielaard  <mjw@redhat.com>
 
+	* nm.c (show_symbols): Guard against divide by zero in error check.
+	Add section index number in error message.
+
+2014-12-26  Mark Wielaard  <mjw@redhat.com>
+
 	* nm.c (handle_ar): Skip over /SYM64/ entries.
 
 2014-12-26  Mark Wielaard  <mjw@redhat.com>

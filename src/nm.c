@@ -1169,14 +1169,17 @@ show_symbols (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, Elf_Scn *xndxscn,
   size_t entsize = shdr->sh_entsize;
 
   /* Consistency checks.  */
-  if (entsize != gelf_fsize (ebl->elf, ELF_T_SYM, 1, ehdr->e_version))
+  if (entsize == 0
+      || entsize != gelf_fsize (ebl->elf, ELF_T_SYM, 1, ehdr->e_version))
     error (0, 0,
-	   gettext ("%s: entry size in section `%s' is not what we expect"),
-	   fullname, elf_strptr (ebl->elf, shstrndx, shdr->sh_name));
+	   gettext ("%s: entry size in section %zd `%s' is not what we expect"),
+	   fullname, elf_ndxscn (scn),
+	   elf_strptr (ebl->elf, shstrndx, shdr->sh_name));
   else if (size % entsize != 0)
     error (0, 0,
-	   gettext ("%s: size of section `%s' is not multiple of entry size"),
-	   fullname, elf_strptr (ebl->elf, shstrndx, shdr->sh_name));
+	   gettext ("%s: size of section %zd `%s' is not multiple of entry size"),
+	   fullname, elf_ndxscn (scn),
+	   elf_strptr (ebl->elf, shstrndx, shdr->sh_name));
 
   /* Compute number of entries.  Handle buggy entsize values.  */
   size_t nentries = size / (entsize ?: 1);

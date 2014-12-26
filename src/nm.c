@@ -468,7 +468,7 @@ handle_ar (int fd, Elf *elf, const char *prefix, const char *fname,
 		{
 		  error (0, 0, gettext ("invalid offset %zu for symbol %s"),
 			 arsym->as_off, arsym->as_name);
-		  continue;
+		  break;
 		}
 
 	      printf (gettext ("%s in %s\n"), arsym->as_name, arhdr->ar_name);

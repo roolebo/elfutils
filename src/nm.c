@@ -493,7 +493,8 @@ handle_ar (int fd, Elf *elf, const char *prefix, const char *fname,
 
       /* Skip over the index entries.  */
       if (strcmp (arhdr->ar_name, "/") != 0
-	  && strcmp (arhdr->ar_name, "//") != 0)
+	  && strcmp (arhdr->ar_name, "//") != 0
+	  && strcmp (arhdr->ar_name, "/SYM64/") != 0)
 	{
 	  if (elf_kind (subelf) == ELF_K_ELF)
 	    result |= handle_elf (subelf, new_prefix, arhdr->ar_name,

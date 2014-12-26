@@ -1,5 +1,9 @@
 2014-12-26  Mark Wielaard  <mjw@redhat.com>
 
+	* nm.c (handle_ar): Skip over /SYM64/ entries.
+
+2014-12-26  Mark Wielaard  <mjw@redhat.com>
+
 	* nm.c (handle_ar): Break on arsym with invalid offset.
 
 2014-12-20  Mark Wielaard  <mjw@redhat.com>

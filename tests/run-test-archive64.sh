@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2012 Red Hat, Inc.
+# Copyright (C) 2012, 2014 Red Hat, Inc.
 # This file is part of elfutils.
 #
 # This file is free software; you can redistribute it and/or modify
@@ -38,6 +38,18 @@ Archive member 'ccc.o' contains:
 	ccc
 	ccc2
 	ccc3
+EOF
+
+testrun_compare ${abs_top_builddir}/src/nm -P -g testarchive64.a <<\EOF
+testarchive64.a[aaa.o]:
+aaa T 0000000000000000 0000000000000016
+testarchive64.a[bbb.o]:
+bbb T 0000000000000000 0000000000000016
+bbb2 T 0000000000000018 0000000000000016
+testarchive64.a[ccc.o]:
+ccc T 0000000000000000 0000000000000016
+ccc2 T 0000000000000018 0000000000000016
+ccc3 T 0000000000000030 0000000000000016
 EOF
 
 exit 0

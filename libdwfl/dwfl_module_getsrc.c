@@ -64,11 +64,11 @@ dwfl_module_getsrc (Dwfl_Module *mod, Dwarf_Addr addr)
 		l = idx;
 	    }
 
-	  /* The last line which is less than or equal to addr is what we want,
-	     except with an end_sequence which can only be strictly equal.  */
+	  /* The last line which is less than or equal to addr is what
+	     we want, unless it is the end_sequence which is after the
+	     current line sequence.  */
 	  Dwarf_Line *line = &lines->info[l];
-	  if (line->addr == addr
-	      || (! line->end_sequence && line->addr < addr))
+	  if (! line->end_sequence && line->addr <= addr)
 	    return &cu->lines->idx[l];
 	}
 

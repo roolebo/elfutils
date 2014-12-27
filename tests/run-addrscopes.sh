@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2005 Red Hat, Inc.
+# Copyright (C) 2005, 2014 Red Hat, Inc.
 # This file is part of elfutils.
 #
 # This file is free software; you can redistribute it and/or modify
@@ -21,9 +21,9 @@ testfiles testfile22
 
 testrun_compare ${abs_builddir}/addrscopes -e testfile22 0x8048353 <<\EOF
 0x8048353:
-    tests/foo.c (0x11): 0x8048348 (tests/foo.c:5) .. 0x804837e (tests/foo.c:16)
+    tests/foo.c (0x11): 0x8048348 (tests/foo.c:5) .. 0x804837c (tests/foo.c:16)
         global                        [    be]
-        function (0x2e): 0x8048348 (tests/foo.c:5) .. 0x804835b (tests/foo.c:14)
+        function (0x2e): 0x8048348 (tests/foo.c:5) .. 0x8048359 (tests/foo.c:11)
             local                         [    8f]
 EOF
 
@@ -32,8 +32,8 @@ test_cleanup
 testfiles testfile24
 testrun_compare ${abs_builddir}/addrscopes -e testfile24 0x804834e <<\EOF
 0x804834e:
-    inline-test.c (0x11): 0x8048348 (/home/roland/build/stock-elfutils/inline-test.c:7) .. 0x8048364 (/home/roland/build/stock-elfutils/inline-test.c:16)
-        add (0x1d): 0x804834e (/home/roland/build/stock-elfutils/inline-test.c:3) .. 0x8048350 (/home/roland/build/stock-elfutils/inline-test.c:9)
+    inline-test.c (0x11): 0x8048348 (/home/roland/build/stock-elfutils/inline-test.c:7) .. 0x8048360 (/home/roland/build/stock-elfutils/inline-test.c:16)
+        add (0x1d): 0x804834e (/home/roland/build/stock-elfutils/inline-test.c:3) .. 0x804834f
             y                             [    9d]
             x                             [    a2]
             x (abstract)

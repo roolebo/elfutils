@@ -1,3 +1,10 @@
+2014-12-27  Mark Wielaard  <mjw@redhat.com>
+
+	* addrscopes.c (handle_address): Last address in scope is highpc - 1.
+	* funcscopes.c (handle_function): Likewise.
+	* run-addrscopes.sh: Adjust last address in scope.
+	* run-funcscopes.sh: Likewise.
+
 2015-01-07  Mark Wielaard  <mjw@redhat.com>
 
 	* run-addrcfi.sh: Add test for ppc32 eh_frame_hdr address search.

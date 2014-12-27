@@ -1,5 +1,5 @@
 /* Test program for dwarf_getscopes.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2014 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -125,10 +125,10 @@ handle_address (GElf_Addr pc, Dwfl *dwfl)
 	      lowpc += cubias;
 	      highpc += cubias;
 	      Dwfl_Line *loline = dwfl_getsrc (dwfl, lowpc);
-	      Dwfl_Line *hiline = dwfl_getsrc (dwfl, highpc);
+	      Dwfl_Line *hiline = dwfl_getsrc (dwfl, highpc - 1);
 	      paddr (": ", lowpc, loline);
 	      if (highpc != lowpc)
-		paddr (" .. ", lowpc, hiline == loline ? NULL : hiline);
+		paddr (" .. ", highpc - 1, hiline == loline ? NULL : hiline);
 	    }
 	  puts ("");
 

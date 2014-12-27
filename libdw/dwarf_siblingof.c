@@ -79,6 +79,13 @@ dwarf_siblingof (die, result)
 	    /* Something went wrong.  */
 	    return -1;
 
+	  size_t size = sibattr.cu->endp - sibattr.cu->startp;
+	  if (unlikely (offset >= size))
+	    {
+	      __libdw_seterrno (DWARF_E_INVALID_DWARF);
+	      return -1;
+	    }
+
 	  /* Compute the next address.  */
 	  addr = sibattr.cu->startp + offset;
 	}

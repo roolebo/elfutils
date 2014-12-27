@@ -1,3 +1,8 @@
+2014-12-27  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_siblingof.c (dwarf_siblingof): Check sibling attribute offset
+	still falls inside CU data.
+
 2015-01-11  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_func_inline.c (dwarf_func_inline_instances): Call

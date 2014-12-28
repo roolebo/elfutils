@@ -749,10 +749,7 @@ read_long_names (Elf *elf)
 	    }
 
 	  /* NUL-terminate the string.  */
-	  *runp = '\0';
-
-	  /* Skip the NUL byte and the \012.  */
-	  runp += 2;
+	  *runp++ = '\0';
 
 	  /* A sanity check.  Somebody might have generated invalid
 	     archive.  */

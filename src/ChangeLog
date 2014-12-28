@@ -1,3 +1,28 @@
+2014-12-30  Mark Wielaard  <mjw@redhat.com>
+
+	* elflint.c (check_scn_group): Check d_buf and name are not NULL.
+	(is_rel_dyn): Check d is not NULL. Check shdr->sh_entsize is not
+	zero.
+	(check_dynamic): Check strshdr is not NULL. Check d_tag is positive.
+	(check_symtab_shndx): Check symshdr and data->d_buf are not NULL.
+	Check shdr and symshdr sh_entsize are not zero.
+	(check_gnu_hash): Make sure maskidx is smaller than bitmask_words.
+	Check symshdr->sh_entsize is not zero. Check data->d_buf is not
+	NULL.
+	(compare_hash_gnu_hash): Check sections d_buf are not NULL.
+	Check section data is large enough. Use gnu_symbias.
+	(check_group): Check section val is valid.
+	(has_copy_reloc): Check sh_entsize is not zero.
+	(check_versym): Likewise.
+	(unknown_dependency_p): Likewise.
+	(check_verneed): Break on invalid ref or offset. Don't assert.
+	Report error when next offset is zero, but more vers expected.
+	(check_verdef): Likewise.
+	(check_attributes): Make sure d_buf is not NULL.
+	(check_note): Likewise.
+	(check_note_section): Likewise.
+	(check_program_header): Make sure section name is not NULL.
+
 2014-12-26  Mark Wielaard  <mjw@redhat.com>
 
 	* strings.c (read_elf): Produce error when section data falls outside

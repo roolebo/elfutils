@@ -511,6 +511,8 @@ extern Elf_Scn *__elf64_offscn_internal (Elf *__elf, Elf64_Off __offset)
      attribute_hidden;
 extern int __elf_getphdrnum_rdlock (Elf *__elf, size_t *__dst)
      internal_function;
+extern int __elf_getphdrnum_chk_rdlock (Elf *__elf, size_t *__dst)
+     internal_function;
 extern int __elf_getshdrnum_rdlock (Elf *__elf, size_t *__dst)
      internal_function;
 extern int __elf_getshdrstrndx_internal (Elf *__elf, size_t *__dst)

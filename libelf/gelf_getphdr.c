@@ -80,10 +80,8 @@ gelf_getphdr (elf, ndx, dst)
 
       /* Test whether the index is ok.  */
       size_t phnum;
-      if (ndx >= elf->state.elf32.ehdr->e_phnum
-	  && (elf->state.elf32.ehdr->e_phnum != PN_XNUM
-	      || __elf_getphdrnum_rdlock (elf, &phnum) != 0
-	      || (size_t) ndx >= phnum))
+      if (__elf_getphdrnum_chk_rdlock (elf, &phnum) != 0
+	  || (size_t) ndx >= phnum)
 	{
 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
 	  goto out;
@@ -122,10 +120,8 @@ gelf_getphdr (elf, ndx, dst)
 
       /* Test whether the index is ok.  */
       size_t phnum;
-      if (ndx >= elf->state.elf64.ehdr->e_phnum
-	  && (elf->state.elf64.ehdr->e_phnum != PN_XNUM
-	      || __elf_getphdrnum_rdlock (elf, &phnum) != 0
-	      || (size_t) ndx >= phnum))
+      if (__elf_getphdrnum_chk_rdlock (elf, &phnum) != 0
+	  || (size_t) ndx >= phnum)
 	{
 	  __libelf_seterrno (ELF_E_INVALID_INDEX);
 	  goto out;

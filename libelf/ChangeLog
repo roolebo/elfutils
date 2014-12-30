@@ -1,3 +1,11 @@
+2014-12-30  Mark Wielaard  <mjw@redhat.com>
+
+	* elf_getphdrnum.c (__elf_getphdrnum_chk_rdlock): New function.
+	(elf_getphdrnum): Call __elf_getphdrnum_chk_rdlock.
+	* gelf_getphdr (gelf_getphdr): Call __elf_getphdrnum_chk_rdlock
+	and always check ndx against phnum.
+	* libelfP.h (__elf_getphdrnum_chk_rdlock): New internal function.
+
 2014-12-25  Mark Wielaard  <mjw@redhat.com>
 
 	* elf_begin.c (__libelf_next_arhdr_wrlock): ar_size cannot be

@@ -98,7 +98,8 @@ find_dyn_got (Elf *elf, GElf_Addr *addr)
       GElf_Shdr shdr_mem;
       GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
       Elf_Data *data = elf_getdata (scn, NULL);
-      if (shdr != NULL && shdr->sh_type == SHT_DYNAMIC && data != NULL)
+      if (shdr != NULL && shdr->sh_type == SHT_DYNAMIC && data != NULL
+	  && shdr->sh_entsize != 0)
 	for (unsigned int j = 0; j < shdr->sh_size / shdr->sh_entsize; ++j)
 	  {
 	    GElf_Dyn dyn_mem;

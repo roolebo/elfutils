@@ -1,3 +1,7 @@
+2014-12-30  Mark Wielaard  <mjw@redhat.com>
+
+	* ppc_symbol.c (find_dyn_got): Check sh_entsize is not zero.
+
 2014-12-18  Ulrich Drepper  <drepper@gmail.com>
 
 	* Makefile.am: Suppress output of textrel_check command.

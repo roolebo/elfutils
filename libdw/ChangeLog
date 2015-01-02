@@ -1,5 +1,11 @@
 2015-01-02  Mark Wielaard  <mjw@redhat.com>
 
+	* dwarf_getcfi_elf.c (parse_eh_frame_hdr): Add size check.
+	(getcfi_gnu_eh_frame): Remove size check. Check d_buf is not NULL.
+	(getcfi_scn_eh_frame): Check d_buf is not NULL.
+
+2015-01-02  Mark Wielaard  <mjw@redhat.com>
+
 	* dwarf_getlocation.c (__libdw_intern_expression): Check dbg is not
 	NULL for DW_OP_call_ref and DW_OP_GNU_implicit_pointer. For
 	DW_OP_addr if dbg is NULL then read argument directly.

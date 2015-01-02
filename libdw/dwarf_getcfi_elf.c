@@ -76,7 +76,7 @@ parse_eh_frame_hdr (const uint8_t *hdr, size_t hdr_size, GElf_Addr hdr_vaddr,
 {
   const uint8_t *h = hdr;
 
-  if (*h++ != 1)		/* version */
+  if (hdr_size < 4 || *h++ != 1)		/* version */
     return (void *) -1l;
 
   uint8_t eh_frame_ptr_encoding = *h++;
@@ -125,15 +125,11 @@ parse_eh_frame_hdr (const uint8_t *hdr, size_t hdr_size, GElf_Addr hdr_vaddr,
 static Dwarf_CFI *
 getcfi_gnu_eh_frame (Elf *elf, const GElf_Ehdr *ehdr, const GElf_Phdr *phdr)
 {
-  if (unlikely (phdr->p_filesz < 4))
-    goto invalid;
-
   Elf_Data *data = elf_getdata_rawchunk (elf, phdr->p_offset, phdr->p_filesz,
 					 ELF_T_BYTE);
-  if (data == NULL)
+  if (data == NULL || data->d_buf == NULL)
     {
     invalid_hdr:
-    invalid:
       /* XXX might be read error or corrupt phdr */
       __libdw_seterrno (DWARF_E_INVALID_CFI);
       return NULL;
@@ -211,7 +207,7 @@ getcfi_scn_eh_frame (Elf *elf, const GElf_Ehdr *ehdr,
 		     Elf_Scn *hdr_scn, GElf_Addr hdr_vaddr)
 {
   Elf_Data *data = elf_rawdata (scn, NULL);
-  if (data == NULL)
+  if (data == NULL || data->d_buf == NULL)
     {
       __libdw_seterrno (DWARF_E_INVALID_ELF);
       return NULL;
@@ -223,7 +219,7 @@ getcfi_scn_eh_frame (Elf *elf, const GElf_Ehdr *ehdr,
       if (hdr_scn != NULL)
 	{
 	  Elf_Data *hdr_data = elf_rawdata (hdr_scn, NULL);
-	  if (hdr_data != NULL)
+	  if (hdr_data != NULL && hdr_data->d_buf != NULL)
 	    {
 	      GElf_Addr eh_frame_vaddr;
 	      cfi->search_table_vaddr = hdr_vaddr;

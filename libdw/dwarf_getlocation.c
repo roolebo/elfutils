@@ -1,5 +1,5 @@
 /* Return location expression list.
-   Copyright (C) 2000-2010, 2013, 2014 Red Hat, Inc.
+   Copyright (C) 2000-2010, 2013-2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -270,16 +270,36 @@ __libdw_intern_expression (Dwarf *dbg, bool other_byte_order,
 	{
 	case DW_OP_addr:
 	  /* Address, depends on address size of CU.  */
-	  if (__libdw_read_address_inc (dbg, sec_index, &data,
-					address_size, &newloc->number))
-	    return -1;
+	  if (dbg == NULL)
+	    {
+	      // XXX relocation?
+	      if (address_size == 4)
+		{
+		  if (unlikely (data + 4 > end_data))
+		    goto invalid;
+		  else
+		    newloc->number = read_4ubyte_unaligned_inc (&bo, data);
+		}
+	      else
+		{
+		  if (unlikely (data + 8 > end_data))
+		    goto invalid;
+		  else
+		    newloc->number = read_8ubyte_unaligned_inc (&bo, data);
+		}
+	    }
+	  else if (__libdw_read_address_inc (dbg, sec_index, &data,
+					     address_size, &newloc->number))
+	    goto invalid;
 	  break;
 
 	case DW_OP_call_ref:
 	  /* DW_FORM_ref_addr, depends on offset size of CU.  */
-	  if (__libdw_read_offset_inc (dbg, sec_index, &data, ref_size,
-				       &newloc->number, IDX_debug_info, 0))
-	    return -1;
+	  if (dbg == NULL || __libdw_read_offset_inc (dbg, sec_index, &data,
+						      ref_size,
+						      &newloc->number,
+						      IDX_debug_info, 0))
+	    goto invalid;
 	  break;
 
 	case DW_OP_deref:
@@ -435,9 +455,11 @@ __libdw_intern_expression (Dwarf *dbg, bool other_byte_order,
 
 	case DW_OP_GNU_implicit_pointer:
 	  /* DW_FORM_ref_addr, depends on offset size of CU.  */
-	  if (__libdw_read_offset_inc (dbg, sec_index, &data, ref_size,
-				       &newloc->number, IDX_debug_info, 0))
-	    return -1;
+	  if (dbg == NULL || __libdw_read_offset_inc (dbg, sec_index, &data,
+						      ref_size,
+						      &newloc->number,
+						      IDX_debug_info, 0))
+	    goto invalid;
 	  if (unlikely (data >= end_data))
 	    goto invalid;
 	  get_uleb128 (newloc->number2, data, end_data); /* Byte offset.  */

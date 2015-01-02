@@ -1,3 +1,9 @@
+2015-01-02  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_getlocation.c (__libdw_intern_expression): Check dbg is not
+	NULL for DW_OP_call_ref and DW_OP_GNU_implicit_pointer. For
+	DW_OP_addr if dbg is NULL then read argument directly.
+
 2015-01-14  Jason P. Leasure <jpleasu@super.org>
 
 	* dwarf_formref_die.c (dwarf_formref_die): Offset is cu->type_offset

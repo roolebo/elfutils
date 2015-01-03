@@ -1,5 +1,5 @@
 /* Conversion functions for versioning information.
-   Copyright (C) 1998, 1999, 2000, 2002, 2003 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2003, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -54,6 +54,11 @@ elf_cvt_Verdef (void *dest, const void *src, size_t len, int encode)
 
   if (len == 0)
     return;
+
+  /* Below we rely on the next field offsets to be correct, start by
+     copying over all data as is in case some data isn't translated.
+     We don't want to leave (undefined) garbage in the dest buffer.  */
+  memmove (dest, src, len);
 
   do
     {
@@ -148,6 +153,11 @@ elf_cvt_Verneed (void *dest, const void *src, size_t len, int encode)
 
   if (len == 0)
     return;
+
+  /* Below we rely on the next field offsets to be correct, start by
+     copying over all data as is in case some data isn't translated.
+     We don't want to leave (undefined) garbage in the dest buffer.  */
+  memmove (dest, src, len);
 
   do
     {

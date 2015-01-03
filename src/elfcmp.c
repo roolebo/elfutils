@@ -287,7 +287,8 @@ main (int argc, char *argv[])
 
       /* Compare the headers.  We allow the name to be at a different
 	 location.  */
-      if (unlikely (strcmp (sname1, sname2) != 0))
+      if (unlikely (sname1 == NULL || sname2 == NULL
+		    || strcmp (sname1, sname2) != 0))
 	{
 	  error (0, 0, gettext ("%s %s differ: section [%zu], [%zu] name"),
 		 fname1, fname2, elf_ndxscn (scn1), elf_ndxscn (scn2));
@@ -295,8 +296,8 @@ main (int argc, char *argv[])
 	}
 
       /* We ignore certain sections.  */
-      if (strcmp (sname1, ".gnu_debuglink") == 0
-	  || strcmp (sname1, ".gnu.prelink_undo") == 0)
+      if ((sname1 != NULL && strcmp (sname1, ".gnu_debuglink") == 0)
+	  || (sname1 != NULL && strcmp (sname1, ".gnu.prelink_undo") == 0))
 	continue;
 
       if (shdr1->sh_type != shdr2->sh_type
@@ -333,6 +334,11 @@ main (int argc, char *argv[])
 	{
 	case SHT_DYNSYM:
 	case SHT_SYMTAB:
+	  if (shdr1->sh_entsize == 0)
+	    error (2, 0,
+		   gettext ("symbol table [%zu] in '%s' has zero sh_entsize"),
+		   elf_ndxscn (scn1), fname1);
+
 	  /* Iterate over the symbol table.  We ignore the st_size
 	     value of undefined symbols.  */
 	  for (int ndx = 0; ndx < (int) (shdr1->sh_size / shdr1->sh_entsize);
@@ -591,13 +597,13 @@ cannot read note section [%zu] '%s' in '%s': %s"),
     {
       GElf_Phdr phdr1_mem;
       GElf_Phdr *phdr1 = gelf_getphdr (elf1, ndx, &phdr1_mem);
-      if (ehdr1 == NULL)
+      if (phdr1 == NULL)
 	error (2, 0,
 	       gettext ("cannot get program header entry %d of '%s': %s"),
 	       ndx, fname1, elf_errmsg (-1));
       GElf_Phdr phdr2_mem;
       GElf_Phdr *phdr2 = gelf_getphdr (elf2, ndx, &phdr2_mem);
-      if (ehdr2 == NULL)
+      if (phdr2 == NULL)
 	error (2, 0,
 	       gettext ("cannot get program header entry %d of '%s': %s"),
 	       ndx, fname2, elf_errmsg (-1));
@@ -760,7 +766,7 @@ search_for_copy_reloc (Ebl *ebl, size_t scnndx, int symndx)
 	       gettext ("cannot get content of section %zu: %s"),
 	       elf_ndxscn (scn), elf_errmsg (-1));
 
-      if (shdr->sh_type == SHT_REL)
+      if (shdr->sh_type == SHT_REL && shdr->sh_entsize != 0)
 	for (int ndx = 0; ndx < (int) (shdr->sh_size / shdr->sh_entsize);
 	     ++ndx)
 	  {
@@ -774,7 +780,7 @@ search_for_copy_reloc (Ebl *ebl, size_t scnndx, int symndx)
 		&& ebl_copy_reloc_p (ebl, GELF_R_TYPE (rel->r_info)))
 	      return true;
 	  }
-      else
+      else if (shdr->sh_entsize != 0)
 	for (int ndx = 0; ndx < (int) (shdr->sh_size / shdr->sh_entsize);
 	     ++ndx)
 	  {

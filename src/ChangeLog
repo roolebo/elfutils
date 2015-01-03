@@ -1,3 +1,9 @@
+2015-01-03  Mark Wielaard  <mjw@redhat.com>
+
+	* elfcmp (main): Check section name is not NULL. Check sh_entsize
+	is not zero for symbol tables. Check phdrs are not NULL.
+	(search_for_copy_reloc): Check sh_entsize is not zero.
+
 2014-12-30  Mark Wielaard  <mjw@redhat.com>
 
 	* elflint.c (check_scn_group): Check d_buf and name are not NULL.

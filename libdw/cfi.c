@@ -1,5 +1,5 @@
 /* CFI program execution.
-   Copyright (C) 2009-2010, 2014 Red Hat, Inc.
+   Copyright (C) 2009-2010, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -79,6 +79,15 @@ execute_cfi (Dwarf_CFI *cache,
   Dwarf_Frame *fs = *state;
   inline bool enough_registers (Dwarf_Word reg)
     {
+      /* Don't allow insanely large register numbers.  268435456 registers
+	 should be enough for anybody.  And very large values might overflow
+	 the array size and offsetof calculations below.  */
+      if (unlikely (reg >= INT32_MAX / sizeof (fs->regs[0])))
+	{
+	  result = DWARF_E_INVALID_CFI;
+	  return false;
+	}
+
       if (fs->nregs <= reg)
 	{
 	  size_t size = offsetof (Dwarf_Frame, regs[reg + 1]);

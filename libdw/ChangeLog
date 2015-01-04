@@ -1,3 +1,8 @@
+2015-01-04  Mark Wielaard  <mjw@redhat.com>
+
+	* cfi.c (enough_registers): Check reg < INT32_MAX / sizeof
+	(dwarf_frame_register).
+
 2015-01-02  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_getcfi_elf.c (parse_eh_frame_hdr): Add size check.

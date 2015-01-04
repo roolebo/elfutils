@@ -1,5 +1,5 @@
 /* Keeping track of DWARF compilation units in libdwfl.
-   Copyright (C) 2005-2010 Red Hat, Inc.
+   Copyright (C) 2005-2010, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -186,8 +186,9 @@ intern_cu (Dwfl_Module *mod, Dwarf_Off cuoff, struct dwfl_cu **result)
 	{
 	  /* This is the EOF marker.  Now we have interned all the CUs.
 	     One increment in MOD->lazycu counts not having hit EOF yet.  */
-	  *found = (void *) -1l;
+	  *found = *result = (void *) -1;
 	  less_lazy (mod);
+	  return DWFL_E_NOERROR;
 	}
       else
 	{
@@ -275,7 +276,8 @@ __libdwfl_nextcu (Dwfl_Module *mod, struct dwfl_cu *lastcu,
       if (result != DWFL_E_NOERROR)
 	return result;
 
-      if ((*nextp)->next == NULL && nextoff == (Dwarf_Off) -1l)
+      if (*nextp != (void *) -1
+	  && (*nextp)->next == NULL && nextoff == (Dwarf_Off) -1l)
 	(*nextp)->next = (void *) -1l;
     }
 

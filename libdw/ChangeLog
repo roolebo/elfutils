@@ -1,5 +1,10 @@
 2015-01-04  Mark Wielaard  <mjw@redhat.com>
 
+	* dwarf_siblingof.c (dwarf_siblingof): Check sibling attribute
+	is after current DIE.
+
+2015-01-04  Mark Wielaard  <mjw@redhat.com>
+
 	* cfi.c (enough_registers): Check reg < INT32_MAX / sizeof
 	(dwarf_frame_register).
 

@@ -1,5 +1,5 @@
 /* Internal definitions for libdw CFI interpreter.
-   Copyright (C) 2009-2010, 2013 Red Hat, Inc.
+   Copyright (C) 2009-2010, 2013, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -103,6 +103,7 @@ struct Dwarf_CFI_s
 
   /* Binary search table in .eh_frame_hdr section.  */
   const uint8_t *search_table;
+  size_t search_table_len;
   Dwarf_Addr search_table_vaddr;
   size_t search_table_entries;
   uint8_t search_table_encoding;

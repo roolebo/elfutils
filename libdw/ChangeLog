@@ -1,3 +1,18 @@
+2015-01-07  Mark Wielaard  <mjw@redhat.com>
+
+	* cfi.h (struct Dwarf_CFI_s): Add search_table_len.
+	* dwarf_getcfi_elf.c (getcfi_gnu_eh_frame): Check there is enough
+	room in the search table for all entries. Store search_table_len.
+	(getcfi_scn_eh_frame): Likewise.
+	* encoded-value.h (encoded_value_size): Don't abort, return zero.
+	(__libdw_cfi_read_address_inc): Check there is enough room to read
+	values. Pass other byte order to read functions.
+	(read_encoded_value): Check encoded_value_size. Don't abort, but
+	set libdw errno and report failure. Check there is enough room to
+	read values.
+	* fde.c (binary_search_fde): Check encoded value size. Add hdr
+	data buf and size to dummy_cfi.
+
 2015-01-04  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_siblingof.c (dwarf_siblingof): Check sibling attribute

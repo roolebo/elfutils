@@ -1,5 +1,5 @@
 /* FDE reading.
-   Copyright (C) 2009-2010, 2014 Red Hat, Inc.
+   Copyright (C) 2009-2010, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -161,13 +161,22 @@ binary_search_fde (Dwarf_CFI *cache, Dwarf_Addr address)
   const size_t size = 2 * encoded_value_size (&cache->data->d, cache->e_ident,
 					      cache->search_table_encoding,
 					      NULL);
+  if (unlikely (size == 0))
+    return (Dwarf_Off) -1l;
 
   /* Dummy used by read_encoded_value.  */
+  Elf_Data_Scn dummy_cfi_hdr_data =
+    {
+      .d = { .d_buf = (void *) cache->search_table,
+	     .d_size = cache->search_table_len }
+    };
+
   Dwarf_CFI dummy_cfi =
     {
       .e_ident = cache->e_ident,
       .datarel = cache->search_table_vaddr,
       .frame_vaddr = cache->search_table_vaddr,
+      .data = &dummy_cfi_hdr_data
     };
 
   size_t l = 0, u = cache->search_table_entries;
@@ -175,6 +184,8 @@ binary_search_fde (Dwarf_CFI *cache, Dwarf_Addr address)
     {
       size_t idx = (l + u) / 2;
 
+      /* Max idx * size is checked against search_table len when
+	 loading eh_frame_hdr.  */
       const uint8_t *p = &cache->search_table[idx * size];
       Dwarf_Addr start;
       if (unlikely (read_encoded_value (&dummy_cfi,

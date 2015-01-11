@@ -1,5 +1,5 @@
 /* Return scope DIEs containing given DIE.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -67,7 +67,7 @@ dwarf_getscopes_die (Dwarf_Die *die, Dwarf_Die **scopes)
 
   struct Dwarf_Die_Chain cu = { .die = CUDIE (die->cu), .parent = NULL };
   void *info = die->addr;
-  int result = __libdw_visit_scopes (1, &cu, &scope_visitor, NULL, &info);
+  int result = __libdw_visit_scopes (1, &cu, NULL, &scope_visitor, NULL, &info);
   if (result > 0)
     *scopes = info;
   return result;

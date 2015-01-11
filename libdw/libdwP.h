@@ -1,5 +1,5 @@
 /* Internal definitions for libdwarf.
-   Copyright (C) 2002-2011, 2013, 2014 Red Hat, Inc.
+   Copyright (C) 2002-2011, 2013-2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -555,6 +555,7 @@ struct Dwarf_Die_Chain
 };
 extern int __libdw_visit_scopes (unsigned int depth,
 				 struct Dwarf_Die_Chain *root,
+				 struct Dwarf_Die_Chain *imports,
 				 int (*previsit) (unsigned int depth,
 						  struct Dwarf_Die_Chain *,
 						  void *arg),
@@ -562,7 +563,7 @@ extern int __libdw_visit_scopes (unsigned int depth,
 						   struct Dwarf_Die_Chain *,
 						   void *arg),
 				 void *arg)
-  __nonnull_attribute__ (2, 3) internal_function;
+  __nonnull_attribute__ (2, 4) internal_function;
 
 /* Parse a DWARF Dwarf_Block into an array of Dwarf_Op's,
    and cache the result (via tsearch).  */

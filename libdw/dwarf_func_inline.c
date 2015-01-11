@@ -1,5 +1,5 @@
 /* Convenience functions for handling DWARF descriptions of inline functions.
-   Copyright (C) 2005,2006 Red Hat, Inc.
+   Copyright (C) 2005,2006,2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -97,5 +97,5 @@ dwarf_func_inline_instances (Dwarf_Die *func,
 {
   struct visitor_info v = { func->addr, callback, arg };
   struct Dwarf_Die_Chain cu = { .die = CUDIE (func->cu), .parent = NULL };
-  return __libdw_visit_scopes (0, &cu, &scope_visitor, NULL, &v);
+  return __libdw_visit_scopes (0, &cu, NULL, &scope_visitor, NULL, &v);
 }

@@ -1,5 +1,5 @@
 /* Return scope DIEs containing PC address.
-   Copyright (C) 2005, 2007 Red Hat, Inc.
+   Copyright (C) 2005, 2007, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -176,7 +176,7 @@ pc_record (unsigned int depth, struct Dwarf_Die_Chain *die, void *arg)
      If we don't find it, return to search the containing scope.
      If we do find it, the nonzero return value will bail us out
      of the postorder traversal.  */
-  return __libdw_visit_scopes (depth, die, &origin_match, NULL, a);
+  return __libdw_visit_scopes (depth, die, NULL, &origin_match, NULL, a);
 }
 
 
@@ -189,10 +189,10 @@ dwarf_getscopes (Dwarf_Die *cudie, Dwarf_Addr pc, Dwarf_Die **scopes)
   struct Dwarf_Die_Chain cu = { .parent = NULL, .die = *cudie };
   struct args a = { .pc = pc };
 
-  int result = __libdw_visit_scopes (0, &cu, &pc_match, &pc_record, &a);
+  int result = __libdw_visit_scopes (0, &cu, NULL, &pc_match, &pc_record, &a);
 
   if (result == 0 && a.scopes != NULL)
-    result = __libdw_visit_scopes (0, &cu, &origin_match, NULL, &a);
+    result = __libdw_visit_scopes (0, &cu, NULL, &origin_match, NULL, &a);
 
   if (result > 0)
     *scopes = a.scopes;

@@ -1,3 +1,16 @@
+2015-01-11  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_func_inline.c (dwarf_func_inline_instances): Call
+	__libdw_visit_scopes with NULL imports.
+	* dwarf_getfuncs.c (dwarf_getfuncs): Likewise.
+	* dwarf_getscopes.c (pc_record): Likewise.
+	(dwarf_getscopes): Likewise.
+	* dwarf_getscopes_die.c (dwarf_getscopes_die): Likewise.
+	* libdwP.h (__libdw_visit_scopes): Add imports argument.
+	* libdw_visit_scopes.c (__libdw_visit_scopes): Likewise. Add new
+	function imports_contains. Push and pop imports around walk_children
+	when processing DW_TAG_imported_unit.
+
 2014-12-18  Ulrich Drepper  <drepper@gmail.com>
 
 	* Makefile.am: Suppress output of textrel_check command.

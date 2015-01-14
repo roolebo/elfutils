@@ -1,4 +1,4 @@
-/* Copyright (C) 2012, 2013 Red Hat, Inc.
+/* Copyright (C) 2012, 2013, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <dwarf.h>
+#include <inttypes.h>
 
 int
 main (int argc, char *argv[])
@@ -71,7 +72,8 @@ main (int argc, char *argv[])
 		      if (form == NULL)
 			printf ("fail\n");
 		      else
-			printf ("ok\n");
+			printf ("ok %s [%" PRIx64 "]\n",
+				dwarf_diename (form), dwarf_dieoffset (form));
 		    }
 
 		  if (dwarf_siblingof (iter, &iter_mem) != 0)

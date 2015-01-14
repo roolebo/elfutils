@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 1996-2014 Red Hat, Inc.
+## Copyright (C) 1996-2015 Red Hat, Inc.
 ## This file is part of elfutils.
 ##
 ## This file is free software; you can redistribute it and/or modify
@@ -280,7 +280,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     linkmap-cut.bz2 linkmap-cut.core.bz2 \
 	     run-aggregate-size.sh testfile-sizes1.o.bz2 testfile-sizes2.o.bz2 \
 	     testfile-sizes3.o.bz2 \
-	     run-readelf-A.sh testfileppc32attrs.o.bz2
+	     run-readelf-A.sh testfileppc32attrs.o.bz2 \
+	     testfile-debug-types.bz2
 
 if USE_VALGRIND
 valgrind_cmd='valgrind -q --error-exitcode=1 --run-libc-freeres=no'

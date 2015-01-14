@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2012 Red Hat, Inc.
+# Copyright (C) 2012, 2015 Red Hat, Inc.
 # This file is part of elfutils.
 #
 # This file is free software; you can redistribute it and/or modify
@@ -41,14 +41,22 @@
 #
 # g++ -gdwarf-4 -g -fdebug-types-section
 
-testfiles testfile59
+# echo 'struct A{ struct B {} x;};A a; A::B b;int main(){return 0;}' \
+#  | g++ -x c++  -g -fdebug-types-section -o testfile-debug-types -
+
+testfiles testfile59 testfile-debug-types
 
 testrun_compare ${abs_builddir}/typeiter testfile59 <<\EOF
 ok
 EOF
 
 testrun_compare ${abs_builddir}/typeiter2 testfile59 <<\EOF
-ok
+ok s1 [25]
+EOF
+
+testrun_compare ${abs_builddir}/typeiter2 testfile-debug-types <<\EOF
+ok A [68]
+ok B [38]
 EOF
 
 exit 0

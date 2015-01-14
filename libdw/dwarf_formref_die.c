@@ -95,7 +95,7 @@ dwarf_formref_die (attr, result)
 
       datap = cu->dbg->sectiondata[IDX_debug_types]->d_buf;
       size = cu->dbg->sectiondata[IDX_debug_types]->d_size;
-      offset = cu->type_offset;
+      offset = cu->start + cu->type_offset;
     }
   else
     {

@@ -1,3 +1,8 @@
+2015-01-14  Jason P. Leasure <jpleasu@super.org>
+
+	* dwarf_formref_die.c (dwarf_formref_die): Offset is cu->type_offset
+	plus cu->start.
+
 2014-12-27  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_siblingof.c (dwarf_siblingof): Check sibling attribute offset

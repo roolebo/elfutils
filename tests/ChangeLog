@@ -1,3 +1,8 @@
+2015-01-15  Mark Wielaard  <mjw@redhat.com>
+
+	* deleted.c (main): Call prctl(PR_SET_PTRACER, PR_SET_PTRACER_ANY).
+	* vdsosyms.c (main): Use getpid () instead of getppid ().
+
 2014-12-27  Mark Wielaard  <mjw@redhat.com>
 
 	* addrscopes.c (handle_address): Last address in scope is highpc - 1.

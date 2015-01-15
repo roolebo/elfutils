@@ -80,8 +80,9 @@ main (int argc __attribute__ ((unused)), char **argv __attribute__ ((unused)))
   if (dwfl == NULL)
     error (2, 0, "dwfl_begin: %s", dwfl_errmsg (-1));
 
-  /* Take our parent as "arbitrary" process to inspect.  */
-  pid_t pid = getppid();
+  /* Take ourself as "arbitrary" process to inspect.  This should work
+     even with "restricted ptrace".  */
+  pid_t pid = getpid();
 
   int result = dwfl_linux_proc_report (dwfl, pid);
   if (result < 0)

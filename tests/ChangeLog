@@ -1,3 +1,12 @@
+2015-01-20  Mark Wielaard  <mjw@redhat.com>
+
+	* strptr.c: New file.
+	* run-strptr.sh: New test.
+	* Makefile.am (check_PROGRAMS): Add strptr.
+	(TESTS): Add run-strptr.sh.
+	(EXTRA_DIST): Likewise.
+	(strptr_LDADD): New variable.
+
 2015-01-15  Mark Wielaard  <mjw@redhat.com>
 
 	* deleted.c (main): Call prctl(PR_SET_PTRACER, PR_SET_PTRACER_ANY).

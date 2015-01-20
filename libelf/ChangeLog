@@ -1,3 +1,8 @@
+2015-01-20  Mark Wielaard  <mjw@redhat.com>
+
+	* elf_strptr.c (elf_strptr): Call __elf[32|64]_getshdr_rdlock if
+	necessary.
+
 2014-12-30  Mark Wielaard  <mjw@redhat.com>
 
 	* elf_getphdrnum.c (__elf_getphdrnum_chk_rdlock): New function.

@@ -1,5 +1,5 @@
 /* Return string pointer from string section.
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004, 2008, 2009 Red Hat, Inc.
+   Copyright (C) 1998-2002, 2004, 2008, 2009, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -88,14 +88,15 @@ elf_strptr (elf, idx, offset)
 
   if (elf->class == ELFCLASS32)
     {
-      if (unlikely (strscn->shdr.e32->sh_type != SHT_STRTAB))
+      Elf32_Shdr *shdr = strscn->shdr.e32 ?: __elf32_getshdr_rdlock (strscn);
+      if (unlikely (shdr->sh_type != SHT_STRTAB))
 	{
 	  /* This is no string section.  */
 	  __libelf_seterrno (ELF_E_INVALID_SECTION);
 	  goto out;
 	}
 
-      if (unlikely (offset >= strscn->shdr.e32->sh_size))
+      if (unlikely (offset >= shdr->sh_size))
 	{
 	  /* The given offset is too big, it is beyond this section.  */
 	  __libelf_seterrno (ELF_E_OFFSET_RANGE);
@@ -104,14 +105,15 @@ elf_strptr (elf, idx, offset)
     }
   else
     {
-      if (unlikely (strscn->shdr.e64->sh_type != SHT_STRTAB))
+      Elf64_Shdr *shdr = strscn->shdr.e64 ?: __elf64_getshdr_rdlock (strscn);
+      if (unlikely (shdr->sh_type != SHT_STRTAB))
 	{
 	  /* This is no string section.  */
 	  __libelf_seterrno (ELF_E_INVALID_SECTION);
 	  goto out;
 	}
 
-      if (unlikely (offset >= strscn->shdr.e64->sh_size))
+      if (unlikely (offset >= shdr->sh_size))
 	{
 	  /* The given offset is too big, it is beyond this section.  */
 	  __libelf_seterrno (ELF_E_OFFSET_RANGE);

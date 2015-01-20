@@ -532,6 +532,12 @@ extern Elf_Data *__elf_getdata_rdlock (Elf_Scn *__scn, Elf_Data *__data)
      internal_function;
 extern Elf_Data *__elf_rawdata_internal (Elf_Scn *__scn, Elf_Data *__data)
      attribute_hidden;
+/* Should be called to setup first section data element if
+   data_list_rear is NULL and we know data_read is set and there is
+   raw data available.  Might upgrade the ELF lock from a read to a
+   write lock.  If the lock is already a write lock set wrlocked.  */
+extern void __libelf_set_data_list_rdlock (Elf_Scn *scn, int wrlocked)
+  attribute_hidden;
 extern char *__elf_strptr_internal (Elf *__elf, size_t __index,
 				    size_t __offset) attribute_hidden;
 extern Elf_Data *__elf32_xlatetom_internal (Elf_Data *__dest,

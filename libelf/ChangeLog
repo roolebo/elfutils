@@ -1,5 +1,14 @@
 2015-01-20  Mark Wielaard  <mjw@redhat.com>
 
+	* libelfP.h (__elf_strptr_internal): New function declaration.
+	* elf_getdata.c (__libelf_set_data_list_rdlock): New internal
+	function extracted from...
+	(__elf_getdata_rdlock): ... here.
+	* elf_newdata.c (elf_newdata): Check scn->rawdata_base and update
+	datalist if necessary.
+
+2015-01-20  Mark Wielaard  <mjw@redhat.com>
+
 	* elf_strptr.c (elf_strptr): Call __elf[32|64]_getshdr_rdlock if
 	necessary.
 

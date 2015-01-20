@@ -337,6 +337,44 @@ __libelf_set_rawdata (Elf_Scn *scn)
   return result;
 }
 
+void
+internal_function
+__libelf_set_data_list_rdlock (Elf_Scn *scn, int wrlocked)
+{
+  if (scn->rawdata.d.d_buf != NULL && scn->rawdata.d.d_size > 0)
+    {
+      Elf *elf = scn->elf;
+
+      /* Upgrade the lock to a write lock if necessary and check
+	 nobody else already did the work.  */
+      if (!wrlocked)
+	{
+	  rwlock_unlock (elf->lock);
+	  rwlock_wrlock (elf->lock);
+	  if (scn->data_list_rear != NULL)
+	    return;
+	}
+
+      /* Convert according to the version and the type.   */
+      convert_data (scn, __libelf_version, elf->class,
+		    (elf->class == ELFCLASS32
+		     || (offsetof (struct Elf, state.elf32.ehdr)
+			 == offsetof (struct Elf, state.elf64.ehdr))
+		     ? elf->state.elf32.ehdr->e_ident[EI_DATA]
+		     : elf->state.elf64.ehdr->e_ident[EI_DATA]),
+		    scn->rawdata.d.d_size, scn->rawdata.d.d_type);
+    }
+  else
+    {
+      /* This is an empty or NOBITS section.  There is no buffer but
+	 the size information etc is important.  */
+      scn->data_list.data.d = scn->rawdata.d;
+      scn->data_list.data.s = scn;
+    }
+
+  scn->data_list_rear = &scn->data_list;
+}
+
 Elf_Data *
 internal_function
 __elf_getdata_rdlock (scn, data)
@@ -427,42 +465,10 @@ __elf_getdata_rdlock (scn, data)
      empty in case the section has size zero (for whatever reason).
      Now create the converted data in case this is necessary.  */
   if (scn->data_list_rear == NULL)
-    {
-      if (scn->rawdata.d.d_buf != NULL && scn->rawdata.d.d_size > 0)
-	{
-	  if (!locked)
-	    {
-	      rwlock_unlock (elf->lock);
-	      rwlock_wrlock (elf->lock);
-	      if (scn->data_list_rear != NULL)
-		goto pass;
-	    }
+    __libelf_set_data_list_rdlock (scn, locked);
 
-	  /* Convert according to the version and the type.   */
-	  convert_data (scn, __libelf_version, elf->class,
-			(elf->class == ELFCLASS32
-			 || (offsetof (struct Elf, state.elf32.ehdr)
-			     == offsetof (struct Elf, state.elf64.ehdr))
-			 ? elf->state.elf32.ehdr->e_ident[EI_DATA]
-			 : elf->state.elf64.ehdr->e_ident[EI_DATA]),
-			scn->rawdata.d.d_size, scn->rawdata.d.d_type);
-	}
-      else
-	{
-	  /* This is an empty or NOBITS section.  There is no buffer but
-	     the size information etc is important.  */
-	  scn->data_list.data.d = scn->rawdata.d;
-	  scn->data_list.data.s = scn;
-	}
-
-      scn->data_list_rear = &scn->data_list;
-    }
-
-  /* If no data is present we cannot return any.  */
-  if (scn->data_list_rear != NULL)
-  pass:
-    /* Return the first data element in the list.  */
-    result = &scn->data_list.data.d;
+  /* Return the first data element in the list.  */
+  result = &scn->data_list.data.d;
 
  out:
   return result;

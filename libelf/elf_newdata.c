@@ -1,5 +1,5 @@
 /* Create new, empty section data.
-   Copyright (C) 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -64,6 +64,25 @@ elf_newdata (Elf_Scn *scn)
 
   rwlock_wrlock (scn->elf->lock);
 
+  /* data_read is set when data has been read from the ELF image or
+     when a new section has been created by elf_newscn.  If data has
+     been read from the ELF image, then rawdata_base will point to raw
+     data.  If data_read has been set by elf_newscn, then rawdata_base
+     will be NULL.  data_list_rear will be set by elf_getdata if the
+     data has been converted, or by this function, elf_newdata, when
+     new data has been added.
+
+     Currently elf_getdata and elf_update rely on the fact that when
+     data_list_read is not NULL all they have to do is walk the data
+     list. They will ignore any (unread) raw data in that case.
+
+     So we need to make sure the data list is setup if there is
+     already data available.  */
+  if (scn->data_read
+      && scn->rawdata_base != NULL
+      && scn->data_list_rear == NULL)
+    __libelf_set_data_list_rdlock (scn, 1);
+
   if (scn->data_read && scn->data_list_rear == NULL)
     {
       /* This means the section was created by the user and this is the
@@ -73,6 +92,19 @@ elf_newdata (Elf_Scn *scn)
     }
   else
     {
+      /* It would be more efficient to create new data without
+	 reading/converting the data from the file.  But then we
+	 have to remember this.  Currently elf_getdata and
+	 elf_update rely on the fact that they don't have to
+	 load/convert any data if data_list_rear is set.  */
+      if (scn->data_read == 0)
+	{
+	  if (__libelf_set_rawdata_wrlock (scn) != 0)
+	    /* Something went wrong.  The error value is already set.  */
+	    goto out;
+	  __libelf_set_data_list_rdlock (scn, 1);
+	}
+
       /* Create a new, empty data descriptor.  */
       result = (Elf_Data_List *) calloc (1, sizeof (Elf_Data_List));
       if (result == NULL)
@@ -82,11 +114,6 @@ elf_newdata (Elf_Scn *scn)
 	}
 
       result->flags = ELF_F_DIRTY | ELF_F_MALLOCED;
-
-      if (scn->data_list_rear == NULL)
-	/* We create new data without reading/converting the data from the
-	   file.  That is fine but we have to remember this.  */
-	scn->data_list_rear = &scn->data_list;
     }
 
   /* Set the predefined values.  */

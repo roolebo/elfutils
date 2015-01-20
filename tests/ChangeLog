@@ -1,5 +1,12 @@
 2015-01-20  Mark Wielaard  <mjw@redhat.com>
 
+	* Makefile.am (check_PROGRAMS): Add newdata.
+	(TESTS): Likewise.
+	(newdata_LDADD): new variable.
+	* newdata.c: New test.
+
+2015-01-20  Mark Wielaard  <mjw@redhat.com>
+
 	* strptr.c: New file.
 	* run-strptr.sh: New test.
 	* Makefile.am (check_PROGRAMS): Add strptr.

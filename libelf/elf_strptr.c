@@ -131,12 +131,18 @@ elf_strptr (elf, idx, offset)
 	goto out;
     }
 
-  if (likely (strscn->rawdata_base != NULL))
-    // XXX Is this correct if a file is read and then new data is added
-    // XXX to the string section?  Likely needs to check offset against
-    // XXX size of rawdata_base buffer and then iterate over rest of the
-    // XXX list.
-    result = &strscn->rawdata_base[offset];
+  if (likely (strscn->data_list_rear == NULL))
+    {
+      // XXX The above is currently correct since elf_newdata will
+      // make sure to convert the rawdata into the datalist if
+      // necessary. But it would be more efficient to keep the rawdata
+      // unconverted and only then iterate over the rest of the (newly
+      // added data) list.  Note that when the ELF file is mmapped
+      // rawdata_base can be set while rawdata.d hasn't been
+      // initialized yet (when data_read is zero). So we cannot just
+      // look at the rawdata.d.d_size.
+      result = &strscn->rawdata_base[offset];
+    }
   else
     {
       /* This is a file which is currently created.  Use the list of

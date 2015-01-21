@@ -1,3 +1,10 @@
+2015-01-21  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (check_PROGRAMS): Add elfstrtab.
+	(TESTS): Likewise.
+	(elfstrtab_LDADD): New variable.
+	* elfstrtab.c: New test.
+
 2015-01-20  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (check_PROGRAMS): Add newdata.

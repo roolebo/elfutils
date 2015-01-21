@@ -1,3 +1,8 @@
+2015-01-21  Mark Wielaard  <mjw@redhat.com>
+
+	* elf_strptr.c (elf_strptr): Check data_list_rear == NULL instead
+	of rawdata_base != NULL before using rawdata directly.
+
 2015-01-20  Mark Wielaard  <mjw@redhat.com>
 
 	* libelfP.h (__elf_strptr_internal): New function declaration.

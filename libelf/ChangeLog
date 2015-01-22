@@ -1,3 +1,8 @@
+2015-01-22  Mark Wielaard  <mjw@redhat.com>
+
+	* elf_strptr (elf_strptr): Make sure returned string is NUL
+	terminated.
+
 2015-01-21  Mark Wielaard  <mjw@redhat.com>
 
 	* elf_strptr.c (elf_strptr): Check data_list_rear == NULL instead

@@ -86,6 +86,7 @@ elf_strptr (elf, idx, offset)
 	}
     }
 
+  size_t sh_size = 0;
   if (elf->class == ELFCLASS32)
     {
       Elf32_Shdr *shdr = strscn->shdr.e32 ?: __elf32_getshdr_rdlock (strscn);
@@ -96,6 +97,7 @@ elf_strptr (elf, idx, offset)
 	  goto out;
 	}
 
+      sh_size = shdr->sh_size;
       if (unlikely (offset >= shdr->sh_size))
 	{
 	  /* The given offset is too big, it is beyond this section.  */
@@ -113,6 +115,7 @@ elf_strptr (elf, idx, offset)
 	  goto out;
 	}
 
+      sh_size = shdr->sh_size;
       if (unlikely (offset >= shdr->sh_size))
 	{
 	  /* The given offset is too big, it is beyond this section.  */
@@ -141,7 +144,14 @@ elf_strptr (elf, idx, offset)
       // rawdata_base can be set while rawdata.d hasn't been
       // initialized yet (when data_read is zero). So we cannot just
       // look at the rawdata.d.d_size.
-      result = &strscn->rawdata_base[offset];
+
+      /* Make sure the string is NUL terminated.  Start from the end,
+	 which very likely is a NUL char.  */
+      if (likely (memrchr (&strscn->rawdata_base[offset],
+			  '\0', sh_size - offset) != NULL))
+	result = &strscn->rawdata_base[offset];
+      else
+	__libelf_seterrno (ELF_E_INVALID_INDEX);
     }
   else
     {
@@ -153,7 +163,16 @@ elf_strptr (elf, idx, offset)
 	  if (offset >= (size_t) dl->data.d.d_off
 	      && offset < dl->data.d.d_off + dl->data.d.d_size)
 	    {
-	      result = (char *) dl->data.d.d_buf + (offset - dl->data.d.d_off);
+	      /* Make sure the string is NUL terminated.  Start from
+		 the end, which very likely is a NUL char.  */
+	      if (likely (memrchr ((char *) dl->data.d.d_buf
+				   + (offset - dl->data.d.d_off), '\0',
+				   (dl->data.d.d_size
+				    - (offset - dl->data.d.d_off))) != NULL))
+		result = ((char *) dl->data.d.d_buf
+			  + (offset - dl->data.d.d_off));
+	      else
+		__libelf_seterrno (ELF_E_INVALID_INDEX);
 	      break;
 	    }
 

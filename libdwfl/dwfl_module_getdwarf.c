@@ -1083,6 +1083,9 @@ find_symtab (Dwfl_Module *mod)
   if (elf_strptr (mod->symfile->elf, strshndx, 0) == NULL)
     {
     elferr:
+      mod->symdata = NULL;
+      mod->syments = 0;
+      mod->first_global = 0;
       mod->symerr = DWFL_E (LIBELF, elf_errno ());
       goto aux_cleanup; /* This cleans up some more and tries find_dynsym.  */
     }

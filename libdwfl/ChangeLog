@@ -1,3 +1,8 @@
+2015-01-26  Mark Wielaard  <mjw@redhat.com>
+
+	* dwfl_module_getdwarf.c (find_symtab): Explicitly clear symdata,
+	syments and first_global on elferr before calling find_dynsym.
+
 2014-12-27  Mark Wielaard  <mjw@redhat.com>
 
 	* dwfl_module_getsrc.c (dwfl_module_getsrc): Never match a line that

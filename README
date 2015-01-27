@@ -5,7 +5,7 @@ Fundamental design decision:
   greatly simplified and speed increases.  Since no change violating this
   assumption is in sight this is believed to be a worthwhile optimization.
 
-- the ABI of the backend modules is not guaranteed.  Really, not guarantee
+- the ABI of the backend modules is not guaranteed.  Really, no guarantee
   whatsoever.  We are enforcing this in the code.  The modules and their
   users must match.  No third-party EBL module are supported or allowed.
   The only reason there are separate modules is to not have the code for

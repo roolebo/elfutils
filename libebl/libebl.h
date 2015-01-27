@@ -32,7 +32,7 @@
    function directly.  These are only for internal elfutils backends
    and tools.  There is NO source or binary compatible guarantee.
 
-   The ABI of the backend modules is not guaranteed.  Really, not guarantee
+   The ABI of the backend modules is not guaranteed.  Really, no guarantee
    whatsoever.  We are enforcing this in the code.  The modules and their
    users must match.  No third-party EBL module are supported or allowed.
    The only reason there are separate modules is to not have the code for

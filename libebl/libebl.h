@@ -1,5 +1,5 @@
 /* Interface for libebl.
-   Copyright (C) 2000-2010, 2013, 2014 Red Hat, Inc.
+   Copyright (C) 2000-2010, 2013, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -25,6 +25,19 @@
    You should have received copies of the GNU General Public License and
    the GNU Lesser General Public License along with this program.  If
    not, see <http://www.gnu.org/licenses/>.  */
+
+
+/* This is the interface for the Elfutils Backend Library.
+   It is a completely UNSUPPORTED interface.  Don't use any libebl
+   function directly.  These are only for internal elfutils backends
+   and tools.  There is NO source or binary compatible guarantee.
+
+   The ABI of the backend modules is not guaranteed.  Really, not guarantee
+   whatsoever.  We are enforcing this in the code.  The modules and their
+   users must match.  No third-party EBL module are supported or allowed.
+   The only reason there are separate modules is to not have the code for
+   all architectures in all the binaries.  */
+
 
 #ifndef _LIBEBL_H
 #define _LIBEBL_H 1

@@ -1,3 +1,8 @@
+2015-01-27  Mark Wielaard  <mjw@redhat.com>
+
+	* libebl.h: Add comment from README that this is completely
+	UNSUPPORTED.
+
 2014-11-22  Mark Wielaard  <mjw@redhat.com>
 
 	* ebl-hooks.h (bss_plt_p): Remove ehdr argument.

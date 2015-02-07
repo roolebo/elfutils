@@ -1,3 +1,8 @@
+2015-02-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
+
+	* elf32_updatenull.c (__elfw2(LIBELFBITS,updatenull_wrlock)): Consider
+	sh_addralign 0 as 1.
+
 2015-01-22  Mark Wielaard  <mjw@redhat.com>
 
 	* elf_strptr (elf_strptr): Make sure returned string is NUL

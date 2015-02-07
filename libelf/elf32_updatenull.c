@@ -328,7 +328,7 @@ __elfw2(LIBELFBITS,updatenull_wrlock) (Elf *elf, int *change_bop, size_t shnum)
 		     enough for the largest alignment required by a data
 		     block.  */
 		  if (unlikely (! powerof2 (shdr->sh_addralign))
-		      || unlikely (shdr->sh_addralign < sh_align))
+		      || unlikely ((shdr->sh_addralign ?: 1) < sh_align))
 		    {
 		      __libelf_seterrno (ELF_E_INVALID_ALIGN);
 		      return -1;

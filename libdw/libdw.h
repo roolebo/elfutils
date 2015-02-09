@@ -409,7 +409,8 @@ extern int dwarf_siblingof (Dwarf_Die *die, Dwarf_Die *result)
 
    The current DWARF specification defines one type alias tag
    (DW_TAG_typedef) and three qualifier type tags (DW_TAG_const_type,
-   DW_TAG_volatile_type, DW_TAG_restrict_type).  A future version of
+   DW_TAG_volatile_type, DW_TAG_restrict_type).  DWARF5 defines one
+   other qualifier type tag (DW_TAG_atomic_type).  A future version of
    this function might peel other alias or qualifier type tags if a
    future DWARF version or GNU extension defines other type aliases or
    qualifier type tags that don't modify or change the structural

@@ -51,7 +51,8 @@ dwarf_peel_type (die, result)
   while (tag == DW_TAG_typedef
 	 || tag == DW_TAG_const_type
 	 || tag == DW_TAG_volatile_type
-	 || tag == DW_TAG_restrict_type)
+	 || tag == DW_TAG_restrict_type
+	 || tag == DW_TAG_atomic_type)
     {
       Dwarf_Attribute attr_mem;
       Dwarf_Attribute *attr = INTUSE (dwarf_attr_integrate) (die, DW_AT_type,

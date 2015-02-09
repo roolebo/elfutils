@@ -1,5 +1,11 @@
 2015-02-09  Mark Wielaard  <mjw@redhat.com>
 
+	* dwarf.h: Add DW_LANG_Fortran03 and DW_LANG_Fortran08.
+	* dwarf_aggregate_size.c (array_size): Recognize array lower bound
+	for new Fortran language codes is 1.
+
+2015-02-09  Mark Wielaard  <mjw@redhat.com>
+
 	* dwarf.h: Add DW_TAG_atomic_type.
 	* libdw.h (dwarf_peel_type): Document DW_TAG_atomic_type.
 	* dwarf_peel_type.c (dwarf_peel_type): Handle DW_TAG_atomic_type.

@@ -123,6 +123,8 @@ array_size (Dwarf_Die *die, Dwarf_Word *size,
 		    case DW_LANG_Fortran77:
 		    case DW_LANG_Fortran90:
 		    case DW_LANG_Fortran95:
+		    case DW_LANG_Fortran03:
+		    case DW_LANG_Fortran08:
 		    case DW_LANG_Pascal83:
 		    case DW_LANG_Modula2:
 		    case DW_LANG_PL1:

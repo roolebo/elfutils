@@ -1,3 +1,7 @@
+2015-02-11  Josh Stone  <jistone@redhat.com>
+
+	* backtrace.c (exec_dump): Initialize jmp.
+
 2015-02-11  Petr Machata  <pmachata@redhat.com>
 
 	* run-dwarf-ranges.sh: New test.

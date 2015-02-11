@@ -377,7 +377,7 @@ exec_dump (const char *exec)
 #else /* __x86_64__ */
   is_x86_64_native = ehdr->e_ident[EI_CLASS] == ELFCLASS64;
 #endif /* __x86_64__ */
-  void (*jmp) (void);
+  void (*jmp) (void) = 0;
   if (is_x86_64_native)
     {
       // Find inferior symbol named "jmp".

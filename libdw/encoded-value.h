@@ -152,7 +152,7 @@ read_encoded_value (const Dwarf_CFI *cache, uint8_t encoding,
       return true;
     }
 
-  Dwarf_Addr value;
+  Dwarf_Addr value = 0;
   const unsigned char *endp = cache->data->d.d_buf + cache->data->d.d_size;
   switch (encoding & 0x0f)
     {

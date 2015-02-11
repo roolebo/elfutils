@@ -1,3 +1,7 @@
+2015-02-11  Josh Stone  <jistone@redhat.com>
+
+	* encoded-value.h (read_encoded_value): Initialize value.
+
 2015-02-11  Petr Machata  <pmachata@redhat.com>
 
 	* dwarf_ranges.c (dwarf_ranges): Do not bail out when neither

@@ -142,14 +142,7 @@ dwarf_ranges (Dwarf_Die *die, ptrdiff_t offset, Dwarf_Addr *basep,
 							 DW_AT_entry_pc,
 							 &attr_mem),
 				     basep) != 0)
-	{
-	  if (INTUSE(dwarf_errno) () == 0)
-	    {
-	    invalid:
-	      __libdw_seterrno (DWARF_E_INVALID_DWARF);
-	    }
-	  return -1;
-	}
+	*basep = (Dwarf_Addr) -1;
     }
   else
     {
@@ -182,7 +175,17 @@ dwarf_ranges (Dwarf_Die *die, ptrdiff_t offset, Dwarf_Addr *basep,
       return -1l;
     }
 
-  /* We have an address range entry.  */
+  /* We have an address range entry.  Check that we have a base.  */
+  if (*basep == (Dwarf_Addr) -1)
+    {
+      if (INTUSE(dwarf_errno) () == 0)
+	{
+	invalid:
+	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
+	}
+      return -1;
+    }
+
   *startp = *basep + begin;
   *endp = *basep + end;
   return readp - (unsigned char *) d->d_buf;

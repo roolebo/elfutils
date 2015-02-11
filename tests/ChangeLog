@@ -1,3 +1,9 @@
+2015-02-11  Petr Machata  <pmachata@redhat.com>
+
+	* run-dwarf-ranges.sh: New test.
+	* dwarf-ranges.c: New file.
+	* debug-ranges-no-lowpc.s, debug-ranges-no-lowpc.o.bz2: New test case.
+
 2015-01-21  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (check_PROGRAMS): Add elfstrtab.

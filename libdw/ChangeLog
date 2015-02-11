@@ -1,3 +1,10 @@
+2015-02-11  Petr Machata  <pmachata@redhat.com>
+
+	* dwarf_ranges.c (dwarf_ranges): Do not bail out when neither
+	DW_AT_entry_pc nor DW_AT_low_pc are available.  Instead remember
+	the fact in *BASEP and bail out later if it hasn't been updated by
+	__libdw_read_begin_end_pair_inc.
+
 2014-12-24  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_getsrc_die.c (dwarf_getsrc_die): Return the last line record

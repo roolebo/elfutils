@@ -1,3 +1,7 @@
+2015-02-18  Mark Wielaard  <mjw@redhat.com>
+
+	* libelfP.h (__libelf_set_data_list_rdlock): Make internal_function.
+
 2015-02-07  Jan Kratochvil  <jan.kratochvil@redhat.com>
 
 	* elf32_updatenull.c (__elfw2(LIBELFBITS,updatenull_wrlock)): Consider

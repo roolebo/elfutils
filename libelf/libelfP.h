@@ -537,7 +537,7 @@ extern Elf_Data *__elf_rawdata_internal (Elf_Scn *__scn, Elf_Data *__data)
    raw data available.  Might upgrade the ELF lock from a read to a
    write lock.  If the lock is already a write lock set wrlocked.  */
 extern void __libelf_set_data_list_rdlock (Elf_Scn *scn, int wrlocked)
-  attribute_hidden;
+     internal_function;
 extern char *__elf_strptr_internal (Elf *__elf, size_t __index,
 				    size_t __offset) attribute_hidden;
 extern Elf_Data *__elf32_xlatetom_internal (Elf_Data *__dest,

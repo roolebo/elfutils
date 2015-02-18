@@ -217,11 +217,12 @@ check_section_data (Elf *elf, char *data, size_t len, size_t times)
 	      exit (1);
 	    }
 	  else
-	    printf ("OK, section data item %zd (d_off: %zd, d_size: %zd)\n",
-		    i, d->d_off, d->d_size);
+	    printf ("OK, section data item %zd (d_off: %" PRId64
+		    ", d_size: %zd)\n", i, d->d_off, d->d_size);
 	}
       char *d_data = (char *) d->d_buf + (len * i) - d->d_off;
-      printf ("%zd data (d_off: %zd, len * i: %zd): (%p + %zd) %s\n",
+      printf ("%zd data (d_off: %" PRId64
+	      ", len * i: %zd): (%p + %" PRId64 ") %s\n",
 	      i, d->d_off, len * i, d->d_buf, (len * i) - d->d_off, d_data);
       if (memcmp (data, d_data, len) != 0)
 	{

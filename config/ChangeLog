@@ -1,3 +1,8 @@
+2015-02-20  Petr Machata  <pmachata@redhat.com>
+
+	* known-dwarf.awk (END): Drop useless variables lo, hi.  Merge two
+	continue-checks in one.
+
 2014-12-18  Mark Wielaard  <mjw@redhat.com>
 
 	* elfutils.spec.in: Update for 0.161.

@@ -1,5 +1,5 @@
 /* Arm specific symbolic name handling.
-   Copyright (C) 2002-2009, 2014 Red Hat, Inc.
+   Copyright (C) 2002-2009, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -128,4 +128,17 @@ bool
 arm_check_reloc_target_type (Ebl *ebl __attribute__ ((unused)), Elf64_Word sh_type)
 {
   return sh_type == SHT_ARM_EXIDX;
+}
+
+const char *
+arm_symbol_type_name (int type,
+		      char *buf __attribute__ ((unused)),
+		      size_t len __attribute__ ((unused)))
+{
+  switch (type)
+    {
+    case STT_ARM_TFUNC:
+      return "ARM_TFUNC";
+    }
+  return NULL;
 }

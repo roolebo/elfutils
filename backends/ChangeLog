@@ -1,3 +1,8 @@
+2015-02-23  Petr Machata  <pmachata@redhat.com>
+
+	* arm_symbol.c (arm_symbol_type_name): New function.
+	* arm_init.c (arm_init): Initialize the hook.
+
 2014-12-30  Mark Wielaard  <mjw@redhat.com>
 
 	* ppc_symbol.c (find_dyn_got): Check sh_entsize is not zero.

@@ -1,5 +1,5 @@
 /* List the relocation types for i386.	-*- C -*-
-   Copyright (C) 2000, 2001, 2002, 2003, 2005, 2009 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2003, 2005, 2009, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -29,7 +29,7 @@
 /*	    NAME,		REL|EXEC|DYN	*/
 
 RELOC_TYPE (NONE,		0)
-RELOC_TYPE (COPY,		EXEC)
+RELOC_TYPE (COPY,		EXEC|DYN)
 RELOC_TYPE (32,			REL|EXEC|DYN)
 RELOC_TYPE (PC32,		REL|EXEC|DYN)
 RELOC_TYPE (GOT32,		REL)

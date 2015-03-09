@@ -1,5 +1,5 @@
 /* List the relocation types for s390.  -*- C -*-
-   Copyright (C) 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -37,7 +37,7 @@ RELOC_TYPE (PC32,               REL|EXEC|DYN)
 RELOC_TYPE (GOT12,              REL)
 RELOC_TYPE (GOT32,              REL)
 RELOC_TYPE (PLT32,              REL)
-RELOC_TYPE (COPY,               EXEC)
+RELOC_TYPE (COPY,               EXEC|DYN)
 RELOC_TYPE (GLOB_DAT,           EXEC|DYN)
 RELOC_TYPE (JMP_SLOT,           EXEC|DYN)
 RELOC_TYPE (RELATIVE,           EXEC|DYN)

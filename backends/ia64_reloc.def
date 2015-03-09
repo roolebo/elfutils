@@ -1,5 +1,5 @@
 /* List the relocation types for ia64.  -*- C -*-
-   Copyright (C) 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -88,7 +88,7 @@ RELOC_TYPE (PCREL22,		REL)
 RELOC_TYPE (PCREL64I,		REL)
 RELOC_TYPE (IPLTMSB,		REL|EXEC|DYN)
 RELOC_TYPE (IPLTLSB,		REL|EXEC|DYN)
-RELOC_TYPE (COPY,		EXEC)
+RELOC_TYPE (COPY,		EXEC|DYN)
 RELOC_TYPE (SUB,		0)
 RELOC_TYPE (LTOFF22X,		REL)
 RELOC_TYPE (LDXMOV,		REL)

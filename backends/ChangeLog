@@ -1,3 +1,17 @@
+2015-03-09  Mark Wielaard  <mjw@redhat.com>
+
+	* aarch64_reloc.def (COPY): Add DYN.
+	* arm_reloc.def (COPY): Likewise.
+	* i386_reloc.def (COPY): Likewise.
+	* ia64_reloc.def (COPY): Likewise.
+	* ppc64_reloc.def (COPY): Likewise.
+	* ppc_reloc.def (COPY): Likewise.
+	* s390_reloc.def (COPY): Likewise.
+	* sh_reloc.def (COPY): Likewise.
+	* sparc_reloc.def (COPY): Likewise.
+	* tilegx_reloc.def (COPY): Likewise.
+	* x86_64_reloc.def (COPY): Likewise.
+
 2015-02-23  Petr Machata  <pmachata@redhat.com>
 
 	* arm_symbol.c (arm_symbol_type_name): New function.

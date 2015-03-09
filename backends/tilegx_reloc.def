@@ -1,5 +1,6 @@
 /* List the relocation types for tilegx.  -*- C -*-
    Copyright (C) 2012 Tilera Corporation
+   Copyright (C) 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -44,7 +45,7 @@ RELOC_TYPE (HW3,			REL)
 RELOC_TYPE (HW0_LAST,			REL)
 RELOC_TYPE (HW1_LAST,			REL)
 RELOC_TYPE (HW2_LAST,			REL)
-RELOC_TYPE (COPY,			EXEC)
+RELOC_TYPE (COPY,			EXEC|DYN)
 RELOC_TYPE (GLOB_DAT,			EXEC|DYN)
 RELOC_TYPE (JMP_SLOT,			EXEC|DYN)
 RELOC_TYPE (RELATIVE,			EXEC|DYN)

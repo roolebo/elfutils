@@ -1,5 +1,5 @@
 /* List the relocation types for sparc.  -*- C -*-
-   Copyright (C) 2009 Red Hat, Inc.
+   Copyright (C) 2009, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -47,7 +47,7 @@ RELOC_TYPE (GOT22,              REL)
 RELOC_TYPE (PC10,               REL)
 RELOC_TYPE (PC22,               REL)
 RELOC_TYPE (WPLT30,             REL)
-RELOC_TYPE (COPY,               EXEC)
+RELOC_TYPE (COPY,               EXEC|DYN)
 RELOC_TYPE (GLOB_DAT,           EXEC|DYN)
 RELOC_TYPE (JMP_SLOT,           EXEC|DYN)
 RELOC_TYPE (RELATIVE,           EXEC|DYN)

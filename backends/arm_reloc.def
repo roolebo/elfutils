@@ -1,5 +1,5 @@
 /* List the relocation types for arm.  -*- C -*-
-   Copyright (C) 2005-2010, 2014 Red Hat, Inc.
+   Copyright (C) 2005-2010, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -48,7 +48,7 @@ RELOC_TYPE (THM_XPC22,		REL)
 RELOC_TYPE (TLS_DTPMOD32,	EXEC|DYN)
 RELOC_TYPE (TLS_DTPOFF32,	EXEC|DYN)
 RELOC_TYPE (TLS_TPOFF32,	EXEC|DYN)
-RELOC_TYPE (COPY,		EXEC)
+RELOC_TYPE (COPY,		EXEC|DYN)
 RELOC_TYPE (GLOB_DAT,		EXEC|DYN)
 RELOC_TYPE (JUMP_SLOT,		EXEC|DYN)
 RELOC_TYPE (RELATIVE,		EXEC|DYN)

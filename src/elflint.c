@@ -2397,20 +2397,22 @@ hash section [%2zu] '%s' uses too much data\n"),
 
   for (Elf32_Word cnt = 0; cnt < gnu_nbucket; ++cnt)
     {
-      Elf32_Word symidx = gnu_bucket[cnt] - gnu_symbias;;
-      if (symidx != STN_UNDEF)
-	do
-	  {
-	    if (symidx >= max_nsyms || symidx >= nentries)
-	      {
-		ERROR (gettext ("\
-hash section [%2zu] '%s' invalid symbol index\n"),
-		       gnu_hash_idx, gnu_hash_name);
-		return;
-	      }
-	    used[symidx] |= 1;
-	  }
-	while ((gnu_chain[symidx++] & 1u) == 0);
+      if (gnu_bucket[cnt] != STN_UNDEF)
+	{
+	  Elf32_Word symidx = gnu_bucket[cnt] - gnu_symbias;
+	  do
+	    {
+	      if (symidx >= max_nsyms || symidx + gnu_symbias >= nentries)
+		{
+		  ERROR (gettext ("\
+hash section [%2zu] '%s' invalid symbol index %" PRIu32 " (max_nsyms: %" PRIu32 ", nentries: %" PRIu32 "\n"),
+			 gnu_hash_idx, gnu_hash_name, symidx, max_nsyms, nentries);
+		  return;
+		}
+	      used[symidx + gnu_symbias] |= 1;
+	    }
+	  while ((gnu_chain[symidx++] & 1u) == 0);
+	}
     }
 
   /* Now go over the old hash table and check that we cover the same

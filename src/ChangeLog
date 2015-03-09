@@ -1,3 +1,7 @@
+2015-03-09  Mark Wielaard  <mjw@redhat.com>
+
+	* elflint.c (compare_hash_gnu_hash): Correct gnu_symbias usage.
+
 2015-01-03  Mark Wielaard  <mjw@redhat.com>
 
 	* elfcmp (main): Check section name is not NULL. Check sh_entsize

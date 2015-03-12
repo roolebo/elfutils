@@ -260,9 +260,13 @@ prepare_thread (pid_t pid2 __attribute__ ((unused)),
   abort ();
 #else /* x86_64 */
   long l;
+  struct user_regs_struct user_regs;
   errno = 0;
-  l = ptrace (PTRACE_POKEUSER, pid2,
-	      (void *) (intptr_t) offsetof (struct user_regs_struct, rip), jmp);
+  l = ptrace (PTRACE_GETREGS, pid2, 0, (intptr_t) &user_regs);
+  assert_perror (errno);
+  assert (l == 0);
+  user_regs.rip = (intptr_t) jmp;
+  l = ptrace (PTRACE_SETREGS, pid2, 0, (intptr_t) &user_regs);
   assert_perror (errno);
   assert (l == 0);
   l = ptrace (PTRACE_CONT, pid2, NULL, (void *) (intptr_t) SIGUSR2);
@@ -375,7 +379,7 @@ exec_dump (const char *exec)
 #ifndef __x86_64__
   is_x86_64_native = false;
 #else /* __x86_64__ */
-  is_x86_64_native = ehdr->e_ident[EI_CLASS] == ELFCLASS64;
+  is_x86_64_native = ehdr->e_machine == EM_X86_64;
 #endif /* __x86_64__ */
   void (*jmp) (void) = 0;
   if (is_x86_64_native)

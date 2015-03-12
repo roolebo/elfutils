@@ -1,3 +1,10 @@
+2015-03-13  H.J. Lu  <hjl.tools@gmail.com>
+
+	* backtrace.c (prepare_thread): Use PTRACE_GETREGS/PTRACE_SETREGS
+	instead of PTRACE_POKEUSER.
+	(exec_dump): Check EM_X86_64 instead of ELFCLASS64 for
+	is_x86_64_native.
+
 2015-02-18  Mark Wielaard  <mjw@redhat.com>
 
 	* newdata.c (check_section_data): Use PRId64 for printing loff_t.

@@ -1,5 +1,6 @@
 /* Initialization of x86-64 specific backend library.
    Copyright (C) 2002-2009, 2013 Red Hat, Inc.
+   Copyright (C) H.J. Lu <hjl.tools@gmail.com>, 2015.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -38,6 +39,8 @@
 /* This defines the common reloc hooks based on x86_64_reloc.def.  */
 #include "common-reloc.c"
 
+extern __typeof (EBLHOOK (core_note)) x32_core_note attribute_hidden;
+
 const char *
 x86_64_init (elf, machine, eh, ehlen)
      Elf *elf __attribute__ ((unused));
@@ -53,7 +56,10 @@ x86_64_init (elf, machine, eh, ehlen)
   eh->name = "AMD x86-64";
   x86_64_init_reloc (eh);
   HOOK (eh, reloc_simple_type);
-  HOOK (eh, core_note);
+  if (eh->class == ELFCLASS32)
+    eh->core_note = x32_core_note;
+  else
+    HOOK (eh, core_note);
   HOOK (eh, return_value_location);
   HOOK (eh, register_info);
   HOOK (eh, syscall_abi);

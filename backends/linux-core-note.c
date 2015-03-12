@@ -1,5 +1,6 @@
 /* Common core note type descriptions for Linux.
    Copyright (C) 2007-2010 Red Hat, Inc.
+   Copyright (C) H.J. Lu <hjl.tools@gmail.com>, 2015.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -42,8 +43,21 @@
 #define	INT			int32_t
 #define ALIGN_INT		4
 #define TYPE_INT		ELF_T_SWORD
+#ifndef PR_REG
+# define PR_REG			ULONG
+#endif
 #ifndef ALIGN_PR_REG
 # define ALIGN_PR_REG		ALIGN_ULONG
+#endif
+#ifndef PRPSINFO_UID_T
+# define PRPSINFO_UID_T		UID_T
+# define ALIGN_PRPSINFO_UID_T	ALIGN_UID_T
+# define TYPE_PRPSINFO_UID_T	TYPE_UID_T
+#endif
+#ifndef PRPSINFO_GID_T
+# define PRPSINFO_GID_T		GID_T
+# define ALIGN_PRPSINFO_GID_T	ALIGN_GID_T
+# define TYPE_PRPSINFO_GID_T	TYPE_GID_T
 #endif
 
 #define FIELD(type, name) type name __attribute__ ((aligned (ALIGN_##type)))
@@ -86,7 +100,7 @@ struct EBLHOOK(prstatus)
   struct EBLHOOK(timeval) pr_cstime;
   struct
   {
-    FIELD (ULONG, pr_reg[PRSTATUS_REGS_SIZE / sizeof (ULONG)]);
+    FIELD (PR_REG, pr_reg[PRSTATUS_REGS_SIZE / sizeof (PR_REG)]);
   }
 #ifdef ALIGN_PR_REG
     __attribute__ ((aligned (ALIGN_PR_REG)))
@@ -105,8 +119,8 @@ struct EBLHOOK(prpsinfo)
   FIELD (CHAR, pr_zomb);
   FIELD (CHAR, pr_nice);
   FIELD (ULONG, pr_flag);
-  FIELD (UID_T, pr_uid);
-  FIELD (GID_T, pr_gid);
+  FIELD (PRPSINFO_UID_T, pr_uid);
+  FIELD (PRPSINFO_GID_T, pr_gid);
   FIELD (PID_T, pr_pid);
   FIELD (PID_T, pr_ppid);
   FIELD (PID_T, pr_pgrp);
@@ -170,8 +184,8 @@ static const Ebl_Core_Item prpsinfo_items[] =
     FIELD (state, CHAR, zomb, 'd'),
     FIELD (state, CHAR, nice, 'd'),
     FIELD (state, ULONG, flag, 'x'),
-    FIELD (identity, UID_T, uid, 'd'),
-    FIELD (identity, GID_T, gid, 'd'),
+    FIELD (identity, PRPSINFO_UID_T, uid, 'd'),
+    FIELD (identity, PRPSINFO_GID_T, gid, 'd'),
     FIELD (identity, PID_T, pid, 'd'),
     FIELD (identity, PID_T, ppid, 'd'),
     FIELD (identity, PID_T, pgrp, 'd'),

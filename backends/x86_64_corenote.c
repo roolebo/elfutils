@@ -1,5 +1,6 @@
 /* x86-64 specific core note handling.
    Copyright (C) 2005, 2007, 2008 Red Hat, Inc.
+   Copyright (C) H.J. Lu <hjl.tools@gmail.com>, 2015.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -36,7 +37,13 @@
 #include <stdio.h>
 #include <sys/time.h>
 
-#define BACKEND		x86_64_
+#ifndef BITS
+# define BITS 		64
+# define BACKEND	x86_64_
+#else
+# define BITS 		32
+# define BACKEND	x32_
+#endif
 #include "libebl_CPU.h"
 
 
@@ -77,15 +84,35 @@ static const Ebl_Register_Location prstatus_regs[] =
   };
 #define PRSTATUS_REGS_SIZE	(27 * 8)
 
-#define	ULONG			uint64_t
+#if BITS == 32
+# define ULONG			uint32_t
+# define ALIGN_ULONG		4
+# define TYPE_ULONG		ELF_T_WORD
+# define PRPSINFO_UID_T		uint16_t
+# define ALIGN_PRPSINFO_UID_T	2
+# define TYPE_PRPSINFO_UID_T	ELF_T_HALF
+# define PRPSINFO_GID_T		uint16_t
+# define ALIGN_PRPSINFO_GID_T	2
+# define TYPE_PRPSINFO_GID_T	ELF_T_HALF
+#else
+# define ULONG			uint64_t
+# define ALIGN_ULONG		8
+# define TYPE_ULONG		ELF_T_XWORD
+# define PRPSINFO_UID_T		uint32_t
+# define ALIGN_PRPSINFO_UID_T	4
+# define TYPE_PRPSINFO_UID_T	TYPE_UID_T
+# define PRPSINFO_GID_T		uint32_t
+# define ALIGN_PRPSINFO_GID_T	4
+# define TYPE_PRPSINFO_GID_T	TYPE_GID_T
+#endif
+#define PR_REG			uint64_t
+#define ALIGN_PR_REG		8
 #define PID_T			int32_t
 #define	UID_T			uint32_t
 #define	GID_T			uint32_t
-#define ALIGN_ULONG		8
 #define ALIGN_PID_T		4
 #define ALIGN_UID_T		4
 #define ALIGN_GID_T		4
-#define TYPE_ULONG		ELF_T_XWORD
 #define TYPE_PID_T		ELF_T_SWORD
 #define TYPE_UID_T		ELF_T_SWORD
 #define TYPE_GID_T		ELF_T_SWORD

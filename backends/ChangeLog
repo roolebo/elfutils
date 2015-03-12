@@ -1,3 +1,35 @@
+2015-04-01  H.J. Lu  <hjl.tools@gmail.com>
+
+	* Makefile.am (x86_64_SRCS): Add x32_corenote.c.
+	* linux-core-note.c (PR_REG): New.
+	(PRPSINFO_UID_T): Likewise.
+	(ALIGN_PRPSINFO_UID_T): Likewise.
+	(TYPE_PRPSINFO_UID_T): Likewise.
+	(PRPSINFO_GID_T): Likewise.
+	(ALIGN_PRPSINFO_GID_T): Likewise.
+	(TYPE_PRPSINFO_GID_T): Likewise.
+	(pr_reg): Replace ULONG with PR_REG.
+	(pr_uid): Replace UID_T with PRPSINFO_UID_T.
+	(uid): Likewise.
+	(pr_gid): Replace GID_T with PRPSINFO_GID_T.
+	(gid): Likewise.
+	* x32_corenote.c: New file.
+	* x86_64_corenote.c (BITS): New.  Support x32.
+	(BACKEND): Support x32.
+	(ULONG): Likewise.
+	(ALIGN_ULONG): Likewise.
+	(TYPE_ULONG): Likewise.
+	(PRPSINFO_UID_T): New.
+	(ALIGN_PRPSINFO_UID_T): Likewise.
+	(TYPE_PRPSINFO_UID_T): Likewise.
+	(PRPSINFO_GID_T): Likewise.
+	(ALIGN_PRPSINFO_GID_T): Likewise.
+	(TYPE_PRPSINFO_GID_T): Likewise.
+	(PR_REG): Likewise.
+	(ALIGN_PR_REG): Likewise.
+	* x86_64_init.c (x32_core_note): New.
+	(x86_64_init): Set eh->core_note to x32_core_note for x32.
+
 2015-03-23  Mark Wielaard  <mjw@redhat.com>
 
 	* aarch64_symbol.c (aarch64_check_special_symbol): Accept

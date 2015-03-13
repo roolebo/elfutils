@@ -1,3 +1,9 @@
+2015-03-13  Mark Wielaard  <mjw@redhat.com>
+
+	* backtrace-dwarf.c: Add explicit includes.
+	(cleanup_13_abort): Remove unused static declaration.
+	(thread_callback): Add explicit return.
+
 2015-03-13  H.J. Lu  <hjl.tools@gmail.com>
 
 	* backtrace.c (prepare_thread): Use PTRACE_GETREGS/PTRACE_SETREGS

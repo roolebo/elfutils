@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl Configure input file for elfutils.                     -*-autoconf-*-
 dnl
-dnl Copyright (C) 1996-2014 Red Hat, Inc.
+dnl Copyright (C) 1996-2015 Red Hat, Inc.
 dnl
 dnl This file is part of elfutils.
 dnl
@@ -83,7 +83,7 @@ AC_CACHE_CHECK([for gcc with C99 support], ac_cv_c99, [dnl
 old_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS -std=gnu99"
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([dnl
-int foo (int a) { for (int i = 0; i < a; ++i) if (i % 4) break; int s = a; }])],
+int foo (int a) { for (int i = 0; i < a; ++i) if (i % 4) break; int s = a; return s;}])],
 		  ac_cv_c99=yes, ac_cv_c99=no)
 CFLAGS="$old_CFLAGS"])
 AS_IF([test "x$ac_cv_c99" != xyes],
@@ -97,7 +97,8 @@ save_LDFLAGS="$LDFLAGS"
 CFLAGS="-fpic $CFLAGS"
 LDFLAGS="-shared -Wl,-z,defs,-z,relro $LDFLAGS"
 AC_LINK_IFELSE([dnl
-AC_LANG_PROGRAM([[#undef __thread
+AC_LANG_PROGRAM([[#include <stdlib.h>
+#undef __thread
 static __thread int a; int foo (int b) { return a + b; }]],
 		[[exit (foo (0));]])],
 	       ac_cv_tls=yes, ac_cv_tls=no)

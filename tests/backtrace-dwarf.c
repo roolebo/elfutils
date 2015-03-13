@@ -1,5 +1,5 @@
 /* Test program for unwinding of complicated DWARF expressions.
-   Copyright (C) 2013 Red Hat, Inc.
+   Copyright (C) 2013, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -22,7 +22,11 @@
 #include <stdio_ext.h>
 #include <locale.h>
 #include <errno.h>
+#include <error.h>
+#include <unistd.h>
 #include <sys/ptrace.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include ELFUTILS_HEADER(dwfl)
 
 #ifndef __linux__
@@ -37,7 +41,6 @@ main (int argc __attribute__ ((unused)), char **argv)
 
 #else /* __linux__ */
 
-static void cleanup_13_abort (void);
 #define main cleanup_13_main
 #include "cleanup-13.c"
 #undef main
@@ -115,7 +118,9 @@ static int
 thread_callback (Dwfl_Thread *thread, void *thread_arg)
 {
   dwfl_thread_getframes (thread, frame_callback, NULL);
+  /* frame_callback shall exit (0) on success.  */
   error (1, 0, "dwfl_thread_getframes: %s", dwfl_errmsg (-1));
+  return DWARF_CB_ABORT;
 }
 
 int

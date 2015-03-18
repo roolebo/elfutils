@@ -1,3 +1,8 @@
+2015-03-18  Petr Machata  <pmachata@redhat.com>
+
+	* Makefile.am (EXTRA_DIST): Add run-dwarf-ranges.sh,
+	debug-ranges-no-lowpc.o.bz2.
+
 2015-03-13  Mark Wielaard  <mjw@redhat.com>
 
 	* backtrace-dwarf.c: Add explicit includes.

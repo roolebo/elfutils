@@ -1,3 +1,7 @@
+Version 0.162
+
+libdw: Install new header elfutils/known-dwarf.h.
+
 Version 0.161
 
 libdw: New function dwarf_peel_type. dwarf_aggregate_size now uses

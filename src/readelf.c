@@ -1,5 +1,5 @@
 /* Print information from ELF file in human-readable form.
-   Copyright (C) 1999-2014 Red Hat, Inc.
+   Copyright (C) 1999-2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1999.
 
@@ -3566,9 +3566,9 @@ dwarf_tag_string (unsigned int tag)
 {
   switch (tag)
     {
-#define ONE_KNOWN_DW_TAG(NAME, CODE) case CODE: return #NAME;
-      ALL_KNOWN_DW_TAG
-#undef ONE_KNOWN_DW_TAG
+#define DWARF_ONE_KNOWN_DW_TAG(NAME, CODE) case CODE: return #NAME;
+      DWARF_ALL_KNOWN_DW_TAG
+#undef DWARF_ONE_KNOWN_DW_TAG
     default:
       return NULL;
     }
@@ -3580,9 +3580,9 @@ dwarf_attr_string (unsigned int attrnum)
 {
   switch (attrnum)
     {
-#define ONE_KNOWN_DW_AT(NAME, CODE) case CODE: return #NAME;
-      ALL_KNOWN_DW_AT
-#undef ONE_KNOWN_DW_AT
+#define DWARF_ONE_KNOWN_DW_AT(NAME, CODE) case CODE: return #NAME;
+      DWARF_ALL_KNOWN_DW_AT
+#undef DWARF_ONE_KNOWN_DW_AT
     default:
       return NULL;
     }
@@ -3594,11 +3594,9 @@ dwarf_form_string (unsigned int form)
 {
   switch (form)
     {
-#define ONE_KNOWN_DW_FORM_DESC(NAME, CODE, DESC) ONE_KNOWN_DW_FORM (NAME, CODE)
-#define ONE_KNOWN_DW_FORM(NAME, CODE) case CODE: return #NAME;
-      ALL_KNOWN_DW_FORM
-#undef ONE_KNOWN_DW_FORM
-#undef ONE_KNOWN_DW_FORM_DESC
+#define DWARF_ONE_KNOWN_DW_FORM(NAME, CODE) case CODE: return #NAME;
+      DWARF_ALL_KNOWN_DW_FORM
+#undef DWARF_ONE_KNOWN_DW_FORM
     default:
       return NULL;
     }
@@ -3610,9 +3608,9 @@ dwarf_lang_string (unsigned int lang)
 {
   switch (lang)
     {
-#define ONE_KNOWN_DW_LANG_DESC(NAME, CODE, DESC) case CODE: return #NAME;
-      ALL_KNOWN_DW_LANG
-#undef ONE_KNOWN_DW_LANG_DESC
+#define DWARF_ONE_KNOWN_DW_LANG(NAME, CODE) case CODE: return #NAME;
+      DWARF_ALL_KNOWN_DW_LANG
+#undef DWARF_ONE_KNOWN_DW_LANG
     default:
       return NULL;
     }
@@ -3624,9 +3622,9 @@ dwarf_inline_string (unsigned int code)
 {
   static const char *const known[] =
     {
-#define ONE_KNOWN_DW_INL(NAME, CODE) [CODE] = #NAME,
-      ALL_KNOWN_DW_INL
-#undef ONE_KNOWN_DW_INL
+#define DWARF_ONE_KNOWN_DW_INL(NAME, CODE) [CODE] = #NAME,
+      DWARF_ALL_KNOWN_DW_INL
+#undef DWARF_ONE_KNOWN_DW_INL
     };
 
   if (likely (code < sizeof (known) / sizeof (known[0])))
@@ -3641,9 +3639,9 @@ dwarf_encoding_string (unsigned int code)
 {
   static const char *const known[] =
     {
-#define ONE_KNOWN_DW_ATE(NAME, CODE) [CODE] = #NAME,
-      ALL_KNOWN_DW_ATE
-#undef ONE_KNOWN_DW_ATE
+#define DWARF_ONE_KNOWN_DW_ATE(NAME, CODE) [CODE] = #NAME,
+      DWARF_ALL_KNOWN_DW_ATE
+#undef DWARF_ONE_KNOWN_DW_ATE
     };
 
   if (likely (code < sizeof (known) / sizeof (known[0])))
@@ -3658,9 +3656,9 @@ dwarf_access_string (unsigned int code)
 {
   static const char *const known[] =
     {
-#define ONE_KNOWN_DW_ACCESS(NAME, CODE) [CODE] = #NAME,
-      ALL_KNOWN_DW_ACCESS
-#undef ONE_KNOWN_DW_ACCESS
+#define DWARF_ONE_KNOWN_DW_ACCESS(NAME, CODE) [CODE] = #NAME,
+      DWARF_ALL_KNOWN_DW_ACCESS
+#undef DWARF_ONE_KNOWN_DW_ACCESS
     };
 
   if (likely (code < sizeof (known) / sizeof (known[0])))
@@ -3675,9 +3673,9 @@ dwarf_visibility_string (unsigned int code)
 {
   static const char *const known[] =
     {
-#define ONE_KNOWN_DW_VIS(NAME, CODE) [CODE] = #NAME,
-      ALL_KNOWN_DW_VIS
-#undef ONE_KNOWN_DW_VIS
+#define DWARF_ONE_KNOWN_DW_VIS(NAME, CODE) [CODE] = #NAME,
+      DWARF_ALL_KNOWN_DW_VIS
+#undef DWARF_ONE_KNOWN_DW_VIS
     };
 
   if (likely (code < sizeof (known) / sizeof (known[0])))
@@ -3692,9 +3690,9 @@ dwarf_virtuality_string (unsigned int code)
 {
   static const char *const known[] =
     {
-#define ONE_KNOWN_DW_VIRTUALITY(NAME, CODE) [CODE] = #NAME,
-      ALL_KNOWN_DW_VIRTUALITY
-#undef ONE_KNOWN_DW_VIRTUALITY
+#define DWARF_ONE_KNOWN_DW_VIRTUALITY(NAME, CODE) [CODE] = #NAME,
+      DWARF_ALL_KNOWN_DW_VIRTUALITY
+#undef DWARF_ONE_KNOWN_DW_VIRTUALITY
     };
 
   if (likely (code < sizeof (known) / sizeof (known[0])))
@@ -3709,9 +3707,9 @@ dwarf_identifier_case_string (unsigned int code)
 {
   static const char *const known[] =
     {
-#define ONE_KNOWN_DW_ID(NAME, CODE) [CODE] = #NAME,
-      ALL_KNOWN_DW_ID
-#undef ONE_KNOWN_DW_ID
+#define DWARF_ONE_KNOWN_DW_ID(NAME, CODE) [CODE] = #NAME,
+      DWARF_ALL_KNOWN_DW_ID
+#undef DWARF_ONE_KNOWN_DW_ID
     };
 
   if (likely (code < sizeof (known) / sizeof (known[0])))
@@ -3726,9 +3724,9 @@ dwarf_calling_convention_string (unsigned int code)
 {
   static const char *const known[] =
     {
-#define ONE_KNOWN_DW_CC(NAME, CODE) [CODE] = #NAME,
-      ALL_KNOWN_DW_CC
-#undef ONE_KNOWN_DW_CC
+#define DWARF_ONE_KNOWN_DW_CC(NAME, CODE) [CODE] = #NAME,
+      DWARF_ALL_KNOWN_DW_CC
+#undef DWARF_ONE_KNOWN_DW_CC
     };
 
   if (likely (code < sizeof (known) / sizeof (known[0])))
@@ -3743,9 +3741,9 @@ dwarf_ordering_string (unsigned int code)
 {
   static const char *const known[] =
     {
-#define ONE_KNOWN_DW_ORD(NAME, CODE) [CODE] = #NAME,
-      ALL_KNOWN_DW_ORD
-#undef ONE_KNOWN_DW_ORD
+#define DWARF_ONE_KNOWN_DW_ORD(NAME, CODE) [CODE] = #NAME,
+      DWARF_ALL_KNOWN_DW_ORD
+#undef DWARF_ONE_KNOWN_DW_ORD
     };
 
   if (likely (code < sizeof (known) / sizeof (known[0])))
@@ -3760,9 +3758,9 @@ dwarf_discr_list_string (unsigned int code)
 {
   static const char *const known[] =
     {
-#define ONE_KNOWN_DW_DSC(NAME, CODE) [CODE] = #NAME,
-      ALL_KNOWN_DW_DSC
-#undef ONE_KNOWN_DW_DSC
+#define DWARF_ONE_KNOWN_DW_DSC(NAME, CODE) [CODE] = #NAME,
+      DWARF_ALL_KNOWN_DW_DSC
+#undef DWARF_ONE_KNOWN_DW_DSC
     };
 
   if (likely (code < sizeof (known) / sizeof (known[0])))
@@ -3780,11 +3778,9 @@ dwarf_locexpr_opcode_string (unsigned int code)
       /* Normally we can't affort building huge table of 64K entries,
 	 most of them zero, just because there are a couple defined
 	 values at the far end.  In case of opcodes, it's OK.  */
-#define ONE_KNOWN_DW_OP_DESC(NAME, CODE, DESC) ONE_KNOWN_DW_OP (NAME, CODE)
-#define ONE_KNOWN_DW_OP(NAME, CODE) [CODE] = #NAME,
-      ALL_KNOWN_DW_OP
-#undef ONE_KNOWN_DW_OP
-#undef ONE_KNOWN_DW_OP_DESC
+#define DWARF_ONE_KNOWN_DW_OP(NAME, CODE) [CODE] = #NAME,
+      DWARF_ALL_KNOWN_DW_OP
+#undef DWARF_ONE_KNOWN_DW_OP
     };
 
   if (likely (code < sizeof (known) / sizeof (known[0])))

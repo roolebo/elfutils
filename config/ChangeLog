@@ -1,3 +1,10 @@
+2015-03-18  Petr Machata  <pmachata@redhat.com>
+
+	* known-dwarf.awk (comment): Drop all uses of this variable.
+	(END): Always emit the non-_DESC variant.  Emit
+	DWARF_ALL_KNOWN_DW_ instead of ALL_KNOWN_DW_*, and
+	DWARF_ONE_KNOWN_DW_ instead of ONE_KNOWN_DW_*.
+
 2015-02-20  Petr Machata  <pmachata@redhat.com>
 
 	* known-dwarf.awk (END): Drop useless variables lo, hi.  Merge two

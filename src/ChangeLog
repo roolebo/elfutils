@@ -1,3 +1,14 @@
+2015-03-18  Petr Machata  <pmachata@redhat.com>
+
+	* readelf.c (dwarf_tag_string, dwarf_attr_string)
+	(dwarf_form_string, dwarf_lang_string, dwarf_inline_string)
+	(dwarf_encoding_string, dwarf_access_string)
+	(dwarf_visibility_string, dwarf_virtuality_string)
+	(dwarf_identifier_case_string, dwarf_calling_convention_string)
+	(dwarf_ordering_string, dwarf_discr_list_string)
+	(dwarf_locexpr_opcode_string): Adjust uses of know-dwarf.h macros
+	to match the API changes.
+
 2015-03-09  Mark Wielaard  <mjw@redhat.com>
 
 	* elflint.c (compare_hash_gnu_hash): Correct gnu_symbias usage.

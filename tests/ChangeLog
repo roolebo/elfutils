@@ -1,5 +1,13 @@
 2015-03-18  Petr Machata  <pmachata@redhat.com>
 
+	* addrcfi.c (op_name): Adjust uses of know-dwarf.h macros to match
+	the API changes.
+	* allregs.c (dwarf_encoding_string): Likewise.
+	* show-die-info.c (dwarf_tag_string, dwarf_attr_string): Likewise.
+	* varlocs.c (dwarf_encoding_string, dwarf_opcode_string): Likewise.
+
+2015-03-18  Petr Machata  <pmachata@redhat.com>
+
 	* Makefile.am (EXTRA_DIST): Add run-dwarf-ranges.sh,
 	debug-ranges-no-lowpc.o.bz2.
 

@@ -1,3 +1,8 @@
+2015-03-23  Mark Wielaard  <mjw@redhat.com>
+
+	* elf32_updatenull.c (updatenull_wrlock): Don't extend size with
+	SHT_NOBITS sh_offset.
+
 2015-02-18  Mark Wielaard  <mjw@redhat.com>
 
 	* libelfP.h (__libelf_set_data_list_rdlock): Make internal_function.

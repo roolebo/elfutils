@@ -1,5 +1,5 @@
 /* Update data structures for changes.
-   Copyright (C) 2000-2010 Red Hat, Inc.
+   Copyright (C) 2000-2010, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -318,9 +318,8 @@ __elfw2(LIBELFBITS,updatenull_wrlock) (Elf *elf, int *change_bop, size_t shnum)
 	      if (elf->flags & ELF_F_LAYOUT)
 		{
 		  size = MAX ((GElf_Word) size,
-			      shdr->sh_offset
-			      + (shdr->sh_type != SHT_NOBITS
-				 ? shdr->sh_size : 0));
+			      (shdr->sh_type != SHT_NOBITS
+			       ? shdr->sh_offset + shdr->sh_size : 0));
 
 		  /* The alignment must be a power of two.  This is a
 		     requirement from the ELF specification.  Additionally

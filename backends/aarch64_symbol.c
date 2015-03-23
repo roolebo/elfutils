@@ -1,5 +1,5 @@
 /* AArch64 specific symbolic name handling.
-   Copyright (C) 2013 Red Hat, Inc.
+   Copyright (C) 2013, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -56,8 +56,11 @@ aarch64_reloc_simple_type (Ebl *ebl __attribute__ ((unused)), int type)
     }
 }
 
-/* If this is the _GLOBAL_OFFSET_TABLE_ symbol, then it should point to
-   .got[0] even if there is a .got.plt section.  */
+/* If this is the _GLOBAL_OFFSET_TABLE_ symbol, then it should point in
+   the .got even if there is a .got.plt section.
+   https://sourceware.org/ml/libc-ports/2013-06/msg00057.html
+   https://bugzilla.redhat.com/show_bug.cgi?id=1201778
+ */
 bool
 aarch64_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr, const GElf_Sym *sym,
                               const char *name, const GElf_Shdr *destshdr)
@@ -66,7 +69,8 @@ aarch64_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr, const GElf_Sym *sym,
       && strcmp (name, "_GLOBAL_OFFSET_TABLE_") == 0)
     {
       const char *sname = elf_strptr (elf, ehdr->e_shstrndx, destshdr->sh_name);
-      if (sname != NULL && strcmp (sname, ".got.plt") == 0)
+      if (sname != NULL
+	  && (strcmp (sname, ".got") == 0 || strcmp (sname, ".got.plt") == 0))
 	{
 	  Elf_Scn *scn = NULL;
 	  while ((scn = elf_nextscn (elf, scn)) != NULL)
@@ -77,7 +81,8 @@ aarch64_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr, const GElf_Sym *sym,
 		{
 		  sname = elf_strptr (elf, ehdr->e_shstrndx, shdr->sh_name);
 		  if (sname != NULL && strcmp (sname, ".got") == 0)
-		    return sym->st_value == shdr->sh_addr;
+		    return (sym->st_value >= shdr->sh_addr
+			    && sym->st_value < shdr->sh_addr + shdr->sh_size);
 		}
 	    }
 	}

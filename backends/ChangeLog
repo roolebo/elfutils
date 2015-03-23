@@ -1,3 +1,8 @@
+2015-03-23  Mark Wielaard  <mjw@redhat.com>
+
+	* aarch64_symbol.c (aarch64_check_special_symbol): Accept
+	_GLOBAL_OFFSET_TABLE_ pointing anywhere in .got.
+
 2015-03-09  Mark Wielaard  <mjw@redhat.com>
 
 	* aarch64_reloc.def (COPY): Add DYN.

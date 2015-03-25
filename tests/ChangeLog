@@ -1,5 +1,9 @@
 2015-04-01  H.J. Lu  <hjl.tools@gmail.com>
 
+	* run-allregs.sh: Add a test for testfile-x32-core.
+
+2015-04-01  H.J. Lu  <hjl.tools@gmail.com>
+
 	* run-readelf-mixed-corenote.sh: Add a test for testfile-x32-core.
 	* testfile-x32-core.bz2: New file.
 	* Makefile.am (EXTRA_DIST): Add testfile-x32-core.bz2.

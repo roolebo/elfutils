@@ -1,5 +1,6 @@
 #! /bin/sh
 # Copyright (C) 2005, 2006, 2007, 2012, 2013 Red Hat, Inc.
+# Copyright (C) H.J. Lu <hjl.tools@gmail.com>, 2015.
 # This file is part of elfutils.
 #
 # This file is free software; you can redistribute it and/or modify
@@ -2796,4 +2797,77 @@ FP/SIMD registers:
 	 95: v31 (v31), unsigned 128 bits
 EOF
 
+# See run-readelf-mixed-corenote.sh for instructions to regenerate
+# this core file.
+regs_test testfile-x32-core <<\EOF
+integer registers:
+	  0: %rax (rax), signed 64 bits
+	  1: %rdx (rdx), signed 64 bits
+	  2: %rcx (rcx), signed 64 bits
+	  3: %rbx (rbx), signed 64 bits
+	  4: %rsi (rsi), signed 64 bits
+	  5: %rdi (rdi), signed 64 bits
+	  6: %rbp (rbp), address 64 bits
+	  7: %rsp (rsp), address 64 bits
+	  8: %r8 (r8), signed 64 bits
+	  9: %r9 (r9), signed 64 bits
+	 10: %r10 (r10), signed 64 bits
+	 11: %r11 (r11), signed 64 bits
+	 12: %r12 (r12), signed 64 bits
+	 13: %r13 (r13), signed 64 bits
+	 14: %r14 (r14), signed 64 bits
+	 15: %r15 (r15), signed 64 bits
+	 16: %rip (rip), address 64 bits
+	 49: %rflags (rflags), unsigned 64 bits
+MMX registers:
+	 41: %mm0 (mm0), unsigned 64 bits
+	 42: %mm1 (mm1), unsigned 64 bits
+	 43: %mm2 (mm2), unsigned 64 bits
+	 44: %mm3 (mm3), unsigned 64 bits
+	 45: %mm4 (mm4), unsigned 64 bits
+	 46: %mm5 (mm5), unsigned 64 bits
+	 47: %mm6 (mm6), unsigned 64 bits
+	 48: %mm7 (mm7), unsigned 64 bits
+SSE registers:
+	 17: %xmm0 (xmm0), unsigned 128 bits
+	 18: %xmm1 (xmm1), unsigned 128 bits
+	 19: %xmm2 (xmm2), unsigned 128 bits
+	 20: %xmm3 (xmm3), unsigned 128 bits
+	 21: %xmm4 (xmm4), unsigned 128 bits
+	 22: %xmm5 (xmm5), unsigned 128 bits
+	 23: %xmm6 (xmm6), unsigned 128 bits
+	 24: %xmm7 (xmm7), unsigned 128 bits
+	 25: %xmm8 (xmm8), unsigned 128 bits
+	 26: %xmm9 (xmm9), unsigned 128 bits
+	 27: %xmm10 (xmm10), unsigned 128 bits
+	 28: %xmm11 (xmm11), unsigned 128 bits
+	 29: %xmm12 (xmm12), unsigned 128 bits
+	 30: %xmm13 (xmm13), unsigned 128 bits
+	 31: %xmm14 (xmm14), unsigned 128 bits
+	 32: %xmm15 (xmm15), unsigned 128 bits
+control registers:
+	 62: %tr (tr), unsigned 64 bits
+	 63: %ldtr (ldtr), unsigned 64 bits
+	 64: %mxcsr (mxcsr), unsigned 64 bits
+	 65: %fcw (fcw), unsigned 16 bits
+	 66: %fsw (fsw), unsigned 16 bits
+segment registers:
+	 50: %es (es), unsigned 16 bits
+	 51: %cs (cs), unsigned 16 bits
+	 52: %ss (ss), unsigned 16 bits
+	 53: %ds (ds), unsigned 16 bits
+	 54: %fs (fs), unsigned 16 bits
+	 55: %gs (gs), unsigned 16 bits
+	 58: %fs.base (fs.base), address 64 bits
+	 59: %gs.base (gs.base), address 64 bits
+x87 registers:
+	 33: %st0 (st0), float 80 bits
+	 34: %st1 (st1), float 80 bits
+	 35: %st2 (st2), float 80 bits
+	 36: %st3 (st3), float 80 bits
+	 37: %st4 (st4), float 80 bits
+	 38: %st5 (st5), float 80 bits
+	 39: %st6 (st6), float 80 bits
+	 40: %st7 (st7), float 80 bits
+EOF
 exit 0

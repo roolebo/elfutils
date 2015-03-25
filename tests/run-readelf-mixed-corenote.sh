@@ -1,5 +1,6 @@
 #! /bin/sh
 # Copyright (C) 2012, 2013, 2014 Red Hat, Inc.
+# Copyright (C) H.J. Lu <hjl.tools@gmail.com>, 2015.
 # This file is part of elfutils.
 #
 # This file is free software; you can redistribute it and/or modify
@@ -488,6 +489,97 @@ Note segment of 1000 bytes at offset 0x214:
     index: 6, base: 0xb77da700, limit: 0x000fffff, flags: 0x00000051
     index: 7, base: 0x00000000, limit: 0x00000000, flags: 0x00000028
     index: 8, base: 0x00000000, limit: 0x00000000, flags: 0x00000028
+EOF
+
+# To reproduce this core dump, do this on x86_64 machine with Linux
+# 3.7 or later:
+# $ gcc -mx32 -x c <(echo 'int main () { return *(int *)0x12345678; }')
+# $ ./a.out
+testfiles testfile-x32-core
+testrun_compare ${abs_top_builddir}/src/readelf -n testfile-x32-core <<\EOF
+
+Note segment of 2548 bytes at offset 0x234:
+  Owner          Data size  Type
+  CORE                 296  PRSTATUS
+    info.si_signo: 11, info.si_code: 0, info.si_errno: 0, cursig: 11
+    sigpend: <>
+    sighold: <>
+    pid: 6885, ppid: 2792, pgrp: 6885, sid: 2792
+    utime: 0.000000, stime: 0.001000, cutime: 0.000000, cstime: 0.000000
+    orig_rax: -1, fpvalid: 1
+    r15:                       0  r14:                       0
+    r13:              4290830656  r12:                 4194960
+    rbp:      0x00000000ffc0e070  rbx:                       0
+    r11:              4145779200  r10:                       0
+    r9:               4149627024  r8:               4149551744
+    rax:               305419896  rcx:                 4195216
+    rdx:              4290830668  rsi:              4290830660
+    rdi:                       1  rip:      0x0000000000400380
+    rflags:   0x0000000000010246  rsp:      0x00000000ffc0e070
+    fs.base:   0x00000000f7754700  gs.base:   0x0000000000000000
+    cs: 0x0033  ss: 0x002b  ds: 0x002b  es: 0x002b  fs: 0x0063  gs: 0x0000
+  CORE                 124  PRPSINFO
+    state: 0, sname: R, zomb: 0, nice: 0, flag: 0x00406600
+    uid: 1000, gid: 1000, pid: 6885, ppid: 2792, pgrp: 6885, sid: 2792
+    fname: a.out, psargs: ./a.out 
+  CORE                 128  SIGINFO
+    si_signo: 11, si_errno: 0, si_code: 1
+    fault address: 0x12345678
+  CORE                 152  AUXV
+    SYSINFO_EHDR: 0xffd49000
+    HWCAP: 0xbfebfbff  <fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe>
+    PAGESZ: 4096
+    CLKTCK: 100
+    PHDR: 0x400034
+    PHENT: 32
+    PHNUM: 8
+    BASE: 0xf7555000
+    FLAGS: 0
+    ENTRY: 0x400290
+    UID: 1000
+    EUID: 1000
+    GID: 1000
+    EGID: 1000
+    SECURE: 0
+    RANDOM: 0xffc0e2cb
+    EXECFN: 0xffc0fff0
+    PLATFORM: 0xffc0e2db
+    NULL
+  CORE                 361  FILE
+    9 files:
+      00400000-00401000 00000000 4096                /export/home/hjl/bugs/gdb/x32-1/a.out
+      00600000-00601000 00000000 4096                /export/home/hjl/bugs/gdb/x32-1/a.out
+      f71a2000-f734f000 00000000 1757184             /usr/libx32/libc-2.20.so
+      f734f000-f754e000 001ad000 2093056             /usr/libx32/libc-2.20.so
+      f754e000-f7551000 001ac000 12288               /usr/libx32/libc-2.20.so
+      f7551000-f7552000 001af000 4096                /usr/libx32/libc-2.20.so
+      f7555000-f7575000 00000000 131072              /usr/libx32/ld-2.20.so
+      f7774000-f7775000 0001f000 4096                /usr/libx32/ld-2.20.so
+      f7775000-f7776000 00020000 4096                /usr/libx32/ld-2.20.so
+  CORE                 512  FPREGSET
+    xmm0:  0x0000000000000000000000000000ff00
+    xmm1:  0x2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f
+    xmm2:  0x00000000000000000000000000000000
+    xmm3:  0x0000000000000000ff00000000000000
+    xmm4:  0x000000000000000000ff000000000000
+    xmm5:  0x00000000000000000000000000000000
+    xmm6:  0x00000000000000000000000000000000
+    xmm7:  0x00000000000000000000000000000000
+    xmm8:  0x00000000000000000000000000000000
+    xmm9:  0x00000000000000000000000000000000
+    xmm10: 0x00000000000000000000000000000000
+    xmm11: 0x00000000000000000000000000000000
+    xmm12: 0x00000000000000000000000000000000
+    xmm13: 0x00000000000000000000000000000000
+    xmm14: 0x00000000000000000000000000000000
+    xmm15: 0x00000000000000000000000000000000
+    st0: 0x00000000000000000000  st1: 0x00000000000000000000
+    st2: 0x00000000000000000000  st3: 0x00000000000000000000
+    st4: 0x00000000000000000000  st5: 0x00000000000000000000
+    st6: 0x00000000000000000000  st7: 0x00000000000000000000
+    mxcsr:   0x0000ffff00001f80
+    fcw: 0x037f  fsw: 0x0000
+  LINUX                832  X86_XSTATE
 EOF
 
 exit 0

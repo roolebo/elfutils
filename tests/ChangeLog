@@ -1,5 +1,14 @@
 2015-04-01  H.J. Lu  <hjl.tools@gmail.com>
 
+	* Makefile.am (TESTS): Add run-backtrace-core-x32.sh.
+	(EXTRA_DIST): Likewise. Add backtrace.x32.core.bz2.
+	Add backtrace.x32.exec.bz2.
+	* backtrace.x32.core.bz2 : New file.
+	* backtrace.x32.exec.bz2: Likewise.
+	* run-backtrace-core-x32.sh: Likewise.
+
+2015-04-01  H.J. Lu  <hjl.tools@gmail.com>
+
 	* run-addrcfi.sh: Add a test for testfile-x32.
 	* testfile-x32.bz2: New file.
 	* Makefile.am (EXTRA_DIST): Add testfile-x32.bz2.

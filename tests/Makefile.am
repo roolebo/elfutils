@@ -107,6 +107,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-backtrace-native.sh run-backtrace-data.sh run-backtrace-dwarf.sh \
 	run-backtrace-native-biarch.sh run-backtrace-native-core.sh \
 	run-backtrace-native-core-biarch.sh run-backtrace-core-x86_64.sh \
+	run-backtrace-core-x32.sh \
 	run-backtrace-core-i386.sh run-backtrace-core-ppc.sh \
 	run-backtrace-core-s390x.sh run-backtrace-core-s390.sh \
 	run-backtrace-core-aarch64.sh \
@@ -265,6 +266,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-backtrace-native.sh run-backtrace-native-biarch.sh \
 	     run-backtrace-native-core.sh run-backtrace-native-core-biarch.sh \
 	     run-backtrace-core-x86_64.sh run-backtrace-core-i386.sh \
+	     run-backtrace-core-x32.sh \
 	     backtrace-subr.sh backtrace.i386.core.bz2 backtrace.i386.exec.bz2 \
 	     backtrace.x86_64.core.bz2 backtrace.x86_64.exec.bz2 \
 	     backtrace.ppc.core.bz2 backtrace.ppc.exec.bz2 \
@@ -287,7 +289,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-readelf-A.sh testfileppc32attrs.o.bz2 \
 	     testfile-debug-types.bz2 \
 	     run-getsrc-die.sh run-strptr.sh \
-	     testfile-x32-core.bz2 testfile-x32.bz2
+	     testfile-x32-core.bz2 testfile-x32.bz2 \
+	     backtrace.x32.core.bz2 backtrace.x32.exec.bz2
 
 if USE_VALGRIND
 valgrind_cmd='valgrind -q --error-exitcode=1 --run-libc-freeres=no'

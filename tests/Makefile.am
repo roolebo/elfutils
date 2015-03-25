@@ -287,7 +287,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-readelf-A.sh testfileppc32attrs.o.bz2 \
 	     testfile-debug-types.bz2 \
 	     run-getsrc-die.sh run-strptr.sh \
-	     testfile-x32-core.bz2
+	     testfile-x32-core.bz2 testfile-x32.bz2
 
 if USE_VALGRIND
 valgrind_cmd='valgrind -q --error-exitcode=1 --run-libc-freeres=no'

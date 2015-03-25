@@ -1,5 +1,11 @@
 2015-04-01  H.J. Lu  <hjl.tools@gmail.com>
 
+	* run-addrcfi.sh: Add a test for testfile-x32.
+	* testfile-x32.bz2: New file.
+	* Makefile.am (EXTRA_DIST): Add testfile-x32.bz2.
+
+2015-04-01  H.J. Lu  <hjl.tools@gmail.com>
+
 	* run-allregs.sh: Add a test for testfile-x32-core.
 
 2015-04-01  H.J. Lu  <hjl.tools@gmail.com>

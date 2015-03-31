@@ -1,5 +1,5 @@
 /* Core file handling.
-   Copyright (C) 2008-2010, 2013 Red Hat, Inc.
+   Copyright (C) 2008-2010, 2013, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -161,6 +161,9 @@ dwfl_report_core_segments (Dwfl *dwfl, Elf *elf, size_t phnum, GElf_Phdr *notes)
 /* Never read more than this much without mmap.  */
 #define MAX_EAGER_COST	8192
 
+/* Dwfl_Module_Callback passed to and called by dwfl_segment_report_module
+   to read in a segment as ELF image directly if possible or indicate an
+   attempt must be made to read in the while segment right now.  */
 static bool
 core_file_read_eagerly (Dwfl_Module *mod,
 			void **userdata __attribute__ ((unused)),
@@ -174,6 +177,10 @@ core_file_read_eagerly (Dwfl_Module *mod,
 {
   Elf *core = arg;
 
+  /* The available buffer is often the whole segment when the core file
+     was mmap'd if used together with the dwfl_elf_phdr_memory_callback.
+     Which means that if it is complete we can just construct the whole
+     ELF image right now without having to read in anything more.  */
   if (whole <= *buffer_available)
     {
       /* All there ever was, we already have on hand.  */
@@ -198,8 +205,9 @@ core_file_read_eagerly (Dwfl_Module *mod,
       return *elfp != NULL;
     }
 
-  /* We don't have the whole file.
-     Figure out if this is better than nothing.  */
+  /* We don't have the whole file.  Which either means the core file
+     wasn't mmap'd, but needs to still be read in, or that the segment
+     is truncated.  Figure out if this is better than nothing.  */
 
   if (worthwhile == 0)
     /* Caller doesn't think so.  */
@@ -212,11 +220,15 @@ core_file_read_eagerly (Dwfl_Module *mod,
     requires find_elf hook re-doing the magic to fall back if no file found
   */
 
-  if (mod->build_id_len > 0)
-    /* There is a build ID that could help us find the whole file,
-       which might be more useful than what we have.
-       We'll just rely on that.  */
+  if (whole > MAX_EAGER_COST && mod->build_id_len > 0)
+    /* We can't cheaply read the whole file here, so we'd
+       be using a partial file.  But there is a build ID that could
+       help us find the whole file, which might be more useful than
+       what we have.  We'll just rely on that.  */
     return false;
+
+  /* The file is either small (most likely the vdso) or big and incomplete,
+     but we don't have a build-id.  */
 
   if (core->map_address != NULL)
     /* It's cheap to get, so get it.  */

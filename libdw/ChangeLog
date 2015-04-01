@@ -1,3 +1,12 @@
+2015-04-01  Petr Machata  <pmachata@redhat.com>
+
+	* libdwP.h (DWARF_E_NOT_CUDIE): New enumerator.
+	(is_cudie): New function.
+	* dwarf_error.c (errmsgs): Add message for DWARF_E_NOT_CUDIE.
+	* dwarf_getsrcfiles.c (dwarf_getsrcfiles): Call is_cudie instead
+	of white-listing valid tags.
+	* dwarf_getsrclines.c (dwarf_getsrclines): Likewise.
+
 2015-03-18  Petr Machata  <pmachata@redhat.com>
 
 	* Makefile.am (pkginclude_HEADERS): Add known-dwarf.h.

@@ -1,5 +1,5 @@
 /* Return source file information of CU.
-   Copyright (C) 2004, 2005, 2013 Red Hat, Inc.
+   Copyright (C) 2004, 2005, 2013, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
@@ -39,10 +39,13 @@
 int
 dwarf_getsrcfiles (Dwarf_Die *cudie, Dwarf_Files **files, size_t *nfiles)
 {
-  if (unlikely (cudie == NULL
-		|| (INTUSE(dwarf_tag) (cudie) != DW_TAG_compile_unit
-		    && INTUSE(dwarf_tag) (cudie) != DW_TAG_partial_unit)))
+  if (cudie == NULL)
     return -1;
+  if (! is_cudie (cudie))
+    {
+      __libdw_seterrno (DWARF_E_NOT_CUDIE);
+      return -1;
+    }
 
   int res = -1;
 

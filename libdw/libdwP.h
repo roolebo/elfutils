@@ -128,6 +128,7 @@ enum
   DWARF_E_INVALID_CFI,
   DWARF_E_NO_ALT_DEBUGLINK,
   DWARF_E_INVALID_OPCODE,
+  DWARF_E_NOT_CUDIE,
 };
 
 
@@ -723,6 +724,12 @@ static inline size_t
 cu_sec_idx (struct Dwarf_CU *cu)
 {
   return cu->type_offset == 0 ? IDX_debug_info : IDX_debug_types;
+}
+
+static inline bool
+is_cudie (Dwarf_Die *cudie)
+{
+  return CUDIE (cudie->cu).addr == cudie->addr;
 }
 
 /* Read up begin/end pair and increment read pointer.

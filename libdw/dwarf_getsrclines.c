@@ -1,5 +1,5 @@
 /* Return line number information of CU.
-   Copyright (C) 2004-2010, 2013, 2014 Red Hat, Inc.
+   Copyright (C) 2004-2010, 2013, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
@@ -838,10 +838,13 @@ __libdw_getcompdir (Dwarf_Die *cudie)
 int
 dwarf_getsrclines (Dwarf_Die *cudie, Dwarf_Lines **lines, size_t *nlines)
 {
-  if (unlikely (cudie == NULL
-		|| (INTUSE(dwarf_tag) (cudie) != DW_TAG_compile_unit
-		    && INTUSE(dwarf_tag) (cudie) != DW_TAG_partial_unit)))
+  if (cudie == NULL)
     return -1;
+  if (! is_cudie (cudie))
+    {
+      __libdw_seterrno (DWARF_E_NOT_CUDIE);
+      return -1;
+    }
 
   /* Get the information if it is not already known.  */
   struct Dwarf_CU *const cu = cudie->cu;

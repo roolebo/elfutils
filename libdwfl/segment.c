@@ -1,5 +1,5 @@
 /* Manage address space lookup table for libdwfl.
-   Copyright (C) 2008, 2009, 2010, 2013 Red Hat, Inc.
+   Copyright (C) 2008, 2009, 2010, 2013, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -50,7 +50,8 @@ static bool
 insert (Dwfl *dwfl, size_t i, GElf_Addr start, GElf_Addr end, int segndx)
 {
   bool need_start = (i == 0 || dwfl->lookup_addr[i - 1] != start);
-  bool need_end = (i >= dwfl->lookup_elts || dwfl->lookup_addr[i + 1] != end);
+  bool need_end = (i + 1 >= dwfl->lookup_elts
+		   || dwfl->lookup_addr[i + 1] != end);
   size_t need = need_start + need_end;
   if (need == 0)
     return false;

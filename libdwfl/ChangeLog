@@ -1,6 +1,10 @@
+2015-04-02  Mark Wielaard  <mjw@redhat.com>
+
+	* segment.c (insert): Check correct number of lookup_elts.
+
 2015-03-31  Mark Wielaard  <mjw@redhat.com>
 
-       * core-file.c (core_file_read_eagerly): Special case small images.
+	* core-file.c (core_file_read_eagerly): Special case small images.
 
 2015-01-26  Mark Wielaard  <mjw@redhat.com>
 

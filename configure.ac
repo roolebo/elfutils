@@ -79,15 +79,38 @@ m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 AC_CHECK_TOOL([READELF], [readelf])
 AC_CHECK_TOOL([NM], [nm])
 
-AC_CACHE_CHECK([for gcc with C99 support], ac_cv_c99, [dnl
+# We use -std=gnu99 but have explicit checks for some language constructs
+# and GNU extensions since some compilers claim GNU99 support, but don't
+# really support all language extensions. In particular we need
+# Mixed Declarations and Code
+# https://gcc.gnu.org/onlinedocs/gcc/Mixed-Declarations.html
+# Nested Functions
+# https://gcc.gnu.org/onlinedocs/gcc/Nested-Functions.html
+# Arrays of Variable Length
+# https://gcc.gnu.org/onlinedocs/gcc/Variable-Length.html
+AC_CACHE_CHECK([for gcc with GNU99 support], ac_cv_c99, [dnl
 old_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS -std=gnu99"
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([dnl
-int foo (int a) { for (int i = 0; i < a; ++i) if (i % 4) break; int s = a; return s;}])],
+int foo (int a)
+{
+  for (int i = 0; i < a; ++i) if (i % 4) break; int s = a; return s;
+}
+
+double bar (double a, double b)
+{
+  double square (double z) { return z * z; }
+  return square (a) + square (b);
+}
+
+void baz (int n)
+{
+  struct S { int x[[n]]; };
+}])],
 		  ac_cv_c99=yes, ac_cv_c99=no)
 CFLAGS="$old_CFLAGS"])
 AS_IF([test "x$ac_cv_c99" != xyes],
-      AC_MSG_ERROR([gcc with C99 support required]))
+      AC_MSG_ERROR([gcc with GNU99 support required]))
 
 AC_CACHE_CHECK([for __thread support], ac_cv_tls, [dnl
 # Use the same flags that we use for our DSOs, so the test is representative.

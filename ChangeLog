@@ -1,3 +1,8 @@
+2015-04-14  Mark Wielaard  <mjw@redhat.com>
+
+	* configure.ac (ac_cv_c99): Add explicit checks for all GNU99
+	extensions used.
+
 2015-03-13  Mark Wielaard  <mjw@redhat.com>
 
 	* configure.ac (ac_cv_c99): Add explicit return.

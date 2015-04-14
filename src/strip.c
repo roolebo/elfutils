@@ -1,5 +1,5 @@
 /* Discard section not used at runtime from object files.
-   Copyright (C) 2000-2012, 2014 Red Hat, Inc.
+   Copyright (C) 2000-2012, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -117,8 +117,8 @@ static int handle_ar (int fd, Elf *elf, const char *prefix, const char *fname,
 		      struct timeval tvp[2]);
 
 #define INTERNAL_ERROR(fname) \
-  error (EXIT_FAILURE, 0, gettext ("%s: INTERNAL ERROR %d (%s-%s): %s"),      \
-	 fname, __LINE__, PACKAGE_VERSION, __DATE__, elf_errmsg (-1))
+  error (EXIT_FAILURE, 0, gettext ("%s: INTERNAL ERROR %d (%s): %s"),      \
+	 fname, __LINE__, PACKAGE_VERSION, elf_errmsg (-1))
 
 
 /* Name of the output file.  */

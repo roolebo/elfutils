@@ -1,5 +1,5 @@
 /* Print information from ELF file in human-readable form.
-   Copyright (C) 2005, 2006, 2007, 2009, 2011, 2012, 2014 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007, 2009, 2011, 2012, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -101,8 +101,8 @@ static int handle_elf (Elf *elf, const char *prefix, const char *fname,
 
 
 #define INTERNAL_ERROR(fname) \
-  error (EXIT_FAILURE, 0, gettext ("%s: INTERNAL ERROR %d (%s-%s): %s"),      \
-	 fname, __LINE__, PACKAGE_VERSION, __DATE__, elf_errmsg (-1))
+  error (EXIT_FAILURE, 0, gettext ("%s: INTERNAL ERROR %d (%s): %s"),      \
+	 fname, __LINE__, PACKAGE_VERSION, elf_errmsg (-1))
 
 
 /* List of sections which should be used.  */

@@ -8011,6 +8011,12 @@ print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
   uint32_t const_off = read_4ubyte_unaligned (dbg, readp);
   printf (gettext (" constant offset: %#" PRIx32 "\n"), const_off);
 
+  if (unlikely ((size_t) (dataend - (const unsigned char *) data->d_buf)
+		< const_off))
+    goto invalid_data;
+
+  const unsigned char *const_start = data->d_buf + const_off;
+
   readp = data->d_buf + cu_off;
 
   const unsigned char *nextp = data->d_buf + tu_off;
@@ -8021,7 +8027,7 @@ print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	  cu_off, cu_nr);
 
   size_t n = 0;
-  while (readp + 16 <= dataend && n < cu_nr)
+  while (dataend - readp >= 16 && n < cu_nr)
     {
       uint64_t off = read_8ubyte_unaligned (dbg, readp);
       readp += 8;
@@ -8043,7 +8049,7 @@ print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	  tu_off, tu_nr);
 
   n = 0;
-  while (readp + 24 <= dataend && n < tu_nr)
+  while (dataend - readp >= 24 && n < tu_nr)
     {
       uint64_t off = read_8ubyte_unaligned (dbg, readp);
       readp += 8;
@@ -8069,7 +8075,7 @@ print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	  addr_off, addr_nr);
 
   n = 0;
-  while (readp + 20 <= dataend && n < addr_nr)
+  while (dataend - readp >= 20 && n < addr_nr)
     {
       uint64_t low = read_8ubyte_unaligned (dbg, readp);
       readp += 8;
@@ -8090,7 +8096,7 @@ print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
     }
 
   readp = data->d_buf + sym_off;
-  nextp = data->d_buf + const_off;
+  nextp = const_start;
   size_t sym_nr = (nextp - readp) / 8;
 
   printf (gettext ("\n Symbol table at offset %#" PRIx32
@@ -8098,7 +8104,7 @@ print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	  addr_off, sym_nr);
 
   n = 0;
-  while (readp + 8 <= dataend && n < sym_nr)
+  while (dataend - readp >= 8 && n < sym_nr)
     {
       uint32_t name = read_4ubyte_unaligned (dbg, readp);
       readp += 4;
@@ -8108,15 +8114,15 @@ print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
       if (name != 0 || vector != 0)
 	{
-	  const unsigned char *sym = data->d_buf + const_off + name;
-	  if (unlikely (sym > dataend
+	  const unsigned char *sym = const_start + name;
+	  if (unlikely ((size_t) (dataend - const_start) < name
 			|| memchr (sym, '\0', dataend - sym) == NULL))
 	    goto invalid_data;
 
 	  printf (" [%4zu] symbol: %s, CUs: ", n, sym);
 
-	  const unsigned char *readcus = data->d_buf + const_off + vector;
-	  if (unlikely (readcus + 4 > dataend))
+	  const unsigned char *readcus = const_start + vector;
+	  if (unlikely ((size_t) (dataend - const_start) < vector))
 	    goto invalid_data;
 	  uint32_t cus = read_4ubyte_unaligned (dbg, readcus);
 	  while (cus--)

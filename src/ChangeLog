@@ -1,3 +1,8 @@
+2015-03-17  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (print_gdb_index_section): Add overflow checking for
+	dataend checks.
+
 2015-03-14  Mark Wielaard  <mjw@redhat.com>
 
 	* nm.c (INTERNAL_ERROR): Remove __DATE__.

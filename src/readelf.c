@@ -8188,8 +8188,6 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
       if ((print_debug_sections & ~section_exception) != 0)
 	error (0, 0, gettext ("cannot get debug context descriptor: %s"),
 	       dwfl_errmsg (-1));
-      if ((print_debug_sections & section_exception) == 0)
-	return;
       dbg = &dummy_dbg;
     }
 

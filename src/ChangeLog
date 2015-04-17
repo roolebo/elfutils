@@ -1,5 +1,9 @@
 2015-03-17  Mark Wielaard  <mjw@redhat.com>
 
+	* readelf.c (print_debug): Don't return, but always use dummy_dbg.
+
+2015-03-17  Mark Wielaard  <mjw@redhat.com>
+
 	* readelf.c (print_gdb_index_section): Add overflow checking for
 	dataend checks.
 

@@ -1,3 +1,8 @@
+2015-04-21  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_getmacros.c (read_macros): Allocate attributes dynamically
+	when there are more than 8.
+
 2015-04-01  Petr Machata  <pmachata@redhat.com>
 
 	* libdwP.h (DWARF_E_NOT_CUDIE): New enumerator.

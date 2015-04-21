@@ -361,7 +361,22 @@ read_macros (Dwarf *dbg, int sec_index,
 	.endp = (void *) endp,
       };
 
-      Dwarf_Attribute attributes[proto->nforms];
+      Dwarf_Attribute *attributes;
+      Dwarf_Attribute *attributesp = NULL;
+      Dwarf_Attribute nattributes[8];
+      if (unlikely (proto->nforms > 8))
+	{
+	  attributesp = malloc (sizeof (Dwarf_Attribute) * proto->nforms);
+	  if (attributesp == NULL)
+	    {
+	      __libdw_seterrno (DWARF_E_NOMEM);
+	      return -1;
+	    }
+	  attributes = attributesp;
+	}
+      else
+	attributes = &nattributes[0];
+
       for (Dwarf_Word i = 0; i < proto->nforms; ++i)
 	{
 	  /* We pretend this is a DW_AT_GNU_macros attribute so that
@@ -373,8 +388,11 @@ read_macros (Dwarf *dbg, int sec_index,
 	  attributes[i].cu = &fake_cu;
 
 	  size_t len = __libdw_form_val_len (&fake_cu, proto->forms[i], readp);
-	  if (len == (size_t) -1)
-	    return -1;
+	  if (unlikely (len == (size_t) -1))
+	    {
+	      free (attributesp);
+	      return -1;
+	    }
 
 	  readp += len;
 	}
@@ -385,7 +403,11 @@ read_macros (Dwarf *dbg, int sec_index,
 	.attributes = attributes,
       };
 
-      if (callback (&macro, arg) != DWARF_CB_OK)
+      int res = callback (&macro, arg);
+      if (unlikely (attributesp != NULL))
+	free (attributesp);
+
+      if (res != DWARF_CB_OK)
 	return readp - startp;
     }
 

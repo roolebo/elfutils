@@ -8015,11 +8015,12 @@ print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 		< const_off))
     goto invalid_data;
 
-  const unsigned char *const_start = data->d_buf + const_off;
-
   readp = data->d_buf + cu_off;
 
   const unsigned char *nextp = data->d_buf + tu_off;
+  if (tu_off >= data->d_size)
+    goto invalid_data;
+
   size_t cu_nr = (nextp - readp) / 16;
 
   printf (gettext ("\n CU list at offset %#" PRIx32
@@ -8042,6 +8043,9 @@ print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
   readp = data->d_buf + tu_off;
   nextp = data->d_buf + addr_off;
+  if (addr_off >= data->d_size)
+    goto invalid_data;
+
   size_t tu_nr = (nextp - readp) / 24;
 
   printf (gettext ("\n TU list at offset %#" PRIx32
@@ -8068,6 +8072,9 @@ print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
   readp = data->d_buf + addr_off;
   nextp = data->d_buf + sym_off;
+  if (sym_off >= data->d_size)
+    goto invalid_data;
+
   size_t addr_nr = (nextp - readp) / 20;
 
   printf (gettext ("\n Address list at offset %#" PRIx32
@@ -8094,6 +8101,10 @@ print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
       free (h);
       n++;
     }
+
+  const unsigned char *const_start = data->d_buf + const_off;
+  if (const_off >= data->d_size)
+    goto invalid_data;
 
   readp = data->d_buf + sym_off;
   nextp = const_start;

@@ -5619,8 +5619,8 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	  struct cieinfo *cie = cies;
 	  while (cie != NULL)
 	    if (is_eh_frame
-		? start - (ptrdiff_t) cie_id == cie->cie_offset
-		: (ptrdiff_t) cie_id == cie->cie_offset)
+		? ((Dwarf_Off) start - cie_id) == (Dwarf_Off) cie->cie_offset
+		: cie_id == (Dwarf_Off) cie->cie_offset)
 	      break;
 	    else
 	      cie = cie->next;

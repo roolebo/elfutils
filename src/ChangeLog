@@ -1,5 +1,11 @@
 2015-03-22  Mark Wielaard  <mjw@redhat.com>
 
+	* readelf.c (print_debug_frame_section): Cast start to Dwarf_Off
+	before subtracting cie_id. And cast cie_offset to Dwarf_Off before
+	comparison.
+
+2015-03-22  Mark Wielaard  <mjw@redhat.com>
+
 	* readelf.c (print_gdb_index_section): Check all offsets used
 	against section d_size.
 

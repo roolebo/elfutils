@@ -1,3 +1,11 @@
+2015-04-22  Mark Wielaard  <mjw@redhat.com>
+
+	* memory-access.h (__libdw_max_len_leb128): Take type_len as argument.
+	(__libdw_max_len_uleb128): New function.
+	(__libdw_max_len_sleb128): Likewise.
+	(__libdw_get_uleb128): Use __libdw_max_len_uleb128.
+	(__libdw_get_sleb128): Use __libdw_max_len_sleb128.
+
 2015-04-21  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_getmacros.c (read_macros): Allocate attributes dynamically

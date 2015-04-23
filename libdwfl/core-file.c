@@ -588,7 +588,7 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const char *executable)
 INTDEF (dwfl_core_file_report)
 NEW_VERSION (dwfl_core_file_report, ELFUTILS_0.158)
 
-#ifdef SHARED
+#ifdef SYMBOL_VERSIONING
 int _compat_without_executable_dwfl_core_file_report (Dwfl *dwfl, Elf *elf);
 COMPAT_VERSION_NEWPROTO (dwfl_core_file_report, ELFUTILS_0.146,
 			 without_executable)

@@ -1,3 +1,12 @@
+2015-04-23  Max Filippov  <jcmvbkbc@gmail.com>
+
+	* core-file.c (_compat_without_executable_dwfl_core_file_report):
+	Guard with SYMBOL_VERSIONING.
+	* dwfl_module_build_id.c (_compat_vaddr_at_end_dwfl_module_build_id):
+	Likewise.
+	* dwfl_report_elf.c (_compat_without_add_p_vaddr_dwfl_report_elf):
+	Likewise.
+
 2015-04-02  Mark Wielaard  <mjw@redhat.com>
 
 	* segment.c (insert): Check correct number of lookup_elts.

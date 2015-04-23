@@ -101,7 +101,7 @@ dwfl_module_build_id (Dwfl_Module *mod,
 INTDEF (dwfl_module_build_id)
 NEW_VERSION (dwfl_module_build_id, ELFUTILS_0.138)
 
-#ifdef SHARED
+#ifdef SYMBOL_VERSIONING
 COMPAT_VERSION (dwfl_module_build_id, ELFUTILS_0.130, vaddr_at_end)
 
 int

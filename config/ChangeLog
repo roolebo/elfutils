@@ -1,3 +1,7 @@
+2015-04-23  Max Filippov  <jcmvbkbc@gmail.com>
+
+	* eu.am (DEFS.os): New variable.
+
 2015-03-18  Petr Machata  <pmachata@redhat.com>
 
 	* known-dwarf.awk (comment): Drop all uses of this variable.

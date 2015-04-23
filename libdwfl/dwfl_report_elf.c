@@ -321,7 +321,7 @@ dwfl_report_elf (Dwfl *dwfl, const char *name, const char *file_name, int fd,
 INTDEF (dwfl_report_elf)
 NEW_VERSION (dwfl_report_elf, ELFUTILS_0.156)
 
-#ifdef SHARED
+#ifdef SYMBOL_VERSIONING
 Dwfl_Module *
   _compat_without_add_p_vaddr_dwfl_report_elf (Dwfl *dwfl, const char *name,
 					       const char *file_name, int fd,

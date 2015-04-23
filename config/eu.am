@@ -38,16 +38,22 @@ AM_CFLAGS = -std=gnu99 -Wall -Wshadow -Wformat=2 \
 
 COMPILE.os = $(filter-out -fprofile-arcs -ftest-coverage, $(COMPILE))
 
+DEFS.os = -DPIC -DSHARED
+if SYMBOL_VERSIONING
+DEFS.os += -DSYMBOL_VERSIONING
+else
+endif
+
 %.os: %.c %.o
 if AMDEP
-	if $(COMPILE.os) -c -o $@ -fpic -DPIC -DSHARED -MT $@ -MD -MP \
+	if $(COMPILE.os) -c -o $@ -fpic $(DEFS.os) -MT $@ -MD -MP \
 	  -MF "$(DEPDIR)/$*.Tpo" `test -f '$<' || echo '$(srcdir)/'`$<; \
 	then cat "$(DEPDIR)/$*.Tpo" >> "$(DEPDIR)/$*.Po"; \
 	     rm -f "$(DEPDIR)/$*.Tpo"; \
 	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
 	fi
 else
-	$(COMPILE.os) -c -o $@ -fpic -DPIC -DSHARED $<
+	$(COMPILE.os) -c -o $@ -fpic $(DEFS.os) $<
 endif
 
 CLEANFILES = *.gcno *.gcda

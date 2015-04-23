@@ -1,3 +1,7 @@
+2015-04-23  Max Filippov  <jcmvbkbc@gmail.com>
+
+	* configure.ac: Add --disable-symbol-versioning.
+
 2015-04-14  Mark Wielaard  <mjw@redhat.com>
 
 	* configure.ac (ac_cv_c99): Add explicit checks for all GNU99

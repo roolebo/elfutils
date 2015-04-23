@@ -241,6 +241,13 @@ AS_HELP_STRING([--disable-textrelcheck],
                [Disable textrelcheck being a fatal error]))
 AM_CONDITIONAL(FATAL_TEXTREL, [test "x$enable_textrelcheck" != "xno"])
 
+AC_ARG_ENABLE([symbol-versioning],
+AS_HELP_STRING([--disable-symbol-versioning],
+               [Disable symbol versioning in shared objects]))
+AM_CONDITIONAL(SYMBOL_VERSIONING, [test "x$enable_symbol_versioning" != "xno"])
+AS_IF([test "x$enable_symbol_versioning" = "xno"],
+      [AC_MSG_WARN([Disabling symbol versioning breaks ABI compatibility.])])
+
 dnl The directories with content.
 
 dnl Documentation.

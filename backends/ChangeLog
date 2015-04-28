@@ -1,3 +1,8 @@
+2015-04-28  Mark Wielaard  <mjw@redhat.com>
+
+	* aarch64_reloc.def: Drop "64" from TLS_DTPMOD64, TLS_DTPREL64 and
+	TLS_TPREL64.
+
 2015-04-01  H.J. Lu  <hjl.tools@gmail.com>
 
 	* Makefile.am (x86_64_SRCS): Add x32_corenote.c.

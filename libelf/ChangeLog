@@ -1,3 +1,7 @@
+2015-03-28  Mark Wielaard  <mjw@redhat.com>
+
+	* elf.h: Update from glibc.
+
 2015-03-23  Mark Wielaard  <mjw@redhat.com>
 
 	* elf32_updatenull.c (updatenull_wrlock): Don't extend size with

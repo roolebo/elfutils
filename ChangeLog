@@ -1,5 +1,9 @@
 2015-05-01  Mark Wielaard  <mjw@redhat.com>
 
+	* configure.ac (DEMANGLE): Explicitly set enable_demangler.
+
+2015-05-01  Mark Wielaard  <mjw@redhat.com>
+
 	* configure.ac (debugpred): Use and set use_debugpred_val.
 	(textrelcheck): Explicitly set enable_textrelcheck to yes or no.
 	(symbol-versioning): Likewise for enable_symbol_versioning.

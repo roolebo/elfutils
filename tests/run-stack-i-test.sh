@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2014 Red Hat, Inc.
+# Copyright (C) 2014, 2015 Red Hat, Inc.
 # This file is part of elfutils.
 #
 # This file is free software; you can redistribute it and/or modify
@@ -31,25 +31,26 @@ fi
 
 # Compare with run-stack-d-test.sh to see the output without --inlines.
 # Only two call frames are visible (there is a jump from main to fu or
-# fubar).
+# fubar). Explicitly use --raw so demangler support being configured in
+# doesn't change the results.
 
 # With --inlines we get all inlined calls. Note they share the same
 # address.
-testrun_compare ${abs_top_builddir}/src/stack -n 6 -i -e testfiledwarfinlines --core testfiledwarfinlines.core<<EOF
+testrun_compare ${abs_top_builddir}/src/stack -r -n 6 -i -e testfiledwarfinlines --core testfiledwarfinlines.core<<EOF
 PID 13654 - core
 TID 13654:
 #0  0x00000000004006c8 fubar
 #1  0x00000000004006c8 foobar
 #2  0x00000000004006c8 bar
 #3  0x00000000004006c8 foo
-#4  0x00000000004006c8 fu(int)
+#4  0x00000000004006c8 _Z2fui
 #5  0x00000000004004c5 main
 $STACKCMD: tid 13654: shown max number of frames (6, use -n 0 for unlimited)
 EOF
 
 # With --source we can also see where in the source the inlined frames
 # where originally called from.
-testrun_compare ${abs_top_builddir}/src/stack -n 6 -s -i -e testfiledwarfinlines --core testfiledwarfinlines.core<<EOF
+testrun_compare ${abs_top_builddir}/src/stack -r -n 6 -s -i -e testfiledwarfinlines --core testfiledwarfinlines.core<<EOF
 PID 13654 - core
 TID 13654:
 #0  0x00000000004006c8 fubar
@@ -60,7 +61,7 @@ TID 13654:
     /home/mark/src/tests/dwarfinlines.cpp:21
 #3  0x00000000004006c8 foo
     /home/mark/src/tests/dwarfinlines.cpp:27
-#4  0x00000000004006c8 fu(int)
+#4  0x00000000004006c8 _Z2fui
     /home/mark/src/tests/dwarfinlines.cpp:33
 #5  0x00000000004004c5 main
     /home/mark/src/tests/dwarfinlines.cpp:39

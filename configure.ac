@@ -235,6 +235,8 @@ AC_SUBST([zip_LIBS])
 AC_CHECK_LIB([stdc++], [__cxa_demangle], [dnl
 AC_DEFINE([USE_DEMANGLE], [1], [Defined if demangling is enabled])])
 AM_CONDITIONAL(DEMANGLE, test "$ac_cv_lib_stdcpp___cxa_demangle" = yes)
+AS_IF([test "$ac_cv_lib_stdcpp___cxa_demangle" = yes]
+      [enable_demangler=yes],[enable_demangler=no])
 
 AC_ARG_ENABLE([textrelcheck],
 AS_HELP_STRING([--disable-textrelcheck],
@@ -378,7 +380,7 @@ AC_MSG_NOTICE([
     gzip support                       : ${with_zlib}
     bzip2 support                      : ${with_bzlib}
     lzma/xz support                    : ${with_lzma}
-    libstdc++ demangle support         : ${ac_cv_lib_stdcpp___cxa_demangle}
+    libstdc++ demangle support         : ${enable_demangler}
     File textrel check                 : ${enable_textrelcheck}
     Symbol versioning                  : ${enable_symbol_versioning}
 

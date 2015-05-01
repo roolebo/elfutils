@@ -22,7 +22,7 @@ AC_INIT([elfutils],[0.161],[https://bugzilla.redhat.com/],[elfutils])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_FILES([config/Makefile])
 
-AC_COPYRIGHT([Copyright (C) 1996-2014 Red Hat, Inc.])
+AC_COPYRIGHT([Copyright (C) 1996-2015 Red Hat, Inc.])
 AC_PREREQ(2.63)			dnl Minimum Autoconf version required.
 
 dnl We use GNU make extensions; automake 1.10 defaults to -Wportability.
@@ -170,10 +170,10 @@ AC_ARG_ENABLE([debugpred],
 AS_HELP_STRING([--enable-debugpred],[build binaries with support to debug branch prediction]),
 [use_debugpred=$enableval], [use_debugpred=no])
 case $use_debugpred in
- yes) use_debugpred=1 ;;
- *)   use_debugpred=0 ;;
+ yes) use_debugpred_val=1 ;;
+ *)   use_debugpred_val=0 ;;
 esac
-AC_SUBST([DEBUGPRED], $use_debugpred)
+AC_SUBST([DEBUGPRED], $use_debugpred_val)
 
 dnl Enable gprof suport.
 AC_ARG_ENABLE([gprof],
@@ -240,13 +240,16 @@ AC_ARG_ENABLE([textrelcheck],
 AS_HELP_STRING([--disable-textrelcheck],
                [Disable textrelcheck being a fatal error]))
 AM_CONDITIONAL(FATAL_TEXTREL, [test "x$enable_textrelcheck" != "xno"])
+AS_IF([test "x$enable_textrelcheck" != "xno"],
+      [enable_textrelcheck=yes],[enable_textrelcheck=no])
 
 AC_ARG_ENABLE([symbol-versioning],
 AS_HELP_STRING([--disable-symbol-versioning],
                [Disable symbol versioning in shared objects]))
 AM_CONDITIONAL(SYMBOL_VERSIONING, [test "x$enable_symbol_versioning" != "xno"])
 AS_IF([test "x$enable_symbol_versioning" = "xno"],
-      [AC_MSG_WARN([Disabling symbol versioning breaks ABI compatibility.])])
+      [AC_MSG_WARN([Disabling symbol versioning breaks ABI compatibility.])
+       enable_symbol_versioning=no],[enable_symbol_versioning=yes])
 
 dnl The directories with content.
 
@@ -358,3 +361,39 @@ CC_BIARCH="$CC $utrace_biarch"
 AC_SUBST([CC_BIARCH])
 
 AC_OUTPUT
+
+AC_MSG_NOTICE([
+=====================================================================
+        elfutils: ${PACKAGE_VERSION} (eu_version: ${eu_version})
+=====================================================================
+
+    Prefix                             : ${prefix}
+    Program prefix ("eu-" recommended) : ${program_prefix}
+    Source code location               : ${srcdir}
+    Maintainer mode                    : ${enable_maintainer_mode}
+    libebl modules subdirectory        : ${LIBEBL_SUBDIR}
+    build arch                         : ${ac_cv_build}
+
+  RECOMMENDED FEATURES (should all be yes)
+    gzip support                       : ${with_zlib}
+    bzip2 support                      : ${with_bzlib}
+    lzma/xz support                    : ${with_lzma}
+    libstdc++ demangle support         : ${ac_cv_lib_stdcpp___cxa_demangle}
+    File textrel check                 : ${enable_textrelcheck}
+    Symbol versioning                  : ${enable_symbol_versioning}
+
+  NOT RECOMMENDED FEATURES (should all be no)
+    Experimental thread safety         : ${use_locks}
+
+  OTHER FEATURES
+    Deterministic archives by default  : ${default_ar_deterministic}
+    Native language support            : ${USE_NLS}
+
+  EXTRA TEST FEATURES (used with make check)
+    debug branch prediction            : ${use_debugpred}
+    gprof support                      : ${use_gprof}
+    gcov support                       : ${use_gcov}
+    run all tests under valgrind       : ${use_valgrind}
+    use rpath in tests                 : ${tests_use_rpath}
+    test biarch                        : ${utrace_cv_cc_biarch}
+])

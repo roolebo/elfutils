@@ -14,5 +14,7 @@ fi
 AM_CONDITIONAL([$2], test $with_[$1] = yes)
 if test $with_[$1] = yes; then
   AC_DEFINE(USE_[$2])
+else
+  with_[$1]=no
 fi
 AH_TEMPLATE(USE_[$2], [Support $5 decompression via -l$3.])])

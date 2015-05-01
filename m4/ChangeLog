@@ -1,3 +1,7 @@
+2015-05-01  Mark Wielaard  <mjw@redhat.com>
+
+	* zip.m4: Explicitly set with_ to no, if not yes.
+
 2014-07-14  Mark Wielaard  <mjw@redhat.com>
 
 	* biarch.m4 (utrace_BIARCH): Set biarch-no for cross-compile using

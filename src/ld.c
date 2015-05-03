@@ -26,7 +26,6 @@
 #include <libelf.h>
 #include <libintl.h>
 #include <locale.h>
-#include <mcheck.h>
 #include <stdio.h>
 #include <stdio_ext.h>
 #include <stdlib.h>
@@ -276,11 +275,6 @@ main (int argc, char *argv[])
 {
   int remaining;
   int err;
-
-#ifndef NDEBUG
-  /* Enable memory debugging.  */
-  mtrace ();
-#endif
 
   /* Sanity check.  We always want to use the LFS functionality.  */
   if (sizeof (off_t) != sizeof (off64_t))

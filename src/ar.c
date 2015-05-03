@@ -28,7 +28,6 @@
 #include <libintl.h>
 #include <limits.h>
 #include <locale.h>
-#include <mcheck.h>
 #include <search.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -141,9 +140,6 @@ static enum { ipos_none, ipos_before, ipos_after } ipos;
 int
 main (int argc, char *argv[])
 {
-  /* Make memory leak detection possible.  */
-  mtrace ();
-
   /* We use no threads here which can interfere with handling a stream.  */
   (void) __fsetlocking (stdin, FSETLOCKING_BYCALLER);
   (void) __fsetlocking (stdout, FSETLOCKING_BYCALLER);

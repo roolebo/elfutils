@@ -30,7 +30,6 @@
 #include <dwarf.h>
 #include <libintl.h>
 #include <locale.h>
-#include <mcheck.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdio_ext.h>
@@ -130,9 +129,6 @@ main (int argc, char *argv[])
 {
   int remaining;
   int result = 0;
-
-  /* Make memory leak detection possible.  */
-  mtrace ();
 
   /* We use no threads here which can interfere with handling a stream.  */
   (void) __fsetlocking (stdout, FSETLOCKING_BYCALLER);

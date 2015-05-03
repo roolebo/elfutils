@@ -36,7 +36,6 @@
 #include <fnmatch.h>
 #include <libintl.h>
 #include <locale.h>
-#include <mcheck.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdio_ext.h>
@@ -2252,9 +2251,6 @@ handle_implicit_modules (const struct arg_info *info)
 int
 main (int argc, char **argv)
 {
-  /* Make memory leak detection possible.  */
-  mtrace ();
-
   /* We use no threads here which can interfere with handling a stream.  */
   __fsetlocking (stdin, FSETLOCKING_BYCALLER);
   __fsetlocking (stdout, FSETLOCKING_BYCALLER);

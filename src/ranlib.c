@@ -29,7 +29,6 @@
 #include <gelf.h>
 #include <libintl.h>
 #include <locale.h>
-#include <mcheck.h>
 #include <obstack.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -78,9 +77,6 @@ static const struct argp argp =
 int
 main (int argc, char *argv[])
 {
-  /* Make memory leak detection possible.  */
-  mtrace ();
-
   /* We use no threads here which can interfere with handling a stream.  */
   (void) __fsetlocking (stdin, FSETLOCKING_BYCALLER);
   (void) __fsetlocking (stdout, FSETLOCKING_BYCALLER);

@@ -1,3 +1,15 @@
+2015-05-04  Max Filippov  <jcmvbkbc@gmail.com>
+
+	* addr2line.c (main): Drop mtrace() call and #include <mcheck.h>.
+	* ar.c: Likewise.
+	* ld.c: Likewise.
+	* nm.c: Likewise.
+	* objdump.c: Likewise.
+	* ranlib.c: Likewise.
+	* size.c: Likewise.
+	* strip.c: Likewise.
+	* unstrip.c: Likewise.
+
 2015-05-04  Anthony G. Basile  <blueness@gentoo.org>
 
 	* Makefile.am (readelf_LDADD, nm_LDADD, size_LDADD, strip_LDADD)

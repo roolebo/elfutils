@@ -1,3 +1,10 @@
+2015-05-04  Anthony G. Basile  <blueness@gentoo.org>
+
+	* Makefile.am (readelf_LDADD, nm_LDADD, size_LDADD, strip_LDADD)
+	(ld_LDADD, elflint_LDADD, findtextrel_LDADD, addr2line_LDADD)
+	(elfcmp_LDADD, objdump_LDADD, ranlib_LDADD, strings_LDADD)
+	(ar_LDADD, unstrip_LDADD, stack_LDADD): Append $(argp_LDADD).
+
 2015-03-22  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (print_debug_frame_section): Cast start to Dwarf_Off

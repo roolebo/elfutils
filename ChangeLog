@@ -1,3 +1,8 @@
+2015-05-04  Anthony G. Basile  <blueness@gentoo.org>
+
+	* configure.ac (argp_LDADD): Check if libc has argp and set
+	argp_LDADD accordingly.
+
 2015-05-03  Max Filippov  <jcmvbkbc@gmail.com>
 
 	* configure.ac (DEMANGLE): Fix enable_demangler setting.

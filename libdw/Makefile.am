@@ -112,7 +112,7 @@ libdw.so$(EXEEXT): $(srcdir)/libdw.map libdw_pic.a ../libdwelf/libdwelf_pic.a \
 		-Wl,--enable-new-dtags,-rpath,$(pkglibdir) \
 		-Wl,--version-script,$<,--no-undefined \
 		-Wl,--whole-archive $(filter-out $<,$^) -Wl,--no-whole-archive\
-		-ldl $(zip_LIBS)
+		-ldl $(argp_LDADD) $(zip_LIBS)
 	@$(textrel_check)
 	ln -fs $@ $@.$(VERSION)
 

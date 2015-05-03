@@ -1,3 +1,11 @@
+2015-05-04  Anthony G. Basile  <blueness@gentoo.org>
+
+	* Makefile.am (line2addr_LDADD, addrscopes_LDADD, funcscopes_LDADD)
+	(funcretval_LDADD, allregs_LDADD, find_prologues_LDADD)
+	(dwflmodtest_LDADD, dwfl_addr_sect_LDADD, addrcfi_LDADD)
+	(low_high_pc_LDADD, dwflsyms_LDADD, dwfllines_LDADD, varlocs_LDADD)
+	(backtrace_LDADD, aggregate_size_LDADD): Append $(argp_LDADD).
+
 2015-05-01  Mark Wielaard  <mjw@redhat.com>
 
 	* run-stack-d-test.sh: Use --raw and mangled output.

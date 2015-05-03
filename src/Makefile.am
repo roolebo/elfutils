@@ -89,27 +89,27 @@ endif
 # XXX While the file is not finished, don't warn about this
 ldgeneric_no_Wunused = yes
 
-readelf_LDADD = $(libdw) $(libebl) $(libelf) $(libeu) -ldl
-nm_LDADD = $(libdw) $(libebl) $(libelf) $(libeu) -ldl \
+readelf_LDADD = $(libdw) $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl
+nm_LDADD = $(libdw) $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl \
 	   $(demanglelib)
-size_LDADD = $(libelf) $(libeu)
-strip_LDADD = $(libebl) $(libelf) $(libeu) -ldl
-ld_LDADD = $(libebl) $(libelf) $(libeu) -ldl
+size_LDADD = $(libelf) $(libeu) $(argp_LDADD)
+strip_LDADD = $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl
+ld_LDADD = $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl
 if NATIVE_LD
 # -ldl is always needed for libebl.
 ld_LDADD += libld_elf.a
 endif
 ld_LDFLAGS = -rdynamic
-elflint_LDADD  = $(libebl) $(libelf) $(libeu) -ldl
-findtextrel_LDADD = $(libdw) $(libelf)
-addr2line_LDADD = $(libdw) $(libelf)
-elfcmp_LDADD = $(libebl) $(libelf) -ldl
-objdump_LDADD  = $(libasm) $(libebl) $(libelf) $(libeu) -ldl
-ranlib_LDADD = libar.a $(libelf) $(libeu)
-strings_LDADD = $(libelf) $(libeu)
-ar_LDADD = libar.a $(libelf) $(libeu)
-unstrip_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) -ldl
-stack_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) -ldl $(demanglelib)
+elflint_LDADD  = $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl
+findtextrel_LDADD = $(libdw) $(libelf) $(argp_LDADD)
+addr2line_LDADD = $(libdw) $(libelf) $(argp_LDADD)
+elfcmp_LDADD = $(libebl) $(libelf) $(argp_LDADD) -ldl
+objdump_LDADD  = $(libasm) $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl
+ranlib_LDADD = libar.a $(libelf) $(libeu) $(argp_LDADD)
+strings_LDADD = $(libelf) $(libeu) $(argp_LDADD)
+ar_LDADD = libar.a $(libelf) $(libeu) $(argp_LDADD)
+unstrip_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD) -ldl
+stack_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD) -ldl $(demanglelib)
 
 ldlex.o: ldscript.c
 ldlex_no_Werror = yes

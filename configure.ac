@@ -253,6 +253,31 @@ AS_IF([test "x$enable_symbol_versioning" = "xno"],
       [AC_MSG_WARN([Disabling symbol versioning breaks ABI compatibility.])
        enable_symbol_versioning=no],[enable_symbol_versioning=yes])
 
+dnl Check if we have argp available from our libc
+AC_LINK_IFELSE(
+	[AC_LANG_PROGRAM(
+		[#include <argp.h>],
+		[int argc=1; char *argv[]={"test"}; argp_parse(0,argc,argv,0,0,0); return 0;]
+		)],
+	[libc_has_argp="true"],
+	[libc_has_argp="false"]
+)
+
+dnl If our libc doesn't provide argp, then test for libargp
+if test "$libc_has_argp" = "false" ; then
+	AC_MSG_WARN("libc does not have argp")
+	AC_CHECK_LIB([argp], [argp_parse], [have_argp="true"], [have_argp="false"])
+
+	if test "$have_argp" = "false"; then
+		AC_MSG_ERROR("no libargp found")
+	else
+		argp_LDADD="-largp"
+	fi
+else
+	argp_LDADD=""
+fi
+AC_SUBST([argp_LDADD])
+
 dnl The directories with content.
 
 dnl Documentation.

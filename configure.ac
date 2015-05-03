@@ -234,8 +234,8 @@ AC_SUBST([zip_LIBS])
 
 AC_CHECK_LIB([stdc++], [__cxa_demangle], [dnl
 AC_DEFINE([USE_DEMANGLE], [1], [Defined if demangling is enabled])])
-AM_CONDITIONAL(DEMANGLE, test "$ac_cv_lib_stdcpp___cxa_demangle" = yes)
-AS_IF([test "$ac_cv_lib_stdcpp___cxa_demangle" = yes]
+AM_CONDITIONAL(DEMANGLE, test "x$ac_cv_lib_stdcpp___cxa_demangle" = "xyes")
+AS_IF([test "x$ac_cv_lib_stdcpp___cxa_demangle" = "xyes"],
       [enable_demangler=yes],[enable_demangler=no])
 
 AC_ARG_ENABLE([textrelcheck],

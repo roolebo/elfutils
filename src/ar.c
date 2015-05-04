@@ -679,13 +679,13 @@ do_oper_extract (int oper, const char *arfname, char **argv, int argc,
 
 	      if (preserve_dates)
 		{
-		  struct timeval tv[2];
+		  struct timespec tv[2];
 		  tv[0].tv_sec = arhdr->ar_date;
-		  tv[0].tv_usec = 0;
+		  tv[0].tv_nsec = 0;
 		  tv[1].tv_sec = arhdr->ar_date;
-		  tv[1].tv_usec = 0;
+		  tv[1].tv_nsec = 0;
 
-		  if (unlikely (futimes (xfd, tv) != 0))
+		  if (unlikely (futimens (xfd, tv) != 0))
 		    {
 		      error (0, errno,
 			     gettext ("cannot change modification time of %s"),

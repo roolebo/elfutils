@@ -109,11 +109,11 @@ static int process_file (const char *fname);
 
 /* Handle one ELF file.  */
 static int handle_elf (int fd, Elf *elf, const char *prefix,
-		       const char *fname, mode_t mode, struct timeval tvp[2]);
+		       const char *fname, mode_t mode, struct timespec tvp[2]);
 
 /* Handle all files contained in the archive.  */
 static int handle_ar (int fd, Elf *elf, const char *prefix, const char *fname,
-		      struct timeval tvp[2]);
+		      struct timespec tvp[2]);
 
 #define INTERNAL_ERROR(fname) \
   error (EXIT_FAILURE, 0, gettext ("%s: INTERNAL ERROR %d (%s): %s"),      \
@@ -302,7 +302,7 @@ process_file (const char *fname)
      now.  We cannot use fstat() after opening the file since the open
      would change the access time.  */
   struct stat64 pre_st;
-  struct timeval tv[2];
+  struct timespec tv[2];
  again:
   if (preserve_dates)
     {
@@ -314,8 +314,8 @@ process_file (const char *fname)
 
       /* If we have to preserve the timestamp, we need it in the
 	 format utimes() understands.  */
-      TIMESPEC_TO_TIMEVAL (&tv[0], &pre_st.st_atim);
-      TIMESPEC_TO_TIMEVAL (&tv[1], &pre_st.st_mtim);
+      tv[0] = pre_st.st_atim;
+      tv[1] = pre_st.st_mtim;
     }
 
   /* Open the file.  */
@@ -388,7 +388,7 @@ process_file (const char *fname)
 
 static int
 handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
-	    mode_t mode, struct timeval tvp[2])
+	    mode_t mode, struct timespec tvp[2])
 {
   size_t prefix_len = prefix == NULL ? 0 : strlen (prefix);
   size_t fname_len = strlen (fname) + 1;
@@ -2087,7 +2087,7 @@ while computing checksum for debug information"));
   /* If requested, preserve the timestamp.  */
   if (tvp != NULL)
     {
-      if (futimes (fd, tvp) != 0)
+      if (futimens (fd, tvp) != 0)
 	{
 	  error (0, errno, gettext ("\
 cannot set access and modification date of '%s'"),
@@ -2106,7 +2106,7 @@ cannot set access and modification date of '%s'"),
 
 static int
 handle_ar (int fd, Elf *elf, const char *prefix, const char *fname,
-	   struct timeval tvp[2])
+	   struct timespec tvp[2])
 {
   size_t prefix_len = prefix == NULL ? 0 : strlen (prefix);
   size_t fname_len = strlen (fname) + 1;
@@ -2144,7 +2144,7 @@ handle_ar (int fd, Elf *elf, const char *prefix, const char *fname,
 
   if (tvp != NULL)
     {
-      if (unlikely (futimes (fd, tvp) != 0))
+      if (unlikely (futimens (fd, tvp) != 0))
 	{
 	  error (0, errno, gettext ("\
 cannot set access and modification date of '%s'"), fname);

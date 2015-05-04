@@ -1,5 +1,13 @@
 2015-05-04  Max Filippov  <jcmvbkbc@gmail.com>
 
+	* ar.c (do_oper_extract): Replace struct timeval with struct timespec
+	and futimes with futimens.
+	* strip.c (process_file): Replace struct timeval with struct timespec.
+	(handle_elf, handle_ar): Replace struct timeval with struct timespec
+	in prototype. Replace futimes with futimens.
+
+2015-05-04  Max Filippov  <jcmvbkbc@gmail.com>
+
 	* addr2line.c (main): Drop mtrace() call and #include <mcheck.h>.
 	* ar.c: Likewise.
 	* ld.c: Likewise.

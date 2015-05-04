@@ -143,7 +143,7 @@ main (int argc __attribute__ ((unused)), char **argv)
       abort ();
     case 0:;
       long l = ptrace (PTRACE_TRACEME, 0, NULL, NULL);
-      assert_perror (errno);
+      assert (errno == 0);
       assert (l == 0);
       cleanup_13_main ();
       abort ();
@@ -154,7 +154,7 @@ main (int argc __attribute__ ((unused)), char **argv)
   errno = 0;
   int status;
   pid_t got = waitpid (pid, &status, 0);
-  assert_perror (errno);
+  assert (errno == 0);
   assert (got == pid);
   assert (WIFSTOPPED (status));
   assert (WSTOPSIG (status) == SIGABRT);

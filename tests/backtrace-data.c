@@ -74,7 +74,7 @@ memory_read (Dwfl *dwfl, Dwarf_Addr addr, Dwarf_Word *result,
 
   errno = 0;
   long l = ptrace (PTRACE_PEEKDATA, child, (void *) (uintptr_t) addr, NULL);
-  assert_perror (errno);
+  assert (errno == 0);
   *result = l;
 
   /* We could also return false for failed ptrace.  */
@@ -89,10 +89,10 @@ maps_lookup (pid_t pid, Dwarf_Addr addr, GElf_Addr *basep)
 {
   char *fname;
   int i = asprintf (&fname, "/proc/%ld/maps", (long) pid);
-  assert_perror (errno);
+  assert (errno == 0);
   assert (i > 0);
   FILE *f = fopen (fname, "r");
-  assert_perror (errno);
+  assert (errno == 0);
   assert (f);
   free (fname);
   for (;;)
@@ -100,7 +100,7 @@ maps_lookup (pid_t pid, Dwarf_Addr addr, GElf_Addr *basep)
       // 37e3c22000-37e3c23000 rw-p 00022000 00:11 49532 /lib64/ld-2.14.90.so */
       unsigned long start, end, offset;
       i = fscanf (f, "%lx-%lx %*s %lx %*x:%*x %*x", &start, &end, &offset);
-      assert_perror (errno);
+      assert (errno == 0);
       assert (i == 3);
       char *filename = strdup ("");
       assert (filename);
@@ -121,7 +121,7 @@ maps_lookup (pid_t pid, Dwarf_Addr addr, GElf_Addr *basep)
       if (start <= addr && addr < end)
 	{
 	  i = fclose (f);
-	  assert_perror (errno);
+	  assert (errno == 0);
 	  assert (i == 0);
 
 	  *basep = start - offset;
@@ -171,7 +171,7 @@ set_initial_registers (Dwfl_Thread *thread,
 
   struct user_regs_struct user_regs;
   long l = ptrace (PTRACE_GETREGS, child, NULL, &user_regs);
-  assert_perror (errno);
+  assert (errno == 0);
   assert (l == 0);
 
   Dwarf_Word dwarf_regs[17];
@@ -271,11 +271,11 @@ main (int argc __attribute__ ((unused)), char **argv __attribute__ ((unused)))
   switch (child)
   {
     case -1:
-      assert_perror (errno);
+      assert (errno == 0);
       assert (0);
     case 0:;
       long l = ptrace (PTRACE_TRACEME, 0, NULL, NULL);
-      assert_perror (errno);
+      assert (errno == 0);
       assert (l == 0);
       raise (SIGUSR1);
       return 0;
@@ -285,7 +285,7 @@ main (int argc __attribute__ ((unused)), char **argv __attribute__ ((unused)))
 
   int status;
   pid_t pid = waitpid (child, &status, 0);
-  assert_perror (errno);
+  assert (errno == 0);
   assert (pid == child);
   assert (WIFSTOPPED (status));
   assert (WSTOPSIG (status) == SIGUSR1);
@@ -303,7 +303,7 @@ main (int argc __attribute__ ((unused)), char **argv __attribute__ ((unused)))
 
   struct user_regs_struct user_regs;
   long l = ptrace (PTRACE_GETREGS, child, NULL, &user_regs);
-  assert_perror (errno);
+  assert (errno == 0);
   assert (l == 0);
   report_module (dwfl, child, user_regs.rip);
 
@@ -317,7 +317,7 @@ main (int argc __attribute__ ((unused)), char **argv __attribute__ ((unused)))
   dwfl_end (dwfl);
   kill (child, SIGKILL);
   pid = waitpid (child, &status, 0);
-  assert_perror (errno);
+  assert (errno == 0);
   assert (pid == child);
   assert (WIFSIGNALED (status));
   assert (WTERMSIG (status) == SIGKILL);

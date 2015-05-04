@@ -154,7 +154,7 @@ stdarg (int f UNUSED, ...)
   if (ptraceme)
     {
       long l = ptrace (PTRACE_TRACEME, 0, NULL, NULL);
-      assert_perror (errno);
+      assert (errno == 0);
       assert (l == 0);
     }
 #ifdef __x86_64__
@@ -226,7 +226,7 @@ main (int argc UNUSED, char **argv)
     {
       errno = 0;
       long l = ptrace (PTRACE_TRACEME, 0, NULL, NULL);
-      assert_perror (errno);
+      assert (errno == 0);
       assert (l == 0);
     }
   if (gencore)

@@ -263,16 +263,16 @@ prepare_thread (pid_t pid2 __attribute__ ((unused)),
   struct user_regs_struct user_regs;
   errno = 0;
   l = ptrace (PTRACE_GETREGS, pid2, 0, (intptr_t) &user_regs);
-  assert_perror (errno);
+  assert (errno == 0);
   assert (l == 0);
   user_regs.rip = (intptr_t) jmp;
   l = ptrace (PTRACE_SETREGS, pid2, 0, (intptr_t) &user_regs);
-  assert_perror (errno);
+  assert (errno == 0);
   assert (l == 0);
   l = ptrace (PTRACE_CONT, pid2, NULL, (void *) (intptr_t) SIGUSR2);
   int status;
   pid_t got = waitpid (pid2, &status, __WALL);
-  assert_perror (errno);
+  assert (errno == 0);
   assert (got == pid2);
   assert (WIFSTOPPED (status));
   assert (WSTOPSIG (status) == SIGUSR1);
@@ -340,7 +340,7 @@ exec_dump (const char *exec)
   errno = 0;
   int status;
   pid_t got = waitpid (pid, &status, 0);
-  assert_perror (errno);
+  assert (errno == 0);
   assert (got == pid);
   assert (WIFSTOPPED (status));
   // Main thread will signal SIGUSR2.  Other thread will signal SIGUSR1.
@@ -350,7 +350,7 @@ exec_dump (const char *exec)
      __WCLONE, probably despite pthread_create already had to be called the new
      task is not yet alive enough for waitpid.  */
   pid_t pid2 = waitpid (-1, &status, __WALL);
-  assert_perror (errno);
+  assert (errno == 0);
   assert (pid2 > 0);
   assert (pid2 != pid);
   assert (WIFSTOPPED (status));

@@ -1,3 +1,11 @@
+2015-05-04  Max Filippov  <jcmvbkbc@gmail.com>
+
+	* backtrace-child.c (stdarg, main): Replace assert_perror with assert.
+	* backtrace-data.c (memory_read, maps_lookup, set_initial_registers)
+	(main): Likewise.
+	* backtrace-dwarf.c (main): Likewise.
+	* backtrace.c (prepare_thread, exec_dump): Likewise.
+
 2015-05-04  Anthony G. Basile  <blueness@gentoo.org>
 
 	* Makefile.am (line2addr_LDADD, addrscopes_LDADD, funcscopes_LDADD)

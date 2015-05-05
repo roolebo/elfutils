@@ -110,15 +110,24 @@ dwarf_getaranges (dbg, aranges, naranges)
 
 	 5. A 1-byte unsigned integer containing the size in bytes of
 	 a segment descriptor on the target system.  */
+      if (unlikely (readp + 4 > readendp))
+	goto invalid;
+
       Dwarf_Word length = read_4ubyte_unaligned_inc (dbg, readp);
       unsigned int length_bytes = 4;
       if (length == DWARF3_LENGTH_64_BIT)
 	{
+	  if (unlikely (readp + 8 > readendp))
+	    goto invalid;
+
 	  length = read_8ubyte_unaligned_inc (dbg, readp);
 	  length_bytes = 8;
 	}
       else if (unlikely (length >= DWARF3_LENGTH_MIN_ESCAPE_CODE
 			 && length <= DWARF3_LENGTH_MAX_ESCAPE_CODE))
+	goto invalid;
+
+      if (unlikely (readp + 2 > readendp))
 	goto invalid;
 
       unsigned int version = read_2ubyte_unaligned_inc (dbg, readp);
@@ -136,14 +145,14 @@ dwarf_getaranges (dbg, aranges, naranges)
 	  return -1;
 	}
 
-      Dwarf_Word offset;
+      Dwarf_Word offset = 0;
       if (__libdw_read_offset_inc (dbg,
 				   IDX_debug_aranges, &readp,
 				   length_bytes, &offset, IDX_debug_info, 4))
 	goto fail;
 
       unsigned int address_size = *readp++;
-      if (address_size != 4 && address_size != 8)
+      if (unlikely (address_size != 4 && address_size != 8))
 	goto invalid;
 
       /* We don't actually support segment selectors.  */
@@ -163,6 +172,9 @@ dwarf_getaranges (dbg, aranges, naranges)
 	  if (__libdw_read_address_inc (dbg, IDX_debug_aranges, &readp,
 					address_size, &range_address))
 	    goto fail;
+
+	  if (readp + address_size > readendp)
+	    goto invalid;
 
 	  if (address_size == 4)
 	    range_length = read_4ubyte_unaligned_inc (dbg, readp);

@@ -1,3 +1,8 @@
+2015-05-05  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_getaranges.c (dwarf_getaranges): Check there is enough data
+	left before reading values.
+
 2015-05-04  Anthony G. Basile  <blueness@gentoo.org>
 
 	* Makefile.am (libdw_so_SOURCES): Append $(argp_LDADD) to link

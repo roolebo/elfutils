@@ -1,5 +1,5 @@
 /* Get information from a source line record returned by libdwfl.
-   Copyright (C) 2005-2010 Red Hat, Inc.
+   Copyright (C) 2005-2010, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -45,6 +45,12 @@ dwfl_lineinfo (Dwfl_Line *line, Dwarf_Addr *addr, int *linep, int *colp,
     *linep = info->line;
   if (colp != NULL)
     *colp = info->column;
+
+  if (unlikely (info->file >= info->files->nfiles))
+    {
+      __libdwfl_seterrno (DWFL_E (LIBDW, DWARF_E_INVALID_DWARF));
+      return NULL;
+    }
 
   struct Dwarf_Fileinfo_s *file = &info->files->info[info->file];
   if (mtime != NULL)

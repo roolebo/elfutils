@@ -1,3 +1,7 @@
+2015-05-05  Mark Wielaard  <mjw@redhat.com>
+
+	* dwfl_lineinfo.c (dwfl_lineinfo): Check info->file is valid.
+
 2015-05-06  Roland McGrath  <roland@hack.frob.com>
 
 	* dwfl_error.c (struct msgtable): Break type definition out of

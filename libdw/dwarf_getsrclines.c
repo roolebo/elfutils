@@ -302,7 +302,8 @@ read_srclines (Dwarf *dbg,
   Dwarf_Word addr = 0;
   unsigned int op_index = 0;
   unsigned int file = 1;
-  int line = 1;
+  /* We only store an int, but want to check for overflow (see SET below).  */
+  int64_t line = 1;
   unsigned int column = 0;
   uint_fast8_t is_stmt = default_is_stmt;
   bool basic_block = false;

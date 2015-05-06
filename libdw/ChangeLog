@@ -1,3 +1,8 @@
+2015-05-06  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_getsrclines.c (read_srclines): Use an int64_t to store and
+	check the line number.
+
 2015-05-05  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_getaranges.c (dwarf_getaranges): Check there is enough data

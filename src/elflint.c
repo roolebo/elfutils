@@ -3037,8 +3037,10 @@ section [%2d] '%s': sh_link does not link to string table\n"),
       return;
     }
   unsigned int offset = 0;
-  for (int cnt = shdr->sh_info; --cnt >= 0; )
+  for (Elf64_Word cnt = shdr->sh_info; cnt > 0; )
     {
+      cnt--;
+
       /* Get the data at the next offset.  */
       GElf_Verneed needmem;
       GElf_Verneed *need = gelf_getverneed (data, offset, &needmem);
@@ -3196,8 +3198,10 @@ section [%2d] '%s': sh_link does not link to string table\n"),
 
   bool has_base = false;
   unsigned int offset = 0;
-  for (int cnt = shdr->sh_info; --cnt >= 0; )
+  for (Elf64_Word cnt = shdr->sh_info; cnt > 0; )
     {
+      cnt--;
+
       /* Get the data at the next offset.  */
       GElf_Verdef defmem;
       GElf_Verdef *def = gelf_getverdef (data, offset, &defmem);

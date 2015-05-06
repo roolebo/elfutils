@@ -2,6 +2,8 @@
 
 	* elflint.c (check_gnu_hash): Return early when 2nd hash function
 	shift too big.
+	(check_verdef): Use Elf64_Word for shdr->sh_info cnt.
+	(check_verneed): Likewise.
 
 2015-05-05  Mark Wielaard  <mjw@redhat.com>
 

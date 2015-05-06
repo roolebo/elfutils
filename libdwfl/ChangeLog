@@ -1,3 +1,10 @@
+2015-05-06  Roland McGrath  <roland@hack.frob.com>
+
+	* dwfl_error.c (struct msgtable): Break type definition out of
+	the 'msgtable' initializer.
+	(msgtable): Make it a union of struct msgtable and a char array.
+	(msgstr): Use the full-table char array rather than the msg_0 entry.
+
 2015-04-23  Max Filippov  <jcmvbkbc@gmail.com>
 
 	* core-file.c (_compat_without_executable_dwfl_core_file_report):

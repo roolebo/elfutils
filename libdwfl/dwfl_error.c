@@ -1,5 +1,5 @@
 /* Error handling in libdwfl.
-   Copyright (C) 2005-2010 Red Hat, Inc.
+   Copyright (C) 2005-2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -54,18 +54,31 @@ dwfl_errno (void)
 INTDEF (dwfl_errno)
 
 
-static const struct msgtable
+struct msgtable
 {
 #define DWFL_ERROR(name, text) char msg_##name[sizeof text];
   DWFL_ERRORS
 #undef	DWFL_ERROR
+};
+
+static const union
+{
+  struct msgtable table;
+  char strings[
+#define DWFL_ERROR(name, text)	+ sizeof text
+	       DWFL_ERRORS
+#undef	DWFL_ERROR
+	       ];
 } msgtable =
   {
+    .table =
+    {
 #define DWFL_ERROR(name, text) text,
-  DWFL_ERRORS
+      DWFL_ERRORS
 #undef	DWFL_ERROR
+    }
   };
-#define msgstr (&msgtable.msg_NOERROR[0])
+#define msgstr (msgtable.strings)
 
 static const uint_fast16_t msgidx[] =
 {

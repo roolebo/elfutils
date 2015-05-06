@@ -3423,7 +3423,7 @@ section [%2d] '%s': offset %zu: invalid length in attribute section\n"),
 	  ERROR (gettext ("\
 section [%2d] '%s': offset %zu: unterminated vendor name string\n"),
 		 idx, section_name (ebl, idx), pos (p));
-	  continue;
+	  break;
 	}
       ++q;
 
@@ -3466,7 +3466,9 @@ section [%2d] '%s': offset %zu: zero length field in attribute subsection\n"),
 	    if (MY_ELFDATA != ehdr->e_ident[EI_DATA])
 	      CONVERT (subsection_len);
 
-	    if (p - chunk < (ptrdiff_t) subsection_len)
+	    /* Don't overflow, ptrdiff_t might be 32bits, but signed.  */
+	    if (p - chunk < (ptrdiff_t) subsection_len
+	        || subsection_len >= (uint32_t) PTRDIFF_MAX)
 	      {
 		ERROR (gettext ("\
 section [%2d] '%s': offset %zu: invalid length in attribute subsection\n"),

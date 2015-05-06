@@ -2115,9 +2115,12 @@ section [%2d] '%s': hash table section is too small (is %ld, expected at least %
     }
 
   if (shift > 31)
-    ERROR (gettext ("\
+    {
+      ERROR (gettext ("\
 section [%2d] '%s': 2nd hash function shift too big: %u\n"),
-	   idx, section_name (ebl, idx), shift);
+	     idx, section_name (ebl, idx), shift);
+      return;
+    }
 
   size_t maxidx = shdr->sh_size / sizeof (Elf32_Word) - (4 + bitmask_words
 							 + nbuckets);

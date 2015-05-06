@@ -1297,11 +1297,10 @@ show_symbols (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, Elf_Scn *xndxscn,
 			  /* We found the line.  */
 			  int lineno;
 			  (void) dwarf_lineno (line, &lineno);
+			  const char *file = dwarf_linesrc (line, NULL, NULL);
+			  file = (file != NULL) ? basename (file) : "???";
 			  int n;
-			  n = obstack_printf (&whereob, "%s:%d%c",
-					      basename (dwarf_linesrc (line,
-								       NULL,
-								       NULL)),
+			  n = obstack_printf (&whereob, "%s:%d%c", file,
 					      lineno, '\0');
 			  sym_mem[nentries_used].where
 			    = obstack_finish (&whereob);

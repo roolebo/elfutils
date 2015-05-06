@@ -1,3 +1,7 @@
+2015-05-05  Mark Wielaard  <mjw@redhat.com>
+
+	* nm.c (show_symbols): Handle dwarf_linesrc returning NULL.
+
 2015-05-04  Max Filippov  <jcmvbkbc@gmail.com>
 
 	* ar.c (do_oper_extract): Replace struct timeval with struct timespec

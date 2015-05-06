@@ -2091,26 +2091,40 @@ static void
 check_gnu_hash (Ebl *ebl, GElf_Shdr *shdr, Elf_Data *data, int idx,
 		GElf_Shdr *symshdr)
 {
+  if (data->d_size < 4 * sizeof (Elf32_Word))
+    {
+      ERROR (gettext ("\
+section [%2d] '%s': not enough data\n"),
+	     idx, section_name (ebl, idx));
+      return;
+    }
+
   Elf32_Word nbuckets = ((Elf32_Word *) data->d_buf)[0];
   Elf32_Word symbias = ((Elf32_Word *) data->d_buf)[1];
   Elf32_Word bitmask_words = ((Elf32_Word *) data->d_buf)[2];
 
-  if (!powerof2 (bitmask_words))
-    ERROR (gettext ("\
-section [%2d] '%s': bitmask size not power of 2: %u\n"),
-	   idx, section_name (ebl, idx), bitmask_words);
+  if (bitmask_words == 0 || !powerof2 (bitmask_words))
+    {
+      ERROR (gettext ("\
+section [%2d] '%s': bitmask size zero or not power of 2: %u\n"),
+	     idx, section_name (ebl, idx), bitmask_words);
+      return;
+    }
 
   size_t bitmask_idxmask = bitmask_words - 1;
   if (gelf_getclass (ebl->elf) == ELFCLASS64)
     bitmask_words *= 2;
   Elf32_Word shift = ((Elf32_Word *) data->d_buf)[3];
 
-  if (shdr->sh_size < (4 + bitmask_words + nbuckets) * sizeof (Elf32_Word))
+  /* Is there still room for the sym chain?
+     Use uint64_t calculation to prevent 32bit overlow.  */
+  uint64_t used_buf = (4ULL + bitmask_words + nbuckets) * sizeof (Elf32_Word);
+  if (used_buf > data->d_size)
     {
       ERROR (gettext ("\
 section [%2d] '%s': hash table section is too small (is %ld, expected at least %ld)\n"),
 	     idx, section_name (ebl, idx), (long int) shdr->sh_size,
-	     (long int) ((4 + bitmask_words + nbuckets) * sizeof (Elf32_Word)));
+	     (long int) used_buf);
       return;
     }
 

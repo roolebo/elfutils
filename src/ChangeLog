@@ -1,7 +1,8 @@
 2015-05-06  Mark Wielaard  <mjw@redhat.com>
 
 	* elflint.c (check_gnu_hash): Return early when 2nd hash function
-	shift too big.
+	shift too big. Check there is enough data available. Make sure
+	bitmask_words is not zero.
 	(check_verdef): Use Elf64_Word for shdr->sh_info cnt.
 	(check_verneed): Likewise.
 	(check_attributes): Break when vendor name isn't terminated.

@@ -1,3 +1,8 @@
+2015-05-07  Mark Wielaard  <mjw@redhat.com>
+
+	* cu.c (intern_cu): Check for EOF and check cuoff points to a real
+	Dwarf_Die before interning. Explicitly check EOF is expected.
+
 2015-05-05  Mark Wielaard  <mjw@redhat.com>
 
 	* dwfl_lineinfo.c (dwfl_lineinfo): Check info->file is valid.

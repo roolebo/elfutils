@@ -1166,7 +1166,7 @@ show_symbols (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, Elf_Scn *xndxscn,
 
   /* Consistency checks.  */
   if (entsize == 0
-      || entsize != gelf_fsize (ebl->elf, ELF_T_SYM, 1, ehdr->e_version))
+      || entsize != gelf_fsize (ebl->elf, ELF_T_SYM, 1, EV_CURRENT))
     error (0, 0,
 	   gettext ("%s: entry size in section %zd `%s' is not what we expect"),
 	   fullname, elf_ndxscn (scn),

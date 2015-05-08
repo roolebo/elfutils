@@ -810,8 +810,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 
 		  /* Go through all symbols and make sure the section they
 		     reference is not removed.  */
-		  size_t elsize = gelf_fsize (elf, ELF_T_SYM, 1,
-					      ehdr->e_version);
+		  size_t elsize = gelf_fsize (elf, ELF_T_SYM, 1, EV_CURRENT);
 
 		  for (size_t inner = 0;
 		       inner < shdr_info[cnt].data->d_size / elsize;
@@ -1193,8 +1192,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 		Elf_Data *versiondata = NULL;
 		Elf_Data *shndxdata = NULL;
 
-		size_t elsize = gelf_fsize (elf, ELF_T_SYM, 1,
-					    ehdr->e_version);
+		size_t elsize = gelf_fsize (elf, ELF_T_SYM, 1, EV_CURRENT);
 
 		if (shdr_info[cnt].symtab_idx != 0)
 		  {
@@ -1487,8 +1485,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 		Elf32_Word *bucket = (Elf32_Word *) hashd->d_buf;
 
 		size_t strshndx = shdr_info[symtabidx].old_sh_link;
-		size_t elsize = gelf_fsize (elf, ELF_T_SYM, 1,
-					    ehdr->e_version);
+		size_t elsize = gelf_fsize (elf, ELF_T_SYM, 1, EV_CURRENT);
 
 		/* Adjust the nchain value.  The symbol table size
 		   changed.  We keep the same size for the bucket array.  */
@@ -1541,8 +1538,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 		Elf64_Xword *bucket = (Elf64_Xword *) hashd->d_buf;
 
 		size_t strshndx = shdr_info[symtabidx].old_sh_link;
-		size_t elsize = gelf_fsize (elf, ELF_T_SYM, 1,
-					    ehdr->e_version);
+		size_t elsize = gelf_fsize (elf, ELF_T_SYM, 1, EV_CURRENT);
 
 		/* Adjust the nchain value.  The symbol table size
 		   changed.  We keep the same size for the bucket array.  */
@@ -1611,8 +1607,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	    GElf_Half *verstab = (GElf_Half *) verd->d_buf;
 
 	    /* Walk through the list and */
-	    size_t elsize = gelf_fsize (elf, verd->d_type, 1,
-					ehdr->e_version);
+	    size_t elsize = gelf_fsize (elf, verd->d_type, 1, EV_CURRENT);
 	    for (size_t inner = 1; inner < verd->d_size / elsize; ++inner)
 	      if (newsymidx[inner] != 0)
 		/* Overwriting the same array works since the
@@ -1624,8 +1619,8 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	    verd->d_size = gelf_fsize (newelf, verd->d_type,
 				       symd->d_size
 				       / gelf_fsize (elf, symd->d_type, 1,
-						     ehdr->e_version),
-				       ehdr->e_version);
+						     EV_CURRENT),
+				       EV_CURRENT);
 	    update_section_size (verd);
 	    break;
 

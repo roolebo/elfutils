@@ -126,7 +126,7 @@ nlist (const char *filename, struct nlist *nl)
 
   /* How many symbols are there?  */
   nsyms = (shdr->sh_size
-	   / INTUSE(gelf_fsize) (elf, ELF_T_SYM, 1, data->d_version));
+	   / INTUSE(gelf_fsize) (elf, ELF_T_SYM, 1, EV_CURRENT));
 
   /* Create the hash table.  */
   table = nlist_fshash_init (nsyms);

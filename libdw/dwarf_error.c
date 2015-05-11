@@ -62,6 +62,7 @@ static const char *errmsgs[] =
     [DWARF_E_IO_ERROR] = N_("I/O error"),
     [DWARF_E_INVALID_ELF] = N_("invalid ELF file"),
     [DWARF_E_NO_DWARF] = N_("no DWARF information"),
+    [DWARF_E_COMPRESSED_ERROR] = N_("cannot decompress DWARF"),
     [DWARF_E_NOELF] = N_("no ELF file"),
     [DWARF_E_GETEHDR_ERROR] = N_("cannot get ELF header"),
     [DWARF_E_NOMEM] = N_("out of memory"),

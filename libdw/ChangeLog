@@ -1,5 +1,14 @@
 2015-05-11  Jonathan Lebon  <jlebon@redhat.com>
 
+	* libdwP.h (DWARF_E_COMPRESSED_ERROR): New enumerator.
+	* dwarf_error.c (errmsgs): Add DWARF_E_COMPRESSED_ERROR message.
+	* dwarf_begin_elf.c (inflate_section): New static function, lifted
+	from...
+	(check_section): ... here. Call inflate_section, set libdw errno to
+	DWARF_E_COMPRESSED_ERROR if .debug_info section couldn't be inflated.
+
+2015-05-11  Jonathan Lebon  <jlebon@redhat.com>
+
 	* dwarf_begin_elf.c (check_section): Add compressed flag. Always
 	check for .zdebug sections. Only wrap decompression in #if USE_ZLIB.
 

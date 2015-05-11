@@ -71,6 +71,70 @@ static const char dwarf_scnnames[IDX_last][18] =
 };
 #define ndwarf_scnnames (sizeof (dwarf_scnnames) / sizeof (dwarf_scnnames[0]))
 
+#if USE_ZLIB
+static Elf_Data *
+inflate_section (Elf_Data * data)
+{
+  /* There is a 12-byte header of "ZLIB" followed by
+     an 8-byte big-endian size.  */
+
+  if (unlikely (data->d_size < 4 + 8)
+      || unlikely (memcmp (data->d_buf, "ZLIB", 4) != 0))
+    return NULL;
+
+  uint64_t size;
+  memcpy (&size, data->d_buf + 4, sizeof size);
+  size = be64toh (size);
+
+  /* Check for unsigned overflow so malloc always allocated
+     enough memory for both the Elf_Data header and the
+     uncompressed section data.  */
+  if (unlikely (sizeof (Elf_Data) + size < size))
+    return NULL;
+
+  Elf_Data *zdata = malloc (sizeof (Elf_Data) + size);
+  if (unlikely (zdata == NULL))
+    return NULL;
+
+  zdata->d_buf = &zdata[1];
+  zdata->d_type = ELF_T_BYTE;
+  zdata->d_version = EV_CURRENT;
+  zdata->d_size = size;
+  zdata->d_off = 0;
+  zdata->d_align = 1;
+
+  z_stream z =
+    {
+      .next_in = data->d_buf + 4 + 8,
+      .avail_in = data->d_size - 4 - 8,
+      .next_out = zdata->d_buf,
+      .avail_out = zdata->d_size
+    };
+  int zrc = inflateInit (&z);
+  while (z.avail_in > 0 && likely (zrc == Z_OK))
+    {
+      z.next_out = zdata->d_buf + (zdata->d_size - z.avail_out);
+      zrc = inflate (&z, Z_FINISH);
+      if (unlikely (zrc != Z_STREAM_END))
+	{
+	  zrc = Z_DATA_ERROR;
+	  break;
+	}
+      zrc = inflateReset (&z);
+    }
+  if (likely (zrc == Z_OK))
+    zrc = inflateEnd (&z);
+
+  if (unlikely (zrc != Z_OK) || unlikely (z.avail_out != 0))
+    {
+      free (zdata);
+      return NULL;
+    }
+
+  return zdata;
+}
+#endif
+
 static Dwarf *
 check_section (Dwarf *result, GElf_Ehdr *ehdr, Elf_Scn *scn, bool inscngrp)
 {
@@ -146,70 +210,31 @@ check_section (Dwarf *result, GElf_Ehdr *ehdr, Elf_Scn *scn, bool inscngrp)
   /* We can now read the section data into results. */
   if (!compressed)
     result->sectiondata[cnt] = data;
-#if USE_ZLIB
   else
     {
-        /* A compressed section. */
+      /* A compressed section. */
 
-	    /* There is a 12-byte header of "ZLIB" followed by
-	       an 8-byte big-endian size.  */
-
-	    if (unlikely (data->d_size < 4 + 8)
-		|| unlikely (memcmp (data->d_buf, "ZLIB", 4) != 0))
-	      return result;
-
-	    uint64_t size;
-	    memcpy (&size, data->d_buf + 4, sizeof size);
-	    size = be64toh (size);
-
-	    /* Check for unsigned overflow so malloc always allocated
-	       enough memory for both the Elf_Data header and the
-	       uncompressed section data.  */
-	    if (unlikely (sizeof (Elf_Data) + size < size))
-	      return result;
-
-	    Elf_Data *zdata = malloc (sizeof (Elf_Data) + size);
-	    if (unlikely (zdata == NULL))
-	      return result;
-
-	    zdata->d_buf = &zdata[1];
-	    zdata->d_type = ELF_T_BYTE;
-	    zdata->d_version = EV_CURRENT;
-	    zdata->d_size = size;
-	    zdata->d_off = 0;
-	    zdata->d_align = 1;
-
-	    z_stream z =
-	      {
-		.next_in = data->d_buf + 4 + 8,
-		.avail_in = data->d_size - 4 - 8,
-		.next_out = zdata->d_buf,
-		.avail_out = zdata->d_size
-	      };
-	    int zrc = inflateInit (&z);
-	    while (z.avail_in > 0 && likely (zrc == Z_OK))
-	      {
-		z.next_out = zdata->d_buf + (zdata->d_size - z.avail_out);
-		zrc = inflate (&z, Z_FINISH);
-		if (unlikely (zrc != Z_STREAM_END))
-		  {
-		    zrc = Z_DATA_ERROR;
-		    break;
-		  }
-		zrc = inflateReset (&z);
-	      }
-	    if (likely (zrc == Z_OK))
-	      zrc = inflateEnd (&z);
-
-	    if (unlikely (zrc != Z_OK) || unlikely (z.avail_out != 0))
-	      free (zdata);
-	    else
-	      {
-		result->sectiondata[cnt] = zdata;
-		result->sectiondata_gzip_mask |= 1U << cnt;
-	      }
-    }
+#if USE_ZLIB
+      Elf_Data *inflated = inflate_section(data);
+      if (inflated != NULL)
+        {
+          result->sectiondata[cnt] = inflated;
+          result->sectiondata_gzip_mask |= 1U << cnt;
+        }
 #endif
+
+      /* If we failed to decompress the section and it's the debug_info section,
+       * then fail with specific error rather than the generic NO_DWARF. Without
+       * debug_info we can't do anything (see also valid_p()). */
+      if (result->sectiondata[cnt] == NULL && cnt == IDX_debug_info)
+        {
+          __libdw_free_zdata (result);
+          Dwarf_Sig8_Hash_free (&result->sig8_hash);
+          __libdw_seterrno (DWARF_E_COMPRESSED_ERROR);
+          free (result);
+          return NULL;
+        }
+    }
 
   return result;
 }

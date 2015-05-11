@@ -1,3 +1,8 @@
+2015-05-11  Jonathan Lebon  <jlebon@redhat.com>
+
+	* dwarf_begin_elf.c (check_section): Add compressed flag. Always
+	check for .zdebug sections. Only wrap decompression in #if USE_ZLIB.
+
 2015-05-06  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_getsrclines.c (read_srclines): Use an int64_t to store and

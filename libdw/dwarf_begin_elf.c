@@ -1,5 +1,5 @@
 /* Create descriptor from ELF descriptor for processing file.
-   Copyright (C) 2002-2011, 2014 Red Hat, Inc.
+   Copyright (C) 2002-2011, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -118,42 +118,45 @@ check_section (Dwarf *result, GElf_Ehdr *ehdr, Elf_Scn *scn, bool inscngrp)
 
   /* Recognize the various sections.  Most names start with .debug_.  */
   size_t cnt;
+  bool compressed = false;
   for (cnt = 0; cnt < ndwarf_scnnames; ++cnt)
     if (strcmp (scnname, dwarf_scnnames[cnt]) == 0)
-      {
-	/* Found it.  Remember where the data is.  */
-	if (unlikely (result->sectiondata[cnt] != NULL))
-	  /* A section appears twice.  That's bad.  We ignore the section.  */
-	  break;
-
-	/* Get the section data.  */
-	Elf_Data *data = elf_getdata (scn, NULL);
-	if (data != NULL && data->d_size != 0)
-	  /* Yep, there is actually data available.  */
-	  result->sectiondata[cnt] = data;
-
-	break;
-      }
-#if USE_ZLIB
+      break;
     else if (scnname[0] == '.' && scnname[1] == 'z'
 	     && strcmp (&scnname[2], &dwarf_scnnames[cnt][1]) == 0)
       {
-	/* A compressed section.  */
+        compressed = true;
+        break;
+      }
 
-	if (unlikely (result->sectiondata[cnt] != NULL))
-	  /* A section appears twice.  That's bad.  We ignore the section.  */
-	  break;
+  if (cnt >= ndwarf_scnnames)
+    /* Not a debug section; ignore it. */
+    return result;
 
-	/* Get the section data.  */
-	Elf_Data *data = elf_getdata (scn, NULL);
-	if (data != NULL && data->d_size != 0)
-	  {
+  if (unlikely (result->sectiondata[cnt] != NULL))
+    /* A section appears twice.  That's bad.  We ignore the section.  */
+    return result;
+
+  /* Get the section data.  */
+  Elf_Data *data = elf_getdata (scn, NULL);
+  if (data == NULL || data->d_size == 0)
+    /* No data actually available, ignore it. */
+    return result;
+
+  /* We can now read the section data into results. */
+  if (!compressed)
+    result->sectiondata[cnt] = data;
+#if USE_ZLIB
+  else
+    {
+        /* A compressed section. */
+
 	    /* There is a 12-byte header of "ZLIB" followed by
 	       an 8-byte big-endian size.  */
 
 	    if (unlikely (data->d_size < 4 + 8)
 		|| unlikely (memcmp (data->d_buf, "ZLIB", 4) != 0))
-	      break;
+	      return result;
 
 	    uint64_t size;
 	    memcpy (&size, data->d_buf + 4, sizeof size);
@@ -163,11 +166,11 @@ check_section (Dwarf *result, GElf_Ehdr *ehdr, Elf_Scn *scn, bool inscngrp)
 	       enough memory for both the Elf_Data header and the
 	       uncompressed section data.  */
 	    if (unlikely (sizeof (Elf_Data) + size < size))
-	      break;
+	      return result;
 
 	    Elf_Data *zdata = malloc (sizeof (Elf_Data) + size);
 	    if (unlikely (zdata == NULL))
-	      break;
+	      return result;
 
 	    zdata->d_buf = &zdata[1];
 	    zdata->d_type = ELF_T_BYTE;
@@ -205,10 +208,7 @@ check_section (Dwarf *result, GElf_Ehdr *ehdr, Elf_Scn *scn, bool inscngrp)
 		result->sectiondata[cnt] = zdata;
 		result->sectiondata_gzip_mask |= 1U << cnt;
 	      }
-	  }
-
-	break;
-      }
+    }
 #endif
 
   return result;

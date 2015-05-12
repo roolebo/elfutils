@@ -301,6 +301,20 @@ __libelf_set_rawdata_wrlock (Elf_Scn *scn)
   else
     scn->rawdata.d.d_type = shtype_map[LIBELF_EV_IDX][TYPEIDX (type)];
   scn->rawdata.d.d_off = 0;
+
+  /* Make sure the alignment makes sense.  d_align should be aligned both
+     in the section (trivially true since d_off is zero) and in the file.
+     Unfortunately we cannot be too strict because there are ELF files
+     out there that fail this requirement.  We will try to fix those up
+     in elf_update when writing out the image.  But for very large
+     alignment values this can bloat the image considerably.  So here
+     just check and clamp the alignment value to not be bigger than the
+     actual offset of the data in the file.  Given that there is always
+     at least an ehdr this will only trigger for alignment values > 64
+     which should be uncommon.  */
+  align = align ?: 1;
+  if (align > offset)
+    align = offset;
   scn->rawdata.d.d_align = align;
   if (elf->class == ELFCLASS32
       || (offsetof (struct Elf, state.elf32.ehdr)

@@ -202,6 +202,11 @@ __elfw2(LIBELFBITS,updatenull_wrlock) (Elf *elf, int *change_bop, size_t shnum)
 	      assert (shdr != NULL);
 	      ElfW2(LIBELFBITS,Word) sh_entsize = shdr->sh_entsize;
 	      ElfW2(LIBELFBITS,Word) sh_align = shdr->sh_addralign ?: 1;
+	      if (unlikely (! powerof2 (sh_align)))
+		{
+		  __libelf_seterrno (ELF_E_INVALID_ALIGN);
+		  return -1;
+		}
 
 	      /* Set the sh_entsize value if we can reliably detect it.  */
 	      switch (shdr->sh_type)

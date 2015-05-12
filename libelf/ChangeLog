@@ -1,5 +1,12 @@
 2015-05-12  Mark Wielaard  <mjw@redhat.com>
 
+	* elf32_updatenull.c (updatenull_wrlock): Check that sh_addralign
+	is a powerof2.
+	* elf_getdata.c (__libelf_set_rawdata_wrlock): Clamp large d_aligns
+	to the elf image offset.
+
+2015-05-12  Mark Wielaard  <mjw@redhat.com>
+
 	* elf32_newphdr.c (newphdr): Call __libelf_seterrno with
 	ELF_E_INVALID_INDEX before failing. Check whether section zero shdr
 	actually exists if we need to put extended phnum in section zero.

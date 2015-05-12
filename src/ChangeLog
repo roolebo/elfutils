@@ -1,3 +1,16 @@
+2015-05-12  Mark Wielaard  <mjw@redhat.com>
+
+	* strip.c (debug_fd): New static variable.
+	(tmp_debug_fname): Likewise.
+	(cleanup_debug): New function using the above to clean up temporary
+	debug file.
+	(INTERNAL_ERROR): Call cleanup_debug.
+	(handle_elf): Use debug_fd and tmp_debug_fname statics and call
+	cleanup_debug before any error. Use output_fname instead of fname in
+	error messages when it exists (-o was given). SHT_NOBITS sections
+	can also be moved freely even if SHF_ALLOC is set. Add various
+	sanity checks. Use elf_assert instead of plain assert.
+
 2015-05-08  Mark Wielaard  <mjw@redhat.com>
 
 	* nm.c (show_symbols): Call gelf_fsize with EV_CURRENT.

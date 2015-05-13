@@ -106,6 +106,14 @@ ELFW(default_ehdr,LIBELFBITS) (Elf *elf, ElfW2(LIBELFBITS,Ehdr) *ehdr,
       elf->state.ELFW(elf,LIBELFBITS).ehdr_flags |= ELF_F_DIRTY;
     }
 
+  /* If phnum is zero make sure e_phoff is also zero and not some random
+     value.  That would cause trouble in update_file.  */
+  if (ehdr->e_phnum == 0 && ehdr->e_phoff != 0)
+    {
+      ehdr->e_phoff = 0;
+      elf->state.ELFW(elf,LIBELFBITS).ehdr_flags |= ELF_F_DIRTY;
+    }
+
   return 0;
 }
 

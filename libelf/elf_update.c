@@ -1,5 +1,5 @@
 /* Update data structures for changes and write them out.
-   Copyright (C) 1999, 2000, 2001, 2002, 2004, 2005, 2006 Red Hat, Inc.
+   Copyright (C) 1999, 2000, 2001, 2002, 2004, 2005, 2006, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1999.
 
@@ -32,6 +32,7 @@
 #endif
 
 #include <libelf.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -56,11 +57,19 @@ write_file (Elf *elf, off_t size, int change_bo, size_t shnum)
      We cannot do this if this file is in an archive.  We also don't
      do it *now* if we are shortening the file since this would
      prevent programs to use the data of the file in generating the
-     new file.  We truncate the file later in this case.  */
+     new file.  We truncate the file later in this case.
+
+     Note we use posix_fallocate to make sure the file content is really
+     there. Using ftruncate might mean the file is extended, but space
+     isn't allocated yet. This might cause a SIGBUS once we write into
+     the mmapped space and the disk is full. Using fallocate might fail
+     on some file systems. posix_fallocate is required to extend the file
+     and allocate enough space even if the underlying filesystem would
+     normally return EOPNOTSUPP.  */
   if (elf->parent == NULL
       && (elf->maximum_size == ~((size_t) 0)
 	  || (size_t) size > elf->maximum_size)
-      && unlikely (ftruncate (elf->fildes, size) != 0))
+      && unlikely (posix_fallocate (elf->fildes, 0, size) != 0))
     {
       __libelf_seterrno (ELF_E_WRITE_ERROR);
       return -1;
@@ -94,6 +103,7 @@ write_file (Elf *elf, off_t size, int change_bo, size_t shnum)
 	size = -1;
     }
 
+  /* Reduce the file size if necessary.  */
   if (size != -1
       && elf->parent == NULL
       && elf->maximum_size != ~((size_t) 0)

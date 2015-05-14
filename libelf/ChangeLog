@@ -1,3 +1,8 @@
+2015-05-14  Mark Wielaard  <mjw@redhat.com>
+
+	* elf_update.c (write_file): Use posix_fallocate instead of
+	ftruncate to extend file if necessary.
+
 2015-05-13  Mark Wielaard  <mjw@redhat.com>
 
 	* elf32_updatenull.c (default_ehdr): If e_phnum is zero then set

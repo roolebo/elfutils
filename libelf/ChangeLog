@@ -1,5 +1,10 @@
 2015-05-16  Mark Wielaard  <mjw@redhat.com>
 
+	* elf32_updatefile.c (updatemmap): Allocate temporary shdr storage
+	with malloc, not alloca. Free after writing section header.
+
+2015-05-16  Mark Wielaard  <mjw@redhat.com>
+
 	* elf_getarsym.c (elf_getarsym): Allocate temporary file_date with
 	malloc, not alloca. Call free after out.
 

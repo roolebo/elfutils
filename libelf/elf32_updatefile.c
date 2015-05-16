@@ -1,5 +1,5 @@
 /* Write changed data structures.
-   Copyright (C) 2000-2010, 2014 Red Hat, Inc.
+   Copyright (C) 2000-2010, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -206,7 +206,12 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 	return 1;
 
       Elf_ScnList *list = &elf->state.ELFW(elf,LIBELFBITS).scns;
-      Elf_Scn **scns = (Elf_Scn **) alloca (shnum * sizeof (Elf_Scn *));
+      Elf_Scn **scns = (Elf_Scn **) malloc (shnum * sizeof (Elf_Scn *));
+      if (unlikely (scns == NULL))
+	{
+	  __libelf_seterrno (ELF_E_NOMEM);
+	  return -1;
+	}
       char *const shdr_start = ((char *) elf->map_address + elf->start_offset
 				+ ehdr->e_shoff);
       char *const shdr_end = shdr_start + ehdr->e_shnum * ehdr->e_shentsize;
@@ -238,7 +243,12 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 		      < ((char *) elf->map_address + elf->start_offset
 			 + elf->maximum_size));
 
-	      void *p = alloca (sizeof (ElfW2(LIBELFBITS,Shdr)));
+	      void *p = malloc (sizeof (ElfW2(LIBELFBITS,Shdr)));
+	      if (unlikely (p == NULL))
+		{
+		  __libelf_seterrno (ELF_E_NOMEM);
+		  return -1;
+		}
 	      scn->shdr.ELFW(e,LIBELFBITS)
 		= memcpy (p, scn->shdr.ELFW(e,LIBELFBITS),
 			  sizeof (ElfW2(LIBELFBITS,Shdr)));
@@ -260,7 +270,7 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 		  > (char *) scn->data_list.data.d.d_buf))
 	    {
 	      void *p = malloc (scn->data_list.data.d.d_size);
-	      if (p == NULL)
+	      if (unlikely (p == NULL))
 		{
 		  __libelf_seterrno (ELF_E_NOMEM);
 		  return -1;
@@ -421,12 +431,17 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 		 entry we now have to adjust the pointer again so
 		 point to new place in the mapping.  */
 	      if (!elf->state.ELFW(elf,LIBELFBITS).shdr_malloced
-		  && (scn->shdr_flags & ELF_F_MALLOCED) == 0)
-		scn->shdr.ELFW(e,LIBELFBITS) = &shdr_dest[scn->index];
+		  && (scn->shdr_flags & ELF_F_MALLOCED) == 0
+		  && scn->shdr.ELFW(e,LIBELFBITS) != &shdr_dest[scn->index])
+		{
+		  free (scn->shdr.ELFW(e,LIBELFBITS));
+		  scn->shdr.ELFW(e,LIBELFBITS) = &shdr_dest[scn->index];
+		}
 
 	      scn->shdr_flags &= ~ELF_F_DIRTY;
 	    }
 	}
+      free (scns);
     }
 
   /* That was the last part.  Clear the overall flag.  */
@@ -582,7 +597,7 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 	  /* Allocate sufficient memory.  */
 	  tmp_phdr = (ElfW2(LIBELFBITS,Phdr) *)
 	    malloc (sizeof (ElfW2(LIBELFBITS,Phdr)) * phnum);
-	  if (tmp_phdr == NULL)
+	  if (unlikely (tmp_phdr == NULL))
 	    {
 	      __libelf_seterrno (ELF_E_NOMEM);
 	      return 1;
@@ -714,7 +729,7 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 			if (dl->data.d.d_size > MAX_TMPBUF)
 			  {
 			    buf = malloc (dl->data.d.d_size);
-			    if (buf == NULL)
+			    if (unlikely (buf == NULL))
 			      {
 				__libelf_seterrno (ELF_E_NOMEM);
 				return 1;

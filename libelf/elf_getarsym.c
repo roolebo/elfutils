@@ -1,5 +1,5 @@
 /* Return symbol table of archive.
-   Copyright (C) 1998-2000, 2002, 2005, 2009, 2012, 2014 Red Hat, Inc.
+   Copyright (C) 1998-2000, 2002, 2005, 2009, 2012, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -106,6 +106,9 @@ elf_getarsym (elf, ptr)
       /* In case we find no index remember this for the next call.  */
       elf->state.ar.ar_sym = (Elf_Arsym *) -1l;
 
+      /* We might have to allocate some temporary data for reading.  */
+      void *temp_data = NULL;
+
       struct ar_hdr *index_hdr;
       if (elf->map_address == NULL)
 	{
@@ -210,7 +213,13 @@ elf_getarsym (elf, ptr)
 
 	  if (elf->map_address == NULL)
 	    {
-	      file_data = alloca (sz);
+	      temp_data = malloc (sz);
+	      if (unlikely (temp_data == NULL))
+		{
+		  __libelf_seterrno (ELF_E_NOMEM);
+		  goto out;
+		}
+	      file_data = temp_data;
 
 	      ar_sym_len += index_size - n * w;
 	      Elf_Arsym *newp = (Elf_Arsym *) realloc (elf->state.ar.ar_sym,
@@ -299,6 +308,7 @@ elf_getarsym (elf, ptr)
       result = elf->state.ar.ar_sym;
 
     out:
+      free (temp_data);
       rwlock_unlock (elf->lock);
     }
 

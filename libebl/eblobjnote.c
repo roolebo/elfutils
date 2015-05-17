@@ -1,5 +1,5 @@
 /* Print contents of object file note.
-   Copyright (C) 2002, 2007, 2009, 2011 Red Hat, Inc.
+   Copyright (C) 2002, 2007, 2009, 2011, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -33,6 +33,7 @@
 
 #include <inttypes.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <libeblP.h>
 
@@ -165,7 +166,19 @@ ebl_object_note (ebl, name, type, descsz, desc)
 		.d_size = descsz,
 		.d_buf = (void *) desc
 	      };
-	    uint32_t buf[descsz / 4];
+	    /* Normally NT_GNU_ABI_TAG is just 4 words (16 bytes).  If it
+	       is much (4*) larger dynamically allocate memory to convert.  */
+#define FIXED_TAG_BYTES 16
+	    uint32_t sbuf[FIXED_TAG_BYTES];
+	    uint32_t *buf;
+	    if (unlikely (descsz / 4 > FIXED_TAG_BYTES))
+	      {
+	        buf = malloc (descsz);
+		if (unlikely (buf == NULL))
+		  return;
+	      }
+	    else
+	      buf = sbuf;
 	    Elf_Data out =
 	      {
 		.d_version = EV_CURRENT,
@@ -209,6 +222,8 @@ ebl_object_note (ebl, name, type, descsz, desc)
 		  }
 		putchar_unlocked ('\n');
 	      }
+	    if (descsz / 4 > FIXED_TAG_BYTES)
+	      free (buf);
 	    break;
 	  }
 	/* FALLTHROUGH */

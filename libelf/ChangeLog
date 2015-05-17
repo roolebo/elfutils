@@ -1,3 +1,8 @@
+2015-05-17  Mark Wielaard  <mjw@redhat.com>
+
+	* elf32_updatefile.c (updatefile): Allocate shdr_data and scns
+	with malloc, not alloca. Free after writing section headers.
+
 2015-05-16  Mark Wielaard  <mjw@redhat.com>
 
 	* elf32_updatefile.c (updatemmap): Allocate temporary shdr storage

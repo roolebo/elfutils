@@ -657,15 +657,27 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
       ElfW2(LIBELFBITS,Shdr) *shdr_data;
       if (change_bo || elf->state.ELFW(elf,LIBELFBITS).shdr == NULL
 	  || (elf->flags & ELF_F_DIRTY))
-	shdr_data = (ElfW2(LIBELFBITS,Shdr) *)
-	  alloca (shnum * sizeof (ElfW2(LIBELFBITS,Shdr)));
+	{
+	  shdr_data = (ElfW2(LIBELFBITS,Shdr) *)
+	    malloc (shnum * sizeof (ElfW2(LIBELFBITS,Shdr)));
+	  if (unlikely (shdr_data == NULL))
+	    {
+	      __libelf_seterrno (ELF_E_NOMEM);
+	      return -1;
+	    }
+	}
       else
 	shdr_data = elf->state.ELFW(elf,LIBELFBITS).shdr;
       int shdr_flags = elf->flags;
 
       /* Get all sections into the array and sort them.  */
       Elf_ScnList *list = &elf->state.ELFW(elf,LIBELFBITS).scns;
-      Elf_Scn **scns = (Elf_Scn **) alloca (shnum * sizeof (Elf_Scn *));
+      Elf_Scn **scns = (Elf_Scn **) malloc (shnum * sizeof (Elf_Scn *));
+      if (unlikely (scns == NULL))
+	{
+	  __libelf_seterrno (ELF_E_NOMEM);
+	  return -1;
+	}
       sort_sections (scns, list);
 
       for (size_t cnt = 0; cnt < shnum; ++cnt)
@@ -814,6 +826,12 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 	  __libelf_seterrno (ELF_E_WRITE_ERROR);
 	  return 1;
 	}
+
+      if (change_bo || elf->state.ELFW(elf,LIBELFBITS).shdr == NULL
+	  || (elf->flags & ELF_F_DIRTY))
+	free (shdr_data);
+
+      free (scns);
     }
 
   /* That was the last part.  Clear the overall flag.  */

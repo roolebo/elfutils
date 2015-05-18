@@ -1,5 +1,10 @@
 2015-05-18  Mark Wielaard  <mjw@redhat.com>
 
+	* dwfl_module_getdwarf.c (find_prelink_address_sync): Allocate
+	phdrs and shdrs unions with malloc, not alloca. Free after use.
+
+2015-05-18  Mark Wielaard  <mjw@redhat.com>
+
 	* derelocate.c (cache_sections): Allocate temporary newrefs and
 	sortrefs with malloc, not alloca. Always free them on return.
 

@@ -1,5 +1,5 @@
 /* Recover relocatibility for addresses computed from debug information.
-   Copyright (C) 2005-2010, 2013 Red Hat, Inc.
+   Copyright (C) 2005-2010, 2013, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -80,7 +80,8 @@ cache_sections (Dwfl_Module *mod)
     {
     elf_error:
       __libdwfl_seterrno (DWFL_E_LIBELF);
-      return -1;
+      nrefs = -1;
+      goto free_refs;
     }
 
   bool check_reloc_sections = false;
@@ -112,7 +113,15 @@ cache_sections (Dwfl_Module *mod)
 	  if (unlikely (name == NULL))
 	    goto elf_error;
 
-	  struct secref *newref = alloca (sizeof *newref);
+	  struct secref *newref = malloc (sizeof *newref);
+	  if (unlikely (newref == NULL))
+	    {
+	    nomem:
+	      __libdwfl_seterrno (DWFL_E_NOMEM);
+	      nrefs = -1;
+	      goto free_refs;
+	    }
+
 	  newref->scn = scn;
 	  newref->relocs = NULL;
 	  newref->name = name;
@@ -147,13 +156,13 @@ cache_sections (Dwfl_Module *mod)
     }
 
   mod->reloc_info = malloc (offsetof (struct dwfl_relocation, refs[nrefs]));
-  if (mod->reloc_info == NULL)
-    {
-      __libdwfl_seterrno (DWFL_E_NOMEM);
-      return -1;
-    }
+  if (unlikely (mod->reloc_info == NULL))
+    goto nomem;
 
-  struct secref **sortrefs = alloca (nrefs * sizeof sortrefs[0]);
+  struct secref **sortrefs = malloc (nrefs * sizeof sortrefs[0]);
+  if (unlikely (sortrefs == NULL))
+    goto nomem;
+
   for (size_t i = nrefs; i-- > 0; refs = refs->next)
     sortrefs[i] = refs;
   assert (refs == NULL);
@@ -169,6 +178,8 @@ cache_sections (Dwfl_Module *mod)
       mod->reloc_info->refs[i].start = sortrefs[i]->start;
       mod->reloc_info->refs[i].end = sortrefs[i]->end;
     }
+
+  free (sortrefs);
 
   if (unlikely (check_reloc_sections))
     {
@@ -197,6 +208,14 @@ cache_sections (Dwfl_Module *mod)
 		    }
 	    }
 	}
+    }
+
+free_refs:
+  while (refs != NULL)
+    {
+      struct secref *ref = refs;
+      refs = ref->next;
+      free (ref);
     }
 
   return nrefs;

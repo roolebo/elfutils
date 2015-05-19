@@ -1,5 +1,5 @@
 /* Standard libdwfl callbacks for debugging the running Linux kernel.
-   Copyright (C) 2005-2011, 2013, 2014 Red Hat, Inc.
+   Copyright (C) 2005-2011, 2013, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -379,13 +379,16 @@ dwfl_linux_kernel_report_offline (Dwfl *dwfl, const char *release,
 		     names.  To handle that, we would have to look at the
 		     __this_module.name contents in the module's text.  */
 
-		  char name[f->fts_namelen - suffix + 1];
-		  for (size_t i = 0; i < f->fts_namelen - 3U; ++i)
-		    if (f->fts_name[i] == '-' || f->fts_name[i] == ',')
+		  char *name = strndup (f->fts_name, f->fts_namelen - suffix);
+		  if (unlikely (name == NULL))
+		    {
+		      __libdwfl_seterrno (DWFL_E_NOMEM);
+		      result = -1;
+		      break;
+		    }
+		  for (size_t i = 0; i < f->fts_namelen - suffix; ++i)
+		    if (name[i] == '-' || name[i] == ',')
 		      name[i] = '_';
-		    else
-		      name[i] = f->fts_name[i];
-		  name[f->fts_namelen - suffix] = '\0';
 
 		  if (predicate != NULL)
 		    {
@@ -394,17 +397,23 @@ dwfl_linux_kernel_report_offline (Dwfl *dwfl, const char *release,
 		      if (want < 0)
 			{
 			  result = -1;
+			  free (name);
 			  break;
 			}
 		      if (!want)
-			continue;
+			{
+			  free (name);
+			  continue;
+			}
 		    }
 
 		  if (dwfl_report_offline (dwfl, name, f->fts_path, -1) == NULL)
 		    {
+		      free (name);
 		      result = -1;
 		      break;
 		    }
+		  free (name);
 		}
 	      continue;
 

@@ -277,7 +277,7 @@ EOF
 #	local l0local2, 0
 #	offset 12
 testfiles testfile64
-testrun_compare ${abs_top_builddir}/src/addr2line -S -e testfile64 1 4 5 8 9 12 <<\EOF
+testrun_compare ${abs_top_builddir}/src/addr2line -S -e testfile64 1 4 5 8 9 c <<\EOF
 gglobal2
 ??:0
 g0global2

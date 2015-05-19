@@ -2,6 +2,9 @@ Version 0.162
 
 libdw: Install new header elfutils/known-dwarf.h.
 
+addr2line: Input addresses are now always interpreted as hexadecimal
+           numbers, never as octal or decimal numbers.
+
 Version 0.161
 
 libdw: New function dwarf_peel_type. dwarf_aggregate_size now uses

@@ -1,3 +1,7 @@
+2015-05-20  Mark Wielaard  <mjw@redhat.com>
+
+	* run-addrname-test.sh: Make sure all input addresses are hex.
+
 2015-05-04  Max Filippov  <jcmvbkbc@gmail.com>
 
 	* backtrace-child.c (stdarg, main): Replace assert_perror with assert.

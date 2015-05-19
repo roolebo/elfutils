@@ -532,8 +532,8 @@ static int
 handle_address (const char *string, Dwfl *dwfl)
 {
   char *endp;
-  uintmax_t addr = strtoumax (string, &endp, 0);
-  if (endp == string)
+  uintmax_t addr = strtoumax (string, &endp, 16);
+  if (endp == string || *endp != '\0')
     {
       bool parsed = false;
       int i, j;

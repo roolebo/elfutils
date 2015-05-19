@@ -707,7 +707,12 @@ dwfl_linux_kernel_find_elf (Dwfl_Module *mod,
      two files when either a '_' or '-' appears in a module name, one using
      only '_' and one only using '-'.  */
 
-  char alternate_name[namelen + 1];
+  char *alternate_name = malloc (namelen + 1);
+  if (unlikely (alternate_name == NULL))
+    {
+      free (modulesdir[0]);
+      return ENOMEM;
+    }
   inline bool subst_name (char from, char to)
     {
       const char *n = memchr (module_name, from, namelen);
@@ -757,6 +762,7 @@ dwfl_linux_kernel_find_elf (Dwfl_Module *mod,
 	      *file_name = strdup (f->fts_path);
 	      fts_close (fts);
 	      free (modulesdir[0]);
+	      free (alternate_name);
 	      if (fd < 0)
 		free (*file_name);
 	      else if (*file_name == NULL)
@@ -782,6 +788,7 @@ dwfl_linux_kernel_find_elf (Dwfl_Module *mod,
 
   fts_close (fts);
   free (modulesdir[0]);
+  free (alternate_name);
   errno = error;
   return -1;
 }

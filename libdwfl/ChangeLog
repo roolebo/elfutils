@@ -1,5 +1,10 @@
 2015-05-19  Mark Wielaard  <mjw@redhat.com>
 
+	* linux-kernel-modules.c (dwfl_linux_kernel_find_elf): malloc and
+	free alternate_name.
+
+2015-05-19  Mark Wielaard  <mjw@redhat.com>
+
 	* linux-kernel-modules.c (dwfl_linux_kernel_report_offline): Don't
 	stack allocate name. Only change chars up to suffix.
 

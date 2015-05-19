@@ -1,5 +1,5 @@
 /* Locate source files and line information for given addresses
-   Copyright (C) 2005-2010, 2012, 2013 Red Hat, Inc.
+   Copyright (C) 2005-2010, 2012, 2013, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -59,6 +59,7 @@ static const struct argp_option options[] =
     N_("Treat addresses as offsets relative to NAME section."), 0 },
 
   { NULL, 0, NULL, 0, N_("Output format options:"), 3 },
+  { "addresses", 'a', NULL, 0, N_("Print address before each entry"), 0 },
   { "basenames", 's', NULL, 0, N_("Show only base names of source files"), 0 },
   { "absolute", 'A', NULL, 0,
     N_("Show absolute file names using compilation directory"), 0 },
@@ -100,6 +101,8 @@ static const struct argp argp =
 /* Handle ADDR.  */
 static int handle_address (const char *addr, Dwfl *dwfl);
 
+/* True when we should print the address for each entry.  */
+static bool print_addresses;
 
 /* True if only base names of files should be shown.  */
 static bool only_basenames;
@@ -208,6 +211,10 @@ parse_opt (int key, char *arg, struct argp_state *state)
     {
     case ARGP_KEY_INIT:
       state->child_inputs[0] = state->input;
+      break;
+
+    case 'a':
+      print_addresses = true;
       break;
 
     case 'b':
@@ -529,6 +536,29 @@ print_src (const char *src, int lineno, int linecol, Dwarf_Die *cu)
 }
 
 static int
+get_addr_width (Dwfl_Module *mod)
+{
+  // Try to find the address width if possible.
+  static int width = 0;
+  if (width == 0 && mod != NULL)
+    {
+      Dwarf_Addr bias;
+      Elf *elf = dwfl_module_getelf (mod, &bias);
+      if (elf != NULL)
+        {
+	  GElf_Ehdr ehdr_mem;
+	  GElf_Ehdr *ehdr = gelf_getehdr (elf, &ehdr_mem);
+	  if (ehdr != NULL)
+	    width = ehdr->e_ident[EI_CLASS] == ELFCLASS32 ? 8 : 16;
+	}
+    }
+  if (width == 0)
+    width = 16;
+
+  return width;
+}
+
+static int
 handle_address (const char *string, Dwfl *dwfl)
 {
   char *endp;
@@ -581,6 +611,12 @@ handle_address (const char *string, Dwfl *dwfl)
     return 1;
 
   Dwfl_Module *mod = dwfl_addrmodule (dwfl, addr);
+
+  if (print_addresses)
+    {
+      int width = get_addr_width (mod);
+      printf ("0x%.*" PRIx64 "\n", width, addr);
+    }
 
   if (show_functions)
     {

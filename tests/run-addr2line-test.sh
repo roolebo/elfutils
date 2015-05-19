@@ -71,4 +71,40 @@ echo "# stdin without newline symbol, just EOF."
 echo -n "foo" | testrun ${abs_top_builddir}/src/addr2line -f -e testfile > stdin.nl.out || exit 1
 cmp foo.out stdin.nonl.out || exit 1
 
+tempfiles good.addr.out
+
+cat > good.addr.out <<\EOF
+0x08048468
+foo
+/home/drepper/gnu/new-bu/build/ttt/f.c:3
+0x0804845c
+bar
+/home/drepper/gnu/new-bu/build/ttt/b.c:4
+0x08048468
+foo
+/home/drepper/gnu/new-bu/build/ttt/f.c:3
+0x0804845c
+bar
+/home/drepper/gnu/new-bu/build/ttt/b.c:4
+0x08048468
+foo
+/home/drepper/gnu/new-bu/build/ttt/f.c:3
+0x0804845c
+bar
+/home/drepper/gnu/new-bu/build/ttt/b.c:4
+0x08048468
+foo
+/home/drepper/gnu/new-bu/build/ttt/f.c:3
+0x0804845c
+bar
+/home/drepper/gnu/new-bu/build/ttt/b.c:4
+EOF
+
+echo "# Everything on the command line with addresses"
+cat good.addr.out | testrun_compare ${abs_top_builddir}/src/addr2line -a -f -e testfile 0x08048468 0x0804845c foo bar foo+0x0 bar+0x0 foo-0x0 bar-0x0
+
+echo "# Everything from stdin (with newlines) with addresses."
+cat stdin.nl | testrun ${abs_top_builddir}/src/addr2line -a -f -e testfile > stdin.nl.out || exit 1
+cmp good.addr.out stdin.nl.out || exit 1
+
 exit 0

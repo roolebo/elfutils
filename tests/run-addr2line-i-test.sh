@@ -144,4 +144,57 @@ _Z2fuv
 /tmp/x.cpp:33
 EOF
 
+# All together now (plus function names plus addresses).
+testrun_compare ${abs_top_builddir}/src/addr2line -a -f -i -e testfile-inlines 0x00000000000005a0 0x00000000000005a1 0x00000000000005b0 0x00000000000005b1 0x00000000000005c0 0x00000000000005d0 0x00000000000005e0 0x00000000000005e1 0x00000000000005f0 0x00000000000005f1 0x00000000000005f2 <<\EOF
+0x00000000000005a0
+foobar
+/tmp/x.cpp:5
+0x00000000000005a1
+foobar
+/tmp/x.cpp:6
+0x00000000000005b0
+fubar
+/tmp/x.cpp:10
+0x00000000000005b1
+fubar
+/tmp/x.cpp:11
+0x00000000000005c0
+foobar inlined at /tmp/x.cpp:15 in _Z3barv
+/tmp/x.cpp:5
+bar
+/tmp/x.cpp:15
+0x00000000000005d0
+fubar inlined at /tmp/x.cpp:20 in _Z3bazv
+/tmp/x.cpp:10
+baz
+/tmp/x.cpp:20
+0x00000000000005e0
+foobar inlined at /tmp/x.cpp:15 in _Z3foov
+/tmp/x.cpp:5
+bar
+/tmp/x.cpp:15
+_Z3foov
+/tmp/x.cpp:25
+0x00000000000005e1
+fubar inlined at /tmp/x.cpp:20 in _Z3foov
+/tmp/x.cpp:10
+baz
+/tmp/x.cpp:20
+_Z3foov
+/tmp/x.cpp:26
+0x00000000000005f0
+_Z2fuv
+/tmp/x.cpp:31
+0x00000000000005f1
+fubar inlined at /tmp/x.cpp:32 in _Z2fuv
+/tmp/x.cpp:10
+_Z2fuv
+/tmp/x.cpp:32
+0x00000000000005f2
+foobar inlined at /tmp/x.cpp:33 in _Z2fuv
+/tmp/x.cpp:5
+_Z2fuv
+/tmp/x.cpp:33
+EOF
+
 exit 0

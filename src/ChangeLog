@@ -1,5 +1,13 @@
 2015-05-20  Mark Wielaard  <mjw@redhat.com>
 
+	* addr2line.c (argp_option): Add "addresses", 'a'.
+	(print_addresses): New static bool.
+	(parse_opt): Set print_addresses.
+	(get_addr_width): New static function.
+	(handle_address): Print address if print_addresses is true.
+
+2015-05-20  Mark Wielaard  <mjw@redhat.com>
+
 	* addr2line.c (handle_address): Call strtoumax with base 16. Make
 	sure all input has been processed.
 

@@ -1,5 +1,10 @@
 2015-05-19  Mark Wielaard  <mjw@redhat.com>
 
+	* elf-from-memory.c (elf_from_remote_memory): Don't allocate all
+	phdrs on the stack. Allocate with malloc and free when done.
+
+2015-05-19  Mark Wielaard  <mjw@redhat.com>
+
 	* linux-kernel-modules.c (dwfl_linux_kernel_find_elf): malloc and
 	free alternate_name.
 

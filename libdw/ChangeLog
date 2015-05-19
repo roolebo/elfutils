@@ -1,3 +1,9 @@
+2015-05-19  Mark Wielaard <mjw@redhat.com>
+
+	* dwarf_getlocation.c (__libdw_intern_expression): Create a stack
+	allocated array to hold locs. Allocate locs bigger than the array
+	with malloc and free them when done.
+
 2015-05-11  Jonathan Lebon  <jlebon@redhat.com>
 
 	* libdwP.h (DWARF_E_COMPRESSED_ERROR): New enumerator.

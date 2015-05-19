@@ -239,18 +239,28 @@ __libdw_intern_expression (Dwarf *dbg, bool other_byte_order,
   struct loclist *loclist = NULL;
   unsigned int n = 0;
 
+  /* Stack allocate at most this many locs.  */
+#define MAX_STACK_LOCS 256
+  struct loclist stack_locs[MAX_STACK_LOCS];
+#define NEW_LOC() ({ struct loclist *ll;			\
+		     ll = (likely (n < MAX_STACK_LOCS)		\
+			   ? &stack_locs[n]			\
+			   : malloc (sizeof (struct loclist)));	\
+		     if (unlikely (ll == NULL))			\
+		       goto nomem;				\
+		     n++;					\
+		     ll->next = loclist;			\
+		     loclist = ll;				\
+		     ll; })
+
   if (cfap)
     {
       /* Synthesize the operation to push the CFA before the expression.  */
-      struct loclist *newloc;
-      newloc = (struct loclist *) alloca (sizeof (struct loclist));
+      struct loclist *newloc = NEW_LOC ();
       newloc->atom = DW_OP_call_frame_cfa;
       newloc->number = 0;
       newloc->number2 = 0;
       newloc->offset = -1;
-      newloc->next = loclist;
-      loclist = newloc;
-      ++n;
     }
 
   /* Decode the opcodes.  It is possible in some situations to have a
@@ -258,13 +268,10 @@ __libdw_intern_expression (Dwarf *dbg, bool other_byte_order,
   while (data < end_data)
     {
       struct loclist *newloc;
-      newloc = (struct loclist *) alloca (sizeof (struct loclist));
+      newloc = NEW_LOC ();
       newloc->number = 0;
       newloc->number2 = 0;
       newloc->offset = data - block->data;
-      newloc->next = loclist;
-      loclist = newloc;
-      ++n;
 
       switch ((newloc->atom = *data++))
 	{
@@ -348,6 +355,15 @@ __libdw_intern_expression (Dwarf *dbg, bool other_byte_order,
 	    {
 	    invalid:
 	      __libdw_seterrno (DWARF_E_INVALID_DWARF);
+	    returnmem:
+	      /* Free any dynamicly allocated loclists, if any.  */
+	      while (n > MAX_STACK_LOCS)
+		{
+		  struct loclist *loc = loclist;
+		  loclist = loc->next;
+		  free (loc);
+		  n--;
+		}
 	      return -1;
 	    }
 
@@ -503,15 +519,11 @@ __libdw_intern_expression (Dwarf *dbg, bool other_byte_order,
 
   if (valuep)
     {
-      struct loclist *newloc;
-      newloc = (struct loclist *) alloca (sizeof (struct loclist));
+      struct loclist *newloc = NEW_LOC ();
       newloc->atom = DW_OP_stack_value;
       newloc->number = 0;
       newloc->number2 = 0;
       newloc->offset = data - block->data;
-      newloc->next = loclist;
-      loclist = newloc;
-      ++n;
     }
 
   /* Allocate the array.  */
@@ -525,7 +537,7 @@ __libdw_intern_expression (Dwarf *dbg, bool other_byte_order,
 	{
 	nomem:
 	  __libdw_seterrno (DWARF_E_NOMEM);
-	  return -1;
+	  goto returnmem;
 	}
     }
 
@@ -545,7 +557,10 @@ __libdw_intern_expression (Dwarf *dbg, bool other_byte_order,
       if (result[n].atom == DW_OP_implicit_value)
 	store_implicit_value (dbg, cache, &result[n]);
 
+      struct loclist *loc = loclist;
       loclist = loclist->next;
+      if (unlikely (n + 1 > MAX_STACK_LOCS))
+	free (loc);
     }
   while (n > 0);
 

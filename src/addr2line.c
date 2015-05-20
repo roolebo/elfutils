@@ -70,11 +70,12 @@ static const struct argp_option options[] =
   { "inlines", 'i', NULL, 0,
     N_("Show all source locations that caused inline expansion of subroutines at the address."),
     0 },
+  { "demangle", 'C', "ARG", OPTION_ARG_OPTIONAL,
+    N_("Show demangled symbols (ARG is always ignored)"), 0 },
 
   { NULL, 0, NULL, 0, N_("Miscellaneous:"), 0 },
   /* Unsupported options.  */
   { "target", 'b', "ARG", OPTION_HIDDEN, NULL, 0 },
-  { "demangle", 'C', "ARG", OPTION_HIDDEN | OPTION_ARG_OPTIONAL, NULL, 0 },
   { "demangler", OPT_DEMANGLER, "ARG", OPTION_HIDDEN, NULL, 0 },
   { NULL, 0, NULL, 0, NULL, 0 }
 };
@@ -128,6 +129,13 @@ static const char *just_section;
 /* True if all inlined subroutines of the current address should be shown.  */
 static bool show_inlines;
 
+/* True if all names need to be demangled.  */
+static bool demangle;
+
+#ifdef USE_DEMANGLE
+static size_t demangle_buffer_len = 0;
+static char *demangle_buffer = NULL;
+#endif
 
 int
 main (int argc, char *argv[])
@@ -185,6 +193,11 @@ main (int argc, char *argv[])
     }
 
   dwfl_end (dwfl);
+
+#ifdef USE_DEMANGLE
+  free (demangle_buffer);
+#endif
+
   return result;
 }
 
@@ -220,7 +233,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
     case 'b':
     case 'C':
     case OPT_DEMANGLER:
-      /* Ignored for compatibility.  */
+      demangle = true;
       break;
 
     case 's':
@@ -262,6 +275,22 @@ parse_opt (int key, char *arg, struct argp_state *state)
   return 0;
 }
 
+static const char *
+symname (const char *name)
+{
+#ifdef USE_DEMANGLE
+  // Require GNU v3 ABI by the "_Z" prefix.
+  if (demangle && name[0] == '_' && name[1] == 'Z')
+    {
+      int status = -1;
+      char *dsymname = __cxa_demangle (name, demangle_buffer,
+				       &demangle_buffer_len, &status);
+      if (status == 0)
+	name = demangle_buffer = dsymname;
+    }
+#endif
+  return name;
+}
 
 static const char *
 get_diename (Dwarf_Die *die)
@@ -299,7 +328,7 @@ print_dwarf_function (Dwfl_Module *mod, Dwarf_Addr addr)
 	  const char *name = get_diename (&scopes[i]);
 	  if (name == NULL)
 	    return false;
-	  puts (name);
+	  puts (symname (name));
 	  return true;
 	}
 
@@ -308,7 +337,7 @@ print_dwarf_function (Dwfl_Module *mod, Dwarf_Addr addr)
 	  const char *name = get_diename (&scopes[i]);
 	  if (name == NULL)
 	    return false;
-	  printf ("%s inlined", name);
+	  printf ("%s inlined", symname (name));
 
 	  Dwarf_Files *files;
 	  if (dwarf_getsrcfiles (cudie, &files, NULL) == 0)
@@ -389,6 +418,7 @@ print_addrsym (Dwfl_Module *mod, GElf_Addr addr)
     }
   else
     {
+      name = symname (name);
       if (off == 0)
 	printf ("%s", name);
       else
@@ -623,7 +653,13 @@ handle_address (const char *string, Dwfl *dwfl)
       /* First determine the function name.  Use the DWARF information if
 	 possible.  */
       if (! print_dwarf_function (mod, addr) && !show_symbols)
-	puts (dwfl_module_addrname (mod, addr) ?: "??");
+	{
+	  const char *name = dwfl_module_addrname (mod, addr);
+	  if (name != NULL)
+	    puts (symname (name));
+	  else
+	    puts ("??");
+	}
     }
 
   if (show_symbols)
@@ -718,7 +754,7 @@ handle_address (const char *string, Dwfl *dwfl)
 				  || tag == DW_TAG_entry_point
 				  || tag == DW_TAG_subprogram)
 				{
-				  puts (get_diename (parent));
+				  puts (symname (get_diename (parent)));
 				  break;
 				}
 			    }

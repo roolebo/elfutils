@@ -5,6 +5,7 @@ libdw: Install new header elfutils/known-dwarf.h.
 addr2line: Input addresses are now always interpreted as hexadecimal
            numbers, never as octal or decimal numbers.
            New option -a, --addresses to print address before each entry.
+           New option -C, --demangle to show demangled symbols.
 
 Version 0.161
 

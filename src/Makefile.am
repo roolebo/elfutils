@@ -102,7 +102,7 @@ endif
 ld_LDFLAGS = -rdynamic
 elflint_LDADD  = $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl
 findtextrel_LDADD = $(libdw) $(libelf) $(argp_LDADD)
-addr2line_LDADD = $(libdw) $(libelf) $(argp_LDADD)
+addr2line_LDADD = $(libdw) $(libelf) $(argp_LDADD) $(demanglelib)
 elfcmp_LDADD = $(libebl) $(libelf) $(argp_LDADD) -ldl
 objdump_LDADD  = $(libasm) $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl
 ranlib_LDADD = libar.a $(libelf) $(libeu) $(argp_LDADD)

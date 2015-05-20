@@ -1,5 +1,20 @@
 2015-05-20  Mark Wielaard  <mjw@redhat.com>
 
+	* Makefile.am (addr2line_LDADD): Add demanglelib.
+	* addr2line.c (argp_option): Move demangle under output format.
+	(demangle): New static bool.
+	(demangle_buffer_len): New static size_t.
+	(demangle_buffer): New static char *.
+	(main): free demangle_buffer.
+	(parse_opt): Set demangle.
+	(symname): New static function.
+	(get_diename): Use symname.
+	(print_dwarf_function): Likewise.
+	(print_addrsym): Likewise.
+	(handle_address): Likewise.
+
+2015-05-20  Mark Wielaard  <mjw@redhat.com>
+
 	* addr2line.c (argp_option): Add "addresses", 'a'.
 	(print_addresses): New static bool.
 	(parse_opt): Set print_addresses.

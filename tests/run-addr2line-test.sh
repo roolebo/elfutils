@@ -107,4 +107,10 @@ echo "# Everything from stdin (with newlines) with addresses."
 cat stdin.nl | testrun ${abs_top_builddir}/src/addr2line -a -f -e testfile > stdin.nl.out || exit 1
 cmp good.addr.out stdin.nl.out || exit 1
 
+echo "# Pretty with functions and addresses."
+testrun_compare ${abs_top_builddir}/src/addr2line --pretty -a -f -e testfile 0x08048468 0x0804845c << EOF
+0x08048468: foo at /home/drepper/gnu/new-bu/build/ttt/f.c:3
+0x0804845c: bar at /home/drepper/gnu/new-bu/build/ttt/b.c:4
+EOF
+
 exit 0

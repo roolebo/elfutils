@@ -50,6 +50,7 @@ ARGP_PROGRAM_BUG_ADDRESS_DEF = PACKAGE_BUGREPORT;
 
 /* Values for the parameters which have no short form.  */
 #define OPT_DEMANGLER 0x100
+#define OPT_PRETTY 0x101  /* 'p' is already used to select the process.  */
 
 /* Definitions of arguments for argp functions.  */
 static const struct argp_option options[] =
@@ -72,6 +73,8 @@ static const struct argp_option options[] =
     0 },
   { "demangle", 'C', "ARG", OPTION_ARG_OPTIONAL,
     N_("Show demangled symbols (ARG is always ignored)"), 0 },
+  { "pretty-print", OPT_PRETTY, NULL, 0,
+    N_("Print all information on one line, and indent inlines"), 0 },
 
   { NULL, 0, NULL, 0, N_("Miscellaneous:"), 0 },
   /* Unsupported options.  */
@@ -131,6 +134,9 @@ static bool show_inlines;
 
 /* True if all names need to be demangled.  */
 static bool demangle;
+
+/* True if all information should be printed on one line.  */
+static bool pretty;
 
 #ifdef USE_DEMANGLE
 static size_t demangle_buffer_len = 0;
@@ -269,6 +275,10 @@ parse_opt (int key, char *arg, struct argp_state *state)
       show_inlines = true;
       break;
 
+    case OPT_PRETTY:
+      pretty = true;
+      break;
+
     default:
       return ARGP_ERR_UNKNOWN;
     }
@@ -328,7 +338,7 @@ print_dwarf_function (Dwfl_Module *mod, Dwarf_Addr addr)
 	  const char *name = get_diename (&scopes[i]);
 	  if (name == NULL)
 	    return false;
-	  puts (symname (name));
+	  printf ("%s%c", symname (name), pretty ? ' ' : '\n');
 	  return true;
 	}
 
@@ -337,7 +347,16 @@ print_dwarf_function (Dwfl_Module *mod, Dwarf_Addr addr)
 	  const char *name = get_diename (&scopes[i]);
 	  if (name == NULL)
 	    return false;
-	  printf ("%s inlined", symname (name));
+
+	  /* When using --pretty-print we only show inlines on their
+	     own line.  Just print the first subroutine name.  */
+	  if (pretty)
+	    {
+	      printf ("%s ", symname (name));
+	      return true;
+	    }
+	  else
+	    printf ("%s inlined", symname (name));
 
 	  Dwarf_Files *files;
 	  if (dwarf_getsrcfiles (cudie, &files, NULL) == 0)
@@ -412,9 +431,9 @@ print_addrsym (Dwfl_Module *mod, GElf_Addr addr)
       if (i >= 0)
 	name = dwfl_module_relocation_info (mod, i, NULL);
       if (name == NULL)
-	puts ("??");
+	printf ("??%c", pretty ? ' ': '\n');
       else
-	printf ("(%s)+%#" PRIx64 "\n", name, addr);
+	printf ("(%s)+%#" PRIx64 "%c", name, addr, pretty ? ' ' : '\n');
     }
   else
     {
@@ -443,7 +462,7 @@ print_addrsym (Dwfl_Module *mod, GElf_Addr addr)
 		}
 	    }
 	}
-      puts ("");
+      printf ("%c", pretty ? ' ' : '\n');
     }
 }
 
@@ -645,7 +664,7 @@ handle_address (const char *string, Dwfl *dwfl)
   if (print_addresses)
     {
       int width = get_addr_width (mod);
-      printf ("0x%.*" PRIx64 "\n", width, addr);
+      printf ("0x%.*" PRIx64 "%s", width, addr, pretty ? ": " : "\n");
     }
 
   if (show_functions)
@@ -655,15 +674,16 @@ handle_address (const char *string, Dwfl *dwfl)
       if (! print_dwarf_function (mod, addr) && !show_symbols)
 	{
 	  const char *name = dwfl_module_addrname (mod, addr);
-	  if (name != NULL)
-	    puts (symname (name));
-	  else
-	    puts ("??");
+	  name = name != NULL ? symname (name) : "??";
+	  printf ("%s%c", name, pretty ? ' ' : '\n');
 	}
     }
 
   if (show_symbols)
     print_addrsym (mod, addr);
+
+  if ((show_functions || show_symbols) && pretty)
+    printf ("at ");
 
   Dwfl_Line *line = dwfl_module_getsrc (mod, addr);
 
@@ -741,6 +761,9 @@ handle_address (const char *string, Dwfl *dwfl)
 		      if (dwarf_tag (die) != DW_TAG_inlined_subroutine)
 			continue;
 
+		      if (pretty)
+			printf (" (inlined by) ");
+
 		      if (show_functions)
 			{
 			  /* Search for the parent inline or function.  It
@@ -754,7 +777,9 @@ handle_address (const char *string, Dwfl *dwfl)
 				  || tag == DW_TAG_entry_point
 				  || tag == DW_TAG_subprogram)
 				{
-				  puts (symname (get_diename (parent)));
+				  printf ("%s%s",
+					  symname (get_diename (parent)),
+					  pretty ? " at " : "\n");
 				  break;
 				}
 			    }

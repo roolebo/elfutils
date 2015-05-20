@@ -1,5 +1,10 @@
 2015-05-20  Mark Wielaard  <mjw@redhat.com>
 
+	* run-addr2line-i-test.sh: Add pretty test.
+	* run-addr2line-test.sh: Likewise.
+
+2015-05-20  Mark Wielaard  <mjw@redhat.com>
+
 	* run-addr2line-i-demangle-test.sh: New test.
 	* Makefile.am (TESTS): Add run-addr2line-i-demangle-test.sh.
 	(EXTRA_DIST): Likewise.

@@ -197,4 +197,27 @@ _Z2fuv
 /tmp/x.cpp:33
 EOF
 
+# All together now (plus function names and addresses and pretty)
+testrun_compare ${abs_top_builddir}/src/addr2line --pretty-print -a -f -i -e testfile-inlines 0x00000000000005a0 0x00000000000005a1 0x00000000000005b0 0x00000000000005b1 0x00000000000005c0 0x00000000000005d0 0x00000000000005e0 0x00000000000005e1 0x00000000000005f0 0x00000000000005f1 0x00000000000005f2 <<\EOF
+0x00000000000005a0: foobar at /tmp/x.cpp:5
+0x00000000000005a1: foobar at /tmp/x.cpp:6
+0x00000000000005b0: fubar at /tmp/x.cpp:10
+0x00000000000005b1: fubar at /tmp/x.cpp:11
+0x00000000000005c0: foobar at /tmp/x.cpp:5
+ (inlined by) bar at /tmp/x.cpp:15
+0x00000000000005d0: fubar at /tmp/x.cpp:10
+ (inlined by) baz at /tmp/x.cpp:20
+0x00000000000005e0: foobar at /tmp/x.cpp:5
+ (inlined by) bar at /tmp/x.cpp:15
+ (inlined by) _Z3foov at /tmp/x.cpp:25
+0x00000000000005e1: fubar at /tmp/x.cpp:10
+ (inlined by) baz at /tmp/x.cpp:20
+ (inlined by) _Z3foov at /tmp/x.cpp:26
+0x00000000000005f0: _Z2fuv at /tmp/x.cpp:31
+0x00000000000005f1: fubar at /tmp/x.cpp:10
+ (inlined by) _Z2fuv at /tmp/x.cpp:32
+0x00000000000005f2: foobar at /tmp/x.cpp:5
+ (inlined by) _Z2fuv at /tmp/x.cpp:33
+EOF
+
 exit 0

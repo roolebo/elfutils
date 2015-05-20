@@ -1,3 +1,8 @@
+2015-05-20  Mark Wielaard  <mjw@redhat.com>
+
+	* addr2line (argp_option): Group 'section' under "Input format
+	options".
+
 2015-05-12  Mark Wielaard  <mjw@redhat.com>
 
 	* strip.c (debug_fd): New static variable.

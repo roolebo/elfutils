@@ -54,7 +54,11 @@ ARGP_PROGRAM_BUG_ADDRESS_DEF = PACKAGE_BUGREPORT;
 /* Definitions of arguments for argp functions.  */
 static const struct argp_option options[] =
 {
-  { NULL, 0, NULL, 0, N_("Output selection options:"), 2 },
+  { NULL, 0, NULL, 0, N_("Input format options:"), 2 },
+  { "section", 'j', "NAME", 0,
+    N_("Treat addresses as offsets relative to NAME section."), 0 },
+
+  { NULL, 0, NULL, 0, N_("Output format options:"), 3 },
   { "basenames", 's', NULL, 0, N_("Show only base names of source files"), 0 },
   { "absolute", 'A', NULL, 0,
     N_("Show absolute file names using compilation directory"), 0 },
@@ -62,8 +66,6 @@ static const struct argp_option options[] =
   { "symbols", 'S', NULL, 0, N_("Also show symbol or section names"), 0 },
   { "symbols-sections", 'x', NULL, 0, N_("Also show symbol and the section names"), 0 },
   { "flags", 'F', NULL, 0, N_("Also show line table flags"), 0 },
-  { "section", 'j', "NAME", 0,
-    N_("Treat addresses as offsets relative to NAME section."), 0 },
   { "inlines", 'i', NULL, 0,
     N_("Show all source locations that caused inline expansion of subroutines at the address."),
     0 },

@@ -744,6 +744,7 @@ handle_address (const char *string, Dwfl *dwfl)
 	  dwarf_offdie (dwfl_module_getdwarf (mod, &bias),
 			dieoff, &subroutine);
 	  free (scopes);
+	  scopes = NULL;
 
 	  nscopes = dwarf_getscopes_die (&subroutine, &scopes);
 	  if (nscopes > 1)

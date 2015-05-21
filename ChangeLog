@@ -1,3 +1,9 @@
+2015-05-21  Mark Wielaard  <mjw@redhat.com>
+
+	* configure.ac: Add --enable-sanitize-undefined.
+	* Makefile.am (DISTCHECK_CONFIGURE_FLAGS): Rename to...
+	(AM_DISTCHECK_CONFIGURE_FLAGS): this. Add --enable-sanitize-undefined.
+
 2015-05-04  Anthony G. Basile  <blueness@gentoo.org>
 
 	* configure.ac (argp_LDADD): Check if libc has argp and set

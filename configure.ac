@@ -193,6 +193,23 @@ if test "$use_gcov" = yes; then
 fi
 AM_CONDITIONAL(GCOV, test "$use_gcov" = yes)
 
+AC_ARG_ENABLE([sanitize-undefined],
+              AS_HELP_STRING([--enable-sanitize-undefined],
+                             [Use gcc undefined behaviour sanitizer]),
+                             [use_undefined=$enableval], [use_undefined=no])
+if test "$use_undefined" = yes; then
+  old_CFLAGS="$CFLAGS"
+  old_CXXFLAGS="$CXXFLAGS"
+  # We explicitly use unaligned access when possible (see ALLOW_UNALIGNED)
+  # We want to fail immediately on first error, don't try to recover.
+  CFLAGS="$CFLAGS -fsanitize=undefined -fno-sanitize=alignment -fno-sanitize-recover"
+  CXXFLAGS="$CXXFLAGS -fsanitize=undefined -fno-sanitize=alignment -fno-sanitize-recover"
+  AC_COMPILE_IFELSE([AC_LANG_SOURCE([])], use_undefined=yes, use_undefined=no)
+  AS_IF([test "x$use_undefined" != xyes],
+        AC_MSG_WARN([gcc undefined behaviour sanitizer not available])
+        CFLAGS="$old_CFLAGS" CXXFLAGS="$old_CXXFLAGS")
+fi
+
 AC_ARG_ENABLE([valgrind],
 AS_HELP_STRING([--enable-valgrind],[run all tests under valgrind]),
 [use_valgrind=$enableval], [use_valgrind=no])
@@ -421,6 +438,7 @@ AC_MSG_NOTICE([
     gprof support                      : ${use_gprof}
     gcov support                       : ${use_gcov}
     run all tests under valgrind       : ${use_valgrind}
+    gcc undefined behaviour sanitizer  : ${use_undefined}
     use rpath in tests                 : ${tests_use_rpath}
     test biarch                        : ${utrace_cv_cc_biarch}
 ])

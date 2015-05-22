@@ -1,3 +1,9 @@
+2015-05-22  Mark Wielaard  <mjw@redhat.com>
+
+	* dwfl_build_id_find_elf.c (__libdwfl_open_by_build_id): Return
+	error when id_len too small or too large. strdup, not strdupa,
+	and free path when done.
+
 2015-05-19  Mark Wielaard  <mjw@redhat.com>
 
 	* elf-from-memory.c (elf_from_remote_memory): Don't allocate all

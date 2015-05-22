@@ -1,3 +1,11 @@
+2015-05-22  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_getsrclines.c (read_srclines): Limit stack usage of lines
+	with MAX_STACK_LINES, files with MAX_STACK_LINES and dirs with
+	MAX_STACK_DIRS. Calculate number of dirs needed first, then
+	create dirarray directly, without needing the next field. Free
+	not stack allocated lines and files at the end.
+
 2015-05-19  Mark Wielaard <mjw@redhat.com>
 
 	* dwarf_getlocation.c (__libdw_intern_expression): Create a stack

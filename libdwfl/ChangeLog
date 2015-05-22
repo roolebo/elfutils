@@ -1,5 +1,11 @@
 2015-05-22  Mark Wielaard  <mjw@redhat.com>
 
+	* dwfl_segment_report_module.c (dwfl_segment_report_module):
+	Allocate phdrs with malloc, not on stack. free in finish.
+	Allocate dyn with malloc, not on stack, free after use.
+
+2015-05-22  Mark Wielaard  <mjw@redhat.com>
+
 	* find-debuginfo.c (find_debuginfo_in_path): malloc or strdup,
 	instead of alloca or strdupa, local strings of unknown size.
 	Call free before return.

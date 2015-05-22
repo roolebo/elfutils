@@ -45,7 +45,7 @@ try_open (const struct stat64 *main_stat,
   if (dir == NULL && subdir == NULL)
     {
       fname = strdup (debuglink);
-      if (fname == NULL)
+      if (unlikely (fname == NULL))
 	return -1;
     }
   else if ((subdir == NULL ? asprintf (&fname, "%s/%s", dir, debuglink)
@@ -161,6 +161,7 @@ find_debuginfo_in_path (Dwfl_Module *mod, const char *file_name,
   bool cancheck = debuglink_crc != (GElf_Word) 0;
 
   const char *file_basename = file_name == NULL ? NULL : basename (file_name);
+  char *localname = NULL;
   if (debuglink_file == NULL)
     {
       /* For a alt debug multi file we need a name, for a separate debug
@@ -172,7 +173,9 @@ find_debuginfo_in_path (Dwfl_Module *mod, const char *file_name,
 	}
 
       size_t len = strlen (file_basename);
-      char *localname = alloca (len + sizeof ".debug");
+      localname = malloc (len + sizeof ".debug");
+      if (unlikely (localname == NULL))
+	return -1;
       memcpy (localname, file_basename, len);
       memcpy (&localname[len], ".debug", sizeof ".debug");
       debuglink_file = localname;
@@ -183,11 +186,17 @@ find_debuginfo_in_path (Dwfl_Module *mod, const char *file_name,
      indicated by the debug directory path setting.  */
 
   const Dwfl_Callbacks *const cb = mod->dwfl->callbacks;
-  char *path = strdupa ((cb->debuginfo_path ? *cb->debuginfo_path : NULL)
-			?: DEFAULT_DEBUGINFO_PATH);
+  char *localpath = strdup ((cb->debuginfo_path ? *cb->debuginfo_path : NULL)
+			    ?: DEFAULT_DEBUGINFO_PATH);
+  if (unlikely (localpath == NULL))
+    {
+      free (localname);
+      return -1;
+    }
 
   /* A leading - or + in the whole path sets whether to check file CRCs.  */
   bool defcheck = true;
+  char *path = localpath;
   if (path[0] == '-' || path[0] == '+')
     {
       defcheck = path[0] == '+';
@@ -205,7 +214,13 @@ find_debuginfo_in_path (Dwfl_Module *mod, const char *file_name,
     }
 
   char *file_dirname = (file_basename == file_name ? NULL
-			: strndupa (file_name, file_basename - 1 - file_name));
+			: strndup (file_name, file_basename - 1 - file_name));
+  if (file_basename != file_name && file_dirname == NULL)
+    {
+      free (localpath);
+      free (localname);
+      return -1;
+    }
   char *p;
   while ((p = strsep (&path, ":")) != NULL)
     {
@@ -270,7 +285,7 @@ find_debuginfo_in_path (Dwfl_Module *mod, const char *file_name,
 		if (fd < 0)
 		  {
 		    if (errno != ENOENT && errno != ENOTDIR)
-		      return -1;
+		      goto fail_free;
 		    else
 		      continue;
 		  }
@@ -278,8 +293,17 @@ find_debuginfo_in_path (Dwfl_Module *mod, const char *file_name,
 	      }
 	    continue;
 	  default:
-	    return -1;
+	    {
+	    fail_free:
+	      free (localpath);
+	      free (localname);
+	      free (file_dirname);
+	      return -1;
+	    }
 	  }
+      free (localpath);
+      free (localname);
+      free (file_dirname);
       if (validate (mod, fd, check, debuglink_crc))
 	{
 	  *debuginfo_file_name = fname;

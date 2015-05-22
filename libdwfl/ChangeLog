@@ -1,5 +1,11 @@
 2015-05-22  Mark Wielaard  <mjw@redhat.com>
 
+	* find-debuginfo.c (find_debuginfo_in_path): malloc or strdup,
+	instead of alloca or strdupa, local strings of unknown size.
+	Call free before return.
+
+2015-05-22  Mark Wielaard  <mjw@redhat.com>
+
 	* dwfl_build_id_find_elf.c (__libdwfl_open_by_build_id): Return
 	error when id_len too small or too large. strdup, not strdupa,
 	and free path when done.

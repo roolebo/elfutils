@@ -1,5 +1,5 @@
 /* Report modules by examining dynamic linker data structures.
-   Copyright (C) 2008-2014 Red Hat, Inc.
+   Copyright (C) 2008-2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -369,7 +369,7 @@ report_r_debug (uint_fast8_t elfclass, uint_fast8_t elfdata,
 	  const char *name1 = name == NULL ? "" : name;
 	  r_debug_info_module = malloc (sizeof (*r_debug_info_module)
 					+ strlen (name1) + 1);
-	  if (r_debug_info_module == NULL)
+	  if (unlikely (r_debug_info_module == NULL))
 	    return release_buffer (result);
 	  r_debug_info_module->fd = -1;
 	  r_debug_info_module->elf = NULL;
@@ -856,18 +856,24 @@ dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 	    }
 	  if (in_ok)
 	    {
-	      union
+	      typedef union
 	      {
 		Elf32_Phdr p32;
 		Elf64_Phdr p64;
 		char data[phnum * phent];
-	      } buf;
+	      } data_buf;
+	      data_buf *buf = malloc (sizeof (data_buf));
+	      if (unlikely (buf == NULL))
+		{
+		  __libdwfl_seterrno (DWFL_E_NOMEM);
+		  return false;
+		}
 	      Elf_Data out =
 		{
 		  .d_type = ELF_T_PHDR,
 		  .d_version = EV_CURRENT,
 		  .d_size = phnum * phent,
-		  .d_buf = &buf
+		  .d_buf = buf
 		};
 	      in.d_size = out.d_size;
 	      if (likely ((elfclass == ELFCLASS32
@@ -879,7 +885,7 @@ dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 		  {
 		    Elf32_Phdr p32[phnum];
 		    Elf64_Phdr p64[phnum];
-		  } *u = (void *) &buf;
+		  } *u = (void *) buf;
 		  if (elfclass == ELFCLASS32)
 		    {
 		      for (size_t i = 0; i < phnum; ++i)
@@ -900,6 +906,7 @@ dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 
 	      (*memory_callback) (dwfl, -1, &in.d_buf, &in.d_size, 0, 0,
 				  memory_callback_arg);
+	      free (buf);
 	    }
 	  else
 	    /* We could not read the executable's phdrs from the
@@ -943,18 +950,24 @@ dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 	  if ((*memory_callback) (dwfl, dyn_segndx, &in.d_buf, &in.d_size,
 				  dyn_vaddr, dyn_filesz, memory_callback_arg))
 	    {
-	      union
+	      typedef union
 	      {
 		Elf32_Dyn d32;
 		Elf64_Dyn d64;
 		char data[dyn_filesz];
-	      } buf;
+	      } data_buf;
+	      data_buf *buf = malloc (sizeof (data_buf));
+	      if (unlikely (buf == NULL))
+		{
+		  __libdwfl_seterrno (DWFL_E_NOMEM);
+		  return false;
+		}
 	      Elf_Data out =
 		{
 		  .d_type = ELF_T_DYN,
 		  .d_version = EV_CURRENT,
 		  .d_size = dyn_filesz,
-		  .d_buf = &buf
+		  .d_buf = buf
 		};
 	      in.d_size = out.d_size;
 	      if (likely ((elfclass == ELFCLASS32
@@ -966,7 +979,7 @@ dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 		  {
 		    Elf32_Dyn d32[dyn_filesz / sizeof (Elf32_Dyn)];
 		    Elf64_Dyn d64[dyn_filesz / sizeof (Elf64_Dyn)];
-		  } *u = (void *) &buf;
+		  } *u = (void *) buf;
 		  if (elfclass == ELFCLASS32)
 		    {
 		      size_t n = dyn_filesz / sizeof (Elf32_Dyn);
@@ -991,6 +1004,7 @@ dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 
 	      (*memory_callback) (dwfl, -1, &in.d_buf, &in.d_size, 0, 0,
 				  memory_callback_arg);
+	      free (buf);
 	    }
 	}
     }

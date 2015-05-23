@@ -1,3 +1,8 @@
+2015-05-23  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am: Define ldgeneric, readelf, nm, size, strip, elflint,
+	findtextrel, elfcmp objdump, ranlib, ar and unstrip no_Wstack_usage.
+
 2015-05-21  Mark Wielaard  <mjw@redhat.com>
 
 	* addr2line.c (handle_address): Set scopes to NULL after free.

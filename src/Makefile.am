@@ -88,6 +88,20 @@ endif
 
 # XXX While the file is not finished, don't warn about this
 ldgeneric_no_Wunused = yes
+ldgeneric_no_Wstack_usage = yes
+
+# Bad, bad stack usage...
+readelf_no_Wstack_usage = yes
+nm_no_Wstack_usage = yes
+size_no_Wstack_usage = yes
+strip_no_Wstack_usage = yes
+elflint_no_Wstack_usage = yes
+findtextrel_no_Wstack_usage = yes
+elfcmp_no_Wstack_usage = yes
+objdump_no_Wstack_usage = yes
+ranlib_no_Wstack_usage = yes
+ar_no_Wstack_usage = yes
+unstrip_no_Wstack_usage = yes
 
 readelf_LDADD = $(libdw) $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl
 nm_LDADD = $(libdw) $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl \

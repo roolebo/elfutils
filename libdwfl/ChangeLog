@@ -1,3 +1,7 @@
+2015-05-24  Mark Wielaard  <mjw@redhat.com>
+
+	* derelocate.c (check_module): Check mod is not NULL.
+
 2015-05-22  Mark Wielaard  <mjw@redhat.com>
 
 	* link_map.c (dwfl_link_map_report): Allocate phdrs and dyn with

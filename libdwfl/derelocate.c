@@ -285,6 +285,9 @@ dwfl_module_relocation_info (Dwfl_Module *mod, unsigned int idx,
 static bool
 check_module (Dwfl_Module *mod)
 {
+  if (mod == NULL)
+    return true;
+
   if (INTUSE(dwfl_module_getsymtab) (mod) < 0)
     {
       Dwfl_Error error = dwfl_errno ();

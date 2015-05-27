@@ -214,9 +214,10 @@ read_encoded_value (const Dwarf_CFI *cache, uint8_t encoding,
       if (unlikely (*result < cache->frame_vaddr))
 	return true;
       *result -= cache->frame_vaddr;
-      if (unlikely (*result > (cache->data->d.d_size
-			       - encoded_value_size (NULL, cache->e_ident,
-						     DW_EH_PE_absptr, NULL))))
+      size_t ptrsize = encoded_value_size (NULL, cache->e_ident,
+					   DW_EH_PE_absptr, NULL);
+      if (unlikely (cache->data->d.d_size < ptrsize
+		    || *result > (cache->data->d.d_size - ptrsize)))
 	return true;
       const uint8_t *ptr = cache->data->d.d_buf + *result;
       if (unlikely (__libdw_cfi_read_address_inc (cache, &ptr, 0, result)

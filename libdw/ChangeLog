@@ -1,3 +1,8 @@
+2015-05-27  Mark Wielaard  <mjw@redhat.com>
+
+	* encoded-value.h (read_encoded_value): Check data d_size contains
+	at least enough data to hold a pointer for DW_EH_PE_indirect.
+
 2015-05-22  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_getsrclines.c (read_srclines): Limit stack usage of lines

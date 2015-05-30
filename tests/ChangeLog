@@ -1,3 +1,16 @@
+2015-05-30  Mark Wielaard  <mjw@redhat.com>
+
+	* backtrace-subr.sh (check_native_core): Notice core file couldn't be
+	generated before skipping.
+	* run-addr2line-i-demangle-test.sh: Notice demangler is unsupported
+	before skipping.
+	* run-backtrace-demangle.sh: Likewise.
+	* run-stack-demangled-test.sh: Likewise.
+	* run-backtrace-native-biarch.sh: Notice biarch testing is disabled
+	before skipping.
+	* run-backtrace-native-core-biarch.sh: Likewise.
+	* test-subr.sh (testfiles): Notice how bunzip2 fails before skipping.
+
 2015-05-20  Mark Wielaard  <mjw@redhat.com>
 
 	* run-addr2line-i-test.sh: Add pretty test.

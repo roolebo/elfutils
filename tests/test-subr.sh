@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2005-2014 Red Hat, Inc.
+# Copyright (C) 2005-2015 Red Hat, Inc.
 # This file is part of elfutils.
 #
 # This file is free software; you can redistribute it and/or modify
@@ -47,7 +47,7 @@ tempfiles()
 testfiles()
 {
   for file; do
-    bunzip2 -c ${abs_srcdir}/${file}.bz2 > ${file} 2>/dev/null || exit 77
+    bunzip2 -c ${abs_srcdir}/${file}.bz2 > ${file} || exit 77
     remove_files="$remove_files $file"
   done
 }

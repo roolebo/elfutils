@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 if test -n "$ELFUTILS_DISABLE_DEMANGLE"; then
+  echo "demangler unsupported"
   exit 77
 fi
 

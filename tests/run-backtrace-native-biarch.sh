@@ -1,5 +1,5 @@
 #! /bin/bash
-# Copyright (C) 2013 Red Hat, Inc.
+# Copyright (C) 2013, 2015 Red Hat, Inc.
 # This file is part of elfutils.
 #
 # This file is free software; you can redistribute it and/or modify
@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 if test -n "$ELFUTILS_DISABLE_BIARCH"; then
+  echo "biarch testing disabled"
   exit 77
 fi
 

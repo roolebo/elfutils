@@ -1,3 +1,9 @@
+2015-05-30  Mark Wielaard  <mjw@redhat.com>
+
+	* configure.ac: Check for bunzip2. Check flex and bison are
+	installed in maintainer-mode. Otherwise check libdw/known-dwarf.h
+	is already generated.
+
 2015-05-21  Mark Wielaard  <mjw@redhat.com>
 
 	* configure.ac: Add --enable-sanitize-undefined.

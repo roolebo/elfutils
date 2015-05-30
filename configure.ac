@@ -404,6 +404,29 @@ utrace_BIARCH
 CC_BIARCH="$CC $utrace_biarch"
 AC_SUBST([CC_BIARCH])
 
+# In maintainer mode we really need flex and bison.
+# Otherwise we really need a release dir with maintainer files generated.
+if test "x$enable_maintainer_mode" = xyes; then
+  AC_CHECK_PROG(HAVE_FLEX, flex, yes, no)
+  if test "$HAVE_FLEX" = "no"; then
+    AC_MSG_ERROR([flex needed in maintainer mode])
+  fi
+  AC_CHECK_PROG(HAVE_BISON, bison, yes, no)
+  if test "$HAVE_BISON" = "no"; then
+    AC_MSG_ERROR([bison needed in maintainer mode])
+  fi
+else
+  if test ! -f ${srcdir}/libdw/known-dwarf.h; then
+    AC_MSG_ERROR([No libdw/known-dwarf.h. configure --enable-maintainer-mode])
+  fi
+fi
+
+# The testfiles are all compressed, we need bunzip2 when running make check
+AC_CHECK_PROG(HAVE_BUNZIP2, bunzip2, yes, no)
+if test "$HAVE_BUNZIP2" = "no"; then
+  AC_MSG_WARN([No bunzip2, needed to run make check])
+fi
+
 AC_OUTPUT
 
 AC_MSG_NOTICE([
@@ -434,6 +457,7 @@ AC_MSG_NOTICE([
     Native language support            : ${USE_NLS}
 
   EXTRA TEST FEATURES (used with make check)
+    have bunzip2 installed (required)  : ${HAVE_BUNZIP2}
     debug branch prediction            : ${use_debugpred}
     gprof support                      : ${use_gprof}
     gcov support                       : ${use_gcov}

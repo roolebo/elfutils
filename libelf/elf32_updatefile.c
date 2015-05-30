@@ -367,7 +367,7 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 
 			last_position += dl->data.d.d_size;
 		      }
-		    else
+		    else if (dl->data.d.d_size != 0)
 		      last_position = mempcpy (last_position,
 					       dl->data.d.d_buf,
 					       dl->data.d.d_size);

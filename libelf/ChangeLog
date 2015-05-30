@@ -1,5 +1,9 @@
 2015-05-30  Mark Wielaard  <mjw@redhat.com>
 
+	* gelf_xlate.c (elf_cvt_Byte): Only call memmove with non-zero size.
+
+2015-05-30  Mark Wielaard  <mjw@redhat.com>
+
 	* elf32_updatefile.c (updatemmap): Only call mempcpy and update
 	last_position when d_size is non-zero.
 

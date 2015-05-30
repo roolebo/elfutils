@@ -1,5 +1,5 @@
 /* Compare relevant content of two ELF files.
-   Copyright (C) 2005-2012, 2014 Red Hat, Inc.
+   Copyright (C) 2005-2012, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -511,6 +511,7 @@ cannot read note section [%zu] '%s' in '%s': %s"),
 
 	  if (unlikely (data1->d_size != data2->d_size
 			|| (shdr1->sh_type != SHT_NOBITS
+			    && data1->d_size != 0
 			    && memcmp (data1->d_buf, data2->d_buf,
 				       data1->d_size) != 0)))
 	    {

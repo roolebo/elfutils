@@ -1,3 +1,8 @@
+2015-05-30  Mark Wielaard  <mjw@redhat.com>
+
+	* find-debuginfo.c (dwfl_standard_find_debuginfo): Check file_name is
+	not NULL before calling canonicalize_file_name.
+
 2015-05-24  Mark Wielaard  <mjw@redhat.com>
 
 	* derelocate.c (check_module): Check mod is not NULL.

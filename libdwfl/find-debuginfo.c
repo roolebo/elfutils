@@ -357,7 +357,7 @@ dwfl_standard_find_debuginfo (Dwfl_Module *mod,
 				   debuglink_file, debuglink_crc,
 				   debuginfo_file_name);
 
-  if (fd < 0 && errno == 0)
+  if (fd < 0 && errno == 0 && file_name != NULL)
     {
       /* If FILE_NAME is a symlink, the debug file might be associated
 	 with the symlink target name instead.  */

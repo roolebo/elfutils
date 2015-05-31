@@ -111,15 +111,22 @@ load_shdr_wrlock (Elf_Scn *scn)
 	}
       else
 	{
-	  if (ALLOW_UNALIGNED
-	      || ((uintptr_t) file_shdr
-		  & (__alignof__ (ElfW2(LIBELFBITS,Shdr)) - 1)) == 0)
+	  bool copy = ! (ALLOW_UNALIGNED
+			 || ((uintptr_t) file_shdr
+			     & (__alignof__ (ElfW2(LIBELFBITS,Shdr)) - 1))
+			     == 0);
+	  if (! copy)
 	    notcvt = (ElfW2(LIBELFBITS,Shdr) *)
 	      ((char *) elf->map_address
 	       + elf->start_offset + ehdr->e_shoff);
 	  else
 	    {
-	      notcvt = (ElfW2(LIBELFBITS,Shdr) *) alloca (size);
+	      notcvt = (ElfW2(LIBELFBITS,Shdr) *) malloc (size);
+	      if (unlikely (notcvt == NULL))
+		{
+		  __libelf_seterrno (ELF_E_NOMEM);
+		  goto out;
+		}
 	      memcpy (notcvt, ((char *) elf->map_address
 			       + elf->start_offset + ehdr->e_shoff),
 		      size);
@@ -153,6 +160,9 @@ load_shdr_wrlock (Elf_Scn *scn)
 		elf->state.ELFW(elf,LIBELFBITS).scns.data[cnt].shndx_index
 		  = -1;
 	    }
+
+	  if (copy)
+	    free (notcvt);
 	}
     }
   else if (likely (elf->fildes != -1))

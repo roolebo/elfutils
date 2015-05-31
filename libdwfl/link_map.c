@@ -58,8 +58,7 @@ auxv_format_probe (const void *auxv, size_t size,
   inline bool check64 (size_t i)
   {
     /* The AUXV pointer might not even be naturally aligned for 64-bit
-       data, because note payloads in a core file are not aligned.
-       But we assume the data is 32-bit aligned.  */
+       data, because note payloads in a core file are not aligned.  */
 
     uint64_t type = read_8ubyte_unaligned_noncvt (&u->a64[i].a_type);
     uint64_t val = read_8ubyte_unaligned_noncvt (&u->a64[i].a_un.a_val);
@@ -83,15 +82,21 @@ auxv_format_probe (const void *auxv, size_t size,
 
   inline bool check32 (size_t i)
   {
-    if (u->a32[i].a_type == BE32 (PROBE_TYPE)
-	&& u->a32[i].a_un.a_val == BE32 (PROBE_VAL32))
+    /* The AUXV pointer might not even be naturally aligned for 32-bit
+       data, because note payloads in a core file are not aligned.  */
+
+    uint32_t type = read_4ubyte_unaligned_noncvt (&u->a32[i].a_type);
+    uint32_t val = read_4ubyte_unaligned_noncvt (&u->a32[i].a_un.a_val);
+
+    if (type == BE32 (PROBE_TYPE)
+	&& val == BE32 (PROBE_VAL32))
       {
 	*elfdata = ELFDATA2MSB;
 	return true;
       }
 
-    if (u->a32[i].a_type == LE32 (PROBE_TYPE)
-	&& u->a32[i].a_un.a_val == LE32 (PROBE_VAL32))
+    if (type == LE32 (PROBE_TYPE)
+	&& val == LE32 (PROBE_VAL32))
       {
 	*elfdata = ELFDATA2LSB;
 	return true;
@@ -285,19 +290,19 @@ report_r_debug (uint_fast8_t elfclass, uint_fast8_t elfdata,
       {
 	if (elfdata == ELFDATA2MSB)
 	  for (size_t i = 0; i < n; ++i)
-	    addrs[i] = BE32 (in->a32[i]);
+	    addrs[i] = BE32 (read_4ubyte_unaligned_noncvt (&in->a32[i]));
 	else
 	  for (size_t i = 0; i < n; ++i)
-	    addrs[i] = LE32 (in->a32[i]);
+	    addrs[i] = LE32 (read_4ubyte_unaligned_noncvt (&in->a32[i]));
       }
     else
       {
 	if (elfdata == ELFDATA2MSB)
 	  for (size_t i = 0; i < n; ++i)
-	    addrs[i] = BE64 (in->a64[i]);
+	    addrs[i] = BE64 (read_8ubyte_unaligned_noncvt (&in->a64[i]));
 	else
 	  for (size_t i = 0; i < n; ++i)
-	    addrs[i] = LE64 (in->a64[i]);
+	    addrs[i] = LE64 (read_8ubyte_unaligned_noncvt (&in->a64[i]));
       }
 
     return false;

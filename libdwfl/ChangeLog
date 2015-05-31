@@ -1,5 +1,12 @@
 2015-05-30  Mark Wielaard  <mjw@redhat.com>
 
+	* link_map.c (check32): Use read_4ubyte_unaligned_noncvt to read
+	type and value.
+	(read_addrs): Use read_(4|8)ubyte_unaligned_noncvt or to read
+	adresses.
+
+2015-05-30  Mark Wielaard  <mjw@redhat.com>
+
 	* find-debuginfo.c (dwfl_standard_find_debuginfo): Check file_name is
 	not NULL before calling canonicalize_file_name.
 

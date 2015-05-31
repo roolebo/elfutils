@@ -73,7 +73,8 @@
 
 /* Define ALLOW_UNALIGNED if the architecture allows operations on
    unaligned memory locations.  */
-#if defined __i386__ || defined __x86_64__
+#define SANITIZE_UNDEFINED 1
+#if (defined __i386__ || defined __x86_64__) && ! CHECK_UNDEFINED
 # define ALLOW_UNALIGNED	1
 #else
 # define ALLOW_UNALIGNED	0

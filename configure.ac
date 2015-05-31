@@ -202,13 +202,19 @@ if test "$use_undefined" = yes; then
   old_CXXFLAGS="$CXXFLAGS"
   # We explicitly use unaligned access when possible (see ALLOW_UNALIGNED)
   # We want to fail immediately on first error, don't try to recover.
-  CFLAGS="$CFLAGS -fsanitize=undefined -fno-sanitize=alignment -fno-sanitize-recover"
-  CXXFLAGS="$CXXFLAGS -fsanitize=undefined -fno-sanitize=alignment -fno-sanitize-recover"
-  AC_COMPILE_IFELSE([AC_LANG_SOURCE([])], use_undefined=yes, use_undefined=no)
+  CFLAGS="$CFLAGS -fsanitize=undefined -fno-sanitize-recover"
+  CXXFLAGS="$CXXFLAGS -fsanitize=undefined -fno-sanitize-recover"
+  AC_LINK_IFELSE([AC_LANG_SOURCE([int main (int argc, char **argv) { return 0; }])], use_undefined=yes, use_undefined=no)
   AS_IF([test "x$use_undefined" != xyes],
         AC_MSG_WARN([gcc undefined behaviour sanitizer not available])
         CFLAGS="$old_CFLAGS" CXXFLAGS="$old_CXXFLAGS")
 fi
+case $use_undefined in
+ yes) check_undefined_val=1 ;;
+ *)   check_undefined_val=0 ;;
+esac
+AC_DEFINE_UNQUOTED(CHECK_UNDEFINED, $check_undefined_val,
+		   [Building with -fsanitize=undefined or not])
 
 AC_ARG_ENABLE([valgrind],
 AS_HELP_STRING([--enable-valgrind],[run all tests under valgrind]),

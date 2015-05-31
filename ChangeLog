@@ -1,5 +1,10 @@
 2015-05-31  Mark Wielaard  <mjw@redhat.com>
 
+	* configure.ac (MODVERSION): Define using LIBEBL_SUBDIR, eu_version
+	and ac_cv_build.
+
+2015-05-31  Mark Wielaard  <mjw@redhat.com>
+
 	* configure.ac (use_undefined): Use AC_LINK_IFELSE. AC_DEFINE
 	CHECK_UNDEFINED.
 

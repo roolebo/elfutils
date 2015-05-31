@@ -29,12 +29,6 @@ dnl We use GNU make extensions; automake 1.10 defaults to -Wportability.
 AM_INIT_AUTOMAKE([gnits 1.11 -Wno-portability dist-bzip2 no-dist-gzip parallel-tests])
 AM_MAINTAINER_MODE
 
-dnl Unique ID for this build.
-MODVERSION="Build on $(hostname) $(date +%FT%R:%S%z)"
-AC_SUBST([MODVERSION])
-AC_DEFINE_UNQUOTED(MODVERSION, "$MODVERSION")
-AH_TEMPLATE([MODVERSION], [Identifier for modules in the build.])
-
 AC_CONFIG_SRCDIR([libelf/libelf.h])
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_HEADERS([config.h])
@@ -387,6 +381,12 @@ esac
 
 # Round up to the next release API (x.y) version.
 eu_version=$(( (eu_version + 999) / 1000 ))
+
+dnl Unique ID for this build.
+MODVERSION="Build for ${LIBEBL_SUBDIR} ${eu_version} ${ac_cv_build}"
+AC_SUBST([MODVERSION])
+AC_DEFINE_UNQUOTED(MODVERSION, "$MODVERSION")
+AH_TEMPLATE([MODVERSION], [Identifier for modules in the build.])
 
 AC_CHECK_SIZEOF(long)
 

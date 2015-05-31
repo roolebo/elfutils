@@ -141,13 +141,20 @@ __elfw2(LIBELFBITS,getphdr_wrlock) (elf)
 		}
 	      else
 		{
-		  if (ALLOW_UNALIGNED
-		      || ((uintptr_t) file_phdr
-			  & (__alignof__ (ElfW2(LIBELFBITS,Phdr)) - 1)) == 0)
+		  bool copy = ! (ALLOW_UNALIGNED
+				 || ((uintptr_t) file_phdr
+				     & (__alignof__ (ElfW2(LIBELFBITS,Phdr))
+					- 1)) == 0);
+		  if (! copy)
 		    notcvt = file_phdr;
 		  else
 		    {
-		      notcvt = (ElfW2(LIBELFBITS,Phdr) *) alloca (size);
+		      notcvt = (ElfW2(LIBELFBITS,Phdr) *) malloc (size);
+		      if (unlikely (notcvt == NULL))
+			{
+			  __libelf_seterrno (ELF_E_NOMEM);
+			  goto out;
+			}
 		      memcpy (notcvt, file_phdr, size);
 		    }
 
@@ -162,6 +169,9 @@ __elfw2(LIBELFBITS,getphdr_wrlock) (elf)
 		      CONVERT_TO (phdr[cnt].p_flags, notcvt[cnt].p_flags);
 		      CONVERT_TO (phdr[cnt].p_align, notcvt[cnt].p_align);
 		    }
+
+		  if (copy)
+		    free (notcvt);
 		}
 	    }
 	}

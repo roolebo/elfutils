@@ -1,5 +1,10 @@
 2015-05-31  Mark Wielaard  <mjw@redhat.com>
 
+	* elf32_getphdr.c (getphdr_wrlock): Allocate phdrs with malloc, not
+	alloca and free after conversion when a copy needs to be made.
+
+2015-05-31  Mark Wielaard  <mjw@redhat.com>
+
 	* elf_getarsym.c (elf_getarsym): Allocate temporary file_date with
 	malloc, not alloca also in !ALLOW_UNALIGNED case.
 

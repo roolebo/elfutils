@@ -73,7 +73,8 @@ __libdwfl_open_by_build_id (Dwfl_Module *mod, bool debug, char **file_name,
 
   int fd = -1;
   char *dir;
-  while (fd < 0 && (dir = strsep (&path, ":")) != NULL)
+  char *paths = path;
+  while (fd < 0 && (dir = strsep (&paths, ":")) != NULL)
     {
       if (dir[0] == '+' || dir[0] == '-')
 	++dir;

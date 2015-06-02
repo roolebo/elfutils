@@ -1,3 +1,8 @@
+2015-06-02  Mark Wielaard  <mjw@redhat.com>
+
+	* elf_begin.c (file_read_elf): Split checks for ehdr and shdr
+	alignment, drop phdr alignment check.
+
 2015-05-31  Mark Wielaard  <mjw@redhat.com>
 
 	* elf32_getshdr.c (load_shdr_wrlock): Allocate shdrs with malloc,

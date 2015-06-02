@@ -1,5 +1,5 @@
 /* Create descriptor for processing file.
-   Copyright (C) 1998-2010, 2012, 2014 Red Hat, Inc.
+   Copyright (C) 1998-2010, 2012, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -306,17 +306,46 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
       /* This is a 32-bit binary.  */
       if (map_address != NULL && e_ident[EI_DATA] == MY_ELFDATA
 	  && (ALLOW_UNALIGNED
-	      || ((((uintptr_t) ehdr) & (__alignof__ (Elf32_Ehdr) - 1)) == 0
-		  && ((uintptr_t) ((char *) ehdr + ehdr->e_shoff)
-		      & (__alignof__ (Elf32_Shdr) - 1)) == 0
-		  && ((uintptr_t) ((char *) ehdr + ehdr->e_phoff)
-		      & (__alignof__ (Elf32_Phdr) - 1)) == 0)))
+	      || (((uintptr_t) ehdr) & (__alignof__ (Elf32_Ehdr) - 1)) == 0))
 	{
 	  /* We can use the mmapped memory.  */
 	  elf->state.elf32.ehdr = ehdr;
+	}
+      else
+	{
+	  /* Copy the ELF header.  */
+	  elf->state.elf32.ehdr = memcpy (&elf->state.elf32.ehdr_mem, e_ident,
+					  sizeof (Elf32_Ehdr));
 
-	  if (unlikely (ehdr->e_shoff >= maxsize)
-	      || unlikely (maxsize - ehdr->e_shoff
+	  if (e_ident[EI_DATA] != MY_ELFDATA)
+	    {
+	      CONVERT (elf->state.elf32.ehdr_mem.e_type);
+	      CONVERT (elf->state.elf32.ehdr_mem.e_machine);
+	      CONVERT (elf->state.elf32.ehdr_mem.e_version);
+	      CONVERT (elf->state.elf32.ehdr_mem.e_entry);
+	      CONVERT (elf->state.elf32.ehdr_mem.e_phoff);
+	      CONVERT (elf->state.elf32.ehdr_mem.e_shoff);
+	      CONVERT (elf->state.elf32.ehdr_mem.e_flags);
+	      CONVERT (elf->state.elf32.ehdr_mem.e_ehsize);
+	      CONVERT (elf->state.elf32.ehdr_mem.e_phentsize);
+	      CONVERT (elf->state.elf32.ehdr_mem.e_phnum);
+	      CONVERT (elf->state.elf32.ehdr_mem.e_shentsize);
+	      CONVERT (elf->state.elf32.ehdr_mem.e_shnum);
+	      CONVERT (elf->state.elf32.ehdr_mem.e_shstrndx);
+	    }
+	}
+
+      /* Don't precache the phdr pointer here.
+	 elf32_getphdr will validate it against the size when asked.  */
+
+      Elf32_Off e_shoff = elf->state.elf32.ehdr->e_shoff;
+      if (map_address != NULL && e_ident[EI_DATA] == MY_ELFDATA
+	  && (ALLOW_UNALIGNED
+	      || (((uintptr_t) ((char *) ehdr + e_shoff)
+		   & (__alignof__ (Elf32_Shdr) - 1)) == 0)))
+	{
+	  if (unlikely (e_shoff >= maxsize)
+	      || unlikely (maxsize - e_shoff
 			   < scncnt * sizeof (Elf32_Shdr)))
 	    {
 	    free_and_out:
@@ -325,10 +354,7 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 	      return NULL;
 	    }
 	  elf->state.elf32.shdr
-	    = (Elf32_Shdr *) ((char *) ehdr + ehdr->e_shoff);
-
-	  /* Don't precache the phdr pointer here.
-	     elf32_getphdr will validate it against the size when asked.  */
+	    = (Elf32_Shdr *) ((char *) ehdr + e_shoff);
 
 	  for (size_t cnt = 0; cnt < scncnt; ++cnt)
 	    {
@@ -361,27 +387,6 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 	}
       else
 	{
-	  /* Copy the ELF header.  */
-	  elf->state.elf32.ehdr = memcpy (&elf->state.elf32.ehdr_mem, e_ident,
-					  sizeof (Elf32_Ehdr));
-
-	  if (e_ident[EI_DATA] != MY_ELFDATA)
-	    {
-	      CONVERT (elf->state.elf32.ehdr_mem.e_type);
-	      CONVERT (elf->state.elf32.ehdr_mem.e_machine);
-	      CONVERT (elf->state.elf32.ehdr_mem.e_version);
-	      CONVERT (elf->state.elf32.ehdr_mem.e_entry);
-	      CONVERT (elf->state.elf32.ehdr_mem.e_phoff);
-	      CONVERT (elf->state.elf32.ehdr_mem.e_shoff);
-	      CONVERT (elf->state.elf32.ehdr_mem.e_flags);
-	      CONVERT (elf->state.elf32.ehdr_mem.e_ehsize);
-	      CONVERT (elf->state.elf32.ehdr_mem.e_phentsize);
-	      CONVERT (elf->state.elf32.ehdr_mem.e_phnum);
-	      CONVERT (elf->state.elf32.ehdr_mem.e_shentsize);
-	      CONVERT (elf->state.elf32.ehdr_mem.e_shnum);
-	      CONVERT (elf->state.elf32.ehdr_mem.e_shstrndx);
-	    }
-
 	  for (size_t cnt = 0; cnt < scncnt; ++cnt)
 	    {
 	      elf->state.elf32.scns.data[cnt].index = cnt;
@@ -402,24 +407,50 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
       /* This is a 64-bit binary.  */
       if (map_address != NULL && e_ident[EI_DATA] == MY_ELFDATA
 	  && (ALLOW_UNALIGNED
-	      || ((((uintptr_t) ehdr) & (__alignof__ (Elf64_Ehdr) - 1)) == 0
-		  && ((uintptr_t) ((char *) ehdr + ehdr->e_shoff)
-		      & (__alignof__ (Elf64_Shdr) - 1)) == 0
-		  && ((uintptr_t) ((char *) ehdr + ehdr->e_phoff)
-		      & (__alignof__ (Elf64_Phdr) - 1)) == 0)))
+	      || (((uintptr_t) ehdr) & (__alignof__ (Elf64_Ehdr) - 1)) == 0))
 	{
 	  /* We can use the mmapped memory.  */
 	  elf->state.elf64.ehdr = ehdr;
+	}
+      else
+	{
+	  /* Copy the ELF header.  */
+	  elf->state.elf64.ehdr = memcpy (&elf->state.elf64.ehdr_mem, e_ident,
+					  sizeof (Elf64_Ehdr));
 
-	  if (unlikely (ehdr->e_shoff >= maxsize)
-	      || unlikely (maxsize - ehdr->e_shoff
+	  if (e_ident[EI_DATA] != MY_ELFDATA)
+	    {
+	      CONVERT (elf->state.elf64.ehdr_mem.e_type);
+	      CONVERT (elf->state.elf64.ehdr_mem.e_machine);
+	      CONVERT (elf->state.elf64.ehdr_mem.e_version);
+	      CONVERT (elf->state.elf64.ehdr_mem.e_entry);
+	      CONVERT (elf->state.elf64.ehdr_mem.e_phoff);
+	      CONVERT (elf->state.elf64.ehdr_mem.e_shoff);
+	      CONVERT (elf->state.elf64.ehdr_mem.e_flags);
+	      CONVERT (elf->state.elf64.ehdr_mem.e_ehsize);
+	      CONVERT (elf->state.elf64.ehdr_mem.e_phentsize);
+	      CONVERT (elf->state.elf64.ehdr_mem.e_phnum);
+	      CONVERT (elf->state.elf64.ehdr_mem.e_shentsize);
+	      CONVERT (elf->state.elf64.ehdr_mem.e_shnum);
+	      CONVERT (elf->state.elf64.ehdr_mem.e_shstrndx);
+	    }
+	}
+
+      /* Don't precache the phdr pointer here.
+	 elf64_getphdr will validate it against the size when asked.  */
+
+      Elf64_Off e_shoff = elf->state.elf64.ehdr->e_shoff;
+      if (map_address != NULL && e_ident[EI_DATA] == MY_ELFDATA
+	  && (ALLOW_UNALIGNED
+	      || (((uintptr_t) ((char *) ehdr + e_shoff)
+		   & (__alignof__ (Elf64_Shdr) - 1)) == 0)))
+	{
+	  if (unlikely (e_shoff >= maxsize)
+	      || unlikely (maxsize - e_shoff
 			   < scncnt * sizeof (Elf64_Shdr)))
 	    goto free_and_out;
 	  elf->state.elf64.shdr
-	    = (Elf64_Shdr *) ((char *) ehdr + ehdr->e_shoff);
-
-	  /* Don't precache the phdr pointer here.
-	     elf64_getphdr will validate it against the size when asked.  */
+	    = (Elf64_Shdr *) ((char *) ehdr + e_shoff);
 
 	  for (size_t cnt = 0; cnt < scncnt; ++cnt)
 	    {
@@ -452,27 +483,6 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 	}
       else
 	{
-	  /* Copy the ELF header.  */
-	  elf->state.elf64.ehdr = memcpy (&elf->state.elf64.ehdr_mem, e_ident,
-					  sizeof (Elf64_Ehdr));
-
-	  if (e_ident[EI_DATA] != MY_ELFDATA)
-	    {
-	      CONVERT (elf->state.elf64.ehdr_mem.e_type);
-	      CONVERT (elf->state.elf64.ehdr_mem.e_machine);
-	      CONVERT (elf->state.elf64.ehdr_mem.e_version);
-	      CONVERT (elf->state.elf64.ehdr_mem.e_entry);
-	      CONVERT (elf->state.elf64.ehdr_mem.e_phoff);
-	      CONVERT (elf->state.elf64.ehdr_mem.e_shoff);
-	      CONVERT (elf->state.elf64.ehdr_mem.e_flags);
-	      CONVERT (elf->state.elf64.ehdr_mem.e_ehsize);
-	      CONVERT (elf->state.elf64.ehdr_mem.e_phentsize);
-	      CONVERT (elf->state.elf64.ehdr_mem.e_phnum);
-	      CONVERT (elf->state.elf64.ehdr_mem.e_shentsize);
-	      CONVERT (elf->state.elf64.ehdr_mem.e_shnum);
-	      CONVERT (elf->state.elf64.ehdr_mem.e_shstrndx);
-	    }
-
 	  for (size_t cnt = 0; cnt < scncnt; ++cnt)
 	    {
 	      elf->state.elf64.scns.data[cnt].index = cnt;

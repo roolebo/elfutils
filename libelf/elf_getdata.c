@@ -1,5 +1,5 @@
 /* Return the next data element from the section after possibly converting it.
-   Copyright (C) 1998-2005, 2006, 2007 Red Hat, Inc.
+   Copyright (C) 1998-2005, 2006, 2007, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -144,6 +144,25 @@ convert_data (Elf_Scn *scn, int version __attribute__ ((unused)), int eclass,
 	  return;
 	}
 
+      /* Make sure the source is correctly aligned for the conversion
+	 function to directly access the data elements.  */
+      char *rawdata_source;
+      if (ALLOW_UNALIGNED ||
+	  ((((size_t) (char *) scn->rawdata_base)) & (align - 1)) == 0)
+	rawdata_source = scn->rawdata_base;
+      else
+	{
+	  rawdata_source = (char *) malloc (size);
+	  if (rawdata_source == NULL)
+	    {
+	      __libelf_seterrno (ELF_E_NOMEM);
+	      return;
+	    }
+
+	  /* The copy will be appropriately aligned for direct access.  */
+	  memcpy (rawdata_source, scn->rawdata_base, size);
+	}
+
       /* Get the conversion function.  */
 #if EV_NUM != 2
       fp = __elf_xfctstom[version - 1][__libelf_version - 1][eclass - 1][type];
@@ -151,7 +170,10 @@ convert_data (Elf_Scn *scn, int version __attribute__ ((unused)), int eclass,
       fp = __elf_xfctstom[0][0][eclass - 1][type];
 #endif
 
-      fp (scn->data_base, scn->rawdata_base, size, 0);
+      fp (scn->data_base, rawdata_source, size, 0);
+
+      if (rawdata_source != scn->rawdata_base)
+	free (rawdata_source);
     }
 
   scn->data_list.data.d.d_buf = scn->data_base;

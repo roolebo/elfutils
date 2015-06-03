@@ -91,6 +91,18 @@ read_srclines (Dwarf *dbg,
   size_t nfilelist = 0;
   unsigned int ndirlist = 0;
 
+  struct filelist null_file =
+    {
+      .info =
+      {
+	.name = "???",
+	.mtime = 0,
+	.length = 0
+      },
+      .next = NULL
+    };
+  struct filelist *filelist = &null_file;
+
   /* If there are a large number of lines, files or dirs don't blow up
      the stack.  Stack allocate some entries, only dynamically malloc
      when more than MAX.  */
@@ -238,17 +250,6 @@ read_srclines (Dwarf *dbg,
   fl; })
 
   /* Now read the files.  */
-  struct filelist null_file =
-    {
-      .info =
-      {
-	.name = "???",
-	.mtime = 0,
-	.length = 0
-      },
-      .next = NULL
-    };
-  struct filelist *filelist = &null_file;
   nfilelist = 1;
 
   if (unlikely (linep >= lineendp))

@@ -151,8 +151,8 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
 
 	  if (likely (map_address != NULL) && e_ident[EI_DATA] == MY_ELFDATA
 	      && (ALLOW_UNALIGNED
-		  || (((size_t) ((char *) map_address + offset))
-		      & (__alignof__ (Elf32_Ehdr) - 1)) == 0))
+		  || (((size_t) ((char *) map_address + ehdr.e32->e_shoff))
+		      & (__alignof__ (Elf32_Shdr) - 1)) == 0))
 	    /* We can directly access the memory.  */
 	    result = ((Elf32_Shdr *) ((char *) map_address + ehdr.e32->e_shoff
 				      + offset))->sh_size;
@@ -201,8 +201,8 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
 	  Elf64_Xword size;
 	  if (likely (map_address != NULL) && e_ident[EI_DATA] == MY_ELFDATA
 	      && (ALLOW_UNALIGNED
-		  || (((size_t) ((char *) map_address + offset))
-		      & (__alignof__ (Elf64_Ehdr) - 1)) == 0))
+		  || (((size_t) ((char *) map_address + ehdr.e64->e_shoff))
+		      & (__alignof__ (Elf64_Shdr) - 1)) == 0))
 	    /* We can directly access the memory.  */
 	    size = ((Elf64_Shdr *) ((char *) map_address + ehdr.e64->e_shoff
 				    + offset))->sh_size;

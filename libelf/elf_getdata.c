@@ -83,8 +83,15 @@ const uint_fast8_t __libelf_type_aligns[EV_NUM - 1][ELFCLASSNUM - 1][ELF_T_NUM] 
 # define TYPE_ALIGNS(Bits)						      \
     {									      \
       [ELF_T_ADDR] = __alignof__ (ElfW2(Bits,Addr)),			      \
+      [ELF_T_EHDR] = __alignof__ (ElfW2(Bits,Ehdr)),			      \
       [ELF_T_HALF] = __alignof__ (ElfW2(Bits,Half)),			      \
+      [ELF_T_OFF] = __alignof__ (ElfW2(Bits,Off)),			      \
+      [ELF_T_PHDR] = __alignof__ (ElfW2(Bits,Phdr)),			      \
+      [ELF_T_SHDR] = __alignof__ (ElfW2(Bits,Shdr)),			      \
+      [ELF_T_SWORD] = __alignof__ (ElfW2(Bits,Sword)),			      \
       [ELF_T_WORD] = __alignof__ (ElfW2(Bits,Word)),			      \
+      [ELF_T_XWORD] = __alignof__ (ElfW2(Bits,Xword)),			      \
+      [ELF_T_SXWORD] = __alignof__ (ElfW2(Bits,Sxword)),		      \
       [ELF_T_SYM] = __alignof__ (ElfW2(Bits,Sym)),			      \
       [ELF_T_SYMINFO] = __alignof__ (ElfW2(Bits,Syminfo)),		      \
       [ELF_T_REL] = __alignof__ (ElfW2(Bits,Rel)),			      \
@@ -97,6 +104,8 @@ const uint_fast8_t __libelf_type_aligns[EV_NUM - 1][ELFCLASSNUM - 1][ELF_T_NUM] 
       [ELF_T_MOVE] = __alignof__ (ElfW2(Bits,Move)),			      \
       [ELF_T_LIB] = __alignof__ (ElfW2(Bits,Lib)),			      \
       [ELF_T_NHDR] = __alignof__ (ElfW2(Bits,Nhdr)),			      \
+      [ELF_T_GNUHASH] = __alignof__ (Elf32_Word),			      \
+      [ELF_T_AUXV] = __alignof__ (ElfW2(Bits,auxv_t)),			      \
     }
     [EV_CURRENT - 1] =
     {

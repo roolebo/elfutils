@@ -1,3 +1,11 @@
+2015-06-04  Mark Wielaard  <mjw@redhat.com>
+
+	* elf_getdata.c (__libelf_type_aligns): Add entries for ELF_T_EHDR,
+	ELF_T_OFF, ELF_T_PHDR, ELF_T_SHDR, ELF_T_SWORD, ELF_T_XWORD,
+	ELF_T_SXWORD, ELF_T_GNUHASH, ELF_T_AUXV.
+	* elf_getdata_rawchunk.c (elf_getdata_rawchunk): Check alignment
+	of rawdata against requested type.
+
 2015-06-02  Mark Wielaard  <mjw@redhat.com>
 
 	* elf_getdata.c (convert_data): Make sure source data is properly

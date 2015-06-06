@@ -177,6 +177,7 @@ cache_sections (Dwfl_Module *mod)
       mod->reloc_info->refs[i].relocs = sortrefs[i]->relocs;
       mod->reloc_info->refs[i].start = sortrefs[i]->start;
       mod->reloc_info->refs[i].end = sortrefs[i]->end;
+      free (sortrefs[i]);
     }
 
   free (sortrefs);

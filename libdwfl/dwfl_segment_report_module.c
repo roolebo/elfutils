@@ -696,8 +696,13 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 	}
       if (invalid)
 	{
-	  free (build_id);
-	  return finish ();
+	  /* The file was there, but the build_id didn't match.  We
+	     still want to report the module, but need to get the ELF
+	     some other way if possible.  */
+	  close (fd);
+	  fd = -1;
+	  elf_end (elf);
+	  elf = NULL;
 	}
     }
 

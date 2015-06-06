@@ -1,3 +1,9 @@
+2015-06-05  Mark Wielaard  <mjw@redhat.com>
+
+	* dwfl_segment_report_module.c (dwfl_segment_report_module):
+	If the note_file exists, but the build_id doesn't match discard
+	the file and continue reporting.
+
 2015-06-01  Mark Wielaard  <mjw@redhat.com>
 
 	* dwfl_build_id_find_elf.c (__libdwfl_open_by_build_id): Copy path

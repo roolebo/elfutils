@@ -1,5 +1,10 @@
 2015-06-06  Mark Wielaard  <mjw@redhat.com>
 
+	* find-debuginfo.c (find_debuginfo_in_path): Always free localpath,
+	localname and file_dirname.
+
+2015-06-06  Mark Wielaard  <mjw@redhat.com>
+
 	* derelocate.c (cache_sections): Free sortrefs.
 
 2015-06-05  Mark Wielaard  <mjw@redhat.com>

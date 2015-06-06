@@ -293,19 +293,13 @@ find_debuginfo_in_path (Dwfl_Module *mod, const char *file_name,
 	      }
 	    continue;
 	  default:
-	    {
-	    fail_free:
-	      free (localpath);
-	      free (localname);
-	      free (file_dirname);
-	      return -1;
-	    }
+	    goto fail_free;
 	  }
-      free (localpath);
-      free (localname);
-      free (file_dirname);
       if (validate (mod, fd, check, debuglink_crc))
 	{
+	  free (localpath);
+	  free (localname);
+	  free (file_dirname);
 	  *debuginfo_file_name = fname;
 	  return fd;
 	}
@@ -315,6 +309,10 @@ find_debuginfo_in_path (Dwfl_Module *mod, const char *file_name,
 
   /* No dice.  */
   errno = 0;
+fail_free:
+  free (localpath);
+  free (localname);
+  free (file_dirname);
   return -1;
 }
 

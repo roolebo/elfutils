@@ -2,7 +2,7 @@
 # Copyright (C) 2010 Free Software Foundation, Inc.
 # This file is distributed under the same license as the elfutils package.
 #
-# Yuri Chornoivan <yurchor@ukr.net>, 2010, 2011, 2012, 2013.
+# Yuri Chornoivan <yurchor@ukr.net>, 2010, 2011, 2012, 2013, 2014.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
@@ -4715,7 +4715,7 @@ msgstr "<НЕКОРЕКТНИЙ РОЗДІЛ>"
 #: src/readelf.c:2846 src/readelf.c:2920 src/readelf.c:4610
 #, fuzzy, c-format
 msgid "invalid sh_link value in section %Zu"
-msgstr "некоректний розділ .debug_line"
+msgstr "некоректне значення sh_link у розділі %Zu"
 
 #: src/readelf.c:1588
 #, c-format
@@ -6745,27 +6745,27 @@ msgstr "не вдалося створити дескриптор ELF: %s"
 
 #: src/unstrip.c:1967
 msgid "WARNING: "
-msgstr ""
+msgstr "УВАГА: "
 
 #: src/unstrip.c:1969
 msgid ", use --force"
-msgstr ""
+msgstr ", скористайтеся --force"
 
 #: src/unstrip.c:1992
 msgid "ELF header identification (e_ident) different"
-msgstr ""
+msgstr "Різні ідентифікатори заголовків ELF (e_ident)"
 
 #: src/unstrip.c:1995
 msgid "ELF header type (e_type) different"
-msgstr ""
+msgstr "Різні типи заголовків ELF (e_type)"
 
 #: src/unstrip.c:1998
 msgid "ELF header machine type (e_machine) different"
-msgstr ""
+msgstr "Різні типи архітектур заголовків ELF (e_machine)"
 
 #: src/unstrip.c:2001
 msgid "stripped program header (e_phnum) smaller than unstripped"
-msgstr ""
+msgstr "очищений заголовок програми (e_phnum) є меншим за неочищений"
 
 #: src/unstrip.c:2031
 #, c-format

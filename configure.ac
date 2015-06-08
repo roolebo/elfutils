@@ -270,6 +270,14 @@ AS_IF([test "x$enable_symbol_versioning" = "xno"],
       [AC_MSG_WARN([Disabling symbol versioning breaks ABI compatibility.])
        enable_symbol_versioning=no],[enable_symbol_versioning=yes])
 
+AC_CACHE_CHECK([whether gcc accepts -Wstack-usage], ac_cv_stack_usage, [dnl
+old_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS -Wstack-usage=262144"
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([])],
+		  ac_cv_stack_usage=yes, ac_cv_stack_usage=no)
+CFLAGS="$old_CFLAGS"])
+AM_CONDITIONAL(ADD_STACK_USAGE_WARNING, [test "x$ac_cv_stack_usage" != "xno"])
+
 dnl Check if we have argp available from our libc
 AC_LINK_IFELSE(
 	[AC_LANG_PROGRAM(

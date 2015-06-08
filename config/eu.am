@@ -33,10 +33,15 @@ DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H -DLOCALEDIR='"${localedir}"'
 AM_CPPFLAGS = -I. -I$(srcdir) -I$(top_srcdir)/lib -I..
 
 # Warn about stack usage of more than 256K = 262144 bytes.
+if ADD_STACK_USAGE_WARNING
+STACK_USAGE_WARNING=-Wstack-usage=262144
+else
+STACK_USAGE_WARNING=
+endif
 AM_CFLAGS = -std=gnu99 -Wall -Wshadow -Wformat=2 \
 	    $(if $($(*F)_no_Werror),,-Werror) \
 	    $(if $($(*F)_no_Wunused),,-Wunused -Wextra) \
-	    $(if $($(*F)_no_Wstack_usage),,-Wstack-usage=262144) \
+	    $(if $($(*F)_no_Wstack_usage),,$(STACK_USAGE_WARNING)) \
 	    $($(*F)_CFLAGS)
 
 COMPILE.os = $(filter-out -fprofile-arcs -ftest-coverage, $(COMPILE))

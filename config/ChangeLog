@@ -1,5 +1,11 @@
 2015-05-23  Mark Wielaard  <mjw@redhat.com>
 
+	* eu.am (STACK_USAGE_WARNING): New variable set based on
+	ADD_STACK_USAGE_WARNING conditional.
+	(AM_CFLAGS): Use STACK_USAGE_WARNING variable.
+
+2015-05-23  Mark Wielaard  <mjw@redhat.com>
+
 	* eu.am (AM_CFLAGS): Add -Wstack-usage=262144.
 
 2015-04-23  Max Filippov  <jcmvbkbc@gmail.com>

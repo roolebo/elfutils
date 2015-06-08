@@ -1,3 +1,8 @@
+2015-06-08  Mark Wielaard  <mjw@redhat.com>
+
+	* configure.ac (ADD_STACK_USAGE_WARNING): New conditional based on
+	gcc -Wstack-usage check.
+
 2015-05-31  Mark Wielaard  <mjw@redhat.com>
 
 	* configure.ac (MODVERSION): Define using LIBEBL_SUBDIR, eu_version

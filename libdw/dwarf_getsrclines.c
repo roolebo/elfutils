@@ -111,6 +111,14 @@ read_srclines (Dwarf *dbg,
 #define MAX_STACK_FILES (MAX_STACK_ALLOC / 4)
 #define MAX_STACK_DIRS  (MAX_STACK_ALLOC / 16)
 
+  struct dirlist
+  {
+    const char *dir;
+    size_t len;
+  };
+  struct dirlist dirstack[MAX_STACK_DIRS];
+  struct dirlist *dirarray = dirstack;
+
   if (unlikely (linep + 4 > lineendp))
     {
     invalid_data:
@@ -186,11 +194,7 @@ read_srclines (Dwarf *dbg,
 
   /* First comes the list of directories.  Add the compilation
      directory first since the index zero is used for it.  */
-  struct dirlist
-  {
-    const char *dir;
-    size_t len;
-  } comp_dir_elem =
+  struct dirlist comp_dir_elem =
     {
       .dir = comp_dir,
       .len = comp_dir ? strlen (comp_dir) : 0,
@@ -209,11 +213,7 @@ read_srclines (Dwarf *dbg,
     }
 
   /* Arrange the list in array form.  */
-  struct dirlist dirstack[MAX_STACK_DIRS];
-  struct dirlist *dirarray;
-  if (ndirlist < MAX_STACK_DIRS)
-    dirarray = dirstack;
-  else
+  if (ndirlist >= MAX_STACK_DIRS)
     {
       dirarray = (struct dirlist *) malloc (ndirlist * sizeof (*dirarray));
       if (unlikely (dirarray == NULL))

@@ -113,7 +113,7 @@ static int handle_elf (int fd, Elf *elf, const char *prefix,
 
 /* Handle all files contained in the archive.  */
 static int handle_ar (int fd, Elf *elf, const char *prefix, const char *fname,
-		      struct timespec tvp[2]);
+		      struct timespec tvp[2]) __attribute__ ((unused));
 
 static int debug_fd = -1;
 static char *tmp_debug_fname = NULL;
@@ -374,7 +374,17 @@ process_file (const char *fname)
 	  result = 1;
 	}
       else
-	result = handle_ar (fd, elf, NULL, fname, preserve_dates ? tv : NULL);
+	{
+	  /* We would like to support ar archives, but currently it just
+	     doesn't work at all since we call elf_clone on the members
+	     which doesn't really support ar members.
+	     result = handle_ar (fd, elf, NULL, fname,
+				 preserve_dates ? tv : NULL);
+	   */
+	  error (0, 0, gettext ("%s: no support for stripping archive"),
+		 fname);
+	  result = 1;
+	}
       break;
 
     default:

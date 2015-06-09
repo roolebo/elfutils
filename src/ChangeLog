@@ -1,3 +1,8 @@
+2015-06-09  Mark Wielaard  <mjw@redhat.com>
+
+	* strip.c (handle_ar): Mark as unused.
+	(process_file): Produce an error when trying to handle an ar.
+
 2015-05-30  Mark Wielaard  <mjw@redhat.com>
 
 	* elfcmp.c (main): Only call memcmp when d_size != 0.

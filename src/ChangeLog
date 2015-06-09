@@ -1,5 +1,10 @@
 2015-06-09  Mark Wielaard  <mjw@redhat.com>
 
+	* addr2line.c (print_dwarf_function): Always free scopes before
+	returning.
+
+2015-06-09  Mark Wielaard  <mjw@redhat.com>
+
 	* strip.c (handle_ar): Mark as unused.
 	(process_file): Produce an error when trying to handle an ar.
 

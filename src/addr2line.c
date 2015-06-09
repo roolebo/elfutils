@@ -330,6 +330,7 @@ print_dwarf_function (Dwfl_Module *mod, Dwarf_Addr addr)
   if (nscopes <= 0)
     return false;
 
+  bool res = false;
   for (int i = 0; i < nscopes; ++i)
     switch (dwarf_tag (&scopes[i]))
       {
@@ -337,23 +338,25 @@ print_dwarf_function (Dwfl_Module *mod, Dwarf_Addr addr)
 	{
 	  const char *name = get_diename (&scopes[i]);
 	  if (name == NULL)
-	    return false;
+	    goto done;
 	  printf ("%s%c", symname (name), pretty ? ' ' : '\n');
-	  return true;
+	  res = true;
+	  goto done;
 	}
 
       case DW_TAG_inlined_subroutine:
 	{
 	  const char *name = get_diename (&scopes[i]);
 	  if (name == NULL)
-	    return false;
+	    goto done;
 
 	  /* When using --pretty-print we only show inlines on their
 	     own line.  Just print the first subroutine name.  */
 	  if (pretty)
 	    {
 	      printf ("%s ", symname (name));
-	      return true;
+	      res = true;
+	      goto done;
 	    }
 	  else
 	    printf ("%s inlined", symname (name));
@@ -414,7 +417,9 @@ print_dwarf_function (Dwfl_Module *mod, Dwarf_Addr addr)
 	}
       }
 
-  return false;
+done:
+  free (scopes);
+  return res;
 }
 
 static void

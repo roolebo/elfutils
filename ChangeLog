@@ -1,3 +1,8 @@
+2015-06-10  Mark Wielaard  <mjw@redhat.com>
+
+	* configure.ac: Set version to 0.162.
+	* NEWS: Add 0.162 additions.
+
 2015-06-08  Mark Wielaard  <mjw@redhat.com>
 
 	* configure.ac (ADD_STACK_USAGE_WARNING): New conditional based on

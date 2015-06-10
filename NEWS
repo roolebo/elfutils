@@ -1,12 +1,19 @@
 Version 0.162
 
 libdw: Install new header elfutils/known-dwarf.h.
+       dwarf.h Add preliminary DWARF5 constants DW_TAG_atomic_type,
+       DW_LANG_Fortran03, DW_LANG_Fortran08. dwarf_peel_type now also
+       handles DW_TAG_atomic_type.
 
 addr2line: Input addresses are now always interpreted as hexadecimal
            numbers, never as octal or decimal numbers.
            New option -a, --addresses to print address before each entry.
            New option -C, --demangle to show demangled symbols.
            New option --pretty-print to print all information on one line.
+
+ar: CVE-2014-9447 Directory traversal vulnerability in ar extraction.
+
+backends: x32 support.
 
 Version 0.161
 

@@ -1,5 +1,5 @@
 /* Check whether a section type is a valid target for relocation.
-   Copyright (C) 2014 Red Hat, Inc.
+   Copyright (C) 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -39,8 +39,16 @@ ebl_check_reloc_target_type (Ebl *ebl, Elf64_Word sh_type)
   if (ebl->check_reloc_target_type (ebl, sh_type))
     return true;
 
-  if (sh_type == SHT_PROGBITS || sh_type == SHT_NOBITS)
-    return true;
+  switch (sh_type)
+    {
+      case SHT_PROGBITS:
+      case SHT_NOBITS:
+      case SHT_INIT_ARRAY:
+      case SHT_FINI_ARRAY:
+      case SHT_PREINIT_ARRAY:
+	return true;
 
-  return false;
+      default:
+	return false;
+    }
 }

@@ -2,9 +2,8 @@
 # Copyright (C) 2000-2010 Red Hat, Inc.
 
 # Files from the compatibility library
+lib/color.c
 lib/xmalloc.c
-#lib/xstrdup.c
-lib/xstrndup.c
 
 # Library sources
 libasm/asm_error.c
@@ -28,6 +27,7 @@ libelf/elf_error.c
 # Program sources
 src/addr2line.c
 src/ar.c
+src/arlib-argp.c
 src/arlib.c
 src/elfcmp.c
 src/elflint.c
@@ -41,6 +41,11 @@ src/objdump.c
 src/ranlib.c
 src/readelf.c
 src/size.c
+src/stack.c
 src/strings.c
 src/strip.c
 src/unstrip.c
+
+# Tests
+tests/backtrace.c
+tests/dwflmodtest.c

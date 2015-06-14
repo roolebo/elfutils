@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ja\n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2015-06-10 17:40+0200\n"
+"POT-Creation-Date: 2015-06-14 23:31+0200\n"
 "PO-Revision-Date: 2009-09-20 15:32+0900\n"
 "Last-Translator: Hyu_gabaru Ryu_ichi <hyu_gabaru@yahoo.co.jp>\n"
 "Language-Team: Japanese <jp@li.org>\n"
@@ -18,6 +18,26 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+
+#: lib/color.c:53
+msgid ""
+"colorize the output.  WHEN defaults to 'always' or can be 'auto' or 'never'"
+msgstr ""
+
+#: lib/color.c:127
+#, c-format
+msgid ""
+"%s: invalid argument '%s' for '--color'\n"
+"valid arguments are:\n"
+"  - 'always', 'yes', 'force'\n"
+"  - 'never', 'no', 'none'\n"
+"  - 'auto', 'tty', 'if-tty'\n"
+msgstr ""
+
+#: lib/color.c:190 src/objdump.c:738
+#, fuzzy, c-format
+msgid "cannot allocate memory"
+msgstr "PLT セクションを割り当てられません: %s"
 
 #: lib/xmalloc.c:54 lib/xmalloc.c:68 lib/xmalloc.c:82 src/readelf.c:3182
 #: src/readelf.c:3559 src/readelf.c:8307 src/unstrip.c:2126 src/unstrip.c:2331
@@ -223,7 +243,7 @@ msgstr "不当なオペランド"
 msgid "not a CU (unit) DIE"
 msgstr ""
 
-#: libdwfl/argp-std.c:46 src/unstrip.c:2273
+#: libdwfl/argp-std.c:46 src/stack.c:642 src/unstrip.c:2273
 msgid "Input selection options:"
 msgstr "選択オプションを入力してください:"
 
@@ -255,7 +275,7 @@ msgstr "実行中のカーネルのアドレスを探す"
 msgid "Kernel with all modules"
 msgstr "全てのモジュール付きのカーネル"
 
-#: libdwfl/argp-std.c:59
+#: libdwfl/argp-std.c:59 src/stack.c:649
 msgid "Search path for separate debuginfo files"
 msgstr "分離した debuginfo ファイルべきパスを探す"
 
@@ -1032,6 +1052,19 @@ msgstr "%s の ELF 記述子を得られません: %s\n"
 #, c-format
 msgid "cannot read %s: %s"
 msgstr "%s を読みません: %s"
+
+#: src/arlib-argp.c:32
+msgid "Use zero for uid, gid, and date in archive members."
+msgstr ""
+
+#: src/arlib-argp.c:34
+msgid "Use actual uid, gid, and date in archive members."
+msgstr ""
+
+#: src/arlib-argp.c:65
+#, c-format
+msgid "%s (default)"
+msgstr ""
 
 #: src/arlib.c:209
 #, c-format
@@ -4106,11 +4139,6 @@ msgstr ""
 msgid "cannot disassemble"
 msgstr ""
 
-#: src/objdump.c:738
-#, fuzzy, c-format
-msgid "cannot allocate memory"
-msgstr "PLT セクションを割り当てられません: %s"
-
 #: src/ranlib.c:65
 msgid "Generate an index to speed access to archives."
 msgstr ""
@@ -6067,6 +6095,124 @@ msgstr " (ex %s)"
 msgid "(TOTALS)\n"
 msgstr "(合計)\n"
 
+#: src/stack.c:488
+#, c-format
+msgid "-p PID should be a positive process id."
+msgstr ""
+
+#: src/stack.c:494
+#, fuzzy, c-format
+msgid "Cannot open core file '%s'"
+msgstr "アーカイブ '%s' を開くことができません"
+
+#: src/stack.c:554
+#, c-format
+msgid "-n MAXFRAMES should be 0 or higher."
+msgstr ""
+
+#: src/stack.c:566
+#, c-format
+msgid "-e EXEC needs a core given by --core."
+msgstr ""
+
+#: src/stack.c:570
+#, c-format
+msgid "-1 needs a thread id given by -p."
+msgstr ""
+
+#: src/stack.c:574
+#, c-format
+msgid "One of -p PID or --core COREFILE should be given."
+msgstr ""
+
+#: src/stack.c:644
+#, fuzzy
+msgid "Show stack of process PID"
+msgstr "検索ツリーを生成できません"
+
+#: src/stack.c:646
+msgid "Show stack found in COREFILE"
+msgstr ""
+
+#: src/stack.c:647
+msgid "(optional) EXECUTABLE that produced COREFILE"
+msgstr ""
+
+#: src/stack.c:651
+#, fuzzy
+msgid "Output selection options:"
+msgstr "選択オプションを入力してください:"
+
+#: src/stack.c:653
+#, fuzzy
+msgid "Additionally show frame activation"
+msgstr "出力選択:"
+
+#: src/stack.c:655
+msgid "Additionally try to lookup DWARF debuginfo name for frame address"
+msgstr ""
+
+#: src/stack.c:658
+msgid ""
+"Additionally show inlined function frames using DWARF debuginfo if available "
+"(implies -d)"
+msgstr ""
+
+#: src/stack.c:660
+msgid "Additionally show module file information"
+msgstr ""
+
+#: src/stack.c:662
+#, fuzzy
+msgid "Additionally show source file information"
+msgstr "出力選択:"
+
+#: src/stack.c:664
+msgid ""
+"Show all additional information (activation, debugname, inlines, module and "
+"source)"
+msgstr ""
+
+#: src/stack.c:666
+msgid "Do not resolve address to function symbol name"
+msgstr ""
+
+#: src/stack.c:668
+msgid "Show raw function symbol names, do not try to demangle names"
+msgstr ""
+
+#: src/stack.c:670
+msgid "Show module build-id, load address and pc offset"
+msgstr ""
+
+#: src/stack.c:672
+msgid "Show the backtrace of only one thread"
+msgstr ""
+
+#: src/stack.c:674
+msgid "Show at most MAXFRAMES per thread (default 256, use 0 for unlimited)"
+msgstr ""
+
+#: src/stack.c:676
+msgid "Show module memory map with build-id, elf and debug files detected"
+msgstr ""
+
+#: src/stack.c:684
+msgid ""
+"Print a stack for each thread in a process or core file.\vProgram exits with "
+"return code 0 if all frames were shown without any errors.  If some frames "
+"were shown, but there were some non-fatal errors, possibly causing an "
+"incomplete backtrace, the program exits with return code 1.  If no frames "
+"could be shown, or a fatal error occured the program exits with return code "
+"2.  If the program was invoked with bad or missing arguments it will exit "
+"with return code 64."
+msgstr ""
+
+#: src/stack.c:757
+#, c-format
+msgid "Couldn't show any frames."
+msgstr ""
+
 #: src/strings.c:62
 msgid "Output Selection:"
 msgstr ""
@@ -6659,9 +6805,18 @@ msgid ""
 "was found, or . if FILE contains the debug information."
 msgstr ""
 
+#: tests/backtrace.c:425
+msgid "Run executable"
+msgstr ""
+
+#: tests/dwflmodtest.c:213
 #, fuzzy
-#~ msgid "cannot attach to process"
-#~ msgstr "検索ツリーを生成できません"
+msgid "Additionally show function names"
+msgstr "出力選択:"
+
+#: tests/dwflmodtest.c:214
+msgid "Show instances of inlined functions"
+msgstr ""
 
 #, fuzzy
 #~ msgid "cannot attach to core"

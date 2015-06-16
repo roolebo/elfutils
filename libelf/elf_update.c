@@ -60,15 +60,18 @@ write_file (Elf *elf, off_t size, int change_bo, size_t shnum)
      new file.  We truncate the file later in this case.
 
      Note we use posix_fallocate to make sure the file content is really
-     there. Using ftruncate might mean the file is extended, but space
+     there. Only using ftruncate might mean the file is extended, but space
      isn't allocated yet. This might cause a SIGBUS once we write into
      the mmapped space and the disk is full. Using fallocate might fail
      on some file systems. posix_fallocate is required to extend the file
      and allocate enough space even if the underlying filesystem would
-     normally return EOPNOTSUPP.  */
+     normally return EOPNOTSUPP.  Note that we do also need to ftruncate
+     in case the maximum_size isn't known and the file needs to be shorter
+     because posix_fallocate can only extend.  */
   if (elf->parent == NULL
       && (elf->maximum_size == ~((size_t) 0)
 	  || (size_t) size > elf->maximum_size)
+      && unlikely (ftruncate (elf->fildes, size) != 0)
       && unlikely (posix_fallocate (elf->fildes, 0, size) != 0))
     {
       __libelf_seterrno (ELF_E_WRITE_ERROR);

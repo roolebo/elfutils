@@ -1,3 +1,8 @@
+2015-06-16  Mark Wielaard  <mjw@redhat.com>
+
+	* run-strip-test.sh: Add strip-in-place (eu-strip without -o) test
+	for non-ET_REL files.
+
 2015-05-30  Mark Wielaard  <mjw@redhat.com>
 
 	* backtrace-subr.sh (check_native_core): Notice core file couldn't be

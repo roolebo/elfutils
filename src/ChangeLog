@@ -1,5 +1,9 @@
 2015-06-18  Mark Wielaard  <mjw@redhat.com>
 
+	* readelf.c (handle_gnu_hash): Free lengths on invalid_data.
+
+2015-06-18  Mark Wielaard  <mjw@redhat.com>
+
 	* elflint.c (check_symtab): Only check the PT_TLS phdr if it actually
 	exists. Warn otherwise.
 

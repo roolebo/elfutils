@@ -3092,6 +3092,7 @@ handle_sysv_hash64 (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx)
 static void
 handle_gnu_hash (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx)
 {
+  uint32_t *lengths = NULL;
   Elf_Data *data = elf_getdata (scn, NULL);
   if (unlikely (data == NULL))
     {
@@ -3103,6 +3104,7 @@ handle_gnu_hash (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx)
   if (unlikely (data->d_size < 4 * sizeof (Elf32_Word)))
     {
     invalid_data:
+      free (lengths);
       error (0, 0, gettext ("invalid data in gnu.hash section %d"),
 	     (int) elf_ndxscn (scn));
       return;
@@ -3131,7 +3133,7 @@ handle_gnu_hash (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx)
   if (used_buf > data->d_size)
     goto invalid_data;
 
-  uint32_t *lengths = (uint32_t *) xcalloc (nbucket, sizeof (uint32_t));
+  lengths = (uint32_t *) xcalloc (nbucket, sizeof (uint32_t));
 
   Elf32_Word *bitmask = &((Elf32_Word *) data->d_buf)[4];
   Elf32_Word *bucket = &((Elf32_Word *) data->d_buf)[4 + bitmask_words];

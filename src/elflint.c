@@ -858,6 +858,12 @@ section [%2d] '%s': symbol %zu does not fit completely in referenced section [%2
 section [%2d] '%s': symbol %zu: TLS symbol but no TLS program header entry\n"),
 				   idx, section_name (ebl, idx), cnt);
 			}
+		      else if (phdr == NULL)
+			{
+			    ERROR (gettext ("\
+section [%2d] '%s': symbol %zu: TLS symbol but couldn't get TLS program header entry\n"),
+				   idx, section_name (ebl, idx), cnt);
+			}
 		      else
 			{
 			  if (st_value

@@ -1,5 +1,10 @@
 2015-06-18  Mark Wielaard  <mjw@redhat.com>
 
+	* elflint.c (check_symtab): Only check the PT_TLS phdr if it actually
+	exists. Warn otherwise.
+
+2015-06-18  Mark Wielaard  <mjw@redhat.com>
+
 	* nm.c (show_symbols): Check sizeof (sym_mem[0]), not GElf_Sym to
 	known whether or not we stack allocated memory.
 

@@ -484,6 +484,7 @@ cannot get relocation at index %d in section %zu in '%s': %s"),
   if (fd2 != -1)
     close (fd2);
 
+  free (segments);
   tdestroy (knownsrcs, noop);
 
   return result;

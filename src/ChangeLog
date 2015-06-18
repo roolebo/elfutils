@@ -1,5 +1,9 @@
 2015-06-18  Mark Wielaard  <mjw@redhat.com>
 
+	* findtextrel.c (process_file): Free segments after use.
+
+2015-06-18  Mark Wielaard  <mjw@redhat.com>
+
 	* readelf.c (print_phdr): Make sure phdr2_mem lifetime/scope equals
 	phdr2 pointer.
 

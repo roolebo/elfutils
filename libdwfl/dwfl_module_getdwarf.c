@@ -1135,7 +1135,8 @@ find_symtab (Dwfl_Module *mod)
 
   // Sanity check number of symbols.
   GElf_Shdr shdr_mem, *shdr = gelf_getshdr (symscn, &shdr_mem);
-  if (mod->syments > mod->symdata->d_size / shdr->sh_entsize
+  if (shdr == NULL || shdr->sh_entsize == 0
+      || mod->syments > mod->symdata->d_size / shdr->sh_entsize
       || (size_t) mod->first_global > mod->syments)
     goto elferr;
 

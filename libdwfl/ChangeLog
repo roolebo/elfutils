@@ -1,3 +1,8 @@
+2015-06-18  Mark Wielaard  <mjw@redhat.com>
+
+	* dwfl_module_getdwarf.c (find_symtab): Check shdr is not NULL and
+	sh_entsize is not zero.
+
 2015-06-06  Mark Wielaard  <mjw@redhat.com>
 
 	* find-debuginfo.c (find_debuginfo_in_path): Always free localpath,

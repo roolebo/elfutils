@@ -1,5 +1,10 @@
 2015-06-18  Mark Wielaard  <mjw@redhat.com>
 
+	* dwarf_begin_elf.c (dwarf_begin_elf): Assert page size is big enough
+	to hold a Dwarf.
+
+2015-06-18  Mark Wielaard  <mjw@redhat.com>
+
 	* dwarf_getpubnames.c (get_offsets): Always free mem on error.
 
 2015-06-18  Mark Wielaard  <mjw@redhat.com>

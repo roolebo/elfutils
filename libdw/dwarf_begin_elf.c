@@ -365,6 +365,7 @@ dwarf_begin_elf (elf, cmd, scngrp)
 
   /* Default memory allocation size.  */
   size_t mem_default_size = sysconf (_SC_PAGESIZE) - 4 * sizeof (void *);
+  assert (sizeof (struct Dwarf) < mem_default_size);
 
   /* Allocate the data structure.  */
   Dwarf *result = (Dwarf *) calloc (1, sizeof (Dwarf) + mem_default_size);

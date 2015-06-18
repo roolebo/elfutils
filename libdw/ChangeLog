@@ -1,5 +1,9 @@
 2015-06-18  Mark Wielaard  <mjw@redhat.com>
 
+	* dwarf_getpubnames.c (get_offsets): Always free mem on error.
+
+2015-06-18  Mark Wielaard  <mjw@redhat.com>
+
 	* dwarf_getmacros.c (get_macinfo_table): Return NULL when
 	dwarf_formudata reports an error.
 	(get_table_for_offset): Likewise.

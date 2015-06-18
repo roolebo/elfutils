@@ -127,6 +127,7 @@ get_offsets (Dwarf *dbg)
 
   if (mem == NULL || cnt == 0)
     {
+      free (mem);
       __libdw_seterrno (DWARF_E_NO_ENTRY);
       return -1;
     }

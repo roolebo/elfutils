@@ -1,5 +1,9 @@
 2015-06-18  Mark Wielaard  <mjw@redhat.com>
 
+	* find-debuginfo.c (try_open): Free fname on all failure paths.
+
+2015-06-18  Mark Wielaard  <mjw@redhat.com>
+
 	* dwfl_module_getdwarf.c (find_symtab): Check shdr is not NULL and
 	sh_entsize is not zero.
 

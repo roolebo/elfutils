@@ -1,5 +1,5 @@
 /* Standard find_debuginfo callback for libdwfl.
-   Copyright (C) 2005-2010, 2014 Red Hat, Inc.
+   Copyright (C) 2005-2010, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -62,6 +62,7 @@ try_open (const struct stat64 *main_stat,
 	   && st.st_dev == main_stat->st_dev)
     {
       /* This is the main file by another name.  Don't look at it again.  */
+      free (fname);
       close (fd);
       errno = ENOENT;
       fd = -1;

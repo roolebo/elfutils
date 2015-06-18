@@ -125,7 +125,8 @@ get_macinfo_table (Dwarf *dbg, Dwarf_Word macoff, Dwarf_Die *cudie)
     = INTUSE(dwarf_attr) (cudie, DW_AT_stmt_list, &attr_mem);
   Dwarf_Off line_offset = (Dwarf_Off) -1;
   if (attr != NULL)
-    INTUSE(dwarf_formudata) (attr, &line_offset);
+    if (unlikely (INTUSE(dwarf_formudata) (attr, &line_offset) != 0))
+      return NULL;
 
   Dwarf_Macro_Op_Table *table = libdw_alloc (dbg, Dwarf_Macro_Op_Table,
 					     macinfo_data_size, 1);
@@ -178,7 +179,8 @@ get_table_for_offset (Dwarf *dbg, Dwarf_Word macoff,
       Dwarf_Attribute attr_mem, *attr
 	= INTUSE(dwarf_attr) (cudie, DW_AT_stmt_list, &attr_mem);
       if (attr != NULL)
-	INTUSE(dwarf_formudata) (attr, &line_offset);
+	if (unlikely (INTUSE(dwarf_formudata) (attr, &line_offset) != 0))
+	  return NULL;
     }
 
   /* """The macinfo entry types defined in this standard may, but

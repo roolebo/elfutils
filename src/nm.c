@@ -1383,7 +1383,7 @@ show_symbols (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, Elf_Scn *xndxscn,
     }
 
   /* Free all memory.  */
-  if (nentries * sizeof (GElf_Sym) >= MAX_STACK_ALLOC)
+  if (nentries * sizeof (sym_mem[0]) >= MAX_STACK_ALLOC)
     free (sym_mem);
 
   obstack_free (&whereob, NULL);

@@ -1,5 +1,10 @@
 2015-06-18  Mark Wielaard  <mjw@redhat.com>
 
+	* nm.c (show_symbols): Check sizeof (sym_mem[0]), not GElf_Sym to
+	known whether or not we stack allocated memory.
+
+2015-06-18  Mark Wielaard  <mjw@redhat.com>
+
 	* strings.c (readelf): Use "<unknown>" if we cannot retrieve section
 	name.
 

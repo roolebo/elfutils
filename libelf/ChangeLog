@@ -1,5 +1,10 @@
 2015-06-18  Mark Wielaard  <mjw@redhat.com>
 
+	* elf32_updatefile.c (updatefile): Always free shdr_data and scns
+	when allocated on failure paths.
+
+2015-06-18  Mark Wielaard  <mjw@redhat.com>
+
 	* nlist.c (nlist): Check symscn shdr exists before use.
 
 2015-06-16  Mark Wielaard  <mjw@redhat.com>

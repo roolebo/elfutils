@@ -655,16 +655,18 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 #endif
 
       ElfW2(LIBELFBITS,Shdr) *shdr_data;
+      ElfW2(LIBELFBITS,Shdr) *shdr_data_mem = NULL;
       if (change_bo || elf->state.ELFW(elf,LIBELFBITS).shdr == NULL
 	  || (elf->flags & ELF_F_DIRTY))
 	{
-	  shdr_data = (ElfW2(LIBELFBITS,Shdr) *)
+	  shdr_data_mem = (ElfW2(LIBELFBITS,Shdr) *)
 	    malloc (shnum * sizeof (ElfW2(LIBELFBITS,Shdr)));
-	  if (unlikely (shdr_data == NULL))
+	  if (unlikely (shdr_data_mem == NULL))
 	    {
 	      __libelf_seterrno (ELF_E_NOMEM);
 	      return -1;
 	    }
+	  shdr_data = shdr_data_mem;
 	}
       else
 	shdr_data = elf->state.ELFW(elf,LIBELFBITS).shdr;
@@ -675,6 +677,7 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
       Elf_Scn **scns = (Elf_Scn **) malloc (shnum * sizeof (Elf_Scn *));
       if (unlikely (scns == NULL))
 	{
+	  free (shdr_data_mem);
 	  __libelf_seterrno (ELF_E_NOMEM);
 	  return -1;
 	}
@@ -712,7 +715,12 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 					(scn_start + dl->data.d.d_off)
 					- last_offset, fillbuf,
 					&filled) != 0))
-		      return 1;
+		      {
+		      fail_free:
+			free (shdr_data_mem);
+			free (scns);
+			return 1;
+		      }
 		  }
 
 		if ((scn->flags | dl->flags | elf->flags) & ELF_F_DIRTY)
@@ -744,7 +752,7 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 			    if (unlikely (buf == NULL))
 			      {
 				__libelf_seterrno (ELF_E_NOMEM);
-				return 1;
+				goto fail_free;
 			      }
 			  }
 
@@ -761,7 +769,7 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 			  free (buf);
 
 			__libelf_seterrno (ELF_E_WRITE_ERROR);
-			return 1;
+			goto fail_free;
 		      }
 
 		    if (buf != dl->data.d.d_buf && buf != tmpbuf)
@@ -786,7 +794,7 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 		  if (unlikely (fill (elf->fildes, last_offset,
 				      scn_start - last_offset, fillbuf,
 				      &filled) != 0))
-		    return 1;
+		    goto fail_free;
 		}
 
 	      last_offset = scn_start + shdr->sh_size;
@@ -814,7 +822,7 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 	  && unlikely (fill (elf->fildes, last_offset,
 			     shdr_offset - last_offset,
 			     fillbuf, &filled) != 0))
-	return 1;
+	goto fail_free;
 
       /* Write out the section header table.  */
       if (shdr_flags & ELF_F_DIRTY
@@ -824,13 +832,10 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 		       != sizeof (ElfW2(LIBELFBITS,Shdr)) * shnum))
 	{
 	  __libelf_seterrno (ELF_E_WRITE_ERROR);
-	  return 1;
+	  goto fail_free;
 	}
 
-      if (change_bo || elf->state.ELFW(elf,LIBELFBITS).shdr == NULL
-	  || (elf->flags & ELF_F_DIRTY))
-	free (shdr_data);
-
+      free (shdr_data_mem);
       free (scns);
     }
 

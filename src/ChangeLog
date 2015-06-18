@@ -1,3 +1,8 @@
+2015-06-18  Mark Wielaard  <mjw@redhat.com>
+
+	* strings.c (readelf): Use "<unknown>" if we cannot retrieve section
+	name.
+
 2015-06-09  Mark Wielaard  <mjw@redhat.com>
 
 	* addr2line.c (print_dwarf_function): Always free scopes before

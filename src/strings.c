@@ -730,10 +730,14 @@ read_elf (Elf *elf, int fd, const char *fname, off64_t fdlen)
 	      || fdlen - shdr->sh_offset < shdr->sh_size)
 	    {
 	      size_t strndx = 0;
-	      elf_getshdrstrndx (elf, &strndx);
+	      const char *sname;
+	      if (unlikely (elf_getshdrstrndx (elf, &strndx) < 0))
+		sname = "<unknown>";
+	      else
+		sname = elf_strptr (elf, strndx, shdr->sh_name) ?: "<unknown>";
 	      error (0, 0,
 		     gettext ("Skipping section %zd '%s' data outside file"),
-		     elf_ndxscn (scn), elf_strptr (elf, strndx, shdr->sh_name));
+		     elf_ndxscn (scn), sname);
 	      result = 1;
 	    }
 	  else

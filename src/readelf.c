@@ -1315,10 +1315,10 @@ print_phdr (Ebl *ebl, GElf_Ehdr *ehdr)
 		{
 		  /* Determine the segment this section is part of.  */
 		  size_t cnt2;
+		  GElf_Phdr phdr2_mem;
 		  GElf_Phdr *phdr2 = NULL;
 		  for (cnt2 = 0; cnt2 < phnum; ++cnt2)
 		    {
-		      GElf_Phdr phdr2_mem;
 		      phdr2 = gelf_getphdr (ebl->elf, cnt2, &phdr2_mem);
 
 		      if (phdr2 != NULL && phdr2->p_type == PT_LOAD

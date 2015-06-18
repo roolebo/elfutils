@@ -1,5 +1,5 @@
 /* Extract symbol list from binary.
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2005, 2007 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2005, 2007, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -116,7 +116,11 @@ nlist (const char *filename, struct nlist *nl)
   /* Re-get the section header in case we found only the dynamic symbol
      table.  */
   if (scn == NULL)
-    shdr = INTUSE(gelf_getshdr) (symscn, &shdr_mem);
+    {
+      shdr = INTUSE(gelf_getshdr) (symscn, &shdr_mem);
+      if (unlikely (shdr == NULL))
+	goto fail_close;
+    }
   /* SHDR->SH_LINK now contains the index of the string section.  */
 
   /* Get the data for the symbol section.  */

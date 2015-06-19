@@ -1,3 +1,8 @@
+2015-06-19  Mark Wielaard  <mjw@redhat.com>
+
+	* configure.ac: Set version to 0.163.
+	* NEWS: Mention 0.163 is bug fixes only.
+
 2015-06-10  Mark Wielaard  <mjw@redhat.com>
 
 	* configure.ac: Set version to 0.162.

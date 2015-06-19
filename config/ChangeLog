@@ -1,3 +1,7 @@
+2015-06-19  Mark Wielaard  <mjw@redhat.com>
+
+	* elfutils.spec.in: Update for 0.163.
+
 2015-06-11  Mark Wielaard  <mjw@redhat.com>
 
 	* elfutils.spec.in (devel): Include elfutils/known-dwarf.h and

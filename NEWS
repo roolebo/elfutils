@@ -1,3 +1,7 @@
+Version 0.163
+
+Bug fixes only, no new features.
+
 Version 0.162
 
 libdw: Install new header elfutils/known-dwarf.h.

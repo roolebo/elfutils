@@ -198,6 +198,9 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %changelog
+* Fri Jun 19 2015 Mark Wielaard <mjw@redhat.com> 0.163-1
+- Bug fixes only, no new features.
+
 * Wed Jun 10 2015 Mark Wielaard <mjw@redhat.com> 0.162-1
 - libdw: Install new header elfutils/known-dwarf.h.
   dwarf.h Add preliminary DWARF5 constants DW_TAG_atomic_type,

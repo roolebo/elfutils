@@ -28,7 +28,7 @@
 
 #ifndef __linux__
 int
-main (int argc __attribute__ ((unused)), char **argv)
+main (int argc __attribute__ ((unused)), char **argv __attribute__ ((unused)))
 {
   printf ("Getting the vdso is unsupported.\n");
   return 77;

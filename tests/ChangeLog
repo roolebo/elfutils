@@ -1,5 +1,9 @@
 2015-06-26  Pino Toscano  <toscano.pino@tiscali.it>
 
+	* tests/vdsosyms.c [!__linux__] (main): Mark argv as unused.
+
+2015-06-26  Pino Toscano  <toscano.pino@tiscali.it>
+
 	* tests/backtrace-data.c: Reduce scope of some includes to match their
 	usage.
 	* tests/backtrace.c: Likewise.

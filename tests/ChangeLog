@@ -1,3 +1,10 @@
+2015-06-26  Pino Toscano  <toscano.pino@tiscali.it>
+
+	* tests/backtrace-data.c: Reduce scope of some includes to match their
+	usage.
+	* tests/backtrace.c: Likewise.
+	* tests/deleted.c: Likewise.
+
 2015-06-16  Mark Wielaard  <mjw@redhat.com>
 
 	* run-strip-test.sh: Add strip-in-place (eu-strip without -o) test

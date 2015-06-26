@@ -23,7 +23,9 @@
 #include <stdio.h>
 #include <error.h>
 #include <errno.h>
+#ifdef __linux__
 #include <sys/prctl.h>
+#endif
 
 extern void libfunc (void);
 

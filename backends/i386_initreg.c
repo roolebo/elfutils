@@ -30,7 +30,7 @@
 # include <config.h>
 #endif
 
-#if defined __i386__ || defined __x86_64__
+#if (defined __i386__ || defined __x86_64__) && defined(__linux__)
 # include <sys/types.h>
 # include <sys/user.h>
 # include <sys/ptrace.h>

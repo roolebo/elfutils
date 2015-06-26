@@ -1,3 +1,7 @@
+2015-06-26  Pino Toscano  <toscano.pino@tiscali.it>
+
+	* i386_initreg.c: Reduce scope of some includes to match their usage.
+
 2015-04-28  Mark Wielaard  <mjw@redhat.com>
 
 	* aarch64_reloc.def: Drop "64" from TLS_DTPMOD64, TLS_DTPREL64 and

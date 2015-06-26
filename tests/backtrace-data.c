@@ -30,6 +30,7 @@
 #include <error.h>
 #include <unistd.h>
 #include <dwarf.h>
+#if defined(__x86_64__) && defined(__linux__)
 #include <sys/resource.h>
 #include <sys/ptrace.h>
 #include <signal.h>
@@ -39,6 +40,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include ELFUTILS_HEADER(dwfl)
+#endif
 
 #if !defined(__x86_64__) || !defined(__linux__)
 

@@ -27,6 +27,7 @@
 #include <error.h>
 #include <unistd.h>
 #include <dwarf.h>
+#ifdef __linux__
 #include <sys/resource.h>
 #include <sys/ptrace.h>
 #include <signal.h>
@@ -37,6 +38,7 @@
 #include <string.h>
 #include <argp.h>
 #include ELFUTILS_HEADER(dwfl)
+#endif
 
 #ifndef __linux__
 

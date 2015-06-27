@@ -1,3 +1,8 @@
+2015-06-27  Pino Toscano  <toscano.pino@tiscali.it>
+
+	* tests/dwfl-bug-fd-leak.c (elfutils_open): Check for null results of
+	dwfl_addrmodule.
+
 2015-06-26  Pino Toscano  <toscano.pino@tiscali.it>
 
 	* tests/vdsosyms.c [!__linux__] (main): Mark argv as unused.

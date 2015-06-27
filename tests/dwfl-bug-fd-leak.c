@@ -65,7 +65,11 @@ elfutils_open (pid_t pid, Dwarf_Addr address)
     }
   else
     {
-      Elf *elf = dwfl_module_getelf (dwfl_addrmodule (dwfl, address), &bias);
+      Dwfl_Module *module = dwfl_addrmodule (dwfl, address);
+      if (module == NULL)
+	error (2, 0, "dwfl_addrmodule: no module available for 0x%" PRIx64 "",
+	       address);
+      Elf *elf = dwfl_module_getelf (module, &bias);
       if (elf == NULL)
 	error (2, 0, "dwfl_module_getelf: %s", dwfl_errmsg (-1));
     }

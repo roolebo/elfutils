@@ -43,6 +43,10 @@
 
 #include <system.h>
 
+#ifndef MAP_POPULATE
+# define MAP_POPULATE 0
+#endif
+
 
 /* Prototypes of local functions.  */
 static int read_fd (int fd, const char *fname, off64_t fdlen);

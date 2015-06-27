@@ -1,3 +1,7 @@
+2015-06-27  Pino Toscano  <toscano.pino@tiscali.it>
+
+	* src/strings.c: Define MAP_POPULATE if not defined already.
+
 2015-06-27  Mark Wielaard  <mjw@redhat.com>
 
 	* nm.c (show_symbols): First call elf_getdata, then allocate memory.

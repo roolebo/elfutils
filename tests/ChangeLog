@@ -1,5 +1,10 @@
 2015-06-27  Pino Toscano  <toscano.pino@tiscali.it>
 
+	* tests/run-deleted.sh: Skip when detecting a not implemented
+	dwfl_linux_proc_attach.
+
+2015-06-27  Pino Toscano  <toscano.pino@tiscali.it>
+
 	* tests/dwfl-bug-fd-leak.c (elfutils_open): Check for null results of
 	dwfl_addrmodule.
 

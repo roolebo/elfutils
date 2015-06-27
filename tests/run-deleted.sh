@@ -38,6 +38,10 @@ cat bt bt.err
 kill -9 $pid
 wait
 check_native_unsupported bt.err deleted
+if grep -q -E ': dwfl_linux_proc_attach pid ([[:digit:]]+): Function not implemented$' bt.err; then
+  echo >&2 deleted: OS not supported
+  exit 77
+fi
 # For PPC64 we need access to the OPD table which we get through the shdrs
 # (see backends/ppc64_init.c) but for the deleted-lib we only have phdrs.
 # So we don't have the name of the function. But since we should find

@@ -1,3 +1,7 @@
+2015-06-27  Mark Wielaard  <mjw@redhat.com>
+
+	* nm.c (show_symbols): First call elf_getdata, then allocate memory.
+
 2015-06-18  Mark Wielaard  <mjw@redhat.com>
 
 	* findtextrel.c (process_file): Free segments after use.

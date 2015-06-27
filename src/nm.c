@@ -1200,6 +1200,12 @@ show_symbols (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, Elf_Scn *xndxscn,
 	}
     }
 
+  /* Get the data of the section.  */
+  Elf_Data *data = elf_getdata (scn, NULL);
+  Elf_Data *xndxdata = elf_getdata (xndxscn, NULL);
+  if (data == NULL || (xndxscn != NULL && xndxdata == NULL))
+    INTERNAL_ERROR (fullname);
+
   /* Allocate the memory.
 
      XXX We can use a dirty trick here.  Since GElf_Sym == Elf64_Sym we
@@ -1210,12 +1216,6 @@ show_symbols (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, Elf_Scn *xndxscn,
     sym_mem = (GElf_SymX *) alloca (nentries * sizeof (GElf_SymX));
   else
     sym_mem = (GElf_SymX *) xmalloc (nentries * sizeof (GElf_SymX));
-
-  /* Get the data of the section.  */
-  Elf_Data *data = elf_getdata (scn, NULL);
-  Elf_Data *xndxdata = elf_getdata (xndxscn, NULL);
-  if (data == NULL || (xndxscn != NULL && xndxdata == NULL))
-    INTERNAL_ERROR (fullname);
 
   /* Iterate over all symbols.  */
 #ifdef USE_DEMANGLE

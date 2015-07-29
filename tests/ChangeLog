@@ -1,3 +1,13 @@
+2015-07-29  Mark Wielaard  <mjw@redhat.com>
+
+	* run-unstrip-test3.sh: New test.
+	* testfile-info-link.bz2: New file.
+	* testfile-info-link.debuginfo.bz2: Likewise.
+	* testfile-info-link.stripped.bz2: Likewise.
+	* Makefile.am (TESTS): Add run-unstrip-test3.sh.
+	(EXTRA_DIST): Add run-unstrip-test3.sh, testfile-info-link.bz2,
+	testfile-info-link.debuginfo.bz2, testfile-info-link.stripped.bz2.
+
 2015-06-27  Pino Toscano  <toscano.pino@tiscali.it>
 
 	* tests/run-deleted.sh: Skip when detecting a not implemented

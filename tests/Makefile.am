@@ -78,7 +78,8 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-strip-test6.sh run-strip-test7.sh run-strip-test8.sh \
 	run-strip-test9.sh run-strip-test10.sh \
 	run-strip-groups.sh run-strip-reloc.sh \
-	run-unstrip-test.sh run-unstrip-test2.sh run-unstrip-M.sh \
+	run-unstrip-test.sh run-unstrip-test2.sh \
+	run-unstrip-test3.sh run-unstrip-M.sh \
 	run-ecp-test.sh run-ecp-test2.sh run-alldts.sh \
 	run-elflint-test.sh run-elflint-self.sh run-ranlib-test.sh \
 	run-ranlib-test2.sh run-ranlib-test3.sh run-ranlib-test4.sh \
@@ -161,7 +162,10 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-strip-test9.sh run-strip-test10.sh \
 	     run-strip-reloc.sh hello_i386.ko.bz2 hello_x86_64.ko.bz2 \
 	     hello_ppc64.ko.bz2 hello_s390.ko.bz2 hello_aarch64.ko.bz2 \
-	     run-unstrip-test.sh run-unstrip-test2.sh run-unstrip-M.sh\
+	     run-unstrip-test.sh run-unstrip-test2.sh \
+	     testfile-info-link.bz2 testfile-info-link.debuginfo.bz2 \
+	     testfile-info-link.stripped.bz2 run-unstrip-test3.sh \
+	     run-unstrip-M.sh \
 	     run-elflint-self.sh run-ranlib-test.sh run-ranlib-test2.sh \
 	     run-ranlib-test3.sh run-ranlib-test4.sh \
 	     run-addrscopes.sh run-strings-test.sh run-funcscopes.sh \

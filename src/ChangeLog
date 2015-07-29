@@ -1,3 +1,12 @@
+2015-07-29  Mark Wielaard  <mjw@redhat.com>
+
+	* unstrip.c (sections_flags_match): New function.
+	(sections_match): Use sections_flags_match.
+	(find_alloc_sections_prelink): Only clear matched sections if there
+	is an undo section.
+	(copy_elided_sections): Add SHF_INFO_LINK to shdr_mem.sh_flags if
+	necessary.
+
 2015-06-27  Pino Toscano  <toscano.pino@tiscali.it>
 
 	* src/strings.c: Define MAP_POPULATE if not defined already.

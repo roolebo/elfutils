@@ -867,12 +867,28 @@ compare_symbols_output (const void *a, const void *b)
 
 #undef CMP
 
+/* Return true if the flags of the sections match, ignoring the SHF_INFO_LINK
+   flag if the section contains relocation information.  */
+static bool
+sections_flags_match (Elf64_Xword sh_flags1, Elf64_Xword sh_flags2,
+		      Elf64_Word sh_type)
+{
+  if (sh_type == SHT_REL || sh_type == SHT_RELA)
+    {
+      sh_flags1 &= ~SHF_INFO_LINK;
+      sh_flags2 &= ~SHF_INFO_LINK;
+    }
+
+  return sh_flags1 == sh_flags2;
+}
+
 /* Return true iff the flags, size, and name match.  */
 static bool
 sections_match (const struct section *sections, size_t i,
 		const GElf_Shdr *shdr, const char *name)
 {
-  return (sections[i].shdr.sh_flags == shdr->sh_flags
+  return (sections_flags_match (sections[i].shdr.sh_flags, shdr->sh_flags,
+				sections[i].shdr.sh_type)
 	  && (sections[i].shdr.sh_size == shdr->sh_size
 	      || (sections[i].shdr.sh_size < shdr->sh_size
 		  && section_can_shrink (&sections[i].shdr)))
@@ -930,10 +946,6 @@ find_alloc_sections_prelink (Elf *debug, Elf_Data *debug_shstrtab,
 			     struct section *sections,
 			     size_t nalloc, size_t nsections)
 {
-  /* Clear assignments that might have been bogus.  */
-  for (size_t i = 0; i < nalloc; ++i)
-    sections[i].outscn = NULL;
-
   Elf_Scn *undo = NULL;
   for (size_t i = nalloc; i < nsections; ++i)
     {
@@ -952,6 +964,10 @@ find_alloc_sections_prelink (Elf *debug, Elf_Data *debug_shstrtab,
   size_t undo_nalloc = 0;
   if (undo != NULL)
     {
+      /* Clear assignments that might have been bogus.  */
+      for (size_t i = 0; i < nalloc; ++i)
+	sections[i].outscn = NULL;
+
       Elf_Data *undodata = elf_rawdata (undo, NULL);
       ELF_CHECK (undodata != NULL,
 		 _("cannot read '.gnu.prelink_undo' section: %s"));
@@ -1500,6 +1516,14 @@ more sections in stripped file than debug file -- arguments reversed?"));
 	shdr_mem.sh_size = sec->shdr.sh_size;
 	shdr_mem.sh_info = sec->shdr.sh_info;
 	shdr_mem.sh_link = sec->shdr.sh_link;
+
+	/* Buggy binutils objdump might have stripped the SHF_INFO_LINK
+	   put it back if necessary.  */
+	if ((sec->shdr.sh_type == SHT_REL || sec->shdr.sh_type == SHT_RELA)
+	    && sec->shdr.sh_flags != shdr_mem.sh_flags
+	    && (sec->shdr.sh_flags & SHF_INFO_LINK) != 0)
+	  shdr_mem.sh_flags |= SHF_INFO_LINK;
+
 	if (sec->shdr.sh_link != SHN_UNDEF)
 	  shdr_mem.sh_link = ndx_section[sec->shdr.sh_link - 1];
 	if (shdr_mem.sh_flags & SHF_INFO_LINK)

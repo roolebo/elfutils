@@ -1,3 +1,10 @@
+2015-08-04  Mark Wielaard  <mjw@redhat.com>
+
+	* 10-default-yama-scope.conf: New file.
+	* Makefile.am (EXTRA_DIST): Add 10-default-yama-scope.conf.
+	* elfutils.spec.in (Requires): default-yama-scope.
+	(default-yama-scope): New package.
+
 2015-06-19  Mark Wielaard  <mjw@redhat.com>
 
 	* elfutils.spec.in: Update for 0.163.

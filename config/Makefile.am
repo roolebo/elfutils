@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
 ## Configure input file for elfutils.
 ##
-## Copyright (C) 2004, 2005, 2008, 2009, 2011 Red Hat, Inc.
+## Copyright (C) 2004, 2005, 2008, 2009, 2011, 2015 Red Hat, Inc.
 ## This file is part of elfutils.
 ##
 ## This file is free software; you can redistribute it and/or modify
@@ -28,7 +28,7 @@
 ## the GNU Lesser General Public License along with this program.  If
 ## not, see <http://www.gnu.org/licenses/>.
 ##
-EXTRA_DIST = elfutils.spec.in known-dwarf.awk
+EXTRA_DIST = elfutils.spec.in known-dwarf.awk 10-default-yama-scope.conf
 
 if MAINTAINER_MODE
 $(srcdir)/elfutils.spec.in: $(top_srcdir)/NEWS

@@ -10,6 +10,7 @@ Obsoletes: libelf libelf-devel
 Requires: elfutils-libelf = %{version}-%{release}
 Requires: glibc >= 2.7
 Requires: libstdc++
+Requires: default-yama-scope
 
 # ExcludeArch: xxx
 
@@ -97,6 +98,22 @@ Conflicts: libelf-devel
 The elfutils-libelf-static package contains the static archive
 for libelf.
 
+%package default-yama-scope
+Summary: Default yama attach scope sysctl setting
+Group: Development/Tools
+License: GPLv2+ or LGPLv3+
+Provides: default-yama-scope
+BuildArch: noarch
+
+%description default-yama-scope
+Yama sysctl setting to enable default attach scope settings
+enabling programs to use ptrace attach, access to
+/proc/PID/{mem,personality,stack,syscall}, and the syscalls
+process_vm_readv and process_vm_writev which are used for
+interprocess services, communication and introspection
+(like synchronisation, signaling, debugging, tracing and
+profiling) of processes.
+
 %prep
 %setup -q
 
@@ -121,6 +138,8 @@ chmod +x ${RPM_BUILD_ROOT}%{_prefix}/%{_lib}/elfutils/lib*.so*
   rm -f .%{_libdir}/libasm.a
 }
 
+install -Dm0644 config/10-default-yama-scope.conf ${RPM_BUILD_ROOT}%{_sysctldir}/10-default-yama-scope.conf
+
 %check
 make check
 
@@ -134,6 +153,9 @@ rm -rf ${RPM_BUILD_ROOT}
 %post libelf -p /sbin/ldconfig
 
 %postun libelf -p /sbin/ldconfig
+
+%post default-yama-scope
+%sysctl_apply 10-default-yama-scope.conf
 
 %files
 %defattr(-,root,root)
@@ -196,6 +218,9 @@ rm -rf ${RPM_BUILD_ROOT}
 
 %files libelf-devel-static
 %{_libdir}/libelf.a
+
+%files default-yama-scope
+%config(noreplace) %{_sysctldir}/10-default-yama-scope.conf
 
 %changelog
 * Fri Jun 19 2015 Mark Wielaard <mjw@redhat.com> 0.163-1

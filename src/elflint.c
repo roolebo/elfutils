@@ -3978,9 +3978,39 @@ section [%2zu] '%s' not fully contained in segment of program header entry %d\n"
 		  {
 		    if (shdr->sh_offset < phdr->p_offset + phdr->p_filesz
 			&& !is_debuginfo)
-		      ERROR (gettext ("\
+		      {
+			if (!gnuld)
+			  ERROR (gettext ("\
 section [%2zu] '%s' has type NOBITS but is read from the file in segment of program header entry %d\n"),
-			 cnt, section_name (ebl, cnt), pcnt);
+				 cnt, section_name (ebl, cnt), pcnt);
+			else
+			  {
+			    /* This is truly horrible. GNU ld might put a
+			       NOBITS section in the middle of a PT_LOAD
+			       segment, assuming the next gap in the file
+			       actually consists of zero bits...
+			       So it really is like a PROGBITS section
+			       where the data is all zeros.  Check those
+			       zero bytes are really there.  */
+			    bool bad;
+			    Elf_Data *databits;
+			    databits = elf_getdata_rawchunk (ebl->elf,
+							     shdr->sh_offset,
+							     shdr->sh_size,
+							     ELF_T_BYTE);
+			    bad = (databits == NULL
+				   || databits->d_size != shdr->sh_size);
+			    for (size_t idx = 0;
+				 idx < databits->d_size && ! bad;
+				 idx++)
+			      bad = ((char *) databits->d_buf)[idx] != 0;
+
+			    if (bad)
+			      ERROR (gettext ("\
+section [%2zu] '%s' has type NOBITS but is read from the file in segment of program header entry %d and file contents is non-zero\n"),
+				     cnt, section_name (ebl, cnt), pcnt);
+			  }
+		      }
 		  }
 		else
 		  {

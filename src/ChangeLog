@@ -1,3 +1,8 @@
+2015-08-11  Mark Wielaard  <mjw@redhat.com>
+
+	* elflint.c (check_sections): When gnuld and a NOBITS section falls
+	inside a segment make sure any ELF file contents is zero.
+
 2015-07-29  Mark Wielaard  <mjw@redhat.com>
 
 	* unstrip.c (sections_flags_match): New function.

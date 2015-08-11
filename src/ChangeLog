@@ -1,3 +1,10 @@
+2015-10-02  Mark Wielaard  <mjw@redhat.com>
+
+	* strip.c (handle_elf): Don't move around allocated NOBITS sections.
+	Don't just mark the section header string table as unused.
+	* unstrip.c (copy_elided_sections): Add header names to strtab if
+	shstrndx equals the symtab strtabndx.
+
 2015-09-22  Mark Wielaard  <mjw@redhat.com>
 
 	* strip.c (cleanup_debug): Remove old-style function definitions.

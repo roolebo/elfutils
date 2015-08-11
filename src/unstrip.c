@@ -1,5 +1,5 @@
 /* Combine stripped files with separate symbols and debug information.
-   Copyright (C) 2007-2012, 2014 Red Hat, Inc.
+   Copyright (C) 2007-2012, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Roland McGrath <roland@redhat.com>, 2007.
 
@@ -1709,8 +1709,51 @@ more sections in stripped file than debug file -- arguments reversed?"));
       symstrdata = elf_getdata (unstripped_strtab, NULL);
       Elf_Data *shndxdata = NULL;	/* XXX */
 
+      /* If symtab and the section header table share the string table
+	 add the section names to the strtab and then (after finalizing)
+	 fixup the section header sh_names.  Also dispose of the old data.  */
+      struct Ebl_Strent *unstripped_strent[unstripped_shnum - 1];
+      if (unstripped_shstrndx == elf_ndxscn (unstripped_strtab))
+	{
+	  for (size_t i = 0; i < unstripped_shnum - 1; ++i)
+	    {
+	      Elf_Scn *sec = elf_getscn (unstripped, i + 1);
+	      GElf_Shdr mem;
+	      GElf_Shdr *hdr = gelf_getshdr (sec, &mem);
+	      const char *name = get_section_name (i + 1, hdr, shstrtab);
+	      unstripped_strent[i + 1] = ebl_strtabadd (symstrtab, name, 0);
+	      ELF_CHECK (unstripped_strent[i + 1] != NULL,
+			 _("cannot add section name to string table: %s"));
+	    }
+
+	  if (strtab != NULL)
+	    {
+	      ebl_strtabfree (strtab);
+	      free (strtab_data->d_buf);
+	      strtab = NULL;
+	    }
+	}
+
       ebl_strtabfinalize (symstrtab, symstrdata);
       elf_flagdata (symstrdata, ELF_C_SET, ELF_F_DIRTY);
+
+      /* And update the section header names if necessary.  */
+      if (unstripped_shstrndx == elf_ndxscn (unstripped_strtab))
+	{
+	  for (size_t i = 0; i < unstripped_shnum - 1; ++i)
+	    {
+	      Elf_Scn *sec = elf_getscn (unstripped, i + 1);
+	      GElf_Shdr mem;
+	      GElf_Shdr *hdr = gelf_getshdr (sec, &mem);
+	      shdr->sh_name = ebl_strtaboffset (unstripped_strent[i + 1]);
+	      update_shdr (sec, hdr);
+	    }
+	}
+
+      /* Now update the symtab shdr.  Reload symtab shdr because sh_name
+	 might have changed above. */
+      shdr = gelf_getshdr (unstripped_symtab, &shdr_mem);
+      ELF_CHECK (shdr != NULL, _("cannot get section header: %s"));
 
       shdr->sh_size = symdata->d_size = (1 + nsym) * shdr->sh_entsize;
       symdata->d_buf = xmalloc (symdata->d_size);

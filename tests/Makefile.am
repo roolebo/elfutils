@@ -52,7 +52,7 @@ check_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  backtrace-data backtrace-dwarf debuglink debugaltlink \
 		  buildid deleted deleted-lib.so aggregate_size vdsosyms \
 		  getsrc_die strptr newdata elfstrtab dwfl-proc-attach \
-		  elfshphehdr
+		  elfshphehdr elfstrmerge
 
 asm_TESTS = asm-tst1 asm-tst2 asm-tst3 asm-tst4 asm-tst5 \
 	    asm-tst6 asm-tst7 asm-tst8 asm-tst9
@@ -78,7 +78,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-strip-test3.sh run-strip-test4.sh run-strip-test5.sh \
 	run-strip-test6.sh run-strip-test7.sh run-strip-test8.sh \
 	run-strip-test9.sh run-strip-test10.sh \
-	run-strip-groups.sh run-strip-reloc.sh \
+	run-strip-groups.sh run-strip-reloc.sh run-strip-strmerge.sh \
 	run-unstrip-test.sh run-unstrip-test2.sh \
 	run-unstrip-test3.sh run-unstrip-M.sh \
 	run-ecp-test.sh run-ecp-test2.sh run-alldts.sh \
@@ -161,7 +161,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-line2addr.sh run-elflint-test.sh testfile14.bz2 \
 	     run-strip-test4.sh run-strip-test5.sh run-strip-test6.sh \
 	     run-strip-test7.sh run-strip-test8.sh run-strip-groups.sh \
-	     run-strip-test9.sh run-strip-test10.sh \
+	     run-strip-test9.sh run-strip-test10.sh run-strip-strmerge.sh \
 	     run-strip-reloc.sh hello_i386.ko.bz2 hello_x86_64.ko.bz2 \
 	     hello_ppc64.ko.bz2 hello_s390.ko.bz2 hello_aarch64.ko.bz2 \
 	     run-unstrip-test.sh run-unstrip-test2.sh \
@@ -451,6 +451,7 @@ elfstrtab_LDADD = $(libelf)
 dwfl_proc_attach_LDADD = $(libdw)
 dwfl_proc_attach_LDFLAGS = -pthread
 elfshphehdr_LDADD =$(libelf)
+elfstrmerge_LDADD = $(libebl) $(libelf)
 
 if GCOV
 check: check-am coverage

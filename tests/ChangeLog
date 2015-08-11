@@ -1,3 +1,11 @@
+2015-10-02  Mark Wielaard  <mjw@redhat.com>
+
+	* elfstrmerge.c: New check program.
+	* run-strip-strmerge.sh: New test.
+	* Makefile.am (check_PROGRAMS): Add elfstrmerge.
+	(EXTRA_DIST): Add run-strip-strmerge.sh
+	(elfstrmerge_LDADD): New variable.
+
 2015-09-29  Mark Wielaard  <mjw@redhat.com>
 
 	* elfshphehdr.c: New test.

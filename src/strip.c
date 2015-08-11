@@ -644,10 +644,12 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	goto illformed;
 
       /* Sections in files other than relocatable object files which
-	 don't contain any file content or are not loaded can be freely
-	 moved by us.  In relocatable object files everything can be moved.  */
+	 not loaded can be freely moved by us.  In theory we can also
+	 freely move around allocated nobits sections.  But we don't
+	 to keep the layout of all allocated sections as similar as
+	 possible to the original file.  In relocatable object files
+	 everything can be moved.  */
       if (ehdr->e_type == ET_REL
-	  || shdr_info[cnt].shdr.sh_type == SHT_NOBITS
 	  || (shdr_info[cnt].shdr.sh_flags & SHF_ALLOC) == 0)
 	shdr_info[cnt].shdr.sh_offset = 0;
 
@@ -1035,9 +1037,10 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	}
     }
 
-  /* Mark the section header string table as unused, we will create
-     a new one.  */
-  shdr_info[shstrndx].idx = 0;
+  /* Although we always create a new section header string table we
+     don't explicitly mark the existing one as unused.  It can still
+     be used through a symbol table section we are keeping.  If not it
+     will already be marked as unused.  */
 
   /* We need a string table for the section headers.  */
   shst = ebl_strtabinit (true);

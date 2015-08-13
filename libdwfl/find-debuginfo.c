@@ -252,7 +252,15 @@ find_debuginfo_in_path (Dwfl_Module *mod, const char *file_name,
 	  dir = p;
 	  if (mod->dw == NULL)
 	    {
-	      subdir = file_dirname + 1;
+	      subdir = file_dirname;
+	      /* We want to explore all sub-subdirs.  Chop off one slash
+		 at a time.  */
+	    explore_dir:
+	      subdir = strchr (subdir, '/');
+	      if (subdir != NULL)
+		subdir = subdir + 1;
+	      if (subdir && *subdir == 0)
+		continue;
 	      file = debuglink_file;
 	    }
 	  else
@@ -292,6 +300,9 @@ find_debuginfo_in_path (Dwfl_Module *mod, const char *file_name,
 		  }
 		break;
 	      }
+	    /* If possible try again with a sub-subdir.  */
+	    if (mod->dw == NULL && subdir)
+	      goto explore_dir;
 	    continue;
 	  default:
 	    goto fail_free;

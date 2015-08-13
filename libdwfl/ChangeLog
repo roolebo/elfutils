@@ -1,3 +1,12 @@
+2015-08-14  Dodji Seketeli  <dodji@seketeli.org>
+
+	* find-debuginfo.c (find_debuginfo_in_path): Try to locate the
+	debug info file named debuglink_file under
+	mod->dwfl->callbacks->debuginfo_path, by looking at
+	the set of sub-trees under mod->dwfl->callbacks->debuginfo_path
+	which is common to the set of non-absolute parent trees of
+	file_name.
+
 2015-06-18  Mark Wielaard  <mjw@redhat.com>
 
 	* find-debuginfo.c (try_open): Free fname on all failure paths.

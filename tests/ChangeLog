@@ -1,3 +1,9 @@
+2015-08-14  Mark Wielaard  <mjw@redhat.com>
+
+	* run-addr2line-alt-debugpath.sh: New test.
+	* Makefile.am (TESTS): Add run-addr2line-alt-debugpath.sh
+	(EXTRA_DIST): Likewise.
+
 2015-07-29  Mark Wielaard  <mjw@redhat.com>
 
 	* run-unstrip-test3.sh: New test.

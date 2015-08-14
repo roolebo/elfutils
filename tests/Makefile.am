@@ -105,7 +105,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-readelf-mixed-corenote.sh run-dwfllines.sh \
 	run-dwfl-report-elf-align.sh run-addr2line-test.sh \
 	run-addr2line-i-test.sh run-addr2line-i-lex-test.sh \
-	run-addr2line-i-demangle-test.sh \
+	run-addr2line-i-demangle-test.sh run-addr2line-alt-debugpath.sh \
 	run-varlocs.sh run-funcretval.sh \
 	run-backtrace-native.sh run-backtrace-data.sh run-backtrace-dwarf.sh \
 	run-backtrace-native-biarch.sh run-backtrace-native-core.sh \
@@ -259,7 +259,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     test-core.exec.bz2 run-addr2line-test.sh \
 	     run-addr2line-i-test.sh testfile-inlines.bz2 \
 	     run-addr2line-i-lex-test.sh testfile-lex-inlines.bz2 \
-	     run-addr2line-i-demangle-test.sh \
+	     run-addr2line-i-demangle-test.sh run-addr2line-alt-debugpath.sh \
 	     testfileppc32.bz2 testfileppc64.bz2 \
 	     testfiles390.bz2 testfiles390x.bz2 \
 	     testfilearm.bz2 testfileaarch64.bz2 \

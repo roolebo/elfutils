@@ -1,3 +1,7 @@
+2015-08-25  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf.h: Add DW_LANG_Haskell.
+
 2015-06-18  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_begin_elf.c (dwarf_begin_elf): Assert page size is big enough

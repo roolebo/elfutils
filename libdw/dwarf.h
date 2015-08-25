@@ -589,6 +589,7 @@ enum
     DW_LANG_D = 0x0013,		     /* D */
     DW_LANG_Python = 0x0014,	     /* Python */
     DW_LANG_Go = 0x0016,	     /* Go */
+    DW_LANG_Haskell = 0x0018,	     /* Haskell */
     DW_LANG_C_plus_plus_11 = 0x001a, /* ISO C++:2011 */
     DW_LANG_C11 = 0x001d,	     /* ISO C:2011 */
     DW_LANG_C_plus_plus_14 = 0x0021, /* ISO C++:2014 */

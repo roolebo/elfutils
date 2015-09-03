@@ -1,5 +1,5 @@
 /* Register names and numbers for SPARC DWARF.
-   Copyright (C) 2005, 2006 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -42,8 +42,8 @@ sparc_register_info (Ebl *ebl,
 		     const char **prefix, const char **setname,
 		     int *bits, int *type)
 {
-  const int nfp = 32 + (ebl->machine == EM_SPARC ? 0 : 16);
-  const int nspec = ebl->machine == EM_SPARC ? 8 : 6;
+  const int nfp = 32 + (ebl->class == ELFCLASS32 ? 0 : 16);
+  const int nspec = ebl->class == ELFCLASS32 ? 8 : 6;
 
   if (name == NULL)
     return 32 + nfp + nspec;
@@ -51,7 +51,7 @@ sparc_register_info (Ebl *ebl,
   if (regno < 0 || regno >= 32 + nfp + nspec || namelen < 6)
     return -1;
 
-  *bits = ebl->machine == EM_SPARC ? 32 : 64;
+  *bits = ebl->class == ELFCLASS32 ? 32 : 64;
   *type = DW_ATE_signed;
 
   *prefix = "%";
@@ -66,9 +66,9 @@ sparc_register_info (Ebl *ebl,
 	};
       *setname = "control";
       *type = DW_ATE_unsigned;
-      if ((ebl->machine != EM_SPARC ? 0 : 4) + 1 - (unsigned int) regno <= 1)
+      if ((ebl->class == ELFCLASS64 ? 0 : 4) + 1 - (unsigned int) regno <= 1)
 	*type = DW_ATE_address;
-      return stpncpy (name, names[ebl->machine != EM_SPARC][regno],
+      return stpncpy (name, names[ebl->class == ELFCLASS64][regno],
 		      namelen) + 1 - name;
     }
 

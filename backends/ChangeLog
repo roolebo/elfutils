@@ -1,3 +1,7 @@
+2015-09-03  Mark Wielaard  <mjw@redhat.com>
+
+	* sparc_regs.c (sparc_register_info): Use ebl->class not ebl->machine.
+
 2015-06-26  Pino Toscano  <toscano.pino@tiscali.it>
 
 	* i386_initreg.c: Reduce scope of some includes to match their usage.

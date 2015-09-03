@@ -8474,8 +8474,16 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
 	    unsigned int w = negate ? ~*i : *i;
 	    while (w != 0)
 	      {
-		int n = ffs (w);
-		w >>= n;
+		/* Note that a right shift equal to (or greater than)
+		   the number of bits of w is undefined behaviour.  In
+		   particular when the least significant bit is bit 32
+		   (w = 0x8000000) then w >>= n is undefined.  So
+		   explicitly handle that case separately.  */
+		unsigned int n = ffs (w);
+		if (n < sizeof (w) * 8)
+		  w >>= n;
+		else
+		  w = 0;
 		bit += n;
 
 		if (lastbit != 0 && lastbit + 1 == bit)

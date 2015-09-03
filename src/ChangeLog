@@ -1,3 +1,7 @@
+2015-09-03  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (handle_core_item): Handle right shift >= 32 bits.
+
 2015-08-11  Mark Wielaard  <mjw@redhat.com>
 
 	* elflint.c (check_sections): When gnuld and a NOBITS section falls

@@ -680,17 +680,10 @@ initial_offset_base (attr, offset, basep)
 }
 
 static ptrdiff_t
-getlocations_addr (attr, offset, basep, startp, endp, address,
-		   locs, expr, exprlen)
-     Dwarf_Attribute *attr;
-     ptrdiff_t offset;
-     Dwarf_Addr *basep;
-     Dwarf_Addr *startp;
-     Dwarf_Addr *endp;
-     Dwarf_Addr address;
-     Elf_Data *locs;
-     Dwarf_Op **expr;
-     size_t *exprlen;
+getlocations_addr (Dwarf_Attribute *attr, ptrdiff_t offset,
+		   Dwarf_Addr *basep, Dwarf_Addr *startp, Dwarf_Addr *endp,
+		   Dwarf_Addr address, const Elf_Data *locs, Dwarf_Op **expr,
+		   size_t *exprlen)
 {
   unsigned char *readp = locs->d_buf + offset;
   unsigned char *readendp = locs->d_buf + locs->d_size;

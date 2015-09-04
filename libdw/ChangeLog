@@ -1,4 +1,11 @@
 2015-09-04  Chih-Hung Hsieh  <chh@google.com>
+	    Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_getlocation.c (getlocations_addr): Replace K&R function
+	definition with ansi-C definition and add const qualifier to
+	locs argument.
+
+2015-09-04  Chih-Hung Hsieh  <chh@google.com>
 
 	* libdw_findcu.c (__libdw_intern_next_unit): Replace K&R function
 	definition with ansi-C definitions.

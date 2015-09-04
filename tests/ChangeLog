@@ -1,5 +1,10 @@
 2015-09-04  Chih-Hung Hsieh  <chh@google.com>
 
+	* md5-sha1-test.c (md5_expected): Removed.
+	(sha1_expected): Likewise.
+
+2015-09-04  Chih-Hung Hsieh  <chh@google.com>
+
 	* asm-tst1.c (main): Replace %Z length modifier with %z.
 	* asm-tst2.c (main): Likewise.
 	* asm-tst3.c (main): Likewise.

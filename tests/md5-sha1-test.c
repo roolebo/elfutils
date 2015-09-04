@@ -61,14 +61,6 @@ static const struct expected
 #define md5_size	16
 #define sha1_size	20
 
-static const char md5_expected[] =
-  {
-  };
-
-static const char sha1_expected[] =
-  {
-  };
-
 #define TEST_HASH(ALGO, I)						      \
   {									      \
     struct ALGO##_ctx ctx;						      \

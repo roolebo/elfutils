@@ -176,7 +176,7 @@ main (void)
       scn = elf_getscn (elf, cnt);
       if (scn == NULL)
 	{
-	  printf ("cannot get section %Zd: %s\n", cnt, elf_errmsg (-1));
+	  printf ("cannot get section %zd: %s\n", cnt, elf_errmsg (-1));
 	  result = 1;
 	  continue;
 	}
@@ -184,7 +184,7 @@ main (void)
       shdr = gelf_getshdr (scn, &shdr_mem);
       if (shdr == NULL)
 	{
-	  printf ("cannot get section header for section %Zd: %s\n",
+	  printf ("cannot get section header for section %zd: %s\n",
 		  cnt, elf_errmsg (-1));
 	  result = 1;
 	  continue;
@@ -193,7 +193,7 @@ main (void)
       if (strcmp (elf_strptr (elf, ehdr->e_shstrndx, shdr->sh_name),
 		  scnnames[cnt]) != 0)
 	{
-	  printf ("section %Zd's name differs: %s vs %s\n", cnt,
+	  printf ("section %zd's name differs: %s vs %s\n", cnt,
 		  elf_strptr (elf, ehdr->e_shstrndx, shdr->sh_name),
 		  scnnames[cnt]);
 	  result = 1;
@@ -201,20 +201,20 @@ main (void)
 
       if (shdr->sh_type != scntypes[cnt])
 	{
-	  printf ("section %Zd's type differs\n", cnt);
+	  printf ("section %zd's type differs\n", cnt);
 	  result = 1;
 	}
 
       if ((cnt == 1 && shdr->sh_flags != (SHF_ALLOC | SHF_WRITE))
 	  || (cnt != 1 && shdr->sh_flags != 0))
 	{
-	  printf ("section %Zd's flags differs\n", cnt);
+	  printf ("section %zd's flags differs\n", cnt);
 	  result = 1;
 	}
 
       if (shdr->sh_addr != 0)
 	{
-	  printf ("section %Zd's address differs\n", cnt);
+	  printf ("section %zd's address differs\n", cnt);
 	  result = 1;
 	}
 

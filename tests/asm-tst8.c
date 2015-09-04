@@ -103,7 +103,7 @@ main (void)
       scn = elf_getscn (elf, cnt);
       if (scn == NULL)
 	{
-	  printf ("cannot get section %Zd: %s\n", cnt, elf_errmsg (-1));
+	  printf ("cannot get section %zd: %s\n", cnt, elf_errmsg (-1));
 	  result = 1;
 	  continue;
 	}
@@ -111,7 +111,7 @@ main (void)
       shdr = gelf_getshdr (scn, &shdr_mem);
       if (shdr == NULL)
 	{
-	  printf ("cannot get section header for section %Zd: %s\n",
+	  printf ("cannot get section header for section %zd: %s\n",
 		  cnt, elf_errmsg (-1));
 	  result = 1;
 	  continue;

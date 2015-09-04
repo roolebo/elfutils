@@ -2686,7 +2686,7 @@ section [%2d] '%s': section group with only one member\n"),
 
 	  if (val > shnum)
 	    ERROR (gettext ("\
-section [%2d] '%s': section index %Zu out of range\n"),
+section [%2d] '%s': section index %zu out of range\n"),
 		   idx, section_name (ebl, idx), cnt / elsize);
 	  else
 	    {
@@ -2708,7 +2708,7 @@ section [%2d] '%s': section group contains another group [%2d] '%s'\n"),
 
 		  if ((refshdr->sh_flags & SHF_GROUP) == 0)
 		    ERROR (gettext ("\
-section [%2d] '%s': element %Zu references section [%2d] '%s' without SHF_GROUP flag set\n"),
+section [%2d] '%s': element %zu references section [%2d] '%s' without SHF_GROUP flag set\n"),
 			   idx, section_name (ebl, idx), cnt / elsize,
 			   val, section_name (ebl, val));
 		}
@@ -4246,7 +4246,7 @@ phdr[%d]: unknown core file note type %" PRIu32 " at offset %" PRIu64 "\n"),
 	    else
 	      ERROR (gettext ("\
 section [%2d] '%s': unknown core file note type %" PRIu32
-			      " at offset %Zu\n"),
+			      " at offset %zu\n"),
 		     shndx, section_name (ebl, shndx),
 		     (uint32_t) nhdr.n_type, offset);
 	  }
@@ -4268,12 +4268,12 @@ section [%2d] '%s': unknown core file note type %" PRIu32
 	  default:
 	    if (shndx == 0)
 	      ERROR (gettext ("\
-phdr[%d]: unknown object file note type %" PRIu32 " at offset %Zu\n"),
+phdr[%d]: unknown object file note type %" PRIu32 " at offset %zu\n"),
 		     phndx, (uint32_t) nhdr.n_type, offset);
 	    else
 	      ERROR (gettext ("\
 section [%2d] '%s': unknown object file note type %" PRIu32
-			      " at offset %Zu\n"),
+			      " at offset %zu\n"),
 		     shndx, section_name (ebl, shndx),
 		     (uint32_t) nhdr.n_type, offset);
 	  }

@@ -735,7 +735,7 @@ add_id_list (const char *versionname, struct id_list *runp, _Bool local)
 	    if (defp != NULL && defp->u.s.local != local)
 	      error (EXIT_FAILURE, 0, versionname[0] == '\0'
 		     ? gettext ("\
-symbol '%s' is declared both local and global for unnamed version")
+symbol '%s' is declared both local and global for unnamed version '%s'")
 		     : gettext ("\
 symbol '%s' is declared both local and global for version '%s'"),
 		     runp->id, versionname);

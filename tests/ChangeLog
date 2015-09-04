@@ -1,3 +1,16 @@
+2015-09-04  Chih-Hung Hsieh  <chh@google.com>
+
+	* asm-tst1.c (main): Replace %Z length modifier with %z.
+	* asm-tst2.c (main): Likewise.
+	* asm-tst3.c (main): Likewise.
+	* asm-tst4.c (main): Likewise.
+	* asm-tst5.c (main): Likewise.
+	* asm-tst6.c (main): Likewise.
+	* asm-tst7.c (main): Likewise.
+	* asm-tst8.c (main): Likewise.
+	* asm-tst9.c (main): Likewise.
+	* sectiondump.c (print_bytes): Likewise.
+
 2015-08-14  Mark Wielaard  <mjw@redhat.com>
 
 	* run-addr2line-alt-debugpath.sh: New test.

@@ -149,7 +149,7 @@ print_bytes (Elf_Data *data)
     {
       size_t inner;
 
-      printf ("%*Zx: ", sizeof (size_t) == 4 ? 8 : 16, (size_t) offset + cnt);
+      printf ("%*zx: ", sizeof (size_t) == 4 ? 8 : 16, (size_t) offset + cnt);
 
       for (inner = 0; inner < 16 && cnt + inner < size; ++inner)
 	printf (" %02hhx", buf[cnt + inner]);
@@ -172,7 +172,7 @@ print_symtab (Elf *elf, Elf_Data *data)
       GElf_Sym sym_mem;
       GElf_Sym *sym = gelf_getsym (data, cnt, &sym_mem);
 
-      printf ("%5Zu: %*" PRIx64 " %6" PRIx64 " %4d\n",
+      printf ("%5zu: %*" PRIx64 " %6" PRIx64 " %4d\n",
 	      cnt,
 	      class == ELFCLASS32 ? 8 : 16,
 	      sym->st_value,

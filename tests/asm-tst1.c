@@ -160,7 +160,7 @@ main (void)
       scn = elf_getscn (elf, cnt);
       if (scn == NULL)
 	{
-	  printf ("cannot get section %Zd: %s\n", cnt, elf_errmsg (-1));
+	  printf ("cannot get section %zd: %s\n", cnt, elf_errmsg (-1));
 	  result = 1;
 	  continue;
 	}
@@ -168,7 +168,7 @@ main (void)
       shdr = gelf_getshdr (scn, &shdr_mem);
       if (shdr == NULL)
 	{
-	  printf ("cannot get section header for section %Zd: %s\n",
+	  printf ("cannot get section header for section %zd: %s\n",
 		  cnt, elf_errmsg (-1));
 	  result = 1;
 	  continue;
@@ -177,7 +177,7 @@ main (void)
       if (strcmp (elf_strptr (elf, ehdr->e_shstrndx, shdr->sh_name),
 		  scnnames[cnt]) != 0)
 	{
-	  printf ("section %Zd's name differs: %s vs %s\n", cnt,
+	  printf ("section %zd's name differs: %s vs %s\n", cnt,
 		  elf_strptr (elf, ehdr->e_shstrndx, shdr->sh_name),
 		  scnnames[cnt]);
 	  result = 1;
@@ -185,7 +185,7 @@ main (void)
 
       if (shdr->sh_type != (cnt == 3 ? SHT_STRTAB : SHT_PROGBITS))
 	{
-	  printf ("section %Zd's type differs\n", cnt);
+	  printf ("section %zd's type differs\n", cnt);
 	  result = 1;
 	}
 
@@ -193,51 +193,51 @@ main (void)
 	  || (cnt == 2 && shdr->sh_flags != (SHF_ALLOC | SHF_WRITE))
 	  || (cnt == 3 && shdr->sh_flags != 0))
 	{
-	  printf ("section %Zd's flags differs\n", cnt);
+	  printf ("section %zd's flags differs\n", cnt);
 	  result = 1;
 	}
 
       if (shdr->sh_addr != 0)
 	{
-	  printf ("section %Zd's address differs\n", cnt);
+	  printf ("section %zd's address differs\n", cnt);
 	  result = 1;
 	}
 
       if (shdr->sh_offset != ((sizeof (Elf32_Ehdr) + 31) & ~31))
 	{
-	  printf ("section %Zd's offset differs\n", cnt);
+	  printf ("section %zd's offset differs\n", cnt);
 	  result = 1;
 	}
 
       if ((cnt != 3 && shdr->sh_size != 0)
 	  || (cnt == 3 && shdr->sh_size != 23))
 	{
-	  printf ("section %Zd's size differs\n", cnt);
+	  printf ("section %zd's size differs\n", cnt);
 	  result = 1;
 	}
 
       if (shdr->sh_link != 0)
 	{
-	  printf ("section %Zd's link differs\n", cnt);
+	  printf ("section %zd's link differs\n", cnt);
 	  result = 1;
 	}
 
       if (shdr->sh_info != 0)
 	{
-	  printf ("section %Zd's info differs\n", cnt);
+	  printf ("section %zd's info differs\n", cnt);
 	  result = 1;
 	}
 
       if ((cnt == 1 && shdr->sh_addralign != 32)
 	  || (cnt != 1 && shdr->sh_addralign != 1))
 	{
-	  printf ("section %Zd's addralign differs\n", cnt);
+	  printf ("section %zd's addralign differs\n", cnt);
 	  result = 1;
 	}
 
       if (shdr->sh_entsize != 0)
 	{
-	  printf ("section %Zd's entsize differs\n", cnt);
+	  printf ("section %zd's entsize differs\n", cnt);
 	  result = 1;
 	}
     }

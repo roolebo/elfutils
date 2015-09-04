@@ -62,11 +62,11 @@ main (void)
       AsmScn_t *scn;
       AsmSym_t *sym;
 
-      snprintf (buf, sizeof (buf), ".grp%Zu", cnt);
+      snprintf (buf, sizeof (buf), ".grp%zu", cnt);
       grp = asm_newscngrp (ctx, buf, NULL, 0);
       if (grp == NULL)
 	{
-	  printf ("cannot section group %Zu: %s\n", cnt, asm_errmsg (-1));
+	  printf ("cannot section group %zu: %s\n", cnt, asm_errmsg (-1));
 	  asm_abort (ctx);
 	  return 1;
 	}
@@ -75,14 +75,14 @@ main (void)
 			      SHF_ALLOC | SHF_WRITE, grp);
       if (scn == NULL)
 	{
-	  printf ("cannot data section for group %Zu: %s\n",
+	  printf ("cannot data section for group %zu: %s\n",
 		  cnt, asm_errmsg (-1));
 	  asm_abort (ctx);
 	  return 1;
 	}
 
       /* Add a name.  */
-      snprintf (buf, sizeof (buf), "%Zu", cnt);
+      snprintf (buf, sizeof (buf), "%zu", cnt);
       sym = asm_newsym (scn, buf, sizeof (uint32_t), STT_OBJECT,
 			STB_GLOBAL);
       if (sym == NULL)
@@ -104,7 +104,7 @@ main (void)
       /* Now we have a symbol, use it as the signature.  */
       if (asm_scngrp_newsignature (grp, sym) != 0)
 	{
-	  printf ("cannot set signature for section group %Zu: %s\n",
+	  printf ("cannot set signature for section group %zu: %s\n",
 		  cnt, asm_errmsg (-1));
 	  asm_abort (ctx);
 	  return 1;
@@ -114,7 +114,7 @@ main (void)
       scn = asm_newscn_ingrp (ctx, ".stab", SHT_PROGBITS, 0, grp);
       if (scn == NULL)
 	{
-	  printf ("cannot stab section for group %Zu: %s\n",
+	  printf ("cannot stab section for group %zu: %s\n",
 		  cnt, asm_errmsg (-1));
 	  asm_abort (ctx);
 	  return 1;

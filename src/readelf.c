@@ -1582,7 +1582,7 @@ handle_dynamic (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 
   glink = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link), &glink_mem);
   if (glink == NULL)
-    error (EXIT_FAILURE, 0, gettext ("invalid sh_link value in section %Zu"),
+    error (EXIT_FAILURE, 0, gettext ("invalid sh_link value in section %zu"),
 	   elf_ndxscn (scn));
 
   printf (ngettext ("\
@@ -2205,7 +2205,7 @@ handle_symtab (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
   GElf_Shdr *glink = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
 				   &glink_mem);
   if (glink == NULL)
-    error (EXIT_FAILURE, 0, gettext ("invalid sh_link value in section %Zu"),
+    error (EXIT_FAILURE, 0, gettext ("invalid sh_link value in section %zu"),
 	   elf_ndxscn (scn));
 
   /* Now we can compute the number of entries in the section.  */
@@ -2463,7 +2463,7 @@ handle_verneed (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
   GElf_Shdr *glink = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
 				   &glink_mem);
   if (glink == NULL)
-    error (EXIT_FAILURE, 0, gettext ("invalid sh_link value in section %Zu"),
+    error (EXIT_FAILURE, 0, gettext ("invalid sh_link value in section %zu"),
 	   elf_ndxscn (scn));
 
   printf (ngettext ("\
@@ -2539,7 +2539,7 @@ handle_verdef (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
   GElf_Shdr *glink = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link),
 				   &glink_mem);
   if (glink == NULL)
-    error (EXIT_FAILURE, 0, gettext ("invalid sh_link value in section %Zu"),
+    error (EXIT_FAILURE, 0, gettext ("invalid sh_link value in section %zu"),
 	   elf_ndxscn (scn));
 
   int class = gelf_getclass (ebl->elf);
@@ -2843,7 +2843,7 @@ handle_versym (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr)
 				   &glink_mem);
   size_t sh_entsize = gelf_fsize (ebl->elf, ELF_T_HALF, 1, EV_CURRENT);
   if (glink == NULL)
-    error (EXIT_FAILURE, 0, gettext ("invalid sh_link value in section %Zu"),
+    error (EXIT_FAILURE, 0, gettext ("invalid sh_link value in section %zu"),
 	   elf_ndxscn (scn));
 
   /* Print the header.  */
@@ -2917,7 +2917,7 @@ print_hash_info (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx,
 				   &glink_mem);
   if (glink == NULL)
     {
-      error (0, 0, gettext ("invalid sh_link value in section %Zu"),
+      error (0, 0, gettext ("invalid sh_link value in section %zu"),
 	     elf_ndxscn (scn));
       return;
     }
@@ -4605,7 +4605,7 @@ print_decoded_aranges_section (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn,
   glink = gelf_getshdr (elf_getscn (ebl->elf, shdr->sh_link), &glink_mem);
   if (glink == NULL)
     {
-      error (0, 0, gettext ("invalid sh_link value in section %Zu"),
+      error (0, 0, gettext ("invalid sh_link value in section %zu"),
 	     elf_ndxscn (scn));
       return;
     }
@@ -4686,7 +4686,7 @@ print_debug_aranges_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
       const unsigned char *hdrstart = readp;
       size_t start_offset = hdrstart - (const unsigned char *) data->d_buf;
 
-      printf (gettext ("\nTable at offset %Zu:\n"), start_offset);
+      printf (gettext ("\nTable at offset %zu:\n"), start_offset);
       if (readp + 4 > readendp)
 	{
 	invalid_data:
@@ -4804,7 +4804,7 @@ print_debug_aranges_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
       if (readp != nexthdr)
 	{
 	  size_t padding = nexthdr - readp;
-	  printf (gettext ("   %Zu padding bytes\n"), padding);
+	  printf (gettext ("   %zu padding bytes\n"), padding);
 	  readp = nexthdr;
 	}
     }
@@ -6383,7 +6383,7 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
     {
       size_t start_offset = linep - (const unsigned char *) data->d_buf;
 
-      printf (gettext ("\nTable at offset %Zu:\n"), start_offset);
+      printf (gettext ("\nTable at offset %zu:\n"), start_offset);
 
       if (unlikely (linep + 4 > lineendp))
 	goto invalid_data;
@@ -9355,7 +9355,7 @@ hex_dump (const uint8_t *data, size_t len)
   size_t pos = 0;
   while (pos < len)
     {
-      printf ("  0x%08Zx ", pos);
+      printf ("  0x%08zx ", pos);
 
       const size_t chunk = MIN (len - pos, 16);
 
@@ -9383,17 +9383,17 @@ static void
 dump_data_section (Elf_Scn *scn, const GElf_Shdr *shdr, const char *name)
 {
   if (shdr->sh_size == 0 || shdr->sh_type == SHT_NOBITS)
-    printf (gettext ("\nSection [%Zu] '%s' has no data to dump.\n"),
+    printf (gettext ("\nSection [%zu] '%s' has no data to dump.\n"),
 	    elf_ndxscn (scn), name);
   else
     {
       Elf_Data *data = elf_rawdata (scn, NULL);
       if (data == NULL)
-	error (0, 0, gettext ("cannot get data for section [%Zu] '%s': %s"),
+	error (0, 0, gettext ("cannot get data for section [%zu] '%s': %s"),
 	       elf_ndxscn (scn), name, elf_errmsg (-1));
       else
 	{
-	  printf (gettext ("\nHex dump of section [%Zu] '%s', %" PRIu64
+	  printf (gettext ("\nHex dump of section [%zu] '%s', %" PRIu64
 			   " bytes at offset %#0" PRIx64 ":\n"),
 		  elf_ndxscn (scn), name,
 		  shdr->sh_size, shdr->sh_offset);
@@ -9406,17 +9406,17 @@ static void
 print_string_section (Elf_Scn *scn, const GElf_Shdr *shdr, const char *name)
 {
   if (shdr->sh_size == 0 || shdr->sh_type == SHT_NOBITS)
-    printf (gettext ("\nSection [%Zu] '%s' has no strings to dump.\n"),
+    printf (gettext ("\nSection [%zu] '%s' has no strings to dump.\n"),
 	    elf_ndxscn (scn), name);
   else
     {
       Elf_Data *data = elf_rawdata (scn, NULL);
       if (data == NULL)
-	error (0, 0, gettext ("cannot get data for section [%Zu] '%s': %s"),
+	error (0, 0, gettext ("cannot get data for section [%zu] '%s': %s"),
 	       elf_ndxscn (scn), name, elf_errmsg (-1));
       else
 	{
-	  printf (gettext ("\nString section [%Zu] '%s' contains %" PRIu64
+	  printf (gettext ("\nString section [%zu] '%s' contains %" PRIu64
 			   " bytes at offset %#0" PRIx64 ":\n"),
 		  elf_ndxscn (scn), name,
 		  shdr->sh_size, shdr->sh_offset);
@@ -9429,11 +9429,11 @@ print_string_section (Elf_Scn *scn, const GElf_Shdr *shdr, const char *name)
 	      const size_t pos = start - (const char *) data->d_buf;
 	      if (unlikely (end == NULL))
 		{
-		  printf ("  [%6Zx]- %.*s\n",
+		  printf ("  [%6zx]- %.*s\n",
 			  pos, (int) (limit - start), start);
 		  break;
 		}
-	      printf ("  [%6Zx]  %s\n", pos, start);
+	      printf ("  [%6zx]  %s\n", pos, start);
 	      start = end + 1;
 	    } while (start < limit);
 	}
@@ -9557,7 +9557,7 @@ dump_archive_index (Elf *elf, const char *fname)
       return;
     }
 
-  printf (gettext ("\nIndex of archive '%s' has %Zu entries:\n"),
+  printf (gettext ("\nIndex of archive '%s' has %zu entries:\n"),
 	  fname, narsym);
 
   size_t as_off = 0;
@@ -9575,7 +9575,7 @@ dump_archive_index (Elf *elf, const char *fname)
 	    while (1)
 #endif
 	      error (EXIT_FAILURE, 0,
-		     gettext ("cannot extract member at offset %Zu in '%s': %s"),
+		     gettext ("cannot extract member at offset %zu in '%s': %s"),
 		     as_off, fname, elf_errmsg (-1));
 
 	  const Elf_Arhdr *h = elf_getarhdr (subelf);

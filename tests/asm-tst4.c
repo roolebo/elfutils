@@ -62,7 +62,7 @@ main (void)
       AsmScn_t *scn;
 
       /* Create a unique name.  */
-      snprintf (buf, sizeof (buf), ".data.%Zu", cnt);
+      snprintf (buf, sizeof (buf), ".data.%zu", cnt);
 
       /* Create the section.  */
       scn = asm_newscn (ctx, buf, SHT_PROGBITS, SHF_ALLOC | SHF_WRITE);

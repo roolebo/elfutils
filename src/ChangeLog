@@ -1,3 +1,28 @@
+2015-09-04  Chih-Hung Hsieh  <chh@google.com>
+
+	* elflint.c (check_group): Replace %Z length modifier with %z.
+	(check_note_data): Likewise.
+	* findtextrel.c (process_file): Likewise.
+	* readelf.c (handle_dynamic): Likewise.
+	(handle_symtab): Likewise.
+	(handle_verneed): Likewise.
+	(handle_verdef): Likewise.
+	(handle_versym): Likewise.
+	(print_hash_info): Likewise.
+	(print_decoded_aranges_section): Likewise.
+	(print_debug_aranges_section): Likewise.
+	(print_debug_line_section): Likewise.
+	(hex_dump): Likewise.
+	(dump_data_section): Likewise.
+	(print_string_section): Likewise.
+	(dump_archive_index): Likewise.
+	* unstrip.c (adjust_relocs): Likewise.
+	(collect_symbols): likewise.
+	(get_section_name): Likewise.
+	(find_alloc_sections_prelink): Likewise.
+	(copy_elided_sections): Likewise.
+	* ldscript.y (add_id_list): Add missing '%s'.
+
 2015-09-03  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (handle_core_item): Handle right shift >= 32 bits.

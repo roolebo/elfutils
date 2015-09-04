@@ -406,7 +406,7 @@ cannot get program header index at offset %zd: %s"),
 	  if (shdr == NULL)
 	    {
 	      error (0, 0,
-		     gettext ("cannot get section header of section %Zu: %s"),
+		     gettext ("cannot get section header of section %zu: %s"),
 		     elf_ndxscn (scn), elf_errmsg (-1));
 	      result = 1;
 	      goto next;

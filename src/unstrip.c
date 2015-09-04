@@ -523,7 +523,7 @@ adjust_relocs (Elf_Scn *outscn, Elf_Scn *inscn, const GElf_Shdr *shdr,
 
     default:
       error (EXIT_FAILURE, 0,
-	     _("unexpected section type in [%Zu] with sh_link to symtab"),
+	     _("unexpected section type in [%zu] with sh_link to symtab"),
 	     elf_ndxscn (inscn));
     }
 }
@@ -771,7 +771,7 @@ collect_symbols (Elf *outelf, bool rel, Elf_Scn *symscn, Elf_Scn *strscn,
 
       if (sym->st_name >= strdata->d_size)
 	error (EXIT_FAILURE, 0,
-	       _("invalid string offset in symbol [%Zu]"), i);
+	       _("invalid string offset in symbol [%zu]"), i);
 
       struct symbol *s = &table[i - 1];
       s->map = &map[i - 1];
@@ -929,7 +929,7 @@ static inline const char *
 get_section_name (size_t ndx, const GElf_Shdr *shdr, const Elf_Data *shstrtab)
 {
   if (shdr->sh_name >= shstrtab->d_size)
-    error (EXIT_FAILURE, 0, _("cannot read section [%Zu] name: %s"),
+    error (EXIT_FAILURE, 0, _("cannot read section [%zu] name: %s"),
 	   ndx, elf_errmsg (-1));
   return shstrtab->d_buf + shdr->sh_name;
 }
@@ -1065,7 +1065,7 @@ find_alloc_sections_prelink (Elf *debug, Elf_Data *debug_shstrtab,
       if (!match)
 	{
 	  fail = true;
-	  error (0, 0, _("cannot find matching section for [%Zu] '%s'"),
+	  error (0, 0, _("cannot find matching section for [%zu] '%s'"),
 		 elf_ndxscn (scn), name);
 	}
     }
@@ -1270,7 +1270,7 @@ more sections in stripped file than debug file -- arguments reversed?"));
       sections[i].name = elf_strptr (stripped, stripped_shstrndx,
 				     shdr->sh_name);
       if (sections[i].name == NULL)
-	error (EXIT_FAILURE, 0, _("cannot read section [%Zu] name: %s"),
+	error (EXIT_FAILURE, 0, _("cannot read section [%zu] name: %s"),
 	       elf_ndxscn (scn), elf_errmsg (-1));
       sections[i].scn = scn;
       sections[i].outscn = NULL;
@@ -1390,7 +1390,7 @@ more sections in stripped file than debug file -- arguments reversed?"));
 
       if (sec == NULL)
 	error (EXIT_FAILURE, 0,
-	       _("cannot find matching section for [%Zu] '%s'"),
+	       _("cannot find matching section for [%zu] '%s'"),
 	       elf_ndxscn (scn), name);
 
       sec->outscn = scn;
@@ -1575,7 +1575,7 @@ more sections in stripped file than debug file -- arguments reversed?"));
 		  {
 		    if (shndx >= stripped_shnum)
 		      error (EXIT_FAILURE, 0,
-			     _("symbol [%Zu] has invalid section index"), i);
+			     _("symbol [%zu] has invalid section index"), i);
 
 		    shndx = ndx_section[shndx - 1];
 		    if (shndx < SHN_LORESERVE)

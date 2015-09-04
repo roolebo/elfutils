@@ -82,7 +82,7 @@ print_base_type (Dwarf_Die *base)
   assert (dwarf_tag (base) == DW_TAG_base_type);
 
   Dwarf_Attribute encoding;
-  Dwarf_Word enctype;
+  Dwarf_Word enctype = 0;
   if (dwarf_attr (base, DW_AT_encoding, &encoding) == NULL
       || dwarf_formudata (&encoding, &enctype) != 0)
     error (EXIT_FAILURE, 0, "base type without encoding");

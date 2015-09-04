@@ -1,5 +1,9 @@
 2015-09-04  Chih-Hung Hsieh  <chh@google.com>
 
+	* varlocs.c (print_base_type): Initialize enctype.
+
+2015-09-04  Chih-Hung Hsieh  <chh@google.com>
+
 	* md5-sha1-test.c (md5_expected): Removed.
 	(sha1_expected): Likewise.
 

@@ -41,11 +41,10 @@ extern __typeof (s390_core_note) s390x_core_note;
 
 
 const char *
-s390_init (elf, machine, eh, ehlen)
-     Elf *elf __attribute__ ((unused));
-     GElf_Half machine __attribute__ ((unused));
-     Ebl *eh;
-     size_t ehlen;
+s390_init (Elf *elf __attribute__ ((unused)),
+	   GElf_Half machine __attribute__ ((unused)),
+	   Ebl *eh,
+	   size_t ehlen)
 {
   /* Check whether the Elf_BH object has a sufficent size.  */
   if (ehlen < sizeof (Ebl))

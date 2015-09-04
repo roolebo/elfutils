@@ -1,3 +1,9 @@
+2015-09-04  Chih-Hung Hsieh  <chh@google.com>
+
+	* eblopenbackend.c (ebl_openbackend_machine): Replace K&R function
+	definition with ansi-C definitions.
+	* eblstother.c (ebl_check_st_other_bits): Likewise.
+
 2015-06-12  Mark Wielaard  <mjw@redhat.com>
 
 	* eblcheckreloctargettype.c (ebl_check_reloc_target_type): Allow

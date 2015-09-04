@@ -51,9 +51,7 @@
 
 
 int
-FCT(SIZE) (asmscn, num)
-     AsmScn_t *asmscn;
-     TYPE(SIZE) num;
+FCT(SIZE) (AsmScn_t *asmscn, TYPE(SIZE) num)
 {
   if (asmscn == NULL)
     return -1;

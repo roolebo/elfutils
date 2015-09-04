@@ -63,9 +63,7 @@ findcu_cb (const void *arg1, const void *arg2)
 
 struct Dwarf_CU *
 internal_function
-__libdw_intern_next_unit (dbg, debug_types)
-     Dwarf *dbg;
-     bool debug_types;
+__libdw_intern_next_unit (Dwarf *dbg, bool debug_types)
 {
   Dwarf_Off *const offsetp
     = debug_types ? &dbg->next_tu_offset : &dbg->next_cu_offset;
@@ -135,10 +133,7 @@ __libdw_intern_next_unit (dbg, debug_types)
 }
 
 struct Dwarf_CU *
-__libdw_findcu (dbg, start, debug_types)
-     Dwarf *dbg;
-     Dwarf_Off start;
-     bool debug_types;
+__libdw_findcu (Dwarf *dbg, Dwarf_Off start, bool debug_types)
 {
   void **tree = debug_types ? &dbg->tu_tree : &dbg->cu_tree;
   Dwarf_Off *next_offset

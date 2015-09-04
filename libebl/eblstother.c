@@ -34,9 +34,7 @@
 
 
 bool
-ebl_check_st_other_bits (ebl, st_other)
-     Ebl *ebl;
-     unsigned char st_other;
+ebl_check_st_other_bits (Ebl *ebl, unsigned char st_other)
 {
   return ((st_other ^ GELF_ST_VISIBILITY (st_other)) == 0
 	  || ebl->check_st_other_bits (st_other ^ GELF_ST_VISIBILITY (st_other)));

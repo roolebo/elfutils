@@ -127,10 +127,7 @@ prepare_binary_output (AsmCtx_t *result, Ebl *ebl)
 
 
 AsmCtx_t *
-asm_begin (fname, ebl, textp)
-     const char *fname;
-     Ebl *ebl;
-     bool textp;
+asm_begin (const char *fname, Ebl *ebl, bool textp)
 {
   if (fname == NULL && ! textp)
     return NULL;

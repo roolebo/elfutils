@@ -1,3 +1,19 @@
+2015-09-04  Chih-Hung Hsieh  <chh@google.com>
+
+	* aarch64_init.c (aarch64_init): Replace K&R function definition
+	with ansi-C definitions.
+	* alpha_init.c (alpha_init): Likewise.
+	* arm_init.c (arm_init): Likewise.
+	* i386_init.c (i386_init): Likewise.
+	* ia64_init.c (ia64_init): Likewise.
+	* ppc64_init.c (ppc64_init): Likewise.
+	* ppc_init.c (ppc_init): Likewise.
+	* s390_init.c (s390_init): Likewise.
+	* sh_init.c (sh_init): Likewise.
+	* sparc_init.c (sparc_init): Likewise.
+	* tilegx_init.c (tilegx_init): Likewise.
+	* x86_64_init.c (x86_64_init): Likewise.
+
 2015-09-03  Mark Wielaard  <mjw@redhat.com>
 
 	* sparc_regs.c (sparc_register_info): Use ebl->class not ebl->machine.

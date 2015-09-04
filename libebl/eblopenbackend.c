@@ -418,8 +418,7 @@ ebl_openbackend (elf)
 
 /* Find backend without underlying ELF file.  */
 Ebl *
-ebl_openbackend_machine (machine)
-     GElf_Half machine;
+ebl_openbackend_machine (GElf_Half machine)
 {
   return openbackend (NULL, NULL, machine);
 }

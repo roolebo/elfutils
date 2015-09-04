@@ -48,9 +48,7 @@
 
 
 int
-UFCT(SIZE) (asmscn, num)
-     AsmScn_t *asmscn;
-     UTYPE(SIZE) num;
+UFCT(SIZE) (AsmScn_t *asmscn, UTYPE(SIZE) num)
 {
   return INTUSE(FCT(SIZE)) (asmscn, (TYPE(SIZE)) num);
 }

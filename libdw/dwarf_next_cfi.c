@@ -37,13 +37,12 @@
 
 
 int
-dwarf_next_cfi (e_ident, data, eh_frame_p, off, next_off, entry)
-     const unsigned char e_ident[];
-     Elf_Data *data;
-     bool eh_frame_p;
-     Dwarf_Off off;
-     Dwarf_Off *next_off;
-     Dwarf_CFI_Entry *entry;
+dwarf_next_cfi (const unsigned char e_ident[],
+		Elf_Data *data,
+		bool eh_frame_p,
+		Dwarf_Off off,
+		Dwarf_Off *next_off,
+		Dwarf_CFI_Entry *entry)
 {
   /* Dummy struct for memory-access.h macros.  */
   BYTE_ORDER_DUMMY (dw, e_ident);

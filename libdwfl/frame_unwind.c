@@ -342,7 +342,7 @@ expr_eval (Dwfl_Frame *state, Dwarf_Frame *frame, const Dwarf_Op *ops,
 	      return false;						\
 	    }								\
 	  break;
-	UNOP (DW_OP_abs, abs ((int64_t) val1))
+	UNOP (DW_OP_abs, llabs ((int64_t) val1))
 	UNOP (DW_OP_neg, -(int64_t) val1)
 	UNOP (DW_OP_not, ~val1)
 #undef UNOP

@@ -1,3 +1,7 @@
+2015-09-04  Chih-Hung Hsieh  <chh@google.com
+
+	* frame_unwind.c (expr_eval): Use llabs instead of abs.
+
 2015-08-14  Dodji Seketeli  <dodji@seketeli.org>
 
 	* find-debuginfo.c (find_debuginfo_in_path): Try to locate the

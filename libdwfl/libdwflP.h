@@ -400,7 +400,12 @@ struct dwfl_arange
    then get the instance through __libdwfl_get_pid_arg.  */
 struct __libdwfl_pid_arg
 {
+  /* /proc/PID/task/.  */
   DIR *dir;
+  /* Elf for /proc/PID/exe.  Set to NULL if it couldn't be opened.  */
+  Elf *elf;
+  /* fd for /proc/PID/exe.  Set to -1 if it couldn't be opened.  */
+  int elf_fd;
   /* It is 0 if not used.  */
   pid_t tid_attached;
   /* Valid only if TID_ATTACHED is not zero.  */

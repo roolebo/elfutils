@@ -1,3 +1,11 @@
+2015-09-08  Mark Wielaard  <mjw@redhat.com>
+
+	* dwfl-proc-attach.c: New test.
+	* Makefile.am (check_PROGRAMS): Add dwfl-proc-attach.
+	(TESTS): Likewise.
+	(dwfl_proc_attach_LDADD): New variable.
+	(dwfl_proc_attach_LDFLAGS): Likewise.
+
 2015-09-04  Chih-Hung Hsieh  <chh@google.com>
 
 	* varlocs.c (print_base_type): Initialize enctype.

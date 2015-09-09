@@ -1,3 +1,11 @@
+2015-09-09  Chih-Hung Hsieh  <chh@google.com>
+
+	* ebldwarftoregno.c (ebl_dwarf_to_regno): Remove redundant NULL tests
+	on parameters declared with __nonnull_attribute__.
+	* eblinitreg.c (ebl_frame_nregs): Likewise.
+	* eblnormalizepc.c (ebl_normalize_pc): Likewise.
+	* eblunwind.c (ebl_unwind): Likewise.
+
 2015-09-04  Chih-Hung Hsieh  <chh@google.com>
 
 	* eblopenbackend.c (ebl_openbackend_machine): Replace K&R function

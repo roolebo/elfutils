@@ -138,24 +138,22 @@ __libdw_visit_scopes (depth, root, imports, previsit, postvisit, arg)
 
 	child.prune = false;
 
-	if (previsit != NULL)
-	  {
-	    int result = (*previsit) (depth + 1, &child, arg);
-	    if (result != DWARF_CB_OK)
-	      return result;
-	  }
+	/* previsit is declared NN */
+	int result = (*previsit) (depth + 1, &child, arg);
+	if (result != DWARF_CB_OK)
+	  return result;
 
 	if (!child.prune && may_have_scopes (&child.die)
 	    && INTUSE(dwarf_haschildren) (&child.die))
 	  {
-	    int result = recurse ();
+	    result = recurse ();
 	    if (result != DWARF_CB_OK)
 	      return result;
 	  }
 
 	if (postvisit != NULL)
 	  {
-	    int result = (*postvisit) (depth + 1, &child, arg);
+	    result = (*postvisit) (depth + 1, &child, arg);
 	    if (result != DWARF_CB_OK)
 	      return result;
 	  }

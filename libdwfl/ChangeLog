@@ -1,3 +1,11 @@
+2015-09-09  Chih-Hung Hsieh  <chh@google.com>
+	    Mark Wielaard  <mjw@redhat.com>
+
+	* dwfl_frame.c (dwfl_attach_state): Remove redundant NULL tests
+	on parameters declared with __nonnull_attribute__.
+	* libdwfl.h (dwfl_module_getelf): Don't mark first argument as
+	nonnull.
+
 2015-09-08  Mark Wielaard  <mjw@redhat.com>
 
 	* libdwflP.h (struct __libdwfl_pid_arg): Add elf and elf_fd.

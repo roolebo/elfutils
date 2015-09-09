@@ -35,6 +35,7 @@
 void
 ebl_normalize_pc (Ebl *ebl, Dwarf_Addr *pc)
 {
-  if (ebl != NULL && ebl->normalize_pc != NULL)
+  /* ebl is declared NN */
+  if (ebl->normalize_pc != NULL)
     ebl->normalize_pc (ebl, pc);
 }

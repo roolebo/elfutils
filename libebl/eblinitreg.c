@@ -47,7 +47,8 @@ ebl_set_initial_registers_tid (Ebl *ebl, pid_t tid,
 size_t
 ebl_frame_nregs (Ebl *ebl)
 {
-  return ebl == NULL ? 0 : ebl->frame_nregs;
+  /* ebl is declared NN */
+  return ebl->frame_nregs;
 }
 
 GElf_Addr

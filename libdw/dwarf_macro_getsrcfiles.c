@@ -36,9 +36,7 @@ int
 dwarf_macro_getsrcfiles (Dwarf *dbg, Dwarf_Macro *macro,
 			 Dwarf_Files **files, size_t *nfiles)
 {
-  if (macro == NULL)
-    return -1;
-
+  /* macro is declared NN */
   Dwarf_Macro_Op_Table *const table = macro->table;
   if (table->files == NULL)
     {

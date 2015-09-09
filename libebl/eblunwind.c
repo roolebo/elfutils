@@ -37,7 +37,8 @@ ebl_unwind (Ebl *ebl, Dwarf_Addr pc, ebl_tid_registers_t *setfunc,
 	    ebl_tid_registers_get_t *getfunc, ebl_pid_memory_read_t *readfunc,
 	    void *arg, bool *signal_framep)
 {
-  if (ebl == NULL || ebl->unwind == NULL)
+  /* ebl is declared NN */
+  if (ebl->unwind == NULL)
     return false;
   return ebl->unwind (ebl, pc, setfunc, getfunc, readfunc, arg, signal_framep);
 }

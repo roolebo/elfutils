@@ -35,7 +35,6 @@
 bool
 ebl_dwarf_to_regno (Ebl *ebl, unsigned *regno)
 {
-  if (ebl == NULL)
-    return false;
+  /* ebl is declared NN */
   return ebl->dwarf_to_regno == NULL ? true : ebl->dwarf_to_regno (ebl, regno);
 }

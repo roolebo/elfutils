@@ -1,3 +1,9 @@
+2015-09-09  Chih-Hung Hsieh  <chh@google.com>
+
+	* readelf.c (print_debug_exception_table): Initialize variable before
+	it is used, because compiler does not know that error never returns.
+	(dump_arhive_index): Likewise.
+
 2015-09-04  Chih-Hung Hsieh  <chh@google.com>
 
 	* elflint.c (check_group): Replace %Z length modifier with %z.

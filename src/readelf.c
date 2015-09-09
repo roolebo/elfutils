@@ -7910,6 +7910,7 @@ print_debug_exception_table (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	  dsize = 8;
 	  break;
 	default:
+	  dsize = 0;
 	  error (1, 0, gettext ("invalid TType encoding"));
 	}
 
@@ -9567,7 +9568,7 @@ dump_archive_index (Elf *elf, const char *fname)
 	{
 	  as_off = s->as_off;
 
-	  Elf *subelf;
+	  Elf *subelf = NULL;
 	  if (unlikely (elf_rand (elf, as_off) == 0)
 	      || unlikely ((subelf = elf_begin (-1, ELF_C_READ_MMAP, elf))
 			   == NULL))

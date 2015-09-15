@@ -1,5 +1,5 @@
 /* Peel type aliases and qualifier tags from a type DIE.
-   Copyright (C) 2014 Red Hat, Inc.
+   Copyright (C) 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -60,8 +60,7 @@ dwarf_peel_type (die, result)
       if (attr == NULL)
 	return 1;
 
-      result = INTUSE (dwarf_formref_die) (attr, result);
-      if (result == NULL)
+      if (INTUSE (dwarf_formref_die) (attr, result) == NULL)
 	return -1;
 
       tag = INTUSE (dwarf_tag) (result);

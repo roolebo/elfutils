@@ -1,3 +1,19 @@
+2015-09-18  Chih-Hung Hsieh  <chh@google.com>
+
+	* relocate.c (relocate_section): Move nested function "relocate"
+	to file scope, pass all used local variables as constants.
+	Move nested "check_badreltype" to file scope, pass addresses of
+	updated used local variables.
+	* linux-kernel-modules.c (intuit_kernel_bounds): Move nested function
+	"read_address" to file scope, pass all updated local variables in
+	a state structure.
+	* linux-kernel-modules.c (dwfl_linux_kernel_find_elf): Move nested
+	function "subst_name" to file scope, pass all used local variables
+	as constants.
+	* linux-kernel-modules.c (dwfl_linux_kernel_report_kernel): Replace
+	simple nested function "report" with a macro. Work around gcc static
+	analysis error -Werror=maybe-uninitialized.
+
 2015-09-22  Mark Wielaard  <mjw@redhat.com>
 
 	* core-file.c: Remove old-style function definitions.

@@ -1,5 +1,5 @@
 /* Select specific element in archive.
-   Copyright (C) 1998, 1999, 2000, 2002 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -38,9 +38,7 @@
 
 
 size_t
-elf_rand (elf, offset)
-     Elf *elf;
-     size_t offset;
+elf_rand (Elf *elf, size_t offset)
 {
   /* Be gratious, the specs demand it.  */
   if (elf == NULL || elf->kind != ELF_K_AR)

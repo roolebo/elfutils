@@ -1,5 +1,5 @@
 /* Get note information at the supplied offset.
-   Copyright (C) 2007, 2014 Red Hat, Inc.
+   Copyright (C) 2007, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -37,12 +37,8 @@
 #include "libelfP.h"
 
 size_t
-gelf_getnote (data, offset, result, name_offset, desc_offset)
-     Elf_Data *data;
-     size_t offset;
-     GElf_Nhdr *result;
-     size_t *name_offset;
-     size_t *desc_offset;
+gelf_getnote (Elf_Data *data, size_t offset, GElf_Nhdr *result,
+	      size_t *name_offset, size_t *desc_offset)
 {
   if (data == NULL)
     return 0;

@@ -1,5 +1,5 @@
 /* Advance in archive to next element.
-   Copyright (C) 1998-2009 Red Hat, Inc.
+   Copyright (C) 1998-2009, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -39,8 +39,7 @@
 
 
 Elf_Cmd
-elf_next (elf)
-     Elf *elf;
+elf_next (Elf *elf)
 {
   Elf *parent;
   Elf_Cmd ret;

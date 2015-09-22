@@ -35,9 +35,7 @@
 
 
 bool
-ebl_machine_flag_check (ebl, flags)
-     Ebl *ebl;
-     Elf64_Word flags;
+ebl_machine_flag_check (Ebl *ebl, Elf64_Word flags)
 {
   return ebl != NULL ? ebl->machine_flag_check (flags) : (flags == 0);
 }

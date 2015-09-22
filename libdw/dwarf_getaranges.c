@@ -54,10 +54,7 @@ compare_aranges (const void *a, const void *b)
 }
 
 int
-dwarf_getaranges (dbg, aranges, naranges)
-     Dwarf *dbg;
-     Dwarf_Aranges **aranges;
-     size_t *naranges;
+dwarf_getaranges (Dwarf *dbg, Dwarf_Aranges **aranges, size_t *naranges)
 {
   if (dbg == NULL)
     return -1;

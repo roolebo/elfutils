@@ -1,5 +1,5 @@
 /* Update information in dynamic table at the given index.
-   Copyright (C) 2007 Red Hat, Inc.
+   Copyright (C) 2007, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -37,10 +37,7 @@
 
 
 int
-gelf_update_auxv (data, ndx, src)
-     Elf_Data *data;
-     int ndx;
-     GElf_auxv_t *src;
+gelf_update_auxv (Elf_Data *data, int ndx, GElf_auxv_t *src)
 {
   Elf_Data_Scn *data_scn = (Elf_Data_Scn *) data;
   Elf_Scn *scn;

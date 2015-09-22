@@ -1,5 +1,5 @@
 /* Retrieve uninterpreted file contents.
-   Copyright (C) 1998, 1999, 2000, 2002 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -38,9 +38,7 @@
 
 
 char *
-elf_rawfile (elf, ptr)
-     Elf *elf;
-     size_t *ptr;
+elf_rawfile (Elf *elf, size_t *ptr)
 {
   char *result;
 

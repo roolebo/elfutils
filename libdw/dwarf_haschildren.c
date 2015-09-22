@@ -36,8 +36,7 @@
 
 
 int
-dwarf_haschildren (die)
-     Dwarf_Die *die;
+dwarf_haschildren (Dwarf_Die *die)
 {
   /* Find the abbreviation entry.  */
   Dwarf_Abbrev *abbrevp = __libdw_dieabbrev (die, NULL);

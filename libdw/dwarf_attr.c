@@ -36,10 +36,7 @@
 
 
 Dwarf_Attribute *
-dwarf_attr (die, search_name, result)
-     Dwarf_Die *die;
-     unsigned int search_name;
-     Dwarf_Attribute *result;
+dwarf_attr (Dwarf_Die *die, unsigned int search_name, Dwarf_Attribute *result)
 {
   if (die == NULL)
     return NULL;

@@ -1,5 +1,5 @@
 /* Get move structure at the given index.
-   Copyright (C) 2000, 2001, 2002, 2005, 2009, 2014 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2005, 2009, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -39,10 +39,7 @@
 
 
 GElf_Move *
-gelf_getmove (data, ndx, dst)
-     Elf_Data *data;
-     int ndx;
-     GElf_Move *dst;
+gelf_getmove (Elf_Data *data, int ndx, GElf_Move *dst)
 {
   GElf_Move *result = NULL;
   Elf *elf;

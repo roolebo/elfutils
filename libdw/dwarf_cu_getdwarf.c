@@ -36,8 +36,7 @@
 
 
 Dwarf *
-dwarf_cu_getdwarf (cu)
-     Dwarf_CU *cu;
+dwarf_cu_getdwarf (Dwarf_CU *cu)
 {
   if (cu == NULL)
     /* Some error occurred before.  */

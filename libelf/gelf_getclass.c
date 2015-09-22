@@ -1,5 +1,5 @@
 /* Return the class of file associated with the descriptor.
-   Copyright (C) 1999, 2000, 2002 Red Hat, Inc.
+   Copyright (C) 1999, 2000, 2002, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1999.
 
@@ -38,8 +38,7 @@
 
 
 int
-gelf_getclass (elf)
-     Elf *elf;
+gelf_getclass (Elf *elf)
 {
   return elf == NULL || elf->kind != ELF_K_ELF ? ELFCLASSNONE : elf->class;
 }

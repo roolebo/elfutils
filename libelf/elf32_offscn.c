@@ -1,5 +1,5 @@
 /* Get section at specific index.
-   Copyright (C) 2005, 2008 Red Hat, Inc.
+   Copyright (C) 2005, 2008, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -43,9 +43,7 @@
 
 
 Elf_Scn *
-elfw2(LIBELFBITS,offscn) (elf, offset)
-     Elf *elf;
-     ElfW2(LIBELFBITS,Off) offset;
+elfw2(LIBELFBITS,offscn) (Elf *elf, ElfW2(LIBELFBITS,Off) offset)
 {
   if (elf == NULL)
     return NULL;

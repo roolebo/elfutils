@@ -51,9 +51,7 @@ __libdwfl_set_cfi (Dwfl_Module *mod, Dwarf_CFI **slot, Dwarf_CFI *cfi)
 }
 
 Dwarf_CFI *
-dwfl_module_dwarf_cfi (mod, bias)
-     Dwfl_Module *mod;
-     Dwarf_Addr *bias;
+dwfl_module_dwarf_cfi (Dwfl_Module *mod, Dwarf_Addr *bias)
 {
   if (mod == NULL)
     return NULL;

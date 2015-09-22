@@ -1,5 +1,5 @@
 /* Create new ELF program header.
-   Copyright (C) 1998, 1999, 2000, 2002 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -38,9 +38,7 @@
 
 
 unsigned long int
-gelf_newphdr (elf, phnum)
-     Elf *elf;
-     size_t phnum;
+gelf_newphdr ( Elf *elf, size_t phnum)
 {
   return (elf->class == ELFCLASS32
 	  ? (unsigned long int) INTUSE(elf32_newphdr) (elf, phnum)

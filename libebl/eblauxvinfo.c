@@ -85,11 +85,8 @@ static const struct
 #define nauxv_types (sizeof auxv_types / sizeof auxv_types[0])
 
 int
-ebl_auxv_info (ebl, a_type, name, format)
-     Ebl *ebl;
-     GElf_Xword a_type;
-     const char **name;
-     const char **format;
+ebl_auxv_info (Ebl *ebl, GElf_Xword a_type, const char **name,
+	       const char **format)
 {
   int result = ebl->auxv_info (a_type, name, format);
   if (result == 0 && a_type < nauxv_types && auxv_types[a_type].name != NULL)

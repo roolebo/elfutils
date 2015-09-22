@@ -35,12 +35,8 @@
 
 
 bool
-ebl_check_special_symbol (ebl, ehdr, sym, name, destshdr)
-     Ebl *ebl;
-     GElf_Ehdr *ehdr;
-     const GElf_Sym *sym;
-     const char *name;
-     const GElf_Shdr *destshdr;
+ebl_check_special_symbol (Ebl *ebl, GElf_Ehdr *ehdr, const GElf_Sym *sym,
+			  const char *name, const GElf_Shdr *destshdr)
 {
   if (ebl == NULL)
     return false;

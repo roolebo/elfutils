@@ -35,9 +35,7 @@
 
 
 bool
-ebl_reloc_type_check (ebl, reloc)
-     Ebl *ebl;
-     int reloc;
+ebl_reloc_type_check (Ebl *ebl, int reloc)
 {
   return ebl != NULL ? ebl->reloc_type_check (reloc) : false;
 }

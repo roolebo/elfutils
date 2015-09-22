@@ -1,5 +1,5 @@
 /* Get additional required symbol version information at the given offset.
-   Copyright (C) 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright (C) 1999, 2000, 2001, 2002, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1999.
 
@@ -39,10 +39,7 @@
 
 
 GElf_Vernaux *
-gelf_getvernaux (data, offset, dst)
-     Elf_Data *data;
-     int offset;
-     GElf_Vernaux *dst;
+gelf_getvernaux (Elf_Data *data, int offset, GElf_Vernaux *dst)
 {
   GElf_Vernaux *result;
 

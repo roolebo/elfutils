@@ -37,8 +37,7 @@
 
 
 Elf *
-dwarf_getelf (dwarf)
-     Dwarf *dwarf;
+dwarf_getelf (Dwarf *dwarf)
 {
   if (dwarf == NULL)
     /* Some error occurred before.  */

@@ -37,8 +37,7 @@
 
 
 int
-dwarf_abbrevhaschildren (abbrev)
-     Dwarf_Abbrev *abbrev;
+dwarf_abbrevhaschildren (Dwarf_Abbrev *abbrev)
 {
   return abbrev == NULL ? -1 : abbrev->has_children;
 }

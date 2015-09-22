@@ -115,9 +115,7 @@ __libdw_find_attr (Dwarf_Die *die, unsigned int search_name,
 
 
 int
-dwarf_child (die, result)
-     Dwarf_Die *die;
-     Dwarf_Die *result;
+dwarf_child (Dwarf_Die *die, Dwarf_Die *result)
 {
   /* Ignore previous errors.  */
   if (die == NULL)

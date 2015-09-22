@@ -35,10 +35,7 @@
 
 
 Dwarf_Die *
-dwarf_addrdie (dbg, addr, result)
-     Dwarf *dbg;
-     Dwarf_Addr addr;
-     Dwarf_Die *result;
+dwarf_addrdie (Dwarf *dbg, Dwarf_Addr addr, Dwarf_Die *result)
 {
   Dwarf_Aranges *aranges;
   size_t naranges;

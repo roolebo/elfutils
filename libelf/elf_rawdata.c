@@ -1,5 +1,5 @@
 /* Return raw section content.
-   Copyright (C) 1998, 1999, 2000, 2002 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -37,9 +37,7 @@
 
 
 Elf_Data *
-elf_rawdata (scn, data)
-     Elf_Scn *scn;
-     Elf_Data *data;
+elf_rawdata (Elf_Scn *scn, Elf_Data *data)
 {
   if (scn == NULL || scn->elf->kind != ELF_K_ELF)
     {

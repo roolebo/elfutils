@@ -270,8 +270,8 @@ dwfl_elf_phdr_memory_callback (Dwfl *dwfl, int ndx,
   GElf_Off end;
   GElf_Addr end_vaddr;
 
-  inline void update_end ()
-  {
+  inline void update_end (void)
+{
     end = (phdr.p_offset + phdr.p_filesz + align - 1) & -align;
     end_vaddr = (phdr.p_vaddr + phdr.p_memsz + align - 1) & -align;
   }

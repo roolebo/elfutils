@@ -1,5 +1,5 @@
 /* Hash function used in ELF implementations.
-   Copyright (C) 1998, 1999, 2000, 2002 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -37,8 +37,7 @@
 #include <dl-hash.h>
 
 unsigned long int
-elf_hash (string)
-     const char *string;
+elf_hash (const char *string)
 {
   return _dl_elf_hash (string);
 }

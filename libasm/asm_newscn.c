@@ -158,11 +158,8 @@ binary_newscn (AsmScn_t *result, GElf_Word type, GElf_Xword flags,
 
 
 AsmScn_t *
-asm_newscn (ctx, scnname, type, flags)
-     AsmCtx_t *ctx;
-     const char *scnname;
-     GElf_Word type;
-     GElf_Xword flags;
+asm_newscn (AsmCtx_t *ctx, const char *scnname, GElf_Word type,
+	    GElf_Xword flags)
 {
   size_t scnname_len = strlen (scnname) + 1;
   AsmScn_t *result;

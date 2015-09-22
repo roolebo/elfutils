@@ -37,12 +37,8 @@
 
 
 int
-dwarf_getabbrevattr (abbrev, idx, namep, formp, offsetp)
-     Dwarf_Abbrev *abbrev;
-     size_t idx;
-     unsigned int *namep;
-     unsigned int *formp;
-     Dwarf_Off *offsetp;
+dwarf_getabbrevattr (Dwarf_Abbrev *abbrev, size_t idx, unsigned int *namep,
+		     unsigned int *formp, Dwarf_Off *offsetp)
 {
   if (abbrev == NULL)
     return -1;

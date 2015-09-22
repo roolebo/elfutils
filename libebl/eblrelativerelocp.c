@@ -35,9 +35,7 @@
 
 
 bool
-ebl_relative_reloc_p (ebl, reloc)
-     Ebl *ebl;
-     int reloc;
+ebl_relative_reloc_p (Ebl *ebl, int reloc)
 {
   return ebl->relative_reloc_p (reloc);
 }

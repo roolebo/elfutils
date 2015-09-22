@@ -37,8 +37,7 @@
 
 
 Elf *
-asm_getelf (ctx)
-     AsmCtx_t *ctx;
+asm_getelf (AsmCtx_t *ctx)
 {
   return ctx != NULL ? ctx->out.elf : NULL;
 }

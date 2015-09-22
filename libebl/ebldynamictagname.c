@@ -37,11 +37,7 @@
 
 
 const char *
-ebl_dynamic_tag_name (ebl, tag, buf, len)
-     Ebl *ebl;
-     int64_t tag;
-     char *buf;
-     size_t len;
+ebl_dynamic_tag_name (Ebl *ebl, int64_t tag, char *buf, size_t len)
 {
   const char *res = ebl != NULL ? ebl->dynamic_tag_name (tag, buf, len) : NULL;
 

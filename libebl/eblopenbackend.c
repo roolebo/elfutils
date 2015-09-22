@@ -254,10 +254,7 @@ fill_defaults (Ebl *result)
 
 /* Find an appropriate backend for the file associated with ELF.  */
 static Ebl *
-openbackend (elf, emulation, machine)
-     Elf *elf;
-     const char *emulation;
-     GElf_Half machine;
+openbackend (Elf *elf, const char *emulation, GElf_Half machine)
 {
   Ebl *result;
   size_t cnt;
@@ -397,8 +394,7 @@ openbackend (elf, emulation, machine)
 
 /* Find an appropriate backend for the file associated with ELF.  */
 Ebl *
-ebl_openbackend (elf)
-     Elf *elf;
+ebl_openbackend (Elf *elf)
 {
   GElf_Ehdr ehdr_mem;
   GElf_Ehdr *ehdr;

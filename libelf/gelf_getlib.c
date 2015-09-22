@@ -1,5 +1,5 @@
 /* Get library from table at the given index.
-   Copyright (C) 2004, 2005, 2009, 2014 Red Hat, Inc.
+   Copyright (C) 2004, 2005, 2009, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
@@ -39,10 +39,7 @@
 
 
 GElf_Lib *
-gelf_getlib (data, ndx, dst)
-     Elf_Data *data;
-     int ndx;
-     GElf_Lib *dst;
+gelf_getlib (Elf_Data *data, int ndx, GElf_Lib *dst)
 {
   if (data == NULL)
     return NULL;

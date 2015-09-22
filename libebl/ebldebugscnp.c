@@ -36,9 +36,7 @@
 
 
 bool
-ebl_debugscn_p (ebl, name)
-     Ebl *ebl;
-     const char *name;
+ebl_debugscn_p (Ebl *ebl, const char *name)
 {
   return name != NULL && ebl->debugscn_p (name);
 }

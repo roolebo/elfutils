@@ -34,12 +34,8 @@
 #include <dwarf.h>
 
 int
-dwarf_frame_register (fs, regno, ops_mem, ops, nops)
-     Dwarf_Frame *fs;
-     int regno;
-     Dwarf_Op ops_mem[3];
-     Dwarf_Op **ops;
-     size_t *nops;
+dwarf_frame_register (Dwarf_Frame *fs, int regno, Dwarf_Op *ops_mem,
+		      Dwarf_Op **ops, size_t *nops)
 {
   /* Maybe there was a previous error.  */
   if (fs == NULL)

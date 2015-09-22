@@ -422,9 +422,7 @@ __libelf_set_data_list_rdlock (Elf_Scn *scn, int wrlocked)
 
 Elf_Data *
 internal_function
-__elf_getdata_rdlock (scn, data)
-     Elf_Scn *scn;
-     Elf_Data *data;
+__elf_getdata_rdlock (Elf_Scn *scn, Elf_Data *data)
 {
   Elf_Data *result = NULL;
   Elf *elf;
@@ -520,9 +518,7 @@ __elf_getdata_rdlock (scn, data)
 }
 
 Elf_Data *
-elf_getdata (scn, data)
-     Elf_Scn *scn;
-     Elf_Data *data;
+elf_getdata (Elf_Scn *scn, Elf_Data *data)
 {
   Elf_Data *result;
 

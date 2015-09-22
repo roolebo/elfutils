@@ -36,9 +36,7 @@
 
 
 Dwarf_Die *
-dwarf_formref_die (attr, result)
-     Dwarf_Attribute *attr;
-     Dwarf_Die *result;
+dwarf_formref_die (Dwarf_Attribute *attr, Dwarf_Die *result)
 {
   if (attr == NULL)
     return NULL;

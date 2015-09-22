@@ -35,16 +35,10 @@
 
 
 Dwarf_Die *
-dwarf_cu_die (cu, result, versionp, abbrev_offsetp, address_sizep,
-	      offset_sizep, type_signaturep, type_offsetp)
-    Dwarf_CU *cu;
-    Dwarf_Die *result;
-    Dwarf_Half *versionp;
-    Dwarf_Off *abbrev_offsetp;
-    uint8_t *address_sizep;
-    uint8_t *offset_sizep;
-    uint64_t *type_signaturep;
-    Dwarf_Off *type_offsetp;
+dwarf_cu_die (Dwarf_CU *cu, Dwarf_Die *result, Dwarf_Half *versionp,
+	      Dwarf_Off *abbrev_offsetp, uint8_t *address_sizep,
+	      uint8_t *offset_sizep, uint64_t *type_signaturep,
+	      Dwarf_Off *type_offsetp)
 {
   if (cu == NULL)
     return NULL;

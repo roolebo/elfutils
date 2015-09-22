@@ -1,5 +1,5 @@
 /* Create new ELF header.
-   Copyright (C) 1998, 1999, 2000, 2002 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -42,8 +42,7 @@
 
 
 ElfW2(LIBELFBITS,Ehdr) *
-elfw2(LIBELFBITS,newehdr) (elf)
-     Elf *elf;
+elfw2(LIBELFBITS,newehdr) (Elf *elf)
 {
   ElfW2(LIBELFBITS,Ehdr) *result;
 

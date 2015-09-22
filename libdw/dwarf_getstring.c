@@ -36,10 +36,7 @@
 
 
 const char *
-dwarf_getstring (dbg, offset, lenp)
-     Dwarf *dbg;
-     Dwarf_Off offset;
-     size_t *lenp;
+dwarf_getstring (Dwarf *dbg, Dwarf_Off offset, size_t *lenp)
 {
   if (dbg == NULL)
     return NULL;

@@ -39,8 +39,7 @@
 
 
 int
-asm_abort (ctx)
-     AsmCtx_t *ctx;
+asm_abort (AsmCtx_t *ctx)
 {
   if (ctx == NULL)
     /* Something went wrong earlier.  */

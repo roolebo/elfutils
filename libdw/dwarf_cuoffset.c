@@ -36,8 +36,7 @@
 
 
 Dwarf_Off
-dwarf_cuoffset (die)
-     Dwarf_Die *die;
+dwarf_cuoffset (Dwarf_Die *die)
 {
   return (die == NULL
 	  ? (Dwarf_Off) -1l

@@ -44,13 +44,9 @@
   } while (0)
 
 bool
-arm_check_object_attribute (ebl, vendor, tag, value, tag_name, value_name)
-     Ebl *ebl __attribute__ ((unused));
-     const char *vendor;
-     int tag;
-     uint64_t value __attribute__ ((unused));
-     const char **tag_name;
-     const char **value_name;
+arm_check_object_attribute (Ebl *ebl __attribute__ ((unused)),
+			    const char *vendor, int tag, uint64_t value,
+			    const char **tag_name, const char **value_name)
 {
   if (!strcmp (vendor, "aeabi"))
     switch (tag)

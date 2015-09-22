@@ -35,9 +35,7 @@
 
 
 Dwarf_Arange *
-dwarf_getarange_addr (aranges, addr)
-     Dwarf_Aranges *aranges;
-     Dwarf_Addr addr;
+dwarf_getarange_addr (Dwarf_Aranges *aranges, Dwarf_Addr addr)
 {
   if (aranges == NULL)
     return NULL;

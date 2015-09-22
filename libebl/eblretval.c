@@ -35,10 +35,8 @@
 
 
 int
-ebl_return_value_location (ebl, functypedie, locops)
-     Ebl *ebl;
-     Dwarf_Die *functypedie;
-     const Dwarf_Op **locops;
+ebl_return_value_location (Ebl *ebl, Dwarf_Die *functypedie,
+			   const Dwarf_Op **locops)
 {
   return ebl == NULL ? -1 : ebl->return_value_location (functypedie, locops);
 }

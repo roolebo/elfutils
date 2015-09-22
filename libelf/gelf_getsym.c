@@ -1,5 +1,5 @@
 /* Get symbol information from symbol table at the given index.
-   Copyright (C) 1999, 2000, 2001, 2002, 2005, 2009, 2014 Red Hat, Inc.
+   Copyright (C) 1999, 2000, 2001, 2002, 2005, 2009, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1999.
 
@@ -39,10 +39,7 @@
 
 
 GElf_Sym *
-gelf_getsym (data, ndx, dst)
-     Elf_Data *data;
-     int ndx;
-     GElf_Sym *dst;
+gelf_getsym (Elf_Data *data, int ndx, GElf_Sym *dst)
 {
   Elf_Data_Scn *data_scn = (Elf_Data_Scn *) data;
   GElf_Sym *result = NULL;

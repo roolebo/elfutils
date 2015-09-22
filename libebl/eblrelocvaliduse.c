@@ -35,9 +35,7 @@
 
 
 bool
-ebl_reloc_valid_use (ebl, reloc)
-     Ebl *ebl;
-     int reloc;
+ebl_reloc_valid_use (Ebl *ebl, int reloc)
 {
   return ebl != NULL ? ebl->reloc_valid_use (ebl->elf, reloc) : false;
 }

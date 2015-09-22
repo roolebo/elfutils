@@ -1,5 +1,5 @@
 /* Error handling in libelf.
-   Copyright (C) 1998-2010 Red Hat, Inc.
+   Copyright (C) 1998-2010, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -283,16 +283,14 @@ static const uint_fast16_t msgidx[ELF_E_NUM] =
 
 
 void
-__libelf_seterrno (value)
-     int value;
+__libelf_seterrno (int value)
 {
   global_error = value >= 0 && value < nmsgidx ? value : ELF_E_UNKNOWN_ERROR;
 }
 
 
 const char *
-elf_errmsg (error)
-     int error;
+elf_errmsg (int error)
 {
   int last_error = global_error;
 

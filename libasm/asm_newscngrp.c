@@ -41,11 +41,8 @@
 
 
 AsmScnGrp_t *
-asm_newscngrp (ctx, grpname, signature, flags)
-     AsmCtx_t *ctx;
-     const char *grpname;
-     AsmSym_t *signature;
-     Elf32_Word flags;
+asm_newscngrp (AsmCtx_t *ctx, const char *grpname, AsmSym_t *signature,
+	       Elf32_Word flags)
 {
   AsmScnGrp_t *result;
   size_t grpname_len = strlen (grpname) + 1;

@@ -36,9 +36,7 @@
 
 
 int
-dwarf_formsdata (attr, return_sval)
-     Dwarf_Attribute *attr;
-     Dwarf_Sword *return_sval;
+dwarf_formsdata (Dwarf_Attribute *attr, Dwarf_Sword *return_sval)
 {
   if (attr == NULL)
     return -1;

@@ -39,6 +39,7 @@ else
 STACK_USAGE_WARNING=
 endif
 AM_CFLAGS = -std=gnu99 -Wall -Wshadow -Wformat=2 \
+	    -Wold-style-definition -Wstrict-prototypes \
 	    $(if $($(*F)_no_Werror),,-Werror) \
 	    $(if $($(*F)_no_Wunused),,-Wunused -Wextra) \
 	    $(if $($(*F)_no_Wstack_usage),,$(STACK_USAGE_WARNING)) \

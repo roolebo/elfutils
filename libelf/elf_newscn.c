@@ -1,5 +1,5 @@
 /* Append new section.
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2005, 2009, 2014 Red Hat, Inc.
+   Copyright (C) 1998,1999,2000,2001,2002,2005,2009,2014,2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -41,8 +41,7 @@
 
 
 Elf_Scn *
-elf_newscn (elf)
-     Elf *elf;
+elf_newscn (Elf *elf)
 {
   Elf_Scn *result = NULL;
   bool first = false;

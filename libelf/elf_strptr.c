@@ -38,10 +38,7 @@
 
 
 char *
-elf_strptr (elf, idx, offset)
-     Elf *elf;
-     size_t idx;
-     size_t offset;
+elf_strptr (Elf *elf, size_t idx, size_t offset)
 {
   if (elf == NULL)
     return NULL;

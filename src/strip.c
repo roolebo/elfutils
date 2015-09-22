@@ -119,7 +119,7 @@ static int debug_fd = -1;
 static char *tmp_debug_fname = NULL;
 
 /* Close debug file descriptor, if opened. And remove temporary debug file.  */
-static void cleanup_debug ();
+static void cleanup_debug (void);
 
 #define INTERNAL_ERROR(fname) \
   do { \
@@ -2208,7 +2208,7 @@ cannot set access and modification date of '%s'"),
 }
 
 static void
-cleanup_debug ()
+cleanup_debug (void)
 {
   if (debug_fd >= 0)
     {

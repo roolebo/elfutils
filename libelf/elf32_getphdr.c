@@ -1,5 +1,5 @@
 /* Get ELF program header table.
-   Copyright (C) 1998-2010, 2014 Red Hat, Inc.
+   Copyright (C) 1998-2010, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -46,8 +46,7 @@
 #endif
 
 ElfW2(LIBELFBITS,Phdr) *
-__elfw2(LIBELFBITS,getphdr_wrlock) (elf)
-     Elf *elf;
+__elfw2(LIBELFBITS,getphdr_wrlock) (Elf *elf)
 {
   ElfW2(LIBELFBITS,Phdr) *result;
 
@@ -237,8 +236,7 @@ __elfw2(LIBELFBITS,getphdr_wrlock) (elf)
 }
 
 ElfW2(LIBELFBITS,Phdr) *
-elfw2(LIBELFBITS,getphdr) (elf)
-     Elf *elf;
+elfw2(LIBELFBITS,getphdr) (Elf *elf)
 {
   ElfW2(LIBELFBITS,Phdr) *result;
 

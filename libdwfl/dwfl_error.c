@@ -138,8 +138,7 @@ __libdwfl_seterrno (Dwfl_Error error)
 
 
 const char *
-dwfl_errmsg (error)
-     int error;
+dwfl_errmsg (int error)
 {
   if (error == 0 || error == -1)
     {

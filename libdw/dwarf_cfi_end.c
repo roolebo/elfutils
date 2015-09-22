@@ -35,8 +35,7 @@
 #include <stdlib.h>
 
 int
-dwarf_cfi_end (cache)
-     Dwarf_CFI *cache;
+dwarf_cfi_end (Dwarf_CFI *cache)
 {
   if (cache != NULL)
     {

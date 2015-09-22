@@ -40,10 +40,7 @@
 
 /* Add zero terminated string STR of size LEN to (sub)section ASMSCN.  */
 int
-asm_addstrz (asmscn, str, len)
-     AsmScn_t *asmscn;
-     const char *str;
-     size_t len;
+asm_addstrz (AsmScn_t *asmscn, const char *str, size_t len)
 {
   if (asmscn == NULL)
     return -1;

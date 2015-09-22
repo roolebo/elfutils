@@ -1,6 +1,6 @@
 /* Get symbol information and separate section index from symbol table
    at the given index.
-   Copyright (C) 2000, 2001, 2002, 2005, 2009, 2014 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2005, 2009, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -40,12 +40,8 @@
 
 
 GElf_Sym *
-gelf_getsymshndx (symdata, shndxdata, ndx, dst, dstshndx)
-     Elf_Data *symdata;
-     Elf_Data *shndxdata;
-     int ndx;
-     GElf_Sym *dst;
-     Elf32_Word *dstshndx;
+gelf_getsymshndx (Elf_Data *symdata, Elf_Data *shndxdata, int ndx,
+		  GElf_Sym *dst, Elf32_Word *dstshndx)
 {
   Elf_Data_Scn *symdata_scn = (Elf_Data_Scn *) symdata;
   Elf_Data_Scn *shndxdata_scn = (Elf_Data_Scn *) shndxdata;

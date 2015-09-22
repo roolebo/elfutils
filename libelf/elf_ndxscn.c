@@ -1,5 +1,5 @@
 /* Get index of section.
-   Copyright (C) 1998, 1999, 2000, 2002 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -38,8 +38,7 @@
 
 
 size_t
-elf_ndxscn (scn)
-     Elf_Scn *scn;
+elf_ndxscn (Elf_Scn *scn)
 {
   if (scn == NULL)
     return SHN_UNDEF;

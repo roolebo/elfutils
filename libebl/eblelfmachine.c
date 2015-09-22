@@ -35,8 +35,7 @@
 
 
 int
-ebl_get_elfmachine (ebl)
-     Ebl *ebl;
+ebl_get_elfmachine (Ebl *ebl)
 {
   return ebl->machine;
 }

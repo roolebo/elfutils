@@ -1,5 +1,5 @@
 /* Get information from auxiliary vector at the given index.
-   Copyright (C) 2007 Red Hat, Inc.
+   Copyright (C) 2007, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -38,10 +38,7 @@
 
 
 GElf_auxv_t *
-gelf_getauxv (data, ndx, dst)
-     Elf_Data *data;
-     int ndx;
-     GElf_auxv_t *dst;
+gelf_getauxv (Elf_Data *data, int ndx, GElf_auxv_t *dst)
 {
   Elf_Data_Scn *data_scn = (Elf_Data_Scn *) data;
   GElf_auxv_t *result = NULL;

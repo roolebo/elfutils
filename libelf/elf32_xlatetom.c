@@ -1,5 +1,5 @@
 /* Convert from file to memory representation.
-   Copyright (C) 1998, 1999, 2000, 2002, 2012 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2012, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -43,10 +43,8 @@
 
 
 Elf_Data *
-elfw2(LIBELFBITS, xlatetom) (dest, src, encode)
-     Elf_Data *dest;
-     const Elf_Data *src;
-     unsigned int encode;
+elfw2(LIBELFBITS, xlatetom) (Elf_Data *dest, const Elf_Data *src,
+			     unsigned int encode)
 {
   /* First test whether the input data is really suitable for this
      type.  This means, whether there is an integer number of records.

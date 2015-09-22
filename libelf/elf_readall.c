@@ -1,5 +1,5 @@
 /* Read all of the file associated with the descriptor.
-   Copyright (C) 1998-2009 Red Hat, Inc.
+   Copyright (C) 1998-2009, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -66,8 +66,7 @@ set_address (Elf *elf, size_t offset)
 
 
 char *
-__libelf_readall (elf)
-     Elf *elf;
+__libelf_readall (Elf *elf)
 {
   /* Get the file.  */
   rwlock_wrlock (elf->lock);

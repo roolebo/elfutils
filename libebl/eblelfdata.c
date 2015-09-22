@@ -35,8 +35,7 @@
 
 
 int
-ebl_get_elfdata (ebl)
-     Ebl *ebl;
+ebl_get_elfdata (Ebl *ebl)
 {
   return ebl->data;
 }

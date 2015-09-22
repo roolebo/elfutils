@@ -775,8 +775,7 @@ read_long_names (Elf *elf)
 /* Read the next archive header.  */
 int
 internal_function
-__libelf_next_arhdr_wrlock (elf)
-     Elf *elf;
+__libelf_next_arhdr_wrlock (Elf *elf)
 {
   struct ar_hdr *ar_hdr;
   Elf_Arhdr *elf_ar_hdr;
@@ -1043,10 +1042,7 @@ write_file (int fd, Elf_Cmd cmd)
 
 /* Return a descriptor for the file belonging to FILDES.  */
 Elf *
-elf_begin (fildes, cmd, ref)
-     int fildes;
-     Elf_Cmd cmd;
-     Elf *ref;
+elf_begin (int fildes, Elf_Cmd cmd, Elf *ref)
 {
   Elf *retval;
 
@@ -1067,7 +1063,7 @@ elf_begin (fildes, cmd, ref)
       return NULL;
     }
 
-  Elf *lock_dup_elf ()
+  Elf *lock_dup_elf (void)
   {
     /* We need wrlock to dup an archive.  */
     if (ref->kind == ELF_K_AR)

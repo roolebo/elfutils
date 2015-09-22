@@ -36,8 +36,7 @@
 
 
 unsigned int
-dwarf_whatattr (attr)
-     Dwarf_Attribute *attr;
+dwarf_whatattr (Dwarf_Attribute *attr)
 {
   return attr == NULL ? 0 : attr->code;
 }

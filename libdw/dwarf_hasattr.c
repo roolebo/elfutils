@@ -36,9 +36,7 @@
 
 
 int
-dwarf_hasattr (die, search_name)
-     Dwarf_Die *die;
-     unsigned int search_name;
+dwarf_hasattr (Dwarf_Die *die, unsigned int search_name)
 {
   if (die == NULL)
     return 0;

@@ -39,12 +39,8 @@
 
 
 void
-ebl_object_note (ebl, name, type, descsz, desc)
-     Ebl *ebl;
-     const char *name;
-     uint32_t type;
-     uint32_t descsz;
-     const char *desc;
+ebl_object_note (Ebl *ebl, const char *name, uint32_t type,
+		 uint32_t descsz, const char *desc)
 {
   if (! ebl->object_note (name, type, descsz, desc))
     /* The machine specific function did not know this type.  */

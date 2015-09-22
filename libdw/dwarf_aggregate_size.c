@@ -230,9 +230,7 @@ aggregate_size (Dwarf_Die *die, Dwarf_Word *size, Dwarf_Die *type_mem)
 }
 
 int
-dwarf_aggregate_size (die, size)
-     Dwarf_Die *die;
-     Dwarf_Word *size;
+dwarf_aggregate_size (Dwarf_Die *die, Dwarf_Word *size)
 {
   Dwarf_Die type_mem;
 

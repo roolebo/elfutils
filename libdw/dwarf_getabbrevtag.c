@@ -37,8 +37,7 @@
 
 
 unsigned int
-dwarf_getabbrevtag (abbrev)
-     Dwarf_Abbrev *abbrev;
+dwarf_getabbrevtag (Dwarf_Abbrev *abbrev)
 {
   return abbrev == NULL ? 0 : abbrev->tag;
 }

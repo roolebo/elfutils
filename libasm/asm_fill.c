@@ -39,10 +39,7 @@
 
 
 int
-asm_fill (asmscn, bytes, len)
-     AsmScn_t *asmscn;
-     void *bytes;
-     size_t len;
+asm_fill (AsmScn_t *asmscn, void *bytes, size_t len)
 {
   struct FillPattern *pattern;
   struct FillPattern *old_pattern;

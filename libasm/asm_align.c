@@ -40,9 +40,7 @@
 
 
 int
-asm_align (asmscn, value)
-     AsmScn_t *asmscn;
-     GElf_Word value;
+asm_align (AsmScn_t *asmscn, GElf_Word value)
 {
   if (asmscn == NULL)
     /* An earlier error.  */
@@ -134,9 +132,7 @@ asm_align (asmscn, value)
 /* Ensure there are at least LEN bytes available in the output buffer
    for ASMSCN.  */
 int
-__libasm_ensure_section_space (asmscn, len)
-     AsmScn_t *asmscn;
-     size_t len;
+__libasm_ensure_section_space (AsmScn_t *asmscn, size_t len)
 {
   /* The blocks with the section content are kept in a circular
      single-linked list.  */

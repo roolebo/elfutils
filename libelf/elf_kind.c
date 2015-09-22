@@ -1,5 +1,5 @@
 /* Return the kind of file associated with the descriptor.
-   Copyright (C) 1998, 1999, 2000, 2002 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -38,8 +38,7 @@
 
 
 Elf_Kind
-elf_kind (elf)
-     Elf *elf;
+elf_kind (Elf *elf)
 {
   return elf == NULL ? ELF_K_NONE : elf->kind;
 }

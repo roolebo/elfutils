@@ -1,5 +1,5 @@
 /* Create new ELF program header table.
-   Copyright (C) 1999-2010, 2014 Red Hat, Inc.
+   Copyright (C) 1999-2010, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -43,9 +43,7 @@
 
 
 ElfW2(LIBELFBITS,Phdr) *
-elfw2(LIBELFBITS,newphdr) (elf, count)
-     Elf *elf;
-     size_t count;
+elfw2(LIBELFBITS,newphdr) (Elf *elf, size_t count)
 {
   ElfW2(LIBELFBITS,Phdr) *result;
 

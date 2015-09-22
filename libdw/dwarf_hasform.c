@@ -36,9 +36,7 @@
 
 
 int
-dwarf_hasform (attr, search_form)
-     Dwarf_Attribute *attr;
-     unsigned int search_form;
+dwarf_hasform (Dwarf_Attribute *attr, unsigned int search_form)
 {
   if (attr == NULL)
     return 0;

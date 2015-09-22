@@ -1,5 +1,5 @@
 /* Update symbol version information.
-   Copyright (C) 2001, 2002, 2005, 2009, 2014 Red Hat, Inc.
+   Copyright (C) 2001, 2002, 2005, 2009, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -39,10 +39,7 @@
 
 
 int
-gelf_update_versym (data, ndx, src)
-     Elf_Data *data;
-     int ndx;
-     GElf_Versym *src;
+gelf_update_versym (Elf_Data *data, int ndx, GElf_Versym *src)
 {
   Elf_Data_Scn *data_scn = (Elf_Data_Scn *) data;
 

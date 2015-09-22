@@ -36,11 +36,7 @@
 
 
 const char *
-ebl_symbol_type_name (ebl, symbol, buf, len)
-     Ebl *ebl;
-     int symbol;
-     char *buf;
-     size_t len;
+ebl_symbol_type_name (Ebl *ebl, int symbol, char *buf, size_t len)
 {
   const char *res;
 

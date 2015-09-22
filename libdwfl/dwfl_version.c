@@ -29,8 +29,7 @@
 #include "libdwflP.h"
 
 const char *
-dwfl_version (dwfl)
-     Dwfl *dwfl __attribute__ ((unused));
+dwfl_version (Dwfl *dwfl __attribute__ ((unused)))
 {
   return PACKAGE_VERSION;
 }

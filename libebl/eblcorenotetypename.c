@@ -36,11 +36,7 @@
 #include <libeblP.h>
 
 const char *
-ebl_core_note_type_name (ebl, type, buf, len)
-     Ebl *ebl;
-     uint32_t type;
-     char *buf;
-     size_t len;
+ebl_core_note_type_name (Ebl *ebl, uint32_t type, char *buf, size_t len)
 {
   const char *res = ebl->core_note_type_name (type, buf, len);
 

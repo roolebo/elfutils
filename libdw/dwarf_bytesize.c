@@ -36,8 +36,7 @@
 
 
 int
-dwarf_bytesize (die)
-     Dwarf_Die *die;
+dwarf_bytesize (Dwarf_Die *die)
 {
   Dwarf_Attribute attr_mem;
   Dwarf_Word value;

@@ -40,16 +40,10 @@
 
 
 int
-ebl_core_note (ebl, nhdr, name,
-	       regs_offset, nregloc, reglocs, nitems, items)
-     Ebl *ebl;
-     const GElf_Nhdr *nhdr;
-     const char *name;
-     GElf_Word *regs_offset;
-     size_t *nregloc;
-     const Ebl_Register_Location **reglocs;
-     size_t *nitems;
-     const Ebl_Core_Item **items;
+ebl_core_note (Ebl *ebl, const GElf_Nhdr *nhdr, const char *name,
+	       GElf_Word *regs_offset, size_t *nregloc,
+	       const Ebl_Register_Location **reglocs, size_t *nitems,
+	       const Ebl_Core_Item **items)
 {
   int result = ebl->core_note (nhdr, name,
 			       regs_offset, nregloc, reglocs, nitems, items);

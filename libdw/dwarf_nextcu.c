@@ -36,18 +36,11 @@
 
 
 int
-dwarf_next_unit (dwarf, off, next_off, header_sizep, versionp, abbrev_offsetp,
-		 address_sizep, offset_sizep, type_signaturep, type_offsetp)
-     Dwarf *dwarf;
-     Dwarf_Off off;
-     Dwarf_Off *next_off;
-     size_t *header_sizep;
-     Dwarf_Half *versionp;
-     Dwarf_Off *abbrev_offsetp;
-     uint8_t *address_sizep;
-     uint8_t *offset_sizep;
-     uint64_t *type_signaturep;
-     Dwarf_Off *type_offsetp;
+dwarf_next_unit (Dwarf *dwarf, Dwarf_Off off, Dwarf_Off *next_off,
+		 size_t *header_sizep, Dwarf_Half *versionp,
+		 Dwarf_Off *abbrev_offsetp, uint8_t *address_sizep,
+		 uint8_t *offset_sizep, uint64_t *type_signaturep,
+		 Dwarf_Off *type_offsetp)
 {
   const bool debug_types = type_signaturep != NULL;
   const size_t sec_idx = debug_types ? IDX_debug_types : IDX_debug_info;
@@ -182,15 +175,9 @@ dwarf_next_unit (dwarf, off, next_off, header_sizep, versionp, abbrev_offsetp,
 INTDEF(dwarf_next_unit)
 
 int
-dwarf_nextcu (dwarf, off, next_off, header_sizep, abbrev_offsetp,
-	      address_sizep, offset_sizep)
-     Dwarf *dwarf;
-     Dwarf_Off off;
-     Dwarf_Off *next_off;
-     size_t *header_sizep;
-     Dwarf_Off *abbrev_offsetp;
-     uint8_t *address_sizep;
-     uint8_t *offset_sizep;
+dwarf_nextcu (Dwarf *dwarf, Dwarf_Off off, Dwarf_Off *next_off,
+	      size_t *header_sizep, Dwarf_Off *abbrev_offsetp,
+	      uint8_t *address_sizep, uint8_t *offset_sizep)
 {
   return INTUSE(dwarf_next_unit) (dwarf, off, next_off, header_sizep, NULL,
 				  abbrev_offsetp, address_sizep, offset_sizep,

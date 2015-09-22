@@ -30,10 +30,8 @@
 
 
 int
-dwfl_module_return_value_location (mod, functypedie, locops)
-     Dwfl_Module *mod;
-     Dwarf_Die *functypedie;
-     const Dwarf_Op **locops;
+dwfl_module_return_value_location (Dwfl_Module *mod, Dwarf_Die *functypedie,
+				   const Dwarf_Op **locops)
 {
   if (mod == NULL)
     return -1;

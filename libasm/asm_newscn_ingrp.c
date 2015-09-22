@@ -37,12 +37,8 @@
 
 
 AsmScn_t *
-asm_newscn_ingrp (ctx, scnname, type, flags, grp)
-     AsmCtx_t *ctx;
-     const char *scnname;
-     GElf_Word type;
-     GElf_Xword flags;
-     AsmScnGrp_t *grp;
+asm_newscn_ingrp (AsmCtx_t *ctx, const char *scnname, GElf_Word type,
+		  GElf_Xword flags, AsmScnGrp_t *grp)
 {
   AsmScn_t *result = INTUSE (asm_newscn) (ctx, scnname, type, flags);
 

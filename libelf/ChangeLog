@@ -1,3 +1,7 @@
+2015-09-22  Mark Wielaard  <mjw@redhat.com>
+
+	* *.c: Remove old-style function definitions.
+
 2015-06-22  Mark Wielaard  <mjw@redhat.com>
 
 	* dl-hash.h: Update from glibc.

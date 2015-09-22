@@ -1,5 +1,5 @@
 /* Convert from file to memory representation.  Generic ELF version.
-   Copyright (C) 2002 Red Hat, Inc.
+   Copyright (C) 2002, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -38,8 +38,7 @@
 
 
 long int
-gelf_checksum (elf)
-     Elf *elf;
+gelf_checksum (Elf *elf)
 {
   if (elf == NULL)
     return -1l;

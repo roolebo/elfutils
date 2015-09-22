@@ -1,3 +1,7 @@
+2015-09-22  Mark Wielaard  <mjw@redhat.com>
+
+	* asm_*.c: Remove old-style function definitions.
+
 2015-09-04  Chih-Hung Hsieh  <chh@google.com>
 
 	* asm_addint8.c (FCT): Replace K&R function definition

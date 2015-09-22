@@ -36,9 +36,7 @@
 
 
 int
-dwarf_formflag (attr, return_bool)
-     Dwarf_Attribute *attr;
-     bool *return_bool;
+dwarf_formflag (Dwarf_Attribute *attr, bool *return_bool)
 {
   if (attr == NULL)
     return -1;

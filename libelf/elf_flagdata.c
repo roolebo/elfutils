@@ -1,5 +1,5 @@
 /* Manipulate ELF data flag.
-   Copyright (C) 2000, 2001, 2002 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -38,10 +38,7 @@
 
 
 unsigned int
-elf_flagdata (data, cmd, flags)
-     Elf_Data *data;
-     Elf_Cmd cmd;
-     unsigned int flags;
+elf_flagdata (Elf_Data *data, Elf_Cmd cmd, unsigned int flags)
 {
   Elf_Data_Scn *data_scn;
   unsigned int result;

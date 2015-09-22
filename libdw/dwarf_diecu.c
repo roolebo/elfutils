@@ -35,11 +35,8 @@
 
 
 Dwarf_Die *
-dwarf_diecu (die, result, address_sizep, offset_sizep)
-     Dwarf_Die *die;
-     Dwarf_Die *result;
-     uint8_t *address_sizep;
-     uint8_t *offset_sizep;
+dwarf_diecu (Dwarf_Die *die, Dwarf_Die *result, uint8_t *address_sizep,
+	     uint8_t *offset_sizep)
 {
   if (die == NULL)
     return NULL;

@@ -341,10 +341,7 @@ scngrp_read (Dwarf *result, Elf *elf, GElf_Ehdr *ehdr, Elf_Scn *scngrp)
 
 
 Dwarf *
-dwarf_begin_elf (elf, cmd, scngrp)
-     Elf *elf;
-     Dwarf_Cmd cmd;
-     Elf_Scn *scngrp;
+dwarf_begin_elf (Elf *elf, Dwarf_Cmd cmd, Elf_Scn *scngrp)
 {
   GElf_Ehdr *ehdr;
   GElf_Ehdr ehdr_mem;

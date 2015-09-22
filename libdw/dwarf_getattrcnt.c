@@ -35,9 +35,7 @@
 
 
 int
-dwarf_getattrcnt (abbrev, attrcntp)
-     Dwarf_Abbrev *abbrev;
-     size_t *attrcntp;
+dwarf_getattrcnt (Dwarf_Abbrev *abbrev, size_t *attrcntp)
 {
   if (abbrev == NULL)
     return -1;

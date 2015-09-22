@@ -113,10 +113,8 @@ store_implicit_value (Dwarf *dbg, void **cache, Dwarf_Op *op)
 }
 
 int
-dwarf_getlocation_implicit_value (attr, op, return_block)
-     Dwarf_Attribute *attr;
-     const Dwarf_Op *op;
-     Dwarf_Block *return_block;
+dwarf_getlocation_implicit_value (Dwarf_Attribute *attr, const Dwarf_Op *op,
+				  Dwarf_Block *return_block)
 {
   if (attr == NULL)
     return -1;
@@ -609,10 +607,7 @@ getlocation (struct Dwarf_CU *cu, const Dwarf_Block *block,
 }
 
 int
-dwarf_getlocation (attr, llbuf, listlen)
-     Dwarf_Attribute *attr;
-     Dwarf_Op **llbuf;
-     size_t *listlen;
+dwarf_getlocation (Dwarf_Attribute *attr, Dwarf_Op **llbuf, size_t *listlen)
 {
   if (! attr_ok (attr))
     return -1;
@@ -630,9 +625,7 @@ dwarf_getlocation (attr, llbuf, listlen)
 }
 
 static int
-attr_base_address (attr, basep)
-     Dwarf_Attribute *attr;
-     Dwarf_Addr *basep;
+attr_base_address (Dwarf_Attribute *attr, Dwarf_Addr *basep)
 {
   /* Fetch the CU's base address.  */
   Dwarf_Die cudie = CUDIE (attr->cu);
@@ -661,10 +654,8 @@ attr_base_address (attr, basep)
 }
 
 static int
-initial_offset_base (attr, offset, basep)
-     Dwarf_Attribute *attr;
-     ptrdiff_t *offset;
-     Dwarf_Addr *basep;
+initial_offset_base (Dwarf_Attribute *attr, ptrdiff_t *offset,
+		     Dwarf_Addr *basep)
 {
   if (attr_base_address (attr, basep) != 0)
     return -1;
@@ -738,12 +729,8 @@ getlocations_addr (Dwarf_Attribute *attr, ptrdiff_t offset,
 }
 
 int
-dwarf_getlocation_addr (attr, address, llbufs, listlens, maxlocs)
-     Dwarf_Attribute *attr;
-     Dwarf_Addr address;
-     Dwarf_Op **llbufs;
-     size_t *listlens;
-     size_t maxlocs;
+dwarf_getlocation_addr (Dwarf_Attribute *attr, Dwarf_Addr address,
+			Dwarf_Op **llbufs, size_t *listlens, size_t maxlocs)
 {
   if (! attr_ok (attr))
     return -1;
@@ -813,14 +800,9 @@ dwarf_getlocation_addr (attr, address, llbufs, listlens, maxlocs)
 }
 
 ptrdiff_t
-dwarf_getlocations (attr, offset, basep, startp, endp, expr, exprlen)
-     Dwarf_Attribute *attr;
-     ptrdiff_t offset;
-     Dwarf_Addr *basep;
-     Dwarf_Addr *startp;
-     Dwarf_Addr *endp;
-     Dwarf_Op **expr;
-     size_t *exprlen;
+dwarf_getlocations (Dwarf_Attribute *attr, ptrdiff_t offset, Dwarf_Addr *basep,
+		    Dwarf_Addr *startp, Dwarf_Addr *endp, Dwarf_Op **expr,
+		    size_t *exprlen)
 {
   if (! attr_ok (attr))
     return -1;

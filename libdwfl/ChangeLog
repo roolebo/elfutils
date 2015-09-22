@@ -1,3 +1,13 @@
+2015-09-22  Mark Wielaard  <mjw@redhat.com>
+
+	* core-file.c: Remove old-style function definitions.
+	* dwfl_error.c: Likewise.
+	* dwfl_module_dwarf_cfi.c: Likewise.
+	* dwfl_module_eh_cfi.c: Likewise.
+	* dwfl_module_register_names.c: Likewise.
+	* dwfl_module_return_value_location.c: Likewise.
+	* dwfl_version.c: Likewise.
+
 2015-09-09  Chih-Hung Hsieh  <chh@google.com>
 	    Mark Wielaard  <mjw@redhat.com>
 

@@ -1,5 +1,5 @@
 /* Get symbol version definition information at the given offset.
-   Copyright (C) 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright (C) 1999, 2000, 2001, 2002, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1999.
 
@@ -39,10 +39,7 @@
 
 
 GElf_Verdef *
-gelf_getverdef (data, offset, dst)
-     Elf_Data *data;
-     int offset;
-     GElf_Verdef *dst;
+gelf_getverdef (Elf_Data *data, int offset, GElf_Verdef *dst)
 {
   GElf_Verdef *result;
 

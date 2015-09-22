@@ -33,11 +33,8 @@
 #include "cfi.h"
 
 int
-dwarf_frame_info (fs, start, end, signalp)
-     Dwarf_Frame *fs;
-     Dwarf_Addr *start;
-     Dwarf_Addr *end;
-     bool *signalp;
+dwarf_frame_info (Dwarf_Frame *fs, Dwarf_Addr *start, Dwarf_Addr *end,
+		  bool *signalp)
 {
   /* Maybe there was a previous error.  */
   if (fs == NULL)

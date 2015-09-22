@@ -35,8 +35,7 @@
 
 
 int
-ebl_sysvhash_entrysize (ebl)
-     Ebl *ebl;
+ebl_sysvhash_entrysize (Ebl *ebl)
 {
   return ebl->sysvhash_entrysize;
 }

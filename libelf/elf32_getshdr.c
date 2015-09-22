@@ -1,5 +1,5 @@
 /* Return section header.
-   Copyright (C) 1998-2002, 2005, 2007, 2009, 2012, 2014 Red Hat, Inc.
+   Copyright (C) 1998-2002, 2005, 2007, 2009, 2012, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -243,8 +243,7 @@ scn_valid (Elf_Scn *scn)
 }
 
 ElfW2(LIBELFBITS,Shdr) *
-__elfw2(LIBELFBITS,getshdr_rdlock) (scn)
-     Elf_Scn *scn;
+__elfw2(LIBELFBITS,getshdr_rdlock) (Elf_Scn *scn)
 {
   ElfW2(LIBELFBITS,Shdr) *result;
 
@@ -265,8 +264,7 @@ __elfw2(LIBELFBITS,getshdr_rdlock) (scn)
 }
 
 ElfW2(LIBELFBITS,Shdr) *
-__elfw2(LIBELFBITS,getshdr_wrlock) (scn)
-     Elf_Scn *scn;
+__elfw2(LIBELFBITS,getshdr_wrlock) (Elf_Scn *scn)
 {
   ElfW2(LIBELFBITS,Shdr) *result;
 
@@ -281,8 +279,7 @@ __elfw2(LIBELFBITS,getshdr_wrlock) (scn)
 }
 
 ElfW2(LIBELFBITS,Shdr) *
-elfw2(LIBELFBITS,getshdr) (scn)
-     Elf_Scn *scn;
+elfw2(LIBELFBITS,getshdr) (Elf_Scn *scn)
 {
   ElfW2(LIBELFBITS,Shdr) *result;
 

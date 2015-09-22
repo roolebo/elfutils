@@ -36,9 +36,7 @@
 
 
 bool
-ebl_dynamic_tag_check (ebl, tag)
-     Ebl *ebl;
-     int64_t tag;
+ebl_dynamic_tag_check (Ebl *ebl, int64_t tag)
 {
   bool res = ebl != NULL ? ebl->dynamic_tag_check (tag) : false;
 

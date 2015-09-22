@@ -1,5 +1,5 @@
 /* Return section header.
-   Copyright (C) 1998, 1999, 2000, 2002 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -38,9 +38,7 @@
 
 
 GElf_Shdr *
-gelf_getshdr (scn, dst)
-     Elf_Scn *scn;
-     GElf_Shdr *dst;
+gelf_getshdr (Elf_Scn *scn, GElf_Shdr *dst)
 {
   GElf_Shdr *result = NULL;
 

@@ -1,5 +1,5 @@
 /* Return offset of first byte for the object.
-   Copyright (C) 1998, 2000, 2002 Red Hat, Inc.
+   Copyright (C) 1998, 2000, 2002, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -38,8 +38,7 @@
 
 
 off_t
-elf_getbase (elf)
-     Elf *elf;
+elf_getbase (Elf *elf)
 {
   return elf == NULL ? (off_t) -1 : elf->start_offset;
 }

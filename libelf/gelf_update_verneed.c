@@ -1,5 +1,5 @@
 /* Update required symbol version information.
-   Copyright (C) 2001, 2002 Red Hat, Inc.
+   Copyright (C) 2001, 2002, 201r Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -39,10 +39,7 @@
 
 
 int
-gelf_update_verneed (data, offset, src)
-     Elf_Data *data;
-     int offset;
-     GElf_Verneed *src;
+gelf_update_verneed (Elf_Data *data, int offset, GElf_Verneed *src)
 {
   Elf_Data_Scn *data_scn = (Elf_Data_Scn *) data;
 

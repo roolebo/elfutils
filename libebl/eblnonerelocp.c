@@ -35,9 +35,7 @@
 
 
 bool
-ebl_none_reloc_p (ebl, reloc)
-     Ebl *ebl;
-     int reloc;
+ebl_none_reloc_p (Ebl *ebl, int reloc)
 {
   return ebl->none_reloc_p (reloc);
 }

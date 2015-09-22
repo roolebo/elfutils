@@ -1,5 +1,5 @@
 /* Return converted data from raw chunk of ELF file.
-   Copyright (C) 2007, 2014 Red Hat, Inc.
+   Copyright (C) 2007, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -41,11 +41,7 @@
 #include "common.h"
 
 Elf_Data *
-elf_getdata_rawchunk (elf, offset, size, type)
-     Elf *elf;
-     off64_t offset;
-     size_t size;
-     Elf_Type type;
+elf_getdata_rawchunk (Elf *elf, off64_t offset, size_t size, Elf_Type type)
 {
   if (unlikely (elf == NULL))
     return NULL;

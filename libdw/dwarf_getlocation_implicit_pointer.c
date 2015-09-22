@@ -49,10 +49,8 @@ __libdw_empty_loc_attr (Dwarf_Attribute *attr)
 }
 
 int
-dwarf_getlocation_implicit_pointer (attr, op, result)
-     Dwarf_Attribute *attr;
-     const Dwarf_Op *op;
-     Dwarf_Attribute *result;
+dwarf_getlocation_implicit_pointer (Dwarf_Attribute *attr, const Dwarf_Op *op,
+				    Dwarf_Attribute *result)
 {
   if (attr == NULL)
     return -1;

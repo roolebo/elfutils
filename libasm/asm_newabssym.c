@@ -52,13 +52,8 @@ static const AsmScn_t __libasm_abs_scn =
 
 
 AsmSym_t *
-asm_newabssym (ctx, name, size, value, type, binding)
-     AsmCtx_t *ctx;
-     const char *name;
-     GElf_Xword size;
-     GElf_Addr value;
-     int type;
-     int binding;
+asm_newabssym (AsmCtx_t *ctx, const char *name, GElf_Xword size,
+	       GElf_Addr value, int type, int binding)
 {
   AsmSym_t *result;
 

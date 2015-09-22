@@ -36,11 +36,7 @@
 
 
 const char *
-ebl_reloc_type_name (ebl, reloc, buf, len)
-     Ebl *ebl;
-     int reloc;
-     char *buf;
-     size_t len;
+ebl_reloc_type_name (Ebl *ebl, int reloc, char *buf, size_t len)
 {
   const char *res;
 

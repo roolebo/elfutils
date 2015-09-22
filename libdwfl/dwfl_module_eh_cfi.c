@@ -30,9 +30,7 @@
 #include "../libdw/cfi.h"
 
 Dwarf_CFI *
-dwfl_module_eh_cfi (mod, bias)
-     Dwfl_Module *mod;
-     Dwarf_Addr *bias;
+dwfl_module_eh_cfi (Dwfl_Module *mod, Dwarf_Addr *bias)
 {
   if (mod == NULL)
     return NULL;

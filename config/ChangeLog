@@ -1,3 +1,7 @@
+2015-09-22  Mark Wielaard  <mjw@redhat.com>
+
+	* eu.am (AM_CFLAGS): Add -Wold-style-definition -Wstrict-prototypes.
+
 2015-08-04  Mark Wielaard  <mjw@redhat.com>
 
 	* 10-default-yama-scope.conf: New file.

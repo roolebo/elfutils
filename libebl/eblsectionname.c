@@ -36,14 +36,8 @@
 
 
 const char *
-ebl_section_name (ebl, section, xsection, buf, len, scnnames, shnum)
-     Ebl *ebl;
-     int section;
-     int xsection;
-     char *buf;
-     size_t len;
-     const char *scnnames[];
-     size_t shnum;
+ebl_section_name (Ebl *ebl, int section, int xsection, char *buf, size_t len,
+		  const char *scnnames[], size_t shnum)
 {
   const char *res = ebl != NULL ? ebl->section_name (section, xsection,
 						     buf, len) : NULL;

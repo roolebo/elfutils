@@ -34,9 +34,7 @@
 
 
 bool
-ebl_machine_section_flag_check (ebl, flags)
-     Ebl *ebl;
-     GElf_Xword flags;
+ebl_machine_section_flag_check (Ebl *ebl, GElf_Xword flags)
 {
   return ebl != NULL ? ebl->machine_section_flag_check (flags) : (flags == 0);
 }

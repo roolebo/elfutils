@@ -35,8 +35,7 @@
 #include <dwarf.h>
 
 Dwarf_CFI *
-dwarf_getcfi (dbg)
-     Dwarf *dbg;
+dwarf_getcfi (Dwarf *dbg)
 {
   if (dbg == NULL)
     return NULL;

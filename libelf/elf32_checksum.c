@@ -1,5 +1,5 @@
 /* Compute simple checksum from permanent parts of the ELF file.
-   Copyright (C) 2002, 2003, 2004, 2005, 2009 Red Hat, Inc.
+   Copyright (C) 2002, 2003, 2004, 2005, 2009, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -51,8 +51,7 @@
 
 
 long int
-elfw2(LIBELFBITS,checksum) (elf)
-     Elf *elf;
+elfw2(LIBELFBITS,checksum) (Elf *elf)
 {
   size_t shstrndx;
   Elf_Scn *scn;

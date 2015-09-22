@@ -1,5 +1,5 @@
 /* Create descriptor for memory region.
-   Copyright (C) 1999, 2000, 2002 Red Hat, Inc.
+   Copyright (C) 1999, 2000, 2002, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1999.
 
@@ -38,9 +38,7 @@
 
 
 Elf *
-elf_memory (image, size)
-     char *image;
-     size_t size;
+elf_memory (char *image, size_t size)
 {
   if (image == NULL)
     {

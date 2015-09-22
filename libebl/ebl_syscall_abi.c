@@ -34,12 +34,7 @@
 
 
 int
-ebl_syscall_abi (ebl, sp, pc, callno, args)
-     Ebl *ebl;
-     int *sp;
-     int *pc;
-     int *callno;
-     int args[6];
+ebl_syscall_abi (Ebl *ebl, int *sp, int *pc, int *callno, int *args)
 {
   return ebl != NULL ? ebl->syscall_abi (ebl, sp, pc, callno, args) : -1;
 }

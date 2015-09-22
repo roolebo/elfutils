@@ -36,11 +36,7 @@
 
 
 const char *
-ebl_symbol_binding_name (ebl, binding, buf, len)
-     Ebl *ebl;
-     int binding;
-     char *buf;
-     size_t len;
+ebl_symbol_binding_name (Ebl *ebl, int binding, char *buf, size_t len)
 {
   const char *res;
 

@@ -35,9 +35,7 @@
 
 
 int
-dwarf_entry_breakpoints (die, bkpts)
-     Dwarf_Die *die;
-     Dwarf_Addr **bkpts;
+dwarf_entry_breakpoints (Dwarf_Die *die, Dwarf_Addr **bkpts)
 {
   int nbkpts = 0;
   *bkpts = NULL;

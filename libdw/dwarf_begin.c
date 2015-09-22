@@ -39,9 +39,7 @@
 
 
 Dwarf *
-dwarf_begin (fd, cmd)
-     int fd;
-     Dwarf_Cmd cmd;
+dwarf_begin (int fd, Dwarf_Cmd cmd)
 {
   Elf *elf;
   Elf_Cmd elfcmd;

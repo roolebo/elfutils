@@ -1,5 +1,5 @@
 /* Get next section.
-   Copyright (C) 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -39,9 +39,7 @@
 
 
 Elf_Scn *
-elf_nextscn (elf, scn)
-     Elf *elf;
-     Elf_Scn *scn;
+elf_nextscn (Elf *elf, Elf_Scn *scn)
 {
   Elf_Scn *result = NULL;
 

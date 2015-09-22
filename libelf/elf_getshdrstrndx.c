@@ -1,5 +1,5 @@
 /* Return section index of section header string table.
-   Copyright (C) 2002, 2005, 2009, 2014 Red Hat, Inc.
+   Copyright (C) 2002, 2005, 2009, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -43,9 +43,7 @@
 
 
 int
-elf_getshdrstrndx (elf, dst)
-     Elf *elf;
-     size_t *dst;
+elf_getshdrstrndx (Elf *elf, size_t *dst)
 {
   int result = 0;
 

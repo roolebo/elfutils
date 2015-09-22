@@ -1,5 +1,5 @@
 /* Return offset in archive for current file ELF.
-   Copyright (C) 2005, 2008 Red Hat, Inc.
+   Copyright (C) 2005, 2008, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -39,8 +39,7 @@
 
 
 off_t
-elf_getaroff (elf)
-     Elf *elf;
+elf_getaroff (Elf *elf)
 {
   /* Be gratious, the specs demand it.  */
   if (elf == NULL || elf->parent == NULL)

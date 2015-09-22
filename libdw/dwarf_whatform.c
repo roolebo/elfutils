@@ -36,8 +36,7 @@
 
 
 unsigned int
-dwarf_whatform (attr)
-     Dwarf_Attribute *attr;
+dwarf_whatform (Dwarf_Attribute *attr)
 {
   return attr == NULL ? 0 : attr->form;
 }

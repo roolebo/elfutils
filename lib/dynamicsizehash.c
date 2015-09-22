@@ -44,10 +44,7 @@
 
 
 static size_t
-lookup (htab, hval, val)
-     NAME *htab;
-     HASHTYPE hval;
-     TYPE val __attribute__ ((unused));
+lookup (NAME *htab, HASHTYPE hval, TYPE val __attribute__ ((unused)))
 {
   /* First hash function: simply take the modul but prevent zero.  Small values
      can skip the division, which helps performance when this is common.  */
@@ -176,9 +173,7 @@ int
 #define INIT(name) _INIT (name)
 #define _INIT(name) \
   name##_init
-INIT(NAME) (htab, init_size)
-     NAME *htab;
-     size_t init_size;
+INIT(NAME) (NAME *htab, size_t init_size)
 {
   /* We need the size to be a prime.  */
   init_size = next_prime (init_size);
@@ -201,8 +196,7 @@ int
 #define FREE(name) _FREE (name)
 #define _FREE(name) \
   name##_free
-FREE(NAME) (htab)
-     NAME *htab;
+FREE(NAME) (NAME *htab)
 {
   free (htab->table);
   return 0;
@@ -213,10 +207,7 @@ int
 #define INSERT(name) _INSERT (name)
 #define _INSERT(name) \
   name##_insert
-INSERT(NAME) (htab, hval, data)
-     NAME *htab;
-     HASHTYPE hval;
-     TYPE data;
+INSERT(NAME) (NAME *htab, HASHTYPE hval, TYPE data)
 {
   size_t idx;
 
@@ -240,10 +231,7 @@ int
 #define INSERT(name) _INSERT (name)
 #define _INSERT(name) \
   name##_overwrite
-INSERT(NAME) (htab, hval, data)
-     NAME *htab;
-     HASHTYPE hval;
-     TYPE data;
+INSERT(NAME) (NAME *htab, HASHTYPE hval, TYPE data)
 {
   size_t idx;
 
@@ -263,10 +251,7 @@ TYPE
 #define FIND(name) _FIND (name)
 #define _FIND(name) \
   name##_find
-FIND(NAME) (htab, hval, val)
-     NAME *htab;
-     HASHTYPE hval;
-     TYPE val;
+FIND(NAME) (NAME *htab, HASHTYPE hval, TYPE val)
 {
   size_t idx;
 
@@ -287,9 +272,7 @@ FIND(NAME) (htab, hval, val)
 # define _ITERATEFCT(name) \
   name##_iterate
 TYPE
-ITERATEFCT(NAME) (htab, ptr)
-     NAME *htab;
-     void **ptr;
+ITERATEFCT(NAME) (NAME *htab, void **ptr)
 {
   void *p = *ptr;
 

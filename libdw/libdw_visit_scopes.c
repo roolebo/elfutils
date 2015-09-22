@@ -65,13 +65,15 @@ may_have_scopes (Dwarf_Die *die)
 }
 
 int
-__libdw_visit_scopes (depth, root, imports, previsit, postvisit, arg)
-     unsigned int depth;
-     struct Dwarf_Die_Chain *root;
-     struct Dwarf_Die_Chain *imports;
-     int (*previsit) (unsigned int depth, struct Dwarf_Die_Chain *, void *);
-     int (*postvisit) (unsigned int depth, struct Dwarf_Die_Chain *, void *);
-     void *arg;
+__libdw_visit_scopes (unsigned int depth, struct Dwarf_Die_Chain *root,
+		      struct Dwarf_Die_Chain *imports,
+		      int (*previsit) (unsigned int,
+				       struct Dwarf_Die_Chain *,
+				       void *),
+		      int (*postvisit) (unsigned int,
+					struct Dwarf_Die_Chain *,
+					void *),
+		      void *arg)
 {
   struct Dwarf_Die_Chain child;
   int ret;
@@ -97,8 +99,8 @@ __libdw_visit_scopes (depth, root, imports, previsit, postvisit, arg)
     return false;
   }
 
-  inline int walk_children ()
-  {
+  inline int walk_children (void)
+{
     do
       {
 	/* For an imported unit, it is logically as if the children of

@@ -41,12 +41,8 @@
 
 
 AsmSym_t *
-asm_newsym (asmscn, name, size, type, binding)
-     AsmScn_t *asmscn;
-     const char *name;
-     GElf_Xword size;
-     int type;
-     int binding;
+asm_newsym (AsmScn_t *asmscn, const char *name, GElf_Xword size,
+	    int type, int binding)
 {
 #define TEMPSYMLEN 10
   char tempsym[TEMPSYMLEN];

@@ -37,12 +37,8 @@
 
 Dwarf_Abbrev *
 internal_function
-__libdw_getabbrev (dbg, cu, offset, lengthp, result)
-     Dwarf *dbg;
-     struct Dwarf_CU *cu;
-     Dwarf_Off offset;
-     size_t *lengthp;
-     Dwarf_Abbrev *result;
+__libdw_getabbrev (Dwarf *dbg, struct Dwarf_CU *cu, Dwarf_Off offset,
+		   size_t *lengthp, Dwarf_Abbrev *result)
 {
   /* Don't fail if there is not .debug_abbrev section.  */
   if (dbg->sectiondata[IDX_debug_abbrev] == NULL)
@@ -154,10 +150,7 @@ __libdw_getabbrev (dbg, cu, offset, lengthp, result)
 
 
 Dwarf_Abbrev *
-dwarf_getabbrev (die, offset, lengthp)
-     Dwarf_Die *die;
-     Dwarf_Off offset;
-     size_t *lengthp;
+dwarf_getabbrev (Dwarf_Die *die, Dwarf_Off offset, size_t *lengthp)
 {
   return __libdw_getabbrev (die->cu->dbg, die->cu,
 			    die->cu->orig_abbrev_offset + offset, lengthp,

@@ -1,3 +1,7 @@
+2015-09-22  Mark Wielaard  <mjw@redhat.com>
+
+	* *.c: Remove old-style function definitions.
+
 2015-09-15  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_peel_type.c (dwarf_peel_type): Don't reassign result pointer.

@@ -37,11 +37,7 @@
 
 
 const char *
-ebl_machine_flag_name (ebl, flags, buf, len)
-     Ebl *ebl;
-     Elf64_Word flags;
-     char *buf;
-     size_t len;
+ebl_machine_flag_name (Ebl *ebl, Elf64_Word flags, char *buf, size_t len)
 {
   const char *res;
 

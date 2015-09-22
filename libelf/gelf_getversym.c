@@ -1,5 +1,5 @@
 /* Get symbol version information at the given index.
-   Copyright (C) 1999, 2000, 2001, 2002, 2005, 2009, 2014 Red Hat, Inc.
+   Copyright (C) 1999, 2000, 2001, 2002, 2005, 2009, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1999.
 
@@ -39,10 +39,7 @@
 
 
 GElf_Versym *
-gelf_getversym (data, ndx, dst)
-     Elf_Data *data;
-     int ndx;
-     GElf_Versym *dst;
+gelf_getversym (Elf_Data *data, int ndx, GElf_Versym *dst)
 {
   Elf_Data_Scn *data_scn = (Elf_Data_Scn *) data;
   Elf_Scn *scn;

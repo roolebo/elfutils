@@ -1,5 +1,5 @@
 /* Return number of program headers in the ELF file.
-   Copyright (C) 2010, 2014 Red Hat, Inc.
+   Copyright (C) 2010, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -38,9 +38,7 @@
 
 
 int
-__elf_getphdrnum_rdlock (elf, dst)
-     Elf *elf;
-     size_t *dst;
+__elf_getphdrnum_rdlock (Elf *elf, size_t *dst)
 {
  if (unlikely (elf->state.elf64.ehdr == NULL))
    {
@@ -80,9 +78,7 @@ __elf_getphdrnum_rdlock (elf, dst)
 }
 
 int
-__elf_getphdrnum_chk_rdlock (elf, dst)
-     Elf *elf;
-     size_t *dst;
+__elf_getphdrnum_chk_rdlock (Elf *elf, size_t *dst)
 {
   int result = __elf_getphdrnum_rdlock (elf, dst);
 
@@ -119,9 +115,7 @@ __elf_getphdrnum_chk_rdlock (elf, dst)
 }
 
 int
-elf_getphdrnum (elf, dst)
-     Elf *elf;
-     size_t *dst;
+elf_getphdrnum (Elf *elf, size_t *dst)
 {
   int result;
 

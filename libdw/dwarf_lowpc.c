@@ -36,9 +36,7 @@
 
 
 int
-dwarf_lowpc (die, return_addr)
-     Dwarf_Die *die;
-     Dwarf_Addr *return_addr;
+dwarf_lowpc (Dwarf_Die *die, Dwarf_Addr *return_addr)
 {
   Dwarf_Attribute attr_mem;
 

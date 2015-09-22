@@ -94,9 +94,7 @@ __libdw_formptr (Dwarf_Attribute *attr, int sec_index,
 }
 
 int
-dwarf_formudata (attr, return_uval)
-     Dwarf_Attribute *attr;
-     Dwarf_Word *return_uval;
+dwarf_formudata (Dwarf_Attribute *attr, Dwarf_Word *return_uval)
 {
   if (attr == NULL)
     return -1;

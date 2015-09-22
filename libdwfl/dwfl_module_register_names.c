@@ -30,12 +30,11 @@
 
 
 int
-dwfl_module_register_names (mod, func, arg)
-     Dwfl_Module *mod;
-     int (*func) (void *, int regno, const char *setname,
-		  const char *prefix, const char *regname,
-		  int bits, int type);
-     void *arg;
+dwfl_module_register_names (Dwfl_Module *mod,
+			    int (*func) (void *, int, const char *,
+					 const char *, const char *,
+					 int, int),
+			    void *arg)
 {
   if (unlikely (mod == NULL))
     return -1;

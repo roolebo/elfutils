@@ -35,8 +35,7 @@
 
 
 bool
-ebl_bss_plt_p (ebl)
-     Ebl *ebl;
+ebl_bss_plt_p (Ebl *ebl)
 {
   return ebl == NULL ? false : ebl->bss_plt_p (ebl->elf);
 }

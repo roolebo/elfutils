@@ -311,8 +311,7 @@ getcfi_shdr (Elf *elf, const GElf_Ehdr *ehdr)
 }
 
 Dwarf_CFI *
-dwarf_getcfi_elf (elf)
-     Elf *elf;
+dwarf_getcfi_elf (Elf *elf)
 {
   if (elf_kind (elf) != ELF_K_ELF)
     {

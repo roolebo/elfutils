@@ -34,10 +34,7 @@
 
 
 int
-dwarf_getsrcdirs (files, result, ndirs)
-     Dwarf_Files *files;
-     const char *const **result;
-     size_t *ndirs;
+dwarf_getsrcdirs (Dwarf_Files *files, const char *const **result, size_t *ndirs)
 {
   if (files == NULL)
     return -1;

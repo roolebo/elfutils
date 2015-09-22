@@ -204,14 +204,10 @@ static const Ebl_Core_Item vmcoreinfo_items[] =
 #undef	FIELD
 
 int
-EBLHOOK(core_note) (nhdr, name, regs_offset, nregloc, reglocs, nitems, items)
-     const GElf_Nhdr *nhdr;
-     const char *name;
-     GElf_Word *regs_offset;
-     size_t *nregloc;
-     const Ebl_Register_Location **reglocs;
-     size_t *nitems;
-     const Ebl_Core_Item **items;
+EBLHOOK(core_note) (const GElf_Nhdr *nhdr, const char *name,
+		    GElf_Word *regs_offset, size_t *nregloc,
+		    const Ebl_Register_Location **reglocs,
+		    size_t *nitems, const Ebl_Core_Item **items)
 {
   switch (nhdr->n_namesz)
     {

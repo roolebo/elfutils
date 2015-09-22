@@ -52,11 +52,8 @@ static const AsmScn_t __libasm_com_scn =
 
 
 AsmSym_t *
-asm_newcomsym (ctx, name, size, align)
-     AsmCtx_t *ctx;
-     const char *name;
-     GElf_Xword size;
-     GElf_Addr align;
+asm_newcomsym (AsmCtx_t *ctx, const char *name, GElf_Xword size,
+	       GElf_Addr align)
 {
   AsmSym_t *result;
 

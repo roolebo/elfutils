@@ -36,8 +36,7 @@
 
 
 const char *
-dwarf_diename (die)
-     Dwarf_Die *die;
+dwarf_diename (Dwarf_Die *die)
 {
   Dwarf_Attribute attr_mem;
 

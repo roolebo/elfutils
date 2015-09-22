@@ -34,11 +34,8 @@
 
 
 bool
-ebl_check_special_section (ebl, ndx, shdr, sname)
-     Ebl *ebl;
-     int ndx;
-     const GElf_Shdr *shdr;
-     const char *sname;
+ebl_check_special_section (Ebl *ebl, int ndx, const GElf_Shdr *shdr,
+			   const char *sname)
 {
   return ebl != NULL && ebl->check_special_section (ebl, ndx, shdr, sname);
 }

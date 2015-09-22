@@ -71,20 +71,14 @@ __libdw_offdie (Dwarf *dbg, Dwarf_Off offset, Dwarf_Die *result,
 
 
 Dwarf_Die *
-dwarf_offdie (dbg, offset, result)
-     Dwarf *dbg;
-     Dwarf_Off offset;
-     Dwarf_Die *result;
+dwarf_offdie (Dwarf *dbg, Dwarf_Off offset, Dwarf_Die *result)
 {
   return __libdw_offdie (dbg, offset, result, false);
 }
 INTDEF(dwarf_offdie)
 
 Dwarf_Die *
-dwarf_offdie_types (dbg, offset, result)
-     Dwarf *dbg;
-     Dwarf_Off offset;
-     Dwarf_Die *result;
+dwarf_offdie_types (Dwarf *dbg, Dwarf_Off offset, Dwarf_Die *result)
 {
   return __libdw_offdie (dbg, offset, result, true);
 }

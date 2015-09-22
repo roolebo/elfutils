@@ -36,8 +36,7 @@
 
 
 const char *
-dwarf_formstring (attrp)
-     Dwarf_Attribute *attrp;
+dwarf_formstring (Dwarf_Attribute *attrp)
 {
   /* Ignore earlier errors.  */
   if (attrp == NULL)

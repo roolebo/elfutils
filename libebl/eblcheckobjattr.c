@@ -35,13 +35,9 @@
 
 
 bool
-ebl_check_object_attribute (ebl, vendor, tag, value, tag_name, value_name)
-     Ebl *ebl;
-     const char *vendor;
-     int tag;
-     uint64_t value;
-     const char **tag_name;
-     const char **value_name;
+ebl_check_object_attribute (Ebl *ebl, const char *vendor, int tag,
+			    uint64_t value, const char **tag_name,
+			    const char **value_name)
 {
   if (ebl->check_object_attribute (ebl, vendor, tag, value,
 				   tag_name, value_name))

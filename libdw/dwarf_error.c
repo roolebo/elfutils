@@ -100,8 +100,7 @@ static const char *errmsgs[] =
 
 
 void
-__libdw_seterrno (value)
-     int value;
+__libdw_seterrno (int value)
 {
   global_error = (value >= 0 && value < (int) nerrmsgs
 		  ? value : DWARF_E_UNKNOWN_ERROR);
@@ -109,8 +108,7 @@ __libdw_seterrno (value)
 
 
 const char *
-dwarf_errmsg (error)
-     int error;
+dwarf_errmsg (int error)
 {
   int last_error = global_error;
 

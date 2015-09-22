@@ -1,5 +1,5 @@
 /* Convenience functions for allocation.
-   Copyright (C) 2006 Red Hat, Inc.
+   Copyright (C) 2006, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -44,8 +44,7 @@
 
 /* Allocate N bytes of memory dynamically, with error checking.  */
 void *
-xmalloc (n)
-     size_t n;
+xmalloc (size_t n)
 {
   void *p;
 
@@ -58,8 +57,7 @@ xmalloc (n)
 
 /* Allocate memory for N elements of S bytes, with error checking.  */
 void *
-xcalloc (n, s)
-     size_t n, s;
+xcalloc (size_t n, size_t s)
 {
   void *p;
 
@@ -73,9 +71,7 @@ xcalloc (n, s)
 /* Change the size of an allocated block of memory P to N bytes,
    with error checking.  */
 void *
-xrealloc (p, n)
-     void *p;
-     size_t n;
+xrealloc (void *p, size_t n)
 {
   p = realloc (p, n);
   if (p == NULL)

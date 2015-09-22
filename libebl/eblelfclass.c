@@ -35,8 +35,7 @@
 
 
 int
-ebl_get_elfclass (ebl)
-     Ebl *ebl;
+ebl_get_elfclass (Ebl *ebl)
 {
   return ebl->class;
 }

@@ -38,12 +38,8 @@
 
 
 const char *
-ebl_object_note_type_name (ebl, name, type, buf, len)
-     Ebl *ebl;
-     const char *name;
-     uint32_t type;
-     char *buf;
-     size_t len;
+ebl_object_note_type_name (Ebl *ebl, const char *name, uint32_t type,
+			   char *buf, size_t len)
 {
   const char *res = ebl->object_note_type_name (name, type, buf, len);
 

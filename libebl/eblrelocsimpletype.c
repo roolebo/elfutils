@@ -34,9 +34,7 @@
 
 
 Elf_Type
-ebl_reloc_simple_type (ebl, reloc)
-     Ebl *ebl;
-     int reloc;
+ebl_reloc_simple_type (Ebl *ebl, int reloc)
 {
   return ebl != NULL ? ebl->reloc_simple_type (ebl, reloc) : ELF_T_NUM;
 }

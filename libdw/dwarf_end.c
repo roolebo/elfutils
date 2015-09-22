@@ -76,8 +76,7 @@ __libdw_free_zdata (Dwarf *dwarf)
 #endif
 
 int
-dwarf_end (dwarf)
-     Dwarf *dwarf;
+dwarf_end (Dwarf *dwarf)
 {
   if (dwarf != NULL)
     {

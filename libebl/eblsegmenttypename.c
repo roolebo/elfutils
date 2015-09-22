@@ -36,11 +36,7 @@
 
 
 const char *
-ebl_segment_type_name (ebl, segment, buf, len)
-     Ebl *ebl;
-     int segment;
-     char *buf;
-     size_t len;
+ebl_segment_type_name (Ebl *ebl, int segment, char *buf, size_t len)
 {
   const char *res;
 

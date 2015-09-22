@@ -35,10 +35,7 @@
 #include <stdlib.h>
 
 int
-dwarf_frame_cfa (fs, ops, nops)
-     Dwarf_Frame *fs;
-     Dwarf_Op **ops;
-     size_t *nops;
+dwarf_frame_cfa (Dwarf_Frame *fs, Dwarf_Op **ops, size_t *nops)
 {
   /* Maybe there was a previous error.  */
   if (fs == NULL)

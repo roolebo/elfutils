@@ -36,9 +36,7 @@
 
 
 bool
-ebl_gotpc_reloc_check (ebl, reloc)
-     Ebl *ebl;
-     int reloc;
+ebl_gotpc_reloc_check (Ebl *ebl, int reloc)
 {
   return ebl != NULL ? ebl->gotpc_reloc_check (ebl->elf, reloc) : false;
 }

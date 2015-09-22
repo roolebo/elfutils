@@ -1,5 +1,5 @@
 /* Return program header table entry.
-   Copyright (C) 1998-2010 Red Hat, Inc.
+   Copyright (C) 1998-2010, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -39,10 +39,7 @@
 
 
 GElf_Phdr *
-gelf_getphdr (elf, ndx, dst)
-     Elf *elf;
-     int ndx;
-     GElf_Phdr *dst;
+gelf_getphdr (Elf *elf, int ndx, GElf_Phdr *dst)
 {
   GElf_Phdr *result = NULL;
 

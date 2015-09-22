@@ -36,9 +36,7 @@
 
 
 int
-dwarf_peel_type (die, result)
-     Dwarf_Die *die;
-     Dwarf_Die *result;
+dwarf_peel_type (Dwarf_Die *die, Dwarf_Die *result)
 {
   int tag;
 

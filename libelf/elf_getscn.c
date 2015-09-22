@@ -1,5 +1,5 @@
 /* Get section at specific index.
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -39,9 +39,7 @@
 
 
 Elf_Scn *
-elf_getscn (elf, idx)
-     Elf *elf;
-     size_t idx;
+elf_getscn (Elf *elf, size_t idx)
 {
   if (elf == NULL)
     return NULL;

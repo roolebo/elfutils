@@ -36,9 +36,7 @@
 
 
 int
-dwarf_formaddr (attr, return_addr)
-     Dwarf_Attribute *attr;
-     Dwarf_Addr *return_addr;
+dwarf_formaddr (Dwarf_Attribute *attr, Dwarf_Addr *return_addr)
 {
   if (attr == NULL)
     return -1;

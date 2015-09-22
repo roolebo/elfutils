@@ -33,10 +33,7 @@
 #include "cfi.h"
 
 int
-dwarf_cfi_addrframe (cache, address, frame)
-     Dwarf_CFI *cache;
-     Dwarf_Addr address;
-     Dwarf_Frame **frame;
+dwarf_cfi_addrframe (Dwarf_CFI *cache, Dwarf_Addr address, Dwarf_Frame **frame)
 {
   /* Maybe there was a previous error.  */
   if (cache == NULL)

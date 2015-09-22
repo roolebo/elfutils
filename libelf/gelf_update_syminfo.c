@@ -1,5 +1,5 @@
 /* Update additional symbol information in symbol table at the given index.
-   Copyright (C) 2000, 2001, 2002, 2005, 2009, 2014 Red Hat, Inc.
+   Copyright (C) 2000, 2001, 2002, 2005, 2009, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -39,10 +39,7 @@
 
 
 int
-gelf_update_syminfo (data, ndx, src)
-     Elf_Data *data;
-     int ndx;
-     GElf_Syminfo *src;
+gelf_update_syminfo (Elf_Data *data, int ndx, GElf_Syminfo *src)
 {
   Elf_Data_Scn *data_scn = (Elf_Data_Scn *) data;
   Elf_Scn *scn;

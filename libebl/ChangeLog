@@ -1,3 +1,7 @@
+2015-09-22  Mark Wielaard  <mjw@redhat.com>
+
+	* *.c: Remove old-style function definitions.
+
 2015-09-09  Chih-Hung Hsieh  <chh@google.com>
 
 	* ebldwarftoregno.c (ebl_dwarf_to_regno): Remove redundant NULL tests

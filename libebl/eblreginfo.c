@@ -35,15 +35,9 @@
 
 
 ssize_t
-ebl_register_info (ebl, regno, name, namelen, prefix, setname, bits, type)
-     Ebl *ebl;
-     int regno;
-     char *name;
-     size_t namelen;
-     const char **prefix;
-     const char **setname;
-     int *bits;
-     int *type;
+ebl_register_info (Ebl *ebl, int regno, char *name, size_t namelen,
+		   const char **prefix, const char **setname,
+		   int *bits, int *type)
 {
   return ebl == NULL ? -1 : ebl->register_info (ebl, regno, name, namelen,
 						prefix, setname, bits, type);

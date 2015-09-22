@@ -38,9 +38,7 @@
 
 
 AsmScn_t *
-asm_newsubscn (asmscn, nr)
-     AsmScn_t *asmscn;
-     unsigned int nr;
+asm_newsubscn (AsmScn_t *asmscn, unsigned int nr)
 {
   AsmScn_t *runp;
   AsmScn_t *newp;

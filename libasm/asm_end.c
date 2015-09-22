@@ -498,8 +498,7 @@ binary_end (AsmCtx_t *ctx)
 
 
 int
-asm_end (ctx)
-     AsmCtx_t *ctx;
+asm_end (AsmCtx_t *ctx)
 {
   int result;
 
@@ -555,8 +554,7 @@ free_section (AsmScn_t *scnp)
 
 
 void
-__libasm_finictx (ctx)
-     AsmCtx_t *ctx;
+__libasm_finictx (AsmCtx_t *ctx)
 {
   /* Iterate through section table and free individual entries.  */
   AsmScn_t *scn = ctx->section_list;

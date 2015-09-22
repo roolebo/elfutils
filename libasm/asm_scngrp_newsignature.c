@@ -35,9 +35,7 @@
 
 
 int
-asm_scngrp_newsignature (grp, signature)
-     AsmScnGrp_t *grp;
-     AsmSym_t *signature;
+asm_scngrp_newsignature (AsmScnGrp_t *grp, AsmSym_t *signature)
 {
   if (grp == NULL || signature == NULL)
     return 1;

@@ -1,5 +1,5 @@
 /* Create new ELF header.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -38,9 +38,7 @@
 
 
 Elf_Scn *
-gelf_offscn (elf, offset)
-     Elf *elf;
-     GElf_Off offset;
+gelf_offscn (Elf *elf, GElf_Off offset)
 {
   if (elf->class == ELFCLASS32)
     {

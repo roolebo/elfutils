@@ -1,5 +1,5 @@
 /* Update library in table at the given index.
-   Copyright (C) 2004, 2005, 2009, 2014 Red Hat, Inc.
+   Copyright (C) 2004, 2005, 2009, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
@@ -39,10 +39,7 @@
 
 
 int
-gelf_update_lib (data, ndx, src)
-     Elf_Data *data;
-     int ndx;
-     GElf_Lib *src;
+gelf_update_lib (Elf_Data *data, int ndx, GElf_Lib *src)
 {
   if (data == NULL)
     return 0;

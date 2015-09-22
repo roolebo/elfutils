@@ -52,8 +52,7 @@ asm_errno (void)
 
 
 void
-__libasm_seterrno (value)
-     int value;
+__libasm_seterrno (int value)
 {
   global_error = value;
 }
@@ -75,8 +74,7 @@ static const char *msgs[ASM_E_NUM] =
 };
 
 const char *
-asm_errmsg (error)
-     int error;
+asm_errmsg (int error)
 {
   int last_error = global_error;
 

@@ -36,9 +36,7 @@
 
 
 int
-dwarf_highpc (die, return_addr)
-     Dwarf_Die *die;
-     Dwarf_Addr *return_addr;
+dwarf_highpc (Dwarf_Die *die, Dwarf_Addr *return_addr)
 {
   Dwarf_Attribute attr_high_mem;
   Dwarf_Attribute *attr_high = INTUSE(dwarf_attr) (die, DW_AT_high_pc,

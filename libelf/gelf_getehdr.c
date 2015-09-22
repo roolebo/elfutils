@@ -1,5 +1,5 @@
 /* Get ELF header.
-   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2005 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2005, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -40,9 +40,7 @@
 
 
 GElf_Ehdr *
-__gelf_getehdr_rdlock (elf, dest)
-     Elf *elf;
-     GElf_Ehdr *dest;
+__gelf_getehdr_rdlock (Elf *elf, GElf_Ehdr *dest)
 {
   GElf_Ehdr *result = NULL;
 
@@ -95,9 +93,7 @@ __gelf_getehdr_rdlock (elf, dest)
 }
 
 GElf_Ehdr *
-gelf_getehdr (elf, dest)
-     Elf *elf;
-     GElf_Ehdr *dest;
+gelf_getehdr (Elf *elf, GElf_Ehdr *dest)
 {
   GElf_Ehdr *result;
   if (elf == NULL)

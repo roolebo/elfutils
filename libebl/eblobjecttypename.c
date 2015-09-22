@@ -36,11 +36,7 @@
 
 
 const char *
-ebl_object_type_name (ebl, object, buf, len)
-     Ebl *ebl;
-     int object;
-     char *buf;
-     size_t len;
+ebl_object_type_name (Ebl *ebl, int object, char *buf, size_t len)
 {
   const char *res;
 

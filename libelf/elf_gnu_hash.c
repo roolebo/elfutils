@@ -1,5 +1,5 @@
 /* GNU-style Hash function used in ELF implementations.
-   Copyright (C) 2006 Red Hat, Inc.
+   Copyright (C) 2006, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2006.
 
@@ -37,8 +37,7 @@
 #include <dl-hash.h>
 
 unsigned long int
-elf_gnu_hash (string)
-     const char *string;
+elf_gnu_hash (const char *string)
 {
   uint_fast32_t h = 5381;
   for (unsigned char c = *string; c != '\0'; c = *++string)

@@ -35,9 +35,7 @@
 
 
 bool
-ebl_copy_reloc_p (ebl, reloc)
-     Ebl *ebl;
-     int reloc;
+ebl_copy_reloc_p (Ebl *ebl, int reloc)
 {
   return ebl->copy_reloc_p (reloc);
 }

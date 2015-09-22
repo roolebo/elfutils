@@ -1,3 +1,9 @@
+2015-09-22  Mark Wielaard  <mjw@redhat.com>
+
+	* arm_attrs.c: Remove old-style function definitions.
+	* linux-core-note.c: Likewise.
+	* ppc_attrs.c: Likewise.
+
 2015-09-04  Chih-Hung Hsieh  <chh@google.com>
 
 	* aarch64_init.c (aarch64_init): Replace K&R function definition

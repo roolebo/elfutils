@@ -511,11 +511,8 @@ dwarf_getmacros_off (Dwarf *dbg, Dwarf_Off macoff,
 }
 
 ptrdiff_t
-dwarf_getmacros (cudie, callback, arg, token)
-     Dwarf_Die *cudie;
-     int (*callback) (Dwarf_Macro *, void *);
-     void *arg;
-     ptrdiff_t token;
+dwarf_getmacros (Dwarf_Die *cudie, int (*callback) (Dwarf_Macro *, void *),
+		 void *arg, ptrdiff_t token)
 {
   if (cudie == NULL)
     {

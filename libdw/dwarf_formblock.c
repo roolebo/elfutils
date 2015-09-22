@@ -36,9 +36,7 @@
 
 
 int
-dwarf_formblock (attr, return_block)
-     Dwarf_Attribute *attr;
-     Dwarf_Block *return_block;
+dwarf_formblock (Dwarf_Attribute *attr, Dwarf_Block *return_block)
 {
   if (attr == NULL)
     return -1;

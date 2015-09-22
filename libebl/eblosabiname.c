@@ -36,11 +36,7 @@
 
 
 const char *
-ebl_osabi_name (ebl, osabi, buf, len)
-     Ebl *ebl;
-     int osabi;
-     char *buf;
-     size_t len;
+ebl_osabi_name (Ebl *ebl, int osabi, char *buf, size_t len)
 {
   const char *res = ebl != NULL ? ebl->osabi_name (osabi, buf, len) : NULL;
 

@@ -53,10 +53,7 @@ attr_form_cu (Dwarf_Attribute *attr)
 }
 
 int
-dwarf_getlocation_attr (attr, op, result)
-     Dwarf_Attribute *attr;
-     const Dwarf_Op *op;
-     Dwarf_Attribute *result;
+dwarf_getlocation_attr (Dwarf_Attribute *attr, const Dwarf_Op *op, Dwarf_Attribute *result)
 {
   if (attr == NULL)
     return -1;

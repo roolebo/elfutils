@@ -38,9 +38,7 @@
 
 
 int
-asm_addsleb128 (asmscn, num)
-     AsmScn_t *asmscn;
-     int32_t num;
+asm_addsleb128 (AsmScn_t *asmscn, int32_t num)
 {
   if (asmscn == NULL)
     return -1;

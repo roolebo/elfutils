@@ -1,5 +1,5 @@
 /* Convert from memory to file representation.  Generic ELF version.
-   Copyright (C) 2000, 2002 Red Hat, Inc.
+   Copyright (C) 2000, 2002, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -38,11 +38,8 @@
 
 
 Elf_Data *
-gelf_xlatetof (elf, dest, src, encode)
-     Elf *elf;
-     Elf_Data *dest;
-     const Elf_Data * src;
-     unsigned int encode;
+gelf_xlatetof (Elf *elf, Elf_Data *dest, const Elf_Data * src,
+	       unsigned int encode)
 {
   if (elf == NULL)
     return NULL;

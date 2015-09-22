@@ -37,13 +37,9 @@
 #include "libebl_CPU.h"
 
 bool
-ppc_check_object_attribute (ebl, vendor, tag, value, tag_name, value_name)
-     Ebl *ebl __attribute__ ((unused));
-     const char *vendor;
-     int tag;
-     uint64_t value;
-     const char **tag_name;
-     const char **value_name;
+ppc_check_object_attribute (Ebl *ebl __attribute__ ((unused)),
+			    const char *vendor, int tag, uint64_t value,
+			    const char **tag_name, const char **value_name)
 {
   if (!strcmp (vendor, "gnu"))
     switch (tag)

@@ -34,10 +34,8 @@
 #include <libdwP.h>
 
 int
-dwarf_getlocation_die (attr, op, result)
-     Dwarf_Attribute *attr;
-     const Dwarf_Op *op;
-     Dwarf_Die *result;
+dwarf_getlocation_die (Dwarf_Attribute *attr, const Dwarf_Op *op,
+		       Dwarf_Die *result)
 {
   if (attr == NULL)
     return -1;

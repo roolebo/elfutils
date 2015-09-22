@@ -36,8 +36,7 @@
 
 
 int
-dwarf_srclang (die)
-     Dwarf_Die *die;
+dwarf_srclang (Dwarf_Die *die)
 {
   Dwarf_Attribute attr_mem;
   Dwarf_Word value;

@@ -1,5 +1,5 @@
 /* Get ELF header.
-   Copyright (C) 1998, 1999, 2000, 2002 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -42,9 +42,7 @@
 
 
 static ElfW2(LIBELFBITS,Ehdr) *
-getehdr_impl (elf, wrlock)
-     Elf *elf;
-     int wrlock;
+getehdr_impl (Elf *elf, int wrlock)
 {
   if (elf == NULL)
     return NULL;
@@ -77,15 +75,13 @@ getehdr_impl (elf, wrlock)
 }
 
 ElfW2(LIBELFBITS,Ehdr) *
-__elfw2(LIBELFBITS,getehdr_wrlock) (elf)
-     Elf *elf;
+__elfw2(LIBELFBITS,getehdr_wrlock) (Elf *elf)
 {
   return getehdr_impl (elf, 1);
 }
 
 ElfW2(LIBELFBITS,Ehdr) *
-elfw2(LIBELFBITS,getehdr) (elf)
-     Elf *elf;
+elfw2(LIBELFBITS,getehdr) (Elf *elf)
 {
   ElfW2(LIBELFBITS,Ehdr) *result;
   if (elf == NULL)

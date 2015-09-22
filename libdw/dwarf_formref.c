@@ -35,9 +35,7 @@
 #include "libdwP.h"
 
 int
-__libdw_formref (attr, return_offset)
-     Dwarf_Attribute *attr;
-     Dwarf_Off *return_offset;
+__libdw_formref (Dwarf_Attribute *attr, Dwarf_Off *return_offset)
 {
   const unsigned char *datap = attr->valp;
   const unsigned char *endp = attr->cu->endp;
@@ -102,9 +100,7 @@ __libdw_formref (attr, return_offset)
 /* This is the old public entry point.
    It is now deprecated in favor of dwarf_formref_die.  */
 int
-dwarf_formref (attr, return_offset)
-     Dwarf_Attribute *attr;
-     Dwarf_Off *return_offset;
+dwarf_formref (Dwarf_Attribute *attr, Dwarf_Off *return_offset)
 {
   if (attr == NULL)
     return -1;

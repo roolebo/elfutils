@@ -1,5 +1,5 @@
 /* Manipulate ELF section header flags.
-   Copyright (C) 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright (C) 1999, 2000, 2001, 2002, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1999.
 
@@ -38,10 +38,7 @@
 
 
 unsigned int
-elf_flagshdr (scn, cmd, flags)
-     Elf_Scn *scn;
-     Elf_Cmd cmd;
-     unsigned int flags;
+elf_flagshdr (Elf_Scn *scn, Elf_Cmd cmd, unsigned int flags)
 {
   unsigned int result;
 

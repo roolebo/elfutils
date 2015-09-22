@@ -1,5 +1,5 @@
 /* Control an ELF file desrciptor.
-   Copyright (C) 1998, 1999, 2000, 2002 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -37,9 +37,7 @@
 
 
 int
-elf_cntl (elf, cmd)
-     Elf *elf;
-     Elf_Cmd cmd;
+elf_cntl (Elf *elf, Elf_Cmd cmd)
 {
   int result = 0;
 

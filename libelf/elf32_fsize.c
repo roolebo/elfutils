@@ -1,5 +1,5 @@
 /* Return the size of an object file type.
-   Copyright (C) 1998, 1999, 2000, 2002 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -40,10 +40,7 @@
 
 
 size_t
-elfw2(LIBELFBITS, fsize) (type, count, version)
-     Elf_Type type;
-     size_t count;
-     unsigned int version;
+elfw2(LIBELFBITS, fsize) (Elf_Type type, size_t count, unsigned int version)
 {
   /* We do not have differences between file and memory sizes.  Better
      not since otherwise `mmap' would not work.  */

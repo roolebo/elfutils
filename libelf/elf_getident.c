@@ -1,5 +1,5 @@
 /* Retrieve file identification data.
-   Copyright (C) 1998, 1999, 2000, 2002, 2004 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2004, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -37,9 +37,7 @@
 
 
 char *
-elf_getident (elf, ptr)
-     Elf *elf;
-     size_t *ptr;
+elf_getident (Elf *elf, size_t *ptr)
 {
   /* In case this is no ELF file, the handle is invalid and we return
      NULL.  */

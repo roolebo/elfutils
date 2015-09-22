@@ -1,5 +1,5 @@
 /* Return the size of an object file type.
-   Copyright (C) 1998-2010 Red Hat, Inc.
+   Copyright (C) 1998-2010, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -79,11 +79,7 @@ const size_t __libelf_type_sizes[EV_NUM - 1][ELFCLASSNUM - 1][ELF_T_NUM] =
 
 
 size_t
-gelf_fsize (elf, type, count, version)
-     Elf *elf;
-     Elf_Type type;
-     size_t count;
-     unsigned int version;
+gelf_fsize (Elf *elf, Elf_Type type, size_t count, unsigned int version)
 {
   /* We do not have differences between file and memory sizes.  Better
      not since otherwise `mmap' would not work.  */

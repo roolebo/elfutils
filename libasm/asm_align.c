@@ -132,6 +132,7 @@ asm_align (AsmScn_t *asmscn, GElf_Word value)
 /* Ensure there are at least LEN bytes available in the output buffer
    for ASMSCN.  */
 int
+internal_function
 __libasm_ensure_section_space (AsmScn_t *asmscn, size_t len)
 {
   /* The blocks with the section content are kept in a circular

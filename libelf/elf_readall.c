@@ -66,6 +66,7 @@ set_address (Elf *elf, size_t offset)
 
 
 char *
+internal_function
 __libelf_readall (Elf *elf)
 {
   /* Get the file.  */

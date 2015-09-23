@@ -38,6 +38,7 @@
 
 
 int
+internal_function
 __elf_getphdrnum_rdlock (Elf *elf, size_t *dst)
 {
  if (unlikely (elf->state.elf64.ehdr == NULL))
@@ -78,6 +79,7 @@ __elf_getphdrnum_rdlock (Elf *elf, size_t *dst)
 }
 
 int
+internal_function
 __elf_getphdrnum_chk_rdlock (Elf *elf, size_t *dst)
 {
   int result = __elf_getphdrnum_rdlock (elf, dst);

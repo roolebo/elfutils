@@ -100,6 +100,7 @@ static const char *errmsgs[] =
 
 
 void
+internal_function
 __libdw_seterrno (int value)
 {
   global_error = (value >= 0 && value < (int) nerrmsgs

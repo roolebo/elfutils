@@ -40,6 +40,7 @@
 
 
 GElf_Ehdr *
+internal_function
 __gelf_getehdr_rdlock (Elf *elf, GElf_Ehdr *dest)
 {
   GElf_Ehdr *result = NULL;

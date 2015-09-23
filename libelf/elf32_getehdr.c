@@ -75,6 +75,7 @@ getehdr_impl (Elf *elf, int wrlock)
 }
 
 ElfW2(LIBELFBITS,Ehdr) *
+internal_function
 __elfw2(LIBELFBITS,getehdr_wrlock) (Elf *elf)
 {
   return getehdr_impl (elf, 1);

@@ -1,3 +1,10 @@
+2015-09-23  Mark Wielaard  <mjw@redhat.com>
+
+	* asm_align.c (__libasm_ensure_section_space): Mark as
+	internal_function.
+	* asm_end.c (__libasm_finictx): Likewise.
+	* asm_error.c (__libasm_seterrno): Likewise.
+
 2015-09-22  Mark Wielaard  <mjw@redhat.com>
 
 	* asm_*.c: Remove old-style function definitions.

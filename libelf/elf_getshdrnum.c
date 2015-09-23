@@ -39,6 +39,7 @@
 
 
 int
+internal_function
 __elf_getshdrnum_rdlock (Elf *elf, size_t *dst)
 {
   int result = 0;

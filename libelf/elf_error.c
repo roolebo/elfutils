@@ -283,6 +283,7 @@ static const uint_fast16_t msgidx[ELF_E_NUM] =
 
 
 void
+internal_function
 __libelf_seterrno (int value)
 {
   global_error = value >= 0 && value < nmsgidx ? value : ELF_E_UNKNOWN_ERROR;

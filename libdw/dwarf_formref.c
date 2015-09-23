@@ -35,6 +35,7 @@
 #include "libdwP.h"
 
 int
+internal_function
 __libdw_formref (Dwarf_Attribute *attr, Dwarf_Off *return_offset)
 {
   const unsigned char *datap = attr->valp;

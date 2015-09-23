@@ -133,6 +133,7 @@ __libdw_intern_next_unit (Dwarf *dbg, bool debug_types)
 }
 
 struct Dwarf_CU *
+internal_function
 __libdw_findcu (Dwarf *dbg, Dwarf_Off start, bool debug_types)
 {
   void **tree = debug_types ? &dbg->tu_tree : &dbg->cu_tree;

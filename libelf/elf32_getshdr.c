@@ -243,6 +243,7 @@ scn_valid (Elf_Scn *scn)
 }
 
 ElfW2(LIBELFBITS,Shdr) *
+internal_function
 __elfw2(LIBELFBITS,getshdr_rdlock) (Elf_Scn *scn)
 {
   ElfW2(LIBELFBITS,Shdr) *result;
@@ -264,6 +265,7 @@ __elfw2(LIBELFBITS,getshdr_rdlock) (Elf_Scn *scn)
 }
 
 ElfW2(LIBELFBITS,Shdr) *
+internal_function
 __elfw2(LIBELFBITS,getshdr_wrlock) (Elf_Scn *scn)
 {
   ElfW2(LIBELFBITS,Shdr) *result;

@@ -1,3 +1,17 @@
+2015-09-23  Mark Wielaard  <mjw@redhat.com>
+
+	* elf32_getehdr.c (getehdr_wrlock): Mark as internal_function.
+	* elf32_getshdr.c (getshdr_rdlock): Likewise.
+	(getshdr_wrlock): Likewise.
+	* elf_error.c (__libelf_seterrno): Likewise.
+	* elf_getphdrnum.c (__elf_getphdrnum_rdlock): Likewise.
+	(__elf_getphdrnum_chk_rdlock): Likewise.
+	* elf_getshdrnum.c (__elf_getphdrnum_rdlock): Likewise.
+	(__elf_getphdrnum_chk_rdlock): Likewise.
+	* elf_getshdrnum.c (__elf_getshdrnum_rdlock): Likewise.
+	* elf_readall.c (__libelf_readall): Likewise.
+	* gelf_getehdr.c (__gelf_getehdr_rdlock): Likewise.
+
 2015-09-22  Mark Wielaard  <mjw@redhat.com>
 
 	* *.c: Remove old-style function definitions.

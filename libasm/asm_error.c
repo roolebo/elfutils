@@ -52,6 +52,7 @@ asm_errno (void)
 
 
 void
+internal_function
 __libasm_seterrno (int value)
 {
   global_error = value;

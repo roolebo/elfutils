@@ -554,6 +554,7 @@ free_section (AsmScn_t *scnp)
 
 
 void
+internal_function
 __libasm_finictx (AsmCtx_t *ctx)
 {
   /* Iterate through section table and free individual entries.  */

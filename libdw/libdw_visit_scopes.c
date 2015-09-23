@@ -65,6 +65,7 @@ may_have_scopes (Dwarf_Die *die)
 }
 
 int
+internal_function
 __libdw_visit_scopes (unsigned int depth, struct Dwarf_Die_Chain *root,
 		      struct Dwarf_Die_Chain *imports,
 		      int (*previsit) (unsigned int,

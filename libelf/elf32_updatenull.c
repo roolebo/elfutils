@@ -84,8 +84,12 @@ ELFW(default_ehdr,LIBELFBITS) (Elf *elf, ElfW2(LIBELFBITS,Ehdr) *ehdr,
   update_if_changed (ehdr->e_ident[EI_VERSION], EV_CURRENT,
 		     elf->state.ELFW(elf,LIBELFBITS).ehdr_flags);
 
-  if (unlikely (ehdr->e_version == EV_NONE)
-      || unlikely (ehdr->e_version >= EV_NUM))
+  if (unlikely (ehdr->e_version == EV_NONE))
+    {
+      ehdr->e_version = EV_CURRENT;
+      elf->state.ELFW(elf,LIBELFBITS).ehdr_flags |= ELF_F_DIRTY;
+    }
+  else if (unlikely (ehdr->e_version >= EV_NUM))
     {
       __libelf_seterrno (ELF_E_UNKNOWN_VERSION);
       return 1;
@@ -394,6 +398,8 @@ __elfw2(LIBELFBITS,updatenull_wrlock) (Elf *elf, int *change_bop, size_t shnum)
       while ((list = list->next) != NULL);
 
       /* Store section information.  */
+      update_if_changed (ehdr->e_shentsize,
+			 elf_typesize (LIBELFBITS, ELF_T_SHDR, 1), ehdr_flags);
       if (elf->flags & ELF_F_LAYOUT)
 	{
 	  /* The user is supposed to fill out e_shoff.  Use it and
@@ -414,9 +420,6 @@ __elfw2(LIBELFBITS,updatenull_wrlock) (Elf *elf, int *change_bop, size_t shnum)
 	  size = (size + SHDR_ALIGN - 1) & ~(SHDR_ALIGN - 1);
 
 	  update_if_changed (ehdr->e_shoff, (GElf_Word) size, elf->flags);
-	  update_if_changed (ehdr->e_shentsize,
-			     elf_typesize (LIBELFBITS, ELF_T_SHDR, 1),
-			     ehdr_flags);
 
 	  /* Account for the section header size.  */
 	  size += elf_typesize (LIBELFBITS, ELF_T_SHDR, shnum);

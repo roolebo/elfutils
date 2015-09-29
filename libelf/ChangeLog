@@ -1,3 +1,8 @@
+2015-09-29  Mark Wielaard  <mjw@redhat.com>
+
+	* elf32_updatenull.c (default_ehdr): Set e_version when EV_NONE.
+	(updatenull_wrlock): Always set e_shentsize.
+
 2015-09-23  Mark Wielaard  <mjw@redhat.com>
 
 	* elf32_getehdr.c (getehdr_wrlock): Mark as internal_function.

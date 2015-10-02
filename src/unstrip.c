@@ -1526,7 +1526,7 @@ more sections in stripped file than debug file -- arguments reversed?"));
 
 	if (sec->shdr.sh_link != SHN_UNDEF)
 	  shdr_mem.sh_link = ndx_section[sec->shdr.sh_link - 1];
-	if (shdr_mem.sh_flags & SHF_INFO_LINK)
+	if (SH_INFO_LINK_P (&sec->shdr) && sec->shdr.sh_info != 0)
 	  shdr_mem.sh_info = ndx_section[sec->shdr.sh_info - 1];
 
 	if (strtab != NULL)

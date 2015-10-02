@@ -1,5 +1,10 @@
 2015-10-02  Mark Wielaard  <mjw@redhat.com>
 
+	* unstrip.c (copy_elided_sections): Use SH_INFO_LINK_P, not just
+	SHF_INFO_LINK.
+
+2015-10-02  Mark Wielaard  <mjw@redhat.com>
+
 	* strip.c (handle_elf): Don't move around allocated NOBITS sections.
 	Don't just mark the section header string table as unused.
 	* unstrip.c (copy_elided_sections): Add header names to strtab if

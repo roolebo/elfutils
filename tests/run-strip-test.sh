@@ -50,17 +50,11 @@ testrun ${abs_top_builddir}/src/elfcmp --hash-inexact $original testfile.unstrip
 }
 
 # Now strip in-place and make sure it is smaller.
-# Skip ET_REL files, they might have unexpected symbol table entries.
-is_ET_REL=0
-testrun ${abs_top_builddir}/src/readelf -h $original 2>&1 \
-  | fgrep 'REL (Relocatable file)' && is_ET_REL=1
-if test $is_ET_REL -eq 0; then
-  SIZE_original=$(stat -c%s $original)
-  testrun ${abs_top_builddir}/src/strip $original
-  SIZE_stripped=$(stat -c%s $original)
-  test $SIZE_stripped -lt $SIZE_original ||
-    { echo "*** failure in-place strip file not smaller $original"; status=1; }
-fi
+SIZE_original=$(stat -c%s $original)
+testrun ${abs_top_builddir}/src/strip $original
+SIZE_stripped=$(stat -c%s $original)
+test $SIZE_stripped -lt $SIZE_original ||
+  { echo "*** failure in-place strip file not smaller $original"; status=1; }
 
 tempfiles testfile.sections
 testrun ${abs_top_builddir}/src/readelf -S testfile.temp > testfile.sections || status=$?

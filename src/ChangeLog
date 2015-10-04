@@ -1,3 +1,8 @@
+2015-10-04  Mark Wielaard  <mjw@redhat.com>
+
+	* strip.c (handle_elf): Only sanity check section symbols to not
+	kept discarded sections if we are creating a debug file.
+
 2015-10-07  Mark Wielaard  <mjw@redhat.com>
 
 	* unstrip.c (MAX): Removed.

@@ -1379,9 +1379,11 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 			    shdr_info[cnt].shdr.sh_info = destidx - 1;
 			  }
 		      }
-		    else if (debug_fname == NULL
-			     || shdr_info[cnt].debug_data == NULL)
-		      /* This is a section or group signature symbol
+		    else if (debug_fname != NULL
+			     && shdr_info[cnt].debug_data == NULL)
+		      /* The symbol points to a section that is discarded
+			 but isn't preserved in the debug file. Check that
+			 this is a section or group signature symbol
 			 for a section which has been removed.  */
 		      {
 			size_t sidx = (sym->st_shndx != SHN_XINDEX

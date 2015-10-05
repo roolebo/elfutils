@@ -1,3 +1,7 @@
+2015-10-05  Josh Stone  <jistone@redhat.com>
+
+	* Makefile.am (backtrace-child-biarch): Add AM_V_CC silencer.
+
 2015-10-02  Mark Wielaard  <mjw@redhat.com>
 
 	* elfstrmerge.c: New check program.

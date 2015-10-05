@@ -100,11 +100,11 @@ endif
 
 libelf_so_SOURCES =
 libelf.so$(EXEEXT): libelf_pic.a libelf.map
-	$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
+	$(AM_V_CCLD)$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
 		-Wl,--version-script,$(srcdir)/libelf.map,--no-undefined \
 		-Wl,--soname,$@.$(VERSION),-z,defs,-z,relro $(libelf_so_LDLIBS)
 	@$(textrel_check)
-	ln -fs $@ $@.$(VERSION)
+	$(AM_V_at)ln -fs $@ $@.$(VERSION)
 
 install: install-am libelf.so
 	$(mkinstalldirs) $(DESTDIR)$(libdir)

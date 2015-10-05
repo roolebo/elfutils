@@ -63,7 +63,7 @@ endif
 
 # Substitute $(COMPILE).
 backtrace-child-biarch$(EXEEXT): backtrace-child.c
-	$(CC_BIARCH) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_V_CC)$(CC_BIARCH) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 		     $(AM_CPPFLAGS) $(CPPFLAGS) \
 		     $(AM_CFLAGS) $(CFLAGS) $(backtrace_child_CFLAGS) \
 		     $(AM_LDFLAGS) $(LDFLAGS) $(backtrace_child_LDFLAGS) \

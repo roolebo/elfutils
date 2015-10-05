@@ -1,3 +1,7 @@
+2015-10-05  Josh Stone  <jistone@redhat.com>
+
+	* Makefile.am (libasm.so): Add AM_V_CCLD and AM_V_at silencers.
+
 2015-09-23  Mark Wielaard  <mjw@redhat.com>
 
 	* asm_align.c (__libasm_ensure_section_space): Mark as

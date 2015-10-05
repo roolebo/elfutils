@@ -1,3 +1,9 @@
+2015-10-05  Josh Stone  <jistone@redhat.com>
+
+	* Makefile.am (libld_elf_i386.so): Add AM_V_CCLD silencer.
+	(.deps/none_ld.Po): Always silence the dummy command.
+	(make-debug-archive): Add AM_V_GEN and AM_V_at silencers.
+
 2015-10-02  Mark Wielaard  <mjw@redhat.com>
 
 	* unstrip.c (copy_elided_sections): Use SH_INFO_LINK_P, not just

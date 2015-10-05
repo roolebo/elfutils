@@ -1,3 +1,7 @@
+2015-10-05  Josh Stone  <jistone@redhat.com>
+
+	* Makefile.am (libelf.so): Add AM_V_CCLD and AM_V_at silencers.
+
 2015-09-24  Jose E. Marchesi  <jose.marchesi@oracle.com>
 
 	* Makefile.am (AM_CFLAGS): Use -fPIC instead of -fpic to avoid

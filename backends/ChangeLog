@@ -1,3 +1,7 @@
+2015-10-05  Josh Stone  <jistone@redhat.com>
+
+	* Makefile.am (libebl_%.so): Add AM_V_at and AM_V_CCLD silencers.
+
 2015-10-06  Jose E. Marchesi  <jose.marchesi@oracle.com>
 
 	* sparc_attrs.c: New file.

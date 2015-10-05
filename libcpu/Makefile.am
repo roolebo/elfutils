@@ -46,8 +46,8 @@ i386_disasm.o: i386.mnemonics $(srcdir)/i386_dis.h
 x86_64_disasm.o: x86_64.mnemonics $(srcdir)/x86_64_dis.h
 
 %_defs: $(srcdir)/defs/i386
-	m4 -D$* -DDISASSEMBLER $< > $@T
-	mv -f $@T $@
+	$(AM_V_GEN)m4 -D$* -DDISASSEMBLER $< > $@T
+	$(AM_V_at)mv -f $@T $@
 
 if MAINTAINER_MODE
 noinst_HEADERS = memory-access.h i386_parse.h i386_data.h
@@ -55,8 +55,8 @@ noinst_HEADERS = memory-access.h i386_parse.h i386_data.h
 noinst_PROGRAMS = i386_gendis
 
 $(srcdir)/%_dis.h: %_defs i386_gendis
-	./i386_gendis $< > $@T
-	mv -f $@T $@
+	$(AM_V_GEN)./i386_gendis $< > $@T
+	$(AM_V_at)mv -f $@T $@
 
 else
 
@@ -67,7 +67,7 @@ $(srcdir)/%_dis.h:
 endif
 
 %.mnemonics: %_defs
-	sed '1,/^%%/d;/^#/d;/^[[:space:]]*$$/d;s/[^:]*:\([^[:space:]]*\).*/MNE(\1)/;s/{[^}]*}//g;/INVALID/d' \
+	$(AM_V_GEN)sed '1,/^%%/d;/^#/d;/^[[:space:]]*$$/d;s/[^:]*:\([^[:space:]]*\).*/MNE(\1)/;s/{[^}]*}//g;/INVALID/d' \
 	  $< | sort -u > $@
 
 i386_lex_no_Werror = yes

@@ -138,7 +138,7 @@ am_libld_elf_i386_pic_a_OBJECTS = i386_ld.os
 
 libld_elf_i386_so_SOURCES =
 libld_elf_i386.so: libld_elf_i386_pic.a libld_elf_i386.map
-	$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
+	$(AM_V_CCLD)$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
 		$(libelf) $(libeu) \
 		-Wl,--version-script,$(srcdir)/libld_elf_i386.map
 	@$(textrel_check)
@@ -147,7 +147,7 @@ endif
 # Special rule to make it possible to define libld_elf_a_SOURCES as we do.
 # Otherwise make would complain.
 .deps/none_ld.Po: none_ld.os
-	-:
+	@-:
 
 
 installcheck-binPROGRAMS: $(bin_PROGRAMS)
@@ -172,11 +172,11 @@ MAINTAINERCLEANFILES = ldlex.c ldscript.c ldscript.h
 
 
 make-debug-archive: $(srcdir)/make-debug-archive.in
-	UNSTRIP=$(bindir)/`echo unstrip | sed '$(transform)'`; \
+	$(AM_V_GEN)UNSTRIP=$(bindir)/`echo unstrip | sed '$(transform)'`; \
 	AR=$(bindir)/`echo ar | sed '$(transform)'`; \
 	sed -e "s,[@]UNSTRIP[@],$$UNSTRIP,g" -e "s,[@]AR[@],$$AR,g" \
 	    -e "s%[@]PACKAGE_NAME[@]%$(PACKAGE_NAME)%g" \
 	    -e "s%[@]PACKAGE_VERSION[@]%$(PACKAGE_VERSION)%g" \
 	    $(srcdir)/make-debug-archive.in > $@.new
-	chmod +x $@.new
-	mv -f $@.new $@
+	$(AM_V_at)chmod +x $@.new
+	$(AM_V_at)mv -f $@.new $@

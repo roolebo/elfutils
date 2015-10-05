@@ -1,3 +1,9 @@
+2015-10-05  Josh Stone  <jistone@redhat.com>
+
+	* Makefile.am (%_defs): Add AM_V_GEN and AM_V_at silencers.
+	($(srcdir)/%_dis.h): Ditto.
+	(%.mnemonics): Add AM_V_GEN silencer.
+
 2014-10-29  Jose E. Marchesi  <jose.marchesi@oracle.com>
 
 	* Makefile.am (AM_CFLAGS): Use -fPIC instead of -fpic to avoid

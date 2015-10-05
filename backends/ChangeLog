@@ -1,3 +1,8 @@
+2015-10-02  Jose E. Marchesi  <jose.marchesi@oracle.com>
+
+	* sparc_reloc.def: Added relocation types WDISP10, JMP_IREL and
+	IRELATIVE.
+
 2015-09-22  Mark Wielaard  <mjw@redhat.com>
 
 	* arm_attrs.c: Remove old-style function definitions.

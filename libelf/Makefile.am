@@ -29,7 +29,7 @@
 ##
 include $(top_srcdir)/config/eu.am
 if BUILD_STATIC
-AM_CFLAGS += -fpic
+AM_CFLAGS += -fPIC
 endif
 GCC_INCLUDE = -I$(shell $(CC) -print-file-name=include)
 VERSION = 1

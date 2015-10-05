@@ -28,7 +28,7 @@
 ## not, see <http://www.gnu.org/licenses/>.
 ##
 include $(top_srcdir)/config/eu.am
-AM_CFLAGS += -fpic
+AM_CFLAGS += -fPIC
 AM_CPPFLAGS += -I$(srcdir)/../libelf -I$(srcdir)/../libdw -I$(srcdir)/../libasm
 VERSION = 1
 LIBEBL_SUBDIR = @LIBEBL_SUBDIR@

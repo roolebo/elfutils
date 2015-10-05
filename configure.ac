@@ -111,7 +111,7 @@ AC_CACHE_CHECK([for __thread support], ac_cv_tls, [dnl
 # Some old compiler/linker/libc combinations fail some ways and not others.
 save_CFLAGS="$CFLAGS"
 save_LDFLAGS="$LDFLAGS"
-CFLAGS="-fpic $CFLAGS"
+CFLAGS="-fPIC $CFLAGS"
 LDFLAGS="-shared -Wl,-z,defs,-z,relro $LDFLAGS"
 AC_LINK_IFELSE([dnl
 AC_LANG_PROGRAM([[#include <stdlib.h>

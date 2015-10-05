@@ -1,3 +1,8 @@
+2014-10-29  Jose E. Marchesi  <jose.marchesi@oracle.com>
+
+	* Makefile.am (AM_CFLAGS): Use -fPIC instead of -fpic to avoid
+	relocation overflows in some platforms.
+
 2014-04-13  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (i386_gendis_LDADD): Remove libmudflap.

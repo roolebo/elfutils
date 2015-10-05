@@ -1,3 +1,8 @@
+2015-09-24  Jose E. Marchesi  <jose.marchesi@oracle.com>
+
+	* configure.ac: Use -fPIC instead of -fpic to avoid relocation
+	overflows in some platforms.
+
 2015-07-11  Pino Toscano  <toscano.pino@tiscali.it>
 
 	* .gitignore: Add more generated files, and anchor some of the

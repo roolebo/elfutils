@@ -29,7 +29,7 @@
 ##
 include $(top_srcdir)/config/eu.am
 if BUILD_STATIC
-AM_CFLAGS += -fpic
+AM_CFLAGS += -fPIC
 endif
 AM_CPPFLAGS += -I$(srcdir)/../libelf
 VERSION = 1

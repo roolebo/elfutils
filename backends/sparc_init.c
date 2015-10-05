@@ -34,6 +34,11 @@
 #define RELOC_PREFIX	R_SPARC_
 #include "libebl_CPU.h"
 
+/* In SPARC some relocations use the most significative 24 bits of the
+   r_type field to encode a secondary addend.  Make sure the routines
+   in common-reloc.c acknowledge this.  */
+#define RELOC_TYPE_ID(type) ((type) & 0xff)
+
 /* This defines the common reloc hooks based on sparc_reloc.def.  */
 #include "common-reloc.c"
 

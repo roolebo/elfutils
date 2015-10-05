@@ -1,5 +1,13 @@
 2015-10-02  Jose E. Marchesi  <jose.marchesi@oracle.com>
 
+	* sparc_init.c (RELOC_TYPE_ID): Defined.
+	* common-reloc.c (reloc_type_name): Apply target-specific
+	relocation ID extractors if defined.
+	(reloc_type_check): Likewise.
+	(reloc_valid_use): Likewise.
+
+2015-10-02  Jose E. Marchesi  <jose.marchesi@oracle.com>
+
 	* sparc_reloc.def: Added relocation types WDISP10, JMP_IREL and
 	IRELATIVE.
 

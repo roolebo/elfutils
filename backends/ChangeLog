@@ -1,3 +1,9 @@
+2015-10-06  Jose E. Marchesi  <jose.marchesi@oracle.com>
+
+	* sparc_attrs.c: New file.
+	* Makefile.am (sparc_SRCS): Added sparc_attrs.c
+	* sparc_init.c (sparc_init): Hook sparc_check_object_attribute.
+
 2015-10-02  Jose E. Marchesi  <jose.marchesi@oracle.com>
 
 	* sparc_init.c (RELOC_TYPE_ID): Defined.

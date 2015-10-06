@@ -75,6 +75,7 @@ sparc_init (Elf *elf __attribute__ ((unused)),
   HOOK (eh, auxv_info);
   HOOK (eh, register_info);
   HOOK (eh, return_value_location);
+  HOOK (eh, check_object_attribute);
 
   return MODVERSION;
 }

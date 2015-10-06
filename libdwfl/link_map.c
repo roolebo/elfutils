@@ -48,20 +48,16 @@ static bool
 auxv_format_probe (const void *auxv, size_t size,
 		   uint_fast8_t *elfclass, uint_fast8_t *elfdata)
 {
-  const union
-  {
-    char buf[size];
-    Elf32_auxv_t a32[size / sizeof (Elf32_auxv_t)];
-    Elf64_auxv_t a64[size / sizeof (Elf64_auxv_t)];
-  } *u = auxv;
+  const Elf32_auxv_t (*a32)[size / sizeof (Elf32_auxv_t)] = (void *) auxv;
+  const Elf64_auxv_t (*a64)[size / sizeof (Elf64_auxv_t)] = (void *) auxv;
 
   inline bool check64 (size_t i)
   {
     /* The AUXV pointer might not even be naturally aligned for 64-bit
        data, because note payloads in a core file are not aligned.  */
 
-    uint64_t type = read_8ubyte_unaligned_noncvt (&u->a64[i].a_type);
-    uint64_t val = read_8ubyte_unaligned_noncvt (&u->a64[i].a_un.a_val);
+    uint64_t type = read_8ubyte_unaligned_noncvt (&(*a64)[i].a_type);
+    uint64_t val = read_8ubyte_unaligned_noncvt (&(*a64)[i].a_un.a_val);
 
     if (type == BE64 (PROBE_TYPE)
 	&& val == BE64 (PROBE_VAL64))
@@ -85,8 +81,8 @@ auxv_format_probe (const void *auxv, size_t size,
     /* The AUXV pointer might not even be naturally aligned for 32-bit
        data, because note payloads in a core file are not aligned.  */
 
-    uint32_t type = read_4ubyte_unaligned_noncvt (&u->a32[i].a_type);
-    uint32_t val = read_4ubyte_unaligned_noncvt (&u->a32[i].a_un.a_val);
+    uint32_t type = read_4ubyte_unaligned_noncvt (&(*a32)[i].a_type);
+    uint32_t val = read_4ubyte_unaligned_noncvt (&(*a32)[i].a_un.a_val);
 
     if (type == BE32 (PROBE_TYPE)
 	&& val == BE32 (PROBE_VAL32))
@@ -280,29 +276,26 @@ report_r_debug (uint_fast8_t elfclass, uint_fast8_t elfdata,
 	  return true;
       }
 
-    const union
-    {
-      Elf32_Addr a32[n];
-      Elf64_Addr a64[n];
-    } *in = vaddr - read_vaddr + buffer;
+    Elf32_Addr (*a32)[n] = vaddr - read_vaddr + buffer;
+    Elf64_Addr (*a64)[n] = (void *) a32;
 
     if (elfclass == ELFCLASS32)
       {
 	if (elfdata == ELFDATA2MSB)
 	  for (size_t i = 0; i < n; ++i)
-	    addrs[i] = BE32 (read_4ubyte_unaligned_noncvt (&in->a32[i]));
+	    addrs[i] = BE32 (read_4ubyte_unaligned_noncvt (&(*a32)[i]));
 	else
 	  for (size_t i = 0; i < n; ++i)
-	    addrs[i] = LE32 (read_4ubyte_unaligned_noncvt (&in->a32[i]));
+	    addrs[i] = LE32 (read_4ubyte_unaligned_noncvt (&(*a32)[i]));
       }
     else
       {
 	if (elfdata == ELFDATA2MSB)
 	  for (size_t i = 0; i < n; ++i)
-	    addrs[i] = BE64 (read_8ubyte_unaligned_noncvt (&in->a64[i]));
+	    addrs[i] = BE64 (read_8ubyte_unaligned_noncvt (&(*a64)[i]));
 	else
 	  for (size_t i = 0; i < n; ++i)
-	    addrs[i] = LE64 (read_8ubyte_unaligned_noncvt (&in->a64[i]));
+	    addrs[i] = LE64 (read_8ubyte_unaligned_noncvt (&(*a64)[i]));
       }
 
     return false;
@@ -861,13 +854,15 @@ dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 	    }
 	  if (in_ok)
 	    {
-	      typedef union
-	      {
-		Elf32_Phdr p32;
-		Elf64_Phdr p64;
-		char data[phnum * phent];
-	      } data_buf;
-	      data_buf *buf = malloc (sizeof (data_buf));
+	      if (unlikely (phnum > SIZE_MAX / phent))
+		{
+		  __libdwfl_seterrno (DWFL_E_NOMEM);
+		  return false;
+		}
+	      size_t nbytes = phnum * phent;
+	      void *buf = malloc (nbytes);
+	      Elf32_Phdr (*p32)[phnum] = buf;
+	      Elf64_Phdr (*p64)[phnum] = buf;
 	      if (unlikely (buf == NULL))
 		{
 		  __libdwfl_seterrno (DWFL_E_NOMEM);
@@ -886,25 +881,20 @@ dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 			  (&out, &in, elfdata) != NULL))
 		{
 		  /* We are looking for PT_DYNAMIC.  */
-		  const union
-		  {
-		    Elf32_Phdr p32[phnum];
-		    Elf64_Phdr p64[phnum];
-		  } *u = (void *) buf;
 		  if (elfclass == ELFCLASS32)
 		    {
 		      for (size_t i = 0; i < phnum; ++i)
-			if (consider_phdr (u->p32[i].p_type,
-					   u->p32[i].p_vaddr,
-					   u->p32[i].p_filesz))
+			if (consider_phdr ((*p32)[i].p_type,
+					   (*p32)[i].p_vaddr,
+					   (*p32)[i].p_filesz))
 			  break;
 		    }
 		  else
 		    {
 		      for (size_t i = 0; i < phnum; ++i)
-			if (consider_phdr (u->p64[i].p_type,
-					   u->p64[i].p_vaddr,
-					   u->p64[i].p_filesz))
+			if (consider_phdr ((*p64)[i].p_type,
+					   (*p64)[i].p_vaddr,
+					   (*p64)[i].p_filesz))
 			  break;
 		    }
 		}
@@ -955,13 +945,9 @@ dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 	  if ((*memory_callback) (dwfl, dyn_segndx, &in.d_buf, &in.d_size,
 				  dyn_vaddr, dyn_filesz, memory_callback_arg))
 	    {
-	      typedef union
-	      {
-		Elf32_Dyn d32;
-		Elf64_Dyn d64;
-		char data[dyn_filesz];
-	      } data_buf;
-	      data_buf *buf = malloc (sizeof (data_buf));
+	      void *buf = malloc (dyn_filesz);
+	      Elf32_Dyn (*d32)[dyn_filesz / sizeof (Elf32_Dyn)] = buf;
+	      Elf64_Dyn (*d64)[dyn_filesz / sizeof (Elf64_Dyn)] = buf;
 	      if (unlikely (buf == NULL))
 		{
 		  __libdwfl_seterrno (DWFL_E_NOMEM);
@@ -980,18 +966,13 @@ dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 			  (&out, &in, elfdata) != NULL))
 		{
 		  /* We are looking for DT_DEBUG.  */
-		  const union
-		  {
-		    Elf32_Dyn d32[dyn_filesz / sizeof (Elf32_Dyn)];
-		    Elf64_Dyn d64[dyn_filesz / sizeof (Elf64_Dyn)];
-		  } *u = (void *) buf;
 		  if (elfclass == ELFCLASS32)
 		    {
 		      size_t n = dyn_filesz / sizeof (Elf32_Dyn);
 		      for (size_t i = 0; i < n; ++i)
-			if (u->d32[i].d_tag == DT_DEBUG)
+			if ((*d32)[i].d_tag == DT_DEBUG)
 			  {
-			    r_debug_vaddr = u->d32[i].d_un.d_val;
+			    r_debug_vaddr = (*d32)[i].d_un.d_val;
 			    break;
 			  }
 		    }
@@ -999,9 +980,9 @@ dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 		    {
 		      size_t n = dyn_filesz / sizeof (Elf64_Dyn);
 		      for (size_t i = 0; i < n; ++i)
-			if (u->d64[i].d_tag == DT_DEBUG)
+			if ((*d64)[i].d_tag == DT_DEBUG)
 			  {
-			    r_debug_vaddr = u->d64[i].d_un.d_val;
+			    r_debug_vaddr = (*d64)[i].d_un.d_val;
 			    break;
 			  }
 		    }

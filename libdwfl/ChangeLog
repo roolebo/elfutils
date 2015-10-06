@@ -1,3 +1,13 @@
+2015-10-05  Chih-Hung Hsieh <chh@google.com>
+
+	* dwfl_module_getdwarf.c (find_prelink_address_sync): Do not use
+	union of variable length arrays.
+	* dwfl_segment_report_module.c (dwfl_segment_report_module): Likewise.
+	* elf-from-memory.c (elf_from_remote_memory): Likewise.
+	* link_map.c (auxv_format_probe): Likewise.
+	* link_map.c (report_r_debug): Likewise.
+	* link_map.c (dwfl_link_map_report): Likewise.
+
 2015-09-18  Chih-Hung Hsieh  <chh@google.com>
 
 	* relocate.c (relocate_section): Move nested function "relocate"

@@ -1,3 +1,11 @@
+2015-10-05  Chih-Hung Hsieh <chh@google.com>
+
+	* unstrip.c (find_alloc_sections_prelink): Do not allocate
+	on stack union types with variable length arrays; use xmalloc
+	for such dynamic sized objects.
+	* readelf.c (handle_core_item): Likewise, but use alloca
+	for small variable size data object and add assert(count < 128).
+
 2015-10-05  Josh Stone  <jistone@redhat.com>
 
 	* Makefile.am (libld_elf_i386.so): Add AM_V_CCLD silencer.

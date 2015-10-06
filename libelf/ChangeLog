@@ -1,3 +1,8 @@
+2015-10-05  Chih-Hung Hsieh <chh@google.com>
+
+	* elf_getarsym.c (elf_getarsym): Do not use
+	union of variable length arrays.
+
 2015-10-05  Josh Stone  <jistone@redhat.com>
 
 	* Makefile.am (libelf.so): Add AM_V_CCLD and AM_V_at silencers.

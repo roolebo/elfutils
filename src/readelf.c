@@ -8370,6 +8370,9 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
 		  unsigned int colno, size_t *repeated_size)
 {
   uint_fast16_t count = item->count ?: 1;
+  /* Ebl_Core_Item count is always a small number.
+     Make sure the backend didn't put in some large bogus value.  */
+  assert (count < 128);
 
 #define TYPES								      \
   DO_TYPE (BYTE, Byte, "0x%.2" PRIx8, "%" PRId8);			      \
@@ -8379,11 +8382,16 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
   DO_TYPE (XWORD, Xword, "0x%.16" PRIx64, "%" PRId64);			      \
   DO_TYPE (SXWORD, Sxword, "%" PRId64, "%" PRId64)
 
-#define DO_TYPE(NAME, Name, hex, dec) GElf_##Name Name[count]
-  union { TYPES; } value;
+#define DO_TYPE(NAME, Name, hex, dec) GElf_##Name Name
+  typedef union { TYPES; } value_t;
+  void *data = alloca (count * sizeof (value_t));
 #undef DO_TYPE
 
-  void *data = &value;
+#define DO_TYPE(NAME, Name, hex, dec) \
+    GElf_##Name *value_##Name __attribute__((unused)) = data
+  TYPES;
+#undef DO_TYPE
+
   size_t size = gelf_fsize (core, item->type, count, EV_CURRENT);
   size_t convsize = size;
   if (repeated_size != NULL)
@@ -8414,7 +8422,7 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
 #define DO_TYPE(NAME, Name, hex, dec)					      \
 	  case ELF_T_##NAME:						      \
 	    colno = print_core_item (colno, ',', WRAP_COLUMN,		      \
-				     0, item->name, dec, value.Name[0]); \
+				     0, item->name, dec, value_##Name[0]); \
 	    break
 	  TYPES;
 #undef DO_TYPE
@@ -8430,7 +8438,7 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
 #define DO_TYPE(NAME, Name, hex, dec)					      \
 	  case ELF_T_##NAME:						      \
 	    colno = print_core_item (colno, ',', WRAP_COLUMN,		      \
-				     0, item->name, hex, value.Name[0]);      \
+				     0, item->name, hex, value_##Name[0]);      \
 	    break
 	  TYPES;
 #undef DO_TYPE
@@ -8520,8 +8528,8 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
 	{
 #define DO_TYPE(NAME, Name, hex, dec)					      \
 	  case ELF_T_##NAME:						      \
-	    sec = value.Name[0];					      \
-	    usec = value.Name[1];					      \
+	    sec = value_##Name[0];					      \
+	    usec = value_##Name[1];					      \
 	    break
 	  TYPES;
 #undef DO_TYPE
@@ -8551,12 +8559,12 @@ handle_core_item (Elf *core, const Ebl_Core_Item *item, const void *desc,
     case 'c':
       assert (count == 1);
       colno = print_core_item (colno, ',', WRAP_COLUMN, 0, item->name,
-			       "%c", value.Byte[0]);
+			       "%c", value_Byte[0]);
       break;
 
     case 's':
       colno = print_core_item (colno, ',', WRAP_COLUMN, 0, item->name,
-			       "%.*s", (int) count, value.Byte);
+			       "%.*s", (int) count, value_Byte);
       break;
 
     case '\n':

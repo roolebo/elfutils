@@ -53,6 +53,10 @@
 # define MY_ELFDATA	ELFDATA2MSB
 #endif
 
+#ifndef MAX
+# define MAX(a, b) ((a) > (b) ? (a) : (b))
+#endif
+
 
 /* Return user segment index closest to ADDR but not above it.
    If NEXT, return the closest to ADDR but not below it.  */
@@ -404,19 +408,19 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 
   xlatefrom.d_buf = ph_buffer;
 
-  typedef union
-  {
-    Elf32_Phdr p32[phnum];
-    Elf64_Phdr p64[phnum];
-  } phdrsn;
-
-  phdrsp = malloc (sizeof (phdrsn));
+  if (unlikely (phnum >
+                SIZE_MAX / MAX (sizeof (Elf32_Phdr), sizeof (Elf64_Phdr))))
+    return finish ();
+  const size_t phdrsp_bytes =
+      phnum * MAX (sizeof (Elf32_Phdr), sizeof (Elf64_Phdr));
+  phdrsp = malloc (phdrsp_bytes);
+  Elf32_Phdr (*p32)[phnum] = phdrsp;
+  Elf64_Phdr (*p64)[phnum] = phdrsp;
   if (unlikely (phdrsp == NULL))
     return finish ();
-  phdrsn *phdrs = (phdrsn *) phdrsp;
 
-  xlateto.d_buf = phdrs;
-  xlateto.d_size = sizeof (phdrsn);
+  xlateto.d_buf = phdrsp;
+  xlateto.d_size = phdrsp_bytes;
 
   /* Track the bounds of the file visible in memory.  */
   GElf_Off file_trimmed_end = 0; /* Proper p_vaddr + p_filesz end.  */
@@ -579,10 +583,10 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 	found_bias = false;	/* Trigger error check.  */
       else
 	for (uint_fast16_t i = 0; i < phnum; ++i)
-	  consider_phdr (phdrs->p32[i].p_type,
-			 phdrs->p32[i].p_vaddr, phdrs->p32[i].p_memsz,
-			 phdrs->p32[i].p_offset, phdrs->p32[i].p_filesz,
-			 phdrs->p32[i].p_align);
+	  consider_phdr ((*p32)[i].p_type,
+			 (*p32)[i].p_vaddr, (*p32)[i].p_memsz,
+			 (*p32)[i].p_offset, (*p32)[i].p_filesz,
+			 (*p32)[i].p_align);
     }
   else
     {
@@ -590,10 +594,10 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 	found_bias = false;	/* Trigger error check.  */
       else
 	for (uint_fast16_t i = 0; i < phnum; ++i)
-	  consider_phdr (phdrs->p64[i].p_type,
-			 phdrs->p64[i].p_vaddr, phdrs->p64[i].p_memsz,
-			 phdrs->p64[i].p_offset, phdrs->p64[i].p_filesz,
-			 phdrs->p64[i].p_align);
+	  consider_phdr ((*p64)[i].p_type,
+			 (*p64)[i].p_vaddr, (*p64)[i].p_memsz,
+			 (*p64)[i].p_offset, (*p64)[i].p_filesz,
+			 (*p64)[i].p_align);
     }
 
   finish_portion (&ph_buffer, &ph_buffer_size);
@@ -749,44 +753,39 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 
   const size_t dyn_entsize = (ei_class == ELFCLASS32
 			      ? sizeof (Elf32_Dyn) : sizeof (Elf64_Dyn));
-  void *dyns = NULL;
   void *dyn_data = NULL;
   size_t dyn_data_size = 0;
   if (dyn_filesz != 0 && dyn_filesz % dyn_entsize == 0
       && ! read_portion (&dyn_data, &dyn_data_size, dyn_vaddr, dyn_filesz))
     {
-      typedef union
-      {
-	Elf32_Dyn d32[dyn_filesz / sizeof (Elf32_Dyn)];
-	Elf64_Dyn d64[dyn_filesz / sizeof (Elf64_Dyn)];
-      } dynn;
-      dyns = malloc (sizeof (dynn));
+      void *dyns = malloc (dyn_filesz);
+      Elf32_Dyn (*d32)[dyn_filesz / sizeof (Elf32_Dyn)] = dyns;
+      Elf64_Dyn (*d64)[dyn_filesz / sizeof (Elf64_Dyn)] = dyns;
       if (unlikely (dyns == NULL))
 	return finish ();
-      dynn *dyn = (dynn *) dyns;
 
       xlatefrom.d_type = xlateto.d_type = ELF_T_DYN;
       xlatefrom.d_buf = (void *) dyn_data;
       xlatefrom.d_size = dyn_filesz;
-      xlateto.d_buf = dyn;
-      xlateto.d_size = sizeof (dynn);
+      xlateto.d_buf = dyns;
+      xlateto.d_size = dyn_filesz;
 
       if (ei_class == ELFCLASS32)
 	{
 	  if (elf32_xlatetom (&xlateto, &xlatefrom, ei_data) != NULL)
 	    for (size_t i = 0; i < dyn_filesz / sizeof (Elf32_Dyn); ++i)
-	      if (consider_dyn (dyn->d32[i].d_tag, dyn->d32[i].d_un.d_val))
+	      if (consider_dyn ((*d32)[i].d_tag, (*d32)[i].d_un.d_val))
 		break;
 	}
       else
 	{
 	  if (elf64_xlatetom (&xlateto, &xlatefrom, ei_data) != NULL)
 	    for (size_t i = 0; i < dyn_filesz / sizeof (Elf64_Dyn); ++i)
-	      if (consider_dyn (dyn->d64[i].d_tag, dyn->d64[i].d_un.d_val))
+	      if (consider_dyn ((*d64)[i].d_tag, (*d64)[i].d_un.d_val))
 		break;
 	}
+      free (dyns);
     }
-  free (dyns);
   finish_portion (&dyn_data, &dyn_data_size);
 
   /* We'll use the name passed in or a stupid default if not DT_SONAME.  */
@@ -901,12 +900,12 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 
 	  if (ei_class == ELFCLASS32)
 	    for (uint_fast16_t i = 0; i < phnum; ++i)
-	      read_phdr (phdrs->p32[i].p_type, phdrs->p32[i].p_vaddr,
-			 phdrs->p32[i].p_offset, phdrs->p32[i].p_filesz);
+	      read_phdr ((*p32)[i].p_type, (*p32)[i].p_vaddr,
+			 (*p32)[i].p_offset, (*p32)[i].p_filesz);
 	  else
 	    for (uint_fast16_t i = 0; i < phnum; ++i)
-	      read_phdr (phdrs->p64[i].p_type, phdrs->p64[i].p_vaddr,
-			 phdrs->p64[i].p_offset, phdrs->p64[i].p_filesz);
+	      read_phdr ((*p64)[i].p_type, (*p64)[i].p_vaddr,
+			 (*p64)[i].p_offset, (*p64)[i].p_filesz);
 	}
       else
 	{

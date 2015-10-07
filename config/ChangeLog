@@ -1,3 +1,7 @@
+2015-10-07  Mark Wielaard  <mjw@redhat.com>
+
+	* eu.am (ARFLAGS): Set to "cr".
+
 2015-10-09  Josh Stone  <jistone@redhat.com>
 
 	* eu.am (print-%): New target to print any variable.

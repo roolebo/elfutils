@@ -32,6 +32,10 @@
 DEFS = -D_GNU_SOURCE -DHAVE_CONFIG_H -DLOCALEDIR='"${localedir}"'
 AM_CPPFLAGS = -I. -I$(srcdir) -I$(top_srcdir)/lib -I..
 
+# Drop the 'u' flag that automake adds by default. It is incompatible
+# with deterministic archives.
+ARFLAGS = cr
+
 # Warn about stack usage of more than 256K = 262144 bytes.
 if ADD_STACK_USAGE_WARNING
 STACK_USAGE_WARNING=-Wstack-usage=262144

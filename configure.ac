@@ -29,6 +29,8 @@ dnl We use GNU make extensions; automake 1.10 defaults to -Wportability.
 AM_INIT_AUTOMAKE([gnits 1.11 -Wno-portability dist-bzip2 no-dist-gzip parallel-tests])
 AM_MAINTAINER_MODE
 
+AM_SILENT_RULES([yes])
+
 AC_CONFIG_SRCDIR([libelf/libelf.h])
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_HEADERS([config.h])

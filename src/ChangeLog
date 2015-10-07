@@ -1,3 +1,9 @@
+2015-10-07  Mark Wielaard  <mjw@redhat.com>
+
+	* unstrip.c (MAX): Removed.
+	(find_alloc_sections_prelink): Allocate exact amount of bytes for
+	shdrs.
+
 2015-10-05  Chih-Hung Hsieh <chh@google.com>
 
 	* unstrip.c (find_alloc_sections_prelink): Do not allocate

@@ -54,10 +54,6 @@
 # define _(str) gettext (str)
 #endif
 
-#ifndef MAX
-# define MAX(a, b) ((a) > (b) ? (a) : (b))
-#endif
-
 /* Name and version of program.  */
 static void print_version (FILE *stream, struct argp_state *state);
 ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
@@ -1017,15 +1013,13 @@ find_alloc_sections_prelink (Elf *debug, Elf_Data *debug_shstrtab,
 	error (EXIT_FAILURE, 0, _("invalid contents in '%s' section"),
 	       ".gnu.prelink_undo");
 
-      if (unlikely ((shnum - 1) >
-                    SIZE_MAX / MAX (sizeof (Elf32_Shdr), sizeof (Elf64_Shdr))))
+      bool class32 = ehdr.e32.e_ident[EI_CLASS] == ELFCLASS32;
+      size_t shsize = class32 ? sizeof (Elf32_Shdr) : sizeof (Elf64_Shdr);
+      if (unlikely ((shnum - 1) > SIZE_MAX / shsize))
 	error (EXIT_FAILURE, 0, _("overflow with shnum = %zu in '%s' section"),
 	       (size_t) shnum, ".gnu.prelink_undo");
-      const size_t shdr_bytes =
-          (shnum - 1) * MAX (sizeof (Elf32_Shdr), sizeof (Elf64_Shdr));
+      const size_t shdr_bytes = (shnum - 1) * shsize;
       void *shdr = xmalloc (shdr_bytes);
-      Elf32_Shdr (*s32)[shnum - 1] = shdr;
-      Elf64_Shdr (*s64)[shnum - 1] = shdr;
       dst.d_buf = shdr;
       dst.d_size = shdr_bytes;
       ELF_CHECK (gelf_xlatetom (main, &dst, &src,
@@ -1036,7 +1030,9 @@ find_alloc_sections_prelink (Elf *debug, Elf_Data *debug_shstrtab,
       for (size_t i = 0; i < shnum - 1; ++i)
 	{
 	  struct section *sec = &undo_sections[undo_nalloc];
-	  if (ehdr.e32.e_ident[EI_CLASS] == ELFCLASS32)
+	  Elf32_Shdr (*s32)[shnum - 1] = shdr;
+	  Elf64_Shdr (*s64)[shnum - 1] = shdr;
+	  if (class32)
 	    {
 #define COPY(field) sec->shdr.field = (*s32)[i].field
 	      COPY (sh_name);

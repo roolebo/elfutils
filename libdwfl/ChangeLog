@@ -1,3 +1,13 @@
+2015-10-07  Mark Wielaard  <mjw@redhat.com>
+
+	* dwfl_module_getdwarf.c (MAX): Removed.
+	(find_prelink_address_sync): Allocate exact amount of bytes for
+	phdrs and shdrs.
+	* dwfl_segment_report_module.c (dwfl_segment_report_module):
+	Likewise for phdrs.
+	* elf-from-memory.c (MAX): Removed.
+	(elf_from_remote_memory): Allocate exact amount of bytes for phdrs.
+
 2015-10-05  Chih-Hung Hsieh <chh@google.com>
 
 	* dwfl_module_getdwarf.c (find_prelink_address_sync): Do not use

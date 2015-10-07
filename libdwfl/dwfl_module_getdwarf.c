@@ -34,10 +34,6 @@
 #include "../libdw/libdwP.h"	/* DWARF_E_* values are here.  */
 #include "../libelf/libelfP.h"
 
-#ifndef MAX
-# define MAX(a, b) ((a) > (b) ? (a) : (b))
-#endif
-
 static inline Dwfl_Error
 open_elf_file (Elf **elf, int *fd, char **name)
 {
@@ -371,15 +367,13 @@ find_prelink_address_sync (Dwfl_Module *mod, struct dwfl_file *file)
   src.d_size = phnum * phentsize;
 
   GElf_Addr undo_interp = 0;
+  bool class32 = ehdr.e32.e_ident[EI_CLASS] == ELFCLASS32;
   {
-    if (unlikely (phnum >
-                  SIZE_MAX / MAX (sizeof (Elf32_Phdr), sizeof (Elf64_Phdr))))
+    size_t phdr_size = class32 ? sizeof (Elf32_Phdr) : sizeof (Elf64_Phdr);
+    if (unlikely (phnum > SIZE_MAX / phdr_size))
       return DWFL_E_NOMEM;
-    const size_t phdrs_bytes =
-        phnum * MAX (sizeof (Elf32_Phdr), sizeof (Elf64_Phdr));
+    const size_t phdrs_bytes = phnum * phdr_size;
     void *phdrs = malloc (phdrs_bytes);
-    Elf32_Phdr (*p32)[phnum] = phdrs;
-    Elf64_Phdr (*p64)[phnum] = phdrs;
     if (unlikely (phdrs == NULL))
       return DWFL_E_NOMEM;
     dst.d_buf = phdrs;
@@ -390,8 +384,9 @@ find_prelink_address_sync (Dwfl_Module *mod, struct dwfl_file *file)
 	free (phdrs);
 	return DWFL_E_LIBELF;
       }
-    if (ehdr.e32.e_ident[EI_CLASS] == ELFCLASS32)
+    if (class32)
       {
+	Elf32_Phdr (*p32)[phnum] = phdrs;
 	for (uint_fast16_t i = 0; i < phnum; ++i)
 	  if ((*p32)[i].p_type == PT_INTERP)
 	    {
@@ -401,6 +396,7 @@ find_prelink_address_sync (Dwfl_Module *mod, struct dwfl_file *file)
       }
     else
       {
+	Elf64_Phdr (*p64)[phnum] = phdrs;
 	for (uint_fast16_t i = 0; i < phnum; ++i)
 	  if ((*p64)[i].p_type == PT_INTERP)
 	    {
@@ -418,14 +414,11 @@ find_prelink_address_sync (Dwfl_Module *mod, struct dwfl_file *file)
   src.d_type = ELF_T_SHDR;
   src.d_size = gelf_fsize (mod->main.elf, ELF_T_SHDR, shnum - 1, EV_CURRENT);
 
-  if (unlikely (shnum - 1  >
-                SIZE_MAX / MAX (sizeof (Elf32_Shdr), sizeof (Elf64_Shdr))))
+  size_t shdr_size = class32 ? sizeof (Elf32_Shdr) : sizeof (Elf64_Shdr);
+  if (unlikely (shnum - 1  > SIZE_MAX / shdr_size))
     return DWFL_E_NOMEM;
-  const size_t shdrs_bytes =
-      (shnum - 1) * MAX (sizeof (Elf32_Shdr), sizeof (Elf64_Shdr));
+  const size_t shdrs_bytes = (shnum - 1) * shdr_size;
   void *shdrs = malloc (shdrs_bytes);
-  Elf32_Shdr (*s32)[shnum - 1] = shdrs;
-  Elf64_Shdr (*s64)[shnum - 1] = shdrs;
   if (unlikely (shdrs == NULL))
     return DWFL_E_NOMEM;
   dst.d_buf = shdrs;
@@ -490,16 +483,22 @@ find_prelink_address_sync (Dwfl_Module *mod, struct dwfl_file *file)
       mod->main.address_sync = highest;
 
       highest = 0;
-      if (ehdr.e32.e_ident[EI_CLASS] == ELFCLASS32)
-	for (size_t i = 0; i < shnum - 1; ++i)
-	  consider_shdr (undo_interp, (*s32)[i].sh_type,
-			 (*s32)[i].sh_flags, (*s32)[i].sh_addr,
-			 (*s32)[i].sh_size);
+      if (class32)
+	{
+	  Elf32_Shdr (*s32)[shnum - 1] = shdrs;
+	  for (size_t i = 0; i < shnum - 1; ++i)
+	    consider_shdr (undo_interp, (*s32)[i].sh_type,
+			   (*s32)[i].sh_flags, (*s32)[i].sh_addr,
+			   (*s32)[i].sh_size);
+	}
       else
-	for (size_t i = 0; i < shnum - 1; ++i)
-	  consider_shdr (undo_interp, (*s64)[i].sh_type,
-			 (*s64)[i].sh_flags, (*s64)[i].sh_addr,
-			 (*s64)[i].sh_size);
+	{
+	  Elf64_Shdr (*s64)[shnum - 1] = shdrs;
+	  for (size_t i = 0; i < shnum - 1; ++i)
+	    consider_shdr (undo_interp, (*s64)[i].sh_type,
+			   (*s64)[i].sh_flags, (*s64)[i].sh_addr,
+			   (*s64)[i].sh_size);
+	}
 
       if (highest > file->vaddr)
 	file->address_sync = highest;

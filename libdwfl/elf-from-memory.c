@@ -38,10 +38,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef MAX
-# define MAX(a, b) ((a) > (b) ? (a) : (b))
-#endif
-
 /* Reconstruct an ELF file by reading the segments out of remote memory
    based on the ELF file header at EHDR_VMA and the ELF program headers it
    points to.  If not null, *LOADBASEP is filled in with the difference
@@ -195,17 +191,15 @@ elf_from_remote_memory (GElf_Addr ehdr_vma,
       xlatefrom.d_buf = buffer;
     }
 
-  if (unlikely (phnum >
-                SIZE_MAX / MAX (sizeof (Elf32_Phdr), sizeof (Elf64_Phdr))))
+  bool class32 = ehdr.e32.e_ident[EI_CLASS] == ELFCLASS32;
+  size_t phdr_size = class32 ? sizeof (Elf32_Phdr) : sizeof (Elf64_Phdr);
+  if (unlikely (phnum > SIZE_MAX / phdr_size))
     {
       free (buffer);
       goto no_memory;
     }
-  const size_t phdrsp_bytes =
-      phnum * MAX (sizeof (Elf32_Phdr), sizeof (Elf64_Phdr));
+  const size_t phdrsp_bytes = phnum * phdr_size;
   phdrsp = malloc (phdrsp_bytes);
-  Elf32_Phdr (*p32)[phnum] = phdrsp;
-  Elf64_Phdr (*p64)[phnum] = phdrsp;
   if (unlikely (phdrsp == NULL))
     {
       free (buffer);
@@ -221,6 +215,8 @@ elf_from_remote_memory (GElf_Addr ehdr_vma,
   GElf_Off segments_end_mem = 0;
   GElf_Addr loadbase = ehdr_vma;
   bool found_base = false;
+  Elf32_Phdr (*p32)[phnum] = phdrsp;
+  Elf64_Phdr (*p64)[phnum] = phdrsp;
   switch (ehdr.e32.e_ident[EI_CLASS])
     {
       /* Sanity checks segments and calculates segment_end,

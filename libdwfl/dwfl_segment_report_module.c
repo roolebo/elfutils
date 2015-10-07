@@ -408,14 +408,12 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 
   xlatefrom.d_buf = ph_buffer;
 
-  if (unlikely (phnum >
-                SIZE_MAX / MAX (sizeof (Elf32_Phdr), sizeof (Elf64_Phdr))))
+  bool class32 = ei_class == ELFCLASS32;
+  size_t phdr_size = class32 ? sizeof (Elf32_Phdr) : sizeof (Elf64_Phdr);
+  if (unlikely (phnum > SIZE_MAX / phdr_size))
     return finish ();
-  const size_t phdrsp_bytes =
-      phnum * MAX (sizeof (Elf32_Phdr), sizeof (Elf64_Phdr));
+  const size_t phdrsp_bytes = phnum * phdr_size;
   phdrsp = malloc (phdrsp_bytes);
-  Elf32_Phdr (*p32)[phnum] = phdrsp;
-  Elf64_Phdr (*p64)[phnum] = phdrsp;
   if (unlikely (phdrsp == NULL))
     return finish ();
 
@@ -577,6 +575,9 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 	break;
       }
   }
+
+  Elf32_Phdr (*p32)[phnum] = phdrsp;
+  Elf64_Phdr (*p64)[phnum] = phdrsp;
   if (ei_class == ELFCLASS32)
     {
       if (elf32_xlatetom (&xlateto, &xlatefrom, ei_data) == NULL)

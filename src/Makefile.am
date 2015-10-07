@@ -89,6 +89,7 @@ endif
 # XXX While the file is not finished, don't warn about this
 ldgeneric_no_Wunused = yes
 ldgeneric_no_Wstack_usage = yes
+ldlex_no_Wstack_usage = yes
 
 # Bad, bad stack usage...
 readelf_no_Wstack_usage = yes

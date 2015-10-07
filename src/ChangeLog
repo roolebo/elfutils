@@ -1,3 +1,8 @@
+2015-10-07  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (ldlex_no_Wstack_usage): New.
+	* ldlex.l ([RWX]): Make cnt unsigned.
+
 2015-10-09  Josh Stone  <jistone@redhat.com>
 
 	* elflint.c (main): Replace stat64 and fstat64 with stat and fstat.

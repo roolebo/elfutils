@@ -1,3 +1,8 @@
+2015-10-08  Chih-Hung Hsieh  <chh@google.com>
+
+	* ld.c (determine_output_format): Move recursive nested
+	function "try" to file scope.
+
 2015-10-04  Mark Wielaard  <mjw@redhat.com>
 
 	* strip.c (handle_elf): Only sanity check section symbols to not

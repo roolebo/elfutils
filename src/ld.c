@@ -1049,6 +1049,53 @@ parse_B_option_2 (const char *arg)
 }
 
 
+static inline int
+try (int fd, Elf *elf)
+{
+  int result = 0;
+
+  if (elf == NULL)
+    return 0;
+
+  if (elf_kind (elf) == ELF_K_ELF)
+    {
+      /* We have an ELF file.  We now can find out
+	 what the output format should be.  */
+      XElf_Ehdr_vardef(ehdr);
+
+      /* Get the ELF header of the object.  */
+      xelf_getehdr (elf, ehdr);
+      if (ehdr != NULL)
+	ld_state.ebl =
+	  ebl_openbackend_machine (ehdr->e_machine);
+
+      result = 1;
+    }
+  else if (elf_kind (elf) == ELF_K_AR)
+    {
+      /* Try the archive members.  This could
+	 potentially lead to wrong results if the
+	 archive contains files for more than one
+	 architecture.  But this is the user's
+	 problem.  */
+      Elf *subelf;
+      Elf_Cmd cmd = ELF_C_READ_MMAP;
+
+      while ((subelf = elf_begin (fd, cmd, elf)) != NULL)
+	{
+	  cmd = elf_next (subelf);
+
+	  if (try (fd, subelf) != 0)
+	    break;
+	}
+    }
+
+  elf_end (elf);
+
+  return result;
+}
+
+
 static void
 determine_output_format (void)
 {
@@ -1078,52 +1125,7 @@ determine_output_format (void)
 	  int fd = open (runp->name, O_RDONLY);
 	  if (fd != -1)
 	    {
-	      int try (Elf *elf)
-		{
-		  int result = 0;
-
-		  if (elf == NULL)
-		    return 0;
-
-		  if (elf_kind (elf) == ELF_K_ELF)
-		    {
-		      /* We have an ELF file.  We now can find out
-			 what the output format should be.  */
-		      XElf_Ehdr_vardef(ehdr);
-
-		      /* Get the ELF header of the object.  */
-		      xelf_getehdr (elf, ehdr);
-		      if (ehdr != NULL)
-			ld_state.ebl =
-			  ebl_openbackend_machine (ehdr->e_machine);
-
-		      result = 1;
-		    }
-		  else if (elf_kind (elf) == ELF_K_AR)
-		    {
-		      /* Try the archive members.  This could
-			 potentially lead to wrong results if the
-			 archive contains files for more than one
-			 architecture.  But this is the user's
-			 problem.  */
-		      Elf *subelf;
-		      Elf_Cmd cmd = ELF_C_READ_MMAP;
-
-		      while ((subelf = elf_begin (fd, cmd, elf)) != NULL)
-			{
-			  cmd = elf_next (subelf);
-
-			  if (try (subelf) != 0)
-			    break;
-			}
-		    }
-
-		  elf_end (elf);
-
-		  return result;
-		}
-
-	      if (try (elf_begin (fd, ELF_C_READ_MMAP, NULL)) != 0)
+	      if (try (fd, elf_begin (fd, ELF_C_READ_MMAP, NULL)) != 0)
 		/* Found a file.  */
 		break;
 	    }

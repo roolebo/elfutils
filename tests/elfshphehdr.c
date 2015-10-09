@@ -31,9 +31,9 @@
 #include <stdbool.h>
 
 void
-check (const char *msg, bool check)
+check (const char *msg, bool statement)
 {
-  if (! check)
+  if (! statement)
     {
       fprintf (stderr, "%s FAILED\n", msg);
       exit (-1);
@@ -43,9 +43,9 @@ check (const char *msg, bool check)
 }
 
 void
-check_elf (const char *msg, bool check)
+check_elf (const char *msg, bool statement)
 {
-  if (! check)
+  if (! statement)
     {
       fprintf (stderr, "%s: %s\n", msg, elf_errmsg (-1));
       exit (-1);

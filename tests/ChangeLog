@@ -1,3 +1,8 @@
+2015-10-09  Mark Wielaard  <mjw@redhat.com>
+
+	* elfshphehdr.c (check): Rename argument from check to statement.
+	(check_elf): Likewise.
+
 2015-10-05  Josh Stone  <jistone@redhat.com>
 
 	* Makefile.am (backtrace-child-biarch): Add AM_V_CC silencer.

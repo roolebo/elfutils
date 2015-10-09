@@ -310,12 +310,12 @@ process_file (const char *fname)
   /* If we have to preserve the modify and access timestamps get them
      now.  We cannot use fstat() after opening the file since the open
      would change the access time.  */
-  struct stat64 pre_st;
+  struct stat pre_st;
   struct timespec tv[2];
  again:
   if (preserve_dates)
     {
-      if (stat64 (fname, &pre_st) != 0)
+      if (stat (fname, &pre_st) != 0)
 	{
 	  error (0, errno, gettext ("cannot stat input file '%s'"), fname);
 	  return 1;
@@ -338,8 +338,8 @@ process_file (const char *fname)
   /* We always use fstat() even if we called stat() before.  This is
      done to make sure the information returned by stat() is for the
      same file.  */
-  struct stat64 st;
-  if (fstat64 (fd, &st) != 0)
+  struct stat st;
+  if (fstat (fd, &st) != 0)
     {
       error (0, errno, gettext ("cannot stat input file '%s'"), fname);
       return 1;
@@ -2115,7 +2115,7 @@ while computing checksum for debug information"));
 	      || (pwrite_retry (fd, zero, sizeof zero,
 				offsetof (Elf32_Ehdr, e_shentsize))
 		  != sizeof zero)
-	      || ftruncate64 (fd, shdr_info[shdridx].shdr.sh_offset) < 0)
+	      || ftruncate (fd, shdr_info[shdridx].shdr.sh_offset) < 0)
 	    {
 	      error (0, errno, gettext ("while writing '%s'"),
 		     output_fname ?: fname);
@@ -2135,7 +2135,7 @@ while computing checksum for debug information"));
 	      || (pwrite_retry (fd, zero, sizeof zero,
 				offsetof (Elf64_Ehdr, e_shentsize))
 		  != sizeof zero)
-	      || ftruncate64 (fd, shdr_info[shdridx].shdr.sh_offset) < 0)
+	      || ftruncate (fd, shdr_info[shdridx].shdr.sh_offset) < 0)
 	    {
 	      error (0, errno, gettext ("while writing '%s'"),
 		     output_fname ?: fname);

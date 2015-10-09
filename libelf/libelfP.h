@@ -316,7 +316,7 @@ struct Elf
       int ehdr_flags;		/* Flags (dirty) for ELF header.  */
       int phdr_flags;		/* Flags (dirty|malloc) for program header.  */
       int shdr_malloced;	/* Nonzero if shdr array was allocated.  */
-      off64_t sizestr_offset;	/* Offset of the size string in the parent
+      off_t sizestr_offset;	/* Offset of the size string in the parent
 				   if this is an archive member.  */
     } elf;
 
@@ -335,7 +335,7 @@ struct Elf
       int ehdr_flags;		/* Flags (dirty) for ELF header.  */
       int phdr_flags;		/* Flags (dirty|malloc) for program header.  */
       int shdr_malloced;	/* Nonzero if shdr array was allocated.  */
-      off64_t sizestr_offset;	/* Offset of the size string in the parent
+      off_t sizestr_offset;	/* Offset of the size string in the parent
 				   if this is an archive member.  */
       Elf32_Ehdr ehdr_mem;	/* Memory used for ELF header when not
 				   mmaped.  */
@@ -360,7 +360,7 @@ struct Elf
       int ehdr_flags;		/* Flags (dirty) for ELF header.  */
       int phdr_flags;		/* Flags (dirty|malloc) for program header.  */
       int shdr_malloced;	/* Nonzero if shdr array was allocated.  */
-      off64_t sizestr_offset;	/* Offset of the size string in the parent
+      off_t sizestr_offset;	/* Offset of the size string in the parent
 				   if this is an archive member.  */
       Elf64_Ehdr ehdr_mem;	/* Memory used for ELF header when not
 				   mmaped.  */

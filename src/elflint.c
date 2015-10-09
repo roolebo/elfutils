@@ -164,9 +164,9 @@ main (int argc, char *argv[])
       else
 	{
 	  unsigned int prev_error_count = error_count;
-	  struct stat64 st;
+	  struct stat st;
 
-	  if (fstat64 (fd, &st) != 0)
+	  if (fstat (fd, &st) != 0)
 	    {
 	      printf ("cannot stat '%s': %m\n", argv[remaining]);
 	      close (fd);

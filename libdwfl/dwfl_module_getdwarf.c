@@ -46,7 +46,7 @@ open_elf_file (Elf **elf, int *fd, char **name)
       /* If there was a pre-primed file name left that the callback left
 	 behind, try to open that file name.  */
       if (*fd < 0 && *name != NULL)
-	*fd = TEMP_FAILURE_RETRY (open64 (*name, O_RDONLY));
+	*fd = TEMP_FAILURE_RETRY (open (*name, O_RDONLY));
 
       if (*fd < 0)
 	return CBFAIL;

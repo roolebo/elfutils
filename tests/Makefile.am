@@ -120,7 +120,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-readelf-dwz-multi.sh run-allfcts-multi.sh run-deleted.sh \
 	run-linkmap-cut.sh run-aggregate-size.sh vdsosyms run-readelf-A.sh \
 	run-getsrc-die.sh run-strptr.sh newdata elfstrtab dwfl-proc-attach \
-	elfshphehdr
+	elfshphehdr run-lfs-symbols.sh
 
 if !BIARCH
 export ELFUTILS_DISABLE_BIARCH = 1
@@ -303,7 +303,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-getsrc-die.sh run-strptr.sh \
 	     testfile-x32-core.bz2 testfile-x32.bz2 \
 	     backtrace.x32.core.bz2 backtrace.x32.exec.bz2 \
-	     testfile-x32-s.bz2 testfile-x32-d.bz2 testfile-x32-debug.bz2
+	     testfile-x32-s.bz2 testfile-x32-d.bz2 testfile-x32-debug.bz2 \
+	     run-lfs-symbols.sh lfs-symbols testfile-nolfs.bz2
 
 if USE_VALGRIND
 valgrind_cmd='valgrind -q --error-exitcode=1 --run-libc-freeres=no'

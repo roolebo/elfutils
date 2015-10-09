@@ -215,7 +215,7 @@ process_file (const char *fname, bool more_than_one)
       real_fname = new_fname;
     }
 
-  int fd = open64 (real_fname, O_RDONLY);
+  int fd = open (real_fname, O_RDONLY);
   if (fd == -1)
     {
       error (0, errno, gettext ("cannot open '%s'"), fname);
@@ -388,7 +388,7 @@ cannot get program header index at offset %zd: %s"),
 			   fname, fname_len),
 		  ".debug");
 
-	  fd2 = open64 (difname, O_RDONLY);
+	  fd2 = open (difname, O_RDONLY);
 	  if (fd2 != -1
 	      && (elf2 = elf_begin (fd2, ELF_C_READ_MMAP, NULL)) != NULL)
 	    dw = dwarf_begin_elf (elf2, DWARF_C_READ, NULL);

@@ -75,7 +75,7 @@
    is not null on entry, we'll use it in lieu of repeating a read.  */
 
 Dwfl_Error internal_function
-unzip (int fd, off64_t start_offset,
+unzip (int fd, off_t start_offset,
        void *mapped, size_t mapped_size,
        void **whole, size_t *whole_size)
 {
@@ -231,7 +231,7 @@ unzip (int fd, off64_t start_offset,
       return DWFL_E_BADELF;
     if (start_offset != 0)
       {
-	off64_t off = lseek (d, start_offset, SEEK_SET);
+	off_t off = lseek (d, start_offset, SEEK_SET);
 	if (off != start_offset)
 	  {
 	    close (d);

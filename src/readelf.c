@@ -764,8 +764,8 @@ process_file (int fd, const char *fname, bool only_one)
     dwfl->offline_next_address = 0;
   if (dwfl_report_offline (dwfl, fname, fname, dwfl_fd) == NULL)
     {
-      struct stat64 st;
-      if (fstat64 (dwfl_fd, &st) != 0)
+      struct stat st;
+      if (fstat (dwfl_fd, &st) != 0)
 	error (0, errno, gettext ("cannot stat input file"));
       else if (unlikely (st.st_size == 0))
 	error (0, 0, gettext ("input file is empty"));
@@ -848,7 +848,7 @@ process_elf_file (Dwfl_Module *dwflmod, int fd)
   if (ehdr->e_type == ET_REL && print_unrelocated)
     {
       /* Read the file afresh.  */
-      off64_t aroff = elf_getaroff (elf);
+      off_t aroff = elf_getaroff (elf);
       pure_elf = elf_begin (fd, ELF_C_READ_MMAP, NULL);
       if (aroff > 0)
 	{

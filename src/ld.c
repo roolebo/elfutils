@@ -277,7 +277,7 @@ main (int argc, char *argv[])
   int err;
 
   /* Sanity check.  We always want to use the LFS functionality.  */
-  if (sizeof (off_t) != sizeof (off64_t))
+  if (sizeof (off_t) != 8)
     abort ();
 
   /* We use no threads here which can interfere with handling a stream.  */

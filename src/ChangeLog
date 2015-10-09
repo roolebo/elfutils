@@ -1,3 +1,20 @@
+2015-10-09  Josh Stone  <jistone@redhat.com>
+
+	* elflint.c (main): Replace stat64 and fstat64 with stat and fstat.
+	* readelf.c (process_file): Likewise.
+	(process_elf_file): Replace off64_t with off_t.
+	* findtextrel.c (process_file): Replace open64 with open.
+	* ld.c (main): Replace sizeof (off64_t) with 8.
+	* strings.c: Replace off64_t with off_t throughout.
+	(main): Replace stat64 and fstat64 with stat and fstat.
+	(map_file): Replace mmap64 with mmap.
+	(read_block): Likewise, and replace lseek64 with lseek.
+	* strip.c (handle_elf): Replace ftruncate64 with ftruncate.
+	(process_file): Replace stat64 and fstat64 with stat and fstat.
+	* unstrip.c (parse_opt): Replace stat64 with stat.
+	(handle_file): Replace open64 with open.
+	(open_file): Likewise.
+
 2015-10-08  Chih-Hung Hsieh  <chh@google.com>
 
 	* ld.c (determine_output_format): Move recursive nested

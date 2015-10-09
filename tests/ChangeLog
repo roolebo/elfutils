@@ -1,3 +1,20 @@
+2015-10-09  Josh Stone  <jistone@redhat.com>
+
+	* lfs-symbols: New list of LFS-related symbols from lintian.
+	* testfile-nolfs.bz2: New test binary for sanity checking.
+	* run-lfs-symbols.sh: New test.
+	* Makefile.am (TESTS): Add run-lfs-symbols.sh.
+	(EXTRA_DIST): Add lfs-symbols, testfile-nolfs.bz2, and
+	run-lfs-symbols.sh.
+	* alldts.c (main): Replace open64 with open.
+	* dwarf-getstring.c (main): Likewise.
+	* arls.c: Include config.h.
+	* ecp.c: Likewise.
+	* rdwrmmap.c: Likewise.
+	* test-elf_cntl_gelf_getshdr.c: Likewise.
+	* test-flag-nobits.c: Include config.h.
+	(main): Replace open64 with open.
+
 2015-10-09  Mark Wielaard  <mjw@redhat.com>
 
 	* elfshphehdr.c (check): Rename argument from check to statement.

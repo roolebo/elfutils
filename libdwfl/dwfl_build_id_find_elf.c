@@ -89,7 +89,7 @@ __libdwfl_open_by_build_id (Dwfl_Module *mod, bool debug, char **file_name,
 	break;
       memcpy (mempcpy (name, dir, dirlen), id_name, sizeof id_name);
 
-      fd = TEMP_FAILURE_RETRY (open64 (name, O_RDONLY));
+      fd = TEMP_FAILURE_RETRY (open (name, O_RDONLY));
       if (fd >= 0)
 	{
 	  if (*file_name != NULL)
@@ -146,7 +146,7 @@ dwfl_build_id_find_elf (Dwfl_Module *mod,
 	 name this callback will replace the Dwfl_Module main.name with the
 	 recorded executable file when MOD was identified as main executable
 	 (which then triggers opening and reporting of the executable).  */
-      int fd = open64 (mod->dwfl->executable_for_core, O_RDONLY);
+      int fd = open (mod->dwfl->executable_for_core, O_RDONLY);
       if (fd >= 0)
 	{
 	  *file_name = strdup (mod->dwfl->executable_for_core);

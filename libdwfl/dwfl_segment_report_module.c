@@ -691,7 +691,7 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
       name = file_note_name;
       name_is_final = true;
       bool invalid = false;
-      fd = open64 (name, O_RDONLY);
+      fd = open (name, O_RDONLY);
       if (fd >= 0)
 	{
 	  Dwfl_Error error = __libdw_open_file (&fd, &elf, true, false);

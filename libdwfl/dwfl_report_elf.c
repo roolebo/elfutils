@@ -291,7 +291,7 @@ dwfl_report_elf (Dwfl *dwfl, const char *name, const char *file_name, int fd,
   if (fd < 0)
     {
       closefd = true;
-      fd = open64 (file_name, O_RDONLY);
+      fd = open (file_name, O_RDONLY);
       if (fd < 0)
 	{
 	  __libdwfl_seterrno (DWFL_E_ERRNO);

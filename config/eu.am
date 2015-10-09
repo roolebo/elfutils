@@ -74,3 +74,6 @@ else
 textrel_found = $(textrel_msg)
 endif
 textrel_check = if $(READELF) -d $@ | fgrep -q TEXTREL; then $(textrel_found); fi
+
+print-%:
+	@echo $*=$($*)

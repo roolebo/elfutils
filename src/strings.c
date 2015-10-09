@@ -49,8 +49,8 @@
 
 
 /* Prototypes of local functions.  */
-static int read_fd (int fd, const char *fname, off64_t fdlen);
-static int read_elf (Elf *elf, int fd, const char *fname, off64_t fdlen);
+static int read_fd (int fd, const char *fname, off_t fdlen);
+static int read_elf (Elf *elf, int fd, const char *fname, off_t fdlen);
 
 
 /* Name and version of program.  */
@@ -138,7 +138,7 @@ static size_t ps;
 static unsigned char *elfmap;
 static unsigned char *elfmap_base;
 static size_t elfmap_size;
-static off64_t elfmap_off;
+static off_t elfmap_off;
 
 
 int
@@ -167,14 +167,14 @@ main (int argc, char *argv[])
   /* Determine the page size.  We will likely need it a couple of times.  */
   ps = sysconf (_SC_PAGESIZE);
 
-  struct stat64 st;
+  struct stat st;
   int result = 0;
   if (remaining == argc)
     /* We read from standard input.  This we cannot do for a
        structured file.  */
     result = read_fd (STDIN_FILENO,
 		      print_file_name ? "{standard input}" : NULL,
-		      (fstat64 (STDIN_FILENO, &st) == 0 && S_ISREG (st.st_mode))
+		      (fstat (STDIN_FILENO, &st) == 0 && S_ISREG (st.st_mode))
 		      ? st.st_size : INT64_C (0x7fffffffffffffff));
   else
     do
@@ -189,10 +189,10 @@ main (int argc, char *argv[])
 	else
 	  {
 	    const char *fname = print_file_name ? argv[remaining] : NULL;
-	    int fstat_fail = fstat64 (fd, &st);
-	    off64_t fdlen = (fstat_fail
+	    int fstat_fail = fstat (fd, &st);
+	    off_t fdlen = (fstat_fail
 			     ? INT64_C (0x7fffffffffffffff) : st.st_size);
-	    if (fdlen > (off64_t) min_len_bytes)
+	    if (fdlen > (off_t) min_len_bytes)
 	      {
 		Elf *elf = NULL;
 		if (entire_file
@@ -326,7 +326,7 @@ parse_opt (int key, char *arg,
 
 
 static void
-process_chunk_mb (const char *fname, const unsigned char *buf, off64_t to,
+process_chunk_mb (const char *fname, const unsigned char *buf, off_t to,
 		  size_t len, char **unprinted)
 {
   size_t curlen = *unprinted == NULL ? 0 : strlen (*unprinted);
@@ -403,7 +403,7 @@ process_chunk_mb (const char *fname, const unsigned char *buf, off64_t to,
 
 
 static void
-process_chunk (const char *fname, const unsigned char *buf, off64_t to,
+process_chunk (const char *fname, const unsigned char *buf, off_t to,
 	       size_t len, char **unprinted)
 {
   /* We are not going to slow the check down for the 2- and 4-byte
@@ -467,7 +467,7 @@ process_chunk (const char *fname, const unsigned char *buf, off64_t to,
 
 /* Map a file in as large chunks as possible.  */
 static void *
-map_file (int fd, off64_t start_off, off64_t fdlen, size_t *map_sizep)
+map_file (int fd, off_t start_off, off_t fdlen, size_t *map_sizep)
 {
   /* Maximum size we mmap.  We use an #ifdef to avoid overflows on
      32-bit machines.  64-bit machines these days do not have usable
@@ -480,7 +480,7 @@ map_file (int fd, off64_t start_off, off64_t fdlen, size_t *map_sizep)
 # endif
 
   /* Try to mmap the file.  */
-  size_t map_size = MIN ((off64_t) mmap_max, fdlen);
+  size_t map_size = MIN ((off_t) mmap_max, fdlen);
   const size_t map_size_min = MAX (MAX (SIZE_MAX / 16, 2 * ps),
 				   roundup (2 * min_len_bytes + 1, ps));
   void *mem;
@@ -489,8 +489,8 @@ map_file (int fd, off64_t start_off, off64_t fdlen, size_t *map_sizep)
       /* We map the memory for reading only here.  Since we will
 	 always look at every byte of the file it makes sense to
 	 use MAP_POPULATE.  */
-      mem = mmap64 (NULL, map_size, PROT_READ, MAP_PRIVATE | MAP_POPULATE,
-		    fd, start_off);
+      mem = mmap (NULL, map_size, PROT_READ, MAP_PRIVATE | MAP_POPULATE,
+		  fd, start_off);
       if (mem != MAP_FAILED)
 	{
 	  /* We will go through the mapping sequentially.  */
@@ -515,7 +515,7 @@ map_file (int fd, off64_t start_off, off64_t fdlen, size_t *map_sizep)
 
 /* Read the file without mapping.  */
 static int
-read_block_no_mmap (int fd, const char *fname, off64_t from, off64_t fdlen)
+read_block_no_mmap (int fd, const char *fname, off_t from, off_t fdlen)
 {
   char *unprinted = NULL;
 #define CHUNKSIZE 65536
@@ -577,7 +577,7 @@ read_block_no_mmap (int fd, const char *fname, off64_t from, off64_t fdlen)
 
 
 static int
-read_block (int fd, const char *fname, off64_t fdlen, off64_t from, off64_t to)
+read_block (int fd, const char *fname, off_t fdlen, off_t from, off_t to)
 {
   if (elfmap == NULL)
     {
@@ -596,23 +596,23 @@ read_block (int fd, const char *fname, off64_t fdlen, off64_t from, off64_t to)
 	 read pointer.  */
       // XXX Eventually add flag which avoids this if the position
       // XXX is known to match.
-      if (from != 0 && lseek64 (fd, from, SEEK_SET) != from)
-	error (EXIT_FAILURE, errno, gettext ("lseek64 failed"));
+      if (from != 0 && lseek (fd, from, SEEK_SET) != from)
+	error (EXIT_FAILURE, errno, gettext ("lseek failed"));
 
       return read_block_no_mmap (fd, fname, from, to - from);
     }
 
-  assert ((off64_t) min_len_bytes < fdlen);
+  assert ((off_t) min_len_bytes < fdlen);
 
-  if (to < (off64_t) elfmap_off || from > (off64_t) (elfmap_off + elfmap_size))
+  if (to < (off_t) elfmap_off || from > (off_t) (elfmap_off + elfmap_size))
     {
       /* The existing mapping cannot fit at all.  Map the new area.
 	 We always map the full range of ELFMAP_SIZE bytes even if
 	 this extend beyond the end of the file.  The Linux kernel
 	 handles this OK if the access pages are not touched.  */
       elfmap_off = from & ~(ps - 1);
-      if (mmap64 (elfmap, elfmap_size, PROT_READ,
-		  MAP_PRIVATE | MAP_POPULATE | MAP_FIXED, fd, from)
+      if (mmap (elfmap, elfmap_size, PROT_READ,
+		MAP_PRIVATE | MAP_POPULATE | MAP_FIXED, fd, from)
 	  == MAP_FAILED)
 	error (EXIT_FAILURE, errno, gettext ("re-mmap failed"));
       elfmap_base = elfmap;
@@ -622,23 +622,23 @@ read_block (int fd, const char *fname, off64_t fdlen, off64_t from, off64_t to)
 
   /* Use the existing mapping as much as possible.  If necessary, map
      new pages.  */
-  if (from >= (off64_t) elfmap_off
-      && from < (off64_t) (elfmap_off + elfmap_size))
+  if (from >= (off_t) elfmap_off
+      && from < (off_t) (elfmap_off + elfmap_size))
     /* There are at least a few bytes in this mapping which we can
        use.  */
     process_chunk (fname, elfmap_base + (from - elfmap_off),
-		   MIN (to, (off64_t) (elfmap_off + elfmap_size)),
-		   MIN (to, (off64_t) (elfmap_off + elfmap_size)) - from,
+		   MIN (to, (off_t) (elfmap_off + elfmap_size)),
+		   MIN (to, (off_t) (elfmap_off + elfmap_size)) - from,
 		   &unprinted);
 
-  if (to > (off64_t) (elfmap_off + elfmap_size))
+  if (to > (off_t) (elfmap_off + elfmap_size))
     {
       unsigned char *remap_base = elfmap_base;
       size_t read_now = elfmap_size - (elfmap_base - elfmap);
 
-      assert (from >= (off64_t) elfmap_off
-	      && from < (off64_t) (elfmap_off + elfmap_size));
-      off64_t handled_to = elfmap_off + elfmap_size;
+      assert (from >= (off_t) elfmap_off
+	      && from < (off_t) (elfmap_off + elfmap_size));
+      off_t handled_to = elfmap_off + elfmap_size;
       assert (elfmap == elfmap_base
 	      || (elfmap_base - elfmap
 		  == (ptrdiff_t) ((min_len_bytes + ps - 1) & ~(ps - 1))));
@@ -675,8 +675,8 @@ read_block (int fd, const char *fname, off64_t fdlen, off64_t from, off64_t to)
 
 	  assert (handled_to % ps == 0);
 	  assert (handled_to % bytes_per_char == 0);
-	  if (mmap64 (remap_base, read_now, PROT_READ,
-		      MAP_PRIVATE | MAP_POPULATE | MAP_FIXED, fd, handled_to)
+	  if (mmap (remap_base, read_now, PROT_READ,
+		    MAP_PRIVATE | MAP_POPULATE | MAP_FIXED, fd, handled_to)
 	      == MAP_FAILED)
 	    error (EXIT_FAILURE, errno, gettext ("re-mmap failed"));
 	  elfmap_off = handled_to;
@@ -700,14 +700,14 @@ read_block (int fd, const char *fname, off64_t fdlen, off64_t from, off64_t to)
 
 
 static int
-read_fd (int fd, const char *fname, off64_t fdlen)
+read_fd (int fd, const char *fname, off_t fdlen)
 {
   return read_block (fd, fname, fdlen, 0, fdlen);
 }
 
 
 static int
-read_elf (Elf *elf, int fd, const char *fname, off64_t fdlen)
+read_elf (Elf *elf, int fd, const char *fname, off_t fdlen)
 {
   assert (fdlen >= 0);
 

@@ -1,3 +1,29 @@
+2015-10-09  Josh Stone  <jistone@redhat.com>
+
+	* core-file.c (elf_begin_rand): Replace loff_t with off_t.
+	* open.c (decompress): Replace off64_t with off_t.
+	* gzip.c (unzip): Likewise.
+	* image-header.c (__libdw_image_header): Likewise.
+	* libdwflP.h: Likewise in function declarations.
+	* argp-std.c (parse_opt): Replace open64 with open.
+	* dwfl_build_id_find_elf.c (__libdwfl_open_mod_by_build_id,
+	dwfl_build_id_find_elf): Likewise.
+	* dwfl_module_getdwarf.c (open_elf_file): Likewise.
+	* dwfl_report_elf.c (dwfl_report_elf): Likewise.
+	* dwfl_segment_report_module.c (dwfl_segment_report_module): Likewise.
+	* link_map.c (report_r_debug): Likewise.
+	* offline.c (dwfl_report_offline): Likewise.
+	* linux-proc-maps.c (grovel_auxv, get_pid_class,
+	dwfl_linux_proc_find_elf): Likewise.
+	(read_proc_memory): Replace off64_t with off_t.
+	* find-debuginfo.c (find_debuginfo_in_path): Replace stat64 and
+	fstat64 with stat and fstat.
+	(try_open): Likewise, and replace open64 with open.
+	* linux-kernel-modules.c: Manually define open and fopen to open64 and
+	fopen64 when needed, since the early fts.h include breaks that.
+	(try_kernel_name): Replace open64 with open.
+	(check_notes): Likewise.
+
 2015-10-09  Jose E. Marchesi  <jose.marchesi@oracle.com>
 
 	* linux-proc-maps.c (read_proc_memory): Use seek+read instead of

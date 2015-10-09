@@ -57,7 +57,7 @@
 
 Dwfl_Error
 internal_function
-__libdw_image_header (int fd, off64_t *start_offset,
+__libdw_image_header (int fd, off_t *start_offset,
 		      void *mapped, size_t mapped_size)
 {
   if (likely (mapped_size > H_END))

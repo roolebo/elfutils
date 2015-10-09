@@ -53,7 +53,7 @@ decompress (int fd __attribute__ ((unused)), Elf **elf)
   size_t size = 0;
 
 #if USE_ZLIB || USE_BZLIB || USE_LZMA
-  const off64_t offset = (*elf)->start_offset;
+  const off_t offset = (*elf)->start_offset;
   void *const mapped = ((*elf)->map_address == NULL ? NULL
 			: (*elf)->map_address + offset);
   const size_t mapped_size = (*elf)->maximum_size;
@@ -132,7 +132,7 @@ __libdw_open_file (int *fdp, Elf **elfp, bool close_on_fail, bool archive_ok)
       /* It's not an ELF file or a compressed file.
 	 See if it's an image with a header preceding the real file.  */
 
-      off64_t offset = elf->start_offset;
+      off_t offset = elf->start_offset;
       error = __libdw_image_header (*fdp, &offset,
 				    (elf->map_address == NULL ? NULL
 				     : elf->map_address + offset),

@@ -44,6 +44,13 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+/* Since fts.h is included before config.h, its indirect inclusions may not
+   give us the right LFS aliases of these functions, so map them manually.  */
+#ifdef _FILE_OFFSET_BITS
+#define open open64
+#define fopen fopen64
+#endif
+
 
 #define KERNEL_MODNAME	"kernel"
 
@@ -84,7 +91,7 @@ try_kernel_name (Dwfl *dwfl, char **fname, bool try_debug)
   int fd = ((((dwfl->callbacks->debuginfo_path
 	       ? *dwfl->callbacks->debuginfo_path : NULL)
 	      ?: DEFAULT_DEBUGINFO_PATH)[0] == ':') ? -1
-	    : TEMP_FAILURE_RETRY (open64 (*fname, O_RDONLY)));
+	    : TEMP_FAILURE_RETRY (open (*fname, O_RDONLY)));
 
   if (fd < 0)
     {
@@ -116,7 +123,7 @@ try_kernel_name (Dwfl *dwfl, char **fname, bool try_debug)
 	char *zname;
 	if (asprintf (&zname, "%s%s", *fname, vmlinux_suffixes[i]) > 0)
 	  {
-	    fd = TEMP_FAILURE_RETRY (open64 (zname, O_RDONLY));
+	    fd = TEMP_FAILURE_RETRY (open (zname, O_RDONLY));
 	    if (fd < 0)
 	      free (zname);
 	    else
@@ -514,7 +521,7 @@ static int
 check_notes (Dwfl_Module *mod, const char *notesfile,
 	     Dwarf_Addr vaddr, const char *secname)
 {
-  int fd = open64 (notesfile, O_RDONLY);
+  int fd = open (notesfile, O_RDONLY);
   if (fd < 0)
     return 1;
 
@@ -772,7 +779,7 @@ dwfl_linux_kernel_find_elf (Dwfl_Module *mod,
 	      && (!memcmp (f->fts_name, module_name, namelen)
 		  || !memcmp (f->fts_name, alternate_name, namelen)))
 	    {
-	      int fd = open64 (f->fts_accpath, O_RDONLY);
+	      int fd = open (f->fts_accpath, O_RDONLY);
 	      *file_name = strdup (f->fts_path);
 	      fts_close (fts);
 	      free (modulesdir[0]);

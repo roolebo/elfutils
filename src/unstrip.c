@@ -176,9 +176,9 @@ parse_opt (int key, char *arg, struct argp_state *state)
 
       if (info->output_dir != NULL)
 	{
-	  struct stat64 st;
+	  struct stat st;
 	  error_t fail = 0;
-	  if (stat64 (info->output_dir, &st) < 0)
+	  if (stat (info->output_dir, &st) < 0)
 	    fail = errno;
 	  else if (!S_ISDIR (st.st_mode))
 	    fail = ENOTDIR;
@@ -1988,7 +1988,7 @@ DWARF data in '%s' not adjusted for prelinking bias; consider prelink -u"),
 	make_directories (output_file);
 
       /* Copy the unstripped file and then modify it.  */
-      int outfd = open64 (output_file, O_RDWR | O_CREAT,
+      int outfd = open (output_file, O_RDWR | O_CREAT,
 			  stripped_ehdr->e_type == ET_REL ? 0666 : 0777);
       if (outfd < 0)
 	error (EXIT_FAILURE, errno, _("cannot open '%s'"), output_file);
@@ -2018,7 +2018,7 @@ DWARF data in '%s' not adjusted for prelinking bias; consider prelink -u"),
 static int
 open_file (const char *file, bool writable)
 {
-  int fd = open64 (file, writable ? O_RDWR : O_RDONLY);
+  int fd = open (file, writable ? O_RDWR : O_RDONLY);
   if (fd < 0)
     error (EXIT_FAILURE, errno, _("cannot open '%s'"), file);
   return fd;

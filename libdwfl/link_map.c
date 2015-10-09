@@ -385,7 +385,7 @@ report_r_debug (uint_fast8_t elfclass, uint_fast8_t elfdata,
 	{
 	  /* This code is mostly inlined dwfl_report_elf.  */
 	  // XXX hook for sysroot
-	  int fd = open64 (name, O_RDONLY);
+	  int fd = open (name, O_RDONLY);
 	  if (fd >= 0)
 	    {
 	      Elf *elf;

@@ -1,3 +1,8 @@
+2015-10-09  Josh Stone  <jistone@redhat.com>
+
+	* dwarf_begin.c (dwarf_begin): Replace stat64 and fstat64 with stat
+	and fstat.
+
 2015-10-05  Josh Stone  <jistone@redhat.com>
 
 	* Makefile.am (libdw.so): Add AM_V_CCLD and AM_V_at silencers.

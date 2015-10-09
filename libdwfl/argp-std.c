@@ -273,7 +273,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
 
 	if (opt->core)
 	  {
-	    int fd = open64 (opt->core, O_RDONLY);
+	    int fd = open (opt->core, O_RDONLY);
 	    if (fd < 0)
 	      {
 		int code = errno;

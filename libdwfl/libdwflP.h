@@ -588,21 +588,21 @@ extern GElf_Addr __libdwfl_segment_end (Dwfl *dwfl, GElf_Addr end)
   internal_function;
 
 /* Decompression wrappers: decompress whole file into memory.  */
-extern Dwfl_Error __libdw_gunzip  (int fd, off64_t start_offset,
+extern Dwfl_Error __libdw_gunzip  (int fd, off_t start_offset,
 				   void *mapped, size_t mapped_size,
 				   void **whole, size_t *whole_size)
   internal_function;
-extern Dwfl_Error __libdw_bunzip2 (int fd, off64_t start_offset,
+extern Dwfl_Error __libdw_bunzip2 (int fd, off_t start_offset,
 				   void *mapped, size_t mapped_size,
 				   void **whole, size_t *whole_size)
   internal_function;
-extern Dwfl_Error __libdw_unlzma (int fd, off64_t start_offset,
+extern Dwfl_Error __libdw_unlzma (int fd, off_t start_offset,
 				  void *mapped, size_t mapped_size,
 				  void **whole, size_t *whole_size)
   internal_function;
 
 /* Skip the image header before a file image: updates *START_OFFSET.  */
-extern Dwfl_Error __libdw_image_header (int fd, off64_t *start_offset,
+extern Dwfl_Error __libdw_image_header (int fd, off_t *start_offset,
 					void *mapped, size_t mapped_size)
   internal_function;
 

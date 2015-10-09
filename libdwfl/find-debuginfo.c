@@ -34,10 +34,10 @@
 #include "system.h"
 
 
-/* Try to open64 [DIR/][SUBDIR/]DEBUGLINK, return file descriptor or -1.
+/* Try to open [DIR/][SUBDIR/]DEBUGLINK, return file descriptor or -1.
    On success, *DEBUGINFO_FILE_NAME has the malloc'd name of the open file.  */
 static int
-try_open (const struct stat64 *main_stat,
+try_open (const struct stat *main_stat,
 	  const char *dir, const char *subdir, const char *debuglink,
 	  char **debuginfo_file_name)
 {
@@ -53,11 +53,11 @@ try_open (const struct stat64 *main_stat,
 	    : asprintf (&fname, "%s/%s/%s", dir, subdir, debuglink)) < 0)
     return -1;
 
-  struct stat64 st;
-  int fd = TEMP_FAILURE_RETRY (open64 (fname, O_RDONLY));
+  struct stat st;
+  int fd = TEMP_FAILURE_RETRY (open (fname, O_RDONLY));
   if (fd < 0)
     free (fname);
-  else if (fstat64 (fd, &st) == 0
+  else if (fstat (fd, &st) == 0
 	   && st.st_ino == main_stat->st_ino
 	   && st.st_dev == main_stat->st_dev)
     {
@@ -205,9 +205,9 @@ find_debuginfo_in_path (Dwfl_Module *mod, const char *file_name,
     }
 
   /* XXX dev/ino should be cached in struct dwfl_file.  */
-  struct stat64 main_stat;
-  if (unlikely ((mod->main.fd != -1 ? fstat64 (mod->main.fd, &main_stat)
-		 : file_name != NULL ? stat64 (file_name, &main_stat)
+  struct stat main_stat;
+  if (unlikely ((mod->main.fd != -1 ? fstat (mod->main.fd, &main_stat)
+		 : file_name != NULL ? stat (file_name, &main_stat)
 		 : -1) < 0))
     {
       main_stat.st_dev = 0;

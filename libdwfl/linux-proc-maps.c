@@ -315,10 +315,17 @@ read_proc_memory (void *arg, void *data, GElf_Addr address,
 		  size_t minread, size_t maxread)
 {
   const int fd = *(const int *) arg;
-  ssize_t nread = pread64 (fd, data, maxread, (off64_t) address);
-  /* Some kernels don't actually let us do this read, ignore those errors.  */
-  if (nread < 0 && (errno == EINVAL || errno == EPERM))
-    return 0;
+
+  /* This code relies on the fact the Linux kernel accepts negative
+     offsets when seeking /dev/$$/mem files, as a special case. In
+     particular pread[64] cannot be used here, because it will always
+     return EINVAL when passed a negative offset.  */
+
+  if (lseek (fd, (off64_t) address, SEEK_SET) == -1)
+    return -1;
+
+  ssize_t nread = read (fd, data, maxread);
+
   if (nread > 0 && (size_t) nread < minread)
     nread = 0;
   return nread;

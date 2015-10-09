@@ -1,3 +1,8 @@
+2015-10-09  Jose E. Marchesi  <jose.marchesi@oracle.com>
+
+	* linux-proc-maps.c (read_proc_memory): Use seek+read instead of
+	pread, as the later doesn't accept negative offsets.
+
 2015-10-07  Mark Wielaard  <mjw@redhat.com>
 
 	* dwfl_module_getdwarf.c (MAX): Removed.

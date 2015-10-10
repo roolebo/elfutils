@@ -1,3 +1,7 @@
+2015-10-09  Josh Stone  <jistone@redhat.com>
+
+	* libelf.h: Replace loff_t with int64_t throughout.
+
 2015-10-05  Mark Wielaard  <mjw@redhat.com>
 
 	* elf_update.c (write_file): Only use posix_fallocate when using

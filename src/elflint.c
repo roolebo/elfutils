@@ -3938,12 +3938,20 @@ section [%2zu] '%s' has unexpected type %d for an executable section\n"),
 	      break;
 	    }
 
-	  if ((shdr->sh_flags & SHF_WRITE)
-	      && !ebl_check_special_section (ebl, cnt, shdr,
-					     section_name (ebl, cnt)))
-	    ERROR (gettext ("\
+	  if (shdr->sh_flags & SHF_WRITE)
+	    {
+	      if (is_debuginfo && shdr->sh_type != SHT_NOBITS)
+		ERROR (gettext ("\
+section [%2zu] '%s' must be of type NOBITS in debuginfo files\n"),
+		       cnt, section_name (ebl, cnt));
+
+	      if (!is_debuginfo
+		  && !ebl_check_special_section (ebl, cnt, shdr,
+						 section_name (ebl, cnt)))
+		ERROR (gettext ("\
 section [%2zu] '%s' is both executable and writable\n"),
-		   cnt, section_name (ebl, cnt));
+		       cnt, section_name (ebl, cnt));
+	    }
 	}
 
       if (ehdr->e_type != ET_REL && (shdr->sh_flags & SHF_ALLOC) != 0)

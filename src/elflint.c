@@ -4459,10 +4459,26 @@ more than one GNU_RELRO entry in program header\n"));
 		      if ((phdr2->p_flags & PF_W) == 0)
 			ERROR (gettext ("\
 loadable segment GNU_RELRO applies to is not writable\n"));
-		      if ((phdr2->p_flags & ~PF_W) != (phdr->p_flags & ~PF_W))
-			ERROR (gettext ("\
+		      /* Unless fully covered, relro flags could be a
+			 subset of the phdrs2 flags.  For example the load
+			 segment could also have PF_X set.  */
+		      if (phdr->p_vaddr == phdr2->p_vaddr
+			  && (phdr->p_vaddr + phdr->p_memsz
+			      == phdr2->p_vaddr + phdr2->p_memsz))
+			{
+			  if ((phdr2->p_flags & ~PF_W)
+			      != (phdr->p_flags & ~PF_W))
+			    ERROR (gettext ("\
 loadable segment [%u] flags do not match GNU_RELRO [%u] flags\n"),
-			       cnt, inner);
+				   cnt, inner);
+			}
+		      else
+			{
+			  if ((phdr->p_flags & ~phdr2->p_flags) != 0)
+			    ERROR (gettext ("\
+GNU_RELRO [%u] flags are not a subset of the loadable segment [%u] flags\n"),
+				   inner, cnt);
+			}
 		      break;
 		    }
 		}

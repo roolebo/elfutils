@@ -1,3 +1,8 @@
+2015-10-13  Mark Wielaard  <mjw@redhat.com>
+
+	* elflint.c (check_program_header): Check relro flags are a subset
+	of the load segment if they don't fully overlap.
+
 2015-10-07  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (ldlex_no_Wstack_usage): New.

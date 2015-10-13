@@ -78,6 +78,74 @@ compare_lines (const void *a, const void *b)
     : 0;
 }
 
+struct line_state
+{
+  Dwarf_Word addr;
+  unsigned int op_index;
+  unsigned int file;
+  int64_t line;
+  unsigned int column;
+  uint_fast8_t is_stmt;
+  bool basic_block;
+  bool prologue_end;
+  bool epilogue_begin;
+  unsigned int isa;
+  unsigned int discriminator;
+  struct linelist *linelist;
+  size_t nlinelist;
+  unsigned int end_sequence;
+};
+
+static inline void
+run_advance_pc (struct line_state *state, unsigned int op_advance,
+                uint_fast8_t minimum_instr_len, uint_fast8_t max_ops_per_instr)
+{
+  state->addr += minimum_instr_len * ((state->op_index + op_advance)
+				      / max_ops_per_instr);
+  state->op_index = (state->op_index + op_advance) % max_ops_per_instr;
+}
+
+static inline bool
+add_new_line (struct line_state *state, struct linelist *new_line)
+{
+  /* Set the line information.  For some fields we use bitfields,
+     so we would lose information if the encoded values are too large.
+     Check just for paranoia, and call the data "invalid" if it
+     violates our assumptions on reasonable limits for the values.  */
+  new_line->next = state->linelist;
+  new_line->sequence = state->nlinelist;
+  state->linelist = new_line;
+  ++(state->nlinelist);
+
+  /* Set the line information.  For some fields we use bitfields,
+     so we would lose information if the encoded values are too large.
+     Check just for paranoia, and call the data "invalid" if it
+     violates our assumptions on reasonable limits for the values.  */
+#define SET(field)						      \
+  do {								      \
+     new_line->line.field = state->field;			      \
+     if (unlikely (new_line->line.field != state->field))	      \
+       return true;						      \
+   } while (0)
+
+  SET (addr);
+  SET (op_index);
+  SET (file);
+  SET (line);
+  SET (column);
+  SET (is_stmt);
+  SET (basic_block);
+  SET (end_sequence);
+  SET (prologue_end);
+  SET (epilogue_begin);
+  SET (isa);
+  SET (discriminator);
+
+#undef SET
+
+  return false;
+}
+
 static int
 read_srclines (Dwarf *dbg,
 	       const unsigned char *linep, const unsigned char *lineendp,
@@ -86,8 +154,6 @@ read_srclines (Dwarf *dbg,
 {
   int res = -1;
 
-  struct linelist *linelist = NULL;
-  size_t nlinelist = 0;
   size_t nfilelist = 0;
   unsigned int ndirlist = 0;
 
@@ -323,27 +389,28 @@ read_srclines (Dwarf *dbg,
 
   /* We are about to process the statement program.  Initialize the
      state machine registers (see 6.2.2 in the v2.1 specification).  */
-  Dwarf_Word addr = 0;
-  unsigned int op_index = 0;
-  unsigned int file = 1;
-  /* We only store an int, but want to check for overflow (see SET below).  */
-  int64_t line = 1;
-  unsigned int column = 0;
-  uint_fast8_t is_stmt = default_is_stmt;
-  bool basic_block = false;
-  bool prologue_end = false;
-  bool epilogue_begin = false;
-  unsigned int isa = 0;
-  unsigned int discriminator = 0;
+  struct line_state state =
+    {
+      .linelist = NULL,
+      .nlinelist = 0,
+      .addr = 0,
+      .op_index = 0,
+      .file = 1,
+      /* We only store int but want to check for overflow (see SET above).  */
+      .line = 1,
+      .column = 0,
+      .is_stmt = default_is_stmt,
+      .basic_block = false,
+      .prologue_end = false,
+      .epilogue_begin = false,
+      .isa = 0,
+      .discriminator = 0
+    };
 
   /* Apply the "operation advance" from a special opcode or
      DW_LNS_advance_pc (as per DWARF4 6.2.5.1).  */
-  inline void advance_pc (unsigned int op_advance)
-  {
-    addr += minimum_instr_len * ((op_index + op_advance)
-				 / max_ops_per_instr);
-    op_index = (op_index + op_advance) % max_ops_per_instr;
-  }
+#define advance_pc(op_advance) \
+  run_advance_pc (&state, op_advance, minimum_instr_len, max_ops_per_instr)
 
   /* Process the instructions.  */
 
@@ -352,50 +419,15 @@ read_srclines (Dwarf *dbg,
   struct linelist llstack[MAX_STACK_LINES];
 #define NEW_LINE(end_seq)						\
   do {								\
-    struct linelist *ll = (nlinelist < MAX_STACK_LINES		\
-			   ? &llstack[nlinelist]		\
+    struct linelist *ll = (state.nlinelist < MAX_STACK_LINES	\
+			   ? &llstack[state.nlinelist]		\
 			   : malloc (sizeof (struct linelist)));	\
     if (unlikely (ll == NULL))					\
       goto no_mem;						\
-    if (unlikely (add_new_line (ll, end_seq)))			\
+    state.end_sequence = end_seq;				\
+    if (unlikely (add_new_line (&state, ll)))			\
       goto invalid_data;						\
   } while (0)
-
-  inline bool add_new_line (struct linelist *new_line, bool end_sequence)
-  {
-    new_line->next = linelist;
-    new_line->sequence = nlinelist;
-    linelist = new_line;
-    ++nlinelist;
-
-    /* Set the line information.  For some fields we use bitfields,
-       so we would lose information if the encoded values are too large.
-       Check just for paranoia, and call the data "invalid" if it
-       violates our assumptions on reasonable limits for the values.  */
-#define SET(field)							      \
-    do {								      \
-      new_line->line.field = field;					      \
-      if (unlikely (new_line->line.field != field))			      \
-	return true;						      \
-    } while (0)
-
-    SET (addr);
-    SET (op_index);
-    SET (file);
-    SET (line);
-    SET (column);
-    SET (is_stmt);
-    SET (basic_block);
-    SET (end_sequence);
-    SET (prologue_end);
-    SET (epilogue_begin);
-    SET (isa);
-    SET (discriminator);
-
-#undef SET
-
-    return false;
-  }
 
   while (linep < lineendp)
     {
@@ -422,17 +454,17 @@ read_srclines (Dwarf *dbg,
 				+ (opcode - opcode_base) % line_range);
 
 	  /* Perform the increments.  */
-	  line += line_increment;
+	  state.line += line_increment;
 	  advance_pc ((opcode - opcode_base) / line_range);
 
 	  /* Add a new line with the current state machine values.  */
 	  NEW_LINE (0);
 
 	  /* Reset the flags.  */
-	  basic_block = false;
-	  prologue_end = false;
-	  epilogue_begin = false;
-	  discriminator = 0;
+	  state.basic_block = false;
+	  state.prologue_end = false;
+	  state.epilogue_begin = false;
+	  state.discriminator = 0;
 	}
       else if (opcode == 0)
 	{
@@ -457,28 +489,28 @@ read_srclines (Dwarf *dbg,
 	      NEW_LINE (1);
 
 	      /* Reset the registers.  */
-	      addr = 0;
-	      op_index = 0;
-	      file = 1;
-	      line = 1;
-	      column = 0;
-	      is_stmt = default_is_stmt;
-	      basic_block = false;
-	      prologue_end = false;
-	      epilogue_begin = false;
-	      isa = 0;
-	      discriminator = 0;
+	      state.addr = 0;
+	      state.op_index = 0;
+	      state.file = 1;
+	      state.line = 1;
+	      state.column = 0;
+	      state.is_stmt = default_is_stmt;
+	      state.basic_block = false;
+	      state.prologue_end = false;
+	      state.epilogue_begin = false;
+	      state.isa = 0;
+	      state.discriminator = 0;
 	      break;
 
 	    case DW_LNE_set_address:
 	      /* The value is an address.  The size is defined as
 		 apporiate for the target machine.  We use the
 		 address size field from the CU header.  */
-	      op_index = 0;
+	      state.op_index = 0;
 	      if (unlikely (lineendp - linep < (uint8_t) address_size))
 		goto invalid_data;
 	      if (__libdw_read_address_inc (dbg, IDX_debug_line, &linep,
-					    address_size, &addr))
+					    address_size, &state.addr))
 		goto out;
 	      break;
 
@@ -542,7 +574,7 @@ read_srclines (Dwarf *dbg,
 
 	      if (unlikely (linep >= lineendp))
 		goto invalid_data;
-	      get_uleb128 (discriminator, linep, lineendp);
+	      get_uleb128 (state.discriminator, linep, lineendp);
 	      break;
 
 	    default:
@@ -567,10 +599,10 @@ read_srclines (Dwarf *dbg,
 	      NEW_LINE (0);
 
 	      /* Reset the flags.  */
-	      basic_block = false;
-	      prologue_end = false;
-	      epilogue_begin = false;
-	      discriminator = 0;
+	      state.basic_block = false;
+	      state.prologue_end = false;
+	      state.epilogue_begin = false;
+	      state.discriminator = 0;
 	      break;
 
 	    case DW_LNS_advance_pc:
@@ -594,7 +626,7 @@ read_srclines (Dwarf *dbg,
 	      if (unlikely (linep >= lineendp))
 		goto invalid_data;
 	      get_sleb128 (s128, linep, lineendp);
-	      line += s128;
+	      state.line += s128;
 	      break;
 
 	    case DW_LNS_set_file:
@@ -605,7 +637,7 @@ read_srclines (Dwarf *dbg,
 	      if (unlikely (linep >= lineendp))
 		goto invalid_data;
 	      get_uleb128 (u128, linep, lineendp);
-	      file = u128;
+	      state.file = u128;
 	      break;
 
 	    case DW_LNS_set_column:
@@ -616,7 +648,7 @@ read_srclines (Dwarf *dbg,
 	      if (unlikely (linep >= lineendp))
 		goto invalid_data;
 	      get_uleb128 (u128, linep, lineendp);
-	      column = u128;
+	      state.column = u128;
 	      break;
 
 	    case DW_LNS_negate_stmt:
@@ -624,7 +656,7 @@ read_srclines (Dwarf *dbg,
 	      if (unlikely (standard_opcode_lengths[opcode] != 0))
 		goto invalid_data;
 
-	      is_stmt = 1 - is_stmt;
+	      state.is_stmt = 1 - state.is_stmt;
 	      break;
 
 	    case DW_LNS_set_basic_block:
@@ -632,7 +664,7 @@ read_srclines (Dwarf *dbg,
 	      if (unlikely (standard_opcode_lengths[opcode] != 0))
 		goto invalid_data;
 
-	      basic_block = true;
+	      state.basic_block = true;
 	      break;
 
 	    case DW_LNS_const_add_pc:
@@ -653,8 +685,8 @@ read_srclines (Dwarf *dbg,
 		  || unlikely (lineendp - linep < 2))
 		goto invalid_data;
 
-	      addr += read_2ubyte_unaligned_inc (dbg, linep);
-	      op_index = 0;
+	      state.addr += read_2ubyte_unaligned_inc (dbg, linep);
+	      state.op_index = 0;
 	      break;
 
 	    case DW_LNS_set_prologue_end:
@@ -662,7 +694,7 @@ read_srclines (Dwarf *dbg,
 	      if (unlikely (standard_opcode_lengths[opcode] != 0))
 		goto invalid_data;
 
-	      prologue_end = true;
+	      state.prologue_end = true;
 	      break;
 
 	    case DW_LNS_set_epilogue_begin:
@@ -670,7 +702,7 @@ read_srclines (Dwarf *dbg,
 	      if (unlikely (standard_opcode_lengths[opcode] != 0))
 		goto invalid_data;
 
-	      epilogue_begin = true;
+	      state.epilogue_begin = true;
 	      break;
 
 	    case DW_LNS_set_isa:
@@ -680,7 +712,7 @@ read_srclines (Dwarf *dbg,
 
 	      if (unlikely (linep >= lineendp))
 		goto invalid_data;
-	      get_uleb128 (isa, linep, lineendp);
+	      get_uleb128 (state.isa, linep, lineendp);
 	      break;
 	    }
 	}
@@ -728,7 +760,8 @@ read_srclines (Dwarf *dbg,
   if (filesp != NULL)
     *filesp = files;
 
-  size_t buf_size = (sizeof (Dwarf_Lines) + (sizeof (Dwarf_Line) * nlinelist));
+  size_t buf_size = (sizeof (Dwarf_Lines)
+		     + (sizeof (Dwarf_Line) * state.nlinelist));
   void *buf = libdw_alloc (dbg, Dwarf_Lines, buf_size, 1);
 
   /* First use the buffer for the pointers, and sort the entries.
@@ -736,13 +769,13 @@ read_srclines (Dwarf *dbg,
      copy into the buffer from the beginning so the overlap works.  */
   assert (sizeof (Dwarf_Line) >= sizeof (struct linelist *));
   struct linelist **sortlines = (buf + buf_size
-				 - sizeof (struct linelist **) * nlinelist);
+				 - sizeof (struct linelist **) * state.nlinelist);
 
   /* The list is in LIFO order and usually they come in clumps with
      ascending addresses.  So fill from the back to probably start with
      runs already in order before we sort.  */
-  struct linelist *lineslist = linelist;
-  for (size_t i = nlinelist; i-- > 0; )
+  struct linelist *lineslist = state.linelist;
+  for (size_t i = state.nlinelist; i-- > 0; )
     {
       sortlines[i] = lineslist;
       lineslist = lineslist->next;
@@ -750,14 +783,14 @@ read_srclines (Dwarf *dbg,
   assert (lineslist == NULL);
 
   /* Sort by ascending address.  */
-  qsort (sortlines, nlinelist, sizeof sortlines[0], &compare_lines);
+  qsort (sortlines, state.nlinelist, sizeof sortlines[0], &compare_lines);
 
   /* Now that they are sorted, put them in the final array.
      The buffers overlap, so we've clobbered the early elements
      of SORTLINES by the time we're reading the later ones.  */
   Dwarf_Lines *lines = buf;
-  lines->nlines = nlinelist;
-  for (size_t i = 0; i < nlinelist; ++i)
+  lines->nlines = state.nlinelist;
+  for (size_t i = 0; i < state.nlinelist; ++i)
     {
       lines->info[i] = sortlines[i]->line;
       lines->info[i].files = files;
@@ -766,8 +799,8 @@ read_srclines (Dwarf *dbg,
   /* Make sure the highest address for the CU is marked as end_sequence.
      This is required by the DWARF spec, but some compilers forget and
      dwfl_module_getsrc depends on it.  */
-  if (nlinelist > 0)
-    lines->info[nlinelist - 1].end_sequence = 1;
+  if (state.nlinelist > 0)
+    lines->info[state.nlinelist - 1].end_sequence = 1;
 
   /* Pass the line structure back to the caller.  */
   if (linesp != NULL)
@@ -778,11 +811,11 @@ read_srclines (Dwarf *dbg,
 
  out:
   /* Free malloced line records, if any.  */
-  for (size_t i = MAX_STACK_LINES; i < nlinelist; i++)
+  for (size_t i = MAX_STACK_LINES; i < state.nlinelist; i++)
     {
-      struct linelist *ll = linelist->next;
-      free (linelist);
-      linelist = ll;
+      struct linelist *ll = state.linelist->next;
+      free (state.linelist);
+      state.linelist = ll;
     }
   if (ndirlist >= MAX_STACK_DIRS)
     free (dirarray);

@@ -1,5 +1,11 @@
 2015-10-13  Chih-Hung Hsieh  <chh@google.com>
 
+	* dwarf_getsrclines.c (read_srclines): Move nested functions
+	'advance_pc' and 'add_new_line' to file scope and keep many
+	local state variables within one structure.
+
+2015-10-13  Chih-Hung Hsieh  <chh@google.com>
+
 	* dwarf_getscopevar.c (dwarf_getscopevar): Move nested
 	function 'file_matches' to file scope.
 

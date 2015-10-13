@@ -1,3 +1,8 @@
+2015-10-13  Chih-Hung Hsieh  <chh@google.com>
+
+	* dwarf_getscopevar.c (dwarf_getscopevar): Move nested
+	function 'file_matches' to file scope.
+
 2015-10-16  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (libdw.so): Add -lz.

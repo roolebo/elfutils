@@ -52,6 +52,26 @@ getattr (Dwarf_Die *die, int search_name, Dwarf_Word *value)
 						      &attr_mem), value);
 }
 
+static inline int
+file_matches (const char *lastfile,
+              size_t match_file_len, const char *match_file,
+              Dwarf_Files *files, size_t idx,
+              bool *lastfile_matches)
+{
+  if (idx >= files->nfiles)
+    return false;
+  const char *file = files->info[idx].name;
+  if (file != lastfile)
+    {
+      size_t len = strlen (file);
+      *lastfile_matches = (len >= match_file_len
+                          && !memcmp (match_file, file, match_file_len)
+                          && (len == match_file_len
+                              || file[len - match_file_len - 1] == '/'));
+    }
+  return *lastfile_matches;
+}
+
 /* Search SCOPES[0..NSCOPES-1] for a variable called NAME.
    Ignore the first SKIP_SHADOWS scopes that match the name.
    If MATCH_FILE is not null, accept only declaration in that source file;
@@ -72,22 +92,6 @@ dwarf_getscopevar (Dwarf_Die *scopes, int nscopes,
   size_t match_file_len = match_file == NULL ? 0 : strlen (match_file);
   bool lastfile_matches = false;
   const char *lastfile = NULL;
-  inline bool file_matches (Dwarf_Files *files, size_t idx)
-    {
-      if (idx >= files->nfiles)
-	return false;
-
-      const char *file = files->info[idx].name;
-      if (file != lastfile)
-	{
-	  size_t len = strlen (file);
-	  lastfile_matches = (len >= match_file_len
-			      && !memcmp (match_file, file, match_file_len)
-			      && (len == match_file_len
-				  || file[len - match_file_len - 1] == '/'));
-	}
-      return lastfile_matches;
-    }
 
   /* Start with the innermost scope and move out.  */
   for (int out = 0; out < nscopes; ++out)
@@ -130,7 +134,8 @@ dwarf_getscopevar (Dwarf_Die *scopes, int nscopes,
 			|| getfiles (&scopes[out], &files) != 0)
 		      break;
 
-		    if (!file_matches (files, i))
+		    if (!file_matches (lastfile, match_file_len, match_file,
+		                       files, i, &lastfile_matches))
 		      break;
 
 		    if (match_lineno > 0

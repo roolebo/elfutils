@@ -1,5 +1,10 @@
 2015-10-14  Chih-Hung Hsieh  <chh@google.com>
 
+	* dwarf_entry_breakpoints.c (dwarf_entry_breakpoints): Move recursive
+	functions 'add_bkpt', 'entrypc_bkpt', and 'search_range' to file scope.
+
+2015-10-14  Chih-Hung Hsieh  <chh@google.com>
+
 	* libdw_visit_scopes.c (__libdw_visit_scopes): Move recursive nested
 	function 'walk_children' to file scope; inline 'recurse' at its call
 	site.

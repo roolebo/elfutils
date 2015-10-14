@@ -64,6 +64,21 @@ may_have_scopes (Dwarf_Die *die)
   return false;
 }
 
+struct walk_children_state
+{
+  /* Parameters of __libdw_visit_scopes. */
+  unsigned int depth;
+  struct Dwarf_Die_Chain *imports;
+  int (*previsit) (unsigned int depth, struct Dwarf_Die_Chain *, void *);
+  int (*postvisit) (unsigned int depth, struct Dwarf_Die_Chain *, void *);
+  void *arg;
+  /* Extra local variables for the walker. */
+  struct Dwarf_Die_Chain child;
+};
+
+static inline int
+walk_children (struct walk_children_state *state);
+
 int
 internal_function
 __libdw_visit_scopes (unsigned int depth, struct Dwarf_Die_Chain *root,
@@ -76,95 +91,98 @@ __libdw_visit_scopes (unsigned int depth, struct Dwarf_Die_Chain *root,
 					void *),
 		      void *arg)
 {
-  struct Dwarf_Die_Chain child;
-  int ret;
+  struct walk_children_state state =
+    {
+      .depth = depth,
+      .imports = imports,
+      .previsit = previsit,
+      .postvisit = postvisit,
+      .arg = arg
+    };
 
-  child.parent = root;
-  if ((ret = INTUSE(dwarf_child) (&root->die, &child.die)) != 0)
+  state.child.parent = root;
+  int ret;
+  if ((ret = INTUSE(dwarf_child) (&root->die, &state.child.die)) != 0)
     return ret < 0 ? -1 : 0; // Having zero children is legal.
 
-  inline int recurse (void)
-    {
-      return __libdw_visit_scopes (depth + 1, &child, imports,
-				   previsit, postvisit, arg);
-    }
+  return walk_children (&state);
+}
 
-  /* Checks the given DIE hasn't been imported yet to prevent cycles.  */
-  inline bool imports_contains (Dwarf_Die *die)
-  {
-    for (struct Dwarf_Die_Chain *import = imports; import != NULL;
-	 import = import->parent)
-      if (import->die.addr == die->addr)
-	return true;
-
-    return false;
-  }
-
-  inline int walk_children (void)
+static inline int
+walk_children (struct walk_children_state *state)
 {
-    do
-      {
-	/* For an imported unit, it is logically as if the children of
-	   that unit are siblings of the other children.  So don't do
-	   a full recursion into the imported unit, but just walk the
-	   children in place before moving to the next real child.  */
-	while (INTUSE(dwarf_tag) (&child.die) == DW_TAG_imported_unit)
-	  {
-	    Dwarf_Die orig_child_die = child.die;
-	    Dwarf_Attribute attr_mem;
-	    Dwarf_Attribute *attr = INTUSE(dwarf_attr) (&child.die,
-							DW_AT_import,
-							&attr_mem);
-	    if (INTUSE(dwarf_formref_die) (attr, &child.die) != NULL
-                && INTUSE(dwarf_child) (&child.die, &child.die) == 0)
-	      {
-		if (imports_contains (&orig_child_die))
-		  {
-		    __libdw_seterrno (DWARF_E_INVALID_DWARF);
-		    return -1;
-		  }
-		struct Dwarf_Die_Chain *orig_imports = imports;
-		struct Dwarf_Die_Chain import = { .die = orig_child_die,
-						  .parent = orig_imports };
-		imports = &import;
-		int result = walk_children ();
-		imports = orig_imports;
-		if (result != DWARF_CB_OK)
-		  return result;
-	      }
+  int ret;
+  do
+    {
+      /* For an imported unit, it is logically as if the children of
+	 that unit are siblings of the other children.  So don't do
+	 a full recursion into the imported unit, but just walk the
+	 children in place before moving to the next real child.  */
+      while (INTUSE(dwarf_tag) (&state->child.die) == DW_TAG_imported_unit)
+	{
+	  Dwarf_Die orig_child_die = state->child.die;
+	  Dwarf_Attribute attr_mem;
+	  Dwarf_Attribute *attr = INTUSE(dwarf_attr) (&state->child.die,
+						      DW_AT_import,
+						      &attr_mem);
+	  if (INTUSE(dwarf_formref_die) (attr, &state->child.die) != NULL
+	      && INTUSE(dwarf_child) (&state->child.die, &state->child.die) == 0)
+	    {
+	      /* Checks the given DIE hasn't been imported yet
+	         to prevent cycles.  */
+	      bool imported = false;
+	      for (struct Dwarf_Die_Chain *import = state->imports; import != NULL;
+	        import = import->parent)
+	        if (import->die.addr == orig_child_die.addr)
+	          {
+	            imported = true;
+	            break;
+	          }
+	      if (imported)
+		{
+		  __libdw_seterrno (DWARF_E_INVALID_DWARF);
+		  return -1;
+		}
+	      struct Dwarf_Die_Chain *orig_imports = state->imports;
+	      struct Dwarf_Die_Chain import = { .die = orig_child_die,
+					        .parent = orig_imports };
+	      state->imports = &import;
+	      int result = walk_children (state);
+	      state->imports = orig_imports;
+	      if (result != DWARF_CB_OK)
+		return result;
+	    }
 
-	    /* Any "real" children left?  */
-	    if ((ret = INTUSE(dwarf_siblingof) (&orig_child_die,
-						&child.die)) != 0)
-	      return ret < 0 ? -1 : 0;
-	  };
+	  /* Any "real" children left?  */
+	  if ((ret = INTUSE(dwarf_siblingof) (&orig_child_die,
+					      &state->child.die)) != 0)
+	    return ret < 0 ? -1 : 0;
+	};
 
-	child.prune = false;
+	state->child.prune = false;
 
 	/* previsit is declared NN */
-	int result = (*previsit) (depth + 1, &child, arg);
+	int result = (*state->previsit) (state->depth + 1, &state->child, state->arg);
 	if (result != DWARF_CB_OK)
 	  return result;
 
-	if (!child.prune && may_have_scopes (&child.die)
-	    && INTUSE(dwarf_haschildren) (&child.die))
+	if (!state->child.prune && may_have_scopes (&state->child.die)
+	    && INTUSE(dwarf_haschildren) (&state->child.die))
 	  {
-	    result = recurse ();
+	    result = __libdw_visit_scopes (state->depth + 1, &state->child, state->imports,
+				           state->previsit, state->postvisit, state->arg);
 	    if (result != DWARF_CB_OK)
 	      return result;
 	  }
 
-	if (postvisit != NULL)
+	if (state->postvisit != NULL)
 	  {
-	    result = (*postvisit) (depth + 1, &child, arg);
+	    result = (*state->postvisit) (state->depth + 1, &state->child, state->arg);
 	    if (result != DWARF_CB_OK)
 	      return result;
 	  }
-      }
-    while ((ret = INTUSE(dwarf_siblingof) (&child.die, &child.die)) == 0);
+    }
+  while ((ret = INTUSE(dwarf_siblingof) (&state->child.die, &state->child.die)) == 0);
 
-    return ret < 0 ? -1 : 0;
-  }
-
-  return walk_children ();
+  return ret < 0 ? -1 : 0;
 }

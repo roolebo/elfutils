@@ -1,3 +1,9 @@
+2015-10-14  Chih-Hung Hsieh  <chh@google.com>
+
+	* libdw_visit_scopes.c (__libdw_visit_scopes): Move recursive nested
+	function 'walk_children' to file scope; inline 'recurse' at its call
+	site.
+
 2015-10-19  Mark Wielaard  <mjw@redhat.com>
 
 	* frame-cache.c (__libdw_destroy_frame_cache): Call ebl_closebackend

@@ -1,3 +1,10 @@
+2015-10-13  Chih-Hung Hsieh  <chh@google.com>
+
+	* elf32_updatefile.c (__elfw2(LIBELFBITS,updatemmap)): Move nested
+	function 'fill_mmap' to file scope.
+	* elf_begin.c (elf_begin): Move nested function 'lock_dup_elf'
+	to file scope.
+
 2015-10-09  Josh Stone  <jistone@redhat.com>
 
 	* libelf.h: Replace loff_t with int64_t throughout.

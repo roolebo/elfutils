@@ -1,3 +1,8 @@
+2015-10-14  Chih-Hung Hsieh  <chh@google.com>
+
+	* cfi.c (execute_cfi): Move nested functions 'enough_registers'
+	and 'require_cfa_offset' to file scope.
+
 2015-10-09  Josh Stone  <jistone@redhat.com>
 
 	* dwarf_begin.c (dwarf_begin): Replace stat64 and fstat64 with stat

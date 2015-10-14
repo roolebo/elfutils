@@ -56,6 +56,46 @@ duplicate_frame_state (const Dwarf_Frame *original,
   return copy;
 }
 
+static inline bool
+enough_registers (Dwarf_Word reg, Dwarf_Frame **pfs, int *result)
+{
+  /* Don't allow insanely large register numbers.  268435456 registers
+     should be enough for anybody.  And very large values might overflow
+     the array size and offsetof calculations below.  */
+  if (unlikely (reg >= INT32_MAX / sizeof ((*pfs)->regs[0])))
+    {
+      *result = DWARF_E_INVALID_CFI;
+      return false;
+    }
+
+  if ((*pfs)->nregs <= reg)
+    {
+       size_t size = offsetof (Dwarf_Frame, regs[reg + 1]);
+       Dwarf_Frame *bigger = realloc (*pfs, size);
+       if (unlikely (bigger == NULL))
+         {
+           *result = DWARF_E_NOMEM;
+           return false;
+         }
+       else
+         {
+           eu_static_assert (reg_unspecified == 0);
+           memset (bigger->regs + bigger->nregs, 0,
+                   (reg + 1 - bigger->nregs) * sizeof bigger->regs[0]);
+           bigger->nregs = reg + 1;
+           *pfs = bigger;
+         }
+     }
+  return true;
+}
+
+static inline void
+require_cfa_offset (Dwarf_Frame *fs)
+{
+  if (unlikely (fs->cfa_rule != cfa_offset))
+    fs->cfa_rule = cfa_invalid;
+}
+
 /* Returns a DWARF_E_* error code, usually NOERROR or INVALID_CFI.
    Frees *STATE on failure.  */
 static int
@@ -77,46 +117,9 @@ execute_cfi (Dwarf_CFI *cache,
   } while (0)
 
   Dwarf_Frame *fs = *state;
-  inline bool enough_registers (Dwarf_Word reg)
-    {
-      /* Don't allow insanely large register numbers.  268435456 registers
-	 should be enough for anybody.  And very large values might overflow
-	 the array size and offsetof calculations below.  */
-      if (unlikely (reg >= INT32_MAX / sizeof (fs->regs[0])))
-	{
-	  result = DWARF_E_INVALID_CFI;
-	  return false;
-	}
-
-      if (fs->nregs <= reg)
-	{
-	  size_t size = offsetof (Dwarf_Frame, regs[reg + 1]);
-	  Dwarf_Frame *bigger = realloc (fs, size);
-	  if (unlikely (bigger == NULL))
-	    {
-	      result = DWARF_E_NOMEM;
-	      return false;
-	    }
-	  else
-	    {
-	      eu_static_assert (reg_unspecified == 0);
-	      memset (bigger->regs + bigger->nregs, 0,
-		      (reg + 1 - bigger->nregs) * sizeof bigger->regs[0]);
-	      bigger->nregs = reg + 1;
-	      fs = bigger;
-	    }
-	}
-      return true;
-    }
-
-  inline void require_cfa_offset (void)
-  {
-    if (unlikely (fs->cfa_rule != cfa_offset))
-      fs->cfa_rule = cfa_invalid;
-  }
 
 #define register_rule(regno, r_rule, r_value) do {	\
-    if (unlikely (! enough_registers (regno)))		\
+    if (unlikely (! enough_registers (regno, &fs, &result)))	\
       goto out;						\
     fs->regs[regno].rule = reg_##r_rule;		\
     fs->regs[regno].value = (r_value);			\
@@ -179,7 +182,7 @@ execute_cfi (Dwarf_CFI *cache,
 
 	case DW_CFA_def_cfa_register:
 	  get_uleb128 (regno, program, end);
-	  require_cfa_offset ();
+	  require_cfa_offset (fs);
 	  fs->cfa_val_reg = regno;
 	  continue;
 
@@ -193,7 +196,7 @@ execute_cfi (Dwarf_CFI *cache,
 	case DW_CFA_def_cfa_offset:
 	  get_uleb128 (offset, program, end);
 	def_cfa_offset:
-	  require_cfa_offset ();
+	  require_cfa_offset (fs);
 	  fs->cfa_val_offset = offset;
 	  continue;
 
@@ -310,7 +313,7 @@ execute_cfi (Dwarf_CFI *cache,
 	  cfi_assert (cie->initial_state != NULL);
 
 	  /* Restore the CIE's initial rule for this register.  */
-	  if (unlikely (! enough_registers (operand)))
+	  if (unlikely (! enough_registers (operand, &fs, &result)))
 	    goto out;
 	  if (cie->initial_state->nregs > operand)
 	    fs->regs[operand] = cie->initial_state->regs[operand];
@@ -347,7 +350,7 @@ execute_cfi (Dwarf_CFI *cache,
 	case DW_CFA_GNU_window_save:
 	  /* This is magic shorthand used only by SPARC.  It's equivalent
 	     to a bunch of DW_CFA_register and DW_CFA_offset operations.  */
-	  if (unlikely (! enough_registers (31)))
+	  if (unlikely (! enough_registers (31, &fs, &result)))
 	    goto out;
 	  for (regno = 8; regno < 16; ++regno)
 	    {

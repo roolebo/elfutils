@@ -35,6 +35,29 @@
 
 #define NO_VADDR	((GElf_Addr) -1l)
 
+static int
+check_notes (Elf_Data *data, GElf_Addr data_elfaddr,
+             const void **build_id_bits, GElf_Addr *build_id_elfaddr,
+             int *build_id_len)
+{
+  size_t pos = 0;
+  GElf_Nhdr nhdr;
+  size_t name_pos;
+  size_t desc_pos;
+  while ((pos = gelf_getnote (data, pos, &nhdr, &name_pos, &desc_pos)) > 0)
+    if (nhdr.n_type == NT_GNU_BUILD_ID
+	&& nhdr.n_namesz == sizeof "GNU"
+	&& !memcmp (data->d_buf + name_pos, "GNU", sizeof "GNU"))
+	{
+	  *build_id_bits = data->d_buf + desc_pos;
+	  *build_id_elfaddr = (data_elfaddr == NO_VADDR
+	                      ? 0 : data_elfaddr + desc_pos);
+	  *build_id_len = nhdr.n_descsz;
+	  return 1;
+	}
+  return 0;
+}
+
 /* Defined here for reuse. The dwelf interface doesn't care about the
    address of the note, but libdwfl does.  */
 static int
@@ -42,26 +65,6 @@ find_elf_build_id (Dwfl_Module *mod, int e_type, Elf *elf,
 		   const void **build_id_bits, GElf_Addr *build_id_elfaddr,
 		   int *build_id_len)
 {
-  int check_notes (Elf_Data *data, GElf_Addr data_elfaddr)
-  {
-    size_t pos = 0;
-    GElf_Nhdr nhdr;
-    size_t name_pos;
-    size_t desc_pos;
-    while ((pos = gelf_getnote (data, pos, &nhdr, &name_pos, &desc_pos)) > 0)
-      if (nhdr.n_type == NT_GNU_BUILD_ID
-	  && nhdr.n_namesz == sizeof "GNU" && !memcmp (data->d_buf + name_pos,
-						       "GNU", sizeof "GNU"))
-	{
-	  *build_id_bits = data->d_buf + desc_pos;
-	  *build_id_elfaddr = (data_elfaddr == NO_VADDR
-			       ? 0 : data_elfaddr + desc_pos);
-	  *build_id_len = nhdr.n_descsz;
-	  return 1;
-	}
-    return 0;
-  }
-
   size_t shstrndx = SHN_UNDEF;
   int result = 0;
 
@@ -86,7 +89,10 @@ find_elf_build_id (Dwfl_Module *mod, int e_type, Elf *elf,
 							phdr->p_offset,
 							phdr->p_filesz,
 							ELF_T_NHDR),
-				  phdr->p_vaddr);
+				  phdr->p_vaddr,
+				  build_id_bits,
+				  build_id_elfaddr,
+				  build_id_len);
 	}
     }
   else
@@ -105,7 +111,10 @@ find_elf_build_id (Dwfl_Module *mod, int e_type, Elf *elf,
 	    else if (__libdwfl_relocate_value (mod, elf, &shstrndx,
 					       elf_ndxscn (scn), &vaddr))
 	      vaddr = NO_VADDR;
-	    result = check_notes (elf_getdata (scn, NULL), vaddr);
+	    result = check_notes (elf_getdata (scn, NULL), vaddr,
+	                          build_id_bits,
+	                          build_id_elfaddr,
+	                          build_id_len);
 	  }
       }
     while (result == 0 && (scn = elf_nextscn (elf, scn)) != NULL);

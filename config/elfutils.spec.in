@@ -223,6 +223,20 @@ rm -rf ${RPM_BUILD_ROOT}
 %config(noreplace) %{_sysctldir}/10-default-yama-scope.conf
 
 %changelog
+* Thu Oct 15 2015 Mark Wielaard <mjw@redhat.com> 0.164-1
+- strip, unstrip: Handle ELF files with merged strtab/shstrtab
+  tables. Handle missing SHF_INFO_LINK section flags.
+- libelf: Use int64_t for offsets in libelf.h instead of loff_t.
+- libdw: dwarf.h Add preliminary DWARF5 DW_LANG_Haskell.
+- libdwfl: dwfl_standard_find_debuginfo now searches any subdir of
+  the binary path under the debuginfo root when the separate
+  debug file couldn't be found by build-id.
+  dwfl_linux_proc_attach can now be called before any Dwfl_Modules
+  have been reported.
+- backends: Better sparc and sparc64 support.
+- translations: Updated Ukrainian translation.
+- Provide default-yama-scope subpackage.
+
 * Fri Jun 19 2015 Mark Wielaard <mjw@redhat.com> 0.163-1
 - Bug fixes only, no new features.
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2015-09-26 15:11+0300\n"
+"POT-Creation-Date: 2015-10-15 15:21+0200\n"
 "PO-Revision-Date: 2015-09-26 16:41+0300\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <kde-i18n-uk@kde.org>\n"
@@ -47,7 +47,7 @@ msgid "cannot allocate memory"
 msgstr "не вдалося розподілити пам’ять"
 
 #: lib/xmalloc.c:53 lib/xmalloc.c:66 lib/xmalloc.c:78 src/readelf.c:3184
-#: src/readelf.c:3561 src/readelf.c:8310 src/unstrip.c:2150 src/unstrip.c:2355
+#: src/readelf.c:3561 src/readelf.c:8310 src/unstrip.c:2198 src/unstrip.c:2403
 #, c-format
 msgid "memory exhausted"
 msgstr "пам’ять вичерпано"
@@ -249,7 +249,7 @@ msgstr "некоректний код операції"
 msgid "not a CU (unit) DIE"
 msgstr "не є DIE CU (модуля)"
 
-#: libdwfl/argp-std.c:46 src/stack.c:642 src/unstrip.c:2297
+#: libdwfl/argp-std.c:46 src/stack.c:642 src/unstrip.c:2345
 msgid "Input selection options:"
 msgstr "Вибір параметрів виведення даних:"
 
@@ -1260,8 +1260,8 @@ msgstr "Некоректне значення «%s» параметра --gaps."
 
 #: src/elfcmp.c:730 src/findtextrel.c:221 src/ldgeneric.c:1757
 #: src/ldgeneric.c:4247 src/nm.c:377 src/ranlib.c:157 src/size.c:289
-#: src/strings.c:186 src/strip.c:466 src/strip.c:503 src/unstrip.c:1946
-#: src/unstrip.c:1975
+#: src/strings.c:186 src/strip.c:466 src/strip.c:503 src/unstrip.c:1994
+#: src/unstrip.c:2023
 #, c-format
 msgid "cannot open '%s'"
 msgstr "не вдалося відкрити «%s»"
@@ -1489,7 +1489,7 @@ msgstr ""
 
 #: src/elflint.c:591 src/elflint.c:1470 src/elflint.c:1521 src/elflint.c:1627
 #: src/elflint.c:1963 src/elflint.c:2279 src/elflint.c:2892 src/elflint.c:3055
-#: src/elflint.c:3203 src/elflint.c:3393 src/elflint.c:4327
+#: src/elflint.c:3203 src/elflint.c:3393 src/elflint.c:4335
 #, c-format
 msgid "section [%2d] '%s': cannot get section data\n"
 msgstr "розділ [%2d] «%s»: не вдалося отримати дані розділу\n"
@@ -2910,11 +2910,16 @@ msgid "section [%2zu] '%s' has unexpected type %d for an executable section\n"
 msgstr "розділ [%2zu] «%s» має неочікуваний тип %d для виконуваного розділу\n"
 
 #: src/elflint.c:3944
+#, fuzzy, c-format
+msgid "section [%2zu] '%s' must be of type NOBITS in debuginfo files\n"
+msgstr "розділ [%2zu] «%s» не повинен бути придатним до запису\n"
+
+#: src/elflint.c:3951
 #, c-format
 msgid "section [%2zu] '%s' is both executable and writable\n"
 msgstr "розділ [%2zu] «%s» є одночасно виконуваним і придатним до запису\n"
 
-#: src/elflint.c:3973
+#: src/elflint.c:3981
 #, c-format
 msgid ""
 "section [%2zu] '%s' not fully contained in segment of program header entry "
@@ -2923,7 +2928,7 @@ msgstr ""
 "розділ [%2zu] «%s» не повністю міститься у сегменті запису заголовка "
 "програми %d\n"
 
-#: src/elflint.c:3983
+#: src/elflint.c:3991
 #, c-format
 msgid ""
 "section [%2zu] '%s' has type NOBITS but is read from the file in segment of "
@@ -2932,7 +2937,7 @@ msgstr ""
 "розділ [%2zu] «%s» належить до типу NOBITS, але його читання виконується з "
 "файла у сегментів запису заголовка програми %d\n"
 
-#: src/elflint.c:4009
+#: src/elflint.c:4017
 #, c-format
 msgid ""
 "section [%2zu] '%s' has type NOBITS but is read from the file in segment of "
@@ -2941,7 +2946,7 @@ msgstr ""
 "розділ [%2zu] «%s» належить до типу NOBITS, але його читання виконується з "
 "файла у сегментів запису заголовка програми %d, а вміст файла є ненульовим\n"
 
-#: src/elflint.c:4020
+#: src/elflint.c:4028
 #, c-format
 msgid ""
 "section [%2zu] '%s' has not type NOBITS but is not read from the file in "
@@ -2950,19 +2955,19 @@ msgstr ""
 "розділ [%2zu] «%s» не належить до типу NOBITS, але його читання не "
 "виконується з файла у сегментів запису заголовка програми %d\n"
 
-#: src/elflint.c:4031
+#: src/elflint.c:4039
 #, c-format
 msgid "section [%2zu] '%s' is executable in nonexecutable segment %d\n"
 msgstr "розділ [%2zu] «%s» є виконуваним у невиконуваному сегменті %d\n"
 
-#: src/elflint.c:4041
+#: src/elflint.c:4049
 #, c-format
 msgid "section [%2zu] '%s' is writable in unwritable segment %d\n"
 msgstr ""
 "розділ [%2zu] «%s» є придатним до запису у непридатному до запису сегменті "
 "%d\n"
 
-#: src/elflint.c:4051
+#: src/elflint.c:4059
 #, c-format
 msgid ""
 "section [%2zu] '%s': alloc flag set but section not in any loaded segment\n"
@@ -2970,7 +2975,7 @@ msgstr ""
 "розділ [%2zu] «%s»: встановлено прапорець alloc, але розділ не перебуває у "
 "жодному завантаженому сегменті\n"
 
-#: src/elflint.c:4057
+#: src/elflint.c:4065
 #, c-format
 msgid ""
 "section [%2zu] '%s': ELF header says this is the section header string table "
@@ -2979,7 +2984,7 @@ msgstr ""
 "розділ [%2zu] «%s»: заголовок ELF повідомляє про те, що це таблиця рядків "
 "заголовка розділу, але ця таблиця не належить до типу SHT_TYPE\n"
 
-#: src/elflint.c:4065
+#: src/elflint.c:4073
 #, c-format
 msgid ""
 "section [%2zu] '%s': relocatable files cannot have dynamic symbol tables\n"
@@ -2987,17 +2992,17 @@ msgstr ""
 "розділ [%2zu] «%s»: придатні до пересування файли не можуть містити "
 "динамічних таблиць символів\n"
 
-#: src/elflint.c:4116
+#: src/elflint.c:4124
 #, c-format
 msgid "more than one version symbol table present\n"
 msgstr "виявлено більше за одну таблицю символів версій\n"
 
-#: src/elflint.c:4139
+#: src/elflint.c:4147
 #, c-format
 msgid "INTERP program header entry but no .interp section\n"
 msgstr "існує запис заголовка програми INTERP, але не розділ .interp\n"
 
-#: src/elflint.c:4150
+#: src/elflint.c:4158
 #, c-format
 msgid ""
 "loadable segment [%u] is executable but contains no executable sections\n"
@@ -3005,14 +3010,14 @@ msgstr ""
 "придатний до завантаження сегмент [%u] є виконуваним, але не містить "
 "виконуваних розділів\n"
 
-#: src/elflint.c:4156
+#: src/elflint.c:4164
 #, c-format
 msgid "loadable segment [%u] is writable but contains no writable sections\n"
 msgstr ""
 "придатний до завантаження розділ [%u] є придатним до запису, але не містить "
 "придатних до запису розділів\n"
 
-#: src/elflint.c:4167
+#: src/elflint.c:4175
 #, c-format
 msgid ""
 "no .gnu.versym section present but .gnu.versym_d or .gnu.versym_r section "
@@ -3021,24 +3026,24 @@ msgstr ""
 "немає розділу .gnu.versym, хоча існує розділ .gnu.versym_d або .gnu."
 "versym_r\n"
 
-#: src/elflint.c:4180
+#: src/elflint.c:4188
 #, c-format
 msgid "duplicate version index %d\n"
 msgstr "дублікат індексу версії %d\n"
 
-#: src/elflint.c:4194
+#: src/elflint.c:4202
 #, c-format
 msgid ".gnu.versym section present without .gnu.versym_d or .gnu.versym_r\n"
 msgstr ""
 "існує розділ .gnu.versym, але немає розділу .gnu.versym_d або .gnu.versym_r\n"
 
-#: src/elflint.c:4243
+#: src/elflint.c:4251
 #, c-format
 msgid "phdr[%d]: unknown core file note type %<PRIu32> at offset %<PRIu64>\n"
 msgstr ""
 "phdr[%d]: невідомий тип нотатки файла core %<PRIu32> за зміщенням %<PRIu64>\n"
 
-#: src/elflint.c:4247
+#: src/elflint.c:4255
 #, c-format
 msgid ""
 "section [%2d] '%s': unknown core file note type %<PRIu32> at offset %zu\n"
@@ -3046,13 +3051,13 @@ msgstr ""
 "розділ [%2d] «%s»: невідомий тип нотатки файла core %<PRIu32> за зміщенням "
 "%zu\n"
 
-#: src/elflint.c:4270
+#: src/elflint.c:4278
 #, c-format
 msgid "phdr[%d]: unknown object file note type %<PRIu32> at offset %zu\n"
 msgstr ""
 "phdr[%d]: невідомий тип нотатки об’єктного файла %<PRIu32> за зміщенням %zu\n"
 
-#: src/elflint.c:4274
+#: src/elflint.c:4282
 #, c-format
 msgid ""
 "section [%2d] '%s': unknown object file note type %<PRIu32> at offset %zu\n"
@@ -3060,39 +3065,39 @@ msgstr ""
 "розділ [%2d] «%s»: невідомий тип нотатки об’єктного файла %<PRIu32> за "
 "зміщенням %zu\n"
 
-#: src/elflint.c:4291
+#: src/elflint.c:4299
 #, c-format
 msgid "phdr[%d]: no note entries defined for the type of file\n"
 msgstr "phdr[%d]: для цього типу файлів не визначено записів нотаток\n"
 
-#: src/elflint.c:4310
+#: src/elflint.c:4318
 #, c-format
 msgid "phdr[%d]: cannot get content of note section: %s\n"
 msgstr "phdr[%d]: не вдалося отримати вміст розділу нотаток: %s\n"
 
-#: src/elflint.c:4313
+#: src/elflint.c:4321
 #, c-format
 msgid "phdr[%d]: extra %<PRIu64> bytes after last note\n"
 msgstr "phdr[%d]: зайві %<PRIu64> байтів після останнього запису нотатки\n"
 
-#: src/elflint.c:4334
+#: src/elflint.c:4342
 #, c-format
 msgid "section [%2d] '%s': no note entries defined for the type of file\n"
 msgstr ""
 "розділ [%2d] «%s»: для цього типу файлів не визначено записів нотаток\n"
 
-#: src/elflint.c:4341
+#: src/elflint.c:4349
 #, c-format
 msgid "section [%2d] '%s': cannot get content of note section\n"
 msgstr "розділ [%2d] «%s»: не вдалося отримати вміст розділу нотаток\n"
 
-#: src/elflint.c:4344
+#: src/elflint.c:4352
 #, c-format
 msgid "section [%2d] '%s': extra %<PRIu64> bytes after last note\n"
 msgstr ""
 "розділ [%2d] «%s»: додаткові %<PRIu64> байтів після останньої нотатки\n"
 
-#: src/elflint.c:4362
+#: src/elflint.c:4370
 #, c-format
 msgid ""
 "only executables, shared objects, and core files can have program headers\n"
@@ -3100,135 +3105,141 @@ msgstr ""
 "заголовки програм можуть бути лише у виконуваних файлів, об’єктних файлів "
 "спільного використання або файлів core\n"
 
-#: src/elflint.c:4377
+#: src/elflint.c:4385
 #, c-format
 msgid "cannot get program header entry %d: %s\n"
 msgstr "не вдалося отримати запис заголовка програми %d: %s\n"
 
-#: src/elflint.c:4386
+#: src/elflint.c:4394
 #, c-format
 msgid "program header entry %d: unknown program header entry type %#<PRIx64>\n"
 msgstr ""
 "запис заголовка програми %d: невідомий тип запису заголовка програми "
 "%#<PRIx64>\n"
 
-#: src/elflint.c:4397
+#: src/elflint.c:4405
 #, c-format
 msgid "more than one INTERP entry in program header\n"
 msgstr "більше за один запис INTERP у заголовку програми\n"
 
-#: src/elflint.c:4405
+#: src/elflint.c:4413
 #, c-format
 msgid "more than one TLS entry in program header\n"
 msgstr "більше за один запис TLS у заголовку програми\n"
 
-#: src/elflint.c:4412
+#: src/elflint.c:4420
 #, c-format
 msgid "static executable cannot have dynamic sections\n"
 msgstr "у статичному виконуваному файлі не може бути динамічних розділів\n"
 
-#: src/elflint.c:4426
+#: src/elflint.c:4434
 #, c-format
 msgid "dynamic section reference in program header has wrong offset\n"
 msgstr ""
 "посилання на динамічний розділ у заголовку програми має помилкове зміщення\n"
 
-#: src/elflint.c:4429
+#: src/elflint.c:4437
 #, c-format
 msgid "dynamic section size mismatch in program and section header\n"
 msgstr ""
 "розміри динамічного розділу у заголовку програми та у заголовку розділу не "
 "збігаються\n"
 
-#: src/elflint.c:4439
+#: src/elflint.c:4447
 #, c-format
 msgid "more than one GNU_RELRO entry in program header\n"
 msgstr "більше за один запис GNU_RELRO у заголовку програми\n"
 
-#: src/elflint.c:4460
+#: src/elflint.c:4468
 #, c-format
 msgid "loadable segment GNU_RELRO applies to is not writable\n"
 msgstr ""
 "придатний до завантаження сегмент, до якого звертається GNU_RELRO, "
 "непридатний до запису\n"
 
-#: src/elflint.c:4463
+#: src/elflint.c:4479
 #, c-format
 msgid "loadable segment [%u] flags do not match GNU_RELRO [%u] flags\n"
 msgstr ""
 "прапорці придатного до завантаження сегмента [%u] не відповідають прапорцям "
 "GNU_RELRO [%u]\n"
 
-#: src/elflint.c:4471 src/elflint.c:4494
+#: src/elflint.c:4486
+#, c-format
+msgid ""
+"GNU_RELRO [%u] flags are not a subset of the loadable segment [%u] flags\n"
+msgstr ""
+
+#: src/elflint.c:4495 src/elflint.c:4518
 #, c-format
 msgid "%s segment not contained in a loaded segment\n"
 msgstr "сегмент %s не міститься у завантаженому сегменті\n"
 
-#: src/elflint.c:4500
+#: src/elflint.c:4524
 #, c-format
 msgid "program header offset in ELF header and PHDR entry do not match"
 msgstr "зміщення заголовка програми у заголовку ELF і запис PHDR не збігаються"
 
-#: src/elflint.c:4525
+#: src/elflint.c:4549
 #, c-format
 msgid "call frame search table reference in program header has wrong offset\n"
 msgstr ""
 "посилання на таблицю вікон викликів у заголовку програми має помилкове "
 "зміщення\n"
 
-#: src/elflint.c:4528
+#: src/elflint.c:4552
 #, c-format
 msgid "call frame search table size mismatch in program and section header\n"
 msgstr ""
 "розміри таблиці пошуку вікон виклику у заголовку програми та у заголовку "
 "розділу не збігаються\n"
 
-#: src/elflint.c:4541
+#: src/elflint.c:4565
 #, c-format
 msgid "PT_GNU_EH_FRAME present but no .eh_frame_hdr section\n"
 msgstr "існує PT_GNU_EH_FRAME, хоча немає розділу .eh_frame_hdr\n"
 
-#: src/elflint.c:4549
+#: src/elflint.c:4573
 #, c-format
 msgid "call frame search table must be allocated\n"
 msgstr "таблицю пошуку вікон викликів має бути розміщено у пам’яті\n"
 
-#: src/elflint.c:4552
+#: src/elflint.c:4576
 #, c-format
 msgid "section [%2zu] '%s' must be allocated\n"
 msgstr "розділ [%2zu] «%s» має бути розміщено у пам’яті\n"
 
-#: src/elflint.c:4556
+#: src/elflint.c:4580
 #, c-format
 msgid "call frame search table must not be writable\n"
 msgstr "таблиця пошуку вікон викликів не повинна бути придатною до запису\n"
 
-#: src/elflint.c:4559
+#: src/elflint.c:4583
 #, c-format
 msgid "section [%2zu] '%s' must not be writable\n"
 msgstr "розділ [%2zu] «%s» не повинен бути придатним до запису\n"
 
-#: src/elflint.c:4564
+#: src/elflint.c:4588
 #, c-format
 msgid "call frame search table must not be executable\n"
 msgstr "таблиця пошуку вікон викликів не повинна бути придатною до виконання\n"
 
-#: src/elflint.c:4567
+#: src/elflint.c:4591
 #, c-format
 msgid "section [%2zu] '%s' must not be executable\n"
 msgstr "розділ [%2zu] «%s» не повинен бути придатним до виконання\n"
 
-#: src/elflint.c:4578
+#: src/elflint.c:4602
 #, c-format
 msgid "program header entry %d: file size greater than memory size\n"
 msgstr "запис заголовка програми %d: розмір файла перевищує об’єм пам’яті\n"
 
-#: src/elflint.c:4585
+#: src/elflint.c:4609
 #, c-format
 msgid "program header entry %d: alignment not a power of 2\n"
 msgstr "запис заголовка програми %d: значення вирівнювання не є степенем 2\n"
 
-#: src/elflint.c:4588
+#: src/elflint.c:4612
 #, c-format
 msgid ""
 "program header entry %d: file offset and virtual address not module of "
@@ -3237,7 +3248,7 @@ msgstr ""
 "запис заголовка програми %d: зміщення у файлі і віртуальна адреса не "
 "співвідносяться з вирівнюванням\n"
 
-#: src/elflint.c:4601
+#: src/elflint.c:4625
 #, c-format
 msgid ""
 "executable/DSO with .eh_frame_hdr section does not have a PT_GNU_EH_FRAME "
@@ -3246,12 +3257,12 @@ msgstr ""
 "виконуваний модуль/DSO з розділом .eh_frame_hdr не містить запису заголовка "
 "програми PT_GNU_EH_FRAME"
 
-#: src/elflint.c:4635
+#: src/elflint.c:4659
 #, c-format
 msgid "cannot read ELF header: %s\n"
 msgstr "не вдалося прочитати заголовок ELF: %s\n"
 
-#: src/elflint.c:4661
+#: src/elflint.c:4685
 #, c-format
 msgid "text relocation flag set but not needed\n"
 msgstr ""
@@ -3720,24 +3731,24 @@ msgstr "-) без відповідника -("
 msgid "unknown option '-%c %s'"
 msgstr "невідомий параметр «-%c %s»"
 
-#: src/ld.c:1136
+#: src/ld.c:1138
 #, c-format
 msgid "could not find input file to determine output file format"
 msgstr ""
 "не вдалося виявити файл вхідних даних для визначення формату файла вихідних "
 "даних"
 
-#: src/ld.c:1138
+#: src/ld.c:1140
 #, c-format
 msgid "try again with an appropriate '-m' parameter"
 msgstr "повторіть спробу з належним параметром «-m»"
 
-#: src/ld.c:1432
+#: src/ld.c:1434
 #, c-format
 msgid "cannot read version script '%s'"
 msgstr "не вдалося прочитати скрипт версій «%s»"
 
-#: src/ld.c:1498 src/ld.c:1537
+#: src/ld.c:1500 src/ld.c:1539
 #, c-format
 msgid "duplicate definition of '%s' in linker script"
 msgstr "повторне визначення «%s» у скрипті компонування"
@@ -4025,7 +4036,7 @@ msgstr "внутрішня помилка: небезбітовий розділ
 msgid "cannot get header of 0th section: %s"
 msgstr "не вдалося отримати заголовок 0-го розділу: %s"
 
-#: src/ldgeneric.c:6930 src/unstrip.c:1845
+#: src/ldgeneric.c:6930 src/unstrip.c:1893
 #, c-format
 msgid "cannot update ELF header: %s"
 msgstr "не вдалося оновити заголовок ELF: %s"
@@ -4193,7 +4204,7 @@ msgid "%s: INTERNAL ERROR %d (%s): %s"
 msgstr "%s: ВНУТРІШНЯ ПОМИЛКА %d (%s): %s"
 
 #: src/nm.c:394 src/nm.c:406 src/size.c:305 src/size.c:314 src/size.c:325
-#: src/strip.c:2275
+#: src/strip.c:2280
 #, c-format
 msgid "while closing '%s'"
 msgstr "під час закриття «%s»"
@@ -4240,8 +4251,8 @@ msgstr "не вдалося створити дерево пошуку"
 #: src/readelf.c:1085 src/readelf.c:1245 src/readelf.c:1393 src/readelf.c:1579
 #: src/readelf.c:1785 src/readelf.c:1975 src/readelf.c:2202 src/readelf.c:2460
 #: src/readelf.c:2536 src/readelf.c:2623 src/readelf.c:3203 src/readelf.c:3239
-#: src/readelf.c:3302 src/readelf.c:8212 src/readelf.c:9306 src/readelf.c:9453
-#: src/readelf.c:9521 src/size.c:413 src/size.c:482 src/strip.c:520
+#: src/readelf.c:3302 src/readelf.c:8212 src/readelf.c:9314 src/readelf.c:9461
+#: src/readelf.c:9529 src/size.c:413 src/size.c:482 src/strip.c:520
 #, c-format
 msgid "cannot get section header string table index"
 msgstr "не вдалося визначити індекс заголовка розділу у таблиці рядків"
@@ -4508,11 +4519,11 @@ msgstr "не вдалося створити дескриптор Elf: %s"
 msgid "cannot get section: %s"
 msgstr "не вдалося отримати розділ: %s"
 
-#: src/readelf.c:554 src/readelf.c:1106 src/readelf.c:1277 src/readelf.c:9473
+#: src/readelf.c:554 src/readelf.c:1106 src/readelf.c:1277 src/readelf.c:9481
 #: src/unstrip.c:355 src/unstrip.c:386 src/unstrip.c:435 src/unstrip.c:543
-#: src/unstrip.c:560 src/unstrip.c:596 src/unstrip.c:794 src/unstrip.c:1078
-#: src/unstrip.c:1269 src/unstrip.c:1329 src/unstrip.c:1450 src/unstrip.c:1503
-#: src/unstrip.c:1618 src/unstrip.c:1807
+#: src/unstrip.c:560 src/unstrip.c:596 src/unstrip.c:794 src/unstrip.c:1083
+#: src/unstrip.c:1274 src/unstrip.c:1334 src/unstrip.c:1455 src/unstrip.c:1508
+#: src/unstrip.c:1623 src/unstrip.c:1761 src/unstrip.c:1855
 #, c-format
 msgid "cannot get section header: %s"
 msgstr "не вдалося отримати заголовок розділу: %s"
@@ -4825,7 +4836,7 @@ msgstr ""
 " Відображення розділів на сегмент:\n"
 "  Розділи сегмента..."
 
-#: src/readelf.c:1258 src/unstrip.c:1866 src/unstrip.c:1909 src/unstrip.c:1916
+#: src/readelf.c:1258 src/unstrip.c:1914 src/unstrip.c:1957 src/unstrip.c:1964
 #, c-format
 msgid "cannot get program header: %s"
 msgstr "не вдалося отримати заголовок програми: %s"
@@ -6186,12 +6197,12 @@ msgstr ""
 msgid "cannot get debug context descriptor: %s"
 msgstr "не вдалося отримати дескриптор контексту зневаджування: %s"
 
-#: src/readelf.c:8361 src/readelf.c:8975 src/readelf.c:9086 src/readelf.c:9144
+#: src/readelf.c:8361 src/readelf.c:8983 src/readelf.c:9094 src/readelf.c:9152
 #, c-format
 msgid "cannot convert core note data: %s"
 msgstr "не вдалося перетворити дані запису ядра: %s"
 
-#: src/readelf.c:8716
+#: src/readelf.c:8724
 #, c-format
 msgid ""
 "\n"
@@ -6200,21 +6211,21 @@ msgstr ""
 "\n"
 "%*s... <повторюється %u разів> ..."
 
-#: src/readelf.c:9223
+#: src/readelf.c:9231
 msgid "  Owner          Data size  Type\n"
 msgstr "  Власник        Розм. даних Тип\n"
 
-#: src/readelf.c:9241
+#: src/readelf.c:9249
 #, c-format
 msgid "  %-13.*s  %9<PRId32>  %s\n"
 msgstr "  %-13.*s  %9<PRId32>  %s\n"
 
-#: src/readelf.c:9291
+#: src/readelf.c:9299
 #, c-format
 msgid "cannot get content of note section: %s"
 msgstr "не вдалося отримати вміст розділу записів: %s"
 
-#: src/readelf.c:9318
+#: src/readelf.c:9326
 #, c-format
 msgid ""
 "\n"
@@ -6224,7 +6235,7 @@ msgstr ""
 "Розділ записів (note) [%2zu] «%s» з %<PRIu64> байтів за зміщенням "
 "%#0<PRIx64>:\n"
 
-#: src/readelf.c:9341
+#: src/readelf.c:9349
 #, c-format
 msgid ""
 "\n"
@@ -6233,7 +6244,7 @@ msgstr ""
 "\n"
 "Сегмент записів з %<PRIu64> байтів за зміщенням %#0<PRIx64>:\n"
 
-#: src/readelf.c:9387
+#: src/readelf.c:9395
 #, c-format
 msgid ""
 "\n"
@@ -6242,12 +6253,12 @@ msgstr ""
 "\n"
 "У розділі [%zu] «%s» не міститься даних для створення дампу.\n"
 
-#: src/readelf.c:9393 src/readelf.c:9416
+#: src/readelf.c:9401 src/readelf.c:9424
 #, c-format
 msgid "cannot get data for section [%zu] '%s': %s"
 msgstr "не вдалося отримати дані для розділу [%zu] «%s»: %s"
 
-#: src/readelf.c:9397
+#: src/readelf.c:9405
 #, c-format
 msgid ""
 "\n"
@@ -6256,7 +6267,7 @@ msgstr ""
 "\n"
 "Шіст. дамп розділу [%zu] «%s», %<PRIu64> байтів за зміщенням %#0<PRIx64>:\n"
 
-#: src/readelf.c:9410
+#: src/readelf.c:9418
 #, c-format
 msgid ""
 "\n"
@@ -6265,7 +6276,7 @@ msgstr ""
 "\n"
 "У розділі [%zu] «%s» не міститься рядків для створення дампу.\n"
 
-#: src/readelf.c:9420
+#: src/readelf.c:9428
 #, c-format
 msgid ""
 "\n"
@@ -6274,7 +6285,7 @@ msgstr ""
 "\n"
 "Розділ рядків [%zu] «%s» містить %<PRIu64> байтів за зміщенням %#0<PRIx64>:\n"
 
-#: src/readelf.c:9468
+#: src/readelf.c:9476
 #, c-format
 msgid ""
 "\n"
@@ -6283,7 +6294,7 @@ msgstr ""
 "\n"
 "розділу [%lu] не існує"
 
-#: src/readelf.c:9497
+#: src/readelf.c:9505
 #, c-format
 msgid ""
 "\n"
@@ -6292,12 +6303,12 @@ msgstr ""
 "\n"
 "розділу «%s» не існує"
 
-#: src/readelf.c:9554
+#: src/readelf.c:9562
 #, c-format
 msgid "cannot get symbol index of archive '%s': %s"
 msgstr "не вдалося отримати покажчик символів архіву «%s»: %s"
 
-#: src/readelf.c:9557
+#: src/readelf.c:9565
 #, c-format
 msgid ""
 "\n"
@@ -6306,7 +6317,7 @@ msgstr ""
 "\n"
 "У архіві «%s» немає покажчика символів\n"
 
-#: src/readelf.c:9561
+#: src/readelf.c:9569
 #, c-format
 msgid ""
 "\n"
@@ -6315,12 +6326,12 @@ msgstr ""
 "\n"
 "Покажчик архіву «%s» містить %zu записів:\n"
 
-#: src/readelf.c:9579
+#: src/readelf.c:9587
 #, c-format
 msgid "cannot extract member at offset %zu in '%s': %s"
 msgstr "не вдалося видобути елемент за зміщенням %zu у «%s»: %s"
 
-#: src/readelf.c:9584
+#: src/readelf.c:9592
 #, c-format
 msgid "Archive member '%s' contains:\n"
 msgstr "Елемент архіву «%s» містить:\n"
@@ -6577,8 +6588,8 @@ msgid "invalid minimum length of matched string size"
 msgstr "некоректна мінімальна довжина розмірності рядка для порівняння"
 
 #: src/strings.c:600
-#, c-format
-msgid "lseek64 failed"
+#, fuzzy, c-format
+msgid "lseek failed"
 msgstr "помилка lseek64"
 
 #: src/strings.c:617 src/strings.c:681
@@ -6716,72 +6727,72 @@ msgstr "не вдалося створити файл «%s»: %s"
 msgid "illformed file '%s'"
 msgstr "помилкове форматування файла «%s»"
 
-#: src/strip.c:966 src/strip.c:1064
+#: src/strip.c:968 src/strip.c:1067
 #, c-format
 msgid "while generating output file: %s"
 msgstr "під час спроби створення файла з виведеними даними: %s"
 
-#: src/strip.c:1031 src/strip.c:2066
+#: src/strip.c:1033 src/strip.c:2071
 #, c-format
 msgid "%s: error while creating ELF header: %s"
 msgstr "%s: помилка під час створення заголовка ELF: %s"
 
-#: src/strip.c:1047
+#: src/strip.c:1050
 #, c-format
 msgid "while preparing output for '%s'"
 msgstr "під час приготування виведених даних для «%s»"
 
-#: src/strip.c:1105 src/strip.c:1168
+#: src/strip.c:1108 src/strip.c:1171
 #, c-format
 msgid "while create section header section: %s"
 msgstr "під час створення розділу заголовка розділу: %s"
 
-#: src/strip.c:1114
+#: src/strip.c:1117
 #, c-format
 msgid "cannot allocate section data: %s"
 msgstr "не вдалося розмістити дані розділу: %s"
 
-#: src/strip.c:1180
+#: src/strip.c:1183
 #, c-format
 msgid "while create section header string table: %s"
 msgstr "під час створення таблиці рядків заголовка розділу: %s"
 
-#: src/strip.c:1856
+#: src/strip.c:1861
 #, c-format
 msgid "bad relocation"
 msgstr "помилкове пересування"
 
-#: src/strip.c:1977 src/strip.c:2090
+#: src/strip.c:1982 src/strip.c:2095
 #, c-format
 msgid "while writing '%s': %s"
 msgstr "під час запису «%s»: %s"
 
-#: src/strip.c:1988
+#: src/strip.c:1993
 #, c-format
 msgid "while creating '%s'"
 msgstr "під час спроби створення «%s»"
 
-#: src/strip.c:2011
+#: src/strip.c:2016
 #, c-format
 msgid "while computing checksum for debug information"
 msgstr "під час обчислення контрольної суми для діагностичних даних"
 
-#: src/strip.c:2075
+#: src/strip.c:2080
 #, c-format
 msgid "%s: error while reading the file: %s"
 msgstr "%s: помилка під час читання файла: %s"
 
-#: src/strip.c:2115 src/strip.c:2135
+#: src/strip.c:2120 src/strip.c:2140
 #, c-format
 msgid "while writing '%s'"
 msgstr "під час спроби запису «%s»"
 
-#: src/strip.c:2172 src/strip.c:2179
+#: src/strip.c:2177 src/strip.c:2184
 #, c-format
 msgid "error while finishing '%s': %s"
 msgstr "помилка під час завершення «%s»: %s"
 
-#: src/strip.c:2196 src/strip.c:2268
+#: src/strip.c:2201 src/strip.c:2273
 #, c-format
 msgid "cannot set access and modification date of '%s'"
 msgstr "не вдалося встановити права доступу та дату зміни «%s»"
@@ -6874,12 +6885,12 @@ msgstr "не вдалося створити заголовок ELF: %s"
 msgid "cannot copy ELF header: %s"
 msgstr "не вдалося скопіювати заголовок ELF: %s"
 
-#: src/unstrip.c:261 src/unstrip.c:1855 src/unstrip.c:1899
+#: src/unstrip.c:261 src/unstrip.c:1903 src/unstrip.c:1947
 #, c-format
 msgid "cannot get number of program headers: %s"
 msgstr "не вдалося отримати кількість заголовків програми: %s"
 
-#: src/unstrip.c:266 src/unstrip.c:1859
+#: src/unstrip.c:266 src/unstrip.c:1907
 #, c-format
 msgid "cannot create program headers: %s"
 msgstr "не вдалося створити заголовки програми: %s"
@@ -6894,12 +6905,12 @@ msgstr "не вдалося скопіювати заголовок програ
 msgid "cannot copy section header: %s"
 msgstr "не вдалося скопіювати заголовок розділу: %s"
 
-#: src/unstrip.c:285 src/unstrip.c:1536
+#: src/unstrip.c:285 src/unstrip.c:1541
 #, c-format
 msgid "cannot get section data: %s"
 msgstr "не вдалося отримати дані розділу: %s"
 
-#: src/unstrip.c:287 src/unstrip.c:1538
+#: src/unstrip.c:287 src/unstrip.c:1543
 #, c-format
 msgid "cannot copy section data: %s"
 msgstr "не вдалося скопіювати дані розділу: %s"
@@ -6909,13 +6920,13 @@ msgstr "не вдалося скопіювати дані розділу: %s"
 msgid "cannot create directory '%s'"
 msgstr "не вдалося створити каталог «%s»"
 
-#: src/unstrip.c:351 src/unstrip.c:768 src/unstrip.c:1570
+#: src/unstrip.c:351 src/unstrip.c:768 src/unstrip.c:1575
 #, c-format
 msgid "cannot get symbol table entry: %s"
 msgstr "не вдалося отримати запис таблиці символів: %s"
 
 #: src/unstrip.c:367 src/unstrip.c:585 src/unstrip.c:606 src/unstrip.c:618
-#: src/unstrip.c:1591 src/unstrip.c:1721 src/unstrip.c:1745
+#: src/unstrip.c:1596 src/unstrip.c:1769 src/unstrip.c:1793
 #, c-format
 msgid "cannot update symbol table: %s"
 msgstr "не вдалося оновити таблицю символів: %s"
@@ -6945,12 +6956,12 @@ msgstr "неочікуваний тип розділу у [%zu] з посила�
 msgid "invalid string offset in symbol [%zu]"
 msgstr "некоректне зміщення рядка у символі [%zu]"
 
-#: src/unstrip.c:932 src/unstrip.c:1273
+#: src/unstrip.c:932 src/unstrip.c:1278
 #, c-format
 msgid "cannot read section [%zu] name: %s"
 msgstr "не вдалося прочитати назву розділу [%zu]: %s"
 
-#: src/unstrip.c:973 src/unstrip.c:992 src/unstrip.c:1025
+#: src/unstrip.c:973 src/unstrip.c:992 src/unstrip.c:1027
 #, c-format
 msgid "cannot read '.gnu.prelink_undo' section: %s"
 msgstr "не вдалося прочитати розділ «.gnu.prelink_undo»: %s"
@@ -6960,82 +6971,87 @@ msgstr "не вдалося прочитати розділ «.gnu.prelink_undo�
 msgid "invalid contents in '%s' section"
 msgstr "некоректний вміст розділу «%s»"
 
-#: src/unstrip.c:1068 src/unstrip.c:1393
+#: src/unstrip.c:1019
+#, c-format
+msgid "overflow with shnum = %zu in '%s' section"
+msgstr ""
+
+#: src/unstrip.c:1073 src/unstrip.c:1398
 #, c-format
 msgid "cannot find matching section for [%zu] '%s'"
 msgstr "не вдалося знайти відповідний розділ для [%zu] «%s»"
 
-#: src/unstrip.c:1193 src/unstrip.c:1208 src/unstrip.c:1474
+#: src/unstrip.c:1198 src/unstrip.c:1213 src/unstrip.c:1479 src/unstrip.c:1731
 #, c-format
 msgid "cannot add section name to string table: %s"
 msgstr "не вдалося додати назву розділу до таблиці рядків: %s"
 
-#: src/unstrip.c:1217
+#: src/unstrip.c:1222
 #, c-format
 msgid "cannot update section header string table data: %s"
 msgstr "не вдалося оновити дані заголовка розділу у таблиці рядків: %s"
 
-#: src/unstrip.c:1244 src/unstrip.c:1248
+#: src/unstrip.c:1249 src/unstrip.c:1253
 #, c-format
 msgid "cannot get section header string table section index: %s"
 msgstr ""
 "не вдалося визначити індекс розділу заголовка розділу у таблиці рядків: %s"
 
-#: src/unstrip.c:1252 src/unstrip.c:1256 src/unstrip.c:1489
+#: src/unstrip.c:1257 src/unstrip.c:1261 src/unstrip.c:1494
 #, c-format
 msgid "cannot get section count: %s"
 msgstr "не вдалося отримати кількість розділів: %s"
 
-#: src/unstrip.c:1259
+#: src/unstrip.c:1264
 #, c-format
 msgid "more sections in stripped file than debug file -- arguments reversed?"
 msgstr ""
 "у очищеному файлі більше розділів ніж у файлі з даними для зневаджування — "
 "помилковий порядок параметрів?"
 
-#: src/unstrip.c:1318 src/unstrip.c:1408
+#: src/unstrip.c:1323 src/unstrip.c:1413
 #, c-format
 msgid "cannot read section header string table: %s"
 msgstr "не вдалося прочитати таблицю рядків заголовка розділу: %s"
 
-#: src/unstrip.c:1468
+#: src/unstrip.c:1473
 #, c-format
 msgid "cannot add new section: %s"
 msgstr "не вдалося додати новий розділ: %s"
 
-#: src/unstrip.c:1578
+#: src/unstrip.c:1583
 #, c-format
 msgid "symbol [%zu] has invalid section index"
 msgstr "символ [%zu] має некоректний індекс розділу"
 
-#: src/unstrip.c:1816
+#: src/unstrip.c:1864
 #, c-format
 msgid "cannot read section data: %s"
 msgstr "не вдалося прочитати дані розділу: %s"
 
-#: src/unstrip.c:1837
+#: src/unstrip.c:1885
 #, c-format
 msgid "cannot get ELF header: %s"
 msgstr "не вдалося отримати заголовок ELF: %s"
 
-#: src/unstrip.c:1869
+#: src/unstrip.c:1917
 #, c-format
 msgid "cannot update program header: %s"
 msgstr "не вдалося оновити заголовок програми: %s"
 
-#: src/unstrip.c:1874 src/unstrip.c:1957
+#: src/unstrip.c:1922 src/unstrip.c:2005
 #, c-format
 msgid "cannot write output file: %s"
 msgstr "не вдалося записати файл виведених даних: %s"
 
-#: src/unstrip.c:1926
+#: src/unstrip.c:1974
 #, c-format
 msgid "DWARF data not adjusted for prelinking bias; consider prelink -u"
 msgstr ""
 "Дані DWARF не скориговано відповідно до відхилення перед компонуванням; "
 "спробуйте виправити це командою prelink -u"
 
-#: src/unstrip.c:1929
+#: src/unstrip.c:1977
 #, c-format
 msgid ""
 "DWARF data in '%s' not adjusted for prelinking bias; consider prelink -u"
@@ -7043,76 +7059,76 @@ msgstr ""
 "Дані DWARF у «%s» не скориговано відповідно до відхилення перед "
 "компонуванням; спробуйте виправити це командою prelink -u"
 
-#: src/unstrip.c:1948 src/unstrip.c:1999 src/unstrip.c:2011 src/unstrip.c:2097
+#: src/unstrip.c:1996 src/unstrip.c:2047 src/unstrip.c:2059 src/unstrip.c:2145
 #, c-format
 msgid "cannot create ELF descriptor: %s"
 msgstr "не вдалося створити дескриптор ELF: %s"
 
-#: src/unstrip.c:1990
+#: src/unstrip.c:2038
 msgid "WARNING: "
 msgstr "УВАГА: "
 
-#: src/unstrip.c:1992
+#: src/unstrip.c:2040
 msgid ", use --force"
 msgstr ", скористайтеся --force"
 
-#: src/unstrip.c:2015
+#: src/unstrip.c:2063
 msgid "ELF header identification (e_ident) different"
 msgstr "Різні ідентифікатори заголовків ELF (e_ident)"
 
-#: src/unstrip.c:2018
+#: src/unstrip.c:2066
 msgid "ELF header type (e_type) different"
 msgstr "Різні типи заголовків ELF (e_type)"
 
-#: src/unstrip.c:2021
+#: src/unstrip.c:2069
 msgid "ELF header machine type (e_machine) different"
 msgstr "Різні типи архітектур заголовків ELF (e_machine)"
 
-#: src/unstrip.c:2024
+#: src/unstrip.c:2072
 msgid "stripped program header (e_phnum) smaller than unstripped"
 msgstr "очищений заголовок програми (e_phnum) є меншим за неочищений"
 
-#: src/unstrip.c:2054
+#: src/unstrip.c:2102
 #, c-format
 msgid "cannot find stripped file for module '%s': %s"
 msgstr "не вдалося знайти очищений файл для модуля «%s»: %s"
 
-#: src/unstrip.c:2058
+#: src/unstrip.c:2106
 #, c-format
 msgid "cannot open stripped file '%s' for module '%s': %s"
 msgstr "не вдалося відкрити очищений файл «%s» для модуля «%s»: %s"
 
-#: src/unstrip.c:2073
+#: src/unstrip.c:2121
 #, c-format
 msgid "cannot find debug file for module '%s': %s"
 msgstr "не вдалося знайти файл діагностичних даних для модуля «%s»: %s"
 
-#: src/unstrip.c:2077
+#: src/unstrip.c:2125
 #, c-format
 msgid "cannot open debug file '%s' for module '%s': %s"
 msgstr "не вдалося відкрити файл діагностичних даних «%s» для модуля «%s»: %s"
 
-#: src/unstrip.c:2090
+#: src/unstrip.c:2138
 #, c-format
 msgid "module '%s' file '%s' is not stripped"
 msgstr "у модулі «%s» файл «%s» не очищено strip"
 
-#: src/unstrip.c:2121
+#: src/unstrip.c:2169
 #, c-format
 msgid "cannot cache section addresses for module '%s': %s"
 msgstr "не вдалося кешувати адреси розділів для модуля «%s»: %s"
 
-#: src/unstrip.c:2254
+#: src/unstrip.c:2302
 #, c-format
 msgid "no matching modules found"
 msgstr "відповідних модулів не виявлено"
 
-#: src/unstrip.c:2263
+#: src/unstrip.c:2311
 #, c-format
 msgid "matched more than one module"
 msgstr "встановлено відповідність декількох модулів"
 
-#: src/unstrip.c:2307
+#: src/unstrip.c:2355
 msgid ""
 "STRIPPED-FILE DEBUG-FILE\n"
 "[MODULE...]"
@@ -7120,7 +7136,7 @@ msgstr ""
 "ОЧИЩЕНИЙ-ФАЙЛ ФАЙЛ-DEBUG\n"
 "[МОДУЛЬ...]"
 
-#: src/unstrip.c:2308
+#: src/unstrip.c:2356
 msgid ""
 "Combine stripped files with separate symbols and debug information.\vThe "
 "first form puts the result in DEBUG-FILE if -o was not given.\n"

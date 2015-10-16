@@ -864,7 +864,7 @@ section [%2d] '%s': symbol %zu: TLS symbol but no TLS program header entry\n"),
 section [%2d] '%s': symbol %zu: TLS symbol but couldn't get TLS program header entry\n"),
 				   idx, section_name (ebl, idx), cnt);
 			}
-		      else
+		      else if (!is_debuginfo)
 			{
 			  if (st_value
 			      < destshdr->sh_offset - phdr->p_offset)
@@ -3955,7 +3955,8 @@ section [%2zu] '%s' is both executable and writable\n"),
 	    }
 	}
 
-      if (ehdr->e_type != ET_REL && (shdr->sh_flags & SHF_ALLOC) != 0)
+      if (ehdr->e_type != ET_REL && (shdr->sh_flags & SHF_ALLOC) != 0
+	  && !is_debuginfo)
 	{
 	  /* Make sure the section is contained in a loaded segment
 	     and that the initialization part matches NOBITS sections.  */

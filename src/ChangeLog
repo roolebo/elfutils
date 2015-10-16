@@ -1,5 +1,12 @@
 2015-10-16  Mark Wielaard  <mjw@redhat.com>
 
+	* elflint.c (check_symtab): Don't check TLS symbol value against TLS
+	phdr offset in debuginfo files.
+	(check_sections): Don't try to match section offsets to phdrs offsets
+	in debuginfo files.
+
+2015-10-16  Mark Wielaard  <mjw@redhat.com>
+
 	* elflint.c (check_reloc_shdr): Reject only desthdrs if they have both
 	SHF_MERGE and SHF_STRINGS set.
 

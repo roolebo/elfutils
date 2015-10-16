@@ -1,5 +1,11 @@
 2015-10-28  Mark Wielaard  <mjw@redhat.com>
 
+	* run-readelf-z.sh: New test.
+	* Makefile.am (TESTS): Add run-readelf-z.sh.
+	(EXTRA_DIST): Likewise.
+
+2015-10-28  Mark Wielaard  <mjw@redhat.com>
+
 	* elfgetchdr.c: New file.
 	* run-elfgetchdr.sh: New test.
 	* testfile-zgabi32.bz2: New testfile.

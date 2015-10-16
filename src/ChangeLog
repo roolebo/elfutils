@@ -1,3 +1,11 @@
+2015-10-16  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (argp_option): Describe --decompress,-z.
+	(print_decompress): New bool.
+	(parse_opt): Handle -z.
+	(elf_ch_type_name): New function.
+	(print_shdr): Print section compress information.
+
 2015-12-31  Mark Wielaard  <mjw@redhat.com>
 
 	* elflint.c (check_symtab): Add _edata and _end (plus extra underscore

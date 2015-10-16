@@ -48,6 +48,7 @@
 #include "../libelf/libelfP.h"
 #include "../libelf/common.h"
 #include "../libebl/libeblP.h"
+#include "../libdwelf/libdwelf.h"
 #include "../libdw/libdwP.h"
 #include "../libdwfl/libdwflP.h"
 #include "../libdw/memory-access.h"
@@ -112,6 +113,8 @@ static const struct argp_option options[] =
     N_("Display just offsets instead of resolving values to addresses in DWARF data"), 0 },
   { "wide", 'W', NULL, 0,
     N_("Ignored for compatibility (lines always wide)"), 0 },
+  { "decompress", 'z', NULL, 0,
+    N_("Show compression information for compressed sections (when used with -S)."), 0 },
   { NULL, 0, NULL, 0, NULL, 0 }
 };
 
@@ -189,6 +192,9 @@ static bool decodedaranges = false;
 
 /* True if we should print the .debug_aranges section using libdw.  */
 static bool decodedline = false;
+
+/* True if we want to show more information about compressed sections.  */
+static bool print_decompress = false;
 
 /* Select printing of debugging sections.  */
 static enum section_e
@@ -478,6 +484,9 @@ parse_opt (int key, char *arg,
 	}
       break;
     case 'W':			/* Ignored.  */
+      break;
+    case 'z':
+      print_decompress = true;
       break;
     case ELF_INPUT_SECTION:
       if (arg == NULL)
@@ -1065,6 +1074,17 @@ get_visibility_type (int value)
     }
 }
 
+static const char *
+elf_ch_type_name (unsigned int code)
+{
+  if (code == 0)
+    return "NONE";
+
+  if (code == ELFCOMPRESS_ZLIB)
+    return "ZLIB";
+
+  return "UNKNOWN";
+}
 
 /* Print the section headers.  */
 static void
@@ -1090,6 +1110,14 @@ There are %d section headers, starting at offset %#" PRIx64 ":\n\
     puts (gettext ("[Nr] Name                 Type         Addr     Off    Size   ES Flags Lk Inf Al"));
   else
     puts (gettext ("[Nr] Name                 Type         Addr             Off      Size     ES Flags Lk Inf Al"));
+
+  if (print_decompress)
+    {
+      if (ehdr->e_ident[EI_CLASS] == ELFCLASS32)
+	puts (gettext ("     [Compression  Size   Al]"));
+      else
+	puts (gettext ("     [Compression  Size     Al]"));
+    }
 
   for (cnt = 0; cnt < shnum; ++cnt)
     {
@@ -1128,25 +1156,57 @@ There are %d section headers, starting at offset %#" PRIx64 ":\n\
 	*cp++ = 'G';
       if (shdr->sh_flags & SHF_TLS)
 	*cp++ = 'T';
+      if (shdr->sh_flags & SHF_COMPRESSED)
+	*cp++ = 'C';
       if (shdr->sh_flags & SHF_ORDERED)
 	*cp++ = 'O';
       if (shdr->sh_flags & SHF_EXCLUDE)
 	*cp++ = 'E';
       *cp = '\0';
 
+      const char *sname;
       char buf[128];
+      sname = elf_strptr (ebl->elf, shstrndx, shdr->sh_name) ?: "<corrupt>";
       printf ("[%2zu] %-20s %-12s %0*" PRIx64 " %0*" PRIx64 " %0*" PRIx64
 	      " %2" PRId64 " %-5s %2" PRId32 " %3" PRId32
 	      " %2" PRId64 "\n",
-	      cnt,
-	      elf_strptr (ebl->elf, shstrndx, shdr->sh_name)
-	      ?: "<corrupt>",
+	      cnt, sname,
 	      ebl_section_type_name (ebl, shdr->sh_type, buf, sizeof (buf)),
 	      ehdr->e_ident[EI_CLASS] == ELFCLASS32 ? 8 : 16, shdr->sh_addr,
 	      ehdr->e_ident[EI_CLASS] == ELFCLASS32 ? 6 : 8, shdr->sh_offset,
 	      ehdr->e_ident[EI_CLASS] == ELFCLASS32 ? 6 : 8, shdr->sh_size,
 	      shdr->sh_entsize, flagbuf, shdr->sh_link, shdr->sh_info,
 	      shdr->sh_addralign);
+
+      if (print_decompress)
+	{
+	  if ((shdr->sh_flags & SHF_COMPRESSED) != 0)
+	    {
+	      GElf_Chdr chdr;
+	      if (gelf_getchdr (scn, &chdr) != NULL)
+		printf ("     [ELF %s (%" PRId32 ") %0*" PRIx64
+			" %2" PRId64 "]\n",
+			elf_ch_type_name (chdr.ch_type),
+			chdr.ch_type,
+			ehdr->e_ident[EI_CLASS] == ELFCLASS32 ? 6 : 8,
+			chdr.ch_size, chdr.ch_addralign);
+	      else
+		error (0, 0,
+		       gettext ("bad compression header for section %zd: %s"),
+		       elf_ndxscn (scn), elf_errmsg (-1));
+	    }
+	  else if (strncmp(".zdebug", sname, strlen (".zdebug")) == 0)
+	    {
+	      ssize_t size;
+	      if ((size = dwelf_scn_gnu_compressed_size (scn)) >= 0)
+		printf ("     [GNU ZLIB     %0*" PRIx64 "   ]\n",
+			ehdr->e_ident[EI_CLASS] == ELFCLASS32 ? 6 : 8, size);
+	      else
+		error (0, 0,
+		       gettext ("bad gnu compressed size for section %zd: %s"),
+		       elf_ndxscn (scn), elf_errmsg (-1));
+	    }
+	}
     }
 
   fputc_unlocked ('\n', stdout);

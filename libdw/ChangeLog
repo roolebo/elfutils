@@ -1,3 +1,7 @@
+2015-10-16  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (libdw.so): Add -lz.
+
 2015-10-14  Chih-Hung Hsieh  <chh@google.com>
 
 	* cfi.c (execute_cfi): Move nested functions 'enough_registers'

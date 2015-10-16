@@ -93,7 +93,7 @@ libelf_a_SOURCES = elf_version.c elf_hash.c elf_error.c elf_fill.c \
 libelf_pic_a_SOURCES =
 am_libelf_pic_a_OBJECTS = $(libelf_a_SOURCES:.c=.os)
 
-libelf_so_LDLIBS =
+libelf_so_LDLIBS = -lz
 if USE_LOCKS
 libelf_so_LDLIBS += -lpthread
 endif

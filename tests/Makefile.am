@@ -353,8 +353,8 @@ libasm = -lasm
 libebl = -lebl
 else !STANDALONE
 if BUILD_STATIC
-libdw = ../libdw/libdw.a $(zip_LIBS) $(libelf) $(libebl) -ldl
-libelf = ../libelf/libelf.a
+libdw = ../libdw/libdw.a -lz $(zip_LIBS) $(libelf) $(libebl) -ldl
+libelf = ../libelf/libelf.a -lz
 libasm = ../libasm/libasm.a
 else
 libdw = ../libdw/libdw.so

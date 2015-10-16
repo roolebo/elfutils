@@ -1,5 +1,10 @@
 2015-10-16  Mark Wielaard  <mjw@redhat.com>
 
+	* Makefile.am [BUILD_STATIC](libdw): Add -lz.
+	[BUILD_STATIC](libelf): Likewise.
+
+2015-10-16  Mark Wielaard  <mjw@redhat.com>
+
 	* elflint.c (check_symtab): Don't check TLS symbol value against TLS
 	phdr offset in debuginfo files.
 	(check_sections): Don't try to match section offsets to phdrs offsets

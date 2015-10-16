@@ -1,5 +1,10 @@
 2015-10-16  Mark Wielaard  <mjw@redhat.com>
 
+	* Makefile.am [BUILD_STATIC] (libdw): Add -lz.
+	[BUILD_STATIC] (libelf): Likewise.
+
+2015-10-16  Mark Wielaard  <mjw@redhat.com>
+
 	* Makefile.am (dwfl_proc_attach_LDFLAGS): Add AM_LDFLAGS.
 
 2015-10-09  Josh Stone  <jistone@redhat.com>

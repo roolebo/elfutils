@@ -240,11 +240,17 @@ AC_SUBST([LIBEBL_SUBDIR])
 AC_DEFINE_UNQUOTED(LIBEBL_SUBDIR, "$LIBEBL_SUBDIR")
 AH_TEMPLATE([LIBEBL_SUBDIR], [$libdir subdirectory containing libebl modules.])
 
-dnl Test for zlib and bzlib, gives ZLIB/BZLIB .am
-dnl conditional and config.h USE_ZLIB/USE_BZLIB #define.
+dnl zlib is mandatory.
 save_LIBS="$LIBS"
 LIBS=
 eu_ZIPLIB(zlib,ZLIB,z,gzdirect,gzip)
+AS_IF([test "x$with_zlib" = xno], [AC_MSG_ERROR("zlib not found")])
+LIBS="$save_LIBS"
+
+dnl Test for bzlib and xz/lzma, gives BZLIB/LZMALIB .am
+dnl conditional and config.h USE_BZLIB/USE_LZMALIB #define.
+save_LIBS="$LIBS"
+LIBS=
 eu_ZIPLIB(bzlib,BZLIB,bz2,BZ2_bzdopen,bzip2)
 eu_ZIPLIB(lzma,LZMA,lzma,lzma_auto_decoder,[LZMA (xz)])
 zip_LIBS="$LIBS"

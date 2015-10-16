@@ -1,3 +1,7 @@
+2015-10-16  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (libelf_so_LDLIBS): Add -lz.
+
 2015-10-14  Mark Wielaard  <mjw@redhat.com>
 
 	* elf.h: Update from glibc. Add section compression constants and

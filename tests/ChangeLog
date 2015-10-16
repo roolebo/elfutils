@@ -1,3 +1,7 @@
+2015-10-16  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (dwfl_proc_attach_LDFLAGS): Add AM_LDFLAGS.
+
 2015-10-09  Josh Stone  <jistone@redhat.com>
 
 	* lfs-symbols: New list of LFS-related symbols from lintian.

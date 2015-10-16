@@ -1,3 +1,8 @@
+2015-10-16  Mark Wielaard  <mjw@redhat.com>
+
+	* ppc_symbol.c (ppc_check_special_symbol): Also allow _SDA_BASE_
+	in .data section.
+
 2015-10-05  Josh Stone  <jistone@redhat.com>
 
 	* Makefile.am (libebl_%.so): Add AM_V_at and AM_V_CCLD silencers.

@@ -1,3 +1,8 @@
+2015-10-16  Mark Wielaard  <mjw@redhat.com>
+
+	* elflint.c (check_reloc_shdr): Reject only desthdrs if they have both
+	SHF_MERGE and SHF_STRINGS set.
+
 2015-10-13  Jose E. Marchesi  <jose.marchesi@oracle.com>
 
 	* elflint.c (check_sections): Do not rely on

@@ -1254,9 +1254,10 @@ section [%2d] '%s': sh_info should be zero\n"),
 		}
 	    }
 
-	  if (((*destshdrp)->sh_flags & (SHF_MERGE | SHF_STRINGS)) != 0)
+	  if ((((*destshdrp)->sh_flags & SHF_MERGE) != 0)
+	      && ((*destshdrp)->sh_flags & SHF_STRINGS) != 0)
 	    ERROR (gettext ("\
-section [%2d] '%s': no relocations for merge-able sections possible\n"),
+section [%2d] '%s': no relocations for merge-able string sections possible\n"),
 		   idx, section_name (ebl, idx));
 	}
     }

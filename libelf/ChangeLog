@@ -1,3 +1,8 @@
+2015-10-20  Jose E. Marchesi  <jose.marchesi@oracle.com>
+
+	* elf_begin.c (get_shnum): Elf64_Shdr.sh_size is an Elf64_Xword.
+	Fix the size argument to pread_retry.
+
 2015-10-13  Chih-Hung Hsieh  <chh@google.com>
 
 	* elf32_updatefile.c (__elfw2(LIBELFBITS,updatemmap)): Move nested

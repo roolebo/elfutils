@@ -216,7 +216,7 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
 						 + offset))->sh_size,
 			sizeof (Elf64_Xword));
 	      else
-		if (unlikely (pread_retry (fildes, &size, sizeof (Elf64_Word),
+		if (unlikely (pread_retry (fildes, &size, sizeof (Elf64_Xword),
 					   offset + ehdr.e64->e_shoff
 					   + offsetof (Elf64_Shdr, sh_size))
 			      != sizeof (Elf64_Xword)))

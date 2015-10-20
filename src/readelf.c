@@ -114,7 +114,7 @@ static const struct argp_option options[] =
   { "wide", 'W', NULL, 0,
     N_("Ignored for compatibility (lines always wide)"), 0 },
   { "decompress", 'z', NULL, 0,
-    N_("Show compression information for compressed sections (when used with -S)."), 0 },
+    N_("Show compression information for compressed sections (when used with -S); decompress section before dumping data (when used with -p or -x)"), 0 },
   { NULL, 0, NULL, 0, NULL, 0 }
 };
 
@@ -806,6 +806,20 @@ process_file (int fd, const char *fname, bool only_one)
     close (fd);
 }
 
+/* Check whether there are any compressed sections in the ELF file.  */
+static bool
+elf_contains_chdrs (Elf *elf)
+{
+  Elf_Scn *scn = NULL;
+  while ((scn = elf_nextscn (elf, scn)) != NULL)
+    {
+      GElf_Shdr shdr_mem;
+      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+      if (shdr != NULL && (shdr->sh_flags & SHF_COMPRESSED) != 0)
+	return true;
+    }
+  return false;
+}
 
 /* Process one ELF file.  */
 static void
@@ -844,17 +858,21 @@ process_elf_file (Dwfl_Module *dwflmod, int fd)
 	   gettext ("cannot determine number of program headers: %s"),
 	   elf_errmsg (-1));
 
-  /* For an ET_REL file, libdwfl has adjusted the in-core shdrs
-     and may have applied relocation to some sections.
-     So we need to get a fresh Elf handle on the file to display those.  */
-  bool print_unrelocated = (print_section_header
-			    || print_relocations
-			    || dump_data_sections != NULL
-			    || print_notes);
+  /* For an ET_REL file, libdwfl has adjusted the in-core shdrs and
+     may have applied relocation to some sections.  If there are any
+     compressed sections, any pass (or libdw/libdwfl) might have
+     uncompressed them.  So we need to get a fresh Elf handle on the
+     file to display those.  */
+  bool print_unchanged = ((print_section_header
+			   || print_relocations
+			   || dump_data_sections != NULL
+			   || print_notes)
+			  && (ehdr->e_type == ET_REL
+			      || elf_contains_chdrs (ebl->elf)));
 
   Elf *pure_elf = NULL;
   Ebl *pure_ebl = ebl;
-  if (ehdr->e_type == ET_REL && print_unrelocated)
+  if (print_unchanged)
     {
       /* Read the file afresh.  */
       off_t aroff = elf_getaroff (elf);
@@ -1503,7 +1521,17 @@ print_scngrp (Ebl *ebl)
       GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
 
       if (shdr != NULL && shdr->sh_type == SHT_GROUP)
-	handle_scngrp (ebl, scn, shdr);
+	{
+	  if ((shdr->sh_flags & SHF_COMPRESSED) != 0)
+	    {
+	      if (elf_compress (scn, 0, 0) < 0)
+		printf ("WARNING: %s [%zd]\n",
+			gettext ("Couldn't uncompress section"),
+			elf_ndxscn (scn));
+	      shdr = gelf_getshdr (scn, &shdr_mem);
+	    }
+	  handle_scngrp (ebl, scn, shdr);
+	}
     }
 }
 
@@ -2202,7 +2230,17 @@ print_symtab (Ebl *ebl, int type)
       GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
 
       if (shdr != NULL && shdr->sh_type == (GElf_Word) type)
-	handle_symtab (ebl, scn, shdr);
+	{
+	  if ((shdr->sh_flags & SHF_COMPRESSED) != 0)
+	    {
+	      if (elf_compress (scn, 0, 0) < 0)
+		printf ("WARNING: %s [%zd]\n",
+			gettext ("Couldn't uncompress section"),
+			elf_ndxscn (scn));
+	      shdr = gelf_getshdr (scn, &shdr_mem);
+	    }
+	  handle_symtab (ebl, scn, shdr);
+	}
     }
 }
 
@@ -3271,6 +3309,16 @@ handle_hash (Ebl *ebl)
 
       if (likely (shdr != NULL))
 	{
+	  if ((shdr->sh_type == SHT_HASH || shdr->sh_type == SHT_GNU_HASH)
+	      && (shdr->sh_flags & SHF_COMPRESSED) != 0)
+	    {
+	      if (elf_compress (scn, 0, 0) < 0)
+		printf ("WARNING: %s [%zd]\n",
+			gettext ("Couldn't uncompress section"),
+			elf_ndxscn (scn));
+	      shdr = gelf_getshdr (scn, &shdr_mem);
+	    }
+
 	  if (shdr->sh_type == SHT_HASH)
 	    {
 	      if (ebl_sysvhash_entrysize (ebl) == sizeof (Elf64_Xword))
@@ -8320,11 +8368,9 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
 	  int n;
 	  for (n = 0; n < ndebug_sections; ++n)
 	    if (strcmp (name, debug_sections[n].name) == 0
-#if USE_ZLIB
 		|| (name[0] == '.' && name[1] == 'z'
 		    && debug_sections[n].name[1] == 'd'
 		    && strcmp (&name[2], &debug_sections[n].name[1]) == 0)
-#endif
 		)
 	      {
 		if ((print_debug_sections | implicit_debug_sections)
@@ -9456,16 +9502,34 @@ dump_data_section (Elf_Scn *scn, const GElf_Shdr *shdr, const char *name)
 	    elf_ndxscn (scn), name);
   else
     {
+      if (print_decompress)
+	{
+	  /* We try to decompress the section, but keep the old shdr around
+	     so we can show both the original shdr size and the uncompressed
+	     data size.   */
+	  if ((shdr->sh_flags & SHF_COMPRESSED) != 0)
+	    elf_compress (scn, 0, 0);
+	  else if (strncmp (name, ".zdebug", strlen (".zdebug")) == 0)
+	    elf_compress_gnu (scn, 0, 0);
+	}
+
       Elf_Data *data = elf_rawdata (scn, NULL);
       if (data == NULL)
 	error (0, 0, gettext ("cannot get data for section [%zu] '%s': %s"),
 	       elf_ndxscn (scn), name, elf_errmsg (-1));
       else
 	{
-	  printf (gettext ("\nHex dump of section [%zu] '%s', %" PRIu64
-			   " bytes at offset %#0" PRIx64 ":\n"),
-		  elf_ndxscn (scn), name,
-		  shdr->sh_size, shdr->sh_offset);
+	  if (data->d_size == shdr->sh_size)
+	    printf (gettext ("\nHex dump of section [%zu] '%s', %" PRIu64
+			     " bytes at offset %#0" PRIx64 ":\n"),
+		    elf_ndxscn (scn), name,
+		    shdr->sh_size, shdr->sh_offset);
+	  else
+	    printf (gettext ("\nHex dump of section [%zu] '%s', %" PRIu64
+			     " bytes (%zd uncompressed) at offset %#0"
+			     PRIx64 ":\n"),
+		    elf_ndxscn (scn), name,
+		    shdr->sh_size, data->d_size, shdr->sh_offset);
 	  hex_dump (data->d_buf, data->d_size);
 	}
     }
@@ -9479,16 +9543,34 @@ print_string_section (Elf_Scn *scn, const GElf_Shdr *shdr, const char *name)
 	    elf_ndxscn (scn), name);
   else
     {
+      if (print_decompress)
+	{
+	  /* We try to decompress the section, but keep the old shdr around
+	     so we can show both the original shdr size and the uncompressed
+	     data size.  */
+	  if ((shdr->sh_flags & SHF_COMPRESSED) != 0)
+	    elf_compress (scn, 0, 0);
+	  else if (strncmp (name, ".zdebug", strlen (".zdebug")) == 0)
+	    elf_compress_gnu (scn, 0, 0);
+	}
+
       Elf_Data *data = elf_rawdata (scn, NULL);
       if (data == NULL)
 	error (0, 0, gettext ("cannot get data for section [%zu] '%s': %s"),
 	       elf_ndxscn (scn), name, elf_errmsg (-1));
       else
 	{
-	  printf (gettext ("\nString section [%zu] '%s' contains %" PRIu64
-			   " bytes at offset %#0" PRIx64 ":\n"),
-		  elf_ndxscn (scn), name,
-		  shdr->sh_size, shdr->sh_offset);
+	  if (data->d_size == shdr->sh_size)
+	    printf (gettext ("\nString section [%zu] '%s' contains %" PRIu64
+			     " bytes at offset %#0" PRIx64 ":\n"),
+		    elf_ndxscn (scn), name,
+		    shdr->sh_size, shdr->sh_offset);
+	  else
+	    printf (gettext ("\nString section [%zu] '%s' contains %" PRIu64
+			     " bytes (%zd uncompressed) at offset %#0"
+			     PRIx64 ":\n"),
+		    elf_ndxscn (scn), name,
+		    shdr->sh_size, data->d_size, shdr->sh_offset);
 
 	  const char *start = data->d_buf;
 	  const char *const limit = start + data->d_size;

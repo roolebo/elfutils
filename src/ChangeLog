@@ -1,3 +1,16 @@
+2015-10-20  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (options): Expand -z help text.
+	(dump_data_section): Check whether we need and can decompress section
+	data and call elf_rawzdata if so,
+	(print_string_section): Likewise.
+	(elf_contains_chdrs): New function.
+	(process_elf_file): Rename print_unrelocated to print_unchanged,
+	use elf_contains_chdrs.
+	(print_scngrp): Check whether section is compressed before use.
+	(print_symtab): Likewise.
+	(handle_hash): Likewise.
+
 2015-10-16  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (argp_option): Describe --decompress,-z.

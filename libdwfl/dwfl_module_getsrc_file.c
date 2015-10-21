@@ -30,6 +30,24 @@
 #include "../libdw/libdwP.h"
 
 
+static inline const char *
+dwfl_dwarf_line_file (const Dwarf_Line *line)
+{
+  return line->files->info[line->file].name;
+}
+
+static inline Dwarf_Line *
+dwfl_line (const Dwfl_Line *line)
+{
+  return &dwfl_linecu (line)->die.cu->lines->info[line->idx];
+}
+
+static inline const char *
+dwfl_line_file (const Dwfl_Line *line)
+{
+  return dwfl_dwarf_line_file (dwfl_line (line));
+}
+
 int
 dwfl_module_getsrc_file (Dwfl_Module *mod,
 			 const char *fname, int lineno, int column,
@@ -58,19 +76,6 @@ dwfl_module_getsrc_file (Dwfl_Module *mod,
 	 && cu != NULL
 	 && (error = __libdwfl_cu_getsrclines (cu)) == DWFL_E_NOERROR)
     {
-      inline const char *INTUSE(dwarf_line_file) (const Dwarf_Line *line)
-	{
-	  return line->files->info[line->file].name;
-	}
-      inline Dwarf_Line *dwfl_line (const Dwfl_Line *line)
-	{
-	  return &dwfl_linecu (line)->die.cu->lines->info[line->idx];
-	}
-      inline const char *dwfl_line_file (const Dwfl_Line *line)
-	{
-	  return INTUSE(dwarf_line_file) (dwfl_line (line));
-	}
-
       /* Search through all the line number records for a matching
 	 file and line/column number.  If any of the numbers is zero,
 	 no match is performed.  */
@@ -87,7 +92,7 @@ dwfl_module_getsrc_file (Dwfl_Module *mod,
 	    }
 	  else
 	    {
-	      const char *file = INTUSE(dwarf_line_file) (line);
+	      const char *file = dwfl_dwarf_line_file (line);
 	      if (file != lastfile)
 		{
 		  /* Match the name with the name the user provided.  */
@@ -110,7 +115,7 @@ dwfl_module_getsrc_file (Dwfl_Module *mod,
 	  size_t inner;
 	  for (inner = 0; inner < cur_match; ++inner)
 	    if (dwfl_line_file (match[inner])
-		== INTUSE(dwarf_line_file) (line))
+		== dwfl_dwarf_line_file (line))
 	      break;
 	  if (inner < cur_match
 	      && (dwfl_line (match[inner])->line != line->line

@@ -38,6 +38,25 @@
 #define BACKEND aarch64_
 #include "libebl_CPU.h"
 
+__attribute__ ((format (printf, 7, 8)))
+static ssize_t
+do_regtype (const char *setname, int type,
+           const char **setnamep, int *typep,
+           char *name, size_t namelen, const char *fmt, ...)
+{
+  *setnamep = setname;
+  *typep = type;
+
+  va_list ap;
+  va_start (ap, fmt);
+  int s = vsnprintf (name, namelen, fmt, ap);
+  va_end(ap);
+
+  if (s < 0 || (unsigned) s >= namelen)
+    return -1;
+  return s + 1;
+}
+
 ssize_t
 aarch64_register_info (Ebl *ebl __attribute__ ((unused)),
 		       int regno, char *name, size_t namelen,
@@ -47,25 +66,12 @@ aarch64_register_info (Ebl *ebl __attribute__ ((unused)),
   if (name == NULL)
     return 128;
 
-  __attribute__ ((format (printf, 3, 4)))
-  ssize_t
-  regtype (const char *setname, int type, const char *fmt, ...)
-  {
-    *setnamep = setname;
-    *typep = type;
-
-    va_list ap;
-    va_start (ap, fmt);
-    int s = vsnprintf (name, namelen, fmt, ap);
-    va_end(ap);
-
-    if (s < 0 || (unsigned) s >= namelen)
-      return -1;
-    return s + 1;
-  }
 
   *prefix = "";
   *bits = 64;
+
+#define regtype(setname, type, ...) \
+    do_regtype(setname, type, setnamep, typep, name, namelen, __VA_ARGS__)
 
   switch (regno)
     {

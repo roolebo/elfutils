@@ -89,6 +89,17 @@ static const Dwarf_Op loc_aggregate[] =
 #define nloc_aggregate 1
 
 
+static inline int
+compute_hfa (const Dwarf_Op *loc, int nregs,
+	     const Dwarf_Op **locp, int fpregs_used)
+{
+  if (fpregs_used == 0)
+    *locp = loc;
+  else if (*locp != loc)
+    return 9;
+  return fpregs_used + nregs;
+}
+
 /* If this type is an HFA small enough to be returned in FP registers,
    return the number of registers to use.  Otherwise 9, or -1 for errors.  */
 static int
@@ -99,15 +110,6 @@ hfa_type (Dwarf_Die *typedie, Dwarf_Word size,
      If we find a datum that's not an FP type (and not quad FP), punt.
      If we find a datum that's not the same FP type as the first datum, punt.
      If we count more than eight total homogeneous FP data, punt.  */
-
-  inline int hfa (const Dwarf_Op *loc, int nregs)
-    {
-      if (fpregs_used == 0)
-	*locp = loc;
-      else if (*locp != loc)
-	return 9;
-      return fpregs_used + nregs;
-    }
 
   int tag = DWARF_TAG_OR_RETURN (typedie);
   switch (tag)
@@ -123,6 +125,7 @@ hfa_type (Dwarf_Die *typedie, Dwarf_Word size,
 						 &attr_mem), &encoding) != 0)
 	return -1;
 
+#define hfa(loc, nregs) compute_hfa(loc, nregs, locp, fpregs_used)
       switch (encoding)
 	{
 	case DW_ATE_float:

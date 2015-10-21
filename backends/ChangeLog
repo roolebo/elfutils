@@ -1,3 +1,9 @@
+2015-10-21  Chih-Hung Hsieh  <chh@google.com>
+
+	* ia64_retval.c (hfa_type): Move nested function 'hfa' to file scope.
+	* aarch64_regs.c (aarch64_register_info): Move nested function 'regtype'
+	to file scope.
+
 2015-10-16  Mark Wielaard  <mjw@redhat.com>
 
 	* ppc_symbol.c (ppc_check_special_symbol): Also allow _SDA_BASE_

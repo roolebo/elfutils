@@ -1,3 +1,8 @@
+2015-10-21  Chih-Hung Hsieh <chh@google.com>
+
+	* dwfl_module.c (dwfl_report_module): Move nested function 'use' to
+	file scope.
+
 2015-10-09  Josh Stone  <jistone@redhat.com>
 
 	* core-file.c (elf_begin_rand): Replace loff_t with off_t.

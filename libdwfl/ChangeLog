@@ -1,5 +1,10 @@
 2015-10-21  Chih-Hung Hsieh <chh@google.com>
 
+	* frame_unwind.c (expr_eval): Move nested function 'push' and 'pop'
+	to file scope. Pass used local variables in struct eval_stack.
+
+2015-10-21  Chih-Hung Hsieh <chh@google.com>
+
 	* dwfl_module.c (dwfl_report_module): Move nested function 'use' to
 	file scope.
 

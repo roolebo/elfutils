@@ -67,6 +67,97 @@
 
 #define READ_SIZE		(1 << 20)
 
+struct unzip_state {
+#if !USE_INFLATE
+  gzFile zf;
+#endif
+  size_t mapped_size;
+  void **whole;
+  void *buffer;
+  size_t size;
+  void *input_buffer;
+  off_t input_pos;
+};
+
+static inline bool
+bigger_buffer (struct unzip_state *state, size_t start)
+{
+  size_t more = state->size ? state->size * 2 : start;
+  char *b = realloc (state->buffer, more);
+  while (unlikely (b == NULL) && more >= state->size + 1024)
+    b = realloc (state->buffer, more -= 1024);
+  if (unlikely (b == NULL))
+    return false;
+  state->buffer = b;
+  state->size = more;
+  return true;
+}
+
+static inline void
+smaller_buffer (struct unzip_state *state, size_t end)
+{
+  state->buffer =
+      realloc (state->buffer, end) ?: end == 0 ? NULL : state->buffer;
+  state->size = end;
+}
+
+static inline Dwfl_Error
+fail (struct unzip_state *state, Dwfl_Error failure)
+{
+  if (state->input_pos == (off_t) state->mapped_size)
+    *state->whole = state->input_buffer;
+  else
+    {
+      free (state->input_buffer);
+      *state->whole = NULL;
+    }
+  free (state->buffer);
+  return failure;
+}
+
+static inline Dwfl_Error
+zlib_fail (struct unzip_state *state, int result)
+{
+  switch (result)
+    {
+    case Z (MEM_ERROR):
+      return fail (state, DWFL_E_NOMEM);
+    case Z (ERRNO):
+      return fail (state, DWFL_E_ERRNO);
+    default:
+      return fail (state, DWFL_E_ZLIB);
+    }
+}
+
+#if !USE_INFLATE
+static Dwfl_Error
+open_stream (int fd, off_t start_offset, struct unzip_state *state)
+{
+    int d = dup (fd);
+    if (unlikely (d < 0))
+      return DWFL_E_BADELF;
+    if (start_offset != 0)
+      {
+	off_t off = lseek (d, start_offset, SEEK_SET);
+	if (off != start_offset)
+	  {
+	    close (d);
+	    return DWFL_E_BADELF;
+	  }
+      }
+    state->zf = gzdopen (d, "r");
+    if (unlikely (state->zf == NULL))
+      {
+	close (d);
+	return zlib_fail (state, Z (MEM_ERROR));
+      }
+
+    /* From here on, zlib will close D.  */
+
+    return DWFL_E_NOERROR;
+}
+#endif
+
 /* If this is not a compressed image, return DWFL_E_BADELF.
    If we uncompressed it into *WHOLE, *WHOLE_SIZE, return DWFL_E_NOERROR.
    Otherwise return an error for bad compressed data or I/O failure.
@@ -76,83 +167,48 @@
 
 Dwfl_Error internal_function
 unzip (int fd, off_t start_offset,
-       void *mapped, size_t mapped_size,
-       void **whole, size_t *whole_size)
+       void *mapped, size_t _mapped_size,
+       void **_whole, size_t *whole_size)
 {
-  void *buffer = NULL;
-  size_t size = 0;
-  inline bool bigger_buffer (size_t start)
-  {
-    size_t more = size ? size * 2 : start;
-    char *b = realloc (buffer, more);
-    while (unlikely (b == NULL) && more >= size + 1024)
-      b = realloc (buffer, more -= 1024);
-    if (unlikely (b == NULL))
-      return false;
-    buffer = b;
-    size = more;
-    return true;
-  }
-  inline void smaller_buffer (size_t end)
-  {
-    buffer = realloc (buffer, end) ?: end == 0 ? NULL : buffer;
-    size = end;
-  }
-
-  void *input_buffer = NULL;
-  off_t input_pos = 0;
-
-  inline Dwfl_Error fail (Dwfl_Error failure)
-  {
-    if (input_pos == (off_t) mapped_size)
-      *whole = input_buffer;
-    else
-      {
-	free (input_buffer);
-	*whole = NULL;
-      }
-    free (buffer);
-    return failure;
-  }
-
-  inline Dwfl_Error zlib_fail (int result)
-  {
-    switch (result)
-      {
-      case Z (MEM_ERROR):
-	return fail (DWFL_E_NOMEM);
-      case Z (ERRNO):
-	return fail (DWFL_E_ERRNO);
-      default:
-	return fail (DWFL_E_ZLIB);
-      }
-  }
+  struct unzip_state state =
+    {
+#if !USE_INFLATE
+      .zf = NULL,
+#endif
+      .mapped_size = _mapped_size,
+      .whole = _whole,
+      .buffer = NULL,
+      .size = 0,
+      .input_buffer = NULL,
+      .input_pos = 0
+    };
 
   if (mapped == NULL)
     {
-      if (*whole == NULL)
+      if (*state.whole == NULL)
 	{
-	  input_buffer = malloc (READ_SIZE);
-	  if (unlikely (input_buffer == NULL))
+	  state.input_buffer = malloc (READ_SIZE);
+	  if (unlikely (state.input_buffer == NULL))
 	    return DWFL_E_NOMEM;
 
-	  ssize_t n = pread_retry (fd, input_buffer, READ_SIZE, start_offset);
+	  ssize_t n = pread_retry (fd, state.input_buffer, READ_SIZE, start_offset);
 	  if (unlikely (n < 0))
-	    return zlib_fail (Z (ERRNO));
+	    return zlib_fail (&state, Z (ERRNO));
 
-	  input_pos = n;
-	  mapped = input_buffer;
-	  mapped_size = n;
+	  state.input_pos = n;
+	  mapped = state.input_buffer;
+	  state.mapped_size = n;
 	}
       else
 	{
-	  input_buffer = *whole;
-	  input_pos = mapped_size = *whole_size;
+	  state.input_buffer = *state.whole;
+	  state.input_pos = state.mapped_size = *whole_size;
 	}
     }
 
 #define NOMAGIC(magic) \
-  (mapped_size <= sizeof magic || memcmp (mapped, magic, sizeof magic - 1))
+  (state.mapped_size <= sizeof magic || \
+   memcmp (mapped, magic, sizeof magic - 1))
 
   /* First, look at the header.  */
   if (NOMAGIC (MAGIC)
@@ -169,39 +225,39 @@ unzip (int fd, off_t start_offset,
      The stupid zlib interface has nothing to grok the
      gzip file headers except the slow gzFile interface.  */
 
-  z_stream z = { .next_in = mapped, .avail_in = mapped_size };
+  z_stream z = { .next_in = mapped, .avail_in = state.mapped_size };
   int result = inflateInit (&z);
   if (result != Z (OK))
     {
       inflateEnd (&z);
-      return zlib_fail (result);
+      return zlib_fail (&state, result);
     }
 
   do
     {
-      if (z.avail_in == 0 && input_buffer != NULL)
+      if (z.avail_in == 0 && state.input_buffer != NULL)
 	{
-	  ssize_t n = pread_retry (fd, input_buffer, READ_SIZE,
-				   start_offset + input_pos);
+	  ssize_t n = pread_retry (fd, state.input_buffer, READ_SIZE,
+				   start_offset + state.input_pos);
 	  if (unlikely (n < 0))
 	    {
 	      inflateEnd (&z);
-	      return zlib_fail (Z (ERRNO));
+	      return zlib_fail (&state, Z (ERRNO));
 	    }
-	  z.next_in = input_buffer;
+	  z.next_in = state.input_buffer;
 	  z.avail_in = n;
-	  input_pos += n;
+	  state.input_pos += n;
 	}
       if (z.avail_out == 0)
 	{
-	  ptrdiff_t pos = (void *) z.next_out - buffer;
-	  if (!bigger_buffer (z.avail_in))
+	  ptrdiff_t pos = (void *) z.next_out - state.buffer;
+	  if (!bigger_buffer (&state, z.avail_in))
 	    {
 	      result = Z (MEM_ERROR);
 	      break;
 	    }
-	  z.next_out = buffer + pos;
-	  z.avail_out = size - pos;
+	  z.next_out = state.buffer + pos;
+	  z.avail_out = state.size - pos;
 	}
     }
   while ((result = do_inflate (&z)) == Z (OK));
@@ -209,87 +265,60 @@ unzip (int fd, off_t start_offset,
 #ifdef BZLIB
   uint64_t total_out = (((uint64_t) z.total_out_hi32 << 32)
 			| z.total_out_lo32);
-  smaller_buffer (total_out);
+  smaller_buffer (&state, total_out);
 #else
-  smaller_buffer (z.total_out);
+  smaller_buffer (&state, z.total_out);
 #endif
 
   inflateEnd (&z);
 
   if (result != Z (STREAM_END))
-    return zlib_fail (result);
+    return zlib_fail (&state, result);
 
 #else  /* gzip only.  */
 
   /* Let the decompression library read the file directly.  */
 
-  gzFile zf;
-  Dwfl_Error open_stream (void)
-  {
-    int d = dup (fd);
-    if (unlikely (d < 0))
-      return DWFL_E_BADELF;
-    if (start_offset != 0)
-      {
-	off_t off = lseek (d, start_offset, SEEK_SET);
-	if (off != start_offset)
-	  {
-	    close (d);
-	    return DWFL_E_BADELF;
-	  }
-      }
-    zf = gzdopen (d, "r");
-    if (unlikely (zf == NULL))
-      {
-	close (d);
-	return zlib_fail (Z (MEM_ERROR));
-      }
+  Dwfl_Error result = open_stream (fd, start_offset, &state);
 
-    /* From here on, zlib will close D.  */
-
-    return DWFL_E_NOERROR;
-  }
-
-  Dwfl_Error result = open_stream ();
-
-  if (result == DWFL_E_NOERROR && gzdirect (zf))
+  if (result == DWFL_E_NOERROR && gzdirect (state.zf))
     {
-      gzclose (zf);
-      return fail (DWFL_E_BADELF);
+      gzclose (state.zf);
+      return fail (&state, DWFL_E_BADELF);
     }
 
   if (result != DWFL_E_NOERROR)
-    return fail (result);
+    return fail (&state, result);
 
   ptrdiff_t pos = 0;
   while (1)
     {
-      if (!bigger_buffer (1024))
+      if (!bigger_buffer (&state, 1024))
 	{
-	  gzclose (zf);
-	  return zlib_fail (Z (MEM_ERROR));
+	  gzclose (state.zf);
+	  return zlib_fail (&state, Z (MEM_ERROR));
 	}
-      int n = gzread (zf, buffer + pos, size - pos);
+      int n = gzread (state.zf, state.buffer + pos, state.size - pos);
       if (n < 0)
 	{
 	  int code;
-	  gzerror (zf, &code);
-	  gzclose (zf);
-	  return zlib_fail (code);
+	  gzerror (state.zf, &code);
+	  gzclose (state.zf);
+	  return zlib_fail (&state, code);
 	}
       if (n == 0)
 	break;
       pos += n;
     }
 
-  gzclose (zf);
-  smaller_buffer (pos);
+  gzclose (state.zf);
+  smaller_buffer (&state, pos);
 #endif
 
-  free (input_buffer);
+  free (state.input_buffer);
 
-  *whole = buffer;
-  *whole_size = size;
+  *state.whole = state.buffer;
+  *whole_size = state.size;
 
   return DWFL_E_NOERROR;
 }

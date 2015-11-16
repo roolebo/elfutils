@@ -1,3 +1,7 @@
+2015-10-16  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* dwarf_getsrclines.c (read_srclines): Initialize state early.
+
 2015-10-13  Chih-Hung Hsieh  <chh@google.com>
 
 	* dwarf_getsrclines.c (read_srclines): Move nested functions

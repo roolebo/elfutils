@@ -185,6 +185,25 @@ read_srclines (Dwarf *dbg,
   struct dirlist dirstack[MAX_STACK_DIRS];
   struct dirlist *dirarray = dirstack;
 
+  /* We are about to process the statement program.  Initialize the
+     state machine registers (see 6.2.2 in the v2.1 specification).  */
+  struct line_state state =
+    {
+      .linelist = NULL,
+      .nlinelist = 0,
+      .addr = 0,
+      .op_index = 0,
+      .file = 1,
+      /* We only store int but want to check for overflow (see SET above).  */
+      .line = 1,
+      .column = 0,
+      .basic_block = false,
+      .prologue_end = false,
+      .epilogue_begin = false,
+      .isa = 0,
+      .discriminator = 0
+    };
+
   if (unlikely (linep + 4 > lineendp))
     {
     invalid_data:
@@ -387,25 +406,7 @@ read_srclines (Dwarf *dbg,
       goto out;
     }
 
-  /* We are about to process the statement program.  Initialize the
-     state machine registers (see 6.2.2 in the v2.1 specification).  */
-  struct line_state state =
-    {
-      .linelist = NULL,
-      .nlinelist = 0,
-      .addr = 0,
-      .op_index = 0,
-      .file = 1,
-      /* We only store int but want to check for overflow (see SET above).  */
-      .line = 1,
-      .column = 0,
-      .is_stmt = default_is_stmt,
-      .basic_block = false,
-      .prologue_end = false,
-      .epilogue_begin = false,
-      .isa = 0,
-      .discriminator = 0
-    };
+  state.is_stmt = default_is_stmt;
 
   /* Apply the "operation advance" from a special opcode or
      DW_LNS_advance_pc (as per DWARF4 6.2.5.1).  */

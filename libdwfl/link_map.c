@@ -42,6 +42,62 @@
 #define PROBE_VAL64	sizeof (Elf64_Phdr)
 
 
+static inline bool
+do_check64 (size_t i, const Elf64_auxv_t (*a64)[], uint_fast8_t *elfdata)
+{
+  /* The AUXV pointer might not even be naturally aligned for 64-bit
+     data, because note payloads in a core file are not aligned.  */
+
+  uint64_t type = read_8ubyte_unaligned_noncvt (&(*a64)[i].a_type);
+  uint64_t val = read_8ubyte_unaligned_noncvt (&(*a64)[i].a_un.a_val);
+
+  if (type == BE64 (PROBE_TYPE)
+      && val == BE64 (PROBE_VAL64))
+    {
+      *elfdata = ELFDATA2MSB;
+      return true;
+    }
+
+  if (type == LE64 (PROBE_TYPE)
+      && val == LE64 (PROBE_VAL64))
+    {
+      *elfdata = ELFDATA2LSB;
+      return true;
+    }
+
+  return false;
+}
+
+#define check64(n) do_check64 (n, a64, elfdata)
+
+static inline bool
+do_check32 (size_t i, const Elf32_auxv_t (*a32)[], uint_fast8_t *elfdata)
+{
+  /* The AUXV pointer might not even be naturally aligned for 32-bit
+     data, because note payloads in a core file are not aligned.  */
+
+  uint32_t type = read_4ubyte_unaligned_noncvt (&(*a32)[i].a_type);
+  uint32_t val = read_4ubyte_unaligned_noncvt (&(*a32)[i].a_un.a_val);
+
+  if (type == BE32 (PROBE_TYPE)
+      && val == BE32 (PROBE_VAL32))
+    {
+      *elfdata = ELFDATA2MSB;
+      return true;
+    }
+
+  if (type == LE32 (PROBE_TYPE)
+      && val == LE32 (PROBE_VAL32))
+    {
+      *elfdata = ELFDATA2LSB;
+      return true;
+    }
+
+  return false;
+}
+
+#define check32(n) do_check32 (n, a32, elfdata)
+
 /* Examine an auxv data block and determine its format.
    Return true iff we figured it out.  */
 static bool
@@ -50,56 +106,6 @@ auxv_format_probe (const void *auxv, size_t size,
 {
   const Elf32_auxv_t (*a32)[size / sizeof (Elf32_auxv_t)] = (void *) auxv;
   const Elf64_auxv_t (*a64)[size / sizeof (Elf64_auxv_t)] = (void *) auxv;
-
-  inline bool check64 (size_t i)
-  {
-    /* The AUXV pointer might not even be naturally aligned for 64-bit
-       data, because note payloads in a core file are not aligned.  */
-
-    uint64_t type = read_8ubyte_unaligned_noncvt (&(*a64)[i].a_type);
-    uint64_t val = read_8ubyte_unaligned_noncvt (&(*a64)[i].a_un.a_val);
-
-    if (type == BE64 (PROBE_TYPE)
-	&& val == BE64 (PROBE_VAL64))
-      {
-	*elfdata = ELFDATA2MSB;
-	return true;
-      }
-
-    if (type == LE64 (PROBE_TYPE)
-	&& val == LE64 (PROBE_VAL64))
-      {
-	*elfdata = ELFDATA2LSB;
-	return true;
-      }
-
-    return false;
-  }
-
-  inline bool check32 (size_t i)
-  {
-    /* The AUXV pointer might not even be naturally aligned for 32-bit
-       data, because note payloads in a core file are not aligned.  */
-
-    uint32_t type = read_4ubyte_unaligned_noncvt (&(*a32)[i].a_type);
-    uint32_t val = read_4ubyte_unaligned_noncvt (&(*a32)[i].a_un.a_val);
-
-    if (type == BE32 (PROBE_TYPE)
-	&& val == BE32 (PROBE_VAL32))
-      {
-	*elfdata = ELFDATA2MSB;
-	return true;
-      }
-
-    if (type == LE32 (PROBE_TYPE)
-	&& val == LE32 (PROBE_VAL32))
-      {
-	*elfdata = ELFDATA2LSB;
-	return true;
-      }
-
-    return false;
-  }
 
   for (size_t i = 0; i < size / sizeof (Elf64_auxv_t); ++i)
     {

@@ -1,3 +1,8 @@
+2015-11-17  Chih-Hung Hsieh <chh@google.com>
+
+	* link_map.c (auxv_format_probe): Move nested functions
+	check64 and check32 to file scope.
+
 2015-12-08  Jose E. Marchesi  <jose.marchesi@oracle.com>
 
 	* dwfl_frame.c (state_fetch_pc): Add a backend-defined offset to

@@ -1,5 +1,12 @@
 2015-11-16  Chih-Hung Hsieh <chh@google.com>
 
+	* dwfl_module_getdwarf.c (find_prelink_address_sync): Move nested
+	function 'consider_shdr' to file scope.
+	* dwfl_module_getdwarf.c (find_dynsym): Move nested function
+	'translate_offs' to file scope.
+
+2015-11-16  Chih-Hung Hsieh <chh@google.com>
+
 	* dwfl_module_addrsym.c (__libdwfl_addrsym): Move nested functions
 	'same_section', 'binding_value', 'try_sym_value', and 'search_table'
 	to file scope.

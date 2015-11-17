@@ -322,3 +322,8 @@ ELFUTILS_0.161 {
     dwarf_macro_getparamcnt;
     dwarf_macro_param;
 } ELFUTILS_0.160;
+
+ELFUTILS_0.165 {
+  global:
+    dwelf_scn_gnu_compressed_size;
+} ELFUTILS_0.161;

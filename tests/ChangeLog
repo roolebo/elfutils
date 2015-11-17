@@ -1,3 +1,15 @@
+2015-10-28  Mark Wielaard  <mjw@redhat.com>
+
+	* dwelfgnucompressed.c: New file.
+	* run-dwelfgnucompressed.sh: New test.
+	* testfile-zgnu32.bz2: New testfile.
+	* testfile-zgnu64.bz2: Likewise.
+	* Makefile.am (check_PROGRAMS): Add dwelfgnucompressed.
+	(TESTS): Add run-dwelfgnucompressed.sh.
+	(EXTRA_DIST): Add run-dwelfgnucompressed.sh, testfile-zgnu32.bz2,
+	testfile-zgnu64.bz2, testfile-zgnu32be.bz2, testfile-zgnu64be.bz2.
+	(dwelfgnucompressed_LDADD): New variable.
+
 2015-12-31  Mark Wielaard  <mjw@redhat.com>
 
 	* elfstrmerge.c (main): Warn about STT_SECTION symbol for shstrhndx.

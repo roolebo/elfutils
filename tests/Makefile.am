@@ -52,7 +52,7 @@ check_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  backtrace-data backtrace-dwarf debuglink debugaltlink \
 		  buildid deleted deleted-lib.so aggregate_size vdsosyms \
 		  getsrc_die strptr newdata elfstrtab dwfl-proc-attach \
-		  elfshphehdr elfstrmerge
+		  elfshphehdr elfstrmerge dwelfgnucompressed
 
 asm_TESTS = asm-tst1 asm-tst2 asm-tst3 asm-tst4 asm-tst5 \
 	    asm-tst6 asm-tst7 asm-tst8 asm-tst9
@@ -120,7 +120,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-readelf-dwz-multi.sh run-allfcts-multi.sh run-deleted.sh \
 	run-linkmap-cut.sh run-aggregate-size.sh vdsosyms run-readelf-A.sh \
 	run-getsrc-die.sh run-strptr.sh newdata elfstrtab dwfl-proc-attach \
-	elfshphehdr run-lfs-symbols.sh
+	elfshphehdr run-lfs-symbols.sh run-dwelfgnucompressed.sh
 
 if !BIARCH
 export ELFUTILS_DISABLE_BIARCH = 1
@@ -306,7 +306,10 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile-x32-core.bz2 testfile-x32.bz2 \
 	     backtrace.x32.core.bz2 backtrace.x32.exec.bz2 \
 	     testfile-x32-s.bz2 testfile-x32-d.bz2 testfile-x32-debug.bz2 \
-	     run-lfs-symbols.sh lfs-symbols testfile-nolfs.bz2
+	     run-lfs-symbols.sh lfs-symbols testfile-nolfs.bz2 \
+	     testfile-zgnu32.bz2 testfile-zgnu64.bz2 \
+	     testfile-zgnu32be.bz2 testfile-zgnu64be.bz2 \
+	     run-dwelfgnucompressed.sh
 
 if USE_VALGRIND
 valgrind_cmd='valgrind -q --leak-check=full --error-exitcode=1'
@@ -455,6 +458,7 @@ dwfl_proc_attach_LDADD = $(libdw)
 dwfl_proc_attach_LDFLAGS = -pthread $(AM_LDFLAGS)
 elfshphehdr_LDADD =$(libelf)
 elfstrmerge_LDADD = $(libebl) $(libelf)
+dwelfgnucompressed_LDADD = $(libelf) $(libdw)
 
 if GCOV
 check: check-am coverage

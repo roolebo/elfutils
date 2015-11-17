@@ -1,3 +1,10 @@
+2015-10-28  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (libdwelf_a_SOURCES): Add
+	dwelf_scn_gnu_compressed_size.c.
+	* dwelf_scn_gnu_compressed_size.c: Likewise.
+	* libdwelf.h (dwelf_scn_gnu_compressed_size): New declaration.
+
 2015-10-14  Chih-Hung Hsieh  <chh@google.com>
 
 	* dwelf_elf_gnu_build_id.c (find_elf_build_id): Move nested function

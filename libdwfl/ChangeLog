@@ -1,3 +1,9 @@
+2015-11-16  Chih-Hung Hsieh <chh@google.com>
+
+	* dwfl_module_addrsym.c (__libdwfl_addrsym): Move nested functions
+	'same_section', 'binding_value', 'try_sym_value', and 'search_table'
+	to file scope.
+
 2015-11-19  Mark Wielaard  <mjw@redhat.com>
 
 	* dwfl_module.c (__libdwfl_module_free): Remove Dwfl_Module Ebl from

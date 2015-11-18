@@ -175,6 +175,23 @@ grovel_auxv (pid_t pid, Dwfl *dwfl, GElf_Addr *sysinfo_ehdr)
   return ENOEXEC;
 }
 
+static inline bool
+do_report (Dwfl *dwfl, char **plast_file, Dwarf_Addr low, Dwarf_Addr high)
+{
+  if (*plast_file != NULL)
+    {
+      Dwfl_Module *mod = INTUSE(dwfl_report_module) (dwfl, *plast_file,
+						     low, high);
+      free (*plast_file);
+      *plast_file = NULL;
+      if (unlikely (mod == NULL))
+        return true;
+    }
+  return false;
+}
+
+#define report() do_report(dwfl, &last_file, low, high)
+
 static int
 proc_maps_report (Dwfl *dwfl, FILE *f, GElf_Addr sysinfo_ehdr, pid_t pid)
 {
@@ -182,20 +199,6 @@ proc_maps_report (Dwfl *dwfl, FILE *f, GElf_Addr sysinfo_ehdr, pid_t pid)
   uint64_t last_ino = -1;
   char *last_file = NULL;
   Dwarf_Addr low = 0, high = 0;
-
-  inline bool report (void)
-    {
-      if (last_file != NULL)
-	{
-	  Dwfl_Module *mod = INTUSE(dwfl_report_module) (dwfl, last_file,
-							 low, high);
-	  free (last_file);
-	  last_file = NULL;
-	  if (unlikely (mod == NULL))
-	    return true;
-	}
-      return false;
-    }
 
   char *line = NULL;
   size_t linesz;

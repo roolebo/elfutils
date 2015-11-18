@@ -1,5 +1,10 @@
 2015-11-18  Chih-Hung Hsieh <chh@google.com>
 
+	* linux-proc-maps.c (proc_maps_report): Move nested function
+	'report' to file scope.
+
+2015-11-18  Chih-Hung Hsieh <chh@google.com>
+
 	* core-file.c (elf_begin_rand): Move nested function 'fail' to file
 	scope.
 	* core-file.c (dwfl_elf_phdr_memory_callback): Move nested functions

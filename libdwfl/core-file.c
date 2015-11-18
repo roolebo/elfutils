@@ -39,6 +39,19 @@
 #include "system.h"
 
 
+/* On failure return, we update *NEXT to point back at OFFSET.  */
+static inline Elf *
+do_fail (int error, off_t *next, off_t offset)
+{
+    if (next != NULL)
+      *next = offset;
+    //__libelf_seterrno (error);
+    __libdwfl_seterrno (DWFL_E (LIBELF, error));
+    return NULL;
+}
+
+#define fail(error) do_fail (error, next, offset)
+
 /* This is a prototype of what a new libelf interface might be.
    This implementation is pessimal for non-mmap cases and should
    be replaced by more diddling inside libelf internals.  */
@@ -47,16 +60,6 @@ elf_begin_rand (Elf *parent, off_t offset, off_t size, off_t *next)
 {
   if (parent == NULL)
     return NULL;
-
-  /* On failure return, we update *NEXT to point back at OFFSET.  */
-  inline Elf *fail (int error)
-  {
-    if (next != NULL)
-      *next = offset;
-    //__libelf_seterrno (error);
-    __libdwfl_seterrno (DWFL_E (LIBELF, error));
-    return NULL;
-  }
 
   off_t min = (parent->kind == ELF_K_ELF ?
 		(parent->class == ELFCLASS32
@@ -238,6 +241,44 @@ core_file_read_eagerly (Dwfl_Module *mod,
   return cost <= MAX_EAGER_COST;
 }
 
+static inline void
+update_end (GElf_Phdr *pphdr, const GElf_Off align,
+            GElf_Off *pend, GElf_Addr *pend_vaddr)
+{
+  *pend = (pphdr->p_offset + pphdr->p_filesz + align - 1) & -align;
+  *pend_vaddr = (pphdr->p_vaddr + pphdr->p_memsz + align - 1) & -align;
+}
+
+/* Use following contiguous segments to get towards SIZE.  */
+static inline bool
+do_more (size_t size, GElf_Phdr *pphdr, const GElf_Off align,
+         Elf *elf, GElf_Off start, int *pndx,
+         GElf_Off *pend, GElf_Addr *pend_vaddr)
+{
+  while (*pend <= start || *pend - start < size)
+    {
+      if (pphdr->p_filesz < pphdr->p_memsz)
+	/* This segment is truncated, so no following one helps us.  */
+	return false;
+
+      if (unlikely (gelf_getphdr (elf, (*pndx)++, pphdr) == NULL))
+	return false;
+
+      if (pphdr->p_type == PT_LOAD)
+	{
+	  if (pphdr->p_offset > *pend
+	      || pphdr->p_vaddr > *pend_vaddr)
+	    /* It's discontiguous!  */
+	    return false;
+
+	  update_end (pphdr, align, pend, pend_vaddr);
+	}
+    }
+  return true;
+}
+
+#define more(size) do_more (size, &phdr, align, elf, start, &ndx, &end, &end_vaddr)
+
 bool
 dwfl_elf_phdr_memory_callback (Dwfl *dwfl, int ndx,
 			       void **buffer, size_t *buffer_available,
@@ -270,38 +311,7 @@ dwfl_elf_phdr_memory_callback (Dwfl *dwfl, int ndx,
   GElf_Off end;
   GElf_Addr end_vaddr;
 
-  inline void update_end (void)
-{
-    end = (phdr.p_offset + phdr.p_filesz + align - 1) & -align;
-    end_vaddr = (phdr.p_vaddr + phdr.p_memsz + align - 1) & -align;
-  }
-
-  update_end ();
-
-  /* Use following contiguous segments to get towards SIZE.  */
-  inline bool more (size_t size)
-  {
-    while (end <= start || end - start < size)
-      {
-	if (phdr.p_filesz < phdr.p_memsz)
-	  /* This segment is truncated, so no following one helps us.  */
-	  return false;
-
-	if (unlikely (gelf_getphdr (elf, ndx++, &phdr) == NULL))
-	  return false;
-
-	if (phdr.p_type == PT_LOAD)
-	  {
-	    if (phdr.p_offset > end
-		|| phdr.p_vaddr > end_vaddr)
-	      /* It's discontiguous!  */
-	      return false;
-
-	    update_end ();
-	  }
-      }
-    return true;
-  }
+  update_end (&phdr, align, &end, &end_vaddr);
 
   /* We need at least this much.  */
   if (! more (minread))

@@ -1,5 +1,5 @@
 /* Maintenance of module list in libdwfl.
-   Copyright (C) 2005, 2006, 2007, 2008, 2014 Red Hat, Inc.
+   Copyright (C) 2005, 2006, 2007, 2008, 2014, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -27,6 +27,7 @@
    not, see <http://www.gnu.org/licenses/>.  */
 
 #include "libdwflP.h"
+#include "../libdw/cfi.h"
 #include <search.h>
 #include <unistd.h>
 
@@ -70,6 +71,23 @@ __libdwfl_module_free (Dwfl_Module *mod)
       free (mod->cu);
     }
 
+  /* We might have primed the Dwarf_CFI ebl cache with our own ebl
+     in __libdwfl_set_cfi. Make sure we don't free it twice.  */
+  if (mod->eh_cfi != NULL)
+    {
+      if (mod->eh_cfi->ebl != NULL && mod->eh_cfi->ebl == mod->ebl)
+	mod->eh_cfi->ebl = NULL;
+      dwarf_cfi_end (mod->eh_cfi);
+    }
+
+  if (mod->dwarf_cfi != NULL)
+    {
+      if (mod->dwarf_cfi->ebl != NULL && mod->dwarf_cfi->ebl == mod->ebl)
+	mod->dwarf_cfi->ebl = NULL;
+      /* We don't need to explicitly destroy the dwarf_cfi.
+	 That will be done by dwarf_end.  */
+    }
+
   if (mod->dw != NULL)
     {
       INTUSE(dwarf_end) (mod->dw);
@@ -96,9 +114,6 @@ __libdwfl_module_free (Dwfl_Module *mod)
 
   if (mod->reloc_info != NULL)
     free (mod->reloc_info);
-
-  if (mod->eh_cfi != NULL)
-    dwarf_cfi_end (mod->eh_cfi);
 
   free (mod->name);
   free (mod);

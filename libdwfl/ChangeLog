@@ -1,3 +1,9 @@
+2015-11-19  Mark Wielaard  <mjw@redhat.com>
+
+	* dwfl_module.c (__libdwfl_module_free): Remove Dwfl_Module Ebl from
+	eh_cfi and dwarf_cfi cache if necessary before calling dwarf_end and
+	dwarf_cfi_end.
+
 2015-11-13  Chih-Hung Hsieh <chh@google.com>
 
 	* gzip.c (unzip): Move nested functions to file scope.

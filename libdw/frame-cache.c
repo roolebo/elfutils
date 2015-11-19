@@ -1,5 +1,5 @@
 /* Frame cache handling.
-   Copyright (C) 2009 Red Hat, Inc.
+   Copyright (C) 2009, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -30,6 +30,7 @@
 # include <config.h>
 #endif
 
+#include "../libebl/libebl.h"
 #include "cfi.h"
 #include <search.h>
 #include <stdlib.h>
@@ -63,4 +64,7 @@ __libdw_destroy_frame_cache (Dwarf_CFI *cache)
   tdestroy (cache->fde_tree, free_fde);
   tdestroy (cache->cie_tree, free_cie);
   tdestroy (cache->expr_tree, free_expr);
+
+  if (cache->ebl != NULL && cache->ebl != (void *) -1l)
+    ebl_closebackend (cache->ebl);
 }

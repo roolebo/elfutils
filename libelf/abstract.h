@@ -1,5 +1,5 @@
 /* Abstract description of component ELF types.
-   Copyright (C) 1998, 1999, 2000, 2002, 2004, 2007 Red Hat, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2004, 2007, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -310,3 +310,21 @@ START (64, auxv_t, Ext##auxv_t)						      \
   TYPE_XLATE (Elf64_cvt_Addr1 (&tdest->a_un.a_val, &tsrc->a_un.a_val);)	      \
   TYPE_EXTRA (} a_un;)							      \
 END (64, Ext##auxv_t)
+
+/* Note that there is actual compression data right after the Chdr.
+   So we also have a separate conversion function for the whole
+   section.  */
+#define Chdr32(Ext) \
+START (32, Chdr, Ext##Chdr)						\
+  TYPE_NAME (ElfW2(32, Ext##Word), ch_type)				\
+  TYPE_NAME (ElfW2(32, Ext##Word), ch_size)				\
+  TYPE_NAME (ElfW2(32, Ext##Word), ch_addralign)			\
+END (32, Ext##Chdr)
+
+#define Chdr64(Ext) \
+START (64, Chdr, Ext##Chdr)						\
+  TYPE_NAME (ElfW2(64, Ext##Word), ch_type)				\
+  TYPE_NAME (ElfW2(64, Ext##Word), ch_reserved)				\
+  TYPE_NAME (ElfW2(64, Ext##Xword), ch_size)				\
+  TYPE_NAME (ElfW2(64, Ext##Xword), ch_addralign)			\
+END (64, Ext##Chdr)

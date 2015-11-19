@@ -74,7 +74,10 @@ static struct
       "program header only allowed in executables, shared objects, \
 and core files" },
     { ELF_E_NO_PHDR, "file has no program header" },
-    { ELF_E_INVALID_OFFSET, "invalid offset" }
+    { ELF_E_INVALID_OFFSET, "invalid offset" },
+    { ELF_E_INVALID_SECTION_TYPE , "invalid section type" },
+    { ELF_E_INVALID_SECTION_FLAGS , "invalid section flags" },
+    { ELF_E_NOT_COMPRESSED, "section does not contain compressed data" }
   };
 
 

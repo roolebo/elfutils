@@ -1,5 +1,5 @@
 /* External ELF types.
-   Copyright (C) 1998-2010 Red Hat, Inc.
+   Copyright (C) 1998-2010, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -75,6 +75,7 @@ Syminfo32 (Ext_);
 Move32 (Ext_);
 Lib32 (Ext_);
 auxv_t32 (Ext_);
+Chdr32 (Ext_);
 
 Ehdr64 (Ext_);
 Phdr64 (Ext_);
@@ -92,6 +93,7 @@ Syminfo64 (Ext_);
 Move64 (Ext_);
 Lib64 (Ext_);
 auxv_t64 (Ext_);
+Chdr64 (Ext_);
 
 #undef START
 #undef END

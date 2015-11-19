@@ -1,5 +1,5 @@
 /* Internal interfaces for libelf.
-   Copyright (C) 1998-2010 Red Hat, Inc.
+   Copyright (C) 1998-2010, 2015 Red Hat, Inc.
    This file is part of elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -138,6 +138,9 @@ enum
   ELF_E_INVALID_PHDR,
   ELF_E_NO_PHDR,
   ELF_E_INVALID_OFFSET,
+  ELF_E_INVALID_SECTION_TYPE,
+  ELF_E_INVALID_SECTION_FLAGS,
+  ELF_E_NOT_COMPRESSED,
   /* Keep this as the last entry.  */
   ELF_E_NUM
 };

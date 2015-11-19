@@ -166,6 +166,7 @@ union unaligned
 #include "version_xlate.h"
 #include "gnuhash_xlate.h"
 #include "note_xlate.h"
+#include "chdr_xlate.h"
 
 
 /* Now the externally visible table with the function pointers.  */
@@ -198,7 +199,8 @@ const xfct_t __elf_xfctstom[EV_NUM - 1][EV_NUM - 1][ELFCLASSNUM - 1][ELF_T_NUM] 
 	[ELF_T_SYMINFO] = ElfW2(Bits, cvt_Syminfo),			      \
 	[ELF_T_MOVE]	= ElfW2(Bits, cvt_Move),			      \
 	[ELF_T_LIB]	= ElfW2(Bits, cvt_Lib),				      \
-	[ELF_T_AUXV]	= ElfW2(Bits, cvt_auxv_t)
+	[ELF_T_AUXV]	= ElfW2(Bits, cvt_auxv_t),			      \
+	[ELF_T_CHDR]	= ElfW2(Bits, cvt_chdr)
         define_xfcts (32),
 	[ELF_T_GNUHASH] = Elf32_cvt_Word
       },

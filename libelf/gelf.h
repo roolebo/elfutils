@@ -1,5 +1,5 @@
 /* This file defines generic ELF types, structures, and macros.
-   Copyright (C) 1999, 2000, 2001, 2002, 2004, 2005, 2007 Red Hat, Inc.
+   Copyright (C) 1999, 2000, 2001, 2002, 2004, 2005, 2007, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -84,6 +84,9 @@ typedef Elf64_Rela GElf_Rela;
 
 /* Program segment header.  */
 typedef Elf64_Phdr GElf_Phdr;
+
+/* Header of a compressed section.  */
+typedef Elf64_Chdr GElf_Chdr;
 
 /* Dynamic section entry.  */
 typedef Elf64_Dyn GElf_Dyn;
@@ -183,6 +186,9 @@ extern int gelf_update_phdr (Elf *__elf, int __ndx, GElf_Phdr *__src);
 /* Create new program header with PHNUM entries.  */
 extern unsigned long int gelf_newphdr (Elf *__elf, size_t __phnum);
 
+/* Get compression header of section if any.  Returns NULL and sets
+   elf_errno if the section isn't compressed or an error occurred.  */
+extern GElf_Chdr *gelf_getchdr (Elf_Scn *__scn, GElf_Chdr *__dst);
 
 /* Convert data structure from the representation in the file represented
    by ELF to their memory representation.  */

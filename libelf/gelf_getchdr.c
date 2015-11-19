@@ -1,7 +1,6 @@
-/* Helper file for type conversion function generation.
-   Copyright (C) 1998, 1999, 2000, 2002, 2004, 2007 Red Hat, Inc.
+/* Return section compression header.
+   Copyright (C) 2015 Red Hat, Inc.
    This file is part of elfutils.
-   Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
    This file is free software; you can redistribute it and/or modify
    it under the terms of either
@@ -27,31 +26,44 @@
    the GNU Lesser General Public License along with this program.  If
    not, see <http://www.gnu.org/licenses/>.  */
 
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
 
-/* Simple types.  */
-FUNDAMENTAL (ADDR, Addr, LIBELFBITS);
-FUNDAMENTAL (OFF, Off, LIBELFBITS);
-FUNDAMENTAL (HALF, Half, LIBELFBITS);
-FUNDAMENTAL (WORD, Word, LIBELFBITS);
-FUNDAMENTAL (SWORD, Sword, LIBELFBITS);
-FUNDAMENTAL (XWORD, Xword, LIBELFBITS);
-FUNDAMENTAL (SXWORD, Sxword, LIBELFBITS);
-
-/* The structured types.  */
-TYPE (Ehdr, LIBELFBITS)
-TYPE (Phdr, LIBELFBITS)
-TYPE (Shdr, LIBELFBITS)
-TYPE (Sym, LIBELFBITS)
-TYPE (Rel, LIBELFBITS)
-TYPE (Rela, LIBELFBITS)
-TYPE (Note, LIBELFBITS)
-TYPE (Dyn, LIBELFBITS)
-TYPE (Syminfo, LIBELFBITS)
-TYPE (Move, LIBELFBITS)
-TYPE (Lib, LIBELFBITS)
-TYPE (auxv_t, LIBELFBITS)
-TYPE (Chdr, LIBELFBITS)
+#include "libelfP.h"
+#include <gelf.h>
+#include <stddef.h>
 
 
-/* Prepare for the next round.  */
-#undef LIBELFBITS
+GElf_Chdr *
+gelf_getchdr (Elf_Scn *scn, GElf_Chdr *dest)
+{
+  if (scn == NULL)
+    return NULL;
+
+  if (dest == NULL)
+    {
+      __libelf_seterrno (ELF_E_INVALID_OPERAND);
+      return NULL;
+    }
+
+  if (scn->elf->class == ELFCLASS32)
+    {
+      Elf32_Chdr *chdr = elf32_getchdr (scn);
+      if (chdr == NULL)
+	return NULL;
+      dest->ch_type = chdr->ch_type;
+      dest->ch_size = chdr->ch_size;
+      dest->ch_addralign = chdr->ch_addralign;
+    }
+  else
+    {
+      Elf64_Chdr *chdr = elf64_getchdr (scn);
+      if (chdr == NULL)
+	return NULL;
+      *dest = *chdr;
+    }
+
+  return dest;
+}
+INTDEF(gelf_getchdr)

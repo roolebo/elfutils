@@ -1,3 +1,31 @@
+2015-11-19  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (libelf_a_SOURCES): Add elf32_getchdr.c,
+	elf64_getchdr.c and gelf_getchdr.c.
+	(noinst_HEADERS): Add chdr_xlate.h.
+	* abstract.h: Define Chdr32 and Chdr64.
+	* chdr_xlate.h: New file.
+	* elf32_getchdr.c: New file.
+	* elf64_getchdr.c: New file.
+	* elf_error.c: Add ELF_E_NOT_COMPRESSED, ELF_E_INVALID_SECTION_TYPE
+	and ELF_E_INVALID_SECTION_FLAGS.
+	* elf_getdata.c (__libelf_set_rawdata_wrlock): Set d_type to
+	ELF_T_CHDR for SHF_COMPRESSED sections.
+	* exttypes.h: Add Chdr32 and Chdr64.
+	* gelf.h (GElf_Chdr): New typedef.
+	(gelf_getchdr): New function definition.
+	* gelf_fsize.c (__libelf_type_sizes): Add ELF_T_CHDR.
+	* gelf_getchdr.c: New file.
+	* gelf_xlate.c (__elf_xfctstom): Add ELF_T_CHDR cvt_chdr.
+	* gelf_xlate.h: Add Chdr.
+	* libelf.h (Elf_Type): Add ELF_T_CHDR.
+	(elf32_getchdr): New function definition.
+	(elf64_getchdr): Likewise.
+	* libelf.map (ELFUTILS_1.7): New sections add elf32_getchdr,
+	elf64_getchdr and gelf_getchdr.
+	* libelfP.h: Add ELF_E_NOT_COMPRESSED, ELF_E_INVALID_SECTION_TYPE
+	and ELF_E_INVALID_SECTION_FLAGS.
+
 2015-10-16  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (libelf_so_LDLIBS): Add -lz.

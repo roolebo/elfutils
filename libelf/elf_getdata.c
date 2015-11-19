@@ -106,6 +106,7 @@ const uint_fast8_t __libelf_type_aligns[EV_NUM - 1][ELFCLASSNUM - 1][ELF_T_NUM] 
       [ELF_T_NHDR] = __alignof__ (ElfW2(Bits,Nhdr)),			      \
       [ELF_T_GNUHASH] = __alignof__ (Elf32_Word),			      \
       [ELF_T_AUXV] = __alignof__ (ElfW2(Bits,auxv_t)),			      \
+      [ELF_T_CHDR] = __alignof__ (ElfW2(Bits,Chdr)),			      \
     }
     [EV_CURRENT - 1] =
     {
@@ -204,6 +205,7 @@ __libelf_set_rawdata_wrlock (Elf_Scn *scn)
   Elf64_Off offset;
   Elf64_Xword size;
   Elf64_Xword align;
+  Elf64_Xword flags;
   int type;
   Elf *elf = scn->elf;
 
@@ -220,6 +222,7 @@ __libelf_set_rawdata_wrlock (Elf_Scn *scn)
       size = shdr->sh_size;
       type = shdr->sh_type;
       align = shdr->sh_addralign;
+      flags = shdr->sh_flags;
     }
   else
     {
@@ -234,6 +237,7 @@ __libelf_set_rawdata_wrlock (Elf_Scn *scn)
       size = shdr->sh_size;
       type = shdr->sh_type;
       align = shdr->sh_addralign;
+      flags = shdr->sh_flags;
     }
 
   /* If the section has no data (for whatever reason), leave the `d_buf'
@@ -243,7 +247,10 @@ __libelf_set_rawdata_wrlock (Elf_Scn *scn)
       /* First a test whether the section is valid at all.  */
       size_t entsize;
 
-      if (type == SHT_HASH)
+      /* Compressed data has a header, but then compressed data.  */
+      if ((flags & SHF_COMPRESSED) != 0)
+	entsize = 1;
+      else if (type == SHT_HASH)
 	{
 	  GElf_Ehdr ehdr_mem;
 	  GElf_Ehdr *ehdr = __gelf_getehdr_rdlock (elf, &ehdr_mem);
@@ -320,10 +327,15 @@ __libelf_set_rawdata_wrlock (Elf_Scn *scn)
     }
 
   scn->rawdata.d.d_size = size;
-  /* Some broken ELF ABI for 64-bit machines use the wrong hash table
-     entry size.  See elf-knowledge.h for more information.  */
-  if (type == SHT_HASH && elf->class == ELFCLASS64)
+
+  /* Compressed data always has type ELF_T_CHDR regardless of the
+     section type.  */
+  if ((flags & SHF_COMPRESSED) != 0)
+    scn->rawdata.d.d_type = ELF_T_CHDR;
+  else if (type == SHT_HASH && elf->class == ELFCLASS64)
     {
+      /* Some broken ELF ABI for 64-bit machines use the wrong hash table
+	 entry size.  See elf-knowledge.h for more information.  */
       GElf_Ehdr ehdr_mem;
       GElf_Ehdr *ehdr = __gelf_getehdr_rdlock (elf, &ehdr_mem);
       scn->rawdata.d.d_type

@@ -1,5 +1,5 @@
 /* Interface for libelf.
-   Copyright (C) 1998-2010 Red Hat, Inc.
+   Copyright (C) 1998-2010, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -64,6 +64,7 @@ typedef enum
   ELF_T_LIB,			/* Elf32_Lib, Elf64_Lib, ... */
   ELF_T_GNUHASH,		/* GNU-style hash section.  */
   ELF_T_AUXV,			/* Elf32_auxv_t, Elf64_auxv_t, ... */
+  ELF_T_CHDR,			/* Compressed, Elf32_Chdr, Elf64_Chdr, ... */
   /* Keep this the last entry.  */
   ELF_T_NUM
 } Elf_Type;
@@ -267,6 +268,11 @@ extern Elf32_Shdr *elf32_getshdr (Elf_Scn *__scn);
 /* Similar for ELFCLASS64.  */
 extern Elf64_Shdr *elf64_getshdr (Elf_Scn *__scn);
 
+/* Returns compression header for a section if section data is
+   compressed.  Returns NULL and sets elf_errno if the section isn't
+   compressed or an error occurred.  */
+extern Elf32_Chdr *elf32_getchdr (Elf_Scn *__scn);
+extern Elf64_Chdr *elf64_getchdr (Elf_Scn *__scn);
 
 /* Set or clear flags for ELF file.  */
 extern unsigned int elf_flagelf (Elf *__elf, Elf_Cmd __cmd,

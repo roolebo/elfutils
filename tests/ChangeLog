@@ -1,5 +1,22 @@
 2015-10-28  Mark Wielaard  <mjw@redhat.com>
 
+	* elfgetchdr.c: New file.
+	* run-elfgetchdr.sh: New test.
+	* testfile-zgabi32.bz2: New testfile.
+	* testfile-zgabi32be.bz2: Likewise.
+	* testfile-zgabi64.bz2: Likewise.
+	* testfile-zgabi64be.bz2: Likewise.
+	* Makefile.am (check_PROGRAMS): Add elfgetchdr.
+	(TESTS): Add run-elfgetchdr.sh.
+	(EXTRA_DIST): Add run-elfgetchdr.sh, testfile-zgabi32.bz2,
+	testfile-zgabi32be.bz2, testfile-zgabi64.bz2, testfile-zgabi64be.bz2.
+	(welfgetchdr_LDADD): New variable.
+	* msg_tst.c: Add ELF_E_NOT_COMPRESSED, ELF_E_INVALID_SECTION_TYPE
+	and ELF_E_INVALID_SECTION_FLAGS,
+
+
+2015-10-28  Mark Wielaard  <mjw@redhat.com>
+
 	* dwelfgnucompressed.c: New file.
 	* run-dwelfgnucompressed.sh: New test.
 	* testfile-zgnu32.bz2: New testfile.

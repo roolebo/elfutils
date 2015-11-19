@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 1996-2010 Red Hat, Inc.
+## Copyright (C) 1996-2010, 2015 Red Hat, Inc.
 ## This file is part of elfutils.
 ##
 ## This file is free software; you can redistribute it and/or modify
@@ -88,7 +88,8 @@ libelf_a_SOURCES = elf_version.c elf_hash.c elf_error.c elf_fill.c \
 		   elf32_offscn.c elf64_offscn.c gelf_offscn.c \
 		   elf_getaroff.c \
 		   elf_gnu_hash.c \
-		   elf_scnshndx.c
+		   elf_scnshndx.c \
+		   elf32_getchdr.c elf64_getchdr.c gelf_getchdr.c
 
 libelf_pic_a_SOURCES =
 am_libelf_pic_a_OBJECTS = $(libelf_a_SOURCES:.c=.os)
@@ -118,7 +119,8 @@ uninstall: uninstall-am
 	rm -f $(DESTDIR)$(libdir)/libelf.so
 
 noinst_HEADERS = elf.h abstract.h common.h exttypes.h gelf_xlate.h libelfP.h \
-		 version_xlate.h gnuhash_xlate.h note_xlate.h dl-hash.h
+		 version_xlate.h gnuhash_xlate.h note_xlate.h dl-hash.h \
+		 chdr_xlate.h
 EXTRA_DIST = libelf.map
 
 CLEANFILES += $(am_libelf_pic_a_OBJECTS) libelf.so.$(VERSION)

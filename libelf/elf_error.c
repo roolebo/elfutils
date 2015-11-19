@@ -230,6 +230,21 @@ core files")
   (ELF_E_NO_PHDR_IDX \
    + sizeof "file has no program header")
   N_("invalid offset")
+  "\0"
+#define ELF_E_INVALID_SECTION_TYPE_IDX \
+  (ELF_E_INVALID_OFFSET_IDX \
+   + sizeof "invalid offset")
+  N_("invalid section type")
+  "\0"
+#define ELF_E_INVALID_SECTION_FLAGS_IDX \
+  (ELF_E_INVALID_SECTION_TYPE_IDX \
+   + sizeof "invalid section type")
+  N_("invalid section flags")
+  "\0"
+#define ELF_E_NOT_COMPRESSED_IDX		\
+  (ELF_E_INVALID_SECTION_FLAGS_IDX			\
+   + sizeof "invalid section flags")
+  N_("section does not contain compressed data")
 };
 
 
@@ -277,7 +292,10 @@ static const uint_fast16_t msgidx[ELF_E_NUM] =
   [ELF_E_GROUP_NOT_REL] = ELF_E_GROUP_NOT_REL_IDX,
   [ELF_E_INVALID_PHDR] = ELF_E_INVALID_PHDR_IDX,
   [ELF_E_NO_PHDR] = ELF_E_NO_PHDR_IDX,
-  [ELF_E_INVALID_OFFSET] = ELF_E_INVALID_OFFSET_IDX
+  [ELF_E_INVALID_OFFSET] = ELF_E_INVALID_OFFSET_IDX,
+  [ELF_E_INVALID_SECTION_TYPE] = ELF_E_INVALID_SECTION_TYPE_IDX,
+  [ELF_E_INVALID_SECTION_FLAGS] = ELF_E_INVALID_SECTION_FLAGS_IDX,
+  [ELF_E_NOT_COMPRESSED] = ELF_E_NOT_COMPRESSED_IDX
 };
 #define nmsgidx ((int) (sizeof (msgidx) / sizeof (msgidx[0])))
 

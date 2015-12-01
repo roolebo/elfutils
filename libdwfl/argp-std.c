@@ -1,5 +1,5 @@
 /* Standard argp argument parsers for tools using libdwfl.
-   Copyright (C) 2005-2010, 2012 Red Hat, Inc.
+   Copyright (C) 2005-2010, 2012, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -303,7 +303,19 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	    /* Non-fatal to not be able to attach to core, ignore error.  */
 	    INTUSE(dwfl_core_file_attach) (dwfl, core);
 
-	    /* From now we leak FD and CORE.  */
+	    /* Store core Elf and fd in Dwfl to expose with dwfl_end.  */
+	    if (dwfl->user_core == NULL)
+	      {
+		dwfl->user_core = calloc (1, sizeof (struct Dwfl_User_Core));
+		if (dwfl->user_core == NULL)
+		  {
+		    argp_failure (state, EXIT_FAILURE, 0,
+				  _("Not enough memory"));
+		    return ENOMEM;
+		  }
+	      }
+	    dwfl->user_core->core = core;
+	    dwfl->user_core->fd = fd;
 
 	    if (result == 0)
 	      {

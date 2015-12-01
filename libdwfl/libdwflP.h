@@ -1,5 +1,5 @@
 /* Internal definitions for libdwfl.
-   Copyright (C) 2005-2014 Red Hat, Inc.
+   Copyright (C) 2005-2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -104,6 +104,16 @@ typedef enum { DWFL_ERRORS DWFL_E_NUM } Dwfl_Error;
 extern int __libdwfl_canon_error (Dwfl_Error) internal_function;
 extern void __libdwfl_seterrno (Dwfl_Error) internal_function;
 
+/* Resources we might keep for the user about the core file that the
+   Dwfl might have been created from.  Can currently only be set
+   through std-argp.  */
+struct Dwfl_User_Core
+{
+  char *executable_for_core;	/* --executable if --core was specified.  */
+  Elf *core;                    /* non-NULL if we need to free it.  */
+  int fd;                       /* close if >= 0.  */
+};
+
 struct Dwfl
 {
   const Dwfl_Callbacks *callbacks;
@@ -130,7 +140,7 @@ struct Dwfl
   GElf_Off lookup_tail_offset;
   int lookup_tail_ndx;
 
-  char *executable_for_core;	/* --executable if --core was specified.  */
+  struct Dwfl_User_Core *user_core;
 };
 
 #define OFFLINE_REDZONE		0x10000

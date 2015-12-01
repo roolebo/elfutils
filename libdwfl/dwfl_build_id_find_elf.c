@@ -140,16 +140,19 @@ dwfl_build_id_find_elf (Dwfl_Module *mod,
 			char **file_name, Elf **elfp)
 {
   *elfp = NULL;
-  if (mod->is_executable && mod->dwfl->executable_for_core != NULL)
+  if (mod->is_executable
+      && mod->dwfl->user_core != NULL
+      && mod->dwfl->user_core->executable_for_core != NULL)
     {
       /* When dwfl_core_file_report was called with a non-NULL executable file
 	 name this callback will replace the Dwfl_Module main.name with the
 	 recorded executable file when MOD was identified as main executable
 	 (which then triggers opening and reporting of the executable).  */
-      int fd = open (mod->dwfl->executable_for_core, O_RDONLY);
+      const char *executable = mod->dwfl->user_core->executable_for_core;
+      int fd = open (executable, O_RDONLY);
       if (fd >= 0)
 	{
-	  *file_name = strdup (mod->dwfl->executable_for_core);
+	  *file_name = strdup (executable);
 	  if (*file_name != NULL)
 	    return fd;
 	  else

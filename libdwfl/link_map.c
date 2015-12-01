@@ -356,8 +356,10 @@ report_r_debug (uint_fast8_t elfclass, uint_fast8_t elfdata,
       if (name != NULL && name[0] == '\0')
 	name = NULL;
 
-      if (iterations == 1 && dwfl->executable_for_core != NULL)
-	name = dwfl->executable_for_core;
+      if (iterations == 1
+	  && dwfl->user_core != NULL
+	  && dwfl->user_core->executable_for_core != NULL)
+	name = dwfl->user_core->executable_for_core;
 
       struct r_debug_info_module *r_debug_info_module = NULL;
       if (r_debug_info != NULL)
@@ -789,7 +791,9 @@ dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 	  bool in_ok = (*memory_callback) (dwfl, phdr_segndx, &in.d_buf,
 					   &in.d_size, phdr, phnum * phent,
 					   memory_callback_arg);
-	  if (! in_ok && dwfl->executable_for_core != NULL)
+	  if (! in_ok
+	      && dwfl->user_core != NULL
+	      && dwfl->user_core->executable_for_core != NULL)
 	    {
 	      /* AUXV -> PHDR -> DYNAMIC
 		 Both AUXV and DYNAMIC should be always present in a core file.
@@ -797,7 +801,7 @@ dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 		 EXECUTABLE_FOR_CORE to find where DYNAMIC is located in the
 		 core file.  */
 
-	      int fd = open (dwfl->executable_for_core, O_RDONLY);
+	      int fd = open (dwfl->user_core->executable_for_core, O_RDONLY);
 	      Elf *elf;
 	      Dwfl_Error error = DWFL_E_ERRNO;
 	      if (fd != -1)

@@ -1,3 +1,17 @@
+2015-12-01  Mark Wielaard  <mjw@redhat.com>
+
+	* libdwflP.h (struct Dwfl_User_Core): New.
+	(struct DWfl): Replace executable_for_core with user_core.
+	* argp-std.c (parse_opt): Store core and fd in Dwfl user_core.
+	* core-file.c (dwfl_core_file_report): Check and store
+	executable_for_core in Dwfl user_core.
+	* dwfl_build_id_find_elf.c (dwfl_build_id_find_elf): Check and use
+	executable_for_core in Dwfl user_core.
+	* dwfl_end.c (dwfl_end): Release resources held in Dwfl user_core.
+	* link-map.c (report_r_debug): Check executable_for_core in Dwfl
+	user_core.
+	(dwfl_link_map_report): Likewise.
+
 2015-11-16  Chih-Hung Hsieh <chh@google.com>
 
 	* dwfl_module_getdwarf.c (find_prelink_address_sync): Move nested

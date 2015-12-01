@@ -1,5 +1,5 @@
 /* Finish a session using libdwfl.
-   Copyright (C) 2005, 2008, 2012-2013 Red Hat, Inc.
+   Copyright (C) 2005, 2008, 2012-2013, 2015 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -27,6 +27,7 @@
    not, see <http://www.gnu.org/licenses/>.  */
 
 #include "libdwflP.h"
+#include <unistd.h>
 
 void
 dwfl_end (Dwfl *dwfl)
@@ -49,6 +50,13 @@ dwfl_end (Dwfl *dwfl)
       __libdwfl_module_free (dead);
     }
 
-  free (dwfl->executable_for_core);
+  if (dwfl->user_core != NULL)
+    {
+      free (dwfl->user_core->executable_for_core);
+      elf_end (dwfl->user_core->core);
+      if (dwfl->user_core->fd != -1)
+	close (dwfl->user_core->fd);
+      free (dwfl->user_core);
+    }
   free (dwfl);
 }

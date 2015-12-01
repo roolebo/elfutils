@@ -441,13 +441,27 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const char *executable)
       return -1;
     }
 
-  free (dwfl->executable_for_core);
+  if (dwfl->user_core != NULL)
+    free (dwfl->user_core->executable_for_core);
   if (executable == NULL)
-    dwfl->executable_for_core = NULL;
+    {
+      if (dwfl->user_core != NULL)
+	dwfl->user_core->executable_for_core = NULL;
+    }
   else
     {
-      dwfl->executable_for_core = strdup (executable);
-      if (dwfl->executable_for_core == NULL)
+      if (dwfl->user_core == NULL)
+	{
+	  dwfl->user_core = calloc (1, sizeof (struct Dwfl_User_Core));
+	  if (dwfl->user_core == NULL)
+	    {
+	      __libdwfl_seterrno (DWFL_E_NOMEM);
+	      return -1;
+	    }
+	  dwfl->user_core->fd = -1;
+	}
+      dwfl->user_core->executable_for_core = strdup (executable);
+      if (dwfl->user_core->executable_for_core == NULL)
 	{
 	  __libdwfl_seterrno (DWFL_E_NOMEM);
 	  return -1;

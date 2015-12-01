@@ -1,3 +1,7 @@
+2015-12-01  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_end.c (dwarf_end): Call cu_free on fake_loc_cu if it exists.
+
 2015-10-14  Chih-Hung Hsieh  <chh@google.com>
 
 	* dwarf_entry_breakpoints.c (dwarf_entry_breakpoints): Move recursive

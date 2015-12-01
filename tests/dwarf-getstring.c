@@ -70,6 +70,7 @@ main (int argc, char *argv[])
 	  offset += len + 1;
 	}
 
+      dwarf_end (dbg);
       close (fd);
     }
 

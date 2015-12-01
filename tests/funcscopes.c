@@ -162,6 +162,7 @@ handle_function (Dwarf_Die *funcdie, void *arg)
 
 	  print_vars (indent + INDENT, die);
 	}
+      free (scopes);
     }
 
   return 0;

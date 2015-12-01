@@ -256,6 +256,9 @@ main (void)
   /* And the data allocated in the .shstrtab section.  */
   free (data->d_buf);
 
+  /* And the dynamic entries.  */
+  free (dyn);
+
   /* All done.  */
   if (elf_end (elf) != 0)
     {

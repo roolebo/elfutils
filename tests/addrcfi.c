@@ -160,10 +160,19 @@ handle_address (GElf_Addr pc, Dwfl *dwfl)
   Dwfl_Module *mod = dwfl_addrmodule (dwfl, pc);
 
   struct stuff stuff;
-  return (handle_cfi (dwfl, ".eh_frame",
-		      dwfl_module_eh_cfi (mod, &stuff.bias), pc, &stuff)
-	  & handle_cfi (dwfl, ".debug_frame",
-			dwfl_module_dwarf_cfi (mod, &stuff.bias), pc, &stuff));
+  stuff.frame = NULL;
+  stuff.bias = 0;
+  int res = handle_cfi (dwfl, ".eh_frame",
+			dwfl_module_eh_cfi (mod, &stuff.bias), pc, &stuff);
+  free (stuff.frame);
+
+  stuff.frame = NULL;
+  stuff.bias = 0;
+  res &= handle_cfi (dwfl, ".debug_frame",
+		     dwfl_module_dwarf_cfi (mod, &stuff.bias), pc, &stuff);
+  free (stuff.frame);
+
+  return res;
 }
 
 int

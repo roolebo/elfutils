@@ -36,4 +36,7 @@ main (int argc, char **argv)
   Elf_Scn *scn = NULL;
   while ((scn = elf_nextscn (stripped, scn)) != NULL)
     elf_flagdata (elf_getdata (scn, NULL), ELF_C_SET, ELF_F_DIRTY);
+
+  elf_end (stripped);
+  return 0;
 }

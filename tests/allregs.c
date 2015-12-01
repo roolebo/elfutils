@@ -184,6 +184,7 @@ main (int argc, char **argv)
 		    dwarf_encoding_string (state.info[i].type),
 		    state.info[i].bits);
 	  }
+      free (state.info);
     }
   else
     do

@@ -42,5 +42,6 @@ main (int argc, char **argv)
   assert (die == &die_mem);
   assert (dwarf_tag (die) == 0);
 
+  dwarf_end (dw);
   return 0;
 }

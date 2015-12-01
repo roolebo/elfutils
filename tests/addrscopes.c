@@ -134,6 +134,7 @@ handle_address (GElf_Addr pc, Dwfl *dwfl)
 
 	  print_vars (indent + INDENT, die);
 	}
+      free (scopes);
     }
 }
 

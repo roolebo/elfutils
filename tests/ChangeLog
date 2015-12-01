@@ -1,3 +1,15 @@
+2015-12-01  Mark Wielaard  <mjw@redhat.com>
+
+	* test-flag-nobits.c (main): Call elf_end.
+	* rerequest_tag.c (main): Call dwarf_end.
+	* funcscopes.c (handle_function): Free scopes.
+	* dwarf-getstring.c (main): Call dwarf_end.
+	* allregs.c (main): Free state.info.
+	* alldts.c (main): Free dyn.
+	* addrcfi.c (handle_address): Free stuff.frame between handle_cfi
+	calls.
+	* addrscopes.c (handle_address): Free scopes.
+
 2015-10-16  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am [BUILD_STATIC] (libdw): Add -lz.

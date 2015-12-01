@@ -90,6 +90,13 @@ intern_fde (Dwarf_CFI *cache, const Dwarf_FDE *entry)
     }
   fde->end += fde->start;
 
+  /* Make sure the fde actually covers a real code range.  */
+  if (fde->start >= fde->end)
+    {
+      free (fde);
+      return (void *) -1;
+    }
+
   fde->cie = cie;
 
   if (cie->sized_augmentation_data)

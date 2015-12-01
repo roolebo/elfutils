@@ -1,5 +1,10 @@
 2015-12-01  Mark Wielaard  <mjw@redhat.com>
 
+	* fde.c (intern_fde): Don't intern an fde that doesn't cover a
+	valid code range.
+
+2015-12-01  Mark Wielaard  <mjw@redhat.com>
+
 	* dwarf_end.c (dwarf_end): Call cu_free on fake_loc_cu if it exists.
 
 2015-10-14  Chih-Hung Hsieh  <chh@google.com>

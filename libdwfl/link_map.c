@@ -791,6 +791,7 @@ dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 	  bool in_ok = (*memory_callback) (dwfl, phdr_segndx, &in.d_buf,
 					   &in.d_size, phdr, phnum * phent,
 					   memory_callback_arg);
+	  bool in_from_exec = false;
 	  if (! in_ok
 	      && dwfl->user_core != NULL
 	      && dwfl->user_core->executable_for_core != NULL)
@@ -855,6 +856,7 @@ dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 		  return false;
 		}
 	      in_ok = true;
+	      in_from_exec = true;
 	    }
 	  if (in_ok)
 	    {
@@ -903,8 +905,11 @@ dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 		    }
 		}
 
-	      (*memory_callback) (dwfl, -1, &in.d_buf, &in.d_size, 0, 0,
-				  memory_callback_arg);
+	      if (in_from_exec)
+		free (in.d_buf);
+	      else
+		(*memory_callback) (dwfl, -1, &in.d_buf, &in.d_size, 0, 0,
+				    memory_callback_arg);
 	      free (buf);
 	    }
 	  else

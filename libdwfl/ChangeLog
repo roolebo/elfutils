@@ -1,5 +1,10 @@
 2015-12-01  Mark Wielaard  <mjw@redhat.com>
 
+	* link_map.c (dwfl_link_map_report): Track whether in.d_buf comes
+	from exec or memory_callback, free as appropriate.
+
+2015-12-01  Mark Wielaard  <mjw@redhat.com>
+
 	* libdwflP.h (struct Dwfl_User_Core): New.
 	(struct DWfl): Replace executable_for_core with user_core.
 	* argp-std.c (parse_opt): Store core and fd in Dwfl user_core.

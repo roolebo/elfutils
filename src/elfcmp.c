@@ -655,6 +655,8 @@ cannot read note section [%zu] '%s' in '%s': %s"),
  out:
   elf_end (elf1);
   elf_end (elf2);
+  ebl_closebackend (ebl1);
+  ebl_closebackend (ebl2);
   close (fd1);
   close (fd2);
 

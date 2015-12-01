@@ -1,3 +1,7 @@
+2015-12-01  Mark Wielaard  <mjw@redhat.com>
+
+	* elfcmp.c (main): Close ebl1 and ebl2 backends.
+
 2015-10-16  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am [BUILD_STATIC](libdw): Add -lz.

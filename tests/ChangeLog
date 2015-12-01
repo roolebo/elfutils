@@ -1,3 +1,9 @@
+2015-12-16  Mark Wielaard  <mjw@redhat.com>
+
+	* run-compress-test.sh: New test.
+	* Makefile.am (TESTS): Add run-compress-test.sh.
+	(EXTRA_DISTS): Likewise.
+
 2015-11-26  Mark Wielaard  <mjw@redhat.com>
 
 	* zstrptr.c: New file.

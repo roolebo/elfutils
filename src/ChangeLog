@@ -1,3 +1,9 @@
+2015-12-16  Mark Wielaard  <mjw@redhat.com>
+
+	* elfcompress.c: New file.
+	* Makefile.am (bin_PROGRAMS): Add elfcompress.
+	(elfcompress_LDADD): New variable.
+
 2015-12-18  Mark Wielaard  <mjw@redhat.com>
 
 	* elflint.c (section_flags_string): Add NEWFLAG COMPRESSED.

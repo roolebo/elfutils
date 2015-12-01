@@ -123,7 +123,8 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-getsrc-die.sh run-strptr.sh newdata elfstrtab dwfl-proc-attach \
 	elfshphehdr run-lfs-symbols.sh run-dwelfgnucompressed.sh \
 	run-elfgetchdr.sh \
-	run-elfgetzdata.sh run-elfputzdata.sh run-zstrptr.sh
+	run-elfgetzdata.sh run-elfputzdata.sh run-zstrptr.sh \
+	run-compress-test.sh
 
 if !BIARCH
 export ELFUTILS_DISABLE_BIARCH = 1
@@ -320,7 +321,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile-zgabi32.bz2 testfile-zgabi64.bz2 \
 	     testfile-zgabi32be.bz2 testfile-zgabi64be.bz2 \
 	     run-elfgetchdr.sh run-elfgetzdata.sh run-elfputzdata.sh \
-	     run-zstrptr.sh
+	     run-zstrptr.sh run-compress-test.sh
 
 if USE_VALGRIND
 valgrind_cmd='valgrind -q --leak-check=full --error-exitcode=1'

@@ -1,3 +1,13 @@
+2015-12-02  Mark Wielaard  <mjw@redhat.com>
+
+	* unstrip.c (struct data_list): New.
+	(new_data_list): Likewise.
+	(record_new_data): Likewise.
+	(free_new_data): Likewise.
+	(adjust_relocs): Call record_new_data.
+	(add_new_section_symbols): Likewise.
+	(copy_elided_sections): Call free_new_data.
+
 2015-12-01  Mark Wielaard  <mjw@redhat.com>
 
 	* elfcmp.c (main): Close ebl1 and ebl2 backends.

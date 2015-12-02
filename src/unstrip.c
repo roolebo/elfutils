@@ -311,6 +311,38 @@ make_directories (const char *path)
       error (EXIT_FAILURE, errno, _("cannot create directory '%s'"), dir);
 }
 
+/* Keep track of new section data we are creating, so we can free it
+   when done.  */
+struct data_list
+{
+  void *data;
+  struct data_list *next;
+};
+
+struct data_list *new_data_list;
+
+static void
+record_new_data (void *data)
+{
+  struct data_list *next = new_data_list;
+  new_data_list = xmalloc (sizeof (struct data_list));
+  new_data_list->data = data;
+  new_data_list->next = next;
+}
+
+static void
+free_new_data (void)
+{
+  struct data_list *list = new_data_list;
+  while (list != NULL)
+    {
+      struct data_list *next = list->next;
+      free (list->data);
+      free (list);
+      list = next;
+    }
+  new_data_list = NULL;
+}
 
 /* The binutils linker leaves gratuitous section symbols in .symtab
    that strip has to remove.  Older linkers likewise include a
@@ -472,6 +504,7 @@ adjust_relocs (Elf_Scn *outscn, Elf_Scn *inscn, const GElf_Shdr *shdr,
 	    if (old_chain[i] != STN_UNDEF)				      \
 	      new_chain[map[i - 1]] = map[old_chain[i] - 1];		      \
 									      \
+	  record_new_data (new_hash);					\
 	  data->d_buf = new_hash;					      \
 	  data->d_size = nent * sizeof new_hash[0];			      \
 	}
@@ -514,6 +547,7 @@ adjust_relocs (Elf_Scn *outscn, Elf_Scn *inscn, const GElf_Shdr *shdr,
 	    ELF_CHECK (v != NULL, _("cannot get symbol version: %s"));
 	  }
 
+	record_new_data (versym);
 	data->d_buf = versym;
 	data->d_size = nent * shdr->sh_entsize;
 	elf_flagdata (data, ELF_C_SET, ELF_F_DIRTY);
@@ -571,6 +605,7 @@ add_new_section_symbols (Elf_Scn *old_symscn, size_t old_shnum,
 
   symdata->d_size = shdr->sh_size;
   symdata->d_buf = xmalloc (symdata->d_size);
+  record_new_data (symdata->d_buf);
 
   /* Copy the existing section symbols.  */
   Elf_Data *old_symdata = elf_getdata (old_symscn, NULL);
@@ -1762,6 +1797,7 @@ more sections in stripped file than debug file -- arguments reversed?"));
 
       shdr->sh_size = symdata->d_size = (1 + nsym) * shdr->sh_entsize;
       symdata->d_buf = xmalloc (symdata->d_size);
+      record_new_data (symdata->d_buf);
 
       GElf_Sym sym;
       memset (&sym, 0, sizeof sym);
@@ -1927,13 +1963,12 @@ more sections in stripped file than debug file -- arguments reversed?"));
       free (strtab_data->d_buf);
     }
 
-  if (symdata != NULL)
-    free (symdata->d_buf);
   if (symstrtab != NULL)
     {
       ebl_strtabfree (symstrtab);
       free (symstrdata->d_buf);
     }
+  free_new_data ();
 }
 
 /* Process one pair of files, already opened.  */

@@ -45,6 +45,7 @@
 
 #include <system.h>
 #include "../libebl/libeblP.h"
+#include "../libdwfl/libdwflP.h"
 
 
 /* Name and version of program.  */
@@ -131,7 +132,7 @@ static int handle_ar (int fd, Elf *elf, const char *prefix, const char *fname,
 		      const char *suffix);
 
 /* Handle ELF file.  */
-static int handle_elf (Elf *elf, const char *prefix, const char *fname,
+static int handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 		       const char *suffix);
 
 
@@ -384,7 +385,7 @@ process_file (const char *fname, bool more_than_one)
     {
       if (elf_kind (elf) == ELF_K_ELF)
 	{
-	  int result = handle_elf (elf, more_than_one ? "" : NULL,
+	  int result = handle_elf (fd, elf, more_than_one ? "" : NULL,
 				   fname, NULL);
 
 	  if (elf_end (elf) != 0)
@@ -493,7 +494,7 @@ handle_ar (int fd, Elf *elf, const char *prefix, const char *fname,
 	  && strcmp (arhdr->ar_name, "/SYM64/") != 0)
 	{
 	  if (elf_kind (subelf) == ELF_K_ELF)
-	    result |= handle_elf (subelf, new_prefix, arhdr->ar_name,
+	    result |= handle_elf (fd, subelf, new_prefix, arhdr->ar_name,
 				  new_suffix);
 	  else if (elf_kind (subelf) == ELF_K_AR)
 	    result |= handle_ar (fd, subelf, new_prefix, arhdr->ar_name,
@@ -1153,8 +1154,63 @@ sort_by_name (const void *p1, const void *p2)
   return reverse_sort ? -result : result;
 }
 
+/* Stub libdwfl callback, only the ELF handle already open is ever
+   used.  Only used for finding the alternate debug file if the Dwarf
+   comes from the main file.  We are not interested in separate
+   debuginfo.  */
+static int
+find_no_debuginfo (Dwfl_Module *mod,
+		   void **userdata,
+		   const char *modname,
+		   Dwarf_Addr base,
+		   const char *file_name,
+		   const char *debuglink_file,
+		   GElf_Word debuglink_crc,
+		   char **debuginfo_file_name)
+{
+  Dwarf_Addr dwbias;
+  dwfl_module_info (mod, NULL, NULL, NULL, &dwbias, NULL, NULL, NULL);
+
+  /* We are only interested if the Dwarf has been setup on the main
+     elf file but is only missing the alternate debug link.  If dwbias
+     hasn't even been setup, this is searching for separate debuginfo
+     for the main elf.  We don't care in that case.  */
+  if (dwbias == (Dwarf_Addr) -1)
+    return -1;
+
+  return dwfl_standard_find_debuginfo (mod, userdata, modname, base,
+				       file_name, debuglink_file,
+				       debuglink_crc, debuginfo_file_name);
+}
+
+/* Get the Dwarf for the module/file we want.  */
+struct getdbg
+{
+  const char *name;
+  Dwarf **dbg;
+};
+
+static int
+getdbg_dwflmod (Dwfl_Module *dwflmod,
+		void **userdata __attribute__ ((unused)),
+		const char *name,
+		Dwarf_Addr base __attribute__ ((unused)),
+		void *arg)
+{
+  struct getdbg *get = (struct getdbg *) arg;
+  if (get != NULL && get->name != NULL && strcmp (get->name, name) == 0)
+    {
+      Dwarf_Addr bias;
+      *get->dbg = dwfl_module_getdwarf (dwflmod, &bias);
+      return DWARF_CB_ABORT;
+    }
+
+  return DWARF_CB_OK;
+}
+
 static void
-show_symbols (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, Elf_Scn *xndxscn,
+show_symbols (int fd, Ebl *ebl, GElf_Ehdr *ehdr,
+	      Elf_Scn *scn, Elf_Scn *xndxscn,
 	      GElf_Shdr *shdr, const char *prefix, const char *fname,
 	      const char *fullname)
 {
@@ -1194,9 +1250,48 @@ show_symbols (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, Elf_Scn *xndxscn,
   /* Get a DWARF debugging descriptor.  It's no problem if this isn't
      possible.  We just won't print any line number information.  */
   Dwarf *dbg = NULL;
+  Dwfl *dwfl = NULL;
   if (format == format_sysv)
     {
-      dbg = dwarf_begin_elf (ebl->elf, DWARF_C_READ, NULL);
+      if (ehdr->e_type != ET_REL)
+	dbg = dwarf_begin_elf (ebl->elf, DWARF_C_READ, NULL);
+      else
+	{
+	  /* Abuse libdwfl to do the relocations for us.  This is just
+	     for the ET_REL file containing Dwarf, so no need for
+	     fancy lookups.  */
+
+	  /* Duplicate an fd for dwfl_report_offline to swallow.  */
+	  int dwfl_fd = dup (fd);
+	  if (likely (dwfl_fd >= 0))
+	    {
+	      static const Dwfl_Callbacks callbacks =
+		{
+		  .section_address = dwfl_offline_section_address,
+		  .find_debuginfo = find_no_debuginfo
+		};
+	      dwfl = dwfl_begin (&callbacks);
+	      if (likely (dwfl != NULL))
+		{
+		  /* Let 0 be the logical address of the file (or
+		     first in archive).  */
+		  dwfl->offline_next_address = 0;
+		  if (dwfl_report_offline (dwfl, fname, fname, dwfl_fd)
+		      == NULL)
+		    {
+		      /* Consumed on success, not on failure.  */
+		      close (dwfl_fd);
+		    }
+		  else
+		    {
+		      dwfl_report_end (dwfl, NULL, NULL);
+
+		      struct getdbg get = { .name = fname, .dbg = &dbg };
+		      dwfl_getmodules (dwfl, &getdbg_dwflmod, &get, 0);
+		    }
+		}
+	    }
+	}
       if (dbg != NULL)
 	{
 	  (void) dwarf_getpubnames (dbg, get_global, NULL, 0);
@@ -1401,13 +1496,16 @@ show_symbols (Ebl *ebl, GElf_Ehdr *ehdr, Elf_Scn *scn, Elf_Scn *xndxscn,
       tdestroy (local_root, free);
       local_root = NULL;
 
-      (void) dwarf_end (dbg);
+      if (dwfl == NULL)
+	(void) dwarf_end (dbg);
     }
+  if (dwfl != NULL)
+    dwfl_end (dwfl);
 }
 
 
 static int
-handle_elf (Elf *elf, const char *prefix, const char *fname,
+handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	    const char *suffix)
 {
   size_t prefix_len = prefix == NULL ? 0 : strlen (prefix);
@@ -1486,7 +1584,7 @@ handle_elf (Elf *elf, const char *prefix, const char *fname,
 		}
 	    }
 
-	  show_symbols (ebl, ehdr, scn, xndxscn, shdr, prefix, fname,
+	  show_symbols (fd, ebl, ehdr, scn, xndxscn, shdr, prefix, fname,
 			fullname);
 	}
     }

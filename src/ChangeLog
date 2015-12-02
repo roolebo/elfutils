@@ -1,5 +1,15 @@
 2015-12-02  Mark Wielaard  <mjw@redhat.com>
 
+	* nm.c (process_file): Accept fd and pass it on.
+	(handle_elf): Likewise.
+	(find_no_debuginfo): New.
+	(struct getdbg): Likewise.
+	(getdbg_dwflmod): Likewise.
+	(show_symbols): Take fd. If the file is ET_REL use libdwfl to get
+	the relocated Dwarf.
+
+2015-12-02  Mark Wielaard  <mjw@redhat.com>
+
 	* nm.c (get_local_names): Check for duplicates in local_root tree.
 
 2015-12-02  Mark Wielaard  <mjw@redhat.com>

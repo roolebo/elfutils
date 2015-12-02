@@ -119,11 +119,20 @@ intern_fde (Dwarf_CFI *cache, const Dwarf_FDE *entry)
     fde->instructions += cie->fde_augmentation_data_size;
 
   /* Add the new entry to the search tree.  */
-  if (tsearch (fde, &cache->fde_tree, &compare_fde) == NULL)
+  struct dwarf_fde **tres = tsearch (fde, &cache->fde_tree, &compare_fde);
+  if (tres == NULL)
     {
       free (fde);
       __libdw_seterrno (DWARF_E_NOMEM);
       return NULL;
+    }
+  else if (*tres != fde)
+    {
+      /* There is already an FDE in the cache that covers the same
+	 address range.  That is odd.  Ignore this FDE.  And just use
+	 the one in the cache for consistency.  */
+      free (fde);
+      return *tres;
     }
 
   return fde;

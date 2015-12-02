@@ -1,3 +1,7 @@
+2015-12-02  Mark Wielaard  <mjw@redhat.com>
+
+	* fde.c (intern_fde): Don't leak duplicate FDEs.
+
 2015-12-01  Mark Wielaard  <mjw@redhat.com>
 
 	* fde.c (intern_fde): Don't intern an fde that doesn't cover a

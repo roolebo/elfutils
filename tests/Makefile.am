@@ -307,7 +307,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-lfs-symbols.sh lfs-symbols testfile-nolfs.bz2
 
 if USE_VALGRIND
-valgrind_cmd='valgrind -q --error-exitcode=1 --run-libc-freeres=no'
+valgrind_cmd='valgrind -q --leak-check=full --error-exitcode=1'
 endif
 
 

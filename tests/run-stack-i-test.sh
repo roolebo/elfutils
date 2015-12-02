@@ -29,6 +29,11 @@ else
 STACKCMD=${abs_top_builddir}/src/stack
 fi
 
+# Disable valgrind while dumping because of a bug unmapping libc.so.
+# https://bugs.kde.org/show_bug.cgi?id=327427
+SAVED_VALGRIND_CMD="$VALGRIND_CMD"
+unset VALGRIND_CMD
+
 # Compare with run-stack-d-test.sh to see the output without --inlines.
 # Only two call frames are visible (there is a jump from main to fu or
 # fubar). Explicitly use --raw so demangler support being configured in
@@ -67,5 +72,10 @@ TID 13654:
     /home/mark/src/tests/dwarfinlines.cpp:39
 $STACKCMD: tid 13654: shown max number of frames (6, use -n 0 for unlimited)
 EOF
+
+if [ "x$SAVED_VALGRIND_CMD" != "x" ]; then
+  VALGRIND_CMD="$SAVED_VALGRIND_CMD"
+  export VALGRIND_CMD
+fi
 
 exit 0

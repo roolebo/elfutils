@@ -708,11 +708,16 @@ get_local_names (Dwarf *dbg)
 	    newp->lowpc = lowpc;
 	    newp->highpc = highpc;
 
-	    /* Since we cannot deallocate individual memory we do not test
-	       for duplicates in the tree.  This should not happen anyway.  */
-	    if (tsearch (newp, &local_root, local_compare) == NULL)
-	      error (EXIT_FAILURE, errno,
-		     gettext ("cannot create search tree"));
+	   /* Check whether a similar local_name is already in the
+	      cache.  That should not happen.  But if it does, we
+	      don't want to leak memory.  */
+	    struct local_name **tres = tsearch (newp, &local_root,
+						local_compare);
+	    if (tres == NULL)
+              error (EXIT_FAILURE, errno,
+                     gettext ("cannot create search tree"));
+	    else if (*tres != newp)
+	      free (newp);
 	  }
 	while (dwarf_siblingof (die, die) == 0);
     }

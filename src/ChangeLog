@@ -1,5 +1,9 @@
 2015-12-02  Mark Wielaard  <mjw@redhat.com>
 
+	* nm.c (get_local_names): Check for duplicates in local_root tree.
+
+2015-12-02  Mark Wielaard  <mjw@redhat.com>
+
 	* unstrip.c (struct data_list): New.
 	(new_data_list): Likewise.
 	(record_new_data): Likewise.

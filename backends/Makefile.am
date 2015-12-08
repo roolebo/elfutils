@@ -85,7 +85,7 @@ am_libebl_aarch64_pic_a_OBJECTS = $(aarch64_SRCS:.c=.os)
 
 sparc_SRCS = sparc_init.c sparc_symbol.c sparc_regs.c sparc_retval.c \
 	     sparc_corenote.c sparc64_corenote.c sparc_auxv.c sparc_attrs.c \
-             sparc_cfi.c
+             sparc_cfi.c sparc_initreg.c
 libebl_sparc_pic_a_SOURCES = $(sparc_SRCS)
 am_libebl_sparc_pic_a_OBJECTS = $(sparc_SRCS:.c=.os)
 

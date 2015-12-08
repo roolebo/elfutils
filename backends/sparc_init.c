@@ -83,6 +83,7 @@ sparc_init (Elf *elf __attribute__ ((unused)),
      actually contains the call address.  The return address is
      located 8 bytes after it.  */
   eh->ra_offset = 8;
+  HOOK (eh, set_initial_registers_tid);
 
   return MODVERSION;
 }

@@ -422,6 +422,12 @@ extern bool ebl_set_initial_registers_tid (Ebl *ebl,
 extern size_t ebl_frame_nregs (Ebl *ebl)
   __nonnull_attribute__ (1);
 
+/* Offset to apply to the value of the return_address_register, as
+   fetched from a Dwarf CFI.  This is used by some backends, where the
+   return_address_register actually contains the call address.  */
+extern int ebl_ra_offset (Ebl *ebl)
+  __nonnull_attribute__ (1);
+
 /* Mask to use for function symbol or unwind return addresses in case
    the architecture adds some extra non-address bits to it.  This is
    different from ebl_resolve_sym_value which only works for actual

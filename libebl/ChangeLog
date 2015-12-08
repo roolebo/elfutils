@@ -1,3 +1,9 @@
+2015-12-08  Jose E. Marchesi  <jose.marchesi@oracle.com>
+
+	* libebl.h: Prototype for ebl_ra_offset.
+	* eblabicfi.c (ebl_ra_offset): New function.
+	* libeblP.h (struct ebl): new field ra_offset;
+
 2015-09-24  Jose E. Marchesi  <jose.marchesi@oracle.com>
 
 	* Makefile.am (AM_CFLAGS): Use -fPIC instead of -fpic to avoid

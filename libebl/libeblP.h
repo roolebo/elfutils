@@ -64,6 +64,12 @@ struct ebl
      Ebl architecture can unwind iff FRAME_NREGS > 0.  */
   size_t frame_nregs;
 
+  /* Offset to apply to the value of the return_address_register, as
+     fetched from a Dwarf CFI.  This is used by some backends, where
+     the return_address_register actually contains the call
+     address.  */
+  int ra_offset;
+
   /* Mask to use to turn a function value into a real function address
      in case the architecture adds some extra non-address bits to it.
      If not initialized (0) then ebl_func_addr_mask will return ~0,

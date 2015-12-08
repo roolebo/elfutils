@@ -637,7 +637,14 @@ handle_cfi (Dwfl_Frame *state, Dwarf_Addr pc, Dwarf_CFI *cfi, Dwarf_Addr bias)
       if (unwound->pc == 0)
 	unwound->pc_state = DWFL_FRAME_STATE_PC_UNDEFINED;
       else
-	unwound->pc_state = DWFL_FRAME_STATE_PC_SET;
+        {
+          unwound->pc_state = DWFL_FRAME_STATE_PC_SET;
+          /* In SPARC the return address register actually contains
+             the address of the call instruction instead of the return
+             address.  Therefore we add here an offset defined by the
+             backend.  Most likely 0.  */
+          unwound->pc += ebl_ra_offset (ebl);
+        }
     }
   free (frame);
 }

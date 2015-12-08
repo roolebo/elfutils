@@ -57,7 +57,7 @@ state_fetch_pc (Dwfl_Frame *state)
 	    __libdwfl_seterrno (DWFL_E_LIBEBL_BAD);
 	    return false;
 	  }
-	state->pc = state->regs[ra];
+	state->pc = state->regs[ra] + ebl_ra_offset (ebl);
 	state->pc_state = DWFL_FRAME_STATE_PC_SET;
       }
       return true;

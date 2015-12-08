@@ -1,5 +1,6 @@
-/* PowerPC specific core note handling.
+/* SPARC specific core note handling.
    Copyright (C) 2007 Red Hat, Inc.
+   Copyright (C) 2015 Oracle, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -108,5 +109,12 @@ static const Ebl_Register_Location fpregset_regs[] =
 #define PID_T			int32_t
 #define ALIGN_PID_T		4
 #define TYPE_PID_T		ELF_T_SWORD
+
+#define PRSTATUS_REGSET_ITEMS						      \
+  {									      \
+    .name = "pc", .type = ELF_T_ADDR, .format = 'x',			      \
+    .offset = offsetof (struct EBLHOOK(prstatus), pr_reg[33]),		      \
+    .group = "register", .pc_register = true				      \
+  }
 
 #include "linux-core-note.c"

@@ -1,3 +1,11 @@
+2015-12-08  Jose E. Marchesi  <jose.marchesi@oracle.com>
+
+	* run-backtrace-core-sparc.sh: New file.
+	* backtrace.sparc.core.bz2: New file.
+	* backtrace.sparc.exec.bz2: New file.
+	* Makefile.am (EXTRA_DIST): ... and added all here.
+	(TESTS): Added run-backtrace-core-sparc.sh.
+
 2015-12-02  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (valgrind_cmd): Use --leak-check=full.

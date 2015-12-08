@@ -76,6 +76,13 @@ sparc_init (Elf *elf __attribute__ ((unused)),
   HOOK (eh, register_info);
   HOOK (eh, return_value_location);
   HOOK (eh, check_object_attribute);
+  HOOK (eh, abi_cfi);
+  /* gcc/config/sparc.h define FIRST_PSEUDO_REGISTER  */
+  eh->frame_nregs = 103;
+  /* The CFI Dwarf register with the "return address" in sparc
+     actually contains the call address.  The return address is
+     located 8 bytes after it.  */
+  eh->ra_offset = 8;
 
   return MODVERSION;
 }

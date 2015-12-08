@@ -114,7 +114,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-backtrace-core-x32.sh \
 	run-backtrace-core-i386.sh run-backtrace-core-ppc.sh \
 	run-backtrace-core-s390x.sh run-backtrace-core-s390.sh \
-	run-backtrace-core-aarch64.sh \
+	run-backtrace-core-aarch64.sh run-backtrace-core-sparc.sh \
 	run-backtrace-demangle.sh run-stack-d-test.sh run-stack-i-test.sh \
 	run-stack-demangled-test.sh \
 	run-readelf-dwz-multi.sh run-allfcts-multi.sh run-deleted.sh \
@@ -287,6 +287,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-backtrace-core-s390x.sh run-backtrace-core-s390.sh \
 	     run-backtrace-core-aarch64.sh \
 	     backtrace.aarch64.core.bz2 backtrace.aarch64.exec.bz2 \
+	     run-backtrace-core-sparc.sh \
+	     backtrace.sparc.core.bz2 backtrace.sparc.exec.bz2 \
 	     run-backtrace-demangle.sh testfile-backtrace-demangle.bz2 \
 	     testfile-backtrace-demangle.cc \
 	     testfile-backtrace-demangle.core.bz2 \

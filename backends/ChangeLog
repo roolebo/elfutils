@@ -1,3 +1,13 @@
+2015-12-08  Jose E. Marchesi  <jose.marchesi@oracle.com>
+
+	* sparc_corenote.c: Header comment typo fixed.
+	(PRSTATUS_REGSET_ITEMS): Defined, so the PC can be fetched from
+	core files.
+	* Makefile.am (sparc_SRCS): Added sparc_cfi.c
+	* sparc_cfi.c: New file.
+	* sparc_init.c (sparc_init): Set eh->frame_nregs, eh->ra_offset
+	and hook sparc_abi_cfi.
+
 2015-10-21  Chih-Hung Hsieh  <chh@google.com>
 
 	* ia64_retval.c (hfa_type): Move nested function 'hfa' to file scope.

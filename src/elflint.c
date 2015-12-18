@@ -1,5 +1,5 @@
 /* Pedantic checking of ELF files compliance with gABI/psABI spec.
-   Copyright (C) 2001-2014 Red Hat, Inc.
+   Copyright (C) 2001-2015 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -2750,7 +2750,8 @@ section_flags_string (GElf_Word flags, char *buf, size_t len)
       NEWFLAG (LINK_ORDER),
       NEWFLAG (OS_NONCONFORMING),
       NEWFLAG (GROUP),
-      NEWFLAG (TLS)
+      NEWFLAG (TLS),
+      NEWFLAG (COMPRESSED)
     };
 #undef NEWFLAG
   const size_t nknown_flags = sizeof (known_flags) / sizeof (known_flags[0]);
@@ -3698,7 +3699,8 @@ zeroth section has nonzero link value while ELF header does not signal overflow 
   size_t versym_scnndx = 0;
   for (size_t cnt = 1; cnt < shnum; ++cnt)
     {
-      shdr = gelf_getshdr (elf_getscn (ebl->elf, cnt), &shdr_mem);
+      Elf_Scn *scn = elf_getscn (ebl->elf, cnt);
+      shdr = gelf_getshdr (scn, &shdr_mem);
       if (shdr == NULL)
 	{
 	  ERROR (gettext ("\
@@ -3748,9 +3750,11 @@ section [%2d] '%s' has wrong type: expected %s, is %s\n"),
 		if (special_sections[s].attrflag == exact
 		    || special_sections[s].attrflag == exact_or_gnuld)
 		  {
-		    /* Except for the link order and group bit all the
-		       other bits should match exactly.  */
-		    if ((shdr->sh_flags & ~(SHF_LINK_ORDER | SHF_GROUP))
+		    /* Except for the link order, group bit and
+		       compression flag all the other bits should
+		       match exactly.  */
+		    if ((shdr->sh_flags
+			 & ~(SHF_LINK_ORDER | SHF_GROUP | SHF_COMPRESSED))
 			!= special_sections[s].attr
 			&& (special_sections[s].attrflag == exact || !gnuld))
 		      ERROR (gettext ("\
@@ -3766,9 +3770,10 @@ section [%2zu] '%s' has wrong flags: expected %s, is %s\n"),
 		  {
 		    if ((shdr->sh_flags & special_sections[s].attr)
 			!= special_sections[s].attr
-			|| ((shdr->sh_flags & ~(SHF_LINK_ORDER | SHF_GROUP
-						| special_sections[s].attr
-						| special_sections[s].attr2))
+			|| ((shdr->sh_flags
+			     & ~(SHF_LINK_ORDER | SHF_GROUP | SHF_COMPRESSED
+				 | special_sections[s].attr
+				 | special_sections[s].attr2))
 			    != 0))
 		      ERROR (gettext ("\
 section [%2zu] '%s' has wrong flags: expected %s and possibly %s, is %s\n"),
@@ -3871,7 +3876,8 @@ section [%2zu] '%s': size not multiple of entry size\n"),
 
 #define ALL_SH_FLAGS (SHF_WRITE | SHF_ALLOC | SHF_EXECINSTR | SHF_MERGE \
 		      | SHF_STRINGS | SHF_INFO_LINK | SHF_LINK_ORDER \
-		      | SHF_OS_NONCONFORMING | SHF_GROUP | SHF_TLS)
+		      | SHF_OS_NONCONFORMING | SHF_GROUP | SHF_TLS \
+		      | SHF_COMPRESSED)
       if (shdr->sh_flags & ~(GElf_Xword) ALL_SH_FLAGS)
 	{
 	  GElf_Xword sh_flags = shdr->sh_flags & ~(GElf_Xword) ALL_SH_FLAGS;
@@ -3899,6 +3905,25 @@ section [%2zu] '%s': thread-local data sections address not zero\n"),
 		   cnt, section_name (ebl, cnt));
 
 	  // XXX TODO more tests!?
+	}
+
+      if (shdr->sh_flags & SHF_COMPRESSED)
+	{
+	  if (shdr->sh_flags & SHF_ALLOC)
+	    ERROR (gettext ("\
+section [%2zu] '%s': allocated section cannot be compressed\n"),
+		   cnt, section_name (ebl, cnt));
+
+	  if (shdr->sh_type == SHT_NOBITS)
+	    ERROR (gettext ("\
+section [%2zu] '%s': nobits section cannot be compressed\n"),
+		   cnt, section_name (ebl, cnt));
+
+	  GElf_Chdr chdr;
+	  if (gelf_getchdr (scn, &chdr) == NULL)
+	    ERROR (gettext ("\
+section [%2zu] '%s': compressed section with no compression header: %s\n"),
+		   cnt, section_name (ebl, cnt), elf_errmsg (-1));
 	}
 
       if (shdr->sh_link >= shnum)

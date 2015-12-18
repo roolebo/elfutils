@@ -1,3 +1,11 @@
+2015-12-18  Mark Wielaard  <mjw@redhat.com>
+
+	* elflint.c (section_flags_string): Add NEWFLAG COMPRESSED.
+	(check_sections): SHF_COMPRESSED can be on any special section.
+	SHF_COMPRESSED is a valid section flag. SHF_COMPRESSED cannot
+	be used together with SHF_ALLOC or with SHT_NOBITS. Should have
+	a valid Chdr.
+
 2015-10-20  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (options): Expand -z help text.

@@ -382,12 +382,27 @@ __elfw2(LIBELFBITS,updatenull_wrlock) (Elf *elf, int *change_bop, size_t shnum)
 
 	      /* Check that the section size is actually a multiple of
 		 the entry size.  */
-	      if (shdr->sh_entsize != 0
-		  && unlikely (shdr->sh_size % shdr->sh_entsize != 0)
+	      if (shdr->sh_entsize != 0 && shdr->sh_entsize != 1
 		  && (elf->flags & ELF_F_PERMISSIVE) == 0)
 		{
-		  __libelf_seterrno (ELF_E_INVALID_SHENTSIZE);
-		  return -1;
+		  /* For compressed sections check the uncompressed size.  */
+		  ElfW2(LIBELFBITS,Word) sh_size;
+		  if ((shdr->sh_flags & SHF_COMPRESSED) == 0)
+		    sh_size = shdr->sh_size;
+		  else
+		    {
+		      ElfW2(LIBELFBITS,Chdr) *chdr;
+		      chdr = elfw2(LIBELFBITS,getchdr) (scn);
+		      if (unlikely (chdr == NULL))
+			return -1;
+		      sh_size = chdr->ch_size;
+		    }
+
+		  if (unlikely (sh_size % shdr->sh_entsize != 0))
+		    {
+		      __libelf_seterrno (ELF_E_INVALID_SHENTSIZE);
+		      return -1;
+		    }
 		}
 	    }
 

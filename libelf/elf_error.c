@@ -245,6 +245,26 @@ core files")
   (ELF_E_INVALID_SECTION_FLAGS_IDX			\
    + sizeof "invalid section flags")
   N_("section does not contain compressed data")
+  "\0"
+#define ELF_E_ALREADY_COMPRESSED_IDX \
+  (ELF_E_NOT_COMPRESSED_IDX \
+   + sizeof "section does not contain compressed data")
+  N_("section contains compressed data")
+  "\0"
+#define ELF_E_UNKNOWN_COMPRESSION_TYPE_IDX \
+  (ELF_E_ALREADY_COMPRESSED_IDX \
+   + sizeof "section contains compressed data")
+  N_("unknown compression type")
+  "\0"
+#define ELF_E_COMPRESS_ERROR_IDX \
+  (ELF_E_UNKNOWN_COMPRESSION_TYPE_IDX \
+   + sizeof "unknown compression type")
+  N_("cannot compress data")
+  "\0"
+#define ELF_E_DECOMPRESS_ERROR_IDX \
+  (ELF_E_COMPRESS_ERROR_IDX \
+   + sizeof "cannot compress data")
+  N_("cannot decompress data")
 };
 
 
@@ -295,7 +315,11 @@ static const uint_fast16_t msgidx[ELF_E_NUM] =
   [ELF_E_INVALID_OFFSET] = ELF_E_INVALID_OFFSET_IDX,
   [ELF_E_INVALID_SECTION_TYPE] = ELF_E_INVALID_SECTION_TYPE_IDX,
   [ELF_E_INVALID_SECTION_FLAGS] = ELF_E_INVALID_SECTION_FLAGS_IDX,
-  [ELF_E_NOT_COMPRESSED] = ELF_E_NOT_COMPRESSED_IDX
+  [ELF_E_NOT_COMPRESSED] = ELF_E_NOT_COMPRESSED_IDX,
+  [ELF_E_ALREADY_COMPRESSED] = ELF_E_ALREADY_COMPRESSED_IDX,
+  [ELF_E_UNKNOWN_COMPRESSION_TYPE] = ELF_E_UNKNOWN_COMPRESSION_TYPE_IDX,
+  [ELF_E_COMPRESS_ERROR] = ELF_E_COMPRESS_ERROR_IDX,
+  [ELF_E_DECOMPRESS_ERROR] = ELF_E_DECOMPRESS_ERROR_IDX
 };
 #define nmsgidx ((int) (sizeof (msgidx) / sizeof (msgidx[0])))
 

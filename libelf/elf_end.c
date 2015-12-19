@@ -150,6 +150,12 @@ elf_end (Elf *elf)
 		  /* It doesn't matter which pointer.  */
 		  free (scn->shdr.e32);
 
+		/* Free zdata if uncompressed, but not yet used as
+		   rawdata_base.  If it is already used it will be
+		   freed below.  */
+		if (scn->zdata_base != scn->rawdata_base)
+		  free (scn->zdata_base);
+
 		/* If the file has the same byte order and the
 		   architecture doesn't require overly stringent
 		   alignment the raw data buffer is the same as the
@@ -158,8 +164,9 @@ elf_end (Elf *elf)
 		  free (scn->data_base);
 
 		/* The section data is allocated if we couldn't mmap
-		   the file.  */
-		if (elf->map_address == NULL)
+		   the file.  Or if we had to decompress.  */
+		if (elf->map_address == NULL
+		    || scn->rawdata_base == scn->zdata_base)
 		  free (scn->rawdata_base);
 
 		/* Free the list of data buffers for the section.

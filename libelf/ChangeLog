@@ -1,3 +1,33 @@
+2015-10-21  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (libelf_a_SOURCES): Add elf_compress.c and
+	elf_compress_gnu.c.
+	* elf_compress.c: New file.
+	* elf_compress_gnu.c: Likewise.
+	* elf_begin.c (file_read_elf): Make a writable copy of the shdrs
+	for ELF_C_READ_MMAP.
+	* elf_end.c (elf_end): Free zdata_base.
+	* elf_error.c: Add ELF_E_ALREADY_COMPRESSED,
+	ELF_E_UNKNOWN_COMPRESSION_TYPE, ELF_E_COMPRESS_ERROR and
+	ELF_E_DECOMPRESS_ERROR.
+	* elf_data.c (__libelf_data_type): New internal function extracted
+	from convert_data.
+	(convert_data): Handle SHF_COMPRESSED.
+	* elf32_updatenull.c (updatenull_wrlock): Check sh_entsize against
+	uncompressed section data size if SHF_COMPRESSED.
+	* elf32_getshdr.c (load_shdr_wrlock): Adjust assert to account for
+	ELF_C_READ_MMAP.
+	* libelf.h: Define elf_compress and elf_compress_gnu.
+	* libelf.map (ELFUTILS_1.7): Add elf_compress and elf_compress_gnu.
+	* libelfP.h: Add ELF_E_ALREADY_COMPRESSED,
+	ELF_E_UNKNOWN_COMPRESSION_TYPE, ELF_E_COMPRESS_ERROR and
+	ELF_E_DECOMPRESS_ERROR. Define __libelf_data_type.
+	(__libelf_compress): New internal function definition.
+	(__libelf_decompress): Likewise.
+	(__libelf_reset_rawdata): Likewise.
+	(__libelf_data_type): Likewise.
+	(struct Elf_Scn): Add zdata_base.
+
 2015-11-19  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (libelf_a_SOURCES): Add elf32_getchdr.c,

@@ -1,3 +1,13 @@
+2015-12-18  Mark Wielaard  <mjw@redhat.com>
+
+	* dwfl_module_getdwarf.c (find_symtab): Uncompress symstr, xndx, sym
+	sections and aux_str, aux_xndx and aux_sym sections if necessary.
+	* relocate.c (relocate_getsym): Uncompress symtab and symtab_shndx
+	if necessary.
+	(resolve_symbol): Uncompress strtab section if necessary.
+	(relocate_section): Uncompress the section the relocations apply to
+	if necessary.
+
 2015-11-18  Chih-Hung Hsieh <chh@google.com>
 
 	* linux-proc-maps.c (proc_maps_report): Move nested function

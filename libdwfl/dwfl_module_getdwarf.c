@@ -1130,10 +1130,39 @@ find_symtab (Dwfl_Module *mod)
       goto aux_cleanup; /* This cleans up some more and tries find_dynsym.  */
     }
 
-  /* Cache the data; MOD->syments and MOD->first_global were set above.  */
+  /* Cache the data; MOD->syments and MOD->first_global were set
+     above.  If any of the sections is compressed, uncompress it
+     first.  Only the string data setion could theoretically be
+     compressed GNU style (as .zdebug_str).  Everything else only ELF
+     gabi style (SHF_COMPRESSED).  */
 
-  mod->symstrdata = elf_getdata (elf_getscn (mod->symfile->elf, strshndx),
-				 NULL);
+  Elf_Scn *symstrscn = elf_getscn (mod->symfile->elf, strshndx);
+  if (symstrscn == NULL)
+    goto elferr;
+
+  GElf_Shdr shdr_mem;
+  GElf_Shdr *shdr = gelf_getshdr (symstrscn, &shdr_mem);
+  if (shdr == NULL)
+    goto elferr;
+
+  size_t shstrndx;
+  if (elf_getshdrstrndx (mod->symfile->elf, &shstrndx) < 0)
+    goto elferr;
+
+  const char *sname = elf_strptr (mod->symfile->elf, shstrndx, shdr->sh_name);
+  if (sname == NULL)
+    goto elferr;
+
+  if (strncmp (sname, ".zdebug", strlen (".zdebug")) == 0)
+    /* Try to uncompress, but it might already have been, an error
+       might just indicate, already uncompressed.  */
+    elf_compress_gnu (symstrscn, 0, 0);
+
+  if ((shdr->sh_flags & SHF_COMPRESSED) != 0)
+    if (elf_compress (symstrscn, 0, 0) < 0)
+      goto elferr;
+
+  mod->symstrdata = elf_getdata (symstrscn, NULL);
   if (mod->symstrdata == NULL || mod->symstrdata->d_buf == NULL)
     goto elferr;
 
@@ -1141,17 +1170,33 @@ find_symtab (Dwfl_Module *mod)
     mod->symxndxdata = NULL;
   else
     {
+      shdr = gelf_getshdr (xndxscn, &shdr_mem);
+      if (shdr == NULL)
+	goto elferr;
+
+      if ((shdr->sh_flags & SHF_COMPRESSED) != 0)
+	if (elf_compress (xndxscn, 0, 0) < 0)
+	  goto elferr;
+
       mod->symxndxdata = elf_getdata (xndxscn, NULL);
       if (mod->symxndxdata == NULL || mod->symxndxdata->d_buf == NULL)
 	goto elferr;
     }
+
+  shdr = gelf_getshdr (symscn, &shdr_mem);
+  if (shdr == NULL)
+    goto elferr;
+
+  if ((shdr->sh_flags & SHF_COMPRESSED) != 0)
+    if (elf_compress (symscn, 0, 0) < 0)
+      goto elferr;
 
   mod->symdata = elf_getdata (symscn, NULL);
   if (mod->symdata == NULL || mod->symdata->d_buf == NULL)
     goto elferr;
 
   // Sanity check number of symbols.
-  GElf_Shdr shdr_mem, *shdr = gelf_getshdr (symscn, &shdr_mem);
+  shdr = gelf_getshdr (symscn, &shdr_mem);
   if (shdr == NULL || shdr->sh_entsize == 0
       || mod->syments > mod->symdata->d_size / shdr->sh_entsize
       || (size_t) mod->first_global > mod->syments)
@@ -1174,9 +1219,33 @@ find_symtab (Dwfl_Module *mod)
 	  return;
 	}
 
-      mod->aux_symstrdata = elf_getdata (elf_getscn (mod->aux_sym.elf,
-						     aux_strshndx),
-					 NULL);
+      Elf_Scn *aux_strscn = elf_getscn (mod->aux_sym.elf, aux_strshndx);
+      if (aux_strscn == NULL)
+	goto elferr;
+
+      shdr = gelf_getshdr (aux_strscn, &shdr_mem);
+      if (shdr == NULL)
+	goto elferr;
+
+      size_t aux_shstrndx;
+      if (elf_getshdrstrndx (mod->aux_sym.elf, &aux_shstrndx) < 0)
+	goto elferr;
+
+      sname = elf_strptr (mod->aux_sym.elf, aux_shstrndx,
+				      shdr->sh_name);
+      if (sname == NULL)
+	goto elferr;
+
+      if (strncmp (sname, ".zdebug", strlen (".zdebug")) == 0)
+	/* Try to uncompress, but it might already have been, an error
+	   might just indicate, already uncompressed.  */
+	elf_compress_gnu (aux_strscn, 0, 0);
+
+      if ((shdr->sh_flags & SHF_COMPRESSED) != 0)
+	if (elf_compress (aux_strscn, 0, 0) < 0)
+	  goto elferr;
+
+      mod->aux_symstrdata = elf_getdata (aux_strscn, NULL);
       if (mod->aux_symstrdata == NULL || mod->aux_symstrdata->d_buf == NULL)
 	goto aux_cleanup;
 
@@ -1184,11 +1253,27 @@ find_symtab (Dwfl_Module *mod)
 	mod->aux_symxndxdata = NULL;
       else
 	{
+	  shdr = gelf_getshdr (aux_xndxscn, &shdr_mem);
+	  if (shdr == NULL)
+	    goto elferr;
+
+	  if ((shdr->sh_flags & SHF_COMPRESSED) != 0)
+	    if (elf_compress (aux_xndxscn, 0, 0) < 0)
+	      goto elferr;
+
 	  mod->aux_symxndxdata = elf_getdata (aux_xndxscn, NULL);
 	  if (mod->aux_symxndxdata == NULL
 	      || mod->aux_symxndxdata->d_buf == NULL)
 	    goto aux_cleanup;
 	}
+
+      shdr = gelf_getshdr (aux_symscn, &shdr_mem);
+      if (shdr == NULL)
+	goto elferr;
+
+      if ((shdr->sh_flags & SHF_COMPRESSED) != 0)
+	if (elf_compress (aux_symscn, 0, 0) < 0)
+	  goto elferr;
 
       mod->aux_symdata = elf_getdata (aux_symscn, NULL);
       if (mod->aux_symdata == NULL || mod->aux_symdata->d_buf == NULL)

@@ -123,23 +123,32 @@ relocate_getsym (Dwfl_Module *mod,
 	    {
 	      GElf_Shdr shdr_mem, *shdr = gelf_getshdr (scn, &shdr_mem);
 	      if (shdr != NULL)
-		switch (shdr->sh_type)
-		  {
-		  default:
-		    continue;
-		  case SHT_SYMTAB:
-		    cache->symelf = relocated;
-		    cache->symdata = elf_getdata (scn, NULL);
-		    cache->strtabndx = shdr->sh_link;
-		    if (unlikely (cache->symdata == NULL))
+		{
+		  /* We need uncompressed data.  */
+		  if ((shdr->sh_type == SHT_SYMTAB
+		       || shdr->sh_type == SHT_SYMTAB_SHNDX)
+		      && (shdr->sh_flags & SHF_COMPRESSED) != 0)
+		    if (elf_compress (scn, 0, 0) < 0)
 		      return DWFL_E_LIBELF;
-		    break;
-		  case SHT_SYMTAB_SHNDX:
-		    cache->symxndxdata = elf_getdata (scn, NULL);
-		    if (unlikely (cache->symxndxdata == NULL))
-		      return DWFL_E_LIBELF;
-		    break;
-		  }
+
+		  switch (shdr->sh_type)
+		    {
+		    default:
+		      continue;
+		    case SHT_SYMTAB:
+		      cache->symelf = relocated;
+		      cache->symdata = elf_getdata (scn, NULL);
+		      cache->strtabndx = shdr->sh_link;
+		      if (unlikely (cache->symdata == NULL))
+			return DWFL_E_LIBELF;
+		      break;
+		    case SHT_SYMTAB_SHNDX:
+		      cache->symxndxdata = elf_getdata (scn, NULL);
+		      if (unlikely (cache->symxndxdata == NULL))
+			return DWFL_E_LIBELF;
+		      break;
+		    }
+		}
 	      if (cache->symdata != NULL && cache->symxndxdata != NULL)
 		break;
 	    }
@@ -203,9 +212,34 @@ resolve_symbol (Dwfl_Module *referer, struct reloc_symtab_cache *symtab,
 	  /* Cache the strtab for this symtab.  */
 	  assert (referer->symfile == NULL
 		  || referer->symfile->elf != symtab->symelf);
-	  symtab->symstrdata = elf_getdata (elf_getscn (symtab->symelf,
-							symtab->strtabndx),
-					    NULL);
+
+	  Elf_Scn *scn = elf_getscn (symtab->symelf, symtab->strtabndx);
+	  if (scn == NULL)
+	    return DWFL_E_LIBELF;
+
+	  GElf_Shdr shdr_mem;
+	  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+	  if (shdr == NULL)
+	    return DWFL_E_LIBELF;
+
+	  if (symtab->symshstrndx == SHN_UNDEF
+	      && elf_getshdrstrndx (symtab->symelf, &symtab->symshstrndx) < 0)
+	    return DWFL_E_LIBELF;
+
+	  const char *sname = elf_strptr (symtab->symelf, symtab->symshstrndx,
+					  shdr->sh_name);
+	  if (sname == NULL)
+	    return DWFL_E_LIBELF;
+
+	  /* If the section is already decompressed, that isn't an error.  */
+	  if (strncmp (sname, ".zdebug", strlen (".zdebug")) == 0)
+	    elf_compress_gnu (scn, 0, 0);
+
+	  if ((shdr->sh_flags & SHF_COMPRESSED) != 0)
+	    if (elf_compress (scn, 0, 0) < 0)
+	      return DWFL_E_LIBELF;
+
+	  symtab->symstrdata = elf_getdata (scn, NULL);
 	  if (unlikely (symtab->symstrdata == NULL
 			|| symtab->symstrdata->d_buf == NULL))
 	    return DWFL_E_LIBELF;
@@ -446,21 +480,55 @@ relocate_section (Dwfl_Module *mod, Elf *relocated, const GElf_Ehdr *ehdr,
 		  Elf_Scn *scn, GElf_Shdr *shdr,
 		  Elf_Scn *tscn, bool debugscn, bool partial)
 {
-  /* First, fetch the name of the section these relocations apply to.  */
+  /* First, fetch the name of the section these relocations apply to.
+     Then try to decompress both relocation and target section.  */
   GElf_Shdr tshdr_mem;
   GElf_Shdr *tshdr = gelf_getshdr (tscn, &tshdr_mem);
+  if (tshdr == NULL)
+    return DWFL_E_LIBELF;
+
   const char *tname = elf_strptr (relocated, shstrndx, tshdr->sh_name);
   if (tname == NULL)
     return DWFL_E_LIBELF;
-
-  if (unlikely (tshdr->sh_type == SHT_NOBITS) || unlikely (tshdr->sh_size == 0))
-    /* No contents to relocate.  */
-    return DWFL_E_NOERROR;
 
   if (debugscn && ! ebl_debugscn_p (mod->ebl, tname))
     /* This relocation section is not for a debugging section.
        Nothing to do here.  */
     return DWFL_E_NOERROR;
+
+  if (strncmp (tname, ".zdebug", strlen ("zdebug")) == 0)
+    elf_compress_gnu (tscn, 0, 0);
+
+  if ((tshdr->sh_flags & SHF_COMPRESSED) != 0)
+    if (elf_compress (tscn, 0, 0) < 0)
+      return DWFL_E_LIBELF;
+
+  /* Reload Shdr in case section was just decompressed.  */
+  tshdr = gelf_getshdr (tscn, &tshdr_mem);
+  if (tshdr == NULL)
+    return DWFL_E_LIBELF;
+
+  if (unlikely (tshdr->sh_type == SHT_NOBITS)
+      || unlikely (tshdr->sh_size == 0))
+    /* No contents to relocate.  */
+    return DWFL_E_NOERROR;
+
+  const char *sname = elf_strptr (relocated, shstrndx, shdr->sh_name);
+  if (sname == NULL)
+    return DWFL_E_LIBELF;
+
+  if (strncmp (sname, ".zdebug", strlen ("zdebug")) == 0)
+    elf_compress_gnu (scn, 0, 0);
+
+  if ((shdr->sh_flags & SHF_COMPRESSED) != 0)
+    if (elf_compress (scn, 0, 0) < 0)
+      return DWFL_E_LIBELF;
+
+  /* Reload Shdr in case section was just decompressed.  */
+  GElf_Shdr shdr_mem;
+  shdr = gelf_getshdr (scn, &shdr_mem);
+  if (shdr == NULL)
+    return DWFL_E_LIBELF;
 
   /* Fetch the section data that needs the relocations applied.  */
   Elf_Data *tdata = elf_rawdata (tscn, NULL);

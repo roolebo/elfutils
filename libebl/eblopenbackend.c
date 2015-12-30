@@ -662,7 +662,9 @@ default_debugscn_p (const char *name)
   const size_t ndwarf_scn_names = (sizeof (dwarf_scn_names)
 				   / sizeof (dwarf_scn_names[0]));
   for (size_t cnt = 0; cnt < ndwarf_scn_names; ++cnt)
-    if (strcmp (name, dwarf_scn_names[cnt]) == 0)
+    if (strcmp (name, dwarf_scn_names[cnt]) == 0
+	|| (strncmp (name, ".zdebug", strlen (".zdebug")) == 0
+	    && strcmp (&name[2], &dwarf_scn_names[cnt][1]) == 0))
       return true;
 
   return false;

@@ -147,11 +147,6 @@ struct Dwarf
   /* The section data.  */
   Elf_Data *sectiondata[IDX_last];
 
-#if USE_ZLIB
-  /* The 1 << N bit is set if sectiondata[N] is malloc'd decompressed data.  */
-  unsigned int sectiondata_gzip_mask:IDX_last;
-#endif
-
   /* True if the file has a byte order different from the host.  */
   bool other_byte_order;
 
@@ -439,12 +434,6 @@ extern void *__libdw_allocate (Dwarf *dbg, size_t minsize, size_t align)
 
 /* Default OOM handler.  */
 extern void __libdw_oom (void) __attribute ((noreturn, visibility ("hidden")));
-
-#if USE_ZLIB
-extern void __libdw_free_zdata (Dwarf *dwarf) internal_function;
-#else
-# define __libdw_free_zdata(dwarf)	((void) (dwarf))
-#endif
 
 /* Allocate the internal data for a unit not seen before.  */
 extern struct Dwarf_CU *__libdw_intern_next_unit (Dwarf *dbg, bool debug_types)

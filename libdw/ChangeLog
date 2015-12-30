@@ -1,3 +1,16 @@
+2015-12-18  Mark Wielaard  <mjw@redhat.com>
+
+	* libdwP.h (struct Dwarf): Remove sectiondata_gzip_mask.
+	(__libdw_free_zdata): Remove.
+	* dwarf_begin_elf.c (inflate_section): Remove.
+	(check_section): Remove __libdw_free_zdata calls. Use elf_compress
+	and elf_compress_gnu to decompress if necessary.
+	(valid_p): Remove __libdw_free_zdata calls.
+	(scngrp_read): Use elf_compress if section is compressed. Remove
+	__libdw_free_zdata calls.
+	* dwarf_end.c (__libdw_free_zdata): Remove.
+	(dwarf_end): Don't call __libdw_free_zdata.
+
 2015-10-28  Mark Wielaard  <mjw@redhat.com>
 
 	* libdw.map (ELFUTILS_0.165): New. Add dwelf_scn_gnu_compressed_size.

@@ -248,6 +248,47 @@ __libelf_decompress (void *buf_in, size_t size_in, size_t size_out)
   return buf_out;
 }
 
+void *
+internal_function
+__libelf_decompress_elf (Elf_Scn *scn, size_t *size_out, size_t *addralign)
+{
+  GElf_Chdr chdr;
+  if (gelf_getchdr (scn, &chdr) == NULL)
+    return NULL;
+
+  if (chdr.ch_type != ELFCOMPRESS_ZLIB)
+    {
+      __libelf_seterrno (ELF_E_UNKNOWN_COMPRESSION_TYPE);
+      return NULL;
+    }
+
+  if (! powerof2 (chdr.ch_addralign))
+    {
+      __libelf_seterrno (ELF_E_INVALID_ALIGN);
+      return NULL;
+    }
+
+  /* Take the in-memory representation, so we can even handle a
+     section that has just been constructed (maybe it was copied
+     over from some other ELF file first with elf_newdata).  This
+     is slightly inefficient when the raw data needs to be
+     converted since then we'll be converting the whole buffer and
+     not just Chdr.  */
+  Elf_Data *data = elf_getdata (scn, NULL);
+  if (data == NULL)
+    return NULL;
+
+  int elfclass = scn->elf->class;
+  size_t hsize = (elfclass == ELFCLASS32
+		  ? sizeof (Elf32_Chdr) : sizeof (Elf64_Chdr));
+  size_t size_in = data->d_size - hsize;
+  void *buf_in = data->d_buf + hsize;
+  void *buf_out = __libelf_decompress (buf_in, size_in, chdr.ch_size);
+  *size_out = chdr.ch_size;
+  *addralign = chdr.ch_addralign;
+  return buf_out;
+}
+
 void
 internal_function
 __libelf_reset_rawdata (Elf_Scn *scn, void *buf, size_t size, size_t align,
@@ -424,61 +465,41 @@ elf_compress (Elf_Scn *scn, int type, unsigned int flags)
 	  return -1;
 	}
 
-      GElf_Chdr chdr;
-      if (gelf_getchdr (scn, &chdr) == NULL)
-	return -1;
-
-      if (chdr.ch_type != ELFCOMPRESS_ZLIB)
+      /* If the data is already decompressed (by elf_strptr), then we
+	 only need to setup the rawdata and section header. XXX what
+	 about elf_newdata?  */
+      if (scn->zdata_base == NULL)
 	{
-	  __libelf_seterrno (ELF_E_UNKNOWN_COMPRESSION_TYPE);
-	  return -1;
+	  size_t size_out, addralign;
+	  void *buf_out = __libelf_decompress_elf (scn, &size_out, &addralign);
+	  if (buf_out == NULL)
+	    return -1;
+
+	  scn->zdata_base = buf_out;
+	  scn->zdata_size = size_out;
+	  scn->zdata_align = addralign;
 	}
-
-      if (! powerof2 (chdr.ch_addralign))
-	{
-	  __libelf_seterrno (ELF_E_INVALID_ALIGN);
-	  return -1;
-	}
-
-      /* Take the in-memory representation, so we can even handle a
-	 section that has just been constructed (maybe it was copied
-	 over from some other ELF file first with elf_newdata).  This
-	 is slightly inefficient when the raw data needs to be
-	 converted since then we'll be converting the whole buffer and
-	 not just Chdr.  */
-      Elf_Data *data = elf_getdata (scn, NULL);
-      if (data == NULL)
-	return -1;
-
-      size_t hsize = (elfclass == ELFCLASS32
-		      ? sizeof (Elf32_Chdr) : sizeof (Elf64_Chdr));
-      size_t size_in = data->d_size - hsize;
-      void *buf_in = data->d_buf + hsize;
-      void *buf_out = __libelf_decompress (buf_in, size_in, chdr.ch_size);
-      if (buf_out == NULL)
-	return -1;
 
       /* Note we keep the sh_entsize as is, we assume it is setup
 	 correctly and ignored when SHF_COMPRESSED is set.  */
       if (elfclass == ELFCLASS32)
 	{
 	  Elf32_Shdr *shdr = elf32_getshdr (scn);
-	  shdr->sh_size = chdr.ch_size;
-	  shdr->sh_addralign = chdr.ch_addralign;
+	  shdr->sh_size = scn->zdata_size;
+	  shdr->sh_addralign = scn->zdata_align;
 	  shdr->sh_flags &= ~SHF_COMPRESSED;
 	}
       else
 	{
 	  Elf64_Shdr *shdr = elf64_getshdr (scn);
-	  shdr->sh_size = chdr.ch_size;
-	  shdr->sh_addralign = chdr.ch_addralign;
+	  shdr->sh_size = scn->zdata_size;
+	  shdr->sh_addralign = scn->zdata_align;
 	  shdr->sh_flags &= ~SHF_COMPRESSED;
 	}
 
-      __libelf_reset_rawdata (scn, buf_out, chdr.ch_size, chdr.ch_addralign,
+      __libelf_reset_rawdata (scn, scn->zdata_base,
+			      scn->zdata_size, scn->zdata_align,
 			      __libelf_data_type (elf, sh_type));
-
-      scn->zdata_base = buf_out;
 
       return 1;
     }

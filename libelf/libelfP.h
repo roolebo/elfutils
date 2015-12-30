@@ -239,6 +239,8 @@ struct Elf_Scn
   char *data_base;		/* The converted data of the section.  */
 
   char *zdata_base;		/* The uncompressed data of the section.  */
+  size_t zdata_size;		/* If zdata_base != NULL, the size of data.  */
+  size_t zdata_align;		/* If zdata_base != NULL, the addralign.  */
 
   struct Elf_ScnList *list;	/* Pointer to the section list element the
 				   data is in.  */
@@ -600,6 +602,10 @@ extern void * __libelf_compress (Elf_Scn *scn, size_t hsize, int ei_data,
 
 extern void * __libelf_decompress (void *buf_in, size_t size_in,
 				   size_t size_out) internal_function;
+extern void * __libelf_decompress_elf (Elf_Scn *scn,
+				       size_t *size_out, size_t *addralign)
+     internal_function;
+
 
 extern void __libelf_reset_rawdata (Elf_Scn *scn, void *buf, size_t size,
 				    size_t align, Elf_Type type)

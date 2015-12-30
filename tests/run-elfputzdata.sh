@@ -53,7 +53,7 @@ Lets compress 29 .debug_info, size: 960
 Lets compress 30 .debug_abbrev, size: 405
 Lets compress 31 .debug_line, size: 189
 Lets compress 32 .note, size: 240
-Not compressing section string table 33
+Lets compress 33 .shstrtab, size: 320
 Lets compress 34 .symtab, size: 5488
 Lets compress 35 .strtab, size: 5727
 EOF
@@ -91,7 +91,7 @@ Lets compress 29 .debug_info, size: 960
 Lets compress 30 .debug_abbrev, size: 405
 Lets compress 31 .debug_line, size: 189
 Lets compress 32 .note, size: 240
-Not compressing section string table 33
+Lets compress 33 .shstrtab, size: 320
 Lets compress 34 .symtab, size: 5488
 Lets compress 35 .strtab, size: 5727
 EOF
@@ -130,7 +130,7 @@ Lets compress 27 .debug_line, size: 709
 Lets compress 28 .debug_frame, size: 56
 Lets compress 29 .debug_str, size: 2235
 Lets compress 30 .debug_macinfo, size: 10518
-Not compressing section string table 31
+Lets compress 31 .shstrtab, size: 308
 Lets compress 32 .symtab, size: 1944
 Lets compress 33 .strtab, size: 757
 EOF
@@ -166,7 +166,7 @@ Lets compress 27 .debug_line, size: 709
 Lets compress 28 .debug_frame, size: 56
 Lets compress 29 .debug_str, size: 2235
 Lets compress 30 .debug_macinfo, size: 10518
-Not compressing section string table 31
+Lets compress 31 .shstrtab, size: 308
 Lets compress 32 .symtab, size: 1944
 Lets compress 33 .strtab, size: 757
 EOF
@@ -208,7 +208,7 @@ Lets compress 30 .debug_frame, size: 96
 Lets compress 31 .debug_str, size: 174
 Lets compress 32 .debug_loc, size: 171
 Lets compress 33 .debug_ranges, size: 32
-Not compressing section string table 34
+Lets compress 34 .shstrtab, size: 352
 Lets compress 35 .symtab, size: 1800
 Lets compress 36 .strtab, size: 602
 EOF
@@ -247,7 +247,7 @@ Lets compress 30 .debug_frame, size: 96
 Lets compress 31 .debug_str, size: 174
 Lets compress 32 .debug_loc, size: 171
 Lets compress 33 .debug_ranges, size: 32
-Not compressing section string table 34
+Lets compress 34 .shstrtab, size: 352
 Lets compress 35 .symtab, size: 1800
 Lets compress 36 .strtab, size: 602
 EOF
@@ -291,7 +291,7 @@ Lets compress 32 .debug_frame, size: 64
 Lets compress 33 .debug_str, size: 179
 Lets compress 34 .debug_loc, size: 99
 Lets compress 35 .debug_ranges, size: 16
-Not compressing section string table 36
+Lets compress 36 .shstrtab, size: 370
 Lets compress 37 .symtab, size: 1232
 Lets compress 38 .strtab, size: 569
 EOF
@@ -332,7 +332,7 @@ Lets compress 32 .debug_frame, size: 64
 Lets compress 33 .debug_str, size: 179
 Lets compress 34 .debug_loc, size: 99
 Lets compress 35 .debug_ranges, size: 16
-Not compressing section string table 36
+Lets compress 36 .shstrtab, size: 370
 Lets compress 37 .symtab, size: 1232
 Lets compress 38 .strtab, size: 569
 EOF

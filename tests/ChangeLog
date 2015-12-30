@@ -1,3 +1,14 @@
+2015-11-26  Mark Wielaard  <mjw@redhat.com>
+
+	* zstrptr.c: New file.
+	* run-zstrptr.sh: New test.
+	* elfputzdata.c (main): (re)compress .shstrtab.
+	* run-elfputzdata.sh: Expect .shstrtab compression.
+	* Makefile.am (check_PROGRAMS): Add zstrptr.
+	(TESTS): Add run-zstrptr.sh.
+	(EXTRA_DIST): Likewise.
+	(zstrptr_LDADD): New variable.
+
 2015-10-20  Mark Wielaard  <mjw@redhat.com>
 
 	* run-readelf-zx.sh: New test.

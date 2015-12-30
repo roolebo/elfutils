@@ -77,11 +77,7 @@ main (int argc, char *argv[])
 	  GElf_Shdr mem;
 	  GElf_Shdr *shdr = gelf_getshdr (scn, &mem);
 	  const char *name = elf_strptr (elf, strndx, shdr->sh_name);
-	  if (idx == strndx)
-	    {
-	      printf ("Not compressing section string table %zd\n", idx);
-	    }
-	  else if (shdr->sh_type == SHT_NOBITS
+	  if (shdr->sh_type == SHT_NOBITS
 	      || (shdr->sh_flags & SHF_ALLOC) != 0)
 	    {
 	      printf ("Cannot compress %zd %s\n", idx, name);
@@ -221,6 +217,15 @@ main (int argc, char *argv[])
 		  return -1;
 		}
 	      free (orig_buf);
+	      // Recompress the string table, just to make sure
+	      // everything keeps working. See elf_strptr above.
+	      if (! gnu && idx == strndx
+		  && elf_compress (scn, ELFCOMPRESS_ZLIB, 0) < 0)
+		{
+		  printf ("couldn't recompress section header strings: %s\n",
+			  elf_errmsg (-1));
+		  return -1;
+		}
 	    }
 	}
 

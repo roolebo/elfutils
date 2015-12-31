@@ -1,7 +1,7 @@
 ## Process this file with automake to create Makefile.in
 ## Configure input file for elfutils.
 ##
-## Copyright (C) 1996-2002, 2003, 2004, 2005, 2006, 2008, 2009 Red Hat, Inc.
+## Copyright (C) 1996-2006, 2008, 2009, 2015 Red Hat, Inc.
 ##
 ## This file is part of elfutils.
 ##
@@ -19,6 +19,10 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ACLOCAL_AMFLAGS = -I m4
+
+# automake already tells which subdir is being entered.
+# Don't make make repeat.
+AM_MAKEFLAGS = --no-print-directory
 
 pkginclude_HEADERS = version.h
 

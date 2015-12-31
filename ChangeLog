@@ -1,3 +1,7 @@
+2015-12-31  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (AM_MAKEFLAGS): Set --no-print-directory.
+
 2015-10-16  Mark Wielaard  <mjw@redhat.com>
 
 	* configure.ac: Make zlib mandatory.

@@ -1,3 +1,8 @@
+2015-12-31  Mark Wielaard  <mjw@redhat.com>
+
+	* elflint.c (check_symtab): Add _edata and _end (plus extra underscore
+	variants) to to the list of possibly dangling symbols.
+
 2015-12-02  Mark Wielaard  <mjw@redhat.com>
 
 	* nm.c (process_file): Accept fd and pass it on.

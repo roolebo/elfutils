@@ -1,3 +1,10 @@
+2015-12-31  Mark Wielaard  <mjw@redhat.com>
+
+	* elfstrmerge.c (main): Warn about STT_SECTION symbol for shstrhndx.
+	* run-elfstrmerge-test.sh: New test.
+	* Makefile.am (TESTS): Add run-elfstrmerge-test.sh
+	(EXTRA_DIST): Likewise.
+
 2015-12-08  Jose E. Marchesi  <jose.marchesi@oracle.com>
 
 	* run-backtrace-core-sparc.sh: New file.

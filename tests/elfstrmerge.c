@@ -518,8 +518,13 @@ main (int argc, char **argv)
 		    if (gelf_getsym (data, i, &sym) == NULL)
 		      fail_elf_idx ("Couldn't get symbol", fname, i);
 
-		    if (sym.st_shndx != SHN_UNDEF
-			&& sym.st_shndx < SHN_LORESERVE)
+		    if (GELF_ST_TYPE (sym.st_info) == STT_SECTION
+			&& sym.st_shndx == shdrstrndx)
+		      fprintf (stderr, "WARNING:"
+			       " symbol table [%zd] contains section symbol %zd"
+			       " for old shdrstrndx %zd\n", ndx, i, shdrstrndx);
+		    else if (sym.st_shndx != SHN_UNDEF
+			     && sym.st_shndx < SHN_LORESERVE)
 		      sym.st_shndx = newsecndx (sym.st_shndx, "section", ndx,
 						"symbol", i);
 		    if (update_name && sym.st_name != 0)

@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in -*-Makefile-*-
 ## Configure input file for elfutils.
 ##
-## Copyright (C) 2004, 2005, 2008, 2009, 2011, 2015 Red Hat, Inc.
+## Copyright (C) 2004, 2005, 2008, 2009, 2011, 2015, 2016 Red Hat, Inc.
 ## This file is part of elfutils.
 ##
 ## This file is free software; you can redistribute it and/or modify
@@ -29,6 +29,10 @@
 ## not, see <http://www.gnu.org/licenses/>.
 ##
 EXTRA_DIST = elfutils.spec.in known-dwarf.awk 10-default-yama-scope.conf
+	     libelf.pc.in libdw.pc.in
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libelf.pc libdw.pc
 
 if MAINTAINER_MODE
 $(srcdir)/elfutils.spec.in: $(top_srcdir)/NEWS

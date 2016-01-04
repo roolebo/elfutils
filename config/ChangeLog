@@ -1,3 +1,13 @@
+2016-01-04  Mark Wielaard  <mjw@redhat.com>
+
+	* libelf.pc.in: New file.
+	* libdw.pc.in: Likewise.
+	* Makefile.am (EXTRA_DIST): Add libelf.pc.in and libdw.pc.in.
+	(pkgconfigdir): New variable.
+	(pkgconfigdir_DATA): Likewise.
+	* elfutils.spec.in (files devel): Add libdw.pc.
+	(files libelf-devel): Add libelf.pc.
+
 2015-10-15  Mark Wielaard  <mjw@redhat.com>
 
 	* elfutils.spec.in: Update for 0.164.

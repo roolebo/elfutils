@@ -197,6 +197,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libebl.a
 #%{_libdir}/libasm.so
 %{_libdir}/libdw.so
+%{_libdir}/pkgconfig/libdw.pc
 
 %files devel-static
 %{_libdir}/libdw.a
@@ -215,6 +216,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_includedir}/nlist.h
 %{_includedir}/elfutils/version.h
 %{_libdir}/libelf.so
+%{_libdir}/pkgconfig/libelf.pc
 
 %files libelf-devel-static
 %{_libdir}/libelf.a

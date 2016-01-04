@@ -1,3 +1,8 @@
+2016-01-04  Mark Wielaard  <mjw@redhat.com>
+
+	* configure.ac: Add BZ2_LIBS and LIBLZMA substitutions.
+	Add config/libelf.pc and config/libdw.pc config files.
+
 2015-12-31  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (AM_MAKEFLAGS): Set --no-print-directory.

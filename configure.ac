@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl Configure input file for elfutils.                     -*-autoconf-*-
 dnl
-dnl Copyright (C) 1996-2015 Red Hat, Inc.
+dnl Copyright (C) 1996-2016 Red Hat, Inc.
 dnl
 dnl This file is part of elfutils.
 dnl
@@ -22,7 +22,7 @@ AC_INIT([elfutils],[0.164],[https://bugzilla.redhat.com/],[elfutils])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_FILES([config/Makefile])
 
-AC_COPYRIGHT([Copyright (C) 1996-2015 Red Hat, Inc.])
+AC_COPYRIGHT([Copyright (C) 1996-2016 Red Hat, Inc.])
 AC_PREREQ(2.63)			dnl Minimum Autoconf version required.
 
 dnl We use GNU make extensions; automake 1.10 defaults to -Wportability.
@@ -252,7 +252,12 @@ dnl conditional and config.h USE_BZLIB/USE_LZMALIB #define.
 save_LIBS="$LIBS"
 LIBS=
 eu_ZIPLIB(bzlib,BZLIB,bz2,BZ2_bzdopen,bzip2)
+# We need this since bzip2 doesn't have a pkgconfig file.
+BZ2_LIB="$LIBS"
+AC_SUBST([BZ2_LIB])
 eu_ZIPLIB(lzma,LZMA,lzma,lzma_auto_decoder,[LZMA (xz)])
+AS_IF([test "x$with_lzma" = xyes], [LIBLZMA="liblzma"], [LIBLZMA=""])
+AC_SUBST([LIBLZMA])
 zip_LIBS="$LIBS"
 LIBS="$save_LIBS"
 AC_SUBST([zip_LIBS])
@@ -351,6 +356,9 @@ AC_CONFIG_FILES([src/Makefile po/Makefile.in])
 dnl Test suite.
 AM_CONDITIONAL(STANDALONE, false)dnl Used in tests/Makefile.am, which see.
 AC_CONFIG_FILES([tests/Makefile])
+
+dnl pkgconfig files
+AC_CONFIG_FILES([config/libelf.pc config/libdw.pc])
 
 # Get the definitions necessary to create the Makefiles in the po
 # subdirectories.  This is a small subset of the gettext rules.

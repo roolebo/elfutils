@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: elfutils\n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2016-01-07 15:42+0100\n"
+"POT-Creation-Date: 2016-01-08 14:06+0100\n"
 "PO-Revision-Date: 2016-01-07 15:44+0100\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <trans-pl@lists.fedoraproject.org>\n"
@@ -44,9 +44,8 @@ msgstr ""
 msgid "cannot allocate memory"
 msgstr "nie można przydzielić pamięci"
 
-#: lib/xmalloc.c:53 lib/xmalloc.c:66 lib/xmalloc.c:78
-#: src/readelf.c:3282 src/readelf.c:3669 src/readelf.c:8416
-#: src/unstrip.c:2233 src/unstrip.c:2438
+#: lib/xmalloc.c:53 lib/xmalloc.c:66 lib/xmalloc.c:78 src/readelf.c:3282
+#: src/readelf.c:3669 src/readelf.c:8416 src/unstrip.c:2233 src/unstrip.c:2438
 #, c-format
 msgid "memory exhausted"
 msgstr "pamięć wyczerpana"
@@ -74,7 +73,6 @@ msgstr "nieprawidłowy parametr"
 msgid "cannot change mode of output file"
 msgstr "nie można zmienić trybu pliku wyjściowego"
 
-#. Something went wrong.
 #: libasm/asm_error.c:70 src/ldgeneric.c:6990
 #, c-format
 msgid "cannot rename output file"
@@ -137,8 +135,7 @@ msgstr "nie można uzyskać nagłówka ELF"
 msgid "not implemented"
 msgstr "niezaimplementowane"
 
-#: libdw/dwarf_error.c:70 libelf/elf_error.c:107
-#: libelf/elf_error.c:155
+#: libdw/dwarf_error.c:70 libelf/elf_error.c:107 libelf/elf_error.c:155
 msgid "invalid command"
 msgstr "nieprawidłowe polecenie"
 
@@ -294,7 +291,6 @@ msgstr "dopuszczalna jest tylko jedna z opcji -e, -p, -k, -K lub --core"
 msgid "cannot load kernel symbols"
 msgstr "nie można wczytać symboli jądra"
 
-#. Non-fatal to have no modules since we do have the kernel.
 #: libdwfl/argp-std.c:234
 msgid "cannot find kernel modules"
 msgstr "nie można odnaleźć modułów jądra"
@@ -529,7 +525,6 @@ msgstr " Parametry: "
 msgid "    Build ID: "
 msgstr "    Identyfikator kopii: "
 
-#. A non-null terminated version string.
 #: libebl/eblobjnote.c:151
 #, c-format
 msgid "    Linker version: %.*s\n"
@@ -780,12 +775,11 @@ msgstr ""
 msgid "Print all information on one line, and indent inlines"
 msgstr "Wyświetla wszystkie informacje w jednym wierszy i wyrównuje wstawki"
 
-#: src/addr2line.c:79 src/elfcmp.c:72 src/findtextrel.c:67
-#: src/nm.c:100 src/strings.c:79
+#: src/addr2line.c:79 src/elfcmp.c:72 src/findtextrel.c:67 src/nm.c:100
+#: src/strings.c:79
 msgid "Miscellaneous:"
 msgstr "Różne:"
 
-#. Short description of program.
 #: src/addr2line.c:87
 msgid ""
 "Locate source files and line information for ADDRs (in a.out by default)."
@@ -793,15 +787,13 @@ msgstr ""
 "Odnajdywanie plików źródłowych i informacji o wierszu dla ADRESU (domyślne w "
 "a.out)."
 
-#. Strings for arguments in help texts.
 #: src/addr2line.c:91
 msgid "[ADDR...]"
 msgstr "[ADRES…]"
 
-#: src/addr2line.c:216 src/ar.c:285 src/elfcmp.c:672
-#: src/elflint.c:235 src/findtextrel.c:162 src/ld.c:943
-#: src/nm.c:262 src/objdump.c:177 src/ranlib.c:124
-#: src/readelf.c:509 src/size.c:207 src/strings.c:230
+#: src/addr2line.c:216 src/ar.c:285 src/elfcmp.c:672 src/elflint.c:235
+#: src/findtextrel.c:162 src/ld.c:943 src/nm.c:262 src/objdump.c:177
+#: src/ranlib.c:124 src/readelf.c:509 src/size.c:207 src/strings.c:230
 #: src/strip.c:218 src/unstrip.c:232
 #, c-format
 msgid ""
@@ -815,10 +807,9 @@ msgstr ""
 "BEZ JAKIEJKOLWIEK GWARANCJI, nawet domyślnej gwarancji PRZYDATNOŚCI\n"
 "HANDLOWEJ albo PRZYDATNOŚCI DO OKREŚLONYCH ZASTOSOWAŃ.\n"
 
-#: src/addr2line.c:221 src/ar.c:290 src/elfcmp.c:677
-#: src/elflint.c:240 src/findtextrel.c:167 src/ld.c:948
-#: src/nm.c:267 src/objdump.c:182 src/ranlib.c:129
-#: src/readelf.c:514 src/size.c:212 src/strings.c:235
+#: src/addr2line.c:221 src/ar.c:290 src/elfcmp.c:677 src/elflint.c:240
+#: src/findtextrel.c:167 src/ld.c:948 src/nm.c:267 src/objdump.c:182
+#: src/ranlib.c:129 src/readelf.c:514 src/size.c:212 src/strings.c:235
 #: src/strip.c:223 src/unstrip.c:237
 #, c-format
 msgid "Written by %s.\n"
@@ -928,12 +919,10 @@ msgstr "Używa pełnej ścieżki do dopasowywania plików."
 msgid "Update only older files in archive."
 msgstr "Aktualizuje tylko starsze pliki w archiwum."
 
-#. Short description of program.
 #: src/ar.c:99
 msgid "Create, modify, and extract from archives."
 msgstr "Tworzenie, modyfikowanie i wypakowywanie archiwów."
 
-#. Strings for arguments in help texts.
 #: src/ar.c:102
 msgid "[MEMBER] [COUNT] ARCHIVE [FILE...]"
 msgstr "[ELEMENT] [LICZNIK] ARCHIWUM [PLIK…]"
@@ -1106,7 +1095,6 @@ msgstr "Używa prawdziwe UID, GID i datę w elementach archiwum."
 msgid "%s (default)"
 msgstr "%s (domyślnie)"
 
-#. The archive is too big.
 #: src/arlib.c:209
 #, c-format
 msgid "the archive '%s' is too large"
@@ -1145,12 +1133,10 @@ msgstr "Ignorowanie różnic w identyfikatorze kopii"
 msgid "Output nothing; yield exit status only"
 msgstr "Bez wypisywania; przekazanie tylko kodu wyjścia"
 
-#. Short description of program.
 #: src/elfcmp.c:77
 msgid "Compare relevant parts of two ELF files for equality."
 msgstr "Porównywanie odpowiednich części dwóch plików ELF pod kątem równości."
 
-#. Strings for arguments in help texts.
 #: src/elfcmp.c:81
 msgid "FILE1 FILE2"
 msgstr "PLIK1 PLIK2"
@@ -1300,9 +1286,9 @@ msgid "Invalid value '%s' for --gaps parameter."
 msgstr "Nieprawidłowa wartość „%s” dla parametru --gaps."
 
 #: src/elfcmp.c:732 src/findtextrel.c:221 src/ldgeneric.c:1757
-#: src/ldgeneric.c:4247 src/nm.c:378 src/ranlib.c:157
-#: src/size.c:289 src/strings.c:186 src/strip.c:466 src/strip.c:503
-#: src/unstrip.c:2029 src/unstrip.c:2058
+#: src/ldgeneric.c:4247 src/nm.c:378 src/ranlib.c:157 src/size.c:289
+#: src/strings.c:186 src/strip.c:466 src/strip.c:503 src/unstrip.c:2029
+#: src/unstrip.c:2058
 #, c-format
 msgid "cannot open '%s'"
 msgstr "nie można otworzyć „%s”"
@@ -1352,13 +1338,11 @@ msgstr ""
 "Plik binarny został utworzony przez program GNU ld, przez co jest uszkodzony "
 "w pewien sposób"
 
-#. Short description of program.
 #: src/elflint.c:74
 msgid "Pedantic checking of ELF files compliance with gABI/psABI spec."
 msgstr ""
 "Szczegółowe sprawdzanie zgodności plików ELF ze specyfikacją gABI/psABI."
 
-#. Strings for arguments in help texts.
 #: src/elflint.c:78 src/readelf.c:126
 msgid "FILE..."
 msgstr "PLIK…"
@@ -1391,7 +1375,6 @@ msgstr "Brak nazwy pliku.\n"
 msgid " error while freeing sub-ELF descriptor: %s\n"
 msgstr " błąd podczas zwalniania deskryptora pod-ELF: %s\n"
 
-#. We cannot do anything.
 #: src/elflint.c:306
 #, c-format
 msgid "Not an ELF file - it has the wrong magic bytes at the start\n"
@@ -1528,10 +1511,9 @@ msgid ""
 msgstr ""
 "sekcja [%2d] „%s”: grupa sekcji [%2zu] „%s” nie poprzedza elementu grupy\n"
 
-#: src/elflint.c:591 src/elflint.c:1475 src/elflint.c:1526
-#: src/elflint.c:1632 src/elflint.c:1968 src/elflint.c:2284
-#: src/elflint.c:2898 src/elflint.c:3061 src/elflint.c:3209
-#: src/elflint.c:3399 src/elflint.c:4366
+#: src/elflint.c:591 src/elflint.c:1475 src/elflint.c:1526 src/elflint.c:1632
+#: src/elflint.c:1968 src/elflint.c:2284 src/elflint.c:2898 src/elflint.c:3061
+#: src/elflint.c:3209 src/elflint.c:3399 src/elflint.c:4366
 #, c-format
 msgid "section [%2d] '%s': cannot get section data\n"
 msgstr "sekcja [%2d] „%s”: nie można uzyskać danych sekcji\n"
@@ -1564,8 +1546,8 @@ msgstr "sekcja [%2u] „%s”: rozmiar wpisu nie zgadza się z ElfXX_Sym\n"
 msgid "section [%2d] '%s': cannot get symbol %d: %s\n"
 msgstr "sekcja [%2d] „%s”: nie można uzyskać symbolu %d: %s\n"
 
-#: src/elflint.c:653 src/elflint.c:656 src/elflint.c:659
-#: src/elflint.c:662 src/elflint.c:665 src/elflint.c:668
+#: src/elflint.c:653 src/elflint.c:656 src/elflint.c:659 src/elflint.c:662
+#: src/elflint.c:665 src/elflint.c:668
 #, c-format
 msgid "section [%2d] '%s': '%s' in zeroth entry not zero\n"
 msgstr "sekcja [%2d] „%s”: „%s” w zerowym wpisie nie jest zerem\n"
@@ -1603,7 +1585,6 @@ msgstr ""
 "sekcja [%2d] „%s”: symbol %zu: XINDEX użyty dla indeksu, który zmieściłby "
 "się w st_shndx (%<PRIu32>)\n"
 
-#. || sym->st_shndx > SHN_HIRESERVE  always false
 #: src/elflint.c:723
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: invalid section index\n"
@@ -1742,9 +1723,6 @@ msgstr ""
 "sekcja [%2d] „%s”: symbol _GLOBAL_OFFSET_TABLE_ odnosi się do sekcji [%2d] "
 "„%s”\n"
 
-#. This test is more strict than the psABIs which
-#. usually allow the symbol to be in the middle of
-#. the .got section, allowing negative offsets.
 #: src/elflint.c:989
 #, c-format
 msgid ""
@@ -2054,8 +2032,7 @@ msgstr ""
 "sekcja [%2d] „%s”: plik nie-DSO oznaczony jako zależność podczas wstępnej "
 "konsolidacji\n"
 
-#: src/elflint.c:1887 src/elflint.c:1891 src/elflint.c:1895
-#: src/elflint.c:1899
+#: src/elflint.c:1887 src/elflint.c:1891 src/elflint.c:1895 src/elflint.c:1899
 #, c-format
 msgid "section [%2d] '%s': %s tag missing in prelinked executable\n"
 msgstr ""
@@ -2707,7 +2684,6 @@ msgid ""
 msgstr ""
 "sekcja [%2d] „%s”: offset %zu: nieprawidłowa długość w podsekcji atrybutów\n"
 
-#. Tag_File
 #: src/elflint.c:3510
 #, c-format
 msgid ""
@@ -3318,12 +3294,10 @@ msgstr "Dołącza ŚCIEŻKĘ do wszystkich nazw plików"
 msgid "Use PATH as root of debuginfo hierarchy"
 msgstr "Używa ŚCIEŻKI jako korzenia dla hierarchii debuginfo"
 
-#. Short description of program.
 #: src/findtextrel.c:72
 msgid "Locate source of text relocations in FILEs (a.out by default)."
 msgstr "Odnajduje źródło relokacji tekstu w PLIKACH (domyślnie a.out)."
 
-#. Strings for arguments in help texts.
 #: src/findtextrel.c:76 src/nm.c:108 src/objdump.c:71 src/size.c:83
 #: src/strings.c:88 src/strip.c:95
 msgid "[FILE...]"
@@ -3677,12 +3651,10 @@ msgstr "Odczytuje informacje o wersji z PLIKU."
 msgid "Set emulation to NAME."
 msgstr "Ustawia emulację na NAZWĘ."
 
-#. Short description of program.
 #: src/ld.c:188
 msgid "Combine object and archive files."
 msgstr "Łączy pliki obiektów i archiwów."
 
-#. Strings for arguments in help texts.
 #: src/ld.c:191
 msgid "[FILE]..."
 msgstr "[PLIK]…"
@@ -3778,8 +3750,6 @@ msgstr "proszę spróbować jeszcze raz z odpowiednim parametrem „-m”"
 msgid "cannot read version script '%s'"
 msgstr "nie można odczytać skryptu wersji „%s”"
 
-#. The symbol is already defined and now again
-#. in the linker script.  This is an error.
 #: src/ld.c:1500 src/ld.c:1539
 #, c-format
 msgid "duplicate definition of '%s' in linker script"
@@ -3826,8 +3796,8 @@ msgid "Warning: size of `%s' changed from %<PRIu64> in %s to %<PRIu64> in %s"
 msgstr ""
 "Ostrzeżenie: rozmiar „%s” zmienił się z %<PRIu64> w %s na %<PRIu64> w %s"
 
-#: src/ldgeneric.c:651 src/ldgeneric.c:1112 src/readelf.c:536
-#: src/readelf.c:852 src/strip.c:589
+#: src/ldgeneric.c:651 src/ldgeneric.c:1112 src/readelf.c:536 src/readelf.c:852
+#: src/strip.c:589
 #, c-format
 msgid "cannot determine number of sections: %s"
 msgstr "nie można określić liczby sekcji: %s"
@@ -3847,9 +3817,6 @@ msgstr "(%s+%#<PRIx64>): pierwszy raz określono tutaj\n"
 msgid "%s: cannot get section group data: %s"
 msgstr "%s: nie można uzyskać danych grupy sekcji: %s"
 
-#. If we come here no section group contained the given section
-#. despite the SHF_GROUP flag.  This is an error in the input
-#. file.
 #: src/ldgeneric.c:830
 #, c-format
 msgid "%s: section '%s' with group flag set does not belong to any group"
@@ -3860,7 +3827,6 @@ msgstr "%s: sekcja „%s” z ustawioną flagą grupy nie należy do żadnej gru
 msgid "%s: section [%2d] '%s' is not in the correct section group"
 msgstr "%s: sekcja [%2d] „%s” nie jest w poprawnej grupie sekcji"
 
-#. This should never happen.
 #: src/ldgeneric.c:1146 src/ldgeneric.c:1403 src/ldgeneric.c:1412
 #: src/ldgeneric.c:1471 src/ldgeneric.c:1480 src/ldgeneric.c:1743
 #: src/ldgeneric.c:1995
@@ -3932,9 +3898,6 @@ msgstr "nie można użyć DSO „%s” podczas tworzenia relokowalnego pliku obi
 msgid "input file '%s' ignored"
 msgstr "plik wejściowy „%s” został zignorowany"
 
-#. XXX The error message should get better.  It should use
-#. the debugging information if present to tell where in the
-#. sources the undefined reference is.
 #: src/ldgeneric.c:2362
 #, c-format
 msgid "undefined symbol `%s' in %s"
@@ -4104,9 +4067,6 @@ msgstr ""
 "OSTRZEŻENIE: tymczasowy plik wyjściowy został zastąpiony przed ukończeniem "
 "konsolidowania"
 
-#. This cannot be implemented generally.  There should have been a
-#. machine dependent implementation and we should never have arrived
-#. here.
 #: src/ldgeneric.c:7053 src/ldgeneric.c:7064 src/ldgeneric.c:7075
 #: src/ldgeneric.c:7086 src/ldgeneric.c:7105 src/ldgeneric.c:7118
 #: src/ldgeneric.c:7130
@@ -4231,7 +4191,6 @@ msgstr "Odwraca kierunek porządkowania"
 msgid "Decode low-level symbol names into source code names"
 msgstr "Dekoduje niskopoziomowe nazwy symboli na nazwy kodu źródłowego"
 
-#. Short description of program.
 #: src/nm.c:105
 msgid "List symbols from FILEs (a.out by default)."
 msgstr "Wyświetla listę symboli z PLIKU (domyślnie a.out)."
@@ -4245,8 +4204,8 @@ msgstr "Formatowanie wyjścia"
 msgid "%s: INTERNAL ERROR %d (%s): %s"
 msgstr "%s: BŁĄD WEWNĘTRZNY %d (%s): %s"
 
-#: src/nm.c:395 src/nm.c:407 src/size.c:305 src/size.c:314
-#: src/size.c:325 src/strip.c:2280
+#: src/nm.c:395 src/nm.c:407 src/size.c:305 src/size.c:314 src/size.c:325
+#: src/strip.c:2280
 #, c-format
 msgid "while closing '%s'"
 msgstr "podczas zamykania „%s”"
@@ -4256,7 +4215,6 @@ msgstr "podczas zamykania „%s”"
 msgid "%s: File format not recognized"
 msgstr "%s: nie rozpoznano formatu pliku"
 
-#. Note: 0 is no valid offset.
 #: src/nm.c:457
 msgid ""
 "\n"
@@ -4291,18 +4249,15 @@ msgid "cannot create search tree"
 msgstr "nie można utworzyć drzewa wyszukiwania"
 
 #: src/nm.c:760 src/nm.c:1221 src/objdump.c:789 src/readelf.c:545
-#: src/readelf.c:1123 src/readelf.c:1323 src/readelf.c:1471
-#: src/readelf.c:1667 src/readelf.c:1873 src/readelf.c:2063
-#: src/readelf.c:2300 src/readelf.c:2558 src/readelf.c:2634
-#: src/readelf.c:2721 src/readelf.c:3301 src/readelf.c:3347
-#: src/readelf.c:3410 src/readelf.c:8320 src/readelf.c:9420
-#: src/readelf.c:9603 src/readelf.c:9671 src/size.c:413
-#: src/size.c:482 src/strip.c:520
+#: src/readelf.c:1123 src/readelf.c:1323 src/readelf.c:1471 src/readelf.c:1667
+#: src/readelf.c:1873 src/readelf.c:2063 src/readelf.c:2300 src/readelf.c:2558
+#: src/readelf.c:2634 src/readelf.c:2721 src/readelf.c:3301 src/readelf.c:3347
+#: src/readelf.c:3410 src/readelf.c:8320 src/readelf.c:9420 src/readelf.c:9603
+#: src/readelf.c:9671 src/size.c:413 src/size.c:482 src/strip.c:520
 #, c-format
 msgid "cannot get section header string table index"
 msgstr "nie można uzyskać indeksu tabeli ciągów nagłówków sekcji"
 
-#. We always print this prolog.
 #: src/nm.c:787
 #, c-format
 msgid ""
@@ -4316,7 +4271,6 @@ msgstr ""
 "Symbole z %s:\n"
 "\n"
 
-#. The header line.
 #: src/nm.c:790
 #, c-format
 msgid ""
@@ -4336,7 +4290,6 @@ msgstr "%s: rozmiar wpisu w sekcji %zd „%s” nie jest tym, czego oczekiwano"
 msgid "%s: size of section %zd `%s' is not multiple of entry size"
 msgstr "%s: rozmiar sekcji %zd „%s” nie jest wielokrotnością rozmiaru wpisu"
 
-#. XXX Add machine specific object file types.
 #: src/nm.c:1537
 #, c-format
 msgid "%s%s%s%s: Invalid operation"
@@ -4371,7 +4324,6 @@ msgstr "Wybór zawartości wyjścia:"
 msgid "Only display information for section NAME."
 msgstr "Wyświetla tylko informacje o sekcji NAZWA."
 
-#. Short description of program.
 #: src/objdump.c:67
 msgid "Show information from FILEs (a.out by default)."
 msgstr "Wyświetla informacje z PLIKÓW (domyślnie a.out)."
@@ -4418,12 +4370,10 @@ msgstr "Zawartość sekcji %s:\n"
 msgid "cannot disassemble"
 msgstr "nie można deasemblować"
 
-#. Short description of program.
 #: src/ranlib.c:65
 msgid "Generate an index to speed access to archives."
 msgstr "Tworzenie indeksu w celu przyspieszenia dostępu do archiwów."
 
-#. Strings for arguments in help texts.
 #: src/ranlib.c:68
 msgid "ARCHIVE"
 msgstr "ARCHIWUM"
@@ -4560,7 +4510,6 @@ msgstr ""
 "używane z opcją -S); dekompresuje sekcję przed zrzuceniem danych (kiedy jest "
 "używane z opcją -p lub -x)"
 
-#. Short description of program.
 #: src/readelf.c:122
 msgid "Print information from ELF file in human-readable form."
 msgstr "Wyświetla informacje z pliku ELF w postaci czytelnej dla człowieka."
@@ -4580,13 +4529,11 @@ msgstr "nie można utworzyć deskryptora ELF: %s"
 msgid "cannot get section: %s"
 msgstr "nie można uzyskać sekcji: %s"
 
-#: src/readelf.c:563 src/readelf.c:1152 src/readelf.c:1355
-#: src/readelf.c:9623 src/unstrip.c:387 src/unstrip.c:418
-#: src/unstrip.c:467 src/unstrip.c:577 src/unstrip.c:594
-#: src/unstrip.c:631 src/unstrip.c:829 src/unstrip.c:1118
-#: src/unstrip.c:1309 src/unstrip.c:1369 src/unstrip.c:1490
-#: src/unstrip.c:1543 src/unstrip.c:1658 src/unstrip.c:1796
-#: src/unstrip.c:1891
+#: src/readelf.c:563 src/readelf.c:1152 src/readelf.c:1355 src/readelf.c:9623
+#: src/unstrip.c:387 src/unstrip.c:418 src/unstrip.c:467 src/unstrip.c:577
+#: src/unstrip.c:594 src/unstrip.c:631 src/unstrip.c:829 src/unstrip.c:1118
+#: src/unstrip.c:1309 src/unstrip.c:1369 src/unstrip.c:1490 src/unstrip.c:1543
+#: src/unstrip.c:1658 src/unstrip.c:1796 src/unstrip.c:1891
 #, c-format
 msgid "cannot get section header: %s"
 msgstr "nie można uzyskać nagłówka sekcji: %s"
@@ -4596,8 +4543,8 @@ msgstr "nie można uzyskać nagłówka sekcji: %s"
 msgid "cannot get section name"
 msgstr "nie można uzyskać nazwy sekcji"
 
-#: src/readelf.c:580 src/readelf.c:5504 src/readelf.c:7778
-#: src/readelf.c:7880 src/readelf.c:8057
+#: src/readelf.c:580 src/readelf.c:5504 src/readelf.c:7778 src/readelf.c:7880
+#: src/readelf.c:8057
 #, c-format
 msgid "cannot get %s content: %s"
 msgstr "nie można uzyskać zwartości %s: %s"
@@ -4687,7 +4634,6 @@ msgstr "CORE (plik core)"
 msgid "OS Specific: (%x)\n"
 msgstr "Zależny od systemu: (%x)\n"
 
-#. && e_type <= ET_HIPROC always true
 #: src/readelf.c:959
 #, c-format
 msgid "Processor Specific: (%x)\n"
@@ -4815,7 +4761,6 @@ msgstr "  Liczba wpisów nagłówków sekcji:    %<PRId16>"
 msgid " (%<PRIu32> in [0].sh_size)"
 msgstr " (%<PRIu32> w [0].sh_size)"
 
-#. We managed to get the zeroth section.
 #: src/readelf.c:1060
 #, c-format
 msgid " (%<PRIu32> in [0].sh_link)"
@@ -4920,8 +4865,7 @@ msgstr ""
 " Mapowanie sekcji do segmentów:\n"
 "  Segment sekcji…"
 
-#: src/readelf.c:1336 src/unstrip.c:1950 src/unstrip.c:1992
-#: src/unstrip.c:1999
+#: src/readelf.c:1336 src/unstrip.c:1950 src/unstrip.c:1992 src/unstrip.c:1999
 #, c-format
 msgid "cannot get program header: %s"
 msgstr "nie można uzyskać nagłówka programu: %s"
@@ -4974,9 +4918,8 @@ msgstr "<NIEPRAWIDŁOWY SEKCJA>"
 msgid "Couldn't uncompress section"
 msgstr "Nie można dekompresować sekcji"
 
-#: src/readelf.c:1673 src/readelf.c:2306 src/readelf.c:2564
-#: src/readelf.c:2640 src/readelf.c:2944 src/readelf.c:3018
-#: src/readelf.c:4716
+#: src/readelf.c:1673 src/readelf.c:2306 src/readelf.c:2564 src/readelf.c:2640
+#: src/readelf.c:2944 src/readelf.c:3018 src/readelf.c:4716
 #, c-format
 msgid "invalid sh_link value in section %zu"
 msgstr "nieprawidłowa wartość sh_link w sekcji %zu"
@@ -5068,12 +5011,6 @@ msgstr[2] ""
 "Sekcja relokacji [%2zu] „%s” dla sekcji [%2u] „%s” pod offsetem %#0<PRIx64> "
 "zawiera %d wpisów:\n"
 
-#. The .rel.dyn section does not refer to a specific section but
-#. instead of section index zero.  Do not try to print a section
-#. name.
-#. The .rela.dyn section does not refer to a specific section but
-#. instead of section index zero.  Do not try to print a section
-#. name.
 #: src/readelf.c:1891 src/readelf.c:2081
 #, c-format
 msgid ""
@@ -5100,10 +5037,9 @@ msgstr "  Offset      Typ                  Wartość     Nazwa\n"
 msgid "  Offset              Type                 Value               Name\n"
 msgstr "  Offset              Typ                  Wartość             Nazwa\n"
 
-#: src/readelf.c:1956 src/readelf.c:1967 src/readelf.c:1980
-#: src/readelf.c:2001 src/readelf.c:2013 src/readelf.c:2147
-#: src/readelf.c:2159 src/readelf.c:2173 src/readelf.c:2195
-#: src/readelf.c:2208
+#: src/readelf.c:1956 src/readelf.c:1967 src/readelf.c:1980 src/readelf.c:2001
+#: src/readelf.c:2013 src/readelf.c:2147 src/readelf.c:2159 src/readelf.c:2173
+#: src/readelf.c:2195 src/readelf.c:2208
 msgid "<INVALID RELOC>"
 msgstr "<NIEPRAWIDŁOWA RELOKACJA>"
 
@@ -5241,7 +5177,6 @@ msgstr ""
 msgid "  %#06x: Parent %d: %s\n"
 msgstr "  %#06x: Rodzic %d: %s\n"
 
-#. Print the header.
 #: src/readelf.c:2948
 #, c-format
 msgid ""
@@ -5407,13 +5342,11 @@ msgstr "  Właściciel          Rozmiar\n"
 msgid "  %-13s  %4<PRIu32>\n"
 msgstr "  %-13s  %4<PRIu32>\n"
 
-#. Unknown subsection, print and skip.
 #: src/readelf.c:3507
 #, c-format
 msgid "    %-4u %12<PRIu32>\n"
 msgstr "    %-4u %12<PRIu32>\n"
 
-#. Tag_File
 #: src/readelf.c:3512
 #, c-format
 msgid "    File: %11<PRIu32>\n"
@@ -5607,9 +5540,8 @@ msgstr ""
 " [%*zu] początek: %0#*<PRIx64>, długość: %5<PRIu64>, offset CU DIE: "
 "%6<PRId64>\n"
 
-#: src/readelf.c:4784 src/readelf.c:4938 src/readelf.c:5514
-#: src/readelf.c:6468 src/readelf.c:7000 src/readelf.c:7120
-#: src/readelf.c:7284 src/readelf.c:7709
+#: src/readelf.c:4784 src/readelf.c:4938 src/readelf.c:5514 src/readelf.c:6468
+#: src/readelf.c:7000 src/readelf.c:7120 src/readelf.c:7284 src/readelf.c:7709
 #, c-format
 msgid ""
 "\n"
@@ -5715,8 +5647,6 @@ msgstr " [%6tx]  adres podstawowy %s\n"
 msgid " [%6tx]  empty list\n"
 msgstr " [%6tx]  pusta lista\n"
 
-#. We have an address range entry.
-#. First address range entry in a list.
 #: src/readelf.c:5003
 #, c-format
 msgid " [%6tx]  %s..%s\n"
@@ -5874,7 +5804,6 @@ msgstr ""
 msgid "cannot get line data section data: %s"
 msgstr "nie można uzyskać danych sekcji danych wiersza: %s"
 
-#. Print what we got so far.
 #: src/readelf.c:6551
 #, c-format
 msgid ""
@@ -5985,12 +5914,10 @@ msgstr ""
 msgid " set discriminator to %u\n"
 msgstr " ustawienie dyskryminatora na %u\n"
 
-#. Unknown, ignore it.
 #: src/readelf.c:6827
 msgid " unknown opcode"
 msgstr " nieznana instrukcja"
 
-#. Takes no argument.
 #: src/readelf.c:6839
 msgid " copy"
 msgstr " kopiowanie"
@@ -6025,7 +5952,6 @@ msgstr " ustawienie kolumny na %<PRIu64>\n"
 msgid " set '%s' to %<PRIuFAST8>\n"
 msgstr " ustawienie „%s” na %<PRIuFAST8>\n"
 
-#. Takes no argument.
 #: src/readelf.c:6896
 msgid " set basic block flag"
 msgstr " ustawienie podstawowej flagi bloku"
@@ -6045,12 +5971,10 @@ msgstr " zwiększenie adresu o stałą %u do %s\n"
 msgid " advance address by fixed value %u to %s\n"
 msgstr " zwiększenie adresu o stałą wartość %u do %s\n"
 
-#. Takes no argument.
 #: src/readelf.c:6940
 msgid " set prologue end flag"
 msgstr " ustawienie flagi końca prologu"
 
-#. Takes no argument.
 #: src/readelf.c:6945
 msgid " set epilogue begin flag"
 msgstr " ustawienie flagi początku epilogu"
@@ -6060,9 +5984,6 @@ msgstr " ustawienie flagi początku epilogu"
 msgid " set isa to %u\n"
 msgstr " ustawienie isa na %u\n"
 
-#. This is a new opcode the generator but not we know about.
-#. Read the parameters associated with it but then discard
-#. everything.  Read all the parameters for this opcode.
 #: src/readelf.c:6963
 #, c-format
 msgid " unknown opcode with %<PRIu8> parameter:"
@@ -6076,7 +5997,6 @@ msgstr[2] " nieznana instrukcja z %<PRIu8> parametrami:"
 msgid "cannot get .debug_loc content: %s"
 msgstr "nie można uzyskać zawartości .debug_log: %s"
 
-#. First entry in a list.
 #: src/readelf.c:7070
 #, c-format
 msgid " [%6tx]  %s..%s"
@@ -6321,8 +6241,7 @@ msgstr ""
 msgid "cannot get debug context descriptor: %s"
 msgstr "nie można uzyskać deskryptora kontekstu debugowania: %s"
 
-#: src/readelf.c:8467 src/readelf.c:9089 src/readelf.c:9200
-#: src/readelf.c:9258
+#: src/readelf.c:8467 src/readelf.c:9089 src/readelf.c:9200 src/readelf.c:9258
 #, c-format
 msgid "cannot convert core note data: %s"
 msgstr "nie można konwertować danych notatki core: %s"
@@ -6523,7 +6442,6 @@ msgstr "Wyświetla rozmiar i flagi uprawnień dla segmentów wczytywalnych"
 msgid "Display the total sizes (bsd only)"
 msgstr "Wyświetla całkowite rozmiary (tylko bsd)"
 
-#. Short description of program.
 #: src/size.c:79
 msgid "List section sizes of FILEs (a.out by default)."
 msgstr "Wyświetla listę rozmiarów sekcji PLIKU (domyślnie a.out)."
@@ -6716,7 +6634,6 @@ msgstr "Wyświetla położenie ciągu z podstawą odpowiednio 8, 10 lub 16."
 msgid "Alias for --radix=o"
 msgstr "Alias dla --radix=o"
 
-#. Short description of program.
 #: src/strings.c:84
 msgid "Print the strings of printable characters in files."
 msgstr "Wyświetla ciągi znaków drukowalnych w plikach."
@@ -6793,7 +6710,6 @@ msgstr "Usuwa sekcję .comment"
 msgid "Relax a few rules to handle slightly broken ELF files"
 msgstr "Łagodzi kilka reguł, aby obsłużyć lekko uszkodzone pliki ELF"
 
-#. Short description of program.
 #: src/strip.c:92
 msgid "Discard symbols from object files."
 msgstr "Odrzuca symbole z plików obiektów."
@@ -6843,12 +6759,6 @@ msgstr "podczas otwierania „%s”"
 msgid "%s: cannot use -o or -f when stripping archive"
 msgstr "%s: nie można używać -o lub -f podczas okrajania archiwum"
 
-#. We would like to support ar archives, but currently it just
-#. doesn't work at all since we call elf_clone on the members
-#. which doesn't really support ar members.
-#. result = handle_ar (fd, elf, NULL, fname,
-#. preserve_dates ? tv : NULL);
-#.
 #: src/strip.c:384
 #, c-format
 msgid "%s: no support for stripping archive"
@@ -7068,9 +6978,8 @@ msgstr "nie można utworzyć katalogu „%s”"
 msgid "cannot get symbol table entry: %s"
 msgstr "nie można uzyskać wpisu tabeli symboli: %s"
 
-#: src/unstrip.c:399 src/unstrip.c:620 src/unstrip.c:641
-#: src/unstrip.c:653 src/unstrip.c:1631 src/unstrip.c:1805
-#: src/unstrip.c:1829
+#: src/unstrip.c:399 src/unstrip.c:620 src/unstrip.c:641 src/unstrip.c:653
+#: src/unstrip.c:1631 src/unstrip.c:1805 src/unstrip.c:1829
 #, c-format
 msgid "cannot update symbol table: %s"
 msgstr "nie można zaktualizować tabeli symboli: %s"
@@ -7125,8 +7034,7 @@ msgstr "przepełnienie z shnum = %zu w sekcji „%s”"
 msgid "cannot find matching section for [%zu] '%s'"
 msgstr "nie można odnaleźć pasującej sekcji dla [%zu] „%s”"
 
-#: src/unstrip.c:1233 src/unstrip.c:1248 src/unstrip.c:1514
-#: src/unstrip.c:1766
+#: src/unstrip.c:1233 src/unstrip.c:1248 src/unstrip.c:1514 src/unstrip.c:1766
 #, c-format
 msgid "cannot add section name to string table: %s"
 msgstr "nie można nazwy sekcji do tabeli ciągów: %s"
@@ -7203,8 +7111,7 @@ msgstr ""
 "Dane DWARF w „%s” nie zostały dostosowane do przesunięcia wczesnego "
 "konsolidowania; proszę rozważyć polecenie prelink -u"
 
-#: src/unstrip.c:2031 src/unstrip.c:2082 src/unstrip.c:2094
-#: src/unstrip.c:2180
+#: src/unstrip.c:2031 src/unstrip.c:2082 src/unstrip.c:2094 src/unstrip.c:2180
 #, c-format
 msgid "cannot create ELF descriptor: %s"
 msgstr "nie można utworzyć deskryptora ELF: %s"

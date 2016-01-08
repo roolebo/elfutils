@@ -1,3 +1,20 @@
+Version 0.165
+
+elfcompress: New utility to compress or decompress ELF sections.
+
+readelf: Add -z,--decompress option.
+
+libelf: Add elf_compress, elf_compress_gnu, elf32_getchdr, elf64_getchdr
+        and gelf_getchdr.
+
+libdwelf: New function dwelf_scn_gnu_compressed_size.
+
+config: Add libelf and libdw pkg-config files.
+
+backends: sparc support for core and live backtraces.
+
+translations: Updated Polish translation.
+
 Version 0.164
 
 strip, unstrip: Handle ELF files with merged strtab/shstrtab tables.

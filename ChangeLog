@@ -1,3 +1,8 @@
+2016-01-08  Mark Wielaard  <mjw@redhat.com>
+
+	* configure.ac: Set version to 0.165.
+	* NEWS: Add 0.164 section.
+
 2016-01-04  Mark Wielaard  <mjw@redhat.com>
 
 	* configure.ac: Add BZ2_LIBS and LIBLZMA substitutions.

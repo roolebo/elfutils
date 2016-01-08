@@ -31,13 +31,15 @@ BuildRequires: gcc-c++
 %define _programprefix eu-
 
 %description
-Elfutils is a collection of utilities, including ld (a linker),
-nm (for listing symbols from object files), size (for listing the
-section sizes of an object or archive file), strip (for discarding
-symbols), readelf (to see the raw ELF file structures), and elflint
-(to check for well-formed ELF files).  Also included are numerous
-helper libraries which implement DWARF, ELF, and machine-specific ELF
-handling.
+
+Elfutils is a collection of utilities, including stack (to show
+backtraces), nm (for listing symbols from object files), size
+(for listing the section sizes of an object or archive file),
+strip (for discarding symbols), readelf (to see the raw ELF file
+structures), elflint (to check for well-formed ELF files) and
+elfcompress (to compress or decompress ELF sections).
+Also included are helper libraries which implement DWARF, ELF,
+and machine-specific ELF handling and process introspection.
 
 %package devel
 Summary: Development libraries to handle compiled objects.
@@ -175,6 +177,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_bindir}/eu-unstrip
 %{_bindir}/eu-make-debug-archive
 #%{_bindir}/eu-ld
+%{_bindir}/eu-elfcompress
 %{_libdir}/libasm-%{version}.so
 %{_libdir}/libdw-%{version}.so
 %{_libdir}/libasm.so.*
@@ -225,6 +228,16 @@ rm -rf ${RPM_BUILD_ROOT}
 %config(noreplace) %{_sysctldir}/10-default-yama-scope.conf
 
 %changelog
+* Fri Jan  8 2016 Mark Wielaard <mjw@redhat.com> 0.165-1
+- elfcompress: New utility to compress or decompress ELF sections.
+- readelf: Add -z,--decompress option.
+- libelf: Add elf_compress, elf_compress_gnu, elf32_getchdr,
+  elf64_getchdr and gelf_getchdr.
+- libdwelf: New function dwelf_scn_gnu_compressed_size.
+- config: Add libelf and libdw pkg-config files.
+- backends: sparc support for core and live backtraces.
+- translations: Updated Polish translation.
+
 * Thu Oct 15 2015 Mark Wielaard <mjw@redhat.com> 0.164-1
 - strip, unstrip: Handle ELF files with merged strtab/shstrtab
   tables. Handle missing SHF_INFO_LINK section flags.

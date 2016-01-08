@@ -1,5 +1,9 @@
 2016-01-08  Mark Wielaard  <mjw@redhat.com>
 
+	* elfputzdata.c (main): Fix parentheses in strncmp test.
+
+2016-01-08  Mark Wielaard  <mjw@redhat.com>
+
 	* elfputzdata.c (main): Use PRId64 to print 64 bit value.
 
 2016-01-08  Mark Wielaard  <mjw@redhat.com>

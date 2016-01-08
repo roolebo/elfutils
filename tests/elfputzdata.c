@@ -83,7 +83,7 @@ main (int argc, char *argv[])
 	      printf ("Cannot compress %zd %s\n", idx, name);
 	    }
 	  else if ((shdr->sh_flags & SHF_COMPRESSED) != 0
-		   || strncmp (name, ".zdebug", strlen (".zdebug") == 0))
+		   || strncmp (name, ".zdebug", strlen (".zdebug")) == 0)
 	    {
 	      printf ("Already compressed %zd %s\n", idx, name);
 	    }

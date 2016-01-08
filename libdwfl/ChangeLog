@@ -1,3 +1,12 @@
+2016-01-08  Mark Wielaard  <mjw@redhat.com>
+
+	* libdwfl_a_SOURCES: Unconditionally add gzip.c.
+	* linux-kernel-modules.c (vmlinux_suffixes): We always have at least
+	.gz support.
+	(try_kernel_name): Likewise.
+	(check_suffix): Likewise.
+	* open.c (decompress): Likewise.
+
 2015-12-18  Mark Wielaard  <mjw@redhat.com>
 
 	* dwfl_module_getdwarf.c (find_symtab): Uncompress symstr, xndx, sym

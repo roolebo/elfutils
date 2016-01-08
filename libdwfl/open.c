@@ -1,5 +1,5 @@
-/* Decompression support for libdwfl: zlib (gzip) and/or bzlib (bzip2).
-   Copyright (C) 2009 Red Hat, Inc.
+/* Decompression support for libdwfl: zlib (gzip), bzlib (bzip2) or lzma (xz).
+   Copyright (C) 2009, 2016 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -32,10 +32,6 @@
 
 #include <unistd.h>
 
-#if !USE_ZLIB
-# define __libdw_gunzip(...)	DWFL_E_BADELF
-#endif
-
 #if !USE_BZLIB
 # define __libdw_bunzip2(...)	DWFL_E_BADELF
 #endif
@@ -52,7 +48,6 @@ decompress (int fd __attribute__ ((unused)), Elf **elf)
   void *buffer = NULL;
   size_t size = 0;
 
-#if USE_ZLIB || USE_BZLIB || USE_LZMA
   const off_t offset = (*elf)->start_offset;
   void *const mapped = ((*elf)->map_address == NULL ? NULL
 			: (*elf)->map_address + offset);
@@ -65,7 +60,6 @@ decompress (int fd __attribute__ ((unused)), Elf **elf)
     error = __libdw_bunzip2 (fd, offset, mapped, mapped_size, &buffer, &size);
   if (error == DWFL_E_BADELF)
     error = __libdw_unlzma (fd, offset, mapped, mapped_size, &buffer, &size);
-#endif
 
   if (error == DWFL_E_NOERROR)
     {

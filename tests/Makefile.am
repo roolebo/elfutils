@@ -124,7 +124,8 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	elfshphehdr run-lfs-symbols.sh run-dwelfgnucompressed.sh \
 	run-elfgetchdr.sh \
 	run-elfgetzdata.sh run-elfputzdata.sh run-zstrptr.sh \
-	run-compress-test.sh
+	run-compress-test.sh \
+	run-readelf-zdebug.sh run-readelf-zdebug-rel.sh
 
 if !BIARCH
 export ELFUTILS_DISABLE_BIARCH = 1
@@ -141,10 +142,6 @@ endif
 
 if LZMA
 TESTS += run-readelf-s.sh run-dwflsyms.sh
-endif
-
-if ZLIB
-TESTS += run-readelf-zdebug.sh run-readelf-zdebug-rel.sh
 endif
 
 if HAVE_LIBASM

@@ -68,11 +68,9 @@ libdwfl_a_SOURCES = dwfl_begin.c dwfl_end.c dwfl_error.c dwfl_version.c \
 		    dwfl_segment_report_module.c \
 		    link_map.c core-file.c open.c image-header.c \
 		    dwfl_frame.c frame_unwind.c dwfl_frame_pc.c \
-		    linux-pid-attach.c linux-core-attach.c dwfl_frame_regs.c
+		    linux-pid-attach.c linux-core-attach.c dwfl_frame_regs.c \
+		    gzip.c
 
-if ZLIB
-libdwfl_a_SOURCES += gzip.c
-endif
 if BZLIB
 libdwfl_a_SOURCES += bzip2.c
 endif

@@ -1217,7 +1217,7 @@ There are %d section headers, starting at offset %#" PRIx64 ":\n\
 	    {
 	      ssize_t size;
 	      if ((size = dwelf_scn_gnu_compressed_size (scn)) >= 0)
-		printf ("     [GNU ZLIB     %0*" PRIx64 "   ]\n",
+		printf ("     [GNU ZLIB     %0*zx   ]\n",
 			ehdr->e_ident[EI_CLASS] == ELFCLASS32 ? 6 : 8, size);
 	      else
 		error (0, 0,

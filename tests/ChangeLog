@@ -1,5 +1,9 @@
 2016-01-08  Mark Wielaard  <mjw@redhat.com>
 
+	* elfputzdata.c (main): Use PRId64 to print 64 bit value.
+
+2016-01-08  Mark Wielaard  <mjw@redhat.com>
+
 	* Makefile.am (TESTS): Always unconditionally add
 	run-readelf-zdebug.sh and run-readelf-zdebug-rel.sh.
 

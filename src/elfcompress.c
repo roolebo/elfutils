@@ -237,7 +237,7 @@ compress_section (Elf_Scn *scn, size_t orig_size, const char *name,
 	    }
 	  float new = shdr->sh_size;
 	  float orig = orig_size ?: 1;
-	  printf (" (%" PRIu64 " => %" PRIu64 " %.2f%%)\n",
+	  printf (" (%zu => %" PRIu64 " %.2f%%)\n",
 		  orig_size, shdr->sh_size, (new / orig) * 100);
 	}
     }

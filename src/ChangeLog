@@ -1,3 +1,8 @@
+2016-01-08  Mark Wielaard  <mjw@redhat.com>
+
+	* elfcompress.c (compress_section): Use %zu to print size_t.
+	* readelf.c (print_shdr): Use %zx to print size_t.
+
 2015-12-16  Mark Wielaard  <mjw@redhat.com>
 
 	* elfcompress.c: New file.

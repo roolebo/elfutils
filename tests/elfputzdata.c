@@ -90,7 +90,7 @@ main (int argc, char *argv[])
 	  else
 	    {
 	      size_t orig_size = shdr->sh_size;
-	      printf ("Lets compress %zd %s, size: %zd\n",
+	      printf ("Lets compress %zd %s, size: %" PRId64 "\n",
 		      idx, name, shdr->sh_size);
 	      Elf_Data *d = elf_getdata (scn, NULL);
 	      if (d == NULL)

@@ -1,3 +1,8 @@
+2016-01-09  Mark Wielaard  <mjw@redhat.com>
+
+	* eblobjnote.c (ebl_object_note): Add brackets around if statement
+	body.
+
 2015-12-18  Mark Wielaard  <mjw@redhat.com>
 
 	* eblopenbackend.c (default_debugscn_p): Also match .zdebug sections.

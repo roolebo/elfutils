@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2016-01-08 14:06+0100\n"
+"POT-Creation-Date: 2016-01-11 08:48+0100\n"
 "PO-Revision-Date: 2015-09-26 16:41+0300\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <kde-i18n-uk@kde.org>\n"
@@ -484,57 +484,57 @@ msgstr "<невідомо>"
 msgid "<unknown>: %#<PRIx64>"
 msgstr "<невідомо>: %#<PRIx64>"
 
-#: libebl/eblobjnote.c:52
+#: libebl/eblobjnote.c:53
 #, c-format
 msgid "unknown SDT version %u\n"
 msgstr "невідома версія SDT, %u\n"
 
-#: libebl/eblobjnote.c:70
+#: libebl/eblobjnote.c:71
 #, c-format
 msgid "invalid SDT probe descriptor\n"
 msgstr "некоректний дескриптор зондування SDT\n"
 
-#: libebl/eblobjnote.c:120
+#: libebl/eblobjnote.c:121
 #, c-format
 msgid "    PC: "
 msgstr "    PC: "
 
-#: libebl/eblobjnote.c:122
+#: libebl/eblobjnote.c:123
 #, c-format
 msgid " Base: "
 msgstr "Основа: "
 
-#: libebl/eblobjnote.c:124
+#: libebl/eblobjnote.c:125
 #, c-format
 msgid " Semaphore: "
 msgstr " Семафор:   "
 
-#: libebl/eblobjnote.c:126
+#: libebl/eblobjnote.c:127
 #, c-format
 msgid "    Provider: "
 msgstr " Постачальник: "
 
-#: libebl/eblobjnote.c:128
+#: libebl/eblobjnote.c:129
 #, c-format
 msgid " Name: "
 msgstr "Назва: "
 
-#: libebl/eblobjnote.c:130
+#: libebl/eblobjnote.c:131
 #, c-format
 msgid " Args: "
 msgstr " Арг.: "
 
-#: libebl/eblobjnote.c:140
+#: libebl/eblobjnote.c:141
 #, c-format
 msgid "    Build ID: "
 msgstr "    Ід. збирання: "
 
-#: libebl/eblobjnote.c:151
+#: libebl/eblobjnote.c:152
 #, c-format
 msgid "    Linker version: %.*s\n"
 msgstr "    Версія компонувальника: %.*s\n"
 
-#: libebl/eblobjnote.c:212
+#: libebl/eblobjnote.c:213
 #, c-format
 msgid "    OS: %s, ABI: "
 msgstr "    ОС: %s, ABI: "

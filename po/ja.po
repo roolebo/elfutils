@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ja\n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2016-01-08 14:06+0100\n"
+"POT-Creation-Date: 2016-01-11 08:48+0100\n"
 "PO-Revision-Date: 2009-09-20 15:32+0900\n"
 "Last-Translator: Hyu_gabaru Ryu_ichi <hyu_gabaru@yahoo.co.jp>\n"
 "Language-Team: Japanese <jp@li.org>\n"
@@ -488,57 +488,57 @@ msgstr "<不明>"
 msgid "<unknown>: %#<PRIx64>"
 msgstr "<不明>: %#<PRIx64>"
 
-#: libebl/eblobjnote.c:52
+#: libebl/eblobjnote.c:53
 #, fuzzy, c-format
 msgid "unknown SDT version %u\n"
 msgstr "不明なバージョン"
 
-#: libebl/eblobjnote.c:70
+#: libebl/eblobjnote.c:71
 #, fuzzy, c-format
 msgid "invalid SDT probe descriptor\n"
 msgstr "不当なファイル記述子"
 
-#: libebl/eblobjnote.c:120
+#: libebl/eblobjnote.c:121
 #, c-format
 msgid "    PC: "
 msgstr ""
 
-#: libebl/eblobjnote.c:122
+#: libebl/eblobjnote.c:123
 #, c-format
 msgid " Base: "
 msgstr ""
 
-#: libebl/eblobjnote.c:124
+#: libebl/eblobjnote.c:125
 #, c-format
 msgid " Semaphore: "
 msgstr ""
 
-#: libebl/eblobjnote.c:126
+#: libebl/eblobjnote.c:127
 #, c-format
 msgid "    Provider: "
 msgstr ""
 
-#: libebl/eblobjnote.c:128
+#: libebl/eblobjnote.c:129
 #, c-format
 msgid " Name: "
 msgstr ""
 
-#: libebl/eblobjnote.c:130
+#: libebl/eblobjnote.c:131
 #, c-format
 msgid " Args: "
 msgstr ""
 
-#: libebl/eblobjnote.c:140
+#: libebl/eblobjnote.c:141
 #, c-format
 msgid "    Build ID: "
 msgstr "   ビルト ID: "
 
-#: libebl/eblobjnote.c:151
+#: libebl/eblobjnote.c:152
 #, c-format
 msgid "    Linker version: %.*s\n"
 msgstr ""
 
-#: libebl/eblobjnote.c:212
+#: libebl/eblobjnote.c:213
 #, c-format
 msgid "    OS: %s, ABI: "
 msgstr "    OS: %s、ABI: "

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: elfutils\n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2016-01-08 14:06+0100\n"
+"POT-Creation-Date: 2016-01-11 08:48+0100\n"
 "PO-Revision-Date: 2016-01-07 15:44+0100\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <trans-pl@lists.fedoraproject.org>\n"
@@ -480,57 +480,57 @@ msgstr "<nieznany>"
 msgid "<unknown>: %#<PRIx64>"
 msgstr "<nieznany>: %#<PRIx64>"
 
-#: libebl/eblobjnote.c:52
+#: libebl/eblobjnote.c:53
 #, c-format
 msgid "unknown SDT version %u\n"
 msgstr "nieznana wersja SDT %u\n"
 
-#: libebl/eblobjnote.c:70
+#: libebl/eblobjnote.c:71
 #, c-format
 msgid "invalid SDT probe descriptor\n"
 msgstr "nieprawidłowy deskryptor sondy SDT\n"
 
-#: libebl/eblobjnote.c:120
+#: libebl/eblobjnote.c:121
 #, c-format
 msgid "    PC: "
 msgstr "    PC: "
 
-#: libebl/eblobjnote.c:122
+#: libebl/eblobjnote.c:123
 #, c-format
 msgid " Base: "
 msgstr " Podstawa: "
 
-#: libebl/eblobjnote.c:124
+#: libebl/eblobjnote.c:125
 #, c-format
 msgid " Semaphore: "
 msgstr " Semafor: "
 
-#: libebl/eblobjnote.c:126
+#: libebl/eblobjnote.c:127
 #, c-format
 msgid "    Provider: "
 msgstr "    Dostawca: "
 
-#: libebl/eblobjnote.c:128
+#: libebl/eblobjnote.c:129
 #, c-format
 msgid " Name: "
 msgstr " Nazwa: "
 
-#: libebl/eblobjnote.c:130
+#: libebl/eblobjnote.c:131
 #, c-format
 msgid " Args: "
 msgstr " Parametry: "
 
-#: libebl/eblobjnote.c:140
+#: libebl/eblobjnote.c:141
 #, c-format
 msgid "    Build ID: "
 msgstr "    Identyfikator kopii: "
 
-#: libebl/eblobjnote.c:151
+#: libebl/eblobjnote.c:152
 #, c-format
 msgid "    Linker version: %.*s\n"
 msgstr "    Wersja konsolidatora: %.*s\n"
 
-#: libebl/eblobjnote.c:212
+#: libebl/eblobjnote.c:213
 #, c-format
 msgid "    OS: %s, ABI: "
 msgstr "    System operacyjny: %s, ABI: "

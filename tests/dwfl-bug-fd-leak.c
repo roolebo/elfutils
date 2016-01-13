@@ -27,6 +27,15 @@
 #include <error.h>
 #include <unistd.h>
 #include <dwarf.h>
+
+#ifndef __linux__
+int
+main (void)
+{
+  return 77; /* dwfl_linux_proc_report is linux specific.  */
+}
+#else
+
 #include <sys/resource.h>
 #include ELFUTILS_HEADER(dwfl)
 
@@ -104,3 +113,4 @@ main (void)
 
   return 0;
 }
+#endif

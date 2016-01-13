@@ -1,5 +1,9 @@
 2016-01-13  Mark Wielaard  <mjw@redhat.com>
 
+	* dwfl-proc-attach.c: Guard linux specific header.
+
+2016-01-13  Mark Wielaard  <mjw@redhat.com>
+
 	* system-elf-libelf-test.c: New test.
 	* Makefile.am (TESTS): Add system-elf-libelf-test, if !STANDALONE.
 	(check_PROGRAMS): Likewise.

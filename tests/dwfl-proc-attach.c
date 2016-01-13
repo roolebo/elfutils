@@ -22,6 +22,7 @@
 #include <errno.h>
 #include <error.h>
 #include <unistd.h>
+#ifdef __linux__
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/user.h>
@@ -29,6 +30,7 @@
 #include <string.h>
 #include ELFUTILS_HEADER(dwfl)
 #include <pthread.h>
+#endif
 
 #ifndef __linux__
 int

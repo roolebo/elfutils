@@ -380,9 +380,11 @@ check_elf_header (Ebl *ebl, GElf_Ehdr *ehdr, size_t size)
     ERROR (gettext ("unknown ELF header version number e_ident[%d] == %d\n"),
 	   EI_VERSION, ehdr->e_ident[EI_VERSION]);
 
-  /* We currently don't handle any OS ABIs other than Linux.  */
+  /* We currently don't handle any OS ABIs other than Linux and the
+     kFreeBSD variant of Debian.  */
   if (ehdr->e_ident[EI_OSABI] != ELFOSABI_NONE
-      && ehdr->e_ident[EI_OSABI] != ELFOSABI_LINUX)
+      && ehdr->e_ident[EI_OSABI] != ELFOSABI_LINUX
+      && ehdr->e_ident[EI_OSABI] != ELFOSABI_FREEBSD)
     ERROR (gettext ("unsupported OS ABI e_ident[%d] == '%s'\n"),
 	   EI_OSABI,
 	   ebl_osabi_name (ebl, ehdr->e_ident[EI_OSABI], buf, sizeof (buf)));

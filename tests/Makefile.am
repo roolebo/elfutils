@@ -136,8 +136,8 @@ export ELFUTILS_DISABLE_DEMANGLE = 1
 endif
 
 if !STANDALONE
-check_PROGRAMS += msg_tst md5-sha1-test
-TESTS += msg_tst md5-sha1-test
+check_PROGRAMS += msg_tst md5-sha1-test system-elf-libelf-test
+TESTS += msg_tst md5-sha1-test system-elf-libelf-test
 endif
 
 if LZMA
@@ -472,6 +472,11 @@ elfgetchdr_LDADD = $(libelf) $(libdw)
 elfgetzdata_LDADD = $(libelf)
 elfputzdata_LDADD = $(libelf)
 zstrptr_LDADD = $(libelf)
+
+# We want to test the libelf header against the system elf.h header.
+# Don't include any -I CPPFLAGS.
+system_elf_libelf_test_CPPFLAGS =
+system_elf_libelf_test_LDADD = $(libelf)
 
 if GCOV
 check: check-am coverage

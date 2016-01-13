@@ -35,6 +35,34 @@
 /* Get the ELF types.  */
 #include <elf.h>
 
+#ifndef SHF_COMPRESSED
+ /* Older glibc elf.h might not yet define the ELF compression types.  */
+ #define SHF_COMPRESSED      (1 << 11)  /* Section with compressed data. */
+
+ /* Section compression header.  Used when SHF_COMPRESSED is set.  */
+
+ typedef struct
+ {
+   Elf32_Word   ch_type;        /* Compression format.  */
+   Elf32_Word   ch_size;        /* Uncompressed data size.  */
+   Elf32_Word   ch_addralign;   /* Uncompressed data alignment.  */
+ } Elf32_Chdr;
+
+ typedef struct
+ {
+   Elf64_Word   ch_type;        /* Compression format.  */
+   Elf64_Word   ch_reserved;
+   Elf64_Xword  ch_size;        /* Uncompressed data size.  */
+   Elf64_Xword  ch_addralign;   /* Uncompressed data alignment.  */
+ } Elf64_Chdr;
+
+ /* Legal values for ch_type (compression algorithm).  */
+ #define ELFCOMPRESS_ZLIB       1          /* ZLIB/DEFLATE algorithm.  */
+ #define ELFCOMPRESS_LOOS       0x60000000 /* Start of OS-specific.  */
+ #define ELFCOMPRESS_HIOS       0x6fffffff /* End of OS-specific.  */
+ #define ELFCOMPRESS_LOPROC     0x70000000 /* Start of processor-specific.  */
+ #define ELFCOMPRESS_HIPROC     0x7fffffff /* End of processor-specific.  */
+#endif
 
 /* Known translation types.  */
 typedef enum

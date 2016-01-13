@@ -1,3 +1,8 @@
+2016-01-13  Mark Wielaard  <mjw@redhat.com>
+
+	* libelf.h: Check SHF_COMPRESSED is defined. If not define it and the
+	associated ELF compression types/defines.
+
 2015-11-26  Mark Wielaard  <mjw@redhat.com>
 
 	* elf_compress.c (__libelf_decompress_elf): New function, extracted

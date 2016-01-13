@@ -1,3 +1,11 @@
+2016-01-13  Mark Wielaard  <mjw@redhat.com>
+
+	* system-elf-libelf-test.c: New test.
+	* Makefile.am (TESTS): Add system-elf-libelf-test, if !STANDALONE.
+	(check_PROGRAMS): Likewise.
+	(system_elf_libelf_test_CPPFLAGS): New variable.
+	(system_elf_libelf_test_LDADD): Likewise.
+
 2016-01-08  Mark Wielaard  <mjw@redhat.com>
 
 	* elfputzdata.c (main): Fix parentheses in strncmp test.

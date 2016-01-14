@@ -31,6 +31,8 @@ Makefile.in
 /config/config.sub
 /config/depcomp
 /config/install-sh
+/config/libdw.pc
+/config/libelf.pc
 /config/missing
 /config/test-driver
 /config/ylwrap
@@ -55,6 +57,7 @@ Makefile.in
 /src/addr2line
 /src/ar
 /src/elfcmp
+/src/elfcompress
 /src/elflint
 /src/findtextrel
 /src/ld

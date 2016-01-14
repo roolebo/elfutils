@@ -244,7 +244,7 @@ dnl zlib is mandatory.
 save_LIBS="$LIBS"
 LIBS=
 eu_ZIPLIB(zlib,ZLIB,z,gzdirect,gzip)
-AS_IF([test "x$with_zlib" = xno], [AC_MSG_ERROR("zlib not found")])
+AS_IF([test "x$with_zlib" = xno], [AC_MSG_ERROR([zlib not found but is required])])
 LIBS="$save_LIBS"
 
 dnl Test for bzlib and xz/lzma, gives BZLIB/LZMALIB .am

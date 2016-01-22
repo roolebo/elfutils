@@ -37,6 +37,21 @@
 #include "libelfP.h"
 
 
+static void *
+get_zdata (Elf_Scn *strscn)
+{
+  size_t zsize, zalign;
+  void *zdata = __libelf_decompress_elf (strscn, &zsize, &zalign);
+  if (zdata == NULL)
+    return NULL;
+
+  strscn->zdata_base = zdata;
+  strscn->zdata_size = zsize;
+  strscn->zdata_align = zalign;
+
+  return zdata;
+}
+
 char *
 elf_strptr (Elf *elf, size_t idx, size_t offset)
 {
@@ -83,20 +98,6 @@ elf_strptr (Elf *elf, size_t idx, size_t offset)
 	}
     }
 
-  void *get_zdata (void)
-  {
-    size_t zsize, zalign;
-    void *zdata = __libelf_decompress_elf (strscn, &zsize, &zalign);
-    if (zdata == NULL)
-      return NULL;
-
-    strscn->zdata_base = zdata;
-    strscn->zdata_size = zsize;
-    strscn->zdata_align = zalign;
-
-    return zdata;
-  }
-
   size_t sh_size = 0;
   if (elf->class == ELFCLASS32)
     {
@@ -112,7 +113,7 @@ elf_strptr (Elf *elf, size_t idx, size_t offset)
 	sh_size = shdr->sh_size;
       else
 	{
-	  if (strscn->zdata_base == NULL && get_zdata () == NULL)
+	  if (strscn->zdata_base == NULL && get_zdata (strscn) == NULL)
 	    goto out;
 	  sh_size = strscn->zdata_size;
 	}
@@ -138,7 +139,7 @@ elf_strptr (Elf *elf, size_t idx, size_t offset)
 	sh_size = shdr->sh_size;
       else
 	{
-	  if (strscn->zdata_base == NULL && get_zdata () == NULL)
+	  if (strscn->zdata_base == NULL && get_zdata (strscn) == NULL)
 	    goto out;
 	  sh_size = strscn->zdata_size;
 	}

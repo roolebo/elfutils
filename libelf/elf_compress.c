@@ -45,6 +45,21 @@
 # define MAX(a, b) ((a) > (b) ? (a) : (b))
 #endif
 
+/* Cleanup and return result.  Don't leak memory.  */
+static void *
+do_deflate_cleanup (void *result, z_stream *z, void *out_buf,
+                    int ei_data, Elf_Data *cdatap)
+{
+  deflateEnd (z);
+  free (out_buf);
+  if (ei_data != MY_ELFDATA)
+    free (cdatap->d_buf);
+  return result;
+}
+
+#define deflate_cleanup(result) \
+    do_deflate_cleanup(result, &z, out_buf, ei_data, &cdata)
+
 /* Given a section, uses the (in-memory) Elf_Data to extract the
    original data size (including the given header size) and data
    alignment.  Returns a buffer that has at least hsize bytes (for the
@@ -108,16 +123,6 @@ __libelf_compress (Elf_Scn *scn, size_t hsize, int ei_data,
 
   Elf_Data cdata;
   cdata.d_buf = NULL;
-
-  /* Cleanup and return result.  Don't leak memory.  */
-  void *deflate_cleanup (void *result)
-  {
-    deflateEnd (&z);
-    free (out_buf);
-    if (ei_data != MY_ELFDATA)
-      free (cdata.d_buf);
-    return result;
-  }
 
   /* Loop over data buffers.  */
   int flush = Z_NO_FLUSH;

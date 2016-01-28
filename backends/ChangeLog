@@ -1,3 +1,8 @@
+2015-12-28  Mark Wielaard  <mjw@redhat.com>
+
+	* i386_reloc.def: Add GOT32X.
+	* x86_64_reloc.def: Add GOTPCRELX and REX_GOTPCRELX.
+
 2016-02-12  Mark Wielaard  <mjw@redhat.com>
 
 	* aarch64_corenote.c (aarch64_syscall_items): New Ebl_Core_Item[].

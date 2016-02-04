@@ -1,3 +1,8 @@
+2016-02-04  Mark Wielaard  <mjw@redhat.com>
+
+	* elf_getdata.c (__libelf_set_rawdata_wrlock): Don't adjust align
+	for SHT_NOBITS sections.
+
 2016-01-22  Chih-Hung Hsieh <chh@google.com>
 
 	* elf_compress.c (__libelf_compress): Move nested function

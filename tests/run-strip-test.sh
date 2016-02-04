@@ -34,13 +34,13 @@ status=0
 cmp $stripped testfile.temp || status=$?
 
 # Check elflint and the expected result.
-testrun ${abs_top_builddir}/src/elflint -q testfile.temp || status=$?
+testrun ${abs_top_builddir}/src/elflint --gnu -q testfile.temp || status=$?
 
 test -z "$debugfile" || {
 cmp $debugfile testfile.debug.temp || status=$?
 
 # Check elflint and the expected result.
-testrun ${abs_top_builddir}/src/elflint -q -d testfile.debug.temp || status=$?
+testrun ${abs_top_builddir}/src/elflint --gnu -q -d testfile.debug.temp || status=$?
 
 # Now test unstrip recombining those files.
 testrun ${abs_top_builddir}/src/unstrip -o testfile.unstrip testfile.temp testfile.debug.temp

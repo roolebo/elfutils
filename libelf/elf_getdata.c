@@ -1,5 +1,5 @@
 /* Return the next data element from the section after possibly converting it.
-   Copyright (C) 1998-2005, 2006, 2007, 2015 Red Hat, Inc.
+   Copyright (C) 1998-2005, 2006, 2007, 2015, 2016 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -363,7 +363,7 @@ __libelf_set_rawdata_wrlock (Elf_Scn *scn)
      at least an ehdr this will only trigger for alignment values > 64
      which should be uncommon.  */
   align = align ?: 1;
-  if (align > offset)
+  if (type != SHT_NOBITS && align > offset)
     align = offset;
   scn->rawdata.d.d_align = align;
   if (elf->class == ELFCLASS32

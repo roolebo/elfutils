@@ -1,3 +1,13 @@
+2016-02-04  Mark Wielaard  <mjw@redhat.com>
+
+	* run-strip-nobitsalign.sh: New test.
+	* testfile-nobitsalign.bz2: New testfile.
+	* testfile-nobitsalign.strip.bz2: Likewise.
+	* Makefile.am (TESTS): Add run-strip-nobitsalign.sh.
+	(EXTRA_DIST): Add run-strip-nobitsalign.sh, testfile-nobitsalign.bz2
+	and testfile-nobitsalign.strip.bz2.
+	* run-strip-test.sh: Add --gnu to elflint calls.
+
 2016-01-13  Mark Wielaard  <mjw@redhat.com>
 
 	* dwfl-bug-fd-leak.c: Skip test unless on __linux__.

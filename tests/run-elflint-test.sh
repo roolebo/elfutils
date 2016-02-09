@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2005, 2007, 2008 Red Hat, Inc.
+# Copyright (C) 2005, 2007, 2008, 2015 Red Hat, Inc.
 # This file is part of elfutils.
 # Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 #
@@ -39,5 +39,12 @@ testrun ${abs_top_builddir}/src/elflint -q testfile46
 # see also run-readelf-d.sh
 testfiles testlib_dynseg.so
 testrun ${abs_top_builddir}/src/elflint -q --gnu-ld testlib_dynseg.so
+
+# s390x has SHT_HASH with sh_entsize 8 (really should be 4, but see common.h)
+# This was wrongly checked when comparing .gnu.hash and .hash.
+# Simple "int main (int argc, char **argv) { return 0; }"
+# gcc -Xlinker --hash-style=both -o testfile-s390x-hash-both s390x-hash-both.c
+testfiles testfile-s390x-hash-both
+testrun ${abs_top_builddir}/src/elflint -q --gnu-ld testfile-s390x-hash-both
 
 exit 0

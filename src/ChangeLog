@@ -1,3 +1,9 @@
+2016-02-09  Mark Wielaard  <mjw@redhat.com>
+
+	* elflint.c (compare_hash_gnu_hash): Check hash sh_entsize against
+	sizeof (Elf64_Xword). Correct invalid sh_entsize error message
+	section idx and name.
+
 2016-01-13  Mark Wielaard  <mjw@redhat.com>
 
 	* elflint.c (check_elf_header): Recognize ELFOSABI_FREEBSD.

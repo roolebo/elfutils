@@ -1,3 +1,9 @@
+2016-02-09  Mark Wielaard  <mjw@redhat.com>
+
+	* testfile-s390x-hash-both.bz2: New testfile.
+	* Makefile.am (EXTRA_DIST): Add testfile-s390x-hash-both.bz2.
+	* run-elflint-test.sh: Add elflint testfile-s390x-hash-both test.
+
 2016-02-04  Mark Wielaard  <mjw@redhat.com>
 
 	* run-strip-nobitsalign.sh: New test.

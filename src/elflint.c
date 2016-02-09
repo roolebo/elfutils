@@ -2482,7 +2482,7 @@ hash section [%2zu] '%s' uses too much data\n"),
 	    }
 	}
     }
-  else if (hash_shdr->sh_entsize == sizeof (Elf64_Word))
+  else if (hash_shdr->sh_entsize == sizeof (Elf64_Xword))
     {
       const Elf64_Xword *hasharr = (Elf64_Xword *) hash_data->d_buf;
       if (hash_data->d_size < 2 * sizeof (Elf32_Word))
@@ -2523,7 +2523,7 @@ hash section [%2zu] '%s' uses too much data\n"),
     {
       ERROR (gettext ("\
 hash section [%2zu] '%s' invalid sh_entsize\n"),
-	     gnu_hash_idx, gnu_hash_name);
+	     hash_idx, hash_name);
       return;
     }
 

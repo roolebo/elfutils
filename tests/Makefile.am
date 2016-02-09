@@ -236,6 +236,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile56.bz2 testfile57.bz2 testfile58.bz2 \
 	     run-typeiter.sh testfile59.bz2 \
 	     run-readelf-d.sh testlib_dynseg.so.bz2 \
+	     testfile-s390x-hash-both.bz2 \
 	     run-readelf-gdb_index.sh testfilegdbindex5.bz2 \
 	     testfilegdbindex7.bz2 \
 	     run-readelf-s.sh testfilebazdbg.bz2 testfilebazdyn.bz2 \

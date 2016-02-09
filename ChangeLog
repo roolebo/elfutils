@@ -1,3 +1,8 @@
+2016-02-08  Mark Wielaard  <mjw@redhat.com>
+
+	* configure.ac: Add checks for sane -Wlogical-op and whether gcc
+	accepts -Wduplicated-cond.
+
 2016-01-08  Mark Wielaard  <mjw@redhat.com>
 
 	* configure.ac: Set version to 0.165.

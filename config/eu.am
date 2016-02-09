@@ -1,6 +1,6 @@
 ## Common automake fragments for elfutils subdirectory makefiles.
 ##
-## Copyright (C) 2010, 2014 Red Hat, Inc.
+## Copyright (C) 2010, 2014, 2016 Red Hat, Inc.
 ##
 ## This file is part of elfutils.
 ##
@@ -42,8 +42,22 @@ STACK_USAGE_WARNING=-Wstack-usage=262144
 else
 STACK_USAGE_WARNING=
 endif
+
+if SANE_LOGICAL_OP_WARNING
+LOGICAL_OP_WARNING=-Wlogical-op
+else
+LOGICAL_OP_WARNING=
+endif
+
+if HAVE_DUPLICATED_COND_WARNING
+DUPLICATED_COND_WARNING=-Wduplicated-cond
+else
+DUPLICATED_COND_WARNING=
+endif
+
 AM_CFLAGS = -std=gnu99 -Wall -Wshadow -Wformat=2 \
 	    -Wold-style-definition -Wstrict-prototypes \
+	    $(LOGICAL_OP_WARNING) $(DUPLICATED_COND_WARNING) \
 	    $(if $($(*F)_no_Werror),,-Werror) \
 	    $(if $($(*F)_no_Wunused),,-Wunused -Wextra) \
 	    $(if $($(*F)_no_Wstack_usage),,$(STACK_USAGE_WARNING)) \

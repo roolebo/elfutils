@@ -291,6 +291,28 @@ AC_COMPILE_IFELSE([AC_LANG_SOURCE([])],
 CFLAGS="$old_CFLAGS"])
 AM_CONDITIONAL(ADD_STACK_USAGE_WARNING, [test "x$ac_cv_stack_usage" != "xno"])
 
+# -Wlogical-op was too fragile in the past, make sure we get a sane one.
+AC_CACHE_CHECK([whether gcc has a sane -Wlogical-op], ac_cv_logical_op, [dnl
+old_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS -Wlogical-op -Werror"
+AC_COMPILE_IFELSE([AC_LANG_SOURCE(
+	[#define FLAG 1
+	int f (int r, int f) { return (r && (FLAG || (FLAG & f))); }])],
+		  ac_cv_logical_op=yes, ac_cv_logical_op=no)
+CFLAGS="$old_CFLAGS"])
+AM_CONDITIONAL(SANE_LOGICAL_OP_WARNING,
+	       [test "x$ac_cv_logical_op" != "xno"])
+
+# -Wduplicated-cond was added by GCC6
+AC_CACHE_CHECK([whether gcc accepts -Wduplicated-cond], ac_cv_duplicated_cond, [dnl
+old_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS -Wduplicated-cond"
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([])],
+		  ac_cv_duplicated_cond=yes, ac_cv_duplicated_cond=no)
+CFLAGS="$old_CFLAGS"])
+AM_CONDITIONAL(HAVE_DUPLICATED_COND_WARNING,
+	       [test "x$ac_cv_duplicated_cond" != "xno"])
+
 dnl Check if we have argp available from our libc
 AC_LINK_IFELSE(
 	[AC_LANG_PROGRAM(

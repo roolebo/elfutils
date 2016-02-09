@@ -1,5 +1,12 @@
 2016-02-09  Mark Wielaard  <mjw@redhat.com>
 
+	* readelf.c (read_encoded): Move up.
+	(print_cfa_program): Add encoding argument. Use it for read_encoded
+	when reading DW_CFA_set_loc op.
+	(print_debug_frame_section): Pass fde_encoding to print_cfa_program.
+
+2016-02-09  Mark Wielaard  <mjw@redhat.com>
+
 	* elflint.c (compare_hash_gnu_hash): Check hash sh_entsize against
 	sizeof (Elf64_Xword). Correct invalid sh_entsize error message
 	section idx and name.

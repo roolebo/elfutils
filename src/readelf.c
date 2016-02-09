@@ -5044,11 +5044,68 @@ register_info (Ebl *ebl, unsigned int regno, const Ebl_Register_Location *loc,
   return set;
 }
 
+static const unsigned char *
+read_encoded (unsigned int encoding, const unsigned char *readp,
+	      const unsigned char *const endp, uint64_t *res, Dwarf *dbg)
+{
+  if ((encoding & 0xf) == DW_EH_PE_absptr)
+    encoding = gelf_getclass (dbg->elf) == ELFCLASS32
+      ? DW_EH_PE_udata4 : DW_EH_PE_udata8;
+
+  switch (encoding & 0xf)
+    {
+    case DW_EH_PE_uleb128:
+      get_uleb128 (*res, readp, endp);
+      break;
+    case DW_EH_PE_sleb128:
+      get_sleb128 (*res, readp, endp);
+      break;
+    case DW_EH_PE_udata2:
+      if (readp + 2 > endp)
+	goto invalid;
+      *res = read_2ubyte_unaligned_inc (dbg, readp);
+      break;
+    case DW_EH_PE_udata4:
+      if (readp + 4 > endp)
+	goto invalid;
+      *res = read_4ubyte_unaligned_inc (dbg, readp);
+      break;
+    case DW_EH_PE_udata8:
+      if (readp + 8 > endp)
+	goto invalid;
+      *res = read_8ubyte_unaligned_inc (dbg, readp);
+      break;
+    case DW_EH_PE_sdata2:
+      if (readp + 2 > endp)
+	goto invalid;
+      *res = read_2sbyte_unaligned_inc (dbg, readp);
+      break;
+    case DW_EH_PE_sdata4:
+      if (readp + 4 > endp)
+	goto invalid;
+      *res = read_4sbyte_unaligned_inc (dbg, readp);
+      break;
+    case DW_EH_PE_sdata8:
+      if (readp + 8 > endp)
+	goto invalid;
+      *res = read_8sbyte_unaligned_inc (dbg, readp);
+      break;
+    default:
+    invalid:
+      error (1, 0,
+	     gettext ("invalid encoding"));
+    }
+
+  return readp;
+}
+
+
 static void
 print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 		   Dwarf_Word vma_base, unsigned int code_align,
 		   int data_align,
 		   unsigned int version, unsigned int ptr_size,
+		   unsigned int encoding,
 		   Dwfl_Module *dwflmod, Ebl *ebl, Dwarf *dbg)
 {
   char regnamebuf[REGNAMESZ];
@@ -5079,9 +5136,9 @@ print_cfa_program (const unsigned char *readp, const unsigned char *const endp,
 	  case DW_CFA_set_loc:
 	    if ((uint64_t) (endp - readp) < 1)
 	      goto invalid;
-	    get_uleb128 (op1, readp, endp);
-	    op1 += vma_base;
-	    printf ("     set_loc %" PRIu64 "\n", op1 * code_align);
+	    readp = read_encoded (encoding, readp, endp, &op1, dbg);
+	    printf ("     set_loc %#" PRIx64 " to %#" PRIx64 "\n",
+		    op1, pc = vma_base + op1);
 	    break;
 	  case DW_CFA_advance_loc1:
 	    if ((uint64_t) (endp - readp) < 1)
@@ -5418,62 +5475,6 @@ print_encoding_base (const char *pfx, unsigned int fde_encoding)
 
       puts (")");
     }
-}
-
-
-static const unsigned char *
-read_encoded (unsigned int encoding, const unsigned char *readp,
-	      const unsigned char *const endp, uint64_t *res, Dwarf *dbg)
-{
-  if ((encoding & 0xf) == DW_EH_PE_absptr)
-    encoding = gelf_getclass (dbg->elf) == ELFCLASS32
-      ? DW_EH_PE_udata4 : DW_EH_PE_udata8;
-
-  switch (encoding & 0xf)
-    {
-    case DW_EH_PE_uleb128:
-      get_uleb128 (*res, readp, endp);
-      break;
-    case DW_EH_PE_sleb128:
-      get_sleb128 (*res, readp, endp);
-      break;
-    case DW_EH_PE_udata2:
-      if (readp + 2 > endp)
-	goto invalid;
-      *res = read_2ubyte_unaligned_inc (dbg, readp);
-      break;
-    case DW_EH_PE_udata4:
-      if (readp + 4 > endp)
-	goto invalid;
-      *res = read_4ubyte_unaligned_inc (dbg, readp);
-      break;
-    case DW_EH_PE_udata8:
-      if (readp + 8 > endp)
-	goto invalid;
-      *res = read_8ubyte_unaligned_inc (dbg, readp);
-      break;
-    case DW_EH_PE_sdata2:
-      if (readp + 2 > endp)
-	goto invalid;
-      *res = read_2sbyte_unaligned_inc (dbg, readp);
-      break;
-    case DW_EH_PE_sdata4:
-      if (readp + 4 > endp)
-	goto invalid;
-      *res = read_4sbyte_unaligned_inc (dbg, readp);
-      break;
-    case DW_EH_PE_sdata8:
-      if (readp + 8 > endp)
-	goto invalid;
-      *res = read_8sbyte_unaligned_inc (dbg, readp);
-      break;
-    default:
-    invalid:
-      error (1, 0,
-	     gettext ("invalid encoding"));
-    }
-
-  return readp;
 }
 
 
@@ -5851,7 +5852,7 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
       else
 	print_cfa_program (readp, cieend, vma_base, code_alignment_factor,
 			   data_alignment_factor, version, ptr_size,
-			   dwflmod, ebl, dbg);
+			   fde_encoding, dwflmod, ebl, dbg);
       readp = cieend;
     }
 }

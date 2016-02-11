@@ -1,5 +1,5 @@
 /* Relocate debug information.
-   Copyright (C) 2005-2011, 2014 Red Hat, Inc.
+   Copyright (C) 2005-2011, 2014, 2016 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -605,7 +605,8 @@ relocate_section (Dwfl_Module *mod, Elf *relocated, const GElf_Ehdr *ehdr,
 	    case DWFL_E_NOERROR:
 	      /* We applied the relocation.  Elide it.  */
 	      memset (&rel_mem, 0, sizeof rel_mem);
-	      gelf_update_rel (reldata, relidx, &rel_mem);
+	      if (unlikely (gelf_update_rel (reldata, relidx, &rel_mem) == 0))
+		return DWFL_E_LIBELF;
 	      ++complete;
 	      break;
 	    case DWFL_E_BADRELTYPE:
@@ -635,7 +636,9 @@ relocate_section (Dwfl_Module *mod, Elf *relocated, const GElf_Ehdr *ehdr,
 	    case DWFL_E_NOERROR:
 	      /* We applied the relocation.  Elide it.  */
 	      memset (&rela_mem, 0, sizeof rela_mem);
-	      gelf_update_rela (reldata, relidx, &rela_mem);
+	      if (unlikely (gelf_update_rela (reldata, relidx,
+					      &rela_mem) == 0))
+		return DWFL_E_LIBELF;
 	      ++complete;
 	      break;
 	    case DWFL_E_BADRELTYPE:
@@ -671,7 +674,8 @@ relocate_section (Dwfl_Module *mod, Elf *relocated, const GElf_Ehdr *ehdr,
 		if (r->r_info != 0 || r->r_offset != 0)
 		  {
 		    if (next != relidx)
-		      gelf_update_rel (reldata, next, r);
+		      if (unlikely (gelf_update_rel (reldata, next, r) == 0))
+			return DWFL_E_LIBELF;
 		    ++next;
 		  }
 	      }
@@ -683,7 +687,8 @@ relocate_section (Dwfl_Module *mod, Elf *relocated, const GElf_Ehdr *ehdr,
 		if (r->r_info != 0 || r->r_offset != 0 || r->r_addend != 0)
 		  {
 		    if (next != relidx)
-		      gelf_update_rela (reldata, next, r);
+		      if (unlikely (gelf_update_rela (reldata, next, r) == 0))
+			return DWFL_E_LIBELF;
 		    ++next;
 		  }
 	      }
@@ -691,7 +696,8 @@ relocate_section (Dwfl_Module *mod, Elf *relocated, const GElf_Ehdr *ehdr,
 	}
 
       shdr->sh_size = reldata->d_size = nrels * sh_entsize;
-      gelf_update_shdr (scn, shdr);
+      if (unlikely (gelf_update_shdr (scn, shdr) == 0))
+	return DWFL_E_LIBELF;
     }
 
   return result;

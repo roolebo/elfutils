@@ -1,5 +1,11 @@
 2016-02-11  Mark Wielaard  <mjw@redhat.com>
 
+	* relocate.c (relocate_section): Check result of all gelf_get* calls.
+	(__libdwfl_relocate): Likewise.
+	(__libdwfl_relocate_section): Likewise.
+
+2016-02-11  Mark Wielaard  <mjw@redhat.com>
+
 	* relocate.c (relocate_section): Check result of gelf_update_* calls.
 
 2016-01-08  Mark Wielaard  <mjw@redhat.com>

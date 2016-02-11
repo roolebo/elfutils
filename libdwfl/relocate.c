@@ -671,6 +671,8 @@ relocate_section (Dwfl_Module *mod, Elf *relocated, const GElf_Ehdr *ehdr,
 	      {
 		GElf_Rel rel_mem;
 		GElf_Rel *r = gelf_getrel (reldata, relidx, &rel_mem);
+		if (unlikely (r == NULL))
+		  return DWFL_E_LIBELF;
 		if (r->r_info != 0 || r->r_offset != 0)
 		  {
 		    if (next != relidx)
@@ -684,6 +686,8 @@ relocate_section (Dwfl_Module *mod, Elf *relocated, const GElf_Ehdr *ehdr,
 	      {
 		GElf_Rela rela_mem;
 		GElf_Rela *r = gelf_getrela (reldata, relidx, &rela_mem);
+		if (unlikely (r == NULL))
+		  return DWFL_E_LIBELF;
 		if (r->r_info != 0 || r->r_offset != 0 || r->r_addend != 0)
 		  {
 		    if (next != relidx)
@@ -729,6 +733,8 @@ __libdwfl_relocate (Dwfl_Module *mod, Elf *debugfile, bool debug)
     {
       GElf_Shdr shdr_mem;
       GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+      if (unlikely (shdr == NULL))
+	return DWFL_E_LIBELF;
 
       if ((shdr->sh_type == SHT_REL || shdr->sh_type == SHT_RELA)
 	  && shdr->sh_size != 0)
@@ -762,10 +768,18 @@ __libdwfl_relocate_section (Dwfl_Module *mod, Elf *relocated,
   if (elf_getshdrstrndx (relocated, &shstrndx) < 0)
     return DWFL_E_LIBELF;
 
-  return (__libdwfl_module_getebl (mod)
-	  ?: relocate_section (mod, relocated,
-			       gelf_getehdr (relocated, &ehdr_mem), shstrndx,
-			       &reloc_symtab,
-			       relocscn, gelf_getshdr (relocscn, &shdr_mem),
-			       tscn, false, partial));
+  Dwfl_Error result = __libdwfl_module_getebl (mod);
+  if (unlikely (result != DWFL_E_NOERROR))
+    return result;
+
+  GElf_Ehdr *ehdr = gelf_getehdr (relocated, &ehdr_mem);
+  if (unlikely (ehdr == NULL))
+    return DWFL_E_LIBELF;
+
+  GElf_Shdr *shdr = gelf_getshdr (relocscn, &shdr_mem);
+  if (unlikely (shdr == NULL))
+    return DWFL_E_LIBELF;
+
+  return relocate_section (mod, relocated, ehdr, shstrndx, &reloc_symtab,
+			   relocscn, shdr, tscn, false, partial);
 }

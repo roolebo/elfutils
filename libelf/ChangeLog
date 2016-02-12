@@ -1,3 +1,7 @@
+2016-02-12  Mark Wielaard  <mjw@redhat.com>
+
+	* elf.h: Update from glibc. Add NT_ARM_SYSTEM_CALL.
+
 2016-02-04  Mark Wielaard  <mjw@redhat.com>
 
 	* elf_getdata.c (__libelf_set_rawdata_wrlock): Don't adjust align

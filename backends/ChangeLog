@@ -1,3 +1,10 @@
+2016-02-12  Mark Wielaard  <mjw@redhat.com>
+
+	* aarch64_corenote.c (aarch64_syscall_items): New Ebl_Core_Item[].
+	(EXTRA_NOTES): Add NT_ARM_SYSTEM_CALL.
+	* eblcorenotetypename.c (ebl_core_note_type_name):
+	Add ARM_SYSTEM_CALL.
+
 2015-12-08  Jose E. Marchesi  <jose.marchesi@oracle.com>
 
 	* sparc_init.c (sparc_init): Hook sparc_set_initial_registers_tid.

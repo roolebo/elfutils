@@ -99,6 +99,14 @@ static const Ebl_Core_Item aarch64_tls_items[] =
     }
   };
 
+static const Ebl_Core_Item aarch64_syscall_items [] =
+  {
+    {
+      .name = "syscall", .type = ELF_T_WORD, .format = 'x',
+      .offset = 0, .group = "register"
+    }
+  };
+
 #define AARCH64_HWBP_REG(KIND, N)					\
     {									\
       .name = "DBG" KIND "VR" #N "_EL1", .type = ELF_T_XWORD, .format = 'x', \
@@ -158,6 +166,7 @@ AARCH64_BP_WP_GROUP ("W", aarch64_hw_wp_items);
 		      aarch64_fpregset_regs, aarch64_fpregset_items)	\
   EXTRA_ITEMS (NT_ARM_TLS, 8, aarch64_tls_items)			\
   EXTRA_ITEMS (NT_ARM_HW_BREAK, 264, aarch64_hw_bp_items)		\
-  EXTRA_ITEMS (NT_ARM_HW_WATCH, 264, aarch64_hw_wp_items)
+  EXTRA_ITEMS (NT_ARM_HW_WATCH, 264, aarch64_hw_wp_items)		\
+  EXTRA_ITEMS (NT_ARM_SYSTEM_CALL, 4, aarch64_syscall_items)
 
 #include "linux-core-note.c"

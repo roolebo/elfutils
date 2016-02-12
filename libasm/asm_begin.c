@@ -58,8 +58,8 @@ prepare_text_output (AsmCtx_t *result)
 	  free (result);
 	  result = NULL;
 	}
-
-      __fsetlocking (result->out.file, FSETLOCKING_BYCALLER);
+      else
+	__fsetlocking (result->out.file, FSETLOCKING_BYCALLER);
     }
 
   return result;

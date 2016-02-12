@@ -1,3 +1,8 @@
+2016-02-12  Mark Wielaard  <mjw@redhat.com>
+
+	* asm_begin.c (prepare_text_output): Only call __fsetlocking when
+	result isn't NULL.
+
 2015-10-05  Josh Stone  <jistone@redhat.com>
 
 	* Makefile.am (libasm.so): Add AM_V_CCLD and AM_V_at silencers.

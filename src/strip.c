@@ -1267,8 +1267,10 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 		    shndxdata = elf_getdata (shdr_info[shdr_info[cnt].symtab_idx].scn,
 					     NULL);
 
-		    elf_assert ((versiondata->d_size / sizeof (Elf32_Word))
-				>= shdr_info[cnt].data->d_size / elsize);
+		    elf_assert (shndxdata != NULL
+				&& shndxdata->d_buf != NULL
+				&& ((shndxdata->d_size / sizeof (Elf32_Word))
+				    >= shdr_info[cnt].data->d_size / elsize));
 		  }
 
 		if (shdr_info[cnt].version_idx != 0)

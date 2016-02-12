@@ -1,3 +1,9 @@
+2016-02-12  Mark Wielaard  <mjw@redhat.com>
+
+	* eblobjnotetypename.c (ebl_object_note_type_name): Check name is
+	"Go" and use new goknowntypes then. Otherwise check name is not
+	"GNU" and return "unknown".
+
 2016-01-09  Mark Wielaard  <mjw@redhat.com>
 
 	* eblobjnote.c (ebl_object_note): Add brackets around if statement

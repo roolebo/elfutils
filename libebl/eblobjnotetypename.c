@@ -1,5 +1,5 @@
 /* Return note type name.
-   Copyright (C) 2002, 2007, 2009, 2011 Red Hat, Inc.
+   Copyright (C) 2002, 2007, 2009, 2011, 2016 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -48,6 +48,39 @@ ebl_object_note_type_name (Ebl *ebl, const char *name, uint32_t type,
       if (strcmp (name, "stapsdt") == 0)
 	{
 	  snprintf (buf, len, "Version: %" PRIu32, type);
+	  return buf;
+	}
+
+#define ELF_NOTE_GOPKGLIST 1
+#define ELF_NOTE_GOABIHASH 2
+#define ELF_NOTE_GODEPS    3
+#define ELF_NOTE_GOBUILDID 4
+
+      static const char *goknowntypes[] =
+	{
+#define KNOWNSTYPE(name) [ELF_NOTE_GO##name] = #name
+	  KNOWNSTYPE (PKGLIST),
+	  KNOWNSTYPE (ABIHASH),
+	  KNOWNSTYPE (DEPS),
+	  KNOWNSTYPE (BUILDID),
+#undef KNOWNSTYPE
+	};
+
+      if (strcmp (name, "Go") == 0)
+	{
+	  if (type < sizeof (goknowntypes) / sizeof (goknowntypes[0])
+	      && goknowntypes[type] != NULL)
+	    return goknowntypes[type];
+	  else
+	    {
+	      snprintf (buf, len, "%s: %" PRIu32, gettext ("<unknown>"), type);
+	      return buf;
+	    }
+	}
+
+      if (strcmp (name, "GNU") != 0)
+	{
+	  snprintf (buf, len, "%s: %" PRIu32, gettext ("<unknown>"), type);
 	  return buf;
 	}
 

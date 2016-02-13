@@ -1,3 +1,7 @@
+2016-02-13  Mark Wielaard  <mjw@redhat.com>
+
+	* configure.ac: Add check for whether gcc accepts -Wnull-dereference.
+
 2016-02-08  Mark Wielaard  <mjw@redhat.com>
 
 	* configure.ac: Add checks for sane -Wlogical-op and whether gcc

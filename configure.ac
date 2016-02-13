@@ -313,6 +313,16 @@ CFLAGS="$old_CFLAGS"])
 AM_CONDITIONAL(HAVE_DUPLICATED_COND_WARNING,
 	       [test "x$ac_cv_duplicated_cond" != "xno"])
 
+# -Wnull-dereference was added by GCC6
+AC_CACHE_CHECK([whether gcc accepts -Wnull-dereference], ac_cv_null_dereference, [dnl
+old_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS -Wnull-dereference"
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([])],
+		  ac_cv_null_dereference=yes, ac_cv_null_dereference=no)
+CFLAGS="$old_CFLAGS"])
+AM_CONDITIONAL(HAVE_NULL_DEREFERENCE_WARNING,
+	       [test "x$ac_cv_null_dereference" != "xno"])
+
 dnl Check if we have argp available from our libc
 AC_LINK_IFELSE(
 	[AC_LANG_PROGRAM(

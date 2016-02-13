@@ -1,3 +1,8 @@
+2016-02-13  Mark Wielaard  <mjw@redhat.com>
+
+	* eu.am: Check HAVE_NULL_DEREFERENCE_WARNING.
+	(AM_CFLAGS): Add NULL_DEREFERENCE_WARNING.
+
 2016-02-09  Mark Wielaard  <mjw@redhat.com>
 
 	* eu.am: Check SANE_LOGICAL_OP_WARNING and

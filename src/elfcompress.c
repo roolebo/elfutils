@@ -1,5 +1,5 @@
 /* Compress or decompress an ELF file.
-   Copyright (C) 2015 Red Hat, Inc.
+   Copyright (C) 2015, 2016 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -101,6 +101,7 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
 
     case 'q':
       verbose--;
+      break;
 
     case 'f':
       force = true;

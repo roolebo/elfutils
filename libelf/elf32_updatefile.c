@@ -1,5 +1,5 @@
 /* Write changed data structures.
-   Copyright (C) 2000-2010, 2014, 2015 Red Hat, Inc.
+   Copyright (C) 2000-2010, 2014, 2015, 2016 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -269,6 +269,7 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 	      void *p = malloc (sizeof (ElfW2(LIBELFBITS,Shdr)));
 	      if (unlikely (p == NULL))
 		{
+		  free (scns);
 		  __libelf_seterrno (ELF_E_NOMEM);
 		  return -1;
 		}
@@ -295,6 +296,7 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 	      void *p = malloc (scn->data_list.data.d.d_size);
 	      if (unlikely (p == NULL))
 		{
+		  free (scns);
 		  __libelf_seterrno (ELF_E_NOMEM);
 		  return -1;
 		}

@@ -1,3 +1,8 @@
+2016-02-13  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_getsrclines.c (read_srclines): Calculate ndirs first, then
+	assign to ndirlist.
+
 2015-12-18  Mark Wielaard  <mjw@redhat.com>
 
 	* libdwP.h (struct Dwarf): Remove sectiondata_gzip_mask.

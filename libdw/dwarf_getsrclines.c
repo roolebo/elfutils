@@ -1,5 +1,5 @@
 /* Return line number information of CU.
-   Copyright (C) 2004-2010, 2013, 2014, 2015 Red Hat, Inc.
+   Copyright (C) 2004-2010, 2013, 2014, 2015, 2016 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
@@ -288,14 +288,16 @@ read_srclines (Dwarf *dbg,
 
   /* First count the entries.  */
   const unsigned char *dirp = linep;
+  unsigned int ndirs = 0;
   while (*dirp != 0)
     {
       uint8_t *endp = memchr (dirp, '\0', lineendp - dirp);
       if (endp == NULL)
 	goto invalid_data;
-      ++ndirlist;
+      ++ndirs;
       dirp = endp + 1;
     }
+  ndirlist += ndirs;
 
   /* Arrange the list in array form.  */
   if (ndirlist >= MAX_STACK_DIRS)

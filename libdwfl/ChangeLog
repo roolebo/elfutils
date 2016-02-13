@@ -1,3 +1,9 @@
+2016-02-13  Mark Wielaard  <mjw@redhat.com>
+
+	* frame_unwind.c (new_unwound): Check and return unwound.
+	(handle_cfi): Check new_unwound was able to allocate new memory
+	before use. Return DWFL_E_NOMEM otherwise.
+
 2016-02-11  Mark Wielaard  <mjw@redhat.com>
 
 	* relocate.c (relocate_section): Check result of all gelf_get* calls.

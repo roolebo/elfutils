@@ -1,5 +1,5 @@
 /* Print information from ELF file in human-readable form.
-   Copyright (C) 1999-2015 Red Hat, Inc.
+   Copyright (C) 1999-2016 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1999.
 
@@ -1529,6 +1529,11 @@ print_scngrp (Ebl *ebl)
 			gettext ("Couldn't uncompress section"),
 			elf_ndxscn (scn));
 	      shdr = gelf_getshdr (scn, &shdr_mem);
+	      if (unlikely (shdr == NULL))
+		error (EXIT_FAILURE, 0,
+		       gettext ("cannot get section [%zd] header: %s"),
+		       elf_ndxscn (scn),
+		       elf_errmsg (-1));
 	    }
 	  handle_scngrp (ebl, scn, shdr);
 	}
@@ -2238,6 +2243,10 @@ print_symtab (Ebl *ebl, int type)
 			gettext ("Couldn't uncompress section"),
 			elf_ndxscn (scn));
 	      shdr = gelf_getshdr (scn, &shdr_mem);
+	      if (unlikely (shdr == NULL))
+		error (EXIT_FAILURE, 0,
+		       gettext ("cannot get section [%zd] header: %s"),
+		       elf_ndxscn (scn), elf_errmsg (-1));
 	    }
 	  handle_symtab (ebl, scn, shdr);
 	}
@@ -3317,6 +3326,10 @@ handle_hash (Ebl *ebl)
 			gettext ("Couldn't uncompress section"),
 			elf_ndxscn (scn));
 	      shdr = gelf_getshdr (scn, &shdr_mem);
+	      if (unlikely (shdr == NULL))
+		error (EXIT_FAILURE, 0,
+		       gettext ("cannot get section [%zd] header: %s"),
+		       elf_ndxscn (scn), elf_errmsg (-1));
 	    }
 
 	  if (shdr->sh_type == SHT_HASH)
@@ -9509,9 +9522,19 @@ dump_data_section (Elf_Scn *scn, const GElf_Shdr *shdr, const char *name)
 	     so we can show both the original shdr size and the uncompressed
 	     data size.   */
 	  if ((shdr->sh_flags & SHF_COMPRESSED) != 0)
-	    elf_compress (scn, 0, 0);
+	    {
+	      if (elf_compress (scn, 0, 0) < 0)
+		printf ("WARNING: %s [%zd]\n",
+			gettext ("Couldn't uncompress section"),
+			elf_ndxscn (scn));
+	    }
 	  else if (strncmp (name, ".zdebug", strlen (".zdebug")) == 0)
-	    elf_compress_gnu (scn, 0, 0);
+	    {
+	      if (elf_compress_gnu (scn, 0, 0) < 0)
+		printf ("WARNING: %s [%zd]\n",
+			gettext ("Couldn't uncompress section"),
+			elf_ndxscn (scn));
+	    }
 	}
 
       Elf_Data *data = elf_rawdata (scn, NULL);
@@ -9550,9 +9573,19 @@ print_string_section (Elf_Scn *scn, const GElf_Shdr *shdr, const char *name)
 	     so we can show both the original shdr size and the uncompressed
 	     data size.  */
 	  if ((shdr->sh_flags & SHF_COMPRESSED) != 0)
-	    elf_compress (scn, 0, 0);
+	    {
+	      if (elf_compress (scn, 0, 0) < 0)
+		printf ("WARNING: %s [%zd]\n",
+			gettext ("Couldn't uncompress section"),
+			elf_ndxscn (scn));
+	    }
 	  else if (strncmp (name, ".zdebug", strlen (".zdebug")) == 0)
-	    elf_compress_gnu (scn, 0, 0);
+	    {
+	      if (elf_compress_gnu (scn, 0, 0) < 0)
+		printf ("WARNING: %s [%zd]\n",
+			gettext ("Couldn't uncompress section"),
+			elf_ndxscn (scn));
+	    }
 	}
 
       Elf_Data *data = elf_rawdata (scn, NULL);

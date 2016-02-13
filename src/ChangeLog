@@ -1,5 +1,13 @@
 2016-02-13  Mark Wielaard  <mjw@redhat.com>
 
+	* readelf.c (print_scngrp): Call error when gelf_getshdr fails.
+	(print_symtab): Likewise.
+	(handle_hash): Likewise.
+	(dump_data_section): Print a warning if decompressing fails.
+	(print_string_section): Likewise.
+
+2016-02-13  Mark Wielaard  <mjw@redhat.com>
+
 	* elfcompress.c (parse_opt): Don't fallthrough after processing -q.
 
 2016-02-12  Mark Wielaard  <mjw@redhat.com>

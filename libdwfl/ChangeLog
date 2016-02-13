@@ -1,5 +1,9 @@
 2016-02-13  Mark Wielaard  <mjw@redhat.com>
 
+	* linux-proc-maps.c (proc_maps_report): Free last_file when ENOEXEC.
+
+2016-02-13  Mark Wielaard  <mjw@redhat.com>
+
 	* frame_unwind.c (new_unwound): Check and return unwound.
 	(handle_cfi): Check new_unwound was able to allocate new memory
 	before use. Return DWFL_E_NOMEM otherwise.

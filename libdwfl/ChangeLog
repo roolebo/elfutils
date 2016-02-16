@@ -1,3 +1,13 @@
+2016-02-22  Ravi Bangoria <ravi.bangoria@linux.vnet.ibm.com>
+	    Mark Wielaard  <mjw@redhat.com>
+
+	* find-debuginfo.c (find_debuginfo_in_path): Remember whether
+	debuglink_file is NULL. Try file basename (without .debug) ofr
+	absolute and relative path if debug_file was NULL.
+	* linux-kernel-modules.c (try_kernel_name): If try_debug is true call
+	dwfl_standard_find_debuginfo with NULL debuglink_file, otherwise with
+	basename of fname.
+
 2016-02-13  Mark Wielaard  <mjw@redhat.com>
 
 	* linux-proc-maps.c (proc_maps_report): Free last_file when ENOEXEC.

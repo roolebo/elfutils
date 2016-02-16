@@ -92,17 +92,21 @@ try_kernel_name (Dwfl *dwfl, char **fname, bool try_debug)
   if (fd < 0)
     {
       Dwfl_Module fakemod = { .dwfl = dwfl };
-      /* First try the file's unadorned basename as DEBUGLINK_FILE,
-	 to look for "vmlinux" files.  */
-      fd = INTUSE(dwfl_standard_find_debuginfo) (&fakemod, NULL, NULL, 0,
-						 *fname, basename (*fname), 0,
-						 &fakemod.debug.name);
-      if (fd < 0 && try_debug)
-	/* Next, let the call use the default of basename + ".debug",
-	   to look for "vmlinux.debug" files.  */
+
+      if (try_debug)
+	/* Passing NULL for DEBUGLINK_FILE searches for both the basenamer
+	   "vmlinux" and the default of basename + ".debug", to look for
+	   "vmlinux.debug" files.  */
 	fd = INTUSE(dwfl_standard_find_debuginfo) (&fakemod, NULL, NULL, 0,
 						   *fname, NULL, 0,
 						   &fakemod.debug.name);
+      else
+	/* Try the file's unadorned basename as DEBUGLINK_FILE,
+	   to look only for "vmlinux" files.  */
+	fd = INTUSE(dwfl_standard_find_debuginfo) (&fakemod, NULL, NULL, 0,
+						   *fname, basename (*fname),
+						   0, &fakemod.debug.name);
+
       if (fakemod.debug.name != NULL)
 	{
 	  free (*fname);

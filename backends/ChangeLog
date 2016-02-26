@@ -1,3 +1,9 @@
+2016-02-26  Jose E. Marchesi  <jose.marchesi@oracle.com>
+
+	* sparc_initreg.c (EBLHOOK): Provide a dummy
+	sparc_set_initial_registers_tid for sparc32.  This fixes the build
+	in sparcv9-*-* targets.
+
 2016-02-26  Andreas Schwab  <schwab@suse.de>
 
 	* ppc_symbol.c (ppc_dynamic_tag_name): Add DT_PPC_OPT.

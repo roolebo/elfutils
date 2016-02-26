@@ -45,7 +45,7 @@ EBLHOOK (set_initial_registers_tid) (pid_t tid __attribute__ ((unused)),
                                      ebl_tid_registers_t *setfunc __attribute__ ((unused)),
                                      void *arg __attribute__ ((unused)))
 {
-#ifndef __sparc__
+#if !defined(__sparc__) || !defined( __arch64__)
   return false;
 #else /* __sparc__ */
 

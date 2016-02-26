@@ -1,3 +1,8 @@
+2016-02-26  Andreas Schwab  <schwab@suse.de>
+
+	* ppc_symbol.c (ppc_dynamic_tag_name): Add DT_PPC_OPT.
+	(ppc_dynamic_tag_check): Likewise.
+
 2015-12-28  Mark Wielaard  <mjw@redhat.com>
 
 	* i386_reloc.def: Add GOT32X.

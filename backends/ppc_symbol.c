@@ -65,6 +65,8 @@ ppc_dynamic_tag_name (int64_t tag, char *buf __attribute__ ((unused)),
     {
     case DT_PPC_GOT:
       return "PPC_GOT";
+    case DT_PPC_OPT:
+      return "PPC_OPT";
     default:
       break;
     }
@@ -75,7 +77,8 @@ ppc_dynamic_tag_name (int64_t tag, char *buf __attribute__ ((unused)),
 bool
 ppc_dynamic_tag_check (int64_t tag)
 {
-  return tag == DT_PPC_GOT;
+  return (tag == DT_PPC_GOT
+	  || tag == DT_PPC_OPT);
 }
 
 

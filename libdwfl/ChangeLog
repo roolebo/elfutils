@@ -1,3 +1,10 @@
+2016-03-01  Steven Chamberlain  <steven@pyro.eu.org>
+
+	* linux-pid-attach.c: Removed unused pid_thread_callbacks,
+	pid_thread_detach, pid_detach, pid_set_initial_registers,
+	pid_memory_read, pid_getthread, pid_next_thread in #ifndef
+	__linux__ code.
+
 2016-02-22  Ravi Bangoria <ravi.bangoria@linux.vnet.ibm.com>
 	    Mark Wielaard  <mjw@redhat.com>
 

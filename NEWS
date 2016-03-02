@@ -1,3 +1,8 @@
+Version 0.166
+
+config: The default program prefix for the installed tools is now eu-.
+        Use configure --program-prefix="" to not use a program prefix.
+
 Version 0.165
 
 elfcompress: New utility to compress or decompress ELF sections.

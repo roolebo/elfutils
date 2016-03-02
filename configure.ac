@@ -19,6 +19,19 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AC_INIT([elfutils],[0.165],[https://bugzilla.redhat.com/],[elfutils])
 
+# We want eu- as default program prefix if none was given by the user.
+# But if the user explicitly provided --program-prefix="" then pretend
+# it wasn't set at all (NONE). We want to test this really early before
+# configure has a chance to use the value.
+
+if test "x$program_prefix" = "xNONE"; then
+  AC_MSG_NOTICE([No --program-prefix given, using "eu-"])
+  program_prefix="eu-"
+elif test "x$program_prefix" = "x"; then
+  AC_MSG_NOTICE([Using no program-prefix])
+  program_prefix=NONE
+fi
+
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_FILES([config/Makefile])
 

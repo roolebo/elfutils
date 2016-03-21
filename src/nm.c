@@ -1311,6 +1311,11 @@ show_symbols (int fd, Ebl *ebl, GElf_Ehdr *ehdr,
      XXX We can use a dirty trick here.  Since GElf_Sym == Elf64_Sym we
      can use the data memory instead of copying again if what we read
      is a 64 bit file.  */
+  if (nentries > SIZE_MAX / sizeof (GElf_SymX))
+    error (EXIT_FAILURE, 0,
+          gettext ("%s: entries (%zd) in section %zd `%s' is too large"),
+          fullname, nentries, elf_ndxscn (scn),
+          elf_strptr (ebl->elf, shstrndx, shdr->sh_name));
   GElf_SymX *sym_mem;
   if (nentries * sizeof (GElf_SymX) < MAX_STACK_ALLOC)
     sym_mem = (GElf_SymX *) alloca (nentries * sizeof (GElf_SymX));

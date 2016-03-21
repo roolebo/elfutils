@@ -1,3 +1,7 @@
+2016-03-21  Mark Wielaard  <mjw@redhat.com>
+
+	* nm.c (show_symbols): Check for malloc size argument overflow.
+
 2016-02-13  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (print_scngrp): Call error when gelf_getshdr fails.

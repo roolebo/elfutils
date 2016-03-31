@@ -228,6 +228,10 @@ rm -rf ${RPM_BUILD_ROOT}
 %config(noreplace) %{_sysctldir}/10-default-yama-scope.conf
 
 %changelog
+* Thu Mar 31 2016 Mark Wielaard <mark@gmail.com> 0.166-1
+- config: The default program prefix for the installed tools is now
+  eu-. Use configure --program-prefix="" to not use a program prefix.
+
 * Fri Jan  8 2016 Mark Wielaard <mjw@redhat.com> 0.165-1
 - elfcompress: New utility to compress or decompress ELF sections.
 - readelf: Add -z,--decompress option.

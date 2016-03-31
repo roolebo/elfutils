@@ -1,3 +1,7 @@
+2016-03-31  Mark Wielaard  <mjw@redhat.com>
+
+	* configure.ac: Set version to 0.166.
+
 2016-03-02  Mark Wielaard  <mjw@redhat.com>
 
 	* configure.ac: Set program_prefix to eu- by default.

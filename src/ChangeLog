@@ -1,3 +1,7 @@
+2016-04-11  David Abdurachmanov  <davidlt@cern.ch>
+
+	* elfcmp.c (main): Fix self-comparison error with GCC 6.
+
 2016-03-21  Mark Wielaard  <mjw@redhat.com>
 
 	* nm.c (show_symbols): Check for malloc size argument overflow.

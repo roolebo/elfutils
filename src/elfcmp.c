@@ -368,7 +368,7 @@ main (int argc, char *argv[])
 				&& sym1->st_shndx != SHN_UNDEF)
 			    || sym1->st_info != sym2->st_info
 			    || sym1->st_other != sym2->st_other
-			    || sym1->st_shndx != sym1->st_shndx))
+			    || sym1->st_shndx != sym2->st_shndx))
 		{
 		  // XXX Do we want to allow reordered symbol tables?
 		symtab_mismatch:

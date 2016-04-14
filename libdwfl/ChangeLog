@@ -1,3 +1,8 @@
+2016-04-14  Mark Wielaard  <mjw@redhat.com>
+
+	* linux-proc-maps.c (proc_maps_report): Free last_file on bad file
+	mapping.
+
 2016-03-01  Steven Chamberlain  <steven@pyro.eu.org>
 
 	* linux-pid-attach.c: Removed unused pid_thread_callbacks,

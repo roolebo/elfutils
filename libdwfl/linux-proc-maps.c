@@ -250,7 +250,10 @@ proc_maps_report (Dwfl *dwfl, FILE *f, GElf_Addr sysinfo_ehdr, pid_t pid)
 	{
 	  /* This is another portion of the same file's mapping.  */
 	  if (strcmp (last_file, file) != 0)
-	    goto bad_report;
+	    {
+	      free (last_file);
+	      goto bad_report;
+	    }
 	  high = end;
 	}
       else

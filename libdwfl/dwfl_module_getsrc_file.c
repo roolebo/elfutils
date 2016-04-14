@@ -87,6 +87,8 @@ dwfl_module_getsrc_file (Dwfl_Module *mod,
 
 	  if (unlikely (line->file >= line->files->nfiles))
 	    {
+	      if (*nsrcs == 0)
+		free (match);
 	      __libdwfl_seterrno (DWFL_E (LIBDW, DWARF_E_INVALID_DWARF));
 	      return -1;
 	    }

@@ -1,5 +1,10 @@
 2016-04-14  Mark Wielaard  <mjw@redhat.com>
 
+	* dwfl_module_getsrc_file.c (dwfl_module_getsrc_file): Free match
+	on invalid DWARF if we allocated it.
+
+2016-04-14  Mark Wielaard  <mjw@redhat.com>
+
 	* linux-proc-maps.c (proc_maps_report): Free last_file on bad file
 	mapping.
 

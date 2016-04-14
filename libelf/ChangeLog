@@ -1,3 +1,8 @@
+2016-04-14  Mark Wielaard  <mjw@redhat.com>
+
+	* elf_compress.c (__libelf_compress): Free out_buf if deflateInit
+	fails.
+
 2016-02-13  Mark Wielaard  <mjw@redhat.com>
 
 	* elf32_updatefile.c (updatemmap): Free scns when out of memory.

@@ -1,6 +1,9 @@
 2016-05-02  Filipe Brandenburger  <filbranden@google.com>
 
 	* configure.ac (argp check): Pass pass &argv.
+	* configure.ac (-W<...> checks): Pass -Werror to the warning checks,
+	to ensure unsupported warning options are noticed during ./configure
+	time and not only later during build.
 
 2016-03-31  Mark Wielaard  <mjw@redhat.com>
 

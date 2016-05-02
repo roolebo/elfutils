@@ -298,7 +298,7 @@ AS_IF([test "x$enable_symbol_versioning" = "xno"],
 
 AC_CACHE_CHECK([whether gcc accepts -Wstack-usage], ac_cv_stack_usage, [dnl
 old_CFLAGS="$CFLAGS"
-CFLAGS="$CFLAGS -Wstack-usage=262144"
+CFLAGS="$CFLAGS -Wstack-usage=262144 -Werror"
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([])],
 		  ac_cv_stack_usage=yes, ac_cv_stack_usage=no)
 CFLAGS="$old_CFLAGS"])
@@ -319,7 +319,7 @@ AM_CONDITIONAL(SANE_LOGICAL_OP_WARNING,
 # -Wduplicated-cond was added by GCC6
 AC_CACHE_CHECK([whether gcc accepts -Wduplicated-cond], ac_cv_duplicated_cond, [dnl
 old_CFLAGS="$CFLAGS"
-CFLAGS="$CFLAGS -Wduplicated-cond"
+CFLAGS="$CFLAGS -Wduplicated-cond -Werror"
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([])],
 		  ac_cv_duplicated_cond=yes, ac_cv_duplicated_cond=no)
 CFLAGS="$old_CFLAGS"])
@@ -329,7 +329,7 @@ AM_CONDITIONAL(HAVE_DUPLICATED_COND_WARNING,
 # -Wnull-dereference was added by GCC6
 AC_CACHE_CHECK([whether gcc accepts -Wnull-dereference], ac_cv_null_dereference, [dnl
 old_CFLAGS="$CFLAGS"
-CFLAGS="$CFLAGS -Wnull-dereference"
+CFLAGS="$CFLAGS -Wnull-dereference -Werror"
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([])],
 		  ac_cv_null_dereference=yes, ac_cv_null_dereference=no)
 CFLAGS="$old_CFLAGS"])

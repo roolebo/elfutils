@@ -1,3 +1,7 @@
+2016-05-02  Filipe Brandenburger  <filbranden@google.com>
+
+	* configure.ac (argp check): Pass pass &argv.
+
 2016-03-31  Mark Wielaard  <mjw@redhat.com>
 
 	* configure.ac: Set version to 0.166.

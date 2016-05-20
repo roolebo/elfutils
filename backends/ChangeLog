@@ -1,3 +1,17 @@
+2016-05-20  Andreas Schwab  <schwab@linux-m68k.org>
+
+	* Makefile.am (modules): Add m68k.
+	(libebl_pic): Add libebl_m68k_pic.a.
+	(m68k_SRCS, libebl_m68k_pic_a_SOURCES)
+	(am_libebl_m68k_pic_a_OBJECTS): Define.
+	* m68k_init.c: New file.
+	* m68k_symbol.c: New file.
+	* m68k_regs.c: New file.
+	* m68k_retval.c: New file.
+	* m68k_corenote.c: New file.
+	* m68k_reloc.def: New file.
+	* linux-core-note.c (ALIGN_INT): Only define if not defined.
+
 2016-02-26  Jose E. Marchesi  <jose.marchesi@oracle.com>
 
 	* sparc_initreg.c (EBLHOOK): Provide a dummy

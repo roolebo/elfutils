@@ -1,3 +1,7 @@
+2016-05-20  Andreas Schwab  <schwab@linux-m68k.org>
+
+	* eblopenbackend.c (machines) [EM_68K]: Set class and data.
+
 2016-02-12  Mark Wielaard  <mjw@redhat.com>
 
 	* eblobjnotetypename.c (ebl_object_note_type_name): Check name is

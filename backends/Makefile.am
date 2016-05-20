@@ -33,11 +33,12 @@ AM_CPPFLAGS += -I$(top_srcdir)/libebl -I$(top_srcdir)/libasm \
 
 
 modules = i386 sh x86_64 ia64 alpha arm aarch64 sparc ppc ppc64 s390 \
-	  tilegx
+	  tilegx m68k
 libebl_pic = libebl_i386_pic.a libebl_sh_pic.a libebl_x86_64_pic.a    \
 	     libebl_ia64_pic.a libebl_alpha_pic.a libebl_arm_pic.a    \
 	     libebl_aarch64_pic.a libebl_sparc_pic.a libebl_ppc_pic.a \
-	     libebl_ppc64_pic.a libebl_s390_pic.a libebl_tilegx_pic.a
+	     libebl_ppc64_pic.a libebl_s390_pic.a libebl_tilegx_pic.a \
+	     libebl_m68k_pic.a
 noinst_LIBRARIES = $(libebl_pic)
 noinst_DATA = $(libebl_pic:_pic.a=.so)
 
@@ -111,6 +112,11 @@ tilegx_SRCS = tilegx_init.c tilegx_symbol.c tilegx_regs.c \
               tilegx_retval.c tilegx_corenote.c
 libebl_tilegx_pic_a_SOURCES = $(tilegx_SRCS)
 am_libebl_tilegx_pic_a_OBJECTS = $(tilegx_SRCS:.c=.os)
+
+m68k_SRCS = m68k_init.c m68k_symbol.c m68k_regs.c \
+	    m68k_retval.c m68k_corenote.c
+libebl_m68k_pic_a_SOURCES = $(m68k_SRCS)
+am_libebl_m68k_pic_a_OBJECTS = $(m68k_SRCS:.c=.os)
 
 
 libebl_%.so libebl_%.map: libebl_%_pic.a $(libelf) $(libdw)

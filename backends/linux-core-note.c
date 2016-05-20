@@ -41,7 +41,9 @@
 #define ALIGN_SHORT		2
 #define TYPE_SHORT		ELF_T_HALF
 #define	INT			int32_t
-#define ALIGN_INT		4
+#ifndef ALIGN_INT
+# define ALIGN_INT		4
+#endif
 #define TYPE_INT		ELF_T_SWORD
 #ifndef PR_REG
 # define PR_REG			ULONG

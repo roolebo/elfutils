@@ -73,7 +73,7 @@ static const struct
   { "s390", "ebl_s390", "s390", 4, EM_S390, 0, 0 },
 
   { "m32", "elf_m32", "m32", 3, EM_M32, 0, 0 },
-  { "m68k", "elf_m68k", "m68k", 4, EM_68K, 0, 0 },
+  { "m68k", "elf_m68k", "m68k", 4, EM_68K, ELFCLASS32, ELFDATA2MSB },
   { "m88k", "elf_m88k", "m88k", 4, EM_88K, 0, 0 },
   { "i860", "elf_i860", "i860", 4, EM_860, 0, 0 },
   { "s370", "ebl_s370", "s370", 4, EM_S370, 0, 0 },

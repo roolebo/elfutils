@@ -1,3 +1,7 @@
+2016-06-10  Mark Wielaard  <mjw@redhat.com>
+
+	* CONTRIBUTING: Extend patch, committer and maintainer guidelines.
+
 2016-05-02  Filipe Brandenburger  <filbranden@google.com>
 
 	* configure.ac (argp check): Pass pass &argv.

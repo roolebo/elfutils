@@ -1,3 +1,7 @@
+2016-06-28  Richard Henderson  <rth@redhat.com>
+
+	* elf.h: Update from glibc.  Add lots of new EM_* definitions.
+
 2016-04-14  Mark Wielaard  <mjw@redhat.com>
 
 	* elf_compress.c (__libelf_compress): Free out_buf if deflateInit

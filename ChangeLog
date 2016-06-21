@@ -1,3 +1,7 @@
+2016-06-28  Richard Henderson <rth@redhat.com>
+
+	* configure.ac (HAVE_LINUX_BPF_H): New test and conditional.
+
 2016-06-10  Mark Wielaard  <mjw@redhat.com>
 
 	* CONTRIBUTING: Extend patch, committer and maintainer guidelines.

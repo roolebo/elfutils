@@ -1,3 +1,8 @@
+2016-06-28  Richard Henderson <rth@redhat.com>
+
+	* ebl-hooks.h (EBLHOOK(disasm)): Add ebl parameter.
+	* eblopenbackend.c (machines): Add EM_BPF entry.
+
 2016-05-20  Andreas Schwab  <schwab@linux-m68k.org>
 
 	* eblopenbackend.c (machines) [EM_68K]: Set class and data.

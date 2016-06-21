@@ -1,3 +1,7 @@
+2016-06-28  Richard Henderson <rth@redhat.com>
+
+	* elflint.c (valid_e_machine): Add EM_BPF.
+
 2016-04-11  David Abdurachmanov  <davidlt@cern.ch>
 
 	* elfcmp.c (main): Fix self-comparison error with GCC 6.

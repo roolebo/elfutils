@@ -313,7 +313,8 @@ struct output_data
 
 
 int
-i386_disasm (const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
+i386_disasm (Ebl *ebl __attribute__((unused)),
+	     const uint8_t **startp, const uint8_t *end, GElf_Addr addr,
 	     const char *fmt, DisasmOutputCB_t outcb, DisasmGetSymCB_t symcb,
 	     void *outcbarg, void *symcbarg)
 {

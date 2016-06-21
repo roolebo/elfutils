@@ -1,3 +1,13 @@
+2016-06-28  Richard Henderson <rth@redhat.com>
+
+	* Makefile.am (modules): Add bpf.
+	(libebl_pic): Add libebl_bpf_pic.a.
+	(am_libebl_bpf_pic_a_OBJECTS): New.
+	* bpf_init.c, bpf_regs.c, bpf_reloc.def: New files.
+	* common-reloc.c (copy_reloc_p): Honor NO_COPY_RELOC.
+	(init_reloc): Likewise.
+
+
 2016-05-20  Andreas Schwab  <schwab@linux-m68k.org>
 
 	* Makefile.am (modules): Add m68k.

@@ -344,7 +344,7 @@ static const int valid_e_machine[] =
     EM_CRIS, EM_JAVELIN, EM_FIREPATH, EM_ZSP, EM_MMIX, EM_HUANY, EM_PRISM,
     EM_AVR, EM_FR30, EM_D10V, EM_D30V, EM_V850, EM_M32R, EM_MN10300,
     EM_MN10200, EM_PJ, EM_OPENRISC, EM_ARC_A5, EM_XTENSA, EM_ALPHA,
-    EM_TILEGX, EM_TILEPRO, EM_AARCH64
+    EM_TILEGX, EM_TILEPRO, EM_AARCH64, EM_BPF
   };
 #define nvalid_e_machine \
   (sizeof (valid_e_machine) / sizeof (valid_e_machine[0]))

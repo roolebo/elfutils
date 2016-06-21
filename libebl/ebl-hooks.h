@@ -150,7 +150,7 @@ int EBLHOOK(syscall_abi) (Ebl *ebl, int *sp, int *pc,
 			  int *callno, int args[6]);
 
 /* Disassembler function.  */
-int EBLHOOK(disasm) (const uint8_t **startp, const uint8_t *end,
+int EBLHOOK(disasm) (Ebl *ebl, const uint8_t **startp, const uint8_t *end,
 		     GElf_Addr addr, const char *fmt, DisasmOutputCB_t outcb,
 		     DisasmGetSymCB_t symcb, void *outcbarg, void *symcbarg);
 

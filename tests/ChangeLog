@@ -1,3 +1,12 @@
+2016-06-28  Richard Henderson <rth@redhat.com>
+
+	* Makefile.am (TESTS): Add run-disasm-bpf.sh, conditionally.
+	(EXTRA_DIST): Add run-disasm-bpf.sh, testfile-bpf-dis1.expect.bz2,
+	testfile-bpf-dis1.o.bz2
+	(run-disasm-bpf.sh): New file.
+	(testfile-bpf-dis1.expect.bz2): New file.
+	(testfile-bpf-dis1.o.bz2): New file.
+
 2016-02-09  Mark Wielaard  <mjw@redhat.com>
 
 	* testfile-s390x-hash-both.bz2: New testfile.

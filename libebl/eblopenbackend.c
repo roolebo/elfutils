@@ -132,6 +132,7 @@ static const struct
   { "arc", "elf_arc_a5", "arc_a5", 6, EM_ARC_A5, 0, 0 },
   { "xtensa", "elf_xtensa", "xtensa", 6, EM_XTENSA, 0, 0 },
   { "aarch64", "elf_aarch64", "aarch64", 7, EM_AARCH64, ELFCLASS64, 0 },
+  { "bpf", "elf_bpf", "bpf", 3, EM_BPF, 0, 0 },
 };
 #define nmachines (sizeof (machines) / sizeof (machines[0]))
 

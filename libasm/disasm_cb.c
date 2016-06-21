@@ -173,7 +173,7 @@ disasm_cb (DisasmCtx_t *ctx, const uint8_t **startp, const uint8_t *end,
       getsym = default_elf_getsym;
     }
 
-  return ctx->ebl->disasm (startp, end, addr, fmt, outcb, getsym, outcbarg,
-			   symcbarg);
+  return ctx->ebl->disasm (ctx->ebl, startp, end, addr, fmt, outcb,
+			   getsym, outcbarg, symcbarg);
 }
 INTDEF (disasm_cb)

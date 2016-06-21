@@ -45,6 +45,12 @@ i386_gendis_SOURCES = i386_gendis.c i386_lex.l i386_parse.y
 i386_disasm.o: i386.mnemonics $(srcdir)/i386_dis.h
 x86_64_disasm.o: x86_64.mnemonics $(srcdir)/x86_64_dis.h
 
+if HAVE_LINUX_BPF_H
+noinst_LIBRARIES += libcpu_bpf.a
+libcpu_bpf_a_SOURCES = bpf_disasm.c
+libcpu_bpf_a_CFLAGS = $(AM_CFLAGS) -Wno-format-nonliteral
+endif
+
 %_defs: $(srcdir)/defs/i386
 	$(AM_V_GEN)m4 -D$* -DDISASSEMBLER $< > $@T
 	$(AM_V_at)mv -f $@T $@

@@ -1,3 +1,10 @@
+2016-06-28  Richard Henderson <rth@redhat.com>
+
+	* Makefile.am (noinst_LIBRARIES): Add libcpu_bpf.a.
+	(libcpu_bpf_a_SOURCES, libcpu_bpf_a_CFLAGS): New.
+	* bpf_disasm.c: New file.
+	* i386_disasm.c (i386_disasm): Add ebl parameter.
+
 2015-10-05  Josh Stone  <jistone@redhat.com>
 
 	* Makefile.am (%_defs): Add AM_V_GEN and AM_V_at silencers.

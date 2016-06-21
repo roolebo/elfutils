@@ -124,12 +124,13 @@ EBLHOOK(reloc_valid_use) (Elf *elf, int reloc)
   return type > ET_NONE && type < ET_CORE && (uses & (1 << (type - 1)));
 }
 
-
+#ifndef NO_COPY_RELOC
 bool
 EBLHOOK(copy_reloc_p) (int reloc)
 {
   return reloc == R_TYPE (COPY);
 }
+#endif
 
 bool
 EBLHOOK(none_reloc_p) (int reloc)
@@ -151,8 +152,10 @@ EBLHOOK(init_reloc) (Ebl *ebl)
   ebl->reloc_type_name = EBLHOOK(reloc_type_name);
   ebl->reloc_type_check = EBLHOOK(reloc_type_check);
   ebl->reloc_valid_use = EBLHOOK(reloc_valid_use);
-  ebl->copy_reloc_p = EBLHOOK(copy_reloc_p);
   ebl->none_reloc_p = EBLHOOK(none_reloc_p);
+#ifndef NO_COPY_RELOC
+  ebl->copy_reloc_p = EBLHOOK(copy_reloc_p);
+#endif
 #ifndef NO_RELATIVE_RELOC
   ebl->relative_reloc_p = EBLHOOK(relative_reloc_p);
 #endif

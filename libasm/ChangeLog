@@ -1,3 +1,7 @@
+2016-06-28  Richard Henderson <rth@redhat.com>
+
+	* disasm_cb.c (disasm_cb): Pass ebl to disasm hook.
+
 2016-02-12  Mark Wielaard  <mjw@redhat.com>
 
 	* asm_begin.c (prepare_text_output): Only call __fsetlocking when

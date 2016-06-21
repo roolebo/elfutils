@@ -148,6 +148,9 @@ endif
 if HAVE_LIBASM
 check_PROGRAMS += $(asm_TESTS)
 TESTS += $(asm_TESTS)
+if HAVE_LINUX_BPF_H
+TESTS += run-disasm-bpf.sh
+endif
 endif
 
 EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
@@ -322,7 +325,9 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     testfile-zgabi32.bz2 testfile-zgabi64.bz2 \
 	     testfile-zgabi32be.bz2 testfile-zgabi64be.bz2 \
 	     run-elfgetchdr.sh run-elfgetzdata.sh run-elfputzdata.sh \
-	     run-zstrptr.sh run-compress-test.sh
+	     run-zstrptr.sh run-compress-test.sh \
+	     run-disasm-bpf.sh \
+	     testfile-bpf-dis1.expect.bz2 testfile-bpf-dis1.o.bz2
 
 if USE_VALGRIND
 valgrind_cmd='valgrind -q --leak-check=full --error-exitcode=1'

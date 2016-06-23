@@ -1,3 +1,9 @@
+2016-06-24  John Ogness  <john.ogness@linutronix.de>
+
+	* elf32_updatenull.c (updatenull_wrlock): Find first section.
+	* elf_nextscn.c (elf_nextscn): When scn is NULL start from 0th
+	section.
+
 2016-06-28  Richard Henderson  <rth@redhat.com>
 
 	* elf.h: Update from glibc.  Add lots of new EM_* definitions.

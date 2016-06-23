@@ -41,6 +41,7 @@
 Elf_Scn *
 elf_nextscn (Elf *elf, Elf_Scn *scn)
 {
+  Elf_ScnList *list;
   Elf_Scn *result = NULL;
 
   if (elf == NULL)
@@ -50,34 +51,29 @@ elf_nextscn (Elf *elf, Elf_Scn *scn)
 
   if (scn == NULL)
     {
-      /* If no section handle is given return the first (not 0th) section.  */
+      /* If no section handle is given return the first (not 0th) section.
+	 Set scn to the 0th section and perform nextscn.  */
       if (elf->class == ELFCLASS32
 	   || (offsetof (Elf, state.elf32.scns)
 	       == offsetof (Elf, state.elf64.scns)))
-	{
-	  if (elf->state.elf32.scns.cnt > 1)
-	    result = &elf->state.elf32.scns.data[1];
-	}
+	list = &elf->state.elf32.scns;
       else
-	{
-	  if (elf->state.elf64.scns.cnt > 1)
-	    result = &elf->state.elf64.scns.data[1];
-	}
+	list = &elf->state.elf64.scns;
+
+      scn = &list->data[0];
     }
   else
-    {
-      Elf_ScnList *list = scn->list;
+    list = scn->list;
 
-      if (scn + 1 < &list->data[list->cnt])
-	result = scn + 1;
-      else if (scn + 1 == &list->data[list->max]
-	       && (list = list->next) != NULL)
-	{
-	  /* If there is another element in the section list it must
-	     have at least one entry.  */
-	  assert (list->cnt > 0);
-	  result = &list->data[0];
-	}
+  if (scn + 1 < &list->data[list->cnt])
+    result = scn + 1;
+  else if (scn + 1 == &list->data[list->max]
+	   && (list = list->next) != NULL)
+    {
+      /* If there is another element in the section list it must
+         have at least one entry.  */
+      assert (list->cnt > 0);
+      result = &list->data[0];
     }
 
   rwlock_unlock (elf->lock);

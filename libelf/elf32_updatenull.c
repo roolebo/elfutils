@@ -180,6 +180,7 @@ __elfw2(LIBELFBITS,updatenull_wrlock) (Elf *elf, int *change_bop, size_t shnum)
 
   if (shnum > 0)
     {
+      struct Elf_Scn *scn1 = NULL;
       Elf_ScnList *list;
       bool first = true;
 
@@ -198,10 +199,16 @@ __elfw2(LIBELFBITS,updatenull_wrlock) (Elf *elf, int *change_bop, size_t shnum)
       /* Go over all sections and find out how large they are.  */
       list = &elf->state.ELFW(elf,LIBELFBITS).scns;
 
+      /* Find the first section. */
+      if (list->cnt > 1)
+	scn1 = &list->data[1];
+      else if (list->next != NULL)
+	scn1 = &list->next->data[0];
+
       /* Load the section headers if necessary.  This loads the
 	 headers for all sections.  */
-      if (list->data[1].shdr.ELFW(e,LIBELFBITS) == NULL)
-	(void) __elfw2(LIBELFBITS,getshdr_wrlock) (&list->data[1]);
+      if (scn1 != NULL && scn1->shdr.ELFW(e,LIBELFBITS) == NULL)
+	(void) __elfw2(LIBELFBITS,getshdr_wrlock) (scn1);
 
       do
 	{

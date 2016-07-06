@@ -126,7 +126,7 @@ test (Elf *elf, int class, bool layout)
   check_elf ("elf_getshdrnum", elf_getshdrnum (elf, &shnum) == 0);
   check ("shnum == 1", shnum == 2); /* section zero is also created.  */
 
-  check_elf ("elf_getphdrnum", elf_getphdrnum (elf, &phnum) != 0);
+  check_elf ("elf_getphdrnum", elf_getphdrnum (elf, &phnum) == 0);
   check ("phnum == 1", phnum == 1);
 
   check_elf ("gelf_getehdr", gelf_getehdr (elf, &ehdr) != NULL);

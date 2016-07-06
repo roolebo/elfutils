@@ -1,3 +1,11 @@
+2016-07-06  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (check_PROGRAMS): Add vendorelf.
+	(TESTS): Likewise.
+	(vendorelf_LDADD): New variable.
+	* vendorelf.c: New test.
+	* elfshphehdr.c (test): Check elf_getphdrnum succeeds.
+
 2016-06-24  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (check_PROGRAMS): Add emptyfile.

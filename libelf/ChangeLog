@@ -1,3 +1,10 @@
+2016-07-06  Mark Wielaard  <mjw@redhat.com>
+
+	* elf32_updatenull.c (updatenull_wrlock): Ignore e_type when
+	updating phdrs.
+	* elf_getphdrnum.c (__elf_getphdrnum_chk_rdlock): Only do sanity
+	checking if phdrs haven't been read in yet.
+
 2016-06-24  John Ogness  <john.ogness@linutronix.de>
 
 	* elf32_updatenull.c (updatenull_wrlock): Find first section.

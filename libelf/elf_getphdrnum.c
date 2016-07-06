@@ -1,5 +1,5 @@
 /* Return number of program headers in the ELF file.
-   Copyright (C) 2010, 2014, 2015 Red Hat, Inc.
+   Copyright (C) 2010, 2014, 2015, 2016 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -84,34 +84,38 @@ __elf_getphdrnum_chk_rdlock (Elf *elf, size_t *dst)
 {
   int result = __elf_getphdrnum_rdlock (elf, dst);
 
-  /* Do some sanity checking to make sure phnum and phoff are consistent.  */
-  Elf64_Off off = (elf->class == ELFCLASS32
-		   ? elf->state.elf32.ehdr->e_phoff
-		   : elf->state.elf64.ehdr->e_phoff);
-  if (unlikely (off == 0))
+  /* If the phdrs haven't been created or read in yet then do some
+     sanity checking to make sure phnum and phoff are consistent.  */
+  if (elf->state.elf.phdr == NULL)
     {
-      *dst = 0;
-      return result;
-    }
+      Elf64_Off off = (elf->class == ELFCLASS32
+		       ? elf->state.elf32.ehdr->e_phoff
+		       : elf->state.elf64.ehdr->e_phoff);
+      if (unlikely (off == 0))
+	{
+	  *dst = 0;
+	  return result;
+	}
 
-  if (unlikely (off >= elf->maximum_size))
-    {
-      __libelf_seterrno (ELF_E_INVALID_DATA);
-      return -1;
-    }
+      if (unlikely (off >= elf->maximum_size))
+	{
+	  __libelf_seterrno (ELF_E_INVALID_DATA);
+	  return -1;
+	}
 
-  /* Check for too many sections.  */
-  size_t phdr_size = (elf->class == ELFCLASS32
-		      ? sizeof (Elf32_Phdr) : sizeof (Elf64_Phdr));
-  if (unlikely (*dst > SIZE_MAX / phdr_size))
-    {
-      __libelf_seterrno (ELF_E_INVALID_DATA);
-      return -1;
-    }
+      /* Check for too many sections.  */
+      size_t phdr_size = (elf->class == ELFCLASS32
+			  ? sizeof (Elf32_Phdr) : sizeof (Elf64_Phdr));
+      if (unlikely (*dst > SIZE_MAX / phdr_size))
+	{
+	  __libelf_seterrno (ELF_E_INVALID_DATA);
+	  return -1;
+	}
 
-  /* Truncated file?  Don't return more than can be indexed.  */
-  if (unlikely (elf->maximum_size - off < *dst * phdr_size))
-    *dst = (elf->maximum_size - off) / phdr_size;
+      /* Truncated file?  Don't return more than can be indexed.  */
+      if (unlikely (elf->maximum_size - off < *dst * phdr_size))
+	*dst = (elf->maximum_size - off) / phdr_size;
+    }
 
   return result;
 }

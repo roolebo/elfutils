@@ -1,5 +1,5 @@
 /* Update data structures for changes.
-   Copyright (C) 2000-2010, 2015 Red Hat, Inc.
+   Copyright (C) 2000-2010, 2015, 2016 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -140,21 +140,10 @@ __elfw2(LIBELFBITS,updatenull_wrlock) (Elf *elf, int *change_bop, size_t shnum)
   off_t size = elf_typesize (LIBELFBITS, ELF_T_EHDR, 1);
 
   /* Set the program header position.  */
-  if (elf->state.ELFW(elf,LIBELFBITS).phdr == NULL
-      && (ehdr->e_type == ET_EXEC || ehdr->e_type == ET_DYN
-	  || ehdr->e_type == ET_CORE))
+  if (elf->state.ELFW(elf,LIBELFBITS).phdr == NULL)
     (void) __elfw2(LIBELFBITS,getphdr_wrlock) (elf);
   if (elf->state.ELFW(elf,LIBELFBITS).phdr != NULL)
     {
-      /* Only executables, shared objects, and core files have a program
-	 header.  */
-      if (ehdr->e_type != ET_EXEC && ehdr->e_type != ET_DYN
-	  && unlikely (ehdr->e_type != ET_CORE))
-	{
-	  __libelf_seterrno (ELF_E_INVALID_PHDR);
-	  return -1;
-	}
-
       size_t phnum;
       if (unlikely (__elf_getphdrnum_rdlock (elf, &phnum) != 0))
 	return -1;

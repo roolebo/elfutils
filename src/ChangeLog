@@ -1,3 +1,8 @@
+2016-07-06  Mark Wielaard  <mjw@redhat.com>
+
+	* unstrip.c (copy_elided_sections): Use unstripped_strent[] from
+	index zero, instead of one.
+
 2016-06-28  Richard Henderson <rth@redhat.com>
 
 	* elflint.c (valid_e_machine): Add EM_BPF.

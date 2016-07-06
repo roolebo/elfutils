@@ -1761,8 +1761,8 @@ more sections in stripped file than debug file -- arguments reversed?"));
 	      GElf_Shdr mem;
 	      GElf_Shdr *hdr = gelf_getshdr (sec, &mem);
 	      const char *name = get_section_name (i + 1, hdr, shstrtab);
-	      unstripped_strent[i + 1] = ebl_strtabadd (symstrtab, name, 0);
-	      ELF_CHECK (unstripped_strent[i + 1] != NULL,
+	      unstripped_strent[i] = ebl_strtabadd (symstrtab, name, 0);
+	      ELF_CHECK (unstripped_strent[i] != NULL,
 			 _("cannot add section name to string table: %s"));
 	    }
 
@@ -1785,7 +1785,7 @@ more sections in stripped file than debug file -- arguments reversed?"));
 	      Elf_Scn *sec = elf_getscn (unstripped, i + 1);
 	      GElf_Shdr mem;
 	      GElf_Shdr *hdr = gelf_getshdr (sec, &mem);
-	      shdr->sh_name = ebl_strtaboffset (unstripped_strent[i + 1]);
+	      shdr->sh_name = ebl_strtaboffset (unstripped_strent[i]);
 	      update_shdr (sec, hdr);
 	    }
 	}

@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 1996-2014 Red Hat, Inc.
+## Copyright (C) 1996-2014, 2016 Red Hat, Inc.
 ## This file is part of elfutils.
 ##
 ## This file is free software; you can redistribute it and/or modify
@@ -25,46 +25,14 @@ AM_CPPFLAGS += -I$(srcdir)/../libelf -I$(srcdir)/../libebl \
 
 AM_LDFLAGS = -Wl,-rpath-link,../libelf:../libdw
 
-YACC = @YACC@ -d
-AM_YFLAGS = -pld
-AM_LFLAGS = -Pld -olex.yy.c
-## Uncomment to enable debugging of linker script parser
-##YYDEBUG = -DYYDEBUG=1
-
-native_ld = @native_ld@
-base_cpu = @base_cpu@
-
-bin_PROGRAMS = readelf nm size strip ld elflint findtextrel addr2line \
+bin_PROGRAMS = readelf nm size strip elflint findtextrel addr2line \
 	       elfcmp objdump ranlib strings ar unstrip stack elfcompress
 
-
-ld_dsos = libld_elf_i386_pic.a
-if NATIVE_LD
-noinst_LIBRARIES = libld_elf.a libar.a
-native_ld_cflags = -DBASE_ELF_NAME=elf_$(base_cpu)
-else
-noinst_LIBRARIES = libld_elf.a libar.a $(ld_dsos)
-noinst_PROGRAMS = $(ld_dsos:_pic.a=.so)
-endif
-if NEVER
-# We never build this library but we need to get the dependency files
-# of all the linker backends that might be used in a non-generic linker.
-noinst_LIBRARIES += libdummy.a
-libdummy_a_SOURCES = i386_ld.c
-endif
-
-
-ld_SOURCES = ld.c ldgeneric.c ldlex.l ldscript.y symbolhash.c sectionhash.c \
-	     versionhash.c
+noinst_LIBRARIES = libar.a
 
 libar_a_SOURCES = arlib.c arlib2.c arlib-argp.c
 
-noinst_HEADERS = ld.h symbolhash.h sectionhash.h versionhash.h \
-		 ldscript.h xelf.h unaligned.h
-
-EXTRA_DIST = elf32-i386.script libld_elf_i386.map $(ld_modules) arlib.h \
-	     debugpred.h
-ld_modules = i386_ld.c
+EXTRA_DIST = arlib.h debugpred.h
 
 bin_SCRIPTS = make-debug-archive
 EXTRA_DIST += make-debug-archive.in
@@ -86,11 +54,6 @@ if DEMANGLE
 demanglelib = -lstdc++
 endif
 
-# XXX While the file is not finished, don't warn about this
-ldgeneric_no_Wunused = yes
-ldgeneric_no_Wstack_usage = yes
-ldlex_no_Wstack_usage = yes
-
 # Bad, bad stack usage...
 readelf_no_Wstack_usage = yes
 nm_no_Wstack_usage = yes
@@ -109,12 +72,6 @@ nm_LDADD = $(libdw) $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl \
 	   $(demanglelib)
 size_LDADD = $(libelf) $(libeu) $(argp_LDADD)
 strip_LDADD = $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl
-ld_LDADD = $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl
-if NATIVE_LD
-# -ldl is always needed for libebl.
-ld_LDADD += libld_elf.a
-endif
-ld_LDFLAGS = -rdynamic
 elflint_LDADD  = $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl
 findtextrel_LDADD = $(libdw) $(libelf) $(argp_LDADD)
 addr2line_LDADD = $(libdw) $(libelf) $(argp_LDADD) $(demanglelib)
@@ -126,31 +83,6 @@ ar_LDADD = libar.a $(libelf) $(libeu) $(argp_LDADD)
 unstrip_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD) -ldl
 stack_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD) -ldl $(demanglelib)
 elfcompress_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD)
-
-ldlex.o: ldscript.c
-ldlex_no_Werror = yes
-ldscript.h: ldscript.c
-
-if NATIVE_LD
-# Machine-specific linker code.
-libld_elf_a_SOURCES := $(base_cpu)_ld.c
-else
-libld_elf_i386_pic_a_SOURCES =
-am_libld_elf_i386_pic_a_OBJECTS = i386_ld.os
-
-libld_elf_i386_so_SOURCES =
-libld_elf_i386.so: libld_elf_i386_pic.a libld_elf_i386.map
-	$(AM_V_CCLD)$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
-		$(libelf) $(libeu) \
-		-Wl,--version-script,$(srcdir)/libld_elf_i386.map
-	@$(textrel_check)
-endif
-
-# Special rule to make it possible to define libld_elf_a_SOURCES as we do.
-# Otherwise make would complain.
-.deps/none_ld.Po: none_ld.os
-	@-:
-
 
 installcheck-binPROGRAMS: $(bin_PROGRAMS)
 	bad=0; pid=$$$$; list="$(bin_PROGRAMS)"; for p in $$list; do \
@@ -168,10 +100,7 @@ installcheck-binPROGRAMS: $(bin_PROGRAMS)
 	  done; \
 	done; rm -f c$${pid}_.???; exit $$bad
 
-CLEANFILES += none_ld.os $(ld_modules:.c=.os) *.gconv
-
-MAINTAINERCLEANFILES = ldlex.c ldscript.c ldscript.h
-
+CLEANFILES += *.gconv
 
 make-debug-archive: $(srcdir)/make-debug-archive.in
 	$(AM_V_GEN)UNSTRIP=$(bindir)/`echo unstrip | sed '$(transform)'`; \

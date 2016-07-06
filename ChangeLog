@@ -1,3 +1,8 @@
+2016-07-06  Mark Wielaard  <mjw@redhat.com>
+
+	* .gitignore: Remove src/ld. ldlex.c, ldscript.c and ldscript.h.
+	* configure.ac (enable generic): Removed.
+
 2016-06-28  Richard Henderson <rth@redhat.com>
 
 	* configure.ac (HAVE_LINUX_BPF_H): New test and conditional.

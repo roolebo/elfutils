@@ -1,5 +1,5 @@
 /* Accumulation of various pieces of knowledge about ELF.
-   Copyright (C) 2000-2012, 2014 Red Hat, Inc.
+   Copyright (C) 2000-2012, 2014, 2016 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -60,30 +60,6 @@
 #define SH_INFO_LINK_P(Shdr) \
   ((Shdr)->sh_type == SHT_REL || (Shdr)->sh_type == SHT_RELA		      \
    || ((Shdr)->sh_flags & SHF_INFO_LINK) != 0)
-
-
-/* When combining ELF section flags we must distinguish two kinds:
-
-   - flags which cause problem if not added to the result even if not
-     present in all input sections
-
-   - flags which cause problem if added to the result if not present
-     in all input sections
-
-   The following definition is for the general case.  There might be
-   machine specific extensions.  */
-#define SH_FLAGS_COMBINE(Flags1, Flags2) \
-  (((Flags1 | Flags2)							      \
-    & (SHF_WRITE | SHF_ALLOC | SHF_EXECINSTR | SHF_LINK_ORDER		      \
-       | SHF_OS_NONCONFORMING | SHF_GROUP))				      \
-   | (Flags1 & Flags2 & (SHF_MERGE | SHF_STRINGS | SHF_INFO_LINK)))
-
-/* Similar macro: return the bits of the flags which necessarily must
-   match if two sections are automatically combined.  Sections still
-   can be forcefully combined in which case SH_FLAGS_COMBINE can be
-   used to determine the combined flags.  */
-#define SH_FLAGS_IMPORTANT(Flags) \
-  ((Flags) & ~((GElf_Xword) 0 | SHF_LINK_ORDER | SHF_OS_NONCONFORMING))
 
 
 /* Size of an entry in the hash table.  The ELF specification says all

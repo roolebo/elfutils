@@ -1,5 +1,10 @@
 2016-07-06  Mark Wielaard  <mjw@redhat.com>
 
+	* elf-knowledge.h (SH_FLAGS_COMBINE): Removed.
+	(SH_FLAGS_IMPORTANT): Likewise.
+
+2016-07-06  Mark Wielaard  <mjw@redhat.com>
+
 	* elf32_updatenull.c (updatenull_wrlock): Ignore e_type when
 	updating phdrs.
 	* elf_getphdrnum.c (__elf_getphdrnum_chk_rdlock): Only do sanity

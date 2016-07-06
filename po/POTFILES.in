@@ -13,7 +13,6 @@ libdwfl/libdwflP.h
 libebl/eblbackendname.c
 libebl/eblcorenotetypename.c
 libebl/ebldynamictagname.c
-libebl/eblobjecttypename.c
 libebl/eblobjnote.c
 libebl/eblobjnotetypename.c
 libebl/eblosabiname.c
@@ -32,10 +31,6 @@ src/arlib.c
 src/elfcmp.c
 src/elflint.c
 src/findtextrel.c
-src/i386_ld.c
-src/ld.c
-src/ldgeneric.c
-src/ldscript.y
 src/nm.c
 src/objdump.c
 src/ranlib.c

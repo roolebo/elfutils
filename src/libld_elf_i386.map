@@ -1,7 +1,0 @@
-ELFUTILS_1.0 {
-  global:
-    elf_i386_ld_init;
-
-  local:
-    *;
-};

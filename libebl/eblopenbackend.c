@@ -1,5 +1,5 @@
 /* Generate ELF backend handle.
-   Copyright (C) 2000-2015 Red Hat, Inc.
+   Copyright (C) 2000-2016 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -140,8 +140,6 @@ static const struct
 #define MAX_PREFIX_LEN 16
 
 /* Default callbacks.  Mostly they just return the error value.  */
-static const char *default_object_type_name (int ignore, char *buf,
-					     size_t len);
 static const char *default_reloc_type_name (int ignore, char *buf, size_t len);
 static bool default_reloc_type_check (int ignore);
 static bool default_reloc_valid_use (Elf *elf, int ignore);
@@ -163,7 +161,6 @@ static const char *default_symbol_binding_name (int ignore, char *buf,
 static const char *default_dynamic_tag_name (int64_t ignore, char *buf,
 					     size_t len);
 static bool default_dynamic_tag_check (int64_t ignore);
-static GElf_Word default_sh_flags_combine (GElf_Word flags1, GElf_Word flags2);
 static const char *default_osabi_name (int ignore, char *buf, size_t len);
 static void default_destr (struct ebl *ignore);
 static const char *default_core_note_type_name (uint32_t, char *buf,
@@ -210,7 +207,6 @@ static int default_abi_cfi (Ebl *ebl, Dwarf_CIE *abi_info);
 static void
 fill_defaults (Ebl *result)
 {
-  result->object_type_name = default_object_type_name;
   result->reloc_type_name = default_reloc_type_name;
   result->reloc_type_check = default_reloc_type_check;
   result->reloc_valid_use = default_reloc_valid_use;
@@ -227,7 +223,6 @@ fill_defaults (Ebl *result)
   result->symbol_binding_name = default_symbol_binding_name;
   result->dynamic_tag_name = default_dynamic_tag_name;
   result->dynamic_tag_check = default_dynamic_tag_check;
-  result->sh_flags_combine = default_sh_flags_combine;
   result->osabi_name = default_osabi_name;
   result->core_note_type_name = default_core_note_type_name;
   result->object_note_type_name = default_object_note_type_name;
@@ -431,14 +426,6 @@ ebl_openbackend_emulation (const char *emulation)
 
 /* Default callbacks.  Mostly they just return the error value.  */
 static const char *
-default_object_type_name (int ignore __attribute__ ((unused)),
-			  char *buf __attribute__ ((unused)),
-			  size_t len __attribute__ ((unused)))
-{
-  return NULL;
-}
-
-static const char *
 default_reloc_type_name (int ignore __attribute__ ((unused)),
 			 char *buf __attribute__ ((unused)),
 			 size_t len __attribute__ ((unused)))
@@ -553,12 +540,6 @@ static bool
 default_dynamic_tag_check (int64_t ignore __attribute__ ((unused)))
 {
   return false;
-}
-
-static GElf_Word
-default_sh_flags_combine (GElf_Word flags1, GElf_Word flags2)
-{
-  return SH_FLAGS_COMBINE (flags1, flags2);
 }
 
 static void

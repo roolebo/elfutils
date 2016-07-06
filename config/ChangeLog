@@ -1,3 +1,7 @@
+2016-07-06  Mark Wielaard  <mjw@redhat.com>
+
+	* elfutils.spec.in: Remove eu-ld.
+
 2016-03-31  Mark Wielaard  <mjw@redhat.com>
 
 	* elfutils.spec.in: Update for 0.166.

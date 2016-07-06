@@ -1,5 +1,5 @@
 /* Interface for libebl.
-   Copyright (C) 2000-2010, 2013, 2014, 2015 Red Hat, Inc.
+   Copyright (C) 2000-2010, 2013, 2014, 2015, 2016 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -89,10 +89,6 @@ extern int ebl_get_elfdata (Ebl *ebl) __attribute__ ((__pure__));
 extern const char *ebl_backend_name (Ebl *ebl);
 
 /* Return relocation type name.  */
-extern const char *ebl_object_type_name (Ebl *ebl, int object,
-					 char *buf, size_t len);
-
-/* Return relocation type name.  */
 extern const char *ebl_reloc_type_name (Ebl *ebl, int reloc,
 					char *buf, size_t len);
 
@@ -162,10 +158,6 @@ extern bool ebl_check_special_symbol (Ebl *ebl, GElf_Ehdr *ehdr,
 
 /* Check whether only valid bits are set on the st_other symbol flag.  */
 extern bool ebl_check_st_other_bits (Ebl *ebl, unsigned char st_other);
-
-/* Return combined section header flags value.  */
-extern GElf_Word ebl_sh_flags_combine (Ebl *ebl, GElf_Word flags1,
-				       GElf_Word flags2);
 
 /* Return symbolic representation of OS ABI.  */
 extern const char *ebl_osabi_name (Ebl *ebl, int osabi, char *buf, size_t len);
@@ -318,50 +310,6 @@ extern size_t ebl_strtaboffset (struct Ebl_Strent *se);
 
 /* Return the string associated with SE.  */
 extern const char *ebl_string (struct Ebl_Strent *se);
-
-
-/* ELF wide char string table handling.  */
-struct Ebl_WStrtab;
-struct Ebl_WStrent;
-
-/* Create new ELF wide char string table object in memory.  */
-extern struct Ebl_WStrtab *ebl_wstrtabinit (bool nullstr);
-
-/* Free resources allocated for ELF wide char string table ST.  */
-extern void ebl_wstrtabfree (struct Ebl_WStrtab *st);
-
-/* Add string STR (length LEN is != 0) to ELF string table ST.  */
-extern struct Ebl_WStrent *ebl_wstrtabadd (struct Ebl_WStrtab *st,
-					   const wchar_t *str, size_t len);
-
-/* Finalize string table ST and store size and memory location information
-   in DATA.  */
-extern void ebl_wstrtabfinalize (struct Ebl_WStrtab *st, Elf_Data *data);
-
-/* Get offset in wide char string table for string associated with SE.  */
-extern size_t ebl_wstrtaboffset (struct Ebl_WStrent *se);
-
-
-/* Generic string table handling.  */
-struct Ebl_GStrtab;
-struct Ebl_GStrent;
-
-/* Create new string table object in memory.  */
-extern struct Ebl_GStrtab *ebl_gstrtabinit (unsigned int width, bool nullstr);
-
-/* Free resources allocated for string table ST.  */
-extern void ebl_gstrtabfree (struct Ebl_GStrtab *st);
-
-/* Add string STR (length LEN is != 0) to string table ST.  */
-extern struct Ebl_GStrent *ebl_gstrtabadd (struct Ebl_GStrtab *st,
-					   const char *str, size_t len);
-
-/* Finalize string table ST and store size and memory location information
-   in DATA.  */
-extern void ebl_gstrtabfinalize (struct Ebl_GStrtab *st, Elf_Data *data);
-
-/* Get offset in wide char string table for string associated with SE.  */
-extern size_t ebl_gstrtaboffset (struct Ebl_GStrent *se);
 
 
 /* Register map info. */

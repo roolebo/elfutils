@@ -1,5 +1,29 @@
 2016-07-06  Mark Wielaard  <mjw@redhat.com>
 
+	* elf32-i386.script, i386_ld.c, ld.c, ld.h, ldgeneric.c, ldlex.l,
+	ldscript.y, libld_elf_i386.map, none_ld.c, sectionhash.c,
+	sectionhash.h, symbolhash.c, symbolhash.h, unaligned.h,
+	versionhash.c, versionhash.h, xelf.h: Removed.
+	* Makefile.am (YACC): Removed.
+	(AM_YFLAGS): Removed.
+	(AM_LFLAGS): Removed.
+	(native_ld): Removed.
+	(base_cpu): Removed.
+	(bin_PROGRAMS): Removed ld.
+	(ld_dsos): Removed.
+	(ld_SOURCES): Removed.
+	(noinst_LIBRARIES): Only libar.a.
+	(EXTRA_DIST): Just arlib.h and debugpred.h.
+	(ld_LDADD): Removed.
+	(ld_LDFLAGS): Removed.
+	(ldlex.o): Removed.
+	(ldscript.h): Removed.
+	(libld*): Removed.
+	(CLEANFILES): Just *.gconv.
+	(MAINTAINERCLEANFILES): Removed.
+
+2016-07-06  Mark Wielaard  <mjw@redhat.com>
+
 	* unstrip.c (copy_elided_sections): Use unstripped_strent[] from
 	index zero, instead of one.
 

@@ -1,3 +1,21 @@
+2016-07-06  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (gen_SOURCES): Remove eblobjecttypename.c,
+	eblshflagscombine.c, eblwstrtab.c and eblgstrtab.c.
+	* ebl-hooks.h (object_type_name): Removed.
+	(sh_flags_combine): Likewise.
+	* eblgstrtab.c: Removed.
+	* eblobjecttypename.c: Removed.
+	* eblopenbackend.c (default_object_type_name): Removed.
+	(default_sh_flags_combine): Likewise.
+	(fill_defaults): Removed object_type_name and sh_flags_combine.
+	* eblshflagscombine.c: Removed.
+	* eblwstrtab.c: Removed.
+	* libebl.h (ebl_object_type_name): Removed.
+	(ebl_sh_flags_combine): Likewise.
+	(ebl_wstrtab*): Removed.
+	(ebl_gstrtab*): Likewise.
+
 2016-06-28  Richard Henderson <rth@redhat.com>
 
 	* ebl-hooks.h (EBLHOOK(disasm)): Add ebl parameter.

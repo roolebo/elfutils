@@ -60,10 +60,6 @@ Makefile.in
 /src/elfcompress
 /src/elflint
 /src/findtextrel
-/src/ld
-/src/ldlex.c
-/src/ldscript.c
-/src/ldscript.h
 /src/make-debug-archive
 /src/nm
 /src/objdump

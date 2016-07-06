@@ -144,36 +144,6 @@ dnl tests, because the choice of the file model can (in principle) affect
 dnl whether functions and headers are available, whether they work, etc.
 AC_SYS_LARGEFILE
 
-dnl Enable the linker to be build as a native-only linker.  By default it
-dnl can handle all architectures but this comes at a cost.  A native
-dnl will be slightly faster, small, and has fewer dependencies.
-native_ld=no
-AC_ARG_ENABLE([generic],
-AS_HELP_STRING([--disable-generic], [do not build generic linker]), [dnl
-if test "$enable_generic" = no; then
-  case "$host_cpu" in
-   i?86)
-    AC_DEFINE(NATIVE_ELF, 32)
-    native_ld=yes
-    base_cpu=i386
-    ;;
-   *)
-    AC_MSG_ERROR([no machine-specific linker for this configuration available])
-    ;;
-  esac
-fi])
-AH_TEMPLATE([NATIVE_ELF],
-[Define to 32 or 64 if a specific implementation is wanted.])
-AM_CONDITIONAL(NATIVE_LD, test "$native_ld" = yes)
-dnl The automake generated Makefile cannot deal with macros in the name
-dnl of files if at any time there is no such file, even if the filename
-dnl would not be used.
-AS_IF([test -z "$base_cpu"], [base_cpu=none])
-AC_SUBST(base_cpu)
-dnl Support to work around automake's inflexible dependency generation.
-dnl See src/Makefile.am for more information.
-AM_CONDITIONAL(NEVER, false)
-
 dnl enable debugging of branch prediction.
 AC_ARG_ENABLE([debugpred],
 AS_HELP_STRING([--enable-debugpred],[build binaries with support to debug branch prediction]),

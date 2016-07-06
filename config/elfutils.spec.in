@@ -134,7 +134,6 @@ chmod +x ${RPM_BUILD_ROOT}%{_prefix}/%{_lib}/elfutils/lib*.so*
 
 # XXX Nuke unpackaged files
 { cd ${RPM_BUILD_ROOT}
-  rm -f .%{_bindir}/eu-ld
   rm -f .%{_includedir}/elfutils/libasm.h
   rm -f .%{_libdir}/libasm.so
   rm -f .%{_libdir}/libasm.a
@@ -176,7 +175,6 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_bindir}/eu-ar
 %{_bindir}/eu-unstrip
 %{_bindir}/eu-make-debug-archive
-#%{_bindir}/eu-ld
 %{_bindir}/eu-elfcompress
 %{_libdir}/libasm-%{version}.so
 %{_libdir}/libdw-%{version}.so

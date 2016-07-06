@@ -1,5 +1,5 @@
 /* Backend hook signatures internal interface for libebl.
-   Copyright (C) 2000-2011, 2013, 2014 Red Hat, Inc.
+   Copyright (C) 2000-2011, 2013, 2014, 2016 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -25,9 +25,6 @@
    You should have received copies of the GNU General Public License and
    the GNU Lesser General Public License along with this program.  If
    not, see <http://www.gnu.org/licenses/>.  */
-
-/* Return symbol representaton of object file type.  */
-const char *EBLHOOK(object_type_name) (int, char *, size_t);
 
 /* Return symbolic representation of relocation type.  */
 const char *EBLHOOK(reloc_type_name) (int, char *, size_t);
@@ -79,9 +76,6 @@ const char *EBLHOOK(dynamic_tag_name) (int64_t, char *, size_t);
 
 /* Check dynamic tag.  */
 bool EBLHOOK(dynamic_tag_check) (int64_t);
-
-/* Combine section header flags values.  */
-GElf_Word EBLHOOK(sh_flags_combine) (GElf_Word, GElf_Word);
 
 /* Return symbolic representation of OS ABI.  */
 const char *EBLHOOK(osabi_name) (int, char *, size_t);

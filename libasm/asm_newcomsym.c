@@ -1,5 +1,5 @@
 /* Create new COMMON symbol.
-   Copyright (C) 2002 Red Hat, Inc.
+   Copyright (C) 2002, 2016 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -82,7 +82,7 @@ asm_newcomsym (AsmCtx_t *ctx, const char *name, GElf_Xword size,
   /* XXX Do we have to allow a different binding?  */
   result->binding = STB_GLOBAL;
   result->symidx = 0;
-  result->strent = ebl_strtabadd (ctx->symbol_strtab, name, 0);
+  result->strent = dwelf_strtab_add (ctx->symbol_strtab, name);
 
   /* The value of a COM symbol is the alignment.  Since there are no
      subsection and the initial offset of the section is 0 we can get

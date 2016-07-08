@@ -48,6 +48,7 @@
 #include <gelf.h>
 #include <libebl.h>
 #include <libdwfl.h>
+#include "libdwelf.h"
 #include "system.h"
 
 #ifndef _
@@ -686,7 +687,7 @@ struct section
   Elf_Scn *scn;
   const char *name;
   Elf_Scn *outscn;
-  struct Ebl_Strent *strent;
+  Dwelf_Strent *strent;
   GElf_Shdr shdr;
 };
 
@@ -757,7 +758,7 @@ struct symbol
   union
   {
     const char *name;
-    struct Ebl_Strent *strent;
+    Dwelf_Strent *strent;
   };
   union
   {
@@ -1214,12 +1215,12 @@ static Elf_Data *
 new_shstrtab (Elf *unstripped, size_t unstripped_shnum,
 	      Elf_Data *shstrtab, size_t unstripped_shstrndx,
 	      struct section *sections, size_t stripped_shnum,
-	      struct Ebl_Strtab *strtab)
+	      Dwelf_Strtab *strtab)
 {
   if (strtab == NULL)
     return NULL;
 
-  struct Ebl_Strent *unstripped_strent[unstripped_shnum - 1];
+  Dwelf_Strent *unstripped_strent[unstripped_shnum - 1];
   memset (unstripped_strent, 0, sizeof unstripped_strent);
   for (struct section *sec = sections;
        sec < &sections[stripped_shnum - 1];
@@ -1228,7 +1229,7 @@ new_shstrtab (Elf *unstripped, size_t unstripped_shnum,
       {
 	if (sec->strent == NULL)
 	  {
-	    sec->strent = ebl_strtabadd (strtab, sec->name, 0);
+	    sec->strent = dwelf_strtab_add (strtab, sec->name);
 	    ELF_CHECK (sec->strent != NULL,
 		       _("cannot add section name to string table: %s"));
 	  }
@@ -1243,7 +1244,7 @@ new_shstrtab (Elf *unstripped, size_t unstripped_shnum,
 	GElf_Shdr shdr_mem;
 	GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
 	const char *name = get_section_name (i + 1, shdr, shstrtab);
-	unstripped_strent[i] = ebl_strtabadd (strtab, name, 0);
+	unstripped_strent[i] = dwelf_strtab_add (strtab, name);
 	ELF_CHECK (unstripped_strent[i] != NULL,
 		   _("cannot add section name to string table: %s"));
       }
@@ -1255,7 +1256,8 @@ new_shstrtab (Elf *unstripped, size_t unstripped_shnum,
 						   unstripped_shstrndx), NULL);
   ELF_CHECK (elf_flagdata (strtab_data, ELF_C_SET, ELF_F_DIRTY),
 	     _("cannot update section header string table data: %s"));
-  ebl_strtabfinalize (strtab, strtab_data);
+  if (dwelf_strtab_finalize (strtab, strtab_data) == NULL)
+    error (EXIT_FAILURE, 0, "Not enough memory to create string table");
 
   /* Update the sh_name fields of sections we aren't modifying later.  */
   for (size_t i = 0; i < unstripped_shnum - 1; ++i)
@@ -1264,7 +1266,7 @@ new_shstrtab (Elf *unstripped, size_t unstripped_shnum,
 	Elf_Scn *scn = elf_getscn (unstripped, i + 1);
 	GElf_Shdr shdr_mem;
 	GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
-	shdr->sh_name = ebl_strtaboffset (unstripped_strent[i]);
+	shdr->sh_name = dwelf_strent_off (unstripped_strent[i]);
 	if (i + 1 == unstripped_shstrndx)
 	  shdr->sh_size = strtab_data->d_size;
 	update_shdr (scn, shdr);
@@ -1456,7 +1458,7 @@ more sections in stripped file than debug file -- arguments reversed?"));
   const struct section *stripped_dynsym = NULL;
   size_t debuglink = SHN_UNDEF;
   size_t ndx_section[stripped_shnum - 1];
-  struct Ebl_Strtab *strtab = NULL;
+  Dwelf_Strtab *strtab = NULL;
   for (struct section *sec = sections;
        sec < &sections[stripped_shnum - 1];
        ++sec)
@@ -1508,8 +1510,8 @@ more sections in stripped file than debug file -- arguments reversed?"));
 		     _("cannot add new section: %s"));
 
 	  if (strtab == NULL)
-	    strtab = ebl_strtabinit (true);
-	  sec->strent = ebl_strtabadd (strtab, sec->name, 0);
+	    strtab = dwelf_strtab_init (true);
+	  sec->strent = dwelf_strtab_add (strtab, sec->name);
 	  ELF_CHECK (sec->strent != NULL,
 		     _("cannot add section name to string table: %s"));
 	}
@@ -1570,7 +1572,7 @@ more sections in stripped file than debug file -- arguments reversed?"));
 	  shdr_mem.sh_info = ndx_section[sec->shdr.sh_info - 1];
 
 	if (strtab != NULL)
-	  shdr_mem.sh_name = ebl_strtaboffset (sec->strent);
+	  shdr_mem.sh_name = dwelf_strent_off (sec->strent);
 
 	Elf_Data *indata = elf_getdata (sec->scn, NULL);
 	ELF_CHECK (indata != NULL, _("cannot get section data: %s"));
@@ -1641,7 +1643,7 @@ more sections in stripped file than debug file -- arguments reversed?"));
 
   /* We may need to update the symbol table.  */
   Elf_Data *symdata = NULL;
-  struct Ebl_Strtab *symstrtab = NULL;
+  Dwelf_Strtab *symstrtab = NULL;
   Elf_Data *symstrdata = NULL;
   if (unstripped_symtab != NULL && (stripped_symtab != NULL
 				    || check_prelink /* Section adjustments. */
@@ -1721,13 +1723,13 @@ more sections in stripped file than debug file -- arguments reversed?"));
 
       /* Now a final pass updates the map with the final order,
 	 and builds up the new string table.  */
-      symstrtab = ebl_strtabinit (true);
+      symstrtab = dwelf_strtab_init (true);
       for (size_t i = 0; i < nsym; ++i)
 	{
 	  assert (symbols[i].name != NULL);
 	  assert (*symbols[i].map != 0);
 	  *symbols[i].map = 1 + i;
-	  symbols[i].strent = ebl_strtabadd (symstrtab, symbols[i].name, 0);
+	  symbols[i].strent = dwelf_strtab_add (symstrtab, symbols[i].name);
 	}
 
       /* Scan the discarded symbols too, just to update their slots
@@ -1752,7 +1754,7 @@ more sections in stripped file than debug file -- arguments reversed?"));
       /* If symtab and the section header table share the string table
 	 add the section names to the strtab and then (after finalizing)
 	 fixup the section header sh_names.  Also dispose of the old data.  */
-      struct Ebl_Strent *unstripped_strent[unstripped_shnum - 1];
+      Dwelf_Strent *unstripped_strent[unstripped_shnum - 1];
       if (unstripped_shstrndx == elf_ndxscn (unstripped_strtab))
 	{
 	  for (size_t i = 0; i < unstripped_shnum - 1; ++i)
@@ -1761,20 +1763,22 @@ more sections in stripped file than debug file -- arguments reversed?"));
 	      GElf_Shdr mem;
 	      GElf_Shdr *hdr = gelf_getshdr (sec, &mem);
 	      const char *name = get_section_name (i + 1, hdr, shstrtab);
-	      unstripped_strent[i] = ebl_strtabadd (symstrtab, name, 0);
+	      unstripped_strent[i] = dwelf_strtab_add (symstrtab, name);
 	      ELF_CHECK (unstripped_strent[i] != NULL,
 			 _("cannot add section name to string table: %s"));
 	    }
 
 	  if (strtab != NULL)
 	    {
-	      ebl_strtabfree (strtab);
+	      dwelf_strtab_free (strtab);
 	      free (strtab_data->d_buf);
 	      strtab = NULL;
 	    }
 	}
 
-      ebl_strtabfinalize (symstrtab, symstrdata);
+      if (dwelf_strtab_finalize (symstrtab, symstrdata) == NULL)
+	error (EXIT_FAILURE, 0, "Not enough memory to create symbol table");
+
       elf_flagdata (symstrdata, ELF_C_SET, ELF_F_DIRTY);
 
       /* And update the section header names if necessary.  */
@@ -1785,7 +1789,7 @@ more sections in stripped file than debug file -- arguments reversed?"));
 	      Elf_Scn *sec = elf_getscn (unstripped, i + 1);
 	      GElf_Shdr mem;
 	      GElf_Shdr *hdr = gelf_getshdr (sec, &mem);
-	      shdr->sh_name = ebl_strtaboffset (unstripped_strent[i]);
+	      shdr->sh_name = dwelf_strent_off (unstripped_strent[i]);
 	      update_shdr (sec, hdr);
 	    }
 	}
@@ -1810,7 +1814,7 @@ more sections in stripped file than debug file -- arguments reversed?"));
 	  struct symbol *s = &symbols[i];
 
 	  /* Fill in the symbol details.  */
-	  sym.st_name = ebl_strtaboffset (s->strent);
+	  sym.st_name = dwelf_strent_off (s->strent);
 	  sym.st_value = s->value; /* Already biased to output address.  */
 	  sym.st_size = s->size;
 	  sym.st_shndx = s->shndx; /* Already mapped to output index.  */
@@ -1959,13 +1963,13 @@ more sections in stripped file than debug file -- arguments reversed?"));
 
   if (strtab != NULL)
     {
-      ebl_strtabfree (strtab);
+      dwelf_strtab_free (strtab);
       free (strtab_data->d_buf);
     }
 
   if (symstrtab != NULL)
     {
-      ebl_strtabfree (symstrtab);
+      dwelf_strtab_free (symstrtab);
       free (symstrdata->d_buf);
     }
   free_new_data ();

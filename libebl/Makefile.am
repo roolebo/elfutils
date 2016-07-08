@@ -37,7 +37,7 @@ lib_LIBRARIES = libebl.a
 
 pkginclude_HEADERS = libebl.h
 
-gen_SOURCES = eblopenbackend.c eblclosebackend.c eblstrtab.c \
+gen_SOURCES = eblopenbackend.c eblclosebackend.c \
 	      eblreloctypename.c eblsegmenttypename.c \
 	      eblsectiontypename.c eblmachineflagname.c \
 	      eblsymboltypename.c ebldynamictagname.c eblsectionname.c \

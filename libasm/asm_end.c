@@ -1,5 +1,5 @@
 /* Finalize operations on the assembler context, free all resources.
-   Copyright (C) 2002, 2003, 2005 Red Hat, Inc.
+   Copyright (C) 2002, 2003, 2005, 2016 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -62,11 +62,11 @@ static int
 binary_end (AsmCtx_t *ctx)
 {
   void *symtab = NULL;
-  struct Ebl_Strent *symscn_strent = NULL;
-  struct Ebl_Strent *strscn_strent = NULL;
-  struct Ebl_Strent *xndxscn_strent = NULL;
+  Dwelf_Strent *symscn_strent = NULL;
+  Dwelf_Strent *strscn_strent = NULL;
+  Dwelf_Strent *xndxscn_strent = NULL;
   Elf_Scn *shstrscn;
-  struct Ebl_Strent *shstrscn_strent;
+  Dwelf_Strent *shstrscn_strent;
   size_t shstrscnndx;
   size_t symscnndx = 0;
   size_t strscnndx = 0;
@@ -136,8 +136,8 @@ binary_end (AsmCtx_t *ctx)
   if (ctx->nsymbol_tab > 0)
     {
       /* Create the symbol table and string table section names.  */
-      symscn_strent = ebl_strtabadd (ctx->section_strtab, ".symtab", 8);
-      strscn_strent = ebl_strtabadd (ctx->section_strtab, ".strtab", 8);
+      symscn_strent = dwelf_strtab_add_len (ctx->section_strtab, ".symtab", 8);
+      strscn_strent = dwelf_strtab_add_len (ctx->section_strtab, ".strtab", 8);
 
       /* Create the symbol string table section.  */
       Elf_Scn *strscn = elf_newscn (ctx->out.elf);
@@ -150,7 +150,7 @@ binary_end (AsmCtx_t *ctx)
 	}
       strscnndx = elf_ndxscn (strscn);
 
-      ebl_strtabfinalize (ctx->symbol_strtab, strtabdata);
+      dwelf_strtab_finalize (ctx->symbol_strtab, strtabdata);
 
       shdr->sh_type = SHT_STRTAB;
       assert (shdr->sh_entsize == 0);
@@ -190,11 +190,11 @@ binary_end (AsmCtx_t *ctx)
       uint32_t *xshndx = NULL;
       AsmSym_t *sym;
       while ((sym = asm_symbol_tab_iterate (&ctx->symbol_tab, &runp)) != NULL)
-	if (asm_emit_symbol_p (ebl_string (sym->strent)))
+	if (asm_emit_symbol_p (dwelf_strent_str (sym->strent)))
 	  {
 	    assert (ptr_local <= ptr_nonlocal);
 
-	    syment.st_name = ebl_strtaboffset (sym->strent);
+	    syment.st_name = dwelf_strent_off (sym->strent);
 	    syment.st_info = GELF_ST_INFO (sym->binding, sym->type);
 	    syment.st_other = 0;
 	    syment.st_value = sym->scn->offset + sym->offset;
@@ -240,8 +240,9 @@ binary_end (AsmCtx_t *ctx)
 
 		    (void) gelf_update_shdr (xndxscn, shdr);
 
-		    xndxscn_strent = ebl_strtabadd (ctx->section_strtab,
-						    ".symtab_shndx", 14);
+		    xndxscn_strent = dwelf_strtab_add_len (ctx->section_strtab,
+							   ".symtab_shndx",
+							   14);
 
 		    /* Note that using 'elf32_fsize' instead of
 		       'gelf_fsize' here is correct.  */
@@ -299,13 +300,14 @@ binary_end (AsmCtx_t *ctx)
 
 
   /* Add the name of the section header string table.  */
-  shstrscn_strent = ebl_strtabadd (ctx->section_strtab, ".shstrtab", 10);
+  shstrscn_strent = dwelf_strtab_add_len (ctx->section_strtab,
+					  ".shstrtab", 10);
 
-  ebl_strtabfinalize (ctx->section_strtab, shstrtabdata);
+  dwelf_strtab_finalize (ctx->section_strtab, shstrtabdata);
 
   shdr->sh_type = SHT_STRTAB;
   assert (shdr->sh_entsize == 0);
-  shdr->sh_name = ebl_strtaboffset (shstrscn_strent);
+  shdr->sh_name = dwelf_strent_off (shstrscn_strent);
 
   (void) gelf_update_shdr (shstrscn, shdr);
 
@@ -364,7 +366,7 @@ binary_end (AsmCtx_t *ctx)
 	    }
 
 	  /* Construct the section header.  */
-	  shdr->sh_name = ebl_strtaboffset (runp->strent);
+	  shdr->sh_name = dwelf_strent_off (runp->strent);
 	  shdr->sh_type = SHT_GROUP;
 	  shdr->sh_flags = 0;
 	  shdr->sh_link = symscnndx;
@@ -386,7 +388,7 @@ binary_end (AsmCtx_t *ctx)
 
       shdr = gelf_getshdr (scn, &shdr_mem);
 
-      shdr->sh_name = ebl_strtaboffset (symscn_strent);
+      shdr->sh_name = dwelf_strent_off (symscn_strent);
 
       (void) gelf_update_shdr (scn, shdr);
 
@@ -397,7 +399,7 @@ binary_end (AsmCtx_t *ctx)
 
       shdr = gelf_getshdr (scn, &shdr_mem);
 
-      shdr->sh_name = ebl_strtaboffset (strscn_strent);
+      shdr->sh_name = dwelf_strent_off (strscn_strent);
 
       (void) gelf_update_shdr (scn, shdr);
 
@@ -409,7 +411,7 @@ binary_end (AsmCtx_t *ctx)
 
 	  shdr = gelf_getshdr (scn, &shdr_mem);
 
-	  shdr->sh_name = ebl_strtaboffset (xndxscn_strent);
+	  shdr->sh_name = dwelf_strent_off (xndxscn_strent);
 
 	  (void) gelf_update_shdr (scn, shdr);
 	}
@@ -423,7 +425,7 @@ binary_end (AsmCtx_t *ctx)
       /* This better should not fail.  */
       assert (shdr != NULL);
 
-      shdr->sh_name = ebl_strtaboffset (asmscn->data.main.strent);
+      shdr->sh_name = dwelf_strent_off (asmscn->data.main.strent);
 
       /* We now know the maximum alignment.  */
       shdr->sh_addralign = asmscn->max_align;
@@ -600,8 +602,8 @@ __libasm_finictx (AsmCtx_t *ctx)
       (void) close (ctx->fd);
 
       /* And the string tables.  */
-      ebl_strtabfree (ctx->section_strtab);
-      ebl_strtabfree (ctx->symbol_strtab);
+      dwelf_strtab_free (ctx->section_strtab);
+      dwelf_strtab_free (ctx->symbol_strtab);
     }
 
   /* Initialize the lock.  */

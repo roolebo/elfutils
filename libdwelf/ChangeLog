@@ -1,3 +1,17 @@
+2016-07-08  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (libdwelf_a_SOURCES): Add dwelf_strtab.c.
+	* dwelf_strtab.c: New file.
+	* libdwelf.h (Dwelf_Strtab): New typedef.
+	(Dwelf_Strent): Likewise.
+	(dwelf_strtab_init): New function.
+	(dwelf_strtab_add): Likewise.
+	(dwelf_strtab_add_len): Likewise.
+	(dwelf_strtab_finalize): Likewise.
+	(dwelf_strent_off): Likewise.
+	(dwelf_strent_str): Likewise.
+	(dwelf_strtab_free): Likewise.
+
 2015-10-28  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (libdwelf_a_SOURCES): Add

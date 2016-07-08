@@ -1,5 +1,5 @@
 /* Create an ELF file with all the DT_* flags set.
-   Copyright (C) 2011 Red Hat, Inc.
+   Copyright (C) 2011, 2016 Red Hat, Inc.
    This file is part of elfutils.
    Written by Marek Polacek <mpolacek@redhat.com>, 2011.
 
@@ -20,7 +20,7 @@
 # include <config.h>
 #endif
 
-#include ELFUTILS_HEADER(ebl)
+#include ELFUTILS_HEADER(dwelf)
 #include <elf.h>
 #include <gelf.h>
 #include <fcntl.h>
@@ -38,9 +38,9 @@ int
 main (void)
 {
   static const char fname[] = "testfile-alldts";
-  struct Ebl_Strtab *shst;
-  struct Ebl_Strent *dynscn;
-  struct Ebl_Strent *shstrtabse;
+  Dwelf_Strtab *shst;
+  Dwelf_Strent *dynscn;
+  Dwelf_Strent *shstrtabse;
   const Elf32_Sword dtflags[] =
     {
       DT_NULL, DT_NEEDED, DT_PLTRELSZ, DT_PLTGOT,
@@ -117,7 +117,7 @@ main (void)
   phdr[1].p_type = PT_DYNAMIC;
 
   elf_flagphdr (elf, ELF_C_SET, ELF_F_DIRTY);
-  shst = ebl_strtabinit (true);
+  shst = dwelf_strtab_init (true);
 
   /* Create the .dynamic section.  */
   Elf_Scn *scn = elf_newscn (elf);
@@ -134,7 +134,7 @@ main (void)
       return 1;
     }
 
-  dynscn = ebl_strtabadd (shst, ".dynamic", 0);
+  dynscn = dwelf_strtab_add (shst, ".dynamic");
 
   /* We'll need to know the section offset.  But this will be set up
      by elf_update later, so for now just store the address.  */
@@ -191,7 +191,7 @@ main (void)
       return 1;
     }
 
-  shstrtabse = ebl_strtabadd (shst, ".shstrtab", 0);
+  shstrtabse = dwelf_strtab_add (shst, ".shstrtab");
 
   shdr->sh_type = SHT_STRTAB;
   shdr->sh_flags = 0;
@@ -211,10 +211,10 @@ main (void)
     }
 
   /* No more sections, finalize the section header string table.  */
-  ebl_strtabfinalize (shst, data);
+  dwelf_strtab_finalize (shst, data);
 
-  elf32_getshdr (elf_getscn (elf, 1))->sh_name = ebl_strtaboffset (dynscn);
-  shdr->sh_name = ebl_strtaboffset (shstrtabse);
+  elf32_getshdr (elf_getscn (elf, 1))->sh_name = dwelf_strent_off (dynscn);
+  shdr->sh_name = dwelf_strent_off (shstrtabse);
 
   /* Let the library compute the internal structure information.  */
   if (elf_update (elf, ELF_C_NULL) < 0)
@@ -251,7 +251,7 @@ main (void)
     }
 
   /* We don't need the string table anymore.  */
-  ebl_strtabfree (shst);
+  dwelf_strtab_free (shst);
 
   /* And the data allocated in the .shstrtab section.  */
   free (data->d_buf);

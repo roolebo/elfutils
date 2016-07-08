@@ -32,6 +32,7 @@
 #include <unistd.h>
 #include ELFUTILS_HEADER(elf)
 #include ELFUTILS_HEADER(ebl)
+#include ELFUTILS_HEADER(dwelf)
 #include <gelf.h>
 #include "system.h"
 
@@ -265,9 +266,9 @@ process_file (const char *fname)
   char *snamebuf = NULL;
 
   /* String table (and symbol table), if section names need adjusting.  */
-  struct Ebl_Strtab *names = NULL;
-  struct Ebl_Strent **scnstrents = NULL;
-  struct Ebl_Strent **symstrents = NULL;
+  Dwelf_Strtab *names = NULL;
+  Dwelf_Strent **scnstrents = NULL;
+  Dwelf_Strent **symstrents = NULL;
   char **scnnames = NULL;
 
   /* Section data from names.  */
@@ -308,7 +309,7 @@ process_file (const char *fname)
     free (snamebuf);
     if (names != NULL)
       {
-	ebl_strtabfree (names);
+	dwelf_strtab_free (names);
 	free (scnstrents);
 	free (symstrents);
 	free (namesbuf);
@@ -524,14 +525,14 @@ process_file (const char *fname)
 
   if (adjust_names)
     {
-      names = ebl_strtabinit (true);
+      names = dwelf_strtab_init (true);
       if (names == NULL)
 	{
 	  error (0, 0, "Not enough memory for new strtab");
 	  return cleanup (-1);
 	}
       scnstrents = xmalloc (shnum
-			    * sizeof (struct Ebl_Strent *));
+			    * sizeof (Dwelf_Strent *));
       scnnames = xcalloc (shnum, sizeof (char *));
     }
 
@@ -870,7 +871,7 @@ process_file (const char *fname)
 
 	  /* We need to keep a copy of the name till the strtab is done.  */
 	  name = scnnames[ndx] = xstrdup (name);
-	  if ((scnstrents[ndx] = ebl_strtabadd (names, name, 0)) == NULL)
+	  if ((scnstrents[ndx] = dwelf_strtab_add (names, name)) == NULL)
 	    {
 	      error (0, 0, "No memory to add section name string table");
 	      return cleanup (-1);
@@ -916,7 +917,7 @@ process_file (const char *fname)
 		}
 	      size_t elsize = gelf_fsize (elfnew, ELF_T_SYM, 1, EV_CURRENT);
 	      size_t syms = symd->d_size / elsize;
-	      symstrents = xmalloc (syms * sizeof (struct Ebl_Strent *));
+	      symstrents = xmalloc (syms * sizeof (Dwelf_Strent *));
 	      for (size_t i = 0; i < syms; i++)
 		{
 		  GElf_Sym sym_mem;
@@ -938,7 +939,7 @@ process_file (const char *fname)
 			  error (0, 0, "Couldn't get symbol %zd name", i);
 			  return cleanup (-1);
 			}
-		      symstrents[i] = ebl_strtabadd (names, symname, 0);
+		      symstrents[i] = dwelf_strtab_add (names, symname);
 		      if (symstrents[i] == NULL)
 			{
 			  error (0, 0, "No memory to add to symbol name");
@@ -970,7 +971,11 @@ process_file (const char *fname)
 	  error (0, 0, "Couldn't create new section header string table data");
 	  return cleanup (-1);
 	}
-      ebl_strtabfinalize (names, data);
+      if (dwelf_strtab_finalize (names, data) == NULL)
+	{
+	  error (0, 0, "Not enough memory to create string table");
+	  return cleanup (-1);
+	}
       namesbuf = data->d_buf;
 
       GElf_Shdr shdr_mem;
@@ -984,7 +989,7 @@ process_file (const char *fname)
 
       /* Note that we also might have to compress and possibly set
 	 sh_off below */
-      shdr->sh_name = ebl_strtaboffset (scnstrents[shdrstrndx]);
+      shdr->sh_name = dwelf_strent_off (scnstrents[shdrstrndx]);
       shdr->sh_type = SHT_STRTAB;
       shdr->sh_flags = 0;
       shdr->sh_addr = 0;
@@ -1099,7 +1104,7 @@ process_file (const char *fname)
 	    }
 
 	  if (adjust_names)
-	    shdr->sh_name = ebl_strtaboffset (scnstrents[ndx]);
+	    shdr->sh_name = dwelf_strent_off (scnstrents[ndx]);
 
 	  if (gelf_update_shdr (scn, shdr) == 0)
 	    {
@@ -1133,7 +1138,7 @@ process_file (const char *fname)
 
 		  if (sym->st_name != 0)
 		    {
-		      sym->st_name = ebl_strtaboffset (symstrents[i]);
+		      sym->st_name = dwelf_strent_off (symstrents[i]);
 
 		      if (gelf_update_sym (symd, i, sym) == 0)
 			{

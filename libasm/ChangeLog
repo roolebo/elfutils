@@ -1,3 +1,20 @@
+2016-07-08  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (AM_CPPFLAGS): Add libdwelf.
+	(libasm.so): Add libdw.
+	* asm_begin.c (prepare_binary_output): Use dwelf_strtab instead of
+	ebl_strtab.
+	* asm_end.c (binary_end): Likewise.
+	(__libasm_finictx): Likewise.
+	* asm_newabssym.c (asm_newabssym):  Likewise.
+	* asm_newcomsym.c (asm_newcomsym): Likewise.
+	* asm_newscn.c (binary_newscn): Likewise.
+	* asm_newscngrp.c (asm_newscngrp): Likewise.
+	* asm_newsym.c (asm_newsym): Likewise.
+	* libasmP.h: Likewise.
+	* symbolhash.c (COMPARE): Likewise.
+	* symbolhash.h (COMPARE): Likewise.
+
 2016-06-28  Richard Henderson <rth@redhat.com>
 
 	* disasm_cb.c (disasm_cb): Pass ebl to disasm hook.

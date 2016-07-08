@@ -1,5 +1,5 @@
 /* Create new ABS symbol.
-   Copyright (C) 2002 Red Hat, Inc.
+   Copyright (C) 2002, 2016 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -80,7 +80,7 @@ asm_newabssym (AsmCtx_t *ctx, const char *name, GElf_Xword size,
   result->type = type;
   result->binding = binding;
   result->symidx = 0;
-  result->strent = ebl_strtabadd (ctx->symbol_strtab, name, 0);
+  result->strent = dwelf_strtab_add (ctx->symbol_strtab, name);
 
   /* The value of an ABS symbol must not be modified.  Since there are
      no subsection and the initial offset of the section is 0 we can

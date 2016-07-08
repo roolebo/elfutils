@@ -1,5 +1,5 @@
 /* Internal definitions for libasm.
-   Copyright (C) 2002, 2004, 2005 Red Hat, Inc.
+   Copyright (C) 2002, 2004, 2005, 2016 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -32,6 +32,8 @@
 #include <stdio.h>
 
 #include <libasm.h>
+
+#include "libdwelf.h"
 
 /* gettext helper macros.  */
 #define _(Str) dgettext ("elfutils", Str)
@@ -85,7 +87,7 @@ struct AsmScn
       Elf_Scn *scn;
 
       /* Entry in the section header string table.  */
-      struct Ebl_Strent *strent;
+      Dwelf_Strent *strent;
 
       /* Next member of group.  */
       struct AsmScn *next_in_group;
@@ -156,14 +158,14 @@ struct AsmCtx
   /* List with defined sections.  */
   AsmScn_t *section_list;
   /* Section header string table.  */
-  struct Ebl_Strtab *section_strtab;
+  Dwelf_Strtab *section_strtab;
 
   /* Table with defined symbols.  */
   asm_symbol_tab symbol_tab;
   /* Number of symbols in the table.  */
   unsigned int nsymbol_tab;
   /* Symbol string table.  */
-  struct Ebl_Strtab *symbol_strtab;
+  Dwelf_Strtab *symbol_strtab;
 
   /* List of section groups.  */
   struct AsmScnGrp *groups;
@@ -207,7 +209,7 @@ struct AsmSym
   size_t symidx;
 
   /* Reference to name of the symbol.  */
-  struct Ebl_Strent *strent;
+  Dwelf_Strent *strent;
 };
 
 
@@ -215,7 +217,7 @@ struct AsmSym
 struct AsmScnGrp
 {
   /* Entry in the section header string table.  */
-  struct Ebl_Strent *strent;
+  Dwelf_Strent *strent;
 
   /* The ELF section.  */
   Elf_Scn *scn;

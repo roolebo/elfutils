@@ -287,31 +287,6 @@ extern int ebl_syscall_abi (Ebl *ebl, int *sp, int *pc,
 extern int ebl_abi_cfi (Ebl *ebl, Dwarf_CIE *abi_info)
   __nonnull_attribute__ (2);
 
-/* ELF string table handling.  */
-struct Ebl_Strtab;
-struct Ebl_Strent;
-
-/* Create new ELF string table object in memory.  */
-extern struct Ebl_Strtab *ebl_strtabinit (bool nullstr);
-
-/* Free resources allocated for ELF string table ST.  */
-extern void ebl_strtabfree (struct Ebl_Strtab *st);
-
-/* Add string STR (length LEN is != 0) to ELF string table ST.  */
-extern struct Ebl_Strent *ebl_strtabadd (struct Ebl_Strtab *st,
-					 const char *str, size_t len);
-
-/* Finalize string table ST and store size and memory location information
-   in DATA.  */
-extern void ebl_strtabfinalize (struct Ebl_Strtab *st, Elf_Data *data);
-
-/* Get offset in string table for string associated with SE.  */
-extern size_t ebl_strtaboffset (struct Ebl_Strent *se);
-
-/* Return the string associated with SE.  */
-extern const char *ebl_string (struct Ebl_Strent *se);
-
-
 /* Register map info. */
 typedef struct
 {

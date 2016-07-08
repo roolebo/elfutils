@@ -1,3 +1,11 @@
+2016-07-08  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (strip_LDADD): Add libdw.
+	* elfcompress.c (process_file): Use dwelf_strtab functions instead of
+	ebl_strtab.
+	* strip.c (handle_elf): Likewise.
+	* unstrip.c (new_shstrtab): Likewise.
+
 2016-07-06  Mark Wielaard  <mjw@redhat.com>
 
 	* elf32-i386.script, i386_ld.c, ld.c, ld.h, ldgeneric.c, ldlex.l,

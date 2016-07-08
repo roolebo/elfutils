@@ -34,7 +34,7 @@
 #define NAME asm_symbol_tab
 #define ITERATE 1
 #define COMPARE(a, b) \
-  strcmp (ebl_string ((a)->strent), ebl_string ((b)->strent))
+  strcmp (dwelf_strent_str ((a)->strent), dwelf_strent_str ((b)->strent))
 #include <dynamicsizehash.h>
 
 #endif	/* symbolhash.h */

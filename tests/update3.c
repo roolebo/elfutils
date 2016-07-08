@@ -1,5 +1,5 @@
 /* Test program for elf_update function.
-   Copyright (C) 2000, 2002, 2005 Red Hat, Inc.
+   Copyright (C) 2000, 2002, 2005, 2016 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -28,7 +28,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include ELFUTILS_HEADER(ebl)
+#include ELFUTILS_HEADER(dwelf)
 
 
 int
@@ -42,8 +42,8 @@ main (int argc, char *argv[] __attribute__ ((unused)))
   Elf_Scn *scn;
   Elf32_Shdr *shdr;
   Elf_Data *data;
-  struct Ebl_Strtab *shst;
-  struct Ebl_Strent *shstrtabse;
+  Dwelf_Strtab *shst;
+  Dwelf_Strent *shstrtabse;
   int i;
 
   fd = open (fname, O_RDWR | O_CREAT | O_TRUNC, 0666);
@@ -107,7 +107,7 @@ main (int argc, char *argv[] __attribute__ ((unused)))
   phdr[0].p_type = PT_PHDR;
   elf_flagphdr (elf, ELF_C_SET, ELF_F_DIRTY);
 
-  shst = ebl_strtabinit (true);
+  shst = dwelf_strtab_init (true);
 
   scn = elf_newscn (elf);
   if (scn == NULL)
@@ -122,7 +122,7 @@ main (int argc, char *argv[] __attribute__ ((unused)))
       exit (1);
     }
 
-  shstrtabse = ebl_strtabadd (shst, ".shstrtab", 0);
+  shstrtabse = dwelf_strtab_add (shst, ".shstrtab");
 
   shdr->sh_type = SHT_STRTAB;
   shdr->sh_flags = 0;
@@ -143,9 +143,9 @@ main (int argc, char *argv[] __attribute__ ((unused)))
     }
 
   /* No more sections, finalize the section header string table.  */
-  ebl_strtabfinalize (shst, data);
+  dwelf_strtab_finalize (shst, data);
 
-  shdr->sh_name = ebl_strtaboffset (shstrtabse);
+  shdr->sh_name = dwelf_strent_off (shstrtabse);
 
   /* Let the library compute the internal structure information.  */
   if (elf_update (elf, ELF_C_NULL) < 0)
@@ -173,7 +173,7 @@ main (int argc, char *argv[] __attribute__ ((unused)))
     }
 
   /* We don't need the string table anymore.  */
-  ebl_strtabfree (shst);
+  dwelf_strtab_free (shst);
 
   /* And the data allocated in the .shstrtab section.  */
   free (data->d_buf);

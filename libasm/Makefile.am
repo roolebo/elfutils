@@ -28,7 +28,7 @@
 ## not, see <http://www.gnu.org/licenses/>.
 ##
 include $(top_srcdir)/config/eu.am
-AM_CPPFLAGS += -I$(top_srcdir)/libelf -I$(top_srcdir)/libebl -I$(top_srcdir)/libdw
+AM_CPPFLAGS += -I$(top_srcdir)/libelf -I$(top_srcdir)/libebl -I$(top_srcdir)/libdw -I$(top_srcdir)/libdwelf
 
 GCC_INCLUDE = -I$(shell $(CC) -print-file-name=include)
 VERSION = 1
@@ -65,7 +65,8 @@ libasm.so$(EXEEXT): libasm_pic.a libasm.map
 	$(AM_V_CCLD)$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
 		-Wl,--version-script,$(srcdir)/libasm.map,--no-undefined \
 		-Wl,--soname,$@.$(VERSION) \
-		../libebl/libebl.a ../libelf/libelf.so  $(libasm_so_LDLIBS)
+		../libebl/libebl.a ../libelf/libelf.so ../libdw/libdw.so \
+		$(libasm_so_LDLIBS)
 	@$(textrel_check)
 	$(AM_V_at)ln -fs $@ $@.$(VERSION)
 

@@ -1,3 +1,15 @@
+2016-07-08  Mark Wielaard  <mjw@redhat.com>
+
+	* update3_LDADD: Use libdw instead of libebl.
+	* update4_LDADD: Likewise.
+	* alldts_LDADD: Likewise.
+	* elfstrmerge_LDADD: Likewise.
+	* alldts.c (main): Use dwelf_strtab instead of ebl_strtab.
+	* elfstrmerge.c (release): Likewise.
+	(main): Likewise.
+	* update3.c (main): Likewise.
+	* update4.c (main): Likewise.
+
 2016-07-10  Andreas Schwab  <schwab@linux-m68k.org>
 
 	* Makefile.am (TESTS): Add run-strip-test11.sh.

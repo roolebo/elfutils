@@ -71,7 +71,7 @@ readelf_LDADD = $(libdw) $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl
 nm_LDADD = $(libdw) $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl \
 	   $(demanglelib)
 size_LDADD = $(libelf) $(libeu) $(argp_LDADD)
-strip_LDADD = $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl
+strip_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD) -ldl
 elflint_LDADD  = $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl
 findtextrel_LDADD = $(libdw) $(libelf) $(argp_LDADD)
 addr2line_LDADD = $(libdw) $(libelf) $(argp_LDADD) $(demanglelib)

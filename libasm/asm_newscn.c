@@ -1,5 +1,5 @@
 /* Create new section in output file.
-   Copyright (C) 2002-2011 Red Hat, Inc.
+   Copyright (C) 2002-2011, 2016 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -129,8 +129,8 @@ binary_newscn (AsmScn_t *result, GElf_Word type, GElf_Xword flags,
   result->subnext = NULL;
 
   /* Add the name to the section header string table.  */
-  result->data.main.strent = ebl_strtabadd (result->ctx->section_strtab,
-					    result->name, scnname_len);
+  result->data.main.strent = dwelf_strtab_add_len (result->ctx->section_strtab,
+						   result->name, scnname_len);
   assert (result->data.main.strent != NULL);
 
   /* Create the new ELF section.  */

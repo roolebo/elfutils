@@ -1,5 +1,5 @@
 /* Create descriptor for assembling.
-   Copyright (C) 2002 Red Hat, Inc.
+   Copyright (C) 2002, 2016 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -115,8 +115,8 @@ prepare_binary_output (AsmCtx_t *result, Ebl *ebl)
   asm_symbol_tab_init (&result->symbol_tab, 67);
   result->nsymbol_tab = 0;
   /* And the string tables.  */
-  result->section_strtab = ebl_strtabinit (true);
-  result->symbol_strtab = ebl_strtabinit (true);
+  result->section_strtab = dwelf_strtab_init (true);
+  result->symbol_strtab = dwelf_strtab_init (true);
 
   /* We have no section groups so far.  */
   result->groups = NULL;

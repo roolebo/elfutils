@@ -1,5 +1,5 @@
 /* Merge string sections.
-   Copyright (C) 2015 Red Hat, Inc.
+   Copyright (C) 2015, 2016 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -30,7 +30,8 @@
 #include <unistd.h>
 
 #include <gelf.h>
-#include ELFUTILS_HEADER(ebl)
+#include ELFUTILS_HEADER(dwelf)
+#include "elf-knowledge.h"
 
 /* The original ELF file.  */
 static int fd = -1;
@@ -43,13 +44,13 @@ static int fdnew = -1;
 static Elf *elfnew = NULL;
 
 /* The merged string table.  */
-static struct Ebl_Strtab *strings = NULL;
+static Dwelf_Strtab *strings = NULL;
 
 /* Section name strents.  */
-static struct Ebl_Strent **scnstrents = NULL;
+static Dwelf_Strent **scnstrents = NULL;
 
 /* Symbol name strends.  */
-static struct Ebl_Strent **symstrents = NULL;
+static Dwelf_Strent **symstrents = NULL;
 
 /* New ELF file buffers.  */
 static Elf_Data newstrtabdata = { .d_buf = NULL };
@@ -62,7 +63,7 @@ release (void)
 {
   /* The new string table.  */
   if (strings != NULL)
-    ebl_strtabfree (strings);
+    dwelf_strtab_free (strings);
 
   free (scnstrents);
   free (symstrents);
@@ -241,7 +242,7 @@ main (int argc, char **argv)
   bool layout = phnum != 0;
 
   /* Create a new merged strings table that starts with the empty string.  */
-  strings = ebl_strtabinit (true);
+  strings = dwelf_strtab_init (true);
   if (strings == NULL)
     fail ("No memory to create merged string table", NULL);
 
@@ -249,7 +250,7 @@ main (int argc, char **argv)
   size_t shdrnum;
   if (elf_getshdrnum (elf, &shdrnum) != 0)
     fail_elf ("Couldn't get number of sections", fname);
-  scnstrents = malloc (shdrnum * sizeof (struct Ebl_Strent *));
+  scnstrents = malloc (shdrnum * sizeof (Dwelf_Strent *));
   if (scnstrents == NULL)
     fail ("couldn't allocate memory for section strings", NULL);
 
@@ -275,8 +276,8 @@ main (int argc, char **argv)
 	  const char *sname = elf_strptr (elf, shdrstrndx, shdr->sh_name);
 	  if (sname == NULL)
 	    fail_elf_idx ("couldn't get section name", fname, scnnum);
-	  if ((scnstrents[scnnum] = ebl_strtabadd (strings, sname, 0)) == NULL)
-	    fail ("No memory to add to  merged string table", NULL);
+	  if ((scnstrents[scnnum] = dwelf_strtab_add (strings, sname)) == NULL)
+	    fail ("No memory to add to merged string table", NULL);
 	}
 
       if (layout)
@@ -295,7 +296,7 @@ main (int argc, char **argv)
   if (symd == NULL)
     fail_elf ("couldn't get symtab data", fname);
   size_t symsnum = symd->d_size / elsize;
-  symstrents = malloc (symsnum * sizeof (struct Ebl_Strent *));
+  symstrents = malloc (symsnum * sizeof (Dwelf_Strent *));
   if (symstrents == NULL)
     fail_errno ("Couldn't allocate memory for symbol strings", NULL);
   for (size_t i = 0; i < symsnum; i++)
@@ -309,7 +310,7 @@ main (int argc, char **argv)
 	  const char *sname = elf_strptr (elf, strtabndx, sym->st_name);
 	  if (sname == NULL)
 	    fail_elf_idx ("Couldn't get symbol name", fname, i);
-	  if ((symstrents[i] = ebl_strtabadd (strings, sname, 0)) == NULL)
+	  if ((symstrents[i] = dwelf_strtab_add (strings, sname)) == NULL)
 	    fail_idx ("No memory to add to merged string table symbol",
 		      fname, i);
 	}
@@ -317,7 +318,7 @@ main (int argc, char **argv)
 
   /* We got all strings, build the new string table and store it as
      new strtab.  */
-  ebl_strtabfinalize (strings, &newstrtabdata);
+  dwelf_strtab_finalize (strings, &newstrtabdata);
 
   /* We share at least the empty string so the result is at least 1
      byte smaller.  */
@@ -453,7 +454,7 @@ main (int argc, char **argv)
 
       GElf_Shdr newshdr;
       newshdr.sh_name = (shdr->sh_name != 0
-			 ? ebl_strtaboffset (scnstrents[ndx]) : 0);
+			 ? dwelf_strent_off (scnstrents[ndx]) : 0);
       newshdr.sh_type = shdr->sh_type;
       newshdr.sh_flags = shdr->sh_flags;
       newshdr.sh_addr = shdr->sh_addr;
@@ -528,7 +529,7 @@ main (int argc, char **argv)
 		      sym.st_shndx = newsecndx (sym.st_shndx, "section", ndx,
 						"symbol", i);
 		    if (update_name && sym.st_name != 0)
-		      sym.st_name = ebl_strtaboffset (symstrents[i]);
+		      sym.st_name = dwelf_strent_off (symstrents[i]);
 
 		    /* We explicitly don't update the SHNDX table at
 		       the same time, we do that below.  */

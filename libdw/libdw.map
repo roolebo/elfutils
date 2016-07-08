@@ -327,3 +327,14 @@ ELFUTILS_0.165 {
   global:
     dwelf_scn_gnu_compressed_size;
 } ELFUTILS_0.161;
+
+ELFUTILS_0.167 {
+  global:
+    dwelf_strtab_init;
+    dwelf_strtab_add;
+    dwelf_strtab_add_len;
+    dwelf_strtab_finalize;
+    dwelf_strent_off;
+    dwelf_strent_str;
+    dwelf_strtab_free;
+} ELFUTILS_0.165;

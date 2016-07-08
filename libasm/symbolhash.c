@@ -1,5 +1,5 @@
 /* Symbol hash table implementation.
-   Copyright (C) 2001, 2002 Red Hat, Inc.
+   Copyright (C) 2001, 2002, 2016 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
@@ -42,7 +42,7 @@
 #define ITERATE 1
 #define REVERSE 1
 #define COMPARE(a, b) \
-  strcmp (ebl_string ((a)->strent), ebl_string ((b)->strent))
+  strcmp (dwelf_strent_str ((a)->strent), dwelf_strent_str ((b)->strent))
 
 #define next_prime __libasm_next_prime
 extern size_t next_prime (size_t) attribute_hidden;

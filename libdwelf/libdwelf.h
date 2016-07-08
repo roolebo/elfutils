@@ -1,5 +1,5 @@
 /* Interfaces for libdwelf. DWARF ELF Low-level Functions.
-   Copyright (C) 2014, 2015 Red Hat, Inc.
+   Copyright (C) 2014, 2015, 2016 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -71,6 +71,59 @@ extern ssize_t dwelf_elf_gnu_build_id (Elf *elf, const void **build_idp);
    (the section data doesn't start with ZLIB) -1 is returned. If an
    error occured -1 is returned and elf_errno is set.  */
 extern ssize_t dwelf_scn_gnu_compressed_size (Elf_Scn *scn);
+
+/* ELF/DWARF string table handling.  */
+typedef struct Dwelf_Strtab Dwelf_Strtab;
+typedef struct Dwelf_Strent Dwelf_Strent;
+
+/* Create a new ELF/DWARF string table object in memory.  ELF string
+   tables have a required zero length null string at offset zero.
+   DWARF string tables don't require such a null entry (unless they
+   are shared with an ELF string table).  If NULLSTR is true then a
+   null entry is always created (even if the string table is empty
+   otherwise).  */
+extern Dwelf_Strtab *dwelf_strtab_init (bool nullstr);
+
+/* Add string STR to string table ST.  Returns NULL if no memory could
+   be allocated.  The given STR is owned by the called and must be
+   valid till dwelf_strtab_free is called.  dwelf_strtab_finalize
+   might copy the string into the final table and dwelf_strent_str
+   might return it, or a reference to an identical copy/substring
+   added to the string table.  */
+extern Dwelf_Strent *dwelf_strtab_add (Dwelf_Strtab *st, const char *str)
+  __nonnull_attribute__ (1, 2);
+
+/* This is an optimized version of dwelf_strtab_add if the length of
+   the string is already known.  LEN is the length of STR including
+   zero terminator.  Calling dwelf_strtab_add (st, str) is similar to
+   calling dwelf_strtab_len (st, str, strlen (str) + 1).  */
+extern Dwelf_Strent *dwelf_strtab_add_len (Dwelf_Strtab *st,
+					   const char *str, size_t len)
+  __nonnull_attribute__ (1, 2);
+
+/* Finalize string table ST and store size and memory location
+   information in DATA d_size and d_buf.  DATA d_type will be set to
+   ELF_T_BYTE, d_off will be zero, d_align will be 1 and d_version
+   will be set to EV_CURRENT.  If no memory could be allocated NULL is
+   returned and DATA->d_buf will be set to NULL.  Otherwise DATA will
+   be returned.  */
+extern Elf_Data *dwelf_strtab_finalize (Dwelf_Strtab *st,
+					Elf_Data *data)
+  __nonnull_attribute__ (1, 2);
+
+/* Get offset in string table for string associated with entry.  Only
+   valid after dwelf_strtab_finalize has been called.  */
+extern size_t dwelf_strent_off (Dwelf_Strent *se)
+  __nonnull_attribute__ (1);
+
+/* Return the string associated with the entry.  */
+extern const char *dwelf_strent_str (Dwelf_Strent *se)
+  __nonnull_attribute__ (1);
+
+/* Free resources allocated for the string table.  This invalidates
+   any Dwelf_Strent references returned earlier. */
+extern void dwelf_strtab_free (Dwelf_Strtab *st)
+  __nonnull_attribute__ (1);
 
 #ifdef __cplusplus
 }

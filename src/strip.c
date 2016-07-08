@@ -42,6 +42,7 @@
 
 #include <elf-knowledge.h>
 #include <libebl.h>
+#include "libdwelf.h"
 #include <system.h>
 
 typedef uint8_t GElf_Byte;
@@ -432,7 +433,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
     Elf32_Word group_idx;
     Elf32_Word group_cnt;
     Elf_Scn *newscn;
-    struct Ebl_Strent *se;
+    Dwelf_Strent *se;
     Elf32_Word *newsymidx;
   } *shdr_info = NULL;
   Elf_Scn *scn;
@@ -443,7 +444,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
   GElf_Ehdr *newehdr;
   GElf_Ehdr debugehdr_mem;
   GElf_Ehdr *debugehdr;
-  struct Ebl_Strtab *shst = NULL;
+  Dwelf_Strtab *shst = NULL;
   Elf_Data debuglink_crc_data;
   bool any_symtab_changes = false;
   Elf_Data *shstrtab_data = NULL;
@@ -1043,7 +1044,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
      will already be marked as unused.  */
 
   /* We need a string table for the section headers.  */
-  shst = ebl_strtabinit (true);
+  shst = dwelf_strtab_init (true);
   if (shst == NULL)
     {
       cleanup_debug ();
@@ -1071,7 +1072,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	elf_assert (elf_ndxscn (shdr_info[cnt].newscn) == shdr_info[cnt].idx);
 
 	/* Add this name to the section header string table.  */
-	shdr_info[cnt].se = ebl_strtabadd (shst, shdr_info[cnt].name, 0);
+	shdr_info[cnt].se = dwelf_strtab_add (shst, shdr_info[cnt].name);
       }
 
   /* Test whether we are doing anything at all.  */
@@ -1083,7 +1084,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
   if (debug_fname != NULL && !remove_shdrs)
     {
       /* Add the section header string table section name.  */
-      shdr_info[cnt].se = ebl_strtabadd (shst, ".gnu_debuglink", 15);
+      shdr_info[cnt].se = dwelf_strtab_add_len (shst, ".gnu_debuglink", 15);
       shdr_info[cnt].idx = idx++;
 
       /* Create the section header.  */
@@ -1146,7 +1147,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
   shdridx = cnt;
 
   /* Add the section header string table section name.  */
-  shdr_info[cnt].se = ebl_strtabadd (shst, ".shstrtab", 10);
+  shdr_info[cnt].se = dwelf_strtab_add_len (shst, ".shstrtab", 10);
   shdr_info[cnt].idx = idx;
 
   /* Create the section header.  */
@@ -1183,7 +1184,12 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	     gettext ("while create section header string table: %s"),
 	     elf_errmsg (-1));
     }
-  ebl_strtabfinalize (shst, shstrtab_data);
+  if (dwelf_strtab_finalize (shst, shstrtab_data) == NULL)
+    {
+      cleanup_debug ();
+      error (EXIT_FAILURE, 0,
+	     gettext ("no memory to create section header string table"));
+    }
 
   /* We have to set the section size.  */
   shdr_info[cnt].shdr.sh_size = shstrtab_data->d_size;
@@ -1199,7 +1205,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	elf_assert (scn != NULL);
 
 	/* Update the name.  */
-	shdr_info[cnt].shdr.sh_name = ebl_strtaboffset (shdr_info[cnt].se);
+	shdr_info[cnt].shdr.sh_name = dwelf_strent_off (shdr_info[cnt].se);
 
 	/* Update the section header from the input file.  Some fields
 	   might be section indeces which now have to be adjusted.  */
@@ -2171,7 +2177,7 @@ while computing checksum for debug information"));
   if (shstrtab_data != NULL)
     free (shstrtab_data->d_buf);
   if (shst != NULL)
-    ebl_strtabfree (shst);
+    dwelf_strtab_free (shst);
 
   /* That was it.  Close the descriptors.  */
   if (elf_end (newelf) != 0)

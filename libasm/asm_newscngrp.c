@@ -1,5 +1,5 @@
 /* Create new section group.
-   Copyright (C) 2002 Red Hat, Inc.
+   Copyright (C) 2002, 2016 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -67,8 +67,8 @@ asm_newscngrp (AsmCtx_t *ctx, const char *grpname, AsmSym_t *signature,
   result->flags = flags;
 
   memcpy (result->name, grpname, grpname_len);
-  result->strent = ebl_strtabadd (ctx->section_strtab, result->name,
-				  grpname_len);
+  result->strent = dwelf_strtab_add_len (ctx->section_strtab, result->name,
+					 grpname_len);
 
   if (unlikely (ctx->textp))
     // XXX TBI.  What is the format?

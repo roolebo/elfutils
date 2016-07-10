@@ -1,3 +1,17 @@
+2016-07-10  Andreas Schwab  <schwab@linux-m68k.org>
+
+	* Makefile.am (TESTS): Add run-strip-test11.sh.
+	(EXTRA_DIST): Add run-strip-test11.sh, hello_m68k.ko.bz2,
+	testfile-m86k-core.bz2, testfile-m68k.bz2, testfile-m68k-s.bz2.
+	(run-strip-test11.sh): New file.
+	(hello_m68k.ko.bz2): New file.
+	(testfile-m68k-core.bz2): New file.
+	(testfile-m68k.bz2): New file.
+	(testfile-m68k-s.bz2): New file.
+	* run-allregs.sh: Add test for testfile-m68k-core.
+	* run-readelf-mixed-corenote.sh: Likewise.
+	* run-strip-reloc.sh: Add test for hello_m68k.ko.
+
 2016-07-06  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (check_PROGRAMS): Add vendorelf.

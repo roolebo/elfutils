@@ -57,6 +57,7 @@ static const Ebl_Register_Location prstatus_regs[] =
 #define ALIGN_PID_T		2
 #define ALIGN_UID_T		2
 #define ALIGN_GID_T		2
+#define ALIGN_PRSTATUS		2
 #define TYPE_ULONG		ELF_T_WORD
 #define TYPE_PID_T		ELF_T_SWORD
 #define TYPE_UID_T		ELF_T_HALF

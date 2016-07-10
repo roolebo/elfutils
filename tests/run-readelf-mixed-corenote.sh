@@ -582,4 +582,68 @@ Note segment of 2548 bytes at offset 0x234:
   LINUX                832  X86_XSTATE
 EOF
 
+# To reproduce this core dump, do this on an m68k machine:
+# $ gcc -x c <(echo 'int main () { return *(int *)0x12345678; }')
+# $ ./a.out
+testfiles testfile-m68k-core
+testrun_compare ${abs_top_builddir}/src/readelf -n testfile-m68k-core <<\EOF
+
+Note segment of 1056 bytes at offset 0x1f4:
+  Owner          Data size  Type
+  CORE                 154  PRSTATUS
+    info.si_signo: 11, info.si_code: 0, info.si_errno: 0, cursig: 11
+    sigpend: <>
+    sighold: <>
+    pid: 1963, ppid: 1084, pgrp: 1963, sid: 1084
+    utime: 0.000000, stime: 0.010000, cutime: 0.000000, cstime: 0.000000
+    fpvalid: 1
+    d1:           1  d2:           0  d3: -2146476616  d4: -2146476616
+    d5:           0  d6: -2147393212  d7: -2144827216  a0:  0x12345678
+    a1:  0xefe71460  a2:  0x00000000  a3:  0x80288df8  a4:  0x80000340
+    a5:  0xc017a000  a6:  0xefe71434  d0: -1073595312  a7:  0xefe71434
+    pc:  0x800003fe
+  CORE                 124  PRPSINFO
+    state: 0, sname: R, zomb: 0, nice: 0, flag: 0x00400600
+    uid: 1000, gid: 501, pid: 1963, ppid: 1084, pgrp: 1963, sid: 1084
+    fname: a.out, psargs: ./a.out 
+  CORE                 128  SIGINFO
+    si_signo: 11, si_errno: 0, si_code: 1
+    fault address: 0x12345678
+  CORE                 136  AUXV
+    HWCAP: 0
+    PAGESZ: 4096
+    CLKTCK: 100
+    PHDR: 0x80000034
+    PHENT: 32
+    PHNUM: 9
+    BASE: 0xc0000000
+    FLAGS: 0
+    ENTRY: 0x80000340
+    UID: 1000
+    EUID: 1000
+    GID: 501
+    EGID: 501
+    SECURE: 0
+    RANDOM: 0xefe716d9
+    EXECFN: 0xefe71ff4
+    NULL
+  CORE                 281  FILE
+    10 files:
+      80000000-80001000 00000000 4096                /tmp/a.out
+      80003000-80004000 00001000 4096                /tmp/a.out
+      80004000-80005000 00002000 4096                /tmp/a.out
+      c0000000-c001c000 00000000 114688              /lib/ld-2.23.so
+      c001f000-c0020000 0001d000 4096                /lib/ld-2.23.so
+      c0020000-c0021000 0001e000 4096                /lib/ld-2.23.so
+      c0032000-c0177000 00000000 1331200             /lib/libc-2.23.so
+      c0177000-c0178000 00145000 4096                /lib/libc-2.23.so
+      c0178000-c017a000 00144000 8192                /lib/libc-2.23.so
+      c017a000-c017e000 00146000 16384               /lib/libc-2.23.so
+  CORE                 108  FPREGSET
+    fp0: 0x7fff0000ffffffffffffffff  fp1: 0x7fff0000ffffffffffffffff
+    fp2: 0x7fff0000ffffffffffffffff  fp3: 0x7fff0000ffffffffffffffff
+    fp4: 0x7fff0000ffffffffffffffff  fp5: 0x7fff0000ffffffffffffffff
+    fp6: 0x7fff0000ffffffffffffffff  fp7: 0x7fff0000ffffffffffffffff
+EOF
+
 exit 0

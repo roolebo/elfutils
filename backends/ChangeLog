@@ -1,3 +1,9 @@
+2016-07-10  Andreas Schwab  <schwab@linux-m68k.org>
+
+	* m68k_corenote.c (ALIGN_PRSTATUS): Define.
+	* linux-core-note.c (struct EBLHOOK(prstatus)): Set alignment to
+	ALIGN_PRSTATUS if defined.
+
 2016-06-28  Richard Henderson <rth@redhat.com>
 
 	* Makefile.am (modules): Add bpf.

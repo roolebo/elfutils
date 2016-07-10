@@ -109,7 +109,11 @@ struct EBLHOOK(prstatus)
 #endif
     ;
   FIELD (INT, pr_fpvalid);
-};
+}
+#ifdef ALIGN_PRSTATUS
+  __attribute__ ((packed, aligned (ALIGN_PRSTATUS)))
+#endif
+;
 
 #define	FNAMESZ	16
 #define	PRARGSZ	80

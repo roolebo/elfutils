@@ -78,7 +78,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	newscn run-strip-test.sh run-strip-test2.sh \
 	run-strip-test3.sh run-strip-test4.sh run-strip-test5.sh \
 	run-strip-test6.sh run-strip-test7.sh run-strip-test8.sh \
-	run-strip-test9.sh run-strip-test10.sh \
+	run-strip-test9.sh run-strip-test10.sh run-strip-test11.sh \
 	run-strip-groups.sh run-strip-reloc.sh run-strip-strmerge.sh \
 	run-strip-nobitsalign.sh \
 	run-unstrip-test.sh run-unstrip-test2.sh \
@@ -167,11 +167,12 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-line2addr.sh run-elflint-test.sh testfile14.bz2 \
 	     run-strip-test4.sh run-strip-test5.sh run-strip-test6.sh \
 	     run-strip-test7.sh run-strip-test8.sh run-strip-groups.sh \
-	     run-strip-test9.sh run-strip-test10.sh run-strip-strmerge.sh \
-	     run-strip-nobitsalign.sh \
+	     run-strip-test9.sh run-strip-test10.sh run-strip-test11.sh \
+	     run-strip-strmerge.sh run-strip-nobitsalign.sh \
 	     testfile-nobitsalign.bz2 testfile-nobitsalign.strip.bz2 \
 	     run-strip-reloc.sh hello_i386.ko.bz2 hello_x86_64.ko.bz2 \
 	     hello_ppc64.ko.bz2 hello_s390.ko.bz2 hello_aarch64.ko.bz2 \
+	     hello_m68k.ko.bz2 \
 	     run-unstrip-test.sh run-unstrip-test2.sh \
 	     testfile-info-link.bz2 testfile-info-link.debuginfo.bz2 \
 	     testfile-info-link.stripped.bz2 run-unstrip-test3.sh \
@@ -328,7 +329,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-elfgetchdr.sh run-elfgetzdata.sh run-elfputzdata.sh \
 	     run-zstrptr.sh run-compress-test.sh \
 	     run-disasm-bpf.sh \
-	     testfile-bpf-dis1.expect.bz2 testfile-bpf-dis1.o.bz2
+	     testfile-bpf-dis1.expect.bz2 testfile-bpf-dis1.o.bz2 \
+	     testfile-m68k-core.bz2 testfile-m68k.bz2 testfile-m68k-s.bz2
 
 if USE_VALGRIND
 valgrind_cmd='valgrind -q --leak-check=full --error-exitcode=1'

@@ -1,3 +1,15 @@
+Version 0.167
+
+libasm: Add eBPF disassembler for EM_BPF files.
+
+backends: Add m68k and BPF backends.
+
+ld: Removed.
+
+dwelf: Add ELF/DWARF string table creation functions. dwelf_strtab_init,
+       dwelf_strtab_add, dwelf_strtab_add_len, dwelf_strtab_finalize,
+       dwelf_strent_off, dwelf_strent_str and dwelf_strtab_free.
+
 Version 0.166
 
 config: The default program prefix for the installed tools is now eu-.

@@ -1,3 +1,7 @@
+2016-08-04  Mark Wielaard  <mjw@redhat.com>
+
+	* *.po: Update for 0.167.
+
 2016-07-06  Mark Wielaard  <mjw@redhat.com>
 
 	* po/POTFILES.in: Removed libebl/eblobjecttypename.c,

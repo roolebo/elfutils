@@ -1,3 +1,8 @@
+2016-08-04  Mark Wielaard  <mjw@redhat.com>
+
+	* configure.ac: Set version to 0.167.
+	* NEWS: Add 0.167 section.
+
 2016-07-06  Mark Wielaard  <mjw@redhat.com>
 
 	* .gitignore: Remove src/ld. ldlex.c, ldscript.c and ldscript.h.

@@ -1,5 +1,5 @@
 /* Discard section not used at runtime from object files.
-   Copyright (C) 2000-2012, 2014, 2015 Red Hat, Inc.
+   Copyright (C) 2000-2012, 2014, 2015, 2016 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -1791,10 +1791,18 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	      Elf_Data *reldata = elf_getdata (scn, NULL);
 	      if (reldata == NULL || reldata->d_buf == NULL)
 		INTERNAL_ERROR (fname);
-	      /* We actually wanted the rawdata, but since we already
-		 accessed it earlier as elf_getdata () that won't
-		 work. But debug sections are all ELF_T_BYTE, so it
-		 doesn't really matter.  */
+
+	      /* Make sure we adjust the uncompressed debug data
+		 (and recompress if necessary at the end).  */
+	      GElf_Chdr tchdr;
+	      int tcompress_type = 0;
+	      if (gelf_getchdr (tscn, &tchdr) != NULL)
+		{
+		  tcompress_type = tchdr.ch_type;
+		  if (elf_compress (tscn, 0, 0) != 1)
+		    INTERNAL_ERROR (fname);
+		}
+
 	      Elf_Data *tdata = elf_getdata (tscn, NULL);
 	      if (tdata == NULL || tdata->d_buf == NULL
 		  || tdata->d_type != ELF_T_BYTE)
@@ -1976,6 +1984,10 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	      nrels = next;
 	      shdr->sh_size = reldata->d_size = nrels * shdr->sh_entsize;
 	      gelf_update_shdr (scn, shdr);
+
+	      if (tcompress_type != 0)
+		if (elf_compress (tscn, tcompress_type, 0) != 1)
+		  INTERNAL_ERROR (fname);
 	    }
 	}
     }

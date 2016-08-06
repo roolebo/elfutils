@@ -1,3 +1,8 @@
+2016-08-06  Mark Wielaard  <mjw@redhat.com>
+
+	* strip.c (handle_elf): Uncompress and recompress relocation target
+	section if necessary.
+
 2016-07-08  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (strip_LDADD): Add libdw.

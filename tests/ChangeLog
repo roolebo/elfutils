@@ -1,3 +1,8 @@
+2016-08-06  Mark Wielaard  <mjw@redhat.com>
+
+	* run-strip-reloc.sh: Add explicit compressed and uncompressed
+	test cases.
+
 2016-08-10  Richard Henderson  <rth@redhat.com>
 
 	* file-bpf-dis1.expect.bz2: Fix expected mod and endian operations

@@ -1,3 +1,11 @@
+2016-08-07  Mark Wielaard  <mjw@redhat.com>
+
+	* elf_compress.c (__libelf_reset_rawdata): Check scn->flags and
+	free rawdata_base when malloced. Set ELF_F_MALLOCED for scn->flags.
+	* elf_end.c (elf_end): Check scn->flags and free rawdata_base if
+	malloced.
+	* libelfP.h (struct Elf_Scn): Document flags ELF_F_MALLOCED usage.
+
 2016-07-06  Mark Wielaard  <mjw@redhat.com>
 
 	* elf-knowledge.h (SH_FLAGS_COMBINE): Removed.

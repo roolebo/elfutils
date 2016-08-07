@@ -1,5 +1,5 @@
 /* Free resources associated with Elf descriptor.
-   Copyright (C) 1998,1999,2000,2001,2002,2004,2005,2007,2015 Red Hat, Inc.
+   Copyright (C) 1998,1999,2000,2001,2002,2004,2005,2007,2015,2016 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -166,7 +166,8 @@ elf_end (Elf *elf)
 		/* The section data is allocated if we couldn't mmap
 		   the file.  Or if we had to decompress.  */
 		if (elf->map_address == NULL
-		    || scn->rawdata_base == scn->zdata_base)
+		    || scn->rawdata_base == scn->zdata_base
+		    || (scn->flags & ELF_F_MALLOCED) != 0)
 		  free (scn->rawdata_base);
 
 		/* Free the list of data buffers for the section.

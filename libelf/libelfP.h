@@ -1,5 +1,5 @@
 /* Internal interfaces for libelf.
-   Copyright (C) 1998-2010, 2015 Red Hat, Inc.
+   Copyright (C) 1998-2010, 2015, 2016 Red Hat, Inc.
    This file is part of elfutils.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -233,7 +233,13 @@ struct Elf_Scn
   } shdr;
 
   unsigned int shdr_flags;	/* Section header modified?  */
-  unsigned int flags;		/* Section changed in size?  */
+  unsigned int flags;		/* Section changed in size?
+				   ELF_F_MALLOCED for a Elf_Data_Chunk
+				   dummy_scn means the rawchunks
+				   data.d.d_buf was malloced. For normal
+				   sections it means rawdata_base was
+				   malloced (by elf_compress) even if
+				   the Elf was mmapped.  */
 
   char *rawdata_base;		/* The unmodified data of the section.  */
   char *data_base;		/* The converted data of the section.  */

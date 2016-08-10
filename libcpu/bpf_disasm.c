@@ -52,136 +52,24 @@ static const char class_string[8][8] = {
   [BPF_ALU64] = "alu64",
 };
 
-/* Dest = 1$, Src = 2$, Imm = 3$, Off = 4$, Branch = 5$.  */
 
-#define DST		"r%1$d"
-#define DSTU		"(u32)" DST
-#define DSTS		"(s64)" DST
+#define REG(N)		"r%" #N "$d"
+#define REGU(N)		"(u32)" REG(N)
+#define REGS(N)		"(s64)" REG(N)
 
-#define SRC		"r%2$d"
-#define SRCU		"(u32)" SRC
-#define SRCS		"(s64)" SRC
+#define IMMS(N)		"%" #N "$d"
+#define IMMX(N)		"%" #N "$#x"
 
-#define IMMS		"%3$d"
-#define IMMX		"%3$#x"
-#define OFF		"%4$+d"
-#define JMP		"%5$#x"
+#define OFF(N)		"%" #N "$+d"
+#define JMP(N)		"%" #N "$#x"
 
-#define A32(O, S)	DST " = " DSTU " " #O " " S
-#define A64(O, S)	DST " " #O "= " S
-#define J64(D, O, S)	"if " D " " #O " " S " goto " JMP
-#define LOAD(T)		DST " = *(" #T " *)(" SRC OFF ")"
-#define STORE(T, S)	"*(" #T " *)(" DST OFF ") = " S
-#define XADD(T, S)	"lock *(" #T " *)(" DST OFF ") += " S
+#define A32(O, S)	REG(1) " = " REGU(1) " " #O " " S
+#define A64(O, S)	REG(1) " " #O "= " S
+#define J64(D, O, S)	"if " D " " #O " " S " goto " JMP(3)
+#define LOAD(T)		REG(1) " = *(" #T " *)(" REG(2) OFF(3) ")"
+#define STORE(T, S)	"*(" #T " *)(" REG(1) OFF(3) ") = " S
+#define XADD(T, S)	"lock *(" #T " *)(" REG(1) OFF(3) ") += " S
 #define LDSKB(T, S)	"r0 = *(" #T " *)skb[" S "]"
-
-/* 8 character field between opcode and arguments.  */
-static const char * const code_fmts[256] = {
-  [BPF_ALU | BPF_ADD  | BPF_K]    = A32(+, IMMS),
-  [BPF_ALU | BPF_SUB  | BPF_K]    = A32(-, IMMS),
-  [BPF_ALU | BPF_MUL  | BPF_K]    = A32(*, IMMS),
-  [BPF_ALU | BPF_DIV  | BPF_K]    = A32(/, IMMS),
-  [BPF_ALU | BPF_OR   | BPF_K]    = A32(|, IMMX),
-  [BPF_ALU | BPF_AND  | BPF_K]    = A32(&, IMMX),
-  [BPF_ALU | BPF_LSH  | BPF_K]    = A32(<<, IMMS),
-  [BPF_ALU | BPF_RSH  | BPF_K]    = A32(>>, IMMS),
-  [BPF_ALU | BPF_MOD  | BPF_K]    = A32(%, IMMS),
-  [BPF_ALU | BPF_XOR  | BPF_K]    = A32(^, IMMX),
-  [BPF_ALU | BPF_MOV  | BPF_K]    = DST " = " IMMX,
-  [BPF_ALU | BPF_ARSH | BPF_K]    = DST " = (u32)((s32)" DST " >> " IMMS ")",
-
-  [BPF_ALU | BPF_ADD  | BPF_X]    = A32(+, SRCU),
-  [BPF_ALU | BPF_SUB  | BPF_X]    = A32(-, SRCU),
-  [BPF_ALU | BPF_MUL  | BPF_X]    = A32(*, SRCU),
-  [BPF_ALU | BPF_DIV  | BPF_X]    = A32(/, SRCU),
-  [BPF_ALU | BPF_OR   | BPF_X]    = A32(|, SRCU),
-  [BPF_ALU | BPF_AND  | BPF_X]    = A32(&, SRCU),
-  [BPF_ALU | BPF_LSH  | BPF_X]    = A32(<<, SRCU),
-  [BPF_ALU | BPF_RSH  | BPF_X]    = A32(>>, SRCU),
-  [BPF_ALU | BPF_MOD  | BPF_X]    = A32(%, SRCU),
-  [BPF_ALU | BPF_XOR  | BPF_X]    = A32(^, SRCU),
-  [BPF_ALU | BPF_MOV  | BPF_X]    = DST " = " SRCU,
-  [BPF_ALU | BPF_ARSH | BPF_X]    = DST " = (u32)((s32)" DST " >> " SRC ")",
-
-  [BPF_ALU64 | BPF_ADD  | BPF_K]  = A64(+, IMMS),
-  [BPF_ALU64 | BPF_SUB  | BPF_K]  = A64(-, IMMS),
-  [BPF_ALU64 | BPF_MUL  | BPF_K]  = A64(*, IMMS),
-  [BPF_ALU64 | BPF_DIV  | BPF_K]  = A64(/, IMMS),
-  [BPF_ALU64 | BPF_OR   | BPF_K]  = A64(|, IMMS),
-  [BPF_ALU64 | BPF_AND  | BPF_K]  = A64(&, IMMS),
-  [BPF_ALU64 | BPF_LSH  | BPF_K]  = A64(<<, IMMS),
-  [BPF_ALU64 | BPF_RSH  | BPF_K]  = A64(>>, IMMS),
-  [BPF_ALU64 | BPF_MOD  | BPF_K]  = A64(%, IMMS),
-  [BPF_ALU64 | BPF_XOR  | BPF_K]  = A64(^, IMMS),
-  [BPF_ALU64 | BPF_MOV  | BPF_K]  = DST " = " IMMS,
-  [BPF_ALU64 | BPF_ARSH | BPF_K]  = DST " = (s64)" DST " >> " IMMS,
-
-  [BPF_ALU64 | BPF_ADD  | BPF_X]  = A64(+, SRC),
-  [BPF_ALU64 | BPF_SUB  | BPF_X]  = A64(-, SRC),
-  [BPF_ALU64 | BPF_MUL  | BPF_X]  = A64(*, SRC),
-  [BPF_ALU64 | BPF_DIV  | BPF_X]  = A64(/, SRC),
-  [BPF_ALU64 | BPF_OR   | BPF_X]  = A64(|, SRC),
-  [BPF_ALU64 | BPF_AND  | BPF_X]  = A64(&, SRC),
-  [BPF_ALU64 | BPF_LSH  | BPF_X]  = A64(<<, SRC),
-  [BPF_ALU64 | BPF_RSH  | BPF_X]  = A64(>>, SRC),
-  [BPF_ALU64 | BPF_MOD  | BPF_X]  = A64(%, SRC),
-  [BPF_ALU64 | BPF_XOR  | BPF_X]  = A64(^, SRC),
-  [BPF_ALU64 | BPF_MOV  | BPF_X]  = DST " = " SRC,
-  [BPF_ALU64 | BPF_ARSH | BPF_X]  = DST " = (s64)" DST " >> " SRC,
-
-  [BPF_ALU | BPF_NEG]		  = DST " = (u32)-" DST,
-  [BPF_ALU64 | BPF_NEG]		  = DST " = -" DST,
-
-  /* The imm field contains {16,32,64}.  */
-  [BPF_ALU | BPF_END | BPF_TO_LE] = DST " = le%3$-6d(" DST ")",
-  [BPF_ALU | BPF_END | BPF_TO_BE] = DST " = be%3$-6d(" DST ")",
-
-  [BPF_JMP | BPF_JEQ  | BPF_K]    = J64(DST, ==, IMMS),
-  [BPF_JMP | BPF_JGT  | BPF_K]    = J64(DST, >, IMMS),
-  [BPF_JMP | BPF_JGE  | BPF_K]    = J64(DST, >=, IMMS),
-  [BPF_JMP | BPF_JSET | BPF_K]    = J64(DST, &, IMMS),
-  [BPF_JMP | BPF_JNE  | BPF_K]    = J64(DST, !=, IMMS),
-  [BPF_JMP | BPF_JSGT | BPF_K]    = J64(DSTS, >, IMMS),
-  [BPF_JMP | BPF_JSGE | BPF_K]    = J64(DSTS, >=, IMMS),
-
-  [BPF_JMP | BPF_JEQ  | BPF_X]    = J64(DST, ==, SRC),
-  [BPF_JMP | BPF_JGT  | BPF_X]    = J64(DST, >, SRC),
-  [BPF_JMP | BPF_JGE  | BPF_X]    = J64(DST, >=, SRC),
-  [BPF_JMP | BPF_JSET | BPF_X]    = J64(DST, &, SRC),
-  [BPF_JMP | BPF_JNE  | BPF_X]    = J64(DST, !=, SRC),
-  [BPF_JMP | BPF_JSGT | BPF_X]    = J64(DSTS, >, SRCS),
-  [BPF_JMP | BPF_JSGE | BPF_X]    = J64(DSTS, >=, SRCS),
-
-  [BPF_JMP | BPF_JA]              = "goto " JMP,
-  [BPF_JMP | BPF_CALL]            = "call " IMMS,
-  [BPF_JMP | BPF_EXIT]            = "exit",
-
-  [BPF_LDX | BPF_MEM | BPF_B]     = LOAD(u8),
-  [BPF_LDX | BPF_MEM | BPF_H]     = LOAD(u16),
-  [BPF_LDX | BPF_MEM | BPF_W]     = LOAD(u32),
-  [BPF_LDX | BPF_MEM | BPF_DW]    = LOAD(u64),
-
-  [BPF_STX | BPF_MEM | BPF_B]     = STORE(u8, SRC),
-  [BPF_STX | BPF_MEM | BPF_H]     = STORE(u16, SRC),
-  [BPF_STX | BPF_MEM | BPF_W]     = STORE(u32, SRC),
-  [BPF_STX | BPF_MEM | BPF_DW]    = STORE(u64, SRC),
-
-  [BPF_STX | BPF_XADD | BPF_W]    = XADD(u32, SRC),
-  [BPF_STX | BPF_XADD | BPF_DW]   = XADD(u64, SRC),
-
-  [BPF_ST | BPF_MEM | BPF_B]      = STORE(u8, IMMS),
-  [BPF_ST | BPF_MEM | BPF_H]      = STORE(u16, IMMS),
-  [BPF_ST | BPF_MEM | BPF_W]      = STORE(u32, IMMS),
-  [BPF_ST | BPF_MEM | BPF_DW]     = STORE(u64, IMMS),
-
-  [BPF_LD | BPF_ABS | BPF_B]      = LDSKB(u8, IMMS),
-  [BPF_LD | BPF_ABS | BPF_H]      = LDSKB(u16, IMMS),
-  [BPF_LD | BPF_ABS | BPF_W]      = LDSKB(u32, IMMS),
-
-  [BPF_LD | BPF_IND | BPF_B]      = LDSKB(u8, SRC "+" IMMS),
-  [BPF_LD | BPF_IND | BPF_H]      = LDSKB(u16, SRC "+" IMMS),
-  [BPF_LD | BPF_IND | BPF_W]      = LDSKB(u32, SRC "+" IMMS),
-};
 
 static void
 bswap_bpf_insn (struct bpf_insn *p)
@@ -222,59 +110,364 @@ bpf_disasm (Ebl *ebl, const uint8_t **startp, const uint8_t *end,
       memcpy(&i, start, sizeof(struct bpf_insn));
       if (need_bswap)
 	bswap_bpf_insn (&i);
+
       start += sizeof(struct bpf_insn);
       addr += sizeof(struct bpf_insn);
-
-      /* ??? We really should pass in CTX, so that we can detect
-	 wrong endianness and do some swapping.  */
+      jmp = addr + i.off * sizeof(struct bpf_insn);
 
       code = i.code;
-      code_fmt = code_fmts[code];
-
-      if (code == (BPF_LD | BPF_IMM | BPF_DW))
+      switch (code)
 	{
-	  struct bpf_insn i2;
-	  uint64_t imm64;
+	case BPF_LD | BPF_IMM | BPF_DW:
+	  {
+	    struct bpf_insn i2;
+	    uint64_t imm64;
 
-	  if (start + sizeof(struct bpf_insn) > end)
-	    {
-	      start -= sizeof(struct bpf_insn);
-	      *startp = start;
-	      goto done;
-	    }
-	  memcpy(&i2, start, sizeof(struct bpf_insn));
-	  if (need_bswap)
-	    bswap_bpf_insn (&i2);
-	  start += sizeof(struct bpf_insn);
-	  addr += sizeof(struct bpf_insn);
+	    if (start + sizeof(struct bpf_insn) > end)
+	      {
+		start -= sizeof(struct bpf_insn);
+		*startp = start;
+		goto done;
+	      }
+	    memcpy(&i2, start, sizeof(struct bpf_insn));
+	    if (need_bswap)
+	      bswap_bpf_insn (&i2);
+	    start += sizeof(struct bpf_insn);
+	    addr += sizeof(struct bpf_insn);
 
-	  imm64 = (uint32_t)i.imm | ((uint64_t)i2.imm << 32);
-	  switch (i.src_reg)
-	    {
-	    case 0:
-	      code_fmt = DST " = %2$#" PRIx64;
-	      break;
-	    case BPF_PSEUDO_MAP_FD:
-	      code_fmt = DST " = map_fd(%2$#" PRIx64 ")";
-	      break;
-	    default:
-	      code_fmt = DST " = ld_pseudo(%3$d, %2$#" PRIx64 ")";
-	      break;
-	    }
+	    imm64 = (uint32_t)i.imm | ((uint64_t)i2.imm << 32);
+	    switch (i.src_reg)
+	      {
+	      case 0:
+		code_fmt = REG(1) " = %2$#" PRIx64;
+		break;
+	      case BPF_PSEUDO_MAP_FD:
+		code_fmt = REG(1) " = map_fd(%2$#" PRIx64 ")";
+		break;
+	      default:
+		code_fmt = REG(1) " = ld_pseudo(%3$d, %2$#" PRIx64 ")";
+		break;
+	      }
+	    len = snprintf(buf, sizeof(buf), code_fmt,
+			   i.dst_reg, imm64, i.src_reg);
+	  }
+	  break;
+
+	case BPF_JMP | BPF_EXIT:
+	  len = snprintf(buf, sizeof(buf), "exit");
+	  break;
+	case BPF_JMP | BPF_JA:
+	  len = snprintf(buf, sizeof(buf), "goto " JMP(1), jmp);
+	  break;
+	case BPF_JMP | BPF_CALL:
+	  code_fmt = "call " IMMS(1);
+	  goto do_imm;
+
+	case BPF_ALU | BPF_END | BPF_TO_LE:
+	  /* The imm field contains {16,32,64}.  */
+	  code_fmt = REG(1) " = le" IMMS(2) "(" REG(1) ")";
+	  goto do_dst_imm;
+	case BPF_ALU | BPF_END | BPF_TO_BE:
+	  code_fmt = REG(1) " = be" IMMS(2) "(" REG(1) ")";
+	  goto do_dst_imm;
+
+	case BPF_ALU | BPF_ADD | BPF_K:
+	  code_fmt = A32(+, IMMS(2));
+	  goto do_dst_imm;
+	case BPF_ALU | BPF_SUB | BPF_K:
+	  code_fmt = A32(-, IMMS(2));
+	  goto do_dst_imm;
+	case BPF_ALU | BPF_MUL | BPF_K:
+	  code_fmt = A32(*, IMMS(2));
+	  goto do_dst_imm;
+	case BPF_ALU | BPF_DIV | BPF_K:
+	  code_fmt = A32(/, IMMS(2));
+	  goto do_dst_imm;
+	case BPF_ALU | BPF_OR | BPF_K:
+	  code_fmt = A32(|, IMMX(2));
+	  goto do_dst_imm;
+	case BPF_ALU | BPF_AND | BPF_K:
+	  code_fmt = A32(&, IMMX(2));
+	  goto do_dst_imm;
+	case BPF_ALU | BPF_LSH | BPF_K:
+	  code_fmt = A32(<<, IMMS(2));
+	  goto do_dst_imm;
+	case BPF_ALU | BPF_RSH | BPF_K:
+	  code_fmt = A32(>>, IMMS(2));
+	  goto do_dst_imm;
+	case BPF_ALU | BPF_MOD | BPF_K:
+	  code_fmt = A32(%%, IMMS(2));
+	  goto do_dst_imm;
+	case BPF_ALU | BPF_XOR | BPF_K:
+	  code_fmt = A32(^, IMMX(2));
+	  goto do_dst_imm;
+	case BPF_ALU | BPF_MOV | BPF_K:
+	  code_fmt = REG(1) " = " IMMX(2);
+	  goto do_dst_imm;
+	case BPF_ALU | BPF_ARSH | BPF_K:
+	  code_fmt = REG(1) " = (u32)((s32)" REG(1) " >> " IMMS(2) ")";
+	  goto do_dst_imm;
+
+	case BPF_ALU | BPF_ADD | BPF_X:
+	  code_fmt = A32(+, REGU(2));
+	  goto do_dst_src;
+	case BPF_ALU | BPF_SUB | BPF_X:
+	  code_fmt = A32(-, REGU(2));
+	  goto do_dst_src;
+	case BPF_ALU | BPF_MUL | BPF_X:
+	  code_fmt = A32(*, REGU(2));
+	  goto do_dst_src;
+	case BPF_ALU | BPF_DIV | BPF_X:
+	  code_fmt = A32(/, REGU(2));
+	  goto do_dst_src;
+	case BPF_ALU | BPF_OR | BPF_X:
+	  code_fmt = A32(|, REGU(2));
+	  goto do_dst_src;
+	case BPF_ALU | BPF_AND | BPF_X:
+	  code_fmt = A32(&, REGU(2));
+	  goto do_dst_src;
+	case BPF_ALU | BPF_LSH | BPF_X:
+	  code_fmt = A32(<<, REGU(2));
+	  goto do_dst_src;
+	case BPF_ALU | BPF_RSH | BPF_X:
+	  code_fmt = A32(>>, REGU(2));
+	  goto do_dst_src;
+	case BPF_ALU | BPF_MOD | BPF_X:
+	  code_fmt = A32(%%, REGU(2));
+	  goto do_dst_src;
+	case BPF_ALU | BPF_XOR | BPF_X:
+	  code_fmt = A32(^, REGU(2));
+	  goto do_dst_src;
+	case BPF_ALU | BPF_MOV | BPF_X:
+	  code_fmt = REG(1) " = " REGU(2);
+	  goto do_dst_src;
+	case BPF_ALU | BPF_ARSH | BPF_X:
+	  code_fmt = REG(1) " = (u32)((s32)" REG(1) " >> " REG(2) ")";
+	  goto do_dst_src;
+
+	case BPF_ALU64 | BPF_ADD | BPF_K:
+	  code_fmt = A64(+, IMMS(2));
+	  goto do_dst_imm;
+	case BPF_ALU64 | BPF_SUB | BPF_K:
+	  code_fmt = A64(-, IMMS(2));
+	  goto do_dst_imm;
+	case BPF_ALU64 | BPF_MUL | BPF_K:
+	  code_fmt = A64(*, IMMS(2));
+	  goto do_dst_imm;
+	case BPF_ALU64 | BPF_DIV | BPF_K:
+	  code_fmt = A64(/, IMMS(2));
+	  goto do_dst_imm;
+	case BPF_ALU64 | BPF_OR | BPF_K:
+	  code_fmt = A64(|, IMMS(2));
+	  goto do_dst_imm;
+	case BPF_ALU64 | BPF_AND | BPF_K:
+	  code_fmt = A64(&, IMMS(2));
+	  goto do_dst_imm;
+	case BPF_ALU64 | BPF_LSH | BPF_K:
+	  code_fmt = A64(<<, IMMS(2));
+	  goto do_dst_imm;
+	case BPF_ALU64 | BPF_RSH | BPF_K:
+	  code_fmt = A64(>>, IMMS(2));
+	  goto do_dst_imm;
+	case BPF_ALU64 | BPF_MOD | BPF_K:
+	  code_fmt = A64(%%, IMMS(2));
+	  goto do_dst_imm;
+	case BPF_ALU64 | BPF_XOR | BPF_K:
+	  code_fmt = A64(^, IMMS(2));
+	  goto do_dst_imm;
+	case BPF_ALU64 | BPF_MOV | BPF_K:
+	  code_fmt = REG(1) " = " IMMS(2);
+	  goto do_dst_imm;
+	case BPF_ALU64 | BPF_ARSH | BPF_K:
+	  code_fmt = REG(1) " = (s64)" REG(1) " >> " IMMS(2);
+	  goto do_dst_imm;
+
+	case BPF_ALU64 | BPF_ADD | BPF_X:
+	  code_fmt = A64(+, REG(2));
+	  goto do_dst_src;
+	case BPF_ALU64 | BPF_SUB | BPF_X:
+	  code_fmt = A64(-, REG(2));
+	  goto do_dst_src;
+	case BPF_ALU64 | BPF_MUL | BPF_X:
+	  code_fmt = A64(*, REG(2));
+	  goto do_dst_src;
+	case BPF_ALU64 | BPF_DIV | BPF_X:
+	  code_fmt = A64(/, REG(2));
+	  goto do_dst_src;
+	case BPF_ALU64 | BPF_OR | BPF_X:
+	  code_fmt = A64(|, REG(2));
+	  goto do_dst_src;
+	case BPF_ALU64 | BPF_AND | BPF_X:
+	  code_fmt = A64(&, REG(2));
+	  goto do_dst_src;
+	case BPF_ALU64 | BPF_LSH | BPF_X:
+	  code_fmt = A64(<<, REG(2));
+	  goto do_dst_src;
+	case BPF_ALU64 | BPF_RSH | BPF_X:
+	  code_fmt = A64(>>, REG(2));
+	  goto do_dst_src;
+	case BPF_ALU64 | BPF_MOD | BPF_X:
+	  code_fmt = A64(%%, REG(2));
+	  goto do_dst_src;
+	case BPF_ALU64 | BPF_XOR | BPF_X:
+	  code_fmt = A64(^, REG(2));
+	  goto do_dst_src;
+	case BPF_ALU64 | BPF_MOV | BPF_X:
+	  code_fmt = REG(1) " = " REG(2);
+	  goto do_dst_src;
+	case BPF_ALU64 | BPF_ARSH | BPF_X:
+	  code_fmt = REG(1) " = (s64)" REG(1) " >> " REG(2);
+	  goto do_dst_src;
+
+	case BPF_ALU | BPF_NEG:
+	  code_fmt = REG(1) " = (u32)-" REG(1);
+	  goto do_dst_src;
+	case BPF_ALU64 | BPF_NEG:
+	  code_fmt = REG(1) " = -" REG(1);
+	  goto do_dst_src;
+
+	case BPF_JMP | BPF_JEQ | BPF_K:
+	  code_fmt = J64(REG(1), ==, IMMS(2));
+	  goto do_dst_imm_jmp;
+	case BPF_JMP | BPF_JGT | BPF_K:
+	  code_fmt = J64(REG(1), >, IMMS(2));
+	  goto do_dst_imm_jmp;
+	case BPF_JMP | BPF_JGE | BPF_K:
+	  code_fmt = J64(REG(1), >=, IMMS(2));
+	  goto do_dst_imm_jmp;
+	case BPF_JMP | BPF_JSET | BPF_K:
+	  code_fmt = J64(REG(1), &, IMMS(2));
+	  goto do_dst_imm_jmp;
+	case BPF_JMP | BPF_JNE | BPF_K:
+	  code_fmt = J64(REG(1), !=, IMMS(2));
+	  goto do_dst_imm_jmp;
+	case BPF_JMP | BPF_JSGT | BPF_K:
+	  code_fmt = J64(REGS(1), >, IMMS(2));
+	  goto do_dst_imm_jmp;
+	case BPF_JMP | BPF_JSGE | BPF_K:
+	  code_fmt = J64(REGS(1), >=, IMMS(2));
+	  goto do_dst_imm_jmp;
+
+	case BPF_JMP | BPF_JEQ | BPF_X:
+	  code_fmt = J64(REG(1), ==, REG(2));
+	  goto do_dst_src_jmp;
+	case BPF_JMP | BPF_JGT | BPF_X:
+	  code_fmt = J64(REG(1), >, REG(2));
+	  goto do_dst_src_jmp;
+	case BPF_JMP | BPF_JGE | BPF_X:
+	  code_fmt = J64(REG(1), >=, REG(2));
+	  goto do_dst_src_jmp;
+	case BPF_JMP | BPF_JSET | BPF_X:
+	  code_fmt = J64(REG(1), &, REG(2));
+	  goto do_dst_src_jmp;
+	case BPF_JMP | BPF_JNE | BPF_X:
+	  code_fmt = J64(REG(1), !=, REG(2));
+	  goto do_dst_src_jmp;
+	case BPF_JMP | BPF_JSGT | BPF_X:
+	  code_fmt = J64(REGS(1), >, REGS(2));
+	  goto do_dst_src_jmp;
+	case BPF_JMP | BPF_JSGE | BPF_X:
+	  code_fmt = J64(REGS(1), >=, REGS(2));
+	  goto do_dst_src_jmp;
+
+	case BPF_LDX | BPF_MEM | BPF_B:
+	  code_fmt = LOAD(u8);
+	  goto do_dst_src_off;
+	case BPF_LDX | BPF_MEM | BPF_H:
+	  code_fmt = LOAD(u16);
+	  goto do_dst_src_off;
+	case BPF_LDX | BPF_MEM | BPF_W:
+	  code_fmt = LOAD(u32);
+	  goto do_dst_src_off;
+	case BPF_LDX | BPF_MEM | BPF_DW:
+	  code_fmt = LOAD(u64);
+	  goto do_dst_src_off;
+
+	case BPF_STX | BPF_MEM | BPF_B:
+	  code_fmt = STORE(u8, REG(2));
+	  goto do_dst_src_off;
+	case BPF_STX | BPF_MEM | BPF_H:
+	  code_fmt = STORE(u16, REG(2));
+	  goto do_dst_src_off;
+	case BPF_STX | BPF_MEM | BPF_W:
+	  code_fmt = STORE(u32, REG(2));
+	  goto do_dst_src_off;
+	case BPF_STX | BPF_MEM | BPF_DW:
+	  code_fmt = STORE(u64, REG(2));
+	  goto do_dst_src_off;
+
+	case BPF_STX | BPF_XADD | BPF_W:
+	  code_fmt = XADD(u32, REG(2));
+	  goto do_dst_src_off;
+	case BPF_STX | BPF_XADD | BPF_DW:
+	  code_fmt = XADD(u64, REG(2));
+	  goto do_dst_src_off;
+
+	case BPF_ST | BPF_MEM | BPF_B:
+	  code_fmt = STORE(u8, IMMS(2));
+	  goto do_dst_imm_off;
+	case BPF_ST | BPF_MEM | BPF_H:
+	  code_fmt = STORE(u16, IMMS(2));
+	  goto do_dst_imm_off;
+	case BPF_ST | BPF_MEM | BPF_W:
+	  code_fmt = STORE(u32, IMMS(2));
+	  goto do_dst_imm_off;
+	case BPF_ST | BPF_MEM | BPF_DW:
+	  code_fmt = STORE(u64, IMMS(2));
+	  goto do_dst_imm_off;
+
+	case BPF_LD | BPF_ABS | BPF_B:
+	  code_fmt = LDSKB(u8, IMMS(1));
+	  goto do_imm;
+	case BPF_LD | BPF_ABS | BPF_H:
+	  code_fmt = LDSKB(u16, IMMS(1));
+	  goto do_imm;
+	case BPF_LD | BPF_ABS | BPF_W:
+	  code_fmt = LDSKB(u32, IMMS(1));
+	  goto do_imm;
+
+	case BPF_LD | BPF_IND | BPF_B:
+	  code_fmt = LDSKB(u8, REG(1) "+" IMMS(2));
+	  goto do_src_imm;
+	case BPF_LD | BPF_IND | BPF_H:
+	  code_fmt = LDSKB(u16, REG(1) "+" IMMS(2));
+	  goto do_src_imm;
+	case BPF_LD | BPF_IND | BPF_W:
+	  code_fmt = LDSKB(u32, REG(1) "+" IMMS(2));
+	  goto do_src_imm;
+
+	do_imm:
+	  len = snprintf(buf, sizeof(buf), code_fmt, i.imm);
+	  break;
+	do_dst_imm:
+	  len = snprintf(buf, sizeof(buf), code_fmt, i.dst_reg, i.imm);
+	  break;
+	do_src_imm:
+	  len = snprintf(buf, sizeof(buf), code_fmt, i.src_reg, i.imm);
+	  break;
+	do_dst_src:
+	  len = snprintf(buf, sizeof(buf), code_fmt, i.dst_reg, i.src_reg);
+	  break;
+	do_dst_imm_jmp:
+	  len = snprintf(buf, sizeof(buf), code_fmt, i.dst_reg, i.imm, jmp);
+	  break;
+	do_dst_src_jmp:
 	  len = snprintf(buf, sizeof(buf), code_fmt,
-			 i.dst_reg, imm64, i.src_reg);
-	}
-      else if (code_fmt != NULL)
-	{
-	  jmp = addr + i.off * sizeof(struct bpf_insn);
-	  len = snprintf(buf, sizeof(buf), code_fmt, i.dst_reg, i.src_reg,
-			 i.imm, i.off, jmp);
-	}
-      else
-	{
+			 i.dst_reg, i.src_reg, jmp);
+	  break;
+	do_dst_imm_off:
+	  len = snprintf(buf, sizeof(buf), code_fmt, i.dst_reg, i.imm, i.off);
+	  break;
+	do_dst_src_off:
+	  len = snprintf(buf, sizeof(buf), code_fmt,
+			 i.dst_reg, i.src_reg, i.off);
+	  break;
+
+	default:
 	  class = BPF_CLASS(code);
 	  len = snprintf(buf, sizeof(buf), "invalid class %s",
 			 class_string[class]);
+	  break;
         }
 
       *startp = start;

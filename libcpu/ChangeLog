@@ -1,4 +1,9 @@
-2016-06-28  Richard Henderson <rth@redhat.com>
+2016-08-10  Richard Henderson  <rth@redhat.com>
+
+	* bpf_disasm.c (bpf_disasm): Rearrange the printing of instructions
+	to use exactly the operands required.
+
+2016-06-28  Richard Henderson  <rth@redhat.com>
 
 	* Makefile.am (noinst_LIBRARIES): Add libcpu_bpf.a.
 	(libcpu_bpf_a_SOURCES, libcpu_bpf_a_CFLAGS): New.

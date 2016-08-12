@@ -1,5 +1,5 @@
 /* Report modules by examining dynamic linker data structures.
-   Copyright (C) 2008-2015 Red Hat, Inc.
+   Copyright (C) 2008-2016 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -843,7 +843,10 @@ dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 		}
 	      off_t off = ehdr->e_phoff;
 	      assert (in.d_buf == NULL);
-	      assert (in.d_size == phnum * phent);
+	      /* Note this in the !in_ok path.  That means memory_callback
+		 failed.  But the callback might still have reset the d_size
+		 value (to zero).  So explicitly set it here again.  */
+	      in.d_size = phnum * phent;
 	      in.d_buf = malloc (in.d_size);
 	      if (unlikely (in.d_buf == NULL))
 		{

@@ -9,7 +9,8 @@ top_builddir = ..
 
 # These options get passed to xgettext.
 XGETTEXT_OPTIONS = --keyword=_ --keyword=N_  --flag=error:3:c-format \
-		   --flag=ERROR:1:c-format --flag=argp_error:2:c-format
+		   --flag=ERROR:1:c-format --flag=argp_error:2:c-format \
+		   --add-comments
 
 # This is the copyright holder that gets inserted into the header of the
 # $(DOMAIN).pot file.  Set this to the copyright holder of the surrounding

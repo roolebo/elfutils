@@ -29,6 +29,7 @@ src/ar.c
 src/arlib-argp.c
 src/arlib.c
 src/elfcmp.c
+src/elfcompress.c
 src/elflint.c
 src/findtextrel.c
 src/nm.c

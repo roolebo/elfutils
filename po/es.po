@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: elfutils.master.es\n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2016-08-04 13:31+0200\n"
+"POT-Creation-Date: 2016-08-19 14:38+0200\n"
 "PO-Revision-Date: 2011-01-10 15:17-0300\n"
 "Last-Translator: Claudio Rodrigo Pereyra Diaz <claudiorodrigo@pereyradiaz."
 "com.ar>\n"
@@ -290,6 +290,7 @@ msgstr "Sólo uno de -e, -p, -k, -K, ó --core está permitido"
 msgid "cannot load kernel symbols"
 msgstr "No se pueden cargar símbolos de kernel"
 
+#. Non-fatal to have no modules since we do have the kernel.
 #: libdwfl/argp-std.c:234
 msgid "cannot find kernel modules"
 msgstr "no se pueden hallar módulos de kernel"
@@ -530,6 +531,7 @@ msgstr ""
 msgid "    Build ID: "
 msgstr "    Build ID: "
 
+#. A non-null terminated version string.
 #: libebl/eblobjnote.c:152
 #, c-format
 msgid "    Linker version: %.*s\n"
@@ -793,6 +795,7 @@ msgstr ""
 msgid "Miscellaneous:"
 msgstr "Misceláneos:"
 
+#. Short description of program.
 #: src/addr2line.c:87
 msgid ""
 "Locate source files and line information for ADDRs (in a.out by default)."
@@ -800,6 +803,7 @@ msgstr ""
 "Localizar archivos fuente e información de línea para DIRECCIONES (en a.out "
 "por defecto)."
 
+#. Strings for arguments in help texts.
 #: src/addr2line.c:91
 msgid "[ADDR...]"
 msgstr "[DIREC...]"
@@ -932,10 +936,12 @@ msgstr "Usar la ruta total para fichero coincidente."
 msgid "Update only older files in archive."
 msgstr "Actualizar sólo ficheros antiguos en archivo."
 
+#. Short description of program.
 #: src/ar.c:99
 msgid "Create, modify, and extract from archives."
 msgstr "Crear, modificar, y extraer de archivos."
 
+#. Strings for arguments in help texts.
 #: src/ar.c:102
 msgid "[MEMBER] [COUNT] ARCHIVE [FILE...]"
 msgstr "[MIEMBRO] [CONTAR] ARCHIVO [FICHERO...]"
@@ -1108,6 +1114,7 @@ msgstr ""
 msgid "%s (default)"
 msgstr ""
 
+#. The archive is too big.
 #: src/arlib.c:209
 #, c-format
 msgid "the archive '%s' is too large"
@@ -1146,10 +1153,12 @@ msgstr ""
 msgid "Output nothing; yield exit status only"
 msgstr "Nada de salida; producir estado de salida únicamente"
 
+#. Short description of program.
 #: src/elfcmp.c:77
 msgid "Compare relevant parts of two ELF files for equality."
 msgstr "Comparar partes relevantes de dos ficheros ELF para igualdad."
 
+#. Strings for arguments in help texts.
 #: src/elfcmp.c:81
 msgid "FILE1 FILE2"
 msgstr "FICHERO1 FICHERO2"
@@ -1333,6 +1342,77 @@ msgstr "No se puede obtener contenido de sección %zu: %s"
 msgid "cannot get relocation: %s"
 msgstr "No se puede obtener reubicación: %s"
 
+#: src/elfcompress.c:121 src/strip.c:255 src/unstrip.c:121
+#, c-format
+msgid "-o option specified twice"
+msgstr "opción -o especificada dos veces"
+
+#: src/elfcompress.c:128
+#, fuzzy, c-format
+msgid "-t option specified twice"
+msgstr "opción -f especificada dos veces"
+
+#: src/elfcompress.c:137
+#, fuzzy, c-format
+msgid "unknown compression type '%s'"
+msgstr "tipo desconocido"
+
+#. We need at least one input file.
+#: src/elfcompress.c:149 src/elfcompress.c:1310
+#, fuzzy, c-format
+msgid "No input file given"
+msgstr "archivo de entrada vacío"
+
+#: src/elfcompress.c:155 src/elfcompress.c:1315
+#, fuzzy, c-format
+msgid "Only one input file allowed together with '-o'"
+msgstr "Sólo se permite ingresar un archivo junto con '-o' y '-f'"
+
+#: src/elfcompress.c:1272
+#, fuzzy
+msgid "Place (de)compressed output into FILE"
+msgstr "Colocar la salida obtenida en FICHERO"
+
+#: src/elfcompress.c:1275
+msgid ""
+"What type of compression to apply. TYPE can be 'none' (decompress), "
+"'zlib' (ELF ZLIB compression, the default, 'zlib-gabi' is an alias) or 'zlib-"
+"gnu' (.zdebug GNU style compression, 'gnu' is an alias)"
+msgstr ""
+
+#: src/elfcompress.c:1278
+msgid ""
+"SECTION name to (de)compress, SECTION is an extended wildcard pattern "
+"(defaults to '.?(z)debug*')"
+msgstr ""
+
+#: src/elfcompress.c:1281
+msgid "Print a message for each section being (de)compressed"
+msgstr ""
+
+#: src/elfcompress.c:1284
+msgid "Force compression of section even if it would become larger"
+msgstr ""
+
+#: src/elfcompress.c:1287 src/strip.c:88
+msgid "Relax a few rules to handle slightly broken ELF files"
+msgstr "Relaja algunas reglas para manejar ficheros ELF rotos"
+
+#: src/elfcompress.c:1290
+#, fuzzy
+msgid "Be silent when a section cannot be compressed"
+msgstr ""
+"Sección [%2zu] '%s': dirección de secciones de datos de hilo-local no cero\n"
+
+#. Strings for arguments in help texts.
+#: src/elfcompress.c:1299 src/elflint.c:78 src/readelf.c:126
+msgid "FILE..."
+msgstr "FICHERO..."
+
+#: src/elfcompress.c:1300
+msgid "Compress or decompress sections in an ELF file."
+msgstr ""
+
 #: src/elflint.c:64
 msgid "Be extremely strict, flag level 2 features."
 msgstr "Sea extremadamente estricto, característica de marca de nivel 2."
@@ -1353,13 +1433,10 @@ msgstr ""
 "Binario ha sido creado con GNU Id y por lo tanto se sabe que puede estar "
 "roto de alguna forma"
 
+#. Short description of program.
 #: src/elflint.c:74
 msgid "Pedantic checking of ELF files compliance with gABI/psABI spec."
 msgstr "Chequeo minucioso de ficheros ELF de acuerdo con gABI/psABI "
-
-#: src/elflint.c:78 src/readelf.c:126
-msgid "FILE..."
-msgstr "FICHERO..."
 
 #: src/elflint.c:155 src/readelf.c:298
 #, c-format
@@ -1389,6 +1466,7 @@ msgstr "Falta el nombre de archivo.\n"
 msgid " error while freeing sub-ELF descriptor: %s\n"
 msgstr " error al liberar descriptor sub-ELF: %s\n"
 
+#. We cannot do anything.
 #: src/elflint.c:306
 #, c-format
 msgid "Not an ELF file - it has the wrong magic bytes at the start\n"
@@ -1605,6 +1683,7 @@ msgstr ""
 "Sección [%2d] '%s': símbolo %zu: XINDEX es utilizado para índice que pueda "
 "caber en st_shndx (%<PRIu32>)\n"
 
+#. || sym->st_shndx > SHN_HIRESERVE  always false
 #: src/elflint.c:725
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: invalid section index\n"
@@ -1745,6 +1824,9 @@ msgstr ""
 "Sección [%2d] '%s': símbolo _GLOBAL_OFFSET_TABLE_ se refiere a sección [%2d] "
 "'%s'\n"
 
+#. This test is more strict than the psABIs which
+#. usually allow the symbol to be in the middle of
+#. the .got section, allowing negative offsets.
 #: src/elflint.c:991
 #, c-format
 msgid ""
@@ -2725,6 +2807,7 @@ msgstr ""
 "Sección [%2d] '%s': compensación %zu: longitud inválida en sub-sección de "
 "atributo\n"
 
+#. Tag_File
 #: src/elflint.c:3512
 #, c-format
 msgid ""
@@ -3357,11 +3440,13 @@ msgstr "Agregar RUTA a todos los nombres de ficheros"
 msgid "Use PATH as root of debuginfo hierarchy"
 msgstr "Usar RUTA como root de jerarquía de debuginfo"
 
+#. Short description of program.
 #: src/findtextrel.c:72
 msgid "Locate source of text relocations in FILEs (a.out by default)."
 msgstr ""
 "Localizar origen de reubicaciones de texto en FICHEROS (a.out por defecto)."
 
+#. Strings for arguments in help texts.
 #: src/findtextrel.c:76 src/nm.c:108 src/objdump.c:71 src/size.c:83
 #: src/strings.c:88 src/strip.c:96
 msgid "[FILE...]"
@@ -3543,6 +3628,7 @@ msgstr "Invertir el orden"
 msgid "Decode low-level symbol names into source code names"
 msgstr ""
 
+#. Short description of program.
 #: src/nm.c:105
 msgid "List symbols from FILEs (a.out by default)."
 msgstr "Listar símbolos de FICHEROS (a.out por defecto)."
@@ -3558,7 +3644,7 @@ msgid "%s: INTERNAL ERROR %d (%s): %s"
 msgstr "%s: ERROR INTERNO %d (%s-%s): %s"
 
 #: src/nm.c:395 src/nm.c:407 src/size.c:305 src/size.c:314 src/size.c:325
-#: src/strip.c:2288
+#: src/strip.c:2300
 #, c-format
 msgid "while closing '%s'"
 msgstr "error al cerrar '%s'"
@@ -3568,6 +3654,7 @@ msgstr "error al cerrar '%s'"
 msgid "%s: File format not recognized"
 msgstr "%s: No se reconoce el formato del fichero"
 
+#. Note: 0 is no valid offset.
 #: src/nm.c:457
 #, fuzzy
 msgid ""
@@ -3612,6 +3699,7 @@ msgstr "No se puede crear el árbol de búsqueda"
 msgid "cannot get section header string table index"
 msgstr "no se puede obtener índice de cadena de encabezamiento de sección"
 
+#. We always print this prolog.
 #: src/nm.c:787
 #, c-format
 msgid ""
@@ -3625,6 +3713,7 @@ msgstr ""
 "Símbolos de %s:\n"
 "\n"
 
+#. The header line.
 #: src/nm.c:790
 #, c-format
 msgid ""
@@ -3651,6 +3740,7 @@ msgid "%s: entries (%zd) in section %zd `%s' is too large"
 msgstr ""
 "%s: el tamaño de la entrada en la sección `%s' no es el que esperábamos "
 
+#. XXX Add machine specific object file types.
 #: src/nm.c:1542
 #, c-format
 msgid "%s%s%s%s: Invalid operation"
@@ -3686,6 +3776,7 @@ msgstr "Selección de opción de salida:"
 msgid "Only display information for section NAME."
 msgstr "Sólo muestra información para NOMBRE de sección."
 
+#. Short description of program.
 #: src/objdump.c:67
 msgid "Show information from FILEs (a.out by default)."
 msgstr "Muestra información de FICHEROS (a.out por defecto)."
@@ -3732,10 +3823,12 @@ msgstr "Contenido de la sección %s:\n"
 msgid "cannot disassemble"
 msgstr "No se puede desensamblar"
 
+#. Short description of program.
 #: src/ranlib.c:65
 msgid "Generate an index to speed access to archives."
 msgstr " Generar un índice para acelerar el acceso a los archivos."
 
+#. Strings for arguments in help texts.
 #: src/ranlib.c:68
 msgid "ARCHIVE"
 msgstr "ARCHIVO "
@@ -3870,6 +3963,7 @@ msgid ""
 "decompress section before dumping data (when used with -p or -x)"
 msgstr ""
 
+#. Short description of program.
 #: src/readelf.c:122
 msgid "Print information from ELF file in human-readable form."
 msgstr ""
@@ -4001,6 +4095,7 @@ msgstr "CORE (Fichero núcleo)"
 msgid "OS Specific: (%x)\n"
 msgstr "OS Specific: (%x)\n"
 
+#. && e_type <= ET_HIPROC always true
 #: src/readelf.c:959
 #, c-format
 msgid "Processor Specific: (%x)\n"
@@ -4130,6 +4225,7 @@ msgstr "  Cantidad de entradas en los encabezamientos de sección: %<PRId16>"
 msgid " (%<PRIu32> in [0].sh_size)"
 msgstr " (%<PRIu32> en [0].sh_size)"
 
+#. We managed to get the zeroth section.
 #: src/readelf.c:1060
 #, c-format
 msgid " (%<PRIu32> in [0].sh_link)"
@@ -4369,6 +4465,12 @@ msgstr[1] ""
 "Sección de reubicación [%2zu] '%s' para sección [%2u] '%s' en compensación "
 "%#0<PRIx64> contiene entradas %d:\n"
 
+#. The .rel.dyn section does not refer to a specific section but
+#. instead of section index zero.  Do not try to print a section
+#. name.
+#. The .rela.dyn section does not refer to a specific section but
+#. instead of section index zero.  Do not try to print a section
+#. name.
 #: src/readelf.c:1896 src/readelf.c:2086
 #, c-format
 msgid ""
@@ -4519,6 +4621,7 @@ msgstr ""
 msgid "  %#06x: Parent %d: %s\n"
 msgstr "  %#06x: Principal %d: %s\n"
 
+#. Print the header.
 #: src/readelf.c:2957
 #, c-format
 msgid ""
@@ -4672,11 +4775,13 @@ msgstr "  Propietario          Tamaño\n"
 msgid "  %-13s  %4<PRIu32>\n"
 msgstr "  %-13s  %4<PRIu32>\n"
 
+#. Unknown subsection, print and skip.
 #: src/readelf.c:3520
 #, c-format
 msgid "    %-4u %12<PRIu32>\n"
 msgstr "    %-4u %12<PRIu32>\n"
 
+#. Tag_File
 #: src/readelf.c:3525
 #, c-format
 msgid "    File: %11<PRIu32>\n"
@@ -4970,6 +5075,8 @@ msgstr " [%6tx]   (dirección base) %s\n"
 msgid " [%6tx]  empty list\n"
 msgstr " [%6tx]  lista vacía\n"
 
+#. We have an address range entry.
+#. First address range entry in a list.
 #: src/readelf.c:5016
 #, c-format
 msgid " [%6tx]  %s..%s\n"
@@ -5129,6 +5236,7 @@ msgstr ""
 msgid "cannot get line data section data: %s"
 msgstr "No se puede obtener sección de datos de línea: %s"
 
+#. Print what we got so far.
 #: src/readelf.c:6565
 #, c-format
 msgid ""
@@ -5239,11 +5347,13 @@ msgstr ""
 msgid " set discriminator to %u\n"
 msgstr " establecer discriminador a %u\n"
 
+#. Unknown, ignore it.
 #: src/readelf.c:6841
 #, fuzzy
 msgid " unknown opcode"
 msgstr "código operativo desconocido "
 
+#. Takes no argument.
 #: src/readelf.c:6853
 msgid " copy"
 msgstr "Copiar"
@@ -5278,6 +5388,7 @@ msgstr "  Establecer columna a %<PRIu64>\n"
 msgid " set '%s' to %<PRIuFAST8>\n"
 msgstr "Establecer '%s' a %<PRIuFAST8>\n"
 
+#. Takes no argument.
 #: src/readelf.c:6910
 msgid " set basic block flag"
 msgstr "Establecer bandera de bloque básico"
@@ -5297,10 +5408,12 @@ msgstr "Dirección de avance por constante %u a %s\n"
 msgid " advance address by fixed value %u to %s\n"
 msgstr "dirección de avance por valor corregido %u a %s\n"
 
+#. Takes no argument.
 #: src/readelf.c:6954
 msgid " set prologue end flag"
 msgstr " Establecer bandera prologue_end"
 
+#. Takes no argument.
 #: src/readelf.c:6959
 msgid " set epilogue begin flag"
 msgstr " Establecer bandera epilogue_begin"
@@ -5310,6 +5423,9 @@ msgstr " Establecer bandera epilogue_begin"
 msgid " set isa to %u\n"
 msgstr " establecer isa para %u\n"
 
+#. This is a new opcode the generator but not we know about.
+#. Read the parameters associated with it but then discard
+#. everything.  Read all the parameters for this opcode.
 #: src/readelf.c:6977
 #, c-format
 msgid " unknown opcode with %<PRIu8> parameter:"
@@ -5322,6 +5438,7 @@ msgstr[1] " opcódigo con parámetros %<PRIu8> desconocido:"
 msgid "cannot get .debug_loc content: %s"
 msgstr "no es posible obtener contenido de .debug_loc: %s"
 
+#. First entry in a list.
 #: src/readelf.c:7084
 #, c-format
 msgid " [%6tx]  %s..%s"
@@ -5772,6 +5889,7 @@ msgstr ""
 msgid "Display the total sizes (bsd only)"
 msgstr "Muestra el tamaño total (bsd solamente)"
 
+#. Short description of program.
 #: src/size.c:79
 msgid "List section sizes of FILEs (a.out by default)."
 msgstr "Lista los tamaños de sección de FICHEROS (por defecto a.out). "
@@ -5949,6 +6067,7 @@ msgstr "Imprimir ubicación de la cadena en base 8, 10, o 16 respectivamente."
 msgid "Alias for --radix=o"
 msgstr "Alias para --radix=o"
 
+#. Short description of program.
 #: src/strings.c:84
 msgid "Print the strings of printable characters in files."
 msgstr "Imprimir las cadenas de caracteres imprimibles en archivos."
@@ -6018,10 +6137,7 @@ msgstr ""
 msgid "Remove .comment section"
 msgstr "Quitar sección de comentario"
 
-#: src/strip.c:88
-msgid "Relax a few rules to handle slightly broken ELF files"
-msgstr "Relaja algunas reglas para manejar ficheros ELF rotos"
-
+#. Short description of program.
 #: src/strip.c:93
 msgid "Discard symbols from object files."
 msgstr "Descarta símbolos de archivos objeto."
@@ -6046,11 +6162,6 @@ msgstr "opción -f especificada dos veces"
 msgid "-F option specified twice"
 msgstr "opción -F especificada dos veces"
 
-#: src/strip.c:255 src/unstrip.c:121
-#, c-format
-msgid "-o option specified twice"
-msgstr "opción -o especificada dos veces"
-
 #: src/strip.c:279
 #, c-format
 msgid "-R option supports only .comment section"
@@ -6071,6 +6182,12 @@ msgstr "mientras se abría '%s'"
 msgid "%s: cannot use -o or -f when stripping archive"
 msgstr "%s: no puede utilizarse -o o -f cuando se extrae un archivo"
 
+#. We would like to support ar archives, but currently it just
+#. doesn't work at all since we call elf_clone on the members
+#. which doesn't really support ar members.
+#. result = handle_ar (fd, elf, NULL, fname,
+#. preserve_dates ? tv : NULL);
+#.
 #: src/strip.c:385
 #, fuzzy, c-format
 msgid "%s: no support for stripping archive"
@@ -6101,7 +6218,7 @@ msgstr "Fichero illformed '%s'"
 msgid "while generating output file: %s"
 msgstr "al generar fichero de salida: %s"
 
-#: src/strip.c:1034 src/strip.c:2079
+#: src/strip.c:1034 src/strip.c:2091
 #, c-format
 msgid "%s: error while creating ELF header: %s"
 msgstr "%s: error al crear encabezamiento ELF: %s"
@@ -6131,42 +6248,42 @@ msgstr "al crear tabla de cadenas de encabezamiento de sección: %s"
 msgid "no memory to create section header string table"
 msgstr "al crear tabla de cadenas de encabezamiento de sección: %s"
 
-#: src/strip.c:1869
+#: src/strip.c:1877
 #, fuzzy, c-format
 msgid "bad relocation"
 msgstr "Mostrar reubicaciones"
 
-#: src/strip.c:1990 src/strip.c:2103
+#: src/strip.c:2002 src/strip.c:2115
 #, c-format
 msgid "while writing '%s': %s"
 msgstr "al escribir '%s': %s"
 
-#: src/strip.c:2001
+#: src/strip.c:2013
 #, c-format
 msgid "while creating '%s'"
 msgstr "al crear '%s'"
 
-#: src/strip.c:2024
+#: src/strip.c:2036
 #, c-format
 msgid "while computing checksum for debug information"
 msgstr "al computar la suma de verificación para información de depuración"
 
-#: src/strip.c:2088
+#: src/strip.c:2100
 #, c-format
 msgid "%s: error while reading the file: %s"
 msgstr "%s: error al leer el fichero: %s"
 
-#: src/strip.c:2128 src/strip.c:2148
+#: src/strip.c:2140 src/strip.c:2160
 #, c-format
 msgid "while writing '%s'"
 msgstr "al escribir '%s'"
 
-#: src/strip.c:2185 src/strip.c:2192
+#: src/strip.c:2197 src/strip.c:2204
 #, c-format
 msgid "error while finishing '%s': %s"
 msgstr "Error al terminar '%s': %s"
 
-#: src/strip.c:2209 src/strip.c:2281
+#: src/strip.c:2221 src/strip.c:2293
 #, c-format
 msgid "cannot set access and modification date of '%s'"
 msgstr "no es posible establecer acceso y fecha de modificación de '%s'"

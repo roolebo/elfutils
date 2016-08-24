@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ja\n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2016-08-04 13:31+0200\n"
+"POT-Creation-Date: 2016-08-19 14:38+0200\n"
 "PO-Revision-Date: 2009-09-20 15:32+0900\n"
 "Last-Translator: Hyu_gabaru Ryu_ichi <hyu_gabaru@yahoo.co.jp>\n"
 "Language-Team: Japanese <jp@li.org>\n"
@@ -285,6 +285,7 @@ msgstr "-e か、-p、-k、-K、--core のひとつだけが認められます"
 msgid "cannot load kernel symbols"
 msgstr "カーネルシンボルをロードできません"
 
+#. Non-fatal to have no modules since we do have the kernel.
 #: libdwfl/argp-std.c:234
 msgid "cannot find kernel modules"
 msgstr "カーネルモジュールを見つけられません"
@@ -531,6 +532,7 @@ msgstr ""
 msgid "    Build ID: "
 msgstr "   ビルト ID: "
 
+#. A non-null terminated version string.
 #: libebl/eblobjnote.c:152
 #, c-format
 msgid "    Linker version: %.*s\n"
@@ -792,11 +794,13 @@ msgstr ""
 msgid "Miscellaneous:"
 msgstr "雑則:"
 
+#. Short description of program.
 #: src/addr2line.c:87
 msgid ""
 "Locate source files and line information for ADDRs (in a.out by default)."
 msgstr ""
 
+#. Strings for arguments in help texts.
 #: src/addr2line.c:91
 msgid "[ADDR...]"
 msgstr ""
@@ -927,10 +931,12 @@ msgstr "ファイル照合にフルパスを使う。"
 msgid "Update only older files in archive."
 msgstr "アーカイブの古いファイルのみ更新する。"
 
+#. Short description of program.
 #: src/ar.c:99
 msgid "Create, modify, and extract from archives."
 msgstr "アーカイブから作成や、修正、抽出する。"
 
+#. Strings for arguments in help texts.
 #: src/ar.c:102
 msgid "[MEMBER] [COUNT] ARCHIVE [FILE...]"
 msgstr "[メンバー] [合計] アーカイブ [ファイル...]"
@@ -1103,6 +1109,7 @@ msgstr ""
 msgid "%s (default)"
 msgstr ""
 
+#. The archive is too big.
 #: src/arlib.c:209
 #, c-format
 msgid "the archive '%s' is too large"
@@ -1139,10 +1146,12 @@ msgstr ""
 msgid "Output nothing; yield exit status only"
 msgstr ""
 
+#. Short description of program.
 #: src/elfcmp.c:77
 msgid "Compare relevant parts of two ELF files for equality."
 msgstr ""
 
+#. Strings for arguments in help texts.
 #: src/elfcmp.c:81
 msgid "FILE1 FILE2"
 msgstr ""
@@ -1325,6 +1334,76 @@ msgstr ""
 msgid "cannot get relocation: %s"
 msgstr ""
 
+#: src/elfcompress.c:121 src/strip.c:255 src/unstrip.c:121
+#, c-format
+msgid "-o option specified twice"
+msgstr "-o オプションが 2 回指定されています"
+
+#: src/elfcompress.c:128
+#, fuzzy, c-format
+msgid "-t option specified twice"
+msgstr "-f オプションが 2 回指定されています"
+
+#: src/elfcompress.c:137
+#, fuzzy, c-format
+msgid "unknown compression type '%s'"
+msgstr "不明なタイプ"
+
+#. We need at least one input file.
+#: src/elfcompress.c:149 src/elfcompress.c:1310
+#, fuzzy, c-format
+msgid "No input file given"
+msgstr "入力ファイルが空です"
+
+#: src/elfcompress.c:155 src/elfcompress.c:1315
+#, fuzzy, c-format
+msgid "Only one input file allowed together with '-o'"
+msgstr "'-o' と '-f' と一緒の場合は入力ファイルは 1 つしか認められません"
+
+#: src/elfcompress.c:1272
+#, fuzzy
+msgid "Place (de)compressed output into FILE"
+msgstr "はぎ取った出力を ふぁいる に置く"
+
+#: src/elfcompress.c:1275
+msgid ""
+"What type of compression to apply. TYPE can be 'none' (decompress), "
+"'zlib' (ELF ZLIB compression, the default, 'zlib-gabi' is an alias) or 'zlib-"
+"gnu' (.zdebug GNU style compression, 'gnu' is an alias)"
+msgstr ""
+
+#: src/elfcompress.c:1278
+msgid ""
+"SECTION name to (de)compress, SECTION is an extended wildcard pattern "
+"(defaults to '.?(z)debug*')"
+msgstr ""
+
+#: src/elfcompress.c:1281
+msgid "Print a message for each section being (de)compressed"
+msgstr ""
+
+#: src/elfcompress.c:1284
+msgid "Force compression of section even if it would become larger"
+msgstr ""
+
+#: src/elfcompress.c:1287 src/strip.c:88
+msgid "Relax a few rules to handle slightly broken ELF files"
+msgstr "少し壊れた ELF ファイルを取り扱うためにルールを少し緩和する"
+
+#: src/elfcompress.c:1290
+#, fuzzy
+msgid "Be silent when a section cannot be compressed"
+msgstr "セクション [%2d] '%s': セクションデータを得られません\n"
+
+#. Strings for arguments in help texts.
+#: src/elfcompress.c:1299 src/elflint.c:78 src/readelf.c:126
+msgid "FILE..."
+msgstr "ふぁいる..."
+
+#: src/elfcompress.c:1300
+msgid "Compress or decompress sections in an ELF file."
+msgstr ""
+
 #: src/elflint.c:64
 msgid "Be extremely strict, flag level 2 features."
 msgstr "非常に厳密にやってください、フラグレベル 2 機能。"
@@ -1344,13 +1423,10 @@ msgid ""
 msgstr ""
 "バイナリーは GNU ld で作成され、従ってある方法で壊れているのが知られている"
 
+#. Short description of program.
 #: src/elflint.c:74
 msgid "Pedantic checking of ELF files compliance with gABI/psABI spec."
 msgstr "ELF ファイルが gABI/psABI 仕様へ準拠しているかの厳密なチェック。"
-
-#: src/elflint.c:78 src/readelf.c:126
-msgid "FILE..."
-msgstr "ふぁいる..."
 
 #: src/elflint.c:155 src/readelf.c:298
 #, c-format
@@ -1380,6 +1456,7 @@ msgstr "ファイル名がありません。\n"
 msgid " error while freeing sub-ELF descriptor: %s\n"
 msgstr "副-ELF 記述子を解放している時にエラー: %s\n"
 
+#. We cannot do anything.
 #: src/elflint.c:306
 #, c-format
 msgid "Not an ELF file - it has the wrong magic bytes at the start\n"
@@ -1592,6 +1669,7 @@ msgstr ""
 "セクション [%2d] '%s': シンボル %zu: st_shndx (%<PRIu32>) に適合するインデッ"
 "クス用に使われる XINDEX\n"
 
+#. || sym->st_shndx > SHN_HIRESERVE  always false
 #: src/elflint.c:725
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: invalid section index\n"
@@ -1736,6 +1814,9 @@ msgstr ""
 "セクション [%2d] '%s': _GLOBAL_OFFSET_TABLE_ シンボルはセクション [%2d] '%s' "
 "を参照しています\n"
 
+#. This test is more strict than the psABIs which
+#. usually allow the symbol to be in the middle of
+#. the .got section, allowing negative offsets.
 #: src/elflint.c:991
 #, c-format
 msgid ""
@@ -2607,6 +2688,7 @@ msgid ""
 "section [%2d] '%s': offset %zu: invalid length in attribute subsection\n"
 msgstr ""
 
+#. Tag_File
 #: src/elflint.c:3512
 #, c-format
 msgid ""
@@ -3148,10 +3230,12 @@ msgstr ""
 msgid "Use PATH as root of debuginfo hierarchy"
 msgstr ""
 
+#. Short description of program.
 #: src/findtextrel.c:72
 msgid "Locate source of text relocations in FILEs (a.out by default)."
 msgstr ""
 
+#. Strings for arguments in help texts.
 #: src/findtextrel.c:76 src/nm.c:108 src/objdump.c:71 src/size.c:83
 #: src/strings.c:88 src/strip.c:96
 msgid "[FILE...]"
@@ -3323,6 +3407,7 @@ msgstr "並べ替えの意味を逆にする"
 msgid "Decode low-level symbol names into source code names"
 msgstr ""
 
+#. Short description of program.
 #: src/nm.c:105
 msgid "List symbols from FILEs (a.out by default)."
 msgstr "ふぁいる からシンボルを表示 (デフォルトではa.out)。"
@@ -3338,7 +3423,7 @@ msgid "%s: INTERNAL ERROR %d (%s): %s"
 msgstr "%s: 内部エラー %d (%s-%s): %s"
 
 #: src/nm.c:395 src/nm.c:407 src/size.c:305 src/size.c:314 src/size.c:325
-#: src/strip.c:2288
+#: src/strip.c:2300
 #, c-format
 msgid "while closing '%s'"
 msgstr "'%s' を閉じている最中"
@@ -3348,6 +3433,7 @@ msgstr "'%s' を閉じている最中"
 msgid "%s: File format not recognized"
 msgstr "%s: ファイル形式を認識できませんでした"
 
+#. Note: 0 is no valid offset.
 #: src/nm.c:457
 #, fuzzy
 msgid ""
@@ -3392,6 +3478,7 @@ msgstr "検索ツリーを生成できません"
 msgid "cannot get section header string table index"
 msgstr "セクションヘッダー文字列テーブル索引が得られません"
 
+#. We always print this prolog.
 #: src/nm.c:787
 #, c-format
 msgid ""
@@ -3405,6 +3492,7 @@ msgstr ""
 "%s からのシンボル:\n"
 "\n"
 
+#. The header line.
 #: src/nm.c:790
 #, c-format
 msgid ""
@@ -3429,6 +3517,7 @@ msgstr "%s: セクション `%s' の大きさは項目の大きさの整数倍�
 msgid "%s: entries (%zd) in section %zd `%s' is too large"
 msgstr "%s: セクションの項目の大きさ `%s' は予期したものとは異なります"
 
+#. XXX Add machine specific object file types.
 #: src/nm.c:1542
 #, c-format
 msgid "%s%s%s%s: Invalid operation"
@@ -3464,6 +3553,7 @@ msgstr "出力選択:"
 msgid "Only display information for section NAME."
 msgstr ""
 
+#. Short description of program.
 #: src/objdump.c:67
 msgid "Show information from FILEs (a.out by default)."
 msgstr ""
@@ -3507,10 +3597,12 @@ msgstr ""
 msgid "cannot disassemble"
 msgstr ""
 
+#. Short description of program.
 #: src/ranlib.c:65
 msgid "Generate an index to speed access to archives."
 msgstr ""
 
+#. Strings for arguments in help texts.
 #: src/ranlib.c:68
 msgid "ARCHIVE"
 msgstr ""
@@ -3647,6 +3739,7 @@ msgid ""
 "decompress section before dumping data (when used with -p or -x)"
 msgstr ""
 
+#. Short description of program.
 #: src/readelf.c:122
 msgid "Print information from ELF file in human-readable form."
 msgstr "ELF ファイルから人間が読める形で情報を印刷する。"
@@ -3776,6 +3869,7 @@ msgstr "CORE (コアファイル)"
 msgid "OS Specific: (%x)\n"
 msgstr "OS 固有: (%x)\n"
 
+#. && e_type <= ET_HIPROC always true
 #: src/readelf.c:959
 #, c-format
 msgid "Processor Specific: (%x)\n"
@@ -3903,6 +3997,7 @@ msgstr "  セクションヘッダー項目の数 : %<PRId16>"
 msgid " (%<PRIu32> in [0].sh_size)"
 msgstr " ([0].sh_size の %<PRIu32>)"
 
+#. We managed to get the zeroth section.
 #: src/readelf.c:1060
 #, c-format
 msgid " (%<PRIu32> in [0].sh_link)"
@@ -4130,6 +4225,12 @@ msgstr[0] ""
 "オフセット %5$#0<PRIx64> のセクション [%3$2u] '%4$s' 用のリロケーションセク"
 "ション [%1$2zu] '%2$s' には %6$d 個の項目があります:\n"
 
+#. The .rel.dyn section does not refer to a specific section but
+#. instead of section index zero.  Do not try to print a section
+#. name.
+#. The .rela.dyn section does not refer to a specific section but
+#. instead of section index zero.  Do not try to print a section
+#. name.
 #: src/readelf.c:1896 src/readelf.c:2086
 #, c-format
 msgid ""
@@ -4261,6 +4362,7 @@ msgstr "  %#06x: バージョン: %hd  フラグ: %s  索引: %hd  数: %hd  名
 msgid "  %#06x: Parent %d: %s\n"
 msgstr "  %#06x: 親 %d: %s\n"
 
+#. Print the header.
 #: src/readelf.c:2957
 #, c-format
 msgid ""
@@ -4398,11 +4500,13 @@ msgstr "  所有者         大きさ\n"
 msgid "  %-13s  %4<PRIu32>\n"
 msgstr "  %-13s  %4<PRIu32>\n"
 
+#. Unknown subsection, print and skip.
 #: src/readelf.c:3520
 #, c-format
 msgid "    %-4u %12<PRIu32>\n"
 msgstr "    %-4u %12<PRIu32>\n"
 
+#. Tag_File
 #: src/readelf.c:3525
 #, c-format
 msgid "    File: %11<PRIu32>\n"
@@ -4695,6 +4799,8 @@ msgstr ""
 "\n"
 " [%6tx] ゼロ終端\n"
 
+#. We have an address range entry.
+#. First address range entry in a list.
 #: src/readelf.c:5016
 #, c-format
 msgid " [%6tx]  %s..%s\n"
@@ -4853,6 +4959,7 @@ msgstr ""
 msgid "cannot get line data section data: %s"
 msgstr "ラインデータセクションデータを得られません: %s"
 
+#. Print what we got so far.
 #: src/readelf.c:6565
 #, fuzzy, c-format
 msgid ""
@@ -4959,11 +5066,13 @@ msgstr ""
 msgid " set discriminator to %u\n"
 msgstr "カラムを %<PRIu64> に設定する\n"
 
+#. Unknown, ignore it.
 #: src/readelf.c:6841
 #, fuzzy
 msgid " unknown opcode"
 msgstr "不明な命令コード"
 
+#. Takes no argument.
 #: src/readelf.c:6853
 msgid " copy"
 msgstr "複写"
@@ -4998,6 +5107,7 @@ msgstr "カラムを %<PRIu64> に設定する\n"
 msgid " set '%s' to %<PRIuFAST8>\n"
 msgstr " '%s' を %<PRIuFAST8> に設定する\n"
 
+#. Takes no argument.
 #: src/readelf.c:6910
 msgid " set basic block flag"
 msgstr "基本ブロックフラグを設定する"
@@ -5017,10 +5127,12 @@ msgstr "アドレスを定数 %u だけ済めて %s にする\n"
 msgid " advance address by fixed value %u to %s\n"
 msgstr "アドレスを固定値 %u だけ進めて %s にする\n"
 
+#. Takes no argument.
 #: src/readelf.c:6954
 msgid " set prologue end flag"
 msgstr "プロローグ終了フラグを設定する"
 
+#. Takes no argument.
 #: src/readelf.c:6959
 msgid " set epilogue begin flag"
 msgstr "エピローグ開始フラグを設定する"
@@ -5030,6 +5142,9 @@ msgstr "エピローグ開始フラグを設定する"
 msgid " set isa to %u\n"
 msgstr " ファイルを %<PRIu64> に設定する\n"
 
+#. This is a new opcode the generator but not we know about.
+#. Read the parameters associated with it but then discard
+#. everything.  Read all the parameters for this opcode.
 #: src/readelf.c:6977
 #, c-format
 msgid " unknown opcode with %<PRIu8> parameter:"
@@ -5041,6 +5156,7 @@ msgstr[0] " %<PRIu8> 個のパラメーターのある不明な命令コード:"
 msgid "cannot get .debug_loc content: %s"
 msgstr ".debug_loc の内容を得られません: %s"
 
+#. First entry in a list.
 #: src/readelf.c:7084
 #, c-format
 msgid " [%6tx]  %s..%s"
@@ -5496,6 +5612,7 @@ msgstr "ロード可能セグメントのための印刷の大きさと許可フ
 msgid "Display the total sizes (bsd only)"
 msgstr "合計の大きさを表示 (bsd のみ)"
 
+#. Short description of program.
 #: src/size.c:79
 msgid "List section sizes of FILEs (a.out by default)."
 msgstr "ふぁいる のセクションの大きさの一覧 (省略値は a.out)"
@@ -5672,6 +5789,7 @@ msgstr ""
 msgid "Alias for --radix=o"
 msgstr ""
 
+#. Short description of program.
 #: src/strings.c:84
 msgid "Print the strings of printable characters in files."
 msgstr ""
@@ -5741,10 +5859,7 @@ msgstr ""
 msgid "Remove .comment section"
 msgstr ".comment セクションを取り除く"
 
-#: src/strip.c:88
-msgid "Relax a few rules to handle slightly broken ELF files"
-msgstr "少し壊れた ELF ファイルを取り扱うためにルールを少し緩和する"
-
+#. Short description of program.
 #: src/strip.c:93
 msgid "Discard symbols from object files."
 msgstr "オブジェクトファイルからシンボルを破棄する"
@@ -5769,11 +5884,6 @@ msgstr "-f オプションが 2 回指定されています"
 msgid "-F option specified twice"
 msgstr "-F オプションが 2 回指定されています"
 
-#: src/strip.c:255 src/unstrip.c:121
-#, c-format
-msgid "-o option specified twice"
-msgstr "-o オプションが 2 回指定されています"
-
 #: src/strip.c:279
 #, c-format
 msgid "-R option supports only .comment section"
@@ -5794,6 +5904,12 @@ msgstr "'%s' を開いている間"
 msgid "%s: cannot use -o or -f when stripping archive"
 msgstr "%s: アーカイブから抜き出している時は -o や -f は使えません"
 
+#. We would like to support ar archives, but currently it just
+#. doesn't work at all since we call elf_clone on the members
+#. which doesn't really support ar members.
+#. result = handle_ar (fd, elf, NULL, fname,
+#. preserve_dates ? tv : NULL);
+#.
 #: src/strip.c:385
 #, fuzzy, c-format
 msgid "%s: no support for stripping archive"
@@ -5824,7 +5940,7 @@ msgstr "不適格なファイル '%s'"
 msgid "while generating output file: %s"
 msgstr "出力ファイルを生成している間: %s"
 
-#: src/strip.c:1034 src/strip.c:2079
+#: src/strip.c:1034 src/strip.c:2091
 #, c-format
 msgid "%s: error while creating ELF header: %s"
 msgstr "%s: ELF ヘッダーを生成している間にエラー: %s"
@@ -5854,42 +5970,42 @@ msgstr "セクションヘッダー文字列テーブルを生成中: %s"
 msgid "no memory to create section header string table"
 msgstr "セクションヘッダー文字列テーブルを生成中: %s"
 
-#: src/strip.c:1869
+#: src/strip.c:1877
 #, fuzzy, c-format
 msgid "bad relocation"
 msgstr "リロケーションを表示"
 
-#: src/strip.c:1990 src/strip.c:2103
+#: src/strip.c:2002 src/strip.c:2115
 #, c-format
 msgid "while writing '%s': %s"
 msgstr "'%s' を書込み中: %s"
 
-#: src/strip.c:2001
+#: src/strip.c:2013
 #, c-format
 msgid "while creating '%s'"
 msgstr "'%s' を生成中"
 
-#: src/strip.c:2024
+#: src/strip.c:2036
 #, c-format
 msgid "while computing checksum for debug information"
 msgstr "デバッグ情報のチェックサムを計算中"
 
-#: src/strip.c:2088
+#: src/strip.c:2100
 #, c-format
 msgid "%s: error while reading the file: %s"
 msgstr "%s: ファイルを読込み中にエラー: %s"
 
-#: src/strip.c:2128 src/strip.c:2148
+#: src/strip.c:2140 src/strip.c:2160
 #, fuzzy, c-format
 msgid "while writing '%s'"
 msgstr "'%s' を書込み中: %s"
 
-#: src/strip.c:2185 src/strip.c:2192
+#: src/strip.c:2197 src/strip.c:2204
 #, c-format
 msgid "error while finishing '%s': %s"
 msgstr "'%s' の終了中にエラー: %s"
 
-#: src/strip.c:2209 src/strip.c:2281
+#: src/strip.c:2221 src/strip.c:2293
 #, c-format
 msgid "cannot set access and modification date of '%s'"
 msgstr "'%s' のアクセスと変更日付を設定できません"

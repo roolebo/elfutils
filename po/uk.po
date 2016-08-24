@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2016-08-04 13:31+0200\n"
+"POT-Creation-Date: 2016-08-19 14:38+0200\n"
 "PO-Revision-Date: 2015-09-26 16:41+0300\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <kde-i18n-uk@kde.org>\n"
@@ -292,6 +292,7 @@ msgstr ""
 msgid "cannot load kernel symbols"
 msgstr "не вдалося завантажити символи ядра"
 
+#. Non-fatal to have no modules since we do have the kernel.
 #: libdwfl/argp-std.c:234
 msgid "cannot find kernel modules"
 msgstr "не вдалося виявити модулі ядра"
@@ -527,6 +528,7 @@ msgstr " Арг.: "
 msgid "    Build ID: "
 msgstr "    Ід. збирання: "
 
+#. A non-null terminated version string.
 #: libebl/eblobjnote.c:152
 #, c-format
 msgid "    Linker version: %.*s\n"
@@ -787,11 +789,13 @@ msgstr "Вивести усі дані у один рядок і додати в
 msgid "Miscellaneous:"
 msgstr "Інше:"
 
+#. Short description of program.
 #: src/addr2line.c:87
 msgid ""
 "Locate source files and line information for ADDRs (in a.out by default)."
 msgstr "Шукати АДРЕСИ у файлах кодів та даних про рядки (типово, у a.out)."
 
+#. Strings for arguments in help texts.
 #: src/addr2line.c:91
 msgid "[ADDR...]"
 msgstr "[АДРЕСА...]"
@@ -923,10 +927,12 @@ msgstr "Використовувати для порівняння повний 
 msgid "Update only older files in archive."
 msgstr "Оновлювати у архіві лише старіші файли."
 
+#. Short description of program.
 #: src/ar.c:99
 msgid "Create, modify, and extract from archives."
 msgstr "Створення, зміна архівів і видобування даних з архівів."
 
+#. Strings for arguments in help texts.
 #: src/ar.c:102
 msgid "[MEMBER] [COUNT] ARCHIVE [FILE...]"
 msgstr "[ЕЛЕМЕНТ] [НОМЕР] АРХІВ [ФАЙЛ...]"
@@ -1104,6 +1110,7 @@ msgstr ""
 msgid "%s (default)"
 msgstr "%s (типово)"
 
+#. The archive is too big.
 #: src/arlib.c:209
 #, c-format
 msgid "the archive '%s' is too large"
@@ -1142,10 +1149,12 @@ msgstr "Ігнорувати відмінності у ідентифікато�
 msgid "Output nothing; yield exit status only"
 msgstr "Нічого не виводити; визначити лише стан виходу"
 
+#. Short description of program.
 #: src/elfcmp.c:77
 msgid "Compare relevant parts of two ELF files for equality."
 msgstr "Порівнює відповідні частини двох файлів ELF."
 
+#. Strings for arguments in help texts.
 #: src/elfcmp.c:81
 msgid "FILE1 FILE2"
 msgstr "ФАЙЛ1 ФАЙЛ2"
@@ -1327,6 +1336,79 @@ msgstr "не вдалося отримати вміст розділу %zu: %s"
 msgid "cannot get relocation: %s"
 msgstr "не вдалося отримати пересування: %s"
 
+#: src/elfcompress.c:121 src/strip.c:255 src/unstrip.c:121
+#, c-format
+msgid "-o option specified twice"
+msgstr "параметр -o вказано двічі"
+
+#: src/elfcompress.c:128
+#, fuzzy, c-format
+msgid "-t option specified twice"
+msgstr "параметр -f вказано двічі"
+
+#: src/elfcompress.c:137
+#, fuzzy, c-format
+msgid "unknown compression type '%s'"
+msgstr "невизначений тип"
+
+#. We need at least one input file.
+#: src/elfcompress.c:149 src/elfcompress.c:1310
+#, fuzzy, c-format
+msgid "No input file given"
+msgstr "вхідний файл є порожнім"
+
+#: src/elfcompress.c:155 src/elfcompress.c:1315
+#, fuzzy, c-format
+msgid "Only one input file allowed together with '-o'"
+msgstr ""
+"Разом з «-o» або «-f» можна використовувати лише один файл вхідних даних"
+
+#: src/elfcompress.c:1272
+#, fuzzy
+msgid "Place (de)compressed output into FILE"
+msgstr "Вивести дані після вилучення до ФАЙЛа"
+
+#: src/elfcompress.c:1275
+msgid ""
+"What type of compression to apply. TYPE can be 'none' (decompress), "
+"'zlib' (ELF ZLIB compression, the default, 'zlib-gabi' is an alias) or 'zlib-"
+"gnu' (.zdebug GNU style compression, 'gnu' is an alias)"
+msgstr ""
+
+#: src/elfcompress.c:1278
+msgid ""
+"SECTION name to (de)compress, SECTION is an extended wildcard pattern "
+"(defaults to '.?(z)debug*')"
+msgstr ""
+
+#: src/elfcompress.c:1281
+msgid "Print a message for each section being (de)compressed"
+msgstr ""
+
+#: src/elfcompress.c:1284
+msgid "Force compression of section even if it would become larger"
+msgstr ""
+
+#: src/elfcompress.c:1287 src/strip.c:88
+msgid "Relax a few rules to handle slightly broken ELF files"
+msgstr ""
+"Знехтувати декількома правилами для обробки трохи пошкоджених файлів ELF"
+
+#: src/elfcompress.c:1290
+#, fuzzy
+msgid "Be silent when a section cannot be compressed"
+msgstr ""
+"розділ [%2zu] «%s»: адреса розділів локальних даних потоків не є нульовою\n"
+
+#. Strings for arguments in help texts.
+#: src/elfcompress.c:1299 src/elflint.c:78 src/readelf.c:126
+msgid "FILE..."
+msgstr "ФАЙЛ..."
+
+#: src/elfcompress.c:1300
+msgid "Compress or decompress sections in an ELF file."
+msgstr ""
+
 #: src/elflint.c:64
 msgid "Be extremely strict, flag level 2 features."
 msgstr "Висока строгість, увімкнути можливості рівня 2."
@@ -1347,14 +1429,11 @@ msgstr ""
 "Бінарний файл було створено за допомогою GNU ld, тому він, очевидно, є до "
 "певної міри неправильним"
 
+#. Short description of program.
 #: src/elflint.c:74
 msgid "Pedantic checking of ELF files compliance with gABI/psABI spec."
 msgstr ""
 "Педантична перевірка файлів ELF на сумісність зі специфікаціями gABI/psABI."
-
-#: src/elflint.c:78 src/readelf.c:126
-msgid "FILE..."
-msgstr "ФАЙЛ..."
 
 #: src/elflint.c:155 src/readelf.c:298
 #, c-format
@@ -1384,6 +1463,7 @@ msgstr "Не вказано назви файла.\n"
 msgid " error while freeing sub-ELF descriptor: %s\n"
 msgstr " помилка під час спроби вивільнення дескриптора суб-ELF: %s\n"
 
+#. We cannot do anything.
 #: src/elflint.c:306
 #, c-format
 msgid "Not an ELF file - it has the wrong magic bytes at the start\n"
@@ -1597,6 +1677,7 @@ msgstr ""
 "розділ [%2d] «%s»: символ %zu: XINDEX використано для індексування, яке не "
 "відповідає st_shndx (%<PRIu32>)\n"
 
+#. || sym->st_shndx > SHN_HIRESERVE  always false
 #: src/elflint.c:725
 #, c-format
 msgid "section [%2d] '%s': symbol %zu: invalid section index\n"
@@ -1741,6 +1822,9 @@ msgstr ""
 "розділ [%2d] «%s»: символ _GLOBAL_OFFSET_TABLE_  посилається на розділ [%2d] "
 "'%s'\n"
 
+#. This test is more strict than the psABIs which
+#. usually allow the symbol to be in the middle of
+#. the .got section, allowing negative offsets.
 #: src/elflint.c:991
 #, c-format
 msgid ""
@@ -2713,6 +2797,7 @@ msgid ""
 msgstr ""
 "розділ [%2d] «%s»: зміщення %zu: некоректна довжина у підрозділі атрибутів\n"
 
+#. Tag_File
 #: src/elflint.c:3512
 #, c-format
 msgid ""
@@ -3334,10 +3419,12 @@ msgstr "Додавати ШЛЯХ до всіх назв файлів"
 msgid "Use PATH as root of debuginfo hierarchy"
 msgstr "Використовувати ШЛЯХ як кореневий каталог для ієрархії debuginfo"
 
+#. Short description of program.
 #: src/findtextrel.c:72
 msgid "Locate source of text relocations in FILEs (a.out by default)."
 msgstr "Шукає джерело пересуваного тексту у ФАЙЛАХ (типово, a.out)."
 
+#. Strings for arguments in help texts.
 #: src/findtextrel.c:76 src/nm.c:108 src/objdump.c:71 src/size.c:83
 #: src/strings.c:88 src/strip.c:96
 msgid "[FILE...]"
@@ -3516,6 +3603,7 @@ msgstr "Змінити порядок на протилежний"
 msgid "Decode low-level symbol names into source code names"
 msgstr "Визначати за низькорівневими назвами символів назви у початковому коді"
 
+#. Short description of program.
 #: src/nm.c:105
 msgid "List symbols from FILEs (a.out by default)."
 msgstr "Показати список символів з ФАЙЛів (типово з a.out)."
@@ -3530,7 +3618,7 @@ msgid "%s: INTERNAL ERROR %d (%s): %s"
 msgstr "%s: ВНУТРІШНЯ ПОМИЛКА %d (%s): %s"
 
 #: src/nm.c:395 src/nm.c:407 src/size.c:305 src/size.c:314 src/size.c:325
-#: src/strip.c:2288
+#: src/strip.c:2300
 #, c-format
 msgid "while closing '%s'"
 msgstr "під час закриття «%s»"
@@ -3540,6 +3628,7 @@ msgstr "під час закриття «%s»"
 msgid "%s: File format not recognized"
 msgstr "%s: не вдалося розпізнати формат файла"
 
+#. Note: 0 is no valid offset.
 #: src/nm.c:457
 msgid ""
 "\n"
@@ -3583,6 +3672,7 @@ msgstr "не вдалося створити дерево пошуку"
 msgid "cannot get section header string table index"
 msgstr "не вдалося визначити індекс заголовка розділу у таблиці рядків"
 
+#. We always print this prolog.
 #: src/nm.c:787
 #, c-format
 msgid ""
@@ -3596,6 +3686,7 @@ msgstr ""
 "Символи з %s:\n"
 "\n"
 
+#. The header line.
 #: src/nm.c:790
 #, c-format
 msgid ""
@@ -3620,6 +3711,7 @@ msgstr "%s: розмір розділу %zd «%s» не є кратним до �
 msgid "%s: entries (%zd) in section %zd `%s' is too large"
 msgstr "%s: розмір запису у розділі %zd «%s» не є очікуваним"
 
+#. XXX Add machine specific object file types.
 #: src/nm.c:1542
 #, c-format
 msgid "%s%s%s%s: Invalid operation"
@@ -3654,6 +3746,7 @@ msgstr "Вибір виведених даних:"
 msgid "Only display information for section NAME."
 msgstr "Показати інформацію лише з розділу НАЗВА."
 
+#. Short description of program.
 #: src/objdump.c:67
 msgid "Show information from FILEs (a.out by default)."
 msgstr "Показати інформацію з ФАЙЛів (типово a.out)."
@@ -3700,10 +3793,12 @@ msgstr "Вміст розділу %s:\n"
 msgid "cannot disassemble"
 msgstr "не вдалося дизасемблювати"
 
+#. Short description of program.
 #: src/ranlib.c:65
 msgid "Generate an index to speed access to archives."
 msgstr "Створювати покажчик для пришвидшення доступу до архівів."
 
+#. Strings for arguments in help texts.
 #: src/ranlib.c:68
 msgid "ARCHIVE"
 msgstr "АРХІВ"
@@ -3837,6 +3932,7 @@ msgid ""
 "decompress section before dumping data (when used with -p or -x)"
 msgstr ""
 
+#. Short description of program.
 #: src/readelf.c:122
 msgid "Print information from ELF file in human-readable form."
 msgstr "Виводити відомості з файла ELF у придатному для читання форматі."
@@ -3966,6 +4062,7 @@ msgstr "CORE (Файл ядра)"
 msgid "OS Specific: (%x)\n"
 msgstr "ОС-специфічне: (%x)\n"
 
+#. && e_type <= ET_HIPROC always true
 #: src/readelf.c:959
 #, c-format
 msgid "Processor Specific: (%x)\n"
@@ -4093,6 +4190,7 @@ msgstr "  Кількість записів заголовків розділі�
 msgid " (%<PRIu32> in [0].sh_size)"
 msgstr " (%<PRIu32> у [0].sh_size)"
 
+#. We managed to get the zeroth section.
 #: src/readelf.c:1060
 #, c-format
 msgid " (%<PRIu32> in [0].sh_link)"
@@ -4345,6 +4443,12 @@ msgstr[2] ""
 "Розділ пересування [%2zu] «%s» для розділу [%2u] «%s» за зміщенням "
 "%#0<PRIx64> містить %d записів:\n"
 
+#. The .rel.dyn section does not refer to a specific section but
+#. instead of section index zero.  Do not try to print a section
+#. name.
+#. The .rela.dyn section does not refer to a specific section but
+#. instead of section index zero.  Do not try to print a section
+#. name.
 #: src/readelf.c:1896 src/readelf.c:2086
 #, c-format
 msgid ""
@@ -4504,6 +4608,7 @@ msgstr "  %#06x: Версія:  %hd  Прап.: %s  Індекс: %hd К-ть: %
 msgid "  %#06x: Parent %d: %s\n"
 msgstr "  %#06x: батьківський %d: %s\n"
 
+#. Print the header.
 #: src/readelf.c:2957
 #, c-format
 msgid ""
@@ -4666,11 +4771,13 @@ msgstr "  Власник        Розмір\n"
 msgid "  %-13s  %4<PRIu32>\n"
 msgstr "  %-13s  %4<PRIu32>\n"
 
+#. Unknown subsection, print and skip.
 #: src/readelf.c:3520
 #, c-format
 msgid "    %-4u %12<PRIu32>\n"
 msgstr "    %-4u %12<PRIu32>\n"
 
+#. Tag_File
 #: src/readelf.c:3525
 #, c-format
 msgid "    File: %11<PRIu32>\n"
@@ -4971,6 +5078,8 @@ msgstr " [%6tx]  базова адреса %s\n"
 msgid " [%6tx]  empty list\n"
 msgstr " [%6tx]  порожній список\n"
 
+#. We have an address range entry.
+#. First address range entry in a list.
 #: src/readelf.c:5016
 #, c-format
 msgid " [%6tx]  %s..%s\n"
@@ -5128,6 +5237,7 @@ msgstr ""
 msgid "cannot get line data section data: %s"
 msgstr "не вдалося отримати дані розділу лінійних даних: %s"
 
+#. Print what we got so far.
 #: src/readelf.c:6565
 #, c-format
 msgid ""
@@ -5239,10 +5349,12 @@ msgstr ""
 msgid " set discriminator to %u\n"
 msgstr " встановити розрізнення для %u\n"
 
+#. Unknown, ignore it.
 #: src/readelf.c:6841
 msgid " unknown opcode"
 msgstr " невідомий код операції"
 
+#. Takes no argument.
 #: src/readelf.c:6853
 msgid " copy"
 msgstr " копія"
@@ -5277,6 +5389,7 @@ msgstr " встановити значення стовпчика %<PRIu64>\n"
 msgid " set '%s' to %<PRIuFAST8>\n"
 msgstr " встановити «%s» у %<PRIuFAST8>\n"
 
+#. Takes no argument.
 #: src/readelf.c:6910
 msgid " set basic block flag"
 msgstr " встановити прапорець базового блоку"
@@ -5296,10 +5409,12 @@ msgstr " збільшити адресу на сталу величину %u д�
 msgid " advance address by fixed value %u to %s\n"
 msgstr " збільшити адресу на фіксовану величину %u до %s\n"
 
+#. Takes no argument.
 #: src/readelf.c:6954
 msgid " set prologue end flag"
 msgstr " встановити прапорець кінця вступу"
 
+#. Takes no argument.
 #: src/readelf.c:6959
 msgid " set epilogue begin flag"
 msgstr " встановити прапорець початку епілогу"
@@ -5309,6 +5424,9 @@ msgstr " встановити прапорець початку епілогу"
 msgid " set isa to %u\n"
 msgstr " встановити isa у %u\n"
 
+#. This is a new opcode the generator but not we know about.
+#. Read the parameters associated with it but then discard
+#. everything.  Read all the parameters for this opcode.
 #: src/readelf.c:6977
 #, c-format
 msgid " unknown opcode with %<PRIu8> parameter:"
@@ -5322,6 +5440,7 @@ msgstr[2] " невідомий код операції з %<PRIu8> параме�
 msgid "cannot get .debug_loc content: %s"
 msgstr "не вдалося отримати вміст .debug_loc: %s"
 
+#. First entry in a list.
 #: src/readelf.c:7084
 #, c-format
 msgid " [%6tx]  %s..%s"
@@ -5768,6 +5887,7 @@ msgstr ""
 msgid "Display the total sizes (bsd only)"
 msgstr "Показувати загальні розміри (лише bsd)"
 
+#. Short description of program.
 #: src/size.c:79
 msgid "List section sizes of FILEs (a.out by default)."
 msgstr "Показати розміри розділів ФАЙЛів (типово a.out)."
@@ -5963,6 +6083,7 @@ msgstr "Виводити адресу рядка за основами 8, 10 т�
 msgid "Alias for --radix=o"
 msgstr "Замінник --radix=o"
 
+#. Short description of program.
 #: src/strings.c:84
 msgid "Print the strings of printable characters in files."
 msgstr "Вивести рядки файлів з символів, придатних для друку."
@@ -6035,11 +6156,7 @@ msgstr ""
 msgid "Remove .comment section"
 msgstr "Вилучити розділ .comment"
 
-#: src/strip.c:88
-msgid "Relax a few rules to handle slightly broken ELF files"
-msgstr ""
-"Знехтувати декількома правилами для обробки трохи пошкоджених файлів ELF"
-
+#. Short description of program.
 #: src/strip.c:93
 msgid "Discard symbols from object files."
 msgstr "Відкинути символи з об’єктних файлів"
@@ -6065,11 +6182,6 @@ msgstr "параметр -f вказано двічі"
 msgid "-F option specified twice"
 msgstr "параметр -F вказано двічі"
 
-#: src/strip.c:255 src/unstrip.c:121
-#, c-format
-msgid "-o option specified twice"
-msgstr "параметр -o вказано двічі"
-
 #: src/strip.c:279
 #, c-format
 msgid "-R option supports only .comment section"
@@ -6092,6 +6204,12 @@ msgstr ""
 "%s: не можна використовувати -o або -f під час вилучення додаткового вмісту "
 "архіву"
 
+#. We would like to support ar archives, but currently it just
+#. doesn't work at all since we call elf_clone on the members
+#. which doesn't really support ar members.
+#. result = handle_ar (fd, elf, NULL, fname,
+#. preserve_dates ? tv : NULL);
+#.
 #: src/strip.c:385
 #, c-format
 msgid "%s: no support for stripping archive"
@@ -6122,7 +6240,7 @@ msgstr "помилкове форматування файла «%s»"
 msgid "while generating output file: %s"
 msgstr "під час спроби створення файла з виведеними даними: %s"
 
-#: src/strip.c:1034 src/strip.c:2079
+#: src/strip.c:1034 src/strip.c:2091
 #, c-format
 msgid "%s: error while creating ELF header: %s"
 msgstr "%s: помилка під час створення заголовка ELF: %s"
@@ -6152,42 +6270,42 @@ msgstr "під час створення таблиці рядків загол�
 msgid "no memory to create section header string table"
 msgstr "під час створення таблиці рядків заголовка розділу: %s"
 
-#: src/strip.c:1869
+#: src/strip.c:1877
 #, c-format
 msgid "bad relocation"
 msgstr "помилкове пересування"
 
-#: src/strip.c:1990 src/strip.c:2103
+#: src/strip.c:2002 src/strip.c:2115
 #, c-format
 msgid "while writing '%s': %s"
 msgstr "під час запису «%s»: %s"
 
-#: src/strip.c:2001
+#: src/strip.c:2013
 #, c-format
 msgid "while creating '%s'"
 msgstr "під час спроби створення «%s»"
 
-#: src/strip.c:2024
+#: src/strip.c:2036
 #, c-format
 msgid "while computing checksum for debug information"
 msgstr "під час обчислення контрольної суми для діагностичних даних"
 
-#: src/strip.c:2088
+#: src/strip.c:2100
 #, c-format
 msgid "%s: error while reading the file: %s"
 msgstr "%s: помилка під час читання файла: %s"
 
-#: src/strip.c:2128 src/strip.c:2148
+#: src/strip.c:2140 src/strip.c:2160
 #, c-format
 msgid "while writing '%s'"
 msgstr "під час спроби запису «%s»"
 
-#: src/strip.c:2185 src/strip.c:2192
+#: src/strip.c:2197 src/strip.c:2204
 #, c-format
 msgid "error while finishing '%s': %s"
 msgstr "помилка під час завершення «%s»: %s"
 
-#: src/strip.c:2209 src/strip.c:2281
+#: src/strip.c:2221 src/strip.c:2293
 #, c-format
 msgid "cannot set access and modification date of '%s'"
 msgstr "не вдалося встановити права доступу та дату зміни «%s»"

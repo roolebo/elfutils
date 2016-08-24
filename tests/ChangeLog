@@ -1,3 +1,8 @@
+2016-08-09  Jose E. Marchesi  <jose.marchesi@oracle.com>
+
+	* testfilesparc64attrs.o.bz2: New file.
+	* run-readelf-A.sh: Check attributes in a sparc object.
+
 2016-08-06  Mark Wielaard  <mjw@redhat.com>
 
 	* run-strip-reloc.sh: Add explicit compressed and uncompressed

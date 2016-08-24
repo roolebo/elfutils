@@ -1,5 +1,6 @@
 #! /bin/sh
 # Copyright (C) 2014 Red Hat, Inc.
+# Copyright (C) 2016 Oracle, Inc.
 # This file is part of elfutils.
 #
 # This file is free software; you can redistribute it and/or modify
@@ -25,7 +26,13 @@
 #
 # gcc -m32 -c testfileppc32attrs.s
 
-testfiles testfilearm testfileppc32attrs.o
+# = testfilesparc64attrs.s =
+# .gnu_attribute 4,0x0aaaaaaa
+# .gnu_attribute 8,0x00000055
+#
+# gcc -c testfilesparc64attrs.s
+
+testfiles testfilearm testfileppc32attrs.o testfilesparc64attrs.o
 
 testrun_compare ${abs_top_builddir}/src/readelf -A testfilearm <<\EOF
 
@@ -60,6 +67,16 @@ Object attributes section [ 4] '.gnu.attributes' of 18 bytes at offset 0x34:
     File:           9
       GNU_Power_ABI_Vector: Generic
       GNU_Power_ABI_Struct_Return: r3/r4
+EOF
+
+testrun_compare ${abs_top_builddir}/src/readelf -A testfilesparc64attrs.o <<\EOF
+
+Object attributes section [ 4] '.gnu.attributes' of 21 bytes at offset 0x40:
+  Owner          Size
+  gnu              20
+    File:          12
+      GNU_Sparc_HWCAPS: div32,v8plus,vis,asi_blk_init,vis3,random,fjfmau,asi_cache_sparing,des,camellia,sha1,sha512,mont,cbcond
+      GNU_Sparc_HWCAPS2: fjathplus,adp,mwait,xmont
 EOF
 
 exit 0

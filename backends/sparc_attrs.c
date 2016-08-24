@@ -41,33 +41,63 @@ sparc_check_object_attribute (Ebl *ebl __attribute__ ((unused)),
 			      const char *vendor, int tag, uint64_t value,
 			      const char **tag_name, const char **value_name)
 {
+  static const char *hwcaps[32] =
+    {
+      "mul32", "div32", "fsmuld", "v8plus", "popc", "vis", "vis2",
+      "asi_blk_init", "fmaf", "vis3", "hpc", "random", "trans",
+      "fjfmau", "ima", "asi_cache_sparing", "aes", "des", "kasumi",
+      "camellia", "md5", "sha1", "sha256", "sha512", "mpmul", "mont",
+      "pause", "cbcond", "crc32c", "resv30", "resv31"
+    };
+
+  
+  static const char *hwcaps2[32] =
+    {
+      "fjathplus", "vis3b", "adp", "sparc5", "mwait", "xmpmul", "xmont",
+      "nsec", "resv8", "resv9" , "resv10", "resv11", "fjathhpc", "fjdes",
+      "fjaes", "resv15", "resv16", "resv17", "resv18", "resv19", "resv20",
+      "resv21", "resv22", "resv23", "resv24", "resv25", "resv26", "resv27",
+      "resv28", "resv29", "resv30", "resv31",
+    };
+
+  /* NAME should be big enough to hold any possible comma-separated
+     list (no repetitions allowed) of attribute names from one of the
+     arrays above.  */
+  static char name[32*17+32+1];
+  name[0] = '\0';
+
   if (!strcmp (vendor, "gnu"))
     switch (tag)
       {
       case 4:
-	*tag_name = "GNU_Sparc_HWCAPS";
-	static const char *hwcaps[30] =
-	  {
-	    "mul32", "div32", "fsmuld", "v8plus", "popc", "vis", "vis2",
-	    "asi_blk_init", "fmaf", NULL, "vis3", "hpc", "random", "trans", "fjfmau",
-	    "ima", "asi_cache_sparing", "aes", "des", "kasumi", "camellia",
-	    "md5", "sha1", "sha256", "sha512", "mpmul", "mont", "pause",
-	    "cbcond", "crc32c"
-	  };
-	if (value < 30 && hwcaps[value] != NULL)
-	  *value_name = hwcaps[value];
-	return true;
-
       case 8:
-	*tag_name = "GNU_Sparc_HWCAPS2";
-	static const char *hwcaps2[11] =
-	  {
-	    "fjathplus", "vis3b", "adp", "sparc5", "mwait", "xmpmul",
-	    "xmont", "nsec", "fjathhpc", "fjdes", "fjaes"
-	  };
-	if (value < 11)
-	  *value_name = hwcaps2[value];
-	return true;
+        {
+          const char **caps;
+          int cap;
+          
+          if (tag == 4)
+            {
+              *tag_name = "GNU_Sparc_HWCAPS";
+              caps = hwcaps;
+            }
+          else
+            {
+              *tag_name = "GNU_Sparc_HWCAPS2";
+              caps = hwcaps2;
+            }
+          
+          char *s = name;
+          for (cap = 0; cap < 32; cap++)
+            if (value & (1U << cap))
+              {
+                if (*s != '\0')
+                  s = strcat (s, ",");
+                s = strcat (s, caps[cap]);
+              }
+          
+          *value_name = s;
+          return true;
+        }
       }
 
   return false;

@@ -315,6 +315,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-aggregate-size.sh testfile-sizes1.o.bz2 testfile-sizes2.o.bz2 \
 	     testfile-sizes3.o.bz2 \
 	     run-readelf-A.sh testfileppc32attrs.o.bz2 \
+	     testfilesparc64attrs.o.bz2 \
 	     testfile-debug-types.bz2 \
 	     run-getsrc-die.sh run-strptr.sh \
 	     testfile-x32-core.bz2 testfile-x32.bz2 \

@@ -1986,7 +1986,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	      gelf_update_shdr (scn, shdr);
 
 	      if (tcompress_type != 0)
-		if (elf_compress (tscn, tcompress_type, 0) != 1)
+		if (elf_compress (tscn, tcompress_type, ELF_CHF_FORCE) != 1)
 		  INTERNAL_ERROR (fname);
 	    }
 	}

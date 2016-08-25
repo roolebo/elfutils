@@ -1,3 +1,19 @@
+2016-08-25  Mark Wielaard  <mjw@redhat.com>
+
+	* backtrace-child.c: Disable and add documentation about why we disable
+	RAISE_JMP_PATCHING even on x86_64.
+	* backtrace.c (is_x86_64_native): Rename to...
+	(use_raise_jmp_patching): ... this.
+	(callback_verify): Use use_raise_jmp_patching instead of
+	is_x86_64_native.
+	(see_exec_module): Return DWARF_CB_ABORT after finding the correct exe
+	path.
+	(prepare_thread): Use RAISE_JMP_PATCHING instead of __x86_64__
+	conditional.
+	(exec_dump): Only assert on data.mod != NULL. Drop ptrdiff. Use
+	RAISE_JMP_PATCHING instead of __x86_64__ conditional. Use
+	use_raise_jmp_patching instead of is_x86_64_native.
+
 2016-08-24  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (EXTRA_DIST): Add testfilesparc64attrs.o.bz2.

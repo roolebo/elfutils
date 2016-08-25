@@ -1,5 +1,5 @@
 /* Test program for unwinding of frames.
-   Copyright (C) 2013, 2014 Red Hat, Inc.
+   Copyright (C) 2013, 2014, 2016 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -64,7 +64,7 @@ dump_modules (Dwfl_Module *mod, void **userdata __attribute__ ((unused)),
   return DWARF_CB_OK;
 }
 
-static bool is_x86_64_native;
+static bool use_raise_jmp_patching;
 static pid_t check_tid;
 
 static void
@@ -93,7 +93,7 @@ callback_verify (pid_t tid, unsigned frameno, Dwarf_Addr pc,
   static bool reduce_frameno = false;
   if (reduce_frameno)
     frameno--;
-  if (! is_x86_64_native && frameno >= 2)
+  if (! use_raise_jmp_patching && frameno >= 2)
     frameno += 2;
   const char *symname2 = NULL;
   switch (frameno)
@@ -112,8 +112,8 @@ callback_verify (pid_t tid, unsigned frameno, Dwarf_Addr pc,
     case 2: // x86_64 only
       /* __restore_rt - glibc maybe does not have to have this symbol.  */
       break;
-    case 3: // x86_64 only
-      if (is_x86_64_native)
+    case 3: // use_raise_jmp_patching
+      if (use_raise_jmp_patching)
 	{
 	  /* Verify we trapped on the very first instruction of jmp.  */
 	  assert (symname != NULL && strcmp (symname, "jmp") == 0);
@@ -138,7 +138,7 @@ callback_verify (pid_t tid, unsigned frameno, Dwarf_Addr pc,
       // there is no guarantee that the compiler doesn't reorder the
       // instructions or even inserts some padding instructions at the end
       // (which apparently happens on ppc64).
-      if (is_x86_64_native)
+      if (use_raise_jmp_patching)
         assert (symname2 == NULL || strcmp (symname2, "backtracegen") != 0);
       break;
   }
@@ -243,10 +243,10 @@ see_exec_module (Dwfl_Module *mod, void **userdata __attribute__ ((unused)),
     return DWARF_CB_OK;
   assert (data->mod == NULL);
   data->mod = mod;
-  return DWARF_CB_OK;
+  return DWARF_CB_ABORT;
 }
 
-/* On x86_64 only:
+/* We used to do this on x86_64 only (see backtrace-child why we now don't):
      PC will get changed to function 'jmp' by backtrace.c function
      prepare_thread.  Then SIGUSR2 will be signalled to backtrace-child
      which will invoke function sigusr2.
@@ -254,13 +254,17 @@ see_exec_module (Dwfl_Module *mod, void **userdata __attribute__ ((unused)),
      instruction of a function.  Properly handled unwind should not slip into
      the previous unrelated function.  */
 
+#ifdef __x86_64__
+/* #define RAISE_JMP_PATCHING 1 */
+#endif
+
 static void
 prepare_thread (pid_t pid2 __attribute__ ((unused)),
 		void (*jmp) (void) __attribute__ ((unused)))
 {
-#ifndef __x86_64__
+#ifndef RAISE_JMP_PATCHING
   abort ();
-#else /* x86_64 */
+#else /* RAISE_JMP_PATCHING */
   long l;
   struct user_regs_struct user_regs;
   errno = 0;
@@ -278,7 +282,7 @@ prepare_thread (pid_t pid2 __attribute__ ((unused)),
   assert (got == pid2);
   assert (WIFSTOPPED (status));
   assert (WSTOPSIG (status) == SIGUSR1);
-#endif /* __x86_64__ */
+#endif /* RAISE_JMP_PATCHING */
 }
 
 #include <asm/unistd.h>
@@ -370,21 +374,20 @@ exec_dump (const char *exec)
   assert (ssize > 0 && ssize < (ssize_t) sizeof (data.selfpath));
   data.selfpath[ssize] = '\0';
   data.mod = NULL;
-  ptrdiff_t ptrdiff = dwfl_getmodules (dwfl, see_exec_module, &data, 0);
-  assert (ptrdiff == 0);
+  dwfl_getmodules (dwfl, see_exec_module, &data, 0);
   assert (data.mod != NULL);
   GElf_Addr loadbase;
   Elf *elf = dwfl_module_getelf (data.mod, &loadbase);
   GElf_Ehdr ehdr_mem, *ehdr = gelf_getehdr (elf, &ehdr_mem);
   assert (ehdr != NULL);
   /* It is false also on x86_64 with i386 inferior.  */
-#ifndef __x86_64__
-  is_x86_64_native = false;
-#else /* __x86_64__ */
-  is_x86_64_native = ehdr->e_machine == EM_X86_64;
+#ifndef RAISE_JMP_PATCHING
+  use_raise_jmp_patching = false;
+#else /* RAISE_JMP_PATCHING_ */
+  use_raise_jmp_patching = ehdr->e_machine == EM_X86_64;
 #endif /* __x86_64__ */
   void (*jmp) (void) = 0;
-  if (is_x86_64_native)
+  if (use_raise_jmp_patching)
     {
       // Find inferior symbol named "jmp".
       int nsym = dwfl_module_getsymtab (data.mod);

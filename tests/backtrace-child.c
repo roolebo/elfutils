@@ -1,5 +1,5 @@
 /* Test child for parent backtrace test.
-   Copyright (C) 2013 Red Hat, Inc.
+   Copyright (C) 2013, 2016 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -19,7 +19,8 @@
    --ptraceme will call ptrace (PTRACE_TRACEME) in the two threads.
    --gencore will call abort () at its end.
    Main thread will signal SIGUSR2.  Other thread will signal SIGUSR1.
-   On x86_64 only:
+   There used to be a difference between x86_64 and other architectures.
+   To test getting a signal at the very first instruction of a function:
      PC will get changed to function 'jmp' by backtrace.c function
      prepare_thread.  Then SIGUSR2 will be signalled to backtrace-child
      which will invoke function sigusr2.
@@ -66,7 +67,16 @@
    # 5 0xf77c1a48 - 1      start
    # 6 0xf77699da - 1      start_thread
    # 7 0xf769bbfe - 1      __clone
+
+   But the raise jmp patching was unreliable. It depends on the CFI for the raise()
+   function in glibc to be the same as for the jmp() function. This is not always
+   the case. Some newer glibc versions rewrote raise() and now the CFA is calculated
+   differently. So we disable raise jmp patching everywhere.
    */
+
+#ifdef __x86_64__
+/* #define RAISE_JMP_PATCHING 1 */
+#endif
 
 #include <config.h>
 #include <assert.h>
@@ -130,7 +140,7 @@ dummy1 (void)
   asm volatile ("");
 }
 
-#ifdef __x86_64__
+#ifdef RAISE_JMP_PATCHING
 static NOINLINE_NOCLONE USED void
 jmp (void)
 {
@@ -157,7 +167,7 @@ stdarg (int f UNUSED, ...)
       assert (errno == 0);
       assert (l == 0);
     }
-#ifdef __x86_64__
+#ifdef RAISE_JMP_PATCHING
   if (! gencore)
     {
       /* Execution will get PC patched into function jmp.  */

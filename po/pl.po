@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: elfutils\n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2016-08-19 14:38+0200\n"
+"POT-Creation-Date: 2016-08-25 18:09+0200\n"
 "PO-Revision-Date: 2016-08-18 15:32+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <trans-pl@lists.fedoraproject.org>\n"
@@ -6668,7 +6668,7 @@ msgstr ""
 "jest nazwą oddzielnego pliku debuginfo lub „-”, jeśli nie odnaleziono "
 "debuginfo lub „.”, jeśli PLIK zawiera informacje debugowania."
 
-#: tests/backtrace.c:427
+#: tests/backtrace.c:430
 msgid "Run executable"
 msgstr "Uruchamia plik wykonywalny"
 

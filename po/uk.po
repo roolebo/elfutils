@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2016-08-19 14:38+0200\n"
+"POT-Creation-Date: 2016-08-25 18:09+0200\n"
 "PO-Revision-Date: 2015-09-26 16:41+0300\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <kde-i18n-uk@kde.org>\n"
@@ -6710,7 +6710,7 @@ msgstr ""
 "окремого файла діагностичних даних або «-», якщо файла діагностичних даних "
 "не вдалося знайти, і «.», якщо ФАЙЛ сам містить діагностичні дані."
 
-#: tests/backtrace.c:427
+#: tests/backtrace.c:430
 msgid "Run executable"
 msgstr "Запустити виконуваний файл"
 

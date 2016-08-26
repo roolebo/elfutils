@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ja\n"
 "Report-Msgid-Bugs-To: http://bugzilla.redhat.com/\n"
-"POT-Creation-Date: 2016-08-19 14:38+0200\n"
+"POT-Creation-Date: 2016-08-25 18:09+0200\n"
 "PO-Revision-Date: 2009-09-20 15:32+0900\n"
 "Last-Translator: Hyu_gabaru Ryu_ichi <hyu_gabaru@yahoo.co.jp>\n"
 "Language-Team: Japanese <jp@li.org>\n"
@@ -6365,7 +6365,7 @@ msgid ""
 "was found, or . if FILE contains the debug information."
 msgstr ""
 
-#: tests/backtrace.c:427
+#: tests/backtrace.c:430
 msgid "Run executable"
 msgstr ""
 

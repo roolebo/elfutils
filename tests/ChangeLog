@@ -1,3 +1,7 @@
+2016-08-30  Mark Wielaard  <mjw@redhat.com>
+
+	* Makefile.am (asm_tst?_LDADD): Add libdw.
+
 2016-08-25  Mark Wielaard  <mjw@redhat.com>
 
 	* backtrace-child.c: Disable and add documentation about why we disable

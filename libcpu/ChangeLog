@@ -1,3 +1,7 @@
+2016-09-05  Mark Wielaard  <mjw@redhat.com>
+
+	* bpf_disasm.c: Define BPF_PSEUDO_MAP_FD if undefined.
+
 2016-08-10  Richard Henderson  <rth@redhat.com>
 
 	* bpf_disasm.c (bpf_disasm): Rearrange the printing of instructions

@@ -1,3 +1,18 @@
+2015-10-11  Akihiko Odaki  <akihiko.odaki.4i@stu.hosei.ac.jp>
+
+	* arlib.c: Remove system.h include, add libeu.h include.
+	* arlib2.c: Remove sys/param.h include.
+	* elfcompress.c: Add libeu.h include.
+	* elflint.c: Remove sys/param.h include, add libeu.h include.
+	* nm.c: Likewise.
+	* objdump.c: Likewise.
+	* ranlib.c: Likewise.
+	* readelf.c: Likewise.
+	* size.c: Remove sys/param.h include.
+	* strings.c: Likewise, add libeu.h include.
+	* strip.c: Likewise.
+	* unstrip.c: Likewise.
+
 2016-10-06  Mark Wielaard  <mjw@redhat.com>
 
 	* strip.c (handle_elf): Don't remove real symbols from allocated

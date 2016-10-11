@@ -32,10 +32,6 @@
 
 #include "../libdw/memory-access.h"
 
-#ifndef MIN
-# define MIN(a, b) ((a) < (b) ? (a) : (b))
-#endif
-
 struct core_arg
 {
   Elf *core;

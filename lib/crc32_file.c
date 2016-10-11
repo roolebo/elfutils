@@ -30,7 +30,7 @@
 # include <config.h>
 #endif
 
-#include "system.h"
+#include "libeu.h"
 #include <errno.h>
 #include <unistd.h>
 #include <sys/stat.h>

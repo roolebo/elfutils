@@ -34,7 +34,7 @@
 #include <error.h>
 #include <libintl.h>
 
-#include <system.h>
+#include <libeu.h>
 #include "i386_parse.h"
 
 

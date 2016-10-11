@@ -49,6 +49,7 @@
 #include <libebl.h>
 #include <libdwfl.h>
 #include "libdwelf.h"
+#include "libeu.h"
 #include "system.h"
 
 #ifndef _

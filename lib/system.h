@@ -32,6 +32,7 @@
 #include <argp.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <sys/param.h>
 #include <endian.h>
 #include <byteswap.h>
 #include <unistd.h>
@@ -50,16 +51,14 @@
 # error "Unknown byte order"
 #endif
 
-extern void *xmalloc (size_t) __attribute__ ((__malloc__));
-extern void *xcalloc (size_t, size_t) __attribute__ ((__malloc__));
-extern void *xrealloc (void *, size_t) __attribute__ ((__malloc__));
+#ifndef MAX
+#define MAX(m, n) ((m) < (n) ? (n) : (m))
+#endif
 
-extern char *xstrdup (const char *) __attribute__ ((__malloc__));
-extern char *xstrndup (const char *, size_t) __attribute__ ((__malloc__));
+#ifndef MIN
+#define MIN(m, n) ((m) < (n) ? (m) : (n))
+#endif
 
-
-extern uint32_t crc32 (uint32_t crc, unsigned char *buf, size_t len);
-extern int crc32_file (int fd, uint32_t *resp);
 
 /* A special gettext function we use if the strings are too short.  */
 #define sgettext(Str) \
@@ -141,39 +140,6 @@ pread_retry (int fd, void *buf, size_t len, off_t off)
 /* The demangler from libstdc++.  */
 extern char *__cxa_demangle (const char *mangled_name, char *output_buffer,
 			     size_t *length, int *status);
-
-
-
-/* Color handling.  */
-
-/* Command line parser.  */
-extern const struct argp color_argp;
-
-/* Coloring mode.  */
-enum color_enum
-  {
-    color_never = 0,
-    color_always,
-    color_auto
-  } __attribute__ ((packed));
-extern enum color_enum color_mode;
-
-/* Colors to use for the various components.  */
-extern char *color_address;
-extern char *color_bytes;
-extern char *color_mnemonic;
-extern char *color_operand1;
-extern char *color_operand2;
-extern char *color_operand3;
-extern char *color_label;
-extern char *color_undef;
-extern char *color_undef_tls;
-extern char *color_undef_weak;
-extern char *color_symbol;
-extern char *color_tls;
-extern char *color_weak;
-
-extern const char color_off[];
 
 /* A static assertion.  This will cause a compile-time error if EXPR,
    which must be a compile-time constant, is false.  */

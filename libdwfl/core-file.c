@@ -32,7 +32,6 @@
 #include "libdwflP.h"
 #include <gelf.h>
 
-#include <sys/param.h>
 #include <unistd.h>
 #include <endian.h>
 #include <byteswap.h>

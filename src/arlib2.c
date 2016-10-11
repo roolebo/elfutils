@@ -24,7 +24,6 @@
 #include <libintl.h>
 #include <limits.h>
 #include <string.h>
-#include <sys/param.h>
 
 #include "arlib.h"
 

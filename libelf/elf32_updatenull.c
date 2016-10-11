@@ -36,8 +36,8 @@
 #include <libelf.h>
 #include <stdbool.h>
 #include <string.h>
-#include <sys/param.h>
 
+#include <system.h>
 #include "libelfP.h"
 #include "elf-knowledge.h"
 

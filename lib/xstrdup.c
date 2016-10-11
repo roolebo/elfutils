@@ -31,7 +31,7 @@
 #endif
 
 #include <string.h>
-#include "system.h"
+#include "libeu.h"
 
 
 /* Return a newly allocated copy of STRING.  */

@@ -35,6 +35,7 @@
 #include "libdwflP.h"
 #include "../libdw/dwarf.h"
 #include <sys/ptrace.h>
+#include <system.h>
 
 /* Maximum number of DWARF expression stack slots before returning an error.  */
 #define DWARF_EXPR_STACK_MAX 0x100
@@ -42,10 +43,6 @@
 /* Maximum number of DWARF expression executed operations before returning an
    error.  */
 #define DWARF_EXPR_STEPS_MAX 0x1000
-
-#ifndef MAX
-# define MAX(a, b) ((a) > (b) ? (a) : (b))
-#endif
 
 bool
 internal_function

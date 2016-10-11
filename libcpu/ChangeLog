@@ -1,3 +1,9 @@
+2015-10-11  Akihiko Odaki  <akihiko.odaki.4i@stu.hosei.ac.jp>
+
+	* i386_lex.l: Remove system.h include, add libeu.h include.
+	* i386_parse.y: Remove sys/param.h include, add libeu.h include.
+	* i386_disasm.c: Remove sys/param.h.
+
 2016-09-05  Mark Wielaard  <mjw@redhat.com>
 
 	* bpf_disasm.c: Define BPF_PSEUDO_MAP_FD if undefined.

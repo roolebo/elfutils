@@ -1,3 +1,7 @@
+2015-10-11  Akihiko Odaki  <akihiko.odaki.4i@stu.hosei.ac.jp>
+
+	* arextract.c: Remove sys/param.h include, add system.h include.
+
 2016-08-30  Mark Wielaard  <mjw@redhat.com>
 
 	* Makefile.am (asm_tst?_LDADD): Add libdw.

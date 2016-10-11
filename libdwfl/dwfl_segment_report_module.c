@@ -35,10 +35,11 @@
 #include <elf.h>
 #include <gelf.h>
 #include <inttypes.h>
-#include <sys/param.h>
 #include <endian.h>
 #include <unistd.h>
 #include <fcntl.h>
+
+#include <system.h>
 
 
 /* A good size for the initial read from memory, if it's not too costly.
@@ -51,10 +52,6 @@
 # define MY_ELFDATA	ELFDATA2LSB
 #else
 # define MY_ELFDATA	ELFDATA2MSB
-#endif
-
-#ifndef MAX
-# define MAX(a, b) ((a) > (b) ? (a) : (b))
 #endif
 
 

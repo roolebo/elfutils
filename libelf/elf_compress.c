@@ -31,19 +31,15 @@
 #endif
 
 #include <libelf.h>
+#include <system.h>
 #include "libelfP.h"
 #include "common.h"
 
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/param.h>
 #include <unistd.h>
 #include <zlib.h>
-
-#ifndef MAX
-# define MAX(a, b) ((a) > (b) ? (a) : (b))
-#endif
 
 /* Cleanup and return result.  Don't leak memory.  */
 static void *

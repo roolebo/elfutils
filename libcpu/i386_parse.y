@@ -44,8 +44,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/param.h>
 
+#include <libeu.h>
 #include <system.h>
 
 #define obstack_chunk_alloc xmalloc

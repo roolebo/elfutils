@@ -38,14 +38,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/param.h>
 
 #include "libdwelfP.h"
 #include <system.h>
-
-#ifndef MIN
-# define MIN(a, b) ((a) < (b) ? (a) : (b))
-#endif
 
 
 struct Dwelf_Strent

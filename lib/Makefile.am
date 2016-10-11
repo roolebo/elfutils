@@ -37,8 +37,8 @@ libeu_a_SOURCES = xstrdup.c xstrndup.c xmalloc.c next_prime.c \
 		  crc32.c crc32_file.c md5.c sha1.c \
 		  color.c
 
-noinst_HEADERS = fixedsizehash.h system.h dynamicsizehash.h list.h md5.h \
-		 sha1.h eu-config.h
+noinst_HEADERS = fixedsizehash.h libeu.h system.h dynamicsizehash.h list.h \
+		 md5.h sha1.h eu-config.h
 EXTRA_DIST = dynamicsizehash.c
 
 if !GPROF

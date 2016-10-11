@@ -34,6 +34,7 @@
 #include ELFUTILS_HEADER(ebl)
 #include ELFUTILS_HEADER(dwelf)
 #include <gelf.h>
+#include "libeu.h"
 #include "system.h"
 
 /* Name and version of program.  */

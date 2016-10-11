@@ -28,7 +28,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include <system.h>
+#include <libeu.h>
 
 #include "arlib.h"
 

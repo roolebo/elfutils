@@ -40,10 +40,10 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
-#include <sys/param.h>
 #include <sys/stat.h>
 #include <signal.h>
 
+#include <libeu.h>
 #include <system.h>
 #include "../libelf/libelfP.h"
 #include "../libelf/common.h"

@@ -35,9 +35,9 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/stat.h>
-#include <sys/param.h>
 
 #include <elf-knowledge.h>
+#include <libeu.h>
 #include <system.h>
 #include "../libelf/libelfP.h"
 #include "../libelf/common.h"

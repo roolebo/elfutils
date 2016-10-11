@@ -32,8 +32,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/param.h>
 
+#include <libeu.h>
 #include <system.h>
 #include "../libebl/libeblP.h"
 

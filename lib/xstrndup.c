@@ -30,8 +30,9 @@
 # include <config.h>
 #endif
 
+#include <stdint.h>
 #include <string.h>
-#include "system.h"
+#include "libeu.h"
 
 
 /* Return a newly allocated copy of STRING.  */

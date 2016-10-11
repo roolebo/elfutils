@@ -37,7 +37,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "system.h"
+#include "libeu.h"
 
 
 /* Prototype for option handler.  */

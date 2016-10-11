@@ -39,7 +39,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/mman.h>
-#include <sys/param.h>
 
 #include <system.h>
 #include "libelfP.h"

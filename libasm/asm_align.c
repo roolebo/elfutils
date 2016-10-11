@@ -33,7 +33,6 @@
 
 #include <inttypes.h>
 #include <stdlib.h>
-#include <sys/param.h>
 
 #include <libasmP.h>
 #include <system.h>

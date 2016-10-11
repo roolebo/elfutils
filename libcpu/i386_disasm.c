@@ -41,7 +41,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/param.h>
 
 #include "../libebl/libeblP.h"
 

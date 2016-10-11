@@ -37,10 +37,6 @@
 #include <sys/syscall.h>
 #include <unistd.h>
 
-#ifndef MAX
-# define MAX(a, b) ((a) > (b) ? (a) : (b))
-#endif
-
 #ifdef __linux__
 
 static bool

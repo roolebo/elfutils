@@ -38,9 +38,9 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/mman.h>
-#include <sys/param.h>
 #include <sys/stat.h>
 
+#include <libeu.h>
 #include <system.h>
 
 #ifndef MAP_POPULATE

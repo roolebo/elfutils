@@ -35,7 +35,6 @@
 #include <stdio_ext.h>
 #include <unistd.h>
 #include <sys/mman.h>
-#include <sys/param.h>
 #include <sys/stat.h>
 
 #include <system.h>

@@ -36,13 +36,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/param.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 
 #include <elf-knowledge.h>
 #include <libebl.h>
 #include "libdwelf.h"
+#include <libeu.h>
 #include <system.h>
 
 typedef uint8_t GElf_Byte;

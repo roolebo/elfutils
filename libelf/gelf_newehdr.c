@@ -37,10 +37,10 @@
 #include "libelfP.h"
 
 
-unsigned long int
+void *
 gelf_newehdr (Elf *elf, int class)
 {
   return (class == ELFCLASS32
-	  ? (unsigned long int) INTUSE(elf32_newehdr) (elf)
-	  : (unsigned long int) INTUSE(elf64_newehdr) (elf));
+	  ? (void *) INTUSE(elf32_newehdr) (elf)
+	  : (void *) INTUSE(elf64_newehdr) (elf));
 }

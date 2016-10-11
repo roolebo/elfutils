@@ -165,8 +165,10 @@ extern GElf_Ehdr *gelf_getehdr (Elf *__elf, GElf_Ehdr *__dest);
 /* Update the ELF header.  */
 extern int gelf_update_ehdr (Elf *__elf, GElf_Ehdr *__src);
 
-/* Create new ELF header if none exists.  */
-extern unsigned long int gelf_newehdr (Elf *__elf, int __class);
+/* Create new ELF header if none exists.  Creates an Elf32_Ehdr if CLASS
+   is ELFCLASS32 or an Elf64_Ehdr if CLASS is ELFCLASS64.  Returns NULL
+   on error.  */
+extern void *gelf_newehdr (Elf *__elf, int __class);
 
 /* Get section at OFFSET.  */
 extern Elf_Scn *gelf_offscn (Elf *__elf, GElf_Off __offset);
@@ -183,8 +185,10 @@ extern GElf_Phdr *gelf_getphdr (Elf *__elf, int __ndx, GElf_Phdr *__dst);
 /* Update the program header.  */
 extern int gelf_update_phdr (Elf *__elf, int __ndx, GElf_Phdr *__src);
 
-/* Create new program header with PHNUM entries.  */
-extern unsigned long int gelf_newphdr (Elf *__elf, size_t __phnum);
+/* Create new program header with PHNUM entries.  Creates either an
+   Elf32_Phdr or an Elf64_Phdr depending on whether the given ELF is
+   ELFCLASS32 or ELFCLASS64.  Returns NULL on error.  */
+extern void *gelf_newphdr (Elf *__elf, size_t __phnum);
 
 /* Get compression header of section if any.  Returns NULL and sets
    elf_errno if the section isn't compressed or an error occurred.  */

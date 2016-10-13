@@ -297,7 +297,15 @@ elf_getarsym (Elf *elf, size_t *ptr)
 		arsym[cnt].as_off = (*u32)[cnt];
 
 	      arsym[cnt].as_hash = _dl_elf_hash (str_data);
+#if HAVE_DECL_RAWMEMCHR
 	      str_data = rawmemchr (str_data, '\0') + 1;
+#else
+	      char c;
+	      do {
+		c = *str_data;
+		str_data++;
+	      } while (c);
+#endif
 	    }
 
 	  /* At the end a special entry.  */

@@ -29,7 +29,12 @@
 #ifndef LIB_SYSTEM_H
 #define LIB_SYSTEM_H	1
 
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <argp.h>
+#include <errno.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <sys/param.h>
@@ -59,6 +64,9 @@
 #define MIN(m, n) ((m) < (n) ? (m) : (n))
 #endif
 
+#if !HAVE_DECL_POWEROF2
+#define powerof2(x) (((x) & ((x) - 1)) == 0)
+#endif
 
 /* A special gettext function we use if the strings are too short.  */
 #define sgettext(Str) \
@@ -67,6 +75,14 @@
 
 #define gettext_noop(Str) Str
 
+#ifndef TEMP_FAILURE_RETRY
+#define TEMP_FAILURE_RETRY(expression) \
+  ({ ssize_t __res; \
+     do \
+       __res = expression; \
+     while (__res == -1 && errno == EINTR); \
+     __res; });
+#endif
 
 static inline ssize_t __attribute__ ((unused))
 pwrite_retry (int fd, const void *buf, size_t len, off_t off)

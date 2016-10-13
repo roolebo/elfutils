@@ -245,6 +245,11 @@ zip_LIBS="$LIBS"
 LIBS="$save_LIBS"
 AC_SUBST([zip_LIBS])
 
+AC_CHECK_DECLS([memrchr, rawmemchr],[],[],
+               [#define _GNU_SOURCE
+                #include <string.h>])
+AC_CHECK_DECLS([powerof2],[],[],[#include <sys/param.h>])
+
 AC_CHECK_LIB([stdc++], [__cxa_demangle], [dnl
 AC_DEFINE([USE_DEMANGLE], [1], [Defined if demangling is enabled])])
 AM_CONDITIONAL(DEMANGLE, test "x$ac_cv_lib_stdcpp___cxa_demangle" = "xyes")

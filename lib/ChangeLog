@@ -1,5 +1,12 @@
 2015-10-11  Akihiko Odaki  <akihiko.odaki.4i@stu.hosei.ac.jp>
 
+	* fixedsizehash.h (CONCAT): Use __CONCAT when available.
+	* system.h: Include config.h and errno.h.
+	(powerof2): Define if not already defined.
+	(TEMP_FAILURE_RETRY): Define when not yet defined.
+
+2015-10-11  Akihiko Odaki  <akihiko.odaki.4i@stu.hosei.ac.jp>
+
 	* Makefile.am (noinst_HEADERS): Add libeu.h.
 	* color.c: Remove system.h include, add libeu.h include.
 	* crc32_file.c: Likewise.

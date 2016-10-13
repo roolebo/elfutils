@@ -32,6 +32,7 @@
 #endif
 
 #include <libelf.h>
+#include <stdbool.h>
 #include <stddef.h>
 
 #include "libelfP.h"
@@ -50,6 +51,22 @@ get_zdata (Elf_Scn *strscn)
   strscn->zdata_align = zalign;
 
   return zdata;
+}
+
+static bool validate_str (const char *str, size_t from, size_t to)
+{
+#if HAVE_DECL_MEMRCHR
+  return memrchr (&str[from], '\0', to - from) != NULL;
+#else
+  do {
+    if (to <= from)
+      return false;
+
+    to--;
+  } while (str[to]);
+
+  return true;
+#endif
 }
 
 char *
@@ -166,8 +183,7 @@ elf_strptr (Elf *elf, size_t idx, size_t offset)
     {
       /* Make sure the string is NUL terminated.  Start from the end,
          which very likely is a NUL char.  */
-      if (likely (memrchr (&strscn->zdata_base[offset],
-			   '\0', sh_size - offset) != NULL))
+      if (likely (validate_str (strscn->zdata_base, offset, sh_size)))
         result = &strscn->zdata_base[offset];
       else
         __libelf_seterrno (ELF_E_INVALID_INDEX);
@@ -185,8 +201,7 @@ elf_strptr (Elf *elf, size_t idx, size_t offset)
 
       /* Make sure the string is NUL terminated.  Start from the end,
 	 which very likely is a NUL char.  */
-      if (likely (memrchr (&strscn->rawdata_base[offset],
-			  '\0', sh_size - offset) != NULL))
+      if (likely (validate_str (strscn->rawdata_base, offset, sh_size)))
 	result = &strscn->rawdata_base[offset];
       else
 	__libelf_seterrno (ELF_E_INVALID_INDEX);
@@ -203,10 +218,9 @@ elf_strptr (Elf *elf, size_t idx, size_t offset)
 	    {
 	      /* Make sure the string is NUL terminated.  Start from
 		 the end, which very likely is a NUL char.  */
-	      if (likely (memrchr ((char *) dl->data.d.d_buf
-				   + (offset - dl->data.d.d_off), '\0',
-				   (dl->data.d.d_size
-				    - (offset - dl->data.d.d_off))) != NULL))
+	      if (likely (validate_str ((char *) dl->data.d.d_buf,
+					offset - dl->data.d.d_off,
+					dl->data.d.d_size)))
 		result = ((char *) dl->data.d.d_buf
 			  + (offset - dl->data.d.d_off));
 	      else

@@ -1,3 +1,8 @@
+2016-10-21  Mark Wielaard  <mjw@redhat.com>
+
+	* elf_getdata.c (__libelf_set_rawdata_wrlock): Sanity check
+	offset and size before trying to malloc and read data.
+
 2016-10-26  Mark Wielaard  <mjw@redhat.com>
 
 	* elf_begin.c (read_file): Always set maxsize when parent == NULL.

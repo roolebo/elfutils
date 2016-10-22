@@ -1,5 +1,5 @@
 /* Compute size of an aggregate type from DWARF.
-   Copyright (C) 2010, 2014 Red Hat, Inc.
+   Copyright (C) 2010, 2014, 2016 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -127,7 +127,7 @@ array_size (Dwarf_Die *die, Dwarf_Word *size,
 		    case DW_LANG_Fortran08:
 		    case DW_LANG_Pascal83:
 		    case DW_LANG_Modula2:
-		    case DW_LANG_PL1:
+		    case DW_LANG_PLI:
 		      lower = 1;
 		      break;
 

@@ -1,5 +1,5 @@
 /* This file defines standard DWARF types, structures, and macros.
-   Copyright (C) 2000-2011, 2014 Red Hat, Inc.
+   Copyright (C) 2000-2011, 2014, 2016 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -582,7 +582,7 @@ enum
     DW_LANG_C99 = 0x000c,	     /* ISO C:1999 */
     DW_LANG_Ada95 = 0x000d,	     /* ISO Ada:1995 */
     DW_LANG_Fortran95 = 0x000e,	     /* ISO Fortran 95 */
-    DW_LANG_PL1 = 0x000f,	     /* ISO PL/1:1976 */
+    DW_LANG_PLI = 0x000f,	     /* ISO PL/1:1976 */
     DW_LANG_ObjC = 0x0010,	     /* Objective-C */
     DW_LANG_ObjC_plus_plus = 0x0011, /* Objective-C++ */
     DW_LANG_UPC = 0x0012,	     /* Unified Parallel C */
@@ -602,6 +602,8 @@ enum
     DW_LANG_hi_user = 0xffff
   };
 
+/* Old (typo) '1' != 'I'.  */
+#define DW_LANG_PL1 DW_LANG_PLI
 
 /* DWARF identifier case encodings.  */
 enum

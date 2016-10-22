@@ -1,3 +1,9 @@
+2016-10-22  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf.h: Correct spelling of DW_LANG_PLI. Add compatibility define.
+	* dwarf_aggregate_size.c (array_size): Use correct spelling of
+	DW_LANG_PLI.
+
 2016-11-02  Mark Wielaard  <mjw@redhat.com>
 
 	* cfi.c (execute_cfi): Add fallthrough comments.

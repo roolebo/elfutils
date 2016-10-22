@@ -1,3 +1,7 @@
+Version 0.168
+
+libdw: dwarf.h corrected the DW_LANG_PLI constant name (was DW_LANG_PL1).
+
 Version 0.167
 
 libasm: Add eBPF disassembler for EM_BPF files.

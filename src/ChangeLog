@@ -1,4 +1,9 @@
-2015-10-11  Akihiko Odaki  <akihiko.odaki.4i@stu.hosei.ac.jp>
+2016-10-22  Kevin Cernekee  <cernekee@chromium.org>
+
+	* unstrip.c: Fix "invalid string offset" error caused by using the
+	  unstripped .symtab with the stripped .strtab.
+
+2016-10-11  Akihiko Odaki  <akihiko.odaki.4i@stu.hosei.ac.jp>
 
 	* arlib.c: Remove system.h include, add libeu.h include.
 	* arlib2.c: Remove sys/param.h include.

@@ -1363,6 +1363,7 @@ more sections in stripped file than debug file -- arguments reversed?"));
   /* Match each debuginfo section with its corresponding stripped section.  */
   bool check_prelink = false;
   Elf_Scn *unstripped_symtab = NULL;
+  size_t unstripped_strndx = 0;
   size_t alloc_avail = 0;
   scn = NULL;
   while ((scn = elf_nextscn (unstripped, scn)) != NULL)
@@ -1374,11 +1375,12 @@ more sections in stripped file than debug file -- arguments reversed?"));
       if (shdr->sh_type == SHT_SYMTAB)
 	{
 	  unstripped_symtab = scn;
+	  unstripped_strndx = shdr->sh_link;
 	  continue;
 	}
 
       const size_t ndx = elf_ndxscn (scn);
-      if (ndx == unstripped_shstrndx)
+      if (ndx == unstripped_shstrndx || ndx == unstripped_strndx)
 	continue;
 
       const char *name = get_section_name (ndx, shdr, shstrtab);
@@ -1485,13 +1487,11 @@ more sections in stripped file than debug file -- arguments reversed?"));
 	    }
 
 	  if (unstripped_symtab != NULL && stripped_symtab != NULL
-	      && secndx == stripped_symtab->shdr.sh_link)
+	      && secndx == stripped_symtab->shdr.sh_link
+	      && unstripped_strndx != 0)
 	    {
 	      /* ... nor its string table.  */
-	      GElf_Shdr shdr_mem;
-	      GElf_Shdr *shdr = gelf_getshdr (unstripped_symtab, &shdr_mem);
-	      ELF_CHECK (shdr != NULL, _("cannot get section header: %s"));
-	      ndx_section[secndx - 1] = shdr->sh_link;
+	      ndx_section[secndx - 1] = unstripped_strndx;
 	      continue;
 	    }
 

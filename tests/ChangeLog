@@ -1,4 +1,14 @@
-2015-10-11  Akihiko Odaki  <akihiko.odaki.4i@stu.hosei.ac.jp>
+2016-10-22  Kevin Cernekee  <cernekee@chromium.org>
+
+	* Makefile.am (TESTS): Add run-unstrip-test4.sh.
+	(EXTRA_DIST): Add run-unstrip-test4.sh, testfile-strtab.bz2,
+	testfile-strtab.stripped.bz2, testfile-strtab.debuginfo.bz2.
+	(run-unstrip-test4.sh): New file.
+	(testfile-strtab.bz2): New file.
+	(testfile-strtab.stripped.bz2): New file.
+	(testfile-strtab.debuginfo.bz2): New file.
+
+2016-10-11  Akihiko Odaki  <akihiko.odaki.4i@stu.hosei.ac.jp>
 
 	* arextract.c: Remove sys/param.h include, add system.h include.
 

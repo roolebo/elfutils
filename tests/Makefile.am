@@ -81,8 +81,8 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-strip-test9.sh run-strip-test10.sh run-strip-test11.sh \
 	run-strip-groups.sh run-strip-reloc.sh run-strip-strmerge.sh \
 	run-strip-nobitsalign.sh \
-	run-unstrip-test.sh run-unstrip-test2.sh \
-	run-unstrip-test3.sh run-unstrip-M.sh run-elfstrmerge-test.sh \
+	run-unstrip-test.sh run-unstrip-test2.sh run-unstrip-test3.sh \
+	run-unstrip-test4.sh run-unstrip-M.sh run-elfstrmerge-test.sh \
 	run-ecp-test.sh run-ecp-test2.sh run-alldts.sh \
 	run-elflint-test.sh run-elflint-self.sh run-ranlib-test.sh \
 	run-ranlib-test2.sh run-ranlib-test3.sh run-ranlib-test4.sh \
@@ -176,6 +176,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-unstrip-test.sh run-unstrip-test2.sh \
 	     testfile-info-link.bz2 testfile-info-link.debuginfo.bz2 \
 	     testfile-info-link.stripped.bz2 run-unstrip-test3.sh \
+	     run-unstrip-test4.sh testfile-strtab.bz2 \
+	     testfile-strtab.stripped.bz2 testfile-strtab.debuginfo.bz2 \
 	     run-unstrip-M.sh run-elfstrmerge-test.sh \
 	     run-elflint-self.sh run-ranlib-test.sh run-ranlib-test2.sh \
 	     run-ranlib-test3.sh run-ranlib-test4.sh \

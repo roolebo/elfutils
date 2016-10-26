@@ -1,4 +1,8 @@
-2015-10-11  Akihiko Odaki  <akihiko.odaki.4i@stu.hosei.ac.jp>
+2016-10-26  Mark Wielaard  <mjw@redhat.com>
+
+	* elf_begin.c (read_file): Always set maxsize when parent == NULL.
+
+2016-10-11  Akihiko Odaki  <akihiko.odaki.4i@stu.hosei.ac.jp>
 
 	* elf_getarsym.c (elf_getarsym): Open code rawmemchr when not
 	available.
@@ -6,7 +10,7 @@
 	(validate_str): New function.
 	(elf_strptr): Use validate_str instead of memrchr.
 
-2015-10-11  Akihiko Odaki  <akihiko.odaki.4i@stu.hosei.ac.jp>
+2016-10-11  Akihiko Odaki  <akihiko.odaki.4i@stu.hosei.ac.jp>
 
 	* elf32_updatefile.c: Remove sys/param.h include.
 	* elf32_updatenull.c: Likewise. Add system.h include.

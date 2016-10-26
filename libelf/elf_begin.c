@@ -1,5 +1,5 @@
 /* Create descriptor for processing file.
-   Copyright (C) 1998-2010, 2012, 2014, 2015 Red Hat, Inc.
+   Copyright (C) 1998-2010, 2012, 2014, 2015, 2016 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 1998.
 
@@ -605,22 +605,30 @@ read_file (int fildes, off_t offset, size_t maxsize,
 		  || cmd == ELF_C_WRITE_MMAP
 		  || cmd == ELF_C_READ_MMAP_PRIVATE);
 
+  if (parent == NULL)
+    {
+      if (maxsize == ~((size_t) 0))
+	{
+	  /* We don't know in the moment how large the file is.
+	     Determine it now.  */
+	  struct stat st;
+
+	  if (fstat (fildes, &st) == 0
+	      && (sizeof (size_t) >= sizeof (st.st_size)
+		  || st.st_size <= ~((size_t) 0)))
+	    maxsize = (size_t) st.st_size;
+	}
+    }
+  else
+    {
+      /* The parent is already loaded.  Use it.  */
+      assert (maxsize != ~((size_t) 0));
+    }
+
   if (use_mmap)
     {
       if (parent == NULL)
 	{
-	  if (maxsize == ~((size_t) 0))
-	    {
-	      /* We don't know in the moment how large the file is.
-		 Determine it now.  */
-	      struct stat st;
-
-	      if (fstat (fildes, &st) == 0
-		  && (sizeof (size_t) >= sizeof (st.st_size)
-		      || st.st_size <= ~((size_t) 0)))
-		maxsize = (size_t) st.st_size;
-	    }
-
 	  /* We try to map the file ourself.  */
 	  map_address = mmap (NULL, maxsize, (cmd == ELF_C_READ_MMAP
 					      ? PROT_READ
@@ -635,9 +643,6 @@ read_file (int fildes, off_t offset, size_t maxsize,
 	}
       else
 	{
-	  /* The parent is already loaded.  Use it.  */
-	  assert (maxsize != ~((size_t) 0));
-
 	  map_address = parent->map_address;
 	}
     }

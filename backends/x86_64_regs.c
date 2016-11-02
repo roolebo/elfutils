@@ -87,6 +87,7 @@ x86_64_register_info (Ebl *ebl __attribute__ ((unused)),
 
     case 6 ... 7:
       *type = DW_ATE_address;
+      /* Fallthrough */
     case 0 ... 5:
       name[0] = 'r';
       name[1] = baseregs[regno][0];

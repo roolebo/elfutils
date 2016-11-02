@@ -234,7 +234,9 @@ parse_opt (int key, char *arg,
 		     program_invocation_short_name);
 	  exit (EXIT_FAILURE);
 	}
-
+      /* We only use this for checking the number of arguments, we don't
+	 actually want to consume them.  */
+      /* Fallthrough */
     default:
       return ARGP_ERR_UNKNOWN;
     }

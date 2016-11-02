@@ -819,7 +819,7 @@ i386_disasm (Ebl *ebl __attribute__((unused)),
 			      ++param_start;
 			      break;
 			    }
-
+			  /* Fallthrough */
 			default:
 			  assert (! "INVALID not handled");
 			}

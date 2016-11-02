@@ -123,7 +123,7 @@ callback_verify (pid_t tid, unsigned frameno, Dwarf_Addr pc,
 	  assert (symname2 == NULL || strcmp (symname2, "jmp") != 0);
 	  break;
 	}
-      /* PASSTHRU */
+      /* FALLTHRU */
     case 4:
       assert (symname != NULL && strcmp (symname, "stdarg") == 0);
       break;

@@ -225,8 +225,8 @@ EBLHOOK(core_note) (const GElf_Nhdr *nhdr, const char *name,
     case sizeof "CORE":
       if (memcmp (name, "CORE", nhdr->n_namesz) == 0)
 	break;
-      /* Buggy old Linux kernels didn't terminate "LINUX".
-         Fall through.  */
+      /* Buggy old Linux kernels didn't terminate "LINUX".  */
+      /* Fall through. */
 
     case sizeof "LINUX":
       if (memcmp (name, "LINUX", nhdr->n_namesz) == 0)

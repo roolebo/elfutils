@@ -1,3 +1,11 @@
+2016-11-02  Mark Wielaard  <mjw@redhat.com>
+
+	* addr2line.c (handle_address): Add fallthrough comment.
+	* elfcompress.c (parse_opt): Adjust fallthrough comment.
+	* elflint.c (parse_opt): Add missing break after 'd' case.
+	(check_sections): Add fallthrough comments.
+	* objdump.c (parse_opt): Add explantion for fallthrough comment.
+
 2016-10-22  Kevin Cernekee  <cernekee@chromium.org>
 
 	* unstrip.c: Fix "invalid string offset" error caused by using the

@@ -1,3 +1,14 @@
+2016-11-02  Mark Wielaard  <mjw@redhat.com>
+
+	* i386_regs.c (i386_register_info): Add fallthrough comment.
+	* i386_retval.c (i386_return_value_location): Move fallthrough
+	comment.
+	* linux-core-note.c (core_note): Adjust fallthrough comment.
+	* m68k_retval.c (m68k_return_value_location): Move fallthrough
+	comment.
+	* ppc_regs.c (ppc_register_info): Add fallthrough comment.
+	* x86_64_regs.c (x86_64_register_info): Likewise.
+
 2016-08-09  Jose E. Marchesi  <jose.marchesi@oracle.com>
 
 	* sparc_attrs.c (sparc_check_object_attribute): Fix the

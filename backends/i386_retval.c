@@ -122,9 +122,8 @@ i386_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
 	  return nloc_intreg;
 	if (size <= 8)
 	  return nloc_intregpair;
-
-	/* Else fall through.  */
       }
+    /* Fallthrough */
 
     case DW_TAG_structure_type:
     case DW_TAG_class_type:

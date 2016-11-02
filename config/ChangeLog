@@ -1,3 +1,8 @@
+2016-11-02  Mark Wielaard  <mjw@redhat.com>
+
+	* eu.am: Check HAVE_IMPLICIT_FALLTHROUGH_WARNING.
+	(AM_CFLAGS): Add IMPLICIT_FALLTHROUGH_WARNING.
+
 2016-08-04  Mark Wielaard  <mjw@redhat.com>
 
 	* elfutils.spec.in: Update for 0.167.

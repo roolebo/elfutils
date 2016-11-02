@@ -1,4 +1,12 @@
-2015-10-11  Akihiko Odaki  <akihiko.odaki.4i@stu.hosei.ac.jp>
+2016-11-02  Mark Wielaard  <mjw@redhat.com>
+
+	* cfi.c (execute_cfi): Add fallthrough comments.
+	* encoded-value.h (encoded_value_size): Add explicit return instead
+	of relying on fallthrough.
+	* dwfl_report_elf.c (__libdwfl_elf_address_range): Add fallthrough
+	comment.
+
+2016-10-11  Akihiko Odaki  <akihiko.odaki.4i@stu.hosei.ac.jp>
 
 	* dwarf_getpubnames.c: Remove sys/param.h include, add system.h.
 	* libdw_alloc.c: Likewise.

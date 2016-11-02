@@ -250,6 +250,7 @@ thread_callback (Dwfl_Thread *thread, void *thread_arg __attribute__ ((unused)))
       break;
     case -1:
       error (1, 0, "dwfl_thread_getframes: %s", dwfl_errmsg (-1));
+      break;
     default:
       abort ();
     }

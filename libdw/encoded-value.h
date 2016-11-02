@@ -64,6 +64,7 @@ encoded_value_size (const Elf_Data *data, const unsigned char e_ident[],
 	    if (*end++ & 0x80u)
 	      return end - p;
 	}
+      return 0;
 
     default:
       return 0;

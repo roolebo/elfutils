@@ -210,6 +210,7 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
 
     case 'd':
       is_debuginfo = true;
+      break;
 
     case ARGP_gnuld:
       gnuld = true;
@@ -3963,6 +3964,7 @@ section [%2zu] '%s': merge flag set but entry size is zero\n"),
 	    case SHT_NOBITS:
 	      if (is_debuginfo)
 		break;
+	      /* Fallthrough */
 	    default:
 	      ERROR (gettext ("\
 section [%2zu] '%s' has unexpected type %d for an executable section\n"),
@@ -4305,7 +4307,7 @@ section [%2d] '%s': unknown core file note type %" PRIu32
 	    if (nhdr.n_namesz == sizeof "Linux"
 		&& !memcmp (data->d_buf + name_offset, "Linux", sizeof "Linux"))
 	      break;
-
+	    /* Fallthrough */
 	  default:
 	    if (shndx == 0)
 	      ERROR (gettext ("\

@@ -1,3 +1,8 @@
+2016-11-02  Mark Wielaard  <mjw@redhat.com>
+
+	* backtrace-data.c (thread_callback): Add explicit break after error.
+	* backtrace.c (callback_verify): Change PASSTHRU to FALLTHRU.
+
 2016-10-22  Kevin Cernekee  <cernekee@chromium.org>
 
 	* Makefile.am (TESTS): Add run-unstrip-test4.sh.

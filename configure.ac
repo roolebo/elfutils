@@ -311,6 +311,16 @@ CFLAGS="$old_CFLAGS"])
 AM_CONDITIONAL(HAVE_NULL_DEREFERENCE_WARNING,
 	       [test "x$ac_cv_null_dereference" != "xno"])
 
+# -Wimplicit-fallthrough was added by GCC7
+AC_CACHE_CHECK([whether gcc accepts -Wimplicit-fallthrough], ac_cv_implicit_fallthrough, [dnl
+old_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS -Wimplicit-fallthrough -Werror"
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([])],
+		  ac_cv_implicit_fallthrough=yes, ac_cv_implicit_fallthrough=no)
+CFLAGS="$old_CFLAGS"])
+AM_CONDITIONAL(HAVE_IMPLICIT_FALLTHROUGH_WARNING,
+	       [test "x$ac_cv_implicit_fallthrough" != "xno"])
+
 dnl Check if we have argp available from our libc
 AC_LINK_IFELSE(
 	[AC_LANG_PROGRAM(

@@ -140,7 +140,7 @@ ppc_register_info (Ebl *ebl __attribute__ ((unused)),
     case 100:
       if (*bits == 32)
 	return stpcpy (name, "mq") + 1 - name;
-
+      /* Fallthrough */
     case 102 ... 107:
       name[0] = 's';
       name[1] = 'p';

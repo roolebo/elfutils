@@ -92,6 +92,7 @@ i386_register_info (Ebl *ebl __attribute__ ((unused)),
     case 5:
     case 8:
       *type = DW_ATE_address;
+      /* Fallthrough */
     case 0 ... 3:
     case 6 ... 7:
       name[0] = 'e';

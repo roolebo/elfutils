@@ -632,6 +632,7 @@ handle_address (const char *string, Dwfl *dwfl)
 	case 1:
 	  addr = 0;
 	  j = i;
+	  /* Fallthrough */
 	case 2:
 	  if (string[j] != '\0')
 	    break;

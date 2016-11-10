@@ -1,5 +1,5 @@
 /* Functions to handle creation of Linux archives.
-   Copyright (C) 2007-2012 Red Hat, Inc.
+   Copyright (C) 2007-2012, 2016 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2007.
 
@@ -23,6 +23,7 @@
 #include <assert.h>
 #include <error.h>
 #include <gelf.h>
+#include <inttypes.h>
 #include <libintl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -107,6 +108,9 @@ arlib_init (void)
 void
 arlib_finalize (void)
 {
+  /* Note that the size is stored as decimal string in 10 chars,
+     without zero terminator (we add + 1 here only so snprintf can
+     put it at the end, we then don't use it when we memcpy it).  */
   char tmpbuf[sizeof (((struct ar_hdr *) NULL)->ar_size) + 1];
 
   symtab.longnameslen = obstack_object_size (&symtab.longnamesob);
@@ -121,9 +125,9 @@ arlib_finalize (void)
 
       symtab.longnames = obstack_finish (&symtab.longnamesob);
 
-      int s = snprintf (tmpbuf, sizeof (tmpbuf), "%-*zu",
+      int s = snprintf (tmpbuf, sizeof (tmpbuf), "%-*" PRIu32 "",
 			(int) sizeof (((struct ar_hdr *) NULL)->ar_size),
-			symtab.longnameslen - sizeof (struct ar_hdr));
+			(uint32_t) (symtab.longnameslen - sizeof (struct ar_hdr)));
       memcpy (&((struct ar_hdr *) symtab.longnames)->ar_size, tmpbuf, s);
     }
 
@@ -169,10 +173,10 @@ arlib_finalize (void)
 
   /* See comment for ar_date above.  */
   memcpy (&((struct ar_hdr *) symtab.symsoff)->ar_size, tmpbuf,
-	  snprintf (tmpbuf, sizeof (tmpbuf), "%-*zu",
+	  snprintf (tmpbuf, sizeof (tmpbuf), "%-*" PRIu32 "",
 		    (int) sizeof (((struct ar_hdr *) NULL)->ar_size),
-		    symtab.symsofflen + symtab.symsnamelen
-		    - sizeof (struct ar_hdr)));
+		    (uint32_t) (symtab.symsofflen + symtab.symsnamelen
+				- sizeof (struct ar_hdr))));
 }
 
 

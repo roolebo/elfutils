@@ -1,3 +1,10 @@
+2016-11-10  Mark Wielaard  <mjw@redhat.com>
+
+	* ar.c (write_member): Make sure tmpbuf is large enough to contain
+	a starting '/' and ending '\0' char.
+	(do_oper_insert): Likewise.
+	* arlib.c (arlib_finalize): Format tmpbuf as PRId32 decimal.
+
 2016-11-02  Mark Wielaard  <mjw@redhat.com>
 
 	* addr2line.c (handle_address): Add fallthrough comment.

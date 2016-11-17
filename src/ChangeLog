@@ -1,3 +1,10 @@
+2016-11-17  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (options): Add optional arg SECTION for symbols.
+	(symbol_table_section): New static variable.
+	(parse_opt): Set symbol_table_section on 's'.
+	(print_symtab): Filter on symbol_table_section name is set.
+
 2016-11-10  Mark Wielaard  <mjw@redhat.com>
 
 	* ar.c (write_member): Make sure tmpbuf is large enough to contain

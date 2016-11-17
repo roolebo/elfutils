@@ -273,8 +273,19 @@ Symbol table [28] '.symtab' contains 40 entries:
    39: 0000000000000680      0 FUNC    GLOBAL DEFAULT       11 _init
 EOF
 
+# Display all symbol tables.
 cat testfile.dynsym.in testfile.symtab.in \
   | testrun_compare ${abs_top_builddir}/src/readelf -s testfilebaztab
+
+# Display just .dynsym
+cat testfile.dynsym.in \
+  | testrun_compare ${abs_top_builddir}/src/readelf \
+    --symbols=.dynsym testfilebaztab
+
+# Display just .symtab
+cat testfile.symtab.in \
+  | testrun_compare ${abs_top_builddir}/src/readelf \
+    --symbols=.symtab testfilebaztab
 
 cat testfile.dynsym.in \
   | testrun_compare ${abs_top_builddir}/src/readelf -s testfilebazdbg

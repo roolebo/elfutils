@@ -1,3 +1,7 @@
+2016-11-17  Mark Wielaard  <mjw@redhat.com>
+
+	* run-readelf-s.sh: Add --symbols=.dynsym and --symbols=.symtab tests.
+
 2016-11-02  Mark Wielaard  <mjw@redhat.com>
 
 	* backtrace-data.c (thread_callback): Add explicit break after error.

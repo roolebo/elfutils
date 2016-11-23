@@ -1,4 +1,9 @@
-2015-10-11  Akihiko Odaki  <akihiko.odaki.4i@stu.hosei.ac.jp>
+2016-11-23  Mark Wielaard  <mjw@redhat.com>
+
+	* linux-kernel-modules.c: Only include fts.h early if BAD_FTS is
+	defined.
+
+2016-10-11  Akihiko Odaki  <akihiko.odaki.4i@stu.hosei.ac.jp>
 
 	* core-file.c: Remove sys/param.h.
 	* dwfl_segment_report_module.c: Likewise. Add system.h include.

@@ -26,10 +26,12 @@
    the GNU Lesser General Public License along with this program.  If
    not, see <http://www.gnu.org/licenses/>.  */
 
-/* We include this before config.h because it can't handle _FILE_OFFSET_BITS.
+/* In case we have a bad fts we include this before config.h because it
+   can't handle _FILE_OFFSET_BITS.
    Everything we need here is fine if its declarations just come first.  */
-
-#include <fts.h>
+#ifdef BAD_FTS
+  #include <fts.h>
+#endif
 
 #include <config.h>
 
@@ -44,11 +46,15 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-/* Since fts.h is included before config.h, its indirect inclusions may not
+/* If fts.h is included before config.h, its indirect inclusions may not
    give us the right LFS aliases of these functions, so map them manually.  */
-#ifdef _FILE_OFFSET_BITS
-#define open open64
-#define fopen fopen64
+#ifdef BAD_FTS
+  #ifdef _FILE_OFFSET_BITS
+    #define open open64
+    #define fopen fopen64
+  #endif
+#else
+  #include <fts.h>
 #endif
 
 

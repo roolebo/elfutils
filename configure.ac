@@ -144,6 +144,15 @@ dnl tests, because the choice of the file model can (in principle) affect
 dnl whether functions and headers are available, whether they work, etc.
 AC_SYS_LARGEFILE
 
+dnl Older glibc had a broken fts that didn't work with Large File Systems.
+dnl We want the version that can handler LFS, but include workaround if we
+dnl get a bad one. Add define to CFLAGS (not AC_DEFINE it) since we need to
+dnl check it before including config.h (which might define _FILE_OFFSET_BITS).
+AC_CACHE_CHECK([whether fts.h is bad when included (with LFS)], ac_cv_bad_fts,
+  [AC_COMPILE_IFELSE([AC_LANG_SOURCE([[#include <fts.h>]])],
+		     ac_cv_bad_fts=no, ac_cv_bad_fts=yes)])
+AS_IF([test "x$ac_cv_bad_fts" = "xyes"], [CFLAGS="$CFLAGS -DBAD_FTS=1"])
+
 dnl enable debugging of branch prediction.
 AC_ARG_ENABLE([debugpred],
 AS_HELP_STRING([--enable-debugpred],[build binaries with support to debug branch prediction]),

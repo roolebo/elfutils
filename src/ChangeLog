@@ -1,3 +1,24 @@
+2016-12-24  Mark Wielaard  <mark@klomp.org>
+
+	* Makefile.am (findtextrel_LDADD): Add $(libeu).
+	(addr2line_LDADD): Likewise.
+	(elfcmp_LDADD): Likewise.
+	* addr2line.c (print_version): Removed.
+	* ar.c (print_version): Likewise.
+	* elfcmp.c (print_version): Likewise.
+	* elfcompress.c (print_version): Likewise.
+	* elflint.c (print_version): Likewise.
+	* findtextrel.c (print_version): Likewise.
+	* nm.c (print_version): Likewise.
+	* objdump.c: Likewise.
+	* ranlib.c: Likewise.
+	* readelf.c: Likewise.
+	* size.c: Likewise.
+	* stack.c: Likewise.
+	* strings.c: Likewise.
+	* strip.c: Likewise.
+	* unstrip.c: Likewise.
+
 2016-11-17  Mark Wielaard  <mjw@redhat.com>
 
 	* readelf.c (options): Add optional arg SECTION for symbols.

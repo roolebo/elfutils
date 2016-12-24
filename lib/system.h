@@ -152,6 +152,8 @@ pread_retry (int fd, void *buf, size_t len, off_t off)
 #define ARGP_PROGRAM_BUG_ADDRESS_DEF \
   const char *const apba__ __asm ("argp_program_bug_address")
 
+/* Defined in version.c.  Common ARGP_PROGRAM_VERSION_HOOK_DEF.  */
+void print_version (FILE *stream, struct argp_state *state);
 
 /* The demangler from libstdc++.  */
 extern char *__cxa_demangle (const char *mangled_name, char *output_buffer,

@@ -1,3 +1,8 @@
+2016-12-24  Mark Wielaard  <mark@klomp.org>
+
+	* Makevars (COPYRIGHT_HOLDER): Set to the elfutils developers.
+	(MSGID_BUGS_ADDRESS): Set to http://sourceware.org/bugzilla/
+
 2016-08-24  Mark Wielaard  <mjw@redhat.com>
 
 	* *.po: Regenerate.

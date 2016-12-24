@@ -1,3 +1,14 @@
+2016-12-24  Mark Wielaard  <mark@klomp.org>
+
+	* README: Move design notes to NOTES. Add URLs for home, releases,
+	bugs, git and mailinglist now on sourceware.
+	* NOTES: Add notes from README.
+	* CONTRIBUTING: Change fedorahosted.org references to new
+	sourceware.org locations.
+	* configure.ac (AC_INIT): Add package URL http://elfutils.org/
+	change bug-report to https://sourceware.org/bugzilla/
+	(AC_COPYRIGHT): Set to the elfutils developers.
+
 2016-11-23  Mark Wielaard  <mjw@redhat.com>
 
 	* configure.ac: Add test for bad fts.h. Add -DBAD_FTS=1 to CFLAGS

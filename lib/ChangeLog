@@ -1,4 +1,10 @@
-2015-10-11  Akihiko Odaki  <akihiko.odaki.4i@stu.hosei.ac.jp>
+2016-12-24  Mark Wielaard  <mark@klomp.org>
+
+	* version.c: New source file.
+	* Makefile.am (libeu_a_SOURCES): Add version.c
+	* system.h (print_version): New function definition.
+
+2016-10-11  Akihiko Odaki  <akihiko.odaki.4i@stu.hosei.ac.jp>
 
 	* fixedsizehash.h (CONCAT): Use __CONCAT when available.
 	* system.h: Include config.h and errno.h.

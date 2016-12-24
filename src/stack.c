@@ -32,7 +32,6 @@
 #include <system.h>
 
 /* Name and version of program.  */
-static void print_version (FILE *stream, struct argp_state *state);
 ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
 
 /* Bug report address.  */
@@ -468,12 +467,6 @@ thread_callback (Dwfl_Thread *thread, void *thread_arg)
     }
   print_frames (frames, tid, err, "dwfl_thread_getframes");
   return DWARF_CB_OK;
-}
-
-static void
-print_version (FILE *stream, struct argp_state *state __attribute__ ((unused)))
-{
-  fprintf (stream, "stack (%s) %s\n", PACKAGE_NAME, PACKAGE_VERSION);
 }
 
 static error_t

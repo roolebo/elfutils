@@ -1,11 +1,14 @@
-The project homepage is at https://fedorahosted.org/elfutils/
+The project home is http://elfutils.org/
 
 The current elfutils source code can be checked out with
-git clone git://git.fedorahosted.org/git/elfutils.git
+git clone git://sourceware.org/git/elfutils.git
 
 The developer mailinglist to send patches to is
-elfutils-devel@lists.fedorahosted.org.
-https://fedorahosted.org/mailman/listinfo/elfutils-devel
+elfutils-devel@sourceware.org.
+https://sourceware.org/ml/elfutils-devel/
+
+To subscribe send an email to elfutils-devel-subscribe@sourceware.org
+Or use the form at https://sourceware.org/lists.html#ml-requestor
 
 Please supply patches using git format-patch or using git send-email.
 
@@ -66,20 +69,22 @@ After sending your patch to the mailinglist one of the committers
 to the project will review it, give feedback, and if perfect they
 will commit it for you.
 
-The current maintainers/committers can be found at:
-https://admin.fedoraproject.org/accounts/group/members/gitelfutils/*
-
 You can become a maintainer/committer yourself after you have provided
 at least a handful of accepted patches and agree to the guidelines in
 this document for creating, reviewing, accepting and committing patches.
 
-To become a committer you need an FAS account at:
-https://admin.fedoraproject.org/accounts/
+To become a committer you need a sourceware account:
+https://sourceware.org/cgi-bin/pdw/ps_form.cgi
 Upload a SSH public key and have an existing maintainer sponsor you
-for the Elf Utils Group (gitelfutils).
+for the elfutils group.
 
 committers can push patches through:
-ssh://<fasname>@git.fedorahosted.org/git/elfutils.git
+ssh://<user>@sourceware.org/git/elfutils.git
+
+The current webpages published at https://sourceware.org/elfutils/
+can be checked out with:
+git clone ssh://<user>@sourceware.org/git/elfutils-htdocs.git
+Patches should also be posted to the mailinglist.
 
 As a maintainer/committer you should still post patches as described
 above. And ideally they are reviewed and approved as above. If no
@@ -88,7 +93,7 @@ you may use your own judgement whether you ping your patch or push
 it after "self-review". If you do, you should post a message to the
 mailinglist that the patch has been pushed.
 
-committers may also create git branches starting with <fasname>/...
+committers may also create git branches starting with <nickname>/...
 patches on these branches are works in progress, so might not be perfect
 yet, but should follow the above guidelines as much as possible and should
 be aimed at integration into master. For merging a branch into master

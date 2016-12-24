@@ -6,7 +6,7 @@ includedir=@includedir@
 Name: libdw
 Description: elfutils library for DWARF data and ELF file or process inspection
 Version: @VERSION@
-URL: https://fedorahosted.org/elfutils/
+URL: http://elfutils.org/
 
 Libs: -L${libdir} -ldw
 Cflags: -I${includedir}

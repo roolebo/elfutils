@@ -6,7 +6,7 @@ includedir=@includedir@
 Name: libelf
 Description: elfutils libelf library to read and write ELF files
 Version: @VERSION@
-URL: https://fedorahosted.org/elfutils/
+URL: http://elfutils.org/
 
 Libs: -L${libdir} -lelf
 Cflags: -I${includedir}

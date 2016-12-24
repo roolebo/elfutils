@@ -1,19 +1,22 @@
-Fundamental design decision:
+The elfutils project provides libraries and tools for ELF files and DWARF data.
 
-- the sizes of external and internal types are assumed to be the same.
-  This leaves byte ordering aside.  While assuming this the code can be
-  greatly simplified and speed increases.  Since no change violating this
-  assumption is in sight this is believed to be a worthwhile optimization.
+The project home is http://elfutils.org/
 
-- the ABI of the backend modules is not guaranteed.  Really, no guarantee
-  whatsoever.  We are enforcing this in the code.  The modules and their
-  users must match.  No third-party EBL module are supported or allowed.
-  The only reason there are separate modules is to not have the code for
-  all architectures in all the binaries.
+Releases are published at ftp://sourceware.org/pub/elfutils/
+Which can also be found at https://sourceware.org/elfutils/ftp/
 
-- although the public libraries (libasm, libdw) have a stable API and are
-  backwards ABI compatible they, and the elfutils tools, do depend on each
-  others internals, and on internals of libelf to provide their interfaces.
-  So they should always be upgraded in lockstep when packaging the tools
-  and libraries separately. For one example of how to do that, see the
-  config/elfutils.spec.
+Please reports bugs at https://sourceware.org/bugzilla/
+
+The current elfutils source code can be checked out with
+git clone git://sourceware.org/git/elfutils.git
+
+The developer mailinglist to send patches to is
+elfutils-devel@sourceware.org.
+https://sourceware.org/ml/elfutils-devel/
+
+To subscribe send an email to elfutils-devel-subscribe@sourceware.org
+Or use the form at https://sourceware.org/lists.html#ml-requestor
+
+See the CONTRIBUTING file for how to propose patches to the code.
+
+See the NOTES files for some design decisions and notes.

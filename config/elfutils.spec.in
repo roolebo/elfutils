@@ -1,11 +1,12 @@
 # -*- rpm-spec-*-
-Summary: A collection of utilities and DSOs to handle compiled objects
+Summary: A collection of utilities and DSOs to handle ELF files and DWARF data
 Name: elfutils
 Version: @PACKAGE_VERSION@
 Release: 1
+URL: http://elfutils.org/
 License: GPLv3+ and (GPLv2+ or LGPLv3+)
 Group: Development/Tools
-Source: elfutils-%{version}.tar.bz2
+Source: ftp://sourceware.org/pub/elfutils/%{version}/elfutils-%{version}.tar.bz2
 Obsoletes: libelf libelf-devel
 Requires: elfutils-libelf = %{version}-%{release}
 Requires: glibc >= 2.7
@@ -226,6 +227,12 @@ rm -rf ${RPM_BUILD_ROOT}
 %config(noreplace) %{_sysctldir}/10-default-yama-scope.conf
 
 %changelog
+* Tue Dec 27 2016 Mark Wielaard <mark@klomp.org> 0.168-1
+- http://elfutils.org/ is now hosted at http://sourceware.org/elfutils/
+- libelf: gelf_newehdr and gelf_newehdr now return void *.
+- libdw: dwarf.h corrected the DW_LANG_PLI constant name (was DW_LANG_PL1).
+- readelf: Add optional --symbols[=SECTION] argument to select section name.
+
 * Thu Aug  4 2016 Mark Wielaard <mjw@redhat.com> 0.167-1
 - libasm: Add eBPF disassembler for EM_BPF files.
 - backends: Add m68k and BPF backends.

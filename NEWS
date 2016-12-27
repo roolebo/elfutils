@@ -1,6 +1,12 @@
 Version 0.168
 
+http://elfutils.org/ is now hosted at http://sourceware.org/elfutils/
+
+libelf: gelf_newehdr and gelf_newehdr now return void *.
+
 libdw: dwarf.h corrected the DW_LANG_PLI constant name (was DW_LANG_PL1).
+
+readelf: Add optional --symbols[=SECTION] argument to select section name.
 
 Version 0.167
 

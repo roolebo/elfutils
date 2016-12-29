@@ -1,3 +1,9 @@
+2016-12-29  Luiz Angelo Daros de Luca  <luizluca@gmail.com>
+
+	* dwfl_build_id_find_elf.c: Include system.h.
+	* dwfl_module_getdwarf.c: Likewise.
+	* libdwfl_crc32_file.c: Don't define LIB_SYSTEM_H.
+
 2016-11-23  Mark Wielaard  <mjw@redhat.com>
 
 	* linux-kernel-modules.c: Only include fts.h early if BAD_FTS is

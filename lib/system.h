@@ -81,7 +81,7 @@
      do \
        __res = expression; \
      while (__res == -1 && errno == EINTR); \
-     __res; });
+     __res; })
 #endif
 
 static inline ssize_t __attribute__ ((unused))

@@ -33,6 +33,7 @@
 #include <unistd.h>
 #include "../libdw/libdwP.h"	/* DWARF_E_* values are here.  */
 #include "../libelf/libelfP.h"
+#include "system.h"
 
 static inline Dwfl_Error
 open_elf_file (Elf **elf, int *fd, char **name)

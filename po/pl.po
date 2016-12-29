@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: elfutils\n"
 "Report-Msgid-Bugs-To: https://sourceware.org/bugzilla/\n"
-"POT-Creation-Date: 2016-12-27 15:20+0100\n"
-"PO-Revision-Date: 2016-12-28 19:30+0100\n"
+"POT-Creation-Date: 2016-12-29 17:47+0100\n"
+"PO-Revision-Date: 2016-12-29 17:48+0100\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <trans-pl@lists.fedoraproject.org>\n"
 "Language: pl\n"
@@ -45,6 +45,19 @@ msgstr ""
 #, c-format
 msgid "cannot allocate memory"
 msgstr "nie można przydzielić pamięci"
+
+#: lib/version.c:42
+#, c-format
+msgid ""
+"Copyright (C) %s The elfutils developers <%s>.\n"
+"This is free software; see the source for copying conditions.  There is NO\n"
+"warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
+msgstr ""
+"Copyright © %s programiści projektu elfutils <%s>.\n"
+"Niniejszy program jest wolnym oprogramowaniem; proszę zobaczyć kod źródłowy\n"
+"w celu poznania warunków kopiowania. Niniejszy program rozprowadzany jest\n"
+"BEZ JAKIEJKOLWIEK GWARANCJI, nawet domyślnej gwarancji PRZYDATNOŚCI\n"
+"HANDLOWEJ albo PRZYDATNOŚCI DO OKREŚLONYCH ZASTOSOWAŃ.\n"
 
 #: lib/xmalloc.c:53 lib/xmalloc.c:66 lib/xmalloc.c:78 src/readelf.c:3294
 #: src/readelf.c:3685 src/readelf.c:8433 src/unstrip.c:2224 src/unstrip.c:2429

@@ -1,3 +1,7 @@
+2017-01-12  Mark Wielaard  <mark@klomp.org>
+
+	* configure.ac: Define PACKAGE_URL for older autoconf.
+
 2016-12-27  Mark Wielaard  <mark@klomp.org>
 
 	* configure.ac: Set version to 0.168.

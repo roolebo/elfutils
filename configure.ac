@@ -19,6 +19,12 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AC_INIT([elfutils],[0.168],[https://sourceware.org/bugzilla],[elfutils],[http://elfutils.org/])
 
+dnl Workaround for older autoconf < 2.64
+m4_ifndef([AC_PACKAGE_URL],
+         [AC_DEFINE([PACKAGE_URL], ["http://elfutils.org/"],
+                    [Define to home page for this package])
+          AC_SUBST([PACKAGE_URL], ["http://elfutils.org/"])])
+
 # We want eu- as default program prefix if none was given by the user.
 # But if the user explicitly provided --program-prefix="" then pretend
 # it wasn't set at all (NONE). We want to test this really early before

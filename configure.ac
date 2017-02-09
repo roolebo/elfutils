@@ -159,6 +159,27 @@ AC_CACHE_CHECK([whether fts.h is bad when included (with LFS)], ac_cv_bad_fts,
 		     ac_cv_bad_fts=no, ac_cv_bad_fts=yes)])
 AS_IF([test "x$ac_cv_bad_fts" = "xyes"], [CFLAGS="$CFLAGS -DBAD_FTS=1"])
 
+# See if we can add -D_FORTIFY_SOURCE=2. Don't do it if it is already
+# (differently) defined or if it generates warnings/errors because we
+# don't use the right optimisation level (string.h will warn about that).
+AC_MSG_CHECKING([whether to add -D_FORTIFY_SOURCE=2 to CFLAGS])
+case "$CFLAGS" in
+  *-D_FORTIFY_SOURCE=2*)
+    AC_MSG_RESULT([no, already there])
+    ;;
+  *)
+    save_CFLAGS="$CFLAGS"
+    CFLAGS="-D_FORTIFY_SOURCE=2 -Werror $CFLAGS"
+    AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
+      #include <string.h>
+      int main() { return 0; }
+    ]])], [ AC_MSG_RESULT([yes])
+            CFLAGS="-D_FORTIFY_SOURCE=2 $save_CFLAGS" ],
+          [ AC_MSG_RESULT([no])
+            CFLAGS="$save_CFLAGS"])
+  ;;
+esac
+
 dnl enable debugging of branch prediction.
 AC_ARG_ENABLE([debugpred],
 AS_HELP_STRING([--enable-debugpred],[build binaries with support to debug branch prediction]),

@@ -1,3 +1,9 @@
+2017-02-09  Ulf Hermann  <ulf.hermann@qt.io>
+
+	* backtrace-data.c: Don't assert that symbols are found.
+	The unwinder is allowed to ask for invalid addresses. We deny
+	such requests, rather than make the test fail.
+
 2016-11-17  Mark Wielaard  <mjw@redhat.com>
 
 	* run-readelf-s.sh: Add --symbols=.dynsym and --symbols=.symtab tests.

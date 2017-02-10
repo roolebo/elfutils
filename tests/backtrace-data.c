@@ -76,10 +76,15 @@ memory_read (Dwfl *dwfl, Dwarf_Addr addr, Dwarf_Word *result,
 
   errno = 0;
   long l = ptrace (PTRACE_PEEKDATA, child, (void *) (uintptr_t) addr, NULL);
-  assert (errno == 0);
+
+  // The unwinder can ask for an invalid address.
+  // Don't assert on that but just politely refuse.
+  if (errno != 0) {
+      errno = 0;
+      return false;
+  }
   *result = l;
 
-  /* We could also return false for failed ptrace.  */
   return true;
 }
 
@@ -103,7 +108,8 @@ maps_lookup (pid_t pid, Dwarf_Addr addr, GElf_Addr *basep)
       unsigned long start, end, offset;
       i = fscanf (f, "%lx-%lx %*s %lx %*x:%*x %*x", &start, &end, &offset);
       assert (errno == 0);
-      assert (i == 3);
+      if (i != 3)
+          break;
       char *filename = strdup ("");
       assert (filename);
       size_t filename_len = 0;
@@ -131,6 +137,8 @@ maps_lookup (pid_t pid, Dwarf_Addr addr, GElf_Addr *basep)
 	}
       free (filename);
     }
+  *basep = 0;
+  return NULL;
 }
 
 /* Add module containing ADDR to the DWFL address space.
@@ -145,6 +153,8 @@ report_module (Dwfl *dwfl, pid_t child, Dwarf_Addr addr)
 {
   GElf_Addr base;
   char *long_name = maps_lookup (child, addr, &base);
+  if (!long_name)
+      return NULL; // not found
   Dwfl_Module *mod = dwfl_report_elf (dwfl, long_name, long_name, -1,
 				      base, false /* add_p_vaddr */);
   assert (mod);

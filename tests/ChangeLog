@@ -1,5 +1,11 @@
 2017-02-09  Ulf Hermann  <ulf.hermann@qt.io>
 
+	* backtrace.c: Add an option to allow unknown symbols in the trace
+	* backtrace-substr.sh: Add an option to allow unknown symbols
+	to check_core() and allow failed symbol lookups in check_err()
+
+2017-02-09  Ulf Hermann  <ulf.hermann@qt.io>
+
 	* backtrace-data.c: Don't assert that symbols are found.
 	The unwinder is allowed to ask for invalid addresses. We deny
 	such requests, rather than make the test fail.

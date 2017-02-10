@@ -44,9 +44,12 @@ check_gsignal()
 # In some cases we cannot reliably find out we got behind _start as some
 # operating system do not properly terminate CFI by undefined PC.
 # Ignore it here as it is a bug of OS, not a bug of elfutils.
+# If the CFI is not terminated correctly, we might find another frame by
+# checking for frame pointers. This is still not our problem, but only
+# gives an error message when trying to look up the function name.
 check_err()
 {
-  if [ $(egrep -v <$1 'dwfl_thread_getframes: (No DWARF information found|no matching address range)$' \
+  if [ $(egrep -v <$1 'dwfl_thread_getframes: (No DWARF information found|no matching address range|address out of range)$' \
          | wc -c) \
        -eq 0 ]
   then
@@ -61,7 +64,9 @@ check_all()
   bt=$1
   err=$2
   testname=$3
-  check_main $bt $testname
+  if [ "x$4" != "x--allow-unknown" ]; then
+    check_main $bt $testname
+  fi
   check_gsignal $bt $testname
   check_err $err $testname
 }
@@ -98,13 +103,14 @@ check_native_unsupported()
 check_core()
 {
   arch=$1
+  args=$2
   testfiles backtrace.$arch.{exec,core}
   tempfiles backtrace.$arch.{bt,err}
   echo ./backtrace ./backtrace.$arch.{exec,core}
-  testrun ${abs_builddir}/backtrace -e ./backtrace.$arch.exec --core=./backtrace.$arch.core 1>backtrace.$arch.bt 2>backtrace.$arch.err || true
+  testrun ${abs_builddir}/backtrace $args -e ./backtrace.$arch.exec --core=./backtrace.$arch.core 1>backtrace.$arch.bt 2>backtrace.$arch.err || true
   cat backtrace.$arch.{bt,err}
   check_unsupported backtrace.$arch.err backtrace.$arch.core
-  check_all backtrace.$arch.{bt,err} backtrace.$arch.core
+  check_all backtrace.$arch.{bt,err} backtrace.$arch.core $args
 }
 
 # Backtrace live process.

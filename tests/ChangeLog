@@ -1,3 +1,10 @@
+2017-02-09  Ulf Hermann  <ulf.hermann@qt.io>
+
+	* Makefile.am: Add test for unwinding with frame pointers on x86_64
+	* backtrace.x86_64.fp.core.bz2: New file
+	* backtrace.x86_64.fp.exec.bz2: New file
+	* run-backtrace-fp-core-x86_64.sh: New file
+
 2017-04-25  Mark Wielaard  <mark@klomp.org>
 
 	* backtrace-subr.sh (check_backtracegen): New function.

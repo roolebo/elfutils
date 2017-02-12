@@ -1,5 +1,5 @@
 /* Define new symbol for current position in given section.
-   Copyright (C) 2002, 2005, 2016 Red Hat, Inc.
+   Copyright (C) 2002, 2005, 2016, 2017 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -44,7 +44,9 @@ AsmSym_t *
 asm_newsym (AsmScn_t *asmscn, const char *name, GElf_Xword size,
 	    int type, int binding)
 {
-#define TEMPSYMLEN 10
+/* We don't really expect labels with many digits, but in theory it could
+   be 10 digits (plus ".L" and a zero terminator).  */
+#define TEMPSYMLEN 13
   char tempsym[TEMPSYMLEN];
   AsmSym_t *result;
 

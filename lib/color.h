@@ -1,6 +1,7 @@
-/* Declarations for the common library.
-   Copyright (C) 2006-2011 Red Hat, Inc.
+/* Handling of color output.
+   Copyright (C) 2017 The Qt Company
    This file is part of elfutils.
+   Written by Ulrich Drepper <drepper@redhat.com>, 2011.
 
    This file is free software; you can redistribute it and/or modify
    it under the terms of either
@@ -26,21 +27,37 @@
    the GNU Lesser General Public License along with this program.  If
    not, see <http://www.gnu.org/licenses/>.  */
 
-#ifndef LIBEU_H
-#define LIBEU_H
 
-#include <stddef.h>
-#include <stdint.h>
+#ifndef COLOR_H
+#define COLOR_H 1
 
-extern void *xmalloc (size_t) __attribute__ ((__malloc__));
-extern void *xcalloc (size_t, size_t) __attribute__ ((__malloc__));
-extern void *xrealloc (void *, size_t) __attribute__ ((__malloc__));
+/* Command line parser.  */
+extern const struct argp color_argp;
 
-extern char *xstrdup (const char *) __attribute__ ((__malloc__));
-extern char *xstrndup (const char *, size_t) __attribute__ ((__malloc__));
+/* Coloring mode.  */
+enum color_enum
+  {
+    color_never = 0,
+    color_always,
+    color_auto
+  } __attribute__ ((packed));
+extern enum color_enum color_mode;
 
+/* Colors to use for the various components.  */
+extern char *color_address;
+extern char *color_bytes;
+extern char *color_mnemonic;
+extern char *color_operand1;
+extern char *color_operand2;
+extern char *color_operand3;
+extern char *color_label;
+extern char *color_undef;
+extern char *color_undef_tls;
+extern char *color_undef_weak;
+extern char *color_symbol;
+extern char *color_tls;
+extern char *color_weak;
 
-extern uint32_t crc32 (uint32_t crc, unsigned char *buf, size_t len);
-extern int crc32_file (int fd, uint32_t *resp);
+extern const char color_off[];
 
-#endif
+#endif /* color.h */

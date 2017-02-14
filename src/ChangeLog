@@ -1,3 +1,8 @@
+2017-02-14  Ulf Hermann  <ulf.hermann@qt.io>
+
+	* nm.c: Include color.h.
+	* objdump.c: Likewise.
+
 2016-12-24  Mark Wielaard  <mark@klomp.org>
 
 	* Makefile.am (findtextrel_LDADD): Add $(libeu).

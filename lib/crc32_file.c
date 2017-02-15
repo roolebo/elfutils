@@ -53,7 +53,7 @@ crc32_file (int fd, uint32_t *resp)
       void *mapped = mmap (NULL, mapsize, PROT_READ, MAP_PRIVATE, fd, 0);
       if (mapped == MAP_FAILED && errno == ENOMEM)
 	{
-	  const size_t pagesize = sysconf (_SC_PAGE_SIZE);
+	  const size_t pagesize = sysconf (_SC_PAGESIZE);
 	  mapsize = ((mapsize / 2) + pagesize - 1) & -pagesize;
 	  while (mapsize >= pagesize
 		 && (mapped = mmap (NULL, mapsize, PROT_READ, MAP_PRIVATE,

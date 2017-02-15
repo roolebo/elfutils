@@ -32,7 +32,12 @@
 #
 # gcc -c testfilesparc64attrs.s
 
-testfiles testfilearm testfileppc32attrs.o testfilesparc64attrs.o
+# = testfileppc64attrs.s =
+# .gnu_attribute 4,3
+#
+# gcc -c testfileppc64attrs.s
+
+testfiles testfilearm testfileppc32attrs.o testfilesparc64attrs.o testfileppc64attrs.o
 
 testrun_compare ${abs_top_builddir}/src/readelf -A testfilearm <<\EOF
 
@@ -77,6 +82,15 @@ Object attributes section [ 4] '.gnu.attributes' of 21 bytes at offset 0x40:
     File:          12
       GNU_Sparc_HWCAPS: div32,v8plus,vis,asi_blk_init,vis3,random,fjfmau,asi_cache_sparing,des,camellia,sha1,sha512,mont,cbcond
       GNU_Sparc_HWCAPS2: fjathplus,adp,mwait,xmont
+EOF
+
+testrun_compare ${abs_top_builddir}/src/readelf -A testfileppc64attrs.o <<\EOF
+
+Object attributes section [ 4] '.gnu.attributes' of 16 bytes at offset 0x40:
+  Owner          Size
+  gnu              15
+    File:           7
+      GNU_Power_ABI_FP: Single-precision hard float
 EOF
 
 exit 0

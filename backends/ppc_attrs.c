@@ -51,6 +51,7 @@ ppc_check_object_attribute (Ebl *ebl __attribute__ ((unused)),
 	    "Hard or soft float",
 	    "Hard float",
 	    "Soft float",
+	    "Single-precision hard float",
 	  };
 	if (value < sizeof fp_kinds / sizeof fp_kinds[0])
 	  *value_name = fp_kinds[value];

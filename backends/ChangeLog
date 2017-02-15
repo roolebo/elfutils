@@ -1,3 +1,9 @@
+2017-02-15  Mark Wielaard  <mark@klomp.org>
+
+	* ppc64_init.c (ppc64_init): Add check_object_attribute HOOK.
+	* ppc_attrs.c (ppc_check_object_attribute): Add Single-precision hard
+	float.
+
 2016-11-02  Mark Wielaard  <mjw@redhat.com>
 
 	* i386_regs.c (i386_register_info): Add fallthrough comment.

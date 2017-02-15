@@ -67,6 +67,7 @@ ppc64_init (Elf *elf __attribute__ ((unused)),
   HOOK (eh, syscall_abi);
   HOOK (eh, core_note);
   HOOK (eh, auxv_info);
+  HOOK (eh, check_object_attribute);
   HOOK (eh, abi_cfi);
   /* gcc/config/ #define DWARF_FRAME_REGISTERS.  */
   eh->frame_nregs = (114 - 1) + 32;

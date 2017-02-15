@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 1996-2016 Red Hat, Inc.
+## Copyright (C) 1996-2017 Red Hat, Inc.
 ## This file is part of elfutils.
 ##
 ## This file is free software; you can redistribute it and/or modify
@@ -317,7 +317,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-aggregate-size.sh testfile-sizes1.o.bz2 testfile-sizes2.o.bz2 \
 	     testfile-sizes3.o.bz2 \
 	     run-readelf-A.sh testfileppc32attrs.o.bz2 \
-	     testfilesparc64attrs.o.bz2 \
+	     testfilesparc64attrs.o.bz2 testfileppc64attrs.o.bz2 \
 	     testfile-debug-types.bz2 \
 	     run-getsrc-die.sh run-strptr.sh \
 	     testfile-x32-core.bz2 testfile-x32.bz2 \

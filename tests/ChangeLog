@@ -1,3 +1,8 @@
+2017-02-15  Mark Wielaard  <mark@klomp.org>
+
+	* Makefile.am (EXTRA_DIST): Add testfileppc64attrs.o.bz2.
+	* run-readelf-A.sh: Add testfileppc64.o test.
+
 2017-02-15  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* elfstrmerge.c: Include system.h.

@@ -30,10 +30,8 @@
 # include <config.h>
 #endif
 
-#include <argp.h>
 #include <libintl.h>
-#include <stdio.h>
-#include "system.h"
+#include "printversion.h"
 
 void
 print_version (FILE *stream, struct argp_state *state)

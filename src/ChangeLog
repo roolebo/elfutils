@@ -1,3 +1,21 @@
+2017-02-16  Ulf Hermann  <ulf.hermann@qt.io>
+
+	* addr2line.c: Include printversion.h
+	* ar.c: Likewise.
+	* elflint.c: Likewise.
+	* nm.c: Likewise.
+	* objdump.c: Likewise.
+	* ranlib.c: Likewise.
+	* readelf.c: Likewise.
+	* size.c: Likewise.
+	* stack.c: Likewise.
+	* strings.c: Likewise.
+	* strip.c: Likewise.
+	* elfcmp.c: Include printversion.h, remove system.h include.
+	* elfcompress.c: Likewise.
+	* findtextrel.c: Likewise.
+	* unstrip.c: Likewise.
+
 2017-02-14  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* nm.c: Include color.h.

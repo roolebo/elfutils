@@ -30,6 +30,7 @@
 
 #include <dwarf.h>
 #include <system.h>
+#include <printversion.h>
 
 /* Name and version of program.  */
 ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;

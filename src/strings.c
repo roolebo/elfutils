@@ -42,6 +42,7 @@
 
 #include <libeu.h>
 #include <system.h>
+#include <printversion.h>
 
 #ifndef MAP_POPULATE
 # define MAP_POPULATE 0

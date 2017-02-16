@@ -1,3 +1,16 @@
+2017-02-16  Ulf Hermann  <ulf.hermann@qt.io>
+
+	* Makefile.am (libeu_a_SOURCES): Remove version.c, add printversion.c
+	(noinst_HEADERS): Add printversion.h
+	* version.c: Moved to printversion.c.
+	* printversion.c: New file, moved from version.c,
+	remove stdio.h, argp.h, system.h includes,
+	add printversion.h include.
+	* printversion.h: New file.
+	* system.h: Remove argp.h include,
+	(ARGP_PROGRAM_VERSION_HOOK_DEF, ARGP_PROGRAM_BUG_ADDRESS_DEF): Remove.
+	(print_version): Remove.
+
 2017-02-15  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* system.h: Provide mempcpy if it doesn't exist.

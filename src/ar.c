@@ -41,6 +41,7 @@
 #include <sys/time.h>
 
 #include <system.h>
+#include <printversion.h>
 
 #include "arlib.h"
 

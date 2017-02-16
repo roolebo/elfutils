@@ -38,6 +38,7 @@
 #include <unistd.h>
 
 #include <system.h>
+#include <printversion.h>
 
 
 /* Name and version of program.  */

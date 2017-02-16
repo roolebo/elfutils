@@ -39,6 +39,7 @@
 #include <elf-knowledge.h>
 #include <libeu.h>
 #include <system.h>
+#include <printversion.h>
 #include "../libelf/libelfP.h"
 #include "../libelf/common.h"
 #include "../libebl/libeblP.h"

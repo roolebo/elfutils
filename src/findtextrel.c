@@ -36,7 +36,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <system.h>
+#include <printversion.h>
 
 
 struct segments

@@ -50,7 +50,7 @@
 #include <libdwfl.h>
 #include "libdwelf.h"
 #include "libeu.h"
-#include "system.h"
+#include "printversion.h"
 
 #ifndef _
 # define _(str) gettext (str)

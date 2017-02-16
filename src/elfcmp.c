@@ -33,7 +33,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <system.h>
+#include <printversion.h>
 #include "../libelf/elf-knowledge.h"
 #include "../libebl/libeblP.h"
 

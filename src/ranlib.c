@@ -38,6 +38,7 @@
 #include <sys/stat.h>
 
 #include <system.h>
+#include <printversion.h>
 
 #include "arlib.h"
 

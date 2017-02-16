@@ -44,6 +44,7 @@
 #include "libdwelf.h"
 #include <libeu.h>
 #include <system.h>
+#include <printversion.h>
 
 typedef uint8_t GElf_Byte;
 

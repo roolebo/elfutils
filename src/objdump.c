@@ -36,6 +36,7 @@
 #include <libeu.h>
 #include <system.h>
 #include <color.h>
+#include <printversion.h>
 #include "../libebl/libeblP.h"
 
 

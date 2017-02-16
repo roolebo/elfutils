@@ -33,7 +33,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "libeu.h"
-
+#include "system.h"
 
 /* Return a newly allocated copy of STRING.  */
 char *

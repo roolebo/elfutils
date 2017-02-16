@@ -68,6 +68,11 @@
 #define powerof2(x) (((x) & ((x) - 1)) == 0)
 #endif
 
+#if !HAVE_DECL_MEMPCPY
+#define mempcpy(dest, src, n) \
+    ((void *) ((char *) memcpy (dest, src, n) + (size_t) n))
+#endif
+
 /* A special gettext function we use if the strings are too short.  */
 #define sgettext(Str) \
   ({ const char *__res = strrchr (gettext (Str), '|');			      \

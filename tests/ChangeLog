@@ -1,3 +1,7 @@
+2017-02-15  Ulf Hermann  <ulf.hermann@qt.io>
+
+	* elfstrmerge.c: Include system.h.
+
 2017-02-09  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* backtrace.c: Add an option to allow unknown symbols in the trace

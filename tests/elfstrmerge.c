@@ -29,6 +29,7 @@
 #include <inttypes.h>
 #include <unistd.h>
 
+#include <system.h>
 #include <gelf.h>
 #include ELFUTILS_HEADER(dwelf)
 #include "elf-knowledge.h"

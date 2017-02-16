@@ -1,5 +1,10 @@
 2017-02-15  Ulf Hermann  <ulf.hermann@qt.io>
 
+	* system.h: Provide mempcpy if it doesn't exist.
+	* xstrndup.c: Include system.h.
+
+2017-02-15  Ulf Hermann  <ulf.hermann@qt.io>
+
 	* crc32_file.c: Use _SC_PAGESIZE rather than _SC_PAGE_SIZE.
 
 2017-02-14  Ulf Hermann  <ulf.hermann@qt.io>

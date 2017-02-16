@@ -34,6 +34,7 @@
 #endif
 
 #include <config.h>
+#include <system.h>
 
 #include "libdwflP.h"
 #include <inttypes.h>

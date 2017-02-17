@@ -1,3 +1,11 @@
+2017-02-17  Ulf hermann  <ulf.hermann@qt.io>
+
+	* Makefile.am: Add libelf_so_DEPS, which include libeu.a,
+	libelf_so_LIBS.
+	(libelf_so_LDLIBS): Add $(libelf_so_DEPS).
+	(libelf.so$(EXEEXT): Use $(libelf_so_LIBS), require libelf.map
+	from the right directory.
+
 2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* libelfP.h: Don't include config.h.

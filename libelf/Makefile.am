@@ -95,16 +95,20 @@ libelf_a_SOURCES = elf_version.c elf_hash.c elf_error.c elf_fill.c \
 libelf_pic_a_SOURCES =
 am_libelf_pic_a_OBJECTS = $(libelf_a_SOURCES:.c=.os)
 
-libelf_so_LDLIBS = -lz
+libelf_so_DEPS = ../lib/libeu.a
+libelf_so_LDLIBS = $(libelf_so_DEPS) -lz
 if USE_LOCKS
 libelf_so_LDLIBS += -lpthread
 endif
 
+libelf_so_LIBS = libelf_pic.a
 libelf_so_SOURCES =
-libelf.so$(EXEEXT): libelf_pic.a libelf.map
-	$(AM_V_CCLD)$(LINK) -shared -o $@ -Wl,--whole-archive,$<,--no-whole-archive \
-		-Wl,--version-script,$(srcdir)/libelf.map,--no-undefined \
-		-Wl,--soname,$@.$(VERSION),-z,defs,-z,relro $(libelf_so_LDLIBS)
+libelf.so$(EXEEXT): $(srcdir)/libelf.map $(libelf_so_LIBS) $(libelf_so_DEPS)
+	$(AM_V_CCLD)$(LINK) -shared -o $@ \
+		-Wl,--soname,$@.$(VERSION),-z,defs,-z,relro \
+		-Wl,--version-script,$<,--no-undefined \
+		-Wl,--whole-archive $(libelf_so_LIBS) -Wl,--no-whole-archive \
+		$(libelf_so_LDLIBS)
 	@$(textrel_check)
 	$(AM_V_at)ln -fs $@ $@.$(VERSION)
 

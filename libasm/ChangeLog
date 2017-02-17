@@ -1,3 +1,14 @@
+2017-02-17  Ulf Hermann  <ulf.hermann@qt.io>
+
+	* Makefile.am: Add libasm_so_DEPS to specify external libraries
+	that have to be linked in, and libasm_so_LIBS to specify the
+	archives libasm consists of. The dependencies include libeu.a.
+	(libasm_so_LDLIBS): Add $(libasm_so_DEPS).
+	(libasm_so$(EXEEXT): Use $(libasm_so_LIBS),
+	add --no-undefined,-z,defs,-z,relro,
+	drop the manual enumeration of dependencies,
+	specify the correct path for libasm.map.
+
 2017-04-27  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* asm_end.c (binary_end): Fix nesting of braces.

@@ -102,17 +102,20 @@ endif
 libdw_pic_a_SOURCES =
 am_libdw_pic_a_OBJECTS = $(libdw_a_SOURCES:.c=.os)
 
+libdw_so_LIBS = libdw_pic.a ../libdwelf/libdwelf_pic.a \
+	  ../libdwfl/libdwfl_pic.a ../libebl/libebl.a
+libdw_so_DEPS = ../lib/libeu.a ../libelf/libelf.so
+libdw_so_LDLIBS = $(libdw_so_DEPS) -ldl -lz $(argp_LDADD) $(zip_LIBS)
 libdw_so_SOURCES =
-libdw.so$(EXEEXT): $(srcdir)/libdw.map libdw_pic.a ../libdwelf/libdwelf_pic.a \
-	  ../libdwfl/libdwfl_pic.a ../libebl/libebl.a \
-	  ../libelf/libelf.so
+libdw.so$(EXEEXT): $(srcdir)/libdw.map $(libdw_so_LIBS) $(libdw_so_DEPS)
 # The rpath is necessary for libebl because its $ORIGIN use will
 # not fly in a setuid executable that links in libdw.
-	$(AM_V_CCLD)$(LINK) -shared -o $@ -Wl,--soname,$@.$(VERSION),-z,defs \
+	$(AM_V_CCLD)$(LINK) -shared -o $@ \
+		-Wl,--soname,$@.$(VERSION),-z,defs,-z,relro \
 		-Wl,--enable-new-dtags,-rpath,$(pkglibdir) \
 		-Wl,--version-script,$<,--no-undefined \
-		-Wl,--whole-archive $(filter-out $<,$^) -Wl,--no-whole-archive\
-		-ldl -lz $(argp_LDADD) $(zip_LIBS)
+		-Wl,--whole-archive $(libdw_so_LIBS) -Wl,--no-whole-archive \
+		$(libdw_so_LDLIBS)
 	@$(textrel_check)
 	$(AM_V_at)ln -fs $@ $@.$(VERSION)
 

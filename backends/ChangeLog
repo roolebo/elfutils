@@ -1,3 +1,9 @@
+2017-02-17  Ulf Hermann  <ulf.hermann@qt.io>
+
+	* Makefile.am: Add libeu.
+	(libebl_%so): Link with --no-undefined,-z,defs,-z,relro
+	and libeu.a.
+
 2017-06-17  Mark Wielaard  <mark@klomp.org>
 
 	* s390_initreg.c: Swap sys/ptrace.h and asm/ptrace.h include order.

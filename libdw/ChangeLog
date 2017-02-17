@@ -1,3 +1,12 @@
+2017-02-17  Ulf Hermann  <ulf.hermann@qt.io>
+
+	* Makefile.am: Add libdw_so_LIBS to specify the archives libdw is is
+	made of, libdw_so_DEPS for libraries it depends on (including
+	libeu.a), libdw_so_LDLIBS to specify libraries libdw links against.
+	(libdw.so$(EXEEXT)): Add $(libdw_so_LDLIBS), remove enumeration of
+	library dependencies, use libdw_so_LIBS rather than relying on the
+	order of dependencies specified, add -z,relro.
+
 2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* libdw.h: Remove attribute macro declarations and use

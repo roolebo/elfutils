@@ -45,6 +45,7 @@ noinst_DATA = $(libebl_pic:_pic.a=.so)
 
 libelf = ../libelf/libelf.so
 libdw = ../libdw/libdw.so
+libeu = ../lib/libeu.a
 
 i386_SRCS = i386_init.c i386_symbol.c i386_corenote.c i386_cfi.c \
 	    i386_retval.c i386_regs.c i386_auxv.c i386_syscall.c \
@@ -129,14 +130,14 @@ libebl_bpf_pic_a_SOURCES = $(bpf_SRCS)
 am_libebl_bpf_pic_a_OBJECTS = $(bpf_SRCS:.c=.os)
 
 
-libebl_%.so libebl_%.map: libebl_%_pic.a $(libelf) $(libdw)
+libebl_%.so libebl_%.map: libebl_%_pic.a $(libelf) $(libdw) $(libeu)
 	@rm -f $(@:.so=.map)
 	$(AM_V_at)echo 'ELFUTILS_$(PACKAGE_VERSION) { global: $*_init; local: *; };' \
 	  > $(@:.so=.map)
 	$(AM_V_CCLD)$(LINK) -shared -o $(@:.map=.so) \
 		-Wl,--whole-archive $< $(cpu_$*) -Wl,--no-whole-archive \
-		-Wl,--version-script,$(@:.so=.map) \
-		-Wl,-z,defs -Wl,--as-needed $(libelf) $(libdw)
+		-Wl,--version-script,$(@:.so=.map),--no-undefined \
+		-Wl,-z,defs,-z,relro -Wl,--as-needed $(libelf) $(libdw) $(libeu)
 	@$(textrel_check)
 
 libebl_i386.so: $(cpu_i386)

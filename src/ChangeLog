@@ -1,5 +1,11 @@
 2017-03-24  Mark Wielaard  <mjw@redhat.com>
 
+	* elfcmp.c (main): If n_namesz == 0 then the note name data is the
+	empty string.
+	* readelf.c (handle_notes_data): Likewise.
+
+2017-03-24  Mark Wielaard  <mjw@redhat.com>
+
 	* readelf.c (handle_gnu_hash): Check inner < max_nsyms before
 	indexing into chain array.
 

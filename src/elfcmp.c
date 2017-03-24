@@ -419,7 +419,8 @@ main (int argc, char *argv[])
 		   && (off1 = gelf_getnote (data1, off1, &note1,
 					    &name_offset, &desc_offset)) > 0)
 	      {
-		const char *name1 = data1->d_buf + name_offset;
+		const char *name1 = (note1.n_namesz == 0
+				     ? "" : data1->d_buf + name_offset);
 		const void *desc1 = data1->d_buf + desc_offset;
 		if (off2 >= data2->d_size)
 		  {
@@ -435,7 +436,8 @@ main (int argc, char *argv[])
 		  error (2, 0, gettext ("\
 cannot read note section [%zu] '%s' in '%s': %s"),
 			 elf_ndxscn (scn2), sname2, fname2, elf_errmsg (-1));
-		const char *name2 = data2->d_buf + name_offset;
+		const char *name2 = (note2.n_namesz == 0
+				     ? "" : data2->d_buf + name_offset);
 		const void *desc2 = data2->d_buf + desc_offset;
 
 		if (note1.n_namesz != note2.n_namesz

@@ -9365,7 +9365,7 @@ handle_notes_data (Ebl *ebl, const GElf_Ehdr *ehdr,
 	 && (offset = gelf_getnote (data, offset,
 				    &nhdr, &name_offset, &desc_offset)) > 0)
     {
-      const char *name = data->d_buf + name_offset;
+      const char *name = nhdr.n_namesz == 0 ? "" : data->d_buf + name_offset;
       const char *desc = data->d_buf + desc_offset;
 
       char buf[100];

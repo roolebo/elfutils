@@ -3263,7 +3263,7 @@ handle_gnu_hash (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx)
 	    ++nsyms;
 	    if (maxlength < ++lengths[cnt])
 	      ++maxlength;
-	    if (inner > max_nsyms)
+	    if (inner >= max_nsyms)
 	      goto invalid_data;
 	  }
 	while ((chain[inner++] & 1) == 0);

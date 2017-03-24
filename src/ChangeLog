@@ -1,3 +1,8 @@
+2017-03-24  Mark Wielaard  <mjw@redhat.com>
+
+	* readelf.c (handle_gnu_hash): Check inner < max_nsyms before
+	indexing into chain array.
+
 2017-02-16  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* addr2line.c: Include printversion.h

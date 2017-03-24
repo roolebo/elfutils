@@ -1,3 +1,8 @@
+2017-03-24  Mark Wielaard  <mark@klomp.org>
+
+	* elf_compress.c (__libelf_decompress): Check insane compression
+	ratios before trying to allocate output buffer.
+
 2016-10-11  Akihiko Odaki  <akihiko.odaki.4i@stu.hosei.ac.jp>
 	    Mark Wielaard  <mjw@redhat.com>
 

@@ -1,3 +1,7 @@
+2017-03-27  Mark Wielaard  <mark@klomp.org>
+
+	* elflint.c (check_symtab_shndx): Check data->d_size.
+
 2017-03-24  Mark Wielaard  <mjw@redhat.com>
 
 	* elfcmp.c (main): If n_namesz == 0 then the note name data is the

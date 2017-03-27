@@ -1,3 +1,8 @@
+2017-03-27  Mark Wielaard  <mark@klomp.org>
+
+	* elf32_updatefile.c (updatemmap): Always update last_positition.
+	(updatefile): Likewise.
+
 2017-03-24  Mark Wielaard  <mark@klomp.org>
 
 	* elf_compress.c (__libelf_decompress): Check insane compression

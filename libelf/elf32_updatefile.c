@@ -343,8 +343,9 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 		  {
 		    fill_mmap (dl->data.d.d_off, last_position, scn_start,
 		               shdr_start, shdr_end);
-		    last_position = scn_start + dl->data.d.d_off;
 		  }
+
+		last_position = scn_start + dl->data.d.d_off;
 
 		if ((scn->flags | dl->flags | elf->flags) & ELF_F_DIRTY)
 		  {
@@ -352,8 +353,6 @@ __elfw2(LIBELFBITS,updatemmap) (Elf *elf, int change_bo, size_t shnum)
 		       layout with overlaps.  We'll overwrite the stupid
 		       user's section data with the latest one, rather than
 		       crashing.  */
-
-		    last_position = scn_start + dl->data.d.d_off;
 
 		    if (unlikely (change_bo))
 		      {
@@ -728,6 +727,8 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 		      }
 		  }
 
+		last_offset = scn_start + dl->data.d.d_off;
+
 		if ((scn->flags | dl->flags | elf->flags) & ELF_F_DIRTY)
 		  {
 		    char tmpbuf[MAX_TMPBUF];
@@ -737,8 +738,6 @@ __elfw2(LIBELFBITS,updatefile) (Elf *elf, int change_bo, size_t shnum)
 		       layout with overlaps.  We'll overwrite the stupid
 		       user's section data with the latest one, rather than
 		       crashing.  */
-
-		    last_offset = scn_start + dl->data.d.d_off;
 
 		    if (unlikely (change_bo))
 		      {

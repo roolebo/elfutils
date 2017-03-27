@@ -1,5 +1,9 @@
 2017-03-27  Mark Wielaard  <mark@klomp.org>
 
+	* elflint.c (check_elf_header): Sanity check phnum and shnum.
+
+2017-03-27  Mark Wielaard  <mark@klomp.org>
+
 	* elflint.c (check_sysv_hash): Return early if section size is
 	too small.
 	(check_sysv_hash64): Likewise.

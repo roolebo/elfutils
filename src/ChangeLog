@@ -1,5 +1,12 @@
 2017-03-27  Mark Wielaard  <mark@klomp.org>
 
+	* elflint.c (check_sysv_hash): Return early if section size is
+	too small.
+	(check_sysv_hash64): Likewise.
+	(check_hash): Calculate expect_entsize to check section size.
+
+2017-03-27  Mark Wielaard  <mark@klomp.org>
+
 	* elflint.c (check_symtab_shndx): Check data->d_size.
 
 2017-03-24  Mark Wielaard  <mjw@redhat.com>

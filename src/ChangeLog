@@ -1,3 +1,7 @@
+2017-03-28  Mark Wielaard  <mark@klomp.org>
+
+	* elflint (check_group): Don't check if there is no flag word.
+
 2017-03-27  Mark Wielaard  <mark@klomp.org>
 
 	* elflint.c (check_elf_header): Sanity check phnum and shnum.

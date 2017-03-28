@@ -2681,9 +2681,12 @@ section [%2d] '%s': section size not multiple of sizeof(Elf32_Word)\n"),
 	       idx, section_name (ebl, idx));
 
       if (data->d_size < elsize)
-	ERROR (gettext ("\
+	{
+	  ERROR (gettext ("\
 section [%2d] '%s': section group without flags word\n"),
 	       idx, section_name (ebl, idx));
+	  return;
+	}
       else if (be_strict)
 	{
 	  if (data->d_size < 2 * elsize)

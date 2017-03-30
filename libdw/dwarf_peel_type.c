@@ -53,7 +53,7 @@ dwarf_peel_type (Dwarf_Die *die, Dwarf_Die *result)
 	 || tag == DW_TAG_atomic_type)
     {
       Dwarf_Attribute attr_mem;
-      Dwarf_Attribute *attr = INTUSE (dwarf_attr_integrate) (die, DW_AT_type,
+      Dwarf_Attribute *attr = INTUSE (dwarf_attr_integrate) (result, DW_AT_type,
 							     &attr_mem);
       if (attr == NULL)
 	return 1;

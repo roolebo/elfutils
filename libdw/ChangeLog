@@ -1,3 +1,8 @@
+2017-03-30  Mark Wielaard  <mjw@redhat.com>
+
+	* dwarf_peel_type.c (dwarf_peel_type): Call dwarf_attr_integrate on
+	result.
+
 2016-10-22  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf.h: Correct spelling of DW_LANG_PLI. Add compatibility define.

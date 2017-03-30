@@ -50,7 +50,8 @@ check_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  test-elf_cntl_gelf_getshdr dwflsyms dwfllines \
 		  dwfl-report-elf-align varlocs backtrace backtrace-child \
 		  backtrace-data backtrace-dwarf debuglink debugaltlink \
-		  buildid deleted deleted-lib.so aggregate_size vdsosyms \
+		  buildid deleted deleted-lib.so aggregate_size peel_type \
+		  vdsosyms \
 		  getsrc_die strptr newdata elfstrtab dwfl-proc-attach \
 		  elfshphehdr elfstrmerge dwelfgnucompressed elfgetchdr \
 		  elfgetzdata elfputzdata zstrptr emptyfile vendorelf \
@@ -121,7 +122,8 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-backtrace-demangle.sh run-stack-d-test.sh run-stack-i-test.sh \
 	run-stack-demangled-test.sh run-readelf-zx.sh run-readelf-zp.sh \
 	run-readelf-dwz-multi.sh run-allfcts-multi.sh run-deleted.sh \
-	run-linkmap-cut.sh run-aggregate-size.sh vdsosyms run-readelf-A.sh \
+	run-linkmap-cut.sh run-aggregate-size.sh run-peel-type.sh \
+	vdsosyms run-readelf-A.sh \
 	run-getsrc-die.sh run-strptr.sh newdata elfstrtab dwfl-proc-attach \
 	elfshphehdr run-lfs-symbols.sh run-dwelfgnucompressed.sh \
 	run-elfgetchdr.sh \
@@ -316,7 +318,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
 	     run-deleted.sh run-linkmap-cut.sh linkmap-cut-lib.so.bz2 \
 	     linkmap-cut.bz2 linkmap-cut.core.bz2 \
 	     run-aggregate-size.sh testfile-sizes1.o.bz2 testfile-sizes2.o.bz2 \
-	     testfile-sizes3.o.bz2 \
+	     testfile-sizes3.o.bz2 run-peel-type.sh \
 	     run-readelf-A.sh testfileppc32attrs.o.bz2 \
 	     testfilesparc64attrs.o.bz2 testfileppc64attrs.o.bz2 \
 	     testfile-debug-types.bz2 \
@@ -474,6 +476,7 @@ deleted_LDADD = ./deleted-lib.so
 deleted_lib_so_LDFLAGS = -shared -rdynamic
 deleted_lib_so_CFLAGS = -fPIC -fasynchronous-unwind-tables
 aggregate_size_LDADD = $(libdw) $(libelf) $(argp_LDADD)
+peel_type_LDADD = $(libdw) $(libelf) $(argp_LDADD)
 vdsosyms_LDADD = $(libdw) $(libelf)
 getsrc_die_LDADD = $(libdw) $(libelf)
 strptr_LDADD = $(libelf)

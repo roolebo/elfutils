@@ -1,3 +1,12 @@
+2017-03-30  Mark Wielaard  <mark@klomp.org>
+
+	* peel_type.c: New file.
+	* run-peel-type.sh: New test.
+	* Makefile.am (check_PROGRAMS): Add peel_type.c.
+	(TESTS): Add run-peel-type.sh.
+	(EXTRA_DIST): Likewise.
+	(peel_type_LDADD): New variable.
+
 2017-03-27  Mark Wielaard  <mark@klomp.org>
 
 	* fillfile.c: New file.

@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2005-2015 Red Hat, Inc.
+# Copyright (C) 2005-2015, 2017 Red Hat, Inc.
 # This file is part of elfutils.
 #
 # This file is free software; you can redistribute it and/or modify
@@ -133,6 +133,24 @@ testrun_on_self()
   for file in $self_test_files; do
       testrun $* $file \
 	  || { echo "*** failure in $* $file"; exit_status=1; }
+  done
+
+  # Only exit if something failed
+  if test $exit_status != 0; then exit $exit_status; fi
+}
+
+# Compress the files first. Compress both debug sections and symtab.
+testrun_on_self_compressed()
+{
+  exit_status=0
+
+  for file in $self_test_files; do
+      tempfiles ${file}z
+      testrun ${abs_top_builddir}/src/elfcompress -f -q -o ${file}z ${file}
+      testrun ${abs_top_builddir}/src/elfcompress -f -q --name='.s??tab' ${file}z
+
+      testrun $* ${file}z \
+	  || { echo "*** failure in $* ${file}z"; exit_status=1; }
   done
 
   # Only exit if something failed

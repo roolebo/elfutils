@@ -1,3 +1,7 @@
+2017-04-05  Mark Wielaard  <mark@klomp.org>
+
+	* elflint.c (check_elf_header): Decompress all sections.
+
 2017-03-28  Mark Wielaard  <mark@klomp.org>
 
 	* elflint (check_group): Don't check if there is no flag word.

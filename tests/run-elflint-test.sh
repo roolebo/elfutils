@@ -33,6 +33,11 @@ testrun ${abs_top_builddir}/src/elflint -q testfile33
 testfiles testfile42
 testrun ${abs_top_builddir}/src/elflint -q --gnu-ld testfile42
 
+# Contains debuginfo, compress it, recheck
+tempfiles testfile42z
+testrun ${abs_top_builddir}/src/elfcompress -f -q -o testfile42z testfile42
+testrun ${abs_top_builddir}/src/elflint -q --gnu-ld testfile42z
+
 testfiles testfile46
 testrun ${abs_top_builddir}/src/elflint -q testfile46
 
@@ -46,5 +51,10 @@ testrun ${abs_top_builddir}/src/elflint -q --gnu-ld testlib_dynseg.so
 # gcc -Xlinker --hash-style=both -o testfile-s390x-hash-both s390x-hash-both.c
 testfiles testfile-s390x-hash-both
 testrun ${abs_top_builddir}/src/elflint -q --gnu-ld testfile-s390x-hash-both
+
+# Compress the symtab/strtab just because and recheck
+tempfiles testfile-s390x-hash-bothz
+testrun ${abs_top_builddir}/src/elfcompress -f -q --name='.s??tab' -o testfile-s390x-hash-bothz testfile-s390x-hash-both
+testrun ${abs_top_builddir}/src/elflint -q --gnu-ld testfile-s390x-hash-bothz
 
 exit 0

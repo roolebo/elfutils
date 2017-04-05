@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2005, 2007 Red Hat, Inc.
+# Copyright (C) 2005, 2007, 2017 Red Hat, Inc.
 # This file is part of elfutils.
 # Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 #
@@ -19,3 +19,4 @@
 . $srcdir/test-subr.sh
 
 testrun_on_self ${abs_top_builddir}/src/elflint --quiet --gnu-ld
+testrun_on_self_compressed ${abs_top_builddir}/src/elflint --quiet --gnu-ld

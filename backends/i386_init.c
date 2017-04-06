@@ -1,5 +1,5 @@
 /* Initialization of i386 specific backend library.
-   Copyright (C) 2000-2009, 2013 Red Hat, Inc.
+   Copyright (C) 2000-2009, 2013, 2017 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -65,6 +65,7 @@ i386_init (Elf *elf __attribute__ ((unused)),
   /* gcc/config/ #define DWARF_FRAME_REGISTERS.  For i386 it is 17, why?  */
   eh->frame_nregs = 9;
   HOOK (eh, set_initial_registers_tid);
+  HOOK (eh, unwind);
 
   return MODVERSION;
 }

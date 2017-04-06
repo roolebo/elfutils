@@ -1,3 +1,12 @@
+2017-04-06  Mark Wielaard  <mark@klomp.org>
+
+	* run-backtrace-fp-core-i386.sh: New test.
+	* backtrace.i386.fp.core.bz2: New test file.
+	* backtrace.i386.fp.exec.bz2: New testfile.
+	* Makefile.am (TESTS): Add run-backtrace-fp-core-i386.sh.
+	(EXTRA_DIST): Add run-backtrace-fp-core-i386.sh,
+	backtrace.i386.fp.core.bz2 and backtrace.i386.fp.exec.bz2.
+
 2017-02-09  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* Makefile.am: Add test for unwinding with frame pointers on x86_64

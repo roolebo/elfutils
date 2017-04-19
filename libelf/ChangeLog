@@ -1,3 +1,7 @@
+2017-04-19  Mark Wielaard  <mark@klomp.org>
+
+	* elf_getarsym.c (elf_getarsym): Initialize n to zero.
+
 2017-03-27  Mark Wielaard  <mark@klomp.org>
 
 	* elf32_updatefile.c (updatemmap): Always update last_positition.

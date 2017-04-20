@@ -74,6 +74,8 @@ write_file (Elf *elf, off_t size, int change_bo, size_t shnum)
 			       MAP_SHARED, elf->fildes, 0);
       if (unlikely (elf->map_address == MAP_FAILED))
 	elf->map_address = NULL;
+      else
+	elf->flags |= ELF_F_MMAPPED;
     }
 
   if (elf->map_address != NULL)

@@ -1,3 +1,8 @@
+2017-04-20  Ulf Hermann <ulf.hermann@qt.io>
+
+	* readelf.c: Replace YESSTR and NOSTR with gettext ("yes") and
+	gettext ("no"), respectively.
+
 2017-04-05  Mark Wielaard  <mark@klomp.org>
 
 	* elflint.c (check_elf_header): Decompress all sections.

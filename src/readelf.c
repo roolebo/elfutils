@@ -6132,7 +6132,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 
       printf ("           %*s%-20s (%s) %s\n",
 	      (int) (level * 2), "", dwarf_attr_name (attr),
-	      dwarf_form_name (form), nl_langinfo (flag ? YESSTR : NOSTR));
+	      dwarf_form_name (form), flag ? gettext ("yes") : gettext ("no"));
       break;
 
     case DW_FORM_flag_present:
@@ -6140,7 +6140,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	break;
       printf ("           %*s%-20s (%s) %s\n",
 	      (int) (level * 2), "", dwarf_attr_name (attr),
-	      dwarf_form_name (form), nl_langinfo (YESSTR));
+	      dwarf_form_name (form), gettext ("yes"));
       break;
 
     case DW_FORM_exprloc:
@@ -7650,7 +7650,7 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 		      if (readp + 1 > readendp)
 			goto invalid_data;
 		      val = *readp++;
-		      printf (" %s", nl_langinfo (val != 0 ? YESSTR : NOSTR));
+		      printf (" %s", val != 0 ? gettext ("yes") : gettext ("no"));
 		      break;
 
 		    case DW_FORM_string:

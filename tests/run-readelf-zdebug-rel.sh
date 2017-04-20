@@ -60,17 +60,17 @@ DWARF section [ 4] '.debug_info' at offset 0x58:
            high_pc              (data8) 24 (0x0000000000000018)
            stmt_list            (sec_offset) 0
  [    2d]    subprogram
-             external             (flag_present) 
+             external             (flag_present) yes
              name                 (strp) "main"
              decl_file            (data1) 1
              decl_line            (data1) 4
-             prototyped           (flag_present) 
+             prototyped           (flag_present) yes
              type                 (ref4) [    80]
              low_pc               (addr) 000000000000000000
              high_pc              (data8) 24 (0x0000000000000018)
              frame_base           (exprloc) 
               [   0] call_frame_cfa
-             GNU_all_call_sites   (flag_present) 
+             GNU_all_call_sites   (flag_present) yes
              sibling              (ref4) [    80]
  [    4e]      formal_parameter
                name                 (strp) "argc"

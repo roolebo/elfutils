@@ -1,5 +1,11 @@
 2017-04-20  Ulf Hermann <ulf.hermann@qt.io>
 
+	* run-readelf-dwz-multi.sh: Expect readelf to output "yes" for flags
+	that are set.
+	* run-readelf-zdebug-rel.sh: Likewise.
+
+2017-04-20  Ulf Hermann <ulf.hermann@qt.io>
+
 	* backtrace-child.c: Include sys/ptrace.h only on linux.
 	* backtrace-dwarf.c: Likewise.
 

@@ -29,9 +29,6 @@
 #ifndef _LIBDWFLP_H
 #define _LIBDWFLP_H	1
 
-#ifndef PACKAGE_NAME
-# include <config.h>
-#endif
 #include <libdwfl.h>
 #include <libebl.h>
 #include <assert.h>

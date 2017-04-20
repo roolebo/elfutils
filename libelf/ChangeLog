@@ -1,5 +1,9 @@
 2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>
 
+	* libelfP.h: Don't include config.h.
+
+2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>
+
 	* elf_begin.c: Use F_GETFD rather than F_GETFL.
 
 2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>

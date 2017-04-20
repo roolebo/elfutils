@@ -1,5 +1,63 @@
 2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>
 
+	* libdwflP.h: Don't include config.h.
+	* argp-std.c: Include config.h.
+	* cu.c: Likewise.
+	* derelocate.c: Likewise.
+	* dwfl_addrdie.c: Likewise.
+	* dwfl_addrdwarf.c: Likewise.
+	* dwfl_addrmodule.c: Likewise.
+	* dwfl_begin.c: Likewise.
+	* dwfl_build_id_find_debuginfo.c: Likewise.
+	* dwfl_build_id_find_elf.c: Likewise.
+	* dwfl_cumodule.c: Likewise.
+	* dwfl_dwarf_line.c: Likewise.
+	* dwfl_end.c: Likewise.
+	* dwfl_frame.c: Likewise.
+	* dwfl_frame_regs.c: Likewise.
+	* dwfl_getdwarf.c: Likewise.
+	* dwfl_getmodules.c: Likewise.
+	* dwfl_getsrc.c: Likewise.
+	* dwfl_getsrclines.c: Likewise.
+	* dwfl_line_comp_dir.c: Likewise.
+	* dwfl_linecu.c: Likewise.
+	* dwfl_lineinfo.c: Likewise.
+	* dwfl_linemodule.c: Likewise.
+	* dwfl_module.c: Likewise.
+	* dwfl_module_addrdie.c: Likewise.
+	* dwfl_module_addrname.c: Likewise.
+	* dwfl_module_addrsym.c: Likewise.
+	* dwfl_module_build_id.c: Likewise.
+	* dwfl_module_dwarf_cfi.c: Likewise.
+	* dwfl_module_eh_cfi.c: Likewise.
+	* dwfl_module_getdarf.c: Likewise.
+	* dwfl_module_getelf.c: Likewise.
+	* dwfl_module_getsrc.c: Likewise.
+	* dwfl_module_getsrc_file.c: Likewise.
+	* dwfl_module_getsym.c: Likewise.
+	* dwfl_module_info.c: Likewise.
+	* dwfl_module_nextcu.c: Likewise.
+	* dwfl_module_register_names.c: Likewise.
+	* dwfl_module_report_build_id.c: Likewise.
+	* dwfl_module_return_value_location.c: Likewise.
+	* dwfl_nextcu.c: Likewise.
+	* dwfl_onesrcline.c: Likewise.
+	* dwfl_report_elf.c: Likewise.
+	* dwfl_validate_address.c: Likewise.
+	* dwfl_version.c: Likewise.
+	* find-debuginfo.c: Likewise.
+	* gzip.c: Likewise.
+	* image-header.c: Likewise.
+	* lines.c: Likewise.
+	* linux-core-attach.c: Likewise.
+	* linux-pid-attach.c: Likewise.
+	* offline.c: Likewise.
+	* open.c: Likewise.
+	* relocate.c: Likewise.
+	* segment.c: Likewise.
+
+2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>
+
 	* libdwfl.h: Use __const_attribute__.
 
 2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>

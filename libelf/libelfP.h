@@ -30,10 +30,6 @@
 #ifndef _LIBELFP_H
 #define _LIBELFP_H 1
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
-
 #include <ar.h>
 #include <gelf.h>
 

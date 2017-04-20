@@ -1,5 +1,9 @@
 2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>
 
+	* elf-from-memory.c: Explicitly cast phnum to size_t.
+
+2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>
+
 	* dwfl_module_getdwarf.c: Check shnum for 0 before subtracting from
 	it.
 

@@ -172,7 +172,7 @@ elf_from_remote_memory (GElf_Addr ehdr_vma,
     {
       /* Read in the program headers.  */
 
-      if (initial_bufsize < phnum * phentsize)
+      if (initial_bufsize < (size_t)phnum * phentsize)
 	{
 	  unsigned char *newbuf = realloc (buffer, phnum * phentsize);
 	  if (newbuf == NULL)

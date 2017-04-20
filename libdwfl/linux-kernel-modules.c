@@ -156,11 +156,18 @@ try_kernel_name (Dwfl *dwfl, char **fname, bool try_debug)
 static inline const char *
 kernel_release (void)
 {
+#ifdef __linux__
   /* Cache the `uname -r` string we'll use.  */
   static struct utsname utsname;
   if (utsname.release[0] == '\0' && uname (&utsname) != 0)
     return NULL;
   return utsname.release;
+#else
+  /* Used for finding the running linux kernel, which isn't supported
+     on non-linux kernel systems.  */
+  errno = ENOTSUP;
+  return NULL;
+#endif
 }
 
 static int

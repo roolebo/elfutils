@@ -67,7 +67,13 @@ compare_secrefs (const void *a, const void *b)
   if ((*p1)->start > (*p2)->start)
     return 1;
 
-  return 0;
+  if ((*p1)->end < (*p2)->end)
+    return -1;
+  if ((*p1)->end > (*p2)->end)
+    return 1;
+
+  /* Same start/end, then just compare which section came first.  */
+  return elf_ndxscn ((*p1)->scn) - elf_ndxscn ((*p2)->scn);
 }
 
 static int

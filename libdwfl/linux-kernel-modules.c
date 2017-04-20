@@ -28,8 +28,11 @@
 
 /* In case we have a bad fts we include this before config.h because it
    can't handle _FILE_OFFSET_BITS.
-   Everything we need here is fine if its declarations just come first.  */
+   Everything we need here is fine if its declarations just come first.
+   Also, include sys/types.h before fts. On some systems fts.h is not self
+   contained. */
 #ifdef BAD_FTS
+  #include <sys/types.h>
   #include <fts.h>
 #endif
 
@@ -55,6 +58,7 @@
     #define fopen fopen64
   #endif
 #else
+  #include <sys/types.h>
   #include <fts.h>
 #endif
 

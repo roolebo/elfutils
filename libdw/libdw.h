@@ -34,23 +34,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-
-#if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 3)
-# define __nonnull_attribute__(...) __attribute__ ((__nonnull__ (__VA_ARGS__)))
-# define __deprecated_attribute__ __attribute__ ((__deprecated__))
-#else
-# define __nonnull_attribute__(args...)
-# define __deprecated_attribute__
-#endif
-
-
-#ifdef __GNUC_STDC_INLINE__
-# define __libdw_extern_inline extern __inline __attribute__ ((__gnu_inline__))
-#else
-# define __libdw_extern_inline extern __inline
-#endif
-
-
 /* Mode for the session.  */
 typedef enum
   {
@@ -242,11 +225,7 @@ typedef struct Dwarf Dwarf;
 
 
 /* Out-Of-Memory handler.  */
-#if __GNUC__ < 4
-typedef void (*Dwarf_OOM) (void);
-#else
-typedef void (*__attribute__ ((noreturn)) Dwarf_OOM) (void);
-#endif
+typedef void (*__noreturn_attribute__ Dwarf_OOM) (void);
 
 
 #ifdef __cplusplus

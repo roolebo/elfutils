@@ -1,5 +1,9 @@
 2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>
 
+	* libdwfl.h: Use __const_attribute__.
+
+2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>
+
 	* elf-from-memory.c: Explicitly cast phnum to size_t.
 
 2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>

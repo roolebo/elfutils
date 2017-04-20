@@ -385,7 +385,7 @@ extern int dwfl_linux_proc_find_elf (Dwfl_Module *mod, void **userdata,
 
 /* Standard argument parsing for using a standard callback set.  */
 struct argp;
-extern const struct argp *dwfl_standard_argp (void) __attribute__ ((const));
+extern const struct argp *dwfl_standard_argp (void) __const_attribute__;
 
 
 /*** Relocation of addresses from Dwfl ***/

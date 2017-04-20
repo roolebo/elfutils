@@ -1,5 +1,10 @@
 2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>
 
+	* libelf.h: Define macros for various function attributes and use
+	them.
+
+2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>
+
 	* elf_update.c: Set ELF_F_MMAPPED flag if we mmap from elf_update.
 
 2017-04-19  Mark Wielaard  <mark@klomp.org>

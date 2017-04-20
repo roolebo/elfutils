@@ -73,13 +73,13 @@ extern void ebl_closebackend (Ebl *bh);
 /* Information about the descriptor.  */
 
 /* Get ELF machine.  */
-extern int ebl_get_elfmachine (Ebl *ebl) __attribute__ ((__pure__));
+extern int ebl_get_elfmachine (Ebl *ebl) __pure_attribute__;
 
 /* Get ELF class.  */
-extern int ebl_get_elfclass (Ebl *ebl) __attribute__ ((__pure__));
+extern int ebl_get_elfclass (Ebl *ebl) __pure_attribute__;
 
 /* Get ELF data encoding.  */
-extern int ebl_get_elfdata (Ebl *ebl) __attribute__ ((__pure__));
+extern int ebl_get_elfdata (Ebl *ebl) __pure_attribute__;
 
 
 /* Function to call the callback functions including default ELF

@@ -1,5 +1,10 @@
 2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>
 
+	* libdw.h: Remove attribute macro declarations and use
+	__noreturn_attribute__ as defined in libelf.h.
+
+2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>
+
 	* dwarf_begin_elf.c: Include endian.h.
 
 2017-03-30  Mark Wielaard  <mjw@redhat.com>

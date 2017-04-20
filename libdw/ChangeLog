@@ -1,3 +1,7 @@
+2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>
+
+	* dwarf_begin_elf.c: Include endian.h.
+
 2017-03-30  Mark Wielaard  <mjw@redhat.com>
 
 	* dwarf_peel_type.c (dwarf_peel_type): Call dwarf_attr_integrate on

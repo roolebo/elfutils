@@ -309,10 +309,10 @@ instr:		  bytes ':' bitfieldopt kID bitfieldopt optargs
 			  newp->mnemonic = $4;
 			  if (newp->mnemonic != (void *) -1l
 			      && tfind ($4, &mnemonics,
-					(comparison_fn_t) strcmp) == NULL)
+					(int (*)(const void *, const void *)) strcmp) == NULL)
 			    {
 			      if (tsearch ($4, &mnemonics,
-					   (comparison_fn_t) strcmp) == NULL)
+					   (int (*)(const void *, const void *)) strcmp) == NULL)
 				error (EXIT_FAILURE, errno, "tsearch");
 			      ++nmnemonics;
 			    }

@@ -1,3 +1,7 @@
+2017-04-20  Ulf Hermann <ulf.hermann@qt.io>
+
+	* i386_parse.y: Eliminate comparison_fn_t.
+
 2016-11-02  Mark Wielaard  <mjw@redhat.com>
 
 	* i386_disasm.c (i386_disasm): Add fallthrough comment.

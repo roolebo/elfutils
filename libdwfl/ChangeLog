@@ -1,5 +1,10 @@
 2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>
 
+	* dwfl_module_getdwarf.c: Check shnum for 0 before subtracting from
+	it.
+
+2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>
+
 	* dwfl_frame.c: Drop unused sys/ptrace.h include.
 	* frame_unwind.c: Likewise.
 	* linux-pid-attach.c: Include sys/ptrace.h and sys/syscall.h only on

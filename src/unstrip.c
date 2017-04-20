@@ -1027,21 +1027,24 @@ find_alloc_sections_prelink (Elf *debug, Elf_Data *debug_shstrtab,
 	  shnum = ehdr.e64.e_shnum;
 	}
 
+      bool class32 = ehdr.e32.e_ident[EI_CLASS] == ELFCLASS32;
+      size_t shsize = class32 ? sizeof (Elf32_Shdr) : sizeof (Elf64_Shdr);
+      if (unlikely (shnum == 0 || shnum > SIZE_MAX / shsize + 1))
+	error (EXIT_FAILURE, 0, _("overflow with shnum = %zu in '%s' section"),
+	       (size_t) shnum, ".gnu.prelink_undo");
+
+      --shnum;
+
       size_t phsize = gelf_fsize (main, ELF_T_PHDR, phnum, EV_CURRENT);
       src.d_buf += src.d_size + phsize;
-      src.d_size = gelf_fsize (main, ELF_T_SHDR, shnum - 1, EV_CURRENT);
+      src.d_size = gelf_fsize (main, ELF_T_SHDR, shnum, EV_CURRENT);
       src.d_type = ELF_T_SHDR;
       if ((size_t) (src.d_buf - undodata->d_buf) > undodata->d_size
 	  || undodata->d_size - (src.d_buf - undodata->d_buf) != src.d_size)
 	error (EXIT_FAILURE, 0, _("invalid contents in '%s' section"),
 	       ".gnu.prelink_undo");
 
-      bool class32 = ehdr.e32.e_ident[EI_CLASS] == ELFCLASS32;
-      size_t shsize = class32 ? sizeof (Elf32_Shdr) : sizeof (Elf64_Shdr);
-      if (unlikely ((shnum - 1) > SIZE_MAX / shsize))
-	error (EXIT_FAILURE, 0, _("overflow with shnum = %zu in '%s' section"),
-	       (size_t) shnum, ".gnu.prelink_undo");
-      const size_t shdr_bytes = (shnum - 1) * shsize;
+      const size_t shdr_bytes = shnum * shsize;
       void *shdr = xmalloc (shdr_bytes);
       dst.d_buf = shdr;
       dst.d_size = shdr_bytes;
@@ -1049,12 +1052,12 @@ find_alloc_sections_prelink (Elf *debug, Elf_Data *debug_shstrtab,
 				main_ehdr->e_ident[EI_DATA]) != NULL,
 		 _("cannot read '.gnu.prelink_undo' section: %s"));
 
-      undo_sections = xmalloc ((shnum - 1) * sizeof undo_sections[0]);
-      for (size_t i = 0; i < shnum - 1; ++i)
+      undo_sections = xmalloc (shnum * sizeof undo_sections[0]);
+      for (size_t i = 0; i < shnum; ++i)
 	{
 	  struct section *sec = &undo_sections[undo_nalloc];
-	  Elf32_Shdr (*s32)[shnum - 1] = shdr;
-	  Elf64_Shdr (*s64)[shnum - 1] = shdr;
+	  Elf32_Shdr (*s32)[shnum] = shdr;
+	  Elf64_Shdr (*s64)[shnum] = shdr;
 	  if (class32)
 	    {
 #define COPY(field) sec->shdr.field = (*s32)[i].field

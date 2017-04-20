@@ -1,3 +1,7 @@
+2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>
+
+	* unstrip.c: Check shnum for 0 before subtracting from it.
+
 2017-04-20  Ulf Hermann <ulf.hermann@qt.io>
 
 	* readelf.c: Replace YESSTR and NOSTR with gettext ("yes") and

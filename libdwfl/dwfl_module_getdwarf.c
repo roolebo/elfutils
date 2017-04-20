@@ -349,11 +349,13 @@ find_prelink_address_sync (Dwfl_Module *mod, struct dwfl_file *file)
 
   /* Since prelink does not store the zeroth section header in the undo
      section, it cannot support SHN_XINDEX encoding.  */
-  if (unlikely (shnum >= SHN_LORESERVE)
+  if (unlikely (shnum >= SHN_LORESERVE) || unlikely(shnum == 0)
       || unlikely (undodata->d_size != (src.d_size
 					+ phnum * phentsize
 					+ (shnum - 1) * shentsize)))
     return DWFL_E_BAD_PRELINK;
+
+  --shnum;
 
   /* We look at the allocated SHT_PROGBITS (or SHT_NOBITS) sections.  (Most
      every file will have some SHT_PROGBITS sections, but it's possible to
@@ -431,12 +433,12 @@ find_prelink_address_sync (Dwfl_Module *mod, struct dwfl_file *file)
 
   src.d_buf += src.d_size;
   src.d_type = ELF_T_SHDR;
-  src.d_size = gelf_fsize (mod->main.elf, ELF_T_SHDR, shnum - 1, EV_CURRENT);
+  src.d_size = gelf_fsize (mod->main.elf, ELF_T_SHDR, shnum, EV_CURRENT);
 
   size_t shdr_size = class32 ? sizeof (Elf32_Shdr) : sizeof (Elf64_Shdr);
-  if (unlikely (shnum - 1  > SIZE_MAX / shdr_size))
+  if (unlikely (shnum > SIZE_MAX / shdr_size))
     return DWFL_E_NOMEM;
-  const size_t shdrs_bytes = (shnum - 1) * shdr_size;
+  const size_t shdrs_bytes = shnum * shdr_size;
   void *shdrs = malloc (shdrs_bytes);
   if (unlikely (shdrs == NULL))
     return DWFL_E_NOMEM;
@@ -488,16 +490,16 @@ find_prelink_address_sync (Dwfl_Module *mod, struct dwfl_file *file)
       highest = 0;
       if (class32)
 	{
-	  Elf32_Shdr (*s32)[shnum - 1] = shdrs;
-	  for (size_t i = 0; i < shnum - 1; ++i)
+	  Elf32_Shdr (*s32)[shnum] = shdrs;
+	  for (size_t i = 0; i < shnum; ++i)
 	    consider_shdr (undo_interp, (*s32)[i].sh_type,
 			   (*s32)[i].sh_flags, (*s32)[i].sh_addr,
 			   (*s32)[i].sh_size, &highest);
 	}
       else
 	{
-	  Elf64_Shdr (*s64)[shnum - 1] = shdrs;
-	  for (size_t i = 0; i < shnum - 1; ++i)
+	  Elf64_Shdr (*s64)[shnum] = shdrs;
+	  for (size_t i = 0; i < shnum; ++i)
 	    consider_shdr (undo_interp, (*s64)[i].sh_type,
 			   (*s64)[i].sh_flags, (*s64)[i].sh_addr,
 			   (*s64)[i].sh_size, &highest);

@@ -6,6 +6,12 @@
 
 2017-02-09  Ulf Hermann  <ulf.hermann@qt.io>
 
+	* aarch64_unwind.c: New file
+	* Makefile.am (aarch64_SRCS): Add aarch64_unwind.c
+	* aarch64_init.c (aarch64_init): Hook aarch64_unwind
+
+2017-02-09  Ulf Hermann  <ulf.hermann@qt.io>
+
 	* x86_64_unwind.c: New file
 	* Makefile.am (x86_64_SRCS): Add x86_64_unwind.c
 	* x86_64_init.c (x86_64_init): Hook x86_64_unwind

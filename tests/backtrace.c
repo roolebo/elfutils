@@ -90,6 +90,10 @@ callback_verify (pid_t tid, unsigned frameno, Dwarf_Addr pc,
       return;
     }
   Dwfl_Module *mod;
+  /* See case 4. Special case to help out simple frame pointer unwinders. */
+  static bool duplicate_sigusr2 = false;
+  if (duplicate_sigusr2)
+    frameno--;
   static bool reduce_frameno = false;
   if (reduce_frameno)
     frameno--;
@@ -125,6 +129,14 @@ callback_verify (pid_t tid, unsigned frameno, Dwarf_Addr pc,
 	}
       /* FALLTHRU */
     case 4:
+      /* Some simple frame unwinders get this wrong and think sigusr2
+	 is calling itself again. Allow it and just pretend there is
+	 an extra sigusr2 frame. */
+      if (symname != NULL && strcmp (symname, "sigusr2") == 0)
+	{
+	  duplicate_sigusr2 = true;
+	  break;
+	}
       assert (symname != NULL && strcmp (symname, "stdarg") == 0);
       break;
     case 5:

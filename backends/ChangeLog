@@ -1,3 +1,11 @@
+2017-04-20  Ulf Hermann <ulf.hermann@qt.io>
+
+	* aarch64_initreg.c: Compile register initialization only on linux.
+	* arm_initreg.c: Likewise.
+	* ppc_initreg.c: Likewise.
+	* s390_initreg.c: Likewise.
+	* x86_64_initreg.c: Likewise.
+
 2017-02-15  Mark Wielaard  <mark@klomp.org>
 
 	* ppc64_init.c (ppc64_init): Add check_object_attribute HOOK.

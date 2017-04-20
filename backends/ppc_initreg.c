@@ -32,7 +32,7 @@
 
 #include "system.h"
 #include <stdlib.h>
-#ifdef __powerpc__
+#if defined(__powerpc__) && defined(__linux__)
 # include <sys/user.h>
 # include <sys/ptrace.h>
 #endif
@@ -70,7 +70,7 @@ ppc_set_initial_registers_tid (pid_t tid __attribute__ ((unused)),
 			  ebl_tid_registers_t *setfunc __attribute__ ((unused)),
 			       void *arg __attribute__ ((unused)))
 {
-#ifndef __powerpc__
+#if !defined(__powerpc__) || !defined(__linux__)
   return false;
 #else /* __powerpc__ */
   union

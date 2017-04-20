@@ -27,7 +27,6 @@
    not, see <http://www.gnu.org/licenses/>.  */
 
 #include "libdwflP.h"
-#include <sys/ptrace.h>
 #include <unistd.h>
 
 /* Set STATE->pc_set from STATE->regs according to the backend.  Return true on

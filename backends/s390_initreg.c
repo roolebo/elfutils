@@ -32,7 +32,7 @@
 
 #include "system.h"
 #include <assert.h>
-#ifdef __s390__
+#if defined(__s390__) && defined(__linux__)
 # include <sys/user.h>
 # include <asm/ptrace.h>
 # include <sys/ptrace.h>
@@ -46,7 +46,7 @@ s390_set_initial_registers_tid (pid_t tid __attribute__ ((unused)),
 			  ebl_tid_registers_t *setfunc __attribute__ ((unused)),
 				void *arg __attribute__ ((unused)))
 {
-#ifndef __s390__
+#if !defined(__s390__) || !defined(__linux__)
   return false;
 #else /* __s390__ */
   struct user user_regs;

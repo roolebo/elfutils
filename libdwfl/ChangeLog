@@ -1,5 +1,12 @@
 2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>
 
+	* dwfl_frame.c: Drop unused sys/ptrace.h include.
+	* frame_unwind.c: Likewise.
+	* linux-pid-attach.c: Include sys/ptrace.h and sys/syscall.h only on
+	linux.
+
+2017-04-20  Ulf Hermann <ulf.hermann@qt.io>
+
 	* linux-kernel-modules.c: Include sys/types.h before fts.h
 
 2017-03-24  Mark Wielaard  <mark@klomp.org>

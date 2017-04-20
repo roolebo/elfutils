@@ -83,7 +83,6 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <errno.h>
-#include <sys/ptrace.h>
 #include <string.h>
 #include <pthread.h>
 #include <stdio.h>
@@ -100,6 +99,7 @@ main (int argc __attribute__ ((unused)), char **argv)
 }
 
 #else /* __linux__ */
+#include <sys/ptrace.h>
 
 #if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
 #define NOINLINE_NOCLONE __attribute__ ((noinline, noclone))

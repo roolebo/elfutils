@@ -30,6 +30,7 @@
 # include <config.h>
 #endif
 
+#ifdef __linux__
 #if defined __arm__
 # include <sys/types.h>
 # include <sys/user.h>
@@ -45,6 +46,7 @@
 #  define user_regs_struct user_pt_regs
 # endif
 #endif
+#endif
 
 #define BACKEND arm_
 #include "libebl_CPU.h"
@@ -54,7 +56,7 @@ arm_set_initial_registers_tid (pid_t tid __attribute__ ((unused)),
 			  ebl_tid_registers_t *setfunc __attribute__ ((unused)),
 			       void *arg __attribute__ ((unused)))
 {
-#if !defined __arm__ && !defined __aarch64__
+#if !defined(__linux__) || (!defined __arm__ && !defined __aarch64__)
   return false;
 #else	/* __arm__ || __aarch64__ */
 #if defined __arm__

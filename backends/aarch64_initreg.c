@@ -32,7 +32,7 @@
 
 #include "system.h"
 #include <assert.h>
-#ifdef __aarch64__
+#if defined(__aarch64__) && defined(__linux__)
 # include <linux/uio.h>
 # include <sys/user.h>
 # include <sys/ptrace.h>
@@ -51,7 +51,7 @@ aarch64_set_initial_registers_tid (pid_t tid __attribute__ ((unused)),
 			  ebl_tid_registers_t *setfunc __attribute__ ((unused)),
 				void *arg __attribute__ ((unused)))
 {
-#ifndef __aarch64__
+#if !defined(__aarch64__) || !defined(__linux__)
   return false;
 #else /* __aarch64__ */
 

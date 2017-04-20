@@ -31,7 +31,7 @@
 #endif
 
 #include <stdlib.h>
-#ifdef __x86_64__
+#if defined(__x86_64__) && defined(__linux__)
 # include <sys/user.h>
 # include <sys/ptrace.h>
 #endif

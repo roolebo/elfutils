@@ -1,3 +1,8 @@
+2017-04-20  Ulf Hermann <ulf.hermann@qt.io>
+
+	* backtrace-child.c: Include sys/ptrace.h only on linux.
+	* backtrace-dwarf.c: Likewise.
+
 2017-04-05  Mark Wielaard  <mark@klomp.org>
 
 	* test-subr.sh (testrun_on_self_compressed): New function.

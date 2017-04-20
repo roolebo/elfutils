@@ -34,7 +34,6 @@
 #include <stdlib.h>
 #include "libdwflP.h"
 #include "../libdw/dwarf.h"
-#include <sys/ptrace.h>
 #include <system.h>
 
 /* Maximum number of DWARF expression stack slots before returning an error.  */

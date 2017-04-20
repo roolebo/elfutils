@@ -24,7 +24,6 @@
 #include <errno.h>
 #include <error.h>
 #include <unistd.h>
-#include <sys/ptrace.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include ELFUTILS_HEADER(dwfl)
@@ -40,6 +39,7 @@ main (int argc __attribute__ ((unused)), char **argv)
 }
 
 #else /* __linux__ */
+#include <sys/ptrace.h>
 
 #define main cleanup_13_main
 #include "cleanup-13.c"

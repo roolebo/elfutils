@@ -1075,7 +1075,7 @@ elf_begin (int fildes, Elf_Cmd cmd, Elf *ref)
   if (ref != NULL)
     /* Make sure the descriptor is not suddenly going away.  */
     rwlock_rdlock (ref->lock);
-  else if (unlikely (fcntl (fildes, F_GETFL) == -1 && errno == EBADF))
+  else if (unlikely (fcntl (fildes, F_GETFD) == -1 && errno == EBADF))
     {
       /* We cannot do anything productive without a file descriptor.  */
       __libelf_seterrno (ELF_E_INVALID_FILE);

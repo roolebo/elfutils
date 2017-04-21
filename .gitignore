@@ -123,6 +123,7 @@ Makefile.in
 /tests/elfstrmerge
 /tests/elfstrtab
 /tests/emptyfile
+/tests/fillfile
 /tests/find-prologues
 /tests/funcretval
 /tests/funcscopes
@@ -139,6 +140,7 @@ Makefile.in
 /tests/newdata
 /tests/newfile
 /tests/newscn
+/tests/peel_type
 /tests/rdwrmmap
 /tests/rerequest_tag
 /tests/saridx

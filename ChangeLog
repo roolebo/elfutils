@@ -1,3 +1,7 @@
+2017-04-21  Ulf Hermann  <ulf.hermann@qt.io>
+
+	* .gitignore: Add fillfile and peel_type tests.
+
 2017-02-15  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* configure.ac: Add check for mempcpy.

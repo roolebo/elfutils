@@ -1,3 +1,9 @@
+2017-04-24  Mark Wielaard  <mark@klomp.org>
+
+	* backtrace.c: Remove option to allow unknown symbols in the trace.
+	* backtrace-substr.sh: Remove option to allow unknown symbols
+	to check_core() and allow failed symbol lookups in check_err().
+
 2017-04-20  Ulf Hermann <ulf.hermann@qt.io>
 
 	* run-readelf-dwz-multi.sh: Expect readelf to output "yes" for flags

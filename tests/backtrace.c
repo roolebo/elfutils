@@ -64,7 +64,6 @@ dump_modules (Dwfl_Module *mod, void **userdata __attribute__ ((unused)),
   return DWARF_CB_OK;
 }
 
-static bool allow_unknown;
 static bool use_raise_jmp_patching;
 static pid_t check_tid;
 
@@ -79,8 +78,7 @@ callback_verify (pid_t tid, unsigned frameno, Dwarf_Addr pc,
     seen_main = true;
   if (pc == 0)
     {
-      if (!allow_unknown)
-        assert (seen_main);
+      assert (seen_main);
       return;
     }
   if (check_tid == 0)
@@ -105,12 +103,11 @@ callback_verify (pid_t tid, unsigned frameno, Dwarf_Addr pc,
 	       && (strcmp (symname, "__kernel_vsyscall") == 0
 		   || strcmp (symname, "__libc_do_syscall") == 0))
 	reduce_frameno = true;
-      else if (!allow_unknown || symname)
+      else
 	assert (symname && strcmp (symname, "raise") == 0);
       break;
     case 1:
-      if (!allow_unknown || symname)
-        assert (symname != NULL && strcmp (symname, "sigusr2") == 0);
+      assert (symname != NULL && strcmp (symname, "sigusr2") == 0);
       break;
     case 2: // x86_64 only
       /* __restore_rt - glibc maybe does not have to have this symbol.  */
@@ -119,24 +116,20 @@ callback_verify (pid_t tid, unsigned frameno, Dwarf_Addr pc,
       if (use_raise_jmp_patching)
 	{
 	  /* Verify we trapped on the very first instruction of jmp.  */
-          if (!allow_unknown || symname)
-            assert (symname != NULL && strcmp (symname, "jmp") == 0);
+	  assert (symname != NULL && strcmp (symname, "jmp") == 0);
 	  mod = dwfl_addrmodule (dwfl, pc - 1);
 	  if (mod)
 	    symname2 = dwfl_module_addrname (mod, pc - 1);
-          if (!allow_unknown || symname2)
-            assert (symname2 == NULL || strcmp (symname2, "jmp") != 0);
+	  assert (symname2 == NULL || strcmp (symname2, "jmp") != 0);
 	  break;
 	}
       /* FALLTHRU */
     case 4:
-      if (!allow_unknown || symname)
-        assert (symname != NULL && strcmp (symname, "stdarg") == 0);
+      assert (symname != NULL && strcmp (symname, "stdarg") == 0);
       break;
     case 5:
       /* Verify we trapped on the very last instruction of child.  */
-      if (!allow_unknown || symname)
-        assert (symname != NULL && strcmp (symname, "backtracegen") == 0);
+      assert (symname != NULL && strcmp (symname, "backtracegen") == 0);
       mod = dwfl_addrmodule (dwfl, pc);
       if (mod)
 	symname2 = dwfl_module_addrname (mod, pc);
@@ -145,7 +138,7 @@ callback_verify (pid_t tid, unsigned frameno, Dwarf_Addr pc,
       // there is no guarantee that the compiler doesn't reorder the
       // instructions or even inserts some padding instructions at the end
       // (which apparently happens on ppc64).
-      if (use_raise_jmp_patching && (!allow_unknown || symname2))
+      if (use_raise_jmp_patching)
         assert (symname2 == NULL || strcmp (symname2, "backtracegen") != 0);
       break;
   }
@@ -431,12 +424,10 @@ exec_dump (const char *exec)
 }
 
 #define OPT_BACKTRACE_EXEC 0x100
-#define OPT_ALLOW_UNKNOWN 0x200
 
 static const struct argp_option options[] =
   {
     { "backtrace-exec", OPT_BACKTRACE_EXEC, "EXEC", 0, N_("Run executable"), 0 },
-    { "allow-unknown", OPT_ALLOW_UNKNOWN, 0, 0, N_("Allow unknown symbols"), 0 },
     { NULL, 0, NULL, 0, NULL, 0 }
   };
 
@@ -453,10 +444,6 @@ parse_opt (int key, char *arg, struct argp_state *state)
     case OPT_BACKTRACE_EXEC:
       exec_dump (arg);
       exit (0);
-
-    case OPT_ALLOW_UNKNOWN:
-      allow_unknown = true;
-      break;
 
     default:
       return ARGP_ERR_UNKNOWN;
@@ -476,7 +463,6 @@ main (int argc __attribute__ ((unused)), char **argv)
   (void) setlocale (LC_ALL, "");
 
   elf_version (EV_CURRENT);
-  allow_unknown = false;
 
   Dwfl *dwfl = NULL;
   const struct argp_child argp_children[] =

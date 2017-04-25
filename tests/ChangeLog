@@ -1,3 +1,10 @@
+2017-04-25  Mark Wielaard  <mark@klomp.org>
+
+	* backtrace-subr.sh (check_backtracegen): New function.
+	(check_core): Add check_backtracegen call.
+	* backtrace.ppc.exec.bz2: Regenerated.
+	* backtrace.ppc.core.bz2: Likewise.
+
 2017-04-24  Mark Wielaard  <mark@klomp.org>
 
 	* backtrace.c: Remove option to allow unknown symbols in the trace.

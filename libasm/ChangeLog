@@ -1,3 +1,7 @@
+2017-04-27  Ulf Hermann  <ulf.hermann@qt.io>
+
+	* asm_end.c (binary_end): Fix nesting of braces.
+
 2017-02-12  Mark Wielaard  <mjw@redhat.com>
 
 	* asm_newsym.c (asm_newsym): Increase TEMPSYMLEN to 13.

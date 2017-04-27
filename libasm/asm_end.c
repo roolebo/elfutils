@@ -464,7 +464,7 @@ binary_end (AsmCtx_t *ctx)
   gelf_update_ehdr (ctx->out.elf, ehdr);
 
   /* Write out the ELF file.  */
-  if (unlikely (elf_update (ctx->out.elf, ELF_C_WRITE_MMAP)) < 0)
+  if (unlikely (elf_update (ctx->out.elf, ELF_C_WRITE_MMAP) < 0))
     {
       __libasm_seterrno (ASM_E_LIBELF);
       result = -1;

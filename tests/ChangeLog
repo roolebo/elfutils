@@ -1,3 +1,7 @@
+2017-05-04  Ulf Hermann  <ulf.hermann@qt.io>
+
+	* elfshphehdr.c: For writing, use /dev/null rather than /dev/zero.
+
 2017-07-14  Mark Wielaard  <mark@klomp.org>
 
 	* run-strip-remove-keep.sh: New test.

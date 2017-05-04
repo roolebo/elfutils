@@ -152,7 +152,7 @@ main (int argc __attribute__ ((unused)), char **argv __attribute ((unused)))
 {
   elf_version (EV_CURRENT);
 
-  int fd = fd = open("/dev/zero", O_WRONLY);
+  int fd = open("/dev/null", O_WRONLY);
   check ("open", fd >= 0);
 
   Elf *elf;

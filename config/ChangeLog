@@ -1,3 +1,7 @@
+2016-05-05  Mark Wielaard  <mark@klomp.org>
+
+	* elfutils.spec.in: Update for 0.169.
+
 2016-12-27  Mark Wielaard  <mjw@redhat.com>
 
 	* elfutils.spec.in: Update for 0.168 and new project location.

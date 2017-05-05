@@ -227,6 +227,11 @@ rm -rf ${RPM_BUILD_ROOT}
 %config(noreplace) %{_sysctldir}/10-default-yama-scope.conf
 
 %changelog
+* Fri May  5 2017 Mark Wielaard <mark@klomp.org> 0.169-1
+- backends: Add support for EM_PPC64 GNU_ATTRIBUTES.
+  Frame pointer unwinding fallback support for i386, x86_64, aarch64.
+- translations: Update Polish translation.
+
 * Tue Dec 27 2016 Mark Wielaard <mark@klomp.org> 0.168-1
 - http://elfutils.org/ is now hosted at http://sourceware.org/elfutils/
 - libelf: gelf_newehdr and gelf_newehdr now return void *.

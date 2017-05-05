@@ -1,3 +1,7 @@
+2017-05-05  Mark Wielaard  <mark@klomp.org>
+
+	* printversion.c (print_version): Update copyright year.
+
 2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* crc32.c: include config.h.

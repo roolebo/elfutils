@@ -628,7 +628,8 @@ __libdw_offset_in_section (Dwarf *dbg, int sec_index,
   if (data == NULL)
     return -1;
   if (unlikely (offset > data->d_size)
-      || unlikely (data->d_size - offset < size))
+      || unlikely (data->d_size < size)
+      || unlikely (offset > data->d_size - size))
     {
       __libdw_seterrno (DWARF_E_INVALID_OFFSET);
       return -1;
@@ -645,7 +646,8 @@ __libdw_in_section (Dwarf *dbg, int sec_index,
   if (data == NULL)
     return false;
   if (unlikely (addr < data->d_buf)
-      || unlikely (data->d_size - (addr - data->d_buf) < size))
+      || unlikely (data->d_size < size)
+      || unlikely ((size_t)(addr - data->d_buf) > data->d_size - size))
     {
       __libdw_seterrno (DWARF_E_INVALID_OFFSET);
       return false;

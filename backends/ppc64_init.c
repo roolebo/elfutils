@@ -73,6 +73,7 @@ ppc64_init (Elf *elf __attribute__ ((unused)),
   eh->frame_nregs = (114 - 1) + 32;
   HOOK (eh, set_initial_registers_tid);
   HOOK (eh, dwarf_to_regno);
+  HOOK (eh, unwind);
   HOOK (eh, resolve_sym_value);
 
   /* Find the function descriptor .opd table for resolve_sym_value.  */

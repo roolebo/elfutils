@@ -1,3 +1,9 @@
+2017-05-30  Mark Wielaard  <mark@klomp.org>
+
+	* ppc64_unwind.c: New file.
+	* ppc64_init.c (pcc64_init): Hook unwind.
+	* Makefile.am (ppc64_SRCS): Add ppc64_unwind.c
+
 2017-04-06  Mark Wielaard  <mark@klomp.org>
 
 	* i386_unwind.c: New file.

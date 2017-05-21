@@ -59,7 +59,7 @@ check_backtracegen()
 # Ignore it here as it is a bug of OS, not a bug of elfutils.
 check_err()
 {
-  if [ $(egrep -v <$1 'dwfl_thread_getframes: (No DWARF information found|no matching address range|address out of range|Invalid register)$' \
+  if [ $(egrep -v <$1 'dwfl_thread_getframes: (No DWARF information found|no matching address range|address out of range|Invalid register|\(null\))$' \
          | wc -c) \
        -eq 0 ]
   then

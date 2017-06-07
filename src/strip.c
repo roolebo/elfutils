@@ -1063,15 +1063,17 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	shdr_info[cnt].se = dwelf_strtab_add (shst, shdr_info[cnt].name);
       }
 
-  /* Test whether we are doing anything at all.  */
-  if (cnt == idx
-      || (cnt == idx + 1 && shdr_info[ehdr->e_shstrndx].idx == 0))
-    /* Nope, all removable sections are already gone.  Or the only section
-       we would remove is the .shstrtab section which we will add again.  */
-    goto fail_close;
+  /* Test whether we are doing anything at all.  Either all removable
+     sections are already gone.  Or the only section we would remove is
+     the .shstrtab section which we would add again.  */
+  bool removing_sections = !(cnt == idx
+			     || (cnt == idx + 1
+				 && shdr_info[ehdr->e_shstrndx].idx == 0));
+  if (output_fname == NULL && !removing_sections)
+      goto fail_close;
 
-  /* Create the reference to the file with the debug info.  */
-  if (debug_fname != NULL && !remove_shdrs)
+  /* Create the reference to the file with the debug info (if any).  */
+  if (debug_fname != NULL && !remove_shdrs && removing_sections)
     {
       /* Add the section header string table section name.  */
       shdr_info[cnt].se = dwelf_strtab_add_len (shst, ".gnu_debuglink", 15);
@@ -1759,7 +1761,8 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
   /* Remove any relocations between debug sections in ET_REL
      for the debug file when requested.  These relocations are always
      zero based between the unallocated sections.  */
-  if (debug_fname != NULL && reloc_debug && ehdr->e_type == ET_REL)
+  if (debug_fname != NULL && removing_sections
+      && reloc_debug && ehdr->e_type == ET_REL)
     {
       scn = NULL;
       cnt = 0;
@@ -1997,7 +2000,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 
   /* Now that we have done all adjustments to the data,
      we can actually write out the debug file.  */
-  if (debug_fname != NULL)
+  if (debug_fname != NULL && removing_sections)
     {
       /* Finally write the file.  */
       if (unlikely (elf_update (debugelf, ELF_C_WRITE) == -1))
@@ -2230,7 +2233,11 @@ cannot set access and modification date of '%s'"),
 
   /* Close the file descriptor if we created a new file.  */
   if (output_fname != NULL)
-    close (fd);
+    {
+      close (fd);
+      if (result != 0)
+       unlink (output_fname);
+    }
 
   return result;
 }

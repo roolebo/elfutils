@@ -1,3 +1,9 @@
+2017-06-07  Mark Wielaard  <mark@klomp.org>
+
+	* run-strip-nothing.sh: New test.
+	* Makefile.am (TESTS): Add run-strip-nothing.sh.
+	(EXTRA_DIST): Likewise.
+
 2017-06-06  Mark Wielaard  <mark@klomp.org>
 
 	* run-strip-test.sh: Test strip -g doesn't introduce extra .shstrtab.

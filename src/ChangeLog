@@ -1,3 +1,9 @@
+2017-06-07  Mark Wielaard  <mark@klomp.org>
+
+	* strip.c (handle_elf): Introduce new handle_elf boolean. Use it to
+	determine whether to create an output and/or debug file. Remove new
+	output file on error.
+
 2017-06-06  Mark Wielaard  <mark@klomp.org>
 
 	* strip.c (handle_elf): Assume e_shstrndx section can be removed.

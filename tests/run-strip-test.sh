@@ -49,6 +49,14 @@ testrun ${abs_top_builddir}/src/unstrip -o testfile.unstrip testfile.temp testfi
 testrun ${abs_top_builddir}/src/elfcmp --hash-inexact $original testfile.unstrip
 }
 
+# test strip -g
+testrun ${abs_top_builddir}/src/strip -g -o testfile.temp $original
+
+# Buggy eu-strip created multiple .shstrtab sections
+shstrtab_SECS=$(testrun ${abs_top_builddir}/src/readelf -S testfile.temp | grep '.shstrtab' | wc --lines)
+test $shstrtab_SECS -eq 1 ||
+  { echo "*** failure not just one '.shstrtab' testfile.temp ($shstrtab_SECS)"; status=1; }
+
 # Now strip in-place and make sure it is smaller.
 SIZE_original=$(stat -c%s $original)
 testrun ${abs_top_builddir}/src/strip $original

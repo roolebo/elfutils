@@ -711,11 +711,13 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
        in the sh_link or sh_info element it cannot be removed either
   */
   for (cnt = 1; cnt < shnum; ++cnt)
-    /* Check whether the section can be removed.  */
+    /* Check whether the section can be removed.  Since we will create
+       a new .shstrtab assume it will be removed too.  */
     if (remove_shdrs ? !(shdr_info[cnt].shdr.sh_flags & SHF_ALLOC)
-	: ebl_section_strip_p (ebl, ehdr, &shdr_info[cnt].shdr,
-			       shdr_info[cnt].name, remove_comment,
-			       remove_debug))
+	: (ebl_section_strip_p (ebl, ehdr, &shdr_info[cnt].shdr,
+				shdr_info[cnt].name, remove_comment,
+				remove_debug)
+	   || cnt == ehdr->e_shstrndx))
       {
 	/* For now assume this section will be removed.  */
 	shdr_info[cnt].idx = 0;
@@ -1062,8 +1064,10 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
       }
 
   /* Test whether we are doing anything at all.  */
-  if (cnt == idx)
-    /* Nope, all removable sections are already gone.  */
+  if (cnt == idx
+      || (cnt == idx + 1 && shdr_info[ehdr->e_shstrndx].idx == 0))
+    /* Nope, all removable sections are already gone.  Or the only section
+       we would remove is the .shstrtab section which we will add again.  */
     goto fail_close;
 
   /* Create the reference to the file with the debug info.  */

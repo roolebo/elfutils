@@ -1,3 +1,7 @@
+2017-06-06  Mark Wielaard  <mark@klomp.org>
+
+	* strip.c (handle_elf): Assume e_shstrndx section can be removed.
+
 2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* readelf.c: Include strings.h.

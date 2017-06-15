@@ -57,6 +57,16 @@ ppc_reloc_simple_type (Ebl *ebl __attribute__ ((unused)), int type)
 }
 
 
+/* Check whether machine flags are valid.  */
+bool
+ppc_machine_flag_check (GElf_Word flags)
+{
+  return ((flags &~ (EF_PPC_EMB
+		     | EF_PPC_RELOCATABLE
+		     | EF_PPC_RELOCATABLE_LIB)) == 0);
+}
+
+
 const char *
 ppc_dynamic_tag_name (int64_t tag, char *buf __attribute__ ((unused)),
 		      size_t len __attribute__ ((unused)))

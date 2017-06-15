@@ -1,3 +1,8 @@
+2017-06-15  Andreas Schwab  <schwab@linux-m68k.org>
+
+	* ppc_symbol.c (ppc_machine_flag_check): New function.
+	* ppc_init.c (ppc_init): Hook it.
+
 2017-05-30  Mark Wielaard  <mark@klomp.org>
 
 	* ppc64_unwind.c: New file.

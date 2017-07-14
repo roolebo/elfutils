@@ -1,3 +1,7 @@
+Version 0.170
+
+strip: Add -R, --remove-section=SECTION and --keep-section=SECTION.
+
 Version 0.169
 
 backends: Add support for EM_PPC64 GNU_ATTRIBUTES.

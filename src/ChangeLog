@@ -1,3 +1,16 @@
+2017-07-14  Mark Wielaard  <mark@klomp.org>
+
+	* strip (OPT_KEEP_SECTION): New define.
+	(options): Add documentation for remove-section. Add keep-section.
+	(struct section_pattern): New data type.
+	(keep_secs, remove_secs): New globals.
+	(add_pattern, free_sec_patterns, free_patterns, section_name_matches):
+	New functions.
+	(main): Call free_patterns.
+	(parse_opt): Handle 'R' and OPT_KEEP_SECTION. Check remove_comment
+	on ARGP_KEY_SUCCESS.
+	(handle_elf): Handle and sanity check keep_secs and remove_secs.
+
 2017-06-07  Mark Wielaard  <mark@klomp.org>
 
 	* strip.c (handle_elf): Introduce new handle_elf boolean. Use it to

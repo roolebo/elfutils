@@ -1,3 +1,7 @@
+2017-07-14  Mark Wielaard  <mark@klomp.org>
+
+	* NEWS: Add 0.170 section and new strip options.
+
 2017-05-05  Mark Wielaard  <mark@klomp.org>
 
 	* configure.ac: Set version to 0.169. Update copyright year.

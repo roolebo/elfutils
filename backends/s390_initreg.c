@@ -34,8 +34,8 @@
 #include <assert.h>
 #if defined(__s390__) && defined(__linux__)
 # include <sys/user.h>
-# include <asm/ptrace.h>
 # include <sys/ptrace.h>
+# include <asm/ptrace.h>
 #endif
 
 #define BACKEND s390_

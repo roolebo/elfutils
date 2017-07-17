@@ -1,3 +1,7 @@
+2017-06-17  Mark Wielaard  <mark@klomp.org>
+
+	* s390_initreg.c: Swap sys/ptrace.h and asm/ptrace.h include order.
+
 2017-06-15  Andreas Schwab  <schwab@linux-m68k.org>
 
 	* ppc_symbol.c (ppc_machine_flag_check): New function.

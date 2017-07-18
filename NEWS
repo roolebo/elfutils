@@ -2,6 +2,8 @@ Version 0.170
 
 strip: Add -R, --remove-section=SECTION and --keep-section=SECTION.
 
+backends: The bpf disassembler is now always build on all platforms.
+
 Version 0.169
 
 backends: Add support for EM_PPC64 GNU_ATTRIBUTES.

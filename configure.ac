@@ -385,10 +385,6 @@ else
 fi
 AC_SUBST([argp_LDADD])
 
-dnl Check if we have <linux/bpf.h> for EM_BPF disassembly.
-AC_CHECK_HEADERS(linux/bpf.h)
-AM_CONDITIONAL(HAVE_LINUX_BPF_H, [test "x$ac_cv_header_linux_bpf_h" = "xyes"])
-
 dnl The directories with content.
 
 dnl Documentation.

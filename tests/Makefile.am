@@ -156,10 +156,7 @@ endif
 
 if HAVE_LIBASM
 check_PROGRAMS += $(asm_TESTS)
-TESTS += $(asm_TESTS)
-if HAVE_LINUX_BPF_H
-TESTS += run-disasm-bpf.sh
-endif
+TESTS += $(asm_TESTS) run-disasm-bpf.sh
 endif
 
 EXTRA_DIST = run-arextract.sh run-arsymtest.sh \

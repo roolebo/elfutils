@@ -35,15 +35,10 @@
 #include <stdio.h>
 #include <gelf.h>
 #include <inttypes.h>
-#include <linux/bpf.h>
+#include "bpf.h"
 
 #include "../libelf/common.h"
 #include "../libebl/libeblP.h"
-
-/* BPF_PSEUDO_MAP_FD was only introduced in linux 3.20.  */
-#ifndef BPF_PSEUDO_MAP_FD
-  #define BPF_PSEUDO_MAP_FD 1
-#endif
 
 static const char class_string[8][8] = {
   [BPF_LD]    = "ld",

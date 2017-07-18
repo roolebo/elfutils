@@ -1,3 +1,10 @@
+2017-07-18  Mark Wielaard  <mark@klomp.org>
+
+	* Makefile.am (cpu_bpf): Always define.
+	* bpf_init.c (disasm): Always hook.
+	* bpf_regs.c: Include bpf.h instead of linux/bpf.h. Don't define
+	MAX_BPF_REG.
+
 2017-02-17  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* Makefile.am: Add libeu.

@@ -120,12 +120,7 @@ libebl_m68k_pic_a_SOURCES = $(m68k_SRCS)
 am_libebl_m68k_pic_a_OBJECTS = $(m68k_SRCS:.c=.os)
 
 bpf_SRCS = bpf_init.c bpf_regs.c
-# The disam hook depends on this if we have linux/bpf.h.
-if HAVE_LINUX_BPF_H
 cpu_bpf = ../libcpu/libcpu_bpf.a
-else
-cpu_bpf = 
-endif
 libebl_bpf_pic_a_SOURCES = $(bpf_SRCS)
 am_libebl_bpf_pic_a_OBJECTS = $(bpf_SRCS:.c=.os)
 

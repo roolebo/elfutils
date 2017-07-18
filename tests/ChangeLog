@@ -1,3 +1,7 @@
+2017-07-18  Mark Wielaard  <mark@klomp.org>
+
+	* Makefile.am (TESTS): Always add run-disasm-bpf.sh if HAVE_LIBASM.
+
 2017-05-04  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* elfshphehdr.c: For writing, use /dev/null rather than /dev/zero.

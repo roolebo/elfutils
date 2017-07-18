@@ -32,11 +32,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef HAVE_LINUX_BPF_H
-#include <linux/bpf.h>
-#else
-#define MAX_BPF_REG 10
-#endif
+#include "bpf.h"
 
 #define BACKEND bpf_
 #include "libebl_CPU.h"

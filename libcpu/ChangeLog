@@ -1,3 +1,9 @@
+2017-07-18  Mark Wielaard  <mark@klomp.org>
+
+	* Makefile.am: Don't check HAVE_LINUX_BPF_H, just define libcpu_bpf.
+	* bpf_disasm.c: Include bpf.h instead of linux/bpf.h. Don't define
+	BPF_PSEUDO_MAP_FD.
+
 2017-04-20  Ulf Hermann <ulf.hermann@qt.io>
 
 	* Makefile.am: Add EXEEXT to gendis.

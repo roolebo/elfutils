@@ -1,5 +1,5 @@
 /* AArch64 specific symbolic name handling.
-   Copyright (C) 2013, 2015 Red Hat, Inc.
+   Copyright (C) 2013, 2015, 2017 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -89,4 +89,16 @@ aarch64_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr, const GElf_Sym *sym,
     }
 
   return false;
+}
+
+/* A data mapping symbol is a symbol with "$d" name or "$d.<any...>" name,
+   STT_NOTYPE, STB_LOCAL and st_size of zero. The indicate the stat of a
+   sequence of data items.  */
+bool
+aarch64_data_marker_symbol (const GElf_Sym *sym, const char *sname)
+{
+  return (sym != NULL && sname != NULL
+	  && sym->st_size == 0 && GELF_ST_BIND (sym->st_info) == STB_LOCAL
+	  && GELF_ST_TYPE (sym->st_info) == STT_NOTYPE
+	  && (strcmp (sname, "$d") == 0 || strncmp (sname, "$d.", 3) == 0));
 }

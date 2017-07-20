@@ -1,5 +1,5 @@
 /* Arm specific symbolic name handling.
-   Copyright (C) 2002-2009, 2014, 2015 Red Hat, Inc.
+   Copyright (C) 2002-2009, 2014, 2015, 2017 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -32,6 +32,7 @@
 
 #include <elf.h>
 #include <stddef.h>
+#include <string.h>
 
 #define BACKEND		arm_
 #include "libebl_CPU.h"
@@ -141,4 +142,16 @@ arm_symbol_type_name (int type,
       return "ARM_TFUNC";
     }
   return NULL;
+}
+
+/* A data mapping symbol is a symbol with "$d" name or "$d.<any...>" name,
+ *    STT_NOTYPE, STB_LOCAL and st_size of zero. The indicate the stat of a
+ *       sequence of data items.  */
+bool
+arm_data_marker_symbol (const GElf_Sym *sym, const char *sname)
+{
+  return (sym != NULL && sname != NULL
+          && sym->st_size == 0 && GELF_ST_BIND (sym->st_info) == STB_LOCAL
+          && GELF_ST_TYPE (sym->st_info) == STT_NOTYPE
+          && (strcmp (sname, "$d") == 0 || strncmp (sname, "$d.", 3) == 0));
 }

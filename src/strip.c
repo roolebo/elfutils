@@ -1,5 +1,5 @@
 /* Discard section not used at runtime from object files.
-   Copyright (C) 2000-2012, 2014, 2015, 2016 Red Hat, Inc.
+   Copyright (C) 2000-2012, 2014, 2015, 2016, 2017 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -960,8 +960,19 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 		      if (shdr_info[scnidx].idx == 0)
 			/* This symbol table has a real symbol in
 			   a discarded section.  So preserve the
-			   original table in the debug file.  */
-			shdr_info[cnt].debug_data = symdata;
+			   original table in the debug file.  Unless
+			   it is a redundant data marker to a debug
+			   (data only) section.  */
+			if (! (ebl_section_strip_p (ebl, ehdr,
+						    &shdr_info[scnidx].shdr,
+						    shdr_info[scnidx].name,
+						    remove_comment,
+						    remove_debug)
+			       && ebl_data_marker_symbol (ebl, sym,
+					elf_strptr (elf,
+						    shdr_info[cnt].shdr.sh_link,
+						    sym->st_name))))
+			  shdr_info[cnt].debug_data = symdata;
 		    }
 		}
 
@@ -1293,7 +1304,10 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	shdr_info[cnt].shdr.sh_name = dwelf_strent_off (shdr_info[cnt].se);
 
 	/* Update the section header from the input file.  Some fields
-	   might be section indeces which now have to be adjusted.  */
+	   might be section indeces which now have to be adjusted.  Keep
+	   the index to the "current" sh_link in case we need it to lookup
+	   symbol table names.  */
+	size_t sh_link = shdr_info[cnt].shdr.sh_link;
 	if (shdr_info[cnt].shdr.sh_link != 0)
 	  shdr_info[cnt].shdr.sh_link =
 	    shdr_info[shdr_info[cnt].shdr.sh_link].idx;
@@ -1492,13 +1506,17 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 		      /* The symbol points to a section that is discarded
 			 but isn't preserved in the debug file. Check that
 			 this is a section or group signature symbol
-			 for a section which has been removed.  */
+			 for a section which has been removed.  Or a special
+			 data marker symbol to a debug section.  */
 		      {
 			elf_assert (GELF_ST_TYPE (sym->st_info) == STT_SECTION
 				    || ((shdr_info[sidx].shdr.sh_type
 					 == SHT_GROUP)
 					&& (shdr_info[sidx].shdr.sh_info
-					    == inner)));
+					    == inner))
+				    || ebl_data_marker_symbol (ebl, sym,
+						elf_strptr (elf, sh_link,
+							    sym->st_name)));
 		      }
 		  }
 

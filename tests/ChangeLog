@@ -1,3 +1,9 @@
+2017-07-20  Mark Wielaard  <mark@klomp.org>
+
+	* run-strip-g.sh: New test.
+	* Makefile.am (TESTS): Add run-strip-g.sh.
+	(EXTRA_DIST): Likewise.
+
 2017-07-18  Mark Wielaard  <mark@klomp.org>
 
 	* Makefile.am (TESTS): Always add run-disasm-bpf.sh if HAVE_LIBASM.

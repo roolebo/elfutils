@@ -1,5 +1,5 @@
 /* Interface for libebl.
-   Copyright (C) 2000-2010, 2013, 2014, 2015, 2016 Red Hat, Inc.
+   Copyright (C) 2000-2010, 2013, 2014, 2015, 2016, 2017 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -155,6 +155,10 @@ extern bool ebl_dynamic_tag_check (Ebl *ebl, int64_t tag);
 extern bool ebl_check_special_symbol (Ebl *ebl, GElf_Ehdr *ehdr,
 				      const GElf_Sym *sym, const char *name,
 				      const GElf_Shdr *destshdr);
+
+/* Check if this is a data marker symbol.  e.g. '$d' symbols for ARM.  */
+extern bool ebl_data_marker_symbol (Ebl *ebl, const GElf_Sym *sym,
+				    const char *sname);
 
 /* Check whether only valid bits are set on the st_other symbol flag.  */
 extern bool ebl_check_st_other_bits (Ebl *ebl, unsigned char st_other);

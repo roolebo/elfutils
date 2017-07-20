@@ -1,3 +1,12 @@
+2017-07-20  Mark Wielaard  <mark@klomp.org>
+
+	* Makefile.am (gen_SOURCES): Add ebl_data_marker_symbol.c.
+	* ebl-hooks.h (data_marker_symbol): New hook.
+	* ebl_data_marker_symbol.c: New file.
+	* eblopenbackend.c (default_data_marker_symbol): New function.
+	(fill_defaults): Add default_data_marker_symbol.
+	* libebl.h (ebl_data_marker_symbol): New function.
+
 2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* libebl.h: Use __pure_attribute__.

@@ -1,5 +1,5 @@
 /* Initialization of AArch64 specific backend library.
-   Copyright (C) 2013 Red Hat, Inc.
+   Copyright (C) 2013, 2017 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -56,6 +56,7 @@ aarch64_init (Elf *elf __attribute__ ((unused)),
   HOOK (eh, reloc_simple_type);
   HOOK (eh, return_value_location);
   HOOK (eh, check_special_symbol);
+  HOOK (eh, data_marker_symbol);
   HOOK (eh, abi_cfi);
 
   /* X0-X30 (31 regs) + SP + 1 Reserved + ELR, 30 Reserved regs (34-43)

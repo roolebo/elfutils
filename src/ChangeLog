@@ -1,3 +1,8 @@
+2017-07-20  Mark Wielaard  <mark@klomp.org>
+
+	* strip.c (handle_elf): Deal with data marker symbols pointing to
+	debug sections (they can be removed).
+
 2017-07-14  Mark Wielaard  <mark@klomp.org>
 
 	* strip (OPT_KEEP_SECTION): New define.

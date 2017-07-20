@@ -1,3 +1,10 @@
+2017-08-20  Mark Wielaard  <mark@klomp.org>
+
+	* aarch64_init.c (aarch64_init): Hook data_marker_symbol.
+	* aarch64_symbol.c (aarch64_data_marker_symbol): New function.
+	* arm_init.c (arm_init): Hook data_marker_symbol.
+	* arm_symbol.c (aarch64_data_marker_symbol): New function.
+
 2017-07-18  Mark Wielaard  <mark@klomp.org>
 
 	* Makefile.am (cpu_bpf): Always define.

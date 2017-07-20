@@ -1,5 +1,5 @@
 /* Backend hook signatures internal interface for libebl.
-   Copyright (C) 2000-2011, 2013, 2014, 2016 Red Hat, Inc.
+   Copyright (C) 2000-2011, 2013, 2014, 2016, 2017 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -120,6 +120,9 @@ bool EBLHOOK(relative_reloc_p) (int);
 /* Check whether given symbol's value is ok despite normal checks.  */
 bool EBLHOOK(check_special_symbol) (Elf *, GElf_Ehdr *, const GElf_Sym *,
 			      const char *, const GElf_Shdr *);
+
+/* Check if this is a data marker symbol.  e.g. '$d' symbols for ARM.  */
+bool EBLHOOK(data_marker_symbol) (const GElf_Sym *sym, const char *sname);
 
 /* Check whether only valid bits are set on the st_other symbol flag.
    Standard ST_VISIBILITY have already been masked off.  */

@@ -94,9 +94,20 @@ static const Ebl_Register_Location spe_regs[] =
     { .offset = 34 * 4, .regno = 612, .count = 1, .bits = 32 }
   };
 
+static const Ebl_Register_Location tm_spr_regs[] =
+  {
+    /* tfhar */
+    { .offset = 0, .regno = 114, .count = 1, .bits = 64 },
+    /* texasr */
+    { .offset = 8, .regno = 116, .count = 1, .bits = 64 },
+    /* tfiar */
+    { .offset = 16, .regno = 115, .count = 1, .bits = 64 }
+  };
+
 #define EXTRA_NOTES \
   EXTRA_REGSET (NT_PPC_VMX, 34 * 16, altivec_regs) \
-  EXTRA_REGSET (NT_PPC_SPE, 35 * 4, spe_regs)
+  EXTRA_REGSET (NT_PPC_SPE, 35 * 4, spe_regs) \
+  EXTRA_REGSET (NT_PPC_TM_SPR, 3 * 8, tm_spr_regs)
 
 #if BITS == 32
 # define ULONG			uint32_t

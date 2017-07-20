@@ -397,9 +397,9 @@ dwarf_cfi_addrframe (.eh_frame): no matching address range
 	privileged reg111 (spr11): undefined
 	privileged reg112 (spr12): undefined
 	privileged reg113 (spr13): undefined
-	privileged reg114 (spr14): undefined
-	privileged reg115 (spr15): undefined
-	privileged reg116 (spr16): undefined
+	privileged reg114 (tfhar): undefined
+	privileged reg115 (tfiar): undefined
+	privileged reg116 (texasr): undefined
 	privileged reg117 (spr17): undefined
 	privileged reg118 (dsisr): undefined
 	privileged reg119 (dar): undefined
@@ -1419,9 +1419,9 @@ testrun_compare ${abs_builddir}/addrcfi -e testfileppc32 0x100004d2 <<\EOF
 	privileged reg111 (spr11): undefined
 	privileged reg112 (spr12): undefined
 	privileged reg113 (spr13): undefined
-	privileged reg114 (spr14): undefined
-	privileged reg115 (spr15): undefined
-	privileged reg116 (spr16): undefined
+	privileged reg114 (tfhar): undefined
+	privileged reg115 (tfiar): undefined
+	privileged reg116 (texasr): undefined
 	privileged reg117 (spr17): undefined
 	privileged reg118 (dsisr): undefined
 	privileged reg119 (dar): undefined
@@ -2447,9 +2447,9 @@ dwarf_cfi_addrframe (.eh_frame): no matching address range
 	privileged reg111 (spr11): undefined
 	privileged reg112 (spr12): undefined
 	privileged reg113 (spr13): undefined
-	privileged reg114 (spr14): undefined
-	privileged reg115 (spr15): undefined
-	privileged reg116 (spr16): undefined
+	privileged reg114 (tfhar): undefined
+	privileged reg115 (tfiar): undefined
+	privileged reg116 (texasr): undefined
 	privileged reg117 (spr17): undefined
 	privileged reg118 (dsisr): undefined
 	privileged reg119 (dar): undefined

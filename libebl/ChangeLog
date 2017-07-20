@@ -1,3 +1,7 @@
+2017-07-19  Gustavo Romero <gromero@linux.vnet.ibm.com>
+
+	* eblcorenotetypename.c: Add ppc64 HTM SPRs note as known type.
+
 2017-07-20  Mark Wielaard  <mark@klomp.org>
 
 	* Makefile.am (gen_SOURCES): Add ebl_data_marker_symbol.c.

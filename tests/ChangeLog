@@ -1,3 +1,8 @@
+2017-07-19  Gustavo Romero <gromero@linux.vnet.ibm.com>
+
+	* run-addrcfi.sh: Update generic SPRs names to HTM SPRs names
+	* run-allregs.sh: Update generic SPRs names to HTM SPRs names
+
 2017-07-20  Mark Wielaard  <mark@klomp.org>
 
 	* run-strip-g.sh: New test.

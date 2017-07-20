@@ -1,4 +1,10 @@
-2017-08-20  Mark Wielaard  <mark@klomp.org>
+2017-07-19  Gustavo Romero <gromero@linux.vnet.ibm.com>
+
+	* ppc_corenote.c: Add offsets for ppc64 HTM SPRs: thfar, tfiar,
+	and texasr.
+	* ppc_regs.c: Add names for ppc64 HTM SPRs mappings.
+
+2017-07-20  Mark Wielaard  <mark@klomp.org>
 
 	* aarch64_init.c (aarch64_init): Hook data_marker_symbol.
 	* aarch64_symbol.c (aarch64_data_marker_symbol): New function.

@@ -253,9 +253,9 @@ privileged registers:
 	111: spr11 (spr11), unsigned 32 bits
 	112: spr12 (spr12), unsigned 32 bits
 	113: spr13 (spr13), unsigned 32 bits
-	114: spr14 (spr14), unsigned 32 bits
-	115: spr15 (spr15), unsigned 32 bits
-	116: spr16 (spr16), unsigned 32 bits
+	114: tfhar (tfhar), unsigned 32 bits
+	115: tfiar (tfiar), unsigned 32 bits
+	116: texasr (texasr), unsigned 32 bits
 	117: spr17 (spr17), unsigned 32 bits
 	118: dsisr (dsisr), unsigned 32 bits
 	119: dar (dar), unsigned 32 bits
@@ -1276,9 +1276,9 @@ privileged registers:
 	111: spr11 (spr11), unsigned 64 bits
 	112: spr12 (spr12), unsigned 64 bits
 	113: spr13 (spr13), unsigned 64 bits
-	114: spr14 (spr14), unsigned 64 bits
-	115: spr15 (spr15), unsigned 64 bits
-	116: spr16 (spr16), unsigned 64 bits
+	114: tfhar (tfhar), unsigned 64 bits
+	115: tfiar (tfiar), unsigned 64 bits
+	116: texasr (texasr), unsigned 64 bits
 	117: spr17 (spr17), unsigned 64 bits
 	118: dsisr (dsisr), unsigned 64 bits
 	119: dar (dar), unsigned 64 bits

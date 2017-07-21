@@ -338,3 +338,8 @@ ELFUTILS_0.167 {
     dwelf_strent_str;
     dwelf_strtab_free;
 } ELFUTILS_0.165;
+
+ELFUTILS_0.170 {
+  global:
+    dwarf_line_file;
+} ELFUTILS_0.167;

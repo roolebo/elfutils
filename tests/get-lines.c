@@ -24,6 +24,7 @@
 #include <libelf.h>
 #include ELFUTILS_HEADER(dw)
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 
 
@@ -99,6 +100,28 @@ main (int argc, char *argv[])
 
 	      printf ("%" PRIx64 ": %s:%d:", (uint64_t) addr,
 		      file ?: "???", line);
+
+	      /* Getting the file path through the Dwarf_Files should
+		 result in the same path.  */
+	      Dwarf_Files *files;
+	      size_t idx;
+	      if (dwarf_line_file (l, &files, &idx) != 0)
+		{
+		  printf ("%s: cannot get file from line (%zd): %s\n",
+			  argv[cnt], i, dwarf_errmsg (-1));
+		  result = 1;
+		  break;
+		}
+	      const char *path = dwarf_filesrc (files, idx, NULL, NULL);
+	      if ((path == NULL && file != NULL)
+		  || (path != NULL && file == NULL)
+		  || (strcmp (file, path) != 0))
+		{
+		  printf ("%s: line %zd srcline (%s) != file srcline (%s)\n",
+			  argv[cnt], i, file ?: "???", path ?: "???");
+		  result = 1;
+		  break;
+		}
 
 	      int column;
 	      if (dwarf_linecol (l, &column) != 0)

@@ -1,3 +1,10 @@
+2017-07-21  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_line_file.c: New file.
+	* Makefile.am (libdw_a_SOURCES): Add dwarf_line_file.c.
+	* libdw.h (dwarf_line_file): New function declaration.
+	* libdw.map (ELFUTILS_0.170): New. Add dwarf_line_file.
+
 2017-02-17  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* Makefile.am: Add libdw_so_LIBS to specify the archives libdw is is

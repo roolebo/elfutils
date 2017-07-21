@@ -640,6 +640,11 @@ extern const char *dwarf_linesrc (Dwarf_Line *line,
 extern const char *dwarf_filesrc (Dwarf_Files *file, size_t idx,
 				  Dwarf_Word *mtime, Dwarf_Word *length);
 
+/* Return the Dwarf_Files and index associated with the given Dwarf_Line.  */
+extern int dwarf_line_file (Dwarf_Line *line,
+			    Dwarf_Files **files, size_t *idx)
+    __nonnull_attribute__ (2, 3);
+
 /* Return the directory list used in the file information extracted.
    (*RESULT)[0] is the CU's DW_AT_comp_dir value, and may be null.
    (*RESULT)[0..*NDIRS-1] are the compile-time include directory path

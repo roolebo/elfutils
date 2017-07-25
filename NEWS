@@ -1,5 +1,7 @@
 Version 0.170
 
+libdw: Added new DWARF5 attribute constants to dwarf.h.
+
 strip: Add -R, --remove-section=SECTION and --keep-section=SECTION.
 
 backends: The bpf disassembler is now always build on all platforms.

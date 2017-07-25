@@ -1,3 +1,9 @@
+2017-07-25  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf.h (DWARF attributes enum): Remove DW_AT_subscr_data,
+	DW_AT_element_list and DW_AT_member. Add DWARF5 attribute constants.
+	(DW_AT_subscr_data, DW_AT_element_list, DW_AT_member): New defines.
+
 2017-07-21  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_line_file.c: New file.

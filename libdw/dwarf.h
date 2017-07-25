@@ -1,5 +1,5 @@
 /* This file defines standard DWARF types, structures, and macros.
-   Copyright (C) 2000-2011, 2014, 2016 Red Hat, Inc.
+   Copyright (C) 2000-2011, 2014, 2016, 2017 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -131,17 +131,23 @@ enum
     DW_AT_sibling = 0x01,
     DW_AT_location = 0x02,
     DW_AT_name = 0x03,
+    /* 0x04 reserved.  */
+    /* 0x05 reserved.  */
+    /* 0x06 reserved.  */
+    /* 0x07 reserved.  */
+    /* 0x08 reserved.  */
     DW_AT_ordering = 0x09,
-    DW_AT_subscr_data = 0x0a,
+    /* 0x0a reserved.  */
     DW_AT_byte_size = 0x0b,
-    DW_AT_bit_offset = 0x0c,
+    DW_AT_bit_offset = 0x0c,  /* Deprecated in DWARF4.  */
     DW_AT_bit_size = 0x0d,
-    DW_AT_element_list = 0x0f,
+    /* 0x0e reserved.  */
+    /* 0x0f reserved.  */
     DW_AT_stmt_list = 0x10,
     DW_AT_low_pc = 0x11,
     DW_AT_high_pc = 0x12,
     DW_AT_language = 0x13,
-    DW_AT_member = 0x14,
+    /* 0x14 reserved.  */
     DW_AT_discr = 0x15,
     DW_AT_discr_value = 0x16,
     DW_AT_visibility = 0x17,
@@ -152,15 +158,24 @@ enum
     DW_AT_const_value = 0x1c,
     DW_AT_containing_type = 0x1d,
     DW_AT_default_value = 0x1e,
+    /* 0x1f reserved.  */
     DW_AT_inline = 0x20,
     DW_AT_is_optional = 0x21,
     DW_AT_lower_bound = 0x22,
+    /* 0x23 reserved.  */
+    /* 0x24 reserved.  */
     DW_AT_producer = 0x25,
+    /* 0x26 reserved.  */
     DW_AT_prototyped = 0x27,
+    /* 0x28 reserved.  */
+    /* 0x29 reserved.  */
     DW_AT_return_addr = 0x2a,
+    /* 0x2b reserved.  */
     DW_AT_start_scope = 0x2c,
+    /* 0x2d reserved.  */
     DW_AT_bit_stride = 0x2e,
     DW_AT_upper_bound = 0x2f,
+    /* 0x30 reserved.  */
     DW_AT_abstract_origin = 0x31,
     DW_AT_accessibility = 0x32,
     DW_AT_address_class = 0x33,
@@ -179,7 +194,7 @@ enum
     DW_AT_frame_base = 0x40,
     DW_AT_friend = 0x41,
     DW_AT_identifier_case = 0x42,
-    DW_AT_macro_info = 0x43,
+    DW_AT_macro_info = 0x43, /* Deprecated in DWARF5.  */
     DW_AT_namelist_item = 0x44,
     DW_AT_priority = 0x45,
     DW_AT_segment = 0x46,
@@ -223,9 +238,36 @@ enum
     DW_AT_const_expr = 0x6c,
     DW_AT_enum_class = 0x6d,
     DW_AT_linkage_name = 0x6e,
-
-    /* DWARF5 attribute values.  */
+    DW_AT_string_length_bit_size = 0x6f,
+    DW_AT_string_length_byte_size = 0x70,
+    DW_AT_rank = 0x71,
+    DW_AT_str_offsets_base = 0x72,
+    DW_AT_addr_base = 0x73,
+    DW_AT_rnglists_base = 0x74,
+    /* 0x75 reserved.  */
+    DW_AT_dwo_name = 0x76,
+    DW_AT_reference = 0x77,
+    DW_AT_rvalue_reference = 0x78,
+    DW_AT_macros = 0x79,
+    DW_AT_call_all_calls = 0x7a,
+    DW_AT_call_all_source_calls = 0x7b,
+    DW_AT_call_all_tail_calls = 0x7c,
+    DW_AT_call_return_pc = 0x7d,
+    DW_AT_call_value = 0x7e,
+    DW_AT_call_origin = 0x7f,
+    DW_AT_call_parameter = 0x80,
+    DW_AT_call_pc = 0x81,
+    DW_AT_call_tail_call = 0x82,
+    DW_AT_call_target = 0x83,
+    DW_AT_call_target_clobbered = 0x84,
+    DW_AT_call_data_location = 0x85,
+    DW_AT_call_data_value = 0x86,
     DW_AT_noreturn = 0x87,
+    DW_AT_alignment = 0x88,
+    DW_AT_export_symbols = 0x89,
+    DW_AT_deleted = 0x8a,
+    DW_AT_defaulted = 0x8b,
+    DW_AT_loclists_base = 0x8c,
 
     DW_AT_lo_user = 0x2000,
 
@@ -278,6 +320,15 @@ enum
     DW_AT_hi_user = 0x3fff
   };
 
+/* Old unofficially attribute names.  Should not be used.
+   Will not appear in known-dwarf.h  */
+
+/* DWARF1 array subscripts and element data types.  */
+#define DW_AT_subscr_data	0x0a
+/* DWARF1 enumeration literals.  */
+#define DW_AT_element_list	0x0f
+/* DWARF1 reference for variable to member structure, class or union.  */
+#define DW_AT_member		0x14
 
 /* DWARF form encodings.  */
 enum

@@ -1,3 +1,8 @@
+2017-07-26  Yunlian Jiang  <yunlian@google.com>
+
+	* argp-std.c (failure): Move to file scope.
+	(fail): Likewise.
+
 2017-04-20  Ulf Hermann  <ulf.hermann@qt.io>
 	    Mark Wielaard  <mark@klomp.org>
 

@@ -104,25 +104,28 @@ struct parse_opt
   const char *core;
 };
 
+static inline void
+failure (Dwfl *dwfl, int errnum, const char *msg, struct argp_state *state)
+{
+  if (dwfl != NULL)
+    dwfl_end (dwfl);
+  if (errnum == -1)
+    argp_failure (state, EXIT_FAILURE, 0, "%s: %s",
+                  msg, INTUSE(dwfl_errmsg) (-1));
+  else
+    argp_failure (state, EXIT_FAILURE, errnum, "%s", msg);
+}
+
+static inline error_t
+fail (Dwfl *dwfl, int errnum, const char *msg, struct argp_state *state)
+{
+  failure (dwfl, errnum, msg, state);
+  return errnum == -1 ? EIO : errnum;
+}
+
 static error_t
 parse_opt (int key, char *arg, struct argp_state *state)
 {
-  inline void failure (Dwfl *dwfl, int errnum, const char *msg)
-    {
-      if (dwfl != NULL)
-	dwfl_end (dwfl);
-      if (errnum == -1)
-	argp_failure (state, EXIT_FAILURE, 0, "%s: %s",
-		      msg, INTUSE(dwfl_errmsg) (-1));
-      else
-	argp_failure (state, EXIT_FAILURE, errnum, "%s", msg);
-    }
-  inline error_t fail (Dwfl *dwfl, int errnum, const char *msg)
-    {
-      failure (dwfl, errnum, msg);
-      return errnum == -1 ? EIO : errnum;
-    }
-
   switch (key)
     {
     case ARGP_KEY_INIT:
@@ -130,7 +133,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	assert (state->hook == NULL);
 	struct parse_opt *opt = calloc (1, sizeof (*opt));
 	if (opt == NULL)
-	  failure (NULL, DWFL_E_ERRNO, "calloc");
+	  failure (NULL, DWFL_E_ERRNO, "calloc", state);
 	state->hook = opt;
       }
       break;
@@ -147,7 +150,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	  {
 	    dwfl = INTUSE(dwfl_begin) (&offline_callbacks);
 	    if (dwfl == NULL)
-	      return fail (dwfl, -1, arg);
+	      return fail (dwfl, -1, arg, state);
 	    opt->dwfl = dwfl;
 
 	    /* Start at zero so if there is just one -e foo.so,
@@ -173,7 +176,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	    Dwfl *dwfl = INTUSE(dwfl_begin) (&proc_callbacks);
 	    int result = INTUSE(dwfl_linux_proc_report) (dwfl, atoi (arg));
 	    if (result != 0)
-	      return fail (dwfl, result, arg);
+	      return fail (dwfl, result, arg, state);
 
 	    /* Non-fatal to not be able to attach to process, ignore error.  */
 	    INTUSE(dwfl_linux_proc_attach) (dwfl, atoi (arg), false);
@@ -202,7 +205,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	    int result = INTUSE(dwfl_linux_proc_maps_report) (dwfl, f);
 	    fclose (f);
 	    if (result != 0)
-	      return fail (dwfl, result, arg);
+	      return fail (dwfl, result, arg, state);
 	    opt->dwfl = dwfl;
 	  }
 	else
@@ -231,11 +234,11 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	    Dwfl *dwfl = INTUSE(dwfl_begin) (&kernel_callbacks);
 	    int result = INTUSE(dwfl_linux_kernel_report_kernel) (dwfl);
 	    if (result != 0)
-	      return fail (dwfl, result, _("cannot load kernel symbols"));
+	      return fail (dwfl, result, _("cannot load kernel symbols"), state);
 	    result = INTUSE(dwfl_linux_kernel_report_modules) (dwfl);
 	    if (result != 0)
 	      /* Non-fatal to have no modules since we do have the kernel.  */
-	      failure (dwfl, result, _("cannot find kernel modules"));
+	      failure (dwfl, result, _("cannot find kernel modules"), state);
 	    opt->dwfl = dwfl;
 	  }
 	else
@@ -252,7 +255,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	    int result = INTUSE(dwfl_linux_kernel_report_offline) (dwfl, arg,
 								   NULL);
 	    if (result != 0)
-	      return fail (dwfl, result, _("cannot find kernel or modules"));
+	      return fail (dwfl, result, _("cannot find kernel or modules"), state);
 	    opt->dwfl = dwfl;
 	  }
 	else
@@ -271,7 +274,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	    arg = "a.out";
 	    dwfl = INTUSE(dwfl_begin) (&offline_callbacks);
 	    if (INTUSE(dwfl_report_offline) (dwfl, "", arg, -1) == NULL)
-	      return fail (dwfl, -1, arg);
+	      return fail (dwfl, -1, arg, state);
 	    opt->dwfl = dwfl;
 	  }
 
@@ -301,7 +304,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	      {
 		elf_end (core);
 		close (fd);
-		return fail (dwfl, result, opt->core);
+		return fail (dwfl, result, opt->core, state);
 	      }
 
 	    /* Non-fatal to not be able to attach to core, ignore error.  */
@@ -331,7 +334,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	else if (opt->e)
 	  {
 	    if (INTUSE(dwfl_report_offline) (dwfl, "", opt->e, -1) == NULL)
-	      return fail (dwfl, -1, opt->e);
+	      return fail (dwfl, -1, opt->e, state);
 	  }
 
 	/* One of the three flavors has done dwfl_begin and some reporting

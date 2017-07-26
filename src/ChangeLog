@@ -1,5 +1,12 @@
 2017-07-26  Mark Wielaard  <mark@klomp.org>
 
+	* readelf.c (print_debug_macro_section): Accept either version 4 or
+	version 5. Use DW_MACRO names instead of DW_MACRO_GNU names. Add
+	minimal support for DW_MACRO_define_sup, DW_MACRO_undef_sup,
+	DW_MACRO_import_sup, DW_MACRO_define_strx and DW_MACRO_undef_strx.
+
+2017-07-26  Mark Wielaard  <mark@klomp.org>
+
 	* readelf.c (dwarf_defaulted_string): New function.
 	(dwarf_defaulted_name): Likewise.
 	(attr_callback): Use dwarf_defaulted_name to get value of

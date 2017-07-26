@@ -1,5 +1,9 @@
 2017-07-26  Mark Wielaard  <mark@klomp.org>
 
+	* NEWS: Mention dwarf_getmacros handling version 5 .debug_macro.
+
+2017-07-26  Mark Wielaard  <mark@klomp.org>
+
 	* NEWS: Mention dwarf_peel_type DWARF5 tags improvement.
 
 2017-07-26  Mark Wielaard  <mark@klomp.org>

@@ -1,5 +1,12 @@
 2017-07-26  Mark Wielaard  <mark@klomp.org>
 
+	* dwarf.h: Add DW_MACRO_* and compat defines for DW_MACRO_GNU_*.
+	* dwarf_getmacros.c (get_table_for_offset): Accept either version
+	4 or 5. Use DW_MACRO names instead of DW_MACRO_GNU names.
+	(read_macros): Use table version for fake_cu.
+
+2017-07-26  Mark Wielaard  <mark@klomp.org>
+
 	* dwarf_peel_type.c (dwarf_peel_type): Handle DW_TAG_immutable_type,
 	DW_TAG_packed_type and DW_TAG_shared_type.
 	* libdw.h (dwarf_peel_type): Extend documentation.

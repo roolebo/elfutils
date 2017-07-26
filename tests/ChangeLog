@@ -1,5 +1,9 @@
 2017-07-26  Mark Wielaard  <mark@klomp.org>
 
+	* dwarf-getmacros.c (mac): Use DW_MACRO names instead of DW_MACRO_GNU.
+
+2016-10-27  Mark Wielaard  <mjw@redhat.com>
+
 	* dwarf_default_lower_bound.c: New test.
 	* Makefile.am (check_PROGRAMS): Add dwarf_default_lower_bound.
 	(TESTS): Likewise.

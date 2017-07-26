@@ -38,7 +38,7 @@ mac (Dwarf_Macro *macro, void *dbg)
   dwarf_macro_opcode (macro, &opcode);
   switch (opcode)
     {
-    case DW_MACRO_GNU_transparent_include:
+    case DW_MACRO_import:
       {
 	Dwarf_Attribute at;
 	int r = dwarf_macro_param (macro, 0, &at);
@@ -56,7 +56,7 @@ mac (Dwarf_Macro *macro, void *dbg)
 	break;
       }
 
-    case DW_MACRO_GNU_start_file:
+    case DW_MACRO_start_file:
       {
 	Dwarf_Files *files;
 	size_t nfiles;
@@ -73,7 +73,7 @@ mac (Dwarf_Macro *macro, void *dbg)
 	break;
       }
 
-    case DW_MACRO_GNU_end_file:
+    case DW_MACRO_end_file:
       {
 	--level;
 	printf ("%*s/file\n", level, "");
@@ -81,7 +81,7 @@ mac (Dwarf_Macro *macro, void *dbg)
       }
 
     case DW_MACINFO_define:
-    case DW_MACRO_GNU_define_indirect:
+    case DW_MACRO_define_strp:
       {
 	const char *value;
 	dwarf_macro_param2 (macro, NULL, &value);
@@ -90,7 +90,7 @@ mac (Dwarf_Macro *macro, void *dbg)
       }
 
     case DW_MACINFO_undef:
-    case DW_MACRO_GNU_undef_indirect:
+    case DW_MACRO_undef_strp:
       break;
 
     default:

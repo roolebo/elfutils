@@ -7394,7 +7394,7 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 
       // Version 4 is the GNU extension for DWARF4.  DWARF5 will use version
       // 5 when it gets standardized.
-      if (vers != 4)
+      if (vers != 4 && vers != 5)
 	{
 	  printf (gettext ("  unknown version, cannot parse section\n"));
 	  return;
@@ -7418,7 +7418,7 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 		  line_offset);
 	}
 
-      const unsigned char *vendor[DW_MACRO_GNU_hi_user - DW_MACRO_GNU_lo_user];
+      const unsigned char *vendor[DW_MACRO_hi_user - DW_MACRO_lo_user];
       memset (vendor, 0, sizeof vendor);
       if (flag & 0x04)
 	{
@@ -7435,12 +7435,12 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 		goto invalid_data;
 	      unsigned int opcode = *readp++;
 	      printf (gettext ("    [%" PRIx8 "]"), opcode);
-	      if (opcode < DW_MACRO_GNU_lo_user
-		  || opcode > DW_MACRO_GNU_hi_user)
+	      if (opcode < DW_MACRO_lo_user
+		  || opcode > DW_MACRO_hi_user)
 		goto invalid_data;
 	      // Record the start of description for this vendor opcode.
 	      // uleb128 nr args, 1 byte per arg form.
-	      vendor[opcode - DW_MACRO_GNU_lo_user] = readp;
+	      vendor[opcode - DW_MACRO_lo_user] = readp;
 	      if (readp + 1 > readendp)
 		goto invalid_data;
 	      unsigned int args = *readp++;
@@ -7493,7 +7493,7 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 
           switch (opcode)
             {
-            case DW_MACRO_GNU_start_file:
+            case DW_MACRO_start_file:
 	      get_uleb128 (u128, readp, readendp);
 	      if (readp >= readendp)
 		goto invalid_data;
@@ -7523,12 +7523,12 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	      ++level;
 	      break;
 
-	    case DW_MACRO_GNU_end_file:
+	    case DW_MACRO_end_file:
 	      --level;
 	      printf ("%*send_file\n", level, "");
 	      break;
 
-	    case DW_MACRO_GNU_define:
+	    case DW_MACRO_define:
 	      get_uleb128 (u128, readp, readendp);
 	      endp = memchr (readp, '\0', readendp - readp);
 	      if (endp == NULL)
@@ -7538,7 +7538,7 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	      readp = endp + 1;
 	      break;
 
-	    case DW_MACRO_GNU_undef:
+	    case DW_MACRO_undef:
 	      get_uleb128 (u128, readp, readendp);
 	      endp = memchr (readp, '\0', readendp - readp);
 	      if (endp == NULL)
@@ -7548,7 +7548,7 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	      readp = endp + 1;
 	      break;
 
-	    case DW_MACRO_GNU_define_indirect:
+	    case DW_MACRO_define_strp:
 	      get_uleb128 (u128, readp, readendp);
 	      if (readp + offset_len > readendp)
 		goto invalid_data;
@@ -7560,7 +7560,7 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 		      level, "", dwarf_getstring (dbg, off, NULL), u128);
 	      break;
 
-	    case DW_MACRO_GNU_undef_indirect:
+	    case DW_MACRO_undef_strp:
 	      get_uleb128 (u128, readp, readendp);
 	      if (readp + offset_len > readendp)
 		goto invalid_data;
@@ -7572,7 +7572,7 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 		      level, "", dwarf_getstring (dbg, off, NULL), u128);
 	      break;
 
-	    case DW_MACRO_GNU_transparent_include:
+	    case DW_MACRO_import:
 	      if (readp + offset_len > readendp)
 		goto invalid_data;
 	      if (offset_len == 8)
@@ -7583,15 +7583,78 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 		      level, "", off);
 	      break;
 
+	    case DW_MACRO_define_sup:
+	      get_uleb128 (u128, readp, readendp);
+	      if (readp + offset_len > readendp)
+		goto invalid_data;
+	      if (offset_len == 8)
+		off = read_8ubyte_unaligned_inc (dbg, readp);
+	      else
+		off = read_4ubyte_unaligned_inc (dbg, readp);
+	      // Needs support for reading from supplementary object file.
+	      printf ("%*s#define <str-at-0x%" PRIx64 ">, line %u (sup)\n",
+		      level, "", off, u128);
+	      break;
+
+	    case DW_MACRO_undef_sup:
+	      get_uleb128 (u128, readp, readendp);
+	      if (readp + offset_len > readendp)
+		goto invalid_data;
+	      if (offset_len == 8)
+		off = read_8ubyte_unaligned_inc (dbg, readp);
+	      else
+		off = read_4ubyte_unaligned_inc (dbg, readp);
+	      // Needs support for reading from supplementary object file.
+	      printf ("%*s#undef <str-at-0x%" PRIx64 ">, line %u (sup)\n",
+		      level, "", off, u128);
+	      break;
+
+	    case DW_MACRO_import_sup:
+	      if (readp + offset_len > readendp)
+		goto invalid_data;
+	      if (offset_len == 8)
+		off = read_8ubyte_unaligned_inc (dbg, readp);
+	      else
+		off = read_4ubyte_unaligned_inc (dbg, readp);
+	      printf ("%*s#include offset 0x%" PRIx64 " (sup)\n",
+		      level, "", off);
+	      break;
+
+	    case DW_MACRO_define_strx:
+	      get_uleb128 (u128, readp, readendp);
+	      if (readp + offset_len > readendp)
+		goto invalid_data;
+	      if (offset_len == 8)
+		off = read_8ubyte_unaligned_inc (dbg, readp);
+	      else
+		off = read_4ubyte_unaligned_inc (dbg, readp);
+	      // Needs support for reading indirect string offset table
+	      printf ("%*s#define <str-at-0x%" PRIx64 ">, line %u (strx)\n",
+		      level, "", off, u128);
+	      break;
+
+	    case DW_MACRO_undef_strx:
+	      get_uleb128 (u128, readp, readendp);
+	      if (readp + offset_len > readendp)
+		goto invalid_data;
+	      if (offset_len == 8)
+		off = read_8ubyte_unaligned_inc (dbg, readp);
+	      else
+		off = read_4ubyte_unaligned_inc (dbg, readp);
+	      // Needs support for reading indirect string offset table.
+	      printf ("%*s#undef <str-at-0x%" PRIx64 ">, line %u (strx)\n",
+		      level, "", off, u128);
+	      break;
+
 	    default:
 	      printf ("%*svendor opcode 0x%" PRIx8, level, "", opcode);
-	      if (opcode < DW_MACRO_GNU_lo_user
-		  || opcode > DW_MACRO_GNU_lo_user
-		  || vendor[opcode - DW_MACRO_GNU_lo_user] == NULL)
+	      if (opcode < DW_MACRO_lo_user
+		  || opcode > DW_MACRO_lo_user
+		  || vendor[opcode - DW_MACRO_lo_user] == NULL)
 		goto invalid_data;
 
 	      const unsigned char *op_desc;
-	      op_desc = vendor[opcode - DW_MACRO_GNU_lo_user];
+	      op_desc = vendor[opcode - DW_MACRO_lo_user];
 
 	      // Just skip the arguments, we cannot really interpret them,
 	      // but print as much as we can.

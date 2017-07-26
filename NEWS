@@ -1,9 +1,11 @@
 Version 0.170
 
 libdw: Added new DWARF5 attribute, tag, character encoding, language code,
-       calling convention and defaulted member function constants to dwarf.h.
+       calling convention, defaulted member function and macro constants
+       to dwarf.h.
        New function dwarf_default_lower_bound.
        dwarf_peel_type now handles DWARF5 immutable, packed and shared tags.
+       dwarf_getmacros now handles DWARF5 .debug_macro sections.
 
 strip: Add -R, --remove-section=SECTION and --keep-section=SECTION.
 

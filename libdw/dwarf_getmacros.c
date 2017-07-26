@@ -158,7 +158,7 @@ get_table_for_offset (Dwarf *dbg, Dwarf_Word macoff,
     }
 
   uint16_t version = read_2ubyte_unaligned_inc (dbg, readp);
-  if (version != 4)
+  if (version != 4 && version != 5)
     {
       __libdw_seterrno (DWARF_E_INVALID_VERSION);
       return NULL;
@@ -198,15 +198,17 @@ get_table_for_offset (Dwarf *dbg, Dwarf_Word macoff,
 
   Dwarf_Macro_Op_Proto op_protos[255] =
     {
-      [DW_MACRO_GNU_define - 1] = p_udata_str,
-      [DW_MACRO_GNU_undef - 1] = p_udata_str,
-      [DW_MACRO_GNU_define_indirect - 1] = p_udata_strp,
-      [DW_MACRO_GNU_undef_indirect - 1] = p_udata_strp,
-      [DW_MACRO_GNU_start_file - 1] = p_udata_udata,
-      [DW_MACRO_GNU_end_file - 1] = p_none,
-      [DW_MACRO_GNU_transparent_include - 1] = p_secoffset,
-      /* N.B. DW_MACRO_undef_indirectx, DW_MACRO_define_indirectx
-	 should be added when 130313.1 is supported.  */
+      [DW_MACRO_define - 1] = p_udata_str,
+      [DW_MACRO_undef - 1] = p_udata_str,
+      [DW_MACRO_define_strp - 1] = p_udata_strp,
+      [DW_MACRO_undef_strp - 1] = p_udata_strp,
+      [DW_MACRO_start_file - 1] = p_udata_udata,
+      [DW_MACRO_end_file - 1] = p_none,
+      [DW_MACRO_import - 1] = p_secoffset,
+      /* When adding support for DWARF5 supplementary object files and
+	 indirect string tables also add support for DW_MACRO_define_sup,
+	 DW_MACRO_undef_sup, DW_MACRO_import_sup, DW_MACRO_define_strx
+	 and DW_MACRO_undef_strx.  */
     };
 
   if ((flags & 0x4) != 0)
@@ -354,10 +356,11 @@ read_macros (Dwarf *dbg, int sec_index,
 
       /* A fake CU with bare minimum data to fool dwarf_formX into
 	 doing the right thing with the attributes that we put out.
-	 We arbitrarily pretend it's version 4.  */
+	 We pretend it is the same version as the actual table.
+	 Version 4 for the old GNU extension, version 5 for DWARF5.  */
       Dwarf_CU fake_cu = {
 	.dbg = dbg,
-	.version = 4,
+	.version = table->version,
 	.offset_size = table->is_64bit ? 8 : 4,
 	.startp = (void *) startp + offset,
 	.endp = (void *) endp,

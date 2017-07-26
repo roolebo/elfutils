@@ -3797,6 +3797,23 @@ dwarf_access_string (unsigned int code)
 
 
 static const char *
+dwarf_defaulted_string (unsigned int code)
+{
+  static const char *const known[] =
+    {
+#define DWARF_ONE_KNOWN_DW_DEFAULTED(NAME, CODE) [CODE] = #NAME,
+      DWARF_ALL_KNOWN_DW_DEFAULTED
+#undef DWARF_ONE_KNOWN_DW_DEFAULTED
+    };
+
+  if (likely (code < sizeof (known) / sizeof (known[0])))
+    return known[code];
+
+  return NULL;
+}
+
+
+static const char *
 dwarf_visibility_string (unsigned int code)
 {
   static const char *const known[] =
@@ -3997,6 +4014,14 @@ static const char *
 dwarf_access_name (unsigned int code)
 {
   const char *ret = dwarf_access_string (code);
+  return string_or_unknown (ret, code, 0, 0, false);
+}
+
+
+static const char *
+dwarf_defaulted_name (unsigned int code)
+{
+  const char *ret = dwarf_defaulted_string (code);
   return string_or_unknown (ret, code, 0, 0, false);
 }
 
@@ -6052,6 +6077,9 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	  break;
 	case DW_AT_accessibility:
 	  valuestr = dwarf_access_name (num);
+	  break;
+	case DW_AT_defaulted:
+	  valuestr = dwarf_defaulted_name (num);
 	  break;
 	case DW_AT_visibility:
 	  valuestr = dwarf_visibility_name (num);

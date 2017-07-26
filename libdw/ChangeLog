@@ -1,5 +1,10 @@
 2017-07-26  Mark Wielaard  <mark@klomp.org>
 
+	* dwarf.h: Add DW_DEFAULTED_no, DW_DEFAULTED_in_class and
+	DW_DEFAULTED_out_of_class.
+
+2017-07-26  Mark Wielaard  <mark@klomp.org>
+
 	* dwarf.h: Add DW_CC_pass_by_reference and DW_CC_pass_by_reference.
 
 2017-07-26  Mark Wielaard  <mark@klomp.org>

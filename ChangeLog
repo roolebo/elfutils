@@ -1,6 +1,7 @@
 2017-07-26  Mark Wielaard  <mark@klomp.org>
 
-	* NEWS: Mention new DWARF5 calling conventions.
+	* NEWS: Mention new DWARF5 calling conventions and defaulted member
+	function.
 
 2017-07-26  Mark Wielaard  <mark@klomp.org>
 

@@ -1,3 +1,10 @@
+2017-07-26  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (dwarf_defaulted_string): New function.
+	(dwarf_defaulted_name): Likewise.
+	(attr_callback): Use dwarf_defaulted_name to get value of
+	DW_AT_defaulted.
+
 2017-07-20  Mark Wielaard  <mark@klomp.org>
 
 	* strip.c (handle_elf): Deal with data marker symbols pointing to

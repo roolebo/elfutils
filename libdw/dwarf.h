@@ -729,6 +729,14 @@ enum
     DW_DSC_range = 1
   };
 
+/* DWARF defaulted member function encodings.  */
+enum
+  {
+    DW_DEFAULTED_no = 0,
+    DW_DEFAULTED_in_class = 1,
+    DW_DEFAULTED_out_of_class = 2
+  };
+
 
 /* DWARF standard opcode encodings.  */
 enum

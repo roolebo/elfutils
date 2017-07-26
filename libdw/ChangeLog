@@ -1,5 +1,11 @@
 2017-07-26  Mark Wielaard  <mark@klomp.org>
 
+	* dwarf_peel_type.c (dwarf_peel_type): Handle DW_TAG_immutable_type,
+	DW_TAG_packed_type and DW_TAG_shared_type.
+	* libdw.h (dwarf_peel_type): Extend documentation.
+
+2017-07-26  Mark Wielaard  <mark@klomp.org>
+
 	* dwarf.h: Add DW_DEFAULTED_no, DW_DEFAULTED_in_class and
 	DW_DEFAULTED_out_of_class.
 

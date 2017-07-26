@@ -1,5 +1,5 @@
 /* Interfaces for libdw.
-   Copyright (C) 2002-2010, 2013, 2014 Red Hat, Inc.
+   Copyright (C) 2002-2010, 2013, 2014, 2016 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -378,8 +378,11 @@ extern int dwarf_child (Dwarf_Die *die, Dwarf_Die *result)
 extern int dwarf_siblingof (Dwarf_Die *die, Dwarf_Die *result)
      __nonnull_attribute__ (2);
 
-/* For type aliases and qualifier type DIEs follow the DW_AT_type
-   attribute (recursively) and return the underlying type Dwarf_Die.
+/* For type aliases and qualifier type DIEs, which don't modify or
+   change the structural layout of the underlying type, follow the
+   DW_AT_type attribute (recursively) and return the underlying type
+   Dwarf_Die.
+
    Returns 0 when RESULT contains a Dwarf_Die (possibly equal to the
    given DIE) that isn't a type alias or qualifier type.  Returns 1
    when RESULT contains a type alias or qualifier Dwarf_Die that
@@ -387,13 +390,18 @@ extern int dwarf_siblingof (Dwarf_Die *die, Dwarf_Die *result)
    attribute).  Returns -1 when an error occured.
 
    The current DWARF specification defines one type alias tag
-   (DW_TAG_typedef) and three qualifier type tags (DW_TAG_const_type,
-   DW_TAG_volatile_type, DW_TAG_restrict_type).  DWARF5 defines one
-   other qualifier type tag (DW_TAG_atomic_type).  A future version of
-   this function might peel other alias or qualifier type tags if a
-   future DWARF version or GNU extension defines other type aliases or
-   qualifier type tags that don't modify or change the structural
-   layout of the underlying type.  */
+   (DW_TAG_typedef) and seven modifier/qualifier type tags
+   (DW_TAG_const_type, DW_TAG_volatile_type, DW_TAG_restrict_type,
+   DW_TAG_atomic_type, DW_TAG_immutable_type, DW_TAG_packed_type and
+   DW_TAG_shared_type).  This function won't peel modifier type
+   tags that change the way the underlying type is accessed such
+   as the pointer or reference type tags (DW_TAG_pointer_type,
+   DW_TAG_reference_type or DW_TAG_rvalue_reference_type).
+
+   A future version of this function might peel other alias or
+   qualifier type tags if a future DWARF version or GNU extension
+   defines other type aliases or qualifier type tags that don't modify,
+   change the structural layout or the way to access the underlying type.  */
 extern int dwarf_peel_type (Dwarf_Die *die, Dwarf_Die *result)
     __nonnull_attribute__ (2);
 

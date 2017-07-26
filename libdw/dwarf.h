@@ -688,12 +688,17 @@ enum
   };
 
 
-/* DWARF calling conventions encodings.  */
+/* DWARF calling conventions encodings.
+   Used as values of DW_AT_calling_convention for subroutines
+   (normal, program or nocall) or structures, unions and class types
+   (normal, reference or value).  */
 enum
   {
     DW_CC_normal = 0x1,
     DW_CC_program = 0x2,
     DW_CC_nocall = 0x3,
+    DW_CC_pass_by_reference = 0x4,
+    DW_CC_pass_by_value = 0x5,
     DW_CC_lo_user = 0x40,
     DW_CC_hi_user = 0xff
   };

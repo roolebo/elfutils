@@ -1,5 +1,9 @@
 2017-07-26  Mark Wielaard  <mark@klomp.org>
 
+	* dwarf.h: Add DW_CC_pass_by_reference and DW_CC_pass_by_reference.
+
+2017-07-26  Mark Wielaard  <mark@klomp.org>
+
 	* dwarf_default_lower_bound.c: New file.
 	* Makefile.am (libdw_a_SOURCES): Add dwarf_default_lower_bound.c.
 	* dwarf_aggregate_size.c (array_size): Use dwarf_default_lower_bound.

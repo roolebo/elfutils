@@ -652,14 +652,23 @@ enum
     DW_LANG_UPC = 0x0012,	     /* Unified Parallel C */
     DW_LANG_D = 0x0013,		     /* D */
     DW_LANG_Python = 0x0014,	     /* Python */
+    DW_LANG_OpenCL = 0x0015,	     /* OpenCL */
     DW_LANG_Go = 0x0016,	     /* Go */
+    DW_LANG_Modula3 = 0x0017,	     /* Modula-3 */
     DW_LANG_Haskell = 0x0018,	     /* Haskell */
+    DW_LANG_C_plus_plus_03 = 0x0019, /* ISO C++:2003 */
     DW_LANG_C_plus_plus_11 = 0x001a, /* ISO C++:2011 */
+    DW_LANG_OCaml = 0x001b,	     /* OCaml */
+    DW_LANG_Rust = 0x001c,	     /* Rust */
     DW_LANG_C11 = 0x001d,	     /* ISO C:2011 */
+    DW_LANG_Swift = 0x001e,	     /* Swift */
+    DW_LANG_Julia = 0x001f,	     /* Julia */
+    DW_LANG_Dylan = 0x0020,	     /* Dylan */
     DW_LANG_C_plus_plus_14 = 0x0021, /* ISO C++:2014 */
     DW_LANG_Fortran03 = 0x0022,	     /* ISO/IEC 1539-1:2004 */
     DW_LANG_Fortran08 = 0x0023,	     /* ISO/IEC 1539-1:2010 */
-
+    DW_LANG_RenderScript = 0x0024,   /* RenderScript Kernal Language */
+    DW_LANG_BLISS = 0x0025,	     /* BLISS */
 
     DW_LANG_lo_user = 0x8000,
     DW_LANG_Mips_Assembler = 0x8001, /* Assembler */

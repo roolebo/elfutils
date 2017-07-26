@@ -1,5 +1,16 @@
 2017-07-26  Mark Wielaard  <mark@klomp.org>
 
+	* dwarf.h: Add DW_LANG_OpenCL, DW_LANG_Modula3,
+	DW_LANG_C_plus_plus_03, DW_LANG_OCaml, DW_LANG_Rust, DW_LANG_Swift,
+	DW_LANG_Julia, DW_LANG_Dylan, DW_LANG_RenderScript, DW_LANG_BLISS.
+	* dwarf_aggregate_size.c (array_size): Add lower bound for
+	DW_LANG_C_plus_plus_03, DW_LANG_Python, DW_LANG_OpenCL,
+	DW_LANG_Haskell, DW_LANG_OCaml, DW_LANG_Rust, DW_LANG_Swift,
+	DW_LANG_Dylan, DW_LANG_RenderScript, DW_LANG_Modula3,
+	DW_LANG_Julia and DW_LANG_BLISS.
+
+2017-07-26  Mark Wielaard  <mark@klomp.org>
+
 	* dwarf.h: Add DW_ATE_UCS and DW_ATE_ASCII.
 
 2017-07-25  Mark Wielaard  <mark@klomp.org>

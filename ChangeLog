@@ -1,7 +1,7 @@
 2017-07-25  Mark Wielaard  <mark@klomp.org>
 
-	* NEWS: Mention new DWARF5 attributes, tags and character encodings
-	in dwarf.h.
+	* NEWS: Mention new DWARF5 attributes, tags, character encodings
+	and language codes in dwarf.h.
 
 2017-07-18  Mark Wielaard  <mark@klomp.org>
 

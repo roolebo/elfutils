@@ -105,14 +105,24 @@ array_size (Dwarf_Die *die, Dwarf_Word *size,
 		    case DW_LANG_C99:
 		    case DW_LANG_C11:
 		    case DW_LANG_C_plus_plus:
+		    case DW_LANG_C_plus_plus_03:
 		    case DW_LANG_C_plus_plus_11:
 		    case DW_LANG_C_plus_plus_14:
 		    case DW_LANG_ObjC:
 		    case DW_LANG_ObjC_plus_plus:
 		    case DW_LANG_Java:
 		    case DW_LANG_D:
+		    case DW_LANG_Python:
 		    case DW_LANG_UPC:
+		    case DW_LANG_OpenCL:
 		    case DW_LANG_Go:
+		    case DW_LANG_Haskell:
+		    case DW_LANG_OCaml:
+		    case DW_LANG_Rust:
+		    case DW_LANG_Swift:
+		    case DW_LANG_Dylan:
+		    case DW_LANG_RenderScript:
+		    case DW_LANG_BLISS:
 		      lower = 0;
 		      break;
 
@@ -127,7 +137,9 @@ array_size (Dwarf_Die *die, Dwarf_Word *size,
 		    case DW_LANG_Fortran08:
 		    case DW_LANG_Pascal83:
 		    case DW_LANG_Modula2:
+		    case DW_LANG_Modula3:
 		    case DW_LANG_PLI:
+		    case DW_LANG_Julia:
 		      lower = 1;
 		      break;
 

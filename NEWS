@@ -1,7 +1,7 @@
 Version 0.170
 
-libdw: Added new DWARF5 attribute, tag and character encodings constants
-       to dwarf.h.
+libdw: Added new DWARF5 attribute, tag, character encodings constants and
+       language codes to dwarf.h.
 
 strip: Add -R, --remove-section=SECTION and --keep-section=SECTION.
 

@@ -95,6 +95,7 @@ static const char *errmsgs[] =
     [DWARF_E_NO_ALT_DEBUGLINK] = N_("no alternative debug link found"),
     [DWARF_E_INVALID_OPCODE] = N_("invalid opcode"),
     [DWARF_E_NOT_CUDIE] = N_("not a CU (unit) DIE"),
+    [DWARF_E_UNKNOWN_LANGUAGE] = N_("unknown language code")
   };
 #define nerrmsgs (sizeof (errmsgs) / sizeof (errmsgs[0]))
 

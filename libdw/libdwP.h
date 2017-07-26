@@ -1,5 +1,5 @@
 /* Internal definitions for libdwarf.
-   Copyright (C) 2002-2011, 2013-2015 Red Hat, Inc.
+   Copyright (C) 2002-2011, 2013-2016 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -130,6 +130,7 @@ enum
   DWARF_E_NO_ALT_DEBUGLINK,
   DWARF_E_INVALID_OPCODE,
   DWARF_E_NOT_CUDIE,
+  DWARF_E_UNKNOWN_LANGUAGE,
 };
 
 
@@ -764,6 +765,7 @@ INTDECL (dwarf_attr_integrate)
 INTDECL (dwarf_begin)
 INTDECL (dwarf_begin_elf)
 INTDECL (dwarf_child)
+INTDECL (dwarf_default_lower_bound)
 INTDECL (dwarf_dieoffset)
 INTDECL (dwarf_diename)
 INTDECL (dwarf_end)

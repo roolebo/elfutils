@@ -1,3 +1,7 @@
+2017-07-26  Mark Wielaard  <mark@klomp.org>
+
+	* NEWS: Mention new dwarf_default_lower_bound function.
+
 2017-07-25  Mark Wielaard  <mark@klomp.org>
 
 	* NEWS: Mention new DWARF5 attributes, tags, character encodings

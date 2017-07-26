@@ -55,7 +55,7 @@ check_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  getsrc_die strptr newdata elfstrtab dwfl-proc-attach \
 		  elfshphehdr elfstrmerge dwelfgnucompressed elfgetchdr \
 		  elfgetzdata elfputzdata zstrptr emptyfile vendorelf \
-		  fillfile
+		  fillfile dwarf_default_lower_bound
 
 asm_TESTS = asm-tst1 asm-tst2 asm-tst3 asm-tst4 asm-tst5 \
 	    asm-tst6 asm-tst7 asm-tst8 asm-tst9
@@ -135,7 +135,7 @@ TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
 	run-elfgetzdata.sh run-elfputzdata.sh run-zstrptr.sh \
 	run-compress-test.sh \
 	run-readelf-zdebug.sh run-readelf-zdebug-rel.sh \
-	emptyfile vendorelf fillfile
+	emptyfile vendorelf fillfile dwarf_default_lower_bound
 
 if !BIARCH
 export ELFUTILS_DISABLE_BIARCH = 1
@@ -505,6 +505,7 @@ zstrptr_LDADD = $(libelf)
 emptyfile_LDADD = $(libelf)
 vendorelf_LDADD = $(libelf)
 fillfile_LDADD = $(libelf)
+dwarf_default_lower_bound_LDADD = $(libdw)
 
 # We want to test the libelf header against the system elf.h header.
 # Don't include any -I CPPFLAGS.

@@ -1,5 +1,16 @@
 2017-07-26  Mark Wielaard  <mark@klomp.org>
 
+	* dwarf_default_lower_bound.c: New file.
+	* Makefile.am (libdw_a_SOURCES): Add dwarf_default_lower_bound.c.
+	* dwarf_aggregate_size.c (array_size): Use dwarf_default_lower_bound.
+	* dwarf_error.c (errmsgs): Add DWARF_E_UNKNOWN_LANGUAGE.
+	* libdw.h: Add dwarf_default_lower_bound.
+	* libdw.map (ELFUTILS_0.170): Add dwarf_default_lower_bound.
+	* libdwP.h: Add DWARF_E_UNKNOWN_LANGUAGE and
+	dwarf_default_lower_bound INTDECL.
+
+2017-07-26  Mark Wielaard  <mark@klomp.org>
+
 	* dwarf.h: Add DW_LANG_OpenCL, DW_LANG_Modula3,
 	DW_LANG_C_plus_plus_03, DW_LANG_OCaml, DW_LANG_Rust, DW_LANG_Swift,
 	DW_LANG_Julia, DW_LANG_Dylan, DW_LANG_RenderScript, DW_LANG_BLISS.

@@ -1,3 +1,10 @@
+2017-07-26  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_default_lower_bound.c: New test.
+	* Makefile.am (check_PROGRAMS): Add dwarf_default_lower_bound.
+	(TESTS): Likewise.
+	(dwarf_default_lower_bound_LDADD): New variable.
+
 2017-07-21  Mark Wielaard  <mark@klomp.org>
 
 	* get-lines.c (main): Add dwarf_line_file test.

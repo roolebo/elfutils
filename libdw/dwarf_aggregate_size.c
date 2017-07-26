@@ -95,57 +95,11 @@ array_size (Dwarf_Die *die, Dwarf_Word *size,
 		}
 	      else
 		{
-		  /* Determine default lower bound from language,
-		     as per "4.12 Subrange Type Entries".  */
 		  Dwarf_Die cu = CUDIE (die->cu);
-		  switch (INTUSE(dwarf_srclang) (&cu))
-		    {
-		    case DW_LANG_C:
-		    case DW_LANG_C89:
-		    case DW_LANG_C99:
-		    case DW_LANG_C11:
-		    case DW_LANG_C_plus_plus:
-		    case DW_LANG_C_plus_plus_03:
-		    case DW_LANG_C_plus_plus_11:
-		    case DW_LANG_C_plus_plus_14:
-		    case DW_LANG_ObjC:
-		    case DW_LANG_ObjC_plus_plus:
-		    case DW_LANG_Java:
-		    case DW_LANG_D:
-		    case DW_LANG_Python:
-		    case DW_LANG_UPC:
-		    case DW_LANG_OpenCL:
-		    case DW_LANG_Go:
-		    case DW_LANG_Haskell:
-		    case DW_LANG_OCaml:
-		    case DW_LANG_Rust:
-		    case DW_LANG_Swift:
-		    case DW_LANG_Dylan:
-		    case DW_LANG_RenderScript:
-		    case DW_LANG_BLISS:
-		      lower = 0;
-		      break;
-
-		    case DW_LANG_Ada83:
-		    case DW_LANG_Ada95:
-		    case DW_LANG_Cobol74:
-		    case DW_LANG_Cobol85:
-		    case DW_LANG_Fortran77:
-		    case DW_LANG_Fortran90:
-		    case DW_LANG_Fortran95:
-		    case DW_LANG_Fortran03:
-		    case DW_LANG_Fortran08:
-		    case DW_LANG_Pascal83:
-		    case DW_LANG_Modula2:
-		    case DW_LANG_Modula3:
-		    case DW_LANG_PLI:
-		    case DW_LANG_Julia:
-		      lower = 1;
-		      break;
-
-		    default:
-		      return -1;
-		    }
+		  int lang = INTUSE(dwarf_srclang) (&cu);
+		  if (lang == -1
+		      || INTUSE(dwarf_default_lower_bound) (lang, &lower) != 0)
+		    return -1;
 		}
 	      if (unlikely (lower > upper))
 		return -1;

@@ -341,5 +341,6 @@ ELFUTILS_0.167 {
 
 ELFUTILS_0.170 {
   global:
+    dwarf_default_lower_bound;
     dwarf_line_file;
 } ELFUTILS_0.167;

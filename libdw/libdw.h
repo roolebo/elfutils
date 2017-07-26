@@ -733,6 +733,12 @@ extern int dwarf_getlocation_attr (Dwarf_Attribute *attr,
    For DW_TAG_array_type it can apply much more complex rules.  */
 extern int dwarf_aggregate_size (Dwarf_Die *die, Dwarf_Word *size);
 
+/* Given a language code, as returned by dwarf_srclan, get the default
+   lower bound for a subrange type without a lower bound attribute.
+   Returns zero on success or -1 on failure when the given language
+   wasn't recognized.  */
+extern int dwarf_default_lower_bound (int lang, Dwarf_Sword *result)
+  __nonnull_attribute__ (2);
 
 /* Return scope DIEs containing PC address.
    Sets *SCOPES to a malloc'd array of Dwarf_Die structures,

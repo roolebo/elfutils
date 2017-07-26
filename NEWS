@@ -1,6 +1,6 @@
 Version 0.170
 
-libdw: Added new DWARF5 attribute constants to dwarf.h.
+libdw: Added new DWARF5 attribute and tag constants to dwarf.h.
 
 strip: Add -R, --remove-section=SECTION and --keep-section=SECTION.
 

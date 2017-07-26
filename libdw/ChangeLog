@@ -1,5 +1,12 @@
 2017-07-25  Mark Wielaard  <mark@klomp.org>
 
+	* dwarf.h: Add DW_TAG_coarray_type, DW_TAG_generic_subrange,
+	DW_TAG_dynamic_type, DW_TAG_call_site, DW_TAG_call_site_parameter,
+	DW_TAG_skeleton_unit, DW_TAG_immutable_type. Add reserved comments
+	for currently unused numbers.
+
+2017-07-25  Mark Wielaard  <mark@klomp.org>
+
 	* dwarf.h (DWARF attributes enum): Remove DW_AT_subscr_data,
 	DW_AT_element_list and DW_AT_member. Add DWARF5 attribute constants.
 	(DW_AT_subscr_data, DW_AT_element_list, DW_AT_member): New defines.

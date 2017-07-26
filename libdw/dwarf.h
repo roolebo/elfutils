@@ -37,15 +37,21 @@ enum
     DW_TAG_entry_point = 0x03,
     DW_TAG_enumeration_type = 0x04,
     DW_TAG_formal_parameter = 0x05,
+    /* 0x06 reserved.  */
+    /* 0x07 reserved.  */
     DW_TAG_imported_declaration = 0x08,
+    /* 0x09 reserved.  */
     DW_TAG_label = 0x0a,
     DW_TAG_lexical_block = 0x0b,
+    /* 0x0c reserved.  */
     DW_TAG_member = 0x0d,
+    /* 0x0e reserved.  */
     DW_TAG_pointer_type = 0x0f,
     DW_TAG_reference_type = 0x10,
     DW_TAG_compile_unit = 0x11,
     DW_TAG_string_type = 0x12,
     DW_TAG_structure_type = 0x13,
+    /* 0x14 reserved.  */
     DW_TAG_subroutine_type = 0x15,
     DW_TAG_typedef = 0x16,
     DW_TAG_union_type = 0x17,
@@ -87,15 +93,20 @@ enum
     DW_TAG_unspecified_type = 0x3b,
     DW_TAG_partial_unit = 0x3c,
     DW_TAG_imported_unit = 0x3d,
-    /* 0x3e reserved.  */
+    /* 0x3e reserved.  Was DW_TAG_mutable_type.  */
     DW_TAG_condition = 0x3f,
     DW_TAG_shared_type = 0x40,
     DW_TAG_type_unit = 0x41,
     DW_TAG_rvalue_reference_type = 0x42,
     DW_TAG_template_alias = 0x43,
-
-    /* DWARF 5.  */
+    DW_TAG_coarray_type = 0x44,
+    DW_TAG_generic_subrange = 0x45,
+    DW_TAG_dynamic_type = 0x46,
     DW_TAG_atomic_type = 0x47,
+    DW_TAG_call_site = 0x48,
+    DW_TAG_call_site_parameter = 0x49,
+    DW_TAG_skeleton_unit = 0x4a,
+    DW_TAG_immutable_type = 0x4b,
 
     DW_TAG_lo_user = 0x4080,
 

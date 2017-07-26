@@ -1,3 +1,7 @@
+2017-07-26  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf.h: Add DW_ATE_UCS and DW_ATE_ASCII.
+
 2017-07-25  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf.h: Add DW_TAG_coarray_type, DW_TAG_generic_subrange,

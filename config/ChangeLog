@@ -1,4 +1,8 @@
-2016-05-05  Mark Wielaard  <mark@klomp.org>
+2016-08-02  Mark Wielaard  <mark@klomp.org>
+
+	* elfutils.spec.in: Update for 0.170.
+
+2017-05-05  Mark Wielaard  <mark@klomp.org>
 
 	* elfutils.spec.in: Update for 0.169.
 

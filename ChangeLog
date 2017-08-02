@@ -1,3 +1,8 @@
+2017-08-02  Mark Wielaard  <mark@klomp.org>
+
+	* configure.ac: Set version to 0.170.
+	* NEWS: Mention new libdw dwarf_line_file function.
+
 2017-07-26  Mark Wielaard  <mark@klomp.org>
 
 	* NEWS: Mention dwarf_getmacros handling version 5 .debug_macro.

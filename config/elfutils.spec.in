@@ -227,6 +227,16 @@ rm -rf ${RPM_BUILD_ROOT}
 %config(noreplace) %{_sysctldir}/10-default-yama-scope.conf
 
 %changelog
+* Wed Aug  2 2017 Mark Wielaard <mark@gmail.com> 0.170-1
+- libdw: Added new DWARF5 attribute, tag, character encoding,
+  language code, calling convention, defaulted member function
+  and macro constants to dwarf.h.
+  New functions dwarf_default_lower_bound and dwarf_line_file.
+  dwarf_peel_type now handles DWARF5 immutable, packed and shared tags.
+  dwarf_getmacros now handles DWARF5 .debug_macro sections.
+- strip: Add -R, --remove-section=SECTION and --keep-section=SECTION.
+- backends: The bpf disassembler is now always build on all platforms.
+
 * Fri May  5 2017 Mark Wielaard <mark@klomp.org> 0.169-1
 - backends: Add support for EM_PPC64 GNU_ATTRIBUTES.
   Frame pointer unwinding fallback support for i386, x86_64, aarch64.

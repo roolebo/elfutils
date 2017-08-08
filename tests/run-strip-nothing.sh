@@ -23,7 +23,7 @@
 tempfiles a.out strip.out debug.out
 
 # Create no-debug a.out.
-echo "int main() { return 1; }" | gcc -xc -
+echo "int main() { return 1; }" | gcc -s -xc -
 
 # strip to file
 testrun ${abs_top_builddir}/src/strip -g -o strip.out ||

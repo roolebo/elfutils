@@ -1,3 +1,7 @@
+2017-08-08  Dmitry V. Levin <ldv@altlinux.org>
+
+	* run-strip-nothing.sh: Add -s.
+
 2017-07-26  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf-getmacros.c (mac): Use DW_MACRO names instead of DW_MACRO_GNU.

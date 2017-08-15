@@ -1,5 +1,5 @@
 /* This file defines standard ELF types, structures, and macros.
-   Copyright (C) 1995-2016 Free Software Foundation, Inc.
+   Copyright (C) 1995-2017 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -762,8 +762,23 @@ typedef struct
 #define NT_PPC_VMX	0x100		/* PowerPC Altivec/VMX registers */
 #define NT_PPC_SPE	0x101		/* PowerPC SPE/EVR registers */
 #define NT_PPC_VSX	0x102		/* PowerPC VSX registers */
+#define NT_PPC_TAR	0x103		/* Target Address Register */
+#define NT_PPC_PPR	0x104		/* Program Priority Register */
+#define NT_PPC_DSCR	0x105		/* Data Stream Control Register */
+#define NT_PPC_EBB	0x106		/* Event Based Branch Registers */
+#define NT_PPC_PMU	0x107		/* Performance Monitor Registers */
+#define NT_PPC_TM_CGPR	0x108		/* TM checkpointed GPR Registers */
+#define NT_PPC_TM_CFPR	0x109		/* TM checkpointed FPR Registers */
+#define NT_PPC_TM_CVMX	0x10a		/* TM checkpointed VMX Registers */
+#define NT_PPC_TM_CVSX	0x10b		/* TM checkpointed VSX Registers */
+#define NT_PPC_TM_SPR	0x10c		/* TM Special Purpose Registers */
+#define NT_PPC_TM_CTAR	0x10d		/* TM checkpointed Target Address
+					   Register */
+#define NT_PPC_TM_CPPR	0x10e		/* TM checkpointed Program Priority
+					   Register */
+#define NT_PPC_TM_CDSCR	0x10f		/* TM checkpointed Data Stream Control
+					   Register */
 #define NT_386_TLS	0x200		/* i386 TLS slots (struct user_desc) */
-#define NT_PPC_TM_SPR	0x10c		/* PowerPC HW Transactional Memory SPRs */
 #define NT_386_IOPERM	0x201		/* x86 io permission bitmap (1=deny) */
 #define NT_X86_XSTATE	0x202		/* x86 extended state using xsave */
 #define NT_S390_HIGH_GPRS	0x300	/* s390 upper register halves */
@@ -1170,6 +1185,18 @@ typedef struct
 #define AT_L1D_CACHESHAPE	35
 #define AT_L2_CACHESHAPE	36
 #define AT_L3_CACHESHAPE	37
+
+/* Shapes of the caches, with more room to describe them.
+   *GEOMETRY are comprised of cache line size in bytes in the bottom 16 bits
+   and the cache associativity in the next 16 bits.  */
+#define AT_L1I_CACHESIZE	40
+#define AT_L1I_CACHEGEOMETRY	41
+#define AT_L1D_CACHESIZE	42
+#define AT_L1D_CACHEGEOMETRY	43
+#define AT_L2_CACHESIZE		44
+#define AT_L2_CACHEGEOMETRY	45
+#define AT_L3_CACHESIZE		46
+#define AT_L3_CACHEGEOMETRY	47
 
 /* Note section contents.  Each entry in the note section begins with
    a header of a fixed form.  */
@@ -2533,9 +2560,10 @@ enum
 #define DT_PPC64_OPT	(DT_LOPROC + 3)
 #define DT_PPC64_NUM    4
 
-/* PowerPC64 specific values for the DT_PPC64_OPT Dyn entry.  */
+/* PowerPC64 specific bits in the DT_PPC64_OPT Dyn entry.  */
 #define PPC64_OPT_TLS		1
 #define PPC64_OPT_MULTI_TOC	2
+#define PPC64_OPT_LOCALENTRY	4
 
 /* PowerPC64 specific values for the Elf64_Sym st_other field.  */
 #define STO_PPC64_LOCAL_BIT	5
@@ -3682,6 +3710,68 @@ enum
 
 #define R_BPF_NONE		0	/* No reloc */
 #define R_BPF_MAP_FD		1	/* Map fd to pointer */
+
+/* Imagination Meta specific relocations. */
+
+#define R_METAG_HIADDR16	0
+#define R_METAG_LOADDR16	1
+#define R_METAG_ADDR32		2	/* 32bit absolute address */
+#define R_METAG_NONE		3	/* No reloc */
+#define R_METAG_RELBRANCH	4
+#define R_METAG_GETSETOFF	5
+
+/* Backward compatability */
+#define R_METAG_REG32OP1	6
+#define R_METAG_REG32OP2	7
+#define R_METAG_REG32OP3	8
+#define R_METAG_REG16OP1	9
+#define R_METAG_REG16OP2	10
+#define R_METAG_REG16OP3	11
+#define R_METAG_REG32OP4	12
+
+#define R_METAG_HIOG		13
+#define R_METAG_LOOG		14
+
+#define R_METAG_REL8		15
+#define R_METAG_REL16		16
+
+/* GNU */
+#define R_METAG_GNU_VTINHERIT	30
+#define R_METAG_GNU_VTENTRY	31
+
+/* PIC relocations */
+#define R_METAG_HI16_GOTOFF	32
+#define R_METAG_LO16_GOTOFF	33
+#define R_METAG_GETSET_GOTOFF	34
+#define R_METAG_GETSET_GOT	35
+#define R_METAG_HI16_GOTPC	36
+#define R_METAG_LO16_GOTPC	37
+#define R_METAG_HI16_PLT	38
+#define R_METAG_LO16_PLT	39
+#define R_METAG_RELBRANCH_PLT	40
+#define R_METAG_GOTOFF		41
+#define R_METAG_PLT		42
+#define R_METAG_COPY		43
+#define R_METAG_JMP_SLOT	44
+#define R_METAG_RELATIVE	45
+#define R_METAG_GLOB_DAT	46
+
+/* TLS relocations */
+#define R_METAG_TLS_GD		47
+#define R_METAG_TLS_LDM		48
+#define R_METAG_TLS_LDO_HI16	49
+#define R_METAG_TLS_LDO_LO16	50
+#define R_METAG_TLS_LDO		51
+#define R_METAG_TLS_IE		52
+#define R_METAG_TLS_IENONPIC	53
+#define R_METAG_TLS_IENONPIC_HI16 54
+#define R_METAG_TLS_IENONPIC_LO16 55
+#define R_METAG_TLS_TPOFF	56
+#define R_METAG_TLS_DTPMOD	57
+#define R_METAG_TLS_DTPOFF	58
+#define R_METAG_TLS_LE		59
+#define R_METAG_TLS_LE_HI16	60
+#define R_METAG_TLS_LE_LO16	61
 
 __END_DECLS
 

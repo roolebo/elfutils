@@ -362,7 +362,7 @@ print_frames (struct frames *frames, pid_t tid, int dwflerr, const char *what)
   if (frames->frames > 0)
     frames_shown = true;
 
-  printf ("TID %d:\n", tid);
+  printf ("TID %lld:\n", (long long) tid);
   int frame_nr = 0;
   for (int nr = 0; nr < frames->frames && (maxframes == 0
 					   || frame_nr < maxframes); nr++)
@@ -419,8 +419,8 @@ print_frames (struct frames *frames, pid_t tid, int dwflerr, const char *what)
     }
 
   if (frames->frames > 0 && frame_nr == maxframes)
-    error (0, 0, "tid %d: shown max number of frames "
-	   "(%d, use -n 0 for unlimited)", tid, maxframes);
+    error (0, 0, "tid %lld: shown max number of frames "
+	   "(%d, use -n 0 for unlimited)", (long long) tid, maxframes);
   else if (dwflerr != 0)
     {
       if (frames->frames > 0)
@@ -440,11 +440,12 @@ print_frames (struct frames *frames, pid_t tid, int dwflerr, const char *what)
 	      else
 		modname = "<unknown>";
 	    }
-	  error (0, 0, "%s tid %d at 0x%" PRIx64 " in %s: %s", what, tid,
-		 pc_adjusted, modname, dwfl_errmsg (dwflerr));
+	  error (0, 0, "%s tid %lld at 0x%" PRIx64 " in %s: %s", what,
+		 (long long) tid, pc_adjusted, modname, dwfl_errmsg (dwflerr));
 	}
       else
-	error (0, 0, "%s tid %d: %s", what, tid, dwfl_errmsg (dwflerr));
+	error (0, 0, "%s tid %lld: %s", what, (long long) tid,
+	       dwfl_errmsg (dwflerr));
     }
 }
 
@@ -575,10 +576,11 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
 
 	  int err = dwfl_linux_proc_report (dwfl, pid);
 	  if (err < 0)
-	    error (EXIT_BAD, 0, "dwfl_linux_proc_report pid %d: %s", pid,
-		   dwfl_errmsg (-1));
+	    error (EXIT_BAD, 0, "dwfl_linux_proc_report pid %lld: %s",
+		   (long long) pid, dwfl_errmsg (-1));
 	  else if (err > 0)
-	    error (EXIT_BAD, err, "dwfl_linux_proc_report pid %d", pid);
+	    error (EXIT_BAD, err, "dwfl_linux_proc_report pid %lld",
+		   (long long) pid);
 	}
 
       if (core != NULL)
@@ -597,10 +599,11 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
 	{
 	  int err = dwfl_linux_proc_attach (dwfl, pid, false);
 	  if (err < 0)
-	    error (EXIT_BAD, 0, "dwfl_linux_proc_attach pid %d: %s", pid,
-		   dwfl_errmsg (-1));
+	    error (EXIT_BAD, 0, "dwfl_linux_proc_attach pid %lld: %s",
+		   (long long) pid, dwfl_errmsg (-1));
 	  else if (err > 0)
-	    error (EXIT_BAD, err, "dwfl_linux_proc_attach pid %d", pid);
+	    error (EXIT_BAD, err, "dwfl_linux_proc_attach pid %lld",
+		   (long long) pid);
 	}
 
       if (core != NULL)
@@ -688,7 +691,7 @@ invoked with bad or missing arguments it will exit with return code 64.")
 
   if (show_modules)
     {
-      printf ("PID %d - %s module memory map\n", dwfl_pid (dwfl),
+      printf ("PID %lld - %s module memory map\n", (long long) dwfl_pid (dwfl),
 	      pid != 0 ? "process" : "core");
       if (dwfl_getmodules (dwfl, module_callback, NULL, 0) != 0)
 	error (EXIT_BAD, 0, "dwfl_getmodules: %s", dwfl_errmsg (-1));
@@ -721,7 +724,8 @@ invoked with bad or missing arguments it will exit with return code 64.")
     }
   else
     {
-      printf ("PID %d - %s\n", dwfl_pid (dwfl), pid != 0 ? "process" : "core");
+      printf ("PID %lld - %s\n", (long long) dwfl_pid (dwfl),
+	      pid != 0 ? "process" : "core");
       switch (dwfl_getthreads (dwfl, thread_callback, &frames))
 	{
 	case DWARF_CB_OK:

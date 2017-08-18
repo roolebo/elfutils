@@ -1,3 +1,7 @@
+2017-05-04  Ulf Hermann  <ulf.hermann@qt.io>
+
+	* stack.c: Print pid_t using %lld.
+
 2017-08-18  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* readelf.c: Hardcode the signal numbers for non-linux systems.

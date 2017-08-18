@@ -127,6 +127,22 @@ CFLAGS="$old_CFLAGS"])
 AS_IF([test "x$ac_cv_c99" != xyes],
       AC_MSG_ERROR([gcc with GNU99 support required]))
 
+AC_CACHE_CHECK([whether gcc supports __attribute__((visibility()))],
+	ac_cv_visibility, [dnl
+save_CFLAGS="$CFLAGS"
+CFLAGS="$save_CFLAGS -Werror"
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([dnl
+int __attribute__((visibility("hidden")))
+foo (int a)
+{
+  return a;
+}])], ac_cv_visibility=yes, ac_cv_visibility=no)
+CFLAGS="$save_CFLAGS"])
+if test "$ac_cv_visibility" = "yes"; then
+	AC_DEFINE([HAVE_VISIBILITY], [1],
+		  [Defined if __attribute__((visibility())) is supported])
+fi
+
 AC_CACHE_CHECK([whether gcc supports -fPIC], ac_cv_fpic, [dnl
 save_CFLAGS="$CFLAGS"
 CFLAGS="$save_CFLAGS -fPIC -Werror"

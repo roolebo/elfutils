@@ -1,5 +1,10 @@
 2017-04-27  Ulf Hermann  <ulf.hermann@qt.io>
 
+	* eu-config.h: Define attribute_hidden to be empty if the compiler
+	doesn't support it.
+
+2017-04-27  Ulf Hermann  <ulf.hermann@qt.io>
+
 	* Makefile.am: Use fpic_CFLAGS.
 
 2017-07-18  Mark Wielaard  <mark@klomp.org>

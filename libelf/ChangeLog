@@ -1,5 +1,9 @@
 2017-04-27  Ulf Hermann  <ulf.hermann@qt.io>
 
+	* libelfP.h: Use attribute_hidden.
+
+2017-04-27  Ulf Hermann  <ulf.hermann@qt.io>
+
 	* Makefile.am: Use fpic_CFLAGS and dso_LDFLAGS.
 
 2017-08-15  Mark Wielaard  <mark@klomp.org>

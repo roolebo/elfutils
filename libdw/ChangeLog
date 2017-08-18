@@ -1,5 +1,10 @@
 2017-02-27  Ulf Hermann  <ulf.hermann@qt.io>
 
+	* libdwP.h: Use attribute_hidden.
+	* libdw_alloc.c: Likewise.
+
+2017-02-27  Ulf Hermann  <ulf.hermann@qt.io>
+
 	* Makefile.am: Use fpic_CFLAGS and dso_LDFLAGS.
 
 2017-07-26  Mark Wielaard  <mark@klomp.org>

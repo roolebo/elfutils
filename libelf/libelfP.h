@@ -578,7 +578,7 @@ extern Elf_Data *__elf64_xlatetof_internal (Elf_Data *__dest,
 extern unsigned int __elf_version_internal (unsigned int __version)
      attribute_hidden;
 extern unsigned long int __elf_hash_internal (const char *__string)
-       __attribute__ ((__pure__, visibility ("hidden")));
+       __attribute__ ((__pure__)) attribute_hidden;
 extern long int __elf32_checksum_internal (Elf *__elf) attribute_hidden;
 extern long int __elf64_checksum_internal (Elf *__elf) attribute_hidden;
 

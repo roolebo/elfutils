@@ -1,5 +1,10 @@
 2017-04-27  Ulf Hermann  <ulf.hermann@qt.io>
 
+	* configure.ac: Check if the compiler supports
+	__attribute__((visibility(...))).
+
+2017-04-27  Ulf Hermann  <ulf.hermann@qt.io>
+
 	* configure.ac: Check if -fPIC, -fPIE, -Wl,-z,defs,
 	and -Wl,-z,relro are supported by the compiler.
 

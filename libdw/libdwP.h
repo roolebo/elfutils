@@ -434,7 +434,7 @@ extern void *__libdw_allocate (Dwarf *dbg, size_t minsize, size_t align)
      __attribute__ ((__malloc__)) __nonnull_attribute__ (1);
 
 /* Default OOM handler.  */
-extern void __libdw_oom (void) __attribute ((noreturn, visibility ("hidden")));
+extern void __libdw_oom (void) __attribute ((noreturn)) attribute_hidden;
 
 /* Allocate the internal data for a unit not seen before.  */
 extern struct Dwarf_CU *__libdw_intern_next_unit (Dwarf *dbg, bool debug_types)

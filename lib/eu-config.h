@@ -68,8 +68,12 @@
 #define internal_strong_alias(name, aliasname) \
   extern __typeof (name) aliasname __attribute__ ((alias (#name))) internal_function;
 
+#ifdef HAVE_VISIBILITY
 #define attribute_hidden \
   __attribute__ ((visibility ("hidden")))
+#else
+#define attribute_hidden /* empty */
+#endif
 
 /* Define ALLOW_UNALIGNED if the architecture allows operations on
    unaligned memory locations.  */

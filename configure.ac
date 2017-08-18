@@ -373,6 +373,21 @@ AS_IF([test "x$enable_textrelcheck" != "xno"],
 AC_ARG_ENABLE([symbol-versioning],
 AS_HELP_STRING([--disable-symbol-versioning],
                [Disable symbol versioning in shared objects]))
+
+AC_CACHE_CHECK([whether symbol versioning is supported], ac_cv_symbol_versioning, [dnl
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([dnl
+#define NEW_VERSION(name, version) \
+  asm (".symver " #name "," #name "@@@" #version);
+int foo(int x) { return x + 1; }
+NEW_VERSION (foo, ELFUTILS_12.12)
+])], ac_cv_symbol_versioning=yes, ac_cv_symbol_versioning=no)])
+if test "$ac_cv_symbol_versioning" = "no"; then
+    if test "x$enable_symbol_versioning" != "xno"; then
+        AC_MSG_ERROR([Symbol versioning is not supported.
+                      Use --disable-symbol-versioning to build without.])
+    fi
+fi
+
 AM_CONDITIONAL(SYMBOL_VERSIONING, [test "x$enable_symbol_versioning" != "xno"])
 AS_IF([test "x$enable_symbol_versioning" = "xno"],
       [AC_MSG_WARN([Disabling symbol versioning breaks ABI compatibility.])

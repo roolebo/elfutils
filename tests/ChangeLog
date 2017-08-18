@@ -1,3 +1,7 @@
+2017-08-18  Ulf Hermann <ulf.hermann@qt.io>
+
+	* Makefile.am: Drop -rdynamic from deleted_lib_so_LDFLAGS.
+
 2017-04-27  Ulf Hermann <ulf.hermann@qt.io>
 
 	* Makefile.am: Use fpie_CFLAGS and fpic_CFLAGS.

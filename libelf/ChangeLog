@@ -1,3 +1,7 @@
+2017-08-18  Ulf Hermann  <ulf.hermann@qt.io>
+
+	* gelf_xlate.c: Use attribute_packed.
+
 2017-04-27  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* libelfP.h: Use attribute_hidden.

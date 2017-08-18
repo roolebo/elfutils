@@ -1,3 +1,8 @@
+2017-08-18  Ulf Hermann  <ulf.hermann@qt.io>
+
+	* configure.ac: Check if the compiler supports
+	__attribute__((gcc_struct)).
+
 2017-09-19  Mark Wielaard  <mark@klomp.org>
 
 	* README: Add basic build instructions.

@@ -1,3 +1,8 @@
+2017-08-18  Ulf Hermann  <ulf.hermann@qt.io>
+
+	* eu-config.h: Define attribute_packed to either
+	__attribute__((packed)) or __attribute__((packed, gcc_struct)).
+
 2017-04-27  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* eu-config.h: Define attribute_hidden to be empty if the compiler

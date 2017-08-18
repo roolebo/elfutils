@@ -74,7 +74,7 @@ union unaligned
     uint16_t u16;
     uint32_t u32;
     uint64_t u64;
-  } __attribute__ ((packed));
+  } attribute_packed;
 
 #define FETCH(Bits, ptr)	(((const union unaligned *) ptr)->u##Bits)
 #define STORE(Bits, ptr, val)	(((union unaligned *) ptr)->u##Bits = val)

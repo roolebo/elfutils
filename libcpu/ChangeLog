@@ -1,3 +1,7 @@
+2017-08-18  Ulf Hermann  <ulf.hermann@qt.io>
+
+	* memory-access.h: Use attribute_packed.
+
 2017-02-27  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* Makefile.am: Use fpic_CFLAGS.

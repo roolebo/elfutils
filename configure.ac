@@ -143,6 +143,19 @@ if test "$ac_cv_visibility" = "yes"; then
 		  [Defined if __attribute__((visibility())) is supported])
 fi
 
+AC_CACHE_CHECK([whether gcc supports __attribute__((gcc_struct))],
+	ac_cv_gcc_struct, [dnl
+save_CFLAGS="$CFLAGS"
+CFLAGS="$save_CFLAGS -Werror"
+AC_COMPILE_IFELSE([AC_LANG_SOURCE([dnl
+struct test { int x; } __attribute__((gcc_struct));
+])], ac_cv_gcc_struct=yes, ac_cv_gcc_struct=no)
+CFLAGS="$save_CFLAGS"])
+if test "$ac_cv_gcc_struct" = "yes"; then
+	AC_DEFINE([HAVE_GCC_STRUCT], [1],
+		  [Defined if __attribute__((gcc_struct)) is supported])
+fi
+
 AC_CACHE_CHECK([whether gcc supports -fPIC], ac_cv_fpic, [dnl
 save_CFLAGS="$CFLAGS"
 CFLAGS="$save_CFLAGS -fPIC -Werror"

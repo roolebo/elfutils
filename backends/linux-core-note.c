@@ -111,7 +111,7 @@ struct EBLHOOK(prstatus)
   FIELD (INT, pr_fpvalid);
 }
 #ifdef ALIGN_PRSTATUS
-  __attribute__ ((packed, aligned (ALIGN_PRSTATUS)))
+  attribute_packed __attribute__ ((aligned (ALIGN_PRSTATUS)))
 #endif
 ;
 

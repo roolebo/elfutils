@@ -170,7 +170,7 @@ union unaligned
     int16_t s2;
     int32_t s4;
     int64_t s8;
-  } __attribute__ ((packed));
+  } attribute_packed;
 
 # define read_2ubyte_unaligned(Dbg, Addr) \
   read_2ubyte_unaligned_1 ((Dbg)->other_byte_order, (Addr))

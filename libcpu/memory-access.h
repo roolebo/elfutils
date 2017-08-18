@@ -90,7 +90,7 @@ union unaligned
     int16_t s2;
     int32_t s4;
     int64_t s8;
-  } __attribute__ ((packed));
+  } attribute_packed;
 
 static inline uint16_t
 read_2ubyte_unaligned (const void *p)

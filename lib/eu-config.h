@@ -75,6 +75,14 @@
 #define attribute_hidden /* empty */
 #endif
 
+#ifdef HAVE_GCC_STRUCT
+#define attribute_packed \
+  __attribute__ ((packed, gcc_struct))
+#else
+#define attribute_packed \
+  __attribute__ ((packed))
+#endif
+
 /* Define ALLOW_UNALIGNED if the architecture allows operations on
    unaligned memory locations.  */
 #define SANITIZE_UNDEFINED 1

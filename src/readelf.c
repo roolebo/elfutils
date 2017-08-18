@@ -57,6 +57,20 @@
 
 #include "../libdw/known-dwarf.h"
 
+#ifdef __linux__
+#define CORE_SIGILL  SIGILL
+#define CORE_SIGBUS  SIGBUS
+#define CORE_SIGFPE  SIGFPE
+#define CORE_SIGSEGV SIGSEGV
+#define CORE_SI_USER SI_USER
+#else
+/* We want the linux version of those as that is what shows up in the core files. */
+#define CORE_SIGILL  4  /* Illegal instruction (ANSI).  */
+#define CORE_SIGBUS  7  /* BUS error (4.2 BSD).  */
+#define CORE_SIGFPE  8  /* Floating-point exception (ANSI).  */
+#define CORE_SIGSEGV 11 /* Segmentation violation (ANSI).  */
+#define CORE_SI_USER 0  /* Sent by kill, sigsend.  */
+#endif
 
 /* Name and version of program.  */
 ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
@@ -9335,10 +9349,10 @@ handle_siginfo_note (Elf *core, GElf_Word descsz, GElf_Off desc_pos)
   if (si_code > 0)
     switch (si_signo)
       {
-      case SIGILL:
-      case SIGFPE:
-      case SIGSEGV:
-      case SIGBUS:
+      case CORE_SIGILL:
+      case CORE_SIGFPE:
+      case CORE_SIGSEGV:
+      case CORE_SIGBUS:
 	{
 	  uint64_t addr;
 	  if (! buf_read_ulong (core, &ptr, end, &addr))
@@ -9349,7 +9363,7 @@ handle_siginfo_note (Elf *core, GElf_Word descsz, GElf_Off desc_pos)
       default:
 	;
       }
-  else if (si_code == SI_USER)
+  else if (si_code == CORE_SI_USER)
     {
       int pid, uid;
       if (! buf_read_int (core, &ptr, end, &pid)

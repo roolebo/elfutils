@@ -1,3 +1,7 @@
+2017-04-27  Ulf Hermann <ulf.hermann@qt.io>
+
+	* Makefile.am: Use fpie_CFLAGS and fpic_CFLAGS.
+
 2017-08-08  Dmitry V. Levin <ldv@altlinux.org>
 
 	* run-strip-nothing.sh: Add -s.

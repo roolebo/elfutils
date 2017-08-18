@@ -29,7 +29,7 @@
 ##
 include $(top_srcdir)/config/eu.am
 if BUILD_STATIC
-AM_CFLAGS += -fPIC
+AM_CFLAGS += $(fpic_CFLAGS)
 endif
 GCC_INCLUDE = -I$(shell $(CC) -print-file-name=include)
 VERSION = 1
@@ -104,8 +104,8 @@ endif
 libelf_so_LIBS = libelf_pic.a
 libelf_so_SOURCES =
 libelf.so$(EXEEXT): $(srcdir)/libelf.map $(libelf_so_LIBS) $(libelf_so_DEPS)
-	$(AM_V_CCLD)$(LINK) -shared -o $@ \
-		-Wl,--soname,$@.$(VERSION),-z,defs,-z,relro \
+	$(AM_V_CCLD)$(LINK) $(dso_LDFLAGS) -o $@ \
+		-Wl,--soname,$@.$(VERSION) \
 		-Wl,--version-script,$<,--no-undefined \
 		-Wl,--whole-archive $(libelf_so_LIBS) -Wl,--no-whole-archive \
 		$(libelf_so_LDLIBS)

@@ -86,14 +86,14 @@ endif
 
 %.os: %.c %.o
 if AMDEP
-	$(AM_V_CC)if $(COMPILE.os) -c -o $@ -fPIC $(DEFS.os) -MT $@ -MD -MP \
+	$(AM_V_CC)if $(COMPILE.os) -c -o $@ $(fpic_CFLAGS) $(DEFS.os) -MT $@ -MD -MP \
 	  -MF "$(DEPDIR)/$*.Tpo" `test -f '$<' || echo '$(srcdir)/'`$<; \
 	then cat "$(DEPDIR)/$*.Tpo" >> "$(DEPDIR)/$*.Po"; \
 	     rm -f "$(DEPDIR)/$*.Tpo"; \
 	else rm -f "$(DEPDIR)/$*.Tpo"; exit 1; \
 	fi
 else
-	$(AM_V_CC)$(COMPILE.os) -c -o $@ -fPIC $(DEFS.os) $<
+	$(AM_V_CC)$(COMPILE.os) -c -o $@ $(fpic_CFLAGS) $(DEFS.os) $<
 endif
 
 CLEANFILES = *.gcno *.gcda

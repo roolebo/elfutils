@@ -474,7 +474,7 @@ dwfl_report_elf_align_LDADD = $(libdw)
 varlocs_LDADD = $(libdw) $(libelf) $(argp_LDADD)
 backtrace_LDADD = $(libdw) $(libelf) $(argp_LDADD)
 # backtrace-child-biarch also uses those *_CFLAGS and *_LDLAGS variables:
-backtrace_child_CFLAGS = -fPIE
+backtrace_child_CFLAGS = $(fpie_CFLAGS)
 backtrace_child_LDFLAGS = -pie -pthread
 backtrace_child_biarch_SOURCES = backtrace-child.c
 backtrace_data_LDADD = $(libdw) $(libelf)
@@ -485,7 +485,7 @@ debugaltlink_LDADD = $(libdw) $(libelf)
 buildid_LDADD = $(libdw) $(libelf)
 deleted_LDADD = ./deleted-lib.so
 deleted_lib_so_LDFLAGS = -shared -rdynamic
-deleted_lib_so_CFLAGS = -fPIC -fasynchronous-unwind-tables
+deleted_lib_so_CFLAGS = $(fpic_CFLAGS) -fasynchronous-unwind-tables
 aggregate_size_LDADD = $(libdw) $(libelf) $(argp_LDADD)
 peel_type_LDADD = $(libdw) $(libelf) $(argp_LDADD)
 vdsosyms_LDADD = $(libdw) $(libelf)

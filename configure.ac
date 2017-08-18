@@ -127,13 +127,65 @@ CFLAGS="$old_CFLAGS"])
 AS_IF([test "x$ac_cv_c99" != xyes],
       AC_MSG_ERROR([gcc with GNU99 support required]))
 
+AC_CACHE_CHECK([whether gcc supports -fPIC], ac_cv_fpic, [dnl
+save_CFLAGS="$CFLAGS"
+CFLAGS="$save_CFLAGS -fPIC -Werror"
+AC_COMPILE_IFELSE([AC_LANG_SOURCE()], ac_cv_fpic=yes, ac_cv_fpic=no)
+CFLAGS="$save_CFLAGS"
+])
+if test "$ac_cv_fpic" = "yes"; then
+	fpic_CFLAGS="-fPIC"
+else
+	fpic_CFLAGS=""
+fi
+AC_SUBST([fpic_CFLAGS])
+
+AC_CACHE_CHECK([whether gcc supports -fPIE], ac_cv_fpie, [dnl
+save_CFLAGS="$CFLAGS"
+CFLAGS="$save_CFLAGS -fPIE -Werror"
+AC_COMPILE_IFELSE([AC_LANG_SOURCE()], ac_cv_fpie=yes, ac_cv_fpie=no)
+CFLAGS="$save_CFLAGS"
+])
+if test "$ac_cv_fpie" = "yes"; then
+	fpie_CFLAGS="-fPIE"
+else
+	fpie_CFLAGS=""
+fi
+AC_SUBST([fpie_CFLAGS])
+
+dso_LDFLAGS="-shared"
+
+ZDEFS_LDFLAGS="-Wl,-z,defs"
+AC_CACHE_CHECK([whether gcc supports $ZDEFS_LDFLAGS], ac_cv_zdefs, [dnl
+save_LDFLAGS="$LDFLAGS"
+LDFLAGS="$ZDEFS_LDFLAGS $save_LDFLAGS"
+AC_LINK_IFELSE([AC_LANG_PROGRAM()], ac_cv_zdefs=yes, ac_cv_zdefs=no)
+LDFLAGS="$save_LDFLAGS"
+])
+if test "$ac_cv_zdefs" = "yes"; then
+	dso_LDFLAGS="$dso_LDFLAGS $ZDEFS_LDFLAGS"
+fi
+
+ZRELRO_LDFLAGS="-Wl,-z,relro"
+AC_CACHE_CHECK([whether gcc supports $ZRELRO_LDFLAGS], ac_cv_zrelro, [dnl
+save_LDFLAGS="$LDFLAGS"
+LDFLAGS="$ZRELRO_LDFLAGS $save_LDFLAGS"
+AC_LINK_IFELSE([AC_LANG_PROGRAM()], ac_cv_zrelro=yes, ac_cv_zrelro=no)
+LDFLAGS="$save_LDFLAGS"
+])
+if test "$ac_cv_zrelro" = "yes"; then
+	dso_LDFLAGS="$dso_LDFLAGS $ZRELRO_LDFLAGS"
+fi
+
+AC_SUBST([dso_LDFLAGS])
+
 AC_CACHE_CHECK([for __thread support], ac_cv_tls, [dnl
 # Use the same flags that we use for our DSOs, so the test is representative.
 # Some old compiler/linker/libc combinations fail some ways and not others.
 save_CFLAGS="$CFLAGS"
 save_LDFLAGS="$LDFLAGS"
-CFLAGS="-fPIC $CFLAGS"
-LDFLAGS="-shared -Wl,-z,defs,-z,relro $LDFLAGS"
+CFLAGS="$fpic_CFLAGS $CFLAGS"
+LDFLAGS="$dso_LDFLAGS $LDFLAGS"
 AC_LINK_IFELSE([dnl
 AC_LANG_PROGRAM([[#include <stdlib.h>
 #undef __thread

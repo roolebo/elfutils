@@ -30,7 +30,7 @@
 include $(top_srcdir)/config/eu.am
 AM_CPPFLAGS += -I$(srcdir)/../libelf -I$(srcdir)/../libebl \
 	    -I$(srcdir)/../libdw -I$(srcdir)/../libasm
-AM_CFLAGS += -fPIC -fdollars-in-identifiers
+AM_CFLAGS += $(fpic_CFLAGS) -fdollars-in-identifiers
 LEXCOMPILE = $(LEX) $(LFLAGS) $(AM_LFLAGS) -P$(<F:lex.l=)
 LEX_OUTPUT_ROOT = lex.$(<F:lex.l=)
 AM_YFLAGS = -p$(<F:parse.y=)

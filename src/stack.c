@@ -678,7 +678,8 @@ main (int argc, char **argv)
     {
       .options = options,
       .parser = parse_opt,
-      .doc = N_("Print a stack for each thread in a process or core file.\v\
+      .doc = N_("Print a stack for each thread in a process or core file.\n\
+\n\
 Program exits with return code 0 if all frames were shown without \
 any errors.  If some frames were shown, but there were some non-fatal \
 errors, possibly causing an incomplete backtrace, the program exits \

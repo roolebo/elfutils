@@ -1,3 +1,7 @@
+2017-09-01  Mark Wielaard  <mark@klomp.org>
+
+	* *.po: Regenerated. Replace \v with \n\n.
+
 2017-08-02  Mark Wielaard  <mark@klomp.org>
 
 	* *.po: Update for 0.170.

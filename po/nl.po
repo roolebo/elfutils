@@ -5640,7 +5640,7 @@ msgstr ""
 
 #: src/unstrip.c:2248
 msgid ""
-"Combine stripped files with separate symbols and debug information.\vThe "
+"Combine stripped files with separate symbols and debug information.\n\nThe "
 "first form puts the result in DEBUG-FILE if -o was not given.\n"
 "\n"
 "MODULE arguments give file name patterns matching modules to process.\n"

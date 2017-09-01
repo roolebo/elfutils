@@ -1,3 +1,8 @@
+2017-09-01  Mark Wielaard  <mark@klomp.org>
+
+	* stack.c (main): Replace \v in doc string with \n\n.
+	* unstrip.c (main): Likewise.
+
 2017-05-04  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* stack.c: Print pid_t using %lld.

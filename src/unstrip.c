@@ -2383,7 +2383,8 @@ main (int argc, char **argv)
       .children = argp_children,
       .args_doc = N_("STRIPPED-FILE DEBUG-FILE\n[MODULE...]"),
       .doc = N_("\
-Combine stripped files with separate symbols and debug information.\v\
+Combine stripped files with separate symbols and debug information.\n\
+\n\
 The first form puts the result in DEBUG-FILE if -o was not given.\n\
 \n\
 MODULE arguments give file name patterns matching modules to process.\n\

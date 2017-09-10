@@ -72,7 +72,7 @@ backtrace-child-biarch$(EXEEXT): backtrace-child.c
 		     $(AM_LDFLAGS) $(LDFLAGS) $(backtrace_child_LDFLAGS) \
 		     -o $@ $<
 
-TESTS = run-arextract.sh run-arsymtest.sh newfile test-nlist \
+TESTS = run-arextract.sh run-arsymtest.sh run-ar.sh newfile test-nlist \
 	update1 update2 update3 update4 \
 	run-show-die-info.sh run-get-files.sh run-get-lines.sh \
 	run-get-pubnames.sh run-get-aranges.sh run-allfcts.sh \
@@ -159,7 +159,7 @@ check_PROGRAMS += $(asm_TESTS)
 TESTS += $(asm_TESTS) run-disasm-bpf.sh
 endif
 
-EXTRA_DIST = run-arextract.sh run-arsymtest.sh \
+EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     run-show-die-info.sh run-get-files.sh run-get-lines.sh \
 	     run-get-pubnames.sh run-get-aranges.sh \
 	     run-show-abbrev.sh run-strip-test.sh \

@@ -1,3 +1,12 @@
+2017-09-10  Mark Wielaard  <mark@klomp.org>
+
+	* ar.c (do_oper_delete): Remove DEBUG conditional check.
+	(no0print): Return bool. Check snprintf return value.
+	(do_oper_insert): Initialize elf. Remove DEBUG conditional check.
+	Check no0print calls succeed. Explicitly elf_end found elfs.
+	(do_oper_extract): Make sure we don't create an empty variable
+	length array.
+
 2017-09-01  Mark Wielaard  <mark@klomp.org>
 
 	* stack.c (main): Replace \v in doc string with \n\n.

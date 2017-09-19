@@ -1,3 +1,7 @@
+2017-09-19  Mark Wielaard  <mark@klomp.org>
+
+	* README: Add basic build instructions.
+
 2017-05-03  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* configure.ac: Test if symbol versioning is supported.

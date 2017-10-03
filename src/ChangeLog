@@ -1,3 +1,7 @@
+2017-10-03  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (attr_callback): Print DIE offset in error messages.
+
 2017-11-03  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_ops): Handle DW_OP_GNU_variable_value. Print

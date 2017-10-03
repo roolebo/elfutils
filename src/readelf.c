@@ -5935,13 +5935,15 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 {
   struct attrcb_args *cbargs = (struct attrcb_args *) arg;
   const int level = cbargs->level;
+  Dwarf_Die *die = cbargs->die;
 
   unsigned int attr = dwarf_whatattr (attrp);
   if (unlikely (attr == 0))
     {
       if (!cbargs->silent)
-	error (0, 0, gettext ("cannot get attribute code: %s"),
-	       dwarf_errmsg (-1));
+	error (0, 0, gettext ("DIE [%" PRIx64 "] "
+			      "cannot get attribute code: %s"),
+	       dwarf_dieoffset (die), dwarf_errmsg (-1));
       return DWARF_CB_ABORT;
     }
 
@@ -5949,8 +5951,9 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
   if (unlikely (form == 0))
     {
       if (!cbargs->silent)
-	error (0, 0, gettext ("cannot get attribute form: %s"),
-	       dwarf_errmsg (-1));
+	error (0, 0, gettext ("DIE [%" PRIx64 "] "
+			      "cannot get attribute form: %s"),
+	       dwarf_dieoffset (die), dwarf_errmsg (-1));
       return DWARF_CB_ABORT;
     }
 
@@ -5964,8 +5967,9 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	    {
 	    attrval_out:
 	      if (!cbargs->silent)
-		error (0, 0, gettext ("cannot get attribute value: %s"),
-		       dwarf_errmsg (-1));
+		error (0, 0, gettext ("DIE [%" PRIx64 "] "
+				      "cannot get attribute value: %s"),
+		       dwarf_dieoffset (die), dwarf_errmsg (-1));
 	      return DWARF_CB_ABORT;
 	    }
 	  char *a = format_dwarf_addr (cbargs->dwflmod, cbargs->addrsize,

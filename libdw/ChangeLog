@@ -1,3 +1,7 @@
+2017-10-03  Mark Wielaard  <mark@klomp.org>
+
+	* libdw.h: Define LIBDW_CIE_ID and use it in dwarf_cfi_cie_p.
+
 2017-08-18  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* memory-access.h: Use attribute_packed.

@@ -211,7 +211,9 @@ typedef union
   Dwarf_FDE fde;
 } Dwarf_CFI_Entry;
 
-#define dwarf_cfi_cie_p(entry)	((entry)->cie.CIE_id == DW_CIE_ID_64)
+/* Same as DW_CIE_ID_64 from dwarf.h to keep libdw.h independent.  */
+#define LIBDW_CIE_ID 0xffffffffffffffffULL
+#define dwarf_cfi_cie_p(entry)	((entry)->cie.CIE_id == LIBDW_CIE_ID)
 
 /* Opaque type representing a frame state described by CFI.  */
 typedef struct Dwarf_Frame_s Dwarf_Frame;

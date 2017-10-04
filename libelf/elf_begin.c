@@ -373,7 +373,7 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 	      || (((uintptr_t) ((char *) ehdr + e_shoff)
 		   & (__alignof__ (Elf32_Shdr) - 1)) == 0)))
 	{
-	  if (unlikely (e_shoff >= maxsize)
+	  if (unlikely (scncnt > 0 && e_shoff >= maxsize)
 	      || unlikely (maxsize - e_shoff
 			   < scncnt * sizeof (Elf32_Shdr)))
 	    {
@@ -475,7 +475,7 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 	      || (((uintptr_t) ((char *) ehdr + e_shoff)
 		   & (__alignof__ (Elf64_Shdr) - 1)) == 0)))
 	{
-	  if (unlikely (e_shoff >= maxsize)
+	  if (unlikely (scncnt > 0 && e_shoff >= maxsize)
 	      || unlikely (maxsize - e_shoff
 			   < scncnt * sizeof (Elf64_Shdr)))
 	    goto free_and_out;

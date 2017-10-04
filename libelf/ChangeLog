@@ -1,5 +1,10 @@
 2017-10-04  Mark Wielaard  <mark@klomp.org>
 
+	* elf_begin.c (file_read_elf): Skip sanity checking e_shoff if scncnt
+	is zero, we won't use it then.
+
+2017-10-04  Mark Wielaard  <mark@klomp.org>
+
 	* libelfP.h: Add ELF_E_INVALID_ELF to error values enum.
 	* elf_error.c (ELF_E_INVALID_ELF_IDX): New define. Use it as value
 	for ELF_E_INVALID_ELF in msgidx.

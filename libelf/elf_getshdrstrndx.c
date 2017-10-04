@@ -133,13 +133,17 @@ elf_getshdrstrndx (Elf *elf, size_t *dst)
 		  /* We avoid reading in all the section headers.  Just read
 		     the first one.  */
 		  Elf32_Shdr shdr_mem;
+		  ssize_t r;
 
-		  if (unlikely (pread_retry (elf->fildes, &shdr_mem,
-					     sizeof (Elf32_Shdr), offset)
+		  if (unlikely ((r = pread_retry (elf->fildes, &shdr_mem,
+						  sizeof (Elf32_Shdr), offset))
 				!= sizeof (Elf32_Shdr)))
 		    {
 		      /* We must be able to read this ELF section header.  */
-		      __libelf_seterrno (ELF_E_INVALID_FILE);
+		      if (r < 0)
+			__libelf_seterrno (ELF_E_INVALID_FILE);
+		      else
+			__libelf_seterrno (ELF_E_INVALID_ELF);
 		      result = -1;
 		      goto out;
 		    }
@@ -194,13 +198,17 @@ elf_getshdrstrndx (Elf *elf, size_t *dst)
 		  /* We avoid reading in all the section headers.  Just read
 		     the first one.  */
 		  Elf64_Shdr shdr_mem;
+		  ssize_t r;
 
-		  if (unlikely (pread_retry (elf->fildes, &shdr_mem,
-					     sizeof (Elf64_Shdr), offset)
+		  if (unlikely ((r = pread_retry (elf->fildes, &shdr_mem,
+						  sizeof (Elf64_Shdr), offset))
 				!= sizeof (Elf64_Shdr)))
 		    {
 		      /* We must be able to read this ELF section header.  */
-		      __libelf_seterrno (ELF_E_INVALID_FILE);
+		      if (r < 0)
+			__libelf_seterrno (ELF_E_INVALID_FILE);
+		      else
+			__libelf_seterrno (ELF_E_INVALID_ELF);
 		      result = -1;
 		      goto out;
 		    }

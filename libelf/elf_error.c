@@ -94,8 +94,12 @@ static const char msgstr[] =
   (ELF_E_NOMEM_IDX + sizeof "out of memory")
   N_("invalid file descriptor")
   "\0"
-#define ELF_E_INVALID_OP_IDX \
+#define ELF_E_INVALID_ELF_IDX \
   (ELF_E_INVALID_FILE_IDX + sizeof "invalid file descriptor")
+  N_("invalid ELF file data")
+  "\0"
+#define ELF_E_INVALID_OP_IDX \
+  (ELF_E_INVALID_ELF_IDX + sizeof "invalid ELF file data")
   N_("invalid operation")
   "\0"
 #define ELF_E_NO_VERSION_IDX \
@@ -280,6 +284,7 @@ static const uint_fast16_t msgidx[ELF_E_NUM] =
   [ELF_E_INVALID_ENCODING] = ELF_E_INVALID_ENCODING_IDX,
   [ELF_E_NOMEM] = ELF_E_NOMEM_IDX,
   [ELF_E_INVALID_FILE] = ELF_E_INVALID_FILE_IDX,
+  [ELF_E_INVALID_ELF] = ELF_E_INVALID_ELF_IDX,
   [ELF_E_INVALID_OP] = ELF_E_INVALID_OP_IDX,
   [ELF_E_NO_VERSION] = ELF_E_NO_VERSION_IDX,
   [ELF_E_INVALID_CMD] = ELF_E_INVALID_CMD_IDX,

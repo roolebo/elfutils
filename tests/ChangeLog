@@ -1,3 +1,7 @@
+2017-10-04  Mark Wielaard  <mark@klomp.org>
+
+	* msg_tst.c: Handle ELF_E_INVALID_ELF.
+
 2017-09-10  Mark Wielaard  <mark@klomp.org>
 
 	* run-ar.sh: New test.

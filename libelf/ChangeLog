@@ -1,3 +1,15 @@
+2017-10-04  Mark Wielaard  <mark@klomp.org>
+
+	* libelfP.h: Add ELF_E_INVALID_ELF to error values enum.
+	* elf_error.c (ELF_E_INVALID_ELF_IDX): New define. Use it as value
+	for ELF_E_INVALID_ELF in msgidx.
+	* elf_getshdrstrndx.c (elf_getshdrstrndx): Distinquish between pread
+	failing and not having enough data.
+	* elf_begin.c (get_shnum): Likewise. Explicitly set libelf errno on
+	too large value.
+	(file_read_elf): Make sure to always set libelf errno when returning
+	NULL. Distinquish between i/o file and elf data errors.
+
 2017-08-18  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* gelf_xlate.c: Use attribute_packed.

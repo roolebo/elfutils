@@ -158,6 +158,7 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
 	  else
 	    {
 	      Elf32_Word size;
+	      ssize_t r;
 
 	      if (likely (map_address != NULL))
 		/* gcc will optimize the memcpy to a simple memory
@@ -167,11 +168,19 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
 						 + offset))->sh_size,
 			sizeof (Elf32_Word));
 	      else
-		if (unlikely (pread_retry (fildes, &size, sizeof (Elf32_Word),
-					   offset + ehdr.e32->e_shoff
-					   + offsetof (Elf32_Shdr, sh_size))
+		if (unlikely ((r = pread_retry (fildes, &size,
+						sizeof (Elf32_Word),
+						offset + ehdr.e32->e_shoff
+						+ offsetof (Elf32_Shdr,
+							    sh_size)))
 			      != sizeof (Elf32_Word)))
-		  return (size_t) -1l;
+		  {
+		    if (r < 0)
+		      __libelf_seterrno (ELF_E_INVALID_FILE);
+		    else
+		      __libelf_seterrno (ELF_E_INVALID_ELF);
+		    return (size_t) -1l;
+		  }
 
 	      if (e_ident[EI_DATA] != MY_ELFDATA)
 		CONVERT (size);
@@ -207,6 +216,7 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
 				    + offset))->sh_size;
 	  else
 	    {
+	      ssize_t r;
 	      if (likely (map_address != NULL))
 		/* gcc will optimize the memcpy to a simple memory
 		   access while taking care of alignment issues.  */
@@ -215,19 +225,30 @@ get_shnum (void *map_address, unsigned char *e_ident, int fildes, off_t offset,
 						 + offset))->sh_size,
 			sizeof (Elf64_Xword));
 	      else
-		if (unlikely (pread_retry (fildes, &size, sizeof (Elf64_Xword),
-					   offset + ehdr.e64->e_shoff
-					   + offsetof (Elf64_Shdr, sh_size))
+		if (unlikely ((r = pread_retry (fildes, &size,
+						sizeof (Elf64_Xword),
+						offset + ehdr.e64->e_shoff
+						+ offsetof (Elf64_Shdr,
+							    sh_size)))
 			      != sizeof (Elf64_Xword)))
-		  return (size_t) -1l;
+		  {
+		    if (r < 0)
+		      __libelf_seterrno (ELF_E_INVALID_FILE);
+		    else
+		      __libelf_seterrno (ELF_E_INVALID_ELF);
+		    return (size_t) -1l;
+		  }
 
 	      if (e_ident[EI_DATA] != MY_ELFDATA)
 		CONVERT (size);
 	    }
 
 	  if (size > ~((GElf_Word) 0))
-	    /* Invalid value, it is too large.  */
-	    return (size_t) -1l;
+	    {
+	      /* Invalid value, it is too large.  */
+	      __libelf_seterrno (ELF_E_INVALID_ELF);
+	      return (size_t) -1l;
+	    }
 
 	  result = size;
 	}
@@ -255,11 +276,13 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 		    && e_ident[EI_DATA] != ELFDATA2MSB)))
     {
       /* Cannot handle this.  */
-      __libelf_seterrno (ELF_E_INVALID_FILE);
+      __libelf_seterrno (ELF_E_INVALID_ELF);
       return NULL;
     }
 
-  /* Determine the number of sections.  */
+  /* Determine the number of sections.  Returns -1 and sets libelf errno
+     if the file handle or elf file is invalid.  Returns zero if there
+     are no section headers (or they cannot be read).  */
   size_t scncnt = get_shnum (map_address, e_ident, fildes, offset, maxsize);
   if (scncnt == (size_t) -1l)
     /* Could not determine the number of sections.  */
@@ -269,10 +292,16 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
   if (e_ident[EI_CLASS] == ELFCLASS32)
     {
       if (scncnt > SIZE_MAX / (sizeof (Elf_Scn) + sizeof (Elf32_Shdr)))
-	return NULL;
+	{
+	  __libelf_seterrno (ELF_E_INVALID_ELF);
+	  return NULL;
+	}
     }
   else if (scncnt > SIZE_MAX / (sizeof (Elf_Scn) + sizeof (Elf64_Shdr)))
-    return NULL;
+    {
+      __libelf_seterrno (ELF_E_INVALID_ELF);
+      return NULL;
+    }
 
   /* We can now allocate the memory.  Even if there are no section headers,
      we allocate space for a zeroth section in case we need it later.  */
@@ -281,7 +310,7 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
   Elf *elf = allocate_elf (fildes, map_address, offset, maxsize, cmd, parent,
 			   ELF_K_ELF, scnmax * sizeof (Elf_Scn));
   if (elf == NULL)
-    /* Not enough memory.  */
+    /* Not enough memory.  allocate_elf will have set libelf errno.  */
     return NULL;
 
   assert ((unsigned int) scncnt == scncnt);
@@ -350,7 +379,7 @@ file_read_elf (int fildes, void *map_address, unsigned char *e_ident,
 	    {
 	    free_and_out:
 	      free (elf);
-	      __libelf_seterrno (ELF_E_INVALID_FILE);
+	      __libelf_seterrno (ELF_E_INVALID_ELF);
 	      return NULL;
 	    }
 	  elf->state.elf32.shdr

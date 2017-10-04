@@ -39,6 +39,7 @@ static struct
     { ELF_E_INVALID_ENCODING, "invalid encoding" },
     { ELF_E_NOMEM, "out of memory" },
     { ELF_E_INVALID_FILE, "invalid file descriptor" },
+    { ELF_E_INVALID_ELF, "invalid ELF file data" },
     { ELF_E_INVALID_OP, "invalid operation" },
     { ELF_E_NO_VERSION, "ELF version not set" },
     { ELF_E_INVALID_CMD, "invalid command" },

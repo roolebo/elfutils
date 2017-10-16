@@ -1,3 +1,7 @@
+2017-10-16  Mark Wielaard  <mark@klomp.org>
+
+	* .gitignore: Remove tests/md5-sha1-test.
+
 2017-08-18  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* configure.ac: Check if the compiler supports

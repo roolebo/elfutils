@@ -34,11 +34,11 @@ AM_CPPFLAGS += -I$(srcdir)/../libelf
 noinst_LIBRARIES = libeu.a
 
 libeu_a_SOURCES = xstrdup.c xstrndup.c xmalloc.c next_prime.c \
-		  crc32.c crc32_file.c md5.c sha1.c \
+		  crc32.c crc32_file.c \
 		  color.c printversion.c
 
 noinst_HEADERS = fixedsizehash.h libeu.h system.h dynamicsizehash.h list.h \
-		 md5.h sha1.h eu-config.h color.h printversion.h bpf.h
+		 eu-config.h color.h printversion.h bpf.h
 EXTRA_DIST = dynamicsizehash.c
 
 if !GPROF

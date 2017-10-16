@@ -135,7 +135,6 @@ Makefile.in
 /tests/hash
 /tests/line2addr
 /tests/low_high_pc
-/tests/md5-sha1-test
 /tests/msg_tst
 /tests/newdata
 /tests/newfile

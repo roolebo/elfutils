@@ -1,3 +1,10 @@
+2017-10-16  Mark Wielaard  <mark@klomp.org>
+
+	* md5-sha1-test.c: Removed.
+	* Makefile.am (check_PROGRAMS): Remove md5-sha1-test.
+	(TESTS): Likewise.
+	(md5_sha1_test_LDADD): Removed.
+
 2017-10-04  Mark Wielaard  <mark@klomp.org>
 
 	* msg_tst.c: Handle ELF_E_INVALID_ELF.

@@ -46,7 +46,7 @@ check_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  dwfl-addr-sect dwfl-bug-report early-offscn \
 		  dwfl-bug-getmodules dwarf-getmacros dwarf-ranges addrcfi \
 		  test-flag-nobits dwarf-getstring rerequest_tag \
-		  alldts md5-sha1-test typeiter typeiter2 low_high_pc \
+		  alldts typeiter typeiter2 low_high_pc \
 		  test-elf_cntl_gelf_getshdr dwflsyms dwfllines \
 		  dwfl-report-elf-align varlocs backtrace backtrace-child \
 		  backtrace-data backtrace-dwarf debuglink debugaltlink \
@@ -146,8 +146,8 @@ export ELFUTILS_DISABLE_DEMANGLE = 1
 endif
 
 if !STANDALONE
-check_PROGRAMS += msg_tst md5-sha1-test system-elf-libelf-test
-TESTS += msg_tst md5-sha1-test system-elf-libelf-test
+check_PROGRAMS += msg_tst system-elf-libelf-test
+TESTS += msg_tst system-elf-libelf-test
 endif
 
 if LZMA
@@ -463,7 +463,6 @@ addrcfi_LDADD = $(libdw) $(libebl) $(libelf) $(argp_LDADD) -ldl
 test_flag_nobits_LDADD = $(libelf)
 rerequest_tag_LDADD = $(libdw)
 alldts_LDADD = $(libdw) $(libelf)
-md5_sha1_test_LDADD = $(libeu)
 typeiter_LDADD = $(libdw) $(libelf)
 typeiter2_LDADD = $(libdw) $(libelf)
 low_high_pc_LDADD = $(libdw) $(libelf) $(argp_LDADD)

@@ -238,7 +238,7 @@ parse_opt (int key, char *arg, struct argp_state *state)
 	    result = INTUSE(dwfl_linux_kernel_report_modules) (dwfl);
 	    if (result != 0)
 	      /* Non-fatal to have no modules since we do have the kernel.  */
-	      failure (dwfl, result, _("cannot find kernel modules"), state);
+	      argp_failure (state, 0, result, _("cannot find kernel modules"));
 	    opt->dwfl = dwfl;
 	  }
 	else

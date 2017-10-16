@@ -1,3 +1,8 @@
+2017-10-16  Mark Wielaard  <mark@klomp.org>
+
+	* argp-std.c (parse_opt): For -k call argp_failure not failure to
+	keep dwfl around.
+
 2017-07-26  Yunlian Jiang  <yunlian@google.com>
 
 	* argp-std.c (failure): Move to file scope.

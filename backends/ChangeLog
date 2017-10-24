@@ -1,3 +1,7 @@
+2017-10-24  Mark Wielaard  <mark@klomp.org>
+
+	* Makefile.am (m68k_corenote_no_Wpacked_not_aligned): New variable.
+
 2017-08-18  Ulf Hermann <ulf.hermann@qt.io>
 
 	* linux-core-note.c: Use attribute_packed.

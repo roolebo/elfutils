@@ -119,6 +119,13 @@ m68k_SRCS = m68k_init.c m68k_symbol.c m68k_regs.c \
 libebl_m68k_pic_a_SOURCES = $(m68k_SRCS)
 am_libebl_m68k_pic_a_OBJECTS = $(m68k_SRCS:.c=.os)
 
+# m68k prstatus core notes are described by a packed structure
+# which has not naturally aligned fields. Since we don't access
+# these fields directly, but take their offset to be used later
+# to extract the data through elfxx_xlatetom/memmove, this isn't
+# an issue.
+m68k_corenote_no_Wpacked_not_aligned = yes
+
 bpf_SRCS = bpf_init.c bpf_regs.c
 cpu_bpf = ../libcpu/libcpu_bpf.a
 libebl_bpf_pic_a_SOURCES = $(bpf_SRCS)

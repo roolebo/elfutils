@@ -1,3 +1,7 @@
+2017-10-24  Mark Wielaard  <mark@klomp.org>
+
+	* eu.am (AM_CFLAGS): Handle -Wno-packed-not-aligned.
+
 2017-04-27  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* eu.am: Use fpic_CFLAGS.

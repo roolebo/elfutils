@@ -45,10 +45,34 @@ attr_ok (Dwarf_Attribute *attr)
   if (attr == NULL)
     return false;
 
-  /* Must be one of the attributes listed below.  */
+  /* If it is an exprloc, it is obviously OK.  */
+  if (dwarf_whatform (attr) == DW_FORM_exprloc)
+    return true;
+
+  /* Otherwise must be one of the attributes listed below.  Older
+     DWARF versions might have encoded the exprloc as block, and we
+     cannot easily distinquish attributes in the loclist class because
+     the same forms are used for different classes.  */
   switch (attr->code)
     {
     case DW_AT_location:
+    case DW_AT_byte_size:
+    case DW_AT_bit_offset:
+    case DW_AT_bit_size:
+    case DW_AT_lower_bound:
+    case DW_AT_bit_stride:
+    case DW_AT_upper_bound:
+    case DW_AT_count:
+    case DW_AT_allocated:
+    case DW_AT_associated:
+    case DW_AT_data_location:
+    case DW_AT_byte_stride:
+    case DW_AT_rank:
+    case DW_AT_call_value:
+    case DW_AT_call_target:
+    case DW_AT_call_target_clobbered:
+    case DW_AT_call_data_location:
+    case DW_AT_call_data_value:
     case DW_AT_data_member_location:
     case DW_AT_vtable_elem_location:
     case DW_AT_string_length:

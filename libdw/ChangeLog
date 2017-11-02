@@ -1,5 +1,10 @@
 2017-11-03  Mark Wielaard  <mark@klomp.org>
 
+	* dwarf_getlocation.c (attr_ok): Always accept DW_FORM_exprloc.
+	Update list of acceptable attribute codes based on DWARF5.
+
+2017-11-03  Mark Wielaard  <mark@klomp.org>
+
 	* dwarf.h: Add DW_OP_GNU_variable_value.
 
 2017-10-03  Mark Wielaard  <mark@klomp.org>

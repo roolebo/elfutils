@@ -224,10 +224,10 @@ rm -rf ${RPM_BUILD_ROOT}
 %{_libdir}/libelf.a
 
 %files default-yama-scope
-%config(noreplace) %{_sysctldir}/10-default-yama-scope.conf
+%{_sysctldir}/10-default-yama-scope.conf
 
 %changelog
-* Wed Aug  2 2017 Mark Wielaard <mark@gmail.com> 0.170-1
+* Wed Aug  2 2017 Mark Wielaard <mark@klomp.org> 0.170-1
 - libdw: Added new DWARF5 attribute, tag, character encoding,
   language code, calling convention, defaulted member function
   and macro constants to dwarf.h.

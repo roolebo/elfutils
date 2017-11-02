@@ -75,6 +75,45 @@ dwarf_encoding_string (unsigned int code)
   return NULL;
 }
 
+static const char *
+dwarf_tag_string (unsigned int tag)
+{
+  switch (tag)
+    {
+#define DWARF_ONE_KNOWN_DW_TAG(NAME, CODE) case CODE: return #NAME;
+      DWARF_ALL_KNOWN_DW_TAG
+#undef DWARF_ONE_KNOWN_DW_TAG
+    default:
+      return NULL;
+    }
+}
+
+static const char *
+dwarf_attr_string (unsigned int attrnum)
+{
+  switch (attrnum)
+    {
+#define DWARF_ONE_KNOWN_DW_AT(NAME, CODE) case CODE: return #NAME;
+      DWARF_ALL_KNOWN_DW_AT
+#undef DWARF_ONE_KNOWN_DW_AT
+    default:
+      return NULL;
+    }
+}
+
+static const char *
+dwarf_form_string (unsigned int form)
+{
+  switch (form)
+    {
+#define DWARF_ONE_KNOWN_DW_FORM(NAME, CODE) case CODE: return #NAME;
+      DWARF_ALL_KNOWN_DW_FORM
+#undef DWARF_ONE_KNOWN_DW_FORM
+    default:
+      return NULL;
+    }
+}
+
 /* BASE must be a base type DIE referenced by a typed DWARF expression op.  */
 static void
 print_base_type (Dwarf_Die *base)
@@ -386,11 +425,51 @@ print_expr (Dwarf_Attribute *attr, Dwarf_Op *expr, Dwarf_Addr addr)
 
 	Dwarf_Die impl_die;
 	if (dwarf_getlocation_die (attr, expr, &impl_die) != 0)
-	  error (EXIT_FAILURE, 0, "dwarf_getlocation_due: %s",
+	  error (EXIT_FAILURE, 0, "dwarf_getlocation_die: %s",
 		 dwarf_errmsg (-1));
 
 	printf ("%s([%" PRIx64 "],%" PRId64 ") ", opname,
 		dwarf_dieoffset (&impl_die), expr->number2);
+
+	if (dwarf_whatattr (&attrval) == DW_AT_const_value)
+	  printf ("<constant value>"); // Lookup type...
+	else
+	  {
+	    // Lookup the location description at the current address.
+	    Dwarf_Op *exprval;
+	    size_t exprval_len;
+	    int locs = dwarf_getlocation_addr (&attrval, addr,
+					       &exprval, &exprval_len, 1);
+	    if (locs == 0)
+	      printf ("<no location>"); // This means "optimized out".
+	    else if (locs == 1)
+	      print_expr_block (&attrval, exprval, exprval_len, addr);
+	    else
+	      error (EXIT_FAILURE, 0,
+		     "dwarf_getlocation_addr attrval at addr 0x%" PRIx64
+		     ", locs (%d): %s", addr, locs, dwarf_errmsg (-1));
+	  }
+      }
+      break;
+
+    case DW_OP_GNU_variable_value:
+      /* Special, DIE offset. Referenced DIE has a location or const_value
+	 attribute. */
+      {
+	if (attr == NULL)
+	  error (EXIT_FAILURE, 0, "%s used in CFI", opname);
+
+	Dwarf_Attribute attrval;
+	if (dwarf_getlocation_attr (attr, expr, &attrval) != 0)
+	  error (EXIT_FAILURE, 0, "dwarf_getlocation_attr: %s",
+		 dwarf_errmsg (-1));
+
+	Dwarf_Die impl_die;
+	if (dwarf_getlocation_die (attr, expr, &impl_die) != 0)
+	  error (EXIT_FAILURE, 0, "dwarf_getlocation_die: %s",
+		 dwarf_errmsg (-1));
+
+	printf ("%s([%" PRIx64 "]) ", opname, dwarf_dieoffset (&impl_die));
 
 	if (dwarf_whatattr (&attrval) == DW_AT_const_value)
 	  printf ("<constant value>"); // Lookup type...
@@ -759,9 +838,133 @@ handle_function (Dwarf_Die *funcdie, void *arg __attribute__((unused)))
   return DWARF_CB_OK;
 }
 
+struct attr_arg
+{
+  int depth;
+  Dwarf_Addr entrypc;
+};
+
+static int
+handle_attr (Dwarf_Attribute *attr, void *arg)
+{
+  int depth = ((struct attr_arg *) arg)->depth;
+  Dwarf_Addr entrypc = ((struct attr_arg *) arg)->entrypc;
+
+  unsigned int code = dwarf_whatattr (attr);
+  unsigned int form = dwarf_whatform (attr);
+
+  printf ("%*s%s (%s)", depth * 2, "",
+	  dwarf_attr_string (code), dwarf_form_string (form));
+
+  /* If we can get an DWARF expression (or location lists) from this
+     attribute we'll print it, otherwise we'll ignore it.  But if
+     there is an error while the attribute has the "correct" form then
+     we'll report an error (we can only really check DW_FORM_exprloc
+     other forms can be ambiguous).  */
+  Dwarf_Op *expr;
+  size_t exprlen;
+  bool printed = false;
+  int res = dwarf_getlocation (attr, &expr, &exprlen);
+  if (res == 0)
+    {
+      printf (" ");
+      print_expr_block (attr, expr, exprlen, entrypc);
+      printf ("\n");
+      printed = true;
+    }
+  else if (form == DW_FORM_exprloc)
+    {
+      error (0, 0, "%s dwarf_getlocation failed: %s",
+	     dwarf_attr_string (code), dwarf_errmsg (-1));
+      return DWARF_CB_ABORT;
+    }
+  else
+    {
+      Dwarf_Addr base, begin, end;
+      ptrdiff_t offset = 0;
+      while ((offset = dwarf_getlocations (attr, offset,
+					   &base, &begin, &end,
+					   &expr, &exprlen)) > 0)
+	{
+	  if (! printed)
+	    printf ("\n");
+	  printf ("%*s", depth * 2, "");
+	  print_expr_block_addrs (attr, begin, end, expr, exprlen);
+	  printed = true;
+	}
+    }
+
+  if (! printed)
+    printf ("\n");
+
+  return DWARF_CB_OK;
+}
+
+static void
+handle_die (Dwarf_Die *die, int depth, bool outer_has_frame_base,
+	    Dwarf_Addr outer_entrypc)
+{
+  /* CU DIE already printed.  */
+  if (depth > 0)
+    {
+      const char *name = dwarf_diename (die);
+      if (name != NULL)
+	printf ("%*s[%" PRIx64 "] %s \"%s\"\n", depth * 2, "",
+		dwarf_dieoffset (die), dwarf_tag_string (dwarf_tag (die)),
+		name);
+      else
+	printf ("%*s[%" PRIx64 "] %s\n", depth * 2, "",
+		dwarf_dieoffset (die), dwarf_tag_string (dwarf_tag (die)));
+    }
+
+  struct attr_arg arg;
+  arg.depth = depth + 1;
+
+  /* The (lowest) address to use for (looking up) operands that depend
+     on address.  */
+  Dwarf_Addr die_entrypc;
+  if (dwarf_entrypc (die, &die_entrypc) != 0 || die_entrypc == 0)
+    die_entrypc = outer_entrypc;
+  arg.entrypc = die_entrypc;
+
+  /* Whether this or the any outer DIE has a frame base. Used as
+     sanity check when printing experssions that use DW_OP_fbreg.  */
+  bool die_has_frame_base = dwarf_hasattr (die, DW_AT_frame_base);
+  die_has_frame_base |= outer_has_frame_base;
+  has_frame_base = die_has_frame_base;
+
+  /* Look through all attributes to find those that contain DWARF
+     expressions and print those.  We expect to handle all attributes,
+     anything else is an error.  */
+  if (dwarf_getattrs (die, handle_attr, &arg, 0) != 1)
+    error (EXIT_FAILURE, 0, "Couldn't get all attributes: %s",
+	   dwarf_errmsg (-1));
+
+  /* Handle children and siblings recursively depth first.  */
+  Dwarf_Die child;
+  if (dwarf_haschildren (die) != 0 && dwarf_child (die, &child) == 0)
+    handle_die (&child, depth + 1, die_has_frame_base, die_entrypc);
+
+  Dwarf_Die sibling;
+  if (dwarf_siblingof (die, &sibling) == 0)
+    handle_die (&sibling, depth, outer_has_frame_base, outer_entrypc);
+}
+
 int
 main (int argc, char *argv[])
 {
+  /* With --exprlocs we process all DIEs looking for any attribute
+     which contains an DWARF expression (but not location lists) and
+     print those.  Otherwise we process all function DIEs and print
+     all DWARF expressions and location lists associated with
+     parameters and variables). */
+  bool exprlocs = false;
+  if (argc > 1 && strcmp ("--exprlocs", argv[1]) == 0)
+    {
+      exprlocs = true;
+      argv[1] = "";
+    }
+
   int remaining;
   Dwfl *dwfl;
   (void) argp_parse (dwfl_standard_argp (), argc, argv, 0, &remaining,
@@ -773,10 +976,11 @@ main (int argc, char *argv[])
   while ((cu = dwfl_nextcu (dwfl, cu, &dwbias)) != NULL)
     {
       /* Only walk actual compile units (not partial units) that
-	 contain code.  */
+	 contain code if we are only interested in the function variable
+	 locations.  */
       Dwarf_Addr cubase;
       if (dwarf_tag (cu) == DW_TAG_compile_unit
-	  && dwarf_lowpc (cu, &cubase) == 0)
+	  && (exprlocs || dwarf_lowpc (cu, &cubase) == 0))
 	{
 	  Dwfl_Module *mod = dwfl_cumodule (cu);
 	  Dwarf_Addr modbias;
@@ -806,14 +1010,28 @@ main (int argc, char *argv[])
 	  cfi_eh = dwarf_getcfi_elf (elf);
 	  cfi_eh_bias = dwbias - elfbias;
 
-	  // Get the actual CU DIE and walk all functions inside it.
+	  // Get the actual CU DIE and walk all all DIEs (or just the
+	  // functions) inside it.
 	  Dwarf_Die cudie;
 	  uint8_t offsize;
 	  uint8_t addrsize;
 	  if (dwarf_diecu (cu, &cudie, &addrsize, &offsize) == NULL)
 	    error (EXIT_FAILURE, 0, "dwarf_diecu %s", dwarf_errmsg (-1));
 
-	  if (dwarf_getfuncs (cu, handle_function, NULL, 0) != 0)
+	  if (exprlocs)
+	    {
+	      Dwarf_Addr entrypc;
+	      if (dwarf_entrypc (cu, &entrypc) != 0)
+		entrypc = 0;
+
+	      /* XXX - Passing true for has_frame_base is not really true.
+		 We do it because we want to resolve all DIEs and all
+		 attributes. Technically we should check that the DIE
+		 (types) are referenced from variables that are defined in
+		 a context (function) that has a frame base.  */
+	      handle_die (cu, 0, true /* Should be false */, entrypc);
+	    }
+	  else if (dwarf_getfuncs (cu, handle_function, NULL, 0) != 0)
 	    error (EXIT_FAILURE, 0, "dwarf_getfuncs %s",
 		   dwarf_errmsg (-1));
 	}

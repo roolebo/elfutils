@@ -112,7 +112,7 @@ TESTS = run-arextract.sh run-arsymtest.sh run-ar.sh newfile test-nlist \
 	run-dwfl-report-elf-align.sh run-addr2line-test.sh \
 	run-addr2line-i-test.sh run-addr2line-i-lex-test.sh \
 	run-addr2line-i-demangle-test.sh run-addr2line-alt-debugpath.sh \
-	run-varlocs.sh run-funcretval.sh \
+	run-varlocs.sh run-exprlocs.sh run-funcretval.sh \
 	run-backtrace-native.sh run-backtrace-data.sh run-backtrace-dwarf.sh \
 	run-backtrace-native-biarch.sh run-backtrace-native-core.sh \
 	run-backtrace-native-core-biarch.sh run-backtrace-core-x86_64.sh \
@@ -284,7 +284,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     testfileppc32.bz2 testfileppc64.bz2 \
 	     testfiles390.bz2 testfiles390x.bz2 \
 	     testfilearm.bz2 testfileaarch64.bz2 \
-	     run-varlocs.sh \
+	     run-varlocs.sh run-exprlocs.sh testfile-stridex.bz2 \
 	     testfile_const_type.c testfile_const_type.bz2 \
 	     testfile_implicit_pointer.c testfile_implicit_pointer.bz2 \
 	     testfile_parameter_ref.c testfile_parameter_ref.bz2 \

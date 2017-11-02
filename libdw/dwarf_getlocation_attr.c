@@ -97,6 +97,7 @@ dwarf_getlocation_attr (Dwarf_Attribute *attr, const Dwarf_Op *op, Dwarf_Attribu
 	break;
 
       case DW_OP_GNU_implicit_pointer:
+      case DW_OP_GNU_variable_value:
 	{
 	  Dwarf_Die die;
 	  if (INTUSE(dwarf_getlocation_die) (attr, op, &die) != 0)

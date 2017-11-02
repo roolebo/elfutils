@@ -1,3 +1,19 @@
+2017-11-03  Mark Wielaard  <mark@klomp.org>
+
+	* run-exprlocs.sh: New test.
+	* testfile-stridex.bz2: New testfile.
+	* Makefile.am (TESTS): Add run-exprlocs.sh.
+	(EXTRA_DIST): Add run-exprlocs.sh and testfile-stridex.bz2.
+	* varlocs.c (dwarf_tag_string): New function.
+	(dwarf_attr_string): Likewise.
+	(dwarf_form_string): Likewise.
+	(print_expr): Fix typo in error message.r
+	Handle DW_OP_GNU_variable_value.
+	(attr_arg): New struct.
+	(handle_attr): New function.
+	(handle_die): Likewise.
+	(main): Handle --exprlocs argument. Call handle_die.
+
 2017-10-16  Mark Wielaard  <mark@klomp.org>
 
 	* md5-sha1-test.c: Removed.

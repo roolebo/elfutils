@@ -45,6 +45,7 @@ dwarf_getlocation_die (Dwarf_Attribute *attr, const Dwarf_Op *op,
     {
     case DW_OP_GNU_implicit_pointer:
     case DW_OP_call_ref:
+    case DW_OP_GNU_variable_value:
       dieoff = op->number;
       break;
 

@@ -323,6 +323,7 @@ __libdw_intern_expression (Dwarf *dbg, bool other_byte_order,
 	  break;
 
 	case DW_OP_call_ref:
+	case DW_OP_GNU_variable_value:
 	  /* DW_FORM_ref_addr, depends on offset size of CU.  */
 	  if (dbg == NULL || __libdw_read_offset_inc (dbg, sec_index, &data,
 						      ref_size,

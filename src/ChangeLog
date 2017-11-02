@@ -1,3 +1,8 @@
+2017-11-03  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (print_ops): Handle DW_OP_GNU_variable_value. Print
+	referenced DIE as offset.
+
 2017-09-10  Mark Wielaard  <mark@klomp.org>
 
 	* ar.c (do_oper_delete): Remove DEBUG conditional check.

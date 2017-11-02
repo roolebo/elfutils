@@ -545,6 +545,7 @@ enum
     DW_OP_GNU_convert = 0xf7,
     DW_OP_GNU_reinterpret = 0xf9,
     DW_OP_GNU_parameter_ref = 0xfa,
+    DW_OP_GNU_variable_value = 0xfd,
 
     DW_OP_lo_user = 0xe0,	/* Implementation-defined range start.  */
     DW_OP_hi_user = 0xff	/* Implementation-defined range end.  */

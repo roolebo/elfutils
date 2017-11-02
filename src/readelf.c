@@ -4160,6 +4160,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  break;
 
 	case DW_OP_call_ref:
+	case DW_OP_GNU_variable_value:
 	  /* Offset operand.  */
 	  if (ref_size != 4 && ref_size != 8)
 	    goto invalid; /* Cannot be used in CFA.  */
@@ -4170,8 +4171,8 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	    addr = read_8ubyte_unaligned (dbg, data);
 	  data += ref_size;
 	  CONSUME (ref_size);
-
-	  printf ("%*s[%4" PRIuMAX "] %s %#" PRIxMAX "\n",
+	  /* addr is a DIE offset, so format it as one.  */
+	  printf ("%*s[%4" PRIuMAX "] %s [%6" PRIxMAX "]\n",
 		  indent, "", (uintmax_t) offset,
 		  op_name, (uintmax_t) addr);
 	  offset += 1 + ref_size;

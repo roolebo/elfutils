@@ -39,8 +39,11 @@
 // Needed for DW_OP_call_frame_cfa.
 static Dwarf *dw;
 Dwarf_CFI *cfi_debug;
+Dwarf_Addr cfi_debug_bias;
 Dwarf_CFI *cfi_eh;
 Dwarf_Addr cfi_eh_bias;
+
+bool is_ET_REL;
 
 // Whether the current function has a DW_AT_frame_base defined.
 // Needed for DW_OP_fbreg.
@@ -258,20 +261,29 @@ print_expr (Dwarf_Attribute *attr, Dwarf_Op *expr, Dwarf_Addr addr)
 	error (EXIT_FAILURE, 0, "DW_OP_call_frame_cfa used but no cfi found.");
 
       Dwarf_Frame *frame;
-      if (dwarf_cfi_addrframe (cfi_eh, addr + cfi_eh_bias, &frame) != 0
-	  && dwarf_cfi_addrframe (cfi_debug, addr, &frame) != 0)
+      if (dwarf_cfi_addrframe (cfi_eh, addr + cfi_eh_bias, &frame) == 0
+	  || dwarf_cfi_addrframe (cfi_debug, addr + cfi_debug_bias,
+				  &frame) == 0)
+	{
+	  Dwarf_Op *cfa_ops;
+	  size_t cfa_nops;
+	  if (dwarf_frame_cfa (frame, &cfa_ops, &cfa_nops) != 0)
+	    error (EXIT_FAILURE, 0, "dwarf_frame_cfa 0x%" PRIx64 ": %s",
+		   addr, dwarf_errmsg (-1));
+	  if (cfa_nops < 1)
+	    error (EXIT_FAILURE, 0, "dwarf_frame_cfa no ops");
+	  print_expr_block (NULL, cfa_ops, cfa_nops, 0);
+	  free (frame);
+	}
+      else if (is_ET_REL)
+	{
+	  /* XXX In ET_REL files there might be an .eh_frame with relocations
+	     we don't handle (e.g. X86_64_PC32). Maybe we should?  */
+	  printf ("{...}\n");
+	}
+      else
 	error (EXIT_FAILURE, 0, "dwarf_cfi_addrframe 0x%" PRIx64 ": %s",
 	       addr, dwarf_errmsg (-1));
-
-      Dwarf_Op *cfa_ops;
-      size_t cfa_nops;
-      if (dwarf_frame_cfa (frame, &cfa_ops, &cfa_nops) != 0)
-	error (EXIT_FAILURE, 0, "dwarf_frame_cfa 0x%" PRIx64 ": %s",
-	       addr, dwarf_errmsg (-1));
-      if (cfa_nops < 1)
-	error (EXIT_FAILURE, 0, "dwarf_frame_cfa no ops");
-      print_expr_block (NULL, cfa_ops, cfa_nops, 0);
-      free (frame);
       break;
 
     case DW_OP_push_object_address:
@@ -924,7 +936,14 @@ handle_die (Dwarf_Die *die, int depth, bool outer_has_frame_base,
      on address.  */
   Dwarf_Addr die_entrypc;
   if (dwarf_entrypc (die, &die_entrypc) != 0 || die_entrypc == 0)
-    die_entrypc = outer_entrypc;
+    {
+      /* Try to get the lowest address of the first range covered.  */
+      Dwarf_Addr base, start, end;
+      if (dwarf_ranges (die, 0, &base, &start, &end) <= 0 || start == 0)
+	die_entrypc = outer_entrypc;
+      else
+	die_entrypc = start;
+    }
   arg.entrypc = die_entrypc;
 
   /* Whether this or the any outer DIE has a frame base. Used as
@@ -973,6 +992,7 @@ main (int argc, char *argv[])
 
   Dwarf_Die *cu = NULL;
   Dwarf_Addr dwbias;
+  bool found_cu = false;
   while ((cu = dwfl_nextcu (dwfl, cu, &dwbias)) != NULL)
     {
       /* Only walk actual compile units (not partial units) that
@@ -982,6 +1002,8 @@ main (int argc, char *argv[])
       if (dwarf_tag (cu) == DW_TAG_compile_unit
 	  && (exprlocs || dwarf_lowpc (cu, &cubase) == 0))
 	{
+	  found_cu = true;
+
 	  Dwfl_Module *mod = dwfl_cumodule (cu);
 	  Dwarf_Addr modbias;
 	  dw = dwfl_module_getdwarf (mod, &modbias);
@@ -1006,9 +1028,16 @@ main (int argc, char *argv[])
 	  Elf *elf = dwfl_module_getelf (mod, &elfbias);
 
 	  // CFI. We need both since sometimes neither is complete.
-	  cfi_debug = dwarf_getcfi (dw); // No bias needed, same file.
-	  cfi_eh = dwarf_getcfi_elf (elf);
-	  cfi_eh_bias = dwbias - elfbias;
+	  cfi_debug = dwfl_module_dwarf_cfi (mod, &cfi_debug_bias);
+	  cfi_eh = dwfl_module_eh_cfi (mod, &cfi_eh_bias);
+
+	  assert (cfi_debug == 0); // No bias needed, same file.
+
+	  // We are a bit forgiving for object files.  There might be
+	  // relocations we don't handle that are needed in some
+	  // places...
+	  GElf_Ehdr ehdr_mem, *ehdr = gelf_getehdr (elf, &ehdr_mem);
+	  is_ET_REL = ehdr->e_type == ET_REL;
 
 	  // Get the actual CU DIE and walk all all DIEs (or just the
 	  // functions) inside it.
@@ -1036,6 +1065,9 @@ main (int argc, char *argv[])
 		   dwarf_errmsg (-1));
 	}
     }
+
+  if (! found_cu)
+    error (EXIT_FAILURE, 0, "No DWARF CU found?");
 
   dwfl_end (dwfl);
   return 0;

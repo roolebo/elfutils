@@ -1,3 +1,19 @@
+2017-11-10  Mark Wielaard  <mark@klomp.org>
+
+	* run-exprlocs-self.sh: New test.
+	* run-varlocs-self.sh: Likewise.
+	* Makefile.am (TESTS) Add run-exprlocs-self.sh and
+	run-varlocs-self.sh.
+	(EXTRA_DIST): Likewise.
+	* varlocs.c (cfi_debug_bias): New global variable.
+	(is_ET_REL): Likewise.
+	(print_expr): Don't crash and burn when CFI cannot be found for an
+	ET_REL file for DW_OP_call_frame_cfa.
+	(handle_die): If there is no entry_pc pick the lowest pc start range
+	for the DIE.
+	(main): Check at least one CU was found. Use dwfl_module_dwarf_cfi
+	and dwfl_module_eh_cfi to fix memory leak. Set is_ET_REL.
+
 2017-11-03  Mark Wielaard  <mark@klomp.org>
 
 	* run-exprlocs.sh: New test.

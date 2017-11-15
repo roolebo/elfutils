@@ -1,5 +1,5 @@
 /* Return location expression list.
-   Copyright (C) 2000-2010, 2013-2015 Red Hat, Inc.
+   Copyright (C) 2000-2010, 2013-2015, 2017 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -452,8 +452,12 @@ __libdw_intern_expression (Dwarf *dbg, bool other_byte_order,
 	case DW_OP_plus_uconst:
 	case DW_OP_regx:
 	case DW_OP_piece:
+	case DW_OP_convert:
 	case DW_OP_GNU_convert:
+	case DW_OP_reinterpret:
 	case DW_OP_GNU_reinterpret:
+	case DW_OP_addrx:
+	case DW_OP_constx:
 	  get_uleb128 (newloc->number, data, end_data);
 	  break;
 
@@ -471,6 +475,7 @@ __libdw_intern_expression (Dwarf *dbg, bool other_byte_order,
 	  break;
 
 	case DW_OP_bit_piece:
+	case DW_OP_regval_type:
 	case DW_OP_GNU_regval_type:
 	  get_uleb128 (newloc->number, data, end_data);
 	  if (unlikely (data >= end_data))
@@ -479,6 +484,7 @@ __libdw_intern_expression (Dwarf *dbg, bool other_byte_order,
 	  break;
 
 	case DW_OP_implicit_value:
+	case DW_OP_entry_value:
 	case DW_OP_GNU_entry_value:
 	  /* This cannot be used in a CFI expression.  */
 	  if (unlikely (dbg == NULL))
@@ -492,6 +498,7 @@ __libdw_intern_expression (Dwarf *dbg, bool other_byte_order,
 	  data += newloc->number;		/* Skip the block.  */
 	  break;
 
+	case DW_OP_implicit_pointer:
 	case DW_OP_GNU_implicit_pointer:
 	  /* DW_FORM_ref_addr, depends on offset size of CU.  */
 	  if (dbg == NULL || __libdw_read_offset_inc (dbg, sec_index, &data,
@@ -504,13 +511,16 @@ __libdw_intern_expression (Dwarf *dbg, bool other_byte_order,
 	  get_uleb128 (newloc->number2, data, end_data); /* Byte offset.  */
 	  break;
 
+	case DW_OP_deref_type:
 	case DW_OP_GNU_deref_type:
+	case DW_OP_xderef_type:
 	  if (unlikely (data + 1 >= end_data))
 	    goto invalid;
 	  newloc->number = *data++;
 	  get_uleb128 (newloc->number2, data, end_data);
 	  break;
 
+	case DW_OP_const_type:
 	case DW_OP_GNU_const_type:
 	  {
 	    size_t size;

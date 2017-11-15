@@ -1,5 +1,5 @@
 /* Return DIE associated with a location expression op.
-   Copyright (C) 2013 Red Hat, Inc.
+   Copyright (C) 2013, 2017 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -43,6 +43,7 @@ dwarf_getlocation_die (Dwarf_Attribute *attr, const Dwarf_Op *op,
   Dwarf_Off dieoff;
   switch (op->atom)
     {
+    case DW_OP_implicit_pointer:
     case DW_OP_GNU_implicit_pointer:
     case DW_OP_call_ref:
     case DW_OP_GNU_variable_value:
@@ -50,17 +51,26 @@ dwarf_getlocation_die (Dwarf_Attribute *attr, const Dwarf_Op *op,
       break;
 
     case DW_OP_GNU_parameter_ref:
+    case DW_OP_convert:
     case DW_OP_GNU_convert:
+    case DW_OP_reinterpret:
     case DW_OP_GNU_reinterpret:
+    case DW_OP_const_type:
     case DW_OP_GNU_const_type:
     case DW_OP_call2:
     case DW_OP_call4:
       dieoff = attr->cu->start + op->number;
       break;
 
+    case DW_OP_regval_type:
     case DW_OP_GNU_regval_type:
+    case DW_OP_deref_type:
     case DW_OP_GNU_deref_type:
       dieoff = attr->cu->start + op->number2;
+      break;
+
+    case DW_OP_xderef_type:
+      dieoff = op->number2;
       break;
 
     default:

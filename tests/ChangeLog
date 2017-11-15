@@ -1,3 +1,10 @@
+2018-03-06  Mark Wielaard  <mark@klomp.org>
+
+	* varlocs.c (print_expr): Handle DW_OP_implicit_pointer,
+	DW_OP_entry_value, DW_OP_convert, DW_OP_reinterpret,
+	DW_OP_regval_type, DW_OP_deref_type, DW_OP_xderef_type and
+	DW_OP_const_type.
+
 2018-02-16  Mark Wielaard  <mark@klomp.org>
 
 	* backtrace-subr.sh (check_native_core): Check if there is any core,

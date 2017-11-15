@@ -4295,7 +4295,9 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	case DW_OP_piece:
 	case DW_OP_regx:
 	case DW_OP_plus_uconst:
-	case DW_OP_constu:;
+	case DW_OP_constu:
+	case DW_OP_addrx:
+	case DW_OP_constx:;
 	  const unsigned char *start = data;
 	  uint64_t uleb;
 	  NEED (1);
@@ -4388,6 +4390,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  offset += 1 + (data - start);
 	  break;
 
+	case DW_OP_implicit_pointer:
 	case DW_OP_GNU_implicit_pointer:
 	  /* DIE offset operand.  */
 	  start = data;
@@ -4410,6 +4413,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  offset += 1 + (data - start);
 	  break;
 
+	case DW_OP_entry_value:
 	case DW_OP_GNU_entry_value:
 	  /* Size plus expression block.  */
 	  start = data;
@@ -4425,6 +4429,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  offset += 1 + (data - start);
 	  break;
 
+	case DW_OP_const_type:
 	case DW_OP_GNU_const_type:
 	  /* uleb128 CU relative DW_TAG_base_type DIE offset, 1-byte
 	     unsigned size plus block.  */
@@ -4444,6 +4449,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  offset += 1 + (data - start);
 	  break;
 
+	case DW_OP_regval_type:
 	case DW_OP_GNU_regval_type:
 	  /* uleb128 register number, uleb128 CU relative
 	     DW_TAG_base_type DIE offset.  */
@@ -4460,6 +4466,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  offset += 1 + (data - start);
 	  break;
 
+	case DW_OP_deref_type:
 	case DW_OP_GNU_deref_type:
 	  /* 1-byte unsigned size of value, uleb128 CU relative
 	     DW_TAG_base_type DIE offset.  */
@@ -4477,7 +4484,23 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  offset += 1 + (data - start);
 	  break;
 
+	case DW_OP_xderef_type:
+	  /* 1-byte unsigned size of value, uleb128 base_type DIE offset.  */
+	  start = data;
+	  NEED (1);
+	  usize = *(uint8_t *) data++;
+	  NEED (1);
+	  get_uleb128 (uleb, data, data + len);
+	  printf ("%*s[%4" PRIuMAX "] %s %" PRIu8 " [%6" PRIxMAX "]\n",
+		  indent, "", (uintmax_t) offset,
+		  op_name, usize, uleb);
+	  CONSUME (data - start);
+	  offset += 1 + (data - start);
+	  break;
+
+	case DW_OP_convert:
 	case DW_OP_GNU_convert:
+	case DW_OP_reinterpret:
 	case DW_OP_GNU_reinterpret:
 	  /* uleb128 CU relative offset to DW_TAG_base_type, or zero
 	     for conversion to untyped.  */

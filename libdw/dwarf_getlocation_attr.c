@@ -1,5 +1,5 @@
 /* Return DWARF attribute associated with a location expression op.
-   Copyright (C) 2013, 2014 Red Hat, Inc.
+   Copyright (C) 2013, 2014, 2017 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -67,6 +67,7 @@ dwarf_getlocation_attr (Dwarf_Attribute *attr, const Dwarf_Op *op, Dwarf_Attribu
 	result->cu = attr_form_cu (attr);
 	break;
 
+      case DW_OP_entry_value:
       case DW_OP_GNU_entry_value:
 	result->code = DW_AT_location;
 	result->form = DW_FORM_exprloc;
@@ -74,6 +75,7 @@ dwarf_getlocation_attr (Dwarf_Attribute *attr, const Dwarf_Op *op, Dwarf_Attribu
 	result->cu = attr_form_cu (attr);
 	break;
 
+      case DW_OP_const_type:
       case DW_OP_GNU_const_type:
 	result->code = DW_AT_const_value;
 	result->form = DW_FORM_block1;
@@ -96,6 +98,7 @@ dwarf_getlocation_attr (Dwarf_Attribute *attr, const Dwarf_Op *op, Dwarf_Attribu
 	}
 	break;
 
+      case DW_OP_implicit_pointer:
       case DW_OP_GNU_implicit_pointer:
       case DW_OP_GNU_variable_value:
 	{

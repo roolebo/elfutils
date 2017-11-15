@@ -1,3 +1,22 @@
+2018-03-06  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf.h: Add DW_OP_implicit_pointer, DW_OP_addrx, DW_OP_constx,
+	DW_OP_entry_value, DW_OP_const_type, DW_OP_regval_type,
+	DW_OP_deref_type, DW_OP_xderef_type, DW_OP_convert and
+	DW_OP_reinterpret.
+	* dwarf_getlocation.c (__libdw_intern_expression): Handle
+	DW_OP_convert, DW_OP_reinterpret, DW_OP_addrx, DW_OP_constx,
+	DW_OP_regval_type, DW_OP_entry_value, DW_OP_implicit_pointer,
+	DW_OP_deref_type, DW_OP_xderef_type and DW_OP_const_type.
+	* dwarf_getlocation_attr.c (dwarf_getlocation_attr): Handle
+	DW_OP_entry_value, DW_OP_const_type and DW_OP_implicit_pointer.
+	* dwarf_getlocation_die.c (dwarf_getlocation_die): Handle
+	DW_OP_implicit_pointer, DW_OP_convert, DW_OP_reinterpret,
+	DW_OP_const_type, DW_OP_regval_type, DW_OP_deref_type and
+	DW_OP_xderef_type.
+	* dwarf_getlocation_implicit_pointer.c
+	(dwarf_getlocation_implicit_pointer): Handle DW_OP_implicit_pointer.
+
 2018-03-01  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf.h: Add DW_AT_GNU_locviews and DW_AT_GNU_entry_view.

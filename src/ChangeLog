@@ -1,3 +1,10 @@
+2018-03-06  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (print_ops): Handle DW_OP_addrx, DW_OP_constx,
+	DW_OP_implicit_pointer, DW_OP_entry_value, DW_OP_const_type,
+	DW_OP_regval_type, DW_OP_deref_type, DW_OP_xderef_type,
+	DW_OP_convert, DW_OP_reinterpret.
+
 2018-03-01  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (struct listptr): Add attr field.

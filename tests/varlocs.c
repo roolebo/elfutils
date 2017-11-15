@@ -1,5 +1,5 @@
 /* Test program for dwarf location functions.
-   Copyright (C) 2013, 2015 Red Hat, Inc.
+   Copyright (C) 2013, 2015, 2017 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -411,6 +411,7 @@ print_expr (Dwarf_Attribute *attr, Dwarf_Op *expr, Dwarf_Addr addr)
       }
       break;
 
+    case DW_OP_implicit_pointer:
     case DW_OP_GNU_implicit_pointer:
       /* Special, DIE offset, signed offset. Referenced DIE has a
 	 location or const_value attribute. */
@@ -504,6 +505,7 @@ print_expr (Dwarf_Attribute *attr, Dwarf_Op *expr, Dwarf_Addr addr)
       }
       break;
 
+    case DW_OP_entry_value:
     case DW_OP_GNU_entry_value:
       /* Special, unsigned size plus expression block. All registers
 	 inside the block should be interpreted as they had on
@@ -546,7 +548,9 @@ print_expr (Dwarf_Attribute *attr, Dwarf_Op *expr, Dwarf_Addr addr)
       }
       break;
 
+    case DW_OP_convert:
     case DW_OP_GNU_convert:
+    case DW_OP_reinterpret:
     case DW_OP_GNU_reinterpret:
       /* Special, unsigned CU relative DIE offset pointing to a
 	 DW_TAG_base_type. Pops a value, converts or reinterprets the
@@ -571,6 +575,7 @@ print_expr (Dwarf_Attribute *attr, Dwarf_Op *expr, Dwarf_Addr addr)
       }
       break;
 
+    case DW_OP_regval_type:
     case DW_OP_GNU_regval_type:
       /* Special, unsigned register number plus unsigned CU relative
          DIE offset pointing to a DW_TAG_base_type. */
@@ -586,9 +591,10 @@ print_expr (Dwarf_Attribute *attr, Dwarf_Op *expr, Dwarf_Addr addr)
       }
       break;
 
+    case DW_OP_deref_type:
     case DW_OP_GNU_deref_type:
       /* Special, unsigned size plus unsigned CU relative DIE offset
-	 pointing to a DW_TAG_base_type. */ 
+	 pointing to a DW_TAG_base_type. */
       {
 	Dwarf_Die type;
 	if (dwarf_getlocation_die (attr, expr, &type) != 0)
@@ -601,6 +607,21 @@ print_expr (Dwarf_Attribute *attr, Dwarf_Op *expr, Dwarf_Addr addr)
       }
       break;
 
+    case DW_OP_xderef_type:
+      /* Special, unsigned size plus unsigned DIE offset
+	 pointing to a DW_TAG_base_type. */
+      {
+	Dwarf_Die type;
+	if (dwarf_getlocation_die (attr, expr, &type) != 0)
+	  error (EXIT_FAILURE, 0, "dwarf_getlocation_die: %s",
+		 dwarf_errmsg (-1));
+	// XXX check size against base_type size?
+	printf ("%s(%" PRIu64 ")", opname, expr->number);
+	print_base_type (&type);
+      }
+      break;
+
+    case DW_OP_const_type:
     case DW_OP_GNU_const_type:
       /* Special, unsigned CU relative DIE offset pointing to a
 	 DW_TAG_base_type, an unsigned size length plus a block with

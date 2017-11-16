@@ -1,3 +1,7 @@
+2017-11-16  Mark Wielaard  <mark@klomp.org>
+
+	* varlocs.c (main): Fix cfi_debug => cfi_debug_bias typo in assert.
+
 2017-11-10  Mark Wielaard  <mark@klomp.org>
 
 	* run-exprlocs-self.sh: New test.

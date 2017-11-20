@@ -1,3 +1,15 @@
+2017-11-20  Mark Wielaard  <mark@klomp.org>
+
+	* link_map.c (do_check64): Take a char * and calculate type and val
+	offsets before reading, possibly unaligned, values.
+	(do_check32): Likewise.
+	(check64): Remove define.
+	(check32): Likewise.
+	(auxv_format_probe): Call do_check32 and do_check64 directly with
+	a, possibly unaligned, auxv entry pointer.
+	(dwfl_link_map_report): Redefine AUXV_SCAN to not dereference a
+	possibly unaligned auxv entry pointer.
+
 2017-10-16  Mark Wielaard  <mark@klomp.org>
 
 	* argp-std.c (parse_opt): For -k call argp_failure not failure to

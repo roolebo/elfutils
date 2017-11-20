@@ -43,13 +43,14 @@
 
 
 static inline bool
-do_check64 (size_t i, const Elf64_auxv_t (*a64)[], uint_fast8_t *elfdata)
+do_check64 (const char *a64, uint_fast8_t *elfdata)
 {
   /* The AUXV pointer might not even be naturally aligned for 64-bit
      data, because note payloads in a core file are not aligned.  */
-
-  uint64_t type = read_8ubyte_unaligned_noncvt (&(*a64)[i].a_type);
-  uint64_t val = read_8ubyte_unaligned_noncvt (&(*a64)[i].a_un.a_val);
+  const char *typep = a64 + offsetof (Elf64_auxv_t, a_type);
+  uint64_t type = read_8ubyte_unaligned_noncvt (typep);
+  const char *valp = a64 + offsetof (Elf64_auxv_t, a_un.a_val);
+  uint64_t val = read_8ubyte_unaligned_noncvt (valp);
 
   if (type == BE64 (PROBE_TYPE)
       && val == BE64 (PROBE_VAL64))
@@ -68,16 +69,15 @@ do_check64 (size_t i, const Elf64_auxv_t (*a64)[], uint_fast8_t *elfdata)
   return false;
 }
 
-#define check64(n) do_check64 (n, a64, elfdata)
-
 static inline bool
-do_check32 (size_t i, const Elf32_auxv_t (*a32)[], uint_fast8_t *elfdata)
+do_check32 (const char *a32, uint_fast8_t *elfdata)
 {
   /* The AUXV pointer might not even be naturally aligned for 32-bit
      data, because note payloads in a core file are not aligned.  */
-
-  uint32_t type = read_4ubyte_unaligned_noncvt (&(*a32)[i].a_type);
-  uint32_t val = read_4ubyte_unaligned_noncvt (&(*a32)[i].a_un.a_val);
+  const char *typep = a32 + offsetof (Elf32_auxv_t, a_type);
+  uint32_t type = read_4ubyte_unaligned_noncvt (typep);
+  const char *valp = a32 + offsetof (Elf32_auxv_t, a_un.a_val);
+  uint32_t val = read_4ubyte_unaligned_noncvt (valp);
 
   if (type == BE32 (PROBE_TYPE)
       && val == BE32 (PROBE_VAL32))
@@ -96,26 +96,22 @@ do_check32 (size_t i, const Elf32_auxv_t (*a32)[], uint_fast8_t *elfdata)
   return false;
 }
 
-#define check32(n) do_check32 (n, a32, elfdata)
-
 /* Examine an auxv data block and determine its format.
    Return true iff we figured it out.  */
 static bool
 auxv_format_probe (const void *auxv, size_t size,
 		   uint_fast8_t *elfclass, uint_fast8_t *elfdata)
 {
-  const Elf32_auxv_t (*a32)[size / sizeof (Elf32_auxv_t)] = (void *) auxv;
-  const Elf64_auxv_t (*a64)[size / sizeof (Elf64_auxv_t)] = (void *) auxv;
-
   for (size_t i = 0; i < size / sizeof (Elf64_auxv_t); ++i)
     {
-      if (check64 (i))
+      if (do_check64 (auxv + i * sizeof (Elf64_auxv_t), elfdata))
 	{
 	  *elfclass = ELFCLASS64;
 	  return true;
 	}
 
-      if (check32 (i * 2) || check32 (i * 2 + 1))
+      if (do_check32 (auxv + (i * 2) * sizeof (Elf32_auxv_t), elfdata)
+	  || do_check32 (auxv + (i * 2 + 1) * sizeof (Elf32_auxv_t), elfdata))
 	{
 	  *elfclass = ELFCLASS32;
 	  return true;
@@ -717,8 +713,12 @@ dwfl_link_map_report (Dwfl *dwfl, const void *auxv, size_t auxv_size,
 	  const Elf##NN##_auxv_t *av = auxv;                            \
 	  for (size_t i = 0; i < auxv_size / sizeof av[0]; ++i)         \
 	    {                                                           \
-              uint##NN##_t type = READ_AUXV##NN (&av[i].a_type);        \
-              uint##NN##_t val = BL##NN (READ_AUXV##NN (&av[i].a_un.a_val)); \
+	      const char *typep = auxv + i * sizeof (Elf##NN##_auxv_t); \
+	      typep += offsetof (Elf##NN##_auxv_t, a_type);             \
+	      uint##NN##_t type = READ_AUXV##NN (typep);                \
+	      const char *valp = auxv + i * sizeof (Elf##NN##_auxv_t);  \
+	      valp += offsetof (Elf##NN##_auxv_t, a_un.a_val);          \
+	      uint##NN##_t val = BL##NN (READ_AUXV##NN (valp));         \
 	      if (type == BL##NN (AT_ENTRY))                            \
 		entry = val;                                            \
 	      else if (type == BL##NN (AT_PHDR))                        \

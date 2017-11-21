@@ -5968,9 +5968,14 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	    attrval_out:
 	      if (!cbargs->silent)
 		error (0, 0, gettext ("DIE [%" PRIx64 "] "
-				      "cannot get attribute value: %s"),
-		       dwarf_dieoffset (die), dwarf_errmsg (-1));
-	      return DWARF_CB_ABORT;
+				      "cannot get attribute '%s' (%s) value: "
+				      "%s"),
+		       dwarf_dieoffset (die),
+		       dwarf_attr_name (attr),
+		       dwarf_form_name (form),
+		       dwarf_errmsg (-1));
+	      /* Don't ABORT, it might be other attributes can be resolved.  */
+	      return DWARF_CB_OK;
 	    }
 	  char *a = format_dwarf_addr (cbargs->dwflmod, cbargs->addrsize,
 				       addr, addr);

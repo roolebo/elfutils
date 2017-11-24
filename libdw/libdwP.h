@@ -84,6 +84,7 @@ enum
     IDX_debug_macinfo,
     IDX_debug_macro,
     IDX_debug_ranges,
+    IDX_debug_rnglists,
     IDX_gnu_debugaltlink,
     IDX_last
   };
@@ -131,6 +132,7 @@ enum
   DWARF_E_NO_FLAG,
   DWARF_E_INVALID_OFFSET,
   DWARF_E_NO_DEBUG_RANGES,
+  DWARF_E_NO_DEBUG_RNGLISTS,
   DWARF_E_INVALID_CFI,
   DWARF_E_NO_ALT_DEBUGLINK,
   DWARF_E_INVALID_OPCODE,

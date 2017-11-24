@@ -1,3 +1,9 @@
+2018-04-11  Mark Wielaard  <mark@klomp.org>
+
+	* run-readelf-ranges.sh: New test.
+	* Makefile.am (TESTS): Add run-readelf-ranges.sh.
+	(EXTRA_DIST): Likewise.
+
 2018-05-21  Mark Wielaard  <mark@klomp.org>
 
 	* addrx_constx-4.dwo.bz2: New testfile.

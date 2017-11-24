@@ -1,3 +1,14 @@
+2018-04-11  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf.h: Add DWARF5 range list entry DW_RLE encodings.
+	* begin_elf.c (dwarf_scnnames): Add IDX_debug_rnglists.
+	* dwarf_error.c (errmsgs): Add DWARF_E_NO_DEBUG_RNGLISTS.
+	* dwarf_formudata.c (dwarf_formudata): Handle DW_AT_rnglists_base
+	and DW_FORM_rnglistx.
+	* dwarf_getscopes.c (pc_match): Also check for
+	DWARF_E_NO_DEBUG_RNGLISTS.
+	* libdwP.h: Add IDX_debug_rnglists.
+
 2018-05-25  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_getlocation_attr.c (__libdw_cu_addr_base): Cast offset to

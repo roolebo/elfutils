@@ -97,7 +97,7 @@ TESTS = run-arextract.sh run-arsymtest.sh run-ar.sh newfile test-nlist \
 	run-varlocs-self.sh run-exprlocs-self.sh \
 	run-readelf-test1.sh run-readelf-test2.sh run-readelf-test3.sh \
 	run-readelf-test4.sh run-readelf-twofiles.sh \
-	run-readelf-macro.sh run-readelf-loc.sh \
+	run-readelf-macro.sh run-readelf-loc.sh run-readelf-ranges.sh \
 	run-readelf-aranges.sh run-readelf-line.sh run-readelf-z.sh \
 	run-native-test.sh run-bug1-test.sh \
 	run-debuglink.sh run-debugaltlink.sh run-buildid.sh \
@@ -234,6 +234,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     testfile-macros-0xff.bz2 \
 	     run-readelf-macro.sh testfilemacro.bz2 \
 	     run-readelf-loc.sh testfileloc.bz2 \
+	     run-readelf-ranges.sh \
 	     run-readelf-aranges.sh run-readelf-line.sh testfilefoobarbaz.bz2 \
 	     testfile-ppc64-min-instr.bz2 \
 	     testfile-dwarf-45.source \

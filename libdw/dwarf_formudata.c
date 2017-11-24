@@ -211,11 +211,23 @@ dwarf_formudata (Dwarf_Attribute *attr, Dwarf_Word *return_uval)
 	    case DW_AT_ranges:
 	    case DW_AT_start_scope:
 	    case DW_AT_GNU_ranges_base:
-	      /* rangelistptr */
-	      if (__libdw_formptr (attr, IDX_debug_ranges,
-				   DWARF_E_NO_DEBUG_RANGES, NULL,
-				   return_uval) == NULL)
-		return -1;
+	    case DW_AT_rnglists_base:
+	      if (attr->cu->version < 5)
+		{
+		  /* rangelistptr */
+		  if (__libdw_formptr (attr, IDX_debug_ranges,
+				       DWARF_E_NO_DEBUG_RANGES, NULL,
+				       return_uval) == NULL)
+		    return -1;
+		}
+	      else
+		{
+		  /* rnglistsptr */
+		  if (__libdw_formptr (attr, IDX_debug_rnglists,
+				       DWARF_E_NO_DEBUG_RNGLISTS, NULL,
+				       return_uval) == NULL)
+		    return -1;
+		}
 	      break;
 
 	    case DW_AT_stmt_list:
@@ -278,6 +290,7 @@ dwarf_formudata (Dwarf_Attribute *attr, Dwarf_Word *return_uval)
       break;
 
     case DW_FORM_udata:
+    case DW_FORM_rnglistx:
       if (datap + 1 > endp)
 	goto invalid;
       get_uleb128 (*return_uval, datap, endp);

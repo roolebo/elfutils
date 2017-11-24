@@ -64,6 +64,7 @@ static const char dwarf_scnnames[IDX_last][19] =
   [IDX_debug_macinfo] = ".debug_macinfo",
   [IDX_debug_macro] = ".debug_macro",
   [IDX_debug_ranges] = ".debug_ranges",
+  [IDX_debug_rnglists] = ".debug_rnglists",
   [IDX_gnu_debugaltlink] = ".gnu_debugaltlink"
 };
 #define ndwarf_scnnames (sizeof (dwarf_scnnames) / sizeof (dwarf_scnnames[0]))

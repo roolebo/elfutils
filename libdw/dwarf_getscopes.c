@@ -62,7 +62,9 @@ pc_match (unsigned int depth, struct Dwarf_Die_Chain *die, void *arg)
       if (result < 0)
 	{
 	  int error = INTUSE(dwarf_errno) ();
-	  if (error != DWARF_E_NOERROR && error != DWARF_E_NO_DEBUG_RANGES)
+	  if (error != DWARF_E_NOERROR
+	      && error != DWARF_E_NO_DEBUG_RANGES
+	      && error != DWARF_E_NO_DEBUG_RNGLISTS)
 	    {
 	      __libdw_seterrno (error);
 	      return -1;

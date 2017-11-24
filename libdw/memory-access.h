@@ -1,7 +1,6 @@
 /* Unaligned memory access functionality.
-   Copyright (C) 2000-2014 Red Hat, Inc.
+   Copyright (C) 2000-2014, 2018 Red Hat, Inc.
    This file is part of elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2001.
 
    This file is free software; you can redistribute it and/or modify
    it under the terms of either
@@ -31,6 +30,7 @@
 #define _MEMORY_ACCESS_H 1
 
 #include <byteswap.h>
+#include <endian.h>
 #include <limits.h>
 #include <stdint.h>
 
@@ -314,6 +314,52 @@ read_8sbyte_unaligned_1 (bool other_byte_order, const void *p)
   ({ int64_t t_ = read_8sbyte_unaligned (Dbg, Addr);			      \
      Addr = (__typeof (Addr)) (((uintptr_t) (Addr)) + 8);		      \
      t_; })
+
+/* 3ubyte reads are only used for DW_FORM_addrx3 and DW_FORM_strx3.
+   And are probably very rare.  They are not optimized.  They are
+   handled as if reading a 4byte value with the first (for big endian)
+   or last (for little endian) byte zero.  */
+
+static inline int
+file_byte_order (bool other_byte_order)
+{
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+  return other_byte_order ? __BIG_ENDIAN : __LITTLE_ENDIAN;
+#else
+  return other_byte_order ? __LITTLE_ENDIAN : __BIG_ENDIAN;
+#endif
+}
+
+static inline uint32_t
+read_3ubyte_unaligned (Dwarf *dbg, const unsigned char *p)
+{
+  union
+  {
+    uint32_t u4;
+    unsigned char c[4];
+  } d;
+  bool other_byte_order = dbg->other_byte_order;
+
+  if (file_byte_order (other_byte_order) == __BIG_ENDIAN)
+    {
+      d.c[0] = 0x00;
+      d.c[1] = p[0];
+      d.c[2] = p[1];
+      d.c[3] = p[2];
+    }
+  else
+    {
+      d.c[0] = p[0];
+      d.c[1] = p[1];
+      d.c[2] = p[2];
+      d.c[3] = 0x00;
+    }
+
+  if (other_byte_order)
+    return bswap_32 (d.u4);
+  else
+    return d.u4;
+}
 
 
 #define read_addr_unaligned_inc(Nbytes, Dbg, Addr)			\

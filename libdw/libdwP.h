@@ -74,6 +74,7 @@ enum
     IDX_debug_types,
     IDX_debug_abbrev,
     IDX_debug_aranges,
+    IDX_debug_addr,
     IDX_debug_line,
     IDX_debug_frame,
     IDX_debug_loc,
@@ -131,6 +132,7 @@ enum
   DWARF_E_INVALID_OPCODE,
   DWARF_E_NOT_CUDIE,
   DWARF_E_UNKNOWN_LANGUAGE,
+  DWARF_E_NO_DEBUG_ADDR,
 };
 
 
@@ -323,6 +325,10 @@ struct Dwarf_CU
 
   /* Known location lists.  */
   void *locs;
+
+  /* The offset into the .debug_addr section where index zero begins.
+     Don't access directly, call __libdw_cu_addr_base.  */
+  Dwarf_Off addr_base;
 
   /* Memory boundaries of this CU.  */
   void *startp;
@@ -864,6 +870,9 @@ int __libdw_getsrclines (Dwarf *dbg, Dwarf_Off debug_line_offset,
 
 /* Load and return value of DW_AT_comp_dir from CUDIE.  */
 const char *__libdw_getcompdir (Dwarf_Die *cudie);
+
+/* Get the address base for the CU, fetches it when not yet set.  */
+Dwarf_Off __libdw_cu_addr_base (Dwarf_CU *cu);
 
 /* Given a file descriptor, dir and file returns a full path.  If the
    file is absolute (starts with a /) a copy of file is returned.  If

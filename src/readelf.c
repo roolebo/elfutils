@@ -6072,6 +6072,11 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
   switch (form)
     {
     case DW_FORM_addr:
+    case DW_FORM_addrx:
+    case DW_FORM_addrx1:
+    case DW_FORM_addrx2:
+    case DW_FORM_addrx3:
+    case DW_FORM_addrx4:
       if (!cbargs->silent)
 	{
 	  Dwarf_Addr addr;

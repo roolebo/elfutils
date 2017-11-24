@@ -1,3 +1,17 @@
+2018-03-22  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_begin_elf.c (dwarf_scnnames): Add IDX_debug_addr.
+	* dwarf_error.c (errmsgs): Add DWARF_E_NO_DEBUG_ADDR.
+	* dwarf_formaddr.c (dwarf_formaddr): Handle DW_FORM_addrx[1234].
+	(__libdw_cu_addr_base): New function.
+	* dwarf_formudata.c (dwarf_formudata): Handle DW_AT_addr_base as
+	addrptr.
+	* libdwP.h: Add IDX_debug_addr and DWARF_E_NO_DEBUG_ADDR.
+	(struct Dwarf_CU): Add addr_base field.
+	(__libdw_cu_addr_base): New function definition.
+	* memory-access.h (file_byte_order): New static function.
+	(read_3ubyte_unaligned): New inline function.
+
 2018-03-29  Mark Wielaard  <mark@klomp.org>
 
 	* libdw.h (dwarf_decl_file): Extend documentation.

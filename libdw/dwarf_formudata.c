@@ -182,6 +182,14 @@ dwarf_formudata (Dwarf_Attribute *attr, Dwarf_Word *return_uval)
 		return -1;
 	      break;
 
+	    case DW_AT_addr_base:
+	      /* addrptr */
+	      if (__libdw_formptr (attr, IDX_debug_addr,
+				   DWARF_E_NO_DEBUG_ADDR, NULL,
+				   return_uval) == NULL)
+		return -1;
+	      break;
+
 	    default:
 	      /* sec_offset can only be used by one of the above attrs.  */
 	      if (attr->form == DW_FORM_sec_offset)

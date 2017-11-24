@@ -184,11 +184,23 @@ dwarf_formudata (Dwarf_Attribute *attr, Dwarf_Word *return_uval)
 	    case DW_AT_use_location:
 	    case DW_AT_vtable_elem_location:
 	    case DW_AT_GNU_locviews:
-	      /* loclistptr */
-	      if (__libdw_formptr (attr, IDX_debug_loc,
-				   DWARF_E_NO_LOCLIST, NULL,
-				   return_uval) == NULL)
-		return -1;
+	    case DW_AT_loclists_base:
+	      if (attr->cu->version < 5)
+		{
+		  /* loclistptr */
+		  if (__libdw_formptr (attr, IDX_debug_loc,
+				       DWARF_E_NO_DEBUG_LOC, NULL,
+				       return_uval) == NULL)
+		    return -1;
+		}
+	      else
+		{
+		  /* loclist, loclistsptr */
+		  if (__libdw_formptr (attr, IDX_debug_loclists,
+				       DWARF_E_NO_DEBUG_LOCLISTS, NULL,
+				       return_uval) == NULL)
+		    return -1;
+		}
 	      break;
 
 	    case DW_AT_macro_info:
@@ -291,6 +303,7 @@ dwarf_formudata (Dwarf_Attribute *attr, Dwarf_Word *return_uval)
 
     case DW_FORM_udata:
     case DW_FORM_rnglistx:
+    case DW_FORM_loclistx:
       if (datap + 1 > endp)
 	goto invalid;
       get_uleb128 (*return_uval, datap, endp);

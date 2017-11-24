@@ -87,7 +87,7 @@ attr_ok (Dwarf_Attribute *attr)
       break;
 
     default:
-      __libdw_seterrno (DWARF_E_NO_LOCLIST);
+      __libdw_seterrno (DWARF_E_NO_LOC_VALUE);
       return false;
     }
 
@@ -700,7 +700,7 @@ initial_offset (Dwarf_Attribute *attr, ptrdiff_t *offset)
 
   Dwarf_Word start_offset;
   if (__libdw_formptr (attr, secidx,
-		       DWARF_E_NO_LOCLIST,
+		       DWARF_E_NO_DEBUG_LOC,
 		       NULL, &start_offset) == NULL)
     return -1;
 

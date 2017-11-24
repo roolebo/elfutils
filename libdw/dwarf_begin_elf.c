@@ -58,6 +58,7 @@ static const char dwarf_scnnames[IDX_last][19] =
   [IDX_debug_line_str] = ".debug_line_str",
   [IDX_debug_frame] = ".debug_frame",
   [IDX_debug_loc] = ".debug_loc",
+  [IDX_debug_loclists] = ".debug_loclists",
   [IDX_debug_pubnames] = ".debug_pubnames",
   [IDX_debug_str] = ".debug_str",
   [IDX_debug_str_offsets] = ".debug_str_offsets",

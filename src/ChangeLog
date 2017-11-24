@@ -1,3 +1,22 @@
+2018-04-12  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (dwarf_loc_list_encoding_string): New functions.
+	(dwarf_loc_list_encoding_name): Likewise.
+	(known_loclistptr): Renamed and split in two...
+	(known_locsptr): this and ...
+	(known_loclistsptr): this.
+	(listptr_base): Split out...
+	(cudie_base): ...this.
+	(is_split_dwarf): New function.
+	(attr_callback): Handle DW_AT_loclists_base and notice sec_offset
+	in correct list.
+	(print_debug_rnglists_section): Use spit_dwarf_cu_base.
+	(print_debug_loclists_section): New function.
+	(print_debug_loc_section): Use known_locsptr instead of
+	known_loclistptr.
+	(print_debug): Recognize .debug_loclists. Reset known_locsptr and
+	known_loclistsptr.
+
 2018-05-25  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (DWARF_SKELETON): New constant.

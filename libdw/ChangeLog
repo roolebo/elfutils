@@ -1,3 +1,18 @@
+2018-04-12  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf.h: Add DWARF5 location list entry DW_LLE encodings.
+	* begin_elf.c (dwarf_scnnames): Add IDX_debug_loclists.
+	* dwarf_error.c (errmsgs): Remove DWARF_E_NO_LOCLIST. And replace
+	with DWARF_E_NO_DEBUG_LOC, DWARF_E_NO_DEBUG_LOCLISTS and
+	DWARF_E_NO_LOC_VALUE.
+	* dwarf_formudata.c (dwarf_formudata): Handle DW_AT_loclists_base
+	and DW_FORM_loclistx.
+	* dwarf_getlocation.c (attr_ok): Use DWARF_E_NO_LOC_VALUE.
+	(initial_offset): Use DWARF_E_NO_DEBUG_LOC.
+	* libdwP.h: Add IDX_debug_rnglists. Remove DWARF_E_NO_LOCLIST.
+	Add DWARF_E_NO_DEBUG_LOC, DWARF_E_NO_DEBUG_LOCLISTS and
+	DWARF_E_NO_LOC_VALUE.
+
 2018-05-25  Mark Wielaard  <mark@klomp.org>
 
 	* libdw_find_split_unit.c (__libdw_find_split_unit): Extract linking

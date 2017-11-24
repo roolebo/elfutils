@@ -899,6 +899,22 @@ enum
     DW_RLE_start_length = 0x7
   };
 
+
+/* Location list entry encoding.  */
+enum
+  {
+    DW_LLE_end_of_list = 0x0,
+    DW_LLE_base_addressx = 0x1,
+    DW_LLE_startx_endx = 0x2,
+    DW_LLE_startx_length = 0x3,
+    DW_LLE_offset_pair = 0x4,
+    DW_LLE_default_location = 0x5,
+    DW_LLE_base_address = 0x6,
+    DW_LLE_start_end = 0x7,
+    DW_LLE_start_length = 0x8
+  };
+
+
 /* DWARF call frame instruction encodings.  */
 enum
   {

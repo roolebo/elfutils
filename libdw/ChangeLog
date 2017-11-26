@@ -1,3 +1,13 @@
+2018-02-08  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf.h: Add DWARF5 DW_FORMs.
+	* libdwP.h (__libdw_form_val_compute_len): Handle fix length
+	DW_FORM_implicit_const, DW_FORM_addrx[1234], DW_FORM_strx[1234],
+	DW_FORM_ref_sup[48] and DW_FORM_data16.
+	* libdw_form.c (__libdw_form_val_compute_len): DW_FORM_strp_sup
+	and DW_FORM_line_strp are offset_size. DW_FORM_addrx, DW_FORM_strx,
+	DW_FORM_loclistx and DW_FORM_rnglistx are uleb128.
+
 2018-01-30  Mark Wielaard  <mark@klomp.org>
 
 	* Makefile.am (libdw_a_SOURCES): Add dwarf_get_units.c.

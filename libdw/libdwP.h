@@ -576,7 +576,7 @@ extern size_t __libdw_form_val_compute_len (struct Dwarf_CU *cu,
 					    const unsigned char *valp)
      __nonnull_attribute__ (1, 3) internal_function;
 
-/* Find the length of a form attribute.  */
+/* Find the length of a form attribute in DIE/info data.  */
 static inline size_t
 __nonnull_attribute__ (1, 3)
 __libdw_form_val_len (struct Dwarf_CU *cu, unsigned int form,
@@ -587,10 +587,24 @@ __libdw_form_val_len (struct Dwarf_CU *cu, unsigned int form,
   static const uint8_t form_lengths[] =
     {
       [DW_FORM_flag_present] = 0x80,
-      [DW_FORM_data1] = 1, [DW_FORM_ref1] = 1, [DW_FORM_flag] = 1,
+      [DW_FORM_implicit_const] = 0x80, /* Value is in abbrev, not in info.  */
+
+      [DW_FORM_flag] = 1,
+      [DW_FORM_data1] = 1, [DW_FORM_ref1] = 1,
+      [DW_FORM_addrx1] = 1, [DW_FORM_strx1] = 1,
+
       [DW_FORM_data2] = 2, [DW_FORM_ref2] = 2,
-      [DW_FORM_data4] = 4, [DW_FORM_ref4] = 4,
-      [DW_FORM_data8] = 8, [DW_FORM_ref8] = 8, [DW_FORM_ref_sig8] = 8,
+      [DW_FORM_addrx2] = 2, [DW_FORM_strx2] = 2,
+
+      [DW_FORM_addrx3] = 3, [DW_FORM_strx3] = 3,
+
+      [DW_FORM_data4] = 4, [DW_FORM_ref4] = 4, [DW_FORM_ref_sup4] = 4,
+      [DW_FORM_addrx4] = 4, [DW_FORM_strx4] = 4,
+
+      [DW_FORM_ref_sig8] = 8,
+      [DW_FORM_data8] = 8, [DW_FORM_ref8] = 8, [DW_FORM_ref_sup8] = 8,
+
+      [DW_FORM_data16] = 16,
     };
 
   /* Return immediately for forms with fixed lengths.  */

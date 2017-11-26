@@ -1,5 +1,5 @@
 /* Return unsigned constant represented by attribute.
-   Copyright (C) 2003-2012, 2014 Red Hat, Inc.
+   Copyright (C) 2003-2012, 2014, 2017 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -219,6 +219,11 @@ dwarf_formudata (Dwarf_Attribute *attr, Dwarf_Word *return_uval)
       if (datap + 1 > endp)
 	goto invalid;
       get_uleb128 (*return_uval, datap, endp);
+      break;
+
+    case DW_FORM_implicit_const:
+      // The data comes from the abbrev, which has been bounds checked.
+      get_sleb128_unchecked (*return_uval, datap);
       break;
 
     default:

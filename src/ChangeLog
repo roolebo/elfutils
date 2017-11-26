@@ -1,3 +1,9 @@
+2018-02-09  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (print_debug_abbrev_section): Print the value of a
+	DW_FORM_implicit_const using dwarf_getabbrevattr_data.
+	(attr_callback): Handle DW_FORM_implicit_const.
+
 2018-01-30  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (dwarf_unit_string): New function.

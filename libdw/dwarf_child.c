@@ -77,7 +77,12 @@ __libdw_find_attr (Dwarf_Die *die, unsigned int search_name,
 	  if (formp != NULL)
 	    *formp = attr_form;
 
-	  return (unsigned char *) readp;
+	  /* Normally the attribute data comes from the DIE/info,
+	     except for implicit_form, where it comes from the abbrev.  */
+	  if (attr_form == DW_FORM_implicit_const)
+	    return (unsigned char *) attrp;
+	  else
+	    return (unsigned char *) readp;
 	}
 
       /* Skip over the rest of this attribute (if there is any).  */
@@ -92,6 +97,13 @@ __libdw_find_attr (Dwarf_Die *die, unsigned int search_name,
 
 	  // __libdw_form_val_len will have done a bounds check.
 	  readp += len;
+
+	  // If the value is in the abbrev data, skip it.
+	  if (attr_form == DW_FORM_implicit_const)
+	    {
+	      int64_t attr_value __attribute__((__unused__));
+	      get_sleb128_unchecked (attr_value, attrp);
+	    }
 	}
     }
 

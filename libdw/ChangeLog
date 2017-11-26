@@ -1,3 +1,22 @@
+2018-02-09  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_child.c (__libdw_find_attr): Handle DW_FORM_implicit_const.
+	* dwarf_formsdata.c (dwarf_formsdata): Likewise.
+	* dwarf_formudata.c (dwarf_formudata): Likewise.
+	* dwarf_getabbrev.c (__libdw_getabbrev): Likewise.
+	* dwarf_getattrs.c (dwarf_getattrs): Likewise.
+	* dwarf_hasattr.c (dwarf_hasattr): Likewise.
+	* dwarf_getabbrevattr.c (dwarf_getabbrevattr_data): New function
+	that will also return any data associated with the abbrev. Which
+	currently is only for DW_FORM_implicit_const. Based on...
+	(dwarf_getabbrevattr): ... this function. Which now just calls
+	dwarf_getabbrevattr_data.
+	* libdw.h (dwarf_getabbrevattr_data): Declare new function.
+	* libdw.map (ELFUTILS_0.170): Add dwarf_getabbrevattr_data.
+	* libdwP.h (dwarf_getabbrevattr_data): INTDECL.
+	* memory-access.h (__libdw_get_sleb128_unchecked): New inlined
+	function based on __libdw_get_uleb128_unchecked.
+
 2018-02-08  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf.h: Add DWARF5 DW_FORMs.

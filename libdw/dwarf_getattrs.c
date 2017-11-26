@@ -83,7 +83,10 @@ dwarf_getattrs (Dwarf_Die *die, int (*callback) (Dwarf_Attribute *, void *),
       if (remembered_attrp >= offset_attrp)
 	{
 	  /* Fill in the rest.  */
-	  attr.valp = (unsigned char *) die_addr;
+	  if (attr.form == DW_FORM_implicit_const)
+	    attr.valp = (unsigned char *) attrp;
+	  else
+	    attr.valp = (unsigned char *) die_addr;
 	  attr.cu = die->cu;
 
 	  /* Now call the callback function.  */
@@ -104,6 +107,12 @@ dwarf_getattrs (Dwarf_Die *die, int (*callback) (Dwarf_Attribute *, void *),
 
 	  // __libdw_form_val_len will have done a bounds check.
 	  die_addr += len;
+
+	  if (attr.form == DW_FORM_implicit_const)
+	    {
+	      int64_t attr_value __attribute__((__unused__));
+	      get_sleb128_unchecked (attr_value, attrp);
+	    }
 	}
     }
   /* NOTREACHED */

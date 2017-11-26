@@ -66,6 +66,12 @@ dwarf_hasattr (Dwarf_Die *die, unsigned int search_name)
 
       if (attr_name == search_name)
 	return 1;
+
+      if (attr_form == DW_FORM_implicit_const)
+	{
+	  int64_t attr_value __attribute__ ((unused));
+	  get_sleb128_unchecked (attr_value, attrp);
+	}
     }
 }
 INTDEF (dwarf_hasattr)

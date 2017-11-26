@@ -132,6 +132,13 @@ __libdw_getabbrev (Dwarf *dbg, struct Dwarf_CU *cu, Dwarf_Off offset,
       if (abbrevp >= end)
 	goto invalid;
       get_uleb128 (attrform, abbrevp, end);
+      if (attrform == DW_FORM_implicit_const)
+	{
+	  int64_t formval __attribute__((__unused__));
+	  if (abbrevp >= end)
+	    goto invalid;
+	  get_sleb128 (formval, abbrevp, end);
+	}
     }
   while (attrname != 0 && attrform != 0);
 

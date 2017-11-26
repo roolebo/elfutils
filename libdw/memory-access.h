@@ -139,7 +139,26 @@ __libdw_get_sleb128 (const unsigned char **addrp, const unsigned char *end)
   return INT64_MAX;
 }
 
+static inline int64_t
+__libdw_get_sleb128_unchecked (const unsigned char **addrp)
+{
+  int64_t acc = 0;
+
+  /* Unroll the first step to help the compiler optimize
+     for the common single-byte case.  */
+  get_sleb128_step (acc, *addrp, 0);
+
+  /* Subtract one step, so we don't shift into sign bit.  */
+  const size_t max = len_leb128 (int64_t) - 1;
+  for (size_t i = 1; i < max; ++i)
+    get_sleb128_step (acc, *addrp, i);
+  /* Other implementations set VALUE to INT_MAX in this
+     case.  So we better do this as well.  */
+  return INT64_MAX;
+}
+
 #define get_sleb128(var, addr, end) ((var) = __libdw_get_sleb128 (&(addr), end))
+#define get_sleb128_unchecked(var, addr) ((var) = __libdw_get_sleb128_unchecked (&(addr)))
 
 
 /* We use simple memory access functions in case the hardware allows it.

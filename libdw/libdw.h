@@ -594,6 +594,12 @@ extern int dwarf_getabbrevattr (Dwarf_Abbrev *abbrev, size_t idx,
 				unsigned int *namep, unsigned int *formp,
 				Dwarf_Off *offset);
 
+/* Get specific attribute of abbreviation and any data encoded with it.
+   Specifically for DW_FORM_implicit_const data will be set to the
+   constant value associated.  */
+extern int dwarf_getabbrevattr_data (Dwarf_Abbrev *abbrev, size_t idx,
+				     unsigned int *namep, unsigned int *formp,
+				     Dwarf_Sword *datap, Dwarf_Off *offset);
 
 /* Get string from-debug_str section.  */
 extern const char *dwarf_getstring (Dwarf *dbg, Dwarf_Off offset,

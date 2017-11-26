@@ -1,5 +1,5 @@
 /* Return signed constant represented by attribute.
-   Copyright (C) 2003, 2005, 2014 Red Hat, Inc.
+   Copyright (C) 2003, 2005, 2014, 2017 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -84,6 +84,11 @@ dwarf_formsdata (Dwarf_Attribute *attr, Dwarf_Sword *return_sval)
       if (datap + 1 > endp)
 	goto invalid;
       get_uleb128 (*return_sval, datap, endp);
+      break;
+
+    case DW_FORM_implicit_const:
+      // The data comes from the abbrev, which has been bounds checked.
+      get_sleb128_unchecked (*return_sval, datap);
       break;
 
     default:

@@ -37,8 +37,9 @@
 
 
 int
-dwarf_getabbrevattr (Dwarf_Abbrev *abbrev, size_t idx, unsigned int *namep,
-		     unsigned int *formp, Dwarf_Off *offsetp)
+dwarf_getabbrevattr_data (Dwarf_Abbrev *abbrev, size_t idx,
+			  unsigned int *namep, unsigned int *formp,
+			  Dwarf_Sword *datap, Dwarf_Off *offsetp)
 {
   if (abbrev == NULL)
     return -1;
@@ -48,6 +49,7 @@ dwarf_getabbrevattr (Dwarf_Abbrev *abbrev, size_t idx, unsigned int *namep,
   const unsigned char *start_attrp;
   unsigned int name;
   unsigned int form;
+  Dwarf_Word data;
 
   do
     {
@@ -57,6 +59,11 @@ dwarf_getabbrevattr (Dwarf_Abbrev *abbrev, size_t idx, unsigned int *namep,
          Already checked when Dwarf_Abbrev was created, read unchecked.  */
       get_uleb128_unchecked (name, attrp);
       get_uleb128_unchecked (form, attrp);
+
+      if (form == DW_FORM_implicit_const)
+	get_sleb128_unchecked (data, attrp);
+      else
+	data = 0;
 
       /* If both values are zero the index is out of range.  */
       if (name == 0 && form == 0)
@@ -69,8 +76,19 @@ dwarf_getabbrevattr (Dwarf_Abbrev *abbrev, size_t idx, unsigned int *namep,
     *namep = name;
   if (formp != NULL)
     *formp = form;
+  if (datap != NULL)
+    *datap = data;
   if (offsetp != NULL)
     *offsetp = (start_attrp - abbrev->attrp) + abbrev->offset;
 
   return 0;
+}
+INTDEF(dwarf_getabbrevattr_data)
+
+int
+dwarf_getabbrevattr (Dwarf_Abbrev *abbrev, size_t idx, unsigned int *namep,
+		     unsigned int *formp, Dwarf_Off *offsetp)
+{
+  return INTUSE(dwarf_getabbrevattr_data) (abbrev, idx, namep, formp,
+					   NULL, offsetp);
 }

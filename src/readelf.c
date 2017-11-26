@@ -4758,14 +4758,16 @@ print_debug_abbrev_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	  size_t cnt = 0;
 	  unsigned int name;
 	  unsigned int form;
+	  Dwarf_Sword data;
 	  Dwarf_Off enoffset;
-	  while (dwarf_getabbrevattr (&abbrev, cnt,
-				      &name, &form, &enoffset) == 0)
+	  while (dwarf_getabbrevattr_data (&abbrev, cnt, &name, &form,
+					   &data, &enoffset) == 0)
 	    {
-	      printf ("          attr: %s, form: %s, offset: %#" PRIx64 "\n",
-		      dwarf_attr_name (name), dwarf_form_name (form),
-		      (uint64_t) enoffset);
-
+	      printf ("          attr: %s, form: %s",
+		      dwarf_attr_name (name), dwarf_form_name (form));
+	      if (form == DW_FORM_implicit_const)
+		printf (" (%" PRId64 ")", data);
+	      printf (", offset: %#" PRIx64 "\n", (uint64_t) enoffset);
 	      ++cnt;
 	    }
 
@@ -6078,6 +6080,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
       break;
 
     case DW_FORM_sec_offset:
+    case DW_FORM_implicit_const:
     case DW_FORM_udata:
     case DW_FORM_sdata:
     case DW_FORM_data8:

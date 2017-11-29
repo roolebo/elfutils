@@ -100,7 +100,7 @@ DWARF section [28] '.debug_info' at offset 0x1078:
  [    31]    subprogram           abbrev: 3
              external             (flag_present) yes
              name                 (strp) "main"
-             decl_file            (data1) 1
+             decl_file            (data1) main.c (1)
              decl_line            (data1) 3
              prototyped           (flag_present) yes
              type                 (GNU_ref_alt) [    3e]
@@ -112,21 +112,21 @@ DWARF section [28] '.debug_info' at offset 0x1078:
              sibling              (ref_udata) [    6e]
  [    48]      formal_parameter     abbrev: 8
                name                 (strp) "argc"
-               decl_file            (data1) 1
+               decl_file            (data1) main.c (1)
                decl_line            (data1) 3
                type                 (GNU_ref_alt) [    3e]
                location             (exprloc) 
                 [ 0] fbreg -36
  [    56]      formal_parameter     abbrev: 4
                name                 (strp) "argv"
-               decl_file            (data1) 1
+               decl_file            (data1) main.c (1)
                decl_line            (data1) 3
                type                 (ref_udata) [    6e]
                location             (exprloc) 
                 [ 0] fbreg -48
  [    61]      variable             abbrev: 7
                name                 (string) "b"
-               decl_file            (data1) 1
+               decl_file            (data1) main.c (1)
                decl_line            (data1) 5
                type                 (GNU_ref_alt) [    5a]
                location             (exprloc) 
@@ -161,7 +161,7 @@ DWARF section [28] '.debug_info' at offset 0x1078:
  [    31]    subprogram           abbrev: 3
              external             (flag_present) yes
              name                 (strp) "main"
-             decl_file            (data1) 1
+             decl_file            (data1) main.c (1)
              decl_line            (data1) 3
              prototyped           (flag_present) yes
              type                 (GNU_ref_alt) [    3e]
@@ -173,21 +173,21 @@ DWARF section [28] '.debug_info' at offset 0x1078:
              sibling              (ref_udata) [    6e]
  [    48]      formal_parameter     abbrev: 8
                name                 (strp) "argc"
-               decl_file            (data1) 1
+               decl_file            (data1) main.c (1)
                decl_line            (data1) 3
                type                 (GNU_ref_alt) [    3e]
                location             (exprloc) 
                 [ 0] fbreg -36
  [    56]      formal_parameter     abbrev: 4
                name                 (strp) "argv"
-               decl_file            (data1) 1
+               decl_file            (data1) main.c (1)
                decl_line            (data1) 3
                type                 (ref_udata) [    6e]
                location             (exprloc) 
                 [ 0] fbreg -48
  [    61]      variable             abbrev: 7
                name                 (string) "b"
-               decl_file            (data1) 1
+               decl_file            (data1) main.c (1)
                decl_line            (data1) 5
                type                 (GNU_ref_alt) [    5a]
                location             (exprloc) 
@@ -218,7 +218,7 @@ DWARF section [25] '.debug_info' at offset 0x106c:
  [    2b]    subprogram           abbrev: 1
              external             (flag_present) yes
              name                 (strp) "call_foo"
-             decl_file            (data1) 1
+             decl_file            (data1) shared.c (1)
              decl_line            (data1) 3
              prototyped           (flag_present) yes
              type                 (GNU_ref_alt) [    3e]
@@ -229,7 +229,7 @@ DWARF section [25] '.debug_info' at offset 0x106c:
              GNU_all_call_sites   (flag_present) yes
  [    41]      formal_parameter     abbrev: 4
                name                 (string) "fb"
-               decl_file            (data1) 1
+               decl_file            (data1) shared.c (1)
                decl_line            (data1) 3
                type                 (GNU_ref_alt) [    76]
                location             (exprloc) 
@@ -258,7 +258,7 @@ DWARF section [25] '.debug_info' at offset 0x106c:
  [    2b]    subprogram           abbrev: 1
              external             (flag_present) yes
              name                 (strp) "call_foo"
-             decl_file            (data1) 1
+             decl_file            (data1) shared.c (1)
              decl_line            (data1) 3
              prototyped           (flag_present) yes
              type                 (GNU_ref_alt) [    3e]
@@ -269,7 +269,7 @@ DWARF section [25] '.debug_info' at offset 0x106c:
              GNU_all_call_sites   (flag_present) yes
  [    41]      formal_parameter     abbrev: 4
                name                 (string) "fb"
-               decl_file            (data1) 1
+               decl_file            (data1) shared.c (1)
                decl_line            (data1) 3
                type                 (GNU_ref_alt) [    76]
                location             (exprloc) 
@@ -297,7 +297,7 @@ DWARF section [28] '.debug_info' at offset 0x1088:
  [    2b]    subprogram           abbrev: 4
              external             (flag_present) yes
              name                 (GNU_strp_alt) "main"
-             decl_file            (data1) 1
+             decl_file            (data1) main.c (1)
              decl_line            (data1) 8
              prototyped           (flag_present) yes
              type                 (GNU_ref_alt) [    30]
@@ -308,21 +308,21 @@ DWARF section [28] '.debug_info' at offset 0x1088:
              GNU_all_call_sites   (flag_present) yes
  [    41]      formal_parameter     abbrev: 1
                name                 (GNU_strp_alt) "argc"
-               decl_file            (data1) 1
+               decl_file            (data1) main.c (1)
                decl_line            (data1) 8
                type                 (GNU_ref_alt) [    30]
                location             (exprloc) 
                 [ 0] fbreg -36
  [    4f]      formal_parameter     abbrev: 1
                name                 (GNU_strp_alt) "argv"
-               decl_file            (data1) 1
+               decl_file            (data1) main.c (1)
                decl_line            (data1) 8
                type                 (GNU_ref_alt) [    41]
                location             (exprloc) 
                 [ 0] fbreg -48
  [    5d]      variable             abbrev: 3
                name                 (string) "fbb"
-               decl_file            (data1) 1
+               decl_file            (data1) main.c (1)
                decl_line            (data1) 10
                type                 (GNU_ref_alt) [    14]
                location             (exprloc) 

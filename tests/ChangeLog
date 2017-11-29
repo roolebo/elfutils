@@ -1,5 +1,10 @@
 2017-11-29  Mark Wielaard  <mark@klomp.org>
 
+	* run-readelf-dwz-multi.sh: Add expected file names.
+	* run-readelf-zdebug-rel.sh: Likewise.
+
+2017-11-29  Mark Wielaard  <mark@klomp.org>
+
 	* run-readelf-dwz-multi.sh: Add expected abbrev codes.
 	* run-readelf-zdebug-rel.sh: Likewise.
 

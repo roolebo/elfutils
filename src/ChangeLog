@@ -1,5 +1,10 @@
 2017-11-29  Mark Wielaard  <mark@klomp.org>
 
+	* readelf.c (attr_callback): Set valuestr to resolved file name
+	for DW_AT_decl_file and DW_AT_call_file.
+
+2017-11-29  Mark Wielaard  <mark@klomp.org>
+
 	* readelf.c (print_debug_units): Print abbrev code after DIE tag.
 
 2017-11-29  Mark Wielaard  <mark@klomp.org>

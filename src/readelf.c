@@ -6126,6 +6126,28 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	case DW_AT_discr_list:
 	  valuestr = dwarf_discr_list_name (num);
 	  break;
+	case DW_AT_decl_file:
+	case DW_AT_call_file:
+	  {
+	    /* Try to get the actual file, the current interface only
+	       gives us full paths, but we only want to show the file
+	       name for now.  */
+	    Dwarf_Die cudie;
+	    if (dwarf_cu_die (cbargs->cu, &cudie,
+			      NULL, NULL, NULL, NULL, NULL, NULL) != NULL)
+	      {
+		Dwarf_Files *files;
+		size_t nfiles;
+		if (dwarf_getsrcfiles (&cudie, &files, &nfiles) == 0)
+		  {
+		    valuestr = dwarf_filesrc (files, num, NULL, NULL);
+		    char *filename = strrchr (valuestr, '/');
+		    if (filename != NULL)
+		      valuestr = filename + 1;
+		  }
+	      }
+	  }
+	  break;
 	default:
 	  /* Nothing.  */
 	  break;

@@ -69,7 +69,7 @@ DWARF section [ 4] '.debug_info' at offset 0x58:
              low_pc               (addr) 000000000000000000
              high_pc              (data8) 24 (0x0000000000000018)
              frame_base           (exprloc) 
-              [   0] call_frame_cfa
+              [ 0] call_frame_cfa
              GNU_all_call_sites   (flag_present) yes
              sibling              (ref4) [    80]
  [    4e]      formal_parameter
@@ -84,7 +84,7 @@ DWARF section [ 4] '.debug_info' at offset 0x58:
                decl_line            (data1) 4
                type                 (ref4) [    87]
                location             (exprloc) 
-                [   0] reg4
+                [ 0] reg4
  [    6a]      variable
                name                 (string) "a"
                decl_file            (data1) 1
@@ -97,7 +97,7 @@ DWARF section [ 4] '.debug_info' at offset 0x58:
                decl_line            (data1) 7
                type                 (ref4) [    9a]
                location             (exprloc) 
-                [   0] reg5
+                [ 0] reg5
  [    80]    base_type
              byte_size            (data1) 4
              encoding             (data1) signed (5)
@@ -127,12 +127,12 @@ cat info.out | testrun_compare ${abs_top_builddir}/src/readelf -U --debug-dump=i
 cat > loc.out << \EOF
 
 DWARF section [ 7] '.debug_loc' at offset 0x185:
- [     0]  000000000000000000..0x0000000000000003 [   0] reg5
-           0x0000000000000003..0x0000000000000010 [   0] breg5 -42
-                                                  [   2] stack_value
-           0x0000000000000010..0x0000000000000018 [   0] GNU_entry_value:
-       [   0] reg5
-                                                  [   3] stack_value
+ [     0]  000000000000000000..0x0000000000000003 [ 0] reg5
+           0x0000000000000003..0x0000000000000010 [ 0] breg5 -42
+                                                  [ 2] stack_value
+           0x0000000000000010..0x0000000000000018 [ 0] GNU_entry_value:
+      [ 0] reg5
+                                                  [ 3] stack_value
 EOF
 
 cat loc.out | testrun_compare ${abs_top_builddir}/src/readelf -U --debug-dump=loc testfile-debug-rel.o

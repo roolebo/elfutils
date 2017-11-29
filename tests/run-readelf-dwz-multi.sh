@@ -107,7 +107,7 @@ DWARF section [28] '.debug_info' at offset 0x1078:
              low_pc               (addr) 0x00000000004006ac <main>
              high_pc              (udata) 44 (0x00000000004006d8)
              frame_base           (exprloc) 
-              [   0] call_frame_cfa
+              [ 0] call_frame_cfa
              GNU_all_tail_call_sites (flag_present) yes
              sibling              (ref_udata) [    6e]
  [    48]      formal_parameter
@@ -116,21 +116,21 @@ DWARF section [28] '.debug_info' at offset 0x1078:
                decl_line            (data1) 3
                type                 (GNU_ref_alt) [    3e]
                location             (exprloc) 
-                [   0] fbreg -36
+                [ 0] fbreg -36
  [    56]      formal_parameter
                name                 (strp) "argv"
                decl_file            (data1) 1
                decl_line            (data1) 3
                type                 (ref_udata) [    6e]
                location             (exprloc) 
-                [   0] fbreg -48
+                [ 0] fbreg -48
  [    61]      variable
                name                 (string) "b"
                decl_file            (data1) 1
                decl_line            (data1) 5
                type                 (GNU_ref_alt) [    5a]
                location             (exprloc) 
-                [   0] fbreg -32
+                [ 0] fbreg -32
  [    6e]    pointer_type
              byte_size            (data1) 8
              type                 (ref_udata) [    2b]
@@ -168,7 +168,7 @@ DWARF section [28] '.debug_info' at offset 0x1078:
              low_pc               (addr) 0x00000000004006ac <main>
              high_pc              (udata) 44 (0x00000000004006d8)
              frame_base           (exprloc) 
-              [   0] call_frame_cfa
+              [ 0] call_frame_cfa
              GNU_all_tail_call_sites (flag_present) yes
              sibling              (ref_udata) [    6e]
  [    48]      formal_parameter
@@ -177,21 +177,21 @@ DWARF section [28] '.debug_info' at offset 0x1078:
                decl_line            (data1) 3
                type                 (GNU_ref_alt) [    3e]
                location             (exprloc) 
-                [   0] fbreg -36
+                [ 0] fbreg -36
  [    56]      formal_parameter
                name                 (strp) "argv"
                decl_file            (data1) 1
                decl_line            (data1) 3
                type                 (ref_udata) [    6e]
                location             (exprloc) 
-                [   0] fbreg -48
+                [ 0] fbreg -48
  [    61]      variable
                name                 (string) "b"
                decl_file            (data1) 1
                decl_line            (data1) 5
                type                 (GNU_ref_alt) [    5a]
                location             (exprloc) 
-                [   0] fbreg -32
+                [ 0] fbreg -32
  [    6e]    pointer_type
              byte_size            (data1) 8
              type                 (ref_udata) [    2b]
@@ -225,7 +225,7 @@ DWARF section [25] '.debug_info' at offset 0x106c:
              low_pc               (addr) +0x0000000000000670 <call_foo>
              high_pc              (udata) 23 (+0x0000000000000687)
              frame_base           (exprloc) 
-              [   0] call_frame_cfa
+              [ 0] call_frame_cfa
              GNU_all_call_sites   (flag_present) yes
  [    41]      formal_parameter
                name                 (string) "fb"
@@ -233,7 +233,7 @@ DWARF section [25] '.debug_info' at offset 0x106c:
                decl_line            (data1) 3
                type                 (GNU_ref_alt) [    76]
                location             (exprloc) 
-                [   0] fbreg -24
+                [ 0] fbreg -24
 EOF
 
 # Same as above, but find alt debug file in a .dwz subdir.
@@ -265,7 +265,7 @@ DWARF section [25] '.debug_info' at offset 0x106c:
              low_pc               (addr) +0x0000000000000670 <call_foo>
              high_pc              (udata) 23 (+0x0000000000000687)
              frame_base           (exprloc) 
-              [   0] call_frame_cfa
+              [ 0] call_frame_cfa
              GNU_all_call_sites   (flag_present) yes
  [    41]      formal_parameter
                name                 (string) "fb"
@@ -273,7 +273,7 @@ DWARF section [25] '.debug_info' at offset 0x106c:
                decl_line            (data1) 3
                type                 (GNU_ref_alt) [    76]
                location             (exprloc) 
-                [   0] fbreg -24
+                [ 0] fbreg -24
 EOF
 mv .dwz/testfile_multi.dwz .
 rmdir .dwz
@@ -304,7 +304,7 @@ DWARF section [28] '.debug_info' at offset 0x1088:
              low_pc               (addr) 0x00000000004004ec <main>
              high_pc              (udata) 18 (0x00000000004004fe)
              frame_base           (exprloc) 
-              [   0] call_frame_cfa
+              [ 0] call_frame_cfa
              GNU_all_call_sites   (flag_present) yes
  [    41]      formal_parameter
                name                 (GNU_strp_alt) "argc"
@@ -312,21 +312,21 @@ DWARF section [28] '.debug_info' at offset 0x1088:
                decl_line            (data1) 8
                type                 (GNU_ref_alt) [    30]
                location             (exprloc) 
-                [   0] fbreg -36
+                [ 0] fbreg -36
  [    4f]      formal_parameter
                name                 (GNU_strp_alt) "argv"
                decl_file            (data1) 1
                decl_line            (data1) 8
                type                 (GNU_ref_alt) [    41]
                location             (exprloc) 
-                [   0] fbreg -48
+                [ 0] fbreg -48
  [    5d]      variable
                name                 (string) "fbb"
                decl_file            (data1) 1
                decl_line            (data1) 10
                type                 (GNU_ref_alt) [    14]
                location             (exprloc) 
-                [   0] fbreg -32
+                [ 0] fbreg -32
 EOF
 
 exit 0

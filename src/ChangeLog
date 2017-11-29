@@ -1,3 +1,8 @@
+2017-11-29  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (print_ops): Use only2 space for index. re-indent +5
+	for DW_OP_GNU_entry_value.
+
 2017-11-21  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (attr_callback): Print attribute name and form in error

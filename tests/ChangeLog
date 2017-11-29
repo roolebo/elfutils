@@ -1,3 +1,10 @@
+2017-11-29  Mark Wielaard  <mark@klomp.org>
+
+	* run-readelf-dwz-multi.sh: Adjust expected ops index spaces.
+	* run-readelf-loc.sh: Likewise.
+	* run-readelf-zdebug-rel.sh: Likewise.
+	* run-readelf-zdebug.sh: Likewise.
+
 2017-11-16  Mark Wielaard  <mark@klomp.org>
 
 	* varlocs.c (main): Fix cfi_debug => cfi_debug_bias typo in assert.

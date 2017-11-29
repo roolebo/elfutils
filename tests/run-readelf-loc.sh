@@ -63,9 +63,9 @@ testrun_compare ${abs_top_builddir}/src/readelf --debug-dump=loc --debug-dump=ra
   testfileloc<<\EOF
 
 DWARF section [33] '.debug_loc' at offset 0xd2a:
- [     0]  0x0000000000400480 <main>..0x000000000040048d <main+0xd> [   0] reg5
- [    23]  0x0000000000400485 <main+0x5>..0x000000000040048d <main+0xd> [   0] reg5
- [    46]  0x00000000004004b2 <say+0x12>..0x00000000004004ba <say+0x1a> [   0] breg5 0
+ [     0]  0x0000000000400480 <main>..0x000000000040048d <main+0xd> [ 0] reg5
+ [    23]  0x0000000000400485 <main+0x5>..0x000000000040048d <main+0xd> [ 0] reg5
+ [    46]  0x00000000004004b2 <say+0x12>..0x00000000004004ba <say+0x1a> [ 0] breg5 0
 
 DWARF section [34] '.debug_ranges' at offset 0xd94:
  [     0]  0x0000000000400480 <main>..0x0000000000400482 <main+0x2>
@@ -79,9 +79,9 @@ testrun_compare ${abs_top_builddir}/src/readelf -N --debug-dump=loc --debug-dump
   testfileloc<<\EOF
 
 DWARF section [33] '.debug_loc' at offset 0xd2a:
- [     0]  0x0000000000400480..0x000000000040048d [   0] reg5
- [    23]  0x0000000000400485..0x000000000040048d [   0] reg5
- [    46]  0x00000000004004b2..0x00000000004004ba [   0] breg5 0
+ [     0]  0x0000000000400480..0x000000000040048d [ 0] reg5
+ [    23]  0x0000000000400485..0x000000000040048d [ 0] reg5
+ [    46]  0x00000000004004b2..0x00000000004004ba [ 0] breg5 0
 
 DWARF section [34] '.debug_ranges' at offset 0xd94:
  [     0]  0x0000000000400480..0x0000000000400482
@@ -95,9 +95,9 @@ testrun_compare ${abs_top_builddir}/src/readelf -U --debug-dump=loc --debug-dump
   testfileloc<<\EOF
 
 DWARF section [33] '.debug_loc' at offset 0xd2a:
- [     0]  000000000000000000..0x000000000000000d [   0] reg5
- [    23]  0x0000000000000005..0x000000000000000d [   0] reg5
- [    46]  0x0000000000000012..0x000000000000001a [   0] breg5 0
+ [     0]  000000000000000000..0x000000000000000d [ 0] reg5
+ [    23]  0x0000000000000005..0x000000000000000d [ 0] reg5
+ [    46]  0x0000000000000012..0x000000000000001a [ 0] breg5 0
 
 DWARF section [34] '.debug_ranges' at offset 0xd94:
  [     0]  000000000000000000..0x0000000000000002

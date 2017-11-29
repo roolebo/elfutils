@@ -46,12 +46,17 @@ tempfiles loc.out aranges.out ranges.out macro.out line.out frame.out
 cat > loc.out << \EOF
 
 DWARF section [30] '.debug_loc' at offset 0xa17:
- [     0]  0x00000000004003c0..0x00000000004003c3 [ 0] reg5
-           0x00000000004003c3..0x00000000004003d6 [ 0] breg5 -42
-                                                  [ 2] stack_value
-           0x00000000004003d6..0x00000000004003d9 [ 0] GNU_entry_value:
-      [ 0] reg5
-                                                  [ 3] stack_value
+
+ CU [     b] base: 000000000000000000
+ [     0] range 4003c0, 4003c3
+           [ 0] reg5
+          range 4003c3, 4003d6
+           [ 0] breg5 -42
+           [ 2] stack_value
+          range 4003d6, 4003d9
+           [ 0] GNU_entry_value:
+                [ 0] reg5
+           [ 3] stack_value
 EOF
 
 cat loc.out | testrun_compare ${abs_top_builddir}/src/readelf -U --debug-dump=loc testfile-debug

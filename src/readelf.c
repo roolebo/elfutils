@@ -7130,18 +7130,35 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
   uint_fast8_t offset_size = 4;
 
   bool first = true;
-  struct Dwarf_CU *cu = NULL;
   Dwarf_Addr base = 0;
   unsigned char *readp = data->d_buf;
   unsigned char *const endp = (unsigned char *) data->d_buf + data->d_size;
+  Dwarf_CU *last_cu = NULL;
   while (readp < endp)
     {
       ptrdiff_t offset = readp - (unsigned char *) data->d_buf;
+      Dwarf_CU *cu;
 
       if (first && skip_listptr_hole (&known_loclistptr, &listptr_idx,
 				      &address_size, &offset_size, &base,
 				      &cu, offset, &readp, endp))
 	continue;
+
+      if (last_cu != cu)
+       {
+	char *basestr = format_dwarf_addr (dwflmod, address_size,
+					   base, base);
+	Dwarf_Die cudie;
+	if (dwarf_cu_die (cu, &cudie,
+			  NULL, NULL, NULL, NULL,
+			  NULL, NULL) == NULL)
+	  printf (gettext ("\n Unknown CU base: %s\n"), basestr);
+	else
+	  printf (gettext ("\n CU [%6" PRIx64 "] base: %s\n"),
+		  dwarf_dieoffset (&cudie), basestr);
+	free (basestr);
+       }
+      last_cu = cu;
 
       if (unlikely (data->d_size - offset < (size_t) address_size * 2))
 	{
@@ -7167,14 +7184,14 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
       if (begin == (Dwarf_Addr) -1l) /* Base address entry.  */
 	{
 	  char *b = format_dwarf_addr (dwflmod, address_size, end, end);
-	  printf (gettext (" [%6tx]  base address %s\n"), offset, b);
+	  printf (gettext (" [%6tx] base address\n          %s\n"), offset, b);
 	  free (b);
 	  base = end;
 	}
       else if (begin == 0 && end == 0) /* End of list entry.  */
 	{
 	  if (first)
-	    printf (gettext (" [%6tx]  empty list\n"), offset);
+	    printf (gettext (" [%6tx] empty list\n"), offset);
 	  first = true;
 	}
       else
@@ -7182,18 +7199,23 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
 	  /* We have a location expression entry.  */
 	  uint_fast16_t len = read_2ubyte_unaligned_inc (dbg, readp);
 
-	  char *b = format_dwarf_addr (dwflmod, address_size, base + begin,
-				       begin);
-	  char *e = format_dwarf_addr (dwflmod, address_size, base + end,
-				       end);
-
 	  if (first)		/* First entry in a list.  */
-	    printf (gettext (" [%6tx]  %s..%s"), offset, b, e);
+	    printf (" [%6tx] ", offset);
 	  else
-	    printf (gettext ("           %s..%s"), b, e);
+	    printf ("          ");
 
-	  free (b);
-	  free (e);
+	  printf ("range %" PRIx64 ", %" PRIx64 "\n", begin, end);
+	  if (! print_unresolved_addresses)
+	    {
+	      char *b = format_dwarf_addr (dwflmod, address_size, base + begin,
+					   base + begin);
+	      char *e = format_dwarf_addr (dwflmod, address_size,
+					   base + end - 1, base + end);
+	      printf ("          %s..\n", b);
+	      printf ("          %s\n", e);
+	      free (b);
+	      free (e);
+	    }
 
 	  if (endp - readp <= (ptrdiff_t) len)
 	    {
@@ -7201,8 +7223,9 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
 	      break;
 	    }
 
-	  print_ops (dwflmod, dbg, 1, 18 + (address_size * 4),
-		     3 /*XXX*/, address_size, offset_size, cu, len, readp);
+	  print_ops (dwflmod, dbg, 11, 11,
+		     cu != NULL ? cu->version : 3,
+		     address_size, offset_size, cu, len, readp);
 
 	  first = false;
 	  readp += len;

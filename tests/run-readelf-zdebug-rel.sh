@@ -127,12 +127,17 @@ cat info.out | testrun_compare ${abs_top_builddir}/src/readelf -U --debug-dump=i
 cat > loc.out << \EOF
 
 DWARF section [ 7] '.debug_loc' at offset 0x185:
- [     0]  000000000000000000..0x0000000000000003 [ 0] reg5
-           0x0000000000000003..0x0000000000000010 [ 0] breg5 -42
-                                                  [ 2] stack_value
-           0x0000000000000010..0x0000000000000018 [ 0] GNU_entry_value:
-      [ 0] reg5
-                                                  [ 3] stack_value
+
+ CU [     b] base: 000000000000000000
+ [     0] range 0, 3
+           [ 0] reg5
+          range 3, 10
+           [ 0] breg5 -42
+           [ 2] stack_value
+          range 10, 18
+           [ 0] GNU_entry_value:
+                [ 0] reg5
+           [ 3] stack_value
 EOF
 
 cat loc.out | testrun_compare ${abs_top_builddir}/src/readelf -U --debug-dump=loc testfile-debug-rel.o

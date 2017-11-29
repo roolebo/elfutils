@@ -1,5 +1,11 @@
 2017-11-29  Mark Wielaard  <mark@klomp.org>
 
+	* run-readelf-loc.sh: Adjust expected loc list output.
+	* run-readelf-zdebug-rel.sh: Likewise.
+	* run-readelf-zdebug.sh: Likewise.
+
+2017-11-29  Mark Wielaard  <mark@klomp.org>
+
 	* run-readelf-loc.sh: Adjust expected range list output.
 	* run-readelf-zdebug.sh: Likewise.
 

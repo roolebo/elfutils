@@ -98,6 +98,7 @@ static const struct argp_option options[] =
   { "program-headers", 'l', NULL, 0, N_("Display the program headers"), 0 },
   { "segments", 'l', NULL, OPTION_ALIAS | OPTION_HIDDEN, NULL, 0 },
   { "relocs", 'r', NULL, 0, N_("Display relocations"), 0 },
+  { "section-groups", 'g', NULL, 0, N_("Display the section groups"), 0 },
   { "section-headers", 'S', NULL, 0, N_("Display the sections' headers"), 0 },
   { "sections", 'S', NULL, OPTION_ALIAS | OPTION_HIDDEN, NULL, 0 },
   { "symbols", 's', "SECTION", OPTION_ARG_OPTIONAL,

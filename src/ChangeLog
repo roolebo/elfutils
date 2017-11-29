@@ -1,5 +1,9 @@
 2017-11-29  Mark Wielaard  <mark@klomp.org>
 
+	* readelf.c (argp_options): Add "section-groups", 'g'.
+
+2017-11-29  Mark Wielaard  <mark@klomp.org>
+
 	* readelf.c (print_debug_loc_section): Print CU base and unresolved
 	addresses. Adjust formatting.
 

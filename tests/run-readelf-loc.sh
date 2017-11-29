@@ -68,10 +68,22 @@ DWARF section [33] '.debug_loc' at offset 0xd2a:
  [    46]  0x00000000004004b2 <say+0x12>..0x00000000004004ba <say+0x1a> [ 0] breg5 0
 
 DWARF section [34] '.debug_ranges' at offset 0xd94:
- [     0]  0x0000000000400480 <main>..0x0000000000400482 <main+0x2>
-           0x0000000000400485 <main+0x5>..0x000000000040048d <main+0xd>
- [    30]  0x00000000004004ad <say+0xd>..0x00000000004004af <say+0xf>
-           0x00000000004004b2 <say+0x12>..0x00000000004004ba <say+0x1a>
+
+ CU [     b] base: 0x0000000000400480 <main>
+ [     0] range 0, 2
+          0x0000000000400480 <main>..
+          0x0000000000400481 <main+0x1>
+          range 5, d
+          0x0000000000400485 <main+0x5>..
+          0x000000000040048c <main+0xc>
+
+ CU [    e0] base: 0x00000000004004a0 <say>
+ [    30] range d, f
+          0x00000000004004ad <say+0xd>..
+          0x00000000004004ae <say+0xe>
+          range 12, 1a
+          0x00000000004004b2 <say+0x12>..
+          0x00000000004004b9 <say+0x19>
 EOF
 
 # Don't resolve addresses to symbols.
@@ -84,10 +96,22 @@ DWARF section [33] '.debug_loc' at offset 0xd2a:
  [    46]  0x00000000004004b2..0x00000000004004ba [ 0] breg5 0
 
 DWARF section [34] '.debug_ranges' at offset 0xd94:
- [     0]  0x0000000000400480..0x0000000000400482
-           0x0000000000400485..0x000000000040048d
- [    30]  0x00000000004004ad..0x00000000004004af
-           0x00000000004004b2..0x00000000004004ba
+
+ CU [     b] base: 0x0000000000400480
+ [     0] range 0, 2
+          0x0000000000400480..
+          0x0000000000400481
+          range 5, d
+          0x0000000000400485..
+          0x000000000040048c
+
+ CU [    e0] base: 0x00000000004004a0
+ [    30] range d, f
+          0x00000000004004ad..
+          0x00000000004004ae
+          range 12, 1a
+          0x00000000004004b2..
+          0x00000000004004b9
 EOF
 
 # Produce "raw" unprocessed content.
@@ -100,10 +124,14 @@ DWARF section [33] '.debug_loc' at offset 0xd2a:
  [    46]  0x0000000000000012..0x000000000000001a [ 0] breg5 0
 
 DWARF section [34] '.debug_ranges' at offset 0xd94:
- [     0]  000000000000000000..0x0000000000000002
-           0x0000000000000005..0x000000000000000d
- [    30]  0x000000000000000d..0x000000000000000f
-           0x0000000000000012..0x000000000000001a
+
+ CU [     b] base: 0x0000000000400480
+ [     0] range 0, 2
+          range 5, d
+
+ CU [    e0] base: 0x00000000004004a0
+ [    30] range d, f
+          range 12, 1a
 EOF
 
 exit 0

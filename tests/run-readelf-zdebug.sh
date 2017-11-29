@@ -80,7 +80,9 @@ cat aranges.out | sed -e "s/.debug_aranges' at offset 0xa65/.zdebug_aranges' at 
 cat > ranges.out << \EOF
 
 DWARF section [32] '.debug_ranges' at offset 0xa95:
- [     0]  0x00000000004003c0..0x00000000004003d9
+
+ CU [     b] base: 000000000000000000
+ [     0] range 4003c0, 4003d9
 EOF
 
 cat ranges.out | testrun_compare ${abs_top_builddir}/src/readelf -U --debug-dump=ranges testfile-debug

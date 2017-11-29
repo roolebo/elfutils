@@ -6371,9 +6371,12 @@ print_debug_units (Dwfl_Module *dwflmod,
 	}
 
       if (!silent)
-	printf (" [%6" PRIx64 "]  %*s%s\n",
-		(uint64_t) offset, (int) (level * 2), "",
-		dwarf_tag_name (tag));
+	{
+	  unsigned int code = dwarf_getabbrevcode (dies[level].abbrev);
+	  printf (" [%6" PRIx64 "]  %*s%-20s abbrev: %u\n",
+		  (uint64_t) offset, (int) (level * 2), "",
+		  dwarf_tag_name (tag), code);
+	}
 
       /* Print the attribute values.  */
       args.level = level;

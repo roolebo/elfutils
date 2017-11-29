@@ -1,5 +1,9 @@
 2017-11-29  Mark Wielaard  <mark@klomp.org>
 
+	* readelf.c (print_debug_units): Print abbrev code after DIE tag.
+
+2017-11-29  Mark Wielaard  <mark@klomp.org>
+
 	* readelf.c (print_ops): Use only2 space for index. re-indent +5
 	for DW_OP_GNU_entry_value.
 

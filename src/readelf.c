@@ -8205,20 +8205,7 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 			goto invalid_data;
 		      unsigned int form = *readp++;
 		      printf (" %s", dwarf_form_name (form));
-		      if (form != DW_FORM_data1
-			  && form != DW_FORM_data2
-			  && form != DW_FORM_data4
-			  && form != DW_FORM_data8
-			  && form != DW_FORM_sdata
-			  && form != DW_FORM_udata
-			  && form != DW_FORM_block
-			  && form != DW_FORM_block1
-			  && form != DW_FORM_block2
-			  && form != DW_FORM_block4
-			  && form != DW_FORM_flag
-			  && form != DW_FORM_string
-			  && form != DW_FORM_strp
-			  && form != DW_FORM_sec_offset)
+		      if (! libdw_valid_user_form (form))
 			goto invalid_data;
 		      args--;
 		      if (args > 0)
@@ -8333,26 +8320,22 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	      get_uleb128 (u128, readp, readendp);
 	      if (readp + offset_len > readendp)
 		goto invalid_data;
-	      if (offset_len == 8)
-		off = read_8ubyte_unaligned_inc (dbg, readp);
-	      else
-		off = read_4ubyte_unaligned_inc (dbg, readp);
-	      // Needs support for reading from supplementary object file.
-	      printf ("%*s#define <str-at-0x%" PRIx64 ">, line %u (sup)\n",
-		      level, "", off, u128);
+	      printf ("%*s#define ", level, "");
+	      readp =  print_form_data (dbg, DW_FORM_strp_sup,
+					readp, readendp, offset_len,
+					str_offsets_base);
+	      printf (", line %u (sup)\n", u128);
 	      break;
 
 	    case DW_MACRO_undef_sup:
 	      get_uleb128 (u128, readp, readendp);
 	      if (readp + offset_len > readendp)
 		goto invalid_data;
-	      if (offset_len == 8)
-		off = read_8ubyte_unaligned_inc (dbg, readp);
-	      else
-		off = read_4ubyte_unaligned_inc (dbg, readp);
-	      // Needs support for reading from supplementary object file.
-	      printf ("%*s#undef <str-at-0x%" PRIx64 ">, line %u (sup)\n",
-		      level, "", off, u128);
+	      printf ("%*s#undef ", level, "");
+	      readp =  print_form_data (dbg, DW_FORM_strp_sup,
+					readp, readendp, offset_len,
+					str_offsets_base);
+	      printf (", line %u (sup)\n", u128);
 	      break;
 
 	    case DW_MACRO_import_sup:
@@ -8362,6 +8345,7 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 		off = read_8ubyte_unaligned_inc (dbg, readp);
 	      else
 		off = read_4ubyte_unaligned_inc (dbg, readp);
+	      // XXX Needs support for reading from supplementary object file.
 	      printf ("%*s#include offset 0x%" PRIx64 " (sup)\n",
 		      level, "", off);
 	      break;
@@ -8370,26 +8354,22 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	      get_uleb128 (u128, readp, readendp);
 	      if (readp + offset_len > readendp)
 		goto invalid_data;
-	      if (offset_len == 8)
-		off = read_8ubyte_unaligned_inc (dbg, readp);
-	      else
-		off = read_4ubyte_unaligned_inc (dbg, readp);
-	      // Needs support for reading indirect string offset table
-	      printf ("%*s#define <str-at-0x%" PRIx64 ">, line %u (strx)\n",
-		      level, "", off, u128);
+	      printf ("%*s#define ", level, "");
+	      readp =  print_form_data (dbg, DW_FORM_strx,
+					readp, readendp, offset_len,
+					str_offsets_base);
+	      printf (", line %u (strx)\n", u128);
 	      break;
 
 	    case DW_MACRO_undef_strx:
 	      get_uleb128 (u128, readp, readendp);
 	      if (readp + offset_len > readendp)
 		goto invalid_data;
-	      if (offset_len == 8)
-		off = read_8ubyte_unaligned_inc (dbg, readp);
-	      else
-		off = read_4ubyte_unaligned_inc (dbg, readp);
-	      // Needs support for reading indirect string offset table.
-	      printf ("%*s#undef <str-at-0x%" PRIx64 ">, line %u (strx)\n",
-		      level, "", off, u128);
+	      printf ("%*s#undef ", level, "");
+	      readp =  print_form_data (dbg, DW_FORM_strx,
+					readp, readendp, offset_len,
+					str_offsets_base);
+	      printf (", line %u (strx)\n", u128);
 	      break;
 
 	    default:
@@ -8405,11 +8385,11 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	      // Just skip the arguments, we cannot really interpret them,
 	      // but print as much as we can.
 	      unsigned int args = *op_desc++;
-	      while (args > 0)
+	      while (args > 0 && readp < readendp)
 		{
 		  unsigned int form = *op_desc++;
-		  print_form_data (dbg, form, readp, readendp, offset_len,
-				   str_offsets_base);
+		  readp = print_form_data (dbg, form, readp, readendp,
+					   offset_len, str_offsets_base);
 		  args--;
 		  if (args > 0)
 		    printf (", ");

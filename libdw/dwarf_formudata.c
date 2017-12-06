@@ -158,6 +158,7 @@ dwarf_formudata (Dwarf_Attribute *attr, Dwarf_Word *return_uval)
 	      break;
 
 	    case DW_AT_GNU_macros:
+	    case DW_AT_macros:
 	      /* macptr into .debug_macro */
 	      if (__libdw_formptr (attr, IDX_debug_macro,
 				   DWARF_E_NO_ENTRY, NULL,

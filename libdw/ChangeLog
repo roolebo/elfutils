@@ -1,3 +1,11 @@
+2018-05-11  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_formudata.c (dwarf_formudata): Handle DW_AT_macros as macptr.
+	* dwarf_getmacros.c (get_table_for_offset): Add DW_MACRO_define_sup,
+	DW_MACRO_undef_sup, DW_MACRO_import_sup, DW_MACRO_define_strx and
+	DW_MACRO_undef_strx. Add str_offsets_base_off to fake CU. Deal with
+	DW_AT_macros. Use libdw_valid_user_form.
+
 2018-05-09  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_formstring.c (__libdw_cu_str_off_base): Moved to...

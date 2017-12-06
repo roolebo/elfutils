@@ -1,7 +1,6 @@
 /* Get macro information.
-   Copyright (C) 2002-2009, 2014 Red Hat, Inc.
+   Copyright (C) 2002-2009, 2014, 2017, 2018 Red Hat, Inc.
    This file is part of elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
    This file is free software; you can redistribute it and/or modify
    it under the terms of either
@@ -192,6 +191,8 @@ get_table_for_offset (Dwarf *dbg, Dwarf_Word macoff,
 
   MACRO_PROTO (p_udata_str, DW_FORM_udata, DW_FORM_string);
   MACRO_PROTO (p_udata_strp, DW_FORM_udata, DW_FORM_strp);
+  MACRO_PROTO (p_udata_strsup, DW_FORM_udata, DW_FORM_strp_sup);
+  MACRO_PROTO (p_udata_strx, DW_FORM_udata, DW_FORM_strx);
   MACRO_PROTO (p_udata_udata, DW_FORM_udata, DW_FORM_udata);
   MACRO_PROTO (p_secoffset, DW_FORM_sec_offset);
   MACRO_PROTO (p_none);
@@ -205,10 +206,11 @@ get_table_for_offset (Dwarf *dbg, Dwarf_Word macoff,
       [DW_MACRO_start_file - 1] = p_udata_udata,
       [DW_MACRO_end_file - 1] = p_none,
       [DW_MACRO_import - 1] = p_secoffset,
-      /* When adding support for DWARF5 supplementary object files and
-	 indirect string tables also add support for DW_MACRO_define_sup,
-	 DW_MACRO_undef_sup, DW_MACRO_import_sup, DW_MACRO_define_strx
-	 and DW_MACRO_undef_strx.  */
+      [DW_MACRO_define_sup - 1] = p_udata_strsup,
+      [DW_MACRO_undef_sup - 1] = p_udata_strsup,
+      [DW_MACRO_import_sup - 1] = p_secoffset, /* XXX - but in sup!. */
+      [DW_MACRO_define_strx - 1] = p_udata_strx,
+      [DW_MACRO_undef_strx - 1] = p_udata_strx,
     };
 
   if ((flags & 0x4) != 0)
@@ -357,12 +359,18 @@ read_macros (Dwarf *dbg, int sec_index,
       /* A fake CU with bare minimum data to fool dwarf_formX into
 	 doing the right thing with the attributes that we put out.
 	 We pretend it is the same version as the actual table.
-	 Version 4 for the old GNU extension, version 5 for DWARF5.  */
+	 Version 4 for the old GNU extension, version 5 for DWARF5.
+	 To handle DW_FORM_strx[1234] we set the .str_offsets_base
+	 from the given CU.
+	 XXX We will need to deal with DW_MACRO_import_sup and change
+	 out the dbg somehow for the DW_FORM_sec_offset to make sense.  */
       Dwarf_CU fake_cu = {
 	.dbg = dbg,
 	.sec_idx = sec_index,
 	.version = table->version,
 	.offset_size = table->is_64bit ? 8 : 4,
+	.str_off_base = str_offsets_base_off (dbg, (cudie != NULL
+						    ? cudie->cu: NULL)),
 	.startp = (void *) startp + offset,
 	.endp = (void *) endp,
       };
@@ -385,13 +393,24 @@ read_macros (Dwarf *dbg, int sec_index,
 
       for (Dwarf_Word i = 0; i < proto->nforms; ++i)
 	{
-	  /* We pretend this is a DW_AT_GNU_macros attribute so that
+	  /* We pretend this is a DW_AT[_GNU]_macros attribute so that
 	     DW_FORM_sec_offset forms get correctly interpreted as
-	     offset into .debug_macro.  */
-	  attributes[i].code = DW_AT_GNU_macros;
+	     offset into .debug_macro.  XXX Deal with DW_MACRO_import_sup
+	     (swap .dbg) for DW_FORM_sec_offset? */
+	  attributes[i].code = (fake_cu.version == 4 ? DW_AT_GNU_macros
+						     : DW_AT_macros);
 	  attributes[i].form = proto->forms[i];
 	  attributes[i].valp = (void *) readp;
 	  attributes[i].cu = &fake_cu;
+
+	  /* We don't want forms that aren't allowed because they could
+	     read from the "abbrev" like DW_FORM_implicit_const.  */
+	  if (! libdw_valid_user_form (attributes[i].form))
+	    {
+	      __libdw_seterrno (DWARF_E_INVALID_DWARF);
+	      free (attributesp);
+	      return -1;
+	    }
 
 	  size_t len = __libdw_form_val_len (&fake_cu, proto->forms[i], readp);
 	  if (unlikely (len == (size_t) -1))
@@ -562,7 +581,8 @@ dwarf_getmacros (Dwarf_Die *cudie, int (*callback) (Dwarf_Macro *, void *),
     {
       /* DW_AT_GNU_macros, DW_AT_macros */
       Dwarf_Word macoff;
-      if (get_offset_from (cudie, DW_AT_GNU_macros, &macoff) != 0)
+      if (get_offset_from (cudie, DW_AT_GNU_macros, &macoff) != 0
+	  && get_offset_from (cudie, DW_AT_macros, &macoff) != 0)
 	return -1;
       offset = gnu_macros_getmacros_off (cudie->cu->dbg, macoff,
 					 callback, arg, offset, accept_0xff,

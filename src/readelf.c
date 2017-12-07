@@ -4324,19 +4324,21 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 
 	case DW_OP_call2:
 	  NEED (2);
-	  printf ("%*s[%2" PRIuMAX "] %s %" PRIu16 "\n",
+	  printf ("%*s[%2" PRIuMAX "] %s [%6" PRIx16 "]\n",
 		  indent, "", (uintmax_t) offset, op_name,
 		  read_2ubyte_unaligned (dbg, data));
 	  CONSUME (2);
+	  data += 2;
 	  offset += 3;
 	  break;
 
 	case DW_OP_call4:
 	  NEED (4);
-	  printf ("%*s[%2" PRIuMAX "] %s %" PRIu32 "\n",
+	  printf ("%*s[%2" PRIuMAX "] %s [%6" PRIx32 "]\n",
 		  indent, "", (uintmax_t) offset, op_name,
 		  read_4ubyte_unaligned (dbg, data));
 	  CONSUME (4);
+	  data += 4;
 	  offset += 5;
 	  break;
 

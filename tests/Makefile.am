@@ -110,6 +110,7 @@ TESTS = run-arextract.sh run-arsymtest.sh run-ar.sh newfile test-nlist \
 	run-low_high_pc.sh run-macro-test.sh run-elf_cntl_gelf_getshdr.sh \
 	run-test-archive64.sh run-readelf-vmcoreinfo.sh \
 	run-readelf-mixed-corenote.sh run-dwfllines.sh \
+	run-readelf-variant.sh \
 	run-dwfl-report-elf-align.sh run-addr2line-test.sh \
 	run-addr2line-i-test.sh run-addr2line-i-lex-test.sh \
 	run-addr2line-i-demangle-test.sh run-addr2line-alt-debugpath.sh \
@@ -264,6 +265,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     testfilebazdynppc64.bz2 testfilebazmdbppc64.bz2 \
 	     testfilebazminppc64.bz2 testfilebazminppc64_pl.bz2 \
 	     testfilebazminppc64_plr.bz2 testfilebaztabppc64.bz2 \
+	     run-readelf-variant.sh testfile-ada-variant.bz2 \
 	     run-dwflsyms.sh \
 	     run-unstrip-n.sh testcore-rtlib.bz2 testcore-rtlib-ppc.bz2 \
 	     run-low_high_pc.sh testfile_low_high_pc.bz2 \

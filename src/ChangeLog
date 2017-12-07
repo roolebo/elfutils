@@ -1,3 +1,8 @@
+2017-12-07  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (print_ops): Update data pointer and print arguments
+	to DW_OP_call2 and DW_OP_call4 as DIE offsets.
+
 2017-11-29  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (argp_options): Add "section-groups", 'g'.

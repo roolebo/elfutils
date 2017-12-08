@@ -1,3 +1,9 @@
+2017-12-11  Dima Kogan  <dima@secretsauce.net>
+
+        * run-aggregate-size.sh: Added check for multi-dimensional arrays.
+        * run-peel-type.sh: Likewise.
+        * testfile-sizes3.o.bz2: Likewise.
+
 2017-12-07  Mark Wielaard  <mark@klomp.org>
 
 	* run-readelf-variant.sh: New test.

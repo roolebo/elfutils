@@ -54,6 +54,7 @@
 # volatile int ia[32];
 # const volatile void * const volatile restrict va[64];
 # struct s sa[8];
+# double d3d[3][4][5];
 #
 # typedef const int foo;
 # typedef volatile foo bar;
@@ -98,6 +99,7 @@ ca size 16
 ia size 128
 va size 512
 sa size 128
+d3d size 480
 f size 4
 b size 4
 EOF

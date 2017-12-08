@@ -63,7 +63,7 @@ array_size (Dwarf_Die *die, Dwarf_Word *size,
     return -1;
 
   bool any = false;
-  Dwarf_Word total = 0;
+  Dwarf_Word count_total = 1;
   do
     {
       Dwarf_Word count;
@@ -134,34 +134,35 @@ array_size (Dwarf_Die *die, Dwarf_Word *size,
 	  continue;
 	}
 
-      /* This is a subrange_type or enumeration_type and we've set COUNT.
-	 Now determine the stride for this array dimension.  */
-      Dwarf_Word stride = eltsize;
-      if (INTUSE(dwarf_attr_integrate) (&child, DW_AT_byte_stride,
-					attr_mem) != NULL)
-	{
-	  if (INTUSE(dwarf_formudata) (attr_mem, &stride) != 0)
-	    return -1;
-	}
-      else if (INTUSE(dwarf_attr_integrate) (&child, DW_AT_bit_stride,
-					     attr_mem) != NULL)
-	{
-	  if (INTUSE(dwarf_formudata) (attr_mem, &stride) != 0)
-	    return -1;
-	  if (stride % 8) 	/* XXX maybe compute in bits? */
-	    return -1;
-	  stride /= 8;
-	}
+      count_total *= count;
 
       any = true;
-      total += stride * count;
     }
   while (INTUSE(dwarf_siblingof) (&child, &child) == 0);
 
   if (!any)
     return -1;
 
-  *size = total;
+  /* This is a subrange_type or enumeration_type and we've set COUNT.
+     Now determine the stride for this array.  */
+  Dwarf_Word stride = eltsize;
+  if (INTUSE(dwarf_attr_integrate) (die, DW_AT_byte_stride,
+                                    attr_mem) != NULL)
+    {
+      if (INTUSE(dwarf_formudata) (attr_mem, &stride) != 0)
+        return -1;
+    }
+  else if (INTUSE(dwarf_attr_integrate) (die, DW_AT_bit_stride,
+                                         attr_mem) != NULL)
+    {
+      if (INTUSE(dwarf_formudata) (attr_mem, &stride) != 0)
+        return -1;
+      if (stride % 8) 	/* XXX maybe compute in bits? */
+        return -1;
+      stride /= 8;
+    }
+
+  *size = count_total * stride;
   return 0;
 }
 

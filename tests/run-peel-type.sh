@@ -55,6 +55,7 @@ ca raw type array_type
 ia raw type array_type
 va raw type array_type
 sa raw type array_type
+d3d raw type array_type
 f raw type base_type
 b raw type base_type
 EOF

@@ -1,3 +1,8 @@
+2017-12-12  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_aggregate_size.c (dwarf_aggregate_size): Don't peel the
+	given DIE. Reserve memory for a new DIE first.
+
 2017-12-11  Dima Kogan  <dima@secretsauce.net>
 
 	* dwarf_aggregate_size.c (array_size): Handle multi-dimensional

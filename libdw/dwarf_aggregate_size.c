@@ -199,12 +199,12 @@ aggregate_size (Dwarf_Die *die, Dwarf_Word *size, Dwarf_Die *type_mem)
 int
 dwarf_aggregate_size (Dwarf_Die *die, Dwarf_Word *size)
 {
-  Dwarf_Die type_mem;
+  Dwarf_Die die_mem, type_mem;
 
-  if (INTUSE (dwarf_peel_type) (die, die) != 0)
+  if (INTUSE (dwarf_peel_type) (die, &die_mem) != 0)
     return -1;
 
-  return aggregate_size (die, size, &type_mem);
+  return aggregate_size (&die_mem, size, &type_mem);
 }
 INTDEF (dwarf_aggregate_size)
 OLD_VERSION (dwarf_aggregate_size, ELFUTILS_0.144)

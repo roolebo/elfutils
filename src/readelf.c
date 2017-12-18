@@ -9611,9 +9611,9 @@ handle_notes_data (Ebl *ebl, const GElf_Ehdr *ehdr,
     return;
 
  bad_note:
-  error (EXIT_FAILURE, 0,
-	 gettext ("cannot get content of note section: %s"),
-	 elf_errmsg (-1));
+  error (0, 0,
+	 gettext ("cannot get content of note: %s"),
+	 data != NULL ? "garbage data" : elf_errmsg (-1));
 }
 
 static void

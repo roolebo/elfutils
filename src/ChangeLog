@@ -1,3 +1,8 @@
+2017-12-18  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (handle_notes_data): Don't use EXIT_FAILURE in error.
+	Adjust error message depending on whether or not we got data.
+
 2017-12-07  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_ops): Update data pointer and print arguments

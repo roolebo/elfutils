@@ -293,6 +293,8 @@ struct Dwarf_CU
   uint8_t offset_size;
   uint16_t version;
 
+  size_t sec_idx; /* Normally .debug_info, could be .debug_type or "fake". */
+
   /* Zero if this is a normal CU.  Nonzero if it is a type unit.  */
   size_t type_offset;
   uint64_t type_sig8;
@@ -714,7 +716,7 @@ __libdw_read_offset (Dwarf *dbg, Dwarf *dbg_ret,
 static inline size_t
 cu_sec_idx (struct Dwarf_CU *cu)
 {
-  return cu->type_offset == 0 ? IDX_debug_info : IDX_debug_types;
+  return cu->sec_idx;
 }
 
 static inline bool

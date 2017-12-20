@@ -93,8 +93,8 @@ __libdw_intern_next_unit (Dwarf *dbg, bool debug_types)
     }
 
   /* Invalid or truncated debug section data?  */
-  Elf_Data *data = dbg->sectiondata[debug_types
-				    ? IDX_debug_types : IDX_debug_info];
+  size_t sec_idx = debug_types ? IDX_debug_types : IDX_debug_info;
+  Elf_Data *data = dbg->sectiondata[sec_idx];
   if (unlikely (*offsetp > data->d_size))
     *offsetp = data->d_size;
 
@@ -102,6 +102,7 @@ __libdw_intern_next_unit (Dwarf *dbg, bool debug_types)
   struct Dwarf_CU *newp = libdw_typed_alloc (dbg, struct Dwarf_CU);
 
   newp->dbg = dbg;
+  newp->sec_idx = sec_idx;
   newp->start = oldoff;
   newp->end = *offsetp;
   newp->address_size = address_size;

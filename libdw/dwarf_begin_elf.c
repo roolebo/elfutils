@@ -201,6 +201,7 @@ valid_p (Dwarf *result)
 	}
       else
 	{
+	  result->fake_loc_cu->sec_idx = IDX_debug_loc;
 	  result->fake_loc_cu->dbg = result;
 	  result->fake_loc_cu->startp
 	    = result->sectiondata[IDX_debug_loc]->d_buf;

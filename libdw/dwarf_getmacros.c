@@ -360,6 +360,7 @@ read_macros (Dwarf *dbg, int sec_index,
 	 Version 4 for the old GNU extension, version 5 for DWARF5.  */
       Dwarf_CU fake_cu = {
 	.dbg = dbg,
+	.sec_idx = sec_index,
 	.version = table->version,
 	.offset_size = table->is_64bit ? 8 : 4,
 	.startp = (void *) startp + offset,

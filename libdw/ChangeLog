@@ -1,3 +1,14 @@
+2017-12-20  Mark Wielaard  <mark@klomp.org>
+
+	* libdwP.h (struct Dwarf_CU): Add sec_idx field.
+	(cu_sec_idx): Return cu->sec_idx.
+	* libdw_findcu.c (__libdw_intern_next_unit): Set cu sec_idx to
+	IDX_debug_info or IDX_debug_types.
+	* dwarf_begin_elf.c (valid_p): Set fake_loc_cu->sec_idx to
+	IDX_debug_loc.
+	* dwarf_getmacros.c (read_macros): Set fake_cu->sec_idx to
+	IDX_debug_macro or IDX_debug_macinfo.
+
 2017-12-12  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_aggregate_size.c (dwarf_aggregate_size): Don't peel the

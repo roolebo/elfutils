@@ -137,19 +137,46 @@ check_native()
 # Backtrace core file.
 check_native_core()
 {
+# systemd-coredump/coredumpctl doesn't seem to like concurrent core dumps
+# use a lock file (fd 200) tests/core-dump-backtrace.lock
+(
   child=$1
 
   # Disable valgrind while dumping core.
   SAVED_VALGRIND_CMD="$VALGRIND_CMD"
   unset VALGRIND_CMD
 
+  # Wait for lock for 10 seconds or skip.
+  flock -x -w 10 200 || exit 77;
+
   # Skip the test if we cannot adjust core ulimit.
-  core="core.`ulimit -c unlimited || exit 77; set +ex; testrun ${abs_builddir}/$child --gencore; true`"
+  pid="`ulimit -c unlimited || exit 77; set +ex; testrun ${abs_builddir}/$child --gencore; true`"
+  core="core.$pid"
   # see if /proc/sys/kernel/core_uses_pid is set to 0
   if [ -f core ]; then
     mv core "$core"
   fi
-  if [ ! -f "$core" ]; then echo "No $core file generated"; exit 77; fi
+  type -P coredumpctl && have_coredumpctl=1 || have_coredumpctl=0
+  if [ ! -f "$core" -a $have_coredumpctl -eq 1 ]; then
+    # Maybe systemd-coredump took it. But give it some time to dump first...
+    sleep 1
+    coredumpctl --output="$core" dump $pid || rm -f $core
+
+    # Try a couple of times after waiting some more if something went wrong...
+    if [ ! -f "$core" ]; then
+      sleep 2
+      coredumpctl --output="$core" dump $pid || rm -f $core
+    fi
+
+    if [ ! -f "$core" ]; then
+      sleep 3
+      coredumpctl --output="$core" dump $pid || rm -f $core
+    fi
+  fi
+  if [ ! -f "$core" ]; then
+    echo "No $core file generated";
+    exit 77;
+  fi
 
   if [ "x$SAVED_VALGRIND_CMD" != "x" ]; then
     VALGRIND_CMD="$SAVED_VALGRIND_CMD"
@@ -163,4 +190,6 @@ check_native_core()
   cat $core.{bt,err}
   check_native_unsupported $core.err $child-$core
   check_all $core.{bt,err} $child-$core
+  rm $core{,.{bt,err}}
+) 200>${abs_builddir}/core-dump-backtrace.lock
 }

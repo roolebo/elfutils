@@ -515,6 +515,9 @@ dwarf_default_lower_bound_LDADD = $(libdw)
 system_elf_libelf_test_CPPFLAGS =
 system_elf_libelf_test_LDADD = $(libelf)
 
+# A lock file used to make sure only one test dumps core at a time
+CLEANFILES += core-dump-backtrace.lock
+
 if GCOV
 check: check-am coverage
 .PHONY: coverage

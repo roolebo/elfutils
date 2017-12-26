@@ -1,5 +1,5 @@
 /* Get attributes of the DIE.
-   Copyright (C) 2004, 2005, 2008, 2009, 2014 Red Hat, Inc.
+   Copyright (C) 2004, 2005, 2008, 2009, 2014, 2017 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
@@ -51,7 +51,6 @@ dwarf_getattrs (Dwarf_Die *die, int (*callback) (Dwarf_Attribute *, void *),
 
   if (unlikely (abbrevp == DWARF_END_ABBREV))
     {
-    invalid_dwarf:
       __libdw_seterrno (DWARF_E_INVALID_DWARF);
       return -1l;
     }
@@ -61,24 +60,15 @@ dwarf_getattrs (Dwarf_Die *die, int (*callback) (Dwarf_Attribute *, void *),
   const unsigned char *const offset_attrp = abbrevp->attrp + offset;
 
   /* Go over the list of attributes.  */
-  Dwarf *dbg = die->cu->dbg;
-  const unsigned char *endp;
-  endp = ((const unsigned char *) dbg->sectiondata[IDX_debug_abbrev]->d_buf
-	  + dbg->sectiondata[IDX_debug_abbrev]->d_size);
   while (1)
     {
-      /* Are we still in bounds?  */
-      if (unlikely (attrp >= endp))
-	goto invalid_dwarf;
-
-      /* Get attribute name and form.  */
+      /* Get attribute name and form.  Dwarf_Abbrev was checked when
+	 created, so we can read unchecked.  */
       Dwarf_Attribute attr;
       const unsigned char *remembered_attrp = attrp;
 
-      get_uleb128 (attr.code, attrp, endp);
-      if (unlikely (attrp >= endp))
-	goto invalid_dwarf;
-      get_uleb128 (attr.form, attrp, endp);
+      get_uleb128_unchecked (attr.code, attrp);
+      get_uleb128_unchecked (attr.form, attrp);
 
       /* We can stop if we found the attribute with value zero.  */
       if (attr.code == 0 && attr.form == 0)

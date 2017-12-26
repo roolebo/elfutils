@@ -87,8 +87,26 @@ __libdw_get_uleb128 (const unsigned char **addrp, const unsigned char *end)
   return UINT64_MAX;
 }
 
+static inline uint64_t
+__libdw_get_uleb128_unchecked (const unsigned char **addrp)
+{
+  uint64_t acc = 0;
+
+  /* Unroll the first step to help the compiler optimize
+     for the common single-byte case.  */
+  get_uleb128_step (acc, *addrp, 0);
+
+  const size_t max = len_leb128 (uint64_t);
+  for (size_t i = 1; i < max; ++i)
+    get_uleb128_step (acc, *addrp, i);
+  /* Other implementations set VALUE to UINT_MAX in this
+     case.  So we better do this as well.  */
+  return UINT64_MAX;
+}
+
 /* Note, addr needs to me smaller than end. */
 #define get_uleb128(var, addr, end) ((var) = __libdw_get_uleb128 (&(addr), end))
+#define get_uleb128_unchecked(var, addr) ((var) = __libdw_get_uleb128_unchecked (&(addr)))
 
 /* The signed case is similar, but we sign-extend the result.  */
 

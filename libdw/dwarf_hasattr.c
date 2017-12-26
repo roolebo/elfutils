@@ -1,5 +1,5 @@
 /* Check whether given DIE has specific attribute.
-   Copyright (C) 2003, 2005, 2014 Red Hat, Inc.
+   Copyright (C) 2003, 2005, 2014, 2017 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -45,32 +45,20 @@ dwarf_hasattr (Dwarf_Die *die, unsigned int search_name)
   Dwarf_Abbrev *abbrevp = __libdw_dieabbrev (die, NULL);
   if (unlikely (abbrevp == DWARF_END_ABBREV))
     {
-    invalid_dwarf:
       __libdw_seterrno (DWARF_E_INVALID_DWARF);
       return 0;
     }
 
-  Dwarf *dbg = die->cu->dbg;
-
-  /* Search the name attribute.  */
-  unsigned char *const endp
-    = ((unsigned char *) dbg->sectiondata[IDX_debug_abbrev]->d_buf
-       + dbg->sectiondata[IDX_debug_abbrev]->d_size);
-
+  /* Search the name attribute.  Dwarf_Abbrev was checked when created,
+     so we can read unchecked here.  */
   const unsigned char *attrp = abbrevp->attrp;
   while (1)
     {
-      /* Are we still in bounds?  This test needs to be refined.  */
-      if (unlikely (attrp >= endp))
-	goto invalid_dwarf;
-
       /* Get attribute name and form.  */
       unsigned int attr_name;
-      get_uleb128 (attr_name, attrp, endp);
+      get_uleb128_unchecked (attr_name, attrp);
       unsigned int attr_form;
-      if (unlikely (attrp >= endp))
-	goto invalid_dwarf;
-      get_uleb128 (attr_form, attrp, endp);
+      get_uleb128_unchecked (attr_form, attrp);
 
       /* We can stop if we found the attribute with value zero.  */
       if (attr_name == 0 || attr_form == 0)

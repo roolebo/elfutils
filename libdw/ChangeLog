@@ -1,3 +1,13 @@
+2017-12-26  Mark Wielaard  <mark@klomp.org>
+
+	* memory-access.h (__libdw_get_uleb128_unchecked): New function.
+	(get_uleb128_unchecked): New define.
+	* dwarf_child.c (__libdw_find_attr): Use get_uleb128_unchecked to
+	read attr name and form.
+	* dwarf_getabbrevattr.c (dwarf_getabbrevattr): Likewise.
+	* dwarf_getattrs.c (dwarf_getattrs): Likewise.
+	* dwarf_hasattr.c (dwarf_hasattr): Likewise.
+
 2017-12-28  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_offdie.c (__libdw_offdie): Check sectiondata exists.

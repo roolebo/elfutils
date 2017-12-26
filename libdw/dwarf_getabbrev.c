@@ -1,5 +1,5 @@
 /* Get abbreviation at given offset.
-   Copyright (C) 2003, 2004, 2005, 2006, 2014 Red Hat, Inc.
+   Copyright (C) 2003, 2004, 2005, 2006, 2014, 2017 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -121,8 +121,7 @@ __libdw_getabbrev (Dwarf *dbg, struct Dwarf_CU *cu, Dwarf_Off offset,
   abb->attrp = (unsigned char *) abbrevp;
   abb->offset = offset;
 
-  /* Skip over all the attributes and count them while doing so.  */
-  abb->attrcnt = 0;
+  /* Skip over all the attributes and check rest of the abbrev is valid.  */
   unsigned int attrname;
   unsigned int attrform;
   do
@@ -134,7 +133,7 @@ __libdw_getabbrev (Dwarf *dbg, struct Dwarf_CU *cu, Dwarf_Off offset,
 	goto invalid;
       get_uleb128 (attrform, abbrevp, end);
     }
-  while (attrname != 0 && attrform != 0 && ++abb->attrcnt);
+  while (attrname != 0 && attrform != 0);
 
   /* Return the length to the caller if she asked for it.  */
   if (lengthp != NULL)

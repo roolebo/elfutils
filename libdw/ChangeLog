@@ -1,5 +1,12 @@
 2017-12-26  Mark Wielaard  <mark@klomp.org>
 
+	* libdwP.h (struct Dwarf_Abbrev): Pack struct. Remove attrcnt,
+	use bitfields for has_children and code.
+	* dwarf_getabbrev.c (__libdw_getabbrev): Don't count attrs.
+	* dwarf_getattrcnt.c (dwarf_getattrcnt): Count attrs.
+
+2017-12-26  Mark Wielaard  <mark@klomp.org>
+
 	* memory-access.h (__libdw_get_uleb128_unchecked): New function.
 	(get_uleb128_unchecked): New define.
 	* dwarf_child.c (__libdw_find_attr): Use get_uleb128_unchecked to

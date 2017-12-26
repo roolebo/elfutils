@@ -1,5 +1,5 @@
 /* Internal definitions for libdwarf.
-   Copyright (C) 2002-2011, 2013-2016 Red Hat, Inc.
+   Copyright (C) 2002-2011, 2013-2017 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -212,13 +212,12 @@ struct Dwarf
 /* Abbreviation representation.  */
 struct Dwarf_Abbrev
 {
-  Dwarf_Off offset;
-  unsigned char *attrp;
-  unsigned int attrcnt;
-  unsigned int code;
-  unsigned int tag;
-  bool has_children;
-};
+  Dwarf_Off offset;	  /* Offset to start of abbrev into .debug_abbrev.  */
+  unsigned char *attrp;   /* Pointer to start of attribute name/form pairs. */
+  bool has_children : 1;  /* Whether or not the DIE has children. */
+  unsigned int code : 31; /* The (unique) abbrev code.  */
+  unsigned int tag;	  /* The tag of the DIE. */
+} attribute_packed;
 
 #include "dwarf_abbrev_hash.h"
 

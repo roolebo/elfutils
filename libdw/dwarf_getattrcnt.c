@@ -1,5 +1,5 @@
 /* Get number of attributes of abbreviation.
-   Copyright (C) 2003, 2004 Red Hat, Inc.
+   Copyright (C) 2003, 2004, 2017 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -40,7 +40,22 @@ dwarf_getattrcnt (Dwarf_Abbrev *abbrev, size_t *attrcntp)
   if (abbrev == NULL)
     return -1;
 
-  *attrcntp = abbrev->attrcnt;
+  const unsigned char *abbrevp = abbrev->attrp;
+
+  /* Skip over all the attributes and count them while doing so.  */
+  int attrcnt = 0;
+  unsigned int attrname;
+  unsigned int attrform;
+  do
+    {
+      /* We can use unchecked since they were checked when the Dwrf_Abbrev
+	 was created.  */
+      get_uleb128_unchecked (attrname, abbrevp);
+      get_uleb128_unchecked (attrform, abbrevp);
+    }
+  while (attrname != 0 && attrform != 0 && ++attrcnt);
+
+  *attrcntp = attrcnt;
 
   return 0;
 }

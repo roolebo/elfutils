@@ -1,5 +1,5 @@
 /* Return DIE at given offset.
-   Copyright (C) 2002-2010 Red Hat, Inc.
+   Copyright (C) 2002-2010, 2017 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -45,7 +45,7 @@ __libdw_offdie (Dwarf *dbg, Dwarf_Off offset, Dwarf_Die *result,
 
   Elf_Data *const data = dbg->sectiondata[debug_types ? IDX_debug_types
 					  : IDX_debug_info];
-  if (offset >= data->d_size)
+  if (data == NULL || offset >= data->d_size)
     {
       __libdw_seterrno (DWARF_E_INVALID_DWARF);
       return NULL;

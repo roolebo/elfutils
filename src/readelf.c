@@ -6083,7 +6083,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
     case DW_FORM_implicit_const:
     case DW_FORM_udata:
     case DW_FORM_sdata:
-    case DW_FORM_data8:
+    case DW_FORM_data8: /* Note no data16 here, we see that as block. */
     case DW_FORM_data4:
     case DW_FORM_data2:
     case DW_FORM_data1:;
@@ -6276,6 +6276,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
     case DW_FORM_block2:
     case DW_FORM_block1:
     case DW_FORM_block:
+    case DW_FORM_data16: /* DWARF5 calls this a constant class.  */
       if (cbargs->silent)
 	break;
       Dwarf_Block block;

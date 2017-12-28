@@ -1,5 +1,10 @@
 2018-02-09  Mark Wielaard  <mark@klomp.org>
 
+	* dwarf_formblock.c (dwarf_formblock): Handle DW_FORM_data16 as a
+	16 byte block.
+
+2018-02-09  Mark Wielaard  <mark@klomp.org>
+
 	* dwarf_child.c (__libdw_find_attr): Handle DW_FORM_implicit_const.
 	* dwarf_formsdata.c (dwarf_formsdata): Likewise.
 	* dwarf_formudata.c (dwarf_formudata): Likewise.

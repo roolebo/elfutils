@@ -1,5 +1,5 @@
 /* Return block represented by attribute.
-   Copyright (C) 2004-2010, 2014 Red Hat, Inc.
+   Copyright (C) 2004-2010, 2014, 2018 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
@@ -72,6 +72,16 @@ dwarf_formblock (Dwarf_Attribute *attr, Dwarf_Block *return_block)
       if (unlikely (endp - datap < 1))
 	goto invalid;
       get_uleb128 (return_block->length, datap, endp);
+      return_block->data = (unsigned char *) datap;
+      break;
+
+    case DW_FORM_data16:
+      /* The DWARFv5 spec calls this constant class, but we interpret
+	 it as a block that the user will need to interpret when
+	 converting to a value.  */
+      if (unlikely (endp - datap < 16))
+	goto invalid;
+      return_block->length = 16;
       return_block->data = (unsigned char *) datap;
       break;
 

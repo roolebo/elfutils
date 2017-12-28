@@ -1,3 +1,8 @@
+2017-12-28  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (print_debug_units): Print DIE offset in error message
+	as hex.
+
 2017-12-18  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (handle_notes_data): Don't use EXIT_FAILURE in error.

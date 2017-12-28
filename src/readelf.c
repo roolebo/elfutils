@@ -6414,8 +6414,8 @@ print_debug_units (Dwfl_Module *dwflmod,
       if (unlikely (tag == DW_TAG_invalid))
 	{
 	  if (!silent)
-	    error (0, 0, gettext ("cannot get tag of DIE at offset %" PRIu64
-				  " in section '%s': %s"),
+	    error (0, 0, gettext ("cannot get tag of DIE at offset [%" PRIx64
+				  "] in section '%s': %s"),
 		   (uint64_t) offset, secname, dwarf_errmsg (-1));
 	  goto do_return;
 	}

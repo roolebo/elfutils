@@ -6306,9 +6306,9 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
     default:
       if (cbargs->silent)
 	break;
-      printf ("           %*s%-20s (form: %#x) ???\n",
+      printf ("           %*s%-20s (%s) ???\n",
 	      (int) (level * 2), "", dwarf_attr_name (attr),
-	      (int) form);
+	      dwarf_form_name (form));
       break;
     }
 
@@ -7552,7 +7552,7 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 		      if (readp + 1 > readendp)
 			goto invalid_data;
 		      unsigned int form = *readp++;
-		      printf (" %s", dwarf_form_string (form));
+		      printf (" %s", dwarf_form_name (form));
 		      if (form != DW_FORM_data1
 			  && form != DW_FORM_data2
 			  && form != DW_FORM_data4

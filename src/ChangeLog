@@ -1,3 +1,8 @@
+2018-01-01  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (attr_callback): Use dwarf_form_name for unknown forms.
+	(print_debug_macro_section): Print form using dwarf_form_name.
+
 2017-12-28  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_debug_units): Print DIE offset in error message

@@ -1,3 +1,10 @@
+2018-01-14  Petr Machata  <pmachata@gmail.com>
+
+	* dwarf_formsdata.c (dwarf_formsdata):
+	<DW_FORM_data1>: Cast to signed char.
+	<DW_FORM_data2,4,8>: Use read_*sbyte_unaligned instead of
+	read_*ubyte_unaligned.
+
 2017-12-26  Mark Wielaard  <mark@klomp.org>
 
 	* libdwP.h (struct Dwarf_Abbrev): Pack struct. Remove attrcnt,

@@ -333,7 +333,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     run-deleted.sh run-linkmap-cut.sh linkmap-cut-lib.so.bz2 \
 	     linkmap-cut.bz2 linkmap-cut.core.bz2 \
 	     run-aggregate-size.sh testfile-sizes1.o.bz2 testfile-sizes2.o.bz2 \
-	     testfile-sizes3.o.bz2 run-peel-type.sh \
+	     testfile-sizes3.o.bz2 testfile-sizes4.o.bz2 testfile-sizes4.s \
+	     run-peel-type.sh \
 	     run-readelf-A.sh testfileppc32attrs.o.bz2 \
 	     testfilesparc64attrs.o.bz2 testfileppc64attrs.o.bz2 \
 	     testfile-debug-types.bz2 \

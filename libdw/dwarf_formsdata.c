@@ -53,25 +53,25 @@ dwarf_formsdata (Dwarf_Attribute *attr, Dwarf_Sword *return_sval)
 	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
 	  return -1;
 	}
-      *return_sval = *attr->valp;
+      *return_sval = (signed char) *attr->valp;
       break;
 
     case DW_FORM_data2:
       if (datap + 2 > endp)
 	goto invalid;
-      *return_sval = read_2ubyte_unaligned (attr->cu->dbg, attr->valp);
+      *return_sval = read_2sbyte_unaligned (attr->cu->dbg, attr->valp);
       break;
 
     case DW_FORM_data4:
       if (datap + 4 > endp)
 	goto invalid;
-      *return_sval = read_4ubyte_unaligned (attr->cu->dbg, attr->valp);
+      *return_sval = read_4sbyte_unaligned (attr->cu->dbg, attr->valp);
       break;
 
     case DW_FORM_data8:
       if (datap + 8 > endp)
 	goto invalid;
-      *return_sval = read_8ubyte_unaligned (attr->cu->dbg, attr->valp);
+      *return_sval = read_8sbyte_unaligned (attr->cu->dbg, attr->valp);
       break;
 
     case DW_FORM_sdata:

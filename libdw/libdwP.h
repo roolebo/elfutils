@@ -314,6 +314,12 @@ struct Dwarf_CU
   size_t subdie_offset;
   uint64_t unit_id8;
 
+  /* If this is a skeleton unit this points to the split compile unit.
+     Or the other way around if this is a split compile unit.  Set to -1
+     if not yet searched.  Always use __libdw_find_split_unit to access
+     this field.  */
+  struct Dwarf_CU *split;
+
   /* Hash table for the abbreviations.  */
   Dwarf_Abbrev_Hash abbrev_hash;
   /* Offset of the first abbreviation.  */
@@ -588,6 +594,9 @@ extern struct Dwarf_CU *__libdw_findcu (Dwarf *dbg, Dwarf_Off offset, bool tu)
 /* Find CU for given DIE address.  */
 extern struct Dwarf_CU *__libdw_findcu_addr (Dwarf *dbg, void *addr)
      __nonnull_attribute__ (1) internal_function;
+
+/* Find the split (or skeleton) unit.  */
+extern struct Dwarf_CU *__libdw_find_split_unit (Dwarf_CU *cu);
 
 /* Get abbreviation with given code.  */
 extern Dwarf_Abbrev *__libdw_findabbrev (struct Dwarf_CU *cu,
@@ -972,6 +981,9 @@ str_offsets_base_off (Dwarf *dbg, Dwarf_CU *cu)
 	      cu->str_off_base = 0;
 	      return cu->str_off_base;
 	    }
+
+	  if (dbg == NULL)
+	    dbg = cu->dbg;
 	}
       else
 	return cu->str_off_base;
@@ -1051,7 +1063,7 @@ static inline Dwarf_Off __libdw_cu_str_off_base (Dwarf_CU *cu)
    constructed NULL is returned.
 
    The caller is responsible for freeing the result if not NULL.  */
-char * filepath (int fd, const char *dir, const char *file)
+char * __libdw_filepath (int fd, const char *dir, const char *file)
   internal_function;
 
 

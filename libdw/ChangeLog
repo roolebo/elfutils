@@ -1,5 +1,20 @@
 2018-05-15  Mark Wielaard  <mark@klomp.org>
 
+	* Makefile.am (libdw_a_SOURCES): Add libdw_find_split_unit.c.
+	* dwarf_end.c (cu_free): Free split Dwarf.
+	* dwarf_get_units.c (dwarf_get_units): Handle DW_UT_skeleton by
+	calling __libdw_find_split_unit.
+	* libdwP.h (struct Dwarf_CU): Add split Dwarf_CU field.
+	(__libdw_find_split_unit): New function prototype.
+	(str_offsets_base_off): Use cu Dwarf if dbg is NULL.
+	(filepath): Rename to ...
+	(__libdw_filepath): This. Which is the actual function name in
+	dwarf_getalt.c.
+	(libdw_find_split_unit.c): New file.
+	* libdw_findcu.c (__libdw_intern_next_unit): Initialize split to -1.
+
+2018-05-15  Mark Wielaard  <mark@klomp.org>
+
 	* libdwP.h (__libdw_first_die_from_cu_start): Adjust commented out
 	asserts.
 	* libdw_findcu.c (__libdw_intern_next_unit): For version 4 DWARF if

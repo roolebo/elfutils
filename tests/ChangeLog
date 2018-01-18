@@ -1,3 +1,23 @@
+2018-05-16  Mark Wielaard  <mark@klomp.org>
+
+	* Makefile.am (check_PROGRAMS): Add get-units-split.
+	(TESTS): Add run-get-units-split.sh.
+	(EXTRA_DIST): Add run-get-units-split.sh, testfile-hello4.dwo.bz2,
+	testfile-hello5.dwo.bz2, testfile-splitdwarf-4.bz2,
+	testfile-splitdwarf-5.bz2, testfile-world5.dwo.bz2 and
+	testfile-world4.dwo.bz2.
+	(get_units_split_LDADD): New variable.
+	* get-units-split.c: New test.
+	* run-get-units-split.sh: New test runner.
+	* testfile-dwarf-45.source: Extend with build instructions for new
+	test files.
+	* testfile-hello4.dwo.bz2: New test file.
+	* testfile-hello5.dwo.bz2: Likewise.
+	* testfile-splitdwarf-4.bz2: Likewise.
+	* testfile-splitdwarf-5.bz2: Likewise.
+	* testfile-world5.dwo.bz2 and: Likewise.
+	* testfile-world4.dwo.bz2: Likewise.
+
 2018-05-09  Mark Wielaard  <mark@klomp.org>
 
 	* run-readelf-zdebug.sh: Adjust test output for new header layout.

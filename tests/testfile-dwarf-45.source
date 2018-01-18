@@ -79,3 +79,11 @@ $ gcc -o testfile-dwarf-4 hello.o world.o
 $ gcc -gdwarf-5 -gno-as-loc-support -gno-variable-location-views -O2 -c world.c
 $ gcc -gdwarf-5 -gno-as-loc-support -gno-variable-location-views -O2 -c hello.c
 $ gcc -o testfile-dwarf-5 hello.o world.o
+
+$ gcc -gdwarf-4 -gsplit-dwarf -gno-as-loc-support -gno-variable-location-views -O2 -o testfile-world4.o -c world.c
+$ gcc -gdwarf-4 -gsplit-dwarf -gno-as-loc-support -gno-variable-location-views -O2 -o testfile-hello4.o -c hello.c
+$ gcc -o testfile-splitdwarf-4 testfile-hello4.o testfile-world4.o
+
+$ gcc -gdwarf-5 -gsplit-dwarf -gno-as-loc-support -gno-variable-location-views -O2 -o testfile-world5.o -c world.c
+$ gcc -gdwarf-5 -gsplit-dwarf -gno-as-loc-support -gno-variable-location-views -O2 -o testfile-hello5.o -c hello.c
+$ gcc -o testfile-splitdwarf-5 testfile-hello5.o testfile-world5.o

@@ -100,10 +100,25 @@ dwarf_get_units (Dwarf *dwarf, Dwarf_CU *cu, Dwarf_CU **next_cu,
 
   if (subdie != NULL)
     {
-      if (next->version >= 2 && next->version <= 5
-	  && (next->unit_type == DW_UT_type
-	      || next->unit_type == DW_UT_split_type))
-	*subdie = SUBDIE(next);
+      if (next->version >= 2 && next->version <= 5)
+	{
+	  /* For types, return the actual type DIE.  For skeletons,
+	     find the associated split compile unit and return its
+	     DIE.  */
+	  if (next->unit_type == DW_UT_type
+	      || next->unit_type == DW_UT_split_type)
+	    *subdie = SUBDIE(next);
+	  else if (next->unit_type == DW_UT_skeleton)
+	    {
+	      Dwarf_CU *split_cu = __libdw_find_split_unit (next);
+	      if (split_cu != NULL)
+		*subdie = CUDIE(split_cu);
+	      else
+		memset (subdie, '\0', sizeof (Dwarf_Die));
+	    }
+	  else
+	    memset (subdie, '\0', sizeof (Dwarf_Die));
+	}
       else
 	memset (subdie, '\0', sizeof (Dwarf_Die));
     }

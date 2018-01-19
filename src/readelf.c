@@ -112,7 +112,7 @@ static const struct argp_option options[] =
   { NULL, 0, NULL, 0, N_("Additional output selection:"), 0 },
   { "debug-dump", 'w', "SECTION", OPTION_ARG_OPTIONAL,
     N_("Display DWARF section content.  SECTION can be one of abbrev, "
-       "aranges, decodedaranges, frame, gdb_index, info, loc, line, "
+       "aranges, decodedaranges, frame, gdb_index, info, info+, loc, line, "
        "decodedline, ranges, pubnames, str, macinfo, macro or exception"), 0 },
   { "hex-dump", 'x', "SECTION", 0,
     N_("Dump the uninterpreted contents of SECTION, by number or name"), 0 },
@@ -214,6 +214,9 @@ static bool decodedline = false;
 
 /* True if we want to show more information about compressed sections.  */
 static bool print_decompress = false;
+
+/* True if we want to show split compile units for debug_info skeletons.  */
+static bool show_split_units = false;
 
 /* Select printing of debugging sections.  */
 static enum section_e
@@ -422,6 +425,7 @@ parse_opt (int key, char *arg,
 	{
 	  print_debug_sections = section_all;
 	  implicit_debug_sections = section_info;
+	  show_split_units = true;
 	}
       else if (strcmp (arg, "abbrev") == 0)
 	print_debug_sections |= section_abbrev;
@@ -441,6 +445,11 @@ parse_opt (int key, char *arg,
 	print_debug_sections |= section_frame;
       else if (strcmp (arg, "info") == 0)
 	print_debug_sections |= section_info;
+      else if (strcmp (arg, "info+") == 0)
+	{
+	  print_debug_sections |= section_info;
+	  show_split_units = true;
+	}
       else if (strcmp (arg, "loc") == 0)
 	{
 	  print_debug_sections |= section_loc;
@@ -6075,6 +6084,7 @@ struct attrcb_args
   Dwarf_Die *die;
   int level;
   bool silent;
+  bool is_split;
   unsigned int version;
   unsigned int addrsize;
   unsigned int offset_size;
@@ -6088,6 +6098,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
   struct attrcb_args *cbargs = (struct attrcb_args *) arg;
   const int level = cbargs->level;
   Dwarf_Die *die = cbargs->die;
+  bool is_split = cbargs->is_split;
 
   unsigned int attr = dwarf_whatattr (attrp);
   if (unlikely (attr == 0))
@@ -6180,9 +6191,13 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
       if (unlikely (dwarf_formref_die (attrp, &ref) == NULL))
 	goto attrval_out;
 
-      printf ("           %*s%-20s (%s) [%6" PRIxMAX "]\n",
+      printf ("           %*s%-20s (%s) ",
 	      (int) (level * 2), "", dwarf_attr_name (attr),
-	      dwarf_form_name (form), (uintmax_t) dwarf_dieoffset (&ref));
+	      dwarf_form_name (form));
+      if (is_split)
+	printf ("{%6" PRIxMAX "}\n", (uintmax_t) dwarf_dieoffset (&ref));
+      else
+	printf ("[%6" PRIxMAX "]\n", (uintmax_t) dwarf_dieoffset (&ref));
       break;
 
     case DW_FORM_ref_sig8:
@@ -6521,7 +6536,6 @@ print_debug_units (Dwfl_Module *dwflmod,
   Dwarf_CU cu_mem;
   uint8_t unit_type;
   Dwarf_Die cudie;
-  Dwarf_Die subdie;
 
   /* We cheat a little because we want to see only the CUs from .debug_info
      or .debug_types.  We know the Dwarf_CU struct layout.  Set it up at
@@ -6539,7 +6553,7 @@ print_debug_units (Dwfl_Module *dwflmod,
 
  next_cu:
   unit_res = dwarf_get_units (dbg, cu, &cu, &version, &unit_type,
-			      &cudie, &subdie);
+			      &cudie, NULL);
   if (unit_res == 1)
     goto do_return;
 
@@ -6560,14 +6574,21 @@ print_debug_units (Dwfl_Module *dwflmod,
     {
       Dwarf_Off offset = cu->start;
       if (debug_types && version < 5)
-	printf (gettext (" Type unit at offset %" PRIu64 ":\n"
-			 " Version: %" PRIu16 ", Abbreviation section offset: %"
-			 PRIu64 ", Address size: %" PRIu8
-			 ", Offset size: %" PRIu8
-			 "\n Type signature: %#" PRIx64
-			 ", Type offset: %#" PRIx64 " [%" PRIx64 "]\n"),
-		(uint64_t) offset, version, abbroffset, addrsize, offsize,
-		unit_id, (uint64_t) subdie_off, dwarf_dieoffset (&subdie));
+	{
+	  Dwarf_Die typedie;
+	  Dwarf_Off dieoffset;
+	  dieoffset = dwarf_dieoffset (dwarf_offdie_types (dbg, subdie_off,
+							   &typedie));
+	  printf (gettext (" Type unit at offset %" PRIu64 ":\n"
+			   " Version: %" PRIu16
+			   ", Abbreviation section offset: %" PRIu64
+			   ", Address size: %" PRIu8
+			   ", Offset size: %" PRIu8
+			   "\n Type signature: %#" PRIx64
+			   ", Type offset: %#" PRIx64 " [%" PRIx64 "]\n"),
+		  (uint64_t) offset, version, abbroffset, addrsize, offsize,
+		  unit_id, (uint64_t) subdie_off, dieoffset);
+	}
       else
 	{
 	  printf (gettext (" Compilation unit at offset %" PRIu64 ":\n"
@@ -6589,8 +6610,15 @@ print_debug_units (Dwfl_Module *dwflmod,
 		printf (", Unit id: 0x%.16" PRIx64 "", unit_id);
 	      if (unit_type == DW_UT_type
 		  || unit_type == DW_UT_split_type)
-		printf (", Unit DIE off: %#" PRIx64 " [%" PRIx64 "]",
-			subdie_off, dwarf_dieoffset (&subdie));
+		{
+		  Dwarf_Die typedie;
+		  Dwarf_Off dieoffset;
+		  dwarf_cu_info (cu, NULL, NULL, NULL, &typedie,
+				 NULL, NULL, NULL);
+		  dieoffset = dwarf_dieoffset (&typedie);
+		  printf (", Unit DIE off: %#" PRIx64 " [%" PRIx64 "]",
+			  subdie_off, dieoffset);
+		}
 	      printf ("\n");
 	    }
 	}
@@ -6608,17 +6636,21 @@ print_debug_units (Dwfl_Module *dwflmod,
   struct attrcb_args args =
     {
       .dwflmod = dwflmod,
-      .dbg = dbg,
       .silent = silent,
       .version = version,
       .addrsize = addrsize,
       .offset_size = offsize
     };
 
+  bool is_split = false;
   int level = 0;
   dies[0] = cudie;
   args.cu = dies[0].cu;
+  args.dbg = dbg;
+  args.is_split = is_split;
 
+  /* We might return here again for the split CU subdie.  */
+  do_cu:
   do
     {
       Dwarf_Off offset = dwarf_dieoffset (&dies[level]);
@@ -6643,8 +6675,11 @@ print_debug_units (Dwfl_Module *dwflmod,
       if (!silent)
 	{
 	  unsigned int code = dwarf_getabbrevcode (dies[level].abbrev);
-	  printf (" [%6" PRIx64 "]  %*s%-20s abbrev: %u\n",
-		  (uint64_t) offset, (int) (level * 2), "",
+	  if (is_split)
+	    printf (" {%6" PRIx64 "}  ", (uint64_t) offset);
+	  else
+	    printf (" [%6" PRIx64 "]  ", (uint64_t) offset);
+	  printf ("%*s%-20s abbrev: %u\n", (int) (level * 2), "",
 		  dwarf_tag_name (tag), code);
 	}
 
@@ -6685,6 +6720,42 @@ print_debug_units (Dwfl_Module *dwflmod,
 	++level;
     }
   while (level >= 0);
+
+  /* We might want to show the split compile unit if this was a skeleton.  */
+  if (!silent && show_split_units && unit_type == DW_UT_skeleton)
+    {
+      Dwarf_Die subdie;
+      if (dwarf_cu_info (cu, NULL, NULL, NULL, &subdie, NULL, NULL, NULL) != 0
+	  || dwarf_tag (&subdie) == DW_TAG_invalid)
+	error (0, 0, gettext ("Could not find split compile unit"));
+      else
+	{
+	  Dwarf_CU *split_cu = subdie.cu;
+	  dwarf_cu_die (split_cu, &result, NULL, &abbroffset,
+			&addrsize, &offsize, &unit_id, &subdie_off);
+	  Dwarf_Off offset = cu->start;
+
+	  printf (gettext (" Split compilation unit at offset %" PRIu64 ":\n"
+			   " Version: %" PRIu16
+			   ", Abbreviation section offset: %" PRIu64
+			   ", Address size: %" PRIu8
+			   ", Offset size: %" PRIu8 "\n"),
+		  (uint64_t) offset, version, abbroffset, addrsize, offsize);
+	  printf (gettext (" Unit type: %s (%" PRIu8 ")"),
+		  dwarf_unit_name (unit_type), unit_type);
+	  printf (", Unit id: 0x%.16" PRIx64 "", unit_id);
+	  printf ("\n");
+
+	  unit_type = DW_UT_split_compile;
+	  is_split = true;
+	  level = 0;
+	  dies[0] = subdie;
+	  args.cu = dies[0].cu;
+	  args.dbg = split_cu->dbg;
+	  args.is_split = is_split;
+	  goto do_cu;
+	}
+    }
 
   /* And again... */
   goto next_cu;

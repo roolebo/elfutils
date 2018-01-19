@@ -1,3 +1,15 @@
+2018-01-19  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (options): Add info+.
+	(show_split_units): New static boolean defaulting to false.
+	(parse_opt): For all (no arg) --debug-dump set show_split_units
+	to yes. For "info+" enable section_info and show_split_units.
+	(attrcb_args): Add is_split field.
+	(attr_callback): Use is_split to format DIE offsets differently.
+	(print_debug_units): Likewise. Get subdie (type or split) only
+	when needed. When not silent reiterate over split DIEs when
+	found.
+
 2018-05-15  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_debug_units): Print unit type and id for any

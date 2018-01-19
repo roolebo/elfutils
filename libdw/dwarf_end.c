@@ -1,5 +1,5 @@
 /* Release debugging handling context.
-   Copyright (C) 2002-2011, 2014 Red Hat, Inc.
+   Copyright (C) 2002-2011, 2014, 2018 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -35,6 +35,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "libdwP.h"
 #include "cfi.h"
@@ -101,6 +102,13 @@ dwarf_end (Dwarf *dwarf)
 	{
 	  cu_free (dwarf->fake_loc_cu);
 	  free (dwarf->fake_loc_cu);
+	}
+
+      /* Did we find and allocate the alt Dwarf ourselves?  */
+      if (dwarf->alt_fd != -1)
+	{
+	  INTUSE(dwarf_end) (dwarf->alt_dwarf);
+	  close (dwarf->alt_fd);
 	}
 
       /* Free the context descriptor.  */

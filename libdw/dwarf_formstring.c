@@ -1,5 +1,5 @@
 /* Return string associated with given attribute.
-   Copyright (C) 2003-2010, 2013 Red Hat, Inc.
+   Copyright (C) 2003-2010, 2013, 2018 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -48,7 +48,8 @@ dwarf_formstring (Dwarf_Attribute *attrp)
     return (const char *) attrp->valp;
 
   Dwarf *dbg = attrp->cu->dbg;
-  Dwarf *dbg_ret = attrp->form == DW_FORM_GNU_strp_alt ? dbg->alt_dwarf : dbg;
+  Dwarf *dbg_ret = (attrp->form == DW_FORM_GNU_strp_alt
+		    ? INTUSE(dwarf_getalt) (dbg) : dbg);
 
   if (unlikely (dbg_ret == NULL))
     {

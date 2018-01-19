@@ -1,5 +1,5 @@
 /* Internal definitions for libdwarf.
-   Copyright (C) 2002-2011, 2013-2017 Red Hat, Inc.
+   Copyright (C) 2002-2011, 2013-2018 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -153,6 +153,10 @@ struct Dwarf
 
   /* If true, we allocated the ELF descriptor ourselves.  */
   bool free_elf;
+
+  /* If >= 0, we allocated the alt_dwarf ourselves and must end it and
+     close this file descriptor.  */
+  int alt_fd;
 
   /* Information for traversing the .debug_pubnames section.  This is
      an array and separately allocated with malloc.  */
@@ -759,6 +763,22 @@ int __libdw_getsrclines (Dwarf *dbg, Dwarf_Off debug_line_offset,
 
 /* Load and return value of DW_AT_comp_dir from CUDIE.  */
 const char *__libdw_getcompdir (Dwarf_Die *cudie);
+
+/* Given a file descriptor, dir and file returns a full path.  If the
+   file is absolute (starts with a /) a copy of file is returned.  If
+   the file isn't absolute, but dir is absolute, then a path that is
+   the concatenation of dir and file is returned.  If neither file,
+   nor dir is absolute, the path will be constructed using dir (if not
+   NULL) and file relative to the path of the given file descriptor
+   (if valid).
+
+   The file descriptor may be -1 and the dir may be NULL (in which
+   case they aren't used). If file is NULL, or no full path can be
+   constructed NULL is returned.
+
+   The caller is responsible for freeing the result if not NULL.  */
+char * filepath (int fd, const char *dir, const char *file)
+  internal_function;
 
 
 /* Aliases to avoid PLTs.  */

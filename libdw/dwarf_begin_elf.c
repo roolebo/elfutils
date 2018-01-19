@@ -1,5 +1,5 @@
 /* Create descriptor from ELF descriptor for processing file.
-   Copyright (C) 2002-2011, 2014, 2015 Red Hat, Inc.
+   Copyright (C) 2002-2011, 2014, 2015, 2018 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -326,6 +326,7 @@ dwarf_begin_elf (Elf *elf, Dwarf_Cmd cmd, Elf_Scn *scngrp)
     result->other_byte_order = true;
 
   result->elf = elf;
+  result->alt_fd = -1;
 
   /* Initialize the memory handling.  */
   result->mem_default_size = mem_default_size;

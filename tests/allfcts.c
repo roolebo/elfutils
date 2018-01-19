@@ -51,7 +51,10 @@ setup_alt (Dwarf *main)
     errx (1, "dwelf_dwarf_gnu_debugaltlink: %s", dwarf_errmsg (-1));
   int fd = open (alt_name, O_RDONLY);
   if (fd < 0)
-    err (1, "open (%s)", alt_name);
+    {
+      printf ("Warning: no alt file found.\n");
+      return NULL;
+    }
   Dwarf *dbg_alt = dwarf_begin (fd, DWARF_C_READ);
   if (dbg_alt == NULL)
     errx (1, "dwarf_begin (%s): %s", alt_name, dwarf_errmsg (-1));

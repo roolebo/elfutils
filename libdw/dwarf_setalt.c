@@ -1,5 +1,5 @@
 /* Provides the data referenced by the .gnu_debugaltlink section.
-   Copyright (C) 2014 Red Hat, Inc.
+   Copyright (C) 2014, 2018 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -32,9 +32,18 @@
 
 #include "libdwP.h"
 
+#include <unistd.h>
+
 void
 dwarf_setalt (Dwarf *main, Dwarf *alt)
 {
+  if (main->alt_fd != -1)
+    {
+      INTUSE(dwarf_end) (main->alt_dwarf);
+      close (main->alt_fd);
+      main->alt_fd = -1;
+    }
+
   main->alt_dwarf = alt;
 }
 INTDEF (dwarf_setalt)

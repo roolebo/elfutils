@@ -1,3 +1,22 @@
+2018-01-22  Mark Wielaard  <mark@klomp.org>
+
+	* Makefile.am (AM_CPPFLAGS): Add -I libdwelf.
+	* dwarf_begin_elf.c (dwarf_begin_elf): Initialize Dwarf alt_fd to -1.
+	* dwarf_end.c (dwarf_end): Call dwarf_end and close on the alt_dwarf
+	and alt_fd if we allocated them.
+	* dwarf_fromref_die.c (dwarf_formref_die): Call dwarf_getalt.
+	* dwarf_formstring.c (dwarf_formstring): Likewise.
+	* dwarf_getalt.c (__libdw_filepath): New internal function.
+	(find_debug_altlink): New static function.
+	(dwarf_getalt): Check Dwarf alt_dwarf and call find_debug_altlink.
+	Cache result.
+	* dwarf_setalt.c (dwarf_setalt): Clean up Dwarf alt_dwarf and alt_fd
+	if we allocated.
+	* libdw.h (dwarf_getalt): Extend documentation.
+	(dwarf_setalt): Likewise.
+	* libdwP.h (struct Dwarf): Add alt_fd field.
+	(filepath): Declare new internal function.
+
 2018-01-14  Petr Machata  <pmachata@gmail.com>
 
 	* dwarf_formsdata.c (dwarf_formsdata):

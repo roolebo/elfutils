@@ -1,3 +1,10 @@
+2018-01-22  Mark Wielaard  <mark@klomp.org>
+
+	* allfcts.c (setup_alt): Print warning when alt file couldn't be
+	found.
+	* run-allfcts-multi.sh: Add testcase where alt file is in a subdir
+	where it cannot be found by allfcts itself (but it can by libdw).
+
 2018-01-25  Mark Wielaard  <mark@klomp.org>
 
 	* elfstrmerge.c (main): Initialize and check symtabshdr instead of

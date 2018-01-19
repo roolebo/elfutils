@@ -1,5 +1,5 @@
 /* Look up the DIE in a reference-form attribute.
-   Copyright (C) 2005-2010 Red Hat, Inc.
+   Copyright (C) 2005-2010, 2018 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -53,7 +53,7 @@ dwarf_formref_die (Dwarf_Attribute *attr, Dwarf_Die *result)
 			  : cu->offset_size);
 
       Dwarf *dbg_ret = (attr->form == DW_FORM_GNU_ref_alt
-			? cu->dbg->alt_dwarf : cu->dbg);
+			? INTUSE(dwarf_getalt) (cu->dbg) : cu->dbg);
 
       if (dbg_ret == NULL)
 	{

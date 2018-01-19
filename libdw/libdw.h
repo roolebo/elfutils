@@ -1,5 +1,5 @@
 /* Interfaces for libdw.
-   Copyright (C) 2002-2010, 2013, 2014, 2016 Red Hat, Inc.
+   Copyright (C) 2002-2010, 2013, 2014, 2016, 2018 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -250,7 +250,9 @@ extern Elf *dwarf_getelf (Dwarf *dwarf);
 extern Dwarf *dwarf_cu_getdwarf (Dwarf_CU *cu);
 
 /* Retrieves the DWARF descriptor for debugaltlink data.  Returns NULL
-   if no alternate debug data has been supplied.  */
+   if no alternate debug data has been supplied yet.  libdw will try
+   to set the alt file on first use of an alt FORM if not yet explicitly
+   provided by dwarf_setalt.  */
 extern Dwarf *dwarf_getalt (Dwarf *main);
 
 /* Provides the data referenced by the .gnu_debugaltlink section.  The
@@ -258,7 +260,9 @@ extern Dwarf *dwarf_getalt (Dwarf *main);
    same build ID).  It is the responsibility of the caller to ensure
    that the data referenced by ALT stays valid while it is used by
    MAIN, until dwarf_setalt is called on MAIN with a different
-   descriptor, or dwarf_end.  */
+   descriptor, or dwarf_end.  Must be called before inspecting DIEs
+   that might have alt FORMs.  Otherwise libdw will try to set the
+   alt file itself on first use.  */
 extern void dwarf_setalt (Dwarf *main, Dwarf *alt);
 
 /* Release debugging handling context.  */

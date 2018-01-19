@@ -53,4 +53,20 @@ testrun_compare cat allfcts.out <<\EOF
 /tmp/test-offset-loop.c:7:main
 EOF
 
+# allfcts has a too simple mechanism for setting the alt file.
+# check that if we don't set it, things still work (because libdw will
+# find the alt file for us).
+mkdir subdir
+mv test-offset-loop test-offset-loop.alt subdir/
+testrun ${abs_builddir}/allfcts subdir/test-offset-loop > allfcts.out
+testrun_compare cat allfcts.out <<\EOF
+Warning: no alt file found.
+/tmp/test-offset-loop.c:6:get_errno
+/tmp/test-offset-loop.c:5:is_error
+/tmp/test-offset-loop.c:4:padding
+/tmp/test-offset-loop.c:7:main
+EOF
+
+rm -rf subdir
+
 exit 0

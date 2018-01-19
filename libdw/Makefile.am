@@ -1,6 +1,6 @@
 ## Process this file with automake to create Makefile.in
 ##
-## Copyright (C) 2002-2010, 2012, 2014, 2016 Red Hat, Inc.
+## Copyright (C) 2002-2010, 2012, 2014, 2016, 2018 Red Hat, Inc.
 ## This file is part of elfutils.
 ##
 ## This file is free software; you can redistribute it and/or modify
@@ -31,7 +31,7 @@ include $(top_srcdir)/config/eu.am
 if BUILD_STATIC
 AM_CFLAGS += $(fpic_CFLAGS)
 endif
-AM_CPPFLAGS += -I$(srcdir)/../libelf
+AM_CPPFLAGS += -I$(srcdir)/../libelf -I$(srcdir)/../libdwelf
 VERSION = 1
 
 lib_LIBRARIES = libdw.a

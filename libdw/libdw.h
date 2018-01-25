@@ -350,6 +350,18 @@ extern Dwarf_Die *dwarf_diecu (Dwarf_Die *die, Dwarf_Die *result,
 			       uint8_t *address_sizep, uint8_t *offset_sizep)
      __nonnull_attribute__ (2);
 
+/* Given a Dwarf_Die addr returns a (reconstructed) Dwarf_Die, or NULL
+   if the given addr didn't come from a valid Dwarf_Die.  In particular
+   it will make sure that the correct Dwarf_CU pointer is set for the
+   Dwarf_Die, the Dwarf_Abbrev pointer will not be set up yet (it will
+   only be once the Dwarf_Die is used to read attributes, children or
+   siblings).  This functions can be used to keep a reference to a
+   Dwarf_Die which you want to refer to later.  The addr, and the result
+   of this function, is only valid while the associated Dwarf is valid.  */
+extern Dwarf_Die *dwarf_die_addr_die (Dwarf *dbg, void *addr,
+				      Dwarf_Die *result)
+     __nonnull_attribute__ (3);
+
 /* Return the CU DIE and the header info associated with a Dwarf_Die
    or Dwarf_Attribute.  A Dwarf_Die or a Dwarf_Attribute is associated
    with a particular Dwarf_CU handle.  This function returns the CU or

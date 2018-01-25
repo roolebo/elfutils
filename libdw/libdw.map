@@ -344,3 +344,8 @@ ELFUTILS_0.170 {
     dwarf_default_lower_bound;
     dwarf_line_file;
 } ELFUTILS_0.167;
+
+ELFUTILS_0.171 {
+  global:
+    dwarf_die_addr_die;
+} ELFUTILS_0.170;

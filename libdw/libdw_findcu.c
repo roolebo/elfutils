@@ -1,5 +1,5 @@
 /* Find CU for given offset.
-   Copyright (C) 2003-2010, 2014 Red Hat, Inc.
+   Copyright (C) 2003-2010, 2014, 2018 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -166,4 +166,37 @@ __libdw_findcu (Dwarf *dbg, Dwarf_Off start, bool debug_types)
 	return newp;
     }
   /* NOTREACHED */
+}
+
+struct Dwarf_CU *
+internal_function
+__libdw_findcu_addr (Dwarf *dbg, void *addr)
+{
+  void **tree;
+  Dwarf_Off start;
+  if (addr >= dbg->sectiondata[IDX_debug_info]->d_buf
+      && addr < (dbg->sectiondata[IDX_debug_info]->d_buf
+		 + dbg->sectiondata[IDX_debug_info]->d_size))
+    {
+      tree = &dbg->cu_tree;
+      start = addr - dbg->sectiondata[IDX_debug_info]->d_buf;
+    }
+  else if (dbg->sectiondata[IDX_debug_types] != NULL
+	   && addr >= dbg->sectiondata[IDX_debug_types]->d_buf
+	   && addr < (dbg->sectiondata[IDX_debug_types]->d_buf
+		      + dbg->sectiondata[IDX_debug_types]->d_size))
+    {
+      tree = &dbg->tu_tree;
+      start = addr - dbg->sectiondata[IDX_debug_types]->d_buf;
+    }
+  else
+    return NULL;
+
+  struct Dwarf_CU fake = { .start = start, .end = 0 };
+  struct Dwarf_CU **found = tfind (&fake, tree, findcu_cb);
+
+  if (found != NULL)
+    return *found;
+
+  return NULL;
 }

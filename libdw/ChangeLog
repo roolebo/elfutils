@@ -1,3 +1,12 @@
+2018-01-25  Mark Wielaard  <mark@klomp.org>
+
+	* Makefile.am (libdw_a_SOURCES): Add dwarf_die_addr_die.c.
+	* dwarf_die_addr_die.c: New file.
+	* libdw.h (dwarf_die_addr_die): New function declaration.
+	* libdw.map (ELFUTILS_0.171): New section with dwarf_die_addr_die.
+	* libdwP.h (__libdw_findcu_addr): New internal function declaration.
+	* libdw_findcu.c (__libdw_findcu_addr): New internal function.
+
 2018-02-09  Joshua Watt  <JPEWhacker@gmail.com>
 
 	* cfi.c (execute_cfi): Use FALLTHROUGH macro instead of comment.

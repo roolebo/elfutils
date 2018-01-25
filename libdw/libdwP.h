@@ -449,6 +449,10 @@ extern struct Dwarf_CU *__libdw_intern_next_unit (Dwarf *dbg, bool debug_types)
 extern struct Dwarf_CU *__libdw_findcu (Dwarf *dbg, Dwarf_Off offset, bool tu)
      __nonnull_attribute__ (1) internal_function;
 
+/* Find CU for given DIE address.  */
+extern struct Dwarf_CU *__libdw_findcu_addr (Dwarf *dbg, void *addr)
+     __nonnull_attribute__ (1) internal_function;
+
 /* Get abbreviation with given code.  */
 extern Dwarf_Abbrev *__libdw_findabbrev (struct Dwarf_CU *cu,
 					 unsigned int code)

@@ -1,3 +1,12 @@
+2018-01-25  Mark Wielaard  <mark@klomp.org>
+
+	* Makefile.am (check_PROGRAMS): Add dwarf-die-addr-die.
+	(TESTS): Add run-dwarf-die-addr-die.sh.
+	(EXTRA_DIST): Likewise.
+	(dwarf_die_addr_die_LDADD): New variable.
+	* dwarf-die-addr-die.c: New file.
+	* run-dwarf-die-addr-die.sh: New test.
+
 2018-02-09  Joshua Watt  <JPEWhacker@gmail.com>
 
 	* elfstrmerge.c (main): Use FALLTHROUGH macro instead of comment.

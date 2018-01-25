@@ -5014,7 +5014,7 @@ print_debug_ranges_section (Dwfl_Module *dwflmod,
   while (readp < endp)
     {
       ptrdiff_t offset = readp - (unsigned char *) data->d_buf;
-      Dwarf_CU *cu;
+      Dwarf_CU *cu = last_cu;
 
       if (first && skip_listptr_hole (&known_rangelistptr, &listptr_idx,
 				      &address_size, NULL, &base, &cu,
@@ -7140,7 +7140,7 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
   while (readp < endp)
     {
       ptrdiff_t offset = readp - (unsigned char *) data->d_buf;
-      Dwarf_CU *cu;
+      Dwarf_CU *cu = last_cu;
 
       if (first && skip_listptr_hole (&known_loclistptr, &listptr_idx,
 				      &address_size, &offset_size, &base,

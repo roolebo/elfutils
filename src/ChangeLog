@@ -1,3 +1,8 @@
+2018-01-25  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (print_debug_ranges_section): Initialize cu to last_cu.
+	(print_debug_loc_section): Likewise.
+
 2018-01-01  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (attr_callback): Use dwarf_form_name for unknown forms.

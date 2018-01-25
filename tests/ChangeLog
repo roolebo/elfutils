@@ -1,3 +1,8 @@
+2018-01-25  Mark Wielaard  <mark@klomp.org>
+
+	* elfstrmerge.c (main): Initialize and check symtabshdr instead of
+	symtabndx.
+
 2018-01-14  Petr Machata  <pmachata@gmail.com>
 
 	* testfile-sizes4.o.bz2: New test file.
@@ -12,9 +17,9 @@
 
 2017-12-11  Dima Kogan  <dima@secretsauce.net>
 
-        * run-aggregate-size.sh: Added check for multi-dimensional arrays.
-        * run-peel-type.sh: Likewise.
-        * testfile-sizes3.o.bz2: Likewise.
+	* run-aggregate-size.sh: Added check for multi-dimensional arrays.
+	* run-peel-type.sh: Likewise.
+	* testfile-sizes3.o.bz2: Likewise.
 
 2017-12-07  Mark Wielaard  <mark@klomp.org>
 

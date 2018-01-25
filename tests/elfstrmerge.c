@@ -195,7 +195,7 @@ main (int argc, char **argv)
   size_t symtabndx = 0;
   Elf_Scn *symtabscn = NULL;
   GElf_Shdr symtabshdr_mem;
-  GElf_Shdr *symtabshdr;
+  GElf_Shdr *symtabshdr = NULL;
   while ((symtabscn = elf_nextscn (elf, symtabscn)) != NULL)
     {
       symtabshdr = gelf_getshdr (symtabscn, &symtabshdr_mem);
@@ -210,7 +210,7 @@ main (int argc, char **argv)
 	}
     }
 
-  if (symtabndx == 0)
+  if (symtabshdr == NULL)
     fail ("No symtab found", fname);
 
   if ((symtabshdr->sh_flags & SHF_ALLOC) != 0)

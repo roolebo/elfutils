@@ -73,27 +73,38 @@ dwarf_formref_die (Dwarf_Attribute *attr, Dwarf_Die *result)
   if (attr->form == DW_FORM_ref_sig8)
     {
       /* This doesn't have an offset, but instead a value we
-	 have to match in the .debug_types type unit headers.  */
+	 have to match in the type unit headers.  */
 
       uint64_t sig = read_8ubyte_unaligned (cu->dbg, attr->valp);
       cu = Dwarf_Sig8_Hash_find (&cu->dbg->sig8_hash, sig, NULL);
       if (cu == NULL)
-	/* Not seen before.  We have to scan through the type units.  */
-	do
-	  {
-	    cu = __libdw_intern_next_unit (attr->cu->dbg, true);
-	    if (cu == NULL)
-	      {
-		__libdw_seterrno (INTUSE(dwarf_errno) ()
-				  ?: DWARF_E_INVALID_REFERENCE);
-		return NULL;
-	      }
-	  }
-	while (cu->type_sig8 != sig);
+	{
+	  /* Not seen before.  We have to scan through the type units.
+	     Since DWARFv5 these can (also) be found in .debug_info,
+	     so scan that first.  */
+	  bool scan_debug_types = false;
+	  do
+	    {
+	      cu = __libdw_intern_next_unit (attr->cu->dbg, scan_debug_types);
+	      if (cu == NULL)
+		{
+		  if (scan_debug_types == false)
+		    scan_debug_types = true;
+		  else
+		    {
+		      __libdw_seterrno (INTUSE(dwarf_errno) ()
+					?: DWARF_E_INVALID_REFERENCE);
+		      return NULL;
+		    }
+		}
+	    }
+	  while (cu == NULL || cu->unit_id8 != sig);
+	}
 
-      datap = cu->dbg->sectiondata[IDX_debug_types]->d_buf;
-      size = cu->dbg->sectiondata[IDX_debug_types]->d_size;
-      offset = cu->start + cu->type_offset;
+      int secid = cu_sec_idx (cu);
+      datap = cu->dbg->sectiondata[secid]->d_buf;
+      size = cu->dbg->sectiondata[secid]->d_size;
+      offset = cu->start + cu->subdie_offset;
     }
   else
     {

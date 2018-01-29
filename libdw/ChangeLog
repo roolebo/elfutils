@@ -1,3 +1,39 @@
+2018-01-29  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf.h (DW_UT_*): Add DWARF Unit Header Types.
+	* dwarf_cu_die.c (dwarf_cu_die): Rename arguments. type_signaturep
+	is now called unit_idp. type_offsetp is now called subdie_offsetp.
+	* dwarf_formref_die.c (dwarf_formref_die): Scan both .debug_info
+	and .debug_types sections for type units when type signature ref
+	not found.
+	* dwarf_getaranges.c (dwarf_getaranges): Use __libdw_findcu and
+	__libdw_first_die_off_from_cu instead of trying by hand.
+	* dwarf_getlocation_die.c (dwarf_getlocation_die): Use ISV4TU
+	instead of checking type_offset by hand.
+	* dwarf_getlocation_implicit_pointer.c
+	(dwarf_getlocation_implicit_pointer): Likewise.
+	* dwarf_nextcu.c (dwarf_next_unit): Call __libdw_next_unit.
+	(__libdw_next_unit): New function based on dwarf_next_unit with
+	DWARF5 header support.
+	* libdwP.h (struct Dwarf_CU): Renamed type_offset to subdie_offset
+	and type_sig8 to unit_id8.
+	(ISV4TU): New macro to determine whether a CU is a version 4 type
+	unit (which comes from the .debug_types section).
+	(DIE_OFFSET_FROM_CU_OFFSET): Replaced macro by real function...
+	(__libdw_first_die_from_cu_start): ... that also handles DWARF5
+	unit headers.
+	(__libdw_first_die_off_from_cu): New function that calls the above
+	using the CU fields.
+	(CUDIE): Use __libdw_first_die_off_from_cu.
+	(SUBDIE): New macro that provides the DIE for a CU using the
+	subdie_offset.
+	(__libdw_next_unit): New internal function declaration.
+	* libdw_findcu.c (__libdw_intern_next_unit): Use __libdw_next_unit.
+	Accept DWARF version 5 headers. Setup unit_type.
+	(__libdw_findcu): Rename debug_types argument to v4_debug_types
+	argument (to indicate that we are looking in the .debug_types
+	section). Support finding the exact offset (unit header start).
+
 2018-01-25  Mark Wielaard  <mark@klomp.org>
 
 	* Makefile.am (libdw_a_SOURCES): Add dwarf_die_addr_die.c.

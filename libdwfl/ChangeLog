@@ -1,3 +1,10 @@
+2018-01-29  Mark Wielaard  <mark@klomp.org>
+
+	* cu.c (cudie_offset): Use __libdw_first_die_off_from_cu instead of
+	DIE_OFFSET_FROM_CU_OFFSET.
+	(intern_cu): Simply use a copy of the given die CU as key instead of
+	trying to construct a dummy one by hand.
+
 2018-02-15  Mark Wielaard  <mark@klomp.org>
 
 	* linux-pid-attach.c: Include sys/wait.h after sys/ptrace.h.

@@ -1,5 +1,5 @@
 /* This file defines standard DWARF types, structures, and macros.
-   Copyright (C) 2000-2011, 2014, 2016, 2017 Red Hat, Inc.
+   Copyright (C) 2000-2011, 2014, 2016, 2017, 2018 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -28,6 +28,20 @@
 
 #ifndef _DWARF_H
 #define	_DWARF_H 1
+
+/* DWARF Unit Header Types.  */
+enum
+  {
+    DW_UT_compile = 0x01,
+    DW_UT_type = 0x02,
+    DW_UT_partial = 0x03,
+    DW_UT_skeleton = 0x04,
+    DW_UT_split_compile = 0x05,
+    DW_UT_split_type = 0x06,
+
+    DW_UT_lo_user = 0x80,
+    DW_UT_hi_user = 0xff
+  };
 
 /* DWARF tags.  */
 enum

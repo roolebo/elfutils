@@ -1,5 +1,5 @@
 /* Find CU for given offset.
-   Copyright (C) 2003-2010, 2014, 2018 Red Hat, Inc.
+   Copyright (C) 2003-2010, 2014, 2016, 2017, 2018 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -71,22 +71,24 @@ __libdw_intern_next_unit (Dwarf *dbg, bool debug_types)
 
   Dwarf_Off oldoff = *offsetp;
   uint16_t version;
+  uint8_t unit_type;
   uint8_t address_size;
   uint8_t offset_size;
   Dwarf_Off abbrev_offset;
-  uint64_t type_sig8 = 0;
-  Dwarf_Off type_offset = 0;
+  uint64_t unit_id8;
+  Dwarf_Off subdie_offset;
 
-  if (INTUSE(dwarf_next_unit) (dbg, oldoff, offsetp, NULL,
-			       &version, &abbrev_offset,
-			       &address_size, &offset_size,
-			       debug_types ? &type_sig8 : NULL,
-			       debug_types ? &type_offset : NULL) != 0)
+  if (__libdw_next_unit (dbg, debug_types, oldoff, offsetp, NULL,
+			 &version, &unit_type, &abbrev_offset,
+			 &address_size, &offset_size,
+			 &unit_id8, &subdie_offset) != 0)
     /* No more entries.  */
     return NULL;
 
-  /* We only know how to handle the DWARF version 2 through 4 formats.  */
-  if (unlikely (version < 2) || unlikely (version > 4))
+  /* We only know how to handle the DWARF version 2 through 5 formats.
+     For v4 debug types we only handle version 4. */
+  if (unlikely (version < 2) || unlikely (version > 5)
+      || (debug_types && unlikely (version != 4)))
     {
       __libdw_seterrno (DWARF_E_INVALID_DWARF);
       return NULL;
@@ -108,18 +110,40 @@ __libdw_intern_next_unit (Dwarf *dbg, bool debug_types)
   newp->address_size = address_size;
   newp->offset_size = offset_size;
   newp->version = version;
-  newp->type_sig8 = type_sig8;
-  newp->type_offset = type_offset;
+  newp->unit_id8 = unit_id8;
+  newp->subdie_offset = subdie_offset;
   Dwarf_Abbrev_Hash_init (&newp->abbrev_hash, 41);
   newp->orig_abbrev_offset = newp->last_abbrev_offset = abbrev_offset;
   newp->lines = NULL;
   newp->locs = NULL;
 
-  if (debug_types)
-    Dwarf_Sig8_Hash_insert (&dbg->sig8_hash, type_sig8, newp);
-
   newp->startp = data->d_buf + newp->start;
   newp->endp = data->d_buf + newp->end;
+
+  /* v4 debug type units have version == 4 and unit_type == 1.  */
+  if (debug_types)
+    newp->unit_type = DW_UT_type;
+  else if (version < 5)
+    {
+      /* This is a reasonable guess (and needed to get the CUDIE).  */
+      newp->unit_type = DW_UT_compile;
+
+      /* But set it correctly from the actual CUDIE tag.  */
+      Dwarf_Die cudie = CUDIE (newp);
+      int tag = dwarf_tag (&cudie);
+      if (tag == DW_TAG_compile_unit)
+	newp->unit_type = DW_UT_compile;
+      else if (tag == DW_TAG_partial_unit)
+	newp->unit_type = DW_UT_partial;
+      else if (tag == DW_TAG_type_unit)
+	newp->unit_type = DW_UT_type;
+    }
+  else
+    newp->unit_type = unit_type;
+
+  /* Store a reference to any type unit ids in the hash for quick lookup.  */
+  if (unit_type == DW_UT_type || unit_type == DW_UT_split_type)
+    Dwarf_Sig8_Hash_insert (&dbg->sig8_hash, unit_id8, newp);
 
   /* Add the new entry to the search tree.  */
   if (tsearch (newp, tree, findcu_cb) == NULL)
@@ -135,11 +159,11 @@ __libdw_intern_next_unit (Dwarf *dbg, bool debug_types)
 
 struct Dwarf_CU *
 internal_function
-__libdw_findcu (Dwarf *dbg, Dwarf_Off start, bool debug_types)
+__libdw_findcu (Dwarf *dbg, Dwarf_Off start, bool v4_debug_types)
 {
-  void **tree = debug_types ? &dbg->tu_tree : &dbg->cu_tree;
+  void **tree = v4_debug_types ? &dbg->tu_tree : &dbg->cu_tree;
   Dwarf_Off *next_offset
-    = debug_types ? &dbg->next_tu_offset : &dbg->next_cu_offset;
+    = v4_debug_types ? &dbg->next_tu_offset : &dbg->next_cu_offset;
 
   /* Maybe we already know that CU.  */
   struct Dwarf_CU fake = { .start = start, .end = 0 };
@@ -156,13 +180,12 @@ __libdw_findcu (Dwarf *dbg, Dwarf_Off start, bool debug_types)
   /* No.  Then read more CUs.  */
   while (1)
     {
-      struct Dwarf_CU *newp = __libdw_intern_next_unit (dbg, debug_types);
+      struct Dwarf_CU *newp = __libdw_intern_next_unit (dbg, v4_debug_types);
       if (newp == NULL)
 	return NULL;
 
       /* Is this the one we are looking for?  */
-      if (start < *next_offset)
-	// XXX Match exact offset.
+      if (start < *next_offset || start == newp->start)
 	return newp;
     }
   /* NOTREACHED */

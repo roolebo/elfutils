@@ -1,5 +1,5 @@
 /* Return list address ranges.
-   Copyright (C) 2000-2010 Red Hat, Inc.
+   Copyright (C) 2000-2010, 2016, 2017 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -195,16 +195,10 @@ dwarf_getaranges (Dwarf *dbg, Dwarf_Aranges **aranges, size_t *naranges)
 	  new_arange->arange.length = range_length;
 
 	  /* We store the actual CU DIE offset, not the CU header offset.  */
-	  const char *cu_header = (dbg->sectiondata[IDX_debug_info]->d_buf
-				   + offset);
-	  unsigned int offset_size;
-	  if (read_4ubyte_unaligned_noncvt (cu_header) == DWARF3_LENGTH_64_BIT)
-	    offset_size = 8;
-	  else
-	    offset_size = 4;
-	  new_arange->arange.offset = DIE_OFFSET_FROM_CU_OFFSET (offset,
-								 offset_size,
-								 false);
+	  Dwarf_CU *cu = __libdw_findcu (dbg, offset, false);
+	  if (unlikely (cu == NULL))
+	    goto fail;
+	  new_arange->arange.offset = __libdw_first_die_off_from_cu (cu);
 
 	  new_arange->next = arangelist;
 	  arangelist = new_arange;

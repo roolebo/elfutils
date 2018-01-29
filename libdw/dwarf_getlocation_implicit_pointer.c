@@ -63,7 +63,7 @@ dwarf_getlocation_implicit_pointer (Dwarf_Attribute *attr, const Dwarf_Op *op,
 
   Dwarf_Die die;
   if (__libdw_offdie (attr->cu->dbg, op->number, &die,
-		      attr->cu->type_offset != 0) == NULL)
+		      ISV4TU(attr->cu)) == NULL)
     return -1;
 
   if (INTUSE(dwarf_attr) (&die, DW_AT_location, result) == NULL

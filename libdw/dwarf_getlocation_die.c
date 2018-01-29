@@ -69,7 +69,7 @@ dwarf_getlocation_die (Dwarf_Attribute *attr, const Dwarf_Op *op,
     }
 
   if (__libdw_offdie (attr->cu->dbg, dieoff, result,
-                     attr->cu->type_offset != 0) == NULL)
+		      ISV4TU(attr->cu)) == NULL)
     return -1;
 
   return 0;

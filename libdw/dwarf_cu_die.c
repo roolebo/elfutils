@@ -37,8 +37,8 @@
 Dwarf_Die *
 dwarf_cu_die (Dwarf_CU *cu, Dwarf_Die *result, Dwarf_Half *versionp,
 	      Dwarf_Off *abbrev_offsetp, uint8_t *address_sizep,
-	      uint8_t *offset_sizep, uint64_t *type_signaturep,
-	      Dwarf_Off *type_offsetp)
+	      uint8_t *offset_sizep, uint64_t *unit_idp,
+	      Dwarf_Off *subdie_offsetp)
 {
   if (cu == NULL)
     return NULL;
@@ -53,10 +53,10 @@ dwarf_cu_die (Dwarf_CU *cu, Dwarf_Die *result, Dwarf_Half *versionp,
     *address_sizep = cu->address_size;
   if (offset_sizep != NULL)
     *offset_sizep = cu->offset_size;
-  if (type_signaturep != NULL)
-    *type_signaturep = cu->type_sig8;
-  if (type_offsetp != NULL)
-    *type_offsetp = cu->type_offset;
+  if (unit_idp != NULL)
+    *unit_idp = cu->unit_id8;
+  if (subdie_offsetp != NULL)
+    *subdie_offsetp = cu->subdie_offset;
 
   return result;
 }

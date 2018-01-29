@@ -1,5 +1,5 @@
 /* Keeping track of DWARF compilation units in libdwfl.
-   Copyright (C) 2005-2010, 2015 Red Hat, Inc.
+   Copyright (C) 2005-2010, 2015, 2016, 2017 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -155,12 +155,7 @@ less_lazy (Dwfl_Module *mod)
 static inline Dwarf_Off
 cudie_offset (const struct dwfl_cu *cu)
 {
-  /* These are real CUs, so there never is a type_sig8.  Note
-     initialization of dwkey.start and offset_size in intern_cu ()
-     to see why this calculates the same value for both key and
-     die.cu search items.  */
-  return DIE_OFFSET_FROM_CU_OFFSET (cu->die.cu->start, cu->die.cu->offset_size,
-				    0);
+  return __libdw_first_die_off_from_cu (cu->die.cu);
 }
 
 static int
@@ -198,11 +193,8 @@ intern_cu (Dwfl_Module *mod, Dwarf_Off cuoff, struct dwfl_cu **result)
   if (die == NULL)
     return DWFL_E_LIBDW;
 
-  struct Dwarf_CU dwkey;
   struct dwfl_cu key;
-  key.die.cu = &dwkey;
-  dwkey.offset_size = 0;
-  dwkey.start = cuoff - (3 * 0 - 4 + 3);
+  key.die.cu = die->cu;
   struct dwfl_cu **found = tsearch (&key, &mod->lazy_cu_root, &compare_cukey);
   if (unlikely (found == NULL))
     return DWFL_E_NOMEM;

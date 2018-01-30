@@ -1,3 +1,10 @@
+2018-01-30  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (dwarf_unit_string): New function.
+	(dwarf_unit_name): Likewise.
+	(print_debug_units): Use dwarf_get_units and dwarf_cu_die instead
+	of dwarf_next_unit. Print unit type, id and subdie if available.
+
 2018-02-09  Joshua Watt  <JPEWhacker@gmail.com>
 
 	* addr2line.c (handle_address): Use FALLTHROUGH macro instead of

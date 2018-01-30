@@ -3950,6 +3950,20 @@ dwarf_locexpr_opcode_string (unsigned int code)
 }
 
 
+static const char *
+dwarf_unit_string (unsigned int type)
+{
+  switch (type)
+    {
+#define DWARF_ONE_KNOWN_DW_UT(NAME, CODE) case CODE: return #NAME;
+      DWARF_ALL_KNOWN_DW_UT
+#undef DWARF_ONE_KNOWN_DW_UT
+    default:
+      return NULL;
+    }
+}
+
+
 /* Used by all dwarf_foo_name functions.  */
 static const char *
 string_or_unknown (const char *known, unsigned int code,
@@ -4086,6 +4100,14 @@ dwarf_discr_list_name (unsigned int code)
 {
   const char *ret = dwarf_discr_list_string (code);
   return string_or_unknown (ret, code, 0, 0, false);
+}
+
+
+static const char *
+dwarf_unit_name (unsigned int type)
+{
+  const char *ret = dwarf_unit_string (type);
+  return string_or_unknown (ret, type, DW_UT_lo_user, DW_UT_hi_user, true);
 }
 
 
@@ -6336,41 +6358,102 @@ print_debug_units (Dwfl_Module *dwflmod,
   int maxdies = 20;
   Dwarf_Die *dies = (Dwarf_Die *) xmalloc (maxdies * sizeof (Dwarf_Die));
 
-  Dwarf_Off offset = 0;
-
   /* New compilation unit.  */
-  size_t cuhl;
   Dwarf_Half version;
+
+  Dwarf_Die result;
   Dwarf_Off abbroffset;
   uint8_t addrsize;
   uint8_t offsize;
-  Dwarf_Off nextcu;
-  uint64_t typesig;
-  Dwarf_Off typeoff;
+  uint64_t unit_id;
+  Dwarf_Off subdie_off;
+
+  int unit_res;
+  Dwarf_CU *cu;
+  Dwarf_CU cu_mem;
+  uint8_t unit_type;
+  Dwarf_Die cudie;
+  Dwarf_Die subdie;
+
+  /* We cheat a little because we want to see only the CUs from .debug_info
+     or .debug_types.  We know the Dwarf_CU struct layout.  Set it up at
+     the end of .debug_info if we want .debug_types only.  Check the returned
+     Dwarf_CU is still in the expected section.  */
+  if (debug_types)
+    {
+      cu_mem.dbg = dbg;
+      cu_mem.end = dbg->sectiondata[IDX_debug_info]->d_size;
+      cu_mem.sec_idx = IDX_debug_info;
+      cu = &cu_mem;
+    }
+  else
+    cu = NULL;
+
  next_cu:
-  if (dwarf_next_unit (dbg, offset, &nextcu, &cuhl, &version,
-		       &abbroffset, &addrsize, &offsize,
-		       debug_types ? &typesig : NULL,
-		       debug_types ? &typeoff : NULL) != 0)
+  unit_res = dwarf_get_units (dbg, cu, &cu, &version, &unit_type,
+			      &cudie, &subdie);
+  if (unit_res == 1)
     goto do_return;
+
+  if (unit_res == -1)
+    {
+      if (!silent)
+	error (0, 0, gettext ("cannot get next unit: %s"), dwarf_errmsg (-1));
+      goto do_return;
+    }
+
+  if (cu->sec_idx != (size_t) (debug_types ? IDX_debug_types : IDX_debug_info))
+    goto do_return;
+
+  dwarf_cu_die (cu, &result, NULL, &abbroffset, &addrsize, &offsize,
+		&unit_id, &subdie_off);
 
   if (!silent)
     {
-      if (debug_types)
+      Dwarf_Off offset = cu->start;
+      if (debug_types && version < 5)
 	printf (gettext (" Type unit at offset %" PRIu64 ":\n"
 			 " Version: %" PRIu16 ", Abbreviation section offset: %"
 			 PRIu64 ", Address size: %" PRIu8
 			 ", Offset size: %" PRIu8
 			 "\n Type signature: %#" PRIx64
-			 ", Type offset: %#" PRIx64 "\n"),
+			 ", Type offset: %#" PRIx64 " [%" PRIx64 "]\n"),
 		(uint64_t) offset, version, abbroffset, addrsize, offsize,
-		typesig, (uint64_t) typeoff);
+		unit_id, (uint64_t) subdie_off, dwarf_dieoffset (&subdie));
       else
-	printf (gettext (" Compilation unit at offset %" PRIu64 ":\n"
-			 " Version: %" PRIu16 ", Abbreviation section offset: %"
-			 PRIu64 ", Address size: %" PRIu8
-			 ", Offset size: %" PRIu8 "\n"),
-		(uint64_t) offset, version, abbroffset, addrsize, offsize);
+	{
+	  printf (gettext (" Compilation unit at offset %" PRIu64 ":\n"
+			   " Version: %" PRIu16
+			   ", Abbreviation section offset: %" PRIu64
+			   ", Address size: %" PRIu8
+			   ", Offset size: %" PRIu8 "\n"),
+		  (uint64_t) offset, version, abbroffset, addrsize, offsize);
+
+	  if (version >= 5)
+	    {
+	      printf (gettext (" Unit type: %s (%" PRIu8 ")"),
+			       dwarf_unit_name (unit_type), unit_type);
+	      if (unit_type == DW_UT_type
+		  || unit_type == DW_UT_skeleton
+		  || unit_type == DW_UT_split_compile
+		  || unit_type == DW_UT_split_type)
+		printf (", Unit id: 0x%.16" PRIx64 "", unit_id);
+	      if (unit_type == DW_UT_type
+		  || unit_type == DW_UT_split_type)
+		printf (", Unit DIE off: %#" PRIx64 " [%" PRIx64 "]",
+			subdie_off, dwarf_dieoffset (&subdie));
+	      printf ("\n");
+	    }
+	}
+    }
+
+  if (version < 2 || version > 5
+      || unit_type < DW_UT_compile || unit_type > DW_UT_split_type)
+    {
+      if (!silent)
+	error (0, 0, gettext ("unknown version (%d) or unit type (%d)"),
+	       version, unit_type);
+      goto next_cu;
     }
 
   struct attrcb_args args =
@@ -6383,25 +6466,13 @@ print_debug_units (Dwfl_Module *dwflmod,
       .offset_size = offsize
     };
 
-  offset += cuhl;
-
   int level = 0;
-
-  if (unlikely ((debug_types ? dwarf_offdie_types : dwarf_offdie)
-		(dbg, offset, &dies[level]) == NULL))
-    {
-      if (!silent)
-	error (0, 0, gettext ("cannot get DIE at offset %" PRIu64
-			      " in section '%s': %s"),
-	       (uint64_t) offset, secname, dwarf_errmsg (-1));
-      goto do_return;
-    }
-
+  dies[0] = cudie;
   args.cu = dies[0].cu;
 
   do
     {
-      offset = dwarf_dieoffset (&dies[level]);
+      Dwarf_Off offset = dwarf_dieoffset (&dies[level]);
       if (unlikely (offset == ~0ul))
 	{
 	  if (!silent)
@@ -6466,9 +6537,8 @@ print_debug_units (Dwfl_Module *dwflmod,
     }
   while (level >= 0);
 
-  offset = nextcu;
-  if (offset != 0)
-     goto next_cu;
+  /* And again... */
+  goto next_cu;
 
  do_return:
   free (dies);

@@ -348,4 +348,5 @@ ELFUTILS_0.170 {
 ELFUTILS_0.171 {
   global:
     dwarf_die_addr_die;
+    dwarf_get_units;
 } ELFUTILS_0.170;

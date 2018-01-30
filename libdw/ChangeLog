@@ -1,3 +1,10 @@
+2018-01-30  Mark Wielaard  <mark@klomp.org>
+
+	* Makefile.am (libdw_a_SOURCES): Add dwarf_get_units.c.
+	* dwarf_get_units.c: New file.
+	* libdw.h (dwarf_get_units): New function declaration.
+	* libdw.map (ELFUTILS_0.170): Add dwarf_get_units.
+
 2018-01-29  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf.h (DW_UT_*): Add DWARF Unit Header Types.

@@ -232,7 +232,7 @@ __elfw2(LIBELFBITS,updatenull_wrlock) (Elf *elf, int *change_bop, size_t shnum)
 		      __libelf_seterrno (ELF_E_GROUP_NOT_REL);
 		      return -1;
 		    }
-		  /* FALLTHROUGH */
+		  FALLTHROUGH;
 		case SHT_SYMTAB_SHNDX:
 		  sh_entsize = elf_typesize (32, ELF_T_WORD, 1);
 		  break;

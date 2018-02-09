@@ -1,3 +1,25 @@
+2018-02-09  Joshua Watt  <JPEWhacker@gmail.com>
+
+	* aarch64_retval.c (aarch64_return_value_location): Use FALLTHROUGH
+	macro instead of comment.
+	* alpha_retval.c (alpha_return_value_location): Likewise.
+	* arm_regs.c (arm_register_info): Likewise.
+	* arm_retval.c (arm_return_value_location): Likewise.
+	* i386_regs.c (i386_register_info): Likewise.
+	* i386_retval.c (i386_return_value_location): Likewise.
+	* ia64_retval.c (ia64_return_value_location): Likewise.
+	* linux-core-note.c (core_note): Likewise.
+	* m68k_retval.c (m68k_return_value_location): Likewise.
+	* ppc64_retval.c (ppc64_return_value_location): Likewise.
+	* ppc_regs.c (ppc_register_info): Likewise.
+	* ppc_retval.c (ppc_return_value_location): Likewise.
+	* s390_retval.c (s390_return_value_location): Likewise.
+	* sh_retval.c (sh_return_value_location): Likewise.
+	* sparc_retval.c (sparc_return_value_location): Likewise.
+	* tilegx_retval.c (tilegx_return_value_location): Likewise.
+	* x86_64_regs.c (x86_64_register_info): Likewise.
+	* x86_64_retval.c (x86_64_return_value_location): Likewise.
+
 2017-10-24  Mark Wielaard  <mark@klomp.org>
 
 	* Makefile.am (m68k_corenote_no_Wpacked_not_aligned): New variable.

@@ -198,5 +198,12 @@ asm (".section predict_data, \"aw\"; .previous\n"
 # define COMPAT_VERSION(name, version, prefix) error "should use #ifdef SYMBOL_VERSIONING"
 #endif
 
+#ifndef FALLTHROUGH
+# ifdef HAVE_FALLTHROUGH
+#  define FALLTHROUGH __attribute__ ((fallthrough))
+# else
+#  define FALLTHROUGH ((void) 0)
+# endif
+#endif
 
 #endif	/* eu-config.h */

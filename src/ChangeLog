@@ -1,3 +1,18 @@
+2018-02-09  Joshua Watt  <JPEWhacker@gmail.com>
+
+	* addr2line.c (handle_address): Use FALLTHROUGH macro instead of
+	comment.
+	* elfcompress.c (parse_opt): Likewise.
+	* elflint.c (check_dynamic): Likewise.
+	(check_sections): Likewise.
+	(check_note_data): Likewise.
+	* objdump.c (parse_opt): Likewise.
+	* readelf.c (parse_opt): Likewise.
+	(attr_callback): Likewise.
+	(handle_auxv_note): Likewise.
+	* strings.c (parse_opt): Likewise.
+	* backtrace.c (callback_verify): Likewise.
+
 2018-01-25  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_debug_ranges_section): Initialize cu to last_cu.

@@ -223,7 +223,7 @@ ebl_object_note (Ebl *ebl, const char *name, uint32_t type,
 		free (buf);
 	      break;
 	    }
-	  /* FALLTHROUGH */
+	  FALLTHROUGH;
 
 	default:
 	  /* Unknown type.  */

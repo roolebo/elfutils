@@ -292,7 +292,7 @@ aarch64_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
 	  assert (count > 0);
 	  if (count <= 4)
 	    return pass_hfa (locp, base_size, count);
-	  /* Fall through.  */
+	  FALLTHROUGH;
 
 	case 1:
 	  /* Not a HFA.  */

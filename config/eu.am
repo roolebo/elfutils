@@ -62,7 +62,9 @@ NULL_DEREFERENCE_WARNING=
 endif
 
 if HAVE_IMPLICIT_FALLTHROUGH_WARNING
-IMPLICIT_FALLTHROUGH_WARNING=-Wimplicit-fallthrough
+# Use strict fallthrough. Only __attribute__((fallthrough)) will prevent the
+# warning
+IMPLICIT_FALLTHROUGH_WARNING=-Wimplicit-fallthrough=5
 else
 IMPLICIT_FALLTHROUGH_WARNING=
 endif

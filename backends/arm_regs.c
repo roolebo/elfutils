@@ -77,7 +77,7 @@ arm_register_info (Ebl *ebl __attribute__ ((unused)),
 
     case 16 + 0 ... 16 + 7:
       regno += 96 - 16;
-      /* Fall through.  */
+      FALLTHROUGH;
     case 96 + 0 ... 96 + 7:
       *setname = "FPA";
       *type = DW_ATE_float;

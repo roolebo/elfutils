@@ -1,3 +1,11 @@
+2018-02-09  Joshua Watt  <JPEWhacker@gmail.com>
+
+	* elf32_updatenull.c (updatenull_wrlock): Use FALLTHROUGH macro
+	instead of comment.
+	* elf_begin.c (read_unmmaped_file): Likewise.
+	(elf_begin): Likewise.
+	* elf_cntl.c (elf_cntl): Likewise.
+
 2017-10-04  Mark Wielaard  <mark@klomp.org>
 
 	* elf_begin.c (file_read_elf): Skip sanity checking e_shoff if scncnt

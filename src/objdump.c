@@ -223,7 +223,7 @@ parse_opt (int key, char *arg,
 	}
       /* We only use this for checking the number of arguments, we don't
 	 actually want to consume them.  */
-      /* Fallthrough */
+      FALLTHROUGH;
     default:
       return ARGP_ERR_UNKNOWN;
     }

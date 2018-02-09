@@ -127,7 +127,7 @@ callback_verify (pid_t tid, unsigned frameno, Dwarf_Addr pc,
 	  assert (symname2 == NULL || strcmp (symname2, "jmp") != 0);
 	  break;
 	}
-      /* FALLTHRU */
+      FALLTHROUGH;
     case 4:
       /* Some simple frame unwinders get this wrong and think sigusr2
 	 is calling itself again. Allow it and just pretend there is

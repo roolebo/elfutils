@@ -174,7 +174,7 @@ __libdwfl_elf_address_range (Elf *elf, GElf_Addr base, bool add_p_vaddr,
       /* An assigned base address is meaningless for these.  */
       base = 0;
       add_p_vaddr = true;
-      /* Fallthrough. */
+      FALLTHROUGH;
     case ET_DYN:
     default:;
       size_t phnum;

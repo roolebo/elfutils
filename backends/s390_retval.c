@@ -87,7 +87,7 @@ s390_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
 	  typedie = dwarf_formref_die (attr, &die_mem);
 	  tag = DWARF_TAG_OR_RETURN (typedie);
 	}
-      /* Fall through.  */
+      FALLTHROUGH;
 
     case DW_TAG_base_type:
     case DW_TAG_enumeration_type:
@@ -127,7 +127,7 @@ s390_return_value_location (Dwarf_Die *functypedie, const Dwarf_Op **locp)
 	    return size <= asize ? nloc_intreg : nloc_intregpair;
 	  }
       }
-      /* Fall through.  */
+      FALLTHROUGH;
 
     case DW_TAG_structure_type:
     case DW_TAG_class_type:

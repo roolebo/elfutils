@@ -456,6 +456,12 @@ CFLAGS="$old_CFLAGS"])
 AM_CONDITIONAL(HAVE_IMPLICIT_FALLTHROUGH_WARNING,
 	       [test "x$ac_cv_implicit_fallthrough" != "xno"])
 
+# Assume the fallthrough attribute is supported if -Wimplict-fallthrough is supported
+if test "$ac_cv_implicit_fallthrough" = "yes"; then
+	AC_DEFINE([HAVE_FALLTHROUGH], [1],
+		  [Defined if __attribute__((fallthrough)) is supported])
+fi
+
 dnl Check if we have argp available from our libc
 AC_LINK_IFELSE(
 	[AC_LANG_PROGRAM(

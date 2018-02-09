@@ -442,7 +442,7 @@ expr_eval (Dwfl_Frame *state, Dwarf_Frame *frame, const Dwarf_Op *ops,
 	    }
 	  if (val1 == 0)
 	    break;
-	  /* FALLTHRU */
+	  FALLTHROUGH;
 	case DW_OP_skip:;
 	  Dwarf_Word offset = op->offset + 1 + 2 + (int16_t) op->number;
 	  const Dwarf_Op *found = bsearch ((void *) (uintptr_t) offset, ops, nops,

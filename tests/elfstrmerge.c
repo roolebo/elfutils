@@ -578,7 +578,8 @@ main (int argc, char **argv)
 	      break;
 
 	    case SHT_DYNAMIC:
-	      /* Fallthrough.  There are string indexes in here, but
+	      FALLTHROUGH;
+	      /* There are string indexes in here, but
 		 they (should) point to a allocated string table,
 		 which we don't alter.  */
 	    default:

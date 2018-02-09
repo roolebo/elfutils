@@ -611,7 +611,7 @@ read_unmmaped_file (int fildes, off_t offset, size_t maxsize, Elf_Cmd cmd,
 			     ? sizeof (Elf32_Ehdr) : sizeof (Elf64_Ehdr)))
 	return file_read_elf (fildes, NULL, mem.header, offset, maxsize, cmd,
 			      parent);
-      /* FALLTHROUGH */
+      FALLTHROUGH;
 
     default:
       break;
@@ -1126,7 +1126,7 @@ elf_begin (int fildes, Elf_Cmd cmd, Elf *ref)
 	  retval = NULL;
 	  break;
 	}
-      /* FALLTHROUGH */
+      FALLTHROUGH;
 
     case ELF_C_READ:
     case ELF_C_READ_MMAP:

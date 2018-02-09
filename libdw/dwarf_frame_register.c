@@ -62,7 +62,7 @@ dwarf_frame_register (Dwarf_Frame *fs, int regno, Dwarf_Op *ops_mem,
       /* Use the default rule for registers not yet mentioned in CFI.  */
       if (fs->cache->default_same_value)
 	goto same_value;
-      /*FALLTHROUGH*/
+      FALLTHROUGH;
     case reg_undefined:
       /* The value is known to be unavailable.  */
       break;

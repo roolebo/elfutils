@@ -138,7 +138,7 @@ execute_cfi (Dwarf_CFI *cache,
 
 	case DW_CFA_advance_loc1:
 	  operand = *program++;
-	  /* Fallthrough */
+	  FALLTHROUGH;
 	case DW_CFA_advance_loc + 0 ... DW_CFA_advance_loc + CFI_PRIMARY_MAX:
 	advance_loc:
 	  loc += operand * cie->code_alignment_factor;
@@ -301,7 +301,7 @@ execute_cfi (Dwarf_CFI *cache,
 
 	case DW_CFA_restore_extended:
 	  get_uleb128 (operand, program, end);
-	  /* Fallthrough */
+	  FALLTHROUGH;
 	case DW_CFA_restore + 0 ... DW_CFA_restore + CFI_PRIMARY_MAX:
 
 	  if (unlikely (abi_cfi) && likely (opcode == DW_CFA_restore))

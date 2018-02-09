@@ -62,7 +62,7 @@ elf_cntl (Elf *elf, Elf_Cmd cmd)
 	  result = -1;
 	  break;
 	}
-      /* FALLTHROUGH */
+      FALLTHROUGH;
 
     case ELF_C_FDDONE:
       /* Mark the file descriptor as not usable.  */

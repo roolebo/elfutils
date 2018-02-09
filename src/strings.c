@@ -246,7 +246,7 @@ parse_opt (int key, char *arg,
 	case 'b':
 	case 'B':
 	  big_endian = true;
-	  /* FALLTHROUGH */
+	  FALLTHROUGH;
 
 	case 'l':
 	case 'L':

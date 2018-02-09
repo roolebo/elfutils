@@ -149,7 +149,7 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
 		    N_("Only one input file allowed together with '-o'"));
       /* We only use this for checking the number of arguments, we don't
 	 actually want to consume them.  */
-      /* Fallthrough */
+      FALLTHROUGH;
     default:
       return ARGP_ERR_UNKNOWN;
     }

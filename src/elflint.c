@@ -1764,7 +1764,7 @@ section [%2d] '%s': entry %zu: pointer does not match address of section [%2d] '
 	  if (dyn->d_tag < DT_ADDRRNGLO || dyn->d_tag > DT_ADDRRNGHI)
 	    /* Value is no pointer.  */
 	    break;
-	  /* FALLTHROUGH */
+	  FALLTHROUGH;
 
 	case DT_AUXILIARY:
 	case DT_FILTER:
@@ -3993,7 +3993,7 @@ section [%2zu] '%s': merge flag set but entry size is zero\n"),
 	    case SHT_NOBITS:
 	      if (is_debuginfo)
 		break;
-	      /* Fallthrough */
+	      FALLTHROUGH;
 	    default:
 	      ERROR (gettext ("\
 section [%2zu] '%s' has unexpected type %d for an executable section\n"),
@@ -4137,7 +4137,7 @@ section [%2zu] '%s': ELF header says this is the section header string table but
 	    ERROR (gettext ("\
 section [%2zu] '%s': relocatable files cannot have dynamic symbol tables\n"),
 		   cnt, section_name (ebl, cnt));
-	  /* FALLTHROUGH */
+	  FALLTHROUGH;
 	case SHT_SYMTAB:
 	  check_symtab (ebl, ehdr, shdr, cnt);
 	  break;
@@ -4336,7 +4336,7 @@ section [%2d] '%s': unknown core file note type %" PRIu32
 	    if (nhdr.n_namesz == sizeof "Linux"
 		&& !memcmp (data->d_buf + name_offset, "Linux", sizeof "Linux"))
 	      break;
-	    /* Fallthrough */
+	    FALLTHROUGH;
 	  default:
 	    if (shndx == 0)
 	      ERROR (gettext ("\

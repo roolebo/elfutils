@@ -1,3 +1,7 @@
+2018-02-09  Joshua Watt  <JPEWhacker@gmail.com>
+
+	* eu-config.h (FALLTHROUGH): New macro.
+
 2017-10-16  Mark Wielaard  <mark@klomp.org>
 
 	* md5.{c,h}: Removed.

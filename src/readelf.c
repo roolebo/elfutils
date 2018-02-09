@@ -480,7 +480,7 @@ parse_opt (int key, char *arg,
 	  print_string_sections = true;
 	  break;
 	}
-      /* Fall through.  */
+      FALLTHROUGH;
     case 'x':
       add_dump_section (arg, false);
       any_control_option = true;
@@ -6081,7 +6081,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 			dwarf_form_name (form), (uintmax_t) num);
 	      return DWARF_CB_OK;
 	    }
-	  /* else fallthrough */
+	  FALLTHROUGH;
 
 	/* These cases always take a loclistptr and no constant. */
 	case DW_AT_location:
@@ -6269,7 +6269,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	      print_block (block.length, block.data);
 	      break;
 	    }
-	  /* Fall through.  */
+	  FALLTHROUGH;
 
 	case DW_AT_location:
 	case DW_AT_data_location:
@@ -9326,7 +9326,7 @@ handle_auxv_note (Ebl *ebl, Elf *core, GElf_Word descsz, GElf_Off desc_pos)
 		printf ("    %s\n", name);
 		break;
 	      }
-	    /* Fall through */
+	    FALLTHROUGH;
 	  case 'x':		/* hex */
 	  case 'p':		/* address */
 	  case 's':		/* address of string */

@@ -1,3 +1,7 @@
+2018-02-09  Joshua Watt  <JPEWhacker@gmail.com>
+
+	* elfstrmerge.c (main): Use FALLTHROUGH macro instead of comment.
+
 2018-01-22  Mark Wielaard  <mark@klomp.org>
 
 	* allfcts.c (setup_alt): Print warning when alt file couldn't be

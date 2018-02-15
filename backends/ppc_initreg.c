@@ -30,12 +30,13 @@
 # include <config.h>
 #endif
 
-#include "system.h"
 #include <stdlib.h>
 #if defined(__powerpc__) && defined(__linux__)
-# include <sys/user.h>
 # include <sys/ptrace.h>
+# include <sys/user.h>
 #endif
+
+#include "system.h"
 
 #define BACKEND ppc_
 #include "libebl_CPU.h"

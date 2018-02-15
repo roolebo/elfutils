@@ -35,7 +35,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <sys/wait.h>
 #include <dirent.h>
 #include <unistd.h>
 
@@ -43,6 +42,7 @@
 
 #include <sys/ptrace.h>
 #include <sys/syscall.h>
+#include <sys/wait.h>
 
 static bool
 linux_proc_pid_is_stopped (pid_t pid)

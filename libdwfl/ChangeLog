@@ -1,3 +1,7 @@
+2018-02-15  Mark Wielaard  <mark@klomp.org>
+
+	* linux-pid-attach.c: Include sys/wait.h after sys/ptrace.h.
+
 2018-02-09  Joshua Watt  <JPEWhacker@gmail.com>
 
 	* dwfl_report_elf.c (__libdwfl_elf_address_range): Use FALLTHROUGH

@@ -1,3 +1,9 @@
+2018-02-15  Mark Wielaard  <mark@klomp.org>
+
+	* backtrace-child.c: Include signal.h after sys/ptrace.h.
+	* backtrace-dwarf.c: Include sys/wait.h and signal.h after
+	sys/ptrace.h.
+
 2018-01-25  Mark Wielaard  <mark@klomp.org>
 
 	* Makefile.am (check_PROGRAMS): Add dwarf-die-addr-die.

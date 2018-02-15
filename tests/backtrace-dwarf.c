@@ -17,7 +17,6 @@
 
 #include <config.h>
 #include <assert.h>
-#include <signal.h>
 #include <inttypes.h>
 #include <stdio_ext.h>
 #include <locale.h>
@@ -25,7 +24,6 @@
 #include <error.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <sys/wait.h>
 #include ELFUTILS_HEADER(dwfl)
 
 #ifndef __linux__
@@ -40,6 +38,8 @@ main (int argc __attribute__ ((unused)), char **argv)
 
 #else /* __linux__ */
 #include <sys/ptrace.h>
+#include <sys/wait.h>
+#include <signal.h>
 
 #define main cleanup_13_main
 #include "cleanup-13.c"

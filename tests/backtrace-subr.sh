@@ -174,6 +174,13 @@ check_native_core()
     fi
   fi
   if [ ! -f "$core" ]; then
+    # In some containers our view of pids is confused. Since tests are
+    # run in a new fresh directory any core here is most like is ours.
+    if ls core.[0-9]* 1> /dev/null 2>&1; then
+      mv core.[0-9]* "$core"
+    fi
+  fi
+  if [ ! -f "$core" ]; then
     echo "No $core file generated";
     exit 77;
   fi

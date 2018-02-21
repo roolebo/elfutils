@@ -46,6 +46,7 @@ ebl_check_reloc_target_type (Ebl *ebl, Elf64_Word sh_type)
       case SHT_INIT_ARRAY:
       case SHT_FINI_ARRAY:
       case SHT_PREINIT_ARRAY:
+      case SHT_NOTE:
 	return true;
 
       default:

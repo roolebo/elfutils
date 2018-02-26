@@ -2713,7 +2713,7 @@ section [%2d] '%s': section group with only one member\n"),
 	ERROR (gettext ("section [%2d] '%s': unknown section group flags\n"),
 	       idx, section_name (ebl, idx));
 
-      for (cnt = elsize; cnt < data->d_size; cnt += elsize)
+      for (cnt = elsize; cnt + elsize <= data->d_size; cnt += elsize)
 	{
 #if ALLOW_UNALIGNED
 	  val = *((Elf32_Word *) ((char *) data->d_buf + cnt));

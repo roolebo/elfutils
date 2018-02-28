@@ -1,3 +1,9 @@
+2018-03-01  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf.h: Add DW_AT_GNU_locviews and DW_AT_GNU_entry_view.
+	* dwarf_formudata.c (dwarf_formudata): Handle DW_AT_GNU_locviews
+	as a loclistptr.
+
 2018-02-09  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_formblock.c (dwarf_formblock): Handle DW_FORM_data16 as a

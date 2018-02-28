@@ -339,6 +339,8 @@ enum
     DW_AT_GNU_all_tail_call_sites = 0x2116,
     DW_AT_GNU_all_call_sites = 0x2117,
     DW_AT_GNU_all_source_call_sites = 0x2118,
+    DW_AT_GNU_locviews = 0x2137,
+    DW_AT_GNU_entry_view = 0x2138,
     DW_AT_GNU_macros = 0x2119,
     DW_AT_GNU_deleted = 0x211a,
 

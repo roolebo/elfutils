@@ -1,3 +1,18 @@
+2018-03-01  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (struct listptr): Add attr field.
+	(compare_listptr): Warn when two listptrs for the same offset have
+	different attributes.
+	(notice_listptr): Take attr as argument and add it to listptr.
+	(skip_listptr_hole): New attr argument.
+	(next_listptr_offset): New function.
+	(print_debug_ranges_section): Pass NULL attr to skip_listptr_hole.
+	(attr_callback): Handle DW_AT_GNU_locviews. Call notice_listptr with
+	attr.
+	(print_debug_loc_section): Keep track of which attr is associated with
+	a listptr. If the attr is DW_AT_GNU_locview print view pairs till the
+	next listptr offset.
+
 2018-02-09  Mark Wielaard  <mark@klomp.org>
 
 	* elflint.c (check_group): Make sure we can read a complete

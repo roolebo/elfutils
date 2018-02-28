@@ -4532,6 +4532,7 @@ struct listptr
   bool dwarf64:1;
   bool warned:1;
   struct Dwarf_CU *cu;
+  unsigned int attr;
 };
 
 #define listptr_offset_size(p)	((p)->dwarf64 ? 8 : 4)
@@ -4592,6 +4593,15 @@ compare_listptr (const void *a, const void *b, void *arg)
 		 gettext ("%s %#" PRIx64 " used with different base addresses"),
 		 name, (uint64_t) p1->offset);
 	}
+      if (p1->attr != p2 ->attr)
+	{
+	  p1->warned = p2->warned = true;
+	  error (0, 0,
+		 gettext ("%s %#" PRIx64
+			  " used with different attribute %s and %s"),
+		 name, (uint64_t) p1->offset, dwarf_attr_name (p2->attr),
+		 dwarf_attr_name (p2->attr));
+	}
     }
 
   return 0;
@@ -4619,7 +4629,7 @@ reset_listptr (struct listptr_table *table)
 static bool
 notice_listptr (enum section_e section, struct listptr_table *table,
 		uint_fast8_t address_size, uint_fast8_t offset_size,
-		struct Dwarf_CU *cu, Dwarf_Off offset)
+		struct Dwarf_CU *cu, Dwarf_Off offset, unsigned int attr)
 {
   if (print_debug_sections & section)
     {
@@ -4640,7 +4650,8 @@ notice_listptr (enum section_e section, struct listptr_table *table,
 	  .addr64 = address_size == 8,
 	  .dwarf64 = offset_size == 8,
 	  .offset = offset,
-	  .cu = cu
+	  .cu = cu,
+	  .attr = attr
 	};
 
       if (p->offset != offset)
@@ -4664,7 +4675,8 @@ static bool
 skip_listptr_hole (struct listptr_table *table, size_t *idxp,
 		   uint_fast8_t *address_sizep, uint_fast8_t *offset_sizep,
 		   Dwarf_Addr *base, struct Dwarf_CU **cu, ptrdiff_t offset,
-		   unsigned char **readp, unsigned char *endp)
+		   unsigned char **readp, unsigned char *endp,
+		   unsigned int *attr)
 {
   if (table->n == 0)
     return false;
@@ -4699,10 +4711,27 @@ skip_listptr_hole (struct listptr_table *table, size_t *idxp,
     *base = listptr_base (p);
   if (cu != NULL)
     *cu = p->cu;
+  if (attr != NULL)
+    *attr = p->attr;
 
   return false;
 }
 
+static Dwarf_Off
+next_listptr_offset (struct listptr_table *table, size_t idx)
+{
+  /* Note that multiple attributes could in theory point to the same loclist
+     offset, so make sure we pick one that is bigger than the current one.
+     The table is sorted on offset.  */
+  Dwarf_Off offset = table->table[idx].offset;
+  while (++idx < table->n)
+    {
+      Dwarf_Off next = table->table[idx].offset;
+      if (next > offset)
+	return next;
+    }
+  return 0;
+}
 
 static void
 print_debug_abbrev_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
@@ -5042,7 +5071,7 @@ print_debug_ranges_section (Dwfl_Module *dwflmod,
 
       if (first && skip_listptr_hole (&known_rangelistptr, &listptr_idx,
 				      &address_size, NULL, &base, &cu,
-				      offset, &readp, endp))
+				      offset, &readp, endp, NULL))
 	continue;
 
       if (last_cu != cu)
@@ -6121,10 +6150,11 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	case DW_AT_GNU_call_site_data_value:
 	case DW_AT_GNU_call_site_target:
 	case DW_AT_GNU_call_site_target_clobbered:
+	case DW_AT_GNU_locviews:
 	  {
 	    bool nlpt = notice_listptr (section_loc, &known_loclistptr,
 					cbargs->addrsize, cbargs->offset_size,
-					cbargs->cu, num);
+					cbargs->cu, num, attr);
 	    if (!cbargs->silent)
 	      printf ("           %*s%-20s (%s) location list [%6" PRIxMAX "]%s\n",
 		      (int) (level * 2), "", dwarf_attr_name (attr),
@@ -6137,7 +6167,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	  {
 	    bool nlpt = notice_listptr (section_ranges, &known_rangelistptr,
 					cbargs->addrsize, cbargs->offset_size,
-					cbargs->cu, num);
+					cbargs->cu, num, attr);
 	    if (!cbargs->silent)
 	      printf ("           %*s%-20s (%s) range list [%6" PRIxMAX "]%s\n",
 		      (int) (level * 2), "", dwarf_attr_name (attr),
@@ -7215,10 +7245,11 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
     {
       ptrdiff_t offset = readp - (unsigned char *) data->d_buf;
       Dwarf_CU *cu = last_cu;
+      unsigned int attr = 0;
 
       if (first && skip_listptr_hole (&known_loclistptr, &listptr_idx,
 				      &address_size, &offset_size, &base,
-				      &cu, offset, &readp, endp))
+				      &cu, offset, &readp, endp, &attr))
 	continue;
 
       if (last_cu != cu)
@@ -7236,6 +7267,40 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
 	free (basestr);
        }
       last_cu = cu;
+
+      if (attr == DW_AT_GNU_locviews)
+	{
+	  Dwarf_Off next_off = next_listptr_offset (&known_loclistptr,
+						    listptr_idx);
+	  const unsigned char *locp = readp;
+	  const unsigned char *locendp;
+	  if (next_off == 0)
+	    locendp = endp;
+	  else
+	    locendp = (const unsigned char *) data->d_buf + next_off;
+
+	  while (locp < locendp)
+	    {
+	      uint64_t v1, v2;
+	      get_uleb128 (v1, locp, locendp);
+	      if (locp >= locendp)
+		{
+		  printf (gettext (" [%6tx]  <INVALID DATA>\n"), offset);
+		  break;
+		}
+	      get_uleb128 (v2, locp, locendp);
+	      if (first)		/* First view pair in a list.  */
+		printf (" [%6tx] ", offset);
+	      else
+		printf ("          ");
+	      printf ("view pair %" PRId64 ", %" PRId64 "\n", v1, v2);
+	      first = false;
+	    }
+
+	  first = true;
+	  readp = (unsigned char *) locendp;
+	  continue;
+	}
 
       if (unlikely (data->d_size - offset < (size_t) address_size * 2))
 	{

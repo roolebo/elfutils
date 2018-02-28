@@ -141,6 +141,7 @@ dwarf_formudata (Dwarf_Attribute *attr, Dwarf_Word *return_uval)
 	    case DW_AT_string_length:
 	    case DW_AT_use_location:
 	    case DW_AT_vtable_elem_location:
+	    case DW_AT_GNU_locviews:
 	      /* loclistptr */
 	      if (__libdw_formptr (attr, IDX_debug_loc,
 				   DWARF_E_NO_LOCLIST, NULL,

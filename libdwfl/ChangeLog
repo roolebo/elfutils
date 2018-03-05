@@ -1,3 +1,9 @@
+2018-03-05  Mark Wielaard  <mark@klomp.org>
+
+	* dwfl_build_id_find_elf.c (__libdwfl_open_by_build_id): Use
+	realpath (name, NULL) instead of canonicalize_file_name (name).
+	* find-debuginfo.c (dwfl_standard_find_debuginfo): Likewise.
+
 2018-01-29  Mark Wielaard  <mark@klomp.org>
 
 	* cu.c (cudie_offset): Use __libdw_first_die_off_from_cu instead of

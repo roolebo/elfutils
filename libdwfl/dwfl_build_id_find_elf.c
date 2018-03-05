@@ -99,7 +99,7 @@ __libdwfl_open_by_build_id (Dwfl_Module *mod, bool debug, char **file_name,
 	{
 	  if (*file_name != NULL)
 	    free (*file_name);
-	  *file_name = canonicalize_file_name (name);
+	  *file_name = realpath (name, NULL);
 	  if (*file_name == NULL)
 	    {
 	      *file_name = name;

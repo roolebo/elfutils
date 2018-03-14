@@ -1,3 +1,16 @@
+2018-03-23  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_begin_elf.c (dwarf_scnnames): Add IDX_debug_str_offsets,
+	increase size.
+	* dwarf_error.c (errmsgs): Add DWARF_E_NO_STR_OFFSETS.
+	* dwarf_formstring.c (dwarf_formstring): Handle DW_FORM_strx[1234].
+	(__libdw_cu_str_off_base): New function.
+	* dwarf_formudata.c (dwarf_formudata): Handle IDX_debug_str_offsets
+	as stroffsetsptr.
+	* libdwP.h: Add IDX_debug_str_offsets and DWARF_E_NO_STR_OFFSETS.
+	(struct Dwarf_CU): Add str_off_base field.
+	(__libdw_cu_str_off_base): New function declaration.
+
 2018-03-22  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_begin_elf.c (dwarf_scnnames): Add IDX_debug_addr.

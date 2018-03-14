@@ -73,6 +73,7 @@ static const char *errmsgs[] =
     [DWARF_E_NO_ENTRY] = N_("no entries found"),
     [DWARF_E_INVALID_DWARF] = N_("invalid DWARF"),
     [DWARF_E_NO_STRING] = N_("no string data"),
+    [DWARF_E_NO_STR_OFFSETS] = N_(".debug_str_offsets section missing"),
     [DWARF_E_NO_ADDR] = N_("no address value"),
     [DWARF_E_NO_CONSTANT] = N_("no constant value"),
     [DWARF_E_NO_REFERENCE] = N_("no reference value"),

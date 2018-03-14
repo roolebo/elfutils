@@ -80,6 +80,7 @@ enum
     IDX_debug_loc,
     IDX_debug_pubnames,
     IDX_debug_str,
+    IDX_debug_str_offsets,
     IDX_debug_macinfo,
     IDX_debug_macro,
     IDX_debug_ranges,
@@ -109,6 +110,7 @@ enum
   DWARF_E_NO_ENTRY,
   DWARF_E_INVALID_DWARF,
   DWARF_E_NO_STRING,
+  DWARF_E_NO_STR_OFFSETS,
   DWARF_E_NO_ADDR,
   DWARF_E_NO_CONSTANT,
   DWARF_E_NO_REFERENCE,
@@ -329,6 +331,10 @@ struct Dwarf_CU
   /* The offset into the .debug_addr section where index zero begins.
      Don't access directly, call __libdw_cu_addr_base.  */
   Dwarf_Off addr_base;
+
+  /* The offset into the .debug_str_offsets section where index zero begins.
+     Don't access directly, call __libdw_cu_str_off_base.  */
+  Dwarf_Off str_off_base;
 
   /* Memory boundaries of this CU.  */
   void *startp;
@@ -873,6 +879,9 @@ const char *__libdw_getcompdir (Dwarf_Die *cudie);
 
 /* Get the address base for the CU, fetches it when not yet set.  */
 Dwarf_Off __libdw_cu_addr_base (Dwarf_CU *cu);
+
+/* Get the string offsets base for the CU, fetches it when not yet set.  */
+Dwarf_Off __libdw_cu_str_off_base (Dwarf_CU *cu);
 
 /* Given a file descriptor, dir and file returns a full path.  If the
    file is absolute (starts with a /) a copy of file is returned.  If

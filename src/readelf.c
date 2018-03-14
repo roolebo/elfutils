@@ -6105,6 +6105,11 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 
     case DW_FORM_indirect:
     case DW_FORM_strp:
+    case DW_FORM_strx:
+    case DW_FORM_strx1:
+    case DW_FORM_strx2:
+    case DW_FORM_strx3:
+    case DW_FORM_strx4:
     case DW_FORM_string:
     case DW_FORM_GNU_strp_alt:
       if (cbargs->silent)

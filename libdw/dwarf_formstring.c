@@ -1,7 +1,6 @@
 /* Return string associated with given attribute.
    Copyright (C) 2003-2010, 2013, 2018 Red Hat, Inc.
    This file is part of elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
    This file is free software; you can redistribute it and/or modify
    it under the terms of either
@@ -47,7 +46,8 @@ dwarf_formstring (Dwarf_Attribute *attrp)
     /* A simple inlined string.  */
     return (const char *) attrp->valp;
 
-  Dwarf *dbg = attrp->cu->dbg;
+  Dwarf_CU *cu = attrp->cu;
+  Dwarf *dbg = cu->dbg;
   Dwarf *dbg_ret = (attrp->form == DW_FORM_GNU_strp_alt
 		    ? INTUSE(dwarf_getalt) (dbg) : dbg);
 
@@ -57,20 +57,126 @@ dwarf_formstring (Dwarf_Attribute *attrp)
       return NULL;
     }
 
-
-  if (unlikely (attrp->form != DW_FORM_strp
-		   && attrp->form != DW_FORM_GNU_strp_alt)
-      || dbg_ret->sectiondata[IDX_debug_str] == NULL)
+  if (dbg_ret->sectiondata[IDX_debug_str] == NULL)
     {
       __libdw_seterrno (DWARF_E_NO_STRING);
       return NULL;
     }
 
   uint64_t off;
-  if (__libdw_read_offset (dbg, dbg_ret, cu_sec_idx (attrp->cu), attrp->valp,
-			   attrp->cu->offset_size, &off, IDX_debug_str, 1))
-    return NULL;
+  if (attrp->form == DW_FORM_strp
+      || attrp->form == DW_FORM_GNU_strp_alt)
+    {
+      if (__libdw_read_offset (dbg, dbg_ret, cu_sec_idx (cu),
+			       attrp->valp, cu->offset_size, &off,
+			       IDX_debug_str, 1))
+	return NULL;
+    }
+  else
+    {
+      Dwarf_Word idx;
+      const unsigned char *datap = attrp->valp;
+      const unsigned char *endp = cu->endp;
+      switch (attrp->form)
+	{
+	case DW_FORM_strx:
+	  if (datap >= endp)
+	    {
+	    invalid:
+	      __libdw_seterrno (DWARF_E_INVALID_DWARF);
+	      return NULL;
+	    }
+	  get_uleb128 (idx, datap, endp);
+	  break;
+
+	case DW_FORM_strx1:
+	  if (datap >= endp - 1)
+	    goto invalid;
+	  idx = *datap;
+	  break;
+
+	case DW_FORM_strx2:
+	  if (datap >= endp - 2)
+	    goto invalid;
+	  idx = read_2ubyte_unaligned (dbg, datap);
+	  break;
+
+	case DW_FORM_strx3:
+	  if (datap >= endp - 3)
+	    goto invalid;
+	  idx = read_3ubyte_unaligned (dbg, datap);
+	  break;
+
+	case DW_FORM_strx4:
+	  if (datap >= endp - 4)
+	    goto invalid;
+	  idx = read_4ubyte_unaligned (dbg, datap);
+	  break;
+
+	default:
+	  __libdw_seterrno (DWARF_E_NO_STRING);
+	  return NULL;
+	}
+
+      /* So we got an index in the .debug_str_offsets.  Lets see if it
+	 is valid and we can get the actual .debug_str offset.  */
+      Dwarf_Off str_off = __libdw_cu_str_off_base (cu);
+      if (str_off == (Dwarf_Off) -1)
+	return NULL;
+
+      if (dbg->sectiondata[IDX_debug_str_offsets] == NULL)
+	{
+	  __libdw_seterrno (DWARF_E_NO_STR_OFFSETS);
+	  return NULL;
+	}
+
+      /* The section should at least contain room for one offset.  */
+      int offset_size = cu->offset_size;
+      if (cu->offset_size > dbg->sectiondata[IDX_debug_str_offsets]->d_size)
+	{
+	invalid_offset:
+	  __libdw_seterrno (DWARF_E_INVALID_OFFSET);
+	  return NULL;
+	}
+
+      /* And the base offset should be at least inside the section.  */
+      if (str_off > (dbg->sectiondata[IDX_debug_str_offsets]->d_size
+		     - offset_size))
+	goto invalid_offset;
+
+      size_t max_idx = (dbg->sectiondata[IDX_debug_str_offsets]->d_size
+			- offset_size - str_off) / offset_size;
+      if (idx > max_idx)
+	goto invalid_offset;
+
+      datap = (dbg->sectiondata[IDX_debug_str_offsets]->d_buf
+	       + str_off + (idx * offset_size));
+      if (offset_size == 4)
+	off = read_4ubyte_unaligned (dbg, datap);
+      else
+	off = read_8ubyte_unaligned (dbg, datap);
+
+      if (off > dbg->sectiondata[IDX_debug_str]->d_size)
+	goto invalid_offset;
+    }
 
   return (const char *) dbg_ret->sectiondata[IDX_debug_str]->d_buf + off;
 }
 INTDEF(dwarf_formstring)
+
+Dwarf_Off __libdw_cu_str_off_base (Dwarf_CU *cu)
+{
+  if (cu->str_off_base == (Dwarf_Off) -1)
+    {
+      Dwarf_Die cu_die = CUDIE(cu);
+      Dwarf_Attribute attr;
+      if (dwarf_attr (&cu_die, DW_AT_str_offsets_base, &attr) != NULL)
+	{
+	  Dwarf_Word off;
+	  if (dwarf_formudata (&attr, &off) == 0)
+	    cu->str_off_base = off;
+	}
+    }
+
+  return cu->str_off_base;
+}

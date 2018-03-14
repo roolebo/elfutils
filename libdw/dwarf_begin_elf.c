@@ -46,8 +46,8 @@
 #include "libdwP.h"
 
 
-/* Section names.  */
-static const char dwarf_scnnames[IDX_last][18] =
+/* Section names.  (Note .debug_str_offsets is the largest 19 chars.)  */
+static const char dwarf_scnnames[IDX_last][19] =
 {
   [IDX_debug_info] = ".debug_info",
   [IDX_debug_types] = ".debug_types",
@@ -59,6 +59,7 @@ static const char dwarf_scnnames[IDX_last][18] =
   [IDX_debug_loc] = ".debug_loc",
   [IDX_debug_pubnames] = ".debug_pubnames",
   [IDX_debug_str] = ".debug_str",
+  [IDX_debug_str_offsets] = ".debug_str_offsets",
   [IDX_debug_macinfo] = ".debug_macinfo",
   [IDX_debug_macro] = ".debug_macro",
   [IDX_debug_ranges] = ".debug_ranges",

@@ -1,3 +1,9 @@
+2018-03-16  Mark Wielaard  <mark@klomp.org>
+
+	* ebldynamictagname.c (ebl_dynamic_tag_name): Add SYMTAB_SHNDX to
+	stdtags. Add a eu_static_assert to make sure stdtags contains all
+	DT_NUM entries.
+
 2018-02-21  Mark Wielaard  <mark@klomp.org>
 
 	* eblcheckreloctargettype.c (ebl_check_reloc_target_type): Accept

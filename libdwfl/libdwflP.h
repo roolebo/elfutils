@@ -1,5 +1,5 @@
 /* Internal definitions for libdwfl.
-   Copyright (C) 2005-2015 Red Hat, Inc.
+   Copyright (C) 2005-2015, 2018 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -401,6 +401,14 @@ struct dwfl_arange
   size_t arange;		/* Index in Dwarf_Aranges.  */
 };
 
+#define __LIBDWFL_REMOTE_MEM_CACHE_SIZE 4096
+/* Structure for caching remote memory reads as used by __libdwfl_pid_arg.  */
+struct __libdwfl_remote_mem_cache
+{
+  Dwarf_Addr addr; /* Remote address.  */
+  Dwarf_Off len;   /* Zero if cleared, otherwise likely 4K. */
+  unsigned char buf[__LIBDWFL_REMOTE_MEM_CACHE_SIZE]; /* The actual cache.  */
+};
 
 /* Structure used for keeping track of ptrace attaching a thread.
    Shared by linux-pid-attach and linux-proc-maps.  If it has been setup
@@ -411,6 +419,10 @@ struct __libdwfl_pid_arg
   DIR *dir;
   /* Elf for /proc/PID/exe.  Set to NULL if it couldn't be opened.  */
   Elf *elf;
+  /* Remote memory cache, NULL if there is no memory cached.
+     Should be cleared on detachment (because that makes the thread
+     runnable and the cache invalid).  */
+  struct __libdwfl_remote_mem_cache *mem_cache;
   /* fd for /proc/PID/exe.  Set to -1 if it couldn't be opened.  */
   int elf_fd;
   /* It is 0 if not used.  */

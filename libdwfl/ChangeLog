@@ -1,3 +1,14 @@
+2018-03-17  Mark Wielaard  <mark@klomp.org>
+
+	* libdwflP.h (struct __libdwfl_remote_mem_cache): New.
+	(struct __libdwfl_pid_arg): Add mem_cache field.
+	* linux-pid-attach.c (read_cached_memory): New function.
+	(clear_cached_memory): Likewise.
+	(pid_memory_read): Call read_cached_memory.
+	(pid_detach): Free mem_cache.
+	(pid_thread_detach): Call clear_cached_memory.
+	(dwfl_linux_proc_attach): Initialize mem_cache to NULL.
+
 2018-03-05  Mark Wielaard  <mark@klomp.org>
 
 	* dwfl_build_id_find_elf.c (__libdwfl_open_by_build_id): Use

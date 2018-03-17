@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl Configure input file for elfutils.                     -*-autoconf-*-
 dnl
-dnl Copyright (C) 1996-2017 Red Hat, Inc.
+dnl Copyright (C) 1996-2018 Red Hat, Inc.
 dnl
 dnl This file is part of elfutils.
 dnl
@@ -41,7 +41,7 @@ fi
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_FILES([config/Makefile])
 
-AC_COPYRIGHT([Copyright (C) 1996-2017 The elfutils developers.])
+AC_COPYRIGHT([Copyright (C) 1996-2018 The elfutils developers.])
 AC_PREREQ(2.63)			dnl Minimum Autoconf version required.
 
 dnl We use GNU make extensions; automake 1.10 defaults to -Wportability.
@@ -369,6 +369,8 @@ AC_CHECK_DECLS([powerof2],[],[],[#include <sys/param.h>])
 AC_CHECK_DECLS([mempcpy],[],[],
                [#define _GNU_SOURCE
                 #include <string.h>])
+
+AC_CHECK_FUNCS([process_vm_readv])
 
 AC_CHECK_LIB([stdc++], [__cxa_demangle], [dnl
 AC_DEFINE([USE_DEMANGLE], [1], [Defined if demangling is enabled])])

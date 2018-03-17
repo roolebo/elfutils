@@ -1,3 +1,7 @@
+2018-03-17  Mark Wielaard  <mark@klomp.org>
+
+	* configure.ac (CHECK_FUNCS): Check for process_vm_readv.
+
 2018-02-09  Joshua Watt  <JPEWhacker@gmail.com>
 
 	* configure.ac (HAVE_FALLTHROUGH): New define.

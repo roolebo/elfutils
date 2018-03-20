@@ -1,3 +1,8 @@
+2018-03-20  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (attr_callback): Report error when DW_AT_decl_file or
+	DW_AT_call_file cannot be resolved.
+
 2018-03-06  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_ops): Handle DW_OP_addrx, DW_OP_constx,

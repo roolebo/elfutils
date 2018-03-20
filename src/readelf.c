@@ -6247,11 +6247,25 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 		if (dwarf_getsrcfiles (&cudie, &files, &nfiles) == 0)
 		  {
 		    valuestr = dwarf_filesrc (files, num, NULL, NULL);
-		    char *filename = strrchr (valuestr, '/');
-		    if (filename != NULL)
-		      valuestr = filename + 1;
+		    if (valuestr != NULL)
+		      {
+			char *filename = strrchr (valuestr, '/');
+			if (filename != NULL)
+			  valuestr = filename + 1;
+		      }
+		    else
+		      error (0, 0, gettext ("invalid file (%" PRId64 "): %s"),
+			     num, dwarf_errmsg (-1));
 		  }
+		else
+		  error (0, 0, gettext ("no srcfiles for CU [%zx]"),
+			 dwarf_dieoffset (&cudie));
 	      }
+	    else
+	     error (0, 0, gettext ("couldn't get DWARF CU: %s"),
+		    dwarf_errmsg (-1));
+	    if (valuestr == NULL)
+	      valuestr = "???";
 	  }
 	  break;
 	default:

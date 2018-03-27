@@ -6258,7 +6258,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 			     num, dwarf_errmsg (-1));
 		  }
 		else
-		  error (0, 0, gettext ("no srcfiles for CU [%zx]"),
+		  error (0, 0, gettext ("no srcfiles for CU [%" PRIx64 "]"),
 			 dwarf_dieoffset (&cudie));
 	      }
 	    else

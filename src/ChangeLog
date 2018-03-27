@@ -1,3 +1,8 @@
+2018-03-27  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (attr_callback): Print dwarf_dieoffset as %PRIx64,
+	not %zx.
+
 2018-03-20  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (attr_callback): Report error when DW_AT_decl_file or

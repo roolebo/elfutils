@@ -1,3 +1,9 @@
+2018-03-28  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (handle_sysv_hash): Break bucket chain after nchain
+	entries are found.
+	(handle_sysv_hash64): Likewise.
+
 2018-03-27  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (attr_callback): Print dwarf_dieoffset as %PRIx64,

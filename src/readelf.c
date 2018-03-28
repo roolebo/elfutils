@@ -3141,9 +3141,13 @@ handle_sysv_hash (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx)
   for (Elf32_Word cnt = 0; cnt < nbucket; ++cnt)
     {
       Elf32_Word inner = bucket[cnt];
+      Elf32_Word chain_len = 0;
       while (inner > 0 && inner < nchain)
 	{
 	  ++nsyms;
+	  ++chain_len;
+	  if (chain_len > nchain)
+	    goto invalid_data;
 	  if (maxlength < ++lengths[cnt])
 	    ++maxlength;
 
@@ -3198,9 +3202,13 @@ handle_sysv_hash64 (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx)
   for (Elf64_Xword cnt = 0; cnt < nbucket; ++cnt)
     {
       Elf64_Xword inner = bucket[cnt];
+      Elf64_Xword chain_len = 0;
       while (inner > 0 && inner < nchain)
 	{
 	  ++nsyms;
+	  ++chain_len;
+	  if (chain_len > nchain)
+	    goto invalid_data;
 	  if (maxlength < ++lengths[cnt])
 	    ++maxlength;
 

@@ -1,3 +1,9 @@
+2018-03-29  Mark Wielaard  <mark@klomp.org>
+
+	* libdw.h (dwarf_decl_file): Extend documentation.
+	(dwarf_linesrc): Likewise.
+	(dwarf_filesrc): Likewise.
+
 2018-03-06  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf.h: Add DW_OP_implicit_pointer, DW_OP_addrx, DW_OP_constx,

@@ -679,11 +679,15 @@ extern int dwarf_linediscriminator (Dwarf_Line *line, unsigned int *discp)
      __nonnull_attribute__ (2);
 
 
-/* Find line information for address.  */
+/* Find line information for address.  The returned string is NULL when
+   an error occured, or the file path.  The file path is either absolute
+   or relative to the compilation directory.  See dwarf_decl_file.  */
 extern const char *dwarf_linesrc (Dwarf_Line *line,
 				  Dwarf_Word *mtime, Dwarf_Word *length);
 
-/* Return file information.  */
+/* Return file information.  The returned string is NULL when
+   an error occured, or the file path.  The file path is either absolute
+   or relative to the compilation directory.  See dwarf_decl_file.  */
 extern const char *dwarf_filesrc (Dwarf_Files *file, size_t idx,
 				  Dwarf_Word *mtime, Dwarf_Word *length);
 
@@ -855,7 +859,14 @@ extern ptrdiff_t dwarf_getfuncs (Dwarf_Die *cudie,
 				 void *arg, ptrdiff_t offset);
 
 
-/* Return file name containing definition of the given declaration.  */
+/* Return file name containing definition of the given declaration.
+   Of the DECL has an (indirect, see dwarf_attr_integrate) decl_file
+   attribute.  The returned file path is either absolute, or relative
+   to the compilation directory.  Given the decl DIE, the compilation
+   directory can be retrieved through:
+   dwarf_formstring (dwarf_attr (dwarf_diecu (decl, &cudie, NULL, NULL),
+                                 DW_AT_comp_dir, &attr));
+   Returns NULL if no decl_file could be found or an error occured.  */
 extern const char *dwarf_decl_file (Dwarf_Die *decl);
 
 /* Get line number of beginning of given declaration.  */

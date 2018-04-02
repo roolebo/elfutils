@@ -116,6 +116,7 @@ __libdw_intern_next_unit (Dwarf *dbg, bool debug_types)
   newp->orig_abbrev_offset = newp->last_abbrev_offset = abbrev_offset;
   newp->lines = NULL;
   newp->locs = NULL;
+  newp->base_address = (Dwarf_Addr) -1;
   newp->addr_base = (Dwarf_Off) -1;
   newp->str_off_base = (Dwarf_Off) -1;
 

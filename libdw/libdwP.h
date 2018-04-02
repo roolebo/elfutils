@@ -1,7 +1,6 @@
-/* Internal definitions for libdwarf.
+/* Internal definitions for libdw.
    Copyright (C) 2002-2011, 2013-2018 Red Hat, Inc.
    This file is part of elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
    This file is free software; you can redistribute it and/or modify
    it under the terms of either
@@ -327,6 +326,10 @@ struct Dwarf_CU
 
   /* Known location lists.  */
   void *locs;
+
+  /* Base address for use with ranges and locs.
+     Don't access directly, call __libdw_cu_base_address.  */
+  Dwarf_Addr base_address;
 
   /* The offset into the .debug_addr section where index zero begins.
      Don't access directly, call __libdw_cu_addr_base.  */
@@ -849,14 +852,17 @@ is_cudie (Dwarf_Die *cudie)
     - If it's end of rangelist, don't set anything and return 2
     - If an error occurs, don't set anything and return <0.  */
 int __libdw_read_begin_end_pair_inc (Dwarf *dbg, int sec_index,
-				     unsigned char **addr, int width,
+				     const unsigned char **readp,
+				     const unsigned char *readend,
+				     int width,
 				     Dwarf_Addr *beginp, Dwarf_Addr *endp,
 				     Dwarf_Addr *basep)
   internal_function;
 
-unsigned char * __libdw_formptr (Dwarf_Attribute *attr, int sec_index,
-				 int err_nodata, unsigned char **endpp,
-				 Dwarf_Off *offsetp)
+const unsigned char * __libdw_formptr (Dwarf_Attribute *attr, int sec_index,
+				       int err_nodata,
+				       const unsigned char **endpp,
+				       Dwarf_Off *offsetp)
   internal_function;
 
 /* Fills in the given attribute to point at an empty location expression.  */
@@ -876,6 +882,10 @@ int __libdw_getsrclines (Dwarf *dbg, Dwarf_Off debug_line_offset,
 
 /* Load and return value of DW_AT_comp_dir from CUDIE.  */
 const char *__libdw_getcompdir (Dwarf_Die *cudie);
+
+/* Get the base address for the CU, fetches it when not yet set.
+   This is used as initial base address for ranges and loclists.  */
+Dwarf_Addr __libdw_cu_base_address (Dwarf_CU *cu);
 
 /* Get the address base for the CU, fetches it when not yet set.  */
 Dwarf_Off __libdw_cu_addr_base (Dwarf_CU *cu);

@@ -198,6 +198,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     run-dwfl-addr-sect.sh run-early-offscn.sh \
 	     run-dwarf-getmacros.sh \
 	     run-dwarf-ranges.sh debug-ranges-no-lowpc.o.bz2 \
+	     testfileranges4.debug.bz2 \
 	     run-test-flag-nobits.sh \
 	     run-dwarf-getstring.sh run-rerequest_tag.sh run-alldts.sh \
 	     testfile15.bz2 testfile15.debug.bz2 \

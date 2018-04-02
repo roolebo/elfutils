@@ -1,3 +1,9 @@
+2018-04-03  Mark Wielaard  <mark@klomp.org>
+
+	* testfileranges4.debug.bz2: New testfile.
+	* run-dwarf-ranges.sh: Run on testfileranges4.debug.
+	* tests/Makefile.am (EXTRA_DIST): Add testfileranges4.debug.bz2.
+
 2018-03-06  Mark Wielaard  <mark@klomp.org>
 
 	* varlocs.c (print_expr): Handle DW_OP_implicit_pointer,

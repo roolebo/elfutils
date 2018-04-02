@@ -1,3 +1,33 @@
+2018-04-03  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_formudata.c (__libdw_formptr): Take and return const
+	unsigned char pointers.
+	* dwarf_getlocation.c (attr_base_address): Rename to...
+	(__libdw_cu_base_address): this. Take Dwarf_CU, check and set
+	base_address.
+	(initial_offset_base): Renamed to...
+	(initial_offset): this. Only provide offset.
+	(getlocations_addr): Move data size check and
+	address base addition into __libdw_read_begin_end_pair_inc. Use
+	__libdw_cu_base_address and initial_offset. Drop Elf_Data NULL
+	check (already done by initial_offset, through __libdw_formptr).
+	(dwarf_getlocations): Use __libdw_cu_base_address and initial_offset.
+	Drop Elf_Data NULL check.
+	* dwarf_ranges.c (__libdw_read_begin_end_pair_inc): Change argument
+	type of readp to Add readend argument. Check data size. Include base
+	in begin and end result.
+	(initial_offset): New static function.
+	(dwarf_ranges): Don't check Elf_Data being NULL (already done by
+	initial_offset, through __libdw_formptr). Use __libdw_cu_base_address
+	and initial_offset. Remove base check and addition (already done by
+	__libdw_read_begin_end_pair_inc.
+	* libdwP.h (Dwarf_CU): Add base_address field.
+	(__libdw_read_begin_end_pair_inc): Change argument type of readp to
+	const. Add readend argument.
+	(__libdw_formptr): Take and return const unsigned char pointers.
+	* libdw_findcu.c (__libdw_intern_next_unit): Initialize Dwarf_CU
+	base_address.
+
 2018-04-04  Mark Wielaard  <mark@klomp.org>
 
 	* libdw_findcu.c (__libdw_intern_next_unit): Initialize Dwarf_CU

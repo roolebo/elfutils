@@ -1,5 +1,5 @@
 /* Enumerate the PC ranges covered by a DIE.
-   Copyright (C) 2005, 2007, 2009 Red Hat, Inc.
+   Copyright (C) 2005, 2007, 2009, 2018 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -41,7 +41,9 @@
     - If an error occurs, don't set anything and return -1.  */
 internal_function int
 __libdw_read_begin_end_pair_inc (Dwarf *dbg, int sec_index,
-				 unsigned char **addrp, int width,
+				 const unsigned char **addrp,
+				 const unsigned char *addrend,
+				 int width,
 				 Dwarf_Addr *beginp, Dwarf_Addr *endp,
 				 Dwarf_Addr *basep)
 {
@@ -50,7 +52,14 @@ __libdw_read_begin_end_pair_inc (Dwarf *dbg, int sec_index,
   Dwarf_Addr begin;
   Dwarf_Addr end;
 
-  unsigned char *addr = *addrp;
+  const unsigned char *addr = *addrp;
+  if (addrend - addr < width * 2)
+    {
+    invalid:
+      __libdw_seterrno (DWARF_E_INVALID_DWARF);
+      return -1;
+    }
+
   bool begin_relocated = READ_AND_RELOCATE (__libdw_relocate_address, begin);
   bool end_relocated = READ_AND_RELOCATE (__libdw_relocate_address, end);
   *addrp = addr;
@@ -59,13 +68,9 @@ __libdw_read_begin_end_pair_inc (Dwarf *dbg, int sec_index,
   if (begin == escape && !begin_relocated)
     {
       if (unlikely (end == escape))
-	{
-	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
-	  return -1;
-	}
+	goto invalid;
 
-      if (basep != NULL)
-	*basep = end;
+      *basep = end;
       return 1;
     }
 
@@ -75,9 +80,24 @@ __libdw_read_begin_end_pair_inc (Dwarf *dbg, int sec_index,
 
   /* Don't check for begin_relocated == end_relocated.  Serve the data
      to the client even though it may be buggy.  */
-  *beginp = begin;
-  *endp = end;
+  *beginp = begin + *basep;
+  *endp = end + *basep;
 
+  return 0;
+}
+
+static int
+initial_offset (Dwarf_Attribute *attr, ptrdiff_t *offset)
+{
+  size_t secidx = IDX_debug_ranges;
+
+  Dwarf_Word start_offset;
+  if (__libdw_formptr (attr, secidx,
+		       DWARF_E_NO_DEBUG_RANGES,
+		       NULL, &start_offset) == NULL)
+    return -1;
+
+  *offset = start_offset;
   return 0;
 }
 
@@ -101,16 +121,11 @@ dwarf_ranges (Dwarf_Die *die, ptrdiff_t offset, Dwarf_Addr *basep,
     return 0;
 
   /* We have to look for a noncontiguous range.  */
+  size_t secidx = IDX_debug_ranges;
+  const Elf_Data *d = die->cu->dbg->sectiondata[secidx];
 
-  const Elf_Data *d = die->cu->dbg->sectiondata[IDX_debug_ranges];
-  if (d == NULL && offset != 0)
-    {
-      __libdw_seterrno (DWARF_E_NO_DEBUG_RANGES);
-      return -1;
-    }
-
-  unsigned char *readp;
-  unsigned char *readendp;
+  const unsigned char *readp;
+  const unsigned char *readendp;
   if (offset == 0)
     {
       Dwarf_Attribute attr_mem;
@@ -120,49 +135,30 @@ dwarf_ranges (Dwarf_Die *die, ptrdiff_t offset, Dwarf_Addr *basep,
 	/* No PC attributes in this DIE at all, so an empty range list.  */
 	return 0;
 
-      Dwarf_Word start_offset;
-      if ((readp = __libdw_formptr (attr, IDX_debug_ranges,
-				    DWARF_E_NO_DEBUG_RANGES,
-				    &readendp, &start_offset)) == NULL)
+      *basep = __libdw_cu_base_address (attr->cu);
+      if (*basep == (Dwarf_Addr) -1)
 	return -1;
 
-      offset = start_offset;
-      assert ((Dwarf_Word) offset == start_offset);
-
-      /* Fetch the CU's base address.  */
-      Dwarf_Die cudie = CUDIE (attr->cu);
-
-      /* Find the base address of the compilation unit.  It will
-	 normally be specified by DW_AT_low_pc.  In DWARF-3 draft 4,
-	 the base address could be overridden by DW_AT_entry_pc.  It's
-	 been removed, but GCC emits DW_AT_entry_pc and not DW_AT_lowpc
-	 for compilation units with discontinuous ranges.  */
-      if (unlikely (INTUSE(dwarf_lowpc) (&cudie, basep) != 0)
-	  && INTUSE(dwarf_formaddr) (INTUSE(dwarf_attr) (&cudie,
-							 DW_AT_entry_pc,
-							 &attr_mem),
-				     basep) != 0)
-	*basep = (Dwarf_Addr) -1;
+      if (initial_offset (attr, &offset) != 0)
+	return -1;
     }
   else
     {
       if (__libdw_offset_in_section (die->cu->dbg,
-				     IDX_debug_ranges, offset, 1))
-	return -1l;
-
-      readp = d->d_buf + offset;
-      readendp = d->d_buf + d->d_size;
+				     secidx, offset, 1))
+	return -1;
     }
 
- next:
-  if (readendp - readp < die->cu->address_size * 2)
-    goto invalid;
+  readp = d->d_buf + offset;
+  readendp = d->d_buf + d->d_size;
 
   Dwarf_Addr begin;
   Dwarf_Addr end;
 
-  switch (__libdw_read_begin_end_pair_inc (die->cu->dbg, IDX_debug_ranges,
-					   &readp, die->cu->address_size,
+ next:
+  switch (__libdw_read_begin_end_pair_inc (die->cu->dbg, secidx,
+					   &readp, readendp,
+					   die->cu->address_size,
 					   &begin, &end, basep))
     {
     case 0:
@@ -172,22 +168,11 @@ dwarf_ranges (Dwarf_Die *die, ptrdiff_t offset, Dwarf_Addr *basep,
     case 2:
       return 0;
     default:
-      return -1l;
-    }
-
-  /* We have an address range entry.  Check that we have a base.  */
-  if (*basep == (Dwarf_Addr) -1)
-    {
-      if (INTUSE(dwarf_errno) () == 0)
-	{
-	invalid:
-	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
-	}
       return -1;
     }
 
-  *startp = *basep + begin;
-  *endp = *basep + end;
+  *startp = begin;
+  *endp = end;
   return readp - (unsigned char *) d->d_buf;
 }
 INTDEF (dwarf_ranges)

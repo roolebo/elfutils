@@ -34,9 +34,9 @@
 #include <dwarf.h>
 #include "libdwP.h"
 
-internal_function unsigned char *
+internal_function const unsigned char *
 __libdw_formptr (Dwarf_Attribute *attr, int sec_index,
-		 int err_nodata, unsigned char **endpp,
+		 int err_nodata, const unsigned char **endpp,
 		 Dwarf_Off *offsetp)
 {
   if (attr == NULL)

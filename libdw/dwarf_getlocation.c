@@ -1,7 +1,6 @@
 /* Return location expression list.
-   Copyright (C) 2000-2010, 2013-2015, 2017 Red Hat, Inc.
+   Copyright (C) 2000-2010, 2013-2015, 2017, 2018 Red Hat, Inc.
    This file is part of elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
    This file is free software; you can redistribute it and/or modify
    it under the terms of either
@@ -659,44 +658,55 @@ dwarf_getlocation (Dwarf_Attribute *attr, Dwarf_Op **llbuf, size_t *listlen)
   return getlocation (attr->cu, &block, llbuf, listlen, cu_sec_idx (attr->cu));
 }
 
-static int
-attr_base_address (Dwarf_Attribute *attr, Dwarf_Addr *basep)
+Dwarf_Addr
+__libdw_cu_base_address (Dwarf_CU *cu)
 {
-  /* Fetch the CU's base address.  */
-  Dwarf_Die cudie = CUDIE (attr->cu);
-
-  /* Find the base address of the compilation unit.  It will
-     normally be specified by DW_AT_low_pc.  In DWARF-3 draft 4,
-     the base address could be overridden by DW_AT_entry_pc.  It's
-     been removed, but GCC emits DW_AT_entry_pc and not DW_AT_lowpc
-     for compilation units with discontinuous ranges.  */
-  Dwarf_Attribute attr_mem;
-  if (unlikely (INTUSE(dwarf_lowpc) (&cudie, basep) != 0)
-      && INTUSE(dwarf_formaddr) (INTUSE(dwarf_attr) (&cudie,
-						     DW_AT_entry_pc,
-						     &attr_mem),
-				 basep) != 0)
+  if (cu->base_address == (Dwarf_Addr) -1)
     {
-      if (INTUSE(dwarf_errno) () != 0)
-	return -1;
+      Dwarf_Addr base;
 
-      /* The compiler provided no base address when it should
-	 have.  Buggy GCC does this when it used absolute
-	 addresses in the location list and no DW_AT_ranges.  */
-      *basep = 0;
+      /* Fetch the CU's base address.  */
+      Dwarf_Die cudie = CUDIE (cu);
+
+      /* Find the base address of the compilation unit.  It will
+	 normally be specified by DW_AT_low_pc.  In DWARF-3 draft 4,
+	 the base address could be overridden by DW_AT_entry_pc.  It's
+	 been removed, but GCC emits DW_AT_entry_pc and not DW_AT_lowpc
+	 for compilation units with discontinuous ranges.  */
+      Dwarf_Attribute attr_mem;
+      if (INTUSE(dwarf_lowpc) (&cudie, &base) != 0
+	  && INTUSE(dwarf_formaddr) (INTUSE(dwarf_attr) (&cudie,
+							 DW_AT_entry_pc,
+							 &attr_mem),
+				     &base) != 0)
+	{
+	  int err = INTUSE(dwarf_errno) ();
+	  if (err != 0)
+	    {
+	      __libdw_seterrno (err);
+	      base = (Dwarf_Addr) -1;
+	    }
+	  else
+	    {
+	      /* The compiler provided no base address when it should
+		 have.  Buggy GCC does this when it used absolute
+		 addresses in the location list and no DW_AT_ranges.  */
+	      base = 0;
+	    }
+	}
+      cu->base_address = base;
     }
-  return 0;
+
+  return cu->base_address;
 }
 
 static int
-initial_offset_base (Dwarf_Attribute *attr, ptrdiff_t *offset,
-		     Dwarf_Addr *basep)
+initial_offset (Dwarf_Attribute *attr, ptrdiff_t *offset)
 {
-  if (attr_base_address (attr, basep) != 0)
-    return -1;
+  size_t secidx = IDX_debug_loc;
 
   Dwarf_Word start_offset;
-  if (__libdw_formptr (attr, IDX_debug_loc,
+  if (__libdw_formptr (attr, secidx,
 		       DWARF_E_NO_LOCLIST,
 		       NULL, &start_offset) == NULL)
     return -1;
@@ -711,22 +721,19 @@ getlocations_addr (Dwarf_Attribute *attr, ptrdiff_t offset,
 		   Dwarf_Addr address, const Elf_Data *locs, Dwarf_Op **expr,
 		   size_t *exprlen)
 {
-  unsigned char *readp = locs->d_buf + offset;
-  unsigned char *readendp = locs->d_buf + locs->d_size;
-
- next:
-  if (readendp - readp < attr->cu->address_size * 2)
-    {
-    invalid:
-      __libdw_seterrno (DWARF_E_INVALID_DWARF);
-      return -1;
-    }
+  Dwarf_CU *cu = attr->cu;
+  Dwarf *dbg = cu->dbg;
+  size_t secidx = IDX_debug_loc;
+  const unsigned char *readp = locs->d_buf + offset;
+  const unsigned char *readendp = locs->d_buf + locs->d_size;
 
   Dwarf_Addr begin;
   Dwarf_Addr end;
 
-  switch (__libdw_read_begin_end_pair_inc (attr->cu->dbg, IDX_debug_loc,
-					   &readp, attr->cu->address_size,
+ next:
+  switch (__libdw_read_begin_end_pair_inc (dbg, secidx,
+					   &readp, readendp,
+					   cu->address_size,
 					   &begin, &end, basep))
     {
     case 0: /* got location range. */
@@ -739,25 +746,29 @@ getlocations_addr (Dwarf_Attribute *attr, ptrdiff_t offset,
       return -1;
     }
 
-  if (readendp - readp < 2)
-    goto invalid;
-
   /* We have a location expression.  */
   Dwarf_Block block;
-  block.length = read_2ubyte_unaligned_inc (attr->cu->dbg, readp);
-  block.data = readp;
+  if (readendp - readp < 2)
+    {
+    invalid:
+      __libdw_seterrno (DWARF_E_INVALID_DWARF);
+      return -1;
+    }
+  block.length = read_2ubyte_unaligned_inc (dbg, readp);
+  block.data = (unsigned char *) readp;
   if (readendp - readp < (ptrdiff_t) block.length)
     goto invalid;
   readp += block.length;
 
-  *startp = *basep + begin;
-  *endp = *basep + end;
+  /* Note these addresses include any base (if necessary) already.  */
+  *startp = begin;
+  *endp = end;
 
   /* If address is minus one we want them all, otherwise only matching.  */
   if (address != (Dwarf_Word) -1 && (address < *startp || address >= *endp))
     goto next;
 
-  if (getlocation (attr->cu, &block, expr, exprlen, IDX_debug_loc) != 0)
+  if (getlocation (cu, &block, expr, exprlen, secidx) != 0)
     return -1;
 
   return readp - (unsigned char *) locs->d_buf;
@@ -804,19 +815,19 @@ dwarf_getlocation_addr (Dwarf_Attribute *attr, Dwarf_Addr address,
   size_t got = 0;
 
   /* This is a true loclistptr, fetch the initial base address and offset.  */
-  if (initial_offset_base (attr, &off, &base) != 0)
+  base = __libdw_cu_base_address (attr->cu);
+  if (base == (Dwarf_Addr) -1)
     return -1;
 
-  const Elf_Data *d = attr->cu->dbg->sectiondata[IDX_debug_loc];
-  if (d == NULL)
-    {
-      __libdw_seterrno (DWARF_E_NO_LOCLIST);
-      return -1;
-    }
+  if (initial_offset (attr, &off) != 0)
+    return -1;
+
+  size_t secidx = IDX_debug_loc;
+  const Elf_Data *d = attr->cu->dbg->sectiondata[secidx];
 
   while (got < maxlocs
          && (off = getlocations_addr (attr, off, &base, &start, &end,
-				   address, d, &expr, &expr_len)) > 0)
+				      address, d, &expr, &expr_len)) > 0)
     {
       /* This one matches the address.  */
       if (llbufs != NULL)
@@ -884,16 +895,16 @@ dwarf_getlocations (Dwarf_Attribute *attr, ptrdiff_t offset, Dwarf_Addr *basep,
 
       /* We must be looking at a true loclistptr, fetch the initial
 	 base address and offset.  */
-      if (initial_offset_base (attr, &offset, basep) != 0)
+      *basep = __libdw_cu_base_address (attr->cu);
+      if (*basep == (Dwarf_Addr) -1)
+	return -1;
+
+      if (initial_offset (attr, &offset) != 0)
 	return -1;
     }
 
-  const Elf_Data *d = attr->cu->dbg->sectiondata[IDX_debug_loc];
-  if (d == NULL)
-    {
-      __libdw_seterrno (DWARF_E_NO_LOCLIST);
-      return -1;
-    }
+  size_t secidx = IDX_debug_loc;
+  const Elf_Data *d = attr->cu->dbg->sectiondata[secidx];
 
   return getlocations_addr (attr, offset, basep, startp, endp,
 			    (Dwarf_Word) -1, d, expr, exprlen);

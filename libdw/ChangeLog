@@ -1,3 +1,8 @@
+2018-04-04  Mark Wielaard  <mark@klomp.org>
+
+	* libdw_findcu.c (__libdw_intern_next_unit): Initialize Dwarf_CU
+	addr_base and str_off_base.
+
 2018-03-23  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_begin_elf.c (dwarf_scnnames): Add IDX_debug_str_offsets,

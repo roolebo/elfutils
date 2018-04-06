@@ -915,7 +915,7 @@ is_cudie (Dwarf_Die *cudie)
     - If it's base address selection record, set up *BASEP and return 1.
     - If it's end of rangelist, don't set anything and return 2
     - If an error occurs, don't set anything and return <0.  */
-int __libdw_read_begin_end_pair_inc (Dwarf *dbg, int sec_index,
+int __libdw_read_begin_end_pair_inc (Dwarf_CU *cu, int sec_index,
 				     const unsigned char **readp,
 				     const unsigned char *readend,
 				     int width,
@@ -1084,6 +1084,8 @@ static inline Dwarf_Off __libdw_cu_str_off_base (Dwarf_CU *cu)
 }
 
 
+/* Either a direct offset into .debug_ranges for version < 5, or the
+   start of the offset table in .debug_rnglists for version > 5.  */
 static inline Dwarf_Off
 __libdw_cu_ranges_base (Dwarf_CU *cu)
 {
@@ -1092,17 +1094,89 @@ __libdw_cu_ranges_base (Dwarf_CU *cu)
       Dwarf_Off offset = 0;
       Dwarf_Die cu_die = CUDIE(cu);
       Dwarf_Attribute attr;
-      if (dwarf_attr (&cu_die, DW_AT_GNU_ranges_base, &attr) != NULL)
+      if (cu->version < 5)
 	{
-	  Dwarf_Word off;
-	  if (dwarf_formudata (&attr, &off) == 0)
-	    offset = off;
+	  if (dwarf_attr (&cu_die, DW_AT_GNU_ranges_base, &attr) != NULL)
+	    {
+	      Dwarf_Word off;
+	      if (dwarf_formudata (&attr, &off) == 0)
+		offset = off;
+	    }
 	}
+      else
+	{
+	  if (dwarf_attr (&cu_die, DW_AT_rnglists_base, &attr) != NULL)
+	    {
+	      Dwarf_Word off;
+	      if (dwarf_formudata (&attr, &off) == 0)
+		offset = off;
+	    }
+
+	  /* There wasn't an rnglists_base, if the Dwarf does have a
+	     .debug_rnglists section, then it might be we need the
+	     base after the first header. */
+	  Elf_Data *data = cu->dbg->sectiondata[IDX_debug_rnglists];
+	  if (offset == 0 && data != NULL)
+	    {
+	      Dwarf *dbg = cu->dbg;
+	      const unsigned char *readp = data->d_buf;
+	      const unsigned char *const dataend
+		= (unsigned char *) data->d_buf + data->d_size;
+
+	      uint64_t unit_length = read_4ubyte_unaligned_inc (dbg, readp);
+	      unsigned int offset_size = 4;
+	      if (unlikely (unit_length == 0xffffffff))
+		{
+		  if (unlikely (readp > dataend - 8))
+		    goto no_header;
+
+		  unit_length = read_8ubyte_unaligned_inc (dbg, readp);
+		  offset_size = 8;
+		}
+
+	      if (readp > dataend - 8
+		  || unit_length < 8
+		  || unit_length > (uint64_t) (dataend - readp))
+		goto no_header;
+
+	      uint16_t version = read_2ubyte_unaligned_inc (dbg, readp);
+	      if (version != 5)
+		goto no_header;
+
+	      uint8_t address_size = *readp++;
+	      if (address_size != 4 && address_size != 8)
+		goto no_header;
+
+	      uint8_t segment_size = *readp++;
+	      if (segment_size != 0)
+		goto no_header;
+
+	      uint32_t offset_entry_count;
+	      offset_entry_count = read_4ubyte_unaligned_inc (dbg, readp);
+
+	      const unsigned char *offset_array_start = readp;
+	      if (offset_entry_count <= 0)
+		goto no_header;
+
+	      uint64_t needed = offset_entry_count * offset_size;
+	      if (unit_length - 8 < needed)
+		goto no_header;
+
+	      offset = (Dwarf_Off) (offset_array_start
+				    - (unsigned char *) data->d_buf);
+	    }
+	}
+    no_header:
       cu->ranges_base = offset;
     }
 
   return cu->ranges_base;
 }
+
+
+/* Given an address index for a CU return the address.
+   Returns -1 and sets libdw_errno if an error occurs.  */
+int __libdw_addrx (Dwarf_CU *cu, Dwarf_Word idx, Dwarf_Addr *addr);
 
 
 /* Helper function to set debugdir field in Dwarf, used from dwarf_begin_elf

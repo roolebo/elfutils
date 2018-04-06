@@ -71,4 +71,59 @@ die: no_subject (2e)
 
 EOF
 
+# Same with -gdwarf-5
+# gcc -c -O2 -o testfile-ranges-hello5.o -gsplit-dwarf -gdwarf-5 hello.c
+# gcc -c -O2 -o testfile-ranges-world5.o -gsplit-dwarf -gdwarf-5 world.c
+# gcc -o testfilesplitranges5 -O2 testfile-ranges-hello5.o testfile-ranges-world5.o
+# eu-strip -f testfilesplitranges5.debug testfilesplitranges5
+
+testfiles testfilesplitranges5.debug
+testfiles testfile-ranges-hello5.dwo testfile-ranges-world5.dwo
+
+testrun_compare ${abs_builddir}/all-dwarf-ranges testfilesplitranges5.debug <<\EOF
+die: hello.c (11)
+ 401150..40117a
+ 401050..401067
+
+die: no_say (2e)
+ 401160..40117a
+
+die: main (2e)
+ 401050..401067
+
+die: subject (1d)
+ 401053..40105f
+
+die: subject (2e)
+ 401150..401160
+
+die: world.c (11)
+ 401180..4011e7
+
+die: no_main (2e)
+ 4011d0..4011e7
+
+die: no_subject (1d)
+ 4011d3..4011df
+
+die: say (2e)
+ 401180..4011c0
+
+die: happy (1d)
+ 40119b..40119b
+ 40119c..4011a6
+ 4011b0..4011b4
+ 4011b5..4011bf
+
+die: sad (1d)
+ 40119b..40119b
+ 40119c..4011a6
+ 4011b4..4011b4
+ 4011b5..4011bf
+
+die: no_subject (2e)
+ 4011c0..4011d0
+
+EOF
+
 exit 0

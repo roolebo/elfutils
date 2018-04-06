@@ -724,7 +724,7 @@ getlocations_addr (Dwarf_Attribute *attr, ptrdiff_t offset,
   Dwarf_Addr end;
 
  next:
-  switch (__libdw_read_begin_end_pair_inc (dbg, secidx,
+  switch (__libdw_read_begin_end_pair_inc (cu, secidx,
 					   &readp, readendp,
 					   cu->address_size,
 					   &begin, &end, basep))

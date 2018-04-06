@@ -6,7 +6,8 @@
 	(listptr_cu): New function.
 	(print_debug_rnglists_section): Likewise.
 	(attr_callback): Call notice_listptr for DW_AT_ranges. Handle
-	DW_AT_rnglists_base.
+	DW_AT_rnglists_base. Handle DW_FORM_rnglistx. DW_AT_start_scope
+	can also have a rnglist.
 	(print_debug_units): Do (silently) scan split DWARF also for
 	debug_ranges before DWARF5 to catch all rangelistptrs.
 	(print_debug): Recognize .debug_rnglists. Reset known_rnglistptr.

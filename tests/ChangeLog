@@ -1,3 +1,15 @@
+2018-04-06  Mark Wielaard  <mark@klomp.org>
+
+	* testfileranges5.debug.bz2: New testfile.
+	* testfilesplitranges5.debug.bz2: Likewise.
+	* testfile-ranges-hello5.dwo.bz2: Likewise.
+	* testfile-ranges-world5.dwo.bz2: Likewise.
+	* run-dwarf-ranges.sh: Run on testfileranges5.debug.
+	* run-all-dwarf-ranges.sh: Run on testfilesplitranges5.debug.
+	* tests/Makefile.am (EXTRA_DIST): Add testfileranges5.debug.bz2,
+	testfilesplitranges5.debug.bz2, testfile-ranges-hello5.dwo.bz2 and
+	testfile-ranges-world5.dwo.bz2.
+
 2018-04-11  Mark Wielaard  <mark@klomp.org>
 
 	* run-readelf-ranges.sh: New test.

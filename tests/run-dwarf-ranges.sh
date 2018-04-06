@@ -102,4 +102,25 @@ testrun_compare ${abs_builddir}/dwarf-ranges testfileranges4.debug 0x374 <<\EOF
 4005a5..4005ad (base 400540)
 EOF
 
+# Like above, but with -gdwarf-5.
+testfiles testfileranges5.debug
+testrun_compare ${abs_builddir}/dwarf-ranges testfileranges5.debug 0xc <<\EOF
+401150..40117a (base 0)
+401050..401067 (base 0)
+EOF
+
+testrun_compare ${abs_builddir}/dwarf-ranges testfileranges5.debug 0x2ce <<\EOF
+40119b..40119b (base 401180)
+40119c..4011a6 (base 401180)
+4011b0..4011b4 (base 401180)
+4011b5..4011bf (base 401180)
+EOF
+
+testrun_compare ${abs_builddir}/dwarf-ranges testfileranges5.debug 0x2ef <<\EOF
+40119b..40119b (base 401180)
+40119c..4011a6 (base 401180)
+4011b4..4011b4 (base 401180)
+4011b5..4011bf (base 401180)
+EOF
+
 exit 0

@@ -35,6 +35,48 @@
 
 
 int
+__libdw_addrx (Dwarf_CU *cu, Dwarf_Word idx, Dwarf_Addr *addr)
+{
+  Dwarf_Off addr_off = __libdw_cu_addr_base (cu);
+  if (addr_off == (Dwarf_Off) -1)
+    return -1;
+
+  Dwarf *dbg = cu->dbg;
+  if (dbg->sectiondata[IDX_debug_addr] == NULL)
+    {
+      __libdw_seterrno (DWARF_E_NO_DEBUG_ADDR);
+      return -1;
+    }
+
+  /* The section should at least contain room for one address.  */
+  int address_size = cu->address_size;
+  if (cu->address_size > dbg->sectiondata[IDX_debug_addr]->d_size)
+    {
+    invalid_offset:
+      __libdw_seterrno (DWARF_E_INVALID_OFFSET);
+      return -1;
+    }
+
+  if (addr_off > (dbg->sectiondata[IDX_debug_addr]->d_size
+		  - address_size))
+    goto invalid_offset;
+
+  idx *= address_size;
+  if (idx > (dbg->sectiondata[IDX_debug_addr]->d_size
+	     - address_size - addr_off))
+    goto invalid_offset;
+
+  const unsigned char *datap;
+  datap = dbg->sectiondata[IDX_debug_addr]->d_buf + addr_off + idx;
+  if (address_size == 4)
+    *addr = read_4ubyte_unaligned (dbg, datap);
+  else
+    *addr = read_8ubyte_unaligned (dbg, datap);
+
+  return 0;
+}
+
+int
 dwarf_formaddr (Dwarf_Attribute *attr, Dwarf_Addr *return_addr)
 {
   if (attr == NULL)
@@ -98,40 +140,8 @@ dwarf_formaddr (Dwarf_Attribute *attr, Dwarf_Addr *return_addr)
 
   /* So we got an index.  Lets see if it is valid and we can get the actual
      address.  */
-
-  Dwarf_Off addr_off = __libdw_cu_addr_base (cu);
-  if (addr_off == (Dwarf_Off) -1)
+  if (__libdw_addrx (cu, idx, return_addr) != 0)
     return -1;
-
-  if (dbg->sectiondata[IDX_debug_addr] == NULL)
-    {
-      __libdw_seterrno (DWARF_E_NO_DEBUG_ADDR);
-      return -1;
-    }
-
-  /* The section should at least contain room for one address.  */
-  int address_size = cu->address_size;
-  if (cu->address_size > dbg->sectiondata[IDX_debug_addr]->d_size)
-    {
-    invalid_offset:
-      __libdw_seterrno (DWARF_E_INVALID_OFFSET);
-      return -1;
-    }
-
-  if (addr_off > (dbg->sectiondata[IDX_debug_addr]->d_size
-		  - address_size))
-    goto invalid_offset;
-
-  idx *= address_size;
-  if (idx > (dbg->sectiondata[IDX_debug_addr]->d_size
-	     - address_size - addr_off))
-    goto invalid_offset;
-
-  datap = dbg->sectiondata[IDX_debug_addr]->d_buf + addr_off + idx;
-  if (address_size == 4)
-    *return_addr = read_4ubyte_unaligned (dbg, datap);
-  else
-    *return_addr = read_8ubyte_unaligned (dbg, datap);
 
   return 0;
 }

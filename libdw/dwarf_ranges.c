@@ -40,62 +40,244 @@
     - If it's end of rangelist, don't set anything and return 2
     - If an error occurs, don't set anything and return -1.  */
 internal_function int
-__libdw_read_begin_end_pair_inc (Dwarf *dbg, int sec_index,
+__libdw_read_begin_end_pair_inc (Dwarf_CU *cu, int sec_index,
 				 const unsigned char **addrp,
 				 const unsigned char *addrend,
 				 int width,
 				 Dwarf_Addr *beginp, Dwarf_Addr *endp,
 				 Dwarf_Addr *basep)
 {
-  Dwarf_Addr escape = (width == 8 ? (Elf64_Addr) -1
-		       : (Elf64_Addr) (Elf32_Addr) -1);
-  Dwarf_Addr begin;
-  Dwarf_Addr end;
-
-  const unsigned char *addr = *addrp;
-  if (addrend - addr < width * 2)
+  Dwarf *dbg = cu->dbg;
+  if (sec_index == IDX_debug_ranges || sec_index == IDX_debug_loc)
     {
-    invalid:
+      Dwarf_Addr escape = (width == 8 ? (Elf64_Addr) -1
+			   : (Elf64_Addr) (Elf32_Addr) -1);
+      Dwarf_Addr begin;
+      Dwarf_Addr end;
+
+      const unsigned char *addr = *addrp;
+      if (addrend - addr < width * 2)
+	{
+	invalid:
+	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
+	  return -1;
+	}
+
+      bool begin_relocated = READ_AND_RELOCATE (__libdw_relocate_address,
+						begin);
+      bool end_relocated = READ_AND_RELOCATE (__libdw_relocate_address,
+					      end);
+      *addrp = addr;
+
+      /* Unrelocated escape for begin means base address selection.  */
+      if (begin == escape && !begin_relocated)
+	{
+	  if (unlikely (end == escape))
+	    goto invalid;
+
+	  *basep = end;
+	  return 1;
+	}
+
+      /* Unrelocated pair of zeroes means end of range list.  */
+      if (begin == 0 && end == 0 && !begin_relocated && !end_relocated)
+	return 2;
+
+      /* Don't check for begin_relocated == end_relocated.  Serve the data
+	 to the client even though it may be buggy.  */
+      *beginp = begin + *basep;
+      *endp = end + *basep;
+
+      return 0;
+    }
+  else if (sec_index == IDX_debug_rnglists)
+    {
+      const unsigned char *addr = *addrp;
+      if (addrend - addr < 1)
+	goto invalid;
+
+      const char code = *addr++;
+      uint64_t begin = 0, end = 0, base = *basep, addr_idx;
+      switch (code)
+	{
+	case DW_RLE_end_of_list:
+	  *addrp = addr;
+	  return 2;
+
+	case DW_RLE_base_addressx:
+	  if (addrend - addr < 1)
+	    goto invalid;
+	  get_uleb128 (addr_idx, addr, addrend);
+	  if (__libdw_addrx (cu, addr_idx, &base) != 0)
+	    return -1;
+
+	  *basep = base;
+	  *addrp = addr;
+	  return 1;
+
+	case DW_RLE_startx_endx:
+	  if (addrend - addr < 1)
+	    goto invalid;
+	  get_uleb128 (addr_idx, addr, addrend);
+	  if (__libdw_addrx (cu, addr_idx, &begin) != 0)
+	    return -1;
+	  if (addrend - addr < 1)
+	    goto invalid;
+	  get_uleb128 (addr_idx, addr, addrend);
+	  if (__libdw_addrx (cu, addr_idx, &end) != 0)
+	    return -1;
+
+	  *beginp = begin;
+	  *endp = end;
+	  *addrp = addr;
+	  return 0;
+
+	case DW_RLE_startx_length:
+	  if (addrend - addr < 1)
+	    goto invalid;
+	  get_uleb128 (addr_idx, addr, addrend);
+	  if (__libdw_addrx (cu, addr_idx, &begin) != 0)
+	    return -1;
+	  if (addrend - addr < 1)
+	    goto invalid;
+	  get_uleb128 (end, addr, addrend);
+
+	  *beginp = begin;
+	  *endp = begin + end;
+	  *addrp = addr;
+	  return 0;
+
+	case DW_RLE_offset_pair:
+	  if (addrend - addr < 1)
+	    goto invalid;
+	  get_uleb128 (begin, addr, addrend);
+	  if (addrend - addr < 1)
+	    goto invalid;
+	  get_uleb128 (end, addr, addrend);
+
+	  *beginp = begin + base;
+	  *endp = end + base;
+	  *addrp = addr;
+	  return 0;
+
+	case DW_RLE_base_address:
+	  if (addrend - addr < width)
+	    goto invalid;
+	  __libdw_read_address_inc (dbg, sec_index, &addr, width, &base);
+
+	  *basep = base;
+	  *addrp = addr;
+	  return 1;
+
+	case DW_RLE_start_end:
+	  if (addrend - addr < 2 * width)
+	    goto invalid;
+	  __libdw_read_address_inc (dbg, sec_index, &addr, width, &begin);
+	  __libdw_read_address_inc (dbg, sec_index, &addr, width, &end);
+
+	  *beginp = begin;
+	  *endp = end;
+	  *addrp = addr;
+	  return 0;
+
+	case DW_RLE_start_length:
+	  if (addrend - addr < width)
+	    goto invalid;
+	  __libdw_read_address_inc (dbg, sec_index, &addr, width, &begin);
+	  if (addrend - addr < 1)
+	    goto invalid;
+	  get_uleb128 (end, addr, addrend);
+
+	  *beginp = begin;
+	  *endp = begin + end;
+	  *addrp = addr;
+	  return 0;
+
+	default:
+	  goto invalid;
+	}
+    }
+  else
+    {
       __libdw_seterrno (DWARF_E_INVALID_DWARF);
       return -1;
     }
-
-  bool begin_relocated = READ_AND_RELOCATE (__libdw_relocate_address, begin);
-  bool end_relocated = READ_AND_RELOCATE (__libdw_relocate_address, end);
-  *addrp = addr;
-
-  /* Unrelocated escape for begin means base address selection.  */
-  if (begin == escape && !begin_relocated)
-    {
-      if (unlikely (end == escape))
-	goto invalid;
-
-      *basep = end;
-      return 1;
-    }
-
-  /* Unrelocated pair of zeroes means end of range list.  */
-  if (begin == 0 && end == 0 && !begin_relocated && !end_relocated)
-    return 2;
-
-  /* Don't check for begin_relocated == end_relocated.  Serve the data
-     to the client even though it may be buggy.  */
-  *beginp = begin + *basep;
-  *endp = end + *basep;
-
-  return 0;
 }
 
 static int
 initial_offset (Dwarf_Attribute *attr, ptrdiff_t *offset)
 {
-  size_t secidx = IDX_debug_ranges;
+  size_t secidx = (attr->cu->version < 5
+		   ? IDX_debug_ranges : IDX_debug_rnglists);
 
   Dwarf_Word start_offset;
-  if (__libdw_formptr (attr, secidx,
-		       DWARF_E_NO_DEBUG_RANGES,
-		       NULL, &start_offset) == NULL)
-    return -1;
+  if (attr->form == DW_FORM_rnglistx)
+    {
+      Dwarf_Word idx;
+      Dwarf_CU *cu = attr->cu;
+      const unsigned char *datap = attr->valp;
+      const unsigned char *endp = cu->endp;
+      if (datap >= endp)
+	{
+	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
+	  return -1;
+	}
+      get_uleb128 (idx, datap, endp);
+
+      Elf_Data *data = cu->dbg->sectiondata[secidx];
+      if (data == NULL && cu->unit_type == DW_UT_split_compile)
+	{
+	  cu = __libdw_find_split_unit (cu);
+	  if (cu != NULL)
+	    data = cu->dbg->sectiondata[secidx];
+	}
+
+      if (data == NULL)
+	{
+	  __libdw_seterrno (secidx == IDX_debug_ranges
+                            ? DWARF_E_NO_DEBUG_RANGES
+                            : DWARF_E_NO_DEBUG_RNGLISTS);
+	  return -1;
+	}
+
+      Dwarf_Off range_base_off = __libdw_cu_ranges_base (cu);
+
+      /* The section should at least contain room for one offset.  */
+      size_t sec_size = cu->dbg->sectiondata[secidx]->d_size;
+      size_t offset_size = cu->offset_size;
+      if (offset_size > sec_size)
+	{
+	invalid_offset:
+	  __libdw_seterrno (DWARF_E_INVALID_OFFSET);
+	  return -1;
+	}
+
+      /* And the base offset should be at least inside the section.  */
+      if (range_base_off > (sec_size - offset_size))
+	goto invalid_offset;
+
+      size_t max_idx = (sec_size - offset_size - range_base_off) / offset_size;
+      if (idx > max_idx)
+	goto invalid_offset;
+
+      datap = (cu->dbg->sectiondata[secidx]->d_buf
+	       + range_base_off + (idx * offset_size));
+      if (offset_size == 4)
+	start_offset = read_4ubyte_unaligned (cu->dbg, datap);
+      else
+	start_offset = read_8ubyte_unaligned (cu->dbg, datap);
+
+      start_offset += range_base_off;
+    }
+  else
+    {
+      if (__libdw_formptr (attr, secidx,
+			   (secidx == IDX_debug_ranges
+			    ? DWARF_E_NO_DEBUG_RANGES
+			    : DWARF_E_NO_DEBUG_RNGLISTS),
+			   NULL, &start_offset) == NULL)
+	return -1;
+    }
 
   *offset = start_offset;
   return 0;
@@ -121,7 +303,6 @@ dwarf_ranges (Dwarf_Die *die, ptrdiff_t offset, Dwarf_Addr *basep,
     return 0;
 
   /* We have to look for a noncontiguous range.  */
-  size_t secidx = IDX_debug_ranges;
   Dwarf_CU *cu = die->cu;
   if (cu == NULL)
     {
@@ -129,6 +310,7 @@ dwarf_ranges (Dwarf_Die *die, ptrdiff_t offset, Dwarf_Addr *basep,
       return -1;
     }
 
+  size_t secidx = (cu->version < 5 ? IDX_debug_ranges : IDX_debug_rnglists);
   const Elf_Data *d = cu->dbg->sectiondata[secidx];
   if (d == NULL && cu->unit_type == DW_UT_split_compile)
     {
@@ -176,7 +358,7 @@ dwarf_ranges (Dwarf_Die *die, ptrdiff_t offset, Dwarf_Addr *basep,
   Dwarf_Addr end;
 
  next:
-  switch (__libdw_read_begin_end_pair_inc (cu->dbg, secidx,
+  switch (__libdw_read_begin_end_pair_inc (cu, secidx,
 					   &readp, readendp,
 					   cu->address_size,
 					   &begin, &end, basep))

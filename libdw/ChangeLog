@@ -1,3 +1,18 @@
+2018-04-06  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_formaddr.c (__libdw_addrx): New function, extracted from...
+	(dwarf_formaddr): here. Use __libdw_addrx.
+	* dwarf_getlocation.c (getlocations_addr): Pass cu to
+	__libdw_read_begin_end_pair_inc.
+	* dwarf_ranges.c (__libdw_read_begin_end_pair_inc): Take cu as
+	argument. Handle .debug_rnglists.
+	(initial_offset): Handle .debug_rnglists and DW_FORM_rnglistx.
+	(dwarf_ranges): Likewise. Check cu isn't NULL before use. Pass cu to
+	__libdw_read_begin_end_pair_inc.
+	* libdwP.h (__libdw_read_begin_end_pair_inc): Take cu as argument.
+	(__libdw_cu_ranges_base): Handle DW_AT_rnglists_base.
+	(__libdw_addrx): New function definition.
+
 2018-04-11  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf.h: Add DWARF5 range list entry DW_RLE encodings.

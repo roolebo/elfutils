@@ -6699,6 +6699,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
       break;
 
     case DW_FORM_sec_offset:
+    case DW_FORM_rnglistx:
     case DW_FORM_implicit_const:
     case DW_FORM_udata:
     case DW_FORM_sdata:
@@ -6755,6 +6756,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	  return DWARF_CB_OK;
 
 	case DW_AT_ranges:
+	case DW_AT_start_scope:
 	  {
 	    bool nlpt;
 	    if (cbargs->cu->version < 5)

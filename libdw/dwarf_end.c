@@ -113,6 +113,11 @@ dwarf_end (Dwarf *dwarf)
 	  cu_free (dwarf->fake_loc_cu);
 	  free (dwarf->fake_loc_cu);
 	}
+      if (dwarf->fake_loclists_cu != NULL)
+	{
+	  cu_free (dwarf->fake_loclists_cu);
+	  free (dwarf->fake_loclists_cu);
+	}
       if (dwarf->fake_addr_cu != NULL)
 	{
 	  cu_free (dwarf->fake_addr_cu);

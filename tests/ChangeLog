@@ -1,3 +1,11 @@
+2018-04-07  Mark Wielaard  <mark@klomp.org>
+
+	* run-varlocs.sh: Run on testfileranges5.debug and
+	testsplitfileranges5.debug.
+	* varlocs.c (is_debug): New bool.
+	(print_expr): Don't fail on missing CFI for is_debug.
+	(main): Parse --debug, set is_debug.
+
 2018-04-12  Mark Wielaard  <mark@klomp.org>
 
 	* run-readelf-loc.sh: Add new testcases.

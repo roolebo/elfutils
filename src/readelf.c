@@ -6779,6 +6779,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 
     case DW_FORM_sec_offset:
     case DW_FORM_rnglistx:
+    case DW_FORM_loclistx:
     case DW_FORM_implicit_const:
     case DW_FORM_udata:
     case DW_FORM_sdata:
@@ -6808,7 +6809,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	    }
 	  FALLTHROUGH;
 
-	/* These cases always take a loclistptr and no constant. */
+	/* These cases always take a loclist[ptr] and no constant. */
 	case DW_AT_location:
 	case DW_AT_data_location:
 	case DW_AT_vtable_elem_location:
@@ -6817,6 +6818,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	case DW_AT_frame_base:
 	case DW_AT_return_addr:
 	case DW_AT_static_link:
+	case DW_AT_segment:
 	case DW_AT_GNU_call_site_value:
 	case DW_AT_GNU_call_site_data_value:
 	case DW_AT_GNU_call_site_target:

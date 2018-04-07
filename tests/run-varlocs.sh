@@ -124,6 +124,158 @@ module 'testfile_implicit_pointer'
     frame_base: {call_frame_cfa {bregx(7,8)}}
 EOF
 
+# Multi CU DWARF5. See run-dwarf-ranges.sh.
+testfiles testfileranges5.debug
+testrun_compare ${abs_top_builddir}/tests/varlocs --debug -e testfileranges5.debug <<\EOF
+module 'testfileranges5.debug'
+[c] CU 'hello.c'@0
+  [2a] function 'no_say'@401160
+    frame_base: {call_frame_cfa {...}}
+    [4a] parameter 'prefix'
+      [401160,401169) {reg5}
+      [401169,40116a) {entry_value(1) {reg5}, stack_value}
+      [40116a,401175) {reg5}
+      [401175,40117a) {entry_value(1) {reg5}, stack_value}
+    [59] variable 'world'
+      [401160,40117a) {addr(0x402004), stack_value}
+  [bd] function 'main'@401050
+    frame_base: {call_frame_cfa {...}}
+    [dd] parameter 'argc'
+      [401050,401062) {reg5}
+      [401062,401067) {entry_value(1) {reg5}, stack_value}
+    [ec] parameter 'argv'
+      [401050,401066) {reg4}
+      [401066,401067) {entry_value(1) {reg4}, stack_value}
+  [fb] inlined function 'subject'@401053
+    [117] parameter 'count'
+      [401053,40105f) {reg5}
+    [120] parameter 'word'
+      [401053,40105f) {reg0}
+  [168] function 'subject'@401150
+    frame_base: {call_frame_cfa {...}}
+    [183] parameter 'word'
+      [401150,401160) {reg5}
+    [18a] parameter 'count'
+      [401150,401160) {reg4}
+module 'testfileranges5.debug'
+[1ab] CU 'world.c'@401180
+  [1cd] function 'no_main'@4011d0
+    frame_base: {call_frame_cfa {...}}
+    [1ef] parameter 'argc'
+      [4011d0,4011e2) {reg5}
+      [4011e2,4011e7) {entry_value(1) {reg5}, stack_value}
+    [1fe] parameter 'argv'
+      [4011d0,4011e6) {reg4}
+      [4011e6,4011e7) {entry_value(1) {reg4}, stack_value}
+  [20d] inlined function 'no_subject'@4011d3
+    [229] parameter 'count'
+      [4011d3,4011df) {reg5}
+    [232] parameter 'word'
+      [4011d3,4011df) {reg0}
+  [28d] function 'say'@401180
+    frame_base: {call_frame_cfa {...}}
+    [2af] parameter 'prefix'
+      [401180,40118e) {reg5}
+      [40118e,40119c) {reg3}
+      [40119c,4011a7) {entry_value(1) {reg5}, stack_value}
+      [4011a7,4011b5) {reg3}
+      [4011b5,4011c0) {entry_value(1) {reg5}, stack_value}
+    [2be] variable 'world'
+      [401193,40119b) {reg0}
+      [4011a7,4011b4) {reg0}
+  [2ce] inlined function 'happy'@40119b
+    [2e6] parameter 'w'
+      [4011a7,4011b4) {reg0}
+  [2ef] inlined function 'sad'@40119b
+    [303] parameter 'c'
+      [40119b,4011a6) {reg0}
+      [4011a6,4011a7) {entry_value(1) {reg5}}
+      [4011b4,4011bf) {reg0}
+  [36b] function 'no_subject'@4011c0
+    frame_base: {call_frame_cfa {...}}
+    [386] parameter 'word'
+      [4011c0,4011d0) {reg5}
+    [38d] parameter 'count'
+      [4011c0,4011d0) {reg4}
+EOF
+
+# Multi CU Split DWARF5. See run-dwarf-ranges.sh.
+# Note that the DIE numbers change, but the actual location addresses are
+# the same as above, even though the representation is totally different.
+testfiles testfilesplitranges5.debug
+testfiles testfile-ranges-hello5.dwo testfile-ranges-world5.dwo
+testrun_compare ${abs_top_builddir}/tests/varlocs --debug -e testfilesplitranges5.debug <<\EOF
+module 'testfilesplitranges5.debug'
+[14] CU 'hello.c'
+  [1d] function 'no_say'@401160
+    frame_base: {call_frame_cfa {...}}
+    [33] parameter 'prefix'
+      [401160,401169) {reg5}
+      [401169,40116a) {entry_value(1) {reg5}, stack_value}
+      [40116a,401175) {reg5}
+      [401175,40117a) {entry_value(1) {reg5}, stack_value}
+    [3c] variable 'world'
+      [401160,40117a) {addr: 0x402004, stack_value}
+  [7e] function 'main'@401050
+    frame_base: {call_frame_cfa {...}}
+    [94] parameter 'argc'
+      [401050,401062) {reg5}
+      [401062,401067) {entry_value(1) {reg5}, stack_value}
+    [9d] parameter 'argv'
+      [401050,401066) {reg4}
+      [401066,401067) {entry_value(1) {reg4}, stack_value}
+  [a6] inlined function 'subject'@401053
+    [bb] parameter 'count'
+      [401053,40105f) {reg5}
+    [c1] parameter 'word'
+      [401053,40105f) {reg0}
+  [f6] function 'subject'@401150
+    frame_base: {call_frame_cfa {...}}
+    [10a] parameter 'word'
+      [401150,401160) {reg5}
+    [111] parameter 'count'
+      [401150,401160) {reg4}
+module 'testfilesplitranges5.debug'
+[14] CU 'world.c'
+  [1d] function 'no_main'@4011d0
+    frame_base: {call_frame_cfa {...}}
+    [35] parameter 'argc'
+      [4011d0,4011e2) {reg5}
+      [4011e2,4011e7) {entry_value(1) {reg5}, stack_value}
+    [3e] parameter 'argv'
+      [4011d0,4011e6) {reg4}
+      [4011e6,4011e7) {entry_value(1) {reg4}, stack_value}
+  [47] inlined function 'no_subject'@4011d3
+    [5c] parameter 'count'
+      [4011d3,4011df) {reg5}
+    [62] parameter 'word'
+      [4011d3,4011df) {reg0}
+  [a7] function 'say'@401180
+    frame_base: {call_frame_cfa {...}}
+    [c2] parameter 'prefix'
+      [401180,40118e) {reg5}
+      [40118e,40119c) {reg3}
+      [40119c,4011a7) {entry_value(1) {reg5}, stack_value}
+      [4011a7,4011b5) {reg3}
+      [4011b5,4011c0) {entry_value(1) {reg5}, stack_value}
+    [cb] variable 'world'
+      [401193,40119b) {reg0}
+      [4011a7,4011b4) {reg0}
+  [d5] inlined function 'happy'@40119b
+    [e3] parameter 'w'
+      [4011a7,4011b4) {reg0}
+  [e9] inlined function 'sad'@40119b
+    [f3] parameter 'c'
+      [40119b,4011a6) {reg0}
+      [4011a6,4011a7) {entry_value(1) {reg5}}
+      [4011b4,4011bf) {reg0}
+  [147] function 'no_subject'@4011c0
+    frame_base: {call_frame_cfa {...}}
+    [15b] parameter 'word'
+      [4011c0,4011d0) {reg5}
+    [162] parameter 'count'
+      [4011c0,4011d0) {reg4}
+EOF
 
 # DW_OP_addrx and DW_OP_constx testcases.
 #

@@ -696,13 +696,77 @@ __libdw_cu_base_address (Dwarf_CU *cu)
 static int
 initial_offset (Dwarf_Attribute *attr, ptrdiff_t *offset)
 {
-  size_t secidx = IDX_debug_loc;
+  size_t secidx = (attr->cu->version < 5
+		   ? IDX_debug_loc : IDX_debug_loclists);
 
   Dwarf_Word start_offset;
-  if (__libdw_formptr (attr, secidx,
-		       DWARF_E_NO_DEBUG_LOC,
-		       NULL, &start_offset) == NULL)
-    return -1;
+  if (attr->form == DW_FORM_loclistx)
+    {
+      Dwarf_Word idx;
+      Dwarf_CU *cu = attr->cu;
+      const unsigned char *datap = attr->valp;
+      const unsigned char *endp = cu->endp;
+      if (datap >= endp)
+	{
+	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
+	  return -1;
+	}
+      get_uleb128 (idx, datap, endp);
+
+      Elf_Data *data = cu->dbg->sectiondata[secidx];
+      if (data == NULL && cu->unit_type == DW_UT_split_compile)
+	{
+	  cu = __libdw_find_split_unit (cu);
+	  if (cu != NULL)
+	    data = cu->dbg->sectiondata[secidx];
+	}
+
+      if (data == NULL)
+	{
+	  __libdw_seterrno (secidx == IDX_debug_loc
+                            ? DWARF_E_NO_DEBUG_LOC
+                            : DWARF_E_NO_DEBUG_LOCLISTS);
+	  return -1;
+	}
+
+      Dwarf_Off loc_base_off = __libdw_cu_locs_base (cu);
+
+      /* The section should at least contain room for one offset.  */
+      size_t sec_size = cu->dbg->sectiondata[secidx]->d_size;
+      size_t offset_size = cu->offset_size;
+      if (offset_size > sec_size)
+	{
+	invalid_offset:
+	  __libdw_seterrno (DWARF_E_INVALID_OFFSET);
+	  return -1;
+	}
+
+      /* And the base offset should be at least inside the section.  */
+      if (loc_base_off > (sec_size - offset_size))
+	goto invalid_offset;
+
+      size_t max_idx = (sec_size - offset_size - loc_base_off) / offset_size;
+      if (idx > max_idx)
+	goto invalid_offset;
+
+      datap = (cu->dbg->sectiondata[secidx]->d_buf
+	       + loc_base_off + (idx * offset_size));
+      if (offset_size == 4)
+	start_offset = read_4ubyte_unaligned (cu->dbg, datap);
+      else
+	start_offset = read_8ubyte_unaligned (cu->dbg, datap);
+
+      start_offset += loc_base_off;
+    }
+  else
+    {
+      if (__libdw_formptr (attr, secidx,
+			   (secidx == IDX_debug_loc
+			    ? DWARF_E_NO_DEBUG_LOC
+			    : DWARF_E_NO_DEBUG_LOCLISTS),
+			    NULL, &start_offset) == NULL)
+	return -1;
+    }
 
   *offset = start_offset;
   return 0;
@@ -716,7 +780,7 @@ getlocations_addr (Dwarf_Attribute *attr, ptrdiff_t offset,
 {
   Dwarf_CU *cu = attr->cu;
   Dwarf *dbg = cu->dbg;
-  size_t secidx = IDX_debug_loc;
+  size_t secidx = cu->version < 5 ? IDX_debug_loc : IDX_debug_loclists;
   const unsigned char *readp = locs->d_buf + offset;
   const unsigned char *readendp = locs->d_buf + locs->d_size;
 
@@ -741,13 +805,22 @@ getlocations_addr (Dwarf_Attribute *attr, ptrdiff_t offset,
 
   /* We have a location expression.  */
   Dwarf_Block block;
-  if (readendp - readp < 2)
+  if (secidx == IDX_debug_loc)
     {
-    invalid:
-      __libdw_seterrno (DWARF_E_INVALID_DWARF);
-      return -1;
+      if (readendp - readp < 2)
+	{
+	invalid:
+	  __libdw_seterrno (DWARF_E_INVALID_DWARF);
+	  return -1;
+	}
+      block.length = read_2ubyte_unaligned_inc (dbg, readp);
     }
-  block.length = read_2ubyte_unaligned_inc (dbg, readp);
+  else
+    {
+      if (readendp - readp < 1)
+	goto invalid;
+      get_uleb128 (block.length, readp, readendp);
+    }
   block.data = (unsigned char *) readp;
   if (readendp - readp < (ptrdiff_t) block.length)
     goto invalid;
@@ -815,7 +888,7 @@ dwarf_getlocation_addr (Dwarf_Attribute *attr, Dwarf_Addr address,
   if (initial_offset (attr, &off) != 0)
     return -1;
 
-  size_t secidx = IDX_debug_loc;
+  size_t secidx = attr->cu->version < 5 ? IDX_debug_loc : IDX_debug_loclists;
   const Elf_Data *d = attr->cu->dbg->sectiondata[secidx];
 
   while (got < maxlocs
@@ -896,7 +969,7 @@ dwarf_getlocations (Dwarf_Attribute *attr, ptrdiff_t offset, Dwarf_Addr *basep,
 	return -1;
     }
 
-  size_t secidx = IDX_debug_loc;
+  size_t secidx = attr->cu->version < 5 ? IDX_debug_loc : IDX_debug_loclists;
   const Elf_Data *d = attr->cu->dbg->sectiondata[secidx];
 
   return getlocations_addr (attr, offset, basep, startp, endp,

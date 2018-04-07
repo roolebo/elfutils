@@ -36,6 +36,7 @@
 
 /* Read up begin/end pair and increment read pointer.
     - If it's normal range record, set up `*beginp' and `*endp' and return 0.
+    - If it's a default location, set `*beginp' (0), `*endp' (-1) and return 0.
     - If it's base address selection record, set up `*basep' and return 1.
     - If it's end of rangelist, don't set anything and return 2
     - If an error occurs, don't set anything and return -1.  */
@@ -181,6 +182,119 @@ __libdw_read_begin_end_pair_inc (Dwarf_CU *cu, int sec_index,
 	  return 0;
 
 	case DW_RLE_start_length:
+	  if (addrend - addr < width)
+	    goto invalid;
+	  __libdw_read_address_inc (dbg, sec_index, &addr, width, &begin);
+	  if (addrend - addr < 1)
+	    goto invalid;
+	  get_uleb128 (end, addr, addrend);
+
+	  *beginp = begin;
+	  *endp = begin + end;
+	  *addrp = addr;
+	  return 0;
+
+	default:
+	  goto invalid;
+	}
+    }
+  else if (sec_index == IDX_debug_loclists)
+    {
+      const unsigned char *addr = *addrp;
+      if (addrend - addr < 1)
+	goto invalid;
+
+      const char code = *addr++;
+      uint64_t begin = 0, end = 0, base = *basep, addr_idx;
+      switch (code)
+	{
+	case DW_LLE_end_of_list:
+	  *addrp = addr;
+	  return 2;
+
+	case DW_LLE_base_addressx:
+	  if (addrend - addr < 1)
+	    goto invalid;
+	  get_uleb128 (addr_idx, addr, addrend);
+	  if (__libdw_addrx (cu, addr_idx, &base) != 0)
+	    return -1;
+
+	  *basep = base;
+	  *addrp = addr;
+	  return 1;
+
+	case DW_LLE_startx_endx:
+	  if (addrend - addr < 1)
+	    goto invalid;
+	  get_uleb128 (addr_idx, addr, addrend);
+	  if (__libdw_addrx (cu, addr_idx, &begin) != 0)
+	    return -1;
+	  if (addrend - addr < 1)
+	    goto invalid;
+	  get_uleb128 (addr_idx, addr, addrend);
+	  if (__libdw_addrx (cu, addr_idx, &end) != 0)
+	    return -1;
+
+	  *beginp = begin;
+	  *endp = end;
+	  *addrp = addr;
+	  return 0;
+
+	case DW_LLE_startx_length:
+	  if (addrend - addr < 1)
+	    goto invalid;
+	  get_uleb128 (addr_idx, addr, addrend);
+	  if (__libdw_addrx (cu, addr_idx, &begin) != 0)
+	    return -1;
+	  if (addrend - addr < 1)
+	    goto invalid;
+	  get_uleb128 (end, addr, addrend);
+
+	  *beginp = begin;
+	  *endp = begin + end;
+	  *addrp = addr;
+	  return 0;
+
+	case DW_LLE_offset_pair:
+	  if (addrend - addr < 1)
+	    goto invalid;
+	  get_uleb128 (begin, addr, addrend);
+	  if (addrend - addr < 1)
+	    goto invalid;
+	  get_uleb128 (end, addr, addrend);
+
+	  *beginp = begin + base;
+	  *endp = end + base;
+	  *addrp = addr;
+	  return 0;
+
+	case DW_LLE_default_location:
+	  *beginp = 0;
+	  *endp = (Dwarf_Addr) -1;
+	  *addrp = addr;
+	  return 0;
+
+	case DW_LLE_base_address:
+	  if (addrend - addr < width)
+	    goto invalid;
+	  __libdw_read_address_inc (dbg, sec_index, &addr, width, &base);
+
+	  *basep = base;
+	  *addrp = addr;
+	  return 1;
+
+	case DW_LLE_start_end:
+	  if (addrend - addr < 2 * width)
+	    goto invalid;
+	  __libdw_read_address_inc (dbg, sec_index, &addr, width, &begin);
+	  __libdw_read_address_inc (dbg, sec_index, &addr, width, &end);
+
+	  *beginp = begin;
+	  *endp = end;
+	  *addrp = addr;
+	  return 0;
+
+	case DW_LLE_start_length:
 	  if (addrend - addr < width)
 	    goto invalid;
 	  __libdw_read_address_inc (dbg, sec_index, &addr, width, &begin);

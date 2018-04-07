@@ -1,5 +1,5 @@
 /* Test program for dwarf location functions.
-   Copyright (C) 2013, 2015, 2017 Red Hat, Inc.
+   Copyright (C) 2013, 2015, 2017, 2018 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -44,6 +44,7 @@ Dwarf_CFI *cfi_eh;
 Dwarf_Addr cfi_eh_bias;
 
 bool is_ET_REL;
+bool is_debug;
 
 // Whether the current function has a DW_AT_frame_base defined.
 // Needed for DW_OP_fbreg.
@@ -257,7 +258,7 @@ print_expr (Dwarf_Attribute *attr, Dwarf_Op *expr, Dwarf_Addr addr)
 	error (EXIT_FAILURE, 0, "%s used in CFI", opname);
 
       printf ("%s ", opname);
-      if (cfi_eh == NULL && cfi_debug == NULL)
+      if (cfi_eh == NULL && cfi_debug == NULL && !is_debug)
 	error (EXIT_FAILURE, 0, "DW_OP_call_frame_cfa used but no cfi found.");
 
       Dwarf_Frame *frame;
@@ -275,11 +276,11 @@ print_expr (Dwarf_Attribute *attr, Dwarf_Op *expr, Dwarf_Addr addr)
 	  print_expr_block (NULL, cfa_ops, cfa_nops, 0);
 	  free (frame);
 	}
-      else if (is_ET_REL)
+      else if (is_ET_REL || is_debug)
 	{
 	  /* XXX In ET_REL files there might be an .eh_frame with relocations
 	     we don't handle (e.g. X86_64_PC32). Maybe we should?  */
-	  printf ("{...}\n");
+	  printf ("{...}");
 	}
       else
 	error (EXIT_FAILURE, 0, "dwarf_cfi_addrframe 0x%" PRIx64 ": %s",
@@ -1033,12 +1034,34 @@ main (int argc, char *argv[])
      which contains an DWARF expression (but not location lists) and
      print those.  Otherwise we process all function DIEs and print
      all DWARF expressions and location lists associated with
-     parameters and variables). */
+     parameters and variables). It must be the first argument,
+     or the second, after --debug.  */
   bool exprlocs = false;
-  if (argc > 1 && strcmp ("--exprlocs", argv[1]) == 0)
+
+  /* With --debug we ignore not being able to find .eh_frame.
+     It must come as first argument.  */
+  is_debug = false;
+  if (argc > 1)
     {
-      exprlocs = true;
-      argv[1] = "";
+      if (strcmp ("--exprlocs", argv[1]) == 0)
+	{
+	  exprlocs = true;
+	  argv[1] = "";
+	}
+      else if (strcmp ("--debug", argv[1]) == 0)
+	{
+	  is_debug = true;
+	  argv[1] = "";
+	}
+    }
+
+  if (argc > 2)
+    {
+      if (strcmp ("--exprlocs", argv[2]) == 0)
+	{
+	  exprlocs = true;
+	  argv[2] = "";
+	}
     }
 
   int remaining;

@@ -206,8 +206,11 @@ struct Dwarf
   struct Dwarf_CFI_s *cfi;
 
   /* Fake loc CU.  Used when synthesizing attributes for Dwarf_Ops that
-     came from a location list entry in dwarf_getlocation_attr.  */
+     came from a location list entry in dwarf_getlocation_attr.
+     Depending on version this is the .debug_loc or .debug_loclists
+     section (could be both if mixing CUs with different DWARF versions).  */
   struct Dwarf_CU *fake_loc_cu;
+  struct Dwarf_CU *fake_loclists_cu;
 
   /* Similar for addrx/constx, which will come from .debug_addr section.  */
   struct Dwarf_CU *fake_addr_cu;
@@ -364,6 +367,10 @@ struct Dwarf_CU
      DebugFission split units.  Don't access directly, call
      __libdw_cu_ranges_base.  */
   Dwarf_Off ranges_base;
+
+  /* The start of the offset table in .debug_loclists.
+     Don't access directly, call __libdw_cu_locs_base.  */
+  Dwarf_Off locs_base;
 
   /* Memory boundaries of this CU.  */
   void *startp;
@@ -1174,6 +1181,84 @@ __libdw_cu_ranges_base (Dwarf_CU *cu)
     }
 
   return cu->ranges_base;
+}
+
+
+/* The start of the offset table in .debug_loclists for DWARF5.  */
+static inline Dwarf_Off
+__libdw_cu_locs_base (Dwarf_CU *cu)
+{
+  if (cu->locs_base == (Dwarf_Off) -1)
+    {
+      Dwarf_Off offset = 0;
+      Dwarf_Die cu_die = CUDIE(cu);
+      Dwarf_Attribute attr;
+      if (dwarf_attr (&cu_die, DW_AT_loclists_base, &attr) != NULL)
+	{
+	  Dwarf_Word off;
+	  if (dwarf_formudata (&attr, &off) == 0)
+	    offset = off;
+	}
+
+      /* There wasn't an loclists_base, if the Dwarf does have a
+	 .debug_loclists section, then it might be we need the
+	 base after the first header. */
+      Elf_Data *data = cu->dbg->sectiondata[IDX_debug_loclists];
+      if (offset == 0 && data != NULL)
+	{
+	  Dwarf *dbg = cu->dbg;
+	  const unsigned char *readp = data->d_buf;
+	  const unsigned char *const dataend
+	    = (unsigned char *) data->d_buf + data->d_size;
+
+	  uint64_t unit_length = read_4ubyte_unaligned_inc (dbg, readp);
+	  unsigned int offset_size = 4;
+	  if (unlikely (unit_length == 0xffffffff))
+	    {
+	      if (unlikely (readp > dataend - 8))
+		goto no_header;
+
+	      unit_length = read_8ubyte_unaligned_inc (dbg, readp);
+	      offset_size = 8;
+	    }
+
+	  if (readp > dataend - 8
+	      || unit_length < 8
+	      || unit_length > (uint64_t) (dataend - readp))
+	    goto no_header;
+
+	  uint16_t version = read_2ubyte_unaligned_inc (dbg, readp);
+	  if (version != 5)
+	    goto no_header;
+
+	  uint8_t address_size = *readp++;
+	  if (address_size != 4 && address_size != 8)
+	    goto no_header;
+
+	  uint8_t segment_size = *readp++;
+	  if (segment_size != 0)
+	    goto no_header;
+
+	  uint32_t offset_entry_count;
+	  offset_entry_count = read_4ubyte_unaligned_inc (dbg, readp);
+
+	  const unsigned char *offset_array_start = readp;
+	  if (offset_entry_count <= 0)
+	    goto no_header;
+
+	  uint64_t needed = offset_entry_count * offset_size;
+	  if (unit_length - 8 < needed)
+	    goto no_header;
+
+	  offset = (Dwarf_Off) (offset_array_start
+				- (unsigned char *) data->d_buf);
+	}
+
+    no_header:
+      cu->locs_base = offset;
+    }
+
+  return cu->locs_base;
 }
 
 

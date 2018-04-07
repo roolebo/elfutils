@@ -1,3 +1,8 @@
+2018-04-07  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (attr_callback): Handle DW_FORM_loclistx and
+	DW_AT_segment.
+
 2018-04-12  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (dwarf_loc_list_encoding_string): New functions.

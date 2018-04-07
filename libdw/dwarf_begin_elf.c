@@ -226,6 +226,9 @@ valid_p (Dwarf *result)
       result = NULL;
     }
 
+  /* For dwarf_location_attr () we need a "fake" CU to indicate
+     where the "fake" attribute data comes from.  This is a block
+     inside the .debug_loc or .debug_loclists section.  */
   if (result != NULL && result->sectiondata[IDX_debug_loc] != NULL)
     {
       result->fake_loc_cu = (Dwarf_CU *) calloc (1, sizeof (Dwarf_CU));
@@ -248,6 +251,29 @@ valid_p (Dwarf *result)
 	}
     }
 
+  if (result != NULL && result->sectiondata[IDX_debug_loclists] != NULL)
+    {
+      result->fake_loclists_cu = (Dwarf_CU *) calloc (1, sizeof (Dwarf_CU));
+      if (unlikely (result->fake_loclists_cu == NULL))
+	{
+	  Dwarf_Sig8_Hash_free (&result->sig8_hash);
+	  __libdw_seterrno (DWARF_E_NOMEM);
+	  free (result->fake_loc_cu);
+	  free (result);
+	  result = NULL;
+	}
+      else
+	{
+	  result->fake_loclists_cu->sec_idx = IDX_debug_loclists;
+	  result->fake_loclists_cu->dbg = result;
+	  result->fake_loclists_cu->startp
+	    = result->sectiondata[IDX_debug_loclists]->d_buf;
+	  result->fake_loclists_cu->endp
+	    = (result->sectiondata[IDX_debug_loclists]->d_buf
+	       + result->sectiondata[IDX_debug_loclists]->d_size);
+	}
+    }
+
   /* For DW_OP_constx/GNU_const_index and DW_OP_addrx/GNU_addr_index
      the dwarf_location_attr () will need a "fake" address CU to
      indicate where the attribute data comes from.  This is a just
@@ -260,6 +286,7 @@ valid_p (Dwarf *result)
 	  Dwarf_Sig8_Hash_free (&result->sig8_hash);
 	  __libdw_seterrno (DWARF_E_NOMEM);
 	  free (result->fake_loc_cu);
+	  free (result->fake_loclists_cu);
 	  free (result);
 	  result = NULL;
 	}

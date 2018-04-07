@@ -38,7 +38,7 @@ attr_form_cu (Dwarf_Attribute *attr)
 {
   /* If the attribute has block/expr form the data comes from the
      .debug_info from the same cu as the attr.  Otherwise it comes from
-     the .debug_loc data section.  */
+     the .debug_loc or .debug_loclists data section.  */
   switch (attr->form)
     {
     case DW_FORM_block1:
@@ -48,7 +48,9 @@ attr_form_cu (Dwarf_Attribute *attr)
     case DW_FORM_exprloc:
       return attr->cu;
     default:
-      return attr->cu->dbg->fake_loc_cu;
+      return (attr->cu->version < 5
+	      ? attr->cu->dbg->fake_loc_cu
+	      : attr->cu->dbg->fake_loclists_cu);
     }
 }
 

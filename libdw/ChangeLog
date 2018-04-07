@@ -1,3 +1,20 @@
+2018-04-07  Mark Wielaard  <mark@klomp.org>
+
+	* libdwP.h (struct Dwarf_CU): Add locs_base.
+	(__libdw_cu_locs_base): New static inline function.
+	* libdw_findcu.c (__libdw_intern_next_unit): Initialize locs_base.
+	* dwarf_begin_elf.c (valid_p): Create fake_loclists_cu if necessary.
+	* dwarf_end.c (dwarf_end): Clean up fake_loclists_cu.
+	* dwarf_getlocation.c (initial_offset): Handle .debug_loclists.
+	(getlocations_addr): Likewise.
+	(dwarf_getlocation_addr): Likewise.
+	* dwarf_getlocation_attr.c (attr_form_cu): Use fake_loclists_cu for
+	DWARF5.
+	(initial_offset): Handle DW_FORM_loclistx.
+	* dwarf_ranges.c (__libdw_read_begin_end_pair_inc): Handle
+	.debug_loclists.
+	* libdwP.h (struct Dwarf): Add fake_loclists_cu.
+
 2018-04-12  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf.h: Add DWARF5 location list entry DW_LLE encodings.

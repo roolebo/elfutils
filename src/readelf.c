@@ -80,6 +80,13 @@ ARGP_PROGRAM_BUG_ADDRESS_DEF = PACKAGE_BUGREPORT;
 /* argp key value for --elf-section, non-ascii.  */
 #define ELF_INPUT_SECTION 256
 
+/* argp key value for --dwarf-skeleton, non-ascii.  */
+#define DWARF_SKELETON 257
+
+/* Terrible hack for hooking unrelated skeleton/split compile units,
+   see __libdw_link_skel_split in print_debug.  */
+static bool do_not_close_dwfl = false;
+
 /* Definitions of arguments for argp functions.  */
 static const struct argp_option options[] =
 {
@@ -87,6 +94,9 @@ static const struct argp_option options[] =
   { "elf-section", ELF_INPUT_SECTION, "SECTION", OPTION_ARG_OPTIONAL,
     N_("Use the named SECTION (default .gnu_debugdata) as (compressed) ELF "
        "input data"), 0 },
+  { "dwarf-skeleton", DWARF_SKELETON, "FILE", 0,
+    N_("Used with -w to find the skeleton Compile Units in FILE associated "
+       "with the Split Compile units in a .dwo input file"), 0 },
   { NULL, 0, NULL, 0, N_("ELF output selection:"), 0 },
   { "all", 'a', NULL, 0,
     N_("All these plus -p .strtab -p .dynstr -p .comment"), 0 },
@@ -152,6 +162,9 @@ static struct argp argp =
 
 /* If non-null, the section from which we should read to (compressed) ELF.  */
 static const char *elf_input_section = NULL;
+
+/* If non-null, the file that contains the skeleton CUs.  */
+static const char *dwarf_skeleton = NULL;
 
 /* Flags set by the option controlling the output.  */
 
@@ -526,6 +539,9 @@ parse_opt (int key, char *arg,
       else
 	elf_input_section = arg;
       break;
+    case DWARF_SKELETON:
+      dwarf_skeleton = arg;
+      break;
     default:
       return ARGP_ERR_UNKNOWN;
     }
@@ -748,31 +764,9 @@ find_no_debuginfo (Dwfl_Module *mod,
 				       debuglink_crc, debuginfo_file_name);
 }
 
-/* Process one input file.  */
-static void
-process_file (int fd, const char *fname, bool only_one)
+static Dwfl *
+create_dwfl (int fd, const char *fname)
 {
-  if (print_archive_index)
-    check_archive_index (fd, fname, only_one);
-
-  if (!any_control_option)
-    return;
-
-  if (elf_input_section != NULL)
-    {
-      /* Replace fname and fd with section content. */
-      char *fnname = alloca (strlen (fname) + strlen (elf_input_section) + 2);
-      sprintf (fnname, "%s:%s", fname, elf_input_section);
-      fd = open_input_section (fd);
-      if (fd == -1)
-        {
-          error (0, 0, gettext ("No such section '%s' in '%s'"),
-		 elf_input_section, fname);
-          return;
-        }
-      fname = fnname;
-    }
-
   /* Duplicate an fd for dwfl_report_offline to swallow.  */
   int dwfl_fd = dup (fd);
   if (unlikely (dwfl_fd < 0))
@@ -800,11 +794,42 @@ process_file (int fd, const char *fname, bool only_one)
 	error (0, 0, gettext ("failed reading '%s': %s"),
 	       fname, dwfl_errmsg (-1));
       close (dwfl_fd);		/* Consumed on success, not on failure.  */
+      dwfl = NULL;
     }
   else
-    {
-      dwfl_report_end (dwfl, NULL, NULL);
+    dwfl_report_end (dwfl, NULL, NULL);
 
+  return dwfl;
+}
+
+/* Process one input file.  */
+static void
+process_file (int fd, const char *fname, bool only_one)
+{
+  if (print_archive_index)
+    check_archive_index (fd, fname, only_one);
+
+  if (!any_control_option)
+    return;
+
+  if (elf_input_section != NULL)
+    {
+      /* Replace fname and fd with section content. */
+      char *fnname = alloca (strlen (fname) + strlen (elf_input_section) + 2);
+      sprintf (fnname, "%s:%s", fname, elf_input_section);
+      fd = open_input_section (fd);
+      if (fd == -1)
+        {
+          error (0, 0, gettext ("No such section '%s' in '%s'"),
+		 elf_input_section, fname);
+          return;
+        }
+      fname = fnname;
+    }
+
+  Dwfl *dwfl = create_dwfl (fd, fname);
+  if (dwfl != NULL)
+    {
       if (only_one)
 	{
 	  /* Clear ONLY_ONE if we have multiple modules, from an archive.  */
@@ -816,7 +841,10 @@ process_file (int fd, const char *fname, bool only_one)
       struct process_dwflmod_args a = { .fd = fd, .only_one = only_one };
       dwfl_getmodules (dwfl, &process_dwflmod, &a, 0);
     }
-  dwfl_end (dwfl);
+  /* Terrible hack for hooking unrelated skeleton/split compile units,
+     see __libdw_link_skel_split in print_debug.  */
+  if (! do_not_close_dwfl)
+    dwfl_end (dwfl);
 
   /* Need to close the replaced fd if we created it.  Caller takes
      care of original.  */
@@ -9649,9 +9677,60 @@ print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
     }
 }
 
+/* Returns true and sets split DWARF CU id if there is a split compile
+   unit in the given Dwarf, and no non-split units are found (before it).  */
+static bool
+is_split_dwarf (Dwarf *dbg, uint64_t *id, Dwarf_CU **split_cu)
+{
+  Dwarf_CU *cu = NULL;
+  while (dwarf_get_units (dbg, cu, &cu, NULL, NULL, NULL, NULL) == 0)
+    {
+      uint8_t unit_type;
+      if (dwarf_cu_info (cu, NULL, &unit_type, NULL, NULL,
+			 id, NULL, NULL) != 0)
+	return false;
+
+      if (unit_type != DW_UT_split_compile && unit_type != DW_UT_split_type)
+	return false;
+
+      /* We really only care about the split compile unit, the types
+	 should be fine and self sufficient.  Also they don't have an
+	 id that we can match with a skeleton unit.  */
+      if (unit_type == DW_UT_split_compile)
+	{
+	  *split_cu = cu;
+	  return true;
+	}
+    }
+
+  return false;
+}
+
+/* Check that there is one and only one Dwfl_Module, return in arg.  */
+static int
+getone_dwflmod (Dwfl_Module *dwflmod,
+	       void **userdata __attribute__ ((unused)),
+	       const char *name __attribute__ ((unused)),
+	       Dwarf_Addr base __attribute__ ((unused)),
+	       void *arg)
+{
+  Dwfl_Module **m = (Dwfl_Module **) arg;
+  if (*m != NULL)
+    return DWARF_CB_ABORT;
+  *m = dwflmod;
+  return DWARF_CB_OK;
+}
+
 static void
 print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
 {
+  /* Used for skeleton file, if necessary for split DWARF.  */
+  Dwfl *skel_dwfl = NULL;
+  Dwfl_Module *skel_mod = NULL;
+  char *skel_name = NULL;
+  Dwarf *split_dbg = NULL;
+  Dwarf_CU *split_cu = NULL;
+
   /* Before we start the real work get a debug context descriptor.  */
   Dwarf_Addr dwbias;
   Dwarf *dbg = dwfl_module_getdwarf (dwflmod, &dwbias);
@@ -9666,6 +9745,141 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
 	error (0, 0, gettext ("cannot get debug context descriptor: %s"),
 	       dwfl_errmsg (-1));
       dbg = &dummy_dbg;
+    }
+  else
+    {
+      /* If we are asked about a split dwarf (.dwo) file, use the user
+	 provided, or find the corresponding skeleton file. If we got
+	 a skeleton file, replace the given dwflmod and dbg, with one
+	 derived from the skeleton file to provide enough context.  */
+      uint64_t split_id;
+      if (is_split_dwarf (dbg, &split_id, &split_cu))
+	{
+	  if (dwarf_skeleton != NULL)
+	    skel_name = strdup (dwarf_skeleton);
+	  else
+	    {
+	      /* Replace file.dwo with file.o and see if that matches. */
+	      const char *fname;
+	      dwfl_module_info (dwflmod, NULL, NULL, NULL, NULL, NULL,
+				&fname, NULL);
+	      if (fname != NULL)
+		{
+		  size_t flen = strlen (fname);
+		  if (flen > 4 && strcmp (".dwo", fname + flen - 4) == 0)
+		    {
+		      skel_name = strdup (fname);
+		      if (skel_name != NULL)
+			{
+			  skel_name[flen - 3] = 'o';
+			  skel_name[flen - 2] = '\0';
+			}
+		    }
+		}
+	    }
+
+	  if (skel_name != NULL)
+	    {
+	      int skel_fd = open (skel_name, O_RDONLY);
+	      if (skel_fd == -1)
+		fprintf (stderr, "Warning: Couldn't open DWARF skeleton file"
+			 " '%s'\n", skel_name);
+	      else
+		skel_dwfl = create_dwfl (skel_fd, skel_name);
+
+	      if (skel_dwfl != NULL)
+		{
+		  if (dwfl_getmodules (skel_dwfl, &getone_dwflmod,
+				       &skel_mod, 0) != 0)
+		    {
+		      fprintf (stderr, "Warning: Bad DWARF skeleton,"
+			       " multiple modules '%s'\n", skel_name);
+		      dwfl_end (skel_dwfl);
+		      skel_mod = NULL;
+		    }
+		}
+	      else if (skel_fd != -1)
+		fprintf (stderr, "Warning: Couldn't create skeleton dwfl for"
+			 " '%s': %s\n", skel_name, dwfl_errmsg (-1));
+
+	      if (skel_mod != NULL)
+		{
+		  Dwarf *skel_dbg = dwfl_module_getdwarf (skel_mod, &dwbias);
+		  if (skel_dbg != NULL)
+		    {
+		      /* First check the skeleton CU DIE, only fetch
+			 the split DIE if we know the id matches to
+			 not unnecessary search for any split DIEs we
+			 don't need. */
+		      Dwarf_CU *cu = NULL;
+		      while (dwarf_get_units (skel_dbg, cu, &cu,
+					      NULL, NULL, NULL, NULL) == 0)
+			{
+			  uint8_t unit_type;
+			  uint64_t skel_id;
+			  if (dwarf_cu_info (cu, NULL, &unit_type, NULL, NULL,
+					     &skel_id, NULL, NULL) == 0
+			      && unit_type == DW_UT_skeleton
+			      && split_id == skel_id)
+			    {
+			      Dwarf_Die subdie;
+			      if (dwarf_cu_info (cu, NULL, NULL, NULL,
+						 &subdie,
+						 NULL, NULL, NULL) == 0
+				  && dwarf_tag (&subdie) != DW_TAG_invalid)
+				{
+				  split_dbg = dwarf_cu_getdwarf (subdie.cu);
+				  if (split_dbg == NULL)
+				    fprintf (stderr,
+					     "Warning: Couldn't get split_dbg:"
+					     " %s\n", dwarf_errmsg (-1));
+				  break;
+				}
+			      else
+				{
+				  /* Everything matches up, but not
+				     according to libdw. Which means
+				     the user knew better.  So...
+				     Terrible hack... We can never
+				     destroy the underlying dwfl
+				     because it would free the wrong
+				     Dwarfs... So we leak memory...*/
+				  if (cu->split == NULL
+				      && dwarf_skeleton != NULL)
+				    {
+				      do_not_close_dwfl = true;
+				      __libdw_link_skel_split (cu, split_cu);
+				      split_dbg = dwarf_cu_getdwarf (split_cu);
+				      break;
+				    }
+				  else
+				    fprintf (stderr, "Warning: Couldn't get"
+					     " skeleton subdie: %s\n",
+					     dwarf_errmsg (-1));
+				}
+			    }
+			}
+		      if (split_dbg == NULL)
+			fprintf (stderr, "Warning: '%s' didn't contain a skeleton for split id %" PRIx64 "\n", skel_name, split_id);
+		    }
+		  else
+		    fprintf (stderr, "Warning: Couldn't get skeleton DWARF:"
+			     " %s\n", dwfl_errmsg (-1));
+		}
+	    }
+
+	  if (split_dbg != NULL)
+	    {
+	      dbg = split_dbg;
+	      dwflmod = skel_mod;
+	    }
+	  else if (skel_name == NULL)
+	    fprintf (stderr,
+		     "Warning: split DWARF file, but no skeleton found.\n");
+	}
+      else if (dwarf_skeleton != NULL)
+	fprintf (stderr, "Warning: DWARF skeleton given,"
+		 " but not a split DWARF file\n");
     }
 
   /* Get the section header string table index.  */
@@ -9785,6 +9999,9 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
 	    }
 	}
     }
+
+  dwfl_end (skel_dwfl);
+  free (skel_name);
 
   reset_listptr (&known_loclistptr);
   reset_listptr (&known_rangelistptr);

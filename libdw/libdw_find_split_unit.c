@@ -84,23 +84,8 @@ __libdw_find_split_unit (Dwarf_CU *cu)
 			  if (split->unit_type == DW_UT_split_compile
 			      && cu->unit_id8 == split->unit_id8)
 			    {
-			      /* Link skeleton and split compule units.  */
-			      cu->split = split;
-			      split->split = cu;
-
-			      /* Get .debug_addr and addr_base greedy.
-			         We also need it for the fake addr cu.
-				 There is only one per split debug.  */
-			      Dwarf *dbg = cu->dbg;
-			      Dwarf *sdbg = split->dbg;
-			      if (sdbg->sectiondata[IDX_debug_addr] == NULL
-				  && dbg->sectiondata[IDX_debug_addr] != NULL)
-				{
-				  sdbg->sectiondata[IDX_debug_addr]
-				    = dbg->sectiondata[IDX_debug_addr];
-				  split->addr_base = __libdw_cu_addr_base (cu);
-				  sdbg->fake_addr_cu = dbg->fake_addr_cu;
-			        }
+			      /* Link skeleton and split compile units.  */
+			      __libdw_link_skel_split (cu, split);
 
 			      /* We have everything we need from this
 				 ELF file.  And we are going to close

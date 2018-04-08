@@ -1174,6 +1174,29 @@ __libdw_cu_ranges_base (Dwarf_CU *cu)
 }
 
 
+/* Link skeleton and split compile units.  */
+static inline void
+__libdw_link_skel_split (Dwarf_CU *skel, Dwarf_CU *split)
+{
+  skel->split = split;
+  split->split = skel;
+
+  /* Get .debug_addr and addr_base greedy.
+     We also need it for the fake addr cu.
+     There is only one per split debug.  */
+  Dwarf *dbg = skel->dbg;
+  Dwarf *sdbg = split->dbg;
+  if (sdbg->sectiondata[IDX_debug_addr] == NULL
+      && dbg->sectiondata[IDX_debug_addr] != NULL)
+    {
+      sdbg->sectiondata[IDX_debug_addr]
+	= dbg->sectiondata[IDX_debug_addr];
+      split->addr_base = __libdw_cu_addr_base (skel);
+      sdbg->fake_addr_cu = dbg->fake_addr_cu;
+    }
+}
+
+
 /* Given an address index for a CU return the address.
    Returns -1 and sets libdw_errno if an error occurs.  */
 int __libdw_addrx (Dwarf_CU *cu, Dwarf_Word idx, Dwarf_Addr *addr);

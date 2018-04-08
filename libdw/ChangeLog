@@ -1,3 +1,9 @@
+2018-05-25  Mark Wielaard  <mark@klomp.org>
+
+	* libdw_find_split_unit.c (__libdw_find_split_unit): Extract linking
+	skeleton and split compile units code into...
+	* libdwP (__libdw_link_skel_split): ...this new function.
+
 2018-04-06  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_formaddr.c (__libdw_addrx): New function, extracted from...

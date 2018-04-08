@@ -1,3 +1,17 @@
+2018-05-25  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (DWARF_SKELETON): New constant.
+	(do_not_close_dwfl): New bool.
+	(options): Add dwarf-skeleton.
+	(dwarf_skeleton): New static variable.
+	(parse_opt): Handle DWARF_SKELETON, set dwarf_skeleton.
+	(create_dwfl): New function, with code extracted from...
+	(process_file): ...here. Check do_not_close_dwfl.
+	(is_split_darf): New function.
+	(getone_dwflmod): Likewise.
+	(print_debug): Use new functions to find skeleton DWARF file to use
+	when inspecting .dwo split DWARF file.
+
 2018-04-11  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (dwarf_range_list_encoding_string): New function.

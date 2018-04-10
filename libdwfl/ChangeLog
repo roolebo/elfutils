@@ -1,3 +1,8 @@
+2018-04-10  Mark Wielaard  <mark@klomp.org>
+
+	* frame_unwind.c (unwind): If __libdwfl_frame_reg_get fails for
+	the return address either set an error or mark the pc undefined.
+
 2018-03-17  Mark Wielaard  <mark@klomp.org>
 
 	* libdwflP.h (struct __libdwfl_remote_mem_cache): New.

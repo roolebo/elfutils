@@ -1,5 +1,5 @@
-/* arm ABI-specified defaults for DWARF CFI.
-   Copyright (C) 2013 Red Hat, Inc.
+/* arm64 ABI-specified defaults for DWARF CFI.
+   Copyright (C) 2013, 2018 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -61,6 +61,9 @@ aarch64_abi_cfi (Ebl *ebl __attribute__ ((unused)), Dwarf_CIE *abi_info)
 
       /* The Frame Pointer (FP, r29) and Link Register (LR, r30).  */
       SV (29), SV (30),
+
+      /* The Stack Pointer (r31) is restored from CFA address by default.  */
+      DW_CFA_val_offset, ULEB128_7 (31), ULEB128_7 (0),
 
       /* Callee-saved fpregs v8-v15.  v0 == 64.  */
       SV (72), SV (73), SV (74), SV (75),

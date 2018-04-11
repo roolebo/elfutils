@@ -1,3 +1,7 @@
+2018-04-11  Mark Wielaard  <mark@klomp.org>
+
+	* run-addrcfi.sh: Adjust expected rule for aarch64 sp.
+
 2018-04-03  Mark Wielaard  <mark@klomp.org>
 
 	* testfileranges4.debug.bz2: New testfile.

@@ -6253,6 +6253,9 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	case DW_AT_decl_file:
 	case DW_AT_call_file:
 	  {
+	    if (cbargs->silent)
+	      break;
+
 	    /* Try to get the actual file, the current interface only
 	       gives us full paths, but we only want to show the file
 	       name for now.  */

@@ -6971,7 +6971,7 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
       {
 	op_addr_advance = minimum_instr_len * ((op_index + op_advance)
 					       / max_ops_per_instr);
-	address += op_advance;
+	address += op_addr_advance;
 	show_op_index = (op_index > 0 ||
 			 (op_index + op_advance) % max_ops_per_instr > 0);
 	op_index = (op_index + op_advance) % max_ops_per_instr;

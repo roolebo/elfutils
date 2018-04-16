@@ -256,4 +256,93 @@ DWARF section [30] '.debug_line' at offset 0x15f6:
 
 EOF
 
+# A .debug_line table with mininum instruction length > 1.
+#
+# = hello.c
+# #include <stdio.h>
+#
+# int
+# main (int argc, char **argv)
+# {
+#   printf ("Hello, %s\n", (argc > 0
+# 			  ? argv[1]: "World"));
+#   return 0;
+# }
+#
+# clang version 5.0.1 (tags/RELEASE_501/final)
+# Target: powerpc64-unknown-linux-gnu
+# clang -g -O2 -o testfile-ppc64-min-instr hello.c
+testfiles testfile-ppc64-min-instr
+
+testrun_compare ${abs_top_builddir}/src/readelf --debug-dump=line testfile-ppc64-min-instr <<\EOF
+
+DWARF section [29] '.debug_line' at offset 0xdf6:
+
+Table at offset 0:
+
+ Length:                     69
+ DWARF version:              2
+ Prologue length:            30
+ Minimum instruction length: 4
+ Maximum operations per instruction: 1
+ Initial value if 'is_stmt': 1
+ Line base:                  -5
+ Line range:                 14
+ Opcode base:                13
+
+Opcodes:
+  [ 1]  0 arguments
+  [ 2]  1 argument
+  [ 3]  1 argument
+  [ 4]  1 argument
+  [ 5]  1 argument
+  [ 6]  0 arguments
+  [ 7]  0 arguments
+  [ 8]  0 arguments
+  [ 9]  1 argument
+  [10]  0 arguments
+  [11]  0 arguments
+  [12]  1 argument
+
+Directory table:
+
+File name table:
+ Entry Dir   Time      Size      Name
+ 1     0     0         0         hello.c
+
+Line number statements:
+ [    28] extended opcode 2:  set address to 0x100005a4 <main>
+ [    33] special opcode 22: address+0 = 0x100005a4 <main>, line+4 = 5
+ [    34] set column to 27
+ [    36] set prologue end flag
+ [    37] special opcode 19: address+0 = 0x100005a4 <main>, line+1 = 6
+ [    38] set column to 8
+ [    3a] special opcode 47: address+8 = 0x100005ac <main+0x8>, line+1 = 7
+ [    3b] set 'is_stmt' to 0
+ [    3c] advance line by constant -7 to 0
+ [    3e] special opcode 32: address+4 = 0x100005b0 <main+0xc>, line+0 = 0
+ [    3f] set column to 3
+ [    41] set 'is_stmt' to 1
+ [    42] special opcode 108: address+24 = 0x100005c8 <main+0x24>, line+6 = 6
+ [    43] special opcode 76: address+16 = 0x100005d8 <main+0x34>, line+2 = 8
+ [    44] advance address by 32 to 0x100005f8
+ [    46] extended opcode 1:  end of sequence
+EOF
+
+testrun_compare ${abs_top_builddir}/src/readelf --debug-dump=decodedline testfile-ppc64-min-instr <<\EOF
+
+DWARF section [29] '.debug_line' at offset 0xdf6:
+
+ CU [b] hello.c
+  line:col SBPE* disc isa op address (Statement Block Prologue Epilogue *End)
+  /home/fedora/mjw/hello.c (mtime: 0, length: 0)
+     5:0   S        0   0  0 0x00000000100005a4 <main>
+     6:27  S P      0   0  0 0x00000000100005a4 <main>
+     7:8   S        0   0  0 0x00000000100005ac <main+0x8>
+     0:8            0   0  0 0x00000000100005b0 <main+0xc>
+     6:3   S        0   0  0 0x00000000100005c8 <main+0x24>
+     8:3   S        0   0  0 0x00000000100005d8 <main+0x34>
+     8:3   S   *    0   0  0 0x00000000100005f7 <main+0x53>
+
+EOF
 exit 0

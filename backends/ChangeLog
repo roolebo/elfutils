@@ -1,3 +1,10 @@
+2018-04-19  Andreas Schwab  <schwab@suse.de>
+
+	* Makefile.am (modules): Add riscv.
+	* riscv_init.c: New file.
+	* riscv_reloc.def: New file.
+	* riscv_symbol.c: New file.
+
 2018-04-11  Mark Wielaard  <mark@klomp.org>
 
 	* aarch64_cfi.c (aarch64_abi_cfi): Add rule for restoring SP from

@@ -33,12 +33,12 @@ AM_CPPFLAGS += -I$(top_srcdir)/libebl -I$(top_srcdir)/libasm \
 
 
 modules = i386 sh x86_64 ia64 alpha arm aarch64 sparc ppc ppc64 s390 \
-	  tilegx m68k bpf
+	  tilegx m68k bpf riscv
 libebl_pic = libebl_i386_pic.a libebl_sh_pic.a libebl_x86_64_pic.a    \
 	     libebl_ia64_pic.a libebl_alpha_pic.a libebl_arm_pic.a    \
 	     libebl_aarch64_pic.a libebl_sparc_pic.a libebl_ppc_pic.a \
 	     libebl_ppc64_pic.a libebl_s390_pic.a libebl_tilegx_pic.a \
-	     libebl_m68k_pic.a libebl_bpf_pic.a
+	     libebl_m68k_pic.a libebl_bpf_pic.a libebl_riscv_pic.a
 noinst_LIBRARIES = $(libebl_pic)
 noinst_DATA = $(libebl_pic:_pic.a=.so)
 
@@ -130,6 +130,10 @@ bpf_SRCS = bpf_init.c bpf_regs.c
 cpu_bpf = ../libcpu/libcpu_bpf.a
 libebl_bpf_pic_a_SOURCES = $(bpf_SRCS)
 am_libebl_bpf_pic_a_OBJECTS = $(bpf_SRCS:.c=.os)
+
+riscv_SRCS = riscv_init.c riscv_symbol.c
+libebl_riscv_pic_a_SOURCES = $(riscv_SRCS)
+am_libebl_riscv_pic_a_OBJECTS = $(riscv_SRCS:.c=.os)
 
 
 libebl_%.so libebl_%.map: libebl_%_pic.a $(libelf) $(libdw) $(libeu)

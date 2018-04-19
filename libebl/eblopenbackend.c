@@ -134,6 +134,8 @@ static const struct
   { "xtensa", "elf_xtensa", "xtensa", 6, EM_XTENSA, 0, 0 },
   { "aarch64", "elf_aarch64", "aarch64", 7, EM_AARCH64, ELFCLASS64, 0 },
   { "bpf", "elf_bpf", "bpf", 3, EM_BPF, 0, 0 },
+  { "riscv", "elf_riscv", "riscv", 5, EM_RISCV, ELFCLASS64, ELFDATA2LSB },
+  { "riscv", "elf_riscv", "riscv", 5, EM_RISCV, ELFCLASS32, ELFDATA2LSB },
 };
 #define nmachines (sizeof (machines) / sizeof (machines[0]))
 

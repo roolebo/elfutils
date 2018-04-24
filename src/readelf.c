@@ -4920,7 +4920,8 @@ print_debug_aranges_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
       return;
     }
 
-  Elf_Data *data = dbg->sectiondata[IDX_debug_aranges];
+  Elf_Data *data = (dbg->sectiondata[IDX_debug_aranges]
+		    ?: elf_rawdata (scn, NULL));
 
   if (unlikely (data == NULL))
     {
@@ -5074,8 +5075,8 @@ print_debug_ranges_section (Dwfl_Module *dwflmod,
 			    Elf_Scn *scn, GElf_Shdr *shdr,
 			    Dwarf *dbg)
 {
-  Elf_Data *data = dbg->sectiondata[IDX_debug_ranges];
-
+  Elf_Data *data = (dbg->sectiondata[IDX_debug_ranges]
+		    ?: elf_rawdata (scn, NULL));
   if (unlikely (data == NULL))
     {
       error (0, 0, gettext ("cannot get .debug_ranges content: %s"),
@@ -5671,7 +5672,8 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
   bool is_eh_frame = strcmp (scnname, ".eh_frame") == 0;
   Elf_Data *data = (is_eh_frame
 		    ? elf_rawdata (scn, NULL)
-		    : dbg->sectiondata[IDX_debug_frame]);
+		    : (dbg->sectiondata[IDX_debug_frame]
+		       ?: elf_rawdata (scn, NULL)));
 
   if (unlikely (data == NULL))
     {
@@ -6767,8 +6769,9 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
   /* There is no functionality in libdw to read the information in the
      way it is represented here.  Hardcode the decoder.  */
-  Elf_Data *data = dbg->sectiondata[IDX_debug_line];
-  if (unlikely (data == NULL || data->d_buf == NULL))
+  Elf_Data *data = (dbg->sectiondata[IDX_debug_line]
+		    ?: elf_rawdata (scn, NULL));
+  if (unlikely (data == NULL))
     {
       error (0, 0, gettext ("cannot get line data section data: %s"),
 	     elf_errmsg (-1));
@@ -7280,7 +7283,8 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
 			 Ebl *ebl, GElf_Ehdr *ehdr,
 			 Elf_Scn *scn, GElf_Shdr *shdr, Dwarf *dbg)
 {
-  Elf_Data *data = dbg->sectiondata[IDX_debug_loc];
+  Elf_Data *data = (dbg->sectiondata[IDX_debug_loc]
+		    ?: elf_rawdata (scn, NULL));
 
   if (unlikely (data == NULL))
     {
@@ -7475,8 +7479,9 @@ print_debug_macinfo_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 
   /* There is no function in libdw to iterate over the raw content of
      the section but it is easy enough to do.  */
-  Elf_Data *data = dbg->sectiondata[IDX_debug_macinfo];
-  if (unlikely (data == NULL || data->d_buf == NULL))
+  Elf_Data *data = (dbg->sectiondata[IDX_debug_macinfo]
+		    ?: elf_rawdata (scn, NULL));
+  if (unlikely (data == NULL))
     {
       error (0, 0, gettext ("cannot get macro information section data: %s"),
 	     elf_errmsg (-1));
@@ -7637,8 +7642,9 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	  (uint64_t) shdr->sh_offset);
   putc_unlocked ('\n', stdout);
 
-  Elf_Data *data = dbg->sectiondata[IDX_debug_macro];
-  if (unlikely (data == NULL || data->d_buf == NULL))
+  Elf_Data *data = (dbg->sectiondata[IDX_debug_macro]
+		    ?: elf_rawdata (scn, NULL));
+  if (unlikely (data == NULL))
     {
       error (0, 0, gettext ("cannot get macro information section data: %s"),
 	     elf_errmsg (-1));

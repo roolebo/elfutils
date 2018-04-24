@@ -1,3 +1,14 @@
+2018-04-24  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (print_debug_aranges_section): Try elf_rawdata if no
+	sectiondata.
+	(print_debug_ranges_section): Likewise.
+	(print_debug_frame_section): Likewise.
+	(print_debug_line_section): Likewise. Check for data == NULL.
+	(print_debug_loc_section): Likewise.
+	(print_debug_macinfo_section): Likewise.
+	(print_debug_macro_section): Likewise.
+
 2018-04-28  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_debug): If .debug_info is needed implicitly by

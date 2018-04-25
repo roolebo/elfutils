@@ -1,3 +1,9 @@
+2018-04-25  Mark Wielaard  <mark@klomp.org>
+
+	* eblopenbackend.c (default_debugscn_p): Add new DWARF5 sections
+	.debug_addr, .debug_line_str, .debug_loclists, .debug_names,
+	.debug_rnglists and .debug_str_offsets.
+
 2018-04-19  Andreas Schwab  <schwab@suse.de>
 
 	* eblopenbackend.c (machines): Add entries for RISC-V.

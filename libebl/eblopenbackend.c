@@ -640,6 +640,13 @@ default_debugscn_p (const char *name)
       ".gdb_index",
       /* GNU/DWARF 5 extension/proposal */
       ".debug_macro",
+      /* DWARF 5 */
+      ".debug_addr",
+      ".debug_line_str",
+      ".debug_loclists",
+      ".debug_names",
+      ".debug_rnglists",
+      ".debug_str_offsets",
       /* SGI/MIPS DWARF 2 extensions */
       ".debug_weaknames",
       ".debug_funcnames",

@@ -57,9 +57,14 @@ dwarf_formstring (Dwarf_Attribute *attrp)
       return NULL;
     }
 
-  if (dbg_ret->sectiondata[IDX_debug_str] == NULL)
+  Elf_Data *data = ((attrp->form == DW_FORM_line_strp)
+		    ? dbg_ret->sectiondata[IDX_debug_line_str]
+		    : dbg_ret->sectiondata[IDX_debug_str]);
+  if (data == NULL)
     {
-      __libdw_seterrno (DWARF_E_NO_STRING);
+      __libdw_seterrno ((attrp->form == DW_FORM_line_strp)
+			? DWARF_E_NO_DEBUG_LINE_STR
+			: DWARF_E_NO_DEBUG_STR);
       return NULL;
     }
 
@@ -70,6 +75,13 @@ dwarf_formstring (Dwarf_Attribute *attrp)
       if (__libdw_read_offset (dbg, dbg_ret, cu_sec_idx (cu),
 			       attrp->valp, cu->offset_size, &off,
 			       IDX_debug_str, 1))
+	return NULL;
+    }
+  else if (attrp->form == DW_FORM_line_strp)
+    {
+      if (__libdw_read_offset (dbg, dbg_ret, cu_sec_idx (cu),
+			       attrp->valp, cu->offset_size, &off,
+			       IDX_debug_line_str, 1))
 	return NULL;
     }
   else
@@ -160,7 +172,7 @@ dwarf_formstring (Dwarf_Attribute *attrp)
 	goto invalid_offset;
     }
 
-  return (const char *) dbg_ret->sectiondata[IDX_debug_str]->d_buf + off;
+  return (const char *) data->d_buf + off;
 }
 INTDEF(dwarf_formstring)
 

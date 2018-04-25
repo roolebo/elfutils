@@ -55,6 +55,7 @@ static const char dwarf_scnnames[IDX_last][19] =
   [IDX_debug_addr] = ".debug_addr",
   [IDX_debug_aranges] = ".debug_aranges",
   [IDX_debug_line] = ".debug_line",
+  [IDX_debug_line_str] = ".debug_line_str",
   [IDX_debug_frame] = ".debug_frame",
   [IDX_debug_loc] = ".debug_loc",
   [IDX_debug_pubnames] = ".debug_pubnames",

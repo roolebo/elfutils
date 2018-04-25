@@ -1,3 +1,13 @@
+2018-04-24  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_begin_elf.c (dwarf_scnnames): Add ".debug_line_str".
+	* dwarf_error.c (errmsgs): Add DWARF_E_NO_DEBUG_STR and
+	DWARF_E_NO_DEBUG_LINE_STR.
+	* dwarf_formstring.c (dwarf_formstring): Handle DW_FORM_line_strp.
+	Get data from either .debug_str or .debug_line_str.
+	* libdwP.h: Add IDX_debug_line_str, DWARF_E_NO_DEBUG_STR and
+	DWARF_E_NO_DEBUG_LINE_STR.
+
 2018-04-03  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_formudata.c (__libdw_formptr): Take and return const

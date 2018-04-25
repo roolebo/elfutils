@@ -1,7 +1,6 @@
 /* Retrieve ELF descriptor used for DWARF access.
-   Copyright (C) 2002, 2003, 2004, 2005, 2009, 2014, 2015 Red Hat, Inc.
+   Copyright (C) 2002-2005, 2009, 2014, 2015, 2017, 2018 Red Hat, Inc.
    This file is part of elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
    This file is free software; you can redistribute it and/or modify
    it under the terms of either
@@ -73,6 +72,8 @@ static const char *errmsgs[] =
     [DWARF_E_NO_ENTRY] = N_("no entries found"),
     [DWARF_E_INVALID_DWARF] = N_("invalid DWARF"),
     [DWARF_E_NO_STRING] = N_("no string data"),
+    [DWARF_E_NO_DEBUG_STR] = N_(".debug_str section missing"),
+    [DWARF_E_NO_DEBUG_LINE_STR] = N_(".debug_line_str section missing"),
     [DWARF_E_NO_STR_OFFSETS] = N_(".debug_str_offsets section missing"),
     [DWARF_E_NO_ADDR] = N_("no address value"),
     [DWARF_E_NO_CONSTANT] = N_("no constant value"),

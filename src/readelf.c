@@ -6105,6 +6105,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 
     case DW_FORM_indirect:
     case DW_FORM_strp:
+    case DW_FORM_line_strp:
     case DW_FORM_strx:
     case DW_FORM_strx1:
     case DW_FORM_strx2:
@@ -8125,10 +8126,11 @@ print_debug_pubnames_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 static void
 print_debug_str_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 			 Ebl *ebl, GElf_Ehdr *ehdr,
-			 Elf_Scn *scn, GElf_Shdr *shdr, Dwarf *dbg)
+			 Elf_Scn *scn, GElf_Shdr *shdr,
+			 Dwarf *dbg __attribute__ ((unused)))
 {
-  const size_t sh_size = (dbg->sectiondata[IDX_debug_str] ?
-			  dbg->sectiondata[IDX_debug_str]->d_size : 0);
+  Elf_Data *data = elf_rawdata (scn, NULL);
+  const size_t sh_size = data ? data->d_size : 0;
 
   /* Compute floor(log16(shdr->sh_size)).  */
   GElf_Addr tmp = sh_size;
@@ -8151,16 +8153,16 @@ print_debug_str_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
   while (offset < sh_size)
     {
       size_t len;
-      const char *str = dwarf_getstring (dbg, offset, &len);
-      if (unlikely (str == NULL))
+      const char *str = (const char *) data->d_buf + offset;
+      const char *endp = memchr (str, '\0', sh_size - offset);
+      if (unlikely (endp == NULL))
 	{
-	  printf (gettext (" *** error while reading strings: %s\n"),
-		  dwarf_errmsg (-1));
+	  printf (gettext (" *** error, missing string terminator\n"));
 	  break;
 	}
 
       printf (" [%*" PRIx64 "]  \"%s\"\n", digits, (uint64_t) offset, str);
-
+      len = endp - str;
       offset += len + 1;
     }
 }
@@ -8754,6 +8756,9 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
 	      NEW_SECTION (loc),
 	      NEW_SECTION (pubnames),
 	      NEW_SECTION (str),
+	      /* A DWARF5 specialised debug string section.  */
+	      { ".debug_line_str", section_str,
+		print_debug_str_section },
 	      NEW_SECTION (macinfo),
 	      NEW_SECTION (macro),
 	      NEW_SECTION (ranges),

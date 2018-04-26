@@ -177,20 +177,3 @@ dwarf_formstring (Dwarf_Attribute *attrp)
   return (const char *) data->d_buf + off;
 }
 INTDEF(dwarf_formstring)
-
-Dwarf_Off __libdw_cu_str_off_base (Dwarf_CU *cu)
-{
-  if (cu->str_off_base == (Dwarf_Off) -1)
-    {
-      Dwarf_Die cu_die = CUDIE(cu);
-      Dwarf_Attribute attr;
-      if (dwarf_attr (&cu_die, DW_AT_str_offsets_base, &attr) != NULL)
-	{
-	  Dwarf_Word off;
-	  if (dwarf_formudata (&attr, &off) == 0)
-	    cu->str_off_base = off;
-	}
-    }
-
-  return cu->str_off_base;
-}

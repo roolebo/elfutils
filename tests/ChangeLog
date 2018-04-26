@@ -1,3 +1,9 @@
+2018-05-09  Mark Wielaard  <mark@klomp.org>
+
+	* run-readelf-zdebug.sh: Adjust test output for new header layout.
+	* run-readelf-line.sh: Likewise. Add new tests for testfile-dwarf-4
+	and testfile-dwarf-5.
+
 2018-05-11  Mark Wielaard  <mark@klomp.org>
 
 	* Makefile.am (check_PROGRAMS): Add get-units-invalid.

@@ -361,15 +361,17 @@ DWARF section [34] '.debug_line' at offset 0x104c:
 
 Table at offset 0:
 
- Length:                     70
- DWARF version:              2
- Prologue length:            40
- Minimum instruction length: 1
- Maximum operations per instruction: 1
- Initial value if 'is_stmt': 1
- Line base:                  -5
- Line range:                 14
- Opcode base:                13
+ Length:                         70
+ DWARF version:                  2
+ Prologue length:                40
+ Address size:                   8
+ Segment selector size:          0
+ Min instruction length:         1
+ Max operations per instruction: 1
+ Initial value if 'is_stmt':     1
+ Line base:                      -5
+ Line range:                     14
+ Opcode base:                    13
 
 Opcodes:
   [ 1]  0 arguments

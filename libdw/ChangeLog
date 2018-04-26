@@ -1,3 +1,10 @@
+2018-05-09  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_formstring.c (__libdw_cu_str_off_base): Moved to...
+	* libdwP.h (__libdw_cu_str_off_base): ...here. Make static inline.
+	(str_offsets_base_off): New internal function that also parses
+	.debug_str_offsets header if necessary.
+
 2018-05-11  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_siblingof.c (dwarf_siblingof): Don't reference cu till it is

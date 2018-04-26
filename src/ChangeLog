@@ -1,3 +1,14 @@
+2018-05-09  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (dwarf_line_content_description_string): New function.
+	(dwarf_line_content_description_name): Likewise.
+	(print_bytes): Likewise.
+	(print_form_data): Likewise. Based on code taken from...
+	(print_debug_macro_section): ...here. Now calls print_form_data
+	and str_offsets_base_off.
+	(print_debug_line_section): Parse DWARF5 header, directory and file
+	name tables.
+
 2018-05-12  Mark Wielaard  <mark@klomp.org>
 
 	* addr2line.c (main): Add fflush (stdout) after handle_address ()

@@ -1,7 +1,6 @@
 /* Print information from ELF file in human-readable form.
-   Copyright (C) 1999-2017 Red Hat, Inc.
+   Copyright (C) 1999-2018 Red Hat, Inc.
    This file is part of elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 1999.
 
    This file is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -3975,6 +3974,20 @@ dwarf_unit_string (unsigned int type)
 }
 
 
+static const char *
+dwarf_line_content_description_string (unsigned int kind)
+{
+  switch (kind)
+    {
+#define DWARF_ONE_KNOWN_DW_LNCT(NAME, CODE) case CODE: return #NAME;
+      DWARF_ALL_KNOWN_DW_LNCT
+#undef DWARF_ONE_KNOWN_DW_LNCT
+    default:
+      return NULL;
+    }
+}
+
+
 /* Used by all dwarf_foo_name functions.  */
 static const char *
 string_or_unknown (const char *known, unsigned int code,
@@ -4122,6 +4135,15 @@ dwarf_unit_name (unsigned int type)
 }
 
 
+static const char *
+dwarf_line_content_description_name (unsigned int kind)
+{
+  const char *ret = dwarf_line_content_description_string (kind);
+  return string_or_unknown (ret, kind, DW_LNCT_lo_user, DW_LNCT_hi_user,
+			    false);
+}
+
+
 static void
 print_block (size_t n, const void *block)
 {
@@ -4135,6 +4157,17 @@ print_block (size_t n, const void *block)
 	printf (" %02x", *data++);
       while (--n > 0);
       putchar ('\n');
+    }
+}
+
+static void
+print_bytes (size_t n, const unsigned char *bytes)
+{
+  while (n-- > 0)
+    {
+      printf ("%02x", *bytes++);
+      if (n > 0)
+	printf (" ");
     }
 }
 
@@ -6749,6 +6782,230 @@ print_decoded_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 }
 
 
+/* Print the value of a form.
+   Returns new value of readp, or readendp on failure.  */
+static const unsigned char *
+print_form_data (Dwarf *dbg, int form, const unsigned char *readp,
+		 const unsigned char *readendp, unsigned int offset_len,
+		 Dwarf_Off str_offsets_base)
+{
+  Dwarf_Word val;
+  unsigned char *endp;
+  Elf_Data *data;
+  char *str;
+  switch (form)
+    {
+    case DW_FORM_data1:
+      if (readendp - readp < 1)
+	{
+	invalid_data:
+	  error (0, 0, "invalid data");
+	  return readendp;
+	}
+      val = *readp++;
+      printf (" %" PRIx8, (unsigned int) val);
+      break;
+
+    case DW_FORM_data2:
+      if (readendp - readp < 2)
+	goto invalid_data;
+      val = read_2ubyte_unaligned_inc (dbg, readp);
+      printf(" %" PRIx16, (unsigned int) val);
+      break;
+
+    case DW_FORM_data4:
+      if (readendp - readp < 4)
+	goto invalid_data;
+      val = read_4ubyte_unaligned_inc (dbg, readp);
+      printf (" %" PRIx32, (unsigned int) val);
+      break;
+
+    case DW_FORM_data8:
+      if (readendp - readp < 8)
+	goto invalid_data;
+      val = read_8ubyte_unaligned_inc (dbg, readp);
+      printf (" %" PRIx64, val);
+      break;
+
+    case DW_FORM_sdata:
+      if (readendp - readp < 1)
+	goto invalid_data;
+      get_sleb128 (val, readp, readendp);
+      printf (" %" PRIx64, val);
+      break;
+
+    case DW_FORM_udata:
+      if (readendp - readp < 1)
+	goto invalid_data;
+      get_uleb128 (val, readp, readendp);
+      printf (" %" PRIx64, val);
+      break;
+
+    case DW_FORM_block:
+      if (readendp - readp < 1)
+	goto invalid_data;
+      get_uleb128 (val, readp, readendp);
+      if (readendp - readp < (ptrdiff_t) val)
+	goto invalid_data;
+      print_bytes (val, readp);
+      readp += val;
+      break;
+
+    case DW_FORM_block1:
+      if (readendp - readp < 1)
+	goto invalid_data;
+      val = *readp++;
+      if (readendp - readp < (ptrdiff_t) val)
+	goto invalid_data;
+      print_bytes (val, readp);
+      readp += val;
+      break;
+
+    case DW_FORM_block2:
+      if (readendp - readp < 2)
+	goto invalid_data;
+      val = read_2ubyte_unaligned_inc (dbg, readp);
+      if (readendp - readp < (ptrdiff_t) val)
+	goto invalid_data;
+      print_bytes (val, readp);
+      readp += val;
+      break;
+
+    case DW_FORM_block4:
+      if (readendp - readp < 2)
+	goto invalid_data;
+      val = read_4ubyte_unaligned_inc (dbg, readp);
+      if (readendp - readp < (ptrdiff_t) val)
+	goto invalid_data;
+      print_bytes (val, readp);
+      readp += val;
+      break;
+
+    case DW_FORM_data16:
+      if (readendp - readp < 16)
+	goto invalid_data;
+      print_bytes (16, readp);
+      readp += 16;
+      break;
+
+    case DW_FORM_flag:
+      if (readendp - readp < 1)
+	goto invalid_data;
+      val = *readp++;
+      printf ("%s", val != 0 ? gettext ("yes") : gettext ("no"));
+      break;
+
+    case DW_FORM_string:
+      endp = memchr (readp, '\0', readendp - readp);
+      if (endp == NULL)
+	goto invalid_data;
+      printf ("%s", readp);
+      readp = endp + 1;
+      break;
+
+    case DW_FORM_strp:
+    case DW_FORM_line_strp:
+    case DW_FORM_strp_sup:
+      if (readendp - readp < offset_len)
+	goto invalid_data;
+      if (offset_len == 8)
+	val = read_8ubyte_unaligned_inc (dbg, readp);
+      else
+	val = read_4ubyte_unaligned_inc (dbg, readp);
+      if (form == DW_FORM_strp)
+	data = dbg->sectiondata[IDX_debug_str];
+      else if (form == DW_FORM_line_strp)
+	data = dbg->sectiondata[IDX_debug_line_str];
+      else /* form == DW_FORM_strp_sup */
+	{
+	  Dwarf *alt = dwarf_getalt (dbg);
+	  data = alt != NULL ? alt->sectiondata[IDX_debug_str] : NULL;
+	}
+      if (data == NULL || val >= data->d_size
+	  || memchr (data->d_buf + val, '\0', data->d_size - val) == NULL)
+	str = "???";
+      else
+	str = (char *) data->d_buf + val;
+      printf ("%s (%" PRIu64 ")", str, val);
+      break;
+
+    case DW_FORM_sec_offset:
+      if (readendp - readp < offset_len)
+	goto invalid_data;
+      if (offset_len == 8)
+	val = read_8ubyte_unaligned_inc (dbg, readp);
+      else
+	val = read_4ubyte_unaligned_inc (dbg, readp);
+      printf ("[%" PRIx64 "]", val);
+      break;
+
+    case DW_FORM_strx:
+      if (readendp - readp < 1)
+	goto invalid_data;
+      get_uleb128 (val, readp, readendp);
+    strx_val:
+      data = dbg->sectiondata[IDX_debug_str_offsets];
+      if (data == NULL
+	  || data->d_size - str_offsets_base < val)
+	str = "???";
+      else
+	{
+	  readp = data->d_buf + str_offsets_base + val;
+	  readendp = data->d_buf + data->d_size;
+	  if (readendp - readp < offset_len)
+	    str = "???";
+	  else
+	    {
+	      Dwarf_Off idx;
+	      if (offset_len == 8)
+		idx = read_8ubyte_unaligned_inc (dbg, readp);
+	      else
+		idx = read_4ubyte_unaligned_inc (dbg, readp);
+
+	      data = dbg->sectiondata[IDX_debug_str];
+	      if (data == NULL || idx >= data->d_size
+		  || memchr (data->d_buf + idx, '\0',
+			     data->d_size - idx) == NULL)
+		str = "???";
+	      else
+		str = (char *) data->d_buf + idx;
+	    }
+	}
+      printf ("%s (%" PRIu64 ")", str, val);
+      break;
+
+    case DW_FORM_strx1:
+      if (readendp - readp < 1)
+	goto invalid_data;
+      val = *readp;
+      goto strx_val;
+
+    case DW_FORM_strx2:
+      if (readendp - readp < 2)
+	goto invalid_data;
+      val = read_2ubyte_unaligned (dbg, readp);
+      goto strx_val;
+
+    case DW_FORM_strx3:
+      if (readendp - readp < 3)
+	goto invalid_data;
+      val = read_3ubyte_unaligned (dbg, readp);
+      goto strx_val;
+
+    case DW_FORM_strx4:
+      if (readendp - readp < 4)
+	goto invalid_data;
+      val = read_4ubyte_unaligned (dbg, readp);
+      goto strx_val;
+
+    default:
+      error (0, 0, gettext ("unknown form: %s"), dwarf_form_name (form));
+      return readendp;
+    }
+
+  return readp;
+}
+
 static void
 print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 			  Elf_Scn *scn, GElf_Shdr *shdr, Dwarf *dbg)
@@ -6806,35 +7063,67 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	}
 
       /* Check whether we have enough room in the section.  */
-      if (unlikely (unit_length > (size_t) (lineendp - linep)
-	  || unit_length < 2 + length + 5 * 1))
+      if (unlikely (unit_length > (size_t) (lineendp - linep)))
 	goto invalid_data;
       lineendp = linep + unit_length;
 
       /* The next element of the header is the version identifier.  */
+      if ((size_t) (lineendp - linep) < 2)
+	goto invalid_data;
       uint_fast16_t version = read_2ubyte_unaligned_inc (dbg, linep);
+
+      size_t address_size
+	= elf_getident (ebl->elf, NULL)[EI_CLASS] == ELFCLASS32 ? 4 : 8;
+      unsigned char segment_selector_size = 0;
+      if (version > 4)
+	{
+	  if ((size_t) (lineendp - linep) < 2)
+	    goto invalid_data;
+	  address_size = *linep++;
+	  segment_selector_size = *linep++;
+	}
 
       /* Next comes the header length.  */
       Dwarf_Word header_length;
       if (length == 4)
-	header_length = read_4ubyte_unaligned_inc (dbg, linep);
+	{
+	  if ((size_t) (lineendp - linep) < 4)
+	    goto invalid_data;
+	  header_length = read_4ubyte_unaligned_inc (dbg, linep);
+	}
       else
-	header_length = read_8ubyte_unaligned_inc (dbg, linep);
-      //const unsigned char *header_start = linep;
+	{
+	  if ((size_t) (lineendp - linep) < 8)
+	    goto invalid_data;
+	  header_length = read_8ubyte_unaligned_inc (dbg, linep);
+	}
 
       /* Next the minimum instruction length.  */
+      if ((size_t) (lineendp - linep) < 1)
+	goto invalid_data;
       uint_fast8_t minimum_instr_len = *linep++;
 
       /* Next the maximum operations per instruction, in version 4 format.  */
-      uint_fast8_t max_ops_per_instr = version < 4 ? 1 : *linep++;
+      uint_fast8_t max_ops_per_instr;
+      if (version < 4)
+	max_ops_per_instr = 1;
+      else
+	{
+	  if ((size_t) (lineendp - linep) < 1)
+	    goto invalid_data;
+	  max_ops_per_instr = *linep++;
+	}
 
-	/* Then the flag determining the default value of the is_stmt
-	   register.  */
+      /* We need at least 4 more bytes.  */
+      if ((size_t) (lineendp - linep) < 4)
+	goto invalid_data;
+
+      /* Then the flag determining the default value of the is_stmt
+	 register.  */
       uint_fast8_t default_is_stmt = *linep++;
 
       /* Now the line base.  */
-      int_fast8_t line_base = *((const int_fast8_t *) linep);
-      ++linep;
+      int_fast8_t line_base = *linep++;
 
       /* And the line range.  */
       uint_fast8_t line_range = *linep++;
@@ -6844,21 +7133,48 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
       /* Print what we got so far.  */
       printf (gettext ("\n"
-		       " Length:                     %" PRIu64 "\n"
-		       " DWARF version:              %" PRIuFAST16 "\n"
-		       " Prologue length:            %" PRIu64 "\n"
-		       " Minimum instruction length: %" PRIuFAST8 "\n"
-		       " Maximum operations per instruction: %" PRIuFAST8 "\n"
-		       " Initial value if '%s': %" PRIuFAST8 "\n"
-		       " Line base:                  %" PRIdFAST8 "\n"
-		       " Line range:                 %" PRIuFAST8 "\n"
-		       " Opcode base:                %" PRIuFAST8 "\n"
+		       " Length:                         %" PRIu64 "\n"
+		       " DWARF version:                  %" PRIuFAST16 "\n"
+		       " Prologue length:                %" PRIu64 "\n"
+		       " Address size:                   %zd\n"
+		       " Segment selector size:          %zd\n"
+		       " Min instruction length:         %" PRIuFAST8 "\n"
+		       " Max operations per instruction: %" PRIuFAST8 "\n"
+		       " Initial value if 'is_stmt':     %" PRIuFAST8 "\n"
+		       " Line base:                      %" PRIdFAST8 "\n"
+		       " Line range:                     %" PRIuFAST8 "\n"
+		       " Opcode base:                    %" PRIuFAST8 "\n"
 		       "\n"
 		       "Opcodes:\n"),
 	      (uint64_t) unit_length, version, (uint64_t) header_length,
+	      address_size, (size_t) segment_selector_size,
 	      minimum_instr_len, max_ops_per_instr,
-	      "is_stmt", default_is_stmt, line_base,
+	      default_is_stmt, line_base,
 	      line_range, opcode_base);
+
+      if (version < 2 || version > 5)
+	{
+	  error (0, 0, gettext ("cannot handle .debug_line version: %u\n"),
+		 (unsigned int) version);
+	  linep = lineendp;
+	  continue;
+	}
+
+      if (address_size != 4 && address_size != 8)
+	{
+	  error (0, 0, gettext ("cannot handle address size: %u\n"),
+		 (unsigned int) address_size);
+	  linep = lineendp;
+	  continue;
+	}
+
+      if (segment_selector_size != 0)
+	{
+	  error (0, 0, gettext ("cannot handle segment selector size: %u\n"),
+		 (unsigned int) segment_selector_size);
+	  linep = lineendp;
+	  continue;
+	}
 
       if (unlikely (linep + opcode_base - 1 >= lineendp))
 	{
@@ -6884,69 +7200,184 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 			  (int) linep[cnt - 1]),
 		opcode_base_l10, cnt, linep[cnt - 1]);
       linep += opcode_base - 1;
+
       if (unlikely (linep >= lineendp))
 	goto invalid_unit;
+
+      Dwarf_Off str_offsets_base = str_offsets_base_off (dbg, NULL);
 
       puts (gettext ("\nDirectory table:"));
-      while (*linep != 0)
+      if (version > 4)
 	{
-	  unsigned char *endp = memchr (linep, '\0', lineendp - linep);
-	  if (unlikely (endp == NULL))
-	    goto invalid_unit;
+	  struct encpair { uint16_t desc; uint16_t form; };
+	  struct encpair enc[256];
 
-	  printf (" %s\n", (char *) linep);
+	  printf (gettext ("      ["));
+	  if ((size_t) (lineendp - linep) < 1)
+	    goto invalid_data;
+	  unsigned char directory_entry_format_count = *linep++;
+	  for (int i = 0; i < directory_entry_format_count; i++)
+	    {
+	      uint16_t desc, form;
+	      if ((size_t) (lineendp - linep) < 1)
+		goto invalid_data;
+	      get_uleb128 (desc, linep, lineendp);
+	      if ((size_t) (lineendp - linep) < 1)
+		goto invalid_data;
+	      get_uleb128 (form, linep, lineendp);
 
-	  linep = endp + 1;
+	      enc[i].desc = desc;
+	      enc[i].form = form;
+
+	      printf ("%s(%s)",
+		      dwarf_line_content_description_name (desc),
+		      dwarf_form_name (form));
+	      if (i + 1 < directory_entry_format_count)
+		printf (", ");
+	    }
+	  printf ("]\n");
+
+	  uint64_t directories_count;
+	  if ((size_t) (lineendp - linep) < 1)
+            goto invalid_data;
+	  get_uleb128 (directories_count, linep, lineendp);
+
+	  if (directory_entry_format_count == 0
+	      && directories_count != 0)
+	    goto invalid_data;
+
+	  for (uint64_t i = 0; i < directories_count; i++)
+	    {
+	      printf (" %-5lu ", i);
+	      for (int j = 0; j < directory_entry_format_count; j++)
+		{
+		  linep = print_form_data (dbg, enc[j].form,
+					   linep, lineendp, length,
+					   str_offsets_base);
+		  if (j + 1 < directory_entry_format_count)
+		    printf (", ");
+		}
+	      printf ("\n");
+	    }
 	}
-      /* Skip the final NUL byte.  */
-      ++linep;
+      else
+	{
+	  while (*linep != 0)
+	    {
+	      unsigned char *endp = memchr (linep, '\0', lineendp - linep);
+	      if (unlikely (endp == NULL))
+		goto invalid_unit;
+
+	      printf (" %s\n", (char *) linep);
+
+	      linep = endp + 1;
+	    }
+	  /* Skip the final NUL byte.  */
+	  ++linep;
+	}
 
       if (unlikely (linep >= lineendp))
 	goto invalid_unit;
-      puts (gettext ("\nFile name table:\n"
-		     " Entry Dir   Time      Size      Name"));
-      for (unsigned int cnt = 1; *linep != 0; ++cnt)
+
+      puts (gettext ("\nFile name table:"));
+      if (version > 4)
 	{
-	  /* First comes the file name.  */
-	  char *fname = (char *) linep;
-	  unsigned char *endp = memchr (fname, '\0', lineendp - linep);
-	  if (unlikely (endp == NULL))
-	    goto invalid_unit;
-	  linep = endp + 1;
+	  struct encpair { uint16_t desc; uint16_t form; };
+	  struct encpair enc[256];
 
-	  /* Then the index.  */
-	  unsigned int diridx;
-	  if (lineendp - linep < 1)
-	    goto invalid_unit;
-	  get_uleb128 (diridx, linep, lineendp);
+	  printf (gettext ("      ["));
+	  if ((size_t) (lineendp - linep) < 1)
+	    goto invalid_data;
+	  unsigned char file_name_format_count = *linep++;
+	  for (int i = 0; i < file_name_format_count; i++)
+	    {
+	      uint64_t desc, form;
+	      if ((size_t) (lineendp - linep) < 1)
+		goto invalid_data;
+	      get_uleb128 (desc, linep, lineendp);
+	      if ((size_t) (lineendp - linep) < 1)
+		goto invalid_data;
+	      get_uleb128 (form, linep, lineendp);
 
-	  /* Next comes the modification time.  */
-	  unsigned int mtime;
-	  if (lineendp - linep < 1)
-	    goto invalid_unit;
-	  get_uleb128 (mtime, linep, lineendp);
+	      if (! libdw_valid_user_form (form))
+		goto invalid_data;
 
-	  /* Finally the length of the file.  */
-	  unsigned int fsize;
-	  if (lineendp - linep < 1)
-	    goto invalid_unit;
-	  get_uleb128 (fsize, linep, lineendp);
+	      enc[i].desc = desc;
+	      enc[i].form = form;
 
-	  printf (" %-5u %-5u %-9u %-9u %s\n",
-		  cnt, diridx, mtime, fsize, fname);
+	      printf ("%s(%s)",
+		      dwarf_line_content_description_name (desc),
+		      dwarf_form_name (form));
+	      if (i + 1 < file_name_format_count)
+		printf (", ");
+	    }
+	  printf ("]\n");
+
+	  uint64_t file_name_count;
+	  if ((size_t) (lineendp - linep) < 1)
+            goto invalid_data;
+	  get_uleb128 (file_name_count, linep, lineendp);
+
+	  if (file_name_format_count == 0
+	      && file_name_count != 0)
+	    goto invalid_data;
+
+	  for (uint64_t i = 0; i < file_name_count; i++)
+	    {
+	      printf (" %-5lu ", i);
+	      for (int j = 0; j < file_name_format_count; j++)
+		{
+		  linep = print_form_data (dbg, enc[j].form,
+					   linep, lineendp, length,
+					   str_offsets_base);
+		  if (j + 1 < file_name_format_count)
+		    printf (", ");
+		}
+	      printf ("\n");
+	    }
 	}
-      /* Skip the final NUL byte.  */
-      ++linep;
+      else
+	{
+	  puts (gettext (" Entry Dir   Time      Size      Name"));
+	  for (unsigned int cnt = 1; *linep != 0; ++cnt)
+	    {
+	      /* First comes the file name.  */
+	      char *fname = (char *) linep;
+	      unsigned char *endp = memchr (fname, '\0', lineendp - linep);
+	      if (unlikely (endp == NULL))
+		goto invalid_unit;
+	      linep = endp + 1;
+
+	      /* Then the index.  */
+	      unsigned int diridx;
+	      if (lineendp - linep < 1)
+		goto invalid_unit;
+	      get_uleb128 (diridx, linep, lineendp);
+
+	      /* Next comes the modification time.  */
+	      unsigned int mtime;
+	      if (lineendp - linep < 1)
+		goto invalid_unit;
+	      get_uleb128 (mtime, linep, lineendp);
+
+	      /* Finally the length of the file.  */
+	      unsigned int fsize;
+	      if (lineendp - linep < 1)
+		goto invalid_unit;
+	      get_uleb128 (fsize, linep, lineendp);
+
+	      printf (" %-5u %-5u %-9u %-9u %s\n",
+		      cnt, diridx, mtime, fsize, fname);
+	    }
+	  /* Skip the final NUL byte.  */
+	  ++linep;
+	}
 
       puts (gettext ("\nLine number statements:"));
       Dwarf_Word address = 0;
       unsigned int op_index = 0;
       size_t line = 1;
       uint_fast8_t is_stmt = default_is_stmt;
-
-      /* Default address value, in case we do not find the CU.  */
-      size_t address_size
-	= elf_getident (ebl->elf, NULL)[EI_CLASS] == ELFCLASS32 ? 4 : 8;
 
       /* Determine the CU this block is for.  */
       Dwarf_Off cuoffset;
@@ -7727,6 +8158,18 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 		  line_offset);
 	}
 
+      struct mac_culist *cu = NULL;
+      if (line_offset != (Dwarf_Off) -1)
+	{
+	  cu = culist;
+	  while (cu != NULL && line_offset != cu->offset)
+	    cu = cu->next;
+	}
+
+      Dwarf_Off str_offsets_base = str_offsets_base_off (dbg, (cu != NULL
+							       ? cu->die.cu
+							       : NULL));
+
       const unsigned char *vendor[DW_MACRO_hi_user - DW_MACRO_lo_user];
       memset (vendor, 0, sizeof vendor);
       if (flag & 0x04)
@@ -7810,22 +8253,16 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 
 	      /* Find the CU DIE that matches this line offset.  */
 	      const char *fname = "???";
-	      if (line_offset != (Dwarf_Off) -1)
+	      if (cu != NULL)
 		{
-		  struct mac_culist *cu = culist;
-		  while (cu != NULL && line_offset != cu->offset)
-		    cu = cu->next;
-		  if (cu != NULL)
-		    {
-		      if (cu->files == NULL
-			  && dwarf_getsrcfiles (&cu->die, &cu->files,
-						NULL) != 0)
-			cu->files = (Dwarf_Files *) -1l;
+		  if (cu->files == NULL
+		      && dwarf_getsrcfiles (&cu->die, &cu->files,
+					    NULL) != 0)
+		    cu->files = (Dwarf_Files *) -1l;
 
-		      if (cu->files != (Dwarf_Files *) -1l)
-			fname = (dwarf_filesrc (cu->files, u128_2,
-						NULL, NULL) ?: "???");
-		    }
+		  if (cu->files != (Dwarf_Files *) -1l)
+		    fname = (dwarf_filesrc (cu->files, u128_2,
+					    NULL, NULL) ?: "???");
 		}
 	      printf ("%*sstart_file %u, [%u] %s\n",
 		      level, "", u128, u128_2, fname);
@@ -7971,125 +8408,11 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	      while (args > 0)
 		{
 		  unsigned int form = *op_desc++;
-		  Dwarf_Word val;
-		  switch (form)
-		    {
-		    case DW_FORM_data1:
-		      if (readp + 1 > readendp)
-			goto invalid_data;
-		      val = *readp++;
-		      printf (" %" PRIx8, (unsigned int) val);
-		      break;
-
-		    case DW_FORM_data2:
-		      if (readp + 2 > readendp)
-			goto invalid_data;
-		      val = read_2ubyte_unaligned_inc (dbg, readp);
-		      printf(" %" PRIx16, (unsigned int) val);
-		      break;
-
-		    case DW_FORM_data4:
-		      if (readp + 4 > readendp)
-			goto invalid_data;
-		      val = read_4ubyte_unaligned_inc (dbg, readp);
-		      printf (" %" PRIx32, (unsigned int) val);
-		      break;
-
-		    case DW_FORM_data8:
-		      if (readp + 8 > readendp)
-			goto invalid_data;
-		      val = read_8ubyte_unaligned_inc (dbg, readp);
-		      printf (" %" PRIx64, val);
-		      break;
-
-		    case DW_FORM_sdata:
-		      get_sleb128 (val, readp, readendp);
-		      printf (" %" PRIx64, val);
-		      break;
-
-		    case DW_FORM_udata:
-		      get_uleb128 (val, readp, readendp);
-		      printf (" %" PRIx64, val);
-		      break;
-
-		    case DW_FORM_block:
-		      get_uleb128 (val, readp, readendp);
-		      printf (" block[%" PRIu64 "]", val);
-		      if (readp + val > readendp)
-			goto invalid_data;
-		      readp += val;
-		      break;
-
-		    case DW_FORM_block1:
-		      if (readp + 1 > readendp)
-			goto invalid_data;
-		      val = *readp++;
-		      printf (" block[%" PRIu64 "]", val);
-		      if (readp + val > readendp)
-			goto invalid_data;
-		      break;
-
-		    case DW_FORM_block2:
-		      if (readp + 2 > readendp)
-			goto invalid_data;
-		      val = read_2ubyte_unaligned_inc (dbg, readp);
-		      printf (" block[%" PRIu64 "]", val);
-		      if (readp + val > readendp)
-			goto invalid_data;
-		      break;
-
-		    case DW_FORM_block4:
-		      if (readp + 2 > readendp)
-			goto invalid_data;
-		      val =read_4ubyte_unaligned_inc (dbg, readp);
-		      printf (" block[%" PRIu64 "]", val);
-		      if (readp + val > readendp)
-			goto invalid_data;
-		      break;
-
-		    case DW_FORM_flag:
-		      if (readp + 1 > readendp)
-			goto invalid_data;
-		      val = *readp++;
-		      printf (" %s", val != 0 ? gettext ("yes") : gettext ("no"));
-		      break;
-
-		    case DW_FORM_string:
-		      endp = memchr (readp, '\0', readendp - readp);
-		      if (endp == NULL)
-			goto invalid_data;
-		      printf (" %s", readp);
-		      readp = endp + 1;
-		      break;
-
-		    case DW_FORM_strp:
-		      if (readp + offset_len > readendp)
-			goto invalid_data;
-		      if (offset_len == 8)
-			val = read_8ubyte_unaligned_inc (dbg, readp);
-		      else
-			val = read_4ubyte_unaligned_inc (dbg, readp);
-		      printf (" %s", dwarf_getstring (dbg, val, NULL));
-		      break;
-
-		    case DW_FORM_sec_offset:
-		      if (readp + offset_len > readendp)
-			goto invalid_data;
-		      if (offset_len == 8)
-			val = read_8ubyte_unaligned_inc (dbg, readp);
-		      else
-			val = read_4ubyte_unaligned_inc (dbg, readp);
-		      printf (" %" PRIx64, val);
-		      break;
-
-		      default:
-			error (0, 0, gettext ("vendor opcode not verified?"));
-			return;
-		    }
-
+		  print_form_data (dbg, form, readp, readendp, offset_len,
+				   str_offsets_base);
 		  args--;
 		  if (args > 0)
-		    putchar_unlocked (',');
+		    printf (", ");
 		}
 	      putchar_unlocked ('\n');
 	    }

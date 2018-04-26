@@ -933,8 +933,113 @@ Dwarf_Addr __libdw_cu_base_address (Dwarf_CU *cu);
 /* Get the address base for the CU, fetches it when not yet set.  */
 Dwarf_Off __libdw_cu_addr_base (Dwarf_CU *cu);
 
+/* Gets the .debug_str_offsets base offset to use.  static inline to
+   be shared between libdw and eu-readelf.  */
+static inline Dwarf_Off
+str_offsets_base_off (Dwarf *dbg, Dwarf_CU *cu)
+{
+  /* If we don't have a CU, then find and use the first one in the
+     debug file (when we support .dwp files, we must actually find the
+     one matching our "caller" - aka macro or line).  If we (now) have
+     a cu and str_offsets_base attribute, just use that.  Otherwise
+     use the first offset.  But we might have to parse the header
+     first, but only if this is version 5.  Assume if all else fails,
+     this is version 4, without header.  */
+
+  if (cu == NULL && dbg != NULL)
+    {
+      Dwarf_CU *first_cu;
+      if (dwarf_get_units (dbg, NULL, &first_cu,
+			   NULL, NULL, NULL, NULL) == 0)
+	cu = first_cu;
+    }
+
+  if (cu != NULL)
+    {
+      if (cu->str_off_base == (Dwarf_Off) -1)
+	{
+	  Dwarf_Die cu_die = CUDIE(cu);
+	  Dwarf_Attribute attr;
+	  if (dwarf_attr (&cu_die, DW_AT_str_offsets_base, &attr) != NULL)
+	    {
+	      Dwarf_Word off;
+	      if (dwarf_formudata (&attr, &off) == 0)
+		{
+		  cu->str_off_base = off;
+		  return cu->str_off_base;
+		}
+	    }
+	  /* For older DWARF simply assume zero (no header).  */
+	  if (cu->version < 5)
+	    {
+	      cu->str_off_base = 0;
+	      return cu->str_off_base;
+	    }
+	}
+      else
+	return cu->str_off_base;
+    }
+
+  /* No str_offsets_base attribute, we have to assume "zero".
+     But there could be a header first.  */
+  Dwarf_Off off = 0;
+  if (dbg == NULL)
+    goto no_header;
+
+  Elf_Data *data =  dbg->sectiondata[IDX_debug_str_offsets];
+  if (data == NULL)
+    goto no_header;
+
+  const unsigned char *start;
+  const unsigned char *readp;
+  const unsigned char *readendp;
+  start = readp = (const unsigned char *) data->d_buf;
+  readendp = (const unsigned char *) data->d_buf + data->d_size;
+
+  uint64_t unit_length;
+  uint16_t version;
+
+  unit_length = read_4ubyte_unaligned_inc (dbg, readp);
+  if (unlikely (unit_length == 0xffffffff))
+    {
+      if (unlikely (readendp - readp < 8))
+	goto no_header;
+      unit_length = read_8ubyte_unaligned_inc (dbg, readp);
+      /* In theory the offset size could be different
+	 between CU and str_offsets unit.  But we just
+	 ignore that here. */
+    }
+
+  /* We need at least 2-bytes (version) + 2-bytes (padding) =
+     4 bytes to complete the header.  And this unit cannot go
+     beyond the section data.  */
+  if (readendp - readp < 4
+      || unit_length < 4
+      || (uint64_t) (readendp - readp) < unit_length)
+    goto no_header;
+
+  version = read_2ubyte_unaligned_inc (dbg, readp);
+  if (version != 5)
+    goto no_header;
+  /* padding */
+  read_2ubyte_unaligned_inc (dbg, readp);
+
+  off = (Dwarf_Off) (readp - start);
+
+ no_header:
+  if (cu != NULL)
+    cu->str_off_base = off;
+
+  return off;
+}
+
+
 /* Get the string offsets base for the CU, fetches it when not yet set.  */
-Dwarf_Off __libdw_cu_str_off_base (Dwarf_CU *cu);
+static inline Dwarf_Off __libdw_cu_str_off_base (Dwarf_CU *cu)
+{
+  return str_offsets_base_off (NULL, cu);
+}
+
 
 /* Given a file descriptor, dir and file returns a full path.  If the
    file is absolute (starts with a /) a copy of file is returned.  If

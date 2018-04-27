@@ -1,3 +1,15 @@
+2018-04-27  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (options): Add addr.
+	(enum section_e): Add section_addr.
+	(section_all): Add section_addr.
+	(parse_opt): Parse "addr".
+	(known_addrbases): New static variable.
+	(get_listptr): New function.
+	(print_debug_addr_section): Likewise.
+	(attr_callback): Handle DW_AT_addr_base and DW_AT_GNU_addr_base.
+	(print_debug): Add NEW_SECTION (addr). Reset known_addrbases.
+
 2018-04-07  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (attr_callback): Handle DW_FORM_loclistx and

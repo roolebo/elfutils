@@ -194,7 +194,7 @@ DWARF section [28] '.debug_info' at offset 0x3102:
            dwo_name             (strp) "testfile-hello5.dwo"
            comp_dir             (strp) "/home/mark/src/elfutils/tests"
            GNU_pubnames         (flag_present) yes
-           addr_base            (sec_offset) 8
+           addr_base            (sec_offset) address base [     8]
  Compilation unit at offset 53:
  Version: 5, Abbreviation section offset: 21, Address size: 8, Offset size: 4
  Unit type: skeleton (4), Unit id: 0xb6c8b9d97e6dfdfe
@@ -205,7 +205,7 @@ DWARF section [28] '.debug_info' at offset 0x3102:
            dwo_name             (strp) "testfile-world5.dwo"
            comp_dir             (strp) "/home/mark/src/elfutils/tests"
            GNU_pubnames         (flag_present) yes
-           addr_base            (sec_offset) 168
+           addr_base            (sec_offset) address base [    a8]
            rnglists_base        (sec_offset) range list [     c]
 EOF
 

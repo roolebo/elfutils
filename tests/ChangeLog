@@ -1,3 +1,10 @@
+2018-04-27  Mark Wielaard  <mark@klomp.org>
+
+	* run-readelf-ranges.sh: Adjust expected output for address base.
+	* run-readelf-addr.sh: New test.
+	* Makefile.am (TESTS): Add run-readelf-addr.sh.
+	(EXTRA_DIST): Likewise.
+
 2018-04-07  Mark Wielaard  <mark@klomp.org>
 
 	* run-varlocs.sh: Run on testfileranges5.debug and

@@ -121,7 +121,7 @@ static const struct argp_option options[] =
 
   { NULL, 0, NULL, 0, N_("Additional output selection:"), 0 },
   { "debug-dump", 'w', "SECTION", OPTION_ARG_OPTIONAL,
-    N_("Display DWARF section content.  SECTION can be one of abbrev, "
+    N_("Display DWARF section content.  SECTION can be one of abbrev, addr, "
        "aranges, decodedaranges, frame, gdb_index, info, info+, loc, line, "
        "decodedline, ranges, pubnames, str, macinfo, macro or exception"), 0 },
   { "hex-dump", 'x', "SECTION", 0,
@@ -248,11 +248,12 @@ static enum section_e
   section_exception = 1024,	/* .eh_frame & al.  */
   section_gdb_index = 2048,	/* .gdb_index  */
   section_macro = 4096,		/* .debug_macro  */
+  section_addr = 8192,
   section_all = (section_abbrev | section_aranges | section_frame
 		 | section_info | section_line | section_loc
 		 | section_pubnames | section_str | section_macinfo
 		 | section_ranges | section_exception | section_gdb_index
-		 | section_macro)
+		 | section_macro | section_addr)
 } print_debug_sections, implicit_debug_sections;
 
 /* Select hex dumping of sections.  */
@@ -442,6 +443,11 @@ parse_opt (int key, char *arg,
 	}
       else if (strcmp (arg, "abbrev") == 0)
 	print_debug_sections |= section_abbrev;
+      else if (strcmp (arg, "addr") == 0)
+	{
+	  print_debug_sections |= section_addr;
+	  implicit_debug_sections |= section_info;
+	}
       else if (strcmp (arg, "aranges") == 0)
 	print_debug_sections |= section_aranges;
       else if (strcmp (arg, "decodedaranges") == 0)
@@ -4817,6 +4823,7 @@ static struct listptr_table known_locsptr;
 static struct listptr_table known_loclistsptr;
 static struct listptr_table known_rangelistptr;
 static struct listptr_table known_rnglistptr;
+static struct listptr_table known_addrbases;
 
 static void
 reset_listptr (struct listptr_table *table)
@@ -4934,6 +4941,15 @@ next_listptr_offset (struct listptr_table *table, size_t idx)
   return 0;
 }
 
+/* Returns the listptr associated with the given index, or NULL.  */
+static struct listptr *
+get_listptr (struct listptr_table *table, size_t idx)
+{
+  if (idx >= table->n)
+    return NULL;
+  return &table->table[idx];
+}
+
 /* Returns the next index, base address and CU associated with the
    list unit offsets.  If there is none false is returned, otherwise
    true.  Assumes the table has been sorted.  */
@@ -5032,6 +5048,235 @@ print_debug_abbrev_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
     }
 }
 
+
+static void
+print_debug_addr_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
+			  Ebl *ebl, GElf_Ehdr *ehdr,
+			  Elf_Scn *scn, GElf_Shdr *shdr, Dwarf *dbg)
+{
+  printf (gettext ("\
+\nDWARF section [%2zu] '%s' at offset %#" PRIx64 ":\n"),
+	  elf_ndxscn (scn), section_name (ebl, ehdr, shdr),
+	  (uint64_t) shdr->sh_offset);
+
+  if (shdr->sh_size == 0)
+    return;
+
+  /* We like to get the section from libdw to make sure they are relocated.  */
+  Elf_Data *data = (dbg->sectiondata[IDX_debug_addr]
+		    ?: elf_rawdata (scn, NULL));
+  if (unlikely (data == NULL))
+    {
+      error (0, 0, gettext ("cannot get .debug_addr section data: %s"),
+	     elf_errmsg (-1));
+      return;
+    }
+
+  size_t idx = 0;
+  sort_listptr (&known_addrbases, "addr_base");
+
+  const unsigned char *start = (const unsigned char *) data->d_buf;
+  const unsigned char *readp = start;
+  const unsigned char *readendp = ((const unsigned char *) data->d_buf
+				   + data->d_size);
+
+  while (readp < readendp)
+    {
+      /* We cannot really know whether or not there is an header.  The
+	 DebugFission extension to DWARF4 doesn't add one.  The DWARF5
+	 .debug_addr variant does.  Whether or not we have an header,
+	 DW_AT_[GNU_]addr_base points at "index 0".  So if the current
+	 offset equals the CU addr_base then we can just start
+	 printing addresses.  If there is no CU with an exact match
+	 then we'll try to parse the header first.  */
+      Dwarf_Off off = (Dwarf_Off) (readp
+				   - (const unsigned char *) data->d_buf);
+
+      printf ("Table at offset %" PRIx64 " ", off);
+
+      struct listptr *listptr = get_listptr (&known_addrbases, idx++);
+      const unsigned char *next_unitp;
+
+      uint64_t unit_length;
+      uint16_t version;
+      uint8_t address_size;
+      uint8_t segment_size;
+      if (listptr == NULL)
+	{
+	  error (0, 0, "Warning: No CU references .debug_addr after %" PRIx64,
+		 off);
+
+	  /* We will have to assume it is just addresses to the end... */
+	  address_size = ehdr->e_ident[EI_CLASS] == ELFCLASS32 ? 4 : 8;
+	  next_unitp = readendp;
+	  printf ("Unknown CU:\n");
+	}
+      else
+	{
+	  Dwarf_Die cudie;
+	  if (dwarf_cu_die (listptr->cu, &cudie,
+			    NULL, NULL, NULL, NULL,
+			    NULL, NULL) == NULL)
+	    printf ("Unknown CU (%s):\n", dwarf_errmsg (-1));
+	  else
+	    printf ("for CU [%6" PRIx64 "]:\n", dwarf_dieoffset (&cudie));
+
+	  if (listptr->offset == off)
+	    {
+	      address_size = listptr_address_size (listptr);
+	      segment_size = 0;
+	      version = 4;
+
+	      /* The addresses start here, but where do they end?  */
+	      listptr = get_listptr (&known_addrbases, idx);
+	      if (listptr == NULL)
+		{
+		  next_unitp = readendp;
+		  unit_length = (uint64_t) (next_unitp - readp);
+		}
+	      else if (listptr->cu->version < 5)
+		{
+		  next_unitp = start + listptr->offset;
+		  if (listptr->offset < off || listptr->offset > data->d_size)
+		    {
+		      error (0, 0,
+			     "Warning: Bad address base for next unit at %"
+			     PRIx64, off);
+		      next_unitp = readendp;
+		    }
+		  unit_length = (uint64_t) (next_unitp - readp);
+		}
+	      else
+		{
+		  /* Tricky, we don't have a header for this unit, but
+		     there is one for the next.  We will have to
+		     "guess" how big it is and subtract it from the
+		     offset (because that points after the header).  */
+		  unsigned int offset_size = listptr_offset_size (listptr);
+		  Dwarf_Off next_off = (listptr->offset
+					- (offset_size == 4 ? 4 : 12) /* len */
+					- 2 /* version */
+					- 1 /* address size */
+					- 1); /* segment selector size */
+		  next_unitp = start + next_off;
+		  if (next_off < off || next_off > data->d_size)
+		    {
+		      error (0, 0,
+			     "Warning: Couldn't calculate .debug_addr "
+			     " unit lenght at %" PRIx64, off);
+		      next_unitp = readendp;
+		    }
+		}
+
+	      /* Pretend we have a header.  */
+	      printf ("\n");
+	      printf (gettext (" Length:         %8" PRIu64 "\n"),
+		      unit_length);
+	      printf (gettext (" DWARF version:  %8" PRIu16 "\n"), version);
+	      printf (gettext (" Address size:   %8" PRIu64 "\n"),
+		      (uint64_t) address_size);
+	      printf (gettext (" Segment size:   %8" PRIu64 "\n"),
+		      (uint64_t) segment_size);
+	      printf ("\n");
+	    }
+	  else
+	    {
+	      /* OK, we have to parse an header first.  */
+	      unit_length = read_4ubyte_unaligned_inc (dbg, readp);
+	      if (unlikely (unit_length == 0xffffffff))
+		{
+		  if (unlikely (readp > readendp - 8))
+		    {
+		    invalid_data:
+		      error (0, 0, "Invalid data");
+		      return;
+		    }
+		  unit_length = read_8ubyte_unaligned_inc (dbg, readp);
+		}
+	      printf ("\n");
+	      printf (gettext (" Length:         %8" PRIu64 "\n"),
+		      unit_length);
+
+	      /* We need at least 2-bytes (version) + 1-byte
+		 (addr_size) + 1-byte (segment_size) = 4 bytes to
+		 complete the header.  And this unit cannot go beyond
+		 the section data.  */
+	      if (readp > readendp - 4
+		  || unit_length < 4
+		  || unit_length > (uint64_t) (readendp - readp))
+		goto invalid_data;
+
+	      next_unitp = readp + unit_length;
+
+	      version = read_2ubyte_unaligned_inc (dbg, readp);
+	      printf (gettext (" DWARF version:  %8" PRIu16 "\n"), version);
+
+	      if (version != 5)
+		{
+		  error (0, 0, gettext ("Unknown version"));
+		  goto next_unit;
+		}
+
+	      address_size = *readp++;
+	      printf (gettext (" Address size:   %8" PRIu64 "\n"),
+		      (uint64_t) address_size);
+
+	      if (address_size != 4 && address_size != 8)
+		{
+		  error (0, 0, gettext ("unsupported address size"));
+		  goto next_unit;
+		}
+
+	      segment_size = *readp++;
+	      printf (gettext (" Segment size:   %8" PRIu64 "\n"),
+		      (uint64_t) segment_size);
+	      printf ("\n");
+
+	      if (segment_size != 0)
+		{
+		  error (0, 0, gettext ("unsupported segment size"));
+		  goto next_unit;
+		}
+
+	      if (listptr->offset != (Dwarf_Off) (readp - start))
+		{
+		  error (0, 0, "Address index doesn't start after header");
+		  goto next_unit;
+		}
+	    }
+	}
+
+      int digits = 1;
+      size_t addresses = (next_unitp - readp) / address_size;
+      while (addresses >= 10)
+	{
+	  ++digits;
+	  addresses /= 10;
+	}
+
+      unsigned int index = 0;
+      size_t index_offset =  readp - (const unsigned char *) data->d_buf;
+      printf (" Addresses start at offset 0x%zx:\n", index_offset);
+      while (readp <= next_unitp - address_size)
+	{
+	  Dwarf_Addr addr = read_addr_unaligned_inc (address_size, dbg,
+						     readp);
+	  printf (" [%*u] ", digits, index++);
+	  char *a = format_dwarf_addr (dwflmod, address_size,
+				       addr, addr);
+	  printf ("%s\n", a);
+	  free (a);
+	}
+      printf ("\n");
+
+      if (readp != next_unitp)
+	error (0, 0, "extra %zd bytes at end of unit",
+	       (size_t) (next_unitp - readp));
+
+    next_unit:
+      readp = next_unitp;
+    }
+}
 
 /* Print content of DWARF .debug_aranges section.  We fortunately do
    not have to know a bit about the structure of the section, libdwarf
@@ -6928,6 +7173,22 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 		      (int) (level * 2), "", dwarf_attr_name (attr),
 		      dwarf_form_name (form), (uintmax_t) num,
 		      nlpt ? "" : " <WARNING offset too big>");
+	  }
+	  return DWARF_CB_OK;
+
+	case DW_AT_addr_base:
+	case DW_AT_GNU_addr_base:
+	  {
+	    bool addrbase = notice_listptr (section_addr, &known_addrbases,
+					    cbargs->addrsize,
+					    cbargs->offset_size,
+					    cbargs->cu, num, attr);
+	    if (!cbargs->silent)
+	      printf ("           %*s%-20s (%s) address base [%6"
+		      PRIxMAX "]%s\n",
+		      (int) (level * 2), "", dwarf_attr_name (attr),
+		      dwarf_form_name (form), (uintmax_t) num,
+		      addrbase ? "" : " <WARNING offset too big>");
 	  }
 	  return DWARF_CB_OK;
 
@@ -10476,6 +10737,7 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
 #define NEW_SECTION(name) \
 	      { ".debug_" #name, section_##name, print_debug_##name##_section }
 	      NEW_SECTION (abbrev),
+	      NEW_SECTION (addr),
 	      NEW_SECTION (aranges),
 	      NEW_SECTION (frame),
 	      NEW_SECTION (info),
@@ -10544,6 +10806,7 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
   reset_listptr (&known_loclistsptr);
   reset_listptr (&known_rangelistptr);
   reset_listptr (&known_rnglistptr);
+  reset_listptr (&known_addrbases);
 }
 
 

@@ -420,7 +420,10 @@ parse_opt (int key, char *arg,
       break;
     case 'w':
       if (arg == NULL)
-	print_debug_sections = section_all;
+	{
+	  print_debug_sections = section_all;
+	  implicit_debug_sections = section_info;
+	}
       else if (strcmp (arg, "abbrev") == 0)
 	print_debug_sections |= section_abbrev;
       else if (strcmp (arg, "aranges") == 0)
@@ -8729,6 +8732,40 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
   if (unlikely (elf_getshdrstrndx (ebl->elf, &shstrndx) < 0))
     error (EXIT_FAILURE, 0,
 	   gettext ("cannot get section header string table index"));
+
+  /* If the .debug_info section is listed as implicitly required then
+     we must make sure to handle it before handling any other debug
+     section.  Various other sections depend on the CU DIEs being
+     scanned (silently) first.  */
+  if ((implicit_debug_sections & section_info) != 0)
+    {
+      Elf_Scn *scn = NULL;
+      while ((scn = elf_nextscn (ebl->elf, scn)) != NULL)
+	{
+	  GElf_Shdr shdr_mem;
+	  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+
+	  if (shdr != NULL && shdr->sh_type == SHT_PROGBITS)
+	    {
+	      const char *name = elf_strptr (ebl->elf, shstrndx,
+					     shdr->sh_name);
+	      if (name == NULL)
+		continue;
+
+	      if (strcmp (name, ".debug_info") == 0
+		  || strcmp (name, ".debug_info.dwo") == 0
+		  || strcmp (name, ".zdebug_info") == 0
+		  || strcmp (name, ".zdebug_info.dwo") == 0)
+		{
+		  print_debug_info_section (dwflmod, ebl, ehdr,
+					    scn, shdr, dbg);
+		  break;
+		}
+	    }
+	}
+      print_debug_sections &= ~section_info;
+      implicit_debug_sections &= ~section_info;
+    }
 
   /* Look through all the sections for the debugging sections to print.  */
   Elf_Scn *scn = NULL;

@@ -130,7 +130,7 @@ TESTS = run-arextract.sh run-arsymtest.sh run-ar.sh newfile test-nlist \
 	run-backtrace-core-aarch64.sh run-backtrace-core-sparc.sh \
 	run-backtrace-demangle.sh run-stack-d-test.sh run-stack-i-test.sh \
 	run-stack-demangled-test.sh run-readelf-zx.sh run-readelf-zp.sh \
-	run-readelf-addr.sh \
+	run-readelf-addr.sh run-readelf-str.sh \
 	run-readelf-dwz-multi.sh run-allfcts-multi.sh run-deleted.sh \
 	run-linkmap-cut.sh run-aggregate-size.sh run-peel-type.sh \
 	vdsosyms run-readelf-A.sh \
@@ -246,7 +246,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     run-readelf-dwz-multi.sh libtestfile_multi_shared.so.bz2 \
 	     testfile_multi.dwz.bz2 testfile_multi_main.bz2 \
 	     testfile-dwzstr.bz2 testfile-dwzstr.multi.bz2 \
-	     run-readelf-addr.sh \
+	     run-readelf-addr.sh run-readelf-str.sh \
 	     run-allfcts-multi.sh \
 	     test-offset-loop.bz2 test-offset-loop.alt.bz2 \
 	     run-prelink-addr-test.sh \

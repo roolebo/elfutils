@@ -1,3 +1,12 @@
+2018-04-29  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (parse_opt): Request implicit section_info for "str".
+	(known_stroffbases): New static variable.
+	(attr_callbackattr_callback): Handle DW_AT_str_offets_base.
+	(print_debug_str_offsets_section): New function.
+	(print_debug): Handle .debug_str_offsets as section_str. Reset
+	known_stroffbases.
+
 2018-04-27  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (options): Add addr.

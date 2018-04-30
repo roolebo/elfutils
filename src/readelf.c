@@ -484,7 +484,11 @@ parse_opt (int key, char *arg,
       else if (strcmp (arg, "pubnames") == 0)
 	print_debug_sections |= section_pubnames;
       else if (strcmp (arg, "str") == 0)
-	print_debug_sections |= section_str;
+	{
+	  print_debug_sections |= section_str;
+	  /* For mapping string offset tables to CUs.  */
+	  implicit_debug_sections |= section_info;
+	}
       else if (strcmp (arg, "macinfo") == 0)
 	print_debug_sections |= section_macinfo;
       else if (strcmp (arg, "macro") == 0)
@@ -4824,6 +4828,7 @@ static struct listptr_table known_loclistsptr;
 static struct listptr_table known_rangelistptr;
 static struct listptr_table known_rnglistptr;
 static struct listptr_table known_addrbases;
+static struct listptr_table known_stroffbases;
 
 static void
 reset_listptr (struct listptr_table *table)
@@ -7189,6 +7194,21 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 		      (int) (level * 2), "", dwarf_attr_name (attr),
 		      dwarf_form_name (form), (uintmax_t) num,
 		      addrbase ? "" : " <WARNING offset too big>");
+	  }
+	  return DWARF_CB_OK;
+
+	case DW_AT_str_offsets_base:
+	  {
+	    bool stroffbase = notice_listptr (section_str, &known_stroffbases,
+					      cbargs->addrsize,
+					      cbargs->offset_size,
+					      cbargs->cu, num, attr);
+	    if (!cbargs->silent)
+	      printf ("           %*s%-20s (%s) str offsets base [%6"
+		      PRIxMAX "]%s\n",
+		      (int) (level * 2), "", dwarf_attr_name (attr),
+		      dwarf_form_name (form), (uintmax_t) num,
+		      stroffbase ? "" : " <WARNING offset too big>");
 	  }
 	  return DWARF_CB_OK;
 
@@ -9936,6 +9956,193 @@ print_debug_str_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
     }
 }
 
+static void
+print_debug_str_offsets_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
+				 Ebl *ebl, GElf_Ehdr *ehdr,
+				 Elf_Scn *scn, GElf_Shdr *shdr, Dwarf *dbg)
+{
+  printf (gettext ("\
+\nDWARF section [%2zu] '%s' at offset %#" PRIx64 ":\n"),
+	  elf_ndxscn (scn), section_name (ebl, ehdr, shdr),
+	  (uint64_t) shdr->sh_offset);
+
+  if (shdr->sh_size == 0)
+    return;
+
+  /* We like to get the section from libdw to make sure they are relocated.  */
+  Elf_Data *data = (dbg->sectiondata[IDX_debug_str_offsets]
+		    ?: elf_rawdata (scn, NULL));
+  if (unlikely (data == NULL))
+    {
+      error (0, 0, gettext ("cannot get .debug_str_offsets section data: %s"),
+	     elf_errmsg (-1));
+      return;
+    }
+
+  size_t idx = 0;
+  sort_listptr (&known_stroffbases, "str_offsets");
+
+  const unsigned char *start = (const unsigned char *) data->d_buf;
+  const unsigned char *readp = start;
+  const unsigned char *readendp = ((const unsigned char *) data->d_buf
+				   + data->d_size);
+
+  while (readp < readendp)
+    {
+      /* Most string offset tables will have a header.  For split
+	 dwarf unit GNU DebugFission didn't add one.  But they were
+	 also only defined for split units (main or skeleton units
+	 didn't have indirect strings).  So if we don't have a
+	 DW_AT_str_offsets_base at all and this is offset zero, then
+	 just start printing offsets immediately, if this is a .dwo
+	 section.  */
+      Dwarf_Off off = (Dwarf_Off) (readp
+				   - (const unsigned char *) data->d_buf);
+
+      printf ("Table at offset %" PRIx64 " ", off);
+
+      struct listptr *listptr = get_listptr (&known_stroffbases, idx++);
+      const unsigned char *next_unitp = readendp;
+      uint8_t offset_size;
+      bool has_header;
+      if (listptr == NULL)
+	{
+	  /* This can happen for .dwo files.  There is only an header
+	     in the case this is a version 5 split DWARF file.  */
+	  Dwarf_CU *cu;
+	  uint8_t unit_type;
+	  if (dwarf_get_units (dbg, NULL, &cu, NULL, &unit_type,
+			       NULL, NULL) != 0)
+	    {
+	      error (0, 0, "Warning: Cannot find any DWARF unit.");
+	      /* Just guess some values.  */
+	      has_header = false;
+	      offset_size = 4;
+	    }
+	  else if (off == 0
+		   && (unit_type == DW_UT_split_type
+		       || unit_type == DW_UT_split_compile))
+	    {
+	      has_header = cu->version > 4;
+	      offset_size = cu->offset_size;
+	    }
+	  else
+	    {
+	      error (0, 0,
+		     "Warning: No CU references .debug_str_offsets after %"
+		     PRIx64, off);
+	      has_header = cu->version > 4;
+	      offset_size = cu->offset_size;
+	    }
+	  printf ("\n");
+	}
+      else
+	{
+	  /* This must be DWARF5, since GNU DebugFission didn't define
+	     DW_AT_str_offsets_base.  */
+	  has_header = true;
+
+	  Dwarf_Die cudie;
+	  if (dwarf_cu_die (listptr->cu, &cudie,
+			    NULL, NULL, NULL, NULL,
+			    NULL, NULL) == NULL)
+	    printf ("Unknown CU (%s):\n", dwarf_errmsg (-1));
+	  else
+	    printf ("for CU [%6" PRIx64 "]:\n", dwarf_dieoffset (&cudie));
+	}
+
+      if (has_header)
+	{
+	  uint64_t unit_length;
+	  uint16_t version;
+	  uint16_t padding;
+
+	  unit_length = read_4ubyte_unaligned_inc (dbg, readp);
+	  if (unlikely (unit_length == 0xffffffff))
+	    {
+	      if (unlikely (readp > readendp - 8))
+		{
+		invalid_data:
+		  error (0, 0, "Invalid data");
+		  return;
+		}
+	      unit_length = read_8ubyte_unaligned_inc (dbg, readp);
+	      offset_size = 8;
+	    }
+	  else
+	    offset_size = 4;
+
+	  printf ("\n");
+	  printf (gettext (" Length:        %8" PRIu64 "\n"),
+		  unit_length);
+	  printf (gettext (" Offset size:   %8" PRIu8 "\n"),
+		  offset_size);
+
+	  /* We need at least 2-bytes (version) + 2-bytes (padding) =
+	     4 bytes to complete the header.  And this unit cannot go
+	     beyond the section data.  */
+	  if (readp > readendp - 4
+	      || unit_length < 4
+	      || unit_length > (uint64_t) (readendp - readp))
+	    goto invalid_data;
+
+	  next_unitp = readp + unit_length;
+
+	  version = read_2ubyte_unaligned_inc (dbg, readp);
+	  printf (gettext (" DWARF version: %8" PRIu16 "\n"), version);
+
+	  if (version != 5)
+	    {
+	      error (0, 0, gettext ("Unknown version"));
+	      goto next_unit;
+	    }
+
+	  padding = read_2ubyte_unaligned_inc (dbg, readp);
+	  printf (gettext (" Padding:       %8" PRIx16 "\n"), padding);
+
+	  if (listptr != NULL
+	      && listptr->offset != (Dwarf_Off) (readp - start))
+	    {
+	      error (0, 0, "String offsets index doesn't start after header");
+	      goto next_unit;
+	    }
+
+	  printf ("\n");
+	}
+
+      int digits = 1;
+      size_t offsets = (next_unitp - readp) / offset_size;
+      while (offsets >= 10)
+	{
+	  ++digits;
+	  offsets /= 10;
+	}
+
+      unsigned int index = 0;
+      size_t index_offset =  readp - (const unsigned char *) data->d_buf;
+      printf (" Offsets start at 0x%zx:\n", index_offset);
+      while (readp <= next_unitp - offset_size)
+	{
+	  Dwarf_Word offset;
+	  if (offset_size == 4)
+	    offset = read_4ubyte_unaligned_inc (dbg, readp);
+	  else
+	    offset = read_8ubyte_unaligned_inc (dbg, readp);
+	  const char *str = dwarf_getstring (dbg, offset, NULL);
+	  printf (" [%*u] [%*" PRIx64 "]  \"%s\"\n",
+		  digits, index++, (int) offset_size * 2, offset, str ?: "???");
+	}
+      printf ("\n");
+
+      if (readp != next_unitp)
+	error (0, 0, "extra %zd bytes at end of unit",
+	       (size_t) (next_unitp - readp));
+
+    next_unit:
+      readp = next_unitp;
+    }
+}
+
 
 /* Print the content of the call frame search table section
    '.eh_frame_hdr'.  */
@@ -10752,6 +10959,9 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
 	      /* A DWARF5 specialised debug string section.  */
 	      { ".debug_line_str", section_str,
 		print_debug_str_section },
+	      /* DWARF5 string offsets table.  */
+	      { ".debug_str_offsets", section_str,
+		print_debug_str_offsets_section },
 	      NEW_SECTION (macinfo),
 	      NEW_SECTION (macro),
 	      NEW_SECTION (ranges),
@@ -10807,6 +11017,7 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
   reset_listptr (&known_rangelistptr);
   reset_listptr (&known_rnglistptr);
   reset_listptr (&known_addrbases);
+  reset_listptr (&known_stroffbases);
 }
 
 

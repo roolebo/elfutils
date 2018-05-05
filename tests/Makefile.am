@@ -231,6 +231,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     run-readelf-loc.sh testfileloc.bz2 \
 	     run-readelf-aranges.sh run-readelf-line.sh testfilefoobarbaz.bz2 \
 	     testfile-ppc64-min-instr.bz2 \
+	     testfile-dwarf-45.source \
+	     testfile-dwarf-4.bz2 testfile-dwarf-5.bz2 \
 	     run-readelf-z.sh \
 	     run-readelf-dwz-multi.sh libtestfile_multi_shared.so.bz2 \
 	     testfile_multi.dwz.bz2 testfile_multi_main.bz2 \

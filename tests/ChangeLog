@@ -1,3 +1,13 @@
+2018-05-05  Mark Wielaard  <mark@klomp.org>
+
+	* testfile-dwarf-45.source: New file.
+	* testfile-dwarf-4.bz2: New test file.
+	* testfile-dwarf-5.bz2: Likewise.
+	* run-readelf-line.sh: Add testcases for testfile-dwarf-4 and
+	testfile-dwarf-5.
+	* Makefile (EXTRA_DIST): Add testfile-dwarf-45.source,
+	testfile-dwarf-4.bz2 and testfile-dwarf-5.bz2.
+
 2018-04-19  Andreas Schwab  <schwab@suse.de>
 
 	* hello_riscv64.ko.bz2: New file.

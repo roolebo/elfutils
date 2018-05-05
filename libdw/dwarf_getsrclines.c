@@ -1,7 +1,6 @@
 /* Return line number information of CU.
-   Copyright (C) 2004-2010, 2013, 2014, 2015, 2016 Red Hat, Inc.
+   Copyright (C) 2004-2010, 2013, 2014, 2015, 2016, 2018 Red Hat, Inc.
    This file is part of elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
    This file is free software; you can redistribute it and/or modify
    it under the terms of either
@@ -157,18 +156,6 @@ read_srclines (Dwarf *dbg,
   size_t nfilelist = 0;
   unsigned int ndirlist = 0;
 
-  struct filelist null_file =
-    {
-      .info =
-      {
-	.name = "???",
-	.mtime = 0,
-	.length = 0
-      },
-      .next = NULL
-    };
-  struct filelist *filelist = &null_file;
-
   /* If there are a large number of lines, files or dirs don't blow up
      the stack.  Stack allocate some entries, only dynamically malloc
      when more than MAX.  */
@@ -177,16 +164,7 @@ read_srclines (Dwarf *dbg,
 #define MAX_STACK_FILES (MAX_STACK_ALLOC / 4)
 #define MAX_STACK_DIRS  (MAX_STACK_ALLOC / 16)
 
-  struct dirlist
-  {
-    const char *dir;
-    size_t len;
-  };
-  struct dirlist dirstack[MAX_STACK_DIRS];
-  struct dirlist *dirarray = dirstack;
-
-  /* We are about to process the statement program.  Initialize the
-     state machine registers (see 6.2.2 in the v2.1 specification).  */
+  /* Initial statement program state (except for stmt_list, see below).  */
   struct line_state state =
     {
       .linelist = NULL,
@@ -222,25 +200,45 @@ read_srclines (Dwarf *dbg,
     }
 
   /* Check whether we have enough room in the section.  */
-  if (unlikely (unit_length > (size_t) (lineendp - linep)
-      || unit_length < 2 + length + 5 * 1))
+  if (unlikely (unit_length > (size_t) (lineendp - linep)))
     goto invalid_data;
   lineendp = linep + unit_length;
 
   /* The next element of the header is the version identifier.  */
+  if ((size_t) (lineendp - linep) < 2)
+    goto invalid_data;
   uint_fast16_t version = read_2ubyte_unaligned_inc (dbg, linep);
-  if (unlikely (version < 2) || unlikely (version > 4))
+  if (unlikely (version < 2) || unlikely (version > 5))
     {
       __libdw_seterrno (DWARF_E_VERSION);
       goto out;
     }
 
+  /* DWARF5 explicitly lists address and segment_selector sizes.  */
+  if (version >= 5)
+    {
+      if ((size_t) (lineendp - linep) < 2)
+	goto invalid_data;
+      size_t line_address_size = *linep++;
+      size_t segment_selector_size = *linep++;
+      if (line_address_size != address_size || segment_selector_size != 0)
+	goto invalid_data;
+    }
+
   /* Next comes the header length.  */
   Dwarf_Word header_length;
   if (length == 4)
-    header_length = read_4ubyte_unaligned_inc (dbg, linep);
+    {
+      if ((size_t) (lineendp - linep) < 4)
+	goto invalid_data;
+      header_length = read_4ubyte_unaligned_inc (dbg, linep);
+    }
   else
-    header_length = read_8ubyte_unaligned_inc (dbg, linep);
+    {
+      if ((size_t) (lineendp - linep) < 8)
+	goto invalid_data;
+      header_length = read_8ubyte_unaligned_inc (dbg, linep);
+    }
   const unsigned char *header_start = linep;
 
   /* Next the minimum instruction length.  */
@@ -250,12 +248,16 @@ read_srclines (Dwarf *dbg,
   uint_fast8_t max_ops_per_instr = 1;
   if (version >= 4)
     {
-      if (unlikely (lineendp - linep < 5))
+      if (unlikely ((size_t) (lineendp - linep) < 1))
 	goto invalid_data;
       max_ops_per_instr = *linep++;
       if (unlikely (max_ops_per_instr == 0))
 	goto invalid_data;
     }
+
+  /* 4 more bytes, is_stmt, line_base, line_range and opcode_base.  */
+  if ((size_t) (lineendp - linep) < 4)
+    goto invalid_data;
 
   /* Then the flag determining the default value of the is_stmt
      register.  */
@@ -277,29 +279,84 @@ read_srclines (Dwarf *dbg,
     goto invalid_data;
   linep += opcode_base - 1;
 
-  /* First comes the list of directories.  Add the compilation
-     directory first since the index zero is used for it.  */
-  struct dirlist comp_dir_elem =
-    {
-      .dir = comp_dir,
-      .len = comp_dir ? strlen (comp_dir) : 0,
-    };
-  ndirlist = 1;
+  /* To read DWARF5 dir and file lists we need to know the forms.  For
+     now we skip everything, except the DW_LNCT_path and
+     DW_LNCT_directory_index.  */
+  uint16_t forms[256];
+  unsigned char nforms = 0;
+  unsigned char form_path = -1; /* Which forms is DW_LNCT_path.  */
+  unsigned char form_idx = -1;  /* And which is DW_LNCT_directory_index.  */
+
+  /* To read/skip form data.  */
+  Dwarf_CU fake_cu = {
+    .dbg = dbg,
+    .sec_idx = IDX_debug_line,
+    .version = 5,
+    .offset_size = length,
+    .address_size = address_size,
+    .startp = (void *) linep,
+    .endp = (void *) lineendp,
+  };
 
   /* First count the entries.  */
-  const unsigned char *dirp = linep;
   unsigned int ndirs = 0;
-  while (*dirp != 0)
+  if (version < 5)
     {
-      uint8_t *endp = memchr (dirp, '\0', lineendp - dirp);
-      if (endp == NULL)
-	goto invalid_data;
-      ++ndirs;
-      dirp = endp + 1;
+      const unsigned char *dirp = linep;
+      while (*dirp != 0)
+	{
+	  uint8_t *endp = memchr (dirp, '\0', lineendp - dirp);
+	  if (endp == NULL)
+	    goto invalid_data;
+	  ++ndirs;
+	  dirp = endp + 1;
+	}
+      ndirs = ndirs + 1; /* There is always the "unknown" dir.  */
     }
-  ndirlist += ndirs;
+  else
+    {
+      if ((size_t) (lineendp - linep) < 1)
+	goto invalid_data;
+      nforms = *linep++;
+      for (int i = 0; i < nforms; i++)
+	{
+	  uint16_t desc, form;
+	  if ((size_t) (lineendp - linep) < 1)
+	    goto invalid_data;
+	  get_uleb128 (desc, linep, lineendp);
+	  if ((size_t) (lineendp - linep) < 1)
+	    goto invalid_data;
+	  get_uleb128 (form, linep, lineendp);
+
+	  if (! libdw_valid_user_form (form))
+	    goto invalid_data;
+
+	  forms[i] = form;
+	  if (desc == DW_LNCT_path)
+	    form_path = i;
+	}
+
+      if (nforms > 0 && form_path == (unsigned char) -1)
+	goto invalid_data;
+
+      if ((size_t) (lineendp - linep) < 1)
+	goto invalid_data;
+      get_uleb128 (ndirs, linep, lineendp);
+
+      if (nforms == 0 && ndirs != 0)
+	goto invalid_data;
+    }
+
+  struct dirlist
+  {
+    const char *dir;
+    size_t len;
+  };
+  struct dirlist dirstack[MAX_STACK_DIRS];
+  struct dirlist *dirarray = dirstack;
 
   /* Arrange the list in array form.  */
+  ndirlist = ndirs;
   if (ndirlist >= MAX_STACK_DIRS)
     {
       dirarray = (struct dirlist *) malloc (ndirlist * sizeof (*dirarray));
@@ -310,20 +367,82 @@ read_srclines (Dwarf *dbg,
 	  goto out;
 	}
     }
-  dirarray[0] = comp_dir_elem;
-  for (unsigned int n = 1; n < ndirlist; n++)
+
+  /* Entry zero is implicit for older versions, but explicit for 5+.  */
+  struct dirlist comp_dir_elem;
+  if (version < 5)
     {
-      dirarray[n].dir = (char *) linep;
-      uint8_t *endp = memchr (linep, '\0', lineendp - linep);
-      assert (endp != NULL);
-      dirarray[n].len = endp - linep;
-      linep = endp + 1;
+      /* First comes the list of directories.  Add the compilation
+	 directory first since the index zero is used for it.  */
+      comp_dir_elem.dir = comp_dir;
+      comp_dir_elem.len = comp_dir ? strlen (comp_dir) : 0,
+      dirarray[0] = comp_dir_elem;
+      for (unsigned int n = 1; n < ndirlist; n++)
+	{
+	  dirarray[n].dir = (char *) linep;
+	  uint8_t *endp = memchr (linep, '\0', lineendp - linep);
+	  assert (endp != NULL);
+	  dirarray[n].len = endp - linep;
+	  linep = endp + 1;
+	}
+      /* Skip the final NUL byte.  */
+      ++linep;
     }
-  /* Skip the final NUL byte.  */
-  ++linep;
+  else
+    {
+      Dwarf_Attribute attr;
+      attr.code = DW_AT_name;
+      attr.cu = &fake_cu;
+      for (unsigned int n = 0; n < ndirlist; n++)
+	{
+	  const char *dir = NULL;
+	  for (unsigned char m = 0; m < nforms; m++)
+	    {
+	      if (m == form_path)
+		{
+		  attr.form = forms[m];
+		  attr.valp = (void *) linep;
+		  dir = dwarf_formstring (&attr);
+		}
+
+	      size_t len = __libdw_form_val_len (&fake_cu, forms[m], linep);
+	      if ((size_t) (lineendp - linep) < len)
+		goto invalid_data;
+
+	      linep += len;
+	    }
+
+	  if (dir == NULL)
+	    goto invalid_data;
+
+	  dirarray[n].dir = dir;
+	  dirarray[n].len = strlen (dir);
+	}
+    }
+
+  /* File index zero doesn't exist for DWARF < 5.  Files are indexed
+     starting from 1.  But for DWARF5 they are indexed starting from
+     zero, but the default index is still 1.  In both cases the
+     "first" file is special and refers to the main compile unit file,
+     equal to the DW_AT_name of the DW_TAG_compile_unit.  */
+  struct filelist null_file =
+    {
+      .info =
+      {
+	.name = "???",
+	.mtime = 0,
+	.length = 0
+      },
+      .next = NULL
+    };
+  struct filelist *filelist = &null_file;
+  nfilelist = 1;
 
   /* Allocate memory for a new file.  For the first MAX_STACK_FILES
-     entries just return a slot in the preallocated stack array.  */
+     entries just return a slot in the preallocated stack array.
+     This is slightly complicated because in DWARF < 5 new files could
+     be defined with DW_LNE_define_file after the normal file list was
+     read.  */
   struct filelist flstack[MAX_STACK_FILES];
 #define NEW_FILE() ({							\
   struct filelist *fl = (nfilelist < MAX_STACK_FILES			\
@@ -337,69 +456,176 @@ read_srclines (Dwarf *dbg,
   fl; })
 
   /* Now read the files.  */
-  nfilelist = 1;
-
-  if (unlikely (linep >= lineendp))
-    goto invalid_data;
-  while (*linep != 0)
+  if (version < 5)
     {
-      struct filelist *new_file = NEW_FILE ();
-
-      /* First comes the file name.  */
-      char *fname = (char *) linep;
-      uint8_t *endp = memchr (fname, '\0', lineendp - linep);
-      if (endp == NULL)
-	goto invalid_data;
-      size_t fnamelen = endp - (uint8_t *) fname;
-      linep = endp + 1;
-
-      /* Then the index.  */
-      Dwarf_Word diridx;
       if (unlikely (linep >= lineendp))
 	goto invalid_data;
-      get_uleb128 (diridx, linep, lineendp);
-      if (unlikely (diridx >= ndirlist))
+      while (*linep != 0)
 	{
-	  __libdw_seterrno (DWARF_E_INVALID_DIR_IDX);
-	  goto out;
-	}
+	  struct filelist *new_file = NEW_FILE ();
 
-      if (*fname == '/')
-	/* It's an absolute path.  */
-	new_file->info.name = fname;
-      else
-	{
-	  new_file->info.name = libdw_alloc (dbg, char, 1,
-					     dirarray[diridx].len + 1
-					     + fnamelen + 1);
-	  char *cp = new_file->info.name;
+	  /* First comes the file name.  */
+	  char *fname = (char *) linep;
+	  uint8_t *endp = memchr (fname, '\0', lineendp - linep);
+	  if (endp == NULL)
+	    goto invalid_data;
+	  size_t fnamelen = endp - (uint8_t *) fname;
+	  linep = endp + 1;
 
-	  if (dirarray[diridx].dir != NULL)
+	  /* Then the index.  */
+	  Dwarf_Word diridx;
+	  if (unlikely (linep >= lineendp))
+	    goto invalid_data;
+	  get_uleb128 (diridx, linep, lineendp);
+	  if (unlikely (diridx >= ndirlist))
 	    {
-	      /* This value could be NULL in case the DW_AT_comp_dir
-		 was not present.  We cannot do much in this case.
-		 The easiest thing is to convert the path in an
-		 absolute path.  */
-	      cp = stpcpy (cp, dirarray[diridx].dir);
+	      __libdw_seterrno (DWARF_E_INVALID_DIR_IDX);
+	      goto out;
 	    }
-	  *cp++ = '/';
-	  strcpy (cp, fname);
-	  assert (strlen (new_file->info.name)
-		  < dirarray[diridx].len + 1 + fnamelen + 1);
+
+	  if (*fname == '/')
+	    /* It's an absolute path.  */
+	    new_file->info.name = fname;
+	  else
+	    {
+	      new_file->info.name = libdw_alloc (dbg, char, 1,
+						 dirarray[diridx].len + 1
+						 + fnamelen + 1);
+	      char *cp = new_file->info.name;
+
+	      if (dirarray[diridx].dir != NULL)
+		{
+		  /* This value could be NULL in case the DW_AT_comp_dir
+		     was not present.  We cannot do much in this case.
+		     The easiest thing is to convert the path in an
+		     absolute path.  */
+		  cp = stpcpy (cp, dirarray[diridx].dir);
+		}
+	      *cp++ = '/';
+	      strcpy (cp, fname);
+	      assert (strlen (new_file->info.name)
+		      < dirarray[diridx].len + 1 + fnamelen + 1);
+	    }
+
+	  /* Next comes the modification time.  */
+	  if (unlikely (linep >= lineendp))
+	    goto invalid_data;
+	  get_uleb128 (new_file->info.mtime, linep, lineendp);
+
+	  /* Finally the length of the file.  */
+	  if (unlikely (linep >= lineendp))
+	    goto invalid_data;
+	  get_uleb128 (new_file->info.length, linep, lineendp);
+	}
+      /* Skip the final NUL byte.  */
+      ++linep;
+    }
+  else
+    {
+      if ((size_t) (lineendp - linep) < 1)
+	goto invalid_data;
+      nforms = *linep++;
+      form_path = form_idx = -1;
+      for (int i = 0; i < nforms; i++)
+	{
+	  uint16_t desc, form;
+	  if ((size_t) (lineendp - linep) < 1)
+	    goto invalid_data;
+	  get_uleb128 (desc, linep, lineendp);
+	  if ((size_t) (lineendp - linep) < 1)
+	    goto invalid_data;
+	  get_uleb128 (form, linep, lineendp);
+
+	  if (! libdw_valid_user_form (form))
+	    goto invalid_data;
+
+	  forms[i] = form;
+	  if (desc == DW_LNCT_path)
+	    form_path = i;
+	  else if (desc == DW_LNCT_directory_index)
+	    form_idx = i;
 	}
 
-      /* Next comes the modification time.  */
-      if (unlikely (linep >= lineendp))
+      if (nforms > 0 && (form_path == (unsigned char) -1
+			 || form_idx == (unsigned char) -1))
 	goto invalid_data;
-      get_uleb128 (new_file->info.mtime, linep, lineendp);
 
-      /* Finally the length of the file.  */
-      if (unlikely (linep >= lineendp))
+      size_t nfiles;
+      get_uleb128 (nfiles, linep, lineendp);
+
+      if (nforms == 0 && nfiles != 0)
 	goto invalid_data;
-      get_uleb128 (new_file->info.length, linep, lineendp);
+
+      Dwarf_Attribute attr;
+      attr.cu = &fake_cu;
+      for (unsigned int n = 0; n < nfiles; n++)
+	{
+	  const char *fname = NULL;
+	  Dwarf_Word diridx = -1;
+	  for (unsigned char m = 0; m < nforms; m++)
+	    {
+	      if (m == form_path)
+		{
+		  attr.code = DW_AT_name;
+		  attr.form = forms[m];
+		  attr.valp = (void *) linep;
+		  fname = dwarf_formstring (&attr);
+		}
+	      else if (m == form_idx)
+		{
+		  attr.code = DW_AT_decl_file; /* Close enough.  */
+		  attr.form = forms[m];
+		  attr.valp = (void *) linep;
+		  dwarf_formudata (&attr, &diridx);
+		}
+
+	      size_t len = __libdw_form_val_len (&fake_cu, forms[m], linep);
+	      if ((size_t) (lineendp - linep) < len)
+		goto invalid_data;
+
+	      linep += len;
+	    }
+
+	  if (fname == NULL || diridx == (Dwarf_Word) -1)
+	    goto invalid_data;
+
+	  size_t fnamelen = strlen (fname);
+
+	  if (unlikely (diridx >= ndirlist))
+	    {
+	      __libdw_seterrno (DWARF_E_INVALID_DIR_IDX);
+	      goto out;
+	    }
+
+	  /* Yes, weird.  Looks like an off-by-one in the spec.  */
+	  struct filelist *new_file = n == 0 ? &null_file : NEW_FILE ();
+
+	  /* We follow the same rules as above for DWARF < 5, even
+	     though the standard doesn't explicitly mention absolute
+	     paths and ignoring the dir index.  */
+	  if (*fname == '/')
+	    /* It's an absolute path.  */
+	    new_file->info.name = (char *) fname;
+	  else
+	    {
+	      new_file->info.name = libdw_alloc (dbg, char, 1,
+						 dirarray[diridx].len + 1
+						 + fnamelen + 1);
+	      char *cp = new_file->info.name;
+
+	      /* In the DWARF >= 5 case, dir can never be NULL.  */
+	      cp = stpcpy (cp, dirarray[diridx].dir);
+	      *cp++ = '/';
+	      strcpy (cp, fname);
+	      assert (strlen (new_file->info.name)
+		      < dirarray[diridx].len + 1 + fnamelen + 1);
+	    }
+
+	  /* For now we just ignore the modification time and file length.  */
+	  new_file->info.mtime = 0;
+	  new_file->info.length = 0;
+	}
     }
-  /* Skip the final NUL byte.  */
-  ++linep;
 
   /* Consistency check.  */
   if (unlikely (linep != header_start + header_length))
@@ -408,6 +634,9 @@ read_srclines (Dwarf *dbg,
       goto out;
     }
 
+  /* We are about to process the statement program.  Most state machine
+     registers have already been initialize above.  Just add the is_stmt
+     default. See 6.2.2 in the v2.1 specification.  */
   state.is_stmt = default_is_stmt;
 
   /* Apply the "operation advance" from a special opcode or

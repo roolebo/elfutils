@@ -493,6 +493,44 @@ libdw_macro_nforms (Dwarf_Macro *macro)
   return macro->table->table[macro->table->opcodes[macro->opcode - 1]].nforms;
 }
 
+/* Returns true for any allowed FORM in the opcode_operands_table as
+   mentioned in the DWARF5 spec (6.3.1 Macro Information Header).
+   Or those mentioned in DWARF5 spec (6.2.4.2 Vendor-defined Content
+   Descriptions) for the directory/file table (plus DW_FORM_strp_sup).  */
+static inline bool
+libdw_valid_user_form (int form)
+{
+  switch (form)
+    {
+      case DW_FORM_block:
+      case DW_FORM_block1:
+      case DW_FORM_block2:
+      case DW_FORM_block4:
+      case DW_FORM_data1:
+      case DW_FORM_data2:
+      case DW_FORM_data4:
+      case DW_FORM_data8:
+      case DW_FORM_data16:
+      case DW_FORM_flag:
+      case DW_FORM_line_strp:
+      case DW_FORM_sdata:
+      case DW_FORM_sec_offset:
+      case DW_FORM_string:
+      case DW_FORM_strp:
+      case DW_FORM_strp_sup:
+      case DW_FORM_strx:
+      case DW_FORM_strx1:
+      case DW_FORM_strx2:
+      case DW_FORM_strx3:
+      case DW_FORM_strx4:
+      case DW_FORM_udata:
+	return true;
+      default:
+	return false;
+    }
+}
+
+
 /* We have to include the file at this point because the inline
    functions access internals of the Dwarf structure.  */
 #include "memory-access.h"

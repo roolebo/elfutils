@@ -345,4 +345,167 @@ DWARF section [29] '.debug_line' at offset 0xdf6:
      8:3   S   *    0   0  0 0x00000000100005f7 <main+0x53>
 
 EOF
+
+# Two tests for the same code but encoded using DWARF4 or DWARF5.
+# Output is identical except for the section offset and CU numbers.
+# See tests/testfile-dwarf-45.source.
+
+testfiles testfile-dwarf-4 testfile-dwarf-5
+
+testrun_compare ${abs_top_builddir}/src/readelf --debug-dump=decodedline testfile-dwarf-4 << \EOF
+
+DWARF section [29] '.debug_line' at offset 0x1734:
+
+ CU [b] hello.c
+  line:col SBPE* disc isa op address (Statement Block Prologue Epilogue *End)
+  /var/tmp/hello/hello.c (mtime: 0, length: 0)
+    21:0   S        0   0  0 0x0000000000400510 <foo>
+    22:1   S        0   0  0 0x0000000000400510 <foo>
+    22:3            0   0  0 0x0000000000400510 <foo>
+    25:6            0   0  0 0x0000000000400514 <foo+0x4>
+    25:34  S        0   0  0 0x000000000040051a <foo+0xa>
+    25:3            0   0  0 0x000000000040051a <foo+0xa>
+    26:34           0   0  0 0x000000000040051e <foo+0xe>
+    25:1            1   0  0 0x0000000000400528 <foo+0x18>
+  /var/tmp/hello/hello.h (mtime: 0, length: 0)
+     7:18  S        0   0  0 0x000000000040052b <foo+0x1b>
+     9:3   S        0   0  0 0x000000000040052b <foo+0x1b>
+     9:3            0   0  0 0x000000000040052b <foo+0x1b>
+    10:6   S        0   0  0 0x000000000040052f <foo+0x1f>
+    10:5            0   0  0 0x000000000040052f <foo+0x1f>
+    12:7   S        0   0  0 0x0000000000400531 <foo+0x21>
+  /var/tmp/hello/hello.c (mtime: 0, length: 0)
+    10:3   S        0   0  0 0x0000000000400531 <foo+0x21>
+    12:3   S        0   0  0 0x0000000000400531 <foo+0x21>
+    12:3            0   0  0 0x0000000000400531 <foo+0x21>
+    13:6   S        0   0  0 0x0000000000400535 <foo+0x25>
+    13:5            0   0  0 0x0000000000400535 <foo+0x25>
+    15:7   S        0   0  0 0x0000000000400539 <foo+0x29>
+    22:3   S        0   0  0 0x0000000000400539 <foo+0x29>
+    22:3            0   0  0 0x0000000000400539 <foo+0x29>
+    23:6   S        0   0  0 0x000000000040053d <foo+0x2d>
+    23:5            0   0  0 0x000000000040053d <foo+0x2d>
+     9:12  S        0   0  0 0x0000000000400550 <baz>
+    10:1   S        0   0  0 0x0000000000400550 <baz>
+    12:3   S        0   0  0 0x0000000000400550 <baz>
+    12:3            0   0  0 0x0000000000400550 <baz>
+    13:9            0   0  0 0x0000000000400556 <baz+0x6>
+    15:7   S        0   0  0 0x000000000040055f <baz+0xf>
+    15:3            0   0  0 0x000000000040055f <baz+0xf>
+    15:7       *    0   0  0 0x0000000000400560 <baz+0x10>
+
+ CU [21c] world.c
+  line:col SBPE* disc isa op address (Statement Block Prologue Epilogue *End)
+  /var/tmp/hello/world.c (mtime: 0, length: 0)
+    15:0   S        0   0  0 0x0000000000400410 <main>
+    16:1   S        0   0  0 0x0000000000400410 <main>
+    17:3   S        0   0  0 0x0000000000400410 <main>
+    15:3            0   0  0 0x0000000000400410 <main>
+    17:1            0   0  0 0x0000000000400419 <main+0x9>
+    18:6   S        0   0  0 0x000000000040041e <main+0xe>
+    18:5            0   0  0 0x000000000040041e <main+0xe>
+    22:7   S        0   0  0 0x0000000000400421 <main+0x11>
+    22:3   S   *    0   0  0 0x000000000040042f <main+0x1f>
+
+     6:0   S        0   0  0 0x0000000000400570 <calc>
+     7:1   S        0   0  0 0x0000000000400570 <calc>
+     7:3            0   0  0 0x0000000000400570 <calc>
+     7:6            1   0  0 0x0000000000400575 <calc+0x5>
+     7:24           0   0  0 0x0000000000400578 <calc+0x8>
+    10:17  S        0   0  0 0x000000000040057d <calc+0xd>
+    10:3            0   0  0 0x000000000040057d <calc+0xd>
+  /var/tmp/hello/hello.h (mtime: 0, length: 0)
+    10:10           0   0  0 0x0000000000400583 <calc+0x13>
+  /var/tmp/hello/world.c (mtime: 0, length: 0)
+    10:7            0   0  0 0x0000000000400585 <calc+0x15>
+  /var/tmp/hello/hello.h (mtime: 0, length: 0)
+     7:10  S        0   0  0 0x0000000000400588 <calc+0x18>
+     9:3   S        0   0  0 0x0000000000400588 <calc+0x18>
+    10:3            0   0  0 0x0000000000400588 <calc+0x18>
+    12:7   S        0   0  0 0x000000000040058f <calc+0x1f>
+    12:3            0   0  0 0x000000000040058f <calc+0x1f>
+  /var/tmp/hello/world.c (mtime: 0, length: 0)
+    11:10           0   0  0 0x0000000000400598 <calc+0x28>
+    11:1       *    0   0  0 0x000000000040059a <calc+0x2a>
+
+EOF
+
+testrun_compare ${abs_top_builddir}/src/readelf --debug-dump=decodedline testfile-dwarf-5 << \EOF
+
+DWARF section [29] '.debug_line' at offset 0x171f:
+
+ CU [c] hello.c
+  line:col SBPE* disc isa op address (Statement Block Prologue Epilogue *End)
+  /var/tmp/hello/hello.c (mtime: 0, length: 0)
+    21:0   S        0   0  0 0x0000000000400510 <foo>
+    22:1   S        0   0  0 0x0000000000400510 <foo>
+    22:3            0   0  0 0x0000000000400510 <foo>
+    25:6            0   0  0 0x0000000000400514 <foo+0x4>
+    25:34  S        0   0  0 0x000000000040051a <foo+0xa>
+    25:3            0   0  0 0x000000000040051a <foo+0xa>
+    26:34           0   0  0 0x000000000040051e <foo+0xe>
+    25:1            1   0  0 0x0000000000400528 <foo+0x18>
+  /var/tmp/hello/hello.h (mtime: 0, length: 0)
+     7:18  S        0   0  0 0x000000000040052b <foo+0x1b>
+     9:3   S        0   0  0 0x000000000040052b <foo+0x1b>
+     9:3            0   0  0 0x000000000040052b <foo+0x1b>
+    10:6   S        0   0  0 0x000000000040052f <foo+0x1f>
+    10:5            0   0  0 0x000000000040052f <foo+0x1f>
+    12:7   S        0   0  0 0x0000000000400531 <foo+0x21>
+  /var/tmp/hello/hello.c (mtime: 0, length: 0)
+    10:3   S        0   0  0 0x0000000000400531 <foo+0x21>
+    12:3   S        0   0  0 0x0000000000400531 <foo+0x21>
+    12:3            0   0  0 0x0000000000400531 <foo+0x21>
+    13:6   S        0   0  0 0x0000000000400535 <foo+0x25>
+    13:5            0   0  0 0x0000000000400535 <foo+0x25>
+    15:7   S        0   0  0 0x0000000000400539 <foo+0x29>
+    22:3   S        0   0  0 0x0000000000400539 <foo+0x29>
+    22:3            0   0  0 0x0000000000400539 <foo+0x29>
+    23:6   S        0   0  0 0x000000000040053d <foo+0x2d>
+    23:5            0   0  0 0x000000000040053d <foo+0x2d>
+     9:12  S        0   0  0 0x0000000000400550 <baz>
+    10:1   S        0   0  0 0x0000000000400550 <baz>
+    12:3   S        0   0  0 0x0000000000400550 <baz>
+    12:3            0   0  0 0x0000000000400550 <baz>
+    13:9            0   0  0 0x0000000000400556 <baz+0x6>
+    15:7   S        0   0  0 0x000000000040055f <baz+0xf>
+    15:3            0   0  0 0x000000000040055f <baz+0xf>
+    15:7       *    0   0  0 0x0000000000400560 <baz+0x10>
+
+ CU [218] world.c
+  line:col SBPE* disc isa op address (Statement Block Prologue Epilogue *End)
+  /var/tmp/hello/world.c (mtime: 0, length: 0)
+    15:0   S        0   0  0 0x0000000000400410 <main>
+    16:1   S        0   0  0 0x0000000000400410 <main>
+    17:3   S        0   0  0 0x0000000000400410 <main>
+    15:3            0   0  0 0x0000000000400410 <main>
+    17:1            0   0  0 0x0000000000400419 <main+0x9>
+    18:6   S        0   0  0 0x000000000040041e <main+0xe>
+    18:5            0   0  0 0x000000000040041e <main+0xe>
+    22:7   S        0   0  0 0x0000000000400421 <main+0x11>
+    22:3   S   *    0   0  0 0x000000000040042f <main+0x1f>
+
+     6:0   S        0   0  0 0x0000000000400570 <calc>
+     7:1   S        0   0  0 0x0000000000400570 <calc>
+     7:3            0   0  0 0x0000000000400570 <calc>
+     7:6            1   0  0 0x0000000000400575 <calc+0x5>
+     7:24           0   0  0 0x0000000000400578 <calc+0x8>
+    10:17  S        0   0  0 0x000000000040057d <calc+0xd>
+    10:3            0   0  0 0x000000000040057d <calc+0xd>
+  /var/tmp/hello/hello.h (mtime: 0, length: 0)
+    10:10           0   0  0 0x0000000000400583 <calc+0x13>
+  /var/tmp/hello/world.c (mtime: 0, length: 0)
+    10:7            0   0  0 0x0000000000400585 <calc+0x15>
+  /var/tmp/hello/hello.h (mtime: 0, length: 0)
+     7:10  S        0   0  0 0x0000000000400588 <calc+0x18>
+     9:3   S        0   0  0 0x0000000000400588 <calc+0x18>
+    10:3            0   0  0 0x0000000000400588 <calc+0x18>
+    12:7   S        0   0  0 0x000000000040058f <calc+0x1f>
+    12:3            0   0  0 0x000000000040058f <calc+0x1f>
+  /var/tmp/hello/world.c (mtime: 0, length: 0)
+    11:10           0   0  0 0x0000000000400598 <calc+0x28>
+    11:1       *    0   0  0 0x000000000040059a <calc+0x2a>
+
+EOF
+
 exit 0

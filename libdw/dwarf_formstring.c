@@ -48,7 +48,8 @@ dwarf_formstring (Dwarf_Attribute *attrp)
 
   Dwarf_CU *cu = attrp->cu;
   Dwarf *dbg = cu->dbg;
-  Dwarf *dbg_ret = (attrp->form == DW_FORM_GNU_strp_alt
+  Dwarf *dbg_ret = ((attrp->form == DW_FORM_GNU_strp_alt
+		     || attrp->form == DW_FORM_strp_sup)
 		    ? INTUSE(dwarf_getalt) (dbg) : dbg);
 
   if (unlikely (dbg_ret == NULL))
@@ -70,7 +71,8 @@ dwarf_formstring (Dwarf_Attribute *attrp)
 
   uint64_t off;
   if (attrp->form == DW_FORM_strp
-      || attrp->form == DW_FORM_GNU_strp_alt)
+      || attrp->form == DW_FORM_GNU_strp_alt
+      || attrp->form == DW_FORM_strp_sup)
     {
       if (__libdw_read_offset (dbg, dbg_ret, cu_sec_idx (cu),
 			       attrp->valp, cu->offset_size, &off,

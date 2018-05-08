@@ -6130,6 +6130,8 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
     case DW_FORM_ref2:
     case DW_FORM_ref1:
     case DW_FORM_GNU_ref_alt:
+    case DW_FORM_ref_sup4:
+    case DW_FORM_ref_sup8:
       if (cbargs->silent)
 	break;
       Dwarf_Die ref;

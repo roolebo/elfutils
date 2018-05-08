@@ -1,3 +1,12 @@
+2018-05-08  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_formref.c (__libdw_formref): Explicitly don't handle
+	DW_FORM_ref_sup4 and DW_FORM_ref_sup8.
+	* dwarf_formref_die.c (dwarf_formref_die): Handle DW_FORM_ref_sup4
+	and DW_FORM_ref_sup8.
+	* dwarf_formstring.c (dwarf_formstring): Handle DW_FORM_strp_sup
+	as DW_FORM_GNU_strp_alt.
+
 2018-05-05  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf.h: Add DWARF line content descriptions.

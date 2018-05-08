@@ -44,13 +44,20 @@ dwarf_formref_die (Dwarf_Attribute *attr, Dwarf_Die *result)
   struct Dwarf_CU *cu = attr->cu;
 
   Dwarf_Off offset;
-  if (attr->form == DW_FORM_ref_addr || attr->form == DW_FORM_GNU_ref_alt)
+  if (attr->form == DW_FORM_ref_addr || attr->form == DW_FORM_GNU_ref_alt
+      || attr->form == DW_FORM_ref_sup4 || attr->form == DW_FORM_ref_sup8)
     {
       /* This has an absolute offset.  */
 
-      uint8_t ref_size = (cu->version == 2 && attr->form == DW_FORM_ref_addr
-			  ? cu->address_size
-			  : cu->offset_size);
+      uint8_t ref_size;
+      if (cu->version == 2 && attr->form == DW_FORM_ref_addr)
+	ref_size = cu->address_size;
+      else if (attr->form == DW_FORM_ref_sup4)
+	ref_size = 4;
+      else if (attr->form == DW_FORM_ref_sup8)
+	ref_size = 8;
+      else
+	ref_size = cu->offset_size;
 
       Dwarf *dbg_ret = (attr->form == DW_FORM_GNU_ref_alt
 			? INTUSE(dwarf_getalt) (cu->dbg) : cu->dbg);

@@ -1,3 +1,12 @@
+2018-05-11  Mark Wielaard  <mark@klomp.org>
+
+	* Makefile.am (check_PROGRAMS): Add get-units-invalid.
+	(TESTS): Add run-get-units-invalid.sh.
+	(EXTRA_DIST): Likewise.
+	(get_units_invalid_LDADD): New variable.
+	* get-units-invalid.c: New test program.
+	* run-get-units-invalid.sh: New test program runner.
+
 2018-05-05  Mark Wielaard  <mark@klomp.org>
 
 	* testfile-dwarf-45.source: New file.

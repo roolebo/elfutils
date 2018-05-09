@@ -58,8 +58,6 @@ dwarf_siblingof (Dwarf_Die *die, Dwarf_Die *result)
   sibattr.cu = this_die.cu;
   /* That's the address we start looking.  */
   unsigned char *addr = this_die.addr;
-  /* End of the buffer.  */
-  unsigned char *endp = sibattr.cu->endp;
 
   /* Search for the beginning of the next die on this level.  We
      must not return the dies for children of the given die.  */
@@ -96,6 +94,8 @@ dwarf_siblingof (Dwarf_Die *die, Dwarf_Die *result)
 	/* This abbreviation has children.  */
 	++level;
 
+      /* End of the buffer.  */
+      unsigned char *endp = sibattr.cu->endp;
 
       while (1)
 	{
@@ -125,6 +125,7 @@ dwarf_siblingof (Dwarf_Die *die, Dwarf_Die *result)
   while (level > 0);
 
   /* Maybe we reached the end of the CU.  */
+  unsigned char *endp = sibattr.cu->endp;
   if (addr >= endp)
     return 1;
 

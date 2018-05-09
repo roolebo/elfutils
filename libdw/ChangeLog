@@ -1,3 +1,9 @@
+2018-05-11  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_siblingof.c (dwarf_siblingof): Don't reference cu till it is
+	known the Dwarf_Die is came from is valid.
+	* libdwP.h (__libdw_dieabbrev): Check cu is not NULL.
+
 2018-05-08  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_formref.c (__libdw_formref): Explicitly don't handle

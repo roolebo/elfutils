@@ -9127,17 +9127,27 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
 
 	  int n;
 	  for (n = 0; n < ndebug_sections; ++n)
-	    if (strcmp (name, debug_sections[n].name) == 0
-		|| (name[0] == '.' && name[1] == 'z'
-		    && debug_sections[n].name[1] == 'd'
-		    && strcmp (&name[2], &debug_sections[n].name[1]) == 0)
-		)
-	      {
-		if ((print_debug_sections | implicit_debug_sections)
-		    & debug_sections[n].bitmask)
-		  debug_sections[n].fp (dwflmod, ebl, ehdr, scn, shdr, dbg);
-		break;
-	      }
+	    {
+	      size_t dbglen = strlen (debug_sections[n].name);
+	      size_t scnlen = strlen (name);
+	      if ((strncmp (name, debug_sections[n].name, dbglen) == 0
+		   && (dbglen == scnlen
+		       || (scnlen == dbglen + 4
+			   && strstr (name, ".dwo") == name + dbglen)))
+		  || (name[0] == '.' && name[1] == 'z'
+		      && debug_sections[n].name[1] == 'd'
+		      && strncmp (&name[2], &debug_sections[n].name[1],
+				  dbglen - 1) == 0
+		      && (scnlen == dbglen + 1
+			  || (scnlen == dbglen + 5
+			      && strstr (name, ".dwo") == name + dbglen + 1))))
+		{
+		  if ((print_debug_sections | implicit_debug_sections)
+		      & debug_sections[n].bitmask)
+		    debug_sections[n].fp (dwflmod, ebl, ehdr, scn, shdr, dbg);
+		  break;
+		}
+	    }
 	}
     }
 

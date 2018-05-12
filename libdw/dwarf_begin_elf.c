@@ -1,7 +1,6 @@
 /* Create descriptor from ELF descriptor for processing file.
-   Copyright (C) 2002-2011, 2014, 2015, 2018 Red Hat, Inc.
+   Copyright (C) 2002-2011, 2014, 2015, 2017, 2018 Red Hat, Inc.
    This file is part of elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
    This file is free software; you can redistribute it and/or modify
    it under the terms of either
@@ -116,14 +115,26 @@ check_section (Dwarf *result, GElf_Ehdr *ehdr, Elf_Scn *scn, bool inscngrp)
   size_t cnt;
   bool gnu_compressed = false;
   for (cnt = 0; cnt < ndwarf_scnnames; ++cnt)
-    if (strcmp (scnname, dwarf_scnnames[cnt]) == 0)
-      break;
-    else if (scnname[0] == '.' && scnname[1] == 'z'
-	     && strcmp (&scnname[2], &dwarf_scnnames[cnt][1]) == 0)
-      {
-        gnu_compressed = true;
-        break;
-      }
+    {
+      size_t dbglen = strlen (dwarf_scnnames[cnt]);
+      size_t scnlen = strlen (scnname);
+      if (strncmp (scnname, dwarf_scnnames[cnt], dbglen) == 0
+	  && (dbglen == scnlen
+	      || (scnlen == dbglen + 4
+		  && strstr (scnname, ".dwo") == scnname + dbglen)))
+	break;
+      else if (scnname[0] == '.' && scnname[1] == 'z'
+	       && (strncmp (&scnname[2], &dwarf_scnnames[cnt][1],
+			    dbglen - 1) == 0
+		   && (scnlen == dbglen + 1
+		       || (scnlen == dbglen + 5
+			   && strstr (scnname,
+				      ".dwo") == scnname + dbglen + 1))))
+	{
+	  gnu_compressed = true;
+	  break;
+	}
+    }
 
   if (cnt >= ndwarf_scnnames)
     /* Not a debug section; ignore it. */

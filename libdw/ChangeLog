@@ -1,3 +1,8 @@
+2018-05-12  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_begin_elf.c (check_section): Also recognize .dwo section
+	name variants.
+
 2018-05-11  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_formudata.c (dwarf_formudata): Handle DW_AT_macros as macptr.

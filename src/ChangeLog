@@ -1,3 +1,8 @@
+2018-05-12  Mark Wielaard  <mark@klomp.org>
+
+	* addr2line.c (main): Add fflush (stdout) after handle_address ()
+	when reading from stdin.
+
 2018-04-24  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_debug_aranges_section): Try elf_rawdata if no

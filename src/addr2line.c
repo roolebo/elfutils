@@ -187,6 +187,7 @@ main (int argc, char *argv[])
 	    buf[chars - 1] = '\0';
 
 	  result = handle_address (buf, dwfl);
+	  fflush (stdout);
 	}
 
       free (buf);

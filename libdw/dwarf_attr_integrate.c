@@ -1,5 +1,5 @@
 /* Return specific DWARF attribute of a DIE, integrating indirections.
-   Copyright (C) 2005 Red Hat, Inc.
+   Copyright (C) 2005, 2018 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -55,6 +55,19 @@ dwarf_attr_integrate (Dwarf_Die *die, unsigned int search_name,
     }
   while (die != NULL);
 
+  /* Not NULL if it didn't have abstract_origin and specification
+     attributes.  If it is a split CU then see if the skeleton
+     has it.  */
+  if (die != NULL && is_cudie (die)
+      && die->cu->unit_type == DW_UT_split_compile)
+    {
+      Dwarf_CU *skel_cu = __libdw_find_split_unit (die->cu);
+      if (skel_cu != NULL)
+	{
+	  Dwarf_Die skel_die = CUDIE (skel_cu);
+	  return INTUSE(dwarf_attr) (&skel_die, search_name, result);
+	}
+    }
   return NULL;
 }
 INTDEF (dwarf_attr_integrate)

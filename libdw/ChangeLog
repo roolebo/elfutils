@@ -1,3 +1,10 @@
+2018-05-17  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_attr_integrate.c (dwarf_attr_integrate): Handle split_compile
+	unit DIE, search skeleton_compile unit DIE.
+	* dwarf_hasattr_integrate.c (dwarf_hasattr_integrate): Likewise.
+	* libdwP.h (is_cudie): Check cu is not NULL.
+
 2018-05-19  Mark Wielaard  <mark@klomp.org>
 
 	* libdwP.h (__libdw_find_split_unit): Mark as internal_function.

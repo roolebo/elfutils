@@ -1,3 +1,12 @@
+2018-05-17  Mark Wielaard  <mark@klomp.org>
+
+	* Makefile.am (check_PROGRAMS): Add attr-integrate-skel.
+	(TESTS): Add run-attr-integrate-skel.
+	(EXTRA_DIST): Likewise.
+	(attr_integrate_skel_LDADD): New variable.
+	* attr-integrate-skel.c: New test.
+	* run-attr-integrate-skel.sh: New test runner.
+
 2018-05-16  Mark Wielaard  <mark@klomp.org>
 
 	* Makefile.am (check_PROGRAMS): Add get-units-split.

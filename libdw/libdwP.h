@@ -893,7 +893,7 @@ cu_sec_idx (struct Dwarf_CU *cu)
 static inline bool
 is_cudie (Dwarf_Die *cudie)
 {
-  return CUDIE (cudie->cu).addr == cudie->addr;
+  return cudie->cu != NULL && CUDIE (cudie->cu).addr == cudie->addr;
 }
 
 /* Read up begin/end pair and increment read pointer.

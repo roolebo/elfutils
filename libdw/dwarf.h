@@ -343,6 +343,13 @@ enum
     DW_AT_GNU_entry_view = 0x2138,
     DW_AT_GNU_macros = 0x2119,
     DW_AT_GNU_deleted = 0x211a,
+    /* GNU Debug Fission extensions.  */
+    DW_AT_GNU_dwo_name = 0x2130,
+    DW_AT_GNU_dwo_id = 0x2131,
+    DW_AT_GNU_ranges_base = 0x2132,
+    DW_AT_GNU_addr_base = 0x2133,
+    DW_AT_GNU_pubnames = 0x2134,
+    DW_AT_GNU_pubtypes = 0x2135,
 
     DW_AT_hi_user = 0x3fff
   };
@@ -403,6 +410,10 @@ enum
     DW_FORM_addrx2 = 0x2a,
     DW_FORM_addrx3 = 0x2b,
     DW_FORM_addrx4 = 0x2c,
+
+    /* GNU Debug Fission extensions.  */
+    DW_FORM_GNU_addr_index = 0x1f01,
+    DW_FORM_GNU_str_index = 0x1f02,
 
     DW_FORM_GNU_ref_alt = 0x1f20, /* offset in alternate .debuginfo.  */
     DW_FORM_GNU_strp_alt = 0x1f21 /* offset in alternate .debug_str. */
@@ -590,6 +601,11 @@ enum
     DW_OP_GNU_convert = 0xf7,
     DW_OP_GNU_reinterpret = 0xf9,
     DW_OP_GNU_parameter_ref = 0xfa,
+
+    /* GNU Debug Fission extensions.  */
+    DW_OP_GNU_addr_index = 0xfb,
+    DW_OP_GNU_const_index = 0xfc,
+
     DW_OP_GNU_variable_value = 0xfd,
 
     DW_OP_lo_user = 0xe0,	/* Implementation-defined range start.  */

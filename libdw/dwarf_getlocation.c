@@ -456,7 +456,9 @@ __libdw_intern_expression (Dwarf *dbg, bool other_byte_order,
 	case DW_OP_reinterpret:
 	case DW_OP_GNU_reinterpret:
 	case DW_OP_addrx:
+	case DW_OP_GNU_addr_index:
 	case DW_OP_constx:
+	case DW_OP_GNU_const_index:
 	  get_uleb128 (newloc->number, data, end_data);
 	  break;
 

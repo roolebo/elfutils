@@ -1,5 +1,5 @@
 /* Return string associated with given attribute.
-   Copyright (C) 2003-2010, 2013, 2018 Red Hat, Inc.
+   Copyright (C) 2003-2010, 2013, 2017, 2018 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -94,6 +94,7 @@ dwarf_formstring (Dwarf_Attribute *attrp)
       switch (attrp->form)
 	{
 	case DW_FORM_strx:
+	case DW_FORM_GNU_str_index:
 	  if (datap >= endp)
 	    {
 	    invalid:

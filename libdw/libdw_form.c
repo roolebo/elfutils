@@ -109,6 +109,8 @@ __libdw_form_val_compute_len (struct Dwarf_CU *cu, unsigned int form,
     case DW_FORM_loclistx:
     case DW_FORM_rnglistx:
     case DW_FORM_strx:
+    case DW_FORM_GNU_addr_index:
+    case DW_FORM_GNU_str_index:
       get_uleb128 (u128, valp, endp);
       result = valp - startp;
       break;

@@ -4341,7 +4341,9 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	case DW_OP_plus_uconst:
 	case DW_OP_constu:
 	case DW_OP_addrx:
-	case DW_OP_constx:;
+	case DW_OP_GNU_addr_index:
+	case DW_OP_constx:
+	case DW_OP_GNU_const_index:;
 	  const unsigned char *start = data;
 	  uint64_t uleb;
 	  NEED (1);
@@ -6115,6 +6117,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
     case DW_FORM_addrx2:
     case DW_FORM_addrx3:
     case DW_FORM_addrx4:
+    case DW_FORM_GNU_addr_index:
       if (!cbargs->silent)
 	{
 	  Dwarf_Addr addr;
@@ -6151,6 +6154,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
     case DW_FORM_strx4:
     case DW_FORM_string:
     case DW_FORM_GNU_strp_alt:
+    case DW_FORM_GNU_str_index:
       if (cbargs->silent)
 	break;
       const char *str = dwarf_formstring (attrp);
@@ -6203,6 +6207,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	goto attrval_out;
 
       const char *valuestr = NULL;
+      bool as_hex_id = false;
       switch (attr)
 	{
 	  /* This case can take either a constant or a loclistptr.  */
@@ -6330,6 +6335,10 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	      valuestr = "???";
 	  }
 	  break;
+	case DW_AT_GNU_dwo_id:
+	  as_hex_id = true;
+	  break;
+
 	default:
 	  /* Nothing.  */
 	  break;
@@ -6357,7 +6366,13 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	    if (unlikely (dwarf_formsdata (attrp, &snum) != 0))
 	      goto attrval_out;
 
-	  if (valuestr == NULL)
+	  if (as_hex_id)
+	    {
+	      printf ("           %*s%-20s (%s) 0x%.16" PRIx64 "\n",
+		      (int) (level * 2), "", dwarf_attr_name (attr),
+		      dwarf_form_name (form), num);
+	    }
+	  else if (valuestr == NULL)
 	    {
 	      printf ("           %*s%-20s (%s)",
 		      (int) (level * 2), "", dwarf_attr_name (attr),
@@ -6940,6 +6955,7 @@ print_form_data (Dwarf *dbg, int form, const unsigned char *readp,
       break;
 
     case DW_FORM_strx:
+    case DW_FORM_GNU_str_index:
       if (readendp - readp < 1)
 	goto invalid_data;
       get_uleb128 (val, readp, readendp);

@@ -168,6 +168,7 @@ dwarf_formudata (Dwarf_Attribute *attr, Dwarf_Word *return_uval)
 
 	    case DW_AT_ranges:
 	    case DW_AT_start_scope:
+	    case DW_AT_GNU_ranges_base:
 	      /* rangelistptr */
 	      if (__libdw_formptr (attr, IDX_debug_ranges,
 				   DWARF_E_NO_DEBUG_RANGES, NULL,
@@ -184,6 +185,7 @@ dwarf_formudata (Dwarf_Attribute *attr, Dwarf_Word *return_uval)
 	      break;
 
 	    case DW_AT_addr_base:
+	    case DW_AT_GNU_addr_base:
 	      /* addrptr */
 	      if (__libdw_formptr (attr, IDX_debug_addr,
 				   DWARF_E_NO_DEBUG_ADDR, NULL,

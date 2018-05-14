@@ -1,3 +1,12 @@
+2018-05-14  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (print_ops): Handle DW_OP_GNU_addr_index and
+	DW_OP_GNU_const_index.
+	(attr_callback): Handle DW_FORM_GNU_addr_index as DW_FORM_addrx.
+	Handle DW_FORM_GNU_str_index as DW_FORM_constx. Add as_hex_id.
+	Handle DW_AT_GNU_dwo_id as_hex_id.
+	(print_form_data): Handle DW_FORM_GNU_str_index as DW_FORM_strx.
+
 2018-05-12  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_debug): Also recognize .dwo section name variants.

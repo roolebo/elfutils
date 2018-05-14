@@ -1,3 +1,8 @@
+2018-05-15  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (print_debug_units): Print unit type and id for any
+	unit type that has it even when version < 5.
+
 2018-05-14  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_ops): Handle DW_OP_GNU_addr_index and

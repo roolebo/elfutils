@@ -360,15 +360,12 @@ __libdw_first_die_from_cu_start (Dwarf_Off cu_start,
 /*
   assert (offset_size == 4 || offset_size == 8);
   assert (version >= 2 && version <= 5);
-  assert (version >= 5 || (unit_type == DW_UT_compile
-			   || unit_type == DW_UT_partial
-			   || unit_type == DW_UT_type));
-  assert (version != 5 || (unit_type == DW_UT_compile
-			   || unit_type == DW_UT_partial
-			   || unit_type == DW_UT_skeleton
-			   || unit_type == DW_UT_split_compile
-			   || unit_type == DW_UT_type
-			   || unit_type == DW_UT_split_type));
+  assert (unit_type == DW_UT_compile
+	  || unit_type == DW_UT_partial
+	  || unit_type == DW_UT_skeleton
+	  || unit_type == DW_UT_split_compile
+	  || unit_type == DW_UT_type
+	  || unit_type == DW_UT_split_type);
 */
 
   Dwarf_Off off = cu_start;

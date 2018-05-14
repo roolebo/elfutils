@@ -1,3 +1,12 @@
+2018-05-15  Mark Wielaard  <mark@klomp.org>
+
+	* libdwP.h (__libdw_first_die_from_cu_start): Adjust commented out
+	asserts.
+	* libdw_findcu.c (__libdw_intern_next_unit): For version 4 DWARF if
+	the cudie has a DW_AT_GNU_dwi_id set the unit_id8 and unit_type to
+	DW_UT_skeleton or DW_UT_split_compile based on whether the cudie has
+	child DIEs and a DW_AT_GNU_dwo_name attribute.
+
 2018-05-14  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf.h: Add GNU Debug Fission extensions. DW_AT_GNU_dwo_name,

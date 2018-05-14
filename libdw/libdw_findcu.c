@@ -123,7 +123,7 @@ __libdw_intern_next_unit (Dwarf *dbg, bool debug_types)
   newp->startp = data->d_buf + newp->start;
   newp->endp = data->d_buf + newp->end;
 
-  /* v4 debug type units have version == 4 and unit_type == 1.  */
+  /* v4 debug type units have version == 4 and unit_type == DW_UT_type.  */
   if (debug_types)
     newp->unit_type = DW_UT_type;
   else if (version < 5)
@@ -133,9 +133,26 @@ __libdw_intern_next_unit (Dwarf *dbg, bool debug_types)
 
       /* But set it correctly from the actual CUDIE tag.  */
       Dwarf_Die cudie = CUDIE (newp);
-      int tag = dwarf_tag (&cudie);
+      int tag = INTUSE(dwarf_tag) (&cudie);
       if (tag == DW_TAG_compile_unit)
-	newp->unit_type = DW_UT_compile;
+	{
+	  Dwarf_Attribute dwo_id;
+	  if (INTUSE(dwarf_attr) (&cudie, DW_AT_GNU_dwo_id, &dwo_id) != NULL)
+	    {
+	      Dwarf_Word id8;
+	      if (INTUSE(dwarf_formudata) (&dwo_id, &id8) == 0)
+		{
+		  if (INTUSE(dwarf_haschildren) (&cudie) == 0
+		      && INTUSE(dwarf_hasattr) (&cudie,
+						DW_AT_GNU_dwo_name) == 1)
+		    newp->unit_type = DW_UT_skeleton;
+		  else
+		    newp->unit_type = DW_UT_split_compile;
+
+		  newp->unit_id8 = id8;
+		}
+	    }
+	}
       else if (tag == DW_TAG_partial_unit)
 	newp->unit_type = DW_UT_partial;
       else if (tag == DW_TAG_type_unit)

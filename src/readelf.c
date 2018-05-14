@@ -6577,7 +6577,8 @@ print_debug_units (Dwfl_Module *dwflmod,
 			   ", Offset size: %" PRIu8 "\n"),
 		  (uint64_t) offset, version, abbroffset, addrsize, offsize);
 
-	  if (version >= 5)
+	  if (version >= 5 || (unit_type != DW_UT_compile
+			       && unit_type != DW_UT_partial))
 	    {
 	      printf (gettext (" Unit type: %s (%" PRIu8 ")"),
 			       dwarf_unit_name (unit_type), unit_type);

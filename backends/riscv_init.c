@@ -51,6 +51,7 @@ riscv_init (Elf *elf __attribute__ ((unused)),
   eh->name = "RISC-V";
   riscv_init_reloc (eh);
   HOOK (eh, reloc_simple_type);
+  HOOK (eh, check_special_symbol);
   HOOK (eh, machine_flag_check);
 
   return MODVERSION;

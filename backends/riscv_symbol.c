@@ -60,3 +60,35 @@ riscv_machine_flag_check (GElf_Word flags)
   return ((flags &~ (EF_RISCV_RVC
 		     | EF_RISCV_FLOAT_ABI)) == 0);
 }
+
+/* Check whether given symbol's st_value and st_size are OK despite failing
+   normal checks.  */
+bool
+riscv_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr, const GElf_Sym *sym,
+			    const char *name, const GElf_Shdr *destshdr)
+{
+  if (name == NULL)
+    return false;
+
+  const char *sname = elf_strptr (elf, ehdr->e_shstrndx, destshdr->sh_name);
+  if (sname == NULL)
+    return false;
+
+  /* _GLOBAL_OFFSET_TABLE_ points to the start of the .got section, but it
+     is preceded by the .got.plt section in the output .got section.  */
+  if (strcmp (name, "_GLOBAL_OFFSET_TABLE_") == 0)
+    return (strcmp (sname, ".got") == 0
+	    && sym->st_value >= destshdr->sh_addr
+	    && sym->st_value < destshdr->sh_addr + destshdr->sh_size);
+
+  /* __global_pointer$ points to the .sdata section with an offset of
+     0x800.  It might however fall in the .got section, in which case we
+     cannot check the offset.  The size always should be zero.  */
+  if (strcmp (name, "__global_pointer$") == 0)
+    return (((strcmp (sname, ".sdata") == 0
+	      && sym->st_value == destshdr->sh_addr + 0x800)
+	     || strcmp (sname, ".got") == 0)
+	    && sym->st_size == 0);
+
+  return false;
+}

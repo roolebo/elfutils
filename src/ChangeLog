@@ -1,3 +1,7 @@
+2018-05-15  Dmitry V. Levin  <ldv@altlinux.org>
+
+	* elflint.c (check_elf_header): Fix typo in error diagnostics.
+
 2018-05-15  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_form_data): Cast comparisons against offset_len to

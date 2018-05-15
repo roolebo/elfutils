@@ -376,9 +376,9 @@ check_elf_header (Ebl *ebl, GElf_Ehdr *ehdr, size_t size)
 	   EI_OSABI,
 	   ebl_osabi_name (ebl, ehdr->e_ident[EI_OSABI], buf, sizeof (buf)));
 
-  /* No ABI versions other than zero supported either.  */
+  /* No ABI versions other than zero are supported either.  */
   if (ehdr->e_ident[EI_ABIVERSION] != 0)
-    ERROR (gettext ("unsupport ABI version e_ident[%d] == %d\n"),
+    ERROR (gettext ("unsupported ABI version e_ident[%d] == %d\n"),
 	   EI_ABIVERSION, ehdr->e_ident[EI_ABIVERSION]);
 
   for (cnt = EI_PAD; cnt < EI_NIDENT; ++cnt)

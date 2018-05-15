@@ -1,3 +1,9 @@
+2018-05-15  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (print_form_data): Cast comparisons against offset_len to
+	ptrdiff_t.
+	(print_debug_line_section): Print uint64_t as PRIu64.
+
 2018-05-11  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_debug_macro_section): Use libdw_valid_user_form.

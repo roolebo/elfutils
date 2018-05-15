@@ -6906,7 +6906,7 @@ print_form_data (Dwarf *dbg, int form, const unsigned char *readp,
     case DW_FORM_strp:
     case DW_FORM_line_strp:
     case DW_FORM_strp_sup:
-      if (readendp - readp < offset_len)
+      if (readendp - readp < (ptrdiff_t) offset_len)
 	goto invalid_data;
       if (offset_len == 8)
 	val = read_8ubyte_unaligned_inc (dbg, readp);
@@ -6930,7 +6930,7 @@ print_form_data (Dwarf *dbg, int form, const unsigned char *readp,
       break;
 
     case DW_FORM_sec_offset:
-      if (readendp - readp < offset_len)
+      if (readendp - readp < (ptrdiff_t) offset_len)
 	goto invalid_data;
       if (offset_len == 8)
 	val = read_8ubyte_unaligned_inc (dbg, readp);
@@ -6952,7 +6952,7 @@ print_form_data (Dwarf *dbg, int form, const unsigned char *readp,
 	{
 	  readp = data->d_buf + str_offsets_base + val;
 	  readendp = data->d_buf + data->d_size;
-	  if (readendp - readp < offset_len)
+	  if (readendp - readp < (ptrdiff_t) offset_len)
 	    str = "???";
 	  else
 	    {
@@ -7248,7 +7248,7 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
 	  for (uint64_t i = 0; i < directories_count; i++)
 	    {
-	      printf (" %-5lu ", i);
+	      printf (" %-5" PRIu64 " ", i);
 	      for (int j = 0; j < directory_entry_format_count; j++)
 		{
 		  linep = print_form_data (dbg, enc[j].form,
@@ -7324,7 +7324,7 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
 	  for (uint64_t i = 0; i < file_name_count; i++)
 	    {
-	      printf (" %-5lu ", i);
+	      printf (" %-5" PRIu64 " ", i);
 	      for (int j = 0; j < file_name_format_count; j++)
 		{
 		  linep = print_form_data (dbg, enc[j].form,

@@ -1335,7 +1335,18 @@ load_dw (Dwfl_Module *mod, struct dwfl_file *debugfile)
 	result = __libdwfl_relocate (mod, debugfile->elf, true);
       if (result != DWFL_E_NOERROR)
 	return result;
+    }
 
+  mod->dw = INTUSE(dwarf_begin_elf) (debugfile->elf, DWARF_C_READ, NULL);
+  if (mod->dw == NULL)
+    {
+      int err = INTUSE(dwarf_errno) ();
+      return err == DWARF_E_NO_DWARF ? DWFL_E_NO_DWARF : DWFL_E (LIBDW, err);
+    }
+
+  /* Do this after dwarf_begin_elf has a chance to process the fd.  */
+  if (mod->e_type == ET_REL && !debugfile->relocated)
+    {
       /* Don't keep the file descriptors around.  */
       if (mod->main.fd != -1 && elf_cntl (mod->main.elf, ELF_C_FDREAD) == 0)
 	{
@@ -1349,12 +1360,12 @@ load_dw (Dwfl_Module *mod, struct dwfl_file *debugfile)
 	}
     }
 
-  mod->dw = INTUSE(dwarf_begin_elf) (debugfile->elf, DWARF_C_READ, NULL);
-  if (mod->dw == NULL)
-    {
-      int err = INTUSE(dwarf_errno) ();
-      return err == DWARF_E_NO_DWARF ? DWFL_E_NO_DWARF : DWFL_E (LIBDW, err);
-    }
+  /* We might have already closed the fd when we asked dwarf_begin_elf to
+     create an Dwarf.  Help out a little in case we need to find an alt or
+     dwo file later.  */
+  if (mod->dw->debugdir == NULL && mod->elfdir != NULL
+      && debugfile == &mod->main)
+    mod->dw->debugdir = strdup (mod->elfdir);
 
   /* Until we have iterated through all CU's, we might do lazy lookups.  */
   mod->lazycu = 1;

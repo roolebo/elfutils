@@ -148,6 +148,10 @@ struct Dwarf
   /* The underlying ELF file.  */
   Elf *elf;
 
+  /* The (absolute) path to the ELF dir, if known.  To help locating
+     alt and dwo files.  */
+  char *debugdir;
+
   /* dwz alternate DWARF file.  */
   Dwarf *alt_dwarf;
 
@@ -1051,20 +1055,26 @@ static inline Dwarf_Off __libdw_cu_str_off_base (Dwarf_CU *cu)
 }
 
 
-/* Given a file descriptor, dir and file returns a full path.  If the
-   file is absolute (starts with a /) a copy of file is returned.  If
+/* Helper function to set debugdir field in Dwarf, used from dwarf_begin_elf
+   and libdwfl process_file.  */
+char * __libdw_debugdir (int fd);
+
+
+/* Given the directory of a debug file, an absolute or relative dir
+   to look in, and file returns a full path.
+
+   If the file is absolute (starts with a /) a copy of file is returned.
    the file isn't absolute, but dir is absolute, then a path that is
    the concatenation of dir and file is returned.  If neither file,
    nor dir is absolute, the path will be constructed using dir (if not
-   NULL) and file relative to the path of the given file descriptor
-   (if valid).
+   NULL) and file relative to the debugdir (if valid).
 
-   The file descriptor may be -1 and the dir may be NULL (in which
-   case they aren't used). If file is NULL, or no full path can be
-   constructed NULL is returned.
+   The debugdir and the dir may be NULL (in which case they aren't used).
+   If file is NULL, or no full path can be constructed NULL is returned.
 
    The caller is responsible for freeing the result if not NULL.  */
-char * __libdw_filepath (int fd, const char *dir, const char *file)
+char * __libdw_filepath (const char *debugdir, const char *dir,
+			 const char *file)
   internal_function;
 
 

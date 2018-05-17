@@ -1,3 +1,13 @@
+2018-05-17  Mark Wielaard  <mark@klomp.org>
+
+	* dwfl_module (__libdwfl_module_free): Free elfdir.
+	* dwfl_module_getdwarf.c (load_dw): Close file descriptors after
+	dwarf_begin_elf call. Set Dwarf debugdir if it is NULL, this is the
+	main module file and we recorded the elfdir.
+	* libdwflP.h (struct Dwfl_Module): Add elfdir field.
+	* offline.c (process_elf): Record the elfdir before we close the
+	main ELF file descriptor.
+
 2018-04-10  Mark Wielaard  <mark@klomp.org>
 
 	* frame_unwind.c (unwind): If __libdwfl_frame_reg_get fails for

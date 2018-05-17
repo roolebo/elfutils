@@ -1,5 +1,20 @@
 2018-05-17  Mark Wielaard  <mark@klomp.org>
 
+	* dwarf_begin_elf.c (__libdw_debugdir): New function.
+	(valid_p): Call __libdw_debugdir.
+	* dwarf_end.c (dwarf_end.c): Free debugdir.
+	* dwarf_getalt.c (__libdw_filepath): Extract __libdw_debugdir logic.
+	take debugdir as argument instead of fd.
+	(find_debug_altlink): Call __libdw_filepath with debugdir.
+	* libdwP.h (struct Dwarf): Add debugdir field.
+	(__libdw_debugdir): New function prototype.
+	(__libdw_filepath): Adjust prototype to take a const char * instead of
+	an int.
+	* libdw_find_split_unit.c (__libdw_find_split_unit): Call
+	__libdw_filepath with debugdir.
+
+2018-05-17  Mark Wielaard  <mark@klomp.org>
+
 	* dwarf_attr_integrate.c (dwarf_attr_integrate): Handle split_compile
 	unit DIE, search skeleton_compile unit DIE.
 	* dwarf_hasattr_integrate.c (dwarf_hasattr_integrate): Likewise.

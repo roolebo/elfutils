@@ -47,7 +47,7 @@
 
 char *
 internal_function
-__libdw_filepath (int fd, const char *dir, const char *file)
+__libdw_filepath (const char *debugdir, const char *dir, const char *file)
 {
   if (file == NULL)
     return NULL;
@@ -71,37 +71,25 @@ __libdw_filepath (int fd, const char *dir, const char *file)
       return path;
     }
 
-  if (fd >= 0)
+  if (debugdir != NULL)
     {
-      /* strlen ("/proc/self/fd/") = 14 + strlen (<MAXINT>) = 10 + 1 = 25.  */
-      char devfdpath[25];
-      sprintf (devfdpath, "/proc/self/fd/%u", fd);
-      char *fdpath = realpath (devfdpath, NULL);
-      char *path = NULL;
-      char *fddir;
-      if (fdpath != NULL && fdpath[0] == '/'
-	  && (fddir = strrchr (fdpath, '/')) != NULL)
+      size_t debugdirlen = strlen (debugdir);
+      size_t dirlen = dir != NULL ? strlen (dir) : 0;
+      size_t filelen = strlen (file);
+      size_t len = debugdirlen + 1 + dirlen + 1 + filelen + 1;
+      char *path = malloc (len);
+      if (path != NULL)
 	{
-	  *++fddir = '\0';
-	  size_t fdpathlen = strlen (fdpath);
-	  size_t dirlen = dir != NULL ? strlen (dir) : 0;
-	  size_t filelen = strlen (file);
-	  size_t len = fdpathlen + 1 + dirlen + 1 + filelen + 1;
-	  path = malloc (len);
-	  if (path != NULL)
+	  char *c = mempcpy (path, debugdir, debugdirlen);
+	  if (dirlen > 0)
 	    {
-	      char *c = mempcpy (path, fdpath, fdpathlen);
-	      if (dirlen > 0)
-		{
-		  c = mempcpy (c, dir, dirlen);
-		  if (dir[dirlen - 1] != '/')
-		    *c++ = '/';
-		}
-	      mempcpy (c, file, filelen + 1);
+	      c = mempcpy (c, dir, dirlen);
+	      if (dir[dirlen - 1] != '/')
+		*c++ = '/';
 	    }
+	  mempcpy (c, file, filelen + 1);
+	  return path;
 	}
-      free (fdpath);
-      return path;
     }
 
   return NULL;
@@ -151,7 +139,7 @@ find_debug_altlink (Dwarf *dbg)
   /* Fall back on (possible relative) alt file path.  */
   if (fd < 0)
     {
-      char *altpath = __libdw_filepath (dbg->elf->fildes, NULL, altname);
+      char *altpath = __libdw_filepath (dbg->debugdir, NULL, altname);
       if (altpath != NULL)
 	{
 	  fd = TEMP_FAILURE_RETRY (open (altpath, O_RDONLY));

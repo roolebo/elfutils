@@ -150,6 +150,9 @@ process_elf (Dwfl *dwfl, const char *name, const char *file_name, int fd,
       /* Don't keep the file descriptor around.  */
       if (mod->main.fd != -1 && elf_cntl (mod->main.elf, ELF_C_FDREAD) == 0)
 	{
+	  /* Grab the dir path in case we want to report this file as
+	     Dwarf later.  */
+	  mod->elfdir = __libdw_debugdir (mod->main.fd);
 	  close (mod->main.fd);
 	  mod->main.fd = -1;
 	}

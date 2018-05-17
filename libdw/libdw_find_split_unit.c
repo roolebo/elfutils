@@ -65,10 +65,10 @@ __libdw_find_split_unit (Dwarf_CU *cu)
 	{
 	  const char *comp_dir = dwarf_formstring (&compdir);
 	  const char *dwo_file = dwarf_formstring (&dwo_name);
-	  int fd = cu->dbg->elf->fildes;
-	  char *dwo_path = __libdw_filepath (fd, NULL, dwo_file);
+	  const char *debugdir = cu->dbg->debugdir;
+	  char *dwo_path = __libdw_filepath (debugdir, NULL, dwo_file);
 	  if (dwo_path == NULL && comp_dir != NULL)
-	    dwo_path = __libdw_filepath (fd, comp_dir, dwo_file);
+	    dwo_path = __libdw_filepath (debugdir, comp_dir, dwo_file);
 	  if (dwo_path != NULL)
 	    {
 	      int split_fd = open (dwo_path, O_RDONLY);

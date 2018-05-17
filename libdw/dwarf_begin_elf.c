@@ -42,6 +42,7 @@
 #include <fcntl.h>
 #include <endian.h>
 
+#include "libelfP.h"
 #include "libdwP.h"
 
 
@@ -184,6 +185,26 @@ check_section (Dwarf *result, GElf_Ehdr *ehdr, Elf_Scn *scn, bool inscngrp)
 }
 
 
+/* Helper function to set debugdir field.  We want to cache the dir
+   where we found this Dwarf ELF file to locate alt and dwo files.  */
+char *
+__libdw_debugdir (int fd)
+{
+  /* strlen ("/proc/self/fd/") = 14 + strlen (<MAXINT>) = 10 + 1 = 25.  */
+  char devfdpath[25];
+  sprintf (devfdpath, "/proc/self/fd/%u", fd);
+  char *fdpath = realpath (devfdpath, NULL);
+  char *fddir;
+  if (fdpath != NULL && fdpath[0] == '/'
+      && (fddir = strrchr (fdpath, '/')) != NULL)
+    {
+      *++fddir = '\0';
+      return fdpath;
+    }
+  return NULL;
+}
+
+
 /* Check whether all the necessary DWARF information is available.  */
 static Dwarf *
 valid_p (Dwarf *result)
@@ -224,6 +245,9 @@ valid_p (Dwarf *result)
 	       + result->sectiondata[IDX_debug_loc]->d_size);
 	}
     }
+
+  if (result != NULL)
+    result->debugdir = __libdw_debugdir (result->elf->fildes);
 
   return result;
 }

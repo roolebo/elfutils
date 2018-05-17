@@ -120,6 +120,7 @@ __libdwfl_module_free (Dwfl_Module *mod)
     free (mod->reloc_info);
 
   free (mod->name);
+  free (mod->elfdir);
   free (mod);
 }
 

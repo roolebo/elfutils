@@ -1,7 +1,6 @@
 /* Return source file information of CU.
-   Copyright (C) 2004, 2005, 2013, 2015 Red Hat, Inc.
+   Copyright (C) 2004, 2005, 2013, 2015, 2018 Red Hat, Inc.
    This file is part of elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2004.
 
    This file is free software; you can redistribute it and/or modify
    it under the terms of either
@@ -51,14 +50,47 @@ dwarf_getsrcfiles (Dwarf_Die *cudie, Dwarf_Files **files, size_t *nfiles)
 
   /* Get the information if it is not already known.  */
   struct Dwarf_CU *const cu = cudie->cu;
-  if (cu->lines == NULL)
+  if (cu->files == NULL)
     {
-      Dwarf_Lines *lines;
-      size_t nlines;
+      /* For split units there might be a simple file table (without lines).
+	 If not, use the one from the skeleton.  */
+      if (cu->unit_type == DW_UT_split_compile
+	  || cu->unit_type == DW_UT_split_type)
+	{
+	  /* We tried, assume we fail...  */
+	  cu->files = (void *) -1;
 
-      /* Let the more generic function do the work.  It'll create more
-	 data but that will be needed in an real program anyway.  */
-      res = INTUSE(dwarf_getsrclines) (cudie, &lines, &nlines);
+	  /* See if there is a .debug_line section, for split CUs
+	     the table is at offset zero.  */
+	  if (cu->dbg->sectiondata[IDX_debug_line] != NULL)
+	    {
+	      /* We are only interested in the files, the lines will
+		 always come from the skeleton.  */
+	      res = __libdw_getsrclines (cu->dbg, 0,
+					 __libdw_getcompdir (cudie),
+					 cu->address_size, NULL,
+					 &cu->files);
+	    }
+	  else
+	    {
+	      Dwarf_CU *skel = __libdw_find_split_unit (cu);
+	      if (skel != NULL)
+		{
+		  Dwarf_Die skeldie = CUDIE (skel);
+		  res = INTUSE(dwarf_getsrcfiles) (&skeldie, files, nfiles);
+		  cu->files = skel->files;
+		}
+	    }
+	}
+      else
+	{
+	  Dwarf_Lines *lines;
+	  size_t nlines;
+
+	  /* Let the more generic function do the work.  It'll create more
+	     data but that will be needed in an real program anyway.  */
+	  res = INTUSE(dwarf_getsrclines) (cudie, &lines, &nlines);
+	}
     }
   else if (cu->files != (void *) -1l)
     /* We already have the information.  */

@@ -1,3 +1,9 @@
+2018-05-18  Mark Wielaard  <mark@klomp.org>
+
+	* run-get-files.sh: Add testcases for testfile-splitdwarf-4,
+	testfile-hello4.dwo, testfile-world4.dwo and testfile-splitdwarf-5,
+	testfile-hello5.dwo, testfile-world5.dwo.
+
 2018-05-17  Mark Wielaard  <mark@klomp.org>
 
 	* Makefile.am (check_PROGRAMS): Add attr-integrate-skel.

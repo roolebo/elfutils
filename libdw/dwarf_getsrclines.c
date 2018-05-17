@@ -1147,6 +1147,31 @@ dwarf_getsrclines (Dwarf_Die *cudie, Dwarf_Lines **lines, size_t *nlines)
   struct Dwarf_CU *const cu = cudie->cu;
   if (cu->lines == NULL)
     {
+      /* For split units always pick the lines from the skeleton.  */
+      if (cu->unit_type == DW_UT_split_compile
+	  || cu->unit_type == DW_UT_split_type)
+	{
+	  /* We tries, assume we fail...  */
+	  cu->lines = (void *) -1l;
+
+	  Dwarf_CU *skel = __libdw_find_split_unit (cu);
+	  if (skel != NULL)
+	    {
+	      Dwarf_Die skeldie = CUDIE (skel);
+	      int res = INTUSE(dwarf_getsrclines) (&skeldie, lines, nlines);
+	      if (res == 0)
+		{
+		  cu->lines = skel->lines;
+		  *lines = cu->lines;
+		  *nlines = cu->lines->nlines;
+		}
+	      return res;
+	    }
+
+	  __libdw_seterrno (DWARF_E_NO_DEBUG_LINE);
+	  return -1;
+	}
+
       /* Failsafe mode: no data found.  */
       cu->lines = (void *) -1l;
       cu->files = (void *) -1l;

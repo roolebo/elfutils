@@ -64,4 +64,70 @@ cuhl = 11, o = 267, asz = 4, osz = 4, ncu = 2680
  file[1] = "/shoggoth/drepper/m.c"
 EOF
 
+# see tests/testfile-dwarf-45.source
+testfiles testfile-splitdwarf-4 testfile-hello4.dwo testfile-world4.dwo
+testfiles testfile-splitdwarf-5 testfile-hello5.dwo testfile-world5.dwo
+
+testrun_compare ${abs_builddir}/get-files testfile-splitdwarf-4 testfile-hello4.dwo testfile-world4.dwo <<\EOF
+cuhl = 11, o = 0, asz = 8, osz = 4, ncu = 52
+ dirs[0] = "/home/mark/src/elfutils/tests"
+ dirs[1] = "/opt/local/install/gcc/lib/gcc/x86_64-pc-linux-gnu/9.0.0/include"
+ file[0] = "???"
+ file[1] = "/home/mark/src/elfutils/tests/hello.c"
+ file[2] = "/home/mark/src/elfutils/tests/hello.h"
+ file[3] = "/opt/local/install/gcc/lib/gcc/x86_64-pc-linux-gnu/9.0.0/include/stddef.h"
+cuhl = 11, o = 26, asz = 8, osz = 4, ncu = 104
+ dirs[0] = "/home/mark/src/elfutils/tests"
+ dirs[1] = "/usr/include"
+ file[0] = "???"
+ file[1] = "/home/mark/src/elfutils/tests/world.c"
+ file[2] = "/home/mark/src/elfutils/tests/hello.h"
+ file[3] = "/usr/include/stdlib.h"
+cuhl = 11, o = 0, asz = 8, osz = 4, ncu = 414
+ dirs[0] = "/home/mark/src/elfutils/tests"
+ dirs[1] = "/opt/local/install/gcc/lib/gcc/x86_64-pc-linux-gnu/9.0.0/include"
+ file[0] = "???"
+ file[1] = "/home/mark/src/elfutils/tests/hello.c"
+ file[2] = "/home/mark/src/elfutils/tests/hello.h"
+ file[3] = "/opt/local/install/gcc/lib/gcc/x86_64-pc-linux-gnu/9.0.0/include/stddef.h"
+cuhl = 11, o = 0, asz = 8, osz = 4, ncu = 331
+ dirs[0] = "/home/mark/src/elfutils/tests"
+ dirs[1] = "/usr/include"
+ file[0] = "???"
+ file[1] = "/home/mark/src/elfutils/tests/world.c"
+ file[2] = "/home/mark/src/elfutils/tests/hello.h"
+ file[3] = "/usr/include/stdlib.h"
+EOF
+
+testrun_compare ${abs_builddir}/get-files testfile-splitdwarf-5 testfile-hello5.dwo testfile-world5.dwo <<\EOF
+cuhl = 20, o = 0, asz = 8, osz = 4, ncu = 53
+ dirs[0] = "/home/mark/src/elfutils/tests"
+ dirs[1] = "/opt/local/install/gcc/lib/gcc/x86_64-pc-linux-gnu/9.0.0/include"
+ file[0] = "/home/mark/src/elfutils/tests/hello.c"
+ file[1] = "/home/mark/src/elfutils/tests/hello.c"
+ file[2] = "/home/mark/src/elfutils/tests/hello.h"
+ file[3] = "/opt/local/install/gcc/lib/gcc/x86_64-pc-linux-gnu/9.0.0/include/stddef.h"
+cuhl = 20, o = 21, asz = 8, osz = 4, ncu = 106
+ dirs[0] = "/home/mark/src/elfutils/tests"
+ dirs[1] = "/usr/include"
+ file[0] = "/home/mark/src/elfutils/tests/world.c"
+ file[1] = "/home/mark/src/elfutils/tests/world.c"
+ file[2] = "/home/mark/src/elfutils/tests/hello.h"
+ file[3] = "/usr/include/stdlib.h"
+cuhl = 20, o = 0, asz = 8, osz = 4, ncu = 386
+ dirs[0] = "/home/mark/src/elfutils/tests"
+ dirs[1] = "/opt/local/install/gcc/lib/gcc/x86_64-pc-linux-gnu/9.0.0/include"
+ file[0] = "/home/mark/src/elfutils/tests/hello.c"
+ file[1] = "/home/mark/src/elfutils/tests/hello.c"
+ file[2] = "/home/mark/src/elfutils/tests/hello.h"
+ file[3] = "/opt/local/install/gcc/lib/gcc/x86_64-pc-linux-gnu/9.0.0/include/stddef.h"
+cuhl = 20, o = 0, asz = 8, osz = 4, ncu = 296
+ dirs[0] = "/home/mark/src/elfutils/tests"
+ dirs[1] = "/usr/include"
+ file[0] = "/home/mark/src/elfutils/tests/world.c"
+ file[1] = "/home/mark/src/elfutils/tests/world.c"
+ file[2] = "/home/mark/src/elfutils/tests/hello.h"
+ file[3] = "/usr/include/stdlib.h"
+EOF
+
 exit 0

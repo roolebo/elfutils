@@ -114,6 +114,7 @@ __libdw_intern_next_unit (Dwarf *dbg, bool debug_types)
   newp->subdie_offset = subdie_offset;
   Dwarf_Abbrev_Hash_init (&newp->abbrev_hash, 41);
   newp->orig_abbrev_offset = newp->last_abbrev_offset = abbrev_offset;
+  newp->files = NULL;
   newp->lines = NULL;
   newp->locs = NULL;
   newp->split = (Dwarf_CU *) -1;

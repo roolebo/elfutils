@@ -1,3 +1,12 @@
+2018-05-18  Mark Wielaard  <mark@klomp.org>
+
+	* libdw_findcu.c (__libdw_intern_next_unit): Init files to NULL.
+	* dwarf_getsrclines.c (dwarf_getsrclines): Handle split units by
+	taking the line table from the skeleton.
+	* dwarf_getsrcfiles.c (dwarf_getsrcfiles): Handle split units by
+	only taking the files from .debug_line offset zero (if it exists),
+	otherwise fall back to the skeleton.
+
 2018-05-17  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_begin_elf.c (__libdw_debugdir): New function.

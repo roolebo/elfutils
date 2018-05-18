@@ -122,7 +122,17 @@ dwarf_ranges (Dwarf_Die *die, ptrdiff_t offset, Dwarf_Addr *basep,
 
   /* We have to look for a noncontiguous range.  */
   size_t secidx = IDX_debug_ranges;
-  const Elf_Data *d = die->cu->dbg->sectiondata[secidx];
+  Dwarf_CU *cu = die->cu;
+  const Elf_Data *d = cu->dbg->sectiondata[secidx];
+  if (d == NULL && cu->unit_type == DW_UT_split_compile)
+    {
+      Dwarf_CU *skel = __libdw_find_split_unit (cu);
+      if (skel != NULL)
+	{
+	  cu = skel;
+	  d = cu->dbg->sectiondata[secidx];
+	}
+    }
 
   const unsigned char *readp;
   const unsigned char *readendp;
@@ -131,6 +141,10 @@ dwarf_ranges (Dwarf_Die *die, ptrdiff_t offset, Dwarf_Addr *basep,
       Dwarf_Attribute attr_mem;
       Dwarf_Attribute *attr = INTUSE(dwarf_attr) (die, DW_AT_ranges,
 						  &attr_mem);
+      if (attr == NULL
+	  && is_cudie (die)
+	  && die->cu->unit_type == DW_UT_split_compile)
+	attr = INTUSE(dwarf_attr_integrate) (die, DW_AT_ranges, &attr_mem);
       if (attr == NULL)
 	/* No PC attributes in this DIE at all, so an empty range list.  */
 	return 0;
@@ -144,7 +158,7 @@ dwarf_ranges (Dwarf_Die *die, ptrdiff_t offset, Dwarf_Addr *basep,
     }
   else
     {
-      if (__libdw_offset_in_section (die->cu->dbg,
+      if (__libdw_offset_in_section (cu->dbg,
 				     secidx, offset, 1))
 	return -1;
     }
@@ -156,9 +170,9 @@ dwarf_ranges (Dwarf_Die *die, ptrdiff_t offset, Dwarf_Addr *basep,
   Dwarf_Addr end;
 
  next:
-  switch (__libdw_read_begin_end_pair_inc (die->cu->dbg, secidx,
+  switch (__libdw_read_begin_end_pair_inc (cu->dbg, secidx,
 					   &readp, readendp,
-					   die->cu->address_size,
+					   cu->address_size,
 					   &begin, &end, basep))
     {
     case 0:

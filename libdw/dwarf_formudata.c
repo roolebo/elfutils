@@ -43,6 +43,17 @@ __libdw_formptr (Dwarf_Attribute *attr, int sec_index,
     return NULL;
 
   const Elf_Data *d = attr->cu->dbg->sectiondata[sec_index];
+  Dwarf_CU *skel = NULL; /* See below, needed for GNU DebugFission.  */
+  if (unlikely (d == NULL
+		&& sec_index == IDX_debug_ranges
+		&& attr->cu->version < 5
+		&& attr->cu->unit_type == DW_UT_split_compile))
+    {
+      skel = __libdw_find_split_unit (attr->cu);
+      if (skel != NULL)
+	d = skel->dbg->sectiondata[IDX_debug_ranges];
+    }
+
   if (unlikely (d == NULL))
     {
       __libdw_seterrno (err_nodata);
@@ -52,10 +63,41 @@ __libdw_formptr (Dwarf_Attribute *attr, int sec_index,
   Dwarf_Word offset;
   if (attr->form == DW_FORM_sec_offset)
     {
-      if (__libdw_read_offset (attr->cu->dbg, attr->cu->dbg,
-			       cu_sec_idx (attr->cu), attr->valp,
-			       attr->cu->offset_size, &offset, sec_index, 0))
-	return NULL;
+      /* GNU DebugFission is slightly odd.  It uses DW_FORM_sec_offset
+	 in split units, but they are really (unrelocated) offsets
+	 from the skeleton DW_AT_GNU_ranges_base (which is only used
+	 for the split unit, not the skeleton ranges itself, see also
+	 DW_AT_rnglists_base, which is used in DWARF5 for both, but
+	 points to the offsets index).  So it isn't really a formptr,
+	 but an offset + base calculation.  */
+      if (unlikely (skel != NULL))
+	{
+	  Elf_Data *data = attr->cu->dbg->sectiondata[cu_sec_idx (attr->cu)];
+	  const unsigned char *datap = attr->valp;
+	  size_t size = attr->cu->offset_size;
+	  if (unlikely (data == NULL
+			|| datap < (const unsigned char *) data->d_buf
+			|| data->d_size < size
+			|| ((size_t) (datap
+				      - (const unsigned char *) data->d_buf)
+			    > data->d_size - size)))
+	    goto invalid;
+
+	  if (size == 4)
+	    offset = read_4ubyte_unaligned (attr->cu->dbg, datap);
+	  else
+	    offset = read_8ubyte_unaligned (attr->cu->dbg, datap);
+
+	  offset += __libdw_cu_ranges_base (skel);
+	}
+      else
+	{
+	  if (__libdw_read_offset (attr->cu->dbg, attr->cu->dbg,
+				   cu_sec_idx (attr->cu), attr->valp,
+				   attr->cu->offset_size, &offset,
+				   sec_index, 0))
+	    return NULL;
+	}
     }
   else if (attr->cu->version > 3)
     goto invalid;

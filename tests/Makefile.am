@@ -56,7 +56,8 @@ check_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  elfshphehdr elfstrmerge dwelfgnucompressed elfgetchdr \
 		  elfgetzdata elfputzdata zstrptr emptyfile vendorelf \
 		  fillfile dwarf_default_lower_bound dwarf-die-addr-die \
-		  get-units-invalid get-units-split attr-integrate-skel
+		  get-units-invalid get-units-split attr-integrate-skel \
+		  all-dwarf-ranges
 
 asm_TESTS = asm-tst1 asm-tst2 asm-tst3 asm-tst4 asm-tst5 \
 	    asm-tst6 asm-tst7 asm-tst8 asm-tst9
@@ -141,7 +142,8 @@ TESTS = run-arextract.sh run-arsymtest.sh run-ar.sh newfile test-nlist \
 	emptyfile vendorelf fillfile dwarf_default_lower_bound \
 	run-dwarf-die-addr-die.sh \
 	run-get-units-invalid.sh run-get-units-split.sh \
-	run-attr-integrate-skel.sh
+	run-attr-integrate-skel.sh \
+	run-all-dwarf-ranges.sh
 
 if !BIARCH
 export ELFUTILS_DISABLE_BIARCH = 1
@@ -366,7 +368,9 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     testfile-hello4.dwo.bz2 testfile-hello5.dwo.bz2 \
 	     testfile-splitdwarf-4.bz2 testfile-splitdwarf-5.bz2 \
 	     testfile-world5.dwo.bz2 testfile-world4.dwo.bz2 \
-	     run-attr-integrate-skel.sh
+	     run-attr-integrate-skel.sh \
+	     run-all-dwarf-ranges.sh testfilesplitranges4.debug.bz2 \
+	     testfile-ranges-hello.dwo.bz2 testfile-ranges-world.dwo.bz2
 
 if USE_VALGRIND
 valgrind_cmd='valgrind -q --leak-check=full --error-exitcode=1'
@@ -528,6 +532,7 @@ dwarf_die_addr_die_LDADD = $(libdw)
 get_units_invalid_LDADD = $(libdw)
 get_units_split_LDADD = $(libdw)
 attr_integrate_skel_LDADD = $(libdw)
+all_dwarf_ranges_LDADD = $(libdw)
 
 # We want to test the libelf header against the system elf.h header.
 # Don't include any -I CPPFLAGS.

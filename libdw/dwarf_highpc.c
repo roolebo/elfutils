@@ -1,7 +1,6 @@
 /* Return high PC attribute of DIE.
-   Copyright (C) 2003, 2005, 2012 Red Hat, Inc.
+   Copyright (C) 2003, 2005, 2012, 2018 Red Hat, Inc.
    This file is part of elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
    This file is free software; you can redistribute it and/or modify
    it under the terms of either
@@ -39,8 +38,14 @@ int
 dwarf_highpc (Dwarf_Die *die, Dwarf_Addr *return_addr)
 {
   Dwarf_Attribute attr_high_mem;
-  Dwarf_Attribute *attr_high = INTUSE(dwarf_attr) (die, DW_AT_high_pc,
-						   &attr_high_mem);
+  Dwarf_Attribute *attr_high;
+  /* Split compile DIEs inherit high_pc from their skeleton DIE.  */
+  if (is_cudie (die) && die->cu->unit_type == DW_UT_split_compile)
+    attr_high = INTUSE(dwarf_attr_integrate) (die, DW_AT_high_pc,
+					      &attr_high_mem);
+  else
+    attr_high = INTUSE(dwarf_attr) (die, DW_AT_high_pc, &attr_high_mem);
+
   if (attr_high == NULL)
     return -1;
 
@@ -48,10 +53,7 @@ dwarf_highpc (Dwarf_Die *die, Dwarf_Addr *return_addr)
     return INTUSE(dwarf_formaddr) (attr_high, return_addr);
 
   /* DWARF 4 allows high_pc to be a constant offset from low_pc. */
-  Dwarf_Attribute attr_low_mem;
-  if (INTUSE(dwarf_formaddr) (INTUSE(dwarf_attr) (die, DW_AT_low_pc,
-						  &attr_low_mem),
-			      return_addr) == 0)
+  if (INTUSE(dwarf_lowpc) (die, return_addr) == 0)
     {
       Dwarf_Word uval;
       if (INTUSE(dwarf_formudata) (attr_high, &uval) == 0)

@@ -1,5 +1,19 @@
 2018-05-18  Mark Wielaard  <mark@klomp.org>
 
+	* tests/Makefiles.am (check_PROGRAMS): Add all-dwarf-ranges.
+	(TESTS): Add run-all-dwarf-ranges.sh.
+	(EXTRA_DIST): Add run-all-dwarf-ranges.sh,
+	testfilesplitranges4.debug.bz2, testfile-ranges-hello.dwo.bz2
+	and testfile-ranges-world.dwo.bz2.
+	(all_dwarf_ranges_LDADD): New variable.
+	* all-dwarf-ranges.c: New test program.
+	* run-all-dwarf-ranges: New test runner.
+	* testfile-ranges-hello.dwo.bz2: New test file.
+	* testfile-ranges-world.dwo.bz2: Likewise.
+	* testfilesplitranges4.debug.bz2: Likewise.
+
+2018-05-18  Mark Wielaard  <mark@klomp.org>
+
 	* run-get-files.sh: Add testcases for testfile-splitdwarf-4,
 	testfile-hello4.dwo, testfile-world4.dwo and testfile-splitdwarf-5,
 	testfile-hello5.dwo, testfile-world5.dwo.

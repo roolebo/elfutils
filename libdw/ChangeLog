@@ -1,5 +1,17 @@
 2018-05-18  Mark Wielaard  <mark@klomp.org>
 
+	* dwarf_formudata.c (__libdw_formptr): Handle the special case
+	of IDX_debug_ranges for DW_UT_split_compile with version < 5.
+	* dwarf_highpc.c (dwarf_highpc): Use dwarf_lowpc, check for
+	split compile cudie.
+	* dwarf_lowpc.c (dwarf_lowpc): Check for split compile cudie.
+	* dwarf_ranges.c (dwarf_ranges): Switch cu and sectiondata for
+	split compile units.
+	* libdwP.h (struct Dwarf_CU): Add ranges_base field.
+	(__libdw_cu_ranges_base): New static inline function.
+
+2018-05-18  Mark Wielaard  <mark@klomp.org>
+
 	* libdw_findcu.c (__libdw_intern_next_unit): Init files to NULL.
 	* dwarf_getsrclines.c (dwarf_getsrclines): Handle split units by
 	taking the line table from the skeleton.

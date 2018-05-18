@@ -1,7 +1,6 @@
 /* Return low PC attribute of DIE.
-   Copyright (C) 2003, 2005 Red Hat, Inc.
+   Copyright (C) 2003, 2005, 2018 Red Hat, Inc.
    This file is part of elfutils.
-   Written by Ulrich Drepper <drepper@redhat.com>, 2003.
 
    This file is free software; you can redistribute it and/or modify
    it under the terms of either
@@ -38,10 +37,12 @@
 int
 dwarf_lowpc (Dwarf_Die *die, Dwarf_Addr *return_addr)
 {
-  Dwarf_Attribute attr_mem;
-
-  return INTUSE(dwarf_formaddr) (INTUSE(dwarf_attr) (die, DW_AT_low_pc,
-						     &attr_mem),
-				 return_addr);
+  Dwarf_Attribute attr_mem, *attr;
+  /* Split compile DIEs inherit low_pc from their skeleton DIE.  */
+  if (is_cudie (die) && die->cu->unit_type == DW_UT_split_compile)
+    attr = INTUSE(dwarf_attr_integrate) (die, DW_AT_low_pc, &attr_mem);
+  else
+    attr = INTUSE(dwarf_attr) (die, DW_AT_low_pc, &attr_mem);
+  return INTUSE(dwarf_formaddr) (attr, return_addr);
 }
 INTDEF(dwarf_lowpc)

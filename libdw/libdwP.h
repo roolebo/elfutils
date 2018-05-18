@@ -352,6 +352,11 @@ struct Dwarf_CU
      Don't access directly, call __libdw_cu_str_off_base.  */
   Dwarf_Off str_off_base;
 
+  /* The offset into the .debug_ranges section to use for GNU
+     DebugFission split units.  Don't access directly, call
+     __libdw_cu_ranges_base.  */
+  Dwarf_Off ranges_base;
+
   /* Memory boundaries of this CU.  */
   void *startp;
   void *endp;
@@ -1052,6 +1057,27 @@ str_offsets_base_off (Dwarf *dbg, Dwarf_CU *cu)
 static inline Dwarf_Off __libdw_cu_str_off_base (Dwarf_CU *cu)
 {
   return str_offsets_base_off (NULL, cu);
+}
+
+
+static inline Dwarf_Off
+__libdw_cu_ranges_base (Dwarf_CU *cu)
+{
+  if (cu->ranges_base == (Dwarf_Off) -1)
+    {
+      Dwarf_Off offset = 0;
+      Dwarf_Die cu_die = CUDIE(cu);
+      Dwarf_Attribute attr;
+      if (dwarf_attr (&cu_die, DW_AT_GNU_ranges_base, &attr) != NULL)
+	{
+	  Dwarf_Word off;
+	  if (dwarf_formudata (&attr, &off) == 0)
+	    offset = off;
+	}
+      cu->ranges_base = offset;
+    }
+
+  return cu->ranges_base;
 }
 
 

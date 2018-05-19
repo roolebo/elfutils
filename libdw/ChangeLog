@@ -1,3 +1,7 @@
+2018-05-19  Mark Wielaard  <mark@klomp.org>
+
+	* libdwP.h (__libdw_find_split_unit): Mark as internal_function.
+
 2018-05-15  Mark Wielaard  <mark@klomp.org>
 
 	* Makefile.am (libdw_a_SOURCES): Add libdw_find_split_unit.c.

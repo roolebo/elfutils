@@ -596,7 +596,8 @@ extern struct Dwarf_CU *__libdw_findcu_addr (Dwarf *dbg, void *addr)
      __nonnull_attribute__ (1) internal_function;
 
 /* Find the split (or skeleton) unit.  */
-extern struct Dwarf_CU *__libdw_find_split_unit (Dwarf_CU *cu);
+extern struct Dwarf_CU *__libdw_find_split_unit (Dwarf_CU *cu)
+     internal_function;
 
 /* Get abbreviation with given code.  */
 extern Dwarf_Abbrev *__libdw_findabbrev (struct Dwarf_CU *cu,

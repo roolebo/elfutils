@@ -1,3 +1,12 @@
+2018-05-20  Mark Wielaard  <mark@klomp.org>
+
+	* unit-info.c: New test.
+	* run-unit-info.sh: New test runner.
+	* Makefile.am (check_PROGRAMS): Add unit-info.
+	(TESTS): Add run-unit-info.sh
+	(EXTRA_INFO): Likewise.
+	(unit_info_LDADD): New variable.
+
 2018-05-24  Mark Wielaard  <mark@klomp.org>
 
 	* get-units-invalid.c (main): Add check for invalid dwarf_ranges.

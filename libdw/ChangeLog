@@ -1,3 +1,10 @@
+2018-05-20  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_cu_info.c: New file.
+	* Makefile.am (libdw_a_SOURCES): Add dwarf_cu_info.c.
+	* libdw.h (dwarf_cu_info): New function declaration.
+	* libdw.map (ELFUTILS_0.171): Add dwarf_cu_info.
+
 2018-05-24  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_ranges.c (dwarf_ranges): Check for NULL cu.

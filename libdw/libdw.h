@@ -297,12 +297,24 @@ extern int dwarf_next_unit (Dwarf *dwarf, Dwarf_Off off, Dwarf_Off *next_off,
    DW_UT_type for DW_TAG_type_unit or DW_UT_partial for
    DW_TAG_partial_unit), otherwise it is set to zero.  If unavailable
    (the version or unit type is unknown) the CU DIE is cleared.
-   Likewise ff the sub DIE isn't isn't available (the unit type is not
+   Likewise if the sub DIE isn't isn't available (the unit type is not
    DW_UT_type or DW_UT_split_type) the sub DIE tag is cleared.  */
 extern int dwarf_get_units (Dwarf *dwarf, Dwarf_CU *cu, Dwarf_CU **next_cu,
 			    Dwarf_Half *version, uint8_t *unit_type,
 			    Dwarf_Die *cudie, Dwarf_Die *subdie)
      __nonnull_attribute__ (3);
+
+/* Provides information and DIEs associated with the given Dwarf_CU
+   unit.  Returns -1 on error, zero on success. Arguments not needed
+   may be NULL.  If they are NULL and aren't known yet, they won't be
+   looked up.  If the subdie doesn't exist for this unit_type it will
+   be cleared.  If there is no unit_id for this unit type it will be
+   set to zero.  */
+extern int dwarf_cu_info (Dwarf_CU *cu,
+			  Dwarf_Half *version, uint8_t *unit_type,
+			  Dwarf_Die *cudie, Dwarf_Die *subdie,
+			  uint64_t *unit_id,
+			  uint8_t *address_size, uint8_t *offset_size);
 
 /* Decode one DWARF CFI entry (CIE or FDE) from the raw section data.
    The E_IDENT from the originating ELF file indicates the address

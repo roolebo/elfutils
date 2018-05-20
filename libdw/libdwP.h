@@ -204,6 +204,9 @@ struct Dwarf
      came from a location list entry in dwarf_getlocation_attr.  */
   struct Dwarf_CU *fake_loc_cu;
 
+  /* Similar for addrx/constx, which will come from .debug_addr section.  */
+  struct Dwarf_CU *fake_addr_cu;
+
   /* Internal memory handling.  This is basically a simplified
      reimplementation of obstacks.  Unfortunately the standard obstack
      implementation is not usable in libraries.  */
@@ -947,7 +950,26 @@ const char *__libdw_getcompdir (Dwarf_Die *cudie);
 Dwarf_Addr __libdw_cu_base_address (Dwarf_CU *cu);
 
 /* Get the address base for the CU, fetches it when not yet set.  */
-Dwarf_Off __libdw_cu_addr_base (Dwarf_CU *cu);
+static inline Dwarf_Off
+__libdw_cu_addr_base (Dwarf_CU *cu)
+{
+  if (cu->addr_base == (Dwarf_Off) -1)
+    {
+      Dwarf_Die cu_die = CUDIE(cu);
+      Dwarf_Attribute attr;
+      Dwarf_Off offset = 0;
+      if (dwarf_attr (&cu_die, DW_AT_GNU_addr_base, &attr) != NULL
+	  || dwarf_attr (&cu_die, DW_AT_addr_base, &attr) != NULL)
+	{
+	  Dwarf_Word off;
+	  if (dwarf_formudata (&attr, &off) == 0)
+	    offset = off;
+	}
+      cu->addr_base = offset;
+    }
+
+  return cu->addr_base;
+}
 
 /* Gets the .debug_str_offsets base offset to use.  static inline to
    be shared between libdw and eu-readelf.  */

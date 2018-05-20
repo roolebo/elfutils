@@ -1,3 +1,12 @@
+2018-01-21  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (get_indexed_addr): New function.
+	(print_ops): Handle DW_OP_addrx, DW_OP_GNU_addr_index,
+	DW_OP_constx, DW_OP_GNU_const_index separately and resolve
+	address.
+	(attr_callback): Print index and address for
+	DW_FORM_GNU_addr_index and DW_FORM_addrx[1234].
+
 2018-01-19  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (options): Add info+.

@@ -246,6 +246,33 @@ valid_p (Dwarf *result)
 	}
     }
 
+  /* For DW_OP_constx/GNU_const_index and DW_OP_addrx/GNU_addr_index
+     the dwarf_location_attr () will need a "fake" address CU to
+     indicate where the attribute data comes from.  This is a just
+     inside the .debug_addr section, if it exists.  */
+  if (result != NULL && result->sectiondata[IDX_debug_addr] != NULL)
+    {
+      result->fake_addr_cu = (Dwarf_CU *) calloc (1, sizeof (Dwarf_CU));
+      if (unlikely (result->fake_addr_cu == NULL))
+	{
+	  Dwarf_Sig8_Hash_free (&result->sig8_hash);
+	  __libdw_seterrno (DWARF_E_NOMEM);
+	  free (result->fake_loc_cu);
+	  free (result);
+	  result = NULL;
+	}
+      else
+	{
+	  result->fake_addr_cu->sec_idx = IDX_debug_addr;
+	  result->fake_addr_cu->dbg = result;
+	  result->fake_addr_cu->startp
+	    = result->sectiondata[IDX_debug_addr]->d_buf;
+	  result->fake_addr_cu->endp
+	    = (result->sectiondata[IDX_debug_addr]->d_buf
+	       + result->sectiondata[IDX_debug_addr]->d_size);
+	}
+    }
+
   if (result != NULL)
     result->debugdir = __libdw_debugdir (result->elf->fildes);
 

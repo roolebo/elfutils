@@ -1,3 +1,17 @@
+2018-05-21  Mark Wielaard  <mark@klomp.org>
+
+	* addrx_constx-4.dwo.bz2: New testfile.
+	* addrx_constx-5.dwo.bz2: Likewise.
+	* testfile-addrx_constx-4.bz2: Likewise.
+	* testfile-addrx_constx-5.bz2: Likewise
+	* Makefile.am (EXTRA_DIST): Add addrx_constx-5.dwo.bz2
+	testfile-addrx_constx-4\ .bz2 testfile-addrx_constx-5.bz2.
+	* run-varlocs.sh: Add addrx_constx tests for DWARF4 and DWARF5.
+	* varlocx.c (print_expr): Handle DW_OP_GNU_addr_index,
+	DW_OP_addrx, DW_OP_GNU_const_index and DW_OP_constx.
+	(main): Handle split DWARF.
+	* run-all-dwarf-ranges.sh: Add new ranges for addrx low/highpc.
+
 2018-05-20  Mark Wielaard  <mark@klomp.org>
 
 	* unit-info.c: New test.

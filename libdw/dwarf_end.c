@@ -59,7 +59,12 @@ cu_free (void *arg)
   /* Free split dwarf one way (from skeleton to split).  */
   if (p->unit_type == DW_UT_skeleton
       && p->split != NULL && p->split != (void *)-1)
-    INTUSE(dwarf_end) (p->split->dbg);
+    {
+      /* The fake_addr_cu might be shared, only release one.  */
+      if (p->dbg->fake_addr_cu == p->split->dbg->fake_addr_cu)
+	p->split->dbg->fake_addr_cu = NULL;
+      INTUSE(dwarf_end) (p->split->dbg);
+    }
 }
 
 
@@ -107,6 +112,11 @@ dwarf_end (Dwarf *dwarf)
 	{
 	  cu_free (dwarf->fake_loc_cu);
 	  free (dwarf->fake_loc_cu);
+	}
+      if (dwarf->fake_addr_cu != NULL)
+	{
+	  cu_free (dwarf->fake_addr_cu);
+	  free (dwarf->fake_addr_cu);
 	}
 
       /* Did we find and allocate the alt Dwarf ourselves?  */

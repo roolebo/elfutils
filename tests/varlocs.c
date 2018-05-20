@@ -652,6 +652,42 @@ print_expr (Dwarf_Attribute *attr, Dwarf_Op *expr, Dwarf_Addr addr)
       }
       break;
 
+    case DW_OP_GNU_addr_index:
+    case DW_OP_addrx:
+      /* Address from the .debug_addr section (indexed based on CU).  */
+      {
+	Dwarf_Attribute addr_attr;
+	if (dwarf_getlocation_attr (attr, expr, &addr_attr) != 0)
+	  error (EXIT_FAILURE, 0, "dwarf_getlocation_attr for addr: %s",
+		 dwarf_errmsg (-1));
+
+	Dwarf_Addr address;
+	if (dwarf_formaddr (&addr_attr, &address) != 0)
+	  error (EXIT_FAILURE, 0, "dwarf_formaddr address failed: %s",
+		 dwarf_errmsg (-1));
+
+	printf ("addr: 0x%" PRIx64, address);
+      }
+      break;
+
+    case DW_OP_GNU_const_index:
+    case DW_OP_constx:
+      /* Constant from the .debug_addr section (indexed based on CU).  */
+      {
+	Dwarf_Attribute addr_attr;
+	if (dwarf_getlocation_attr (attr, expr, &addr_attr) != 0)
+	  error (EXIT_FAILURE, 0, "dwarf_getlocation_attr for addr: %s",
+		 dwarf_errmsg (-1));
+
+	Dwarf_Word constant;
+	if (dwarf_formudata (&addr_attr, &constant) != 0)
+	  error (EXIT_FAILURE, 0, "dwarf_formudata constant failed: %s",
+		 dwarf_errmsg (-1));
+
+	printf ("const: 0x%" PRIx64, constant);
+      }
+      break;
+
     default:
       error (EXIT_FAILURE, 0, "unhandled opcode: DW_OP_%s (0x%x)",
 	     opname, atom);
@@ -1019,9 +1055,18 @@ main (int argc, char *argv[])
       /* Only walk actual compile units (not partial units) that
 	 contain code if we are only interested in the function variable
 	 locations.  */
+      Dwarf_Die cudie;
+      Dwarf_Die subdie;
+      uint8_t unit_type;
+      if (dwarf_cu_info (cu->cu, NULL, &unit_type, &cudie, &subdie,
+		         NULL, NULL, NULL) != 0)
+	error (EXIT_FAILURE, 0, "dwarf_cu_info: %s", dwarf_errmsg (-1));
+      if (unit_type == DW_UT_skeleton)
+	cudie = subdie;
+
       Dwarf_Addr cubase;
-      if (dwarf_tag (cu) == DW_TAG_compile_unit
-	  && (exprlocs || dwarf_lowpc (cu, &cubase) == 0))
+      if (dwarf_tag (&cudie) == DW_TAG_compile_unit
+	  && (exprlocs || dwarf_lowpc (&cudie, &cubase) == 0))
 	{
 	  found_cu = true;
 
@@ -1043,7 +1088,7 @@ main (int argc, char *argv[])
 			      ? modname
 			      :  basename (mainfile));
 	  printf ("module '%s'\n", name);
-	  print_die (cu, "CU", 0);
+	  print_die (&cudie, "CU", 0);
 
 	  Dwarf_Addr elfbias;
 	  Elf *elf = dwfl_module_getelf (mod, &elfbias);
@@ -1060,18 +1105,10 @@ main (int argc, char *argv[])
 	  GElf_Ehdr ehdr_mem, *ehdr = gelf_getehdr (elf, &ehdr_mem);
 	  is_ET_REL = ehdr->e_type == ET_REL;
 
-	  // Get the actual CU DIE and walk all all DIEs (or just the
-	  // functions) inside it.
-	  Dwarf_Die cudie;
-	  uint8_t offsize;
-	  uint8_t addrsize;
-	  if (dwarf_diecu (cu, &cudie, &addrsize, &offsize) == NULL)
-	    error (EXIT_FAILURE, 0, "dwarf_diecu %s", dwarf_errmsg (-1));
-
 	  if (exprlocs)
 	    {
 	      Dwarf_Addr entrypc;
-	      if (dwarf_entrypc (cu, &entrypc) != 0)
+	      if (dwarf_entrypc (&cudie, &entrypc) != 0)
 		entrypc = 0;
 
 	      /* XXX - Passing true for has_frame_base is not really true.
@@ -1079,9 +1116,9 @@ main (int argc, char *argv[])
 		 attributes. Technically we should check that the DIE
 		 (types) are referenced from variables that are defined in
 		 a context (function) that has a frame base.  */
-	      handle_die (cu, 0, true /* Should be false */, entrypc);
+	      handle_die (&cudie, 0, true /* Should be false */, entrypc);
 	    }
-	  else if (dwarf_getfuncs (cu, handle_function, NULL, 0) != 0)
+	  else if (dwarf_getfuncs (&cudie, handle_function, NULL, 0) != 0)
 	    error (EXIT_FAILURE, 0, "dwarf_getfuncs %s",
 		   dwarf_errmsg (-1));
 	}

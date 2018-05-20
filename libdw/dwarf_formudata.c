@@ -288,6 +288,39 @@ dwarf_formudata (Dwarf_Attribute *attr, Dwarf_Word *return_uval)
       get_sleb128_unchecked (*return_uval, datap);
       break;
 
+    /* These are indexes into the .debug_addr section, normally resolved
+       with dwarf_formaddr.  Here treat as constants.  */
+    case DW_FORM_GNU_addr_index:
+    case DW_FORM_addrx:
+      if (datap >= endp)
+	goto invalid;
+      get_uleb128 (*return_uval, datap, endp);
+      break;
+
+    case DW_FORM_addrx1:
+      if (datap >= endp - 1)
+	goto invalid;
+      *return_uval = *datap;
+      break;
+
+    case DW_FORM_addrx2:
+      if (datap >= endp - 2)
+	goto invalid;
+      *return_uval = read_2ubyte_unaligned (attr->cu->dbg, datap);
+      break;
+
+    case DW_FORM_addrx3:
+      if (datap >= endp - 3)
+	goto invalid;
+      *return_uval = read_3ubyte_unaligned (attr->cu->dbg, datap);
+      break;
+
+    case DW_FORM_addrx4:
+      if (datap >= endp - 4)
+	goto invalid;
+      *return_uval = read_4ubyte_unaligned (attr->cu->dbg, datap);
+      break;
+
     default:
       __libdw_seterrno (DWARF_E_NO_CONSTANT);
       return -1;

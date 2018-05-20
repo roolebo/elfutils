@@ -305,6 +305,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     testfile_entry_value.c testfile_entry_value.bz2 \
 	     testfile_implicit_value.c testfile_implicit_value.bz2 \
 	     testfile_aarch64_core.bz2 testfile_i686_core.bz2 \
+	     addrx_constx-4.dwo.bz2 addrx_constx-5.dwo.bz2 \
+	     testfile-addrx_constx-4.bz2 testfile-addrx_constx-5.bz2 \
 	     run-funcretval.sh funcretval_test.c funcretval_test_aarch64.bz2 \
 	     run-backtrace-data.sh run-backtrace-dwarf.sh cleanup-13.c \
 	     run-backtrace-native.sh run-backtrace-native-biarch.sh \

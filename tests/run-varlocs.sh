@@ -125,4 +125,212 @@ module 'testfile_implicit_pointer'
 EOF
 
 
+# DW_OP_addrx and DW_OP_constx testcases.
+#
+# int i, j, k;
+# __thread int l, m, n;
+#
+# int main ()
+# {
+#   int r1 = i + j + k;
+#   int r2 = l + m + n;
+#   int res = r1 + r2;
+#
+#   return res;
+# }
+#
+# gcc -O2 -gdwarf-5 -gsplit-dwarf -o addrx_constx-5.o -c addrx_constx.c
+# gcc -O2 -gdwarf-5 -gsplit-dwarf -o testfile-addrx_constx-5 addrx_constx-5.o
+# gcc -O2 -gdwarf-4 -gsplit-dwarf -o addrx_constx-4.o -c addrx_constx.c
+# gcc -O2 -gdwarf-4 -gsplit-dwarf -o testfile-addrx_constx-4 addrx_constx-4.o
+
+testfiles testfile-addrx_constx-5 addrx_constx-5.dwo
+testrun_compare ${abs_top_builddir}/tests/varlocs --exprlocs -e testfile-addrx_constx-5 <<\EOF
+module 'testfile-addrx_constx-5'
+[14] CU 'addrx_constx.c'
+  producer (strx)
+  language (data1)
+  name (strx)
+  comp_dir (strx)
+  [19] variable "i"
+    name (string)
+    decl_file (implicit_const)
+    decl_line (data1)
+    decl_column (data1)
+    type (ref4)
+    external (flag_present)
+    location (exprloc) {addr: 0x404038}
+  [25] base_type "int"
+    byte_size (data1)
+    encoding (data1)
+    name (string)
+  [2c] variable "j"
+    name (string)
+    decl_file (implicit_const)
+    decl_line (data1)
+    decl_column (data1)
+    type (ref4)
+    external (flag_present)
+    location (exprloc) {addr: 0x404034}
+  [38] variable "k"
+    name (string)
+    decl_file (implicit_const)
+    decl_line (data1)
+    decl_column (data1)
+    type (ref4)
+    external (flag_present)
+    location (exprloc) {addr: 0x40403c}
+  [44] variable "l"
+    name (string)
+    decl_file (implicit_const)
+    decl_line (data1)
+    decl_column (data1)
+    type (ref4)
+    external (flag_present)
+    location (exprloc) {const: 0x403e10, form_tls_address}
+  [51] variable "m"
+    name (string)
+    decl_file (implicit_const)
+    decl_line (data1)
+    decl_column (data1)
+    type (ref4)
+    external (flag_present)
+    location (exprloc) {const: 0x403e0c, form_tls_address}
+  [5e] variable "n"
+    name (string)
+    decl_file (implicit_const)
+    decl_line (data1)
+    decl_column (data1)
+    type (ref4)
+    external (flag_present)
+    location (exprloc) {const: 0x403e08, form_tls_address}
+  [6b] subprogram "main"
+    external (flag_present)
+    name (strx)
+    decl_file (data1)
+    decl_line (data1)
+    decl_column (data1)
+    type (ref4)
+    low_pc (addrx)
+    high_pc (data8)
+    frame_base (exprloc) {call_frame_cfa {bregx(7,8)}}
+    call_all_calls (flag_present)
+    [7f] variable "r1"
+      name (string)
+      decl_file (implicit_const)
+      decl_line (data1)
+      decl_column (implicit_const)
+      type (ref4)
+      location (exprloc) {addr: 0x404038, deref_size(4), addr: 0x404034, deref_size(4), plus, addr: 0x40403c, deref_size(4), plus, stack_value}
+    [98] variable "r2"
+      name (string)
+      decl_file (implicit_const)
+      decl_line (data1)
+      decl_column (implicit_const)
+      type (ref4)
+      location (exprloc) {form_tls_address, const: 0x403e10, deref_size(4), form_tls_address, const: 0x403e0c, deref_size(4), plus, form_tls_address, const: 0x403e08, deref_size(4), plus, stack_value}
+    [b4] variable "res"
+      name (string)
+      decl_file (implicit_const)
+      decl_line (data1)
+      decl_column (implicit_const)
+      type (ref4)
+      location (exprloc) {addr: 0x404038, deref_size(4), form_tls_address, const: 0x403e08, deref_size(4), plus, form_tls_address, const: 0x403e0c, deref_size(4), plus, form_tls_address, const: 0x403e10, deref_size(4), plus, addr: 0x404034, deref_size(4), plus, addr: 0x40403c, deref_size(4), plus, stack_value}
+EOF
+
+testfiles testfile-addrx_constx-4 addrx_constx-4.dwo
+testrun_compare ${abs_top_builddir}/tests/varlocs --exprlocs -e testfile-addrx_constx-4 <<\EOF
+module 'testfile-addrx_constx-4'
+[b] CU 'addrx_constx.c'
+  producer (GNU_str_index)
+  language (data1)
+  name (GNU_str_index)
+  comp_dir (GNU_str_index)
+  GNU_dwo_id (data8)
+  [18] variable "i"
+    name (string)
+    decl_file (data1)
+    decl_line (data1)
+    decl_column (data1)
+    type (ref4)
+    external (flag_present)
+    location (exprloc) {addr: 0x404038}
+  [25] base_type "int"
+    byte_size (data1)
+    encoding (data1)
+    name (string)
+  [2c] variable "j"
+    name (string)
+    decl_file (data1)
+    decl_line (data1)
+    decl_column (data1)
+    type (ref4)
+    external (flag_present)
+    location (exprloc) {addr: 0x404034}
+  [39] variable "k"
+    name (string)
+    decl_file (data1)
+    decl_line (data1)
+    decl_column (data1)
+    type (ref4)
+    external (flag_present)
+    location (exprloc) {addr: 0x40403c}
+  [46] variable "l"
+    name (string)
+    decl_file (data1)
+    decl_line (data1)
+    decl_column (data1)
+    type (ref4)
+    external (flag_present)
+    location (exprloc) {const: 0x403e10, GNU_push_tls_address}
+  [54] variable "m"
+    name (string)
+    decl_file (data1)
+    decl_line (data1)
+    decl_column (data1)
+    type (ref4)
+    external (flag_present)
+    location (exprloc) {const: 0x403e0c, GNU_push_tls_address}
+  [62] variable "n"
+    name (string)
+    decl_file (data1)
+    decl_line (data1)
+    decl_column (data1)
+    type (ref4)
+    external (flag_present)
+    location (exprloc) {const: 0x403e08, GNU_push_tls_address}
+  [70] subprogram "main"
+    external (flag_present)
+    name (GNU_str_index)
+    decl_file (data1)
+    decl_line (data1)
+    decl_column (data1)
+    type (ref4)
+    low_pc (GNU_addr_index)
+    high_pc (data8)
+    frame_base (exprloc) {call_frame_cfa {bregx(7,8)}}
+    GNU_all_call_sites (flag_present)
+    [84] variable "r1"
+      name (string)
+      decl_file (data1)
+      decl_line (data1)
+      decl_column (data1)
+      type (ref4)
+      location (exprloc) {addr: 0x404038, deref_size(4), addr: 0x404034, deref_size(4), plus, addr: 0x40403c, deref_size(4), plus, stack_value}
+    [9f] variable "r2"
+      name (string)
+      decl_file (data1)
+      decl_line (data1)
+      decl_column (data1)
+      type (ref4)
+      location (exprloc) {GNU_push_tls_address, const: 0x403e10, deref_size(4), GNU_push_tls_address, const: 0x403e0c, deref_size(4), plus, GNU_push_tls_address, const: 0x403e08, deref_size(4), plus, stack_value}
+    [bd] variable "res"
+      name (string)
+      decl_file (data1)
+      decl_line (data1)
+      decl_column (data1)
+      type (ref4)
+      location (exprloc) {addr: 0x404038, deref_size(4), GNU_push_tls_address, const: 0x403e08, deref_size(4), plus, GNU_push_tls_address, const: 0x403e0c, deref_size(4), plus, GNU_push_tls_address, const: 0x403e10, deref_size(4), plus, addr: 0x404034, deref_size(4), plus, addr: 0x40403c, deref_size(4), plus, stack_value}
+EOF
+
 exit 0

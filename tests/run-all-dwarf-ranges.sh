@@ -33,8 +33,29 @@ die: hello.c (11)
  4004e0..4004ff
  4003e0..4003f7
 
+die: no_say (2e)
+ 4004f0..4004ff
+
+die: main (2e)
+ 4003e0..4003f7
+
+die: subject (1d)
+ 4003e3..4003ef
+
+die: subject (2e)
+ 4004e0..4004f0
+
 die: world.c (11)
  400500..400567
+
+die: no_main (2e)
+ 400550..400567
+
+die: no_subject (1d)
+ 400553..40055f
+
+die: say (2e)
+ 400500..400540
 
 die: happy (1d)
  40051c..400526
@@ -44,6 +65,9 @@ die: happy (1d)
 die: sad (1d)
  40051c..400526
  400535..40053f
+
+die: no_subject (2e)
+ 400540..400550
 
 EOF
 

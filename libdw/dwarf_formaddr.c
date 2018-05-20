@@ -136,21 +136,3 @@ dwarf_formaddr (Dwarf_Attribute *attr, Dwarf_Addr *return_addr)
   return 0;
 }
 INTDEF(dwarf_formaddr)
-
-Dwarf_Off __libdw_cu_addr_base (Dwarf_CU *cu)
-{
-  if (cu->addr_base == (Dwarf_Off) -1)
-    {
-      Dwarf_Die cu_die = CUDIE(cu);
-      Dwarf_Attribute attr;
-      if (dwarf_attr (&cu_die, DW_AT_GNU_addr_base, &attr) != NULL
-	  || dwarf_attr (&cu_die, DW_AT_addr_base, &attr) != NULL)
-	{
-	  Dwarf_Word off;
-	  if (dwarf_formudata (&attr, &off) == 0)
-	    cu->addr_base = off;
-	}
-    }
-
-  return cu->addr_base;
-}

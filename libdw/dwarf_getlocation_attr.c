@@ -52,6 +52,18 @@ attr_form_cu (Dwarf_Attribute *attr)
     }
 }
 
+static unsigned char *
+addr_valp (Dwarf_CU *cu, Dwarf_Word index)
+{
+  Elf_Data *debug_addr = cu->dbg->sectiondata[IDX_debug_addr];
+  Dwarf_Word offset = __libdw_cu_addr_base (cu) + (index * cu->address_size);
+  if (debug_addr == NULL)
+    /* This is really an error, will trigger with dwarf_formaddr.  */
+    return (unsigned char *) offset;
+
+  return (unsigned char *) debug_addr->d_buf + offset;
+}
+
 int
 dwarf_getlocation_attr (Dwarf_Attribute *attr, const Dwarf_Op *op, Dwarf_Attribute *result)
 {
@@ -81,6 +93,25 @@ dwarf_getlocation_attr (Dwarf_Attribute *attr, const Dwarf_Op *op, Dwarf_Attribu
 	result->form = DW_FORM_block1;
 	result->valp = (unsigned char *) (uintptr_t) op->number2;
 	result->cu = attr_form_cu (attr);
+	break;
+
+      case DW_OP_GNU_const_index:
+      case DW_OP_constx:
+	result->code = DW_AT_const_value;
+	if (attr->cu->address_size == 4)
+	  result->form = DW_FORM_data4;
+	else
+	  result->form = DW_FORM_data8;
+	result->valp = addr_valp (attr->cu, op->number);
+	result->cu = attr->cu->dbg->fake_addr_cu;
+	break;
+
+      case DW_OP_GNU_addr_index:
+      case DW_OP_addrx:
+	result->code = DW_AT_low_pc;
+	result->form = DW_FORM_addr;
+	result->valp = addr_valp (attr->cu, op->number);
+	result->cu = attr->cu->dbg->fake_addr_cu;
 	break;
 
       case DW_OP_call2:

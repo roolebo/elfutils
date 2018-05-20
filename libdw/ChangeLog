@@ -1,3 +1,22 @@
+2018-05-21  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_begin_elf.c (valid_p): Add a fake_addr_cu to the result.
+	* dwarf_end.c (cu_free): Disconnect the fake_addr_cu from the split
+	dwarf if shared with skeleton.
+	(dwarf_end): release fake_addr_cu.
+	* dwarf_formaddr.c (__libdw_cu_addr_base): Move to...
+	* libdwP.h (__libdw_cu_addr_base): ... here.
+	(struct Dwarf): Add fake_addr_cu field.
+	* dwarf_formudata.c (dwarf_formudata): Handle
+	DW_FORM_GNU_addr_index and DW_FORM_addrx[1234].
+	* dwarf_getlocation_attr.c (addr_valp): New static function.
+	(dwarf_getlocation_attr): Create attribute for values of
+	DW_OP_GNU_const_index, DW_OP_constx and DW_OP_GNU_addr_index and
+	DW_OP_addrx.
+	* libdw_find_split_unit.c (__libdw_find_split_unit): Connect
+	IDX_debug_addr sectiondata and fake_addr_cu between split and
+	skeleton.
+
 2018-05-20  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_cu_info.c: New file.

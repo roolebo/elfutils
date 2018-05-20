@@ -4180,6 +4180,29 @@ print_bytes (size_t n, const unsigned char *bytes)
     }
 }
 
+static int
+get_indexed_addr (Dwarf_CU *cu, Dwarf_Word idx, Dwarf_Addr *addr)
+{
+  Elf_Data *debug_addr = cu->dbg->sectiondata[IDX_debug_addr];
+  if (debug_addr == NULL)
+    return -1;
+
+  Dwarf_Off base = __libdw_cu_addr_base (cu);
+  Dwarf_Word off = idx * cu->address_size;
+  if (base > debug_addr->d_size
+      || off > debug_addr->d_size - base
+      || cu->address_size > debug_addr->d_size - base - off)
+    return -1;
+
+  const unsigned char *addrp = debug_addr->d_buf + base + off;
+  if (cu->address_size == 4)
+    *addr = read_4ubyte_unaligned (cu->dbg, addrp);
+  else
+    *addr = read_8ubyte_unaligned (cu->dbg, addrp);
+
+  return 0;
+}
+
 static void
 print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	   unsigned int vers, unsigned int addrsize, unsigned int offset_size,
@@ -4348,11 +4371,7 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	case DW_OP_piece:
 	case DW_OP_regx:
 	case DW_OP_plus_uconst:
-	case DW_OP_constu:
-	case DW_OP_addrx:
-	case DW_OP_GNU_addr_index:
-	case DW_OP_constx:
-	case DW_OP_GNU_const_index:;
+	case DW_OP_constu:;
 	  const unsigned char *start = data;
 	  uint64_t uleb;
 	  NEED (1);
@@ -4361,6 +4380,27 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 		  indent, "", (uintmax_t) offset, op_name, uleb);
 	  CONSUME (data - start);
 	  offset += 1 + (data - start);
+	  break;
+
+	case DW_OP_addrx:
+	case DW_OP_GNU_addr_index:
+	case DW_OP_constx:
+	case DW_OP_GNU_const_index:;
+	  start = data;
+	  NEED (1);
+	  get_uleb128 (uleb, data, data + len);
+	  printf ("%*s[%2" PRIuMAX "] %s [%" PRIu64 "] ",
+		  indent, "", (uintmax_t) offset, op_name, uleb);
+	  CONSUME (data - start);
+	  offset += 1 + (data - start);
+	  if (get_indexed_addr (cu, uleb, &addr) != 0)
+	    printf ("???\n");
+	  else
+	    {
+	      a = format_dwarf_addr (dwflmod, 0, addr, addr);
+	      printf ("%s\n", a);
+	      free (a);
+	    }
 	  break;
 
 	case DW_OP_bit_piece:
@@ -6148,9 +6188,19 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	    }
 	  char *a = format_dwarf_addr (cbargs->dwflmod, cbargs->addrsize,
 				       addr, addr);
-	  printf ("           %*s%-20s (%s) %s\n",
-		  (int) (level * 2), "", dwarf_attr_name (attr),
-		  dwarf_form_name (form), a);
+	  if (form != DW_FORM_addr )
+	    {
+	      Dwarf_Word index;
+	      if (dwarf_formudata (attrp, &index) != 0)
+		goto attrval_out;
+	      printf ("           %*s%-20s (%s) [%" PRIx64 "] %s\n",
+		      (int) (level * 2), "", dwarf_attr_name (attr),
+		      dwarf_form_name (form), index, a);
+	    }
+	  else
+	    printf ("           %*s%-20s (%s) %s\n",
+		    (int) (level * 2), "", dwarf_attr_name (attr),
+		    dwarf_form_name (form), a);
 	  free (a);
 	}
       break;

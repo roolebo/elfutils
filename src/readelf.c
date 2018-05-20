@@ -7668,7 +7668,7 @@ print_debug_units (Dwfl_Module *dwflmod,
 	  || dwarf_tag (&subdie) == DW_TAG_invalid)
 	{
 	  if (!silent)
-	    error (0, 0, gettext ("Could not find split compile unit"));
+	    fprintf (stderr, gettext ("Could not find split compile unit"));
 	}
       else
 	{

@@ -1,3 +1,8 @@
+2018-05-28  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (print_debug_units): Turn "Could not find split compile
+	unit" into an Warning instead of an error.
+
 2018-04-29  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (parse_opt): Request implicit section_info for "str".

@@ -94,14 +94,13 @@ __libdw_find_split_unit (Dwarf_CU *cu)
 			      elf_cntl (split_dwarf->elf, ELF_C_FDDONE);
 			      break;
 			    }
-
-			  if (cu->split == (Dwarf_CU *) -1)
-			    dwarf_end (split_dwarf);
 			}
-		      /* Always close, because we don't want to run
-			 out of file descriptors.  See also the
-			 elf_fcntl ELF_C_FDDONE call above.  */
+		      if (cu->split == (Dwarf_CU *) -1)
+			dwarf_end (split_dwarf);
 		    }
+		  /* Always close, because we don't want to run
+		     out of file descriptors.  See also the
+		     elf_fcntl ELF_C_FDDONE call above.  */
 		  close (split_fd);
 		}
 	      free (dwo_path);

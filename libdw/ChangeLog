@@ -1,3 +1,10 @@
+2018-05-22  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_getlocation.c (__libdw_cu_base_address): Treat errors of
+	getting lowpc or entrypc the same as missing base address (zero).
+	* dwarf_highpc (dwarf_highpc): Handle any address form. Always set
+	error when attribute could not be found.
+
 2018-05-21  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_begin_elf.c (valid_p): Add a fake_addr_cu to the result.

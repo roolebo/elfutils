@@ -47,10 +47,10 @@ dwarf_highpc (Dwarf_Die *die, Dwarf_Addr *return_addr)
     attr_high = INTUSE(dwarf_attr) (die, DW_AT_high_pc, &attr_high_mem);
 
   if (attr_high == NULL)
-    return -1;
+    goto no_addr;
 
-  if (attr_high->form == DW_FORM_addr)
-    return INTUSE(dwarf_formaddr) (attr_high, return_addr);
+  if (INTUSE(dwarf_formaddr) (attr_high, return_addr) == 0)
+    return 0;
 
   /* DWARF 4 allows high_pc to be a constant offset from low_pc. */
   if (INTUSE(dwarf_lowpc) (die, return_addr) == 0)
@@ -61,8 +61,10 @@ dwarf_highpc (Dwarf_Die *die, Dwarf_Addr *return_addr)
 	  *return_addr += uval;
 	  return 0;
 	}
-      __libdw_seterrno (DWARF_E_NO_ADDR);
     }
+
+no_addr:
+  __libdw_seterrno (DWARF_E_NO_ADDR);
   return -1;
 }
 INTDEF(dwarf_highpc)

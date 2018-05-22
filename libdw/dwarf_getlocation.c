@@ -682,19 +682,10 @@ __libdw_cu_base_address (Dwarf_CU *cu)
 							 &attr_mem),
 				     &base) != 0)
 	{
-	  int err = INTUSE(dwarf_errno) ();
-	  if (err != 0)
-	    {
-	      __libdw_seterrno (err);
-	      base = (Dwarf_Addr) -1;
-	    }
-	  else
-	    {
-	      /* The compiler provided no base address when it should
-		 have.  Buggy GCC does this when it used absolute
-		 addresses in the location list and no DW_AT_ranges.  */
-	      base = 0;
-	    }
+	  /* The compiler provided no base address when it should
+	     have.  Buggy GCC does this when it used absolute
+	     addresses in the location list and no DW_AT_ranges.  */
+	   base = 0;
 	}
       cu->base_address = base;
     }

@@ -79,6 +79,13 @@ main (int argc, char *argv[])
 			  dwarf_diename (&result));
 		  return -1;
 		}
+	      Dwarf_Addr base, start, end;
+	      if (dwarf_ranges (&subdie, 0, &base, &start, &end) != -1)
+		{
+		  printf ("Should NOT have a ranges: %s\n",
+			  dwarf_diename (&result));
+		  return -1;
+		}
 	    }
 	  else if (unit_type == DW_UT_type)
 	    printf ("subdie: %s\n", dwarf_diename (&subdie));

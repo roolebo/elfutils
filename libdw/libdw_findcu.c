@@ -121,6 +121,7 @@ __libdw_intern_next_unit (Dwarf *dbg, bool debug_types)
   newp->base_address = (Dwarf_Addr) -1;
   newp->addr_base = (Dwarf_Off) -1;
   newp->str_off_base = (Dwarf_Off) -1;
+  newp->ranges_base = (Dwarf_Off) -1;
 
   newp->startp = data->d_buf + newp->start;
   newp->endp = data->d_buf + newp->end;

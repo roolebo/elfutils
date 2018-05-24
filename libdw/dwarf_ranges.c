@@ -123,6 +123,12 @@ dwarf_ranges (Dwarf_Die *die, ptrdiff_t offset, Dwarf_Addr *basep,
   /* We have to look for a noncontiguous range.  */
   size_t secidx = IDX_debug_ranges;
   Dwarf_CU *cu = die->cu;
+  if (cu == NULL)
+    {
+      __libdw_seterrno (DWARF_E_INVALID_DWARF);
+      return -1;
+    }
+
   const Elf_Data *d = cu->dbg->sectiondata[secidx];
   if (d == NULL && cu->unit_type == DW_UT_split_compile)
     {

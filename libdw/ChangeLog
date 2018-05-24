@@ -1,3 +1,8 @@
+2018-05-24  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_ranges.c (dwarf_ranges): Check for NULL cu.
+	* libdw_findcu.c (__libdw_intern_next_unit): Initialize ranges_base.
+
 2018-05-18  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_formudata.c (__libdw_formptr): Handle the special case

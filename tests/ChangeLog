@@ -1,6 +1,11 @@
+2018-05-24  Mark Wielaard  <mark@klomp.org>
+
+	* get-units-invalid.c (main): Add check for invalid dwarf_ranges.
+	* run-all-dwarf-ranges.sh: Correct expected output.
+
 2018-05-18  Mark Wielaard  <mark@klomp.org>
 
-	* tests/Makefiles.am (check_PROGRAMS): Add all-dwarf-ranges.
+	* Makefiles.am (check_PROGRAMS): Add all-dwarf-ranges.
 	(TESTS): Add run-all-dwarf-ranges.sh.
 	(EXTRA_DIST): Add run-all-dwarf-ranges.sh,
 	testfilesplitranges4.debug.bz2, testfile-ranges-hello.dwo.bz2

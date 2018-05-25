@@ -59,7 +59,7 @@ addr_valp (Dwarf_CU *cu, Dwarf_Word index)
   Dwarf_Word offset = __libdw_cu_addr_base (cu) + (index * cu->address_size);
   if (debug_addr == NULL)
     /* This is really an error, will trigger with dwarf_formaddr.  */
-    return (unsigned char *) offset;
+    return (unsigned char *) (uintptr_t) offset;
 
   return (unsigned char *) debug_addr->d_buf + offset;
 }

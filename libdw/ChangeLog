@@ -1,3 +1,8 @@
+2018-05-25  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_getlocation_attr.c (__libdw_cu_addr_base): Cast offset to
+	uintptr_t before returning as pointer.
+
 2018-05-22  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_getlocation.c (__libdw_cu_base_address): Treat errors of

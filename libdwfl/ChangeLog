@@ -1,3 +1,8 @@
+2018-05-27  Mark Wielaard  <mark@klomp.org>
+
+	* relocate.c (__libdwfl_relocate): Always call relocate_section with
+	partial true.
+
 2018-05-17  Mark Wielaard  <mark@klomp.org>
 
 	* dwfl_module (__libdwfl_module_free): Free elfdir.

@@ -751,7 +751,7 @@ __libdwfl_relocate (Dwfl_Module *mod, Elf *debugfile, bool debug)
 	  else
 	    result = relocate_section (mod, debugfile, ehdr, d_shstrndx,
 				       &reloc_symtab, scn, shdr, tscn,
-				       debug, !debug);
+				       debug, true /* partial always OK. */);
 	}
     }
 

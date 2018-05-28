@@ -9276,15 +9276,81 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
 	  continue;
 	}
 
-      if (unlikely (data->d_size - offset < (size_t) address_size * 2))
-	{
+      /* GNU DebugFission encoded addresses as addrx.  */
+      bool is_debugfission = ((cu != NULL
+			       || split_dwarf_cu_base (dbg, &cu, &base))
+			      && (cu->version < 5
+				  && cu->unit_type == DW_UT_split_compile));
+      if (!is_debugfission
+	  && unlikely (data->d_size - offset < (size_t) address_size * 2))
+        {
+	invalid_data:
 	  printf (gettext (" [%6tx]  <INVALID DATA>\n"), offset);
 	  break;
 	}
 
       Dwarf_Addr begin;
       Dwarf_Addr end;
-      if (address_size == 8)
+      bool use_base = true;
+      if (is_debugfission)
+	{
+	  const unsigned char *locp = readp;
+	  const unsigned char *locendp = readp + data->d_size;
+	  if (locp >= locendp)
+	    goto invalid_data;
+
+	  Dwarf_Word idx;
+	  unsigned char code = *locp++;
+	  switch (code)
+	    {
+	    case DW_LLE_GNU_end_of_list_entry:
+	      begin = 0;
+	      end = 0;
+	      break;
+
+	    case DW_LLE_GNU_base_address_selection_entry:
+	      if (locp >= locendp)
+		goto invalid_data;
+	      begin = (Dwarf_Addr) -1;
+	      get_uleb128 (idx, locp, locendp);
+	      if (get_indexed_addr (cu, idx, &end) != 0)
+		end = idx; /* ... */
+	      break;
+
+	    case DW_LLE_GNU_start_end_entry:
+	      if (locp >= locendp)
+		goto invalid_data;
+	      get_uleb128 (idx, locp, locendp);
+	      if (get_indexed_addr (cu, idx, &begin) != 0)
+		end = idx; /* ... */
+	      if (locp >= locendp)
+		goto invalid_data;
+	      get_uleb128 (idx, locp, locendp);
+	      if (get_indexed_addr (cu, idx, &end) != 0)
+		end = idx; /* ... */
+	      use_base = false;
+	      break;
+
+	    case DW_LLE_GNU_start_length_entry:
+	      if (locp >= locendp)
+		goto invalid_data;
+	      get_uleb128 (idx, locp, locendp);
+	      if (get_indexed_addr (cu, idx, &begin) != 0)
+		begin = idx; /* ... */
+	      if (locendp - locp < 4)
+		goto invalid_data;
+	      end = read_4ubyte_unaligned_inc (dbg, locp);
+	      end += begin;
+	      use_base = false;
+	      break;
+
+	    default:
+		goto invalid_data;
+	    }
+
+	  readp = (unsigned char *) locp;
+	}
+      else if (address_size == 8)
 	{
 	  begin = read_8ubyte_unaligned_inc (dbg, readp);
 	  end = read_8ubyte_unaligned_inc (dbg, readp);
@@ -9323,10 +9389,12 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
 	  printf ("range %" PRIx64 ", %" PRIx64 "\n", begin, end);
 	  if (! print_unresolved_addresses)
 	    {
-	      char *b = format_dwarf_addr (dwflmod, address_size, base + begin,
-					   base + begin);
+	      Dwarf_Addr dab = use_base ? base + begin : begin;
+	      Dwarf_Addr dae = use_base ? base + end : end;
+	      char *b = format_dwarf_addr (dwflmod, address_size,
+					   dab, dab);
 	      char *e = format_dwarf_addr (dwflmod, address_size,
-					   base + end - 1, base + end);
+					   dae - 1, dae);
 	      printf ("          %s..\n", b);
 	      printf ("          %s\n", e);
 	      free (b);

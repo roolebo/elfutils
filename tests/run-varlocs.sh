@@ -277,6 +277,80 @@ module 'testfilesplitranges5.debug'
       [4011c0,4011d0) {reg4}
 EOF
 
+# GNU DebugFissuon Multi CU Split DWARF. See run-dwarf-ranges.sh.
+testfiles testfilesplitranges4.debug
+testfiles testfile-ranges-hello.dwo testfile-ranges-world.dwo
+testrun_compare ${abs_top_builddir}/tests/varlocs --debug -e testfilesplitranges4.debug <<\EOF
+module 'testfilesplitranges4.debug'
+[b] CU 'hello.c'
+  [18] function 'no_say'@4004f0
+    frame_base: {call_frame_cfa {...}}
+    [2f] parameter 'prefix'
+      [4004f0,4004fa) {reg5}
+      [4004fa,4004ff) {GNU_entry_value(1) {reg5}, stack_value}
+    [3b] variable 'world'
+      <no value>
+  [60] function 'main'@4003e0
+    frame_base: {call_frame_cfa {...}}
+    [77] parameter 'argc'
+      [4003e0,4003f2) {reg5}
+      [4003f2,4003f7) {GNU_entry_value(1) {reg5}, stack_value}
+    [83] parameter 'argv'
+      [4003e0,4003f6) {reg4}
+      [4003f6,1004003f5) {GNU_entry_value(1) {reg4}, stack_value}
+  [8f] inlined function 'subject'@4003e3
+    [a3] parameter 'count'
+      [4003e3,4003ef) {reg5}
+    [ac] parameter 'word'
+      [4003e3,4003ef) {reg0}
+  [e7] function 'subject'@4004e0
+    frame_base: {call_frame_cfa {...}}
+    [fb] parameter 'word'
+      [4004e0,4004f0) {reg5}
+    [102] parameter 'count'
+      [4004e0,4004f0) {reg4}
+module 'testfilesplitranges4.debug'
+[b] CU 'world.c'
+  [18] function 'no_main'@400550
+    frame_base: {call_frame_cfa {...}}
+    [2f] parameter 'argc'
+      [400550,400562) {reg5}
+      [400562,400567) {GNU_entry_value(1) {reg5}, stack_value}
+    [3b] parameter 'argv'
+      [400550,400566) {reg4}
+      [400566,100400565) {GNU_entry_value(1) {reg4}, stack_value}
+  [47] inlined function 'no_subject'@400553
+    [5b] parameter 'count'
+      [400553,40055f) {reg5}
+    [64] parameter 'word'
+      [400553,40055f) {reg0}
+  [af] function 'say'@400500
+    frame_base: {call_frame_cfa {...}}
+    [c9] parameter 'prefix'
+      [400500,40050e) {reg5}
+      [40050e,40051c) {reg3}
+      [40051c,400527) {GNU_entry_value(1) {reg5}, stack_value}
+      [400527,400535) {reg3}
+      [400535,400540) {GNU_entry_value(1) {reg5}, stack_value}
+    [d5] variable 'world'
+      [400513,40051b) {reg0}
+      [400527,400534) {reg0}
+  [e1] inlined function 'happy'@40051c
+    [f1] parameter 'w'
+      [400527,400534) {reg0}
+  [fa] inlined function 'sad'@40051c
+    [106] parameter 'c'
+      [40051b,400526) {reg0}
+      [400526,400527) {GNU_entry_value(1) {reg5}}
+      [400534,40053f) {reg0}
+  [15c] function 'no_subject'@400540
+    frame_base: {call_frame_cfa {...}}
+    [170] parameter 'word'
+      [400540,400550) {reg5}
+    [177] parameter 'count'
+      [400540,400550) {reg4}
+EOF
+
 # DW_OP_addrx and DW_OP_constx testcases.
 #
 # int i, j, k;

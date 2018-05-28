@@ -727,4 +727,145 @@ Table at Offset 0x0:
 
 EOF
 
+# GNU DebugFission split-dwarf variant. Still uses .debug_loc, but now in
+# .dwo file, with somewhat similar, but different encoding from DWARF5.
+testfiles testfile-splitdwarf-4 testfile-hello4.dwo testfile-world4.dwo
+testrun_compare ${abs_top_builddir}/src/readelf --debug-dump=loc --dwarf-skeleton=testfile-splitdwarf-4 testfile-hello4.dwo testfile-world4.dwo <<\EOF
+
+testfile-hello4.dwo:
+
+
+DWARF section [ 3] '.debug_loc.dwo' at offset 0x253:
+
+ CU [     b] base: 0x0000000000401160 <foo>
+ [     0] range 401160, 40116a
+          0x0000000000401160 <foo>..
+          0x0000000000401169 <foo+0x9>
+           [ 0] reg5
+          range 40116a, 401194
+          0x000000000040116a <foo+0xa>..
+          0x0000000000401193 <foo+0x33>
+           [ 0] GNU_entry_value:
+                [ 0] reg5
+           [ 3] stack_value
+ [    16] range 40117b, 40118d
+          0x000000000040117b <foo+0x1b>..
+          0x000000000040118c <foo+0x2c>
+           [ 0] GNU_addr_index [18] 0x404038 <m>
+ [    21] range 40117b, 401181
+          0x000000000040117b <foo+0x1b>..
+          0x0000000000401180 <foo+0x20>
+           [ 0] reg5
+ [    2b] range 40117b, 401187
+          0x000000000040117b <foo+0x1b>..
+          0x0000000000401186 <foo+0x26>
+           [ 0] reg5
+          range 401189, 40118d
+          0x0000000000401189 <foo+0x29>..
+          0x000000000040118c <foo+0x2c>
+           [ 0] reg5
+ [    3e] range 401181, 401187
+          0x0000000000401181 <foo+0x21>..
+          0x0000000000401186 <foo+0x26>
+           [ 0] reg5
+          range 401189, 40118d
+          0x0000000000401189 <foo+0x29>..
+          0x000000000040118c <foo+0x2c>
+           [ 0] reg5
+ [    51] range 401181, 40118d
+          0x0000000000401181 <foo+0x21>..
+          0x000000000040118c <foo+0x2c>
+           [ 0] reg5
+ [    5b] range 40118d, 401193
+          0x000000000040118d <foo+0x2d>..
+          0x0000000000401192 <foo+0x32>
+           [ 0] reg5
+ [    65] range 4011a0, 4011af
+          0x00000000004011a0 <baz>..
+          0x00000000004011ae <baz+0xe>
+           [ 0] reg5
+          range 4011af, 4011b1
+          0x00000000004011af <baz+0xf>..
+          0x00000000004011b0 <baz+0x10>
+           [ 0] GNU_entry_value:
+                [ 0] reg5
+           [ 3] stack_value
+ [    7b] range 4011a0, 4011b0
+          0x00000000004011a0 <baz>..
+          0x00000000004011af <baz+0xf>
+           [ 0] reg5
+
+testfile-world4.dwo:
+
+
+DWARF section [ 3] '.debug_loc.dwo' at offset 0x225:
+
+ CU [     b] base: 000000000000000000
+ [     0] range 401060, 401074
+          0x0000000000401060 <main>..
+          0x0000000000401073 <main+0x13>
+           [ 0] reg5
+          range 401074, 401080
+          0x0000000000401074 <main+0x14>..
+          0x000000000040107f <main+0x1f>
+           [ 0] GNU_entry_value:
+                [ 0] reg5
+           [ 3] stack_value
+ [    16] range 401060, 401078
+          0x0000000000401060 <main>..
+          0x0000000000401077 <main+0x17>
+           [ 0] reg4
+          range 401078, 40107e
+          0x0000000000401078 <main+0x18>..
+          0x000000000040107d <main+0x1d>
+           [ 0] GNU_entry_value:
+                [ 0] reg4
+           [ 3] stack_value
+ [    2c] range 401071, 401078
+          0x0000000000401071 <main+0x11>..
+          0x0000000000401077 <main+0x17>
+           [ 0] reg0
+ [    36] range 4011c0, 4011c8
+          0x00000000004011c0 <calc>..
+          0x00000000004011c7 <calc+0x7>
+           [ 0] reg5
+          range 4011c8, 4011eb
+          0x00000000004011c8 <calc+0x8>..
+          0x00000000004011ea <calc+0x2a>
+           [ 0] GNU_entry_value:
+                [ 0] reg5
+           [ 3] stack_value
+ [    4c] range 4011d8, 4011e3
+          0x00000000004011d8 <calc+0x18>..
+          0x00000000004011e2 <calc+0x22>
+           [ 0] reg0
+ [    56] range 4011d8, 4011da
+          0x00000000004011d8 <calc+0x18>..
+          0x00000000004011d9 <calc+0x19>
+           [ 0] reg1
+          range 4011da, 4011df
+          0x00000000004011da <calc+0x1a>..
+          0x00000000004011de <calc+0x1e>
+           [ 0] reg5
+          range 4011df, 4011e3
+          0x00000000004011df <calc+0x1f>..
+          0x00000000004011e2 <calc+0x22>
+           [ 0] GNU_entry_value:
+                [ 0] reg5
+           [ 3] deref_size 1
+           [ 5] const1u 56
+           [ 7] shl
+           [ 8] const1u 56
+           [10] shra
+           [11] stack_value
+ [    7d] range 4011d8, 4011da
+          0x00000000004011d8 <calc+0x18>..
+          0x00000000004011d9 <calc+0x19>
+           [ 0] reg1
+          range 4011da, 4011e3
+          0x00000000004011da <calc+0x1a>..
+          0x00000000004011e2 <calc+0x22>
+           [ 0] reg5
+EOF
+
 exit 0

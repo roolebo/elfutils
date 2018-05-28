@@ -915,6 +915,16 @@ enum
   };
 
 
+/* GNU DebugFission list entry encodings (.debug_loc.dwo).  */
+enum
+  {
+    DW_LLE_GNU_end_of_list_entry = 0x0,
+    DW_LLE_GNU_base_address_selection_entry = 0x1,
+    DW_LLE_GNU_start_end_entry = 0x2,
+    DW_LLE_GNU_start_length_entry = 0x3
+  };
+
+
 /* DWARF call frame instruction encodings.  */
 enum
   {

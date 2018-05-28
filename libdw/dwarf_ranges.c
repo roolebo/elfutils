@@ -49,7 +49,70 @@ __libdw_read_begin_end_pair_inc (Dwarf_CU *cu, int sec_index,
 				 Dwarf_Addr *basep)
 {
   Dwarf *dbg = cu->dbg;
-  if (sec_index == IDX_debug_ranges || sec_index == IDX_debug_loc)
+  if (sec_index == IDX_debug_loc
+      && cu->version < 5
+      && cu->unit_type == DW_UT_split_compile)
+    {
+      /* GNU DebugFission.  */
+      const unsigned char *addr = *addrp;
+      if (addrend - addr < 1)
+	goto invalid;
+
+      const char code = *addr++;
+      uint64_t begin = 0, end = 0, base = *basep, addr_idx;
+      switch (code)
+	{
+	case DW_LLE_GNU_end_of_list_entry:
+	  *addrp = addr;
+	  return 2;
+
+	case DW_LLE_GNU_base_address_selection_entry:
+	  if (addrend - addr < 1)
+	    goto invalid;
+	  get_uleb128 (addr_idx, addr, addrend);
+	  if (__libdw_addrx (cu, addr_idx, &base) != 0)
+	    return -1;
+	  *basep = base;
+	  *addrp = addr;
+	  return 1;
+
+	case DW_LLE_GNU_start_end_entry:
+	  if (addrend - addr < 1)
+	    goto invalid;
+	  get_uleb128 (addr_idx, addr, addrend);
+	  if (__libdw_addrx (cu, addr_idx, &begin) != 0)
+	    return -1;
+	  if (addrend - addr < 1)
+	    goto invalid;
+	  get_uleb128 (addr_idx, addr, addrend);
+	  if (__libdw_addrx (cu, addr_idx, &end) != 0)
+	    return -1;
+
+	  *beginp = begin;
+	  *endp = end;
+	  *addrp = addr;
+	  return 0;
+
+	case DW_LLE_GNU_start_length_entry:
+	  if (addrend - addr < 1)
+	    goto invalid;
+	  get_uleb128 (addr_idx, addr, addrend);
+	  if (__libdw_addrx (cu, addr_idx, &begin) != 0)
+	    return -1;
+	  if (addrend - addr < 4)
+	    goto invalid;
+	  end = read_4ubyte_unaligned_inc (dbg, addr);
+
+	  *beginp = begin;
+	  *endp = begin + end;
+	  *addrp = addr;
+	  return 0;
+
+	default:
+	  goto invalid;
+	}
+    }
+  else if (sec_index == IDX_debug_ranges || sec_index == IDX_debug_loc)
     {
       Dwarf_Addr escape = (width == 8 ? (Elf64_Addr) -1
 			   : (Elf64_Addr) (Elf32_Addr) -1);

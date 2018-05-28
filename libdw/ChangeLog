@@ -1,3 +1,12 @@
+2018-05-29  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf.h: Add GNU DebugFission list entry encodings
+	DW_LLE_GNU_end_of_list_entry,
+	DW_LLE_GNU_base_address_selection_entry,
+	DW_LLE_GNU_start_end_entry and DW_LLE_GNU_start_length_entry.
+	* dwarf_ranges.c (__libdw_read_begin_end_pair_inc): Handle
+	GNU DebugFission list entries.
+
 2018-05-28  Mark Wielaard  <mark@klomp.org>
 
 	* libdw_find_split_unit.c (__libdw_find_split_unit): End split_dwarf

@@ -1,3 +1,8 @@
+2018-05-29  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (print_debug): Record and reset section_info status in
+	implicit_debug_sections and print_debug_sections.
+
 2018-05-28  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_debug_units): Turn "Could not find split compile

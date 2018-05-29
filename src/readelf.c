@@ -10894,7 +10894,9 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
      we must make sure to handle it before handling any other debug
      section.  Various other sections depend on the CU DIEs being
      scanned (silently) first.  */
-  if ((implicit_debug_sections & section_info) != 0)
+  bool implicit_info = (implicit_debug_sections & section_info) != 0;
+  bool explicit_info = (print_debug_sections & section_info) != 0;
+  if (implicit_info)
     {
       Elf_Scn *scn = NULL;
       while ((scn = elf_nextscn (ebl->elf, scn)) != NULL)
@@ -11011,6 +11013,12 @@ print_debug (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr)
 
   dwfl_end (skel_dwfl);
   free (skel_name);
+
+  /* Turn implicit and/or explicit back on in case we go over another file.  */
+  if (implicit_info)
+    implicit_debug_sections |= section_info;
+  if (explicit_info)
+    print_debug_sections |= section_info;
 
   reset_listptr (&known_locsptr);
   reset_listptr (&known_loclistsptr);

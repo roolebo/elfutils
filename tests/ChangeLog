@@ -1,5 +1,12 @@
 2018-05-29  Mark Wielaard  <mark@klomp.org>
 
+	* dwarf-die-addr-die.c (check_dbg): Also check subdies, split or
+	type, gotten through dwarf_get_units.
+	* run-dwarf-die-addr-die.sh: Add tests for dwarf-4, dwarf-5,
+	split-dwarf-4, split-dwarf-5 and dwo files.
+
+2018-05-29  Mark Wielaard  <mark@klomp.org>
+
 	* run-readelf-loc.sh: Add GNU DebugFission split-dwarf variant.
 	* run-varlocs.sh: Likewise.
 

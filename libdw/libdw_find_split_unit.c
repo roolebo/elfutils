@@ -34,6 +34,7 @@
 #include "libelfP.h"
 
 #include <limits.h>
+#include <search.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
@@ -84,6 +85,14 @@ __libdw_find_split_unit (Dwarf_CU *cu)
 			  if (split->unit_type == DW_UT_split_compile
 			      && cu->unit_id8 == split->unit_id8)
 			    {
+			      if (tsearch (split->dbg, &cu->dbg->split_tree,
+					   __libdw_finddbg_cb) == NULL)
+				{
+				  /* Something went wrong.  Don't link.  */
+				  __libdw_seterrno (DWARF_E_NOMEM);
+				  break;
+				}
+
 			      /* Link skeleton and split compile units.  */
 			      __libdw_link_skel_split (cu, split);
 

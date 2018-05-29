@@ -61,6 +61,40 @@ findcu_cb (const void *arg1, const void *arg2)
   return 0;
 }
 
+int
+__libdw_finddbg_cb (const void *arg1, const void *arg2)
+{
+  Dwarf *dbg1 = (Dwarf *) arg1;
+  Dwarf *dbg2 = (Dwarf *) arg2;
+
+  Elf_Data *dbg1_data = dbg1->sectiondata[IDX_debug_info];
+  unsigned char *dbg1_start = dbg1_data->d_buf;
+  size_t dbg1_size = dbg1_data->d_size;
+
+  Elf_Data *dbg2_data = dbg2->sectiondata[IDX_debug_info];
+  unsigned char *dbg2_start = dbg2_data->d_buf;
+  size_t dbg2_size = dbg2_data->d_size;
+
+  /* Find out which of the two arguments is the search value.  It has
+     a size of 0.  */
+  if (dbg1_size == 0)
+    {
+      if (dbg1_start < dbg2_start)
+	return -1;
+      if (dbg1_start >= dbg2_start + dbg2_size)
+	return 1;
+    }
+  else
+    {
+      if (dbg2_start < dbg1_start)
+	return 1;
+      if (dbg2_start >= dbg1_start + dbg1_size)
+	return -1;
+    }
+
+  return 0;
+}
+
 struct Dwarf_CU *
 internal_function
 __libdw_intern_next_unit (Dwarf *dbg, bool debug_types)
@@ -241,6 +275,21 @@ __libdw_findcu_addr (Dwarf *dbg, void *addr)
 
   struct Dwarf_CU fake = { .start = start, .end = 0 };
   struct Dwarf_CU **found = tfind (&fake, tree, findcu_cb);
+
+  if (found != NULL)
+    return *found;
+
+  return NULL;
+}
+
+Dwarf *
+internal_function
+__libdw_find_split_dbg_addr (Dwarf *dbg, void *addr)
+{
+  /* XXX Assumes split DWARF only has CUs in main IDX_debug_info.  */
+  Elf_Data fake_data = { .d_buf = addr, .d_size = 0 };
+  Dwarf fake = { .sectiondata[IDX_debug_info] = &fake_data };
+  Dwarf **found = tfind (&fake, &dbg->split_tree, __libdw_finddbg_cb);
 
   if (found != NULL)
     return *found;

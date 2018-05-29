@@ -91,6 +91,9 @@ dwarf_end (Dwarf *dwarf)
       /* Search tree for decoded .debug_lines units.  */
       tdestroy (dwarf->files_lines, noop_free);
 
+      /* And the split Dwarf.  */
+      tdestroy (dwarf->split_tree, noop_free);
+
       struct libdw_memblock *memp = dwarf->mem_tail;
       /* The first block is allocated together with the Dwarf object.  */
       while (memp->prev != NULL)

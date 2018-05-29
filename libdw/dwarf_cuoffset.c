@@ -38,7 +38,7 @@
 Dwarf_Off
 dwarf_cuoffset (Dwarf_Die *die)
 {
-  return (die == NULL
+  return ((die == NULL || die->cu == NULL)
 	  ? (Dwarf_Off) -1l
 	  : (Dwarf_Off) (die->addr - die->cu->startp));
 }

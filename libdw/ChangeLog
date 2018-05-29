@@ -1,5 +1,19 @@
 2018-05-29  Mark Wielaard  <mark@klomp.org>
 
+	* dwarf_cuoffset.c (dwarf_cuoffset): Check die->cu is not NULL.
+	* dwarf_die_addr_die.c (dwarf_die_addr_die): Also search split
+	Dwarfs.
+	* libdwP.h (struct Dwarf): Add split_tree field.
+	(__libdw_find_split_dbg_addr): New internal function definition.
+	(__libdw_finddbg_cb): Likewise.
+	* libdw_find_split_unit.c (__libdw_find_split_unit): Insert split
+	Dwarf into skeleton dbg split_tree.
+	* libdw_findcu.c (__libdw_finddbg_cb): New function.
+	(__libdw_find_split_dbg_addr): Likewise.
+	* dwarf_end (dwarf_end): Destroy split_tree.
+
+2018-05-29  Mark Wielaard  <mark@klomp.org>
+
 	* dwarf.h: Add GNU DebugFission list entry encodings
 	DW_LLE_GNU_end_of_list_entry,
 	DW_LLE_GNU_base_address_selection_entry,

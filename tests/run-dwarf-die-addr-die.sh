@@ -32,6 +32,20 @@ testfiles testfilebazdbgppc64.debug
 
 testrun ${abs_builddir}/dwarf-die-addr-die testfilebazdbgppc64.debug
 
+# see tests/testfile-dwarf-45.source
+testfiles testfile-dwarf-4 testfile-dwarf-5
+testfiles testfile-splitdwarf-4 testfile-hello4.dwo testfile-world4.dwo
+testfiles testfile-splitdwarf-5 testfile-hello5.dwo testfile-world5.dwo
+
+testrun ${abs_builddir}/dwarf-die-addr-die testfile-dwarf-4
+testrun ${abs_builddir}/dwarf-die-addr-die testfile-dwarf-5
+testrun ${abs_builddir}/dwarf-die-addr-die testfile-splitdwarf-4
+testrun ${abs_builddir}/dwarf-die-addr-die testfile-splitdwarf-5
+testrun ${abs_builddir}/dwarf-die-addr-die testfile-hello4.dwo
+testrun ${abs_builddir}/dwarf-die-addr-die testfile-world4.dwo
+testrun ${abs_builddir}/dwarf-die-addr-die testfile-hello5.dwo
+testrun ${abs_builddir}/dwarf-die-addr-die testfile-world5.dwo
+
 # Self test
 testrun_on_self ${abs_builddir}/dwarf-die-addr-die
 

@@ -134,6 +134,20 @@ check_dbg (Dwarf *dbg)
       res |= check_dbg (alt);
     }
 
+  // Split or Type Dwarf_Dies gotten through dwarf_get_units.
+  Dwarf_CU *cu = NULL;
+  Dwarf_Die subdie;
+  uint8_t unit_type;
+  while (dwarf_get_units (dbg, cu, &cu, NULL,
+                          &unit_type, NULL, &subdie) == 0)
+    {
+      if (dwarf_tag (&subdie) != DW_TAG_invalid)
+        {
+	  printf ("checking %" PRIx8 " subdie\n", unit_type);
+	  res |= check_die (&subdie);
+	}
+    }
+
   return res;
 }
 

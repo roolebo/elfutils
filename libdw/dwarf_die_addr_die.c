@@ -30,6 +30,8 @@
 # include <config.h>
 #endif
 
+#include <string.h>
+
 #include <dwarf.h>
 #include "libdwP.h"
 
@@ -50,7 +52,17 @@ dwarf_die_addr_die (Dwarf *dbg, void *addr, Dwarf_Die *result)
     }
 
   if (cu == NULL)
-    return NULL;
+    {
+      Dwarf *split = __libdw_find_split_dbg_addr (dbg, addr);
+      if (split != NULL)
+	cu = __libdw_findcu_addr (split, addr);
+    }
+
+  if (cu == NULL)
+    {
+      memset (result, '\0', sizeof (Dwarf_Die));
+      return NULL;
+    }
 
   *result = (Dwarf_Die) { .addr = addr, .cu = cu };
 

@@ -193,6 +193,9 @@ struct Dwarf
   Dwarf_Off next_tu_offset;
   Dwarf_Sig8_Hash sig8_hash;
 
+  /* Search tree for split Dwarf associated with CUs in this debug.  */
+  void *split_tree;
+
   /* Search tree for .debug_macro operator tables.  */
   void *macro_ops;
 
@@ -617,6 +620,10 @@ extern struct Dwarf_CU *__libdw_findcu (Dwarf *dbg, Dwarf_Off offset, bool tu)
 
 /* Find CU for given DIE address.  */
 extern struct Dwarf_CU *__libdw_findcu_addr (Dwarf *dbg, void *addr)
+     __nonnull_attribute__ (1) internal_function;
+
+/* Find split Dwarf for given DIE address.  */
+extern struct Dwarf *__libdw_find_split_dbg_addr (Dwarf *dbg, void *addr)
      __nonnull_attribute__ (1) internal_function;
 
 /* Find the split (or skeleton) unit.  */
@@ -1261,6 +1268,8 @@ __libdw_cu_locs_base (Dwarf_CU *cu)
   return cu->locs_base;
 }
 
+/* Helper function for tsearch/tfind split_tree Dwarf.  */
+int __libdw_finddbg_cb (const void *arg1, const void *arg2);
 
 /* Link skeleton and split compile units.  */
 static inline void

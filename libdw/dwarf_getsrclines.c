@@ -154,7 +154,7 @@ read_srclines (Dwarf *dbg,
   int res = -1;
 
   size_t nfilelist = 0;
-  unsigned int ndirlist = 0;
+  size_t ndirlist = 0;
 
   /* If there are a large number of lines, files or dirs don't blow up
      the stack.  Stack allocate some entries, only dynamically malloc
@@ -299,7 +299,7 @@ read_srclines (Dwarf *dbg,
   };
 
   /* First count the entries.  */
-  unsigned int ndirs = 0;
+  size_t ndirs = 0;
   if (version < 5)
     {
       const unsigned char *dirp = linep;
@@ -359,6 +359,8 @@ read_srclines (Dwarf *dbg,
   ndirlist = ndirs;
   if (ndirlist >= MAX_STACK_DIRS)
     {
+      if (ndirlist > SIZE_MAX / sizeof (*dirarray))
+	goto no_mem;
       dirarray = (struct dirlist *) malloc (ndirlist * sizeof (*dirarray));
       if (unlikely (dirarray == NULL))
 	{

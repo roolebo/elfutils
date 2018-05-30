@@ -1,3 +1,8 @@
+2018-05-30  Mark Wielaard  <mark@klomp.org>
+
+	* libdw/dwarf_getsrclines.c (read_srclines): Change ndir and
+	ndirlist to size_t. Add check to see ndirlist doesn't overflow.
+
 2018-05-31  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_dieoffset.c: Check die->cu != NULL. Return -1, not ~0ul

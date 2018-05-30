@@ -1,3 +1,8 @@
+2018-05-30  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (print_debug_loc_section): Use correct listptr for
+	locview attribute.
+
 2018-05-31  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_debug_units): Check offset against -1 not ~0ul.

@@ -9244,7 +9244,7 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
 
       if (attr == DW_AT_GNU_locviews)
 	{
-	  Dwarf_Off next_off = next_listptr_offset (&known_loclistsptr,
+	  Dwarf_Off next_off = next_listptr_offset (&known_locsptr,
 						    listptr_idx);
 	  const unsigned char *locp = readp;
 	  const unsigned char *locendp;

@@ -1,3 +1,8 @@
+2018-05-31  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_dieoffset.c: Check die->cu != NULL. Return -1, not ~0ul
+	on failure.
+
 2018-05-29  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_cuoffset.c (dwarf_cuoffset): Check die->cu is not NULL.

@@ -7588,7 +7588,7 @@ print_debug_units (Dwfl_Module *dwflmod,
   do
     {
       Dwarf_Off offset = dwarf_dieoffset (&dies[level]);
-      if (unlikely (offset == ~0ul))
+      if (unlikely (offset == (Dwarf_Off) -1))
 	{
 	  if (!silent)
 	    error (0, 0, gettext ("cannot get DIE offset: %s"),

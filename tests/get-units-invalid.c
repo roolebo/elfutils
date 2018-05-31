@@ -83,7 +83,19 @@ main (int argc, char *argv[])
 	      if (dwarf_ranges (&subdie, 0, &base, &start, &end) != -1)
 		{
 		  printf ("Should NOT have a ranges: %s\n",
-			  dwarf_diename (&result));
+			  dwarf_diename (&subdie));
+		  return -1;
+		}
+	      if (dwarf_cuoffset (&subdie) != (Dwarf_Off) -1)
+		{
+		  printf ("Should NOT have a cuoffset: %s\n",
+			  dwarf_diename (&subdie));
+		  return -1;
+		}
+	      if (dwarf_dieoffset (&subdie) != (Dwarf_Off) -1)
+		{
+		  printf ("Should NOT have a die offset: %s\n",
+			  dwarf_diename (&subdie));
 		  return -1;
 		}
 	    }

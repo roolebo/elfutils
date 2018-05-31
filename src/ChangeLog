@@ -1,3 +1,7 @@
+2018-05-31  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (print_debug_units): Check offset against -1 not ~0ul.
+
 2018-05-29  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_debug_loc_section): Handle GNU DebugFission list

@@ -1,3 +1,8 @@
+2018-05-31  Mark Wielaard  <mark@klomp.org>
+
+	* get-units-invalid.c (main): Check dwarf_cuoffset and
+	dwarf_dieoffset.
+
 2018-05-29  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf-die-addr-die.c (check_dbg): Also check subdies, split or

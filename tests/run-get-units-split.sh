@@ -59,7 +59,8 @@ Found a skeleton unit, with split die: world.c
 
 EOF
 
-# Self test
-testrun_on_self ${abs_builddir}/get-units-split
+# Self test (Not on obj files since those need relocation first).
+testrun_on_self_exe ${abs_builddir}/get-units-split
+testrun_on_self_lib ${abs_builddir}/get-units-split
 
 exit 0

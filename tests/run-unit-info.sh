@@ -74,7 +74,8 @@ Iterate no info, compare recorded info with dwarf_cu_info.
 
 EOF
 
-# Self test
-testrun_on_self ${abs_builddir}/unit-info
+# Self test (not on obj files, since those need relocation first).
+testrun_on_self_exe ${abs_builddir}/unit-info
+testrun_on_self_lib ${abs_builddir}/unit-info
 
 exit 0

@@ -1,5 +1,15 @@
 2018-05-31  Mark Wielaard  <mark@klomp.org>
 
+	* test-subr.sh (self_test_files): Split into self_test_files_exe,
+	self_test_files_lib and self_test_obj.
+	(testrun_on_self_exe): New function.
+	(testrun_on_self_lib): Likewise.
+	* run-get-units-split.sh: Replace testrun_on_self with
+	testrun_on_self_exe and testrun_on_self_lib.
+	* run-unit-info.sh: Likewise.
+
+2018-05-31  Mark Wielaard  <mark@klomp.org>
+
 	* low_high_pc.c (handle_die): Handle NULL name. Print offset and
 	name of die.
 	(main): Check if the cu DIE is a skeleton, then get and handle

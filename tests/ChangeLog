@@ -1,5 +1,14 @@
 2018-05-31  Mark Wielaard  <mark@klomp.org>
 
+	* low_high_pc.c (handle_die): Handle NULL name. Print offset and
+	name of die.
+	(main): Check if the cu DIE is a skeleton, then get and handle
+	the split subdie.
+	* run-low-high-pc.sh: Run on testfile-splitdwarf-4 and
+	testfile-splitdwarf-5. Run on all selftest files.
+
+2018-05-31  Mark Wielaard  <mark@klomp.org>
+
 	* get-units-invalid.c (main): Check dwarf_cuoffset and
 	dwarf_dieoffset.
 

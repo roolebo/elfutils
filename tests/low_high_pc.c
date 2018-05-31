@@ -1,5 +1,5 @@
 /* Test program for dwarf_lowpc and dwarf_highpc
-   Copyright (C) 2012 Red Hat, Inc.
+   Copyright (C) 2012, 2018 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -55,7 +55,9 @@ handle_die (Dwarf_Die *die, void *arg)
 
   const char *name = dwarf_diename (die);
   if (name == NULL)
-    fail (off, "<no name>", "die without a name");
+    name = "<no name>";
+
+  printf ("[%" PRIx64 "] %s\n", off, name);
 
   Dwarf_Addr lowpc = 0;
   Dwarf_Addr highpc = 0;
@@ -101,9 +103,31 @@ main (int argc, char *argv[])
       a.file = dwarf_diename (a.cu);
       handle_die (a.cu, &a);
       dwarf_getfuncs (a.cu, &handle_die, &a, 0);
+
+      uint8_t unit_type;
+      Dwarf_Die subdie;
+      if (dwarf_cu_info (a.cu->cu, NULL, &unit_type, NULL, &subdie,
+			 NULL, NULL, NULL) != 0)
+	{
+	  Dwarf_Off off = dwarf_dieoffset (a.cu);
+	  fail (off, "dwarf_cu_info", dwarf_errmsg (-1));
+	}
+
+      if (unit_type == DW_UT_skeleton)
+	{
+	  const char *name = dwarf_diename (&subdie) ?: "<unknown>";
+	  printf ("Following split subdie: %s\n", name);
+	  struct args b = a;
+	  b.cu = &subdie;
+	  handle_die (b.cu, &b);
+	  dwarf_getfuncs (b.cu, &handle_die, &b, 0);
+	  printf ("Done subdie: %s\n", name);
+	}
     }
 
   dwfl_end (a.dwfl);
+
+  printf ("\n");
 
   return result;
 }

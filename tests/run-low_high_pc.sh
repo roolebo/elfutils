@@ -1,5 +1,5 @@
 #! /bin/sh
-# Copyright (C) 2005 Red Hat, Inc.
+# Copyright (C) 2005, 2018 Red Hat, Inc.
 # This file is part of elfutils.
 #
 # This file is free software; you can redistribute it and/or modify
@@ -27,8 +27,15 @@ testfiles testfile_low_high_pc
 
 testrun ${abs_builddir}/low_high_pc -e ./testfile_low_high_pc
 testrun ${abs_builddir}/low_high_pc -e ${abs_builddir}/low_high_pc
-testrun ${abs_builddir}/low_high_pc -e ${abs_top_builddir}/src/strip
-testrun ${abs_builddir}/low_high_pc -e ${abs_top_builddir}/src/strip.o
-testrun ${abs_builddir}/low_high_pc -e ${abs_top_builddir}/libelf/libelf.so
+
+# see tests/testfile-dwarf-45.source
+testfiles testfile-splitdwarf-4 testfile-splitdwarf-5
+testfiles testfile-hello4.dwo testfile-hello5.dwo
+testfiles testfile-world4.dwo testfile-world5.dwo
+
+testrun ${abs_builddir}/low_high_pc -e testfile-splitdwarf-4
+testrun ${abs_builddir}/low_high_pc -e testfile-splitdwarf-5
+
+testrun_on_self ${abs_builddir}/low_high_pc -e
 
 exit 0

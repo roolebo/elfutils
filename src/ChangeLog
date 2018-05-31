@@ -1,5 +1,10 @@
 2018-05-31  Mark Wielaard  <mark@klomp.org>
 
+	* readelf.c (print_debug_units): Print the dwo name and id when
+	unable to find a .dwo file.
+
+2018-05-31  Mark Wielaard  <mark@klomp.org>
+
 	* readelf.c (enum section_e): Make section_types not an alias of
 	section_info.
 	(section_all): Add section_types.

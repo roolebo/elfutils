@@ -7680,7 +7680,18 @@ print_debug_units (Dwfl_Module *dwflmod,
 	  || dwarf_tag (&subdie) == DW_TAG_invalid)
 	{
 	  if (!silent)
-	    fprintf (stderr, gettext ("Could not find split compile unit"));
+	    {
+	      Dwarf_Attribute dwo_at;
+	      const char *dwo_name =
+		(dwarf_formstring (dwarf_attr (&cudie, DW_AT_dwo_name,
+					       &dwo_at))
+		 ?: (dwarf_formstring (dwarf_attr (&cudie, DW_AT_GNU_dwo_name,
+						   &dwo_at))
+		     ?: "<unknown>"));
+	      fprintf (stderr,
+		       "Could not find split unit '%s', id: %" PRIx64 "\n",
+		       dwo_name, unit_id);
+	    }
 	}
       else
 	{

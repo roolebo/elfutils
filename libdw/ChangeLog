@@ -1,3 +1,10 @@
+2018-05-31  Mark Wielaard  <mark@klomp.org>
+
+	* libdw_find_split_unit.c (try_split_file): New function extracted
+	from...
+	(__libdw_find_split_unit): ... here. Try both the relative and
+	absolute paths to find a .dwo file.
+
 2018-05-30  Mark Wielaard  <mark@klomp.org>
 
 	* libdw/dwarf_getsrclines.c (read_srclines): Change ndir and

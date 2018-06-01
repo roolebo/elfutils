@@ -7077,9 +7077,17 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	  {
 	    bool nlpt;
 	    if (cbargs->cu->version < 5)
-	      nlpt = notice_listptr (section_loc, &known_locsptr,
-				     cbargs->addrsize, cbargs->offset_size,
-				     cbargs->cu, num, attr);
+	      {
+		if (! cbargs->is_split)
+		  {
+		    nlpt = notice_listptr (section_loc, &known_locsptr,
+					   cbargs->addrsize,
+					   cbargs->offset_size,
+					   cbargs->cu, num, attr);
+		  }
+		else
+		  nlpt = true;
+	      }
 	    else
 	      {
 		/* Only register for a real section offset.  Otherwise

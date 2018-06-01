@@ -238,6 +238,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     testfile-macros-0xff.bz2 \
 	     run-readelf-macro.sh testfilemacro.bz2 \
 	     run-readelf-loc.sh testfileloc.bz2 \
+	     splitdwarf4-not-split4.dwo.bz2 \
+	     testfile-splitdwarf4-not-split4.debug.bz2 \
 	     run-readelf-ranges.sh \
 	     run-readelf-aranges.sh run-readelf-line.sh testfilefoobarbaz.bz2 \
 	     testfile-ppc64-min-instr.bz2 \

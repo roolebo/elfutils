@@ -868,4 +868,293 @@ DWARF section [ 3] '.debug_loc.dwo' at offset 0x225:
            [ 0] reg5
 EOF
 
+# Partial dwarf-4 and partial GNU DebugFission split-dwarf.
+#
+# = popcount.c =
+#
+# int popcount (unsigned char u)
+# {
+#   int c = 0;
+#   while (u != 0)
+#     {
+#       if ((u & 1) == 1)
+#         c++;
+#       u >>= 1;
+#     }
+#   return c;
+# }
+#
+# = splitdwarf4-not-split4.c =
+#
+# extern int popcount (unsigned char);
+#
+# int main (int argc, char **argv)
+# {
+#   int i;
+#   int p = argc;
+#   for (i = 0; i < argc;  ++i)
+#     p += popcount (argv[i][0]);
+#   i += p;
+#   return i;
+# }
+#
+# gcc -gdwarf-4 -O2 -c popcount.c
+# gcc -gdwarf-4 -gsplit-dwarf -O2 -c splitdwarf4-not-split4.c
+# gcc -o testfile-splitdwarf4-not-split4 splitdwarf4-not-split4.o popcount.o
+# eu-strip -f testfile-splitdwarf4-not-split4.debug \
+#   testfile-splitdwarf4-not-split4
+
+testfiles testfile-splitdwarf4-not-split4.debug
+testfiles splitdwarf4-not-split4.dwo
+
+testrun_compare ${abs_top_builddir}/src/readelf --debug-dump=info+ --debug-dump=loc testfile-splitdwarf4-not-split4.debug <<\EOF
+
+DWARF section [28] '.debug_info' at offset 0x330:
+ [Offset]
+ Compilation unit at offset 0:
+ Version: 4, Abbreviation section offset: 0, Address size: 8, Offset size: 4
+ Unit type: skeleton (4), Unit id: 0x3d909d7bd0e69c0b
+ [     b]  compile_unit         abbrev: 1
+           ranges               (sec_offset) range list [     0]
+           low_pc               (addr) 000000000000000000
+           stmt_list            (sec_offset) 0
+           GNU_dwo_name         (strp) "splitdwarf4-not-split4.dwo"
+           comp_dir             (strp) "/tmp"
+           GNU_pubnames         (flag_present) yes
+           GNU_addr_base        (sec_offset) address base [     0]
+           GNU_dwo_id           (data8) 0x3d909d7bd0e69c0b
+           GNU_ranges_base      (sec_offset) 0
+ Split compilation unit at offset 0:
+ Version: 4, Abbreviation section offset: 0, Address size: 8, Offset size: 4
+ Unit type: skeleton (4), Unit id: 0x3d909d7bd0e69c0b
+ {     b}  compile_unit         abbrev: 1
+           producer             (GNU_str_index) "GNU C17 9.0.0 20180528 (experimental) -mtune=generic -march=x86-64 -gdwarf-4 -gsplit-dwarf -O2"
+           language             (data1) C99 (12)
+           name                 (GNU_str_index) "splitdwarf4-not-split4.c"
+           comp_dir             (GNU_str_index) "/tmp"
+           GNU_dwo_id           (data8) 0x3d909d7bd0e69c0b
+ {    18}    subprogram           abbrev: 2
+             external             (flag_present) yes
+             name                 (GNU_str_index) "main"
+             decl_file            (data1) splitdwarf4-not-split4.c (1)
+             decl_line            (data1) 3
+             decl_column          (data1) 5
+             prototyped           (flag_present) yes
+             type                 (ref4) {    6d}
+             low_pc               (GNU_addr_index) [4] 0x0000000000401050 <main>
+             high_pc              (data8) 76 (0x000000000040109c <_start>)
+             frame_base           (exprloc) 
+              [ 0] call_frame_cfa
+             GNU_all_call_sites   (flag_present) yes
+             sibling              (ref4) {    6d}
+ {    30}      formal_parameter     abbrev: 3
+               name                 (GNU_str_index) "argc"
+               decl_file            (data1) splitdwarf4-not-split4.c (1)
+               decl_line            (data1) 3
+               decl_column          (data1) 15
+               type                 (ref4) {    6d}
+               location             (sec_offset) location list [     0]
+ {    3d}      formal_parameter     abbrev: 3
+               name                 (GNU_str_index) "argv"
+               decl_file            (data1) splitdwarf4-not-split4.c (1)
+               decl_line            (data1) 3
+               decl_column          (data1) 28
+               type                 (ref4) {    74}
+               location             (sec_offset) location list [    28]
+ {    4a}      variable             abbrev: 4
+               name                 (string) "i"
+               decl_file            (data1) splitdwarf4-not-split4.c (1)
+               decl_line            (data1) 5
+               decl_column          (data1) 7
+               type                 (ref4) {    6d}
+               location             (sec_offset) location list [    47]
+ {    58}      variable             abbrev: 4
+               name                 (string) "p"
+               decl_file            (data1) splitdwarf4-not-split4.c (1)
+               decl_line            (data1) 6
+               decl_column          (data1) 7
+               type                 (ref4) {    6d}
+               location             (sec_offset) location list [    73]
+ {    66}      GNU_call_site        abbrev: 5
+               low_pc               (GNU_addr_index) [1] 0x000000000040107f <main+0x2f>
+               abstract_origin      (ref4) {    84}
+ {    6d}    base_type            abbrev: 6
+             byte_size            (data1) 4
+             encoding             (data1) signed (5)
+             name                 (string) "int"
+ {    74}    pointer_type         abbrev: 7
+             byte_size            (data1) 8
+             type                 (ref4) {    7a}
+ {    7a}    pointer_type         abbrev: 7
+             byte_size            (data1) 8
+             type                 (ref4) {    80}
+ {    80}    base_type            abbrev: 8
+             byte_size            (data1) 1
+             encoding             (data1) signed_char (6)
+             name                 (GNU_str_index) "char"
+ {    84}    subprogram           abbrev: 9
+             external             (flag_present) yes
+             declaration          (flag_present) yes
+             linkage_name         (GNU_str_index) "popcount"
+             name                 (GNU_str_index) "popcount"
+             decl_file            (data1) splitdwarf4-not-split4.c (1)
+             decl_line            (data1) 1
+             decl_column          (data1) 12
+ Compilation unit at offset 52:
+ Version: 4, Abbreviation section offset: 29, Address size: 8, Offset size: 4
+ [    3f]  compile_unit         abbrev: 1
+           producer             (strp) "GNU C17 9.0.0 20180528 (experimental) -mtune=generic -march=x86-64 -gdwarf-4 -O2"
+           language             (data1) C99 (12)
+           name                 (strp) "popcount.c"
+           comp_dir             (strp) "/tmp"
+           low_pc               (addr) 0x0000000000401180 <popcount>
+           high_pc              (data8) 33 (0x00000000004011a1)
+           stmt_list            (sec_offset) 145
+ [    61]    subprogram           abbrev: 2
+             external             (flag_present) yes
+             name                 (strp) "popcount"
+             decl_file            (data1) popcount.c (1)
+             decl_line            (data1) 1
+             decl_column          (data1) 5
+             prototyped           (flag_present) yes
+             type                 (ref4) [    a0]
+             low_pc               (addr) 0x0000000000401180 <popcount>
+             high_pc              (data8) 33 (0x00000000004011a1)
+             frame_base           (exprloc) 
+              [ 0] call_frame_cfa
+             GNU_all_call_sites   (flag_present) yes
+             sibling              (ref4) [    a0]
+ [    83]      formal_parameter     abbrev: 3
+               name                 (string) "u"
+               decl_file            (data1) popcount.c (1)
+               decl_line            (data1) 1
+               decl_column          (data1) 29
+               type                 (ref4) [    a7]
+               location             (sec_offset) location list [     0]
+ [    91]      variable             abbrev: 4
+               name                 (string) "c"
+               decl_file            (data1) popcount.c (1)
+               decl_line            (data1) 3
+               decl_column          (data1) 7
+               type                 (ref4) [    a0]
+               location             (sec_offset) location list [    60]
+ [    a0]    base_type            abbrev: 5
+             byte_size            (data1) 4
+             encoding             (data1) signed (5)
+             name                 (string) "int"
+ [    a7]    base_type            abbrev: 6
+             byte_size            (data1) 1
+             encoding             (data1) unsigned_char (8)
+             name                 (strp) "unsigned char"
+
+DWARF section [32] '.debug_loc' at offset 0x5ef:
+
+ CU [    3f] base: 0x0000000000401180 <popcount>
+ [     0] range 0, 9
+          0x0000000000401180 <popcount>..
+          0x0000000000401188 <popcount+0x8>
+           [ 0] reg5
+          range 9, 1b
+          0x0000000000401189 <popcount+0x9>..
+          0x000000000040119a <popcount+0x1a>
+           [ 0] reg1
+          range 1b, 1d
+          0x000000000040119b <popcount+0x1b>..
+          0x000000000040119c <popcount+0x1c>
+           [ 0] breg1 0
+           [ 2] lit1
+           [ 3] shr
+           [ 4] stack_value
+          range 1d, 21
+          0x000000000040119d <popcount+0x1d>..
+          0x00000000004011a0 <popcount+0x20>
+           [ 0] reg1
+ [    60] range 0, 9
+          0x0000000000401180 <popcount>..
+          0x0000000000401188 <popcount+0x8>
+           [ 0] lit0
+           [ 1] stack_value
+          range 9, 20
+          0x0000000000401189 <popcount+0x9>..
+          0x000000000040119f <popcount+0x1f>
+           [ 0] reg0
+          range 20, 21
+          0x00000000004011a0 <popcount+0x20>..
+          0x00000000004011a0 <popcount+0x20>
+           [ 0] lit0
+           [ 1] stack_value
+EOF
+
+testrun_compare ${abs_top_builddir}/src/readelf --dwarf-skeleton=testfile-splitdwarf4-not-split4.debug --debug-dump=loc splitdwarf4-not-split4.dwo <<\EOF
+
+DWARF section [ 3] '.debug_loc.dwo' at offset 0x15b:
+
+ CU [     b] base: 000000000000000000
+ [     0] range 401050, 40106e
+          0x0000000000401050 <main>..
+          0x000000000040106d <main+0x1d>
+           [ 0] reg5
+          range 40106e, 401086
+          0x000000000040106e <main+0x1e>..
+          0x0000000000401085 <main+0x35>
+           [ 0] reg12
+          range 401086, 401095
+          0x0000000000401086 <main+0x36>..
+          0x0000000000401094 <main+0x44>
+           [ 0] GNU_entry_value:
+                [ 0] reg5
+           [ 3] stack_value
+          range 401095, 40109c
+          0x0000000000401095 <main+0x45>..
+          0x000000000040109b <main+0x4b>
+           [ 0] reg5
+ [    28] range 401050, 40106e
+          0x0000000000401050 <main>..
+          0x000000000040106d <main+0x1d>
+           [ 0] reg4
+          range 40106e, 401095
+          0x000000000040106e <main+0x1e>..
+          0x0000000000401094 <main+0x44>
+           [ 0] GNU_entry_value:
+                [ 0] reg4
+           [ 3] stack_value
+          range 401095, 40109c
+          0x0000000000401095 <main+0x45>..
+          0x000000000040109b <main+0x4b>
+           [ 0] reg4
+ [    47] range 401050, 40106e
+          0x0000000000401050 <main>..
+          0x000000000040106d <main+0x1d>
+           [ 0] lit0
+           [ 1] stack_value
+          range 401086, 40108e
+          0x0000000000401086 <main+0x36>..
+          0x000000000040108d <main+0x3d>
+           [ 0] breg12 0
+           [ 2] breg6 0
+           [ 4] plus
+           [ 5] stack_value
+          range 40108e, 401095
+          0x000000000040108e <main+0x3e>..
+          0x0000000000401094 <main+0x44>
+           [ 0] reg0
+          range 401095, 40109c
+          0x0000000000401095 <main+0x45>..
+          0x000000000040109b <main+0x4b>
+           [ 0] lit0
+           [ 1] stack_value
+ [    73] range 401050, 40106e
+          0x0000000000401050 <main>..
+          0x000000000040106d <main+0x1d>
+           [ 0] reg5
+          range 40106e, 401090
+          0x000000000040106e <main+0x1e>..
+          0x000000000040108f <main+0x3f>
+           [ 0] reg6
+          range 401095, 40109c
+          0x0000000000401095 <main+0x45>..
+          0x000000000040109b <main+0x4b>
+           [ 0] reg5
+EOF
+
 exit 0

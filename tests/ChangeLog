@@ -1,5 +1,15 @@
 2018-05-31  Mark Wielaard  <mark@klomp.org>
 
+	* splitdwarf4-not-split4.dwo.bz2: New test file.
+	* testfile-splitdwarf4-not-split4.debug.bz2: Likewise.
+	* run-readelf-loc.sh: Add test for splitdwarf4-not-split4.dwo
+	and testfile-splitdwarf4-not-split4.debug.
+	* run-varlocs.sh: Test testfile-splitdwarf4-not-split4.debug.
+	* Makefile.am (EXTRA_DIST): Add splitdwarf4-not-split4.dwo.bz2
+	and testfile-splitdwarf4-not-split4.debug.bz2.
+
+2018-05-31  Mark Wielaard  <mark@klomp.org>
+
 	* test-subr.sh (self_test_files): Split into self_test_files_exe,
 	self_test_files_lib and self_test_obj.
 	(testrun_on_self_exe): New function.

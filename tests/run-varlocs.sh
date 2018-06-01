@@ -559,4 +559,46 @@ module 'testfile-addrx_constx-4'
       location (exprloc) {addr: 0x404038, deref_size(4), GNU_push_tls_address, const: 0x403e08, deref_size(4), plus, GNU_push_tls_address, const: 0x403e0c, deref_size(4), plus, GNU_push_tls_address, const: 0x403e10, deref_size(4), plus, addr: 0x404034, deref_size(4), plus, addr: 0x40403c, deref_size(4), plus, stack_value}
 EOF
 
+# See run-readelf-loc.sh
+testfiles testfile-splitdwarf4-not-split4.debug
+testfiles splitdwarf4-not-split4.dwo
+
+testrun_compare ${abs_top_builddir}/tests/varlocs --debug -e testfile-splitdwarf4-not-split4.debug <<\EOF
+module 'testfile-splitdwarf4-not-split4.debug'
+[b] CU 'splitdwarf4-not-split4.c'
+  [18] function 'main'@401050
+    frame_base: {call_frame_cfa {...}}
+    [30] parameter 'argc'
+      [401050,40106e) {reg5}
+      [40106e,401086) {reg12}
+      [401086,401095) {GNU_entry_value(1) {reg5}, stack_value}
+      [401095,40109c) {reg5}
+    [3d] parameter 'argv'
+      [401050,40106e) {reg4}
+      [40106e,401095) {GNU_entry_value(1) {reg4}, stack_value}
+      [401095,40109c) {reg4}
+    [4a] variable 'i'
+      [401050,40106e) {lit0, stack_value}
+      [401086,40108e) {breg12(0), breg6(0), plus, stack_value}
+      [40108e,401095) {reg0}
+      [401095,40109c) {lit0, stack_value}
+    [58] variable 'p'
+      [401050,40106e) {reg5}
+      [40106e,401090) {reg6}
+      [401095,40109c) {reg5}
+module 'testfile-splitdwarf4-not-split4.debug'
+[3f] CU 'popcount.c'@401180
+  [61] function 'popcount'@401180
+    frame_base: {call_frame_cfa {...}}
+    [83] parameter 'u'
+      [401180,401189) {reg5}
+      [401189,40119b) {reg1}
+      [40119b,40119d) {breg1(0), lit1, shr, stack_value}
+      [40119d,4011a1) {reg1}
+    [91] variable 'c'
+      [401180,401189) {lit0, stack_value}
+      [401189,4011a0) {reg0}
+      [4011a0,4011a1) {lit0, stack_value}
+EOF
+
 exit 0

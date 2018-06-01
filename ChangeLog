@@ -1,3 +1,8 @@
+2018-06-01  Mark Wielaard  <mark@klomp.org>
+
+	* configure.ac: Set version to 0.171.
+	* NEWS: Mention DWARF5, split-dwarf and GNU DebugFission support.
+
 2018-03-17  Mark Wielaard  <mark@klomp.org>
 
 	* configure.ac (CHECK_FUNCS): Check for process_vm_readv.

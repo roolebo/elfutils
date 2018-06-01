@@ -1,5 +1,5 @@
 /* Common argp_print_version_hook for all tools.
-   Copyright (C) 2016, 2017 Red Hat, Inc.
+   Copyright (C) 2016, 2017, 2018 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -41,5 +41,5 @@ print_version (FILE *stream, struct argp_state *state)
 Copyright (C) %s The elfutils developers <%s>.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
-"), "2017", PACKAGE_URL);
+"), "2018", PACKAGE_URL);
 }

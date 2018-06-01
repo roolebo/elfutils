@@ -1,3 +1,41 @@
+Version 0.171
+
+DWARF5 and split dwarf, including GNU DebugFission, are supported now.
+Data can be read from the new DWARF sections .debug_addr, .debug_line_str,
+.debug_loclists, .debug_str_offsets and .debug_rnglists.  Plus the new
+DWARF5 and GNU DebugFission encodings of the existing .debug sections.
+Also in split DWARF .dwo (DWARF object) files.  This support is mostly
+handled by existing functions (dwarf_getlocation*, dwarf_getsrclines,
+dwarf_ranges, dwarf_form*, etc.) now returning the data from the new
+sections and data formats.  But some new functions have been added
+to more easily get information about skeleton and split compile units
+(dwarf_get_units and dwarf_cu_info), handle new attribute data
+(dwarf_getabbrevattr_data) and to keep references to Dwarf_Dies
+that might come from different sections or files (dwarf_die_addr_die).
+
+Not yet supported are .dwp (Dwarf Package) and .sup (Dwarf Supplementary)
+files, the .debug_names index, the .debug_cu_index and .debug_tu_index
+sections. Only a single .debug_info (and .debug_types) section are
+currently handled.
+
+readelf: Handle all new DWARF5 sections.
+         --debug-dump=info+ will show split unit DIEs when found.
+         --dwarf-skeleton can be used when inspecting a .dwo file.
+	 Recognizes GNU locviews with --debug-dump=loc.
+
+libdw: New functions dwarf_die_addr_die, dwarf_get_units,
+       dwarf_getabbrevattr_data and dwarf_cu_info.
+       libdw will now try to resolve the alt file on first use of
+       an alt attribute FORM when not set yet with dwarf_set_alt.
+       dwarf_aggregate_size() now works with multi-dimensional arrays.
+
+libdwfl: Use process_vm_readv when available instead of ptrace.
+
+backends: Add a RISC-V backend.
+
+There were various improvements to build on Windows.
+The sha1 and md5 implementations have been removed, they weren't used.
+
 Version 0.170
 
 libdw: Added new DWARF5 attribute, tag, character encoding, language code,

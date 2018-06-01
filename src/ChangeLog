@@ -1,5 +1,14 @@
 2018-05-31  Mark Wielaard  <mark@klomp.org>
 
+	* readelf.c (enum section_e): Make section_types not an alias of
+	section_info.
+	(section_all): Add section_types.
+	(parse_opt): Add both section_info and section_types for "info"
+	and "info+".
+	(print_debug_units): Don't be silent for debug_types.
+
+2018-05-31  Mark Wielaard  <mark@klomp.org>
+
 	* readelf.c (attr_callback): Only register section_loc when not
 	looking at a split dwarf from a skeleton.
 

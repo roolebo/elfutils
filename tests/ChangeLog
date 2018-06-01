@@ -1,5 +1,11 @@
 2018-05-31  Mark Wielaard  <mark@klomp.org>
 
+	* run-readelf-types.sh: New test.
+	* Makefile.am (TESTS): Add run-readelf-types.sh.
+	(EXTRA_DIST): Likewise.
+
+2018-05-31  Mark Wielaard  <mark@klomp.org>
+
 	* splitdwarf4-not-split4.dwo.bz2: New test file.
 	* testfile-splitdwarf4-not-split4.debug.bz2: Likewise.
 	* run-readelf-loc.sh: Add test for splitdwarf4-not-split4.dwo

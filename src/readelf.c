@@ -237,8 +237,7 @@ static enum section_e
   section_abbrev = 1,		/* .debug_abbrev  */
   section_aranges = 2,		/* .debug_aranges  */
   section_frame = 4,		/* .debug_frame or .eh_frame & al.  */
-  section_info = 8,		/* .debug_info, .debug_types  */
-  section_types = section_info,
+  section_info = 8,		/* .debug_info, (implies .debug_types)  */
   section_line = 16,		/* .debug_line  */
   section_loc = 32,		/* .debug_loc  */
   section_pubnames = 64,	/* .debug_pubnames  */
@@ -248,12 +247,13 @@ static enum section_e
   section_exception = 1024,	/* .eh_frame & al.  */
   section_gdb_index = 2048,	/* .gdb_index  */
   section_macro = 4096,		/* .debug_macro  */
-  section_addr = 8192,
+  section_addr = 8192,		/* .debug_addr  */
+  section_types = 16384,	/* .debug_types (implied by .debug_info)  */
   section_all = (section_abbrev | section_aranges | section_frame
 		 | section_info | section_line | section_loc
 		 | section_pubnames | section_str | section_macinfo
 		 | section_ranges | section_exception | section_gdb_index
-		 | section_macro | section_addr)
+		 | section_macro | section_addr | section_types)
 } print_debug_sections, implicit_debug_sections;
 
 /* Select hex dumping of sections.  */
@@ -463,10 +463,14 @@ parse_opt (int key, char *arg,
       else if (strcmp (arg, "frame") == 0 || strcmp (arg, "frames") == 0)
 	print_debug_sections |= section_frame;
       else if (strcmp (arg, "info") == 0)
-	print_debug_sections |= section_info;
+	{
+	  print_debug_sections |= section_info;
+	  print_debug_sections |= section_types;
+	}
       else if (strcmp (arg, "info+") == 0)
 	{
 	  print_debug_sections |= section_info;
+	  print_debug_sections |= section_types;
 	  show_split_units = true;
 	}
       else if (strcmp (arg, "loc") == 0)
@@ -7448,7 +7452,7 @@ print_debug_units (Dwfl_Module *dwflmod,
 		   Elf_Scn *scn, GElf_Shdr *shdr,
 		   Dwarf *dbg, bool debug_types)
 {
-  const bool silent = !(print_debug_sections & section_info);
+  const bool silent = !(print_debug_sections & section_info) && !debug_types;
   const char *secname = section_name (ebl, ehdr, shdr);
 
   if (!silent)

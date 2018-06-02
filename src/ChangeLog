@@ -1,5 +1,25 @@
 2018-06-04  Mark Wielaard  <mark@klomp.org>
 
+	* readelf (format_result): New static char pointer.
+	(format_result_size): New static size_t.
+	(format_dwarf_addr): Calculate max string size, reuse format_result
+	if possible, otherwise realloc. Use sprintf on result, not asprintf.
+	(print_ops): Don't free format_dwarf_addr, make sure result is
+	printed before calling format_dwarf_addr again.
+	(print_debug_addr_section): Likewise.
+	(print_debug_aranges_section): Likewise.
+	(print_debug_rnglists_section): Likewise.
+	(print_debug_ranges_section): Likewise.
+	(print_debug_frame_section): Likewise.
+	(attr_callback): Likewise.
+	(print_decoded_line_section): Likewise.
+	(print_debug_line_section): Likewise.
+	(print_debug_loclists_section): Likewise.
+	(print_debug_loc_section): Likewise.
+	(print_gdb_index_section): Likewsie.
+
+2018-06-04  Mark Wielaard  <mark@klomp.org>
+
 	* readelf.c (yes_str): New static char pointer.
 	(no_str): Likewise.
 	(main): Set yes_str and no_str using gettext.

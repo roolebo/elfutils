@@ -1,3 +1,8 @@
+2018-06-02  Mark Wielaard  <mark@klomp.org>
+
+	* test-subr.sh (self_test_files_exe): Drop shared libraries.
+	Keep addr2line, elfcmp, objdump and readelf.
+
 2018-05-31  Mark Wielaard  <mark@klomp.org>
 
 	* run-readelf-types.sh: New test.

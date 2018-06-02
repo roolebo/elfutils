@@ -116,13 +116,9 @@ program_transform()
 }
 
 self_test_files_exe=`echo ${abs_top_builddir}/src/addr2line \
-${abs_top_builddir}/src/elfcmp ${abs_top_builddir}/src/elflint \
-${abs_top_builddir}/src/nm ${abs_top_builddir}/src/objdump \
-${abs_top_builddir}/src/readelf \
-${abs_top_builddir}/libelf/libelf.so \
-${abs_top_builddir}/libdw/libdw.so \
-${abs_top_builddir}/backends/libebl_i386.so \
-${abs_top_builddir}/backends/libebl_x86_64.so`
+${abs_top_builddir}/src/elfcmp \
+${abs_top_builddir}/src/objdump \
+${abs_top_builddir}/src/readelf`
 
 self_test_files_lib=`echo ${abs_top_builddir}/libelf/libelf.so \
 ${abs_top_builddir}/libdw/libdw.so \

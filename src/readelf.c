@@ -35,6 +35,8 @@
 #include <locale.h>
 #include <stdarg.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdio_ext.h>
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
@@ -310,6 +312,9 @@ static void dump_archive_index (Elf *, const char *);
 int
 main (int argc, char *argv[])
 {
+  /* We use no threads here which can interfere with handling a stream.  */
+  (void) __fsetlocking (stdout, FSETLOCKING_BYCALLER);
+
   /* Set locale.  */
   setlocale (LC_ALL, "");
 

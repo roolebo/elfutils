@@ -1,3 +1,7 @@
+2018-06-04  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (main): Call __fsetlocking (stdout, FSETLOCKING_BYCALLER).
+
 2018-05-31  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_debug_units): Print the dwo name and id when

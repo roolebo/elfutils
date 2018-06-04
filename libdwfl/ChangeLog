@@ -1,3 +1,8 @@
+2018-06-04  Mark Wielaard  <mark@klomp.org>
+
+	* libdwflP.h (__libdwfl_addrsym): Remove function declaration.
+	* dwfl_module_addrsym.c (__libdwfl_addrsym): Make a static function.
+
 2018-05-27  Mark Wielaard  <mark@klomp.org>
 
 	* relocate.c (__libdwfl_relocate): Always call relocate_section with

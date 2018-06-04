@@ -463,15 +463,6 @@ extern const char *__libdwfl_getsym (Dwfl_Module *mod, int ndx, GElf_Sym *sym,
 				     bool *resolved, bool adjust_st_value)
   internal_function;
 
-/* Internal wrapper for old dwfl_module_addrsym and new dwfl_module_addrinfo.
-   adjust_st_value set to true returns adjusted SYM st_value, set to false
-   it will not adjust SYM at all, but does match against resolved values. */
-extern const char *__libdwfl_addrsym (Dwfl_Module *mod, GElf_Addr addr,
-				      GElf_Off *off, GElf_Sym *sym,
-				      GElf_Word *shndxp, Elf **elfp,
-				      Dwarf_Addr *bias,
-				      bool adjust_st_value) internal_function;
-
 extern void __libdwfl_module_free (Dwfl_Module *mod) internal_function;
 
 /* Find the main ELF file, update MOD->elferr and/or MOD->main.elf.  */

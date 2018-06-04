@@ -235,9 +235,12 @@ search_table (struct search_state *state, int start, int end)
 }
 
 /* Returns the name of the symbol "closest" to ADDR.
-   Never returns symbols at addresses above ADDR.  */
-const char *
-internal_function
+   Never returns symbols at addresses above ADDR.
+
+   Wrapper for old dwfl_module_addrsym and new dwfl_module_addrinfo.
+   adjust_st_value set to true returns adjusted SYM st_value, set to false
+   it will not adjust SYM at all, but does match against resolved values.   */
+static const char *
 __libdwfl_addrsym (Dwfl_Module *_mod, GElf_Addr _addr, GElf_Off *off,
 		   GElf_Sym *_closest_sym, GElf_Word *shndxp,
 		   Elf **elfp, Dwarf_Addr *biasp, bool _adjust_st_value)

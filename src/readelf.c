@@ -309,6 +309,10 @@ static void print_strings (Ebl *ebl);
 static void dump_archive_index (Elf *, const char *);
 
 
+/* Looked up once with gettext in main.  */
+static char *yes_str;
+static char *no_str;
+
 int
 main (int argc, char *argv[])
 {
@@ -320,6 +324,10 @@ main (int argc, char *argv[])
 
   /* Initialize the message catalog.  */
   textdomain (PACKAGE_TARNAME);
+
+  /* Look up once.  */
+  yes_str = gettext ("yes");
+  no_str = gettext ("yes");
 
   /* Parse and process arguments.  */
   int remaining;
@@ -7370,7 +7378,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 
       printf ("           %*s%-20s (%s) %s\n",
 	      (int) (level * 2), "", dwarf_attr_name (attr),
-	      dwarf_form_name (form), flag ? gettext ("yes") : gettext ("no"));
+	      dwarf_form_name (form), flag ? yes_str : no_str);
       break;
 
     case DW_FORM_flag_present:
@@ -7378,7 +7386,7 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	break;
       printf ("           %*s%-20s (%s) %s\n",
 	      (int) (level * 2), "", dwarf_attr_name (attr),
-	      dwarf_form_name (form), gettext ("yes"));
+	      dwarf_form_name (form), yes_str);
       break;
 
     case DW_FORM_exprloc:

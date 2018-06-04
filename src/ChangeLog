@@ -1,5 +1,12 @@
 2018-06-04  Mark Wielaard  <mark@klomp.org>
 
+	* readelf.c (yes_str): New static char pointer.
+	(no_str): Likewise.
+	(main): Set yes_str and no_str using gettext.
+	(attr_callback): Use yes_str and no_str instead of calling gettext.
+
+2018-06-04  Mark Wielaard  <mark@klomp.org>
+
 	* readelf.c (main): Call __fsetlocking (stdout, FSETLOCKING_BYCALLER).
 
 2018-05-31  Mark Wielaard  <mark@klomp.org>

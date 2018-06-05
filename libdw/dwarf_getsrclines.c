@@ -566,7 +566,7 @@ read_srclines (Dwarf *dbg,
       for (unsigned int n = 0; n < nfiles; n++)
 	{
 	  const char *fname = NULL;
-	  Dwarf_Word diridx = -1;
+	  Dwarf_Word diridx = (Dwarf_Word) -1;
 	  for (unsigned char m = 0; m < nforms; m++)
 	    {
 	      if (m == form_path)
@@ -581,7 +581,8 @@ read_srclines (Dwarf *dbg,
 		  attr.code = DW_AT_decl_file; /* Close enough.  */
 		  attr.form = forms[m];
 		  attr.valp = (void *) linep;
-		  dwarf_formudata (&attr, &diridx);
+		  if (dwarf_formudata (&attr, &diridx) != 0)
+		    diridx = (Dwarf_Word) -1;
 		}
 
 	      size_t len = __libdw_form_val_len (&fake_cu, forms[m], linep);

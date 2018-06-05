@@ -1,5 +1,10 @@
 2018-06-05  Mark Wielaard  <mark@klomp.org>
 
+	* dwarf_getsrclines.c (read_srclines): Explicitly set diridx to -1
+	in case dwarf_formudata fails.
+
+2018-06-05  Mark Wielaard  <mark@klomp.org>
+
 	* dwarf_getaranges (dwarf_getaranges): Free new_arange if
 	__libdw_findcu fails.
 

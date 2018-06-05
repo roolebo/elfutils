@@ -182,6 +182,17 @@ read_srclines (Dwarf *dbg,
       .discriminator = 0
     };
 
+  /* The dirs normally go on the stack, but if there are too many
+     we alloc them all.  Set up stack storage early, so we can check on
+     error if we need to free them or not.  */
+  struct dirlist
+  {
+    const char *dir;
+    size_t len;
+  };
+  struct dirlist dirstack[MAX_STACK_DIRS];
+  struct dirlist *dirarray = dirstack;
+
   if (unlikely (linep + 4 > lineendp))
     {
     invalid_data:
@@ -346,14 +357,6 @@ read_srclines (Dwarf *dbg,
       if (nforms == 0 && ndirs != 0)
 	goto invalid_data;
     }
-
-  struct dirlist
-  {
-    const char *dir;
-    size_t len;
-  };
-  struct dirlist dirstack[MAX_STACK_DIRS];
-  struct dirlist *dirarray = dirstack;
 
   /* Arrange the list in array form.  */
   ndirlist = ndirs;
@@ -1051,7 +1054,7 @@ read_srclines (Dwarf *dbg,
       free (state.linelist);
       state.linelist = ll;
     }
-  if (ndirlist >= MAX_STACK_DIRS)
+  if (dirarray != dirstack)
     free (dirarray);
   for (size_t i = MAX_STACK_FILES; i < nfilelist; i++)
     {

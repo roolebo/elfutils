@@ -1,5 +1,11 @@
 2018-06-05  Mark Wielaard  <mark@klomp.org>
 
+	* dwarf_getsrclines.c (read_srclines): Define dirarray early and
+	check whether or not it is equal to dirstack on exit/out before
+	cleanup.
+
+2018-06-05  Mark Wielaard  <mark@klomp.org>
+
 	* dwarf_getalt.c (find_debug_altlink): id_path array should be 2
 	larger to contain MAX_BUILD_ID_BYTES.
 

@@ -123,7 +123,7 @@ find_debug_altlink (Dwarf *dbg)
     {
       /* Note sizeof a string literal includes the trailing zero.  */
       char id_path[sizeof DEBUGINFO_PATH - 1 + sizeof "/.build-id/" - 1
-		   + 2 + 1 + (MAX_BUILD_ID_BYTES - 2) * 2 + sizeof ".debug"];
+		   + 2 + 1 + (MAX_BUILD_ID_BYTES - 1) * 2 + sizeof ".debug"];
       sprintf (&id_path[0], "%s%s", DEBUGINFO_PATH, "/.build-id/");
       sprintf (&id_path[sizeof DEBUGINFO_PATH - 1 + sizeof "/.build-id/" - 1],
 	       "%02" PRIx8 "/", (uint8_t) id[0]);

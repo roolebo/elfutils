@@ -1,3 +1,8 @@
+2018-06-05  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_getalt.c (find_debug_altlink): id_path array should be 2
+	larger to contain MAX_BUILD_ID_BYTES.
+
 2018-05-31  Mark Wielaard  <mark@klomp.org>
 
 	* libdw_find_split_unit.c (try_split_file): New function extracted

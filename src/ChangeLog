@@ -1,5 +1,10 @@
 2018-06-05  Mark Wielaard  <mark@klomp.org>
 
+	* readelf.c (print_debug_loc_section): Set begin to idx when failing
+	to read the start address if DW_LLE_GNU_start_end_entry.
+
+2018-06-05  Mark Wielaard  <mark@klomp.org>
+
 	* readelf.c (handle_sysv_hash): Don't leak lengths array when
 	detecting an invalid chain.
 	(handle_sysv_hash64): Likewise.

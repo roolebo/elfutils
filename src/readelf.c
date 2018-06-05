@@ -9343,7 +9343,7 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
 		goto invalid_data;
 	      get_uleb128 (idx, locp, locendp);
 	      if (get_indexed_addr (cu, idx, &begin) != 0)
-		end = idx; /* ... */
+		begin = idx; /* ... */
 	      if (locp >= locendp)
 		goto invalid_data;
 	      get_uleb128 (idx, locp, locendp);

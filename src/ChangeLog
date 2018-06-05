@@ -1,5 +1,10 @@
 2018-06-05  Mark Wielaard  <mark@klomp.org>
 
+	* readelf.c (print_debug_addr_section): Set unit_length always to
+	(next_unitp - readp) in case we don't have a real header.
+
+2018-06-05  Mark Wielaard  <mark@klomp.org>
+
 	* readelf.c (print_debug_loc_section): Set begin to idx when failing
 	to read the start address if DW_LLE_GNU_start_end_entry.
 

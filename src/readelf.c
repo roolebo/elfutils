@@ -5178,10 +5178,7 @@ print_debug_addr_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	      /* The addresses start here, but where do they end?  */
 	      listptr = get_listptr (&known_addrbases, idx);
 	      if (listptr == NULL)
-		{
-		  next_unitp = readendp;
-		  unit_length = (uint64_t) (next_unitp - readp);
-		}
+		next_unitp = readendp;
 	      else if (listptr->cu->version < 5)
 		{
 		  next_unitp = start + listptr->offset;
@@ -5192,7 +5189,6 @@ print_debug_addr_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 			     PRIx64, off);
 		      next_unitp = readendp;
 		    }
-		  unit_length = (uint64_t) (next_unitp - readp);
 		}
 	      else
 		{
@@ -5215,6 +5211,7 @@ print_debug_addr_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 		      next_unitp = readendp;
 		    }
 		}
+	      unit_length = (uint64_t) (next_unitp - readp);
 
 	      /* Pretend we have a header.  */
 	      printf ("\n");

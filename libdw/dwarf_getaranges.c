@@ -197,7 +197,12 @@ dwarf_getaranges (Dwarf *dbg, Dwarf_Aranges **aranges, size_t *naranges)
 	  /* We store the actual CU DIE offset, not the CU header offset.  */
 	  Dwarf_CU *cu = __libdw_findcu (dbg, offset, false);
 	  if (unlikely (cu == NULL))
-	    goto fail;
+	    {
+	      /* We haven't gotten a chance to link in the new_arange
+		 into the arangelist, don't leak it.  */
+	      free (new_arange);
+	      goto fail;
+	    }
 	  new_arange->arange.offset = __libdw_first_die_off_from_cu (cu);
 
 	  new_arange->next = arangelist;

@@ -1,5 +1,11 @@
 2018-06-05  Mark Wielaard  <mark@klomp.org>
 
+	* readelf.c (handle_sysv_hash): Don't leak lengths array when
+	detecting an invalid chain.
+	(handle_sysv_hash64): Likewise.
+
+2018-06-05  Mark Wielaard  <mark@klomp.org>
+
 	* readelf.c (print_debug_macro_section): Extend vendor array by one
 	to include max DW_MACRO_hi_user opcode.
 

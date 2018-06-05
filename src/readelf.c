@@ -3213,7 +3213,12 @@ handle_sysv_hash (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx)
 	  ++nsyms;
 	  ++chain_len;
 	  if (chain_len > nchain)
-	    goto invalid_data;
+	    {
+	      error (0, 0, gettext ("invalid chain in sysv.hash section %d"),
+		     (int) elf_ndxscn (scn));
+	      free (lengths);
+	      return;
+	    }
 	  if (maxlength < ++lengths[cnt])
 	    ++maxlength;
 
@@ -3274,7 +3279,12 @@ handle_sysv_hash64 (Ebl *ebl, Elf_Scn *scn, GElf_Shdr *shdr, size_t shstrndx)
 	  ++nsyms;
 	  ++chain_len;
 	  if (chain_len > nchain)
-	    goto invalid_data;
+	    {
+	      error (0, 0, gettext ("invalid chain in sysv.hash64 section %d"),
+		     (int) elf_ndxscn (scn));
+	      free (lengths);
+	      return;
+	    }
 	  if (maxlength < ++lengths[cnt])
 	    ++maxlength;
 

@@ -9721,7 +9721,7 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 							       ? cu->die.cu
 							       : NULL));
 
-      const unsigned char *vendor[DW_MACRO_hi_user - DW_MACRO_lo_user];
+      const unsigned char *vendor[DW_MACRO_hi_user - DW_MACRO_lo_user + 1];
       memset (vendor, 0, sizeof vendor);
       if (flag & 0x04)
 	{

@@ -122,7 +122,8 @@ dwarf_form_string (unsigned int form)
 static void
 print_base_type (Dwarf_Die *base)
 {
-  assert (dwarf_tag (base) == DW_TAG_base_type);
+  if (dwarf_tag (base) != DW_TAG_base_type)
+    error (EXIT_FAILURE, 0, "not a base type");
 
   Dwarf_Attribute encoding;
   Dwarf_Word enctype = 0;

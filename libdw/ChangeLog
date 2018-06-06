@@ -1,3 +1,8 @@
+2018-06-06  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_getlocation_die.c (dwarf_getlocation_die): Check offset
+	falls inside cu data.
+
 2018-06-05  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_getsrclines.c (read_srclines): Explicitly set diridx to -1

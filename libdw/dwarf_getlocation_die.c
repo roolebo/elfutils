@@ -59,6 +59,12 @@ dwarf_getlocation_die (Dwarf_Attribute *attr, const Dwarf_Op *op,
     case DW_OP_GNU_const_type:
     case DW_OP_call2:
     case DW_OP_call4:
+      if (op->number > (attr->cu->end - attr->cu->start))
+	{
+	invalid_offset:
+	  __libdw_seterrno (DWARF_E_INVALID_OFFSET);
+	  return -1;
+	}
       dieoff = attr->cu->start + op->number;
       break;
 
@@ -66,6 +72,8 @@ dwarf_getlocation_die (Dwarf_Attribute *attr, const Dwarf_Op *op,
     case DW_OP_GNU_regval_type:
     case DW_OP_deref_type:
     case DW_OP_GNU_deref_type:
+      if (op->number2 > (attr->cu->end - attr->cu->start))
+	goto invalid_offset;
       dieoff = attr->cu->start + op->number2;
       break;
 

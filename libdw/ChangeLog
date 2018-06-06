@@ -1,3 +1,9 @@
+2018-06-07  Mark Wielaard  <mark@klomp.org>
+
+	* libdw_findcu.c (__libdw_intern_next_unit): Report DWARF_E_VERSION,
+	not DWARF_E_INVALID_DWARF on unknown version. Set address_size and
+	offset_size to 8 when unknown.
+
 2018-06-06  Mark Wielaard  <mark@klomp.org>
 
 	* libdwP.h (__libdw_dieabbrev): Check DIE addr falls in cu.

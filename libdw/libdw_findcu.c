@@ -120,13 +120,22 @@ __libdw_intern_next_unit (Dwarf *dbg, bool debug_types)
     return NULL;
 
   /* We only know how to handle the DWARF version 2 through 5 formats.
-     For v4 debug types we only handle version 4. */
+     For v4 debug types we only handle version 4.  */
   if (unlikely (version < 2) || unlikely (version > 5)
       || (debug_types && unlikely (version != 4)))
     {
-      __libdw_seterrno (DWARF_E_INVALID_DWARF);
+      __libdw_seterrno (DWARF_E_VERSION);
       return NULL;
     }
+
+  /* We only handle 32 or 64 bit (4 or 8 byte) addresses and offsets.
+     Just assume we are dealing with 64bit in case the size is "unknown".
+     Too much code assumes if it isn't 4 then it is 8 (or the other way
+     around).  */
+  if (unlikely (address_size != 4 && address_size != 8))
+    address_size = 8;
+  if (unlikely (offset_size != 4 && offset_size != 8))
+    offset_size = 8;
 
   /* Invalid or truncated debug section data?  */
   size_t sec_idx = debug_types ? IDX_debug_types : IDX_debug_info;

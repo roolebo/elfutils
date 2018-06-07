@@ -1,5 +1,9 @@
 2018-06-06  Mark Wielaard  <mark@klomp.org>
 
+	* libdwP.h (__libdw_dieabbrev): Check DIE addr falls in cu.
+
+2018-06-06  Mark Wielaard  <mark@klomp.org>
+
 	* dwarf_getlocation_die.c (dwarf_getlocation_die): Check offset
 	falls inside cu data.
 

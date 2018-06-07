@@ -3705,12 +3705,9 @@ print_attributes (Ebl *ebl, const GElf_Ehdr *ehdr)
 }
 
 
-static char *format_result = NULL;
-static size_t format_result_size = 0;
-
-static char *
-format_dwarf_addr (Dwfl_Module *dwflmod,
-		   int address_size, Dwarf_Addr address, Dwarf_Addr raw)
+void
+print_dwarf_addr (Dwfl_Module *dwflmod,
+		  int address_size, Dwarf_Addr address, Dwarf_Addr raw)
 {
   /* See if there is a name we can give for this address.  */
   GElf_Sym sym;
@@ -3736,75 +3733,40 @@ format_dwarf_addr (Dwfl_Module *dwflmod,
 	     : dwfl_module_relocation_info (dwflmod, i, NULL));
     }
 
-  char *result;
-  size_t max_size = ((name != NULL ? strlen (name) : 0)
-		     + (scn != NULL ? strlen (scn) : 0)
-		     + (2 + 8 * 2) * 2 + 6);
-  if (max_size > format_result_size)
-    {
-      max_size *= 2; /* A bit more, so we don't immediately realloc again.  */
-      result = realloc (format_result, max_size);
-      if (result == NULL)
-	error (EXIT_FAILURE, 0, _("memory exhausted"));
-      format_result_size = max_size;
-      format_result = result;
-    }
-  else
-    result = format_result;
-
   if ((name != NULL
        ? (off != 0
 	  ? (scn != NULL
 	     ? (address_size == 0
-		? sprintf (result,
-			   "%s+%#" PRIx64 " <%s+%#" PRIx64 ">",
-			   scn, address, name, off)
-		: sprintf (result,
-			   "%s+%#0*" PRIx64 " <%s+%#" PRIx64 ">",
-			   scn, 2 + address_size * 2, address,
-			   name, off))
+		? printf ("%s+%#" PRIx64 " <%s+%#" PRIx64 ">",
+			  scn, address, name, off)
+		: printf ("%s+%#0*" PRIx64 " <%s+%#" PRIx64 ">",
+			  scn, 2 + address_size * 2, address,
+			  name, off))
 	     : (address_size == 0
-		? sprintf (result,
-			   "%#" PRIx64 " <%s+%#" PRIx64 ">",
-			   address, name, off)
-		: sprintf (result,
-			   "%#0*" PRIx64 " <%s+%#" PRIx64 ">",
-			   2 + address_size * 2, address,
-			   name, off)))
+		? printf ("%#" PRIx64 " <%s+%#" PRIx64 ">",
+			  address, name, off)
+		: printf ("%#0*" PRIx64 " <%s+%#" PRIx64 ">",
+			  2 + address_size * 2, address,
+			  name, off)))
 	  : (scn != NULL
 	     ? (address_size == 0
-		? sprintf (result,
-			   "%s+%#" PRIx64 " <%s>",
-			   scn, address, name)
-		: sprintf (result,
-			   "%s+%#0*" PRIx64 " <%s>",
+		? printf ("%s+%#" PRIx64 " <%s>", scn, address, name)
+		: printf ("%s+%#0*" PRIx64 " <%s>",
 			   scn, 2 + address_size * 2, address, name))
 	     : (address_size == 0
-		? sprintf (result,
-			   "%#" PRIx64 " <%s>",
-			   address, name)
-		: sprintf (result,
-			   "%#0*" PRIx64 " <%s>",
-			   2 + address_size * 2, address, name))))
+		? printf ("%#" PRIx64 " <%s>", address, name)
+		: printf ("%#0*" PRIx64 " <%s>",
+			  2 + address_size * 2, address, name))))
        : (scn != NULL
 	  ? (address_size == 0
-	     ? sprintf (result,
-			"%s+%#" PRIx64,
-			scn, address)
-	     : sprintf (result,
-			"%s+%#0*" PRIx64,
-			scn, 2 + address_size * 2, address))
+	     ? printf ("%s+%#" PRIx64, scn, address)
+	     : printf ("%s+%#0*" PRIx64, scn, 2 + address_size * 2, address))
 	  : (address_size == 0
-	     ? sprintf (result,
-			"%#" PRIx64,
-			address)
-	     : sprintf (result,
-			"%#0*" PRIx64,
-			2 + address_size * 2, address)))) < 0)
+	     ? printf ("%#" PRIx64, address)
+	     : printf ("%#0*" PRIx64, 2 + address_size * 2, address)))) < 0)
     error (EXIT_FAILURE, 0, _("sprintf failure"));
-
-  return result;
 }
+
 
 static const char *
 dwarf_tag_string (unsigned int tag)
@@ -4380,9 +4342,10 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	  data += addrsize;
 	  CONSUME (addrsize);
 
-	  char *a = format_dwarf_addr (dwflmod, 0, addr, addr);
-	  printf ("%*s[%2" PRIuMAX "] %s %s\n",
-		  indent, "", (uintmax_t) offset, op_name, a);
+	  printf ("%*s[%2" PRIuMAX "] %s ",
+		  indent, "", (uintmax_t) offset, op_name);
+	  print_dwarf_addr (dwflmod, 0, addr, addr);
+	  printf ("\n");
 
 	  offset += 1 + addrsize;
 	  break;
@@ -4526,8 +4489,8 @@ print_ops (Dwfl_Module *dwflmod, Dwarf *dbg, int indent, int indentrest,
 	    printf ("???\n");
 	  else
 	    {
-	      a = format_dwarf_addr (dwflmod, 0, addr, addr);
-	      printf ("%s\n", a);
+	      print_dwarf_addr (dwflmod, 0, addr, addr);
+	      printf ("\n");
 	    }
 	  break;
 
@@ -5307,9 +5270,8 @@ print_debug_addr_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	  Dwarf_Addr addr = read_addr_unaligned_inc (address_size, dbg,
 						     readp);
 	  printf (" [%*u] ", digits, index++);
-	  char *a = format_dwarf_addr (dwflmod, address_size,
-				       addr, addr);
-	  printf ("%s\n", a);
+	  print_dwarf_addr (dwflmod, address_size, addr, addr);
+	  printf ("\n");
 	}
       printf ("\n");
 
@@ -5525,16 +5487,17 @@ print_debug_aranges_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	  if (range_address == 0 && range_length == 0 && segment == 0)
 	    break;
 
-	  char *b = format_dwarf_addr (dwflmod, address_size, range_address,
-				       range_address);
-	  printf ("   %s", b);
-	  char *e = format_dwarf_addr (dwflmod, address_size,
-				       range_address + range_length - 1,
-				       range_length);
+	  printf ("   ");
+	  print_dwarf_addr (dwflmod, address_size, range_address,
+			    range_address);
+	  printf ("..");
+	  print_dwarf_addr (dwflmod, address_size,
+			    range_address + range_length - 1,
+			    range_length);
 	  if (segment_size != 0)
-	    printf ("..%s (%" PRIx64 ")\n", e, (uint64_t) segment);
+	    printf (" (%" PRIx64 ")\n", (uint64_t) segment);
 	  else
-	    printf ("..%s\n", e);
+	    printf ("\n");
 	}
 
     next_table:
@@ -5674,16 +5637,16 @@ print_debug_rnglists_section (Dwfl_Module *dwflmod,
 		      &cu_base, &cu)
 	  || split_dwarf_cu_base (dbg, &cu, &cu_base))
 	{
-	  char *basestr = format_dwarf_addr (dwflmod, address_size,
-					     cu_base, cu_base);
 	  Dwarf_Die cudie;
 	  if (dwarf_cu_die (cu, &cudie,
 			    NULL, NULL, NULL, NULL,
 			    NULL, NULL) == NULL)
-	    printf (gettext (" Unknown CU base: %s\n"), basestr);
+	    printf (gettext (" Unknown CU base: "));
 	  else
-	    printf (gettext (" CU [%6" PRIx64 "] base: %s\n"),
-		    dwarf_dieoffset (&cudie), basestr);
+	    printf (gettext (" CU [%6" PRIx64 "] base: "),
+		    dwarf_dieoffset (&cudie));
+	  print_dwarf_addr (dwflmod, address_size, cu_base, cu_base);
+	  printf ("\n");
 	}
       else
 	printf (gettext (" Not associated with a CU.\n"));
@@ -5727,7 +5690,6 @@ print_debug_rnglists_section (Dwfl_Module *dwflmod,
 	{
 	  uint8_t kind = *readp++;
 	  uint64_t op1, op2;
-	  char *a1, *a2;
 
 	  /* Skip padding.  */
 	  if (start_of_list && kind == DW_RLE_end_of_list)
@@ -5766,9 +5728,9 @@ print_debug_rnglists_section (Dwfl_Module *dwflmod,
 		    printf ("      ???\n");
 		  else
 		    {
-		      a1 = format_dwarf_addr (dwflmod, address_size,
-					      addr, addr);
-		      printf ("      %s\n", a1);
+		      printf ("      ");
+		      print_dwarf_addr (dwflmod, address_size, addr, addr);
+		      printf ("\n");
 		    }
 		}
 	      break;
@@ -5793,12 +5755,12 @@ print_debug_rnglists_section (Dwfl_Module *dwflmod,
 		    }
 		  else
 		    {
-		      a1 = format_dwarf_addr (dwflmod, address_size,
-					      addr1, addr1);
-		      printf ("      %s..\n", a1);
-		      a2 = format_dwarf_addr (dwflmod, address_size,
-					      addr2 - 1, addr2);
-		      printf ("      %s\n", a2);
+		      printf ("      ");
+		      print_dwarf_addr (dwflmod, address_size, addr1, addr1);
+		      printf ("..\n      ");
+		      print_dwarf_addr (dwflmod, address_size,
+					addr2 - 1, addr2);
+		      printf ("\n");
 		    }
 		}
 	      break;
@@ -5823,12 +5785,12 @@ print_debug_rnglists_section (Dwfl_Module *dwflmod,
 		  else
 		    {
 		      addr2 = addr1 + op2;
-		      a1 = format_dwarf_addr (dwflmod, address_size,
-					      addr1, addr1);
-		      printf ("      %s..\n", a1);
-		      a2 = format_dwarf_addr (dwflmod, address_size,
-					      addr2 - 1, addr2);
-		      printf ("      %s..\n", a2);
+		      printf ("      ");
+		      print_dwarf_addr (dwflmod, address_size, addr1, addr1);
+		      printf ("..\n      ");
+		      print_dwarf_addr (dwflmod, address_size,
+					addr2 - 1, addr2);
+		      printf ("\n");
 		    }
 		}
 	      break;
@@ -5845,11 +5807,11 @@ print_debug_rnglists_section (Dwfl_Module *dwflmod,
 		{
 		  op1 += base;
 		  op2 += base;
-		  a1 = format_dwarf_addr (dwflmod, address_size, op1, op1);
-		  printf ("      %s..\n", a1);
-		  a2 = format_dwarf_addr (dwflmod, address_size,
-					  op2 - 1, op2);
-		  printf ("      %s\n", a2);
+		  printf ("      ");
+		  print_dwarf_addr (dwflmod, address_size, op1, op1);
+		  printf ("..\n      ");
+		  print_dwarf_addr (dwflmod, address_size, op2 - 1, op2);
+		  printf ("\n");
 		}
 	      break;
 
@@ -5870,8 +5832,9 @@ print_debug_rnglists_section (Dwfl_Module *dwflmod,
 	      printf (" 0x%" PRIx64 "\n", base);
 	      if (! print_unresolved_addresses)
 		{
-		  a1 = format_dwarf_addr (dwflmod, address_size, base, base);
-		  printf ("      %s\n", a1);
+		  printf ("      ");
+		  print_dwarf_addr (dwflmod, address_size, base, base);
+		  printf ("\n");
 		}
 	      break;
 
@@ -5893,11 +5856,11 @@ print_debug_rnglists_section (Dwfl_Module *dwflmod,
 	      printf (" 0x%" PRIx64 "..0x%" PRIx64 "\n", op1, op2);
 	      if (! print_unresolved_addresses)
 		{
-		  a1 = format_dwarf_addr (dwflmod, address_size, op1, op1);
-		  printf ("      %s..\n", a1);
-		  a2 = format_dwarf_addr (dwflmod, address_size,
-					  op2 - 1, op2);
-		  printf ("      %s\n", a2);
+		  printf ("      ");
+		  print_dwarf_addr (dwflmod, address_size, op1, op1);
+		  printf ("..\n      ");
+		  print_dwarf_addr (dwflmod, address_size, op2 - 1, op2);
+		  printf ("\n");
 		}
 	      break;
 
@@ -5920,13 +5883,12 @@ print_debug_rnglists_section (Dwfl_Module *dwflmod,
 	      printf (" 0x%" PRIx64 ", %" PRIx64 "\n", op1, op2);
 	      if (! print_unresolved_addresses)
 		{
-		  a1 = format_dwarf_addr (dwflmod, address_size, op1, op1);
-		  printf ("      %s..\n", a1);
-
 		  op2 = op1 + op2;
-		  a2 = format_dwarf_addr (dwflmod, address_size,
-					  op2 - 1, op2);
-		  printf ("      %s\n", a2);
+		  printf ("      ");
+		  print_dwarf_addr (dwflmod, address_size, op1, op1);
+		  printf ("..\n      ");
+		  print_dwarf_addr (dwflmod, address_size, op2 - 1, op2);
+		  printf ("\n");
 		}
 	      break;
 
@@ -5988,16 +5950,16 @@ print_debug_ranges_section (Dwfl_Module *dwflmod,
 
       if (last_cu != cu)
 	{
-	  char *basestr = format_dwarf_addr (dwflmod, address_size,
-					     base, base);
 	  Dwarf_Die cudie;
 	  if (dwarf_cu_die (cu, &cudie,
 			    NULL, NULL, NULL, NULL,
 			    NULL, NULL) == NULL)
-	    printf (gettext ("\n Unknown CU base: %s\n"), basestr);
+	    printf (gettext ("\n Unknown CU base: "));
 	  else
-	    printf (gettext ("\n CU [%6" PRIx64 "] base: %s\n"),
-		    dwarf_dieoffset (&cudie), basestr);
+	    printf (gettext ("\n CU [%6" PRIx64 "] base: "),
+		    dwarf_dieoffset (&cudie));
+	  print_dwarf_addr (dwflmod, address_size, base, base);
+	  printf ("\n");
 	}
       last_cu = cu;
 
@@ -6024,8 +5986,9 @@ print_debug_ranges_section (Dwfl_Module *dwflmod,
 
       if (begin == (Dwarf_Addr) -1l) /* Base address entry.  */
 	{
-	  char *b = format_dwarf_addr (dwflmod, address_size, end, end);
-	  printf (gettext (" [%6tx] base address\n          %s\n"), offset, b);
+	  printf (gettext (" [%6tx] base address\n          "), offset);
+	  print_dwarf_addr (dwflmod, address_size, end, end);
+	  printf ("\n");
 	  base = end;
 	}
       else if (begin == 0 && end == 0) /* End of list entry.  */
@@ -6045,12 +6008,13 @@ print_debug_ranges_section (Dwfl_Module *dwflmod,
 	  printf ("range %" PRIx64 ", %" PRIx64 "\n", begin, end);
 	  if (! print_unresolved_addresses)
 	    {
-	      char *b = format_dwarf_addr (dwflmod, address_size, base + begin,
-					   base + begin);
-	      printf ("          %s..\n", b);
-	      char *e = format_dwarf_addr (dwflmod, address_size,
-					   base + end - 1, base + end);
-	      printf ("          %s\n", e);
+	      printf ("          ");
+	      print_dwarf_addr (dwflmod, address_size, base + begin,
+			        base + begin);
+	      printf ("..\n          ");
+	      print_dwarf_addr (dwflmod, address_size,
+				base + end - 1, base + end);
+	      printf ("\n");
 	    }
 
 	  first = false;
@@ -6815,13 +6779,13 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 			 + (base - (const unsigned char *) data->d_buf)
 			 - bias);
 
-	  char *a = format_dwarf_addr (dwflmod, cie->address_size,
-				       pc_start, initial_location);
 	  printf ("\n [%6tx] FDE length=%" PRIu64 " cie=[%6tx]\n"
 		  "   CIE_pointer:              %" PRIu64 "\n"
-		  "   initial_location:         %s",
+		  "   initial_location:         ",
 		  offset, (uint64_t) unit_length,
-		  cie->cie_offset, (uint64_t) cie_id, a);
+		  cie->cie_offset, (uint64_t) cie_id);
+	  print_dwarf_addr (dwflmod, cie->address_size,
+			    pc_start, initial_location);
 	  if ((fde_encoding & 0x70) == DW_EH_PE_pcrel)
 	    {
 	      vma_base = (((uint64_t) shdr->sh_offset
@@ -6974,21 +6938,21 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	      /* Don't ABORT, it might be other attributes can be resolved.  */
 	      return DWARF_CB_OK;
 	    }
-	  char *a = format_dwarf_addr (cbargs->dwflmod, cbargs->addrsize,
-				       addr, addr);
 	  if (form != DW_FORM_addr )
 	    {
 	      Dwarf_Word index;
 	      if (dwarf_formudata (attrp, &index) != 0)
 		goto attrval_out;
-	      printf ("           %*s%-20s (%s) [%" PRIx64 "] %s\n",
+	      printf ("           %*s%-20s (%s) [%" PRIx64 "] ",
 		      (int) (level * 2), "", dwarf_attr_name (attr),
-		      dwarf_form_name (form), index, a);
+		      dwarf_form_name (form), index);
 	    }
 	  else
-	    printf ("           %*s%-20s (%s) %s\n",
+	    printf ("           %*s%-20s (%s) ",
 		    (int) (level * 2), "", dwarf_attr_name (attr),
-		    dwarf_form_name (form), a);
+		    dwarf_form_name (form));
+	  print_dwarf_addr (cbargs->dwflmod, cbargs->addrsize, addr, addr);
+	  printf ("\n");
 	}
       break;
 
@@ -7328,11 +7292,11 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
       Dwarf_Addr highpc;
       if (attr == DW_AT_high_pc && dwarf_highpc (cbargs->die, &highpc) == 0)
 	{
-	  char *a = format_dwarf_addr (cbargs->dwflmod, cbargs->addrsize,
-				       highpc, highpc);
-	  printf ("           %*s%-20s (%s) %" PRIuMAX " (%s)\n",
+	  printf ("           %*s%-20s (%s) %" PRIuMAX " (",
 		  (int) (level * 2), "", dwarf_attr_name (attr),
-		  dwarf_form_name (form), (uintmax_t) num, a);
+		  dwarf_form_name (form), (uintmax_t) num);
+	  print_dwarf_addr (cbargs->dwflmod, cbargs->addrsize, highpc, highpc);
+	  printf (")\n");
 	}
       else
 	{
@@ -7834,16 +7798,17 @@ print_decoded_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	  dwarf_linediscriminator (line, &disc);
 
 	  /* End sequence is special, it is one byte past.  */
-	  char *a = format_dwarf_addr (dwflmod, address_size,
-				       address - (endseq ? 1 : 0), address);
-	  printf ("  %4d:%-3d %c%c%c%c%c %4d %3d %2d %s\n",
+	  printf ("  %4d:%-3d %c%c%c%c%c %4d %3d %2d ",
 		  lineno, colno,
 		  (statement ? 'S' : ' '),
 		  (block ? 'B' : ' '),
 		  (prologue_end ? 'P' : ' '),
 		  (epilogue_begin ? 'E' : ' '),
 		  (endseq ? '*' : ' '),
-		  disc, isa, lineop, a);
+		  disc, isa, lineop);
+	  print_dwarf_addr (dwflmod, address_size,
+			    address - (endseq ? 1 : 0), address);
+	  printf ("\n");
 
 	  if (endseq)
 	    printf("\n");
@@ -8525,16 +8490,15 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 	      line += line_increment;
 	      advance_pc ((opcode - opcode_base) / line_range);
 
-	      char *a = format_dwarf_addr (dwflmod, 0, address, address);
+	      printf (gettext (" special opcode %u: address+%u = "),
+		      opcode, op_addr_advance);
+	      print_dwarf_addr (dwflmod, 0, address, address);
 	      if (show_op_index)
-		printf (gettext ("\
- special opcode %u: address+%u = %s, op_index = %u, line%+d = %zu\n"),
-			opcode, op_addr_advance, a, op_index,
-			line_increment, line);
+		printf (gettext (", op_index = %u, line%+d = %zu\n"),
+			op_index, line_increment, line);
 	      else
-		printf (gettext ("\
- special opcode %u: address+%u = %s, line%+d = %zu\n"),
-			opcode, op_addr_advance, a, line_increment, line);
+		printf (gettext (", line%+d = %zu\n"),
+			line_increment, line);
 	    }
 	  else if (opcode == 0)
 	    {
@@ -8574,8 +8538,9 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 		  else
 		    address = read_8ubyte_unaligned_inc (dbg, linep);
 		  {
-		    char *a = format_dwarf_addr (dwflmod, 0, address, address);
-		    printf (gettext (" set address to %s\n"), a);
+		    printf (gettext (" set address to "));
+		    print_dwarf_addr (dwflmod, 0, address, address);
+		    printf ("\n");
 		  }
 		  break;
 
@@ -8640,14 +8605,12 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 		  get_uleb128 (u128, linep, lineendp);
 		  advance_pc (u128);
 		  {
-		    char *a = format_dwarf_addr (dwflmod, 0, address, address);
+		    printf (gettext (" advance address by %u to "),
+			    op_addr_advance);
+		    print_dwarf_addr (dwflmod, 0, address, address);
 		    if (show_op_index)
-		      printf (gettext ("\
- advance address by %u to %s, op_index to %u\n"),
-			      op_addr_advance, a, op_index);
-		    else
-		      printf (gettext (" advance address by %u to %s\n"),
-			      op_addr_advance, a);
+		      printf (gettext (", op_index to %u"), op_index);
+		    printf ("\n");
 		  }
 		  break;
 
@@ -8698,15 +8661,12 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 
 		  advance_pc ((255 - opcode_base) / line_range);
 		  {
-		    char *a = format_dwarf_addr (dwflmod, 0, address, address);
+		    printf (gettext (" advance address by constant %u to "),
+			    op_addr_advance);
+		    print_dwarf_addr (dwflmod, 0, address, address);
 		    if (show_op_index)
-		      printf (gettext ("\
- advance address by constant %u to %s, op_index to %u\n"),
-			      op_addr_advance, a, op_index);
-		    else
-		      printf (gettext ("\
- advance address by constant %u to %s\n"),
-			      op_addr_advance, a);
+		      printf (gettext (", op_index to %u"), op_index);
+		    printf ("\n");
 		  }
 		  break;
 
@@ -8720,10 +8680,11 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 		  address += u128;
 		  op_index = 0;
 		  {
-		    char *a = format_dwarf_addr (dwflmod, 0, address, address);
 		    printf (gettext ("\
- advance address by fixed value %u to %s\n"),
-			    u128, a);
+ advance address by fixed value %u to \n"),
+			    u128);
+		    print_dwarf_addr (dwflmod, 0, address, address);
+		    printf ("\n");
 		  }
 		  break;
 
@@ -8880,16 +8841,16 @@ print_debug_loclists_section (Dwfl_Module *dwflmod,
 		      &cu_base, &cu)
 	  || split_dwarf_cu_base (dbg, &cu, &cu_base))
 	{
-	  char *basestr = format_dwarf_addr (dwflmod, address_size,
-					     cu_base, cu_base);
 	  Dwarf_Die cudie;
 	  if (dwarf_cu_die (cu, &cudie,
 			    NULL, NULL, NULL, NULL,
 			    NULL, NULL) == NULL)
-	    printf (gettext (" Unknown CU base: %s\n"), basestr);
+	    printf (gettext (" Unknown CU base: "));
 	  else
-	    printf (gettext (" CU [%6" PRIx64 "] base: %s\n"),
-		    dwarf_dieoffset (&cudie), basestr);
+	    printf (gettext (" CU [%6" PRIx64 "] base: "),
+		    dwarf_dieoffset (&cudie));
+	  print_dwarf_addr (dwflmod, address_size, cu_base, cu_base);
+	  printf ("\n");
 	}
       else
 	printf (gettext (" Not associated with a CU.\n"));
@@ -8933,7 +8894,6 @@ print_debug_loclists_section (Dwfl_Module *dwflmod,
 	{
 	  uint8_t kind = *readp++;
 	  uint64_t op1, op2, len;
-	  char *a1, *a2;
 
 	  /* Skip padding.  */
 	  if (start_of_list && kind == DW_LLE_end_of_list)
@@ -8972,9 +8932,9 @@ print_debug_loclists_section (Dwfl_Module *dwflmod,
 		    printf ("      ???\n");
 		  else
 		    {
-		      a1 = format_dwarf_addr (dwflmod, address_size,
-					      addr, addr);
-		      printf ("      %s\n", a1);
+		      printf ("      ");
+		      print_dwarf_addr (dwflmod, address_size, addr, addr);
+		      printf ("\n");
 		    }
 		}
 	      break;
@@ -8999,12 +8959,12 @@ print_debug_loclists_section (Dwfl_Module *dwflmod,
 		    }
 		  else
 		    {
-		      a1 = format_dwarf_addr (dwflmod, address_size,
-					      addr1, addr1);
-		      printf ("      %s..\n", a1);
-		      a2 = format_dwarf_addr (dwflmod, address_size,
-					      addr2 - 1, addr2);
-		      printf ("      %s\n", a2);
+		      printf ("      ");
+		      print_dwarf_addr (dwflmod, address_size, addr1, addr1);
+		      printf ("..\n      ");
+		      print_dwarf_addr (dwflmod, address_size,
+					addr2 - 1, addr2);
+		      printf ("\n");
 		    }
 		}
 	      if ((uint64_t) (nexthdr - readp) < 1)
@@ -9037,12 +8997,12 @@ print_debug_loclists_section (Dwfl_Module *dwflmod,
 		  else
 		    {
 		      addr2 = addr1 + op2;
-		      a1 = format_dwarf_addr (dwflmod, address_size,
-					      addr1, addr1);
-		      printf ("      %s..\n", a1);
-		      a2 = format_dwarf_addr (dwflmod, address_size,
-					      addr2 - 1, addr2);
-		      printf ("      %s..\n", a2);
+		      printf ("      ");
+		      print_dwarf_addr (dwflmod, address_size, addr1, addr1);
+		      printf ("..\n      ");
+		      print_dwarf_addr (dwflmod, address_size,
+					addr2 - 1, addr2);
+		      printf ("\n");
 		    }
 		}
 	      if ((uint64_t) (nexthdr - readp) < 1)
@@ -9067,11 +9027,11 @@ print_debug_loclists_section (Dwfl_Module *dwflmod,
 		{
 		  op1 += base;
 		  op2 += base;
-		  a1 = format_dwarf_addr (dwflmod, address_size, op1, op1);
-		  printf ("      %s..\n", a1);
-		  a2 = format_dwarf_addr (dwflmod, address_size,
-					  op2 - 1, op2);
-		  printf ("      %s\n", a2);
+		  printf ("      ");
+		  print_dwarf_addr (dwflmod, address_size, op1, op1);
+		  printf ("..\n      ");
+		  print_dwarf_addr (dwflmod, address_size, op2 - 1, op2);
+		  printf ("\n");
 		}
 	      if ((uint64_t) (nexthdr - readp) < 1)
 		goto invalid_entry;
@@ -9111,8 +9071,9 @@ print_debug_loclists_section (Dwfl_Module *dwflmod,
 	      printf (" 0x%" PRIx64 "\n", base);
 	      if (! print_unresolved_addresses)
 		{
-		  a1 = format_dwarf_addr (dwflmod, address_size, base, base);
-		  printf ("      %s\n", a1);
+		  printf ("      ");
+		  print_dwarf_addr (dwflmod, address_size, base, base);
+		  printf ("\n");
 		}
 	      break;
 
@@ -9134,11 +9095,11 @@ print_debug_loclists_section (Dwfl_Module *dwflmod,
 	      printf (" 0x%" PRIx64 "..0x%" PRIx64 "\n", op1, op2);
 	      if (! print_unresolved_addresses)
 		{
-		  a1 = format_dwarf_addr (dwflmod, address_size, op1, op1);
-		  printf ("      %s..\n", a1);
-		  a2 = format_dwarf_addr (dwflmod, address_size,
-					  op2 - 1, op2);
-		  printf ("      %s\n", a2);
+		  printf ("      ");
+		  print_dwarf_addr (dwflmod, address_size, op1, op1);
+		  printf ("..\n      ");
+		  print_dwarf_addr (dwflmod, address_size, op2 - 1, op2);
+		  printf ("\n");
 		}
 	      if ((uint64_t) (nexthdr - readp) < 1)
 		goto invalid_entry;
@@ -9169,13 +9130,12 @@ print_debug_loclists_section (Dwfl_Module *dwflmod,
 	      printf (" 0x%" PRIx64 ", %" PRIx64 "\n", op1, op2);
 	      if (! print_unresolved_addresses)
 		{
-		  a1 = format_dwarf_addr (dwflmod, address_size, op1, op1);
-		  printf ("      %s..\n", a1);
-
 		  op2 = op1 + op2;
-		  a2 = format_dwarf_addr (dwflmod, address_size,
-					  op2 - 1, op2);
-		  printf ("      %s\n", a2);
+		  printf ("      ");
+		  print_dwarf_addr (dwflmod, address_size, op1, op1);
+		  printf ("..\n      ");
+		  print_dwarf_addr (dwflmod, address_size, op2 - 1, op2);
+		  printf ("\n");
 		}
 	      if ((uint64_t) (nexthdr - readp) < 1)
 		goto invalid_entry;
@@ -9247,16 +9207,16 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
 
       if (last_cu != cu)
        {
-	char *basestr = format_dwarf_addr (dwflmod, address_size,
-					   base, base);
 	Dwarf_Die cudie;
 	if (dwarf_cu_die (cu, &cudie,
 			  NULL, NULL, NULL, NULL,
 			  NULL, NULL) == NULL)
-	  printf (gettext ("\n Unknown CU base: %s\n"), basestr);
+	  printf (gettext ("\n Unknown CU base: "));
 	else
-	  printf (gettext ("\n CU [%6" PRIx64 "] base: %s\n"),
-		  dwarf_dieoffset (&cudie), basestr);
+	  printf (gettext ("\n CU [%6" PRIx64 "] base: "),
+		  dwarf_dieoffset (&cudie));
+	print_dwarf_addr (dwflmod, address_size, base, base);
+	printf ("\n");
        }
       last_cu = cu;
 
@@ -9383,8 +9343,9 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
 
       if (begin == (Dwarf_Addr) -1l) /* Base address entry.  */
 	{
-	  char *b = format_dwarf_addr (dwflmod, address_size, end, end);
-	  printf (gettext (" [%6tx] base address\n          %s\n"), offset, b);
+	  printf (gettext (" [%6tx] base address\n          "), offset);
+	  print_dwarf_addr (dwflmod, address_size, end, end);
+	  printf ("\n");
 	  base = end;
 	}
       else if (begin == 0 && end == 0) /* End of list entry.  */
@@ -9408,12 +9369,11 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
 	    {
 	      Dwarf_Addr dab = use_base ? base + begin : begin;
 	      Dwarf_Addr dae = use_base ? base + end : end;
-	      char *b = format_dwarf_addr (dwflmod, address_size,
-					   dab, dab);
-	      printf ("          %s..\n", b);
-	      char *e = format_dwarf_addr (dwflmod, address_size,
-					   dae - 1, dae);
-	      printf ("          %s\n", e);
+	      printf ("          ");
+	      print_dwarf_addr (dwflmod, address_size, dab, dab);
+	      printf ("..\n          ");
+	      print_dwarf_addr (dwflmod, address_size, dae - 1, dae);
+	      printf ("\n");
 	    }
 
 	  if (endp - readp <= (ptrdiff_t) len)
@@ -10672,10 +10632,11 @@ print_gdb_index_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
       uint32_t idx = read_4ubyte_unaligned (dbg, readp);
       readp += 4;
 
-      char *l = format_dwarf_addr (dwflmod, 8, low, low);
-      printf (" [%4zu] %s..", n, l);
-      char *h = format_dwarf_addr (dwflmod, 8, high - 1, high);
-      printf ("%s, CU index: %5" PRId32 "\n", h, idx);
+      printf (" [%4zu] ", n);
+      print_dwarf_addr (dwflmod, 8, low, low);
+      printf ("..");
+      print_dwarf_addr (dwflmod, 8, high - 1, high);
+      printf (", CU index: %5" PRId32 "\n", idx);
       n++;
     }
 

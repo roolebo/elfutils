@@ -1,3 +1,7 @@
+2018-06-07  Mark Wielaard  <mark@klomp.org>
+
+	* run-readelf-loc.sh: Fix expected output for startx_length.
+
 2018-06-06  Mark Wielaard  <mark@klomp.org>
 
 	* varlocs.c (print_base_type): Use error, not assert when the DIE

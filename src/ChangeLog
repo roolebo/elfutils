@@ -1,3 +1,23 @@
+2018-06-07  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (format_result): Removed.
+	(format_result_size): Removed.
+	(format_dwarf_addr): Renamed to...
+	(print_dwarf_addr): ...this. Simply call printf, don't setup buffer,
+	don't call sprintf.
+	(print_ops): Use print_dwarf_addr instead of format_dwarf_addr.
+	(print_debug_addr_section): Likewise.
+	(print_debug_aranges_section): Likewise.
+	(print_debug_rnglists_section): Likewise.
+	(print_debug_ranges_section): Likewise.
+	(print_debug_frame_section): Likewise.
+	(attr_callback): Likewise.
+	(print_decoded_line_section): Likewise.
+	(print_debug_line_section): Likewise.
+	(print_debug_loclists_section): Likewise.
+	(print_debug_loc_section): Likewise.
+	(print_gdb_index_section): Likewsie.
+
 2018-06-05  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_debug_addr_section): Set unit_length always to

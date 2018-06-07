@@ -536,11 +536,11 @@ Table at Offset 0x0:
   Offset: 30, Index: 24
     startx_length f, a
       0x0000000000401160 <foo>..
-      0x0000000000401169 <foo+0x9>..
+      0x0000000000401169 <foo+0x9>
         [ 0] reg5
     startx_length 0, 2a
       0x000000000040116a <foo+0xa>..
-      0x0000000000401193 <foo+0x33>..
+      0x0000000000401193 <foo+0x33>
         [ 0] entry_value:
              [ 0] reg5
         [ 3] stack_value
@@ -549,61 +549,61 @@ Table at Offset 0x0:
   Offset: 3e, Index: 32
     startx_length 11, 12
       0x000000000040117b <foo+0x1b>..
-      0x000000000040118c <foo+0x2c>..
+      0x000000000040118c <foo+0x2c>
         [ 0] addrx [18] 0x404038 <m>
     end_of_list
 
   Offset: 45, Index: 39
     startx_length 11, 6
       0x000000000040117b <foo+0x1b>..
-      0x0000000000401180 <foo+0x20>..
+      0x0000000000401180 <foo+0x20>
         [ 0] reg5
     end_of_list
 
   Offset: 4b, Index: 3f
     startx_length 11, c
       0x000000000040117b <foo+0x1b>..
-      0x0000000000401186 <foo+0x26>..
+      0x0000000000401186 <foo+0x26>
         [ 0] reg5
     startx_length 1, 4
       0x0000000000401189 <foo+0x29>..
-      0x000000000040118c <foo+0x2c>..
+      0x000000000040118c <foo+0x2c>
         [ 0] reg5
     end_of_list
 
   Offset: 56, Index: 4a
     startx_length 4, 6
       0x0000000000401181 <foo+0x21>..
-      0x0000000000401186 <foo+0x26>..
+      0x0000000000401186 <foo+0x26>
         [ 0] reg5
     startx_length 1, 4
       0x0000000000401189 <foo+0x29>..
-      0x000000000040118c <foo+0x2c>..
+      0x000000000040118c <foo+0x2c>
         [ 0] reg5
     end_of_list
 
   Offset: 61, Index: 55
     startx_length 4, c
       0x0000000000401181 <foo+0x21>..
-      0x000000000040118c <foo+0x2c>..
+      0x000000000040118c <foo+0x2c>
         [ 0] reg5
     end_of_list
 
   Offset: 67, Index: 5b
     startx_length 2, 6
       0x000000000040118d <foo+0x2d>..
-      0x0000000000401192 <foo+0x32>..
+      0x0000000000401192 <foo+0x32>
         [ 0] reg5
     end_of_list
 
   Offset: 6d, Index: 61
     startx_length 9, f
       0x00000000004011a0 <baz>..
-      0x00000000004011ae <baz+0xe>..
+      0x00000000004011ae <baz+0xe>
         [ 0] reg5
     startx_length 5, 2
       0x00000000004011af <baz+0xf>..
-      0x00000000004011b0 <baz+0x10>..
+      0x00000000004011b0 <baz+0x10>
         [ 0] entry_value:
              [ 0] reg5
         [ 3] stack_value
@@ -612,7 +612,7 @@ Table at Offset 0x0:
   Offset: 7b, Index: 6f
     startx_length 9, 10
       0x00000000004011a0 <baz>..
-      0x00000000004011af <baz+0xf>..
+      0x00000000004011af <baz+0xf>
         [ 0] reg5
     end_of_list
 
@@ -642,11 +642,11 @@ Table at Offset 0x0:
   Offset: 28, Index: 1c
     startx_length 2, 14
       0x0000000000401060 <main>..
-      0x0000000000401073 <main+0x13>..
+      0x0000000000401073 <main+0x13>
         [ 0] reg5
     startx_length 4, c
       0x0000000000401074 <main+0x14>..
-      0x000000000040107f <main+0x1f>..
+      0x000000000040107f <main+0x1f>
         [ 0] entry_value:
              [ 0] reg5
         [ 3] stack_value
@@ -655,11 +655,11 @@ Table at Offset 0x0:
   Offset: 36, Index: 2a
     startx_length 2, 18
       0x0000000000401060 <main>..
-      0x0000000000401077 <main+0x17>..
+      0x0000000000401077 <main+0x17>
         [ 0] reg4
     startx_length 7, 6
       0x0000000000401078 <main+0x18>..
-      0x000000000040107d <main+0x1d>..
+      0x000000000040107d <main+0x1d>
         [ 0] entry_value:
              [ 0] reg4
         [ 3] stack_value
@@ -668,18 +668,18 @@ Table at Offset 0x0:
   Offset: 44, Index: 38
     startx_length 3, 7
       0x0000000000401071 <main+0x11>..
-      0x0000000000401077 <main+0x17>..
+      0x0000000000401077 <main+0x17>
         [ 0] reg0
     end_of_list
 
   Offset: 4a, Index: 3e
     startx_length d, 8
       0x00000000004011c0 <calc>..
-      0x00000000004011c7 <calc+0x7>..
+      0x00000000004011c7 <calc+0x7>
         [ 0] reg5
     startx_length e, 23
       0x00000000004011c8 <calc+0x8>..
-      0x00000000004011ea <calc+0x2a>..
+      0x00000000004011ea <calc+0x2a>
         [ 0] entry_value:
              [ 0] reg5
         [ 3] stack_value
@@ -688,22 +688,22 @@ Table at Offset 0x0:
   Offset: 58, Index: 4c
     startx_length f, b
       0x00000000004011d8 <calc+0x18>..
-      0x00000000004011e2 <calc+0x22>..
+      0x00000000004011e2 <calc+0x22>
         [ 0] reg0
     end_of_list
 
   Offset: 5e, Index: 52
     startx_length f, 2
       0x00000000004011d8 <calc+0x18>..
-      0x00000000004011d9 <calc+0x19>..
+      0x00000000004011d9 <calc+0x19>
         [ 0] reg1
     startx_length 10, 5
       0x00000000004011da <calc+0x1a>..
-      0x00000000004011de <calc+0x1e>..
+      0x00000000004011de <calc+0x1e>
         [ 0] reg5
     startx_length 0, 4
       0x00000000004011df <calc+0x1f>..
-      0x00000000004011e2 <calc+0x22>..
+      0x00000000004011e2 <calc+0x22>
         [ 0] entry_value:
              [ 0] reg5
         [ 3] deref_size 1
@@ -717,11 +717,11 @@ Table at Offset 0x0:
   Offset: 79, Index: 6d
     startx_length f, 2
       0x00000000004011d8 <calc+0x18>..
-      0x00000000004011d9 <calc+0x19>..
+      0x00000000004011d9 <calc+0x19>
         [ 0] reg1
     startx_length 10, 9
       0x00000000004011da <calc+0x1a>..
-      0x00000000004011e2 <calc+0x22>..
+      0x00000000004011e2 <calc+0x22>
         [ 0] reg5
     end_of_list
 

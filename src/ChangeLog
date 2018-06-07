@@ -1,3 +1,9 @@
+2018-06-07  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (main): Lookup "no" for no_str.
+	(print_debug_abbrev_section): Use yes_str and no_str.
+	(print_form_data): Likewise.
+
 2018-06-04  Mark Wielaard  <mark@klomp.org>
 
 	* readelf (format_result): New static char pointer.

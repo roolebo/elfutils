@@ -327,7 +327,7 @@ main (int argc, char *argv[])
 
   /* Look up once.  */
   yes_str = gettext ("yes");
-  no_str = gettext ("yes");
+  no_str = gettext ("no");
 
   /* Parse and process arguments.  */
   int remaining;
@@ -5062,7 +5062,7 @@ print_debug_abbrev_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	  printf (gettext (" [%5u] offset: %" PRId64
 			   ", children: %s, tag: %s\n"),
 		  code, (int64_t) offset,
-		  has_children ? gettext ("yes") : gettext ("no"),
+		  has_children ? yes_str : no_str,
 		  dwarf_tag_name (tag));
 
 	  size_t cnt = 0;
@@ -7955,7 +7955,7 @@ print_form_data (Dwarf *dbg, int form, const unsigned char *readp,
       if (readendp - readp < 1)
 	goto invalid_data;
       val = *readp++;
-      printf ("%s", val != 0 ? gettext ("yes") : gettext ("no"));
+      printf ("%s", val != 0 ? yes_str : no_str);
       break;
 
     case DW_FORM_string:

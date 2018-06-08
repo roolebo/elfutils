@@ -158,7 +158,21 @@ __libdw_getabbrev (Dwarf *dbg, struct Dwarf_CU *cu, Dwarf_Off offset,
 Dwarf_Abbrev *
 dwarf_getabbrev (Dwarf_Die *die, Dwarf_Off offset, size_t *lengthp)
 {
-  return __libdw_getabbrev (die->cu->dbg, die->cu,
-			    die->cu->orig_abbrev_offset + offset, lengthp,
-			    NULL);
+  if (die == NULL || die->cu == NULL)
+    return NULL;
+
+  Dwarf_CU *cu = die->cu;
+  Dwarf *dbg = cu->dbg;
+  Dwarf_Off abbrev_offset = cu->orig_abbrev_offset;
+  Elf_Data *data = dbg->sectiondata[IDX_debug_abbrev];
+  if (data == NULL)
+    return NULL;
+
+  if (offset >= data->d_size - abbrev_offset)
+    {
+      __libdw_seterrno (DWARF_E_INVALID_OFFSET);
+      return NULL;
+    }
+
+  return __libdw_getabbrev (dbg, cu, abbrev_offset + offset, lengthp, NULL);
 }

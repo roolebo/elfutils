@@ -98,6 +98,12 @@ main (int argc, char *argv[])
 			  dwarf_diename (&subdie));
 		  return -1;
 		}
+	      if (dwarf_getabbrev (&subdie, 0, NULL) != NULL)
+		{
+		  printf ("Should NOT have an abbrev: %s\n",
+			  dwarf_diename (&subdie));
+		  return -1;
+		}
 	    }
 	  else if (unit_type == DW_UT_type)
 	    printf ("subdie: %s\n", dwarf_diename (&subdie));

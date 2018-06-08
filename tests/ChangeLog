@@ -1,5 +1,10 @@
 2018-06-08  Mark Wielaard  <mark@klomp.org>
 
+	* get-units-invalid.c (main): Check invalid dwarf_getabbrev call.
+	* show-abbrev.c (main): Check illegal dwarf_getabbrev offset call.
+
+2018-06-08  Mark Wielaard  <mark@klomp.org>
+
 	* varlocs.c (main): Only assert when cfi_debug_bias != 0 if there
 	actually is a cfi_debug.
 

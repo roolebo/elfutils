@@ -51,6 +51,14 @@ main (int argc, char *argv[])
 	    /* Something went wrong.  */
 	    break;
 
+	  /* Test something obviously wrong.  */
+	  Dwarf_Abbrev *a = dwarf_getabbrev (&die, (Dwarf_Off) -1, NULL);
+	  if (a != NULL)
+	    {
+	      printf ("dwarf_getabbrev -1 succeeded?\n");
+	      break;
+	    }
+
 	  Dwarf_Off offset = 0;
 
 	  while (1)

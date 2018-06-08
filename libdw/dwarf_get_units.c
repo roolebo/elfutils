@@ -40,6 +40,10 @@ dwarf_get_units (Dwarf *dwarf, Dwarf_CU *cu, Dwarf_CU **next_cu,
 		 Dwarf_Half *version, uint8_t *unit_type,
 		 Dwarf_Die *cudie, Dwarf_Die *subdie)
 {
+  /* Handle existing error.  */
+  if (dwarf == NULL)
+    return -1;
+
   Dwarf_Off off;
   bool v4type;
   if (cu == NULL)

@@ -1,3 +1,8 @@
+2018-06-08  Mark Wielaard  <mark@klomp.org>
+
+	* varlocs.c (main): Only assert when cfi_debug_bias != 0 if there
+	actually is a cfi_debug.
+
 2018-06-07  Mark Wielaard  <mark@klomp.org>
 
 	* run-readelf-loc.sh: Fix expected output for startx_length.

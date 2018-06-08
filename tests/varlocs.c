@@ -1121,7 +1121,8 @@ main (int argc, char *argv[])
 	  cfi_debug = dwfl_module_dwarf_cfi (mod, &cfi_debug_bias);
 	  cfi_eh = dwfl_module_eh_cfi (mod, &cfi_eh_bias);
 
-	  assert (cfi_debug_bias == 0); // No bias needed, same file.
+	  // No bias needed, same file.
+	  assert (cfi_debug == NULL || cfi_debug_bias == 0);
 
 	  // We are a bit forgiving for object files.  There might be
 	  // relocations we don't handle that are needed in some

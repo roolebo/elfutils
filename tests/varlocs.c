@@ -546,7 +546,8 @@ print_expr (Dwarf_Attribute *attr, Dwarf_Op *expr, Dwarf_Addr addr)
 	// XXX actually lookup DW_TAG_GNU_call_site_parameter
 	printf ("%s[%" PRIx64 "]", opname, dwarf_dieoffset (&param));
 	assert (expr->number == dwarf_cuoffset (&param));
-	assert (dwarf_tag (&param) == DW_TAG_formal_parameter);
+	if (dwarf_tag (&param) != DW_TAG_formal_parameter)
+	  error (EXIT_FAILURE, 0, "Not a formal parameter");
       }
       break;
 

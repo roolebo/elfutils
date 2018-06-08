@@ -1,5 +1,5 @@
 /* Return DWARF attribute associated with a location expression op.
-   Copyright (C) 2013, 2014, 2017 Red Hat, Inc.
+   Copyright (C) 2013, 2014, 2017, 2018 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -58,11 +58,13 @@ static unsigned char *
 addr_valp (Dwarf_CU *cu, Dwarf_Word index)
 {
   Elf_Data *debug_addr = cu->dbg->sectiondata[IDX_debug_addr];
-  Dwarf_Word offset = __libdw_cu_addr_base (cu) + (index * cu->address_size);
   if (debug_addr == NULL)
-    /* This is really an error, will trigger with dwarf_formaddr.  */
-    return (unsigned char *) (uintptr_t) offset;
+    {
+      __libdw_seterrno (DWARF_E_NO_DEBUG_ADDR);
+      return NULL;
+    }
 
+  Dwarf_Word offset = __libdw_cu_addr_base (cu) + (index * cu->address_size);
   return (unsigned char *) debug_addr->d_buf + offset;
 }
 
@@ -105,6 +107,8 @@ dwarf_getlocation_attr (Dwarf_Attribute *attr, const Dwarf_Op *op, Dwarf_Attribu
 	else
 	  result->form = DW_FORM_data8;
 	result->valp = addr_valp (attr->cu, op->number);
+	if (result->valp == NULL)
+	  return -1;
 	result->cu = attr->cu->dbg->fake_addr_cu;
 	break;
 
@@ -113,6 +117,8 @@ dwarf_getlocation_attr (Dwarf_Attribute *attr, const Dwarf_Op *op, Dwarf_Attribu
 	result->code = DW_AT_low_pc;
 	result->form = DW_FORM_addr;
 	result->valp = addr_valp (attr->cu, op->number);
+	if (result->valp == NULL)
+	  return -1;
 	result->cu = attr->cu->dbg->fake_addr_cu;
 	break;
 

@@ -120,19 +120,23 @@ loc_compare (const void *p1, const void *p2)
 }
 
 /* For each DW_OP_implicit_value, we store a special entry in the cache.
-   This points us directly to the block data for later fetching.  */
-static void
+   This points us directly to the block data for later fetching.
+   Returns zero on success, -1 on bad DWARF or 1 if tsearch failed.  */
+static int
 store_implicit_value (Dwarf *dbg, void **cache, Dwarf_Op *op)
 {
   struct loc_block_s *block = libdw_alloc (dbg, struct loc_block_s,
 					   sizeof (struct loc_block_s), 1);
   const unsigned char *data = (const unsigned char *) (uintptr_t) op->number2;
-  // Ignored, equal to op->number.  And data length already checked.
-  (void) __libdw_get_uleb128 (&data, data + len_leb128 (Dwarf_Word));
+  uint64_t len = __libdw_get_uleb128 (&data, data + len_leb128 (Dwarf_Word));
+  if (unlikely (len != op->number))
+    return -1;
   block->addr = op;
   block->data = (unsigned char *) data;
   block->length = op->number;
-  (void) tsearch (block, cache, loc_compare);
+  if (unlikely (tsearch (block, cache, loc_compare) == NULL))
+    return 1;
+  return 0;
 }
 
 int
@@ -589,7 +593,16 @@ __libdw_intern_expression (Dwarf *dbg, bool other_byte_order,
       result[n].offset = loclist->offset;
 
       if (result[n].atom == DW_OP_implicit_value)
-	store_implicit_value (dbg, cache, &result[n]);
+	{
+	  int store = store_implicit_value (dbg, cache, &result[n]);
+	  if (unlikely (store != 0))
+	    {
+	      if (store < 0)
+	        goto invalid;
+	      else
+		goto nomem;
+	    }
+	}
 
       struct loclist *loc = loclist;
       loclist = loclist->next;

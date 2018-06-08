@@ -1,5 +1,12 @@
 2018-06-08  Mark Wielaard  <mark@klomp.org>
 
+	* dwarf_getlocation.c (store_implicit_value): Return error when
+	seeing bad DWARF or when tsearch runs out of memory.
+	(__libdw_intern_expression): Report error when store_implicit_value
+	reported an error.
+
+2018-06-08  Mark Wielaard  <mark@klomp.org>
+
 	* dwarf_getsrclines.c (read_srclines): Sanity check ndirs and nfiles.
 
 2018-06-08  Mark Wielaard  <mark@klomp.org>

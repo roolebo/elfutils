@@ -1,5 +1,9 @@
 2018-06-08  Mark Wielaard  <mark@klomp.org>
 
+	* dwarf_getsrclines.c (read_srclines): Sanity check ndirs and nfiles.
+
+2018-06-08  Mark Wielaard  <mark@klomp.org>
+
 	* dwarf_getlocation_attr.c (addr_valp): Set error and return NULL
 	when there is no .debug_addr section.
 	(dwarf_getlocation_attr): If addr_valp returns NULL, then return -1.

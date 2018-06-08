@@ -8294,6 +8294,8 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 		    printf (", ");
 		}
 	      printf ("\n");
+	      if (linep >= lineendp)
+		goto invalid_unit;
 	    }
 	}
       else
@@ -8370,6 +8372,8 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 		    printf (", ");
 		}
 	      printf ("\n");
+	      if (linep >= lineendp)
+		goto invalid_unit;
 	    }
 	}
       else

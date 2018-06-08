@@ -356,6 +356,11 @@ read_srclines (Dwarf *dbg,
 
       if (nforms == 0 && ndirs != 0)
 	goto invalid_data;
+
+      /* Assume there is at least 1 byte needed per form to describe
+	 the directory.  Filters out insanely large ndirs.  */
+      if (nforms != 0 && ndirs > (size_t) (lineendp - linep) / nforms)
+	goto invalid_data;
     }
 
   /* Arrange the list in array form.  */
@@ -559,6 +564,11 @@ read_srclines (Dwarf *dbg,
       get_uleb128 (nfiles, linep, lineendp);
 
       if (nforms == 0 && nfiles != 0)
+	goto invalid_data;
+
+      /* Assume there is at least 1 byte needed per form to describe
+	 the file.  Filters out insanely large nfiles.  */
+      if (nforms != 0 && nfiles > (size_t) (lineendp - linep) / nforms)
 	goto invalid_data;
 
       Dwarf_Attribute attr;

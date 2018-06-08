@@ -1,3 +1,8 @@
+2018-06-08  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (print_debug_line_section): Stop printing directories
+	and files when we are at the end of the unit data.
+
 2018-06-07  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (format_result): Removed.

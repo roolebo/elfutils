@@ -5656,12 +5656,12 @@ print_debug_rnglists_section (Dwfl_Module *dwflmod,
       const unsigned char *offset_array_start = readp;
       if (offset_entry_count > 0)
 	{
-	  uint64_t needed = offset_entry_count * offset_size;
-	  if (unit_length - 8 < needed)
+	  uint64_t max_entries = (unit_length - 8) / offset_size;
+	  if (offset_entry_count > max_entries)
 	    {
 	      error (0, 0,
 		     gettext ("too many offset entries for unit length"));
-	      goto next_table;
+	      offset_entry_count = max_entries;
 	    }
 
 	  printf (gettext ("  Offsets starting at 0x%" PRIx64 ":\n"),
@@ -8864,12 +8864,12 @@ print_debug_loclists_section (Dwfl_Module *dwflmod,
       const unsigned char *offset_array_start = readp;
       if (offset_entry_count > 0)
 	{
-	  uint64_t needed = offset_entry_count * offset_size;
-	  if (unit_length - 8 < needed)
+	  uint64_t max_entries = (unit_length - 8) / offset_size;
+	  if (offset_entry_count > max_entries)
 	    {
 	      error (0, 0,
 		     gettext ("too many offset entries for unit length"));
-	      goto next_table;
+	      offset_entry_count = max_entries;
 	    }
 
 	  printf (gettext ("  Offsets starting at 0x%" PRIx64 ":\n"),

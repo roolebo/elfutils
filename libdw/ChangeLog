@@ -1,3 +1,9 @@
+2018-06-10  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_attr_integrate.c (dwarf_attr_integrate): Stop after 16 DIE
+	ref chains.
+	* dwarf_hasattr_integrate.c (dwarf_hasattr_integrate): Likewise.
+
 2018-06-08  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_getabbrev.c (dwarf_getabbrev): Check die and offset.

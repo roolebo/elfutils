@@ -37,7 +37,7 @@ int
 dwarf_hasattr_integrate (Dwarf_Die *die, unsigned int search_name)
 {
   Dwarf_Die die_mem;
-
+  int chain = 16; /* Largest DIE ref chain we will follow.  */
   do
     {
       if (INTUSE(dwarf_hasattr) (die, search_name))
@@ -53,7 +53,7 @@ dwarf_hasattr_integrate (Dwarf_Die *die, unsigned int search_name)
 
       die = INTUSE(dwarf_formref_die) (attr, &die_mem);
     }
-  while (die != NULL);
+  while (die != NULL && chain-- != 0);
 
   /* Not NULL if it didn't have abstract_origin and specification
      attributes.  If it is a split CU then see if the skeleton

@@ -7880,7 +7880,7 @@ print_form_data (Dwarf *dbg, int form, const unsigned char *readp,
       if (readendp - readp < 1)
 	goto invalid_data;
       get_uleb128 (val, readp, readendp);
-      if (readendp - readp < (ptrdiff_t) val)
+      if ((size_t) (readendp - readp) < val)
 	goto invalid_data;
       print_bytes (val, readp);
       readp += val;
@@ -7890,7 +7890,7 @@ print_form_data (Dwarf *dbg, int form, const unsigned char *readp,
       if (readendp - readp < 1)
 	goto invalid_data;
       val = *readp++;
-      if (readendp - readp < (ptrdiff_t) val)
+      if ((size_t) (readendp - readp) < val)
 	goto invalid_data;
       print_bytes (val, readp);
       readp += val;
@@ -7900,7 +7900,7 @@ print_form_data (Dwarf *dbg, int form, const unsigned char *readp,
       if (readendp - readp < 2)
 	goto invalid_data;
       val = read_2ubyte_unaligned_inc (dbg, readp);
-      if (readendp - readp < (ptrdiff_t) val)
+      if ((size_t) (readendp - readp) < val)
 	goto invalid_data;
       print_bytes (val, readp);
       readp += val;
@@ -7910,7 +7910,7 @@ print_form_data (Dwarf *dbg, int form, const unsigned char *readp,
       if (readendp - readp < 2)
 	goto invalid_data;
       val = read_4ubyte_unaligned_inc (dbg, readp);
-      if (readendp - readp < (ptrdiff_t) val)
+      if ((size_t) (readendp - readp) < val)
 	goto invalid_data;
       print_bytes (val, readp);
       readp += val;
@@ -7941,7 +7941,7 @@ print_form_data (Dwarf *dbg, int form, const unsigned char *readp,
     case DW_FORM_strp:
     case DW_FORM_line_strp:
     case DW_FORM_strp_sup:
-      if (readendp - readp < (ptrdiff_t) offset_len)
+      if ((size_t) (readendp - readp) < offset_len)
 	goto invalid_data;
       if (offset_len == 8)
 	val = read_8ubyte_unaligned_inc (dbg, readp);
@@ -7965,7 +7965,7 @@ print_form_data (Dwarf *dbg, int form, const unsigned char *readp,
       break;
 
     case DW_FORM_sec_offset:
-      if (readendp - readp < (ptrdiff_t) offset_len)
+      if ((size_t) (readendp - readp) < offset_len)
 	goto invalid_data;
       if (offset_len == 8)
 	val = read_8ubyte_unaligned_inc (dbg, readp);
@@ -7988,7 +7988,7 @@ print_form_data (Dwarf *dbg, int form, const unsigned char *readp,
 	{
 	  readp = data->d_buf + str_offsets_base + val;
 	  readendp = data->d_buf + data->d_size;
-	  if (readendp - readp < (ptrdiff_t) offset_len)
+	  if ((size_t) (readendp - readp) < offset_len)
 	    str = "???";
 	  else
 	    {

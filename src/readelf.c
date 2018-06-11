@@ -7986,17 +7986,17 @@ print_form_data (Dwarf *dbg, int form, const unsigned char *readp,
 	str = "???";
       else
 	{
-	  readp = data->d_buf + str_offsets_base + val;
-	  readendp = data->d_buf + data->d_size;
-	  if ((size_t) (readendp - readp) < offset_len)
+	  const unsigned char *strreadp = data->d_buf + str_offsets_base + val;
+	  const unsigned char *strreadendp = data->d_buf + data->d_size;
+	  if ((size_t) (strreadendp - strreadp) < offset_len)
 	    str = "???";
 	  else
 	    {
 	      Dwarf_Off idx;
 	      if (offset_len == 8)
-		idx = read_8ubyte_unaligned_inc (dbg, readp);
+		idx = read_8ubyte_unaligned_inc (dbg, strreadp);
 	      else
-		idx = read_4ubyte_unaligned_inc (dbg, readp);
+		idx = read_4ubyte_unaligned_inc (dbg, strreadp);
 
 	      data = dbg->sectiondata[IDX_debug_str];
 	      if (data == NULL || idx >= data->d_size

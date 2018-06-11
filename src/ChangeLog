@@ -1,3 +1,8 @@
+2018-06-11  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (print_form_data): Don't reuse readp and readendp when
+	reading str_offsets section.
+
 2018-06-10  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_form_data): Don't cast value to ptrdiff_t, cast

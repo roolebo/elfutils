@@ -7987,7 +7987,7 @@ print_form_data (Dwarf *dbg, int form, const unsigned char *readp,
       break;
 
     case DW_FORM_block4:
-      if (readendp - readp < 2)
+      if (readendp - readp < 4)
 	goto invalid_data;
       val = read_4ubyte_unaligned_inc (dbg, readp);
       if ((size_t) (readendp - readp) < val)

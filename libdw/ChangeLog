@@ -1,5 +1,9 @@
 2018-06-12  Mark Wielaard  <mark@klomp.org>
 
+	* memory-access.h (read_3ubyte_unaligned_inc): New define.
+
+2018-06-12  Mark Wielaard  <mark@klomp.org>
+
 	* libdw.h (__libdw_dieabbrev): Set die->abbrev to DWARF_END_ABBREV
 	on failure.
 

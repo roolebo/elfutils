@@ -8074,9 +8074,9 @@ print_form_data (Dwarf *dbg, int form, const unsigned char *readp,
 	    {
 	      Dwarf_Off idx;
 	      if (offset_len == 8)
-		idx = read_8ubyte_unaligned_inc (dbg, strreadp);
+		idx = read_8ubyte_unaligned (dbg, strreadp);
 	      else
-		idx = read_4ubyte_unaligned_inc (dbg, strreadp);
+		idx = read_4ubyte_unaligned (dbg, strreadp);
 
 	      data = dbg->sectiondata[IDX_debug_str];
 	      if (data == NULL || idx >= data->d_size
@@ -8093,25 +8093,25 @@ print_form_data (Dwarf *dbg, int form, const unsigned char *readp,
     case DW_FORM_strx1:
       if (readendp - readp < 1)
 	goto invalid_data;
-      val = *readp;
+      val = *readp++;
       goto strx_val;
 
     case DW_FORM_strx2:
       if (readendp - readp < 2)
 	goto invalid_data;
-      val = read_2ubyte_unaligned (dbg, readp);
+      val = read_2ubyte_unaligned_inc (dbg, readp);
       goto strx_val;
 
     case DW_FORM_strx3:
       if (readendp - readp < 3)
 	goto invalid_data;
-      val = read_3ubyte_unaligned (dbg, readp);
+      val = read_3ubyte_unaligned_inc (dbg, readp);
       goto strx_val;
 
     case DW_FORM_strx4:
       if (readendp - readp < 4)
 	goto invalid_data;
-      val = read_4ubyte_unaligned (dbg, readp);
+      val = read_4ubyte_unaligned_inc (dbg, readp);
       goto strx_val;
 
     default:

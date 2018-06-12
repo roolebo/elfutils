@@ -1,3 +1,8 @@
+2018-06-12  Mark Wielaard  <mark@klomp.org>
+
+	* libdw.h (__libdw_dieabbrev): Set die->abbrev to DWARF_END_ABBREV
+	on failure.
+
 2018-06-10  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_attr_integrate.c (dwarf_attr_integrate): Stop after 16 DIE

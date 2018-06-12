@@ -80,8 +80,7 @@ elf_getdata_rawchunk (Elf *elf, off_t offset, size_t size, Elf_Type type)
     {
     /* If the file is mmap'ed we can use it directly, if aligned for type.  */
       char *rawdata = elf->map_address + elf->start_offset + offset;
-      if (ALLOW_UNALIGNED ||
-	  ((uintptr_t) rawdata & (align - 1)) == 0)
+      if (((uintptr_t) rawdata & (align - 1)) == 0)
 	rawchunk = rawdata;
       else
 	{

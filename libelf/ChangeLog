@@ -1,3 +1,10 @@
+2018-06-19  Mark Wielaard  <mark@klomp.org>
+
+	* libelfP.h (__libelf_type_align): Remove !ALLOW_UNALIGNED guard.
+	* elf_getdata.c (__libelf_type_aligns): Likewise.
+	(convert_data): Remove ALLOW_UNALIGNED check.
+	* elf_getdata_rawchunk.c (elf_getdata_rawchunk): Likewise.
+
 2018-06-21  Mark Wielaard  <mark@klomp.org>
 
 	* elf.h: Update from glibc.

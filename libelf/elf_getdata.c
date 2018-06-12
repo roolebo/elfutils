@@ -76,7 +76,6 @@ static const Elf_Type shtype_map[EV_NUM - 1][TYPEIDX (SHT_HISUNW) + 1] =
     }
   };
 
-#if !ALLOW_UNALIGNED
 /* Associate libelf types with their internal alignment requirements.  */
 const uint_fast8_t __libelf_type_aligns[EV_NUM - 1][ELFCLASSNUM - 1][ELF_T_NUM] =
   {
@@ -115,7 +114,6 @@ const uint_fast8_t __libelf_type_aligns[EV_NUM - 1][ELFCLASSNUM - 1][ELF_T_NUM] 
     }
 # undef TYPE_ALIGNS
   };
-#endif
 
 
 Elf_Type
@@ -173,8 +171,7 @@ convert_data (Elf_Scn *scn, int version __attribute__ ((unused)), int eclass,
       /* Make sure the source is correctly aligned for the conversion
 	 function to directly access the data elements.  */
       char *rawdata_source;
-      if (ALLOW_UNALIGNED ||
-	  ((((size_t) (char *) scn->rawdata_base)) & (align - 1)) == 0)
+      if (((((size_t) (char *) scn->rawdata_base)) & (align - 1)) == 0)
 	rawdata_source = scn->rawdata_base;
       else
 	{

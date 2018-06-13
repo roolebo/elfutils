@@ -1,3 +1,10 @@
+2018-06-13  Andreas Schwab  <schwab@suse.de>
+
+	* Makefile.am (riscv_SRCS): Add riscv_cfi.c and riscv_regs.c.
+	* riscv_cfi.c: New file.
+	* riscv_regs.c: Likewise.
+	* riscv_init.c (riscv_init): Hook register_info and abi_cfi.
+
 2018-05-15  Andreas Schwab  <schwab@suse.de>
 
 	* riscv_init.c (riscv_init): Hook check_special_symbol.

@@ -9310,7 +9310,9 @@ print_debug_loc_section (Dwfl_Module *dwflmod,
 						    listptr_idx);
 	  const unsigned char *locp = readp;
 	  const unsigned char *locendp;
-	  if (next_off == 0)
+	  if (next_off == 0
+	      || next_off > (size_t) (endp
+				      - (const unsigned char *) data->d_buf))
 	    locendp = endp;
 	  else
 	    locendp = (const unsigned char *) data->d_buf + next_off;

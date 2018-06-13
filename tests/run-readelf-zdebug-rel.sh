@@ -90,7 +90,7 @@ DWARF section [ 4] '.debug_info' at offset 0x58:
                decl_file            (data1) testfile-zdebug-rel.c (1)
                decl_line            (data1) 6
                type                 (ref4) [    9a]
-               const_value          (sdata) -9
+               const_value          (sdata) 18446744073709551607 (-9)
  [    74]      variable             abbrev: 6
                name                 (string) "b"
                decl_file            (data1) testfile-zdebug-rel.c (1)

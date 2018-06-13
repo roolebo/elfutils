@@ -1,3 +1,10 @@
+2018-06-13  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (die_type_sign_bytes): New function.
+	(attr_callback): Recognized DW_FORM_implicit_cost as signed. Use
+	die_type_sign_bytes to lookup the signedness and size of const
+	values.
+
 2018-06-11  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_form_data): Don't reuse readp and readendp when

@@ -1,3 +1,12 @@
+2018-06-13  Mark Wielaard  <mark@klomp.org>
+
+	* run-readelf-const-values.sh: New test.
+	* testfile-const-values.debug.bz2: New test file.
+	* run-readelf-zdebug-rel.sh: Adjust expected const_value.
+	* Makefile.am (TESTS): Add run-readelf-const-values.sh.
+	(EXTRA_DIST): Add run-readelf-const-values.sh and
+	testfile-const-values.debug.bz2.
+
 2018-06-08  Mark Wielaard  <mark@klomp.org>
 
 	* varlocs.c (print_expr): Error on bad DW_OP_GNU_parameter_ref

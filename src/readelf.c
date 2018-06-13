@@ -6869,6 +6869,33 @@ print_debug_frame_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
 }
 
 
+/* Returns the signedness (or false if it cannot be determined) and
+   the byte size (or zero if it cannot be gotten) of the given DIE
+   DW_AT_type attribute.  Uses dwarf_peel_type and dwarf_aggregate_size.  */
+static void
+die_type_sign_bytes (Dwarf_Die *die, bool *is_signed, int *bytes)
+{
+  Dwarf_Attribute attr;
+  Dwarf_Die type;
+
+  *bytes = 0;
+  *is_signed = false;
+
+  if (dwarf_peel_type (dwarf_formref_die (dwarf_attr_integrate (die,
+								DW_AT_type,
+								&attr), &type),
+		       &type) == 0)
+    {
+      Dwarf_Word val;
+      *is_signed = (dwarf_formudata (dwarf_attr (&type, DW_AT_encoding,
+						 &attr), &val) == 0
+		    && (val == DW_ATE_signed || val == DW_ATE_signed_char));
+
+      if (dwarf_aggregate_size (&type, &val) == 0)
+	*bytes = val;
+    }
+}
+
 struct attrcb_args
 {
   Dwfl_Module *dwflmod;
@@ -7300,36 +7327,89 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	}
       else
 	{
-	  Dwarf_Sword snum = 0;
-	  if (form == DW_FORM_sdata)
-	    if (unlikely (dwarf_formsdata (attrp, &snum) != 0))
-	      goto attrval_out;
-
 	  if (as_hex_id)
 	    {
 	      printf ("           %*s%-20s (%s) 0x%.16" PRIx64 "\n",
 		      (int) (level * 2), "", dwarf_attr_name (attr),
 		      dwarf_form_name (form), num);
 	    }
-	  else if (valuestr == NULL)
-	    {
-	      printf ("           %*s%-20s (%s)",
-		      (int) (level * 2), "", dwarf_attr_name (attr),
-		      dwarf_form_name (form));
-	      if (form == DW_FORM_sdata)
-		printf (" %" PRIdMAX "\n", (intmax_t) snum);
-	      else
-		printf (" %" PRIuMAX "\n", (uintmax_t) num);
-	    }
 	  else
 	    {
-	      printf ("           %*s%-20s (%s) %s",
-		      (int) (level * 2), "", dwarf_attr_name (attr),
-		      dwarf_form_name (form), valuestr);
-	      if (form == DW_FORM_sdata)
-		printf (" (%" PRIdMAX ")\n", (intmax_t) snum);
+	      Dwarf_Sword snum = 0;
+	      bool is_signed;
+	      int bytes = 0;
+	      if (attr == DW_AT_const_value)
+		die_type_sign_bytes (cbargs->die, &is_signed, &bytes);
 	      else
-		printf (" (%" PRIuMAX ")\n", (uintmax_t) num);
+		is_signed = (form == DW_FORM_sdata
+			     || form == DW_FORM_implicit_const);
+
+	      if (is_signed)
+		if (unlikely (dwarf_formsdata (attrp, &snum) != 0))
+		  goto attrval_out;
+
+	      if (valuestr == NULL)
+		{
+		  printf ("           %*s%-20s (%s) ",
+			  (int) (level * 2), "", dwarf_attr_name (attr),
+			  dwarf_form_name (form));
+		}
+	      else
+		{
+		  printf ("           %*s%-20s (%s) %s (",
+			  (int) (level * 2), "", dwarf_attr_name (attr),
+			  dwarf_form_name (form), valuestr);
+		}
+
+	      switch (bytes)
+		{
+		case 1:
+		  if (is_signed)
+		    printf ("%" PRId8, (int8_t) snum);
+		  else
+		    printf ("%" PRIu8, (uint8_t) num);
+		  break;
+
+		case 2:
+		  if (is_signed)
+		    printf ("%" PRId16, (int16_t) snum);
+		  else
+		    printf ("%" PRIu16, (uint16_t) num);
+		  break;
+
+		case 4:
+		  if (is_signed)
+		    printf ("%" PRId32, (int32_t) snum);
+		  else
+		    printf ("%" PRIu32, (uint32_t) num);
+		  break;
+
+		case 8:
+		  if (is_signed)
+		    printf ("%" PRId64, (int64_t) snum);
+		  else
+		    printf ("%" PRIu64, (uint64_t) num);
+		  break;
+
+		default:
+		  if (is_signed)
+		    printf ("%" PRIdMAX, (intmax_t) snum);
+		  else
+		    printf ("%" PRIuMAX, (uintmax_t) num);
+		  break;
+		}
+
+	      /* Make clear if we switched from a signed encoding to
+		 an unsigned value.  */
+	      if (attr == DW_AT_const_value
+		  && (form == DW_FORM_sdata || form == DW_FORM_implicit_const)
+		  && !is_signed)
+		printf (" (%" PRIdMAX ")", (intmax_t) num);
+
+	      if (valuestr == NULL)
+		printf ("\n");
+	      else
+		printf (")\n");
 	    }
 	}
       break;

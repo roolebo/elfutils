@@ -1,3 +1,8 @@
+2018-06-15  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (attr_callback): Only print block as expressions if it
+	isn't DW_FORM_data16.
+
 2018-06-12  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_form_data): Check we have 4, not 2, bytes

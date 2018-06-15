@@ -1,3 +1,11 @@
+2018-06-15  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_getlocation.c (check_constant_offset): Clarify DW_FORM_data16
+	isn't really a constant.
+	(dwarf_getlocation): Don't handle DW_FORM_data16 as block.
+	(dwarf_getlocation_addr): Likewise.
+	(dwarf_getlocations): Likewise.
+
 2018-06-12  Mark Wielaard  <mark@klomp.org>
 
 	* memory-access.h (read_3ubyte_unaligned_inc): New define.

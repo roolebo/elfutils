@@ -7483,11 +7483,16 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	case DW_AT_GNU_call_site_data_value:
 	case DW_AT_GNU_call_site_target:
 	case DW_AT_GNU_call_site_target_clobbered:
-	  putchar ('\n');
-	  print_ops (cbargs->dwflmod, cbargs->dbg,
-		     12 + level * 2, 12 + level * 2,
-		     cbargs->version, cbargs->addrsize, cbargs->offset_size,
-		     attrp->cu, block.length, block.data);
+	  if (form != DW_FORM_data16)
+	    {
+	      putchar ('\n');
+	      print_ops (cbargs->dwflmod, cbargs->dbg,
+			 12 + level * 2, 12 + level * 2,
+			 cbargs->version, cbargs->addrsize, cbargs->offset_size,
+			 attrp->cu, block.length, block.data);
+	    }
+	  else
+	    print_block (block.length, block.data);
 	  break;
 	}
       break;

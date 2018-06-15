@@ -174,6 +174,8 @@ check_constant_offset (Dwarf_Attribute *attr,
     default:
       return 1;
 
+      /* Note, we don't regard DW_FORM_data16 as a constant form,
+	 even though technically it is according to the standard.  */
     case DW_FORM_data1:
     case DW_FORM_data2:
     case DW_FORM_data4:
@@ -665,7 +667,13 @@ dwarf_getlocation (Dwarf_Attribute *attr, Dwarf_Op **llbuf, size_t *listlen)
   if (result != 1)
     return result;
 
-  /* If it has a block form, it's a single location expression.  */
+  /* If it has a block form, it's a single location expression.
+     Except for DW_FORM_data16, which is a 128bit constant.  */
+  if (attr->form == DW_FORM_data16)
+    {
+      __libdw_seterrno (DWARF_E_NO_BLOCK);
+      return -1;
+    }
   Dwarf_Block block;
   if (INTUSE(dwarf_formblock) (attr, &block) != 0)
     return -1;
@@ -863,9 +871,11 @@ dwarf_getlocation_addr (Dwarf_Attribute *attr, Dwarf_Addr address,
   if (llbufs == NULL)
     maxlocs = SIZE_MAX;
 
-  /* If it has a block form, it's a single location expression.  */
+  /* If it has a block form, it's a single location expression.
+     Except for DW_FORM_data16, which is a 128bit constant.  */
   Dwarf_Block block;
-  if (INTUSE(dwarf_formblock) (attr, &block) == 0)
+  if (attr->form != DW_FORM_data16
+      && INTUSE(dwarf_formblock) (attr, &block) == 0)
     {
       if (maxlocs == 0)
 	return 0;
@@ -876,11 +886,14 @@ dwarf_getlocation_addr (Dwarf_Attribute *attr, Dwarf_Addr address,
       return listlens[0] == 0 ? 0 : 1;
     }
 
-  int error = INTUSE(dwarf_errno) ();
-  if (unlikely (error != DWARF_E_NO_BLOCK))
+  if (attr->form != DW_FORM_data16)
     {
-      __libdw_seterrno (error);
-      return -1;
+      int error = INTUSE(dwarf_errno) ();
+      if (unlikely (error != DWARF_E_NO_BLOCK))
+	{
+	  __libdw_seterrno (error);
+	  return -1;
+	}
     }
 
   int result = check_constant_offset (attr, &llbufs[0], &listlens[0]);
@@ -938,9 +951,11 @@ dwarf_getlocations (Dwarf_Attribute *attr, ptrdiff_t offset, Dwarf_Addr *basep,
 
   if (offset == 0)
     {
-      /* If it has a block form, it's a single location expression.  */
+      /* If it has a block form, it's a single location expression.
+	 Except for DW_FORM_data16, which is a 128bit constant.  */
       Dwarf_Block block;
-      if (INTUSE(dwarf_formblock) (attr, &block) == 0)
+      if (attr->form != DW_FORM_data16
+	  && INTUSE(dwarf_formblock) (attr, &block) == 0)
 	{
 	  if (getlocation (attr->cu, &block, expr, exprlen,
 			   cu_sec_idx (attr->cu)) != 0)
@@ -952,11 +967,14 @@ dwarf_getlocations (Dwarf_Attribute *attr, ptrdiff_t offset, Dwarf_Addr *basep,
 	  return 1;
 	}
 
-      int error = INTUSE(dwarf_errno) ();
-      if (unlikely (error != DWARF_E_NO_BLOCK))
+      if (attr->form != DW_FORM_data16)
 	{
-	  __libdw_seterrno (error);
-	  return -1;
+	  int error = INTUSE(dwarf_errno) ();
+	  if (unlikely (error != DWARF_E_NO_BLOCK))
+	    {
+	      __libdw_seterrno (error);
+	      return -1;
+	    }
 	}
 
       int result = check_constant_offset (attr, expr, exprlen);

@@ -1,3 +1,12 @@
+2018-06-16  Yonghong Song  <yhs@fb.com>
+
+	* run-reloc-bpf.sh: New test.
+	* testfile-bpf-reloc.o.bz2: New test file.
+	* testfile-bpf-reloc.expect.bz2: New test file.
+	* Makefile.am (TESTS): Add run-reloc-bpf.sh.
+	(EXTRA_DIST): Add run-reloc-bpf.sh, testfile-bpf-reloc.o.bz2 and
+	testfile-bpf-reloc.expect.bz2.
+
 2018-06-13  Mark Wielaard  <mark@klomp.org>
 
 	* run-readelf-const-values.sh: New test.

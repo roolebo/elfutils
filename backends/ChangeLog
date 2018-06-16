@@ -1,3 +1,10 @@
+2018-06-16  Yonghong Song  <yhs@fb.com>
+
+	* Makefile.am (bpf_SRCS): Add bpf_symbol.c.
+	* bpf_init.c (bpf_init): Add reloc_simple_type HOOK.
+	* bpf_reloc.def: Add RELOC_TYPE 64_64 and 64_32.
+	* bpf_symbol.c: New file.
+
 2018-06-21  Mark Wielaard  <mark@klomp.org>
 
 	* bpf_reloc.def: Remove MAP_FD.

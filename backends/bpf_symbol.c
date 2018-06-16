@@ -1,4 +1,4 @@
-/* List the relocation types for BPF.  -*- C -*-
+/* BPF specific symbolic name handling.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -25,8 +25,30 @@
    the GNU Lesser General Public License along with this program.  If
    not, see <http://www.gnu.org/licenses/>.  */
 
-/*	    NAME,		REL|EXEC|DYN	*/
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
 
-RELOC_TYPE (NONE,		EXEC|DYN)
-RELOC_TYPE (64_64,		REL)
-RELOC_TYPE (64_32,		REL)
+#include <assert.h>
+#include <elf.h>
+#include <stddef.h>
+#include <string.h>
+
+#define BACKEND bpf_
+#include "libebl_CPU.h"
+
+
+/* Check for the simple reloc types.  */
+Elf_Type
+bpf_reloc_simple_type (Ebl *ebl __attribute__ ((unused)), int type)
+{
+  switch (type)
+    {
+    case R_BPF_64_64:
+      return ELF_T_XWORD;
+    case R_BPF_64_32:
+      return ELF_T_WORD;
+    default:
+      return ELF_T_NUM;
+    }
+}

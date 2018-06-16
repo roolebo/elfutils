@@ -126,7 +126,7 @@ am_libebl_m68k_pic_a_OBJECTS = $(m68k_SRCS:.c=.os)
 # an issue.
 m68k_corenote_no_Wpacked_not_aligned = yes
 
-bpf_SRCS = bpf_init.c bpf_regs.c
+bpf_SRCS = bpf_init.c bpf_regs.c bpf_symbol.c
 cpu_bpf = ../libcpu/libcpu_bpf.a
 libebl_bpf_pic_a_SOURCES = $(bpf_SRCS)
 am_libebl_bpf_pic_a_OBJECTS = $(bpf_SRCS:.c=.os)

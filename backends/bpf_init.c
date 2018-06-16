@@ -53,6 +53,7 @@ bpf_init (Elf *elf __attribute__ ((unused)),
   bpf_init_reloc (eh);
   HOOK (eh, register_info);
   HOOK (eh, disasm);
+  HOOK (eh, reloc_simple_type);
 
   return MODVERSION;
 }

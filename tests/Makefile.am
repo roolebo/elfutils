@@ -146,7 +146,8 @@ TESTS = run-arextract.sh run-arsymtest.sh run-ar.sh newfile test-nlist \
 	run-dwarf-die-addr-die.sh \
 	run-get-units-invalid.sh run-get-units-split.sh \
 	run-attr-integrate-skel.sh \
-	run-all-dwarf-ranges.sh run-unit-info.sh
+	run-all-dwarf-ranges.sh run-unit-info.sh \
+	run-reloc-bpf.sh
 
 if !BIARCH
 export ELFUTILS_DISABLE_BIARCH = 1
@@ -376,6 +377,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     run-zstrptr.sh run-compress-test.sh \
 	     run-disasm-bpf.sh \
 	     testfile-bpf-dis1.expect.bz2 testfile-bpf-dis1.o.bz2 \
+	     run-reloc-bpf.sh \
+	     testfile-bpf-reloc.expect.bz2 testfile-bpf-reloc.o.bz2 \
 	     testfile-m68k-core.bz2 testfile-m68k.bz2 testfile-m68k-s.bz2 \
 	     run-dwarf-die-addr-die.sh \
 	     run-get-units-invalid.sh run-get-units-split.sh \

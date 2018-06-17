@@ -1,5 +1,13 @@
 2018-06-18  Mark Wielaard  <mark@klomp.org>
 
+	* dwarf_aggregate_size.c (array_size): New depth argument. Use
+	aggregate_size instead of dwarf_aggregate_size and pass depth.
+	(aggregate_size): New depth argument. Check depth isn't bigger
+	than MAX_DEPTH (256). Pass depth to recursive calls.
+	(dwarf_aggregate_size): ass zero as depth to aggregate_size.
+
+2018-06-18  Mark Wielaard  <mark@klomp.org>
+
 	* dwarf_peel_type.c (dwarf_peel_type): Limit modifier chain to 64.
 
 2018-06-18  Mark Wielaard  <mark@klomp.org>

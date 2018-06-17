@@ -46,14 +46,19 @@ dwarf_peel_type (Dwarf_Die *die, Dwarf_Die *result)
 
   *result = *die;
   tag = INTUSE (dwarf_tag) (result);
-  while (tag == DW_TAG_typedef
-	 || tag == DW_TAG_const_type
-	 || tag == DW_TAG_volatile_type
-	 || tag == DW_TAG_restrict_type
-	 || tag == DW_TAG_atomic_type
-	 || tag == DW_TAG_immutable_type
-	 || tag == DW_TAG_packed_type
-	 || tag == DW_TAG_shared_type)
+
+/* Stack 8 of all these modifiers, after that it gets silly.  */
+#define MAX_DEPTH (8 * 8)
+  int max_depth = MAX_DEPTH;
+  while ((tag == DW_TAG_typedef
+	  || tag == DW_TAG_const_type
+	  || tag == DW_TAG_volatile_type
+	  || tag == DW_TAG_restrict_type
+	  || tag == DW_TAG_atomic_type
+	  || tag == DW_TAG_immutable_type
+	  || tag == DW_TAG_packed_type
+	  || tag == DW_TAG_shared_type)
+	&& max_depth-- > 0)
     {
       Dwarf_Attribute attr_mem;
       Dwarf_Attribute *attr = INTUSE (dwarf_attr_integrate) (result, DW_AT_type,
@@ -67,7 +72,7 @@ dwarf_peel_type (Dwarf_Die *die, Dwarf_Die *result)
       tag = INTUSE (dwarf_tag) (result);
     }
 
-  if (tag == DW_TAG_invalid)
+  if (tag == DW_TAG_invalid || max_depth <= 0)
     return -1;
 
   return 0;

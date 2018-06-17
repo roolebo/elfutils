@@ -153,6 +153,7 @@ read_srclines (Dwarf *dbg,
 {
   int res = -1;
 
+  struct filelist *filelist = NULL;
   size_t nfilelist = 0;
   size_t ndirlist = 0;
 
@@ -445,7 +446,7 @@ read_srclines (Dwarf *dbg,
       },
       .next = NULL
     };
-  struct filelist *filelist = &null_file;
+  filelist = &null_file;
   nfilelist = 1;
 
   /* Allocate memory for a new file.  For the first MAX_STACK_FILES

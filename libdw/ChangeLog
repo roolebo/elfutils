@@ -1,3 +1,7 @@
+2018-06-17  Luiz Angelo Daros de Luca  <luizluca@gmail.com>
+
+	* dwarf_getsrclines.c (read_srclines): Intialize filelist early.
+
 2018-06-15  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_getlocation.c (check_constant_offset): Clarify DW_FORM_data16

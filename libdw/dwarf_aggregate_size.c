@@ -171,6 +171,9 @@ aggregate_size (Dwarf_Die *die, Dwarf_Word *size, Dwarf_Die *type_mem)
 {
   Dwarf_Attribute attr_mem;
 
+  if (die == NULL)
+    return -1;
+
   if (INTUSE(dwarf_attr_integrate) (die, DW_AT_byte_size, &attr_mem) != NULL)
     return INTUSE(dwarf_formudata) (&attr_mem, size);
 

@@ -1,3 +1,7 @@
+2018-06-18  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_aggregate_size.c (aggregate_size): Check die is not NULL.
+
 2018-06-17  Luiz Angelo Daros de Luca  <luizluca@gmail.com>
 
 	* dwarf_getsrclines.c (read_srclines): Intialize filelist early.

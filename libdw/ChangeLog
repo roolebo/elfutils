@@ -1,3 +1,8 @@
+2018-06-22  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_nextcu.c (__libdw_next_unit): Set next_off to -1 when it would
+	wrap around.
+
 2018-06-18  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_aggregate_size.c (array_size): New depth argument. Use

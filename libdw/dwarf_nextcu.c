@@ -278,6 +278,11 @@ __libdw_next_unit (Dwarf *dwarf, bool v4_debug_types, Dwarf_Off off,
      or with offset == 8: 2 * 8 - 4 == 12.  */
   *next_off = off + 2 * offset_size - 4 + length;
 
+  /* This means that the length field is bogus, but return the CU anyway.
+     We just won't return anything after this.  */
+  if (*next_off <= off)
+    *next_off = (Dwarf_Off) -1;
+
   return 0;
 }
 

@@ -1,3 +1,17 @@
+2018-06-25  Mark Wielaard  <mark@klomp.org>
+
+	* next-files.c: New file.
+	* next-lines.c: Likewise.
+	* run-next-files.sh: New test.
+	* run-next-lines.sh: Likewise.
+	* testfile-only-debug-line.bz2: New test file.
+	* Makefile.am (check_PROGRAMS): Add next-files and next-lines.
+	(TESTS): Add run-next-files.sh and run-next-lines.sh.
+	(EXTRA_DIST): Add run-next-files.sh, run-next-lines.sh and
+	testfile-only-debug-line.bz2.
+	(next_lines_LDADD): New variable.
+	(next_files_LDADD): Likewise.
+
 2018-06-16  Yonghong Song  <yhs@fb.com>
 
 	* run-reloc-bpf.sh: New test.

@@ -716,6 +716,24 @@ extern int dwarf_getsrcdirs (Dwarf_Files *files,
 			     const char *const **result, size_t *ndirs)
   __nonnull_attribute__ (2, 3);
 
+/* Iterates through the debug line units.  Returns 0 on success, -1 on
+   error or 1 if there are no more units.  To start iterating use zero
+   for OFF and set *CU to NULL.  On success NEXT_OFF will be set to
+   the next offset to use.  The *CU will be set if this line table
+   needed a specific CU and needs to be given when calling
+   dwarf_next_lines again (to help dwarf_next_lines quickly find the
+   next CU).  *CU might be set to NULL when it couldn't be found (the
+   compilation directory entry will be the empty string in that case)
+   or for DWARF 5 or later tables, which are self contained.  SRCFILES
+   and SRCLINES may be NULL if the caller is not interested in the
+   actual line or file table.  On success and when not NULL, NFILES
+   and NLINES will be set to the number of files in the file table and
+   number of lines in the line table.  */
+extern int dwarf_next_lines (Dwarf *dwarf, Dwarf_Off off,
+			     Dwarf_Off *next_off, Dwarf_CU **cu,
+			     Dwarf_Files **srcfiles, size_t *nfiles,
+			     Dwarf_Lines **srclines, size_t *nlines)
+  __nonnull_attribute__ (3,4);
 
 /* Return location expression, decoded as a list of operations.  */
 extern int dwarf_getlocation (Dwarf_Attribute *attr, Dwarf_Op **expr,

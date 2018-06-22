@@ -1,3 +1,15 @@
+2018-06-25  Mark Wielaard  <mark@klomp.org>
+
+	* Makefile.am (libdw_a_SOURCES): Add dwarf_next_lines.c.
+	* libdw.h (dwarf_next_lines): New function declaration.
+	* libdw.map (ELFUTILS_0.173): New section.
+	* dwarf_next_lines.c: New files.
+	* dwarf_begin_elf.c (check_section): Don't error out when elf
+	decompression fails.
+	(valid_p): Allow just a single .debug_line section.
+	* dwarf_getsrclines.c (read_srclines): Keep files relative if comp_dir
+	is missing.
+
 2018-06-22  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_nextcu.c (__libdw_next_unit): Set next_off to -1 when it would

@@ -7824,23 +7824,51 @@ print_decoded_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
   size_t address_size
     = elf_getident (ebl->elf, NULL)[EI_CLASS] == ELFCLASS32 ? 4 : 8;
 
-  Dwarf_Off cuoffset;
-  Dwarf_Off ncuoffset = 0;
-  size_t hsize;
-  while (dwarf_nextcu (dbg, cuoffset = ncuoffset, &ncuoffset, &hsize,
-		       NULL, NULL, NULL) == 0)
+  Dwarf_Lines *lines;
+  size_t nlines;
+  Dwarf_Off off, next_off = 0;
+  Dwarf_CU *cu = NULL;
+  while (dwarf_next_lines (dbg, off = next_off, &next_off, &cu, NULL, NULL,
+			   &lines, &nlines) == 0)
     {
       Dwarf_Die cudie;
-      if (dwarf_offdie (dbg, cuoffset + hsize, &cudie) == NULL)
-	continue;
+      if (cu != NULL && dwarf_cu_info (cu, NULL, NULL, &cudie,
+				       NULL, NULL, NULL, NULL) == 0)
+	printf (" CU [%" PRIx64 "] %s\n",
+		dwarf_dieoffset (&cudie), dwarf_diename (&cudie));
+      else
+	{
+	  /* DWARF5 lines can be independent of any CU, but they probably
+	     are used by some CU.  Determine the CU this block is for.  */
+	  Dwarf_Off cuoffset;
+	  Dwarf_Off ncuoffset = 0;
+	  size_t hsize;
+	  while (dwarf_nextcu (dbg, cuoffset = ncuoffset, &ncuoffset, &hsize,
+			       NULL, NULL, NULL) == 0)
+	    {
+	      if (dwarf_offdie (dbg, cuoffset + hsize, &cudie) == NULL)
+		continue;
+	      Dwarf_Attribute stmt_list;
+	      if (dwarf_attr (&cudie, DW_AT_stmt_list, &stmt_list) == NULL)
+		continue;
+	      Dwarf_Word lineoff;
+	      if (dwarf_formudata (&stmt_list, &lineoff) != 0)
+		continue;
+	      if (lineoff == off)
+		{
+		  /* Found the CU.  */
+		  cu = cudie.cu;
+		  break;
+		}
+	    }
 
-      size_t nlines;
-      Dwarf_Lines *lines;
-      if (dwarf_getsrclines (&cudie, &lines, &nlines) != 0)
-	continue;
+	  if (cu != NULL)
+	    printf (" CU [%" PRIx64 "] %s\n",
+		    dwarf_dieoffset (&cudie), dwarf_diename (&cudie));
+	  else
+	    printf (" No CU\n");
+	}
 
-      printf (" CU [%" PRIx64 "] %s\n",
-	      dwarf_dieoffset (&cudie), dwarf_diename (&cudie));
       printf ("  line:col SBPE* disc isa op address"
 	      " (Statement Block Prologue Epilogue *End)\n");
       const char *last_file = "";
@@ -8503,30 +8531,6 @@ print_debug_line_section (Dwfl_Module *dwflmod, Ebl *ebl, GElf_Ehdr *ehdr,
       unsigned int op_index = 0;
       size_t line = 1;
       uint_fast8_t is_stmt = default_is_stmt;
-
-      /* Determine the CU this block is for.  */
-      Dwarf_Off cuoffset;
-      Dwarf_Off ncuoffset = 0;
-      size_t hsize;
-      while (dwarf_nextcu (dbg, cuoffset = ncuoffset, &ncuoffset, &hsize,
-			   NULL, NULL, NULL) == 0)
-	{
-	  Dwarf_Die cudie;
-	  if (dwarf_offdie (dbg, cuoffset + hsize, &cudie) == NULL)
-	    continue;
-	  Dwarf_Attribute stmt_list;
-	  if (dwarf_attr (&cudie, DW_AT_stmt_list, &stmt_list) == NULL)
-	    continue;
-	  Dwarf_Word lineoff;
-	  if (dwarf_formudata (&stmt_list, &lineoff) != 0)
-	    continue;
-	  if (lineoff == start_offset)
-	    {
-	      /* Found the CU.  */
-	      address_size = cudie.cu->address_size;
-	      break;
-	    }
-	}
 
       /* Apply the "operation advance" from a special opcode
 	 or DW_LNS_advance_pc (as per DWARF4 6.2.5.1).  */

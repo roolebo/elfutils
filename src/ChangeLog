@@ -1,3 +1,9 @@
+2018-06-25  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (print_decoded_line_section): Use dwarf_next_lines
+	instead of dwarf_nextcu.
+	(print_debug_line_section): Don't explicitly lookup CU.
+
 2018-06-15  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (attr_callback): Only print block as expressions if it

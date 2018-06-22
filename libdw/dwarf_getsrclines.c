@@ -508,11 +508,10 @@ read_srclines (Dwarf *dbg,
 		{
 		  /* This value could be NULL in case the DW_AT_comp_dir
 		     was not present.  We cannot do much in this case.
-		     The easiest thing is to convert the path in an
-		     absolute path.  */
+		     Just keep the file relative.  */
 		  cp = stpcpy (cp, dirarray[diridx].dir);
+		  *cp++ = '/';
 		}
-	      *cp++ = '/';
 	      strcpy (cp, fname);
 	      assert (strlen (new_file->info.name)
 		      < dirarray[diridx].len + 1 + fnamelen + 1);
@@ -803,11 +802,12 @@ read_srclines (Dwarf *dbg,
 		    if (dirarray[diridx].dir != NULL)
 		      /* This value could be NULL in case the
 			 DW_AT_comp_dir was not present.  We
-			 cannot do much in this case.  The easiest
-			 thing is to convert the path in an
-			 absolute path.  */
-		      cp = stpcpy (cp, dirarray[diridx].dir);
-		    *cp++ = '/';
+			 cannot do much in this case.  Just
+			 keep the file relative.  */
+		      {
+			cp = stpcpy (cp, dirarray[diridx].dir);
+			*cp++ = '/';
+		      }
 		    strcpy (cp, fname);
 		  }
 

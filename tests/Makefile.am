@@ -38,7 +38,8 @@ endif
 
 check_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  showptable update1 update2 update3 update4 test-nlist \
-		  show-die-info get-files get-lines get-pubnames \
+		  show-die-info get-files next-files get-lines next-lines \
+		  get-pubnames \
 		  get-aranges allfcts line2addr addrscopes funcscopes \
 		  show-abbrev hash newscn ecp dwflmodtest \
 		  find-prologues funcretval allregs rdwrmmap \
@@ -77,6 +78,7 @@ backtrace-child-biarch$(EXEEXT): backtrace-child.c
 TESTS = run-arextract.sh run-arsymtest.sh run-ar.sh newfile test-nlist \
 	update1 update2 update3 update4 \
 	run-show-die-info.sh run-get-files.sh run-get-lines.sh \
+	run-next-files.sh run-next-lines.sh \
 	run-get-pubnames.sh run-get-aranges.sh run-allfcts.sh \
 	run-show-abbrev.sh run-line2addr.sh hash \
 	newscn run-strip-test.sh run-strip-test2.sh \
@@ -173,6 +175,7 @@ endif
 
 EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     run-show-die-info.sh run-get-files.sh run-get-lines.sh \
+	     run-next-files.sh run-next-lines.sh testfile-only-debug-line.bz2 \
 	     run-get-pubnames.sh run-get-aranges.sh \
 	     run-show-abbrev.sh run-strip-test.sh \
 	     run-strip-test2.sh run-ecp-test.sh run-ecp-test2.sh \
@@ -470,7 +473,9 @@ show_die_info_LDADD = $(libdw) $(libelf)
 get_pubnames_LDADD = $(libdw) $(libelf)
 show_abbrev_LDADD = $(libdw) $(libelf)
 get_lines_LDADD = $(libdw) $(libelf)
+next_lines_LDADD = $(libdw) $(libelf)
 get_files_LDADD = $(libdw) $(libelf)
+next_files_LDADD = $(libdw) $(libelf)
 get_aranges_LDADD = $(libdw) $(libelf)
 allfcts_LDADD = $(libdw) $(libelf)
 line2addr_LDADD = $(libdw) $(argp_LDADD)

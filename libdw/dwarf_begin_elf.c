@@ -156,17 +156,9 @@ check_section (Dwarf *result, GElf_Ehdr *ehdr, Elf_Scn *scn, bool inscngrp)
     {
       if (elf_compress (scn, 0, 0) < 0)
 	{
-	  /* If we failed to decompress the section and it's the
-	     debug_info section, then fail with specific error rather
-	     than the generic NO_DWARF. Without debug_info we can't do
-	     anything (see also valid_p()). */
-	  if (cnt == IDX_debug_info)
-	    {
-	      Dwarf_Sig8_Hash_free (&result->sig8_hash);
-	      __libdw_seterrno (DWARF_E_COMPRESSED_ERROR);
-	      free (result);
-	      return NULL;
-	    }
+	  /* It would be nice if we could fail with a specific error.
+	     But we don't know if this was an essential section or not.
+	     So just continue for now. See also valid_p().  */
 	  return result;
 	}
     }
@@ -214,11 +206,10 @@ valid_p (Dwarf *result)
   /* We looked at all the sections.  Now determine whether all the
      sections with debugging information we need are there.
 
-     XXX Which sections are absolutely necessary?  Add tests if
-     necessary.  For now we require only .debug_info.  Hopefully this
-     is correct.  */
+     Require at least one section that can be read "standalone".  */
   if (likely (result != NULL)
-      && unlikely (result->sectiondata[IDX_debug_info] == NULL))
+      && unlikely (result->sectiondata[IDX_debug_info] == NULL
+		   && result->sectiondata[IDX_debug_line] == NULL))
     {
       Dwarf_Sig8_Hash_free (&result->sig8_hash);
       __libdw_seterrno (DWARF_E_NO_DWARF);

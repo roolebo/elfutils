@@ -352,3 +352,8 @@ ELFUTILS_0.171 {
     dwarf_getabbrevattr_data;
     dwarf_cu_info;
 } ELFUTILS_0.170;
+
+ELFUTILS_0.173 {
+  global:
+    dwarf_next_lines;
+} ELFUTILS_0.171;

@@ -164,16 +164,16 @@ dwarf_opcode_string (unsigned int code)
 }
 
 // Forward reference for print_expr_block.
-static void print_expr (Dwarf_Attribute *, Dwarf_Op *, Dwarf_Addr);
+static void print_expr (Dwarf_Attribute *, Dwarf_Op *, Dwarf_Addr, int);
 
 static void
 print_expr_block (Dwarf_Attribute *attr, Dwarf_Op *exprs, int len,
-		  Dwarf_Addr addr)
+		  Dwarf_Addr addr, int depth)
 {
   printf ("{");
   for (int i = 0; i < len; i++)
     {
-      print_expr (attr, &exprs[i], addr);
+      print_expr (attr, &exprs[i], addr, depth);
       printf ("%s", (i + 1 < len ? ", " : ""));
     }
   printf ("}");
@@ -185,13 +185,17 @@ print_expr_block_addrs (Dwarf_Attribute *attr,
 			Dwarf_Op *exprs, int len)
 {
   printf ("      [%" PRIx64 ",%" PRIx64 ") ", begin, end);
-  print_expr_block (attr, exprs, len, begin);
+  print_expr_block (attr, exprs, len, begin, 0);
   printf ("\n");
 }
 
 static void
-print_expr (Dwarf_Attribute *attr, Dwarf_Op *expr, Dwarf_Addr addr)
+print_expr (Dwarf_Attribute *attr, Dwarf_Op *expr, Dwarf_Addr addr, int depth)
 {
+#define MAX_DEPTH 64
+  if (depth++ > MAX_DEPTH)
+    error (EXIT_FAILURE, 0, "print_expr recursion depth exceeded");
+
   uint8_t atom = expr->atom;
   const char *opname = dwarf_opcode_string (atom);
   assert (opname != NULL);
@@ -274,7 +278,7 @@ print_expr (Dwarf_Attribute *attr, Dwarf_Op *expr, Dwarf_Addr addr)
 		   addr, dwarf_errmsg (-1));
 	  if (cfa_nops < 1)
 	    error (EXIT_FAILURE, 0, "dwarf_frame_cfa no ops");
-	  print_expr_block (NULL, cfa_ops, cfa_nops, 0);
+	  print_expr_block (NULL, cfa_ops, cfa_nops, 0, depth);
 	  free (frame);
 	}
       else if (is_ET_REL || is_debug)
@@ -343,7 +347,7 @@ print_expr (Dwarf_Attribute *attr, Dwarf_Op *expr, Dwarf_Addr addr)
 		 dwarf_errmsg (-1));
 
 	printf ("%s([%" PRIx64 "]) ", opname, dwarf_dieoffset (&call_die));
-	print_expr_block (&call_attr, call_ops, call_len, addr);
+	print_expr_block (&call_attr, call_ops, call_len, addr, depth);
       }
       break;
 
@@ -458,7 +462,7 @@ print_expr (Dwarf_Attribute *attr, Dwarf_Op *expr, Dwarf_Addr addr)
 	    if (locs == 0)
 	      printf ("<no location>"); // This means "optimized out".
 	    else if (locs == 1)
-	      print_expr_block (&attrval, exprval, exprval_len, addr);
+	      print_expr_block (&attrval, exprval, exprval_len, addr, depth);
 	    else
 	      error (EXIT_FAILURE, 0,
 		     "dwarf_getlocation_addr attrval at addr 0x%" PRIx64
@@ -498,7 +502,7 @@ print_expr (Dwarf_Attribute *attr, Dwarf_Op *expr, Dwarf_Addr addr)
 	    if (locs == 0)
 	      printf ("<no location>"); // This means "optimized out".
 	    else if (locs == 1)
-	      print_expr_block (&attrval, exprval, exprval_len, addr);
+	      print_expr_block (&attrval, exprval, exprval_len, addr, depth);
 	    else
 	      error (EXIT_FAILURE, 0,
 		     "dwarf_getlocation_addr attrval at addr 0x%" PRIx64
@@ -527,7 +531,7 @@ print_expr (Dwarf_Attribute *attr, Dwarf_Op *expr, Dwarf_Addr addr)
 		 dwarf_errmsg (-1));
 
 	printf ("%s(%zd) ", opname, entry_len);
-	print_expr_block (attr, entry_ops, entry_len, addr);
+	print_expr_block (attr, entry_ops, entry_len, addr, depth);
       }
       break;
 
@@ -723,7 +727,7 @@ print_varlocs (Dwarf_Die *funcdie)
 	  if (entrypc == 0)
 	    printf ("XXX zero address"); // XXX bad DWARF?
 	  else
-	    print_expr_block (&fb_attr, fb_expr, fb_exprlen, entrypc);
+	    print_expr_block (&fb_attr, fb_expr, fb_exprlen, entrypc, 0);
 	  printf ("\n");
 	}
       else
@@ -736,7 +740,7 @@ print_varlocs (Dwarf_Die *funcdie)
 					    &fb_expr, &fb_exprlen)) > 0)
 	    {
 	      printf ("      (%" PRIx64 ",%" PRIx64 ") ", start, end);
-	      print_expr_block (&fb_attr, fb_expr, fb_exprlen, start);
+	      print_expr_block (&fb_attr, fb_expr, fb_exprlen, start, 0);
 	      printf ("\n");
 	    }
 
@@ -940,7 +944,7 @@ handle_attr (Dwarf_Attribute *attr, void *arg)
   if (res == 0)
     {
       printf (" ");
-      print_expr_block (attr, expr, exprlen, entrypc);
+      print_expr_block (attr, expr, exprlen, entrypc, 0);
       printf ("\n");
       printed = true;
     }

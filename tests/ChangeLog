@@ -1,3 +1,10 @@
+2018-06-23  Mark Wielaard  <mark@klomp.org>
+
+	* varlocs.c (print_expr): Take a new depth argument. Check it isn't
+	greater than MAX_DEPTH (64). Pass on to print_expr_block.
+	(print_expr_block): Take a new depth argument. Pass it to print_expr.
+	(print_expr_block_addrs): Call print_expr_block with zero depth.
+
 2018-06-25  Mark Wielaard  <mark@klomp.org>
 
 	* next-files.c: New file.

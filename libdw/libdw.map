@@ -49,7 +49,6 @@ ELFUTILS_0.122 {
     dwarf_getlocation_addr;
     dwarf_getmacros;
     dwarf_getpubnames;
-    dwarf_getscn_info;
     dwarf_getscopes;
     dwarf_getscopes_die;
     dwarf_getscopevar;

@@ -1,3 +1,8 @@
+2018-06-26  Mark Wielaard  <mark@klomp.org>
+
+	* libdw.h (dwarf_getscn_info): Remove.
+	* libdw.map (ELFUTILS_0.122): Remove dwarf_getscn_info.
+
 2018-06-25  Mark Wielaard  <mark@klomp.org>
 
 	* Makefile.am (libdw_a_SOURCES): Add dwarf_next_lines.c.

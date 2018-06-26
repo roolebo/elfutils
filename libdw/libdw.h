@@ -269,9 +269,6 @@ extern void dwarf_setalt (Dwarf *main, Dwarf *alt);
 extern int dwarf_end (Dwarf *dwarf);
 
 
-/* Get the data block for the .debug_info section.  */
-extern Elf_Data *dwarf_getscn_info (Dwarf *dwarf);
-
 /* Read the header for the DWARF CU.  */
 extern int dwarf_nextcu (Dwarf *dwarf, Dwarf_Off off, Dwarf_Off *next_off,
 			 size_t *header_sizep, Dwarf_Off *abbrev_offsetp,

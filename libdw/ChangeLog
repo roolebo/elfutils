@@ -1,3 +1,8 @@
+2018-06-27  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_begin_elf.c (check_section): Allow a single .debug_frame
+	section.
+
 2018-06-26  Mark Wielaard  <mark@klomp.org>
 
 	* libdw.h (dwarf_getscn_info): Remove.

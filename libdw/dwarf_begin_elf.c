@@ -209,7 +209,8 @@ valid_p (Dwarf *result)
      Require at least one section that can be read "standalone".  */
   if (likely (result != NULL)
       && unlikely (result->sectiondata[IDX_debug_info] == NULL
-		   && result->sectiondata[IDX_debug_line] == NULL))
+		   && result->sectiondata[IDX_debug_line] == NULL
+		   && result->sectiondata[IDX_debug_frame] == NULL))
     {
       Dwarf_Sig8_Hash_free (&result->sig8_hash);
       __libdw_seterrno (DWARF_E_NO_DWARF);

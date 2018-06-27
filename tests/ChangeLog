@@ -1,3 +1,20 @@
+2018-06-27  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_cfi.c: New file.
+	* run-dwarfcfi.sh: New test.
+	* testfile11-debugframe.bz2: New testfile.
+	* testfile12-debugframe.bz2: Likewise.
+	* testfileaarch64-debugframe.bz2: Likewise.
+	* testfilearm-debugframe.bz2: Likewise.
+	* testfileppc32-debugframe.bz2: Likewise.
+	* testfileppc64-debugframe.bz2: Likewise.
+	* Makefile.am (check_PROGRAMS): Add dwarfcfi.
+	(TESTS): Add run-dwarfcfi.sh.
+	(EXTRA_DIST): Add run-dwarfcfi.sh, testfile11-debugframe.bz2,
+	testfile12-debugframe.bz2, testfileaarch64-debugframe.bz2,
+	testfilearm-debugframe.bz2, testfileppc32-debugframe.bz2 and
+	testfileppc64-debugframe.bz2.
+
 2018-06-23  Mark Wielaard  <mark@klomp.org>
 
 	* varlocs.c (print_expr): Take a new depth argument. Check it isn't

@@ -46,6 +46,7 @@ check_PROGRAMS = arextract arsymtest newfile saridx scnnames sectiondump \
 		  dwfl-bug-addr-overflow arls dwfl-bug-fd-leak \
 		  dwfl-addr-sect dwfl-bug-report early-offscn \
 		  dwfl-bug-getmodules dwarf-getmacros dwarf-ranges addrcfi \
+		  dwarfcfi \
 		  test-flag-nobits dwarf-getstring rerequest_tag \
 		  alldts typeiter typeiter2 low_high_pc \
 		  test-elf_cntl_gelf_getshdr dwflsyms dwfllines \
@@ -95,6 +96,7 @@ TESTS = run-arextract.sh run-arsymtest.sh run-ar.sh newfile test-nlist \
 	run-ranlib-test2.sh run-ranlib-test3.sh run-ranlib-test4.sh \
 	run-addrscopes.sh run-strings-test.sh run-funcscopes.sh \
 	run-find-prologues.sh run-allregs.sh run-addrcfi.sh \
+	run-dwarfcfi.sh \
 	run-nm-self.sh run-readelf-self.sh run-readelf-info-plus.sh \
 	run-readelf-const-values.sh \
 	run-varlocs-self.sh run-exprlocs-self.sh \
@@ -205,7 +207,10 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     run-addrscopes.sh run-strings-test.sh run-funcscopes.sh \
 	     run-nm-self.sh run-readelf-self.sh run-readelf-info-plus.sh \
 	     run-readelf-const-values.sh testfile-const-values.debug.bz2 \
-	     run-addrcfi.sh \
+	     run-addrcfi.sh run-dwarfcfi.sh \
+	     testfile11-debugframe.bz2 testfile12-debugframe.bz2 \
+	     testfileaarch64-debugframe.bz2 testfilearm-debugframe.bz2 \
+	     testfileppc32-debugframe.bz2 testfileppc64-debugframe.bz2 \
 	     run-varlocs-self.sh run-exprlocs-self.sh \
 	     run-find-prologues.sh run-allregs.sh run-native-test.sh \
 	     run-addrname-test.sh run-dwfl-bug-offline-rel.sh \
@@ -506,6 +511,7 @@ dwarf_getmacros_LDADD = $(libdw)
 dwarf_ranges_LDADD = $(libdw)
 dwarf_getstring_LDADD = $(libdw)
 addrcfi_LDADD = $(libdw) $(libebl) $(libelf) $(argp_LDADD) -ldl
+dwarfcfi_LDADD = $(libdw) $(libelf)
 test_flag_nobits_LDADD = $(libelf)
 rerequest_tag_LDADD = $(libdw)
 alldts_LDADD = $(libdw) $(libelf)

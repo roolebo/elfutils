@@ -1,3 +1,13 @@
+2018-06-28  Mark Wielaard  <mark@klomp.org>
+
+	* next_cfi.c: New file.
+	* run-next-cfi.sh: New test.
+	* run-next-cfi-self.sh: Likewise.
+	* Makefile.am (check_PROGRAMS): Add next_cfi.
+	(TESTS): Add run-next-cfi.sh and run-next-cfi-self.sh.
+	(EXTRA_DIST): Likewise.
+	(next_cfi_LDADD): New variable.
+
 2018-06-27  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_cfi.c: New file.

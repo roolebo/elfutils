@@ -54,6 +54,7 @@ dwarf_next_cfi (const unsigned char e_ident[],
 	 we don't know yet whether this is a 64-bit object or not.  */
       || unlikely (off + 4 >= data->d_size))
     {
+    done:
       *next_off = (Dwarf_Off) -1l;
       return 1;
     }
@@ -79,6 +80,13 @@ dwarf_next_cfi (const unsigned char e_ident[],
 	}
       length = read_8ubyte_unaligned_inc (&dw, bytes);
     }
+
+  /* Not explicitly in the DWARF spec, but mentioned in the LSB exception
+     frames (.eh_frame) spec. If Length contains the value 0, then this
+     CIE shall be considered a terminator and processing shall end.  */
+  if (length == 0)
+    goto done;
+
   if (unlikely ((uint64_t) (limit - bytes) < length)
       || unlikely (length < offset_size + 1))
     goto invalid;

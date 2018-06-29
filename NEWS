@@ -1,3 +1,21 @@
+Version 0.173
+
+More fixes for crashes and hangs found by afl-fuzz. In particular various
+functions now detect and break infinite loops caused by bad DIE tree cycles.
+
+readelf: Will now lookup the size and signedness of constant value types
+         to display them correctly (and not just how they were encoded).
+
+libdw: New function dwarf_next_lines to read CU-less .debug_line data.
+       dwarf_begin_elf now accepts ELF files containing just .debug_line
+       or .debug_frame sections (which can be read without needing a DIE
+       tree from the .debug_info section).
+       Removed dwarf_getscn_info, which was never implemented.
+
+backends: Handle BPF simple relocations.
+          The RISCV backends now handles ABI specific CFI and knows about
+          RISCV register types and names.
+
 Version 0.172
 
 No functional changes compared to 0.171.

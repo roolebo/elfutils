@@ -1,3 +1,7 @@
+2018-07-04  Mark Wielaard  <mark@klomp.org>
+
+	* upload-release.sh: New file.
+
 2018-06-11  Mark Wielaard  <mark@klomp.org>
 
 	* elfutils.spec.in: Update for 0.172.

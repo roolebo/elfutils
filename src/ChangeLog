@@ -1,3 +1,9 @@
+2018-07-04  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (print_debug_addr_section): Rename index var to uidx.
+	(attr_callback): Rename index var to word.
+	(print_debug_str_offsets_section): Rename index var to uidx.
+
 2018-07-04  Ross Burton <ross.burton@intel.com>
 
 	* addr2line.c: Remove error.h include.

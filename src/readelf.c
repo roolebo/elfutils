@@ -5261,14 +5261,14 @@ print_debug_addr_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	  addresses /= 10;
 	}
 
-      unsigned int index = 0;
+      unsigned int uidx = 0;
       size_t index_offset =  readp - (const unsigned char *) data->d_buf;
       printf (" Addresses start at offset 0x%zx:\n", index_offset);
       while (readp <= next_unitp - address_size)
 	{
 	  Dwarf_Addr addr = read_addr_unaligned_inc (address_size, dbg,
 						     readp);
-	  printf (" [%*u] ", digits, index++);
+	  printf (" [%*u] ", digits, uidx++);
 	  print_dwarf_addr (dwflmod, address_size, addr, addr);
 	  printf ("\n");
 	}
@@ -6966,12 +6966,12 @@ attr_callback (Dwarf_Attribute *attrp, void *arg)
 	    }
 	  if (form != DW_FORM_addr )
 	    {
-	      Dwarf_Word index;
-	      if (dwarf_formudata (attrp, &index) != 0)
+	      Dwarf_Word word;
+	      if (dwarf_formudata (attrp, &word) != 0)
 		goto attrval_out;
 	      printf ("           %*s%-20s (%s) [%" PRIx64 "] ",
 		      (int) (level * 2), "", dwarf_attr_name (attr),
-		      dwarf_form_name (form), index);
+		      dwarf_form_name (form), word);
 	    }
 	  else
 	    printf ("           %*s%-20s (%s) ",
@@ -10255,7 +10255,7 @@ print_debug_str_offsets_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	  offsets /= 10;
 	}
 
-      unsigned int index = 0;
+      unsigned int uidx = 0;
       size_t index_offset =  readp - (const unsigned char *) data->d_buf;
       printf (" Offsets start at 0x%zx:\n", index_offset);
       while (readp <= next_unitp - offset_size)
@@ -10267,7 +10267,7 @@ print_debug_str_offsets_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	    offset = read_8ubyte_unaligned_inc (dbg, readp);
 	  const char *str = dwarf_getstring (dbg, offset, NULL);
 	  printf (" [%*u] [%*" PRIx64 "]  \"%s\"\n",
-		  digits, index++, (int) offset_size * 2, offset, str ?: "???");
+		  digits, uidx++, (int) offset_size * 2, offset, str ?: "???");
 	}
       printf ("\n");
 

@@ -23,7 +23,6 @@
 #include <argp.h>
 #include <assert.h>
 #include <errno.h>
-#include <error.h>
 #include <fcntl.h>
 #include <locale.h>
 #include <libintl.h>
@@ -36,7 +35,7 @@
 #include <printversion.h>
 #include "../libelf/elf-knowledge.h"
 #include "../libebl/libeblP.h"
-
+#include "system.h"
 
 /* Prototypes of local functions.  */
 static Elf *open_file (const char *fname, int *fdp, Ebl **eblp);

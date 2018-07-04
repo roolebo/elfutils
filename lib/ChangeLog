@@ -1,3 +1,9 @@
+2018-07-04  Ross Burton <ross.burton@intel.com>
+
+	* color.c: Remove error.h, add system.h include.
+	* system.h: Add error.h include.
+	* xmalloc.c: Remove error.h include.
+
 2018-06-01  Mark Wielaard  <mark@klomp.org>
 
 	* printversion.c (print_version): Update copyright year.

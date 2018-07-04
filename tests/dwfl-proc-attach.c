@@ -20,7 +20,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <error.h>
 #include <unistd.h>
 #ifdef __linux__
 #include <sys/types.h>
@@ -31,6 +30,7 @@
 #include ELFUTILS_HEADER(dwfl)
 #include <pthread.h>
 #endif
+#include "system.h"
 
 #ifndef __linux__
 int

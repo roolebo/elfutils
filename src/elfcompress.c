@@ -18,7 +18,6 @@
 #include <config.h>
 #include <assert.h>
 #include <argp.h>
-#include <error.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <inttypes.h>
@@ -34,6 +33,7 @@
 #include ELFUTILS_HEADER(ebl)
 #include ELFUTILS_HEADER(dwelf)
 #include <gelf.h>
+#include "system.h"
 #include "libeu.h"
 #include "printversion.h"
 

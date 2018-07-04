@@ -31,10 +31,10 @@
 #endif
 
 #include <ctype.h>
-#include <error.h>
 #include <libintl.h>
 
 #include <libeu.h>
+#include "system.h"
 #include "i386_parse.h"
 
 

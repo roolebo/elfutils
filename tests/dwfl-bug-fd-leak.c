@@ -24,9 +24,9 @@
 #include <dirent.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <error.h>
 #include <unistd.h>
 #include <dwarf.h>
+#include "system.h"
 
 #ifndef __linux__
 int

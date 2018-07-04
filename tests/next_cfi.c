@@ -18,7 +18,6 @@
 #include <config.h>
 #include <assert.h>
 #include <inttypes.h>
-#include <error.h>
 #include ELFUTILS_HEADER(dw)
 #include <dwarf.h>
 #include <argp.h>
@@ -31,6 +30,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include "system.h"
 
 void
 handle_section (const unsigned char e_ident[],

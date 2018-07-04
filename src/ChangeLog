@@ -1,3 +1,22 @@
+2018-07-04  Ross Burton <ross.burton@intel.com>
+
+	* addr2line.c: Remove error.h include.
+	* ar.c: Likewise.
+	* arlib.c: Likewise and add system.h include.
+	* arlib2.c: Likewise.
+	* elfcmp.c: Likewise.
+	* elfcompress.c: Likewise.
+	* elflint.c: Likewise.
+	* findtextrel.c: Likewise.
+	* nm.c: Likewise.
+	* objdump.c: Likewise.
+	* ranlib.c: Likewise.
+	* readelf.c: Likewise.
+	* stack.c: Likewise.
+	* strings.c: Likewise.
+	* strip.c: Likewise.
+	* unstrip.c: Likewise.
+
 2018-06-25  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_decoded_line_section): Use dwarf_next_lines

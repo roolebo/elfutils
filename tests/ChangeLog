@@ -1,3 +1,40 @@
+2018-07-04  Ross Burton <ross.burton@intel.com>
+
+	* addrscopes.c: Remove error.h include, add system.h include.
+	* allregs.c: Likewise.
+	* backtrace-data.c: Likewise.
+	* backtrace-dwarf.c: Likewise.
+	* backtrace.c: Likewise.
+	* buildid.c: Likewise.
+	* debugaltlink.c: Likewise.
+	* debuglink.c: Likewise.
+	* deleted.c : Likewise.
+	* dwarfcfi.c: Likewise.
+	* dwfl-addr-sect.c: Likewise.
+	* dwfl-bug-addr-overflow.c: Likewise.
+	* dwfl-bug-fd-leak.c: Likewise.
+	* dwfl-bug-getmodules.c: Likewise.
+	* dwfl-proc-attach.c: Likewise.
+	* dwfl-report-elf-align.c: Likewise.
+	* dwfllines.c: Likewise.
+	* dwflmodtest.c: Likewise.
+	* dwflsyms.c: Likewise.
+	* early-offscn.c: Likewise
+	* ecp.c: Likewise.
+	* elfstrmerge.c: Likewise.
+	* find-prologues.c: Likewise.
+	* funcretval.c: Likewise.
+	* funcscopes.c: Likewise.
+	* getsrc_die.c: Likewise.
+	* line2addr.c: Likewise.
+	* low_high_pc.c: Likewise.
+	* next_cfi.c: Likewise.
+	* rdwrmmap.c: Likewise.
+	* saridx.c: Likewise.
+	* sectiondump.c: Likewise.
+	* varlocs.c: Likewise.
+	* vdsosyms.c: Likewise.
+
 2018-06-28  Mark Wielaard  <mark@klomp.org>
 
 	* next_cfi.c: New file.

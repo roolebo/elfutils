@@ -21,7 +21,6 @@
 #endif
 
 #include <assert.h>
-#include <error.h>
 #include <gelf.h>
 #include <inttypes.h>
 #include <libintl.h>
@@ -31,6 +30,7 @@
 
 #include <libeu.h>
 
+#include "system.h"
 #include "arlib.h"
 
 

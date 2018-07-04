@@ -17,7 +17,6 @@
 
 #include <config.h>
 
-#include <error.h>
 #include <fcntl.h>
 #include <gelf.h>
 #include <stdio.h>
@@ -25,6 +24,7 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include "system.h"
 
 
 static const char *machines[] =

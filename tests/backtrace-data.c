@@ -27,7 +27,6 @@
 #include <dirent.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <error.h>
 #include <unistd.h>
 #include <dwarf.h>
 #if defined(__x86_64__) && defined(__linux__)
@@ -41,6 +40,7 @@
 #include <string.h>
 #include ELFUTILS_HEADER(dwfl)
 #endif
+#include "system.h"
 
 #if !defined(__x86_64__) || !defined(__linux__)
 

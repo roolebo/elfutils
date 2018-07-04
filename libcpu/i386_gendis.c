@@ -31,12 +31,11 @@
 # include <config.h>
 #endif
 
-#include <error.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include "system.h"
 
 extern int i386_parse (void);
 

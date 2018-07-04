@@ -34,7 +34,6 @@
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>
-#include <error.h>
 #include <inttypes.h>
 #include <libintl.h>
 #include <math.h>

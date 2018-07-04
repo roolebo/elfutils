@@ -20,7 +20,6 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdio_ext.h>
-#include <error.h>
 #include <locale.h>
 #include ELFUTILS_HEADER(dwfl)
 

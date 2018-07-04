@@ -21,7 +21,6 @@
 #include <unistd.h>
 #include <assert.h>
 #include <stdio.h>
-#include <error.h>
 #include <errno.h>
 #ifdef __linux__
 #include <sys/prctl.h>

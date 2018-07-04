@@ -20,11 +20,11 @@
 #endif
 
 #include <errno.h>
-#include <error.h>
 #include <fcntl.h>
 #include <gelf.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "system.h"
 
 int
 main (int argc, char *argv[])

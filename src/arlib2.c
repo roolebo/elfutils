@@ -20,7 +20,6 @@
 # include <config.h>
 #endif
 
-#include <error.h>
 #include <libintl.h>
 #include <limits.h>
 #include <string.h>

@@ -21,13 +21,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <error.h>
 #include <locale.h>
 #include <argp.h>
 #include <assert.h>
 #include ELFUTILS_HEADER(dwfl)
 #include <dwarf.h>
 
+#include "system.h"
 #include "../libdw/known-dwarf.h"
 
 static const char *

@@ -20,11 +20,11 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdio_ext.h>
-#include <error.h>
 #include <locale.h>
 #include <string.h>
 #include <stdlib.h>
 #include ELFUTILS_HEADER(dwfl)
+#include "system.h"
 
 
 static const Dwfl_Callbacks offline_callbacks =

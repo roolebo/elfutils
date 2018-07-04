@@ -25,9 +25,9 @@
 #include <stdio_ext.h>
 #include <locale.h>
 #include <stdlib.h>
-#include <error.h>
 #include <string.h>
 #include <fnmatch.h>
+#include "system.h"
 
 
 static void

@@ -30,6 +30,7 @@
 #define LIB_SYSTEM_H	1
 
 #include <errno.h>
+#include <error.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <sys/param.h>

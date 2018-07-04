@@ -23,11 +23,11 @@
 #include <stdio_ext.h>
 #include <stdlib.h>
 #include <string.h>
-#include <error.h>
 #include <locale.h>
 #include <argp.h>
 #include ELFUTILS_HEADER(dwfl)
 #include <dwarf.h>
+#include "system.h"
 
 static bool show_inlines;
 

@@ -18,13 +18,13 @@
 #include <config.h>
 
 #include <errno.h>
-#include <error.h>
 #include <fcntl.h>
 #include <gelf.h>
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "system.h"
 
 
 /* Prototypes for local functions.  */

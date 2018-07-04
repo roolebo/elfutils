@@ -21,13 +21,13 @@
 #include <errno.h>
 #include ELFUTILS_HEADER(dwelf)
 #include <stdio.h>
-#include <error.h>
 #include <string.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include "system.h"
 
 int
 main (int argc, char *argv[])

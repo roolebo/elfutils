@@ -18,13 +18,13 @@
 #include <config.h>
 #include <assert.h>
 #include <errno.h>
-#include <error.h>
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include ELFUTILS_HEADER(dwfl)
+#include "system.h"
 
 #ifndef __linux__
 int

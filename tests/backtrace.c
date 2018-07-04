@@ -24,7 +24,6 @@
 #include <dirent.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <error.h>
 #include <unistd.h>
 #include <dwarf.h>
 #ifdef __linux__
@@ -39,6 +38,7 @@
 #include <argp.h>
 #include ELFUTILS_HEADER(dwfl)
 #endif
+#include "system.h"
 
 #ifndef __linux__
 

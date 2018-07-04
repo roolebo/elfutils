@@ -25,7 +25,6 @@
 #include <ctype.h>
 #include <endian.h>
 #include <errno.h>
-#include <error.h>
 #include <fcntl.h>
 #include <gelf.h>
 #include <inttypes.h>

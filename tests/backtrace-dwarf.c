@@ -21,10 +21,10 @@
 #include <stdio_ext.h>
 #include <locale.h>
 #include <errno.h>
-#include <error.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include ELFUTILS_HEADER(dwfl)
+#include "system.h"
 
 #ifndef __linux__
 

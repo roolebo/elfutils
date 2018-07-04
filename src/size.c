@@ -21,7 +21,6 @@
 #endif
 
 #include <argp.h>
-#include <error.h>
 #include <fcntl.h>
 #include <gelf.h>
 #include <inttypes.h>

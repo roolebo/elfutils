@@ -18,7 +18,6 @@
 #include <config.h>
 #include <assert.h>
 #include <argp.h>
-#include <error.h>
 #include <stdlib.h>
 #include <inttypes.h>
 #include <stdio.h>

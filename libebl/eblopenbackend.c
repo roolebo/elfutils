@@ -32,7 +32,6 @@
 
 #include <assert.h>
 #include <dlfcn.h>
-#include <error.h>
 #include <libelfP.h>
 #include <dwarf.h>
 #include <stdlib.h>

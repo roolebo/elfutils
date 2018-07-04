@@ -18,7 +18,6 @@
 #include <config.h>
 #include <assert.h>
 #include <inttypes.h>
-#include <error.h>
 #include ELFUTILS_HEADER(dw)
 #include <dwarf.h>
 #include <argp.h>
@@ -30,6 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "system.h"
 #include "../libdw/known-dwarf.h"
 
 static const char *

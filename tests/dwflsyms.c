@@ -25,7 +25,6 @@
 #include <stdio.h>
 #include <stdio_ext.h>
 #include <stdlib.h>
-#include <error.h>
 #include <string.h>
 
 static const char *

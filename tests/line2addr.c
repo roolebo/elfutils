@@ -26,7 +26,7 @@
 #include <locale.h>
 #include <stdlib.h>
 #include <string.h>
-#include <error.h>
+#include "system.h"
 
 
 static void

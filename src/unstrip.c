@@ -31,7 +31,6 @@
 #include <argp.h>
 #include <assert.h>
 #include <errno.h>
-#include <error.h>
 #include <fcntl.h>
 #include <fnmatch.h>
 #include <libintl.h>
@@ -48,6 +47,7 @@
 #include <gelf.h>
 #include <libebl.h>
 #include <libdwfl.h>
+#include "system.h"
 #include "libdwelf.h"
 #include "libeu.h"
 #include "printversion.h"

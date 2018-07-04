@@ -17,8 +17,8 @@
 
 #include <config.h>
 #include ELFUTILS_HEADER(dwfl)
+#include "system.h"
 
-#include <error.h>
 
 static const Dwfl_Callbacks callbacks =
   {

@@ -618,6 +618,10 @@ if test "x$enable_maintainer_mode" = xyes; then
   if test "$HAVE_BISON" = "no"; then
     AC_MSG_ERROR([bison needed in maintainer mode])
   fi
+  AC_CHECK_PROG(HAVE_GAWK, gawk, yes, no)
+  if test "$HAVE_GAWK" = "no"; then
+    AC_MSG_ERROR([gawk needed in maintainer mode])
+  fi
 else
   if test ! -f ${srcdir}/libdw/known-dwarf.h; then
     AC_MSG_ERROR([No libdw/known-dwarf.h. configure --enable-maintainer-mode])

@@ -1,3 +1,10 @@
+2018-07-05  Mark Wielaard  <mark@klomp.org>
+
+	* next_cfi.c (handle_section): Take a new argument name. Check
+	whether the section is compressed and uncompress if so.
+	(main): Check also for .zdebug_frame and pass the name of the
+	section to handle_section.
+
 2018-07-04  Ross Burton <ross.burton@intel.com>
 
 	* addrscopes.c: Remove error.h include, add system.h include.

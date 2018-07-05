@@ -33,13 +33,31 @@
 #include "system.h"
 
 void
-handle_section (const unsigned char e_ident[],
+handle_section (char *name, const unsigned char e_ident[],
 		Elf_Scn *scn, const bool is_eh)
 {
   if (is_eh)
     printf (".eh_frame\n");
   else
     printf (".debug_frame\n");
+
+  GElf_Shdr mem;
+  GElf_Shdr *shdr = gelf_getshdr (scn, &mem);
+  if (shdr == NULL)
+    error (EXIT_FAILURE, 0, "Couldn't get section header: %s",
+	   elf_errmsg (-1));
+  if ((shdr->sh_flags & SHF_COMPRESSED) != 0)
+    {
+      if (elf_compress (scn, 0, 0) < 0)
+	error (EXIT_FAILURE, 0, "Couldn't decompress section: %s",
+	       elf_errmsg (-1));
+    }
+  else if (name[0] == '.' && name[1] == 'z')
+    {
+      if (elf_compress_gnu (scn, 0, 0) < 0)
+	error (EXIT_FAILURE, 0, "Couldn't decompress section: %s",
+	       elf_errmsg (-1));
+    }
 
   Elf_Data *data = elf_getdata (scn, NULL);
   if (data == NULL || data->d_buf == NULL)
@@ -117,9 +135,10 @@ main (int argc, char *argv[])
 	  if (name != NULL && shdr.sh_type == SHT_PROGBITS)
 	    {
 	      if (strcmp (name, ".eh_frame") == 0)
-		handle_section (ident, scn, true);
-	      if (strcmp (name, ".debug_frame") == 0)
-		handle_section (ident, scn, false);
+		handle_section (name, ident, scn, true);
+	      if (strcmp (name, ".debug_frame") == 0
+		  || strcmp (name, ".zdebug_frame") == 0)
+		handle_section (name, ident, scn, false);
 	    }
 	}
     }

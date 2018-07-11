@@ -1,3 +1,9 @@
+2018-07-11  Andreas Schwab  <schwab@suse.de>
+
+	* Makefile.am (riscv_SRCS): Add riscv_initreg.c.
+	* riscv_initreg.c: New file.
+	* riscv_init.c (riscv_init): Hook set_initial_registers_tid.
+
 2018-06-16  Yonghong Song  <yhs@fb.com>
 
 	* Makefile.am (bpf_SRCS): Add bpf_symbol.c.

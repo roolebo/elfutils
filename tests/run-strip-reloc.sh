@@ -32,6 +32,8 @@ runtest() {
   outfile2=out.stripped2
   debugfile2=out.debug2
 
+  rm -f $outfile1 $debugfile1 $outfile2 $debugfile2
+
   testrun ${abs_top_builddir}/src/strip -o $outfile1 -f $debugfile1 $infile ||
   { echo "*** failure strip $infile"; status=1; }
 

@@ -1,3 +1,8 @@
+2018-07-16  Ulf Hermann  <ulf.hermann@qt.io>
+
+	* run-strip-reloc.sh: Remove previous testfiles before running the
+	next test.
+
 2018-07-17  Mark Wielaard  <mark@klomp.org>
 
 	* hello_riscv64.ko.bz2: Updated with debuginfo.

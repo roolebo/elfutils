@@ -1,4 +1,4 @@
-/* Initialization of RISC-V specific backend library.
+/* RISC-V specific core note handling.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -29,36 +29,32 @@
 # include <config.h>
 #endif
 
-#define BACKEND		riscv_
-#define RELOC_PREFIX	R_RISCV_
+#include <elf.h>
+#include <inttypes.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <sys/time.h>
+
+#define BACKEND	riscv_
 #include "libebl_CPU.h"
 
-/* This defines the common reloc hooks based on riscv_reloc.def.  */
-#include "common-reloc.c"
+#define	ULONG			uint64_t
+#define PID_T			int32_t
+#define	UID_T			uint32_t
+#define	GID_T			uint32_t
+#define ALIGN_ULONG		8
+#define ALIGN_PID_T		4
+#define ALIGN_UID_T		4
+#define ALIGN_GID_T		4
+#define TYPE_ULONG		ELF_T_XWORD
+#define TYPE_PID_T		ELF_T_SWORD
+#define TYPE_UID_T		ELF_T_WORD
+#define TYPE_GID_T		ELF_T_WORD
 
+static const Ebl_Register_Location prstatus_regs[] =
+  {
+    { .offset = 1, .regno = 1, .count = 31, .bits = 64 } /* x1..x31 */
+  };
+#define PRSTATUS_REGS_SIZE	(32 * 8)
 
-const char *
-riscv_init (Elf *elf __attribute__ ((unused)),
-	    GElf_Half machine __attribute__ ((unused)),
-	    Ebl *eh,
-	    size_t ehlen)
-{
-  /* Check whether the Elf_BH object has a sufficent size.  */
-  if (ehlen < sizeof (Ebl))
-    return NULL;
-
-  /* We handle it.  */
-  eh->name = "RISC-V";
-  riscv_init_reloc (eh);
-  HOOK (eh, reloc_simple_type);
-  HOOK (eh, register_info);
-  HOOK (eh, abi_cfi);
-  /* gcc/config/ #define DWARF_FRAME_REGISTERS.  */
-  eh->frame_nregs = 66;
-  HOOK (eh, check_special_symbol);
-  HOOK (eh, machine_flag_check);
-  HOOK (eh, set_initial_registers_tid);
-  HOOK (eh, core_note);
-
-  return MODVERSION;
-}
+#include "linux-core-note.c"

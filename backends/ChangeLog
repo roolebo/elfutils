@@ -1,3 +1,9 @@
+2018-07-17  Andreas Schwab  <schwab@suse.de>
+
+	* Makefile.am (riscv_SRCS): Add riscv_corenote.c.
+	* riscv_corenote.c: New file.
+	* riscv_init.c (riscv_init): Hook core_note.
+
 2018-07-11  Andreas Schwab  <schwab@suse.de>
 
 	* Makefile.am (riscv_SRCS): Add riscv_initreg.c.

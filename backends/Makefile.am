@@ -132,7 +132,7 @@ libebl_bpf_pic_a_SOURCES = $(bpf_SRCS)
 am_libebl_bpf_pic_a_OBJECTS = $(bpf_SRCS:.c=.os)
 
 riscv_SRCS = riscv_init.c riscv_symbol.c riscv_cfi.c riscv_regs.c \
-	     riscv_initreg.c
+	     riscv_initreg.c riscv_corenote.c
 libebl_riscv_pic_a_SOURCES = $(riscv_SRCS)
 am_libebl_riscv_pic_a_OBJECTS = $(riscv_SRCS:.c=.os)
 

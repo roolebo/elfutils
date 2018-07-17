@@ -34,13 +34,13 @@
 #include "libdwflP.h"
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/uio.h>
 #include <fcntl.h>
 #include <dirent.h>
 #include <unistd.h>
 
 #ifdef __linux__
 
+#include <sys/uio.h>
 #include <sys/ptrace.h>
 #include <sys/syscall.h>
 #include <sys/wait.h>

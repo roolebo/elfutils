@@ -68,6 +68,7 @@ runtest() {
 }
 
 # Most simple hello world kernel module for various architectures.
+# Make sure that it contains debuginfo with CONFIG_DEBUG_INFO=y.
 # ::::::::::::::
 # Makefile
 # ::::::::::::::
@@ -75,7 +76,8 @@ runtest() {
 # hello-y := init.o exit.o
 # 
 # all:
-# 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+# 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) \
+#		CONFIG_DEBUG_INFO=y modules
 # ::::::::::::::
 # init.c
 # ::::::::::::::

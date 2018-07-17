@@ -1,3 +1,8 @@
+2018-07-17  Mark Wielaard  <mark@klomp.org>
+
+	* hello_riscv64.ko.bz2: Updated with debuginfo.
+	* run-strip-reloc.sh: Add documentation on CONFIG_DEBUG_INFO=y.
+
 2018-07-05  Mark Wielaard  <mark@klomp.org>
 
 	* next_cfi.c (handle_section): Take a new argument name. Check

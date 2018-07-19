@@ -2902,4 +2902,75 @@ FPU registers:
 	 22: %fp6 (fp6), float 96 bits
 	 23: %fp7 (fp7), float 96 bits
 EOF
+
+# See run-readelf-mixed-corenote.sh for instructions to regenerate
+# this core file.
+regs_test testfile-riscv64-core <<\EOF
+integer registers:
+	  0: zero (zero), signed 64 bits
+	  1: ra (ra), address 64 bits
+	  2: sp (sp), address 64 bits
+	  3: gp (gp), address 64 bits
+	  4: tp (tp), address 64 bits
+	  5: t0 (t0), signed 64 bits
+	  6: t1 (t1), signed 64 bits
+	  7: t2 (t2), signed 64 bits
+	  8: s0 (s0), signed 64 bits
+	  9: s1 (s1), signed 64 bits
+	 10: a0 (a0), signed 64 bits
+	 11: a1 (a1), signed 64 bits
+	 12: a2 (a2), signed 64 bits
+	 13: a3 (a3), signed 64 bits
+	 14: a4 (a4), signed 64 bits
+	 15: a5 (a5), signed 64 bits
+	 16: a6 (a6), signed 64 bits
+	 17: a7 (a7), signed 64 bits
+	 18: s2 (s2), signed 64 bits
+	 19: s3 (s3), signed 64 bits
+	 20: s4 (s4), signed 64 bits
+	 21: s5 (s5), signed 64 bits
+	 22: s6 (s6), signed 64 bits
+	 23: s7 (s7), signed 64 bits
+	 24: s8 (s8), signed 64 bits
+	 25: s9 (s9), signed 64 bits
+	 26: s10 (s10), signed 64 bits
+	 27: s11 (s11), signed 64 bits
+	 28: t3 (t3), signed 64 bits
+	 29: t4 (t4), signed 64 bits
+	 30: t5 (t5), signed 64 bits
+	 31: t6 (t6), signed 64 bits
+FPU registers:
+	 32: ft0 (ft0), float 64 bits
+	 33: ft1 (ft1), float 64 bits
+	 34: ft2 (ft2), float 64 bits
+	 35: ft3 (ft3), float 64 bits
+	 36: ft4 (ft4), float 64 bits
+	 37: ft5 (ft5), float 64 bits
+	 38: ft6 (ft6), float 64 bits
+	 39: ft7 (ft7), float 64 bits
+	 40: fs0 (fs0), float 64 bits
+	 41: fs1 (fs1), float 64 bits
+	 42: fa0 (fa0), float 64 bits
+	 43: fa1 (fa1), float 64 bits
+	 44: fa2 (fa2), float 64 bits
+	 45: fa3 (fa3), float 64 bits
+	 46: fa4 (fa4), float 64 bits
+	 47: fa5 (fa5), float 64 bits
+	 48: fa6 (fa6), float 64 bits
+	 49: fa7 (fa7), float 64 bits
+	 50: fs2 (fs2), float 64 bits
+	 51: fs3 (fs3), float 64 bits
+	 52: fs4 (fs4), float 64 bits
+	 53: fs5 (fs5), float 64 bits
+	 54: fs6 (fs6), float 64 bits
+	 55: fs7 (fs7), float 64 bits
+	 56: fs8 (fs8), float 64 bits
+	 57: fs9 (fs9), float 64 bits
+	 58: fs10 (fs10), float 64 bits
+	 59: fs11 (fs11), float 64 bits
+	 60: ft8 (ft8), float 64 bits
+	 61: ft9 (ft9), float 64 bits
+	 62: ft10 (ft10), float 64 bits
+	 63: ft11 (ft11), float 64 bits
+EOF
 exit 0

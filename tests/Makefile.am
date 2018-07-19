@@ -86,6 +86,7 @@ TESTS = run-arextract.sh run-arsymtest.sh run-ar.sh newfile test-nlist \
 	run-strip-test3.sh run-strip-test4.sh run-strip-test5.sh \
 	run-strip-test6.sh run-strip-test7.sh run-strip-test8.sh \
 	run-strip-test9.sh run-strip-test10.sh run-strip-test11.sh \
+	run-strip-test12.sh \
 	run-strip-nothing.sh run-strip-g.sh \
 	run-strip-groups.sh run-strip-reloc.sh run-strip-strmerge.sh \
 	run-strip-nobitsalign.sh run-strip-remove-keep.sh \
@@ -191,6 +192,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     run-strip-test4.sh run-strip-test5.sh run-strip-test6.sh \
 	     run-strip-test7.sh run-strip-test8.sh run-strip-groups.sh \
 	     run-strip-test9.sh run-strip-test10.sh run-strip-test11.sh \
+	     run-strip-test12.sh \
 	     run-strip-nothing.sh run-strip-remove-keep.sh run-strip-g.sh \
 	     run-strip-strmerge.sh run-strip-nobitsalign.sh \
 	     testfile-nobitsalign.bz2 testfile-nobitsalign.strip.bz2 \
@@ -397,7 +399,9 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     run-attr-integrate-skel.sh \
 	     run-all-dwarf-ranges.sh testfilesplitranges4.debug.bz2 \
 	     testfile-ranges-hello.dwo.bz2 testfile-ranges-world.dwo.bz2 \
-	     run-unit-info.sh run-next-cfi.sh run-next-cfi-self.sh
+	     run-unit-info.sh run-next-cfi.sh run-next-cfi-self.sh \
+	     testfile-riscv64.bz2 testfile-riscv64-s.bz2 \
+	     testfile-riscv64-core.bz2
 
 if USE_VALGRIND
 valgrind_cmd='valgrind -q --leak-check=full --error-exitcode=1'

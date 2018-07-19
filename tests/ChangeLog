@@ -1,3 +1,15 @@
+2018-07-19  Andreas Schwab  <schwab@suse.de>
+
+	* Makefile.am (TESTS): Add run-strip-test12.sh.
+	(EXTRA_DIST): Add run-strip-test12.sh, testfile-riscv64.bz2,
+	testfile-riscv64-s.bz2, testfile-riscv64-core.bz2.
+	(run-strip-test11.sh): New file.
+	(testfile-riscv64.bz2): New file.
+	(testfile-riscv64-s.bz2): New file.
+	(testfile-riscv64-core.bz2): New file.
+	* run-allregs.sh: Add test for testfile-riscv64-core.
+	* run-readelf-mixed-corenote.sh: Likewise.
+
 2018-07-16  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* run-strip-reloc.sh: Remove previous testfiles before running the

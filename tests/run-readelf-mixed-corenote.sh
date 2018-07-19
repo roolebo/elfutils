@@ -646,4 +646,74 @@ Note segment of 1056 bytes at offset 0x1f4:
     fp6: 0x7fff0000ffffffffffffffff  fp7: 0x7fff0000ffffffffffffffff
 EOF
 
+# To reproduce this core dump, do this on a riscv64 machine:
+# $ gcc -x c <(echo 'int main () { return *(int *)0x12345678; }')
+# $ ./a.out
+testfiles testfile-riscv64-core
+testrun_compare ${abs_top_builddir}/src/readelf -n testfile-riscv64-core <<\EOF
+
+Note segment of 1408 bytes at offset 0x388:
+  Owner          Data size  Type
+  CORE                 376  PRSTATUS
+    info.si_signo: 11, info.si_code: 0, info.si_errno: 0, cursig: 11
+    sigpend: <>
+    sighold: <>
+    pid: 6801, ppid: 1155, pgrp: 6801, sid: 1155
+    utime: 0.000000, stime: 0.110000, cutime: 0.000000, cstime: 0.000000
+    fpvalid: 0
+    ra:    0x9a00000000000104  sp:    0x400000002000051c
+    gp:    0x280000003fff9812  tp:    0xd000000000000128
+    t0:   5764607523571106577  t1:   -432345563690696255
+    t2:  -5764607522497362661  s0:   5764607523034235171
+    s1:  -6629298650415654894  a0:     72057594037928196
+    a1:  -6341068275337658368  a2:  -5188146769657096173
+    a3:            1073715219  a4:   8646911284551352320
+    a5:   8646911285625067538  a6:   1729382256911463510
+    a7:             536876397  s2:  -1152921504606846976
+    s3:   1152921505322686797  s4:             536871337
+    s5:  -3458764513820540928  s6:  -9223372036138925403
+    s7:             715843991  s8:  -2594073385365405696
+    s9:   4611686019143218592  s10:            715850259
+    s11:            715850393  t3:   -432345564227567616
+    t4:    144115188075856379  t5:    216172782113783808
+    t6:   1152921504606846976
+  CORE                 136  PRPSINFO
+    state: 0, sname: R, zomb: 0, nice: 0, flag: 0x0000000000400600
+    uid: 0, gid: 0, pid: 6801, ppid: 1155, pgrp: 6801, sid: 1155
+    fname: a.out, psargs: /tmp/a.out 
+  CORE                 128  SIGINFO
+    si_signo: 11, si_errno: 0, si_code: 1
+    fault address: 0x12345678
+  CORE                 288  AUXV
+    SYSINFO_EHDR: 0x200001d000
+    HWCAP: 0x1105
+    PAGESZ: 4096
+    CLKTCK: 100
+    PHDR: 0x10040
+    PHENT: 56
+    PHNUM: 9
+    BASE: 0x2000000000
+    FLAGS: 0
+    ENTRY: 0x103e0
+    UID: 0
+    EUID: 0
+    GID: 0
+    EGID: 0
+    SECURE: 0
+    RANDOM: 0x3fff9816d6
+    EXECFN: 0x3fff981fed
+    NULL
+  CORE                 379  FILE
+    9 files:
+      00010000-00011000 00000000 4096                /tmp/a.out
+      00011000-00012000 00000000 4096                /tmp/a.out
+      00012000-00013000 00001000 4096                /tmp/a.out
+      2000000000-200001a000 00000000 106496          /lib64/ld-2.27.so
+      200001a000-200001b000 00019000 4096            /lib64/ld-2.27.so
+      200001b000-200001c000 0001a000 4096            /lib64/ld-2.27.so
+      2000032000-2000151000 00000000 1175552         /lib64/libc-2.27.so
+      2000151000-2000155000 0011e000 16384           /lib64/libc-2.27.so
+      2000155000-2000157000 00122000 8192            /lib64/libc-2.27.so
+EOF
+
 exit 0

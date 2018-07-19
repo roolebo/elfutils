@@ -106,7 +106,7 @@ riscv_register_info (Ebl *ebl, int regno, char *name, size_t namelen,
     case 26 ... 27:
       name[0] = 's';
       name[1] = '1';
-      name[1] = regno - 26 + '0';
+      name[2] = regno - 26 + '0';
       namelen = 3;
       break;
 

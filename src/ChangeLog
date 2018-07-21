@@ -1,3 +1,7 @@
+2018-07-21  Mark Wielaard  <mark@klomp.org>
+
+	* elfcompress.c (process_file): Swap fchmod and fchown calls.
+
 2018-07-04  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_debug_addr_section): Rename index var to uidx.

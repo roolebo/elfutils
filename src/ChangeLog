@@ -1,5 +1,12 @@
 2018-07-21  Mark Wielaard  <mark@klomp.org>
 
+	* elfcompress.c (get_sections): New function.
+	(process_file): Check whether section needs to change. Don't rewrite
+	file if no section data needs changing.
+	(main): Update 'force' help text.
+
+2018-07-21  Mark Wielaard  <mark@klomp.org>
+
 	* elfcompress.c (process_file): Swap fchmod and fchown calls.
 
 2018-07-04  Mark Wielaard  <mark@klomp.org>

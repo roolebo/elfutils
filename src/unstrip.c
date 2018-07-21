@@ -563,7 +563,11 @@ adjust_all_relocs (Elf *elf, Elf_Scn *symtab, const GElf_Shdr *symshdr,
 	GElf_Shdr shdr_mem;
 	GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
 	ELF_CHECK (shdr != NULL, _("cannot get section header: %s"));
-	if (shdr->sh_type != SHT_NOBITS && shdr->sh_link == new_sh_link)
+	/* Don't redo SHT_GROUP, groups are in both the stripped and debug,
+	   it will already have been done by adjust_relocs for the
+	   stripped_symtab.  */
+	if (shdr->sh_type != SHT_NOBITS && shdr->sh_type != SHT_GROUP
+	    && shdr->sh_link == new_sh_link)
 	  adjust_relocs (scn, scn, shdr, map, symshdr);
       }
 }

@@ -1,3 +1,11 @@
+2018-07-21  Mark Wielaard  <mark@klomp.org>
+
+	* run-annobingroup.sh: New test.
+	* testfile-annobingroup.o.bz2: New test file.
+	* Makefile.am (TESTS): Add run-annobingroup.sh.
+	(EXTRA_DIST): Add run-annobingroup.sh and
+	testfile-annobingroup.o.bz2.
+
 2018-07-19  Andreas Schwab  <schwab@suse.de>
 
 	* Makefile.am (TESTS): Add run-strip-test12.sh.

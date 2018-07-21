@@ -1,5 +1,9 @@
 2018-07-21  Mark Wielaard  <mark@klomp.org>
 
+	* unstrip.c (adjust_all_relocs): Skip SHT_GROUP sections.
+
+2018-07-21  Mark Wielaard  <mark@klomp.org>
+
 	* elfcompress.c (get_sections): New function.
 	(process_file): Check whether section needs to change. Don't rewrite
 	file if no section data needs changing.

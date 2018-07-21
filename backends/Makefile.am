@@ -115,7 +115,7 @@ libebl_tilegx_pic_a_SOURCES = $(tilegx_SRCS)
 am_libebl_tilegx_pic_a_OBJECTS = $(tilegx_SRCS:.c=.os)
 
 m68k_SRCS = m68k_init.c m68k_symbol.c m68k_regs.c \
-	    m68k_retval.c m68k_corenote.c
+	    m68k_retval.c m68k_corenote.c m68k_cfi.c m68k_initreg.c
 libebl_m68k_pic_a_SOURCES = $(m68k_SRCS)
 am_libebl_m68k_pic_a_OBJECTS = $(m68k_SRCS:.c=.os)
 

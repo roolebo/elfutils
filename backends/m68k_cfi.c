@@ -1,4 +1,4 @@
-/* Initialization of M68K specific backend library.
+/* m68k ABI-specified defaults for DWARF CFI.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -29,36 +29,30 @@
 # include <config.h>
 #endif
 
-#define BACKEND		m68k_
-#define RELOC_PREFIX	R_68K_
+#include <dwarf.h>
+
+#define BACKEND m68k_
 #include "libebl_CPU.h"
 
-/* This defines the common reloc hooks based on m68k_reloc.def.  */
-#include "common-reloc.c"
-
-
-const char *
-m68k_init (Elf *elf __attribute__ ((unused)),
-	   GElf_Half machine __attribute__ ((unused)),
-	   Ebl *eh,
-	   size_t ehlen)
+int
+m68k_abi_cfi (Ebl *ebl __attribute__ ((unused)), Dwarf_CIE *abi_info)
 {
-  /* Check whether the Elf_BH object has a sufficent size.  */
-  if (ehlen < sizeof (Ebl))
-    return NULL;
+  static const uint8_t abi_cfi[] =
+    {
+#define SV(n) DW_CFA_same_value, ULEB128_7 (n)
+      /* Call-saved registers %d2-%d7, %a2-%a6.  */
+      SV (2), SV (3), SV (4), SV (5), SV (6), SV (7),
+      SV (10), SV (11), SV (12), SV (13), SV (14),
 
-  /* We handle it.  */
-  eh->name = "M68K";
-  m68k_init_reloc (eh);
-  HOOK (eh, gotpc_reloc_check);
-  HOOK (eh, reloc_simple_type);
-  HOOK (eh, return_value_location);
-  HOOK (eh, register_info);
-  HOOK (eh, core_note);
-  HOOK (eh, abi_cfi);
-  /* gcc/config/ #define DWARF_FRAME_REGISTERS.  */
-  eh->frame_nregs = 25;
-  HOOK (eh, set_initial_registers_tid);
+      /* The CFA is the SP.  */
+      DW_CFA_val_offset, ULEB128_7 (15), ULEB128_7 (0),
+    };
 
-  return MODVERSION;
+  abi_info->initial_instructions = abi_cfi;
+  abi_info->initial_instructions_end = &abi_cfi[sizeof abi_cfi];
+  abi_info->data_alignment_factor = -4;
+
+  abi_info->return_address_register = 24; /* %pc */
+
+  return 0;
 }

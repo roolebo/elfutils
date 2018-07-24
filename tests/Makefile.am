@@ -195,6 +195,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     run-strip-test12.sh \
 	     run-strip-nothing.sh run-strip-remove-keep.sh run-strip-g.sh \
 	     run-annobingroup.sh testfile-annobingroup.o.bz2 \
+	     testfile-annobingroup-i386.o.bz2 \
 	     run-strip-strmerge.sh run-strip-nobitsalign.sh \
 	     testfile-nobitsalign.bz2 testfile-nobitsalign.strip.bz2 \
 	     run-strip-reloc.sh hello_i386.ko.bz2 hello_x86_64.ko.bz2 \

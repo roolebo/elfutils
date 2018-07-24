@@ -709,6 +709,12 @@ compare_unalloc_sections (const GElf_Shdr *shdr1, const GElf_Shdr *shdr2,
   if (shdr1->sh_flags > shdr2->sh_flags)
     return 1;
 
+  /* Sizes should be the same.  */
+  if (shdr1->sh_size < shdr2->sh_size)
+    return -1;
+  if (shdr1->sh_size > shdr2->sh_size)
+    return 1;
+
   /* Sort by name as last resort.  */
   return strcmp (name1, name2);
 }

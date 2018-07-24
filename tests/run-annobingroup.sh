@@ -65,4 +65,59 @@ EOF
 
 testrun ${abs_top_builddir}/src/elfcmp testfile-annobingroup.o remerged.elf
 
+# echo "void * __attribute__((cold)) foo (void) { return foo; }"
+#      > testfile-annobingroup-i386.c
+# gcc -fpic -g -O2 -fplugin=annobin -c testfile-annobingroup-i386.c
+testfiles testfile-annobingroup-i386.o
+
+testrun_compare ${abs_top_builddir}/src/readelf -g testfile-annobingroup-i386.o << EOF
+
+Section group [ 1] '.group' with signature '.text.unlikely.group' contains 3 entries:
+  [ 8] .gnu.build.attributes..text.unlikely
+  [ 9] .rel.gnu.build.attributes..text.unlikely
+  [10] .text.unlikely
+
+COMDAT section group [ 2] '.group' with signature '__x86.get_pc_thunk.ax' contains 1 entry:
+  [13] .text.__x86.get_pc_thunk.ax
+EOF
+
+testrun ${abs_top_builddir}/src/strip -o stripped.elf -f debugfile.elf testfile-annobingroup-i386.o
+
+testrun_compare ${abs_top_builddir}/src/readelf -g stripped.elf << EOF
+
+Section group [ 1] '.group' with signature '.text.unlikely.group' contains 3 entries:
+  [ 8] .gnu.build.attributes..text.unlikely
+  [ 9] .rel.gnu.build.attributes..text.unlikely
+  [10] .text.unlikely
+
+COMDAT section group [ 2] '.group' with signature '__x86.get_pc_thunk.ax' contains 1 entry:
+  [13] .text.__x86.get_pc_thunk.ax
+EOF
+
+testrun_compare ${abs_top_builddir}/src/readelf -g debugfile.elf << EOF
+
+Section group [ 1] '.group' with signature '.text.unlikely.group' contains 3 entries:
+  [ 8] .gnu.build.attributes..text.unlikely
+  [ 9] .rel.gnu.build.attributes..text.unlikely
+  [10] .text.unlikely
+
+COMDAT section group [ 2] '.group' with signature '__x86.get_pc_thunk.ax' contains 1 entry:
+  [13] .text.__x86.get_pc_thunk.ax
+EOF
+
+testrun ${abs_top_builddir}/src/unstrip -o remerged.elf stripped.elf debugfile.elf
+
+testrun_compare ${abs_top_builddir}/src/readelf -g remerged.elf << EOF
+
+Section group [ 1] '.group' with signature '.text.unlikely.group' contains 3 entries:
+  [ 8] .gnu.build.attributes..text.unlikely
+  [ 9] .rel.gnu.build.attributes..text.unlikely
+  [10] .text.unlikely
+
+COMDAT section group [ 2] '.group' with signature '__x86.get_pc_thunk.ax' contains 1 entry:
+  [13] .text.__x86.get_pc_thunk.ax
+EOF
+
+testrun ${abs_top_builddir}/src/elfcmp testfile-annobingroup-i386.o remerged.elf
+
 exit 0

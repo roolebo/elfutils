@@ -1,3 +1,9 @@
+2018-07-24  Mark Wielaard  <mark@klomp.org>
+
+	* run-annobingroup.sh: Add testfile-annobingroup-i386.o tests.
+	* testfile-annobingroup-i386.o.bz2: New test file.
+	* Makefile.am (EXTRA_DIST): Add testfile-annobingroup-i386.o.bz2.
+
 2018-07-21  Mark Wielaard  <mark@klomp.org>
 
 	* run-annobingroup.sh: New test.

@@ -310,13 +310,13 @@ extern int elf_getshnum (Elf *__elf, size_t *__dst)
 
 
 /* Get the section index of the section header string table in the ELF
-   file.  If the index cannot be represented in the e_shnum field of
+   file.  If the index cannot be represented in the e_shstrndx field of
    the ELF header the information from the sh_link field in the zeroth
    section header is used.  */
 extern int elf_getshdrstrndx (Elf *__elf, size_t *__dst);
-/* Sun messed up the implementation of 'elf_getshnum' in their implementation.
-   It was agreed to make the same functionality available under a different
-   name and obsolete the old name.  */
+/* Sun messed up the implementation of 'elf_getshstrndx' in their
+   implementation.  It was agreed to make the same functionality available
+   under a different name and obsolete the old name.  */
 extern int elf_getshstrndx (Elf *__elf, size_t *__dst)
      __deprecated_attribute__;
 

@@ -1,3 +1,8 @@
+2018-07-27  Mark Wielaard  <mark@klomp.org>
+
+	* libelf.h (elf_getshdrstrndx): Fix documentation.
+	(elf_getshstrndx): Likewise.
+
 2018-06-19  Mark Wielaard  <mark@klomp.org>
 
 	* libelfP.h (__libelf_type_align): Remove !ALLOW_UNALIGNED guard.

@@ -661,6 +661,11 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
       memset (shdr_info, '\0', (shnum + 2) * sizeof (struct shdr_info));
     }
 
+  /* Track whether allocated sections all come before non-allocated ones.  */
+  bool seen_allocated = false;
+  bool seen_unallocated = false;
+  bool mixed_allocated_unallocated = false;
+
   /* Prepare section information data structure.  */
   scn = NULL;
   cnt = 1;
@@ -675,6 +680,17 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
       /* Get the header.  */
       if (gelf_getshdr (scn, &shdr_info[cnt].shdr) == NULL)
 	INTERNAL_ERROR (fname);
+
+      /* Normally (in non-ET_REL files) we see all allocated sections first,
+	 then all non-allocated.  */
+      if ((shdr_info[cnt].shdr.sh_flags & SHF_ALLOC) == 0)
+	seen_unallocated = true;
+      else
+	{
+	  if (seen_unallocated && seen_allocated)
+	    mixed_allocated_unallocated = true;
+	  seen_allocated = true;
+	}
 
       /* Get the name of the section.  */
       shdr_info[cnt].name = elf_strptr (elf, shstrndx,
@@ -1535,23 +1551,57 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	      }
 	  }
 
-	/* If we have to, compute the offset of the section.  */
-	if (shdr_info[cnt].shdr.sh_offset == 0)
-	  shdr_info[cnt].shdr.sh_offset
-	    = ((lastoffset + shdr_info[cnt].shdr.sh_addralign - 1)
-	       & ~((GElf_Off) (shdr_info[cnt].shdr.sh_addralign - 1)));
+	/* If we have to, compute the offset of the section.
+	   If allocate and unallocated sections are mixed, we only update
+	   the allocated ones now.  The unallocated ones come second.  */
+	if (! mixed_allocated_unallocated
+	    || (shdr_info[cnt].shdr.sh_flags & SHF_ALLOC) != 0)
+	  {
+	    if (shdr_info[cnt].shdr.sh_offset == 0)
+	      shdr_info[cnt].shdr.sh_offset
+		= ((lastoffset + shdr_info[cnt].shdr.sh_addralign - 1)
+		   & ~((GElf_Off) (shdr_info[cnt].shdr.sh_addralign - 1)));
 
-	/* Set the section header in the new file.  */
-	if (unlikely (gelf_update_shdr (scn, &shdr_info[cnt].shdr) == 0))
-	  /* There cannot be any overflows.  */
-	  INTERNAL_ERROR (fname);
+	    /* Set the section header in the new file.  */
+	    if (unlikely (gelf_update_shdr (scn, &shdr_info[cnt].shdr) == 0))
+	      /* There cannot be any overflows.  */
+	      INTERNAL_ERROR (fname);
 
-	/* Remember the last section written so far.  */
-	GElf_Off filesz = (shdr_info[cnt].shdr.sh_type != SHT_NOBITS
-			   ? shdr_info[cnt].shdr.sh_size : 0);
-	if (lastoffset < shdr_info[cnt].shdr.sh_offset + filesz)
-	  lastoffset = shdr_info[cnt].shdr.sh_offset + filesz;
+	    /* Remember the last section written so far.  */
+	    GElf_Off filesz = (shdr_info[cnt].shdr.sh_type != SHT_NOBITS
+			       ? shdr_info[cnt].shdr.sh_size : 0);
+	    if (lastoffset < shdr_info[cnt].shdr.sh_offset + filesz)
+	      lastoffset = shdr_info[cnt].shdr.sh_offset + filesz;
+	  }
       }
+
+  /* We might have to update the unallocated sections after we done the
+     allocated ones.  lastoffset is set to right after the last allocated
+     section.  */
+  if (mixed_allocated_unallocated)
+    for (cnt = 1; cnt <= shdridx; ++cnt)
+      if (shdr_info[cnt].idx > 0)
+	{
+	  scn = elf_getscn (newelf, shdr_info[cnt].idx);
+	  if ((shdr_info[cnt].shdr.sh_flags & SHF_ALLOC) == 0)
+	    {
+	      if (shdr_info[cnt].shdr.sh_offset == 0)
+		shdr_info[cnt].shdr.sh_offset
+		  = ((lastoffset + shdr_info[cnt].shdr.sh_addralign - 1)
+		     & ~((GElf_Off) (shdr_info[cnt].shdr.sh_addralign - 1)));
+
+	      /* Set the section header in the new file.  */
+	      if (unlikely (gelf_update_shdr (scn, &shdr_info[cnt].shdr) == 0))
+		/* There cannot be any overflows.  */
+		INTERNAL_ERROR (fname);
+
+	      /* Remember the last section written so far.  */
+	      GElf_Off filesz = (shdr_info[cnt].shdr.sh_type != SHT_NOBITS
+				 ? shdr_info[cnt].shdr.sh_size : 0);
+	      if (lastoffset < shdr_info[cnt].shdr.sh_offset + filesz)
+		lastoffset = shdr_info[cnt].shdr.sh_offset + filesz;
+	    }
+	}
 
   /* Adjust symbol references if symbol tables changed.  */
   if (any_symtab_changes)

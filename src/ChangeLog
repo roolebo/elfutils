@@ -1,3 +1,9 @@
+2018-07-30  Mark Wielaard  <mark@klomp.org>
+
+	* strip.c (handle_elf): Track allocated/unallocated sections seen. Set
+	section offset of unallocated sections after handling all allocated
+	sections.
+
 2018-08-18  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_debug_aranges_section): Make sure there is enough

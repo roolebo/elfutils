@@ -1,5 +1,10 @@
 2018-09-12  Mark Wielaard  <mark@klomp.org>
 
+	* elfcmp.c (main): Call ebl_section_strip_p without ehdr.
+	* strip.c (handle_elf): Likewise.
+
+2018-09-12  Mark Wielaard  <mark@klomp.org>
+
 	* elflint.c (check_symtab): Call ebl_check_special_symbol without
 	ehdr.
 

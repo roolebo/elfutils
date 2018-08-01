@@ -35,7 +35,7 @@
 
 
 bool
-ebl_section_strip_p (Ebl *ebl, const GElf_Ehdr *ehdr, const GElf_Shdr *shdr,
+ebl_section_strip_p (Ebl *ebl, const GElf_Shdr *shdr,
 		     const char *name, bool remove_comment,
 		     bool only_remove_debug)
 {
@@ -53,7 +53,10 @@ ebl_section_strip_p (Ebl *ebl, const GElf_Ehdr *ehdr, const GElf_Shdr *shdr,
 	  GElf_Shdr *shdr_l = gelf_getshdr (scn_l, &shdr_mem_l);
 	  if (shdr_l != NULL)
 	    {
-	      const char *s_l = elf_strptr (ebl->elf, ehdr->e_shstrndx,
+	      size_t shstrndx;
+	      if (elf_getshdrstrndx (ebl->elf, &shstrndx) != 0)
+		return false;
+	      const char *s_l = elf_strptr (ebl->elf, shstrndx,
 					    shdr_l->sh_name);
 	      if (s_l != NULL && ebl_debugscn_p (ebl, s_l))
 		return true;

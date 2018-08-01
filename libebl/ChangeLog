@@ -1,5 +1,11 @@
 2018-09-12  Mark Wielaard  <mark@klomp.org>
 
+	* eblsectionstripp.c (ebl_section_strip_p): Drop ehdr argument.
+	Use elf_getshdrstrndx.
+	* libebl.h (ebl_section_strip_p): Drop ehdr argument.
+
+2018-09-12  Mark Wielaard  <mark@klomp.org>
+
 	* ebl-hooks.h (check_special_symbol): Drop ehdr argument.
 	* ebl_check_special_symbol.c (ebl_check_special_symbol): Likewise.
 	* eblopenbackend.c (default_check_special_symbol): Likewise.

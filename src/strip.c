@@ -817,7 +817,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
     /* Check whether the section can be removed.  Since we will create
        a new .shstrtab assume it will be removed too.  */
     if (remove_shdrs ? !(shdr_info[cnt].shdr.sh_flags & SHF_ALLOC)
-	: (ebl_section_strip_p (ebl, ehdr, &shdr_info[cnt].shdr,
+	: (ebl_section_strip_p (ebl, &shdr_info[cnt].shdr,
 				shdr_info[cnt].name, remove_comment,
 				remove_debug)
 	   || cnt == ehdr->e_shstrndx
@@ -978,7 +978,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 			   original table in the debug file.  Unless
 			   it is a redundant data marker to a debug
 			   (data only) section.  */
-			if (! (ebl_section_strip_p (ebl, ehdr,
+			if (! (ebl_section_strip_p (ebl,
 						    &shdr_info[scnidx].shdr,
 						    shdr_info[scnidx].name,
 						    remove_comment,

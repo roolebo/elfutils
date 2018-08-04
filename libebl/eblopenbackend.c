@@ -181,7 +181,7 @@ static bool default_debugscn_p (const char *name);
 static bool default_copy_reloc_p (int reloc);
 static bool default_none_reloc_p (int reloc);
 static bool default_relative_reloc_p (int reloc);
-static bool default_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr,
+static bool default_check_special_symbol (Elf *elf,
 					  const GElf_Sym *sym,
 					  const char *name,
 					  const GElf_Shdr *destshdr);
@@ -673,7 +673,6 @@ strong_alias (default_copy_reloc_p, default_relative_reloc_p)
 
 static bool
 default_check_special_symbol (Elf *elf __attribute__ ((unused)),
-			      GElf_Ehdr *ehdr __attribute__ ((unused)),
 			      const GElf_Sym *sym __attribute__ ((unused)),
 			      const char *name __attribute__ ((unused)),
 			      const GElf_Shdr *destshdr __attribute__ ((unused)))

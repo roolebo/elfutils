@@ -130,7 +130,6 @@ alpha_check_special_section (Ebl *ebl,
    normal checks.  */
 bool
 alpha_check_special_symbol (Elf *elf __attribute__ ((unused)),
-			    GElf_Ehdr *ehdr __attribute__ ((unused)),
 			    const GElf_Sym *sym __attribute__ ((unused)),
 			    const char *name,
 			    const GElf_Shdr *destshdr __attribute__ ((unused)))

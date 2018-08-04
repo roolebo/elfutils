@@ -64,13 +64,16 @@ riscv_machine_flag_check (GElf_Word flags)
 /* Check whether given symbol's st_value and st_size are OK despite failing
    normal checks.  */
 bool
-riscv_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr, const GElf_Sym *sym,
+riscv_check_special_symbol (Elf *elf, const GElf_Sym *sym,
 			    const char *name, const GElf_Shdr *destshdr)
 {
   if (name == NULL)
     return false;
 
-  const char *sname = elf_strptr (elf, ehdr->e_shstrndx, destshdr->sh_name);
+  size_t shstrndx;
+  if (elf_getshdrstrndx (elf, &shstrndx) != 0)
+    return false;
+  const char *sname = elf_strptr (elf, shstrndx, destshdr->sh_name);
   if (sname == NULL)
     return false;
 

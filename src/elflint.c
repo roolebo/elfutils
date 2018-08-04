@@ -796,7 +796,7 @@ section [%2d] '%s': symbol %zu: function in COMMON section is nonsense\n"),
 		st_value = sym->st_value;
 	      if (GELF_ST_TYPE (sym->st_info) != STT_TLS)
 		{
-		  if (! ebl_check_special_symbol (ebl, ehdr, sym, name,
+		  if (! ebl_check_special_symbol (ebl, sym, name,
 						  destshdr))
 		    {
 		      if (st_value - sh_addr > destshdr->sh_size)
@@ -997,7 +997,7 @@ section [%2d] '%s'\n"),
 	      if (destshdr != NULL)
 		{
 		  /* Found it.  */
-		  if (!ebl_check_special_symbol (ebl, ehdr, sym, name,
+		  if (!ebl_check_special_symbol (ebl, sym, name,
 						 destshdr))
 		    {
 		      if (ehdr->e_type != ET_REL

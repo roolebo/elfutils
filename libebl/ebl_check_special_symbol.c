@@ -35,11 +35,11 @@
 
 
 bool
-ebl_check_special_symbol (Ebl *ebl, GElf_Ehdr *ehdr, const GElf_Sym *sym,
+ebl_check_special_symbol (Ebl *ebl, const GElf_Sym *sym,
 			  const char *name, const GElf_Shdr *destshdr)
 {
   if (ebl == NULL)
     return false;
 
-  return ebl->check_special_symbol (ebl->elf, ehdr, sym, name, destshdr);
+  return ebl->check_special_symbol (ebl->elf, sym, name, destshdr);
 }

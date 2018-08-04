@@ -152,7 +152,7 @@ extern bool ebl_dynamic_tag_check (Ebl *ebl, int64_t tag);
 
 /* Check whether given symbol's st_value and st_size are OK despite failing
    normal checks.  */
-extern bool ebl_check_special_symbol (Ebl *ebl, GElf_Ehdr *ehdr,
+extern bool ebl_check_special_symbol (Ebl *ebl,
 				      const GElf_Sym *sym, const char *name,
 				      const GElf_Shdr *destshdr);
 

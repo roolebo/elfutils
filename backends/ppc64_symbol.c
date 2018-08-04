@@ -94,12 +94,15 @@ ppc64_dynamic_tag_check (int64_t tag)
 /* Check whether given symbol's st_value and st_size are OK despite failing
    normal checks.  */
 bool
-ppc64_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr,
+ppc64_check_special_symbol (Elf *elf,
 			    const GElf_Sym *sym __attribute__ ((unused)),
 			    const char *name __attribute__ ((unused)),
 			    const GElf_Shdr *destshdr)
 {
-  const char *sname = elf_strptr (elf, ehdr->e_shstrndx, destshdr->sh_name);
+  size_t shstrndx;
+  if (elf_getshdrstrndx (elf, &shstrndx) != 0)
+    return false;
+  const char *sname = elf_strptr (elf, shstrndx, destshdr->sh_name);
   if (sname == NULL)
     return false;
   return strcmp (sname, ".opd") == 0;

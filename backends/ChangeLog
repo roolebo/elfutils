@@ -1,3 +1,13 @@
+2018-09-12  Mark Wielaard  <mark@klomp.org>
+
+	* aarch64_symbol.c (aarch64_check_special_symbol): Drop ehdr argument,
+	use elf_getshdrstrndx.
+	* alpha_symbol.c (alpha_check_special_symbol): Drop ehdr argument.
+	* ppc64_symbol.c (ppc64_check_special_symbol): Likewise and use
+	elf_getshdrstrndx.
+	* ppc_symbol.c (ppc_check_special_symbol): Likewise.
+	* riscv_symbol.c (riscv_check_special_symbol): Likewise.
+
 2018-07-21  Andreas Schwab  <schwab@linux-m68k.org>
 
 	* Makefile.am (m68k_SRCS): Add m68k_cfi.c and m68k_initreg.c.

@@ -62,13 +62,16 @@ aarch64_reloc_simple_type (Ebl *ebl __attribute__ ((unused)), int type)
    https://bugzilla.redhat.com/show_bug.cgi?id=1201778
  */
 bool
-aarch64_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr, const GElf_Sym *sym,
+aarch64_check_special_symbol (Elf *elf, const GElf_Sym *sym,
                               const char *name, const GElf_Shdr *destshdr)
 {
   if (name != NULL
       && strcmp (name, "_GLOBAL_OFFSET_TABLE_") == 0)
     {
-      const char *sname = elf_strptr (elf, ehdr->e_shstrndx, destshdr->sh_name);
+      size_t shstrndx;
+      if (elf_getshdrstrndx (elf, &shstrndx) != 0)
+	return false;
+      const char *sname = elf_strptr (elf, shstrndx, destshdr->sh_name);
       if (sname != NULL
 	  && (strcmp (sname, ".got") == 0 || strcmp (sname, ".got.plt") == 0))
 	{
@@ -79,7 +82,7 @@ aarch64_check_special_symbol (Elf *elf, GElf_Ehdr *ehdr, const GElf_Sym *sym,
 	      GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
 	      if (shdr != NULL)
 		{
-		  sname = elf_strptr (elf, ehdr->e_shstrndx, shdr->sh_name);
+		  sname = elf_strptr (elf, shstrndx, shdr->sh_name);
 		  if (sname != NULL && strcmp (sname, ".got") == 0)
 		    return (sym->st_value >= shdr->sh_addr
 			    && sym->st_value < shdr->sh_addr + shdr->sh_size);

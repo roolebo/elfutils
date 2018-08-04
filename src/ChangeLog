@@ -1,3 +1,8 @@
+2018-09-12  Mark Wielaard  <mark@klomp.org>
+
+	* elflint.c (check_symtab): Call ebl_check_special_symbol without
+	ehdr.
+
 2018-07-30  Mark Wielaard  <mark@klomp.org>
 
 	* strip.c (handle_elf): Track allocated/unallocated sections seen. Set

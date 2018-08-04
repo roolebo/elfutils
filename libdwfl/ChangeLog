@@ -1,3 +1,9 @@
+2018-09-13  Mark Wielaard  <mark@klomp.org>
+
+	* dwfl_segment_report_module.c (dwfl_segment_report_module):
+	Document why we use e_shnum directly.
+	* elf-from-memory.c (elf_from_remote_memory): Likewise.
+
 2018-07-17  Ulf Hermann  <ulf.hermann@qt.io>
 
 	* linux-pid-attach.c: Include sys/uio.h only on linux.

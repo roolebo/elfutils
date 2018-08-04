@@ -139,6 +139,11 @@ elf_from_remote_memory (GElf_Addr ehdr_vma,
       phentsize = ehdr.e32.e_phentsize;
       if (phentsize != sizeof (Elf32_Phdr) || phnum == 0)
 	goto bad_elf;
+      /* NOTE if the number of sections is > 0xff00 then e_shnum
+	 is zero and the actual number would come from the section
+	 zero sh_size field. We ignore this here because getting shdrs
+	 is just a nice bonus (see below where we trim the last phdrs
+	 PT_LOAD segment).  */
       shdrs_end = ehdr.e32.e_shoff + ehdr.e32.e_shnum * ehdr.e32.e_shentsize;
       break;
 
@@ -151,6 +156,7 @@ elf_from_remote_memory (GElf_Addr ehdr_vma,
       phentsize = ehdr.e64.e_phentsize;
       if (phentsize != sizeof (Elf64_Phdr) || phnum == 0)
 	goto bad_elf;
+      /* See the NOTE above for shdrs_end and ehdr.e32.e_shnum.  */
       shdrs_end = ehdr.e64.e_shoff + ehdr.e64.e_shnum * ehdr.e64.e_shentsize;
       break;
 

@@ -1,5 +1,9 @@
 2018-09-12  Mark Wielaard  <mark@klomp.org>
 
+	* ppc64_init.c (ppc64_init): Use elf_getshdrstrndx.
+
+2018-09-12  Mark Wielaard  <mark@klomp.org>
+
 	* aarch64_symbol.c (aarch64_check_special_symbol): Drop ehdr argument,
 	use elf_getshdrstrndx.
 	* alpha_symbol.c (alpha_check_special_symbol): Drop ehdr argument.

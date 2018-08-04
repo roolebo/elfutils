@@ -156,7 +156,7 @@ TESTS = run-arextract.sh run-arsymtest.sh run-ar.sh newfile test-nlist \
 	run-reloc-bpf.sh \
 	run-next-cfi.sh run-next-cfi-self.sh \
 	run-copyadd-sections.sh run-copymany-sections.sh \
-	run-typeiter-many.sh
+	run-typeiter-many.sh run-strip-test-many.sh
 
 if !BIARCH
 export ELFUTILS_DISABLE_BIARCH = 1
@@ -408,7 +408,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     testfile-riscv64.bz2 testfile-riscv64-s.bz2 \
 	     testfile-riscv64-core.bz2 \
 	     run-copyadd-sections.sh run-copymany-sections.sh \
-	     run-typeiter-many.sh
+	     run-typeiter-many.sh run-strip-test-many.sh
 
 if USE_VALGRIND
 valgrind_cmd='valgrind -q --leak-check=full --error-exitcode=1'

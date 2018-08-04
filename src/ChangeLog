@@ -1,5 +1,12 @@
 2018-09-13  Mark Wielaard  <mark@klomp.org>
 
+	* strip.c (handle_elf): Check against shstrndx, not e_shstrndx.
+	Explicitly set shdrstrndx for debug file.
+	* unstrip.c (copy_elf): Explicitly copy shstrndx.
+	(find_alloc_sections_prelink): Document shnum usage.
+
+2018-09-13  Mark Wielaard  <mark@klomp.org>
+
 	* elflint.c (check_elf_header): Use shnum instead of e_shnum for all
 	checks.
 	(check_symtab): Use shstrndx instead of e_shstrndx to get section

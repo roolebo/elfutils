@@ -239,8 +239,27 @@ copy_elf (Elf *outelf, Elf *inelf)
   ELF_CHECK (gelf_newehdr (outelf, gelf_getclass (inelf)),
 	     _("cannot create ELF header: %s"));
 
+  size_t shstrndx;
+  ELF_CHECK (elf_getshdrstrndx (inelf, &shstrndx) == 0,
+	     _("cannot get shdrstrndx:%s"));
+
   GElf_Ehdr ehdr_mem;
   GElf_Ehdr *ehdr = gelf_getehdr (inelf, &ehdr_mem);
+  if (shstrndx < SHN_LORESERVE)
+    ehdr->e_shstrndx = shstrndx;
+  else
+    {
+      ehdr->e_shstrndx = SHN_XINDEX;
+      Elf_Scn *scn0 = elf_getscn (outelf, 0);
+      GElf_Shdr shdr0_mem;
+      GElf_Shdr *shdr0 = gelf_getshdr (scn0, &shdr0_mem);
+      ELF_CHECK (shdr0 != NULL,
+		 _("cannot get new zero section: %s"));
+      shdr0->sh_link = shstrndx;
+      ELF_CHECK (gelf_update_shdr (scn0, shdr0),
+		 _("cannot update new zero section: %s"));
+    }
+
   ELF_CHECK (gelf_update_ehdr (outelf, ehdr),
 	     _("cannot copy ELF header: %s"));
 
@@ -1025,7 +1044,7 @@ find_alloc_sections_prelink (Elf *debug, Elf_Data *debug_shstrtab,
 		 _("cannot read '.gnu.prelink_undo' section: %s"));
 
       uint_fast16_t phnum;
-      uint_fast16_t shnum;
+      uint_fast16_t shnum;  /* prelink doesn't handle > SHN_LORESERVE.  */
       if (ehdr.e32.e_ident[EI_CLASS] == ELFCLASS32)
 	{
 	  phnum = ehdr.e32.e_phnum;

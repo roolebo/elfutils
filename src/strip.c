@@ -820,7 +820,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	: (ebl_section_strip_p (ebl, &shdr_info[cnt].shdr,
 				shdr_info[cnt].name, remove_comment,
 				remove_debug)
-	   || cnt == ehdr->e_shstrndx
+	   || cnt == shstrndx
 	   || section_name_matches (remove_secs, shdr_info[cnt].name)))
       {
 	/* The user might want to explicitly keep this one.  */
@@ -1081,7 +1081,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 				  && shdr_info[cnt].debug_data == NULL
 				  && shdr_info[cnt].shdr.sh_type != SHT_NOTE
 				  && shdr_info[cnt].shdr.sh_type != SHT_GROUP
-				  && cnt != ehdr->e_shstrndx);
+				  && cnt != shstrndx);
 
 	  /* Set the section header in the new file.  */
 	  GElf_Shdr debugshdr = shdr_info[cnt].shdr;
@@ -1134,7 +1134,42 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
       debugehdr->e_version = ehdr->e_version;
       debugehdr->e_entry = ehdr->e_entry;
       debugehdr->e_flags = ehdr->e_flags;
-      debugehdr->e_shstrndx = ehdr->e_shstrndx;
+
+      size_t shdrstrndx;
+      if (elf_getshdrstrndx (elf, &shdrstrndx) < 0)
+	{
+	  error (0, 0, gettext ("%s: error while getting shdrstrndx: %s"),
+		 fname, elf_errmsg (-1));
+	  result = 1;
+	  goto fail_close;
+	}
+
+      if (shstrndx < SHN_LORESERVE)
+	debugehdr->e_shstrndx = shdrstrndx;
+      else
+	{
+	  debugehdr->e_shstrndx = SHN_XINDEX;
+	  Elf_Scn *scn0 = elf_getscn (debugelf, 0);
+	  GElf_Shdr shdr0_mem;
+	  GElf_Shdr *shdr0 = gelf_getshdr (scn0, &shdr0_mem);
+	  if (shdr0 == NULL)
+	    {
+	      error (0, 0, gettext ("%s: error getting zero section: %s"),
+		     debug_fname, elf_errmsg (-1));
+	      result = 1;
+	      goto fail_close;
+	    }
+
+	  shdr0->sh_link = shdrstrndx;
+	  if (gelf_update_shdr (scn0, shdr0) == 0)
+	    {
+	      error (0, 0, gettext ("%s: error while updating zero section: %s"),
+		     debug_fname, elf_errmsg (-1));
+	      result = 1;
+	      goto fail_close;
+	    }
+
+	}
 
       if (unlikely (gelf_update_ehdr (debugelf, debugehdr) == 0))
 	{
@@ -1187,7 +1222,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
      the .shstrtab section which we would add again.  */
   bool removing_sections = !(cnt == idx
 			     || (cnt == idx + 1
-				 && shdr_info[ehdr->e_shstrndx].idx == 0));
+				 && shdr_info[shstrndx].idx == 0));
   if (output_fname == NULL && !removing_sections)
       goto fail_close;
 

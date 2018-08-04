@@ -1,3 +1,12 @@
+2018-09-13  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_begin_elf.c (check_section): Drop ehdr argument, add and
+	use shstrndx argument.
+	(global_read): Likewise.
+	(scngrp_read): Likewise.
+	(dwarf_begin_elf): Call elf_getshdrstrndx. Pass shstrndx to
+	global_read or scngrp_read.
+
 2018-08-18  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_getabbrev.c (__libdw_getabbrev): Continue until both name

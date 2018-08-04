@@ -1184,15 +1184,24 @@ print_shdr (Ebl *ebl, GElf_Ehdr *ehdr)
   size_t shstrndx;
 
   if (! print_file_header)
-    printf (gettext ("\
-There are %d section headers, starting at offset %#" PRIx64 ":\n\
+    {
+      size_t sections;
+      if (unlikely (elf_getshdrnum (ebl->elf, &sections) < 0))
+	error (EXIT_FAILURE, 0,
+	       gettext ("cannot get number of sections: %s"),
+	       elf_errmsg (-1));
+
+      printf (gettext ("\
+There are %zd section headers, starting at offset %#" PRIx64 ":\n\
 \n"),
-	    ehdr->e_shnum, ehdr->e_shoff);
+	      sections, ehdr->e_shoff);
+    }
 
   /* Get the section header string table index.  */
   if (unlikely (elf_getshdrstrndx (ebl->elf, &shstrndx) < 0))
     error (EXIT_FAILURE, 0,
-	   gettext ("cannot get section header string table index"));
+	   gettext ("cannot get section header string table index: %s"),
+	   elf_errmsg (-1));
 
   puts (gettext ("Section Headers:"));
 
@@ -1384,7 +1393,13 @@ print_phdr (Ebl *ebl, GElf_Ehdr *ehdr)
 	}
     }
 
-  if (ehdr->e_shnum == 0)
+  size_t sections;
+  if (unlikely (elf_getshdrnum (ebl->elf, &sections) < 0))
+    error (EXIT_FAILURE, 0,
+           gettext ("cannot get number of sections: %s"),
+           elf_errmsg (-1));
+
+  if (sections == 0)
     /* No sections in the file.  Punt.  */
     return;
 

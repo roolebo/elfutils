@@ -1,5 +1,10 @@
 2018-09-13  Mark Wielaard  <mark@klomp.org>
 
+	* readelf.c (print_shdr): Get number of section with elf_getshdrnum.
+	(print_phdr): Likewise.
+
+2018-09-13  Mark Wielaard  <mark@klomp.org>
+
 	* strip.c (handle_elf): Check against shstrndx, not e_shstrndx.
 	Explicitly set shdrstrndx for debug file.
 	* unstrip.c (copy_elf): Explicitly copy shstrndx.

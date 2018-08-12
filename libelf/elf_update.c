@@ -93,13 +93,29 @@ write_file (Elf *elf, off_t size, int change_bo, size_t shnum)
 	 ENOSPC. Otherwise we ignore the error and treat it as just hint.  */
       if (elf->parent == NULL
 	  && (elf->maximum_size == ~((size_t) 0)
-	      || (size_t) size > elf->maximum_size)
-	  && unlikely (posix_fallocate (elf->fildes, 0, size) != 0))
-	if (errno == ENOSPC)
-	  {
-	    __libelf_seterrno (ELF_E_WRITE_ERROR);
-	    return -1;
-	  }
+	      || (size_t) size > elf->maximum_size))
+	{
+	  if (unlikely (posix_fallocate (elf->fildes, 0, size) != 0))
+	    if (errno == ENOSPC)
+	      {
+		__libelf_seterrno (ELF_E_WRITE_ERROR);
+		return -1;
+	      }
+
+	  /* Extend the mmap address if needed.  */
+	  if (elf->cmd == ELF_C_RDWR_MMAP
+	      && (size_t) size > elf->maximum_size)
+	    {
+	      if (mremap (elf->map_address, elf->maximum_size,
+			  size, 0) == MAP_FAILED)
+		{
+		  __libelf_seterrno (ELF_E_WRITE_ERROR);
+		  return -1;
+		}
+	      elf->maximum_size = size;
+	    }
+
+	}
 
       /* The file is mmaped.  */
       if ((class == ELFCLASS32

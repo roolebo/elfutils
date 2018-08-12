@@ -1,3 +1,9 @@
+2018-09-12  Mark Wielaard  <mark@klomp.org>
+
+	* elf32_updatefile.c (updatemmap): Use memmove, not memcpy.
+	* elf_update.c (write_file): Try to mremap if file needs to be
+	extended.
+
 2018-08-18  Mark Wielaard  <mark@klomp.org>
 
 	* libelf.h (elf_compress_gnu): Add documentation about

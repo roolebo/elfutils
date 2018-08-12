@@ -1,3 +1,14 @@
+2018-09-12  Mark Wielaard  <mark@klomp.org>
+
+	* Makefile.am (check_PROGRAMS): Add elfcopy and addsections.
+	(TESTS): Add run-copyadd-sections.sh.
+	(EXTRA_DIST): Likewise.
+	(elfcopy_LDADD): New variable.
+	(addsections_LDADD): Likewise.
+	* addsections.c: New file.
+	* elfcopy.c: Likewise.
+	* run-copyadd-sections.sh: New test.
+
 2018-09-11  Mark Wielaard  <mark@klomp.org>
 
 	* backtrace-dwarf.c (main): Add section attribute.

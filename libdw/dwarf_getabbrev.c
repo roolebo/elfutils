@@ -140,7 +140,7 @@ __libdw_getabbrev (Dwarf *dbg, struct Dwarf_CU *cu, Dwarf_Off offset,
 	  get_sleb128 (formval, abbrevp, end);
 	}
     }
-  while (attrname != 0 && attrform != 0);
+  while (attrname != 0 || attrform != 0);
 
   /* Return the length to the caller if she asked for it.  */
   if (lengthp != NULL)

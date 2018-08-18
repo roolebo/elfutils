@@ -60,8 +60,8 @@ dwarf_hasattr (Dwarf_Die *die, unsigned int search_name)
       unsigned int attr_form;
       get_uleb128_unchecked (attr_form, attrp);
 
-      /* We can stop if we found the attribute with value zero.  */
-      if (attr_name == 0 || attr_form == 0)
+      /* We can stop if we found the end of the attribute list.  */
+      if (attr_name == 0 && attr_form == 0)
 	return 0;
 
       if (attr_name == search_name)

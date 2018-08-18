@@ -2023,7 +2023,7 @@ check_sysv_hash (Ebl *ebl, GElf_Shdr *shdr, Elf_Data *data, int idx,
   Elf32_Word nbucket = ((Elf32_Word *) data->d_buf)[0];
   Elf32_Word nchain = ((Elf32_Word *) data->d_buf)[1];
 
-  if (shdr->sh_size < (2 + nbucket + nchain) * sizeof (Elf32_Word))
+  if (shdr->sh_size < (2ULL + nbucket + nchain) * sizeof (Elf32_Word))
     {
       ERROR (gettext ("\
 section [%2d] '%s': hash table section is too small (is %ld, expected %ld)\n"),
@@ -2077,7 +2077,10 @@ check_sysv_hash64 (Ebl *ebl, GElf_Shdr *shdr, Elf_Data *data, int idx,
   Elf64_Xword nbucket = ((Elf64_Xword *) data->d_buf)[0];
   Elf64_Xword nchain = ((Elf64_Xword *) data->d_buf)[1];
 
-  if (shdr->sh_size < (2 + nbucket + nchain) * sizeof (Elf64_Xword))
+  uint64_t maxwords = shdr->sh_size / sizeof (Elf64_Xword);
+  if (maxwords < 2
+      || maxwords - 2 < nbucket
+      || maxwords - 2 - nbucket < nchain)
     {
       ERROR (gettext ("\
 section [%2d] '%s': hash table section is too small (is %ld, expected %ld)\n"),

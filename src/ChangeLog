@@ -1,3 +1,10 @@
+2018-08-18  Mark Wielaard  <mark@klomp.org>
+
+	* elflint.c (check_sysv_hash): Calculate needed size using unsigned
+	long long int to prevent overflow.
+	(check_sysv_hash64): Calculate maxwords used separately before
+	comparison to prevent overflow.
+
 2018-07-24  Mark Wielaard  <mark@klomp.org>
 
 	* unstrip.c (compare_unalloc_sections): Also compare sh_size.

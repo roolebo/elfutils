@@ -1,3 +1,10 @@
+2018-08-18  Mark Wielaard  <mark@klomp.org>
+
+	* libelf.h (elf_compress_gnu): Add documentation about
+	interaction between SHF_COMPRESED and elf_compress_gnu.
+	* elf_compress_gnu.c (elf_compress_gnu): Return error if section
+	sh_flags has SHF_COMPRESSED set.
+
 2018-07-27  Mark Wielaard  <mark@klomp.org>
 
 	* libelf.h (elf_getshdrstrndx): Fix documentation.

@@ -80,7 +80,9 @@ elf_compress_gnu (Elf_Scn *scn, int inflate, unsigned int flags)
       sh_addralign = shdr->sh_addralign;
     }
 
-  if ((sh_flags & SHF_ALLOC) != 0)
+  /* Allocated sections, or sections that are already are compressed
+     cannot (also) be GNU compressed.  */
+  if ((sh_flags & SHF_ALLOC) != 0 || (sh_flags & SHF_COMPRESSED))
     {
       __libelf_seterrno (ELF_E_INVALID_SECTION_FLAGS);
       return -1;

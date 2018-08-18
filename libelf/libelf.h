@@ -366,6 +366,11 @@ extern Elf64_Chdr *elf64_getchdr (Elf_Scn *__scn);
    It is an error to request compression for a section that already
    has SHF_COMPRESSED set, or (for elf_compress) to request
    decompression for an section that doesn't have SHF_COMPRESSED set.
+   If a section has SHF_COMPRESSED set then calling elf_compress_gnu
+   will result in an error.  The section has to be decompressed first
+   using elf_compress.  Calling elf_compress on a section compressed
+   with elf_compress_gnu is fine, but probably useless.
+
    It is always an error to call these functions on SHT_NOBITS
    sections or if the section has the SHF_ALLOC flag set.
    elf_compress_gnu will not check whether the section name starts

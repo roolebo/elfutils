@@ -148,6 +148,10 @@ dwarf_getaranges (Dwarf *dbg, Dwarf_Aranges **aranges, size_t *naranges)
 				   length_bytes, &offset, IDX_debug_info, 4))
 	goto fail;
 
+      /* Next up two bytes for address and segment size.  */
+      if (readp + 2 > readendp)
+	goto invalid;
+
       unsigned int address_size = *readp++;
       if (unlikely (address_size != 4 && address_size != 8))
 	goto invalid;

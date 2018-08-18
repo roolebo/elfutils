@@ -1,3 +1,8 @@
+2018-08-18  Mark Wielaard  <mark@klomp.org>
+
+	* dwarf_getaranges.c (dwarf_getaranges.c): Make sure there is enough
+	data to read the address and segment size.
+
 2018-07-04  Ross Burton <ross.burton@intel.com>
 
 	* libdw_alloc.c: Remove error.h include.

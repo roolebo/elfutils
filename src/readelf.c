@@ -5447,6 +5447,8 @@ print_debug_aranges_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	  goto next_table;
 	}
 
+      if (readp + 1 > readendp)
+	goto invalid_data;
       unsigned int segment_size = *readp++;
       printf (gettext (" Segment size:  %6" PRIu64 "\n\n"),
 	      (uint64_t) segment_size);

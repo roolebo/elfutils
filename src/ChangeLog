@@ -1,5 +1,10 @@
 2018-08-18  Mark Wielaard  <mark@klomp.org>
 
+	* readelf.c (print_debug_aranges_section): Make sure there is enough
+	data to read the header segment size.
+
+2018-08-18  Mark Wielaard  <mark@klomp.org>
+
 	* elflint.c (check_sysv_hash): Calculate needed size using unsigned
 	long long int to prevent overflow.
 	(check_sysv_hash64): Calculate maxwords used separately before

@@ -124,6 +124,7 @@ thread_callback (Dwfl_Thread *thread, void *thread_arg)
 }
 
 int
+__attribute__((section(".main"))) /* Defeat -freorder-blocks-and-partition  */
 main (int argc __attribute__ ((unused)), char **argv)
 {
   /* We use no threads here which can interfere with handling a stream.  */

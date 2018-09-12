@@ -541,7 +541,7 @@ invalid number of program header table entries\n"));
       if (ehdr->e_shentsize != 0 && ehdr->e_shentsize != sizeof (Elf64_Shdr))
 	ERROR (gettext ("invalid section header size: %hd\n"),
 	       ehdr->e_shentsize);
-      else if (ehdr->e_shoff + ehdr->e_shnum * ehdr->e_shentsize > size)
+      else if (ehdr->e_shoff + shnum * ehdr->e_shentsize > size)
 	ERROR (gettext ("invalid section header position or size\n"));
     }
 }
@@ -956,7 +956,7 @@ section [%2d] '%s': symbol %zu: non-local section symbol\n"),
 		      destshdr = gelf_getshdr (gscn, &destshdr_mem);
 		      assert (destshdr != NULL);
 		      const char *sname = elf_strptr (ebl->elf,
-						      ehdr->e_shstrndx,
+						      shstrndx,
 						      destshdr->sh_name);
 		      if (sname != NULL)
 			{
@@ -977,7 +977,7 @@ section [%2d] '%s': symbol %zu: non-local section symbol\n"),
 
 	      const char *sname = ((destshdr == NULL || xndx == SHN_UNDEF)
 				   ? NULL
-				   : elf_strptr (ebl->elf, ehdr->e_shstrndx,
+				   : elf_strptr (ebl->elf, shstrndx,
 						 destshdr->sh_name));
 	      if (sname == NULL)
 		{

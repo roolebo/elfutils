@@ -1,5 +1,12 @@
 2018-09-13  Mark Wielaard  <mark@klomp.org>
 
+	* elflint.c (check_elf_header): Use shnum instead of e_shnum for all
+	checks.
+	(check_symtab): Use shstrndx instead of e_shstrndx to get section
+	names.
+
+2018-09-13  Mark Wielaard  <mark@klomp.org>
+
 	* elfcmp.c (main): Get, check and shdrstrndx for section names.
 
 2018-09-12  Mark Wielaard  <mark@klomp.org>

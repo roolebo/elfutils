@@ -1,3 +1,9 @@
+2018-09-13  Mark Wielaard  <mark@klomp.org>
+
+	* elf32_updatefile.c (updatemmap): Use shnum, not ehdr->e_shnum.
+	* elf_getscn.c (elf_getscn): Create section zero if it is requested,
+	but doesn't exist yet.
+
 2018-09-12  Mark Wielaard  <mark@klomp.org>
 
 	* elf32_updatefile.c (updatemmap): Use memmove, not memcpy.

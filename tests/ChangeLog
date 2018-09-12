@@ -1,3 +1,9 @@
+2018-09-13  Mark Wielaard  <mark@klomp.org>
+
+	* run-copymany-sections.sh: New test.
+	* Makefile.am (TESTS): Add run-copymany-sections.sh.
+	(EXTRA_DIST): Likewise.
+
 2018-09-12  Mark Wielaard  <mark@klomp.org>
 
 	* Makefile.am (check_PROGRAMS): Add elfcopy and addsections.

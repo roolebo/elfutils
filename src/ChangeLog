@@ -1,3 +1,7 @@
+2018-09-13  Mark Wielaard  <mark@klomp.org>
+
+	* elfcmp.c (main): Get, check and shdrstrndx for section names.
+
 2018-09-12  Mark Wielaard  <mark@klomp.org>
 
 	* elfcmp.c (main): Call ebl_section_strip_p without ehdr.

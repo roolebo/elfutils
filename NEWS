@@ -1,3 +1,19 @@
+Version 0.174
+
+libelf, libdw and all tools now handle extended shnum and shstrndx correctly.
+
+elfcompress: Don't rewrite input file if no section data needs updating.
+             Try harder to keep same file mode bits (suid) on rewrite.
+
+strip: Handle mixed (out of order) allocated/non-allocated sections.
+
+unstrip: Handle SHT_GROUP sections.
+
+backends: RISCV and M68K now have backend implementations to generate CFI based
+          backtraces.
+
+Fixes CVE-2018-16062, CVE-2018-16402 and CVE-2018-16403.
+
 Version 0.173
 
 More fixes for crashes and hangs found by afl-fuzz. In particular various

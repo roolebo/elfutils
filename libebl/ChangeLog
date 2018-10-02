@@ -1,3 +1,10 @@
+2018-10-02  Andreas Schwab  <schwab@suse.de>
+
+	* ebl-hooks.h (EBLHOOK(reloc_simple_type)): Add third parameter.
+	* libebl.h (ebl_reloc_simple_type): Likewise.
+	* eblopenbackend.c (default_reloc_simple_type): Likewise.
+	* eblrelocsimpletype.c (ebl_reloc_simple_type): Pass it down.
+
 2018-09-12  Mark Wielaard  <mark@klomp.org>
 
 	* eblsectionstripp.c (ebl_section_strip_p): Drop ehdr argument.

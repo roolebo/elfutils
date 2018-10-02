@@ -115,7 +115,8 @@ ia64_section_type_name (int type,
 
 /* Check for the simple reloc types.  */
 Elf_Type
-ia64_reloc_simple_type (Ebl *ebl, int type)
+ia64_reloc_simple_type (Ebl *ebl, int type,
+			int *addsub __attribute__ ((unused)))
 {
   switch (type)
     {

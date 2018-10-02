@@ -42,7 +42,8 @@
 
 /* Check for the simple reloc types.  */
 Elf_Type
-ppc_reloc_simple_type (Ebl *ebl __attribute__ ((unused)), int type)
+ppc_reloc_simple_type (Ebl *ebl __attribute__ ((unused)), int type,
+		       int *addsub __attribute__ ((unused)))
 {
   switch (type)
     {

@@ -1,3 +1,23 @@
+2018-10-02  Andreas Schwab  <schwab@suse.de>
+
+	* riscv_symbol.c (riscv_reloc_simple_type): Add parameter addsub.
+	Set it for ADD and SUB relocations.
+	* aarch64_symbol.c (aarch64_reloc_simple_type): Add and ignore
+	third parameter.
+	* alpha_symbol.c (alpha_reloc_simple_type): Likewise.
+	* arm_symbol.c (arm_reloc_simple_type): Likewise.
+	* bpf_symbol.c (bpf_reloc_simple_type): Likewise.
+	* i386_symbol.c (i386_reloc_simple_type): Likewise.
+	* ia64_symbol.c (ia64_reloc_simple_type): Likewise.
+	* m68k_symbol.c (m68k_reloc_simple_type): Likewise.
+	* ppc64_symbol.c (ppc64_reloc_simple_type): Likewise.
+	* ppc_symbol.c (ppc_reloc_simple_type): Likewise.
+	* s390_symbol.c (s390_reloc_simple_type): Likewise.
+	* sh_symbol.c (sh_reloc_simple_type): Likewise.
+	* sparc_symbol.c (sparc_reloc_simple_type): Likewise.
+	* tilegx_symbol.c (tilegx_reloc_simple_type): Likewise.
+	* x86_64_symbol.c (x86_64_reloc_simple_type): Likewise.
+
 2018-09-12  Mark Wielaard  <mark@klomp.org>
 
 	* ppc64_init.c (ppc64_init): Use elf_getshdrstrndx.

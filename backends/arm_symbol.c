@@ -109,7 +109,8 @@ arm_machine_flag_check (GElf_Word flags)
 
 /* Check for the simple reloc types.  */
 Elf_Type
-arm_reloc_simple_type (Ebl *ebl __attribute__ ((unused)), int type)
+arm_reloc_simple_type (Ebl *ebl __attribute__ ((unused)), int type,
+		       int *addsub __attribute__ ((unused)))
 {
   switch (type)
     {

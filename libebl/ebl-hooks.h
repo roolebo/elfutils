@@ -33,7 +33,7 @@ const char *EBLHOOK(reloc_type_name) (int, char *, size_t);
 bool EBLHOOK(reloc_type_check) (int);
 
 /* Check if relocation type is for simple absolute relocations.  */
-Elf_Type EBLHOOK(reloc_simple_type) (Ebl *, int);
+Elf_Type EBLHOOK(reloc_simple_type) (Ebl *, int, int *);
 
 /* Check relocation type use.  */
 bool EBLHOOK(reloc_valid_use) (Elf *, int);

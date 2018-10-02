@@ -99,8 +99,10 @@ extern bool ebl_reloc_type_check (Ebl *ebl, int reloc);
 extern bool ebl_reloc_valid_use (Ebl *ebl, int reloc);
 
 /* Check if relocation type is for simple absolute relocations.
-   Return ELF_T_{BYTE,HALF,SWORD,SXWORD} for a simple type, else ELF_T_NUM.  */
-extern Elf_Type ebl_reloc_simple_type (Ebl *ebl, int reloc);
+   Return ELF_T_{BYTE,HALF,SWORD,SXWORD} for a simple type, else ELF_T_NUM.
+   If the relocation type is an ADD or SUB relocation, set *ADDSUB to 1 or -1,
+   resp.  */
+extern Elf_Type ebl_reloc_simple_type (Ebl *ebl, int reloc, int *addsub);
 
 /* Return true if the symbol type is that referencing the GOT.  E.g.,
    R_386_GOTPC.  */

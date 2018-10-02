@@ -338,7 +338,8 @@ relocate (Dwfl_Module * const mod,
 	 So we just pretend it's OK without further relocation.  */
       return DWFL_E_NOERROR;
 
-    Elf_Type type = ebl_reloc_simple_type (mod->ebl, rtype);
+    int addsub = 0;
+    Elf_Type type = ebl_reloc_simple_type (mod->ebl, rtype, &addsub);
     if (unlikely (type == ELF_T_NUM))
       return DWFL_E_BADRELTYPE;
 
@@ -383,6 +384,9 @@ relocate (Dwfl_Module * const mod,
       {
 #define DO_TYPE(NAME, Name)			\
 	case ELF_T_##NAME:			\
+	  if (addsub != 0 && addend == NULL)	\
+	    /* These do not make sense with SHT_REL.  */ \
+	    return DWFL_E_BADRELTYPE;		\
 	  size = sizeof (GElf_##Name);		\
 	break
 	TYPES;
@@ -417,11 +421,24 @@ relocate (Dwfl_Module * const mod,
       {
 	/* For the addend form, we have the value already.  */
 	value += *addend;
+	/* For ADD/SUB relocations we need to fetch the section
+	   contents.  */
+	if (addsub != 0)
+	  {
+	    Elf_Data *d = gelf_xlatetom (relocated, &tmpdata, &rdata,
+					 ehdr->e_ident[EI_DATA]);
+	    if (d == NULL)
+	      return DWFL_E_LIBELF;
+	    assert (d == &tmpdata);
+	  }
 	switch (type)
 	  {
 #define DO_TYPE(NAME, Name)			\
 	    case ELF_T_##NAME:			\
-	      tmpbuf.Name = value;		\
+	      if (addsub != 0)			\
+		tmpbuf.Name += value * addsub;	\
+	      else				\
+		tmpbuf.Name = value;		\
 	    break
 	    TYPES;
 #undef DO_TYPE

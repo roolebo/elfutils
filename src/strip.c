@@ -2030,7 +2030,8 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 		  return true;
 
 		/* We only do simple absolute relocations.  */
-		Elf_Type type = ebl_reloc_simple_type (ebl, rtype);
+		int addsub = 0;
+		Elf_Type type = ebl_reloc_simple_type (ebl, rtype, &addsub);
 		if (type == ELF_T_NUM)
 		  return false;
 
@@ -2109,6 +2110,17 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 			/* For SHT_RELA sections we just take the
 			   given addend and add it to the value.  */
 			value += addend;
+			/* For ADD/SUB relocations we need to fetch the
+			   current section contents.  */
+			if (addsub != 0)
+			  {
+			    Elf_Data *d = gelf_xlatetom (debugelf, &tmpdata,
+							 &rdata,
+							 ehdr->e_ident[EI_DATA]);
+			    if (d == NULL)
+			      INTERNAL_ERROR (fname);
+			    assert (d == &tmpdata);
+			  }
 		      }
 		    else
 		      {
@@ -2125,9 +2137,12 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 
 		    switch (type)
 		      {
-#define DO_TYPE(NAME, Name)					\
-			case ELF_T_##NAME:			\
-			  tmpbuf.Name += (GElf_##Name) value;	\
+#define DO_TYPE(NAME, Name)					 \
+			case ELF_T_##NAME:			 \
+			  if (addsub < 0)			 \
+			    tmpbuf.Name -= (GElf_##Name) value; \
+			  else					 \
+			    tmpbuf.Name += (GElf_##Name) value; \
 			  break;
 			TYPES;
 #undef DO_TYPE

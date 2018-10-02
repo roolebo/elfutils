@@ -1,3 +1,7 @@
+2018-10-02  Andreas Schwab  <schwab@suse.de>
+
+	* strip.c (handle_elf): Handle ADD/SUB relocation.
+
 2018-09-13  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_shdr): Get number of section with elf_getshdrnum.

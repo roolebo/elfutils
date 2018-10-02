@@ -54,7 +54,8 @@ m68k_gotpc_reloc_check (Elf *elf __attribute__ ((unused)), int type)
 
 /* Check for the simple reloc types.  */
 Elf_Type
-m68k_reloc_simple_type (Ebl *ebl __attribute__ ((unused)), int type)
+m68k_reloc_simple_type (Ebl *ebl __attribute__ ((unused)), int type,
+			int *addsub __attribute__ ((unused)))
 {
   switch (type)
     {

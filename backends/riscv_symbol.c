@@ -40,13 +40,37 @@
 
 /* Check for the simple reloc types.  */
 Elf_Type
-riscv_reloc_simple_type (Ebl *ebl __attribute__ ((unused)), int type)
+riscv_reloc_simple_type (Ebl *ebl __attribute__ ((unused)), int type,
+			 int *addsub)
 {
   switch (type)
     {
+    case R_RISCV_SET8:
+      return ELF_T_BYTE;
+    case R_RISCV_SET16:
+      return ELF_T_HALF;
     case R_RISCV_32:
+    case R_RISCV_SET32:
       return ELF_T_WORD;
     case R_RISCV_64:
+      return ELF_T_XWORD;
+    case R_RISCV_ADD16:
+      *addsub = 1;
+      return ELF_T_HALF;
+    case R_RISCV_SUB16:
+      *addsub = -1;
+      return ELF_T_HALF;
+    case R_RISCV_ADD32:
+      *addsub = 1;
+      return ELF_T_WORD;
+    case R_RISCV_SUB32:
+      *addsub = -1;
+      return ELF_T_WORD;
+    case R_RISCV_ADD64:
+      *addsub = 1;
+      return ELF_T_XWORD;
+    case R_RISCV_SUB64:
+      *addsub = -1;
       return ELF_T_XWORD;
     default:
       return ELF_T_NUM;

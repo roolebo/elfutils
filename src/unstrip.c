@@ -1708,6 +1708,20 @@ more sections in stripped file than debug file -- arguments reversed?"));
 	    if (shdr_mem.sh_type == SHT_DYNSYM)
 	      stripped_dynsym = sec;
 	  }
+
+	if (shdr_mem.sh_type == SHT_GROUP)
+	  {
+	    /* We must adjust all the section indices in the group.
+	       Skip the first word, which is the section group flag.
+	       Everything else is a section index.  */
+	    Elf32_Word *shndx = (Elf32_Word *) outdata->d_buf;
+	    for (size_t i = 1; i < shdr_mem.sh_size / sizeof (Elf32_Word); ++i)
+	      if (shndx[i]  == SHN_UNDEF || shndx[i] >= stripped_shnum)
+		error (EXIT_FAILURE, 0,
+		       _("group has invalid section index [%zd]"), i);
+	      else
+		shndx[i] = ndx_section[shndx[i] - 1];
+	  }
       }
 
   /* We may need to update the symbol table.  */

@@ -1,3 +1,7 @@
+2018-10-19  Mark Wielaard  <mark@klomp.org>
+
+	* unstrip.c (copy_elided_sections): Renumber group section indexes.
+
 2018-10-12  Mark Wielaard  <mark@klomp.org>
 
 	* strip.c (handle_elf): Don't remove SHF_GROUP flag from sections.

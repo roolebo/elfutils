@@ -1,3 +1,13 @@
+2018-10-12  Mark Wielaard  <mark@klomp.org>
+
+	* run-readelf-zdebug.sh: Adjust flags output.
+	* run-readelf-macro.sh: Likewise.
+	* run-readelf-macros.sh: New test.
+	* testfile-macros-object.o.bz2: New test file.
+	* Makefile.am (TESTS): Add run-readelf-macros.sh.
+	(EXTRA_DIST): Add run-readelf-macros.sh and
+	testfile-macros-object.o.bz2.
+
 2018-09-12  Mark Wielaard  <mark@klomp.org>
 
 	* run-annobingroup.sh: Add x86_64 ET_REL testcase.

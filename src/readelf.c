@@ -9702,8 +9702,7 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
 	  (uint64_t) shdr->sh_offset);
   putc_unlocked ('\n', stdout);
 
-  Elf_Data *data = (dbg->sectiondata[IDX_debug_macro]
-		    ?: elf_rawdata (scn, NULL));
+  Elf_Data *data =  elf_getdata (scn, NULL);
   if (unlikely (data == NULL))
     {
       error (0, 0, gettext ("cannot get macro information section data: %s"),
@@ -9772,7 +9771,33 @@ print_debug_macro_section (Dwfl_Module *dwflmod __attribute__ ((unused)),
       if (readp + 1 > readendp)
 	goto invalid_data;
       const unsigned char flag = *readp++;
-      printf (gettext (" Flag:               0x%" PRIx8 "\n"), flag);
+      printf (gettext (" Flag:               0x%" PRIx8), flag);
+      if (flag != 0)
+	{
+	  printf (" (");
+	  if ((flag & 0x01) != 0)
+	    {
+	      printf ("offset_size");
+	      if ((flag & 0xFE) !=  0)
+		printf (", ");
+	    }
+	  if ((flag & 0x02) != 0)
+	    {
+	      printf ("debug_line_offset");
+	      if ((flag & 0xFC) !=  0)
+		printf (", ");
+	    }
+	  if ((flag & 0x04) != 0)
+	    {
+	      printf ("operands_table");
+	      if ((flag & 0xF8) !=  0)
+		printf (", ");
+	    }
+	  if ((flag & 0xF8) != 0)
+	    printf ("unknown");
+	  printf (")");
+	}
+      printf ("\n");
 
       unsigned int offset_len = (flag & 0x01) ? 8 : 4;
       printf (gettext (" Offset length:      %" PRIu8 "\n"), offset_len);

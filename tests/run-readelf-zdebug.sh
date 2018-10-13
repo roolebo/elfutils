@@ -100,7 +100,7 @@ DWARF section [33] '.debug_macro' at offset 0xab5:
 
  Offset:             0x0
  Version:            4
- Flag:               0x2
+ Flag:               0x2 (debug_line_offset)
  Offset length:      4
  .debug_line offset: 0x0
 

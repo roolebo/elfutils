@@ -696,6 +696,7 @@ struct section
 {
   Elf_Scn *scn;
   const char *name;
+  const char *sig;
   Elf_Scn *outscn;
   Dwelf_Strent *strent;
   GElf_Shdr shdr;
@@ -720,7 +721,8 @@ compare_alloc_sections (const struct section *s1, const struct section *s2,
 
 static int
 compare_unalloc_sections (const GElf_Shdr *shdr1, const GElf_Shdr *shdr2,
-			  const char *name1, const char *name2)
+			  const char *name1, const char *name2,
+			  const char *sig1, const char *sig2)
 {
   /* Sort by sh_flags as an arbitrary ordering.  */
   if (shdr1->sh_flags < shdr2->sh_flags)
@@ -733,6 +735,10 @@ compare_unalloc_sections (const GElf_Shdr *shdr1, const GElf_Shdr *shdr2,
     return -1;
   if (shdr1->sh_size > shdr2->sh_size)
     return 1;
+
+  /* Are they both SHT_GROUP sections? Then compare signatures.  */
+  if (sig1 != NULL && sig2 != NULL)
+    return strcmp (sig1, sig2);
 
   /* Sort by name as last resort.  */
   return strcmp (name1, name2);
@@ -751,7 +757,8 @@ compare_sections (const void *a, const void *b, bool rel)
   return ((s1->shdr.sh_flags & SHF_ALLOC)
 	  ? compare_alloc_sections (s1, s2, rel)
 	  : compare_unalloc_sections (&s1->shdr, &s2->shdr,
-				      s1->name, s2->name));
+				      s1->name, s2->name,
+				      s1->sig, s2->sig));
 }
 
 static int
@@ -986,6 +993,44 @@ get_section_name (size_t ndx, const GElf_Shdr *shdr, const Elf_Data *shstrtab)
   return shstrtab->d_buf + shdr->sh_name;
 }
 
+/* Returns the signature of a group section, or NULL if the given
+   section isn't a group.  */
+static const char *
+get_group_sig (Elf *elf, GElf_Shdr *shdr)
+{
+  if (shdr->sh_type != SHT_GROUP)
+    return NULL;
+
+  Elf_Scn *symscn = elf_getscn (elf, shdr->sh_link);
+  if (symscn == NULL)
+    error (EXIT_FAILURE, 0, _("bad sh_link for group section: %s"),
+	   elf_errmsg (-1));
+
+  GElf_Shdr symshdr_mem;
+  GElf_Shdr *symshdr = gelf_getshdr (symscn, &symshdr_mem);
+  if (symshdr == NULL)
+    error (EXIT_FAILURE, 0, _("couldn't get shdr for group section: %s"),
+	   elf_errmsg (-1));
+
+  Elf_Data *symdata = elf_getdata (symscn, NULL);
+  if (symdata == NULL)
+    error (EXIT_FAILURE, 0, _("bad data for group symbol section: %s"),
+	   elf_errmsg (-1));
+
+  GElf_Sym sym_mem;
+  GElf_Sym *sym = gelf_getsym (symdata, shdr->sh_info, &sym_mem);
+  if (sym == NULL)
+    error (EXIT_FAILURE, 0, _("couldn't get symbol for group section: %s"),
+	   elf_errmsg (-1));
+
+  const char *sig = elf_strptr (elf, symshdr->sh_link, sym->st_name);
+  if (sig == NULL)
+    error (EXIT_FAILURE, 0, _("bad symbol name for group section: %s"),
+	   elf_errmsg (-1));
+
+  return sig;
+}
+
 /* Fix things up when prelink has moved some allocated sections around
    and the debuginfo file's section headers no longer match up.
    This fills in SECTIONS[0..NALLOC-1].outscn or exits.
@@ -1111,6 +1156,7 @@ find_alloc_sections_prelink (Elf *debug, Elf_Data *debug_shstrtab,
 	      sec->scn = elf_getscn (main, i + 1); /* Really just for ndx.  */
 	      sec->outscn = NULL;
 	      sec->strent = NULL;
+	      sec->sig = get_group_sig (main, &sec->shdr);
 	      ++undo_nalloc;
 	    }
 	}
@@ -1336,6 +1382,7 @@ more sections in stripped file than debug file -- arguments reversed?"));
       sections[i].scn = scn;
       sections[i].outscn = NULL;
       sections[i].strent = NULL;
+      sections[i].sig = get_group_sig (stripped, shdr);
     }
 
   const struct section *stripped_symtab = NULL;
@@ -1354,7 +1401,8 @@ more sections in stripped file than debug file -- arguments reversed?"));
 
   /* Locate a matching unallocated section in SECTIONS.  */
   inline struct section *find_unalloc_section (const GElf_Shdr *shdr,
-					       const char *name)
+					       const char *name,
+					       const char *sig)
     {
       size_t l = nalloc, u = stripped_shnum - 1;
       while (l < u)
@@ -1362,7 +1410,8 @@ more sections in stripped file than debug file -- arguments reversed?"));
 	  size_t i = (l + u) / 2;
 	  struct section *sec = &sections[i];
 	  int cmp = compare_unalloc_sections (shdr, &sec->shdr,
-					      name, sec->name);
+					      name, sec->name,
+					      sig, sec->sig);
 	  if (cmp < 0)
 	    u = i;
 	  else if (cmp > 0)
@@ -1435,7 +1484,8 @@ more sections in stripped file than debug file -- arguments reversed?"));
       else
 	{
 	  /* Look for the section that matches.  */
-	  sec = find_unalloc_section (shdr, name);
+	  sec = find_unalloc_section (shdr, name,
+				      get_group_sig (unstripped, shdr));
 	  if (sec == NULL)
 	    {
 	      /* An additional unallocated section is fine if not SHT_NOBITS.

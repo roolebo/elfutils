@@ -120,4 +120,37 @@ EOF
 
 testrun ${abs_top_builddir}/src/elfcmp testfile-annobingroup-i386.o remerged.elf
 
+# echo "void * foo (void) { return foo; }" > testfile-annobingroup-x86_64.c
+# gcc -g -O2 -fplugin=annobin -c testfile-annobingroup-x86_64.c
+testfiles testfile-annobingroup-x86_64.o
+
+testrun_compare ${abs_top_builddir}/src/readelf -g testfile-annobingroup-x86_64.o << EOF
+
+Section group [ 1] '.group' with signature '.text.hot.group' contains 3 entries:
+  [11] .text.hot
+  [12] .gnu.build.attributes.hot
+  [13] .rela.gnu.build.attributes.hot
+
+Section group [ 2] '.group' with signature '.text.unlikely.group' contains 3 entries:
+  [14] .text.unlikely
+  [15] .gnu.build.attributes.unlikely
+  [16] .rela.gnu.build.attributes.unlikely
+
+Section group [ 3] '.group' with signature '.text.hot..group' contains 1 entry:
+  [26] .text.hot
+
+Section group [ 4] '.group' with signature '.text.unlikely..group' contains 1 entry:
+  [27] .text.unlikely
+EOF
+
+testrun ${abs_top_builddir}/src/strip -o stripped.elf -f debugfile.elf testfile-annobingroup-x86_64.o
+
+# This would/should work, except for the unknown NOTEs.
+# testrun ${abs_top_builddir}/src/elflint --gnu stripped.elf
+# testrun ${abs_top_builddir}/src/elflint --gnu --debug debugfile.elf
+
+testrun ${abs_top_builddir}/src/unstrip -o remerged.elf stripped.elf debugfile.elf
+
+testrun ${abs_top_builddir}/src/elfcmp testfile-annobingroup-x86_64.o remerged.elf
+
 exit 0

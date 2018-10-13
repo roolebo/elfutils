@@ -1,3 +1,9 @@
+2018-09-12  Mark Wielaard  <mark@klomp.org>
+
+	* run-annobingroup.sh: Add x86_64 ET_REL testcase.
+	* testfile-annobingroup-x86_64.o.bz2: New test file.
+	* Makefile.am (EXTRA_DIST): Add testfile-annobingroup-x86_64.o.bz2.
+
 2018-09-18  Mark Wielaard  <mark@klomp.org>
 
 	* backtrace-dwarf.c (thread_callback): Only error when

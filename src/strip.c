@@ -792,9 +792,13 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 
 	  if (shdr_info[shdr_info[cnt].group_idx].idx == 0)
 	    {
-	      /* The section group section will be removed.  */
+	      /* The section group section might be removed.
+		 Don't remove the SHF_GROUP flag.  The section is
+		 either also removed, in which case the flag doesn't matter.
+		 Or it moves with the group into the debug file, then
+		 it will be reconnected with the new group and should
+		 still have the flag set.  */
 	      shdr_info[cnt].group_idx = 0;
-	      shdr_info[cnt].shdr.sh_flags &= ~SHF_GROUP;
 	    }
 	}
 
@@ -1368,7 +1372,9 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 			&& shdr_info[cnt].data->d_buf != NULL);
 
 	    Elf32_Word *grpref = (Elf32_Word *) shdr_info[cnt].data->d_buf;
-	    for (size_t inner = 0;
+	    /* First word is the section group flag.
+	       Followed by section indexes, that need to be renumbered.  */
+	    for (size_t inner = 1;
 		 inner < shdr_info[cnt].data->d_size / sizeof (Elf32_Word);
 		 ++inner)
 	      if (grpref[inner] < shnum)

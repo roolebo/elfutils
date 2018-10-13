@@ -1,3 +1,15 @@
+2018-10-12  Mark Wielaard  <mark@klomp.org>
+
+	* strip.c (handle_elf): Don't remove SHF_GROUP flag from sections.
+	Skip group section flag when renumbering section indexes.
+	* unstrip.c (struct section): Add sig field.
+	(compare_unalloc_sections): Take and use sig1 and sig2 as arguments.
+	(compare_sections): Pass signatures to compare_unalloc_sections.
+	(get_group_sig): New function.
+	(find_alloc_sections_prelink): Set signature.
+	(copy_elided_sections): Likewise and pass them on.
+	(find_unalloc_section): Take and pass signatures.
+
 2018-10-02  Andreas Schwab  <schwab@suse.de>
 
 	* strip.c (handle_elf): Handle ADD/SUB relocation.

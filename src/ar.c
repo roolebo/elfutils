@@ -539,8 +539,14 @@ do_oper_extract (int oper, const char *arfname, char **argv, int argc,
 	      else if (oper == oper_list)
 		{
 		  char datestr[100];
-		  strftime (datestr, sizeof (datestr), "%b %e %H:%M %Y",
-			    localtime (&arhdr->ar_date));
+		  struct tm *tp = localtime (&arhdr->ar_date);
+		  if (tp == NULL)
+		    {
+		      time_t time = 0;
+		      tp = localtime (&time);
+		    }
+
+		  strftime (datestr, sizeof (datestr), "%b %e %H:%M %Y", tp);
 
 		  printf ("%c%c%c%c%c%c%c%c%c %u/%u %6ju %s %s\n",
 			  (arhdr->ar_mode & S_IRUSR) ? 'r' : '-',

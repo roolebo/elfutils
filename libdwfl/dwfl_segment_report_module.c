@@ -1,5 +1,5 @@
 /* Sniff out modules from ELF headers visible in memory segments.
-   Copyright (C) 2008-2012, 2014, 2015 Red Hat, Inc.
+   Copyright (C) 2008-2012, 2014, 2015, 2018 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -301,7 +301,10 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
   inline bool read_portion (void **data, size_t *data_size,
 			    GElf_Addr vaddr, size_t filesz)
   {
-    if (vaddr - start + filesz > buffer_available
+    /* Check whether we will have to read the segment data, or if it
+       can be returned from the existing buffer.  */
+    if (filesz > buffer_available
+	|| vaddr - start > buffer_available - filesz
 	/* If we're in string mode, then don't consider the buffer we have
 	   sufficient unless it contains the terminator of the string.  */
 	|| (filesz == 0 && memchr (vaddr - start + buffer, '\0',
@@ -458,6 +461,12 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
     size_t data_size;
     if (read_portion (&data, &data_size, vaddr, filesz))
       return;
+
+    /* data_size will be zero if we got everything from the initial
+       buffer, otherwise it will be the size of the new buffer that
+       could be read.  */
+    if (data_size != 0)
+      filesz = data_size;
 
     assert (sizeof (Elf32_Nhdr) == sizeof (Elf64_Nhdr));
 

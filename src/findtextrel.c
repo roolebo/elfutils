@@ -1,5 +1,5 @@
 /* Locate source files or functions which caused text relocations.
-   Copyright (C) 2005-2010, 2012, 2014 Red Hat, Inc.
+   Copyright (C) 2005-2010, 2012, 2014, 2018 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2005.
 
@@ -263,9 +263,10 @@ process_file (const char *fname, bool more_than_one)
 	      seen_dynamic = true;
 
 	      Elf_Data *data = elf_getdata (scn, NULL);
+	      size_t entries = (shdr->sh_entsize == 0
+				? 0 : shdr->sh_size / shdr->sh_entsize);
 
-	      for (size_t cnt = 0; cnt < shdr->sh_size / shdr->sh_entsize;
-		   ++cnt)
+	      for (size_t cnt = 0; cnt < entries; ++cnt)
 		{
 		  GElf_Dyn dynmem;
 		  GElf_Dyn *dyn;
@@ -413,10 +414,11 @@ cannot get symbol table section %zu in '%s': %s"),
 	  if (shdr->sh_type == SHT_REL)
 	    {
 	      Elf_Data *data = elf_getdata (scn, NULL);
+	      size_t entries = (shdr->sh_entsize == 0
+				? 0 : shdr->sh_size / shdr->sh_entsize);
 
 	      for (int cnt = 0;
-		   (size_t) cnt < shdr->sh_size / shdr->sh_entsize;
-		   ++cnt)
+		   (size_t) cnt < entries; ++cnt)
 		{
 		  GElf_Rel rel_mem;
 		  GElf_Rel *rel = gelf_getrel (data, cnt, &rel_mem);
@@ -436,10 +438,10 @@ cannot get relocation at index %d in section %zu in '%s': %s"),
 	  else if (shdr->sh_type == SHT_RELA)
 	    {
 	      Elf_Data *data = elf_getdata (scn, NULL);
+	      size_t entries = (shdr->sh_entsize == 0
+				? 0 : shdr->sh_size / shdr->sh_entsize);
 
-	      for (int cnt = 0;
-		   (size_t) cnt < shdr->sh_size / shdr->sh_entsize;
-		   ++cnt)
+	      for (int cnt = 0; (size_t) cnt < entries; ++cnt)
 		{
 		  GElf_Rela rela_mem;
 		  GElf_Rela *rela = gelf_getrela (data, cnt, &rela_mem);
@@ -531,9 +533,10 @@ check_rel (size_t nsegments, struct segments segments[nsegments],
 		int highidx = -1;
 		GElf_Sym sym_mem;
 		GElf_Sym *sym;
+		size_t entries = (shdr->sh_entsize == 0
+				  ? 0 : shdr->sh_size / shdr->sh_entsize);
 
-		for (int i = 0; (size_t) i < shdr->sh_size / shdr->sh_entsize;
-		     ++i)
+		for (int i = 0; (size_t) i < entries; ++i)
 		  {
 		    sym = gelf_getsym (symdata, i, &sym_mem);
 		    if (sym == NULL)

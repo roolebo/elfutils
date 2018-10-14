@@ -1,3 +1,7 @@
+2018-10-14  Mark Wielaard  <mark@klomp.org>
+
+	* findtextrel.c (process_file): Check that sh_entsize is not zero.
+
 2018-09-13  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_debug_macro_section): Use elf_getdata. Print

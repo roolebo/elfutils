@@ -27,7 +27,7 @@
    not, see <http://www.gnu.org/licenses/>.  */
 
 #include <config.h>
-#include "../libelf/libelfP.h"	/* For NOTE_ALIGN.  */
+#include "../libelf/libelfP.h"	/* For NOTE_ALIGN4 and NOTE_ALIGN8.  */
 #undef	_
 #include "libdwflP.h"
 #include "common.h"
@@ -451,7 +451,8 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
   GElf_Addr build_id_vaddr = 0;
 
   /* Consider a PT_NOTE we've found in the image.  */
-  inline void consider_notes (GElf_Addr vaddr, GElf_Xword filesz)
+  inline void consider_notes (GElf_Addr vaddr, GElf_Xword filesz,
+			      GElf_Xword align)
   {
     /* If we have already seen a build ID, we don't care any more.  */
     if (build_id != NULL || filesz == 0)
@@ -478,7 +479,8 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 	notes = malloc (filesz);
 	if (unlikely (notes == NULL))
 	  return;
-	xlatefrom.d_type = xlateto.d_type = ELF_T_NHDR;
+	xlatefrom.d_type = xlateto.d_type = (align == 8
+					     ? ELF_T_NHDR8 : ELF_T_NHDR);
 	xlatefrom.d_buf = (void *) data;
 	xlatefrom.d_size = filesz;
 	xlateto.d_buf = notes;
@@ -489,15 +491,23 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
       }
 
     const GElf_Nhdr *nh = notes;
-    while ((const void *) nh < (const void *) notes + filesz)
-     {
-	const void *note_name = nh + 1;
-	const void *note_desc = note_name + NOTE_ALIGN (nh->n_namesz);
-	if (unlikely ((size_t) ((const void *) notes + filesz
-				- note_desc) < nh->n_descsz))
+    size_t len = 0;
+    while (filesz > len + sizeof (*nh))
+      {
+	const void *note_name;
+	const void *note_desc;
+
+	len += sizeof (*nh);
+	note_name = notes + len;
+
+	len += nh->n_namesz;
+	len = align == 8 ? NOTE_ALIGN8 (len) : NOTE_ALIGN4 (len);
+	note_desc = notes + len;
+
+	if (unlikely (filesz < len + nh->n_descsz))
 	  break;
 
-	if (nh->n_type == NT_GNU_BUILD_ID
+        if (nh->n_type == NT_GNU_BUILD_ID
 	    && nh->n_descsz > 0
 	    && nh->n_namesz == sizeof "GNU"
 	    && !memcmp (note_name, "GNU", sizeof "GNU"))
@@ -510,7 +520,9 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 	    break;
 	  }
 
-	nh = note_desc + NOTE_ALIGN (nh->n_descsz);
+	len += nh->n_descsz;
+	len = align == 8 ? NOTE_ALIGN8 (len) : NOTE_ALIGN4 (len);
+	nh = (void *) notes + len;
       }
 
   done:
@@ -535,7 +547,7 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
       case PT_NOTE:
 	/* We calculate from the p_offset of the note segment,
 	   because we don't yet know the bias for its p_vaddr.  */
-	consider_notes (start + offset, filesz);
+	consider_notes (start + offset, filesz, align);
 	break;
 
       case PT_LOAD:

@@ -39,6 +39,7 @@
 #include <config.h>
 #include <system.h>
 
+#include "libelfP.h"
 #include "libdwflP.h"
 #include <inttypes.h>
 #include <errno.h>
@@ -554,15 +555,41 @@ check_notes (Dwfl_Module *mod, const char *notesfile,
     return 1;
 
   unsigned char *p = buf.data;
+  size_t len = 0;
   while (p < &buf.data[n])
     {
       /* No translation required since we are reading the native kernel.  */
       GElf_Nhdr *nhdr = (void *) p;
-      p += sizeof *nhdr;
+      len += sizeof *nhdr;
+      p += len;
       unsigned char *name = p;
-      p += (nhdr->n_namesz + 3) & -4U;
-      unsigned char *bits = p;
-      p += (nhdr->n_descsz + 3) & -4U;
+      unsigned char *bits;
+      /* This is somewhat ugly, GNU Property notes use different padding,
+	 but all we have is the file content, so we have to actually check
+	 the name and type.  */
+      if (nhdr->n_type == NT_GNU_PROPERTY_TYPE_0
+          && nhdr->n_namesz == sizeof "GNU"
+          && name + nhdr->n_namesz < &buf.data[n]
+          && !memcmp (name, "GNU", sizeof "GNU"))
+	{
+	  len += nhdr->n_namesz;
+	  len = NOTE_ALIGN8 (len);
+	  p = buf.data + len;
+	  bits = p;
+	  len += nhdr->n_descsz;
+	  len = NOTE_ALIGN8 (len);
+	  p = buf.data + len;
+	}
+      else
+	{
+	  len += nhdr->n_namesz;
+	  len = NOTE_ALIGN4 (len);
+	  p = buf.data + len;
+	  bits = p;
+	  len += nhdr->n_descsz;
+	  len = NOTE_ALIGN4 (len);
+	  p = buf.data + len;
+	}
 
       if (p <= &buf.data[n]
 	  && nhdr->n_type == NT_GNU_BUILD_ID

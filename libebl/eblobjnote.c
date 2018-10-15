@@ -1,5 +1,5 @@
 /* Print contents of object file note.
-   Copyright (C) 2002, 2007, 2009, 2011, 2015, 2016 Red Hat, Inc.
+   Copyright (C) 2002, 2007, 2009, 2011, 2015, 2016, 2018 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -36,6 +36,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <libeblP.h>
+
+#include "libelfP.h"
 
 
 void
@@ -151,6 +153,187 @@ ebl_object_note (Ebl *ebl, const char *name, uint32_t type,
 	    /* A non-null terminated version string.  */
 	    printf (gettext ("    Linker version: %.*s\n"),
 		    (int) descsz, desc);
+	  break;
+
+	case NT_GNU_PROPERTY_TYPE_0:
+	  if (strcmp (name, "GNU") == 0 && descsz > 0)
+	    {
+	      /* There are at least 2 words. type and datasz.  */
+	      while (descsz >= 8)
+		{
+		  struct pr_prop
+		  {
+		    GElf_Word pr_type;
+		    GElf_Word pr_datasz;
+		  } prop;
+
+		  Elf_Data in =
+		    {
+		      .d_version = EV_CURRENT,
+		      .d_type = ELF_T_WORD,
+		      .d_size = 8,
+		      .d_buf = (void *) desc
+		    };
+		  Elf_Data out =
+		    {
+		      .d_version = EV_CURRENT,
+		      .d_type = ELF_T_WORD,
+		      .d_size = descsz,
+		      .d_buf = (void *) &prop
+		    };
+
+		  if (gelf_xlatetom (ebl->elf, &out, &in,
+				     elf_getident (ebl->elf,
+						   NULL)[EI_DATA]) == NULL)
+		    {
+		      printf ("%s\n", elf_errmsg (-1));
+		      return;
+		    }
+
+		  desc += 8;
+		  descsz -= 8;
+
+		  int elfclass = gelf_getclass (ebl->elf);
+		  char *elfident = elf_getident (ebl->elf, NULL);
+		  GElf_Ehdr ehdr;
+		  gelf_getehdr (ebl->elf, &ehdr);
+
+		  /* Prefix.  */
+		  printf ("    ");
+		  if (prop.pr_type == GNU_PROPERTY_STACK_SIZE)
+		    {
+		      printf ("STACK_SIZE ");
+		      if (prop.pr_datasz == 4 || prop.pr_datasz == 8)
+			{
+			  GElf_Addr addr;
+			  in.d_type = ELF_T_ADDR;
+			  out.d_type = ELF_T_ADDR;
+			  in.d_size = prop.pr_datasz;
+			  out.d_size = sizeof (addr);
+			  in.d_buf = (void *) desc;
+			  out.d_buf = (void *) &addr;
+
+			  if (gelf_xlatetom (ebl->elf, &out, &in,
+					     elfident[EI_DATA]) == NULL)
+			    {
+			      printf ("%s\n", elf_errmsg (-1));
+			      return;
+			    }
+			  printf ("%#" PRIx64 "\n", addr);
+			}
+		      else
+			printf (" (garbage datasz: %" PRIx32 ")\n",
+				prop.pr_datasz);
+		    }
+		  else if (prop.pr_type == GNU_PROPERTY_NO_COPY_ON_PROTECTED)
+		    {
+		      printf ("NO_COPY_ON_PROTECTION");
+		      if (prop.pr_datasz == 0)
+			printf ("\n");
+		      else
+			printf (" (garbage datasz: %" PRIx32 ")\n",
+				prop.pr_datasz);
+		    }
+		  else if (prop.pr_type >= GNU_PROPERTY_LOPROC
+		      && prop.pr_type <= GNU_PROPERTY_HIPROC
+		      && (ehdr.e_machine == EM_386
+			  || ehdr.e_machine == EM_X86_64))
+		    {
+		      printf ("X86 ");
+		      if (prop.pr_type == GNU_PROPERTY_X86_FEATURE_1_AND)
+			{
+			  printf ("FEATURE_1_AND: ");
+
+			  if (prop.pr_datasz == 4)
+			    {
+			      GElf_Word data;
+			      in.d_type = ELF_T_WORD;
+			      out.d_type = ELF_T_WORD;
+			      in.d_size = 4;
+			      out.d_size = 4;
+			      in.d_buf = (void *) desc;
+			      out.d_buf = (void *) &data;
+
+			      if (gelf_xlatetom (ebl->elf, &out, &in,
+						 elfident[EI_DATA]) == NULL)
+				{
+				  printf ("%s\n", elf_errmsg (-1));
+				  return;
+				}
+			      printf ("%08" PRIx32 " ", data);
+
+			      if ((data & GNU_PROPERTY_X86_FEATURE_1_IBT)
+				  != 0)
+				{
+				  printf ("IBT");
+				  data &= ~GNU_PROPERTY_X86_FEATURE_1_IBT;
+				  if (data != 0)
+				    printf (" ");
+				}
+
+			      if ((data & GNU_PROPERTY_X86_FEATURE_1_SHSTK)
+				  != 0)
+				{
+				  printf ("SHSTK");
+				  data &= ~GNU_PROPERTY_X86_FEATURE_1_SHSTK;
+				  if (data != 0)
+				    printf (" ");
+				}
+
+			      if (data != 0)
+				printf ("UNKNOWN");
+			    }
+			  else
+			    printf ("<bad datasz: %" PRId32 ">",
+				    prop.pr_datasz);
+
+			  printf ("\n");
+			}
+		      else
+			{
+			  printf ("%#" PRIx32, prop.pr_type);
+			  if (prop.pr_datasz > 0)
+			    {
+			      printf (" data: ");
+			      size_t i;
+			      for (i = 0; i < prop.pr_datasz - 1; i++)
+				printf ("%02" PRIx8 " ", (uint8_t) desc[i]);
+			      printf ("%02" PRIx8 "\n", (uint8_t) desc[i]);
+			    }
+			}
+		    }
+		  else
+		    {
+		      if (prop.pr_type >= GNU_PROPERTY_LOPROC
+			  && prop.pr_type <= GNU_PROPERTY_HIPROC)
+			printf ("proc_type %#" PRIx32, prop.pr_type);
+		      else if (prop.pr_type >= GNU_PROPERTY_LOUSER
+			  && prop.pr_type <= GNU_PROPERTY_HIUSER)
+			printf ("app_type %#" PRIx32, prop.pr_type);
+		      else
+			printf ("unknown_type %#" PRIx32, prop.pr_type);
+
+		      if (prop.pr_datasz > 0)
+			{
+			  printf (" data: ");
+			  size_t i;
+			  for (i = 0; i < prop.pr_datasz - 1; i++)
+			    printf ("%02" PRIx8 " ", (uint8_t) desc[i]);
+			  printf ("%02" PRIx8 "\n", (uint8_t) desc[i]);
+			}
+		    }
+		  if (elfclass == ELFCLASS32)
+		    {
+		      desc += NOTE_ALIGN4 (prop.pr_datasz);
+		      descsz -= NOTE_ALIGN4 (prop.pr_datasz);
+		    }
+		  else
+		    {
+		      desc += NOTE_ALIGN8 (prop.pr_datasz);
+		      descsz -= NOTE_ALIGN8 (prop.pr_datasz);
+		    }
+		}
+	    }
 	  break;
 
 	case NT_GNU_ABI_TAG:

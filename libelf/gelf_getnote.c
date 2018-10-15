@@ -1,5 +1,5 @@
 /* Get note information at the supplied offset.
-   Copyright (C) 2007, 2014, 2015 Red Hat, Inc.
+   Copyright (C) 2007, 2014, 2015, 2018 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -43,7 +43,7 @@ gelf_getnote (Elf_Data *data, size_t offset, GElf_Nhdr *result,
   if (data == NULL)
     return 0;
 
-  if (unlikely (data->d_type != ELF_T_NHDR))
+  if (unlikely (data->d_type != ELF_T_NHDR && data->d_type != ELF_T_NHDR8))
     {
       __libelf_seterrno (ELF_E_INVALID_HANDLE);
       return 0;
@@ -69,27 +69,42 @@ gelf_getnote (Elf_Data *data, size_t offset, GElf_Nhdr *result,
       const GElf_Nhdr *n = data->d_buf + offset;
       offset += sizeof *n;
 
-      /* Include padding.  Check below for overflow.  */
-      GElf_Word namesz = NOTE_ALIGN (n->n_namesz);
-      GElf_Word descsz = NOTE_ALIGN (n->n_descsz);
-
-      if (unlikely (offset > data->d_size
-		    || data->d_size - offset < namesz
-		    || (namesz == 0 && n->n_namesz != 0)))
+      if (offset > data->d_size)
 	offset = 0;
       else
 	{
+	  /* This is slightly tricky, offset is guaranteed to be 4
+	     byte aligned, which is what we need for the name_offset.
+	     And normally desc_offset is also 4 byte aligned, but not
+	     for GNU Property notes, then it should be 8.  So align
+	     the offset, after adding the namesz, and include padding
+	     in descsz to get to the end.  */
 	  *name_offset = offset;
-	  offset += namesz;
-	  if (unlikely (offset > data->d_size
-			|| data->d_size - offset < descsz
-			|| (descsz == 0 && n->n_descsz != 0)))
+	  offset += n->n_namesz;
+	  if (offset > data->d_size)
 	    offset = 0;
 	  else
 	    {
-	      *desc_offset = offset;
-	      offset += descsz;
-	      *result = *n;
+	      /* Include padding.  Check below for overflow.  */
+	      GElf_Word descsz = (data->d_type == ELF_T_NHDR8
+				  ? NOTE_ALIGN8 (n->n_descsz)
+				  : NOTE_ALIGN4 (n->n_descsz));
+
+	      if (data->d_type == ELF_T_NHDR8)
+		offset = NOTE_ALIGN8 (offset);
+	      else
+		offset = NOTE_ALIGN4 (offset);
+
+	      if (unlikely (offset > data->d_size
+			    || data->d_size - offset < descsz
+			    || (descsz == 0 && n->n_descsz != 0)))
+		offset = 0;
+	      else
+		{
+		  *desc_offset = offset;
+		  offset += descsz;
+		  *result = *n;
+		}
 	    }
 	}
     }

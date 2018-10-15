@@ -12300,7 +12300,8 @@ handle_notes (Ebl *ebl, GElf_Ehdr *ehdr)
       handle_notes_data (ebl, ehdr, phdr->p_offset,
 			 elf_getdata_rawchunk (ebl->elf,
 					       phdr->p_offset, phdr->p_filesz,
-					       ELF_T_NHDR));
+					       (phdr->p_align == 8
+						? ELF_T_NHDR8 : ELF_T_NHDR)));
     }
 }
 

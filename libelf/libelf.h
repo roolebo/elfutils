@@ -117,6 +117,8 @@ typedef enum
   ELF_T_GNUHASH,		/* GNU-style hash section.  */
   ELF_T_AUXV,			/* Elf32_auxv_t, Elf64_auxv_t, ... */
   ELF_T_CHDR,			/* Compressed, Elf32_Chdr, Elf64_Chdr, ... */
+  ELF_T_NHDR8,			/* Special GNU Properties note.  Same as Nhdr,
+				   except padding.  */
   /* Keep this the last entry.  */
   ELF_T_NUM
 } Elf_Type;

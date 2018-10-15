@@ -91,6 +91,7 @@ ebl_object_note_type_name (Ebl *ebl, const char *name, uint32_t type,
 	  KNOWNSTYPE (GNU_HWCAP),
 	  KNOWNSTYPE (GNU_BUILD_ID),
 	  KNOWNSTYPE (GNU_GOLD_VERSION),
+	  KNOWNSTYPE (GNU_PROPERTY_TYPE_0),
 	};
 
       /* Handle standard names.  */

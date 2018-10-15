@@ -65,7 +65,7 @@ static const Elf_Type shtype_map[EV_NUM - 1][TYPEIDX (SHT_HISUNW) + 1] =
       [SHT_PREINIT_ARRAY] = ELF_T_ADDR,
       [SHT_GROUP] = ELF_T_WORD,
       [SHT_SYMTAB_SHNDX] = ELF_T_WORD,
-      [SHT_NOTE] = ELF_T_NHDR,
+      [SHT_NOTE] = ELF_T_NHDR, /* Need alignment to guess ELF_T_NHDR8.  */
       [TYPEIDX (SHT_GNU_verdef)] = ELF_T_VDEF,
       [TYPEIDX (SHT_GNU_verneed)] = ELF_T_VNEED,
       [TYPEIDX (SHT_GNU_versym)] = ELF_T_HALF,
@@ -106,6 +106,7 @@ const uint_fast8_t __libelf_type_aligns[EV_NUM - 1][ELFCLASSNUM - 1][ELF_T_NUM] 
       [ELF_T_GNUHASH] = __alignof__ (Elf32_Word),			      \
       [ELF_T_AUXV] = __alignof__ (ElfW2(Bits,auxv_t)),			      \
       [ELF_T_CHDR] = __alignof__ (ElfW2(Bits,Chdr)),			      \
+      [ELF_T_NHDR8] = 8 /* Special case for GNU Property note.  */	      \
     }
     [EV_CURRENT - 1] =
     {
@@ -118,7 +119,7 @@ const uint_fast8_t __libelf_type_aligns[EV_NUM - 1][ELFCLASSNUM - 1][ELF_T_NUM] 
 
 Elf_Type
 internal_function
-__libelf_data_type (Elf *elf, int sh_type)
+__libelf_data_type (Elf *elf, int sh_type, GElf_Xword align)
 {
   /* Some broken ELF ABI for 64-bit machines use the wrong hash table
      entry size.  See elf-knowledge.h for more information.  */
@@ -129,7 +130,13 @@ __libelf_data_type (Elf *elf, int sh_type)
       return (SH_ENTSIZE_HASH (ehdr) == 4 ? ELF_T_WORD : ELF_T_XWORD);
     }
   else
-    return shtype_map[LIBELF_EV_IDX][TYPEIDX (sh_type)];
+    {
+      Elf_Type t = shtype_map[LIBELF_EV_IDX][TYPEIDX (sh_type)];
+      /* Special case for GNU Property notes.  */
+      if (t == ELF_T_NHDR && align == 8)
+	t = ELF_T_NHDR8;
+      return t;
+    }
 }
 
 /* Convert the data in the current section.  */
@@ -272,7 +279,9 @@ __libelf_set_rawdata_wrlock (Elf_Scn *scn)
       else
 	{
 	  Elf_Type t = shtype_map[LIBELF_EV_IDX][TYPEIDX (type)];
-	  if (t == ELF_T_VDEF || t == ELF_T_NHDR
+	  if (t == ELF_T_NHDR && align == 8)
+	    t = ELF_T_NHDR8;
+	  if (t == ELF_T_VDEF || t == ELF_T_NHDR || t == ELF_T_NHDR8
 	      || (t == ELF_T_GNUHASH && elf->class == ELFCLASS64))
 	    entsize = 1;
 	  else
@@ -357,7 +366,7 @@ __libelf_set_rawdata_wrlock (Elf_Scn *scn)
   if ((flags & SHF_COMPRESSED) != 0)
     scn->rawdata.d.d_type = ELF_T_CHDR;
   else
-    scn->rawdata.d.d_type = __libelf_data_type (elf, type);
+    scn->rawdata.d.d_type = __libelf_data_type (elf, type, align);
   scn->rawdata.d.d_off = 0;
 
   /* Make sure the alignment makes sense.  d_align should be aligned both

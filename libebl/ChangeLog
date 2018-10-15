@@ -1,3 +1,9 @@
+2018-10-18  Mark Wielaard  <mark@klomp.org>
+
+	* eblobjnote.c (ebl_object_note): Handle NT_GNU_PROPERTY_TYPE_0.
+	* eblobjnotetypename.c (ebl_object_note_type_name): Add
+	GNU_PROPERTY_TYPE_0.
+
 2018-10-02  Andreas Schwab  <schwab@suse.de>
 
 	* ebl-hooks.h (EBLHOOK(reloc_simple_type)): Add third parameter.

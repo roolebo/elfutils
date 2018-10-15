@@ -355,7 +355,9 @@ dwfl_core_file_attach (Dwfl *dwfl, Elf *core)
       if (phdr != NULL && phdr->p_type == PT_NOTE)
 	{
 	  note_data = elf_getdata_rawchunk (core, phdr->p_offset,
-					    phdr->p_filesz, ELF_T_NHDR);
+					    phdr->p_filesz, (phdr->p_align == 8
+							     ? ELF_T_NHDR8
+							     : ELF_T_NHDR));
 	  break;
 	}
     }

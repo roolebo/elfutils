@@ -60,7 +60,7 @@ elfw2(LIBELFBITS, xlatetom) (Elf_Data *dest, const Elf_Data *src,
   /* We shouldn't require integer number of records when processing
      notes.  Payload bytes follow the header immediately, it's not an
      array of records as is the case otherwise.  */
-  if (src->d_type != ELF_T_NHDR
+  if (src->d_type != ELF_T_NHDR && src->d_type != ELF_T_NHDR8
       && src->d_size % recsize != 0)
     {
       __libelf_seterrno (ELF_E_INVALID_DATA);

@@ -1,3 +1,12 @@
+2018-10-18  Mark Wielaard  <mark@klomp.org>
+
+	* run-readelf-n.sh: New test.
+	* testfile-gnu-property-note.bz2: New testfile.
+	* testfile-gnu-property-note.o.bz2: Likewise.
+	* Makefile.am (TESTS): Add run-readelf-n.sh.
+	(EXTRA_DIST): Likewise and testfile-gnu-property-note.bz2,
+	testfile-gnu-property-note.o.bz2.
+
 2018-10-12  Mark Wielaard  <mark@klomp.org>
 
 	* run-readelf-zdebug.sh: Adjust flags output.

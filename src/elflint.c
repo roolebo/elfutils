@@ -4331,6 +4331,7 @@ section [%2d] '%s': unknown core file note type %" PRIu32
 	  case NT_GNU_HWCAP:
 	  case NT_GNU_BUILD_ID:
 	  case NT_GNU_GOLD_VERSION:
+	  case NT_GNU_PROPERTY_TYPE_0:
 	    break;
 
 	  case 0:
@@ -4376,7 +4377,8 @@ phdr[%d]: no note entries defined for the type of file\n"),
   GElf_Off notes_size = 0;
   Elf_Data *data = elf_getdata_rawchunk (ebl->elf,
 					 phdr->p_offset, phdr->p_filesz,
-					 ELF_T_NHDR);
+					 (phdr->p_align == 8
+					  ? ELF_T_NHDR8 : ELF_T_NHDR));
   if (data != NULL && data->d_buf != NULL)
     notes_size = check_note_data (ebl, ehdr, data, 0, cnt, phdr->p_offset);
 

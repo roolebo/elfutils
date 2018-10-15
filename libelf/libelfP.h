@@ -452,7 +452,8 @@ extern const uint_fast8_t __libelf_type_aligns[EV_NUM - 1][ELFCLASSNUM - 1][ELF_
 /* Given an Elf handle and a section type returns the Elf_Data d_type.
    Should not be called when SHF_COMPRESSED is set, the d_type should
    be ELF_T_BYTE.  */
-extern Elf_Type __libelf_data_type (Elf *elf, int sh_type) internal_function;
+extern Elf_Type __libelf_data_type (Elf *elf, int sh_type, GElf_Xword align)
+  internal_function;
 
 /* The libelf API does not have such a function but it is still useful.
    Get the memory size for the given type.
@@ -624,8 +625,13 @@ extern void __libelf_reset_rawdata (Elf_Scn *scn, void *buf, size_t size,
       }									      \
   } while (0)
 
-/* Align offset to 4 bytes as needed for note name and descriptor data.  */
-#define NOTE_ALIGN(n)	(((n) + 3) & -4U)
+/* Align offset to 4 bytes as needed for note name and descriptor data.
+   This is almost always used, except for GNU Property notes, which use
+   8 byte padding...  */
+#define NOTE_ALIGN4(n)	(((n) + 3) & -4U)
+
+/* Special note padding rule for GNU Property notes.  */
+#define NOTE_ALIGN8(n)	(((n) + 7) & -8U)
 
 /* Convenience macro.  */
 #define INVALID_NDX(ndx, type, data) \

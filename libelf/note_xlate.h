@@ -1,5 +1,5 @@
 /* Conversion functions for notes.
-   Copyright (C) 2007, 2009, 2014 Red Hat, Inc.
+   Copyright (C) 2007, 2009, 2014, 2018 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -27,38 +27,60 @@
    not, see <http://www.gnu.org/licenses/>.  */
 
 static void
-elf_cvt_note (void *dest, const void *src, size_t len, int encode)
+elf_cvt_note (void *dest, const void *src, size_t len, int encode,
+	      bool nhdr8)
 {
+  /* Note that the header is always the same size, but the padding
+     differs for GNU Property notes.  */
   assert (sizeof (Elf32_Nhdr) == sizeof (Elf64_Nhdr));
 
   while (len >= sizeof (Elf32_Nhdr))
     {
+      /* Convert the header.  */
       (1 ? Elf32_cvt_Nhdr : Elf64_cvt_Nhdr) (dest, src, sizeof (Elf32_Nhdr),
 					     encode);
       const Elf32_Nhdr *n = encode ? src : dest;
-      Elf32_Word namesz = NOTE_ALIGN (n->n_namesz);
-      Elf32_Word descsz = NOTE_ALIGN (n->n_descsz);
 
-      len -= sizeof *n;
+      size_t note_len = sizeof *n;
+
+      /* desc needs to be aligned.  */
+      note_len += n->n_namesz;
+      note_len = nhdr8 ? NOTE_ALIGN8 (note_len) : NOTE_ALIGN4 (note_len);
+      if (note_len > len || note_len < 8)
+	break;
+
+      /* data as a whole needs to be aligned.  */
+      note_len += n->n_descsz;
+      note_len = nhdr8 ? NOTE_ALIGN8 (note_len) : NOTE_ALIGN4 (note_len);
+      if (note_len > len || note_len < 8)
+	break;
+
+      /* Copy or skip the note data.  */
+      size_t note_data_len = note_len - sizeof *n;
       src += sizeof *n;
       dest += sizeof *n;
-
-      if (namesz > len)
-	break;
-      len -= namesz;
-      if (descsz > len)
-	break;
-      len -= descsz;
-
       if (src != dest)
-	memcpy (dest, src, namesz + descsz);
+	memcpy (dest, src, note_data_len);
 
-      src += namesz + descsz;
-      dest += namesz + descsz;
+      src += note_data_len;
+      dest += note_data_len;
+      len -= note_len;
     }
 
-    /* Copy opver any leftover data unconcerted.  Probably part of
+    /* Copy over any leftover data unconverted.  Probably part of
        truncated name/desc data.  */
     if (unlikely (len > 0) && src != dest)
       memcpy (dest, src, len);
+}
+
+static void
+elf_cvt_note4 (void *dest, const void *src, size_t len, int encode)
+{
+  elf_cvt_note (dest, src, len, encode, false);
+}
+
+static void
+elf_cvt_note8 (void *dest, const void *src, size_t len, int encode)
+{
+  elf_cvt_note (dest, src, len, encode, true);
 }

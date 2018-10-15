@@ -88,7 +88,9 @@ find_elf_build_id (Dwfl_Module *mod, int e_type, Elf *elf,
 	    result = check_notes (elf_getdata_rawchunk (elf,
 							phdr->p_offset,
 							phdr->p_filesz,
-							ELF_T_NHDR),
+							(phdr->p_align == 8
+							 ? ELF_T_NHDR8
+							 : ELF_T_NHDR)),
 				  phdr->p_vaddr,
 				  build_id_bits,
 				  build_id_elfaddr,

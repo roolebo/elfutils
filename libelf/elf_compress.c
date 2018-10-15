@@ -513,7 +513,8 @@ elf_compress (Elf_Scn *scn, int type, unsigned int flags)
 
       __libelf_reset_rawdata (scn, scn->zdata_base,
 			      scn->zdata_size, scn->zdata_align,
-			      __libelf_data_type (elf, sh_type));
+			      __libelf_data_type (elf, sh_type,
+						  scn->zdata_align));
 
       return 1;
     }

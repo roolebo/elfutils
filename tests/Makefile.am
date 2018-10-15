@@ -106,6 +106,7 @@ TESTS = run-arextract.sh run-arsymtest.sh run-ar.sh newfile test-nlist \
 	run-readelf-test4.sh run-readelf-twofiles.sh \
 	run-readelf-macro.sh run-readelf-loc.sh run-readelf-ranges.sh \
 	run-readelf-aranges.sh run-readelf-line.sh run-readelf-z.sh \
+	run-readelf-n.sh \
 	run-native-test.sh run-bug1-test.sh \
 	run-debuglink.sh run-debugaltlink.sh run-buildid.sh \
 	dwfl-bug-addr-overflow run-addrname-test.sh \
@@ -272,6 +273,8 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     testfile-dwzstr.bz2 testfile-dwzstr.multi.bz2 \
 	     run-readelf-addr.sh run-readelf-str.sh \
 	     run-readelf-types.sh \
+	     run-readelf-n.sh \
+	     testfile-gnu-property-note.bz2 testfile-gnu-property-note.o.bz2 \
 	     run-allfcts-multi.sh \
 	     test-offset-loop.bz2 test-offset-loop.alt.bz2 \
 	     run-prelink-addr-test.sh \

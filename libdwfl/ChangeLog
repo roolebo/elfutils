@@ -1,3 +1,13 @@
+2018-10-18  Mark Wielaard  <mark@klomp.org>
+
+	* dwfl_segment_report_module.c (consider_note): Take align as new
+	argument.  Use align to set d_type and calculate padding.
+	(dwfl_segment_report_module): Pass align to consider_notes.
+	* core-file.c (dwfl_core_file_report): Check p_align to set ELF
+	type.
+	* linux-kernel-modules.c (check_notes): Check name and type of note
+	to determine padding.
+
 2018-10-19  Mark Wielaard  <mark@klomp.org>
 
 	* dwfl_module_getdwarf.c (find_aux_sym): Check sh_entsize is not zero.

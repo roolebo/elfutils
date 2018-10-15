@@ -64,6 +64,8 @@ const size_t __libelf_type_sizes[EV_NUM - 1][ELFCLASSNUM - 1][ELF_T_NUM] =
       [ELF_T_VNEED]	= sizeof (ElfW2(LIBELFBITS, Ext_Verneed)),	      \
       [ELF_T_VNAUX]	= sizeof (ElfW2(LIBELFBITS, Ext_Vernaux)),	      \
       [ELF_T_NHDR]	= sizeof (ElfW2(LIBELFBITS, Ext_Nhdr)),		      \
+      /* Note the header size is the same, but padding is different.  */      \
+      [ELF_T_NHDR8]	= sizeof (ElfW2(LIBELFBITS, Ext_Nhdr)),		      \
       [ELF_T_SYMINFO]	= sizeof (ElfW2(LIBELFBITS, Ext_Syminfo)),	      \
       [ELF_T_MOVE]	= sizeof (ElfW2(LIBELFBITS, Ext_Move)),		      \
       [ELF_T_LIB]	= sizeof (ElfW2(LIBELFBITS, Ext_Lib)),		      \

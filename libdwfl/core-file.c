@@ -496,7 +496,9 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const char *executable)
       Elf_Data *notes = elf_getdata_rawchunk (elf,
 					      notes_phdr.p_offset,
 					      notes_phdr.p_filesz,
-					      ELF_T_NHDR);
+					      (notes_phdr.p_align == 8
+					       ? ELF_T_NHDR8
+					       : ELF_T_NHDR));
       if (likely (notes != NULL))
 	{
 	  size_t pos = 0;

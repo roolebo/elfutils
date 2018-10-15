@@ -1,3 +1,10 @@
+2018-10-18  Mark Wielaard  <mark@klomp.org>
+
+	* elflint.c (check_note_data): Recognize NT_GNU_PROPERTY_TYPE_0.
+	(check_note): Use p_align to pass either ELF_T_NHDR or ELF_T_NHDR8 to
+	elf_getdata_rawchunk.
+	* readelf (handle_notes): Likewise.
+
 2018-10-24  Mark Wielaard  <mark@klomp.org>
 
 	* addr2line.c (print_addrsym): Use elf_getshdrstrndx instead of

@@ -1,3 +1,8 @@
+2018-10-16  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (print_debug_frame_section): Make sure readp is never
+	greater than cieend.
+
 2018-10-19  Mark Wielaard  <mark@klomp.org>
 
 	* dwfl_module_getdwarf.c (adjust_relocs): Check sh_entsize is not

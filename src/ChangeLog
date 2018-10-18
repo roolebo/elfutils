@@ -1,5 +1,9 @@
 2018-10-18  Mark Wielaard  <mark@klomp.org>
 
+	* size.c (handle_ar): Only close elf if prefix was NULL.
+
+2018-10-18  Mark Wielaard  <mark@klomp.org>
+
 	* arlib.c (arlib_add_symbols): Check that sh_entsize is not zero.
 
 2018-10-14  Mark Wielaard  <mark@klomp.org>

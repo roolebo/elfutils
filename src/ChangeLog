@@ -1,3 +1,7 @@
+2018-10-18  Mark Wielaard  <mark@klomp.org>
+
+	* arlib.c (arlib_add_symbols): Check that sh_entsize is not zero.
+
 2018-10-14  Mark Wielaard  <mark@klomp.org>
 
 	* ar.c (do_oper_extract): Assume epoch if ar_date is bogus.

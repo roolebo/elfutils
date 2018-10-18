@@ -252,6 +252,9 @@ arlib_add_symbols (Elf *elf, const char *arfname, const char *membername,
       if (data == NULL)
 	continue;
 
+      if (shdr->sh_entsize == 0)
+	continue;
+
       int nsyms = shdr->sh_size / shdr->sh_entsize;
       for (int ndx = shdr->sh_info; ndx < nsyms; ++ndx)
 	{

@@ -1007,6 +1007,8 @@ find_aux_sym (Dwfl_Module *mod __attribute__ ((unused)),
 		    switch (shdr->sh_type)
 		      {
 		      case SHT_SYMTAB:
+			if (shdr->sh_entsize == 0)
+			  return;
 			minisymtab = true;
 			*aux_symscn = scn;
 			*aux_strshndx = shdr->sh_link;

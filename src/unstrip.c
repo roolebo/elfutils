@@ -446,6 +446,9 @@ adjust_relocs (Elf_Scn *outscn, Elf_Scn *inscn, const GElf_Shdr *shdr,
   switch (shdr->sh_type)
     {
     case SHT_REL:
+      if (shdr->sh_entsize == 0)
+	error (EXIT_FAILURE, 0, "REL section cannot have zero sh_entsize");
+
       for (size_t i = 0; i < shdr->sh_size / shdr->sh_entsize; ++i)
 	{
 	  GElf_Rel rel_mem;
@@ -457,6 +460,9 @@ adjust_relocs (Elf_Scn *outscn, Elf_Scn *inscn, const GElf_Shdr *shdr,
       break;
 
     case SHT_RELA:
+      if (shdr->sh_entsize == 0)
+	error (EXIT_FAILURE, 0, "RELA section cannot have zero sh_entsize");
+
       for (size_t i = 0; i < shdr->sh_size / shdr->sh_entsize; ++i)
 	{
 	  GElf_Rela rela_mem;
@@ -483,6 +489,10 @@ adjust_relocs (Elf_Scn *outscn, Elf_Scn *inscn, const GElf_Shdr *shdr,
     case SHT_HASH:
       /* We must expand the table and rejigger its contents.  */
       {
+	if (shdr->sh_entsize == 0)
+	  error (EXIT_FAILURE, 0, "HASH section cannot have zero sh_entsize");
+	if (symshdr->sh_entsize == 0)
+	  error (EXIT_FAILURE, 0, "Symbol table cannot have zero sh_entsize");
 	const size_t nsym = symshdr->sh_size / symshdr->sh_entsize;
 	const size_t onent = shdr->sh_size / shdr->sh_entsize;
 	assert (data->d_size == shdr->sh_size);
@@ -538,6 +548,11 @@ adjust_relocs (Elf_Scn *outscn, Elf_Scn *inscn, const GElf_Shdr *shdr,
     case SHT_GNU_versym:
       /* We must expand the table and move its elements around.  */
       {
+	if (shdr->sh_entsize == 0)
+	  error (EXIT_FAILURE, 0,
+		 "GNU_versym section cannot have zero sh_entsize");
+	if (symshdr->sh_entsize == 0)
+	  error (EXIT_FAILURE, 0, "Symbol table cannot have zero sh_entsize");
 	const size_t nent = symshdr->sh_size / symshdr->sh_entsize;
 	const size_t onent = shdr->sh_size / shdr->sh_entsize;
 	assert (nent >= onent);
@@ -603,6 +618,8 @@ add_new_section_symbols (Elf_Scn *old_symscn, size_t old_shnum,
   GElf_Shdr shdr_mem;
   GElf_Shdr *shdr = gelf_getshdr (symscn, &shdr_mem);
   ELF_CHECK (shdr != NULL, _("cannot get section header: %s"));
+  if (shdr->sh_entsize == 0)
+    error (EXIT_FAILURE, 0, "Symbol table section cannot have zero sh_entsize");
 
   const size_t nsym = shdr->sh_size / shdr->sh_entsize;
   size_t symndx_map[nsym - 1];
@@ -1671,6 +1688,9 @@ more sections in stripped file than debug file -- arguments reversed?"));
 
 	    Elf_Data *shndxdata = NULL;	/* XXX */
 
+	    if (shdr_mem.sh_entsize == 0)
+	      error (EXIT_FAILURE, 0,
+		     "SYMTAB section cannot have zero sh_entsize");
 	    for (size_t i = 1; i < shdr_mem.sh_size / shdr_mem.sh_entsize; ++i)
 	      {
 		GElf_Sym sym_mem;
@@ -1736,11 +1756,16 @@ more sections in stripped file than debug file -- arguments reversed?"));
       /* Merge the stripped file's symbol table into the unstripped one.  */
       const size_t stripped_nsym = (stripped_symtab == NULL ? 1
 				    : (stripped_symtab->shdr.sh_size
-				       / stripped_symtab->shdr.sh_entsize));
+				       / (stripped_symtab->shdr.sh_entsize == 0
+					  ? 1
+					  : stripped_symtab->shdr.sh_entsize)));
 
       GElf_Shdr shdr_mem;
       GElf_Shdr *shdr = gelf_getshdr (unstripped_symtab, &shdr_mem);
       ELF_CHECK (shdr != NULL, _("cannot get section header: %s"));
+      if (shdr->sh_entsize == 0)
+	error (EXIT_FAILURE, 0,
+	       "unstripped SYMTAB section cannot have zero sh_entsize");
       const size_t unstripped_nsym = shdr->sh_size / shdr->sh_entsize;
 
       /* First collect all the symbols from both tables.  */

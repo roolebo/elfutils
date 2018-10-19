@@ -1,3 +1,7 @@
+2018-10-19  Mark Wielaard  <mark@klomp.org>
+
+	* dwfl_module_getdwarf.c (find_aux_sym): Check sh_entsize is not zero.
+
 2018-10-14  Mark Wielaard  <mark@klomp.org>
 
 	* dwfl_segment_report_module.c (read_portion): Check requested

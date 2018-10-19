@@ -1,3 +1,10 @@
+2018-10-19  Mark Wielaard  <mark@klomp.org>
+
+	* dwfl_module_getdwarf.c (adjust_relocs): Check sh_entsize is not
+	zero.
+	(add_new_section_symbols): Likewise.
+	(copy_elided_sections): Likewise.
+
 2018-10-18  Mark Wielaard  <mark@klomp.org>
 
 	* size.c (handle_ar): Only close elf if prefix was NULL.

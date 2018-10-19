@@ -1,3 +1,7 @@
+2018-10-19  Mark Wielaard  <mark@klomp.org>
+
+	* disasm_cb.c (read_symtab_exec): Check sh_entsize is not zero.
+
 2018-07-04  Ross Burton <ross.burton@intel.com>
 
 	* asm_end.c: Remove error.h include.

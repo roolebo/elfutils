@@ -93,11 +93,11 @@ ppc_set_initial_registers_tid (pid_t tid __attribute__ ((unused)),
       if (errno != 0)
 	return false;
     }
-  const size_t gprs = sizeof (user_regs.r.gpr) / sizeof (*user_regs.r.gpr);
-  Dwarf_Word dwarf_regs[gprs];
-  for (unsigned gpr = 0; gpr < gprs; gpr++)
+#define GPRS (sizeof (user_regs.r.gpr) / sizeof (*user_regs.r.gpr))
+  Dwarf_Word dwarf_regs[GPRS];
+  for (unsigned gpr = 0; gpr < GPRS; gpr++)
     dwarf_regs[gpr] = user_regs.r.gpr[gpr];
-  if (! setfunc (0, gprs, dwarf_regs, arg))
+  if (! setfunc (0, GPRS, dwarf_regs, arg))
     return false;
   dwarf_regs[0] = user_regs.r.link;
   // LR uses both 65 and 108 numbers, there is no consistency for it.

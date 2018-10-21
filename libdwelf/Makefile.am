@@ -41,7 +41,7 @@ noinst_HEADERS = libdwelfP.h
 
 libdwelf_a_SOURCES = dwelf_elf_gnu_debuglink.c dwelf_dwarf_gnu_debugaltlink.c \
 		     dwelf_elf_gnu_build_id.c dwelf_scn_gnu_compressed_size.c \
-		     dwelf_strtab.c
+		     dwelf_strtab.c dwelf_elf_begin.c
 
 libdwelf = $(libdw)
 

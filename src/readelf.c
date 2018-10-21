@@ -905,7 +905,6 @@ process_elf_file (Dwfl_Module *dwflmod, int fd)
 
   if (ehdr == NULL)
     {
-    elf_error:
       error (0, 0, gettext ("cannot read ELF header: %s"), elf_errmsg (-1));
       return;
     }
@@ -948,7 +947,7 @@ process_elf_file (Dwfl_Module *dwflmod, int fd)
     {
       /* Read the file afresh.  */
       off_t aroff = elf_getaroff (elf);
-      pure_elf = elf_begin (fd, ELF_C_READ_MMAP, NULL);
+      pure_elf = dwelf_elf_begin (fd);
       if (aroff > 0)
 	{
 	  /* Archive member.  */
@@ -958,7 +957,10 @@ process_elf_file (Dwfl_Module *dwflmod, int fd)
 	  pure_elf = armem;
 	}
       if (pure_elf == NULL)
-	goto elf_error;
+	{
+	  error (0, 0, gettext ("cannot read ELF: %s"), elf_errmsg (-1));
+	  return;
+	}
       pure_ebl = ebl_openbackend (pure_elf);
       if (pure_ebl == NULL)
 	goto ebl_error;

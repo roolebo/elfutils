@@ -626,6 +626,10 @@ extern Dwfl_Error __libdw_open_file (int *fdp, Elf **elfp,
 				     bool close_on_fail, bool archive_ok)
   internal_function;
 
+/* Same as __libdw_open_file, but never closes the given file
+   descriptor and ELF_K_AR is always an acceptable type.  */
+extern Dwfl_Error __libdw_open_elf (int fd, Elf **elfp) internal_function;
+
 /* Fetch PT_DYNAMIC P_VADDR from ELF and store it to *VADDRP.  Return success.
    *VADDRP is not modified if the function fails.  */
 extern bool __libdwfl_dynamic_vaddr_get (Elf *elf, GElf_Addr *vaddrp)

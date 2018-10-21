@@ -1,3 +1,9 @@
+2018-10-20  Mark Wielaard  <mark@klomp.org>
+
+	* run-readelf-compressed.sh: New test.
+	* Makefile.am (TESTS): Add run-readelf-compressed.sh.
+	(EXTRA_DIST): Likewise.
+
 2018-11-09  Mark Wielaard  <mark@klomp.org>
 
 	* testfile-debug-rel-ppc64-g.o.bz2: New test file.

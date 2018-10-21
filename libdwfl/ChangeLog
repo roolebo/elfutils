@@ -1,3 +1,11 @@
+2018-10-20  Mark Wielaard  <mark@klomp.org>
+
+	* libdwflP.h (__libdw_open_elf): New internal function declaration.
+	* open.c (what_kind): Rename close_fd to may_close_fd.
+	(__libdw_open_file): Replaced (and renamed) by a call to ...
+	(libdw_open_elf): this. And add never_close_fd argument.
+	(__libdw_open_elf): New function that calls libdw_open_elf.
+
 2018-10-18  Mark Wielaard  <mark@klomp.org>
 
 	* dwfl_segment_report_module.c (consider_note): Take align as new

@@ -1,5 +1,5 @@
 /* Interfaces for libdwelf. DWARF ELF Low-level Functions.
-   Copyright (C) 2014, 2015, 2016 Red Hat, Inc.
+   Copyright (C) 2014, 2015, 2016, 2018 Red Hat, Inc.
    This file is part of elfutils.
 
    This file is free software; you can redistribute it and/or modify
@@ -124,6 +124,14 @@ extern const char *dwelf_strent_str (Dwelf_Strent *se)
    any Dwelf_Strent references returned earlier. */
 extern void dwelf_strtab_free (Dwelf_Strtab *st)
   __nonnull_attribute__ (1);
+
+/* Creates a read-only Elf handle from the given file handle.  The
+   file may be compressed and/or contain a linux kernel image header,
+   in which case it is eagerly decompressed in full and the Elf handle
+   is created as if created with elf_memory ().  On error NULL is
+   returned.  The Elf handle should be closed with elf_end ().  The
+   file handle will not be closed.  Does not return ELF_K_NONE handles.  */
+extern Elf *dwelf_elf_begin (int fd);
 
 #ifdef __cplusplus
 }

@@ -1,9 +1,15 @@
+2018-10-21  Mark Wielaard  <mark@klomp.org>
+
+	* libdwelf.h (dwelf_elf_begin): Add function declaration.
+	* dwelf_elf_begin.c: New file.
+	* Makefile.am (libdwelf_a_SOURCES): Add dwelf_elf_begin.c.
+
 2018-10-18  Mark Wielaard  <mark@klomp.org>
 
 	* dwelf_elf_gnu_build_id.c (find_elf_build_id): Check p_align to
 	set ELF type.
 
-2015-10-11  Akihiko Odaki  <akihiko.odaki.4i@stu.hosei.ac.jp>
+2016-10-11  Akihiko Odaki  <akihiko.odaki.4i@stu.hosei.ac.jp>
 
 	* dwelf_strtab.c: Remove sys/param.h include.
 	(MIN): Remove definition.

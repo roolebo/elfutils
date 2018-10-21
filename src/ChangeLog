@@ -1,3 +1,7 @@
+2018-10-20  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (process_elf_file): Use dwelf_elf_begin to open pure_elf.
+
 2018-10-26  Mark Wielaard  <mark@klomp.org>
 
 	* strip.c (OPT_RELOC_DEBUG_ONLY): New define.
@@ -93,11 +97,10 @@
 
 	* findtextrel.c (process_file): Check that sh_entsize is not zero.
 
-2018-09-13  Mark Wielaard  <mark@klomp.org>
+2018-10-13  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_debug_macro_section): Use elf_getdata. Print
 	decoded flag string.
-2018-09-13  Mark Wielaard  <mark@klomp.org>
 
 2018-10-19  Mark Wielaard  <mark@klomp.org>
 

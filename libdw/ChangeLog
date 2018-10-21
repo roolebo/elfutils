@@ -1,3 +1,7 @@
+2018-10-20  Mark Wielaard  <mark@klomp.org>
+
+	* libdw.map (ELFUTILS_0.175): New section. Add dwelf_elf_begin.
+
 2018-10-29  Milian Wolff  <milian.wolff@kdab.com>
 
 	* dwarf_getcfi_elf.c (getcfi_shdr): Check sh_type != SHT_NOBITS.

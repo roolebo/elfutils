@@ -95,7 +95,7 @@ decompress (int fd __attribute__ ((unused)), Elf **elf)
 }
 
 static Dwfl_Error
-what_kind (int fd, Elf **elfp, Elf_Kind *kind, bool *close_fd)
+what_kind (int fd, Elf **elfp, Elf_Kind *kind, bool *may_close_fd)
 {
   Dwfl_Error error = DWFL_E_NOERROR;
   *kind = elf_kind (*elfp);
@@ -108,7 +108,7 @@ what_kind (int fd, Elf **elfp, Elf_Kind *kind, bool *close_fd)
 	  error = decompress (fd, elfp);
 	  if (error == DWFL_E_NOERROR)
 	    {
-	      *close_fd = true;
+	      *may_close_fd = true;
 	      *kind = elf_kind (*elfp);
 	    }
 	}
@@ -116,15 +116,16 @@ what_kind (int fd, Elf **elfp, Elf_Kind *kind, bool *close_fd)
   return error;
 }
 
-Dwfl_Error internal_function
-__libdw_open_file (int *fdp, Elf **elfp, bool close_on_fail, bool archive_ok)
+static Dwfl_Error
+libdw_open_elf (int *fdp, Elf **elfp, bool close_on_fail, bool archive_ok,
+		bool never_close_fd)
 {
-  bool close_fd = false;
+  bool may_close_fd = false;
 
   Elf *elf = elf_begin (*fdp, ELF_C_READ_MMAP_PRIVATE, NULL);
 
   Elf_Kind kind;
-  Dwfl_Error error = what_kind (*fdp, &elf, &kind, &close_fd);
+  Dwfl_Error error = what_kind (*fdp, &elf, &kind, &may_close_fd);
   if (error == DWFL_E_BADELF)
     {
       /* It's not an ELF file or a compressed file.
@@ -153,7 +154,7 @@ __libdw_open_file (int *fdp, Elf **elfp, bool close_on_fail, bool archive_ok)
 	      elf->flags &= ~(ELF_F_MMAPPED | ELF_F_MALLOCED);
 	      elf_end (elf);
 	      elf = subelf;
-	      error = what_kind (*fdp, &elf, &kind, &close_fd);
+	      error = what_kind (*fdp, &elf, &kind, &may_close_fd);
 	    }
 	}
     }
@@ -169,7 +170,8 @@ __libdw_open_file (int *fdp, Elf **elfp, bool close_on_fail, bool archive_ok)
       elf = NULL;
     }
 
-  if (error == DWFL_E_NOERROR ? close_fd : close_on_fail)
+  if (! never_close_fd
+      && error == DWFL_E_NOERROR ? may_close_fd : close_on_fail)
     {
       close (*fdp);
       *fdp = -1;
@@ -177,4 +179,16 @@ __libdw_open_file (int *fdp, Elf **elfp, bool close_on_fail, bool archive_ok)
 
   *elfp = elf;
   return error;
+}
+
+Dwfl_Error internal_function
+__libdw_open_file (int *fdp, Elf **elfp, bool close_on_fail, bool archive_ok)
+{
+  return libdw_open_elf (fdp, elfp, close_on_fail, archive_ok, false);
+}
+
+Dwfl_Error internal_function
+__libdw_open_elf (int fd, Elf **elfp)
+{
+  return libdw_open_elf (&fd, elfp, false, true, true);
 }

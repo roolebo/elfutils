@@ -100,6 +100,7 @@ TESTS = run-arextract.sh run-arsymtest.sh run-ar.sh newfile test-nlist \
 	run-find-prologues.sh run-allregs.sh run-addrcfi.sh \
 	run-dwarfcfi.sh \
 	run-nm-self.sh run-readelf-self.sh run-readelf-info-plus.sh \
+	run-readelf-compressed.sh \
 	run-readelf-const-values.sh \
 	run-varlocs-self.sh run-exprlocs-self.sh \
 	run-readelf-test1.sh run-readelf-test2.sh run-readelf-test3.sh \
@@ -216,6 +217,7 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     run-ranlib-test3.sh run-ranlib-test4.sh \
 	     run-addrscopes.sh run-strings-test.sh run-funcscopes.sh \
 	     run-nm-self.sh run-readelf-self.sh run-readelf-info-plus.sh \
+	     run-readelf-compressed.sh \
 	     run-readelf-const-values.sh testfile-const-values.debug.bz2 \
 	     run-addrcfi.sh run-dwarfcfi.sh \
 	     testfile11-debugframe.bz2 testfile12-debugframe.bz2 \

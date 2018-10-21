@@ -356,3 +356,8 @@ ELFUTILS_0.173 {
   global:
     dwarf_next_lines;
 } ELFUTILS_0.171;
+
+ELFUTILS_0.175 {
+  global:
+    dwelf_elf_begin;
+} ELFUTILS_0.173;

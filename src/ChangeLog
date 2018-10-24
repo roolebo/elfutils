@@ -1,5 +1,10 @@
 2018-10-24  Mark Wielaard  <mark@klomp.org>
 
+	* addr2line.c (print_addrsym): Use elf_getshdrstrndx instead of
+	Ehdr field.
+
+2018-10-24  Mark Wielaard  <mark@klomp.org>
+
 	* readelf.c (section_name): Remove ehdr argument, lookup shstrndx.
 	(print_debug_abbrev_section): Don't pass ehdr.
 	(print_debug_addr_section): Likewise.

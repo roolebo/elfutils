@@ -446,9 +446,9 @@ print_addrsym (Dwfl_Module *mod, GElf_Addr addr)
 	      if (shdr != NULL)
 		{
 		  Elf *elf = dwfl_module_getelf (mod, &ebias);
-		  GElf_Ehdr ehdr;
-		  if (gelf_getehdr (elf, &ehdr) != NULL)
-		    printf (" (%s)", elf_strptr (elf, ehdr.e_shstrndx,
+		  size_t shstrndx;
+		  if (elf_getshdrstrndx (elf, &shstrndx) >= 0)
+		    printf (" (%s)", elf_strptr (elf, shstrndx,
 						 shdr->sh_name));
 		}
 	    }

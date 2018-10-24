@@ -1,3 +1,24 @@
+2018-10-24  Mark Wielaard  <mark@klomp.org>
+
+	* readelf.c (section_name): Remove ehdr argument, lookup shstrndx.
+	(print_debug_abbrev_section): Don't pass ehdr.
+	(print_debug_addr_section): Likewise.
+	(print_decoded_aranges_section): Likewise.
+	(print_debug_aranges_section): Likewise.
+	(print_debug_rnglists_section): Likewise.
+	(print_debug_ranges_section): Likewise.
+	(print_debug_units): Likewise.
+	(print_decoded_line_section): Likewise.
+	(print_debug_line_section): Likewise.
+	(print_debug_loclists_section): Likewise.
+	(print_debug_loc_section): Likewise.
+	(print_debug_macinfo_section): Likewise.
+	(print_debug_macro_section): Likewise.
+	(print_debug_pubnames_section): Likewise.
+	(print_debug_str_section): Liekwise.
+	(print_debug_str_offsets_section): Likewise.
+	(print_gdb_index_section): Likewise.
+
 2018-10-16  Mark Wielaard  <mark@klomp.org>
 
 	* readelf.c (print_debug_frame_section): Make sure readp is never

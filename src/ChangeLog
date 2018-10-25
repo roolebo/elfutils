@@ -1,5 +1,10 @@
 2018-10-24  Mark Wielaard  <mark@klomp.org>
 
+	* strip.c (handle_elf): Extract code to update shdrstrndx into...
+	(update_shdrstrndx): ... this new function.
+
+2018-10-24  Mark Wielaard  <mark@klomp.org>
+
 	* strip.c (handle_elf): Extract code into separate functions...
 	(secndx_name): ... new function.
 	(get_xndxdata): Likewise.

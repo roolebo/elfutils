@@ -395,6 +395,37 @@ get_xndxdata (Elf *elf, Elf_Scn *symscn)
   return xndxdata;
 }
 
+/* Updates the shdrstrndx for the given Elf by updating the Ehdr and
+   possibly the section zero extension field.  Returns zero on success.  */
+static int
+update_shdrstrndx (Elf *elf, size_t shdrstrndx)
+{
+  GElf_Ehdr ehdr;
+  if (gelf_getehdr (elf, &ehdr) == 0)
+    return 1;
+
+  if (shdrstrndx < SHN_LORESERVE)
+    ehdr.e_shstrndx = shdrstrndx;
+  else
+    {
+      ehdr.e_shstrndx = SHN_XINDEX;
+      Elf_Scn *scn0 = elf_getscn (elf, 0);
+      GElf_Shdr shdr0_mem;
+      GElf_Shdr *shdr0 = gelf_getshdr (scn0, &shdr0_mem);
+      if (shdr0 == NULL)
+	return 1;
+
+      shdr0->sh_link = shdrstrndx;
+      if (gelf_update_shdr (scn0, shdr0) == 0)
+	return 1;
+    }
+
+  if (unlikely (gelf_update_ehdr (elf, &ehdr) == 0))
+    return 1;
+
+  return 0;
+}
+
 /* Remove any relocations between debug sections in ET_REL
    for the debug file when requested.  These relocations are always
    zero based between the unallocated sections.  */
@@ -1444,6 +1475,14 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
       debugehdr->e_entry = ehdr->e_entry;
       debugehdr->e_flags = ehdr->e_flags;
 
+      if (unlikely (gelf_update_ehdr (debugelf, debugehdr) == 0))
+	{
+	  error (0, 0, gettext ("%s: error while updating ELF header: %s"),
+		 debug_fname, elf_errmsg (-1));
+	  result = 1;
+	  goto fail_close;
+	}
+
       size_t shdrstrndx;
       if (elf_getshdrstrndx (elf, &shdrstrndx) < 0)
 	{
@@ -1453,36 +1492,9 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	  goto fail_close;
 	}
 
-      if (shstrndx < SHN_LORESERVE)
-	debugehdr->e_shstrndx = shdrstrndx;
-      else
+      if (update_shdrstrndx (debugelf, shdrstrndx) != 0)
 	{
-	  debugehdr->e_shstrndx = SHN_XINDEX;
-	  Elf_Scn *scn0 = elf_getscn (debugelf, 0);
-	  GElf_Shdr shdr0_mem;
-	  GElf_Shdr *shdr0 = gelf_getshdr (scn0, &shdr0_mem);
-	  if (shdr0 == NULL)
-	    {
-	      error (0, 0, gettext ("%s: error getting zero section: %s"),
-		     debug_fname, elf_errmsg (-1));
-	      result = 1;
-	      goto fail_close;
-	    }
-
-	  shdr0->sh_link = shdrstrndx;
-	  if (gelf_update_shdr (scn0, shdr0) == 0)
-	    {
-	      error (0, 0, gettext ("%s: error while updating zero section: %s"),
-		     debug_fname, elf_errmsg (-1));
-	      result = 1;
-	      goto fail_close;
-	    }
-
-	}
-
-      if (unlikely (gelf_update_ehdr (debugelf, debugehdr) == 0))
-	{
-	  error (0, 0, gettext ("%s: error while creating ELF header: %s"),
+	  error (0, 0, gettext ("%s: error updating shdrstrndx: %s"),
 		 debug_fname, elf_errmsg (-1));
 	  result = 1;
 	  goto fail_close;
@@ -2348,26 +2360,18 @@ while computing checksum for debug information"));
 		      & ~((GElf_Off) (offsize - 1)));
   newehdr->e_shentsize = gelf_fsize (elf, ELF_T_SHDR, 1, EV_CURRENT);
 
-  /* The new section header string table index.  */
-  if (likely (idx < SHN_HIRESERVE) && likely (idx != SHN_XINDEX))
-    newehdr->e_shstrndx = idx;
-  else
-    {
-      /* The index does not fit in the ELF header field.  */
-      shdr_info[0].scn = elf_getscn (elf, 0);
-
-      if (gelf_getshdr (shdr_info[0].scn, &shdr_info[0].shdr) == NULL)
-	INTERNAL_ERROR (fname);
-
-      shdr_info[0].shdr.sh_link = idx;
-      (void) gelf_update_shdr (shdr_info[0].scn, &shdr_info[0].shdr);
-
-      newehdr->e_shstrndx = SHN_XINDEX;
-    }
-
   if (gelf_update_ehdr (newelf, newehdr) == 0)
     {
       error (0, 0, gettext ("%s: error while creating ELF header: %s"),
+	     output_fname ?: fname, elf_errmsg (-1));
+      cleanup_debug ();
+      return 1;
+    }
+
+  /* The new section header string table index.  */
+  if (update_shdrstrndx (newelf, idx) != 0)
+    {
+      error (0, 0, gettext ("%s: error updating shdrstrndx: %s"),
 	     output_fname ?: fname, elf_errmsg (-1));
       cleanup_debug ();
       return 1;

@@ -1,3 +1,9 @@
+2018-10-24  Mark Wielaard  <mark@klomp.org>
+
+	* strip.c (handle_elf): Always copy over phdrs if there are any
+	and check phnum instead of e_type to determine whether to move
+	allocated sections.
+
 2018-11-02  Mark Wielaard  <mark@klomp.org>
 
 	* unstrip.c (copy_elf): Add ELF_CHECK to make sure gelf_getehdr ()

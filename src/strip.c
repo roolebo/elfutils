@@ -588,49 +588,63 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
   else
     newelf = elf_clone (elf, ELF_C_EMPTY);
 
-  if (unlikely (gelf_newehdr (newelf, gelf_getclass (elf)) == 0)
-      || (ehdr->e_type != ET_REL
-	  && unlikely (gelf_newphdr (newelf, phnum) == 0)))
+  if (unlikely (gelf_newehdr (newelf, gelf_getclass (elf)) == 0))
     {
-      error (0, 0, gettext ("cannot create new file '%s': %s"),
+      error (0, 0, gettext ("cannot create new ehdr for file '%s': %s"),
 	     output_fname ?: fname, elf_errmsg (-1));
       goto fail;
     }
 
   /* Copy over the old program header if needed.  */
-  if (ehdr->e_type != ET_REL)
-    for (cnt = 0; cnt < phnum; ++cnt)
-      {
-	GElf_Phdr phdr_mem;
-	GElf_Phdr *phdr = gelf_getphdr (elf, cnt, &phdr_mem);
-	if (phdr == NULL
-	    || unlikely (gelf_update_phdr (newelf, cnt, phdr) == 0))
-	  INTERNAL_ERROR (fname);
-      }
+  if (phnum > 0)
+    {
+      if (unlikely (gelf_newphdr (newelf, phnum) == 0))
+	{
+	  error (0, 0, gettext ("cannot create new phdr for file '%s': %s"),
+		 output_fname ?: fname, elf_errmsg (-1));
+	  goto fail;
+	}
+
+      for (cnt = 0; cnt < phnum; ++cnt)
+	{
+	  GElf_Phdr phdr_mem;
+	  GElf_Phdr *phdr = gelf_getphdr (elf, cnt, &phdr_mem);
+	  if (phdr == NULL
+	      || unlikely (gelf_update_phdr (newelf, cnt, phdr) == 0))
+	    INTERNAL_ERROR (fname);
+	}
+    }
 
   if (debug_fname != NULL)
     {
       /* Also create an ELF descriptor for the debug file */
       debugelf = elf_begin (debug_fd, ELF_C_WRITE_MMAP, NULL);
-      if (unlikely (gelf_newehdr (debugelf, gelf_getclass (elf)) == 0)
-	  || (ehdr->e_type != ET_REL
-	      && unlikely (gelf_newphdr (debugelf, phnum) == 0)))
+      if (unlikely (gelf_newehdr (debugelf, gelf_getclass (elf)) == 0))
 	{
-	  error (0, 0, gettext ("cannot create new file '%s': %s"),
+	  error (0, 0, gettext ("cannot create new ehdr for file '%s': %s"),
 		 debug_fname, elf_errmsg (-1));
 	  goto fail_close;
 	}
 
       /* Copy over the old program header if needed.  */
-      if (ehdr->e_type != ET_REL)
-	for (cnt = 0; cnt < phnum; ++cnt)
-	  {
-	    GElf_Phdr phdr_mem;
-	    GElf_Phdr *phdr = gelf_getphdr (elf, cnt, &phdr_mem);
-	    if (phdr == NULL
-		|| unlikely (gelf_update_phdr (debugelf, cnt, phdr) == 0))
-	      INTERNAL_ERROR (fname);
-	  }
+      if (phnum > 0)
+	{
+	  if (unlikely (gelf_newphdr (debugelf, phnum) == 0))
+	    {
+	      error (0, 0, gettext ("cannot create new phdr for file '%s': %s"),
+		     debug_fname, elf_errmsg (-1));
+	      goto fail_close;
+	    }
+
+	  for (cnt = 0; cnt < phnum; ++cnt)
+	    {
+	      GElf_Phdr phdr_mem;
+	      GElf_Phdr *phdr = gelf_getphdr (elf, cnt, &phdr_mem);
+	      if (phdr == NULL
+		  || unlikely (gelf_update_phdr (debugelf, cnt, phdr) == 0))
+		INTERNAL_ERROR (fname);
+	    }
+	}
     }
 
   /* Number of sections.  */
@@ -738,7 +752,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	 to keep the layout of all allocated sections as similar as
 	 possible to the original file.  In relocatable object files
 	 everything can be moved.  */
-      if (ehdr->e_type == ET_REL
+      if (phnum == 0
 	  || (shdr_info[cnt].shdr.sh_flags & SHF_ALLOC) == 0)
 	shdr_info[cnt].shdr.sh_offset = 0;
 
@@ -2328,7 +2342,7 @@ while computing checksum for debug information"));
   /* The ELF library better follows our layout when this is not a
      relocatable object file.  */
   elf_flagelf (newelf, ELF_C_SET,
-	       (ehdr->e_type != ET_REL ? ELF_F_LAYOUT : 0)
+	       (phnum > 0 ? ELF_F_LAYOUT : 0)
 	       | (permissive ? ELF_F_PERMISSIVE : 0));
 
   /* Finally write the file.  */

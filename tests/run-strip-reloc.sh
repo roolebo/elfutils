@@ -32,6 +32,8 @@ runtest() {
   outfile2=out.stripped2
   debugfile2=out.debug2
 
+  echo "runtest $infile"
+
   rm -f $outfile1 $debugfile1 $outfile2 $debugfile2
 
   testrun ${abs_top_builddir}/src/strip -o $outfile1 -f $debugfile1 $infile ||
@@ -67,6 +69,15 @@ runtest() {
 
   testrun_compare cat readelf.out1 < readelf.out2 ||
   { echo "*** failure readelf -w compare $infile"; status=1; }
+
+  testrun ${abs_top_builddir}/src/strip --reloc-debug-sections-only \
+	  $debugfile1 ||
+  { echo "*** failure strip --reloc-debug-sections-only $debugfile1"; \
+    status=1; }
+
+  cmp $debugfile1 $debugfile2 ||
+  { echo "*** failure --reloc-debug-sections[-only] $debugfile1 $debugfile2"; \
+    status=1; }
 }
 
 # Most simple hello world kernel module for various architectures.

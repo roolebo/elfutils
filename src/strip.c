@@ -1,5 +1,5 @@
 /* Discard section not used at runtime from object files.
-   Copyright (C) 2000-2012, 2014, 2015, 2016, 2017 Red Hat, Inc.
+   Copyright (C) 2000-2012, 2014, 2015, 2016, 2017, 2018 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2000.
 
@@ -61,6 +61,7 @@ ARGP_PROGRAM_BUG_ADDRESS_DEF = PACKAGE_BUGREPORT;
 #define OPT_STRIP_SECTIONS	0x102
 #define OPT_RELOC_DEBUG 	0x103
 #define OPT_KEEP_SECTION 	0x104
+#define OPT_RELOC_DEBUG_ONLY    0x105
 
 
 /* Definitions of arguments for argp functions.  */
@@ -82,6 +83,8 @@ static const struct argp_option options[] =
     N_("Copy modified/access timestamps to the output"), 0 },
   { "reloc-debug-sections", OPT_RELOC_DEBUG, NULL, 0,
     N_("Resolve all trivial relocations between debug sections if the removed sections are placed in a debug file (only relevant for ET_REL files, operation is not reversable, needs -f)"), 0 },
+  { "reloc-debug-sections-only", OPT_RELOC_DEBUG_ONLY, NULL, 0,
+    N_("Similar to --reloc-debug-sections, but resolve all trivial relocations between debug sections in place.  No other stripping is performed (operation is not reversable, incompatible with -f, -g, --remove-comment and --remove-section)"), 0 },
   { "remove-comment", OPT_REMOVE_COMMENT, NULL, 0,
     N_("Remove .comment section"), 0 },
   { "remove-section", 'R', "SECTION", 0, N_("Remove the named section.  SECTION is an extended wildcard pattern.  May be given more than once.  Only non-allocated sections can be removed."), 0 },
@@ -158,6 +161,9 @@ static bool permissive;
 
 /* If true perform relocations between debug sections.  */
 static bool reloc_debug;
+
+/* If true perform relocations between debug sections only.  */
+static bool reloc_debug_only;
 
 /* Sections the user explicitly wants to keep or remove.  */
 struct section_pattern
@@ -240,6 +246,12 @@ main (int argc, char *argv[])
     error (EXIT_FAILURE, 0,
 	   gettext ("--reloc-debug-sections used without -f"));
 
+  if (reloc_debug_only &&
+      (debug_fname != NULL || remove_secs != NULL
+       || remove_comment == true || remove_debug == true))
+    error (EXIT_FAILURE, 0,
+	   gettext ("--reloc-debug-sections-only incompatible with -f, -g, --remove-comment and --remove-section"));
+
   /* Tell the library which version we are expecting.  */
   elf_version (EV_CURRENT);
 
@@ -305,6 +317,10 @@ parse_opt (int key, char *arg, struct argp_state *state)
 
     case OPT_RELOC_DEBUG:
       reloc_debug = true;
+      break;
+
+    case OPT_RELOC_DEBUG_ONLY:
+      reloc_debug_only = true;
       break;
 
     case OPT_REMOVE_COMMENT:
@@ -774,6 +790,116 @@ process_file (const char *fname)
   return result;
 }
 
+/* Processing for --reloc-debug-sections-only.  */
+static int
+handle_debug_relocs (Elf *elf, Ebl *ebl, Elf *new_elf,
+		     GElf_Ehdr *ehdr, const char *fname, size_t shstrndx,
+		     GElf_Off *last_offset, GElf_Xword *last_size)
+{
+
+  /* Copy over the ELF header.  */
+  if (gelf_update_ehdr (new_elf, ehdr) == 0)
+    {
+      error (0, 0, "couldn't update new ehdr: %s", elf_errmsg (-1));
+      return 1;
+    }
+
+  /* Copy over sections and record end of allocated sections.  */
+  GElf_Off lastoffset = 0;
+  Elf_Scn *scn = NULL;
+  while ((scn = elf_nextscn (elf, scn)) != NULL)
+    {
+      /* Get the header.  */
+      GElf_Shdr shdr;
+      if (gelf_getshdr (scn, &shdr) == NULL)
+	{
+	  error (0, 0, "couldn't get shdr: %s", elf_errmsg (-1));
+	  return 1;
+	}
+
+      /* Create new section.  */
+      Elf_Scn *new_scn = elf_newscn (new_elf);
+      if (new_scn == NULL)
+	{
+	  error (0, 0, "couldn't create new section: %s", elf_errmsg (-1));
+	  return 1;
+	}
+
+      if (gelf_update_shdr (new_scn, &shdr) == 0)
+	{
+	  error (0, 0, "couldn't update shdr: %s", elf_errmsg (-1));
+	  return 1;
+	}
+
+      /* Copy over section data.  */
+      Elf_Data *data = NULL;
+      while ((data = elf_getdata (scn, data)) != NULL)
+	{
+	  Elf_Data *new_data = elf_newdata (new_scn);
+	  if (new_data == NULL)
+	    {
+	      error (0, 0, "couldn't create new section data: %s",
+		     elf_errmsg (-1));
+	      return 1;
+	    }
+	  *new_data = *data;
+	}
+
+      /* Record last offset of allocated section.  */
+      if ((shdr.sh_flags & SHF_ALLOC) != 0)
+	{
+	  GElf_Off filesz = (shdr.sh_type != SHT_NOBITS
+			     ? shdr.sh_size : 0);
+	  if (lastoffset < shdr.sh_offset + filesz)
+	    lastoffset = shdr.sh_offset + filesz;
+	}
+    }
+
+  /* Make sure section header name table is setup correctly, we'll
+     need it to determine whether to relocate sections.  */
+  if (update_shdrstrndx (new_elf, shstrndx) != 0)
+    {
+      error (0, 0, "error updating shdrstrndx: %s", elf_errmsg (-1));
+      return 1;
+    }
+
+  /* Adjust the relocation sections.  */
+  remove_debug_relocations (ebl, new_elf, ehdr, fname, shstrndx);
+
+  /* Adjust the offsets of the non-allocated sections, so they come after
+     the allocated sections.  */
+  scn = NULL;
+  while ((scn = elf_nextscn (new_elf, scn)) != NULL)
+    {
+      /* Get the header.  */
+      GElf_Shdr shdr;
+      if (gelf_getshdr (scn, &shdr) == NULL)
+	{
+	  error (0, 0, "couldn't get shdr: %s", elf_errmsg (-1));
+	  return 1;
+	}
+
+      /* Adjust non-allocated section offsets to be after any allocated.  */
+      if ((shdr.sh_flags & SHF_ALLOC) == 0)
+	{
+	  shdr.sh_offset = ((lastoffset + shdr.sh_addralign - 1)
+			    & ~((GElf_Off) (shdr.sh_addralign - 1)));
+	  if (gelf_update_shdr (scn, &shdr) == 0)
+	    {
+	      error (0, 0, "couldn't update shdr: %s", elf_errmsg (-1));
+	      return 1;
+	    }
+
+	  GElf_Off filesz = (shdr.sh_type != SHT_NOBITS
+			     ? shdr.sh_size : 0);
+	  lastoffset = shdr.sh_offset + filesz;
+	  *last_offset = shdr.sh_offset;
+	  *last_size = filesz;
+	}
+    }
+
+  return 0;
+}
 
 /* Maximum size of array allocated on stack.  */
 #define MAX_STACK_ALLOC	(400 * 1024)
@@ -790,6 +916,8 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
   tmp_debug_fname = NULL;
   int result = 0;
   size_t shdridx = 0;
+  GElf_Off lastsec_offset = 0;
+  Elf64_Xword lastsec_size = 0;
   size_t shstrndx;
   struct shdr_info
   {
@@ -848,7 +976,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
      the --reloc-debug-sections option are currently the only reasons
      we need EBL so don't open the backend unless necessary.  */
   Ebl *ebl = NULL;
-  if (remove_debug || reloc_debug)
+  if (remove_debug || reloc_debug || reloc_debug_only)
     {
       ebl = ebl_openbackend (elf);
       if (ebl == NULL)
@@ -935,6 +1063,18 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 	      || unlikely (gelf_update_phdr (newelf, cnt, phdr) == 0))
 	    INTERNAL_ERROR (fname);
 	}
+    }
+
+  if (reloc_debug_only)
+    {
+      if (handle_debug_relocs (elf, ebl, newelf, ehdr, fname, shstrndx,
+			       &lastsec_offset, &lastsec_size) != 0)
+	{
+	  result = 1;
+	  goto fail_close;
+	}
+      idx = shstrndx;
+      goto done; /* Skip all actual stripping operations.  */
     }
 
   if (debug_fname != NULL)
@@ -2339,6 +2479,10 @@ while computing checksum for debug information"));
 	}
     }
 
+  lastsec_offset = shdr_info[shdridx].shdr.sh_offset;
+  lastsec_size = shdr_info[shdridx].shdr.sh_size;
+
+ done:
   /* Finally finish the ELF header.  Fill in the fields not handled by
      libelf from the old file.  */
   newehdr = gelf_getehdr (newelf, &newehdr_mem);
@@ -2355,8 +2499,7 @@ while computing checksum for debug information"));
 
   /* We need to position the section header table.  */
   const size_t offsize = gelf_fsize (elf, ELF_T_OFF, 1, EV_CURRENT);
-  newehdr->e_shoff = ((shdr_info[shdridx].shdr.sh_offset
-		       + shdr_info[shdridx].shdr.sh_size + offsize - 1)
+  newehdr->e_shoff = ((lastsec_offset + lastsec_size + offsize - 1)
 		      & ~((GElf_Off) (offsize - 1)));
   newehdr->e_shentsize = gelf_fsize (elf, ELF_T_SHDR, 1, EV_CURRENT);
 
@@ -2418,7 +2561,7 @@ while computing checksum for debug information"));
 	      || (pwrite_retry (fd, zero, sizeof zero,
 				offsetof (Elf32_Ehdr, e_shentsize))
 		  != sizeof zero)
-	      || ftruncate (fd, shdr_info[shdridx].shdr.sh_offset) < 0)
+	      || ftruncate (fd, lastsec_offset) < 0)
 	    {
 	      error (0, errno, gettext ("while writing '%s'"),
 		     output_fname ?: fname);
@@ -2438,7 +2581,7 @@ while computing checksum for debug information"));
 	      || (pwrite_retry (fd, zero, sizeof zero,
 				offsetof (Elf64_Ehdr, e_shentsize))
 		  != sizeof zero)
-	      || ftruncate (fd, shdr_info[shdridx].shdr.sh_offset) < 0)
+	      || ftruncate (fd, lastsec_offset) < 0)
 	    {
 	      error (0, errno, gettext ("while writing '%s'"),
 		     output_fname ?: fname);

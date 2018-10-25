@@ -1,3 +1,14 @@
+2018-10-26  Mark Wielaard  <mark@klomp.org>
+
+	* strip.c (OPT_RELOC_DEBUG_ONLY): New define.
+	(options): Add reloc-debug-sections-only.
+	(reloc_debug_only): New static bool.
+	(main): Check reloc_debug_only is the only strip option used.
+	(parse_opt): Handle OPT_RELOC_DEBUG_ONLY.
+	(handle_debug_relocs): New function.
+	(handle_elf): Add local variables lastsec_offset and lastsec_size.
+	Handle reloc_debug_only.
+
 2018-10-24  Mark Wielaard  <mark@klomp.org>
 
 	* strip.c (handle_elf): Extract code to update shdrstrndx into...

@@ -1,3 +1,7 @@
+2018-10-26  Mark Wielaard  <mark@klomp.org>
+
+	* run-strip-reloc.sh: Add a test for --reloc-debug-sections-only.
+
 2018-10-18  Mark Wielaard  <mark@klomp.org>
 
 	* run-readelf-n.sh: New test.

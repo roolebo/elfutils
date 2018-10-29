@@ -298,7 +298,7 @@ getcfi_shdr (Elf *elf, const GElf_Ehdr *ehdr)
 	    }
 	  else if (!strcmp (name, ".eh_frame"))
 	    {
-	      if (shdr->sh_type == SHT_PROGBITS)
+	      if (shdr->sh_type != SHT_NOBITS)
 		return getcfi_scn_eh_frame (elf, ehdr, scn, shdr,
 					    hdr_scn, hdr_vaddr);
 	      else

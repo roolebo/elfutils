@@ -1,3 +1,7 @@
+2018-10-29  Milian Wolff  <milian.wolff@kdab.com>
+
+	* dwarf_getcfi_elf.c (getcfi_shdr): Check sh_type != SHT_NOBITS.
+
 2018-09-13  Mark Wielaard  <mark@klomp.org>
 
 	* dwarf_begin_elf.c (check_section): Drop ehdr argument, add and

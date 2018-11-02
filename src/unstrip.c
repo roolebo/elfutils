@@ -245,6 +245,7 @@ copy_elf (Elf *outelf, Elf *inelf)
 
   GElf_Ehdr ehdr_mem;
   GElf_Ehdr *ehdr = gelf_getehdr (inelf, &ehdr_mem);
+  ELF_CHECK (ehdr != NULL, _("cannot get ELF header: %s"));
   if (shstrndx < SHN_LORESERVE)
     ehdr->e_shstrndx = shstrndx;
   else

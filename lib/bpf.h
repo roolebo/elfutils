@@ -23,6 +23,10 @@
 #define BPF_JSGE 0x70
 #define BPF_CALL 0x80
 #define BPF_EXIT 0x90
+#define BPF_JLT  0xa0
+#define BPF_JLE  0xb0
+#define BPF_JSLT 0xc0
+#define BPF_JSLE 0xd0
 
 #define BPF_W 0x00
 #define BPF_H 0x08

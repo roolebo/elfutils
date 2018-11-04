@@ -1,3 +1,8 @@
+2018-11-04  Mark Wielaard  <mark@klomp.org>
+
+	* testfile-bpf-reloc.expect.bz2: Update with new expected jump
+	variants.
+
 2018-10-20  Mark Wielaard  <mark@klomp.org>
 
 	* run-readelf-compressed.sh: New test.

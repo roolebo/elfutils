@@ -1,5 +1,5 @@
 /* Initialization of x86-64 specific backend library.
-   Copyright (C) 2002-2009, 2013 Red Hat, Inc.
+   Copyright (C) 2002-2009, 2013, 2018 Red Hat, Inc.
    Copyright (C) H.J. Lu <hjl.tools@gmail.com>, 2015.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
@@ -55,6 +55,7 @@ x86_64_init (Elf *elf __attribute__ ((unused)),
   eh->name = "AMD x86-64";
   x86_64_init_reloc (eh);
   HOOK (eh, reloc_simple_type);
+  HOOK (eh, section_type_name);
   if (eh->class == ELFCLASS32)
     eh->core_note = x32_core_note;
   else

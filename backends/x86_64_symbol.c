@@ -1,5 +1,5 @@
 /* x86_64 specific symbolic name handling.
-   Copyright (C) 2002, 2005 Red Hat, Inc.
+   Copyright (C) 2002, 2005, 2018 Red Hat, Inc.
    This file is part of elfutils.
    Written by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -58,4 +58,16 @@ x86_64_reloc_simple_type (Ebl *ebl __attribute__ ((unused)), int type,
     default:
       return ELF_T_NUM;
     }
+}
+
+/* Return symbolic representation of section type.  */
+const char *
+x86_64_section_type_name (int type,
+			  char *buf __attribute__ ((unused)),
+			  size_t len __attribute__ ((unused)))
+{
+  if (type == SHT_X86_64_UNWIND)
+    return "X86_64_UNWIND";
+
+  return NULL;
 }

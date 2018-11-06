@@ -1,3 +1,8 @@
+2018-11-06  Mark Wielaard  <mark@klomp.org>
+
+	* x86_64_symbol.c (x86_64_section_type_name): New function.
+	* x86_64_init.c (x86_64_int): Hook section_type_name.
+
 2018-10-20  Mark Wielaard  <mark@klomp.org>
 
 	* ppc_initreg.c (ppc_set_initial_registers_tid): Use define instead of

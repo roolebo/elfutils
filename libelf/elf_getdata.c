@@ -146,7 +146,8 @@ convert_data (Elf_Scn *scn, int version __attribute__ ((unused)), int eclass,
 {
   const size_t align = __libelf_type_align (eclass, type);
 
-  if (data == MY_ELFDATA)
+  /* Do we need to convert the data and/or adjust for alignment?  */
+  if (data == MY_ELFDATA || type == ELF_T_BYTE)
     {
       if (((((size_t) (char *) scn->rawdata_base)) & (align - 1)) == 0)
 	/* No need to copy, we can use the raw data.  */

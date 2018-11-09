@@ -412,7 +412,10 @@ EXTRA_DIST = run-arextract.sh run-arsymtest.sh run-ar.sh \
 	     testfile-riscv64.bz2 testfile-riscv64-s.bz2 \
 	     testfile-riscv64-core.bz2 \
 	     run-copyadd-sections.sh run-copymany-sections.sh \
-	     run-typeiter-many.sh run-strip-test-many.sh
+	     run-typeiter-many.sh run-strip-test-many.sh \
+	     testfile-debug-rel-ppc64-g.o.bz2 \
+	     testfile-debug-rel-ppc64-z.o.bz2 \
+	     testfile-debug-rel-ppc64.o.bz2
 
 if USE_VALGRIND
 valgrind_cmd='valgrind -q --leak-check=full --error-exitcode=1'

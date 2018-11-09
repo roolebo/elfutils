@@ -1,3 +1,10 @@
+2018-11-09  Mark Wielaard  <mark@klomp.org>
+
+	* elf_compress.c (__libelf_reset_rawdata): Make rawdata change
+	explicit by calling __libelf_set_data_list.
+	* elf_getdata.c (convert_data): Don't convert if type is ELF_T_BYTE
+	even if endianness is different.
+
 2018-10-18  Mark Wielaard  <mark@klomp.org>
 
 	* libelf.h (Elf_Type): Add ELF_T_NHDR8.

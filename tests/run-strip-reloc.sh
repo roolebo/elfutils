@@ -135,4 +135,8 @@ testrun ${abs_top_builddir}/src/elfcompress -o strip-compressed.o -t zlib \
 runtest strip-uncompressed.o 1
 runtest strip-compressed.o 1
 
+# See run-readelf-zdebug-rel.sh
+testfiles testfile-debug-rel-ppc64.o
+runtest testfile-debug-rel-ppc64.o 1
+
 exit $status

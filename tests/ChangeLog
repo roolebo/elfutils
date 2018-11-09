@@ -1,3 +1,13 @@
+2018-11-09  Mark Wielaard  <mark@klomp.org>
+
+	* testfile-debug-rel-ppc64-g.o.bz2: New test file.
+	* testfile-debug-rel-ppc64-z.o.bz2: Likewise.
+	* testfile-debug-rel-ppc64.o.bz2: Likewise.
+	* Makefile.am (EXTRA_DIST): Add testfile-debug-rel-ppc64-g.o.bz2,
+	testfile-debug-rel-ppc64-z.o.bz2 and testfile-debug-rel-ppc64.o.bz2.
+	* run-strip-reloc.sh: Also test on testfile-debug-rel-ppc64.o.
+	* run-readelf-zdebug-rel.sh: Also test on testfile-debug-rel-ppc64*.o.
+
 2018-10-26  Mark Wielaard  <mark@klomp.org>
 
 	* run-strip-reloc.sh: Add a test for --reloc-debug-sections-only.

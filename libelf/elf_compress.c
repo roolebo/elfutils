@@ -326,6 +326,12 @@ __libelf_reset_rawdata (Elf_Scn *scn, void *buf, size_t size, size_t align,
 
   scn->rawdata_base = buf;
   scn->flags |= ELF_F_MALLOCED;
+
+  /* Pretend we (tried to) read the data from the file and setup the
+     data (might have to convert the Chdr to native format).  */
+  scn->data_read = 1;
+  scn->flags |= ELF_F_FILEDATA;
+  __libelf_set_data_list_rdlock (scn, 1);
 }
 
 int

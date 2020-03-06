@@ -140,6 +140,24 @@ nofree (void *arg)
   assert (cu->mod->lazycu == 0);
 }
 
+#ifdef __APPLE__
+//static void
+//walk_and_destroy (const void *node, VISIT order, int level)
+//{
+//}
+
+
+static void
+tdestroy (void *root, void (*free_node) (void *nodep))
+{
+  // XXX implement it
+  (void) root;
+  (void) free_node;
+  //twalk (root, walk_and_destroy);
+}
+
+#endif
+
 /* One reason fewer to keep the lazy lookup table for CUs.  */
 static inline void
 less_lazy (Dwfl_Module *mod)

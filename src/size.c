@@ -29,13 +29,18 @@
 #include <locale.h>
 #include <stdbool.h>
 #include <stdio.h>
+#ifdef HAVE___FSETLOCKING
 #include <stdio_ext.h>
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
 #include <system.h>
 #include <printversion.h>
+#ifdef __APPLE__
+#include "unlocked-io.h"
+#endif
 
 /* Name and version of program.  */
 ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
@@ -156,10 +161,12 @@ main (int argc, char *argv[])
   int remaining;
   int result = 0;
 
+#ifdef HAVE___FSETLOCKING
   /* We use no threads here which can interfere with handling a stream.  */
   __fsetlocking (stdin, FSETLOCKING_BYCALLER);
   __fsetlocking (stdout, FSETLOCKING_BYCALLER);
   __fsetlocking (stderr, FSETLOCKING_BYCALLER);
+#endif
 
   /* Set locale.  */
   setlocale (LC_ALL, "");

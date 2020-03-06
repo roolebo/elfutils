@@ -46,7 +46,7 @@ elf_cvt_gnuhash (void *dest, const void *src, size_t len, int encode)
     {
       if (len < 4)
 	return;
-      dest32[cnt] = bswap_32 (src32[cnt]);
+      dest32[cnt] = __builtin_bswap32 (src32[cnt]);
       len -= 4;
     }
 
@@ -59,7 +59,7 @@ elf_cvt_gnuhash (void *dest, const void *src, size_t len, int encode)
     {
       if (len < 8)
 	return;
-      dest64[cnt] = bswap_64 (src64[cnt]);
+      dest64[cnt] = __builtin_bswap64 (src64[cnt]);
       len -= 8;
     }
 
@@ -68,7 +68,7 @@ elf_cvt_gnuhash (void *dest, const void *src, size_t len, int encode)
   dest32 = (Elf32_Word *) &dest64[bitmask_words];
   while (len >= 4)
     {
-      *dest32++ = bswap_32 (*src32++);
+      *dest32++ = __builtin_bswap32 (*src32++);
       len -= 4;
     }
 }

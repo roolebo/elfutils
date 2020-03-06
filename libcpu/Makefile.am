@@ -77,12 +77,17 @@ endif
 i386_lex_no_Werror = yes
 
 libeu = ../lib/libeu.a
+#if USE_GNULIB
+libgnu = ../lib/libgnu.a
+#else
+#libgnu =
+#endif
 
 i386_lex_CFLAGS = -Wno-unused-label -Wno-unused-function -Wno-sign-compare
 i386_parse.o: i386_parse.c i386.mnemonics
 i386_parse_CFLAGS = -DNMNES="`wc -l < i386.mnemonics`"
 i386_lex.o: i386_parse.h
-i386_gendis_LDADD = $(libeu) -lm
+i386_gendis_LDADD = $(libeu) $(libgnu) -lm
 
 i386_parse.h: i386_parse.c ;
 

@@ -142,9 +142,8 @@ libebl_%.so libebl_%.map: libebl_%_pic.a $(libelf) $(libdw) $(libeu)
 	$(AM_V_at)echo 'ELFUTILS_$(PACKAGE_VERSION) { global: $*_init; local: *; };' \
 	  > $(@:.so=.map)
 	$(AM_V_CCLD)$(LINK) $(dso_LDFLAGS) -o $(@:.map=.so) \
-		-Wl,--whole-archive $< $(cpu_$*) -Wl,--no-whole-archive \
-		-Wl,--version-script,$(@:.so=.map),--no-undefined \
-		-Wl,--as-needed $(libelf) $(libdw) $(libeu)
+		$< $(cpu_$*) \
+		$(libelf) $(libdw) $(libeu)
 	@$(textrel_check)
 
 libebl_i386.so: $(cpu_i386)

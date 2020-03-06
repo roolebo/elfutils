@@ -31,13 +31,16 @@
 #include <locale.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <stdio_ext.h>
+#ifdef HAVE___FSETLOCKING
+# include <stdio_ext.h>
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
 #include <system.h>
 #include <printversion.h>
+#include "dirname.h"
 
 
 /* Name and version of program.  */
@@ -148,8 +151,10 @@ main (int argc, char *argv[])
   int remaining;
   int result = 0;
 
+#ifdef HAVE___FSETLOCKING
   /* We use no threads here which can interfere with handling a stream.  */
   (void) __fsetlocking (stdout, FSETLOCKING_BYCALLER);
+#endif
 
   /* Set locale.  */
   (void) setlocale (LC_ALL, "");
@@ -171,8 +176,10 @@ main (int argc, char *argv[])
      line, read from stdin.  */
   if (remaining == argc)
     {
+#ifdef HAVE___FSETLOCKING
       /* We use no threads here which can interfere with handling a stream.  */
       (void) __fsetlocking (stdin, FSETLOCKING_BYCALLER);
+#endif
 
       char *buf = NULL;
       size_t len = 0;
@@ -374,7 +381,7 @@ print_dwarf_function (Dwfl_Module *mod, Dwarf_Addr addr)
 		  if (file == NULL)
 		    file = "???";
 		  else if (only_basenames)
-		    file = basename (file);
+		    file = base_name (file);
 		  else if (use_comp_dir && file[0] != '/')
 		    {
 		      const char *const *dirs;
@@ -558,7 +565,7 @@ print_src (const char *src, int lineno, int linecol, Dwarf_Die *cu)
   const char *comp_dir_sep = "";
 
   if (only_basenames)
-    src = basename (src);
+    src = base_name (src);
   else if (use_comp_dir && src[0] != '/')
     {
       Dwarf_Attribute attr;
@@ -682,7 +689,7 @@ handle_address (const char *string, Dwfl *dwfl)
   const char *src;
   int lineno, linecol;
 
-  if (line != NULL && (src = dwfl_lineinfo (line, &addr, &lineno, &linecol,
+  if (line != NULL && (src = dwfl_lineinfo (line, (Dwarf_Addr *) &addr, &lineno, &linecol,
 					    NULL, NULL)) != NULL)
     {
       print_src (src, lineno, linecol, dwfl_linecu (line));

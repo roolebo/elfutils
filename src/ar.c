@@ -31,7 +31,9 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdio_ext.h>
+#ifdef HAVE___FSETLOCKING
+# include <stdio_ext.h>
+#endif
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
@@ -39,6 +41,7 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 
+#include "dirname.h"
 #include <system.h>
 #include <printversion.h>
 
@@ -139,10 +142,12 @@ static enum { ipos_none, ipos_before, ipos_after } ipos;
 int
 main (int argc, char *argv[])
 {
+#ifdef HAVE___FSETLOCKING
   /* We use no threads here which can interfere with handling a stream.  */
   (void) __fsetlocking (stdin, FSETLOCKING_BYCALLER);
   (void) __fsetlocking (stdout, FSETLOCKING_BYCALLER);
   (void) __fsetlocking (stderr, FSETLOCKING_BYCALLER);
+#endif
 
   /* Set locale.  */
   (void) setlocale (LC_ALL, "");
@@ -1129,7 +1134,7 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
       for (int cnt = 0; cnt < argc; ++cnt)
 	{
 	  ENTRY entry;
-	  entry.key = full_path ? argv[cnt] : basename (argv[cnt]);
+	  entry.key = full_path ? argv[cnt] : base_name (argv[cnt]);
 	  entry.data = &argv[cnt];
 	  if (hsearch (entry, ENTER) == NULL)
 	    error (EXIT_FAILURE, errno,
@@ -1239,7 +1244,7 @@ do_oper_insert (int oper, const char *arfname, char **argv, int argc,
       /* Open all the new files, get their sizes and add all symbols.  */
       for (int cnt = 0; cnt < argc; ++cnt)
 	{
-	  const char *bname = basename (argv[cnt]);
+	  const char *bname = base_name (argv[cnt]);
 	  size_t bnamelen = strlen (bname);
 	  if (found[cnt] == NULL)
 	    {

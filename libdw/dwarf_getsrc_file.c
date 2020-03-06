@@ -38,6 +38,7 @@
 
 #include "libdwP.h"
 
+#include "dirname.h"
 
 int
 dwarf_getsrc_file (Dwarf *dbg, const char *fname, int lineno, int column,
@@ -98,7 +99,7 @@ dwarf_getsrc_file (Dwarf *dbg, const char *fname, int lineno, int column,
 	      /* Match the name with the name the user provided.  */
 	      const char *fname2 = line->files->info[lastfile].name;
 	      if (is_basename)
-		lastmatch = strcmp (basename (fname2), fname) == 0;
+		lastmatch = strcmp (base_name (fname2), fname) == 0;
 	      else
 		lastmatch = strcmp (fname2, fname) == 0;
 	    }

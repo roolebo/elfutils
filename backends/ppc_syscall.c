@@ -49,5 +49,14 @@ ppc_syscall_abi (Ebl *ebl __attribute__ ((unused)),
   return 0;
 }
 
+#ifndef __APPLE__
 __typeof (ppc_syscall_abi)
 ppc64_syscall_abi __attribute__ ((alias ("ppc_syscall_abi")));
+#else
+int
+ppc64_syscall_abi (Ebl *ebl __attribute__ ((unused)),
+		 int *sp, int *pc, int *callno, int args[6])
+{
+  return ppc_syscall_abi(ebl, sp, pc, callno, args);
+}
+#endif

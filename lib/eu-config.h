@@ -52,12 +52,19 @@
 # define rwlock_unlock(lock) ((void) (lock))
 #endif	/* USE_LOCKS */
 
+//#ifndef __APPLE__ //If GNULIB
 /* gettext helper macro.  */
 #define N_(Str) Str
+//#endif
 
 /* Compiler-specific definitions.  */
+#ifdef __APPLE__
+#define strong_alias(name, aliasname) \
+// extern __typeof (name) aliasname __atribute__ (weak, alias (#name));
+#else
 #define strong_alias(name, aliasname) \
   extern __typeof (name) aliasname __attribute__ ((alias (#name)));
+#endif
 
 #ifdef __i386__
 # define internal_function __attribute__ ((regparm (3), stdcall))
@@ -161,8 +168,12 @@ asm (".section predict_data, \"aw\"; .previous\n"
 # define INTUSE(name) _INTUSE(name)
 # define _INTUSE(name) __##name##_internal
 # define INTDEF(name) _INTDEF(name)
+# ifdef __APPLE__
+# define _INTDEF(name) extern __typeof__ (name) __##name##_internal;
+# else
 # define _INTDEF(name) \
   extern __typeof__ (name) __##name##_internal __attribute__ ((alias (#name)));
+# endif
 # define INTDECL(name) _INTDECL(name)
 # define _INTDECL(name) \
   extern __typeof__ (name) __##name##_internal attribute_hidden;

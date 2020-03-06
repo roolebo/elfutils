@@ -1,46 +1,36 @@
-/* Convenience function for string allocation.
-   Copyright (C) 2006, 2015 Red Hat, Inc.
-   This file is part of elfutils.
+/* Duplicate a bounded initial segment of a string, with out-of-memory
+   checking.
+   Copyright (C) 2003, 2006-2007, 2009-2018 Free Software Foundation, Inc.
 
-   This file is free software; you can redistribute it and/or modify
-   it under the terms of either
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 3 of the License, or
+   (at your option) any later version.
 
-     * the GNU Lesser General Public License as published by the Free
-       Software Foundation; either version 3 of the License, or (at
-       your option) any later version
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   or
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
-     * the GNU General Public License as published by the Free
-       Software Foundation; either version 2 of the License, or (at
-       your option) any later version
+#include <config.h>
 
-   or both in parallel, as here.
+/* Specification.  */
+#include "xstrndup.h"
 
-   elfutils is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
-
-   You should have received copies of the GNU General Public License and
-   the GNU Lesser General Public License along with this program.  If
-   not, see <http://www.gnu.org/licenses/>.  */
-
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
-
-#include <stdint.h>
 #include <string.h>
-#include "libeu.h"
-#include "system.h"
+#include "xalloc.h"
 
-/* Return a newly allocated copy of STRING.  */
+/* Return a newly allocated copy of at most N bytes of STRING.
+   In other words, return a copy of the initial segment of length N of
+   STRING.  */
 char *
 xstrndup (const char *string, size_t n)
 {
-  char *res;
-  size_t len = strnlen (string, n);
-  *((char *) mempcpy ((res = xmalloc (len + 1)), string, len)) = '\0';
-  return res;
+  char *s = strndup (string, n);
+  if (! s)
+    xalloc_die ();
+  return s;
 }

@@ -114,10 +114,7 @@ libdw.so$(EXEEXT): $(srcdir)/libdw.map $(libdw_so_LIBS) $(libdw_so_DEPS)
 # The rpath is necessary for libebl because its $ORIGIN use will
 # not fly in a setuid executable that links in libdw.
 	$(AM_V_CCLD)$(LINK) $(dso_LDFLAGS) -o $@ \
-		-Wl,--soname,$@.$(VERSION) \
-		-Wl,--enable-new-dtags,-rpath,$(pkglibdir) \
-		-Wl,--version-script,$<,--no-undefined \
-		-Wl,--whole-archive $(libdw_so_LIBS) -Wl,--no-whole-archive \
+		$(libdw_so_LIBS) \
 		$(libdw_so_LDLIBS)
 	@$(textrel_check)
 	$(AM_V_at)ln -fs $@ $@.$(VERSION)
@@ -134,10 +131,10 @@ uninstall: uninstall-am
 	rm -f $(DESTDIR)$(libdir)/libdw.so
 	rmdir --ignore-fail-on-non-empty $(DESTDIR)$(includedir)/elfutils
 
-libdwfl_objects = $(shell $(AR) t ../libdwfl/libdwfl.a)
+libdwfl_objects = $(shell $(AR) t ../libdwfl/libdwfl.a | grep -v __.SYMDEF)
 libdw_a_LIBADD = $(addprefix ../libdwfl/,$(libdwfl_objects))
 
-libdwelf_objects = $(shell $(AR) t ../libdwelf/libdwelf.a)
+libdwelf_objects = $(shell $(AR) t ../libdwelf/libdwelf.a | grep -v __.SYMDEF)
 libdw_a_LIBADD += $(addprefix ../libdwelf/,$(libdwelf_objects))
 
 noinst_HEADERS = libdwP.h memory-access.h dwarf_abbrev_hash.h \

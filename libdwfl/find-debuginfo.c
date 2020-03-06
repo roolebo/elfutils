@@ -35,6 +35,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include "dirname.h"
 #include "system.h"
 
 
@@ -165,7 +166,7 @@ find_debuginfo_in_path (Dwfl_Module *mod, const char *file_name,
 {
   bool cancheck = debuglink_crc != (GElf_Word) 0;
 
-  const char *file_basename = file_name == NULL ? NULL : basename (file_name);
+  const char *file_basename = file_name == NULL ? NULL : base_name (file_name);
   char *localname = NULL;
 
   /* We invent a debuglink .debug name if NULL, but then want to try the
@@ -279,7 +280,7 @@ find_debuginfo_in_path (Dwfl_Module *mod, const char *file_name,
 	  else
 	    {
 	      subdir = NULL;
-	      file = basename (debuglink_file);
+	      file = base_name (debuglink_file);
 	    }
 	  try_file_basename = debuglink_null;
 	  break;
@@ -307,7 +308,7 @@ find_debuginfo_in_path (Dwfl_Module *mod, const char *file_name,
 	    if (mod->dw != NULL && (p[0] == '\0' || p[0] == '/'))
 	      {
 		fd = try_open (&main_stat, dir, ".dwz",
-			       basename (file), &fname);
+			       base_name (file), &fname);
 		if (fd < 0)
 		  {
 		    if (errno != ENOENT && errno != ENOTDIR)

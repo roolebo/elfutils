@@ -38,6 +38,9 @@
 #include <sys/stat.h>
 
 #include "libelfP.h"
+#ifdef __APPLE__
+# include "posix_fallocate_mac.h"
+#endif
 
 
 static off_t
@@ -106,12 +109,16 @@ write_file (Elf *elf, off_t size, int change_bo, size_t shnum)
 	  if (elf->cmd == ELF_C_RDWR_MMAP
 	      && (size_t) size > elf->maximum_size)
 	    {
+#ifndef __APPLE__
 	      if (mremap (elf->map_address, elf->maximum_size,
 			  size, 0) == MAP_FAILED)
 		{
+#endif
 		  __libelf_seterrno (ELF_E_WRITE_ERROR);
 		  return -1;
+#ifndef __APPLE__
 		}
+#endif
 	      elf->maximum_size = size;
 	    }
 

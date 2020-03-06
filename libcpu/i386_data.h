@@ -1153,7 +1153,15 @@ FCT_mod$64r_m (struct output_data *d)
   return general_mod$r_m (d);
 }
 #else
+#ifndef __APPLE__
 static typeof (FCT_mod$r_m) FCT_mod$64r_m __attribute__ ((alias ("FCT_mod$r_m")));
+#else
+static int
+FCT_mod$64r_m (struct output_data *d)
+{
+  return FCT_mod$r_m(d);
+}
+#endif
 #endif
 
 

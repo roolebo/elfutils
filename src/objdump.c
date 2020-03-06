@@ -27,7 +27,9 @@
 #include <locale.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <stdio_ext.h>
+#ifdef HAVE___FSETLOCKING
+# include <stdio_ext.h>
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -37,6 +39,9 @@
 #include <color.h>
 #include <printversion.h>
 #include "../libebl/libeblP.h"
+#ifdef __APPLE__
+# include "unlocked-io.h"
+#endif
 
 
 /* Name and version of program.  */
@@ -130,10 +135,12 @@ static bool print_disasm;
 int
 main (int argc, char *argv[])
 {
+#ifdef HAVE___FSETLOCKING
   /* We use no threads here which can interfere with handling a stream.  */
   (void) __fsetlocking (stdin, FSETLOCKING_BYCALLER);
   (void) __fsetlocking (stdout, FSETLOCKING_BYCALLER);
   (void) __fsetlocking (stderr, FSETLOCKING_BYCALLER);
+#endif
 
   /* Set locale.  */
   (void) setlocale (LC_ALL, "");

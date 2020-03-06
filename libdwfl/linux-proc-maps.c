@@ -36,7 +36,9 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <stdio.h>
-#include <stdio_ext.h>
+#ifdef HAVE___FSETLOCKING
+# include <stdio_ext.h>
+#endif
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
@@ -311,7 +313,9 @@ dwfl_linux_proc_report (Dwfl *dwfl, pid_t pid)
   if (f == NULL)
     return errno;
 
+#ifdef HAVE___FSETLOCKING
   (void) __fsetlocking (f, FSETLOCKING_BYCALLER);
+#endif
 
   result = proc_maps_report (dwfl, f, sysinfo_ehdr, pid);
 

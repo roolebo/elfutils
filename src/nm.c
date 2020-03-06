@@ -36,17 +36,25 @@
 #include <search.h>
 #include <stdbool.h>
 #include <stdio.h>
+#ifdef HAVE___FSETLOCKING
 #include <stdio_ext.h>
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
+#include "dirname.h"
 #include <libeu.h>
 #include <system.h>
 #include <color.h>
 #include <printversion.h>
 #include "../libebl/libeblP.h"
 #include "../libdwfl/libdwflP.h"
+
+#include "dirname.h"
+#ifdef __APPLE__
+#include "unlocked-io.h"
+#endif
 
 
 /* Name and version of program.  */
@@ -217,10 +225,12 @@ main (int argc, char *argv[])
   int remaining;
   int result = 0;
 
+#ifdef HAVE___FSETLOCKING
   /* We use no threads here which can interfere with handling a stream.  */
   (void) __fsetlocking (stdin, FSETLOCKING_BYCALLER);
   (void) __fsetlocking (stdout, FSETLOCKING_BYCALLER);
   (void) __fsetlocking (stderr, FSETLOCKING_BYCALLER);
+#endif
 
   /* Set locale.  */
   (void) setlocale (LC_ALL, "");
@@ -1194,6 +1204,24 @@ getdbg_dwflmod (Dwfl_Module *dwflmod,
   return DWARF_CB_OK;
 }
 
+#ifdef __APPLE__
+//static void
+//walk_and_destroy (const void *node, VISIT order, int level)
+//{
+//}
+
+
+static void
+tdestroy (void *root, void (*free_node) (void *nodep))
+{
+  // XXX implement it
+  (void) root;
+  (void) free_node;
+  //twalk (root, walk_and_destroy);
+}
+
+#endif
+
 static void
 show_symbols (int fd, Ebl *ebl, GElf_Ehdr *ehdr,
 	      Elf_Scn *scn, Elf_Scn *xndxscn,
@@ -1389,7 +1417,7 @@ show_symbols (int fd, Ebl *ebl, GElf_Ehdr *ehdr,
 			  int lineno;
 			  (void) dwarf_lineno (line, &lineno);
 			  const char *file = dwarf_linesrc (line, NULL, NULL);
-			  file = (file != NULL) ? basename (file) : "???";
+			  file = (file != NULL) ? base_name (file) : "???";
 			  int n;
 			  n = obstack_printf (&whereob, "%s:%d%c", file,
 					      lineno, '\0');
@@ -1420,7 +1448,7 @@ show_symbols (int fd, Ebl *ebl, GElf_Ehdr *ehdr,
 		{
 		  /* We found the line.  */
 		  int n = obstack_printf (&whereob, "%s:%" PRIu64 "%c",
-					  basename ((*found)->file),
+					  base_name ((*found)->file),
 					  (*found)->lineno,
 					  '\0');
 		  sym_mem[nentries_used].where = obstack_finish (&whereob);

@@ -37,7 +37,9 @@
 #include <locale.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <stdio_ext.h>
+#ifdef HAVE___FSETLOCKING
+# include <stdio_ext.h>
+#endif
 #include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
@@ -54,6 +56,10 @@
 
 #ifndef _
 # define _(str) gettext (str)
+#endif
+
+#ifdef __APPLE__
+# define strndupa strndup
 #endif
 
 /* Name and version of program.  */
@@ -2471,10 +2477,12 @@ handle_implicit_modules (const struct arg_info *info)
 int
 main (int argc, char **argv)
 {
+#ifdef HAVE___FSETLOCKING
   /* We use no threads here which can interfere with handling a stream.  */
   __fsetlocking (stdin, FSETLOCKING_BYCALLER);
   __fsetlocking (stdout, FSETLOCKING_BYCALLER);
   __fsetlocking (stderr, FSETLOCKING_BYCALLER);
+#endif
 
   /* Set locale.  */
   setlocale (LC_ALL, "");

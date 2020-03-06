@@ -44,12 +44,15 @@
 #include <inttypes.h>
 #include <errno.h>
 #include <stdio.h>
-#include <stdio_ext.h>
+#ifdef HAVE___FSETLOCKING
+# include <stdio_ext.h>
+#endif
 #include <string.h>
 #include <stdlib.h>
 #include <sys/utsname.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include "dirname.h"
 
 /* If fts.h is included before config.h, its indirect inclusions may not
    give us the right LFS aliases of these functions, so map them manually.  */
@@ -116,7 +119,7 @@ try_kernel_name (Dwfl *dwfl, char **fname, bool try_debug)
 	/* Try the file's unadorned basename as DEBUGLINK_FILE,
 	   to look only for "vmlinux" files.  */
 	fd = INTUSE(dwfl_standard_find_debuginfo) (&fakemod, NULL, NULL, 0,
-						   *fname, basename (*fname),
+						   *fname, base_name (*fname),
 						   0, &fakemod.debug.name);
 
       if (fakemod.debug.name != NULL)
@@ -497,7 +500,9 @@ intuit_kernel_bounds (Dwarf_Addr *start, Dwarf_Addr *end, Dwarf_Addr *notes)
   if (state.f == NULL)
     return errno;
 
+#ifdef HAVE___FSETLOCKING
   (void) __fsetlocking (state.f, FSETLOCKING_BYCALLER);
+#endif
 
   *notes = 0;
 
@@ -869,6 +874,7 @@ dwfl_linux_kernel_module_section_address
  const GElf_Shdr *shdr __attribute__ ((unused)),
  Dwarf_Addr *addr)
 {
+  int result;
   char *sysfile;
   if (asprintf (&sysfile, SECADDRDIRFMT "%s", modname, secname) < 0)
     return DWARF_CB_ABORT;
@@ -948,9 +954,11 @@ dwfl_linux_kernel_module_section_address
     }
 
  ok:
+#ifdef HAVE___FSETLOCKING
   (void) __fsetlocking (f, FSETLOCKING_BYCALLER);
+#endif
 
-  int result = (fscanf (f, "%" PRIx64 "\n", addr) == 1 ? 0
+  result = (fscanf (f, "%" PRIx64 "\n", addr) == 1 ? 0
 		: ferror_unlocked (f) ? errno : ENOEXEC);
   fclose (f);
 
@@ -969,7 +977,9 @@ dwfl_linux_kernel_report_modules (Dwfl *dwfl)
   if (f == NULL)
     return errno;
 
+#ifdef HAVE___FSETLOCKING
   (void) __fsetlocking (f, FSETLOCKING_BYCALLER);
+#endif
 
   int result = 0;
   Dwarf_Addr modaddr;

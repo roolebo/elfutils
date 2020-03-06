@@ -45,7 +45,7 @@ AC_COPYRIGHT([Copyright (C) 1996-2018 The elfutils developers.])
 AC_PREREQ(2.63)			dnl Minimum Autoconf version required.
 
 dnl We use GNU make extensions; automake 1.10 defaults to -Wportability.
-AM_INIT_AUTOMAKE([gnits 1.11 -Wno-portability dist-bzip2 no-dist-gzip parallel-tests])
+AM_INIT_AUTOMAKE([gnits subdir-objects 1.11 -Wno-portability dist-bzip2 no-dist-gzip parallel-tests])
 AM_MAINTAINER_MODE
 
 AM_SILENT_RULES([yes])
@@ -86,6 +86,8 @@ AS_IF([test "$use_locks" = yes],
 AH_TEMPLATE([USE_LOCKS], [Defined if libraries should be thread-safe.])
 
 AC_PROG_CC
+gl_EARLY
+gl_INIT
 AC_PROG_RANLIB
 AC_PROG_YACC
 AM_PROG_LEX
@@ -371,6 +373,7 @@ AC_CHECK_DECLS([mempcpy],[],[],
                 #include <string.h>])
 
 AC_CHECK_FUNCS([process_vm_readv])
+AC_CHECK_FUNCS([__fsetlocking])
 
 AC_CHECK_LIB([stdc++], [__cxa_demangle], [dnl
 AC_DEFINE([USE_DEMANGLE], [1], [Defined if demangling is enabled])])
@@ -480,7 +483,7 @@ if test "$libc_has_argp" = "false" ; then
 	AC_CHECK_LIB([argp], [argp_parse], [have_argp="true"], [have_argp="false"])
 
 	if test "$have_argp" = "false"; then
-		AC_MSG_ERROR("no libargp found")
+		AC_MSG_WARN("no libargp found")
 	else
 		argp_LDADD="-largp"
 	fi

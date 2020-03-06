@@ -21,7 +21,9 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include <stdio.h>
+#ifdef HAVE___FSETLOCKING
 #include <stdio_ext.h>
+#endif
 #include <string.h>
 #include <locale.h>
 #include <fcntl.h>
@@ -30,6 +32,7 @@
 #include <dwarf.h>
 #include <system.h>
 #include <printversion.h>
+#include "dirname.h"
 
 /* Name and version of program.  */
 ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
@@ -147,7 +150,7 @@ module_callback (Dwfl_Module *mod, void **userdata __attribute__((unused)),
 
   int width = get_addr_width (mod);
   printf ("0x%0*" PRIx64 "-0x%0*" PRIx64 " %s\n",
-	  width, start, width, end, basename (name));
+	  width, start, width, end, base_name (name));
 
   const unsigned char *id;
   GElf_Addr id_vaddr;
@@ -625,10 +628,12 @@ parse_opt (int key, char *arg __attribute__ ((unused)),
 int
 main (int argc, char **argv)
 {
+#ifdef HAVE___FSETLOCKING
   /* We use no threads here which can interfere with handling a stream.  */
   __fsetlocking (stdin, FSETLOCKING_BYCALLER);
   __fsetlocking (stdout, FSETLOCKING_BYCALLER);
   __fsetlocking (stderr, FSETLOCKING_BYCALLER);
+#endif
 
   /* Set locale.  */
   (void) setlocale (LC_ALL, "");

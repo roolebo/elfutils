@@ -35,7 +35,9 @@
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
+#ifdef HAVE___FSETLOCKING
 #include <stdio_ext.h>
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
@@ -56,6 +58,9 @@
 #include "../libdw/memory-access.h"
 
 #include "../libdw/known-dwarf.h"
+#ifdef __APPLE__
+#include "unlocked-io.h"
+#endif
 
 #ifdef __linux__
 #define CORE_SIGILL  SIGILL
@@ -315,8 +320,10 @@ static char *no_str;
 int
 main (int argc, char *argv[])
 {
+#ifdef HAVE___FSETLOCKING
   /* We use no threads here which can interfere with handling a stream.  */
   (void) __fsetlocking (stdout, FSETLOCKING_BYCALLER);
+#endif
 
   /* Set locale.  */
   setlocale (LC_ALL, "");

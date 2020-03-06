@@ -30,6 +30,7 @@
 # include <config.h>
 #endif
 
+#include "dirname.h"
 #include "libdwflP.h"
 #include "../libdw/libdwP.h"
 
@@ -103,7 +104,7 @@ dwfl_module_getsrc_file (Dwfl_Module *mod,
 		{
 		  /* Match the name with the name the user provided.  */
 		  lastfile = file;
-		  lastmatch = !strcmp (is_basename ? basename (file) : file,
+		  lastmatch = !strcmp (is_basename ? base_name (file) : file,
 				       fname);
 		}
 	    }

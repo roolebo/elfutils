@@ -51,5 +51,13 @@ EBLHOOK(auxv_info) (GElf_Xword a_type, const char **name, const char **format)
   return 1;
 }
 
+#ifndef __APPLE__
 __typeof (ppc_auxv_info) ppc64_auxv_info
 			 __attribute__ ((alias ("ppc_auxv_info")));
+#else
+int
+ppc64_auxv_info (GElf_Xword a_type, const char **name, const char **format)
+{
+  return ppc_auxv_info(a_type, name, format);
+}
+#endif

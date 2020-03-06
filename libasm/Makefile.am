@@ -65,9 +65,7 @@ libasm_so_LIBS = libasm_pic.a
 libasm_so_SOURCES =
 libasm.so$(EXEEXT): $(srcdir)/libasm.map $(libasm_so_LIBS) $(libasm_so_DEPS)
 	$(AM_V_CCLD)$(LINK) $(dso_LDFLAGS) -o $@ \
-		-Wl,--soname,$@.$(VERSION) \
-		-Wl,--version-script,$<,--no-undefined \
-		-Wl,--whole-archive $(libasm_so_LIBS) -Wl,--no-whole-archive \
+		$(libasm_so_LIBS) \
 		$(libasm_so_LDLIBS)
 	@$(textrel_check)
 	$(AM_V_at)ln -fs $@ $@.$(VERSION)

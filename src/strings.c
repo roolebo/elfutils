@@ -32,7 +32,9 @@
 #include <locale.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <stdio_ext.h>
+#ifdef HAVE___FSETLOCKING
+# include <stdio_ext.h>
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -42,6 +44,9 @@
 #include <libeu.h>
 #include <system.h>
 #include <printversion.h>
+#ifdef __APPLE__
+# include "unlocked-io.h"
+#endif
 
 #ifndef MAP_POPULATE
 # define MAP_POPULATE 0
@@ -143,9 +148,11 @@ static off_t elfmap_off;
 int
 main (int argc, char *argv[])
 {
+#ifdef HAVE___FSETLOCKING
   /* We use no threads.  */
   __fsetlocking (stdin, FSETLOCKING_BYCALLER);
   __fsetlocking (stdout, FSETLOCKING_BYCALLER);
+#endif
 
   /* Set locale.  */
   (void) setlocale (LC_ALL, "");
@@ -570,9 +577,11 @@ read_block (int fd, const char *fname, off_t fdlen, off_t from, off_t to)
       elfmap_off = from & ~(ps - 1);
       elfmap_base = elfmap = map_file (fd, elfmap_off, fdlen, &elfmap_size);
 
+#ifndef __APPLE__
       if (unlikely (elfmap == MAP_FAILED))
 	/* Let the kernel know we are going to read everything in sequence.  */
 	(void) posix_fadvise (fd, 0, 0, POSIX_FADV_SEQUENTIAL);
+#endif
     }
 
   if (unlikely (elfmap == MAP_FAILED))

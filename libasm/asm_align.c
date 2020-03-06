@@ -36,7 +36,9 @@
 
 #include <libasmP.h>
 #include <system.h>
-
+#ifdef __APPLE__
+# include "unlocked-io.h"
+#endif
 
 int
 asm_align (AsmScn_t *asmscn, GElf_Word value)

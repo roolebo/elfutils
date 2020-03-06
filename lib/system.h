@@ -64,7 +64,7 @@
 #define powerof2(x) (((x) & ((x) - 1)) == 0)
 #endif
 
-#if !HAVE_DECL_MEMPCPY
+#if !HAVE_DECL_MEMPCPY && !defined(__APPLE__)
 #define mempcpy(dest, src, n) \
     ((void *) ((char *) memcpy (dest, src, n) + (size_t) n))
 #endif

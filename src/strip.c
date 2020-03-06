@@ -32,13 +32,16 @@
 #include <locale.h>
 #include <stdbool.h>
 #include <stdio.h>
+#ifdef HAVE___FSETLOCKING
 #include <stdio_ext.h>
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 
+#include "dirname.h"
 #include <elf-knowledge.h>
 #include <libebl.h>
 #include "libdwelf.h"
@@ -224,10 +227,12 @@ main (int argc, char *argv[])
   int remaining;
   int result = 0;
 
+#ifdef HAVE___FSETLOCKING
   /* We use no threads here which can interfere with handling a stream.  */
   __fsetlocking (stdin, FSETLOCKING_BYCALLER);
   __fsetlocking (stdout, FSETLOCKING_BYCALLER);
   __fsetlocking (stderr, FSETLOCKING_BYCALLER);
+#endif
 
   /* Set locale.  */
   setlocale (LC_ALL, "");
@@ -712,8 +717,13 @@ process_file (const char *fname)
 
       /* If we have to preserve the timestamp, we need it in the
 	 format utimes() understands.  */
+#ifdef __APPLE__
+      tv[0] = pre_st.st_atimespec;
+      tv[1] = pre_st.st_mtimespec;
+#else
       tv[0] = pre_st.st_atim;
       tv[1] = pre_st.st_mtim;
+#endif
     }
 
   /* Open the file.  */
@@ -1726,7 +1736,7 @@ handle_elf (int fd, Elf *elf, const char *prefix, const char *fname,
 		 elf_errmsg (-1));
 	}
 
-      char *debug_basename = basename (debug_fname_embed ?: debug_fname);
+      char *debug_basename = base_name (debug_fname_embed ?: debug_fname);
       off_t crc_offset = strlen (debug_basename) + 1;
       /* Align to 4 byte boundary */
       crc_offset = ((crc_offset - 1) & ~3) + 4;

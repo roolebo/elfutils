@@ -34,7 +34,9 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
-#include <stdio_ext.h>
+#ifdef HAVE___FSETLOCKING
+# include <stdio_ext.h>
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -58,8 +60,10 @@ prepare_text_output (AsmCtx_t *result)
 	  free (result);
 	  result = NULL;
 	}
+#if HAVE___FSETLOCKING
       else
 	__fsetlocking (result->out.file, FSETLOCKING_BYCALLER);
+#endif
     }
 
   return result;

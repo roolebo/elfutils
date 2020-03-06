@@ -49,6 +49,9 @@
 
 #define obstack_chunk_alloc xmalloc
 #define obstack_chunk_free free
+#ifdef __APPLE__
+# include "unlocked-io.h"
+#endif
 
 /* The error handler.  */
 static void yyerror (const char *s);

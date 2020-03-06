@@ -179,6 +179,23 @@ noop (void *arg __attribute__ ((unused)))
 {
 }
 
+#ifdef __APPLE__
+//static void
+//walk_and_destroy (const void *node, VISIT order, int level)
+//{
+//}
+
+
+static void
+tdestroy (void *root, void (*free_node) (void *nodep))
+{
+  // XXX implement it
+  (void) root;
+  (void) free_node;
+  //twalk (root, walk_and_destroy);
+}
+
+#endif
 
 static int
 process_file (const char *fname, bool more_than_one)

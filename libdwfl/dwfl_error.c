@@ -154,7 +154,7 @@ dwfl_errmsg (int error)
   switch (error &~ 0xffff)
     {
     case OTHER_ERROR (ERRNO):
-      return strerror_r (error & 0xffff, "bad", 0);
+      return strerror_r (error & 0xffff, "bad", 0) == 0 ? "bad" : NULL;
     case OTHER_ERROR (LIBELF):
       return elf_errmsg (error & 0xffff);
     case OTHER_ERROR (LIBDW):

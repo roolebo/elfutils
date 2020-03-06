@@ -36,7 +36,7 @@
 #include "libelfP.h"
 
 
-int __libelf_fill_byte;
+int __libelf_fill_byte = 0;
 
 
 void

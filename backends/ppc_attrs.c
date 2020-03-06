@@ -81,6 +81,16 @@ ppc_check_object_attribute (Ebl *ebl __attribute__ ((unused)),
   return false;
 }
 
+#ifndef __APPLE__
 __typeof (ppc_check_object_attribute)
      ppc64_check_object_attribute
      __attribute__ ((alias ("ppc_check_object_attribute")));
+#else
+bool
+ppc64_check_object_attribute (Ebl *ebl __attribute__ ((unused)),
+			    const char *vendor, int tag, uint64_t value,
+			    const char **tag_name, const char **value_name)
+{
+  return ppc_check_object_attribute(ebl, vendor, tag, value, tag_name, value_name);
+}
+#endif

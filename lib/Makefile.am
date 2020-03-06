@@ -28,7 +28,7 @@
 ## not, see <http://www.gnu.org/licenses/>.
 ##
 include $(top_srcdir)/config/eu.am
-AM_CFLAGS += $(fpic_CFLAGS)
+AM_CFLAGS += $(fpic_CFLAGS) -Wno-format-nonliteral -Wno-error=stack-usage= -Wno-error=unused-parameter -Wno-error=missing-field-initializers -Wno-error=type-limits
 AM_CPPFLAGS += -I$(srcdir)/../libelf
 
 noinst_LIBRARIES = libeu.a
@@ -41,6 +41,11 @@ noinst_HEADERS = fixedsizehash.h libeu.h system.h dynamicsizehash.h list.h \
 		 eu-config.h color.h printversion.h bpf.h
 EXTRA_DIST = dynamicsizehash.c
 
+MOSTLYCLEANFILES =
+BUILT_SOURCES =
+
 if !GPROF
 xmalloc_CFLAGS = -ffunction-sections
 endif
+
+include gnulib.am

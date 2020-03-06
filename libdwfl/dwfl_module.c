@@ -58,6 +58,24 @@ free_file (struct dwfl_file *file)
     close (file->fd);
 }
 
+#ifdef __APPLE__
+//static void
+//walk_and_destroy (const void *node, VISIT order, int level)
+//{
+//}
+
+
+static void
+tdestroy (void *root, void (*free_node) (void *nodep))
+{
+  // XXX implement it
+  (void) root;
+  (void) free_node;
+  //twalk (root, walk_and_destroy);
+}
+
+#endif
+
 void
 internal_function
 __libdwfl_module_free (Dwfl_Module *mod)

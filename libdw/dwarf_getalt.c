@@ -66,7 +66,7 @@ __libdw_filepath (const char *debugdir, const char *dir, const char *file)
 	  char *c = mempcpy (path, dir, dirlen);
 	  if (dir[dirlen - 1] != '/')
 	    *c++ = '/';
-	  mempcpy (c, file, filelen + 1);
+	  (void) mempcpy (c, file, filelen + 1);
 	}
       return path;
     }
@@ -87,7 +87,7 @@ __libdw_filepath (const char *debugdir, const char *dir, const char *file)
 	      if (dir[dirlen - 1] != '/')
 		*c++ = '/';
 	    }
-	  mempcpy (c, file, filelen + 1);
+	  (void) mempcpy (c, file, filelen + 1);
 	  return path;
 	}
     }

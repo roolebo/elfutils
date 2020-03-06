@@ -36,6 +36,7 @@
 #include <endian.h>
 #include <byteswap.h>
 #include "system.h"
+#include "dirname.h"
 
 
 /* On failure return, we update *NEXT to point back at OFFSET.  */
@@ -575,7 +576,7 @@ dwfl_core_file_report (Dwfl *dwfl, Elf *elf, const char *executable)
       if (! __libdwfl_dynamic_vaddr_get (module->elf, &file_dynamic_vaddr))
 	continue;
       Dwfl_Module *mod;
-      mod = __libdwfl_report_elf (dwfl, basename (module->name), module->name,
+      mod = __libdwfl_report_elf (dwfl, base_name (module->name), module->name,
 				  module->fd, module->elf,
 				  module->l_ld - file_dynamic_vaddr,
 				  true, true);

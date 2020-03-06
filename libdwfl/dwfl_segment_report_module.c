@@ -39,6 +39,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include "dirname.h"
 #include <system.h>
 
 
@@ -669,7 +670,7 @@ dwfl_segment_report_module (Dwfl *dwfl, int ndx, const char *name,
 	      bias += fixup;
 	      if (module->name[0] != '\0')
 		{
-		  name = basename (module->name);
+		  name = base_name (module->name);
 		  name_is_final = true;
 		}
 	      break;

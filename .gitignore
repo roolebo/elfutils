@@ -2,6 +2,7 @@
 *#
 *.a
 *.o
+*.dSYM
 *.orig
 *.os
 *.patch

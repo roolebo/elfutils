@@ -440,6 +440,7 @@ static const struct argp_option options[] =
 
    { NULL, 0, NULL, 0, "Options:", 2 },
    { "logical", 'L', NULL, 0, "Follow symlinks, default=ignore.", 0 },
+   { "max-depth", 'M', "LEVELS", 0, "Depth of directory levels to descend into, default=no-limit.", 0 },
    { "rescan-time", 't', "SECONDS", 0, "Number of seconds to wait between rescans, 0=disable.", 0 },
    { "groom-time", 'g', "SECONDS", 0, "Number of seconds to wait between database grooming, 0=disable.", 0 },
    { "maxigroom", 'G', NULL, 0, "Run a complete database groom/shrink pass at startup.", 0 },
@@ -520,6 +521,7 @@ static unsigned http_port = 8002;
 static struct sockaddr_in6 http_sockaddr;
 static string addr_info = "";
 static bool webapi_cors = false;
+static int max_depth = -1;
 static unsigned rescan_s = 300;
 static unsigned groom_s = 86400;
 static bool maxigroom = false;
@@ -659,6 +661,13 @@ parse_opt (int key, char *arg,
       if (passive_p)
         argp_failure(state, 1, EINVAL, "-D option inconsistent with passive mode");
       extra_ddl.push_back(string(arg));
+      break;
+    case 'M':
+      if (passive_p)
+        argp_failure(state, 1, EINVAL, "-M option inconsistent with passive mode");
+      max_depth = atoi(arg);
+      if (max_depth < 0)
+        argp_failure(state, 1, EINVAL, "-M LEVELS needs to be at least 0");
       break;
     case 't':
       if (passive_p)
@@ -5182,6 +5191,17 @@ scan_source_paths()
       }
 
     fts_scanned ++;
+
+    if (max_depth >= 0 && (f->fts_info == FTS_D || f->fts_info == FTS_DP) &&
+        f->fts_level > max_depth)
+      {
+        fts_set(fts, f, FTS_SKIP);
+        if (verbose > 2)
+          obatched(clog) << "fts skip " << f->fts_path
+                         << (f->fts_info == FTS_D ? " pre-traversal" :
+                                                    " post-traversal") << endl;
+        continue;
+      };
 
     if (verbose > 2)
       obatched(clog) << "fts traversing " << f->fts_path << endl;
